@@ -8,7 +8,7 @@
   imports = [
     ./global/auto-upgrade.nix
     ./global/docker.nix
-    ./global/local.nix
+    ./global/locale.nix
     ./global/nfs.nix
     ./global/fonts.nix
   ];
