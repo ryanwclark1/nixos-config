@@ -7,9 +7,10 @@
 
 {
   imports = [
-    ../common/global/locale.nix
-    ../common/global/nfs.nix
-    ../common/global/docker.nix
+    # ../common/global/locale.nix
+    # ../common/global/nfs.nix
+    # ../common/global/docker.nix
+    ../common
     ./avahi.nix
     ./bluetooth.nix
     ./desktop.nix
