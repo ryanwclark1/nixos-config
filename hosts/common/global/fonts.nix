@@ -1,3 +1,4 @@
+# ./host/common/global/fonts.nix
 {
   pkgs,
   ...
