@@ -1,7 +1,7 @@
 # ./host/common/global/auto-upgrade.nix
 {
   config,
-  inputs,
+  # inputs,
   ...
 }:
 
@@ -18,6 +18,6 @@ in
     flags = [
       "--refresh"
     ];
-    flake = "git@github.com:ryanwclark1/nix-config.git?ref=release-${hostName}";
+    flake = "git@github.com:ryanwclark1/nixos-config.git?ref=release-${hostName}";
   };
 }
