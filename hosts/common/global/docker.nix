@@ -1,4 +1,5 @@
 # ./host/common/global/docker.nix
+
 {
   virtualisation.docker = {
     enable = true;

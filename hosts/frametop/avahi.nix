@@ -1,4 +1,5 @@
 # ./host/frametop/avahi.nix
+
 {
   services.avahi = {
     openFirewall = true;

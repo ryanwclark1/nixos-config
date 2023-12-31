@@ -34,14 +34,6 @@
 
   boot.kernelModules = [ "nfs" "nfs4" ];
 
-  services.xserver.enable = true;
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
-  services.xserver = {
-    layout = "us";
-    xkbVariant = "";
-  };
-
   environment.systemPackages = with pkgs; [
     neovim
     curl
@@ -49,9 +41,6 @@
     git
     nfs-utils
   ];
-
-
-  programs.dconf.enable = true;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -61,7 +50,6 @@
   services = {
     dbus.packages = [ pkgs.gcr ];
     geoclue2.enable = true;
-    # printing.enable = true;
     gnome.gnome-keyring.enable = true; # libsecret
     # udev.packages = with pkgs; [ gnome.gnome-settings-daemon ];
     printing = {

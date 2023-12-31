@@ -11,7 +11,6 @@
   imports = [
     ./programs
     ./shell
-    # ./users/administrator
   ];
 
   home = {

@@ -1,4 +1,5 @@
 # ./host/woody/avahi.nix
+
 {
   services.avahi = {
     openFirewall = true;

@@ -61,10 +61,8 @@
 
     # KDE/Plasma: support spellchecking
     hunspell
-    hunspellDicts.ru_RU
     hunspellDicts.en_US
     aspell
-    aspellDicts.ru
     aspellDicts.en
     aspellDicts.en-computers
     aspellDicts.en-science

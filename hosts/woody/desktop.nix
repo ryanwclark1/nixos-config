@@ -7,8 +7,24 @@
 }:
 
 {
-  # imports = [
-  #  ./gnome
-  # ];
+  imports = [
+   ./gnome
+  ];
+
+  services.xserver = {
+    enable = true;
+    layout = "us";
+    xkbVariant = "";
+
+    desktopManager.gnome = {
+      enable = true;
+    };
+
+    displayManager.gdm = {
+      enable = true;
+      autoSuspend = false;
+    };
+
+  };
 
 }
