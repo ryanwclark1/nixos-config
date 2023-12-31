@@ -31,6 +31,13 @@
 
   boot.kernelModules = [ "nfs" "nfs4" ];
 
+  services.xserver.enable = true;
+  services.xserver.displayManager.gdm.enable = true;
+  services.xserver.desktopManager.gnome.enable = true;
+  services.xserver = {
+    layout = "us";
+    xkbVariant = "";
+  };
 
   environment.systemPackages = with pkgs; [
     neovim
