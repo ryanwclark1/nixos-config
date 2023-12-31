@@ -16,12 +16,15 @@
     ./hardware-configuration.nix
     ./networking.nix
     ./pipewire.nix
-    ./power-management.nix
+    # ./power-management.nix
     ./ssh.nix
     ./user.nix
   ];
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  # avoid error
+  hardware.pulseaudio.enable = false;
 
   # Bootloader
   boot.loader = {
@@ -48,7 +51,7 @@
   ];
 
 
-  # programs.dconf.enable = true;
+  programs.dconf.enable = true;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;

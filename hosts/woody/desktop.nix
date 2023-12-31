@@ -7,9 +7,8 @@
 }:
 
 {
-  imports = [
-    ./gnome
-  ];
-
+  # imports = [
+  #  ./gnome
+  # ];
 
 }
