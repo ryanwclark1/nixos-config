@@ -8,6 +8,7 @@
     alejandra
     deadnix
     statix
+    carapace
   ];
 
   programs.direnv = {

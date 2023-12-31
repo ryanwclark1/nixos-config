@@ -21,8 +21,6 @@
       cmd_duration = {
         min_time = 5000;
       };
-      # Default w/o Nerd Fonts https://github.com/starship/starship/pull/3544
-
     };
   };
 }
