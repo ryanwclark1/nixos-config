@@ -111,6 +111,7 @@
     kate
     vlc
     handbrake
+    blender
     # neovim
     # curl
     scrot
