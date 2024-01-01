@@ -120,6 +120,7 @@
     megatools
 
     transmission
+    f1viewer
   ];
 
   programs = {
