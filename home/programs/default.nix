@@ -35,7 +35,7 @@
     ./steam.nix
     ./syncthing.nix
     ./tmux.nix
-    ./transmission.nix
+    # ./transmission.nix
     ./vscode.nix
     ./xdg.nix
   ];
