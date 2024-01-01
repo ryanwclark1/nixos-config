@@ -23,7 +23,7 @@
     ./lazygit.nix
     ./media.nix
     ./monitor.nix
-    ./neovim.nix
+    # ./neovim.nix
     ./nnn.nix
     ./obs.nix
     ./office.nix
