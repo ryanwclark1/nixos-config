@@ -40,7 +40,7 @@
       settings = {
         "org/gnome/desktop/interface".color-scheme = "prefer-dark";
         "org/gnome/desktop/wm/preferences".button-layout = "appmenu:minimize,maximize,close";
-        "org/gnome/shell".favorite-apps = ['org.gnome.Nautilus.desktop', 'code.desktop', 'chromium-browser.desktop', 'org.kde.konsole.desktop'];
+        "org/gnome/shell".favorite-apps = ["org.gnome.Nautilus.desktop" "code.desktop" "chromium-browser.desktop" "org.kde.konsole.desktop"];
         "org/gnome/shell".disable-user-extensions = false;
       };
       # settings.enable-extensions = [
