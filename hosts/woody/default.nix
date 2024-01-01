@@ -33,7 +33,7 @@
   boot.kernelModules = [ "nfs" "nfs4" ];
 
   environment.systemPackages = with pkgs; [
-    neovim
+    vim
     curl
     wget
     git

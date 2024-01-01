@@ -15,16 +15,26 @@ with lib; {
       git-workspace # workspace management
       codeberg-cli
     ];
-
     programs.git = {
       enable = true;
-
-    userName = "Ryan Clark";
-    userEmail = "ryanc@accentservices.com";
-          ignores = [
+      userName = "Ryan Clark";
+      userEmail = "ryanc@accentservices.com";
+      ignores = [
         ".env"
         ".vscode"
       ];
+      delta = {
+        enable = true;
+        options = {
+          line-numbers = "true";
+          side-by-side = "true";
+          decorations = "true";
+        };
+      };
+      diff-so-fancy.enable = true;
+      lfs = {
+        enable = true;
+      };
       extraConfig = {
         init = {
           defaultBranch = "main";
@@ -49,23 +59,7 @@ with lib; {
           };
         };
       };
-      # signing = {
-      #   key = "39FEBB6A870385E3";
-      #   signByDefault = true;
-      # };
-
-      diff-so-fancy.enable = true;
-      delta.enable = true;
-      lfs.enable = true;
-      aliases = {
-        lg = "log --pretty=\"%C(green bold)%h%C(reset) %C(blue)%d%C(reset) %C(italic)%s%C(reset) %C(Cyan)(%ar)%C(reset)\" --graph";
-        gsi = "stash save --keep-index";
-        new = "lg main..HEAD";
-        missing = "lg HEAD..main";
-      };
     };
-
-
     programs.gh = {
       enable = true;
       gitCredentialHelper.enable = false;
