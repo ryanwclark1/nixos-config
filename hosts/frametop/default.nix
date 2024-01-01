@@ -51,6 +51,8 @@
 
   security.polkit.enable = true;
 
+  services.xserver.libinput.enable = true;
+
   services = {
     dbus.packages = [ pkgs.gcr ];
     geoclue2.enable = true;
