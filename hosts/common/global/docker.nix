@@ -1,17 +1,19 @@
 # ./host/common/global/docker.nix
 
 {
-  virtualisation.docker = {
-    enable = true;
-    listenOptions = ["/run/docker.sock"];
-    enableOnBoot = true;
-    # enableNvidia = true;
-    logDriver = "journald";
-
-    autoPrune = {
+  virtualisation = {
+    docker = {
       enable = true;
-      flags = ["--all"];
-      dates = "weekly";
+      listenOptions = ["/run/docker.sock"];
+      enableOnBoot = true;
+      # enableNvidia = true;
+      logDriver = "journald";
+
+      autoPrune = {
+        enable = true;
+        flags = ["--all"];
+        dates = "weekly";
+      };
     };
   };
 }

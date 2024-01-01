@@ -72,7 +72,7 @@
     insomnia
 
     # cloud native
-    docker
+    # docker
     kubectl
     kubernetes-helm
     minikube
