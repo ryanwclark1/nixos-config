@@ -1,4 +1,4 @@
-# ./host/common/global/docker.nix
+# ./host/common/global/virtualisation.nix
 
 {
   # Virtualisation configuration

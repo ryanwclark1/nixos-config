@@ -19,7 +19,6 @@
     ./pipewire.nix
     ./power-management.nix
     ./ssh.nix
-    ./user.nix
   ];
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
