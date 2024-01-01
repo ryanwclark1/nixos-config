@@ -121,8 +121,10 @@
     # element-desktop
     megatools
 
+
     transmission
     f1viewer
+    tickrs
   ];
 
   programs = {
