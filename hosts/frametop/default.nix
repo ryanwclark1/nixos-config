@@ -7,11 +7,7 @@
 
 {
   imports = [
-    # ../common/global/locale.nix
-    # ../common/global/nfs.nix
-    # ../common/global/docker.nix
     ../common
-    ./avahi.nix
     ./bluetooth.nix
     ./desktop.nix
     ./hardware-configuration.nix
@@ -60,11 +56,6 @@
     geoclue2.enable = true;
     gnome.gnome-keyring.enable = true; # libsecret
     # udev.packages = with pkgs; [ gnome.gnome-settings-daemon ];
-    printing = {
-      enable = true;
-      browsing = true;
-      drivers = with pkgs; [hplip];
-    };
   };
 
   system.stateVersion = "23.11";

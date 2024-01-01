@@ -14,7 +14,6 @@
     ./hardware-configuration.nix
     ./networking.nix
     ./pipewire.nix
-    # ./power-management.nix
     ./ssh.nix
     ./user.nix
   ];
@@ -50,11 +49,6 @@
     geoclue2.enable = true;
     gnome.gnome-keyring.enable = true; # libsecret
     # udev.packages = with pkgs; [ gnome.gnome-settings-daemon ];
-    printing = {
-      enable = true;
-      browsing = true;
-      drivers = with pkgs; [hplip];
-    };
   };
 
   system.stateVersion = "23.11";
