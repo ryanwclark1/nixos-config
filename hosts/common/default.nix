@@ -11,5 +11,6 @@
     ./global/locale.nix
     ./global/nfs.nix
     ./global/fonts.nix
+    ./global/virtualisation.nix
   ];
 }
