@@ -1,14 +1,24 @@
- {
-  config,
+{
+  lib,
   pkgs,
-  home-manager,
+  config,
   ...
 }:
+with lib; {
+  options.transmission.enable = mkEnableOption "transmission settings";
 
-{
-  programs.transmission = {
-    enable = true;
-    settings = {
-    };
+  config = mkIf config.transmission.enable {
+    home.packages = with pkgs; [
+      transmission
+    ];
   };
 }
+
+
+# {
+#  programs.transmission = {
+#    enable = true;
+#    settings = {
+#    };
+#  };
+#}

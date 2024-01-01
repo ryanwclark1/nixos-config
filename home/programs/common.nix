@@ -118,6 +118,7 @@
     # element-desktop
     megatools
 
+    transmission
   ];
 
   programs = {
