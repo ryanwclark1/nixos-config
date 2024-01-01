@@ -110,6 +110,7 @@
 
     kate
     vlc
+    handbrake
     # neovim
     # curl
     scrot
