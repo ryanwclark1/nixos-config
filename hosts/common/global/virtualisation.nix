@@ -1,4 +1,9 @@
 # ./host/common/global/virtualisation.nix
+{
+  pkgs,
+  ...
+}:
+
 
 {
   # Virtualisation configuration
@@ -9,6 +14,7 @@
       # Qemu settings
       qemu.ovmf = {
         enable = true;
+        # Issue with ovmf
         packages = [ pkgs.OVMFFull.fd ];
       };
       # Virtual TPM
