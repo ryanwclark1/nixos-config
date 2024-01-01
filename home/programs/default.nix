@@ -8,9 +8,9 @@
 
 {
   imports = [
+    ./common.nix
     ./browsers.nix
     # ./chromium.nix
-    ./common.nix
     ./fzf.nix
     # ./gh.nix
     ./git.nix

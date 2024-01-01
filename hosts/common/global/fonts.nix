@@ -14,7 +14,13 @@
     fira-code-symbols
     mplus-outline-fonts.githubRelease
     dina-font
+    hack-font
     proggyfonts
-    (nerdfonts.override { fonts = [ "FiraCode" "DroidSansMono" "JetBrainsMono" ]; })
+    powerline-fonts
+    powerline-symbols
+    jetbrains-mono
+    fira-code
+    font-awesome
+    nerdfonts
   ];
 }
