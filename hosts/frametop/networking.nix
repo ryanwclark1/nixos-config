@@ -3,8 +3,9 @@
 {
   lib,
   ...
-}
+}:
 
+# TODO: update wireguard config and use mkDefault to override
 {
   networking = lib.mkDefault {
     hostName = "frametop";
