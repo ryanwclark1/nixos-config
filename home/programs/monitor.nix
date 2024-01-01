@@ -38,7 +38,7 @@ with lib; {
       };
     };
 
-    # programs.htop.enable = true;
+    programs.htop.enable = true;
 
     home.packages = with pkgs; [
       procs

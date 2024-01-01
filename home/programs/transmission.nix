@@ -6,9 +6,9 @@
 }:
 
 {
-#  programs.transmission = {
-#    enable = true;
-#    settings = {
-#    };
-#  };
+  programs.transmission = {
+    enable = true;
+    settings = {
+    };
+  };
 }
