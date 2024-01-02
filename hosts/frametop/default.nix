@@ -50,8 +50,12 @@
 
   security.polkit.enable = true;
 
-  # Touch pad
-  services.xserver.libinput.enable = true;
+  # Touchpad
+  services.xserver.libinput = {
+    enable = true;
+    # tapping = true;
+    # naturalScroll = true;
+  };
 
   services = {
     dbus.packages = [ pkgs.gcr ];

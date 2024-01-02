@@ -1,4 +1,7 @@
 # ./host/common/global/docker.nix
+{
+  ...
+}:
 
 {
   virtualisation = {

@@ -1,4 +1,7 @@
 # ./host/common/global/locale.nix
+{
+  ...
+}:
 
 {
   time.timeZone = "America/Chicago";

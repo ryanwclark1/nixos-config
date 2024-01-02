@@ -1,7 +1,7 @@
 # ./host/common/global/auto-upgrade.nix
 {
   config,
-  # inputs,
+  inputs,
   ...
 }:
 

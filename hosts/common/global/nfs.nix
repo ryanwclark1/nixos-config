@@ -1,6 +1,5 @@
 # ./host/common/global/nfs.nix
 {
-  config,
   pkgs,
   ...
 }:
