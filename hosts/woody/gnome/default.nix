@@ -101,6 +101,17 @@
           close = ["<super>q" "<alt>f4"];
           toggle-fullscreen = ["<super>f"];
         };
+        "org/gnome/mutter" = {
+          workspaces-only-on-primary = false;
+          center-new-windows = true;
+          edge-tiling = false;                          # Tiling
+        };
+        "org/gnome/mutter/keybindings" = {
+          #toggle-tiled-left = ["<super>left"];         # Floating
+          #toggle-tiled-right = ["<super>right"];
+          toggle-tiled-left = ["@as []"];               # Tiling
+          toggle-tiled-right = ["@as []"];
+        };
         "org/gnome/shell/extensions/dash-to-panel" = {
           intellihide = true;
           panel-positions = ''{"0":"BOTTOM"}'';
