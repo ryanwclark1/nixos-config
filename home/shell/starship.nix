@@ -11,8 +11,10 @@
     enable = true;
     # Configuration written to ~/.config/starship.toml
     settings = {
-      format =  "[](color_a1)\$os\$username\$localip\[](bg:color_a2 fg:color_a1)\$directory\[](fg:color_a2 bg:color_a3)\$git_branch\$git_status\[](fg:color_a3 bg:color_a4)\$bun\$c\$cmake\$dart\$rust\$golang\$nodejs\$php\$java\$kotlin\$haskell\$python\$swift\$zig\$kubernetes[](fg:color_a4 bg:color_bg3)\$docker_context\[ ](fg:color_bg3)\$character";
-      add_newline = false;
+      format =  "[](color_a1)\$os\$username\$hostname\$localip\[](bg:color_a2 fg:color_a1)\$directory\[](fg:color_a2 bg:color_a3)\$git_branch\$git_status\[](fg:color_a3 bg:color_a4)\$bun\$c\$cmake\$dart\$golang\$haskell\$java\$kotlin\$kubernetes\$lua\$nodejs\$php\$python\$rust\$swift\$zig[](fg:color_a4 bg:color_bg3)\$docker_context\[](fg:color_bg3)\$character";
+      add_newline = true;
+      scan_timeout = 30;
+      command_timeout = 500;
       palette = "gruvbox_dark";
       palettes.gruvbox_dark ={
         color_fg0 = "#fbf1c7";
@@ -71,15 +73,25 @@
         disabled = false;
         ssh_only = true;
         style = "bg:color_a1 fg:color_fg0";
-        format = "@[ $localip4 ]($style)";
+        format = "[ $localipv4 ]($style)";
+      };
+
+      hostname = {
+        disabled = false;
+        ssh_only = true;
+        ssh_symbol = "";
+        style = "bg:color_a1 fg:color_fg0";
+        format = "[$ssh_symbol]($style)";
       };
 
       directory = {
         style = "fg:color_fg0 bg:color_a2";
         format = "[ $path ]($style)";
-        truncation_length = 3;
+        truncation_length = 8;
         truncate_to_repo = true;
         truncation_symbol = "…/";
+        read_only = "";
+        home_symbol = "~";
         substitutions = {
           "Documents" = "󰈙 ";
           "Downloads" = " ";
@@ -104,12 +116,6 @@
       git_status = {
         style = "bg:color_a3";
         format = "[[($all_status$ahead_behind )](fg:color_fg0 bg:color_a3)]($style)";
-      };
-
-      nodejs = {
-        symbol = "";
-        style = "bg:color_a4";
-        format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_a4)]($style)";
       };
 
       bun = {
@@ -137,20 +143,14 @@
         disabled = true;
       };
 
-      rust = {
-        symbol = "";
-        style = "bg:color_a4";
-        format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_a4)]($style)";
-      };
-
       golang = {
         symbol = "";
         style = "bg:color_a4";
         format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_a4)]($style)";
       };
 
-      php = {
-        symbol = "";
+      haskell = {
+        symbol = "";
         style = "bg:color_a4";
         format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_a4)]($style)";
       };
@@ -173,14 +173,34 @@
         format = "[[ $symbol$context( \$namespace\ ) ](fg:color_fg0 bg:color_a4)]($style)";
       };
 
-      haskell = {
-        symbol = "";
+      lua = {
+        symbol = "";
+        style = "bg:color_a4";
+        format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_a4)]";
+        disabled = true;
+      };
+
+      nodejs = {
+        symbol = "";
+        style = "bg:color_a4";
+        format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_a4)]($style)";
+      };
+
+      php = {
+        symbol = "";
         style = "bg:color_a4";
         format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_a4)]($style)";
       };
 
       python = {
         symbol = "";
+        style = "bg:color_a4";
+        version_format = "$raw";
+        format = "[ $symbol( $version )(\($virtualenv\) )]($style)";
+      };
+
+      rust = {
+        symbol = "";
         style = "bg:color_a4";
         format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_a4)]($style)";
       };
@@ -218,7 +238,7 @@
       };
 
       cmd_duration = {
-        min_time = 10000;
+        min_time = 2000;
       };
     };
   };
