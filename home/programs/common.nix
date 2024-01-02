@@ -9,7 +9,6 @@
 {
   home.packages = with pkgs; [
 
-    freshfetch
     neofetch
 
     # archives
@@ -72,7 +71,6 @@
     insomnia
 
     # cloud native
-    # docker
     kubectl
     kubernetes-helm
     minikube
@@ -81,6 +79,8 @@
     nodePackages.npm
     nodePackages.pnpm
     yarn
+
+    python311
 
     # db related
     dbeaver
@@ -113,14 +113,12 @@
     handbrake
     blender
     # neovim
-    # curl
     scrot
     nnn # Remove nnn from common
     firefox
     # discord
     # element-desktop
     megatools
-
 
     transmission
     f1viewer
