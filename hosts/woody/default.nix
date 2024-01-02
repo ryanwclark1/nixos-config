@@ -7,14 +7,14 @@
 
 {
   imports = [
-    ../common
-    ./avahi.nix
+    ./hardware-configuration.nix
+    ./gpu.nix
     ./bluetooth.nix
     ./desktop.nix
-    ./hardware-configuration.nix
     ./networking.nix
     ./ssh.nix
     ./user.nix
+    ../common
   ];
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
