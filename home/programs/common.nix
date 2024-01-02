@@ -80,7 +80,7 @@
     nodePackages.pnpm
     yarn
 
-    python311
+    python3
 
     # db related
     dbeaver
@@ -134,7 +134,7 @@
     };
 
     btop.enable = true;  # replacement of htop/nmon
-    # exa.enable = true;   # A modern replacement for ‘ls’
+    eza.enable = true;   # A modern replacement for ‘ls’
     jq.enable = true;    # A lightweight and flexible command-line JSON processor
     ssh.enable = true;
     aria2.enable = true;
@@ -144,7 +144,7 @@
       enableZshIntegration = true;
       defaultCommand = "rg --files --hidden";
       changeDirWidgetOptions = [
-        "--preview 'exa --icons --git --color always -T -L 3 {} | head -200'"
+        "--preview 'eza --icons --git --color always -T -L 3 {} | head -200'"
         "--exact"
       ];
     };
@@ -156,6 +156,7 @@
     enableCompletion = true;
     # TODO add your cusotm bashrc here
     bashrcExtra = ''
+      neofetch
       export PATH="$PATH:$HOME/bin:$HOME/.local/bin:$HOME/go/bin"
     '';
 
