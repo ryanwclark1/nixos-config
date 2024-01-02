@@ -19,7 +19,6 @@
     ./grpc.nix
     ./htop.nix
     ./insomnia.nix
-    ./jq.nix
     ./lazygit.nix
     ./media.nix
     ./monitor.nix

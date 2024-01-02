@@ -105,6 +105,7 @@
     usbutils # lsusb
     lm_sensors # sensors
     smartmontools # smartctl
+    psensor # GUI for lm_sensors
 
     kate
     vlc
