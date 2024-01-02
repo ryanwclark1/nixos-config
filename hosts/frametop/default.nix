@@ -12,7 +12,6 @@
     ./desktop.nix
     ./hardware-configuration.nix
     ./networking.nix
-    ./pipewire.nix
     ./power-management.nix
     ./ssh.nix
   ];

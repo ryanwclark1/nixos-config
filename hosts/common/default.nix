@@ -10,6 +10,7 @@
     ./global/docker.nix
     ./global/locale.nix
     ./global/nfs.nix
+    ./global/pipewire.nix
     ./global/printing.nix
     ./global/fonts.nix
     ./global/users.nix

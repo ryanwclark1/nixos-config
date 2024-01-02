@@ -13,7 +13,6 @@
     ./desktop.nix
     ./hardware-configuration.nix
     ./networking.nix
-    ./pipewire.nix
     ./ssh.nix
     ./user.nix
   ];
