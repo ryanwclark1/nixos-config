@@ -131,6 +131,7 @@
       ms-vscode.cmake-tools
       ms-vscode.cpptools
       ms-vscode.hexeditor
+      ms-vscode.makefile-tools
       golang.go
       charliermarsh.ruff
       ms-azuretools.vscode-docker
