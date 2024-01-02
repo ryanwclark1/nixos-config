@@ -13,7 +13,6 @@
     ./desktop.nix
     ./networking.nix
     ./ssh.nix
-    ./user.nix
     ../common
   ];
 
