@@ -14,6 +14,7 @@ with lib; {
       git-bug # bug reporting right inside the repo
       git-workspace # workspace management
       codeberg-cli
+      gh
     ];
     programs.git = {
       enable = true;
