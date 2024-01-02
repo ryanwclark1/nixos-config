@@ -1,7 +1,6 @@
  {
   config,
   pkgs,
-  home-manager,
   ...
 }:
 
@@ -10,6 +9,39 @@
   # environment.sessionVariables.NIXOS_OZONE_WL = "1";
   programs.vscode = {
     enable = true;
+    package = pkgs.vscode;
+
+    extensions = with pkgs.vscode-extensions; [
+      github.copilot-chat
+      github.copilot
+      github.codespaces
+      github.github-vscode-theme
+      github.vscode-github-actions
+      github.vscode-pull-request-github
+      ms-kubernetes-tools.vscode-kubernetes-tools
+      ms-python.python
+      ms-python.vscode-pylance
+      ms-vscode-remote.remote-ssh
+      ms-vscode-remote.remote-containers
+      ms-vscode.anycode
+      ms-vscode.cmake-tools
+      ms-vscode.cpptools
+      ms-vscode.hexeditor
+      ms-vscode.makefile-tools
+      golang.go
+      charliermarsh.ruff
+      ms-azuretools.vscode-docker
+      bradlc.vscode-tailwindcss
+      bungcip.better-toml
+      jnoortheen.nix-ide
+      jock.svg
+      mikestead.dotenv
+      redhat.vscode-xml
+      redhat.vscode-yaml
+      rust-lang.rust-analyzer
+      vscode-icons-team.vscode-icons
+    ];
+
     userSettings = {
       "editor.fontSize" = 12;
       "editor.fontFamily" = "JetBrainsMono Nerd Font";
@@ -114,37 +146,6 @@
         "yaml" = true;
       };
     };
-
-    extensions = with pkgs.vscode-extensions; [
-      github.copilot-chat
-      github.copilot
-      github.codespaces
-      github.github-vscode-theme
-      github.vscode-github-actions
-      github.vscode-pull-request-github
-      ms-kubernetes-tools.vscode-kubernetes-tools
-      ms-python.python
-      ms-python.vscode-pylance
-      ms-vscode-remote.remote-ssh
-      ms-vscode-remote.remote-containers
-      ms-vscode.anycode
-      ms-vscode.cmake-tools
-      ms-vscode.cpptools
-      ms-vscode.hexeditor
-      ms-vscode.makefile-tools
-      golang.go
-      charliermarsh.ruff
-      ms-azuretools.vscode-docker
-      bradlc.vscode-tailwindcss
-      bungcip.better-toml
-      jnoortheen.nix-ide
-      jock.svg
-      mikestead.dotenv
-      redhat.vscode-xml
-      redhat.vscode-yaml
-      rust-lang.rust-analyzer
-      vscode-icons-team.vscode-icons
-    ];
 
   };
 }

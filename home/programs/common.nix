@@ -1,6 +1,4 @@
 {
-  inputs,
-  system,
   pkgs,
   config,
   ...
@@ -172,7 +170,9 @@
       k = "kubectl";
       urldecode = "python3 -c 'import sys, urllib.parse as ul; print(ul.unquote_plus(sys.stdin.read()))'";
       urlencode = "python3 -c 'import sys, urllib.parse as ul; print(ul.quote_plus(sys.stdin.read()))'";
-      ls = "eza -lag --icons --header --group-directories-first";
+
+      #  Use `lib.mkForce value` or `lib.mkDefault value` to change the priority on any of these definitions.
+      # ls = "eza -lag --icons --header --group-directories-first";
       lr = "eza -lTg --icons --header --group-directories-first";
 
     };
@@ -180,7 +180,6 @@
 
   services = {
     syncthing.enable = true;
-
     # auto mount usb drives
     udiskie.enable = true;
   };
