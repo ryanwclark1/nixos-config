@@ -51,7 +51,6 @@
     dbus.packages = [ pkgs.gcr ];
     geoclue2.enable = true;
     gnome.gnome-keyring.enable = true; # libsecret
-    # udev.packages = with pkgs; [ gnome.gnome-settings-daemon ];
   };
 
   system.stateVersion = "23.11";

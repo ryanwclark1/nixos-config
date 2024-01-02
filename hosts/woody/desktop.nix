@@ -11,20 +11,24 @@
    ./gnome
   ];
 
-  services.xserver = {
-    enable = true;
-    layout = "us";
-    xkbVariant = "";
-
-    desktopManager.gnome = {
+  services = {
+    xserver = {
       enable = true;
-    };
+      layout = "us";
+      xkbVariant = "";
 
-    displayManager.gdm = {
-      enable = true;
-      autoSuspend = false;
-    };
+      desktopManager.gnome = {
+        enable = true;
+      };
 
+      displayManager.gdm = {
+        enable = true;
+        autoSuspend = false;
+      };
+
+    };
+    udev.packages = with pkgs; [
+      gnome.gnome-settings-daemon
+    ];
   };
-
 }
