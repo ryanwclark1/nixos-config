@@ -50,6 +50,7 @@
 
   security.polkit.enable = true;
 
+  # Touch pad
   services.xserver.libinput.enable = true;
 
   services = {

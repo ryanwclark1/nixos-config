@@ -24,4 +24,8 @@
       };
     };
   };
+
+  boot.kernelParams = [
+    "intel_pstate=disable"
+  ];
 }
