@@ -71,7 +71,7 @@
         disabled = false;
         ssh_only = true;
         style = "bg:color_a1 fg:color_fg0";
-        format = "[ $local_ip ]($style)";
+        format = "@[ $localip4 ]($style)";
       };
 
       directory = {

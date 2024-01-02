@@ -142,7 +142,6 @@
     btop.enable = true;  # replacement of htop/nmon
 
     jq.enable = true;    # A lightweight and flexible command-line JSON processor
-    ssh.enable = true;
     aria2.enable = true;
 
     skim = {
