@@ -23,7 +23,6 @@
       ms-python.vscode-pylance
       ms-vscode-remote.remote-ssh
       ms-vscode-remote.remote-containers
-      ms-vscode.anycode
       ms-vscode.cmake-tools
       ms-vscode.cpptools
       ms-vscode.hexeditor
@@ -32,7 +31,6 @@
       charliermarsh.ruff
       ms-azuretools.vscode-docker
       bradlc.vscode-tailwindcss
-      bungcip.better-toml
       jnoortheen.nix-ide
       jock.svg
       mikestead.dotenv
