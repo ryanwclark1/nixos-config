@@ -1,6 +1,5 @@
 # ./host/woody/default.nix
 {
-  config,
   pkgs,
   ...
 }:
@@ -22,12 +21,18 @@
   hardware.pulseaudio.enable = false;
 
   # Bootloader
-  boot.loader = {
-    systemd-boot.enable = true;
-    efi.canTouchEfiVariables = true;
+  boot = {
+    loader = {
+      systemd-boot = {
+        enable = true;
+        configurationLimit = 10;
+      };
+      efi.canTouchEfiVariables = true;
+      timeout = 1;
+    };
+    kernelModules = [ "nfs" "nfs4" ];
+    initrd.kernelModules = [ "amdgpu" ];
   };
-
-  boot.kernelModules = [ "nfs" "nfs4" ];
 
   environment.systemPackages = with pkgs; [
     vim
