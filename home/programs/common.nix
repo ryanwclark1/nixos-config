@@ -78,7 +78,18 @@
     nodePackages.pnpm
     yarn
 
-    python3
+    poetry
+    python311
+    python311Packages.poetry-core
+    python311Packages.pdm-backend
+    python311Packages.pipx
+    python311Packages.pip
+
+    libgcc
+    gcc
+
+    # Need libpq but can't find
+    postgresql
 
     # db related
     dbeaver
