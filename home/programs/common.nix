@@ -133,8 +133,15 @@
       extraConfig = "mouse on";
     };
 
+    eza = {
+      enable = true;
+      icons = true;
+      git = true;
+      enableAliases = true;
+    };
+
     btop.enable = true;  # replacement of htop/nmon
-    eza.enable = true;   # A modern replacement for ‘ls’
+
     jq.enable = true;    # A lightweight and flexible command-line JSON processor
     ssh.enable = true;
     aria2.enable = true;
@@ -160,11 +167,14 @@
       export PATH="$PATH:$HOME/bin:$HOME/.local/bin:$HOME/go/bin"
     '';
 
-    # set some aliases, feel free to add more or remove some
+    # set some aliases
     shellAliases = {
       k = "kubectl";
       urldecode = "python3 -c 'import sys, urllib.parse as ul; print(ul.unquote_plus(sys.stdin.read()))'";
       urlencode = "python3 -c 'import sys, urllib.parse as ul; print(ul.quote_plus(sys.stdin.read()))'";
+      ls = "eza -lag --icons --header --group-directories-first";
+      lr = "eza -lTg --icons --header --group-directories-first";
+
     };
   };
 
