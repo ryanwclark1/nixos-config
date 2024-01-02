@@ -77,6 +77,30 @@
           mouse-button-modifier = "<super>";
           button-layout = "appmenu:minimize,maximize,close";
         };
+        "org/gnome/desktop/wm/keybindings" = {
+          # maximize = ["<super>up"];                   # Floating
+          # unmaximize = ["<super>down"];
+          maximize = ["@as []"];                        # Tiling
+          unmaximize = ["@as []"];
+          switch-to-workspace-left = ["<alt>left"];
+          switch-to-workspace-right = ["<alt>right"];
+          switch-to-workspace-1 = ["<alt>1"];
+          switch-to-workspace-2 = ["<alt>2"];
+          switch-to-workspace-3 = ["<alt>3"];
+          switch-to-workspace-4 = ["<alt>4"];
+          switch-to-workspace-5 = ["<alt>5"];
+          move-to-workspace-left = ["<shift><alt>left"];
+          move-to-workspace-right = ["<shift><alt>right"];
+          move-to-workspace-1 = ["<shift><alt>1"];
+          move-to-workspace-2 = ["<shift><alt>2"];
+          move-to-workspace-3 = ["<shift><alt>3"];
+          move-to-workspace-4 = ["<shift><alt>4"];
+          move-to-workspace-5 = ["<shift><alt>5"];
+          move-to-monitor-left = ["<super><alt>left"];
+          move-to-monitor-right = ["<super><alt>right"];
+          close = ["<super>q" "<alt>f4"];
+          toggle-fullscreen = ["<super>f"];
+        };
         "org/gnome/shell/extensions/dash-to-panel" = {
           intellihide = true;
           panel-positions = ''{"0":"BOTTOM"}'';
