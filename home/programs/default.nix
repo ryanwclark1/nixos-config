@@ -9,14 +9,16 @@
   imports = [
     ./alias.nix
     ./carapace.nix
+    ./cliphist.nix
     ./colors.nix
     ./common.nix
     ./compression.nix
     ./chromium.nix
+    ./deno.nix
+    ./direnv.nix
     ./firefox.nix
     ./filesearch.nix
     ./fzf.nix
-    # ./gh.nix
     ./git.nix
     ./gitui.nix
     ./global-fonts.nix
@@ -47,7 +49,10 @@
   alias.enable = true;
   carapace.enable = true;
   chrome.enable = true;
+  cliphist.enable = true;
   compression.enable = true;
+  deno.enable = true;
+  direnv.enable = true;
   firefox.enable = true;
   filesearch.enable = true;
   fzf.enable = true;
