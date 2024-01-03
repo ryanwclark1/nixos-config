@@ -16,6 +16,7 @@
     # ./gh.nix
     ./git.nix
     ./gitui.nix
+    ./global-fonts.nix
     ./go.nix
     ./grpc.nix
     ./htop.nix

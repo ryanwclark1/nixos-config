@@ -23,19 +23,19 @@ with lib; {
       profiles = {
         default = {
           name = "default";
-          extensions = with pkgs.nur.repos.rycee.firefox-addons; [
-            adnauseam
-            bitwarden
-            clearurls
-            enhanced-github
+          # extensions = with pkgs.nur.repos.rycee.firefox-addons; [
+          #   adnauseam
+          #   bitwarden
+          #   clearurls
+          #   enhanced-github
 
-            switchyomega
-            i-dont-care-about-cookies
-            # snowflake
-            sponsorblock
-            stylus
-            tabliss
-          ];
+          #   switchyomega
+          #   i-dont-care-about-cookies
+          #   # snowflake
+          #   sponsorblock
+          #   stylus
+          #   tabliss
+          # ];
 
           bookmarks = [
             {
