@@ -35,11 +35,13 @@
     home-manager,
     nixos-hardware,
     ...
-    }: {
+    }: let
+      system = "x86_64-linux";
+    in {
 
     nixosConfigurations = {
       frametop = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
+        inherit system;
         modules = [
           ./hosts/frametop
           nixos-hardware.nixosModules.framework-12th-gen-intel
@@ -53,7 +55,7 @@
         ];
       };
       woody = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
+        inherit system;
         modules = [
           ./hosts/woody
           home-manager.nixosModules.home-manager

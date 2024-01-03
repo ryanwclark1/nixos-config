@@ -11,11 +11,13 @@ in
     enable = true;
     settings = {
       env.TERM = "xterm-256color";
-      window.opacity = 0.95;
-      window.dynamic_padding = true;
-      window.padding = {
-        x = 5;
-        y = 5;
+      window = {
+        opacity = 0.95;
+        dynamic_padding = true;
+        padding = {
+          x = 5;
+          y = 5;
+        };
       };
       scrolling.history = 10000;
 
