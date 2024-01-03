@@ -73,5 +73,6 @@
   insomnia.enable = true;
   jq.enable = true;
   just.enable = true;
+  lazygit.enable = true;
   skim.enable = true;
 }
