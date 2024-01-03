@@ -54,9 +54,6 @@
     # productivity
     obsidian
 
-    # IDE
-    insomnia
-
     # cloud native
     kubectl
     kubernetes-helm

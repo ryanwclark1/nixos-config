@@ -8,6 +8,7 @@
 {
   imports = [
     ./alias.nix
+    ./broot.nix
     ./carapace.nix
     ./cliphist.nix
     ./colors.nix
@@ -48,6 +49,7 @@
     ./xdg.nix
   ];
   alias.enable = true;
+  broot.enable = true;
   carapace.enable = true;
   chrome.enable = true;
   cliphist.enable = true;
@@ -61,5 +63,7 @@
   gitui.enable = true;
   go.enable = true;
   graphical.enable = true;
+  grpc.enable = true;
+  insomnia.enable = true;
   skim.enable = true;
 }
