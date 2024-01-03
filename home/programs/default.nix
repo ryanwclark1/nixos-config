@@ -7,9 +7,11 @@
 
 {
   imports = [
+    ./colors.nix
     ./common.nix
     ./browsers.nix
     # ./chromium.nix
+    ./firefox.nix
     ./fzf.nix
     # ./gh.nix
     ./git.nix
