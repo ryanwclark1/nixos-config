@@ -106,7 +106,7 @@
     vlc
     handbrake
     blender
-    # neovim
+    neovim
     scrot
     nnn # Remove nnn from common
     # discord
