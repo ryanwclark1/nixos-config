@@ -45,7 +45,7 @@
         "org/gnome/shell" = {
           favorite-apps = [
             "code.desktop"
-            "alacritty.desktop"
+            "Alacritty.desktop"
             "chromium-browser.desktop"
             "firefox.desktop"
             "org.gnome.Nautilus.desktop"
@@ -145,6 +145,7 @@
         };
         "org/gnome/shell/extensions/dash-to-panel" = {
           intellihide = true;
+          intellihide-use-pressure = true;
           panel-positions = ''{"0":"BOTTOM"}'';
           panel-sizes = ''{"0":55}'';
           panel-lengths = ''{"0":40}'';
