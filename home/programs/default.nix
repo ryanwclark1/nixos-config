@@ -7,10 +7,12 @@
 
 {
   imports = [
+    ./alias.nix
     ./colors.nix
     ./common.nix
     ./chromium.nix
     ./firefox.nix
+    ./filesearch.nix
     ./fzf.nix
     # ./gh.nix
     ./git.nix
@@ -39,7 +41,9 @@
     ./vscode.nix
     ./xdg.nix
   ];
-  go.enable = true;
+  alias.enable = true;
+  chrome.enable = true;
   firefox.enable = true;
-  chromium.enable = true;
+  filesearch.enable = true;
+  go.enable = true;
 }
