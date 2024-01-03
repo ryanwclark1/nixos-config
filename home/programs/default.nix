@@ -1,6 +1,5 @@
 {
   inputs,
-  system,
   config,
   pkgs,
   ...
@@ -38,4 +37,6 @@
     ./vscode.nix
     ./xdg.nix
   ];
+  go.enable = true;
+  firefox.enable = true;
 }
