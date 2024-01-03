@@ -14,6 +14,10 @@
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nur = {
+      url = "github:nix-community/NUR";
+      # inputs.nixpkgs.follows = "nixpkgs";
+    };
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
     nnn-plugins = {
       url = "github:jarun/nnn";
@@ -27,20 +31,26 @@
       url = "github:leophys/zsh-plugin-fzf-finder";
       flake = false;
     };
+    catppuccin-fish = {
+      url = "github:catppuccin/fish";
+      flake = false;
+    };
   };
 
-  outputs = inputs @ {
+  outputs = {
     self,
     nixpkgs,
     home-manager,
     nixos-hardware,
     ...
-    }: let
+    } @ inputs: let
       system = "x86_64-linux";
-    in {
+      inherit (nixpkgs) lib;
+    in
+      with inputs; {
 
     nixosConfigurations = {
-      frametop = nixpkgs.lib.nixosSystem {
+      frametop = lib.nixosSystem {
         inherit system;
         modules = [
           ./hosts/frametop
@@ -49,20 +59,34 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.extraSpecialArgs = inputs;
+            home-manager.extraSpecialArgs = {
+              inherit inputs;
+              inherit system;
+            };
             home-manager.users.administrator = import ./home;
           }
         ];
       };
-      woody = nixpkgs.lib.nixosSystem {
+      woody = lib.nixosSystem {
         inherit system;
         modules = [
+          {
+            nixpkgs.overlays = [
+              # inputs.nixneovim.overlays.default
+              inputs.nur.overlay
+              # inputs.neovim-nightly-overlay.overlay
+              (final: prev: {external.snippets-ls = snippets-ls.packages.${prev.system}.snippets-ls;})
+            ];
+          }
           ./hosts/woody
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.extraSpecialArgs = inputs;
+            home-manager.extraSpecialArgs = {
+              inherit inputs;
+              inherit system;
+            };
             home-manager.users.administrator = import ./home;
           }
         ];

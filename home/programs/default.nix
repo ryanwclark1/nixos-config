@@ -110,7 +110,7 @@
   # tmux.enable = true;
 
   bash.enable = true;
-  # fish.enable = true;
+  fish.enable = true;
   # zsh.enable = true;
 
   # helix.enable = true;
