@@ -31,6 +31,7 @@
     ./htop.nix
     ./insomnia.nix
     ./jq.nix
+    ./just.nix
     ./lazygit.nix
     ./media.nix
     ./monitor.nix
@@ -71,5 +72,6 @@
   grpc.enable = true;
   insomnia.enable = true;
   jq.enable = true;
+  just.enable = true;
   skim.enable = true;
 }
