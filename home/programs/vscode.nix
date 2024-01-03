@@ -37,8 +37,19 @@
       redhat.vscode-xml
       redhat.vscode-yaml
       rust-lang.rust-analyzer
-      vscode-icons-team.vscode-icons
+      tamasfe.even-better-toml
+
+      esbenp.prettier-vscode
+      yzhang.markdown-all-in-one
+      donjayamanne.githistory
+
+      pkief.material-icon-theme
+      jdinhlife.gruvbox
+
+      # vscode-icons-team.vscode-icons
     ];
+
+    mutableExtensionsDir = false;
 
     userSettings = {
       "editor.fontSize" = 12;
