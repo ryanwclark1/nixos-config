@@ -34,6 +34,7 @@
     ./pandoc.nix
     ./pdf.nix
     ./protobuf.nix
+    ./skim.nix
     # ./spotify.nix
     ./sql.nix
     ./steam.nix
@@ -49,5 +50,7 @@
   compression.enable = true;
   firefox.enable = true;
   filesearch.enable = true;
+  fzf.enable = true;
   go.enable = true;
+  skim.enable = true;
 }

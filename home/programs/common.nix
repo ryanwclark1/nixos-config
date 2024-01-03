@@ -12,9 +12,7 @@
 
 
     # utils
-    # ripgrep
     yq-go    # https://github.com/mikefarah/yq
-    fzf
     duf
     nfs-utils
     iw
@@ -141,15 +139,7 @@
     jq.enable = true;    # A lightweight and flexible command-line JSON processor
     aria2.enable = true;
 
-    skim = {
-      enable = true;
-      enableZshIntegration = true;
-      defaultCommand = "rg --files --hidden";
-      changeDirWidgetOptions = [
-        "--preview 'eza --icons --git --color always -T -L 3 {} | head -200'"
-        "--exact"
-      ];
-    };
+
   };
 
 
