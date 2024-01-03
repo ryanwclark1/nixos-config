@@ -11,6 +11,7 @@
     ./carapace.nix
     ./colors.nix
     ./common.nix
+    ./compression.nix
     ./chromium.nix
     ./firefox.nix
     ./filesearch.nix
@@ -45,6 +46,7 @@
   alias.enable = true;
   carapace.enable = true;
   chrome.enable = true;
+  compression.enable = true;
   firefox.enable = true;
   filesearch.enable = true;
   go.enable = true;

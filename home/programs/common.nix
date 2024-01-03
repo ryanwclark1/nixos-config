@@ -9,14 +9,7 @@
 
     neofetch
 
-    # archives
-    zip
-    xz
-    unzip
-    p7zip
-    zstd
-    zpaq
-    unrar
+
 
     # utils
     # ripgrep
