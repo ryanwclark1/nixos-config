@@ -9,19 +9,10 @@
 
     neofetch
 
-    # archives
-    zip
-    xz
-    unzip
-    p7zip
-    zstd
-    zpaq
-    unrar
+
 
     # utils
-    ripgrep
     yq-go    # https://github.com/mikefarah/yq
-    fzf
     duf
     nfs-utils
     iw
@@ -29,8 +20,6 @@
     netcat
     tree
     mc
-    imagemagick
-    inkscape
     acpica-tools
 
     # networking tools
@@ -64,9 +53,6 @@
 
     # productivity
     obsidian
-
-    # IDE
-    insomnia
 
     # cloud native
     kubectl
@@ -143,27 +129,12 @@
       extraConfig = "mouse on";
     };
 
-    eza = {
-      enable = true;
-      icons = true;
-      git = true;
-      enableAliases = true;
-    };
-
     btop.enable = true;  # replacement of htop/nmon
 
     jq.enable = true;    # A lightweight and flexible command-line JSON processor
     aria2.enable = true;
 
-    skim = {
-      enable = true;
-      enableZshIntegration = true;
-      defaultCommand = "rg --files --hidden";
-      changeDirWidgetOptions = [
-        "--preview 'eza --icons --git --color always -T -L 3 {} | head -200'"
-        "--exact"
-      ];
-    };
+
   };
 
 
@@ -177,16 +148,16 @@
     '';
 
     # set some aliases
-    shellAliases = {
-      k = "kubectl";
-      urldecode = "python3 -c 'import sys, urllib.parse as ul; print(ul.unquote_plus(sys.stdin.read()))'";
-      urlencode = "python3 -c 'import sys, urllib.parse as ul; print(ul.quote_plus(sys.stdin.read()))'";
+    # shellAliases = {
+    #   k = "kubectl";
+    #   urldecode = "python3 -c 'import sys, urllib.parse as ul; print(ul.unquote_plus(sys.stdin.read()))'";
+    #   urlencode = "python3 -c 'import sys, urllib.parse as ul; print(ul.quote_plus(sys.stdin.read()))'";
 
-      #  Use `lib.mkForce value` or `lib.mkDefault value` to change the priority on any of these definitions.
-      # ls = "eza -lag --icons --header --group-directories-first";
-      lr = "eza -lTg --icons --header --group-directories-first";
+    #   #  Use `lib.mkForce value` or `lib.mkDefault value` to change the priority on any of these definitions.
+    #   # ls = "eza -lag --icons --header --group-directories-first";
+    #   # lr = "eza -lTg --icons --header --group-directories-first";
 
-    };
+    # };
   };
 
   services = {

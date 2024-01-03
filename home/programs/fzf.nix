@@ -1,3 +1,4 @@
+# TODO add config for fzf
 {
   pkgs,
   lib,
@@ -12,10 +13,10 @@ with lib; {
     programs.fzf = {
       enable = true;
       changeDirWidgetCommand = "fd --type d";
-      tmux.enableShellIntegration = config.tmux.enable;
-      enableBashIntegration = config.bash.enable;
-      enableZshIntegration = config.zsh.enable;
-      enableFishIntegration = config.fish.enable;
+      # tmux.enableShellIntegration = config.tmux.enable;
+      # enableBashIntegration = config.bash.enable;
+      # enableZshIntegration = config.zsh.enable;
+      # enableFishIntegration = config.fish.enable;
     };
 
     home.packages = with pkgs; [
