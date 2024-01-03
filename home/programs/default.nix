@@ -28,6 +28,7 @@
     ./grpc.nix
     ./htop.nix
     ./insomnia.nix
+    ./jq.nix
     ./lazygit.nix
     ./media.nix
     ./monitor.nix
@@ -49,7 +50,7 @@
     ./xdg.nix
   ];
   alias.enable = true;
-  broot.enable = true;
+  brootFile.enable = true;
   carapace.enable = true;
   chrome.enable = true;
   cliphist.enable = true;
@@ -65,5 +66,6 @@
   graphical.enable = true;
   grpc.enable = true;
   insomnia.enable = true;
+  jq.enable = true;
   skim.enable = true;
 }

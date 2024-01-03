@@ -9,8 +9,6 @@
 
     neofetch
 
-
-
     # utils
     yq-go    # https://github.com/mikefarah/yq
     duf
@@ -131,10 +129,7 @@
 
     btop.enable = true;  # replacement of htop/nmon
 
-    jq.enable = true;    # A lightweight and flexible command-line JSON processor
     aria2.enable = true;
-
-
   };
 
 
