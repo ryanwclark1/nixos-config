@@ -24,8 +24,11 @@
     };
 
     displayManager = {
-      sddm.enable = true;
       defaultSession = "plasmawayland";
+      sddm = {
+        enable = true;
+        wayland.enable = true;
+      };
       #videoDrivers = [ "modesetting" ]; # For Intel integrated graphics
     };
   };
