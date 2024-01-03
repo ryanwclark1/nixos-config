@@ -8,7 +8,7 @@
 {
   imports = [
     ./alias.nix
-    ./carapace/nix
+    ./carapace.nix
     ./colors.nix
     ./common.nix
     ./chromium.nix
