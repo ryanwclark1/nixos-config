@@ -9,8 +9,7 @@
   imports = [
     ./colors.nix
     ./common.nix
-    ./browsers.nix
-    # ./chromium.nix
+    ./chromium.nix
     ./firefox.nix
     ./fzf.nix
     # ./gh.nix
@@ -42,4 +41,5 @@
   ];
   go.enable = true;
   firefox.enable = true;
+  chromium.enable = true;
 }
