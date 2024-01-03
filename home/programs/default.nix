@@ -8,6 +8,7 @@
 {
   imports = [
     ./pref.nix
+    ./helix
     ./alacritty.nix
     ./alias.nix
     ./broot.nix
@@ -61,6 +62,9 @@
     # ./transmission.nix
     ./vscode.nix
     ./xdg.nix
+    ./bash.nix
+    ./fish.nix
+    ./zsh.nix
   ];
   alacritty.enable = true;
   alias.enable = true;
@@ -99,9 +103,21 @@
   ranger.enable = true;
   rename.enable = true;
   skim.enable = true;
-  slack.enable = true;
+  # slack.enable = true;
   starship.enable = true;
-  syncthing.enable = true;
+  # syncthing.enable = true;
   sql.enable = true;
   # tmux.enable = true;
+
+  bash.enable = true;
+  # fish.enable = true;
+  # zsh.enable = true;
+
+  # helix.enable = true;
+  # shell.user = "${pkgs.bash}/bin/bash";
+  # editor = {
+  #   terminal = "${config.editor.helix.package}/bin/hx";
+  #   helix.package = inputs.helix.packages.${pkgs.system}.default;
+  # };
+  # terminal = "${pkgs.alacritty}/bin/alacritty";
 }

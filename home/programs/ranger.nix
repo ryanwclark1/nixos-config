@@ -14,14 +14,14 @@ with lib; {
     programs.pistol = {
       enable = true;
       associations = [
-        {
-          mime = "text/*";
-          command = "${config.terminal} ${config.editor.terminal} &pistol-filename%";
-        }
-        {
-          mime = "text/x-go";
-          command = "${config.terminal} ${config.editor.terminal} &pistol-filename%";
-        }
+        # {
+        #   mime = "text/*";
+        #   command = "${config.terminal} ${config.editor.terminal} &pistol-filename%";
+        # }
+        # {
+        #   mime = "text/x-go";
+        #   command = "${config.terminal} ${config.editor.terminal} &pistol-filename%";
+        # }
       ];
     };
   };

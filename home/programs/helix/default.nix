@@ -24,9 +24,9 @@ with lib; {
         yaml-language-server
         clang
         marksman
-        external.snippets-ls
+        # external.snippets-ls
         tailwindcss
-        tailwindcss-language-server
+        # tailwindcss-language-server
         lua-language-server
       ];
 
