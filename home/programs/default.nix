@@ -7,6 +7,7 @@
 
 {
   imports = [
+    ./alacritty.nix
     ./alias.nix
     ./broot.nix
     ./carapace.nix
@@ -38,6 +39,7 @@
     ./monitor.nix
     # ./neovim.nix
     ./nnn.nix
+    ./nushell.nix
     ./obs.nix
     ./office.nix
     ./pandoc.nix
@@ -46,6 +48,7 @@
     ./skim.nix
     # ./spotify.nix
     ./sql.nix
+    ./starship.nix
     ./steam.nix
     ./syncthing.nix
     ./tmux.nix
@@ -53,6 +56,7 @@
     ./vscode.nix
     ./xdg.nix
   ];
+  alacritty.enable = true;
   alias.enable = true;
   brootFile.enable = true;
   carapace.enable = true;
@@ -78,6 +82,8 @@
   lf.enable = true;
   monitor.enable = true;
   # neovim.enable = true;
-  nnn.enable = true;
+  nnn.enable = false;
+  nu.enable = true;
   skim.enable = true;
+  # starship.enable = true;
 }

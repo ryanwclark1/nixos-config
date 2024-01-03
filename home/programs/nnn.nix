@@ -14,8 +14,8 @@ with lib; {
       package = pkgs.nnn.override {withNerdIcons = true;};
       bookmarks = {
         d = "~/Downloads";
-        # p = "~/Documents/projects";
-        # g = "~/Videos/golearn/";
+        p = "~/Documents/projects";
+        g = "~/Videos/golearn/";
       };
       extraPackages = with pkgs; [
         # ffmpegthumbnailer

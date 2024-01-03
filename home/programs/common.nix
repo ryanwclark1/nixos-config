@@ -108,7 +108,7 @@
     blender
     neovim
     scrot
-    nnn # Remove nnn from common
+    # nnn # Remove nnn from common
     # discord
     # element-desktop
     megatools
@@ -116,6 +116,11 @@
     transmission
     f1viewer
     tickrs
+
+    # Nix tooling
+    alejandra
+    deadnix
+    statix
   ];
 
   programs = {
