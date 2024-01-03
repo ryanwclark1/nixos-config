@@ -26,10 +26,5 @@
         # "icpgjfneehieebagbmdbhnlpiopdcmna" # new tab redirect
       ];
     };
-
-    firefox = {
-      enable = true;
-      profiles.administrator = {};
-    };
   };
 }
