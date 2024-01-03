@@ -23,6 +23,7 @@
     ./gitui.nix
     ./global-fonts.nix
     ./go.nix
+    ./graphical.nix
     ./grpc.nix
     ./htop.nix
     ./insomnia.nix
@@ -59,5 +60,6 @@
   git.enable = true;
   gitui.enable = true;
   go.enable = true;
+  graphical.enable = true;
   skim.enable = true;
 }

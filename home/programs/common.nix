@@ -20,8 +20,6 @@
     netcat
     tree
     mc
-    imagemagick
-    inkscape
     acpica-tools
 
     # networking tools
