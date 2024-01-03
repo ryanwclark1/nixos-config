@@ -109,7 +109,6 @@
     # neovim
     scrot
     nnn # Remove nnn from common
-    firefox
     # discord
     # element-desktop
     megatools

@@ -33,6 +33,7 @@
     ./jq.nix
     ./just.nix
     ./lazygit.nix
+    ./lf.nix
     ./media.nix
     ./monitor.nix
     # ./neovim.nix
@@ -74,5 +75,6 @@
   jq.enable = true;
   just.enable = true;
   lazygit.enable = true;
+  lf.enable = true;
   skim.enable = true;
 }
