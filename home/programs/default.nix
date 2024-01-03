@@ -57,6 +57,7 @@
   filesearch.enable = true;
   fzf.enable = true;
   git.enable = true;
+  gitui.enable = true;
   go.enable = true;
   skim.enable = true;
 }
