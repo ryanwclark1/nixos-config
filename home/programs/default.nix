@@ -17,7 +17,8 @@
     ./chromium.nix
     ./deno.nix
     ./direnv.nix
-   ./download.nix
+    ./doc.nix
+    ./download.nix
     ./firefox.nix
     ./filesearch.nix
     ./fzf.nix
@@ -58,6 +59,7 @@
   compression.enable = true;
   deno.enable = true;
   direnv.enable = true;
+  doc.enable = true;
   download.enable = true;
   firefox.enable = true;
   filesearch.enable = true;
