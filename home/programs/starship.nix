@@ -7,9 +7,9 @@
 # TODO: Add pyenv, nvm, rbenv, rustup, etc. support
 with lib; {
   options.starship.enable = mkEnableOption "starship settings";
-  home.sessionVariables.STARSHIP_CACHE = "${config.xdg.cacheHome}/starship";
 
   config = mkIf config.starship.enable {
+   home.sessionVariables.STARSHIP_CACHE = "${config.xdg.cacheHome}/starship";
     programs.starship = {
       enable = true;
       # Configuration written to ~/.config/starship.toml
