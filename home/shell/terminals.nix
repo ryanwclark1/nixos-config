@@ -12,7 +12,8 @@ in
     settings = {
       env.TERM = "xterm-256color";
       window = {
-        opacity = 0.95;
+        opacity = 0.90;
+        dynamic_title = true;
         dynamic_padding = true;
         padding = {
           x = 5;
@@ -26,7 +27,7 @@ in
         bold.family = font;
         italic.family = font;
         draw_bold_text_with_bright_colors = true;
-        size = 11;
+        size = 10;
       };
       scrolling.multiplier = 5;
       selection.save_to_clipboard = true;
