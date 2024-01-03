@@ -8,6 +8,7 @@
 {
   imports = [
     ./alias.nix
+    ./carapace/nix
     ./colors.nix
     ./common.nix
     ./chromium.nix
@@ -42,6 +43,7 @@
     ./xdg.nix
   ];
   alias.enable = true;
+  carapace.enable = true;
   chrome.enable = true;
   firefox.enable = true;
   filesearch.enable = true;
