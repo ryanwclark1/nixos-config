@@ -42,6 +42,7 @@
     ./nushell.nix
     ./obs.nix
     ./office.nix
+    ./ollama.nix
     ./pandoc.nix
     ./pdf.nix
     ./protobuf.nix
@@ -86,6 +87,7 @@
   nu.enable = true;
   obs.enable = true;
   office.enable = true;
+  ollama.enable = true;
   skim.enable = true;
   # starship.enable = true;
 }
