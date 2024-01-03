@@ -32,7 +32,8 @@ with lib; {
           decorations = "true";
         };
       };
-      diff-so-fancy.enable = true;
+      # Can only use diff-so-fancy if delta is not enabled
+      # diff-so-fancy.enable = true;
       lfs = {
         enable = true;
       };

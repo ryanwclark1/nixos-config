@@ -56,6 +56,7 @@
   firefox.enable = true;
   filesearch.enable = true;
   fzf.enable = true;
+  git.enable = true;
   go.enable = true;
   skim.enable = true;
 }
