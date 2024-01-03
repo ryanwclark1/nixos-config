@@ -7,6 +7,7 @@
 
 {
   imports = [
+    ./pref.nix
     ./alacritty.nix
     ./alias.nix
     ./broot.nix
@@ -46,6 +47,10 @@
     ./pandoc.nix
     ./pdf.nix
     ./protobuf.nix
+    ./pueue.nix
+    ./ranger.nix
+    ./rename.nix
+    ./slack.nix
     ./skim.nix
     # ./spotify.nix
     ./sql.nix
@@ -88,7 +93,15 @@
   obs.enable = true;
   office.enable = true;
   ollama.enable = true;
+  pdf.enable = true;
+  protobuf.enable = true;
+  pueue.enable = true;
+  ranger.enable = true;
+  rename.enable = true;
   skim.enable = true;
+  slack.enable = true;
   starship.enable = true;
+  syncthing.enable = true;
+  sql.enable = true;
   # tmux.enable = true;
 }
