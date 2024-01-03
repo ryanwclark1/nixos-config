@@ -89,5 +89,6 @@
   office.enable = true;
   ollama.enable = true;
   skim.enable = true;
-  # starship.enable = true;
+  starship.enable = true;
+  # tmux.enable = true;
 }
