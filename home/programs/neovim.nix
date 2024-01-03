@@ -2,7 +2,6 @@
   pkgs,
   lib,
   config,
-  nixvim,
   ...
 }:
 with lib; {
@@ -43,18 +42,18 @@ with lib; {
       ###############################
       extraPlugins = with pkgs.vimPlugins; [
         rose-pine
-        oxocarbon-nvim
-        poimandres-nvim
-        nord-nvim
-        nightfox-nvim
-        nightfly
-        material-nvim
-        falcon
-        adwaita-nvim
-        tokyonight-nvim
-        gruvbox-nvim
-        everforest
-        kanagawa-nvim
+        # oxocarbon-nvim
+        # poimandres-nvim
+        # nord-nvim
+        # nightfox-nvim
+        # nightfly
+        # material-nvim
+        # falcon
+        # adwaita-nvim
+        # tokyonight-nvim
+        # gruvbox-nvim
+        # everforest
+        # kanagawa-nvim
       ];
 
       plugins = {
@@ -311,6 +310,8 @@ with lib; {
             lua-ls.enable = true;
             rust-analyzer = {
               enable = true;
+              installCargo = false;
+              installRustc = false;
               settings = {
                 checkOnSave = true;
                 check.command = "clippy";

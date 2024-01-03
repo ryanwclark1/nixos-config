@@ -36,7 +36,7 @@
     ./lf.nix
     ./media.nix
     ./monitor.nix
-    # ./neovim.nix
+    ./neovim.nix
     ./nnn.nix
     ./obs.nix
     ./office.nix
@@ -76,5 +76,7 @@
   just.enable = true;
   lazygit.enable = true;
   lf.enable = true;
+  monitor.enable = true;
+  neovim.enable = true;
   skim.enable = true;
 }
