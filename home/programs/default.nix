@@ -84,6 +84,8 @@
   # neovim.enable = true;
   nnn.enable = false;
   nu.enable = true;
+  obs.enable = true;
+  office.enable = true;
   skim.enable = true;
   # starship.enable = true;
 }
