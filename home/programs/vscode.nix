@@ -113,36 +113,6 @@
       "github.copilot.advanced" = {
         "listCount" = 3;
       };
-      "github.copilot.enable" = {
-        "*" = true;
-        "c" = true;
-        "cpp" = true;
-        "css" = true;
-        "dockerfile" = true;
-        "go" = true;
-        "git" = true;
-        "html" = true;
-        "javascript" = true;
-        "javascriptreact" = true;
-        "json" = true;
-        "jsonc" = true;
-        "less" = true;
-        "lua" = true;
-        "makefile" = true;
-        "markdown" = true;
-        "plaintext" = true;
-        "python" = true;
-        "rust" = true;
-        "scss" = true;
-        "shellscript" = true;
-        "sql" = true;
-        "typescript" = true;
-        "typescriptreact" = true;
-        "vue" = true;
-        "vue-html" = true;
-        "xml" = true;
-        "yaml" = true;
-      };
     };
 
   };
