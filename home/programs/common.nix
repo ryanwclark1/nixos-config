@@ -8,10 +8,8 @@
   home.packages = with pkgs; [
 
     neofetch
-
     # utils
     yq-go    # https://github.com/mikefarah/yq
-    duf
     nfs-utils
     iw
     nmap
@@ -98,6 +96,8 @@
 
     bluez-tools # bt-adapter
     usbutils # lsusb
+
+    # Monitoring
     lm_sensors # sensors
     smartmontools # smartctl
     psensor # GUI for lm_sensors

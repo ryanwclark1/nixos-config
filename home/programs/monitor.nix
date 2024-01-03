@@ -38,11 +38,11 @@ with lib; {
       };
     };
 
+    # Keep htop or btop?
     programs.htop.enable = true;
 
     home.packages = with pkgs; [
       procs
-      neofetch
       xorg.xwininfo
       duf
       du-dust
