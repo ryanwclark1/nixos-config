@@ -74,6 +74,7 @@ in
     # ./transmission.nix
     ./video.nix
     ./vscode.nix
+    ./watson.nix
     ./xdg.nix
     ./bash.nix
     ./fish.nix
@@ -129,6 +130,7 @@ in
   sql.enable = true;
   tmux.enable = true;
   video.enable = true;
+  watson.enable = true;
 
   # telegram.enable = false;
   # discord.enable = false;

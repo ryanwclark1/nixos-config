@@ -10,7 +10,7 @@
   users.users.administrator = {
     isNormalUser = true;
     home = "/home/administrator";
-    extraGroups = ["networkmanager" "wheel", "docker"];
+    extraGroups = ["networkmanager" "wheel" "docker"];
   };
 
   time.timeZone = "America/Chicago";
