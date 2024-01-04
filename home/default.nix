@@ -32,6 +32,7 @@ in
     ./direnv.nix
     ./doc.nix
     ./download.nix
+    ./exercism.nix
     ./firefox.nix
     ./filesearch.nix
     ./filezilla.nix
@@ -100,6 +101,7 @@ in
   direnv.enable = true;
   doc.enable = true;
   download.enable = true;
+  exercism.enable = true;
   firefox.enable = true;
   filesearch.enable = true;
   filezilla.enable = true;
