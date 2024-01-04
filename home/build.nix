@@ -9,6 +9,7 @@ with lib; {
 
   config = mkIf config.build.enable {
     home.packages = with pkgs; [
+      cmake
       gnumake
     ];
   };

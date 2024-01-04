@@ -8,13 +8,14 @@ with lib; let
   inputer = placeholder: "${pkgs.gum}/bin/gum input --placeholder=${placeholder}";
   chooser = "${pkgs.gum}/bin/gum choose";
 in {
-  # options = {
-  #   shell = {
-  #     user = mkOption {
-  #       type = types.str;
-  #       default = "${pkgs.zsh}/bin/zsh";
-  #     };
-  #   };
+  options = {
+    shell = {
+      user = mkOption {
+        type = types.str;
+        default = "${pkgs.zsh}/bin/zsh";
+      };
+    };
+  };
 
   #   editor = {
   #     terminal = mkOption {
@@ -30,11 +31,7 @@ in {
   #   };
   #   terminal = mkOption {
   #     type = types.str;
-  #     default = "${pkgs.foot}/bin/foot";
-  #   };
-  #   launcher = mkOption {
-  #     type = types.str;
-  #     default = "${pkgs.fuzzel}/bin/fuzzel";
+  #     default = "${pkgs.alacritty}/bin/alacritty";
   #   };
   #   multiplexer = {
   #     tmux = {

@@ -121,40 +121,9 @@
   ];
 
   programs = {
-    tmux = {
-      enable = true;
-      clock24 = true;
-      keyMode = "vi";
-      extraConfig = "mouse on";
-    };
-
     btop.enable = true;  # replacement of htop/nmon
-
-    # aria2.enable = true;
   };
 
-
-  # programs.bash = {
-  #   enable = true;
-  #   enableCompletion = true;
-  #   # TODO add your cusotm bashrc here
-  #   bashrcExtra = ''
-  #     neofetch
-  #     export PATH="$PATH:$HOME/bin:$HOME/.local/bin:$HOME/go/bin"
-  #   '';
-
-  #   # set some aliases
-  #   # shellAliases = {
-  #   #   k = "kubectl";
-  #   #   urldecode = "python3 -c 'import sys, urllib.parse as ul; print(ul.unquote_plus(sys.stdin.read()))'";
-  #   #   urlencode = "python3 -c 'import sys, urllib.parse as ul; print(ul.quote_plus(sys.stdin.read()))'";
-
-  #   #   #  Use `lib.mkForce value` or `lib.mkDefault value` to change the priority on any of these definitions.
-  #   #   # ls = "eza -lag --icons --header --group-directories-first";
-  #   #   # lr = "eza -lTg --icons --header --group-directories-first";
-
-  #   # };
-  # };
 
   services = {
     syncthing.enable = true;

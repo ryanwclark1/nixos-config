@@ -127,7 +127,7 @@ in
   starship.enable = true;
   # syncthing.enable = true;
   sql.enable = true;
-  # tmux.enable = true;
+  tmux.enable = true;
   video.enable = true;
 
   # telegram.enable = false;
