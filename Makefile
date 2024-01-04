@@ -16,16 +16,22 @@ frametop:
 woody:
 	sudo nixos-rebuild switch --flake .#woody
 
+frametop-debug:
+	sudo nixos-rebuild switch --flake .#frametop --show-trace --verbose
+
+woody-debug:
+	sudo nixos-rebuild switch --flake .#woody --show-trace --verbose
+
 frametop-remote:
 	nixos-rebuild switch --flake .#frametop --use-remote-sudo
 
 woody-remote:
 	nixos-rebuild switch --flake .#woody --use-remote-sudo
 
-frametop-debug:
+frametop-remote-debug:
 	nixos-rebuild switch --flake .#frametop --use-remote-sudo --show-trace --verbose
 
-woody-debug:
+woody-remote-debug:
 	nixos-rebuild switch --flake .#woody --use-remote-sudo --show-trace --verbose
 
 up:
