@@ -76,11 +76,11 @@
     # Settings
     kgamma5
 
-      filelight
-      kcalc
-#      kgpg
-#      qttools
-#      quazip
+    filelight
+    kcalc
+#   kgpg
+#   qttools
+#   quazip
   ];
 
   environment.plasma5.excludePackages = with pkgs.libsForQt5; [
