@@ -115,6 +115,14 @@
       frametop = lib.nixosSystem {
         inherit system;
         modules = [
+          {
+            nixpkgs.overlays = [
+              # inputs.nixneovim.overlays.default
+              inputs.nur.overlay
+              # inputs.neovim-nightly-overlay.overlay
+              (final: prev: {external.snippets-ls = snippets-ls.packages.${prev.system}.snippets-ls;})
+            ];
+          }
           ./hosts/frametop
           nixos-hardware.nixosModules.framework-12th-gen-intel
           home-manager.nixosModules.home-manager
@@ -125,7 +133,13 @@
               inherit inputs;
               inherit system;
             };
-            home-manager.users.administrator = import ./home;
+            home-manager.users.administrator = {
+              home.stateVersion = "23.11";
+              imports = [
+                ./home
+                nixvim.homeManagerModules.nixvim
+                ];
+            };
           }
         ];
       };
