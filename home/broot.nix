@@ -1,3 +1,4 @@
+# Navigate similar to to the output of tree
 {
   config,
   lib,
