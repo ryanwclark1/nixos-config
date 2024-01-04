@@ -1,5 +1,5 @@
 #
-#  NOTE: Makefile's target name should not be the same as one of the file or directory in the current directory, 
+#  NOTE: Makefile's target name should not be the same as one of the file or directory in the current directory,
 #    otherwise the target will not be executed!
 #
 
@@ -10,17 +10,23 @@
 #
 ############################################################################
 
-i3: 
-	nixos-rebuild switch --flake .#ai_i3 --use-remote-sudo
+frametop:
+	sudo nixos-rebuild switch --flake .#frametop
 
-hypr:
-	nixos-rebuild switch --flake .#ai_hyprland --use-remote-sudo
+woody:
+	sudo nixos-rebuild switch --flake .#woody
 
-i3-debug:
-	nixos-rebuild switch --flake .#ai_i3 --use-remote-sudo --show-trace --verbose
+frametop-remote:
+	nixos-rebuild switch --flake .#frametop --use-remote-sudo
 
-hypr-debug:
-	nixos-rebuild switch --flake .#ai_hyprland --use-remote-sudo --show-trace --verbose
+woody-remote:
+	nixos-rebuild switch --flake .#woody --use-remote-sudo
+
+frametop-debug:
+	nixos-rebuild switch --flake .#frametop --use-remote-sudo --show-trace --verbose
+
+woody-debug:
+	nixos-rebuild switch --flake .#woody --use-remote-sudo --show-trace --verbose
 
 up:
 	nix flake update
@@ -102,11 +108,11 @@ idols-image:
 ############################################################################
 #
 #	RISC-V related commands
-#		
+#
 ############################################################################
 
 roll: add-idols-ssh-key
-	colmena apply --on '@riscv' 
+	colmena apply --on '@riscv'
 
 roll-debug: add-idols-ssh-key
 	colmena apply --on '@dist-build' --verbose --show-trace
@@ -142,6 +148,6 @@ fmt:
 	# format the nix files in this repo
 	nix fmt
 
-.PHONY: clean  
-clean:  
+.PHONY: clean
+clean:
 	rm -rf result
