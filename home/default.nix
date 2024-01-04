@@ -167,7 +167,7 @@ in
 
       # set default applications
       # EDITOR = "nvim";
-      BROWSER = "firefox";
+      # BROWSER = "firefox";
       TERMINAL = "alacritty";
 
       # enable scrolling in git diff
