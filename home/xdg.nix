@@ -8,6 +8,8 @@ let
 
   # XDG MIME types
   associations = {
+    "x-scheme-handler/sms" = ["org.Shell.Extensions.GSConnect.desktop"];
+    "x-scheme-handler/tel" = ["org.Shell.Extensions.GSConnect.desktop"];
     "application/x-extension-htm" = browser;
     "application/x-extension-html" = browser;
     "application/x-extension-shtml" = browser;

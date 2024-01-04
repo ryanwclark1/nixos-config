@@ -11,8 +11,8 @@ with lib; {
   options.filezilla.enable = mkEnableOption "filezilla settings";
 
   config = mkIf config.filezilla.enable {
-    programs.filezilla = {
-      enable = true;
-    };
+    home.packages = with pkgs; [
+      filezilla
+    ];
   };
 }
