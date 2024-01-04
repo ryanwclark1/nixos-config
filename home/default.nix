@@ -41,7 +41,6 @@ in
     ./go.nix
     ./graphical.nix
     ./grpc.nix
-    ./htop.nix
     ./insomnia.nix
     ./jq.nix
     ./just.nix
