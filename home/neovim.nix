@@ -11,7 +11,7 @@ with lib; {
     programs.nixvim = {
       enable = true;
       # Configuration that can be only in the form of lua file
-      extraConfigLua = builtins.readFile ./nvim.lua;
+      # extraConfigLua = builtins.readFile ./nvim.lua;
 
       # WARN: lua loader is experimental.
       luaLoader.enable = true;
@@ -308,23 +308,23 @@ with lib; {
             html.enable = true;
             jsonls.enable = true;
             lua-ls.enable = true;
-            rust-analyzer = {
-              enable = true;
-              installCargo = false;
-              installRustc = false;
-              settings = {
-                checkOnSave = true;
-                check.command = "clippy";
-              };
-            };
+            # rust-analyzer = {
+            #   enable = true;
+            #   installCargo = false;
+            #   installRustc = false;
+            #   settings = {
+            #     checkOnSave = true;
+            #     check.command = "clippy";
+            #   };
+            # };
             gopls.enable = true;
             zls.enable = true;
-            nil_ls = {
-              enable = true;
-              settings = {
-                formatting.command = ["${pkgs.alejandra}/bin/bin" "--quiet"];
-              };
-            };
+            # nil_ls = {
+            #   enable = true;
+            #   settings = {
+            #     formatting.command = ["${pkgs.alejandra}/bin/bin" "--quiet"];
+            #   };
+            # };
             nixd.enable = true;
             yamlls.enable = true;
           };
@@ -440,7 +440,7 @@ with lib; {
         smartindent = true;
         expandtab = true;
         smartcase = true;
-        undodir = "/home/administrator/.cache/nvim/undodir";
+        undodir = "/home/a/.cache/nvim/undodir";
         undofile = true;
         clipboard = "unnamedplus";
         wrap = false;

@@ -139,7 +139,7 @@ in
   fish.enable = true;
   zsh.enable = true;
 
-  neovim.enable = true;
+  # neovim.enable = true;
   helix.enable = true;
   # shell.user = "${pkgs.bash}/bin/bash";
   # editor = {

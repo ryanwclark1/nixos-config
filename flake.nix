@@ -86,6 +86,17 @@
       # helix.inputs.nixpkgs.follows = "nixpkgs";
       # in
     };
+    nil = {
+      url = "github:oxalica/nil";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    aspen = {
+      url = "github:prmadev/aspen";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    himalaya = {
+      url = "github:soywod/himalaya";
+    };
   };
 
   outputs = {

@@ -5,6 +5,7 @@
 {
   imports = [
     # ./global/auto-upgrade.nix
+    ./global/boot.nix
     ./global/docker.nix
     ./global/locale.nix
     ./global/nfs.nix

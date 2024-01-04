@@ -21,18 +21,18 @@
   hardware.pulseaudio.enable = false;
 
   # Bootloader
-  boot = {
-    loader = {
-      systemd-boot = {
-        enable = true;
-        configurationLimit = 10;
-      };
-      efi.canTouchEfiVariables = true;
-      timeout = 1;
-    };
-    kernelModules = [ "nfs" "nfs4" ];
-    initrd.kernelModules = [ "amdgpu" ];
-  };
+  # boot = {
+  #   loader = {
+  #     systemd-boot = {
+  #       enable = true;
+  #       configurationLimit = 10;
+  #     };
+  #     efi.canTouchEfiVariables = true;
+  #     timeout = 1;
+  #   };
+  #   kernelModules = [ "nfs" "nfs4" ];
+  #   initrd.kernelModules = [ "amdgpu" ];
+  # };
 
   environment.systemPackages = with pkgs; [
     vim

@@ -69,8 +69,8 @@
     python311Packages.pipx
     python311Packages.pip
 
-    libgcc
-    gcc
+    # libgcc
+    # gcc
 
     # Need libpq but can't find
     postgresql
