@@ -138,7 +138,13 @@
               inherit inputs;
               inherit system;
             };
-            home-manager.users.administrator = import ./home;
+            home-manager.users.administrator = {
+              home.stateVersion = "23.11";
+              imports = [
+                ./home
+                nixvim.homeManagerModules.nixvim
+                ];
+            };
           }
         ];
       };

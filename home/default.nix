@@ -149,7 +149,6 @@ in
   home = {
     username = "administrator";
     homeDirectory = "/home/administrator";
-    stateVersion = "23.11";
     sessionVariables = {
       # clean up ~
       LESSHISTFILE = cache + "/less/history";
