@@ -104,7 +104,7 @@
     psensor # GUI for lm_sensors
 
     kate
-    neovim
+    # neovim
     scrot
     # discord
     # element-desktop
@@ -118,6 +118,8 @@
     alejandra
     deadnix
     statix
+
+    # fantomas
   ];
 
   programs = {

@@ -62,6 +62,7 @@ in
     ./pueue.nix
     ./ranger.nix
     ./rename.nix
+    ./rust.nix
     ./slack.nix
     ./skim.nix
     # ./spotify.nix
@@ -111,7 +112,6 @@ in
   lf.enable = true;
   monitor.enable = true;
   music.enable = true;
-  # neovim.enable = true;
   nnn.enable = false;
   nushell.enable = true;
   obs.enable = true;
@@ -122,6 +122,7 @@ in
   pueue.enable = true;
   ranger.enable = true;
   rename.enable = true;
+  rust.enable = true;
   skim.enable = true;
   starship.enable = true;
   # syncthing.enable = true;
@@ -138,6 +139,7 @@ in
   fish.enable = true;
   zsh.enable = true;
 
+  neovim.enable = true;
   helix.enable = true;
   # shell.user = "${pkgs.bash}/bin/bash";
   # editor = {

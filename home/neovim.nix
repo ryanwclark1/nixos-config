@@ -359,35 +359,35 @@ with lib; {
           };
         };
 
-        none-ls = {
-          enable = true;
-          sources = {
-            code_actions = {
-              # gitsigns.enable = true;
-              shellcheck.enable = true;
-            };
-            diagnostics = {
-              deadnix.enable = true;
-              gitlint.enable = true;
-              luacheck.enable = true;
-              protolint.enable = true;
-              shellcheck.enable = true;
-            };
-            formatting = {
-              alejandra.enable = true;
-              gofmt.enable = true;
-              jq.enable = true;
-              markdownlint.enable = true;
-              prettier_d_slim.enable = true;
-              protolint.enable = true;
-              rustfmt.enable = true;
-              sqlfluff.enable = true;
-              shfmt.enable = true;
-              stylua.enable = true;
-              taplo.enable = true;
-            };
-          };
-        };
+        # none-ls = {
+        #   enable = true;
+        #   sources = {
+        #     code_actions = {
+        #       # gitsigns.enable = true;
+        #       shellcheck.enable = true;
+        #     };
+        #     diagnostics = {
+        #       deadnix.enable = true;
+        #       gitlint.enable = true;
+        #       luacheck.enable = true;
+        #       protolint.enable = true;
+        #       shellcheck.enable = true;
+        #     };
+        #     formatting = {
+        #       alejandra.enable = true;
+        #       gofmt.enable = true;
+        #       jq.enable = true;
+        #       markdownlint.enable = true;
+        #       prettier_d_slim.enable = true;
+        #       protolint.enable = true;
+        #       rustfmt.enable = true;
+        #       sqlfluff.enable = true;
+        #       shfmt.enable = true;
+        #       stylua.enable = true;
+        #       taplo.enable = true;
+        #     };
+        #   };
+        # };
 
         lspsaga = {
           enable = true;
