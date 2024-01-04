@@ -42,18 +42,18 @@ with lib; {
       ###############################
       extraPlugins = with pkgs.vimPlugins; [
         rose-pine
-        # oxocarbon-nvim
-        # poimandres-nvim
-        # nord-nvim
-        # nightfox-nvim
-        # nightfly
-        # material-nvim
-        # falcon
-        # adwaita-nvim
-        # tokyonight-nvim
-        # gruvbox-nvim
-        # everforest
-        # kanagawa-nvim
+        oxocarbon-nvim
+        poimandres-nvim
+        nord-nvim
+        nightfox-nvim
+        nightfly
+        material-nvim
+        falcon
+        adwaita-nvim
+        tokyonight-nvim
+        gruvbox-nvim
+        everforest
+        kanagawa-nvim
       ];
 
       plugins = {

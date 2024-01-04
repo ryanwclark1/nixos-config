@@ -50,6 +50,7 @@ in
     ./lf.nix
     ./media.nix
     ./monitor.nix
+    ./music.nix
     # ./neovim.nix
     ./nnn.nix
     ./nushell.nix
@@ -109,9 +110,10 @@ in
   lazygit.enable = true;
   lf.enable = true;
   monitor.enable = true;
+  music.enable = true;
   # neovim.enable = true;
   nnn.enable = false;
-  nu.enable = true;
+  nushell.enable = true;
   obs.enable = true;
   office.enable = true;
   ollama.enable = true;

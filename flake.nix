@@ -73,6 +73,7 @@
     };
     bat-catppuccin = {
       url = "github:catppuccin/bat";
+
       flake = false;
     };
     snippets-ls = {

@@ -11,12 +11,10 @@ with lib; {
   config = mkIf config.skim.enable {
     programs.skim = {
       enable = true;
-      # enableZshIntegration = config.zsh.enable;
-      # enableFishIntegration = config.fish.enable;
-      # enableBashIntegration = config.bash.enable;
-      enableZshIntegration = true;
-      enableFishIntegration = true;
-      enableBashIntegration = true;
+      enableZshIntegration = config.zsh.enable;
+      enableFishIntegration = config.fish.enable;
+      enableBashIntegration = config.bash.enable;
+      # enableNushellIntegration = config.nushell.enable;
       defaultCommand = "rg --files --hidden";
       changeDirWidgetOptions = [
         "--preview 'eza --icons --git --color always -T -L 3 {} | head -200'"

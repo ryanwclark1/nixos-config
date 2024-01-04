@@ -18,7 +18,7 @@ with lib; {
         g = "~/Videos/golearn/";
       };
       extraPackages = with pkgs; [
-        # ffmpegthumbnailer
+        ffmpegthumbnailer
         mediainfo
       ];
       plugins = {

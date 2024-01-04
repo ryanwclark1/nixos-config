@@ -5,7 +5,7 @@
 }:
 with lib; {
   options = {
-    nu.enable = mkOption {
+    nushell.enable = mkOption {
       type = types.bool;
       default = false;
     };
@@ -13,7 +13,7 @@ with lib; {
   config = let
     nuLibDirs = "${config.xdg.dataHome}/nu_libs";
   in
-    mkIf config.nu.enable {
+    mkIf config.nushell.enable {
       programs.nushell = {
         enable = true;
         # envFile.text = "starship init nu | save -f  ~/.cache/starship/init.nu";
@@ -48,8 +48,7 @@ with lib; {
         # };
       };
       programs.direnv.enableNushellIntegration = config.direnv.enable;
-      programs.starship.enableNushellIntegration = true;
-      # programs.starship.enableNushellIntegration = config.starship.enable;
+      programs.starship.enableNushellIntegration = config.starship.enable;
       programs.zoxide.enableNushellIntegration = config.filesearch.enable;
     };
 }
