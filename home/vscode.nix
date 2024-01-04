@@ -46,23 +46,30 @@
       pkief.material-icon-theme
       jdinhlife.gruvbox
 
+      mikestead.dotenv
+
       # vscode-icons-team.vscode-icons
     ];
 
     mutableExtensionsDir = false;
 
     userSettings = {
-      "editor.fontSize" = 12;
-      "editor.fontFamily" = "JetBrainsMono Nerd Font";
-      "editor.renderWhitespace" = "all";
-      "editor.useTabStops" = false;
-      "editor.formatOnSave" = false;
-      "editor.fontLigatures" = true;
-      "editor.lineHeight" = 20;
-      "editor.rulers" = [ 80 120 ];
-      "editor.tabSize" = 2;
-      "editor.suggestSelection" = "first";
-      "editor.inlineSuggest.enabled" = true;
+
+      editor = {
+        "fontSize" = 12;
+        "fontFamily" = "JetBrainsMono Nerd Font";
+        "renderWhitespace" = "all";
+        "useTabStops" = false;
+        "formatOnSave" = false;
+        "fontLigatures" = true;
+        "lineHeight" = 20;
+        "rulers" = [ 80 120 ];
+        "tabSize" = 2;
+        "suggestSelection" = "first";
+        "inlineSuggest.enabled" = true;
+        "minimap.enabled" = false;
+      };
+
       "files.exclude" = { "**/node_modules/**" = true; };
       "files.autoSave" = "afterDelay";
       "files.trimTrailingWhitespace" = true;
@@ -71,7 +78,7 @@
       "workbench.fontAliasing" = "antialiased";
       "workbench.editor.enablePreview" = false;
       "workbench.colorTheme" = "Default Dark Modern";
-      "editor.minimap.enabled" = false;
+
       "terminal.integrated.fontFamily" = "JetBrainsMono Nerd Font";
 
       # Nix IDE
