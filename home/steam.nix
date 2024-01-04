@@ -1,53 +1,27 @@
 {
   pkgs,
-  ...
-}:
-
-{
-  home.packages = with pkgs; [
-    steam
-    steam-run
-    lunar-client
-    lutris
-    vulkan-loader
-    vulkan-tools
-    # wineWowPackages.stagingFull
-  ];
-}
-
-
-{
-  pkgs,
   lib,
   config,
   ...
 }:
 
 with lib; {
-  options.watson.enable = mkEnableOption "watson settings";
+  options.steam.enable = mkEnableOption "steam settings";
 
-  config = mkIf config.watson.enable {
-    programs.watson = {
+  config = mkIf config.steam.enable {
+    programs.steam = {
       enable = true;
-      package = pkgs.go_1_21;
-      packages = {
-        # "golang.org/x/text" = builtins.fetchGit "https://go.googlesource.com/text";
-      };
-      goPath = "go";
+      remotePlay.openFirewall = true;
     };
 
     home.packages = with pkgs; [
-      richgo
-      golangci-lint-langserver
-      ent-go
-      go-tools
-      gocode
-      gopls
-      godef
-      gotools
-      errcheck
+      steam-run
+      lunar-client
+      lutris
+      vulkan-loader
+      vulkan-tools
+      # wineWowPackages.stagingFull
     ];
 
-    home.sessionPath = ["$HOME/go/bin"];
   };
 }
