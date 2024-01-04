@@ -34,6 +34,7 @@ in
     ./download.nix
     ./firefox.nix
     ./filesearch.nix
+    ./filezilla.nix
     ./fzf.nix
     ./git.nix
     ./gitui.nix
@@ -101,6 +102,7 @@ in
   download.enable = true;
   firefox.enable = true;
   filesearch.enable = true;
+  filezilla.enable = true;
   fzf.enable = true;
   git.enable = true;
   gitui.enable = true;

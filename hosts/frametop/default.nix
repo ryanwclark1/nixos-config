@@ -33,6 +33,7 @@
     curl
     wget
     git
+    nano
     nfs-utils
   ];
 
