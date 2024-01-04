@@ -76,6 +76,7 @@ in
     ./vscode.nix
     ./watson.nix
     ./xdg.nix
+    ./yt-dlp.nix
     ./bash.nix
     ./fish.nix
     ./zsh.nix
@@ -132,6 +133,7 @@ in
   tmux.enable = true;
   video.enable = true;
   watson.enable = true;
+  yt-dlp.enable = true;
 
   # telegram.enable = false;
   # discord.enable = false;
