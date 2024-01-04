@@ -59,6 +59,7 @@ in
     ./office.nix
     ./ollama.nix
     ./pandoc.nix
+    ./pager.nix
     ./pdf.nix
     ./protobuf.nix
     ./pueue.nix
@@ -124,6 +125,7 @@ in
   obs.enable = true;
   office.enable = true;
   ollama.enable = true;
+  pager.enable = true;
   pdf.enable = true;
   protobuf.enable = true;
   pueue.enable = true;
