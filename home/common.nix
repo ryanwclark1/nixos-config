@@ -50,7 +50,7 @@
     nix-update
 
     # productivity
-    obsidian
+    # obsidian
 
     # cloud native
     kubectl
