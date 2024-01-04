@@ -39,6 +39,7 @@
     # misc
     libnotify
     wineWowPackages.wayland
+    # wineWowPackages.stagingFull
     xdg-utils
     graphviz
 
@@ -91,7 +92,6 @@
     jdupes
 
     mediainfo
-    gnumake
     remmina         # XRDP & VNC Client
 
     bluez-tools # bt-adapter

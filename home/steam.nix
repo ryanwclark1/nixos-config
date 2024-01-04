@@ -9,7 +9,6 @@
     steam-run
     lunar-client
     lutris
-    wineWowPackages.stagingFull
-
+    # wineWowPackages.stagingFull
   ];
 }
