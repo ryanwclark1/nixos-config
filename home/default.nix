@@ -16,11 +16,17 @@ in
     ./helix
     ./alacritty.nix
     ./alias.nix
+    ./android_file_browser.nix
+    ./asciidoc.nix
+    ./atuin.nix
+    ./audio.nix
     ./broot.nix
+    ./build.nix
     ./carapace.nix
     ./cliphist.nix
     ./colors.nix
     ./common.nix
+    ./communication.nix
     ./compression.nix
     ./chromium.nix
     ./deno.nix
@@ -74,10 +80,16 @@ in
 
   alacritty.enable = true;
   alias.enable = true;
+  android.enable = true;
+  asciidoc.enable = true;
+  atuin.enable = true;
+  audio.enable = true;
   brootFile.enable = true;
+  build.enable = true;
   carapace.enable = true;
   chrome.enable = true;
   cliphist.enable = true;
+  communication.enable = true;
   compression.enable = true;
   deno.enable = true;
   direnv.enable = true;
