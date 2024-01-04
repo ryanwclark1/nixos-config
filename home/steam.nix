@@ -19,8 +19,8 @@ with lib; {
       steam-run
       lunar-client
       lutris
-      vulkan-loader
-      vulkan-tools
+      # vulkan-loader
+      # vulkan-tools
       # wineWowPackages.stagingFull
     ];
 
