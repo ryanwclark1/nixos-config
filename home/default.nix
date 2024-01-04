@@ -71,6 +71,7 @@ in
     ./syncthing.nix
     ./tmux.nix
     # ./transmission.nix
+    ./video.nix
     ./vscode.nix
     ./xdg.nix
     ./bash.nix
@@ -125,6 +126,7 @@ in
   # syncthing.enable = true;
   sql.enable = true;
   # tmux.enable = true;
+  video.enable = true;
 
   # telegram.enable = false;
   # discord.enable = false;

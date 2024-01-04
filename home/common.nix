@@ -8,6 +8,7 @@
   home.packages = with pkgs; [
 
     neofetch
+
     # utils
     yq-go    # https://github.com/mikefarah/yq
     nfs-utils
@@ -103,12 +104,8 @@
     psensor # GUI for lm_sensors
 
     kate
-    vlc
-    handbrake
-    blender
     neovim
     scrot
-    # nnn # Remove nnn from common
     # discord
     # element-desktop
     megatools
