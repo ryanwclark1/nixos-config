@@ -26,7 +26,7 @@ in
     ./cliphist.nix
     ./colors.nix
     ./common.nix
-    ./communication.nix
+    # ./communication.nix
     ./compression.nix
     ./chromium.nix
     ./deno.nix
@@ -89,7 +89,6 @@ in
   carapace.enable = true;
   chrome.enable = true;
   cliphist.enable = true;
-  communication.enable = true;
   compression.enable = true;
   deno.enable = true;
   direnv.enable = true;
@@ -126,6 +125,11 @@ in
   # syncthing.enable = true;
   sql.enable = true;
   # tmux.enable = true;
+
+  # telegram.enable = false;
+  # discord.enable = false;
+
+
 
   bash.enable = true;
   fish.enable = true;
