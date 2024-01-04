@@ -8,7 +8,7 @@
     avahi = {
       enable = true;
       openFirewall = true;
-      nssmdns = true; # Allows software to use Avahi to resolve.
+      nssmdns4 = true; # Allows software to use Avahi to resolve.
       publish = {
         enable = true;
         addresses = true;
