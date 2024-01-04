@@ -11,7 +11,7 @@
 
     # utils
     yq-go    # https://github.com/mikefarah/yq
-    nfs-utils
+    # nfs-utils
     iw
     nmap
     netcat
