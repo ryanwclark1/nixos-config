@@ -22,7 +22,7 @@ in
     ./broot.nix
     ./build.nix
     ./carapace.nix
-    ./cliphist.nix
+    # ./cliphist.nix
     ./colors.nix
     ./common.nix
     # ./communication.nix
@@ -92,7 +92,7 @@ in
   build.enable = true;
   carapace.enable = true;
   chrome.enable = true;
-  cliphist.enable = true;
+  # cliphist.enable = true;
   compression.enable = true;
   deno.enable = true;
   direnv.enable = true;
