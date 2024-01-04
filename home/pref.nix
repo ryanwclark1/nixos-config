@@ -15,20 +15,19 @@ in {
         default = "${pkgs.zsh}/bin/zsh";
       };
     };
+    editor = {
+      terminal = mkOption {
+        type = types.str;
+        default = "${config.helix.package}/bin/hx";
+      };
+      # helix = {
+      #   package = mkOption {
+      #     type = types.package;
+      #     default = pkgs.hx;
+      #   };
+      # };
+    };
   };
-
-  #   editor = {
-  #     terminal = mkOption {
-  #       type = types.str;
-  #       default = "${config.helix.package}/bin/hx";
-  #     };
-  #     helix = {
-  #       package = mkOption {
-  #         type = types.package;
-  #         default = pkgs.hx;
-  #       };
-  #     };
-  #   };
   #   terminal = mkOption {
   #     type = types.str;
   #     default = "${pkgs.alacritty}/bin/alacritty";

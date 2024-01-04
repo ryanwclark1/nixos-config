@@ -5,7 +5,7 @@
   ...
 }:
 with lib; {
-  imports = [./rosepine.nix ./catppuccin-improved.nix];
+  imports = [./helix/rosepine.nix ./helix/catppuccin-improved.nix];
 
   options.helix.enable = mkEnableOption "helix settings";
 
@@ -72,23 +72,23 @@ with lib; {
           };
           snippets-go = {
             command = "snippets-ls";
-            args = ["-config" "/home/a/.config/helix/snippets-go.json"];
+            args = ["-config" "/home/administrator/.config/helix/snippets-go.json"];
           };
           snippets-rust = {
             command = "snippets-ls";
-            args = ["-config" "/home/a/.config/helix/snippets-rust.json"];
+            args = ["-config" "/home/administrator/.config/helix/snippets-rust.json"];
           };
           snippets-nix = {
             command = "snippets-ls";
-            args = ["-config" "/home/a/.config/helix/snippets-nix.json"];
+            args = ["-config" "/home/administrator/.config/helix/snippets-nix.json"];
           };
           snippets-md = {
             command = "snippets-ls";
-            args = ["-config" "/home/a/.config/helix/snippets-md.json"];
+            args = ["-config" "/home/administrator/.config/helix/snippets-md.json"];
           };
           snippets-org = {
             command = "snippets-ls";
-            args = ["-config" "/home/a/.config/helix/snippets-org.json"];
+            args = ["-config" "/home/administrator/.config/helix/snippets-org.json"];
           };
 
           hls = mkIf config.haskell.enable {

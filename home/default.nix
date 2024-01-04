@@ -78,6 +78,7 @@ in
     ./bash.nix
     ./fish.nix
     ./zsh.nix
+    ./helix.nix
   ];
 
   alacritty.enable = true;
@@ -139,7 +140,7 @@ in
   fish.enable = true;
   zsh.enable = true;
 
-  # helix.enable = true;
+  helix.enable = true;
   # shell.user = "${pkgs.bash}/bin/bash";
   # editor = {
   #   terminal = "${config.editor.helix.package}/bin/hx";

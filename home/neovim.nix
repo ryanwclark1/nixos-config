@@ -440,7 +440,7 @@ with lib; {
         smartindent = true;
         expandtab = true;
         smartcase = true;
-        undodir = "/home/a/.cache/nvim/undodir";
+        undodir = "/home/administrator/.cache/nvim/undodir";
         undofile = true;
         clipboard = "unnamedplus";
         wrap = false;
