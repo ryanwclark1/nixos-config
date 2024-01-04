@@ -11,7 +11,7 @@ with lib; {
       enable = true;
       enableBashIntegration = mkIf config.bash.enable true;
       enableZshIntegration = mkIf config.zsh.enable true;
-      enableFishIntegration = mkIf config.fish.enable true;
+      # enableFishIntegration = mkIf config.fish.enable true;
       enableNushellIntegration = mkIf config.nushell.enable true;
       nix-direnv.enable = true;
     };
