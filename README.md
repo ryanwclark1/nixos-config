@@ -4,13 +4,15 @@
 Create the directory and file for the sops output as the age command does not want to generate a file
 
 ```bash
+$nix --extra-experimental-features nix-command --extra-experimental-features flakes flake init --template github:vimjoyer/flake-starter-config
 $ mkdir -p ~/.config/sops/age/
 $ touch ~/.config/sops/age/keys.txt
+```
 
 ```bash
 # generate new key at ~/.config/sops/age/keys.txt
 $ nix shell nixpkgs#age -c age-keygen -o ~/.config/sops/age/keys.txt
-
+```
 
 
 If you do not want to utilize an SSH Key
