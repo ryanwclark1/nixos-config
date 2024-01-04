@@ -126,6 +126,7 @@ in
   rust.enable = true;
   skim.enable = true;
   starship.enable = true;
+  steam.enable = true;
   # syncthing.enable = true;
   sql.enable = true;
   tmux.enable = true;
