@@ -13,7 +13,6 @@ in
 {
   imports = [
     ./pref.nix
-    ./helix
     ./alacritty.nix
     ./alias.nix
     ./android_file_browser.nix
@@ -51,7 +50,7 @@ in
     ./media.nix
     ./monitor.nix
     ./music.nix
-    # ./neovim.nix
+    ./neovim.nix
     ./nnn.nix
     ./nushell.nix
     ./obs.nix
@@ -124,7 +123,6 @@ in
   ranger.enable = true;
   rename.enable = true;
   skim.enable = true;
-  # slack.enable = true;
   starship.enable = true;
   # syncthing.enable = true;
   sql.enable = true;
@@ -133,7 +131,7 @@ in
 
   # telegram.enable = false;
   # discord.enable = false;
-
+  # slack.enable = true;
 
 
   bash.enable = true;
@@ -159,7 +157,7 @@ in
       WINEPREFIX = d + "/wine";
 
       # set default applications
-      EDITOR = "nvim";
+      # EDITOR = "nvim";
       BROWSER = "firefox";
       TERMINAL = "alacritty";
 

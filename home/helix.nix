@@ -91,16 +91,16 @@ with lib; {
             args = ["-config" "/home/administrator/.config/helix/snippets-org.json"];
           };
 
-          hls = mkIf config.haskell.enable {
-            command = "haskell-language-server-wrapper";
-            # args = ["--lsp"];
-            config = {
-              hling.config.flags = [
-                "--all"
-              ];
-              rename.config.crossModule = true;
-            };
-          };
+          # hls = mkIf config.haskell.enable {
+          #   command = "haskell-language-server-wrapper";
+          #   # args = ["--lsp"];
+          #   config = {
+          #     hling.config.flags = [
+          #       "--all"
+          #     ];
+          #     rename.config.crossModule = true;
+          #   };
+          # };
           rustanalyzer = {
             command = "rust-analyzer";
             config = {
@@ -117,12 +117,6 @@ with lib; {
           };
         };
         language = [
-          {
-            name = "haskell";
-            roots = ["Setup.hs" "stack.yaml" "cabal.project" "*.cabal" "hie.yaml"];
-            auto-format = true;
-            language-servers = ["hls"];
-          }
           {
             name = "ocaml";
             auto-format = true;
