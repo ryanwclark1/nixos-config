@@ -35,6 +35,50 @@
       url = "github:catppuccin/fish";
       flake = false;
     };
+    zsh-windows-title = {
+      url = "github:mdarocha/zsh-windows-title";
+      flake = false;
+    };
+    zsh-terminal-title = {
+      url = "github:AnimiVulpis/zsh-terminal-title";
+      flake = false;
+    };
+    zsh-skim = {
+      url = "github:casonadams/skim.zsh";
+      flake = false;
+    };
+    catppuccin-zsh = {
+      url = "github:catppuccin/zsh-syntax-highlighting";
+      flake = false;
+    };
+    zsh-tab-title = {
+      url = "github:trystan2k/zsh-tab-title";
+      flake = false;
+    };
+    zsh-nix-shell = {
+      url = "github:chisui/zsh-nix-shell";
+      flake = false;
+    };
+    zsh-nix-completion = {
+      url = "github:nix-community/nix-zsh-completions";
+      flake = false;
+    };
+    cd-ls = {
+      url = "github:zshzoo/cd-ls";
+      flake = false;
+    };
+    colorize = {
+      url = "github:zpm-zsh/colorize";
+      flake = false;
+    };
+    bat-catppuccin = {
+      url = "github:catppuccin/bat";
+      flake = false;
+    };
+    snippets-ls = {
+      url = "git+https://git.sr.ht/~prma/snippets-ls";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {

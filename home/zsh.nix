@@ -68,10 +68,10 @@ with lib; {
           src = inputs.zsh-nix-shell;
           name = "zsh-nix-shell";
         }
-        # {
-        #   src = inputs.cd-ls;
-        #   name = "cd-ls";
-        # }
+        {
+          src = inputs.cd-ls;
+          name = "cd-ls";
+        }
         {
           src = inputs.catppuccin-zsh;
           name = "catpuccin-zsh";

@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "bat-catppuccin": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1668065083,
+        "narHash": "sha256-6WVKQErGdaqb++oaXnY3i6/GuH2FhTgK0v4TN4Y0Wbw=",
+        "owner": "catppuccin",
+        "repo": "bat",
+        "rev": "ba4d16880d63e656acced2b7d4e034e4a93f74b1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "catppuccin",
+        "repo": "bat",
+        "type": "github"
+      }
+    },
     "beautysh": {
       "inputs": {
         "nixpkgs": [
@@ -36,6 +52,54 @@
       "original": {
         "owner": "catppuccin",
         "repo": "fish",
+        "type": "github"
+      }
+    },
+    "catppuccin-zsh": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1665638423,
+        "narHash": "sha256-Q7KmwUd9fblprL55W0Sf4g7lRcemnhjh4/v+TacJSfo=",
+        "owner": "catppuccin",
+        "repo": "zsh-syntax-highlighting",
+        "rev": "06d519c20798f0ebe275fc3a8101841faaeee8ea",
+        "type": "github"
+      },
+      "original": {
+        "owner": "catppuccin",
+        "repo": "zsh-syntax-highlighting",
+        "type": "github"
+      }
+    },
+    "cd-ls": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1683132048,
+        "narHash": "sha256-QUnZBb0X6F42FcvNxq65zq2oB8cn1Ym4SuU8MXpIfN4=",
+        "owner": "zshzoo",
+        "repo": "cd-ls",
+        "rev": "f26c86baf50ca0e92b454753dc6f1d25228e67bf",
+        "type": "github"
+      },
+      "original": {
+        "owner": "zshzoo",
+        "repo": "cd-ls",
+        "type": "github"
+      }
+    },
+    "colorize": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1703166761,
+        "narHash": "sha256-LrUU28FF+tHm+AOpNWonDomcagW1TSNL8mffLtg75no=",
+        "owner": "zpm-zsh",
+        "repo": "colorize",
+        "rev": "1f1d49e02156c76a5feb796d598b37b7d0cffd69",
+        "type": "github"
+      },
+      "original": {
+        "owner": "zpm-zsh",
+        "repo": "colorize",
         "type": "github"
       }
     },
@@ -390,7 +454,11 @@
     },
     "root": {
       "inputs": {
+        "bat-catppuccin": "bat-catppuccin",
         "catppuccin-fish": "catppuccin-fish",
+        "catppuccin-zsh": "catppuccin-zsh",
+        "cd-ls": "cd-ls",
+        "colorize": "colorize",
         "fzf-finder": "fzf-finder",
         "fzf-tab": "fzf-tab",
         "home-manager": "home-manager",
@@ -400,7 +468,34 @@
         "nixvim": "nixvim",
         "nnn-plugins": "nnn-plugins",
         "nur": "nur",
-        "stable": "stable"
+        "snippets-ls": "snippets-ls",
+        "stable": "stable",
+        "zsh-nix-completion": "zsh-nix-completion",
+        "zsh-nix-shell": "zsh-nix-shell",
+        "zsh-skim": "zsh-skim",
+        "zsh-tab-title": "zsh-tab-title",
+        "zsh-terminal-title": "zsh-terminal-title",
+        "zsh-windows-title": "zsh-windows-title"
+      }
+    },
+    "snippets-ls": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1700900715,
+        "narHash": "sha256-gCU0bgqkk/7PSHEMqmyymOtlgk6qI0Q2OFQi3m1zsI8=",
+        "ref": "refs/heads/main",
+        "rev": "1a1b1b83310fa7662b8a1ae4244833d5df9aa198",
+        "revCount": 19,
+        "type": "git",
+        "url": "https://git.sr.ht/~prma/snippets-ls"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://git.sr.ht/~prma/snippets-ls"
       }
     },
     "stable": {
@@ -476,6 +571,102 @@
       "original": {
         "owner": "numtide",
         "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "zsh-nix-completion": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1696846724,
+        "narHash": "sha256-JStpIKU+jU6TkXToTONfdEhLjaASGzC+tRmSJRiqKWU=",
+        "owner": "nix-community",
+        "repo": "nix-zsh-completions",
+        "rev": "a7c8781b5a18026fbc3edb36397931526f243590",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nix-zsh-completions",
+        "type": "github"
+      }
+    },
+    "zsh-nix-shell": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1704028593,
+        "narHash": "sha256-Rtg8kWVLhXRuD2/Ctbtgz9MQCtKZOLpAIdommZhXKdE=",
+        "owner": "chisui",
+        "repo": "zsh-nix-shell",
+        "rev": "82ca15e638cc208e6d8368e34a1625ed75e08f90",
+        "type": "github"
+      },
+      "original": {
+        "owner": "chisui",
+        "repo": "zsh-nix-shell",
+        "type": "github"
+      }
+    },
+    "zsh-skim": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1676794701,
+        "narHash": "sha256-fN7mpWIM6r+RkQZZnMH4uRb5Wge7AwmYEzwsrhibeU8=",
+        "owner": "casonadams",
+        "repo": "skim.zsh",
+        "rev": "994a8bbc82c1c12fbb20ba0964dbd7a0cacc3b1e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "casonadams",
+        "repo": "skim.zsh",
+        "type": "github"
+      }
+    },
+    "zsh-tab-title": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1702033235,
+        "narHash": "sha256-RynzgYiIwtDsZgXE/8rZrDzGBULoElm8UBfZmb8bb4k=",
+        "owner": "trystan2k",
+        "repo": "zsh-tab-title",
+        "rev": "44f5220b560ff13bb75d090b187f7cad8849e9d4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "trystan2k",
+        "repo": "zsh-tab-title",
+        "type": "github"
+      }
+    },
+    "zsh-terminal-title": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1674827265,
+        "narHash": "sha256-HbJ2tHzJM0w+/VIMiF/Q4c4GRmvtX1cC2KkYt+r03YY=",
+        "owner": "AnimiVulpis",
+        "repo": "zsh-terminal-title",
+        "rev": "d3226dad5443c1c215823f8003cb9e84abe00e7d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "AnimiVulpis",
+        "repo": "zsh-terminal-title",
+        "type": "github"
+      }
+    },
+    "zsh-windows-title": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1648318754,
+        "narHash": "sha256-k1RcIaxS7NcYgZv0VcmVN2ZYAmlaaIsbkurloRawgzw=",
+        "owner": "mdarocha",
+        "repo": "zsh-windows-title",
+        "rev": "dfd98a0a32d90c3e5a9dd818465ab46f27e8ccaf",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mdarocha",
+        "repo": "zsh-windows-title",
         "type": "github"
       }
     }

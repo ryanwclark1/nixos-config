@@ -135,7 +135,7 @@ in
 
   bash.enable = true;
   fish.enable = true;
-  # zsh.enable = true;
+  zsh.enable = true;
 
   # helix.enable = true;
   # shell.user = "${pkgs.bash}/bin/bash";
