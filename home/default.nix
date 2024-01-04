@@ -126,6 +126,7 @@ in
   rename.enable = true;
   rust.enable = true;
   skim.enable = true;
+  slack.enable = true;
   starship.enable = true;
   steam.enable = true;
   # syncthing.enable = true;
