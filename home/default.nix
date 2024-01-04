@@ -51,6 +51,7 @@ in
     ./monitor.nix
     ./music.nix
     ./neovim.nix
+    ./nixdev.nix
     ./nnn.nix
     ./nushell.nix
     ./obs.nix
@@ -114,6 +115,7 @@ in
   lf.enable = true;
   monitor.enable = true;
   music.enable = true;
+  nixdev.enable = true;
   nnn.enable = false;
   nushell.enable = true;
   obs.enable = true;
