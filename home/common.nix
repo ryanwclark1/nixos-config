@@ -9,6 +9,25 @@
 
     neofetch
 
+    mprocs # multiple commands in parallel
+
+    gum # shell scripts
+
+    hyperfine #cli benchmarking tool
+
+    pkg-config
+    openssl_3
+
+    dfeet # Dbus debugger
+
+    d2 #diagram
+    zk # note taking
+    trashy #cli rm with trash support
+
+    ventoy-full #balena type tool
+
+    hurl # httpie/curl alternative
+
     # utils
     yq-go    # https://github.com/mikefarah/yq
     # nfs-utils
@@ -29,6 +48,7 @@
     nmap # A utility for network discovery and security auditing
     ipcalc  # it is a calculator for the IPv4/v6 addresses
     wireguard-tools
+    sniffnet
 
     # system tools
     sysstat
@@ -102,6 +122,7 @@
     lm_sensors # sensors
     smartmontools # smartctl
     psensor # GUI for lm_sensors
+
 
     kate
     # neovim
