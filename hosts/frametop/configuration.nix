@@ -12,7 +12,7 @@
       ./networking.nix
       ./power-management.nix
       ./ssh.nix
-      ../common/plasma.nix
+      ../common/plasma
       ../common/nfs.nix
       ../common/locale.nix
       ../common/printing.nix
