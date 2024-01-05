@@ -236,7 +236,6 @@ in
   # or
   #
   #  /etc/profiles/per-user/administrator/etc/profile.d/hm-session-vars.sh
-  #
 
   # shell.user = "${pkgs.bash}/bin/bash";
   # editor = {
