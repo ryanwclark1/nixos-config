@@ -48,7 +48,7 @@
     # Runs well with thermald
     auto-cpufreq = {
       enable = true;
-      services.auto-cpufreq.settings = {
+      settings = {
         battery = {
            governor = "powersave";
            turbo = "never";
