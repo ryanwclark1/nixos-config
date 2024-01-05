@@ -24,7 +24,7 @@ with lib; {
         enable_audio_bell = false;
         dynamic_background_opacity = true;
         allow_remote_control = true;
-        background_opacity = 0.9;
+        background_opacity = "0.9";
 
         # Default shell
         shell = "${pkgs.zsh}/bin/zsh";
