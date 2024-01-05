@@ -47,7 +47,7 @@
           inherit system;
           specialArgs = {inherit inputs;};
           modules = [
-            ./hosts/woody/configuration.nix
+            ./hosts/frametop/configuration.nix
             nixos-hardware.nixosModules.framework-12th-gen-intel
             inputs.home-manager.nixosModules.default
           ];
