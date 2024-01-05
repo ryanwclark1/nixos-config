@@ -1,4 +1,8 @@
-{lib, ...}:
+{
+  lib,
+  ...
+}:
+
 with lib; {
   options = {
     global-fonts = {

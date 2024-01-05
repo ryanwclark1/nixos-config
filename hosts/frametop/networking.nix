@@ -1,4 +1,4 @@
-# ./host/frametop/networking.nix
+# ./host/woody/networking.nix
 
 {
   lib,
@@ -8,7 +8,6 @@
 # TODO: update wireguard config and use mkDefault to override
 {
   networking = lib.mkDefault {
-    hostName = "frametop";
     networkmanager.enable = true;
     firewall.enable = false;
     nameservers = [
@@ -20,3 +19,7 @@
     wireguard.enable = true;
   };
 }
+# Transmission firewall
+    # enable = true;
+    # allowedTCPPorts = [ 6881 ];
+    # allowedUDPPorts = [ 6882 ];

@@ -1,10 +1,12 @@
 #Education
+
 {
   pkgs,
   lib,
   config,
   ...
 }:
+
 with lib; {
   options.exercism.enable = mkEnableOption "exercism settings";
 

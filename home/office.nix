@@ -4,6 +4,7 @@
   config,
   ...
 }:
+
 with lib; {
   options.office.enable = mkEnableOption "office settings";
 

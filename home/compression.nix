@@ -4,6 +4,7 @@
   config,
   ...
 }:
+
 with lib; {
   options.compression.enable = mkEnableOption "compression settings";
 

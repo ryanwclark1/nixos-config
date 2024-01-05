@@ -4,6 +4,7 @@
   config,
   ...
 }:
+
 with lib; {
   options.monitor.enable = mkEnableOption "monitor settings";
 
@@ -38,8 +39,8 @@ with lib; {
       };
     };
 
-    # Keep htop or btop?
     programs.htop.enable = true;
+    programs.btop.enable = true;
 
     home.packages = with pkgs; [
       procs
@@ -49,6 +50,10 @@ with lib; {
       ncdu_2
       dutree
       lsof
+      lm_sensors # sensors
+      smartmontools # smartctl
+      psensor # GUI for lm_sensors
+
     ];
   };
 }

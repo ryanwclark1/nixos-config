@@ -4,6 +4,7 @@
   config,
   ...
 }:
+
 with lib; {
   options.slack.enable = mkEnableOption "slack settings";
 

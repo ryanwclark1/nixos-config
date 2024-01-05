@@ -4,6 +4,7 @@
   pkgs,
   ...
 }:
+
 with lib; {
   options.firefox.enable = mkEnableOption "firefox settings";
 

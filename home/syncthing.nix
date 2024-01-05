@@ -3,6 +3,7 @@
   lib,
   ...
 }:
+
 with lib; {
   options.syncthing.enable = mkEnableOption "syncthing settings";
 

@@ -3,6 +3,7 @@
   config,
   ...
 }:
+
 with lib; {
   options.pdf.enable = mkEnableOption "pdf settings";
 

@@ -4,6 +4,7 @@
   config,
   ...
 }:
+
 with lib; {
   options.telegram.enable = mkEnableOption "telegram settings";
   options.discord.enable = mkEnableOption "discord settings";
