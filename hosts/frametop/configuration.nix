@@ -23,11 +23,11 @@
       ../common/transmission.nix
     ];
   nfs.enable = true;
-  gnome.enable = true;
+  plasma.enable = true;
   printing.enable = true;
   audio.enable = true;
   docker.enable = true;
-  transmission.enable = true;
+  transmission.enable = false;
 
   main-user.enable = true;
   main-user.userName = "administrator";
