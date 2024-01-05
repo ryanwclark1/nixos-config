@@ -8,13 +8,13 @@ with lib;
 {
   imports = [
     ./plasmaconfig.nix
-    ./bismuth.nix
+    # ./bismuth.nix
   ];
 
   options.plasma.enable = mkEnableOption "plasma settings";
   config = mkIf config.plasma.enable {
     plasmaconfig.enable = true;
-    bismuth.enable = true;
+    # bismuth.enable = true;
 
     # Enable the X11 windowing system.
     services.xserver.enable = true;
