@@ -48,7 +48,7 @@
           specialArgs = {inherit inputs;};
           modules = [
             ./hosts/woody/configuration.nix
-            nixos-hardware.nixosModules.framework.13-inch.12th-gen-intel
+            nixos-hardware.nixosModules.framework-12th-gen-intel
             inputs.home-manager.nixosModules.default
           ];
         };
