@@ -10,7 +10,7 @@
   config = mkIf config.bismuth.enable {
 
     # programs.plasma5.enable = true;
-    home.packages = [ pkgs.libsForQt5.bismuth ];
+    environment.systemPackages = [ pkgs.libsForQt5.bismuth ];
 
     programs.plasma5.files.kwinrc = {
       files.kwinrc = {
