@@ -11,7 +11,7 @@
 
     programs.plasma.enable = true;
 
-    home.packages = [ pkgs.plasmaPackages.bismuth ];
+    # home.packages = [ pkgs.plasmaPackages.bismuth ];
 
     programs.plasma5.files.kwinrc = {
       files.kwinrc = {
