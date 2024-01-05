@@ -17,17 +17,18 @@ with lib;
     # bismuth.enable = true;
 
     # Enable the X11 windowing system.
-    services.xserver.enable = true;
-
-    # Enable the Plasma Desktop Environment.
-    services.xserver.displayManager.gdm.enable = true;
-    services.xserver.desktopManager.plasma5.enable = true;
-    services.xserver.displayManager.defaultSession = "plasmawayland";
-
-    # Configure keymap in X11
     services.xserver = {
+      enable = true;
       layout = "us";
-      xkbVariant = "";
+      desktopManager.plasma5.enable = true;
+      # Enable the Plasma Desktop Environment.
+      displayManager = {
+        defaultSession = "plasmawayland";
+        sddm = {
+          enable = true;
+          wayland.enable = true;
+        };
+      };
     };
   };
 }
