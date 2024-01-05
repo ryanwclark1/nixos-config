@@ -22,8 +22,9 @@ with lib; {
         # changing default behaviors
         confirm_os_window_close = 0;
         enable_audio_bell = false;
-        dynamic_background_opacity = false;
+        dynamic_background_opacity = true;
         allow_remote_control = true;
+        background_opacity = 0.9;
 
         # Default shell
         shell = "${pkgs.zsh}/bin/zsh";
