@@ -9,7 +9,7 @@
   options.bismuth.enable = mkEnableOption "bismuth settings";
   config = mkIf config.bismuth.enable {
 
-    programs.plasma.enable = true;
+    # programs.plasma.enable = true;
 
     # home.packages = [ pkgs.plasmaPackages.bismuth ];
 
