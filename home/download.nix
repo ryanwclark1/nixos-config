@@ -4,6 +4,7 @@
   config,
   ...
 }:
+
 with lib; {
   options.download.enable = mkEnableOption "downloader settings";
 

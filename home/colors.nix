@@ -1,4 +1,8 @@
-{lib, ...}:
+{
+  lib,
+  ...
+}:
+
 with lib; {
   options = let
     # color ::  string -> listof.integers  -> color

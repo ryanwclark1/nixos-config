@@ -1,3 +1,4 @@
+# A wonderful CLI to track your time!
 {
   pkgs,
   lib,

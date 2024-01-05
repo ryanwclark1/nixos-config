@@ -1,8 +1,10 @@
+#  a universal document converter
 {
   lib,
   config,
   ...
 }:
+
 with lib; {
   options.pandoc.enable = mkEnableOption "pandoc settings";
 

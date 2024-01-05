@@ -4,6 +4,7 @@
   pkgs,
   ...
 }:
+
 with lib; {
   options.asciidoc.enable = mkEnableOption "asciidoc settings";
 
