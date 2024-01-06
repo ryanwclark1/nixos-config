@@ -16,11 +16,9 @@ with lib;
     plasmaconfig.enable = true;
     # bismuth.enable = true;
 
-    # Enable the X11 windowing system.
     services.xserver = {
       enable = true;
       layout = "us";
-      desktopManager.plasma5.enable = true;
       # Enable the Plasma Desktop Environment.
       displayManager = {
         defaultSession = "plasmawayland";
@@ -28,6 +26,9 @@ with lib;
           enable = true;
           wayland.enable = true;
         };
+      };
+      desktopManager = {
+        plasma5.enable = true;
       };
     };
   };
