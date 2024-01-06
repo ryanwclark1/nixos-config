@@ -485,9 +485,14 @@ with lib; {
           '';
 
           search = {
-            default = "kagi";
+            default = "duckduckgo";
             force = true;
             engines = {
+              "duckduckgo" = {
+                urls = [
+                  {template = "https://duckduckgo.com/?q={search}&kp=-2&kl=us-en";}
+                ];
+              };
               "kagi" = {
                 urls = [
                   {template = "https://kagi.com/search?q={searchTerms}";}
