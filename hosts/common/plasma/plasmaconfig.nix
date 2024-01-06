@@ -18,14 +18,17 @@ with lib;
       gwenview
       # kate
       # neovim-qt
+      # libreoffice-qt
       plasma5Packages.kdeconnect-kde
+
+      # Theme
+      utterly-nord-plasma
 
       keepassxc
       kget
       kgpg
       krename
-      hunspell
-      hunspellDicts.ru-ru
+
       hyphen
       okular
       qalculate-gtk
