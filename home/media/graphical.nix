@@ -18,6 +18,7 @@ with lib; {
       imagemagick
       imv
       viu
+      exif
       # vhs
       # ffmpeg_5-full
       # rx
