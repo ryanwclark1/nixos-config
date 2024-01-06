@@ -26,9 +26,9 @@ with lib;
           enable = true;
           wayland.enable = true;
         };
+      };
       desktopManager = {
         plasma5.enable = true;
-      };
       };
     };
   };
