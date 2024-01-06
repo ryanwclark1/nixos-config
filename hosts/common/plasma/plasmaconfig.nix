@@ -19,7 +19,7 @@ with lib;
       # kate
       # neovim-qt
       # libreoffice-qt
-      plasma5Packages.kdeconnect-kde
+      libsForQt5.kdeconnect-kde
 
       # Theme
       utterly-nord-plasma
@@ -46,25 +46,23 @@ with lib;
       # Required by Nix
       gitMinimal
 
-      plasma5Packages.dolphin-plugins
-      plasma5Packages.ffmpegthumbs
-      plasma5Packages.kdegraphics-thumbnailers
-      plasma5Packages.kglobalaccel
-      plasma5Packages.kio
-      plasma5Packages.kio-extras
-
       libsForQt5.ark
       libsForQt5.applet-window-buttons
+      libsForQt5.bismuth
       libsForQt5.discover
       libsForQt5.dolphin-plugins
+      libsForQt5.ffmpegthumbs
       libsForQt5.kaccounts-integration
       libsForQt5.kaccounts-providers
+      libsForQt5.kdegraphics-thumbnailers
+      libsForQt5.kglobalaccel
       libsForQt5.kio
+      libsForQt5.kio-extras
       libsForQt5.kio-gdrive
       libsForQt5.plasma-browser-integration
       libsForQt5.plasma-integration
       libsForQt5.qtstyleplugin-kvantum
-      libsForQt5.bismuth
+
       lightly-qt
 
       # KDE/Plasma: support spellchecking
