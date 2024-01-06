@@ -7,6 +7,7 @@
 with lib;
 {
   options.plasmaconfig.enable = mkEnableOption "plasma configuration settings";
+
   config = mkIf config.plasmaconfig.enable {
 
     programs.kdeconnect.enable = true;
@@ -21,7 +22,7 @@ with lib;
       libsForQt5.kdeconnect-kde
 
       # Theme
-      utterly-nord-plasmaz
+      utterly-nord-plasma
 
       keepassxc
       kget
