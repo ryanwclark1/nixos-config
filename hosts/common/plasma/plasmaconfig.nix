@@ -33,9 +33,6 @@ with lib;
       okular
       qalculate-gtk
 
-      kdeplasma-addons
-      spectacle
-
       # Required by KInfoCenter
       clinfo # clinfo
       glxinfo # eglinfo, glxinfo
@@ -50,18 +47,13 @@ with lib;
       libsForQt5.applet-window-buttons
       libsForQt5.bismuth
       libsForQt5.discover
-      libsForQt5.dolphin-plugins
-      libsForQt5.ffmpegthumbs
       libsForQt5.kaccounts-integration
       libsForQt5.kaccounts-providers
-      libsForQt5.kdegraphics-thumbnailers
-      libsForQt5.kglobalaccel
-      libsForQt5.kio
-      libsForQt5.kio-extras
       libsForQt5.kio-gdrive
       libsForQt5.plasma-browser-integration
       libsForQt5.plasma-integration
       libsForQt5.qtstyleplugin-kvantum
+
 
       lightly-qt
 
@@ -77,13 +69,22 @@ with lib;
       la-capitaine-icon-theme
 
       # Settings
-      kgamma5
-
       filelight
       kcalc
   #   kgpg
   #   qttools
   #   quazip
+
+
+      # kdeplasma-addons # default
+      # spectacle # default
+      # libsForQt5.dolphin-plugins # default
+      # libsForQt5.ffmpegthumbs # default
+      # libsForQt5.kdegraphics-thumbnailers # default
+      # libsForQt5.kglobalaccel
+      # libsForQt5.kio # default
+      # libsForQt5.kio-extras # default
+      # kgamma5 # default
     ];
 
     environment.plasma5.excludePackages = with pkgs.libsForQt5; [
