@@ -61,6 +61,7 @@ in
   insomnia.enable = true;
   kitty.enable = true;
   monitor.enable = true;
+  office.enable = true;
   ollama.enable = true;
   pandoc.enable = true;
   # pdf.enable = false;
@@ -157,15 +158,6 @@ in
 
     # Wayland, Xorg
     wl-clipboard
-
-    # Filesystem stuff
-    gparted
-    dosfstools
-    mtools
-    ntfs3g
-    btrfs-progs
-    jmtpfs
-    jdupes
 
     mediainfo
     remmina         # XRDP & VNC Client

@@ -61,6 +61,7 @@ in
   insomnia.enable = true;
   kitty.enable = true;
   monitor.enable = true;
+  office.enable = true;
   ollama.enable = true;
   pandoc.enable = true;
   # pdf.enable = false;
@@ -88,7 +89,7 @@ in
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
-     neofetch
+    neofetch
 
     mprocs # multiple commands in parallel
 
@@ -159,15 +160,6 @@ in
     # Wayland, Xorg
     wl-clipboard
 
-    # Filesystem stuff
-    gparted
-    dosfstools
-    mtools
-    ntfs3g
-    btrfs-progs
-    jmtpfs
-    jdupes
-
     mediainfo
     remmina         # XRDP & VNC Client
 
@@ -175,6 +167,9 @@ in
     usbutils # lsusb
 
     # Monitoring
+
+    shell_gpt
+
 
     kate
     neovim
