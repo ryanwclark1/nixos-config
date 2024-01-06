@@ -9,7 +9,6 @@ with lib;
   options.plasmaconfig.enable = mkEnableOption "plasma configuration settings";
   config = mkIf config.plasmaconfig.enable {
 
-    programs.dconf.enable = true;
     programs.kdeconnect.enable = true;
 
     environment.systemPackages = with pkgs; [       # Packages installed
@@ -22,7 +21,7 @@ with lib;
       libsForQt5.kdeconnect-kde
 
       # Theme
-      utterly-nord-plasma
+      utterly-nord-plasmaz
 
       keepassxc
       kget
@@ -53,8 +52,6 @@ with lib;
       libsForQt5.plasma-browser-integration
       libsForQt5.plasma-integration
       libsForQt5.qtstyleplugin-kvantum
-
-
       lightly-qt
 
       # KDE/Plasma: support spellchecking
@@ -75,16 +72,6 @@ with lib;
   #   qttools
   #   quazip
 
-
-      # kdeplasma-addons # default
-      # spectacle # default
-      # libsForQt5.dolphin-plugins # default
-      # libsForQt5.ffmpegthumbs # default
-      # libsForQt5.kdegraphics-thumbnailers # default
-      # libsForQt5.kglobalaccel
-      # libsForQt5.kio # default
-      # libsForQt5.kio-extras # default
-      # kgamma5 # default
     ];
 
     environment.plasma5.excludePackages = with pkgs.libsForQt5; [
