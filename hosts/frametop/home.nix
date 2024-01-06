@@ -61,7 +61,7 @@ in
   insomnia.enable = true;
   kitty.enable = true;
   monitor.enable = true;
-  office.ensble = true;
+  office.enable = true;
   ollama.enable = true;
   pandoc.enable = true;
   # pdf.enable = false;
