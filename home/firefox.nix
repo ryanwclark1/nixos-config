@@ -490,7 +490,7 @@ with lib; {
             engines = {
               "duckduckgo" = {
                 urls = [
-                  {template = "https://duckduckgo.com/?q={search}&kp=-2&kl=us-en";}
+                  {template = "https://duckduckgo.com/?q={searchTerms}&kp=-2&kl=us-en";}
                 ];
               };
               "kagi" = {
