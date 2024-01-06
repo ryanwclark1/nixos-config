@@ -32,7 +32,8 @@ with lib; {
         ms-vscode.hexeditor
         ms-vscode.makefile-tools
         golang.go
-        charliermarsh.ruff
+        # hash mismatch in nixos upgrade to unstable
+        # charliermarsh.ruff
         ms-azuretools.vscode-docker
         bradlc.vscode-tailwindcss
         jnoortheen.nix-ide
