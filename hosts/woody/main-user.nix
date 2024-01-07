@@ -34,7 +34,7 @@
     programs.zsh.enable = true;
     programs.wireshark = {
       enable = true;
-      package = pkgs.wireshark;
+      package = pkgs.wireshark-cli;
     };
   };
 }

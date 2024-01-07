@@ -19,18 +19,11 @@ with lib; {
       nmap # A utility for network discovery and security auditing
       ipcalc  # it is a calculator for the IPv4/v6 addresses
       wireguard-tools
-      sniffnet
       libpcap
       tcpdump
       ngrep
       wireshark
       kubeshark
     ];
-    # programs.sniffnet = {
-    #   enable = true;
-    #   extraConfig = ''
-    #     setcap cap_net_raw,cap_net_admin=eip ${pkgs.sniffnet}/bin/dumpcap
-    #   '';
-    # };
   };
 }
