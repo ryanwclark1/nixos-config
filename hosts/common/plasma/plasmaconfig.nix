@@ -5,12 +5,15 @@
   ...
 }:
 with lib;
+
 {
   options.plasmaconfig.enable = mkEnableOption "plasma configuration settings";
 
   config = mkIf config.plasmaconfig.enable {
 
     programs.kdeconnect.enable = true;
+
+    environment.gnome.excludePackages = with pkgs; [];
 
     environment.systemPackages = with pkgs; [       # Packages installed
       xorg.xkill
