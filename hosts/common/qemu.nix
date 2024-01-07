@@ -1,6 +1,7 @@
 # ./host/common/global/virtualisation.nix
 {
   pkgs,
+  config,
   lib,
   ...
 }:
@@ -22,8 +23,8 @@ with lib; {
             # Issue with ovmf
             packages = [ pkgs.OVMFFull.fd ];
           };
-          # Virtual TPM
-          qemu.swtpm.enable = true;
+          # virtual tpm
+          swtpm.enable = true;
         };
       };
       # USB redirection support

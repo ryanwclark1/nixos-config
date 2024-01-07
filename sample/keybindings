@@ -1,0 +1,26 @@
+ Global Keybindings
+
+All default WMs in Axyl come with the same set of basic keybindings:
+Keybind 	Function
+Ctrl + Shft + Q 	Log Out Session
+Ctrl + Shft + R 	Reload Current Session
+Super + [1..7] 	Switches to Workspace 1 to 7
+Super + Shft + [1..7] 	Move Apps/Windows to Workspace 1 to 7
+Super + X 	Launch Powermenu
+Super + Enter 	Launch Terminal (xfce4-terminal)
+Super + C 	Close/Kill Window
+Super 	Launch j4-dmenu-desktop
+Super + D 	Launch dmenu
+Super + N 	Launch NetworkManager dmenu
+Alt + E 	Launch Edit Configs dmenu
+Alt + L 	Launch Quick Links dmenu
+Ctrl + Alt + L 	Lock Screen
+Super + Shft + W 	Launch Firefox
+Super + Shft + F 	Launch Thunar
+Super + Shft + R 	Ranger Quick Launch
+PrtSc 	Screenshot
+Ctrl + PtrSc 	Screenshot Active Window
+Ctrl + Alt + PrtSc 	Screenshot Selected Area
+
+
+https://github.com/axyl-os/axyl-iso/blob/master/keybindings.md
