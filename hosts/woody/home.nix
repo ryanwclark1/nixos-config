@@ -48,6 +48,7 @@ in
     ../../home/steam.nix
     ../../home/watson.nix
     ../../home/networking_utils.nix
+    ../../home/common_desktop.nix
   ];
   bash.enable = true;
   zsh.enable = true;
@@ -70,7 +71,7 @@ in
   steam.enable = true;
   watson.enable = true;
   networking_utils.enable = true;
-
+  common_desktop.enable = true;
 
   # xdg.enable = false;
 
@@ -91,108 +92,9 @@ in
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
-  home.packages = with pkgs; [
-    neofetch
 
-    mprocs # multiple commands in parallel
-
-    gum # shell scripts
-
-    hyperfine #cli benchmarking tool
-
-    pkg-config
-    openssl_3
-
-    dfeet # Dbus debugger
-
-    d2 #diagram
-    zk # note taking
-    trashy #cli rm with trash support
-
-    ventoy-full #balena type tool
-
-    hurl # httpie/curl alternative
-
-    # utils
-    yq-go    # https://github.com/mikefarah/yq
-    # nfs-utils
-    iw
-    nmap
-    netcat
-    tree
-    mc
-    acpica-tools
-
-
-    # system tools
-    sysstat
-    lm_sensors # for `sensors` command
-    ethtool
-    pciutils # lspci
-    usbutils # lsusb
-
-    # misc
-    libnotify
-    wineWowPackages.wayland
-    # wineWowPackages.stagingFull
-    xdg-utils
-    graphviz
-
-    # productivity
-    # obsidian
-
-    # cloud native
-    kubectl
-    kubernetes-helm
-    minikube
-
-    # Need libpq but can't find
-    postgresql
-
-    # Wayland, Xorg
-    wl-clipboard
-
-    mediainfo
-    remmina         # XRDP & VNC Client
-
-    bluez-tools # bt-adapter
-    usbutils # lsusb
-
-    # Monitoring
-
-    shell_gpt
-
-
-    kate
-    neovim
-    scrot
-    discord
-    element-desktop
-    megatools
-
-    transmission
-    f1viewer
-    tickrs
-    # fantomas
-
-    # vscode.enable = true
-    # # Adds the 'hello' command to your environment. It prints a friendly
-    # # "Hello, world!" when run.
-    # pkgs.hello
-
-    # # It is sometimes useful to fine-tune packages, for example, by applying
-    # # overrides. You can do that directly here, just don't forget the
-    # # parentheses. Maybe you want to install Nerd Fonts with a limited number of
-    # # fonts?
-    # (pkgs.nerdfonts.override { fonts = [ "FantasqueSansMono" ]; })
-
-    # # You can also create simple shell scripts directly inside your
-    # # configuration. For example, this adds a command 'my-hello' to your
-    # # environment:
-    # (pkgs.writeShellScriptBin "my-hello" ''
-    #   echo "Hello, ${config.home.username}!"
-    # '')
-  ];
+  # Moved to ../home/common_desktop.nix, use if different by machine
+  # home.packages = with pkgs; []
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
