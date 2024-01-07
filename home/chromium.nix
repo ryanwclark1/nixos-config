@@ -21,7 +21,7 @@ with lib; {
         "icpgjfneehieebagbmdbhnlpiopdcmna" # new tab redirect
       ];
       # commandLineArgs = ["--ozone-platform-hint=wayland" "--gtk-version=4"];
-      commandLineArgs = [ "--enable-features=UseOzonePlatform" "--ozone-platform=wayland"];
+      # commandLineArgs = [ "--enable-features=UseOzonePlatform" "--ozone-platform=wayland"];
     };
   };
 }
