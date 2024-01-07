@@ -10,6 +10,7 @@ with lib;
   options.gnomeconfig.enable = mkEnableOption "gnome confgiruation settings";
 
   config = mkIf config.gnomeconfig.enable {
+
     programs.dconf.enable = true;
 
     environment.gnome.excludePackages = (with pkgs; [
