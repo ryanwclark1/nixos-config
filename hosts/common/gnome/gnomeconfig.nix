@@ -33,8 +33,11 @@ with lib;
 
     environment.systemPackages = with pkgs; [
       gnome.adwaita-icon-theme
+      gnome.devhelp
+      gnome.gnome-nettool
       gnome.gnome-tweaks
       gnome.dconf-editor
+      gnome.gnome-boxes
       gnomeExtensions.appindicator
     ];
 
