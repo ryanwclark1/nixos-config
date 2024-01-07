@@ -34,6 +34,9 @@
   main-user.enable = true;
   main-user.userName = "administrator";
 
+  # Enable Wayland support
+  environment.sessionVariables.NIXOS_OZONE_WL = "1";
+
   networking.hostName = "woody"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 

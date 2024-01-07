@@ -38,6 +38,8 @@
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+  # Enable Wayland support
+  environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
   services = {
 
