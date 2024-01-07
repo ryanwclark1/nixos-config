@@ -13,7 +13,6 @@ with lib;
   options.gnome.enable = mkEnableOption "gnome settings";
   config = mkIf config.gnome.enable {
     gnomeconfig.enable = true;
-    # Enable the X11 windowing system.
 
     services.xserver = {
       enable = true;
@@ -22,6 +21,8 @@ with lib;
       displayManager = {
         gdm = {
           enable = true;
+          # This is turned on because gnome is used on desktop.
+          # Would likely create issue if used on laptop.
           autoSuspend = false;
           banner = ''
             Welcome Ryan!
