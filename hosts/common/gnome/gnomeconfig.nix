@@ -10,6 +10,7 @@ with lib;
   options.gnomeconfig.enable = mkEnableOption "gnome confgiruation settings";
 
   config = mkIf config.gnomeconfig.enable {
+
     programs.dconf.enable = true;
 
     environment.gnome.excludePackages = (with pkgs; [
@@ -31,6 +32,7 @@ with lib;
       gnome-contacts
       gnome-initial-setup
     ]);
+
     environment.systemPackages = with pkgs; [
       gnome.adwaita-icon-theme
       gnome.gnome-tweaks
