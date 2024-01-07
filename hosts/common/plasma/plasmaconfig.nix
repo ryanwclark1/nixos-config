@@ -52,6 +52,7 @@ with lib;
       libsForQt5.plasma-integration
       libsForQt5.qtstyleplugin-kvantum
       libsForQt5.filelight
+      libsForQt5.ksystemlog
       lightly-qt
 
       # KDE/Plasma: support spellchecking
