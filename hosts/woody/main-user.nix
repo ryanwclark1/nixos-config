@@ -22,7 +22,7 @@
       # initialPassword = "";
       description = "Administrator User";
       shell = pkgs.zsh;
-      extraGroups = [ "networkmanager" "wheel" "audio" "docker" "video" "transmission"];
+      extraGroups = [ "networkmanager" "wheel" "audio" "docker" "video" "transmission" "wireshark"];
       openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJx3Sk20pLL1b2PPKZey2oTyioODrErq83xG78YpFBoj admin@xxxx"
       ];
@@ -32,5 +32,9 @@
       # ];
     };
     programs.zsh.enable = true;
+    programs.wireshark = {
+      enable = true;
+      package = pkgs.wireshark;
+    };
   };
 }
