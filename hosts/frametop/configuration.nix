@@ -19,6 +19,7 @@
       ../common/bootloader.nix
       ../common/audio.nix
       ../common/docker.nix
+      ../common/qemu.nix
       ../common/fonts.nix
       ../common/transmission.nix
     ];
