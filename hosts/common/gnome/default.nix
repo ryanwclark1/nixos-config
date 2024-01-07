@@ -22,10 +22,22 @@ with lib;
       displayManager = {
         gdm = {
           enable = true;
+          autoSuspend = false;
+          banner = ''
+            Welcome Ryan!
+            '';
+          wayland = true;
         };
       };
       desktopManager = {
-        gnome.enable = true;
+        # https://github.com/NixOS/nixpkgs/blob/592047fc9e4f7b74a4dc85d1b9f5243dfe4899e3/nixos/modules/services/x11/desktop-managers/gnome.nix
+        gnome = {
+          enable = true;
+          # List of packages for which gsettings are overridden. list of paths
+          extraGSettingsOverridePackages = [];
+          # Additional gsettings overrides. strings concatenated with "\n"
+          extraGSettingsOverrides = "";
+        };
       };
     };
   };

@@ -17,7 +17,6 @@ with lib;
       gnome-tour
       gedit
     ]) ++ (with pkgs.gnome; [
-      atomix
       cheese # webcam tool
       gnome-music
       epiphany # web browser
@@ -31,6 +30,7 @@ with lib;
       gnome-contacts
       gnome-initial-setup
     ]);
+
     environment.systemPackages = with pkgs; [
       gnome.adwaita-icon-theme
       gnome.gnome-tweaks
