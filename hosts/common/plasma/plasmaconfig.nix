@@ -19,9 +19,6 @@ with lib;
       xorg.xkill
       (ark.override {unfreeEnableUnrar = true;})
       gwenview
-      # kate
-      # neovim-qt
-      # libreoffice-qt
       libsForQt5.kdeconnect-kde
 
       # Theme
@@ -45,8 +42,6 @@ with lib;
 
       # Required by Nix
       gitMinimal
-
-      libsForQt5.ark
       libsForQt5.applet-window-buttons
       libsForQt5.bismuth
       libsForQt5.discover
@@ -56,6 +51,7 @@ with lib;
       libsForQt5.plasma-browser-integration
       libsForQt5.plasma-integration
       libsForQt5.qtstyleplugin-kvantum
+      libsForQt5.filelight
       lightly-qt
 
       # KDE/Plasma: support spellchecking
@@ -70,8 +66,8 @@ with lib;
       la-capitaine-icon-theme
 
       # Settings
-      filelight
-      kcalc
+      # filelight
+      # kcalc
   #   kgpg
   #   qttools
   #   quazip
