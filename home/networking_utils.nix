@@ -27,4 +27,17 @@ with lib; {
       kubeshark
     ];
   };
+  programs.sniffnet = {
+    enable = true;
+    extraConfig = ''
+      setcap cap_net_raw,cap_net_admin=eip ${pkgs.sniffnet}/bin/dumpcap
+    '';
+  };
+  programs.wireshark = {
+    enable = true;
+    package = pkgs.wireshark;
+    extraConfig = ''
+      setcap cap_net_raw,cap_net_admin=eip ${pkgs.wireshark}/bin/dumpcap
+    '';
+  };
 }
