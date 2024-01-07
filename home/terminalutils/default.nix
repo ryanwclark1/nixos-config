@@ -15,6 +15,7 @@ with lib; {
     ./fzf.nix
     ./jq.nix
     ./lf.nix
+    ./nix-index.nix
     ./nnn.nix
     ./pager.nix
     ./pueue.nix
@@ -34,6 +35,7 @@ with lib; {
     fzf.enable = true;
     jq.enable = true;
     lf.enable = true;
+    nix-index.enable = true;
     nnn.enable = false;
     pager.enable = false;
     pueue.enable = false;

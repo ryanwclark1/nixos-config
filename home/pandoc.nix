@@ -13,7 +13,7 @@ with lib; {
       enable = true;
       defaults = {
         metadata = {
-          author = "Perma";
+          author = "RC";
         };
       };
     };
