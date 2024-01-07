@@ -19,6 +19,7 @@
       ../common/bootloader.nix
       ../common/audio.nix
       ../common/docker.nix
+      ../common/qemu.nix
       ../common/fonts.nix
       ../common/transmission.nix
     ];
@@ -28,6 +29,7 @@
   audio.enable = true;
   docker.enable = true;
   transmission.enable = false;
+  qemu.enable = true;
 
   main-user.enable = true;
   main-user.userName = "administrator";
