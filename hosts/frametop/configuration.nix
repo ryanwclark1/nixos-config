@@ -61,6 +61,16 @@
         };
       };
     };
+    tailscale = {
+      enable = true;
+      package = pkgs.tailscale;
+      extraUpFlags = [];
+      authKeyFile = null;
+      interfaceName = "tailscale0";
+      permitCertUid = null;
+      port = 41641;
+      useRoutingFeatures = "none";
+    };
   };
 
 
