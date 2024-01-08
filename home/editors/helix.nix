@@ -173,7 +173,7 @@ with lib; {
         theme = "veganMacchiato";
         editor = {
           shell = ["zsh" "-c"];
-          # auto-format = true; # default is true
+          auto-format = true; # default is true
 
           # auto completion
           idle-timeout = 0;
@@ -377,17 +377,17 @@ with lib; {
         source = snippets-org;
       };
     };
-    # home.packages = with pkgs; [
-    #   nodePackages.bash-language-server
-    #   nodePackages.dockerfile-language-server-nodejs
-    #   nodePackages.vscode-langservers-extracted
-    #   taplo-lsp
-    #   yaml-language-server
-    #   clang
-    #   marksman
-    #   external.snippets-ls
+    home.packages = with pkgs; [
+      nodePackages.bash-language-server
+      nodePackages.dockerfile-language-server-nodejs
+      nodePackages.vscode-langservers-extracted
+      taplo-lsp
+      yaml-language-server
+      clang
+      marksman
+      external.snippets-ls
 
-    #   # gcc
-    # ];
+      # gcc
+    ];
   };
 }

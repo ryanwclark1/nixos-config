@@ -14,10 +14,10 @@ with lib; {
     programs.fzf = {
       enable = true;
       changeDirWidgetCommand = "fd --type d";
-      # tmux.enableShellIntegration = config.tmux.enable;
+      tmux.enableShellIntegration = config.tmux.enable;
       enableBashIntegration = config.bash.enable;
       enableZshIntegration = config.zsh.enable;
-      # enableFishIntegration = config.fish.enable;
+      enableFishIntegration = config.fish.enable;
     };
 
     home.packages = with pkgs; [
