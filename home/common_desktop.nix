@@ -64,6 +64,7 @@ with lib; {
       kubectl
       kubernetes-helm
       minikube
+      openlens
 
       # Need libpq but can't find
       postgresql
