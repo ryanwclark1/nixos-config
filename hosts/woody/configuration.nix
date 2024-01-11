@@ -52,6 +52,8 @@
     };
   };
 
+  services.vscode-server.enable = true;
+
   networking.hostName = "woody"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
