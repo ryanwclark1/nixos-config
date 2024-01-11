@@ -76,6 +76,8 @@ with lib;
               "forge@jmmaranan.com"
             ];
           };
+
+
           "org/gnome/desktop/interface" = {
             color-scheme = "prefer-dark";
             enable-hot-corners = false;
@@ -128,6 +130,10 @@ with lib;
             #toggle-tiled-right = ["<super>right"];
             toggle-tiled-left = ["@as []"];               # Tiling
             toggle-tiled-right = ["@as []"];
+          };
+          "org/gnome/nautilus/preferences" = {
+            show-hidden-files = true;
+            default-folder-viewer = "list-view";
           };
           "org/gnome/settings-daemon/plugins/media-keys" = {
             custom-keybindings = [

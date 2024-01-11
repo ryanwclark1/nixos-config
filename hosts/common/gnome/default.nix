@@ -41,5 +41,8 @@ with lib;
         };
       };
     };
+
+    # Temp, find better place.  Allows for copy/paste between host and guest.
+    services.spice-vdagentd.enable = true;
   };
 }
