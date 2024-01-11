@@ -13,7 +13,6 @@ with lib; {
       settings =  {
         shared = {
           use_unix_socket = true;
-
         };
       };
     };
