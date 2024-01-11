@@ -65,6 +65,7 @@ with lib; {
       kubernetes-helm
       minikube
       openlens
+      tilt
 
       # Need libpq but can't find
       postgresql
@@ -85,10 +86,15 @@ with lib; {
       element-desktop
       megatools
 
+      # Duplicate file finder
+      czkawka
+
       transmission
       f1viewer
       tickrs
       # fantomas
+
+      # redisinsight
 
       # # It is sometimes useful to fine-tune packages, for example, by applying
       # # overrides. You can do that directly here, just don't forget the
