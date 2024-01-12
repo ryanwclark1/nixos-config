@@ -45,7 +45,7 @@ in
     ../../home/pandoc.nix
     ../../home/slack.nix
     ../../home/starship.nix
-    ../../home/steam.nix
+    ../../home/games.nix
     ../../home/watson.nix
     ../../home/networking_utils.nix
     ../../home/common_desktop.nix
@@ -69,7 +69,7 @@ in
   pandoc.enable = true;
   # pdf.enable = false;
   slack.enable = true;
-  steam.enable = true;
+  games.enable = true;
   watson.enable = true;
   networking_utils.enable = true;
   common_desktop.enable = true;

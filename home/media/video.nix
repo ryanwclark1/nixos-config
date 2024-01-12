@@ -13,6 +13,9 @@ with lib; {
       handbrake
       blender
       freetube
+      ffmpeg
+      ffmpegthumbs
+      kdenlive
     ];
   };
 }
