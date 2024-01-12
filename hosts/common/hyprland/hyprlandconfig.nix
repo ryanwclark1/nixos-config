@@ -1,4 +1,10 @@
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+with lib;
 
 {
 
@@ -76,10 +82,10 @@
       name = "Papirus-Dark";
       package = pkgs.papirus-icon-theme;
     };
-    # cursorTheme = {
-    #   name = "Bibata-Modern-Ice";
-    #   package = pkgs.bibata-cursors;
-    # };
+    cursorTheme = {
+      name = "Bibata-Modern-Ice";
+      package = pkgs.bibata-cursors;
+    };
     gtk3.extraConfig = {
       Settings = ''
       gtk-application-prefer-dark-theme=1
@@ -93,8 +99,8 @@
   };
   xdg = {
     userDirs = {
-        enable = true;
-        createDirectories = true;
+      enable = true;
+      createDirectories = true;
     };
   };
 
