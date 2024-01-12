@@ -55,8 +55,12 @@
   # services.vscode-server.enable = true;
   services.openvscode-server = {
     enable = true;
-    
+
   };
+
+  # Mouse enabled
+  hardware.logitech.wireless.enable = true;
+  hardware.logitech.wireless.enableGraphical = true;
 
   networking.hostName = "woody"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.

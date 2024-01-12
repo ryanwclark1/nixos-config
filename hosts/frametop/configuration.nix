@@ -12,7 +12,6 @@
       ./networking.nix
       ./power-management.nix
       ./ssh.nix
-      ../common/plasma
       ../common/nfs.nix
       ../common/locale.nix
       ../common/printing.nix
@@ -22,13 +21,19 @@
       ../common/qemu.nix
       ../common/fonts.nix
       ../common/transmission.nix
+
+      ../common/plasma
+      ../common/hyprland
     ];
   nfs.enable = true;
-  plasma.enable = true;
   printing.enable = true;
   audio.enable = true;
   docker.enable = true;
   transmission.enable = false;
+
+  plasma.enable = false;
+  hyprland.enable = true;
+
 
   main-user.enable = true;
   main-user.userName = "administrator";
