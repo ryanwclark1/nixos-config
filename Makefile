@@ -34,6 +34,12 @@ frametop-remote-debug:
 woody-remote-debug:
 	nixos-rebuild switch --flake .#woody --use-remote-sudo --show-trace --verbose
 
+frametop-dryrun:
+	sudo nixos-rebuild dry-run --flake .#frametop
+
+woody-dryrun:
+	sudo nixos-rebuild dry-run --flake .#woody
+
 up:
 	nix flake update
 
