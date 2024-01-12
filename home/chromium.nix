@@ -5,9 +5,9 @@
 }:
 
 with lib; {
-  options.chrome.enable = mkEnableOption "chrome settings";
+  options.chromium.enable = mkEnableOption "chrome settings";
 
-  config = mkIf config.chrome.enable {
+  config = mkIf config.chromium.enable {
     programs.chromium = {
       enable = true;
       extensions = [
