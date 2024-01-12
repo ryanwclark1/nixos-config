@@ -9,9 +9,9 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       ./gpu.nix
-      ./main-user.nix
       ./networking.nix
       ./ssh.nix
+      ../common/main-user.nix
       ../common/gnome
       ../common/nfs.nix
       ../common/locale.nix

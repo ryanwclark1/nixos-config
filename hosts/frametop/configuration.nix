@@ -9,10 +9,10 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       ./gpu.nix
-      ./main-user.nix
       ./networking.nix
       ./power-management.nix
       ./ssh.nix
+      ../common/main-user.nix
       ../common/plasma
       ../common/hyprland
       ../common/nfs.nix
@@ -25,7 +25,6 @@
       ../common/fonts.nix
       ../common/transmission.nix
       ../common/steam.nix
-
     ];
   nfs.enable = true;
   printing.enable = true;
