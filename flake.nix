@@ -130,6 +130,11 @@
           modules = [ ./hosts/woody ];
           specialArgs = { inherit inputs outputs; };
         };
+        # Primary desktop
+        frametop = lib.nixosSystem {
+          modules = [ ./hosts/frametop ];
+          specialArgs = { inherit inputs outputs; };
+        };
       };
 
       homeConfigurations = {
@@ -174,6 +179,17 @@
           pkgs = pkgsFor.x86_64-linux;
           extraSpecialArgs = { inherit inputs outputs; };
         };
+        "administrator@frametop" = lib.homeManagerConfiguration {
+          modules = [ ./home/administrator/generic.nix ];
+          pkgs = pkgsFor.x86_64-linux;
+          extraSpecialArgs = { inherit inputs outputs; };
+        };
+        "administrator@woody" = lib.homeManagerConfiguration {
+          modules = [ ./home/administrator/generic.nix ];
+          pkgs = pkgsFor.x86_64-linux;
+          extraSpecialArgs = { inherit inputs outputs; };
+        };
+
       };
     };
 }
