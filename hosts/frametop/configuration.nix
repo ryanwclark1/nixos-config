@@ -35,7 +35,6 @@
   plasma.enable = true;
   hyprland.enable = false;
 
-
   main-user.enable = true;
   main-user.userName = "administrator";
 
