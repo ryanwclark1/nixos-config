@@ -24,9 +24,9 @@ with lib;
           # This is turned on because gnome is used on desktop.
           # Would likely create issue if used on laptop.
           autoSuspend = false;
-          banner = ''
-            Welcome Ryan!
-            '';
+          # banner = ''
+          #   Welcome Ryan!
+          #   '';
           wayland = true;
         };
       };
