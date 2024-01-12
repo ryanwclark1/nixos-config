@@ -23,9 +23,22 @@ networking = {
     wireguard.enable = true;
   };
 
+  # boot = {
+  #   kernelPackages = pkgs.linuxKernel.packages.linux_zen;
+  #   binfmt.emulatedSystems = [ "aarch64-linux" "i686-linux" ];
+  # };
+
   boot = {
-    kernelPackages = pkgs.linuxKernel.packages.linux_zen;
-    binfmt.emulatedSystems = [ "aarch64-linux" "i686-linux" ];
+    loader = {
+      systemd-boot = {
+        enable = true;
+        configurationLimit = 10;
+      };
+      efi = {
+        canTouchEfiVariables = true;
+      };
+      timeout = 1;
+    };
   };
 
   powerManagement.powertop.enable = true;
