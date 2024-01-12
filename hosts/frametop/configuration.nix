@@ -8,7 +8,7 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      ./gpu.nix
+      # ./gpu.nix
       ./main-user.nix
       ./networking.nix
       ./power-management.nix
@@ -34,8 +34,8 @@
   transmission.enable = false;
   steam.enable = true;
 
-  plasma.enable = false;
-  hyprland.enable = true;
+  plasma.enable = true;
+  hyprland.enable = false;
 
   main-user.enable = true;
   main-user.userName = "administrator";
