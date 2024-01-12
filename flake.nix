@@ -30,13 +30,9 @@
     ...
   } @ inputs:
     let
-      # Flakes are evaluated hermetically, thus are unable to access
-      # host environment (including looking up current system).
-      #
-      # That's why flakes must explicitly export sets for each system
-      # supported.
+      # Flakes must explicitly export sets for each system supported.
       system = "x86_64-linux";
-      # pkgs = nixpkgs.legacyPackages.${system};
+      pkgs = nixpkgs.legacyPackages.${system};
       inherit (nixpkgs) lib;
     in
       with inputs;
