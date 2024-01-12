@@ -62,7 +62,7 @@ in
   exercism.enable = true;
   filezilla.enable = true;
   insomnia.enable = true;
-  kitty.enable = false;
+  kitty.enable = true;
   monitor.enable = true;
   office.enable = true;
   ollama.enable = true;
@@ -80,6 +80,9 @@ in
 
   starship.enable = true;
   vscode.enable = true;
+
+  # temporary
+  hyprland.enable = true;
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
