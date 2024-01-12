@@ -62,6 +62,7 @@
             nixos-hardware.nixosModules.framework-12th-gen-intel
             inputs.home-manager.nixosModules.default
             inputs.vscode-server.nixosModules.default
+            inputs.hyprland.nixosModules.default
             # inputs.plasma-manager.homeManagerModules.plasma-manager
           ];
         };
