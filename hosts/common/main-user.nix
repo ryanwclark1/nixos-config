@@ -4,23 +4,25 @@
   pkgs,
   ...
 }:
-
+let
+  cfg = config.main-user;
+in
 {
-  options = {
-    main-user.enable = lib.mkEnableOption "enable user module";
+  options.main-user = {
+    enable = lib.mkEnableOption "enable user module";
 
-    main-user.userName = lib.mkOption {
+    userName = lib.mkOption {
       default = "administrator";
       description = ''
-        username
+        Administrator User
       '';
     };
   };
-  config = lib.mkIf config.main-user.enable {
-    users.users."administrator" = {
+  
+  config = lib.mkIf cfg.enable {
+    users.users.${cfg.userName} = {
       isNormalUser = true;
       # initialPassword = "";
-      description = "Administrator User";
       shell = pkgs.zsh;
       extraGroups = [ "networkmanager" "wheel" "audio" "docker" "video" "transmission" "wireshark"];
       openssh.authorizedKeys.keys = [
