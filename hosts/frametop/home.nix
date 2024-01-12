@@ -82,7 +82,7 @@ in
   vscode.enable = true;
 
   # temporary
-  hyprland2.enable = false;
+  hyprland.enable = true;
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
