@@ -8,7 +8,7 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      # ./gpu.nix
+      ./gpu.nix
       ./main-user.nix
       ./networking.nix
       ./power-management.nix
