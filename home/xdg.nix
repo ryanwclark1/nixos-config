@@ -4,7 +4,7 @@
 }:
 
 let
-  browser = ["chromium-browser.desktop"];
+  browser = ["google-chrome.desktop"];
 
   # XDG MIME types
   associations = {
@@ -20,7 +20,7 @@ let
     "application/xhtml+xml" = browser;
     "text/html" = browser;
     "x-scheme-handler/about" = browser;
-    "x-scheme-handler/chrome" = ["chromium-browser.desktop"];
+    "x-scheme-handler/chrome" = ["google-chrome.desktop"];
     "x-scheme-handler/ftp" = browser;
     "x-scheme-handler/http" = browser;
     "x-scheme-handler/https" = browser;
