@@ -73,5 +73,5 @@ with lib;
      MOZ_ENABLE_WAYLAND = "1";
     };
   };
-  programs.home-manager.enable = true;
+
 }
