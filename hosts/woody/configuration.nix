@@ -22,6 +22,7 @@
       ../common/qemu.nix
       ../common/fonts.nix
       ../common/transmission.nix
+      ../common/steam.nix
     ];
   nfs.enable = true;
   gnome.enable = true;
@@ -30,6 +31,7 @@
   docker.enable = true;
   transmission.enable = false;
   qemu.enable = true;
+  steam.enable = true;
 
   main-user.enable = true;
   main-user.userName = "administrator";
@@ -51,6 +53,8 @@
       useRoutingFeatures = "none";
     };
   };
+
+  virtualisation.waydroid.enable = true;
 
   # services.vscode-server.enable = true;
   services.openvscode-server = {

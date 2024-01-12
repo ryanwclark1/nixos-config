@@ -24,6 +24,7 @@
       ../common/qemu.nix
       ../common/fonts.nix
       ../common/transmission.nix
+      ../common/steam.nix
 
     ];
   nfs.enable = true;
@@ -31,6 +32,7 @@
   audio.enable = true;
   docker.enable = true;
   transmission.enable = false;
+  steam.enable = true;
 
   plasma.enable = false;
   hyprland.enable = true;
