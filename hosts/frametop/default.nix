@@ -1,6 +1,6 @@
 { pkgs, inputs, ... }: {
   imports = [
-    inputs.nixos-hardware.nixosModules.framework-12th-gen-intel
+    inputs.hardware.nixosModules.framework-12th-gen-intel
     inputs.hardware.nixosModules.common-pc-ssd
     ./hardware-configuration.nix
 
