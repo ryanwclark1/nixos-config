@@ -32,8 +32,8 @@
   docker.enable = true;
   transmission.enable = false;
 
-  plasma.enable = true;
-  hyprland.enable = false;
+  plasma.enable = false;
+  hyprland.enable = true;
 
   main-user.enable = true;
   main-user.userName = "administrator";
