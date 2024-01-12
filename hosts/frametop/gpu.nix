@@ -15,6 +15,6 @@
       vaapiVdpau
       libvdpau-va-gl
     ];
-    extraPackages32 = with pkgs.pkgsi686Linux; [ vaapiIntel ];
+    # extraPackages32 = with pkgs.pkgsi686Linux; [ vaapiIntel ];
   };
 }
