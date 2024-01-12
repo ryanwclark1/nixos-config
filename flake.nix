@@ -17,30 +17,31 @@
     vscode-server.url = "github:nix-community/nixos-vscode-server";
     hyprland.url = "github:hyprwm/Hyprland";
     # plasma-manager = {
-    #   url = "github:pjones/plasma-manager";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    #   inputs.home-manager.follows = "home-manager";
+      #   url = "github:pjones/plasma-manager";
+      #   inputs.nixpkgs.follows = "nixpkgs";
+      #   inputs.home-manager.follows = "home-manager";
     # };
   };
 
   outputs = {
     self,
     nixpkgs,
-    vscode-server,
     ...
   } @ inputs:
     let
       # Flakes must explicitly export sets for each system supported.
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
-      inherit (nixpkgs) lib;
+      # inherit (nixpkgs) lib;
+      config = {
+        allowUnfree = true;
+      };
     in
       with inputs;
     {
       nixosConfigurations = {
 
-        woody = lib.nixosSystem {
-          inherit system;
+        woody = nixpkgs.lib.nixosSystem {
           specialArgs = {inherit inputs;};
           modules = [
             ./hosts/woody/configuration.nix
@@ -50,8 +51,7 @@
           ];
         };
 
-        frametop = lib.nixosSystem {
-          inherit system;
+        frametop = nixpkgs.lib.nixosSystem {
           specialArgs = {inherit inputs;};
           modules = [
             ./hosts/frametop/configuration.nix

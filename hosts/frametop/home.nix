@@ -15,7 +15,7 @@ in
 {
 
   # TODO: Remove this in home.nix
-  nixpkgs.config.allowUnfree = true;
+  # nixpkgs.config.allowUnfree = true;
 
   imports = [
     ../../home/shells/bash.nix

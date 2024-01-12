@@ -51,7 +51,7 @@ with lib;
        "\${HOME}/.cargo/bin"
        "\$/usr/local/bin"
      ];
-     NIXPKGS_ALLOW_UNFREE = "1";
+    #  NIXPKGS_ALLOW_UNFREE = "1";
      SCRIPTDIR = "\${HOME}/.local/share/scriptdeps";
      STARSHIP_CONFIG = "\${HOME}/.config/starship/starship.toml";
      XDG_CURRENT_DESKTOP = "Hyprland";

@@ -320,6 +320,29 @@
         "type": "indirect"
       }
     },
+    "plasma-manager": {
+      "inputs": {
+        "home-manager": [
+          "home-manager"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1704927112,
+        "narHash": "sha256-AKTE0TczctkgAj3FGnslPrDZP0A9FDlRITv+aV2Agsg=",
+        "owner": "pjones",
+        "repo": "plasma-manager",
+        "rev": "06ad8e693009a64b58156b8b55e347defe759970",
+        "type": "github"
+      },
+      "original": {
+        "owner": "pjones",
+        "repo": "plasma-manager",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "aspen": "aspen",
@@ -328,6 +351,7 @@
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_3",
         "nixpkgs-stable": "nixpkgs-stable",
+        "plasma-manager": "plasma-manager",
         "sops-nix": "sops-nix",
         "vscode-server": "vscode-server"
       }
