@@ -49,6 +49,7 @@ in
     ../../home/watson.nix
     ../../home/networking_utils.nix
     ../../home/common_desktop.nix
+    ../../home/chrome.nix
   ];
   bash.enable = true;
   zsh.enable = true;
@@ -75,7 +76,7 @@ in
 
   # xdg.enable = false;
 
-  chrome.enable = true;
+  chromium.enable = true;
   firefox.enable = true;
 
   starship.enable = true;

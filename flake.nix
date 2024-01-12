@@ -14,7 +14,7 @@
       url = "github:prmadev/aspen";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    inputs.vscode-server.url = "github:nix-community/nixos-vscode-server";
+    vscode-server.url = "github:nix-community/nixos-vscode-server";
     # plasma-manager = {
     #   url = "github:pjones/plasma-manager";
     #   inputs.nixpkgs.follows = "nixpkgs";
@@ -48,7 +48,7 @@
           modules = [
             ./hosts/woody/configuration.nix
             inputs.home-manager.nixosModules.default
-            inputs.vscode-server.NixOSModules.default
+            inputs.vscode-server.nixosModules.default
             # inputs.plasma-manager.homeManagerModules.plasma-manager
           ];
         };
@@ -60,7 +60,7 @@
             ./hosts/frametop/configuration.nix
             nixos-hardware.nixosModules.framework-12th-gen-intel
             inputs.home-manager.nixosModules.default
-            inputs.vscode-server.NixOSModules.default
+            inputs.vscode-server.nixosModules.default
             # inputs.plasma-manager.homeManagerModules.plasma-manager
           ];
         };
