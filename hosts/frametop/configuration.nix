@@ -105,11 +105,8 @@
     };
 
     users = {
-      "administrator" = import [ ./home.nix ../../home/hyprland ];
+      "administrator" = import ./home.nix;
     };
-
-
-    # Makeif statment hyprland is enabled
 
   };
 
