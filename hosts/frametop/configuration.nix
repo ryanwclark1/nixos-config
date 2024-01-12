@@ -25,6 +25,7 @@
       ../common/fonts.nix
       ../common/transmission.nix
       ../common/steam.nix
+      inputs.home-manager.nixosModules.default
     ];
   nfs.enable = true;
   printing.enable = true;
@@ -97,7 +98,7 @@
   };
 
   # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
+  # nixpkgs.config.allowUnfree = true;
 
   home-manager = {
     extraSpecialArgs = {
