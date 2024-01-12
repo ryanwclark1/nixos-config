@@ -15,7 +15,7 @@ with lib;
 
     home.file.".config/stinger.mov".source = ./media/stinger.mov;
     home.file.".config/pipewire/pipewire.conf".source = ./config/pipewire/pipewire.conf;
-    home.file.".config/neofetch/config.conf".source = ./config/neofetch/config.conf;
+    # home.file.".config/neofetch/config.conf".source = ./config/neofetch/config.conf;
     home.file.".vimrc".source = ./config/vimrc;
     home.file.".emoji".source = ./config/emoji;
     home.file.".face".source = ./config/face.jpg;
@@ -46,7 +46,7 @@ with lib;
 
 
     home.packages = with pkgs; [
-      neofetch lolcat cmatrix discord btop libvirt
+      lolcat cmatrix discord btop libvirt
       swww polkit_gnome grim slurp lm_sensors gnome.file-roller
       libnotify swaynotificationcenter rofi-wayland imv v4l-utils
       ydotool wl-clipboard socat cowsay lsd pkg-config transmission-gtk
