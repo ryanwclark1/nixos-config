@@ -19,6 +19,8 @@ with lib;
     services.xserver = {
       enable = true;
       layout = "us";
+      # sddm showing albainan keyboard layout
+      xkb.layout = "us";
       # Enable the Plasma Desktop Environment.
       displayManager = {
         defaultSession = "plasmawayland";
