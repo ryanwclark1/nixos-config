@@ -19,7 +19,7 @@
   # You should also install the clinfo package
   # to verify that OpenCL is correctly setup check darktable
   hardware.opengl = {
-
+    enable = true;
     driSupport = true; # This is already enabled by default
     driSupport32Bit = true; # For 32 bit applications
     extraPackages = with pkgs; [
