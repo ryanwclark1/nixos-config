@@ -12,37 +12,37 @@ with lib;
   options.hyprland.enable = mkEnableOption "hyprland settings";
   config = mkIf config.hyprland.enable {
 
-    programs.hyprland = {
-      enable = true;
-      package = inputs.hyprland.packages.${pkgs.system}.hyprland;
-    };
-
-    # Some programs need SUID wrappers, can be configured further or are
-    # started in user sessions.
-    programs.mtr.enable = true;
-    programs.gnupg.agent = {
-      enable = true;
-      enableSSHSupport = true;
-    };
-
-    services.fstrim.enable = true;
-    services.xserver = {
-      enable = true;
-      layout = "us";
-      xkbVariant = "";
-      libinput.enable = true;
-      # This is included in gpu.nix to allow for other drivers
-      # videoDrivers = [ "amdgpu" ];
-      displayManager.gdm = {
+    programs = {
+      hyprland = {
         enable = true;
-        wayland = true;
+        package = inputs.hyprland.packages.${pkgs.system}.hyprland;
+      };
+      mtr.enable = true;
+      gnupg.agent = {
+        enable = true;
+        enableSSHSupport = true;
       };
     };
-    sound.enable = true;
-    security.rtkit.enable = true;
+
+    services = {
+      xserver = {
+        enable = true;
+        layout = "us";
+        xkbVariant = "";
+        libinput.enable = true;
+        # This is included in gpu.nix to allow for other drivers
+        # videoDrivers = [ "amdgpu" ];
+        displayManager.gdm = {
+          enable = true;
+          wayland = true;
+        };
+      };
+      gvfs.enable = true;
+      fstrim.enable = true;
+      tumbler.enable = true;
+    };
+
     programs.thunar.enable = true;
-    services.gvfs.enable = true;
-    services.tumbler.enable = true;
 
     environment.variables={
      NIXOS_OZONE_WL = "1";
