@@ -32,8 +32,8 @@
   docker.enable = true;
   transmission.enable = false;
 
-  plasma.enable = false;
-  hyprland.enable = true;
+  plasma.enable = true;
+  hyprland.enable = false;
 
 
   main-user.enable = true;
