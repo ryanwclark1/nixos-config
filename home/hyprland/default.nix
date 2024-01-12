@@ -7,9 +7,9 @@
 with lib;
 
 {
-  options.hyprlandconfig.enable = mkEnableOption "hyprland confgiruation settings";
+  options.hyprland.enable = mkEnableOption "hyprland confgiruation settings";
 
-  config = mkIf config.hyprlandconfig.enable {
+  config = mkIf config.hyprland.enable {
     home-manager.users.administrator = {
       home.file.".config/stinger.mov".source = ./media/stinger.mov;
       home.file.".config/pipewire/pipewire.conf".source = ./config/pipewire/pipewire.conf;
@@ -18,7 +18,7 @@ with lib;
       home.file.".emoji".source = ./config/emoji;
       home.file.".face".source = ./config/face.jpg;
       home.file."Pictures/Wallpapers" = {
-        source = ./media/Wallpapers;
+        source = ./media/wallpapers;
         recursive = true;
       };
       home.file.".local/share/fonts" = {

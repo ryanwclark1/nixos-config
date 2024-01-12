@@ -107,6 +107,12 @@
     users = {
       "administrator" = import ./home.nix;
     };
+    imports = [
+      ../../home/hyprland
+    ];
+
+    # Makeif statment hyprland is enabled
+
   };
 
   # List packages installed in system profile. To search, run:

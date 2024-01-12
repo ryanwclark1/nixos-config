@@ -8,13 +8,9 @@
 with lib;
 
 {
-  imports = [
-    ./hyprlandconfig.nix
-  ];
 
   options.hyprland.enable = mkEnableOption "hyprland settings";
   config = mkIf config.hyprland.enable {
-    hyprlandconfig.enable = true;
 
     programs.hyprland = {
       enable = true;
