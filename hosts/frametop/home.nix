@@ -49,6 +49,7 @@ in
     ../../home/watson.nix
     ../../home/networking_utils.nix
     ../../home/common_desktop.nix
+    ../../home/hyprland
   ];
   bash.enable = true;
   zsh.enable = true;
