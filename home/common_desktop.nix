@@ -89,7 +89,6 @@ with lib; {
       # Duplicate file finder
       czkawka
 
-      transmission
       f1viewer
       tickrs
       # fantomas
