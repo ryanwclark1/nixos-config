@@ -7,8 +7,12 @@
 with lib;
 
 {
-  options.hyprland.enable = mkEnableOption "hyprland confgiruation settings";
-  config = mkIf config.hyprland.enable {
+  options.hyprland2.enable = mkEnableOption "hyprland confgiruation settings";
+  config = mkIf config.hyprland2.enable {
+    home.username = "administrator";
+    home.homeDirectory = "/home/administrator";
+    home.stateVersion = "23.11";
+
     home.file.".config/stinger.mov".source = ./media/stinger.mov;
     home.file.".config/pipewire/pipewire.conf".source = ./config/pipewire/pipewire.conf;
     home.file.".config/neofetch/config.conf".source = ./config/neofetch/config.conf;
@@ -356,7 +360,7 @@ with lib;
   	}
       '';
     };
-    programs.home-manager.enable = true;
+    # programs.home-manager.enable = true;
   };
 
 }
