@@ -52,11 +52,11 @@ in
           };
         };
       };
-      "tailscale.techcasa.io" = {
-        forceSSL = true;
-        enableACME = true;
-        locations."/".return = "302 https://tailscale.techcasa.io$request_uri";
-      };
+      # "tailscale.techcasa.io" = {
+      #   forceSSL = true;
+      #   enableACME = true;
+      #   locations."/".return = "302 https://tailscale.techcasa.io$request_uri";
+      # };
     };
   };
 
