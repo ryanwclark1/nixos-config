@@ -143,7 +143,7 @@ in
     # set default applications
     # EDITOR = "nvim";
     # BROWSER = "firefox";
-    TERMINAL = "alacritty";
+    # TERMINAL = "alacritty";
 
     # enable scrolling in git diff
     DELTA_PAGER = "less -R";

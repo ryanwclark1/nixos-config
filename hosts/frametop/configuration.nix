@@ -8,10 +8,13 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
+      ./gpu.nix
       ./main-user.nix
       ./networking.nix
       ./power-management.nix
       ./ssh.nix
+      ../common/plasma
+      ../common/hyprland
       ../common/nfs.nix
       ../common/locale.nix
       ../common/printing.nix
@@ -22,8 +25,6 @@
       ../common/fonts.nix
       ../common/transmission.nix
 
-      ../common/plasma
-      ../common/hyprland
     ];
   nfs.enable = true;
   printing.enable = true;
@@ -80,21 +81,6 @@
 
   services.vscode-server.enable = true;
 
-  # nixpkgs.config.packageOverrides = pkgs: {
-  #   vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; };
-  # };
-  # hardware.opengl = {
-  #   enable = true;
-  #   extraPackages = with pkgs; [
-  #     intel-media-driver # LIBVA_DRIVER_NAME=iHD
-  #     vaapiIntel         # LIBVA_DRIVER_NAME=i965 (older but works better for Firefox/Chromium)
-  #     vaapiVdpau
-  #     libvdpau-va-gl
-  #   ];
-  #   extraPackages32 = with pkgs.pkgsi686Linux; [ vaapiIntel ];
-  # };
-
-
   # Enable touchpad support (enabled default in most desktopManager).
   services.xserver.libinput = {
     enable = true;
@@ -106,14 +92,8 @@
   hardware.logitech.wireless.enable = true;
   hardware.logitech.wireless.enableGraphical = true;
 
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
   # Enable networking
   networking.networkmanager.enable = true;
-
-
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
