@@ -40,7 +40,6 @@
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
   services = {
-    # bios updating tool
     fwupd.enable = true;
     tailscale = {
       enable = true;
@@ -52,20 +51,21 @@
       port = 41641;
       useRoutingFeatures = "none";
     };
+    openvscode-server.enable = true;
   };
 
   virtualisation.waydroid.enable = true;
 
-  # services.vscode-server.enable = true;
-  services.openvscode-server = {
-    enable = true;
-
-  };
-
   # Mouse enabled
-  hardware.logitech.wireless.enable = true;
-  hardware.logitech.wireless.enableGraphical = true;
-
+  hardware = {
+    logitech = {
+      wireless = {
+        enable = true;
+        enableGraphical = true;
+      };
+    };
+  };
+  
   networking.hostName = "woody"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 

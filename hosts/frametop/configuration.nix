@@ -40,8 +40,11 @@
   main-user.enable = true;
   main-user.userName = "administrator";
 
-  networking.hostName = "frametop"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+  networking = {
+    hostName = "frametop"; # Define your hostname.
+    # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+    networkmanager.enable = true;
+  };
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
@@ -49,12 +52,9 @@
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
   services = {
-    # bios updating tool
-    fwupd.enable = true;
-    # Intel Thermal Management
-    thermald.enable = true;
-    # Automatic CPU speed & power optimizer for Linux
-    # Runs well with thermald
+    fwupd.enable = true; # bios updating tool
+    thermald.enable = true; # Intel Thermal Management
+    # Automatic CPU speed & power optimizer runs well with thermald
     auto-cpufreq = {
       enable = true;
       settings = {
@@ -78,23 +78,24 @@
       port = 41641;
       useRoutingFeatures = "none";
     };
-  };
-
-  services.vscode-server.enable = true;
-
-  # Enable touchpad support (enabled default in most desktopManager).
-  services.xserver.libinput = {
-    enable = true;
-    # tapping = true;
-    # naturalScroll = true;
+    vscode-server.enable = true;
+    # touchpad support (enabled default in most desktopManager).
+    xserver.libinput = {
+      enable = true;
+      # tapping = true;
+      # naturalScroll = true;
+    };
   };
 
   # Mouse enabled
-  hardware.logitech.wireless.enable = true;
-  hardware.logitech.wireless.enableGraphical = true;
-
-  # Enable networking
-  networking.networkmanager.enable = true;
+  hardware = {
+    logitech = {
+      wireless = {
+        enable = true;
+        enableGraphical = true;
+      };
+    };
+  };
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;

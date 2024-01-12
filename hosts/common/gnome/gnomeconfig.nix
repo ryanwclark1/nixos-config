@@ -52,9 +52,9 @@ with lib;
 
           "org/gnome/shell" = {
             favorite-apps = [
-              "codium.desktop"
+              "code.desktop"
               "Alacritty.desktop"
-              "chromium-browser.desktop"
+              "google-chrome.desktop"
               "firefox.desktop"
               "org.gnome.Nautilus.desktop"
             ];
@@ -149,7 +149,7 @@ with lib;
           };
           "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1" = {
             binding = "<super>t";
-            command = "codium";
+            command = "code";
             name = "open-editor";
           };
           "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2" = {

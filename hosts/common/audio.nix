@@ -11,12 +11,9 @@ with lib;
   options.audio.enable = mkEnableOption "audio settings";
 
   config = mkIf config.audio.enable {
-    # Set sound.enable to false, as it is only applicable to alsa
     # sound.enable = lib.mkForce false;
-
     sound.enable = true;
     hardware.pulseaudio.enable = false;
-    # rtkit is optional but recommended
     security.rtkit.enable = true;
 
     # Configure pipewire
