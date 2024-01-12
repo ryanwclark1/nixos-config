@@ -49,7 +49,7 @@ in
     ../../home/watson.nix
     ../../home/networking_utils.nix
     ../../home/common_desktop.nix
-    ../../home/chrome.nix
+    # ../../home/chrome.nix
   ];
   bash.enable = true;
   zsh.enable = true;
