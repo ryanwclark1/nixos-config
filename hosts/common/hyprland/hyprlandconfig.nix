@@ -44,12 +44,12 @@ with lib;
 
 
       home.packages = with pkgs; [
-        neofetch lolcat cmatrix discord firefox btop libvirt
-        swww polkit_gnome grim slurp lm_sensors unzip unrar gnome.file-roller
+        neofetch lolcat cmatrix discord btop libvirt
+        swww polkit_gnome grim slurp lm_sensors gnome.file-roller
         libnotify swaynotificationcenter rofi-wayland imv v4l-utils
         ydotool wl-clipboard socat cowsay lsd pkg-config transmission-gtk mpv
-        gimp obs-studio blender kdenlive meson glibc hugo gnumake ninja go
-        nodejs godot_4 rustup pavucontrol audacity zeroad xonotic
+        obs-studio blender kdenlive meson glibc hugo gnumake ninja
+        godot_4 rustup pavucontrol audacity zeroad xonotic
         openra font-awesome symbola noto-fonts-color-emoji material-icons
         spotify
         # Import Scripts
