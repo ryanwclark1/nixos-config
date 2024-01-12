@@ -33,7 +33,8 @@ with lib;
       layout = "us";
       xkbVariant = "";
       libinput.enable = true;
-      videoDrivers = [ "amdgpu" ];
+      # This is included in gpu.nix to allow for other drivers
+      # videoDrivers = [ "amdgpu" ];
       displayManager.gdm = {
         enable = true;
         wayland = true;
