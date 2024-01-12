@@ -61,7 +61,7 @@ in
   exercism.enable = true;
   filezilla.enable = true;
   insomnia.enable = true;
-  kitty.enable = true;
+  kitty.enable = false;
   monitor.enable = true;
   office.enable = true;
   ollama.enable = true;

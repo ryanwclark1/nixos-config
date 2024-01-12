@@ -15,6 +15,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     vscode-server.url = "github:nix-community/nixos-vscode-server";
+    hyprland.url = "github:hyprwm/Hyprland";
     # plasma-manager = {
     #   url = "github:pjones/plasma-manager";
     #   inputs.nixpkgs.follows = "nixpkgs";
