@@ -6,7 +6,7 @@
     name = "cincobola";
     JEKYLL_ENV = "production";
     src = pkgs.fetchFromGitHub {
-      owner = "misterio77";
+      owner = "ryanwclark1";
       repo = "BSI-SCC0560";
       rev = "bd1dcc3";
       hash = "sha256-npPYxuZkqZWS0nRGc9IpTNviWzF5sFNUeVTdS6486lg=";

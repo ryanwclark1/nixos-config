@@ -7,16 +7,13 @@ let
   common = rec {
     realName = "Ryan Clark";
     gpg = {
-      key = "7088 C742 1873 E0DB 97FF 17C2 245C AB70 B4C2 25E9";
+      # key = "7088 C742 1873 E0DB 97FF 17C2 245C AB70 B4C2 25E9";
       signByDefault = true;
     };
     signature = {
       showSignature = "append";
       text = ''
         ${realName}
-
-        https://gsfontes.com
-        PGP: ${gpg.key}
       '';
     };
   };
