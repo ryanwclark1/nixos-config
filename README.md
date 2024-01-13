@@ -117,8 +117,6 @@ Some of the services I host:
 - navidrome
 - deluge
 - prometheus
-- websites (such as https://techcasa.io)
-- minecraft
 - headscale
 
 Nixy stuff:
@@ -130,12 +128,5 @@ Nixy stuff:
 - deploy-rs
 - and NixOS and nix itself, of course :)
 
-Let me know if you have any questions about them :)
-
-## Unixpornish stuff
-![fakebusy](https://i.imgur.com/PZ4L7TR.png)
-![clean](https://i.imgur.com/T5FjqbZ.jpg)
-
-That's how my hyprland desktop setup look like (as of 2022 July).
 
 
