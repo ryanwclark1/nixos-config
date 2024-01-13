@@ -12,33 +12,20 @@
   ];
 
 networking = {
-    hostName = "woody";
+    hostName = "frametop";
     useDHCP = true;
-    firewall.enable = false;
-    nameservers = [
-      "10.10.100.1"
-      "9.9.9.9"
-      "1.1.1.1"
-    ];
-    wireguard.enable = true;
+    # firewall.enable = false;
+    # nameservers = [
+    #   "10.10.100.1"
+    #   "9.9.9.9"
+    #   "1.1.1.1"
+    # ];
+    # wireguard.enable = true;
   };
 
-  # boot = {
-  #   kernelPackages = pkgs.linuxKernel.packages.linux_zen;
-  #   binfmt.emulatedSystems = [ "aarch64-linux" "i686-linux" ];
-  # };
-
   boot = {
-    loader = {
-      systemd-boot = {
-        enable = true;
-        configurationLimit = 10;
-      };
-      efi = {
-        canTouchEfiVariables = true;
-      };
-      timeout = 1;
-    };
+    kernelPackages = pkgs.linuxKernel.packages.linux_zen;
+    binfmt.emulatedSystems = [ "aarch64-linux" "i686-linux" ];
   };
 
   powerManagement.powertop.enable = true;
