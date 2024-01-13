@@ -3,6 +3,41 @@
 #    otherwise the target will not be executed!
 #
 
+# Define the output directory and filenames
+RSA_KEY_FILE = ~/.ssh/ssh_host_rsa_key
+ED25519_KEY_FILE = ~/.ssh/ssh_host_ed25519_key
+AGE_DIR = ~/.config/sops/age
+AGE_PUBLIC_KEY_FILE = $(AGE_DIR)/keys.txt
+
+# Define the number of bits for RSA key
+RSA_BITS = 4096
+
+# Define the makefile targets and rules
+.PHONY: keygen rsa_key ed25519_key age_key get_age_public_key
+
+keygen: rsa_key ed25519_key age_key get_age_public_key
+
+rsa_key:
+	@echo "Generating RSA SSH key..."
+	@ssh-keygen -t rsa -b $(RSA_BITS) -f $(RSA_KEY_FILE) -N ""
+
+ed25519_key:
+	@echo "Generating Ed25519 SSH key..."
+	@ssh-keygen -t ed25519 -f $(ED25519_KEY_FILE) -N ""
+
+age_key: create_age_dir
+	@echo "Generating Age key pair..."
+	@nix run nixpkgs#ssh-to-age -c ssh-to-age -private-key -i $(ED25519_KEY_FILE) > $(AGE_PUBLIC_KEY_FILE)
+
+create_age_dir:
+	@echo "Creating Age key directory..."
+	@mkdir -p $(AGE_DIR)
+
+get_age_public_key:
+	@echo "Getting Age public key..."
+	@nix shell nixpkgs#age -c age-keygen -y $(AGE_PUBLIC_KEY_FILE)
+
+
 
 ############################################################################
 #
