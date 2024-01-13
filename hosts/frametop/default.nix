@@ -60,6 +60,7 @@ networking = {
       driSupport = true;
       driSupport32Bit = true;
     };
+
     logitech = {
       wireless = {
         enable = true;
