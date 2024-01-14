@@ -1,8 +1,8 @@
 # .sops.yaml
 
 keys:
-  - &administrator {{YOUR KEY HERE}}
-  - &frametop {{YOUR KEY HERE}}
+  - &administrator age1z579g6gth8cxtqvha7ms98mpshy5n5hssc637jeqaan78rf0mppq4u93cv
+  - &frametop age1z579g6gth8cxtqvha7ms98mpshy5n5hssc637jeqaan78rf0mppq4u93cv
 creation_rules:
   - path_regex: hosts/common/[^/]+\.yaml$
     key_groups:
