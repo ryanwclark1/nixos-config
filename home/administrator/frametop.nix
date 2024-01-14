@@ -9,8 +9,20 @@ in {
     ./features/productivity
   ];
 
-  # colorscheme = lib.mkDefault colorSchemes.silk-dark;
-  # specialisation = {
-  #   light.configuration.colorscheme = colorSchemes.silk-light;
-  # };
+  colorscheme = lib.mkDefault colorSchemes.silk-dark;
+  specialisation = {
+    light.configuration.colorscheme = colorSchemes.silk-light;
+  };
+
+  monitors = [
+    {
+      name = "eDP-1";
+      width = 2256;
+      height = 1504;
+      workspace = "1";
+      x = 0;
+      primary = true;
+    }
+  ];
+
 }
