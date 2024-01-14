@@ -25,7 +25,7 @@
     };
   };
 
-  boot.kernelParams = [
-    "intel_pstate=disable"
-  ];
+  # boot.kernelParams = [
+  #   "intel_pstate=disable"
+  # ];
 }

@@ -18,7 +18,7 @@
       ../common/nfs.nix
       ../common/locale.nix
       ../common/printing.nix
-      ../common/bootloader.nix
+      # ../common/bootloader.nix
       ../common/audio.nix
       ../common/docker.nix
       ../common/qemu.nix
