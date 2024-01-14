@@ -2,30 +2,28 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, inputs, system, ... }:
+{ pkgs, inputs, ... }:
 
 {
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      ./gpu.nix
       ./networking.nix
       ./power-management.nix
       ./ssh.nix
       ../common/main-user.nix
       ../common/plasma
-      ../common/hyprland
       ../common/nfs.nix
       ../common/locale.nix
       ../common/printing.nix
-      # ../common/bootloader.nix
       ../common/audio.nix
       ../common/docker.nix
       ../common/qemu.nix
       ../common/fonts.nix
       ../common/transmission.nix
       ../common/steam.nix
-      inputs.home-manager.nixosModules.default
+      inputs.hardware.nixosModules.framework-12th-gen-intel
+      inputs.hardware.nixosModules.common-pc-ssd
     ];
   nfs.enable = true;
   printing.enable = true;
@@ -35,7 +33,6 @@
   steam.enable = true;
 
   plasma.enable = true;
-  hyprland.enable = false;
 
   main-user.enable = true;
   main-user.userName = "administrator";
@@ -103,7 +100,6 @@
   home-manager = {
     extraSpecialArgs = {
       inherit inputs;
-      inherit system;
     };
 
     users = {
@@ -123,12 +119,6 @@
     # EC-Tool adjusted for usage with framework embedded controller.
     fw-ectool
   ];
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
 
   system.stateVersion = "23.11"; # Change carefully
 
