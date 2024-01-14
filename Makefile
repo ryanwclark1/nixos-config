@@ -18,25 +18,42 @@ RSA_BITS = 4096
 keygen: rsa_key ed25519_key age_key get_age_public_key
 
 rsa_key:
-	@echo "Generating RSA SSH key..."
-	@ssh-keygen -t rsa -b $(RSA_BITS) -f $(RSA_KEY_FILE) -N ""
+	@if [ ! -f $(RSA_KEY_FILE) ] || (read -p "RSA SSH key already exists. Do you want to overwrite it? [y/N] " answer; [ "$$answer" == "y" ]); then \
+		echo "Generating RSA SSH key..."; \
+		ssh-keygen -t rsa -b $(RSA_BITS) -f $(RSA_KEY_FILE) -N ""; \
+	else \
+		echo "Skipping RSA SSH key generation..."; \
+	fi
 
 ed25519_key:
-	@echo "Generating Ed25519 SSH key..."
-	@ssh-keygen -t ed25519 -f $(ED25519_KEY_FILE) -N ""
+	@if [ ! -f $(ED25519_KEY_FILE) ] || (read -p "Ed25519 SSH key already exists. Do you want to overwrite it? [y/N] " answer; [ "$$answer" == "y" ]); then \
+		echo "Generating Ed25519 SSH key..."; \
+		ssh-keygen -t ed25519 -f $(ED25519_KEY_FILE) -N ""; \
+	else \
+		echo "Skipping Ed25519 SSH key generation..."; \
+	fi
 
 age_key: create_age_dir
-	@echo "Generating Age key pair..."
-	@nix --extra-experimental-features nix-command run --extra-experimental-features flakes nixpkgs#ssh-to-age -- -private-key -i $(ED25519_KEY_FILE) > $(AGE_PUBLIC_KEY_FILE)
+	@if [ ! -f $(AGE_PUBLIC_KEY_FILE) ] || (read -p "Age key pair already exists. Do you want to overwrite it? [y/N] " answer; [ "$$answer" == "y" ]); then \
+		echo "Generating Age key pair..."; \
+		nix --extra-experimental-features nix-command run --extra-experimental-features flakes nixpkgs#ssh-to-age -- -private-key -i $(ED25519_KEY_FILE) > $(AGE_PUBLIC_KEY_FILE); \
+	else \
+		echo "Skipping Age key pair generation..."; \
+	fi
 
 create_age_dir:
-	@echo "Creating Age key directory..."
-	@mkdir -p $(AGE_DIR)
+	@if [ ! -d $(AGE_DIR) ]; then \
+		echo "Creating Age key directory..."; \
+		mkdir -p $(AGE_DIR); \
+	fi
 
 get_age_public_key:
-	@echo "Getting Age public key..."
-	@nix --extra-experimental-features nix-command shell --extra-experimental-features flakes nixpkgs#age -c age-keygen -y $(AGE_PUBLIC_KEY_FILE)
-
+	@if [ -f $(AGE_PUBLIC_KEY_FILE) ]; then \
+		echo "Getting Age public key..."; \
+		nix --extra-experimental-features nix-command shell --extra-experimental-features flakes nixpkgs#age -c age-keygen -y $(AGE_PUBLIC_KEY_FILE); \
+	else \
+		echo "Age public key does not exist. Skipping..."; \
+	fi
 
 
 ############################################################################
