@@ -21,11 +21,6 @@
     };
     vscode-server.url = "github:nix-community/nixos-vscode-server";
     hyprland.url = "github:hyprwm/Hyprland";
-    # plasma-manager = {
-      #   url = "github:pjones/plasma-manager";
-      #   inputs.nixpkgs.follows = "nixpkgs";
-      #   inputs.home-manager.follows = "home-manager";
-    # };
   };
 
   outputs = {
@@ -52,7 +47,6 @@
             ./hosts/woody/configuration.nix
             inputs.home-manager.nixosModules.default
             inputs.vscode-server.nixosModules.default
-            # inputs.plasma-manager.homeManagerModules.plasma-manager
           ];
         };
 
@@ -64,7 +58,6 @@
             inputs.home-manager.nixosModules.default
             inputs.vscode-server.nixosModules.default
             inputs.hyprland.nixosModules.default
-            # inputs.plasma-manager.homeManagerModules.plasma-manager
           ];
         };
 
