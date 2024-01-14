@@ -27,7 +27,8 @@ networking = {
   #   kernelPackages = pkgs.linuxKernel.packages.linux_zen;
   #   binfmt.emulatedSystems = [ "aarch64-linux" "i686-linux" ];
   # };
-  # boot.loader.systemd-boot.enable = true;
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
 
   powerManagement.powertop.enable = true;
   programs = {
