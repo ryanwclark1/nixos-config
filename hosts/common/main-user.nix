@@ -18,11 +18,11 @@ in
       '';
     };
   };
-  
+
   config = lib.mkIf cfg.enable {
     users.users.${cfg.userName} = {
       isNormalUser = true;
-      # initialPassword = "";
+      initialPassword = "password123";
       shell = pkgs.zsh;
       extraGroups = [ "networkmanager" "wheel" "audio" "docker" "video" "transmission" "wireshark"];
       openssh.authorizedKeys.keys = [
