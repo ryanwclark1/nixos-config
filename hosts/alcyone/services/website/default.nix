@@ -42,9 +42,9 @@ in
           alias = ./scripts/setup-gpg.sh;
         };
 
-        "=/7088C7421873E0DB97FF17C2245CAB70B4C225E9.asc".alias = pgpKey;
-        "=/pgp.asc".alias = pgpKey;
-        "=/pgp".alias = pgpKey;
+        # "=/7088C7421873E0DB97FF17C2245CAB70B4C225E9.asc".alias = pgpKey;
+        # "=/pgp.asc".alias = pgpKey;
+        # "=/pgp".alias = pgpKey;
         "=/ssh.pub".alias = sshKey;
         "=/ssh".alias = sshKey;
       };
