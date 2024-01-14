@@ -22,8 +22,8 @@
       ../common/fonts.nix
       ../common/transmission.nix
       ../common/steam.nix
-      inputs.hardware.nixosModules.framework-12th-gen-intel
-      inputs.hardware.nixosModules.common-pc-ssd
+      inputs.nixos-hardware.nixosModules.framework-12th-gen-intel
+      inputs.nixos-hardware.nixosModules.common-pc-ssd
     ];
   nfs.enable = true;
   printing.enable = true;
