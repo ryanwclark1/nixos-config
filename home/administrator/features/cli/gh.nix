@@ -15,7 +15,7 @@
     #   prompt = "enabled";
     # };
   };
-  home.persistence = {
-    "/persist/home/administrator".directories = [ ".config/gh" ];
-  };
+  # home.persistence = {
+  #   "/persist/home/administrator".directories = [ ".config/gh" ];
+  # };
 }
