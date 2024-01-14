@@ -45,7 +45,6 @@
           modules = [
             ./hosts/woody/configuration.nix
             inputs.home-manager.nixosModules.default
-            inputs.vscode-server.nixosModules.default
           ];
         };
 
@@ -55,7 +54,6 @@
             ./hosts/frametop/configuration.nix
             nixos-hardware.nixosModules.framework-12th-gen-intel
             inputs.home-manager.nixosModules.default
-            inputs.vscode-server.nixosModules.default
           ];
         };
 
