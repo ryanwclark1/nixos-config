@@ -20,7 +20,7 @@
   };
 
   # Persist entire home
-  environment.persistence = {
-    "/persist".directories = [ "/home/layla" ];
-  };
+  # environment.persistence = {
+  #   "/persist".directories = [ "/home/layla" ];
+  # };
 }

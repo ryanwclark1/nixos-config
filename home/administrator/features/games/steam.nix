@@ -33,23 +33,23 @@ in
     mangohud
     protontricks
   ];
-  home.persistence = {
-    "/persist/home/administrator" = {
-      allowOther = true;
-      directories = [
-        ".factorio"
-        ".config/Hero_Siege"
-        ".config/unity3d/Berserk Games/Tabletop Simulator"
-        ".config/unity3d/IronGate/Valheim"
-        ".local/share/Tabletop Simulator"
-        ".local/share/Paradox Interactive"
-        ".paradoxlauncher"
-        {
-          # A couple of games don't play well with bindfs
-          directory = ".local/share/Steam";
-          method = "symlink";
-        }
-      ];
-    };
-  };
+  # home.persistence = {
+  #   "/persist/home/administrator" = {
+  #     allowOther = true;
+  #     directories = [
+  #       ".factorio"
+  #       ".config/Hero_Siege"
+  #       ".config/unity3d/Berserk Games/Tabletop Simulator"
+  #       ".config/unity3d/IronGate/Valheim"
+  #       ".local/share/Tabletop Simulator"
+  #       ".local/share/Paradox Interactive"
+  #       ".paradoxlauncher"
+  #       {
+  #         # A couple of games don't play well with bindfs
+  #         directory = ".local/share/Steam";
+  #         method = "symlink";
+  #       }
+  #     ];
+  #   };
+  # };
 }

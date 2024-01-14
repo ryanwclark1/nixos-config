@@ -1,9 +1,21 @@
 # .sops.yaml
 
 keys:
-  - &primary {{YOUR KEY HERE}}
+  - &administrator {{YOUR KEY HERE}}
+  - &frametop {{YOUR KEY HERE}}
 creation_rules:
-  - path_regex: secrets.yaml$
+  - path_regex: hosts/common/[^/]+\.yaml$
     key_groups:
     - age:
-      - *primary
+      - *administrator
+      - *frametop
+  - path_regex: hosts/common/users/[^/]+\.yaml$
+    key_groups:
+    - age:
+      - *administrator
+      - *frametop
+  - path_regex: hosts/frametop/[^/]+\.yaml$
+    key_groups:
+    - age:
+      - *administrator
+      - *frametop

@@ -40,7 +40,7 @@ in
     "kdeconnect-scripts/fortune.sh".source = "${script-fortune}/bin/fortune";
   };
 
-  home.persistence = {
-    "/persist/home/administrator".directories = [ ".config/kdeconnect" ];
-  };
+  # home.persistence = {
+  #   "/persist/home/administrator".directories = [ ".config/kdeconnect" ];
+  # };
 }

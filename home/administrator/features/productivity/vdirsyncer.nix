@@ -5,10 +5,10 @@ in
 {
   home.packages = with pkgs; [ vdirsyncer ];
 
-  home.persistence = {
-    "/persist/home/administrator".directories =
-      [ "Calendars" "Contacts" ".local/share/vdirsyncer" ];
-  };
+  # home.persistence = {
+  #   "/persist/home/administrator".directories =
+  #     [ "Calendars" "Contacts" ".local/share/vdirsyncer" ];
+  # };
 
   xdg.configFile."vdirsyncer/config".text = /* ini */ ''
     [general]

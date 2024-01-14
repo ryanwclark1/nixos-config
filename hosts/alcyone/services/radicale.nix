@@ -38,7 +38,7 @@ in
     group = config.users.users.radicale.group;
   };
 
-  environment.persistence = {
-    "/persist".directories = [ "/var/lib/radicale" ];
-  };
+  # environment.persistence = {
+  #   "/persist".directories = [ "/var/lib/radicale" ];
+  # };
 }

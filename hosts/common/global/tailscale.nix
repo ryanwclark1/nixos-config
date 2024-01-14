@@ -9,7 +9,7 @@
     allowedUDPPorts = [ 41641 ]; # Facilitate firewall punching
   };
 
-  environment.persistence = {
-    "/persist".directories = [ "/var/lib/tailscale" ];
-  };
+  # environment.persistence = {
+  #   "/persist".directories = [ "/var/lib/tailscale" ];
+  # };
 }
