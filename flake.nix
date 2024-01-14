@@ -20,16 +20,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     vscode-server.url = "github:nix-community/nixos-vscode-server";
-<<<<<<< HEAD
-    # hyprland.url = "github:hyprwm/Hyprland";
-    # plasma-manager = {
-      #   url = "github:pjones/plasma-manager";
-      #   inputs.nixpkgs.follows = "nixpkgs";
-      #   inputs.home-manager.follows = "home-manager";
-    # };
-=======
-    hyprland.url = "github:hyprwm/Hyprland";
->>>>>>> b4ad8ab151e75a74704a46be1244d06e2a0dbcf9
   };
 
   outputs = {
@@ -66,12 +56,6 @@
             nixos-hardware.nixosModules.framework-12th-gen-intel
             inputs.home-manager.nixosModules.default
             inputs.vscode-server.nixosModules.default
-<<<<<<< HEAD
-            # inputs.hyprland.nixosModules.default
-            # inputs.plasma-manager.homeManagerModules.plasma-manager
-=======
-            inputs.hyprland.nixosModules.default
->>>>>>> b4ad8ab151e75a74704a46be1244d06e2a0dbcf9
           ];
         };
 
