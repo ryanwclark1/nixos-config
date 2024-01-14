@@ -9,8 +9,8 @@ in {
     ./features/productivity
   ];
 
-  colorscheme = lib.mkDefault colorSchemes.silk-dark;
-  specialisation = {
-    light.configuration.colorscheme = colorSchemes.silk-light;
-  };
+  # colorscheme = lib.mkDefault colorSchemes.silk-dark;
+  # specialisation = {
+  #   light.configuration.colorscheme = colorSchemes.silk-light;
+  # };
 }
