@@ -43,19 +43,19 @@ in
       FLAKE = "$HOME/Documents/NixConfig";
     };
 
-    persistence = {
-      "/persist/home/administrator" = {
-        directories = [
-          "Documents"
-          "Downloads"
-          "Pictures"
-          "Videos"
-          ".local/bin"
-          ".local/share/nix" # trusted settings and repl history
-        ];
-        allowOther = true;
-      };
-    };
+    # persistence = {
+    #   "/persist/home/administrator" = {
+    #     directories = [
+    #       "Documents"
+    #       "Downloads"
+    #       "Pictures"
+    #       "Videos"
+    #       ".local/bin"
+    #       ".local/share/nix" # trusted settings and repl history
+    #     ];
+    #     allowOther = true;
+    #   };
+    # };
   };
 
   colorscheme = lib.mkOverride 1499 colorSchemes.dracula;

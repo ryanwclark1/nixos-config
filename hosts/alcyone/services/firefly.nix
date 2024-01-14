@@ -25,7 +25,7 @@
     sopsFile = ../secrets.yaml;
   };
 
-  environment.persistence = {
-    "/persist".directories = [ "/var/lib/firefly-iii" ];
-  };
+  # environment.persistence = {
+  #   "/persist".directories = [ "/var/lib/firefly-iii" ];
+  # };
 }

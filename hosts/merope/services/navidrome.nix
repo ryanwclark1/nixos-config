@@ -27,7 +27,7 @@
     };
   };
 
-  environment.persistence = {
-    "/persist".directories = [ "/var/lib/private/navidrome" ];
-  };
+  # environment.persistence = {
+  #   "/persist".directories = [ "/var/lib/private/navidrome" ];
+  # };
 }

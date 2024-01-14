@@ -19,9 +19,9 @@ let
   };
 in
 {
-  home.persistence = {
-    "/persist/home/administrator".directories = [ "Mail" ];
-  };
+  # home.persistence = {
+  #   "/persist/home/administrator".directories = [ "Mail" ];
+  # };
 
   accounts.email = {
     maildirBasePath = "Mail";

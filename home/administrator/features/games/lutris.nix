@@ -8,13 +8,13 @@
     ]; })
   ];
 
-  home.persistence = {
-    "/persist/home/administrator" = {
-      allowOther = true;
-      directories = [
-        ".config/lutris"
-        ".local/share/lutris"
-      ];
-    };
-  };
+  # home.persistence = {
+  #   "/persist/home/administrator" = {
+  #     allowOther = true;
+  #     directories = [
+  #       ".config/lutris"
+  #       ".local/share/lutris"
+  #     ];
+  #   };
+  # };
 }

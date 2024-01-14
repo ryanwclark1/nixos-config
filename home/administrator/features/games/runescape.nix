@@ -24,12 +24,12 @@ in {
     openssl.name
   ];
 
-  home.persistence = {
-    "/persist/home/administrator" = {
-      allowOther = true;
-      directories = [
-        "Jagex"
-      ];
-    };
-  };
+  # home.persistence = {
+  #   "/persist/home/administrator" = {
+  #     allowOther = true;
+  #     directories = [
+  #       "Jagex"
+  #     ];
+  #   };
+  # };
 }

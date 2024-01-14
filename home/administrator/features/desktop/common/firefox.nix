@@ -28,12 +28,12 @@
     };
   };
 
-  home = {
-    persistence = {
-      # Not persisting is safer
-      # "/persist/home/administrator".directories = [ ".mozilla/firefox" ];
-    };
-  };
+  # home = {
+  #   persistence = {
+  #     # Not persisting is safer
+  #     # "/persist/home/administrator".directories = [ ".mozilla/firefox" ];
+  #   };
+  # };
 
   xdg.mimeApps.defaultApplications = {
     "text/html" = [ "firefox.desktop" ];

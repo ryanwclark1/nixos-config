@@ -3,13 +3,13 @@
 let inherit (config.colorscheme) colors kind;
 in
 {
-  home.persistence = {
-    "/persist/home/administrator".directories = [
-      ".config/qutebrowser/bookmarks"
-      ".config/qutebrowser/greasemonkey"
-      ".local/share/qutebrowser"
-    ];
-  };
+  # home.persistence = {
+  #   "/persist/home/administrator".directories = [
+  #     ".config/qutebrowser/bookmarks"
+  #     ".config/qutebrowser/greasemonkey"
+  #     ".local/share/qutebrowser"
+  #   ];
+  # };
 
 
 

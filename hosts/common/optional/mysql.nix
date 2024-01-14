@@ -5,9 +5,9 @@
     package = pkgs.mariadb;
   };
 
-  environment.persistence = {
-    "/persist".directories = [
-      "/var/lib/mysql"
-    ];
-  };
+  # environment.persistence = {
+  #   "/persist".directories = [
+  #     "/var/lib/mysql"
+  #   ];
+  # };
 }

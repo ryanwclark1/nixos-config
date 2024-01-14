@@ -1,11 +1,11 @@
 { config, lib, pkgs, ... }:
 {
 
-  environment.persistence = {
-    "/persist".directories = [
-      "/srv/git"
-    ];
-  };
+  # environment.persistence = {
+  #   "/persist".directories = [
+  #     "/srv/git"
+  #   ];
+  # };
 
   services.gitDaemon = {
     enable = true;

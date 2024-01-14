@@ -11,7 +11,7 @@
     extraArgs = [ "-e${config.programs.password-store.package}/bin/pass" ];
   };
 
-  home.persistence = {
-    "/persist/home/administrator".directories = [ ".password-store" ];
-  };
+  # home.persistence = {
+  #   "/persist/home/administrator".directories = [ ".password-store" ];
+  # };
 }
