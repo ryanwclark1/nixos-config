@@ -35,7 +35,7 @@ create_age_dir:
 
 get_age_public_key:
 	@echo "Getting Age public key..."
-	@nix shell nixpkgs#age -c age-keygen -y $(AGE_PUBLIC_KEY_FILE)
+	@nix --extra-experimental-features nix-command shell nixpkgs#age -c age-keygen -y $(AGE_PUBLIC_KEY_FILE)
 
 
 
