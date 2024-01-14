@@ -27,7 +27,7 @@ ed25519_key:
 
 age_key: create_age_dir
 	@echo "Generating Age key pair..."
-	@nix run nixpkgs#ssh-to-age -c ssh-to-age -private-key -i $(ED25519_KEY_FILE) > $(AGE_PUBLIC_KEY_FILE)
+	@nix run nixpkgs#ssh-to-age -- -private-key -i $(ED25519_KEY_FILE) > $(AGE_PUBLIC_KEY_FILE)
 
 create_age_dir:
 	@echo "Creating Age key directory..."
