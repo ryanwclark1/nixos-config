@@ -10,7 +10,10 @@ with lib; {
     programs = {
       info.enable = true;
       tealdeer.enable = true;
-      # man.generateCaches = true;
+      man = {
+        enable = true;
+        generateCaches = true;
+      };
     };
   };
 }
