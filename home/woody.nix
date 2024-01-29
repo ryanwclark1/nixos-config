@@ -29,7 +29,6 @@ in {
     ./features/networking-utils
     ./features/nvim
     # ./features/pass
-    ./features/plasma
     ./features/productivity
     ./features/vscode
     ./features/zellij

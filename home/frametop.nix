@@ -28,7 +28,6 @@ in {
     ./features/music
     ./features/networking-utils
     # ./features/pass
-    ./features/plasma
     ./features/productivity
     ./features/vscode
     ./features/zellij
