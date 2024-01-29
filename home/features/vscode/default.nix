@@ -58,31 +58,36 @@
 
       userSettings = {
 
-        editor = {
-          "fontSize" = 12;
-          "fontFamily" = "JetBrainsMono Nerd Font";
-          "renderWhitespace" = "all";
-          "useTabStops" = false;
-          "formatOnSave" = false;
-          "fontLigatures" = true;
-          "lineHeight" = 20;
-          "rulers" = [ 80 120 ];
-          "tabSize" = 2;
-          "suggestSelection" = "first";
-          "inlineSuggest.enabled" = true;
-          "minimap.enabled" = false;
-        };
+          "editor.fontLigatures" = true;
+          "editor.fontVariations" = true;
+          "editor.fontWeight" = "normal";
+          "editor.fontFamily" = "JetBrainsMono Nerd Font";
+          "editor.fontSize" = 12;
+          "editor.formatOnSave" = true;
+          "editor.inlineSuggest.enabled" = true;
+          "editor.minimap.enabled" = false;
+          "editor.renderWhitespace" = "all";
+          "editor.rulers" = [
+            80
+            120
+          ];
+          "editor.suggestSelection" = "first";
+          "editor.tabSize" = 2;
+          "editor.wordWrap" = "on";
+          "editor.useTabStops" = true;
 
         "files.exclude" = { "**/node_modules/**" = true; };
         "files.autoSave" = "afterDelay";
         "files.trimTrailingWhitespace" = true;
-        "telemetry.telemtryLevel" = "off";
+        "telemetry.telemetryLevel" = "off";
         "breadcrumbs.enabled" = true;
         "workbench.fontAliasing" = "antialiased";
         "workbench.editor.enablePreview" = false;
         "workbench.colorTheme" = "Default Dark Modern";
 
         "terminal.integrated.fontFamily" = "JetBrainsMono Nerd Font";
+        "terminal.explorerKind" = "integrated";
+        "terminal.external.linuxExec" = "kitty";
 
         # Nix IDE
         "nix.enableLanguageServer" = true;
@@ -95,12 +100,7 @@
             nixpkgsInputName = null;
           };
         };
-
-        redhat = {
-          "telemetry.enableCrashReporter" = false;
-          "telemetry.enableTelemetry" = false;
-        };
-
+        "redhat.telemetry.enabled" = false;
         # Even Better TOML
         "evenBetterToml.taplo.bundled" = false;
         "evenBetterToml.taplo.path" = "${pkgs.taplo}/bin/taplo";
