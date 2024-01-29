@@ -1,4 +1,7 @@
-{ config, ... }:
+{
+  config,
+...
+}:
 {
   nix = {
     sshServe = {
