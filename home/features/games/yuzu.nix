@@ -1,4 +1,9 @@
-{ pkgs, lib, ... }: {
-  home.packages = [ pkgs.yuzu-mainline ];
+{
+  pkgs,
+  lib,
+  ...
+}:
 
+{
+  home.packages = [ pkgs.yuzu-mainline ];
 }

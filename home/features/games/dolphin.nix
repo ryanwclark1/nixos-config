@@ -1,6 +1,11 @@
-{ lib, pkgs, ... }: {
+{
+  lib,
+  pkgs,
+  ...
+}:
+
+{
   home = {
     packages = [ pkgs.dolphinEmu ];
-
   };
 }
