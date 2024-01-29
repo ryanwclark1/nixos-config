@@ -7,11 +7,13 @@
 
 {
   home.packages = with pkgs; [
-    fd
-    # ripgrep-all
-    ripgrep
-    sd
+    fd #find alternative
+    sd #sed alternative
   ];
+  program.ripgrep = {
+    enable = true;
+    package = pkgs.ripgrep-all;
+  };
   programs.eza = {
     enable = true;
     icons = true;

@@ -86,7 +86,7 @@
         "workbench.colorTheme" = "Default Dark Modern";
 
         "terminal.integrated.fontFamily" = "JetBrainsMono Nerd Font";
-        "terminal.explorerKind" = "integrated";
+        "terminal.explorerKind" = "both";
         "terminal.external.linuxExec" = "kitty";
 
         # Nix IDE
