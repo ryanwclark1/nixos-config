@@ -1,87 +1,10 @@
-{
-  config,
-  pkgs,
-  inputs,
-  lib,
-  system,
-  ...
-}:
-
-let
-  d = config.xdg.dataHome;
-  c = config.xdg.configHome;
-  cache = config.xdg.cacheHome;
-in
+{ config, pkgs, ... }:
 
 {
-
-  # TODO: Remove this in home.nix
-  nixpkgs.config.allowUnfree = true;
-
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = "administrator";
   home.homeDirectory = "/home/administrator";
-  imports = [
-    ../../home/shells/bash.nix
-    ../../home/shells/zsh.nix
-    ../../home/development
-    ../../home/editors/vscode.nix
-    ../../home/editors/insomnia.nix
-    ../../home/media
-    ../../home/terminalutils
-    ../../home/terminals/alacritty.nix
-    ../../home/terminals/kitty.nix
-    ../../home/chromium.nix
-    ../../home/colors.nix
-    ../../home/compression.nix
-    ../../home/download.nix
-    ../../home/exercism.nix
-    ../../home/filezilla.nix
-    ../../home/firefox.nix
-    ../../home/global-fonts.nix
-    ../../home/monitor.nix
-    ../../home/office.nix
-    ../../home/ollama.nix
-    ../../home/pandoc.nix
-    ../../home/slack.nix
-    ../../home/starship.nix
-    ../../home/games.nix
-    ../../home/watson.nix
-    ../../home/networking_utils.nix
-    ../../home/common_desktop.nix
-    # ../../home/chrome.nix
-  ];
-  bash.enable = true;
-  zsh.enable = true;
-  alacritty.enable = true;
-  development.enable = true;
-  media.enable = true;
-  terminalutils.enable = true;
-  compression.enable = true;
-  download.enable = true;
-  exercism.enable = true;
-  filezilla.enable = true;
-  insomnia.enable = true;
-  kitty.enable = true;
-  monitor.enable = true;
-  office.enable = true;
-  ollama.enable = true;
-  pandoc.enable = true;
-  # pdf.enable = false;
-  slack.enable = true;
-  games.enable = true;
-  watson.enable = true;
-  networking_utils.enable = true;
-  common_desktop.enable = true;
-
-  # xdg.enable = false;
-
-  chromium.enable = true;
-  firefox.enable = true;
-
-  starship.enable = true;
-  vscode.enable = true;
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
@@ -94,9 +17,24 @@ in
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
+  home.packages = [
+    # # Adds the 'hello' command to your environment. It prints a friendly
+    # # "Hello, world!" when run.
+    # pkgs.hello
 
-  # Moved to ../home/common_desktop.nix, use if different by machine
-  # home.packages = with pkgs; []
+    # # It is sometimes useful to fine-tune packages, for example, by applying
+    # # overrides. You can do that directly here, just don't forget the
+    # # parentheses. Maybe you want to install Nerd Fonts with a limited number of
+    # # fonts?
+    # (pkgs.nerdfonts.override { fonts = [ "FantasqueSansMono" ]; })
+
+    # # You can also create simple shell scripts directly inside your
+    # # configuration. For example, this adds a command 'my-hello' to your
+    # # environment:
+    # (pkgs.writeShellScriptBin "my-hello" ''
+    #   echo "Hello, ${config.home.username}!"
+    # '')
+  ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
@@ -127,30 +65,9 @@ in
   # or
   #
   #  /etc/profiles/per-user/administrator/etc/profile.d/hm-session-vars.sh
-
-  # shell.user = "${pkgs.bash}/bin/bash";
-  # editor = {
-  #   terminal = "${config.editor.helix.package}/bin/hx";
-  #   helix.package = inputs.helix.packages.${pkgs.system}.default;
-  # };
-  # terminal = "${pkgs.alacritty}/bin/alacritty";
-
+  #
   home.sessionVariables = {
     # EDITOR = "emacs";
-    # clean up ~
-    LESSHISTFILE = cache + "/less/history";
-    LESSKEY = c + "/less/lesskey";
-    WINEPREFIX = d + "/wine";
-
-    # set default applications
-    # EDITOR = "nvim";
-    # BROWSER = "firefox";
-    TERMINAL = "alacritty";
-
-    # enable scrolling in git diff
-    DELTA_PAGER = "less -R";
-
-    MANPAGER = "sh -c 'col -bx | bat -l man -p'";
   };
 
   # Let Home Manager install and manage itself.
