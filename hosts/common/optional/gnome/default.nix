@@ -8,25 +8,29 @@
 
 {
 
-  services.xserver = {
-    enable = true;
-    layout = "us";
-    displayManager = {
-      gdm = {
-        enable = true;
-        # Would likely create issue if used on laptop.
-        autoSuspend = false;
-        wayland = true;
+  services = {
+    xserver = {
+      enable = true;
+      layout = "us";
+      displayManager = {
+        gdm = {
+          enable = true;
+          # Would likely create issue if used on laptop.
+          autoSuspend = false;
+          wayland = true;
+        };
       };
-    };
-    desktopManager = {
-      gnome = {
-        enable = true;
-        # List of packages for which gsettings are overridden. list of paths
-        extraGSettingsOverridePackages = [];
-        # Additional gsettings overrides. strings concatenated with "\n"
-        extraGSettingsOverrides = "";
+      desktopManager = {
+        gnome = {
+          enable = true;
+          # List of packages for which gsettings are overridden. list of paths
+          extraGSettingsOverridePackages = [];
+          # Additional gsettings overrides. strings concatenated with "\n"
+          extraGSettingsOverrides = "";
+        };
       };
+      geoclue2.enable = true;
+      gnome.games.enable = false;
     };
   };
 

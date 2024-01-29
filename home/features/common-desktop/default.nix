@@ -49,7 +49,7 @@ with lib; {
     bluez-tools # bt-adapter
     usbutils # lsusb
     kate
-    neovim
+    # neovim
     scrot
     discord
     element-desktop
