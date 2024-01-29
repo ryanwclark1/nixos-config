@@ -1,14 +1,21 @@
-{ inputs, outputs, pkgs, lib, ... }: let
+{
+  inputs,
+  outputs,
+  pkgs,
+  lib,
+  ...
+}: let
   inherit (inputs.nix-colors) colorSchemes;
 in {
   imports = [
     ./global
-    ./features/plasma/plasmaconfig.nix
-    # ./features/desktop/wireless
-    # ./features/desktop/hyprland
+    ./features/plasma
+
     ./features/alacritty
     ./features/build
     ./features/cli
+    ./features/common-desktop
+    ./features/compression
     ./features/development
     ./features/fzf
     ./features/games
@@ -16,7 +23,9 @@ in {
     ./features/nvim
     ./features/insomnia
     ./features/kitty
+    ./features/kubernetes
     ./features/media
+    ./features/music
     ./features/networking-utils
     # ./features/pass
     ./features/plasma
@@ -24,7 +33,6 @@ in {
     ./features/vscode
     ./features/zellij
     ./features/zoxide
-    ./features/kubernetes
 
   ];
 
