@@ -1,24 +1,36 @@
 {
   pkgs,
-  lib,
   config,
   ...
 }:
-
-with lib;
 let
   font = "JetBrainsMono Nerd Font";
+  inherit (config.colorscheme) colors;
+  kitty-xterm = pkgs.writeShellScriptBin "xterm" ''
+  ${config.programs.kitty.package}/bin/kitty -1 "$@"
+  '';
 in
 {
+  home = {
+    packages = [ kitty-xterm ];
+    sessionVariables = {
+      TERMINAL = "kitty -1";
+    };
+  };
+
   programs.kitty = {
     enable = true;
     package = pkgs.kitty;
-    font.name = font;
+    font = {
+      name = font;
+      size = 12;
+    };
     settings = {
+      # shell_integration = "no-rc"; # I prefer to do it manually
       # performance
       scrollback_lines = 15000;
       wheel_scroll_min_lines = 1;
-      window_padding_width = 6;
+      window_padding_width = 15;
       update_check_interval = 0;
       repaint_delay = 10;
       input_delay = 1;
@@ -35,50 +47,48 @@ in
       shell = "${pkgs.zsh}/bin/zsh";
 
       # Font settings
-      font_size = 12;
+      # font_size = 12;
       # adjust_line_height = 12;
       font_family = config.global-fonts.main-regular;
       bold_font = config.global-fonts.main-black;
       italic_font = config.global-fonts.main-italic;
       bold_italic_font = config.global-fonts.main-black-italic;
+      foreground = "#${colors.base05}";
+      background = "#${colors.base00}";
+      selection_background = "#${colors.base05}";
+      selection_foreground = "#${colors.base00}";
+      url_color = "#${colors.base04}";
+      cursor = "#${colors.base05}";
+      active_border_color = "#${colors.base03}";
+      inactive_border_color = "#${colors.base01}";
+      active_tab_background = "#${colors.base00}";
+      active_tab_foreground = "#${colors.base05}";
+      inactive_tab_background = "#${colors.base01}";
+      inactive_tab_foreground = "#${colors.base04}";
+      tab_bar_background = "#${colors.base01}";
+      color0 = "#${colors.base00}";
+      color1 = "#${colors.base08}";
+      color2 = "#${colors.base0B}";
+      color3 = "#${colors.base0A}";
+      color4 = "#${colors.base0D}";
+      color5 = "#${colors.base0E}";
+      color6 = "#${colors.base0C}";
+      color7 = "#${colors.base05}";
+      color8 = "#${colors.base03}";
+      color9 = "#${colors.base08}";
+      color10 = "#${colors.base0B}";
+      color11 = "#${colors.base0A}";
+      color12 = "#${colors.base0D}";
+      color13 = "#${colors.base0E}";
+      color14 = "#${colors.base0C}";
+      color15 = "#${colors.base07}";
+      color16 = "#${colors.base09}";
+      color17 = "#${colors.base0F}";
+      color18 = "#${colors.base01}";
+      color19 = "#${colors.base02}";
+      color20 = "#${colors.base04}";
+      color21 = "#${colors.base06}";
     };
-    extraConfig = ''
-      foreground #a9b1d6
-      background #1a1b26
-      color0 #414868
-      color8 #414868
-      color1 #f7768e
-      color9 #f7768e
-      color2  #73daca
-      color10 #73daca
-      color3  #e0af68
-      color11 #e0af68
-      color4  #7aa2f7
-      color12 #7aa2f7
-      color5  #bb9af7
-      color13 #bb9af7
-      color6  #7dcfff
-      color14 #7dcfff
-      color7  #c0caf5
-      color15 #c0caf5
-      cursor #c0caf5
-      cursor_text_color #1a1b26
-      selection_foreground none
-      selection_background #28344a
-      url_color #9ece6a
-      active_border_color #3d59a1
-      inactive_border_color #101014
-      bell_border_color #e0af68
-      tab_bar_style fade
-      tab_fade 1
-      active_tab_foreground   #3d59a1
-      active_tab_background   #16161e
-      active_tab_font_style   bold
-      inactive_tab_foreground #787c99
-      inactive_tab_background #16161e
-      inactive_tab_font_style bold
-      tab_bar_background #101014
-    '';
-    theme = "Rosé Pine"; # the default one is mocha colored, nice choice kitty!
+
   };
 }
