@@ -1,4 +1,9 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 let
   enabledMonitors = lib.filter (m: m.enabled) config.monitors;
   # A nice VNC script for remotes running hyprland
