@@ -1,4 +1,10 @@
-{ inputs, outputs, pkgs, lib, ... }: let
+{
+  inputs,
+  outputs,
+  pkgs,
+  lib,
+  ...
+}: let
   inherit (inputs.nix-colors) colorSchemes;
 in {
   imports = [
@@ -29,7 +35,6 @@ in {
     ./features/zellij
     ./features/zoxide
   ];
-
 
   colorscheme = lib.mkDefault colorSchemes.silk-dark;
   specialisation = {
