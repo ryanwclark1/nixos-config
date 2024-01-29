@@ -25,7 +25,6 @@ with lib; {
       dfeet # Dbus debugger
 
       d2 #diagram
-      zk # note taking
       trashy #cli rm with trash support
 
       ventoy-full #balena type tool
@@ -79,8 +78,6 @@ with lib; {
       bluez-tools # bt-adapter
       usbutils # lsusb
 
-      kate
-      neovim
       scrot
       discord
       element-desktop
