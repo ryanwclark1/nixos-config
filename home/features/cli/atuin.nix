@@ -15,5 +15,4 @@ with lib; {
     enableFishIntegration = true;
     enableZshIntegration = true;
   };
-
 }

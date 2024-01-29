@@ -1,4 +1,8 @@
 {
+  ...
+}:
+
+{
   programs.fish = {
     enable = true;
     vendor = {

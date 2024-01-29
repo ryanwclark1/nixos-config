@@ -9,5 +9,4 @@
   programs.zoxide = {
     enable = true;
   };
-
 }
