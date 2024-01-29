@@ -29,9 +29,9 @@
           extraGSettingsOverrides = "";
         };
       };
-      geoclue2.enable = true;
-      gnome.games.enable = false;
     };
+    geoclue2.enable = true;
+    gnome.games.enable = false;
   };
 
 programs.dconf.enable = true;
