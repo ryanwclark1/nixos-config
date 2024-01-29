@@ -9,7 +9,7 @@
 in {
   imports = [
     ./global
-    ./features/plasma
+    ./features/desktop/plasma
 
     ./features/alacritty
     ./features/build
