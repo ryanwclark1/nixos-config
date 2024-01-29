@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }: let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}: let
   hyprbars = (pkgs.inputs.hyprland-plugins.hyprbars.override {
     # Make sure it's using the same hyprland package as we are
     hyprland = config.wayland.windowManager.hyprland.package;

@@ -1,4 +1,7 @@
-{ config, ... }:
+{
+  config,
+  ...
+}:
 let inherit (config.colorscheme) colors kind;
 in {
   services.mako = {
