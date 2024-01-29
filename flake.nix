@@ -1,64 +1,86 @@
 {
-  description = "Ryan's NixOS Flake";
+  description = "Nixos config flake";
 
   inputs = {
-    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-23.11";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    nixos-hardware.url = "github:NixOS/nixos-hardware";
+    hardware.url = "github:nixos/nixos-hardware";
     nix-colors.url = "github:misterio77/nix-colors";
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     sops-nix = {
       url = "github:mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.nixpkgs-stable.follows = "nixpkgs";
     };
-    home-manager = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    aspen = {
-      url = "github:prmadev/aspen";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     vscode-server.url = "github:nix-community/nixos-vscode-server";
+    plasma-manager = {
+      url = "github:pjones/plasma-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
   };
 
-  outputs = {
-    self,
-    nixpkgs,
-    vscode-server,
-    home-manager,
-    ...
-  } @ inputs:
+  outputs = { self, nixpkgs, vscode-server, home-manager, plasma-manager, ... }@inputs:
     let
       inherit (self) outputs;
-      # Flakes must explicitly export sets for each system supported.
-      system = "x86_64-linux";
-      pkgs = nixpkgs.legacyPackages.${system};
-      # inherit (nixpkgs) lib;
+      lib = nixpkgs.lib // home-manager.lib;
+      systems = [ "x86_64-linux" "aarch64-linux" ];
+      forEachSystem = f: lib.genAttrs systems (system: f pkgsFor.${system});
+      pkgsFor = lib.genAttrs systems (system: import nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+      });
     in
-      with inputs;
     {
+      inherit lib;
+      nixosModules = import ./modules/nixos;
+      homeManagerModules = import ./modules/home-manager;
+      templates = import ./templates;
+
+      packages = forEachSystem (pkgs: import ./pkgs { inherit pkgs; });
+      devShells = forEachSystem (pkgs: import ./shell.nix { inherit pkgs; });
+      formatter = forEachSystem (pkgs: pkgs.nixpkgs-fmt);
+
       nixosConfigurations = {
-
-        woody = nixpkgs.lib.nixosSystem {
-          specialArgs = {inherit inputs;};
+        default = nixpkgs.lib.nixosSystem {
+          specialArgs = { inherit inputs outputs; };
           modules = [
-            ./hosts/woody/configuration.nix
-            inputs.home-manager.nixosModules.default
-            inputs.vscode-server.nixosModules.default
+            ./hosts/generic/configuration.nix
           ];
         };
-
         frametop = nixpkgs.lib.nixosSystem {
-          specialArgs = {inherit inputs;};
+          specialArgs = { inherit inputs outputs; };
           modules = [
-            ./hosts/frametop/configuration.nix
-            nixos-hardware.nixosModules.framework-12th-gen-intel
-            inputs.home-manager.nixosModules.default
-            inputs.vscode-server.nixosModules.default
+            ./hosts/frametop
           ];
         };
-
+        woody = nixpkgs.lib.nixosSystem {
+          specialArgs = { inherit inputs outputs; };
+          modules = [
+            ./hosts/woody
+          ];
+        };
       };
+
+      homeConfigurations = {
+        "administrator@generic" = lib.homeManagerConfiguration {
+          modules = [ ./home/generic.nix ];
+          pkgs = pkgsFor.x86_64-linux;
+          extraSpecialArgs = { inherit inputs outputs; };
+        };
+        "administrator@frametop" = lib.homeManagerConfiguration {
+          modules = [ ./home/frametop.nix ];
+          pkgs = pkgsFor.x86_64-linux;
+          extraSpecialArgs = { inherit inputs outputs; };
+        };
+        "administrator@woody" = lib.homeManagerConfiguration {
+          modules = [ ./home/woody.nix ];
+          pkgs = pkgsFor.x86_64-linux;
+          extraSpecialArgs = { inherit inputs outputs; };
+        };
+      };
+
     };
 }
