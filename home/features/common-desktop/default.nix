@@ -8,7 +8,7 @@
 with lib; {
 
   home.packages = with pkgs; [
-    neofetch
+
     mprocs # multiple commands in parallel
     gum # shell scripts
     hyperfine #cli benchmarking tool
@@ -24,8 +24,7 @@ with lib; {
     yq-go    # https://github.com/mikefarah/yq
     iw
     nmap
-    netcat
-    tree
+
     mc
     acpica-tools
     # system tools

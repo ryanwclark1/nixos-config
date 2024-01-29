@@ -25,6 +25,8 @@
     ./zsh.nix
   ];
   home.packages = with pkgs; [
+    neofetch # System info
+
     comma # Install and run programs by sticking a , before them
     distrobox # Nice escape hatch, integrates docker images with my environment
 
@@ -43,7 +45,7 @@
     nh # Nice wrapper for NixOS and HM
 
     ltex-ls # Spell checking LSP
-
+    tree # Directory tree
     # tly # Tally counter
   ];
 }

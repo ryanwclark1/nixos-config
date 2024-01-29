@@ -1,4 +1,7 @@
-{ pkgs, ... }:
+{
+  pkgs,
+  ...
+}:
 let
   update-script = pkgs.writeShellApplication {
     name = "fetch-nix-index-database";
