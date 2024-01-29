@@ -28,7 +28,6 @@ in
         normal.family = font;
         bold.family = font;
         italic.family = font;
-        # draw_bold_text_with_bright_colors = true;
         size = 12;
       };
       selection.save_to_clipboard = true;
