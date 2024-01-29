@@ -5,10 +5,9 @@
 {
   imports = [
     ./dolphin.nix
-    ./factorio.nix
+    # ./factorio.nix
     ./heroic.nix
     ./lutris.nix
-    ./osu.nix
     ./prism-launcher.nix
     ./steam.nix
 
