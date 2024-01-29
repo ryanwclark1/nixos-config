@@ -25,7 +25,14 @@
     ./zsh.nix
   ];
   home.packages = with pkgs; [
+    mprocs # multiple commands in parallel
+    gum # shell scripts
+    hyperfine #cli benchmarking tool
     neofetch # System info
+    yq-go #jq for yaml https://github.com/mikefarah/yq
+    iw # wifi cli
+    pciutils # lspci
+    usbutils # lsusb
 
     comma # Install and run programs by sticking a , before them
     distrobox # Nice escape hatch, integrates docker images with my environment
@@ -43,7 +50,7 @@
     nvd # Differ
     nix-output-monitor
     nh # Nice wrapper for NixOS and HM
-
+    mc # Midnight commander
     ltex-ls # Spell checking LSP
     tree # Directory tree
     # tly # Tally counter
