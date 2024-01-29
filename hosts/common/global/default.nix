@@ -8,7 +8,7 @@
 {
   imports = [
     inputs.home-manager.nixosModules.home-manager
-    ./auto-upgrade.nix
+    # ./auto-upgrade.nix
     ./fish.nix
     ./fonts.nix
     ./gamemode.nix
