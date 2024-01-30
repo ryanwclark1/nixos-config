@@ -11,18 +11,16 @@ with lib; {
 
     openssl_3
     dfeet # Dbus debugger
-    d2 #diagram
-    zk # note taking
-    trashy #cli rm with trash support
+
     ventoy-full #balena type tool
-    hurl # httpie/curl alternative
+
     # utils
     acpica-tools
 
     # system tools
     sysstat
     lm_sensors # for `sensors` command
-    ethtool
+
 
     # misc
     libnotify
@@ -35,7 +33,7 @@ with lib; {
     mediainfo
     remmina         # XRDP & VNC Client
     bluez-tools # bt-adapter
-    usbutils # lsusb
+
     kate
 
     scrot
