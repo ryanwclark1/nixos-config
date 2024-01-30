@@ -1,4 +1,8 @@
-{ pkgs }:
+{
+  pkgs,
+  ...
+}:
+
 {
   gzipJson = {}: {
     generate = name: value: pkgs.callPackage

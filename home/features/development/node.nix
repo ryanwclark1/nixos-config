@@ -1,8 +1,6 @@
-# TODO: add user variable
 {
   pkgs,
   lib,
-  config,
   ...
 }:
 with lib; {
@@ -12,6 +10,6 @@ with lib; {
     nodePackages.pnpm
     yarn
   ];
-  home.sessionPath = ["/home/administrator/.node/bin"];
+  home.sessionPath = ["$HOME/.node/bin"];
 
 }
