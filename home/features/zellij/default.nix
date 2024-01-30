@@ -1,19 +1,26 @@
 # Similar to TMUX
 {
-  lib,
   pkgs,
-  config,
   ...
 }:
+# Update theme
 
-with lib; {
+{
   programs.zellij = {
     enable = true;
     package = pkgs.zellij;
     # https://zellij.dev/documentation
-    # settings = {};
-    # enableZshIntegration = true;
-    # enableFishIntegration = true;
-    # enableBashIntegration = true;
+    settings = {
+      on_force_close = "quit";
+      simplified_ui = false;
+      default_shell = "zsh";
+      pane_frames = true;
+      theme = "nord";
+      default_layout = "default";
+
+    };
+    enableZshIntegration = true;
+    enableFishIntegration = true;
+    enableBashIntegration = true;
   };
 }

@@ -5,6 +5,7 @@
 {
   ...
 }:
+
 {
   programs.atuin = {
     enable = true;
