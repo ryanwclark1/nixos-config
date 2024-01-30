@@ -27,7 +27,6 @@ with lib; {
     wineWowPackages.wayland
     # wineWowPackages.stagingFull
     xdg-utils
-    graphviz
     # Wayland, Xorg
     wl-clipboard
     mediainfo
