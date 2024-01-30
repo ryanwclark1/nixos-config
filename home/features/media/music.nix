@@ -21,5 +21,4 @@
   home.packages = with pkgs; [
     termusic
   ];
-
 }
