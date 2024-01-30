@@ -1,19 +1,13 @@
 {
   pkgs,
-  config,
-  lib,
   ...
 }:
-# media - control and enjoy audio/video
 
 {
   home.packages = with pkgs; [
-    # audio control
     pavucontrol
     playerctl
     pulsemixer
-    # images
-    imv
   ];
 
   programs = {

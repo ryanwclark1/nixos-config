@@ -1,11 +1,8 @@
 {
-  pkgs,
-  lib,
-  config,
   ...
 }:
-{
 
+{
   imports = [
     ./darktable.nix
     ./graphical.nix
@@ -15,7 +12,4 @@
     ./video.nix
     ./yt-dlp.nix
   ];
-
-
-
 }
