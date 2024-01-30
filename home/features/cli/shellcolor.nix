@@ -3,7 +3,8 @@
 ...
 }:
 let inherit (config.colorscheme) colors;
-in {
+in
+{
   programs.shellcolor = {
     enable = true;
     settings = {

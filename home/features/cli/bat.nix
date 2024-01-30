@@ -1,6 +1,7 @@
 {
   ...
 }:
+
 {
   programs.bat = {
     enable = true;

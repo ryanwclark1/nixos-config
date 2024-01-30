@@ -1,6 +1,7 @@
 {
   ...
 }:
+
 {
   programs.pistol = {
     enable = true;
