@@ -1,11 +1,10 @@
 {
   pkgs,
   lib,
-  config,
   ...
 }:
-with lib; {
-
+with lib;
+{
   home.packages = with pkgs; let
     cargoSubCommands = [
       cargo-cross

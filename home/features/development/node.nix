@@ -1,9 +1,9 @@
 {
   pkgs,
-  lib,
   ...
 }:
-with lib; {
+
+{
   home.packages = with pkgs; [
     nodejs
     nodePackages.npm

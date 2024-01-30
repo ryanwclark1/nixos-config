@@ -1,11 +1,9 @@
 {
   pkgs,
-  lib,
-  config,
   ...
 }:
 
-with lib; {
+{
 
   programs.go = {
     enable = true;

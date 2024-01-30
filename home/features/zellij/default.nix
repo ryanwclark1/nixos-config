@@ -13,14 +13,14 @@
     settings = {
       on_force_close = "quit";
       simplified_ui = false;
-      default_shell = "zsh";
+      default_shell = "fish";
       pane_frames = true;
       theme = "nord";
       default_layout = "default";
 
     };
-    enableZshIntegration = true;
+    # enableZshIntegration = true;
     enableFishIntegration = true;
-    enableBashIntegration = true;
+    # enableBashIntegration = true;
   };
 }
