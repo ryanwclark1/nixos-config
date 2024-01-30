@@ -1,10 +1,11 @@
 {
   lib,
+  config,
   ...
 }:
-with lib;
 let
   font = "JetBrainsMono Nerd Font";
+  inherit (config.colorscheme) colors;
 in
 {
   programs.alacritty = {
@@ -29,6 +30,12 @@ in
         bold.family = font;
         italic.family = font;
         size = 12;
+      };
+      colors = {
+        primary = {
+          background = "#${colors.base00}";
+          foreground = "#${colors.base05}";
+        };
       };
       selection.save_to_clipboard = true;
     };
