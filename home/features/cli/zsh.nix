@@ -91,7 +91,7 @@ with lib; {
   };
 
   programs.fzf.enableZshIntegration = true;
-  # programs.nix-index.enableZshIntegration = mkIf config.nix-index.enable true;
+  programs.nix-index.enableZshIntegration = true;
   programs.starship.enableZshIntegration = true;
   programs.zoxide.enableZshIntegration = true;
   # services.gpg-agent.enableZshIntegration = mkIf config.gpg-agent.enable true;

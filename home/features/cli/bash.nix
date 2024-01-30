@@ -3,7 +3,8 @@
   config,
   ...
 }:
-with lib; {
+
+{
   programs.bash = {
     enable = true;
     enableCompletion = true;

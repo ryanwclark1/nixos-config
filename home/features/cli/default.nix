@@ -41,7 +41,6 @@
     comma # Install and run programs by sticking a , before them
     distrobox # Nice escape hatch, integrates docker images with my environment
 
-    bc # Calculator
     bottom # System viewer
     ncdu # TUI disk usage
     httpie # Better curl
@@ -58,5 +57,9 @@
     ltex-ls # Spell checking LSP
     tree # Directory tree
     # tly # Tally counter
+    d2 #diagram
+    zk # note taking
+    trashy #cli rm with trash support
+    hurl # httpie/curl alternative
   ];
 }

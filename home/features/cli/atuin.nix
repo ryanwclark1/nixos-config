@@ -3,11 +3,9 @@
 # Updated when enter is pressed select not execute.
 # TODO: temp disabled up arrow
 {
-  config,
-  lib,
   ...
 }:
-with lib; {
+{
   programs.atuin = {
     enable = true;
     flags = ["--disable-up-arrow"];
