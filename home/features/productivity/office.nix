@@ -10,7 +10,7 @@ with lib; {
 
   config = mkIf config.office.enable {
     home.packages = with pkgs; [
-      # libreoffice-fresh
+      libreoffice-fresh
       libreoffice-qt
     ];
   };
