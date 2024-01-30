@@ -12,7 +12,7 @@ in
     enable = true;
     settings = {
       window = {
-        opacity = 0.85;
+        opacity = 0.9;
         dynamic_title = true;
         dynamic_padding = true;
         padding = {
