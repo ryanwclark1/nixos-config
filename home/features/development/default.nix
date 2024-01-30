@@ -1,10 +1,9 @@
 {
   pkgs,
-  lib,
-  config,
   ...
 }:
-with lib; {
+
+{
 
   imports = [
     ./build.nix
@@ -12,7 +11,6 @@ with lib; {
     ./gitui.nix
     ./go.nix
     ./grpc.nix
-    ./just.nix
     ./lazygit.nix
     ./nixdev.nix
     ./node.nix
@@ -20,6 +18,10 @@ with lib; {
     ./python.nix
     ./rust.nix
     ./sql.nix
+  ];
+
+  home.packages = with pkgs; [
+    so
   ];
 
 }

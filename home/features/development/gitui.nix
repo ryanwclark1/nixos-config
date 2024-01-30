@@ -1,10 +1,8 @@
 {
-  lib,
-  config,
   ...
 }:
 
-with lib; {
+{
   programs.gitui = {
     enable = true;
     theme = ''

@@ -4,8 +4,14 @@
 }:
 
 {
-  home.packages = with pkgs; [
-    deno
+
+  imports = [
+    # ./snoint.nix
+
   ];
-  home.sessionPath = ["$HOME/.deno/bin"];
+
+  home.packages = with pkgs; [
+    sn0int
+  ];
+
 }
