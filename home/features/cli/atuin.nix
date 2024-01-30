@@ -1,7 +1,7 @@
 # Terminal history search
 # https://atuin.sh/docs/
 # Updated when enter is pressed select not execute.
-# TODO: temp disabled up arrow
+
 {
   ...
 }:
