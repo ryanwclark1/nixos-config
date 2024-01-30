@@ -3,9 +3,12 @@
   config,
   ...
 }:
-
+let
+  inherit (config.colorscheme) colors;
+in
 # TODO: Add pyenv, nvm, rbenv, rustup, etc. support
-with lib; {
+
+{
   # home.sessionVariables.STARSHIP_CACHE = "${config.xdg.cacheHome}/starship";
   programs.starship = {
     enable = true;
@@ -15,7 +18,7 @@ with lib; {
       add_newline = true;
       scan_timeout = 30;
       command_timeout = 500;
-      palette = "nord_dark";
+      palette = "system";
 
       palettes.gruvbox_dark ={
         color_fg0 = "#fbf1c7";
@@ -30,6 +33,21 @@ with lib; {
         color_purple = "#b16286";
         color_red = "#cc241d";
         color_docker = "#83a598";
+      };
+
+      palettes.system = {
+        color_fg0 = "#${colors.base00}";
+        color_bg1 = "#${colors.base05}";
+        color_bg3 = "#${colors.base07}";
+        color_a1 = "#${colors.base08}";
+        color_a2 = "#${colors.base09}";
+        color_a3 = "#${colors.base0A}";
+        color_a4 = "#${colors.base0B}";
+        color_docker = "#${colors.base0C}";
+        color_green = "#98971a";
+        color_yellow = "#d79921";
+        color_purple = "#b16286";
+        color_red = "#cc241d";
       };
 
       palettes.nord_dark = {
