@@ -1,4 +1,3 @@
-# TODO: add user variable
 {
   pkgs,
   lib,
@@ -14,5 +13,5 @@ with lib; {
     # python311Packages.pipx
     python311Packages.pip
   ];
-  home.sessionPath = ["/home/administrator/.python/bin"];
+  home.sessionPath = ["$HOME/.python/bin"];
 }

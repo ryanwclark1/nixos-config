@@ -6,7 +6,7 @@
 {
   services.mpd = {
     enable = false;
-    musicDirectory = /home/administrator/Music;
+    musicDirectory = "$HOME/Music";
     # network.startWhenNeeded = true;
     network.port = 6601;
   };

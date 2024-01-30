@@ -2,8 +2,6 @@
 # A command-line fuzzy finder
 {
   pkgs,
-  lib,
-  config,
   ...
 }:
 
