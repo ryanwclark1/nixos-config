@@ -45,7 +45,6 @@ in
 
       # Default shell
       shell = "${pkgs.zsh}/bin/zsh";
-
       # Font settings
       # font_size = 12;
       # adjust_line_height = 12;
