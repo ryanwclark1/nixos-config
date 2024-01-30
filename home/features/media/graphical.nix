@@ -1,25 +1,21 @@
 {
   pkgs,
-  lib,
-  config,
   ...
 }:
 
 {
   home.packages = with pkgs; [
-    inkscape
-    # krita
-    # libresprite
-    # aseprite
+    exif
     gimp
-    pastel
+    graphviz
+    krita
     imagemagick
     imv
+    inkscape
+    pastel
+    rx
+    vhs
     viu
-    exif
-    # vhs
-    # ffmpeg_5-full
-    # rx
   ];
 
 }
