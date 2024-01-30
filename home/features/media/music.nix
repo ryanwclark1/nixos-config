@@ -1,6 +1,4 @@
 {
-  config,
-  lib,
   pkgs,
   ...
 }:
@@ -20,5 +18,15 @@
 
   home.packages = with pkgs; [
     termusic
+    alsa-utils
   ];
+
+  services.fluidsynth = {
+    enable = true;
+    soundService = "pipewire-pulse";
+    extraOptions = [
+      "-g 2"
+    ];
+  };
+
 }

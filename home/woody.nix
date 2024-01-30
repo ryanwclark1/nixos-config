@@ -25,7 +25,6 @@ in {
     ./features/kitty
     ./features/kubernetes
     ./features/media
-    ./features/music
     ./features/networking-utils
     ./features/nvim
     # ./features/pass
