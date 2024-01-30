@@ -30,14 +30,15 @@ in {
     ./features/nvim
     # ./features/pass
     ./features/productivity
+    ./features/starship
     ./features/vscode
     ./features/zellij
     ./features/zoxide
   ];
 
   colorscheme = lib.mkDefault colorSchemes.nord;
-  # specialisation = {
-  #   light.configuration.colorscheme = colorSchemes.silk-light;
-  # };
+  specialisation = {
+    light.configuration.colorscheme = colorSchemes.silk-light;
+  };
 
 }
