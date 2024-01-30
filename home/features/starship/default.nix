@@ -190,8 +190,16 @@ in
       perl.symbol = " ";
       ruby.symbol = " ";
       scala.symbol = " ";
-      shlvl.symbol = "";
       terraform.symbol = "󱁢";
+
+      shlvl = {
+        symbol = "";
+        format = "[$shlvl]($style) ";
+        style = "bold cyan";
+        threshold = 2;
+        repeat = true;
+        disabled = false;
+      };
 
       container = {
         symbol = "";
@@ -319,18 +327,32 @@ in
 
       line_break.disabled = true;
 
+      # character = {
+      #   disabled = false;
+      #   success_symbol = "[](bold fg:color_green)";
+      #   error_symbol = "[](bold fg:color_red)";
+      #   vimcmd_symbol = "[](bold fg:color_green)";
+      #   vimcmd_replace_one_symbol = "[](bold fg:color_purple)";
+      #   vimcmd_replace_symbol = "[](bold fg:color_purple)";
+      #   vimcmd_visual_symbol = "[](bold fg:color_yellow)";
+      # };
+
       character = {
-        disabled = false;
-        success_symbol = "[](bold fg:color_green)";
-        error_symbol = "[](bold fg:color_red)";
-        vimcmd_symbol = "[](bold fg:color_green)";
-        vimcmd_replace_one_symbol = "[](bold fg:color_purple)";
-        vimcmd_replace_symbol = "[](bold fg:color_purple)";
-        vimcmd_visual_symbol = "[](bold fg:color_yellow)";
+        error_symbol = "[~~>](bold red)";
+        success_symbol = "[->>](bold green)";
+        vimcmd_symbol = "[<<-](bold yellow)";
+        vimcmd_visual_symbol = "[<<-](bold cyan)";
+        vimcmd_replace_symbol = "[<<-](bold purple)";
+        vimcmd_replace_one_symbol = "[<<-](bold purple)";
       };
 
       cmd_duration = {
         min_time = 2000;
+      };
+
+      time = {
+        format = "\\\[[$time]($style)\\\]";
+        disabled = false;
       };
     };
 
@@ -368,13 +390,7 @@ in
 #         ssh_only = false;
 #         style = "bold green";
 #       };
-#       shlvl = {
-#         format = "[$shlvl]($style) ";
-#         style = "bold cyan";
-#         threshold = 2;
-#         repeat = true;
-#         disabled = false;
-#       };
+
 #       cmd_duration = {
 #         format = "took [$duration]($style) ";
 #       };
@@ -400,22 +416,6 @@ in
 #       #     style = "bold blue";
 #       #   };
 #       # };
-
-#       character = {
-#         error_symbol = "[~~>](bold red)";
-#         success_symbol = "[->>](bold green)";
-#         vimcmd_symbol = "[<<-](bold yellow)";
-#         vimcmd_visual_symbol = "[<<-](bold cyan)";
-#         vimcmd_replace_symbol = "[<<-](bold purple)";
-#         vimcmd_replace_one_symbol = "[<<-](bold purple)";
-#       };
-
-#       time = {
-#         format = "\\\[[$time]($style)\\\]";
-#         disabled = false;
-#       };
-
-
 #   };
 # }
 }
