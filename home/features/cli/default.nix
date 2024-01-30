@@ -24,7 +24,6 @@
     # ./shellcolor.nix
     ./skim.nix
     # ./ssh.nix
-    ./starship.nix
     # ./xpo.nix
     ./zsh.nix
   ];
