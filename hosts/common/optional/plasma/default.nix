@@ -89,7 +89,7 @@
     aspellDicts.en-science
     capitaine-cursors
     la-capitaine-icon-theme
-    libreoffice-qt
+    # libreoffice-qt
 
     kcalc
     gnome.gnome-boxes
