@@ -18,6 +18,7 @@
     ./lf.nix
     ./nix-index.nix
     ./pfetch.nix
+    ./pistol.nix
     ./ranger.nix
     ./screen.nix
     # ./shellcolor.nix

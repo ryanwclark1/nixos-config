@@ -15,11 +15,57 @@ with lib; {
       add_newline = true;
       scan_timeout = 30;
       command_timeout = 500;
-      palette = "gruvbox_dark";
+      palette = "nord_dark";
+
       palettes.gruvbox_dark ={
         color_fg0 = "#fbf1c7";
         color_bg1 = "#3c3836";
         color_bg3 = "#665c54";
+        color_a1 = "#d65d0e";
+        color_a2 = "#d79921";
+        color_a3 = "#689d6a";
+        color_a4 = "#458588";
+        color_green = "#98971a";
+        color_yellow = "#d79921";
+        color_purple = "#b16286";
+        color_red = "#cc241d";
+        color_docker = "#83a598";
+      };
+
+      palettes.nord_dark = {
+        color_fg0 = "#d8dee9";
+        color_bg1 = "#2e3440";
+        color_bg3 = "#3b4252";
+        color_a1 = "#bf616a";
+        color_a2 = "#d08770";
+        color_a3 = "#ebcb8b";
+        color_a4 = "#a3be8c";
+        color_green = "#a3be8c";
+        color_yellow = "#ebcb8b";
+        color_purple = "#b48ead";
+        color_red = "#bf616a";
+        color_docker = "#88c0d0";
+      };
+
+      palettes.nord_light = {
+        color_fg0 = "#2e3440";
+        color_bg1 = "#d8dee9";
+        color_bg3 = "#eceff4";
+        color_a1 = "#bf616a";
+        color_a2 = "#d08770";
+        color_a3 = "#ebcb8b";
+        color_a4 = "#a3be8c";
+        color_green = "#a3be8c";
+        color_yellow = "#ebcb8b";
+        color_purple = "#b48ead";
+        color_red = "#bf616a";
+        color_docker = "#88c0d0";
+      };
+
+      palettes.gruvbox_light = {
+        color_fg0 = "#3c3836";
+        color_bg1 = "#fbf1c7";
+        color_bg3 = "#d5c4a1";
         color_a1 = "#d65d0e";
         color_a2 = "#d79921";
         color_a3 = "#689d6a";

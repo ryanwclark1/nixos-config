@@ -10,7 +10,7 @@
     fd #find alternative
     sd #sed alternative
   ];
-  program.ripgrep = {
+  programs.ripgrep = {
     enable = true;
     package = pkgs.ripgrep-all;
   };
