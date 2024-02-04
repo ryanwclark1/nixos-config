@@ -1,11 +1,12 @@
 {
-  lib,
   pkgs,
   ...
 }:
 
 {
   home = {
-    packages = [ pkgs.dolphinEmu ];
+    packages = with pkgs; [
+      dolphinEmu
+    ];
   };
 }
