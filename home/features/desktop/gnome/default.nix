@@ -86,7 +86,7 @@ with lib;
           "writer.desktop"
         ];
         categories = ["X-GNOME-Office"];
-        name = "X-GNOME-Office.directory";
+        name = "Office";
         translate = true;
       };
       "org/gnome/desktop/app-folders/folders/Graphics" = {
@@ -101,7 +101,7 @@ with lib;
           "org.kde.showfoto.desktop"
         ];
         categories = ["X-GNOME-Graphics"];
-        name = "X-GNOME-Graphics.directory";
+        name = "Graphics";
         translate = true;
       };
       "org/gnome/desktop/app-folders/folders/Video" = {
@@ -115,7 +115,7 @@ with lib;
           "com.obsproject.Studio.desktop"
         ];
         categories = ["X-GNOME-Video"];
-        name = "X-GNOME-Video.directory";
+        name = "Video";
         translate = true;
       };
       "org/gnome/desktop/app-folders/folders/Game" = {
@@ -125,7 +125,7 @@ with lib;
           "net.lutris.Lutris.desktop"
         ];
         categories = ["X-GNOME-Game"];
-        name = "X-GNOME-Game.directory";
+        name = "Game";
         translate = true;
       };
 
