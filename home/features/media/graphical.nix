@@ -5,6 +5,8 @@
 
 {
   home.packages = with pkgs; [
+    digikam
+    drawio
     exif
     gimp
     graphviz
