@@ -62,5 +62,6 @@
     zk # note taking
     trashy #cli rm with trash support
     hurl # httpie/curl alternative
+    fx # Terminal JSON viewer
   ];
 }
