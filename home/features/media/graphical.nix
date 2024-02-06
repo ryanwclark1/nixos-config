@@ -15,7 +15,6 @@
     imv
     inkscape
     pastel
-    rx
     vhs
     viu
   ];
