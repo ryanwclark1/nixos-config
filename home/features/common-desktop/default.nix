@@ -30,7 +30,7 @@ with lib; {
     # Wayland, Xorg
     wl-clipboard
     mediainfo
-    remmina         # XRDP & VNC Client
+    remmina # XRDP & VNC Client
     bluez-tools # bt-adapter
 
     kate
@@ -39,6 +39,7 @@ with lib; {
     discord
     element-desktop
     megatools
+    megasync
     # Duplicate file finder
     czkawka
     f1viewer
