@@ -19,6 +19,7 @@ with lib;
           "Alacritty.desktop"
           "google-chrome.desktop"
           "firefox.desktop"
+          "steam.desktop"
           "org.gnome.Nautilus.desktop"
         ];
         disable-user-extensions = false;
@@ -46,6 +47,7 @@ with lib;
           "Graphics"
           "Video"
           "Game"
+          "Development"
         ];
       };
       "org/gnome/desktop/app-folders/folders/Utilities" = {
@@ -126,6 +128,19 @@ with lib;
         ];
         categories = ["X-GNOME-Game"];
         name = "Game";
+        translate = true;
+      };
+      "org/gnome/desktop/app-folders/folders/Development" = {
+        apps = [
+          "nvim.desktop"
+          "DevPod.desktop"
+          "Helix.desktop"
+          "insomnia.desktop"
+          "dbeaver.desktop"
+          "org.flameshot.Flameshot.desktop"
+        ];
+        categories = ["X-GNOME-Development"];
+        name = "Development";
         translate = true;
       };
 
