@@ -12,6 +12,8 @@
     python311Packages.pip
     # python311Packages.pipx
     # poetry
+    functiontrace-server
+    memray
   ];
   home.sessionPath = ["$HOME/.python/bin"];
 }
