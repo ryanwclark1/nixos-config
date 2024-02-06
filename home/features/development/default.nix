@@ -7,7 +7,7 @@
 
   imports = [
     ./build.nix
-    ./devprod.nix
+    ./devpod.nix
     ./gitui.nix
     ./go.nix
     ./grpc.nix
