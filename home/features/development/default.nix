@@ -7,13 +7,13 @@
 
   imports = [
     ./build.nix
-    ./deno.nix
+    ./devprod.nix
     ./gitui.nix
     ./go.nix
     ./grpc.nix
+    ./js.nix
     ./lazygit.nix
     ./nixdev.nix
-    ./node.nix
     ./protobuf.nix
     ./python.nix
     ./rust.nix
