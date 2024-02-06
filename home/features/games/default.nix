@@ -8,7 +8,6 @@
     # ./factorio.nix
     ./heroic.nix
     ./lutris.nix
-    ./prism-launcher.nix
     ./steam.nix
 
   ];
