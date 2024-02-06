@@ -39,7 +39,95 @@ with lib;
           "forge@jmmaranan.com"
         ];
       };
-
+      "org/gnome/desktop/app-folders" = {
+        folder-children = [
+          "Utilities"
+          "Office"
+          "Graphics"
+          "Video"
+          "Game"
+        ];
+      };
+      "org/gnome/desktop/app-folders/folders/Utilities" = {
+        apps = [
+          "gnome-abrt.desktop"
+          "gnome-system-log.desktop"
+          "nm-connection-editor.desktop"
+          "org.gnome.baobab.desktop"
+          "org.gnome.Connections.desktop"
+          "org.gnome.DejaDup.desktop"
+          "org.gnome.Dictionary.desktop"
+          "org.gnome.DiskUtility.desktop"
+          "org.gnome.eog.desktop"
+          "org.gnome.Evince.desktop"
+          "org.gnome.FileRoller.desktop"
+          "org.gnome.fonts.desktop"
+          "org.gnome.font-viewer.desktop"
+          "org.gnome.Logs.desktop"
+          "org.gnome.seahorse.Application.desktop"
+          "org.gnome.tweaks.desktop"
+          "org.gnome.Usage.desktop"
+          "vinagre.desktop"
+          "org.gnome.Console.desktop"
+          "org.kde.konsole.desktop"
+        ];
+        categories = ["X-GNOME-Utilities"];
+        name = "X-GNOME-Utilities.directory";
+        translate = true;
+      };
+      "org/gnome/desktop/app-folders/folders/Office" = {
+        apps = [
+          "base.desktop"
+          "startcenter.desktop"
+          "calc.desktop"
+          "draw.desktop"
+          "impress.desktop"
+          "math.desktop"
+          "writer.desktop"
+        ];
+        categories = ["X-GNOME-Office"];
+        name = "X-GNOME-Office.directory";
+        translate = true;
+      };
+      "org/gnome/desktop/app-folders/folders/Graphics" = {
+        apps = [
+          "org.gnome.Loupe.desktop"
+          "gimp.desktop"
+          "drawio.desktop"
+          "org.inkscape.Inkscape.desktop"
+          "org.kde.krita.desktop"
+          "org.darktable.darktable.desktop"
+          "org.kde.digikam.desktop"
+          "org.kde.showfoto.desktop"
+        ];
+        categories = ["X-GNOME-Graphics"];
+        name = "X-GNOME-Graphics.directory";
+        translate = true;
+      };
+      "org/gnome/desktop/app-folders/folders/Video" = {
+        apps = [
+          "vlc.desktop"
+          "org.gnome.Totem.desktop"
+          "org.kde.kdenlive.desktop"
+          "mpv.desktop"
+          "fr.handbrake.ghb.desktop"
+          "blender.desktop"
+          "com.obsproject.Studio.desktop"
+        ];
+        categories = ["X-GNOME-Video"];
+        name = "X-GNOME-Video.directory";
+        translate = true;
+      };
+      "org/gnome/desktop/app-folders/folders/Game" = {
+        apps = [
+          "com.heroicgameslauncher.hgl.desktop"
+          "dolphin-emu.desktop"
+          "net.lutris.Lutris.desktop"
+        ];
+        categories = ["X-GNOME-Game"];
+        name = "X-GNOME-Game.directory";
+        translate = true;
+      };
 
       "org/gnome/desktop/interface" = {
         color-scheme = "prefer-dark";
