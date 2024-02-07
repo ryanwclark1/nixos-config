@@ -19,7 +19,6 @@
     ./openssh.nix
     ./sops.nix
     # ./ssh-serve-store.nix
-    ./steam-hardware.nix
     ./systemd-boot.nix
     ./tailscale.nix
     ./zsh.nix
