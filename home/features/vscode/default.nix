@@ -54,7 +54,7 @@
         mikestead.dotenv
         dbaeumer.vscode-eslint
         # vscode-extension-dbaeumer-vscode-eslint
-        
+
         # vscode-icons-team.vscode-icons
       ];
 
@@ -90,6 +90,7 @@
         "terminal.integrated.fontFamily" = "JetBrainsMono Nerd Font";
         "terminal.explorerKind" = "both";
         "terminal.external.linuxExec" = "kitty";
+        "terminal.integrated.copyOnSelection" = true;
 
         # Nix IDE
         "nix.enableLanguageServer" = true;
