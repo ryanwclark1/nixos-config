@@ -52,7 +52,9 @@
         jdinhlife.gruvbox
 
         mikestead.dotenv
-
+        dbaeumer.vscode-eslint
+        # vscode-extension-dbaeumer-vscode-eslint
+        
         # vscode-icons-team.vscode-icons
       ];
 
