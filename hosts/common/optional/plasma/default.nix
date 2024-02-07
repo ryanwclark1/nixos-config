@@ -77,6 +77,7 @@
     libsForQt5.plasma-integration
     libsForQt5.qtstyleplugin-kvantum
     libsForQt5.filelight
+    libsForQt5.qt5.qtbase
     # libsForQt5.ksystemlog
     ksystemlog
     lightly-qt
