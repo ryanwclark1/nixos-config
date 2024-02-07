@@ -27,11 +27,13 @@
           extraGSettingsOverridePackages = [];
           # Additional gsettings overrides. strings concatenated with "\n"
           extraGSettingsOverrides = "";
+          sushi.enable = true; # File previewer for nautilus
+          games.enable = false;
         };
       };
     };
     geoclue2.enable = true;
-    gnome.games.enable = false;
+
   };
 
   programs.dconf.enable = true;
@@ -45,7 +47,6 @@
     gnome-music
     epiphany # web browser
     geary # email reader
-    gnome-characters
     tali # poker game
     iagno # go game
     hitori # sudoku game
