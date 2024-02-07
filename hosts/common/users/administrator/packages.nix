@@ -20,7 +20,7 @@ let
 in
 {
   users.users.administrator.packages = with pkgs; [
-    firefox
+    # firefox
     google-chrome
     steam-with-pkgs
     gamescope

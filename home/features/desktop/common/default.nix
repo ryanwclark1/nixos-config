@@ -5,10 +5,10 @@
 
 {
   imports = [
-  #   ./deluge.nix
+    ./deluge.nix
     ./discord.nix
   #   ./dragon.nix
-  #   ./firefox.nix
+    ./firefox.nix
     ./font.nix
   #   ./gtk.nix
   #   ./kdeconnect.nix

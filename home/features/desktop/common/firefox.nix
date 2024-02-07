@@ -9,10 +9,10 @@
     enable = true;
     profiles.administrator = {
       bookmarks = { };
-      extensions = with pkgs.inputs.firefox-addons; [
-        ublock-origin
-        browserpass
-      ];
+      # extensions = with pkgs.inputs.firefox-addons; [
+      #   ublock-origin
+      #   browserpass
+      # ];
       bookmarks = { };
       settings = {
         "browser.disableResetPrompt" = true;
