@@ -26,6 +26,5 @@ in
     gamescope
     protontricks
     lutris
-    prismlauncher
   ];
 }
