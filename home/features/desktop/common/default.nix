@@ -18,7 +18,9 @@
   #   ./slack.nix
   #   ./sublime-music.nix
   # ];
-  xdg.portal.enable = true;
+
+  # Requires an implementation in xdg.portal.extraportals such as xdg-desktop-portal-kde or xdg-desktop-portal-gtk
+  # xdg.portal.enable = true;
 
   home.packages = with pkgs; [
 
