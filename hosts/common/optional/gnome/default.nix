@@ -27,13 +27,14 @@
           extraGSettingsOverridePackages = [];
           # Additional gsettings overrides. strings concatenated with "\n"
           extraGSettingsOverrides = "";
-          sushi.enable = true; # File previewer for nautilus
-          games.enable = false;
         };
       };
     };
+    gnome = {
+      games.enable = false;
+      sushi.enable = true;
+    };
     geoclue2.enable = true;
-
   };
 
   programs.dconf.enable = true;
