@@ -35,6 +35,9 @@
     # system tools
     sysstat
     lm_sensors # for `sensors` command
+    inxi
+    dmidecode
+    glxinfo
 
 
     # misc
