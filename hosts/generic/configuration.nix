@@ -87,7 +87,7 @@
     description = "administrator";
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
-      firefox
+      # firefox
       kate
       neovim
       helix
