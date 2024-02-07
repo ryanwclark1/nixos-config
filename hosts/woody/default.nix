@@ -56,5 +56,9 @@
     };
   };
 
+  environment.systemPackages = with pkgs; [
+    gcc
+  ];
+
   system.stateVersion = "23.11";
 }
