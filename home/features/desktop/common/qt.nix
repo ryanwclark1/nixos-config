@@ -1,4 +1,9 @@
-{ pkgs, config, ... }:
+{
+  pkgs,
+  config,
+  ...
+}:
+
 {
   qt = {
     enable = true;

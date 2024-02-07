@@ -29,6 +29,7 @@ in
       # shell_integration = "no-rc"; # I prefer to do it manually
       # performance
       scrollback_lines = 15000;
+      # scrollback_pager_history_size = 2048;
       wheel_scroll_min_lines = 1;
       window_padding_width = 15;
       update_check_interval = 0;

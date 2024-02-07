@@ -6,7 +6,6 @@
   imports = [
     ./hyprland-vnc.nix
     ./gammastep.nix
-    ./kitty.nix
     ./mako.nix
     ./qutebrowser.nix
     ./swayidle.nix

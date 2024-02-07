@@ -1,4 +1,10 @@
-{ pkgs, lib, ... }: {
+{
+  pkgs,
+  lib,
+  ...
+}:
+
+{
   home.packages = [ pkgs.sublime-music ];
 
 }
