@@ -39,6 +39,7 @@
     vscode-server = {
       enable = true;
     };
+    xserver.videoDrivers = [ "amdgpu" ];
   };
 
   hardware ={
