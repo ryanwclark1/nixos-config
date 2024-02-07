@@ -30,6 +30,7 @@ in {
     # ./features/pass
     ./features/productivity
     ./features/starship
+    ./features/sys-stats
     ./features/vscode
     ./features/zellij
     ./features/zoxide

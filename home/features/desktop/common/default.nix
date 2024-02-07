@@ -4,12 +4,12 @@
 }:
 
 {
-  # imports = [
+  imports = [
   #   ./deluge.nix
-  #   ./discord.nix
+    ./discord.nix
   #   ./dragon.nix
   #   ./firefox.nix
-  #   ./font.nix
+    ./font.nix
   #   ./gtk.nix
   #   ./kdeconnect.nix
   #   ./pavucontrol.nix
@@ -17,7 +17,7 @@
   #   ./qt.nix
   #   ./slack.nix
   #   ./sublime-music.nix
-  # ];
+  ];
 
   # Requires an implementation in xdg.portal.extraportals such as xdg-desktop-portal-kde or xdg-desktop-portal-gtk
   # xdg.portal.enable = true;
@@ -29,16 +29,7 @@
 
     ventoy-full #balena type tool
 
-    # utils
-    acpica-tools
 
-    # system tools
-    sysstat
-    lm_sensors # for `sensors` command
-    inxi
-    dmidecode
-    glxinfo
-    xorg.xdpyinfo
 
 
     # misc
@@ -55,7 +46,6 @@
     kate
 
     scrot
-    discord
     element-desktop
     megatools
     megasync
