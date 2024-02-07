@@ -1,6 +1,7 @@
 {
   ...
 }:
+
 {
   boot.loader = {
     systemd-boot = {
