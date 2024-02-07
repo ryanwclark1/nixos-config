@@ -15,7 +15,7 @@ in {
     ./features/alacritty
     ./features/build
     ./features/cli
-    ./features/common-desktop
+    # ./features/common-desktop
     ./features/compression
     ./features/development
     ./features/filesearch
