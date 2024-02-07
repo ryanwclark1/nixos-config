@@ -38,6 +38,7 @@
     inxi
     dmidecode
     glxinfo
+    xorg.xdpyinfo
 
 
     # misc
