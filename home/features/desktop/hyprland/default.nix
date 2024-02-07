@@ -1,4 +1,11 @@
-{ lib, config, pkgs, ... }: {
+{
+  lib,
+  config,
+  pkgs,
+  ...
+}:
+
+{
   imports = [
     ../common
     ../common/wayland-wm
