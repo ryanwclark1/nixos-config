@@ -3,6 +3,7 @@
   ...
 }:
 
+# inxi -Fxxxmprz <--- all info with filters
 {
   home.packages = with pkgs; [
     # system tools
