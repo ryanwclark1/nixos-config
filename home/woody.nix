@@ -10,6 +10,7 @@ in {
   imports = [
     ./global
     ./features/desktop/gnome
+    ./features/desktop/common
 
     ./features/alacritty
     ./features/build

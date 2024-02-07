@@ -1,63 +1,63 @@
-{
-  pkgs,
-  lib,
-  config,
-  ...
-}:
+# {
+#   pkgs,
+#   lib,
+#   config,
+#   ...
+# }:
 
-with lib; {
+# with lib; {
 
-  home.packages = with pkgs; [
+#   home.packages = with pkgs; [
 
-    openssl_3
-    dfeet # Dbus debugger
+#     openssl_3
+#     dfeet # Dbus debugger
 
-    ventoy-full #balena type tool
+#     ventoy-full #balena type tool
 
-    # utils
-    acpica-tools
+#     # utils
+#     acpica-tools
 
-    # system tools
-    sysstat
-    lm_sensors # for `sensors` command
+#     # system tools
+#     sysstat
+#     lm_sensors # for `sensors` command
 
 
-    # misc
-    libnotify
-    wineWowPackages.wayland
-    # wineWowPackages.stagingFull
-    xdg-utils
-    # Wayland, Xorg
-    wl-clipboard
-    mediainfo
-    remmina # XRDP & VNC Client
-    bluez-tools # bt-adapter
+#     # misc
+#     libnotify
+#     wineWowPackages.wayland
+#     # wineWowPackages.stagingFull
+#     xdg-utils
+#     # Wayland, Xorg
+#     wl-clipboard
+#     mediainfo
+#     remmina # XRDP & VNC Client
+#     bluez-tools # bt-adapter
 
-    kate
+#     kate
 
-    scrot
-    discord
-    element-desktop
-    megatools
-    megasync
-    # Duplicate file finder
-    czkawka
-    f1viewer
-    tickrs
-    # fantomas
+#     scrot
+#     discord
+#     element-desktop
+#     megatools
+#     megasync
+#     # Duplicate file finder
+#     czkawka
+#     f1viewer
+#     tickrs
+#     # fantomas
 
-    # # It is sometimes useful to fine-tune packages, for example, by applying
-    # # overrides. You can do that directly here, just don't forget the
-    # # parentheses. Maybe you want to install Nerd Fonts with a limited number of
-    # # fonts?
-    # (pkgs.nerdfonts.override { fonts = [ "FantasqueSansMono" ]; })
+#     # # It is sometimes useful to fine-tune packages, for example, by applying
+#     # # overrides. You can do that directly here, just don't forget the
+#     # # parentheses. Maybe you want to install Nerd Fonts with a limited number of
+#     # # fonts?
+#     # (pkgs.nerdfonts.override { fonts = [ "FantasqueSansMono" ]; })
 
-    # # You can also create simple shell scripts directly inside your
-    # # configuration. For example, this adds a command 'my-hello' to your
-    # # environment:
-    # (pkgs.writeShellScriptBin "my-hello" ''
-    #   echo "Hello, ${config.home.username}!"
-    # '')
-  ];
+#     # # You can also create simple shell scripts directly inside your
+#     # # configuration. For example, this adds a command 'my-hello' to your
+#     # # environment:
+#     # (pkgs.writeShellScriptBin "my-hello" ''
+#     #   echo "Hello, ${config.home.username}!"
+#     # '')
+#   ];
 
-}
+# }
