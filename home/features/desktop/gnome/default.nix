@@ -7,9 +7,10 @@
 with lib;
 
 {
-  # imports = [
+  imports = [
+    ./nautilus-gstreamer.nix
     # ../common
-  # ];
+  ];
   # home-manager.users.administrator = {
   dconf = {
     enable = true;
