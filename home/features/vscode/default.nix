@@ -108,7 +108,7 @@
         "evenBetterToml.taplo.bundled" = false;
         "evenBetterToml.taplo.path" = "${pkgs.taplo}/bin/taplo";
 
-        Go
+        # Go
         "go.alternateTools" = {
           "gopls" = "${pkgs.gopls}/bin/gopls";
           "dlv" = "${pkgs.delve}/bin/dlv";
