@@ -20,7 +20,7 @@
     ent-go
     go-tools
     gocode
-    gopls
+    gocode
     godef
     gotools
     errcheck
