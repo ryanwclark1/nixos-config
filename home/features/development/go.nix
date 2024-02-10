@@ -19,8 +19,7 @@
     golangci-lint-langserver
     ent-go
     go-tools
-    gocode
-    gocode
+    gopls
     godef
     gotools
     errcheck
