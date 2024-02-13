@@ -9,5 +9,6 @@
     dbeaver
     mycli
     pgcli
+    sqlitebrowser
   ];
 }

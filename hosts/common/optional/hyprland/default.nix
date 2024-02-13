@@ -27,7 +27,7 @@ with lib;
     services = {
       xserver = {
         enable = true;
-        layout = "us";
+        xkb.layout = "us";
         xkbVariant = "";
         libinput.enable = true;
         # This is included in gpu.nix to allow for other drivers
