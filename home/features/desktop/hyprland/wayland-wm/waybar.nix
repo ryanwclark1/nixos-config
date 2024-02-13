@@ -324,7 +324,7 @@ in
     # x y -> vertical, horizontal
     # x y z -> top, horizontal, bottom
     # w x y z -> top, right, bottom, left
-    style = let inherit (config.colorscheme) colors; in /* css */ ''
+    style = let inherit (config.colorscheme) palette; in /* css */ ''
       * {
         font-family: ${config.fontProfiles.regular.family}, ${config.fontProfiles.monospace.family};
         font-size: 12pt;
@@ -336,8 +336,8 @@ in
         padding: 0;
         opacity: 0.75;
         border-radius: 0.5em;
-        background-color: #${colors.base00};
-        color: #${colors.base05};
+        background-color: #${palette.base00};
+        color: #${palette.base05};
       }
       .modules-left {
         margin-left: -0.65em;
@@ -347,39 +347,39 @@ in
       }
 
       #workspaces button {
-        background-color: #${colors.base00};
-        color: #${colors.base05};
+        background-color: #${palette.base00};
+        color: #${palette.base05};
         padding-left: 0.4em;
         padding-right: 0.4em;
         margin-top: 0.15em;
         margin-bottom: 0.15em;
       }
       #workspaces button.hidden {
-        background-color: #${colors.base00};
-        color: #${colors.base04};
+        background-color: #${palette.base00};
+        color: #${palette.base04};
       }
       #workspaces button.focused,
       #workspaces button.active {
-        background-color: #${colors.base0A};
-        color: #${colors.base00};
+        background-color: #${palette.base0A};
+        color: #${palette.base00};
       }
 
       #clock {
-        background-color: #${colors.base01};
+        background-color: #${palette.base01};
         padding-right: 1em;
         padding-left: 1em;
         border-radius: 0.5em;
       }
 
       #custom-menu {
-        background-color: #${colors.base01};
+        background-color: #${palette.base01};
         padding-right: 1.5em;
         padding-left: 1em;
         margin-right: 0;
         border-radius: 0.5em;
       }
       #custom-hostname {
-        background-color: #${colors.base01};
+        background-color: #${palette.base01};
         padding-right: 1em;
         padding-left: 1em;
         margin-left: 0;
@@ -389,7 +389,7 @@ in
         padding-right: 0;
       }
       #tray {
-        color: #${colors.base05};
+        color: #${palette.base05};
       }
       #custom-gpu, #cpu, #memory {
         margin-left: 0.05em;
