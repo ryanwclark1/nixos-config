@@ -5,42 +5,42 @@
   ...
 }:
 
-let inherit (config.colorscheme) colors;
+let inherit (config.colorscheme) palette;
 in {
   home.packages = with pkgs; [ discord discocss ];
 
 
   xdg.configFile."discocss/custom.css".text = ''
     .theme-dark {
-        --header-primary: #${colors.base05};
-        --header-secondary: #${colors.base04};
-        --text-normal: #${colors.base05};
-        --text-muted: #${colors.base04};
-        --text-link: #${colors.base08};
-        --channels-default: #${colors.base05};
-        --interactive-normal: #${colors.base04};
-        --interactive-hover: #${colors.base05};
-        --interactive-active: #${colors.base05};
-        --interactive-muted: #${colors.base03};
-        --background-primary: #${colors.base00};
-        --background-secondary: #${colors.base01};
-        --background-secondary-alt: #${colors.base02};
-        --background-tertiary: #${colors.base01};
-        --background-accent: #${colors.base01};
-        --background-floating: #${colors.base00};
+        --header-primary: #${palette.base05};
+        --header-secondary: #${palette.base04};
+        --text-normal: #${palette.base05};
+        --text-muted: #${palette.base04};
+        --text-link: #${palette.base08};
+        --channels-default: #${palette.base05};
+        --interactive-normal: #${palette.base04};
+        --interactive-hover: #${palette.base05};
+        --interactive-active: #${palette.base05};
+        --interactive-muted: #${palette.base03};
+        --background-primary: #${palette.base00};
+        --background-secondary: #${palette.base01};
+        --background-secondary-alt: #${palette.base02};
+        --background-tertiary: #${palette.base01};
+        --background-accent: #${palette.base01};
+        --background-floating: #${palette.base00};
         --background-mobile-primary: var(--background-primary);
         --background-mobile-secondary: var(--background-secondary);
         --background-modifier-selected: var(--background-secondary);
-        --scrollbar-thin-thumb: #${colors.base02};
-        --scrollbar-auto-thumb: #${colors.base02};
-        --scrollbar-auto-track: #${colors.base01};
-        --scrollbar-auto-scrollbar-color-thumb: #${colors.base02};
-        --scrollbar-auto-scrollbar-color-track: #${colors.base01};
-        --focus-primary: #${colors.base08};
-        --channeltextarea-background: #${colors.base01};
-        --deprecated-card-bg: #${colors.base01};
-        --deprecated-quickswitcher-input-background: #${colors.base01};
-        --deprecated-quickswitcher-input-placeholder: #${colors.base05};
+        --scrollbar-thin-thumb: #${palette.base02};
+        --scrollbar-auto-thumb: #${palette.base02};
+        --scrollbar-auto-track: #${palette.base01};
+        --scrollbar-auto-scrollbar-color-thumb: #${palette.base02};
+        --scrollbar-auto-scrollbar-color-track: #${palette.base01};
+        --focus-primary: #${palette.base08};
+        --channeltextarea-background: #${palette.base01};
+        --deprecated-card-bg: #${palette.base01};
+        --deprecated-quickswitcher-input-background: #${palette.base01};
+        --deprecated-quickswitcher-input-placeholder: #${palette.base05};
         --background-modifier-hover: var(--background-secondary);
         --background-modifier-active: var(--background-secondary-alt);
         --activity-card-background: var(--background-secondary);

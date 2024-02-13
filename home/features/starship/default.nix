@@ -4,7 +4,7 @@
   ...
 }:
 let
-  inherit (config.colorscheme) colors;
+  inherit (config.colorscheme) palette;
 in
 # TODO: Add pyenv, nvm, rbenv, rustup, etc. support
 
@@ -36,14 +36,14 @@ in
       };
 
       palettes.system = {
-        color_fg0 = "#${colors.base00}";
-        color_bg1 = "#${colors.base05}";
-        color_bg3 = "#${colors.base07}";
-        color_a1 = "#${colors.base08}";
-        color_a2 = "#${colors.base09}";
-        color_a3 = "#${colors.base0A}";
-        color_a4 = "#${colors.base0B}";
-        color_docker = "#${colors.base0C}";
+        color_fg0 = "#${palette.base00}";
+        color_bg1 = "#${palette.base05}";
+        color_bg3 = "#${palette.base07}";
+        color_a1 = "#${palette.base08}";
+        color_a2 = "#${palette.base09}";
+        color_a3 = "#${palette.base0A}";
+        color_a4 = "#${palette.base0B}";
+        color_docker = "#${palette.base0C}";
         color_green = "#98971a";
         color_yellow = "#d79921";
         color_purple = "#b16286";

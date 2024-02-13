@@ -4,7 +4,7 @@
 }:
 let
   font = "JetBrainsMono Nerd Font";
-  inherit (config.colorscheme) colors;
+  inherit (config.colorscheme) palette;
 in
 {
   programs.alacritty = {
@@ -32,8 +32,8 @@ in
       };
       colors = {
         primary = {
-          background = "#${colors.base00}";
-          foreground = "#${colors.base05}";
+          background = "#${palette.base00}";
+          foreground = "#${palette.base05}";
         };
       };
       selection.save_to_clipboard = true;

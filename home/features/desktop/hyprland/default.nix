@@ -43,12 +43,12 @@
         gaps_out = 20;
         border_size = 2.7;
         cursor_inactive_timeout = 4;
-        "col.active_border" = "0xff${config.colorscheme.colors.base0C}";
-        "col.inactive_border" = "0xff${config.colorscheme.colors.base02}";
+        "col.active_border" = "0xff${config.colorscheme.palette.base0C}";
+        "col.inactive_border" = "0xff${config.colorscheme.palette.base02}";
       };
       group = {
-        "col.border_active" = "0xff${config.colorscheme.colors.base0B}";
-        "col.border_inactive" = "0xff${config.colorscheme.colors.base04}";
+        "col.border_active" = "0xff${config.colorscheme.palette.base0B}";
+        "col.border_inactive" = "0xff${config.colorscheme.palette.base04}";
         groupbar = {
           font_size = 11;
         };
