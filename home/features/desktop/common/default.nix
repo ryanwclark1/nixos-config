@@ -22,13 +22,17 @@
   # Requires an implementation in xdg.portal.extraportals such as xdg-desktop-portal-kde or xdg-desktop-portal-gtk
   # xdg.portal.enable = true;
 
+  nixpkgs.config.permittedInsecurePackages = [
+    "electron-19.1.9"
+  ];
+
   home.packages = with pkgs; [
 
     openssl_3
     dfeet # Dbus debugger
 
     ventoy-full #balena type tool
-
+    etcher
 
 
 
