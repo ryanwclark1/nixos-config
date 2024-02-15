@@ -14,6 +14,7 @@ let
   hasNeomutt = config.programs.neomutt.enable;
   # hasShellColor = config.programs.shellcolor.enable;
   hasKitty = config.programs.kitty.enable;
+  hasZoxide = config.programs.zoxide.enable;
   # shellcolor = "${pkgs.shellcolord}/bin/shellcolor";
 in
 {
@@ -52,6 +53,8 @@ in
 
       cik = mkIf hasKitty "clone-in-kitty --type os-window";
       ck = cik;
+
+      cd = mkIf hasZoxide "zoxide";
     };
     shellAliases = {
       # Clear screen and scrollback
