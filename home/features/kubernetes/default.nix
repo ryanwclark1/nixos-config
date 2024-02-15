@@ -10,5 +10,6 @@
     minikube
     openlens
     tilt
+    kubeshark
   ];
 }

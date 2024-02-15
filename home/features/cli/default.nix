@@ -18,6 +18,7 @@
     ./gpg.nix
     ./jq.nix
     ./lf.nix
+    ./network.nix
     ./nix-index.nix
     ./nixtools.nix
     ./pfetch.nix
@@ -49,12 +50,6 @@
     diffsitter # Better diff
     # trekscii # Cute startrek cli printer
     timer # To help with my ADHD paralysis
-
-    nil # Nix LSP
-    nixfmt # Nix formatter
-    nvd # Differ
-    nix-output-monitor
-    nh # Nice wrapper for NixOS and HM
     mc # Midnight commander
     ltex-ls # Spell checking LSP
     tree # Directory tree
