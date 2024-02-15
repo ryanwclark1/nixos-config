@@ -15,6 +15,7 @@
     ../common/optional/printing.nix
     ../common/optional/qemu.nix
     ../common/optional/steam.nix
+    ../common/optional/k3s.nix
 
     ../common/optional/gnome
 
