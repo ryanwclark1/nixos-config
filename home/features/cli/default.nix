@@ -52,7 +52,7 @@
     timer # To help with my ADHD paralysis
     mc # Midnight commander
     ltex-ls # Spell checking LSP
-    tree # Directory tree
+
     # tly # Tally counter
     d2 #diagram
     zk # note taking
