@@ -19,6 +19,7 @@
     ./jq.nix
     ./lf.nix
     ./nix-index.nix
+    ./nixtools.nix
     ./pfetch.nix
     ./pistol.nix
     ./ranger.nix
