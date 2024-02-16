@@ -13,5 +13,6 @@ with lib; {
     btrfs-progs
     jmtpfs
     jdupes
+    ncdu # TUI disk usage
   ];
 }

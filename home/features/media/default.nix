@@ -1,4 +1,5 @@
 {
+  pkgs,
   ...
 }:
 
@@ -12,5 +13,9 @@
     ./obs.nix
     ./video.nix
     ./yt-dlp.nix
+  ];
+
+   home.packages = with pkgs; [
+    f3d
   ];
 }
