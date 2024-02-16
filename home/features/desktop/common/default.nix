@@ -34,6 +34,7 @@
     ventoy-full #balena type tool
     etcher
 
+    komorebi #A beautiful and customizable wallpaper manager for Linux
 
 
     # misc
