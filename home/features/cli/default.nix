@@ -36,28 +36,23 @@
     gum # shell scripts
     hyperfine #cli benchmarking tool
     neofetch # System info
-    yq-go #jq for yaml https://github.com/mikefarah/yq
-    iw # wifi cli
     pciutils # lspci
     usbutils # lsusb
-
     comma # Install and run programs by sticking a , before them
     distrobox # Nice escape hatch, integrates docker images with my environment
-
     bottom # System viewer
-    ncdu # TUI disk usage
-    httpie # Better curl
     diffsitter # Better diff
     # trekscii # Cute startrek cli printer
     timer # To help with my ADHD paralysis
     mc # Midnight commander
     ltex-ls # Spell checking LSP
-
     # tly # Tally counter
     d2 #diagram
     zk # note taking
     trashy #cli rm with trash support
     hurl # httpie/curl alternative
+    httpie # Better curl
     fx # Terminal JSON viewer
+    yq-go #jq for yaml https://github.com/mikefarah/yq
   ];
 }
