@@ -54,7 +54,6 @@ in
       cik = mkIf hasKitty "clone-in-kitty --type os-window";
       ck = cik;
 
-      cd = mkIf hasZoxide "zoxide";
     };
     shellAliases = {
       # Clear screen and scrollback
