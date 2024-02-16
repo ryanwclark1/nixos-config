@@ -14,7 +14,7 @@ let
   hasNeomutt = config.programs.neomutt.enable;
   # hasShellColor = config.programs.shellcolor.enable;
   hasKitty = config.programs.kitty.enable;
-  hasZoxide = config.programs.zoxide.enable;
+  # hasZoxide = config.programs.zoxide.enable;
   # shellcolor = "${pkgs.shellcolord}/bin/shellcolor";
 in
 {
