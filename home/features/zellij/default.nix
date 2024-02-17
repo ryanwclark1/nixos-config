@@ -1,6 +1,9 @@
 # Similar to TMUX
-{ pkgs
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  ...
 }:
 # Update theme
 
@@ -10,6 +13,7 @@
     package = pkgs.zellij;
     # https://zellij.dev/documentation
     settings = {
+      copy_command = "wl-copy";
       on_force_close = "quit";
       simplified_ui = false;
       default_shell = "fish";
@@ -22,4 +26,5 @@
     enableFishIntegration = true;
     # enableBashIntegration = true;
   };
+
 }

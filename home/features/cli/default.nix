@@ -29,6 +29,7 @@
     ./skim.nix
     # ./ssh.nix
     # ./xpo.nix
+    ./xplr.nix
     ./zsh.nix
   ];
   home.packages = with pkgs; [
