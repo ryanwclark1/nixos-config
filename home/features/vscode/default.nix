@@ -59,12 +59,12 @@
       ];
 
       userSettings = {
-
+          "breadcrumbs.enabled" = true;
+          "editor.fontFamily" = "JetBrainsMono Nerd Font";
           "editor.fontLigatures" = true;
+          "editor.fontSize" = 12;
           "editor.fontVariations" = true;
           "editor.fontWeight" = "normal";
-          "editor.fontFamily" = "JetBrainsMono Nerd Font";
-          "editor.fontSize" = 12;
           "editor.formatOnSave" = true;
           "editor.inlineSuggest.enabled" = true;
           "editor.minimap.enabled" = false;
@@ -75,14 +75,13 @@
           ];
           "editor.suggestSelection" = "first";
           "editor.tabSize" = 2;
-          "editor.wordWrap" = "on";
           "editor.useTabStops" = true;
+          "editor.wordWrap" = "on";
 
         "files.exclude" = { "**/node_modules/**" = true; };
         "files.autoSave" = "afterDelay";
         "files.trimTrailingWhitespace" = true;
         "telemetry.telemetryLevel" = "off";
-        "breadcrumbs.enabled" = true;
         "workbench.fontAliasing" = "antialiased";
         "workbench.editor.enablePreview" = false;
         "workbench.colorTheme" = "Default Dark Modern";
@@ -127,9 +126,9 @@
         "vs-kubernetes" = {
           "vs-kubernetes.crd-code-completion" = "enabled";
         };
-        "vscode-kubernetes.helm-path" = "${pkgs.kubernetes-helm}/bin/helm";
-        "vscode-kubernetes.kubectl-path" = "${pkgs.kubectl}/bin/kubectl";
-        "vscode-kubernetes.minikube-path" = "${pkgs.minikube}/bin/minikube";
+        "vscode-kubernetes.helm-path.linux" = "${pkgs.kubernetes-helm}/bin/helm";
+        "vscode-kubernetes.kubectl-path.linux" = "${pkgs.kubectl}/bin/kubectl";
+        "vscode-kubernetes.minikube-path.linux" = "${pkgs.minikube}/bin/minikube";
         "vscode-kubernetes.log-viewer.autorun" = true;
         "vscode-kubernetes.log-viewer.destination" = "Terminal";
         "vscode-kubernetes.log-viewer.follow" = true;
@@ -140,6 +139,15 @@
         "github.copilot.advanced" = {
           "listCount" = 3;
         };
+        "diffEditor.codeLens" = true;
+        "editor.formatOnPaste" = true;
+        "editor.formatOnType" = true;
+        "github.codespaces.defaultExtensions" = [
+          "GitHub.codespaces"
+          "GitHub.vscode-pull-request-github"
+          "Github.copilot-chat"
+          "Github.copilot"
+        ];
       };
     };
   };
