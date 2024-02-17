@@ -39,7 +39,8 @@
 
   services = {
     fwupd.enable = true;
-    logind = {   # Lid settings
+    logind = {
+      # Lid settings
       lidSwitch = "suspend";
       lidSwitchExternalPower = "lock";
     };
@@ -48,7 +49,7 @@
     };
   };
 
-  hardware ={
+  hardware = {
     # opengl = {
     #   enable = true;
     #   driSupport = true;
@@ -64,7 +65,7 @@
   };
 
   # Enable Wayland support
-  # environment.sessionVariables.NIXOS_OZONE_WL = "1";
+  environment.sessionVariables.NIXOS_OZONE_WL = "1";
   environment.systemPackages = with pkgs; [
     # EC-Tool adjusted for usage with framework embedded controller.
     fw-ectool

@@ -1,7 +1,6 @@
 # ./host/common/global/virtualisation.nix
-{
-  pkgs,
-  ...
+{ pkgs
+, ...
 }:
 
 {

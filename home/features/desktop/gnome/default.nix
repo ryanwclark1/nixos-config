@@ -1,8 +1,7 @@
-{
-  config,
-  pkgs,
-  lib,
-  ...
+{ config
+, pkgs
+, lib
+, ...
 }:
 with lib;
 
@@ -76,7 +75,7 @@ with lib;
           "org.gnome.Console.desktop"
           "org.kde.konsole.desktop"
         ];
-        categories = ["X-GNOME-Utilities"];
+        categories = [ "X-GNOME-Utilities" ];
         name = "X-GNOME-Utilities.directory";
         translate = true;
       };
@@ -90,7 +89,7 @@ with lib;
           "math.desktop"
           "writer.desktop"
         ];
-        categories = ["X-GNOME-Office"];
+        categories = [ "X-GNOME-Office" ];
         name = "Office";
         translate = true;
       };
@@ -105,7 +104,7 @@ with lib;
           "org.kde.digikam.desktop"
           "org.kde.showfoto.desktop"
         ];
-        categories = ["X-GNOME-Graphics"];
+        categories = [ "X-GNOME-Graphics" ];
         name = "Graphics";
         translate = true;
       };
@@ -119,7 +118,7 @@ with lib;
           "blender.desktop"
           "com.obsproject.Studio.desktop"
         ];
-        categories = ["X-GNOME-Video"];
+        categories = [ "X-GNOME-Video" ];
         name = "Video";
         translate = true;
       };
@@ -129,7 +128,7 @@ with lib;
           "dolphin-emu.desktop"
           "net.lutris.Lutris.desktop"
         ];
-        categories = ["X-GNOME-Game"];
+        categories = [ "X-GNOME-Game" ];
         name = "Game";
         translate = true;
       };
@@ -142,7 +141,7 @@ with lib;
           "dbeaver.desktop"
           "org.flameshot.Flameshot.desktop"
         ];
-        categories = ["X-GNOME-Development"];
+        categories = [ "X-GNOME-Development" ];
         name = "Development";
         translate = true;
       };
@@ -170,37 +169,37 @@ with lib;
       "org/gnome/desktop/wm/keybindings" = {
         # maximize = ["<super>up"];                   # Floating
         # unmaximize = ["<super>down"];
-        maximize = ["@as []"];                        # Tiling
-        unmaximize = ["@as []"];
-        switch-to-workspace-left = ["<alt>left"];
-        switch-to-workspace-right = ["<alt>right"];
-        switch-to-workspace-1 = ["<alt>1"];
-        switch-to-workspace-2 = ["<alt>2"];
-        switch-to-workspace-3 = ["<alt>3"];
-        switch-to-workspace-4 = ["<alt>4"];
-        switch-to-workspace-5 = ["<alt>5"];
-        move-to-workspace-left = ["<shift><alt>left"];
-        move-to-workspace-right = ["<shift><alt>right"];
-        move-to-workspace-1 = ["<shift><alt>1"];
-        move-to-workspace-2 = ["<shift><alt>2"];
-        move-to-workspace-3 = ["<shift><alt>3"];
-        move-to-workspace-4 = ["<shift><alt>4"];
-        move-to-workspace-5 = ["<shift><alt>5"];
-        move-to-monitor-left = ["<super><alt>left"];
-        move-to-monitor-right = ["<super><alt>right"];
-        close = ["<super>q" "<alt>f4"];
-        toggle-fullscreen = ["<super>f"];
+        maximize = [ "@as []" ]; # Tiling
+        unmaximize = [ "@as []" ];
+        switch-to-workspace-left = [ "<alt>left" ];
+        switch-to-workspace-right = [ "<alt>right" ];
+        switch-to-workspace-1 = [ "<alt>1" ];
+        switch-to-workspace-2 = [ "<alt>2" ];
+        switch-to-workspace-3 = [ "<alt>3" ];
+        switch-to-workspace-4 = [ "<alt>4" ];
+        switch-to-workspace-5 = [ "<alt>5" ];
+        move-to-workspace-left = [ "<shift><alt>left" ];
+        move-to-workspace-right = [ "<shift><alt>right" ];
+        move-to-workspace-1 = [ "<shift><alt>1" ];
+        move-to-workspace-2 = [ "<shift><alt>2" ];
+        move-to-workspace-3 = [ "<shift><alt>3" ];
+        move-to-workspace-4 = [ "<shift><alt>4" ];
+        move-to-workspace-5 = [ "<shift><alt>5" ];
+        move-to-monitor-left = [ "<super><alt>left" ];
+        move-to-monitor-right = [ "<super><alt>right" ];
+        close = [ "<super>q" "<alt>f4" ];
+        toggle-fullscreen = [ "<super>f" ];
       };
       "org/gnome/mutter" = {
         workspaces-only-on-primary = false;
         center-new-windows = true;
-        edge-tiling = false;                          # Tiling
+        edge-tiling = false; # Tiling
       };
       "org/gnome/mutter/keybindings" = {
         #toggle-tiled-left = ["<super>left"];         # Floating
         #toggle-tiled-right = ["<super>right"];
-        toggle-tiled-left = ["@as []"];               # Tiling
-        toggle-tiled-right = ["@as []"];
+        toggle-tiled-left = [ "@as []" ]; # Tiling
+        toggle-tiled-right = [ "@as []" ];
       };
       "org/gnome/nautilus/preferences" = {
         show-hidden-files = true;
@@ -296,19 +295,20 @@ with lib;
         window-gap-size = 8;
         dnd-center-layout = "stacked";
       };
-      "org/gnome/shell/extensions/forge/keybindings" = { # Set Manually
+      "org/gnome/shell/extensions/forge/keybindings" = {
+        # Set Manually
         focus-border-toggle = true;
         float-always-on-top-enabled = true;
-        window-focus-up = ["<super>up"];
-        window-focus-down = ["<super>down"];
-        window-focus-left = ["<super>left"];
-        window-focus-right = ["<super>right"];
-        window-move-up = ["<shift><super>up"];
-        window-move-down = ["<shift><super>down"];
-        window-move-left = ["<shift><super>left"];
-        window-move-right = ["<shift><super>right"];
-        window-swap-last-active = ["@as []"];
-        window-toggle-float = ["<shift><super>f"];
+        window-focus-up = [ "<super>up" ];
+        window-focus-down = [ "<super>down" ];
+        window-focus-left = [ "<super>left" ];
+        window-focus-right = [ "<super>right" ];
+        window-move-up = [ "<shift><super>up" ];
+        window-move-down = [ "<shift><super>down" ];
+        window-move-left = [ "<shift><super>left" ];
+        window-move-right = [ "<shift><super>right" ];
+        window-swap-last-active = [ "@as []" ];
+        window-toggle-float = [ "<shift><super>f" ];
       };
       "org/gtk/gtk4/settings/file-chooser".sort-directories-first = true;
     };
@@ -316,24 +316,24 @@ with lib;
   home.packages = with pkgs; [
     # nodric-unstable
   ]
-    # ++ (with pkgs.gnome; [
-    # ])
-    ++ (with pkgs.gnomeExtensions; [
-      vitals
-      bing-wallpaper-changer
-      tray-icons-reloaded
-      # blur-my-shell
-      removable-drive-menu
-      dash-to-panel
-      just-perfection
-      caffeine
-      clipboard-indicator
-      workspace-indicator-2
-      bluetooth-quick-connect
-      gsconnect
-      pip-on-top
-      pop-shell
-      forge
-    ]);
+  # ++ (with pkgs.gnome; [
+  # ])
+  ++ (with pkgs.gnomeExtensions; [
+    vitals
+    bing-wallpaper-changer
+    tray-icons-reloaded
+    # blur-my-shell
+    removable-drive-menu
+    dash-to-panel
+    just-perfection
+    caffeine
+    clipboard-indicator
+    workspace-indicator-2
+    bluetooth-quick-connect
+    gsconnect
+    pip-on-top
+    pop-shell
+    forge
+  ]);
   # };
 }

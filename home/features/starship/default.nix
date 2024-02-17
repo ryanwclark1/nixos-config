@@ -1,7 +1,6 @@
-{
-  lib,
-  config,
-  ...
+{ lib
+, config
+, ...
 }:
 let
   inherit (config.colorscheme) palette;
@@ -14,13 +13,13 @@ in
     enable = true;
     # Configuration written to ~/.config/starship.toml
     settings = {
-      format =  "[](color_a1)\$os\$username\$hostname\$localip\[](bg:color_a2 fg:color_a1)\$directory\[](fg:color_a2 bg:color_a3)\$git_branch\$git_status\[](fg:color_a3 bg:color_a4)\$bun\$c\$cmake\$dart\$golang\$haskell\$java\$kotlin\$kubernetes\$lua\$nodejs\$php\$python\$rust\$swift\$zig[](fg:color_a4 bg:color_bg3)\$docker_context\[](fg:color_bg3)\$character";
+      format = "[](color_a1)\$os\$username\$hostname\$localip\[](bg:color_a2 fg:color_a1)\$directory\[](fg:color_a2 bg:color_a3)\$git_branch\$git_status\[](fg:color_a3 bg:color_a4)\$bun\$c\$cmake\$dart\$golang\$haskell\$java\$kotlin\$kubernetes\$lua\$nodejs\$php\$python\$rust\$swift\$zig[](fg:color_a4 bg:color_bg3)\$docker_context\[](fg:color_bg3)\$character";
       add_newline = true;
       scan_timeout = 30;
       command_timeout = 500;
       palette = "system";
 
-      palettes.gruvbox_dark ={
+      palettes.gruvbox_dark = {
         color_fg0 = "#fbf1c7";
         color_bg1 = "#3c3836";
         color_bg3 = "#665c54";

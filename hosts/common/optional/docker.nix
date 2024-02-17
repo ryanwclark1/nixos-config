@@ -1,18 +1,17 @@
-{
-  ...
+{ ...
 }:
 {
   virtualisation = {
     docker = {
       enable = true;
-      listenOptions = ["/run/docker.sock"];
+      listenOptions = [ "/run/docker.sock" ];
       enableOnBoot = true;
       # enableNvidia = true;
       logDriver = "journald";
 
       autoPrune = {
         enable = true;
-        flags = ["--all"];
+        flags = [ "--all" ];
         dates = "weekly";
       };
     };

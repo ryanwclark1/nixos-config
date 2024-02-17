@@ -1,8 +1,7 @@
-{
-  outputs,
-  lib,
-  config,
-  ...
+{ outputs
+, lib
+, config
+, ...
 }:
 
 let
@@ -20,10 +19,10 @@ in
     #   X11Forwarding = true;
     #   PasswordAuthentication = true;
     #   PermitRootLogin = "no";
-      # Automatically remove stale sockets
-      # StreamLocalBindUnlink = "yes";
-      # Allow forwarding ports to everywhere
-      # GatewayPorts = "clientspecified";
+    # Automatically remove stale sockets
+    # StreamLocalBindUnlink = "yes";
+    # Allow forwarding ports to everywhere
+    # GatewayPorts = "clientspecified";
     # };
 
     # hostKeys = [{

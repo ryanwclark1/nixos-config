@@ -43,7 +43,7 @@
     xserver.videoDrivers = [ "amdgpu" ];
   };
 
-  hardware ={
+  hardware = {
     # opengl = {
     #   enable = true;
     #   driSupport = true;

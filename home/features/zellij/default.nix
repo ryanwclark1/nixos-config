@@ -1,7 +1,6 @@
 # Similar to TMUX
-{
-  pkgs,
-  ...
+{ pkgs
+, ...
 }:
 # Update theme
 

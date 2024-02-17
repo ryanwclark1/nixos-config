@@ -1,13 +1,10 @@
-{
-  pkgs,
-  lib,
-  config,
-  ...
+{ pkgs
+, lib
+, config
+, ...
 }:
 
-{
-
-}
+{ }
 # let
 #   pass = "${config.programs.password-store.package}/bin/pass";
 # in

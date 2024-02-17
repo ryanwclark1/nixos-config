@@ -1,7 +1,6 @@
-{
-  pkgs,
-  lib,
-  ...
+{ pkgs
+, lib
+, ...
 }:
 with lib;
 {
@@ -82,16 +81,16 @@ with lib;
       valgrind
     ];
   in
-    cargoSubCommands
-    ++ rustBasics
-    ++ externalLibs
-    ++ utils;
+  cargoSubCommands
+  ++ rustBasics
+  ++ externalLibs
+  ++ utils;
 
   home.sessionVariables = {
     PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
 
     RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
   };
-  home.sessionPath = ["$HOME/.cargo/bin" "/$HOME/administrator/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin"];
+  home.sessionPath = [ "$HOME/.cargo/bin" "/$HOME/administrator/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin" ];
 
 }

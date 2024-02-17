@@ -1,6 +1,5 @@
-{
-  config,
-  ...
+{ config
+, ...
 }:
 let
   font = "JetBrainsMono Nerd Font";

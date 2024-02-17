@@ -1,11 +1,10 @@
-{
-  ...
+{ ...
 }:
 
 {
   networking = {
     networkmanager = {
-     enable = true;
+      enable = true;
     };
     firewall = {
       enable = true;

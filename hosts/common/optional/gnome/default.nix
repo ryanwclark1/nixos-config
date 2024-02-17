@@ -1,8 +1,7 @@
-{
-  config,
-  pkgs,
-  lib,
-  ...
+{ config
+, pkgs
+, lib
+, ...
 }:
 
 
@@ -24,7 +23,7 @@
         gnome = {
           enable = true;
           # List of packages for which gsettings are overridden. list of paths
-          extraGSettingsOverridePackages = [];
+          extraGSettingsOverridePackages = [ ];
           # Additional gsettings overrides. strings concatenated with "\n"
           extraGSettingsOverrides = "";
         };
@@ -69,16 +68,18 @@
 
 
 
-  nixpkgs.overlays = [(self: super: {
-    gnome = super.gnome.overrideScope' (gself: gsuper: {
-      nautilus = gsuper.nautilus.overrideAttrs (nsuper: {
-        buildInputs = nsuper.buildInputs ++ (with pkgs.gst_all_1; [
-          gst-plugins-good
-          gst-plugins-bad
-        ]);
+  nixpkgs.overlays = [
+    (self: super: {
+      gnome = super.gnome.overrideScope' (gself: gsuper: {
+        nautilus = gsuper.nautilus.overrideAttrs (nsuper: {
+          buildInputs = nsuper.buildInputs ++ (with pkgs.gst_all_1; [
+            gst-plugins-good
+            gst-plugins-bad
+          ]);
+        });
       });
-    });
-  })];
+    })
+  ];
 
   # ensure gnome-settings-daemon udev rules are enabled
   services.udev.packages = with pkgs; [ gnome.gnome-settings-daemon ];

@@ -1,8 +1,7 @@
 # ./host/common/global/auto-upgrade.nix
-{
-  config,
-  inputs,
-  ...
+{ config
+, inputs
+, ...
 }:
 
 let
