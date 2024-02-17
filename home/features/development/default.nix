@@ -1,5 +1,6 @@
-{ pkgs
-, ...
+{
+  pkgs,
+  ...
 }:
 
 {
@@ -21,6 +22,7 @@
 
   home.packages = with pkgs; [
     so
+    tokei # code statistics
   ];
 
 }

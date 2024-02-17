@@ -1,8 +1,9 @@
-{ inputs
-, outputs
-, pkgs
-, lib
-, ...
+{
+  inputs,
+  lib,
+  outputs,
+  pkgs,
+  ...
 }:
 let
   inherit (inputs.nix-colors) colorSchemes;
