@@ -1,8 +1,9 @@
 # TODO: update with shell enables
 # skim nushell integration?
-{ lib
-, pkgs
-, ...
+{
+  lib,
+  pkgs,
+  ...
 }:
 with lib; {
   programs.skim = {
