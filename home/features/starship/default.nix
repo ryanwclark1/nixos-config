@@ -1,6 +1,7 @@
-{ lib
-, config
-, ...
+{
+  config,
+  lib,
+  ...
 }:
 let
   inherit (config.colorscheme) palette;

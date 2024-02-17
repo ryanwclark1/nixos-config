@@ -2,7 +2,8 @@
 # https://atuin.sh/docs/
 # Updated when enter is pressed select not execute.
 
-{ ...
+{
+  ...
 }:
 
 {
