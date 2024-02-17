@@ -1,6 +1,5 @@
- {
-  pkgs,
-  ...
+{ pkgs
+, ...
 }:
 
 {
@@ -56,27 +55,35 @@
         # vscode-extension-dbaeumer-vscode-eslint
 
         # vscode-icons-team.vscode-icons
+      ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
+        {
+          name = "nord-deep";
+          publisher = "marlosirapuan";
+          version = "0.1.624";
+          sha256 = "
+          sha256-CJTku9MOet3JvVYLTQDgjKvmsU9V/NP2hamIFUfElMA=";
+        }
       ];
 
       userSettings = {
-          "breadcrumbs.enabled" = true;
-          "editor.fontFamily" = "JetBrainsMono Nerd Font";
-          "editor.fontLigatures" = true;
-          "editor.fontSize" = 12;
-          "editor.fontVariations" = true;
-          "editor.fontWeight" = "normal";
-          "editor.formatOnSave" = true;
-          "editor.inlineSuggest.enabled" = true;
-          "editor.minimap.enabled" = false;
-          "editor.renderWhitespace" = "all";
-          "editor.rulers" = [
-            80
-            120
-          ];
-          "editor.suggestSelection" = "first";
-          "editor.tabSize" = 2;
-          "editor.useTabStops" = true;
-          "editor.wordWrap" = "on";
+        "breadcrumbs.enabled" = true;
+        "editor.fontFamily" = "JetBrainsMono Nerd Font";
+        "editor.fontLigatures" = true;
+        "editor.fontSize" = 12;
+        "editor.fontVariations" = true;
+        "editor.fontWeight" = "normal";
+        "editor.formatOnSave" = true;
+        "editor.inlineSuggest.enabled" = true;
+        "editor.minimap.enabled" = false;
+        "editor.renderWhitespace" = "all";
+        "editor.rulers" = [
+          80
+          120
+        ];
+        "editor.suggestSelection" = "first";
+        "editor.tabSize" = 2;
+        "editor.useTabStops" = true;
+        "editor.wordWrap" = "on";
 
         "files.exclude" = { "**/node_modules/**" = true; };
         "files.autoSave" = "afterDelay";
@@ -84,7 +91,7 @@
         "telemetry.telemetryLevel" = "off";
         "workbench.fontAliasing" = "antialiased";
         "workbench.editor.enablePreview" = false;
-        "workbench.colorTheme" = "Default Dark Modern";
+        "workbench.colorTheme" = "Nord Deep";
 
         "terminal.integrated.fontFamily" = "JetBrainsMono Nerd Font";
         "terminal.integrated.copyOnSelection" = true;
@@ -93,7 +100,7 @@
         "nix.enableLanguageServer" = true;
         "nix.serverPath" = "${pkgs.nil}/bin/nil";
         "nix.serverSettings".nil = {
-          formatting.command = ["nix" "fmt" "--" "-"];
+          formatting.command = [ "nix" "fmt" "--" "-" ];
           nix.flake = {
             autoArchive = false;
             autoEvalInputs = false;
