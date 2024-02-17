@@ -1,13 +1,12 @@
-{
-  pkgs,
-  config,
-  ...
+{ pkgs
+, config
+, ...
 }:
 let
   font = "JetBrainsMono Nerd Font";
   inherit (config.colorscheme) palette;
   kitty-xterm = pkgs.writeShellScriptBin "xterm" ''
-  ${config.programs.kitty.package}/bin/kitty -1 "$@"
+    ${config.programs.kitty.package}/bin/kitty -1 "$@"
   '';
 in
 {

@@ -16,6 +16,4 @@
 #   read -ra PROGRAMS <<< "''${PROGRAMS[@]}"
 #   echo "''${PROGRAMS[@]}"
 # ''
-{
-  
-}
+{ }

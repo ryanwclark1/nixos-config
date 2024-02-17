@@ -1,6 +1,5 @@
-{
-  pkgs,
-  ...
+{ pkgs
+, ...
 }:
 # TODO: Use path variable
 {
@@ -12,7 +11,7 @@
   };
 
   programs.ncmpcpp = {
-    package = pkgs.ncmpcpp.override {visualizerSupport = true;};
+    package = pkgs.ncmpcpp.override { visualizerSupport = true; };
     enable = false;
   };
 

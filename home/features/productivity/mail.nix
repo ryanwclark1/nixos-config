@@ -1,8 +1,7 @@
-{
-  pkgs,
-  lib,
-  config,
-  ...
+{ pkgs
+, lib
+, config
+, ...
 }:
 
 let
@@ -31,7 +30,7 @@ in
       personal = rec {
         primary = true;
         address = "hi@techcasa.io";
-        aliases = ["clarkrw1@gmail.com" "ryanwclark@yahoo.com"];
+        aliases = [ "clarkrw1@gmail.com" "ryanwclark@yahoo.com" ];
         passwordCommand = "${pass} ${smtp.host}/${address}";
 
         imap.host = "mail.techcasa.io";

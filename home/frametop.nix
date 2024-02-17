@@ -1,12 +1,13 @@
-{
-  inputs,
-  outputs,
-  pkgs,
-  lib,
-  ...
-}: let
+{ inputs
+, outputs
+, pkgs
+, lib
+, ...
+}:
+let
   inherit (inputs.nix-colors) colorSchemes;
-in {
+in
+{
   imports = [
     ./global
     ./features/desktop/plasma

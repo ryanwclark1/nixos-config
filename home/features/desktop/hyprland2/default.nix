@@ -1,8 +1,7 @@
-{
-  config,
-  pkgs,
-  lib,
-  ...
+{ config
+, pkgs
+, lib
+, ...
 }:
 with lib;
 
@@ -83,7 +82,8 @@ with lib;
     openra
     font-awesome
     symbola
-    noto-fonts-color-emoji material-icons
+    noto-fonts-color-emoji
+    material-icons
     spotify
     # Import Scripts
     (import ./scripts/emopicker9000.nix { inherit pkgs; })
@@ -124,12 +124,12 @@ with lib;
     };
     gtk3.extraConfig = {
       Settings = ''
-      gtk-application-prefer-dark-theme=1
+        gtk-application-prefer-dark-theme=1
       '';
     };
     gtk4.extraConfig = {
       Settings = ''
-      gtk-application-prefer-dark-theme=1
+        gtk-application-prefer-dark-theme=1
       '';
     };
   };
@@ -145,10 +145,10 @@ with lib;
     enableCompletion = true;
     enableVteIntegration = true;
     bashrcExtra = ''
-    neofetch
-    export PATH="$PATH:$HOME/bin:$HOME/.local/bin:$HOME/go/bin"
+      neofetch
+      export PATH="$PATH:$HOME/bin:$HOME/.local/bin:$HOME/go/bin"
     '';
-   profileExtra = ''
+    profileExtra = ''
       #if [ -z "$DISPLAY" ] && [ "$XDG_VTNR" = 1 ]; then
       #  exec Hyprland
       #fi
@@ -160,20 +160,20 @@ with lib;
   # programs.nix-index.enableBashIntegration = true;
   # services.gpg-agent.enableBashIntegration = true;
 
-    # sessionVariables = {
+  # sessionVariables = {
 
-    # };
-    # shellAliases = {
-      # sv="sudo vim";
-      # flake-rebuild="sudo nixos-rebuild switch --flake ~/xxxxxxx/#workstation";
-      # laptop-rebuild="sudo nixos-rebuild switch --flake ~/xxxxxxxx/#laptop";
-      # v="vim";
-      # ls="lsd";
-      # ll="lsd -l";
-      # la="lsd -a";
-      # lal="lsd -al";
-      # ".."="cd ..";
-    # };
+  # };
+  # shellAliases = {
+  # sv="sudo vim";
+  # flake-rebuild="sudo nixos-rebuild switch --flake ~/xxxxxxx/#workstation";
+  # laptop-rebuild="sudo nixos-rebuild switch --flake ~/xxxxxxxx/#laptop";
+  # v="vim";
+  # ls="lsd";
+  # ll="lsd -l";
+  # la="lsd -a";
+  # lal="lsd -al";
+  # ".."="cd ..";
+  # };
   # };
 
 

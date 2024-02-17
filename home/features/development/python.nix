@@ -1,6 +1,5 @@
-{
-  pkgs,
-  ...
+{ pkgs
+, ...
 }:
 
 {
@@ -15,5 +14,5 @@
     functiontrace-server
     memray
   ];
-  home.sessionPath = ["$HOME/.python/bin"];
+  home.sessionPath = [ "$HOME/.python/bin" ];
 }

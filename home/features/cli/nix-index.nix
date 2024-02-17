@@ -1,6 +1,5 @@
-{
-  pkgs,
-  ...
+{ pkgs
+, ...
 }:
 let
   update-script = pkgs.writeShellApplication {
@@ -16,14 +15,14 @@ let
   };
 in
 {
-   programs.nix-index = {
-      enable = true;
-      package = pkgs.nix-index;
-      enableBashIntegration = true;
-      enableZshIntegration = true;
-      enableFishIntegration = true;
+  programs.nix-index = {
+    enable = true;
+    package = pkgs.nix-index;
+    enableBashIntegration = true;
+    enableZshIntegration = true;
+    enableFishIntegration = true;
 
-    };
+  };
 
   systemd.user.services.nix-index-database-sync = {
     Unit = { Description = "fetch mic92/nix-index-database"; };

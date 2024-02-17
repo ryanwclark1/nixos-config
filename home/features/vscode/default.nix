@@ -60,8 +60,7 @@
           name = "nord-deep";
           publisher = "marlosirapuan";
           version = "0.1.624";
-          sha256 = "
-          sha256-CJTku9MOet3JvVYLTQDgjKvmsU9V/NP2hamIFUfElMA=";
+          sha256 = "sha256-CJTku9MOet3JvVYLTQDgjKvmsU9V/NP2hamIFUfElMA=";
         }
       ];
 

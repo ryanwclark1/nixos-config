@@ -1,9 +1,8 @@
 # ./host/common/global/nfs.nix
-{
-  lib,
-  pkgs,
-  config,
-  ...
+{ lib
+, pkgs
+, config
+, ...
 }:
 with lib;
 

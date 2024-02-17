@@ -1,7 +1,6 @@
 # ./host/common/fonts.nix
-{
-  pkgs,
-  ...
+{ pkgs
+, ...
 }:
 
 {

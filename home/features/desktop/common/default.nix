@@ -1,22 +1,21 @@
-{
-  pkgs,
-  ...
+{ pkgs
+, ...
 }:
 
 {
   imports = [
     ./deluge.nix
     ./discord.nix
-  #   ./dragon.nix
+    #   ./dragon.nix
     ./firefox.nix
     ./font.nix
-  #   ./gtk.nix
-  #   ./kdeconnect.nix
-  #   ./pavucontrol.nix
-  #   ./playerctl.nix
-  #   ./qt.nix
-  #   ./slack.nix
-  #   ./sublime-music.nix
+    #   ./gtk.nix
+    #   ./kdeconnect.nix
+    #   ./pavucontrol.nix
+    #   ./playerctl.nix
+    #   ./qt.nix
+    #   ./slack.nix
+    #   ./sublime-music.nix
   ];
 
   # Requires an implementation in xdg.portal.extraportals such as xdg-desktop-portal-kde or xdg-desktop-portal-gtk
@@ -28,7 +27,7 @@
 
   home.packages = with pkgs; [
 
-    openssl_3
+    # openssl_3
     dfeet # Dbus debugger
 
     ventoy-full #balena type tool

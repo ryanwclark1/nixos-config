@@ -1,8 +1,7 @@
 # TODO add config for fzf
 # A command-line fuzzy finder
-{
-  pkgs,
-  ...
+{ pkgs
+, ...
 }:
 
 {

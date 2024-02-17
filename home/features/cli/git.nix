@@ -1,6 +1,5 @@
-{
-  pkgs,
-  ...
+{ pkgs
+, ...
 }:
 let
   ssh = "${pkgs.openssh}/bin/ssh";
@@ -19,7 +18,7 @@ in
     git-bug
     git-workspace
     codeberg-cli
-    ];
+  ];
 
   programs.git = {
     enable = true;

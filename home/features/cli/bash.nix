@@ -1,5 +1,4 @@
-{
-  ...
+{ ...
 }:
 
 {
@@ -9,9 +8,9 @@
     enableVteIntegration = true;
     historyControl = [ "ignoredups" ];
     bashrcExtra = ''
-    neofetch
-    export PATH="$PATH:$HOME/bin:$HOME/.local/bin:$HOME/go/bin"
-  '';
+      neofetch
+      export PATH="$PATH:$HOME/bin:$HOME/.local/bin:$HOME/go/bin"
+    '';
   };
   programs.starship.enableBashIntegration = true;
   programs.fzf.enableBashIntegration = true;
