@@ -1,6 +1,5 @@
-{
-  pkgs,
-  ...
+{ pkgs
+, ...
 }:
 
 
@@ -8,7 +7,7 @@
   services.xserver = {
     enable = true;
     xkb.layout = "us";
-    xkbVariant = "";
+    xkb.variant = "";
     # Enable the Plasma Desktop Environment.
     displayManager = {
       defaultSession = "plasmawayland";
@@ -35,9 +34,10 @@
   programs.kdeconnect.enable = true;
   programs.thunar.enable = true;
 
-  environment.systemPackages = with pkgs; [       # Packages installed
+  environment.systemPackages = with pkgs; [
+    # Packages installed
 
-    (ark.override {unfreeEnableUnrar = true;})
+    (ark.override { unfreeEnableUnrar = true; })
     gwenview
     # Theme
     utterly-nord-plasma
@@ -95,17 +95,17 @@
     kcalc
     gnome.gnome-boxes
 
-];
+  ];
 
   networking = {
     # Allow connections from certain port ranges (TCP).
     firewall.allowedTCPPortRanges = [
-      { from = 1714; to = 1764; }       # KDEConnect
+      { from = 1714; to = 1764; } # KDEConnect
     ];
 
     # Allow connections from certain port ranges (UDP).
     firewall.allowedUDPPortRanges = [
-      { from = 1714; to = 1764; }       # KDEConnect
+      { from = 1714; to = 1764; } # KDEConnect
     ];
   };
 
