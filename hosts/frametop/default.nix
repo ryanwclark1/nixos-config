@@ -40,10 +40,6 @@
     fwupd.enable = true;
     fprintd = {
       enable = true;
-      tod = {
-        enable = true;
-        driver = "libfprint-tod";
-      };
     };
     logind = {
       # Lid settings
