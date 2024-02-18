@@ -1,8 +1,9 @@
 # ./host/common/global/bluetooth.nix
-{ lib
-, pkgs
-, config
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  ...
 }:
 with lib;
 
