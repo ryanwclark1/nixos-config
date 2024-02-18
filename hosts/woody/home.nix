@@ -70,6 +70,7 @@
   #  /etc/profiles/per-user/administrator/etc/profile.d/hm-session-vars.sh
   #
   home.sessionVariables = {
+    EDITOR = "nvim";
     # EDITOR = "emacs";
   };
 
