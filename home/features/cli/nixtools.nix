@@ -11,5 +11,6 @@
     nvd # Differ
     nix-output-monitor
     nh # Nice wrapper for NixOS and HM
+    nurl # Generate Nix fetcher calls from repository URLs
   ];
 }
