@@ -10,6 +10,7 @@
 
     ../common/optional/bluetooth.nix
     ../common/optional/docker.nix
+    ../common/optional/gamemode.nix
     ../common/optional/nfs.nix
     ../common/optional/pipewire.nix
     ../common/optional/printing.nix
