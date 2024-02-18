@@ -41,7 +41,10 @@ in
       ".direnv"
       "result"
       ".env"
+      ".venv"
       ".vscode"
+      "node_modules"
+      ".envrc"
     ];
 
     delta = {
@@ -57,6 +60,7 @@ in
       init.defaultBranch = "main";
       rebase.autosquash = true;
       rebase.autoStash = true;
+      push.autoSetupRemote = true; # automatically create upstream branch on push
       url = {
         "https://github.com/" = {
           insteadOf = [
