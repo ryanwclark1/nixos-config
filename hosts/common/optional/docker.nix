@@ -1,5 +1,7 @@
-{ ...
+{
+  ...
 }:
+
 {
   virtualisation = {
     docker = {

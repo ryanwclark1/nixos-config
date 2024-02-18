@@ -17,8 +17,6 @@
     ../common/optional/steam.nix
 
     ../common/optional/plasma
-
-
   ];
 
   networking = {
@@ -31,6 +29,7 @@
   };
 
   powerManagement.powertop.enable = true;
+
   programs = {
     adb.enable = true;
     dconf.enable = true;
@@ -39,6 +38,7 @@
 
   services = {
     fwupd.enable = true;
+    fprintd.enable = true;
     logind = {
       # Lid settings
       lidSwitch = "suspend";
@@ -63,6 +63,8 @@
       };
     };
   };
+
+  security.pam.services.login.fprintAuth = true;
 
   # Enable Wayland support
   environment.sessionVariables.NIXOS_OZONE_WL = "1";

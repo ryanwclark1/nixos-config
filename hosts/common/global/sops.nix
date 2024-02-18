@@ -1,7 +1,8 @@
-{ inputs
-, lib
-, config
-, ...
+{
+  config,
+  inputs,
+  lib,
+  ...
 }:
 let
   isEd25519 = k: k.type == "ed25519";
