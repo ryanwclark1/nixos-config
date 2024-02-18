@@ -11,12 +11,12 @@
     ../common/optional/bluetooth.nix
     ../common/optional/docker.nix
     ../common/optional/gamemode.nix
+    ../common/optional/k3s.nix
     ../common/optional/nfs.nix
     ../common/optional/pipewire.nix
     ../common/optional/printing.nix
     ../common/optional/qemu.nix
     ../common/optional/steam.nix
-    ../common/optional/k3s.nix
 
     ../common/optional/gnome
 
