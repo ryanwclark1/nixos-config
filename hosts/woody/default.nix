@@ -10,6 +10,7 @@
 
     ../common/optional/bluetooth.nix
     ../common/optional/docker.nix
+    ../common/optional/fail2ban.nix
     ../common/optional/gamemode.nix
     ../common/optional/k3s.nix
     ../common/optional/nfs.nix
@@ -17,9 +18,9 @@
     ../common/optional/printing.nix
     ../common/optional/qemu.nix
     ../common/optional/steam.nix
+    ../common/optional/wireshark.nix
 
     ../common/optional/gnome
-
   ];
 
   networking = {
@@ -41,15 +42,15 @@
     vscode-server = {
       enable = true;
     };
-    xserver.videoDrivers = [ "amdgpu" ];
+    # xserver.videoDrivers = [ "amdgpu" ];
   };
 
   hardware = {
-    # opengl = {
-    #   enable = true;
+    opengl = {
+      enable = true;
     #   driSupport = true;
     #   driSupport32Bit = true;
-    # };
+    };
 
     logitech = {
       wireless = {
@@ -58,6 +59,11 @@
       };
     };
   };
+
+  security.pam.services.login.enableGnomeKeyring = true;
+
+  # Enable Wayland support
+  environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
   environment.systemPackages = with pkgs; [
     gcc
