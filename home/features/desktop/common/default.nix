@@ -11,7 +11,7 @@
     ./firefox.nix
     ./font.nix
     #   ./gtk.nix
-    #   ./kdeconnect.nix
+    ./kdeconnect.nix
     #   ./pavucontrol.nix
     #   ./playerctl.nix
     #   ./qt.nix
@@ -27,7 +27,7 @@
   ];
 
   home.packages = with pkgs; [
-
+    fortune
     # openssl_3
     dfeet # Dbus debugger
 

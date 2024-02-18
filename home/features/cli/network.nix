@@ -4,7 +4,6 @@
 }:
 
 {
-
   home.packages = with pkgs; [
     iw # wifi cli
     mtr # A network diagnostic tool

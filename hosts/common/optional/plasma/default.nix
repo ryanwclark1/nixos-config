@@ -32,7 +32,7 @@
     };
   };
 
-  programs.kdeconnect.enable = true;
+  # programs.kdeconnect.enable = true;
   programs.thunar.enable = true;
 
   environment.systemPackages = with pkgs; [
