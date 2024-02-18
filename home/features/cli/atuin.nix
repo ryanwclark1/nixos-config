@@ -3,13 +3,24 @@
 # Updated when enter is pressed select not execute.
 
 {
+  pkgs,
   ...
 }:
 
 {
   programs.atuin = {
     enable = true;
-    flags = [ "--disable-up-arrow" ];
+    package = pkgs.atuin;
+    flags = [
+      "--disable-up-arrow"
+    ];
+
+    settings = {
+      auto_sync = true;
+      sync_frequency = "10m";
+      search_mode = "fuzzy";
+      # sync_address = "https://atuin.techcasa.io";
+    };
     enableBashIntegration = true;
     enableFishIntegration = true;
     enableZshIntegration = true;
