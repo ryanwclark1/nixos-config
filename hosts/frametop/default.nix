@@ -55,8 +55,8 @@
   hardware = {
     opengl = {
       enable = true;
-    #   driSupport = true;
-    #   driSupport32Bit = true;
+      driSupport = true;
+      driSupport32Bit = true;
     };
 
     logitech = {
@@ -65,6 +65,8 @@
         enableGraphical = true;
       };
     };
+
+    enableRedistributableFirmware = true;
   };
 
   security.pam.services.login.fprintAuth = true;
