@@ -10,6 +10,7 @@
 
     ../common/optional/bluetooth.nix
     ../common/optional/docker.nix
+    ../common/optional/fail2ban.nix
     ../common/optional/nfs.nix
     ../common/optional/pipewire.nix
     ../common/optional/printing.nix
@@ -52,11 +53,11 @@
   };
 
   hardware = {
-    # opengl = {
-    #   enable = true;
+    opengl = {
+      enable = true;
     #   driSupport = true;
     #   driSupport32Bit = true;
-    # };
+    };
 
     logitech = {
       wireless = {
