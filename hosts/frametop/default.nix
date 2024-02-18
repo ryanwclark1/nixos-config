@@ -16,6 +16,7 @@
     ../common/optional/printing.nix
     ../common/optional/qemu.nix
     ../common/optional/steam.nix
+    ../common/optional/wireshark.nix
 
     ../common/optional/plasma
   ];
@@ -53,6 +54,7 @@
   };
 
   hardware = {
+
     opengl = {
       enable = true;
       driSupport = true;
