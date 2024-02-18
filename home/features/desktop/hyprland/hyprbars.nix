@@ -1,7 +1,8 @@
-{ config
-, pkgs
-, lib
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  ...
 }:
 let
   hyprbars = (pkgs.inputs.hyprland-plugins.hyprbars.override {
