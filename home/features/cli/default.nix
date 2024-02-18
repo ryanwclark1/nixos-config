@@ -6,13 +6,11 @@
 {
   imports = [
     ./atuin.nix
-    ./bash.nix
     ./bat.nix
     ./direnv.nix
     ./doc.nix
     ./filesearch.nix
     ./filesystem_utils.nix
-    ./fish.nix
     ./gh.nix
     ./git.nix
     ./gpg.nix
@@ -30,7 +28,6 @@
     # ./ssh.nix
     # ./xpo.nix
     ./xplr.nix
-    ./zsh.nix
   ];
   home.packages = with pkgs; [
     mprocs # multiple commands in parallel
