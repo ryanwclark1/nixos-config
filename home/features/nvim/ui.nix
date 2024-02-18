@@ -1,5 +1,6 @@
-{ pkgs
-, ...
+{
+  pkgs,
+  ...
 }: {
   programs.neovim.plugins = with pkgs.vimPlugins; [
     # UI

@@ -1,7 +1,8 @@
-{ config
-, pkgs
-, lib
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  ...
 }: {
   # Wireless secrets stored through sops
   sops.secrets.wireless = {

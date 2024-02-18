@@ -1,5 +1,6 @@
-{ pkgs
-, ...
+{
+  pkgs,
+  ...
 }: {
   home.packages = with pkgs; [ todoman ];
   xdg.configFile."todoman/config.py".text = /* python */ ''
