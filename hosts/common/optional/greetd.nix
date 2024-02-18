@@ -1,7 +1,8 @@
-{ pkgs
-, lib
-, config
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  ...
 }:
 let
   homeCfgs = config.home-manager.users;
