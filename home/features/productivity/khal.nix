@@ -1,18 +1,20 @@
-# {
-#  pkgs,
-#  ...
-# }: {
-#   home.packages = with pkgs; [ khal ];
-#   xdg.configFile."khal/config".text = /* toml */ ''
-#     [calendars]
+{
+ pkgs,
+ ...
+}:
 
-#     [[calendars]]
-#     path = ~/Calendars/*
-#     type = discover
+{
+  home.packages = with pkgs; [ khal ];
+  xdg.configFile."khal/config".text = /* toml */ ''
+    [calendars]
 
-#     [locale]
-#     timeformat = %H:%M
-#     dateformat = %d/%m/%Y
-#   '';
-# }
-{ }
+    [[calendars]]
+    path = ~/Calendars/*
+    type = discover
+
+    [locale]
+    timeformat = %H:%M
+    dateformat = %d/%m/%Y
+  '';
+}
+
