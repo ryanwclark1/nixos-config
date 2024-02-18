@@ -1,4 +1,8 @@
 {
+  ...
+}:
+
+{
   programs.wireshark = {
     enable = true;
   };
