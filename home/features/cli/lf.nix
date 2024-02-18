@@ -5,7 +5,6 @@
 }:
 
 {
-
   programs.lf = {
     enable = true;
     previewer = {
