@@ -10,7 +10,7 @@
 {
   programs.atuin = {
     enable = true;
-    package = pkgs.atuin;
+    # package = pkgs.atuin;
     flags = [
       "--disable-up-arrow"
     ];

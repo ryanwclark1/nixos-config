@@ -31,6 +31,7 @@ in
     ./features/networking-utils
     # ./features/pass
     ./features/productivity
+    ./features/shell
     ./features/starship
     ./features/sys-stats
     ./features/vscode
