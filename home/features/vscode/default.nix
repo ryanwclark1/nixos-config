@@ -72,7 +72,7 @@
         "editor.fontSize" = 12;
         "editor.fontVariations" = true;
         "editor.fontWeight" = "normal";
-        "editor.formatOnSave" = true;
+        # "editor.formatOnSave" = true;
         "editor.inlineSuggest.enabled" = true;
         "editor.minimap.enabled" = false;
         "editor.renderWhitespace" = "all";
