@@ -8,7 +8,6 @@
     ./atuin.nix
     ./bat.nix
     ./direnv.nix
-    ./doc.nix
     ./filesearch.nix
     ./filesystem_utils.nix
     ./gh.nix
