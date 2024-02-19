@@ -1,9 +1,10 @@
-{ inputs
-, lib
-, pkgs
-, config
-, outputs
-, ...
+{
+  config,
+  inputs,
+  lib,
+  outputs,
+  pkgs,
+  ...
 }:
 let
   inherit (inputs.nix-colors) colorSchemes;
@@ -47,6 +48,7 @@ in
     sessionPath = [ "$HOME/.local/bin" ];
     sessionVariables = {
       FLAKE = "$HOME/nixos-config";
+      EDITOR = "nvim";
     };
   };
 
