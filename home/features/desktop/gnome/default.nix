@@ -75,6 +75,29 @@ with lib;
           "vinagre.desktop"
           "org.gnome.Console.desktop"
           "org.kde.konsole.desktop"
+          "org.gnome.Calculator.desktop"
+          "org.gnome.Snapshot.desktop"
+          "simple-scan.desktop"
+          "org.gnome.Settings.desktop"
+          "org.gnome.Calendar.desktop"
+          "blueman-manager.desktop"
+          "gnome-system-monitor.desktop"
+          "com.github.qarmin.czkawka.desktop"
+          "org.gnome.dfeet.desktop"
+          "ca.desrt.dconf-editor.desktop"
+          "org.gnome.Extensions.desktop"
+          "org.gnome.Devhelp.desktop"
+          "gparted.desktop"
+          "org.gnome.clocks.desktop"
+          "org.gnome.Maps.desktop"
+          "org.gnome.Weather.desktop"
+          "balena-etcher.desktop"
+          "solaar.desktop"
+          "cups.desktop"
+          "lf.desktop"
+          "gnome-nettool.desktop"
+          "pavucontrol.desktop"
+          "nixos-manual.desktop"
         ];
         categories = [ "X-GNOME-Utilities" ];
         name = "X-GNOME-Utilities.directory";
@@ -89,6 +112,8 @@ with lib;
           "impress.desktop"
           "math.desktop"
           "writer.desktop"
+          "org.gnome.TextEditor.desktop"
+          "org.kde.kwrite.desktop"
         ];
         categories = [ "X-GNOME-Office" ];
         name = "Office";
@@ -135,12 +160,16 @@ with lib;
       };
       "org/gnome/desktop/app-folders/folders/Development" = {
         apps = [
+          "openlens.desktop"
           "nvim.desktop"
           "DevPod.desktop"
           "Helix.desktop"
           "insomnia.desktop"
           "dbeaver.desktop"
           "org.flameshot.Flameshot.desktop"
+          "sqlitebrowser.desktop"
+          "lapce.desktop"
+          "org.kde.kate.desktop"
         ];
         categories = [ "X-GNOME-Development" ];
         name = "Development";
