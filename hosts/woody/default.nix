@@ -1,7 +1,7 @@
 { pkgs, inputs, ... }: {
   imports = [
 
-    inputs.hardware.nixosModules.common-pc-ssd
+    # inputs.hardware.nixosModules.common-pc-ssd
     inputs.vscode-server.nixosModules.default
     ./hardware-configuration.nix
     ../common/global
