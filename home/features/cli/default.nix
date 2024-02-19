@@ -19,8 +19,6 @@
     ./nix-index.nix
     ./nixtools.nix
     ./pfetch.nix
-    ./pistol.nix
-    ./ranger.nix
     ./screen.nix
     # ./shellcolor.nix
     ./skim.nix

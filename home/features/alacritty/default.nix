@@ -1,5 +1,6 @@
 {
   config,
+  pkgs,
   ...
 }:
 let
@@ -7,11 +8,15 @@ let
   inherit (config.colorscheme) palette;
 in
 {
+  home.packages = with pkgs; [
+    alacritty-theme
+  ];
   programs.alacritty = {
     enable = true;
+    package = pkgs.alacritty;
     settings = {
       window = {
-        opacity = 0.9;
+        opacity = 0.8;
         dynamic_title = true;
         dynamic_padding = true;
         padding = {
@@ -30,6 +35,9 @@ in
         italic.family = font;
         size = 12;
       };
+      # import = [
+      #   "${pkgs.alacritty-theme}/themes/nord.yml"
+      # ];
       colors = {
         primary = {
           background = "#${palette.base00}";
