@@ -9,7 +9,6 @@
     ../common/users/administrator
 
     ../common/optional/bluetooth.nix
-    ../common/optional/doc.nix
     ../common/optional/docker.nix
     ../common/optional/fail2ban.nix
     ../common/optional/nfs.nix
