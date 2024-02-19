@@ -10,10 +10,4 @@ with lib; {
     ripgrep
     sd
   ];
-  programs.eza = {
-    enable = true;
-    icons = true;
-    git = true;
-    enableAliases = true;
-  };
 }
