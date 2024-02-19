@@ -5,7 +5,7 @@
 
 {
   imports = [
-    ./atuin.nix
+    # ./atuin.nix
     ./bat.nix
     ./direnv.nix
     ./filesearch.nix
