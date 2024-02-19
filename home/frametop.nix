@@ -13,7 +13,6 @@ in
     ./global
     ./features/desktop/plasma
     ./features/desktop/common
-
     ./features/alacritty
     ./features/build
     ./features/cli
