@@ -1,10 +1,20 @@
 # lf (as in "list files") is a terminal file manager written in Go with a heavy inspiration from ranger file manager.
 {
   pkgs,
+
   ...
 }:
 
 {
+  home.packages = with pkgs; [
+    exiftool
+  ];
+
+  # General purpose file previewer designed for Ranger, Lf to make scope.sh redundant
+  programs.pistol = {
+    enable = true;
+  };
+
   programs.lf = {
     enable = true;
     previewer = {
