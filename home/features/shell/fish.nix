@@ -8,7 +8,6 @@ let
   packageNames = map (p: p.pname or p.name or null) config.home.packages;
   hasPackage = name: lib.any (x: x == name) packageNames;
   hasRipgrep = hasPackage "ripgrep";
-  hasExa = hasPackage "eza";
   hasSpecialisationCli = hasPackage "specialisation";
   hasNeovim = config.programs.neovim.enable;
   hasNeomutt = config.programs.neomutt.enable;
@@ -39,9 +38,6 @@ in
       hms = "home-manager --flake . switch";
 
       s = mkIf hasSpecialisationCli "specialisation";
-
-      ls = mkIf hasExa "eza";
-      exa = mkIf hasExa "eza";
 
       vrg = mkIf (hasNeomutt && hasRipgrep) "nvimrg";
       vim = mkIf hasNeovim "nvim";
