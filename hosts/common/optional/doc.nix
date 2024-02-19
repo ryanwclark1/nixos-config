@@ -4,11 +4,16 @@
 
 {
   programs = {
-    info.enable = true;
+
     tldr.enable = true;
-    man = {
+    documentation = {
       enable = true;
-      generateCaches = true;
+      info.enable = true;
+      nixos.enable = true;
+      man = {
+        enable = true;
+        generateCaches = true;
+      };
     };
   };
 }
