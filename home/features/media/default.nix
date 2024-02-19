@@ -1,5 +1,4 @@
 {
-  pkgs,
   ...
 }:
 
@@ -15,7 +14,4 @@
     ./yt-dlp.nix
   ];
 
-  home.packages = with pkgs; [
-    f3d
-  ];
 }
