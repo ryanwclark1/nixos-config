@@ -16,9 +16,9 @@ in
     ./features/alacritty
     ./features/build
     ./features/cli
-    # ./features/common-desktop
     ./features/compression
     ./features/development
+    ./features/eza
     ./features/fzf
     ./features/games
     ./features/helix
