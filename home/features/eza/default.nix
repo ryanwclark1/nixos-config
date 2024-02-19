@@ -1,3 +1,4 @@
+# A modern, maintained replacement for ls.
 {
   ...
 }:
