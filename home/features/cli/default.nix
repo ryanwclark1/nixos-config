@@ -21,7 +21,6 @@
     ./pfetch.nix
     ./screen.nix
     # ./shellcolor.nix
-    # ./skim.nix
     # ./ssh.nix
     # ./xpo.nix
     # ./xplr.nix
