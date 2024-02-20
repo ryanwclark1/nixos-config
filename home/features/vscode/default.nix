@@ -63,6 +63,12 @@
           version = "0.1.624";
           sha256 = "sha256-CJTku9MOet3JvVYLTQDgjKvmsU9V/NP2hamIFUfElMA=";
         }
+        {
+          name = "color-info";
+          publisher = "bierner";
+          version = "0.7.2";
+          sha256 = "sha256-Bf0thdt4yxH7OsRhIXeqvaxD1tbHTrUc4QJcju7Hv90=";
+        }
       ];
 
       userSettings = {
