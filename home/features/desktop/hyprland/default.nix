@@ -7,8 +7,7 @@
 {
   imports = [
     ../common
-    ../common/wayland-wm
-
+    ./wayland-wm
     ./basic-binds.nix
     ./hyprbars.nix
   ];
@@ -26,7 +25,7 @@
 
   wayland.windowManager.hyprland = {
     enable = true;
-    package = pkgs.inputs.hyprland.hyprland.override { wrapRuntimeDeps = false; };
+    # package = pkgs.inputs.hyprland.hyprland.override { wrapRuntimeDeps = false; };
     systemd = {
       enable = true;
       # Same as default, but stop graphical-session too
