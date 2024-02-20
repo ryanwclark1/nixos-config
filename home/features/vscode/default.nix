@@ -95,7 +95,8 @@
 
         "terminal.integrated.fontFamily" = "JetBrainsMono Nerd Font";
         "terminal.integrated.copyOnSelection" = true;
-
+        "terminal.integrated.defaultProfile.linux" = "zsh";
+        "terminal.integrated.fontSize" = 12;
         # Nix IDE
         "nix.enableLanguageServer" = true;
         "nix.serverPath" = "${pkgs.nil}/bin/nil";
