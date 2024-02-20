@@ -162,6 +162,36 @@
           "Github.copilot-chat"
           "Github.copilot"
         ];
+        "colorInfo.fields" = [
+          "hex"
+          "rgb"
+          "preview-square"
+          "css-color-name"
+          "cmyk"
+          "hsl"
+        ];
+        "colorInfo.languages" = [
+          {
+            "selector" = "css";
+            "colors" = "css";
+          }
+          {
+            "selector" = "sass";
+            "colors" = "css";
+          }
+          {
+            "selector" = "scss";
+            "colors" = "css";
+          }
+          {
+            "selector" = "less";
+            "colors" = "css";
+          }
+          {
+            "selector" = "nix";
+            "colors" = "hex";
+          }
+        ];
       };
     };
   };
