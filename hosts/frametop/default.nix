@@ -18,6 +18,7 @@
     ../common/optional/steam.nix
     ../common/optional/wireshark.nix
 
+    # ../common/optional/hyprland
     ../common/optional/plasma
   ];
 

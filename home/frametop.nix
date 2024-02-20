@@ -11,8 +11,10 @@ in
 {
   imports = [
     ./global
+    # ./features/desktop/hyprland
     ./features/desktop/plasma
     ./features/desktop/common
+
     ./features/alacritty
     ./features/build
     ./features/cli

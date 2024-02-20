@@ -21,14 +21,13 @@
     gtk3 # For gtk-launch
     imv
     mimeo
-    primary-xwayland
+    # primary-xwayland
     pulseaudio
     slurp
     waypipe
     wf-recorder
     wl-clipboard
     wl-mirror
-    wl-mirror-pick
     xdg-utils-spawn-terminal # Patched to open terminal
     ydotool
   ];
