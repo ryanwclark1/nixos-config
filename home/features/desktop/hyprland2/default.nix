@@ -156,7 +156,7 @@ with lib;
     '';
   };
   programs.starship.enableBashIntegration = true;
-  programs.fzf.enableBashIntegration = mkIf config.fzf.enable true;
+  # programs.fzf.enableBashIntegration = mkIf config.fzf.enable true;
   programs.zoxide.enableBashIntegration = true;
   # programs.nix-index.enableBashIntegration = true;
   # services.gpg-agent.enableBashIntegration = true;
