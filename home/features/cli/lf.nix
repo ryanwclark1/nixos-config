@@ -9,6 +9,7 @@
     exiftool
     mediainfo
     poppler_utils #pdftotext and pdfinfo
+    hexyl
   ];
 
   # programs.zathura = {
@@ -23,15 +24,15 @@
       { mime = "image/*"; command = "mediainfo %pistol-filename%"; }
       { mime = "video/*"; command = "mediainfo %pistol-filename%"; }
       { mime = "audio/*"; command = "mediainfo %pistol-filename%"; }
-      { mime = "text/*"; command = "bat %pistol-filename%"; }
+      # { mime = "text/*"; command = "bat %pistol-filename%"; }
       { mime = "application/pdf"; command = "sh: pdftotext -l 10 -nopgbrk -q -- %pistol-filename% - | fmt -w $(tput cols)"; }
       { mime = "application/epub+zip"; command = "foliate %pistol-filename%"; }
-      { mime = "application/zip"; command = "unzip -l %pistol-filename%"; }
-      { mime = "application/x-tar"; command = "tar tf %pistol-filename%"; }
-      { mime = "application/x-xz"; command = "tar tf %pistol-filename%"; }
-      { mime = "application/x-bzip2"; command = "tar tf %pistol-filename%"; }
-      { mime = "application/x-rar"; command = "unrar l %pistol-filename%"; }
-      { mime = "application/x-7z-compressed"; command = "7z l %pistol-filename%"; }
+      # { mime = "application/zip"; command = "unzip -l %pistol-filename%"; }
+      # { mime = "application/x-tar"; command = "tar tf %pistol-filename%"; }
+      # { mime = "application/x-xz"; command = "tar tf %pistol-filename%"; }
+      # { mime = "application/x-bzip2"; command = "tar tf %pistol-filename%"; }
+      # { mime = "application/x-rar"; command = "unrar l %pistol-filename%"; }
+      # { mime = "application/x-7z-compressed"; command = "7z l %pistol-filename%"; }
       { mime = "application/x-msdownload"; command = "exiftool %pistol-filename%"; }
       { mime = "application/x-sharedlib"; command = "exiftool %pistol-filename%"; }
       { mime = "application/x-executable"; command = "exiftool %pistol-filename%"; }
@@ -41,7 +42,7 @@
       { mime = "application/vnd.ms-opentype"; command = "exiftool %pistol-filename%"; }
       { mime = "application/vnd.ms-fontobject"; command = "exiftool %pistol-filename%"; }
       { mime = "application/vnd.ms-excel"; command = "exiftool %pistol-filename%"; }
-      { mime = "application/json"; command = "bat %pistol-filename%"; }
+      # { mime = "application/json"; command = "bat %pistol-filename%"; }
       { mime = "application/*"; command = "hexyl %pistol-filename%"; }
       { fpath = ".*.md$"; command = "sh: bat --paging=never --color=always %pistol-filename% | head -8"; }
     ];
@@ -56,11 +57,11 @@
       source = pkgs.writeShellScript "pv.sh" ''
         #!/bin/sh
         case "''${1,,}" in
-            *.tar*) tar tf "$1";;
-            *.zip) ${pkgs.p7zip}/bin/7z l "$1";;
-            *.rar) ${pkgs.p7zip}/bin/7z l "$1";;
-            *.7z) ${pkgs.p7zip}/bin/7z l "$1";;
-            *.dll|*.exe|*.ttf|*.woff|*.otf|*eot) ${pkgs.exiftool}/bin/exiftool "$1";;
+            # *.tar*) tar tf "$1";;
+            # *.zip) ${pkgs.p7zip}/bin/7z l "$1";;
+            # *.rar) ${pkgs.p7zip}/bin/7z l "$1";;
+            # *.7z) ${pkgs.p7zip}/bin/7z l "$1";;
+            # *.dll|*.exe|*.ttf|*.woff|*.otf|*eot) ${pkgs.exiftool}/bin/exiftool "$1";;
             *) ${pkgs.pistol}/bin/pistol "$1";;
         esac
       '';

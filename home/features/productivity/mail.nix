@@ -56,39 +56,39 @@ in
         userName = address;
       } // common;
 
-      college = rec {
-        address = "g.fontes@usp.br";
-        passwordCommand = "${pass} ${smtp.host}/${address}";
+      # college = rec {
+      #   address = "g.fontes@usp.br";
+      #   passwordCommand = "${pass} ${smtp.host}/${address}";
 
-        msmtp.enable = true;
-        smtp.host = "smtp.gmail.com";
-        userName = address;
-      } // common;
+      #   msmtp.enable = true;
+      #   smtp.host = "smtp.gmail.com";
+      #   userName = address;
+      # } // common;
 
-      zoocha = rec {
-        address = "gabriel@zoocha.com";
-        passwordCommand = "${pass} ${smtp.host}/${address}";
+      # zoocha = rec {
+      #   address = "gabriel@zoocha.com";
+      #   passwordCommand = "${pass} ${smtp.host}/${address}";
 
-        /* TODO: add imap (conditionally)
-        imap.host = "imap.gmail.com";
-        mbsync = {
-          enable = true;
-          create = "maildir";
-          expunge = "both";
-        };
-        folders = {
-          inbox = "INBOX";
-          trash = "Trash";
-        };
-        neomutt = {
-          enable = true;
-        };
-        */
+      #   /* TODO: add imap (conditionally)
+      #   imap.host = "imap.gmail.com";
+      #   mbsync = {
+      #     enable = true;
+      #     create = "maildir";
+      #     expunge = "both";
+      #   };
+      #   folders = {
+      #     inbox = "INBOX";
+      #     trash = "Trash";
+      #   };
+      #   neomutt = {
+      #     enable = true;
+      #   };
+      #   */
 
-        msmtp.enable = true;
-        smtp.host = "smtp.gmail.com";
-        userName = address;
-      } // common;
+      #   msmtp.enable = true;
+      #   smtp.host = "smtp.gmail.com";
+      #   userName = address;
+      # } // common;
     };
   };
 
