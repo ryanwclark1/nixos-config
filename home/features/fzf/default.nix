@@ -22,18 +22,13 @@
       "prompt" = "#81A1C1";
       "marker" = "#EBCB8B";
     };
-    changeDirWidgetCommand = "fd --type d";
-    changeDirWidgetOptions = [
-      "--preview 'tree -C {} | head -200'"
-      # "--preview='ls -l {}'"
-    ];
-    defaultCommand = "fd --type f";
+    defaultCommand = "find . -type f ! -path '.git'";
     defaultOptions = [
       "--preview='pistol {}'"
       "--height=40%"
       "--border"
     ];
-    fileWidgetCommand = "fd --type f";
+    fileWidgetCommand = "find . -type f ! -path '.git'";
     fileWidgetOptions = [
       "--preview 'bat --color=always {}'"
       # "--preview 'head {}'"
@@ -42,12 +37,17 @@
       "--sort"
       "--exact"
     ];
+    changeDirWidgetCommand = "fd --type d";
+    changeDirWidgetOptions = [
+      "--preview 'tree -C {} | head -200'"
+      # "--preview='ls -l {}'"
+    ];
     enableBashIntegration = true;
     enableZshIntegration = true;
     enableFishIntegration = true;
   };
 
   home.packages = with pkgs; [
-    skim
+    fd
   ];
 }

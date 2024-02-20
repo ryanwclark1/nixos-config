@@ -23,7 +23,6 @@
     };
     localVariables = {
       DISABLE_CORRECTION = true;
-      SKIM_BASE = "${pkgs.skim}/bin/sk";
     };
 
     autocd = true;
@@ -81,14 +80,10 @@
       #     name = "zsh-tab-title";
       #   }
 
-      #   {
-      #     src = inputs.zsh-skim;
-      #     name = "zsh-skim";
-      #   }
     ];
   };
 
-  programs.fzf.enableZshIntegration = true;
+  # programs.fzf.enableZshIntegration = true;
   programs.nix-index.enableZshIntegration = true;
   programs.starship.enableZshIntegration = true;
   programs.zoxide.enableZshIntegration = true;

@@ -134,7 +134,9 @@
       # shellopts = "-c";
     };
 
-    # keybindings = {
+    keybindings = {
+      f = "fzf --print0 --preview='pistol {}'";
+    };
     #   nd = "mkdir";
     #   nf = "mkfile";
     #   "<c-f>" = "search";
