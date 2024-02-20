@@ -52,25 +52,28 @@
     enable = true;
     previewer = {
       keybinding = "i";
-      # source = pkgs.pistol;
+      source =  "${pkgs.pistol}/bin/pistol";
 
-      source = pkgs.writeShellScript "pv.sh" ''
-        #!/bin/sh
-        case "''${1,,}" in
-            # *.tar*) tar tf "$1";;
-            # *.zip) ${pkgs.p7zip}/bin/7z l "$1";;
-            # *.rar) ${pkgs.p7zip}/bin/7z l "$1";;
-            # *.7z) ${pkgs.p7zip}/bin/7z l "$1";;
-            # *.dll|*.exe|*.ttf|*.woff|*.otf|*eot) ${pkgs.exiftool}/bin/exiftool "$1";;
-            *) ${pkgs.pistol}/bin/pistol "$1";;
-        esac
-      '';
+      # source = pkgs.writeShellScript "pv.sh" ''
+      #   #!/bin/sh
+      #   case "''${1,,}" in
+      #       # *.tar*) tar tf "$1";;
+      #       # *.zip) ${pkgs.p7zip}/bin/7z l "$1";;
+      #       # *.rar) ${pkgs.p7zip}/bin/7z l "$1";;
+      #       # *.7z) ${pkgs.p7zip}/bin/7z l "$1";;
+      #       # *.dll|*.exe|*.ttf|*.woff|*.otf|*eot) ${pkgs.exiftool}/bin/exiftool "$1";;
+      #       *) ${pkgs.pistol}/bin/pistol "$1";;
+      #   esac
+      # '';
     };
 
     settings = {
       # color256 = false;
+      preview = true;
       hidden = true;
+      drawbox = true;
       icons = true;
+      ignorecase = true;
       # shell = "zsh";
       # shellopts = "-c";
     };
@@ -80,14 +83,14 @@
       nf = "mkfile";
       "<c-f>" = "search";
       "<space>" = "toggle";
-      f = "$nvim $(fzf)";
+      f = "$EDITOR $(fzf)";
       "<enter>" = "shell";
       o = "&mimeopen $f";
       O = "map O $mimeopen --ask $f";
     };
 
     commands = {
-      f = "$nvim $(fzf)";
+      f = "$EDITOR $(fzf --preview='pistol {})";
       fzf_search = ''
         ''${{
             res="$( \
