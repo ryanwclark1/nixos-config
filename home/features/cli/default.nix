@@ -21,10 +21,10 @@
     ./pfetch.nix
     ./screen.nix
     # ./shellcolor.nix
-    ./skim.nix
+    # ./skim.nix
     # ./ssh.nix
     # ./xpo.nix
-    ./xplr.nix
+    # ./xplr.nix
   ];
   home.packages = with pkgs; [
     mprocs # multiple commands in parallel
@@ -39,7 +39,6 @@
     diffsitter # Better diff
     # trekscii # Cute startrek cli printer
     timer # To help with my ADHD paralysis
-    mc # Midnight commander
     ltex-ls # Spell checking LSP
     # tly # Tally counter
     d2 #diagram
