@@ -37,11 +37,11 @@
       "--sort"
       "--exact"
     ];
-    changeDirWidgetCommand = "fd --type d";
-    changeDirWidgetOptions = [
-      "--preview 'tree -C {} | head -200'"
-      # "--preview='ls -l {}'"
-    ];
+    # changeDirWidgetCommand = "fd --type d";
+    # changeDirWidgetOptions = [
+    #   "--preview 'tree -C {} | head -200'"
+    #   # "--preview='ls -l {}'"
+    # ];
     enableBashIntegration = true;
     enableZshIntegration = true;
     enableFishIntegration = true;
