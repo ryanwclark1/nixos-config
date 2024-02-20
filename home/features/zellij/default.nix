@@ -1,7 +1,5 @@
 # Similar to TMUX
 {
-  config,
-  lib,
   pkgs,
   ...
 }:
@@ -20,6 +18,11 @@
       pane_frames = true;
       theme = "nord";
       default_layout = "default";
+      mouse_mode = false;
+      copy_clipboard = "primary";
+      copy_on_select = true;
+      scrollback_editor = "$EDITOR";
+
 
     };
     # enableZshIntegration = true;
