@@ -18,7 +18,6 @@
     ./network.nix
     ./nix-index.nix
     ./nixtools.nix
-    ./pfetch.nix
     ./screen.nix
     # ./shellcolor.nix
     # ./ssh.nix
@@ -36,7 +35,6 @@
     distrobox # Nice escape hatch, integrates docker images with my environment
     bottom # System viewer
     diffsitter # Better diff
-    # trekscii # Cute startrek cli printer
     timer # To help with my ADHD paralysis
     ltex-ls # Spell checking LSP
     # tly # Tally counter
