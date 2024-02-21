@@ -3,7 +3,6 @@
   lib,
   ...
 }:
-
 let
   inherit (lib) mkOption types;
   cfg = config.monitors;

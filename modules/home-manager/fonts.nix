@@ -3,7 +3,6 @@
   lib,
   ...
 }:
-
 let
   mkFontOption = kind: {
     family = lib.mkOption {
