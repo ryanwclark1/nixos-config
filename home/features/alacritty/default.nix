@@ -20,9 +20,11 @@ in
         dynamic_title = true;
         dynamic_padding = true;
         padding = {
-          x = 5;
-          y = 5;
+          x = 2;
+          y = 2;
         };
+        decorations = "Full"; # Borders and title bar
+        blur = true; # works on macOS/KDE Wayland
         title = "terminal";
       };
       scrolling = {
@@ -30,21 +32,40 @@ in
         multiplier = 5;
       };
       font = {
-        normal.family = font;
-        bold.family = font;
-        italic.family = font;
-        size = 12;
+        normal = {
+          family = font;
+          style = "Regular";
+        };
+        bold = {
+          family = font;
+          style = "Bold";
+        };
+        italic = {
+          family = font;
+          style = "Italic";
+        };
+        bold_italic = {
+          family = font;
+          style = "Bold Italic";
+        };
+        size = 11.25;
       };
       # import = [
       #   "${pkgs.alacritty-theme}/themes/nord.yml"
       # ];
       colors = {
+        transparent_background_colors = true;
         primary = {
           background = "#${palette.base00}";
           foreground = "#${palette.base05}";
         };
       };
-      selection.save_to_clipboard = true;
+      selection = {
+        save_to_clipboard = true;
+      };
+      mouse = {
+        hide_when_typing = false;
+      };
     };
   };
 }
