@@ -8,6 +8,7 @@
 {
   programs.fzf = {
     enable = true;
+    package = pkgs.fzf;
     colors = {
       "fg" = "#D8DEE9";
       "bg" = "#2E3440";

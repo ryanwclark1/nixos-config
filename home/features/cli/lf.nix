@@ -109,18 +109,7 @@
     previewer = {
       keybinding = "i";
       source =  "${pkgs.pistol}/bin/pistol";
-
-      # source = pkgs.writeShellScript "pv.sh" ''
-      #   #!/bin/sh
-      #   case "''${1,,}" in
-      #       # *.tar*) tar tf "$1";;
-      #       # *.zip) ${pkgs.p7zip}/bin/7z l "$1";;
-      #       # *.rar) ${pkgs.p7zip}/bin/7z l "$1";;
-      #       # *.7z) ${pkgs.p7zip}/bin/7z l "$1";;
-      #       # *.dll|*.exe|*.ttf|*.woff|*.otf|*eot) ${pkgs.exiftool}/bin/exiftool "$1";;
-      #       *) ${pkgs.pistol}/bin/pistol "$1";;
-      #   esac
-      # '';
+   
     };
 
     settings = {
@@ -129,39 +118,82 @@
       drawbox = true;
       icons = true;
       ignorecase = true;
-      # color256 = false;
+      color256 = true;
       # shell = "zsh";
       # shellopts = "-c";
     };
 
     keybindings = {
-      f = "fzf --print0 --preview='pistol {}'";
+      f = "$(fzf)";
+      nd = "mkdir";
+      nf = "mkfile";
+      "<c-f>" = "fzf_jump";
+      gs = "fzf_search";
+      "<space>" = "toggle";
     };
-    #   nd = "mkdir";
-    #   nf = "mkfile";
-    #   "<c-f>" = "search";
-    #   "<space>" = "toggle";
+
     #   f = "$EDITOR $(fzf)";
     #   "<enter>" = "shell";
     #   o = "&mimeopen $f";
     #   O = "map O $mimeopen --ask $f";
     # };
 
-    # commands = {
+    commands = {
+
+      on-select = ''
+        &{{
+            lf -remote "send $id set statfmt \"$(eza -ld --color=always "$f")\""
+        }}
+      '';
+
+      fzf_jump = ''
+        ''${{
+          res="$(find . -maxdepth 1 | fzf --reverse --header='Jump to location')"
+          if [ -n "$res" ]; then
+              if [ -d "$res" ]; then
+                  cmd="cd"
+              else
+                  cmd="select"
+              fi
+              res="$(printf '%s' "$res" | sed 's/\\/\\\\/g;s/"/\\"/g')"
+              lf -remote "send $id $cmd \"$res\""
+          fi
+        }}
+      '';
+
+      fzf_search = ''
+        ''${{
+            res="$( \
+                RG_PREFIX="rg --column --line-number --no-heading --color=always \
+                    --smart-case "
+                FZF_DEFAULT_COMMAND="$RG_PREFIX \'\'" \
+                    fzf --bind "change:reload:$RG_PREFIX {q} || true" \
+                    --ansi --layout=reverse --header 'Search in files' \
+                    | cut -d':' -f1
+            )"
+            [ ! -z "$res" ] && lf -remote "send $id select \"$res\""
+        }}
+      '';
+
+      mkdir = ''
+        ''${{
+          printf "Directory Name: "
+          read ans
+          mkdir $ans
+        }}
+      '';
+
+      mkfile = ''
+        ''${{
+          printf "File Name: "
+          read ans
+          $EDITOR $ans
+        }}
+      '';
+    };
+    #   f = "${pkgs.fzf}/bin/fzf --print0 --preview='${pkgs.pistol}/bin/pistol {}'";
+    # };
     #   f = "$EDITOR $(fzf --preview='pistol {})";
-    #   fzf_search = ''
-    #     ''${{
-    #         res="$( \
-    #             RG_PREFIX="rg --column --line-number --no-heading --color=always \
-    #                 --smart-case "
-    #             FZF_DEFAULT_COMMAND="$RG_PREFIX \'\'" \
-    #                 fzf --bind "change:reload:$RG_PREFIX {q} || true" \
-    #                 --ansi --layout=reverse --header 'Search in files' \
-    #                 | cut -d':' -f1
-    #         )"
-    #         [ ! -z "$res" ] && lf -remote "send $id select \"$res\""
-    #     }}
-    #   '';
 
     #   open = ''
     #     ''${{
@@ -173,21 +205,7 @@
     #     }}
     #   '';
 
-    #   mkdir = ''
-    #     ''${{
-    #       printf "Directory Name: "
-    #       read ans
-    #       mkdir $ans
-    #     }}
-    #   '';
 
-    #   mkfile = ''
-    #     ''${{
-    #       printf "File Name: "
-    #       read ans
-    #       $EDITOR $ans
-    #     }}
-    #   '';
 
     #   extract = ''
     #     ''${{
@@ -196,12 +214,12 @@
     #     }}
     #   '';
 
-    #   z = ''
-    #     %{{
-    #           	result="$(zoxide query --exclude $PWD $@)"
-    #           	lf -remote "send $id cd $result"
-    #     }}
-    #   '';
+      # z = ''
+      #   %{{
+      #       result="$(zoxide query --exclude $PWD $@)"
+      #       lf -remote "send $id cd $result"
+      #   }}
+      # '';
 
     #   zi = ''
     #     ''${{
