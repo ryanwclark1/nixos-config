@@ -42,7 +42,6 @@
   programs = {
     adb.enable = true;
     dconf.enable = true;
-    # kdeconnect.enable = true;
   };
 
   services = {
@@ -61,7 +60,6 @@
   };
 
   hardware = {
-
     opengl = {
       enable = true;
       driSupport = true;
