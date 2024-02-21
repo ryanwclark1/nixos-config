@@ -48,7 +48,9 @@ in
     sessionPath = [ "$HOME/.local/bin" ];
     sessionVariables = {
       FLAKE = "$HOME/nixos-config";
-      # EDITOR = "nvim";
+      EDITOR = "${pkgs.neovim}";
+      SHELL = "${pkgs.fish}";
+      TERM = "${pkgs.alacritty}";
     };
   };
 
