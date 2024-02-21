@@ -9,7 +9,6 @@
   imports = [
     inputs.home-manager.nixosModules.home-manager
     # ./auto-upgrade.nix
-    ./fish.nix
     ./fonts.nix
     ./locale.nix
     ./networking.nix
@@ -20,7 +19,6 @@
     # ./ssh-serve-store.nix
     ./systemd-boot.nix
     ./tailscale.nix
-    ./zsh.nix
   ] ++ (builtins.attrValues outputs.nixosModules);
 
   home-manager.extraSpecialArgs = { inherit inputs outputs; };
