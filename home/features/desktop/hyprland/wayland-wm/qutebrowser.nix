@@ -1,6 +1,6 @@
-{ config
-, pkgs
-, ...
+{
+  config,
+  ...
 }:
 
 let inherit (config.colorscheme) palette variant;

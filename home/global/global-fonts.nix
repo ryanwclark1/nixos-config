@@ -64,7 +64,7 @@ with lib; {
 
       main-light = mkOption {
         type = types.str;
-        default = "Monaspcae Argon Light";
+        default = "Monaspsce Argon Light";
       };
       main-light-italic = mkOption {
         type = types.str;

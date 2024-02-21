@@ -1,11 +1,8 @@
 # ./host/common/global/nfs.nix
 {
-  config,
-  lib,
   pkgs,
   ...
 }:
-with lib;
 
 {
   services.autofs = {

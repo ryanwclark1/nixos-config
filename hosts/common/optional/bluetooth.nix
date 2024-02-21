@@ -1,11 +1,7 @@
 # ./host/common/global/bluetooth.nix
 {
-  config,
-  lib,
-  pkgs,
   ...
 }:
-with lib;
 
 {
   hardware = {

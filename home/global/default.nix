@@ -48,7 +48,7 @@ in
     sessionPath = [ "$HOME/.local/bin" ];
     sessionVariables = {
       FLAKE = "$HOME/nixos-config";
-      EDITOR = "nvim";
+      # EDITOR = "nvim";
     };
   };
 
