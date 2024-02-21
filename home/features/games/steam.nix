@@ -1,7 +1,6 @@
-{ pkgs
-, lib
-, config
-, ...
+{
+  pkgs,
+  ...
 }:
 let
   steam-with-pkgs = pkgs.steam.override {

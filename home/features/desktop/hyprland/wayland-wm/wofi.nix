@@ -3,7 +3,9 @@
   lib,
   pkgs,
   ...
-}: {
+}:
+
+{
   programs.wofi = {
     enable = true;
     package = pkgs.wofi.overrideAttrs (oa: {

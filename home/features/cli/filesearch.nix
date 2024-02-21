@@ -9,8 +9,4 @@
     sd #sed alternative
     tree # Directory tree
   ];
-  # programs.ripgrep = {
-  #   enable = true;
-  #   package = pkgs.ripgrep;
-  # };
 }

@@ -2,8 +2,8 @@
   config,
   ...
 }:
-
-let inherit (config.colorscheme) palette variant;
+let
+  inherit (config.colorscheme) palette variant;
 in
 {
 

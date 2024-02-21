@@ -3,7 +3,6 @@
 # Updated when enter is pressed select not execute.
 
 {
-  pkgs,
   ...
 }:
 

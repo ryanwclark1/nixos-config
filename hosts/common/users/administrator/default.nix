@@ -1,8 +1,10 @@
-{ pkgs
-, config
-, ...
+{
+  config,
+  pkgs,
+  ...
 }:
-let ifTheyExist = groups: builtins.filter (group: builtins.hasAttr group config.users.groups) groups;
+let
+  ifTheyExist = groups: builtins.filter (group: builtins.hasAttr group config.users.groups) groups;
 in
 {
   imports = [ ./packages.nix ];
