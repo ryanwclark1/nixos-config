@@ -1,27 +1,30 @@
 # TODO add config for fzf
 # A command-line fuzzy finder
 {
+  config,
   pkgs,
   ...
 }:
-
+let
+  inherit (config.colorscheme) palette;
+in
 {
   programs.fzf = {
     enable = true;
     package = pkgs.fzf;
     colors = {
-      "fg" = "#D8DEE9";
-      "bg" = "#2E3440";
-      "hl" = "#A3BE8C";
-      "fg+" = "#D8DEE9";
-      "bg+" = "#434C5E";
-      "hl+" = "#A3BE8C";
-      "pointer" = "#BF616A";
-      "info" = "#4C566A";
-      "spinner" = "#4C566A";
-      "header" = "#4C566A";
-      "prompt" = "#81A1C1";
-      "marker" = "#EBCB8B";
+      "fg" = "#${palette.base06}";
+      "bg" = "#${palette.base02}";
+      "hl" = "#${palette.base0B}";
+      "fg+" = "#${palette.base04}";
+      "bg+" = "#${palette.base00}";
+      "hl+" = "#${palette.base04}";
+      "pointer" = "#${palette.base08}";
+      "info" = "#${palette.base03}";
+      "spinner" = "#${palette.base03}";
+      "header" = "#${palette.base03}";
+      "prompt" = "#${palette.base0D}";
+      "marker" = "#${palette.base0A}";
     };
     defaultCommand = "find . -type f ! -path '.git'";
     defaultOptions = [

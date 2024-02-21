@@ -327,16 +327,6 @@ in
       line_break.disabled = true;
 
       # character = {
-      #   disabled = false;
-      #   success_symbol = "[](bold fg:color_green)";
-      #   error_symbol = "[](bold fg:color_red)";
-      #   vimcmd_symbol = "[](bold fg:color_green)";
-      #   vimcmd_replace_one_symbol = "[](bold fg:color_purple)";
-      #   vimcmd_replace_symbol = "[](bold fg:color_purple)";
-      #   vimcmd_visual_symbol = "[](bold fg:color_yellow)";
-      # };
-
-      # character = {
       #   error_symbol = "[~~>](bold red)";
       #   success_symbol = "[->>](bold green)";
       #   vimcmd_symbol = "[<<-](bold yellow)";

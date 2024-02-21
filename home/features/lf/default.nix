@@ -109,7 +109,6 @@
     previewer = {
       keybinding = "i";
       source =  "${pkgs.pistol}/bin/pistol";
-
     };
 
     settings = {
@@ -119,8 +118,8 @@
       icons = true;
       ignorecase = true;
       color256 = true;
-      # shell = "zsh";
-      # shellopts = "-c";
+      shell = "sh";
+      shellopts = "-eu";
     };
 
     keybindings = {
@@ -131,12 +130,6 @@
       gs = "fzf_search";
       "<space>" = "toggle";
     };
-
-    #   f = "$EDITOR $(fzf)";
-    #   "<enter>" = "shell";
-    #   o = "&mimeopen $f";
-    #   O = "map O $mimeopen --ask $f";
-    # };
 
     commands = {
 
@@ -205,8 +198,6 @@
     #     }}
     #   '';
 
-
-
     #   extract = ''
     #     ''${{
     #         set -f
@@ -228,6 +219,13 @@
     #     }}
     #   '';
     # };
+
+  };
+  home.file = {
+    lf = {
+      source = ./icons;
+      target = ".config/lf/icons";
+    };
   };
 
 }
