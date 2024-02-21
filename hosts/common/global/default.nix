@@ -12,7 +12,6 @@
     ./fonts.nix
     ./locale.nix
     ./networking.nix
-    # ./nfs.nix
     ./nix.nix
     ./openssh.nix
     ./sops.nix
