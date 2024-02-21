@@ -69,6 +69,12 @@
           version = "0.7.2";
           sha256 = "sha256-Bf0thdt4yxH7OsRhIXeqvaxD1tbHTrUc4QJcju7Hv90=";
         }
+        {
+          name = "vscode-speech";
+          publisher = "ms-vscode";
+          version = "0.4.0";
+          sha256 = "sha256-Vtr+0HO29SnQxDEzZ6Zy8BNdBeDY0yETxhcSSbu6cQA=";
+        }
       ];
 
       userSettings = {
@@ -189,6 +195,18 @@
           }
           {
             "selector" = "nix";
+            "colors" = "hex";
+          }
+          {
+            "selector" = "txt";
+            "colors" = "hex";
+          }
+          {
+            "selector" = "yaml";
+            "colors" = "hex";
+          }
+          {
+            "selector" = "json";
             "colors" = "hex";
           }
         ];
