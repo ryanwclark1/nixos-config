@@ -45,8 +45,6 @@
     remmina # XRDP & VNC Client
     bluez-tools # bt-adapter
 
-    kate
-
     scrot
     element-desktop
     megatools

@@ -4,7 +4,6 @@
 }:
 
 {
-
   home.packages = with pkgs; [
     nil # Nix LSP
     nixfmt # Nix formatter

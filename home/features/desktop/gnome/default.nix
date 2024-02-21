@@ -1,11 +1,9 @@
 {
-  config,
   lib,
   pkgs,
   ...
 }:
 with lib;
-
 {
   imports = [
     ./nautilus-gstreamer.nix

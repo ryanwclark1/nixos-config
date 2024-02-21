@@ -1,4 +1,10 @@
-{ pkgs, inputs, ... }: {
+{
+  inputs,
+  pkgs,
+  ...
+}:
+
+{
   imports = [
     inputs.hardware.nixosModules.framework-12th-gen-intel
     inputs.hardware.nixosModules.common-pc-ssd

@@ -1,7 +1,8 @@
-{ pkgs
-, lib
-, config
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  ...
 }:
 let
   enabledMonitors = lib.filter (m: m.enabled) config.monitors;

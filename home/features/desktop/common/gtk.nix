@@ -1,13 +1,14 @@
-{ config
-, pkgs
-, inputs
-, ...
+{
+  config,
+  inputs,
+  pkgs,
+  ...
 }:
-
 let
   inherit (inputs.nix-colors.lib-contrib { inherit pkgs; }) gtkThemeFromScheme;
 in
-rec {
+rec
+{
   gtk = {
     enable = true;
     font = {

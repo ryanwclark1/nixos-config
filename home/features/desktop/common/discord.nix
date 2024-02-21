@@ -4,9 +4,10 @@
   pkgs,
   ...
 }:
-
-let inherit (config.colorscheme) palette;
-in {
+let
+    inherit (config.colorscheme) palette;
+in
+{
   home.packages = with pkgs; [ discord discocss ];
 
 
