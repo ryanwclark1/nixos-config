@@ -1,4 +1,11 @@
-{ pkgs, config, lib, ... }: {
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+
+{
   programs.neovim = {
     extraConfig = lib.mkAfter /* vim */ ''
       function! SetCustomKeywords()

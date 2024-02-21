@@ -3,7 +3,9 @@
   lib,
   pkgs,
   ...
-}: {
+}:
+
+{
   xdg = {
     desktopEntries = {
       neomutt = {

@@ -6,6 +6,7 @@
 
 {
   fonts.packages = with pkgs; [
+    nerdfonts
     noto-fonts
     noto-fonts-cjk
     noto-fonts-emoji
@@ -21,6 +22,5 @@
     jetbrains-mono
     fira-code
     font-awesome
-    nerdfonts
   ];
 }

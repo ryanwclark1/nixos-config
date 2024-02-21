@@ -1,7 +1,9 @@
 {
   pkgs,
   ...
-}: {
+}:
+
+{
   programs.neovim.plugins = with pkgs.vimPlugins; [
     # LSP
     {
