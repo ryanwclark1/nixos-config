@@ -129,6 +129,16 @@
       "<c-f>" = "fzf_jump";
       gs = "fzf_search";
       "<space>" = "toggle";
+      # use enter for shell commands
+      "<enter>" = "shell";
+      # show the result of execution of previous commands
+      "`" = "!true";
+      # execute current file (must be executable)
+      x = "$$f";
+      X = "!$f";
+      # dedicated keys for file opener actions
+      o = "&mimeopen $f";
+      O = "&mimeopen -a $f";
     };
 
     commands = {
@@ -168,6 +178,16 @@
         }}
       '';
 
+      open = ''
+        &{{
+            test -L $f && f=$(readlink -f $f)
+            case $(file --mime-type -Lb $f) in
+                text/*) lf -remote "send $id \$$EDITOR \$fx";;
+                *) for f in $fx; do $OPENER $f > /dev/null 2> /dev/null & done;;
+            esac
+        }}
+      '';
+
       mkdir = ''
         ''${{
           printf "Directory Name: "
@@ -183,10 +203,46 @@
           $EDITOR $ans
         }}
       '';
+
+      # extract the current file with the right command
+      # (xkcd link: https://xkcd.com/1168/)
+      extract = ''
+        ''${{
+            set -f
+            case $f in
+                *.tar.bz|*.tar.bz2|*.tbz|*.tbz2) tar xjvf $f;;
+                *.tar.gz|*.tgz) tar xzvf $f;;
+                *.tar.xz|*.txz) tar xJvf $f;;
+                *.zip) unzip $f;;
+                *.rar) unrar x $f;;
+                *.7z) 7z x $f;;
+            esac
+        }}
+      '';
+
+      # compress current file or selected files with tar and gunzip
+      tar = ''
+        ''${{
+            set -f
+            mkdir $1
+            cp -r $fx $1
+            tar czf $1.tar.gz $1
+            rm -rf $1
+        }}
+      '';
+
+      # compress current file or selected files with zip
+      zip = ''
+        ''${{
+            set -f
+            mkdir $1
+            cp -r $fx $1
+            zip -r $1.zip $1
+            rm -rf $1
+        }}
+      '';
+
     };
-    #   f = "${pkgs.fzf}/bin/fzf --print0 --preview='${pkgs.pistol}/bin/pistol {}'";
-    # };
-    #   f = "$EDITOR $(fzf --preview='pistol {})";
 
     #   open = ''
     #     ''${{
@@ -222,9 +278,13 @@
 
   };
   home.file = {
-    lf = {
+    lf_icons = {
       source = ./icons;
       target = ".config/lf/icons";
+    };
+    lf_colors = {
+      source = ./colors;
+      target = ".config/lf/colors";
     };
   };
 
