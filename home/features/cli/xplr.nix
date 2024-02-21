@@ -9,6 +9,7 @@
 {
 
   programs.xplr = {
+    enable = true;
     extraConfig = ''
       -- xpm
       local home = os.getenv("HOME")
