@@ -14,7 +14,7 @@
     ./git.nix
     ./gpg.nix
     ./jq.nix
-    ./lf.nix
+    # ./lf.nix
     ./network.nix
     ./nix-index.nix
     ./nixtools.nix

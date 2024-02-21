@@ -109,7 +109,7 @@
     previewer = {
       keybinding = "i";
       source =  "${pkgs.pistol}/bin/pistol";
-   
+
     };
 
     settings = {
