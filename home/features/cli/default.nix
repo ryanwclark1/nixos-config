@@ -41,6 +41,7 @@
     d2 #diagram
     zk # note taking
     trashy #cli rm with trash support
+    wget 
     hurl # httpie/curl alternative
     httpie # Better curl
     fx # Terminal JSON viewer
