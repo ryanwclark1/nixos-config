@@ -43,10 +43,10 @@ in
         color_a3 = "#${palette.base0A}";
         color_a4 = "#${palette.base0B}";
         color_docker = "#${palette.base0C}";
-        color_green = "#98971a";
-        color_yellow = "#d79921";
-        color_purple = "#b16286";
-        color_red = "#cc241d";
+        color_green = "#${palette.base0B}";
+        color_yellow = "#${palette.base0A}";
+        color_purple = "#${palette.base0E}";
+        color_red = "#${palette.base08}";
       };
 
       palettes.nord_dark = {
@@ -336,13 +336,22 @@ in
       #   vimcmd_visual_symbol = "[](bold fg:color_yellow)";
       # };
 
+      # character = {
+      #   error_symbol = "[~~>](bold red)";
+      #   success_symbol = "[->>](bold green)";
+      #   vimcmd_symbol = "[<<-](bold yellow)";
+      #   vimcmd_visual_symbol = "[<<-](bold cyan)";
+      #   vimcmd_replace_symbol = "[<<-](bold purple)";
+      #   vimcmd_replace_one_symbol = "[<<-](bold purple)";
+      # };
+
       character = {
-        error_symbol = "[~~>](bold red)";
-        success_symbol = "[->>](bold green)";
-        vimcmd_symbol = "[<<-](bold yellow)";
-        vimcmd_visual_symbol = "[<<-](bold cyan)";
-        vimcmd_replace_symbol = "[<<-](bold purple)";
-        vimcmd_replace_one_symbol = "[<<-](bold purple)";
+        error_symbol = "[~>](bold red)";
+        success_symbol = "[](bold green)";
+        vimcmd_symbol = "[](bold yellow)";
+        vimcmd_visual_symbol = "[](bold cyan)";
+        vimcmd_replace_symbol = "[](bold purple)";
+        vimcmd_replace_one_symbol = "[](bold purple)";
       };
 
       cmd_duration = {
