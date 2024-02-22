@@ -3,35 +3,11 @@
 set -o noclobber -o noglob -o nounset -o pipefail
 IFS=$'\n'
 
-## If the option `use_preview_script` is set to `true`,
-## then this script will be called and its output will be displayed in ranger.
-## ANSI color codes are supported.
-## STDIN is disabled, so interactive scripts won't work properly
-
-## This script is considered a configuration file and must be updated manually.
-## It will be left untouched if you upgrade ranger.
-
-## Because of some automated testing we do on the script #'s for comments need
-## to be doubled up. Code that is commented out, because it's an alternative for
-## example, gets only one #.
-
-## Meanings of exit codes:
-## code | meaning    | action of ranger
-## -----+------------+-------------------------------------------
-## 0    | success    | Display stdout as preview
-## 1    | no preview | Display no preview at all
-## 2    | plain text | Display the plain content of the file
-## 3    | fix width  | Don't reload when width changes
-## 4    | fix height | Don't reload when height changes
-## 5    | fix both   | Don't ever reload
-## 6    | image      | Display the image `$IMAGE_CACHE_PATH` points to as an image preview
-## 7    | image      | Display the file directly as an image
-
 ## Script arguments
 FILE_PATH="${1}"         # Full path of the highlighted file
-PV_WIDTH="${2}"          # Width of the preview pane (number of fitting characters)
+# PV_WIDTH="${2}"          # Width of the preview pane (number of fitting characters)
 ## shellcheck disable=SC2034 # PV_HEIGHT is provided for convenience and unused
-PV_HEIGHT="${3}"         # Height of the preview pane (number of fitting characters)
+# PV_HEIGHT="${3}"         # Height of the preview pane (number of fitting characters)
 IMAGE_CACHE_PATH="${4}"  # Full path that should be used to cache image preview
 PV_IMAGE_ENABLED="${5}"  # 'True' if image previews are enabled, 'False' otherwise.
 
@@ -226,52 +202,7 @@ handle_image() {
             fi
             ;;
 
-        ## Preview archives using the first image inside.
-        ## (Very useful for comic book collections for example.)
-        # application/zip|application/x-rar|application/x-7z-compressed|\
-        #     application/x-xz|application/x-bzip2|application/x-gzip|application/x-tar)
-        #     local fn=""; local fe=""
-        #     local zip=""; local rar=""; local tar=""; local bsd=""
-        #     case "${mimetype}" in
-        #         application/zip) zip=1 ;;
-        #         application/x-rar) rar=1 ;;
-        #         application/x-7z-compressed) ;;
-        #         *) tar=1 ;;
-        #     esac
-        #     { [ "$tar" ] && fn=$(tar --list --file "${FILE_PATH}"); } || \
-        #     { fn=$(bsdtar --list --file "${FILE_PATH}") && bsd=1 && tar=""; } || \
-        #     { [ "$rar" ] && fn=$(unrar lb -p- -- "${FILE_PATH}"); } || \
-        #     { [ "$zip" ] && fn=$(zipinfo -1 -- "${FILE_PATH}"); } || return
-        #
-        #     fn=$(echo "$fn" | python -c "from __future__ import print_function; \
-        #             import sys; import mimetypes as m; \
-        #             [ print(l, end='') for l in sys.stdin if \
-        #               (m.guess_type(l[:-1])[0] or '').startswith('image/') ]" |\
-        #         sort -V | head -n 1)
-        #     [ "$fn" = "" ] && return
-        #     [ "$bsd" ] && fn=$(printf '%b' "$fn")
-        #
-        #     [ "$tar" ] && tar --extract --to-stdout \
-        #         --file "${FILE_PATH}" -- "$fn" > "${IMAGE_CACHE_PATH}" && exit 6
-        #     fe=$(echo -n "$fn" | sed 's/[][*?\]/\\\0/g')
-        #     [ "$bsd" ] && bsdtar --extract --to-stdout \
-        #         --file "${FILE_PATH}" -- "$fe" > "${IMAGE_CACHE_PATH}" && exit 6
-        #     [ "$bsd" ] || [ "$tar" ] && rm -- "${IMAGE_CACHE_PATH}"
-        #     [ "$rar" ] && unrar p -p- -inul -- "${FILE_PATH}" "$fn" > \
-        #         "${IMAGE_CACHE_PATH}" && exit 6
-        #     [ "$zip" ] && unzip -pP "" -- "${FILE_PATH}" "$fe" > \
-        #         "${IMAGE_CACHE_PATH}" && exit 6
-        #     [ "$rar" ] || [ "$zip" ] && rm -- "${IMAGE_CACHE_PATH}"
-        #     ;;
-    esac
 
-    # openscad_image() {
-    #     TMPPNG="$(mktemp -t XXXXXX.png)"
-    #     openscad --colorscheme="${OPENSCAD_COLORSCHEME}" \
-    #         --imgsize="${OPENSCAD_IMGSIZE/x/,}" \
-    #         -o "${TMPPNG}" "${1}"
-    #     mv "${TMPPNG}" "${IMAGE_CACHE_PATH}"
-    # }
 
     case "${FILE_EXTENSION_LOWER}" in
        ## 3D models
