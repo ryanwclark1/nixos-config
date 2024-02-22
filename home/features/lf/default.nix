@@ -15,6 +15,8 @@
     xlsx2csv
     librsvg
     chafa #for lf image previews
+    odt2txt
+    elinks
   ];
 
   # programs.zathura = {
@@ -109,7 +111,32 @@
     enable = true;
     previewer = {
       keybinding = "i";
-      source = .config/lf/pv.sh;
+      source = pkgs.writeShellScript "pv.sh" ''
+        #!/usr/bin/env bash
+
+        case "''${1,,}" in
+            a|ace|alz|arc|arj|bz|bz2|cab|cpio|deb|gz|jar|lha|lz|lzh|lzma|lzo|\
+            rpm|rz|tlz|txz|tZ|tzo|war|xpi|xz|Z)\
+              type archive >/dev/null 2>&1 && archive ${pkgs.atool}/bin/atool --list -- "$1"||
+              echo "ERROR: no atool program installed"
+              ;;
+            *.tar*|*.tbz|*.tbz2|*.tgz)
+              type tar >/dev/null 2>&1 && tar tf "$1"||
+              echo "ERROR: no tar program installed"
+              ;;
+            *.zip|*.7z|*.t7z|*.rar)
+              type zip >/dev/null 2>&1 &&  ${pkgs.p7zip}/bin/7z l "$1" | tail -n +15;;
+            *.pdf) ${pkgs.poppler_utils}/bin/pdftotext -l 10 -nopgbrk -q -- "$1" - | fmt -w $(tput cols);;
+            *.odt|*.sxw) ${pkgs.odt2txt}/bin/odt2txt "$1";;
+            *.ods|*.odp) ${pkgs.odt2txt}/bin/odt2txt "$1";;
+            *.htm|*.html|*.xhtml) ${pkgs.elinks}/bin/elinks -dump "$1";;
+            *.json) jq --color-output . "$1";;
+            *.dll|*.exe|*.ttf|*.woff|*.otf|*eot) ${pkgs.exiftool}/bin/exiftool "$1";;
+            *.xlsx) ${pkgs.xlsx2csv}/bin/xlsx2csv -"$1";;
+            *) ${pkgs.pistol}/bin/pistol "$1";;
+        esac
+
+      '';
     };
 
     settings = {
@@ -297,9 +324,10 @@
       source = ./colors;
       target = ".config/lf/colors";
     };
-    sv = {
+    pv = {
       source = ./pv.sh;
       target = ".config/lf/pv.sh";
+      executable = true;
     };
     mime_types = {
       source = ./mime.types;
