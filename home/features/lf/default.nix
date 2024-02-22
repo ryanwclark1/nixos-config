@@ -14,6 +14,7 @@
     ueberzugpp #for lf image previews
     xlsx2csv
     librsvg
+    chafa #for lf image previews
   ];
 
   # programs.zathura = {
@@ -108,7 +109,7 @@
     enable = true;
     previewer = {
       keybinding = "i";
-      source =  "${pkgs.pistol}/bin/pistol";
+      source = .config/lf/pv.sh;
     };
 
     settings = {
@@ -118,6 +119,7 @@
       icons = true;
       ignorecase = true;
       color256 = true;
+      sixel = true;
       shell = "sh";
       shellopts = "-eu";
     };
@@ -143,9 +145,18 @@
 
     commands = {
 
+      # Shows information in bottom bar
       on-select = ''
         &{{
             lf -remote "send $id set statfmt \"$(eza -ld --color=always "$f")\""
+        }}
+      '';
+
+      on-cd = ''
+        &{{
+          export STARSHIP_SHELL=
+          fmt="$(starship prompt)"
+          lf -remote "send $id set promptfmt \"$fmt\""
         }}
       '';
 
@@ -285,6 +296,14 @@
     lf_colors = {
       source = ./colors;
       target = ".config/lf/colors";
+    };
+    sv = {
+      source = ./pv.sh;
+      target = ".config/lf/pv.sh";
+    };
+    mime_types = {
+      source = ./mime.types;
+      target = ".config/lf/mime.types";
     };
   };
 

@@ -14,7 +14,7 @@ in
     package = pkgs.fzf;
     colors = {
       "fg" = "#${palette.base06}";
-      "bg" = "#${palette.base02}";
+      "bg" = "#${palette.base03}";
       "hl" = "#${palette.base0B}";
       "fg+" = "#${palette.base04}";
       "bg+" = "#${palette.base00}";

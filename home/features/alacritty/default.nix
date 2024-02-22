@@ -54,7 +54,7 @@ in
       #   "${pkgs.alacritty-theme}/themes/nord.yml"
       # ];
       colors = {
-        transparent_background_colors = true;
+        # transparent_background_colors = true;
         primary = {
           background = "#${palette.base00}";
           foreground = "#${palette.base05}";
