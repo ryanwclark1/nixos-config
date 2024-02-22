@@ -25,11 +25,14 @@
       keybinding = "i";
       source = pkgs.writeShellScript "pv.sh" ''
         #!/usr/bin/env bash
-        EXIF_TAGS="-FileName -FileSize -FileModifyDate -FilePermissions -FileType -FileTypeExtension -MIMEType -ImageSize"
+        EXIF_TAGS="-FileName -FileSize -FileModifyDate -FilePermissions -FileTypeExtension -MIMEType -ImageSize"
 
         MIMETYPE="$(file --dereference --brief --mime-type -- "$1")"
 
         case "$MIMETYPE" in
+          text/html)
+            ${pkgs.elinks}/bin/elinks dump "$1"
+            ;;
           text/*)
             ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n";${pkgs.bat}/bin/bat --style=plain --paging=never --color=always -- "$1"
             ;;
@@ -55,10 +58,9 @@
               ${pkgs.p7zip}/bin/7z l "$1" | awk '/  Date/{print}'
             ;;
           application/zip)
-              ${pkgs.atool}/bin/atool --list -- "$1"| sed '1i\Permissions\UID/GID\Size\Date\Time\FileName\n-------\-------\-------\-------\-------\-------'
+              ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n"; ${pkgs.atool}/bin/atool --list -- "$1"
             ;;
           application/gzip)
-
             ${pkgs.atool}/bin/atool --list -- "$1"| sed '1i\Permissions\UID/GID\Size\Date\Time\FileName\n-------\-------\-------\-------\-------\-------'
             ;;
           application/pdf)
@@ -101,9 +103,11 @@
             ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n";${pkgs.xlsx2csv}/bin/xlsx2csv -i -- "$1"
             ;;
           application/*)
+            ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n";
             echo "$1"
             ;;
           *)
+            ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n";
             echo "$1"
             ;;
         esac
