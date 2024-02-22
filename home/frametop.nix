@@ -19,16 +19,17 @@ in
     ./features/compression
     ./features/development
     ./features/eza
+    ./features/filesearch
     ./features/fzf
     ./features/games
     ./features/helix
-    ./features/nvim
     ./features/insomnia
     ./features/kitty
     ./features/kubernetes
     ./features/lf
     ./features/media
     ./features/networking-utils
+    ./features/nvim
     # ./features/pass
     ./features/productivity
     ./features/shell
