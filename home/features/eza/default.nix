@@ -12,7 +12,6 @@
     extraOptions = [
       "--group-directories-first"
       "--header"
-      "--total-size" # unix only
     ];
   };
 }
