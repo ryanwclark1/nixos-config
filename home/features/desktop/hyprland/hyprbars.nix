@@ -4,20 +4,20 @@
   pkgs,
   ...
 }:
-let
-  hyprbars = (pkgs.inputs.hyprland-plugins.hyprbars.override {
-    # Make sure it's using the same hyprland package as we are
-    hyprland = config.wayland.windowManager.hyprland.package;
-  }).overrideAttrs (old: {
-    # Yeet the initialization notification (I hate it)
-    postPatch = (old.postPatch or "") + ''
-      ${lib.getExe pkgs.gnused} -i '/Initialized successfully/d' main.cpp
-    '';
-  });
-in
+# let
+#   hyprbars = (pkgs.inputs.hyprland-plugins.hyprbars.override {
+#     # Make sure it's using the same hyprland package as we are
+#     hyprland = config.wayland.windowManager.hyprland.package;
+#   }).overrideAttrs (old: {
+#     # Yeet the initialization notification (I hate it)
+#     postPatch = (old.postPatch or "") + ''
+#       ${lib.getExe pkgs.gnused} -i '/Initialized successfully/d' main.cpp
+#     '';
+#   });
+# in
 {
   wayland.windowManager.hyprland = {
-    plugins = [ hyprbars ];
+    # plugins = [ hyprbars ];
     settings = {
       "plugin:hyprbars" = {
         bar_height = 25;

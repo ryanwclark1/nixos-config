@@ -26,10 +26,10 @@ in
     systemdTarget = "graphical-session.target";
     timeouts =
       # Lock screen
-      [{
-        timeout = lockTime;
-        command = "${swaylock} -i ${config.wallpaper} --daemonize --grace 15";
-      }] ++
+      # [{
+      #   timeout = lockTime;
+      #   command = "${swaylock} -i ${config.wallpaper} --daemonize --grace 15";
+      # }] ++
       # Mute mic
       (afterLockTimeout {
         timeout = 10;

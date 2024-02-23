@@ -10,7 +10,7 @@
     ../common
     ./wayland-wm
     ./basic-binds.nix
-    ./hyprbars.nix
+    # ./hyprbars.nix
   ];
 
   xdg.portal = {
@@ -19,8 +19,8 @@
   };
 
   home.packages = with pkgs; [
-    inputs.hyprwm-contrib.grimblast
-    hyprslurp
+    # inputs.hyprwm-contrib.grimblast
+    # hyprslurp
     hyprpicker
   ];
 
@@ -53,7 +53,7 @@
         };
       };
       input = {
-        kb_layout = "br,us";
+        kb_layout = "us";
         touchpad.disable_while_typing = false;
       };
       dwindle.split_width_multiplier = 1.35;
@@ -109,24 +109,24 @@
         ];
       };
 
-      exec = [
-        "${pkgs.swaybg}/bin/swaybg -i ${config.wallpaper} --mode fill"
-      ];
+      # exec = [
+      #   "${pkgs.swaybg}/bin/swaybg -i ${config.wallpaper} --mode fill"
+      # ];
 
       bind =
         let
           swaylock = "${config.programs.swaylock.package}/bin/swaylock";
           playerctl = "${config.services.playerctld.package}/bin/playerctl";
           playerctld = "${config.services.playerctld.package}/bin/playerctld";
-          makoctl = "${config.services.mako.package}/bin/makoctl";
+          # makoctl = "${config.services.mako.package}/bin/makoctl";
           wofi = "${config.programs.wofi.package}/bin/wofi";
-          pass-wofi = "${pkgs.pass-wofi.override {
-          pass = config.programs.password-store.package;
-        }}/bin/pass-wofi";
+        #   pass-wofi = "${pkgs.pass-wofi.override {
+        #   pass = config.programs.password-store.package;
+        # }}/bin/pass-wofi";
 
-          grimblast = "${pkgs.inputs.hyprwm-contrib.grimblast}/bin/grimblast";
+          # grimblast = "${pkgs.inputs.hyprwm-contrib.grimblast}/bin/grimblast";
           pactl = "${pkgs.pulseaudio}/bin/pactl";
-          tly = "${pkgs.tly}/bin/tly";
+          # tly = "${pkgs.tly}/bin/tly";
           gtk-play = "${pkgs.libcanberra-gtk3}/bin/canberra-gtk-play";
           notify-send = "${pkgs.libnotify}/bin/notify-send";
 
@@ -134,7 +134,8 @@
           xdg-mime = "${pkgs.xdg-utils}/bin/xdg-mime";
           defaultApp = type: "${gtk-launch} $(${xdg-mime} query default ${type})";
 
-          terminal = config.home.sessionVariables.TERMINAL;
+          # terminal = config.home.sessionVariables.TERMINAL;
+          terminal = "${pkgs.alacritty}/bin/alacritty";
           browser = defaultApp "x-scheme-handler/https";
           editor = defaultApp "text/plain";
         in
@@ -154,16 +155,16 @@
           "SHIFT,XF86AudioMute,exec,${pactl} set-source-mute @DEFAULT_SOURCE@ toggle"
           ",XF86AudioMicMute,exec,${pactl} set-source-mute @DEFAULT_SOURCE@ toggle"
           # Screenshotting
-          ",Print,exec,${grimblast} --notify --freeze copy output"
-          "SHIFT,Print,exec,${grimblast} --notify --freeze copy active"
-          "CONTROL,Print,exec,${grimblast} --notify --freeze copy screen"
-          "SUPER,Print,exec,${grimblast} --notify --freeze copy area"
-          "ALT,Print,exec,${grimblast} --notify --freeze copy area"
+          # ",Print,exec,${grimblast} --notify --freeze copy output"
+          # "SHIFT,Print,exec,${grimblast} --notify --freeze copy active"
+          # "CONTROL,Print,exec,${grimblast} --notify --freeze copy screen"
+          # "SUPER,Print,exec,${grimblast} --notify --freeze copy area"
+          # "ALT,Print,exec,${grimblast} --notify --freeze copy area"
           # Tally counter
-          "SUPER,z,exec,${notify-send} -t 1000 $(${tly} time) && ${tly} add && ${gtk-play} -i dialog-information" # Add new entry
-          "SUPERCONTROL,z,exec,${notify-send} -t 1000 $(${tly} time) && ${tly} undo && ${gtk-play} -i dialog-warning" # Undo last entry
-          "SUPERCONTROLSHIFT,z,exec,${tly} reset && ${gtk-play} -i complete" # Reset
-          "SUPERSHIFT,z,exec,${notify-send} -t 1000 $(${tly} time)" # Show current time
+          # "SUPER,z,exec,${notify-send} -t 1000 $(${tly} time) && ${tly} add && ${gtk-play} -i dialog-information" # Add new entry
+          # "SUPERCONTROL,z,exec,${notify-send} -t 1000 $(${tly} time) && ${tly} undo && ${gtk-play} -i dialog-warning" # Undo last entry
+          # "SUPERCONTROLSHIFT,z,exec,${tly} reset && ${gtk-play} -i complete" # Reset
+          # "SUPERSHIFT,z,exec,${notify-send} -t 1000 $(${tly} time)" # Show current time
         ] ++
 
         (lib.optionals config.services.playerctld.enable [
@@ -183,17 +184,17 @@
           "SUPER,backspace,exec,${swaylock} -S --grace 2"
         ]) ++
         # Notification manager
-        (lib.optionals config.services.mako.enable [
-          "SUPER,w,exec,${makoctl} dismiss"
-        ]) ++
+        # (lib.optionals config.services.mako.enable [
+        #   "SUPER,w,exec,${makoctl} dismiss"
+        # ]) ++
 
         # Launcher
         (lib.optionals config.programs.wofi.enable [
           "SUPER,x,exec,${wofi} -S drun -x 10 -y 10 -W 25% -H 60%"
           "SUPER,d,exec,${wofi} -S run"
         ] ++ (lib.optionals config.programs.password-store.enable [
-          ",Scroll_Lock,exec,${pass-wofi}" # fn+k
-          ",XF86Calculator,exec,${pass-wofi}" # fn+f12
+          # ",Scroll_Lock,exec,${pass-wofi}" # fn+k
+          # ",XF86Calculator,exec,${pass-wofi}" # fn+f12
           "SUPER,semicolon,exec,pass-wofi"
         ]));
 

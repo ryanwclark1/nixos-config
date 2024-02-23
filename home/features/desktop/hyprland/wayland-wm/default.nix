@@ -6,7 +6,7 @@
   imports = [
     ./hyprland-vnc.nix
     ./gammastep.nix
-    ./mako.nix
+    # ./mako.nix
     ./qutebrowser.nix
     ./swayidle.nix
     ./swaylock.nix
@@ -28,7 +28,8 @@
     wf-recorder
     wl-clipboard
     wl-mirror
-    xdg-utils-spawn-terminal # Patched to open terminal
+    xdg-utils
+    # xdg-utils-spawn-terminal # Patched to open terminal
     ydotool
   ];
 
