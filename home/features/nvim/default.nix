@@ -45,6 +45,10 @@ in
         plugin = comment-nvim;
         config = toLua "require(\"Comment\").setup()";
       }
+      {
+        plugin = nord-nvim;
+        config = "colorscheme nord";
+      }
 
       # {
       #   plugin = gruvbox-nvim;
