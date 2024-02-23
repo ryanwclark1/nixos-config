@@ -18,7 +18,7 @@
     ./network.nix
     ./nix-index.nix
     ./nixtools.nix
-    ./screen.nix
+    # ./screen.nix
     # ./shellcolor.nix
     # ./ssh.nix
     # ./xpo.nix
@@ -41,7 +41,7 @@
     d2 #diagram
     zk # note taking
     trashy #cli rm with trash support
-    wget 
+    wget
     hurl # httpie/curl alternative
     httpie # Better curl
     fx # Terminal JSON viewer
