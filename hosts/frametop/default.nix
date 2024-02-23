@@ -46,9 +46,9 @@
 
   services = {
     fwupd.enable = true;
-    fprintd = {
-      enable = true;
-    };
+    # fprintd = {
+    #   enable = true;
+    # };
     logind = {
       # Lid settings
       lidSwitch = "suspend";
