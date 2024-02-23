@@ -10,13 +10,14 @@
     exiftool #A program that shows the metadata of files.
     mediainfo
     poppler_utils #pdftotext and pdfinfo
-    hexyl
     epub2txt2
-    xlsx2csv
+    xlsx2csv #for xlsx files
     librsvg
     chafa #for lf image previews
     odt2txt
     elinks
+    hexyl
+    notcurses
   ];
 
   programs.lf = {
@@ -31,19 +32,20 @@
 
         case "$MIMETYPE" in
           text/html)
-            ${pkgs.elinks}/bin/elinks dump "$1"
+            ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n"; ${pkgs.elinks}/bin/elinks dump "$1"
             ;;
           text/*)
-            ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n";${pkgs.bat}/bin/bat --style=plain --paging=never --color=always -- "$1"
+            ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n"; ${pkgs.bat}/bin/bat --style=plain --paging=never --color=always -- "$1"
             ;;
           image/*)
+            # kitty chafa format is not working.
             case "$TERM" in
               *kitty)
                 CHAFA_FORMAT="kitty";;
               *)
                 CHAFA_FORMAT="symbols";;
             esac
-            ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n"; ${pkgs.chafa}/bin/chafa --format=$CHAFA_FORMAT -- "$1"
+            ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n"; ${pkgs.chafa}/bin/chafa --format=symbols -- "$1"
             ;;
           video/*)
             ${pkgs.mediainfo}/bin/mediainfo -- "$1"
@@ -52,22 +54,22 @@
             ${pkgs.mediainfo}/bin/mediainfo -- "$1"
             ;;
           application/json)
-            ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n"; ${pkgs.jq}/bin/jq --color-output . "$1"
+            ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n"; ${pkgs.jq}/bin/jq --color-output . "$1" | head -n 100
             ;;
           application/x-7z-compressed|application/x-bzip|application/x-bzip2)
-              ${pkgs.p7zip}/bin/7z l "$1" | awk '/  Date/{print}'
+              ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1";echo -e "\n"; ${pkgs.p7zip}/bin/7z l "$1" | awk '/  Date/{print}'
             ;;
           application/zip)
               ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n"; ${pkgs.atool}/bin/atool --list -- "$1"
             ;;
-          application/gzip)
-            ${pkgs.atool}/bin/atool --list -- "$1"| sed '1i\Permissions\UID/GID\Size\Date\Time\FileName\n-------\-------\-------\-------\-------\-------'
+          application/gzip|application/x-xz)
+            ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1";echo -e "\n"; ${pkgs.atool}/bin/atool --list -- "$1"| sed '\Permission\tUID/GID\t\tSize\tDate\tTime\tFileName\n---------\t-------\t\t----\t----\t----\t--------'
             ;;
           application/pdf)
-            ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n";${pkgs.poppler_utils}/bin/pdftotext -l 4 -nopgbrk -q -- "$1" - | fmt -w $(tput cols)
+            ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n"; ${pkgs.poppler_utils}/bin/pdftotext -l 4 -nopgbrk -q -- "$1" - | fmt -w $(tput cols)
             ;;
           application/epub+zip)
-            ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n";${pkgs.epub2txt2}/bin/epub2txt "$1"
+            ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n"; ${pkgs.epub2txt2}/bin/epub2txt "$1"
             ;;
           application/x-msdownload)
             ${pkgs.exiftool}/bin/exiftool "$1"
@@ -93,22 +95,21 @@
           application/vnd.ms-fontobject)
             ${pkgs.exiftool}/bin/exiftool "$1"
             ;;
-          application/vnd.ms-excel)
-            ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n";${pkgs.xlsx2csv}/bin/xlsx2csv -i -- "$1"
-            ;;
           application/vnd.openxmlformats-officedocument.spreadsheetml.sheet)
-            ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n";${pkgs.xlsx2csv}/bin/xlsx2csv -i -- "$1"
+            ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n"; ${pkgs.xlsx2csv}/bin/xlsx2csv -i -- "$1"
             ;;
           application/vnd.ms-excel)
-            ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n";${pkgs.xlsx2csv}/bin/xlsx2csv -i -- "$1"
+            ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n"; ${pkgs.xlsx2csv}/bin/xlsx2csv -i -- "$1"
+            ;;
+          application/vnd.sqlite3)
+            # open sqlite3 database and show table names in the terminal
+            ${pkgs.exiftool}/bin/exiftool "$1"; echo -e "\n"; sqlite3 "$1" ".tables";echo "$MIMETYPE"; echo "$1"
             ;;
           application/*)
-            ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n";
-            echo "$1"
+            ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n"; echo "$MIMETYPE"; echo "$1"
             ;;
           *)
-            ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n";
-            echo "$1"
+            ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n"; echo "$MIMETYPE"; echo "$1"
             ;;
         esac
 
@@ -299,11 +300,6 @@
     lf_colors = {
       source = ./colors;
       target = ".config/lf/colors";
-    };
-    pv = {
-      source = ./pv.sh;
-      target = ".config/lf/pv.sh";
-      executable = true;
     };
     mime_types = {
       source = ./mime.types;
