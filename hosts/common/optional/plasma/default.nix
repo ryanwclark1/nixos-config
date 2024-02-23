@@ -5,29 +5,31 @@
 
 
 {
-  services.xserver = {
-    enable = true;
-    xkb.layout = "us";
-    xkb.variant = "";
-    # Enable the Plasma Desktop Environment.
-    displayManager = {
-      defaultSession = "plasmawayland";
-      sddm = {
-        enable = true;
-        wayland.enable = true;
-      };
-    };
-    desktopManager = {
-      plasma5 = {
-        enable = true;
-        useQtScaling = true;
-      };
-    };
-    libinput = {
+  services = {
+    xserver = {
       enable = true;
-      touchpad = {
-        naturalScrolling = true;
-        scrollMethod = "twofinger";
+      xkb.layout = "us";
+      xkb.variant = "";
+      # Enable the Plasma Desktop Environment.
+      displayManager = {
+        defaultSession = "plasmawayland";
+        sddm = {
+          enable = true;
+          wayland.enable = true;
+        };
+      };
+      desktopManager = {
+        plasma5 = {
+          enable = true;
+          useQtScaling = true;
+        };
+      };
+      libinput = {
+        enable = true;
+        touchpad = {
+          naturalScrolling = true;
+          scrollMethod = "twofinger";
+        };
       };
     };
   };
