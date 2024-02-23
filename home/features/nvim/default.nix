@@ -25,7 +25,6 @@ in
     defaultEditor = true;
     viAlias = true;
     vimAlias = true;
-    vimDiffAlias = true;
 
     extraPackages = with pkgs; [
       lua-language-server
