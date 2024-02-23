@@ -7,7 +7,7 @@
 
 {
   imports = [
-    ../common
+    # ../common
     ./waybar.nix
     # ./wayland-wm
     # ./basic-binds.nix
@@ -73,9 +73,6 @@
     glibc
     hugo
     gnumake
-    ninja
-    godot_4
-    rustup
     pavucontrol
     audacity
     zeroad
@@ -99,10 +96,14 @@
     name = "Bibata-Modern-Ice";
     size = 24;
   };
-  qt.enable = true;
-  qt.platformTheme = "gtk";
-  qt.style.name = "adwaita-dark";
-  qt.style.package = pkgs.adwaita-qt;
+  qt = {
+    enable = true;
+    platformTheme = "gtk";
+    style = {
+      name = "adwaita-dark";
+      package = pkgs.adwaita-qt;
+    };
+  };
   gtk = {
     enable = true;
     font = {
