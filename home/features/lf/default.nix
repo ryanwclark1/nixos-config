@@ -25,7 +25,7 @@
     previewer = {
       keybinding = "i";
       source = pkgs.writeShellScript "pv.sh" ''
-        #!/bin/sh
+        #!/usr/bin/env bash
         case "''${1,,}" in
             *) ${pkgs.pistol}/bin/pistol "$1";;
         esac
