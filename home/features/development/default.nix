@@ -13,6 +13,7 @@
     ./grpc.nix
     ./js.nix
     ./lazygit.nix
+    ./lua.nix
     ./nixdev.nix
     ./protobuf.nix
     ./python.nix
