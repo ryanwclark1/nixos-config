@@ -1,7 +1,7 @@
 -- Lualine
 require("lualine").setup({
     icons_enabled = true,
-    -- theme = 'onedark',
+    theme = 'nord',
 })
 
 -- Comment
