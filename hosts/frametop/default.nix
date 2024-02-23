@@ -84,6 +84,7 @@
     # EC-Tool adjusted for usage with framework embedded controller.
     fw-ectool
     gcc
+    git
   ];
 
 
