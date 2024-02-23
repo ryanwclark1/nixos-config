@@ -9,6 +9,7 @@ let
   inherit (config.colorscheme) palette;
 in
 {
+# source = pkgs.writeShellScript "pv.sh" ''
   programs.fzf = {
     enable = true;
     package = pkgs.fzf;
