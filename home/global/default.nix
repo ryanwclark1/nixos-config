@@ -8,7 +8,7 @@
 }:
 let
   inherit (inputs.nix-colors) colorSchemes;
-  inherit (inputs.nix-colors.lib-contrib { inherit pkgs; }) nixWallpaperFromScheme;
+  # inherit (inputs.nix-colors.lib-contrib { inherit pkgs; }) nixWallpaperFromScheme;
 in
 {
   imports = [
@@ -64,19 +64,19 @@ in
     ".colorscheme.json".text = builtins.toJSON config.colorscheme;
   };
 
-  wallpaper =
-    let
-      largest = f: xs: builtins.head (builtins.sort (a: b: a > b) (map f xs));
-      largestWidth = largest (x: x.width) config.monitors;
-      largestHeight = largest (x: x.height) config.monitors;
-    in
-    lib.mkDefault (nixWallpaperFromScheme
-      {
-        scheme = config.colorscheme;
-        width = largestWidth;
-        height = largestHeight;
-        logoScale = 4;
-      });
+  # wallpaper =
+  #   let
+  #     largest = f: xs: builtins.head (builtins.sort (a: b: a > b) (map f xs));
+  #     largestWidth = largest (x: x.width) config.monitors;
+  #     largestHeight = largest (x: x.height) config.monitors;
+  #   in
+  #   lib.mkDefault (nixWallpaperFromScheme
+  #     {
+  #       scheme = config.colorscheme;
+  #       width = largestWidth;
+  #       height = largestHeight;
+  #       logoScale = 4;
+  #     });
 
   home.packages =
     let
