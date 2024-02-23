@@ -122,16 +122,5 @@
         require('colorizer').setup{}
       '';
     }
-    {
-      plugin = fidget-nvim;
-      type = "lua";
-      config = /* lua */ ''
-        require('fidget').setup{
-          text = {
-            spinner = "dots",
-          },
-        }
-      '';
-    }
   ];
 }
