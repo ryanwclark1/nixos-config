@@ -1,6 +1,7 @@
-{ config
-, pkgs
-, ...
+{
+  config,
+  pkgs,
+  ...
 }:
 let
   color = pkgs.writeText "color.vim" (import ./theme.nix config.colorscheme);
@@ -12,7 +13,7 @@ in
     ./ui.nix
     ./copilot.nix
   ];
-  # home.sessionVariables.EDITOR = "nvim";
+  home.sessionVariables.EDITOR = "nvim";
 
   programs.neovim = {
     enable = true;
@@ -22,6 +23,9 @@ in
       set clipboard=unnamedplus
       "Source colorscheme
       source ${color}
+
+      "Lets us easily trigger completion from binds
+      set wildcharm=<tab>
 
       "Set fold level to highest in file
       "so everything starts out unfolded at just the right level
@@ -66,9 +70,17 @@ in
       nmap <C-k> <C-y>
 
       "Buffers
+      nmap <space>b :buffers<CR>
       nmap <C-l> :bnext<CR>
       nmap <C-h> :bprev<CR>
       nmap <C-q> :bdel<CR>
+
+      "Navigate
+      nmap <space>e :e<space>
+      nmap <space>e :e %:h<tab>
+      "CD to current dir
+      nmap <space>c :cd<space>
+      nmap <space>C :cd %:h<tab>
 
       "Loclist
       nmap <space>l :lwindow<cr>
@@ -110,10 +122,10 @@ in
       vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { desc = "Go to implementation" })
       vim.keymap.set("n", "<space>f", vim.lsp.buf.format, { desc = "Format code" })
       vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover Documentation" })
-      vim.keymap.set("n", "<space>c", vim.lsp.buf.code_action, { desc = "Code action" })
+      vim.keymap.set("n", "<space>a", vim.lsp.buf.code_action, { desc = "Code action" })
 
       -- Diagnostic
-      vim.keymap.set("n", "<space>e", vim.diagnostic.open_float, { desc = "Floating diagnostic" })
+      vim.keymap.set("n", "<space>d", vim.diagnostic.open_float, { desc = "Floating diagnostic" })
       vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
       vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
       vim.keymap.set("n", "gl", vim.diagnostic.setloclist, { desc = "Diagnostics on loclist" })
@@ -140,13 +152,40 @@ in
           require('nvim-autopairs').setup{}
         '';
       }
+      {
+        plugin = oil-nvim;
+        type = "lua";
+        config = /* lua */ ''
+        require('oil').setup{
+          buf_options = {
+            buflisted = true,
+            bufhidden = "delete",
+          },
+          cleanup_delay_ms = false,
+          use_default_keymaps = false,
+          keymaps = {
+            ["<CR>"] = "actions.select",
+            ["-"] = "actions.parent",
+            ["_"] = "actions.open_cwd",
+            ["`"] = "actions.cd",
+            ["~"] = "actions.tcd",
+            ["gc"] = "actions.close",
+            ["gr"] = "actions.refresh",
+            ["gs"] = "actions.change_sort",
+            ["gx"] = "actions.open_external",
+            ["g."] = "actions.toggle_hidden",
+            ["g\\"] = "actions.toggle_trash",
+          },
+        }
+        '';
+      }
     ];
   };
 
   xdg.configFile."nvim/init.lua".onChange = /* bash */ ''
     XDG_RUNTIME_DIR=''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
     for server in $XDG_RUNTIME_DIR/nvim.*; do
-      nvim --server $server --remote-send ':source $MYVIMRC<CR>' &
+      nvim --server $server --remote-send '<Esc>:source $MYVIMRC<CR>' &
     done
   '';
 
