@@ -12,11 +12,9 @@
   ];
 
   home = {
-    file.".config/stinger.mov".source = ./media/stinger.mov;
     file.".config/pipewire/pipewire.conf".source = ./config/pipewire/pipewire.conf;
     file.".vimrc".source = ./config/vimrc;
     file.".emoji".source = ./config/emoji;
-    file.".face".source = ./config/face.jpg;
     file."Pictures/Wallpapers" = {
       source = ./media/wallpapers;
       recursive = true;
