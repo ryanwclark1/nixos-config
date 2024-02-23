@@ -72,6 +72,7 @@
 
   environment.systemPackages = with pkgs; [
     gcc
+    git
   ];
 
   system.stateVersion = "23.11";
