@@ -55,6 +55,7 @@
         dbaeumer.vscode-eslint
         # vscode-extension-dbaeumer-vscode-eslint
 
+        vscodevim.vim
         # vscode-icons-team.vscode-icons
       ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
         {
@@ -78,6 +79,7 @@
       ];
 
       userSettings = {
+        "accessibilitySupport.voice.keywordActivation" = "chatInView";
         "breadcrumbs.enabled" = true;
         "editor.fontFamily" = "JetBrainsMono Nerd Font";
         "editor.fontLigatures" = true;
@@ -112,14 +114,14 @@
         # Nix IDE
         "nix.enableLanguageServer" = true;
         "nix.serverPath" = "${pkgs.nil}/bin/nil";
-        "nix.serverSettings".nil = {
-          formatting.command = [ "nix" "fmt" "--" "-" ];
-          nix.flake = {
-            autoArchive = false;
-            autoEvalInputs = false;
-            nixpkgsInputName = null;
-          };
-        };
+        # "nix.serverSettings".nil = {
+        #   formatting.command = [ "nix" "fmt" "--" "-" ];
+        #   nix.flake = {
+        #     autoArchive = false;
+        #     autoEvalInputs = false;
+        #     nixpkgsInputName = null;
+        #   };
+        # };
         "redhat.telemetry.enabled" = false;
         # Even Better TOML
         "evenBetterToml.taplo.bundled" = false;
@@ -154,7 +156,6 @@
         "vscode-kubernetes.log-viewer.follow" = true;
         "vscode-kubernetes.log-viewer.timestamp" = true;
         "vsdocker.imageUser" = "docker.io/ryanwclark";
-        # "nix.serverPath" = "nil";
         "tabby.usage.anonymousUsageTracking" = true; # this settings actually disables telemetry (pretty weird naming)
         "github.copilot.advanced" = {
           "listCount" = 3;
