@@ -24,11 +24,11 @@
       vim-markdown
       vim-nix
       vim-toml
-      # vim-syntax-shakespeare
-      # gemini-vim-syntax
+      vim-syntax-shakespeare
+      gemini-vim-syntax
       kotlin-vim
       haskell-vim
-      # mermaid-vim
+      mermaid-vim
       pgsql-vim
       vim-terraform
       vim-jsx-typescript
@@ -43,7 +43,7 @@
 
       # Tree sitter
       {
-        plugin = nvim-treesitter;
+        plugin = nvim-treesitter.withAllGrammars;
         type = "lua";
         config = /* lua */ ''
           require('nvim-treesitter.configs').setup{
