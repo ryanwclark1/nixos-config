@@ -12,6 +12,7 @@ in
     ./syntaxes.nix
     ./ui.nix
     ./copilot.nix
+    # ../../../pkgs/vim-plugins
   ];
   home.sessionVariables.EDITOR = "nvim";
 
