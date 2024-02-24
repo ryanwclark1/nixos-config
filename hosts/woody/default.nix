@@ -10,8 +10,9 @@
     # inputs.hardware.nixosModules.common-pc-ssd
     inputs.vscode-server.nixosModules.default
     ./hardware-configuration.nix
-    ../common/global
+    ./services
 
+    ../common/global
     ../common/users/administrator
 
     ../common/optional/bluetooth.nix
