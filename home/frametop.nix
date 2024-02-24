@@ -9,9 +9,9 @@ in
 {
   imports = [
     ./global
-    ./features/desktop/hyprland
+    # ./features/desktop/hyprland
     ./features/desktop/plasma
-    # ./features/desktop/common
+    ./features/desktop/common
 
     ./features/alacritty
     ./features/build
