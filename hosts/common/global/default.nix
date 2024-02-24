@@ -9,14 +9,15 @@
   imports = [
     inputs.home-manager.nixosModules.home-manager
     # ./auto-upgrade.nix
+    ./fish.nix
     ./fonts.nix
     ./locale.nix
-    ./networking.nix
+    # ./networking.nix
     ./nix.nix
     ./openssh.nix
     ./sops.nix
+    ./systemd-initrd.nix
     # ./ssh-serve-store.nix
-    ./systemd-boot.nix
     ./tailscale.nix
   ] ++ (builtins.attrValues outputs.nixosModules);
 
@@ -29,8 +30,7 @@
     };
   };
 
-  # Fix for qt6 plugins
-  # TODO: maybe upstream this?
+
   environment.profileRelativeSessionVariables = {
     QT_PLUGIN_PATH = [ "/lib/qt-6/plugins" ];
   };
