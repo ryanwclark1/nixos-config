@@ -5,6 +5,15 @@
 
 
 {
+
+
+  # programs.kdeconnect.enable = true;
+  programs = {
+    thunar.enable = true;
+    dconf.enable = true;
+    kdeconnect.enable = true;
+  };
+
   services = {
     xserver = {
       enable = true;
@@ -34,8 +43,9 @@
     };
   };
 
-  # programs.kdeconnect.enable = true;
-  programs.thunar.enable = true;
+  environment.sessionVariables ={
+    NIXOS_OZONE_WL = "1";
+  };
 
   environment.systemPackages = with pkgs; [
     # Packages installed
