@@ -36,6 +36,7 @@
 
   boot = {
     kernelPackages = pkgs.linuxKernel.packages.linux_zen;
+    initrd.kernelModules = [ "amdgpu" ];
     binfmt.emulatedSystems = [ "aarch64-linux" "i686-linux" ];
   };
 
@@ -44,6 +45,12 @@
       enable = true;
       driSupport = true;
       driSupport32Bit = true;
+      extraPackages = with pkgs; [
+        amdvlk
+      ];
+      extraPackages32 = with pkgs; [
+        driversi686Linux.amdvlk
+      ];
     };
 
     logitech = {
