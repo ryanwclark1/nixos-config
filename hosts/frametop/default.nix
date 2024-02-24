@@ -73,10 +73,10 @@
       };
     };
 
-    enableRedistributableFirmware = true;
+    # enableRedistributableFirmware = true;
   };
 
-  security.pam.services.login.fprintAuth = true;
+  # security.pam.services.login.fprintAuth = true;
 
   # Enable Wayland support
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
@@ -88,5 +88,5 @@
   ];
 
 
-  system.stateVersion = "23.11";
+  system.stateVersion = "24.05";
 }
