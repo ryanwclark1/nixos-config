@@ -53,11 +53,6 @@
     };
   };
 
-  security.pam.services.login.enableGnomeKeyring = true;
-
-  # Enable Wayland support
-  
-
   environment.systemPackages = with pkgs; [
     gcc
     git

@@ -87,7 +87,7 @@
   # ensure gnome-settings-daemon udev rules are enabled
   services.udev.packages = with pkgs; [ gnome.gnome-settings-daemon ];
 
-  # Temp, find better place.  Allows for copy/paste between host and guest.
-  services.spice-vdagentd.enable = true;
+  security.pam.services.login.enableGnomeKeyring = true;
+
 
 }
