@@ -38,18 +38,6 @@
     binfmt.emulatedSystems = [ "aarch64-linux" "i686-linux" ];
   };
 
-  programs = {
-    adb.enable = true;
-    dconf.enable = true;
-  };
-
-  services = {
-    vscode-server = {
-      enable = true;
-    };
-    # xserver.videoDrivers = [ "amdgpu" ];
-  };
-
   hardware = {
     opengl = {
       enable = true;
@@ -68,7 +56,7 @@
   security.pam.services.login.enableGnomeKeyring = true;
 
   # Enable Wayland support
-  environment.sessionVariables.NIXOS_OZONE_WL = "1";
+  
 
   environment.systemPackages = with pkgs; [
     gcc
