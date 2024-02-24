@@ -35,9 +35,14 @@
     in
     {
       inherit lib;
+
       nixosModules = import ./modules/nixos;
       homeManagerModules = import ./modules/home-manager;
       templates = import ./templates;
+
+      overlays = {
+        nixpkgs = import ./overlays/nixpkgs.nix;
+      };
 
       packages = forEachSystem (pkgs: import ./pkgs { inherit pkgs; });
       devShells = forEachSystem (pkgs: import ./shell.nix { inherit pkgs; });
