@@ -21,6 +21,7 @@
     ../common/optional/printing.nix
     ../common/optional/qemu.nix
     ../common/optional/steam.nix
+    ../common/optional/systemd-boot.nix
     ../common/optional/wireshark.nix
 
     # ../common/optional/hyprland
@@ -56,9 +57,6 @@
 
   };
 
-
-  # Enable Wayland support
-  environment.sessionVariables.NIXOS_OZONE_WL = "1";
   environment.systemPackages = with pkgs; [
     # EC-Tool adjusted for usage with framework embedded controller.
     fw-ectool
