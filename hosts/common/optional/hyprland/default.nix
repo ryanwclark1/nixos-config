@@ -4,6 +4,20 @@
 
 
 {
+
+  programs = {
+    hyprland = {
+      enable = true;
+    };
+    mtr.enable = true;
+    gnupg.agent = {
+      enable = true;
+      enableSSHSupport = true;
+    };
+    dconf.enable = true;
+    thunar.enable = true;
+  };
+
   services = {
     xserver = {
       enable = true;
@@ -21,32 +35,13 @@
         };
 
       };
-      libinput = {
-        enable = true;
-        touchpad = {
-          naturalScrolling = true;
-          scrollMethod = "twofinger";
-        };
-      };
+
     };
 
   };
 
-  programs = {
-    hyprland = {
-      enable = true;
-    };
-    mtr.enable = true;
-    gnupg.agent = {
-      enable = true;
-      enableSSHSupport = true;
-    };
-  };
 
-
-  programs.thunar.enable = true;
-
-  environment.variables = {
+  environment.variables.sessionVariables = {
     NIXOS_OZONE_WL = "1";
     PATH = [
       "\${HOME}/.local/bin"
