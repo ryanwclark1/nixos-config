@@ -8,7 +8,7 @@
 }:
 let
   inherit (inputs.nix-colors) colorSchemes;
-  # inherit (inputs.nix-colors.lib-contrib { inherit pkgs; }) nixWallpaperFromScheme;
+  inherit (inputs.nix-colors.lib-contrib { inherit pkgs; }) nixWallpaperFromScheme;
 in
 {
   imports = [
@@ -19,7 +19,7 @@ in
   ] ++ (builtins.attrValues outputs.homeManagerModules);
 
   nixpkgs = {
-    # overlays = builtins.attrValues outputs.overlays;
+    overlays = builtins.attrValues outputs.overlays;
     config = {
       allowUnfree = true;
       allowUnfreePredicate = (_: true);
@@ -44,7 +44,7 @@ in
   home = {
     username = lib.mkDefault "administrator";
     homeDirectory = lib.mkDefault "/home/${config.home.username}";
-    stateVersion = lib.mkDefault "23.11";
+    stateVersion = lib.mkDefault "24.05";
     sessionPath = [ "$HOME/.local/bin" ];
     sessionVariables = {
       FLAKE = "$HOME/nixos-config";
