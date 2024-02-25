@@ -4,7 +4,10 @@
 }:
 
 {
-  import = inputs.vscode-server.nixosModules.default
+  import = [
+    inputs.vscode-server.nixosModules.default
+  ];
+
   services = {
     vscode-server = {
       enable = true;
