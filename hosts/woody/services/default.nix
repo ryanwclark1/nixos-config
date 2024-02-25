@@ -1,8 +1,10 @@
 {
+  inputs,
   ...
 }:
 
 {
+  import = inputs.vscode-server.nixosModules.default
   services = {
     vscode-server = {
       enable = true;
@@ -12,7 +14,4 @@
     spice-vdagentd.enable = true;
     xserver.videoDrivers = [ "amdgpu" ];
   };
-
-
-
 }
