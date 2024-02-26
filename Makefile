@@ -55,6 +55,24 @@ get_age_public_key:
 		echo "Age public key does not exist. Skipping..."; \
 	fi
 
+###########################################################################
+#
+#  Make Secrets
+#
+############################################################################
+
+.PHONY: ask-path secrets
+
+ask-path:
+	@echo "Enter the path to the secrets.yaml file: "
+	@read SECRETS_PATH; \
+	echo "You entered: $$SECRETS_PATH"
+
+secrets:
+	ask-path
+	@echo "Creating secrets..."
+	@nix --experimental-features 'nix-command flakes' run nixpkgs#sops secrets.yaml > $(SECRETS_PATH)
+
 
 ############################################################################
 #
