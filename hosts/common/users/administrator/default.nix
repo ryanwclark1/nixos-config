@@ -11,7 +11,7 @@ in
   # users.mutableUsers = false;
   users.users.administrator = {
     isNormalUser = true;
-    shell = "${pkgs.zsh}/bin/bash";
+    shell = "${pkgs.zsh}/bin/zsh";
     extraGroups = [
       "wheel"
       "video"
