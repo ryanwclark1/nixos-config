@@ -61,17 +61,30 @@ get_age_public_key:
 #
 ############################################################################
 
-.PHONY: ask-path secrets
-
-ask-path:
-	@echo "Enter the path to the secrets.yaml file: "
-	@read SECRETS_PATH; \
-	echo "You entered: $$SECRETS_PATH"
+.PHONY: secrets
 
 secrets:
-	ask-path
-	@echo "Creating secrets..."
-	@nix --experimental-features 'nix-command flakes' run nixpkgs#sops secrets.yaml > $(SECRETS_PATH)
+	@echo "Enter the path where the encrypted secrets.yaml file will be saved: "
+	@read SECRETS_PATH; \
+	if [ "$${SECRETS_PATH:0:1}" != "/" ]; then \
+		SECRETS_PATH="$(CURDIR)/$$SECRETS_PATH"; \
+	fi; \
+	DIR_PATH=$$(dirname $$SECRETS_PATH); \
+	if [ ! -d "$$DIR_PATH" ]; then \
+		echo "The directory $$DIR_PATH does not exist. Do you want to create it? [y/N]:"; \
+		read CONFIRM; \
+		if [ "$$CONFIRM" != "y" ] && [ "$$CONFIRM" != "Y" ]; then \
+			echo "Exiting. Directory not created."; \
+			exit 1; \
+		fi; \
+		mkdir -p $$DIR_PATH; \
+		echo "Directory $$DIR_PATH created."; \
+	fi; \
+	echo "The encrypted secrets.yaml will be created at: $$SECRETS_PATH"; \
+	cd $$SECRETS_PATH
+	echo "Creating and encrypting secrets.yaml..."; \
+	nix --experimental-features 'nix-command flakes' run nixpkgs#sops secrets.yaml \
+	echo "Encrypted secrets.yaml created at: $$SECRETS_PATH"
 
 
 ############################################################################
