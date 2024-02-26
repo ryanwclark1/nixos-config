@@ -1,13 +1,8 @@
 {
-  config,
-  pkgs,
-  lib,
   ...
 }:
 
-
 {
-
   programs.xplr = {
     enable = true;
     extraConfig = ''
@@ -52,5 +47,4 @@
       })
     '';
   };
-
 }
