@@ -1,9 +1,9 @@
 # .sops.yaml
 
 keys:
-  - &administrator age1t8mqf0rjwrwg23v9q5rstdhxdvq0la58tue6sq3d44jev5dgfqjscnryge
-  - &frametop age1z579g6gth8cxtqvha7ms98mpshy5n5hssc637jeqaan78rf0mppq4u93cv
-  - &woody age1t8mqf0rjwrwg23v9q5rstdhxdvq0la58tue6sq3d44jev5dgfqjscnryge
+  - &administrator age1jny3l6sy32vss49rj32qvszpctmjtgl9hdksqvh826ekx6c2e5aqns6dcm
+  - &frametop age1jny3l6sy32vss49rj32qvszpctmjtgl9hdksqvh826ekx6c2e5aqns6dcm
+  - &woody age1jny3l6sy32vss49rj32qvszpctmjtgl9hdksqvh826ekx6c2e5aqns6dcm
 creation_rules:
   - path_regex: hosts/common/[^/]+\.yaml$
     key_groups:
