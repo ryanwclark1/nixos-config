@@ -35,7 +35,6 @@
     in
     {
       inherit lib;
-
       nixosModules = import ./modules/nixos;
       homeManagerModules = import ./modules/home-manager;
       templates = import ./templates;
@@ -47,12 +46,6 @@
       formatter = forEachSystem (pkgs: pkgs.nixpkgs-fmt);
 
       nixosConfigurations = {
-        default = nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit inputs outputs; };
-          modules = [
-            ./hosts/generic/configuration.nix
-          ];
-        };
         frametop = nixpkgs.lib.nixosSystem {
           specialArgs = { inherit inputs outputs; };
           modules = [
@@ -68,11 +61,6 @@
       };
 
       homeConfigurations = {
-        "administrator@generic" = lib.homeManagerConfiguration {
-          modules = [ ./home/generic.nix ];
-          pkgs = pkgsFor.x86_64-linux;
-          extraSpecialArgs = { inherit inputs outputs; };
-        };
         "administrator@frametop" = lib.homeManagerConfiguration {
           modules = [ ./home/frametop.nix ];
           pkgs = pkgsFor.x86_64-linux;
