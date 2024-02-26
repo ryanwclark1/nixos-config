@@ -7,7 +7,6 @@
 {
   imports = [
     # inputs.hardware.nixosModules.common-pc-ssd
-    inputs.vscode-server.nixosModules.default
     ./hardware-configuration.nix
     ./services
 
