@@ -7,28 +7,28 @@
 
 let
   inherit (config.networking) hostName;
-  # hosts = outputs.nixosConfigurations;
-  # pubKey = host: ../../${host}/ssh_host_ed25519_key.pub;
+  hosts = outputs.nixosConfigurations;
+  pubKey = host: ../../${host}/ssh_host_ed25519_key.pub;
   # gitHost = hosts."NAME".config.networking.hostName;
 in
 {
   services.openssh = {
     enable = true;
     openFirewall = true;
-    # settings = {
-    #   X11Forwarding = true;
-    #   PasswordAuthentication = true;
-    #   PermitRootLogin = "no";
+    settings = {
+      X11Forwarding = true;
+      PasswordAuthentication = true;
+      PermitRootLogin = "no";
     # Automatically remove stale sockets
     # StreamLocalBindUnlink = "yes";
     # Allow forwarding ports to everywhere
     # GatewayPorts = "clientspecified";
-    # };
+    };
 
-    # hostKeys = [{
-    #   path = "~/.ssh/ssh_host_ed25519_key";
-    #   type = "ed25519";
-    # }];
+    hostKeys = [{
+      path = "~/.ssh/ssh_host_ed25519_key";
+      type = "ed25519";
+    }];
   };
 
   programs.ssh = { # Each hosts public key
