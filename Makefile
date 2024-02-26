@@ -57,10 +57,24 @@ get_age_public_key:
 
 ###########################################################################
 #
+#  Make PGP
+#
+############################################################################
+
+.PHONY: pgp
+
+# Not working!!!
+pgp:
+	@echo "Make PGP key..."
+	nix --extra-experimental-features nix-command shell --extra-experimental-features flakes nixpkgs#gpg --full-generate-key
+
+###########################################################################
+#
 #  Make Secrets
 #
 ############################################################################
 
+# Not working!!!!
 .PHONY: secrets
 
 secrets:
