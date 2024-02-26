@@ -10,7 +10,7 @@
     vscode = {
       enable = true;
       package = pkgs.vscode;
-      mutableExtensionsDir = false;
+      mutableExtensionsDir = true;
       enableExtensionUpdateCheck = false;
       enableUpdateCheck = false;
       extensions = with pkgs.vscode-extensions; [
