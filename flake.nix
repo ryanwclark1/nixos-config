@@ -22,7 +22,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, vscode-server, home-manager, plasma-manager, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, ... }@inputs:
     let
       inherit (self) outputs;
       lib = nixpkgs.lib // home-manager.lib;
