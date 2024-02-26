@@ -28,20 +28,19 @@ in
       "deluge"
     ];
 
-    # openssh.authorizedKeys.keys = [ (builtins.readFile ../../../../home/administrator/ssh.pub) ];
-    # hashedPasswordFile = config.sops.secrets.administrator-password.path;
+    openssh.authorizedKeys.keys = [ (builtins.readFile ../../../../home/ssh.pub) ];
+    hashedPasswordFile = config.sops.secrets.administrator-password.path;
     packages = [ pkgs.home-manager ];
   };
 
-  # sops.secrets.administrator-password = {
-  #   sopsFile = ../../secrets.yaml;
-  #   neededForUsers = true;
-  # };
+  sops.secrets.administrator-password = {
+    sopsFile = ../../secrets.yaml;
+    neededForUsers = true;
+  };
 
   # home-manager.users.administrator = import ../../../../home/administrator/${config.networking.hostName}.nix;
   home-manager.users.administrator = import ../../../../home/${config.networking.hostName}.nix;
 
-
-  services.geoclue2.enable = true;
+  # services.geoclue2.enable = true;
   # security.pam.services = { swaylock = { }; };
 }
