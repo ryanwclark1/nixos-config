@@ -17,7 +17,7 @@
     ./openssh.nix
     ./sops.nix
     ./systemd-initrd.nix
-    # ./ssh-serve-store.nix
+    ./ssh-serve-store.nix
     ./tailscale.nix
   ] ++ (builtins.attrValues outputs.nixosModules);
 
@@ -29,7 +29,6 @@
       allowUnfree = true;
     };
   };
-
 
   environment.profileRelativeSessionVariables = {
     QT_PLUGIN_PATH = [ "/lib/qt-6/plugins" ];
