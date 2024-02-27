@@ -155,27 +155,6 @@ gc:
 	# garbage collect all unused nix store entries
 	sudo nix store gc --debug
 
-############################################################################
-#
-#  Darwin related commands, harmonica is my macbook pro's hostname
-#
-############################################################################
-
-darwin-set-proxy:
-	sudo python3 scripts/darwin_set_proxy.py
-	sleep 1
-
-ha: darwin-set-proxy
-	nix build .#darwinConfigurations.harmonica.system
-	./result/sw/bin/darwin-rebuild switch --flake .
-	sleep 1
-	sudo chmod 644 /etc/agenix/alias-for-work.*
-
-ha-debug: darwin-set-proxy
-	nix build .#darwinConfigurations.harmonica.system --show-trace --verbose
-	./result/sw/bin/darwin-rebuild switch --flake .#harmonica --show-trace --verbose
-	sleep 1
-	sudo chmod 644 /etc/agenix/alias-for-work.*
 
 ############################################################################
 #
@@ -213,39 +192,6 @@ idols-image:
 	nom build .#kana
 	scp result root@um560:/var/lib/vz/dump/vzdump-qemu-kana.vma.zst
 
-
-############################################################################
-#
-#	RISC-V related commands
-#
-############################################################################
-
-roll: add-idols-ssh-key
-	colmena apply --on '@riscv'
-
-roll-debug: add-idols-ssh-key
-	colmena apply --on '@dist-build' --verbose --show-trace
-
-nozomi:
-	colmena apply --on '@nozomi'
-
-yukina:
-	colmena apply --on '@yukina'
-
-############################################################################
-#
-# Aarch64 related commands
-#
-############################################################################
-
-aarch:
-	colmena apply --on '@aarch'
-
-suzu:
-	colmena apply --on '@suzu'
-
-suzu-debug:
-	colmena apply --on '@suzu' --verbose --show-trace
 
 ############################################################################
 #

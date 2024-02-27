@@ -14,15 +14,12 @@
     enable = true;
     fallbackToWPA2 = false;
     # Declarative
-    # environmentFile = config.sops.secrets.wireless.path;
-    # networks = {
-    #   "Sample" = {
-    #     psk = "@SAMPLE@";
-    #   };
-    #   "Sample-5G" = {
-    #     psk = "@SAMPLE@";
-    #   };
-    # };
+    environmentFile = config.sops.secrets.wireless.path;
+    networks = {
+      "Buck" = {
+        psk = "@SAMPLE@";
+      };
+    };
 
     # Imperative
     allowAuxiliaryImperativeNetworks = true;

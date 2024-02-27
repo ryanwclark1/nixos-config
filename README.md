@@ -117,7 +117,7 @@ The `default.nix` files in the root of each directory are the entry points.
 
 ### The Shell 🐚
 
-[Fish shell] with [powerline-go](https://github.com/justjanne/powerline-go) and a collection of tools that deliver a *"[Modern Unix]"* experience. The base system has a firewall enabled and also includes [OpenSSH], [sops-nix] for secret management, [ZeroTier], [Podman & Distrobox] and, of course, a delightfully configured [micro]. (*Fight me!* 🥊) My [common scripts](nixos/_mixins/scripts) are (slowly) being migrated to declarative Nix-managed scripts.
+[Fish shell] with [powerline-go](https://github.com/justjanne/powerline-go) and a collection of tools that deliver a *"[Modern Unix]"* experience. The base system has a firewall enabled and also includes [OpenSSH], [sops-nix] for secret management, [ZeroTier], [Podman & Distrobox].  My [common scripts](nixos/_mixins/scripts) are (slowly) being migrated to declarative Nix-managed scripts.
 
 ![fastfetch on Ripper](.github/screenshots/fastfetch.png)
 
@@ -129,7 +129,7 @@ The [font configuration] is common with both desktops using [Work Sans](https://
 | :-------: | :----------------: | :-----------------------: | :--------------------------: |
 
 
-![Alt](https://repobeats.axiom.co/api/embed/a82d5acf21276546e716d36dca41be774e6a5b74.svg "Repobeats analytics image")
+![Alt](https://repobeats.axiom.co/api/embed/5ef4c6a66687d5e71cbe2ed39ec352a4d055aabf.svg "Repobeats analytics image")
 
 ## Post-install Checklist
 
