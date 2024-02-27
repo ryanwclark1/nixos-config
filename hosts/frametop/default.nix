@@ -38,9 +38,6 @@
     binfmt.emulatedSystems = [ "aarch64-linux" "i686-linux" ];
   };
 
-
-
-
   hardware = {
     opengl = {
       enable = true;
