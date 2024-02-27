@@ -108,6 +108,7 @@
     kcalc
     gnome.gnome-boxes
 
+    firefox
   ];
 
   networking = {
