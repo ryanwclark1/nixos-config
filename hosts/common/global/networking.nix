@@ -5,6 +5,7 @@
 {
   networking = {
     useDHCP = true;
+    domain = "techcasa.io";
     networkmanager = {
       enable = true;
     };
