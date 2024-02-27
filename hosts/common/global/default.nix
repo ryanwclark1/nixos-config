@@ -23,18 +23,12 @@
 
   home-manager.extraSpecialArgs = { inherit inputs outputs; };
 
-  nixpkgs = {
-    # overlays = builtins.attrValues outputs.overlays;
-    config = {
-      allowUnfree = true;
-    };
-  };
-
-  environment.profileRelativeSessionVariables = {
-    QT_PLUGIN_PATH = [ "/lib/qt-6/plugins" ];
-  };
-
-  hardware.enableRedistributableFirmware = true;
-  networking.domain = "techcasa.io";
+  # nixpkgs = {
+  #   # overlays = builtins.attrValues outputs.overlays;
+  #   config = {
+  #     allowUnfree = true;
+  #   };
+  # };
+  
 
 }
