@@ -33,9 +33,13 @@
   };
 
   boot = {
-    kernelPackages = pkgs.linuxKernel.packages.linux_zen;
-    initrd.kernelModules = [ "amdgpu" ];
-    binfmt.emulatedSystems = [ "aarch64-linux" "i686-linux" ];
+    loader = {
+      systemd-boot.enable = true;
+      efi.canTouchEfiVariables = true;
+    };
+    # kernelPackages = pkgs.linuxKernel.packages.linux_6_6;
+    # initrd.kernelModules = [ "amdgpu" ];
+    # binfmt.emulatedSystems = [ "aarch64-linux" "i686-linux" ];
   };
 
   hardware = {
@@ -43,12 +47,12 @@
       enable = true;
       driSupport = true;
       driSupport32Bit = true;
-      extraPackages = with pkgs; [
-        amdvlk
-      ];
-      extraPackages32 = with pkgs; [
-        driversi686Linux.amdvlk
-      ];
+      # extraPackages = with pkgs; [
+      #   amdvlk
+      # ];
+      # extraPackages32 = with pkgs; [
+      #   driversi686Linux.amdvlk
+      # ];
     };
 
     logitech = {
@@ -60,7 +64,7 @@
   };
 
   environment.systemPackages = with pkgs; [
-    gcc
+    wget
     git
   ];
 
