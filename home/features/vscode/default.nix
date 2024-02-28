@@ -76,6 +76,18 @@
           version = "0.4.0";
           sha256 = "sha256-Vtr+0HO29SnQxDEzZ6Zy8BNdBeDY0yETxhcSSbu6cQA=";
         }
+        {
+          name = "templ";
+          publisher = "a-h";
+          version = "0.0.2";
+          sha256 = "sha256-92G4J+A0obw3A/yz/Ak/n5gEW6FrdD5Ig52OS5prJag=";
+        }
+        {
+          name = "htmx-attributes";
+          publisher = "craigrbroughton";
+          version = "0.6.0";
+          sha256 = "sha256-ly8jBv2s/BSoze36krut3OJGGfr8J2RMKfjnN7hWeTY=";
+        }
       ];
 
       userSettings = {
