@@ -4,8 +4,11 @@
 }:
 
 {
-  # if use vscode in wayland, uncomment this line
-  # environment.sessionVariables.NIXOS_OZONE_WL = "1";
+
+  home.packages = with pkgs; [
+    tailwindcss
+  ];
+
   programs = {
     vscode = {
       enable = true;
@@ -88,6 +91,12 @@
           version = "0.6.0";
           sha256 = "sha256-ly8jBv2s/BSoze36krut3OJGGfr8J2RMKfjnN7hWeTY=";
         }
+        {
+          name = "alpine-js-intellisense";
+          publisher = "adrianwilczynski";
+          version = "1.2.0";
+          sha256 = "sha256-Klx5ZvV06lXIJ3Q/mzq3KBjPpdROoxDkgEu7MBO+RhI=";
+        }
       ];
 
       userSettings = {
@@ -101,16 +110,36 @@
         # "editor.formatOnSave" = true;
         "editor.inlineSuggest.enabled" = true;
         "editor.minimap.enabled" = false;
+        "editor.parameterHints.enabled" = true;
+        "editor.quickSuggestions" = {
+          "other" = true;
+          "comments" = true;
+          "strings" = true;
+        };
         "editor.renderWhitespace" = "all";
         "editor.rulers" = [
           80
           120
         ];
+        "editor.suggest.showStatusBar" = true;
+        "editor.suggest.localityBonus" = true;
         "editor.suggestSelection" = "first";
+        "editor.quickSuggestionsDelay" = 3;
+        "editor.tabCompletion" = "on";
         "editor.tabSize" = 2;
         "editor.useTabStops" = true;
+        "editor.wordBasedSuggestions" = true;
         "editor.wordWrap" = "on";
-
+        "editor.snippetSuggestions" = "top";
+        "emmet.showSuggestionsAsSnippets" = true;
+        "emmet.includeLanguages" = {
+          "javascript" = "javascriptreact";
+          "typescript" = "typescriptreact";
+        };
+        "emmet.triggerExpansionOnTab" = true;
+        "files.associations" = {
+          "*.css" = "tailwindcss";
+        };
         "files.exclude" = { "**/node_modules/**" = true; };
         "files.autoSave" = "afterDelay";
         "files.trimTrailingWhitespace" = true;
@@ -169,6 +198,20 @@
         "vscode-kubernetes.log-viewer.timestamp" = true;
         "vsdocker.imageUser" = "docker.io/ryanwclark";
         "tabby.usage.anonymousUsageTracking" = true; # this settings actually disables telemetry (pretty weird naming)
+        # Configurations: https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss
+        "tailwindCSS.includeLanguages" = {
+          "plaintext" = "html";
+        };
+        "tailwindCSS.emmetCompletions" = false;
+        "tailwindCSS.classAttributes" = "class";
+        "tailwindCSS.colorDecorators" = true;
+        "tailwindCSS.showPixelEquivalents" = true;
+        "tailwindCSS.hovers" = true;
+        "tailwindCSS.suggestions" = true;
+        "tailwindCSS.codeActions" = true;
+        "tailwindCSS.validate" = "error";
+
+
         "github.copilot.advanced" = {
           "listCount" = 3;
         };
