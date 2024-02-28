@@ -32,7 +32,6 @@
         ms-vscode.cpptools
         ms-vscode.hexeditor
         ms-vscode.makefile-tools
-        ms-vscode.anycode
         golang.go
         wholroyd.jinja # Prefer Better Jinja
         # hash mismatch in nixos upgrade to unstable
@@ -102,6 +101,7 @@
       userSettings = {
         "accessibilitySupport.voice.keywordActivation" = "chatInView";
         "breadcrumbs.enabled" = true;
+        "editor.accessibilityPageSize" = 500;
         "editor.fontFamily" = "JetBrainsMono Nerd Font";
         "editor.fontLigatures" = true;
         "editor.fontSize" = 12;
@@ -203,13 +203,12 @@
           "plaintext" = "html";
         };
         "tailwindCSS.emmetCompletions" = false;
-        "tailwindCSS.classAttributes" = "class";
         "tailwindCSS.colorDecorators" = true;
         "tailwindCSS.showPixelEquivalents" = true;
         "tailwindCSS.hovers" = true;
         "tailwindCSS.suggestions" = true;
         "tailwindCSS.codeActions" = true;
-        "tailwindCSS.validate" = "error";
+        "tailwindCSS.validate" = true;
 
 
         "github.copilot.advanced" = {
