@@ -9,6 +9,7 @@
   ];
 
   services = {
+    fwupd.enable = true;
     vscode-server = {
       enable = true;
     };
