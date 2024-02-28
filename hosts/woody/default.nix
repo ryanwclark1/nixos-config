@@ -6,7 +6,6 @@
 
 {
   imports = [
-    # inputs.hardware.nixosModules.common-pc-ssd
     ./hardware-configuration.nix
     ./services
 

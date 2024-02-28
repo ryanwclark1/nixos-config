@@ -23,12 +23,13 @@
 
   home-manager.extraSpecialArgs = { inherit inputs outputs; };
 
-  # nixpkgs = {
-  #   # overlays = builtins.attrValues outputs.overlays;
-  #   config = {
-  #     allowUnfree = true;
-  #   };
-  # };
-  
+# allowUnfree isn't being inherited from the global flake
+  nixpkgs = {
+    # overlays = builtins.attrValues outputs.overlays;
+    config = {
+      allowUnfree = true;
+    };
+  };
+
 
 }
