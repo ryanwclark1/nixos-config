@@ -76,6 +76,8 @@
   environment.systemPackages = with pkgs; [
     wget
     git
+    # UEFI boot manager
+    refind
   ];
 
   system.stateVersion = "24.05";
