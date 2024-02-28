@@ -37,14 +37,14 @@
       systemd-boot.enable = true;
       efi.canTouchEfiVariables = true;
     };
-    kernelPackages = pkgs.linuxPackagesFor (pkgs.linux_6_7.override {
+    kernelPackages = pkgs.linuxPackagesFor (pkgs.linux_6_6.override {
       argsOverride = rec {
         src = pkgs.fetchurl {
               url = "mirror://kernel/linux/kernel/v6.x/linux-${version}.tar.xz";
-              sha256 = "e489ec0e1370d089b446d565aded7a698093d2b7c4122a18f21edb6ef93d37d3";
+              sha256 = "4e43d8c5fba14f7c82597838011648056487b7550fd83276ad534559e8499b1d";
         };
-        version = "6.7.6";
-        modDirVersion = "6.7.6";
+        version = "6.6.18";
+        modDirVersion = "6.6.18";
         };
     });
 
