@@ -116,7 +116,6 @@
     kmousetool
     kconfigwidgets
     kwidgetsaddons
-    bismuth
     discover
     kaccounts-integration
     kaccounts-providers
