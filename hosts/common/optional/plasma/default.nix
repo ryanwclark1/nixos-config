@@ -70,7 +70,6 @@
     (ark.override { unfreeEnableUnrar = true; })
     gwenview
     qt6.qtimageformats # attempt to fix absence of webp support
-    gnupg
     wl-clipboard # wayland clipboard client
   ] ++ (with pkgs.kdePackages; [
     qt6.qtbase
