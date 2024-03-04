@@ -69,25 +69,9 @@
     gnomeExtensions.appindicator
   ];
 
-
-
-  nixpkgs.overlays = [
-    (self: super: {
-      gnome = super.gnome.overrideScope' (gself: gsuper: {
-        nautilus = gsuper.nautilus.overrideAttrs (nsuper: {
-          buildInputs = nsuper.buildInputs ++ (with pkgs.gst_all_1; [
-            gst-plugins-good
-            gst-plugins-bad
-          ]);
-        });
-      });
-    })
-  ];
-
   # ensure gnome-settings-daemon udev rules are enabled
   services.udev.packages = with pkgs; [ gnome.gnome-settings-daemon ];
 
   security.pam.services.login.enableGnomeKeyring = true;
-
 
 }
