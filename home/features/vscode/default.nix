@@ -144,7 +144,6 @@
         "files.autoSave" = "afterDelay";
         "files.trimTrailingWhitespace" = true;
         "telemetry.telemetryLevel" = "off";
-        "workbench.fontAliasing" = "antialiased";
         "workbench.editor.enablePreview" = false;
         "workbench.colorTheme" = "Nord Deep";
 
@@ -197,7 +196,7 @@
         "vscode-kubernetes.log-viewer.follow" = true;
         "vscode-kubernetes.log-viewer.timestamp" = true;
         "vsdocker.imageUser" = "docker.io/ryanwclark";
-        "tabby.usage.anonymousUsageTracking" = true; # this settings actually disables telemetry (pretty weird naming)
+        # "tabby.usage.anonymousUsageTracking" = true; # this settings actually disables telemetry (pretty weird naming)
         # Configurations: https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss
         "tailwindCSS.includeLanguages" = {
           "plaintext" = "html";
