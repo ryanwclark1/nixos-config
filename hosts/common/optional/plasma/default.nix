@@ -26,7 +26,7 @@
       # Enable the Plasma Desktop Environment.
       displayManager = {
         # Wayland is the default session.
-        defaultSession = "wayland";
+        # defaultSession = "plasma";
         # lightdm ?
         sddm = {
           enable = true;
