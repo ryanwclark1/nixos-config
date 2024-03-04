@@ -30,8 +30,8 @@
                 name = "Nodrzy-icon";
               };
               theme = {
-                package = pkgs.gnome.gnome-themes-extra;
-                name = "Adwaita";
+                package = pkgs.nordic;
+                name = "Nordic";
               };
               draw-user-backgrounds = true;
             };
