@@ -78,24 +78,16 @@
     krename
     hyphen
     okular
-    qalculate-gtk
-    # Required by KInfoCenter
-    clinfo # clinfo
-    glxinfo # eglinfo, glxinfo
-    pciutils # lspci
-    vulkan-tools # vulkaninfo
-    wayland-utils # wayland-info
+    # # Required by KInfoCenter
+    # clinfo # clinfo
+    # glxinfo # eglinfo, glxinfo
+    # pciutils # lspci
+    # vulkan-tools # vulkaninfo
+    # wayland-utils # wayland-info
     # Required by Nix
     gitMinimal
     ksystemlog
-    lightly-qt
     # KDE/Plasma: support spellchecking
-    hunspell
-    hunspellDicts.en_US
-    aspell
-    aspellDicts.en
-    aspellDicts.en-computers
-    aspellDicts.en-science
     capitaine-cursors
     la-capitaine-icon-theme
     # libreoffice-qt
@@ -128,6 +120,10 @@
     kwallet
     ksystemlog
   ]);
+
+  security.pam.services.login.kwallet = {
+    enable = true;
+  };
 
   networking = {
     # Allow connections from certain port ranges (TCP).
