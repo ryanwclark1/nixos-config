@@ -28,11 +28,11 @@
         # Wayland is the default session.
         # defaultSession = "plasma";
         # lightdm ?
-        sddm = {
-          enable = true;
+        # sddm = {
+          # enable = true;
           # wayland.enable = true;
           # theme = "breeze";
-        };
+        # };
       };
       desktopManager = {
         plasma6 = {
