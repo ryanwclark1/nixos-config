@@ -36,6 +36,7 @@
       desktopManager = {
         plasma6 = {
           enable = true;
+          enableQt5Integration = true;
           # useQtScaling = true;
         };
       };
@@ -85,7 +86,7 @@
     # vulkan-tools # vulkaninfo
     # wayland-utils # wayland-info
     # Required by Nix
-    gitMinimal
+    # gitMinimal
     ksystemlog
     # KDE/Plasma: support spellchecking
     capitaine-cursors
@@ -98,9 +99,8 @@
     gnupg
     wl-clipboard # wayland clipboard client
   ] ++ (with pkgs.kdePackages; [
-    plasma-workspace
-    plasma-workspace-wallpapers
-    plasma-integration
+
+
     kwin-dynamic-workspaces
     krdc
     krfb
@@ -113,7 +113,7 @@
     kaccounts-providers
     kio-gdrive
     plasma-browser-integration
-    plasma-integration
+
     qtstyleplugin-kvantum
     filelight
     qt6.qtbase
