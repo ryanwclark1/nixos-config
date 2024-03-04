@@ -116,7 +116,6 @@
     kmousetool
     kconfigwidgets
     kwidgetsaddons
-    applet-window-buttons
     bismuth
     discover
     kaccounts-integration
