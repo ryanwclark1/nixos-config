@@ -5,13 +5,16 @@
 
 
 {
-
-
-  # programs.kdeconnect.enable = true;
   programs = {
     thunar.enable = true;
     dconf.enable = true;
     kdeconnect.enable = true;
+  };
+
+  qt = {
+    enable = true;
+    platformTheme = "gnome";
+    style = "adwaita-dark";
   };
 
   services = {
@@ -49,7 +52,6 @@
 
   environment.systemPackages = with pkgs; [
     # Packages installed
-
     (ark.override { unfreeEnableUnrar = true; })
     gwenview
     # Theme
@@ -70,28 +72,28 @@
     wayland-utils # wayland-info
     # Required by Nix
     gitMinimal
-    kdePackages.kdeconnect-kde
-    kdePackages.plasma-workspace
-    kdePackages.plasma-workspace-wallpapers
-    kdePackages.plasma-integration
-    kdePackages.kwin-dynamic-workspaces
-    kdePackages.krdc
-    kdePackages.krfb
-    kdePackages.kmousetool
-    kdePackages.kconfigwidgets
-    kdePackages.kwidgetsaddons
-    kdePackages.applet-window-buttons
-    kdePackages.bismuth
-    kdePackages.discover
-    kdePackages.kaccounts-integration
-    kdePackages.kaccounts-providers
-    kdePackages.kio-gdrive
-    kdePackages.plasma-browser-integration
-    kdePackages.plasma-integration
-    kdePackages.qtstyleplugin-kvantum
-    kdePackages.filelight
-    kdePackages.qt6.qtbase
-    # kdePackages.ksystemlog
+    libsForQt5.kdeconnect-kde
+    libsForQt5.plasma-workspace
+    libsForQt5.plasma-workspace-wallpapers
+    libsForQt5.plasma-integration
+    libsForQt5.kwin-dynamic-workspaces
+    libsForQt5.krdc
+    libsForQt5.krfb
+    libsForQt5.kmousetool
+    libsForQt5.kconfigwidgets
+    libsForQt5.kwidgetsaddons
+    libsForQt5.applet-window-buttons
+    libsForQt5.bismuth
+    libsForQt5.discover
+    libsForQt5.kaccounts-integration
+    libsForQt5.kaccounts-providers
+    libsForQt5.kio-gdrive
+    libsForQt5.plasma-browser-integration
+    libsForQt5.plasma-integration
+    libsForQt5.qtstyleplugin-kvantum
+    libsForQt5.filelight
+    libsForQt5.qt5.qtbase
+    # libsForQt5.ksystemlog
     ksystemlog
     lightly-qt
     # KDE/Plasma: support spellchecking
@@ -104,10 +106,8 @@
     capitaine-cursors
     la-capitaine-icon-theme
     # libreoffice-qt
-
     kcalc
     gnome.gnome-boxes
-
     firefox
   ];
 
@@ -122,5 +122,4 @@
       { from = 1714; to = 1764; } # KDEConnect
     ];
   };
-
 }
