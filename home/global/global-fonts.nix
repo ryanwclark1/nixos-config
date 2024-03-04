@@ -80,7 +80,7 @@ with lib;
       };
       main-set = mkOption {
         type = types.listOf types.str;
-        default = [ "JetBrainsMono Nerd Font"  "Monaspace Argon" "Monaspace Radon" "Monospace Neon" "Monospace Xenon" "Monospace Krypton" "Lotion" "Cascadia Code" "Maple Mono" "Pragmata Pro" "Operator Mono Book" "LigaOperatorMono Nerd Font" "OperatorMono Nerd Font Mono" "ComicCodeLigatures Nerd Font" "ComicCodeLigatures Nerd Font Complete Mono" "Gintronic" "Vazirmatn" ];
+        default = [ "JetBrainsMono Nerd Font"  "Monaspace Argon" "Monaspace Radon" "Monospace Neon" "Monospace Xenon" "Monospace Krypton" "Lotion" "Cascadia Code" "Maple Mono" "Pragmata Pro" "Operator Mono Book" "LigaOperatorMono Nerd Font" "OperatorMono Nerd Font Mono" "ComicCodeLigatures Nerd Font" "ComicCodeLigatures Nerd Font Complete Mono" "Gintronic" "Vazirmatn" "Powerline Fonts" "Powerline Symbols"];
       };
     };
   };
