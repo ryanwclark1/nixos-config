@@ -17,16 +17,21 @@
             slick = {
               enable = true;
               cursorTheme = {
-                package = pkgs.gnome3.adwaita-icon-theme;
-                name = "HighContrast";
+                package = pkgs.gnome.adwaita-icon-theme;
+                name = "Adwaita";
+                size = 24;
               };
               font = {
                 package = pkgs.noto-fonts;
                 name = "Noto Sans";
               };
               iconTheme = {
-                package = pkgs.papirus-icon-theme;
-                name = "Papirus Dark";
+                package = pkgs.gnome.adwaita-icon-theme;
+                name = "Adwaita";
+              };
+              theme = {
+                package = pkgs.gnome.gnome-themes-extra;
+                name = "Adwaita";
               };
               draw-user-backgrounds = true;
             };
