@@ -7,9 +7,9 @@
 
 {
   programs = {
-    thunar.enable = true;
+    # thunar.enable = true;
     dconf.enable = true;
-    kdeconnect.enable = true;
+    # kdeconnect.enable = true;
   };
 
   qt = {
@@ -37,8 +37,6 @@
       desktopManager = {
         plasma6 = {
           enable = true;
-          enableQt5Integration = true;
-          # useQtScaling = true;
         };
       };
       libinput = {
@@ -62,7 +60,7 @@
   };
 
   environment.sessionVariables ={
-    NIXOS_OZONE_WL = "1";
+    # NIXOS_OZONE_WL = "1";
     # Use librsvg's gdk-pixbuf loader cache file as it enables gdk-pixbuf to load SVG files (important for icons in GTK apps)
     GDK_PIXBUF_MODULE_FILE = lib.mkForce "$(echo ${pkgs.librsvg.out}/lib/gdk-pixbuf-2.0/*/loaders.cache)";
   };
@@ -71,54 +69,11 @@
     # Packages installed
     (ark.override { unfreeEnableUnrar = true; })
     gwenview
-    # Theme
-    utterly-nord-plasma
-    nordic
-    keepassxc
-    kget
-    kgpg
-    krename
-    hyphen
-    okular
-    # # Required by KInfoCenter
-    # clinfo # clinfo
-    # glxinfo # eglinfo, glxinfo
-    # pciutils # lspci
-    # vulkan-tools # vulkaninfo
-    # wayland-utils # wayland-info
-    # Required by Nix
-    # gitMinimal
-    ksystemlog
-    # KDE/Plasma: support spellchecking
-    capitaine-cursors
-    la-capitaine-icon-theme
-    # libreoffice-qt
-    kcalc
-    gnome.gnome-boxes
-    firefox
     qt6.qtimageformats # attempt to fix absence of webp support
     gnupg
     wl-clipboard # wayland clipboard client
   ] ++ (with pkgs.kdePackages; [
-
-
-    kwin-dynamic-workspaces
-    krdc
-    krfb
-    kgpg # add kgpg
-    kmousetool
-    kconfigwidgets
-    kwidgetsaddons
-    discover
-    kaccounts-integration
-    kaccounts-providers
-    kio-gdrive
-    plasma-browser-integration
-
-    qtstyleplugin-kvantum
-    filelight
     qt6.qtbase
-    kwallet
     ksystemlog
   ]);
 
