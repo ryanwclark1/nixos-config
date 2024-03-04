@@ -7,9 +7,9 @@ These computers are managed by this Nix flake ❄️
 
 |   Hostname  |            Board            |               CPU              |  RAM  |         Primary GPU         |      Secondary GPU      | Role | OS  | State |
 | :---------: | :-------------------------: | :----------------------------: | :---: | :-------------------------: | :---------------------: | :--: | :-: | :---: |
-| `woody`     | [MEG-X570-UNIFY]            | [AMD Ryzen 9 7900X]            | 128GB | [RX 7800 XT]                | [AMD Ryzen 9 7900X GPU] | 🖥️   | ❄️  | ✅    |
-| `frametop`  | [MEG-X570-ACE]              | [AMD Ryzen 9 5900X]            | 128GB | [Fighter RX 6700 XT]        | [NVIDIA T600]           | 🖥️   | ❄️  | ✅    |
-| `steamdeck` | [Steam Deck 64GB LCD]       | Zen 2 4c/8t                    | 16GB  | 8 RDNA 2 CUs                |                         | 🎮️   | 🐧  | ✅    |
+| `woody`     | [MEG-X570-UNIFY]            | [AMD Ryzen 9 7900X]            |  64GB | [RX 7800 XT]                | [AMD Ryzen 9 7900X GPU] | 🖥️   | ❄️  | ✅    |
+| `frametop`  | [Framework-13in-12thGen]    | [Intel i7-1260P]               |  64GB | [Iris XE Graphics]          |                         | 🖥️   | ❄️  | ✅    |
+| `steamdeck` | [SteamDeck-OLED]            | Zen 2 4c/8t                    | 16GB  | 8 RDNA 2 CUs                |                         | 🎮️   | 🐧  | ✅    |
 | `vm1`       | [QEMU]                      | -                              | -     | [VirGL]                     |                         | 🐄   | ❄️  | ✅    |
 | `mv2`       | [QEMU]                      | -                              | -     | [VirGL]                     |                         | 🐄   | ❄️  | ✅    |
 | `skull`     | [NUC6i7KYK]                 | [Intel Core i7-6770HQ]         | 64GB  | Intel Iris Pro Graphics 580 |                         | ☁️   | ❄️  | 🚧    |
@@ -240,6 +240,8 @@ The [Disko] implementation and automated installation are chasing the ideas outl
 [NixOS]: https://nixos.org/
 [Home Manager]: https://github.com/nix-community/home-manager
 
+[Framework-13in-12thGen]: https://frame.work/products/laptop-diy-12-gen-intel?q=processor
+[SteamDeck-OLED]: https://www.steamdeck.com/
 [QEMU]: https://www.qemu.org/
 
 [VirGL]: https://docs.mesa3d.org/drivers/virgl.html
