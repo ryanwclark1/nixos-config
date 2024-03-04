@@ -12,11 +12,10 @@
     ./fish.nix
     ./fonts.nix
     ./locale.nix
-    # ./networking.nix
+    ./networking.nix
     ./nix.nix
     ./openssh.nix
     ./sops.nix
-    # ./systemd-initrd.nix
     ./ssh-serve-store.nix
     ./tailscale.nix
   ] ++ (builtins.attrValues outputs.nixosModules);
