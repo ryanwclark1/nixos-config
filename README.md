@@ -1,4 +1,5 @@
 # Ryan's [NixOS]  & [Home Manager] Configurations
+[![built with nix](https://builtwithnix.org/badge.svg)](https://builtwithnix.org)
 
 This repository contains a [Nix Flake](https://zero-to-nix.com/concepts/flakes) for configuring my computers and/or home environment.
 It is not intended to be a drop in configuration for your computer, but you are welcome to use it as a reference or starting point for your own configuration.
