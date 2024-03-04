@@ -24,7 +24,7 @@
       xkb.layout = "us";
       # xkb.variant = "";
       # Enable the Plasma Desktop Environment.
-      displayManager = {
+      # displayManager = {
         # Wayland is the default session.
         # defaultSession = "plasma";
         # lightdm ?
@@ -33,7 +33,7 @@
           # wayland.enable = true;
           # theme = "breeze";
         # };
-      };
+      # };
       desktopManager = {
         plasma6 = {
           enable = true;
