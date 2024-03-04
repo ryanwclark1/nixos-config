@@ -22,15 +22,6 @@
       enable = true;
     };
 
-    xserver = {
-      libinput = {
-        enable = true;
-        touchpad = {
-          naturalScrolling = true;
-          scrollMethod = "twofinger";
-        };
-      };
-    };
   };
 
   powerManagement.powertop.enable = true;
