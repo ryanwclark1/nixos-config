@@ -76,9 +76,9 @@
     ksystemlog
   ]);
 
-  security.pam.services.login.kwallet = {
-    enable = true;
-  };
+  # security.pam.services.login.kwallet = {
+  #   enable = true;
+  # };
 
   networking = {
     # Allow connections from certain port ranges (TCP).
