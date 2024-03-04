@@ -11,7 +11,7 @@ in
   # users.mutableUsers = false;
   users.users.administrator = {
     isNormalUser = true;
-    shell = "${pkgs.zsh}/bin/zsh";
+    # shell = "${pkgs.zsh}/bin/zsh";
     extraGroups = [
       "wheel"
       "video"
@@ -40,6 +40,4 @@ in
 
   home-manager.users.administrator = import ../../../../home/${config.networking.hostName}.nix;
 
-  # services.geoclue2.enable = true;
-  # security.pam.services = { swaylock = { }; };
 }
