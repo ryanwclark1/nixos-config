@@ -41,21 +41,12 @@
       argsOverride = rec {
         src = pkgs.fetchurl {
               url = "mirror://kernel/linux/kernel/v6.x/linux-${version}.tar.xz";
-              sha256 = "e489ec0e1370d089b446d565aded7a698093d2b7c4122a18f21edb6ef93d37d3";
+              sha256 = "sha256-Rp/0a5hoXfE7VsmEF8ZLp6MPikW680qpnweTXhv2XBg=";
         };
-        version = "6.7.6";
-        modDirVersion = "6.7.6";
+        version = "6.7.8";
+        modDirVersion = "6.7.8";
         };
     });
-    kernelPatches = [
-      {
-        name = "c92c108403b09f75f3393588c2326ecad49ee2e2";
-        patch = pkgs.fetchpatch {
-          url = "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/patch/?id=c92c108403b09f75f3393588c2326ecad49ee2e2";
-          sha256 = "sha256-dC/MnW19GimbnXk1ojLh6RZJ9VMH5+8KX3mG4h1f2g0=";
-        };
-      }
-    ];
 
     # initrd.kernelModules = [ "amdgpu" ];
     # binfmt.emulatedSystems = [ "aarch64-linux" "i686-linux" ];

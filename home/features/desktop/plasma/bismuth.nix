@@ -9,10 +9,10 @@
 #   options.bismuth.enable = mkEnableOption "bismuth settings";
 #   config = mkIf config.bismuth.enable {
 
-#     # programs.plasma5.enable = true;
-#     environment.systemPackages = [ pkgs.libsForQt5.bismuth ];
+#     # programs.plasma6.enable = true;
+#     environment.systemPackages = [ pkgs.kdePackages.bismuth ];
 
-#     programs.plasma5.files.kwinrc = {
+#     programs.plasma6.files.kwinrc = {
 #       files.kwinrc = {
 #         Plugins.bismuthEnabled = true;
 
@@ -27,7 +27,7 @@
 #       };
 #     };
 
-#     # programs.plasma5.shortcuts.bismuth = {
+#     # programs.plasma6.shortcuts.bismuth = {
 #     #   decrease_master_size = [];
 #     #   decrease_master_win_count = [ "Meta+[" "Meta+D" ];
 #     #   decrease_window_height = "Meta+Ctrl+K";
