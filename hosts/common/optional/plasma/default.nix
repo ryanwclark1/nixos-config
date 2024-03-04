@@ -1,4 +1,5 @@
 {
+  lib,
   pkgs,
   ...
 }:
@@ -23,13 +24,15 @@
       xkb.layout = "us";
       xkb.variant = "";
       # Enable the Plasma Desktop Environment.
-      displayManager = {
-        defaultSession = "plasmawayland";
-        sddm = {
-          enable = true;
-          wayland.enable = true;
-        };
-      };
+      # displayManager = {
+        # Wayland is the default session.
+        # defaultSession = "plasmawayland";
+        # lightdm ?
+        # sddm = {
+        #   enable = true;
+        #   wayland.enable = true;
+        # };
+      # };
       desktopManager = {
         plasma6 = {
           enable = true;
@@ -46,8 +49,20 @@
     };
   };
 
+    # Ensure XDG portal is enabled
+  xdg = {
+    portal = {
+      enable = true;
+      extraPortals = with pkgs; [
+        kdePackages.xdg-desktop-portal-kde
+      ];
+    };
+  };
+
   environment.sessionVariables ={
     NIXOS_OZONE_WL = "1";
+    # Use librsvg's gdk-pixbuf loader cache file as it enables gdk-pixbuf to load SVG files (important for icons in GTK apps)
+    GDK_PIXBUF_MODULE_FILE = lib.mkForce "$(echo ${pkgs.librsvg.out}/lib/gdk-pixbuf-2.0/*/loaders.cache)";
   };
 
   environment.systemPackages = with pkgs; [
@@ -72,13 +87,13 @@
     wayland-utils # wayland-info
     # Required by Nix
     gitMinimal
-    kdePackages.kdeconnect-kde
     kdePackages.plasma-workspace
     kdePackages.plasma-workspace-wallpapers
     kdePackages.plasma-integration
     kdePackages.kwin-dynamic-workspaces
     kdePackages.krdc
     kdePackages.krfb
+    kdePackages.kgpg # add kgpg
     kdePackages.kmousetool
     kdePackages.kconfigwidgets
     kdePackages.kwidgetsaddons
@@ -110,6 +125,9 @@
     kcalc
     gnome.gnome-boxes
     firefox
+    qt6.qtimageformats # attempt to fix absence of webp support
+    gnupg
+    wl-clipboard # wayland clipboard client
   ];
 
   networking = {
