@@ -25,6 +25,7 @@
     ../common/optional/wireshark.nix
 
     # ../common/optional/hyprland
+    ../common/optional/lightdm.nix
     ../common/optional/plasma
   ];
 
