@@ -72,28 +72,29 @@
     wayland-utils # wayland-info
     # Required by Nix
     gitMinimal
-    libsForQt5.kdeconnect-kde
-    libsForQt5.plasma-workspace
-    libsForQt5.plasma-workspace-wallpapers
-    libsForQt5.plasma-integration
-    libsForQt5.kwin-dynamic-workspaces
-    libsForQt5.krdc
-    libsForQt5.krfb
-    libsForQt5.kmousetool
-    libsForQt5.kconfigwidgets
-    libsForQt5.kwidgetsaddons
-    libsForQt5.applet-window-buttons
-    libsForQt5.bismuth
-    libsForQt5.discover
-    libsForQt5.kaccounts-integration
-    libsForQt5.kaccounts-providers
-    libsForQt5.kio-gdrive
-    libsForQt5.plasma-browser-integration
-    libsForQt5.plasma-integration
-    libsForQt5.qtstyleplugin-kvantum
-    libsForQt5.filelight
-    libsForQt5.qt5.qtbase
-    # libsForQt5.ksystemlog
+    kdePackages.kdeconnect-kde
+    kdePackages.plasma-workspace
+    kdePackages.plasma-workspace-wallpapers
+    kdePackages.plasma-integration
+    kdePackages.kwin-dynamic-workspaces
+    kdePackages.krdc
+    kdePackages.krfb
+    kdePackages.kmousetool
+    kdePackages.kconfigwidgets
+    kdePackages.kwidgetsaddons
+    kdePackages.applet-window-buttons
+    kdePackages.bismuth
+    kdePackages.discover
+    kdePackages.kaccounts-integration
+    kdePackages.kaccounts-providers
+    kdePackages.kio-gdrive
+    kdePackages.plasma-browser-integration
+    kdePackages.plasma-integration
+    kdePackages.qtstyleplugin-kvantum
+    kdePackages.filelight
+    kdePackages.qt6.qtbase
+    kdePackages.kwallet
+    # kdePackages.ksystemlog
     ksystemlog
     lightly-qt
     # KDE/Plasma: support spellchecking
