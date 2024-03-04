@@ -87,29 +87,6 @@
     wayland-utils # wayland-info
     # Required by Nix
     gitMinimal
-    kdePackages.plasma-workspace
-    kdePackages.plasma-workspace-wallpapers
-    kdePackages.plasma-integration
-    kdePackages.kwin-dynamic-workspaces
-    kdePackages.krdc
-    kdePackages.krfb
-    kdePackages.kgpg # add kgpg
-    kdePackages.kmousetool
-    kdePackages.kconfigwidgets
-    kdePackages.kwidgetsaddons
-    kdePackages.applet-window-buttons
-    kdePackages.bismuth
-    kdePackages.discover
-    kdePackages.kaccounts-integration
-    kdePackages.kaccounts-providers
-    kdePackages.kio-gdrive
-    kdePackages.plasma-browser-integration
-    kdePackages.plasma-integration
-    kdePackages.qtstyleplugin-kvantum
-    kdePackages.filelight
-    kdePackages.qt6.qtbase
-    kdePackages.kwallet
-    # kdePackages.ksystemlog
     ksystemlog
     lightly-qt
     # KDE/Plasma: support spellchecking
@@ -128,7 +105,31 @@
     qt6.qtimageformats # attempt to fix absence of webp support
     gnupg
     wl-clipboard # wayland clipboard client
-  ];
+  ] ++ (with pkgs.kdePackages; [
+    plasma-workspace
+    plasma-workspace-wallpapers
+    plasma-integration
+    kwin-dynamic-workspaces
+    krdc
+    krfb
+    kgpg # add kgpg
+    kmousetool
+    kconfigwidgets
+    kwidgetsaddons
+    applet-window-buttons
+    bismuth
+    discover
+    kaccounts-integration
+    kaccounts-providers
+    kio-gdrive
+    plasma-browser-integration
+    plasma-integration
+    qtstyleplugin-kvantum
+    filelight
+    qt6.qtbase
+    kwallet
+    ksystemlog
+  ]);
 
   networking = {
     # Allow connections from certain port ranges (TCP).
