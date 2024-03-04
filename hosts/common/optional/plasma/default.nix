@@ -22,7 +22,7 @@
     xserver = {
       enable = true;
       xkb.layout = "us";
-      xkb.variant = "";
+      # xkb.variant = "";
       # Enable the Plasma Desktop Environment.
       displayManager = {
         # Wayland is the default session.
