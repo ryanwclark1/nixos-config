@@ -57,7 +57,7 @@
     # EC-Tool adjusted for usage with framework embedded controller.
     fw-ectool
     wget
-    git
+    gitMinimal
   ];
 
 
