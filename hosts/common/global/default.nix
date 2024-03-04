@@ -16,7 +16,7 @@
     ./nix.nix
     ./openssh.nix
     ./sops.nix
-    ./ssh-serve-store.nix
+    # ./ssh-serve-store.nix
     ./tailscale.nix
   ] ++ (builtins.attrValues outputs.nixosModules);
 
