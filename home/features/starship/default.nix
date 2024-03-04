@@ -1,5 +1,6 @@
 {
   config,
+  pkgs,
   ...
 }:
 let
@@ -8,6 +9,11 @@ in
 # TODO: Add pyenv, nvm, rbenv, rustup, etc. support
 
 {
+  fonts.packages = with pkgs; [
+    nerdfonts
+    powerline-fonts
+    powerline-symbols
+  ];
   # home.sessionVariables.STARSHIP_CACHE = "${config.xdg.cacheHome}/starship";
   programs.starship = {
     enable = true;
