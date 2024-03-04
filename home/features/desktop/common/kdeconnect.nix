@@ -5,7 +5,7 @@
 
 let
 
-  kdeconnect-cli = "${pkgs.plasma6Packages.kdeconnect-kde}/bin/kdeconnect-cli";
+  kdeconnect-cli = "${pkgs.kdePackages.kdeconnect-kde}/bin/kdeconnect-cli";
   fortune = "${pkgs.fortune}/bin/fortune";
 
   script-fortune = pkgs.writeShellScriptBin "fortune" ''
