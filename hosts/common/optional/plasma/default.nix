@@ -22,18 +22,6 @@
     xserver = {
       enable = true;
       xkb.layout = "us";
-      # xkb.variant = "";
-      # Enable the Plasma Desktop Environment.
-      # displayManager = {
-        # Wayland is the default session.
-        # defaultSession = "plasma";
-        # lightdm ?
-        # sddm = {
-          # enable = true;
-          # wayland.enable = true;
-          # theme = "breeze";
-        # };
-      # };
       desktopManager = {
         plasma6 = {
           enable = true;
@@ -69,11 +57,15 @@
     # Packages installed
     (ark.override { unfreeEnableUnrar = true; })
     gwenview
+    # Themes
+    utterly-nord-plasma
+    nordic
     qt6.qtimageformats # attempt to fix absence of webp support
     wl-clipboard # wayland clipboard client
   ] ++ (with pkgs.kdePackages; [
     qt6.qtbase
     ksystemlog
+    kdegraphics-thumbnailers
   ]);
 
   # security.pam.services.login.kwallet = {
