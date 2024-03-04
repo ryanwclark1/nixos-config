@@ -9,11 +9,12 @@ in
 # TODO: Add pyenv, nvm, rbenv, rustup, etc. support
 
 {
-  fonts.packages = with pkgs; [
+  home.packages = with pkgs; [
     nerdfonts
     powerline-fonts
     powerline-symbols
   ];
+  fonts.fontconfig.enable = true;
   # home.sessionVariables.STARSHIP_CACHE = "${config.xdg.cacheHome}/starship";
   programs.starship = {
     enable = true;
