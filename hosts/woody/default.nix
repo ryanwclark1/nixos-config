@@ -75,7 +75,7 @@
 
   environment.systemPackages = with pkgs; [
     wget
-    git
+    gitMinimal
     # UEFI boot manager
     refind
   ];
