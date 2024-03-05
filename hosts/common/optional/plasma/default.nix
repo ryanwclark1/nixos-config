@@ -57,15 +57,15 @@
     # Packages installed
     (ark.override { unfreeEnableUnrar = true; })
     gwenview
-    # Themes
-    utterly-nord-plasma
-    nordic
+    # Theme
+    # utterly-nord-plasma
+    # nordic
     qt6.qtimageformats # attempt to fix absence of webp support
     wl-clipboard # wayland clipboard client
   ] ++ (with pkgs.kdePackages; [
     qt6.qtbase
     ksystemlog
-    kdegraphics-thumbnailers
+    # kdegraphics-thumbnailers
   ]);
 
   # security.pam.services.login.kwallet = {
