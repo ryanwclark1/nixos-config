@@ -150,10 +150,15 @@ history:
 
 gc:
 	# remove all generations older than 7 days
-	sudo nix profile wipe-history --profile /nix/var/nix/profiles/system  --older-than 7d
-
+	@echo "Enter machine name to rebuild and clean boot menu: "
+	@read MACHINE_NAME; \
+	sudo nix profile wipe-history --profile /nix/var/nix/profiles/system  --older-than 7d \
 	# garbage collect all unused nix store entries
-	sudo nix store gc --debug
+	sudo nix store gc --debug \
+	sudo nix-collect-garbage --delete-older-than 7d \
+	# TODO: fix variable with #
+	sudo nixos-rebuild boot --flake .#$$MACHINE_NAME;
+	
 
 
 ############################################################################
