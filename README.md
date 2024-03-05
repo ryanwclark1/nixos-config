@@ -62,6 +62,26 @@ These computers are managed by this Nix flake ❄️
    - The `nixos-enter` command is used to automatically chroot into the new system and apply the Home Manager configuration.
 - Reboot 🥾
 
+
+All you need is nix (any version). Run:
+```
+nix-shell
+```
+
+If you already have nix 2.4+, git, and have already enabled `flakes` and
+`nix-command`, you can also use the non-legacy command:
+```
+nix develop
+```
+
+`nixos-rebuild --flake .` To build system configurations
+
+`home-manager --flake .` To build user configurations
+
+`nix build` (or shell or run) To build and use packages
+
+`sops` To manage secrets
+
 ## Applying Changes ✨
 
 I clone this repo to `~/nix-config`. NixOS and Home Manager changes are applied separately because I have some non-NixOS hosts.
