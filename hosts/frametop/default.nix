@@ -6,7 +6,7 @@
 
 {
   imports = [
-    inputs.hardware.nixosModules.framework-12th-gen-intel
+    inputs.nixos-hardware.nixosModules.framework-12th-gen-intel
     ./hardware-configuration.nix
     ./services
 
