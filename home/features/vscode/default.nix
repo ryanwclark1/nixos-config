@@ -87,7 +87,7 @@
           name = "ruff";
           publisher = "charliermarsh";
           version = "2024.14.0";
-          sha256 = "sha256-USumBFvwQC5qlpKqPSi37xzpCqxyQLAr+RfPOktfmBQ=";
+          sha256 = "sha256-JuOn9vQibr9emyKWL9/5QKsZDKAbwdbu+hvsl+fteTc=";
         }
         {
           name = "remote-ssh-edit";
