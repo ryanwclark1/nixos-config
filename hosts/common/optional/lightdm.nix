@@ -17,8 +17,8 @@
             slick = {
               enable = true;
               cursorTheme = {
-                package = pkgs.nordzy-cursor-theme;
-                name = "Nordzy-cursors";
+                package = pkgs.gnome.adwaita-icon-theme;
+                name = "Adwaita";
                 size = 24;
               };
               font = {
@@ -26,12 +26,8 @@
                 name = "Noto Sans";
               };
               iconTheme = {
-                package = pkgs.nordzy-icon-theme;
-                name = "Nodrzy-icon";
-              };
-              theme = {
-                package = pkgs.nordic;
-                name = "Nordic";
+                package = pkgs.papirus-icon-theme;
+                name = "Papirus Dark";
               };
               draw-user-backgrounds = true;
             };
