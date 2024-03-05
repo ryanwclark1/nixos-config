@@ -1,16 +1,8 @@
-{ pkgs ? import <nixpkgs> { } }: rec {
+{ pkgs ? import <nixpkgs> { } }: {
 
-  # Packages with an actual source
+  gitkraken = pkgs.callPackage ./gitkraken { };
   # shellcolord = pkgs.callPackage ./shellcolord { };
-  # trekscii = pkgs.callPackage ./trekscii { };
 
-  # Personal scripts
-  # nix-inspect = pkgs.callPackage ./nix-inspect { };
-  lyrics = pkgs.python3Packages.callPackage ./lyrics { };
-  xpo = pkgs.callPackage ./xpo { };
-  # tly = pkgs.callPackage ./tly { };
-  hyprslurp = pkgs.callPackage ./hyprslurp { };
-
-  # My wallpaper collection
+  nix-inspect = pkgs.callPackage ./nix-inspect { };
   # wallpapers = pkgs.callPackage ./wallpapers { };
 }

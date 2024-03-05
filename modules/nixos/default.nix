@@ -1,3 +1,3 @@
 {
-  satisfactory = import ./satisfactory.nix;
+
 }
