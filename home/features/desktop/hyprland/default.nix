@@ -7,7 +7,6 @@
 
 {
   imports = [
-    # ../common
     ./waybar.nix
     # ./wayland-wm
     # ./basic-binds.nix
@@ -67,7 +66,7 @@
     pavucontrol
     audacity
     zeroad
-    xonotic
+    # xonotic
     openra
     symbola
     noto-fonts-color-emoji
