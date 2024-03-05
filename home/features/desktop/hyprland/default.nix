@@ -47,8 +47,6 @@
   home.packages = with pkgs; [
     lolcat
     cmatrix
-    discord
-    btop
     libvirt
     swww
     polkit_gnome
@@ -59,26 +57,18 @@
     libnotify
     swaynotificationcenter
     rofi-wayland
-    imv
     v4l-utils
     ydotool
-    wl-clipboard
-    socat
     cowsay
     lsd
-    pkg-config
     transmission-gtk
-    kdenlive
     meson
-    glibc
     hugo
-    gnumake
     pavucontrol
     audacity
     zeroad
     xonotic
     openra
-    font-awesome
     symbola
     noto-fonts-color-emoji
     material-icons
