@@ -66,22 +66,22 @@
           version = "0.1.624";
           sha256 = "sha256-CJTku9MOet3JvVYLTQDgjKvmsU9V/NP2hamIFUfElMA=";
         }
-        {
-          name = "color-info";
-          publisher = "bierner";
-          version = "0.7.2";
-          sha256 = "sha256-Bf0thdt4yxH7OsRhIXeqvaxD1tbHTrUc4QJcju7Hv90=";
-        }
+        # {
+        #   name = "color-info";
+        #   publisher = "bierner";
+        #   version = "0.7.2";
+        #   sha256 = "sha256-Bf0thdt4yxH7OsRhIXeqvaxD1tbHTrUc4QJcju7Hv90=";
+        # }
         {
           name = "vscode-speech";
           publisher = "ms-vscode";
-          version = "0.4.0";
+          version = "0.6.0";
           sha256 = "sha256-Vtr+0HO29SnQxDEzZ6Zy8BNdBeDY0yETxhcSSbu6cQA=";
         }
         {
           name = "templ";
           publisher = "a-h";
-          version = "0.0.2";
+          version = "0.0.22";
           sha256 = "sha256-92G4J+A0obw3A/yz/Ak/n5gEW6FrdD5Ig52OS5prJag=";
         }
         {
@@ -100,6 +100,8 @@
 
       userSettings = {
         "accessibilitySupport.voice.keywordActivation" = "chatInView";
+        "accessibility.dimUnfocused.enabled" = true;
+        "audioCues.chatRequestSent" = "auto";
         "breadcrumbs.enabled" = true;
         "editor.accessibilityPageSize" = 500;
         "editor.fontFamily" = "JetBrainsMono Nerd Font";
@@ -121,6 +123,7 @@
           80
           120
         ];
+
         "editor.suggest.showStatusBar" = true;
         "editor.suggest.localityBonus" = true;
         "editor.suggestSelection" = "first";
@@ -128,7 +131,7 @@
         "editor.tabCompletion" = "on";
         "editor.tabSize" = 2;
         "editor.useTabStops" = true;
-        "editor.wordBasedSuggestions" = true;
+        "editor.wordBasedSuggestions" = "matchingDocuments";
         "editor.wordWrap" = "on";
         "editor.snippetSuggestions" = "top";
         "emmet.showSuggestionsAsSnippets" = true;
@@ -137,6 +140,7 @@
           "typescript" = "typescriptreact";
         };
         "emmet.triggerExpansionOnTab" = true;
+        "extensions.autoUpdate" = false;
         "files.associations" = {
           "*.css" = "tailwindcss";
         };
@@ -149,8 +153,10 @@
 
         "terminal.integrated.fontFamily" = "JetBrainsMono Nerd Font";
         "terminal.integrated.copyOnSelection" = true;
-        "terminal.integrated.defaultProfile.linux" = "zsh";
+        "terminal.integrated.defaultProfile.linux" = "bash";
         "terminal.integrated.fontSize" = 12;
+        "terminal.integrated.mouseWheelZoom" = true;
+
         # Nix IDE
         "nix.enableLanguageServer" = true;
         "nix.serverPath" = "${pkgs.nil}/bin/nil";
@@ -201,7 +207,7 @@
         "tailwindCSS.includeLanguages" = {
           "plaintext" = "html";
         };
-        "tailwindCSS.emmetCompletions" = false;
+        "tailwindCSS.emmetCompletions" = true;
         "tailwindCSS.colorDecorators" = true;
         "tailwindCSS.showPixelEquivalents" = true;
         "tailwindCSS.hovers" = true;
@@ -210,6 +216,7 @@
         "tailwindCSS.validate" = true;
 
 
+        "git.autofetchPeriod" = 30;
         "github.copilot.advanced" = {
           "listCount" = 3;
         };
@@ -222,48 +229,48 @@
           "Github.copilot-chat"
           "Github.copilot"
         ];
-        "colorInfo.fields" = [
-          "hex"
-          "rgb"
-          "preview-square"
-          "css-color-name"
-          "cmyk"
-          "hsl"
-        ];
-        "colorInfo.languages" = [
-          {
-            "selector" = "css";
-            "colors" = "css";
-          }
-          {
-            "selector" = "sass";
-            "colors" = "css";
-          }
-          {
-            "selector" = "scss";
-            "colors" = "css";
-          }
-          {
-            "selector" = "less";
-            "colors" = "css";
-          }
-          {
-            "selector" = "nix";
-            "colors" = "hex";
-          }
-          {
-            "selector" = "txt";
-            "colors" = "hex";
-          }
-          {
-            "selector" = "yaml";
-            "colors" = "hex";
-          }
-          {
-            "selector" = "json";
-            "colors" = "hex";
-          }
-        ];
+        # "colorInfo.fields" = [
+        #   "hex"
+        #   "rgb"
+        #   "preview-square"
+        #   "css-color-name"
+        #   "cmyk"
+        #   "hsl"
+        # ];
+        # "colorInfo.languages" = [
+        #   {
+        #     "selector" = "css";
+        #     "colors" = "css";
+        #   }
+        #   {
+        #     "selector" = "sass";
+        #     "colors" = "css";
+        #   }
+        #   {
+        #     "selector" = "scss";
+        #     "colors" = "css";
+        #   }
+        #   {
+        #     "selector" = "less";
+        #     "colors" = "css";
+        #   }
+        #   {
+        #     "selector" = "nix";
+        #     "colors" = "hex";
+        #   }
+        #   {
+        #     "selector" = "txt";
+        #     "colors" = "hex";
+        #   }
+        #   {
+        #     "selector" = "yaml";
+        #     "colors" = "hex";
+        #   }
+        #   {
+        #     "selector" = "json";
+        #     "colors" = "hex";
+        #   }
+        # ];
       };
     };
   };
