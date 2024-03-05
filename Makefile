@@ -137,27 +137,15 @@ secrets:
 ############################################################################
 
 frametop:
-	sudo nixos-rebuild switch --flake .#frametop
-
-woody:
-	sudo nixos-rebuild switch --flake .#woody
-
-frametop-debug:
 	sudo nixos-rebuild switch --flake .#frametop --show-trace --verbose
 
-woody-debug:
+woody:
 	sudo nixos-rebuild switch --flake .#woody --show-trace --verbose
 
 frametop-remote:
-	nixos-rebuild switch --flake .#frametop --use-remote-sudo
-
-woody-remote:
-	nixos-rebuild switch --flake .#woody --use-remote-sudo
-
-frametop-remote-debug:
 	nixos-rebuild switch --flake .#frametop --use-remote-sudo --show-trace --verbose
 
-woody-remote-debug:
+woody-remote:
 	nixos-rebuild switch --flake .#woody --use-remote-sudo --show-trace --verbose
 
 frametop-dryrun:
@@ -178,15 +166,16 @@ history:
 	nix profile history --profile /nix/var/nix/profiles/system
 
 gc:
-	# remove all generations older than 7 days
-	@echo "Enter machine name to rebuild and clean boot menu: "
-	@read MACHINE_NAME; \
-	sudo nix profile wipe-history --profile /nix/var/nix/profiles/system  --older-than 7d \
-	# garbage collect all unused nix store entries
-	sudo nix store gc --debug \
-	sudo nix-collect-garbage --delete-older-than 7d \
-	# TODO: fix variable with #
-	sudo nixos-rebuild boot --flake .#$$MACHINE_NAME;
+	$(eval MACHINE_NAME := $(shell hostname))
+	@echo "Machine Name: $$MACHINE_NAME"
+	echo "Wiping profile history older than 7 days..."; \
+	sudo nix profile wipe-history --profile /nix/var/nix/profiles/system --older-than 7d; \
+	echo "Running garbage collection..."; \
+	sudo nix store gc; \
+	echo "Deleting old generations of garbage..."; \
+	sudo nix-collect-garbage --delete-older-than 7d; \
+	echo "Rebuilding NixOS for machine $$MACHINE_NAME..."; \
+	sudo nixos-rebuild boot --flake .#$$MACHINE_NAME
 
 
 
