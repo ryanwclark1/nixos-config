@@ -68,6 +68,35 @@ pgp:
 	@echo "Make PGP key..."
 	nix --extra-experimental-features nix-command shell --extra-experimental-features flakes nixpkgs#gpg --full-generate-key
 
+
+###########################################################################
+#
+#  Get sha256 hash of a VSIX package
+#
+############################################################################
+
+.PHONY: get-vscode-sha
+
+get-vscode-sha:
+	@read -p "Enter Publisher: " PUBLISHER; \
+	read -p "Enter Extension Name: " EXTENSION; \
+	read -p "Enter Version: " VERSION; \
+	URL="https://ms-vscode.gallery.vsassets.io/_apis/public/gallery/publisher/$$PUBLISHER/extension/$$EXTENSION/$$VERSION/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"; \
+	echo "Checking URL $$URL..."; \
+	HTTP_STATUS=$$(curl -o /dev/null -L --silent --write-out '%{http_code}\n' $$URL); \
+	if [ $$HTTP_STATUS -eq 200 ]; then \
+		echo "URL is valid. Calculating SHA256 for $$EXTENSION version $$VERSION from $$PUBLISHER..."; \
+		SHA256_HASH=$$(curl -sL $$URL | openssl dgst -sha256 -binary | openssl base64); \
+		echo "{"; \
+		echo "  name = \"$$EXTENSION\";"; \
+		echo "  publisher = \"$$PUBLISHER\";"; \
+		echo "  version = \"$$VERSION\";"; \
+		echo "  sha256 = \"sha256-$$SHA256_HASH\";"; \
+		echo "}"; \
+	else \
+		echo "Error: The URL is not valid or the file does not exist. HTTP Status: $$HTTP_STATUS"; \
+	fi
+
 ###########################################################################
 #
 #  Make Secrets
@@ -158,7 +187,7 @@ gc:
 	sudo nix-collect-garbage --delete-older-than 7d \
 	# TODO: fix variable with #
 	sudo nixos-rebuild boot --flake .#$$MACHINE_NAME;
-	
+
 
 
 ############################################################################
