@@ -12,5 +12,5 @@
   hyprslurp = pkgs.callPackage ./hyprslurp { };
 
   # My wallpaper collection
-  wallpapers = pkgs.callPackage ./wallpapers { };
+  # wallpapers = pkgs.callPackage ./wallpapers { };
 }
