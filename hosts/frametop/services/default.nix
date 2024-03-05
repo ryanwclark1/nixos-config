@@ -9,7 +9,7 @@
   ];
 
   services = {
-    # fwupd.enable = true;
+    fwupd.enable = true;
     # fprintd = {
     #   enable = true;
     # };
