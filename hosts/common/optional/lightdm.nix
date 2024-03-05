@@ -29,7 +29,7 @@
                 package = pkgs.papirus-icon-theme;
                 name = "Papirus Dark";
               };
-              draw-user-backgrounds = true;
+              draw-user-backgrounds = false;
             };
           };
         };
