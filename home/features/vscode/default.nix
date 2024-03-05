@@ -34,8 +34,6 @@
         ms-vscode.makefile-tools
         golang.go
         wholroyd.jinja # Prefer Better Jinja
-        # hash mismatch in nixos upgrade to unstable
-        # charliermarsh.ruff
         ms-azuretools.vscode-docker
         bradlc.vscode-tailwindcss
         jnoortheen.nix-ide
@@ -45,20 +43,16 @@
         redhat.vscode-yaml
         rust-lang.rust-analyzer
         tamasfe.even-better-toml
-
         esbenp.prettier-vscode
         yzhang.markdown-all-in-one
         donjayamanne.githistory
-
         pkief.material-icon-theme
         jdinhlife.gruvbox
-
         mikestead.dotenv
         dbaeumer.vscode-eslint
         # vscode-extension-dbaeumer-vscode-eslint
 
         vscodevim.vim
-        # vscode-icons-team.vscode-icons
       ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
         {
           name = "nord-deep";
@@ -66,12 +60,6 @@
           version = "0.1.624";
           sha256 = "sha256-CJTku9MOet3JvVYLTQDgjKvmsU9V/NP2hamIFUfElMA=";
         }
-        # {
-        #   name = "color-info";
-        #   publisher = "bierner";
-        #   version = "0.7.2";
-        #   sha256 = "sha256-Bf0thdt4yxH7OsRhIXeqvaxD1tbHTrUc4QJcju7Hv90=";
-        # }
         {
           name = "vscode-speech";
           publisher = "ms-vscode";
@@ -95,6 +83,12 @@
           publisher = "adrianwilczynski";
           version = "1.2.0";
           sha256 = "sha256-Klx5ZvV06lXIJ3Q/mzq3KBjPpdROoxDkgEu7MBO+RhI=";
+        }
+        {
+          name = "ruff";
+          publisher = "charliermarsh";
+          version = "2024.14.0";
+          sha256 = "";
         }
       ];
 
@@ -229,48 +223,6 @@
           "Github.copilot-chat"
           "Github.copilot"
         ];
-        # "colorInfo.fields" = [
-        #   "hex"
-        #   "rgb"
-        #   "preview-square"
-        #   "css-color-name"
-        #   "cmyk"
-        #   "hsl"
-        # ];
-        # "colorInfo.languages" = [
-        #   {
-        #     "selector" = "css";
-        #     "colors" = "css";
-        #   }
-        #   {
-        #     "selector" = "sass";
-        #     "colors" = "css";
-        #   }
-        #   {
-        #     "selector" = "scss";
-        #     "colors" = "css";
-        #   }
-        #   {
-        #     "selector" = "less";
-        #     "colors" = "css";
-        #   }
-        #   {
-        #     "selector" = "nix";
-        #     "colors" = "hex";
-        #   }
-        #   {
-        #     "selector" = "txt";
-        #     "colors" = "hex";
-        #   }
-        #   {
-        #     "selector" = "yaml";
-        #     "colors" = "hex";
-        #   }
-        #   {
-        #     "selector" = "json";
-        #     "colors" = "hex";
-        #   }
-        # ];
       };
     };
   };
