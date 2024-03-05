@@ -59,7 +59,7 @@
 
   # DO NOT USE ON OTHER DEs
   qt.style = "kvantum";
-  qt.platformTheme = "qt5ct";
+  qt.platformTheme = "qt6ct";
 
 
   # Use librsvg's gdk-pixbuf loader cache file as it enables gdk-pixbuf to load SVG files (important for icons in GTK apps)
