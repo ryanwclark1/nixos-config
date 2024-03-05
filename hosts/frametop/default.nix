@@ -24,7 +24,7 @@
     ../common/optional/systemd-boot.nix
     ../common/optional/wireshark.nix
 
-    ../common/optional/hyprland
+    # ../common/optional/hyprland
     ../common/optional/lightdm.nix
     ../common/optional/plasma
   ];
