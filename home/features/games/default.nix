@@ -11,6 +11,10 @@
     ./steam.nix
   ];
   home = {
-    packages = with pkgs; [ gamescope ];
+    packages = with pkgs; [
+      gamescope
+      zeroad
+      openra
+    ];
   };
 }
