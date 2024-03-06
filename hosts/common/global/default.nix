@@ -24,7 +24,7 @@
 
 # allowUnfree isn't being inherited from the global flake
   nixpkgs = {
-    # overlays = builtins.attrValues outputs.overlays;
+    overlays = builtins.attrValues outputs.overlays;
     config = {
       allowUnfree = true;
     };
