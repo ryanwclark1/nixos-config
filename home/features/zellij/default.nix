@@ -1,15 +1,14 @@
 # Similar to TMUX
+# https://zellij.dev/documentation
 {
   pkgs,
   ...
 }:
-# Update theme
 
 {
   programs.zellij = {
     enable = true;
     package = pkgs.zellij;
-    # https://zellij.dev/documentation
     settings = {
       copy_command = "wl-copy";
       on_force_close = "quit";
@@ -22,8 +21,6 @@
       copy_clipboard = "primary";
       copy_on_select = true;
       scrollback_editor = "$EDITOR";
-
-
     };
     # enableZshIntegration = true;
     enableFishIntegration = true;
