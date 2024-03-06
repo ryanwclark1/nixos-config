@@ -28,17 +28,6 @@
       xkb.layout = "us";
       xkb.variant = "";
       libinput.enable = true;
-      # This is included in gpu.nix to allow for other drivers
-      # videoDrivers = [ "amdgpu" ];
-      # displayManager = {
-        # defaultSession = "hyprland";
-        # sddm = {
-        #   enable = true;
-        #   theme = "breeze";
-        #   wayland.enable = true;
-        #   autoLogin.relogin = true;
-        # };
-      # };
     };
   };
 
@@ -51,10 +40,7 @@
     };
   };
 
-   # Enable networking
   networking.networkmanager.enable = true;
-
-  # Add needed packages (moved to software/home/hyprland)
 
   # DO NOT USE ON OTHER DEs
   qt.style = "kvantum";
