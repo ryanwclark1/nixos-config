@@ -43,8 +43,8 @@
   networking.networkmanager.enable = true;
 
   # DO NOT USE ON OTHER DEs
-  qt.style = "kvantum";
-  qt.platformTheme = "qt5ct";
+  # qt.style = "kvantum";
+  # qt.platformTheme = "qt5ct";
 
 
   # Use librsvg's gdk-pixbuf loader cache file as it enables gdk-pixbuf to load SVG files (important for icons in GTK apps)
