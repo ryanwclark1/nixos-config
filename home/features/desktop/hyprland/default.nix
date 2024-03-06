@@ -44,6 +44,7 @@
 
 
   home.packages = with pkgs; [
+    hyprpicker
     lolcat
     cmatrix
     libvirt
@@ -165,10 +166,6 @@
   # ".."="cd ..";
   # };
   # };
-
-  # home.packages = with pkgs; [
-  #   hyprpicker
-  # ];
 
   # wayland.windowManager.hyprland = {
   #   enable = true;
