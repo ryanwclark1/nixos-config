@@ -10,7 +10,7 @@
     ./dragon.nix
     ./firefox.nix
     ./font.nix
-    ./kdeconnect.nix
+    # ./kdeconnect.nix
     ./pavucontrol.nix
     ./playerctl.nix
     ./slack.nix
@@ -29,7 +29,6 @@
     ventoy-full #balena type tool
     etcher
     libnotify
-    wineWowPackages.wayland
     xdg-utils
     wl-clipboard
     mediainfo
