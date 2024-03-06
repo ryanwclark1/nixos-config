@@ -15,13 +15,7 @@
           enableQt5Integration = true;
         };
       };
-      libinput = {
-        enable = true;
-        touchpad = {
-          naturalScrolling = true;
-          scrollMethod = "twofinger";
-        };
-      };
+
     };
   };
 
