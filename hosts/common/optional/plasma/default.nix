@@ -1,21 +1,10 @@
 {
-  lib,
   pkgs,
   ...
 }:
 
 
 {
-  programs = {
-    # thunar.enable = true;
-    dconf.enable = true;
-    # kdeconnect.enable = true;
-  };
-
-  qt = {
-    enable = true;
-  };
-
   services = {
     xserver = {
       enable = true;
@@ -35,7 +24,7 @@
     };
   };
 
-    # Ensure XDG portal is enabled
+  # Ensure XDG portal is enabled
   xdg = {
     portal = {
       enable = true;
@@ -45,19 +34,16 @@
     };
   };
 
-  # environment.sessionVariables ={
-  #   # NIXOS_OZONE_WL = "1";
+  environment.sessionVariables ={
+    NIXOS_OZONE_WL = "1";
   #   # Use librsvg's gdk-pixbuf loader cache file as it enables gdk-pixbuf to load SVG files (important for icons in GTK apps)
   #   GDK_PIXBUF_MODULE_FILE = lib.mkForce "$(echo ${pkgs.librsvg.out}/lib/gdk-pixbuf-2.0/*/loaders.cache)";
-  # };
+  };
 
   environment.systemPackages = with pkgs; [
     # Packages installed
     (ark.override { unfreeEnableUnrar = true; })
     gwenview
-    # Theme
-    # utterly-nord-plasma
-    # nordic
     qt6.qtimageformats # attempt to fix absence of webp support
     wl-clipboard # wayland clipboard client
   ] ++ (with pkgs.kdePackages; [
