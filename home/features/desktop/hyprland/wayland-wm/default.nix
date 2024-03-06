@@ -20,7 +20,6 @@
     grim
     gtk3 # For gtk-launch
     mimeo
-    # primary-xwayland
     pulseaudio
     slurp
     waypipe
@@ -28,7 +27,6 @@
     wl-clipboard
     wl-mirror
     xdg-utils
-    # xdg-utils-spawn-terminal # Patched to open terminal
     ydotool
   ];
 
