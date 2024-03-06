@@ -1,10 +1,7 @@
 {
-  config,
-  lib,
   pkgs,
   ...
 }:
-
 
 {
 	programs.waybar = {
@@ -38,12 +35,12 @@
       };
       "memory" = {
         interval = 5;
-        format = " {}%";
+        format = "  {}%";
         tooltip = true;
       };
       "cpu" = {
         interval = 5;
-        format = " {usage:2}%";
+        format = "  {usage:2}%";
         tooltip = true;
       };
       "disk" = {
@@ -51,11 +48,18 @@
         tooltip = true;
       };
       "network" = {
+				interval = 3;
         format-icons = [ "󰤯" "󰤟" "󰤢" "󰤥" "󰤨" ];
         format-ethernet = ": {bandwidthDownOctets} : {bandwidthUpOctets}";
-        format-wifi = "{icon} {signalStrength}%";
+        format-wifi = "{icon} {signalStrength}% {ssid}";
         format-disconnected = "󰤮";
         tooltip = false;
+				tooltip-format = ''
+            {ifname}
+            {ipaddr}/{cidr}
+            Up: {bandwidthUpBits}
+            Down: {bandwidthDownBits}'';
+				on-click = "";
       };
       "tray" = {
         spacing = 12;
@@ -63,14 +67,13 @@
       "pulseaudio" = {
         format = "{icon} {volume}% {format_source}";
         format-bluetooth = "{volume}% {icon} {format_source}";
-        format-bluetooth-muted = " {icon} {format_source}";
-        format-muted = " {format_source}";
+        format-bluetooth-muted = " {icon} {format_source}";
+        format-muted = "   0%{format_source}";
         format-source = " {volume}%";
         format-source-muted = "";
         format-icons = {
           headphone = "";
-          hands-free = "";
-          headset = "";
+          headset = "󰋎";
           phone = "";
           portable = "";
           car = "";
@@ -98,6 +101,8 @@
         escape = true;
       };
       "battery" = {
+				bat = "BAT0";
+				interval = 10;
         states = {
           warning = 30;
           critical = 15;
