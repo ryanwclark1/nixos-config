@@ -38,31 +38,20 @@
 
 
   home.packages = with pkgs; [
-    hyprpicker
-    lolcat
     cmatrix
     libvirt
     swww
     polkit_gnome
     grim
     slurp
-    lm_sensors
     gnome.file-roller
     libnotify
     swaynotificationcenter
     rofi-wayland
-    v4l-utils
     ydotool
-    cowsay
-    lsd
-    transmission-gtk
-    meson
-    hugo
     pavucontrol
     audacity
-    zeroad
     # xonotic
-    openra
     symbola
     noto-fonts-color-emoji
     material-icons
