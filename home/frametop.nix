@@ -41,7 +41,6 @@ in
 
   ];
 
-
   colorscheme = lib.mkDefault colorSchemes.nord;
   specialisation = {
     light.configuration.colorscheme = colorSchemes.silk-light;
