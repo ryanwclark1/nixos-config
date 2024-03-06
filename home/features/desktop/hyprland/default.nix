@@ -1,9 +1,14 @@
 {
   config,
+  inputs,
   lib,
   pkgs,
   ...
 }:
+let
+  inherit (inputs.nix-colors.lib-contrib { inherit pkgs; }) gtkThemeFromScheme;
+in
+rec
 
 {
   imports = [
@@ -97,13 +102,12 @@
   gtk = {
     enable = true;
     font = {
-      name = "Ubuntu";
+      name = config.fontProfiles.regular.family;
       size = 12;
-      package = pkgs.ubuntu_font_family;
     };
     theme = {
-      name = "Tokyonight-Storm-BL";
-      package = pkgs.tokyo-night-gtk;
+      name = "${config.colorscheme.slug}";
+      package = gtkThemeFromScheme { scheme = config.colorscheme; };
     };
     iconTheme = {
       name = "Papirus-Dark";
