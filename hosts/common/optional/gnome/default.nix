@@ -16,7 +16,7 @@
         gdm = {
           enable = true;
           # Would likely create issue if used on laptop.
-          autoSuspend = false;
+          # autoSuspend = false;
           wayland = true;
         };
       };
