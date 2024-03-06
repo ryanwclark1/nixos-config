@@ -9,7 +9,7 @@
     platformTheme = "gtk";
     style = {
       name = "gtk2";
-      package = pkgs.qt6Packages.qt6gtk2;
+      package = pkgs.kdePackages.qt6gtk2;
     };
   };
 }
