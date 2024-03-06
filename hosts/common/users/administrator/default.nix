@@ -8,7 +8,6 @@ let
 in
 {
   imports = [ ./packages.nix ];
-  # users.mutableUsers = false;
   users.users.administrator = {
     isNormalUser = true;
     # shell = "${pkgs.zsh}/bin/zsh";
