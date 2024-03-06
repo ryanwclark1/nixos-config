@@ -20,11 +20,13 @@
     vscode-server = {
       enable = true;
     };
-    libinput = {
-      enable = true;
-      touchpad = {
-        naturalScrolling = true;
-        scrollMethod = "twofinger";
+    xserver = {
+      libinput = {
+        enable = true;
+        touchpad = {
+          naturalScrolling = true;
+          scrollMethod = "twofinger";
+        };
       };
     };
   };
