@@ -15,6 +15,7 @@
       gamescope
       zeroad
       openra
+      xonotic
     ];
   };
 }
