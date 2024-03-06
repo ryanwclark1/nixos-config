@@ -10,5 +10,6 @@
       powerOnBoot = true;
     };
   };
-  services.blueman.enable = true;
+  # Blueman is a GTK+ Bluetooth Manager
+  # services.blueman.enable = true;
 }
