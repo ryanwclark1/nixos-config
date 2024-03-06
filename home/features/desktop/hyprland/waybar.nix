@@ -11,7 +11,7 @@
 	programs.waybar = {
     enable = true;
     package = pkgs.waybar;
-		systemd.enable = true;
+		# systemd.enable = true;
     settings = [{
       layer = "top";
       position = "top";
