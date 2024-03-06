@@ -1,12 +1,9 @@
 {
-  lib,
   pkgs,
   ...
 }:
 
-
 {
-
   programs = {
     hyprland = {
       enable = true;
@@ -41,10 +38,4 @@
   };
 
   networking.networkmanager.enable = true;
-
-  # Use librsvg's gdk-pixbuf loader cache file as it enables gdk-pixbuf to load SVG files (important for icons in GTK apps)
-  environment.sessionVariables = {
-    XDG_SESSION_DESKTOP = "Hyprland";
-  };
-
 }
