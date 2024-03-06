@@ -6,16 +6,14 @@
 
 
 {
-  # programs = {
+  programs = {
     # thunar.enable = true;
-    # dconf.enable = true;
+    dconf.enable = true;
     # kdeconnect.enable = true;
-  # };
+  };
 
   qt = {
     enable = true;
-    # platformTheme = "gnome";
-    # style = "adwaita-dark";
   };
 
   services = {
@@ -29,10 +27,10 @@
       };
       libinput = {
         enable = true;
-        # touchpad = {
-        #   # naturalScrolling = true;
-        #   scrollMethod = "twofinger";
-        # };
+        touchpad = {
+          naturalScrolling = true;
+          scrollMethod = "twofinger";
+        };
       };
     };
   };
@@ -72,15 +70,15 @@
   #   enable = true;
   # };
 
-  networking = {
-    # Allow connections from certain port ranges (TCP).
-    firewall.allowedTCPPortRanges = [
-      { from = 1714; to = 1764; } # KDEConnect
-    ];
+  # networking = {
+  #   # Allow connections from certain port ranges (TCP).
+  #   firewall.allowedTCPPortRanges = [
+  #     { from = 1714; to = 1764; } # KDEConnect
+  #   ];
 
-    # Allow connections from certain port ranges (UDP).
-    firewall.allowedUDPPortRanges = [
-      { from = 1714; to = 1764; } # KDEConnect
-    ];
-  };
+  #   # Allow connections from certain port ranges (UDP).
+  #   firewall.allowedUDPPortRanges = [
+  #     { from = 1714; to = 1764; } # KDEConnect
+  #   ];
+  # };
 }
