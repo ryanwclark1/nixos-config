@@ -51,16 +51,13 @@
         enableGraphical = true;
       };
     };
-
   };
 
   environment.systemPackages = with pkgs; [
-    # EC-Tool adjusted for usage with framework embedded controller.
-    fw-ectool
+    fw-ectool  # EC-Tool adjusted for usage with framework embedded controller.
     wget
     gitMinimal
   ];
-
 
   system.stateVersion = "24.05";
 }

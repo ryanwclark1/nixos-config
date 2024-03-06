@@ -14,7 +14,6 @@
     #   enable = true;
     # };
     logind = {
-      # Lid settings
       lidSwitch = "suspend";
       lidSwitchExternalPower = "lock";
     };
