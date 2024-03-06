@@ -7,7 +7,7 @@
   imports = [
     ./waybar.nix
     # ./wayland-wm
-    # ./basic-binds.nix
+    ./basic-binds.nix
   ];
 
     home = {
