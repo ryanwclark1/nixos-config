@@ -1,14 +1,7 @@
 {
-  config,
-  inputs,
-  lib,
   pkgs,
   ...
 }:
-let
-  inherit (inputs.nix-colors.lib-contrib { inherit pkgs; }) gtkThemeFromScheme;
-in
-rec
 
 {
   imports = [
@@ -41,10 +34,6 @@ rec
       source = ./config/hyprland;
       recursive = true;
     };
-  };
-
-  xresources.properties = {
-    "Xcursor.size" = 24;
   };
 
 
@@ -84,92 +73,6 @@ rec
     (import ./scripts/wallsetter.nix { inherit pkgs; })
   ];
 
-  home.pointerCursor = {
-    gtk.enable = true;
-    x11.enable = true;
-    package = pkgs.bibata-cursors;
-    name = "Bibata-Modern-Ice";
-    size = 24;
-  };
-  qt = {
-    enable = true;
-    platformTheme = "gtk";
-    style = {
-      name = "adwaita-dark";
-      package = pkgs.adwaita-qt;
-    };
-  };
-  gtk = {
-    enable = true;
-    font = {
-      name = config.fontProfiles.regular.family;
-      size = 12;
-    };
-    theme = {
-      name = "${config.colorscheme.slug}";
-      package = gtkThemeFromScheme { scheme = config.colorscheme; };
-    };
-    iconTheme = {
-      name = "Papirus-Dark";
-      package = pkgs.papirus-icon-theme;
-    };
-    cursorTheme = {
-      name = "Bibata-Modern-Ice";
-      package = pkgs.bibata-cursors;
-    };
-    gtk3.extraConfig = {
-      Settings = ''
-        gtk-application-prefer-dark-theme=1
-      '';
-    };
-    gtk4.extraConfig = {
-      Settings = ''
-        gtk-application-prefer-dark-theme=1
-      '';
-    };
-  };
-  xdg = {
-    userDirs = {
-      enable = true;
-      createDirectories = true;
-    };
-  };
-
-  programs.bash = {
-    enable = true;
-    enableCompletion = true;
-    enableVteIntegration = true;
-    bashrcExtra = ''
-      neofetch
-      export PATH="$PATH:$HOME/bin:$HOME/.local/bin:$HOME/go/bin"
-    '';
-    profileExtra = ''
-      #if [ -z "$DISPLAY" ] && [ "$XDG_VTNR" = 1 ]; then
-      #  exec Hyprland
-      #fi
-    '';
-  };
-  programs.starship.enableBashIntegration = true;
-  # programs.fzf.enableBashIntegration = mkIf config.fzf.enable true;
-  programs.zoxide.enableBashIntegration = true;
-  # programs.nix-index.enableBashIntegration = true;
-  # services.gpg-agent.enableBashIntegration = true;
-
-  # sessionVariables = {
-
-  # };
-  # shellAliases = {
-  # sv="sudo vim";
-  # flake-rebuild="sudo nixos-rebuild switch --flake ~/xxxxxxx/#workstation";
-  # laptop-rebuild="sudo nixos-rebuild switch --flake ~/xxxxxxxx/#laptop";
-  # v="vim";
-  # ls="lsd";
-  # ll="lsd -l";
-  # la="lsd -a";
-  # lal="lsd -al";
-  # ".."="cd ..";
-  # };
-  # };
 
   # wayland.windowManager.hyprland = {
   #   enable = true;
