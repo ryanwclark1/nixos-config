@@ -15,7 +15,6 @@
           enableQt5Integration = true;
         };
       };
-
     };
   };
 
