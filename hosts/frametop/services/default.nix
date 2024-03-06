@@ -13,17 +13,18 @@
     # fprintd = {
     #   enable = true;
     # };
-    logind = {
-      lidSwitch = "suspend";
-      lidSwitchExternalPower = "lock";
-    };
+    # logind = {
+    #   lidSwitch = "suspend";
+    #   lidSwitchExternalPower = "lock";
+    # };
     vscode-server = {
       enable = true;
     };
 
   };
 
-  powerManagement.powertop.enable = true;
+  # Issues with kde powerdevil
+  # powerManagement.powertop.enable = true;
 
   # security.pam.services.login.fprintAuth = true;
 }
