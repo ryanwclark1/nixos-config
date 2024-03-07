@@ -13,7 +13,6 @@ let
   packageNames = map (p: p.pname or p.name or null) config.home.packages;
   hasPackage = name: lib.any (x: x == name) packageNames;
   hasRipgrep = hasPackage "ripgrep";
-  hasSpecialisationCli = hasPackage "specialisation";
   hasNeovim = config.programs.neovim.enable;
   hasNeomutt = config.programs.neomutt.enable;
   hasKitty = config.programs.kitty.enable;
@@ -77,8 +76,6 @@ in
       snrs = "sudo nixos-rebuild --flake . switch";
       hm = "home-manager --flake .";
       hms = "home-manager --flake . switch";
-
-      s = mkIf hasSpecialisationCli "specialisation";
 
       vrg = mkIf (hasNeomutt && hasRipgrep) "nvimrg";
       vim = mkIf hasNeovim "nvim";
