@@ -7,7 +7,6 @@
   imports = [
     ./deluge.nix
     ./discord.nix
-    ./dragon.nix
     ./firefox.nix
     ./font.nix
     # ./kdeconnect.nix
