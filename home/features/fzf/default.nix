@@ -47,9 +47,6 @@ in
     #   "--preview 'tree -C {} | head -200'"
     #   # "--preview='ls -l {}'"
     # ];
-    enableBashIntegration = true;
-    enableZshIntegration = true;
-    enableFishIntegration = true;
   };
 
   home.packages = with pkgs; [
