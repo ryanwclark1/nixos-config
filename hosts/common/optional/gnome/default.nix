@@ -34,7 +34,6 @@
       games.enable = false;
       sushi.enable = true;
     };
-    geoclue2.enable = true;
   };
 
   environment.sessionVariables ={
