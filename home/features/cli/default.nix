@@ -11,7 +11,6 @@
     ./filesearch.nix
     ./filesystem_utils.nix
     ./gh.nix
-    ./git.nix
     ./gpg.nix
     ./jq.nix
     ./network.nix

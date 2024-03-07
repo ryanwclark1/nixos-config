@@ -68,6 +68,12 @@ in
             "github:"
           ];
         };
+        "https://gitlab.com/" = {
+          insteadOf = [
+            "gl:"
+            "gitlab:"
+          ];
+        };
         "https://codeberg.org/" = {
           insteadOf = [
             "cb:"
