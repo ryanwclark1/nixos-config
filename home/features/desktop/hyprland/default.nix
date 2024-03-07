@@ -10,7 +10,7 @@
     ./waybar.nix
     ./basic-binds.nix
     # ./hyprland-vnc.nix
-    ./hyprbars.nix
+    # ./hyprbars.nix
   ];
 
     home = {
