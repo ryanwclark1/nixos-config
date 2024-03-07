@@ -14,7 +14,6 @@ in
     ./features/desktop/common
 
     ./features/alacritty
-    ./features/build
     ./features/cli
     ./features/compression
     ./features/development
