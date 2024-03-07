@@ -7,7 +7,8 @@
   home.packages = with pkgs; [
     digikam
     drawio
-    exif
+    # exif
+    exiftool
     gimp
     graphviz
     krita
