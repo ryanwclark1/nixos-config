@@ -11,7 +11,7 @@
       bump #  CLI tool to draft a GitHub Release for the next semantic version
       gh-markdown-preview
       gh-dash
-      gh-eco
+      # gh-eco #BROKEN
       gh-cal
     ];
   };
