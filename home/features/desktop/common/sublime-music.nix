@@ -4,5 +4,7 @@
 }:
 
 {
-  home.packages = [ pkgs.sublime-music ];
+  home.packages = with pkgs; [
+    sublime-music
+  ];
 }
