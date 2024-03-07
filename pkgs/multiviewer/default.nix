@@ -54,10 +54,10 @@ let
   desktopItems = [
     (makeDesktopItem {
       name = "MultiViewer for F1";
-      exec = "f1multiviewer %U";
-      tryExec = "f1multiviewer";
-      icon = "f1multiviewer";
-      desktopName = "f1multiviewer";
+      exec = "multiviewer %U";
+      tryExec = "multiviewer";
+      icon = "multiviewer";
+      desktopName = "multiviewer";
       mimeTypes = [ "x-scheme-handler/multiviewer" "x-scheme-handler/multiviewer" ];
       comment = "Unofficial motorsports desktop client";
       categories = [ "AudioVideo" "Video" "TV" ];
@@ -104,8 +104,8 @@ let
     installPhase = ''
       runHook preInstall
 
-      mkdir -p $out/Applications/F1MultiViewer.app
-      cp -R . $out/Applications/F1MultiViewer.app
+      mkdir -p $out/Applications/MultiViewer.app
+      cp -R . $out/Applications/MultiViewer.app
 
       runHook postInstall
     '';
