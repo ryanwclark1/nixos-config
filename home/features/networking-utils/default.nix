@@ -15,6 +15,5 @@
     tcpdump
     rathole # similar to ngrok - NAT traversal and reverse proxy
     ngrep
-    wireshark
   ];
 }
