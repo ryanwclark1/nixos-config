@@ -9,6 +9,7 @@
   makeDesktopItem,
   unzip
 }:
+
 with lib;
 
 let
@@ -25,13 +26,13 @@ let
     };
 
     x86_64-darwin = fetchzip {
-    url = "https://releases.multiviewer.app/download/155446334/MultiViewer.for.F1-1.31.5-x64.dmg";
-    hash = "";
-  };
+      url = "https://releases.multiviewer.app/download/155446334/MultiViewer.for.F1-1.31.5-x64.dmg";
+      hash = "";
+    };
 
     aarch64-darwin = fetchzip {
-    url = "https://releases.multiviewer.app/download/155444823/MultiViewer.for.F1-1.31.5-arm64.dmg";
-    hash = "";
+      url = "https://releases.multiviewer.app/download/155444823/MultiViewer.for.F1-1.31.5-arm64.dmg";
+      hash = "";
     };
   };
 
@@ -50,51 +51,51 @@ let
   linux = stdenv.mkDerivation rec {
     inherit pname version src meta;
 
-  # at-spi2-core is included in aur build but is service not package in nixpkgs
-  desktopItems = [
-    (makeDesktopItem {
-      name = "MultiViewer for F1";
-      exec = "multiviewer %U";
-      tryExec = "multiviewer";
-      icon = "multiviewer";
-      desktopName = "multiviewer";
-      mimeTypes = [ "x-scheme-handler/multiviewer" "x-scheme-handler/multiviewer" ];
-      comment = "Unofficial motorsports desktop client";
-      categories = [ "AudioVideo" "Video" "TV" ];
-    })
-  ];
+    # at-spi2-core is included in aur build but is service not package in nixpkgs
+    desktopItems = [
+      (makeDesktopItem {
+        name = "MultiViewer for F1";
+        exec = "multiviewer %U";
+        tryExec = "multiviewer";
+        icon = "multiviewer";
+        desktopName = "multiviewer";
+        mimeTypes = [ "x-scheme-handler/multiviewer" "x-scheme-handler/multiviewer" ];
+        comment = "Unofficial motorsports desktop client";
+        categories = [ "AudioVideo" "Video" "TV" ];
+      })
+    ];
 
-  nativeBuildInputs = [
-    copyDesktopItems
-    makeWrapper
-    wrapGAppsHook
-  ];
+    nativeBuildInputs = [
+      copyDesktopItems
+      makeWrapper
+      wrapGAppsHook
+    ];
 
-  buildInputs = [
-    alsa-lib
-    gtk3
-    xdg-utils
-    unzip
-  ];
+    buildInputs = [
+      alsa-lib
+      gtk3
+      xdg-utils
+      unzip
+    ];
 
-  # avoid double-wrapping
-  dontWrapGApps = true;
+    # avoid double-wrapping
+    # dontWrapGApps = true;
 
-  # As taken from https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=f1multiviewer-bin
-  installPhase = ''
-    runHook preInstall
-    mkdir -p $out/bin $out/opt/${pname}
-    cp -a "MultiViewer for F1-linux-x64/." "$out/opt/${pname}"
+    # As taken from https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=f1multiviewer-bin
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out/bin $out/opt/${pname}
+      cp -a "MultiViewer for F1-linux-x64/." "$out/opt/${pname}"
 
-    install -d "$out/usr/bin/"
-    ln -s "/opt/${pname}/MultiViewer for F1" "$out/usr/bin/${pname}"
-    install -Dm644 "MultiViewer for F1-linux-x64/resources/app/.webpack/main/88a36af69fdc182ce561a66de78de7b1.png" "$out/usr/share/pixmaps/${pname}.png"
-    install -Dm644 ${pname}.desktop "$out/usr/share/applications/${pname}.desktop"
+      install -d "$out/usr/bin/"
+      ln -s "/opt/${pname}/MultiViewer for F1" "$out/usr/bin/${pname}"
+      install -Dm644 "MultiViewer for F1-linux-x64/resources/app/.webpack/main/88a36af69fdc182ce561a66de78de7b1.png" "$out/usr/share/pixmaps/${pname}.png"
+      install -Dm644 ${pname}.desktop "$out/usr/share/applications/${pname}.desktop"
 
-    install -Dm644 "MultiViewer for F1-linux-x64/LICENSE" "$out/usr/share/licenses/${pname}/Electron-LICENSE"
-    install -Dm644 "MultiViewer for F1-linux-x64/LICENSES.chromium.html" "$out/usr/share/licenses/${pname}/LICENSES.chromium.html"
-    runHook postInstall
-  '';
+      install -Dm644 "MultiViewer for F1-linux-x64/LICENSE" "$out/usr/share/licenses/${pname}/Electron-LICENSE"
+      install -Dm644 "MultiViewer for F1-linux-x64/LICENSES.chromium.html" "$out/usr/share/licenses/${pname}/LICENSES.chromium.html"
+      runHook postInstall
+    '';
   };
 
   darwin = stdenv.mkDerivation {
