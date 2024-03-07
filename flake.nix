@@ -78,6 +78,5 @@
           extraSpecialArgs = { inherit inputs outputs; };
         };
       };
-
     };
 }
