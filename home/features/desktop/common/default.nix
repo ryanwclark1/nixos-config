@@ -10,8 +10,6 @@
     ./firefox.nix
     ./font.nix
     # ./kdeconnect.nix
-    ./pavucontrol.nix
-    ./playerctl.nix
     ./slack.nix
     ./sublime-music.nix
   ];
