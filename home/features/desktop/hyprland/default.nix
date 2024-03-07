@@ -8,7 +8,7 @@
     # ./rofi.nix
     ./waybar.nix
     ./basic-binds.nix
-    ./hyprland-vnc.nix
+    # ./hyprland-vnc.nix
     ./hyprbars.nix
   ];
 
