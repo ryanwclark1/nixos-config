@@ -10,7 +10,5 @@
     ./office.nix
     ./zathura.nix
 
-    # Pass feature is required
-    ../pass
   ];
 }
