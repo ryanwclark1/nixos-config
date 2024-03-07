@@ -51,7 +51,7 @@
 				interval = 5;
         format-icons = [ "󰤯" "󰤟" "󰤢" "󰤥" "󰤨" ];
         format-ethernet = ": {bandwidthDownOctets} : {bandwidthUpOctets}";
-        format-wifi = "{icon} {signalStrength}%";
+        format-wifi = "{icon} {signalStrength}% {essid}";
         format-disconnected = "󰤮";
         tooltip = true;
 				tooltip-format = ''
@@ -102,7 +102,6 @@
         escape = true;
       };
       "battery" = {
-				bat = "BAT0";
 				interval = 10;
         states = {
           warning = 30;
