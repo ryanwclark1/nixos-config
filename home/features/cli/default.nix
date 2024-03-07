@@ -31,7 +31,6 @@
     diffsitter # Better diff
     timer # To help with my ADHD paralysis
     ltex-ls # Spell checking LSP
-    tly # Tally counter
     d2 #diagram
     zk # note taking
     trashy #cli rm with trash support
