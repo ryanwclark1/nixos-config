@@ -26,6 +26,7 @@ in
     ./features/insomnia
     ./features/kitty
     ./features/kubernetes
+    ./features/lazygit
     ./features/lf
     ./features/media
     ./features/networking-utils
