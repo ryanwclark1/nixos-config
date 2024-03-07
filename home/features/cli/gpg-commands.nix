@@ -2,7 +2,6 @@
   pkgs,
   ...
 }:
-
 let
   ssh = "${pkgs.openssh}/bin/ssh";
   gpg-connect-agent = "${pkgs.gnupg}/bin/gpg-connect-agent";
