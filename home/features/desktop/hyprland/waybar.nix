@@ -44,21 +44,22 @@
         tooltip = true;
       };
       "disk" = {
-        format = "  {free}";
+        format = "  {free}";
         tooltip = true;
       };
       "network" = {
-				interval = 3;
+				interval = 5;
         format-icons = [ "󰤯" "󰤟" "󰤢" "󰤥" "󰤨" ];
         format-ethernet = ": {bandwidthDownOctets} : {bandwidthUpOctets}";
-        format-wifi = "{icon} {signalStrength}% {ssid}";
+        format-wifi = "{icon} {signalStrength}%";
         format-disconnected = "󰤮";
-        tooltip = false;
+        tooltip = true;
 				tooltip-format = ''
             {ifname}
             {ipaddr}/{cidr}
             Up: {bandwidthUpBits}
-            Down: {bandwidthDownBits}'';
+            Down: {bandwidthDownBits}
+				'';
 				on-click = "";
       };
       "tray" = {
