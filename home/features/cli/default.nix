@@ -14,15 +14,11 @@
     ./git.nix
     ./gpg.nix
     ./jq.nix
-    # ./lf.nix
     ./network.nix
     ./nix-index.nix
     ./nixtools.nix
-    # ./screen.nix
     # ./shellcolor.nix
     # ./ssh.nix
-    # ./xpo.nix
-    # ./xplr.nix
   ];
   home.packages = with pkgs; [
     mprocs # multiple commands in parallel
