@@ -1,7 +1,11 @@
 {
+  lib,
+  programs,
   ...
 }:
-
+let
+  inherit (lib) mkIf;
+in
 {
   programs.zsh = {
     enable = true;
@@ -9,21 +13,9 @@
     enableCompletion = true;
     syntaxHighlighting.enable = true;
     enableVteIntegration = true;
-    cdpath = [
-      "$HOME/repos/notes"
-      "$HOME/repos"
-    ];
-    dirHashes = {
-      notes = "$HOME/repos/notes";
-      vid = "$HOME/Videos";
-      dow = "$HOME/Downloads";
-      dl = "$HOME/Downloads";
-      rep = "$HOME/repos";
-    };
     localVariables = {
       DISABLE_CORRECTION = true;
     };
-
     autocd = true;
     initExtra = ''
       # eval "$(zellij setup --generate-auto-start zsh)"
@@ -43,46 +35,9 @@
     history.ignoreDups = true;
     history.save = 3000000;
     history.size = 30000000;
-    plugins = [
-      #   {
-      #     src = inputs.zsh-nix-completion;
-      #     name = "zsh-nix-shell";
-      #   }
-      #  {
-      #    src = inputs.zsh-nix-shell;
-      #    name = "zsh-nix-shell";
-      #  }
-      #   {
-      #     src = inputs.cd-ls;
-      #     name = "cd-ls";
-      #   }
-      #   {
-      #     src = inputs.catppuccin-zsh;
-      #     name = "catpuccin-zsh";
-      #   }
-      #   {
-      #     src = inputs.fzf-tab;
-      #     name = "fzf-tab";
-      #   }
-      #   {
-      #     src = inputs.zsh-windows-title;
-      #     name = "zsh-windows-title";
-      #   }
-
-      #   {
-      #     src = inputs.zsh-terminal-title;
-      #     name = "zsh-terminal-title";
-      #   }
-
-      #   {
-      #     src = inputs.zsh-tab-title;
-      #     name = "zsh-tab-title";
-      #   }
-
-    ];
   };
 
-  # programs.fzf.enableZshIntegration = true;
+  programs.fzf.enableZshIntegration = true;
   programs.nix-index.enableZshIntegration = true;
   programs.starship.enableZshIntegration = true;
   programs.zoxide.enableZshIntegration = true;

@@ -7,8 +7,17 @@
   ...
 }:
 let
+  inherit (lib) mkIf;
   inherit (inputs.nix-colors) colorSchemes;
   inherit (inputs.nix-colors.lib-contrib { inherit pkgs; }) nixWallpaperFromScheme;
+  packageNames = map (p: p.pname or p.name or null) config.home.packages;
+  hasPackage = name: lib.any (x: x == name) packageNames;
+  hasRipgrep = hasPackage "ripgrep";
+  hasSpecialisationCli = hasPackage "specialisation";
+  hasNeovim = config.programs.neovim.enable;
+  hasNeomutt = config.programs.neomutt.enable;
+  hasKitty = config.programs.kitty.enable;
+  # hasZoxide = config.programs.zoxide.enable;
 in
 {
   imports = [
@@ -16,6 +25,7 @@ in
     ../features/cli
     ../features/nvim
     ./global-fonts.nix
+    ./style.nix
   ] ++ (builtins.attrValues outputs.homeManagerModules);
 
   nixpkgs = {
@@ -46,9 +56,43 @@ in
     sessionPath = [ "$HOME/.local/bin" ];
     sessionVariables = {
       FLAKE = "$HOME/nixos-config";
-      # EDITOR = "${pkgs.neovim}/bin/nvim";
-      # SHELL = "${pkgs.fish}/bin/fish";
+      EDITOR = "${pkgs.neovim}/bin/nvim";
+      SHELL = "${pkgs.bash}/bin/bash";
       # TERM = "${pkgs.alacritty}/bin/alacritty";
+    };
+    shellAliases = rec{
+      ll = "ls -l";
+      la = "ls -la";
+      l = "ls";
+      jqless = "jq -C | less -r";
+
+      n = "nix";
+      nd = "nix develop -c $SHELL";
+      ns = "nix shell";
+      nsn = "nix shell nixpkgs#";
+      nb = "nix build";
+      nbn = "nix build nixpkgs#";
+      nf = "nix flake";
+
+      nr = "nixos-rebuild --flake .";
+      nrs = "nixos-rebuild --flake . switch";
+      snr = "sudo nixos-rebuild --flake .";
+      snrs = "sudo nixos-rebuild --flake . switch";
+      hm = "home-manager --flake .";
+      hms = "home-manager --flake . switch";
+
+      s = mkIf hasSpecialisationCli "specialisation";
+
+      vrg = mkIf (hasNeomutt && hasRipgrep) "nvimrg";
+      vim = mkIf hasNeovim "nvim";
+      vi = vim;
+      v = vim;
+
+      mutt = mkIf hasNeomutt "neomutt";
+      m = mutt;
+
+      cik = mkIf hasKitty "clone-in-kitty --type os-window";
+      ck = cik;
     };
   };
 
