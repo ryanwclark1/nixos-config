@@ -2,14 +2,68 @@
   pkgs,
   ...
 }:
-
+let
+  update-script = pkgs.writeShellApplication {
+    name = "fetch-nix-index-database";
+    runtimeInputs = with pkgs; [ wget coreutils ];
+    text = ''
+      filename="index-x86_64-linux"
+      mkdir -p ~/.cache/nix-index
+      cd ~/.cache/nix-index
+      wget -N "https://github.com/Mic92/nix-index-database/releases/latest/download/$filename"
+      ln -f "$filename" files
+    '';
+  };
+in
 {
   home.packages = with pkgs; [
-    nil # Nix LSP
-    nixfmt # Nix formatter
-    nvd # Differ
-    nix-output-monitor
+    alejandra
+    comma
+    deadnix
+    manix
     nh # Nice wrapper for NixOS and HM
+    nil # Nix LSP
+    niv
+    nix-diff
+    nix-doc
+    nix-init
+    nix-ld
+    nix-output-monitor
+    nix-prefetch
+    nix-prefetch-git
+    nix-template
+    nix-top
+    nix-tree
+    nix-update
+    nixfmt # Nix formatter
+    nixpkgs-lint
     nurl # Generate Nix fetcher calls from repository URLs
+    nvd # Differ
+    patchelf
+    rnix-lsp
+    statix
   ];
+
+programs.nix-index = {
+    enable = true;
+    package = pkgs.nix-index;
+  };
+
+  systemd.user.services.nix-index-database-sync = {
+    Unit = { Description = "fetch mic92/nix-index-database"; };
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${update-script}/bin/fetch-nix-index-database";
+      Restart = "on-failure";
+      RestartSec = "5m";
+    };
+  };
+  systemd.user.timers.nix-index-database-sync = {
+    Unit = { Description = "Automatic github:mic92/nix-index-database fetching"; };
+    Timer = {
+      OnBootSec = "10m";
+      OnUnitActiveSec = "24h";
+    };
+    Install = { WantedBy = [ "timers.target" ]; };
+  };
 }
