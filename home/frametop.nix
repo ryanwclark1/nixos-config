@@ -29,7 +29,6 @@ in
     ./features/media
     ./features/networking-utils
     ./features/nvim
-    # ./features/pass
     ./features/productivity
     ./features/shell
     ./features/starship
