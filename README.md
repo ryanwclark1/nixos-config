@@ -1,20 +1,45 @@
-# Ryan's [NixOS]  & [Home Manager] Configurations
-[![built with nix](https://builtwithnix.org/badge.svg)](https://builtwithnix.org)
+![Static Badge](https://img.shields.io/badge/%20-2e3440?style=for-the-badge&labelColor=2e3440&color=2e3440)
+![Static Badge](https://img.shields.io/badge/%20-3b4252?style=for-the-badge&labelColor=3b4252&color=3b4252)
+![Static Badge](https://img.shields.io/badge/%20-434c5e?style=for-the-badge&labelColor=434c5e&color=434c5e)
+![Static Badge](https://img.shields.io/badge/%20-4c566a?style=for-the-badge&labelColor=4c566a&color=4c566a)
+![Static Badge](https://img.shields.io/badge/%20-d8dee9?style=for-the-badge&labelColor=d8dee9&color=d8dee9)
+![Static Badge](https://img.shields.io/badge/%20-e5e9f0?style=for-the-badge&labelColor=e5e9f0&color=e5e9f0)
+![Static Badge](https://img.shields.io/badge/%20-eceff4?style=for-the-badge&labelColor=eceff4&color=eceff4)
+![Static Badge](https://img.shields.io/badge/%20-8fbcbb?style=for-the-badge&labelColor=8fbcbb&color=8fbcbb)
+![Static Badge](https://img.shields.io/badge/%20-88c0d0?style=for-the-badge&labelColor=88c0d0&color=88c0d0)
+![Static Badge](https://img.shields.io/badge/%20-81a1c1?style=for-the-badge&labelColor=81a1c1&color=81a1c1)
+![Static Badge](https://img.shields.io/badge/%20-5e81ac?style=for-the-badge&labelColor=5e81ac&color=5e81ac)
+![Static Badge](https://img.shields.io/badge/%20-bf616a?style=for-the-badge&labelColor=bf616a&color=bf616a)
+![Static Badge](https://img.shields.io/badge/%20-d08770?style=for-the-badge&labelColor=d08770&color=d08770)
+![Static Badge](https://img.shields.io/badge/%20-ebcb8b?style=for-the-badge&labelColor=ebcb8b&color=ebcb8b)
+![Static Badge](https://img.shields.io/badge/%20-a3be8c?style=for-the-badge&labelColor=a3be8c&color=a3be8c)
+![Static Badge](https://img.shields.io/badge/%20-b48ead?style=for-the-badge&labelColor=b48ead&color=b48ead)
+
+# [NixOS]  & [Home Manager] Configurations
+
+
+
+[![GitHub stars](https://img.shields.io/github/stars/ryanwclark1/nixos-config?color=8fbcbb&labelColor=3b4252&style=for-the-badge&logo=starship&logoColor=8fbcbb)](https://github.com/ryanwclark1/nixos-config/stargazers)
+[![GitHub repo size](https://img.shields.io/github/repo-size/ryanwclark1/nixos-config?color=88c0d0&labelColor=3b4252&style=for-the-badge&logo=github&logoColor=88c0d0)](https://github.com/ryanwclark1/nixos-config/)
+[![NixOS](https://img.shields.io/badge/NixOS-unstable-blue.svg?style=for-the-badge&labelColor=3b4252&logo=NixOS&logoColor=81a1c1&color=81a1c1)](https://nixos.org)
+[![License](https://img.shields.io/static/v1.svg?style=for-the-badge&label=License&message=MIT&colorA=3b4252&colorB=5e81ac&logo=unlicense&logoColor=5e81ac)](https://github.com/ryanwclark1/nixos-config/blob/main/LICENSE)
+
+
 
 This repository contains a [Nix Flake](https://zero-to-nix.com/concepts/flakes) for configuring my computers and/or home environment.
 It is not intended to be a drop in configuration for your computer, but you are welcome to use it as a reference or starting point for your own configuration.
 **If you are looking for a more generic NixOS configuration, I recommend [nix-starter-configs](https://github.com/Misterio77/nix-starter-configs).** 👍️
 These computers are managed by this Nix flake ❄️
 
-|   Hostname  |            Board            |               CPU              |  RAM  |         Primary GPU         |      Secondary GPU      | Role | OS  | State |
-| :---------: | :-------------------------: | :----------------------------: | :---: | :-------------------------: | :---------------------: | :--: | :-: | :---: |
-| `woody`     | [MEG-X570-UNIFY]            | [AMD Ryzen 9 7900X]            |  64GB | [RX 7800 XT]                | [AMD Ryzen 9 7900X GPU] | 🖥️   | ❄️  | ✅    |
-| `frametop`  | [Framework-13in-12thGen]    | [Intel i7-1260P]               |  64GB | [Iris XE Graphics]          |                         | 🖥️   | ❄️  | ✅    |
-| `steamdeck` | [SteamDeck-OLED]            | Zen 2 4c/8t                    | 16GB  | 8 RDNA 2 CUs                |                         | 🎮️   | 🐧  | ✅    |
-| `vm1`       | [QEMU]                      | -                              | -     | [VirGL]                     |                         | 🐄   | ❄️  | ✅    |
-| `mv2`       | [QEMU]                      | -                              | -     | [VirGL]                     |                         | 🐄   | ❄️  | ✅    |
-| `skull`     | [NUC6i7KYK]                 | [Intel Core i7-6770HQ]         | 64GB  | Intel Iris Pro Graphics 580 |                         | ☁️   | ❄️  | 🚧    |
-| `nuc`       | [NUC5i7RYH]                 | [Intel Core i7-5557U]          | 32GB  | Intel Iris Graphics 6100    |                         | ☁️   | ❄️  | 🧟    |
+|   Hostname  |            Board            |               CPU              |  RAM  |         Primary GPU         | Role | OS  | State |
+| :---------: | :-------------------------: | :----------------------------: | :---: | :-------------------------: | :--: | :-: | :---: |
+| `woody`     | [MEG-X570-UNIFY]            | [AMD Ryzen 9 7900X]            |  64GB | [RX 7800 XT]                |   🖥️   | ❄️  | ✅    |
+| `frametop`  | [Framework-13in-12thGen]    | [Intel i7-1260P]               |  64GB | [Iris XE Graphics]          |   💻️   | ❄️  | ✅    |
+| `steamdeck` | [SteamDeck-OLED]            | Zen 2 4c/8t                    | 16GB  | 8 RDNA 2 CUs                |   🎮️   | 🐧  | ✅    |
+| `vm1`       | [QEMU]                      | -                              | -     | [VirGL]                     |   🐄   | ❄️  | ✅    |
+| `mv2`       | [QEMU]                      | -                              | -     | [VirGL]                     |   🐄   | ❄️  | ✅    |
+| `skull`     | [NUC6i7KYK]                 | [Intel Core i7-6770HQ]         | 64GB  | Intel Iris Pro Graphics 580 |   ☁️   | ❄️  | 🚧    |
+| `nuc`       | [NUC5i7RYH]                 | [Intel Core i7-5557U]          | 32GB  | Intel Iris Graphics 6100    |   ☁️   | ❄️  | 🧟    |
 
 **Key**
 
