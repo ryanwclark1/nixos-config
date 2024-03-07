@@ -14,15 +14,12 @@ let
   hasPackage = name: lib.any (x: x == name) packageNames;
   hasRipgrep = hasPackage "ripgrep";
   hasNeovim = config.programs.neovim.enable;
-  hasNeomutt = config.programs.neomutt.enable;
   hasKitty = config.programs.kitty.enable;
   # hasZoxide = config.programs.zoxide.enable;
 in
 {
   imports = [
     inputs.nix-colors.homeManagerModule
-    ../features/cli
-    ../features/nvim
     ./global-fonts.nix
     ./style.nix
   ] ++ (builtins.attrValues outputs.homeManagerModules);
@@ -77,13 +74,9 @@ in
       hm = "home-manager --flake .";
       hms = "home-manager --flake . switch";
 
-      vrg = mkIf (hasNeomutt && hasRipgrep) "nvimrg";
       vim = mkIf hasNeovim "nvim";
       vi = vim;
       v = vim;
-
-      mutt = mkIf hasNeomutt "neomutt";
-      m = mutt;
 
       cik = mkIf hasKitty "clone-in-kitty --type os-window";
       ck = cik;
