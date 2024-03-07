@@ -5,6 +5,7 @@
 
 {
   imports = [
+    ./rofi.nix
     ./waybar.nix
     ./basic-binds.nix
   ];
