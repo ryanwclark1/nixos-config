@@ -36,9 +36,9 @@ in
     history.save = 3000000;
     history.size = 30000000;
   };
-
-  programs.fzf.enableZshIntegration = mkIf config.programs.starship.enable true;
-  programs.nix-index.enableZshIntegration = mkIf config.programs.starship.enable true;
+  programs.atuin.enableZshIntegration = mkIf config.programs.atuin.enable true;
+  programs.fzf.enableZshIntegration = mkIf config.programs.fzf.enable true;
+  programs.nix-index.enableZshIntegration = mkIf config.programs.nix-index.enable true;
   programs.starship.enableZshIntegration = mkIf config.programs.starship.enable true;
-  programs.zoxide.enableZshIntegration = mkIf config.programs.starship.enable true;
+  programs.zoxide.enableZshIntegration = mkIf config.programs.zoxide.enable true;
 }
