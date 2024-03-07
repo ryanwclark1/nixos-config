@@ -1,6 +1,7 @@
 # Similar to TMUX
 # https://zellij.dev/documentation
 {
+  lib,
   pkgs,
   ...
 }:
@@ -13,7 +14,7 @@
       copy_command = "wl-copy";
       on_force_close = "quit";
       simplified_ui = false;
-      default_shell = "fish";
+      default_shell = lib.mkDefault "${pkgs.fish}/bin/fish";
       pane_frames = true;
       theme = "nord";
       default_layout = "default";
@@ -22,9 +23,6 @@
       copy_on_select = true;
       scrollback_editor = "$EDITOR";
     };
-    # enableZshIntegration = true;
-    enableFishIntegration = true;
-    # enableBashIntegration = true;
   };
 
 }

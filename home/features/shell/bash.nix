@@ -1,7 +1,11 @@
 {
+  config,
+  lib,
   ...
 }:
-
+let
+  inherit (lib) mkIf;
+in
 {
   programs.bash = {
     enable = true;
@@ -12,9 +16,8 @@
       neofetch
     '';
   };
-  programs.starship.enableBashIntegration = true;
-  programs.fzf.enableBashIntegration = true;
-  programs.zoxide.enableBashIntegration = true;
-  programs.nix-index.enableBashIntegration = true;
-  # services.gpg-agent.enableBashIntegration = mkIf config.gpg-agent.enable true;
+  programs.fzf.enableBashIntegration = mkIf config.programs.starship.enable true;
+  programs.nix-index.enableBashIntegration = mkIf config.programs.starship.enable true;
+  programs.starship.enableBashIntegration = mkIf config.programs.starship.enable true;
+  programs.zoxide.enableBashIntegration = mkIf config.programs.starship.enable true;
 }

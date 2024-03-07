@@ -8,21 +8,13 @@ let
   packageNames = map (p: p.pname or p.name or null) config.home.packages;
   hasPackage = name: lib.any (x: x == name) packageNames;
   hasRipgrep = hasPackage "ripgrep";
-  hasSpecialisationCli = hasPackage "specialisation";
-  hasNeovim = config.programs.neovim.enable;
   hasNeomutt = config.programs.neomutt.enable;
   # hasShellColor = config.programs.shellcolor.enable;
-  hasKitty = config.programs.kitty.enable;
-  # hasZoxide = config.programs.zoxide.enable;
   # shellcolor = "${pkgs.shellcolord}/bin/shellcolor";
 in
 {
   programs.fish = {
     enable = true;
-    shellAbbrs = rec {
-      
-
-    };
     shellAliases = {
       # Clear screen and scrollback
       clear = "printf '\\033[2J\\033[3J\\033[1;1H'";
@@ -77,4 +69,9 @@ in
 
 
   };
+  programs.fzf.enableFishIntegration = mkIf config.programs.starship.enable true;
+  programs.nix-index.enableFishIntegration = mkIf config.programs.nix-index.enable true;
+  programs.starship.enableFishIntegration = mkIf config.programs.starship.enable true;
+  programs.zoxide.enableFishIntegration = mkIf config.programs.zoxide.enable true;
+  programs.zellij.enableFishIntegration = mkIf config.programs.zellij.enable true;
 }

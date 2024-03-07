@@ -1,6 +1,6 @@
 {
+  config,
   lib,
-  programs,
   ...
 }:
 let
@@ -37,9 +37,8 @@ in
     history.size = 30000000;
   };
 
-  programs.fzf.enableZshIntegration = true;
-  programs.nix-index.enableZshIntegration = true;
-  programs.starship.enableZshIntegration = true;
-  programs.zoxide.enableZshIntegration = true;
-  # services.gpg-agent.enableZshIntegration = mkIf config.gpg-agent.enable true;
+  programs.fzf.enableZshIntegration = mkIf config.programs.starship.enable true;
+  programs.nix-index.enableZshIntegration = mkIf config.programs.starship.enable true;
+  programs.starship.enableZshIntegration = mkIf config.programs.starship.enable true;
+  programs.zoxide.enableZshIntegration = mkIf config.programs.starship.enable true;
 }
