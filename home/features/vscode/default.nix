@@ -123,7 +123,7 @@
       userSettings = {
         "accessibilitySupport.voice.keywordActivation" = "chatInView";
         "accessibility.dimUnfocused.enabled" = true;
-        "audioCues.chatRequestSent" = "auto";
+        # "audioCues.chatRequestSent" = "auto";
         "breadcrumbs.enabled" = true;
         "editor.accessibilityPageSize" = 500;
         "editor.fontFamily" = "JetBrainsMono Nerd Font";
