@@ -1,4 +1,5 @@
 {
+  inputs,
   config,
   lib,
   pkgs,
@@ -8,15 +9,15 @@
 {
   wayland.windowManager.hyprland = {
     enable = true;
-    # package = pkgs.inputs.hyprland.hyprland.override { wrapRuntimeDeps = false; };
-    systemd = {
-      enable = true;
-      # Same as default, but stop graphical-session too
-      extraCommands = lib.mkBefore [
-        "systemctl --user stop graphical-session.target"
-        "systemctl --user start hyprland-session.target"
-      ];
-    };
+    package = inputs.hyprland.packages.${pkgs.system}.hyprland;
+    # systemd = {
+    #   enable = true;
+    #   # Same as default, but stop graphical-session too
+    #   extraCommands = lib.mkBefore [
+    #     "systemctl --user stop graphical-session.target"
+    #     "systemctl --user start hyprland-session.target"
+    #   ];
+    # };
 
     settings = {
       general = {
@@ -87,6 +88,7 @@
           "fadeShadow,1,3,easeout"
           "fadeDim,1,3,easeout"
           "border,1,3,easeout"
+          
         ];
       };
 
