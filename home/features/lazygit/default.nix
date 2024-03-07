@@ -1,3 +1,4 @@
+# Configs https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md
 {
   pkgs,
   ...
