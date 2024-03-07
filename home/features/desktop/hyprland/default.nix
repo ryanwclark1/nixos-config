@@ -6,7 +6,6 @@
 {
   imports = [
     ./waybar.nix
-    # ./wayland-wm
     ./basic-binds.nix
   ];
 
