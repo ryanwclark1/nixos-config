@@ -13,7 +13,13 @@ in
     inputs.sops-nix.nixosModules.sops
   ];
 
+  # sops-nix options: https://dl.thalheim.io/
   sops = {
-    age.sshKeyPaths = map getKeyPath keys;
+    age = {
+      sshKeyPaths = map getKeyPath keys;
+      # keyFile = "$HOME/.config/sops/age/keys.txt";
+      # generateKey = false;
+    };
+    defaultSopsFile = ../secrets.yml;
   };
 }
