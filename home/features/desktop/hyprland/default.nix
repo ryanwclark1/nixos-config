@@ -6,6 +6,7 @@
 {
   imports = [
     # ./rofi.nix
+    ./hyprland.nix
     ./waybar.nix
     ./basic-binds.nix
     # ./hyprland-vnc.nix
