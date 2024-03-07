@@ -88,7 +88,7 @@
           "fadeShadow,1,3,easeout"
           "fadeDim,1,3,easeout"
           "border,1,3,easeout"
-          
+
         ];
       };
 
@@ -115,8 +115,8 @@
           xdg-mime = "${pkgs.xdg-utils}/bin/xdg-mime";
           defaultApp = type: "${gtk-launch} $(${xdg-mime} query default ${type})";
 
-          terminal = config.home.sessionVariables.TERMINAL;
-          # terminal = "${pkgs.alacritty}/bin/alacritty";
+          # terminal = config.home.sessionVariables.TERMINAL;
+          terminal = "${pkgs.kitty}/bin/kitty";
           browser = defaultApp "x-scheme-handler/https";
           editor = defaultApp "text/plain";
         in
@@ -179,21 +179,21 @@
           "SUPER,semicolon,exec,pass-wofi"
         ]));
 
-      monitor = map
-        (m:
-          let
-            resolution = "${toString m.width}x${toString m.height}@${toString m.refreshRate}";
-            position = "${toString m.x}x${toString m.y}";
-          in
-          "${m.name},${if m.enabled then "${resolution},${position},1" else "disable"}"
-        )
-        (config.monitors);
+      # monitor = map
+      #   (m:
+      #     let
+      #       resolution = "${toString m.width}x${toString m.height}@${toString m.refreshRate}";
+      #       position = "${toString m.x}x${toString m.y}";
+      #     in
+      #     "${m.name},${if m.enabled then "${resolution},${position},1" else "disable"}"
+      #   )
+      #   (config.monitors);
 
-      workspace = map
-        (m:
-          "${m.name},${m.workspace}"
-        )
-        (lib.filter (m: m.enabled && m.workspace != null) config.monitors);
+      # workspace = map
+      #   (m:
+      #     "${m.name},${m.workspace}"
+      #   )
+      #   (lib.filter (m: m.enabled && m.workspace != null) config.monitors);
 
     };
     # This is order sensitive, so it has to come here.
