@@ -2,13 +2,19 @@
   pkgs,
   ...
 }:
-# TODO: Use path variable
+
 {
   services.mpd = {
     enable = false;
     musicDirectory = ''$HOME/Music'';
-    # network.startWhenNeeded = true;
-    network.port = 6601;
+  };
+
+  services.fluidsynth = {
+    enable = true;
+    soundService = "pipewire-pulse";
+    extraOptions = [
+      "-g 2"
+    ];
   };
 
   programs.ncmpcpp = {
@@ -21,12 +27,6 @@
     alsa-utils
   ];
 
-  services.fluidsynth = {
-    enable = true;
-    soundService = "pipewire-pulse";
-    extraOptions = [
-      "-g 2"
-    ];
-  };
+
 
 }
