@@ -55,15 +55,12 @@ in
     stateVersion = lib.mkDefault "24.05";
     sessionPath = [ "$HOME/.local/bin" ];
     sessionVariables = {
-      FLAKE = "$HOME/nixos-config";
-      EDITOR = "${pkgs.neovim}/bin/nvim";
-      SHELL = "${pkgs.bash}/bin/bash";
+      FLAKE = lib.mkDefault "$HOME/nixos-config";
+      EDITOR = lib.mkDefault "${pkgs.neovim}/bin/nvim";
+      SHELL = lib.mkDefault "${pkgs.bash}/bin/bash";
       # TERM = "${pkgs.alacritty}/bin/alacritty";
     };
     shellAliases = rec{
-      ll = "ls -l";
-      la = "ls -la";
-      l = "ls";
       jqless = "jq -C | less -r";
 
       n = "nix";
