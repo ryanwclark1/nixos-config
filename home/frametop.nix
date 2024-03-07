@@ -21,6 +21,7 @@ in
     ./features/filesearch
     ./features/fzf
     ./features/games
+    ./features/git
     ./features/helix
     ./features/insomnia
     ./features/kitty
