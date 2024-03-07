@@ -69,7 +69,8 @@ in
 
 
   };
-  programs.fzf.enableFishIntegration = mkIf config.programs.starship.enable true;
+  programs.atuin.enableFishIntegration = mkIf config.programs.atuin.enable true;
+  programs.fzf.enableFishIntegration = mkIf config.programs.fzf.enable true;
   programs.nix-index.enableFishIntegration = mkIf config.programs.nix-index.enable true;
   programs.starship.enableFishIntegration = mkIf config.programs.starship.enable true;
   programs.zoxide.enableFishIntegration = mkIf config.programs.zoxide.enable true;

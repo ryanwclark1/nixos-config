@@ -20,8 +20,6 @@
       search_mode = "fuzzy";
       # sync_address = "https://atuin.techcasa.io";
     };
-    enableBashIntegration = true;
-    enableFishIntegration = true;
-    enableZshIntegration = true;
+
   };
 }
