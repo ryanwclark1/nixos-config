@@ -53,16 +53,12 @@
 
       nixosConfigurations = {
         frametop = nixpkgs.lib.nixosSystem {
+          modules = [ ./hosts/frametop ];
           specialArgs = { inherit inputs outputs; };
-          modules = [
-            ./hosts/frametop
-          ];
         };
         woody = nixpkgs.lib.nixosSystem {
+          modules = [ ./hosts/woody ];
           specialArgs = { inherit inputs outputs; };
-          modules = [
-            ./hosts/woody
-          ];
         };
       };
 
