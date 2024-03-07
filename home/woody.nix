@@ -29,10 +29,12 @@ in
     ./features/networking-utils
     ./features/nvim
     ./features/productivity
+    ./features/qutebrowser
     ./features/shell
     ./features/starship
     ./features/sys-stats
     ./features/vscode
+    ./features/wezterm
     ./features/zellij
     ./features/zoxide
   ];
