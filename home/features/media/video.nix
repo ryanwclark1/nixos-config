@@ -5,8 +5,7 @@
 
 {
   home.packages = with pkgs; [
-    # blender
-    blender-hip
+    blender-hip # Includes blender and thembnailer
     freetube
     ffmpeg
     ffmpegthumbs
