@@ -25,6 +25,7 @@ in
       "git"
       "libvirtd"
       "deluge"
+      "syncthing"
     ];
 
     openssh.authorizedKeys.keys = [ (builtins.readFile ../../../../home/ssh.pub) ];
