@@ -53,7 +53,7 @@ in
     sessionVariables = {
       FLAKE = lib.mkDefault "$HOME/nixos-config";
       EDITOR = lib.mkDefault "${pkgs.neovim}/bin/nvim";
-      SHELL = lib.mkDefault "${pkgs.bash}/bin/bash";
+      # SHELL = lib.mkDefault "${pkgs.bash}/bin/bash";
       # TERM = "${pkgs.alacritty}/bin/alacritty";
     };
     shellAliases = rec{
