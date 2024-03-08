@@ -7,9 +7,11 @@
   programs = {
     k9s = {
       enable = true;
-      alias = {
-        # Use pp as an alias for Pod
-        pp = "v1/pods";
+      aliases = {
+        aliases = {
+          # Use pp as an alias for Pod
+          pp = "v1/pods";
+        };
       };
       hotkey = {
         # Make sure this is camel case
