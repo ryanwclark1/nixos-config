@@ -19,6 +19,7 @@
         mapConf = pkgs.writeText "auto.mnt" ''
           share -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/share
           users -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/users
+          rclark -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/users/rclark
           morningstar -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/morningstar
           # apps -fstype=nfs4,rw,soft 10.10.100.210:/mnt/sophiatank/apps
           sync -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/sync
