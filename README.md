@@ -33,13 +33,13 @@ These computers are managed by this Nix flake ❄️
 
 |   Hostname  |            Board            |               CPU              |  RAM  |         Primary GPU         | Role | OS  | State |
 | :---------: | :-------------------------: | :----------------------------: | :---: | :-------------------------: | :--: | :-: | :---: |
-| `woody`     | [MEG-X570-UNIFY]            | [AMD Ryzen 9 7900X]            |  64GB | [RX 7800 XT]                |   🖥️   | ❄️  | ✅    |
-| `frametop`  | [Framework-13in-12thGen]    | [Intel i7-1260P]               |  64GB | [Iris XE Graphics]          |   💻️   | ❄️  | ✅    |
-| `steamdeck` | [SteamDeck-OLED]            | Zen 2 4c/8t                    | 16GB  | 8 RDNA 2 CUs                |   🎮️   | 🐧  | ✅    |
-| `vm1`       | [QEMU]                      | -                              | -     | [VirGL]                     |   🐄   | ❄️  | ✅    |
-| `mv2`       | [QEMU]                      | -                              | -     | [VirGL]                     |   🐄   | ❄️  | ✅    |
-| `skull`     | [NUC6i7KYK]                 | [Intel Core i7-6770HQ]         | 64GB  | Intel Iris Pro Graphics 580 |   ☁️   | ❄️  | 🚧    |
-| `nuc`       | [NUC5i7RYH]                 | [Intel Core i7-5557U]          | 32GB  | Intel Iris Graphics 6100    |   ☁️   | ❄️  | 🧟    |
+| `woody`     | [ROG-STRIX-B650E-WIFI]      | [AMD Ryzen 9 7900X]            | 64GB  | [AMD Radeon RX 7800 XT]     | 🖥️   | ❄️   | ✅    |
+| `frametop`  | [Framework-13in-12thGen]    | [Intel i7-1260P]               | 64GB  | [Iris XE Graphics]          | 💻️   | ❄️   | ✅    |
+| `steamdeck` | [SteamDeck-OLED]            | Zen 2 4c/8t                    | 16GB  | 8 RDNA 2 CUs                | 🎮️   | 🐧  | ✅    |
+| `vm1`       | [QEMU]                      | -                              | -     | [VirGL]                     | 🐄   | ❄️   | ✅    |
+| `mv2`       | [QEMU]                      | -                              | -     | [VirGL]                     | 🐄   | ❄️   | ✅    |
+| `skull`     | [NUC6i7KYK]                 | [Intel Core i7-6770HQ]         | 64GB  | Intel Iris Pro Graphics 580 | ☁️    | ❄️   | 🚧    |
+| `nuc`       | [NUC5i7RYH]                 | [Intel Core i7-5557U]          | 32GB  | Intel Iris Graphics 6100    | ☁️    | ❄️   | 🧟    |
 
 **Key**
 
@@ -139,43 +139,104 @@ Here is the directory structure I'm using.
 
 ```
 .
-├── home-manager
-│   ├──
-│   │   ├──
-│   │   ├──
-│   │   ├──
-│   │   └──
-│   └── default.nix
-├── nixos
-│   ├──
-│   │   ├──
-│   │   ├──
-│   │   ├──
-│   │   ├──
-│   │   ├──
-│   │   ├──
-│   │   └──
-│   ├──
-│   ├──
-│   ├──
-│   ├──
-│   └──
+├── home
+│   ├── features
+│   │   ├── alacritty
+│   │   ├── cli
+│   │   ├── compression
+│   │   ├── desktop
+│   │   │   ├── common
+│   │   │   ├── gnome
+│   │   │   ├── hyprland
+│   │   │   │   ├── config
+│   │   │   │   │   ├── hyprland
+│   │   │   │   │   ├── neofetch
+│   │   │   │   │   ├── pipewire
+│   │   │   │   │   ├── rofi
+│   │   │   │   │   └── swaync
+│   │   │   │   ├── fonts
+│   │   │   │   ├── media
+│   │   │   │   │   └── wallpapers
+│   │   │   │   └── scripts
+│   │   │   └── plasma
+│   │   ├── development
+│   │   ├── eza
+│   │   ├── filesearch
+│   │   ├── fzf
+│   │   ├── games
+│   │   ├── git
+│   │   ├── gpu
+│   │   ├── helix
+│   │   ├── insomnia
+│   │   ├── kitty
+│   │   ├── kubernetes
+│   │   ├── lazygit
+│   │   ├── lf
+│   │   ├── media
+│   │   ├── networking-utils
+│   │   ├── nvim
+│   │   │   └── plugin
+│   │   ├── osint
+│   │   ├── pistol
+│   │   ├── productivity
+│   │   ├── qutebrowser
+│   │   ├── shell
+│   │   ├── starship
+│   │   ├── sys-stats
+│   │   ├── vscode
+│   │   ├── wezterm
+│   │   ├── zellij
+│   │   └── zoxide
+│   └── global
+├── hosts
+│   ├── common
+│   │   ├── global
+│   │   ├── optional
+│   │   │   ├── displaymanager
+│   │   │   ├── gnome
+│   │   │   ├── hyprland
+│   │   │   ├── pantheon
+│   │   │   └── plasma
+│   │   ├── users
+│   │   │   └── administrator
+│   │   └── wallpaper
+│   ├── frametop
+│   │   └── services
+│   └── woody
+│       └── services
+├── lib
+├── modules
+│   ├── home-manager
+│   └── nixos
 ├── overlays
 ├── pkgs
+│   ├── aichat
+│   ├── gitkraken
+│   ├── multiviewer
+│   ├── nix-inspect
+│   ├── shellcolord
+│   └── wallpapers
+└── templates
+│   ├── c
+│   │   └── src
+│   ├── haskell
+│   │   ├── app
+│   │   └── src
+│   ├── node
+│   │   └── src
+│   └── rust
+│       └── src
 ├── secrets.yaml
 └── flake.nix
 ```
 
-The NixOS and Home Manager configurations are in the `nixos` and `home-manager` directories respectively, they are structured in the same way with `_mixins` directories that contain the mixin configurations that are used to compose the final configuration.
+The NixOS and Home Manager configurations are in the `hosts` and `home` directories respectively
 The `pkgs` directory contains my custom packages with package overlays in the `overlays` directory.
 The `secrets.yaml` contains secrets managed by [sops-nix].
 The `default.nix` files in the root of each directory are the entry points.
 
 ### The Shell 🐚
 
-[Fish shell] with [powerline-go](https://github.com/justjanne/powerline-go) and a collection of tools that deliver a *"[Modern Unix]"* experience. The base system has a firewall enabled and also includes [OpenSSH], [sops-nix] for secret management, [ZeroTier], [Podman & Distrobox].  My [common scripts](nixos/_mixins/scripts) are (slowly) being migrated to declarative Nix-managed scripts.
-
-![fastfetch on Ripper](.github/screenshots/fastfetch.png)
 
 ### The Desktop 🖥️
 
@@ -297,6 +358,8 @@ The [Disko] implementation and automated installation are chasing the ideas outl
 [Home Manager]: https://github.com/nix-community/home-manager
 
 [Framework-13in-12thGen]: https://frame.work/products/laptop-diy-12-gen-intel?q=processor
+[ROG-STRIX-B650E-WIFI]: https://rog.asus.com/us/motherboards/rog-strix/rog-strix-b650e-f-gaming-wifi-model/
+[AMD Radeon RX 7800 XT]:https://www.amd.com/en/products/graphics/amd-radeon-rx-7800-xt
 [SteamDeck-OLED]: https://www.steamdeck.com/
 [QEMU]: https://www.qemu.org/
 
