@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   ...
 }:
@@ -17,15 +18,16 @@
     k3s = {
       enable = true;
       role = "server";
-      # token = "e3d26cefbdf2f81eff5181e68a02372f#";
-      # serverAddr = "https://10.10.100.210:6443";
+      # tokenFile = config.sops.secrets.k3s-token.path;
+      serverAddr = "https://10.10.100.210:6443";
       clusterInit = true;
       extraFlags = toString [
-        "--disable=servicelb" # Disable the built-in DNS server
-        # "--cluster-cidr=172.16.0.0/16"
-        # "--service-cidr=172.17.0.0/16"
-        # "--cluster-dns=172.17.0.10"
+        "--write-kubeconfig-mode=644"
+        "--cluster-cidr=172.16.0.0/16"
+        "--service-cidr=172.17.0.0/16"
+        "--cluster-dns=172.17.0.10"
         # "--bind-address=0.0.0.0"
+        "--cluster-domain=cluster.local"
         # "--node-ip=10.10.100.147"
         # "--rootless" # Run k3s as a non-root user
         # "--kubelet-arg=v=4" # Optionally add additional args to k3s
