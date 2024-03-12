@@ -29,7 +29,7 @@
     stylix.url = "github:danth/stylix";
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, stylix, ... }@inputs:
     let
       inherit (self) outputs;
       lib = nixpkgs.lib // home-manager.lib;
@@ -53,23 +53,23 @@
 
       nixosConfigurations = {
         frametop = nixpkgs.lib.nixosSystem {
-          modules = [ ./hosts/frametop ];
+          modules = [ stylix.nixosModules.stylix ./hosts/frametop ];
           specialArgs = { inherit inputs outputs; };
         };
         woody = nixpkgs.lib.nixosSystem {
-          modules = [ ./hosts/woody ];
+          modules = [ stylix.nixosModules.stylix ./hosts/woody ];
           specialArgs = { inherit inputs outputs; };
         };
       };
 
       homeConfigurations = {
         "administrator@frametop" = lib.homeManagerConfiguration {
-          modules = [ ./home/frametop.nix ];
+          modules = [ stylix.nixosModules.stylix ./home/frametop.nix ];
           pkgs = pkgsFor.x86_64-linux;
           extraSpecialArgs = { inherit inputs outputs; };
         };
         "administrator@woody" = lib.homeManagerConfiguration {
-          modules = [ ./home/woody.nix ];
+          modules = [ stylix.nixosModules.stylix ./home/woody.nix ];
           pkgs = pkgsFor.x86_64-linux;
           extraSpecialArgs = { inherit inputs outputs; };
         };
