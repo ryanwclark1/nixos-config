@@ -34,12 +34,12 @@ These computers are managed by this Nix flake ❄️
 |   Hostname  |            Board            |               CPU              |  RAM  |         Primary GPU         | Role | OS  | State |
 | :---------: | :-------------------------: | :----------------------------: | :---: | :-------------------------: | :--: | :-: | :---: |
 | `woody`     | [ROG-STRIX-B650E-WIFI]      | [AMD Ryzen 9 7900X]            | 64GB  | [AMD Radeon RX 7800 XT]     | 🖥️   | ❄️   | ✅    |
-| `frametop`  | [Framework-13in-12thGen]    | [Intel i7-1260P]               | 64GB  | [Iris XE Graphics]          | 💻️   | ❄️   | ✅    |
+| `frametop`  | [Framework-13in-12thGen]    | [Intel i7-1260P]               | 64GB  | [Intel Iris XE Graphics]    | 💻️   | ❄️   | ✅    |
 | `steamdeck` | [SteamDeck-OLED]            | Zen 2 4c/8t                    | 16GB  | 8 RDNA 2 CUs                | 🎮️   | 🐧  | ✅    |
 | `vm1`       | [QEMU]                      | -                              | -     | [VirGL]                     | 🐄   | ❄️   | ✅    |
 | `mv2`       | [QEMU]                      | -                              | -     | [VirGL]                     | 🐄   | ❄️   | ✅    |
-| `skull`     | [NUC6i7KYK]                 | [Intel Core i7-6770HQ]         | 64GB  | Intel Iris Pro Graphics 580 | ☁️    | ❄️   | 🚧    |
-| `nuc`       | [NUC5i7RYH]                 | [Intel Core i7-5557U]          | 32GB  | Intel Iris Graphics 6100    | ☁️    | ❄️   | 🧟    |
+| `nuc1`      | [NUC6i7KYK]                 | [Intel Core i7-6770HQ]         | 64GB  | Intel Iris Pro Graphics 580 | ☁️    | ❄️   | 🚧    |
+| `nuc2`      | [NUC5i7RYH]                 | [Intel Core i7-5557U]          | 32GB  | Intel Iris Graphics 6100    | ☁️    | ❄️   | 🧟    |
 
 **Key**
 
@@ -357,7 +357,10 @@ The [Disko] implementation and automated installation are chasing the ideas outl
 [NixOS]: https://nixos.org/
 [Home Manager]: https://github.com/nix-community/home-manager
 
+[AMD Ryzen 9 7900X]: https://www.amd.com/en/products/cpu/amd-ryzen-9-7900x
 [Framework-13in-12thGen]: https://frame.work/products/laptop-diy-12-gen-intel?q=processor
+[Intel i7-1260P]: https://www.intel.com/content/www/us/en/products/sku/226254/intel-core-i71260p-processor-18m-cache-up-to-4-70-ghz/specifications.html
+[Intel Iris XE Graphics]: https://www.intel.com/content/www/us/en/products/details/discrete-gpus/iris-xe.html
 [ROG-STRIX-B650E-WIFI]: https://rog.asus.com/us/motherboards/rog-strix/rog-strix-b650e-f-gaming-wifi-model/
 [AMD Radeon RX 7800 XT]:https://www.amd.com/en/products/graphics/amd-radeon-rx-7800-xt
 [SteamDeck-OLED]: https://www.steamdeck.com/
