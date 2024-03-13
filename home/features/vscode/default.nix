@@ -126,7 +126,6 @@
         # "audioCues.chatRequestSent" = "auto";
         "breadcrumbs.enabled" = true;
         "editor.accessibilityPageSize" = 500;
-        "editor.fontFamily" = "JetBrainsMono Nerd Font";
         "editor.fontLigatures" = true;
         "editor.fontSize" = 12;
         "editor.fontVariations" = true;
@@ -171,9 +170,7 @@
         "files.trimTrailingWhitespace" = true;
         "telemetry.telemetryLevel" = "off";
         "workbench.editor.enablePreview" = false;
-        "workbench.colorTheme" = "Nord Deep";
 
-        "terminal.integrated.fontFamily" = "JetBrainsMono Nerd Font";
         "terminal.integrated.copyOnSelection" = true;
         "terminal.integrated.defaultProfile.linux" = "bash";
         "terminal.integrated.fontSize" = 12;
