@@ -16,7 +16,6 @@
       simplified_ui = false;
       default_shell = lib.mkDefault "${pkgs.fish}/bin/fish";
       pane_frames = true;
-      theme = "nord";
       default_layout = "default";
       mouse_mode = false;
       copy_clipboard = "primary";
