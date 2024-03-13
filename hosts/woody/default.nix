@@ -28,6 +28,7 @@
     ../common/optional/qemu.nix
     ../common/optional/steam.nix
     ../common/optional/systemd-boot.nix
+    ../common/optional/theme.nix
     ../common/optional/wireshark.nix
 
     ../common/optional/gnome

@@ -4,7 +4,12 @@
 }:
 
 {
+  # stylix.image = ../wallpaper/FormulaOne_Vettel_1.jpg;
   stylix = {
+    # image = pkgs.fetchurl {
+    #   url = "https://whvn.cc/n6zmx4";
+    #   sha256 = "";
+    # };
     image = ../wallpaper/FormulaOne_Vettel_1.jpg;
     base16Scheme = "${pkgs.base16-schemes}/share/themes/nord.yaml";
     fonts = {
@@ -36,9 +41,9 @@
       autoImport = true;
     };
     opacity = {
-      background = 0.9;
       applications = 0.9;
-      oppacity = 0.9;
+      desktop = 0.9;
+      popups = 0.9;
       terminal = 0.8;
     };
     polarity = "dark";
