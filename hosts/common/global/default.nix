@@ -10,7 +10,7 @@
     inputs.home-manager.nixosModules.home-manager
     # ./auto-upgrade.nix
     ./fish.nix
-    ./fonts.nix
+    # ./fonts.nix
     ./locale.nix
     ./networking.nix
     ./nix.nix
