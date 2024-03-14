@@ -28,7 +28,6 @@ with lib;
           "Vitals@CoreCoding.com"
           "BingWallpaper@ineffable-gmail.com"
           "trayiconsreloaded@selfmade.pl"
-          # "blur-my-shell@aunetx"
           "drive-menu@gnome-shell-extensions.gcampax.github.com"
           "dash-to-panel@jderose9.github.com"
           "just-perfection-desktop@just-perfection"
@@ -176,7 +175,6 @@ with lib;
 
       "org/gnome/desktop/interface" = {
         color-scheme = "prefer-dark";
-        gtk-theme = "Nordic";
         enable-hot-corners = false;
         clock-show-weekday = true;
       };
@@ -296,17 +294,6 @@ with lib;
         show-indicator = true;
         show-notification = false;
       };
-      # "org/gnome/shell/extensions/blur-my-shell" = {
-      #   brightness = 0.9;
-      # };
-      # "org/gnome/shell/extensions/blur-my-shell/panel" = {
-      #   customize = true;
-      #   sigma = 0;
-      # };
-      # "org/gnome/shell/extensions/blur-my-shell/overview" = {
-      #   customize = true;
-      #   sigma = 0;
-      # };
       "org/gnome/shell/extensions/horizontal-workspace-indicator" = {
         widget-position = "left";
         widget-orientation = "horizontal";
@@ -342,7 +329,6 @@ with lib;
     };
   };
   home.packages = with pkgs; [
-    # nodric-unstable
   ]
   # ++ (with pkgs.gnome; [
   # ])
