@@ -1,28 +1,26 @@
 {
+  config,
   pkgs,
   ...
 }:
-
+let
+  currentScheme = "nord";
+in
 {
-  # stylix.image = ../wallpaper/FormulaOne_Vettel_1.jpg;
   stylix = {
-    # image = pkgs.fetchurl {
-    #   url = "https://whvn.cc/n6zmx4";
-    #   sha256 = "";
-    # };
     image = ../wallpaper/FormulaOne_Vettel_1.jpg;
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/nord.yaml";
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/${currentScheme}.yaml";
     fonts = {
       serif = {
         package = pkgs.dejavu_fonts;
         name = "DejaVu Serif";
       };
       sansSerif = {
-        package = pkgs.dejavu_fonts;
+        package = config.stylix.fonts.serif.package;
         name = "DejaVu Sans";
       };
       monospace = {
-        package = pkgs.dejavu_fonts;
+        package = config.stylix.fonts.serif.package;
         name = "DejaVu Sans Mono";
       };
       emoji = {
@@ -35,6 +33,9 @@
         popups = 10;
         terminal = 12;
       };
+      # packages = with pkgs; [
+      #   nerdfonts
+      # ];
     };
     homeManagerIntegration = {
       followSystem = true;
@@ -55,5 +56,12 @@
     #   grub.useImage = true;
     #   gtk.enable = true;
     # };
+  };
+  fonts = {
+    packages = with pkgs; [
+      nerdfonts
+      powerline-fonts
+      powerline-symbols
+    ];
   };
 }
