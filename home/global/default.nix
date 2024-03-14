@@ -8,8 +8,8 @@
 }:
 let
   inherit (lib) mkIf;
-  inherit (inputs.nix-colors) colorSchemes;
-  inherit (inputs.nix-colors.lib-contrib { inherit pkgs; }) nixWallpaperFromScheme;
+  # inherit (inputs.nix-colors) colorSchemes;
+  # inherit (inputs.nix-colors.lib-contrib { inherit pkgs; }) nixWallpaperFromScheme;
   packageNames = map (p: p.pname or p.name or null) config.home.packages;
   hasPackage = name: lib.any (x: x == name) packageNames;
   hasRipgrep = hasPackage "ripgrep";
@@ -20,7 +20,7 @@ in
 {
   imports = [
     inputs.nix-colors.homeManagerModule
-    ./global-fonts.nix
+    # ./global-fonts.nix
     ./style.nix
   ] ++ (builtins.attrValues outputs.homeManagerModules);
 
@@ -83,15 +83,15 @@ in
     };
   };
 
-  colorscheme = lib.mkOverride 1499 colorSchemes.dracula;
-  specialisation = {
-    dark.configuration.colorscheme = lib.mkOverride 1498 config.colorscheme;
-    light.configuration.colorscheme = lib.mkOverride 1498 config.colorscheme;
-  };
-  home.file = {
-    ".colorscheme".text = config.colorscheme.slug;
-    ".colorscheme.json".text = builtins.toJSON config.colorscheme;
-  };
+  # colorscheme = lib.mkOverride 1499 colorSchemes.dracula;
+  # specialisation = {
+  #   dark.configuration.colorscheme = lib.mkOverride 1498 config.colorscheme;
+  #   light.configuration.colorscheme = lib.mkOverride 1498 config.colorscheme;
+  # };
+  # home.file = {
+  #   ".colorscheme".text = config.colorscheme.slug;
+  #   ".colorscheme.json".text = builtins.toJSON config.colorscheme;
+  # };
 
   # wallpaper =
   #   let
