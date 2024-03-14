@@ -190,7 +190,7 @@ with lib;
         resize-with-right-button = true;
         mouse-button-modifier = "<super>";
         button-layout = "appmenu:minimize,maximize,close";
-        theme = "Nordic";
+        # theme = "Nordic";
       };
       "org/gnome/desktop/wm/keybindings" = {
         # maximize = ["<super>up"];                   # Floating
