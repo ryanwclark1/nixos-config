@@ -2,14 +2,15 @@
   ...
 }:
 
+# In home-manager
 {
-  home-manager = {
-    stylix = {
-      autoEnable = true;
 
-      # sharedModules = [{
-      #   stylix.targets.xyz.enable = false;
-      # }];
-    };
+  stylix = {
+    autoEnable = true;
+
+    # sharedModules = [{
+    #   stylix.targets.xyz.enable = false;
+    # }];
   };
+
 }

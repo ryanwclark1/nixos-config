@@ -10,7 +10,7 @@
     package = pkgs.alacritty;
     settings = {
       window = {
-        opacity = 0.8;
+        # opacity = 0.8;
         dynamic_title = true;
         dynamic_padding = true;
         padding = {
@@ -25,10 +25,9 @@
         history = 25000;
         multiplier = 5;
       };
-
-      colors = {
-        transparent_background_colors = true;
-      };
+      # colors = {
+      #   transparent_background_colors = true;
+      # };
       selection = {
         save_to_clipboard = true;
       };
