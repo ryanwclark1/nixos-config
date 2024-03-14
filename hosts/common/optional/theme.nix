@@ -33,9 +33,6 @@ in
         popups = 10;
         terminal = 12;
       };
-      # packages = with pkgs; [
-      #   nerdfonts
-      # ];
     };
     homeManagerIntegration = {
       followSystem = true;
