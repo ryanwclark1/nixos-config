@@ -15,7 +15,6 @@
     ./jq.nix
     ./network.nix
     ./nixtools.nix
-    # ./shellcolor.nix
     # ./ssh.nix
   ];
   home.packages = with pkgs; [
