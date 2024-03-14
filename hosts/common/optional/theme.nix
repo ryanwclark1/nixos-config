@@ -58,6 +58,12 @@ in
     # };
   };
   fonts = {
+    fontconfig = {
+      enable = true;
+      allowBitmaps = true;
+      antialias = true;
+    };
+
     packages = with pkgs; [
       nerdfonts
       powerline-fonts
