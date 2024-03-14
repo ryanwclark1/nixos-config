@@ -19,7 +19,7 @@
         };
         decorations = "Full"; # Borders and title bar
         blur = true; # works on macOS/KDE Wayland
-        title = "terminal";
+        title = "alacritty";
       };
       scrolling = {
         history = 25000;
