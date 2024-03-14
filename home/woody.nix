@@ -3,9 +3,9 @@
   lib,
   ...
 }:
-let
-  inherit (inputs.nix-colors) colorSchemes;
-in
+# let
+#   inherit (inputs.nix-colors) colorSchemes;
+# in
 {
   imports = [
     ./global
@@ -41,9 +41,9 @@ in
     ./features/zoxide
   ];
 
-  colorscheme = lib.mkDefault colorSchemes.nord;
-  specialisation = {
-    light.configuration.colorscheme = colorSchemes.nord;
-  };
+  # colorscheme = lib.mkDefault colorSchemes.nord;
+  # specialisation = {
+  #   light.configuration.colorscheme = colorSchemes.nord;
+  # };
 
 }
