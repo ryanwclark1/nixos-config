@@ -1,15 +1,11 @@
 {
-  config,
   ...
 }:
-let
-  inherit (config) colorscheme;
-in
+
 {
   programs.helix = {
     enable = true;
     settings = {
-      theme = colorscheme.slug;
       editor = {
         color-modes = true;
         line-number = "relative";
@@ -21,6 +17,5 @@ in
         };
       };
     };
-    themes = import ./theme.nix { inherit colorscheme; };
   };
 }
