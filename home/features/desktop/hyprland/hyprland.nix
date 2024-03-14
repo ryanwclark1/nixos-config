@@ -25,12 +25,12 @@
         gaps_out = 20;
         border_size = 2.7;
         cursor_inactive_timeout = 4;
-        "col.active_border" = "0xff${config.colorscheme.palette.base0C}";
-        "col.inactive_border" = "0xff${config.colorscheme.palette.base02}";
+        # "col.active_border" = "0xff${config.colorscheme.palette.base0C}";
+        # "col.inactive_border" = "0xff${config.colorscheme.palette.base02}";
       };
       group = {
-        "col.border_active" = "0xff${config.colorscheme.palette.base0B}";
-        "col.border_inactive" = "0xff${config.colorscheme.palette.base04}";
+        # "col.border_active" = "0xff${config.colorscheme.palette.base0B}";
+        # "col.border_inactive" = "0xff${config.colorscheme.palette.base04}";
         groupbar = {
           font_size = 11;
         };
@@ -65,8 +65,8 @@
         drop_shadow = true;
         shadow_range = 12;
         shadow_offset = "3 3";
-        "col.shadow" = "0x44000000";
-        "col.shadow_inactive" = "0x66000000";
+        # "col.shadow" = "0x44000000";
+        # "col.shadow_inactive" = "0x66000000";
       };
       animations = {
         enabled = true;
