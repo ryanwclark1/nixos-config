@@ -8,7 +8,6 @@
     ./deluge.nix
     ./discord.nix
     ./firefox.nix
-    ./font.nix
     # ./kdeconnect.nix
     ./slack.nix
     ./sublime-music.nix
