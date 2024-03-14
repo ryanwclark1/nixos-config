@@ -3,14 +3,8 @@
   pkgs,
   ...
 }:
-let
-  font = "JetBrainsMono Nerd Font";
-  inherit (config.colorscheme) palette;
-in
+
 {
-  home.packages = with pkgs; [
-    alacritty-theme
-  ];
   programs.alacritty = {
     enable = true;
     package = pkgs.alacritty;
@@ -31,34 +25,9 @@ in
         history = 25000;
         multiplier = 5;
       };
-      font = {
-        normal = {
-          family = font;
-          style = "Regular";
-        };
-        bold = {
-          family = font;
-          style = "Bold";
-        };
-        italic = {
-          family = font;
-          style = "Italic";
-        };
-        bold_italic = {
-          family = font;
-          style = "Bold Italic";
-        };
-        size = 11.25;
-      };
-      # import = [
-      #   "${pkgs.alacritty-theme}/themes/nord.yml"
-      # ];
+
       colors = {
-        # transparent_background_colors = true;
-        primary = {
-          background = "#${palette.base00}";
-          foreground = "#${palette.base05}";
-        };
+        transparent_background_colors = true;
       };
       selection = {
         save_to_clipboard = true;
