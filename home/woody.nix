@@ -1,11 +1,7 @@
 {
-  inputs,
-  lib,
   ...
 }:
-# let
-#   inherit (inputs.nix-colors) colorSchemes;
-# in
+
 {
   imports = [
     ./global
@@ -40,10 +36,5 @@
     ./features/zellij
     ./features/zoxide
   ];
-
-  # colorscheme = lib.mkDefault colorSchemes.nord;
-  # specialisation = {
-  #   light.configuration.colorscheme = colorSchemes.nord;
-  # };
 
 }
