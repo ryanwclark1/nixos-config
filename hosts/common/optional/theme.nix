@@ -20,8 +20,8 @@ in
         name = "DejaVu Sans";
       };
       monospace = {
-        package = config.stylix.fonts.serif.package;
-        name = "DejaVu Sans Mono";
+        package = pkgs.jetbrains-mono;
+        name = "JetBrains Mono";
       };
       emoji = {
         package = pkgs.noto-fonts-emoji;
@@ -45,14 +45,9 @@ in
       terminal = 0.8;
     };
     polarity = "dark";
-    # targets = {
-    #   chromium.enable = true;
-    #   console.enable = true;
-    #   fish.enable = true;
-    #   gnome.enable = true;
-    #   grub.useImage = true;
-    #   gtk.enable = true;
-    # };
+    targets = {
+      grub.useImage = true;
+    };
   };
   fonts = {
     fontconfig = {
