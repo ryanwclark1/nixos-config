@@ -10,10 +10,8 @@ let
   pactl = "${pkgs.pulseaudio}/bin/pactl";
   hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
   swaymsg = "${config.wayland.windowManager.sway.package}/bin/swaymsg";
-
   isLocked = "${pgrep} -x ${swaylock}";
-  lockTime = 4 * 60; # TODO: configurable desktop (10 min)/laptop (4 min)
-
+  lockTime = 4 * 60;
   # Makes two timeouts: one for when the screen is not locked (lockTime+timeout) and one for when it is.
   afterLockTimeout = { timeout, command, resumeCommand ? null }: [
     { timeout = lockTime + timeout; inherit command resumeCommand; }
@@ -26,10 +24,10 @@ in
     systemdTarget = "graphical-session.target";
     timeouts =
       # Lock screen
-      # [{
-      #   timeout = lockTime;
-      #   command = "${swaylock} -i ${config.wallpaper} --daemonize --grace 15";
-      # }] ++
+      [{
+        timeout = lockTime;
+        command = "${swaylock} -i ${config.wallpaper} --daemonize --grace 15";
+      }] ++
       # Mute mic
       (afterLockTimeout {
         timeout = 10;
