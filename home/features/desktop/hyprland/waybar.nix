@@ -9,10 +9,14 @@
     package = pkgs.waybar;
 		# systemd.enable = true;
     settings = [{
+			exclusive = true;
       layer = "top";
       position = "top";
+			height = 18;
+			passthrough = false;
+			gtk-layer-shell = true;
 
-      modules-left = [ "hyprland/window" ];
+			modules-left = [ "hyprland/window" ];
       modules-center = [ "network" "pulseaudio" "cpu" "hyprland/workspaces" "memory" "disk" "clock" ];
       modules-right = [ "custom/notification" "tray" ];
       "hyprland/workspaces" = {
@@ -60,7 +64,8 @@
             Up: {bandwidthUpBits}
             Down: {bandwidthDownBits}
 				'';
-				on-click = "";
+				max-length = 15;
+        on-click = "${pkgs.kitty}/bin/kitty -e ${pkgs.networkmanager}/bin/nmtui";
       };
       "tray" = {
         spacing = 12;
@@ -81,6 +86,7 @@
           default = [ "" "" "" ];
         };
         on-click = "pavucontrol";
+				tooltip-format = "{source_volume}% / {desc}";
       };
       "custom/notification" = {
         tooltip = false;
@@ -104,8 +110,9 @@
       "battery" = {
 				interval = 10;
         states = {
-          warning = 30;
-          critical = 15;
+					good = 95;
+          warning = 20;
+          critical = 10;
         };
         format = "{icon} {capacity}%";
         format-charging = "󰂄 {capacity}%";
