@@ -15,15 +15,15 @@
 
 
   nixpkgs.config.permittedInsecurePackages = [
-    "electron-19.1.9"
+    # "electron-19.1.9"
     "freeimage-unstable-2021-11-01"
   ];
 
   home.packages = with pkgs; [
     fortune
-    dfeet # Dbus debugger
+    d-spy # Dbus debugger
     ventoy-full #balena type tool
-    etcher
+    # etcher  #Etcher depends on insecure version of Electron
     libnotify
     xdg-utils
     wl-clipboard
