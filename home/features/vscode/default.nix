@@ -126,7 +126,7 @@
         # "audioCues.chatRequestSent" = "auto";
         "breadcrumbs.enabled" = true;
         "editor.accessibilityPageSize" = 500;
-        "editor.fontLigatures" = true;
+        "editor.fontLigatures" = false;
         "editor.fontSize" = 12;
         "editor.fontVariations" = true;
         "editor.fontWeight" = "normal";
@@ -175,6 +175,8 @@
         "terminal.integrated.defaultProfile.linux" = "bash";
         "terminal.integrated.fontSize" = 12;
         "terminal.integrated.mouseWheelZoom" = true;
+        "terminal.integrated.enableImages" = true;
+        "terminal.integrated.customGlyphs" = true;
 
         # Nix IDE
         "nix.enableLanguageServer" = true;
