@@ -10,14 +10,6 @@
   wayland.windowManager.hyprland = {
     enable = true;
     package = inputs.hyprland.packages.${pkgs.system}.hyprland;
-    # systemd = {
-    #   enable = true;
-    #   # Same as default, but stop graphical-session too
-    #   extraCommands = lib.mkBefore [
-    #     "systemctl --user stop graphical-session.target"
-    #     "systemctl --user start hyprland-session.target"
-    #   ];
-    # };
 
     settings = {
       general = {
@@ -92,22 +84,15 @@
         ];
       };
 
-      # exec = [
-      #   "${pkgs.swaybg}/bin/swaybg -i ${config.wallpaper} --mode fill"
-      # ];
-
       bind =
         let
           swaylock = "${config.programs.swaylock.package}/bin/swaylock";
           playerctl = "${config.services.playerctld.package}/bin/playerctl";
           playerctld = "${config.services.playerctld.package}/bin/playerctld";
-          # makoctl = "${config.services.mako.package}/bin/makoctl";
+          makoctl = "${config.services.mako.package}/bin/makoctl";
           wofi = "${config.programs.wofi.package}/bin/wofi";
-
-
           grimblast = "${pkgs.inputs.hyprwm-contrib.grimblast}/bin/grimblast";
           pactl = "${pkgs.pulseaudio}/bin/pactl";
-          # tly = "${pkgs.tly}/bin/tly";
           gtk-play = "${pkgs.libcanberra-gtk3}/bin/canberra-gtk-play";
           notify-send = "${pkgs.libnotify}/bin/notify-send";
 
@@ -165,9 +150,9 @@
           "SUPER,backspace,exec,${swaylock} -S --grace 2"
         ]) ++
         # Notification manager
-        # (lib.optionals config.services.mako.enable [
-        #   "SUPER,w,exec,${makoctl} dismiss"
-        # ]) ++
+        (lib.optionals config.services.mako.enable [
+          "SUPER,w,exec,${makoctl} dismiss"
+        ]) ++
 
         # Launcher
         (lib.optionals config.programs.wofi.enable [
@@ -178,22 +163,6 @@
           # ",XF86Calculator,exec,${pass-wofi}" # fn+f12
           "SUPER,semicolon,exec,pass-wofi"
         ]));
-
-      # monitor = map
-      #   (m:
-      #     let
-      #       resolution = "${toString m.width}x${toString m.height}@${toString m.refreshRate}";
-      #       position = "${toString m.x}x${toString m.y}";
-      #     in
-      #     "${m.name},${if m.enabled then "${resolution},${position},1" else "disable"}"
-      #   )
-      #   (config.monitors);
-
-      # workspace = map
-      #   (m:
-      #     "${m.name},${m.workspace}"
-      #   )
-      #   (lib.filter (m: m.enabled && m.workspace != null) config.monitors);
 
     };
     # This is order sensitive, so it has to come here.
