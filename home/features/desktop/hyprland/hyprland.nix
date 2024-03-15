@@ -80,7 +80,6 @@
           "fadeShadow,1,3,easeout"
           "fadeDim,1,3,easeout"
           "border,1,3,easeout"
-
         ];
       };
 
