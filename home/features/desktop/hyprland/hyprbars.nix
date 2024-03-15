@@ -4,27 +4,19 @@
   pkgs,
   ...
 }:
-# let
-#   hyprbars = (pkgs.inputs.hyprland-plugins.hyprbars.override {
-#     # Make sure it's using the same hyprland package as we are
-#     hyprland = config.wayland.windowManager.hyprland.package;
-#   }).overrideAttrs (old: {
-#     # Yeet the initialization notification (I hate it)
-#     postPatch = (old.postPatch or "") + ''
-#       ${lib.getExe pkgs.gnused} -i '/Initialized successfully/d' main.cpp
-#     '';
-#   });
-# in
+
 {
   wayland.windowManager.hyprland = {
-    plugins = [ pkgs.hyprbars ];
+    # plugins = [
+    #   inputs.hyprland-plugins.packages.${pkgs.system}.hyprbars
+    # ];
     settings = {
       "plugin:hyprbars" = {
         bar_height = 25;
-        bar_color = "0xdd${config.colorscheme.palette.base00}";
-        "col.text" = "0xee${config.colorscheme.palette.base05}";
-        bar_text_font = config.fontProfiles.regular.family;
-        bar_text_size = 12;
+        # bar_color = "0xdd${config.colorscheme.palette.base00}";
+        # "col.text" = "0xee${config.colorscheme.palette.base05}";
+        # bar_text_font = config.fontProfiles.regular.family;
+        # bar_text_size = 12;
         bar_part_of_window = true;
         hyprbars-button =
           let
@@ -39,11 +31,11 @@
           in
           [
             # Red close button
-            "rgb(${config.colorscheme.palette.base08}),12,,${closeAction}"
+            "rgb(255, 87, 51),12,,${closeAction}"
             # Yellow "minimize" (send to special workspace) button
-            "rgb(${config.colorscheme.palette.base0A}),12,,${minimizeAction}"
+            "rgb(255, 195, 0),12,,${minimizeAction}"
             # Green "maximize" (togglefloating) button
-            "rgb(${config.colorscheme.palette.base0B}),12,,${maximizeAction}"
+            "rgb(218, 247, 166),12,,${maximizeAction}"
           ];
       };
       bind =
