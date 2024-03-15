@@ -17,7 +17,7 @@
 			gtk-layer-shell = true;
 
 			modules-left = [ "hyprland/window" ];
-      modules-center = [ "network" "pulseaudio" "cpu" "hyprland/workspaces" "memory" "disk" "clock" ];
+      modules-center = [ "network" "pulseaudio" "cpu" "hyprland/workspaces" "memory" "disk" "clock" "battery"];
       modules-right = [ "custom/notification" "tray" ];
       "hyprland/workspaces" = {
         format = "{icon}";
