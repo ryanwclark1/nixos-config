@@ -5,24 +5,19 @@
 
 {
   imports = [
-    # ./rofi.nix
+    ./rofi.nix
     ./hyprland.nix
     ./waybar.nix
     ./basic-binds.nix
     # ./hyprland-vnc.nix
-    # ./hyprbars.nix
+    ./hyprbars.nix
   ];
 
     home = {
     file.".config/pipewire/pipewire.conf".source = ./config/pipewire/pipewire.conf;
-    file.".vimrc".source = ./config/vimrc;
     file.".emoji".source = ./config/emoji;
     file."Pictures/Wallpapers" = {
-      source = ./media/wallpapers;
-      recursive = true;
-    };
-    file.".local/share/fonts" = {
-      source = ./fonts;
+      source = ../../../../hosts/common/wallpaper;
       recursive = true;
     };
     file.".config/rofi" = {
@@ -52,7 +47,7 @@
     noto-fonts-color-emoji
     pavucontrol
     polkit_gnome
-    rofi-wayland
+    # rofi-wayland
     slurp
     spotify
     swaynotificationcenter
@@ -67,7 +62,7 @@
     # Import Scripts
     (import ./scripts/emopicker9000.nix { inherit pkgs; })
     (import ./scripts/task-waybar.nix { inherit pkgs; })
-    (import ./scripts/wallsetter.nix { inherit pkgs; })
+    # (import ./scripts/wallsetter.nix { inherit pkgs; })
   ];
 
 }
