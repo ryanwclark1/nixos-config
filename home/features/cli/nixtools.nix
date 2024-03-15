@@ -40,7 +40,6 @@ in
     nurl # Generate Nix fetcher calls from repository URLs
     nvd # Differ
     patchelf
-    rnix-lsp
     statix
   ];
 
