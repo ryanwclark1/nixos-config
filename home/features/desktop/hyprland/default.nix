@@ -28,10 +28,10 @@
       source = ./config/swaync;
       recursive = true;
     };
-    file.".config/hypr" = {
-      source = ./config/hyprland;
-      recursive = true;
-    };
+    # file.".config/hypr" = {
+    #   source = ./config/hyprland;
+    #   recursive = true;
+    # };
   };
 
   home.packages = with pkgs; [
