@@ -24,9 +24,4 @@
     };
   };
 
-  # home.packages =
-  #   let
-  #     inherit (config.programs.password-store) package enable;
-  #   in
-  #   lib.optional enable (pkgs.pass-wofi.override { pass = package; });
 }
