@@ -1,5 +1,6 @@
 {
   config,
+  inputs,
   lib,
   pkgs,
   ...
@@ -7,9 +8,9 @@
 
 {
   wayland.windowManager.hyprland = {
-    # plugins = [
-    #   inputs.hyprland-plugins.packages.${pkgs.system}.hyprbars
-    # ];
+    plugins = [
+      inputs.hyprland-plugins.packages.${pkgs.system}.hyprbars
+    ];
     settings = {
       "plugin:hyprbars" = {
         bar_height = 25;
@@ -21,12 +22,10 @@
         hyprbars-button =
           let
             closeAction = "hyprctl dispatch killactive";
-
             isOnSpecial = ''hyprctl activewindow -j | jq -re 'select(.workspace.name == "special")' >/dev/null'';
             moveToSpecial = "hyprctl dispatch movetoworkspacesilent special";
             moveToActive = "hyprctl dispatch movetoworkspacesilent name:$(hyprctl -j activeworkspace | jq -re '.name')";
             minimizeAction = "${isOnSpecial} && ${moveToActive} || ${moveToSpecial}";
-
             maximizeAction = "hyprctl dispatch togglefloating";
           in
           [
