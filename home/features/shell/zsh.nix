@@ -37,6 +37,7 @@ in
     history.size = 30000000;
   };
   programs.atuin.enableZshIntegration = mkIf config.programs.atuin.enable true;
+  programs.eza.enableZshIntegration = mkIf config.programs.eza.enable true;
   programs.fzf.enableZshIntegration = mkIf config.programs.fzf.enable true;
   programs.nix-index.enableZshIntegration = mkIf config.programs.nix-index.enable true;
   programs.starship.enableZshIntegration = mkIf config.programs.starship.enable true;
