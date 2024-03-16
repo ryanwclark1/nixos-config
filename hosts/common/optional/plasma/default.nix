@@ -9,13 +9,13 @@
     xserver = {
       enable = true;
       xkb.layout = "us";
-      desktopManager = {
+    };
+    desktopManager = {
         plasma6 = {
           enable = true;
           enableQt5Integration = true;
         };
       };
-    };
   };
 
   # Ensure XDG portal is enabled
