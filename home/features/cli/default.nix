@@ -38,5 +38,8 @@
     httpie # Better curl
     fx # Terminal JSON viewer
     yq-go #jq for yaml https://github.com/mikefarah/yq
+    vulkan-tools # vulkaninfo, required by kde plasma info center
+    wayland-utils # wayland-info required by kde plasma info center
+    clinfo # opencl info required by kde plasma info center
   ];
 }
