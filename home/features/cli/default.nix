@@ -41,5 +41,6 @@
     vulkan-tools # vulkaninfo, required by kde plasma info center
     wayland-utils # wayland-info required by kde plasma info center
     clinfo # opencl info required by kde plasma info center
+    aha # required by kde plasma info center firmware security info
   ];
 }
