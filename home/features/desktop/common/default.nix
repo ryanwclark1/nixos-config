@@ -37,6 +37,8 @@
     czkawka # Duplicate file finder
     f1viewer
     tickrs
+    gpu-viewer
+    
     # fantomas
     # multiviewer
 

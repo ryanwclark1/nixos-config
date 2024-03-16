@@ -1,4 +1,5 @@
 {
+  lib,
   ...
 }:
 
@@ -38,4 +39,6 @@
     ./features/zoxide
   ];
 
+    # Disable impermanence
+  # home.persistence = lib.mkForce { };
 }
