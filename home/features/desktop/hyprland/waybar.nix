@@ -22,7 +22,7 @@ in
 			gtk-layer-shell = true;
 
 			modules-left = [ "hyprland/window" ];
-      modules-center = [ "network" "pulseaudio" "cpu" "hyprland/workspaces" "memory" "disk" "clock" "battery"];
+      modules-center = [ "network" "pulseaudio" "cpu" "custom/gpu" "hyprland/workspaces" "memory" "disk" "clock" "battery"];
       modules-right = [ "custom/notification" "tray" ];
       "hyprland/workspaces" = {
         format = "{icon}";
@@ -105,7 +105,7 @@ in
 				tooltip-format = "{source_volume}% / {desc}";
       };
       "custom/notification" = {
-        tooltip = false;
+        tooltip = true;
         format = "{icon} {}";
         format-icons = {
           notification = "<span foreground='red'><sup></sup></span>";
@@ -226,6 +226,13 @@ in
           		margin: 5px;
           		padding: 2px 20px;
       	}
+				#custom-gpu {
+							color: #ff9e64;
+							background: #1a1b26;
+							border-radius: 15px 50px 15px 50px;
+							margin: 5px;
+							padding: 2px 20px;
+				}
       	#disk {
           		color: #9ece6a;
           		background: #1a1b26;
