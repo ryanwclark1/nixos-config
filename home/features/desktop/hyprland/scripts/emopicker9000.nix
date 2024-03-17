@@ -1,7 +1,7 @@
 { pkgs }:
 
 pkgs.writeShellScriptBin "emopicker9000" ''
-      # Get user selection via wofi from emoji file.
+      # Get user selection via rofi from emoji file.
       chosen=$(cat $HOME/.emoji | ${pkgs.rofi-wayland}/bin/rofi -dmenu | awk '{print $1}')
 
       # Exit if none chosen.
