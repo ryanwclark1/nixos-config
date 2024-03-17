@@ -89,7 +89,7 @@
           playerctl = "${config.services.playerctld.package}/bin/playerctl";
           playerctld = "${config.services.playerctld.package}/bin/playerctld";
           makoctl = "${config.services.mako.package}/bin/makoctl";
-          wofi = "${config.programs.wofi.package}/bin/wofi";
+          rofi = "${config.programs.rofi.package}/bin/rofi";
           grimblast = "${pkgs.inputs.hyprwm-contrib.grimblast}/bin/grimblast";
           pactl = "${pkgs.pulseaudio}/bin/pactl";
           gtk-play = "${pkgs.libcanberra-gtk3}/bin/canberra-gtk-play";
@@ -154,13 +154,13 @@
         ]) ++
 
         # Launcher
-        (lib.optionals config.programs.wofi.enable [
-          "SUPER,x,exec,${wofi} -S drun -x 10 -y 10 -W 25% -H 60%"
-          "SUPER,d,exec,${wofi} -S run"
+        (lib.optionals config.programs.rofi.enable [
+          "SUPER,x,exec,${rofi} -S drun -x 10 -y 10 -W 25% -H 60%"
+          "SUPER,d,exec,${rofi} -S run"
         ] ++ (lib.optionals config.programs.password-store.enable [
-          # ",Scroll_Lock,exec,${pass-wofi}" # fn+k
-          # ",XF86Calculator,exec,${pass-wofi}" # fn+f12
-          "SUPER,semicolon,exec,pass-wofi"
+          # ",Scroll_Lock,exec,${pass-rofi}" # fn+k
+          # ",XF86Calculator,exec,${pass-rofi}" # fn+f12
+          "SUPER,semicolon,exec,pass-rofi"
         ]));
 
     };
