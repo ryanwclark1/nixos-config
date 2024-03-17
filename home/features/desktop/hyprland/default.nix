@@ -5,12 +5,12 @@
 
 {
   imports = [
-    ./rofi.nix
-    ./hyprland.nix
-    ./waybar.nix
-    ./basic-binds.nix
     # ./hyprland-vnc.nix
+    ./basic-binds.nix
     ./hyprbars.nix
+    ./hyprland.nix
+    ./rofi.nix
+    ./waybar.nix
   ];
 
     home = {
@@ -28,10 +28,10 @@
       source = ./config/swaync;
       recursive = true;
     };
-    # file.".config/hypr" = {
-    #   source = ./config/hyprland;
-    #   recursive = true;
-    # };
+    file.".config/hypr" = {
+      source = ./config/hyprland;
+      recursive = true;
+    };
   };
 
   home.packages = with pkgs; [
@@ -46,7 +46,6 @@
     noto-fonts-color-emoji
     pavucontrol
     polkit_gnome
-    # rofi-wayland
     slurp
     spotify
     swaynotificationcenter
@@ -61,7 +60,7 @@
     # Import Scripts
     (import ./scripts/emopicker9000.nix { inherit pkgs; })
     (import ./scripts/task-waybar.nix { inherit pkgs; })
-    # (import ./scripts/wallsetter.nix { inherit pkgs; })
+    (import ./scripts/wallsetter.nix { inherit pkgs; })
   ];
 
 }
