@@ -57,12 +57,20 @@
         "buttons-grid": {
             "actions": [
                 {
+                    "label": "",
+                    "command": "swaylock -f -c 000000"
+                },
+                {
                     "label": "󰐥",
                     "command": "systemctl poweroff"
                 },
                 {
                     "label": "󰜉",
                     "command": "systemctl reboot"
+                },
+                {
+                    "label": "󰀙",
+                    "command": "systemctl restart sddm"
                 },
                 {
                     "label": "",
@@ -90,7 +98,19 @@
                 },
                 {
                     "label": "",
-                    "command": "firefox"
+                    "command": "google-chrome-stable"
+                },
+                {
+                    "label": "",
+                    "command": "kitty"
+                },
+                {
+                    "label": "",
+                    "command": "spotify"
+                },
+                {
+                    "label": "",
+                    "command": "code"
                 },
                 {
                     "label": "",
