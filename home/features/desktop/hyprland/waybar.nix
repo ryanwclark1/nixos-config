@@ -2,7 +2,12 @@
   pkgs,
   ...
 }:
-
+let
+	cat = "${pkgs.coreutils}/bin/cat";
+	pavucontrol = "${pkgs.pavucontrol}/bin/pavucontrol";
+	kitty = "${pkgs.kitty}/bin/kitty";
+	nmtui = "${pkgs.networkmanager}/bin/nmtui";
+in
 {
 	programs.waybar = {
     enable = true;
@@ -29,48 +34,59 @@
         on-scroll-up = "hyprctl dispatch workspace e+1";
         on-scroll-down = "hyprctl dispatch workspace e-1";
       };
-      "clock" = {
+      clock = {
         format = "{: %I:%M %p}";
-        tooltip = false;
+				interval = 1;
+				# format = "{:%d/%m %H:%M:%S}";
+				format-alt = "{:%Y-%m-%d %H:%M:%S %z}";
+				on-click-left = "mode";
+				tooltip-format = ''
+					<big>{:%Y %B}</big>
+					<tt><small>{calendar}</small></tt>'';
       };
       "hyprland/window" = {
         max-length = 60;
         separate-outputs = false;
       };
-      "memory" = {
+      memory = {
         interval = 5;
         format = "  {}%";
         tooltip = true;
       };
-      "cpu" = {
+      cpu = {
         interval = 5;
         format = "  {usage:2}%";
         tooltip = true;
       };
-      "disk" = {
+			"custom/gpu" = {
+          interval = 5;
+          exec = "${cat} /sys/class/drm/card0/device/gpu_busy_percent";
+          format = "󰒋  {}%";
+        };
+      disk = {
         format = "  {free}";
         tooltip = true;
       };
-      "network" = {
-				interval = 5;
+      network = {
+				interval = 3;
         format-icons = [ "󰤯" "󰤟" "󰤢" "󰤥" "󰤨" ];
         format-ethernet = ": {bandwidthDownOctets} : {bandwidthUpOctets}";
         format-wifi = "{icon} {signalStrength}% {essid}";
         format-disconnected = "󰤮";
         tooltip = true;
 				tooltip-format = ''
-            {ifname}
-            {ipaddr}/{cidr}
-            Up: {bandwidthUpBits}
-            Down: {bandwidthDownBits}
+					{ifname}
+					{ipaddr}/{cidr}
+					Up: {bandwidthUpBits}
+					Down: {bandwidthDownBits}
 				'';
 				max-length = 15;
-        on-click = "${pkgs.kitty}/bin/kitty -e ${pkgs.networkmanager}/bin/nmtui";
+        on-click = "${kitty} -e ${nmtui}";
       };
       "tray" = {
         spacing = 12;
       };
-      "pulseaudio" = {
+      pulseaudio = {
         format = "{icon} {volume}% {format_source}";
         format-bluetooth = "{volume}% {icon} {format_source}";
         format-bluetooth-muted = " {icon} {format_source}";
@@ -85,7 +101,7 @@
           car = "";
           default = [ "" "" "" ];
         };
-        on-click = "pavucontrol";
+        on-click = pavucontrol;
 				tooltip-format = "{source_volume}% / {desc}";
       };
       "custom/notification" = {
@@ -107,7 +123,14 @@
         on-click = "task-waybar";
         escape = true;
       };
-      "battery" = {
+			idle_inhibitor = {
+				format = "{icon}";
+				format-icons = {
+					activated = "󰒳";
+					deactivated = "󰒲";
+				};
+			};
+      battery = {
 				interval = 10;
         states = {
 					good = 95;
