@@ -1,3 +1,4 @@
+
 {
   config,
   lib,
@@ -24,7 +25,7 @@ let
   playerctl = "${pkgs.playerctl}/bin/playerctl";
   playerctld = "${pkgs.playerctl}/bin/playerctld";
   pavucontrol = "${pkgs.pavucontrol}/bin/pavucontrol";
-  wofi = "${pkgs.wofi}/bin/wofi";
+  rofi = "${pkgs.rofi}/bin/rofi";
 
   # Function to simplify making waybar outputs
   jsonOutput = name: { pre ? "", text ? "", tooltip ? "", alt ? "", class ? "", percentage ? "" }: "${pkgs.writeShellScriptBin "waybar-${name}" ''
@@ -190,7 +191,7 @@ in
             text = "";
             tooltip = ''$(${cat} /etc/os-release | ${grep} PRETTY_NAME | ${cut} -d '"' -f2)'';
           };
-          on-click-left = "${wofi} -S drun -x 10 -y 10 -W 25% -H 60%";
+          on-click-left = "${rofi} -S drun -x 10 -y 10 -W 25% -H 60%";
           on-click-right = lib.concatStringsSep ";" (
             (lib.optional hasHyprland "${hyprland}/bin/hyprctl dispatch togglespecialworkspace") ++
             (lib.optional hasSway "${sway}/bin/swaymsg scratchpad show")
@@ -243,36 +244,6 @@ in
             "unlocked" = "";
           };
           on-click = "";
-        };
-        "custom/gammastep" = {
-          interval = 5;
-          return-type = "json";
-          exec = jsonOutput "gammastep" {
-            pre = ''
-              if unit_status="$(${systemctl} --user is-active gammastep)"; then
-                status="$unit_status ($(${journalctl} --user -u gammastep.service -g 'Period: ' | ${tail} -1 | ${cut} -d ':' -f6 | ${xargs}))"
-              else
-                status="$unit_status"
-              fi
-            '';
-            alt = "\${status:-inactive}";
-            tooltip = "Gammastep is $status";
-          };
-          format = "{icon}";
-          format-icons = {
-            "activating" = "󰁪 ";
-            "deactivating" = "󰁪 ";
-            "inactive" = "? ";
-            "active (Night)" = " ";
-            "active (Nighttime)" = " ";
-            "active (Transition (Night)" = " ";
-            "active (Transition (Nighttime)" = " ";
-            "active (Day)" = " ";
-            "active (Daytime)" = " ";
-            "active (Transition (Day)" = " ";
-            "active (Transition (Daytime)" = " ";
-          };
-          on-click = "${systemctl} --user is-active gammastep && ${systemctl} --user stop gammastep || ${systemctl} --user start gammastep";
         };
         "custom/currentplayer" = {
           interval = 2;
