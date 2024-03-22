@@ -7,10 +7,8 @@
 
   stylix = {
     autoEnable = true;
+    targets.vscode.enable = false;
 
-    # sharedModules = [{
-    #   stylix.targets.xyz.enable = false;
-    # }];
   };
 
 }
