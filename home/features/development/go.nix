@@ -14,7 +14,6 @@
   home.packages = with pkgs; [
     richgo
     golangci-lint-langserver
-    ent-go
     go-tools
     gopls
     godef
