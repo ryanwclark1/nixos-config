@@ -9,7 +9,7 @@
     freetube
     ffmpeg
     ffmpegthumbs
-    handbrake
+    # handbrake
     kdenlive
     vlc
   ];
