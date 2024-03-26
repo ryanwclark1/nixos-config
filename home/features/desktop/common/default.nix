@@ -10,7 +10,7 @@
     ./firefox.nix
     # ./kdeconnect.nix
     ./slack.nix
-    ./sublime-music.nix
+    # ./sublime-music.nix
   ];
 
 
@@ -38,7 +38,7 @@
     f1viewer
     tickrs
     gpu-viewer
-    
+
     # fantomas
     # multiviewer
 
