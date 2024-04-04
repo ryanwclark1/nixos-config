@@ -11,7 +11,6 @@
     unzip
     pigz
     rar
-    xz
     zstd
     zpaq
   ];
