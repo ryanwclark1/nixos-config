@@ -4,23 +4,23 @@
 }:
 
 {
-  nixpkgs.overlays = [
-    (
-      final: prev: {
-        vscode = prev.vscode.overrideAttrs (_: rec {
-          version = "1.87.0";
-          plat = "linux-x64";
-          archive_fmt = "tar.gz";
-          pname = "vscode";
-          src = prev.fetchurl {
-            url = "https://update.code.visualstudio.com/${version}/${plat}/stable";
-            sha256 = "00izdy01d34czxfjn6rv4vg179r7f264bls5fib4caakj9bblalw";
-            name = "VSCode_${version}_${plat}.${archive_fmt}";
-          };
-        });
-      }
-    )
-  ];
+  # nixpkgs.overlays = [
+  #   (
+  #     final: prev: {
+  #       vscode = prev.vscode.overrideAttrs (_: rec {
+  #         version = "1.87.0";
+  #         plat = "linux-x64";
+  #         archive_fmt = "tar.gz";
+  #         pname = "vscode";
+  #         src = prev.fetchurl {
+  #           url = "https://update.code.visualstudio.com/${version}/${plat}/stable";
+  #           sha256 = "00izdy01d34czxfjn6rv4vg179r7f264bls5fib4caakj9bblalw";
+  #           name = "VSCode_${version}_${plat}.${archive_fmt}";
+  #         };
+  #       });
+  #     }
+  #   )
+  # ];
 
   home.packages = with pkgs; [
     tailwindcss
@@ -50,7 +50,6 @@
         ms-vscode.cpptools
         ms-vscode.hexeditor
         ms-vscode.makefile-tools
-
         bradlc.vscode-tailwindcss
         dbaeumer.vscode-eslint
         donjayamanne.githistory
@@ -69,17 +68,18 @@
         vscodevim.vim
         wholroyd.jinja # Prefer Better Jinja
         yzhang.markdown-all-in-one
+        formulahendry.code-runner
       ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
         {
           name = "nord-deep";
           publisher = "marlosirapuan";
-          version = "0.1.624";
+          version = "0.1.625";
           sha256 = "sha256-CJTku9MOet3JvVYLTQDgjKvmsU9V/NP2hamIFUfElMA=";
         }
         {
           name = "vscode-speech";
           publisher = "ms-vscode";
-          version = "0.6.0";
+          version = "0.8.0";
           sha256 = "sha256-wOktHr0Dpw5KkQF861xBj0L/4ap8dc56l4mN2zhcQ4A=";
         }
         {
@@ -91,7 +91,7 @@
         {
           name = "htmx-attributes";
           publisher = "craigrbroughton";
-          version = "0.6.0";
+          version = "0.7.0";
           sha256 = "sha256-ly8jBv2s/BSoze36krut3OJGGfr8J2RMKfjnN7hWeTY=";
         }
         {
@@ -103,7 +103,7 @@
         {
           name = "ruff";
           publisher = "charliermarsh";
-          version = "2024.14.0";
+          version = "2024.16.0";
           sha256 = "sha256-JuOn9vQibr9emyKWL9/5QKsZDKAbwdbu+hvsl+fteTc=";
         }
         {
@@ -115,7 +115,7 @@
         {
           name = "remote-explorer";
           publisher = "ms-vscode";
-          version = "0.4.3";
+          version = "0.5.2024031109";
           sha256 = "sha256-772l0EnAWXLg53TxPZf93js/W49uozwdslmzNwD1vIk=";
         }
       ];
