@@ -43,7 +43,7 @@
       systemd-boot.enable = true;
       efi.canTouchEfiVariables = true;
     };
-    kernelPackages = pkgs.linux_6_8;
+    kernelPackages = pkgs.linuxKernel.packages.linux_6_8;
 
     # kernelPackages = pkgs.linuxPackagesFor (pkgs.linux_6_7.override {
     #   argsOverride = rec {
