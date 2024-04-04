@@ -35,7 +35,6 @@ in
     nix-top
     nix-tree
     nix-update
-    nixfmt # Nix formatter
     nixpkgs-lint
     nurl # Generate Nix fetcher calls from repository URLs
     nvd # Differ
