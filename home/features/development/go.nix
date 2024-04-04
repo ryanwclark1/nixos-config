@@ -12,13 +12,10 @@
   };
 
   home.packages = with pkgs; [
-    richgo
     golangci-lint-langserver
-    go-tools
     gopls
-    godef
-    gotools
     errcheck
+    templ
   ];
 
   home.sessionPath = [ "$HOME/go/bin" ];
