@@ -69,6 +69,7 @@
         wholroyd.jinja # Prefer Better Jinja
         yzhang.markdown-all-in-one
         formulahendry.code-runner
+        griimick.vhs
       ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
         {
           name = "nord-deep";
