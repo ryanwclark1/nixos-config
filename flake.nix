@@ -6,6 +6,7 @@
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-23.11";
     nixos-hardware.url = "github:nixos/nixos-hardware";
     nix-colors.url = "github:misterio77/nix-colors";
+    nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
     impermanence.url = "github:nix-community/impermanence";
     disko = {
       url = "github:nix-community/disko";
@@ -34,7 +35,7 @@
     stylix.url = "github:danth/stylix";
   };
 
-  outputs = { self, nixpkgs, home-manager, stylix, disko, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, stylix, disko, nixos-wsl, ... }@inputs:
     let
       inherit (self) outputs;
       lib = nixpkgs.lib // home-manager.lib;
@@ -66,9 +67,12 @@
           specialArgs = { inherit inputs outputs; };
         };
         woody = nixpkgs.lib.nixosSystem {
-          modules = [ stylix.nixosModules.stylix ./hosts/woody ];
+          modules = [
+            stylix.nixosModules.stylix ./hosts/woody
+          ];
           specialArgs = { inherit inputs outputs; };
         };
+
       };
 
       homeConfigurations = {
