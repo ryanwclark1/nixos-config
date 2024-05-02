@@ -87,7 +87,7 @@
           name = "templ";
           publisher = "a-h";
           version = "0.0.24";
-          sha256 = "sha256-VKzB7QC1eFPYAL66V3gNoQ+9Djz8veyMLlNMbVNiqqw=";
+          sha256 = "sha256-D2XGCP57gsj02WOpoLR6pTtu2/GQejwQkevQdqHsh14=";
         }
         {
           name = "htmx-attributes";
@@ -264,6 +264,7 @@
           "Github.copilot-chat"
           "Github.copilot"
         ];
+        "yaml.maxComputedItems" = 1000;
       };
     };
   };
