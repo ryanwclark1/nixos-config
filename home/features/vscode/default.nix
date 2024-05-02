@@ -86,7 +86,7 @@
         {
           name = "templ";
           publisher = "a-h";
-          version = "0.0.22";
+          version = "0.0.24";
           sha256 = "sha256-VKzB7QC1eFPYAL66V3gNoQ+9Djz8veyMLlNMbVNiqqw=";
         }
         {
@@ -104,7 +104,7 @@
         {
           name = "ruff";
           publisher = "charliermarsh";
-          version = "2024.16.0";
+          version = "2024.20.0";
           sha256 = "sha256-JuOn9vQibr9emyKWL9/5QKsZDKAbwdbu+hvsl+fteTc=";
         }
         {
@@ -119,6 +119,19 @@
           version = "0.5.2024031109";
           sha256 = "sha256-772l0EnAWXLg53TxPZf93js/W49uozwdslmzNwD1vIk=";
         }
+        {
+          name = "vscode-jsonnet";
+          publisher = "grafana";
+          version = "0.6.1";
+          sha256 ="";
+        }
+        {
+          name = "vscode-terraform";
+          publisher = "hashicorp";
+          version = "2.30.1";
+          sha256 = "";
+        }
+
       ];
 
       userSettings = {
