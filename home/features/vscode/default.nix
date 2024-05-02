@@ -105,7 +105,7 @@
           name = "ruff";
           publisher = "charliermarsh";
           version = "2024.20.0";
-          sha256 = "sha256-JuOn9vQibr9emyKWL9/5QKsZDKAbwdbu+hvsl+fteTc=";
+          sha256 = "sha256-CqLmL8o+arki7UGWtZ/B6GQclWumLqgUqcPIXhG+Ays=";
         }
         {
           name = "remote-ssh-edit";
@@ -125,13 +125,12 @@
           version = "0.6.1";
           sha256 ="sha256-8t/9EJs9Ly6C89jM6HdCbeAdIvjSfePKD2WQwBtuJI0=";
         }
-        {
-          name = "vscode-terraform";
-          publisher = "hashicorp";
-          version = "2.30.1";
-          sha256 = "";
-        }
-
+        # {
+        #   name = "vscode-terraform";
+        #   publisher = "hashicorp";
+        #   version = "2.29.5";
+        #   sha256 = "";
+        # }
       ];
 
       userSettings = {
