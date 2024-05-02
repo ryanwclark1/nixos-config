@@ -123,7 +123,7 @@
           name = "vscode-jsonnet";
           publisher = "grafana";
           version = "0.6.1";
-          sha256 ="";
+          sha256 ="sha256-8t/9EJs9Ly6C89jM6HdCbeAdIvjSfePKD2WQwBtuJI0=";
         }
         {
           name = "vscode-terraform";
