@@ -7,11 +7,9 @@
   home.packages = with pkgs; let
     cargoSubCommands = [
       cargo-cross
-      cargo-geiger
       cargo-clone
       cargo-release
       cargo-vet
-      cargo-pgx
       cargo-shuttle
       cargo-temp
       cargo-shuttle
