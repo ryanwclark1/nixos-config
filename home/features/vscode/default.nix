@@ -75,13 +75,13 @@
           name = "nord-deep";
           publisher = "marlosirapuan";
           version = "0.1.625";
-          sha256 = "sha256-CJTku9MOet3JvVYLTQDgjKvmsU9V/NP2hamIFUfElMA=";
+          sha256 = "sha256-5QJ1zq5vc9PdJHTtpczR/Jf6aqi8qOx/6yUru4TLiQc=";
         }
         {
           name = "vscode-speech";
           publisher = "ms-vscode";
           version = "0.8.0";
-          sha256 = "sha256-wOktHr0Dpw5KkQF861xBj0L/4ap8dc56l4mN2zhcQ4A=";
+          sha256 = "sha256-+eL6z7ZDB+92ZBXEGs6IcJMF7sYZ1cq+/Gq8hVluKiY=";
         }
         {
           name = "templ";
@@ -93,7 +93,7 @@
           name = "htmx-attributes";
           publisher = "craigrbroughton";
           version = "0.7.0";
-          sha256 = "sha256-ly8jBv2s/BSoze36krut3OJGGfr8J2RMKfjnN7hWeTY=";
+          sha256 = "sha256-SNhwGqwfxhQOOxjLjoYYLH3Vo0vVq/MDHImePviUHW0=";
         }
         {
           name = "alpine-js-intellisense";
@@ -117,7 +117,7 @@
           name = "remote-explorer";
           publisher = "ms-vscode";
           version = "0.5.2024031109";
-          sha256 = "sha256-772l0EnAWXLg53TxPZf93js/W49uozwdslmzNwD1vIk=";
+          sha256 = "sha256-t8CeOuoCaK8ecJqMXRx8kA4CtP0x4srcn2SCez5tHOU=";
         }
         {
           name = "vscode-jsonnet";
