@@ -20,16 +20,14 @@
     vscode-server = {
       enable = true;
     };
-    xserver = {
-      libinput = {
-        enable = true;
-        touchpad = {
-          naturalScrolling = true;
-          scrollMethod = "twofinger";
-        };
+    libinput = {
+      enable = true;
+      touchpad = {
+        naturalScrolling = true;
+        scrollMethod = "twofinger";
       };
     };
-  };
+};
 
   # Issues with kde powerdevil
   # powerManagement.powertop.enable = true;
