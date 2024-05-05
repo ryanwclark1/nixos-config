@@ -12,15 +12,14 @@ in
   services = {
     xserver = {
       enable = lib.mkDefault true;
-      displayManager = {
-        defaultSession = "plasma";
-        sddm = {
-          enable = true;
-          wayland.enable = true;
-          theme = "${sddmTheme}";
-        };
+    };
+    displayManager = {
+      defaultSession = "plasma";
+      sddm = {
+        enable = true;
+        wayland.enable = true;
+        theme = "${sddmTheme}";
       };
     };
   };
-
 }
