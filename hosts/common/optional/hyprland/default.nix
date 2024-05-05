@@ -24,7 +24,10 @@
       enable = true;
       xkb.layout = "us";
       xkb.variant = "";
-      libinput.enable = true;
+    };
+    libinput = {
+      enable = true;
+      touchpad.enable = true;
     };
   };
 
