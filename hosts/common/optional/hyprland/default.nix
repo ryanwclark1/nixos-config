@@ -27,7 +27,11 @@
     };
     libinput = {
       enable = true;
-      touchpad.enable = true;
+      touchpad = {
+        naturalScrolling = true;
+        disableWhileTyping = true;
+        scrollMethod = "twofinger";
+      };
     };
   };
 
