@@ -39,7 +39,7 @@
     let
       inherit (self) outputs;
       lib = nixpkgs.lib // home-manager.lib;
-      systems = [ "x86_64-linux" "aarch64-linux" ];
+      systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
       forEachSystem = f: lib.genAttrs systems (system: f pkgsFor.${system});
       pkgsFor = lib.genAttrs systems (system: import nixpkgs {
         inherit system;
@@ -59,18 +59,18 @@
 
       nixosConfigurations = {
         frametop = nixpkgs.lib.nixosSystem {
+          specialArgs = { inherit inputs outputs; };
           modules = [
             stylix.nixosModules.stylix
             disko.nixosModules.disko
             ./hosts/frametop
           ];
-          specialArgs = { inherit inputs outputs; };
         };
         woody = nixpkgs.lib.nixosSystem {
+          specialArgs = { inherit inputs outputs; };
           modules = [
             stylix.nixosModules.stylix ./hosts/woody
           ];
-          specialArgs = { inherit inputs outputs; };
         };
 
       };
@@ -78,12 +78,12 @@
       homeConfigurations = {
         "administrator@frametop" = lib.homeManagerConfiguration {
           modules = [ stylix.nixosModules.stylix ./home/frametop.nix ];
-          pkgs = pkgsFor.x86_64-linux;
+          # pkgs = pkgsFor.x86_64-linux;
           extraSpecialArgs = { inherit inputs outputs; };
         };
         "administrator@woody" = lib.homeManagerConfiguration {
           modules = [ stylix.nixosModules.stylix ./home/woody.nix ];
-          pkgs = pkgsFor.x86_64-linux;
+          # pkgs = pkgsFor.x86_64-linux;
           extraSpecialArgs = { inherit inputs outputs; };
         };
       };
