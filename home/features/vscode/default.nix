@@ -24,6 +24,7 @@
 
   home.packages = with pkgs; [
     tailwindcss
+    fluxcli
   ];
 
   programs = {
