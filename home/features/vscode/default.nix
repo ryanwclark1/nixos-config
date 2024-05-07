@@ -125,6 +125,12 @@
           version = "0.6.1";
           sha256 ="sha256-8t/9EJs9Ly6C89jM6HdCbeAdIvjSfePKD2WQwBtuJI0=";
         }
+        {
+          name = "vscode-gitops-tools";
+          publisher = "weaveworks";
+          version = "0.27.0";
+          sha256 = "sha256-+eL6z7ZDB+92ZBXEGs6IcJMF7sYZ1cq+/Gq8hVluKiY=";
+        }
         # {
         #   name = "vscode-terraform";
         #   publisher = "hashicorp";
