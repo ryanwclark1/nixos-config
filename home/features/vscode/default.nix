@@ -3,28 +3,35 @@
   ...
 }:
 
+
+
 {
-  nixpkgs.overlays = [
-    (
-      final: prev: {
-        vscode = prev.vscode.overrideAttrs (_: rec {
-          version = "1.89.0";
-          plat = "linux-x64";
-          archive_fmt = "tar.gz";
-          pname = "vscode";
-          src = prev.fetchurl {
-            url = "https://update.code.visualstudio.com/${version}/${plat}/stable";
-            sha256 = "bc60d8e7bc4cb8426b989070434b9f9c02add46475ea31032ade7f7ef6bdc143";
-            name = "VSCode_${version}_${plat}.${archive_fmt}";
-          };
-        });
-      }
-    )
-  ];
+  # nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+  #   "vscode"
+  # ];
+
+  # nixpkgs.overlays = [
+  #   (
+  #     final: prev: {
+  #       vscode = prev.vscode.overrideAttrs (_: rec {
+  #         version = "1.89.0";
+  #         plat = "linux-x64";
+  #         archive_fmt = "tar.gz";
+  #         pname = "vscode";
+  #         src = prev.fetchurl {
+  #           url = "https://update.code.visualstudio.com/${version}/${plat}/stable";
+  #           sha256 = "bc60d8e7bc4cb8426b989070434b9f9c02add46475ea31032ade7f7ef6bdc143";
+  #           name = "code-stable-x64-1714529314.${archive_fmt}";
+  #           # name = "VSCode_${version}_${plat}.${archive_fmt}";
+  #         };
+  #       });
+  #     }
+  #   )
+  # ];
 
   home.packages = with pkgs; [
     tailwindcss
-    fluxcli
+    fluxctl
   ];
 
   programs = {
@@ -32,8 +39,8 @@
       enable = true;
       package = pkgs.vscode;
       mutableExtensionsDir = false;
-      enableExtensionUpdateCheck = false;
-      enableUpdateCheck = false;
+      enableExtensionUpdateCheck = true;
+      enableUpdateCheck = true;
       extensions = with pkgs.vscode-extensions; [
         github.copilot-chat
         github.copilot
