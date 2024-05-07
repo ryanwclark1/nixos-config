@@ -4,23 +4,23 @@
 }:
 
 {
-  # nixpkgs.overlays = [
-  #   (
-  #     final: prev: {
-  #       vscode = prev.vscode.overrideAttrs (_: rec {
-  #         version = "1.87.0";
-  #         plat = "linux-x64";
-  #         archive_fmt = "tar.gz";
-  #         pname = "vscode";
-  #         src = prev.fetchurl {
-  #           url = "https://update.code.visualstudio.com/${version}/${plat}/stable";
-  #           sha256 = "00izdy01d34czxfjn6rv4vg179r7f264bls5fib4caakj9bblalw";
-  #           name = "VSCode_${version}_${plat}.${archive_fmt}";
-  #         };
-  #       });
-  #     }
-  #   )
-  # ];
+  nixpkgs.overlays = [
+    (
+      final: prev: {
+        vscode = prev.vscode.overrideAttrs (_: rec {
+          version = "1.89.0";
+          plat = "linux-x64";
+          archive_fmt = "tar.gz";
+          pname = "vscode";
+          src = prev.fetchurl {
+            url = "https://update.code.visualstudio.com/${version}/${plat}/stable";
+            sha256 = "00izdy01d34czxfjn6rv4vg179r7f264bls5fib4caakj9bblalw";
+            name = "VSCode_${version}_${plat}.${archive_fmt}";
+          };
+        });
+      }
+    )
+  ];
 
   home.packages = with pkgs; [
     tailwindcss
@@ -129,7 +129,7 @@
           name = "vscode-gitops-tools";
           publisher = "weaveworks";
           version = "0.27.0";
-          sha256 = "sha256-+eL6z7ZDB+92ZBXEGs6IcJMF7sYZ1cq+/Gq8hVluKiY=";
+          sha256 = "sha256-7MCKDnHCot/CL/SqZ2WuTxbqFdF75EC5WC+OxW0dcaE=";
         }
         # {
         #   name = "vscode-terraform";
