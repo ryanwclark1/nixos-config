@@ -14,7 +14,7 @@
           pname = "vscode";
           src = prev.fetchurl {
             url = "https://update.code.visualstudio.com/${version}/${plat}/stable";
-            sha256 = "00izdy01d34czxfjn6rv4vg179r7f264bls5fib4caakj9bblalw";
+            sha256 = "bc60d8e7bc4cb8426b989070434b9f9c02add46475ea31032ade7f7ef6bdc143";
             name = "VSCode_${version}_${plat}.${archive_fmt}";
           };
         });
