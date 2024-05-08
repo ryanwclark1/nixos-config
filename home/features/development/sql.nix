@@ -5,7 +5,7 @@
 
 {
   home.packages = with pkgs; [
-    # sqlfluff
+    sqlfluff
     dbeaver
     mycli
     pgcli
