@@ -13,17 +13,10 @@
     # ./sublime-music.nix
   ];
 
-
-  # nixpkgs.config.permittedInsecurePackages = [
-  #   # "electron-19.1.9"
-  #   "freeimage-unstable-2021-11-01"
-  # ];
-
   home.packages = with pkgs; [
     fortune
     d-spy # Dbus debugger
     ventoy-full #balena type tool
-    # etcher  #Etcher depends on insecure version of Electron
     libnotify
     xdg-utils
     wl-clipboard
