@@ -15,8 +15,6 @@
       displayManager = {
         gdm = {
           enable = true;
-          # Would likely create issue if used on laptop.
-          # autoSuspend = false;
           wayland = true;
         };
       };
@@ -31,8 +29,12 @@
       };
     };
     gnome = {
+      core-developer-tools.enable = false;
+      core-os-services.enable = false; # Disable gnome services
+      core-shell.enable = false; # Disable gnome shell
       games.enable = false;
-      sushi.enable = true;
+      sushi.enable = true; # File previewer
+      rygel.enable = false; # DLNA/UPnP server
     };
   };
 
@@ -60,7 +62,6 @@
 
   environment.systemPackages = with pkgs; [
     gnome.adwaita-icon-theme
-    gnome.devhelp
     gnome.gnome-nettool
     gnome.gnome-tweaks
     gnome.dconf-editor
@@ -72,5 +73,4 @@
   services.udev.packages = with pkgs; [ gnome.gnome-settings-daemon ];
 
   security.pam.services.login.enableGnomeKeyring = true;
-
 }
