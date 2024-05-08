@@ -150,7 +150,7 @@ Here is the directory structure I'm using.
 │   │   │   ├── hyprland
 │   │   │   │   ├── config
 │   │   │   │   │   ├── hyprland
-│   │   │   │   │   ├── neofetch
+│   │   │   │   │   ├── fastfetch
 │   │   │   │   │   ├── pipewire
 │   │   │   │   │   ├── rofi
 │   │   │   │   │   └── swaync

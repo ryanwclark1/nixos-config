@@ -13,7 +13,11 @@ in
     enableVteIntegration = true;
     historyControl = [ "ignoredups" ];
     bashrcExtra = ''
-      neofetch
+      fastfetch() {
+        if [ -x "$(command -v fastfetch)" ]; then
+          fastfetch --print 2>/dev/null
+        fi
+      }
     '';
   };
   programs.atuin.enableBashIntegration = mkIf config.programs.atuin.enable true;
