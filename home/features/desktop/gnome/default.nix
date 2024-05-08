@@ -6,8 +6,6 @@
 with lib;
 {
   imports = [
-    # ./nautilus-gstreamer.nix
-    # ../common
   ];
   # home-manager.users.administrator = {
   dconf = {
