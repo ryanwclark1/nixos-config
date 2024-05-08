@@ -18,28 +18,26 @@
     # ./ssh.nix
   ];
   home.packages = with pkgs; [
-    mprocs # multiple commands in parallel
-    gum # shell scripts
-    hyperfine #cli benchmarking tool
-    neofetch # System info
-    pciutils # lspci
-    usbutils # lsusb
-    comma # Install and run programs by sticking a , before them
-    distrobox # Nice escape hatch, integrates docker images with my environment
+    aha # required by kde plasma info center firmware security info
     bottom # System viewer
+    clinfo # opencl info required by kde plasma info center
+    comma # Install and run programs by sticking a , before them
     diffsitter # Better diff
-    timer # To help with my ADHD paralysis
-    ltex-ls # Spell checking LSP
-    zk # note taking
-    trashy #cli rm with trash support
-    wget
-    hurl # httpie/curl alternative
-    httpie # Better curl
+    distrobox # Nice escape hatch, integrates docker images with my environment
+    fastfetch # System info
     fx # Terminal JSON viewer
-    yq-go #jq for yaml https://github.com/mikefarah/yq
+    gum # shell scripts
+    httpie # Better curl
+    hurl # httpie/curl alternative
+    hyperfine #cli benchmarking tool
+    mprocs # multiple commands in parallel
+    pciutils # lspci
+    trashy #cli rm with trash support
+    usbutils # lsusb
     vulkan-tools # vulkaninfo, required by kde plasma info center
     wayland-utils # wayland-info required by kde plasma info center
-    clinfo # opencl info required by kde plasma info center
-    aha # required by kde plasma info center firmware security info
+    wget
+    yq-go #jq for yaml https://github.com/mikefarah/yq
+    zk # note taking
   ];
 }
