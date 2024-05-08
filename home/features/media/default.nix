@@ -12,7 +12,7 @@
     ./obs.nix
     ./pavucontrol.nix
     ./playerctl.nix
-    ./pulseaudio.nix
+    ./pulsemixer.nix
     ./video.nix
     ./yt-dlp.nix
   ];
