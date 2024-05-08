@@ -14,10 +14,10 @@
   ];
 
 
-  nixpkgs.config.permittedInsecurePackages = [
-    # "electron-19.1.9"
-    "freeimage-unstable-2021-11-01"
-  ];
+  # nixpkgs.config.permittedInsecurePackages = [
+  #   # "electron-19.1.9"
+  #   "freeimage-unstable-2021-11-01"
+  # ];
 
   home.packages = with pkgs; [
     fortune
