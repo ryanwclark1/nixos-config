@@ -7,7 +7,6 @@ with lib;
 {
   imports = [
   ];
-  # home-manager.users.administrator = {
   dconf = {
     enable = true;
     settings = {
@@ -86,7 +85,6 @@ with lib;
           "org.gnome.clocks.desktop"
           "org.gnome.Maps.desktop"
           "org.gnome.Weather.desktop"
-          # "balena-etcher.desktop"
           "solaar.desktop"
           "cups.desktop"
           "lf.desktop"
@@ -327,10 +325,7 @@ with lib;
     };
   };
   home.packages = with pkgs; [
-  ]
-  # ++ (with pkgs.gnome; [
-  # ])
-  ++ (with pkgs.gnomeExtensions; [
+  ]++ (with pkgs.gnomeExtensions; [
     vitals
     bing-wallpaper-changer
     tray-icons-reloaded
@@ -347,5 +342,4 @@ with lib;
     pop-shell
     forge
   ]);
-  # };
 }

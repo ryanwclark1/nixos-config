@@ -8,7 +8,6 @@
   stylix = {
     autoEnable = true;
     targets.vscode.enable = false;
-
   };
 
 }
