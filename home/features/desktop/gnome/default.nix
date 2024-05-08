@@ -108,7 +108,7 @@ with lib;
           "org.gnome.TextEditor.desktop"
           "org.kde.kwrite.desktop"
         ];
-        categories = [ "X-GNOME-Office" ];
+        categories = [ "X-GNOME-Office" "Office"  ];
         name = "Office";
         translate = true;
       };
@@ -146,6 +146,11 @@ with lib;
           "com.heroicgameslauncher.hgl.desktop"
           "dolphin-emu.desktop"
           "net.lutris.Lutris.desktop"
+          "xonotic.desktop"
+          "openra-cnc.desktop"
+          "openra-d2k.desktop"
+          "0ad.desktop"
+          "openra-ra.desktop"
         ];
         categories = [ "X-GNOME-Game" ];
         name = "Game";
@@ -240,7 +245,7 @@ with lib;
         name = "open-terminal";
       };
       "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1" = {
-        binding = "<super>t";
+        binding = "<super>c";
         command = "code";
         name = "open-editor";
       };
@@ -335,10 +340,7 @@ with lib;
     just-perfection
     caffeine
     clipboard-indicator
-    workspace-indicator-2
     bluetooth-quick-connect
-    gsconnect
-    pip-on-top
     pop-shell
     forge
   ]);
