@@ -30,8 +30,6 @@
     };
     gnome = {
       core-developer-tools.enable = false;
-      core-os-services.enable = false; # Disable gnome services
-      core-shell.enable = false; # Disable gnome shell
       games.enable = false;
       sushi.enable = true; # File previewer
       rygel.enable = false; # DLNA/UPnP server
