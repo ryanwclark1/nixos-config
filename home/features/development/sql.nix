@@ -6,7 +6,7 @@
 {
   home.packages = with pkgs; [
     sqlfluff
-    dbeaver
+    dbeaver-bin
     mycli
     pgcli
     sqlitebrowser
