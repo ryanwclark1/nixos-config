@@ -12,7 +12,6 @@
     inputs.nixos-hardware.nixosModules.common-pc
     inputs.nixos-hardware.nixosModules.common-pc-ssd
     ./hardware-configuration.nix
-    ./nfs-serve.nix
     ./services
 
 
