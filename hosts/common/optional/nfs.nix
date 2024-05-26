@@ -24,6 +24,7 @@
           morningstar -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/morningstar
           # apps -fstype=nfs4,rw,soft 10.10.100.210:/mnt/apptank/apps
           sync -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/sync
+          games -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/games
         '';
       in
       ''
