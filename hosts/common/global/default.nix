@@ -13,6 +13,7 @@
     ./locale.nix
     ./networking.nix
     ./nix.nix
+    ./nix-ld.nix
     ./openssh.nix
     ./sops.nix
     # ./ssh-serve-store.nix
