@@ -27,7 +27,6 @@ in
     nix-diff
     nix-doc
     nix-init
-    nix-ld
     nix-output-monitor
     nix-prefetch
     nix-prefetch-git
