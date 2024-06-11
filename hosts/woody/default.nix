@@ -84,6 +84,7 @@
   environment.systemPackages = with pkgs; [
     wget
     gitMinimal
+    libGL
   ];
 
   system.stateVersion = "24.05";
