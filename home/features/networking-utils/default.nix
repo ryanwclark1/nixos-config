@@ -15,7 +15,7 @@
     openresolv # a resolv.conf management framework
     rathole # similar to ngrok - NAT traversal and reverse proxy
     tcpdump
-    wgnord
+    # wgnord
     wireguard-tools
   ];
 }
