@@ -11,5 +11,5 @@
     };
   };
   # Blueman is a GTK+ Bluetooth Manager
-  # services.blueman.enable = true;
+  services.blueman.enable = true;
 }
