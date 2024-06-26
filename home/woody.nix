@@ -6,7 +6,7 @@
 {
   imports = [
     ./global
-    ./features/desktop/hyprland
+    ./features/desktop/hyprland2
     ./features/desktop/gnome
     ./features/desktop/common
 
