@@ -14,14 +14,12 @@
     ./hardware-configuration.nix
     ./services
 
-
     ../common/global
     ../common/users/administrator
 
     ../common/optional/bluetooth.nix
     ../common/optional/docker.nix
     ../common/optional/fail2ban.nix
-    ../common/optional/gamemode.nix
     # ../common/optional/k3s.nix
     ../common/optional/nfs.nix
     ../common/optional/pipewire.nix
@@ -63,12 +61,6 @@
       enable = true;
       driSupport = true;
       driSupport32Bit = true;
-      # extraPackages = with pkgs; [
-      #   amdvlk
-      # ];
-      # extraPackages32 = with pkgs; [
-      #   driversi686Linux.amdvlk
-      # ];
     };
 
     logitech = {

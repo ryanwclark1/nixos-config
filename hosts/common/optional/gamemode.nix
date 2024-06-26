@@ -1,7 +1,0 @@
-{
-  ...
-}:
-
-{
-  programs.gamemode.enable = true;
-}
