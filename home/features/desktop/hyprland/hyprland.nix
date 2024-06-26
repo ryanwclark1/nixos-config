@@ -41,7 +41,6 @@
         "blur,waybar"
         "ignorezero,waybar"
       ];
-
       decoration = {
         active_opacity = 0.97;
         inactive_opacity = 0.77;
@@ -68,7 +67,6 @@
           "easeinback,0.36, 0, 0.66, -0.56"
           "easeoutback,0.34, 1.56, 0.64, 1"
         ];
-
         animation = [
           "windowsIn,1,3,easeoutback,slide"
           "windowsOut,1,3,easeinback,slide"
@@ -82,7 +80,6 @@
           "border,1,3,easeout"
         ];
       };
-
       bind =
         let
           swaylock = "${config.programs.swaylock.package}/bin/swaylock";
@@ -131,7 +128,6 @@
           # "SUPERCONTROLSHIFT,z,exec,${tly} reset && ${gtk-play} -i complete" # Reset
           # "SUPERSHIFT,z,exec,${notify-send} -t 1000 $(${tly} time)" # Show current time
         ] ++
-
         (lib.optionals config.services.playerctld.enable [
           # Media control
           ",XF86AudioNext,exec,${playerctl} next"

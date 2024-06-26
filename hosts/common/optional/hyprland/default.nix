@@ -4,10 +4,16 @@
 }:
 
 {
+  # environment.systemPackages = with pkgs; [
+  #   epoll-shim
+  # ];
+
   programs = {
     hyprland = {
-      enable = true;
+      systemd.setPath.enable = false;
       xwayland.enable = true;
+      enable = true;
+      package = pkgs.hyprland;
       portalPackage = pkgs.xdg-desktop-portal-hyprland;
     };
     mtr.enable = true;
