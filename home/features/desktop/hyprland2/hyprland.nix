@@ -1,4 +1,7 @@
 {
+  config,
+  inputs,
+  lib,
   pkgs,
   ...
 }:
@@ -13,10 +16,34 @@ in
   ];
 
   programs = {
-    fuzzel = {
+    rofi = {
       enable = true;
-      package = pkgs.fuzzel;
+      package = pkgs.rofi-wayland;
+      plugins = [ pkgs.rofi-calc pkgs.rofi-emoji ];
+      extraConfig = {
+        bw = 1;
+        columns = 2;
+        icon-theme = "Papirus-Dark";
+      };
+      extraConfig = {
+        modi = "drun,emoji,calc";
+        show-icons = true;
+        drun-display-format = "{icon} {name}";
+        disable-history = false;
+        hide-scrollbar = true;
+        display-drun = "   Apps ";
+        display-run = "   Run ";
+        display-emoji = "   Emoji ";
+        display-calc = "   Calc ";
+        sidebar-mode = true;
+      };
     };
+
+    # fuzzel = {
+    #   enable = true;
+    #   package = pkgs.fuzzel;
+    # };
+
     waybar = {
       enable = true;
       package = pkgs.waybar;
@@ -288,10 +315,124 @@ in
     };
   };
 
-  services = {
-    hyprpaper = {
-      enable = true;
-      package = pkgs.hyprpaper;
+  wayland.windowManager.hyprland = {
+    enable = true;
+    package = pkgs.hyprland;
+    # package = inputs.hyprland.packages.${pkgs.system}.hyprland;
+    plugins = [
+      inputs.hyprland-plugins.packages.${pkgs.system}.hyprbars
+    ];
+    settings = {
+      general = {
+        gaps_in = 15;
+        gaps_out = 20;
+        border_size = 2.7;
+        cursor_inactive_timeout = 4;
+        # "col.active_border" = "0xff${config.colorscheme.palette.base0C}";
+        # "col.inactive_border" = "0xff${config.colorscheme.palette.base02}";
+      };
+      group = {
+        # "col.border_active" = "0xff${config.colorscheme.palette.base0B}";
+        # "col.border_inactive" = "0xff${config.colorscheme.palette.base04}";
+        groupbar = {
+          font_size = 11;
+        };
+      };
+      input = {
+        kb_layout = "us";
+      };
+      dwindle.split_width_multiplier = 1.35;
+      misc = {
+        vfr = true;
+        close_special_on_empty = true;
+        # Unfullscreen when opening something
+        new_window_takes_over_fullscreen = 2;
+      };
+      layerrule = [
+        "blur,waybar"
+        "ignorezero,waybar"
+      ];
+      decoration = {
+        active_opacity = 0.97;
+        inactive_opacity = 0.77;
+        fullscreen_opacity = 1.0;
+        rounding = 7;
+        blur = {
+          enabled = true;
+          size = 5;
+          passes = 3;
+          new_optimizations = true;
+          ignore_opacity = true;
+        };
+        drop_shadow = true;
+        shadow_range = 12;
+        shadow_offset = "3 3";
+        # "col.shadow" = "0x44000000";
+        # "col.shadow_inactive" = "0x66000000";
+      };
+      animations = {
+        enabled = true;
+        bezier = [
+          "easein,0.11, 0, 0.5, 0"
+          "easeout,0.5, 1, 0.89, 1"
+          "easeinback,0.36, 0, 0.66, -0.56"
+          "easeoutback,0.34, 1.56, 0.64, 1"
+        ];
+        animation = [
+          "windowsIn,1,3,easeoutback,slide"
+          "windowsOut,1,3,easeinback,slide"
+          "windowsMove,1,3,easeoutback"
+          "workspaces,1,2,easeoutback,slide"
+          "fadeIn,1,3,easeout"
+          "fadeOut,1,3,easein"
+          "fadeSwitch,1,3,easeout"
+          "fadeShadow,1,3,easeout"
+          "fadeDim,1,3,easeout"
+          "border,1,3,easeout"
+        ];
+      };
+      "plugin:hyprbars" = {
+        bar_height = 25;
+        # bar_color = "0xdd${config.colorscheme.palette.base00}";
+        # "col.text" = "0xee${config.colorscheme.palette.base05}";
+        # bar_text_font = config.fontProfiles.regular.family;
+        # bar_text_size = 12;
+        bar_part_of_window = true;
+        hyprbars-button =
+          let
+            closeAction = "hyprctl dispatch killactive";
+            isOnSpecial = ''hyprctl activewindow -j | jq -re 'select(.workspace.name == "special")' >/dev/null'';
+            moveToSpecial = "hyprctl dispatch movetoworkspacesilent special";
+            moveToActive = "hyprctl dispatch movetoworkspacesilent name:$(hyprctl -j activeworkspace | jq -re '.name')";
+            minimizeAction = "${isOnSpecial} && ${moveToActive} || ${moveToSpecial}";
+            maximizeAction = "hyprctl dispatch togglefloating";
+          in
+          [
+            # Red close button
+            "rgb(255, 87, 51),12,,${closeAction}"
+            # Yellow "minimize" (send to special workspace) button
+            "rgb(255, 195, 0),12,,${minimizeAction}"
+            # Green "maximize" (togglefloating) button
+            "rgb(218, 247, 166),12,,${maximizeAction}"
+          ];
+      };
+      bind =
+        let
+          barsEnabled = "hyprctl -j getoption plugin:hyprbars:bar_height | ${lib.getExe pkgs.jq} -re '.int != 0'";
+          setBarHeight = height: "hyprctl keyword plugin:hyprbars:bar_height ${toString height}";
+          toggleOn = setBarHeight config.wayland.windowManager.hyprland.settings."plugin:hyprbars".bar_height;
+          toggleOff = setBarHeight 0;
+        in
+        [
+          "SUPER,m,exec,${barsEnabled} && ${toggleOff} || ${toggleOn}"
+        ];
     };
   };
+
+  # services = {
+  #   hyprpaper = {
+  #     enable = true;
+  #     package = pkgs.hyprpaper;
+  #   };
+  # };
 }
