@@ -22,6 +22,7 @@
     ../common/optional/fail2ban.nix
     # ../common/optional/k3s.nix
     ../common/optional/nfs.nix
+    # ../common/optional/nfs-serve.nix
     ../common/optional/pipewire.nix
     ../common/optional/printing.nix
     ../common/optional/qemu.nix
