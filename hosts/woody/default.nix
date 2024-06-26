@@ -29,7 +29,9 @@
     ../common/optional/theme.nix
     ../common/optional/wireshark.nix
 
+    ../common/optional/displaymanager/gdm.nix
     ../common/optional/gnome
+    ../common/optional/hyprland
   ];
 
   networking = {

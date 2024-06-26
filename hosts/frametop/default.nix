@@ -16,6 +16,7 @@
     ../common/optional/bluetooth.nix
     ../common/optional/docker.nix
     ../common/optional/fail2ban.nix
+    # ../common/optional/k3s.nix
     ../common/optional/nfs.nix
     # ../common/optional/nfs-serve.nix
     ../common/optional/pipewire.nix
@@ -25,9 +26,9 @@
     ../common/optional/theme.nix
     ../common/optional/wireshark.nix
 
-    ../common/optional/hyprland
     ../common/optional/displaymanager/sddm
     ../common/optional/plasma
+    ../common/optional/hyprland
   ];
 
   networking = {
