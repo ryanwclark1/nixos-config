@@ -36,7 +36,7 @@
   };
 
   boot = {
-    kernelPackages = pkgs.linuxKernel.packages.linux_6_8;
+    kernelPackages = pkgs.linuxKernel.packages.linux_6_9;
     binfmt.emulatedSystems = [ "aarch64-linux" "i686-linux" ];
   };
 

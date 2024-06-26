@@ -44,7 +44,7 @@
       systemd-boot.enable = true;
       efi.canTouchEfiVariables = true;
     };
-    kernelPackages = pkgs.linuxKernel.packages.linux_6_8;
+    kernelPackages = pkgs.linuxKernel.packages.linux_6_9;
 
     # kernelPackages = pkgs.linuxPackagesFor (pkgs.linux_6_7.override {
     #   argsOverride = rec {
@@ -56,8 +56,6 @@
     #     modDirVersion = "6.7.8";
     #     };
     # });
-
-    # binfmt.emulatedSystems = [ "aarch64-linux" "i686-linux" ];
   };
 
   hardware = {
