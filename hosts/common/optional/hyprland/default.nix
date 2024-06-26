@@ -23,7 +23,6 @@
     xserver = {
       enable = true;
       xkb.layout = "us";
-      xkb.variant = "";
     };
     libinput = {
       enable = true;
