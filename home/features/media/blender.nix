@@ -5,6 +5,6 @@
 
 {
   home.packages = with pkgs; [
-    pavucontrol
+    blender-hip # Includes blender and thumbnailer
   ];
 }
