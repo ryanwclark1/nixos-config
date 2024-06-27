@@ -22,7 +22,6 @@
           src = prev.fetchurl {
             url = "https://update.code.visualstudio.com/${version}/${plat}/stable";
             sha256 = "9fdab5e023a53a69c4ccb0c5ed9907c2edd8efa94e6ff7c6f5fab14d76583e0d";
-            # name = "code-stable-x64-1714529314.${archive_fmt}";
             name = "VSCode_${version}_${plat}.${archive_fmt}";
           };
         });
@@ -291,7 +290,7 @@
         "workbench.editor.enablePreview" = true;
 
         "yaml.completion" = true;
-        "yaml.extension.recommendations" = "true";
+        "yaml.extension.recommendations" = true;
         "yaml.format.bracketSpacing" = true;
         "yaml.format.enable" = true;
         "yaml.format.printWidth" = 80;
