@@ -151,7 +151,6 @@
 
       userSettings = {
         "accessibility.dimUnfocused.enabled" = true;
-        "audioCues.chatRequestSent" = "auto";
         "breadcrumbs.enabled" = true;
 
         "diffEditor.codeLens" = true;
