@@ -8,6 +8,7 @@
     # ./atuin.nix
     ./bat.nix
     ./direnv.nix
+    ./exiftool.nix
     ./filesearch.nix
     ./filesystem_utils.nix
     ./gh.nix
@@ -16,6 +17,7 @@
     ./network.nix
     ./nixtools.nix
     # ./ssh.nix
+    ./viu.nix
   ];
   home.packages = with pkgs; [
     aha # required by kde plasma info center firmware security info
