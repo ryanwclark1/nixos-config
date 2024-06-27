@@ -40,7 +40,7 @@
       package = pkgs.vscode;
       mutableExtensionsDir = false;
       enableExtensionUpdateCheck = true;
-      enableUpdateCheck = true;
+      enableUpdateCheck = false;
       extensions = with pkgs.vscode-extensions; [
         github.copilot-chat
         github.copilot
@@ -150,10 +150,11 @@
       userSettings = {
         "accessibilitySupport.voice.keywordActivation" = "chatInView";
         "accessibility.dimUnfocused.enabled" = true;
-        # "audioCues.chatRequestSent" = "auto";
+        "audioCues.chatRequestSent" = "auto";
         "breadcrumbs.enabled" = true;
         "editor.accessibilityPageSize" = 500;
-        "editor.fontLigatures" = false;
+        "editor.fontFamily" = "JetBrains Mono, Fira Code, Menlo, Monaco, 'Courier New', monospace";
+        "editor.fontLigatures" = true;
         "editor.fontSize" = 12;
         "editor.fontVariations" = true;
         "editor.fontWeight" = "normal";
@@ -198,6 +199,7 @@
         "telemetry.telemetryLevel" = "off";
         "workbench.editor.enablePreview" = false;
 
+        "terminal.integrated.fontFamily" = "JetBrainsMono Nerd Font";
         "terminal.integrated.copyOnSelection" = true;
         "terminal.integrated.defaultProfile.linux" = "bash";
         "terminal.integrated.fontSize" = 12;
