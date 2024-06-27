@@ -14,13 +14,13 @@ with lib;
 
 let
   pname = "multiviewer";
-  version = "1.31.5";
+  version = "1.34.0";
 
   throwSystem = throw "Unsupported system: ${stdenv.hostPlatform.system}";
 
   srcs = {
     x86_64-linux = fetchzip {
-      url = "https://releases.multiviewer.app/download/155444733/MultiViewer.for.F1-linux-x64-1.31.5.zip";
+      url = "https://releases.multiviewer.app/download/155444733/MultiViewer.for.F1-linux-x64-${version}.zip";
       stripRoot = false;
       hash = "sha256-FHwbzLPMzIpyg6KyYTq6/rSNRH76dytwb9D5f9vNKkU=";
     };
