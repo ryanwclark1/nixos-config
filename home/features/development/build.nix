@@ -8,7 +8,6 @@
 {
   home.packages = with pkgs; [
     pkg-config
-    cmake
     gnumake
     just
   ];
