@@ -10,7 +10,6 @@
     ./bat.nix
     ./direnv.nix
     ./exiftool.nix
-    ./filesearch.nix
     ./filesystem_utils.nix
     ./gh.nix
     ./gpg.nix
