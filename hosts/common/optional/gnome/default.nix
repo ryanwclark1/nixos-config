@@ -13,18 +13,33 @@
       desktopManager = {
         gnome = {
           enable = true;
-          # List of packages for which gsettings are overridden. list of paths
-          extraGSettingsOverridePackages = [ ];
-          # Additional gsettings overrides. strings concatenated with "\n"
-          extraGSettingsOverrides = "";
         };
       };
     };
     gnome = {
+      at-spi2-core.enable = false; # Assistive Technologies available on the GNOME platform
       core-developer-tools.enable = false;
+      core-os-services.enable = true;
+      core-shell.enable = true;
+      core-utilities.enable = true;
+      evolution-data-server = {
+        enable = false; #collection of services for storing addressbooks and calendars
+        # plugins = [];
+      };
       games.enable = false;
-      sushi.enable = true; # File previewer
+      glib-networking.enable = true;
+      gnome-browser-connector.enable = false; # DBus service allowing to install GNOME Shell extensions from a web browser
+      gnome-initial-setup.enable = false; # First time setup wizard
+      gnome-keyring.enable = true;
+      gnome-online-accounts.enable = true; # service that provides a single sign-on framework
+      gnome-online-miners.enable = false; # service that crawls through your online content
+      gnome-remote-desktop = true;
+      gnome-settings-daemon.enable = true;
+      gnome-user-share.enable = true; # user-level file sharing service for GNOME
       rygel.enable = false; # DLNA/UPnP server
+      sushi.enable = true; # File previewer
+      tracker.enable = true; # Tracker search engine and metadata storage
+      tracker-miners.enable = true; # indexing services for Tracker search engine and metadata storage
     };
   };
 
