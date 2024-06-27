@@ -11,24 +11,24 @@
   #   "vscode"
   # ];
 
-  # nixpkgs.overlays = [
-  #   (
-  #     final: prev: {
-  #       vscode = prev.vscode.overrideAttrs (_: rec {
-  #         version = "1.90.1";
-  #         plat = "linux-x64";
-  #         archive_fmt = "tar.gz";
-  #         pname = "vscode";
-  #         src = prev.fetchurl {
-  #           url = "https://update.code.visualstudio.com/${version}/${plat}/stable";
-  #           sha256 = "bc60d8e7bc4cb8426b989070434b9f9c02add46475ea31032ade7f7ef6bdc143";
-  #           # name = "code-stable-x64-1714529314.${archive_fmt}";
-  #           name = "VSCode_${version}_${plat}.${archive_fmt}";
-  #         };
-  #       });
-  #     }
-  #   )
-  # ];
+  nixpkgs.overlays = [
+    (
+      final: prev: {
+        vscode = prev.vscode.overrideAttrs (_: rec {
+          version = "1.90.1";
+          plat = "linux-x64";
+          archive_fmt = "tar.gz";
+          pname = "vscode";
+          src = prev.fetchurl {
+            url = "https://update.code.visualstudio.com/${version}/${plat}/stable";
+            sha256 = "9fdab5e023a53a69c4ccb0c5ed9907c2edd8efa94e6ff7c6f5fab14d76583e0d";
+            # name = "code-stable-x64-1714529314.${archive_fmt}";
+            name = "VSCode_${version}_${plat}.${archive_fmt}";
+          };
+        });
+      }
+    )
+  ];
 
   home.packages = with pkgs; [
     tailwindcss
