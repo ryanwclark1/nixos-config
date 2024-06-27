@@ -6,6 +6,7 @@
 {
   imports = [
     # ./atuin.nix
+    ./aichat.nix
     ./bat.nix
     ./direnv.nix
     ./exiftool.nix
