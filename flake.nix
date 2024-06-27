@@ -46,65 +46,68 @@
     nixos-wsl,
     ...
   } @ inputs:
-    let
-      inherit (self) outputs;
-      lib = nixpkgs.lib // home-manager.lib;
-      # systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
-      forEachSystem = f: lib.genAttrs systems (system: f pkgsFor.${system});
-      pkgsFor = lib.genAttrs systems (system: import nixpkgs {
+  let
+    inherit (self) outputs;
+    lib = nixpkgs.lib // home-manager.lib;
+    # systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
+    forEachSystem = f: lib.genAttrs (import systems) (system: f pkgsFor.${system});
+    pkgsFor = lib.genAttrs (import systems) (
+    system:
+      import nixpkgs {
         inherit system;
         config.allowUnfree = true;
-      });
-    in
-    {
-      inherit lib;
-      nixosModules = import ./modules/nixos;
-      homeManagerModules = import ./modules/home-manager;
-      templates = import ./templates;
+      }
+    );
+  in
+  {
+    inherit lib;
+    nixosModules = import ./modules/nixos;
+    homeManagerModules = import ./modules/home-manager;
+    templates = import ./templates;
 
-      packages = forEachSystem (pkgs: import ./pkgs { inherit pkgs; });
-      devShells = forEachSystem (pkgs: import ./shell.nix { inherit pkgs; });
-      formatter = forEachSystem (pkgs: pkgs.nixpkgs-fmt);
-      overlays = import ./overlays { inherit inputs outputs; };
+    packages = forEachSystem (pkgs: import ./pkgs { inherit pkgs; });
+    devShells = forEachSystem (pkgs: import ./shell.nix { inherit pkgs; });
+    formatter = forEachSystem (pkgs: pkgs.nixpkgs-fmt);
+    overlays = import ./overlays { inherit inputs outputs; };
 
-      nixosConfigurations = {
-        frametop = nixpkgs.lib.nixosSystem {
-          specialArgs = {
-            inherit inputs outputs;
-          };
-          modules = [
-            stylix.nixosModules.stylix
-            disko.nixosModules.disko
-            ./hosts/frametop
-          ];
+    nixosConfigurations = {
+      frametop = nixpkgs.lib.nixosSystem {
+        specialArgs = {
+          inherit inputs outputs;
         };
-        woody = nixpkgs.lib.nixosSystem {
-          specialArgs = {
-            inherit inputs outputs;
-          };
-          modules = [
-            stylix.nixosModules.stylix
-            ./hosts/woody
-          ];
+        modules = [
+          stylix.nixosModules.stylix
+          disko.nixosModules.disko
+          ./hosts/frametop
+        ];
+      };
+      woody = nixpkgs.lib.nixosSystem {
+        specialArgs = {
+          inherit inputs outputs;
         };
-
+        modules = [
+          stylix.nixosModules.stylix
+          ./hosts/woody
+        ];
       };
 
-      homeConfigurations = {
-        "administrator@frametop" = lib.homeManagerConfiguration {
-          modules = [ stylix.nixosModules.stylix ./home/frametop.nix ];
-          pkgs = pkgsFor.x86_64-linux;
-          extraSpecialArgs = {
-            inherit inputs outputs;
-          };
+    };
+
+    homeConfigurations = {
+      "administrator@frametop" = lib.homeManagerConfiguration {
+        modules = [ stylix.nixosModules.stylix ./home/frametop.nix ];
+        pkgs = pkgsFor.x86_64-linux;
+        extraSpecialArgs = {
+          inherit inputs outputs;
         };
-        "administrator@woody" = lib.homeManagerConfiguration {
-          modules = [ stylix.nixosModules.stylix ./home/woody.nix ];
-          pkgs = pkgsFor.x86_64-linux;
-          extraSpecialArgs = {
-            inherit inputs outputs;
-          };
+      };
+      "administrator@woody" = lib.homeManagerConfiguration {
+        modules = [ stylix.nixosModules.stylix ./home/woody.nix ];
+        pkgs = pkgsFor.x86_64-linux;
+        extraSpecialArgs = {
+          inherit inputs outputs;
         };
       };
     };
+  };
 }
