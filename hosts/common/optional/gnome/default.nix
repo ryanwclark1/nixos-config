@@ -7,39 +7,39 @@
 
 {
 
-  programs.dconf.enable = true;
+  programs.dconf.enable = lib.mkDefault true;
   services = {
     xserver = {
       desktopManager = {
         gnome = {
-          enable = true;
+          enable = lib.mkDefault true;
         };
       };
     };
     gnome = {
-      at-spi2-core.enable = false; # Assistive Technologies available on the GNOME platform
-      core-developer-tools.enable = false;
-      core-os-services.enable = true;
-      core-shell.enable = true;
-      core-utilities.enable = true;
+      at-spi2-core.enable = lib.mkDefault false; # Assistive Technologies available on the GNOME platform
+      core-developer-tools.enable = lib.mkDefault false;
+      core-os-services.enable = lib.mkDefault true;
+      core-shell.enable = lib.mkDefault true;
+      core-utilities.enable = lib.mkDefault true;
       evolution-data-server = {
-        enable = false; #collection of services for storing addressbooks and calendars
+        enable = lib.mkDefault false; #collection of services for storing addressbooks and calendars
         # plugins = [];
       };
-      games.enable = false;
-      glib-networking.enable = true;
-      gnome-browser-connector.enable = false; # DBus service allowing to install GNOME Shell extensions from a web browser
-      gnome-initial-setup.enable = false; # First time setup wizard
-      gnome-keyring.enable = true;
-      gnome-online-accounts.enable = true; # service that provides a single sign-on framework
-      gnome-online-miners.enable = false; # service that crawls through your online content
-      gnome-remote-desktop = true;
-      gnome-settings-daemon.enable = true;
-      gnome-user-share.enable = true; # user-level file sharing service for GNOME
-      rygel.enable = false; # DLNA/UPnP server
-      sushi.enable = true; # File previewer
-      tracker.enable = true; # Tracker search engine and metadata storage
-      tracker-miners.enable = true; # indexing services for Tracker search engine and metadata storage
+      games.enable = lib.mkDefault false;
+      glib-networking.enable = lib.mkDefault true;
+      gnome-browser-connector.enable = lib.mkDefault true; # DBus service allowing to install GNOME Shell extensions from a web browser
+      gnome-initial-setup.enable = lib.mkForce false; # First time setup wizard
+      gnome-keyring.enable = lib.mkDefault true;
+      gnome-online-accounts.enable = lib.mkDefault true; # service that provides a single sign-on framework
+      gnome-online-miners.enable = lib.mkDefault false; # service that crawls through your online content
+      gnome-remote-desktop.enable = lib.mkDefault true;
+      gnome-settings-daemon.enable = lib.mkDefault true;
+      gnome-user-share.enable = lib.mkDefault true; # user-level file sharing service for GNOME
+      rygel.enable = lib.mkDefault true; # DLNA/UPnP server
+      sushi.enable = lib.mkDefault true; # File previewer
+      tracker.enable = lib.mkDefault true; # Tracker search engine and metadata storage
+      tracker-miners.enable = lib.mkDefault true; # indexing services for Tracker search engine and metadata storage
     };
   };
 
@@ -56,26 +56,23 @@
     gnome-music
     epiphany # web browser
     geary # email reader
-    tali # poker game
-    iagno # go game
-    hitori # sudoku game
-    atomix # puzzle game
     yelp # Help view
     gnome-contacts
-    gnome-initial-setup
   ]);
 
   environment.systemPackages = with pkgs; [
     gnome.adwaita-icon-theme
-    gnome.gnome-nettool
-    gnome.gnome-tweaks
     gnome.dconf-editor
     gnome.gnome-boxes
+    gnome.gnome-nettool
+    gnome.gnome-tweaks
+    gnome.gnome.bluetooth
     gnomeExtensions.appindicator
   ];
 
   # ensure gnome-settings-daemon udev rules are enabled
   services.udev.packages = with pkgs; [ gnome.gnome-settings-daemon ];
 
-  security.pam.services.login.enableGnomeKeyring = true;
+  # This is enabled if service.gnome.keyring.enable is true
+  # security.pam.services.login.enableGnomeKeyring = true;
 }
