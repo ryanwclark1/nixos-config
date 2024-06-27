@@ -31,7 +31,6 @@ in
     nix-prefetch
     nix-prefetch-git
     nix-template
-    nix-top
     nix-tree
     nix-update
     nixpkgs-lint
