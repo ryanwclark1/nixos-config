@@ -5,6 +5,6 @@
 
 {
   home.packages = with pkgs; [
-    lua
+    lua5_4_compat
   ];
 }
