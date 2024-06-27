@@ -19,7 +19,8 @@
     ./features/fzf
     ./features/games
     ./features/git
-    ./features/helix
+    ./features/gpu
+    # ./features/helix
     ./features/insomnia
     ./features/kitty
     ./features/kubernetes
@@ -28,11 +29,14 @@
     ./features/media
     ./features/networking-utils
     ./features/nvim
+    ./features/osint
+    ./features/pistol
     ./features/productivity
     ./features/qutebrowser
     ./features/shell
     ./features/starship
     ./features/sys-stats
+    ./features/vhs
     ./features/vscode
     ./features/wezterm
     ./features/zellij
