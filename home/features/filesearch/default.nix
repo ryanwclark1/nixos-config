@@ -25,5 +25,6 @@
     fd
     # ripgrep-all
     sd
+    tree
   ];
 }
