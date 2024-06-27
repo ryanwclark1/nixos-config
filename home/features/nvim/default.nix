@@ -4,15 +4,15 @@
   pkgs,
   ...
 }:
-let
-  color = pkgs.writeText "color.vim" (import ./theme.nix config.colorscheme);
-in
+# let
+#   color = pkgs.writeText "color.vim" (import ./theme.nix config.colorscheme);
+# in
 {
   imports = [
-    # ./lsp.nix
-    # ./syntaxes.nix
+    ./lsp.nix
+    ./syntaxes.nix
     ./ui.nix
-    # ./copilot.nix
+    ./copilot.nix
   ];
   # home.sessionVariables.EDITOR = "nvim";
 
@@ -48,11 +48,6 @@ in
         plugin = nord-nvim;
         config = "colorscheme nord";
       }
-
-      # {
-      #   plugin = gruvbox-nvim;
-      #   config = "colorscheme gruvbox";
-      # }
 
       neodev-nvim
 
@@ -113,17 +108,17 @@ in
       }
 
       vim-nix
-      # vim-table-mode
-      # editorconfig-nvim
-      # vim-surround
-      # telescope-nvim
-      # {
-      #   plugin = nvim-autopairs;
-      #   type = "lua";
-      #   config = /* lua */ ''
-      #     require('nvim-autopairs').setup{}
-      #   '';
-      # }
+      vim-table-mode
+      editorconfig-nvim
+      vim-surround
+      telescope-nvim
+      {
+        plugin = nvim-autopairs;
+        type = "lua";
+        config = /* lua */ ''
+          require('nvim-autopairs').setup{}
+        '';
+      }
       # {
       #   plugin = oil-nvim;
       #   type = "lua";
