@@ -77,7 +77,7 @@ pgp:
 
 .PHONY: get-vscode-sha
 
-get-vscode-sha:
+get-vscode-extension-sha:
 	@read -p "Enter Publisher: " PUBLISHER; \
 	read -p "Enter Extension Name: " EXTENSION; \
 	read -p "Enter Version: " VERSION; \
@@ -90,6 +90,25 @@ get-vscode-sha:
 		echo "{"; \
 		echo "  name = \"$$EXTENSION\";"; \
 		echo "  publisher = \"$$PUBLISHER\";"; \
+		echo "  version = \"$$VERSION\";"; \
+		echo "  sha256 = \"sha256-$$SHA256_HASH\";"; \
+		echo "}"; \
+	else \
+		echo "Error: The URL is not valid or the file does not exist. HTTP Status: $$HTTP_STATUS"; \
+	fi
+
+
+get-vscode-sha:
+	@read -p "Enter Platform (linux-x64, linux-arm64, darwin-arm64): " PLAT; \
+	read -p "Enter Version: " VERSION; \
+	URL="https://update.code.visualstudio.com/$$VERSION/$$PLAT/stable"; \
+	echo "Checking URL $$URL..."; \
+	HTTP_STATUS=$$(curl -o /dev/null -L --silent --write-out '%{http_code}\n' $$URL); \
+	if [ $$HTTP_STATUS -eq 200 ]; then \
+		echo "URL is valid. Calculating SHA256 for VSCode version $$VERSION on $$PLAT..."; \
+		SHA256_HASH=$$(curl -sL $$URL | openssl dgst -sha256 -binary | openssl base64); \
+		echo "{"; \
+		echo "  plat = \"$$PLAT\";"; \
 		echo "  version = \"$$VERSION\";"; \
 		echo "  sha256 = \"sha256-$$SHA256_HASH\";"; \
 		echo "}"; \
