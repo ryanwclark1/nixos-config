@@ -83,16 +83,16 @@
         require('range-highlight').setup{}
       '';
     }
-    {
-      plugin = indent-blankline-nvim;
-      type = "lua";
-      config = /* lua */ ''
-        require('ibl').setup{
-          scope = { highlight = {"IndentBlankLine"} },
-          indent = { highlight = {"IndentBlankLine"} },
-        }
-      '';
-    }
+    # {
+    #   plugin = indent-blankline-nvim-lua;
+    #   type = "lua";
+    #   config = /* lua */ ''
+    #     require('ibl').setup{
+    #       scope = { highlight = {"IndentBlankLine"} },
+    #       indent = { highlight = {"IndentBlankLine"} },
+    #     }
+    #   '';
+    # }
     {
       plugin = nvim-web-devicons;
       type = "lua";
