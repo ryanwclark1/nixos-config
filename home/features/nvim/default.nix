@@ -69,39 +69,55 @@
       luasnip
       friendly-snippets
 
-
       lualine-nvim
       nvim-web-devicons
 
       {
-      plugin = copilot-lua;
-      type = "lua";
-      config = /* lua */ ''
-        local copilot = require('copilot')
-        copilot.setup({
-          suggestion = { enabled = true },
-          panel = { enabled = true },
-          copilot_node_command = "${lib.getExe pkgs.nodejs}",
-        })
-      '';
-    }
-    {
-      plugin = copilot-cmp;
-      type = "lua";
-      config = /* lua */ ''
-        local copilot_cmp = require('copilot_cmp')
-        copilot_cmp.setup()
-      '';
-    }
+        plugin = copilot-lua;
+        type = "lua";
+        config = /* lua */ ''
+          local copilot = require('copilot')
+          copilot.setup({
+            suggestion = { enabled = true },
+            panel = { enabled = true },
+            copilot_node_command = "${lib.getExe pkgs.nodejs}",
+          })
+        '';
+      }
+
+      {
+        plugin = copilot-cmp;
+        type = "lua";
+        config = /* lua */ ''
+          local copilot_cmp = require('copilot_cmp')
+          copilot_cmp.setup()
+        '';
+      }
 
       {
         plugin = (nvim-treesitter.withPlugins (p: [
-          p.tree-sitter-nix
-          p.tree-sitter-vim
           p.tree-sitter-bash
-          p.tree-sitter-lua
-          p.tree-sitter-python
+          p.tree-sitter-c
+          p.tree-sitter-cpp
+          p.tree-sitter-css
+          p.tree-sitter-dart
+          p.tree-sitter-go
+          p.tree-sitter-html
+          p.tree-sitter-javascript
           p.tree-sitter-json
+          p.tree-sitter-lua
+          p.tree-sitter-make
+          p.tree-sitter-markdown
+          p.tree-sitter-nix
+          p.tree-sitter-python
+          p.tree-sitter-rust
+          p.tree-sitter-scss
+          p.tree-sitter-sql
+          p.tree-sitter-templ
+          p.tree-sitter-toml
+          p.tree-sitter-typescript
+          p.tree-sitter-vim
+          p.tree-sitter-yaml
         ]));
         config = toLuaFile ./plugin/treesitter.lua;
       }
