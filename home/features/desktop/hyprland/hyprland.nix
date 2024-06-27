@@ -11,6 +11,9 @@
     enable = true;
     package = inputs.hyprland.packages.${pkgs.system}.hyprland;
 
+    plugins = [
+      inputs.hyprland-plugins.packages.${pkgs.system}.hyprbars
+    ];
     settings = {
       general = {
         gaps_in = 15;
@@ -80,6 +83,31 @@
           "border,1,3,easeout"
         ];
       };
+      "plugin:hyprbars" = {
+        bar_height = 25;
+        # bar_color = "0xdd${config.colorscheme.palette.base00}";
+        # "col.text" = "0xee${config.colorscheme.palette.base05}";
+        # bar_text_font = config.fontProfiles.regular.family;
+        # bar_text_size = 12;
+        bar_part_of_window = true;
+        hyprbars-button =
+          let
+            closeAction = "hyprctl dispatch killactive";
+            isOnSpecial = ''hyprctl activewindow -j | jq -re 'select(.workspace.name == "special")' >/dev/null'';
+            moveToSpecial = "hyprctl dispatch movetoworkspacesilent special";
+            moveToActive = "hyprctl dispatch movetoworkspacesilent name:$(hyprctl -j activeworkspace | jq -re '.name')";
+            minimizeAction = "${isOnSpecial} && ${moveToActive} || ${moveToSpecial}";
+            maximizeAction = "hyprctl dispatch togglefloating";
+          in
+          [
+            # Red close button
+            "rgb(255, 87, 51),12,,${closeAction}"
+            # Yellow "minimize" (send to special workspace) button
+            "rgb(255, 195, 0),12,,${minimizeAction}"
+            # Green "maximize" (togglefloating) button
+            "rgb(218, 247, 166),12,,${maximizeAction}"
+          ];
+      };
       bind =
         let
           swaylock = "${config.programs.swaylock.package}/bin/swaylock";
@@ -100,8 +128,14 @@
           terminal = "${pkgs.kitty}/bin/kitty";
           browser = defaultApp "x-scheme-handler/https";
           editor = defaultApp "text/plain";
+          barsEnabled = "hyprctl -j getoption plugin:hyprbars:bar_height | ${lib.getExe pkgs.jq} -re '.int != 0'";
+          setBarHeight = height: "hyprctl keyword plugin:hyprbars:bar_height ${toString height}";
+          toggleOn = setBarHeight config.wayland.windowManager.hyprland.settings."plugin:hyprbars".bar_height;
+          toggleOff = setBarHeight 0;
         in
         [
+          # Bar toggle
+          "SUPER,m,exec,${barsEnabled} && ${toggleOff} || ${toggleOn}"
           # Program bindings
           "SUPER,Return,exec,${terminal}"
           "SUPER,e,exec,${editor}"
