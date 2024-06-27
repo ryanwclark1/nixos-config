@@ -106,7 +106,7 @@ get-vscode-sha:
 	HTTP_STATUS=$$(curl -o /dev/null -L --silent --write-out '%{http_code}\n' $$URL); \
 	if [ $$HTTP_STATUS -eq 200 ]; then \
 		echo "URL is valid. Calculating SHA256 for VSCode version $$VERSION on $$PLAT..."; \
-		SHA256_HASH=$$(curl -sL $$URL | openssl dgst -sha256 -hex || sed 's/^.* //'); \
+		SHA256_HASH=$$(curl -sL $$URL | sha256sum); \
 		echo "{"; \
 		echo "  plat = \"$$PLAT\";"; \
 		echo "  version = \"$$VERSION\";"; \
