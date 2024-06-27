@@ -12,23 +12,23 @@
   ];
   # nixpkgs.config.allowUnfree = true;
 
-  # nixpkgs.overlays = [
-  #   (
-  #     final: prev: {
-  #       vscode = prev.vscode.overrideAttrs (_: rec {
-  #         version = "1.90.1";
-  #         plat = "linux-x64";
-  #         archive_fmt = "tar.gz";
-  #         pname = "vscode";
-  #         src = prev.fetchurl {
-  #           url = "https://update.code.visualstudio.com/${version}/${plat}/stable";
-  #           sha256 = "9fdab5e023a53a69c4ccb0c5ed9907c2edd8efa94e6ff7c6f5fab14d76583e0d";
-  #           name = "VSCode_${version}_${plat}.${archive_fmt}";
-  #         };
-  #       });
-  #     }
-  #   )
-  # ];
+  nixpkgs.overlays = [
+    (
+      final: prev: {
+        vscode = prev.vscode.overrideAttrs (_: rec {
+          version = "1.90.2";
+          plat = "linux-x64";
+          archive_fmt = "tar.gz";
+          pname = "vscode";
+          src = prev.fetchurl {
+            url = "https://update.code.visualstudio.com/${version}/${plat}/stable";
+            sha256 = "bc15c4bf497c569af0726c218328c6ffe85a2189f544897be52157a7a27e0c34";
+            name = "VSCode_${version}_${plat}.${archive_fmt}";
+          };
+        });
+      }
+    )
+  ];
 
   home.packages = with pkgs; [
     tailwindcss
