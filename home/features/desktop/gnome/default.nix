@@ -10,7 +10,6 @@ with lib;
   dconf = {
     enable = true;
     settings = {
-
       "org/gnome/shell" = {
         favorite-apps = [
           "code.desktop"
@@ -45,7 +44,16 @@ with lib;
           "Video"
           "Game"
           "Development"
+          "Communication"
         ];
+      };
+      "org/gnome/desktop/app-folders/folders/Communication" = {
+        apps = [
+          "element-desktop.desktop"
+          "discord.desktop"
+          "slack.desktop"
+        ];
+        name = "Communication";
       };
       "org/gnome/desktop/app-folders/folders/Utilities" = {
         apps = [
@@ -77,7 +85,6 @@ with lib;
           "blueman-manager.desktop"
           "gnome-system-monitor.desktop"
           "com.github.qarmin.czkawka.desktop"
-          # "org.gnome.dfeet.desktop"
           "ca.desrt.dconf-editor.desktop"
           "org.gnome.Extensions.desktop"
           "org.gnome.Devhelp.desktop"
@@ -91,6 +98,14 @@ with lib;
           "gnome-nettool.desktop"
           "pavucontrol.desktop"
           "nixos-manual.desktop"
+          "fish.desktop"
+          "org.gnome.SystemMonitor.desktop"
+          "xterm.desktop"
+          "org.gnome.dspy.desktop"
+          "io.github.arunsivaramanneo.GPUViewer.desktop"
+          "thunar-settings.desktop"
+          "thunar.desktop"
+          "thunar-bulk-rename.desktop"
         ];
         categories = [ "X-GNOME-Utilities" ];
         name = "X-GNOME-Utilities.directory";
@@ -151,6 +166,7 @@ with lib;
           "openra-d2k.desktop"
           "0ad.desktop"
           "openra-ra.desktop"
+          "protontricks.desktop"
         ];
         categories = [ "X-GNOME-Game" ];
         name = "Game";
@@ -168,6 +184,7 @@ with lib;
           "sqlitebrowser.desktop"
           "lapce.desktop"
           "org.kde.kate.desktop"
+          "postman.desktop"
         ];
         categories = [ "X-GNOME-Development" ];
         name = "Development";
@@ -334,7 +351,6 @@ with lib;
     vitals
     bing-wallpaper-changer
     tray-icons-reloaded
-    # blur-my-shell
     removable-drive-menu
     dash-to-panel
     just-perfection
