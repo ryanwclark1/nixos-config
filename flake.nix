@@ -3,7 +3,8 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-23.11";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-24.05";
+    systems.url = "github:nix-systems/default-linux";
     nixos-hardware.url = "github:nixos/nixos-hardware";
     nix-colors.url = "github:misterio77/nix-colors";
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
@@ -35,11 +36,20 @@
     stylix.url = "github:danth/stylix";
   };
 
-  outputs = { self, nixpkgs, home-manager, stylix, disko, nixos-wsl, ... }@inputs:
+  outputs = {
+    self,
+    nixpkgs,
+    home-manager,
+    stylix,
+    systems,
+    disko,
+    nixos-wsl,
+    ...
+  } @ inputs:
     let
       inherit (self) outputs;
       lib = nixpkgs.lib // home-manager.lib;
-      systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
+      # systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
       forEachSystem = f: lib.genAttrs systems (system: f pkgsFor.${system});
       pkgsFor = lib.genAttrs systems (system: import nixpkgs {
         inherit system;
@@ -59,7 +69,9 @@
 
       nixosConfigurations = {
         frametop = nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit inputs outputs; };
+          specialArgs = {
+            inherit inputs outputs;
+          };
           modules = [
             stylix.nixosModules.stylix
             disko.nixosModules.disko
@@ -67,9 +79,12 @@
           ];
         };
         woody = nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit inputs outputs; };
+          specialArgs = {
+            inherit inputs outputs;
+          };
           modules = [
-            stylix.nixosModules.stylix ./hosts/woody
+            stylix.nixosModules.stylix
+            ./hosts/woody
           ];
         };
 
@@ -78,13 +93,17 @@
       homeConfigurations = {
         "administrator@frametop" = lib.homeManagerConfiguration {
           modules = [ stylix.nixosModules.stylix ./home/frametop.nix ];
-          # pkgs = pkgsFor.x86_64-linux;
-          extraSpecialArgs = { inherit inputs outputs; };
+          pkgs = pkgsFor.x86_64-linux;
+          extraSpecialArgs = {
+            inherit inputs outputs;
+          };
         };
         "administrator@woody" = lib.homeManagerConfiguration {
           modules = [ stylix.nixosModules.stylix ./home/woody.nix ];
-          # pkgs = pkgsFor.x86_64-linux;
-          extraSpecialArgs = { inherit inputs outputs; };
+          pkgs = pkgsFor.x86_64-linux;
+          extraSpecialArgs = {
+            inherit inputs outputs;
+          };
         };
       };
     };
