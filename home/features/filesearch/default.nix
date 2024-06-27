@@ -8,11 +8,14 @@
     ripgrep = {
       enable = true;
       arguments = [
-        "--hidden"
         "--glob=!.git/*"
         "--glob=!node_modules/*"
+        "--glob=!dist/*"
         "--glob=!.venv/*"
-        "--glob=!/proc/*"
+        "--glob=!/proc"
+        "--glob=!/sys"
+        "--hidden"
+        "--no-follow"
         "--smart-case"
       ];
     };
