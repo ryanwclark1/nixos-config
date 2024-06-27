@@ -50,7 +50,6 @@
   environment.gnome.excludePackages = (with pkgs; [
     gnome-photos
     gnome-tour
-    gedit
   ]) ++ (with pkgs.gnome; [
     cheese # webcam tool
     gnome-music
@@ -60,15 +59,18 @@
     gnome-contacts
   ]);
 
-  environment.systemPackages = with pkgs; [
-    gnome.adwaita-icon-theme
-    gnome.dconf-editor
-    gnome.gnome-boxes
-    gnome.gnome-nettool
-    gnome.gnome-tweaks
-    gnome.gnome.bluetooth
+  environment.systemPackages = (with pkgs; [
     gnomeExtensions.appindicator
-  ];
+  ]) ++ (with pkgs.gnome; [
+    adwaita-icon-theme
+    dconf-editor
+    gnome-boxes
+    gnome-control-center
+    gnome-nettool
+    gnome-tweaks
+    gnome-bluetooth
+    vinagre
+  ]);
 
   # ensure gnome-settings-daemon udev rules are enabled
   services.udev.packages = with pkgs; [ gnome.gnome-settings-daemon ];
