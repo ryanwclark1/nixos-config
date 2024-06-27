@@ -6,5 +6,5 @@
 
   nix-inspect = pkgs.callPackage ./nix-inspect { };
   # wallpapers = pkgs.callPackage ./wallpapers { };
-  multiviewer = pkgs.callPackage ./multiviewer { };
+  # multiviewer = pkgs.callPackage ./multiviewer { };
 }
