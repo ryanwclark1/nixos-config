@@ -12,8 +12,7 @@ let
 	nmtui = "${pkgs.networkmanager}/bin/nmtui";
 in
 {
-  home.packages = [
-  ];
+
 
   programs = {
     rofi = {
@@ -317,7 +316,7 @@ in
 
   wayland.windowManager.hyprland = {
     enable = true;
-    package = pkgs.hyprland;
+    # package = pkgs.hyprland;
     # package = inputs.hyprland.packages.${pkgs.system}.hyprland;
     plugins = [
       inputs.hyprland-plugins.packages.${pkgs.system}.hyprbars
