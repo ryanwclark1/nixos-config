@@ -7,28 +7,28 @@
 
 
 {
-  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
-    "vscode"
-  ];
+  # nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+  #   "vscode"
+  # ];
 
-  nixpkgs.overlays = [
-    (
-      final: prev: {
-        vscode = prev.vscode.overrideAttrs (_: rec {
-          version = "1.90.1";
-          plat = "linux-x64";
-          archive_fmt = "tar.gz";
-          pname = "vscode";
-          src = prev.fetchurl {
-            url = "https://update.code.visualstudio.com/${version}/${plat}/stable";
-            sha256 = "bc60d8e7bc4cb8426b989070434b9f9c02add46475ea31032ade7f7ef6bdc143";
-            # name = "code-stable-x64-1714529314.${archive_fmt}";
-            name = "VSCode_${version}_${plat}.${archive_fmt}";
-          };
-        });
-      }
-    )
-  ];
+  # nixpkgs.overlays = [
+  #   (
+  #     final: prev: {
+  #       vscode = prev.vscode.overrideAttrs (_: rec {
+  #         version = "1.90.1";
+  #         plat = "linux-x64";
+  #         archive_fmt = "tar.gz";
+  #         pname = "vscode";
+  #         src = prev.fetchurl {
+  #           url = "https://update.code.visualstudio.com/${version}/${plat}/stable";
+  #           sha256 = "bc60d8e7bc4cb8426b989070434b9f9c02add46475ea31032ade7f7ef6bdc143";
+  #           # name = "code-stable-x64-1714529314.${archive_fmt}";
+  #           name = "VSCode_${version}_${plat}.${archive_fmt}";
+  #         };
+  #       });
+  #     }
+  #   )
+  # ];
 
   home.packages = with pkgs; [
     tailwindcss
@@ -60,6 +60,7 @@
         ms-vscode.hexeditor
         ms-vscode.makefile-tools
         bradlc.vscode-tailwindcss
+        charliermarsh.ruff
         dbaeumer.vscode-eslint
         donjayamanne.githistory
         golang.go
@@ -110,12 +111,12 @@
           version = "1.2.0";
           sha256 = "sha256-Klx5ZvV06lXIJ3Q/mzq3KBjPpdROoxDkgEu7MBO+RhI=";
         }
-        {
-          name = "ruff";
-          publisher = "charliermarsh";
-          version = "2024.20.0";
-          sha256 = "sha256-CqLmL8o+arki7UGWtZ/B6GQclWumLqgUqcPIXhG+Ays=";
-        }
+        # {
+        #   name = "ruff";
+        #   publisher = "charliermarsh";
+        #   version = "2024.20.0";
+        #   sha256 = "sha256-CqLmL8o+arki7UGWtZ/B6GQclWumLqgUqcPIXhG+Ays=";
+        # }
         {
           name = "remote-ssh-edit";
           publisher = "ms-vscode-remote";
