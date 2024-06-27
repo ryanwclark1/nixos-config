@@ -7,7 +7,7 @@
   imports = [
     # ./hyprland-vnc.nix
     ./basic-binds.nix
-    ./hyprbars.nix
+    # ./hyprbars.nix
     ./hyprland.nix
     ./rofi.nix
     ./waybar.nix
