@@ -149,47 +149,52 @@
       ];
 
       userSettings = {
-        # "accessibilitySupport.voice.keywordActivation" = "chatInView";
         "accessibility.dimUnfocused.enabled" = true;
         "audioCues.chatRequestSent" = "auto";
         "breadcrumbs.enabled" = true;
+
+        "diffEditor.codeLens" = true;
+
         "editor.accessibilityPageSize" = 500;
         "editor.fontFamily" = "JetBrains Mono, Fira Code, Menlo, Monaco, 'Courier New', monospace";
         "editor.fontLigatures" = true;
         "editor.fontSize" = 12;
         "editor.fontVariations" = true;
         "editor.fontWeight" = "normal";
-        # "editor.formatOnSave" = true;
+        "editor.formatOnPaste" = true;
+        "editor.formatOnSave" = true;
+        "editor.formatOnType" = true;
         "editor.inlineSuggest.enabled" = true;
         "editor.minimap.enabled" = false;
         "editor.parameterHints.enabled" = true;
-        "editor.quickSuggestions" = {
-          "other" = true;
-          "comments" = true;
-          "strings" = true;
-        };
-        "editor.renderWhitespace" = "all";
-        "editor.rulers" = [
-          80
-          120
-        ];
-
-        "editor.suggest.showStatusBar" = true;
-        "editor.suggest.localityBonus" = true;
-        "editor.suggestSelection" = "first";
         "editor.quickSuggestionsDelay" = 3;
+        "editor.renderWhitespace" = "all";
+        "editor.snippetSuggestions" = "top";
+        "editor.suggest.localityBonus" = true;
+        "editor.suggest.showStatusBar" = true;
+        "editor.suggestSelection" = "first";
         "editor.tabCompletion" = "on";
         "editor.tabSize" = 2;
         "editor.useTabStops" = true;
         "editor.wordBasedSuggestions" = "matchingDocuments";
         "editor.wordWrap" = "on";
-        "editor.snippetSuggestions" = "top";
+        "editor.quickSuggestions" = {
+          "other" = true;
+          "comments" = true;
+          "strings" = true;
+        };
+        "editor.rulers" = [
+          80
+          120
+        ];
+
         "emmet.showSuggestionsAsSnippets" = true;
         "emmet.includeLanguages" = {
           "javascript" = "javascriptreact";
           "typescript" = "typescriptreact";
         };
         "emmet.triggerExpansionOnTab" = true;
+
         "extensions.autoUpdate" = false;
         "files.associations" = {
           "*.css" = "tailwindcss";
@@ -197,8 +202,8 @@
         "files.exclude" = { "**/node_modules/**" = true; };
         "files.autoSave" = "afterDelay";
         "files.trimTrailingWhitespace" = true;
+
         "telemetry.telemetryLevel" = "off";
-        "workbench.editor.enablePreview" = false;
 
         "terminal.integrated.fontFamily" = "JetBrainsMono Nerd Font";
         "terminal.integrated.copyOnSelection" = true;
@@ -220,6 +225,7 @@
         #   };
         # };
         "redhat.telemetry.enabled" = false;
+
         # Even Better TOML
         "evenBetterToml.taplo.bundled" = false;
         "evenBetterToml.taplo.path" = "${pkgs.taplo}/bin/taplo";
@@ -238,10 +244,24 @@
         "[json]"."editor.defaultFormatter" = "vscode.json-language-features";
         "[jsonc]"."editor.defaultFormatter" = "vscode.json-language-features";
 
-        "git.confirmSync" = false;
+        # Git
         "git.autofetch" = true;
+        "git.autofetchPeriod" = 30;
+        "git.confirmSync" = false;
         "git.enableSmartCommit" = true;
-        "window.zoomLevel" = 1;
+
+        #Github
+        "github.codespaces.defaultExtensions" = [
+          "GitHub.codespaces"
+          "GitHub.vscode-pull-request-github"
+          "Github.copilot-chat"
+          "Github.copilot"
+        ];
+        "github.copilot.advanced" = {
+          "listCount" = 3;
+        };
+
+        # Kubernetes
         "vs-kubernetes" = {
           "vs-kubernetes.crd-code-completion" = "enabled";
         };
@@ -253,34 +273,34 @@
         "vscode-kubernetes.log-viewer.follow" = true;
         "vscode-kubernetes.log-viewer.timestamp" = true;
         "vsdocker.imageUser" = "docker.io/ryanwclark";
-        # "tabby.usage.anonymousUsageTracking" = true; # this settings actually disables telemetry (pretty weird naming)
+
         # Configurations: https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss
         "tailwindCSS.includeLanguages" = {
           "plaintext" = "html";
         };
-        "tailwindCSS.emmetCompletions" = true;
-        "tailwindCSS.colorDecorators" = true;
-        "tailwindCSS.showPixelEquivalents" = true;
-        "tailwindCSS.hovers" = true;
-        "tailwindCSS.suggestions" = true;
         "tailwindCSS.codeActions" = true;
+        "tailwindCSS.colorDecorators" = true;
+        "tailwindCSS.emmetCompletions" = true;
+        "tailwindCSS.hovers" = true;
+        "tailwindCSS.showPixelEquivalents" = true;
+        "tailwindCSS.suggestions" = true;
         "tailwindCSS.validate" = true;
 
+        "window.zoomLevel" = 1;
+        "workbench.editor.enablePreview" = true;
 
-        "git.autofetchPeriod" = 30;
-        "github.copilot.advanced" = {
-          "listCount" = 3;
-        };
-        "diffEditor.codeLens" = true;
-        "editor.formatOnPaste" = true;
-        "editor.formatOnType" = true;
-        "github.codespaces.defaultExtensions" = [
-          "GitHub.codespaces"
-          "GitHub.vscode-pull-request-github"
-          "Github.copilot-chat"
-          "Github.copilot"
-        ];
-        "yaml.maxComputedItems" = 1000;
+        "yaml.completion" = true;
+        "yaml.extension.recommendations" = "true";
+        "yaml.format.bracketSpacing" = true;
+        "yaml.format.enable" = true;
+        "yaml.format.printWidth" = 80;
+        "yaml.format.proseWrap" = "preserve";
+        "yaml.hover" = true;
+        "yaml.maxItemsComputed" = 5000;
+        "yaml.schemaStore.enable" = true;
+        "yaml.schemaStore.url" = "https://www.schemastore.org/api/json/catalog.json";
+        "yaml.validate" = true;
+        "yaml.yamlVersion" = "1.2";
       };
     };
   };
