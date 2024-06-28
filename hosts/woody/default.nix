@@ -79,6 +79,7 @@
     wget
     gitMinimal
     libGL
+    inputs.nixos-conf-editor.packages.${system}.nixos-conf-editor
   ];
 
   system.stateVersion = "24.05";
