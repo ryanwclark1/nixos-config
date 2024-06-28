@@ -74,10 +74,6 @@ in
       hm = "home-manager --flake .";
       hms = "home-manager --flake . switch";
 
-      vim = mkIf hasNeovim "nvim";
-      vi = vim;
-      v = vim;
-
       cik = mkIf hasKitty "clone-in-kitty --type os-window";
       ck = cik;
     };
