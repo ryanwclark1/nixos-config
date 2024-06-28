@@ -15,12 +15,11 @@
     ./features/compression
     ./features/development
     ./features/eza
-    ./features/ripgrep
+    ./features/fastfetch
     ./features/fzf
     ./features/games
     ./features/git
     ./features/gpu
-    # ./features/helix
     ./features/insomnia
     ./features/kitty
     ./features/kubernetes
@@ -33,14 +32,18 @@
     ./features/pistol
     ./features/productivity
     ./features/qutebrowser
+    ./features/ripgrep
     ./features/shell
     ./features/starship
     ./features/sys-stats
+    ./features/tmux
     ./features/vhs
     ./features/vscode
     ./features/wezterm
     ./features/zellij
     ./features/zoxide
+
+    # ./features/helix
   ];
 
     # Disable impermanence
