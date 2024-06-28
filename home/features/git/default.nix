@@ -57,7 +57,10 @@ in
     };
 
     extraConfig = {
+      core.editor = "nvim";
+      github.user = "ryanwclark1";
       init.defaultBranch = "main";
+      pull.rebase = true;
       rebase.autosquash = true;
       rebase.autoStash = true;
       push.autoSetupRemote = true; # automatically create upstream branch on push
