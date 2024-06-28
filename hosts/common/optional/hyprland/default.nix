@@ -48,5 +48,4 @@
     };
   };
 
-  networking.networkmanager.enable = true;
 }
