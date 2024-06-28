@@ -4,11 +4,12 @@
 }:
 
 {
+
   programs = {
     fastfetch = {
       enable = true;
       package = pkgs.fastfetch;
-      # settings = {
+      settings = {
         logo = {
           source = "nixos_small";
           padding = {
@@ -36,5 +37,11 @@
           "media"
         ];
       };
+    };
   };
+
+  home.shellAliases = {
+    neofetch = "fastfetch";
+  };
+
 }
