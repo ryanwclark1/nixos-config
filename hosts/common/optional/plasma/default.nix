@@ -44,6 +44,7 @@
     ksystemlog
     kdegraphics-thumbnailers
     qtimageformats # attempt to fix absence of webp support
+    dolphin-plugins
   ]);
 
   # security.pam.services.login.kwallet = {
