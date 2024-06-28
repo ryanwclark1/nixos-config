@@ -5,7 +5,7 @@
 
 {
   imports = [
-    # ./atuin.nix
+    ./atuin.nix
     ./aichat.nix
     ./bat.nix
     ./btop.nix
