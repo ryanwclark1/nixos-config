@@ -16,4 +16,9 @@
       # net_iface = "wg0";
     };
   };
+
+  home.shellAliases = {
+    htop = "btop";
+  };
+
 }
