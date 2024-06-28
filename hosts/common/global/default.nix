@@ -9,6 +9,7 @@
   imports = [
     inputs.home-manager.nixosModules.home-manager
     # ./auto-upgrade.nix
+    ./fonts.nix
     ./locale.nix
     ./networking.nix
     ./nix.nix
