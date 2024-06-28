@@ -8,6 +8,7 @@
     # ./atuin.nix
     ./aichat.nix
     ./bat.nix
+    ./btop.nix
     ./direnv.nix
     ./exiftool.nix
     ./filesystem_utils.nix
@@ -23,7 +24,6 @@
     aha # required by kde plasma info center firmware security info
     bottom # System viewer
     clinfo # opencl info required by kde plasma info center
-    comma # Install and run programs by sticking a , before them
     diffsitter # Better diff
     distrobox # Nice escape hatch, integrates docker images with my environment
     fastfetch # System info
