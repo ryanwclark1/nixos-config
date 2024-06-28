@@ -9,13 +9,13 @@
   # ];
 
   programs = {
-    hyprland = {
-      systemd.setPath.enable = false;
-      xwayland.enable = true;
-      enable = true;
-      package = pkgs.hyprland;
-      portalPackage = pkgs.xdg-desktop-portal-hyprland;
-    };
+    # hyprland = {
+    #   systemd.setPath.enable = false;
+    #   xwayland.enable = true;
+    #   enable = true;
+    #   package = pkgs.hyprland;
+    #   portalPackage = pkgs.xdg-desktop-portal-hyprland;
+    # };
     mtr.enable = true;
     gnupg.agent = {
       enable = true;
@@ -25,19 +25,19 @@
     thunar.enable = true;
   };
 
-  services = {
-    xserver = {
-      enable = true;
-      xkb.layout = "us";
-    };
-    libinput = {
-      enable = true;
-      touchpad = {
-        naturalScrolling = true;
-        scrollMethod = "twofinger";
-      };
-    };
-  };
+  # services = {
+    # xserver = {
+    #   enable = true;
+    #   xkb.layout = "us";
+    # };
+    # libinput = {
+    #   enable = true;
+    #   touchpad = {
+    #     naturalScrolling = true;
+    #     scrollMethod = "twofinger";
+    #   };
+    # };
+  # };
 
   xdg = {
     portal = {
