@@ -41,7 +41,7 @@ in
   home = {
     username = lib.mkDefault "administrator";
     homeDirectory = lib.mkDefault "/home/${config.home.username}";
-    stateVersion = lib.mkDefault "24.05";
+    stateVersion = lib.mkDefault config.system.nixos.release;
     sessionPath = [ "$HOME/.local/bin" ];
     sessionVariables = {
       FLAKE = lib.mkDefault "$HOME/nixos-config";
