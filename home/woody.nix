@@ -15,7 +15,7 @@
     ./features/compression
     ./features/development
     ./features/eza
-    ./features/filesearch
+    ./features/ripgrep
     ./features/fzf
     ./features/games
     ./features/git
