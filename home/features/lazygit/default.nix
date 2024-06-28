@@ -18,7 +18,7 @@
        git = {
           log.order = "default";
           fetchAll = false;
-       }
+       };
       };
     };
   };
