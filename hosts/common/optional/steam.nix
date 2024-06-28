@@ -10,8 +10,13 @@
     };
     steam = {
       enable = true;
-      remotePlay.openFirewall = true;
       package = pkgs.steam;
+      remotePlay.openFirewall = true;
+      localNetworkGameTransfers.openFirewall = true;
+      protontricks = {
+        enable = true;
+        package = pkgs.protontricks;
+      };
     };
   };
 }
