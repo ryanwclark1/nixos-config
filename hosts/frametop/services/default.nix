@@ -1,5 +1,6 @@
 {
   inputs,
+  pkgs,
   ...
 }:
 
@@ -9,7 +10,10 @@
   ];
 
   services = {
-    fwupd.enable = true;
+    fwupd = {
+      enable = true;
+      package = pkgs.fwupd;
+    };
     # fprintd = {
     #   enable = true;
     # };
