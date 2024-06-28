@@ -1,5 +1,6 @@
 # ./host/common/global/bluetooth.nix
 {
+  pkgs,
   ...
 }:
 
@@ -7,6 +8,7 @@
   hardware = {
     bluetooth = {
       enable = true;
+      package = pkgs.bluez;
       powerOnBoot = true;
       settings = {
         General = {
