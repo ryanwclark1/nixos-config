@@ -10,9 +10,9 @@ let
   inherit (lib) mkIf;
   # inherit (inputs.nix-colors) colorSchemes;
   # inherit (inputs.nix-colors.lib-contrib { inherit pkgs; }) nixWallpaperFromScheme;
-  packageNames = map (p: p.pname or p.name or null) config.home.packages;
-  hasPackage = name: lib.any (x: x == name) packageNames;
-  hasRipgrep = hasPackage "ripgrep";
+  # packageNames = map (p: p.pname or p.name or null) config.home.packages;
+  # hasPackage = name: lib.any (x: x == name) packageNames;
+  # hasRipgrep = hasPackage "ripgrep";
   hasNeovim = config.programs.neovim.enable;
   hasKitty = config.programs.kitty.enable;
   # hasZoxide = config.programs.zoxide.enable;
@@ -31,7 +31,6 @@ in
       allowUnfreePredicate = (_: true);
     };
   };
-
 
 
   programs = {
