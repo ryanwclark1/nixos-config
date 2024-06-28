@@ -28,7 +28,7 @@
 
     ../common/optional/displaymanager/sddm
     ../common/optional/plasma
-    ../common/optional/hyprland
+    # ../common/optional/hyprland
   ];
 
   networking = {
