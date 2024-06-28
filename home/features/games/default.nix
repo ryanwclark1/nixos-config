@@ -8,7 +8,7 @@
     # ./factorio.nix
     ./heroic.nix
     ./lutris.nix
-    ./steam.nix
+    # ./steam.nix
   ];
   home = {
     packages = with pkgs; [
