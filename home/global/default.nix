@@ -41,12 +41,12 @@ in
   home = {
     username = lib.mkDefault "administrator";
     homeDirectory = lib.mkDefault "/home/${config.home.username}";
-    stateVersion = lib.mkDefault config.system.nixos.release;
+    stateVersion = lib.mkDefault "24.05";
     sessionPath = [ "$HOME/.local/bin" ];
     sessionVariables = {
       FLAKE = lib.mkDefault "$HOME/nixos-config";
       EDITOR = lib.mkDefault "${pkgs.neovim}/bin/nvim";
-      # SHELL = lib.mkDefault "${pkgs.bash}/bin/bash";
+      SHELL = lib.mkDefault "${pkgs.bash}/bin/bash";
       # TERM = "${pkgs.alacritty}/bin/alacritty";
     };
     shellAliases = rec{
