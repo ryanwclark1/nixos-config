@@ -15,6 +15,7 @@
     ./gh.nix
     ./gpg.nix
     ./jq.nix
+    ./neomutt.nix
     ./network.nix
     ./nixtools.nix
     # ./ssh.nix
@@ -37,7 +38,6 @@
     usbutils # lsusb
     vulkan-tools # vulkaninfo, required by kde plasma info center
     wayland-utils # wayland-info required by kde plasma info center
-    wget
     yq-go #jq for yaml https://github.com/mikefarah/yq
     zk # note taking
   ];
