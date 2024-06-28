@@ -315,12 +315,12 @@ in
   };
 
   wayland.windowManager.hyprland = {
-    enable = true;
+    enable = lib.mkDefault true;
     # package = pkgs.hyprland;
     # package = inputs.hyprland.packages.${pkgs.system}.hyprland;
-    plugins = [
-      inputs.hyprland-plugins.packages.${pkgs.system}.hyprbars
-    ];
+    # plugins = [
+    #   inputs.hyprland-plugins.packages.${pkgs.system}.hyprbars
+    # ];
     settings = {
       general = {
         gaps_in = 15;
