@@ -10,18 +10,18 @@ in
   programs.bash = {
     enable = true;
     enableCompletion = true;
-    enableVteIntegration = true;
-    historyControl = [ "ignoredups" ];
-    bashrcExtra = ''
-      fastfetch() {
-        if [ -x "$(command -v fastfetch)" ]; then
-          fastfetch --print 2>/dev/null
-        fi
-      }
-    '';
+    # enableVteIntegration = true;
+    # historyControl = [ "ignoredups" ];
+    # bashrcExtra = ''
+    #   fastfetch() {
+    #     if [ -x "$(command -v fastfetch)" ]; then
+    #       fastfetch --print 2>/dev/null
+    #     fi
+    #   }
+    # '';
   };
 
-  
+
   programs.atuin.enableBashIntegration = mkIf config.programs.atuin.enable true;
   programs.fzf.enableBashIntegration = mkIf config.programs.fzf.enable true;
   programs.eza.enableBashIntegration = mkIf config.programs.eza.enable true;
