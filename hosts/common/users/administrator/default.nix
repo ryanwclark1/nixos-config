@@ -5,12 +5,14 @@
 }:
 let
   ifTheyExist = groups: builtins.filter (group: builtins.hasAttr group config.users.groups) groups;
+  user = "administrator";
 in
 {
   imports = [ ./packages.nix ];
-  users.users.administrator = {
+  users.users.${user} = {
     isNormalUser = true;
-    # shell = "${pkgs.zsh}/bin/zsh";
+    home = "/home/${user}";
+    shell = "${pkgs.zsh}/bin/zsh";
     extraGroups = [
       "wheel"
       "video"
