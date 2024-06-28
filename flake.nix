@@ -34,6 +34,7 @@
       inputs.hyprland.follows = "hyprland";
     };
     stylix.url = "github:danth/stylix";
+    nixos-conf-editor.url = "github:snowfallorg/nixos-conf-editor";
   };
 
   outputs = {
