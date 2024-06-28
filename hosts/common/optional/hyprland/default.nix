@@ -1,6 +1,6 @@
 {
   lib,
-  # pkgs,
+  pkgs,
   ...
 }:
 
@@ -37,16 +37,14 @@
   #   thunar.enable = true;
   # };
 
-  # services = {
 
-
-  # xdg = {
-  #   portal = {
-  #     enable = true;
-  #     extraPortals = with pkgs; [
-  #       xdg-desktop-portal-hyprland
-  #     ];
-  #   };
-  # };
+  xdg = {
+    portal = {
+      enable = true;
+      extraPortals = with pkgs; [
+        xdg-desktop-portal-hyprland
+      ];
+    };
+  };
 
 }

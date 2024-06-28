@@ -8,7 +8,7 @@
 # TODO: Add pyenv, nvm, rbenv, rustup, etc. support
 
 {
-  # home.sessionVariables.STARSHIP_CACHE = "${config.xdg.cacheHome}/starship";
+  home.sessionVariables.STARSHIP_CACHE = "${config.xdg.cacheHome}/starship";
   programs.starship = {
     enable = true;
     # Configuration written to ~/.config/starship.toml
