@@ -33,6 +33,8 @@ in
 
   services.fail2ban = {
     enable = lib.mkDefault true;
+    maxretry = 5;
+    bantime = "30m";
   };
 
 #  programs.ssh = { # Each hosts public key
