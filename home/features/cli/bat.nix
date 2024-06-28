@@ -6,9 +6,15 @@
 {
   programs.bat = {
     enable = true;
-    extraPackages = with pkgs.bat-extras; [ batdiff batman batgrep batwatch ];
+    package = pkgs.bat;
+    extraPackages = with pkgs.bat-extras; [ batdiff batgrep batman batpipe batwatch prettybat];
     # config = {
     #   theme = "Nord";
     # };
   };
+
+  home.shellAliases = {
+    cat = "bat";
+  };
+
 }
