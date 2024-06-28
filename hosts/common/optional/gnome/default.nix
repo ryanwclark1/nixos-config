@@ -6,7 +6,6 @@
 
 
 {
-
   programs.dconf.enable = lib.mkDefault true;
   services = {
     xserver = {
