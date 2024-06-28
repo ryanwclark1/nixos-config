@@ -22,11 +22,9 @@
   ];
   home.packages = with pkgs; [
     aha # required by kde plasma info center firmware security info
-    bottom # System viewer
     clinfo # opencl info required by kde plasma info center
     diffsitter # Better diff
     distrobox # Nice escape hatch, integrates docker images with my environment
-    fastfetch # System info
     fx # Terminal JSON viewer
     gum # shell scripts
     httpie # Better curl
@@ -34,7 +32,8 @@
     hyperfine #cli benchmarking tool
     mprocs # multiple commands in parallel
     pciutils # lspci
-    trashy #cli rm with trash support
+    scrot # A command-line screen capture utility
+    trashy # cli rm with trash support
     usbutils # lsusb
     vulkan-tools # vulkaninfo, required by kde plasma info center
     wayland-utils # wayland-info required by kde plasma info center
