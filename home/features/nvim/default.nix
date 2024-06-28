@@ -328,4 +328,11 @@
       categories = [ "Utility" "TextEditor" ];
     };
   };
+
+  home.sessionVariables.EDITOR = "nvim";
+  home.shellAliases = {
+    v = "nvim";
+    vi = "nvim";
+    vim = "nvim";
+  };
 }
