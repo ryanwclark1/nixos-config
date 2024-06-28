@@ -53,7 +53,6 @@ in
     #       source "$KITTY_INSTALLATION_DIR/shell-integration/fish/vendor_conf.d/kitty-shell-integration.fish"
     #       set --prepend fish_complete_path "$KITTY_INSTALLATION_DIR/shell-integration/fish/vendor_completions.d"
 
-
   };
   programs.atuin.enableFishIntegration = mkIf config.programs.atuin.enable true;
   programs.fzf.enableFishIntegration = mkIf config.programs.fzf.enable true;
