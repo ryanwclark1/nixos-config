@@ -14,16 +14,14 @@
   ];
 
   home.packages = with pkgs; [
-    fortune
     d-spy # Dbus debugger
     ventoy-full #balena type tool
     libnotify
     xdg-utils
     wl-clipboard
     mediainfo
-    remmina # XRDP & VNC Client
     bluez-tools # bt-adapter
-    scrot
+
     element-desktop
     megatools
     megasync
