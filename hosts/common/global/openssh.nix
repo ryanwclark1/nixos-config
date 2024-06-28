@@ -14,11 +14,13 @@ in
 {
   services.openssh = {
     enable = lib.mkDefault true;
+    allowSFTP = lib.mkDefault true;
+    openFirewall = lib.mkDefault true;
+    startWhenNeeded = lib.mkDefault true;
+    ports = [ 22 ];
     settings = {
       PasswordAuthentication = true;
       PermitRootLogin = lib.mkDefault "no";
-    # Automatically remove stale sockets
-    # StreamLocalBindUnlink = "yes";
     # Allow forwarding ports to everywhere
     # GatewayPorts = "clientspecified";
     };
