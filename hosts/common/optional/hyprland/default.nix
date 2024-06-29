@@ -1,13 +1,14 @@
 {
+  inputs,
   lib,
   pkgs,
   ...
 }:
 
 {
-  # environment.systemPackages = with pkgs; [
-  #   epoll-shim
-  # ];
+  environment.systemPackages = with pkgs; [
+    epoll-shim
+  ];
 
   programs.dconf.enable = lib.mkDefault true;
   services = {
@@ -21,21 +22,21 @@
   };
 
 
-  # programs = {
-  #   hyprland = {
-  #     systemd.setPath.enable = false;
-  #     xwayland.enable = true;
-  #     enable = true;
-  #     package = pkgs.hyprland;
-  #     portalPackage = pkgs.xdg-desktop-portal-hyprland;
-  #   };
-  #   mtr.enable = true;
-  #   gnupg.agent = {
-  #     enable = true;
-  #     enableSSHSupport = true;
-  #   };
-  #   thunar.enable = true;
-  # };
+  programs = {
+    hyprland = {
+      systemd.setPath.enable = false;
+      xwayland.enable = true;
+      enable = true;
+      package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+      portalPackage = pkgs.xdg-desktop-portal-hyprland;
+    };
+    mtr.enable = true;
+    gnupg.agent = {
+      enable = true;
+      enableSSHSupport = true;
+    };
+    thunar.enable = true;
+  };
 
 
   xdg = {
