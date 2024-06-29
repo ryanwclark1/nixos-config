@@ -9,17 +9,13 @@ in
 {
   programs.zsh = {
     enable = true;
-    enableBashCompletion = true;
     enableCompletion = true;
     enableVteIntegration = true;
-    histSize = 25000;
     syntaxHighlighting = {
       enable = true;
     };
     autosuggestion = {
       enable = true;
-      async = true;
-
     };
     # localVariables = {
     #   DISABLE_CORRECTION = true;
