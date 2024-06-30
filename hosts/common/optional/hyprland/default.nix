@@ -6,11 +6,10 @@
 }:
 
 {
-  environment.systemPackages = with pkgs; [
-    epoll-shim
-  ];
+  # environment.systemPackages = with pkgs; [
+  #   epoll-shim
+  # ];
 
-  programs.dconf.enable = lib.mkDefault true;
   services = {
     xserver = {
       windowManager = {
@@ -36,6 +35,7 @@
       enableSSHSupport = true;
     };
     thunar.enable = true;
+    dconf.enable = lib.mkDefault true;
   };
 
 
