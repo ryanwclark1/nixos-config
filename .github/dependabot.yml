@@ -4,4 +4,6 @@ updates:
     directory: "/"
     schedule:
       # Check for updates to GitHub Actions every week
-      interval: "weekly"
+      interval: "daily"
+    commit-message:
+        prefix: ".github"
