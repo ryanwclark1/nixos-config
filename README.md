@@ -57,21 +57,23 @@ These computers are managed by this Nix flake ❄️
   - [Magic Nix Cache Action](https://github.com/marketplace/actions/magic-nix-cache)
   - [Flake Checker Action](https://github.com/marketplace/actions/nix-flake-checker)
   - [Update Flake Lock Action](https://github.com/marketplace/actions/update-flake-lock)
-- [flake.nix]: Entrypoint for hosts and home configurations. Also exposes a devshell for boostrapping (`nix develop` or `nix-shell`).
+- `home`: My Home-manager configuration, acessible via `home-manager --flake`
+  - `features`:
+  - `global`:
+  - `$HOST_NAME.nix`: Each hm configuration can toggle.  Sane defaults for shell and desktop
 - `hosts`: NixOS Configurations, accessible via `nixos-rebuild --flake`.
   - `common`: Shared configurations consumed by the machine-specific ones.
     - `global`: Configurations that are globally applied to all my machines.
     - `optional`: Opt-in configurations my machines can use.
   - `$HOST_NAME`: Includes discrete hardware configurations that leverage the [NixOS Hardware modules](https://github.com/NixOS/nixos-hardware).
-- `home`: My Home-manager configuration, acessible via `home-manager --flake`
-    - Each directory here is a "feature" each hm configuration can toggle.  Sane defaults for shell and desktop
 - `modules`: A few modules
 - `overlay`: Patches and version overrides for some packages. Accessible via
-  `nix build`.
 - `pkgs`: My custom packages. Also accessible via `nix build`. You can compose
   these into your own configuration by using my flake's overlay, or consume them through NUR.
 - `templates`: A couple project templates for different languages. Accessible
   via `nix init`.
+- [flake.nix]: Entrypoint for hosts and home configurations. Also exposes a devshell for boostrapping (`nix develop` or `nix-shell`).
+- [Makefile]: Commands for managing nix
 
 
 ## Installing 💾
