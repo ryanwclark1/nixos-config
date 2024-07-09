@@ -41,11 +41,14 @@
         charliermarsh.ruff
         dbaeumer.vscode-eslint
         donjayamanne.githistory
+        esbenp.prettier-vscode
+        formulahendry.code-runner
         golang.go
+        griimick.vhs
+        hediet.vscode-drawio
         jdinhlife.gruvbox
         jnoortheen.nix-ide
         jock.svg
-        esbenp.prettier-vscode
         mikestead.dotenv
         njpwerner.autodocstring
         pkief.material-icon-theme
@@ -56,8 +59,6 @@
         vscodevim.vim
         wholroyd.jinja # Prefer Better Jinja
         yzhang.markdown-all-in-one
-        formulahendry.code-runner
-        griimick.vhs
       ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
         {
           name = "nord-deep";
