@@ -14,5 +14,6 @@
     openlens
     tilt
     kubeshark
+    talosctl
   ];
 }
