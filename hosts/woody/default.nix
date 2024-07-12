@@ -26,6 +26,7 @@
     ../common/optional/printing.nix
     ../common/optional/qemu.nix
     ../common/optional/steam.nix
+    ../common/optional/tailscale.nix
     ../common/optional/theme.nix
     ../common/optional/wireshark.nix
 
