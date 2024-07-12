@@ -38,6 +38,7 @@
     ./features/tmux
     ./features/vscode
     ./features/wezterm
+    ./features/zed
     ./features/zellij
     ./features/zoxide
 
