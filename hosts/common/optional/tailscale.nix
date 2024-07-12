@@ -7,7 +7,7 @@
 {
   services.tailscale = {
     enable = true;
-    useRoutingFeatures = lib.mkDefault "both";
+    useRoutingFeatures = lib.mkDefault "client";
   };
   systemd.services.tailscale-autoconnect = {
     description = "Automatic connection to Tailscale";
@@ -31,7 +31,7 @@
         exit 0
       fi
       # otherwise authenticate with tailscale
-      ${tailscale}/bin/tailscale up --advertise-exit-node
+      ${tailscale}/bin/tailscale up
     '';
   };
 

@@ -35,6 +35,7 @@
     ./features/shell
     ./features/starship
     ./features/sys-stats
+    ./features/tailscale.nix
     ./features/tmux
     ./features/vscode
     ./features/wezterm
