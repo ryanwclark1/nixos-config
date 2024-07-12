@@ -11,6 +11,7 @@
     ./features/desktop/common
 
     ./features/alacritty
+    ./features/ansible
     ./features/cli
     ./features/compression
     ./features/development
