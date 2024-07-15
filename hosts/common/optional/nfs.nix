@@ -11,7 +11,6 @@
 
   services.autofs = {
     enable = true;
-    debug = true;
 
     autoMaster =
       let
@@ -19,10 +18,9 @@
         mapConf = pkgs.writeText "auto.mnt" ''
           share -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/share
           scans -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/scans
-          users -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/users
           rclark -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/users/rclark
-          morningstar -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/morningstar
-          # apps -fstype=nfs4,rw,soft 10.10.100.210:/mnt/apptank/apps
+          ryan -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/users/ryan
+          apps -fstype=nfs4,rw,soft 10.10.100.210:/mnt/apptank/apps
           sync -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/sync
         '';
       in
@@ -31,3 +29,4 @@
       '';
   };
 }
+

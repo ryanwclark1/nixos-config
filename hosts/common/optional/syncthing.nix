@@ -1,10 +1,12 @@
 # https://docs.syncthing.net/users/config.html
 {
+  # lib,
   pkgs,
   ...
 }:
 
 {
+
   services = {
     syncthing = {
       enable = true;
@@ -21,10 +23,16 @@
           "/home/administrator/Documents" ={
             id = "documents_sync";
           };
+          "/home/administrator/Pictures" ={
+            id = "pictures_sync";
+          };
+          "/home/administrator/Videos" ={
+            id = "videos_sync";
+          };
         };
       };
       systemService = true;
-      user = "syncthing";
+      user = "administrator";
     };
   };
 }
