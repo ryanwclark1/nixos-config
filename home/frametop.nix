@@ -33,6 +33,7 @@
     ./features/qutebrowser
     ./features/ripgrep
     ./features/shell
+    ./features/semaphore
     ./features/starship
     ./features/sys-stats
     ./features/tmux
