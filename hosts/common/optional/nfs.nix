@@ -20,7 +20,7 @@
           scans -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/scans
           rclark -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/users/rclark
           ryan -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/users/ryan
-          apps -fstype=nfs4,rw,soft 10.10.100.210:/mnt/apptank/apps
+          conf -fstype=nfs4,rw,soft 10.10.100.210:/mnt/apptank/conf
           sync -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/sync
         '';
       in
