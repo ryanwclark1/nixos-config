@@ -105,8 +105,8 @@
         {
           name = "remote-explorer";
           publisher = "ms-vscode";
-          version = "0.5.2024031109";
-          sha256 = "sha256-t8CeOuoCaK8ecJqMXRx8kA4CtP0x4srcn2SCez5tHOU=";
+          version = "0.5.2024070409";
+          sha256 = "sha256-YwmsZii8TvBhloNQi6mezusEf/SmIq3i1ZNyKN5j1sU=";
         }
         {
           name = "vscode-jsonnet";
@@ -126,6 +126,18 @@
         #   version = "2.29.5";
         #   sha256 = "";
         # }
+        {
+          name = "tailwind-color-matcher";
+          publisher = "OmriGrossman";
+          version = "1.0.8";
+          sha256 = "sha256-WfFg1h5tY43W9YqgXkHDlxjRquFupuvLBwotTw0XoNk=";
+        }
+        {
+          name = "sqlite-viewer";
+          publisher = "qwtel";
+          version = "0.6.4";
+          sha256 = "sha256-wDSWQ36j6zMUD43PqP+x9VRxgDJJexFpxMyuHpbCi2s=";
+        }
       ];
 
       userSettings = {
