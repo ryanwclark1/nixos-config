@@ -31,8 +31,8 @@
         ms-kubernetes-tools.vscode-kubernetes-tools
         ms-python.python
         ms-python.vscode-pylance
-        ms-vscode-remote.remote-ssh
-        ms-vscode-remote.remote-containers
+        # ms-vscode-remote.remote-ssh
+        # ms-vscode-remote.remote-containers
         ms-vscode.cmake-tools
         ms-vscode.cpptools
         ms-vscode.hexeditor
@@ -96,6 +96,18 @@
         #   version = "2024.20.0";
         #   sha256 = "sha256-CqLmL8o+arki7UGWtZ/B6GQclWumLqgUqcPIXhG+Ays=";
         # }
+        {
+          name = "remote-containers";
+          publisher = "ms-vscode-remote";
+          version = "0.381.0";
+          sha256 = "sha256-qGDLpEHQBB1x++KD+xrcJTs8oGmZJXjsUojfG3TwczI=";
+        }
+        {
+          name = "remote-ssh";
+          publisher = "ms-vscode-remote";
+          version = "0.113.2024072315";
+          sha256 = "sha256-s+md+gM5V0EL17LwpiIa3Kbm/AOdYQP0PfOHtnLPYh8=";
+        }
         {
           name = "remote-ssh-edit";
           publisher = "ms-vscode-remote";
