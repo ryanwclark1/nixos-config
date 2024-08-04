@@ -13,7 +13,7 @@
     # python311Packages.pipx
     # poetry
     functiontrace-server
-    memray
+    # memray
   ];
   home.sessionPath = [ "$HOME/.python/bin" ];
 }
