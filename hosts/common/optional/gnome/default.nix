@@ -49,20 +49,22 @@
   environment.gnome.excludePackages = (with pkgs; [
     gnome-photos
     gnome-tour
-  ]) ++ (with pkgs.gnome; [
     cheese # webcam tool
-    gnome-music
+
     epiphany # web browser
     geary # email reader
     yelp # Help view
+  ]) ++ (with pkgs.gnome; [
     gnome-contacts
+    gnome-music
   ]);
 
   environment.systemPackages = (with pkgs; [
     gnomeExtensions.appindicator
-  ]) ++ (with pkgs.gnome; [
     adwaita-icon-theme
     dconf-editor
+  ]) ++ (with pkgs.gnome; [
+
     gnome-boxes
     gnome-control-center
     gnome-nettool

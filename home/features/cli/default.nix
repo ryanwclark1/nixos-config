@@ -29,7 +29,7 @@
     fx # Terminal JSON viewer
     gum # shell scripts
     httpie # Better curl
-    hurl # httpie/curl alternative
+    # hurl # httpie/curl alternative
     hyperfine #cli benchmarking tool
     mprocs # multiple commands in parallel
     pciutils # lspci
