@@ -22,6 +22,7 @@
           ryan -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/users/ryan
           conf -fstype=nfs4,rw,soft 10.10.100.210:/mnt/apptank/conf
           sync -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/sync
+          family -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/users/family
         '';
       in
       ''
