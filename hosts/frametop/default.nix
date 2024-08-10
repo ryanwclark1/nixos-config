@@ -26,9 +26,12 @@
     ../common/optional/wireshark.nix
     # ../common/optional/semaphore.nix
 
-    ../common/optional/displaymanager/sddm
-    ../common/optional/plasma
-    ../common/optional/hyprland
+
+    ../common/optional/displaymanager/cosmic.nix
+    ../common/optional/cosmic.nix
+    # ../common/optional/displaymanager/sddm/
+    # ../common/optional/plasma
+    # ../common/optional/hyprland
   ];
 
   networking = {
