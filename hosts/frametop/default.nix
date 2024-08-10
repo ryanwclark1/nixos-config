@@ -24,7 +24,7 @@
     ../common/optional/tailscale.nix
     ../common/optional/theme.nix
     ../common/optional/wireshark.nix
-    ../common/optional/semaphore.nix
+    # ../common/optional/semaphore.nix
 
     ../common/optional/displaymanager/sddm
     ../common/optional/plasma
