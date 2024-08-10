@@ -41,6 +41,10 @@
     };
     stylix.url = "github:danth/stylix";
     nixos-conf-editor.url = "github:snowfallorg/nixos-conf-editor";
+    nixos-cosmic = {
+      url = "github:lilyinstarlight/nixos-cosmic";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -51,6 +55,7 @@
     systems,
     disko,
     nixos-wsl,
+    nixos-cosmic,
     ...
   } @ inputs:
   let
@@ -85,6 +90,7 @@
         modules = [
           stylix.nixosModules.stylix
           disko.nixosModules.disko
+          nixos-cosmic.nixosModules.default
           ./hosts/frametop
         ];
       };
@@ -94,6 +100,7 @@
         };
         modules = [
           stylix.nixosModules.stylix
+          nixos-cosmic.nixosModules.default
           ./hosts/woody
         ];
       };
