@@ -22,8 +22,6 @@
     ./viu.nix
   ];
   home.packages = with pkgs; [
-    aha # required by kde plasma info center firmware security info
-    clinfo # opencl info required by kde plasma info center
     diffsitter # Better diff
     distrobox # Nice escape hatch, integrates docker images with my environment
     fx # Terminal JSON viewer
@@ -36,8 +34,6 @@
     scrot # A command-line screen capture utility
     trashy # cli rm with trash support
     usbutils # lsusb
-    vulkan-tools # vulkaninfo, required by kde plasma info center
-    wayland-utils # wayland-info required by kde plasma info center
     yq-go #jq for yaml https://github.com/mikefarah/yq
     zk # note taking
   ];
