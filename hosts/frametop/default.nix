@@ -28,7 +28,7 @@
 
 
     ../common/optional/displaymanager/cosmic.nix
-    ../common/optional/cosmic.nix
+    ../common/optional/cosmic
     # ../common/optional/displaymanager/sddm/
     # ../common/optional/plasma
     # ../common/optional/hyprland
