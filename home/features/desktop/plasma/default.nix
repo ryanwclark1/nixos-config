@@ -1,5 +1,6 @@
 {
   inputs,
+  pkgs,
   ...
 }:
 
@@ -941,5 +942,9 @@
 # }
 
 {
+    home.packages = with pkgs; [
+    aha # required by kde plasma info center firmware security info
+    clinfo # opencl info required by kde plasma info center
+    ];
 
 }
