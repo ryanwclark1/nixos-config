@@ -1,5 +1,4 @@
 {
-  lib,
   ...
 }:
 
@@ -20,6 +19,7 @@
     ./features/fzf
     ./features/games
     ./features/git
+    # ./features/helix
     ./features/insomnia
     ./features/kitty
     ./features/kubernetes
@@ -28,21 +28,23 @@
     ./features/media
     ./features/networking-utils
     ./features/nvim
+    ./feature/osint
     ./features/pistol
     ./features/productivity
     ./features/qutebrowser
+    ./features/remmina
     ./features/ripgrep
     ./features/shell
     ./features/starship
     ./features/sys-stats
     ./features/tmux
+    ./features/vhs
     ./features/vscode
-    ./features/wezterm
+    # ./features/wezterm
+    ./features/yazi
     ./features/zed
     ./features/zellij
     ./features/zoxide
-
-    # ./features/helix
   ];
 
     # Disable impermanence
