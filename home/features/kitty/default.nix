@@ -17,7 +17,6 @@ in
       TERMINAL = "kitty -1";
     };
   };
-
   programs.kitty = {
     enable = true;
     package = pkgs.kitty;
