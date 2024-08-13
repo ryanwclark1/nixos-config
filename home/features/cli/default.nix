@@ -22,7 +22,7 @@
     ./network.nix
     ./nixtools.nix
     # ./ssh.nix
-    ./system.nix
+    ./mprocs.nix
     ./viu.nix
     ./yq.nix
     ./zk.nix
