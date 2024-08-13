@@ -12,5 +12,7 @@
     dmidecode
     glxinfo
     xorg.xdpyinfo
+    pciutils # lspci
+    usbutils # lsusb
   ];
 }
