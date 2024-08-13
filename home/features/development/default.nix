@@ -14,6 +14,7 @@
     ./js.nix
     ./lazygit.nix
     ./lua.nix
+    ./poetry.nix
     ./postman.nix
     ./protobuf.nix
     ./python.nix
