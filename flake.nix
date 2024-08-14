@@ -7,7 +7,7 @@
     systems.url = "github:nix-systems/default-linux";
     nixos-hardware.url = "github:nixos/nixos-hardware";
     nix-colors.url = "github:misterio77/nix-colors";
-    nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
+    # nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
     impermanence.url = "github:nix-community/impermanence";
     disko = {
       url = "github:nix-community/disko";

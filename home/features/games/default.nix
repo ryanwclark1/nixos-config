@@ -1,7 +1,7 @@
 {
-  pkgs,
   ...
 }:
+
 {
   imports = [
     ./dolphin.nix
