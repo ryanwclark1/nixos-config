@@ -30,6 +30,7 @@
     ../common/optional/tailscale-exit-node.nix
     ../common/optional/theme.nix
     ../common/optional/wireshark.nix
+    ../common/optional/zsh.nix
 
     ../common/optional/displaymanager/gdm.nix
     ../common/optional/gnome

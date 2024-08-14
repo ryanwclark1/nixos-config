@@ -26,7 +26,7 @@
     ../common/optional/theme.nix
     ../common/optional/wireshark.nix
     # ../common/optional/semaphore.nix
-
+    ../common/optional/zsh.nix
 
     ../common/optional/displaymanager/cosmic.nix
     ../common/optional/cosmic
