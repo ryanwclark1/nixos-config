@@ -44,7 +44,7 @@
     loader = {
       systemd-boot = {
         enable = true;
-        consoleMode = "keep";
+        # consoleMode = "keep";
       };
       efi.canTouchEfiVariables = true;
     };
@@ -70,5 +70,5 @@
     fw-ectool  # EC-Tool adjusted for usage with framework embedded controller.
   ];
 
-  system.stateVersion = "24.05";
+  system.stateVersion = "24.11";
 }
