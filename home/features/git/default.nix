@@ -3,7 +3,7 @@
   ...
 }:
 let
-  ssh = "${pkgs.openssh}/bin/ssh";
+  # ssh = "${pkgs.openssh}/bin/ssh";
 
   # git commit --amend, but for older commits
   git-fixup = pkgs.writeShellScriptBin "git-fixup" ''

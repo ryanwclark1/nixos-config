@@ -119,10 +119,10 @@
           playerctld = "${config.services.playerctld.package}/bin/playerctld";
           makoctl = "${config.services.mako.package}/bin/makoctl";
           rofi = "${config.programs.rofi.package}/bin/rofi";
-          grimblast = "${pkgs.inputs.hyprwm-contrib.grimblast}/bin/grimblast";
+          # grimblast = "${pkgs.inputs.hyprwm-contrib.grimblast}/bin/grimblast";
           pactl = "${pkgs.pulseaudio}/bin/pactl";
-          gtk-play = "${pkgs.libcanberra-gtk3}/bin/canberra-gtk-play";
-          notify-send = "${pkgs.libnotify}/bin/notify-send";
+          # gtk-play = "${pkgs.libcanberra-gtk3}/bin/canberra-gtk-play";
+          # notify-send = "${pkgs.libnotify}/bin/notify-send";
 
           gtk-launch = "${pkgs.gtk3}/bin/gtk-launch";
           xdg-mime = "${pkgs.xdg-utils}/bin/xdg-mime";
