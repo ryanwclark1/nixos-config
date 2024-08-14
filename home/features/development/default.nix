@@ -14,10 +14,10 @@
     ./js.nix
     ./lazygit.nix
     ./lua.nix
-    ./poetry.nix
+    # ./poetry.nix
     ./postman.nix
     ./protobuf.nix
-    ./python.nix
+    # ./python.nix
     ./rust.nix
     ./sql.nix
   ];
