@@ -28,11 +28,12 @@
     # ../common/optional/semaphore.nix
     ../common/optional/zsh.nix
 
-    ../common/optional/displaymanager/cosmic.nix
-    ../common/optional/cosmic
-    # ../common/optional/displaymanager/sddm/
-    # ../common/optional/plasma
-    # ../common/optional/hyprland
+
+    # ../common/optional/displaymanager/cosmic.nix
+    # ../common/optional/cosmic
+    ../common/optional/displaymanager/sddm
+    ../common/optional/plasma
+    ../common/optional/hyprland
   ];
 
   networking = {
