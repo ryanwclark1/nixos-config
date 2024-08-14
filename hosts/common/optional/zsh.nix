@@ -1,0 +1,7 @@
+{
+  ...
+}:
+
+{
+  environment.pathsToLink = [ "/share/zsh" ];
+}
