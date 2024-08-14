@@ -11,6 +11,9 @@
     enable = true;
     submitData = false;
   };
+  services.timesyncd = {
+    enable = true;
+  };
   location.provider = "geoclue2";
   time.timeZone = lib.mkDefault "America/Chicago";
 }
