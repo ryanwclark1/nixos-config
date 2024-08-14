@@ -5,7 +5,7 @@
 
 {
   home.packages = with pkgs; [
-    # libreoffice-fresh
-    libreoffice-qt
+    libreoffice-fresh
+    # libreoffice-qt
   ];
 }
