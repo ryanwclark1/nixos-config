@@ -4,9 +4,9 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-24.05";
-    systems.url = "github:nix-systems/default-linux";
     nixos-hardware.url = "github:nixos/nixos-hardware";
     nix-colors.url = "github:misterio77/nix-colors";
+    systems.url = "github:nix-systems/default-linux";
     # nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
     impermanence.url = "github:nix-community/impermanence";
     disko = {
@@ -51,6 +51,7 @@
     self,
     nixpkgs,
     home-manager,
+    nixos-hardware,
     stylix,
     systems,
     disko,
@@ -109,14 +110,20 @@
 
     homeConfigurations = {
       "administrator@frametop" = lib.homeManagerConfiguration {
-        modules = [ stylix.nixosModules.stylix ./home/frametop.nix ];
+        modules = [
+          stylix.nixosModules.stylix
+          ./home/frametop.nix
+        ];
         pkgs = pkgsFor.x86_64-linux;
         extraSpecialArgs = {
           inherit inputs outputs;
         };
       };
       "administrator@woody" = lib.homeManagerConfiguration {
-        modules = [ stylix.nixosModules.stylix ./home/woody.nix ];
+        modules = [
+          stylix.nixosModules.stylix
+          ./home/woody.nix
+        ];
         pkgs = pkgsFor.x86_64-linux;
         extraSpecialArgs = {
           inherit inputs outputs;
