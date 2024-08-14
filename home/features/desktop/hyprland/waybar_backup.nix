@@ -15,13 +15,13 @@ let
   pgrep = "${pkgs.procps}/bin/pgrep";
   tail = "${pkgs.coreutils}/bin/tail";
   wc = "${pkgs.coreutils}/bin/wc";
-  xargs = "${pkgs.findutils}/bin/xargs";
+  # xargs = "${pkgs.findutils}/bin/xargs";
   timeout = "${pkgs.coreutils}/bin/timeout";
   ping = "${pkgs.iputils}/bin/ping";
 
   jq = "${pkgs.jq}/bin/jq";
   systemctl = "${pkgs.systemd}/bin/systemctl";
-  journalctl = "${pkgs.systemd}/bin/journalctl";
+  # journalctl = "${pkgs.systemd}/bin/journalctl";
   playerctl = "${pkgs.playerctl}/bin/playerctl";
   playerctld = "${pkgs.playerctl}/bin/playerctld";
   pavucontrol = "${pkgs.pavucontrol}/bin/pavucontrol";
