@@ -26,7 +26,4 @@
     termusic
     alsa-utils
   ];
-
-
-
 }

@@ -20,7 +20,7 @@ in
 {
   imports = [
     inputs.nix-colors.homeManagerModule
-    # ./global-fonts.nix
+    ./global-fonts.nix
     ./style.nix
   ] ++ (builtins.attrValues outputs.homeManagerModules);
 
@@ -41,7 +41,7 @@ in
   home = {
     username = lib.mkDefault "administrator";
     homeDirectory = lib.mkDefault "/home/${config.home.username}";
-    stateVersion = lib.mkDefault "24.05";
+    stateVersion = lib.mkDefault "24.11";
     sessionPath = [ "$HOME/.local/bin" ];
     sessionVariables = {
       FLAKE = lib.mkDefault "$HOME/nixos-config";

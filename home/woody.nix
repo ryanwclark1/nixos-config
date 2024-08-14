@@ -1,5 +1,5 @@
 {
-  lib,
+  pkgs,
   ...
 }:
 
@@ -19,7 +19,7 @@
     ./features/fzf
     ./features/games
     ./features/git
-    ./features/gpu
+    # ./features/gpu
     ./features/insomnia
     ./features/kitty
     ./features/kubernetes
@@ -44,6 +44,10 @@
     ./features/zoxide
 
     # ./features/helix
+  ];
+
+  home.packages = with pkgs; [
+    amdgpu_top
   ];
 
     # Disable impermanence
