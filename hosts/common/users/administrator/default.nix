@@ -41,5 +41,4 @@ in
   };
 
   home-manager.users.administrator = import ../../../../home/${config.networking.hostName}.nix;
-
 }

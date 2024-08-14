@@ -5,24 +5,26 @@
 }:
 
 {
-  fonts.packages = with pkgs; [
-    nerdfonts
-    noto-fonts
-    noto-fonts-cjk
-    noto-fonts-emoji
-    liberation_ttf
-    fira-code
-    fira-code-symbols
-    mplus-outline-fonts.githubRelease
-    dina-font
-    hack-font
-    proggyfonts
-    powerline-fonts
-    powerline-symbols
-    jetbrains-mono
-    fira-code
-    font-awesome
-  ];
+  fonts = {
+    packages = with pkgs; [
+      nerdfonts
+      noto-fonts
+      noto-fonts-cjk
+      noto-fonts-emoji
+      liberation_ttf
+      fira-code
+      fira-code-symbols
+      mplus-outline-fonts.githubRelease
+      dina-font
+      hack-font
+      proggyfonts
+      powerline-fonts
+      powerline-symbols
+      jetbrains-mono
+      fira-code
+      font-awesome
+    ];
+  };
 
     # # It is sometimes useful to fine-tune packages, for example, by applying
     # # overrides. You can do that directly here, just don't forget the
