@@ -4,6 +4,7 @@
 {
   config,
   lib,
+  pkgs,
   modulesPath,
   ...
 }:
@@ -25,15 +26,16 @@
       fsType = "btrfs";
       options = [ "subvol=@" ];
     };
+
+  # fileSystems."/boot" =
+  #   { device = "systemd-1";
+  #     fsType = "autofs";
+  #   };
+
   fileSystems."/boot" =
-    {
-      device = "/dev/disk/by-uuid/4168-5EA7";
+    { device = "/dev/disk/by-uuid/416B-5EA7";
       fsType = "vfat";
-    };
-  fileSystems."/efi" =
-    {
-      device = "systemd-1";
-      fsType = "autofs";
+      options = [ "fmask=0077" "dmask=0077" ];
     };
 
   swapDevices =
