@@ -25,7 +25,6 @@ in
     nil # Nix LSP
     niv
     nix-diff
-    # nix-doc
     nix-init
     nix-output-monitor
     nix-prefetch

@@ -24,9 +24,9 @@
         history = 25000;
         multiplier = 5;
       };
-      # colors = {
-      #   transparent_background_colors = true;
-      # };
+      colors = {
+        transparent_background_colors = true;
+      };
       selection = {
         save_to_clipboard = true;
       };

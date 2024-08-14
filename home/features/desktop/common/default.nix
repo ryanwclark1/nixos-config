@@ -24,9 +24,7 @@
     element-desktop
     megasync
     czkawka # Duplicate file finder
-    tickrs
     gpu-viewer
-
   ];
 
 }
