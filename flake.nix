@@ -54,7 +54,7 @@
     stylix,
     systems,
     disko,
-    nixos-wsl,
+    # nixos-wsl,
     nixos-cosmic,
     ...
   } @ inputs:
