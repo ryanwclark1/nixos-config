@@ -25,7 +25,11 @@
       fsType = "btrfs";
       options = [ "subvol=@" ];
     };
-
+  fileSystems."/boot" =
+    {
+      device = "/dev/disk/by-uuid/4168-5EA7";
+      fsType = "vfat";
+    };
   fileSystems."/efi" =
     {
       device = "systemd-1";
