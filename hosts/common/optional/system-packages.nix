@@ -15,5 +15,6 @@
     usbutils # lsusb
     lshw # Hardware lister
     lsof # List open files
+    base16-schemes # Base16 color schemes
   ];
 }
