@@ -13,5 +13,7 @@
     lm_sensors # Tools for reading hardware sensors
     pciutils # lspci
     usbutils # lsusb
+    lshw # Hardware lister
+    lsof # List open files
   ];
 }
