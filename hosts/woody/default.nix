@@ -41,11 +41,16 @@
 
   boot = {
     loader = {
+      # Lanzaboote currently replaces the systemd-boot module.
       systemd-boot = {
-        enable = true;
-        consoleMode = "keep";
+        enable = pkgs.lib.mkForce false;
       };
       efi.canTouchEfiVariables = true;
+    };
+
+    lanzaboote = {
+      enable = true;
+      pkiBundle = "/etc/secureboot";
     };
     kernelPackages = pkgs.linuxKernel.packages.linux_6_9;
 
