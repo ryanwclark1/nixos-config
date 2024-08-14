@@ -5,7 +5,7 @@
 }:
 let
   inherit (lib) mkOption types;
-  cfg = config.monitors;
+  # cfg = config.monitors;
 in
 {
   options.monitors = mkOption {

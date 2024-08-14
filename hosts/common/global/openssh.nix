@@ -1,16 +1,16 @@
 {
-  config,
+  # config,
   lib,
-  outputs,
+  # outputs,
   ...
 }:
 
-let
-  inherit (config.networking) hostName;
-  hosts = outputs.nixosConfigurations;
-  pubKey = host: ../../${host}/ssh_host_ed25519_key.pub;
+# let
+  # inherit (config.networking) hostName;
+  # hosts = outputs.nixosConfigurations;
+  # pubKey = host: ../../${host}/ssh_host_ed25519_key.pub;
   # gitHost = hosts."NAME".config.networking.hostName;
-in
+# in
 {
   services.openssh = {
     enable = lib.mkDefault true;
