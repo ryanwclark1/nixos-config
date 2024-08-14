@@ -12,30 +12,28 @@
   # gitHost = hosts."NAME".config.networking.hostName;
 # in
 {
-  services.openssh = {
-    enable = lib.mkDefault true;
-    allowSFTP = lib.mkDefault true;
-    openFirewall = lib.mkDefault true;
-    startWhenNeeded = lib.mkDefault true;
-    ports = [ 22 ];
-    settings = {
-      PasswordAuthentication = true;
-      PermitRootLogin = lib.mkDefault "no";
-    # Allow forwarding ports to everywhere
-    # GatewayPorts = "clientspecified";
+  services = {
+    openssh = {
+      enable = lib.mkDefault true;
+      allowSFTP = lib.mkDefault true;
+      openFirewall = lib.mkDefault true;
+      startWhenNeeded = lib.mkDefault true;
+      ports = [ 22 ];
+      settings = {
+        PasswordAuthentication = true;
+        PermitRootLogin = lib.mkDefault "no";
+      # Allow forwarding ports to everywhere
+      # GatewayPorts = "clientspecified";
+      };
+
+      hostKeys = [{
+        path = "/home/administrator/.ssh/ssh_host_ed25519_key";
+        type = "ed25519";
+      }];
     };
-
-    hostKeys = [{
-      path = "/home/administrator/.ssh/ssh_host_ed25519_key";
-      type = "ed25519";
-    }];
   };
 
-  services.fail2ban = {
-    enable = lib.mkDefault true;
-    maxretry = 5;
-    bantime = "30m";
-  };
+
 
 #  programs.ssh = { # Each hosts public key
 #    knownHosts = builtins.mapAttrs
