@@ -20,8 +20,8 @@
 
     gc = {
       automatic = true;
-      # Keep the last 5 generations
-      options = "--delete-older-than +5";
+      # Keep the last 14 days of generations
+      options = "--delete-older-than 14d";
     };
   };
 }

@@ -9,4 +9,8 @@
     enable = true;
     package = pkgs.zoxide;
   };
+
+  home.shellAliases = {
+    cd = "z";
+  };
 }
