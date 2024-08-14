@@ -38,7 +38,7 @@
       drawbox = true;
       icons = true;
       ignorecase = true;
-      color256 = true;
+      # color256 = true;
       sixel = true;
       shell = "sh";
       shellopts = "-eu";
