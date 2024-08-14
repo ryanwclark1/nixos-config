@@ -10,7 +10,6 @@
     ./bat.nix
     ./btop.nix
     ./diffsitter.nix
-    ./direnv.nix
     ./exiftool.nix
     ./filesystem_utils.nix
     ./fx.nix

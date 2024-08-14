@@ -19,6 +19,7 @@
 
     ../common/optional/bluetooth.nix
     ../common/optional/docker.nix
+    ../common/optional/direnv.nix
     # ../common/optional/k3s.nix
     ../common/optional/nfs.nix
     ../common/optional/pipewire.nix
@@ -80,8 +81,6 @@
   };
 
   environment.systemPackages = with pkgs; [
-    wget
-    gitMinimal
     libGL
   ];
 
