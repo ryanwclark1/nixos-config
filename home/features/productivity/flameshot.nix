@@ -1,4 +1,5 @@
 {
+  config,
   ...
 }:
 
@@ -12,7 +13,7 @@
         drawFontSize = 23;
         drawThickness = 3;
 
-        savePath = "/home/administrator/Downloads";
+        savePath = "${config.home.homeDirectory}/Downloads";
         savePathFixed = false;
 
         disabledTrayIcon = true;

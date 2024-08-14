@@ -4,13 +4,16 @@
   pkgs,
   ...
 }:
-
+let
+  homeDirectory = "/home/administrator";
+in
 {
 
   services = {
     syncthing = {
       enable = true;
-      dataDir = "/home/administrator";
+      # dataDir = "/home/administrator";
+      configDir = "${homeDirectory}/.config/syncthing";
       group = "syncthing";
       guiAddress = "127.0.0.1:8384";
       openDefaultPorts = true;
@@ -20,13 +23,13 @@
           theme = "black";
         };
         folders = {
-          "/home/administrator/Documents" ={
+          "${homeDirectory}/Documents" = {
             id = "documents_sync";
           };
-          "/home/administrator/Pictures" ={
+          "${homeDirectory}/Pictures" = {
             id = "pictures_sync";
           };
-          "/home/administrator/Videos" ={
+          "${homeDirectory}/Videos" = {
             id = "videos_sync";
           };
         };

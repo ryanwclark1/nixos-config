@@ -394,7 +394,7 @@ in
         # bar_color = "0xdd${config.colorscheme.palette.base00}";
         # "col.text" = "0xee${config.colorscheme.palette.base05}";
         # bar_text_font = config.fontProfiles.regular.family;
-        # bar_text_size = 12;
+        bar_text_size = 12;
         bar_part_of_window = true;
         hyprbars-button =
           let

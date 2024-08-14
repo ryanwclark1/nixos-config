@@ -8,8 +8,12 @@ let
 in
 {
   stylix = {
-    image = ../wallpaper/FormulaOne_Vettel_1.jpg;
+    enable = true;
+    autoEnable = true;
+    image = ../wallpaper/FormulaOne_Vettel_2.jpg;
+    imageScalingMode = "fill";
     base16Scheme = "${pkgs.base16-schemes}/share/themes/${currentScheme}.yaml";
+    polarity = "dark";
     fonts = {
       serif = {
         package = pkgs.dejavu_fonts;
@@ -44,7 +48,6 @@ in
       popups = 0.9;
       terminal = 0.8;
     };
-    polarity = "dark";
     targets = {
       grub.useImage = true;
     };

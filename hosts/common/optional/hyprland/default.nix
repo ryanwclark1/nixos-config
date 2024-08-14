@@ -6,10 +6,6 @@
 }:
 
 {
-  # environment.systemPackages = with pkgs; [
-  #   epoll-shim
-  # ];
-
   services = {
     xserver = {
       windowManager = {
@@ -19,7 +15,6 @@
       };
     };
   };
-
 
   programs = {
     hyprland = {
@@ -37,7 +32,6 @@
     thunar.enable = true;
     dconf.enable = lib.mkDefault true;
   };
-
 
   # xdg = {
   #   portal = {
