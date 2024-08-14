@@ -7,12 +7,8 @@
 {
   home.packages = with pkgs; [
     sysstat
-    lm_sensors # for `sensors` command
     inxi
     dmidecode
     glxinfo
-    xorg.xdpyinfo
-    pciutils # lspci
-    usbutils # lsusb
   ];
 }
