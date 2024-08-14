@@ -28,7 +28,7 @@
     ./features/media
     ./features/networking-utils
     ./features/nvim
-    ./feature/osint
+    ./features/osint
     ./features/pistol
     ./features/productivity
     ./features/qutebrowser
@@ -41,7 +41,7 @@
     ./features/vhs
     ./features/vscode
     # ./features/wezterm
-    ./features/yazi
+    # ./features/yazi
     ./features/zed
     ./features/zellij
     ./features/zoxide

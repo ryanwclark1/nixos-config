@@ -23,7 +23,7 @@
 
   home.packages = with pkgs; [
     fd
-    # ripgrep-all
+    ripgrep-all
     sd
     tree
   ];
