@@ -63,12 +63,11 @@
     gnomeExtensions.appindicator
     adwaita-icon-theme
     dconf-editor
+    gnome-tweaks
   ]) ++ (with pkgs.gnome; [
-
     gnome-boxes
     gnome-control-center
     gnome-nettool
-    gnome-tweaks
     gnome-bluetooth
     vinagre
   ]);
