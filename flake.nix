@@ -60,6 +60,7 @@
     stylix,
     systems,
     disko,
+    lanzaboote,
     # nixos-wsl,
     nixos-cosmic,
     ...
