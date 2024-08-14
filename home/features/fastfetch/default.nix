@@ -11,32 +11,91 @@
       package = pkgs.fastfetch;
       settings = {
         logo = {
-          source = "nixos_small";
           padding = {
-            right = 1;
+            top = 2;
           };
         };
-        display = {
-          size = {
-            binaryPrefix = "si";
-          };
-          color = "blue";
-          separator = "  ";
-        };
-        modules = [
+        modules= [
+          "title"
+          "separator"
+          "os"
+          "host"
+          "bios"
+          "bootmgr"
+          "board"
+          "chassis"
+          "kernel"
+          "initsystem"
+          "uptime"
+          "processes"
+          "packages"
+          "shell"
+          "editor"
+          "display"
+          "brightness"
+          "monitor"
+          "lm"
+          "de"
+          "wm"
+          "wmtheme"
+          "theme"
+          "icons"
+          "font"
+          "cursor"
+          "terminal"
+          "terminalfont"
+          "terminalsize"
+          "terminaltheme"
           {
-            type = "datetime";
-            key = "Date";
-            format = "{1}-{3}-{11}";
+            type = "cpu";
+            showPeCoreCount = true;
+            temp = true;
           }
+          "cpucache"
+          "cpuusage"
           {
-            type = "datetime";
-            key = "Time";
-            format = "{14}:{17}:{20}";
+            type = "gpu";
+            driverSpecific = true;
+            temp = true;
           }
-          "break"
+          "memory"
+          "physicalmemory"
+          "swap"
+          "disk"
+          "battery"
+          "poweradapter"
           "player"
           "media"
+          {
+            type = "publicip";
+            timeout = 1000;
+          }
+          {
+            type = "localip";
+            showIpv6 = true;
+            showMac = true;
+          }
+          "dns"
+          "wifi"
+          "datetime"
+          "locale"
+          "vulkan"
+          "opengl"
+          "opencl"
+          "users"
+          "bluetooth"
+          "bluetoothradio"
+          "sound"
+          "camera"
+          "gamepad"
+          "netio"
+          "diskio"
+          {
+            type = "physicaldisk";
+            temp = true;
+          }
+          "break"
+          "colors"
         ];
       };
     };
