@@ -6,7 +6,7 @@
 
 {
   nix = {
-    package = lib.mkDefault pkgs.nix;
+    package = lib.mkDefault pkgs.nixVersions.git;
 
     settings = {
       auto-optimise-store = lib.mkDefault true;
@@ -16,6 +16,12 @@
         "repl-flake"
       ];
       warn-dirty = false;
+      system-features = [
+        "kvm"
+        "big-parallel"
+        "nixos-test"
+      ];
+
     };
 
     gc = {
