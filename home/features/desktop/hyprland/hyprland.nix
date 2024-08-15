@@ -86,43 +86,44 @@
             ];
 
           };
-          bind = let
-            workspaces = [
-              "0"
-              "1"
-              "2"
-              "3"
-              "4"
-              "5"
-              "6"
-              "7"
-              "8"
-              "9"
-              "F1"
-              "F2"
-              "F3"
-              "F4"
-              "F5"
-              "F6"
-              "F7"
-              "F8"
-              "F9"
-              "F10"
-              "F11"
-              "F12"
-            ];
-            # Map keys (arrows and hjkl) to hyprland directions (l, r, u, d)
-            directions = rec {
-              left = "l";
-              right = "r";
-              up = "u";
-              down = "d";
-              h = left;
-              l = right;
-              k = up;
-              j = down;
-            };
-          in
+          bind =
+            let
+              workspaces = [
+                "0"
+                "1"
+                "2"
+                "3"
+                "4"
+                "5"
+                "6"
+                "7"
+                "8"
+                "9"
+                "F1"
+                "F2"
+                "F3"
+                "F4"
+                "F5"
+                "F6"
+                "F7"
+                "F8"
+                "F9"
+                "F10"
+                "F11"
+                "F12"
+              ];
+              # Map keys (arrows and hjkl) to hyprland directions (l, r, u, d)
+              directions = rec {
+                left = "l";
+                right = "r";
+                up = "u";
+                down = "d";
+                h = left;
+                l = right;
+                k = up;
+                j = down;
+              };
+            in
             [
               "SUPERSHIFT,q,killactive"
               "SUPERSHIFT,e,exit"
@@ -210,8 +211,17 @@
                   ]
                 )
             );
-          
+
         };
+        extraConfig =
+        # let
+          # rofi = config.programs.rofi;
+          # waybar = config.programs.waybar;
+        # in
+        ''
+          exec-once = rofi 
+
+        '';
       };
     };
   };
