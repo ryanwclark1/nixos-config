@@ -1,17 +1,10 @@
 {
-  # config,
+  config,
   lib,
   # outputs,
   ...
 }:
 
-let
-  homeDirectory = "/home/administrator";
-  # inherit (config.networking) hostName;
-  # hosts = outputs.nixosConfigurations;
-  # pubKey = host: ../../${host}/ssh_host_ed25519_key.pub;
-  # gitHost = hosts."NAME".config.networking.hostName;
-in
 {
   services = {
     openssh = {
@@ -28,7 +21,7 @@ in
       };
 
       hostKeys = [{
-        path = "${homeDirectory}/.ssh/ssh_host_ed25519_key";
+        path = "${config.home.homeDirectory}/.ssh/ssh_host_ed25519_key";
         type = "ed25519";
       }];
     };
