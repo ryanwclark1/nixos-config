@@ -219,7 +219,7 @@
           # waybar = config.programs.waybar;
         # in
         ''
-          exec-once = rofi 
+          exec-once = waybar
 
         '';
       };
