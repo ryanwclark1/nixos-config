@@ -26,6 +26,14 @@
         display-calc = "   Calc ";
         sidebar-mode = true;
       };
+      pass = {
+        enable = true;
+        package = pkgs.pass-rofi-wayland;
+        fill = true;
+        stores = [
+          "/home/administrator/.local/share/keyrings"
+        ];
+      };
     };
   };
 }
