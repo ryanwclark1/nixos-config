@@ -18,21 +18,33 @@
   boot.initrd.kernelModules = [ "amdgpu" ];
   boot.kernelModules = [ "kvm-amd" ];
   boot.extraModulePackages = [ ];
-
-  fileSystems."/" =
-    {
-      device = "/dev/disk/by-uuid/9991902a-cdef-4903-aede-60de72e61092";
-      fsType = "ext4";
+    fileSystems."/" =
+    { 
+      device = "/dev/disk/by-uuid/d6591b02-0da6-4daa-ab14-857ef674e057";
+      fsType = "btrfs";
+      options = [ "subvol=@" ];
     };
-
-  fileSystems."/boot" =
-    {
-      device = "/dev/disk/by-uuid/675C-A375";
+    
+    fileSystems."/boot" =
+    { 
+      device = "/dev/disk/by-uuid/1F0E-0235";
       fsType = "vfat";
+      options = [ "fmask=0077" "dmask=0077" ];
     };
+    
+    swapDevices =
+    [ 
+      { device = "/dev/disk/by-uuid/8823dd4c-eec9-4867-a774-15c76f16a8fd"; }
+    ];
 
-  swapDevices =
-    [{ device = "/dev/disk/by-uuid/46b1f5a8-53dd-441c-bbf9-a84c4d6922aa"; }];
+
+  # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
+  # (the default) this is the recommended approach. When using systemd-networkd it's
+  # still possible to use this option, but it's recommended to use it in conjunction
+  # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
+  networking.useDHCP = lib.mkDefault true;
+  # networking.interfaces.eno1.useDHCP = lib.mkDefault true;
+  # networking.interfaces.wlp11s0.useDHCP = lib.mkDefault true;
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's
