@@ -36,9 +36,7 @@ in
   services.kdeconnect = {
     enable = true;
     indicator = true;
-    packages = with pkgs; [
-      kdePackages.kdeconnect-kde
-    ];
+    package = pkgs.kdePackages.kdeconnect-kde;
   };
 
   xdg.configFile = {
