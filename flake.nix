@@ -90,7 +90,7 @@
     overlays = import ./overlays { inherit inputs outputs; };
 
     nixosConfigurations = {
-      frametop = nixpkgs.lib.nixosSystem {
+      frametop = lib.nixosSystem {
         specialArgs = {
           inherit inputs outputs;
         };
@@ -101,7 +101,7 @@
           ./hosts/frametop
         ];
       };
-      woody = nixpkgs.lib.nixosSystem {
+      woody = lib.nixosSystem {
         specialArgs = {
           inherit inputs outputs;
         };
