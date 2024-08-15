@@ -6,12 +6,12 @@
   ...
 }: let
   getHostname = x: lib.last (lib.splitString "@" x);
-  remoteColorschemes = lib.mapAttrs' (n: v: {
-    name = getHostname n;
-    value = v.config.colorscheme.rawColorscheme.colors.${config.colorscheme.mode};
-  }) outputs.homeConfigurations;
-  rgb = color: "rgb(${lib.removePrefix "#" color})";
-  rgba = color: alpha: "rgba(${lib.removePrefix "#" color}${alpha})";
+  # remoteColorschemes = lib.mapAttrs' (n: v: {
+  #   name = getHostname n;
+  #   value = v.config.colorscheme.rawColorscheme.colors.${config.colorscheme.mode};
+  # }) outputs.homeConfigurations;
+  # rgb = color: "rgb(${lib.removePrefix "#" color})";
+  # rgba = color: alpha: "rgba(${lib.removePrefix "#" color}${alpha})";
 in {
   # imports = [
   #   # ../common
@@ -38,27 +38,27 @@ in {
     enable = true;
     # package = pkgs.hyprland.override {wrapRuntimeDeps = false;};
     # package = config.wayland.windowManager.hyprland.package;
-    systemd = {
-      enable = true;
-      # Same as default, but stop graphical-session too
-      extraCommands = lib.mkBefore [
-        "systemctl --user stop graphical-session.target"
-        "systemctl --user start hyprland-session.target"
-      ];
-    };
+    # systemd = {
+    #   enable = true;
+    #   # Same as default, but stop graphical-session too
+    #   extraCommands = lib.mkBefore [
+    #     "systemctl --user stop graphical-session.target"
+    #     "systemctl --user start hyprland-session.target"
+    #   ];
+    # };
 
     settings = {
       general = {
         gaps_in = 15;
         gaps_out = 20;
         border_size = 2;
-        "col.active_border" = rgba config.colorscheme.colors.primary "aa";
-        "col.inactive_border" = rgba config.colorscheme.colors.surface "aa";
+        # "col.active_border" = rgba config.colorscheme.colors.primary "aa";
+        # "col.inactive_border" = rgba config.colorscheme.colors.surface "aa";
       };
       cursor.inactive_timeout = 4;
       group = {
-        "col.border_active" = rgba config.colorscheme.colors.primary "aa";
-        "col.border_inactive" = rgba config.colorscheme.colors.surface "aa";
+        # "col.border_active" = rgba config.colorscheme.colors.primary "aa";
+        # "col.border_inactive" = rgba config.colorscheme.colors.surface "aa";
         groupbar.font_size = 11;
       };
       binds = {
@@ -108,9 +108,10 @@ in {
         "noshadow, ${kdeconnect-pointer}"
         "noborder, ${kdeconnect-pointer}"
         "suppressevent fullscreen, ${kdeconnect-pointer}"
-      ] ++ (lib.mapAttrsToList (name: colors:
-        "bordercolor ${rgba colors.primary "aa"} ${rgba colors.primary_container "aa"}, title:^(\\[${name}\\])"
-      ) remoteColorschemes);
+      ];
+      # ++ (lib.mapAttrsToList (name: colors:
+      #   "bordercolor ${rgba colors.primary "aa"} ${rgba colors.primary_container "aa"}, title:^(\\[${name}\\])"
+      # ) remoteColorschemes);
       layerrule = [
         "animation fade,hyprpicker"
         "animation fade,selection"
@@ -144,8 +145,8 @@ in {
         drop_shadow = true;
         shadow_range = 12;
         shadow_offset = "3 3";
-        "col.shadow" = "0x44000000";
-        "col.shadow_inactive" = "0x66000000";
+        # "col.shadow" = "0x44000000";
+        # "col.shadow_inactive" = "0x66000000";
       };
       animations = {
         enabled = true;
@@ -177,7 +178,7 @@ in {
         ];
       };
 
-      exec = ["${pkgs.swaybg}/bin/swaybg -i ${config.wallpaper} --mode fill"];
+      # exec = ["${pkgs.swaybg}/bin/swaybg -i ${config.wallpaper} --mode fill"];
 
       bind = let
         grimblast = lib.getExe pkgs.grimblast;
@@ -185,20 +186,20 @@ in {
         pactl = lib.getExe' pkgs.pulseaudio "pactl";
         notify-send = lib.getExe' pkgs.libnotify "notify-send";
         defaultApp = type: "${lib.getExe pkgs.handlr-regex} launch ${type}";
-        remote = lib.getExe (pkgs.writeShellScriptBin "remote" ''
-          socket="$(basename "$(find ~/.ssh -name 'master-gabriel@*' | head -1 | cut -d ':' -f1)")"
-          host="''${socket#master-}"
-          ssh "$host" "$@"
-        '');
+        # remote = lib.getExe (pkgs.writeShellScriptBin "remote" ''
+        #   socket="$(basename "$(find ~/.ssh -name 'master-gabriel@*' | head -1 | cut -d ':' -f1)")"
+        #   host="''${socket#master-}"
+        #   ssh "$host" "$@"
+        # '');
       in
         [
           # Program bindings
           "SUPER,Return,exec,${defaultApp "x-scheme-handler/terminal"}"
           "SUPER,e,exec,${defaultApp "text/plain"}"
           "SUPER,b,exec,${defaultApp "x-scheme-handler/https"}"
-          "SUPERALT,Return,exec,${remote} ${defaultApp "x-scheme-handler/terminal"}"
-          "SUPERALT,e,exec,${remote} ${defaultApp "text/plain"}"
-          "SUPERALT,b,exec,${remote} ${defaultApp "x-scheme-handler/https"}"
+          # "SUPERALT,Return,exec,${remote} ${defaultApp "x-scheme-handler/terminal"}"
+          # "SUPERALT,e,exec,${remote} ${defaultApp "text/plain"}"
+          # "SUPERALT,b,exec,${remote} ${defaultApp "x-scheme-handler/https"}"
           # Brightness control (only works if the system has lightd)
           ",XF86MonBrightnessUp,exec,light -A 10"
           ",XF86MonBrightnessDown,exec,light -U 10"
@@ -265,8 +266,8 @@ in {
               "SUPER,s,exec,specialisation $(specialisation | ${wofi} -S dmenu)"
               "SUPER,d,exec,${wofi} -S run"
 
-              "SUPERALT,x,exec,${remote} ${wofi} -S drun -x 10 -y 10 -W 25% -H 60%"
-              "SUPERALT,d,exec,${remote} ${wofi} -S run"
+              # "SUPERALT,x,exec,${remote} ${wofi} -S drun -x 10 -y 10 -W 25% -H 60%"
+              # "SUPERALT,d,exec,${remote} ${wofi} -S run"
             ]
             ++ (
               let
