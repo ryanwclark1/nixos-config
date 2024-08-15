@@ -5,8 +5,8 @@
 {
   imports = [
     ./global
-    # ./features/desktop/hyprland
-    # ./features/desktop/plasma
+    ./features/desktop/hyprland
+    ./features/desktop/plasma
     ./features/desktop/common
 
     ./features/alacritty
