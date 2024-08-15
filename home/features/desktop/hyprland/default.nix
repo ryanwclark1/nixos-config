@@ -1,13 +1,24 @@
 {
+  pkgs,
   ...
 }:
 
 {
   imports = [
-    ./hyprland.nix
+    ./basic-binds.nix
+    ./cliphist.nix
     ./hyprbars.nix
+    ./hyprland.nix
     ./mako.nix
     ./rofi.nix
+    ./swayidle.nix
+    ./swaylock.nix
     ./waybar.nix
+    ./wofi.nix
+  ];
+
+  home.packages = with pkgs; [
+    wf-recorder
+    wl-clipboard
   ];
 }
