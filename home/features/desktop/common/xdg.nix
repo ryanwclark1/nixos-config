@@ -18,7 +18,7 @@
       extraConfig = {
         XDG_SCREENSHOTS_DIR = "${config.xdg.userDirs.pictures}/screenshots";
         XDG_SCREENCAST_DIR = "${config.xdg.userDirs.videos}/screencast";
-        };
+      };
     };
     mimeApps = {
       enable = true;
