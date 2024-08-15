@@ -27,7 +27,7 @@
     libinput = {
       enable = true;
       touchpad = {
-        naturalScrolling = true;
+        naturalScrolling = false;
         scrollMethod = "twofinger";
       };
     };
