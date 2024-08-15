@@ -11,16 +11,17 @@
 }: {
   imports = [inputs.impermanence.nixosModules.impermanence];
 
-  environment.persistence = {
-    "/persist" = {
-      directories = [
-        "/var/lib/systemd"
-        "/var/lib/nixos"
-        "/var/log"
-        "/srv"
-      ];
-    };
-  };
+  # environment.persistence = {
+  #   "/persist" = {
+  #     directories = [
+  #       "/var/lib/systemd"
+  #       "/var/lib/nixos"
+  #       "/var/log"
+  #       "/srv"
+  #     ];
+  #   };
+  # };
+  environment.persistence = {};
   programs.fuse.userAllowOther = true;
 
   system.activationScripts.persistent-dirs.text = let

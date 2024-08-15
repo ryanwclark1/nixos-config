@@ -1,10 +1,12 @@
 {
+  lib,
   pkgs,
   ...
 }:
 
 {
-  security.rtkit.enable = true;
+  security.rtkit.enable = lib.mkDefault true;
+  # hardware.pulseaudio.enable = lib.mkDefault false;
   hardware.pulseaudio.enable = false;
   services.pipewire = {
     enable = true;

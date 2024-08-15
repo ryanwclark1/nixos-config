@@ -6,21 +6,13 @@
   pkgs,
   ...
 }:
-let
-  inherit (lib) mkIf;
-  # inherit (inputs.nix-colors) colorSchemes;
-  # inherit (inputs.nix-colors.lib-contrib { inherit pkgs; }) nixWallpaperFromScheme;
-  # packageNames = map (p: p.pname or p.name or null) config.home.packages;
-  # hasPackage = name: lib.any (x: x == name) packageNames;
-  # hasRipgrep = hasPackage "ripgrep";
-  # hasNeovim = config.programs.neovim.enable;
-  hasKitty = config.programs.kitty.enable;
-  # hasZoxide = config.programs.zoxide.enable;
-in
+# let
+#   inherit (lib) mkIf;
+#   hasKitty = config.programs.kitty.enable;
+# in
 {
   imports = [
     inputs.impermanence.nixosModules.home-manager.impermanence
-    # inputs.nix-colors.homeManagerModule
     ./global-fonts.nix
     ./style.nix
   ]
@@ -81,25 +73,26 @@ in
       hm = "home-manager --flake .";
       hms = "home-manager --flake . switch";
 
-      cik = mkIf hasKitty "clone-in-kitty --type os-window";
+      cik = lib.mkIf config.programs.kitty.enable "clone-in-kitty --type os-window";
       ck = cik;
     };
-  };
 
 
-  persistence = {
-    "/persist${config.home.homeDirectory}" = {
-      defaultDirectoryMethod = "symlink";
-      directories = [
-        "documents"
-        "downloads"
-        "pictures"
-        "videos"
-        ".local/bin"
-        ".local/share/nix" # trusted settings and repl history
-      ];
-      allowOther = true;
-    };
+    # persistence = {};
+    # persistence = {
+    #   "/persist${config.home.homeDirectory}" = {
+    #     defaultDirectoryMethod = "symlink";
+    #     directories = [
+    #       "documents"
+    #       "downloads"
+    #       "pictures"
+    #       "videos"
+    #       ".local/bin"
+    #       ".local/share/nix" # trusted settings and repl history
+    #     ];
+    #     allowOther = true;
+    #   };
+    # };
   };
 
   # home.file = {
