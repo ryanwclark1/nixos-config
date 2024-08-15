@@ -1,5 +1,7 @@
 {
+  config,
   lib,
+  pkgs,
   ...
 }:
 
@@ -7,12 +9,13 @@
   wayland = {
     windowManager = {
       hyprland = {
+        enable = lib.mkDefault true;
         settings = {
           general = {
             gaps_in = 4;
             gaps_out = 8;
             border_size = 3;
-            cursor_inactive_timeout = 4;
+            # cursor_inactive_timeout = 4;
             layout = "dwindle";
             resize_on_border = true;
           };
@@ -64,7 +67,7 @@
             "ignorezero,waybar"
           ];
           animations = {
-            enable = true;
+            # enable = true;
             bezier = [
               "wind, 0.05, 0.9, 0.1, 1.05"
               "winIn, 0.1, 1.1, 0.1, 1.1"
@@ -172,10 +175,41 @@
             (lib.mapAttrsToList (key: direction: "SUPERALT,${key},focusmonitor,${direction}") directions)
             ++
             # Move workspace to other monitor
-            (lib.mapAttrsToList (
-                key: direction: "SUPERALTSHIFT,${key},movecurrentworkspacetomonitor,${direction}"
-              )
-              directions);
+            (lib.mapAttrsToList (key: direction: "SUPERALTSHIFT,${key},movecurrentworkspacetomonitor,${direction}") directions)
+            ++
+            # Launcher
+            (
+              let
+                rofi = lib.getExe config.programs.rofi.package;
+              in
+                lib.optionals config.programs.rofi.enable [
+                  "SUPER,x,exec,${rofi} -S drun -x 10 -y 10 -W 25% -H 60%"
+                  "SUPER,s,exec,specialisation $(specialisation | ${rofi} -S dmenu)"
+                  "SUPER,d,exec,${rofi} -S run"
+
+                  # "SUPERALT,x,exec,${remote} ${rofi} -S drun -x 10 -y 10 -W 25% -H 60%"
+                  # "SUPERALT,d,exec,${remote} ${rofi} -S run"
+                ]
+                ++ (
+                  let
+                    pass-rofi = lib.getExe (pkgs.pass-rofi.override {pass = config.programs.password-store.package;});
+                  in
+                    lib.optionals config.programs.password-store.enable [
+                      ",XF86Calculator,exec,${pass-rofi}"
+                      "SHIFT,XF86Calculator,exec,${pass-rofi} fill"
+
+                      "SUPER,semicolon,exec,${pass-rofi}"
+                      "SHIFTSUPER,semicolon,exec,${pass-rofi} fill"
+                    ]
+                ) ++ (
+                  let
+                    cliphist = lib.getExe config.services.cliphist.package;
+                  in
+                  lib.optionals config.services.cliphist.enable [
+                    ''SUPER,c,exec,selected=$(${cliphist} list | ${rofi} -S dmenu) && echo "$selected" | ${cliphist} decode | wl-copy''
+                  ]
+                )
+            );
         };
       };
     };
