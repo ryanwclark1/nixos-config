@@ -5,7 +5,7 @@
 {
   imports = [
     ./hyprland.nix
-    ./hyprbars.nix
+    # ./hyprbars.nix
     ./mako.nix
     ./rofi.nix
     ./waybar.nix
