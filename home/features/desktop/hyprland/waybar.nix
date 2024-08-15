@@ -18,7 +18,7 @@ in
 				exclusive = true;
 				layer = "top";
 				position = "top";
-				height = 18;
+				height = 12;
 				passthrough = false;
 				gtk-layer-shell = true;
 
