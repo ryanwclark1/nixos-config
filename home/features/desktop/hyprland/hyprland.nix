@@ -1,228 +1,329 @@
 {
-  config,
   lib,
+  config,
   pkgs,
+  outputs,
   ...
-}:
+}: let
+  getHostname = x: lib.last (lib.splitString "@" x);
+  remoteColorschemes = lib.mapAttrs' (n: v: {
+    name = getHostname n;
+    value = v.config.colorscheme.rawColorscheme.colors.${config.colorscheme.mode};
+  }) outputs.homeConfigurations;
+  rgb = color: "rgb(${lib.removePrefix "#" color})";
+  rgba = color: alpha: "rgba(${lib.removePrefix "#" color}${alpha})";
+in {
+  imports = [
+    ../common
+    ../common/wayland-wm
 
-{
-  wayland = {
-    windowManager = {
-      hyprland = {
-        enable = lib.mkDefault true;
-        settings = {
-          general = {
-            gaps_in = 4;
-            gaps_out = 8;
-            border_size = 3;
-            # cursor_inactive_timeout = 4;
-            layout = "dwindle";
-            resize_on_border = true;
-          };
-          decoration = {
-            active_opacity = 0.97;
-            inactive_opacity = 0.77;
-            fullscreen_opacity = 1.0;
-            rounding = 10;
-            blur = {
-              enabled = true;
-              size = 5;
-              passes = 3;
-              new_optimizations = true;
-              ignore_opacity = true;
-            };
-          };
-          group = {
-            groupbar = {
-              font_size = 11;
-            };
-          };
-          input = {
-            kb_layout = "us";
-            kb_options = "caps:super";
-            follow_mouse = 1;
-            touchpad = {
-              natural_scroll = true;
-            };
-            sensitivity = 0; # -1.0 - 1.0, 0 means no modification.
-          };
-          gestures = {
-            workspace_swipe = true;
-            workspace_swipe_fingers = 3;
-          };
-          dwindle = {
-            pseudotile = true; # master switch for pseudotiling. Enabling is bound to mainMod + P in the keybinds section below
-            preserve_split = true;
-            split_width_multiplier = 1.35;
-          };
-          misc = {
-            vfr = true;
-            close_special_on_empty = true;
-            new_window_takes_over_fullscreen = 2;
-            mouse_move_enables_dpms = true;
-            key_press_enables_dpms = false;
-          };
-          layerrule = [
-            "blur,waybar"
-            "ignorezero,waybar"
-          ];
-          animations = {
-            # enable = true;
-            bezier = [
-              "wind, 0.05, 0.9, 0.1, 1.05"
-              "winIn, 0.1, 1.1, 0.1, 1.1"
-              "winOut, 0.3, -0.3, 0, 1"
-              "liner, 1, 1, 1, 1"
-            ];
-            animation = [
-              "windows, 1, 6, wind, slide"
-              "windowsIn, 1, 6, winIn, slide"
-              "windowsOut, 1, 5, winOut, slide"
-              "windowsMove, 1, 5, wind, slide"
-              "border, 1, 1, liner"
-              "borderangle, 1, 30, liner, loop"
-              "fade, 1, 10, default"
-              "workspaces, 1, 5, wind"
-            ];
+    ./basic-binds.nix
+    ./hyprbars.nix
+  ];
 
-          };
-          bind =
-            let
-              workspaces = [
-                "0"
-                "1"
-                "2"
-                "3"
-                "4"
-                "5"
-                "6"
-                "7"
-                "8"
-                "9"
-                "F1"
-                "F2"
-                "F3"
-                "F4"
-                "F5"
-                "F6"
-                "F7"
-                "F8"
-                "F9"
-                "F10"
-                "F11"
-                "F12"
-              ];
-              # Map keys (arrows and hjkl) to hyprland directions (l, r, u, d)
-              directions = rec {
-                left = "l";
-                right = "r";
-                up = "u";
-                down = "d";
-                h = left;
-                l = right;
-                k = up;
-                j = down;
-              };
-            in
-            [
-              "SUPERSHIFT,q,killactive"
-              "SUPERSHIFT,e,exit"
+  xdg.portal = let
+    hyprland = config.wayland.windowManager.hyprland.package;
+    xdph = pkgs.xdg-desktop-portal-hyprland.override {inherit hyprland;};
+  in {
+    extraPortals = [xdph];
+    configPackages = [hyprland];
+  };
 
-              "SUPER,s,togglesplit"
-              "SUPER,f,fullscreen,1"
-              "SUPERSHIFT,f,fullscreen,0"
-              "SUPERSHIFT,space,togglefloating"
+  home.packages = with pkgs; [
+    grimblast
+    hyprpicker
+  ];
 
-              "SUPER,minus,splitratio,-0.25"
-              "SUPERSHIFT,minus,splitratio,-0.3333333"
-
-              "SUPER,equal,splitratio,0.25"
-              "SUPERSHIFT,equal,splitratio,0.3333333"
-
-              "SUPER,g,togglegroup"
-              "SUPER,t,lockactivegroup,toggle"
-              "SUPER,tab,changegroupactive,f"
-              "SUPERSHIFT,tab,changegroupactive,b"
-
-              "SUPER,apostrophe,workspace,previous"
-              "SUPERSHIFT,apostrophe,workspace,next"
-              "SUPER,dead_grave,workspace,previous"
-              "SUPERSHIFT,dead_grave,workspace,next"
-
-              "SUPER,u,togglespecialworkspace"
-              "SUPERSHIFT,u,movetoworkspacesilent,special"
-              "SUPER,i,pseudo"
-            ]
-            ++
-            # Change workspace
-            (map (n: "SUPER,${n},workspace,name:${n}") workspaces)
-            ++
-            # Move window to workspace
-            (map (n: "SUPERSHIFT,${n},movetoworkspacesilent,name:${n}") workspaces)
-            ++
-            # Move focus
-            (lib.mapAttrsToList (key: direction: "SUPER,${key},movefocus,${direction}") directions)
-            ++
-            # Swap windows
-            (lib.mapAttrsToList (key: direction: "SUPERSHIFT,${key},swapwindow,${direction}") directions)
-            ++
-            # Move windows
-            (lib.mapAttrsToList (
-                key: direction: "SUPERCONTROL,${key},movewindoworgroup,${direction}"
-              )
-              directions)
-            ++
-            # Move monitor focus
-            (lib.mapAttrsToList (key: direction: "SUPERALT,${key},focusmonitor,${direction}") directions)
-            ++
-            # Move workspace to other monitor
-            (lib.mapAttrsToList (key: direction: "SUPERALTSHIFT,${key},movecurrentworkspacetomonitor,${direction}") directions)
-            ++
-            # Launcher
-            (
-              let
-                rofi = lib.getExe config.programs.rofi.package;
-              in
-                lib.optionals config.programs.rofi.enable [
-                  "SUPER,x,exec,${rofi} -S drun -x 10 -y 10 -W 25% -H 60%"
-                  "SUPER,s,exec,specialisation $(specialisation | ${rofi} -S dmenu)"
-                  "SUPER,d,exec,${rofi} -S run"
-
-                  # "SUPERALT,x,exec,${remote} ${rofi} -S drun -x 10 -y 10 -W 25% -H 60%"
-                  # "SUPERALT,d,exec,${remote} ${rofi} -S run"
-                ]
-                ++ (
-                  let
-                    pass-rofi = lib.getExe (pkgs.pass-rofi.override {pass = config.programs.password-store.package;});
-                  in
-                    lib.optionals config.programs.password-store.enable [
-                      ",XF86Calculator,exec,${pass-rofi}"
-                      "SHIFT,XF86Calculator,exec,${pass-rofi} fill"
-
-                      "SUPER,semicolon,exec,${pass-rofi}"
-                      "SHIFTSUPER,semicolon,exec,${pass-rofi} fill"
-                    ]
-                ) ++ (
-                  let
-                    cliphist = lib.getExe config.services.cliphist.package;
-                  in
-                  lib.optionals config.services.cliphist.enable [
-                    ''SUPER,c,exec,selected=$(${cliphist} list | ${rofi} -S dmenu) && echo "$selected" | ${cliphist} decode | wl-copy''
-                  ]
-                )
-            );
-
-        };
-        extraConfig =
-        # let
-          # rofi = config.programs.rofi;
-          # waybar = config.programs.waybar;
-        # in
-        ''
-          exec-once = waybar
-
-        '';
-      };
+  wayland.windowManager.hyprland = {
+    enable = true;
+    package = pkgs.hyprland.override {wrapRuntimeDeps = false;};
+    systemd = {
+      enable = true;
+      # Same as default, but stop graphical-session too
+      extraCommands = lib.mkBefore [
+        "systemctl --user stop graphical-session.target"
+        "systemctl --user start hyprland-session.target"
+      ];
     };
+
+    settings = {
+      general = {
+        gaps_in = 15;
+        gaps_out = 20;
+        border_size = 2;
+        "col.active_border" = rgba config.colorscheme.colors.primary "aa";
+        "col.inactive_border" = rgba config.colorscheme.colors.surface "aa";
+      };
+      cursor.inactive_timeout = 4;
+      group = {
+        "col.border_active" = rgba config.colorscheme.colors.primary "aa";
+        "col.border_inactive" = rgba config.colorscheme.colors.surface "aa";
+        groupbar.font_size = 11;
+      };
+      binds = {
+        movefocus_cycles_fullscreen = false;
+      };
+      input = {
+        kb_layout = "br";
+        touchpad.disable_while_typing = false;
+        resolve_binds_by_sym = true;
+      };
+      device = [
+        {
+          name = "keychron-keychron-v3";
+          kb_layout = "us_intl";
+        }
+        {
+          name = "keychron-keychron-v3-keyboard";
+          kb_layout = "us_intl";
+        }
+      ];
+      dwindle = {
+        split_width_multiplier = 1.35;
+        pseudotile = true;
+      };
+      misc = {
+        vfr = true;
+        close_special_on_empty = true;
+        focus_on_activate = true;
+        # Unfullscreen when opening something
+        new_window_takes_over_fullscreen = 2;
+      };
+      windowrulev2 = let
+        sweethome3d-tooltips = "title:^(win[0-9])$,class:^(com-eteks-sweethome3d-SweetHome3DBootstrap)$";
+        steam = "title:^()$,class:^(steam)$";
+        kdeconnect-pointer = "class:^(kdeconnect.daemon)$";
+      in [
+        "nofocus, ${sweethome3d-tooltips}"
+
+        "stayfocused, ${steam}"
+        "minsize 1 1, ${steam}"
+
+        "size 100% 110%, ${kdeconnect-pointer}"
+        "center, ${kdeconnect-pointer}"
+        "nofocus, ${kdeconnect-pointer}"
+        "noblur, ${kdeconnect-pointer}"
+        "noanim, ${kdeconnect-pointer}"
+        "noshadow, ${kdeconnect-pointer}"
+        "noborder, ${kdeconnect-pointer}"
+        "suppressevent fullscreen, ${kdeconnect-pointer}"
+      ] ++ (lib.mapAttrsToList (name: colors:
+        "bordercolor ${rgba colors.primary "aa"} ${rgba colors.primary_container "aa"}, title:^(\\[${name}\\])"
+      ) remoteColorschemes);
+      layerrule = [
+        "animation fade,hyprpicker"
+        "animation fade,selection"
+
+        "animation fade,waybar"
+        "blur,waybar"
+        "ignorezero,waybar"
+
+        "blur,notifications"
+        "ignorezero,notifications"
+
+        "blur,wofi"
+        "ignorezero,wofi"
+
+        "noanim,wallpaper"
+      ];
+
+      decoration = {
+        active_opacity = 1.0;
+        inactive_opacity = 0.85;
+        fullscreen_opacity = 1.0;
+        rounding = 7;
+        blur = {
+          enabled = true;
+          size = 4;
+          passes = 3;
+          new_optimizations = true;
+          ignore_opacity = true;
+          popups = true;
+        };
+        drop_shadow = true;
+        shadow_range = 12;
+        shadow_offset = "3 3";
+        "col.shadow" = "0x44000000";
+        "col.shadow_inactive" = "0x66000000";
+      };
+      animations = {
+        enabled = true;
+        bezier = [
+          "easein,0.1, 0, 0.5, 0"
+          "easeinback,0.35, 0, 0.95, -0.3"
+
+          "easeout,0.5, 1, 0.9, 1"
+          "easeoutback,0.35, 1.35, 0.65, 1"
+
+          "easeinout,0.45, 0, 0.55, 1"
+        ];
+
+        animation = [
+          "fadeIn,1,3,easeout"
+          "fadeLayersIn,1,3,easeoutback"
+          "layersIn,1,3,easeoutback,slide"
+          "windowsIn,1,3,easeoutback,slide"
+
+          "fadeLayersOut,1,3,easeinback"
+          "fadeOut,1,3,easein"
+          "layersOut,1,3,easeinback,slide"
+          "windowsOut,1,3,easeinback,slide"
+
+          "border,1,3,easeout"
+          "fadeDim,1,3,easeinout"
+          "fadeShadow,1,3,easeinout"
+          "fadeSwitch,1,3,easeinout"
+          "windowsMove,1,3,easeoutback"
+          "workspaces,1,2.6,easeoutback,slide"
+        ];
+      };
+
+      exec = ["${pkgs.swaybg}/bin/swaybg -i ${config.wallpaper} --mode fill"];
+
+      bind = let
+        grimblast = lib.getExe pkgs.grimblast;
+        tesseract = lib.getExe pkgs.tesseract;
+        pactl = lib.getExe' pkgs.pulseaudio "pactl";
+        notify-send = lib.getExe' pkgs.libnotify "notify-send";
+        defaultApp = type: "${lib.getExe pkgs.handlr-regex} launch ${type}";
+        remote = lib.getExe (pkgs.writeShellScriptBin "remote" ''
+          socket="$(basename "$(find ~/.ssh -name 'master-gabriel@*' | head -1 | cut -d ':' -f1)")"
+          host="''${socket#master-}"
+          ssh "$host" "$@"
+        '');
+      in
+        [
+          # Program bindings
+          "SUPER,Return,exec,${defaultApp "x-scheme-handler/terminal"}"
+          "SUPER,e,exec,${defaultApp "text/plain"}"
+          "SUPER,b,exec,${defaultApp "x-scheme-handler/https"}"
+          "SUPERALT,Return,exec,${remote} ${defaultApp "x-scheme-handler/terminal"}"
+          "SUPERALT,e,exec,${remote} ${defaultApp "text/plain"}"
+          "SUPERALT,b,exec,${remote} ${defaultApp "x-scheme-handler/https"}"
+          # Brightness control (only works if the system has lightd)
+          ",XF86MonBrightnessUp,exec,light -A 10"
+          ",XF86MonBrightnessDown,exec,light -U 10"
+          # Volume
+          ",XF86AudioRaiseVolume,exec,${pactl} set-sink-volume @DEFAULT_SINK@ +5%"
+          ",XF86AudioLowerVolume,exec,${pactl} set-sink-volume @DEFAULT_SINK@ -5%"
+          ",XF86AudioMute,exec,${pactl} set-sink-mute @DEFAULT_SINK@ toggle"
+          "SHIFT,XF86AudioRaiseVolume,exec,${pactl} set-source-volume @DEFAULT_SOURCE@ +5%"
+          "SHIFT,XF86AudioLowerVolume,exec,${pactl} set-source-volume @DEFAULT_SOURCE@ -5%"
+          "SHIFT,XF86AudioMute,exec,${pactl} set-source-mute @DEFAULT_SOURCE@ toggle"
+          ",XF86AudioMicMute,exec,${pactl} set-source-mute @DEFAULT_SOURCE@ toggle"
+          # Screenshotting
+          ",Print,exec,${grimblast} --notify --freeze copy area"
+          "SHIFT,Print,exec,${grimblast} --notify --freeze copy output"
+          # To OCR
+          "ALT,Print,exec,${grimblast} --freeze save area - | ${tesseract} - - | wl-copy && ${notify-send} -t 3000 'OCR result copied to buffer'"
+        ]
+        ++ (
+          let
+            playerctl = lib.getExe' config.services.playerctld.package "playerctl";
+            playerctld = lib.getExe' config.services.playerctld.package "playerctld";
+          in
+            lib.optionals config.services.playerctld.enable [
+              # Media control
+              ",XF86AudioNext,exec,${playerctl} next"
+              ",XF86AudioPrev,exec,${playerctl} previous"
+              ",XF86AudioPlay,exec,${playerctl} play-pause"
+              ",XF86AudioStop,exec,${playerctl} stop"
+              "SHIFT,XF86AudioNext,exec,${playerctld} shift"
+              "SHIFT,XF86AudioPrev,exec,${playerctld} unshift"
+              "SHIFT,XF86AudioPlay,exec,systemctl --user restart playerctld"
+            ]
+        )
+        ++
+        # Screen lock
+        (
+          let
+            swaylock = lib.getExe config.programs.swaylock.package;
+          in
+            lib.optionals config.programs.swaylock.enable [
+              "SUPER,backspace,exec,${swaylock} -S --grace 2"
+              "SUPER,XF86Calculator,exec,${swaylock} -S --grace 2"
+            ]
+        )
+        ++
+        # Notification manager
+        (
+          let
+            makoctl = lib.getExe' config.services.mako.package "makoctl";
+          in
+            lib.optionals config.services.mako.enable [
+              "SUPER,w,exec,${makoctl} dismiss"
+              "SUPERSHIFT,w,exec,${makoctl} restore"
+            ]
+        )
+        ++
+        # Launcher
+        (
+          let
+            wofi = lib.getExe config.programs.wofi.package;
+          in
+            lib.optionals config.programs.wofi.enable [
+              "SUPER,x,exec,${wofi} -S drun -x 10 -y 10 -W 25% -H 60%"
+              "SUPER,s,exec,specialisation $(specialisation | ${wofi} -S dmenu)"
+              "SUPER,d,exec,${wofi} -S run"
+
+              "SUPERALT,x,exec,${remote} ${wofi} -S drun -x 10 -y 10 -W 25% -H 60%"
+              "SUPERALT,d,exec,${remote} ${wofi} -S run"
+            ]
+            ++ (
+              let
+                pass-wofi = lib.getExe (pkgs.pass-wofi.override {pass = config.programs.password-store.package;});
+              in
+                lib.optionals config.programs.password-store.enable [
+                  ",XF86Calculator,exec,${pass-wofi}"
+                  "SHIFT,XF86Calculator,exec,${pass-wofi} fill"
+
+                  "SUPER,semicolon,exec,${pass-wofi}"
+                  "SHIFTSUPER,semicolon,exec,${pass-wofi} fill"
+                ]
+            ) ++ (
+              let
+                cliphist = lib.getExe config.services.cliphist.package;
+              in
+              lib.optionals config.services.cliphist.enable [
+                ''SUPER,c,exec,selected=$(${cliphist} list | ${wofi} -S dmenu) && echo "$selected" | ${cliphist} decode | wl-copy''
+              ]
+            )
+        );
+
+      monitor = let
+        waybarSpace = let
+          inherit (config.wayland.windowManager.hyprland.settings.general) gaps_in gaps_out;
+          inherit (config.programs.waybar.settings.primary) position height width;
+          gap = gaps_out - gaps_in;
+        in {
+          top = if (position == "top") then height + gap else 0;
+          bottom = if (position == "bottom") then height + gap else 0;
+          left = if (position == "left") then width + gap else 0;
+          right = if (position == "right") then width + gap else 0;
+        };
+      in
+        [
+          ",addreserved,${toString waybarSpace.top},${toString waybarSpace.bottom},${toString waybarSpace.left},${toString waybarSpace.right}"
+        ]
+        ++ (map (
+          m: "${m.name},${
+            if m.enabled
+            then "${toString m.width}x${toString m.height}@${toString m.refreshRate},${m.position},1"
+            else "disable"
+          }"
+        ) (config.monitors));
+
+      workspace = map (m: "name:${m.workspace},monitor:${m.name}") (
+        lib.filter (m: m.enabled && m.workspace != null) config.monitors
+      );
+    };
+    # This is order sensitive, so it has to come here.
+    extraConfig = ''
+      # Passthrough mode (e.g. for VNC)
+      bind=SUPER,P,submap,passthrough
+      submap=passthrough
+      bind=SUPER,P,submap,reset
+      submap=reset
+    '';
   };
 }
