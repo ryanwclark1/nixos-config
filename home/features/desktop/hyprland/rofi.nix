@@ -28,8 +28,7 @@
       };
       pass = {
         enable = true;
-        package = pkgs.pass-rofi-wayland;
-        fill = true;
+        package = pkgs.rofi-pass-wayland;
         stores = [
           "/home/administrator/.local/share/keyrings"
         ];
