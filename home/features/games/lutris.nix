@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   ...
 }:
@@ -10,9 +11,18 @@
         p.wineWowPackages.staging
         p.pixman
         p.libjpeg
-        # p.gnome.zenity
+        p.zenity
       ];
     })
   ];
 
+  home.persistence = {
+    "/persist/${config.home.homeDirectory}" = {
+      allowOther = true;
+      directories = [
+        ".config/lutris"
+        ".local/share/lutris"
+      ];
+    };
+  };
 }
