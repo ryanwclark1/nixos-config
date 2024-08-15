@@ -1,5 +1,6 @@
 {
   config,
+  inputs,
   pkgs,
   lib,
   outputs,
@@ -13,23 +14,24 @@
   rgb = color: "rgb(${lib.removePrefix "#" color})";
   rgba = color: alpha: "rgba(${lib.removePrefix "#" color}${alpha})";
 
-  hyprbars =
-    (pkgs.hyprbars.override {
-      # Make sure it's using the same hyprland package as we are
-      hyprland = config.wayland.windowManager.hyprland.package;
-    })
-    .overrideAttrs
-    (old: {
-      # Yeet the initialization notification (I hate it)
-      postPatch =
-        (old.postPatch or "")
-        + ''
-          ${lib.getExe pkgs.gnused} -i '/Initialized successfully/d' main.cpp
-        '';
-    });
+  # hyprbars =
+  #   (pkgs.hyprbars.override {
+  #     # Make sure it's using the same hyprland package as we are
+  #     hyprland = config.wayland.windowManager.hyprland.package;
+  #   })
+  #   .overrideAttrs
+  #   (old: {
+  #     # Yeet the initialization notification (I hate it)
+  #     postPatch =
+  #       (old.postPatch or "")
+  #       + ''
+  #         ${lib.getExe pkgs.gnused} -i '/Initialized successfully/d' main.cpp
+  #       '';
+  #   });
 in {
   wayland.windowManager.hyprland = {
-    plugins = [hyprbars];
+    # plugins = [ inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}.hyprbars ];
+    plugins = [ pkgs.hyprlandPlugins.hyprbars ];
     settings = {
       "plugin:hyprbars" = {
         bar_height = 25;
@@ -41,7 +43,6 @@ in {
         bar_precedence_over_border = true;
         hyprbars-button = let
           closeAction = "hyprctl dispatch killactive";
-
           isOnSpecial = ''hyprctl activewindow -j | jq -re 'select(.workspace.name == "special")' >/dev/null'';
           moveToSpecial = "hyprctl dispatch movetoworkspacesilent special";
           moveToActive = "hyprctl dispatch movetoworkspacesilent name:$(hyprctl -j activeworkspace | jq -re '.name')";

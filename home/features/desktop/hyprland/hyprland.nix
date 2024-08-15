@@ -13,21 +13,21 @@
   rgb = color: "rgb(${lib.removePrefix "#" color})";
   rgba = color: alpha: "rgba(${lib.removePrefix "#" color}${alpha})";
 in {
-  imports = [
-    ../common
-    ../common/wayland-wm
+  # imports = [
+  #   # ../common
+  #   # ../common/wayland-wm
 
-    ./basic-binds.nix
-    ./hyprbars.nix
-  ];
+  #   # ./basic-binds.nix
+  #   # ./hyprbars.nix
+  # ];
 
-  xdg.portal = let
-    hyprland = config.wayland.windowManager.hyprland.package;
-    xdph = pkgs.xdg-desktop-portal-hyprland.override {inherit hyprland;};
-  in {
-    extraPortals = [xdph];
-    configPackages = [hyprland];
-  };
+  # xdg.portal = let
+  #   hyprland = config.wayland.windowManager.hyprland.package;
+  #   xdph = pkgs.xdg-desktop-portal-hyprland.override {inherit hyprland;};
+  # in {
+  #   extraPortals = [xdph];
+  #   configPackages = [hyprland];
+  # };
 
   home.packages = with pkgs; [
     grimblast
@@ -36,7 +36,8 @@ in {
 
   wayland.windowManager.hyprland = {
     enable = true;
-    package = pkgs.hyprland.override {wrapRuntimeDeps = false;};
+    # package = pkgs.hyprland.override {wrapRuntimeDeps = false;};
+    # package = config.wayland.windowManager.hyprland.package;
     systemd = {
       enable = true;
       # Same as default, but stop graphical-session too
@@ -151,10 +152,8 @@ in {
         bezier = [
           "easein,0.1, 0, 0.5, 0"
           "easeinback,0.35, 0, 0.95, -0.3"
-
           "easeout,0.5, 1, 0.9, 1"
           "easeoutback,0.35, 1.35, 0.65, 1"
-
           "easeinout,0.45, 0, 0.55, 1"
         ];
 
@@ -290,34 +289,34 @@ in {
             )
         );
 
-      monitor = let
-        waybarSpace = let
-          inherit (config.wayland.windowManager.hyprland.settings.general) gaps_in gaps_out;
-          inherit (config.programs.waybar.settings.primary) position height width;
-          gap = gaps_out - gaps_in;
-        in {
-          top = if (position == "top") then height + gap else 0;
-          bottom = if (position == "bottom") then height + gap else 0;
-          left = if (position == "left") then width + gap else 0;
-          right = if (position == "right") then width + gap else 0;
-        };
-      in
-        [
-          ",addreserved,${toString waybarSpace.top},${toString waybarSpace.bottom},${toString waybarSpace.left},${toString waybarSpace.right}"
-        ]
-        ++ (map (
-          m: "${m.name},${
-            if m.enabled
-            then "${toString m.width}x${toString m.height}@${toString m.refreshRate},${m.position},1"
-            else "disable"
-          }"
-        ) (config.monitors));
 
-      workspace = map (m: "name:${m.workspace},monitor:${m.name}") (
-        lib.filter (m: m.enabled && m.workspace != null) config.monitors
-      );
     };
-    # This is order sensitive, so it has to come here.
+    # This is order sensi      # monitor = let
+      #   waybarSpace = let
+      #     inherit (config.wayland.windowManager.hyprland.settings.general) gaps_in gaps_out;
+      #     inherit (config.programs.waybar.settings.primary) position height width;
+      #     gap = gaps_out - gaps_in;
+      #   in {
+      #     top = if (position == "top") then height + gap else 0;
+      #     bottom = if (position == "bottom") then height + gap else 0;
+      #     left = if (position == "left") then width + gap else 0;
+      #     right = if (position == "right") then width + gap else 0;
+      #   };
+      # in
+      #   [
+      #     ",addreserved,${toString waybarSpace.top},${toString waybarSpace.bottom},${toString waybarSpace.left},${toString waybarSpace.right}"
+      #   ]
+      #   ++ (map (
+      #     m: "${m.name},${
+      #       if m.enabled
+      #       then "${toString m.width}x${toString m.height}@${toString m.refreshRate},${m.position},1"
+      #       else "disable"
+      #     }"
+      #   ) (config.monitors));
+
+      # workspace = map (m: "name:${m.workspace},monitor:${m.name}") (
+      #   lib.filter (m: m.enabled && m.workspace != null) config.monitors
+      # );tive, so it has to come here.
     extraConfig = ''
       # Passthrough mode (e.g. for VNC)
       bind=SUPER,P,submap,passthrough
