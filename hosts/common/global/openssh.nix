@@ -1,10 +1,16 @@
 {
   config,
   lib,
-  # outputs,
+  outputs,
+  pkgs,
   ...
 }:
-
+let
+  hosts = lib.attrNames outputs.nixosConfigurations;
+  user = "administrator";
+  homeDirectory = "/home/${user}";
+  hasOptinPersistence = config.environment.persistence ? "/persist";
+in
 {
   services = {
     openssh = {
@@ -16,36 +22,64 @@
       settings = {
         PasswordAuthentication = true;
         PermitRootLogin = lib.mkDefault "no";
-      # Allow forwarding ports to everywhere
-      # GatewayPorts = "clientspecified";
+        # Automatically remove stale sockets
+        StreamLocalBindUnlink = "yes";
+        # Allow forwarding ports to everywhere
+        GatewayPorts = "clientspecified";
+        # Let WAYLAND_DISPLAY be forwarded
+        AcceptEnv = "WAYLAND_DISPLAY";
+        X11Forwarding = true;
       };
 
-      hostKeys = [{
-        path = "${config.home.homeDirectory}/.ssh/ssh_host_ed25519_key";
-        type = "ed25519";
-      }];
+      hostKeys = [
+        {
+          path = "${lib.optionalString hasOptinPersistence "/persist"}${homeDirectory}/.ssh/ssh_host_ed25519_key";
+          type = "ed25519";
+        }
+      ];
     };
   };
 
+  programs.ssh = {
+    # Each hosts public key
+    knownHosts = lib.genAttrs hosts (hostname: {
+      publicKeyFile = ../../${hostname}/ssh_host_ed25519_key.pub;
+      extraHostNames =
+        [
+          "${hostname}.techcasa.io"
+        ]
+        ++
+        # Alias for localhost if it's the same host
+        (lib.optional (hostname == config.networking.hostName) "localhost")
+        ++ (lib.optionals (hostname == "woody") [
+          "techcasa.io"
+          "local.techcasa"
+        ]);
+    });
+  };
 
 
-#  programs.ssh = { # Each hosts public key
-#    knownHosts = builtins.mapAttrs
-#      (name: _: {
-#        # publicKeyFile = pubKey name;
-#        extraHostNames =
-#          (lib.optional (name == hostName) "localhost");
-#          #  ++ # Alias for localhost if it's the same host
-#          # (lib.optionals (name == gitHost) [ "techcasa.io" ]); # Alias for techcasa.io
-#      })
-#      hosts;
-#  };
-#
 # Passwordless sudo when SSH'ing with keys
   # security.pam.sshAgentAuth = {
   #   enable = true;
   #   authorizedKeysFiles = [ "/etc/ssh/authorized_keys.d/%u" ];
   # };
-
+# Passwordless sudo when SSH'ing with keys
+  security.pam.services.sudo = {config, ...}: {
+    rules.auth.rssh = {
+      order = config.rules.auth.ssh_agent_auth.order - 1;
+      control = "sufficient";
+      modulePath = "${pkgs.pam_rssh}/lib/libpam_rssh.so";
+      settings.authorized_keys_command =
+        pkgs.writeShellScript "get-authorized-keys"
+        ''
+          cat "/etc/ssh/authorized_keys.d/$1"
+        '';
+    };
+  };
+  # Keep SSH_AUTH_SOCK when sudo'ing
+  security.sudo.extraConfig = ''
+    Defaults env_keep+=SSH_AUTH_SOCK
+  '';
 
 }

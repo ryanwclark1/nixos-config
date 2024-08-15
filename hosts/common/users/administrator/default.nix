@@ -9,25 +9,28 @@ let
 in
 {
   imports = [ ./packages.nix ];
+  users.mutableUsers = false;
   users.users.${user} = {
     isNormalUser = true;
     home = "/home/${user}";
     shell = "${pkgs.zsh}/bin/zsh";
     extraGroups = [
-      "wheel"
-      "video"
       "audio"
+      "video"
+      "wheel"
     ] ++ ifTheyExist [
-      "network"
-      "wireshark"
-      "i2c"
-      "mysql"
-      "docker"
-      "podman"
-      "git"
-      "libvirtd"
       "deluge"
+      "docker"
+      "git"
+      "i2c"
+      "libvirtd"
+      "mysql"
+      "network"
+      "plugdev"
+      "podman"
+      "postgres"
       "syncthing"
+      "wireshark"
     ];
 
     openssh.authorizedKeys.keys = [ (builtins.readFile ../../../../home/ssh.pub) ];
@@ -45,4 +48,7 @@ in
   security.pam.services = {
     swaylock = {};
   };
+
+    # Persist entire home
+  environment.persistence = {};
 }
