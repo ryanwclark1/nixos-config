@@ -1,4 +1,5 @@
 {
+  lib,
   pkgs,
   ...
 }:
@@ -50,6 +51,6 @@
     amdgpu_top
   ];
 
-    # Disable impermanence
-  # home.persistence = lib.mkForce { };
+  # Disable impermanence
+  home.persistence = lib.mkForce { };
 }
