@@ -17,6 +17,11 @@ RSA_BITS = 4096
 
 keygen: rsa_key ed25519_key age_key get_age_public_key
 
+Generate AGE pair
+# nix-shell -p age --run 'age-keygen -o ~/.config/sops/age/key.txt'
+# Note: age-keygen -y ~/.config/sops/age/key.txt gives you the public output
+# nix-shell -p ssh-to-age --run 'cat ~/.ssh/ssh_host_ed25519_key.pub | ssh-to-age'
+
 rsa_key:
 	@if [ ! -f $(RSA_KEY_FILE) ] || (read -p "RSA SSH key already exists. Do you want to overwrite it? [y/N] " answer; [ "$$answer" == "y" ]); then \
 		echo "Generating RSA SSH key..."; \
@@ -54,6 +59,15 @@ get_age_public_key:
 	else \
 		echo "Age public key does not exist. Skipping..."; \
 	fi
+
+ssh_to_age:
+	@if [ ! -f $(ED25519_KEY_FILE) ] || (read -p "Ed25519 SSH key exists. Do you want to create a AGE key? [y/N] " answer; [ "$$answer" == "y" ]); then \
+		echo "Generating AGE from Ed25519 SSH key..."; \
+		cat $(ED25519_KEY_FILE) | ; \
+	else \
+		echo "Skipping SSH-TO_AGE key conversion..."; \
+	fi
+
 
 ###########################################################################
 #
