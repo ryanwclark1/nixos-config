@@ -16,13 +16,13 @@
     })
   ];
 
-  home.persistence = {
-    "/persist/${config.home.homeDirectory}" = {
-      allowOther = true;
-      directories = [
-        ".config/lutris"
-        ".local/share/lutris"
-      ];
-    };
-  };
+  # home.persistence = {
+  #   "/persist/${config.home.homeDirectory}" = {
+  #     allowOther = true;
+  #     directories = [
+  #       ".config/lutris"
+  #       ".local/share/lutris"
+  #     ];
+  #   };
+  # };
 }
