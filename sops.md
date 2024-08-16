@@ -1,7 +1,6 @@
 mkdir -p ~/.config/sops/age
-nix-shell -p age --run "age-keygen -o ~/.config/sops/age/key.txt"
-nix-shell -p age --run "age-keygen -y ~/.config/sops/age/key.txt"
-
+nix-shell -p age --run "age-keygen -o ~/.config/sops/age/keys.txt"
+nix-shell -p age --run "age-keygen -y ~/.config/sops/age/keys.txt"
 
 $EDITOR ~/nixos-config/.sops.yaml
 
