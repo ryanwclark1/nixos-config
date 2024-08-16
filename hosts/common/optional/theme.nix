@@ -9,14 +9,11 @@ in
 {
   stylix = {
     enable = false;
-    autoEnable = true;
+    autoEnable = false;
     image = ../wallpaper/FormulaOne_Vettel_2.jpg;
     imageScalingMode = "fill";
     base16Scheme = "${pkgs.base16-schemes}/share/themes/${currentScheme}.yaml";
     polarity = "dark";
-    targets = {
-      plymouth.enable = false;
-    };
     fonts = {
       serif = {
         package = pkgs.dejavu_fonts;
@@ -42,8 +39,8 @@ in
       };
     };
     homeManagerIntegration = {
-      followSystem = true;
-      autoImport = true;
+      followSystem = false;
+      autoImport = false;
     };
     opacity = {
       applications = 0.9;
@@ -53,6 +50,7 @@ in
     };
     targets = {
       grub.useImage = true;
+      plymouth.enable = false;
     };
   };
   fonts = {
