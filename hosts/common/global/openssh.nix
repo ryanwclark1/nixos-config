@@ -33,7 +33,8 @@ in
 
       hostKeys = [
         {
-          path = "${lib.optionalString hasOptinPersistence "/persist"}${homeDirectory}/.ssh/ssh_host_ed25519_key";
+          # path = "${lib.optionalString hasOptinPersistence "/persist"}${homeDirectory}/.ssh/ssh_host_ed25519_key";
+          path = "${homeDirectory}/.ssh/ssh_host_ed25519_key";
           type = "ed25519";
         }
       ];
