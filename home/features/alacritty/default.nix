@@ -9,7 +9,7 @@
     package = pkgs.alacritty;
     settings = {
       window = {
-        opacity = 0.8;
+        opacity = 0.85;
         dynamic_title = true;
         dynamic_padding = true;
         padding = {
