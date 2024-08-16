@@ -7,7 +7,6 @@
     nixos-hardware.url = "github:nixos/nixos-hardware";
     nix-colors.url = "github:misterio77/nix-colors";
     systems.url = "github:nix-systems/default-linux";
-    # nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
     impermanence.url = "github:nix-community/impermanence";
     disko = {
       url = "github:nix-community/disko";
@@ -27,8 +26,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
-    # https://github.com/hyprwm/Hyprland/issues/5891
-    # hyprland.url = "github:hyprwm/Hyprland";
     hyprland = {
       type = "git";
       url = "https://github.com/hyprwm/Hyprland";
@@ -60,7 +57,6 @@
     systems,
     disko,
     lanzaboote,
-    # nixos-wsl,
     nixos-cosmic,
     ...
   } @ inputs:

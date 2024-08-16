@@ -15,6 +15,7 @@
     inputs.impermanence.nixosModules.home-manager.impermanence
     ./global-fonts.nix
     ./style.nix
+    ./sops.nix
   ]
   ++ (builtins.attrValues outputs.homeManagerModules);
 
