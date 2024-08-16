@@ -21,7 +21,7 @@
   #     ];
   #   };
   # };
-  environment.persistence = {};
+  # environment.persistence = {};
   programs.fuse.userAllowOther = true;
 
   system.activationScripts.persistent-dirs.text = let
