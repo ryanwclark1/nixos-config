@@ -14,6 +14,9 @@ in
     imageScalingMode = "fill";
     base16Scheme = "${pkgs.base16-schemes}/share/themes/${currentScheme}.yaml";
     polarity = "dark";
+    targets = {
+      plymouth.enable = false;
+    };
     fonts = {
       serif = {
         package = pkgs.dejavu_fonts;
