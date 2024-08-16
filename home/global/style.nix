@@ -5,7 +5,8 @@
 # In home-manager
 {
   stylix = {
-    autoEnable = true;
+    enable = false;
+    autoEnable = false;
     targets.vscode.enable = false;
   };
 }
