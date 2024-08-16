@@ -155,17 +155,11 @@ secrets:
 #
 ############################################################################
 
-frametop:
-	sudo nixos-rebuild switch --flake .#frametop --show-trace --verbose
+switch:
+	sudo nixos-rebuild switch --flake .#$(i) --show-trace --verbose
 
 woody:
 	sudo nixos-rebuild switch --flake .#woody --show-trace --verbose
-
-frametop-remote:
-	nixos-rebuild switch --flake .#frametop --use-remote-sudo --show-trace --verbose
-
-woody-remote:
-	nixos-rebuild switch --flake .#woody --use-remote-sudo --show-trace --verbose
 
 frametop-dryrun:
 	sudo nixos-rebuild dry-run --flake .#frametop
@@ -195,44 +189,6 @@ gc:
 	sudo nix-collect-garbage --delete-older-than 7d; \
 	echo "Rebuilding NixOS for machine $$MACHINE_NAME..."; \
 	sudo nixos-rebuild boot --flake .#$$MACHINE_NAME
-
-
-
-############################################################################
-#
-#  Idols, Commands related to my remote distributed building cluster
-#
-############################################################################
-
-add-idols-ssh-key:
-	ssh-add ~/.ssh/ai-idols
-
-idols: add-idols-ssh-key
-	colmena apply --on '@dist-build'
-
-aqua:
-	colmena apply --on '@aqua'
-
-ruby:
-	colmena apply --on '@ruby'
-
-kana:
-	colmena apply --on '@kana'
-
-idols-debug: add-idols-ssh-key
-	colmena apply --on '@dist-build' --verbose --show-trace
-
-# only used once to setup the virtual machines
-idols-image:
-	# take image for idols, and upload the image to proxmox nodes.
-	nom build .#aquamarine
-	scp result root@gtr5:/var/lib/vz/dump/vzdump-qemu-aquamarine.vma.zst
-
-	nom build .#ruby
-	scp result root@s500plus:/var/lib/vz/dump/vzdump-qemu-ruby.vma.zst
-
-	nom build .#kana
-	scp result root@um560:/var/lib/vz/dump/vzdump-qemu-kana.vma.zst
 
 
 ############################################################################
