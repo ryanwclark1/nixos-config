@@ -8,7 +8,7 @@ let
 in
 {
   stylix = {
-    enable = true;
+    enable = false;
     autoEnable = true;
     image = ../wallpaper/FormulaOne_Vettel_2.jpg;
     imageScalingMode = "fill";
