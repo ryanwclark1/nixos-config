@@ -19,7 +19,7 @@
     extraArgs = ["-e${config.programs.password-store.package}/bin/pass"];
   };
 
-  home.persistence = {
-    "/persist/${config.home.homeDirectory}".directories = [".password-store"];
-  };
+  # home.persistence = {
+  #   "/persist/${config.home.homeDirectory}".directories = [".password-store"];
+  # };
 }
