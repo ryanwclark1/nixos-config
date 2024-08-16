@@ -20,7 +20,6 @@
     sops-nix = {
       url = "github:mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
-      # inputs.nixpkgs-stable.follows = "nixpkgs";
     };
     vscode-server.url = "github:nix-community/nixos-vscode-server";
     plasma-manager = {
@@ -113,7 +112,6 @@
       };
 
     };
-
     homeConfigurations = {
       "administrator@frametop" = lib.homeManagerConfiguration {
         modules = [
