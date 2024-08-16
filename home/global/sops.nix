@@ -11,7 +11,7 @@
   sops = {
     age.keyFile = "/home/administrator/.config/sops/age/keys.txt";
 
-    defaultSopsFile = "../../secrets.yaml";
+    defaultSopsFile = ../../secrets.yaml;
     validateSopsFiles = false;
 
     secrets = {
