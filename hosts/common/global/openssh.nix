@@ -9,7 +9,7 @@ let
   hosts = lib.attrNames outputs.nixosConfigurations;
   user = "administrator";
   homeDirectory = "/home/${user}";
-  hasOptinPersistence = config.environment.persistence ? "/persist";
+  # hasOptinPersistence = config.environment.persistence ? "/persist";
 in
 {
   services = {

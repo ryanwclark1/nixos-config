@@ -50,5 +50,5 @@ in
   };
 
     # Persist entire home
-  environment.persistence = {};
+  # environment.persistence = {};
 }
