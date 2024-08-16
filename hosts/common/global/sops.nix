@@ -17,7 +17,7 @@ in
   # sops-nix options: https://dl.thalheim.io/
   sops = {
 
-    defaultSopsFile = ../../../secrets.yml;
+    defaultSopsFile = ../../../secrets.yaml;
     validateSopsFiles = false;
 
     age = {
