@@ -2,6 +2,8 @@
 {
   config,
   inputs,
+  pkgs,
+  lib,
   ...
 }:
 
@@ -19,5 +21,17 @@ in
       "--refresh"
     ];
     flake = "git@github.com:ryanwclark1/nixos-config.git?ref=release-${hostName}";
+  };
+
+  # Only run if current config (self) is older than the new one.
+  systemd.services.nixos-upgrade = lib.mkIf config.system.autoUpgrade.enable {
+    serviceConfig.ExecCondition = lib.getExe (
+      pkgs.writeShellScriptBin "check-date" ''
+        lastModified() {
+          nix flake metadata "$1" --refresh --json | ${lib.getExe pkgs.jq} '.lastModified'
+        }
+        test "$(lastModified "${config.system.autoUpgrade.flake}")"  -gt "$(lastModified "self")"
+      ''
+    );
   };
 }
