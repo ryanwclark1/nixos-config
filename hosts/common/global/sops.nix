@@ -18,7 +18,7 @@ in
   sops = {
 
     defaultSopsFile = ../../../secrets.yml;
-    validateSopsFile = false;
+    validateSopsFiles = false;
 
     age = {
       # automatically import host SSH keys as age keys
