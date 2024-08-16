@@ -23,7 +23,9 @@
   ] ++ (builtins.attrValues outputs.nixosModules);
 
   home-manager.useGlobalPkgs = true;
-  home-manager.extraSpecialArgs = { inherit inputs outputs; };
+  home-manager.extraSpecialArgs = {
+    inherit inputs outputs;
+  };
 
   # allowUnfree isn't being inherited from the global flake
   nixpkgs = {
@@ -38,7 +40,6 @@
   };
 
   hardware.enableRedistributableFirmware = true;
-  networking.domain = "techcasa.io";
 
   # Increase open file limit for sudoers
   security.pam.loginLimits = [
