@@ -16,7 +16,7 @@
     ./nix.nix
     ./nix-ld.nix
     ./openssh.nix
-    ./optin-persistence.nix
+    # ./optin-persistence.nix
     ./prometheus-node-exporter.nix
     ./sops.nix
     # ./ssh-serve-store.nix
