@@ -68,9 +68,13 @@
   };
 
   hardware = {
-    graphics = {
-      enable = true;
-      enable32Bit = true;
+    enableAllFirmware = true;
+    # graphics = {
+    #   enable = true;
+    #   enable32Bit = true;
+    # };
+    cpu.amd = {
+      updateMicrocode = true;
     };
 
     logitech = {
