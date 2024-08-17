@@ -17,7 +17,7 @@ RSA_BITS = 4096
 
 keygen: rsa_key ed25519_key age_key get_age_public_key
 
-Generate AGE pair
+# Generate AGE pair
 # nix-shell -p age --run 'age-keygen -o ~/.config/sops/age/key.txt'
 # Note: age-keygen -y ~/.config/sops/age/key.txt gives you the public output
 # nix-shell -p ssh-to-age --run 'cat ~/.ssh/ssh_host_ed25519_key.pub | ssh-to-age'
