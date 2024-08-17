@@ -36,11 +36,15 @@
         "F12"
       ];
       # Map keys (arrows and hjkl) to hyprland directions (l, r, u, d)
-      directions = {
-        left = "left";
-        right = "right";
-        up = "up";
-        down = "down";
+      directions = rec {
+          left = "l";
+          right = "r";
+          up = "u";
+          down = "d";
+          h = left;
+          l = right;
+          k = up;
+          j = down;
       };
     in
       [
