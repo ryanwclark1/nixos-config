@@ -40,7 +40,6 @@
     ./features/tmux
     ./features/vhs
     ./features/vscode
-    # ./features/wezterm
     # ./features/yazi
     ./features/zed
     ./features/zellij
