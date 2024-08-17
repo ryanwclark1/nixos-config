@@ -2,9 +2,10 @@
   config,
   ...
 }:
-# let
-#   inherit (config.networking) hostName;
-# in
+let
+  inherit (config.networking) hostName;
+  domain = "techcasa.io";
+in
 {
   networking = {
     networkmanager = {
@@ -16,13 +17,13 @@
         "1.1.1.1"
         "1.0.0.1"
       ];
-      logLevel = "DEBUG";
+      logLevel = "INFO";
     };
     firewall = {
       enable = true;
+      allowPing = true;
     };
-    domain = "techcasa.io";
-    fqdn = "${config.networking.hostName}.${config.networking.domain}";
+    fqdn = "${hostName}.${domain}";
     search = [
       "${config.networking.domain}"
     ];
