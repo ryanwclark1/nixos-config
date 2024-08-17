@@ -48,50 +48,198 @@ in {
     # };
 
     settings = {
+
       general = {
+        border_size = 1;
         gaps_in = 3;
         gaps_out = 5;
-        border_size = 2;
-        # "col.active_border" = rgba config.colorscheme.colors.primary "aa";
-        # "col.inactive_border" = rgba config.colorscheme.colors.surface "aa";
+        gaps_workspaces = 0;
+        col.active_border = "0xffffffff";
+        col.inactive_border = "0xff444444";
+        col.nogroup_border = "0xffffaaff";
+        col.nogroup_border_active = "0xffff00ff";
+        layout = "dwindle";
+        no_focus_fallback = false;
+        apply_sens_to_raw = false;
+        resize_on_border = true;
+        extend_border_grab_area = 15;
+        hover_icon_on_border = true;
+        allow_tearing = false;
+        resize_corner = 0;
       };
-      cursor.inactive_timeout = 4;
-      group = {
-        # "col.border_active" = rgba config.colorscheme.colors.primary "aa";
-        # "col.border_inactive" = rgba config.colorscheme.colors.surface "aa";
-        groupbar.font_size = 11;
+
+      decoration = {
+        rounding = 0;
+        active_opacity = .97;
+        inactive_opacity = 0.77;
+        fullscreen_opacity = 1.0;
+        drop_shadow = true;
+        shadow_range = 12;
+        shadow_render_power = 3;
+        shadow_ignore_window = true;
+        col.shadow = "0xee1a1a1a";
+        col.shadow_inactive = "unset";
+        shadow_offset = "3 3";
+        shadow_scale = 1.0;
+        dim_inactive = false;
+        dim_strength = 0.5;
+        dim_special = 0.2;
+        dim_around = 0.4;
+        blur = {
+          enabled = true;
+          size = 8;
+          passes = 1;
+          ignore_opacity = true;
+          new_optimizations = true;
+          xray = false;
+          noise = 0.0117;
+          contrast = 0.8916;
+          brightness = 0.8172;
+          vibrancy = 0.1696;
+          special = false;
+          popups = true;
+          popups_ignorealpha = 0.2;
+        };
       };
-      binds = {
-        movefocus_cycles_fullscreen = false;
-      };
+
       input = {
         kb_layout = "us";
-        kb_options = "caps:super";
-        follow_mouse = 1;
-        touchpad = {
-          natural_scroll = true;
-          disable_while_typing = false;
-        };
+        # kb_options = "caps:super";
+        numlock_by_default = false;
+        resolve_binds_by_sym = false;
+        repeat_rate = 25;
+        repeat_delay = 600;
         sensitivity = 0; # -1.0 - 1.0, 0 means no modification.
-        resolve_binds_by_sym = true;
+        force_no_accel = false;
+        left_handed = false;
+        scroll_button = 0;
+        scroll_button_lock = false;
+        small_factor = 1.0;
+        natural_scroll = false;
+        follow_mouse = 1;
+        mouse_refocus = true;
+        float_switch_override_focus = 1;
+        special_fallthrough = false;
+        off_window_axis_events = 1;
+        emulate_discrete_scroll = 1;
+        touchpad = {
+          disable_while_typing = true;
+          natural_scroll = false;
+          scroll_factor = 1.0;
+          clickfinger_behavior = false;
+          tap-to-click = true;
+          drag_lock = false;
+          tap-and-drag = false;
+        };
+
       };
+
       gestures = {
         workspace_swipe = true;
         workspace_swipe_fingers = 3;
       };
-      dwindle = {
-        split_width_multiplier = 1.25;
-        pseudotile = true;
+
+      group = {
+        insert_after_current = true;
+        focus_removed_window = true;
+        col.border_active = "0x66ffff00";
+        col.border_inactive = "0x66777700";
+        col.border_locked_active = "0x66ff5500";
+        col.border_locked_inactive = "0x66775500";
+        groupbar = {
+          enabled = true;
+          font_size = 11;
+          gradient = true;
+          height = 14;
+          stacked = false;
+          priority = 3;
+          render_titles = true;
+          scrolling = true;
+          text_color = "0xffffffff";
+          col.active = "0x66ffff00";
+          col.inactive = "0x66777700";
+          col.locked_active = "0x66ff5500";
+          col.locked_inactive = "0x66775500";
+        };
       };
+
       misc = {
+        disable_hyprland_logo = true;
+        disable_splash_rendering = false;
+        col.splash = "0xffffffff";
+        font_family = "Sans";
         vfr = true;
-        close_special_on_empty = true;
+        vrr = 0;
+        mouse_move_enables_dpms = false;
+        key_press_enables_dpms = false;
+        always_follow_on_dnd = true;
+        layers_hog_keyboard_focus = true;
+        animate_manual_resize = true;
+        animate_mouse_windowdragging = true;
+        disable_autoreload = false;
+        enable_swallow = false;
         focus_on_activate = true;
+        mouse_move_focuses_monitor = true;
+        render_ahead_of_time = false;
+        render_ahead_safezone = 1;
+        allow_session_lock_restore = false;
+        background_color = "0x111111";
+        close_special_on_empty = true;
         # Unfullscreen when opening something
         new_window_takes_over_fullscreen = 2;
-        mouse_move_enables_dpms = true;
-        key_press_enables_dpms = false;
+        exit_window_retains_fullscreen = false;
+        initial_workspace_tracking = 1;
+        middle_click_paste = true;
       };
+
+      binds = {
+        pass_mouse_when_bound = false;
+        scroll_event_delay = 300;
+        workspace_back_and_forth = false;
+        allow_workspace_cycles = false;
+        workspace_center_on = 0;
+        focus_preferred_method = 0;
+        ignore_group_lock = false;
+        movefocus_cycles_fullscreen = false;
+        disable_keybind_grabbing = false;
+        window_direction_monitor_fallback = true;
+      };
+
+      cursor = {
+        sync_gsettings_theme = true;
+        no_hardware_cursors = false;
+        no_break_fs_vrr = false;
+        min_refresh_Rate = 24;
+        hostspot_padding = 1;
+        inactive_timeout = 0;
+        no_wraps = false;
+        persistent_warps = false;
+        warp_on_change_workspace = false;
+        zoom_factor = 1.0;
+        zoom_rigid = false;
+        enable_hyprcursor = true;
+        hide_on_key_press = false;
+        hide_on_touch = true;
+        allow_dumb_copy = false;
+      };
+
+
+      dwindle = {
+        pseudotile = true;
+        force_split = 0;
+        preserver_split = false;
+        smart_split = false;
+        smart_resizing = true;
+        permanent_direction_override = false;
+        special_scale_factor = 1;
+        split_width_multiplier = 1.0;
+        no_gaps_when_only = 0;
+        use_active_for_splits = true;
+        default_split_ratio = 1.0;
+      };
+
+      "$mod" = "SUPER";
+
       windowrulev2 = let
         sweethome3d-tooltips = "title:^(win[0-9])$,class:^(com-eteks-sweethome3d-SweetHome3DBootstrap)$";
         steam = "title:^()$,class:^(steam)$";
@@ -131,25 +279,7 @@ in {
         "noanim,wallpaper"
       ];
 
-      decoration = {
-        active_opacity = .97;
-        inactive_opacity = 0.77;
-        fullscreen_opacity = 1.0;
-        rounding = 7;
-        blur = {
-          enabled = true;
-          size = 5;
-          passes = 3;
-          new_optimizations = true;
-          ignore_opacity = true;
-          popups = true;
-        };
-        drop_shadow = true;
-        shadow_range = 12;
-        shadow_offset = "3 3";
-        # "col.shadow" = "0x44000000";
-        # "col.shadow_inactive" = "0x66000000";
-      };
+
       animations = {
         enabled = true;
         bezier = [
