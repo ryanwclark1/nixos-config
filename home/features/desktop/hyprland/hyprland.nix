@@ -66,8 +66,18 @@ in {
       };
       input = {
         kb_layout = "us";
-        touchpad.disable_while_typing = false;
+        kb_options = "caps:super";
+        follow_mouse = 1;
+        touchpad = {
+          natural_scroll = true;
+          disable_while_typing = false;
+        };
+        sensitivity = 0; # -1.0 - 1.0, 0 means no modification.
         resolve_binds_by_sym = true;
+      };
+      gestures = {
+        workspace_swipe = true;
+        workspace_swipe_fingers = 3;
       };
       dwindle = {
         split_width_multiplier = 1.25;
@@ -79,6 +89,8 @@ in {
         focus_on_activate = true;
         # Unfullscreen when opening something
         new_window_takes_over_fullscreen = 2;
+        mouse_move_enables_dpms = true;
+        key_press_enables_dpms = false;
       };
       windowrulev2 = let
         sweethome3d-tooltips = "title:^(win[0-9])$,class:^(com-eteks-sweethome3d-SweetHome3DBootstrap)$";
@@ -120,13 +132,13 @@ in {
       ];
 
       decoration = {
-        active_opacity = 1.0;
-        inactive_opacity = 0.85;
+        active_opacity = .97;
+        inactive_opacity = 0.77;
         fullscreen_opacity = 1.0;
         rounding = 7;
         blur = {
           enabled = true;
-          size = 4;
+          size = 5;
           passes = 3;
           new_optimizations = true;
           ignore_opacity = true;
@@ -315,7 +327,7 @@ in {
       submap=passthrough
       bind=SUPER,P,submap,reset
       submap=reset
-      exec-once ${pkgs.waybar}/bin/waybar
+      exec-once=${pkgs.waybar}/bin/waybar
     '';
   };
 }
