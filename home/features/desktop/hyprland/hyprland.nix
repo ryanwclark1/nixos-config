@@ -65,12 +65,12 @@ in {
         movefocus_cycles_fullscreen = false;
       };
       input = {
-        kb_layout = "br";
+        kb_layout = "us";
         touchpad.disable_while_typing = false;
         resolve_binds_by_sym = true;
       };
       dwindle = {
-        split_width_multiplier = 1.35;
+        split_width_multiplier = 1.25;
         pseudotile = true;
       };
       misc = {
@@ -184,7 +184,8 @@ in {
       in
         [
           # Program bindings
-          "SUPER,Return,exec,${defaultApp "x-scheme-handler/terminal"}"
+          "SUPER,Return,exec,${pkgs.alacritty}/bin/alacritty"
+          #"SUPER,Return,exec,${defaultApp "x-scheme-handler/terminal"}"''''
           "SUPER,e,exec,${defaultApp "text/plain"}"
           "SUPER,b,exec,${defaultApp "x-scheme-handler/https"}"
           # "SUPERALT,Return,exec,${remote} ${defaultApp "x-scheme-handler/terminal"}"
