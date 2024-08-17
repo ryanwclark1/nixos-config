@@ -21,7 +21,6 @@
     ./features/games
     ./features/git
     # ./features/helix
-    ./features/insomnia
     ./features/kitty
     ./features/kubernetes
     ./features/lazygit
