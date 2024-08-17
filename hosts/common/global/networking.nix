@@ -25,7 +25,7 @@ in
     };
     fqdn = "${hostName}.${domain}";
     search = [
-      "${config.networking.domain}"
+      "${domain}"
     ];
   };
 }
