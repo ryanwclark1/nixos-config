@@ -21,7 +21,6 @@
     ./features/games
     ./features/git
     # ./features/gpu
-    ./features/insomnia
     ./features/kitty
     ./features/kubernetes
     ./features/lazygit

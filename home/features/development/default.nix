@@ -6,13 +6,13 @@
 {
 
   imports = [
+    ./insomnia
     ./build.nix
     # ./devpod.nix
     ./gitui.nix
     ./go.nix
     ./grpc.nix
     ./js.nix
-    ./lazygit.nix
     ./lua.nix
     # ./poetry.nix
     ./postman.nix
