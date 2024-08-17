@@ -314,6 +314,7 @@ in {
       submap=passthrough
       bind=SUPER,P,submap,reset
       submap=reset
+      exec-once ${pkgs.waybar}/bin/waybar
     '';
   };
 }
