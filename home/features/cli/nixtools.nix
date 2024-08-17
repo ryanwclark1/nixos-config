@@ -20,7 +20,6 @@ in
     alejandra
     comma
     deadnix
-    manix
     nh # Nice wrapper for NixOS and HM
     nil # Nix LSP
     niv
@@ -30,7 +29,7 @@ in
     nix-prefetch
     nix-prefetch-git
     nix-template
-    nix-tree
+    nix-tree # Interactively browse dependency graphs of Nix derivations
     nix-update
     nixpkgs-lint
     nurl # Generate Nix fetcher calls from repository URLs
@@ -39,7 +38,7 @@ in
     statix
   ];
 
-programs.nix-index = {
+  programs.nix-index = {
     enable = true;
     package = pkgs.nix-index;
   };
