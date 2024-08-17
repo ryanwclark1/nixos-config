@@ -10,8 +10,7 @@
   services.pipewire = {
     enable = true;
     package = pkgs.pipewire;
-    # Enabling system-wide PipeWire is however not recommended and disabled by default according to https://github.com/PipeWire/pipewire/blob/master/NEWS
-    # systemWide = false;
+    # Enabling system-wide PipeWire is not recommended and disabled by default according to https://github.com/PipeWire/pipewire/blob/master/NEWS
     socketActivation = true;
     # Opens UDP/6001-6002, required by RAOP/Airplay for timing and control data.
     raopOpenFirewall = false;
