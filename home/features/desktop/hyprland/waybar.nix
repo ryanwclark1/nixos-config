@@ -13,7 +13,6 @@ in
 		waybar = {
 			enable = true;
 			package = pkgs.waybar;
-			# systemd.enable = true;
 			settings = [{
 				exclusive = true;
 				layer = "top";
@@ -39,7 +38,7 @@ in
 					format = "{: %I:%M %p}";
 					interval = 1;
 					# format = "{:%d/%m %H:%M:%S}";
-					format-alt = "{:%Y-%m-%d %H:%M:%S %z}";
+					format-alt = "{:%Y-%m-%d %H:%M:%S}";
 					on-click-left = "mode";
 					tooltip-format = ''
 						<big>{:%Y %B}</big>
@@ -148,7 +147,7 @@ in
 			}];
 			style = ''
 					* {
-						font-size: 16px;
+						font-size: 12px;
 						font-family: JetBrainsMono Nerd Font, Font Awesome, sans-serif;
 								font-weight: bold;
 					}
