@@ -48,7 +48,11 @@ in {
     # };
 
     settings = {
-      # env = [];
+      env = [
+        "XDG_CURRENT_DESKTOP,Hyprland"
+        "XDG_SESSION_TYPE,wayland"
+        "XDG_SESSION_DESKTOP,Hyprland"
+      ];
       monitor = [
         ",highres,auto,1"
       ];
@@ -260,8 +264,6 @@ in {
         default_split_ratio = 1.0;
       };
 
-      "$mod" = "SUPER";
-
       windowrulev2 = let
         sweethome3d-tooltips = "title:^(win[0-9])$,class:^(com-eteks-sweethome3d-SweetHome3DBootstrap)$";
         steam = "title:^()$,class:^(steam)$";
@@ -284,7 +286,11 @@ in {
       # ++ (lib.mapAttrsToList (name: colors:
       #   "bordercolor ${rgba colors.primary "aa"} ${rgba colors.primary_container "aa"}, title:^(\\[${name}\\])"
       # ) remoteColorschemes);
-      layerrule = [
+      layerrule = let
+        wofi = pkgs.wofi;
+        waybar = pkgs.waybar;
+      in
+      [
         "animation fade,hyprpicker"
         "animation fade,selection"
 
@@ -295,8 +301,8 @@ in {
         "blur,notifications"
         "ignorezero,notifications"
 
-        "blur,wofi"
-        "ignorezero,wofi"
+        "blur,${wofi}"
+        "ignorezero,${wofi}"
 
         "noanim,wallpaper"
       ];
@@ -340,25 +346,24 @@ in {
         pactl = lib.getExe' pkgs.pulseaudio "pactl";
         notify-send = lib.getExe' pkgs.libnotify "notify-send";
         terminal = lib.getExe pkgs.alacritty;
-        # files = lib.getExe pkgs.xfce.thunar;
         files = "${pkgs.kdePackages.dolphin}/bin/dolphin";
         defaultApp = type: "${lib.getExe pkgs.handlr-regex} launch ${type}";
-        # remote = lib.getExe (pkgs.writeShellScriptBin "remote" ''
-        #   socket="$(basename "$(find ~/.ssh -name 'master-gabriel@*' | head -1 | cut -d ':' -f1)")"
-        #   host="''${socket#master-}"
-        #   ssh "$host" "$@"
-        # '');
+        remote = lib.getExe (pkgs.writeShellScriptBin "remote" ''
+          socket="$(basename "$(find ~/.ssh -name 'administrator@*' | head -1 | cut -d ':' -f1)")"
+          host="''${socket#master-}"
+          ssh "$host" "$@"
+        '');
       in
         [
           # Program bindings
           "SUPER,Return,exec,${terminal}"
-          #"SUPER,Return,exec,${defaultApp "x-scheme-handler/terminal"}"''''
+          "SUPER,Return,exec,${defaultApp "x-scheme-handler/terminal"}"''''
           "SUPER,e,exec,${defaultApp "text/plain"}"
           "SUPER,b,exec,${defaultApp "x-scheme-handler/https"}"
           "SUPER,space,exec,${files}"
-          # "SUPERALT,Return,exec,${remote} ${defaultApp "x-scheme-handler/terminal"}"
-          # "SUPERALT,e,exec,${remote} ${defaultApp "text/plain"}"
-          # "SUPERALT,b,exec,${remote} ${defaultApp "x-scheme-handler/https"}"
+          "SUPERALT,Return,exec,${remote} ${defaultApp "x-scheme-handler/terminal"}"
+          "SUPERALT,e,exec,${remote} ${defaultApp "text/plain"}"
+          "SUPERALT,b,exec,${remote} ${defaultApp "x-scheme-handler/https"}"
           # Brightness control (only works if the system has lightd)
           ",XF86MonBrightnessUp,exec,light -A 10"
           ",XF86MonBrightnessDown,exec,light -U 10"
