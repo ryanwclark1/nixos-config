@@ -6,6 +6,7 @@
 {
   imports = [
     ./deluge.nix
+    ./dolphin.nix
     ./discord.nix
     ./firefox.nix
     ./kdeconnect.nix

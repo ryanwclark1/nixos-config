@@ -29,7 +29,6 @@
       enable = true;
       enableSSHSupport = true;
     };
-    thunar.enable = true;
     dconf.enable = lib.mkDefault true;
   };
 
