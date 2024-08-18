@@ -4,7 +4,7 @@ keys:
   - &users:
     - &administrator age1fkurz06svzey276q7r68amvc0f7h0lfrvmpjvm8n0tzy6tpazgqsfmhd65
   - &hosts:
-    - &frametop age1rayemyd3q897l4r0wxfps02vjx43p6klvnns49emxrheskeyngaqyzm8at
+    - &frametop age1jny3l6sy32vss49rj32qvszpctmjtgl9hdksqvh826ekx6c2e5aqns6dcm
     - &woody age1sfg83rldxqkcyygl42nuk3r5v6yj2492s6dtxy22ej3x7t8t65dq0pal93
 creation_rules:
   - path_regex: secrets.yaml$
