@@ -48,16 +48,25 @@ in {
     # };
 
     settings = {
+      # env = [];
+      # monintor = [];
+      "exec-once" =
+      let
+        waybar = lib.getExe pkgs.waybar;
+      in
+        [
+          waybar
+        ];
 
       general = {
         border_size = 1;
         gaps_in = 3;
         gaps_out = 5;
         gaps_workspaces = 0;
-        col.active_border = "0xffffffff";
-        col.inactive_border = "0xff444444";
-        col.nogroup_border = "0xffffaaff";
-        col.nogroup_border_active = "0xffff00ff";
+        "col.active_border" = "0xffffffff";
+        "col.inactive_border" = "0xff444444";
+        "col.nogroup_border" = "0xffffaaff";
+        "col.nogroup_border_active" = "0xffff00ff";
         layout = "dwindle";
         no_focus_fallback = false;
         apply_sens_to_raw = false;
@@ -77,8 +86,8 @@ in {
         shadow_range = 12;
         shadow_render_power = 3;
         shadow_ignore_window = true;
-        col.shadow = "0xee1a1a1a";
-        col.shadow_inactive = "unset";
+        "col.shadow" = "0xee1a1a1a";
+        # "col.shadow_inactive" = "unset";
         shadow_offset = "3 3";
         shadow_scale = 1.0;
         dim_inactive = false;
@@ -114,14 +123,14 @@ in {
         left_handed = false;
         scroll_button = 0;
         scroll_button_lock = false;
-        small_factor = 1.0;
+        scroll_factor = 1.0;
         natural_scroll = false;
         follow_mouse = 1;
         mouse_refocus = true;
         float_switch_override_focus = 1;
         special_fallthrough = false;
         off_window_axis_events = 1;
-        emulate_discrete_scroll = 1;
+        # emulate_discrete_scroll = 1;
         touchpad = {
           disable_while_typing = true;
           natural_scroll = false;
@@ -142,31 +151,31 @@ in {
       group = {
         insert_after_current = true;
         focus_removed_window = true;
-        col.border_active = "0x66ffff00";
-        col.border_inactive = "0x66777700";
-        col.border_locked_active = "0x66ff5500";
-        col.border_locked_inactive = "0x66775500";
+        "col.border_active" = "0x66ffff00";
+        "col.border_inactive" = "0x66777700";
+        "col.border_locked_active" = "0x66ff5500";
+        "col.border_locked_inactive" = "0x66775500";
         groupbar = {
           enabled = true;
           font_size = 11;
-          gradient = true;
+          gradients = true;
           height = 14;
           stacked = false;
           priority = 3;
           render_titles = true;
           scrolling = true;
           text_color = "0xffffffff";
-          col.active = "0x66ffff00";
-          col.inactive = "0x66777700";
-          col.locked_active = "0x66ff5500";
-          col.locked_inactive = "0x66775500";
+          "col.active" = "0x66ffff00";
+          "col.inactive" = "0x66777700";
+          "col.locked_active" = "0x66ff5500";
+          "col.locked_inactive" = "0x66775500";
         };
       };
 
       misc = {
         disable_hyprland_logo = true;
         disable_splash_rendering = false;
-        col.splash = "0xffffffff";
+        "col.splash" = "0xffffffff";
         font_family = "Sans";
         vfr = true;
         vrr = 0;
@@ -174,7 +183,7 @@ in {
         key_press_enables_dpms = false;
         always_follow_on_dnd = true;
         layers_hog_keyboard_focus = true;
-        animate_manual_resize = true;
+        animate_manual_resizes = true;
         animate_mouse_windowdragging = true;
         disable_autoreload = false;
         enable_swallow = false;
@@ -187,7 +196,7 @@ in {
         close_special_on_empty = true;
         # Unfullscreen when opening something
         new_window_takes_over_fullscreen = 2;
-        exit_window_retains_fullscreen = false;
+        # exit_window_retains_fullscreen = false;
         initial_workspace_tracking = 1;
         middle_click_paste = true;
       };
@@ -206,13 +215,13 @@ in {
       };
 
       cursor = {
-        sync_gsettings_theme = true;
+        # sync_gsettings_theme = true;
         no_hardware_cursors = false;
         no_break_fs_vrr = false;
-        min_refresh_Rate = 24;
-        hostspot_padding = 1;
+        min_refresh_rate = 24;
+        hotspot_padding = 1;
         inactive_timeout = 0;
-        no_wraps = false;
+        no_warps = false;
         persistent_warps = false;
         warp_on_change_workspace = false;
         zoom_factor = 1.0;
@@ -220,14 +229,14 @@ in {
         enable_hyprcursor = true;
         hide_on_key_press = false;
         hide_on_touch = true;
-        allow_dumb_copy = false;
+        # allow_dumb_copy = false;
       };
 
 
       dwindle = {
         pseudotile = true;
         force_split = 0;
-        preserver_split = false;
+        preserve_split = false;
         smart_split = false;
         smart_resizing = true;
         permanent_direction_override = false;
@@ -457,7 +466,6 @@ in {
       submap=passthrough
       bind=SUPER,P,submap,reset
       submap=reset
-      exec-once=${pkgs.waybar}/bin/waybar
     '';
   };
 }
