@@ -21,8 +21,6 @@
     wl-clipboard
     mediainfo
     bluez-tools # bt-adapter
-    element-desktop
-    megasync
     czkawka # Duplicate file finder
     gpu-viewer
   ];
