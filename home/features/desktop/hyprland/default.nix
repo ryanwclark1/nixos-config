@@ -15,6 +15,7 @@
     ./swaylock.nix
     ./waybar.nix
     ./wofi.nix
+    ./variables.nix
   ];
 
   home.packages = with pkgs; [
