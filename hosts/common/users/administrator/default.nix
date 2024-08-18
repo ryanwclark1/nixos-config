@@ -53,9 +53,9 @@ in
 
   home-manager.users.administrator = import ../../../../home/${config.networking.hostName}.nix;
 
-  security.pam.services = {
-    swaylock = {};
-  };
+  # security.pam.services = {
+  #   swaylock = {};
+  # };
 
     # Persist entire home
   # environment.persistence = {};

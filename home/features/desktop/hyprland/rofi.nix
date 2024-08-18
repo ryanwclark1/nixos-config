@@ -8,7 +8,10 @@
     rofi = {
       enable = true;
       package = pkgs.rofi-wayland;
-      # plugins = [ pkgs.rofi-calc pkgs.rofi-emoji ];
+      plugins = [
+        pkgs.rofi-calc
+        pkgs.rofi-emoji
+      ];
       extraConfig = {
         bw = 1;
         columns = 2;
@@ -22,8 +25,8 @@
         hide-scrollbar = true;
         display-drun = "   Apps ";
         display-run = "   Run ";
-        # display-emoji = "   Emoji ";
-        # display-calc = "   Calc ";
+        display-emoji = "   Emoji ";
+        display-calc = "   Calc ";
         sidebar-mode = true;
       };
       pass = {
