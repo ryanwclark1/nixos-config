@@ -180,7 +180,7 @@ with lib;
           "Helix.desktop"
           "insomnia.desktop"
           "dbeaver.desktop"
-          "org.flameshot.Flameshot.desktop"
+          # "org.flameshot.Flameshot.desktop"
           "sqlitebrowser.desktop"
           "lapce.desktop"
           "org.kde.kate.desktop"

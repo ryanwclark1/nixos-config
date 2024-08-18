@@ -16,12 +16,12 @@
     # ./swaylock.nix
     ./waybar.nix
     ./wofi.nix
-    ./variables.nix
+    # ./variables.nix
   ];
 
   home = {
-    file.".config/pipewire/pipewire.conf".source = ./config/pipewire/pipewire.conf;
-    file.".emoji".source = ./config/emoji;
+    # file.".config/pipewire/pipewire.conf".source = ./config/pipewire/pipewire.conf;
+    # file.".emoji".source = ./config/emoji;
     file."Pictures/wallpapers" = {
       source = ../../../../hosts/common/wallpaper;
       recursive = true;
@@ -42,13 +42,12 @@
     packages = with pkgs; [
       wf-recorder
       wl-clipboard
-      swaybg
+      # swaybg
       # inputs.hypr-contrib.packages.${pkgs.system}.grimblast
-      hyprpicker
-      grim
-      slurp
-      wl-clip-persist
-      wf-recorder
+      # hyprpicker
+      # grim
+      # slurp
+      # wl-clip-persist
     ];
   };
 }
