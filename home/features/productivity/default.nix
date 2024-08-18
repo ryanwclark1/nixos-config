@@ -4,7 +4,7 @@
 
 {
   imports = [
-    ./flameshot.nix
+    # ./flameshot.nix
     ./office.nix
     ./zathura.nix
   ];

@@ -24,13 +24,13 @@
       hide_cursor = true
     }
 
-    # BACKGROUND
-    background {
-      monitor =
-      path = ~/Pictures/wallpapers/others/cat-leaves.png
-      color = $base
-      blur_passes = 0
-    }
+    # # BACKGROUND
+    # background {
+    #   monitor =
+    #   path = ~/Pictures/wallpapers/others/cat-leaves.png
+    #   color = $base
+    #   blur_passes = 0
+    # }
 
     # TIME
     label {
@@ -61,16 +61,16 @@
 
     # USER AVATAR
 
-    image {
-      monitor =
-      path = ~/Pictures/pp/pp.png
-      size = 125
-      border_color = $accent
+    # image {
+    #   monitor =
+    #   path = ~/Pictures/pp/pp.png
+    #   size = 125
+    #   border_color = $accent
 
-      position = 0, -450
-      halign = center
-      valign = center
-    }
+    #   position = 0, -450
+    #   halign = center
+    #   valign = center
+    # }
 
     # INPUT FIELD
     input-field {

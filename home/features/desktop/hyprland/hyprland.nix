@@ -21,13 +21,13 @@ in {
   #   # ./hyprbars.nix
   # ];
 
-  # xdg.portal = let
-  #   hyprland = config.wayland.windowManager.hyprland.package;
-  #   xdph = pkgs.xdg-desktop-portal-hyprland.override {inherit hyprland;};
-  # in {
-  #   extraPortals = [xdph];
-  #   configPackages = [hyprland];
-  # };
+  xdg.portal = let
+    hyprland = config.wayland.windowManager.hyprland.package;
+    xdph = pkgs.xdg-desktop-portal-hyprland.override {inherit hyprland;};
+  in {
+    extraPortals = [xdph];
+    configPackages = [hyprland];
+  };
 
   home.packages = with pkgs; [
     grimblast
@@ -57,18 +57,18 @@ in {
         waybar = lib.getExe pkgs.waybar;
       in
         [
-          "systemctl --user import-environment &"
-          "hash dbus-update-activation-environment 2>/dev/null &"
-          "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP &"
-          "nm-applet &"
-          "wl-clip-persist --clipboard both"
-          "swaybg -m fill -i $(find ~/Pictures/wallpapers/ -maxdepth 1 -type f) &"
-          "hyprctl setcursor Nordzy-cursors 22 &"
-          "poweralertd &"
-          "${waybar} &"
-          "swaync &"
-          "wl-paste --watch cliphist store &"
-          "hyprlock"
+          # "systemctl --user import-environment &"
+          # "hash dbus-update-activation-environment 2>/dev/null &"
+          # "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP &"
+          # "nm-applet &"
+          # "wl-clip-persist --clipboard both"
+          # "swaybg -m fill -i $(find ~/Pictures/wallpapers/ -maxdepth 1 -type f) &"
+          # "hyprctl setcursor Nordzy-cursors 22 &"
+          # "poweralertd &"
+          "${waybar}"
+          # "swaync &"
+          # "wl-paste --watch cliphist store &"
+          # "hyprlock"
         ];
 
       general = {
@@ -339,8 +339,9 @@ in {
         tesseract = lib.getExe pkgs.tesseract;
         pactl = lib.getExe' pkgs.pulseaudio "pactl";
         notify-send = lib.getExe' pkgs.libnotify "notify-send";
-        # term = lib.getExe pkgs.alacritty;
-        files = lib.getExe pkgs.xfce.thunar;
+        terminal = lib.getExe pkgs.alacritty;
+        # files = lib.getExe pkgs.xfce.thunar;
+        files = "${pkgs.kdePackages.dolphin}/bin/dolphin";
         defaultApp = type: "${lib.getExe pkgs.handlr-regex} launch ${type}";
         # remote = lib.getExe (pkgs.writeShellScriptBin "remote" ''
         #   socket="$(basename "$(find ~/.ssh -name 'master-gabriel@*' | head -1 | cut -d ':' -f1)")"
@@ -350,7 +351,7 @@ in {
       in
         [
           # Program bindings
-          "SUPER,Return,exec,${pkgs.alacritty}/bin/alacritty"
+          "SUPER,Return,exec,${terminal}"
           #"SUPER,Return,exec,${defaultApp "x-scheme-handler/terminal"}"''''
           "SUPER,e,exec,${defaultApp "text/plain"}"
           "SUPER,b,exec,${defaultApp "x-scheme-handler/https"}"
@@ -375,7 +376,8 @@ in {
           # To OCR
           "ALT,Print,exec,${grimblast} --freeze save area - | ${tesseract} - - | wl-copy && ${notify-send} -t 3000 'OCR result copied to buffer'"
         ]
-        ++ (
+        ++
+        (
           let
             playerctl = lib.getExe' config.services.playerctld.package "playerctl";
             playerctld = lib.getExe' config.services.playerctld.package "playerctld";
@@ -391,17 +393,17 @@ in {
               "SHIFT,XF86AudioPlay,exec,systemctl --user restart playerctld"
             ]
         )
-        ++
-        # Screen lock
-        (
-          let
-            swaylock = lib.getExe config.programs.swaylock.package;
-          in
-            lib.optionals config.programs.swaylock.enable [
-              "SUPER,backspace,exec,${swaylock} -S --grace 2"
-              "SUPER,XF86Calculator,exec,${swaylock} -S --grace 2"
-            ]
-        )
+        # ++
+        # # Screen lock
+        # (
+        #   let
+        #     swaylock = lib.getExe config.programs.swaylock.package;
+        #   in
+        #     lib.optionals config.programs.swaylock.enable [
+        #       "SUPER,backspace,exec,${swaylock} -S --grace 2"
+        #       "SUPER,XF86Calculator,exec,${swaylock} -S --grace 2"
+        #     ]
+        # )
         ++
         # Notification manager
         (
@@ -447,35 +449,7 @@ in {
               ]
             )
         );
-
-
     };
-    # This is order sensi      # monitor = let
-      #   waybarSpace = let
-      #     inherit (config.wayland.windowManager.hyprland.settings.general) gaps_in gaps_out;
-      #     inherit (config.programs.waybar.settings.primary) position height width;
-      #     gap = gaps_out - gaps_in;
-      #   in {
-      #     top = if (position == "top") then height + gap else 0;
-      #     bottom = if (position == "bottom") then height + gap else 0;
-      #     left = if (position == "left") then width + gap else 0;
-      #     right = if (position == "right") then width + gap else 0;
-      #   };
-      # in
-      #   [
-      #     ",addreserved,${toString waybarSpace.top},${toString waybarSpace.bottom},${toString waybarSpace.left},${toString waybarSpace.right}"
-      #   ]
-      #   ++ (map (
-      #     m: "${m.name},${
-      #       if m.enabled
-      #       then "${toString m.width}x${toString m.height}@${toString m.refreshRate},${m.position},1"
-      #       else "disable"
-      #     }"
-      #   ) (config.monitors));
-
-      # workspace = map (m: "name:${m.workspace},monitor:${m.name}") (
-      #   lib.filter (m: m.enabled && m.workspace != null) config.monitors
-      # );tive, so it has to come here.
     extraConfig = ''
       # Passthrough mode (e.g. for VNC)
       bind=SUPER,P,submap,passthrough
