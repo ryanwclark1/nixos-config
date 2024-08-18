@@ -49,7 +49,9 @@ in {
 
     settings = {
       # env = [];
-      # monintor = [];
+      monitor = [
+        ",highres,auto,1"
+      ];
       "exec-once" =
       let
         waybar = lib.getExe pkgs.waybar;
@@ -133,7 +135,7 @@ in {
         # emulate_discrete_scroll = 1;
         touchpad = {
           disable_while_typing = true;
-          natural_scroll = false;
+          natural_scroll = true;
           scroll_factor = 1.0;
           clickfinger_behavior = false;
           tap-to-click = true;
@@ -326,6 +328,8 @@ in {
         tesseract = lib.getExe pkgs.tesseract;
         pactl = lib.getExe' pkgs.pulseaudio "pactl";
         notify-send = lib.getExe' pkgs.libnotify "notify-send";
+        # term = lib.getExe pkgs.alacritty;
+        files = lib.getExe pkgs.xfce.thunar;
         defaultApp = type: "${lib.getExe pkgs.handlr-regex} launch ${type}";
         # remote = lib.getExe (pkgs.writeShellScriptBin "remote" ''
         #   socket="$(basename "$(find ~/.ssh -name 'master-gabriel@*' | head -1 | cut -d ':' -f1)")"
@@ -339,6 +343,7 @@ in {
           #"SUPER,Return,exec,${defaultApp "x-scheme-handler/terminal"}"''''
           "SUPER,e,exec,${defaultApp "text/plain"}"
           "SUPER,b,exec,${defaultApp "x-scheme-handler/https"}"
+          "SUPER,space,exec,${files}"
           # "SUPERALT,Return,exec,${remote} ${defaultApp "x-scheme-handler/terminal"}"
           # "SUPERALT,e,exec,${remote} ${defaultApp "text/plain"}"
           # "SUPERALT,b,exec,${remote} ${defaultApp "x-scheme-handler/https"}"

@@ -39,6 +39,7 @@
     (ark.override { unfreeEnableUnrar = true; })
     gwenview
     wl-clipboard # wayland clipboard client
+    syncthingtray
   ] ++ (with pkgs.kdePackages; [
     qtbase
     ksystemlog
