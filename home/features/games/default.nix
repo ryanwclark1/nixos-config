@@ -6,7 +6,7 @@
 
 {
   imports = [
-    ./dolphin.nix
+    ./dolphinemu.nix
     # ./factorio.nix
     ./heroic.nix
     ./lutris.nix
