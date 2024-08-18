@@ -75,11 +75,10 @@ in
 					format-disconnected = "󰤮";
 					tooltip = true;
 					tooltip-format = ''
-						{ifname}
-						{ipaddr}/{cidr}
-						Up: {bandwidthUpBits}
-						Down: {bandwidthDownBits}
-					'';
+{ifname}
+{ipaddr}/{cidr}
+Up: {bandwidthUpBits}
+Down: {bandwidthDownBits}'';
 					max-length = 15;
 					on-click = "${kitty} -e ${nmtui}";
 				};
