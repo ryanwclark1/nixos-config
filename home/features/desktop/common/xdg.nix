@@ -38,11 +38,16 @@
           "audio/wav" = videoPlayers;
           "video/mp4" = videoPlayers;
           "video/mpeg" = videoPlayers;
+
           "image/png" = imageViewers;
           "image/jpeg" = imageViewers;
           "image/gif" = imageViewers;
           "image/webp" = imageViewers;
+
+
           "text/plain" = textEditors;
+
+
           "text/csv" = [ "libreoffice" ];
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" = [ "libreoffice" ];
           "application/vnd.ms-excel" = [ "libreoffice" ];
