@@ -41,10 +41,10 @@
       url = "github:hyprwm/hyprland-plugins";
       inputs.hyprland.follows = "hyprland";
     };
-    # stylix = {
-    #   url = "github:danth/stylix";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
+    stylix = {
+      url = "github:danth/stylix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixos-conf-editor.url = "github:snowfallorg/nixos-conf-editor";
     nixos-cosmic = {
       url = "github:lilyinstarlight/nixos-cosmic";
@@ -62,7 +62,7 @@
     nixpkgs,
     home-manager,
     nixos-hardware,
-    # stylix,
+    stylix,
     systems,
     disko,
     lanzaboote,
@@ -99,7 +99,7 @@
           inherit inputs outputs;
         };
         modules = [
-          # stylix.nixosModules.stylix
+          stylix.nixosModules.stylix
           disko.nixosModules.disko
           nixos-cosmic.nixosModules.default
           ./hosts/frametop
@@ -110,7 +110,7 @@
           inherit inputs outputs;
         };
         modules = [
-          # stylix.nixosModules.stylix
+          stylix.nixosModules.stylix
           nixos-cosmic.nixosModules.default
           ./hosts/woody
         ];
@@ -120,7 +120,7 @@
     homeConfigurations = {
       "administrator@frametop" = lib.homeManagerConfiguration {
         modules = [
-          # stylix.nixosModules.stylix
+          stylix.nixosModules.stylix
           ./home/frametop.nix
         ];
         pkgs = pkgsFor.x86_64-linux;
@@ -130,7 +130,7 @@
       };
       "administrator@woody" = lib.homeManagerConfiguration {
         modules = [
-          # stylix.nixosModules.stylix
+          stylix.nixosModules.stylix
           ./home/woody.nix
         ];
         pkgs = pkgsFor.x86_64-linux;
