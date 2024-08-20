@@ -8,7 +8,7 @@
   imports = [
     ./dolphinemu.nix
     # ./factorio.nix
-    ./heroic.nix
+    # ./heroic.nix
     ./lutris.nix
     # ./steam.nix
     # ./gamescope.nix
