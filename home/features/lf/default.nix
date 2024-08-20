@@ -213,10 +213,10 @@
       source = ./icons;
       target = ".config/lf/icons";
     };
-    lf_colors = {
-      source = ./colors;
-      target = ".config/lf/colors";
-    };
+    # lf_colors = {
+    #   source = ./colors;
+    #   target = ".config/lf/colors";
+    # };
     mime_types = {
       source = ./mime.types;
       target = ".config/lf/mime.types";
