@@ -347,8 +347,9 @@ in
         new_window_takes_over_fullscreen = 2;
       };
       layerrule = [
-        "blur,waybar"
-        "ignorezero,waybar"
+        "blur, ^(wofi)$"
+        # "blur,waybar"
+        # "ignorezero,waybar"
       ];
       decoration = {
         active_opacity = 0.97;

@@ -24,13 +24,13 @@
       hide_cursor = true
     }
 
-    # # BACKGROUND
-    # background {
-    #   monitor =
-    #   path = ~/Pictures/wallpapers/others/cat-leaves.png
-    #   color = $base
-    #   blur_passes = 0
-    # }
+    # BACKGROUND
+    background {
+      monitor =
+      path = ~/Pictures/wallpapers/murky-peaks.jpg
+      color = $base
+      blur_passes = 0
+    }
 
     # TIME
     label {

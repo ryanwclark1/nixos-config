@@ -36,32 +36,32 @@
       };
     in
       [
-        "SUPERSHIFT,q,killactive"
-        "SUPERSHIFT,e,exit"
+        "SUPER SHIFT,q,killactive"
+        "SUPER SHIFT,e,exit"
 
         "SUPER,s,togglesplit"
         "SUPER,f,fullscreen,1"
-        "SUPERSHIFT,f,fullscreen,0"
-        "SUPERSHIFT,space,togglefloating"
+        "SUPER SHIFT,f,fullscreen,0"
+        "SUPER SHIFT,space,togglefloating"
 
         "SUPER,minus,splitratio,-0.25"
-        "SUPERSHIFT,minus,splitratio,-0.3333333"
+        "SUPER SHIFT,minus,splitratio,-0.3333333"
 
         "SUPER,equal,splitratio,0.25"
-        "SUPERSHIFT,equal,splitratio,0.3333333"
+        "SUPER SHIFT,equal,splitratio,0.3333333"
 
         "SUPER,g,togglegroup"
         "SUPER,t,lockactivegroup,toggle"
         "SUPER,tab,changegroupactive,f"
-        "SUPERSHIFT,tab,changegroupactive,b"
+        "SUPER SHIFT,tab,changegroupactive,b"
 
         "SUPER,apostrophe,workspace,previous"
-        "SUPERSHIFT,apostrophe,workspace,next"
+        "SUPER SHIFT,apostrophe,workspace,next"
         "SUPER,dead_grave,workspace,previous"
-        "SUPERSHIFT,dead_grave,workspace,next"
+        "SUPER SHIFT,dead_grave,workspace,next"
 
         "SUPER,u,togglespecialworkspace"
-        "SUPERSHIFT,u,movetoworkspacesilent,special"
+        "SUPER SHIFT,u,movetoworkspacesilent,special"
         "SUPER,i,pseudo"
       ]
       ++
@@ -69,27 +69,21 @@
       (map (n: "SUPER,${n},workspace,name:${n}") workspaces)
       ++
       # Move window to workspace
-      (map (n: "SUPERSHIFT,${n},movetoworkspacesilent,name:${n}") workspaces)
+      (map (n: "SUPER SHIFT,${n},movetoworkspacesilent,name:${n}") workspaces)
       ++
       # Move focus
       (lib.mapAttrsToList (key: direction: "SUPER,${key},movefocus,${direction}") directions)
       ++
       # Swap windows
-      (lib.mapAttrsToList (key: direction: "SUPERSHIFT,${key},swapwindow,${direction}") directions)
+      (lib.mapAttrsToList (key: direction: "SUPER SHIFT,${key},swapwindow,${direction}") directions)
       ++
       # Move windows
-      (lib.mapAttrsToList (
-          key: direction: "SUPERCONTROL,${key},movewindoworgroup,${direction}"
-        )
-        directions)
+      (lib.mapAttrsToList (key: direction: "SUPER CONTROL,${key},movewindoworgroup,${direction}") directions)
       ++
       # Move monitor focus
-      (lib.mapAttrsToList (key: direction: "SUPERALT,${key},focusmonitor,${direction}") directions)
+      (lib.mapAttrsToList (key: direction: "SUPER ALT,${key},focusmonitor,${direction}") directions)
       ++
       # Move workspace to other monitor
-      (lib.mapAttrsToList (
-          key: direction: "SUPERALTSHIFT,${key},movecurrentworkspacetomonitor,${direction}"
-        )
-        directions);
+      (lib.mapAttrsToList (key: direction: "SUPER ALT SHIFT,${key},movecurrentworkspacetomonitor,${direction}") directions);
   };
 }
