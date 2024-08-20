@@ -15,13 +15,9 @@
       batwatch
       prettybat
     ];
-    # config = {
-    #   theme = "Nord";
-    # };
   };
 
   home.shellAliases = {
     cat = "bat";
   };
-
 }
