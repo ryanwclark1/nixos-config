@@ -7,6 +7,10 @@ let
   currentScheme = "nord";
 in
 {
+  imports = [
+    ./fonts.nix
+  ];
+  
   stylix = {
     enable = false;
     autoEnable = false;
@@ -39,8 +43,8 @@ in
       };
     };
     homeManagerIntegration = {
-      followSystem = false;
-      autoImport = false;
+      followSystem = true;
+      # autoImport = false;
     };
     opacity = {
       applications = 0.9;
