@@ -83,10 +83,10 @@ in {
         gaps_in = 3;
         gaps_out = 5;
         gaps_workspaces = 0;
-        "col.active_border" = "0xffffffff";
-        "col.inactive_border" = "0xff444444";
-        "col.nogroup_border" = "0xffffaaff";
-        "col.nogroup_border_active" = "0xffff00ff";
+        # "col.active_border" = "0xffffffff";
+        # "col.inactive_border" = "0xff444444";
+        # "col.nogroup_border" = "0xffffaaff";
+        # "col.nogroup_border_active" = "0xffff00ff";
         layout = "dwindle";
         no_focus_fallback = false;
         apply_sens_to_raw = false;
@@ -106,7 +106,7 @@ in {
         shadow_range = 12;
         shadow_render_power = 3;
         shadow_ignore_window = true;
-        "col.shadow" = "0xee1a1a1a";
+        # "col.shadow" = "0xee1a1a1a";
         # "col.shadow_inactive" = "unset";
         shadow_offset = "3 3";
         shadow_scale = 1.0;
@@ -171,10 +171,10 @@ in {
       group = {
         insert_after_current = true;
         focus_removed_window = true;
-        "col.border_active" = "0x66ffff00";
-        "col.border_inactive" = "0x66777700";
-        "col.border_locked_active" = "0x66ff5500";
-        "col.border_locked_inactive" = "0x66775500";
+        # "col.border_active" = "0x66ffff00";
+        # "col.border_inactive" = "0x66777700";
+        # "col.border_locked_active" = "0x66ff5500";
+        # "col.border_locked_inactive" = "0x66775500";
         groupbar = {
           enabled = true;
           font_size = 11;
@@ -184,18 +184,18 @@ in {
           priority = 3;
           render_titles = true;
           scrolling = true;
-          text_color = "0xffffffff";
-          "col.active" = "0x66ffff00";
-          "col.inactive" = "0x66777700";
-          "col.locked_active" = "0x66ff5500";
-          "col.locked_inactive" = "0x66775500";
+          # text_color = "0xffffffff";
+          # "col.active" = "0x66ffff00";
+          # "col.inactive" = "0x66777700";
+          # "col.locked_active" = "0x66ff5500";
+          # "col.locked_inactive" = "0x66775500";
         };
       };
 
       misc = {
         disable_hyprland_logo = true;
         disable_splash_rendering = false;
-        "col.splash" = "0xffffffff";
+        # "col.splash" = "0xffffffff";
         font_family = "Sans";
         vfr = true;
         vrr = 0;
@@ -212,7 +212,7 @@ in {
         render_ahead_of_time = false;
         render_ahead_safezone = 1;
         allow_session_lock_restore = false;
-        background_color = "0x111111";
+        # background_color = "0x111111";
         close_special_on_empty = true;
         # Unfullscreen when opening something
         new_window_takes_over_fullscreen = 2;
