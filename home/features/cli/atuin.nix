@@ -3,13 +3,14 @@
 # Updated when enter is pressed select not execute.
 
 {
+  pkgs,
   ...
 }:
 
 {
   programs.atuin = {
     enable = true;
-    # package = pkgs.atuin;
+    package = pkgs.atuin;
     flags = [
       "--disable-up-arrow"
     ];
