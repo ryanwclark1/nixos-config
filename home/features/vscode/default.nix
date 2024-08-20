@@ -158,11 +158,11 @@
         "diffEditor.codeLens" = true;
 
         "editor.accessibilityPageSize" = 500;
-        "editor.fontFamily" = "JetBrains Mono, Fira Code, Menlo, Monaco, 'Courier New', monospace";
+        # "editor.fontFamily" = "JetBrains Mono, Fira Code, Menlo, Monaco, 'Courier New', monospace";
         "editor.fontLigatures" = true;
-        "editor.fontSize" = 12;
-        "editor.fontVariations" = true;
-        "editor.fontWeight" = "normal";
+        # "editor.fontSize" = 12;
+        # "editor.fontVariations" = true;
+        # "editor.fontWeight" = "normal";
         "editor.formatOnPaste" = true;
         "editor.formatOnSave" = true;
         "editor.formatOnType" = true;
