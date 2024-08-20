@@ -49,7 +49,13 @@ in
       terminal = 0.85;
     };
     targets = {
-      grub.useImage = true;
+      gnome.enable = true;
+      grub = {
+        enable = true;
+        useImage = true;
+      };
+      nixos-icons.enable = true;
+      gtk.enable = true;
       plymouth.enable = false;
     };
   };
