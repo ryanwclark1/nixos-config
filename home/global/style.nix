@@ -7,11 +7,14 @@ let
 in
 # In home-manager
 {
+  home.packages = with pkgs; [
+    base16-schemes
+  ];
   stylix = {
-    enable = false;
+    enable = true;
     autoEnable = false;
-    base16Schemes = "${pkgs.base16-schemes}/share/themes/${currentScheme}.yaml";
-    image = ../wallpaper/FormulaOne_Vettel_2.jpg;
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/${currentScheme}.yaml";
+    image = ../../hosts/common/wallpaper/FormulaOne_Vettel_2.jpg;
     imageScalingMode = "fill";
     opacity = {
       applications = 0.9;
@@ -29,7 +32,7 @@ in
       };
       fish.enable = true;
       fzf.enable = true;
-      git.enable = true;
+      gitui.enable = true;
       gnome.enable = true;
       gtk = {
         enable = true;

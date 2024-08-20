@@ -28,7 +28,7 @@
     ../common/optional/steam.nix
     ../common/optional/syncthing.nix
     ../common/optional/tailscale.nix
-    # ../common/optional/theme.nix
+    ../common/optional/style.nix
     ../common/optional/wireshark.nix
     ../common/optional/zsh.nix
 
