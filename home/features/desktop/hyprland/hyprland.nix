@@ -405,17 +405,17 @@ in {
               "SHIFT,XF86AudioPlay,exec,systemctl --user restart playerctld"
             ]
         )
-        # ++
-        # # Screen lock
-        # (
-        #   let
-        #     swaylock = lib.getExe config.programs.swaylock.package;
-        #   in
-        #     lib.optionals config.programs.swaylock.enable [
-        #       "SUPER,backspace,exec,${swaylock} -S --grace 2"
-        #       "SUPER,XF86Calculator,exec,${swaylock} -S --grace 2"
-        #     ]
-        # )
+        ++
+        # Screen lock
+        (
+          let
+            hyprlock = lib.getExe config.programs.hyprlock.package;
+          in
+            lib.optionals config.programs.hyprlock.enable [
+              "SUPER,backspace,exec,${hyprlock} -S --grace 2"
+              "SUPER,XF86Calculator,exec,${hyprlock} -S --grace 2"
+            ]
+        )
         ++
         # Notification manager
         (
@@ -438,8 +438,8 @@ in {
               "SUPER,s,exec,specialisation $(specialisation | ${wofi} -S dmenu)"
               "SUPER,d,exec,${wofi} -S run"
 
-              # "SUPER ALT,x,exec,${remote} ${wofi} -S drun -x 10 -y 10 -W 25% -H 60%"
-              # "SUPER ALT,d,exec,${remote} ${wofi} -S run"
+              "SUPER ALT,x,exec,${remote} ${wofi} -S drun" # -x 10 -y 10 -W 25% -H 60%
+              "SUPER ALT,d,exec,${remote} ${wofi} -S run"
             ]
             ++
             (

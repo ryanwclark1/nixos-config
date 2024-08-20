@@ -13,7 +13,7 @@
         # BACKGROUND
         background = {
           # monitor =
-          path = ~/Pictures/wallpapers/murky-peaks.jpg;
+          path = "~/Pictures/wallpapers/murky-peaks.jpg";
           # color = $base
           blur_passes = 0;
         };
@@ -70,7 +70,7 @@
           # inner_color = $surface0;
           # font_color = $text;
           fade_on_empty = false;
-          placeholder_text = ''<span foreground="##$textAlpha"><i>󰌾  Logged in as </i><span foreground="##$accentAlpha">$USER</span></span>'';
+          placeholder_text = "<span foreground='##$textAlpha'><i>󰌾  Logged in as </i><span foreground='##$accentAlpha'>$USER</span></span>";
           hide_input = false;
           # check_color = $accent;
           # fail_color = $red;

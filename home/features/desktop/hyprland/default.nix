@@ -11,7 +11,6 @@
     ./hyprland.nix
     ./hyprlock.nix
     ./mako.nix
-    # ./rofi.nix
     # ./swayidle.nix
     # ./swaylock.nix
     ./waybar.nix
@@ -26,18 +25,6 @@
       source = ../../../../hosts/common/wallpaper;
       recursive = true;
     };
-    # file.".config/rofi" = {
-    #   source = ./config/rofi;
-    #   recursive = true;
-    # };
-    # file.".config/swaync" = {
-    #   source = ./config/swaync;
-    #   recursive = true;
-    # };
-    # file.".config/hypr" = {
-    #   source = ./config/hyprland;
-    #   recursive = true;
-    # };
 
     packages = with pkgs; [
       wf-recorder
