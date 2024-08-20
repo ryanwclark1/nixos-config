@@ -48,8 +48,8 @@ in {
     # };
 
     settings = {
-      "$menu" = "wofi";
-      "$mod" = "SUPER";
+      # "$menu" = "wofi";
+      # "$mod" = "SUPER";
 
       env = [
         "XDG_CURRENT_DESKTOP,Hyprland"
@@ -290,8 +290,8 @@ in {
       #   "bordercolor ${rgba colors.primary "aa"} ${rgba colors.primary_container "aa"}, title:^(\\[${name}\\])"
       # ) remoteColorschemes);
       layerrule = let
-        wofi = pkgs.wofi;
-        waybar = pkgs.waybar;
+        wofi = lib.getExe pkgs.wofi;
+        waybar = lib.getExe pkgs.waybar;
       in
       [
         "animation fade,hyprpicker"
@@ -309,7 +309,6 @@ in {
 
         "noanim,wallpaper"
       ];
-
 
       animations = {
         enabled = true;
@@ -361,14 +360,14 @@ in {
         [
           # Program bindings
           "SUPER,Return,exec,${terminal}"
-          "SUPER,Return,exec,${defaultApp "x-scheme-handler/terminal"}"
+          # "SUPER,Return,exec,${defaultApp "x-scheme-handler/terminal"}"
           "SUPER,e,exec,${defaultApp "text/plain"}"
           "SUPER,b,exec,${defaultApp "x-scheme-handler/https"}"
-          "$mod, Space, exec, $menu --show drun"
+          # "$mod, Space, exec, $menu --show drun"
           "SUPER ALT,space,exec,${files}"
-          "SUPERALT,Return,exec,${remote} ${defaultApp "x-scheme-handler/terminal"}"
-          "SUPERALT,e,exec,${remote} ${defaultApp "text/plain"}"
-          "SUPERALT,b,exec,${remote} ${defaultApp "x-scheme-handler/https"}"
+          "SUPER ALT,Return,exec,${remote} ${defaultApp "x-scheme-handler/terminal"}"
+          "SUPER ALT,e,exec,${remote} ${defaultApp "text/plain"}"
+          "SUPER ALT,b,exec,${remote} ${defaultApp "x-scheme-handler/https"}"
           # Brightness control (only works if the system has lightd)
           ",XF86MonBrightnessUp,exec,light -A 10"
           ",XF86MonBrightnessDown,exec,light -U 10"
@@ -425,7 +424,7 @@ in {
           in
             lib.optionals config.services.mako.enable [
               "SUPER,w,exec,${makoctl} dismiss"
-              "SUPERSHIFT,w,exec,${makoctl} restore"
+              "SUPER SHIFT,w,exec,${makoctl} restore"
             ]
         )
         ++
@@ -439,10 +438,11 @@ in {
               "SUPER,s,exec,specialisation $(specialisation | ${wofi} -S dmenu)"
               "SUPER,d,exec,${wofi} -S run"
 
-              # "SUPERALT,x,exec,${remote} ${wofi} -S drun -x 10 -y 10 -W 25% -H 60%"
-              # "SUPERALT,d,exec,${remote} ${wofi} -S run"
+              # "SUPER ALT,x,exec,${remote} ${wofi} -S drun -x 10 -y 10 -W 25% -H 60%"
+              # "SUPER ALT,d,exec,${remote} ${wofi} -S run"
             ]
-            ++ (
+            ++
+            (
               let
                 pass-wofi = lib.getExe (pkgs.pass-wofi.override {pass = config.programs.password-store.package;});
               in
@@ -451,9 +451,11 @@ in {
                   "SHIFT,XF86Calculator,exec,${pass-wofi} fill"
 
                   "SUPER,semicolon,exec,${pass-wofi}"
-                  "SHIFTSUPER,semicolon,exec,${pass-wofi} fill"
+                  "SUPER SHIFT,semicolon,exec,${pass-wofi} fill"
                 ]
-            ) ++ (
+            )
+            ++
+            (
               let
                 cliphist = lib.getExe config.services.cliphist.package;
               in
