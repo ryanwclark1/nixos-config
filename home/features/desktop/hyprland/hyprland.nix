@@ -48,6 +48,9 @@ in {
     # };
 
     settings = {
+      "$menu" = "wofi";
+      "$mod" = "SUPER";
+
       env = [
         "XDG_CURRENT_DESKTOP,Hyprland"
         "XDG_SESSION_TYPE,wayland"
@@ -348,6 +351,7 @@ in {
         terminal = lib.getExe pkgs.alacritty;
         files = "${pkgs.kdePackages.dolphin}/bin/dolphin";
         defaultApp = type: "${lib.getExe pkgs.handlr-regex} launch ${type}";
+        hyprlock = lib.getExe pkgs.hyprlock;
         remote = lib.getExe (pkgs.writeShellScriptBin "remote" ''
           socket="$(basename "$(find ~/.ssh -name 'administrator@*' | head -1 | cut -d ':' -f1)")"
           host="''${socket#master-}"
@@ -357,10 +361,11 @@ in {
         [
           # Program bindings
           "SUPER,Return,exec,${terminal}"
-          "SUPER,Return,exec,${defaultApp "x-scheme-handler/terminal"}"''''
+          "SUPER,Return,exec,${defaultApp "x-scheme-handler/terminal"}"
           "SUPER,e,exec,${defaultApp "text/plain"}"
           "SUPER,b,exec,${defaultApp "x-scheme-handler/https"}"
-          "SUPER,space,exec,${files}"
+          "$mod, Space, exec, $menu --show drun"
+          "SUPER ALT,space,exec,${files}"
           "SUPERALT,Return,exec,${remote} ${defaultApp "x-scheme-handler/terminal"}"
           "SUPERALT,e,exec,${remote} ${defaultApp "text/plain"}"
           "SUPERALT,b,exec,${remote} ${defaultApp "x-scheme-handler/https"}"
@@ -380,6 +385,9 @@ in {
           "SHIFT,Print,exec,${grimblast} --notify --freeze copy output"
           # To OCR
           "ALT,Print,exec,${grimblast} --freeze save area - | ${tesseract} - - | wl-copy && ${notify-send} -t 3000 'OCR result copied to buffer'"
+          # Hyprlock
+          "SUPER,backspace,exec,${hyprlock} -S --grace 2"
+          "SUPER,XF86Calculator,exec,${hyprlock} -S --grace 2"
         ]
         ++
         (
