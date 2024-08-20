@@ -1,5 +1,4 @@
 {
-  config,
   pkgs,
   ...
 }:
@@ -10,25 +9,29 @@ in
   imports = [
     ./fonts.nix
   ];
-  
+
+  environment.systemPackages = with pkgs; [
+    base16-schemes
+  ];
+
   stylix = {
-    enable = false;
+    enable = true;
     autoEnable = false;
     image = ../wallpaper/FormulaOne_Vettel_2.jpg;
     imageScalingMode = "fill";
     base16Scheme = "${pkgs.base16-schemes}/share/themes/${currentScheme}.yaml";
-    polarity = "dark";
+    polarity = "either";
     fonts = {
       serif = {
         package = pkgs.dejavu_fonts;
         name = "DejaVu Serif";
       };
       sansSerif = {
-        package = config.stylix.fonts.serif.package;
+        package = pkgs.dejavu_fonts;
         name = "DejaVu Sans";
       };
       monospace = {
-        package = pkgs.jetbrains-mono;
+        package = pkgs.nerdfonts.override {fonts = ["JetBrainsMono"];};
         name = "JetBrainsMono Nerd Font";
       };
       emoji = {
@@ -53,6 +56,7 @@ in
       terminal = 0.85;
     };
     targets = {
+      console.enable = true;
       gnome.enable = true;
       grub = {
         enable = true;
@@ -60,20 +64,7 @@ in
       };
       nixos-icons.enable = true;
       gtk.enable = true;
-      plymouth.enable = false;
+      plymouth.enable = true;
     };
-  };
-  fonts = {
-    fontconfig = {
-      enable = true;
-      allowBitmaps = true;
-      antialias = true;
-    };
-
-    packages = with pkgs; [
-      nerdfonts
-      powerline-fonts
-      powerline-symbols
-    ];
   };
 }
