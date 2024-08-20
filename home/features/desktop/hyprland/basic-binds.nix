@@ -39,7 +39,7 @@
         "SUPER SHIFT,q,killactive"
         "SUPER SHIFT,e,exit"
 
-        "SUPER,s,togglesplit"
+        # "SUPER,s,togglesplit"
         "SUPER,f,fullscreen,1"
         "SUPER SHIFT,f,fullscreen,0"
         "SUPER SHIFT,space,togglefloating"
