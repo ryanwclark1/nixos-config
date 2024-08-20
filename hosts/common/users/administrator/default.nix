@@ -45,8 +45,7 @@ in
       (builtins.readFile ./keys/id_frametop.pub)
     ];
 
-    hashedPasswordFile = config.sops.secrets.
-    administrator-password.path;
+    hashedPasswordFile = config.sops.secrets.administrator-password.path;
 
     packages = [ pkgs.home-manager ];
   };
