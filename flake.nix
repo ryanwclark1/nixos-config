@@ -120,7 +120,7 @@
     homeConfigurations = {
       "administrator@frametop" = lib.homeManagerConfiguration {
         modules = [
-          stylix.nixosModules.stylix
+          stylix.homeManagerModules.stylix
           ./home/frametop.nix
         ];
         pkgs = pkgsFor.x86_64-linux;
@@ -130,7 +130,7 @@
       };
       "administrator@woody" = lib.homeManagerConfiguration {
         modules = [
-          stylix.nixosModules.stylix
+          stylix.homeManagerModules.stylix
           ./home/woody.nix
         ];
         pkgs = pkgsFor.x86_64-linux;
