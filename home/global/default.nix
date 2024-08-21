@@ -13,7 +13,7 @@
 {
   imports = [
     inputs.impermanence.nixosModules.home-manager.impermanence
-    ./global-fonts.nix
+    # ./global-fonts.nix
     ./style.nix
     ./sops.nix
   ]
