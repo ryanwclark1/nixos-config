@@ -46,4 +46,5 @@ in
   programs.nix-index.enableZshIntegration = mkIf config.programs.nix-index.enable true;
   programs.starship.enableZshIntegration = mkIf config.programs.starship.enable true;
   programs.zoxide.enableZshIntegration = mkIf config.programs.zoxide.enable true;
+  programs.zellij.enableZshIntegration = mkIf config.programs.zellij.enable true;
 }
