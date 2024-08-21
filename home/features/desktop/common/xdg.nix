@@ -24,7 +24,9 @@
       enable = true;
       defaultApplications =
         let
-          browsers = [ "firefox.desktop" ];
+          browser = [
+            "firefox.desktop"
+           ];
           videoPlayers = [
             "mpv.desktop"
             "umpv.desktop"
@@ -44,9 +46,7 @@
           "image/gif" = imageViewers;
           "image/webp" = imageViewers;
 
-
           "text/plain" = textEditors;
-
 
           "text/csv" = [ "libreoffice" ];
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" = [ "libreoffice" ];
@@ -60,8 +60,12 @@
           ];
           "application/vnd.ms-powerpoint" = [ "libreoffice" ];
           # "application/pdf" = [ "wps-office-pdf.desktop" ];
-          "image/svg+xml" = browsers;
-          "text/html" = browsers;
+          "image/svg+xml" = browser;
+          "text/html" = browser;
+          "x-scheme-handler/http" = browser;
+          "x-scheme-handler/https" = browser;
+          "x-scheme-handler/about" = browser;
+          "x-scheme-handler/unknown" = browser;
         };
     };
   };
