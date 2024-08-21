@@ -8,12 +8,20 @@
     inherit
       (pkgs)
       exiftool
+      ueberzugpp
       ;
+
   };
 
   programs.yazi = {
     enable = true;
     package = pkgs.yazi;
+    initLua = ./init.lua;
+    plugins = {
+      lazygit = ./plugins/lazygit.yazi;
+      fzfbm = ./plugins/fzfbm.yazi;
+      starship = ./plugins/starship.yazi;
+    };
     enableBashIntegration = lib.mkIf config.programs.bash.enable true;
     enableFishIntegration = lib.mkIf config.programs.fish.enable true;
     enableZshIntegration = lib.mkIf config.programs.zsh.enable true;
@@ -270,12 +278,12 @@
           {
             on = ["l"];
             run = "plugin --sync smart-enter";
-            desc = "Enter the child directory, or open the file";
+            desc = "Enter the child directory or open the file";
           }
           {
             on = ["<Right>"];
             run = "plugin --sync smart-enter";
-            desc = "Enter the child directory, or open the file";
+            desc = "Enter the child directory or open the file";
           }
           # https://yazi-rs.github.io/docs/tips/#selected-files-to-clipboard
           {
@@ -409,6 +417,62 @@
             run = "find_arrow --previous";
             desc = "Go to previous found file";
           }
+
+          # lazyfetchGit
+          {
+            on = ["g" "i"];
+            run = "plugin lazygit";
+            desc = "run lazygit";
+          }
+          # fzf bookmark
+          {
+            on = [ "u" "a"];
+            run = "plugin fzfbm --args=save";
+            desc = "Add bookmark";
+          }
+
+          {
+            on = [ "u" "g"];
+            run = "plugin fzfbm --args=jump_by_key";
+            desc = "Jump bookmark by key";
+          }
+
+          {
+            on = [ "u" "G"];
+            run = "plugin fzfbm --args=jump_by_fzf";
+            desc = "Jump bookmark by fzf";
+          }
+          {
+            on = [ "u" "d"];
+            run = "plugin fzfbm --args=delete_by_key";
+            desc = "Delete bookmark by key";
+          }
+
+          {
+            on = [ "u" "D"];
+            run = "plugin fzfbm --args=delete_by_fzf";
+            desc = "Delete bookmark by fzf";
+          }
+
+          {
+            on = [ "u" "A"];
+            run = "plugin fzfbm --args=delete_all";
+            desc = "Delete all bookmarks";
+          }
+
+          {
+            on = [ "u" "r"];
+            run = "plugin fzfbm --args=rename_by_key";
+            desc = "Rename bookmark by key";
+          }
+
+          {
+            on = [ "u" "R"];
+            run = "plugin fzfbm --args=rename_by_fzf";
+            desc = "Rename bookmark by fzf";
+          }
+
+
         ];
       };
       preview = {
