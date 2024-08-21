@@ -5,8 +5,8 @@
 
 {
   imports = [
-    ./atuin.nix
     ./aichat.nix
+    ./atuin.nix
     ./bat.nix
     ./btop.nix
     ./diffsitter.nix
@@ -14,14 +14,12 @@
     ./filesystem_utils.nix
     ./fx.nix
     ./gh.nix
-    ./gpg.nix
     ./gum.nix
     ./jq.nix
+    ./mprocs.nix
     ./neomutt.nix
     ./network.nix
     ./nixtools.nix
-    # ./ssh.nix
-    ./mprocs.nix
     ./viu.nix
     ./yq.nix
     ./zk.nix
@@ -29,7 +27,6 @@
   home.packages = with pkgs; [
     distrobox # Nice escape hatch, integrates docker images with my environment
     httpie # Better curl
-    # hurl # httpie/curl alternative
     hyperfine #cli benchmarking tool
     scrot # A command-line screen capture utility
   ];
