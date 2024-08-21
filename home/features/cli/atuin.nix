@@ -16,7 +16,7 @@
     ];
 
     settings = {
-      auto_sync = true;
+      auto_sync = false;
       sync_frequency = "10m";
       search_mode = "fuzzy";
       # sync_address = "https://atuin.techcasa.io";
