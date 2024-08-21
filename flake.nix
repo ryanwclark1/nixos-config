@@ -15,7 +15,6 @@
 
     #################### Utilities ####################
 
-    nix-colors.url = "github:misterio77/nix-colors";
     systems.url = "github:nix-systems/default-linux";
     impermanence.url = "github:nix-community/impermanence";
     disko = {
@@ -45,7 +44,6 @@
       url = "github:danth/stylix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixos-conf-editor.url = "github:snowfallorg/nixos-conf-editor";
     nixos-cosmic = {
       url = "github:lilyinstarlight/nixos-cosmic";
       inputs.nixpkgs.follows = "nixpkgs";
