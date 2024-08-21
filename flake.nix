@@ -125,7 +125,7 @@
     homeConfigurations = {
       "administrator@frametop" = lib.homeManagerConfiguration {
         modules = [
-          nixvim.homeManagerModules.nixvim
+          # nixvim.homeManagerModules.nixvim
           stylix.homeManagerModules.stylix
           ./home/frametop.nix
         ];
