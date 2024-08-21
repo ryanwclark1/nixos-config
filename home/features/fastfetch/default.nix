@@ -103,6 +103,7 @@
 
   home.shellAliases = {
     neofetch = "fastfetch";
+    fetch = "fastfetch";
   };
 
 }
