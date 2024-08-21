@@ -37,10 +37,10 @@
     ./features/shell
     ./features/starship
     ./features/sys-stats
-    ./features/tmux
+    # ./features/tmux
     ./features/vhs
     ./features/vscode
-    # ./features/yazi
+    ./features/yazi
     ./features/zed
     ./features/zellij
     ./features/zoxide
