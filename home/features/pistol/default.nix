@@ -1,28 +1,52 @@
 {
+  lib,
   pkgs,
   ...
 }:
 
 {
   # General purpose file previewer designed for Ranger, Lf to make scope.sh redundant
+  home.packages = with pkgs; [
+    file #A program that shows the type of files.
+    exiftool #A program that shows the metadata of files.
+    mediainfo
+    poppler_utils #pdftotext and pdfinfo
+    epub2txt2
+    xlsx2csv #for xlsx files
+    librsvg
+    chafa #for lf image previews
+    odt2txt
+    elinks
+    hexyl
+    notcurses
+  ];
+
   programs.pistol = {
     enable = true;
-    associations = [
+    associations =
+    let
+      epub2txt = lib.getExe pkgs.epub2txt2;
+      exiftool = lib.getExe pkgs.exiftool;
+      atool = lib.getExe pkgs.atool;
+      xlsx2csv = lib.getExe pkgs.xlsx2csv;
+      hexyl = lib.getExe pkgs.hexyl;
+    in
+    [
       {
         mime = "image/*";
-        command = "${pkgs.exiftool}/bin/exiftool %pistol-filename%";
+        command = "${exiftool} %pistol-filename%";
       }
       {
         mime = "video/*";
-        command = "${pkgs.exiftool}/bin/exiftool %pistol-filename%";
+        command = "${exiftool} %pistol-filename%";
       }
       {
         mime = "audio/*";
-        command = "${pkgs.exiftool}/bin/exiftool %pistol-filename%";
+        command = "${exiftool} %pistol-filename%";
       }
       {
         mime = "application/gzip";
-        command = "${pkgs.atool}/bin/atool -l %pistol-filename%";
+        command = "${atool} -l %pistol-filename%";
       }
       {
         mime = "application/pdf";
@@ -30,55 +54,55 @@
       }
       {
         mime = "application/epub+zip";
-        command = "epub2txt %pistol-filename%";
+        command = "${epub2txt} %pistol-filename%";
       }
       {
         mime = "application/x-msdownload";
-        command = "${pkgs.exiftool}/bin/exiftool %pistol-filename%";
+        command = "${exiftool} %pistol-filename%";
       }
       {
         mime = "application/x-sharedlib";
-        command = "${pkgs.exiftool}/bin/exiftool %pistol-filename%";
+        command = "${exiftool} %pistol-filename%";
       }
       {
         mime = "application/x-executable";
-        command = "${pkgs.exiftool}/bin/exiftool %pistol-filename%";
+        command = "${exiftool} %pistol-filename%";
       }
       {
         mime = "application/x-font-ttf";
-        command = "${pkgs.exiftool}/bin/exiftool %pistol-filename%";
+        command = "${exiftool} %pistol-filename%";
       }
       {
         mime = "application/x-font-woff";
-        command = "${pkgs.exiftool}/bin/exiftool %pistol-filename%";
+        command = "${exiftool} %pistol-filename%";
       }
       {
         mime = "application/x-font-otf";
-        command = "${pkgs.exiftool}/bin/exiftool %pistol-filename%";
+        command = "${exiftool} %pistol-filename%";
       }
       {
         mime = "application/vnd.ms-opentype";
-        command = "${pkgs.exiftool}/bin/exiftool %pistol-filename%";
+        command = "${exiftool} %pistol-filename%";
       }
       {
         mime = "application/vnd.ms-fontobject";
-        command = "${pkgs.exiftool}/bin/exiftool %pistol-filename%";
+        command = "${exiftool} %pistol-filename%";
       }
       {
         mime = "application/vnd.ms-excel";
-        command = "${pkgs.exiftool}/bin/exiftool %pistol-filename%";
+        command = "${exiftool} %pistol-filename%";
       }
       {
         mime = "application/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-        command = "${pkgs.xlsx2csv}/bin/xlsx2csv %pistol-filename%";
+        command = "${xlsx2csv} %pistol-filename%";
       }
       {
         mime = "application/vnd.ms-excel";
-        command = "${pkgs.xlsx2csv}/bin/xlsx2csv %pistol-filename%";
+        command = "${xlsx2csv} %pistol-filename%";
       }
       {
         mime = "application/*";
-        command = "${pkgs.hexyl}/bin/hexyl %pistol-filename%";
+        command = "${hexyl} %pistol-filename%";
       }
       {
         fpath = ".*.md$";
