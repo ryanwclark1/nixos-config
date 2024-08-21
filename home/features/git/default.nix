@@ -23,8 +23,10 @@ in
 
   programs.git = {
     enable = true;
-
     package = pkgs.gitAndTools.gitFull;
+    userName = "Ryan Clark";
+    userEmail = "ryanc@accentservices.com";
+    lfs.enable = true;
 
     aliases = {
       p = "pull --ff-only";
@@ -33,9 +35,7 @@ in
       pushall = "!git remote | xargs -L1 git push --all";
       add-nowhitespace = "!git diff -U0 -w --no-color | git apply --cached --ignore-whitespace --unidiff-zero -";
     };
-    userName = "Ryan Clark";
-    userEmail = "ryanc@accentservices.com";
-    lfs.enable = true;
+
 
     ignores = [
       ".direnv"
@@ -50,9 +50,11 @@ in
     delta = {
       enable = true;
       options = {
-        line-numbers = "true";
-        side-by-side = "true";
-        decorations = "true";
+        diff-so-fancy = true;
+        line-numbers = true;
+        side-by-side = true;
+        decorations = true;
+        true-color = "always";
       };
     };
 
@@ -61,9 +63,10 @@ in
       github.user = "ryanwclark1";
       init.defaultBranch = "main";
       pull.rebase = true;
+      push.autoSetupRemote = true; # automatically create upstream branch on push
       rebase.autosquash = true;
       rebase.autoStash = true;
-      push.autoSetupRemote = true; # automatically create upstream branch on push
+      trim.bases = "develop,master,main";
       url = {
         "https://github.com/" = {
           insteadOf = [
