@@ -60,7 +60,7 @@ in
       gnome.enable = true;
       grub = {
         enable = true;
-        useImage = true;
+        useImage = false;
       };
       nixos-icons.enable = true;
       gtk.enable = true;
