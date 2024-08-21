@@ -4,7 +4,6 @@
   config,
   ...
 }: {
-
   home.packages = lib.attrValues {
     inherit
       (pkgs)
@@ -14,7 +13,10 @@
 
   programs.yazi = {
     enable = true;
-    # enableZshIntegration = true;
+    package = pkgs.yazi;
+    enableBashIntegration = lib.mkIf config.programs.bash.enable true;
+    enableFishIntegration = lib.mkIf config.programs.fish.enable true;
+    enableZshIntegration = lib.mkIf config.programs.zsh.enable true;
     # enableNushellIntegration = true;
     # https://yazi-rs.github.io/docs/configuration/keymap
     # https://yazi-rs.github.io/docs/quick-start/#keybindings

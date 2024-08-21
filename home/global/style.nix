@@ -71,7 +71,7 @@ in
       kde.enable = true;
       kitty = {
         enable = true;
-        variant256Colors = true;
+        # variant256Colors = true;
       };
       lazygit.enable = true;
       mako.enable = true;
@@ -79,7 +79,7 @@ in
       vscode.enable = false;
       waybar = {
         enable = true;
-        enableCenterBackColors = true;
+        enableCenterBackColors = false;
         enableLeftBackColors = true;
         enableRightBackColors = true;
       };
