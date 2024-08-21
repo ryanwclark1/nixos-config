@@ -1,6 +1,7 @@
 # Similar to TMUX
 # https://zellij.dev/documentation
 {
+  config,
   lib,
   pkgs,
   ...
@@ -22,6 +23,13 @@
       copy_on_select = true;
       scrollback_editor = "$EDITOR";
     };
+    enableBashIntegration = lib.mkIf config.programs.bash.enable true;
+    enableFishIntegration = lib.mkIf config.programs.fish.enable true;
+    enableZshIntegration = lib.mkIf config.programs.zsh.enable true;
+  };
+
+  home.shellAliases = {
+    zj = "zellij";
   };
 
 }
