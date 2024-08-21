@@ -50,31 +50,31 @@
     ];
 
     externalLibs = [
+      # qemu
+      clang
       glib
       grub2
-      clang
       openssl
-      # qemu
-      zlib.out
-      xorriso
       pkg-config
+      xorriso
+      zlib.out
     ];
 
     utils = [
+      # rust-analyzer
+      bunyan-rs
+      lapce
       lldb
       mdbook
-      # rust-analyzer
-      taplo
-      rusty-man
       rust-audit-info
-      lapce
       rust-code-analysis
-      trunk # for wasm
-      sea-orm-cli
-      sqlx-cli
-      bunyan-rs
       rust-script
+      rusty-man
+      sea-orm-cli
       sqlite
+      sqlx-cli
+      taplo
+      trunk # for wasm
       valgrind
     ];
   in
