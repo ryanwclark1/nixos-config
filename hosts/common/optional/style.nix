@@ -63,8 +63,15 @@ in
         enable = true;
         useImage = false;
       };
-      nixos-icons.enable = true;
       gtk.enable = true;
+      nixos-icons.enable = true;
+      nixvim = {
+        enable = true;
+        transparentBackground = {
+          main = true;
+          signColumn = true;
+        };
+      };
       plymouth.enable = true;
     };
   };
