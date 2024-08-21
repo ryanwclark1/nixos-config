@@ -7,6 +7,7 @@
   programs = {
     k9s = {
       enable = true;
+      package = pkgs.k9s;
       aliases = {
         aliases = {
           # Use pp as an alias for Pod
@@ -23,7 +24,6 @@
           };
         };
       };
-      package = pkgs.k9s;
       plugin = {
         # Defines a plugin to provide a `ctrl-l` shortcut to
         # tail the logs while in pod view.
