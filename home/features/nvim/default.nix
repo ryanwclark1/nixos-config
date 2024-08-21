@@ -53,8 +53,12 @@
             templ = {
               enable = true;
             };
-            tsserver.enable = true;
-            lua-ls.enable = true;
+            tsserver = {
+              enable = true;
+            };
+            lua-ls = {
+              enable = true;
+            };
             # rust-analyzer.enable = true;
           };
         };
