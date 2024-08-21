@@ -53,6 +53,10 @@
       url = "github:nix-community/lanzaboote";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -60,11 +64,12 @@
     nixpkgs,
     home-manager,
     nixos-hardware,
-    stylix,
-    systems,
     disko,
     lanzaboote,
     nixos-cosmic,
+    nixvim,
+    stylix,
+    systems,
     ...
   } @ inputs:
   let
@@ -97,6 +102,7 @@
           inherit inputs outputs;
         };
         modules = [
+          # nixvim.nixosModules.nixvim
           stylix.nixosModules.stylix
           disko.nixosModules.disko
           nixos-cosmic.nixosModules.default
@@ -108,6 +114,7 @@
           inherit inputs outputs;
         };
         modules = [
+          # nixvim.nixosModules.nixvim
           stylix.nixosModules.stylix
           nixos-cosmic.nixosModules.default
           ./hosts/woody
@@ -118,6 +125,7 @@
     homeConfigurations = {
       "administrator@frametop" = lib.homeManagerConfiguration {
         modules = [
+          nixvim.homeManagerModules.nixvim
           stylix.homeManagerModules.stylix
           ./home/frametop.nix
         ];
@@ -128,6 +136,7 @@
       };
       "administrator@woody" = lib.homeManagerConfiguration {
         modules = [
+          nixvim.homeManagerModules.nixvim
           stylix.homeManagerModules.stylix
           ./home/woody.nix
         ];
