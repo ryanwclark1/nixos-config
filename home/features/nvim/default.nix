@@ -5,7 +5,6 @@
   ...
 }:
 
-
 {
   imports = [
     ./lsp.nix
@@ -329,10 +328,10 @@
     };
   };
 
-  home.sessionVariables.EDITOR = "nvim";
-  home.shellAliases = {
-    v = "nvim";
-    vi = "nvim";
-    vim = "nvim";
-  };
+  # home.sessionVariables.EDITOR = "nvim";
+  # home.shellAliases = {
+  #   v = "nvim";
+  #   vi = "nvim";
+  #   vim = "nvim";
+  # };
 }
