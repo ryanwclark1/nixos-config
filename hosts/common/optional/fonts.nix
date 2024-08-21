@@ -16,18 +16,19 @@
       noto-fonts
       noto-fonts-cjk
       noto-fonts-emoji
+      noto-fonts-extra
       liberation_ttf
       fira-code
       fira-code-symbols
       mplus-outline-fonts.githubRelease
-      dina-font
-      hack-font
-      proggyfonts
+      # dina-font
+      # hack-font
+      # proggyfonts
       powerline-fonts
       powerline-symbols
-      jetbrains-mono
-      fira-code
-      font-awesome
+      # jetbrains-mono
+      # fira-code
+      # font-awesome
     ];
   };
 }

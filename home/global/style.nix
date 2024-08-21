@@ -13,9 +13,33 @@ in
   stylix = {
     enable = true;
     autoEnable = false;
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/${currentScheme}.yaml";
     image = ../../hosts/common/wallpaper/FormulaOne_Vettel_2.jpg;
     imageScalingMode = "fill";
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/${currentScheme}.yaml";
+    fonts = {
+      serif = {
+        package = pkgs.dejavu_fonts;
+        name = "DejaVu Serif";
+      };
+      sansSerif = {
+        package = pkgs.dejavu_fonts;
+        name = "DejaVu Sans";
+      };
+      monospace = {
+        package = pkgs.nerdfonts.override {fonts = ["JetBrainsMono"];};
+        name = "JetBrainsMono Nerd Font";
+      };
+      emoji = {
+        package = pkgs.noto-fonts-emoji;
+        name = "Noto Color Emoji";
+      };
+      sizes = {
+        applications = 12;
+        desktop = 10;
+        popups = 10;
+        terminal = 12;
+      };
+    };
     opacity = {
       applications = 0.9;
       desktop = 0.9;
@@ -32,6 +56,7 @@ in
       };
       fish.enable = true;
       fzf.enable = true;
+      gedit.enable = true;
       gitui.enable = true;
       gnome.enable = true;
       gtk = {
@@ -44,9 +69,13 @@ in
       hyprpaper.enable = true;
       k9s.enable = true;
       kde.enable = true;
-      kitty.enable = true;
+      kitty = {
+        enable = true;
+        variant256Colors = true;
+      };
       lazygit.enable = true;
       mako.enable = true;
+      qutebrowser.enable = true;
       vscode.enable = false;
       waybar = {
         enable = true;

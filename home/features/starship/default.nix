@@ -1,14 +1,15 @@
 {
   config,
+  lib,
+  pkgs,
   ...
 }:
-# let
-#   inherit (config.colorscheme) palette;
-# in
+let
+  currentScheme = "nord";
+in
 # TODO: Add pyenv, nvm, rbenv, rustup, etc. support
 
 {
-  home.sessionVariables.STARSHIP_CACHE = "${config.xdg.cacheHome}/starship";
   programs.starship = {
     enable = true;
     # Configuration written to ~/.config/starship.toml
@@ -17,7 +18,8 @@
       add_newline = true;
       scan_timeout = 30;
       command_timeout = 500;
-      palette = "gruvbox_dark";
+      follow_symlinks = true;
+      palette = currentScheme;
 
       palettes.gruvbox_dark = {
         color_fg0 = "#fbf1c7";
@@ -63,6 +65,22 @@
         color_red = "#bf616a";
         color_docker = "#88c0d0";
       };
+
+      palettes.nord = {
+        color_fg0 = "#d8dee9";
+        color_bg1 = "#2e3440";
+        color_bg3 = "#3b4252";
+        color_a1 = "#bf616a";
+        color_a2 = "#d08770";
+        color_a3 = "#ebcb8b";
+        color_a4 = "#a3be8c";
+        color_green = "#a3be8c";
+        color_yellow = "#ebcb8b";
+        color_purple = "#b48ead";
+        color_red = "#bf616a";
+        color_docker = "#88c0d0";
+      };
+
 
       palettes.nord_light = {
         color_fg0 = "#2e3440";
@@ -165,6 +183,8 @@
       };
 
 
+
+
       # Cloud
       gcloud = {
         format = "on [$symbol$active(/$project)(\\($region\\))]($style)";
@@ -184,7 +204,6 @@
       julia.symbol = " ";
       memory_usage.symbol = "󰍛 ";
       nim.symbol = "󰆥 ";
-      # nodejs.symbol = " ";
       package.symbol = "󰏗 ";
       perl.symbol = " ";
       ruby.symbol = " ";
