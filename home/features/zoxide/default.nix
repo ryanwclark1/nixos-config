@@ -8,9 +8,12 @@
   programs.zoxide = {
     enable = true;
     package = pkgs.zoxide;
+    options = [
+      "--cmd cd"
+    ];
   };
 
-  home.shellAliases = {
-    cd = "z";
-  };
+  # home.shellAliases = {
+  #   cd = "z";
+  # };
 }
