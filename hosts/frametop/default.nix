@@ -22,8 +22,8 @@
     ../common/optional/printing.nix
     ../common/optional/qemu.nix
     ../common/optional/steam.nix
+    ../common/optional/style.nix
     ../common/optional/tailscale.nix
-    # ../common/optional/theme.nix
     ../common/optional/wireshark.nix
     # ../common/optional/semaphore.nix
     ../common/optional/zsh.nix
@@ -48,7 +48,7 @@
       };
       efi.canTouchEfiVariables = true;
     };
-    kernelPackages = pkgs.linuxKernel.packages.linux_6_9;
+    # kernelPackages = pkgs.linuxKernel.packages.linux_6_9;
     binfmt.emulatedSystems = [ "aarch64-linux" "i686-linux" ];
   };
 

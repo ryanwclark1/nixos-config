@@ -53,18 +53,7 @@
     #   enable = true;
     #   pkiBundle = "/etc/secureboot";
     # };
-    kernelPackages = pkgs.linuxKernel.packages.linux_6_9;
-
-    # kernelPackages = pkgs.linuxPackagesFor (pkgs.linux_6_7.override {
-    #   argsOverride = rec {
-    #     src = pkgs.fetchurl {
-    #           url = "mirror://kernel/linux/kernel/v6.x/linux-${version}.tar.xz";
-    #           sha256 = "sha256-Rp/0a5hoXfE7VsmEF8ZLp6MPikW680qpnweTXhv2XBg=";
-    #     };
-    #     version = "6.7.8";
-    #     modDirVersion = "6.7.8";
-    #     };
-    # });
+    # kernelPackages = pkgs.linuxKernel.packages.linux_6_9;
   };
 
   hardware = {
