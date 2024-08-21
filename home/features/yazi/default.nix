@@ -21,9 +21,7 @@
     # https://yazi-rs.github.io/docs/configuration/keymap
     # https://yazi-rs.github.io/docs/quick-start/#keybindings
     # https://github.com/sxyazi/yazi/blob/latest/yazi-config/preset/keymap.toml
-    settings = let
-      inherit (config.keyboard.vi) e h j k l n o y H J K L N O Y;
-    in {
+    settings = {
       log = {
         enabled = false;
       };
@@ -68,12 +66,12 @@
 
           # Character-wise movement
           {
-            on = [j];
+            on = ["h"];
             run = "move -1";
             desc = "Move back a character";
           }
           {
-            on = [l];
+            on = ["l"];
             run = "move 1";
             desc = "Move forward a character";
           }
@@ -110,7 +108,7 @@
             desc = "Move forward to the start of the next word";
           }
           {
-            on = [e];
+            on = ["e"];
             run = "forward --end-of-word";
             desc = "Move forward to the end of the current or next word";
           }
@@ -132,7 +130,7 @@
             desc = "Move to the BOL";
           }
           {
-            on = ["<C-${e}>"];
+            on = ["<C-e>"];
             run = "move 999";
             desc = "Move to the EOL";
           }
@@ -149,7 +147,7 @@
             desc = "Delete the character under the cursor";
           }
           {
-            on = ["<C-${h}>"];
+            on = ["<C-h>"];
             run = "backspace";
             desc = "Delete the character before the cursor";
           }
@@ -208,7 +206,7 @@
             desc = "Cut the current character";
           }
           {
-            on = [y];
+            on = ["y"];
             run = "yank";
             desc = "Copy the selected characters";
           }
@@ -245,7 +243,11 @@
           2 # current
           5 # preview
         ];
-        prepend_keymap = [
+        prepend_keymap =
+        let
+          wl-copy = "${pkgs.wl-clipboard}/bin/wl-copy";
+        in
+        [
           {
             on = ["q"];
             run = "close";
@@ -266,7 +268,7 @@
           # }
           # https://yazi-rs.github.io/docs/tips/#smart-enter
           {
-            on = [l];
+            on = ["l"];
             run = "plugin --sync smart-enter";
             desc = "Enter the child directory, or open the file";
           }
@@ -277,10 +279,8 @@
           }
           # https://yazi-rs.github.io/docs/tips/#selected-files-to-clipboard
           {
-            on = [y];
-            run = let
-              inherit (config.commands) wl-copy;
-            in [
+            on = ["y"];
+            run = [
               "yank"
               ''
                 shell --confirm 'for path in "$@"; do echo "file://$path"; done | ${wl-copy} -t text/uri-list'
@@ -289,7 +289,7 @@
           }
           # https://yazi-rs.github.io/docs/tips/#navigation-wraparound
           {
-            on = [k];
+            on = ["h"];
             run = "plugin --sync arrow --args=-1";
           }
           {
@@ -297,7 +297,7 @@
             run = "plugin --sync arrow --args=-1";
           }
           {
-            on = [j];
+            on = ["l"];
             run = "plugin --sync arrow --args=1";
           }
           {
@@ -305,11 +305,11 @@
             run = "plugin --sync arrow --args=1";
           }
           {
-            on = [K];
+            on = ["H"];
             run = "plugin --sync arrow --args=-5";
           }
           {
-            on = [J];
+            on = ["L"];
             run = "plugin --sync arrow --args=5";
           }
           # skip confirm on delete
@@ -319,7 +319,7 @@
             desc = "Move the files to the trash";
           }
           {
-            on = [h];
+            on = ["h"];
             run = "leave";
             desc = "Go back to the parent directory";
           }
@@ -330,43 +330,42 @@
           }
           # { on = [ l ]; run = "enter"; desc = "Enter the child directory"; }
           {
-            on = [H];
+            on = ["H"];
             run = "back";
             desc = "Go back to the previous directory";
           }
           {
-            on = [L];
+            on = ["L"];
             run = "forward";
             desc = "Go forward to the next directory";
           }
+          # {
+          #   on = ["<A-${k}>"];
+          #   run = "seek -5";
+          #   desc = "Seek up 5 units in the preview";
+          # }
+          # {
+          #   on = ["<A-${j}>"];
+          #   run = "seek 5";
+          #   desc = "Seek down 5 units in the preview";
+          # }
           {
-            on = ["<A-${k}>"];
-            run = "seek -5";
-            desc = "Seek up 5 units in the preview";
-          }
-          {
-            on = ["<A-${j}>"];
-            run = "seek 5";
-            desc = "Seek down 5 units in the preview";
-          }
-
-          {
-            on = [o];
+            on = ["o"];
             run = "open";
             desc = "Open the selected files";
           }
           {
-            on = [O];
+            on = ["O"];
             run = "open --interactive";
             desc = "Open the selected files interactively";
           }
           {
-            on = [y];
+            on = ["y"];
             run = "yank";
             desc = "Copy the selected files";
           }
           {
-            on = [Y];
+            on = ["Y"];
             run = "unyank";
             desc = "Cancel the yank status of files";
           }
@@ -401,12 +400,12 @@
 
           # Find
           {
-            on = [n];
+            on = ["n"];
             run = "find_arrow";
             desc = "Go to next found file";
           }
           {
-            on = [N];
+            on = ["N"];
             run = "find_arrow --previous";
             desc = "Go to previous found file";
           }
@@ -416,22 +415,30 @@
         image_filter = "lanczos3";
         image_quality = 90;
       };
-      opener = {
+      opener =
+      let
+          # TODO: better ref to nixvim?
+          nvim = lib.getExe pkgs.neovim-unwrapped;
+          alacrity = lib.getExe pkgs.alacritty;
+          xdg-utils = "${pkgs.xdg-utils}/bin/xdg-open";
+      in
+      {
         edit-text = [
           {
-            run = ''${config.programs.neovim.package}/bin/nvim "$0"'';
+
+            run = ''${nvim} "$0"'';
             block = true;
           }
         ];
         terminal = [
           {
-            run = ''${config.programs.alacrity.package}/bin/alacrity -e "$0"'';
+            run = ''${alacrity} -e "$0"'';
             orphan = true;
           }
         ];
         open = [
           {
-            run = ''${pkgs.xdg-utils}/bin/xdg-open "$0"'';
+            run = ''${xdg-utils} "$0"'';
             orphan = true;
           }
         ];
@@ -461,12 +468,12 @@
       tasks = {
         prepend_keymap = [
           {
-            on = [k];
+            on = ["k"];
             run = "arrow -1";
             desc = "Move cursor up";
           }
           {
-            on = [j];
+            on = ["j"];
             run = "arrow 1";
             desc = "Move cursor down";
           }
@@ -475,22 +482,22 @@
       select = {
         prepend_keymap = [
           {
-            on = [k];
+            on = ["k"];
             run = "arrow -1";
             desc = "Move cursor up";
           }
           {
-            on = [j];
+            on = ["j"];
             run = "arrow 1";
             desc = "Move cursor down";
           }
           {
-            on = [K];
+            on = ["K"];
             run = "arrow -5";
             desc = "Move cursor up 5 lines";
           }
           {
-            on = [J];
+            on = ["J"];
             run = "arrow 5";
             desc = "Move cursor down 5 lines";
           }
@@ -499,12 +506,12 @@
       completion = {
         prepend_keymap = [
           {
-            on = ["<A-${k}>"];
+            on = ["<A-p>"];
             run = "arrow -1";
             desc = "Move cursor up";
           }
           {
-            on = ["<A-${j}>"];
+            on = ["<A-n>"];
             run = "arrow 1";
             desc = "Move cursor down";
           }
@@ -514,7 +521,7 @@
             desc = "Move cursor up";
           }
           {
-            on = ["<C-k>"];
+            on = ["<C-n>"];
             run = "arrow 1";
             desc = "Move cursor down";
           }
@@ -523,41 +530,27 @@
       help = {
         prepend_keymap = [
           {
-            on = [k];
+            on = ["k"];
             run = "arrow -1";
             desc = "Move cursor up";
           }
           {
-            on = [j];
+            on = ["j"];
             run = "arrow 1";
             desc = "Move cursor down";
           }
           {
-            on = [K];
+            on = ["K"];
             run = "arrow -5";
             desc = "Move cursor up 5 lines";
           }
           {
-            on = [J];
+            on = ["J"];
             run = "arrow 5";
             desc = "Move cursor down 5 lines";
           }
         ];
       };
     };
-    # https://yazi-rs.github.io/docs/configuration/theme
-    # https://github.com/sxyazi/yazi/blob/latest/yazi-config/preset/yazi.toml
-    # theme = {
-    #   filetype = {
-    #     rules = [
-    #       { fg = "#7AD9E5"; mime = "image/*"; }
-    #       { fg = "#F3D398"; mime = "video/*"; }
-    #       { fg = "#F3D398"; mime = "audio/*"; }
-    #       { fg = "#CD9EFC"; mime = "application/x-bzip"; }
-    #     ];
-    #   };
-    # };
-    # https://yazi-rs.github.io/docs/configuration/yazi
-    # https://github.com/sxyazi/yazi/blob/latest/yazi-config/preset/yazi.toml
   };
 }
