@@ -36,21 +36,6 @@ in
         color_docker = "#83a598";
       };
 
-      # palettes.system = {
-      #   color_fg0 = "#${palette.base00}";
-      #   color_bg1 = "#${palette.base05}";
-      #   color_bg3 = "#${palette.base07}";
-      #   color_a1 = "#${palette.base08}";
-      #   color_a2 = "#${palette.base09}";
-      #   color_a3 = "#${palette.base0A}";
-      #   color_a4 = "#${palette.base0B}";
-      #   color_docker = "#${palette.base0C}";
-      #   color_green = "#${palette.base0B}";
-      #   color_yellow = "#${palette.base0A}";
-      #   color_purple = "#${palette.base0E}";
-      #   color_red = "#${palette.base08}";
-      # };
-
       palettes.nord_dark = {
         color_fg0 = "#d8dee9";
         color_bg1 = "#2e3440";
