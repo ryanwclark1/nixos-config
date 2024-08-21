@@ -1,5 +1,6 @@
 {
   inputs,
+  pkgs,
   ...
 }:
 
@@ -14,6 +15,10 @@
       enable = true;
       defaultEditor = true;
       vimdiffAlias = true;
+      enableMan = true;
+      viAlias = true;
+      vimAlias = true;
+      package = pkgs.neovim-unwrapped;
       clipboard.providers.wl-copy.enable = true;
       plugins = {
         bufferline = {
