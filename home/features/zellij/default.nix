@@ -8,19 +8,25 @@
 }:
 
 {
-  programs.zellij = {
+  programs.zellij =
+  let
+    fish = lib.getExe pkgs.fish;
+    wl-copy = "${pkgs.wl-clipboard}/bin/wl-copy";
+  in
+  {
     enable = true;
     package = pkgs.zellij;
     settings = {
-      copy_command = "wl-copy";
       on_force_close = "quit";
       simplified_ui = false;
-      default_shell = lib.mkDefault "${pkgs.fish}/bin/fish";
+      default_shell = fish;
       pane_frames = true;
       default_layout = "default";
       mouse_mode = false;
+      copy_command = wl-copy;
       copy_clipboard = "primary";
       copy_on_select = true;
+      scroll_buffer_size = 25000;
       scrollback_editor = "$EDITOR";
     };
     enableBashIntegration = lib.mkIf config.programs.bash.enable true;
