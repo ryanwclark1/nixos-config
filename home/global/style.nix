@@ -76,6 +76,13 @@ in
       };
       lazygit.enable = true;
       mako.enable = true;
+      nixvim = {
+        enable = true;
+        transparentBackground = {
+          main = true;
+          signColumn = true;
+        };
+      };
       qutebrowser.enable = true;
       vscode.enable = false;
       waybar = {
