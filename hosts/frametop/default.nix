@@ -1,5 +1,6 @@
 {
   inputs,
+  lib,
   pkgs,
   ...
 }:
@@ -64,6 +65,29 @@
       };
     };
   };
+
+
+  # battery
+  services.upower.enable = true;
+  services.auto-cpufreq = {
+    enable = lib.mkDefault false;
+    settings = {
+      battery = {
+        governor = "powersave";
+        turbo = "auto";
+      };
+      charger = {
+        governor = "performance";
+        turbo = "auto";
+      };
+    };
+  };
+  powerManagement = {
+    enable = true;
+    cpuFreqGovernor = "performance";
+  };
+
+  powerManagement.powertop.enable = true;
 
   environment.systemPackages = with pkgs; [
     fw-ectool  # EC-Tool adjusted for usage with framework embedded controller.
