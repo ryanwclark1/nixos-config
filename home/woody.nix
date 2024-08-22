@@ -12,7 +12,7 @@
     ./features/desktop/common
 
     ./features/alacritty
-    ./feature/atuin
+    ./features/atuin
     ./features/cli
     ./features/compression
     ./features/development
