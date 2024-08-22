@@ -14,7 +14,7 @@ in
     enable = true;
     # Configuration written to ~/.config/starship.toml
     settings = {
-      format = "[](color_a1)\$os\$username\$hostname\$localip\[](bg:color_a2 fg:color_a1)\$directory\[](fg:color_a2 bg:color_a3)\$git_branch\$git_status\[](fg:color_a3 bg:color_a4)\$bun\$c\$cmake\$dart\$golang\$haskell\$java\$kotlin\$kubernetes\$lua\$nodejs\$php\$python\$rust\$swift\$zig[](fg:color_a4 bg:color_bg3)\$docker_context\[](fg:color_bg3)\$character";
+      format = "[](color_a1)\$os\$username\$hostname\$localip\${custom.yazi}\[](bg:color_a2 fg:color_a1)\$directory\[](fg:color_a2 bg:color_a3)\$git_branch\$git_status\[](fg:color_a3 bg:color_a4)\$bun\$c\$cmake\$dart\$golang\$haskell\$java\$kotlin\$kubernetes\$lua\$nodejs\$php\$python\$rust\$swift\$zig[](fg:color_a4 bg:color_bg3)\$docker_context\[](fg:color_bg3)\$character";
       add_newline = true;
       scan_timeout = 30;
       command_timeout = 500;
@@ -326,6 +326,12 @@ in
         symbol = "";
         style = "bg:color_bg3";
         format = "[[ $symbol( $context) ](fg:color_docker bg:color_bg3)]($style)";
+      };
+
+      custom.yazi = {
+        description = "Indicate when the shell was launched by `yazi`";
+        symbol = " ";
+        when = '' test -n "$YAZI_LEVEL" '';
       };
 
       line_break.disabled = true;
