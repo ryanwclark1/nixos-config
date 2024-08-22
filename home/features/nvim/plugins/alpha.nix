@@ -34,6 +34,10 @@
           val = 2;
         }
         {
+          opts = {
+            hl = "Type";
+            position = "center";
+          };
           type = "group";
           val = [
             {
@@ -44,7 +48,7 @@
                 shortcut = "n";
               };
               type = "button";
-              val = "󰈔 New file";
+              val = " 󰈔 New file";
             }
             {
               on_press = {
@@ -54,7 +58,7 @@
                 shortcut = "e";
               };
               type = "button";
-              val = " Explore";
+              val = "  Explore";
             }
             {
               on_press = {
@@ -64,7 +68,7 @@
                 shortcut = "g";
               };
               type = "button";
-              val = " Git summary";
+              val = "  Git summary";
             }
             {
               on_press = {
@@ -74,7 +78,7 @@
                 shortcut = "s";
               };
               type = "button";
-              val = " Scratchpad";
+              val = "  Scratchpad";
             }
             {
               on_press = {
@@ -84,17 +88,7 @@
                 shortcut = "c";
               };
               type = "button";
-              val = "  Nix config flake";
-            }
-            {
-              on_press = {
-                __raw = "function() vim.cmd[[qa]] end";
-              };
-              opts = {
-                shortcut = "q";
-              };
-              type = "button";
-              val = "󰅙  Quit nvim";
+              val = "   Nix config flake";
             }
             {
               on_press = {
@@ -104,8 +98,19 @@
                 shortcut = "c";
               };
               type = "button";
-              val = " Check health";
+              val = "   Check health";
             }
+            {
+              on_press = {
+                __raw = "function() vim.cmd[[qa]] end";
+              };
+              opts = {
+                shortcut = "q";
+              };
+              type = "button";
+              val = " 󰅙  Quit nvim";
+            }
+
           ];
         }
       ];
