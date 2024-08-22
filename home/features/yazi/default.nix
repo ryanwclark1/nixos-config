@@ -21,6 +21,7 @@
       lazygit = ./plugins/lazygit.yazi;
       fzfbm = ./plugins/fzfbm.yazi;
       starship = ./plugins/starship.yazi;
+      full-border = ./plugins/full-border.yazi;
     };
     enableBashIntegration = lib.mkIf config.programs.bash.enable true;
     enableFishIntegration = lib.mkIf config.programs.fish.enable true;

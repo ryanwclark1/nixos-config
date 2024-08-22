@@ -34,4 +34,8 @@ require("fzfbm"):setup {
         (os.getenv("HOME") .. "/.config/yazi/bookmark"),
 }
 
+require("full-border"):setup {
+	-- Available values: ui.Border.PLAIN, ui.Border.ROUNDED
+	type = ui.Border.ROUNDED,
+}
 require("starship"):setup()
