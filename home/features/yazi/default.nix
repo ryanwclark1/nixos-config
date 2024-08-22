@@ -3,15 +3,21 @@
   pkgs,
   config,
   ...
-}: {
-  home.packages = lib.attrValues {
-    inherit
-      (pkgs)
-      exiftool
-      ueberzugpp
-      ;
+}:
 
-  };
+{
+  # home.packages = lib.attrValues {
+  #   inherit
+  #     (pkgs)
+  #     exiftool
+  #     ueberzugpp
+  #     ;
+  # };
+
+  home.packages = with pkgs; [
+    exiftool
+    ueberzugpp
+  ];
 
   programs.yazi = {
     enable = true;
@@ -23,9 +29,6 @@
       starship = ./plugins/starship.yazi;
       full-border = ./plugins/full-border.yazi;
     };
-    enableBashIntegration = lib.mkIf config.programs.bash.enable true;
-    enableFishIntegration = lib.mkIf config.programs.fish.enable true;
-    enableZshIntegration = lib.mkIf config.programs.zsh.enable true;
     # enableNushellIntegration = true;
     # https://yazi-rs.github.io/docs/configuration/keymap
     # https://yazi-rs.github.io/docs/quick-start/#keybindings
@@ -35,223 +38,228 @@
         enabled = false;
       };
       input = {
-        prepend_keymap = [
-          # https://yazi-rs.github.io/docs/tips/#close-input-by-esc
-          {
-            on = ["<Esc>"];
-            run = "close";
-            desc = "Cancel input";
-          }
-          {
-            on = ["i"];
-            run = "insert";
-            desc = "Enter insert mode";
-          }
-          {
-            on = ["a"];
-            run = "insert --prepend";
-            desc = "Enter prepend mode";
-          }
-          {
-            on = ["I"];
-            run = ["move -999" "insert"];
-            desc = "Move to the BOL; and enter insert mode";
-          }
-          {
-            on = ["A"];
-            run = ["move 999" "insert --prepend"];
-            desc = "Move to the EOL; and enter prepend mode";
-          }
-          {
-            on = ["v"];
-            run = "visual";
-            desc = "Enter visual mode";
-          }
-          {
-            on = ["V"];
-            run = ["move -999" "visual" "move 999"];
-            desc = "Enter visual mode and select all";
-          }
+        # prepend_keymap = [
+        #   # https://yazi-rs.github.io/docs/tips/#close-input-by-esc
+        #   {
+        #     on = ["<Esc>"];
+        #     run = "close";
+        #     desc = "Cancel input";
+        #   }
+        #   {
+        #     on = ["i"];
+        #     run = "insert";
+        #     desc = "Enter insert mode";
+        #   }
+        #   {
+        #     on = ["a"];
+        #     run = "insert --prepend";
+        #     desc = "Enter prepend mode";
+        #   }
+        #   {
+        #     on = ["I"];
+        #     run = ["move -999" "insert"];
+        #     desc = "Move to the BOL; and enter insert mode";
+        #   }
+        #   {
+        #     on = ["A"];
+        #     run = ["move 999" "insert --prepend"];
+        #     desc = "Move to the EOL; and enter prepend mode";
+        #   }
+        #   {
+        #     on = ["v"];
+        #     run = "visual";
+        #     desc = "Enter visual mode";
+        #   }
+        #   {
+        #     on = ["V"];
+        #     run = ["move -999" "visual" "move 999"];
+        #     desc = "Enter visual mode and select all";
+        #   }
 
-          # Character-wise movement
-          {
-            on = ["h"];
-            run = "move -1";
-            desc = "Move back a character";
-          }
-          {
-            on = ["l"];
-            run = "move 1";
-            desc = "Move forward a character";
-          }
-          {
-            on = ["<Left>"];
-            run = "move -1";
-            desc = "Move back a character";
-          }
-          {
-            on = ["<Right>"];
-            run = "move 1";
-            desc = "Move forward a character";
-          }
-          {
-            on = ["<C-b>"];
-            run = "move -1";
-            desc = "Move back a character";
-          }
-          {
-            on = ["<C-f>"];
-            run = "move 1";
-            desc = "Move forward a character";
-          }
+        #   # Character-wise movement
+        #   {
+        #     on = ["h"];
+        #     run = "move -1";
+        #     desc = "Move back a character";
+        #   }
+        #   {
+        #     on = ["l"];
+        #     run = "move 1";
+        #     desc = "Move forward a character";
+        #   }
+        #   {
+        #     on = ["<Left>"];
+        #     run = "move -1";
+        #     desc = "Move back a character";
+        #   }
+        #   {
+        #     on = ["<Right>"];
+        #     run = "move 1";
+        #     desc = "Move forward a character";
+        #   }
+        #   {
+        #     on = ["<C-b>"];
+        #     run = "move -1";
+        #     desc = "Move back a character";
+        #   }
+        #   {
+        #     on = ["<C-f>"];
+        #     run = "move 1";
+        #     desc = "Move forward a character";
+        #   }
 
-          # Word-wise movement
-          {
-            on = ["b"];
-            run = "backward";
-            desc = "Move back to the start of the current or previous word";
-          }
-          {
-            on = ["w"];
-            run = "forward";
-            desc = "Move forward to the start of the next word";
-          }
-          {
-            on = ["e"];
-            run = "forward --end-of-word";
-            desc = "Move forward to the end of the current or next word";
-          }
-          {
-            on = ["<A-b>"];
-            run = "backward";
-            desc = "Move back to the start of the current or previous word";
-          }
-          {
-            on = ["<A-f>"];
-            run = "forward --end-of-word";
-            desc = "Move forward to the end of the current or next word";
-          }
+        #   # Word-wise movement
+        #   {
+        #     on = ["b"];
+        #     run = "backward";
+        #     desc = "Move back to the start of the current or previous word";
+        #   }
+        #   {
+        #     on = ["w"];
+        #     run = "forward";
+        #     desc = "Move forward to the start of the next word";
+        #   }
+        #   {
+        #     on = ["e"];
+        #     run = "forward --end-of-word";
+        #     desc = "Move forward to the end of the current or next word";
+        #   }
+        #   {
+        #     on = ["<A-b>"];
+        #     run = "backward";
+        #     desc = "Move back to the start of the current or previous word";
+        #   }
+        #   {
+        #     on = ["<A-f>"];
+        #     run = "forward --end-of-word";
+        #     desc = "Move forward to the end of the current or next word";
+        #   }
 
-          # Line-wise movement
-          {
-            on = ["<C-a>"];
-            run = "move -999";
-            desc = "Move to the BOL";
-          }
-          {
-            on = ["<C-e>"];
-            run = "move 999";
-            desc = "Move to the EOL";
-          }
+        #   # Line-wise movement
+        #   {
+        #     on = ["<C-a>"];
+        #     run = "move -999";
+        #     desc = "Move to the BOL";
+        #   }
+        #   {
+        #     on = ["<C-e>"];
+        #     run = "move 999";
+        #     desc = "Move to the EOL";
+        #   }
 
-          # Delete
-          {
-            on = ["<Backspace>"];
-            run = "backspace";
-            desc = "Delete the character before the cursor";
-          }
-          {
-            on = ["<Delete>"];
-            run = "backspace --under";
-            desc = "Delete the character under the cursor";
-          }
-          {
-            on = ["<C-h>"];
-            run = "backspace";
-            desc = "Delete the character before the cursor";
-          }
-          {
-            on = ["<C-d>"];
-            run = "backspace --under";
-            desc = "Delete the character under the cursor";
-          }
+        #   # Delete
+        #   {
+        #     on = ["<Backspace>"];
+        #     run = "backspace";
+        #     desc = "Delete the character before the cursor";
+        #   }
+        #   {
+        #     on = ["<Delete>"];
+        #     run = "backspace --under";
+        #     desc = "Delete the character under the cursor";
+        #   }
+        #   {
+        #     on = ["<C-h>"];
+        #     run = "backspace";
+        #     desc = "Delete the character before the cursor";
+        #   }
+        #   {
+        #     on = ["<C-d>"];
+        #     run = "backspace --under";
+        #     desc = "Delete the character under the cursor";
+        #   }
 
-          # Kill
-          {
-            on = ["<C-u>"];
-            run = "kill bol";
-            desc = "Kill backwards to the BOL";
-          }
-          {
-            on = ["<C-k>"];
-            run = "kill eol";
-            desc = "Kill forwards to the EOL";
-          }
-          {
-            on = ["<C-w>"];
-            run = "kill backward";
-            desc = "Kill backwards to the start of the current word";
-          }
-          {
-            on = ["<A-d>"];
-            run = "kill forward";
-            desc = "Kill forwards to the end of the current word";
-          }
+        #   # Kill
+        #   {
+        #     on = ["<C-u>"];
+        #     run = "kill bol";
+        #     desc = "Kill backwards to the BOL";
+        #   }
+        #   {
+        #     on = ["<C-k>"];
+        #     run = "kill eol";
+        #     desc = "Kill forwards to the EOL";
+        #   }
+        #   {
+        #     on = ["<C-w>"];
+        #     run = "kill backward";
+        #     desc = "Kill backwards to the start of the current word";
+        #   }
+        #   {
+        #     on = ["<A-d>"];
+        #     run = "kill forward";
+        #     desc = "Kill forwards to the end of the current word";
+        #   }
 
-          # Cut/Yank/Paste
-          {
-            on = ["d"];
-            run = "delete --cut";
-            desc = "Cut the selected characters";
-          }
-          {
-            on = ["D"];
-            run = ["delete --cut" "move 999"];
-            desc = "Cut until the EOL";
-          }
-          {
-            on = ["c"];
-            run = "delete --cut --insert";
-            desc = "Cut the selected characters; and enter insert mode";
-          }
-          {
-            on = ["C"];
-            run = ["delete --cut --insert" "move 999"];
-            desc = "Cut until the EOL; and enter insert mode";
-          }
-          {
-            on = ["x"];
-            run = ["delete --cut" "move 1 --in-operating"];
-            desc = "Cut the current character";
-          }
-          {
-            on = ["y"];
-            run = "yank";
-            desc = "Copy the selected characters";
-          }
-          {
-            on = ["p"];
-            run = "paste";
-            desc = "Paste the copied characters after the cursor";
-          }
-          {
-            on = ["P"];
-            run = "paste --before";
-            desc = "Paste the copied characters before the cursor";
-          }
+        #   # Cut/Yank/Paste
+        #   {
+        #     on = ["d"];
+        #     run = "delete --cut";
+        #     desc = "Cut the selected characters";
+        #   }
+        #   {
+        #     on = ["D"];
+        #     run = ["delete --cut" "move 999"];
+        #     desc = "Cut until the EOL";
+        #   }
+        #   {
+        #     on = ["c"];
+        #     run = "delete --cut --insert";
+        #     desc = "Cut the selected characters; and enter insert mode";
+        #   }
+        #   {
+        #     on = ["C"];
+        #     run = ["delete --cut --insert" "move 999"];
+        #     desc = "Cut until the EOL; and enter insert mode";
+        #   }
+        #   {
+        #     on = ["x"];
+        #     run = ["delete --cut" "move 1 --in-operating"];
+        #     desc = "Cut the current character";
+        #   }
+        #   {
+        #     on = ["y"];
+        #     run = "yank";
+        #     desc = "Copy the selected characters";
+        #   }
+        #   {
+        #     on = ["p"];
+        #     run = "paste";
+        #     desc = "Paste the copied characters after the cursor";
+        #   }
+        #   {
+        #     on = ["P"];
+        #     run = "paste --before";
+        #     desc = "Paste the copied characters before the cursor";
+        #   }
 
-          # Undo/Redo
-          {
-            on = ["u"];
-            run = "undo";
-            desc = "Undo the last operation";
-          }
-          {
-            on = ["<C-r>"];
-            run = "redo";
-            desc = "Redo the last operation";
-          }
-        ];
+        #   # Undo/Redo
+        #   {
+        #     on = ["u"];
+        #     run = "undo";
+        #     desc = "Undo the last operation";
+        #   }
+        #   {
+        #     on = ["<C-r>"];
+        #     run = "redo";
+        #     desc = "Redo the last operation";
+        #   }
+        # ];
       };
       manager = {
-        sort_by = "natural";
-        show_hidden = true;
-        sort_dir_first = true;
+        #  3-element array
         ratio = [
           1 # parent
-          2 # current
-          5 # preview
+          4 # current
+          3 # preview
         ];
+        sort_by = "natural";
+        sort_sensitive = false;
+        sort_reverse = false;
+        sort_dir_first = true;
+        sort_translit = true;
+        show_hidden = true;
+        show_symlink = true;
         prepend_keymap =
         let
           wl-copy = "${pkgs.wl-clipboard}/bin/wl-copy";
@@ -477,22 +485,35 @@
         ];
       };
       preview = {
+        tab_size = 2;
+        max_width = 1000;
+        max_height = 1000;
         image_filter = "lanczos3";
         image_quality = 90;
+        sixel_fraction = 15;
+        # https://github.com/jstkdng/ueberzugpp/issues/122
+        ueberzug_scale = 1;
+        ueberzug_offset = [(0.5) (0.5) (-0.5) (-0.5)];
       };
       opener =
       let
           # TODO: better ref to nixvim?
           nvim = lib.getExe pkgs.neovim-unwrapped;
           alacrity = lib.getExe pkgs.alacritty;
+          mpv = lib.getExe pkgs.mpv;
           xdg-utils = "${pkgs.xdg-utils}/bin/xdg-open";
       in
       {
         edit-text = [
           {
-
-            run = ''${nvim} "$0"'';
+            run = ''${nvim} "$@"'';
             block = true;
+          }
+        ];
+        play = [
+          {
+            run = ''${mpv} "$@"'';
+            orphan = true;
           }
         ];
         terminal = [
@@ -503,7 +524,7 @@
         ];
         open = [
           {
-            run = ''${xdg-utils} "$0"'';
+            run = ''${xdg-utils} "$@"'';
             orphan = true;
           }
         ];
