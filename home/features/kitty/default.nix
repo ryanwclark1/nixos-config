@@ -36,10 +36,5 @@ in
       dynamic_background_opacity = true;
       allow_remote_control = true;
     };
-    shellIntegration = {
-      enableBashIntegration = mkIf config.programs.bash.enable true;
-      enableZshIntegration = mkIf config.programs.zsh.enable true;
-      enableFishIntegration = mkIf config.programs.fish.enable true;
-    };
   };
 }
