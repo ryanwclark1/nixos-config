@@ -5,7 +5,6 @@
   ...
 }:
 let
-  inherit (lib) mkIf;
   packageNames = map (p: p.pname or p.name or null) config.home.packages;
   hasPackage = name: lib.any (x: x == name) packageNames;
   hasRipgrep = hasPackage "ripgrep";
@@ -24,7 +23,7 @@ in
     };
     functions = {
       # Grep using ripgrep and pass to nvim
-      nvimrg = mkIf (hasNeomutt && hasRipgrep) "nvim -q (rg --vimgrep $argv | psub)";
+      nvimrg = lib.mkIf (hasNeomutt && hasRipgrep) "nvim -q (rg --vimgrep $argv | psub)";
       # Merge history upon doing up-or-search
       # This lets multiple fish instances share history
       up-or-search = /* fish */ ''
@@ -81,13 +80,13 @@ in
     '';
 
   };
-  programs.atuin.enableFishIntegration = mkIf config.programs.atuin.enable true;
-  programs.fzf.enableFishIntegration = mkIf config.programs.fzf.enable true;
-  programs.eza.enableFishIntegration = mkIf config.programs.eza.enable true;
-  programs.kitty.shellIntegration.enableFishIntegration = mkIf config.programs.kitty.enable true;
-  programs.nix-index.enableFishIntegration = mkIf config.programs.nix-index.enable true;
-  programs.starship.enableFishIntegration = mkIf config.programs.starship.enable true;
-  programs.yazi.enableFishIntegration = mkIf config.programs.yazi.enable true;
-  programs.zoxide.enableFishIntegration = mkIf config.programs.zoxide.enable true;
-  programs.zellij.enableFishIntegration = mkIf config.programs.zellij.enable true;
+  programs.atuin.enableFishIntegration = lib.mkIf config.programs.atuin.enable true;
+  programs.fzf.enableFishIntegration = lib.mkIf config.programs.fzf.enable true;
+  programs.eza.enableFishIntegration = lib.mkIf config.programs.eza.enable true;
+  programs.kitty.shellIntegration.enableFishIntegration = lib.mkIf config.programs.kitty.enable true;
+  programs.nix-index.enableFishIntegration = lib.mkIf config.programs.nix-index.enable true;
+  programs.starship.enableFishIntegration = lib.mkIf config.programs.starship.enable true;
+  programs.yazi.enableFishIntegration = lib.mkIf config.programs.yazi.enable true;
+  programs.zoxide.enableFishIntegration = lib.mkIf config.programs.zoxide.enable true;
+  programs.zellij.enableFishIntegration = lib.mkIf config.programs.zellij.enable true;
 }
