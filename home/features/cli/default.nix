@@ -6,7 +6,6 @@
 {
   imports = [
     ./aichat.nix
-    ./atuin.nix
     ./bat.nix
     ./btop.nix
     ./diffsitter.nix

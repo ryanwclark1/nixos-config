@@ -12,6 +12,7 @@
 
     ./features/alacritty
     ./features/ansible
+    ./feature/atuin
     ./features/cli
     ./features/compression
     ./features/development
