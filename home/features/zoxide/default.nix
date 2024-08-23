@@ -12,8 +12,4 @@
       "--cmd cd"
     ];
   };
-
-  # home.shellAliases = {
-  #   cd = "z";
-  # };
 }
