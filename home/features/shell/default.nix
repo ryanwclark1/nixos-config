@@ -8,5 +8,4 @@
     ./fish.nix
     ./zsh.nix
   ];
-
 }
