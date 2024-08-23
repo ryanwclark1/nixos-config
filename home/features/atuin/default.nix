@@ -24,7 +24,7 @@
       update_check = true;
       filter_mode = "global";
       search_mode_shell_up_key_binding = "fuzzy";
-      filter_mode_shell_up_key_binding = "session";
+      filter_mode_shell_up_key_binding = "global";
       style = "auto";
       show_preview = true;
       max_preview_height = 4;
@@ -36,7 +36,7 @@
       secrets_filter = false;
       enter_accept = false;
       # TODO: Switch to vim-normal?
-      keymap_mode = "emacs";
+      keymap_mode = "vim-normal";
       prefers_reduced_motion = false;
     };
 
