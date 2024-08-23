@@ -11,9 +11,7 @@
     package = pkgs.zsh;
     enableCompletion = true;
     enableVteIntegration = true;
-    defaultKeymap = "vicmd";
-    # extraConfig = ''
-    # '';
+    # defaultKeymap = "vicmd";
     syntaxHighlighting = {
       enable = true;
     };

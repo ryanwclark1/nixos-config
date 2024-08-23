@@ -4,46 +4,19 @@
   pkgs,
   ...
 }:
-let
-  packageNames = map (p: p.pname or p.name or null) config.home.packages;
-  hasPackage = name: lib.any (x: x == name) packageNames;
-  hasRipgrep = hasPackage "ripgrep";
-  hasNeomutt = config.programs.neomutt.enable;
-in
+
 {
   programs.fish = {
     enable = true;
-    loginShellInit = /* fish */ ''
-      # Remove fish greeting
-      set -U fish_greeting
-    '';
+    # loginShellInit = /* fish */ ''
+    #   # Remove fish greeting
+    #   set -U fish_greeting
+    # '';
     shellAliases = {
       # Clear screen and scrollback
       clear = "printf '\\033[2J\\033[3J\\033[1;1H'";
     };
     functions = {
-      # Grep using ripgrep and pass to nvim
-      nvimrg = lib.mkIf (hasNeomutt && hasRipgrep) "nvim -q (rg --vimgrep $argv | psub)";
-      # Merge history upon doing up-or-search
-      # This lets multiple fish instances share history
-      up-or-search = /* fish */ ''
-        if commandline --search-mode
-          commandline -f history-search-backward
-          return
-        end
-        if commandline --paging-mode
-          commandline -f up-line
-          return
-        end
-        set -l lineno (commandline -L)
-        switch $lineno
-          case 1
-            commandline -f history-search-backward
-            history merge
-          case '*'
-            commandline -f up-line
-        end
-      '';
       # zellij_tab_name_update --on-variable PWD
       zellij_tab_name_update = /* fish */ ''
         if set -q ZELLIJ
@@ -71,12 +44,6 @@ in
 
         # Open command buffer in vim when alt+e is pressed
         bind \ee edit_command_buffer
-
-        # kitty integration
-        set --global KITTY_INSTALLATION_DIR "${pkgs.kitty}/lib/kitty"
-        set --global KITTY_SHELL_INTEGRATION enabled
-        source "$KITTY_INSTALLATION_DIR/shell-integration/fish/vendor_conf.d/kitty-shell-integration.fish"
-        set --prepend fish_complete_path "$KITTY_INSTALLATION_DIR/shell-integration/fish/vendor_completions.d"
     '';
 
   };

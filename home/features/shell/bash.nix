@@ -20,26 +20,13 @@
           fastfetch --print 2>/dev/null
         fi
       }
-      #if [ -f $HOME/.bashrc-personal ]; then
-      #source $HOME/.bashrc-personal
-      #fi
     '';
     bashrcExtra = ''
       eval "$(zoxide init bash)"
       eval "$(atuin init bash)"
       set -o vi
     '';
-    # enableVteIntegration = true;
-    # historyControl = [ "ignoredups" ];
-    # bashrcExtra = ''
-    #   fastfetch() {
-    #     if [ -x "$(command -v fastfetch)" ]; then
-    #       fastfetch --print 2>/dev/null
-    #     fi
-    #   }
-    # '';
   };
-
 
   programs.atuin.enableBashIntegration = lib.mkIf config.programs.atuin.enable true;
   programs.fzf.enableBashIntegration = lib.mkIf config.programs.fzf.enable true;
