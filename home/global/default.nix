@@ -6,10 +6,7 @@
   pkgs,
   ...
 }:
-# let
-#   inherit (lib) mkIf;
-#   hasKitty = config.programs.kitty.enable;
-# in
+
 {
   imports = [
     inputs.impermanence.nixosModules.home-manager.impermanence
@@ -45,16 +42,20 @@
     git.enable = true;
   };
 
-  home = {
+  home =
+  let
+    editor = lib.getExe config.programs.nixvim.package;
+    terminal = lib.getExe config.alacritty.nixvim.package;
+  in
+  {
     username = lib.mkDefault "administrator";
     homeDirectory = lib.mkDefault "/home/${config.home.username}";
     stateVersion = lib.mkDefault "24.11";
     sessionPath = [ "$HOME/.local/bin" ];
     sessionVariables = {
       FLAKE = lib.mkDefault "$HOME/nixos-config";
-      EDITOR = lib.mkDefault "${pkgs.neovim}/bin/nvim";
-      # SHELL = lib.mkDefault "${pkgs.bash}/bin/bash";
-      # TERM = "${pkgs.alacritty}/bin/alacritty";
+      EDITOR = lib.mkDefault "${editor}";
+      TERM = "${terminal}";
     };
     shellAliases = rec{
       jqless = "jq -C | less -r";
