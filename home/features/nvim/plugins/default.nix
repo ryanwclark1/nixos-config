@@ -4,10 +4,16 @@
 
 {
   imports = [
-    ./alpha.nix
+    # ./alpha.nix
+    ./barbar.nix
+    ./comment.nix
     ./floaterm.nix
     ./harpoon.nix
     ./lualine.nix
+    ./neoorg.nix
+    ./neotree.nix
+    ./startify.nix
+    ./tagbar.nix
     ./telescope.nix
     ./treesitter.nix
     ./vimtext.nix
