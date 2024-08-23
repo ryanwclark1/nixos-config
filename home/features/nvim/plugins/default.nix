@@ -12,7 +12,7 @@
     ./lualine.nix
     ./neoorg.nix
     ./neotree.nix
-    ./startify.nix
+    # ./startify.nix
     ./tagbar.nix
     ./telescope.nix
     ./treesitter.nix
