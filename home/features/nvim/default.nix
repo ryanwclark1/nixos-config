@@ -8,6 +8,7 @@
   imports = [
     inputs.nixvim.homeManagerModules.nixvim
     ./plugins
+    ./lsp
   ];
 
   programs = {
@@ -20,6 +21,7 @@
       vimAlias = true;
       package = pkgs.neovim-unwrapped;
       clipboard.providers.wl-copy.enable = true;
+      colorschemes.base16.enable = true;
       plugins = {
         bufferline = {
           enable = true;
@@ -28,40 +30,7 @@
           enable = true;
           autoEnableSources = true;
         };
-        lsp = {
-          enable = true;
-          servers = {
-            dockerls.enable = true;
-            emmet-ls = {
-              enable = true;
-            };
-            gopls = {
-              enable = true;
-            };
-            htmx = {
-              enable = true;
-            };
-            jsonls = {
-              enable = true;
-            };
-            pyright = {
-              enable = true;
-            };
-            ruff = {
-              enable = true;
-            };
-            templ = {
-              enable = true;
-            };
-            tsserver = {
-              enable = true;
-            };
-            lua-ls = {
-              enable = true;
-            };
-            # rust-analyzer.enable = true;
-          };
-        };
+
         lualine = {
           enable = true;
         };
