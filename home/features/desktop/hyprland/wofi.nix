@@ -14,7 +14,7 @@
       height = 600;
       prompt = "Search...";
       image_size = 48;
-      term = "kitty";
+      # term = "kitty";
       columns = 3;
       allow_images = true;
       gtk_dark = true;
