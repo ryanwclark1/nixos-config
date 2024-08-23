@@ -10,7 +10,7 @@
     ./keymappings.nix
     ./autocommands.nix
     ./completion.nix
-
+    ./todo.nix
     ./plugins
     ./lsp
   ];
