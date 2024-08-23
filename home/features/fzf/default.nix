@@ -4,21 +4,32 @@
   pkgs,
   ...
 }:
-# let
-#   inherit (config.colorscheme) palette;
-# in
+
 {
-# source = pkgs.writeShellScript "pv.sh" ''
+  home.packages = with pkgs; [
+    fzf-git0sh
+  ];
+
   programs.fzf = {
     enable = true;
     package = pkgs.fzf;
-    defaultCommand = "find . -type f ! -path '.git'";
+    changeDirWidgetCommand = "fd --type d";
+    changeDirWidgetOptions =
+    [
+      "--preview 'tree -C {} | head -200'"
+    ];
+    defaultCommand = "fd -type f ! -path '.git'";
     defaultOptions = [
       "--preview='pistol {}'"
       "--height=40%"
+      "--layout=reverse"
+      "--info=inline"
+      "--border"
+      "--margin=1"
+      "--padding=1"
       "--border"
     ];
-    fileWidgetCommand = "find . -type f ! -path '.git'";
+    fileWidgetCommand = "fd --type f ! -path '.git'";
     fileWidgetOptions = [
       "--preview 'bat --color=always {}'"
       # "--preview 'head {}'"
@@ -27,14 +38,6 @@
       "--sort"
       "--exact"
     ];
-    # changeDirWidgetCommand = "fd --type d";
-    # changeDirWidgetOptions = [
-    #   "--preview 'tree -C {} | head -200'"
-    #   # "--preview='ls -l {}'"
-    # ];
   };
 
-  home.packages = with pkgs; [
-    fd
-  ];
 }
