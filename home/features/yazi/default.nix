@@ -242,8 +242,8 @@
         #  3-element array
         ratio = [
           1 # parent
-          4 # current
-          3 # preview
+          3 # current
+          4 # preview
         ];
         sort_by = "natural";
         sort_sensitive = false;
@@ -490,7 +490,9 @@
       opener =
       let
           # TODO: better ref to nixvim?
-          editor = lib.getExe config.programs.nixvim.package;
+          # editor = lib.getExe config.programs.nixvim.package;
+          editor = "nvim";
+
           alacrity = lib.getExe pkgs.alacritty;
           mpv = lib.getExe pkgs.mpv;
           xdg-utils = "${pkgs.xdg-utils}/bin/xdg-open";
