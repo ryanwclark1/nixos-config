@@ -7,7 +7,7 @@
 
 {
   home.packages = with pkgs; [
-    fzf-git0sh
+    fzf-git-sh
   ];
 
   programs.fzf = {
