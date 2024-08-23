@@ -76,6 +76,13 @@ in
       };
       lazygit.enable = true;
       mako.enable = true;
+      neovim = {
+        enable = true;
+        transparentBackground = {
+          main = true;
+          signColumn = true;
+        };
+      };
       nixvim = {
         enable = true;
         transparentBackground = {
