@@ -3,8 +3,8 @@
 }:
 
 {
-  programs.nixvim.plugins = {
-    vimtex = {
+  programs.nixvim = {
+    plugins.vimtex = {
       enable = true;
 
       settings = {
