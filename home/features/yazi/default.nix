@@ -6,14 +6,6 @@
 }:
 
 {
-  # home.packages = lib.attrValues {
-  #   inherit
-  #     (pkgs)
-  #     exiftool
-  #     ueberzugpp
-  #     ;
-  # };
-
   home.packages = with pkgs; [
     exiftool
     ueberzugpp
@@ -498,7 +490,7 @@
       opener =
       let
           # TODO: better ref to nixvim?
-          nvim = lib.getExe pkgs.neovim-unwrapped;
+          editor = lib.getExe config.programs.nixvim.package;
           alacrity = lib.getExe pkgs.alacritty;
           mpv = lib.getExe pkgs.mpv;
           xdg-utils = "${pkgs.xdg-utils}/bin/xdg-open";
@@ -506,7 +498,7 @@
       {
         edit-text = [
           {
-            run = ''${nvim} "$@"'';
+            run = ''${editor} "$@"'';
             block = true;
           }
         ];
