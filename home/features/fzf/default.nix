@@ -20,7 +20,7 @@
     ];
     defaultCommand = "fd -type f ! -path '.git'";
     defaultOptions = [
-      "--preview='pistol {}'"
+      # "--preview='pistol {}'"
       "--height=40%"
       "--layout=reverse"
       "--info=inline"
