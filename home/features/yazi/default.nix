@@ -9,6 +9,10 @@
   home.packages = with pkgs; [
     exiftool
     ueberzugpp
+    ffmpegthumbnailer
+    poppler_utils
+    mediainfo
+    hexyl
   ];
 
   programs.yazi = {
@@ -25,7 +29,18 @@
     # https://yazi-rs.github.io/docs/configuration/keymap
     # https://yazi-rs.github.io/docs/quick-start/#keybindings
     # https://github.com/sxyazi/yazi/blob/latest/yazi-config/preset/keymap.toml
-    settings = {
+    settings =
+    let
+        # TODO: better ref to nixvim?
+        # editor = lib.getExe config.programs.nixvim.package;
+        editor = "nvim";
+        alacrity = lib.getExe pkgs.alacritty;
+        mpv = lib.getExe pkgs.mpv;
+        xdg-utils = "${pkgs.xdg-utils}/bin/xdg-open";
+        thumbnailer = lib.getExe pkgs.ffmpegthumbnailer;
+        pdftoppm = "${pkgs.poppler_utils}/bin/pdftoppm";
+      in
+    {
       log = {
         enabled = false;
       };
@@ -487,17 +502,23 @@
         ueberzug_scale = 1;
         ueberzug_offset = [(0.5) (0.5) (-0.5) (-0.5)];
       };
-      opener =
-      let
-          # TODO: better ref to nixvim?
-          # editor = lib.getExe config.programs.nixvim.package;
-          editor = "nvim";
-
-          alacrity = lib.getExe pkgs.alacritty;
-          mpv = lib.getExe pkgs.mpv;
-          xdg-utils = "${pkgs.xdg-utils}/bin/xdg-open";
-      in
-      {
+      plugin = {
+        prepend_previewers = [
+          {
+            mime = "video/*";
+            run = "video";
+          }
+          {
+            mime = "application/epub";
+            run = "pdf";
+          }
+          {
+            mime = "application/pdf";
+            run = "pdf";
+          }
+        ];
+      };
+      opener ={
         edit-text = [
           {
             run = ''${editor} "$@"'';
