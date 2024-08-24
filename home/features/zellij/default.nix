@@ -24,8 +24,8 @@
       simplified_ui = false;
       default_shell = zsh;
       default_layout = "default";
-      default_mode = "normal";
-      mouse_mode = false;
+      default_mode = "locked";
+      mouse_mode = true;
       scroll_buffer_size = 25000;
       copy_command = wl-copy;
       copy_clipboard = "system";
@@ -36,9 +36,11 @@
       ui = {
         pane_frame = {
           rounded_corners = true;
-          hide_session_name = false;
+          hide_session_name = true;
         };
       };
+      auto_layout = true;
+      styled_underlines = true;
       session_serialization = true;
       pane_viewport_serialization = false;
       # Serializes all scroll back to limit
