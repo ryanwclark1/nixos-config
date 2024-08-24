@@ -17,12 +17,14 @@
         "--hidden"
         "--no-follow"
         "--smart-case"
+        "--max-columns=150"
+        "--max-columns-preview"
+        "--type-add=web:*.{html,css,js}*"
       ];
     };
   };
 
   home.packages = with pkgs; [
-    fd
     ripgrep-all
     sd
     tree
