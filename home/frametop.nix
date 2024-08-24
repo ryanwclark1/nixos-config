@@ -18,6 +18,7 @@
     ./features/development
     ./features/eza
     ./features/fastfetch
+    ./features/fd
     ./features/fzf
     ./features/games
     ./features/git
