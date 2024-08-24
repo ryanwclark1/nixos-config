@@ -29,7 +29,7 @@
       "--padding=1"
       "--border"
     ];
-    fileWidgetCommand = "fd --type f ! -path '.git'";
+    fileWidgetCommand = "fd --type file --exclude .git";
     fileWidgetOptions = [
       "--preview 'bat --color=always {}'"
       # "--preview 'head {}'"
