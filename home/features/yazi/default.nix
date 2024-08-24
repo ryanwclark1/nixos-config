@@ -24,6 +24,9 @@
       fzfbm = ./plugins/fzfbm.yazi;
       starship = ./plugins/starship.yazi;
       full-border = ./plugins/full-border.yazi;
+      hexyl = ./plugins/hexyl.yazi;
+      glow = ./plugins/glow.yazi;
+      mediainfo = ./plugins/mediainfo.yazi;
     };
     # enableNushellIntegration = true;
     # https://yazi-rs.github.io/docs/configuration/keymap
@@ -504,10 +507,10 @@
       };
       plugin = {
         prepend_previewers = [
-          {
-            mime = "video/*";
-            run = "video";
-          }
+          # {
+          #   mime = "video/*";
+          #   run = "mediainfo";
+          # }
           {
             mime = "application/epub";
             run = "pdf";
@@ -515,6 +518,27 @@
           {
             mime = "application/pdf";
             run = "pdf";
+          }
+          # markdown files to glow
+          {
+            name = "*.md";
+            run = "glow";
+          }
+          {
+            mime = "text/markdown";
+            run = "glow";
+          }
+          {
+            mime = "{image,audio,video}/*";
+            run = "mediainfo";
+          }
+          {
+            mime = "application/x-subrip";
+            run = "mediainfo";
+          }
+          {
+            mime = "application/octet-stream";
+            run = "hexyl";
           }
         ];
       };

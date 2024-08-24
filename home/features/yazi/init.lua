@@ -38,4 +38,8 @@ require("full-border"):setup {
 	-- Available values: ui.Border.PLAIN, ui.Border.ROUNDED
 	type = ui.Border.ROUNDED,
 }
-require("starship"):setup()
+-- require("starship"):setup()
+require("fzfbm"):setup()
+require("glow"):setup()
+require("mediainfo"):setup()
+require("hexyl"):setup()
