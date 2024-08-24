@@ -31,7 +31,7 @@
     ./features/networking-utils
     ./features/nvim
     ./features/osint
-    ./features/pistol
+    # ./features/pistol
     ./features/productivity
     ./features/qutebrowser
     ./features/remmina
