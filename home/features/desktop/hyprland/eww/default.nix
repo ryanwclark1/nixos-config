@@ -1,13 +1,19 @@
+# TODO: Configure XDG_CONFIG_HOME for config directory
 { inputs, lib, config, pkgs, ... }:
-
+let
+  user = "administrator";
+  homeDirectory = "/home/${user}/.config";
+in
 {
     programs = {
         eww = {
-            enabled = true;
-            package = pkgs.eww-wayland;
+            enable = true;
+            package = pkgs.eww;
             enableZshIntegration = true;
             enableBashIntegration = true;
             enableFishIntegration = true;
+            # configDir = "${XDG_CONFIG_HOME}/eww";
+            configDir = "${homeDirectory}/eww";
         };
     };
 
