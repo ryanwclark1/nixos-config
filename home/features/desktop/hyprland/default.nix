@@ -13,7 +13,8 @@
     ./mako.nix
     # ./swayidle.nix
     # ./swaylock.nix
-    ./waybar.nix
+    # ./waybar.nix
+    ./eww
     ./wofi.nix
     # ./variables.nix
   ];
