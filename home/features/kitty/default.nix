@@ -13,9 +13,9 @@ in
 {
   home = {
     packages = [ kitty-xterm ];
-    sessionVariables = {
-      TERMINAL = "kitty -1";
-    };
+    # sessionVariables = {
+    #   TERMINAL = "kitty -1";
+    # };
   };
   programs.kitty = {
     enable = true;
