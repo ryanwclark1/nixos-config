@@ -41,11 +41,9 @@
     home-manager.enable = true;
     git.enable = true;
   };
-
   home =
   let
     editor = lib.getExe config.programs.nixvim.package;
-    terminal = lib.getExe config.alacritty.nixvim.package;
   in
   {
     username = lib.mkDefault "administrator";
@@ -55,7 +53,6 @@
     sessionVariables = {
       FLAKE = lib.mkDefault "$HOME/nixos-config";
       EDITOR = lib.mkDefault "${editor}";
-      TERM = "${terminal}";
     };
     shellAliases = rec{
       jqless = "jq -C | less -r";
