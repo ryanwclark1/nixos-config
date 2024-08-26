@@ -43,6 +43,15 @@
           change.text = "~";
         };
       };
+      lsp = {
+        servers = {
+          rust-analyzer = {
+            enable = true;
+            installCargo = false;
+            installRustc = false;
+          };
+        };
+      };
       nvim-autopairs.enable = true;
       nvim-colorizer = {
         enable = true;
