@@ -9,7 +9,8 @@
     ./cliphist.nix
     # ./hyprbars.nix
     ./hyprland.nix
-    ./hyprlock.nix
+    ./hyprlock
+    ./hypridle
     ./mako.nix
     ./rofi.nix
     # ./swayidle.nix

@@ -30,6 +30,7 @@
     let
       waybar = lib.getExe pkgs.waybar;
       rofi = lib.getExe config.programs.rofi.package;
+      hypridle = lib.getExe config.services.hypridle.package;
     in
     {
       # "$menu" = "rofi";
@@ -44,7 +45,6 @@
         ",highres,auto,1"
       ];
       "exec-once" =
-
         [
           # "systemctl --user import-environment &"
           # "hash dbus-update-activation-environment 2>/dev/null &"
@@ -54,6 +54,7 @@
           # "swaybg -m fill -i $(find ~/Pictures/wallpapers/ -maxdepth 1 -type f) &"
           # "hyprctl setcursor Nordzy-cursors 22 &"
           # "poweralertd &"
+          "${hypridle}"
           "${waybar}"
           # "swaync &"
           # "wl-paste --watch cliphist store &"
