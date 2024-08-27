@@ -17,16 +17,18 @@ in {
   wayland.windowManager.hyprland = {
     # enable = true;
     # package = inputs.hyprland.packages.${pkgs.system}.hyprland;
-    plugins = [ pkgs.hyprlandPlugins.hyprbars ];
+    plugins = [
+      inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}.hyprbars
+      ];
     settings = {
       "plugin:hyprbars" = {
-        bar_height = 25;
+        bar_height = 20;
         # bar_color = rgba config.colorscheme.colors.surface "dd";
         # "col.text" = rgb config.colorscheme.colors.primary;
         # bar_text_font = config.fontProfiles.regular.family;
-        bar_text_size = 11;
-        bar_part_of_window = true;
-        bar_precedence_over_border = true;
+        # bar_text_size = 11;
+        # bar_part_of_window = true;
+        # bar_precedence_over_border = true;
 
         # hyprbars-button =
         # let

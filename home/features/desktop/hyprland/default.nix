@@ -6,16 +6,17 @@
 {
   imports = [
     ./basic-binds.nix
-    ./cliphist.nix
-    ./hyprbars.nix
+    # ./cliphist.nix
+    # ./hyprbars.nix
     ./hyprland.nix
     ./hyprlock.nix
     ./mako.nix
+    ./rofi.nix
     # ./swayidle.nix
     # ./swaylock.nix
-    # ./waybar.nix
-    ./eww
-    ./wofi.nix
+    ./waybar.nix
+    # ./eww
+    # ./wofi.nix
     # ./variables.nix
   ];
 
@@ -30,6 +31,7 @@
     packages = with pkgs; [
       wf-recorder
       wl-clipboard
+      
       # swaybg
       # inputs.hypr-contrib.packages.${pkgs.system}.grimblast
       # hyprpicker
