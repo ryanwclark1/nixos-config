@@ -72,6 +72,8 @@
       hm = "home-manager --flake .";
       hms = "home-manager --flake . switch";
 
+      wifi = "nmtui";
+      
       cik = lib.mkIf config.programs.kitty.enable "clone-in-kitty --type os-window";
       ck = cik;
     };
