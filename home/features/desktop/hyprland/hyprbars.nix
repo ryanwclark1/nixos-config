@@ -5,20 +5,20 @@
   lib,
   outputs,
   ...
-}: let
-  getHostname = x: lib.last (lib.splitString "@" x);
-  # remoteColorschemes = lib.mapAttrs' (n: v: {
-  # name = getHostname n;
-  # value = v.config.colorscheme.rawColorscheme.colors.${config.colorscheme.mode};
-  # }) outputs.homeConfigurations;
-  # rgb = color: "rgb(${lib.removePrefix "#" color})";
-  # rgba = color: alpha: "rgba(${lib.removePrefix "#" color}${alpha})";
-in {
+}:
+# let
+#   getHostname = x: lib.last (lib.splitString "@" x);
+#   remoteColorschemes = lib.mapAttrs' (n: v: {
+#   name = getHostname n;
+#   value = v.config.colorscheme.rawColorscheme.colors.${config.colorscheme.mode};
+#   }) outputs.homeConfigurations;
+#   rgb = color: "rgb(${lib.removePrefix "#" color})";
+#   rgba = color: alpha: "rgba(${lib.removePrefix "#" color}${alpha})";
+# in
+{
   wayland.windowManager.hyprland = {
-    # enable = true;
-    # package = inputs.hyprland.packages.${pkgs.system}.hyprland;
     plugins = [
-      inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}.hyprbars
+      pkgs.hyprlandPlugins.hyprbars
       ];
     settings = {
       "plugin:hyprbars" = {
@@ -26,9 +26,9 @@ in {
         # bar_color = rgba config.colorscheme.colors.surface "dd";
         # "col.text" = rgb config.colorscheme.colors.primary;
         # bar_text_font = config.fontProfiles.regular.family;
-        # bar_text_size = 11;
-        # bar_part_of_window = true;
-        # bar_precedence_over_border = true;
+        bar_text_size = 11;
+        bar_part_of_window = true;
+        bar_precedence_over_border = true;
 
         # hyprbars-button =
         # let
@@ -40,11 +40,11 @@ in {
         #   maximizeAction = "hyprctl dispatch fullscreen 1";
         # in [
         #   # Red close button
-        #   "rgb(255, 87, 51),12,,${closeAction}"
+        #   "rgb(255,87,51),12,,${closeAction}"
         #   # Yellow "minimize" (send to special workspace) button
-        #   "rgb(255, 195, 0),12,,${minimizeAction}"
+        #   "rgb(255,195,0),12,,${minimizeAction}"
         #   # Green "maximize" (fullscreen) button
-        #   "rgb(218, 247, 166),12,,${maximizeAction}"
+        #   "rgb(218,247,166),12,,${maximizeAction}"
         # ];
       };
       bind =
