@@ -23,7 +23,7 @@
 (defpoll volume :interval "999h" :initial 0 `pamixer --get-volume`)
 (defpoll micvolume :interval "999h" :initial 0 `pamixer --get-volume --source 1`)
 (defwidget dashboard []
-  (box :orientation "v" 
+  (box :orientation "v"
     (box :class "info_box" :orientation "v" :space-evenly false
       (box :class "calendar_box"
         (calendar :width 200 :class "cal")
@@ -43,14 +43,14 @@
           (scale :min 1 :max 101 :width 315 :class "micvolume_slider" :value micvolume :onchange "pamixer --set-volume $(echo {} | sed 's/[.].*$//') --source 1")
         )
       )
-      (box :class "sysinfo_box" :orientation "h" :vexpand true :spacing 15 
+      (box :class "sysinfo_box" :orientation "h" :vexpand true :spacing 15
         (mem :thickness 12 :icon "")
         (cpu :thickness 12 :icon "")
         (disk :thickness 12 :icon "")
       )
     )
     (box :class "notification_box"
-    )     
+    )
   )
 )
 
@@ -223,7 +223,7 @@
 (defwidget launch []
   (button		:class "reg-btn launchbutton"
                 :hexpand true
-                :onclick "wofi --show run --xoffset=1670 --yoffset=12 --width=230px --height=984 --style=$HOME/.config/wofi.css --term=footclient --prompt=Run &" "")
+                :onclick "rofi --show run --xoffset=1670 --yoffset=12 --width=230px --height=984 --style=$HOME/.config/rofi.css --term=footclient --prompt=Run &" "")
 )
 
 (defwidget powerbutton []
@@ -275,8 +275,8 @@
 
 (defwindow dashboard
   :monitor 0
-  :geometry (geometry 
-  :height "1080px" 
+  :geometry (geometry
+  :height "1080px"
   :width "350px"
   :x "48px"
   :y "0px"
@@ -287,7 +287,7 @@
 
 (defwindow bar
   :monitor 0
-  :exclusive false 
+  :exclusive false
   :geometry (geometry :height "1080px" :x "-4px" :y "0px"
   :width "52px"
   :anchor "top left")

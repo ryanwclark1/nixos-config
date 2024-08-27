@@ -2,33 +2,9 @@
   lib,
   config,
   pkgs,
-  outputs,
   ...
-}: let
-  getHostname = x: lib.last (lib.splitString "@" x);
-  # remoteColorschemes = lib.mapAttrs' (n: v: {
-  #   name = getHostname n;
-  #   value = v.config.colorscheme.rawColorscheme.colors.${config.colorscheme.mode};
-  # }) outputs.homeConfigurations;
-  # rgb = color: "rgb(${lib.removePrefix "#" color})";
-  # rgba = color: alpha: "rgba(${lib.removePrefix "#" color}${alpha})";
-in {
-  # imports = [
-  #   # ../common
-  #   # ../common/wayland-wm
-
-  #   # ./basic-binds.nix
-  #   # ./hyprbars.nix
-  # ];
-
-  xdg.portal = let
-    hyprland = config.wayland.windowManager.hyprland.package;
-    xdph = pkgs.xdg-desktop-portal-hyprland.override {inherit hyprland;};
-  in {
-    extraPortals = [xdph];
-    configPackages = [hyprland];
-  };
-
+}:
+{
   home.packages = with pkgs; [
     grimblast
     hyprpicker
@@ -36,6 +12,9 @@ in {
 
   wayland.windowManager.hyprland = {
     enable = true;
+    # plugins = [
+    #   inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}.hyprbars
+    # ];
     # package = pkgs.hyprland.override {wrapRuntimeDeps = false;};
     # package = config.wayland.windowManager.hyprland.package;
     # systemd = {
@@ -47,8 +26,13 @@ in {
     #   ];
     # };
 
-    settings = {
-      # "$menu" = "wofi";
+    settings =
+    let
+      waybar = lib.getExe pkgs.waybar;
+      ofi = lib.getExe config.programs.rofi.package;
+    in
+    {
+      # "$menu" = "rofi";
       # "$mod" = "SUPER";
 
       env = [
@@ -60,9 +44,7 @@ in {
         ",highres,auto,1"
       ];
       "exec-once" =
-      let
-        waybar = lib.getExe pkgs.waybar;
-      in
+
         [
           # "systemctl --user import-environment &"
           # "hash dbus-update-activation-environment 2>/dev/null &"
@@ -267,33 +249,29 @@ in {
         default_split_ratio = 1.0;
       };
 
-      windowrulev2 = let
-        sweethome3d-tooltips = "title:^(win[0-9])$,class:^(com-eteks-sweethome3d-SweetHome3DBootstrap)$";
-        steam = "title:^()$,class:^(steam)$";
-        kdeconnect-pointer = "class:^(kdeconnect.daemon)$";
-      in [
-        "nofocus, ${sweethome3d-tooltips}"
+      # windowrulev2 = let
+      #   sweethome3d-tooltips = "title:^(win[0-9])$,class:^(com-eteks-sweethome3d-SweetHome3DBootstrap)$";
+      #   steam = "title:^()$,class:^(steam)$";
+      #   kdeconnect-pointer = "class:^(kdeconnect.daemon)$";
+      # in [
+      #   "nofocus, ${sweethome3d-tooltips}"
 
-        "stayfocused, ${steam}"
-        "minsize 1 1, ${steam}"
+      #   "stayfocused, ${steam}"
+      #   "minsize 1 1, ${steam}"
 
-        "size 100% 110%, ${kdeconnect-pointer}"
-        "center, ${kdeconnect-pointer}"
-        "nofocus, ${kdeconnect-pointer}"
-        "noblur, ${kdeconnect-pointer}"
-        "noanim, ${kdeconnect-pointer}"
-        "noshadow, ${kdeconnect-pointer}"
-        "noborder, ${kdeconnect-pointer}"
-        "suppressevent fullscreen, ${kdeconnect-pointer}"
-      ];
+      #   "size 100% 110%, ${kdeconnect-pointer}"
+      #   "center, ${kdeconnect-pointer}"
+      #   "nofocus, ${kdeconnect-pointer}"
+      #   "noblur, ${kdeconnect-pointer}"
+      #   "noanim, ${kdeconnect-pointer}"
+      #   "noshadow, ${kdeconnect-pointer}"
+      #   "noborder, ${kdeconnect-pointer}"
+      #   "suppressevent fullscreen, ${kdeconnect-pointer}"
+      # ];
       # ++ (lib.mapAttrsToList (name: colors:
       #   "bordercolor ${rgba colors.primary "aa"} ${rgba colors.primary_container "aa"}, title:^(\\[${name}\\])"
       # ) remoteColorschemes);
-      layerrule = let
-        wofi = lib.getExe pkgs.wofi;
-        waybar = lib.getExe pkgs.waybar;
-      in
-      [
+      layerrule = [
         "animation fade,hyprpicker"
         "animation fade,selection"
 
@@ -304,8 +282,8 @@ in {
         "blur,notifications"
         "ignorezero,notifications"
 
-        "blur,${wofi}"
-        "ignorezero,${wofi}"
+        "blur,${ofi}"
+        "ignorezero,${ofi}"
 
         "noanim,wallpaper"
       ];
@@ -430,39 +408,36 @@ in {
         ++
         # Launcher
         (
-          let
-            wofi = lib.getExe config.programs.wofi.package;
-          in
-            lib.optionals config.programs.wofi.enable [
-              "SUPER,x,exec,${wofi} -S drun" # -x 10 -y 10 -W 25% -H 60%
-              "SUPER,s,exec,specialisation $(specialisation | ${wofi} -S dmenu)"
-              "SUPER,d,exec,${wofi} -S run"
+          lib.optionals config.programs.rofi.enable [
+            "SUPER,x,exec,${ofi} -S drun" # -x 10 -y 10 -W 25% -H 60%
+            "SUPER,s,exec,specialisation $(specialisation | ${ofi} -S dmenu)"
+            "SUPER,d,exec,${ofi} -S run"
 
-              "SUPER ALT,x,exec,${remote} ${wofi} -S drun" # -x 10 -y 10 -W 25% -H 60%
-              "SUPER ALT,d,exec,${remote} ${wofi} -S run"
-            ]
-            ++
-            (
-              let
-                pass-wofi = lib.getExe (pkgs.pass-wofi.override {pass = config.programs.password-store.package;});
-              in
-                lib.optionals config.programs.password-store.enable [
-                  ",XF86Calculator,exec,${pass-wofi}"
-                  "SHIFT,XF86Calculator,exec,${pass-wofi} fill"
+            "SUPER ALT,x,exec,${remote} ${ofi} -S drun" # -x 10 -y 10 -W 25% -H 60%
+            "SUPER ALT,d,exec,${remote} ${ofi} -S run"
+          ]
+          # ++
+          # (
+          #   let
+          #     pass-wofi = lib.getExe (pkgs.pass-wofi.override {pass = config.programs.password-store.package;});
+          #   in
+          #     lib.optionals config.programs.password-store.enable [
+          #       ",XF86Calculator,exec,${pass-wofi}"
+          #       "SHIFT,XF86Calculator,exec,${pass-wofi} fill"
 
-                  "SUPER,semicolon,exec,${pass-wofi}"
-                  "SUPER SHIFT,semicolon,exec,${pass-wofi} fill"
-                ]
-            )
-            ++
-            (
-              let
-                cliphist = lib.getExe config.services.cliphist.package;
-              in
-              lib.optionals config.services.cliphist.enable [
-                ''SUPER,c,exec,selected=$(${cliphist} list | ${wofi} -S dmenu) && echo "$selected" | ${cliphist} decode | wl-copy''
-              ]
-            )
+          #       "SUPER,semicolon,exec,${pass-wofi}"
+          #       "SUPER SHIFT,semicolon,exec,${pass-wofi} fill"
+          #     ]
+          # )
+          # ++
+          # (
+          #   let
+          #     cliphist = lib.getExe config.services.cliphist.package;
+          #   in
+          #   lib.optionals config.services.cliphist.enable [
+          #     ''SUPER,c,exec,selected=$(${cliphist} list | ${ofi} -S dmenu) && echo "$selected" | ${cliphist} decode | wl-copy''
+          #   ]
+          # )
         );
     };
     extraConfig = ''

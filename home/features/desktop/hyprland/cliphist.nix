@@ -5,7 +5,7 @@
 
 {
   services.cliphist = {
-    enable = true;
+    enable = false;
     package = pkgs.cliphist;
     allowImages = true;
     extraOptions = [

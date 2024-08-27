@@ -8,17 +8,18 @@
     rofi = {
       enable = true;
       package = pkgs.rofi-wayland;
+      cycle = true;
+      # font = "";
+      location = "center";
       plugins = [
         pkgs.rofi-calc
-        pkgs.rofi-emoji
+        pkgs.rofi-emoji-wayland
       ];
       extraConfig = {
         bw = 1;
         columns = 2;
         icon-theme = "Papirus-Dark";
-      };
-      extraConfig = {
-        modi = "drun";
+        modi = "drun,ssh";
         show-icons = true;
         drun-display-format = "{icon} {name}";
         disable-history = false;
