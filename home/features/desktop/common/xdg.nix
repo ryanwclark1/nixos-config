@@ -7,17 +7,17 @@
     userDirs = {
       enable = true;
       createDirectories = true;
-      desktop = "${config.home.homeDirectory}/desktop";
-      documents = "${config.home.homeDirectory}/documents";
-      download = "${config.home.homeDirectory}/downloads";
-      videos = "${config.home.homeDirectory}/videos";
-      music = "${config.home.homeDirectory}/music";
-      pictures = "${config.home.homeDirectory}/pictures";
-      publicShare = "${config.home.homeDirectory}/public";
-      templates = "${config.home.homeDirectory}/templates";
+      desktop = "${config.home.homeDirectory}/Desktop";
+      documents = "${config.home.homeDirectory}/Documents";
+      download = "${config.home.homeDirectory}/Downloads";
+      videos = "${config.home.homeDirectory}/Videos";
+      music = "${config.home.homeDirectory}/Music";
+      pictures = "${config.home.homeDirectory}/Pictures";
+      publicShare = "${config.home.homeDirectory}/Public";
+      templates = "${config.home.homeDirectory}/Templates";
       extraConfig = {
-        XDG_SCREENSHOTS_DIR = "${config.xdg.userDirs.pictures}/screenshots";
-        XDG_SCREENCAST_DIR = "${config.xdg.userDirs.videos}/screencast";
+        XDG_SCREENSHOTS_DIR = "${config.xdg.userDirs.pictures}/Screenshots";
+        XDG_SCREENCAST_DIR = "${config.xdg.userDirs.videos}/Screencast";
       };
     };
     mimeApps = {
