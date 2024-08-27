@@ -39,7 +39,7 @@ require("full-border"):setup {
 	type = ui.Border.ROUNDED,
 }
 -- require("starship"):setup()
-require("fzfbm"):setup()
+-- require("fzfbm"):setup()
 require("glow"):setup()
 require("mediainfo"):setup()
 require("hexyl"):setup()

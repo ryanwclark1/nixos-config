@@ -1,12 +1,11 @@
 /*
-#  ____        __ _  
-# |  _ \ ___  / _(_) 
-# | |_) / _ \| |_| | 
-# |  _ < (_) |  _| | 
-# |_| \_\___/|_| |_| 
-#                    
-# by Stephan Raabe (2023) 
-# ----------------------------------------------------- 
+#  ____        __ _
+# |  _ \ ___  / _(_)
+# | |_) / _ \| |_| |
+# |  _ < (_) |  _| |
+# |_| \_\___/|_| |_|
+#
+# -----------------------------------------------------
 */
 
 /* ---- Configuration ---- */
@@ -28,16 +27,16 @@ configuration {
 }
 
 /* ---- Load font ---- */
-@import "~/.config/ml4w/settings/rofi-font.rasi"
+/* ---- @import "~/.config/ml4w/settings/rofi-font.rasi" ---- */
 
 /* ---- Load pywal colors (custom wal template) ---- */
-@import "~/.cache/wal/colors-rofi-pywal"
+/* ---- @import "~/.cache/wal/colors-rofi-pywal" ---- */
 
 /* ---- Load wallpaper ---- */
-@import "~/.config/ml4w/cache/current_wallpaper.rasi"
+/* ---- @import "~/.config/ml4w/cache/current_wallpaper.rasi" ---- */
 
 /* ---- Load border width ---- */
-@import "~/.config/ml4w/settings/rofi-border.rasi"
+@import "./rofi-border.rasi"
 
 /* ---- Window ---- */
 window {
@@ -46,7 +45,7 @@ window {
     y-offset:                     65px;
     spacing:                      0px;
     padding:                      0px;
-    margin:                       0px; 
+    margin:                       0px;
     color:                        #FFFFFF;
     border:                       @border-width;
     border-color:                 #FFFFFF;
