@@ -9,13 +9,14 @@
     # file.".config/pipewire/pipewire.conf".source = ./config/pipewire/pipewire.conf;
     # file.".emoji".source = ./config/emoji;
     file.".config/rofi" = {
-      source = ./rofi;
+      source = ./config;
       recursive = true;
     };
   };
 
   programs = {
-    rofi = let
+    rofi =
+    let
       alacrity = lib.getExe pkgs.alacritty;
     in {
       enable = true;
