@@ -1,3 +1,4 @@
+# Docs: https://stylix.danth.me/
 {
   pkgs,
   ...
@@ -91,6 +92,7 @@ in
         };
       };
       qutebrowser.enable = true;
+      rofi.enable = true;
       vscode.enable = false;
       waybar = {
         enable = true;
@@ -98,7 +100,7 @@ in
         enableLeftBackColors = true;
         enableRightBackColors = true;
       };
-      wofi.enable = true;
+      wofi.enable = false;
       yazi.enable = true;
       zathura.enable = true;
       zellij.enable = true;
