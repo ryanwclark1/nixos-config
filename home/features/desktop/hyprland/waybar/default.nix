@@ -214,12 +214,18 @@ in
           ];
         };
 
+        "custom/chatgpt" = {
+          format = "";
+          on-click = "";
+          tooltip-format = "AI Support";
+        };
+
         # Group Links
         "group/links" = {
           orientation = "horizontal";
           modules = [
-            custom/chatgpt"
-            custom/empty"
+            "custom/chatgpt"
+            "custom/empty"
           ];
         };
 
