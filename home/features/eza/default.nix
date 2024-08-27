@@ -15,7 +15,7 @@
   };
 
   home.shellAliases = {
-    ls = "eza";
+    ls = "eza -a --icons";
     l = "eza -lhg";
     ll = "eza -alhg";
     lt = "eza --tree";
