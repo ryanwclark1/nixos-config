@@ -20,20 +20,21 @@ in
         height = 11;
         passthrough = false;
         gtk-layer-shell = true;
-
         modules-left = [ "hyprland/window" ];
         modules-center = [ "network" "pulseaudio" "cpu" "custom/gpu" "hyprland/workspaces" "memory" "disk" "clock" "battery"];
         modules-right = [ "custom/notification" "tray" ];
+
         "hyprland/workspaces" = {
-          format = "{icon}";
+          format = "{}";
           format-icons = {
-            default = " ";
-            active = " ";
-            urgent = " ";
+            default = "";
+            active = "";
+            urgent = "";
           };
           on-scroll-up = "hyprctl dispatch workspace e+1";
           on-scroll-down = "hyprctl dispatch workspace e-1";
         };
+
         clock = {
           format = "{:%H:%M }";
           interval = 60;
@@ -65,29 +66,35 @@ in
             "on-scroll-down" = "shift_down";
           };
         };
+
         "hyprland/window" = {
           max-length = 60;
           separate-outputs = false;
         };
+
         memory = {
           interval = 5;
           format = "  {}%";
           tooltip = true;
         };
+
         cpu = {
           interval = 5;
           format = "  {usage:2}%";
           tooltip = true;
         };
+
         "custom/gpu" = {
             interval = 5;
             exec = "${cat} /sys/class/drm/card0/device/gpu_busy_percent";
             format = "󰒋  {}%";
         };
+
         disk = {
           format = "  {free}";
           tooltip = true;
         };
+
         network = {
           interval = 3;
           format-icons = [ "󰤯" "󰤟" "󰤢" "󰤥" "󰤨" ];
@@ -104,9 +111,11 @@ in
           max-length = 15;
           on-click = "${kitty} -e ${nmtui}";
         };
+
         "tray" = {
           spacing = 12;
         };
+
         pulseaudio = {
           format = "{icon} {volume}% {format_source}";
           format-bluetooth = "{volume}% {icon} {format_source}";
@@ -125,6 +134,7 @@ in
           on-click = pavucontrol;
           tooltip-format = "{source_volume}% / {desc}";
         };
+
         "custom/notification" = {
           tooltip = true;
           format = "{icon} {}";
@@ -144,6 +154,7 @@ in
           on-click = "task-waybar";
           escape = true;
         };
+
         idle_inhibitor = {
           format = "{icon}";
           format-icons = {
@@ -151,6 +162,7 @@ in
             deactivated = "󰒲";
           };
         };
+
         battery = {
           interval = 10;
           states = {
@@ -160,12 +172,13 @@ in
           };
           format = "{icon} {capacity}%";
           format-charging = "󰂄 {capacity}%";
-          format-plugged = "󱘖 {capacity}%";
+          format-plugged = " {capacity}%";
           format-icons = [ "󰁺" "󰁻" "󰁼" "󰁽" "󰁾" "󰁿" "󰂀" "󰂁" "󰂂" "󰁹" ];
           on-click = "";
           tooltip = false;
         };
       }];
+
       style = ''
           * {
             font-size: 12px;

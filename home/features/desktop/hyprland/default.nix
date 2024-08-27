@@ -6,14 +6,15 @@
 {
   imports = [
     ./basic-binds.nix
-    ./cliphist.nix
+    ./cliphist
+    ./dunst
     ./hyprbars.nix
     ./hyprland.nix
     ./hyprlock
     ./hypridle
     ./mako.nix
-    ./rofi.nix
-    ./waybar.nix
+    ./rofi
+    ./waybar
     # ./eww
     # ./wofi.nix
     # ./variables.nix
