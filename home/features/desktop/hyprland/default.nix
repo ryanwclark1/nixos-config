@@ -6,7 +6,7 @@
 {
   imports = [
     ./basic-binds.nix
-    # ./cliphist.nix
+    ./cliphist.nix
     # ./hyprbars.nix
     ./hyprland.nix
     ./hyprlock.nix
@@ -31,7 +31,7 @@
     packages = with pkgs; [
       wf-recorder
       wl-clipboard
-      
+
       # swaybg
       # inputs.hypr-contrib.packages.${pkgs.system}.grimblast
       # hyprpicker

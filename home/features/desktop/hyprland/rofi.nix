@@ -1,16 +1,32 @@
 {
+  lib,
   pkgs,
   ...
 }:
 
 {
+  home = {
+    # file.".config/pipewire/pipewire.conf".source = ./config/pipewire/pipewire.conf;
+    # file.".emoji".source = ./config/emoji;
+    file.".config/rofi" = {
+      source = ./rofi;
+      recursive = true;
+    };
+  };
+
   programs = {
-    rofi = {
+    rofi = let
+      alacrity = lib.getExe pkgs.alacritty;
+    in {
       enable = true;
       package = pkgs.rofi-wayland;
+      configPath = "~/.config/rofi";
       cycle = true;
       # font = "";
       location = "center";
+      terminal = "\${alacrity}";
+      xoffset = 0;
+      yoffset = 0;
       plugins = [
         pkgs.rofi-calc
         pkgs.rofi-emoji-wayland

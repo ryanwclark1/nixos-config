@@ -21,7 +21,7 @@
     initLua = ./init.lua;
     plugins = {
       lazygit = ./plugins/lazygit.yazi;
-      fzfbm = ./plugins/fzfbm.yazi;
+      # fzfbm = ./plugins/fzfbm.yazi;
       starship = ./plugins/starship.yazi;
       full-border = ./plugins/full-border.yazi;
       hexyl = ./plugins/hexyl.yazi;

@@ -29,7 +29,7 @@
     settings =
     let
       waybar = lib.getExe pkgs.waybar;
-      ofi = lib.getExe config.programs.rofi.package;
+      rofi = lib.getExe config.programs.rofi.package;
     in
     {
       # "$menu" = "rofi";
@@ -282,8 +282,8 @@
         "blur,notifications"
         "ignorezero,notifications"
 
-        "blur,${ofi}"
-        "ignorezero,${ofi}"
+        "blur,${rofi}"
+        "ignorezero,${rofi}"
 
         "noanim,wallpaper"
       ];
@@ -409,12 +409,12 @@
         # Launcher
         (
           lib.optionals config.programs.rofi.enable [
-            "SUPER,x,exec,${ofi} -S drun" # -x 10 -y 10 -W 25% -H 60%
-            "SUPER,s,exec,specialisation $(specialisation | ${ofi} -S dmenu)"
-            "SUPER,d,exec,${ofi} -S run"
+            "SUPER,x,exec,${rofi} -dmenu" # -x 10 -y 10 -W 25% -H 60%
+            "SUPER,s,exec,specialisation $(specialisation | ${rofi} -S dmenu)"
+            "SUPER,d,exec,${rofi} -S run"
 
-            "SUPER ALT,x,exec,${remote} ${ofi} -S drun" # -x 10 -y 10 -W 25% -H 60%
-            "SUPER ALT,d,exec,${remote} ${ofi} -S run"
+            "SUPER ALT,x,exec,${remote} ${rofi} -S drun" # -x 10 -y 10 -W 25% -H 60%
+            "SUPER ALT,d,exec,${remote} ${rofi} -S run"
           ]
           # ++
           # (
@@ -435,7 +435,7 @@
           #     cliphist = lib.getExe config.services.cliphist.package;
           #   in
           #   lib.optionals config.services.cliphist.enable [
-          #     ''SUPER,c,exec,selected=$(${cliphist} list | ${ofi} -S dmenu) && echo "$selected" | ${cliphist} decode | wl-copy''
+          #     ''SUPER,c,exec,selected=$(${cliphist} list | ${rofi} -S dmenu) && echo "$selected" | ${cliphist} decode | wl-copy''
           #   ]
           # )
         );
