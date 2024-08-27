@@ -15,11 +15,9 @@
     enableCompletion = true;
     enableVteIntegration = true;
     initExtra = ''
-      fastfetch() {
-        if [ -x "$(command -v fastfetch)" ]; then
-          fastfetch --print 2>/dev/null
-        fi
-      }
+      if [ -x "$(command -v fastfetch)" ]; then
+        fastfetch --config all 2>/dev/null
+      fi
     '';
     bashrcExtra = ''
       eval "$(zoxide init bash)"
