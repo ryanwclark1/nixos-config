@@ -1,0 +1,9 @@
+/**
+ *
+ * Fonts
+ *
+ **/
+
+* {
+    font: "Iosevka Nerd Font 10";
+}

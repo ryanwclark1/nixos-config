@@ -43,10 +43,10 @@ in
       };
     };
     opacity = {
-      applications = 0.9;
-      desktop = 0.9;
-      popups = 0.9;
-      terminal = 0.85;
+      applications = 0.95;
+      desktop = 0.95;
+      popups = 0.95;
+      terminal = 0.9;
     };
     targets = {
       alacritty.enable = true;
@@ -92,7 +92,7 @@ in
         };
       };
       qutebrowser.enable = true;
-      rofi.enable = true;
+      rofi.enable = false;
       vscode.enable = false;
       waybar = {
         enable = false;

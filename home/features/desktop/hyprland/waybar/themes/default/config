@@ -34,12 +34,7 @@
             "unlocked": ""
         }
     },
-    // ML4W Welcome App
-    "custom/ml4w-welcome": {
-        "on-click": "~/.config/ml4w/apps/ML4W_Welcome-x86_64.AppImage",
-        "format": " ",
-        "tooltip": false
-    },    
+
     // Waybar Themes
     "custom/waybarthemes": {
         "format": "Themes",

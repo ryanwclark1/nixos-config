@@ -444,52 +444,52 @@
             desc = "run lazygit";
           }
           # fzf bookmark
-          {
-            on = [ "u" "a"];
-            run = "plugin fzfbm --args=save";
-            desc = "Add bookmark";
-          }
+          # {
+          #   on = [ "u" "a"];
+          #   run = "plugin fzfbm --args=save";
+          #   desc = "Add bookmark";
+          # }
 
-          {
-            on = [ "u" "g"];
-            run = "plugin fzfbm --args=jump_by_key";
-            desc = "Jump bookmark by key";
-          }
+          # {
+          #   on = [ "u" "g"];
+          #   run = "plugin fzfbm --args=jump_by_key";
+          #   desc = "Jump bookmark by key";
+          # }
 
-          {
-            on = [ "u" "G"];
-            run = "plugin fzfbm --args=jump_by_fzf";
-            desc = "Jump bookmark by fzf";
-          }
-          {
-            on = [ "u" "d"];
-            run = "plugin fzfbm --args=delete_by_key";
-            desc = "Delete bookmark by key";
-          }
+          # {
+          #   on = [ "u" "G"];
+          #   run = "plugin fzfbm --args=jump_by_fzf";
+          #   desc = "Jump bookmark by fzf";
+          # }
+          # {
+          #   on = [ "u" "d"];
+          #   run = "plugin fzfbm --args=delete_by_key";
+          #   desc = "Delete bookmark by key";
+          # }
 
-          {
-            on = [ "u" "D"];
-            run = "plugin fzfbm --args=delete_by_fzf";
-            desc = "Delete bookmark by fzf";
-          }
+          # {
+          #   on = [ "u" "D"];
+          #   run = "plugin fzfbm --args=delete_by_fzf";
+          #   desc = "Delete bookmark by fzf";
+          # }
 
-          {
-            on = [ "u" "A"];
-            run = "plugin fzfbm --args=delete_all";
-            desc = "Delete all bookmarks";
-          }
+          # {
+          #   on = [ "u" "A"];
+          #   run = "plugin fzfbm --args=delete_all";
+          #   desc = "Delete all bookmarks";
+          # }
 
-          {
-            on = [ "u" "r"];
-            run = "plugin fzfbm --args=rename_by_key";
-            desc = "Rename bookmark by key";
-          }
+          # {
+          #   on = [ "u" "r"];
+          #   run = "plugin fzfbm --args=rename_by_key";
+          #   desc = "Rename bookmark by key";
+          # }
 
-          {
-            on = [ "u" "R"];
-            run = "plugin fzfbm --args=rename_by_fzf";
-            desc = "Rename bookmark by fzf";
-          }
+          # {
+          #   on = [ "u" "R"];
+          #   run = "plugin fzfbm --args=rename_by_fzf";
+          #   desc = "Rename bookmark by fzf";
+          # }
 
 
         ];
