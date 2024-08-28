@@ -364,8 +364,7 @@
           # To OCR
           "ALT,Print,exec,${grimblast} --freeze save area - | ${tesseract} - - | wl-copy && ${notify-send} -t 3000 'OCR result copied to buffer'"
           # Hyprlock
-          "SUPER,backspace,exec,${hyprlock} -S --grace 2"
-          "SUPER,XF86Calculator,exec,${hyprlock} -S --grace 2"
+
         ]
         ++
         (
@@ -391,8 +390,8 @@
             hyprlock = lib.getExe config.programs.hyprlock.package;
           in
             lib.optionals config.programs.hyprlock.enable [
-              "SUPER,backspace,exec,${hyprlock} -S --grace 2"
-              "SUPER,XF86Calculator,exec,${hyprlock} -S --grace 2"
+          "SUPER,backspace,exec,/rofi/config/scripts/powermenu_t4"
+          "SUPER,XF86Calculator,exec,/rofi/config/scripts/powermenu_t4"
             ]
         )
         ++
@@ -413,9 +412,10 @@
             "SUPER,x,exec,${rofi} -show drun -theme ${config.xdg.configHome}/rofi/launchers/type-2/style-2.rasi"
             "SUPER,s,exec,specialisation $(specialisation | ${rofi} -S dmenu)"
             "SUPER,d,exec,${rofi} -S run"
-
+            # "CTRL ALT d,exec,${rofi}"
+            # -show ${config.xdg.configHome}/rofi/powermenu/type-4/powermenu.sh -theme ${config.xdg.configHome}/rofi/powermenu/type-4/style-2.rasi"
             "SUPER ALT,x,exec,${remote} ${rofi} -S drun" # -x 10 -y 10 -W 25% -H 60%
-            "SUPER ALT,d,exec,${remote} ${rofi} -S run"
+            # "Control_L ALT,Delete,exec,/rofi/config/scripts/powermenu_t4"
           ]
           # ++
           # (
