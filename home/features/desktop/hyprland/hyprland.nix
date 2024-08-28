@@ -55,7 +55,7 @@
           # "hyprctl setcursor Nordzy-cursors 22 &"
           # "poweralertd &"
           "${hypridle}"
-          "${waybar}"
+          "${waybar} --style ${config.xdg.configHome}/waybar/themes/default/style.css"
           # "swaync &"
           # "wl-paste --watch cliphist store &"
           # "hyprlock"
@@ -410,7 +410,7 @@
         # Launcher
         (
           lib.optionals config.programs.rofi.enable [
-            "SUPER,x,exec,${rofi} -dmenu" # -x 10 -y 10 -W 25% -H 60%
+            "SUPER,x,exec,${rofi} -show drun -theme ${config.xdg.configHome}/rofi/launchers/type-2/style-2.rasi"
             "SUPER,s,exec,specialisation $(specialisation | ${rofi} -S dmenu)"
             "SUPER,d,exec,${rofi} -S run"
 

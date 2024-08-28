@@ -1,4 +1,6 @@
 {
+  config,
+  lib,
   pkgs,
   ...
 }:
@@ -7,14 +9,22 @@ let
   pavucontrol = "${pkgs.pavucontrol}/bin/pavucontrol";
   kitty = "${pkgs.kitty}/bin/kitty";
   nmtui = "${pkgs.networkmanager}/bin/nmtui";
-  nm-connection = "${pkgs.network-manager-applet}/bin/nm-connection-editor";
-  mission-center = "${pkgs.mission-center}/bin/mission-center";
+  nm-connection = "${pkgs.networkmanagerapplet}/bin/nm-connection-editor";
+  missioncenter = "${pkgs.mission-center}/bin/missioncenter";
   cliphist = "${pkgs.cliphist}/bin/cliphist";
   rofi = "${pkgs.rofi}/bin/rofi";
+  hypridle = lib.getExe config.services.hypridle.package;
 in
 {
+  home = {
+    file.".config/waybar/themes" = {
+      source = ./themes;
+      recursive = true;
+    };
+  };
+
   home.packages = with pkgs; [
-    network-manager-applet
+    networkmanagerapplet
     mission-center
   ];
 
@@ -23,14 +33,13 @@ in
       enable = true;
       package = pkgs.waybar;
       settings = [{
-        exclusive = true;
-        layer = "top";
-        position = "top";
-        height = 11;
-        passthrough = false;
-        gtk-layer-shell = true;
-        modules-left = [ "hyprland/window" ];
-        modules-center = [ "network" "pulseaudio" "cpu" "custom/gpu" "hyprland/workspaces" "memory" "disk" "clock" "battery"];
+        # exclusive = true;
+        # layer = "top";
+        # position = "top";
+        # passthrough = false;
+        # gtk-layer-shell = true;
+        modules-left = [ "hyprland/workspaces" ];
+        modules-center = [ "network" "pulseaudio" "cpu" "custom/gpu"  "memory" "disk" "clock" "battery"];
         modules-right = [ "custom/notification" "tray" ];
 
         "hyprland/workspaces" = {
@@ -157,28 +166,28 @@ in
           interval = 5;
           format = "  {}%";
           tooltip = true;
-          on-click = "${mission-center}";
+          on-click = "${missioncenter}";
         };
 
         cpu = {
           interval = 5;
           format = "  {usage:2}%";
           tooltip = true;
-          on-click = "${mission-center}";
+          on-click = "${missioncenter}";
         };
 
         "custom/gpu" = {
             interval = 5;
             exec = "${cat} /sys/class/drm/card0/device/gpu_busy_percent";
             format = "󰒋  {}%";
-            on-click = "${mission-center}";
+            on-click = "${missioncenter}";
         };
 
         disk = {
           interval = 30;
           format = "  {free}";
           tooltip = true;
-          on-click = "${mission-center}";
+          on-click = "${missioncenter}";
         };
 
         "hyprland/language" = {
@@ -263,9 +272,15 @@ in
             Up: {bandwidthUpBits}
             Down: {bandwidthDownBits}
           '';
-          tooltip-format-ethernet = '' {ifname}\nIP: {ipaddr}\n up: {bandwidthUpBits} down: {bandwidthDownBits}'';
+          tooltip-format-ethernet = '' {ifname}
+          IP: {ipaddr}
+          up: {bandwidthUpBits} down: {bandwidthDownBits}'';
           tooltip-format-disconnected = "Disconnected";
-          tooltip-format-wifi = ''  {ifname} @ {essid}\nIP: {ipaddr}\nStrength: {signalStrength}%\nFreq: {frequency}MHz\nUp: {bandwidthUpBits} Down: {bandwidthDownBits}'';
+          tooltip-format-wifi = ''  {ifname} @ {essid}
+          IP: {ipaddr}
+          Strength: {signalStrength}%
+          Freq: {frequency}MHz
+          Up: {bandwidthUpBits} Down: {bandwidthDownBits}'';
           max-length = 50;
           on-click = "${kitty} -e ${nmtui}";
           on-click-right = "${nm-connection}";
@@ -376,138 +391,6 @@ in
           tooltip = false;
         };
       }];
-
-      # style = ''
-      #     * {
-      #       font-size: 12px;
-      #       font-family: JetBrainsMono Nerd Font, Font Awesome, sans-serif;
-      #           font-weight: bold;
-      #     }
-      #     window#waybar {
-      #           background-color: rgba(26,27,38,0);
-      #           border-bottom: 1px solid rgba(26,27,38,0);
-      #           border-radius: 0px;
-      #           color: #f8f8f2;
-      #     }
-      #     #workspaces {
-      #           background: linear-gradient(180deg, #414868, #24283b);
-      #           margin: 5px;
-      #           padding: 0px 1px;
-      #           border-radius: 15px;
-      #           border: 0px;
-      #           font-style: normal;
-      #           color: #15161e;
-      #     }
-      #     #workspaces button {
-      #           padding: 0px 5px;
-      #           margin: 4px 3px;
-      #           border-radius: 15px;
-      #           border: 0px;
-      #           color: #15161e;
-      #           background-color: #1a1b26;
-      #           opacity: 1.0;
-      #           transition: all 0.3s ease-in-out;
-      #     }
-      #     #workspaces button.active {
-      #           color: #15161e;
-      #           background: #7aa2f7;
-      #           border-radius: 15px;
-      #           min-width: 40px;
-      #           transition: all 0.3s ease-in-out;
-      #           opacity: 1.0;
-      #     }
-      #     #workspaces button:hover {
-      #           color: #15161e;
-      #           background: #7aa2f7;
-      #           border-radius: 15px;
-      #           opacity: 1.0;
-      #     }
-      #     tooltip {
-      #         background: #1a1b26;
-      #         border: 1px solid #7aa2f7;
-      #         border-radius: 10px;
-      #     }
-      #     tooltip label {
-      #         color: #c0caf5;
-      #     }
-      #     #window {
-      #           color: #565f89;
-      #           background: #1a1b26;
-      #           border-radius: 0px 15px 50px 0px;
-      #           margin: 5px 5px 5px 0px;
-      #           padding: 2px 20px;
-      #     }
-      #     #memory {
-      #           color: #2ac3de;
-      #           background: #1a1b26;
-      #           border-radius: 15px 50px 15px 50px;
-      #           margin: 5px;
-      #           padding: 2px 20px;
-      #     }
-      #     #clock {
-      #           color: #c0caf5;
-      #           background: #1a1b26;
-      #           border-radius: 15px 50px 15px 50px;
-      #           margin: 5px;
-      #           padding: 2px 20px;
-      #     }
-      #     #cpu {
-      #           color: #b4f9f8;
-      #           background: #1a1b26;
-      #           border-radius: 50px 15px 50px 15px;
-      #           margin: 5px;
-      #           padding: 2px 20px;
-      #     }
-      #     #custom-gpu {
-      #           color: #ff9e64;
-      #           background: #1a1b26;
-      #           border-radius: 15px 50px 15px 50px;
-      #           margin: 5px;
-      #           padding: 2px 20px;
-      #     }
-      #     #disk {
-      #           color: #9ece6a;
-      #           background: #1a1b26;
-      #           border-radius: 15px 50px 15px 50px;
-      #           margin: 5px;
-      #           padding: 2px 20px;
-      #     }
-      #     #battery {
-      #           color: #f7768e;
-      #           background: #1a1b26;
-      #           border-radius: 15px;
-      #           margin: 5px;
-      #           padding: 2px 20px;
-      #     }
-      #     #network {
-      #           color: #ff9e64;
-      #           background: #1a1b26;
-      #           border-radius: 50px 15px 50px 15px;
-      #           margin: 5px;
-      #           padding: 2px 20px;
-      #     }
-      #     #tray {
-      #           color: #bb9af7;
-      #           background: #1a1b26;
-      #           border-radius: 15px 0px 0px 50px;
-      #           margin: 5px 0px 5px 5px;
-      #           padding: 2px 20px;
-      #     }
-      #     #pulseaudio {
-      #           color: #bb9af7;
-      #           background: #1a1b26;
-      #           border-radius: 50px 15px 50px 15px;
-      #           margin: 5px;
-      #           padding: 2px 20px;
-      #     }
-      #     #custom-notification {
-      #           color: #7dcfff;
-      #           background: #1a1b26;
-      #           border-radius: 15px 50px 15px 50px;
-      #           margin: 5px;
-      #           padding: 2px 20px;
-      #     }
-      # '';
 
       style = ''
         * {
