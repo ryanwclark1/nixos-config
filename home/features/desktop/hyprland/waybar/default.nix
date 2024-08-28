@@ -40,14 +40,14 @@ in
         # gtk-layer-shell = true;
         modules-left = [ "hyprland/workspaces" ];
         modules-center = [ "network" "pulseaudio" "cpu" "custom/gpu"  "memory" "disk" "clock" "battery"];
-        modules-right = [ "custom/notification" "tray" ];
+        modules-right = [ "custom/exit" ];
 
         "hyprland/workspaces" = {
-          format = "{}";
+          format = "{icon}";
           format-icons = {
-            default = "";
-            active = "";
-            urgent = "";
+            default = "";
+            active = "";
+            urgent = "";
           };
           on-scroll-up = "hyprctl dispatch workspace e+1";
           on-scroll-down = "hyprctl dispatch workspace e-1";
@@ -267,16 +267,18 @@ in
           format-disconnected = "󰤮";
           # tooltip = true;
           tooltip-format = ''
-            {ifname}
-            {ipaddr}/{cidr}
-            Up: {bandwidthUpBits}
-            Down: {bandwidthDownBits}
+          {ifname}
+          {ipaddr}/{cidr}
+          Up: {bandwidthUpBits}
+          Down: {bandwidthDownBits}
           '';
-          tooltip-format-ethernet = '' {ifname}
+          tooltip-format-ethernet = ''
+           {ifname}
           IP: {ipaddr}
           up: {bandwidthUpBits} down: {bandwidthDownBits}'';
           tooltip-format-disconnected = "Disconnected";
-          tooltip-format-wifi = ''  {ifname} @ {essid}
+          tooltip-format-wifi = ''
+            {ifname} @ {essid}
           IP: {ipaddr}
           Strength: {signalStrength}%
           Freq: {frequency}MHz
@@ -326,25 +328,25 @@ in
           icon = false;
         };
 
-        "custom/notification" = {
-          tooltip = true;
-          format = "{icon} {}";
-          format-icons = {
-            notification = "<span foreground='red'><sup></sup></span>";
-            none = "";
-            dnd-notification = "<span foreground='red'><sup></sup></span>";
-            dnd-none = "";
-            inhibited-notification = "<span foreground='red'><sup></sup></span>";
-            inhibited-none = "";
-            dnd-inhibited-notification = "<span foreground='red'><sup></sup></span>";
-            dnd-inhibited-none = "";
-          };
-          return-type = "json";
-          exec-if = "which swaync-client";
-          exec = "swaync-client -swb";
-          on-click = "task-waybar";
-          escape = true;
-        };
+        # "custom/notification" = {
+        #   tooltip = true;
+        #   format = "{icon} {}";
+        #   format-icons = {
+        #     notification = "<span foreground='red'><sup></sup></span>";
+        #     none = "";
+        #     dnd-notification = "<span foreground='red'><sup></sup></span>";
+        #     dnd-none = "";
+        #     inhibited-notification = "<span foreground='red'><sup></sup></span>";
+        #     inhibited-none = "";
+        #     dnd-inhibited-notification = "<span foreground='red'><sup></sup></span>";
+        #     dnd-inhibited-none = "";
+        #   };
+        #   return-type = "json";
+        #   exec-if = "which swaync-client";
+        #   exec = "swaync-client -swb";
+        #   on-click = "task-waybar";
+        #   escape = true;
+        # };
 
         idle_inhibitor = {
           format = "{icon}";
