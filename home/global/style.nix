@@ -95,10 +95,10 @@ in
       rofi.enable = true;
       vscode.enable = false;
       waybar = {
-        enable = true;
+        enable = false;
         enableCenterBackColors = false;
-        enableLeftBackColors = true;
-        enableRightBackColors = true;
+        enableLeftBackColors = false;
+        enableRightBackColors = false;
       };
       wofi.enable = false;
       yazi.enable = true;
