@@ -1,27 +1,23 @@
 #!/usr/bin/env bash
 
-## Rofi   : Power Menu
-#
-## Available Styles
-#
-## style-1   style-2   style-3   style-4   style-5
-
 # Current Theme
 dir="$HOME/.config/rofi/powermenu/type-4"
-theme='style-5'
+theme='style-2'
+background="$(hyprctl hyprpaper listloaded)"
 
 # CMDs
-uptime="`uptime | sed -e 's/up //g'`"
+lastlogin="`last $USER | head -n1 | tr -s ' ' | cut -d' ' -f5,6,7`"
+uptime="$(uptime | sed -e 's/up //g')"
 host=`hostname`
 
 # Options
-shutdown=''
-reboot=''
-lock=''
-suspend=''
-logout=''
-yes=''
-no=''
+shutdown=''
+reboot=''
+lock=''
+suspend='󰏦'
+logout='󰍃'
+yes=''
+no=''
 
 # Rofi CMD
 rofi_cmd() {
