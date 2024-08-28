@@ -7,15 +7,16 @@ let
   pavucontrol = "${pkgs.pavucontrol}/bin/pavucontrol";
   kitty = "${pkgs.kitty}/bin/kitty";
   nmtui = "${pkgs.networkmanager}/bin/nmtui";
-  nm-connection = "${pkgs.networkmanager}/bin/nm-connection-editor";
+  nm-connection = "${pkgs.network-manager-applet}/bin/nm-connection-editor";
   mission-center = "${pkgs.mission-center}/bin/mission-center";
   cliphist = "${pkgs.cliphist}/bin/cliphist";
   rofi = "${pkgs.rofi}/bin/rofi";
 in
 {
-  home.programs = {
-
-  };
+  home.packages = with pkgs; [
+    network-manager-applet
+    mission-center
+  ];
 
   programs = {
     waybar = {
