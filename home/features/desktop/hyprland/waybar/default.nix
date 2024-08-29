@@ -39,8 +39,9 @@ in
         # passthrough = false;
         # gtk-layer-shell = true;
         modules-left = [ "hyprland/workspaces" ];
-        modules-center = [ "network" "pulseaudio" "cpu" "custom/gpu"  "memory" "disk" "clock" "battery"];
-        modules-right = [ "custom/exit" ];
+        modules-center = [ "clock" ];
+        # modules-center = [ "network" "pulseaudio" "cpu" "custom/gpu"  "memory" "disk" "clock" "battery"];
+        modules-right = [ "group/hardware" "battery" "pulseaudio" "bluetooth" "custom/exit" ];
 
         "hyprland/workspaces" = {
           format = "{icon}";
@@ -51,22 +52,6 @@ in
           };
           on-scroll-up = "hyprctl dispatch workspace e+1";
           on-scroll-down = "hyprctl dispatch workspace e-1";
-        };
-
-        "wlr/taskbar" = {
-          format = "{icon}";
-          icon-size = 18;
-          tooltip-format = "{title}";
-          on-click = "activate";
-          on-click-middle = "close";
-          ignore-list = ["Alacritty" "kitty"];
-          # app_ids-mapping = {
-          #   firefoxdeveloperedition = "firefox-developer-edition"
-          # };
-          # rewrite = {
-          #   "Firefox Web Browser" = "Firefox";
-          #   "Foot Server" = "Terminal"
-          # };
         };
 
         # "hyprland/window" = {
@@ -80,16 +65,6 @@ in
         #   separate-outputs = true
         # };
 
-        # Empty
-        "custom/empty" = {
-          format = "";
-        };
-
-        # Empty
-        "custom/tools" = {
-          format = "";
-          tooltip-format = "Tools";
-        };
 
         # Cliphist
         "custom/cliphist" = {
@@ -103,7 +78,7 @@ in
         # Power Menu
         "custom/exit" = {
           format = "";
-          on-click = "wlogout";
+          on-click = "${config.xdg.configHome}/rofi/scripts/powermenu_t4";
           tooltip-format = "Power Menu";
         };
 
@@ -164,28 +139,36 @@ in
 
         memory = {
           interval = 5;
-          format = "  {}%";
+          format = "{}%";
           tooltip = true;
           on-click = "${missioncenter}";
         };
 
         cpu = {
           interval = 5;
-          format = "  {usage:2}%";
+          format = "{usage:2}%";
           tooltip = true;
+          on-click = "${missioncenter}";
+        };
+
+        "custom/system" = {
+          format = "󰇅";
+          tooltip = true;
+          tooltip-format = "System Information";
           on-click = "${missioncenter}";
         };
 
         "custom/gpu" = {
             interval = 5;
             exec = "${cat} /sys/class/drm/card0/device/gpu_busy_percent";
-            format = "󰒋  {}%";
+            format = "󰢮{}%";
+            tooltip = true;
             on-click = "${missioncenter}";
         };
 
         disk = {
           interval = 30;
-          format = "  {free}";
+          format = " {free}";
           tooltip = true;
           on-click = "${missioncenter}";
         };
@@ -208,7 +191,7 @@ in
             "cpu"
             "custom/gpu"
             "memory"
-            "hyprland/language"
+            # "hyprland/language"
           ];
         };
 
@@ -297,8 +280,8 @@ in
           format = "{icon} {volume}% {format_source}";
           format-bluetooth = "{volume}% {icon} {format_source}";
           format-bluetooth-muted = " {icon} {format_source}";
-          format-muted = "  {format_source}";
-          format-source = " {volume}%";
+          format-muted = " {format_source}";
+          format-source = "{volume}%";
           format-source-muted = "";
           format-icons = {
             headphone = "";
@@ -314,8 +297,8 @@ in
 
         # Bluetooth
         bluetooth = {
-          format = " {status}";
-          format-disabled = "";
+          format = "󰂯";
+          format-disabled = "󰂲";
           format-off = "";
           interval = 30;
           on-click = "blueman-manager";

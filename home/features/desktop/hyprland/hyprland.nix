@@ -390,8 +390,8 @@
             hyprlock = lib.getExe config.programs.hyprlock.package;
           in
             lib.optionals config.programs.hyprlock.enable [
-          "SUPER,backspace,exec,/rofi/config/scripts/powermenu_t4"
-          "SUPER,XF86Calculator,exec,/rofi/config/scripts/powermenu_t4"
+          "SUPER,backspace,exec,${config.xdg.configHome}/rofi/scripts/powermenu_t4"
+          "SUPER,XF86Calculator,exec,${config.xdg.configHome}/rofi/scripts/powermenu_t4"
             ]
         )
         ++
