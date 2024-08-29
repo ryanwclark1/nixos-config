@@ -58,6 +58,7 @@
         vscodevim.vim
         wholroyd.jinja # Prefer Better Jinja
         yzhang.markdown-all-in-one
+        gencer.html-slim-scss-css-class-completion
       ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
         {
           name = "nord-deep";
@@ -148,6 +149,12 @@
           publisher = "qwtel";
           version = "0.6.4";
           sha256 = "sha256-wDSWQ36j6zMUD43PqP+x9VRxgDJJexFpxMyuHpbCi2s=";
+        }
+        {
+          name = "yuck";
+          publisher = "eww-yuck";
+          version = "0.0.3";
+          sha256 = "sha256-DITgLedaO0Ifrttu+ZXkiaVA7Ua5RXc4jXQHPYLqrcM=";
         }
       ];
 

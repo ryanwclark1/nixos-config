@@ -33,10 +33,13 @@ in
       enable = true;
       package = pkgs.waybar;
       settings = [{
-        # exclusive = true;
-        # layer = "top";
-        # position = "top";
-        # passthrough = false;
+        layer = "top";
+        position = "top";
+        mode = "overlay";
+        exclusive = false;
+        fixed-center = true;
+        passthrough = true;
+        reload_style_on_change = true; # Testing
         # gtk-layer-shell = true;
         modules-left = [ "hyprland/workspaces" ];
         modules-center = [ "clock" ];

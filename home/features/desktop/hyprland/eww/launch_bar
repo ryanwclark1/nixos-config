@@ -2,7 +2,8 @@
 
 ## Files and cmd
 FILE="$HOME/.cache/eww_launch.xyz"
-EWW="$HOME/.local/bin/eww/eww -c $HOME/.config/eww/bar"
+# EWW="$HOME/.local/bin/eww/eww -c $HOME/.config/eww"
+EWW="eww -c /home/administrator/nixos-config/home/features/desktop/hyprland/eww"
 
 ## Run eww daemon if not running already
 if [[ ! `pidof eww` ]]; then
@@ -20,8 +21,9 @@ run_eww() {
 ## Launch or close widgets accordingly
 if [[ ! -f "$FILE" ]]; then
 	touch "$FILE"
-	run_eww && bspc config -m LVDS-1 top_padding 49
+	run_eww
+	# && bspc config -m LVDS-1 top_padding 49
 else
-	${EWW} close-all && killall eww
+	${EWW} close-all && pkill eww
 	rm "$FILE"
 fi
