@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 if [ -f ~/.config/ml4w/version/compare.sh ] ;then
     ~/.config/ml4w/version/compare.sh
 fi
