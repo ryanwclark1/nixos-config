@@ -101,7 +101,7 @@ in
         };
 
         clock = {
-          format = "{:%H:%M }";
+          format = "{:%H:%M}";
           interval = 60;
           max-length = 25;
           # format = "{:%d/%m %H:%M:%S}";
@@ -139,20 +139,20 @@ in
 
         memory = {
           interval = 5;
-          format = "{}%";
+          format = " {}%";
           tooltip = true;
           on-click = "${missioncenter}";
         };
 
         cpu = {
           interval = 5;
-          format = "{usage:2}%";
+          format = " {usage:2}%";
           tooltip = true;
           on-click = "${missioncenter}";
         };
 
         "custom/system" = {
-          format = "󰇅";
+          format = " 󰇅 ";
           tooltip = true;
           tooltip-format = "System Information";
           on-click = "${missioncenter}";
@@ -161,7 +161,7 @@ in
         "custom/gpu" = {
             interval = 5;
             exec = "${cat} /sys/class/drm/card0/device/gpu_busy_percent";
-            format = "󰢮{}%";
+            format = "󰢮 {}%";
             tooltip = true;
             on-click = "${missioncenter}";
         };
@@ -289,7 +289,7 @@ in
             phone = "";
             portable = "";
             car = "";
-            default = [ "" "" "" ];
+            default = [ " " " " " " ];
           };
           on-click = "${pavucontrol}";
           tooltip-format = "{source_volume}% / {desc}";
@@ -297,7 +297,7 @@ in
 
         # Bluetooth
         bluetooth = {
-          format = "󰂯";
+          format = "";
           format-disabled = "󰂲";
           format-off = "";
           interval = 30;

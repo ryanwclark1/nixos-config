@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 clear
 figlet -f smslant "Disable DM"
 echo "Hyprland recommends the start with the tty login."
@@ -16,7 +16,7 @@ while true; do
                 echo "No active display manager found."
             fi
         break;;
-        [Nn]* ) 
+        [Nn]* )
             exit
         break;;
         * ) echo "Please answer yes or no.";;
