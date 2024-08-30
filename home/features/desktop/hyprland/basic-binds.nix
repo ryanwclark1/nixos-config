@@ -57,8 +57,6 @@
 
         "SUPER,apostrophe,workspace,previous"
         "SUPER SHIFT,apostrophe,workspace,next"
-        "SUPER,dead_grave,workspace,previous"
-        "SUPER SHIFT,dead_grave,workspace,next"
 
         "SUPER,u,togglespecialworkspace"
         "SUPER SHIFT,u,movetoworkspacesilent,special"
