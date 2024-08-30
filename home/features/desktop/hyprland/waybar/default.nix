@@ -44,7 +44,7 @@ in
         modules-left = [ "hyprland/workspaces" ];
         modules-center = [ "clock" ];
         # modules-center = [ "network" "pulseaudio" "cpu" "custom/gpu"  "memory" "disk" "clock" "battery"];
-        modules-right = [ "group/hardware" "battery" "pulseaudio" "bluetooth" "custom/exit" ];
+        modules-right = [ "battery" "pulseaudio" "bluetooth" "custom/exit" ];
 
         "hyprland/workspaces" = {
           format = "{icon}";
@@ -284,7 +284,7 @@ in
           format-bluetooth = "{volume}% {icon} {format_source}";
           format-bluetooth-muted = " {icon} {format_source}";
           format-muted = " {format_source}";
-          format-source = "{volume}%";
+          format-source = " {volume}%";
           format-source-muted = "";
           format-icons = {
             headphone = "";
@@ -292,7 +292,7 @@ in
             phone = "";
             portable = "";
             car = "";
-            default = [ " " " " " " ];
+            default = [ "" " " " " ];
           };
           on-click = "${pavucontrol}";
           tooltip-format = "{source_volume}% / {desc}";
