@@ -14,7 +14,7 @@
     ./hypridle
     ./mako.nix
     ./rofi
-    # ./waybar
+    ./waybar
     ./eww
     # ./wofi.nix
     # ./variables.nix
