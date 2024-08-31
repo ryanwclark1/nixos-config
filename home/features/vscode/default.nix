@@ -59,6 +59,7 @@
         wholroyd.jinja # Prefer Better Jinja
         yzhang.markdown-all-in-one
         gencer.html-slim-scss-css-class-completion
+        catppuccin.catppuccin-vsc
       ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
         {
           name = "nord-deep";
