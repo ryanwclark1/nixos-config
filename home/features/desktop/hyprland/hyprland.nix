@@ -31,6 +31,7 @@
       waybar = lib.getExe pkgs.waybar;
       rofi = lib.getExe config.programs.rofi.package;
       hypridle = lib.getExe config.services.hypridle.package;
+      eww = lib.getExe config.programs.eww.package;
     in
     {
       # "$menu" = "rofi";
@@ -56,6 +57,7 @@
           # "poweralertd &"
           "${hypridle}"
           "${waybar} --style ${config.xdg.configHome}/waybar/themes/default/style.css"
+          "${eww}"
           # "swaync &"
           # "wl-paste --watch cliphist store &"
           # "hyprlock"

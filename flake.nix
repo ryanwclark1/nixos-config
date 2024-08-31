@@ -61,6 +61,7 @@
     #   url = "github:ryanwclark1/nixvim";
     #   inputs.nixpkgs.follows = "nixpkgs";
     # };
+    ags.url = "github:Aylur/ags";
   };
 
   outputs = {

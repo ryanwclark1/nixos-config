@@ -1,6 +1,6 @@
-@define-color foreground {foreground};
-@define-color background {background};
-@define-color cursor {cursor};
+@define-color foreground {@base00};
+@define-color background {@base00};
+@define-color cursor {@base01};
 
 @define-color color0 {#2e3440};
 @define-color color1 {#3b4252};

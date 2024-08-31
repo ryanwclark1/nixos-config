@@ -14,8 +14,21 @@ fi
 ## Open widgets
 run_eww() {
 	${EWW} open-many \
-         bar
-
+         searchapps \
+				musicplayer \
+				network \
+				appbar \
+				bg \
+				calendar \
+				quicksettings \
+				bigpowermenu \
+				fetch \
+				quote \
+				favorites \
+				smalldate \
+				notes \
+				sys \
+				screenshot
 }
 
 ## Launch or close widgets accordingly
