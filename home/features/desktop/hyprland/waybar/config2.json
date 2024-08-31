@@ -1,0 +1,301 @@
+[
+  {
+    // "passthrough": true,
+    "position": "top",
+    // "exclusive": false,
+    "fixed-center": true,
+    "layer": "top",
+    // "mode": "overlay",
+    "reload_style_on_change": true,
+    "modules-center": [
+      "clock"
+    ],
+    "modules-left": [
+      "hyprland/workspaces"
+    ],
+    "modules-right": [
+      "group/hardware",
+      "battery",
+      "custom/speaker",
+      "custom/mic",
+      "bluetooth",
+      "custom/exit"
+    ],
+    "backlight": {
+      "format": "{icon} {percentage}%",
+      "format-icons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "scroll-step": 1
+    },
+    "battery": {
+      "format": "{icon} {capacity}%",
+      "format-charging": "󰂄{capacity}%",
+      "format-icons": [
+        "󰁺",
+        "󰁻",
+        "󰁼",
+        "󰁽",
+        "󰁾",
+        "󰁿",
+        "󰂀",
+        "󰂁",
+        "󰂂",
+        "󰁹"
+      ],
+      "format-plugged": " {capacity}%",
+      "interval": 10,
+      "on-click": "",
+      "states": {
+        "critical": 10,
+        "good": 95,
+        "warning": 20
+      },
+      "tooltip": false
+    },
+    "bluetooth": {
+      "format": "",
+      "format-disabled": "󰂲",
+      "format-no-controller": "",
+      "format-off": "",
+      "interval": 30,
+      "on-click": "blueman-manager"
+    },
+    "clock": {
+      "actions": {
+        "on-click-backward": "tz_down",
+        "on-click-forward": "tz_up",
+        "on-click-right": "mode",
+        "on-scroll-down": "shift_down",
+        "on-scroll-up": "shift_up"
+      },
+      "calendar": {
+        "format": {
+          "days": "<span color='#ecc6d9'><b>{}</b></span>",
+          "months": "<span color='#ffead3'><b>{}</b></span>",
+          "today": "<span color='#ff6699'><b><u>{}</u></b></span>",
+          "weekdays": "<span color='#ffcc66'><b>{}</b></span>"
+        },
+        "mode": "year",
+        "mode-mon-col": 3,
+        "on-scroll": 1,
+        "weeks-pos": "right"
+      },
+      "format": "{:%H:%M}",
+      "format-alt": "{:%Y-%m-%d %H:%M:%S}",
+      "interval": 60,
+      "max-length": 25,
+      "on-click-left": "mode",
+      "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+    },
+    "cpu": {
+      "format": " {usage}%",
+      "interval": 5,
+      "on-click": "/nix/store/dqfsw93c6ilch019r0yzibgdaqm6wfq9-mission-center-0.5.2/bin/missioncenter",
+      "tooltip": true
+    },
+    "custom/chatgpt": {
+      "format": "",
+      "on-click": "",
+      "tooltip-format": "AI Support"
+    },
+    "custom/cliphist": {
+      "format": "",
+      "on-click": "sleep 0.1 && /nix/store/dgdafdz3fgldknx4w4qgqgx17gy0nx2p-cliphist-0.5.0/bin/cliphist list | /nix/store/7my5fa4c4gya5k6hhrygapickphm8sdc-rofi-1.7.5/bin/rofi -demu -replace -config ~/.config/rofi/config-cliphist.rasi | cliphist delete",
+      "on-click-middle": "/nix/store/dgdafdz3fgldknx4w4qgqgx17gy0nx2p-cliphist-0.5.0/bin/cliphist wipe",
+      "on-click-right": "sleep 0.1 && /nix/store/dgdafdz3fgldknx4w4qgqgx17gy0nx2p-cliphist-0.5.0/bin/cliphist list | /nix/store/7my5fa4c4gya5k6hhrygapickphm8sdc-rofi-1.7.5/bin/rofi -demu -replace -config ~/.config/rofi/config-cliphist.rasi | cliphist decode | wl-copy",
+      "tooltip-format": "Clipboard Manager"
+    },
+    "custom/exit": {
+      "format": "",
+      "on-click": "/home/administrator/.config/rofi/scripts/powermenu_t4",
+      "tooltip-format": "Power Menu"
+    },
+    "custom/gpu": {
+      "exec": "/nix/store/cnknp3yxfibxjhila0sjd1v3yglqssng-coreutils-9.5/bin/cat /sys/class/drm/card0/device/gpu_busy_percent",
+      "format": "󰢮 {}%",
+      "interval": 5,
+      "on-click": "/nix/store/dqfsw93c6ilch019r0yzibgdaqm6wfq9-mission-center-0.5.2/bin/missioncenter",
+      "tooltip": true
+    },
+    "custom/hypridle": {
+      "escape": true,
+      "exec": "~/.config/hypr/scripts/hypridle.sh status",
+      "exec-on-event": true,
+      "format": "",
+      "interval": 60,
+      "on-click": "~/.config/hypr/scripts/hypridle.sh toggle",
+      "on-click-right": "hyprlock",
+      "return-type": "json"
+    },
+    "custom/speaker": {
+      "tooltip": false,
+      "max-length": 6,
+      "exec": "$HOME/.config/waybar/scripts/speaker.sh",
+      "on-click": "pavucontrol"
+    },
+    "custom/mic": {
+      "tooltip": false,
+      "max-length": 6,
+      "exec": "$HOME/.config/waybar/scripts/mic.sh",
+      "on-click": "pavucontrol"
+    },
+    "custom/system": {
+      "format": "󰇅",
+      "on-click": "/nix/store/dqfsw93c6ilch019r0yzibgdaqm6wfq9-mission-center-0.5.2/bin/missioncenter",
+      "tooltip": true,
+      "tooltip-format": "System Information"
+    },
+    "disk": {
+      "format": " {free}",
+      "interval": 30,
+      "on-click": "/nix/store/dqfsw93c6ilch019r0yzibgdaqm6wfq9-mission-center-0.5.2/bin/missioncenter",
+      "tooltip": true
+    },
+    "group/hardware": {
+      "drawer": {
+        "children-class": "child-hardware",
+        "transition-duration": 300,
+        "transition-left-to-right": false
+      },
+      "modules": [
+        "custom/system",
+        "disk",
+        "cpu",
+        "custom/gpu",
+        "memory"
+      ],
+      "orientation": "inherit"
+    },
+    "group/links": {
+      "modules": [
+        "custom/chatgpt",
+        "custom/empty"
+      ],
+      "orientation": "horizontal"
+    },
+    "group/settings": {
+      "drawer": {
+        "children-class": "child-settings",
+        "transition-duration": 300,
+        "transition-left-to-right": true
+      },
+      "modules": [
+        "custom/settings",
+        "custom/waybarthemes",
+        "custom/wallpaper"
+      ],
+      "orientation": "inherit"
+    },
+    "group/tools": {
+      "drawer": {
+        "children-class": "child-tools",
+        "transition-duration": 300,
+        "transition-left-to-right": false
+      },
+      "modules": [
+        "custom/tools",
+        "custom/cliphist",
+        "custom/hypridle",
+        "custom/hyprshade"
+      ],
+      "orientation": "inherit"
+    },
+    "hyprland/language": {
+      "format": "/ K {short}"
+    },
+    "hyprland/window": {
+      "max-length": 60,
+      "separate-outputs": false
+    },
+    "hyprland/workspaces": {
+      "format": "{icon}",
+      "format-icons": {
+        "active": "",
+        "default": "",
+        "urgent": ""
+      },
+      "on-scroll-down": "hyprctl dispatch workspace e-1",
+      "on-scroll-up": "hyprctl dispatch workspace e+1"
+    },
+    "idle_inhibitor": {
+      "format": "{icon}",
+      "format-icons": {
+        "activated": "󰒳",
+        "deactivated": "󰒲"
+      }
+    },
+    "memory": {
+      "format": " {}%",
+      "interval": 5,
+      "on-click": "/nix/store/dqfsw93c6ilch019r0yzibgdaqm6wfq9-mission-center-0.5.2/bin/missioncenter",
+      "tooltip": true
+    },
+    "network": {
+      "format": "{ifname}",
+      "format-disconnected": "󰤮",
+      "format-ethernet": ": {bandwidthDownOctets} : {bandwidthUpOctets}",
+      "format-icons": [
+        "󰤯",
+        "󰤟",
+        "󰤢",
+        "󰤥",
+        "󰤨"
+      ],
+      "format-wifi": "{icon} {signalStrength}% {essid}",
+      "interval": 3,
+      "max-length": 50,
+      "on-click": "/nix/store/5xy7b28d6a18c2jrs3m1grz88lh725c8-kitty-0.35.2/bin/kitty -e /nix/store/53dhq4cc8lg4srgas71mf96irml2spaj-networkmanager-1.48.6/bin/nmtui",
+      "on-click-right": "/nix/store/gb5pvjjkmzln4whz6917qc42vvwiqzqf-network-manager-applet-1.36.0/bin/nm-connection-editor",
+      "tooltip-format": "{ifname}\n{ipaddr}/{cidr}\nUp: {bandwidthUpBits}\nDown: {bandwidthDownBits}\n",
+      "tooltip-format-disconnected": "Disconnected",
+      "tooltip-format-ethernet": " {ifname}\nIP: {ipaddr}\nup: {bandwidthUpBits} down: {bandwidthDownBits}",
+      "tooltip-format-wifi": "  {ifname} @ {essid}\nIP: {ipaddr}\nStrength: {signalStrength}%\nFreq: {frequency}MHz\nUp: {bandwidthUpBits} Down: {bandwidthDownBits}"
+    },
+    "pulseaudio": {
+      "format": "{icon} {volume}% {format_source}",
+      "format-bluetooth": "{volume}% {icon} {format_source}",
+      "format-bluetooth-muted": " {icon} {format_source}",
+      "format-icons": {
+        "car": "",
+        "default": [
+          "",
+          " ",
+          " "
+        ],
+        "headphone": "",
+        "headset": "󰋎",
+        "phone": "",
+        "portable": ""
+      },
+      "format-muted": " {format_source}",
+      "format-source": " {volume}%",
+      "format-source-muted": "",
+      "on-click": "/nix/store/70b0sw5jfzj121716npgb14598wxgqyk-pavucontrol-6.0/bin/pavucontrol",
+      "tooltip-format": "{source_volume}% / {desc}"
+    },
+    "tray": {
+      "icon-size": 21,
+      "spacing": 10
+    },
+    "user": {
+      "format": "{user}",
+      "icon": false,
+      "interval": 60
+    }
+  }
+]
