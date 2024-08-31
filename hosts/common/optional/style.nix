@@ -3,7 +3,7 @@
   ...
 }:
 let
-  currentScheme = "nord";
+  currentScheme = "catppuccin-frappe";
 in
 {
   imports = [
