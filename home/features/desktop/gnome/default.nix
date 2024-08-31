@@ -192,7 +192,7 @@ with lib;
       };
 
       "org/gnome/desktop/interface" = {
-        # color-scheme = "prefer-dark";
+        color-scheme = "prefer-dark";
         enable-hot-corners = false;
         clock-show-weekday = true;
       };
@@ -208,7 +208,6 @@ with lib;
         resize-with-right-button = true;
         mouse-button-modifier = "<super>";
         button-layout = "appmenu:minimize,maximize,close";
-        # theme = "Nordic";
       };
       "org/gnome/desktop/wm/keybindings" = {
         # maximize = ["<super>up"];                   # Floating
