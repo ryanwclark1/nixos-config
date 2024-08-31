@@ -410,12 +410,10 @@ in
         #   on-click = "task-waybar";
         #   escape = true;
         # };
-
-
-
       }];
 
-      style = ''
+      style =
+      ''
         * {
           font-size: 12px;
           font-family: JetBrainsMono Nerd Font, Font Awesome, sans-serif;
@@ -533,8 +531,7 @@ in
         #custom-exit {
           padding-right: 15px;
         }
-
-        '';
+      '';
     };
   };
 }
