@@ -22,6 +22,10 @@ in
       source = ./themes;
       recursive = true;
     };
+    file.".config/waybar/scripts" = {
+      source = ./scripts;
+      recursive = true;
+    };
   };
 
   home.packages = with pkgs; [
