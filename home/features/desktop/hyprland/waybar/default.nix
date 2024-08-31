@@ -8,7 +8,7 @@ let
   cat = "${pkgs.coreutils}/bin/cat";
   cliphist = "${pkgs.cliphist}/bin/cliphist";
   hypridle = lib.getExe config.services.hypridle.package;
-  hyprlock = lib.getExe config.services.hyprlock.package;
+  hyprlock = lib.getExe config.programs.hyprlock.package;
   kitty = "${pkgs.kitty}/bin/kitty";
   missioncenter = "${pkgs.mission-center}/bin/missioncenter";
   nm-connection = "${pkgs.networkmanagerapplet}/bin/nm-connection-editor";
