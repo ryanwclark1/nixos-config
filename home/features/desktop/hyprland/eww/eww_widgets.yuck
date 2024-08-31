@@ -20,7 +20,6 @@
 (defwidget favorites[]
   (box :class "favs" :orientation "v" :space-evenly false :halign "center" :valign "center"
     (button :onclick "pcmanfm ~ &" "")
-    (button :onclick "pcmanfm ~/.config/ &" "漣")
     (button :onclick "pcmanfm ~/Downloads &" "")
     (button :onclick "pcmanfm ~/Pictures &" "")))
 
@@ -40,7 +39,7 @@
   (box :class "uinfo" :orientation "v" :space-evenly false :halign "center" :valign "center"
     (label :style "color: #5e81ac;" :text "sparsh@asus-sea" :halign "center" :valign "center" :wrap "false" :limit-width 25)
     (label :style "color: #efefef;" :text "⎯⎯⎯⎯⎯⎯⎯⎯" :halign "center" :valign "center" :wrap "false" :limit-width 25)
-    
+
     ;; Tags for values
     (box :orientation "h" :space-evenly "false" :spacing 10
         (box :orientation "v" :class "fetch" :spacing 2
@@ -49,7 +48,7 @@
           (label :style "color: #80a0c0;" :halign "end" :text "")
           (label :style "color: #b48ead;" :halign "end" :text "")
           (button :style "color: #88c0d0;" :halign "end" :onclick "alacritty --class 'alacritty-float,alacritty-float' -e yay -Syu &" ""))
-    
+
     ;; Fetch Values
     (box :orientation "v"   :class "fetch"
       (label :style "color: #b48ead;" :halign "start" :text ": ${distro}")
@@ -119,7 +118,7 @@
 ;;;; Music Player
 (defwidget musicplayer []
 
-  (box :orientation "v" :space-evenly false :class "musicplayer" :halign "center" :valign "center" :hexpand true :vexpand true  
+  (box :orientation "v" :space-evenly false :class "musicplayer" :halign "center" :valign "center" :hexpand true :vexpand true
     (label :class "label-control" :text "${music_current}" :halign "center" :limit-width 50 :show-truncated true :hexpand true :vexpand true)
     (box :orientation "h" :space-evenly false :class "controls" :halign "center" :valign "center" :spacing 20
          (button :style "color: #d8dee9;" :onclick "mpc -q toggle && notify-send -u low -t 1800 ${music_current}" "懶")
@@ -129,7 +128,7 @@
 
 (defwidget network []
 
-  (box :orientation "v" :space-evenly false :class "network" :halign "center" :valign "center" :hexpand true :vexpand true  
+  (box :orientation "v" :space-evenly false :class "network" :halign "center" :valign "center" :hexpand true :vexpand true
     (label :class "label-control" :text "${ssid}" :halign "center" :limit-width 50 :show-truncated true :hexpand true :vexpand true)
     (box :orientation "h" :space-evenly false :class "controls" :halign "center" :valign "center" :spacing 20
          (button :style "color: #d8dee9;" :onclick "sh ~/.config/eww/scripts/airplane_mode.sh" "")
@@ -139,7 +138,7 @@
 
 (defwidget screenshot []
 
-  (box :orientation "v" :space-evenly false :class "network" :halign "center" :valign "center" :hexpand true :vexpand true  
+  (box :orientation "v" :space-evenly false :class "network" :halign "center" :valign "center" :hexpand true :vexpand true
     (label :class "label-control" :text "  Screenshot" :halign "center" :limit-width 50 :show-truncated true :hexpand true :vexpand true)
     (box :orientation "h" :space-evenly false :class "controls" :halign "center" :valign "center" :spacing 20
          (button :style "color: #d8dee9;" :onclick "eww close screenshot && ~/.config/eww/scripts/screenshot 'SCREEN'"  "")
