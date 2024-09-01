@@ -4,6 +4,8 @@
   pkgs,
   ...
 }:
+with config.lib.stylix.colors.withHashtag;
+
 let
   cat = "${pkgs.coreutils}/bin/cat";
   cliphist = "${pkgs.cliphist}/bin/cliphist";
@@ -135,10 +137,10 @@ in
             "weeks-pos" = "right";
             "on-scroll" = 1;
             "format" = {
-              "months" = "<span color='#ffead3'><b>{}</b></span>";
-              "days" = "<span color='#ecc6d9'><b>{}</b></span>";
-              "weekdays" = "<span color='#ffcc66'><b>{}</b></span>";
-              "today" = "<span color='#ff6699'><b><u>{}</u></b></span>";
+              "months" = "<span color='${base07}'><b>{}</b></span>";
+              "days" = "<span color='${base05}'><b>{}</b></span>";
+              "weekdays" = "<span color='${base0A}'><b>{}</b></span>";
+              "today" = "<span color='${base08}'><b><u>{}</u></b></span>";
             };
           };
           "actions" = {
@@ -201,14 +203,14 @@ in
 
         "custom/speaker" = {
           tooltip =false;
-          max-length = 6;
+          max-length = 7;
           exec = "${config.xdg.configHome}/waybar/scripts/speaker.sh";
           on-click = "${pavucontrol}";
         };
 
         "custom/mic" = {
           tooltip = false;
-          max-length = 6;
+          max-length = 7;
           exec = "${config.xdg.configHome}/waybar/scripts/mic.sh";
           on-click = "${pavucontrol}";
         };
@@ -368,7 +370,7 @@ in
           format = "{icon} {volume}% {format_source}";
           format-bluetooth = "{volume}% {icon} {format_source}";
           format-bluetooth-muted = " {icon} {format_source}";
-          format-muted = " {format_source}";
+          format-muted = "{format_source}";
           format-source = " {volume}%";
           format-source-muted = "";
           format-icons = {
