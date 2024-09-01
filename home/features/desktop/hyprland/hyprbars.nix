@@ -1,20 +1,16 @@
 {
   config,
-  inputs,
   pkgs,
   lib,
-  outputs,
   ...
 }:
-# let
-#   getHostname = x: lib.last (lib.splitString "@" x);
-#   remoteColorschemes = lib.mapAttrs' (n: v: {
-#   name = getHostname n;
-#   value = v.config.colorscheme.rawColorscheme.colors.${config.colorscheme.mode};
-#   }) outputs.homeConfigurations;
-#   rgb = color: "rgb(${lib.removePrefix "#" color})";
-#   rgba = color: alpha: "rgba(${lib.removePrefix "#" color}${alpha})";
-# in
+with config.lib.stylix.colors;
+with config.stylix.fonts;
+
+# TODO: Figure out toggle
+# Option1: hyprctl -j getoption plugin:hyprbars:bar_height | jq -re '.int != 0' (Can't find)
+# Option2: hyprctl unload plugin:hyprbars (Can't find)
+
 {
   wayland.windowManager.hyprland = {
     plugins = [
@@ -23,29 +19,29 @@
     settings = {
       "plugin:hyprbars" = {
         bar_height = 20;
-        # bar_color = rgba config.colorscheme.colors.surface "dd";
-        # "col.text" = rgb config.colorscheme.colors.primary;
-        # bar_text_font = config.fontProfiles.regular.family;
+        bar_color = "rgba(${base07}50)";
+        "col.text" = "rgba(${base01}75)";
+        bar_text_font = "${monospace.name}";
         bar_text_size = 11;
         bar_part_of_window = true;
         bar_precedence_over_border = true;
 
-        # hyprbars-button =
-        # let
-        #   closeAction = "hyprctl dispatch killactive";
-        #   isOnSpecial = ''hyprctl activewindow -j | jq -re 'select(.workspace.name == "special")' >/dev/null'';
-        #   moveToSpecial = "hyprctl dispatch movetoworkspacesilent special";
-        #   moveToActive = "hyprctl dispatch movetoworkspacesilent name:$(hyprctl -j activeworkspace | jq -re '.name')";
-        #   minimizeAction = "${isOnSpecial} && ${moveToActive} || ${moveToSpecial}";
-        #   maximizeAction = "hyprctl dispatch fullscreen 1";
-        # in [
-        #   # Red close button
-        #   "rgb(255,87,51),12,,${closeAction}"
+        hyprbars-button =
+        let
+          closeAction = "hyprctl dispatch killactive";
+          isOnSpecial = ''hyprctl activewindow -j | jq -re 'select(.workspace.name == "special")' >/dev/null'';
+          moveToSpecial = "hyprctl dispatch movetoworkspacesilent special";
+          moveToActive = "hyprctl dispatch movetoworkspacesilent name:$(hyprctl -j activeworkspace | jq -re '.name')";
+          minimizeAction = "${isOnSpecial} && ${moveToActive} || ${moveToSpecial}";
+          maximizeAction = "hyprctl dispatch fullscreen 1";
+        in [
+          # Red close button
+          "rgb(${base08}),12,,${closeAction}"
         #   # Yellow "minimize" (send to special workspace) button
-        #   "rgb(255,195,0),12,,${minimizeAction}"
+          "rgb(${base0A}),12,,${minimizeAction}"
         #   # Green "maximize" (fullscreen) button
-        #   "rgb(218,247,166),12,,${maximizeAction}"
-        # ];
+          "rgb(${base0B}),12,,${maximizeAction}"
+        ];
       };
       bind =
         let
