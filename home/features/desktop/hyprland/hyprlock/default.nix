@@ -4,7 +4,7 @@
   ...
 }:
 
-with config.lib.stylix.colors;
+with config.lib.stylix.colors.withHashtag;
 with config.stylix.fonts;
 
 {
@@ -15,10 +15,10 @@ with config.stylix.fonts;
       settings = {
         general = {
           disable_loading_bar = true;
-          hide_cursor = true;
+          hide_cursor = false;
           grace = 0;
           no_fade_in = false;
-          no_fade_out = false;
+          no_fade_out = true;
         };
 
         # BACKGROUND
