@@ -8,14 +8,14 @@
     ./basic-binds.nix
     ./cliphist
     ./dunst
+    ./eww
     ./hyprbars.nix
+    ./hypridle
     ./hyprland.nix
     ./hyprlock
-    ./hypridle
     ./mako.nix
     ./rofi
     ./waybar
-    ./eww
     # ./wofi.nix
     # ./variables.nix
   ];
