@@ -4,6 +4,8 @@
   pkgs,
   ...
 }:
+
+
 {
   home.packages = with pkgs; [
     grimblast
@@ -32,6 +34,8 @@
       rofi = lib.getExe config.programs.rofi.package;
       hypridle = lib.getExe config.services.hypridle.package;
       eww = lib.getExe config.programs.eww.package;
+      wl-paste = "${pkgs.wl-clipboard}/bin/wl-paste";
+      cliphist = lib.getExe config.services.cliphist.package;
     in
     {
       # "$menu" = "rofi";
@@ -55,11 +59,11 @@
           # "swaybg -m fill -i $(find ~/Pictures/wallpapers/ -maxdepth 1 -type f) &"
           # "hyprctl setcursor Nordzy-cursors 22 &"
           # "poweralertd &"
-          "${hypridle}"
-          "${waybar} --style ${config.xdg.configHome}/waybar/themes/default/style.css"
-          "${eww}"
+          "${hypridle} &"
+          "${waybar} --style ${config.xdg.configHome}/waybar/style.css &"
+          "${eww} &"
           # "swaync &"
-          # "wl-paste --watch cliphist store &"
+          "${wl-paste} --watch ${cliphist} store"
           # "hyprlock"
         ];
 
@@ -321,7 +325,6 @@
         ];
       };
 
-      # exec = ["${pkgs.swaybg}/bin/swaybg -i ${config.wallpaper} --mode fill"];
 
       bind = let
         grimblast = lib.getExe pkgs.grimblast;
