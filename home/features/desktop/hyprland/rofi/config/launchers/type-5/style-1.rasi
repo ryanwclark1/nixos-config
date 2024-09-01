@@ -4,7 +4,7 @@ configuration {
 	modi:                       "drun";
     show-icons:                 false;
     display-drun:               "Applications";
-	drun-display-format:        ">>      {name} [<span weight='light' size='small'><i>({generic})</i></span>]";
+	drun-display-format:        ">>      {name} [ weight='light' size='small'><i>({generic})</i></span>]";
 }
 
 /*****----- Global Properties -----*****/
