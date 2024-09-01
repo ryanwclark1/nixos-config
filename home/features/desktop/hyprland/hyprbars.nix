@@ -18,7 +18,7 @@ with config.stylix.fonts;
       ];
     settings = {
       "plugin:hyprbars" = {
-        bar_height = 20;
+        bar_height = 0;
         bar_color = "rgba(${base07}50)";
         "col.text" = "rgba(${base01}75)";
         bar_text_font = "${monospace.name}";
