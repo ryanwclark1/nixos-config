@@ -298,6 +298,7 @@
 
         "window.zoomLevel" = 1;
         "workbench.editor.enablePreview" = true;
+        "workbench.colorTheme" = "Catppuccin Frappé";
 
         "yaml.completion" = true;
         "yaml.extension.recommendations" = true;
