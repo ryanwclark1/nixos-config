@@ -17,6 +17,9 @@ let
   nmtui = "${pkgs.networkmanager}/bin/nmtui";
   pavucontrol = "${pkgs.pavucontrol}/bin/pavucontrol";
   rofi = "${pkgs.rofi}/bin/rofi";
+  chrome = "${pkgs.google-chrome}/bin/google-chrome-stable";
+  firefox = lib.getExe config.programs.firefox.package;
+  # thunar = "${pkgs.thunar}/bin/thunar";
 in
 {
   home = {
@@ -170,8 +173,8 @@ in
         # Cliphist
         "custom/cliphist" = {
           format = "";
-          on-click = "sleep 0.1 && ${cliphist} list | ${rofi} -demu -replace -config ~/.config/rofi/cliphist.rasi | ${cliphist} delete";
-          on-click-right = "sleep 0.1 && ${cliphist} list | ${rofi} -demu -replace -config ~/.config/rofi/cliphist.rasi | ${cliphist} decode | wl-copy";
+          on-click = "sleep 0.1 && ${cliphist} list | ${rofi} -demu -theme ${config.xdg.configHome}/rofi/style/cliphist | ${cliphist} delete";
+          on-click-right = "sleep 0.1 && ${cliphist} list | ${rofi} -demu -theme ${config.xdg.configHome}/rofi/style/cliphist | ${cliphist} decode | wl-copy";
           on-click-middle = "${cliphist} wipe";
           tooltip-format = "Clipboard Manager";
         };
@@ -400,6 +403,36 @@ in
           interval = 60;
           icon = false;
         };
+
+        "custom/chrome" = {
+            "format" = "";
+            "on-click" = "${chrome}";
+            "tooltip-format" = "Open Chromium";
+        };
+        "custom/firecox" = {
+            "format" = "";
+            "on-click" = "${firefox}";
+            "tooltip-format" = "Open Firefox";
+        };
+        "custom/thunar" = {
+            "format" = "";
+            "on-click" = "thunar";
+            # "on-click" = "${thunar}";
+            "tooltip-format" = "Open filemanager";
+        };
+        "custom/quicklinkempty" = {
+        };
+        "group/quicklinks" = {
+            orientation = "horizontal";
+            modules = [
+                "custom/chrome"
+                "custom/firefox"
+                "custom/quicklinkempty"
+                "custom/thunar"
+            ];
+        };
+
+
 
         # "custom/notification" = {
         #   tooltip = true;
