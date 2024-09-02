@@ -10,7 +10,6 @@
 {
   imports = [
     inputs.impermanence.nixosModules.home-manager.impermanence
-    # ./global-fonts.nix
     ./style.nix
     ./sops.nix
   ]
@@ -73,7 +72,7 @@
       hms = "home-manager --flake . switch";
 
       wifi = "nmtui";
-      
+
       cik = lib.mkIf config.programs.kitty.enable "clone-in-kitty --type os-window";
       ck = cik;
     };

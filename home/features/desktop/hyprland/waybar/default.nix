@@ -56,6 +56,7 @@ in
         # modules-center = [ "network" "pulseaudio" "cpu" "custom/gpu"  "memory" "disk" "clock" "battery"];
         modules-right = [
           "group/hardware"
+          "custom/cliphist"
           "battery"
           "custom/speaker"
           "custom/mic"
@@ -86,6 +87,7 @@ in
         };
 
         battery = {
+          bat = "BAT0";
           interval = 10;
           states = {
             good = 95;
@@ -168,8 +170,8 @@ in
         # Cliphist
         "custom/cliphist" = {
           format = "";
-          on-click = "sleep 0.1 && ${cliphist} list | ${rofi} -demu -replace -config ~/.config/rofi/config-cliphist.rasi | cliphist delete";
-          on-click-right = "sleep 0.1 && ${cliphist} list | ${rofi} -demu -replace -config ~/.config/rofi/config-cliphist.rasi | cliphist decode | wl-copy";
+          on-click = "sleep 0.1 && ${cliphist} list | ${rofi} -demu -replace -config ~/.config/rofi/cliphist.rasi | ${cliphist} delete";
+          on-click-right = "sleep 0.1 && ${cliphist} list | ${rofi} -demu -replace -config ~/.config/rofi/cliphist.rasi | ${cliphist} decode | wl-copy";
           on-click-middle = "${cliphist} wipe";
           tooltip-format = "Clipboard Manager";
         };
@@ -177,7 +179,7 @@ in
         # Power Menu
         "custom/exit" = {
           format = "";
-          on-click = "${config.xdg.configHome}/rofi/scripts/powermenu_t4";
+          on-click = "${config.xdg.configHome}/rofi/scripts/power-big.sh";
           tooltip-format = "Power Menu";
         };
 
@@ -339,27 +341,29 @@ in
             "󰤥"
             "󰤨"
           ];
-          format-ethernet = "";
+          format-ethernet = "󰈁 Connected";
           format-wifi = "{icon} {signalStrength}% {essid}";
           format-disconnected = "󰤮";
           # tooltip = true;
           tooltip-format = ''
-          {ifname}
-          {ipaddr}/{cidr}
-          Up: {bandwidthUpBits}
-          Down: {bandwidthDownBits}
+            {ifname}
+            {ipaddr}/{cidr}
+            Up: {bandwidthUpBits}
+            Down: {bandwidthDownBits}
           '';
           tooltip-format-ethernet = ''
-           {ifname}
-          IP: {ipaddr}
-          : {bandwidthUpBits} : {bandwidthDownBits}'';
+             {ifname}
+            IP: {ipaddr}
+            : {bandwidthUpBits} : {bandwidthDownBits}
+          '';
           tooltip-format-disconnected = "Disconnected";
           tooltip-format-wifi = ''
-            {ifname} @ {essid}
-          IP: {ipaddr}
-          Strength: {signalStrength}%
-          Freq: {frequency}MHz
-          : {bandwidthUpBits} : {bandwidthDownBits}'';
+              {ifname} @ {essid}
+            IP: {ipaddr}
+            Strength: {signalStrength}%
+            Freq: {frequency}MHz
+            : {bandwidthUpBits} : {bandwidthDownBits}
+          '';
           max-length = 50;
           on-click = "${kitty} -e ${nmtui}";
           on-click-right = "${nm-connection}";
