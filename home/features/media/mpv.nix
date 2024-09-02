@@ -8,11 +8,17 @@
     mpv = {
       enable = true;
       defaultProfiles = [ "high-quality" ];
-      # package = pkgs.wrapMpv (pkgs.mpv-unwrapped.override { vapoursynthSupport = true; });
-      scripts = with pkgs; [
-        mpvScripts.mpris
-        # mpvScripts.thumbnail
-      ];
+      package = pkgs.mpv-unwrapped.wrapper {
+        mpv = pkgs.mpv-unwrapped;
+        youtubeSupport = true;
+        scripts =
+          (with pkgs; [
+            mpvScripts.mpris
+            mpvScripts.autoload
+            mpvScripts.uosc
+            mpvScripts.thumbfast
+          ]);
+      };
     };
   };
 }
