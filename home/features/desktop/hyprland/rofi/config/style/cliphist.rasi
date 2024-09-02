@@ -9,9 +9,9 @@
 */
 
 /*****----- Global Properties -----*****/
-@import                          "../shared/colors.rasi"
-@import                          "../shared/fonts.rasi"
-@import                          "../shared/border.rasi"
+@import                          "shared/colors.rasi"
+@import                          "shared/fonts.rasi"
+@import                          "shared/border.rasi"
 
 
 /* ---- Configuration ---- */
