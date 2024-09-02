@@ -15,4 +15,7 @@
       ];
     };
   };
+  services = {
+    tumbler.enable = true;
+  };
 }
