@@ -19,7 +19,7 @@
     ./krita.nix
     ./mpv.nix
     ./music.nix
-    ./obs.nix
+    # ./obs.nix
     ./pavucontrol.nix
     ./playerctl.nix
     ./pulsemixer.nix

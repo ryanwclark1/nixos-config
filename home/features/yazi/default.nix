@@ -269,7 +269,7 @@
         sort_dir_first = true;
         sort_translit = true;
         show_hidden = true;
-        show_symlink = true;
+        show_symlink = false;
         prepend_keymap =
         let
           wl-copy = "${pkgs.wl-clipboard}/bin/wl-copy";
