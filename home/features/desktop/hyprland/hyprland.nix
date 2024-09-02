@@ -414,11 +414,8 @@
         # Launcher
         (
           lib.optionals config.programs.rofi.enable [
-            "SUPER,x,exec,${rofi} -show drun -theme ${config.xdg.configHome}/rofi/launchers/type-2/style-2.rasi"
-            "SUPER,s,exec,specialisation $(specialisation | ${rofi} -S dmenu)"
-            "SUPER,d,exec,${rofi} -S run"
-            # "CTRL ALT d,exec,${rofi}"
-            # -show ${config.xdg.configHome}/rofi/powermenu/type-4/powermenu.sh -theme ${config.xdg.configHome}/rofi/powermenu/type-4/style-2.rasi"
+            "SUPER,x,exec,${rofi} -show drun -theme ${config.xdg.configHome}/rofi/launchers/type-1/style-7.rasi"
+            "SUPER,s,exec,${rofi} -show drun -theme ${config.xdg.configHome}/rofi/launchers/type-1/style-7.rasi"
             "SUPER ALT,x,exec,${remote} ${rofi} -S drun" # -x 10 -y 10 -W 25% -H 60%
             # "Control_L ALT,Delete,exec,/rofi/config/scripts/powermenu_t4"
           ]
