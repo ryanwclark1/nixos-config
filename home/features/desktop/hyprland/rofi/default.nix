@@ -281,6 +281,12 @@
       #   };
 
       # };
+
+# TRY
+      # home.file."${config.xdg.configPath}/rofi".text = ''
+
+      # '';
+
       pass = {
         enable = true;
         package = pkgs.rofi-pass-wayland;
