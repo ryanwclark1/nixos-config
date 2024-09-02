@@ -524,10 +524,16 @@ in
           font-weight: bold;
         }
 
+        #disk {
+          margin: 0px;
+          padding: 0 10px 0 10px;
+          font-size: 13px;
+          color: #ffffff;
+        }
+
         #cpu,
         #memory,
-        #custom-gpu,
-        #disk {
+        #custom-gpu {
           margin: 0px;
           padding: 0 10px 0 10px;
           font-size: 14px;
