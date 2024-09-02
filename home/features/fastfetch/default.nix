@@ -13,6 +13,8 @@
         logo = {
           padding = {
             top = 2;
+            width = 22;
+            height = 11;
           };
         };
         modules= [
@@ -43,15 +45,11 @@
           "font"
           "cursor"
           "terminal"
-          "terminalfont"
-          "terminalsize"
-          "terminaltheme"
           {
             type = "cpu";
             showPeCoreCount = true;
             temp = true;
           }
-          "cpucache"
           "cpuusage"
           {
             type = "gpu";
@@ -86,9 +84,6 @@
           "bluetooth"
           "bluetoothradio"
           "sound"
-          "camera"
-          "gamepad"
-          "netio"
           "diskio"
           {
             type = "physicaldisk";
