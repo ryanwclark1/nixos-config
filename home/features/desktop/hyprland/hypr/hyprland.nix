@@ -7,6 +7,12 @@
 
 
 {
+    imports = [
+    ./basic-binds.nix
+    ./hyprbars.nix
+  ];
+
+
   wayland.windowManager.hyprland = {
     enable = true;
     # plugins = [
@@ -31,11 +37,10 @@
       eww = lib.getExe config.programs.eww.package;
       wl-paste = "${pkgs.wl-clipboard}/bin/wl-paste";
       cliphist = lib.getExe config.services.cliphist.package;
+      thunar = "${pkgs.thunar}/bin/thunar";
+      steam = "${pkgs.steam}/bin/steam";
     in
     {
-      # "$menu" = "rofi";
-      # "$mod" = "SUPER";
-
       env = [
         "XDG_CURRENT_DESKTOP,Hyprland"
         "XDG_SESSION_TYPE,wayland"
@@ -82,7 +87,7 @@
       };
 
       decoration = {
-        rounding = 0;
+        rounding = 10;
         active_opacity = .97;
         inactive_opacity = 0.77;
         fullscreen_opacity = 1.0;
@@ -101,10 +106,10 @@
         blur = {
           enabled = true;
           size = 8;
-          passes = 1;
+          passes = 4;
           ignore_opacity = true;
           new_optimizations = true;
-          xray = false;
+          xray = true;
           noise = 0.0117;
           contrast = 0.8916;
           brightness = 0.8172;
@@ -178,7 +183,7 @@
 
       misc = {
         disable_hyprland_logo = true;
-        disable_splash_rendering = false;
+        disable_splash_rendering = true;
         # "col.splash" = "0xffffffff";
         font_family = "Sans";
         vfr = true;
@@ -236,7 +241,6 @@
         # allow_dumb_copy = false;
       };
 
-
       dwindle = {
         pseudotile = true;
         force_split = 0;
@@ -250,6 +254,15 @@
         use_active_for_splits = true;
         default_split_ratio = 1.0;
       };
+
+      windowrule = [
+        "float, ^(${thunar})$"
+        "center, ^(${thunar})$"
+        "size 1080 900, ^(${thunar})$"
+        "float, ^(${steam})$"
+        "center, ^(${steam})$"
+        "size 1080 900, ^(${steam})$"
+      ];
 
       # windowrulev2 = let
       #   sweethome3d-tooltips = "title:^(win[0-9])$,class:^(com-eteks-sweethome3d-SweetHome3DBootstrap)$";
@@ -320,6 +333,55 @@
         ];
       };
 
+      # "Dynamic"
+      # animations {
+      #   enabled = true;
+      #   bezier = [
+      #     "wind,0.05,0.9,0.1,1.05"
+      #     "winIn,0.1,1.1,0.1,1.1"
+      #     "winOut,0.3,-0.3,0,1"
+      #     "liner,1,1,1,1"
+      #   ];
+
+      #   animation = [
+      #   "windows,1,6,wind,slide"
+      #   "windowsIn,1,6,winIn,slide"
+      #   "windowsOut,1,5,winOut,slide"
+      #   "windowsMove,1,5,wind,slide"
+      #   "border,1,1,liner"
+      #   "borderangle,1,30,liner,loop"
+      #   "fade,1,10,default"
+      #   "workspaces,1,5,wind"
+      #   ];
+      # };
+
+      # "Fast"
+      # animations = {
+      #   enabled = true;
+
+      #   bezier = [
+      #       "linear,0,0,1,1"
+      #       "md3_standard,0.2,0,0,1"
+      #       "md3_decel,0.05,0.7,0.1,1"
+      #       "md3_accel,0.3,0,0.8,0.15"
+      #       "overshot,0.05,0.9,0.1,1.1"
+      #       "crazyshot,0.1,1.5,0.76,0.92"
+      #       "hyprnostretch,0.05,0.9,0.1,1.0"
+      #       "fluent_decel,0.1,1,0,1"
+      #       "easeInOutCirc,0.85,0,0.15,1"
+      #       "easeOutCirc,0,0.55,0.45,1"
+      #       "easeOutExpo,0.16,1,0.3,1"
+      #   ];
+
+      #   animation = [
+      #       "windows,1,3,md3_decel,popin 60%"
+      #       "border,1,10,default"
+      #       "fade,1,2.5,md3_decel"
+      #       "workspaces,1,3.5,easeOutExpo,slide"
+      #       "specialWorkspace,1,3,md3_decel,slidevert"
+      #   ];
+      # };
+
 
       bind = let
         grimblast = lib.getExe pkgs.grimblast;
@@ -347,9 +409,11 @@
           "SUPER ALT,Return,exec,${remote} ${defaultApp "x-scheme-handler/terminal"}"
           "SUPER ALT,e,exec,${remote} ${defaultApp "text/plain"}"
           "SUPER ALT,b,exec,${remote} ${defaultApp "x-scheme-handler/https"}"
+
           # Brightness control (only works if the system has lightd)
           ",XF86MonBrightnessUp,exec,light -A 10"
           ",XF86MonBrightnessDown,exec,light -U 10"
+
           # Volume
           ",XF86AudioRaiseVolume,exec,${pactl} set-sink-volume @DEFAULT_SINK@ +5%"
           ",XF86AudioLowerVolume,exec,${pactl} set-sink-volume @DEFAULT_SINK@ -5%"
@@ -358,9 +422,11 @@
           "SHIFT,XF86AudioLowerVolume,exec,${pactl} set-source-volume @DEFAULT_SOURCE@ -5%"
           "SHIFT,XF86AudioMute,exec,${pactl} set-source-mute @DEFAULT_SOURCE@ toggle"
           ",XF86AudioMicMute,exec,${pactl} set-source-mute @DEFAULT_SOURCE@ toggle"
+
           # Screenshotting
           ",Print,exec,${grimblast} --notify --freeze copy area"
           "SHIFT,Print,exec,${grimblast} --notify --freeze copy output"
+
           # To OCR
           "ALT,Print,exec,${grimblast} --freeze save area - | ${tesseract} - - | wl-copy && ${notify-send} -t 3000 'OCR result copied to buffer'"
           # Hyprlock

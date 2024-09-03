@@ -17,6 +17,11 @@ in
     image = ../../hosts/common/wallpaper/FormulaOne_Vettel_2.jpg;
     imageScalingMode = "fill";
     base16Scheme = "${pkgs.base16-schemes}/share/themes/${currentScheme}.yaml";
+    cursor = {
+      name = "catppuccin-cursors-frappe";
+      package = pkgs.catppuccin-cursors;
+      size = 24;
+    };
     fonts = {
       serif = {
         package = pkgs.dejavu_fonts;

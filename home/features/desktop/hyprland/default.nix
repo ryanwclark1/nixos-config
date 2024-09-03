@@ -11,7 +11,7 @@
     ./eww
     ./hyprbars.nix
     ./hypridle
-    ./hyprland.nix
+    ./hypr
     ./hyprlock
     ./mako.nix
     ./rofi
