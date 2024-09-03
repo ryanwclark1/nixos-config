@@ -23,6 +23,7 @@
     ./pavucontrol.nix
     ./playerctl.nix
     ./pulsemixer.nix
+    ./subline-music.nix
     ./vhs.nix
     ./vlc.nix
     ./yt-dlp.nix
