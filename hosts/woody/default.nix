@@ -18,18 +18,18 @@
     ../common/users/administrator
 
     ../common/optional/bluetooth.nix
-    ../common/optional/docker.nix
     ../common/optional/direnv.nix
+    ../common/optional/docker.nix
     # ../common/optional/k3s.nix
     ../common/optional/nfs.nix
     ../common/optional/pipewire.nix
     ../common/optional/printing.nix
     ../common/optional/qemu.nix
     ../common/optional/steam.nix
+    ../common/optional/style.nix
     ../common/optional/syncthing.nix
     ../common/optional/tailscale.nix
     ../common/optional/thunar.nix
-    ../common/optional/style.nix
     ../common/optional/wireshark.nix
     ../common/optional/zsh.nix
 
