@@ -5,11 +5,9 @@
 
 {
   imports = [
-    ./basic-binds.nix
     ./cliphist
     ./dunst
     ./eww
-    ./hyprbars.nix
     ./hypridle
     ./hypr
     ./hyprlock
@@ -17,7 +15,6 @@
     ./rofi
     ./waybar
     # ./wofi.nix
-    # ./variables.nix
   ];
 
   home = {
