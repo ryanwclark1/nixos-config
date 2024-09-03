@@ -454,8 +454,16 @@ in
         # };
       }];
 
+        # @background #1E1D2FFF;
+        # @backgroundalt #282839FF;
+        # @foreground #D9E0EEFF;
+        # @selected #7AA2F7FF;
+        # @active #ABE9B3FF;
+        # @urgent #F28FADFF;
+
       style =
       ''
+
         * {
           font-size: 12px;
           font-family: JetBrainsMono Nerd Font, Font Awesome, sans-serif;
@@ -463,7 +471,7 @@ in
         }
 
         window#waybar {
-          background-color: #2e3440;
+          background-color: @background;
           border-bottom: 0px solid #ffffff;
           color: #e5e9f0;
           transition-property: background-color;

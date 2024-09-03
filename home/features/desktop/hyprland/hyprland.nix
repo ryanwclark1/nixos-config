@@ -7,11 +7,6 @@
 
 
 {
-  home.packages = with pkgs; [
-    grimblast
-    hyprpicker
-  ];
-
   wayland.windowManager.hyprland = {
     enable = true;
     # plugins = [
