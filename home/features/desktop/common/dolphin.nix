@@ -3,7 +3,8 @@
   ...
 }:
 
-{  home.packages = with pkgs; [
+{
+  home.packages = with pkgs; [
     syncthingtray
   ] ++ (with pkgs.kdePackages; [
     dolphin
