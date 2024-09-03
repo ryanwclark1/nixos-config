@@ -59,7 +59,6 @@ in
         # modules-center = [ "network" "pulseaudio" "cpu" "custom/gpu"  "memory" "disk" "clock" "battery"];
         modules-right = [
           "group/hardware"
-          "custom/cliphist"
           "battery"
           "custom/speaker"
           "custom/mic"
