@@ -31,6 +31,8 @@
       wl-clipboard
       grim
       slurp
+      grimblast
+      hyprpicker
     ];
   };
 }
