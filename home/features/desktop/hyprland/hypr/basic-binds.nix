@@ -39,7 +39,6 @@
         "SUPER SHIFT,q,killactive"
         "SUPER SHIFT,e,exit"
 
-        # "SUPER,s,togglesplit"
         "SUPER,f,fullscreen,1"
         "SUPER SHIFT,f,fullscreen,0"
         "SUPER SHIFT,space,togglefloating"
@@ -52,8 +51,12 @@
 
         "SUPER,g,togglegroup"
         "SUPER,t,lockactivegroup,toggle"
-        "SUPER,tab,changegroupactive,f"
-        "SUPER SHIFT,tab,changegroupactive,b"
+
+        "SUPER,tab,workspace,m+1"
+        "SUPER SHIFT,tab,workspace,m+1"
+
+        # "SUPER,tab,changegroupactive,f"
+        # "SUPER SHIFT,tab,changegroupactive,b"
 
         "SUPER,apostrophe,workspace,previous"
         "SUPER SHIFT,apostrophe,workspace,next"
