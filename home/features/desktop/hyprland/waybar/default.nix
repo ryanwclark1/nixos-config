@@ -20,6 +20,7 @@ let
   chrome = "${pkgs.google-chrome}/bin/google-chrome-stable";
   firefox = lib.getExe config.programs.firefox.package;
   # thunar = "${pkgs.thunar}/bin/thunar";
+  thunar = "thunar";
 in
 {
   home = {
@@ -326,6 +327,7 @@ in
           };
         };
 
+
         memory = {
           interval = 5;
           format = " {}%";
@@ -415,8 +417,8 @@ in
         };
         "custom/thunar" = {
             "format" = "";
-            "on-click" = "thunar";
-            # "on-click" = "${thunar}";
+            # "on-click" = "thunar";
+            "on-click" = "${thunar}";
             "tooltip-format" = "Open filemanager";
         };
         "custom/quicklinkempty" = {
@@ -454,15 +456,35 @@ in
         # };
       }];
 
-        # @background #1E1D2FFF;
-        # @backgroundalt #282839FF;
-        # @foreground #D9E0EEFF;
-        # @selected #7AA2F7FF;
-        # @active #ABE9B3FF;
-        # @urgent #F28FADFF;
-
       style =
       ''
+      @define-color base00 #303446;
+      @define-color base01 #292c3c;
+      @define-color base02 #414559;
+      @define-color base03 #51576d;
+      @define-color base04 #626880;
+      @define-color base05 #c6d0f5;
+      @define-color base06 #f2d5cf;
+      @define-color base07 #babbf1;
+      @define-color base08 #e78284;
+      @define-color base09 #ef9f76;
+      @define-color base0A #e5c890;
+      @define-color base0B #a6d189;
+      @define-color base0C #81c8be;
+      @define-color base0D #8caaee;
+      @define-color base0E #ca9ee6;
+      @define-color base0F #eebebe;
+
+      @define-color backgrounddark1 @base00;
+      @define-color backgrounddark2 @base01;
+      @define-color backgrounddark3 @base02;
+      @define-color workspacesbackground1 #FFFFFF;
+      @define-color workspacesbackground2 #CCCCCC;
+      @define-color bordercolor #FFFFFF;
+      @define-color textcolor1 @base0E;
+      @define-color textcolor2 @base00;
+      @define-color textcolor3 #FFFFFF;
+      @define-color iconcolor @base0E;
 
         * {
           font-size: 12px;
@@ -470,37 +492,52 @@ in
           font-weight: bold;
         }
 
+        /* -----------------------------------------------------
+        * Window
+        * ----------------------------------------------------- */
+
         window#waybar {
-          background-color: @background;
+          background-color: @backgrounddark2;
+          opacity: 0.7;
+          color: @textcolor1;
           border-bottom: 0px solid #ffffff;
-          color: #e5e9f0;
           transition-property: background-color;
           transition-duration: 0.5s;
-          opacity: 0.5;
         }
+
+        window#waybar.hidden {
+          opacity: 0.2;
+        }
+
+        window#waybar.empty #window {
+          background-color:transparent;
+        }
+
+        /* -----------------------------------------------------
+        * Modules
+        * ----------------------------------------------------- */
 
         .modules-right {
           padding: 0 10px 0 10px;
-          /* margin: 0px 10px 0px 10px; */
           border-radius: 0px;
-          background: #2e3440;
-          /* opacity: 0.7; */
+        }
+
+        .modules-right > widget:last-child > #workspaces {
+            margin-right: 0;
         }
 
         .modules-center {
           padding: 0 10px 0 10px;
-          /* margin: 0px 10px 0px 10px; */
           border-radius: 0px;
-          background: #2e3440;
-          /* opacity: 0.7; */
         }
 
         .modules-left {
           padding: 0 10px 0 10px;
-          /* margin: 0px 10px 0px 10px; */
           border-radius: 0px;
-          background: #2e3440;
-          /* opacity: 0.7; */
+        }
+
+        .modules-left > widget:first-child > #workspaces {
+           margin-left: 0;
         }
 
         #hyprland-workspaces {
@@ -510,6 +547,23 @@ in
 
         #workspaces button {
           min-width: 5px;
+          color: @textcolor1;
+        }
+
+        /* -----------------------------------------------------
+        * Tooltips
+        * ----------------------------------------------------- */
+
+        tooltip {
+            border-radius: 10px;
+            background-color: @backgrounddark2;
+            opacity:0.8;
+            padding:20px;
+            margin:0px;
+        }
+
+        tooltip label {
+            color: @textcolor1;
         }
 
         #custom-exit,
@@ -528,14 +582,18 @@ in
         #mpd {
           margin: 0px;
           padding: 0 10px 0 10px;
-          color: #ffffff;
+          color: @textcolor1;
           font-size: 14px;
         }
+
+        /* -----------------------------------------------------
+        * Clock
+        * ----------------------------------------------------- */
 
         #clock {
           margin: 0px;
           padding: 0 10px 0 10px;
-          color: #ffffff;
+          color: @textcolor1;
           font-size: 16px;
           font-weight: bold;
         }
@@ -549,13 +607,13 @@ in
           margin: 0px;
           padding: 0 10px 0 10px;
           font-size: 14px;
-          color: #ffffff;
+          color: @textcolor1;
         }
 
         #bluetooth {
           margin: 0px;
           padding: 0 10px 0 10px;
-          color: #ffffff;
+          color: @textcolor1;
           font-size: 16px;
           font-weight: bold;
         }
@@ -563,7 +621,7 @@ in
         #group-hardware {
           margin: 0px;
           padding: 0 10px 0 10px;
-          color: #ffffff;
+          color: @textcolor1;
           font-size: 16px;
           font-weight: bold;
         }
@@ -572,7 +630,7 @@ in
           margin: 0px;
           padding: 0 10px 0 10px;
           font-size: 13px;
-          color: #ffffff;
+          color: @textcolor1;
         }
 
         #cpu,
@@ -581,7 +639,7 @@ in
           margin: 0px;
           padding: 0 10px 0 10px;
           font-size: 14px;
-          color: #ffffff;
+          color: @textcolor1;
         }
 
         #custom-exit {

@@ -37,7 +37,7 @@
       eww = lib.getExe config.programs.eww.package;
       wl-paste = "${pkgs.wl-clipboard}/bin/wl-paste";
       cliphist = lib.getExe config.services.cliphist.package;
-      thunar = "${pkgs.thunar}/bin/thunar";
+      thunar = "thunar";
       steam = "${pkgs.steam}/bin/steam";
     in
     {
