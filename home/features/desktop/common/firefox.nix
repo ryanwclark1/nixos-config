@@ -30,7 +30,6 @@
     };
   };
 
-
   xdg.mimeApps.defaultApplications = {
     "text/html" = [ "firefox.desktop" ];
     "text/xml" = [ "firefox.desktop" ];

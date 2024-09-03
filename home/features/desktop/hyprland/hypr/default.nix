@@ -256,9 +256,9 @@
       };
 
       windowrule = [
-        "float, ^(${thunar})$"
-        "center, ^(${thunar})$"
-        "size 1080 900, ^(${thunar})$"
+        # "float, ^(${thunar})$"
+        # "center, ^(${thunar})$"
+        # "size 1080 900, ^(${thunar})$"
         "float, ^(${steam})$"
         "center, ^(${steam})$"
         "size 1080 900, ^(${steam})$"
