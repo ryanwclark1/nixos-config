@@ -1,3 +1,4 @@
+# a lightweight and portable command-line YAML processor
 {
   pkgs,
   ...

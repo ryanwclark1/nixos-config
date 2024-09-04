@@ -1,3 +1,4 @@
+# A plain text note-taking assistant
 {
   pkgs,
   ...
