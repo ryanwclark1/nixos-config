@@ -14,6 +14,7 @@
     ./mako.nix
     ./rofi
     ./waybar
+    ./imv.nix
     # ./wofi.nix
   ];
 
