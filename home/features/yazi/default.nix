@@ -13,7 +13,8 @@
     poppler_utils
     mediainfo
     hexyl
-    xdragon
+    # xdragon
+    ripdrag
   ];
 
   programs.yazi = {
@@ -45,6 +46,7 @@
           thumbnailer = lib.getExe pkgs.ffmpegthumbnailer;
           pdftoppm = "${pkgs.poppler_utils}/bin/pdftoppm";
           dragon = lib.getExe pkgs.xdragon;
+          ripdrag = lib.getExe pkgs.ripdrag;
           wl-copy = "${pkgs.wl-clipboard}/bin/wl-copy";
         in
     {
@@ -286,20 +288,20 @@
               run = "echo $SHELL";
               desc = "Open shell here";
             }
-            {
-              on  = ["<C-n>"];
-              run = ''
-                shell '${dragon} -x -i -T "$1"' --confirm
-              '';
-            }
-
-            # https://yazi-rs.github.io/docs/tips/#drag-and-drop
             # {
-            #   on = ["<C-n>"];
+            #   on  = ["<C-n>"];
             #   run = ''
-            #     shell '${ripdrag} "$@" -x 2>/dev/null &' --confirm
+            #     shell '${dragon} -x -i -T "$1"' --confirm
             #   '';
             # }
+
+            # https://yazi-rs.github.io/docs/tips/#drag-and-drop
+            {
+              on = ["<C-n>"];
+              run = ''
+                shell '${ripdrag} "$@" -x 2>/dev/null &' --confirm
+              '';
+            }
             # https://yazi-rs.github.io/docs/tips/#smart-enter
 
             {

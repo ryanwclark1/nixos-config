@@ -55,5 +55,5 @@
   programs.starship.enableFishIntegration = lib.mkIf config.programs.starship.enable true;
   programs.yazi.enableFishIntegration = lib.mkIf config.programs.yazi.enable true;
   programs.zoxide.enableFishIntegration = lib.mkIf config.programs.zoxide.enable true;
-  programs.zellij.enableFishIntegration = lib.mkIf config.programs.zellij.enable true;
+  programs.zellij.enableFishIntegration = lib.mkIf config.programs.zellij.enable false;
 }
