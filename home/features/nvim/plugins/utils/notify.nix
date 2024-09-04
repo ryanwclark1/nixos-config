@@ -3,7 +3,7 @@
 { ... }:
 
 {
-  plugins.notify = {
+  programs.nixvim.plugins.notify = {
     enable = true;
     fps = 60;
     stages = "fade";
@@ -33,7 +33,7 @@
     '';
   };
 
-  keymaps = [
+  programs.nixvim.keymaps = [
     {
       mode = "n";
       key = "<leader>uD";

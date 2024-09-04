@@ -1,5 +1,5 @@
 _: {
-  plugins.navic = {
+  programs.nixvim.plugins.navic = {
     enable = true;
     click = false;
     depthLimit = 5;

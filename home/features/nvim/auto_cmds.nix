@@ -1,12 +1,12 @@
 {
-  autoGroups = {
+  programs.nixvim.autoGroups = {
     highlight_yank = {};
     vim_enter = {};
     indentscope = {};
     restore_cursor = {};
   };
 
-  autoCmd = [
+  programs.nixvim.autoCmd = [
     {
       group = "highlight_yank";
       event = ["TextYankPost"];

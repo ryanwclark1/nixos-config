@@ -1,9 +1,9 @@
 _: {
-  plugins.copilot-chat = {
+  programs.nixvim.plugins.copilot-chat = {
     enable = true;
   };
 
-  keymaps = [
+  programs.nixvim.keymaps = [
     {
       key = "<leader>ct";
       action = "<CMD>CopilotChatToggle<CR>";

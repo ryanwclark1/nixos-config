@@ -1,5 +1,5 @@
 _: {
-  plugins.todo-comments = {
+  programs.nixvim.plugins.todo-comments = {
     enable = true;
     settings = {
       colors = {

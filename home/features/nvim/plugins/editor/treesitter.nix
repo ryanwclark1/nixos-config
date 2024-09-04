@@ -1,5 +1,5 @@
 {pkgs, ...}: {
-  plugins.treesitter = {
+  programs.nixvim.plugins.treesitter = {
     enable = true;
     settings = {
       indent.enable = true;
@@ -10,7 +10,7 @@
     grammarPackages = pkgs.vimPlugins.nvim-treesitter.allGrammars;
   };
 
-  plugins.treesitter-textobjects = {
+  programs.nixvim.plugins.treesitter-textobjects = {
     enable = false;
     select = {
       enable = true;

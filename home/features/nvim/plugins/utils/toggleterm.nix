@@ -3,7 +3,7 @@
 # nixvim doc: https://nix-community.github.io/nixvim/plugins/toggleterm/index.html
 
 _: {
-  plugins.toggleterm = {
+  programs.nixvim.plugins.toggleterm = {
     enable = true;
     settings = {
       direction = "float";
@@ -38,7 +38,7 @@ _: {
       '';
     };
   };
-  keymaps = [
+  programs.nixvim.keymaps = [
     # {
     #   mode = "n";
     #   key = "<leader>t";

@@ -1,5 +1,5 @@
 {
-  plugins.startup = {
+  programs.nixvim.plugins.startup = {
     enable = false;
 
     colors = {

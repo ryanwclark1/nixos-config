@@ -4,7 +4,7 @@
 
 {
 
-  plugins.neo-tree = {
+  programs.nixvim.plugins.neo-tree = {
     enable = true;
     addBlankLineAtTop = true;
 
@@ -334,11 +334,11 @@
 
  # Enable catppuccin colors
     # https://github.com/catppuccin/nvim/blob/main/lua/catppuccin/groups/integrations/neotree.lua
-    colorschemes.catppuccin.settings.integrations.neotree = true;
-    autoGroups.neotree = { };
+    programs.nixvim.colorschemes.catppuccin.settings.integrations.neotree = true;
+    programs.nixvim.autoGroups.neotree = { };
     # Custom autocommands (taken from AstroNvim)
 
-    autoCmd =
+    programs.nixvim.autoCmd =
       let
         refresh = ''
           function()
@@ -388,7 +388,7 @@
         }
       ];
 
-    keymaps = [
+    programs.nixvim.keymaps = [
       {
         mode = ["n"];
         key = "<leader>e";

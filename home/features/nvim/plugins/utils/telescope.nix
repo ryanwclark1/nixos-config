@@ -1,5 +1,5 @@
 {
-  plugins.telescope = {
+  programs.nixvim.plugins.telescope = {
     enable = true;
     extensions = {
       file-browser = {
@@ -189,7 +189,7 @@
       };
     };
   };
-  keymaps = [
+  programs.nixvim.keymaps = [
     {
       mode = "n";
       key = "<leader>sd";
@@ -215,7 +215,7 @@
       };
     }
   ];
-  extraConfigLua = ''
+  programs.nixvim.extraConfigLua = ''
     require("telescope").setup{
       pickers = {
         colorscheme = {
