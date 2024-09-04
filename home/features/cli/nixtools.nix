@@ -24,18 +24,12 @@ in
     nil # Nix LSP
     niv
     nix-diff
-    nix-init
-    nix-output-monitor
-    nix-prefetch
-    nix-prefetch-git
-    nix-template
     nix-tree # Interactively browse dependency graphs of Nix derivations
     nix-update
     nixpkgs-lint
     nurl # Generate Nix fetcher calls from repository URLs
     nvd # Differ
     patchelf
-    statix
   ];
 
   programs.nix-index = {
