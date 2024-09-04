@@ -42,9 +42,44 @@ in
       "result"
       ".env"
       ".venv"
-      ".vscode"
       "node_modules"
       ".envrc"
+
+       # Compiled source #
+      ###################
+      "*.class"
+      "*.dll"
+      "*.exe"
+      "*.o"
+      "*.so"
+
+      # Temporary files #
+      ###################
+      "*.swp"
+      "*.swo"
+      "*~"
+
+      # Packages #
+      ############
+      "*.7z"
+      "*.dmg"
+      "*.gz"
+      "*.iso"
+      "*.jar"
+      "*.rar"
+      "*.tar"
+      "*.zip"
+
+      # Logs #
+      ######################
+      "*.log"
+
+      # OS generated files #
+      ######################
+      ".DS_Store*"
+      "ehthumbs.db"
+      "Icon?"
+      "Thumbs.db"
     ];
 
     delta = {
@@ -59,9 +94,10 @@ in
     };
 
     extraConfig = {
-      core.editor = "nvim";
+      core.editor = "$EDITOR";
       github.user = "ryanwclark1";
       init.defaultBranch = "main";
+      advice.objectNameWarning = false;
       pull.rebase = true;
       push.autoSetupRemote = true; # automatically create upstream branch on push
       rebase.autosquash = true;
