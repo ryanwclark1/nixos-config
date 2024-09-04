@@ -33,6 +33,6 @@
   programs.kitty.shellIntegration.enableBashIntegration = lib.mkIf config.programs.kitty.enable true;
   programs.starship.enableBashIntegration = lib.mkIf config.programs.starship.enable true;
   programs.yazi.enableBashIntegration = lib.mkIf config.programs.yazi.enable true;
-  programs.zellij.enableBashIntegration = lib.mkIf config.programs.zellij.enable true;
+  programs.zellij.enableBashIntegration = lib.mkIf config.programs.zellij.enable false;
   programs.zoxide.enableBashIntegration = lib.mkIf config.programs.zoxide.enable true;
 }

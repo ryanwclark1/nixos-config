@@ -28,6 +28,6 @@
   programs.starship.enableZshIntegration = lib.mkIf config.programs.starship.enable true;
   programs.zoxide.enableZshIntegration = lib.mkIf config.programs.zoxide.enable true;
   programs.yazi.enableZshIntegration = lib.mkIf config.programs.yazi.enable true;
-  programs.zellij.enableZshIntegration = lib.mkIf config.programs.zellij.enable true;
+  programs.zellij.enableZshIntegration = lib.mkIf config.programs.zellij.enable false;
 
 }
