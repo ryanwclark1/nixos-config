@@ -1,5 +1,5 @@
 _: {
-  plugins = {
+  programs.nixvim.plugins = {
     markdown-preview = {
       enable = true;
       settings = {
@@ -16,7 +16,7 @@ _: {
     };
   };
 
-  keymaps = [
+  programs.nixvim.keymaps = [
     {
       mode = "n";
       key = "<leader>mp";

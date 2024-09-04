@@ -1,9 +1,12 @@
+
+_:
+
 {
-  autoGroups = {
+  programs.nixvim.autoGroups = {
     filetypes = {};
   };
 
-  files."ftdetect/terraformft.lua".autoCmd = [
+  programs.nixvim.files."ftdetect/terraformft.lua".autoCmd = [
     {
       group = "filetypes";
       event = ["BufRead" "BufNewFile"];
@@ -12,7 +15,7 @@
     }
   ];
 
-  files."ftdetect/bicepft.lua".autoCmd = [
+  programs.nixvim.files."ftdetect/bicepft.lua".autoCmd = [
     {
       group = "filetypes";
       event = ["BufRead" "BufNewFile"];

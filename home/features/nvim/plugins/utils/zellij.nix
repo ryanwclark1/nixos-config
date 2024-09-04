@@ -1,5 +1,5 @@
 _: {
-  plugins.zellij = {
+  programs.nixvim.plugins.zellij = {
     enable = true;
     settings = {
       debug = true;

@@ -1,13 +1,13 @@
 {pkgs, ...}: {
-  extraPlugins = with pkgs.vimPlugins; [
+  programs.nixvim.extraPlugins = with pkgs.vimPlugins; [
     lazygit-nvim
   ];
 
-  extraConfigLua = ''
+  programs.nixvim.extraConfigLua = ''
     require("telescope").load_extension("lazygit")
   '';
 
-  keymaps = [
+  programs.nixvim.keymaps = [
     {
       mode = "n";
       key = "<leader>gg";

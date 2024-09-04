@@ -1,7 +1,7 @@
 _: {
-  plugins.yazi.enable = true;
+  programs.nixvim.plugins.yazi.enable = true;
 
-  keymaps = [
+  programs.nixvim.keymaps = [
     {
       mode = "n";
       key = "<leader>e";

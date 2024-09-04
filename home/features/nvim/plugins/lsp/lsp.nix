@@ -1,7 +1,7 @@
 {pkgs, ...}:
 
 {
-  plugins = {
+  programs.nixvim.plugins = {
     lsp-lines = {enable = true;};
     lsp-format = {enable = true;};
     helm = {enable = true;};
@@ -127,11 +127,11 @@
   };
 
 
-  extraPlugins = with pkgs.vimPlugins; [
+  programs.nixvim.extraPlugins = with pkgs.vimPlugins; [
     ansible-vim
   ];
 
-  extraConfigLua = ''
+  programs.nixvim.extraConfigLua = ''
     local _border = "rounded"
 
     vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(

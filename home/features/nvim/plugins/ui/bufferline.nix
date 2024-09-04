@@ -1,5 +1,5 @@
 {
-  plugins = {
+  programs.nixvim.plugins = {
     bufferline = {
       enable = true;
       settings = {
@@ -211,7 +211,7 @@
       };
     };
   };
-  keymaps = [
+  programs.nixvim.keymaps = [
     {
       mode = "n";
       key = "]b";
@@ -293,7 +293,7 @@
       };
     }
   ];
-  extraConfigLua = ''
+  programs.nixvim.extraConfigLua = ''
     vim.opt.termguicolors = true
     require("bufferline").setup{}
   '';

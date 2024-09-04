@@ -1,5 +1,5 @@
 {
-  plugins = {
+  programs.nixvim.plugins = {
     cmp-emoji = {enable = true;};
     cmp = {
       enable = true;
@@ -57,7 +57,7 @@
     cmp_luasnip = {enable = true;}; # snippets
     cmp-cmdline = {enable = false;}; # autocomplete for cmdline
   };
-  extraConfigLua = ''
+  programs.nixvim.extraConfigLua = ''
         luasnip = require("luasnip")
         kind_icons = {
           Text = "󰊄",
@@ -85,7 +85,7 @@
           Event = " ",
           Operator = " ",
           TypeParameter = " ",
-        } 
+        }
 
          local cmp = require'cmp'
 
