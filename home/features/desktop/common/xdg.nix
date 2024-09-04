@@ -20,13 +20,12 @@
         XDG_SCREENCAST_DIR = "${config.xdg.userDirs.videos}/Screencast";
       };
     };
-    mimeApps = {
+    mimeApps =
+    {
       enable = true;
       defaultApplications =
         let
-          browser = [
-            "firefox.desktop"
-           ];
+          browser = ["firefox.desktop"];
           videoPlayers = [
             "mpv.desktop"
             "umpv.desktop"
