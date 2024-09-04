@@ -23,7 +23,7 @@
   programs.atuin.enableZshIntegration = lib.mkIf config.programs.atuin.enable true;
   programs.eza.enableZshIntegration = lib.mkIf config.programs.eza.enable true;
   programs.fzf.enableZshIntegration = lib.mkIf config.programs.fzf.enable true;
-  # progranms.kitty.shellIntegration.enableZshIntegration = lib.mkIf config.programs.kitty.enable true;
+  programs.kitty.shellIntegration.enableZshIntegration = lib.mkIf config.programs.kitty.enable true;
   programs.nix-index.enableZshIntegration = lib.mkIf config.programs.nix-index.enable true;
   programs.starship.enableZshIntegration = lib.mkIf config.programs.starship.enable true;
   programs.zoxide.enableZshIntegration = lib.mkIf config.programs.zoxide.enable true;
