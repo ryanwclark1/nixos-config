@@ -1,8 +1,18 @@
-{ config, ... }:
+{
+  config,
+  pkgs,
+  ...
+}:
 
 {
+  home.packages = with pkgs; [
+    xdg-utils
+  ];
+
+
   xdg = {
     enable = true;
+    cacheHome = config.home.homeDirectory + "/.local/cache";
     configFile."mimeapps.list".force = true;
     userDirs = {
       enable = true;
@@ -25,13 +35,12 @@
       enable = true;
       defaultApplications =
         let
-          browser = ["firefox.desktop"];
+          browser = ["firefox"];
           videoPlayers = [
-            "mpv.desktop"
-            "umpv.desktop"
+            "mpv"
+            "vlc"
           ];
           imageViewers = [ "imv.desktop" ];
-          textEditors = [ "videoPlayers.desktop" ];
         in
         {
           "audio/mp3" = videoPlayers;
@@ -45,7 +54,7 @@
           "image/gif" = imageViewers;
           "image/webp" = imageViewers;
 
-          "text/plain" = textEditors;
+          # "text/plain" = textEditors;
 
           "text/csv" = [ "libreoffice" ];
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" = [ "libreoffice" ];
