@@ -24,7 +24,7 @@
     d-spy # Dbus debugger
     ventoy-full #balena type tool
     libnotify
-    xdg-utils
+
     wl-clipboard
     grim
     mimeo
