@@ -8,7 +8,6 @@
     ./aichat.nix
     ./bat.nix
     ./btop.nix
-    ./diffsitter.nix
     ./exiftool.nix
     ./filesystem_utils.nix
     ./fx.nix
