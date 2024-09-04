@@ -1,12 +1,5 @@
-{
-  inputs,
-  ...
-}:
-
-{
+_: {
   imports = [
-    inputs.nixvim.homeManagerModules.nixvim
-
     # General Configuration
     ./auto_cmds.nix
     ./file_types.nix
@@ -60,22 +53,4 @@
     ./plugins/utils/whichkey.nix
     ./plugins/utils/yazi.nix
   ];
-
-  programs = {
-    nixvim = {
-      enable = true;
-      defaultEditor = true;
-      vimdiffAlias = true;
-      enableMan = true;
-      viAlias = true;
-      vimAlias = true;
-      clipboard = {
-        register = "unnamedplus";
-        providers.wl-copy.enable = true;
-      };
-      colorschemes.base16.enable = true;
-      luaLoader.enable = true;
-
-    };
-  };
 }
