@@ -4,7 +4,7 @@
 
 {
   imports = [
-    ./blender.nix
+    # ./blender.nix
     # ./darktable.nix
     ./digikam.nix
     ./drawio.nix
@@ -22,8 +22,6 @@
     # ./obs.nix
     ./pavucontrol.nix
     ./playerctl.nix
-    ./pulsemixer.nix
-    ./sublime-music.nix
     ./vhs.nix
     ./vlc.nix
     ./yt-dlp.nix
