@@ -46,6 +46,7 @@
     kdegraphics-thumbnailers
     qtimageformats # attempt to fix absence of webp support
     dolphin-plugins
+    ffmpegthumbs
   ]);
 
   # security.pam.services.login.kwallet = {
