@@ -14,4 +14,8 @@
     ];
     # extraOptions = [];
   };
+
+  home.shellAliases = {
+    find = "fd";
+  };
 }
