@@ -16,6 +16,7 @@
 
   home.shellAliases = {
     htop = "btop";
+    top = "btop";
   };
 
 }
