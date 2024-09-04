@@ -6,6 +6,6 @@
 {
   home.packages = with pkgs; [
     libreoffice-fresh
-    # libreoffice-qt
+    # libreoffice-qt6
   ];
 }
