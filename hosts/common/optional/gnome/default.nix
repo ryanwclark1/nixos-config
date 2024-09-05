@@ -50,7 +50,6 @@
     gnome-photos
     gnome-tour
     cheese # webcam tool
-
     epiphany # web browser
     geary # email reader
     yelp # Help view
