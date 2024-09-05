@@ -52,6 +52,7 @@ in
         # passthrough = true;
         reload_style_on_change = true; # Testing
         modules-left = [
+          "custom/applauncher"
           "hyprland/workspaces"
         ];
         modules-center = [
@@ -405,6 +406,12 @@ in
           icon = false;
         };
 
+        "custom/applauncher" = {
+          "format" = "󱗼";
+          "on-click" = "${config.xdg.configHome}/rofi/scripts/applauncher-fullscreen.sh";
+          "tooltip-format" = "Application Launcher";
+        };
+
         "custom/chrome" = {
             "format" = "";
             "on-click" = "${chrome}";
@@ -644,6 +651,11 @@ in
 
         #custom-exit {
           padding-right: 15px;
+        }
+
+        #custom-applauncher {
+          font-size: 16px;
+          font-weight: bold;
         }
       '';
     };
