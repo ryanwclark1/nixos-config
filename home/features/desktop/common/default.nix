@@ -6,7 +6,7 @@
 {
   imports = [
     ./deluge
-    ./dolphin.nix
+    # ./dolphin.nix
     ./discord.nix
     ./firefox.nix
     # ./kdeconnect.nix
@@ -24,7 +24,6 @@
     d-spy # Dbus debugger
     ventoy-full #balena type tool
     libnotify
-
     wl-clipboard
     grim
     mimeo
