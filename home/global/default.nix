@@ -16,16 +16,16 @@
   ++ (builtins.attrValues outputs.homeManagerModules);
 
 # duplicated in host/common/global/nix.nix
-  # nix = {
-  #   package = lib.mkDefault pkgs.nixVersions.latest;
-  #   settings = {
-  #     experimental-features = [
-  #       "nix-command"
-  #       "flakes"
-  #     ];
-  #     warn-dirty = false;
-  #   };
-  # };
+  nix = {
+    package = lib.mkDefault pkgs.nixVersions.latest;
+    settings = {
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
+      warn-dirty = false;
+    };
+  };
 
   # nixpkgs = {
   #   overlays = builtins.attrValues outputs.overlays;
