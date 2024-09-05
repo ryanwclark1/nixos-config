@@ -50,6 +50,7 @@
   programs.atuin.enableFishIntegration = lib.mkIf config.programs.atuin.enable true;
   programs.fzf.enableFishIntegration = lib.mkIf config.programs.fzf.enable true;
   programs.eza.enableFishIntegration = lib.mkIf config.programs.eza.enable true;
+  programs.navi.enableFishIntegration = lib.mkIf config.programs.navi.enable true;
   programs.kitty.shellIntegration.enableFishIntegration = lib.mkIf config.programs.kitty.enable true;
   programs.nix-index.enableFishIntegration = lib.mkIf config.programs.nix-index.enable true;
   programs.starship.enableFishIntegration = lib.mkIf config.programs.starship.enable true;
