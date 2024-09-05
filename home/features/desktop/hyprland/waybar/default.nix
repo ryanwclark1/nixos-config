@@ -654,8 +654,9 @@ in
         }
 
         #custom-applauncher {
-          font-size: 16px;
-          font-weight: bold;
+          font-size: 22px;
+          padding-right: 2px;
+          padding-left: 2px;
         }
       '';
     };
