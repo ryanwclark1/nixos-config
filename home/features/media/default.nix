@@ -9,7 +9,7 @@
     ./digikam.nix
     ./drawio.nix
     ./ffmpeg.nix
-    ./gimp.nix
+    # ./gimp.nix
     # ./graphviz.nix
     ./gstreamer.nix
     ./handbrake.nix
