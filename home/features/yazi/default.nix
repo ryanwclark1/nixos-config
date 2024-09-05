@@ -22,15 +22,18 @@
     package = pkgs.yazi;
     initLua = ./init.lua;
     plugins = {
-      lazygit = ./plugins/lazygit.yazi;
       # fzfbm = ./plugins/fzfbm.yazi;
-      starship = ./plugins/starship.yazi;
+      chmod = ./plugins/chmod.yazi;
       full-border = ./plugins/full-border.yazi;
-      hexyl = ./plugins/hexyl.yazi;
       glow = ./plugins/glow.yazi;
+      hexyl = ./plugins/hexyl.yazi;
+      lazygit = ./plugins/lazygit.yazi;
+      max-preview = ./plugins/max-preview.yazi;
       mediainfo = ./plugins/mediainfo.yazi;
       smart-enter = ./plugins/smart-enter.yazi;
-      max-preview = ./plugins/max-preview.yazi;
+      smart-filter = ./plugins/smart-filter.yazi;
+      smart-paste = ./plugins/smart-paste.yazi;
+      starship = ./plugins/starship.yazi;
     };
     # enableNushellIntegration = true;
     # https://yazi-rs.github.io/docs/configuration/keymap
@@ -91,6 +94,11 @@
               on = ["V"];
               run = ["move -999" "visual" "move 999"];
               desc = "Enter visual mode and select all";
+            }
+            {
+              on   = ["F"];
+              run  = "plugin smart-filter";
+              desc = "Smart filter";
             }
 
           #   # Character-wise movement
