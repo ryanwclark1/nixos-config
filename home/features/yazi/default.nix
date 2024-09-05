@@ -30,6 +30,7 @@
       glow = ./plugins/glow.yazi;
       mediainfo = ./plugins/mediainfo.yazi;
       smart-enter = ./plugins/smart-enter.yazi;
+      max-preview = ./plugins/max-preview.yazi;
     };
     # enableNushellIntegration = true;
     # https://yazi-rs.github.io/docs/configuration/keymap
@@ -328,6 +329,11 @@
                   shell --confirm 'for path in "$@"; do echo "file://$path"; done | ${wl-copy} -t text/uri-list'
                 ''
               ];
+            }
+            {
+              on   = ["T"];
+              run  = "plugin --sync max-preview";
+              desc = "Maximize or restore preview";
             }
             # https://yazi-rs.github.io/docs/tips/#navigation-wraparound
             {
