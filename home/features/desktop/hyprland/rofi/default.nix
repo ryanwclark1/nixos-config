@@ -5,6 +5,7 @@
   ...
 }:
 
+# TODO: Fix ssh functionality
 {
   home = {
     file.".config/rofi" = {
@@ -24,13 +25,12 @@
       # cycle = true;
       # font = "JetBrainsMono";
       # location = "center";
-      # terminal = "${alacrity}";
+      terminal = "${alacrity}";
       # xoffset = 0;
       # yoffset = 0;
-      # plugins = [
-      #   pkgs.rofi-calc
-      #   pkgs.rofi-emoji-wayland
-      # ];
+      plugins = [
+        pkgs.rofi-emoji-wayland
+      ];
       # extraConfig = {
       #   bw = 1;
       #   columns = 2;
