@@ -12,17 +12,23 @@
     ./features/desktop/common
 
     ./features/alacritty
+    ./features/ansible
     ./features/atuin
     ./features/cli
     ./features/compression
+    ./features/discord
+    ./features/deluge
     ./features/development
     ./features/eza
     ./features/fastfetch
     ./features/fd
+    ./features/firefox
     ./features/fzf
     ./features/games
     ./features/git
     # ./features/gpu
+    # ./features/helix
+    # ./features/kdeconnect
     ./features/kitty
     ./features/kubernetes
     ./features/lazygit
@@ -30,10 +36,11 @@
     ./features/networking-utils
     ./features/nvim
     ./features/osint
-    ./features/pistol
+    # ./features/pistol
     ./features/productivity
     ./features/qutebrowser
     ./features/ripgrep
+    ./features/slack
     ./features/shell
     ./features/starship
     ./features/sys-stats
@@ -44,8 +51,6 @@
     ./features/zed
     ./features/zellij
     ./features/zoxide
-
-    # ./features/helix
   ];
 
   home.packages = with pkgs; [
