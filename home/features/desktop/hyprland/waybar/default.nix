@@ -64,6 +64,7 @@ in
           "battery"
           "custom/speaker"
           "custom/mic"
+          "custom/cliphist"
           "bluetooth"
           "custom/exit"
         ];
@@ -125,6 +126,7 @@ in
           interval = 30;
           on-click = "blueman-manager";
           format-no-controller = "";
+           tooltip-format = "Bluetooth";
         };
 
         clock = {
