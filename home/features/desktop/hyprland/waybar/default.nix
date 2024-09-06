@@ -11,7 +11,7 @@ let
   cliphist = "${pkgs.cliphist}/bin/cliphist";
   hypridle = lib.getExe config.services.hypridle.package;
   hyprlock = lib.getExe config.programs.hyprlock.package;
-  kitty = "${pkgs.kitty}/bin/kitty";
+  alacritty = "${pkgs.alacritty}/bin/alacritty";
   missioncenter = "${pkgs.mission-center}/bin/missioncenter";
   nm-connection = "${pkgs.networkmanagerapplet}/bin/nm-connection-editor";
   nmtui = "${pkgs.networkmanager}/bin/nmtui";
@@ -372,7 +372,7 @@ in
             : {bandwidthUpBits} : {bandwidthDownBits}
           '';
           max-length = 50;
-          on-click = "${kitty} -e ${nmtui}";
+          on-click = "${alacritty} -e ${nmtui}";
           on-click-right = "${nm-connection}";
         };
 
