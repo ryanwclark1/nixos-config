@@ -7,6 +7,10 @@
 
 # TODO: Fix ssh functionality
 {
+  imports = [
+    ./style.nix
+  ];
+
   home =
   let
     cliphist = lib.getExe pkgs.cliphist;

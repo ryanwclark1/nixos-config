@@ -13,7 +13,7 @@ with config.stylix.fonts;
   home =
   let
     font = "${monospace.name} 12";
-    background = "${base01}";
+    background = "${base00}";
     # style_dir = "${config.xdg.configHome}/rofi/style";
   in
   {
@@ -23,7 +23,7 @@ with config.stylix.fonts;
         TEST-Font - ${font}
         TEST-Background - ${background}
         */
-        
+
         /*****----- Global Properties -----*****/
         @import                          "shared/colors.rasi"
         @import                          "shared/fonts.rasi"
