@@ -11,7 +11,7 @@
     ./hypridle
     ./hypr
     ./hyprlock
-    ./mako.nix
+    # ./mako.nix
     ./rofi
     ./waybar
     ./imv.nix
