@@ -7,12 +7,50 @@
 
 # TODO: Fix ssh functionality
 {
-  home = {
+  home =
+  let
+    cliphist = lib.getExe pkgs.cliphist;
+    rofi = lib.getExe pkgs.rofi-wayland;
+    # style_dir = "${config.xdg.configHome}/rofi/style";
+  in
+  {
     file.".config/rofi" = {
       source = ./config;
       recursive = true;
     };
+    file.".config/rofi/scripts/cliphist-delete.sh" = {
+      text = ''
+        #!/usr/bin/env bash
+        sleep 0.1 && ${cliphist} list | ${rofi} -dmenu -theme ${config.xdg.configHome}/rofi/style/cliphist | ${cliphist} delete
+        '';
+      executable = true;
+    };
+    file.".config/rofi/scripts/cliphist-copy.sh" = {
+      text = ''
+        #!/usr/bin/env bash
+        sleep 0.1 && ${cliphist} list | ${rofi} -dmenu -theme ${config.xdg.configHome}/rofi/style/cliphist | ${cliphist} delete
+      '';
+      executable = true;
+    };
+    file.".config/rofi/scripts/applauncher-fullscreen.sh" = {
+      text = ''
+        #!/usr/bin/env bash
+
+        dir="${config.xdg.configHome}/rofi/style"
+        theme='launcher-full'
+
+        rofi_cmd() {
+          rofi -show drun \
+            -theme "${dir}/${theme}.rasi"
+        }
+
+        rofi_cmd
+      '';
+      executable = true;
+    };
   };
+
+  # home.file = {
 
   programs = {
     rofi =
