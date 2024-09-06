@@ -80,7 +80,7 @@ in
         # variant256Colors = true;
       };
       lazygit.enable = true;
-      mako.enable = true;
+      mako.enable = false;
       neovim = {
         enable = true;
         transparentBackground = {
