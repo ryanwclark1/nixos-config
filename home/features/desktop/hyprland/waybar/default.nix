@@ -176,8 +176,8 @@ in
         # Cliphist
         "custom/cliphist" = {
           format = "";
-          on-click = "sleep 0.1 && ${cliphist} list | ${rofi} -dmenu -theme ${config.xdg.configHome}/rofi/style/cliphist | ${cliphist} delete";
-          on-click-right = "sleep 0.1 && ${cliphist} list | ${rofi} -dmenu -theme ${config.xdg.configHome}/rofi/style/cliphist | ${cliphist} decode | wl-copy";
+          on-click = "${config.xdg.configHome}/rofi/scripts/cliphist-copy.sh";
+          on-click-right = "${config.xdg.configHome}/rofi/scripts/cliphist-delete.sh";
           on-click-middle = "${cliphist} wipe";
           tooltip-format = "Clipboard Manager";
         };
@@ -620,6 +620,14 @@ in
         }
 
         #bluetooth {
+          margin: 0px;
+          padding: 0 10px 0 10px;
+          color: @textcolor1;
+          font-size: 16px;
+          font-weight: bold;
+        }
+
+        #custom-cliphist {
           margin: 0px;
           padding: 0 10px 0 10px;
           color: @textcolor1;
