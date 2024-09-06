@@ -39,6 +39,7 @@
       cliphist = lib.getExe config.services.cliphist.package;
       thunar = "thunar";
       steam = "${pkgs.steam}/bin/steam";
+      dunst = lib.getExe config.services.dunst.package;
     in
     {
       env = [
@@ -51,15 +52,11 @@
       ];
       "exec-once" =
         [
-          # "swaybg -m fill -i $(find ~/Pictures/wallpapers/ -maxdepth 1 -type f) &"
-          # "hyprctl setcursor Nordzy-cursors 22 &"
-          # "poweralertd &"
           "${hypridle} &"
           "${waybar} --style ${config.xdg.configHome}/waybar/style.css &"
           "${eww} &"
-          # "swaync &"
+          "${dunst} &"
           "${wl-paste} --watch ${cliphist} store"
-          # "hyprlock"
         ];
 
       general = {
