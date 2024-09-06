@@ -174,8 +174,8 @@ in
         # Cliphist
         "custom/cliphist" = {
           format = "";
-          on-click = "sleep 0.1 && ${cliphist} list | ${rofi} -demu -theme ${config.xdg.configHome}/rofi/style/cliphist | ${cliphist} delete";
-          on-click-right = "sleep 0.1 && ${cliphist} list | ${rofi} -demu -theme ${config.xdg.configHome}/rofi/style/cliphist | ${cliphist} decode | wl-copy";
+          on-click = "sleep 0.1 && ${cliphist} list | ${rofi} -dmenu -theme ${config.xdg.configHome}/rofi/style/cliphist | ${cliphist} delete";
+          on-click-right = "sleep 0.1 && ${cliphist} list | ${rofi} -dmenu -theme ${config.xdg.configHome}/rofi/style/cliphist | ${cliphist} decode | wl-copy";
           on-click-middle = "${cliphist} wipe";
           tooltip-format = "Clipboard Manager";
         };
