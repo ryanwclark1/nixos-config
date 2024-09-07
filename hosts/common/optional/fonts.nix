@@ -8,27 +8,17 @@
   fonts = {
     fontconfig = {
       enable = true;
+      subpixel.rgba = "rgb";
       allowBitmaps = true;
       antialias = true;
     };
     packages = with pkgs; [
       nerdfonts
       noto-fonts
-      noto-fonts-cjk
       noto-fonts-emoji
-      noto-fonts-extra
       liberation_ttf
-      fira-code
-      fira-code-symbols
-      mplus-outline-fonts.githubRelease
-      # dina-font
-      # hack-font
-      # proggyfonts
-      powerline-fonts
+      # powerline-fonts
       powerline-symbols
-      # jetbrains-mono
-      # fira-code
-      # font-awesome
     ];
   };
 }
