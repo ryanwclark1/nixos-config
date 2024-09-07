@@ -490,7 +490,7 @@ in
       @define-color workspacesbackground1 #FFFFFF;
       @define-color workspacesbackground2 #CCCCCC;
       @define-color bordercolor #FFFFFF;
-      @define-color textcolor1 @base0E;
+      @define-color textcolor1 @base07;
       @define-color textcolor2 @base00;
       @define-color textcolor3 #FFFFFF;
       @define-color iconcolor @base0E;
@@ -506,8 +506,8 @@ in
         * ----------------------------------------------------- */
 
         window#waybar {
-          background-color: @backgrounddark2;
-          opacity: 0.7;
+          background-color: @backgrounddark1;
+          opacity: 0.8;
           color: @textcolor1;
           border-bottom: 0px solid #ffffff;
           transition-property: background-color;
