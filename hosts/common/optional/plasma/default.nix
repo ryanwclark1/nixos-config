@@ -30,9 +30,11 @@
 
   environment.sessionVariables ={
     NIXOS_OZONE_WL = "1";
-  #   # Use librsvg's gdk-pixbuf loader cache file as it enables gdk-pixbuf to load SVG files (important for icons in GTK apps)
-  #   GDK_PIXBUF_MODULE_FILE = lib.mkForce "$(echo ${pkgs.librsvg.out}/lib/gdk-pixbuf-2.0/*/loaders.cache)";
   };
+
+   environment.plasma6.excludePackages = [
+      pkgs.kdePackages.elisa # Default KDE video player, use VLC instead
+    ];
 
   environment.systemPackages = with pkgs; [
     # Packages installed
