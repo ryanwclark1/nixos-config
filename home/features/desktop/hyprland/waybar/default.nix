@@ -61,6 +61,7 @@ in
         # modules-center = [ "network" "pulseaudio" "cpu" "custom/gpu"  "memory" "disk" "clock" "battery"];
         modules-right = [
           "group/hardware"
+          "network"
           "battery"
           "custom/speaker"
           "custom/mic"
@@ -208,6 +209,12 @@ in
           on-click = "${config.xdg.configHome}/hypr/scripts/hypridle.sh toggle";
           on-click-right = "${hyprlock}";
         };
+
+        "custom/logo" = {
+          exec = "echo ' '";
+          format = "{}";
+        };
+
 
         "custom/speaker" = {
           tooltip =false;
