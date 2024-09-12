@@ -25,10 +25,10 @@
     ../common/optional/steam.nix
     ../common/optional/style.nix
     ../common/optional/tailscale.nix
+    ../common/optional/thunar.nix
     ../common/optional/wireshark.nix
     # ../common/optional/semaphore.nix
     ../common/optional/zsh.nix
-
 
     # ../common/optional/displaymanager/cosmic.nix
     # ../common/optional/cosmic
