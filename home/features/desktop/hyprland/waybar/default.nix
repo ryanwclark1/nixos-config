@@ -5,6 +5,7 @@
   ...
 }:
 with config.lib.stylix.colors.withHashtag;
+with config.stylix.fonts;
 
 let
   cat = "${pkgs.coreutils}/bin/cat";
@@ -59,7 +60,7 @@ in
         modules-center = [
           "clock"
         ];
-        # modules-center = [ "network" "pulseaudio" "cpu" "custom/gpu"  "memory" "disk" "clock" "battery"];
+
         modules-right = [
           "group/hardware"
           "network"
@@ -353,7 +354,7 @@ in
           ];
           format-ethernet = "󰈁";
           # format-wifi = "{icon}  {signalStrength}% {essid}";
-          format-wifi = "{icon}  {signalStrength}%";
+          format-wifi = "{icon} {signalStrength}%";
           format-disconnected = "󰤮";
           # tooltip = true;
           tooltip-format = ''
@@ -430,7 +431,6 @@ in
         };
         "custom/thunar" = {
             "format" = "";
-            # "on-click" = "thunar";
             "on-click" = "${thunar}";
             "tooltip-format" = "Open filemanager";
         };
@@ -445,26 +445,6 @@ in
                 "custom/thunar"
             ];
         };
-
-        # "custom/notification" = {
-        #   tooltip = true;
-        #   format = "{icon} {}";
-        #   format-icons = {
-        #     notification = "<span foreground='red'><sup></sup></span>";
-        #     none = "";
-        #     dnd-notification = "<span foreground='red'><sup></sup></span>";
-        #     dnd-none = "";
-        #     inhibited-notification = "<span foreground='red'><sup></sup></span>";
-        #     inhibited-none = "";
-        #     dnd-inhibited-notification = "<span foreground='red'><sup></sup></span>";
-        #     dnd-inhibited-none = "";
-        #   };
-        #   return-type = "json";
-        #   exec-if = "which swaync-client";
-        #   exec = "swaync-client -swb";
-        #   on-click = "task-waybar";
-        #   escape = true;
-        # };
       }];
 
       style =
@@ -486,20 +466,20 @@ in
       @define-color base0E #ca9ee6;
       @define-color base0F #eebebe;
 
-      @define-color backgrounddark1 @base00;
-      @define-color backgrounddark2 @base01;
-      @define-color backgrounddark3 @base02;
+      @define-color backgrounddark1 ${base00};
+      @define-color backgrounddark2 ${base01};
+      @define-color backgrounddark3 ${base02};
       @define-color workspacesbackground1 #FFFFFF;
       @define-color workspacesbackground2 #CCCCCC;
       @define-color bordercolor #FFFFFF;
-      @define-color textcolor1 @base07;
-      @define-color textcolor2 @base00;
+      @define-color textcolor1 ${base07};
+      @define-color textcolor2 ${base00};
       @define-color textcolor3 #FFFFFF;
-      @define-color iconcolor @base0E;
+      @define-color iconcolor ${base0E};
 
         * {
-          font-size: 12px;
-          font-family: JetBrainsMono Nerd Font, Font Awesome, sans-serif;
+          font-size: 14px;
+          font-family: ${sansSerif.name}, ${monospace.name};
           font-weight: bold;
         }
 
@@ -521,7 +501,7 @@ in
         }
 
         window#waybar.empty #window {
-          background-color:transparent;
+          background-color: transparent;
         }
 
         /* -----------------------------------------------------
@@ -534,7 +514,7 @@ in
         }
 
         .modules-right > widget:last-child > #workspaces {
-            margin-right: 0;
+          margin-right: 0;
         }
 
         .modules-center {
@@ -548,7 +528,7 @@ in
         }
 
         .modules-left > widget:first-child > #workspaces {
-           margin-left: 0;
+          margin-left: 0;
         }
 
         #hyprland-workspaces {
@@ -566,15 +546,15 @@ in
         * ----------------------------------------------------- */
 
         tooltip {
-            border-radius: 10px;
-            background-color: @backgrounddark2;
-            opacity:0.8;
-            padding:20px;
-            margin:0px;
+          border-radius: 10px;
+          background-color: @backgrounddark2;
+          opacity:0.8;
+          padding:20px;
+          margin:0px;
         }
 
         tooltip label {
-            color: @textcolor1;
+          color: @textcolor1;
         }
 
         #custom-exit,
