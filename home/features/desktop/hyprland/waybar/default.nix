@@ -37,6 +37,7 @@ in
   home.packages = with pkgs; [
     networkmanagerapplet
     mission-center
+    qalculate-gtk
   ];
 
   programs = {
@@ -93,7 +94,7 @@ in
         };
 
         battery = {
-          bat = "BAT0";
+          bat = "BAT1";
           interval = 10;
           states = {
             good = 95;
@@ -168,6 +169,13 @@ in
           on-click = "${missioncenter}";
         };
 
+        # Calculator
+        "custom/calculator" = {
+          format = "";
+          on-click = "qalculate-gtk";
+          tooltip-format = "Open calculator";
+        };
+
         "custom/chatgpt" = {
           format = "";
           on-click = "";
@@ -231,7 +239,7 @@ in
         };
 
         "custom/system" = {
-          format = " 󰇅 ";
+          format = "󰇅";
           tooltip = true;
           tooltip-format = "System Information";
           on-click = "${missioncenter}";
@@ -248,17 +256,6 @@ in
           max-length = 60;
           separate-outputs = false;
         };
-
-        # "hyprland/window" = {
-        #   rewrite = {
-        #     (.*) - Brave = "$1";
-        #     (.*) - Chromium = "$1";
-        #     (.*) - Brave Search = "$1";
-        #     (.*) - Outlook = "$1";
-        #     (.*) Microsoft Teams = "$1"
-        #   };
-        #   separate-outputs = true
-        # };
 
         "hyprland/workspaces" = {
           format = "{icon}";
@@ -337,7 +334,6 @@ in
           };
         };
 
-
         memory = {
           interval = 5;
           format = " {}%";
@@ -355,8 +351,9 @@ in
             "󰤥"
             "󰤨"
           ];
-          format-ethernet = "󰈁 Connected";
-          format-wifi = "{icon} {signalStrength}% {essid}";
+          format-ethernet = "󰈁";
+          # format-wifi = "{icon}  {signalStrength}% {essid}";
+          format-wifi = "{icon}  {signalStrength}%";
           format-disconnected = "󰤮";
           # tooltip = true;
           tooltip-format = ''
@@ -397,7 +394,7 @@ in
             phone = "";
             portable = "";
             car = "";
-            default = [ "" " " " " ];
+            default = [ "" "" " " ];
           };
           on-click = "${pavucontrol}";
           tooltip-format = "{source_volume}% / {desc}";
@@ -448,8 +445,6 @@ in
                 "custom/thunar"
             ];
         };
-
-
 
         # "custom/notification" = {
         #   tooltip = true;
@@ -602,6 +597,14 @@ in
           font-size: 14px;
         }
 
+        #battery.icon {
+          font-size: 16px;
+        }
+
+        #network.icon {
+          font-size: 16px;
+        }
+
         /* -----------------------------------------------------
         * Clock
         * ----------------------------------------------------- */
@@ -632,6 +635,10 @@ in
           color: @textcolor1;
           font-size: 16px;
           font-weight: bold;
+        }
+
+        #bluetooth.icon {
+          font-size: 16px;
         }
 
         #custom-cliphist {
