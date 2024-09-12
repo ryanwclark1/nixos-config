@@ -9,7 +9,6 @@ with config.lib.stylix.colors.withHashtag;
 with config.stylix.fonts;
 
 {
-
   home =
   let
     font = "${monospace.name} 12";
