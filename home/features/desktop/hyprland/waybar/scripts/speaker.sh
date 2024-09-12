@@ -22,7 +22,7 @@ while snore $DELAY; do
             VOLUME=$((10#${BASH_REMATCH[1]}${BASH_REMATCH[2]}))
             ICON=(
                 " "
-                " "
+                ""
                 ""
             )
 
