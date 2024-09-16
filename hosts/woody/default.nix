@@ -17,7 +17,7 @@
     ../common/global
     ../common/users/administrator
 
-    ../common/optional/arion.nix
+    # ../common/optional/arion.nix
     ../common/optional/bluetooth.nix
     ../common/optional/direnv.nix
     ../common/optional/docker.nix
