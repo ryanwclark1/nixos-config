@@ -222,6 +222,7 @@
         "terminal.integrated.mouseWheelZoom" = true;
         "terminal.integrated.enableImages" = true;
         "terminal.integrated.customGlyphs" = true;
+        "terminal.integrated.environmentChangesIndicator" = "off";
 
         # Nix IDE
         "nix.enableLanguageServer" = true;
