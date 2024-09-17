@@ -2,7 +2,7 @@
   programs.nixvim.plugins = {
     alpha = {
       enable = true;
-      iconsEnabled = true;
+      # iconsEnabled = true;
       layout = [
         {
           type = "padding";
@@ -35,7 +35,7 @@
           val = "󰈔  New file";
           on_press.__raw = "function() vim.cmd[[enew]] end";
           opts = {
-            shortcut = "SPC z n";
+            shortcut = "n";
             position = "center";
             cursor = 3;
             width = 38;
@@ -171,7 +171,7 @@
           val = "  Exit";
           on_press.__raw = "function() vim.cmd[[qa]] end";
           opts = {
-            shortcut = "SPC z q";
+            shortcut = "q";
             position = "center";
             cursor = 3;
             width = 38;
