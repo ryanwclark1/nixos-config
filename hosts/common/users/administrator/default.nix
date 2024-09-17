@@ -11,7 +11,7 @@ in
   imports = [ ./packages.nix ];
 
   sops.secrets.administrator-password = {
-    sopsFile = ../../../../secrets.yaml;
+    sopsFile = ../../../../secrets/secrets.yaml;
     # Decrypt password to /run/secrets-fo-users/ so it can be used to create the user
     neededForUsers = true;
   };
@@ -19,6 +19,7 @@ in
   users.mutableUsers = true;
   users = {
     users.administrator = {
+      name = "administrator";
       isNormalUser = true;
       home = "/home/${user}";
       shell = "${pkgs.zsh}/bin/zsh";
@@ -42,9 +43,9 @@ in
         "wireshark"
       ];
 
-      openssh.authorizedKeys.keys = [
-        (builtins.readFile ./keys/id_frametop.pub)
-      ];
+      # openssh.authorizedKeys.keys = [
+      #   (builtins.readFile ./keys/id_frametop.pub)
+      # ];
 
       hashedPasswordFile = config.sops.secrets.administrator-password.path;
 
