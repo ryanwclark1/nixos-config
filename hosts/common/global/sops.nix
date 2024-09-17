@@ -21,8 +21,6 @@ in
     defaultSopsFile = "${secretsFile}";
     # defaultSopsFile = ../../../secrets/secrets.yaml;
     validateSopsFiles = true;
-    # generate a new key if none is found
-    generateKey = true;
     age = {
       # automatically import host SSH keys as age keys
       sshKeyPaths = [
@@ -32,6 +30,8 @@ in
       # sshKeyPaths = map getKeyPath keys;
       # this will use an age key that is expected already in the fs.
       keyFile = "/var/lib/sops-nix/keys.txt";
+      # generate a new key if none is found
+      generateKey = true;
     };
 
   };
