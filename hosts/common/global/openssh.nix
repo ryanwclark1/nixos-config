@@ -55,6 +55,10 @@ in
         ++ (lib.optionals (hostname == "woody") [
           "techcasa.io"
           "local.techcasa"
+        ])
+        ++ (lib.optionals (hostname == "frametop") [
+          "techcasa.io"
+          "local.techcasa"
         ]);
     });
   };
