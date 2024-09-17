@@ -14,13 +14,13 @@
       enable = true;
       package = pkgs.fwupd;
     };
-    # fprintd = {
-    #   enable = true;
-    # };
-    # logind = {
-    #   lidSwitch = "suspend";
-    #   lidSwitchExternalPower = "lock";
-    # };
+    fprintd = {
+      enable = true;
+    };
+    logind = {
+      lidSwitch = "suspend";
+      lidSwitchExternalPower = "lock";
+    };
     vscode-server = {
       enable = true;
     };
@@ -34,7 +34,7 @@
 };
 
   # Issues with kde powerdevil
-  # powerManagement.powertop.enable = true;
+  powerManagement.powertop.enable = true;
 
-  # security.pam.services.login.fprintAuth = true;
+  security.pam.services.login.fprintAuth = true;
 }
