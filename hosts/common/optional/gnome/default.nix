@@ -31,7 +31,7 @@
       gnome-initial-setup.enable = lib.mkForce false; # First time setup wizard
       gnome-keyring.enable = lib.mkDefault true;
       gnome-online-accounts.enable = lib.mkDefault true; # service that provides a single sign-on framework
-      gnome-online-miners.enable = lib.mkDefault false; # service that crawls through your online content
+      # gnome-online-miners.enable = lib.mkDefault false; # service that crawls through your online content
       gnome-remote-desktop.enable = lib.mkDefault true;
       gnome-settings-daemon.enable = lib.mkDefault true;
       gnome-user-share.enable = lib.mkDefault true; # user-level file sharing service for GNOME
@@ -53,9 +53,10 @@
     epiphany # web browser
     geary # email reader
     yelp # Help view
-  ]) ++ (with pkgs.gnome; [
     gnome-contacts
     gnome-music
+  ]) ++ (with pkgs.gnome; [
+
   ]);
 
   environment.systemPackages = (with pkgs; [
@@ -63,16 +64,17 @@
     adwaita-icon-theme
     dconf-editor
     gnome-tweaks
-  ]) ++ (with pkgs.gnome; [
     gnome-boxes
     gnome-control-center
     gnome-nettool
     gnome-bluetooth
     vinagre
+  ]) ++ (with pkgs.gnome; [
+
   ]);
 
   # ensure gnome-settings-daemon udev rules are enabled
-  services.udev.packages = with pkgs; [ gnome.gnome-settings-daemon ];
+  services.udev.packages = with pkgs; [ gnome-settings-daemon ];
 
   # This is enabled if service.gnome.keyring.enable is true
   # security.pam.services.login.enableGnomeKeyring = true;
