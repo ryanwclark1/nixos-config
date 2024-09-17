@@ -1,25 +1,16 @@
 {
-  inputs,
-  pkgs,
   ...
 }:
 
 {
   imports = [
-    inputs.vscode-server.nixosModules.default
-    ./auto-cpufreq.nix
+    # ./auto-cpufreq.nix
     ./fprintd.nix
     ./framework-firmware.nix
     ./libinput.nix
     ./logind.nix
     ./upower.nix
+    ./vscode-server.nix
   ];
-
-  services = {
-    vscode-server = {
-      enable = true;
-    };
-  };
-
 
 }
