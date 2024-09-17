@@ -9,7 +9,7 @@
 {
     imports = [
     ./basic-binds.nix
-    ./hyprbars.nix
+    # ./hyprbars.nix
   ];
 
 
