@@ -11,7 +11,6 @@
     kubectl
     kubernetes-helm
     minikube
-    openlens
     tilt
     kubeshark
     talosctl
