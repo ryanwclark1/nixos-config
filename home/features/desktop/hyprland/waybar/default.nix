@@ -60,7 +60,6 @@ in
         modules-center = [
           "clock"
         ];
-
         modules-right = [
           "group/hardware"
           "network"
@@ -224,16 +223,15 @@ in
           format = "{}";
         };
 
-
         "custom/speaker" = {
-          tooltip =false;
+          tooltip = true;
           max-length = 7;
           exec = "${config.xdg.configHome}/waybar/scripts/speaker.sh";
           on-click = "${pavucontrol}";
         };
 
         "custom/mic" = {
-          tooltip = false;
+          tooltip = true;
           max-length = 7;
           exec = "${config.xdg.configHome}/waybar/scripts/mic.sh";
           on-click = "${pavucontrol}";
@@ -344,7 +342,7 @@ in
 
         network = {
           interval = 3;
-          format = "{ifname}";
+          # format = "{ifname}";
           format-icons = [
             "󰤯"
             "󰤟"
@@ -354,7 +352,7 @@ in
           ];
           format-ethernet = "󰈁";
           # format-wifi = "{icon}  {signalStrength}% {essid}";
-          format-wifi = "{icon} {signalStrength}%";
+          format-wifi = "{icon}";
           format-disconnected = "󰤮";
           # tooltip = true;
           tooltip-format = ''
@@ -379,6 +377,7 @@ in
           max-length = 50;
           on-click = "${alacritty} -e ${nmtui}";
           on-click-right = "${nm-connection}";
+          tooltip = true;
         };
 
         # Audio
@@ -424,18 +423,22 @@ in
             "on-click" = "${chrome}";
             "tooltip-format" = "Open Chromium";
         };
-        "custom/firecox" = {
+
+        "custom/firefox" = {
             "format" = "";
             "on-click" = "${firefox}";
             "tooltip-format" = "Open Firefox";
         };
+
         "custom/thunar" = {
             "format" = "";
             "on-click" = "${thunar}";
             "tooltip-format" = "Open filemanager";
         };
+
         "custom/quicklinkempty" = {
         };
+
         "group/quicklinks" = {
             orientation = "horizontal";
             modules = [
@@ -447,205 +450,203 @@ in
         };
       }];
 
-      style =
-      ''
-      
-      @define-color backgrounddark1 ${base00};
-      @define-color backgrounddark2 ${base01};
-      @define-color backgrounddark3 ${base02};
-      @define-color workspacesbackground1 #FFFFFF;
-      @define-color workspacesbackground2 #CCCCCC;
-      @define-color bordercolor #FFFFFF;
-      @define-color textcolor1 ${base07};
-      @define-color textcolor2 ${base00};
-      @define-color textcolor3 #FFFFFF;
-      @define-color iconcolor ${base0E};
+      style = ''
+        @define-color backgrounddark1 ${base00};
+        @define-color backgrounddark2 ${base01};
+        @define-color backgrounddark3 ${base02};
+        @define-color workspacesbackground1 #FFFFFF;
+        @define-color workspacesbackground2 #CCCCCC;
+        @define-color bordercolor #FFFFFF;
+        @define-color textcolor1 ${base07};
+        @define-color textcolor2 ${base00};
+        @define-color textcolor3 #FFFFFF;
+        @define-color iconcolor ${base0E};
 
-        * {
-          font-size: 14px;
-          font-family: ${sansSerif.name}, ${monospace.name};
-          font-weight: bold;
-        }
+          * {
+            font-size: 14px;
+            font-family: ${sansSerif.name}, ${monospace.name};
+            font-weight: bold;
+          }
 
-        /* -----------------------------------------------------
-        * Window
-        * ----------------------------------------------------- */
+          /* -----------------------------------------------------
+          * Window
+          * ----------------------------------------------------- */
 
-        window#waybar {
-          background-color: @backgrounddark1;
-          opacity: 0.8;
-          color: @textcolor1;
-          border-bottom: 0px solid #ffffff;
-          transition-property: background-color;
-          transition-duration: 0.5s;
-        }
+          window#waybar {
+            background-color: @backgrounddark1;
+            opacity: 0.8;
+            color: @textcolor1;
+            border-bottom: 0px solid #ffffff;
+            transition-property: background-color;
+            transition-duration: 0.5s;
+          }
 
-        window#waybar.hidden {
-          opacity: 0.2;
-        }
+          window#waybar.hidden {
+            opacity: 0.2;
+          }
 
-        window#waybar.empty #window {
-          background-color: transparent;
-        }
+          window#waybar.empty #window {
+            background-color: transparent;
+          }
 
-        /* -----------------------------------------------------
-        * Modules
-        * ----------------------------------------------------- */
+          /* -----------------------------------------------------
+          * Modules
+          * ----------------------------------------------------- */
 
-        .modules-right {
-          padding: 0 10px 0 10px;
-          border-radius: 0px;
-        }
+          .modules-right {
+            padding: 0 10px 0 10px;
+            border-radius: 0px;
+          }
 
-        .modules-right > widget:last-child > #workspaces {
-          margin-right: 0;
-        }
+          .modules-right > widget:last-child > #workspaces {
+            margin-right: 0;
+          }
 
-        .modules-center {
-          padding: 0 10px 0 10px;
-          border-radius: 0px;
-        }
+          .modules-center {
+            padding: 0 10px 0 10px;
+            border-radius: 0px;
+          }
 
-        .modules-left {
-          padding: 0 10px 0 10px;
-          border-radius: 0px;
-        }
+          .modules-left {
+            padding: 0 10px 0 10px;
+            border-radius: 0px;
+          }
 
-        .modules-left > widget:first-child > #workspaces {
-          margin-left: 0;
-        }
+          .modules-left > widget:first-child > #workspaces {
+            margin-left: 0;
+          }
 
-        #hyprland-workspaces {
-          border-radius: 0px;
-          padding: 0 1px;
-        }
+          #hyprland-workspaces {
+            border-radius: 0px;
+            padding: 0 1px;
+          }
 
-        #workspaces button {
-          min-width: 5px;
-          color: @textcolor1;
-        }
+          #workspaces button {
+            min-width: 5px;
+            color: @textcolor1;
+          }
 
-        /* -----------------------------------------------------
-        * Tooltips
-        * ----------------------------------------------------- */
+          /* -----------------------------------------------------
+          * Tooltips
+          * ----------------------------------------------------- */
 
-        tooltip {
-          border-radius: 10px;
-          background-color: @backgrounddark2;
-          opacity:0.8;
-          padding:20px;
-          margin:0px;
-        }
+          tooltip {
+            border-radius: 10px;
+            background-color: @backgrounddark2;
+            opacity:0.8;
+            padding:20px;
+            margin:0px;
+          }
 
-        tooltip label {
-          color: @textcolor1;
-        }
+          tooltip label {
+            color: @textcolor1;
+          }
 
-        #custom-exit,
-        #battery,
-        #custom-system,
-        #temperature,
-        #backlight,
-        #network,
-        #pulseaudio,
-        #wireplumber,
-        #custom-media,
-        #tray,
-        #mode,
-        #idle_inhibitor,
-        #scratchpad,
-        #mpd {
-          margin: 0px;
-          padding: 0 10px 0 10px;
-          color: @textcolor1;
-          font-size: 14px;
-        }
+          #custom-exit,
+          #battery,
+          #custom-system,
+          #temperature,
+          #backlight,
+          #network,
+          #pulseaudio,
+          #wireplumber,
+          #custom-media,
+          #tray,
+          #mode,
+          #idle_inhibitor,
+          #scratchpad,
+          #mpd {
+            margin: 0px;
+            padding: 0 10px 0 10px;
+            color: @textcolor1;
+            font-size: 14px;
+          }
 
-        #battery.icon {
-          font-size: 16px;
-        }
+          #battery.icon {
+            font-size: 16px;
+          }
 
-        #network.icon {
-          font-size: 16px;
-        }
+          #network.icon {
+            font-size: 16px;
+          }
 
-        /* -----------------------------------------------------
-        * Clock
-        * ----------------------------------------------------- */
+          /* -----------------------------------------------------
+          * Clock
+          * ----------------------------------------------------- */
 
-        #clock {
-          margin: 0px;
-          padding: 0 10px 0 10px;
-          color: @textcolor1;
-          font-size: 16px;
-          font-weight: bold;
-        }
+          #clock {
+            margin: 0px;
+            padding: 0 10px 0 10px;
+            color: @textcolor1;
+            font-size: 16px;
+            font-weight: bold;
+          }
 
-        #clock.calendar {
-          font-size: 16px;
-        }
+          #clock.calendar {
+            font-size: 16px;
+          }
 
-        #custom-speaker,
-        #custom-mic {
-          margin: 0px;
-          padding: 0 10px 0 10px;
-          font-size: 14px;
-          color: @textcolor1;
-        }
+          #custom-speaker,
+          #custom-mic {
+            margin: 0px;
+            padding: 0 10px 0 10px;
+            font-size: 14px;
+            color: @textcolor1;
+          }
 
-        #bluetooth {
-          margin: 0px;
-          padding: 0 10px 0 10px;
-          color: @textcolor1;
-          font-size: 16px;
-          font-weight: bold;
-        }
+          #bluetooth {
+            margin: 0px;
+            padding: 0 10px 0 10px;
+            color: @textcolor1;
+            font-size: 16px;
+            font-weight: bold;
+          }
 
-        #bluetooth.icon {
-          font-size: 16px;
-        }
+          #bluetooth.icon {
+            font-size: 16px;
+          }
 
-        #custom-cliphist {
-          margin: 0px;
-          padding: 0 10px 0 10px;
-          color: @textcolor1;
-          font-size: 16px;
-          font-weight: bold;
-        }
+          #custom-cliphist {
+            margin: 0px;
+            padding: 0 10px 0 10px;
+            color: @textcolor1;
+            font-size: 16px;
+            font-weight: bold;
+          }
 
-        #group-hardware {
-          margin: 0px;
-          padding: 0 10px 0 10px;
-          color: @textcolor1;
-          font-size: 16px;
-          font-weight: bold;
-        }
+          #group-hardware {
+            margin: 0px;
+            padding: 0 10px 0 10px;
+            color: @textcolor1;
+            font-size: 16px;
+            font-weight: bold;
+          }
 
-        #disk {
-          margin: 0px;
-          padding: 0 10px 0 10px;
-          font-size: 13px;
-          color: @textcolor1;
-        }
+          #disk {
+            margin: 0px;
+            padding: 0 10px 0 10px;
+            font-size: 13px;
+            color: @textcolor1;
+          }
 
-        #cpu,
-        #memory,
-        #custom-gpu {
-          margin: 0px;
-          padding: 0 10px 0 10px;
-          font-size: 14px;
-          color: @textcolor1;
-        }
+          #cpu,
+          #memory,
+          #custom-gpu {
+            margin: 0px;
+            padding: 0 10px 0 10px;
+            font-size: 14px;
+            color: @textcolor1;
+          }
 
-        #custom-exit {
-          padding-right: 15px;
-        }
+          #custom-exit {
+            padding-right: 15px;
+          }
 
-        #custom-applauncher {
-          font-size: 22px;
-          padding-right: 2px;
-          padding-left: 2px;
-        }
+          #custom-applauncher {
+            font-size: 22px;
+            padding-right: 2px;
+            padding-left: 2px;
+          }
       '';
     };
   };
