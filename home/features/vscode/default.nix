@@ -91,13 +91,13 @@
           name = "templ";
           publisher = "a-h";
           version = "0.0.29";
-          sha256 = "sha256-D2XGCP57gsj02WOpoLR6pTtu2/GQejwQkevQdqHsh14=";
+          sha256 = "sha256-RZ++wxL2OqBh3hiLAwKIw5QLjU/imsK7irQUHbJ/tqM=";
         }
         {
           name = "htmx-attributes";
           publisher = "craigrbroughton";
           version = "0.8.0";
-          sha256 = "sha256-SNhwGqwfxhQOOxjLjoYYLH3Vo0vVq/MDHImePviUHW0=";
+          sha256 = "sha256-TsemPZkq2Z13/vahRaP7z206BJaCZ1TR6OVv6aeDvyk=";
         }
         {
           name = "alpine-js-intellisense";
