@@ -174,7 +174,6 @@ with lib;
       };
       "org/gnome/desktop/app-folders/folders/Development" = {
         apps = [
-          "openlens.desktop"
           "nvim.desktop"
           "DevPod.desktop"
           "Helix.desktop"
