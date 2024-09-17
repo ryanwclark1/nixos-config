@@ -15,6 +15,7 @@
     validateSopsFiles = false;
 
     secrets = {
+      administrator-password = {};
       "private_keys/administrator" = {
         path = "/home/administrator/.ssh/id_demo";
       };
