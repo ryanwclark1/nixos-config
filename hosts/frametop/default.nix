@@ -24,6 +24,7 @@
     ../common/optional/qemu.nix
     ../common/optional/steam.nix
     ../common/optional/style.nix
+    ../common/optional/system-packages.nix
     ../common/optional/tailscale.nix
     ../common/optional/thunar.nix
     ../common/optional/wireshark.nix
@@ -66,29 +67,8 @@
     };
   };
 
-
-  # battery
-  services.upower.enable = true;
-  services.auto-cpufreq = {
-    enable = lib.mkDefault false;
-    settings = {
-      battery = {
-        governor = "powersave";
-        turbo = "auto";
-      };
-      charger = {
-        governor = "performance";
-        turbo = "auto";
-      };
-    };
-  };
-  powerManagement = {
-    enable = true;
-    cpuFreqGovernor = "performance";
-  };
-
   powerManagement.powertop.enable = true;
-
+  security.pam.services.login.fprintAuth = true;
   environment.systemPackages = with pkgs; [
     fw-ectool  # EC-Tool adjusted for usage with framework embedded controller.
   ];
