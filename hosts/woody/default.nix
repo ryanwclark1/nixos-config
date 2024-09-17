@@ -29,6 +29,7 @@
     ../common/optional/steam.nix
     ../common/optional/style.nix
     ../common/optional/syncthing.nix
+    ../common/optional/system-packages.nix
     ../common/optional/tailscale.nix
     ../common/optional/thunar.nix
     ../common/optional/wireshark.nix
