@@ -7,10 +7,9 @@ let
     name = "fetch-nix-index-database";
     runtimeInputs = with pkgs; [ wget coreutils ];
     text = ''
-      filename="index-x86_64-linux"
-      mkdir -p ~/.cache/nix-index
-      cd ~/.cache/nix-index
-      wget -N "https://github.com/Mic92/nix-index-database/releases/latest/download/$filename"
+      filename="index-$(uname -m | sed 's/^arm64$/aarch64/')-$(uname | tr A-Z a-z)"
+      mkdir -p ~/.cache/nix-index && cd ~/.cache/nix-index
+      wget -q -N https://github.com/nix-community/nix-index-database/releases/latest/download/$filename
       ln -f "$filename" files
     '';
   };
@@ -30,11 +29,11 @@ in
     nurl # Generate Nix fetcher calls from repository URLs
     nvd # Differ
     patchelf
+    sops
   ];
 
   programs.nix-index = {
     enable = true;
-    package = pkgs.nix-index;
   };
 
   systemd.user.services.nix-index-database-sync = {
