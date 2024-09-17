@@ -37,9 +37,9 @@ _: {
         TypeParameter = "󰊄 ";
         Variable = "󰆧 ";
       };
-    };
-    lsp = {
+      lsp = {
       autoAttach = true;
+      };
     };
   };
 }

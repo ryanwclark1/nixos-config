@@ -28,10 +28,11 @@
         github.vscode-pull-request-github
         ms-azuretools.vscode-docker
         ms-kubernetes-tools.vscode-kubernetes-tools
-        ms-python.python
+        # ms-python.python
         ms-python.vscode-pylance
-        # ms-vscode-remote.remote-ssh
-        # ms-vscode-remote.remote-containers
+        ms-vscode-remote.remote-ssh-edit
+        ms-vscode-remote.remote-ssh
+        ms-vscode-remote.remote-containers
         ms-vscode.cmake-tools
         ms-vscode.cpptools
         ms-vscode.hexeditor
@@ -61,6 +62,19 @@
         gencer.html-slim-scss-css-class-completion
         catppuccin.catppuccin-vsc
       ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
+        # {
+        #   name = "ms-python";
+        #   publisher = "ms-python";
+        #   version = "2024.14.1";
+        #   sha256 = "";
+        # }
+
+        {
+          name = "yuck";
+          publisher = "eww-yuck";
+          version = "0.0.3";
+          sha256 = "sha256-DITgLedaO0Ifrttu+ZXkiaVA7Ua5RXc4jXQHPYLqrcM=";
+        }
         {
           name = "nord-deep";
           publisher = "marlosirapuan";
@@ -70,19 +84,19 @@
         {
           name = "vscode-speech";
           publisher = "ms-vscode";
-          version = "0.8.0";
-          sha256 = "sha256-+eL6z7ZDB+92ZBXEGs6IcJMF7sYZ1cq+/Gq8hVluKiY=";
+          version = "0.10.0";
+          sha256 = "sha256-ef5uzpXVS92snyM47PwTcAhCKKwfn4iQFvZxMev4X58=";
         }
         {
           name = "templ";
           publisher = "a-h";
-          version = "0.0.24";
+          version = "0.0.29";
           sha256 = "sha256-D2XGCP57gsj02WOpoLR6pTtu2/GQejwQkevQdqHsh14=";
         }
         {
           name = "htmx-attributes";
           publisher = "craigrbroughton";
-          version = "0.7.0";
+          version = "0.8.0";
           sha256 = "sha256-SNhwGqwfxhQOOxjLjoYYLH3Vo0vVq/MDHImePviUHW0=";
         }
         {
@@ -97,24 +111,24 @@
         #   version = "2024.20.0";
         #   sha256 = "sha256-CqLmL8o+arki7UGWtZ/B6GQclWumLqgUqcPIXhG+Ays=";
         # }
-        {
-          name = "remote-containers";
-          publisher = "ms-vscode-remote";
-          version = "0.381.0";
-          sha256 = "sha256-qGDLpEHQBB1x++KD+xrcJTs8oGmZJXjsUojfG3TwczI=";
-        }
-        {
-          name = "remote-ssh";
-          publisher = "ms-vscode-remote";
-          version = "0.113.2024072315";
-          sha256 = "sha256-s+md+gM5V0EL17LwpiIa3Kbm/AOdYQP0PfOHtnLPYh8=";
-        }
-        {
-          name = "remote-ssh-edit";
-          publisher = "ms-vscode-remote";
-          version = "0.86.0";
-          sha256 = "sha256-JsbaoIekUo2nKCu+fNbGlh5d1Tt/QJGUuXUGP04TsDI=";
-        }
+        # {
+        #   name = "remote-containers";
+        #   publisher = "ms-vscode-remote";
+        #   version = "0.386.0";
+        #   sha256 = "sha256-qGDLpEHQBB1x++KD+xrcJTs8oGmZJXjsUojfG3TwczI=";
+        # }
+        # {
+        #   name = "remote-ssh";
+        #   publisher = "ms-vscode-remote";
+        #   version = "0.113.2024072315";
+        #   sha256 = "sha256-s+md+gM5V0EL17LwpiIa3Kbm/AOdYQP0PfOHtnLPYh8=";
+        # }
+        # {
+        #   name = "remote-ssh-edit";
+        #   publisher = "ms-vscode-remote";
+        #   version = "0.86.0";
+        #   sha256 = "sha256-JsbaoIekUo2nKCu+fNbGlh5d1Tt/QJGUuXUGP04TsDI=";
+        # }
         {
           name = "remote-explorer";
           publisher = "ms-vscode";
