@@ -13,7 +13,7 @@
       powerKey = "poweroff";
       powerKeyLongPress = "reboot";
       suspendKey = "suspend";
-      suspendKeyLongPress = "suspend-then-hibernate"
+      suspendKeyLongPress = "suspend-then-hibernate";
     };
   };
 }
