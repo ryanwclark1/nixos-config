@@ -8,7 +8,7 @@ keys:
   - &woody-root age1sfg83rldxqkcyygl42nuk3r5v6yj2492s6dtxy22ej3x7t8t65dq0pal93
   - &woody age1smrr2kvq6mmcc3faw4qtlxtl6pkdjemzkqw208mjqkfqa08p3avqusedys
 creation_rules:
-  - path_regex: secrets.yaml$
+  - path_regex: secrets/[^/]+\.yaml$
     key_groups:
     - age:
       - *administrator
