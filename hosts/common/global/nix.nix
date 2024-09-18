@@ -25,11 +25,16 @@
         "nixos-test"
       ];
     };
+  };
 
-    gc = {
-      automatic = true;
-      # Keep the last 14 days of generations
-      options = "--delete-older-than 10d";
+  programs.nh = {
+    enable = true;
+    package = pkgs.nh;
+    clean = {
+      enable = true;
+      dates = "weekly";
+      extraArgs = "--keep-since 4d --keep 3";
     };
+    flake = "~/nixos-config";
   };
 }
