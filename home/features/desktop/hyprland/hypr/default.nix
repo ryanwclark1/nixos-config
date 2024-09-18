@@ -70,7 +70,6 @@
         # "col.nogroup_border_active" = "0xffff00ff";
         layout = "dwindle";
         no_focus_fallback = false;
-        apply_sens_to_raw = false;
         resize_on_border = true;
         extend_border_grab_area = 15;
         hover_icon_on_border = true;
