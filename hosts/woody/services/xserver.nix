@@ -1,0 +1,9 @@
+{
+  ...
+}:
+
+{
+  services = {
+    xserver.videoDrivers = [ "amdgpu" ];
+  };
+}

@@ -4,11 +4,11 @@
 
 {
   imports = [
-    ./spice.nix
+    ./fwupd.nix
+    # ./spice.nix
     ./vscode-server.nix
+    ./xserver.nix
   ];
 
-  services = {
-    xserver.videoDrivers = [ "amdgpu" ];
-  };
+
 }
