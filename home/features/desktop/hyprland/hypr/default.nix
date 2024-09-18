@@ -15,19 +15,7 @@
 
   wayland.windowManager.hyprland = {
     enable = true;
-    # plugins = [
-    #   inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}.hyprbars
-    # ];
-    # package = pkgs.hyprland.override {wrapRuntimeDeps = false;};
-    # package = config.wayland.windowManager.hyprland.package;
-    # systemd = {
-    #   enable = true;
-    #   # Same as default, but stop graphical-session too
-    #   extraCommands = lib.mkBefore [
-    #     "systemctl --user stop graphical-session.target"
-    #     "systemctl --user start hyprland-session.target"
-    #   ];
-    # };
+
 
     settings =
     let
