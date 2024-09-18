@@ -27,7 +27,6 @@
   home.packages = with pkgs; [
     distrobox # Nice escape hatch, integrates docker images with my environment
     httpie # Better curl
-    hyperfine #cli benchmarking tool
     scrot # A command-line screen capture utility
   ];
 }
