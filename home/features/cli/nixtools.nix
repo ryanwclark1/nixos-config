@@ -8,7 +8,7 @@ let
     runtimeInputs = with pkgs; [ wget coreutils ];
     text = ''
       filename="index-$(uname -m | sed 's/^arm64$/aarch64/')-$(uname | tr '[:upper:]' '[:lower:]')"
-      mkdir -p ~/.cache/nix-index && cd ~/.cache/nix-index
+      mkdir -p ~/.local/cache/nix-index && cd ~/.local/cache/nix-index
       wget -q -N "https://github.com/nix-community/nix-index-database/releases/latest/download/$filename"
       ln -f "$filename" files
     '';
@@ -19,7 +19,6 @@ in
     alejandra
     comma
     deadnix
-    nh # Nice wrapper for NixOS and HM
     nil # Nix LSP
     niv
     nix-diff
@@ -27,7 +26,6 @@ in
     nix-update
     nixpkgs-lint
     nurl # Generate Nix fetcher calls from repository URLs
-    nvd # Differ
     patchelf
     sops
   ];
