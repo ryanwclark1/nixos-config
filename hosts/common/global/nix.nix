@@ -35,6 +35,6 @@
       dates = "weekly";
       extraArgs = "--keep-since 4d --keep 3";
     };
-    flake = "~/nixos-config";
+    flake = "/home/administrator/nixos-config";
   };
 }
