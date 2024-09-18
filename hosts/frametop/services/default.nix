@@ -6,7 +6,7 @@
   imports = [
     # ./auto-cpufreq.nix
     ./fprintd.nix
-    ./framework-firmware.nix
+    ./fwupd.nix
     ./libinput.nix
     ./logind.nix
     ./upower.nix
