@@ -201,7 +201,7 @@
         initial_workspace_tracking = 1;
         middle_click_paste = true;
         render_unfocused_fps = 15;
-        disable_xdg_env_checks = false;
+        # disable_xdg_env_checks = false;
       };
 
       binds = {
