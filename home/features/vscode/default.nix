@@ -70,6 +70,18 @@
           sha256 = "sha256-1fb2FisCDu7Ewcb+lzxCwdQWqanKZRz/OVQOiKE6UF8=";
         }
         {
+          name = "ansible";
+          publisher = "redhat";
+          version = "24.9.5152897";
+          sha256 = "sha256-USQT2kZ6R2fuV+jOmqfHoeTGEMuZn/zN7OsDkq/Kz9M=";
+        }
+        # {
+        #   name = "kiota";
+        #   publisher = "ms-graph";
+        #   version = "1.19.24091201";
+        #   sha256 = "sha256-Y+ZWhpmfJ4bmeLiOBACdb839vKtwmsFRmimKFpIVOyA=";
+        # }
+        {
           name = "copilot-chat";
           publisher = "github";
           version = "0.21.2024091802";
@@ -80,12 +92,6 @@
           publisher = "github";
           version = "0.64.0";
           sha256 = "sha256-Nh4PxYVdgdDb8iwHHUbXwJ5ZbMruFB6juL4Yg/wdKMY=";
-        }
-        {
-          name = "heygithub";
-          publisher = "github";
-          version = "0.21.1442";
-          sha256 = "sha256-sjMf4ZUpk25ey+t7kYvuAbHLk8CZvbkWsGUJUY6yg3Q=";
         }
         # {
         #   name = "nord-deep";
@@ -117,12 +123,12 @@
           version = "1.2.0";
           sha256 = "sha256-Klx5ZvV06lXIJ3Q/mzq3KBjPpdROoxDkgEu7MBO+RhI=";
         }
-        {
-          name = "ruff";
-          publisher = "charliermarsh";
-          version = "2024.48.0";
-          sha256 = "sha256-CqLmL8o+arki7UGWtZ/B6GQclWumLqgUqcPIXhG+Ays=";
-        }
+        # {
+        #   name = "ruff";
+        #   publisher = "charliermarsh";
+        #   version = "2024.48.0";
+        #   sha256 = "sha256-ZjEkJSZTL5G99clytDfntWmqJKfcJ9IYrOvJ+X+GN70=";
+        # }
         {
           name = "remote-explorer";
           publisher = "ms-vscode";
