@@ -66,8 +66,8 @@
         {
           name = "python";
           publisher = "ms-python";
-          version = "2024.15.2024091801";
-          sha256 = "sha256-1fb2FisCDu7Ewcb+lzxCwdQWqanKZRz/OVQOiKE6UF8=";
+          version = "2024.14.1";
+          sha256 = "sha256-NhE3xATR4D6aAqIT/hToZ/qzMvZxjTmpTyDoIrdvuTE=";
         }
         {
           name = "ansible";
@@ -82,10 +82,16 @@
         #   sha256 = "sha256-Y+ZWhpmfJ4bmeLiOBACdb839vKtwmsFRmimKFpIVOyA=";
         # }
         {
+          name = "copilot";
+          publisher = "github";
+          version = "1.229.0";
+          sha256 = "sha256-UCwBfScsbAVxuDj5ThUIObF/GsJ/bFMkp8n6Rd7HPEQ=";
+        }
+        {
           name = "copilot-chat";
           publisher = "github";
-          version = "0.21.2024091802";
-          sha256 = "sha256-3TW0GqcvmFkLQEQ8Iw3YhJf0FXBd03xFAyz22OwUc4c=";
+          version = "0.20.1";
+          sha256 = "sha256-HCPUufTZdukDmvP4/90K1x6bPq281Y02RpRds0vDL3U=";
         }
         {
           name = "remotehub";
