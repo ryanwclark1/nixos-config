@@ -55,7 +55,7 @@
         redhat.vscode-xml
         redhat.vscode-yaml
         rust-lang.rust-analyzer
-        tailscale-vscode-tailscale
+        tailscale.vscode-tailscale
         tamasfe.even-better-toml
         vscodevim.vim
         wholroyd.jinja # Prefer Better Jinja
