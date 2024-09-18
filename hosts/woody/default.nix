@@ -47,9 +47,17 @@
     loader = {
       systemd-boot = {
         enable = true;
+        configurationLimit = 20;
         consoleMode = "keep";
+
       };
       efi.canTouchEfiVariables = true;
+    };
+    plymouth = {
+        enable = true;
+      };
+    tmp = {
+      cleanOnBoot = true;
     };
     # lanzaboote = {
     #   enable = true;
@@ -80,12 +88,9 @@
       extraPackages = with pkgs; [
         mesa
       ];
-      extraPackages32Bit = with pkgs; [
+      extraPackages32 = with pkgs; [
         driversi686Linux.mesa
       ];
-    };
-    cpu.amd = {
-      updateMicrocode = true;
     };
 
     logitech = {
@@ -95,10 +100,6 @@
       };
     };
   };
-
-  # environment.systemPackages = with pkgs; [
-  #   libGL
-  # ];
 
   system.stateVersion = "24.05";
 }
