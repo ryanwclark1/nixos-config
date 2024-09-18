@@ -13,12 +13,12 @@
   programs.fzf = {
     enable = true;
     package = pkgs.fzf;
-    changeDirWidgetCommand = "fd --type d";
+    changeDirWidgetCommand = "fd --type directory";
     changeDirWidgetOptions =
     [
       "--preview 'tree -C {} | head -200'"
     ];
-    defaultCommand = "fd -type f ! -path '.git'";
+    defaultCommand = "fd --type file --exclude .git";
     defaultOptions = [
       # "--preview='pistol {}'"
       "--height=40%"
