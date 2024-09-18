@@ -20,29 +20,31 @@
       enableExtensionUpdateCheck = true;
       enableUpdateCheck = false;
       extensions = with pkgs.vscode-extensions; [
-        github.copilot-chat
-        github.copilot
         github.codespaces
+        github.copilot
+        # github.copilot-chat
         github.github-vscode-theme
         github.vscode-github-actions
         github.vscode-pull-request-github
         ms-azuretools.vscode-docker
         ms-kubernetes-tools.vscode-kubernetes-tools
         # ms-python.python
-        ms-python.vscode-pylance
+        # ms-python.vscode-pylance
         ms-vscode-remote.remote-ssh-edit
         ms-vscode-remote.remote-ssh
         ms-vscode-remote.remote-containers
         ms-vscode.cmake-tools
-        ms-vscode.cpptools
+        # ms-vscode.cpptools
         ms-vscode.hexeditor
         ms-vscode.makefile-tools
         bradlc.vscode-tailwindcss
+        catppuccin.catppuccin-vsc
         charliermarsh.ruff
         dbaeumer.vscode-eslint
         donjayamanne.githistory
         esbenp.prettier-vscode
         formulahendry.code-runner
+        gencer.html-slim-scss-css-class-completion
         golang.go
         griimick.vhs
         hediet.vscode-drawio
@@ -60,28 +62,37 @@
         vscodevim.vim
         wholroyd.jinja # Prefer Better Jinja
         yzhang.markdown-all-in-one
-        gencer.html-slim-scss-css-class-completion
-        catppuccin.catppuccin-vsc
       ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
+        {
+          name = "python";
+          publisher = "ms-python";
+          version = "2024.15.2024091801";
+          sha256 = "sha256-1fb2FisCDu7Ewcb+lzxCwdQWqanKZRz/OVQOiKE6UF8=";
+        }
+        {
+          name = "copilot-chat";
+          publisher = "github";
+          version = "0.21.2024091802";
+          sha256 = "sha256-3TW0GqcvmFkLQEQ8Iw3YhJf0FXBd03xFAyz22OwUc4c=";
+        }
+        {
+          name = "remotehub";
+          publisher = "github";
+          version = "0.64.0";
+          sha256 = "sha256-Nh4PxYVdgdDb8iwHHUbXwJ5ZbMruFB6juL4Yg/wdKMY=";
+        }
+        {
+          name = "heygithub";
+          publisher = "github";
+          version = "0.21.1442";
+          sha256 = "sha256-sjMf4ZUpk25ey+t7kYvuAbHLk8CZvbkWsGUJUY6yg3Q=";
+        }
         # {
-        #   name = "ms-python";
-        #   publisher = "ms-python";
-        #   version = "2024.14.1";
-        #   sha256 = "";
+        #   name = "nord-deep";
+        #   publisher = "marlosirapuan";
+        #   version = "0.1.625";
+        #   sha256 = "sha256-5QJ1zq5vc9PdJHTtpczR/Jf6aqi8qOx/6yUru4TLiQc=";
         # }
-
-        {
-          name = "yuck";
-          publisher = "eww-yuck";
-          version = "0.0.3";
-          sha256 = "sha256-DITgLedaO0Ifrttu+ZXkiaVA7Ua5RXc4jXQHPYLqrcM=";
-        }
-        {
-          name = "nord-deep";
-          publisher = "marlosirapuan";
-          version = "0.1.625";
-          sha256 = "sha256-5QJ1zq5vc9PdJHTtpczR/Jf6aqi8qOx/6yUru4TLiQc=";
-        }
         {
           name = "vscode-speech";
           publisher = "ms-vscode";
@@ -106,30 +117,12 @@
           version = "1.2.0";
           sha256 = "sha256-Klx5ZvV06lXIJ3Q/mzq3KBjPpdROoxDkgEu7MBO+RhI=";
         }
-        # {
-        #   name = "ruff";
-        #   publisher = "charliermarsh";
-        #   version = "2024.20.0";
-        #   sha256 = "sha256-CqLmL8o+arki7UGWtZ/B6GQclWumLqgUqcPIXhG+Ays=";
-        # }
-        # {
-        #   name = "remote-containers";
-        #   publisher = "ms-vscode-remote";
-        #   version = "0.386.0";
-        #   sha256 = "sha256-qGDLpEHQBB1x++KD+xrcJTs8oGmZJXjsUojfG3TwczI=";
-        # }
-        # {
-        #   name = "remote-ssh";
-        #   publisher = "ms-vscode-remote";
-        #   version = "0.113.2024072315";
-        #   sha256 = "sha256-s+md+gM5V0EL17LwpiIa3Kbm/AOdYQP0PfOHtnLPYh8=";
-        # }
-        # {
-        #   name = "remote-ssh-edit";
-        #   publisher = "ms-vscode-remote";
-        #   version = "0.86.0";
-        #   sha256 = "sha256-JsbaoIekUo2nKCu+fNbGlh5d1Tt/QJGUuXUGP04TsDI=";
-        # }
+        {
+          name = "ruff";
+          publisher = "charliermarsh";
+          version = "2024.48.0";
+          sha256 = "sha256-CqLmL8o+arki7UGWtZ/B6GQclWumLqgUqcPIXhG+Ays=";
+        }
         {
           name = "remote-explorer";
           publisher = "ms-vscode";
