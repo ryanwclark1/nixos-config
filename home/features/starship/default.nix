@@ -46,6 +46,11 @@ with config.lib.stylix.colors.withHashtag;
           Redhat = "󱄛";
           RedHatEnterprise = "󱄛";
           NixOS = "";
+          FreeBSD = "";
+          Kali = " ";
+          Almalinux = "";
+          Pop = " ";
+          Suse = " ";
         };
       };
 
@@ -85,7 +90,9 @@ with config.lib.stylix.colors.withHashtag;
           "Downloads" = " ";
           "Music" = " ";
           "Pictures" = " ";
-          "code" = "󰲋 ";
+          "/code" = "/󰲋 ";
+          "Videos" = " ";
+          "Desktop" = " ";
         };
       };
 
@@ -108,7 +115,6 @@ with config.lib.stylix.colors.withHashtag;
       julia.symbol = " ";
       memory_usage.symbol = "󰍛 ";
       nim.symbol = "󰆥 ";
-      package.symbol = "󰏗 ";
       perl.symbol = " ";
       ruby.symbol = " ";
       scala.symbol = " ";
@@ -127,29 +133,41 @@ with config.lib.stylix.colors.withHashtag;
         symbol = "";
         style = "fg:${base00} bg:${base07}";
         format = "[$symbol\ [$name]]($style)";
+        disabled = false;
       };
 
       git_branch = {
         symbol = "";
         style = "bg:${base05}";
         format = "[[ $symbol $branch ](fg:${base00} bg:${base05})]($style)";
+        disabled = false;
       };
 
       git_status = {
         style = "bg:${base05}";
         format = "[[($all_status$ahead_behind )](fg:${base00} bg:${base05})]($style)";
+        disabled = false;
+      };
+
+      package = {
+        symbol = "󰏗 ";
+        version_format = "v$raw";
+        format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
+        disabled = false;
       };
 
       bun = {
         symbol = "";
         style = "bg:${base0F}";
         format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
+        disabled = false;
       };
 
       c = {
         symbol = " ";
         style = "bg:${base0F}";
         format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
+        disabled = false;
       };
 
       cmake = {
@@ -169,6 +187,7 @@ with config.lib.stylix.colors.withHashtag;
         symbol = "";
         style = "bg:${base0F}";
         format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
+        disabled = false;
       };
 
       haskell = {
@@ -181,37 +200,42 @@ with config.lib.stylix.colors.withHashtag;
         symbol = " ";
         style = "bg:${base0F}";
         format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
+        disabled = true;
       };
 
       kotlin = {
         symbol = "";
         style = "bg:${base0F}";
         format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
+        disabled = true;
       };
 
       kubernetes = {
         symbol = "󱃾";
         style = "bg:${base0F}";
         format = "[[ $symbol$context( \$namespace\ ) ](fg:${base00} bg:${base0F})]($style)";
+        disabled = false;
       };
 
       lua = {
         symbol = "";
         style = "bg:${base0F}";
         format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]";
-        disabled = true;
+        disabled = false;
       };
 
       nodejs = {
         symbol = "";
         style = "bg:${base0F}";
         format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
+        disabled = false;
       };
 
       php = {
         symbol = "";
         style = "bg:${base0F}";
         format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
+        disabled = false;
       };
 
       python = {
@@ -219,12 +243,14 @@ with config.lib.stylix.colors.withHashtag;
         style = "bg:${base0F}";
         version_format = "$raw";
         format = "[ $symbol( $version )(\($virtualenv\) )]($style)";
+        disabled = false;
       };
 
       rust = {
         symbol = "";
         style = "bg:${base0F}";
         format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
+        disabled = false;
       };
 
       swift = {
@@ -245,6 +271,7 @@ with config.lib.stylix.colors.withHashtag;
         symbol = "";
         style = "bg:${base06}";
         format = "[[ $symbol( $context) ](fg:${base0C} bg:${base06})]($style)";
+        disabled = false;
       };
 
       custom.yazi = {
@@ -255,22 +282,13 @@ with config.lib.stylix.colors.withHashtag;
 
       line_break.disabled = true;
 
-      # character = {
-      #   error_symbol = "[~~>](bold red)";
-      #   success_symbol = "[->>](bold green)";
-      #   vimcmd_symbol = "[<<-](bold yellow)";
-      #   vimcmd_visual_symbol = "[<<-](bold cyan)";
-      #   vimcmd_replace_symbol = "[<<-](bold purple)";
-      #   vimcmd_replace_one_symbol = "[<<-](bold purple)";
-      # };
-
       character = {
-        error_symbol = "[~>](bold red)";
-        success_symbol = "[](bold green)";
-        vimcmd_symbol = "[](bold yellow)";
-        vimcmd_visual_symbol = "[](bold cyan)";
-        vimcmd_replace_symbol = "[](bold purple)";
-        vimcmd_replace_one_symbol = "[](bold purple)";
+        error_symbol = "[~>](bold ${base08})";
+        success_symbol = "[](bold ${base0B})";
+        vimcmd_symbol = "[](bold ${base0A})";
+        vimcmd_visual_symbol = "[](bold ${base0C})";
+        vimcmd_replace_symbol = "[](bold ${base0E})";
+        vimcmd_replace_one_symbol = "[](bold ${base0E})";
       };
 
       cmd_duration = {
