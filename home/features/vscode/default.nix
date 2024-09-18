@@ -21,7 +21,7 @@
       enableUpdateCheck = false;
       extensions = with pkgs.vscode-extensions; [
         github.codespaces
-        github.copilot
+        # github.copilot
         # github.copilot-chat
         github.github-vscode-theme
         github.vscode-github-actions
@@ -81,6 +81,12 @@
         #   version = "1.19.24091201";
         #   sha256 = "sha256-Y+ZWhpmfJ4bmeLiOBACdb839vKtwmsFRmimKFpIVOyA=";
         # }
+        {
+          name = "vscode-thunder-client";
+          publisher = "rangav";
+          version = "2.25.5";
+          sha256 = "sha256-UCwBfScsbAVxuDj5ThUIObF/GsJ/bFMkp8n6Rd7HPEQ=";
+        }
         {
           name = "copilot";
           publisher = "github";
