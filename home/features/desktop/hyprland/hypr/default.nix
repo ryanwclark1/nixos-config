@@ -151,6 +151,7 @@
       group = {
         insert_after_current = true;
         focus_removed_window = true;
+        merge_groups_on_drag = true;
         # "col.border_active" = "0x66ffff00";
         # "col.border_inactive" = "0x66777700";
         # "col.border_locked_active" = "0x66ff5500";
@@ -199,6 +200,8 @@
         # exit_window_retains_fullscreen = false;
         initial_workspace_tracking = 1;
         middle_click_paste = true;
+        render_unfocused_fps = 15;
+        disable_xdg_env_checks = false;
       };
 
       binds = {
