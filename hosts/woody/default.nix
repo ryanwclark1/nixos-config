@@ -60,9 +60,29 @@
 
   hardware = {
     enableAllFirmware = true;
+    enableRedistributableFirmware = true;
+    amdgpu = {
+      amdvlk = {
+        enable = true;
+        package = pkgs.amdvlk;
+        supportExperimental.enable = true;
+        support32Bit = {
+          enable = true;
+          package = pkgs.driversi686Linux.amdvlk;
+        };
+      };
+      initrd.enable = true;
+      opencl.enable = true;
+    };
     graphics = {
       enable = true;
       enable32Bit = true;
+      extraPackages = with pkgs; [
+        mesa
+      ];
+      extraPackages32Bit = with pkgs; [
+        driversi686Linux.mesa
+      ];
     };
     cpu.amd = {
       updateMicrocode = true;
@@ -76,9 +96,9 @@
     };
   };
 
-  environment.systemPackages = with pkgs; [
-    libGL
-  ];
+  # environment.systemPackages = with pkgs; [
+  #   libGL
+  # ];
 
   system.stateVersion = "24.05";
 }
