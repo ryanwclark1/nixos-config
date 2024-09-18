@@ -85,7 +85,7 @@
           name = "vscode-thunder-client";
           publisher = "rangav";
           version = "2.25.5";
-          sha256 = "sha256-UCwBfScsbAVxuDj5ThUIObF/GsJ/bFMkp8n6Rd7HPEQ=";
+          sha256 = "sha256-uwHsTMi1huo8VhVuAynzGbZbBiEPBSqBOAsz3CCvvgM=";
         }
         {
           name = "copilot";
