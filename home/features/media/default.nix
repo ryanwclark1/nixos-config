@@ -21,7 +21,6 @@
     ./mpv.nix
     ./music.nix
     # ./obs.nix
-    ./pavucontrol.nix
     ./playerctl.nix
     ./vlc.nix
     ./yt-dlp.nix
