@@ -5,7 +5,6 @@
 
 {
   security.rtkit.enable = true;
-  hardware.pulseaudio.enable = false;
 
   services.pipewire = {
     enable = true;
@@ -18,15 +17,17 @@
       enable = true;
       support32Bit = true;
     };
-    pulse.enable = true;
-    wireplumber.enable = true;
-    jack.enable = true;
+    wireplumber = {
+      enable = true;
+      package = pkgs.wireplumber;
+    };
+    pulse.enable = false;
+    jack.enable = false;
   };
 
-  environment.systemPackages = builtins.attrValues {
-    inherit (pkgs)
-      pamixer # pulseaudio sound mixer
-      pavucontrol
-      ; # pulseaudio volume control
-  };
+  environment.systemPackages = with pkgs; [
+      pwvucontrol
+      alsa-lib
+      alsa-utils
+  ];
 }

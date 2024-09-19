@@ -105,7 +105,7 @@ run_cmd() {
 	elif [[ "$1" == '--opt4' ]]; then
 		amixer set Capture toggle
 	elif [[ "$1" == '--opt5' ]]; then
-		pavucontrol
+		pwvucontrol
 	fi
 }
 

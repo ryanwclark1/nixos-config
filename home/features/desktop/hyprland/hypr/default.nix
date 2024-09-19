@@ -368,7 +368,7 @@
       bind = let
         grimblast = lib.getExe pkgs.grimblast;
         tesseract = lib.getExe pkgs.tesseract;
-        pactl = lib.getExe' pkgs.pulseaudio "pactl";
+        wpctl = "${pkgs.wireplumber}/bin/wpctl";
         notify-send = lib.getExe' pkgs.libnotify "notify-send";
         terminal = lib.getExe pkgs.alacritty;
         files = "${pkgs.kdePackages.dolphin}/bin/dolphin";
@@ -397,13 +397,13 @@
           ",XF86MonBrightnessDown,exec,light -U 10"
 
           # Volume
-          ",XF86AudioRaiseVolume,exec,${pactl} set-sink-volume @DEFAULT_SINK@ +5%"
-          ",XF86AudioLowerVolume,exec,${pactl} set-sink-volume @DEFAULT_SINK@ -5%"
-          ",XF86AudioMute,exec,${pactl} set-sink-mute @DEFAULT_SINK@ toggle"
-          "SHIFT,XF86AudioRaiseVolume,exec,${pactl} set-source-volume @DEFAULT_SOURCE@ +5%"
-          "SHIFT,XF86AudioLowerVolume,exec,${pactl} set-source-volume @DEFAULT_SOURCE@ -5%"
-          "SHIFT,XF86AudioMute,exec,${pactl} set-source-mute @DEFAULT_SOURCE@ toggle"
-          ",XF86AudioMicMute,exec,${pactl} set-source-mute @DEFAULT_SOURCE@ toggle"
+          ",XF86AudioRaiseVolume,exec,${wpctl} set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%+"
+          ",XF86AudioLowerVolume,exec,${wpctl} set-volume @DEFAULT_AUDIO_SINK@ -5%"
+          ",XF86AudioMute,exec,${wpctl} set-mute @DEFAULT_AUDIO_SINK@ toggle"
+          "SHIFT,XF86AudioRaiseVolume,exec,${wpctl} set-volume -l 1.5 @DEFAULT_AUDIO_SOURCE@ +5%"
+          "SHIFT,XF86AudioLowerVolume,exec,${wpctl} set-volume @DEFAULT_AUDIO_SOURCE@ -5%"
+          "SHIFT,XF86AudioMute,exec,${wpctl} set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
+          ",XF86AudioMicMute,exec,${wpctl} set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
 
           # Screenshotting
           ",Print,exec,${grimblast} --notify --freeze copy area"

@@ -39,23 +39,23 @@
   (box :class "uinfo" :orientation "v" :space-evenly false :halign "center" :valign "center"
     (label :style "color: #5e81ac;" :text "sparsh@asus-sea" :halign "center" :valign "center" :wrap "false" :limit-width 25)
     (label :style "color: #efefef;" :text "⎯⎯⎯⎯⎯⎯⎯⎯" :halign "center" :valign "center" :wrap "false" :limit-width 25)
-
+    
     ;; Tags for values
     (box :orientation "h" :space-evenly "false" :spacing 10
-        (box :orientation "v" :class "fetch" :spacing 2
-          (label :style "font-family: 'archcraft'; color: #b48ead;" :halign "end" :text "")
-          (label :style "color: #ebcb8b;" :halign "end" :text "缾")
-          (label :style "color: #80a0c0;" :halign "end" :text "")
-          (label :style "color: #b48ead;" :halign "end" :text "")
-          (button :style "color: #88c0d0;" :halign "end" :onclick "alacritty --class 'alacritty-float,alacritty-float' -e yay -Syu &" ""))
-
-    ;; Fetch Values
-    (box :orientation "v"   :class "fetch"
-      (label :style "color: #b48ead;" :halign "start" :text ": ${distro}")
-      (label :style "color: #ebcb8b;" :halign "start" :text ": ${wm}")
-      (label :style "color: #80a0c0;" :halign "start" :text ": ${shell}")
-      (label :style "color: #b48ead;" :halign "start" :text ": ${uptime}")
-      (button :style "color: #88c0d0;" :halign "start" :onclick "alacritty --class 'alacritty-float,alacritty-float' -e yay -Syu &" ": ${packages}")))))
+      (box :orientation "v" :class "fetch" :spacing 2
+        (label :style "font-family: 'archcraft'; color: #b48ead;" :halign "end" :text "")
+        (label :style "color: #ebcb8b;" :halign "end" :text "缾")
+        (label :style "color: #80a0c0;" :halign "end" :text "")
+        (label :style "color: #b48ead;" :halign "end" :text "")
+        (button :style "color: #88c0d0;" :halign "end" :onclick "alacritty --class 'alacritty-float,alacritty-float' -e yay -Syu &" ""))
+      
+      ;; Fetch Values
+      (box :orientation "v"   :class "fetch"
+        (label :style "color: #b48ead;" :halign "start" :text ": ${distro}")
+        (label :style "color: #ebcb8b;" :halign "start" :text ": ${wm}")
+        (label :style "color: #80a0c0;" :halign "start" :text ": ${shell}")
+        (label :style "color: #b48ead;" :halign "start" :text ": ${uptime}")
+        (button :style "color: #88c0d0;" :halign "start" :onclick "alacritty --class 'alacritty-float,alacritty-float' -e yay -Syu &" ": ${packages}")))))
 
 ;;;; System Information Widget
 
@@ -77,7 +77,7 @@
 (defwidget quicksettings []
   (box :orientation "h" :space-evenly true :class "quicksettings" :spacing "10" :halign "center" :valign "center"
     (button :style "color: #5e81ac;" :onclick "mpv --demuxer-lavf-format=video4linux2 --demuxer-lavf-o-set=input_format=mjpeg av://v4l2:/dev/video0 &" (image :path "images/camera-web.svg" :width 32 :height 32))
-    (button :style "color: #81a1c1; padding-left: 3px;" :onclick "pavucontrol &" (image :path "images/audio-headphones.svg" :width 32 :height 32))
+    (button :style "color: #81a1c1; padding-left: 3px;" :onclick "pwvucontrol &" (image :path "images/audio-headphones.svg" :width 32 :height 32))
     (button :style "color: #b48ead;" :onclick "sh ~/.config/eww/scripts/airplane_mode.sh &" (image :path "images/network-card.svg" :width 32 :height 32))))
 
 ;;;; AppBar widget
@@ -117,29 +117,29 @@
 
 ;;;; Music Player
 (defwidget musicplayer []
-
+  
   (box :orientation "v" :space-evenly false :class "musicplayer" :halign "center" :valign "center" :hexpand true :vexpand true
     (label :class "label-control" :text "${music_current}" :halign "center" :limit-width 50 :show-truncated true :hexpand true :vexpand true)
     (box :orientation "h" :space-evenly false :class "controls" :halign "center" :valign "center" :spacing 20
-         (button :style "color: #d8dee9;" :onclick "mpc -q toggle && notify-send -u low -t 1800 ${music_current}" "懶")
-         (button :style "color: #e5e9f0;" :onclick "mpc -q stop" "")
-         (button :style "color: #eceff4;" :onclick "mpc -q next && notify-send -u low -t 1800 ${music_current}" "")
-         (button :style "color: #e8e8e8;" :onclick "mpc -q prev && notify0send -u low -t 1800 ${music_current}" ""))))
+      (button :style "color: #d8dee9;" :onclick "mpc -q toggle && notify-send -u low -t 1800 ${music_current}" "懶")
+      (button :style "color: #e5e9f0;" :onclick "mpc -q stop" "")
+      (button :style "color: #eceff4;" :onclick "mpc -q next && notify-send -u low -t 1800 ${music_current}" "")
+      (button :style "color: #e8e8e8;" :onclick "mpc -q prev && notify0send -u low -t 1800 ${music_current}" ""))))
 
 (defwidget network []
-
+  
   (box :orientation "v" :space-evenly false :class "network" :halign "center" :valign "center" :hexpand true :vexpand true
     (label :class "label-control" :text "${ssid}" :halign "center" :limit-width 50 :show-truncated true :hexpand true :vexpand true)
     (box :orientation "h" :space-evenly false :class "controls" :halign "center" :valign "center" :spacing 20
-         (button :style "color: #d8dee9;" :onclick "sh ~/.config/eww/scripts/airplane_mode.sh" "")
-         (button :style "color: #e5e9f0;" :onclick "alacritty --class 'alacritty-float,alacritty-float' -e bmon &" "")
-         (button :style "color: #eceff4;" :onclick "alacritty --class 'alacritty-float,alacritty-float' -e nmtui &" "")
-         (button :style "color: #e8e8e8;" :onclick "nm-connection-editor &" ""))))
+      (button :style "color: #d8dee9;" :onclick "sh ~/.config/eww/scripts/airplane_mode.sh" "")
+      (button :style "color: #e5e9f0;" :onclick "alacritty --class 'alacritty-float,alacritty-float' -e bmon &" "")
+      (button :style "color: #eceff4;" :onclick "alacritty --class 'alacritty-float,alacritty-float' -e nmtui &" "")
+      (button :style "color: #e8e8e8;" :onclick "nm-connection-editor &" ""))))
 
 (defwidget screenshot []
-
+  
   (box :orientation "v" :space-evenly false :class "network" :halign "center" :valign "center" :hexpand true :vexpand true
     (label :class "label-control" :text "  Screenshot" :halign "center" :limit-width 50 :show-truncated true :hexpand true :vexpand true)
     (box :orientation "h" :space-evenly false :class "controls" :halign "center" :valign "center" :spacing 20
-         (button :style "color: #d8dee9;" :onclick "eww close screenshot && ~/.config/eww/scripts/screenshot 'SCREEN'"  "")
-         (button :style "color: #e5e9f0;" :onclick "eww close screenshot && ~/.config/eww/scripts/screenshot 'SELECT'" ""))))
+      (button :style "color: #d8dee9;" :onclick "eww close screenshot && ~/.config/eww/scripts/screenshot 'SCREEN'"  "")
+      (button :style "color: #e5e9f0;" :onclick "eww close screenshot && ~/.config/eww/scripts/screenshot 'SELECT'" ""))))
