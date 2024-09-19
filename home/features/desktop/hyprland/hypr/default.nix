@@ -28,6 +28,7 @@
       thunar = "thunar";
       steam = "${pkgs.steam}/bin/steam";
       dunst = lib.getExe config.services.dunst.package;
+      swaync = "${pkgs.swaynotificationcenter}/bin/swaync";
     in
     {
       env = [
@@ -42,6 +43,7 @@
       [
         "${hypridle} &"
         "${waybar} --style ${config.home.homeDirectory}/.config/waybar/style.css &"
+        "${swaync} &"
         "${eww} &"
         "${dunst} &"
         "${wl-paste} --watch ${cliphist} store"
