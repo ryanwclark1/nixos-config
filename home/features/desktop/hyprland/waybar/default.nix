@@ -25,14 +25,50 @@ let
   thunar = "thunar";
 in
 {
-  home = {
+
+  home =
+  {
     file.".config/waybar/themes" = {
       source = ./themes;
       recursive = true;
     };
-    file.".config/waybar/scripts" = {
-      source = ./scripts;
-      recursive = true;
+    # file.".config/waybar/scripts" = {
+    #   source = ./scripts;
+    #   recursive = true;
+    # };
+    file.".config/waybar/scripts/mic.sh" = {
+      text = ''
+        #!/usr/bin/env bash
+        WP_OUTPUT=$(${wpctl} get-volume @DEFAULT_AUDIO_SOURCE@)
+
+        if [[ "$WP_OUTPUT" == *"[MUTED]" ]]; then
+            printf ""
+        else
+            printf ""
+        fi
+      '';
+      executable = true;
+    };
+    file.".config/waybar/scripts/update-checker.sh" = {
+      text = ''
+        #!/usr/bin/env bash
+
+        #This script assumes your flake is in ~/nixos-config and that your flake's nixosConfigurations is named the same as your $hostname
+        updates="$(cd ~/nixos-config && nix flake lock --update-input nixpkgs && nix build .#nixosConfigurations.$HOSTNAME.config.system.build.toplevel && nvd diff /run/current-system ./result | grep -e '\[U' | wc -l)"
+
+        alt="has-updates"
+        if [ $updates -eq 0 ]; then
+            alt="updated"
+        fi
+
+        tooltip="System updated"
+        if [ $updates != 0 ]; then
+          tooltip=$(cd ~/nixos-config && nvd diff /run/current-system ./result | grep -e '\[U' | awk '{ for (i=3; i<NF; i++) printf $i " "; if (NF >= 3) print $NF; }' ORS='\\n' )
+        fi
+
+        echo "{ \"text\":\"$updates\", \"alt\":\"$alt\", \"tooltip\":\"$tooltip\" }"
+      '';
+      executable = true;
     };
   };
 
@@ -107,16 +143,11 @@ in
           format-charging = "󰂄 {capacity}%";
           format-plugged = " {capacity}%";
           format-icons = [
-            "󰁺"
-            "󰁻"
-            "󰁼"
-            "󰁽"
-            "󰁾"
-            "󰁿"
-            "󰂀"
-            "󰂁"
-            "󰂂"
-            "󰁹"
+            " "
+            " "
+            " "
+            " "
+            " "
           ];
           on-click = "";
           tooltip = false;
@@ -124,7 +155,7 @@ in
 
         # Bluetooth
         bluetooth = {
-          format = "";
+          format = "";
           format-disabled = "󰂲";
           format-off = "";
           interval = 30;
@@ -366,7 +397,7 @@ in
             "󰤥"
             "󰤨"
           ];
-          format-ethernet = "󰈁";
+          format-ethernet = "";
           # format-wifi = "{icon}  {signalStrength}% {essid}";
           format-wifi = "{icon}";
           format-disconnected = "󰤮";
