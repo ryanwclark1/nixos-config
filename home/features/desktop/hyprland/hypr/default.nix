@@ -39,13 +39,13 @@
         ",highres,auto,1"
       ];
       "exec-once" =
-        [
-          "${hypridle} &"
-          "${waybar} --style ${config.home.homeDirectory}/.config/waybar/style.css &"
-          "${eww} &"
-          "${dunst} &"
-          "${wl-paste} --watch ${cliphist} store"
-        ];
+      [
+        "${hypridle} &"
+        "${waybar} --style ${config.home.homeDirectory}/.config/waybar/style.css &"
+        "${eww} &"
+        "${dunst} &"
+        "${wl-paste} --watch ${cliphist} store"
+      ];
 
       general = {
         border_size = 1;
