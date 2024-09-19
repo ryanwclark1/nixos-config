@@ -35,14 +35,6 @@
           "display"
           "brightness"
           "monitor"
-          "lm"
-          "de"
-          "wm"
-          "wmtheme"
-          "theme"
-          "icons"
-          "font"
-          "cursor"
           "terminal"
           {
             type = "cpu";

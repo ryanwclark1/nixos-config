@@ -117,7 +117,7 @@ with config.stylix.fonts;
        size = "32x32";
        package = pkgs.papirus-icon-theme;
       };
-      configFile = "${config.xdg.configHome}/dunst/dunstrc";
+      configFile = "${config.home.homeDirectory}/.config/dunst/dunstrc";
       # Set the service's WAYLAND_DISPLAY environment variable.
       # waylandDisplay = "";
 

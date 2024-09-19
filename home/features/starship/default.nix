@@ -28,7 +28,7 @@ with config.lib.stylix.colors.withHashtag;
         symbols = {
           Windows = "󰍲";
           Ubuntu = "󰕈";
-          SUSE = "";
+          SUSE = " ";
           Raspbian = "󰐿";
           Mint = "󰣭";
           Macos = "󰀵";
@@ -48,9 +48,8 @@ with config.lib.stylix.colors.withHashtag;
           NixOS = "";
           FreeBSD = "";
           Kali = " ";
-          Almalinux = "";
+          AlmaLinux = "";
           Pop = " ";
-          Suse = " ";
         };
       };
 

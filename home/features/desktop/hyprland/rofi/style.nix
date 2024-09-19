@@ -13,7 +13,7 @@ with config.stylix.fonts;
   let
     font = "${monospace.name} 12";
     background = "${base00}";
-    # style_dir = "${config.xdg.configHome}/rofi/style";
+    # style_dir = "${config.home.homeDirectory}/.config/rofi/style";
   in
   {
     file.".config/rofi/style/cliphist.rasi" = {
