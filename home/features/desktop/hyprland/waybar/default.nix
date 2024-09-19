@@ -16,7 +16,7 @@ let
   missioncenter = "${pkgs.mission-center}/bin/missioncenter";
   nm-connection = "${pkgs.networkmanagerapplet}/bin/nm-connection-editor";
   nmtui = "${pkgs.networkmanager}/bin/nmtui";
-  pavucontrol = "${pkgs.pavucontrol}/bin/pavucontrol";
+  pwvucontrol = "${pkgs.pwvucontrol}/bin/pwvucontrol";
   rofi = "${pkgs.rofi}/bin/rofi";
   chrome = "${pkgs.google-chrome}/bin/google-chrome-stable";
   firefox = lib.getExe config.programs.firefox.package;
@@ -227,14 +227,14 @@ in
           tooltip = true;
           max-length = 7;
           exec = "${config.home.homeDirectory}/.config/waybar/scripts/speaker.sh";
-          on-click = "${pavucontrol}";
+          on-click = "${pwvucontrol}";
         };
 
         "custom/mic" = {
           tooltip = true;
           max-length = 7;
           exec = "${config.home.homeDirectory}/.config/waybar/scripts/mic.sh";
-          on-click = "${pavucontrol}";
+          on-click = "${pwvucontrol}";
         };
 
         "custom/system" = {
@@ -396,7 +396,7 @@ in
             car = "";
             default = [ "" "" " " ];
           };
-          on-click = "${pavucontrol}";
+          on-click = "${pwvucontrol}";
           tooltip-format = "{source_volume}% / {desc}";
         };
 

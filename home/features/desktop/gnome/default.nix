@@ -96,7 +96,7 @@ with lib;
           "cups.desktop"
           "lf.desktop"
           "gnome-nettool.desktop"
-          "pavucontrol.desktop"
+          "pwvucontrol.desktop"
           "nixos-manual.desktop"
           "fish.desktop"
           "org.gnome.SystemMonitor.desktop"

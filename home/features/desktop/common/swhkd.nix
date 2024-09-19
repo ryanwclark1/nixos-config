@@ -158,6 +158,8 @@ xf86audioprev
   ${pkgs.playerctl}/bin/playerctl previous
 xf86audionext
   ${pkgs.playerctl}/bin/playerctl next
+
+# Remove pamixer and use pipewire utility instead
 xf86audiolowervolume
   pamixer -d 10
 xf86audioraisevolume

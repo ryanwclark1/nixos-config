@@ -296,7 +296,7 @@
                 " "
             ]
         },
-        "on-click": "pavucontrol"
+        "on-click": "pwvucontrol"
     },
     // Bluetooth
     "bluetooth": {
