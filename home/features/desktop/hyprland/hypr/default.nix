@@ -41,7 +41,7 @@
       "exec-once" =
         [
           "${hypridle} &"
-          "${waybar} --style ${config.xdg.configHome}/waybar/style.css &"
+          "${waybar} --style ${config.home.homeDirectory}/.config/waybar/style.css &"
           "${eww} &"
           "${dunst} &"
           "${wl-paste} --watch ${cliphist} store"
@@ -438,8 +438,8 @@
             hyprlock = lib.getExe config.programs.hyprlock.package;
           in
             lib.optionals config.programs.hyprlock.enable [
-          "SUPER,backspace,exec,${config.xdg.configHome}/rofi/scripts/powermenu_t4"
-          "SUPER,XF86Calculator,exec,${config.xdg.configHome}/rofi/scripts/powermenu_t4"
+          "SUPER,backspace,exec,${config.home.homeDirectory}/.config/rofi/scripts/powermenu_t4"
+          "SUPER,XF86Calculator,exec,${config.home.homeDirectory}/.config/rofi/scripts/powermenu_t4"
             ]
         )
         ++
@@ -457,8 +457,8 @@
         # Launcher
         (
           lib.optionals config.programs.rofi.enable [
-            "SUPER,x,exec,${rofi} -show drun -theme ${config.xdg.configHome}/rofi/style/launcher-center.rasi"
-            "SUPER,s,exec,${rofi} -show drun -theme ${config.xdg.configHome}/rofi/style/launcher-full.rasi"
+            "SUPER,x,exec,${rofi} -show drun -theme ${config.home.homeDirectory}/.config/rofi/style/launcher-center.rasi"
+            "SUPER,s,exec,${rofi} -show drun -theme ${config.home.homeDirectory}/.config/rofi/style/launcher-full.rasi"
             "SUPER ALT,x,exec,${remote} ${rofi} -S drun" # -x 10 -y 10 -W 25% -H 60%
             # "Control_L ALT,Delete,exec,/rofi/config/scripts/powermenu_t4"
           ]

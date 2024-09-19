@@ -185,8 +185,8 @@ in
         # Cliphist
         "custom/cliphist" = {
           format = "";
-          on-click = "${config.xdg.configHome}/rofi/scripts/cliphist-copy.sh";
-          on-click-right = "${config.xdg.configHome}/rofi/scripts/cliphist-delete.sh";
+          on-click = "${config.home.homeDirectory}/.config/rofi/scripts/cliphist-copy.sh";
+          on-click-right = "${config.home.homeDirectory}/.config/rofi/scripts/cliphist-delete.sh";
           on-click-middle = "${cliphist} wipe";
           tooltip-format = "Clipboard Manager";
         };
@@ -194,7 +194,7 @@ in
         # Power Menu
         "custom/exit" = {
           format = "";
-          on-click = "${config.xdg.configHome}/rofi/scripts/power-big.sh";
+          on-click = "${config.home.homeDirectory}/.config/rofi/scripts/power-big.sh";
           tooltip-format = "Power Menu";
         };
 
@@ -213,8 +213,8 @@ in
           escape = true;
           exec-on-event = true;
           interval = 60;
-          exec = "${config.xdg.configHome}/hypr/scripts/hypridle.sh status";
-          on-click = "${config.xdg.configHome}/hypr/scripts/hypridle.sh toggle";
+          exec = "${config.home.homeDirectory}/.config/hypr/scripts/hypridle.sh status";
+          on-click = "${config.home.homeDirectory}/.config/hypr/scripts/hypridle.sh toggle";
           on-click-right = "${hyprlock}";
         };
 
@@ -226,14 +226,14 @@ in
         "custom/speaker" = {
           tooltip = true;
           max-length = 7;
-          exec = "${config.xdg.configHome}/waybar/scripts/speaker.sh";
+          exec = "${config.home.homeDirectory}/.config/waybar/scripts/speaker.sh";
           on-click = "${pavucontrol}";
         };
 
         "custom/mic" = {
           tooltip = true;
           max-length = 7;
-          exec = "${config.xdg.configHome}/waybar/scripts/mic.sh";
+          exec = "${config.home.homeDirectory}/.config/waybar/scripts/mic.sh";
           on-click = "${pavucontrol}";
         };
 
@@ -414,7 +414,7 @@ in
 
         "custom/applauncher" = {
           "format" = "󱗼";
-          "on-click" = "${config.xdg.configHome}/rofi/scripts/applauncher-fullscreen.sh";
+          "on-click" = "${config.home.homeDirectory}/.config/rofi/scripts/applauncher-fullscreen.sh";
           "tooltip-format" = "Application Launcher";
         };
 

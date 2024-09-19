@@ -15,7 +15,7 @@
   let
     cliphist = lib.getExe pkgs.cliphist;
     rofi = lib.getExe pkgs.rofi-wayland;
-    # style_dir = "${config.xdg.configHome}/rofi/style";
+    # style_dir = "${config.home.homeDirectory}/.config/rofi/style";
   in
   {
     file.".config/rofi" = {
@@ -25,14 +25,14 @@
     file.".config/rofi/scripts/cliphist-delete.sh" = {
       text = ''
         #!/usr/bin/env bash
-        sleep 0.1 && ${cliphist} list | ${rofi} -dmenu -theme ${config.xdg.configHome}/rofi/style/cliphist | ${cliphist} delete
+        sleep 0.1 && ${cliphist} list | ${rofi} -dmenu -theme ${config.home.homeDirectory}/.config/rofi/style/cliphist | ${cliphist} delete
         '';
       executable = true;
     };
     file.".config/rofi/scripts/cliphist-copy.sh" = {
       text = ''
         #!/usr/bin/env bash
-        sleep 0.1 && ${cliphist} list | ${rofi} -dmenu -theme ${config.xdg.configHome}/rofi/style/cliphist | ${cliphist} delete
+        sleep 0.1 && ${cliphist} list | ${rofi} -dmenu -theme ${config.home.homeDirectory}/.config/rofi/style/cliphist | ${cliphist} delete
       '';
       executable = true;
     };
@@ -40,7 +40,7 @@
       text = ''
         #!/usr/bin/env bash
 
-        dir="${config.xdg.configHome}/rofi/style"
+        dir="${config.home.homeDirectory}/.config/rofi/style"
         theme='launcher-full'
 
         rofi_cmd() {
@@ -58,7 +58,7 @@
         #!/usr/bin/env bash
 
         # Current Theme
-        dir="${config.xdg.configHome}/rofi/style"
+        dir="${config.home.homeDirectory}/.config/rofi/style"
         theme='power-big'
         background="$(hyprctl hyprpaper listloaded)"
 
@@ -174,7 +174,7 @@
     in {
       enable = true;
       package = pkgs.rofi-wayland;
-      # configPath = "${config.xdg.configHome}/rofi/config.rasi";
+      # configPath = "${config.home.homeDirectory}/.config/rofi/config.rasi";
       # cycle = true;
       # font = "JetBrainsMono";
       # location = "center";

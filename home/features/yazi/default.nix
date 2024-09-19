@@ -527,7 +527,7 @@
           tab_size = 2;
           max_height = 1200;
           max_width = 800;
-          cache_dir = "${config.xdg.cacheHome}/yazi";
+          cache_dir = "${config.home.homeDirectory}/.local/cache/yazi";
           # image_filter = "lanczos3";
           # image_quality = 90;
           # sixel_fraction = 15;

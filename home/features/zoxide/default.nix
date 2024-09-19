@@ -10,6 +10,7 @@
     package = pkgs.zoxide;
     options = [
       "--cmd cd"
+      "--hook pwd"
     ];
   };
 }

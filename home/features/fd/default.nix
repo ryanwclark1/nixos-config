@@ -11,8 +11,13 @@
     ignores = [
       ".git/"
       "*.bak"
+      ".env/"
+      ".venv/"
+      "node_modules/"
     ];
-    # extraOptions = [];
+    extraOptions = [
+      "--absolute-path"
+    ];
   };
 
   home.shellAliases = {
