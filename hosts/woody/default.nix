@@ -31,6 +31,7 @@
     ../common/optional/system-packages.nix
     ../common/optional/tailscale.nix
     ../common/optional/thunar.nix
+    ../common/optional/webcam.nix
     ../common/optional/wireshark.nix
     ../common/optional/zsh.nix
 
