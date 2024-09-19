@@ -233,10 +233,11 @@ in
         };
 
         "custom/mic" = {
-          tooltip = true;
-          max-length = 7;
+          # tooltip = true;
           exec = "${config.home.homeDirectory}/.config/waybar/scripts/mic.sh";
+          interval = 1;
           on-click = "${pwvucontrol}";
+          format = "{}";
         };
 
         "custom/system" = {
