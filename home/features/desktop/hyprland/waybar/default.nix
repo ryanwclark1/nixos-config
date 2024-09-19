@@ -17,6 +17,7 @@ let
   nm-connection = "${pkgs.networkmanagerapplet}/bin/nm-connection-editor";
   nmtui = "${pkgs.networkmanager}/bin/nmtui";
   pwvucontrol = "${pkgs.pwvucontrol}/bin/pwvucontrol";
+  wpctl = "${pkgs.wireplumber}/bin/wpctl";
   rofi = "${pkgs.rofi}/bin/rofi";
   chrome = "${pkgs.google-chrome}/bin/google-chrome-stable";
   firefox = lib.getExe config.programs.firefox.package;
@@ -64,7 +65,8 @@ in
           "group/hardware"
           "network"
           "battery"
-          "custom/speaker"
+          # "custom/speaker"
+          "wireplumber"
           "custom/mic"
           "custom/cliphist"
           "bluetooth"
@@ -244,6 +246,19 @@ in
           on-click = "${missioncenter}";
         };
 
+        "custom/nix-updates" = {
+            exec = "$HOME/bin/update-checker";
+            on-click = "$HOME/bin/update-checker && notify-send 'The system has been updated'"; # refresh on click
+            interval = 3600; # refresh every hour
+            tooltip = true;
+            return-type = "json";
+            format = "{} {icon}";
+            format-icons = {
+                has-updates = ""; # icon when updates needed
+                updated = ""; # icon when all packages updated
+            };
+          };
+
         disk = {
           interval = 60;
           format = " {free}";
@@ -362,7 +377,7 @@ in
             Down: {bandwidthDownBits}
           '';
           tooltip-format-ethernet = ''
-             {ifname}
+              {ifname}
             IP: {ipaddr}
             : {bandwidthUpBits} : {bandwidthDownBits}
           '';
@@ -381,23 +396,43 @@ in
         };
 
         # Audio
-        pulseaudio = {
-          format = "{icon} {volume}% {format_source}";
-          format-bluetooth = "{volume}% {icon} {format_source}";
-          format-bluetooth-muted = " {icon} {format_source}";
-          format-muted = "{format_source}";
-          format-source = " {volume}%";
-          format-source-muted = "";
-          format-icons = {
-            headphone = "";
-            headset = "󰋎";
-            phone = "";
-            portable = "";
-            car = "";
-            default = [ "" "" " " ];
-          };
+        # pulseaudio = {
+        #   format = "{icon} {volume}% {format_source}";
+        #   format-bluetooth = "{volume}% {icon} {format_source}";
+        #   format-bluetooth-muted = " {icon} {format_source}";
+        #   format-muted = "{format_source}";
+        #   format-source = " {volume}%";
+        #   format-source-muted = "";
+        #   format-icons = {
+        #     headphone = "";
+        #     headset = "󰋎";
+        #     phone = "";
+        #     portable = "";
+        #     car = "";
+        #     default = [ "" "" " " ];
+        #   };
+        #   on-click = "${pwvucontrol}";
+        #   tooltip-format = ''
+        #   {source_volume}% / {desc}
+        #   '';
+        # };
+
+        wireplumber = {
+          format = "{icon}";
+          format-muted = "󰖁";
+          max-length = 2;
+          scroll-step = 1;
+          on-scroll-up = "${wpctl} set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+";
+          on-scroll-down = "${wpctl} set-volume @DEFAULT_AUDIO_SINK@ 5%-";
+          format-icons = [ "" "" " " ];
           on-click = "${pwvucontrol}";
-          tooltip-format = "{source_volume}% / {desc}";
+          max-volume = 100.0;
+          tooltip = true;
+          tooltip-format = ''
+          {volume}%
+          {node_name}
+          '';
+          reverse-scrolling = 1;
         };
 
         # System tray
