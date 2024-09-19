@@ -27,7 +27,7 @@ in
     nixpkgs-lint
     nurl # Generate Nix fetcher calls from repository URLs
     patchelf
-    sops
+    # sops
   ];
 
   programs.nix-index = {
