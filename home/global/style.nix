@@ -49,8 +49,8 @@ in
     opacity = {
       applications = 0.95;
       desktop = 0.95;
-      popups = 0.85;
-      terminal = 0.9;
+      popups = 0.80;
+      terminal = 0.85;
     };
     targets = {
       alacritty.enable = true;
