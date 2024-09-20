@@ -165,7 +165,6 @@
       };
     };
 
-  # home.file = {
 
   programs = {
     rofi =
