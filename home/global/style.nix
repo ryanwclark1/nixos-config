@@ -105,6 +105,8 @@ in
         enableRightBackColors = false;
       };
       wofi.enable = false;
+      # xfce.enable = true;
+      # xresources.enable = true;
       yazi.enable = true;
       zathura.enable = true;
       zellij.enable = true;
