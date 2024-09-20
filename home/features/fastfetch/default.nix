@@ -1,25 +1,32 @@
 {
+  config,
   pkgs,
   ...
 }:
 
 {
+    home.file.".config/fastfetch/assets" = {
+      source = ./assets;
+      recursive = true;
+    };
+
+
   programs = {
     fastfetch = {
       enable = true;
       package = pkgs.fastfetch;
       settings = {
         logo = {
-          source = ./assets/nixos.png;
-          type = "kitty-direct";
+          # source = "${config.home.homeDirectory}/.config/fastfetch/assets/nixos.png";
+          type = "auto";
           position = "left";
           padding = {
             top = 1;
-            right = 4;
+            right = 2;
             left = 0;
           };
-          width = 30; # 22
-          height = 15; # 11
+          # width = 40; # 22
+          # height = 25; # 11
         };
         display = {
           color = {
