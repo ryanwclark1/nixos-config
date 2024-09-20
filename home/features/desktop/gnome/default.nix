@@ -74,7 +74,6 @@ with lib;
           "org.gnome.seahorse.Application.desktop"
           "org.gnome.tweaks.desktop"
           "org.gnome.Usage.desktop"
-          "vinagre.desktop"
           "org.gnome.Console.desktop"
           "org.kde.konsole.desktop"
           "org.gnome.Calculator.desktop"
