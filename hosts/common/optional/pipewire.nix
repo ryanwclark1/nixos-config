@@ -21,7 +21,7 @@
       enable = true;
       package = pkgs.wireplumber;
     };
-    pulse.enable = false;
+    pulse.enable = true;
     jack.enable = false;
   };
 
