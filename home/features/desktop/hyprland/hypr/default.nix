@@ -10,6 +10,9 @@
     imports = [
     ./basic-binds.nix
     ./list-hypr-bindings.nix
+    ./screenshooting.nix
+    ./task-waybar.nix
+    ./web-search.nix
     # ./hyprbars.nix
   ];
 
@@ -388,7 +391,9 @@
       # };
 
 
-      bind = let
+      bind =
+      let
+        rofi = lib.getExe config.programs.rofi.package;
         grimblast = lib.getExe pkgs.grimblast;
         tesseract = lib.getExe pkgs.tesseract;
         wpctl = "${pkgs.wireplumber}/bin/wpctl";
@@ -397,6 +402,7 @@
         files = "${pkgs.kdePackages.dolphin}/bin/dolphin";
         defaultApp = type: "${lib.getExe pkgs.handlr-regex} launch ${type}";
         hyprlock = lib.getExe pkgs.hyprlock;
+        browser = "${pkgs.google-chrome}/bin/google-chrome-stable";
         remote = lib.getExe (pkgs.writeShellScriptBin "remote" ''
           socket="$(basename "$(find ~/.ssh -name 'administrator@*' | head -1 | cut -d ':' -f1)")"
           host="''${socket#master-}"
@@ -406,15 +412,18 @@
         [
           # Program bindings
           "SUPER,Return,exec,${terminal}"
-          "SUPER,SHIFT,Return,exec,rofi-launcher"
-          # "SUPER,Return,exec,${defaultApp "x-scheme-handler/terminal"}"
+          "SUPERSHIFT,Return,exec,${rofi} -show drun"
+          "SUPERSHIFT,W,exec,${config.home.homeDirectory}/.config/hypr/scripts/web-search.sh"
+          "SUPER,W,exec,${browser}"
+          "SUPER,S,exec,${config.home.homeDirectory}/.config/hypr/scripts/screenshooting.sh"
+
           "SUPER,e,exec,${defaultApp "text/plain"}"
           "SUPER,b,exec,${defaultApp "x-scheme-handler/https"}"
           # "$mod, Space, exec, $menu --show drun"
           "SUPER ALT,space,exec,${files}"
-          "SUPER ALT,Return,exec,${remote} ${defaultApp "x-scheme-handler/terminal"}"
-          "SUPER ALT,e,exec,${remote} ${defaultApp "text/plain"}"
-          "SUPER ALT,b,exec,${remote} ${defaultApp "x-scheme-handler/https"}"
+          # "SUPER ALT,Return,exec,${remote} ${defaultApp "x-scheme-handler/terminal"}"
+          # "SUPER ALT,e,exec,${remote} ${defaultApp "text/plain"}"
+          # "SUPER ALT,b,exec,${remote} ${defaultApp "x-scheme-handler/https"}"
 
           # Brightness control (only works if the system has lightd)
           ",XF86MonBrightnessUp,exec,light -A 10"
@@ -435,7 +444,10 @@
 
           # To OCR
           "ALT,Print,exec,${grimblast} --freeze save area - | ${tesseract} - - | wl-copy && ${notify-send} -t 3000 'OCR result copied to buffer'"
-          # Hyprlock
+
+          "ALT,Tab,cyclenext"
+          "ALT,Tab,bringactivetotop"
+
 
         ]
         ++
