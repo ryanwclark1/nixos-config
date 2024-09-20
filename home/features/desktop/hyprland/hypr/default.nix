@@ -9,10 +9,6 @@
 {
     imports = [
     ./basic-binds.nix
-    ./list-hypr-bindings.nix
-    ./screenshooting.nix
-    ./task-waybar.nix
-    ./web-search.nix
     # ./hyprbars.nix
   ];
 
@@ -40,7 +36,6 @@
     in
     {
       env = [
-
         "XDG_CURRENT_DESKTOP,Hyprland"
         "XDG_SESSION_TYPE,wayland"
         "XDG_SESSION_DESKTOP,Hyprland"
@@ -390,7 +385,6 @@
       #   ];
       # };
 
-
       bind =
       let
         rofi = lib.getExe config.programs.rofi.package;
@@ -473,10 +467,10 @@
           let
             hyprlock = lib.getExe config.programs.hyprlock.package;
           in
-            lib.optionals config.programs.hyprlock.enable [
-          "SUPER,backspace,exec,${config.home.homeDirectory}/.config/rofi/scripts/powermenu_t4"
-          "SUPER,XF86Calculator,exec,${config.home.homeDirectory}/.config/rofi/scripts/powermenu_t4"
-            ]
+          lib.optionals config.programs.hyprlock.enable [
+            "SUPER,backspace,exec,${config.home.homeDirectory}/.config/rofi/scripts/powermenu_t4"
+            "SUPER,XF86Calculator,exec,${config.home.homeDirectory}/.config/rofi/scripts/powermenu_t4"
+          ]
         )
         ++
         # Notification manager
@@ -495,8 +489,6 @@
           lib.optionals config.programs.rofi.enable [
             "SUPER,x,exec,${rofi} -show drun -theme ${config.home.homeDirectory}/.config/rofi/style/launcher-center.rasi"
             "SUPER,s,exec,${rofi} -show drun -theme ${config.home.homeDirectory}/.config/rofi/style/launcher-full.rasi"
-            "SUPER ALT,x,exec,${remote} ${rofi} -S drun" # -x 10 -y 10 -W 25% -H 60%
-            # "Control_L ALT,Delete,exec,/rofi/config/scripts/powermenu_t4"
           ]
           # ++
           # (
