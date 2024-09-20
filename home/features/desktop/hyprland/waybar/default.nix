@@ -26,51 +26,39 @@ let
 in
 {
 
-  home =
-  {
-    # file.".config/waybar/themes" = {
-    #   source = ./themes;
-    #   recursive = true;
-    # };
-    # file.".config/waybar/scripts" = {
-    #   source = ./scripts;
-    #   recursive = true;
-    # };
-    file.".config/waybar/scripts/mic.sh" = {
-      text = ''
-        #!/usr/bin/env bash
-        WP_OUTPUT=$(${wpctl} get-volume @DEFAULT_AUDIO_SOURCE@)
+  # home =
+  # {
+  #   # file.".config/waybar/themes" = {
+  #   #   source = ./themes;
+  #   #   recursive = true;
+  #   # };
+  #   # file.".config/waybar/scripts" = {
+  #   #   source = ./scripts;
+  #   #   recursive = true;
+  #   # };
 
-        if [[ "$WP_OUTPUT" == *"[MUTED]" ]]; then
-            printf ""
-        else
-            printf ""
-        fi
-      '';
-      executable = true;
-    };
-    file.".config/waybar/scripts/update-checker.sh" = {
-      text = ''
-        #!/usr/bin/env bash
+  #   file.".config/waybar/scripts/update-checker.sh" = {
+  #     text = ''
+  #       #!/usr/bin/env bash
 
-        #This script assumes your flake is in ~/nixos-config and that your flake's nixosConfigurations is named the same as your $hostname
-        updates="$(cd ~/nixos-config && nix flake lock --update-input nixpkgs && nix build .#nixosConfigurations.$HOSTNAME.config.system.build.toplevel && nvd diff /run/current-system ./result | grep -e '\[U' | wc -l)"
+  #       #This script assumes your flake is in ~/nixos-config and that your flake's nixosConfigurations is named the same as your $hostname
+  #       updates="$(cd ~/nixos-config && nix flake lock --update-input nixpkgs && nix build .#nixosConfigurations.$HOSTNAME.config.system.build.toplevel && nvd diff /run/current-system ./result | grep -e '\[U' | wc -l)"
 
-        alt="has-updates"
-        if [ $updates -eq 0 ]; then
-            alt="updated"
-        fi
+  #       alt="has-updates"
+  #       if [ $updates -eq 0 ]; then
+  #           alt="updated"
+  #       fi
 
-        tooltip="System updated"
-        if [ $updates != 0 ]; then
-          tooltip=$(cd ~/nixos-config && nvd diff /run/current-system ./result | grep -e '\[U' | awk '{ for (i=3; i<NF; i++) printf $i " "; if (NF >= 3) print $NF; }' ORS='\\n' )
-        fi
+  #       tooltip="System updated"
+  #       if [ $updates != 0 ]; then
+  #         tooltip=$(cd ~/nixos-config && nvd diff /run/current-system ./result | grep -e '\[U' | awk '{ for (i=3; i<NF; i++) printf $i " "; if (NF >= 3) print $NF; }' ORS='\\n' )
+  #       fi
 
-        echo "{ \"text\":\"$updates\", \"alt\":\"$alt\", \"tooltip\":\"$tooltip\" }"
-      '';
-      executable = true;
-    };
-  };
+  #       echo "{ \"text\":\"$updates\", \"alt\":\"$alt\", \"tooltip\":\"$tooltip\" }"
+  #     '';
+  #     executable = true;
+  #   };
+  # };
 
   home.packages = with pkgs; [
     networkmanagerapplet
@@ -272,7 +260,8 @@ in
 
         "custom/mic" = {
           # tooltip = true;
-          exec = "${config.home.homeDirectory}/.config/waybar/scripts/mic.sh";
+          exec = "microphone-status";
+          # exec = "${pkgs.microphone-status}/bin/microphone-status";
           interval = 1;
           on-click = "${pwvucontrol}";
           format = "{}";
@@ -286,8 +275,8 @@ in
         };
 
         "custom/nix-updates" = {
-            exec = "$HOME/bin/update-checker";
-            on-click = "$HOME/bin/update-checker && notify-send 'The system has been updated'"; # refresh on click
+            exec = "update-checker";
+            on-click = "update-checker && notify-send 'The system has been updated'"; # refresh on click
             interval = 3600; # refresh every hour
             tooltip = true;
             return-type = "json";
