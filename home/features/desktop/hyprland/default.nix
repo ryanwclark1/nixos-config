@@ -13,6 +13,7 @@
     ./hyprlock
     # ./mako
     ./rofi
+    ./swaync
     ./waybar
     ./imv.nix
     # ./wofi.nix
@@ -32,6 +33,7 @@
       grimblast
       hyprpicker
       swww
+      yad
     ];
   };
 }
