@@ -51,10 +51,10 @@ in
       # autoImport = false;
     };
     opacity = {
-      applications = 0.95;
+      applications = 0.90;
       desktop = 0.95;
-      popups = 0.85;
-      terminal = 0.9;
+      popups = 0.80;
+      terminal = 0.85;
     };
     targets = {
       console.enable = true;
