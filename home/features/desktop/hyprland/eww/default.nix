@@ -13,7 +13,7 @@ in
             enableBashIntegration = true;
             enableFishIntegration = true;
             # configDir = "${XDG_CONFIG_HOME}/eww";
-            configDir = "${homeDirectory}/eww";
+            # configDir = "${homeDirectory}/eww";
         };
     };
 
@@ -23,14 +23,14 @@ in
     ];
 
     # configuration
-    home.file.".config/eww/eww.scss".source = ./eww.scss;
-    home.file.".config/eww/eww.yuck".source = ./eww.yuck;
+    # home.file.".config/eww/eww.scss".source = ./eww.scss;
+    # home.file.".config/eww/eww.yuck".source = ./eww.yuck;
 
-    # scripts
-    home.file.".config/eww/scripts" = {
-        source = ./scripts;
-        recursive = true;
-    };
+    # # scripts
+    # home.file.".config/eww/scripts" = {
+    #     source = ./scripts;
+    #     recursive = true;
+    # };
 
     # home.file.".config/eww/scripts/battery.sh" = {
     #     source = ./scripts/battery.sh;
