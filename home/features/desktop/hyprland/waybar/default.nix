@@ -243,7 +243,7 @@ in
         "custom/hyprbindings" = {
           tooltip = false;
           format = "󱕴";
-          on-click = "sleep 0.1 && list-hypr-bindings";
+          on-click = "sleep 0.1 && ${config.home.homeDirectory}/.config/hypr/scripts/list-hypr-bindings.sh";
         };
 
         # Hypridle inhibitor
