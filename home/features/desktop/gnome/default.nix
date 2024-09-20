@@ -189,7 +189,6 @@ with lib;
         name = "Development";
         translate = true;
       };
-
       "org/gnome/desktop/interface" = {
         # color-scheme = "prefer-dark";
         enable-hot-corners = false;
@@ -341,7 +340,9 @@ with lib;
         window-swap-last-active = [ "@as []" ];
         window-toggle-float = [ "<shift><super>f" ];
       };
-      "org/gtk/gtk4/settings/file-chooser".sort-directories-first = true;
+      "org/gtk/gtk4/settings/file-chooser" = {
+        sort-directories-first = true;
+      };
     };
   };
   home.packages = with pkgs; [
