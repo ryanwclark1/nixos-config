@@ -9,7 +9,7 @@ with config.lib.stylix.colors.withHashtag;
 with config.stylix.fonts;
 
 {
-  home.file.".config/rofi/style/config.rasi" = {
+  home.file.".config/rofi/config.rasi" = {
     text = ''
       /*****----- Configuration -----*****/
       configuration {
