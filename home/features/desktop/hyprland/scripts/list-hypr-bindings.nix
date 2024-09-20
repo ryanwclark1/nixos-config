@@ -2,7 +2,7 @@
   pkgs
 }:
 
-pkgs.writeShellScriptBin "script" ''
+pkgs.writeShellScriptBin "list-hypr-bindings" ''
   yad --width=1000 --height=800 \
     --center \
     --fixed \
