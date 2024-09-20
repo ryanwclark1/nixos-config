@@ -10,14 +10,22 @@
       package = pkgs.fastfetch;
       settings = {
         logo = {
+          source = ./assets/nixos.png;
+          type = "kitty-direct";
           position = "left";
           padding = {
             top = 1;
             right = 4;
             left = 0;
           };
-          width = 22;
-          height = 11;
+          width = 30; # 22
+          height = 15; # 11
+        };
+        display = {
+          color = {
+            keys = "35";
+            output = "90";
+          };
         };
         modules = [
           "break"
