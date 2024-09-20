@@ -18,7 +18,6 @@ in
     };
 
     home.packages = with pkgs; [
-        pamixer
         brightnessctl
         (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
     ];
