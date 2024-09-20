@@ -1,0 +1,8 @@
+{
+  pkgs
+}:
+
+pkgs.writeShellScriptBin "script" ''
+
+
+''
