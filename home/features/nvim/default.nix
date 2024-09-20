@@ -1,81 +1,88 @@
+{ pkgs, inputs, ... }:
+let
+  finecmdline = pkgs.vimUtils.buildVimPlugin {
+    name = "fine-cmdline";
+    src = inputs.fine-cmdline;
+  };
+in
 {
-  inputs,
-  ...
-}:
-
-{
-  imports = [
-    inputs.nixvim.homeManagerModules.nixvim
-
-    # General Configuration
-    ./auto_cmds.nix
-    ./file_types.nix
-    ./keymaps.nix
-    ./settings.nix
-
-    # Themes
-    ./plugins/themes/default.nix
-
-    # Completion
-    ./plugins/cmp/autopairs.nix
-    ./plugins/cmp/cmp-copilot.nix
-    ./plugins/cmp/cmp.nix
-    ./plugins/cmp/lspkind.nix
-
-    # Snippets
-    ./plugins/snippets/luasnip.nix
-
-    # Editor plugins and configurations
-    ./plugins/editor/copilot-chat.nix
-    ./plugins/editor/illuminate.nix
-    ./plugins/editor/indent-blankline.nix
-    ./plugins/editor/navic.nix
-    ./plugins/editor/neo-tree.nix
-    ./plugins/editor/todo-comments.nix
-    ./plugins/editor/treesitter.nix
-    ./plugins/editor/undotree.nix
-
-    # UI plugins
-    ./plugins/ui/alpha.nix
-    ./plugins/ui/bufferline.nix
-    ./plugins/ui/lualine.nix
-    ./plugins/ui/startup.nix
-
-    # LSP and formatting
-    ./plugins/lsp/conform.nix
-    ./plugins/lsp/fidget.nix
-    ./plugins/lsp/lsp.nix
-
-    # Git
-    ./plugins/git/gitsigns.nix
-    ./plugins/git/lazygit.nix
-
-    # Utils
-    ./plugins/utils/colorizer.nix
-    ./plugins/utils/extra_plugins.nix
-    ./plugins/utils/markdown-preview.nix
-    ./plugins/utils/mini.nix
-    ./plugins/utils/telescope.nix
-    ./plugins/utils/toggleterm.nix
-    ./plugins/utils/whichkey.nix
-    ./plugins/utils/yazi.nix
-  ];
-
   programs = {
-    nixvim = {
+    neovim = {
       enable = true;
       defaultEditor = true;
-      vimdiffAlias = true;
-      enableMan = true;
       viAlias = true;
       vimAlias = true;
-      clipboard = {
-        register = "unnamedplus";
-        providers.wl-copy.enable = true;
-      };
-      colorschemes.base16.enable = true;
-      luaLoader.enable = true;
-
+      vimdiffAlias = true;
+      withNodeJs = true;
+      extraPackages = with pkgs; [
+        lua-language-server
+        gopls
+        xclip
+        wl-clipboard
+        luajitPackages.lua-lsp
+        nil
+        rust-analyzer
+        #nodePackages.bash-language-server
+        yaml-language-server
+        pyright
+        marksman
+      ];
+      plugins = with pkgs.vimPlugins; [
+        alpha-nvim
+        auto-session
+        bufferline-nvim
+        dressing-nvim
+        indent-blankline-nvim
+        nui-nvim
+        finecmdline
+        nvim-treesitter.withAllGrammars
+        lualine-nvim
+        nvim-autopairs
+        nvim-web-devicons
+        nvim-cmp
+        nvim-surround
+        nvim-lspconfig
+        cmp-nvim-lsp
+        cmp-buffer
+        luasnip
+        cmp_luasnip
+        friendly-snippets
+        lspkind-nvim
+        comment-nvim
+        nvim-ts-context-commentstring
+        plenary-nvim
+        neodev-nvim
+        luasnip
+        telescope-nvim
+        todo-comments-nvim
+        nvim-tree-lua
+        telescope-fzf-native-nvim
+        vim-tmux-navigator
+      ];
+      extraConfig = ''
+        set noemoji
+        nnoremap : <cmd>FineCmdline<CR>
+      '';
+      extraLuaConfig = ''
+        ${builtins.readFile ./options.lua}
+        ${builtins.readFile ./keymaps.lua}
+        ${builtins.readFile ./plugins/alpha.lua}
+        ${builtins.readFile ./plugins/autopairs.lua}
+        ${builtins.readFile ./plugins/auto-session.lua}
+        ${builtins.readFile ./plugins/comment.lua}
+        ${builtins.readFile ./plugins/cmp.lua}
+        ${builtins.readFile ./plugins/lsp.lua}
+        ${builtins.readFile ./plugins/nvim-tree.lua}
+        ${builtins.readFile ./plugins/telescope.lua}
+        ${builtins.readFile ./plugins/todo-comments.lua}
+        ${builtins.readFile ./plugins/treesitter.lua}
+        ${builtins.readFile ./plugins/fine-cmdline.lua}
+        require("ibl").setup()
+        require("bufferline").setup{}
+        require("lualine").setup({
+          icons_enabled = true,
+        })
+      '';
     };
   };
 }

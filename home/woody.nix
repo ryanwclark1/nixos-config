@@ -34,7 +34,7 @@
     ./features/lazygit
     ./features/media
     ./features/networking-utils
-    ./features/nvim
+    ./features/nixvim
     # ./features/osint
     # ./features/pistol
     ./features/productivity
