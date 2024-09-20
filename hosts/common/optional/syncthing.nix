@@ -1,12 +1,11 @@
 # https://docs.syncthing.net/users/config.html
 {
-  # lib,
+  config,
   pkgs,
   ...
 }:
 let
   user = "administrator";
-  homeDirectory = "/home/${user}";
 in
 {
 
@@ -14,7 +13,7 @@ in
     syncthing = {
       enable = true;
       # dataDir = "/home/administrator";
-      configDir = "${homeDirectory}/.config/syncthing";
+      configDir = "${config.home.homeDirectory}/syncthing";
       group = "syncthing";
       guiAddress = "127.0.0.1:8384";
       openDefaultPorts = true;
@@ -24,13 +23,13 @@ in
           theme = "black";
         };
         folders = {
-          "${homeDirectory}/Documents" = {
+          "${config.home.homeDirectory}/Documents" = {
             id = "documents_sync";
           };
-          "${homeDirectory}/Pictures" = {
+          "${config.home.homeDirectory}/Pictures" = {
             id = "pictures_sync";
           };
-          "/${homeDirectory}/Videos" = {
+          "${config.home.homeDirectory}/Videos" = {
             id = "videos_sync";
           };
         };
