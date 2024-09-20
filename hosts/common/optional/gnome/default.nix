@@ -68,7 +68,7 @@
     gnome-control-center
     gnome-nettool
     gnome-bluetooth
-    vinagre
+    gnome-connections
   ]) ++ (with pkgs.gnome; [
 
   ]);
