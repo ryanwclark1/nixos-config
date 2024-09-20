@@ -8,7 +8,7 @@
   imports = [
     ./cliphist
     ./dunst
-    ./eww
+    # ./eww
     ./hypridle
     ./hypr
     ./hyprlock
@@ -24,19 +24,20 @@
     file."Pictures/wallpapers" = {
       source = ../../../../hosts/common/wallpaper;
       recursive = true;
-
-    file.".config/swappy/config".text = ''
-      [Default]
-      save_dir="${config.home.homeDirectory}/Pictures/Screenshots"
-      save_filename_format=swappy-%Y%m%d-%H%M%S.png
-      show_panel=false
-      line_size=5
-      text_size=20
-      text_font=Ubuntu
-      paint_mode=brush
-      early_exit=true
-      fill_shape=false
-    '';
+    };
+    file.".config/swappy/config" = {
+      text = ''
+        [Default]
+        save_dir="${config.home.homeDirectory}/Pictures/Screenshots"
+        save_filename_format=swappy-%Y%m%d-%H%M%S.png
+        show_panel=false
+        line_size=5
+        text_size=20
+        text_font=Ubuntu
+        paint_mode=brush
+        early_exit=true
+        fill_shape=false
+      '';
     };
 
     packages = with pkgs; [
@@ -50,6 +51,9 @@
       yad # Yet another dialog
       brightnessctl # Adjust screen brightness
       swappy # Wayland native snapshot editing tool, inspired by Snappy on macOS
+      (import ./scripts/wallsetter.nix { inherit pkgs; })
+      (import ./scripts/microphone-status.nix { inherit pkgs; })
+      (import ./scripts/update-checker.nix { inherit pkgs; })
     ];
   };
 }
