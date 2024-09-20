@@ -22,6 +22,7 @@ in
     nil # Nix LSP
     niv
     nix-diff
+    nvd
     nix-tree # Interactively browse dependency graphs of Nix derivations
     nix-update
     nixpkgs-lint
