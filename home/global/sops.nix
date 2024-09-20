@@ -1,4 +1,5 @@
 {
+  config,
   inputs,
   ...
 }:
@@ -16,9 +17,9 @@
       # automatically import host SSH keys as age keys
       sshKeyPaths = [
         "/etc/ssh/ssh_host_ed25519_key"
-        "/home/administrator/.ssh/ssh_host_ed25519_key"
+        "${config.home.homeDirectory}/.ssh/ssh_host_ed25519_key"
       ];
-      keyFile = "$HOME/.config/sops/age/keys.txt";
+      keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
       # generate a new key if none is found
       generateKey = true;
     };

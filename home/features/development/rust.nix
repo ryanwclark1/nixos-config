@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   ...
 }:
@@ -88,6 +89,6 @@
 
     RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
   };
-  home.sessionPath = [ "$HOME/.cargo/bin" "/$HOME/administrator/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin" ];
+  home.sessionPath = [ "${config.home.homeDirectory}/.cargo/bin" "${config.home.homeDirectory}/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin" ];
 
 }

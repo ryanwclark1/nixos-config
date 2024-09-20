@@ -51,9 +51,21 @@
       yad # Yet another dialog
       brightnessctl # Adjust screen brightness
       swappy # Wayland native snapshot editing tool, inspired by Snappy on macOS
-      (import ./scripts/wallsetter.nix { inherit pkgs; })
+      networkmanagerapplet
+      mission-center
+      qalculate-gtk
+      (import ./scripts/applauncher-fullscreen.nix { inherit pkgs; })
+      (import ./scripts/cliphist-copy.nix { inherit pkgs; })
+      (import ./scripts/cliphist-delete.nix { inherit pkgs; })
+      (import ./scripts/list-hypr-bindings.nix { inherit pkgs; })
       (import ./scripts/microphone-status.nix { inherit pkgs; })
+      (import ./scripts/power-big.nix { inherit pkgs; })
+      (import ./scripts/rofi-launcher.nix { inherit pkgs; })
+      (import ./scripts/screenshootin.nix { inherit pkgs; })
+      (import ./scripts/task-waybar.nix { inherit pkgs; })
       (import ./scripts/update-checker.nix { inherit pkgs; })
+      (import ./scripts/wallsetter.nix { inherit pkgs; })
+      (import ./scripts/web-search.nix { inherit pkgs; })
     ];
   };
 }

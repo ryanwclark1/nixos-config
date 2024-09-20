@@ -71,7 +71,7 @@ in
         #   @import url("file://${pkgs.stylix}/share/themes/${currentScheme}.css");
         # '';
       };
-      hyprland.enable = true;
+      hyprland.enable = false;
       hyprpaper.enable = true;
       k9s.enable = true;
       kde.enable = true;
