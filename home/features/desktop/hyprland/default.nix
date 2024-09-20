@@ -31,6 +31,7 @@
       slurp
       grimblast
       hyprpicker
+      swww
     ];
   };
 }

@@ -9,12 +9,15 @@
 {
     imports = [
     ./basic-binds.nix
+    ./list-hypr-bindings.nix
     # ./hyprbars.nix
   ];
 
 
   wayland.windowManager.hyprland = {
     enable = true;
+    xwayland.enable = true;
+    systemd.enable = true;
 
 
     settings =
@@ -29,24 +32,39 @@
       steam = "${pkgs.steam}/bin/steam";
       dunst = lib.getExe config.services.dunst.package;
       swaync = "${pkgs.swaynotificationcenter}/bin/swaync";
+      swww = "${pkgs.swww}/bin/swww";
+      nm-applet = "${pkgs.networkmanagerapplet}/bin/nm-applet";
     in
     {
       env = [
+
         "XDG_CURRENT_DESKTOP,Hyprland"
         "XDG_SESSION_TYPE,wayland"
         "XDG_SESSION_DESKTOP,Hyprland"
+        "NIXOS_OZONE_WL, 1"
+        "GDK_BACKEND, wayland, x11"
+        "CLUTTER_BACKEND, wayland"
+        "QT_QPA_PLATFORM=wayland;xcb"
+        "QT_WAYLAND_DISABLE_WINDOWDECORATION, 1"
+        "QT_AUTO_SCREEN_SCALE_FACTOR, 1"
+        "SDL_VIDEODRIVER, x11"
+        "MOZ_ENABLE_WAYLAND, 1"
       ];
       monitor = [
         ",highres,auto,1"
       ];
       "exec-once" =
       [
+        "dbus-update-activation-environment --systemd --all"
+        "systemctl --user import-environment QT_QPA_PLATFORMTHEME WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "${hypridle} &"
-        "${waybar} --style ${config.home.homeDirectory}/.config/waybar/style.css &"
-        "${swaync} &"
+        "killall -q ${swww};sleep .5 && ${swww} init"
+        "killall -q ${waybar};sleep .5 && ${waybar} --style ${config.home.homeDirectory}/.config/waybar/style.css &"
+        "killall -q ${swaync};sleep .5 && ${swaync} &"
+        "nm-applet --indicator &"
         "${eww} &"
-        "${dunst} &"
         "${wl-paste} --watch ${cliphist} store"
+        # "sleep 1.5 && swww img /home/${username}/Pictures/Wallpapers/xyz.jpg"
       ];
 
       general = {
@@ -103,7 +121,10 @@
 
       input = {
         kb_layout = "us";
-        # kb_options = "caps:super";
+        kb_options = [
+          "caps:super"
+          "grp:alt_shift_toggle"
+        ];
         numlock_by_default = false;
         resolve_binds_by_sym = false;
         repeat_rate = 25;
@@ -385,6 +406,7 @@
         [
           # Program bindings
           "SUPER,Return,exec,${terminal}"
+          "SUPER,SHIFT,Return,exec,rofi-launcher"
           # "SUPER,Return,exec,${defaultApp "x-scheme-handler/terminal"}"
           "SUPER,e,exec,${defaultApp "text/plain"}"
           "SUPER,b,exec,${defaultApp "x-scheme-handler/https"}"

@@ -104,6 +104,7 @@ in
           # "custom/speaker"
           "wireplumber"
           "custom/mic"
+          "custom/hyprbindings"
           "custom/cliphist"
           "bluetooth"
           "custom/exit"
@@ -237,6 +238,12 @@ in
             format = "󰢮 {}%";
             tooltip = true;
             on-click = "${missioncenter}";
+        };
+
+        "custom/hyprbindings" = {
+          tooltip = false;
+          format = "󱕴";
+          on-click = "sleep 0.1 && list-hypr-bindings";
         };
 
         # Hypridle inhibitor
