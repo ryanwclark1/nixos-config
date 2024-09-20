@@ -4,6 +4,7 @@
 
 {
   imports = [
+    ./shared
     ./cliphist.nix
     ./config.nix
     ./config-emoji.nix
