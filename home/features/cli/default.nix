@@ -9,7 +9,6 @@
     ./bat.nix
     ./btop.nix
     ./exiftool.nix
-    ./filesystem_utils.nix
     ./fx.nix
     ./gh.nix
     ./gum.nix
@@ -28,5 +27,9 @@
     distrobox # Nice escape hatch, integrates docker images with my environment
     httpie # Better curl
     scrot # A command-line screen capture utility
+    killall # A command-line tool to kill processes by name
+    duf # Disk Usage/Free Utility
+    jdupes # Find duplicate files
+    ncdu # TUI disk usage
   ];
 }
