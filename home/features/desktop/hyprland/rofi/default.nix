@@ -28,7 +28,7 @@
       # cycle = true;
       # font = "JetBrainsMono";
       # location = "center";
-      terminal = "${terminal}";
+      # terminal = "${terminal}";
       # xoffset = 0;
       # yoffset = 0;
       plugins = [
