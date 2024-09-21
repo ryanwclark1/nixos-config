@@ -1,16 +1,8 @@
-{
-  pkgs,
-  ...
-}:
 
-let
-  notify-send = "${pkgs.libnotify}/bin/notify-send";
-  slurp = "${pkgs.slurp}/bin/slurp";
-  wayshot = "${pkgs.wayshot}/bin/wayshot";
-  swappy = "${pkgs.swappy}/bin/swappy";
-  wl-copy = "${pkgs.wl-clipboard}/bin/wl-copy";
-in
-  pkgs.writeShellScript "screenshot" ''
+{
+  pkgs
+}:
+  pkgs.writeShellScript "screenshooting" ''
     SCREENSHOTS="$HOME/Pictures/Screenshots"
     NOW=$(date +%Y-%m-%d_%H-%M-%S)
     TARGET="$SCREENSHOTS/$NOW.png"
@@ -18,14 +10,14 @@ in
     mkdir -p $SCREENSHOTS
 
     if [[ -n "$1" ]]; then
-        ${wayshot} -f $TARGET
+        "${pkgs.wayshot}/bin/wayshot" -f $TARGET
     else
-        ${wayshot} -f $TARGET -s "$(${slurp})"
+        "${pkgs.wayshot}/bin/wayshot" -f $TARGET -s "$("${pkgs.slurp}/bin/slurp")"
     fi
 
-    ${wl-copy} < $TARGET
+    "${pkgs.wl-clipboard}/bin/wl-copy" < $TARGET
 
-    RES=$(${notify-send} \
+    RES=$("${pkgs.libnotify}/bin/notify-send" \
         -a "Screenshot" \
         -i "image-x-generic-symbolic" \
         -h string:image-path:$TARGET \
@@ -38,7 +30,7 @@ in
     case "$RES" in
         "file") xdg-open "$SCREENSHOTS" ;;
         "view") xdg-open $TARGET ;;
-        "edit") ${swappy} -f $TARGET ;;
+        "edit") swappy = "${pkgs.swappy}/bin/swappy" -f $TARGET ;;
         *) ;;
     esac
   ''
