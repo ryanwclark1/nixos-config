@@ -4,10 +4,21 @@
   pkgs,
   ...
 }:
-
+let
+  waybar = lib.getExe pkgs.waybar;
+  rofi = lib.getExe config.programs.rofi.package;
+  hypridle = lib.getExe config.services.hypridle.package;
+  eww = lib.getExe config.programs.eww.package;
+  wl-paste = "${pkgs.wl-clipboard}/bin/wl-paste";
+  cliphist = lib.getExe config.services.cliphist.package;
+  steam = "${pkgs.steam}/bin/steam";
+  swaync = "${pkgs.swaynotificationcenter}/bin/swaync";
+  swww = "${pkgs.swww}/bin/swww";
+  ags = lib.getExe config.programs.ags.package;
+in
 
 {
-    imports = [
+  imports = [
     ./basic-binds.nix
     # ./hyprbars.nix
   ];
@@ -16,20 +27,7 @@
     enable = true;
     xwayland.enable = true;
     systemd.enable = true;
-    settings =
-    let
-      waybar = lib.getExe pkgs.waybar;
-      rofi = lib.getExe config.programs.rofi.package;
-      hypridle = lib.getExe config.services.hypridle.package;
-      eww = lib.getExe config.programs.eww.package;
-      wl-paste = "${pkgs.wl-clipboard}/bin/wl-paste";
-      cliphist = lib.getExe config.services.cliphist.package;
-      steam = "${pkgs.steam}/bin/steam";
-      swaync = "${pkgs.swaynotificationcenter}/bin/swaync";
-      swww = "${pkgs.swww}/bin/swww";
-      ags = lib.getExe config.programs.ags.package;
-    in
-    {
+    settings ={
       env = [
         "XDG_CURRENT_DESKTOP,Hyprland"
         "XDG_SESSION_TYPE,wayland"
