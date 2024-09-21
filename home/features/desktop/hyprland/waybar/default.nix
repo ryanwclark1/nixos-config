@@ -49,6 +49,7 @@ in
           ];
           modules-right = [
             "group/hardware"
+            "custom/nix-updates"
             "network"
             "battery"
             # "custom/speaker"
@@ -339,8 +340,7 @@ in
           };
 
           network = {
-            interval = 3;
-            # format = "{ifname}";
+            interval = 5;
             format-icons = [
               "󰤯"
               "󰤟"
@@ -349,28 +349,28 @@ in
               "󰤨"
             ];
             format-ethernet = "";
-            # format-wifi = "{icon}  {signalStrength}% {essid}";
             format-wifi = "{icon}";
             format-disconnected = "󰤮";
-            # tooltip = true;
             tooltip-format = ''
-              {ifname}
-              {ipaddr}/{cidr}
-              Up: {bandwidthUpBits}
-              Down: {bandwidthDownBits}
+              Network
+              Interface: {ifname}
+              IP: {ipaddr}/{cidr}
+              : {bandwidthUpBits} : {bandwidthDownBits}
             '';
             tooltip-format-ethernet = ''
-                {ifname}
-              IP: {ipaddr}
+              Ethernet
+               : {ifname}
+              IP: {ipaddr}/{cidr}
               : {bandwidthUpBits} : {bandwidthDownBits}
             '';
             tooltip-format-disconnected = "Disconnected";
             tooltip-format-wifi = ''
-                {ifname} @ {essid}
-              IP: {ipaddr}
+              Wi-Fi
+               : {ifname} @ {essid}
+              IP: {ipaddr}/{cidr}
               Strength: {signalStrength}%
               Freq: {frequency}MHz
-              : {bandwidthUpBits} : {bandwidthDownBits}
+              : {bandwidthUpBits} : {bandwidthDownBits}
             '';
             max-length = 50;
             on-click = "${terminal} -e ${nmtui}";
@@ -380,12 +380,12 @@ in
 
           wireplumber = {
             format = "{icon}";
-            format-muted = "󰖁";
+            format-muted = " ";
             max-length = 2;
             scroll-step = 1;
-            on-scroll-up = "${wpctl} set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+";
-            on-scroll-down = "${wpctl} set-volume @DEFAULT_AUDIO_SINK@ 5%-";
-            format-icons = [ "" "" " " ];
+            on-scroll-up = "${wpctl} set-volume -l 1 @DEFAULT_AUDIO_SINK@ 2%+";
+            on-scroll-down = "${wpctl} set-volume @DEFAULT_AUDIO_SINK@ 2%-";
+            format-icons = [ " " " " " " ];
             on-click = "${pwvucontrol}";
             max-volume = 100.0;
             tooltip = true;
@@ -438,10 +438,10 @@ in
           "group/quicklinks" = {
               orientation = "horizontal";
               modules = [
-                  "custom/chrome"
-                  "custom/firefox"
-                  "custom/quicklinkempty"
-                  "custom/thunar"
+                "custom/chrome"
+                "custom/firefox"
+                "custom/quicklinkempty"
+                "custom/thunar"
               ];
           };
         }
@@ -471,7 +471,7 @@ in
 
         window#waybar {
           background-color: @backgrounddark1;
-          opacity: 0.8;
+          opacity: 0.75;
           color: @textcolor1;
           border-bottom: 0px solid #ffffff;
           transition-property: background-color;
@@ -487,7 +487,7 @@ in
         }
 
         /* -----------------------------------------------------
-        * Modules
+        * Module Group
         * ----------------------------------------------------- */
 
         .modules-right {
@@ -513,9 +513,20 @@ in
           margin-left: 0;
         }
 
+         /* -----------------------------------------------------
+        * Modules
+        * ----------------------------------------------------- */
+
+        #custom-applauncher {
+          font-size: 22px;
+          padding-right: 5px;
+          padding-left: 2px;
+        }
+
         #hyprland-workspaces {
           border-radius: 0px;
-          padding: 0 1px;
+          padding-right: 1px;
+          padding-left: 1px;
         }
 
         #workspaces button {
@@ -617,6 +628,22 @@ in
           font-size: 16px;
         }
 
+        #custom-nix-updates {
+          margin: 0px;
+          padding: 0 10px 0 10px;
+          color: @textcolor1;
+          font-size: 16px;
+          font-weight: bold;
+        }
+
+        #custom-hyprbindings {
+          margin: 0px;
+          padding: 0 10px 0 10px;
+          color: @textcolor1;
+          font-size: 16px;
+          font-weight: bold;
+        }
+
         #custom-cliphist {
           margin: 0px;
           padding: 0 10px 0 10px;
@@ -653,11 +680,7 @@ in
           padding-right: 15px;
         }
 
-        #custom-applauncher {
-          font-size: 22px;
-          padding-right: 2px;
-          padding-left: 2px;
-        }
+
       '';
     };
   };
