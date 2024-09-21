@@ -27,6 +27,7 @@
       steam = "${pkgs.steam}/bin/steam";
       swaync = "${pkgs.swaynotificationcenter}/bin/swaync";
       swww = "${pkgs.swww}/bin/swww";
+      ags = lib.getExe config.programs.ags.package;
     in
     {
       env = [
@@ -52,7 +53,8 @@
         "systemctl --user import-environment QT_QPA_PLATFORMTHEME WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "${hypridle} &"
         "killall -q ${swww};sleep .5 && ${swww} init"
-        "killall -q ${waybar};sleep .5 && ${waybar} --style ${config.home.homeDirectory}/.config/waybar/style.css &"
+        "killall -q ${ags}; sleep .5 && ${ags} -b hypr"
+        # "killall -q ${waybar};sleep .5 && ${waybar} --style ${config.home.homeDirectory}/.config/waybar/style.css &"
         "killall -q ${swaync};sleep .5 && ${swaync} &"
         "nm-applet --indicator &"
         "${eww} &"

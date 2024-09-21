@@ -2,7 +2,7 @@
 {
   pkgs
 }:
-  pkgs.writeShellScript "screenshooting" ''
+  pkgs.writeShellScriptBin "screenshooting" ''
     SCREENSHOTS="$HOME/Pictures/Screenshots"
     NOW=$(date +%Y-%m-%d_%H-%M-%S)
     TARGET="$SCREENSHOTS/$NOW.png"

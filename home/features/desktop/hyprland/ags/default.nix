@@ -15,14 +15,14 @@
     dart-sass
   ];
 
-    home.file.".config/ags" = {
-        source = ./config;
-        recursive = true;
-    };
+    # home.file.".config/ags/" = {
+    #     source = ./config;
+    #     recursive = true;
+    # };
 
   programs.ags = {
     enable = true;
-    configDir = "${config.home.homeDirectory}/.config/ags";
+    configDir = ./config;
     extraPackages = with pkgs; [
       accountsservice
     ];
