@@ -178,7 +178,7 @@ in
           # Power Menu
           "custom/exit" = {
             format = "";
-            on-click = "power-big";
+            on-click = "${pkgs.wlogout}/bin/wlogout";
             tooltip-format = "Power Menu";
           };
 
