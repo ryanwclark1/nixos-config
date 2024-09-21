@@ -8,15 +8,16 @@
   imports = [
     ./cliphist
     ./dunst
-    # ./eww
-    ./hypridle
     ./hypr
+    ./hypridle
     ./hyprlock
-    # ./mako
+    ./imv.nix
     ./rofi
     ./swaync
+    ./wlogout
     ./waybar
-    ./imv.nix
+    # ./eww
+    # ./mako
     # ./wofi.nix
   ];
 
