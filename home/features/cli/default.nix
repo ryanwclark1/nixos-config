@@ -31,5 +31,6 @@
     duf # Disk Usage/Free Utility
     jdupes # Find duplicate files
     ncdu # TUI disk usage
+    lazydocker # A simple terminal UI for both docker and docker-compose
   ];
 }
