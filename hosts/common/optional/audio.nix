@@ -4,6 +4,11 @@
 }:
 
 {
+  services.mpd = {
+    enable = false;
+    musicDirectory = ''$HOME/Music'';
+  };
+
   hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
