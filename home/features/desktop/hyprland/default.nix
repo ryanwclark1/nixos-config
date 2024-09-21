@@ -17,6 +17,7 @@
     ./swaync
     ./wlogout
     ./waybar
+    # ./scripts/screenshot.nix
     # ./eww
     # ./mako
     # ./wofi.nix
@@ -63,7 +64,7 @@
       (import ./scripts/microphone-status.nix { inherit pkgs; })
       (import ./scripts/power-big.nix { inherit pkgs; })
       (import ./scripts/rofi-launcher.nix { inherit pkgs; })
-      (import ./scripts/screenshoot.nix { inherit pkgs; })
+      (import ./scripts/screenshooting.nix { inherit pkgs; })
       (import ./scripts/task-waybar.nix { inherit pkgs; })
       (import ./scripts/update-checker.nix { inherit pkgs; })
       (import ./scripts/wallsetter.nix { inherit pkgs; })
