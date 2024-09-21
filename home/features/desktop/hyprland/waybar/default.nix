@@ -459,23 +459,22 @@ in
         @define-color textcolor3 #FFFFFF;
         @define-color iconcolor ${base0E};
 
+        /* Global Styles */
         * {
-          font-size: 14px;
-          font-family: ${sansSerif.name}, ${monospace.name};
-          font-weight: bold;
+            font-size: 14px;
+            font-family: ${sansSerif.name}, ${monospace.name};
+            font-weight: bold;
         }
 
         /* -----------------------------------------------------
         * Window
         * ----------------------------------------------------- */
-
         window#waybar {
           background-color: @backgrounddark1;
           opacity: 0.75;
           color: @textcolor1;
-          border-bottom: 0px solid #ffffff;
-          transition-property: background-color;
-          transition-duration: 0.5s;
+          border-bottom: 0;
+          transition: background-color 0.5s;
         }
 
         window#waybar.hidden {
@@ -489,44 +488,30 @@ in
         /* -----------------------------------------------------
         * Module Group
         * ----------------------------------------------------- */
-
+        .modules-left,
+        .modules-center,
         .modules-right {
-          padding: 0 10px 0 10px;
-          border-radius: 0px;
+          padding: 0 10px;
+          border-radius: 0;
         }
 
+        .modules-left > widget:first-child > #workspaces,
         .modules-right > widget:last-child > #workspaces {
-          margin-right: 0;
+          margin: 10px;
         }
 
-        .modules-center {
-          padding: 0 10px 0 10px;
-          border-radius: 0px;
-        }
-
-        .modules-left {
-          padding: 0 10px 0 10px;
-          border-radius: 0px;
-        }
-
-        .modules-left > widget:first-child > #workspaces {
-          margin-left: 0;
-        }
-
-         /* -----------------------------------------------------
+        /* -----------------------------------------------------
         * Modules
         * ----------------------------------------------------- */
-
         #custom-applauncher {
           font-size: 22px;
-          padding-right: 5px;
-          padding-left: 2px;
+          padding-right: 10px;
         }
 
         #hyprland-workspaces {
-          border-radius: 0px;
-          padding-right: 1px;
           padding-left: 1px;
+          padding-right: 1px;
+          justify-content: center;
         }
 
         #workspaces button {
@@ -535,34 +520,27 @@ in
           transition: ${betterTransition};
         }
 
-        #workspaces button.active {
-          min-width: 5px;
-          color: @textcolor1;
-          transition: ${betterTransition};
-        }
-
+        /* Hover and active states for buttons can be combined */
+        #workspaces button.active,
         #workspaces button.hover {
-          min-width: 5px;
           color: @textcolor1;
-          transition: ${betterTransition};
         }
 
         /* -----------------------------------------------------
         * Tooltips
         * ----------------------------------------------------- */
-
         tooltip {
           border-radius: 10px;
           background-color: @backgrounddark2;
-          opacity:0.8;
-          padding:20px;
-          margin:0px;
+          opacity: 0.8;
+          padding: 20px;
         }
 
         tooltip label {
           color: @textcolor1;
         }
 
+        /* General styles for multiple IDs */
         #custom-exit,
         #custom-hyprbindings,
         #battery,
@@ -577,110 +555,44 @@ in
         #mode,
         #idle_inhibitor,
         #scratchpad,
-        #mpd {
-          margin: 0px;
-          padding: 0 10px 0 10px;
-          color: @textcolor1;
-          font-size: 14px;
-        }
-
-        #battery.icon {
-          font-size: 16px;
-        }
-
-        #network.icon {
-          font-size: 16px;
-        }
-
-        /* -----------------------------------------------------
-        * Clock
-        * ----------------------------------------------------- */
-
-        #clock {
-          margin: 0px;
-          padding: 0 10px 0 10px;
-          color: @textcolor1;
-          font-size: 16px;
-          font-weight: bold;
-        }
-
-        #clock.calendar {
-          font-size: 16px;
-        }
-
+        #mpd,
         #custom-speaker,
-        #custom-mic {
-          margin: 0px;
-          padding: 0 10px 0 10px;
+        #custom-mic,
+        #clock,
+        #bluetooth,
+        #custom-nix-updates,
+        #custom-cliphist,
+        #group-hardware,
+        #disk,
+        #cpu,
+        #memory,
+        #custom-gpu {
+          margin: 0;
+          padding: 0 10px;
+          color: @textcolor1;
           font-size: 14px;
-          color: @textcolor1;
         }
 
-        #bluetooth {
-          margin: 0px;
-          padding: 0 10px 0 10px;
-          color: @textcolor1;
-          font-size: 16px;
-          font-weight: bold;
-        }
-
-        #bluetooth.icon {
-          font-size: 16px;
-        }
-
-        #custom-nix-updates {
-          margin: 0px;
-          padding: 0 10px 0 10px;
-          color: @textcolor1;
-          font-size: 16px;
-          font-weight: bold;
-        }
-
-        #custom-hyprbindings {
-          margin: 0px;
-          padding: 0 10px 0 10px;
-          color: @textcolor1;
-          font-size: 16px;
-          font-weight: bold;
-        }
-
-        #custom-cliphist {
-          margin: 0px;
-          padding: 0 10px 0 10px;
-          color: @textcolor1;
-          font-size: 16px;
-          font-weight: bold;
-        }
-
+        /* Specific font sizes */
+        #battery.icon,
+        #network.icon,
+        #bluetooth,
+        #custom-nix-updates,
+        #custom-hyprbindings,
+        #custom-cliphist,
         #group-hardware {
-          margin: 0px;
-          padding: 0 10px 0 10px;
-          color: @textcolor1;
           font-size: 16px;
           font-weight: bold;
         }
 
         #disk {
-          margin: 0px;
-          padding: 0 10px 0 10px;
           font-size: 13px;
-          color: @textcolor1;
         }
 
-        #cpu,
-        #memory,
-        #custom-gpu {
-          margin: 0px;
-          padding: 0 10px 0 10px;
-          font-size: 14px;
-          color: @textcolor1;
-        }
-
+        /* Additional margin for custom-exit */
         #custom-exit {
-          padding-right: 15px;
+            padding-right: 15px;
         }
-
-
       '';
     };
   };
