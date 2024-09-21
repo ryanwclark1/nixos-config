@@ -74,7 +74,7 @@ in
       hyprland.enable = false;
       hyprpaper.enable = true;
       k9s.enable = true;
-      kde.enable = true;
+      kde.enable = false;
       kitty = {
         enable = true;
         # variant256Colors = true;
