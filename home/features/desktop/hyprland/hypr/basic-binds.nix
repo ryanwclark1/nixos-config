@@ -45,7 +45,7 @@
       (
         let
           terminal = lib.getExe pkgs.alacritty;
-          files = "${pkgs.gnome.nautilus}/bin/nautilus";
+          files = "${pkgs.nautilus}/bin/nautilus";
           defaultApp = type: "${lib.getExe pkgs.handlr-regex} launch ${type}";
           browser = "${pkgs.google-chrome}/bin/google-chrome-stable";
           remote = lib.getExe (pkgs.writeShellScriptBin "remote" ''
@@ -62,6 +62,7 @@
           "SUPER,e,exec,${defaultApp "text/plain"}"
           "SUPER,b,exec,${defaultApp "x-scheme-handler/https"}"
           "SUPER ALT,space,exec,${files}"
+          "SUPER,backspace,exec,${pkgs.wlogout}/bin/wlogout"
           # "SUPER ALT,Return,exec,${remote} ${defaultApp "x-scheme-handler/terminal"}"
           # "SUPER ALT,e,exec,${remote} ${defaultApp "text/plain"}"
           # "SUPER ALT,b,exec,${remote} ${defaultApp "x-scheme-handler/https"}"
