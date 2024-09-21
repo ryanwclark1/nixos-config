@@ -32,13 +32,15 @@ with config.stylix.fonts;
       }
 
       /*****----- Global Properties -----*****/
-      background:     #1E1D2FFF;
-      background-alt: #282839FF;
-      foreground:     #D9E0EEFF;
-      selected:       #7AA2F7FF;
-      active:         #ABE9B3FF;
-      urgent:         #F28FADFF;
-      font: "JetBrains Mono Nerd Font 12";
+      * {
+        background:     #1E1D2FFF;
+        background-alt: #282839FF;
+        foreground:     #D9E0EEFF;
+        selected:       #7AA2F7FF;
+        active:         #ABE9B3FF;
+        urgent:         #F28FADFF;
+        font: "JetBrains Mono Nerd Font 12";
+      }
 
       * {
         border-colour:               var(selected);
