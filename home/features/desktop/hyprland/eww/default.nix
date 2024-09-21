@@ -17,10 +17,10 @@ in
         };
     };
 
-    home.packages = with pkgs; [
-        brightnessctl
-        (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
-    ];
+    # home.packages = with pkgs; [
+    #     brightnessctl
+    #     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+    # ];
 
     # configuration
     # home.file.".config/eww/eww.scss".source = ./eww.scss;
