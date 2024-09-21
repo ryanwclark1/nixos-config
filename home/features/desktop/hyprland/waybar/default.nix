@@ -23,6 +23,7 @@ let
   firefox = lib.getExe config.programs.firefox.package;
   # thunar = "${pkgs.thunar}/bin/thunar";
   thunar = "thunar";
+  betterTransition = "all 0.3s cubic-bezier(.55,-0.68,.48,1.682)";
 in
 {
 
@@ -458,192 +459,205 @@ in
         @define-color textcolor3 #FFFFFF;
         @define-color iconcolor ${base0E};
 
-          * {
-            font-size: 14px;
-            font-family: ${sansSerif.name}, ${monospace.name};
-            font-weight: bold;
-          }
+        * {
+          font-size: 14px;
+          font-family: ${sansSerif.name}, ${monospace.name};
+          font-weight: bold;
+        }
 
-          /* -----------------------------------------------------
-          * Window
-          * ----------------------------------------------------- */
+        /* -----------------------------------------------------
+        * Window
+        * ----------------------------------------------------- */
 
-          window#waybar {
-            background-color: @backgrounddark1;
-            opacity: 0.8;
-            color: @textcolor1;
-            border-bottom: 0px solid #ffffff;
-            transition-property: background-color;
-            transition-duration: 0.5s;
-          }
+        window#waybar {
+          background-color: @backgrounddark1;
+          opacity: 0.8;
+          color: @textcolor1;
+          border-bottom: 0px solid #ffffff;
+          transition-property: background-color;
+          transition-duration: 0.5s;
+        }
 
-          window#waybar.hidden {
-            opacity: 0.2;
-          }
+        window#waybar.hidden {
+          opacity: 0.2;
+        }
 
-          window#waybar.empty #window {
-            background-color: transparent;
-          }
+        window#waybar.empty #window {
+          background-color: transparent;
+        }
 
-          /* -----------------------------------------------------
-          * Modules
-          * ----------------------------------------------------- */
+        /* -----------------------------------------------------
+        * Modules
+        * ----------------------------------------------------- */
 
-          .modules-right {
-            padding: 0 10px 0 10px;
-            border-radius: 0px;
-          }
+        .modules-right {
+          padding: 0 10px 0 10px;
+          border-radius: 0px;
+        }
 
-          .modules-right > widget:last-child > #workspaces {
-            margin-right: 0;
-          }
+        .modules-right > widget:last-child > #workspaces {
+          margin-right: 0;
+        }
 
-          .modules-center {
-            padding: 0 10px 0 10px;
-            border-radius: 0px;
-          }
+        .modules-center {
+          padding: 0 10px 0 10px;
+          border-radius: 0px;
+        }
 
-          .modules-left {
-            padding: 0 10px 0 10px;
-            border-radius: 0px;
-          }
+        .modules-left {
+          padding: 0 10px 0 10px;
+          border-radius: 0px;
+        }
 
-          .modules-left > widget:first-child > #workspaces {
-            margin-left: 0;
-          }
+        .modules-left > widget:first-child > #workspaces {
+          margin-left: 0;
+        }
 
-          #hyprland-workspaces {
-            border-radius: 0px;
-            padding: 0 1px;
-          }
+        #hyprland-workspaces {
+          border-radius: 0px;
+          padding: 0 1px;
+        }
 
-          #workspaces button {
-            min-width: 5px;
-            color: @textcolor1;
-          }
+        #workspaces button {
+          min-width: 5px;
+          color: @textcolor1;
+          transition: ${betterTransition};
+        }
 
-          /* -----------------------------------------------------
-          * Tooltips
-          * ----------------------------------------------------- */
+        #workspaces button.active {
+          min-width: 5px;
+          color: @textcolor1;
+          transition: ${betterTransition};
+        }
 
-          tooltip {
-            border-radius: 10px;
-            background-color: @backgrounddark2;
-            opacity:0.8;
-            padding:20px;
-            margin:0px;
-          }
+        #workspaces button.hover {
+          min-width: 5px;
+          color: @textcolor1;
+          transition: ${betterTransition};
+        }
 
-          tooltip label {
-            color: @textcolor1;
-          }
+        /* -----------------------------------------------------
+        * Tooltips
+        * ----------------------------------------------------- */
 
-          #custom-exit,
-          #custom-hyprbindings,
-          #battery,
-          #custom-system,
-          #temperature,
-          #backlight,
-          #network,
-          #pulseaudio,
-          #wireplumber,
-          #custom-media,
-          #tray,
-          #mode,
-          #idle_inhibitor,
-          #scratchpad,
-          #mpd {
-            margin: 0px;
-            padding: 0 10px 0 10px;
-            color: @textcolor1;
-            font-size: 14px;
-          }
+        tooltip {
+          border-radius: 10px;
+          background-color: @backgrounddark2;
+          opacity:0.8;
+          padding:20px;
+          margin:0px;
+        }
 
-          #battery.icon {
-            font-size: 16px;
-          }
+        tooltip label {
+          color: @textcolor1;
+        }
 
-          #network.icon {
-            font-size: 16px;
-          }
+        #custom-exit,
+        #custom-hyprbindings,
+        #battery,
+        #custom-system,
+        #temperature,
+        #backlight,
+        #network,
+        #pulseaudio,
+        #wireplumber,
+        #custom-media,
+        #tray,
+        #mode,
+        #idle_inhibitor,
+        #scratchpad,
+        #mpd {
+          margin: 0px;
+          padding: 0 10px 0 10px;
+          color: @textcolor1;
+          font-size: 14px;
+        }
 
-          /* -----------------------------------------------------
-          * Clock
-          * ----------------------------------------------------- */
+        #battery.icon {
+          font-size: 16px;
+        }
 
-          #clock {
-            margin: 0px;
-            padding: 0 10px 0 10px;
-            color: @textcolor1;
-            font-size: 16px;
-            font-weight: bold;
-          }
+        #network.icon {
+          font-size: 16px;
+        }
 
-          #clock.calendar {
-            font-size: 16px;
-          }
+        /* -----------------------------------------------------
+        * Clock
+        * ----------------------------------------------------- */
 
-          #custom-speaker,
-          #custom-mic {
-            margin: 0px;
-            padding: 0 10px 0 10px;
-            font-size: 14px;
-            color: @textcolor1;
-          }
+        #clock {
+          margin: 0px;
+          padding: 0 10px 0 10px;
+          color: @textcolor1;
+          font-size: 16px;
+          font-weight: bold;
+        }
 
-          #bluetooth {
-            margin: 0px;
-            padding: 0 10px 0 10px;
-            color: @textcolor1;
-            font-size: 16px;
-            font-weight: bold;
-          }
+        #clock.calendar {
+          font-size: 16px;
+        }
 
-          #bluetooth.icon {
-            font-size: 16px;
-          }
+        #custom-speaker,
+        #custom-mic {
+          margin: 0px;
+          padding: 0 10px 0 10px;
+          font-size: 14px;
+          color: @textcolor1;
+        }
 
-          #custom-cliphist {
-            margin: 0px;
-            padding: 0 10px 0 10px;
-            color: @textcolor1;
-            font-size: 16px;
-            font-weight: bold;
-          }
+        #bluetooth {
+          margin: 0px;
+          padding: 0 10px 0 10px;
+          color: @textcolor1;
+          font-size: 16px;
+          font-weight: bold;
+        }
 
-          #group-hardware {
-            margin: 0px;
-            padding: 0 10px 0 10px;
-            color: @textcolor1;
-            font-size: 16px;
-            font-weight: bold;
-          }
+        #bluetooth.icon {
+          font-size: 16px;
+        }
 
-          #disk {
-            margin: 0px;
-            padding: 0 10px 0 10px;
-            font-size: 13px;
-            color: @textcolor1;
-          }
+        #custom-cliphist {
+          margin: 0px;
+          padding: 0 10px 0 10px;
+          color: @textcolor1;
+          font-size: 16px;
+          font-weight: bold;
+        }
 
-          #cpu,
-          #memory,
-          #custom-gpu {
-            margin: 0px;
-            padding: 0 10px 0 10px;
-            font-size: 14px;
-            color: @textcolor1;
-          }
+        #group-hardware {
+          margin: 0px;
+          padding: 0 10px 0 10px;
+          color: @textcolor1;
+          font-size: 16px;
+          font-weight: bold;
+        }
 
-          #custom-exit {
-            padding-right: 15px;
-          }
+        #disk {
+          margin: 0px;
+          padding: 0 10px 0 10px;
+          font-size: 13px;
+          color: @textcolor1;
+        }
 
-          #custom-applauncher {
-            font-size: 22px;
-            padding-right: 2px;
-            padding-left: 2px;
-          }
+        #cpu,
+        #memory,
+        #custom-gpu {
+          margin: 0px;
+          padding: 0 10px 0 10px;
+          font-size: 14px;
+          color: @textcolor1;
+        }
+
+        #custom-exit {
+          padding-right: 15px;
+        }
+
+        #custom-applauncher {
+          font-size: 22px;
+          padding-right: 2px;
+          padding-left: 2px;
+        }
       '';
     };
   };
