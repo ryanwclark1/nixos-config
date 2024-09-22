@@ -37,7 +37,7 @@
     # ./features/pistol
     ./features/productivity
     ./features/qutebrowser
-    ./features/remmina
+    # ./features/remmina
     ./features/ripgrep
     ./features/slack
     ./features/shell
