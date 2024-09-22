@@ -69,6 +69,7 @@
       (import ./scripts/update-checker.nix { inherit pkgs; })
       (import ./scripts/wallsetter.nix { inherit pkgs; })
       (import ./scripts/web-search.nix { inherit pkgs; })
+      (import ./scripts/wttr.nix { inherit pkgs; })
       (import ./scripts/yt.nix { inherit pkgs; })
     ];
   };
