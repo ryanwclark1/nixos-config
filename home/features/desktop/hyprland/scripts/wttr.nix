@@ -23,7 +23,7 @@ pkgs.writeShellScriptBin "wttr" ''
   fi
 
   wttr() {
-    local location="${1// /+}"
+    local location="(1// /+)"
     command shift
     local args=""
     for p in $WTTR_PARAMS "$@"; do
