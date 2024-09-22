@@ -15,6 +15,8 @@ let
   swaync = "${pkgs.swaynotificationcenter}/bin/swaync";
   swww = "${pkgs.swww}/bin/swww";
   ags = lib.getExe config.programs.ags.package;
+  pwvucontrol = "${pkgs.pwvucontrol}/bin/pwvucontrol";
+  nm-connection-editor = "${pkgs.networkmanagerapplet}/bin/nm-connection-editor";
 in
 
 {
@@ -253,14 +255,22 @@ in
         default_split_ratio = 1.0;
       };
 
-      windowrule = [
-        "noborder, ^(${rofi})$"
-        # "float, ^(${thunar})$"
-        # "center, ^(${thunar})$"
-        # "size 1080 900, ^(${thunar})$"
-        # "float, ^(${steam})$"
-        # "center, ^(${steam})$"
-        # "size 1080 900, ^(${steam})$"
+      windowrule = let
+        f = regex: "float, ^(${regex})$";
+      in [
+        (f "org.gnome.Calculator")
+        (f "org.gnome.Nautilus")
+        (f "pavucontrol")
+        (f "nm-connection-editor")
+        (f "blueberry.py")
+        (f "org.gnome.Settings")
+        (f "org.gnome.design.Palette")
+        (f "Color Picker")
+        (f "xdg-desktop-portal")
+        (f "xdg-desktop-portal-gnome")
+        (f "de.haeckerfelix.Fragments")
+        (f "com.github.Aylur.ags")
+        "workspace 7, title:Spotify"
       ];
 
       windowrulev2 = [
