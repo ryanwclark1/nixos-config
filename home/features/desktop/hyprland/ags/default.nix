@@ -8,6 +8,7 @@
 {
   imports = [
     inputs.ags.homeManagerModules.default
+    inputs.matugen.nixosModules.default
   ];
 
   home.packages = with pkgs; [
@@ -22,9 +23,17 @@
 
   programs.ags = {
     enable = true;
-    configDir = ./config;
+    # configDir = ./config;
     extraPackages = with pkgs; [
+      gtksourceview
+      webkitgtk
       accountsservice
     ];
   };
+  programs.matugen = {
+    enable = true;
+    variant = "dark";
+    jsonFormat = "hex";
+  };
+
 }
