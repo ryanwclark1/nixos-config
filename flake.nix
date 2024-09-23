@@ -62,6 +62,9 @@
     #   inputs.nixpkgs.follows = "nixpkgs";
     # };
     ags.url = "github:Aylur/ags";
+    matugen = {
+      url = "github:/InioX/Matugen";
+    };
   };
 
   outputs = {
