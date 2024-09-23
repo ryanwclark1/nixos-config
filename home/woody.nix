@@ -17,7 +17,7 @@
     ./features/cli
     ./features/compression
     ./features/discord
-    ./features/deluge
+    ./features/fragments
     ./features/development
     ./features/eza
     ./features/fastfetch
