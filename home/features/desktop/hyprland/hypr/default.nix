@@ -57,7 +57,6 @@ in
         # "killall -q ${waybar};sleep .5 && ${waybar} --style ${config.home.homeDirectory}/.config/waybar/style.css &"
         "killall -q ${swaync};sleep .5 && ${swaync} &"
         "nm-applet --indicator &"
-        "${eww} &"
         "${wl-paste} --watch ${cliphist} store"
         # "sleep 1.5 && swww img /home/${username}/Pictures/Wallpapers/xyz.jpg"
       ];
@@ -258,10 +257,11 @@ in
       windowrule = let
         f = regex: "float, ^(${regex})$";
       in [
+        (f "")
         (f "org.gnome.Calculator")
         (f "org.gnome.Nautilus")
-        (f "pavucontrol")
-        (f "nm-connection-editor")
+        (f "${pwvucontrol}")
+        (f "${nm-connection-editor}")
         (f "blueberry.py")
         (f "org.gnome.Settings")
         (f "org.gnome.design.Palette")
