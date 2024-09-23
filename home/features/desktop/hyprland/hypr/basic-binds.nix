@@ -189,7 +189,7 @@ in
         mvactive = binding "SUPER ALT" "moveactive";
         mvtows = binding "SUPER SHIFT" "movetoworkspace";
         e = "exec, ags -b hypr";
-        arr = [1 2 3 4 5 6 7];
+        arr = [1 2 3 4 5 6 7 8 9];
       in
         [
           "CTRL SHIFT, R,  ${e} quit; ags -b hypr"
