@@ -8,7 +8,6 @@ let
   waybar = lib.getExe pkgs.waybar;
   rofi = lib.getExe config.programs.rofi.package;
   hypridle = lib.getExe config.services.hypridle.package;
-  eww = lib.getExe config.programs.eww.package;
   wl-paste = "${pkgs.wl-clipboard}/bin/wl-paste";
   cliphist = lib.getExe config.services.cliphist.package;
   steam = "${pkgs.steam}/bin/steam";
@@ -54,8 +53,6 @@ in
         "${hypridle} &"
         "killall -q ${swww};sleep .5 && ${swww} init"
         "killall -q ${ags}; sleep .5 && ${ags} -b hypr"
-        # "killall -q ${waybar};sleep .5 && ${waybar} --style ${config.home.homeDirectory}/.config/waybar/style.css &"
-        "killall -q ${swaync};sleep .5 && ${swaync} &"
         "nm-applet --indicator &"
         "${wl-paste} --watch ${cliphist} store"
         # "sleep 1.5 && swww img /home/${username}/Pictures/Wallpapers/xyz.jpg"
