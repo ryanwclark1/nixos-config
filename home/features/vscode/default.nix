@@ -28,8 +28,9 @@
         github.vscode-pull-request-github
         ms-azuretools.vscode-docker
         ms-kubernetes-tools.vscode-kubernetes-tools
-        # ms-python.python
-        # ms-python.vscode-pylance
+        ms-python.python
+        ms-python.vscode-pylance
+        ms-python.debugpy
         ms-vscode-remote.remote-ssh-edit
         ms-vscode-remote.remote-ssh
         ms-vscode-remote.remote-containers
@@ -63,11 +64,17 @@
         wholroyd.jinja # Prefer Better Jinja
         yzhang.markdown-all-in-one
       ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
+        # {
+        #   name = "python";
+        #   publisher = "ms-python";
+        #   version = "2024.14.1";
+        #   sha256 = "sha256-NhE3xATR4D6aAqIT/hToZ/qzMvZxjTmpTyDoIrdvuTE=";
+        # }
         {
-          name = "python";
-          publisher = "ms-python";
-          version = "2024.14.1";
-          sha256 = "sha256-NhE3xATR4D6aAqIT/hToZ/qzMvZxjTmpTyDoIrdvuTE=";
+          name = "bun-vscode";
+          publisher = "oven";
+          version = "0.0.15";
+          sha256 = "sha256-9aoDDO7hh+YPTKh64z3rZhnTW5H8Se3+ZTncGrsKyJ0=";
         }
         {
           name = "ansible";
@@ -250,6 +257,8 @@
         "terminal.integrated.customGlyphs" = true;
         "terminal.integrated.environmentChangesIndicator" = "off";
 
+        "code-runner.enableAppInsights" = false;
+
         # Nix IDE
         "nix.enableLanguageServer" = true;
         "nix.serverPath" = "${pkgs.nil}/bin/nil";
@@ -297,6 +306,8 @@
         "github.copilot.advanced" = {
           "listCount" = 3;
         };
+
+
 
         # Kubernetes
         "vs-kubernetes" = {
