@@ -1,4 +1,4 @@
-# GVFS used with
+# GVFS used with AGS
 {
   pkgs,
   ...
