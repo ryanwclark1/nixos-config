@@ -7,16 +7,21 @@
   home.packages = (with pkgs; [
     bun
     nodejs
-    nodePackages.npm
-    nodePackages.pnpm
     yarn
     deno
     tailwindcss
-    # npm
-    # pnpm
   ])
   ++ (with pkgs.nodePackages; [
     npm
     pnpm
+    ts-node
   ]);
+  programs = {
+    bun = {
+      enable = true;
+      package = pkgs.bun;
+      enableGitIntegration = true;
+
+    };
+  };
 }
