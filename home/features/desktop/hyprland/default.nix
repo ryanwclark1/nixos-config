@@ -8,13 +8,13 @@
   imports = [
     ./ags
     ./cliphist
-    ./dunst
+    # ./dunst
     ./hypr
     ./hypridle
     ./hyprlock
     ./imv.nix
     ./rofi
-    ./swaync
+    # ./swaync
     ./wlogout
     ./waybar
     # ./scripts/screenshot.nix
@@ -57,6 +57,8 @@
       networkmanagerapplet
       mission-center
       qalculate-gtk
+      wayshot
+      gtk3
       (import ./scripts/applauncher-fullscreen.nix { inherit pkgs; })
       (import ./scripts/cliphist-copy.nix { inherit pkgs; })
       (import ./scripts/cliphist-delete.nix { inherit pkgs; })
