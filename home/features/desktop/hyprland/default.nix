@@ -9,6 +9,7 @@
     ./ags
     ./cliphist
     # ./dunst
+    ./gvfs
     ./hypr
     ./hypridle
     ./hyprlock
