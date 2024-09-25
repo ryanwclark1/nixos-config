@@ -177,10 +177,10 @@ in
       ++
       (
         let
-        yt = pkgs.writeShellScript "yt" ''
-          notify-send "Opening video" "$(wl-paste)"
-          mpv "$(wl-paste)"
-        '';
+        # yt = pkgs.writeShellScript "yt" ''
+        #   notify-send "Opening video" "$(wl-paste)"
+        #   mpv "$(wl-paste)"
+        # '';
         screenshot = "screenshooting";
         binding = mod: cmd: key: arg: "${mod}, ${key}, ${cmd}, ${arg}";
         mvfocus = binding "SUPER" "movefocus";
@@ -204,7 +204,7 @@ in
           # "SUPER, E, exec, wezterm -e lf"
 
           # youtube
-          ", XF86Launch1,  exec, ${yt}"
+          # ", XF86Launch1,  exec, ${yt}"
 
           "ALT, Tab, focuscurrentorlast"
           "CTRL ALT, Delete, exit"
