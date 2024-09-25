@@ -18,7 +18,7 @@
     # ./poetry.nix
     ./postman.nix
     ./protobuf.nix
-    # ./python.nix
+    ./python.nix
     ./rust.nix
     ./sql.nix
   ];

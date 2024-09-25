@@ -5,7 +5,6 @@
 
 {
   home.packages = with pkgs; [
-
     python312
     python312Packages.poetry-core
     python312Packages.pdm-backend
@@ -15,5 +14,5 @@
     functiontrace-server
     # memray
   ];
-  home.sessionPath = [ "$HOME/.python/bin" ];
+  # home.sessionPath = [ "$HOME/.python/bin" ];
 }
