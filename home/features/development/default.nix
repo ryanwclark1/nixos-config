@@ -15,7 +15,6 @@
     ./grpc.nix
     ./js.nix
     ./lua.nix
-    # ./poetry.nix
     ./postman.nix
     ./protobuf.nix
     ./python.nix
@@ -26,6 +25,7 @@
   home.packages = with pkgs; [
     so
     tokei # code statistics
+    cachix
   ];
 
 }
