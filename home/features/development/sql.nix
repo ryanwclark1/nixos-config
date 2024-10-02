@@ -9,5 +9,6 @@
     dbeaver-bin
     pgcli
     sqlitebrowser
+    sqlite
   ];
 }
