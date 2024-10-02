@@ -350,6 +350,9 @@
         "yaml.schemaStore.url" = "https://www.schemastore.org/api/json/catalog.json";
         "yaml.validate" = true;
         "yaml.yamlVersion" = "1.2";
+        "[templ]" = {
+          "editor.defaultFormatter" = "a-h.templ";
+        };
       };
     };
   };
