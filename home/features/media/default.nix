@@ -11,7 +11,7 @@
     ./eye.nix
     ./ffmpeg.nix
     # ./gimp.nix
-    # ./graphviz.nix
+    ./graphviz.nix
     ./gstreamer.nix
     # ./handbrake.nix
     ./imagemagick.nix
