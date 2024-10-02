@@ -46,6 +46,7 @@
     ./features/sys-stats
     # ./features/tmux
     ./features/virtviewer
+    ./features/virtualisation
     ./features/vhs
     ./features/vscode
     ./features/yazi
