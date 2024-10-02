@@ -53,6 +53,8 @@ in
     };
   };
 
+  nix.settings.trusted-users = [ "${user}" ];
+
   home-manager.users.administrator = import ../../../../home/${config.networking.hostName}.nix;
 
   # security.pam.services = {
