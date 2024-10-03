@@ -1,4 +1,5 @@
 {
+  pkgs,
   ...
 }:
 
@@ -6,7 +7,11 @@
   virtualisation = {
     docker = {
       enable = true;
-      listenOptions = [ "/run/docker.sock" ];
+      package = pkgs.docker;
+      listenOptions = [
+        "/var/run/docker.sock"
+        "/run/docker.sock"
+      ];
       enableOnBoot = true;
       logDriver = "journald";
 
