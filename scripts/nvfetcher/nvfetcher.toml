@@ -96,3 +96,8 @@ passthru = { publisher = "mtxr", name = "sqltools-driver-sqlite" }
 src.vsmarketplace = "mtxr.sqltools"
 fetch.vsmarketplace = "mtxr.sqltools"
 passthru = { publisher = "mtxr", name = "sqltools" }
+
+[gopls]
+src.github_tag = "golang/tools"
+src.include_regex = "gopls/v[0-9]+\\.[0-9]+\\.[0-9]+"
+fetch.github = "golang/tools"
