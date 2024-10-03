@@ -13,7 +13,7 @@
   xdg = {
     enable = true;
     configFile."mimeapps.list".force = true;
-    cacheHome = config.home.homeDirectory + "/.local/cache";
+    cacheHome = "${config.home.homeDirectory}/.local/cache";
     configHome = "${config.home.homeDirectory}/.config";
     dataHome = "${config.home.homeDirectory}/.local/share";
     systemDirs = {
