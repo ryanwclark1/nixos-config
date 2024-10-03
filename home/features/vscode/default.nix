@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   ...
 }:
@@ -277,9 +278,11 @@
         "evenBetterToml.taplo.path" = "${pkgs.taplo}/bin/taplo";
 
         # Go
+        "go.useLanguageServer" = true;
         "go.alternateTools" = {
-          "gopls" = "${pkgs.gopls}/bin/gopls";
-          "dlv" = "${pkgs.delve}/bin/dlv";
+          "gopls" = "${config.home.homeDirectory}/go/bin/gopls";
+          "dlv" = "${config.home.homeDirectory}/go/bin/dlv";
+          "dlv-dap" = "${config.home.homeDirectory}/go/bin/dlv-dap";
         };
         "gopls" = {
           "formatting.gofumpt" = true;
