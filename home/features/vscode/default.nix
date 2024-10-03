@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs,
   ...
 }:
@@ -36,7 +37,6 @@
         ms-vscode-remote.remote-ssh
         ms-vscode-remote.remote-containers
         ms-vscode.cmake-tools
-        # ms-vscode.cpptools
         ms-vscode.hexeditor
         ms-vscode.makefile-tools
         bradlc.vscode-tailwindcss
@@ -65,17 +65,11 @@
         wholroyd.jinja # Prefer Better Jinja
         yzhang.markdown-all-in-one
       ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
-        # {
-        #   name = "python";
-        #   publisher = "ms-python";
-        #   version = "2024.14.1";
-        #   sha256 = "sha256-NhE3xATR4D6aAqIT/hToZ/qzMvZxjTmpTyDoIrdvuTE=";
-        # }
         {
-          name = "bun-vscode";
-          publisher = "oven";
-          version = "0.0.15";
-          sha256 = "sha256-9aoDDO7hh+YPTKh64z3rZhnTW5H8Se3+ZTncGrsKyJ0=";
+          name = "alpine-js-intellisense";
+          publisher = "adrianwilczynski";
+          version = "1.2.0";
+          sha256 = "sha256-Klx5ZvV06lXIJ3Q/mzq3KBjPpdROoxDkgEu7MBO+RhI=";
         }
         {
           name = "ansible";
@@ -83,19 +77,13 @@
           version = "24.9.5152897";
           sha256 = "sha256-USQT2kZ6R2fuV+jOmqfHoeTGEMuZn/zN7OsDkq/Kz9M=";
         }
-        # {
-        #   name = "kiota";
-        #   publisher = "ms-graph";
-        #   version = "1.19.24091201";
-        #   sha256 = "sha256-Y+ZWhpmfJ4bmeLiOBACdb839vKtwmsFRmimKFpIVOyA=";
-        # }
         {
-          name = "vscode-thunder-client";
-          publisher = "rangav";
-          version = "2.25.5";
-          sha256 = "sha256-uwHsTMi1huo8VhVuAynzGbZbBiEPBSqBOAsz3CCvvgM=";
+          name = "bun-vscode";
+          publisher = "oven";
+          version = "0.0.15";
+          sha256 = "sha256-9aoDDO7hh+YPTKh64z3rZhnTW5H8Se3+ZTncGrsKyJ0=";
         }
-        {
+{
           name = "copilot";
           publisher = "github";
           version = "1.229.0";
@@ -108,22 +96,34 @@
           sha256 = "sha256-HCPUufTZdukDmvP4/90K1x6bPq281Y02RpRds0vDL3U=";
         }
         {
+          name = "htmx-attributes";
+          publisher = "craigrbroughton";
+          version = "0.8.0";
+          sha256 = "sha256-TsemPZkq2Z13/vahRaP7z206BJaCZ1TR6OVv6aeDvyk=";
+        }
+        {
+          name = "remote-explorer";
+          publisher = "ms-vscode";
+          version = "0.5.2024070409";
+          sha256 = "sha256-YwmsZii8TvBhloNQi6mezusEf/SmIq3i1ZNyKN5j1sU=";
+        }
+        {
           name = "remotehub";
           publisher = "github";
           version = "0.64.0";
           sha256 = "sha256-Nh4PxYVdgdDb8iwHHUbXwJ5ZbMruFB6juL4Yg/wdKMY=";
         }
-        # {
-        #   name = "nord-deep";
-        #   publisher = "marlosirapuan";
-        #   version = "0.1.625";
-        #   sha256 = "sha256-5QJ1zq5vc9PdJHTtpczR/Jf6aqi8qOx/6yUru4TLiQc=";
-        # }
         {
-          name = "vscode-speech";
-          publisher = "ms-vscode";
-          version = "0.10.0";
-          sha256 = "sha256-ef5uzpXVS92snyM47PwTcAhCKKwfn4iQFvZxMev4X58=";
+          name = "sqlite-viewer";
+          publisher = "qwtel";
+          version = "0.6.4";
+          sha256 = "sha256-wDSWQ36j6zMUD43PqP+x9VRxgDJJexFpxMyuHpbCi2s=";
+        }
+        {
+          name = "tailwind-color-matcher";
+          publisher = "OmriGrossman";
+          version = "1.0.8";
+          sha256 = "sha256-WfFg1h5tY43W9YqgXkHDlxjRquFupuvLBwotTw0XoNk=";
         }
         {
           name = "templ";
@@ -132,28 +132,10 @@
           sha256 = "sha256-RZ++wxL2OqBh3hiLAwKIw5QLjU/imsK7irQUHbJ/tqM=";
         }
         {
-          name = "htmx-attributes";
-          publisher = "craigrbroughton";
-          version = "0.8.0";
-          sha256 = "sha256-TsemPZkq2Z13/vahRaP7z206BJaCZ1TR6OVv6aeDvyk=";
-        }
-        {
-          name = "alpine-js-intellisense";
-          publisher = "adrianwilczynski";
-          version = "1.2.0";
-          sha256 = "sha256-Klx5ZvV06lXIJ3Q/mzq3KBjPpdROoxDkgEu7MBO+RhI=";
-        }
-        # {
-        #   name = "ruff";
-        #   publisher = "charliermarsh";
-        #   version = "2024.48.0";
-        #   sha256 = "sha256-ZjEkJSZTL5G99clytDfntWmqJKfcJ9IYrOvJ+X+GN70=";
-        # }
-        {
-          name = "remote-explorer";
-          publisher = "ms-vscode";
-          version = "0.5.2024070409";
-          sha256 = "sha256-YwmsZii8TvBhloNQi6mezusEf/SmIq3i1ZNyKN5j1sU=";
+          name = "vscode-gitops-tools";
+          publisher = "weaveworks";
+          version = "0.27.0";
+          sha256 = "sha256-7MCKDnHCot/CL/SqZ2WuTxbqFdF75EC5WC+OxW0dcaE=";
         }
         {
           name = "vscode-jsonnet";
@@ -162,28 +144,16 @@
           sha256 ="sha256-8t/9EJs9Ly6C89jM6HdCbeAdIvjSfePKD2WQwBtuJI0=";
         }
         {
-          name = "vscode-gitops-tools";
-          publisher = "weaveworks";
-          version = "0.27.0";
-          sha256 = "sha256-7MCKDnHCot/CL/SqZ2WuTxbqFdF75EC5WC+OxW0dcaE=";
-        }
-        # {
-        #   name = "vscode-terraform";
-        #   publisher = "hashicorp";
-        #   version = "2.29.5";
-        #   sha256 = "";
-        # }
-        {
-          name = "tailwind-color-matcher";
-          publisher = "OmriGrossman";
-          version = "1.0.8";
-          sha256 = "sha256-WfFg1h5tY43W9YqgXkHDlxjRquFupuvLBwotTw0XoNk=";
+          name = "vscode-speech";
+          publisher = "ms-vscode";
+          version = "0.10.0";
+          sha256 = "sha256-ef5uzpXVS92snyM47PwTcAhCKKwfn4iQFvZxMev4X58=";
         }
         {
-          name = "sqlite-viewer";
-          publisher = "qwtel";
-          version = "0.6.4";
-          sha256 = "sha256-wDSWQ36j6zMUD43PqP+x9VRxgDJJexFpxMyuHpbCi2s=";
+          name = "vscode-thunder-client";
+          publisher = "rangav";
+          version = "2.25.5";
+          sha256 = "sha256-uwHsTMi1huo8VhVuAynzGbZbBiEPBSqBOAsz3CCvvgM=";
         }
         {
           name = "yuck";
@@ -278,15 +248,97 @@
         "evenBetterToml.taplo.path" = "${pkgs.taplo}/bin/taplo";
 
         # Go
-        "go.useLanguageServer" = true;
-        "go.alternateTools" = {
-          "gopls" = "${config.home.homeDirectory}/go/bin/gopls";
-          "dlv" = "${config.home.homeDirectory}/go/bin/dlv";
-          "dlv-dap" = "${config.home.homeDirectory}/go/bin/dlv-dap";
+        "go" = {
+          "alternateTools" = {
+            "dlv" = "${pkgs.delve}/bin/dlv";
+            "gopls" = "${pkgs.gopls}/bin/gopls";
+            "go" = "${lib.getExe config.programs.go.package}";
+          };
+          "delveConfig" = {
+            "apiVersion" = 2;
+            "debugAdapter" = "dlv-dap";
+            "showLog" = true;
+          };
+          "editorContextMenuCommands" = {
+              "addImport" = true;
+              "addTags" = true;
+              "benchmarkAtCursor" = false;
+              "debugTestAtCursor" = true;
+              "fillStruct" = false;
+              "generateTestForFile" = false;
+              "generateTestForFunction" = true;
+              "generateTestForPackage" = false;
+              "playground" = true;
+              "removeTags" = false;
+              "testAtCursor" = true;
+              "testCoverage" = true;
+              "testFile" = false;
+              "testPackage" = false;
+              "toggleTestFile" = true;
+          };
+          "enableCodeLens" = {
+            "runtest" = true;
+          };
+          "playground" = {
+            "openbrowser" = true;
+            "run" = true;
+            "share" = true;
+          };
+          "showWelcome" = false;
+          "survey.prompt" = false;
+          "tasks.provideDefault" = true;
+          "terminal.activateEnvironment" = true;
+          "testExplorer" = {
+            "enable" = true;
+            "alwaysRunBenchmarks" = true;
+            "concatenateMessages" = true;
+            "packageDisplayMode" = "nested";
+            "showDynamicSubtestsInEditor" = false;
+            "showOutput" = true;
+          };
+          "testTimeout" = "30s";
+          "trace.server" = "messages";
+          "useLanguageServer" = true;
         };
         "gopls" = {
+          "build.directoryFilters" = [
+            "-**/node_modules"
+          ];
           "formatting.gofumpt" = true;
-          "ui.diagnostic.staticcheck" = true;
+          "formatting.templateExtensions" = [
+            "tmpl"
+            "templ"
+          ];
+          "ui" = {
+            "codelenses" = {
+              "generate" = true;
+              "gc_details" = true;
+              "regenerate_cgo" = true;
+              "run_govulncheck" = false;
+              "test" = true;
+              "tidy" = true;
+              "upgrade_dependency" = true;
+              "vendor" = true;
+            };
+            "completion" = {
+              "completeFunctionCalls" = true;
+              "experimentalPostfixCompletions" = true;
+              "matcher" = "fuzzy";
+              "usePlaceholders" = true;
+            };
+            "diagnostic" = {
+              "analysisProgressReporting" = true;
+              "diagnosticsTrigger" = "Edit";
+              "hoverKind" = "Structured";
+              "staticcheck" = true;
+            };
+            "navigation" = {
+              "importShortcut" = "Both";
+              "symbolMatcher" = "Fuzzy"; #Default FastFuzzy
+              "symbolScope" = "all";
+              "symbolStyle" = "Dynamic";
+            };
+          };
         };
 
         # JSON
