@@ -5,6 +5,7 @@
     lsp-lines = {enable = true;};
     lsp-format = {enable = true;};
     helm = {enable = true;};
+    web-devicons = {enable = true;};
     lsp = {
       enable = true;
       inlayHints = true;
@@ -33,7 +34,7 @@
         pyright = {enable = true;};
         gopls = {enable = true;};
         terraformls = {enable = true;};
-        tsserver = {enable = true;};
+        ts-ls = {enable = true;};
         ansiblels = {enable = true;};
         jsonls = {enable = true;};
         helm-ls = {
