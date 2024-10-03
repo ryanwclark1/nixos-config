@@ -23,10 +23,9 @@ in
 
   programs.git = {
     enable = true;
-    package = pkgs.gitAndTools.gitFull;
+    package = pkgs.git;
     userName = "Ryan Clark";
     userEmail = "ryanc@accentservices.com";
-    lfs.enable = true;
 
     aliases = {
       p = "pull --ff-only";
@@ -36,6 +35,9 @@ in
       add-nowhitespace = "!git diff -U0 -w --no-color | git apply --cached --ignore-whitespace --unidiff-zero -";
     };
 
+    attributes = [
+      "*.pdf diff=pdf"
+    ];
 
     ignores = [
       ".direnv"
@@ -91,6 +93,15 @@ in
         decorations = true;
         true-color = "always";
       };
+    };
+
+    hooks = {
+      pre-commit = ./pre-commit-script;
+    };
+
+    lfs = {
+      enable = true;
+      skipSmudge = false;
     };
 
     extraConfig = {
