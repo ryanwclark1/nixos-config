@@ -168,13 +168,16 @@
         "breadcrumbs.enabled" = true;
 
         "diffEditor.codeLens" = true;
+        "diffEditor.experimental.showMoves" = true;
+        "diffEditor.diffAlgorithm" = "advanced";
+        "diffEditor.maxFileSize" = 0;
+        "diffEditor.renderIndicators" = true;
 
-        "editor.accessibilityPageSize" = 500;
-        # "editor.fontFamily" = "JetBrains Mono, Fira Code, Menlo, Monaco, 'Courier New', monospace";
+        "editor.accessibilityPageSize" = 5000;
+        "editor.experimental.treeSitterTelemetry" = false;
         "editor.fontLigatures" = true;
-        # "editor.fontSize" = 12;
-        # "editor.fontVariations" = true;
-        # "editor.fontWeight" = "normal";
+        "editor.foldingMaximumRegions" = 10000;
+        "editor.foldingStrategy" = "auto";
         "editor.formatOnPaste" = true;
         "editor.formatOnSave" = true;
         "editor.formatOnType" = true;
@@ -206,6 +209,8 @@
         "emmet.includeLanguages" = {
           "javascript" = "javascriptreact";
           "typescript" = "typescriptreact";
+          "vue-html" = "html";
+          "templ" = "html";
         };
         "emmet.triggerExpansionOnTab" = true;
 
@@ -213,12 +218,13 @@
         "files.associations" = {
           "*.css" = "tailwindcss";
         };
-        "files.exclude" = { "**/node_modules/**" = true; };
+        "files.exclude" = {
+          "**/node_modules/**" = true;
+          "**/venv/**" = true;
+        };
         "files.autoSave" = "afterDelay";
         "files.trimTrailingWhitespace" = true;
-
         "telemetry.telemetryLevel" = "off";
-
         "terminal.integrated.fontFamily" = "JetBrainsMono Nerd Font";
         "terminal.integrated.copyOnSelection" = true;
         "terminal.integrated.defaultProfile.linux" = "bash";
@@ -227,20 +233,120 @@
         "terminal.integrated.enableImages" = true;
         "terminal.integrated.customGlyphs" = true;
         "terminal.integrated.environmentChangesIndicator" = "off";
+        "window.zoomLevel" = 1;
+        "workbench.editor.enablePreview" = true;
+        "workbench.colorTheme" = "Catppuccin Frappé";
+        "workbench.externalBrowser" = "chrome";
 
+        "html-css-class-completion.enableEmmetSupport" = true;
+        "html-css-class-completion.enableFindUsage" = true;
+        "html-css-class-completion.enableScssFindUsage" = true;
+
+        # Code Runner
         "code-runner.enableAppInsights" = false;
+
+        "github.copilot.editor.enableAutoCompletions" = true;
+        "github.copilot.enable" = {
+          "c" = true;
+          "cpp" = true;
+          "csharp" = true;
+          "dockercompose" = true;
+          "css" = true;
+          "cuda-cpp" = true;
+          "diff" = true;
+          "dockerfile" = true;
+          "erlang" = true;
+          "fsharp" = true;
+          "git-commit" = true;
+          "git-rebase" = true;
+          "go" = true;
+          "groovy" = true;
+          "handlebars" = true;
+          "haml" = true;
+          "haskell" = true;
+          "html" = true;
+          "ini" = true;
+          "java" = true;
+          "javascript" = true;
+          "javascriptreact" = true;
+          "json" = true;
+          "jsonc" = true;
+          "julia" = true;
+          "latex" = true;
+          "less" = true;
+          "lua" = true;
+          "makefile" = true;
+          "markdown" = true;
+          "objective-c" = true;
+          "objective-cpp" = true;
+          "ocaml" = true;
+          "perl" = true;
+          "php" = true;
+          "plaintext" = true;
+          "powershell" = true;
+          "pug" = true;
+          "python" = true;
+          "r" = true;
+          "ruby" = true;
+          "rust" = true;
+          "scss" = true;
+          "sass" = true;
+          "shellscript" = true;
+          "slim" = true;
+          "sql" = true;
+          "stylus" = true;
+          "svelte" = true;
+          "swift" = true;
+          "typescript" = true;
+          "typescriptreact" = true;
+          "tex" = true;
+          "vue" = true;
+          "vue-html" = true;
+          "xml" = true;
+          "xsl" = true;
+          "yaml" = true;
+        };
+        "github.copilot.inlineSuggest.enable" = true;
+
+        "github.copilot.chat.experimental.generateTests.codeLens" = true;
+        "github.copilot.chat.experimental.inlineChatCompletionTrigger.enabled" = true;
+        "github.copilot.chat.experimental.startDebugging.enabled" = true;
+        "github.copilot.chat.experimental.temporalContext.enabled" = true;
+        "github.copilot.chat.localeOverride" = "en";
+        "github.copilot.chat.runCommand.enabled" = true;
+        "github.copilot.chat.useProjectTemplates" = true;
+        "github.copilot.chat.welcomeMessage" = "never";
+        "github.copilot.editor.enableCodeActions" = true;
+        # "github.copilot.preferredAccount" = "ryanwclark";
+        "github.copilot.renameSuggestions.triggerAutomatically" = true;
+
+
+        # Dev Containers
+        "dev.containers.dockerComposePath" = "${pkgs.docker}/bin/docker compose";
+        "dev.containers.dockerPath" = "${pkgs.docker}/bin/docker";
+        "dev.containers.defaultExtensionsIfInstalledLocally" = [
+          "GitHub.copilot"
+          "GitHub.copilot-chat"
+          "GitHub.vscode-pull-request-github"
+        ];
+        "dotfiles.repository" = "https://github.com/ryanwclark1/dotfiles.git";
+
+        # Docker
+        "docker.composeCommand" = "docker compose";
+        "docker.contexts.showInStatusBar" = true;
+        "docker.dockerPath" = "${pkgs.docker}/bin/docker";
+
+        # Draw.io
+        "hediet.vscode-drawio.plugins" = [
+          "number"
+          "sql"
+        ];
 
         # Nix IDE
         "nix.enableLanguageServer" = true;
         "nix.serverPath" = "${pkgs.nil}/bin/nil";
-        # "nix.serverSettings".nil = {
-        #   formatting.command = [ "nix" "fmt" "--" "-" ];
-        #   nix.flake = {
-        #     autoArchive = false;
-        #     autoEvalInputs = false;
-        #     nixpkgsInputName = null;
-        #   };
-        # };
+
+        # Redhat
         "redhat.telemetry.enabled" = false;
 
         # Even Better TOML
@@ -248,58 +354,64 @@
         "evenBetterToml.taplo.path" = "${pkgs.taplo}/bin/taplo";
 
         # Go
-        "go" = {
-          "alternateTools" = {
-            "dlv" = "${pkgs.delve}/bin/dlv";
-            "gopls" = "${pkgs.gopls}/bin/gopls";
-            "go" = "${lib.getExe config.programs.go.package}";
-          };
-          "delveConfig" = {
-            "apiVersion" = 2;
-            "debugAdapter" = "dlv-dap";
-            "showLog" = true;
-          };
-          "editorContextMenuCommands" = {
-              "addImport" = true;
-              "addTags" = true;
-              "benchmarkAtCursor" = false;
-              "debugTestAtCursor" = true;
-              "fillStruct" = false;
-              "generateTestForFile" = false;
-              "generateTestForFunction" = true;
-              "generateTestForPackage" = false;
-              "playground" = true;
-              "removeTags" = false;
-              "testAtCursor" = true;
-              "testCoverage" = true;
-              "testFile" = false;
-              "testPackage" = false;
-              "toggleTestFile" = true;
-          };
-          "enableCodeLens" = {
-            "runtest" = true;
-          };
-          "playground" = {
-            "openbrowser" = true;
-            "run" = true;
-            "share" = true;
-          };
-          "showWelcome" = false;
-          "survey.prompt" = false;
-          "tasks.provideDefault" = true;
-          "terminal.activateEnvironment" = true;
-          "testExplorer" = {
-            "enable" = true;
-            "alwaysRunBenchmarks" = true;
-            "concatenateMessages" = true;
-            "packageDisplayMode" = "nested";
-            "showDynamicSubtestsInEditor" = false;
-            "showOutput" = true;
-          };
-          "testTimeout" = "30s";
-          "trace.server" = "messages";
-          "useLanguageServer" = true;
+        "go.alternateTools" = {
+          "dlv" = "${pkgs.delve}/bin/dlv";
+          "dlv-dap" = "${pkgs.delve}/bin/dlv-dap";
+          "gopls" = "${pkgs.gopls}/bin/gopls";
+          "go" = "${lib.getExe config.programs.go.package}";
+          "gofumpt" = "${pkgs.gofumpt}/bin/gofumpt";
+          "golangci-lint" = "${pkgs.golangci-lint}/bin/golangci-lint";
+          "gotestsum" = "${pkgs.gotestsum}/bin/gotestsum";
+          "staticcheck" = "${pkgs.go-tools}/bin/staticcheck";
+          "templ" = "${pkgs.templ}/bin/templ";
         };
+        "go.delveConfig" = {
+          "apiVersion" = 2;
+          "debugAdapter" = "dlv-dap";
+          "showLog" = true;
+        };
+        "go.editorContextMenuCommands" = {
+          "addImport" = true;
+          "addTags" = true;
+          "benchmarkAtCursor" = false;
+          "debugTestAtCursor" = true;
+          "fillStruct" = false;
+          "generateTestForFile" = false;
+          "generateTestForFunction" = true;
+          "generateTestForPackage" = false;
+          "playground" = true;
+          "removeTags" = false;
+          "testAtCursor" = true;
+          "testCoverage" = true;
+          "testFile" = false;
+          "testPackage" = false;
+          "toggleTestFile" = true;
+        };
+        "go.enableCodeLens" = {
+          "runtest" = true;
+        };
+        "go.playground" = {
+          "openbrowser" = true;
+          "run" = true;
+          "share" = true;
+        };
+        "go.gopath" = "${config.home.homeDirectory}/go";
+        "go.goroot" = "${lib.getExe config.programs.go.package}";
+        "go.lintOnSave" = "golangci-lint";
+        "go.inferGopath" = true;
+        "go.showWelcome" = false;
+        "go.survey.prompt" = false;
+        "go.tasks.provideDefault" = true;
+        "go.terminal.activateEnvironment" = true;
+        "go.testExplorer.enable" = true;
+        "go.testExplorer.alwaysRunBenchmarks" = true;
+        "go.testExplorer.concatenateMessages" = true;
+        "go.testExplorer.packageDisplayMode" = "nested";
+        "go.testExplorer.showDynamicSubtestsInEditor" = false;
+        "go.testExplorer.showOutput" = true;
+        "go.testTimeout" = "30s";
+        "go.trace.server" = "messages";
+        "go.useLanguageServer" = true;
         "gopls" = {
           "build.directoryFilters" = [
             "-**/node_modules"
@@ -307,38 +419,29 @@
           "formatting.gofumpt" = true;
           "formatting.templateExtensions" = [
             "tmpl"
-            "templ"
           ];
-          "ui" = {
-            "codelenses" = {
-              "generate" = true;
-              "gc_details" = true;
-              "regenerate_cgo" = true;
-              "run_govulncheck" = false;
-              "test" = true;
-              "tidy" = true;
-              "upgrade_dependency" = true;
-              "vendor" = true;
-            };
-            "completion" = {
-              "completeFunctionCalls" = true;
-              "experimentalPostfixCompletions" = true;
-              "matcher" = "fuzzy";
-              "usePlaceholders" = true;
-            };
-            "diagnostic" = {
-              "analysisProgressReporting" = true;
-              "diagnosticsTrigger" = "Edit";
-              "hoverKind" = "Structured";
-              "staticcheck" = true;
-            };
-            "navigation" = {
-              "importShortcut" = "Both";
-              "symbolMatcher" = "Fuzzy"; #Default FastFuzzy
-              "symbolScope" = "all";
-              "symbolStyle" = "Dynamic";
-            };
+          "ui.codelenses" = {
+            "generate" = true;
+            "gc_details" = true;
+            "regenerate_cgo" = true;
+            "run_govulncheck" = false;
+            "test" = true;
+            "tidy" = true;
+            "upgrade_dependency" = true;
+            "vendor" = true;
           };
+          "ui.completion.completeFunctionCalls" = true;
+          "ui.completion.experimentalPostfixCompletions" = true;
+          "ui.completion.matcher" = "fuzzy";
+          "ui.completion.usePlaceholders" = true;
+          "ui.diagnostic.analysisProgressReporting" = true;
+          "ui.diagnostic.diagnosticsTrigger" = "Edit";
+          "ui.diagnostic.hoverKind" = "Structured";
+          "ui.diagnostic.staticcheck" = true;
+          "ui.navigation.importShortcut" = "Both";
+          "ui.navigation.symbolMatcher" = "Fuzzy";
+          "ui.navigation.symbolScope" = "all";
+          "ui.navigation.symbolStyle" = "Dynamic";
         };
 
         # JSON
@@ -362,8 +465,6 @@
           "listCount" = 3;
         };
 
-
-
         # Kubernetes
         "vs-kubernetes" = {
           "vs-kubernetes.crd-code-completion" = "enabled";
@@ -380,6 +481,11 @@
         # Configurations: https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss
         "tailwindCSS.includeLanguages" = {
           "plaintext" = "html";
+          "templ" = "html";
+          "vue-html" = "html";
+          "javascript" = "javascriptreact";
+          "typescript" = "typescriptreact";
+          "svelte" = "html";
         };
         "tailwindCSS.codeActions" = true;
         "tailwindCSS.colorDecorators" = true;
@@ -389,10 +495,12 @@
         "tailwindCSS.suggestions" = true;
         "tailwindCSS.validate" = true;
 
-        "window.zoomLevel" = 1;
-        "workbench.editor.enablePreview" = true;
-        "workbench.colorTheme" = "Catppuccin Frappé";
+        # Templ
+        "templ.pprof" = true;
+        "templ.goplsRPCTrace" = true;
 
+
+        # YAML
         "yaml.completion" = true;
         "yaml.extension.recommendations" = true;
         "yaml.format.bracketSpacing" = true;
