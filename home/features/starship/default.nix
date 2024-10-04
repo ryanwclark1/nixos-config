@@ -286,7 +286,7 @@ with config.lib.stylix.colors.withHashtag;
       character = {
         error_symbol = "[~>](bold ${base08})";
         success_symbol = "[](bold ${base0B})";
-        vimcmd_symbol = "[](bold ${base0A})";
+        vimcmd_symbol = "[](bold ${base0A})";
         vimcmd_visual_symbol = "[](bold ${base0C})";
         vimcmd_replace_symbol = "[](bold ${base0E})";
         vimcmd_replace_one_symbol = "[](bold ${base0E})";
