@@ -79,10 +79,11 @@
     #   valgrind
     # ];
   in
-  cargoSubCommands
-  ++ rustBasics
-  ++ externalLibs
-  ++ utils;
+  rustBasics;
+  # cargoSubCommands
+  # ++ rustBasics
+  # ++ externalLibs
+  # ++ utils;
 
   home.sessionVariables = {
     PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
