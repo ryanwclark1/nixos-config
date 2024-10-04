@@ -43,7 +43,7 @@
     ./features/shell
     ./features/starship
     ./features/sys-stats
-    # ./features/tmux
+    ./features/tmux
     ./features/virtviewer
     ./features/vhs
     ./features/vscode
