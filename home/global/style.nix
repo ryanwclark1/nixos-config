@@ -107,7 +107,7 @@ in
       wofi.enable = false;
       # xfce.enable = true;
       # xresources.enable = true;
-      yazi.enable = true;
+      yazi.enable = false;
       zathura.enable = true;
       zellij.enable = true;
     };
