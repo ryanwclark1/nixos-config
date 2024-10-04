@@ -27,6 +27,5 @@
   home.packages = with pkgs; [
     ripgrep-all
     sd
-    tree
   ];
 }
