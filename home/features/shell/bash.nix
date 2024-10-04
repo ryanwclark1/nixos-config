@@ -12,6 +12,7 @@
 
   programs.bash = {
     enable = true;
+    package = pkgs.bashInteractive;
     enableCompletion = true;
     enableVteIntegration = true;
     initExtra = ''
