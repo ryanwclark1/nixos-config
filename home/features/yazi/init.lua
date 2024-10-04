@@ -4,7 +4,6 @@
 
 -- require("starship"):setup{}
 require("folder-rules"):setup{}
-require("eza-preview"):setup()
 
 -- Show symlink in status bar
 function Status:name()

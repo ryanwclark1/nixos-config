@@ -120,9 +120,14 @@
         }
         # preview directories using eza, can be switched between list and tree modes.
         {
-          on = ["g" "e"];
-          run = "plugin --sync eza-preview";
+          on = ["E"];
+          run = "plugin eza-preview";
           desc = "Toggle tree/list dir preview";
+        }
+        {
+          on = ["c,m"];
+          run = "plugin chmod";
+          desc = "Chmod the selected files";
         }
       ];
       manager.keymap = [
