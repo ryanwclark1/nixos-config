@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   ...
 }:
@@ -29,9 +30,22 @@
     errcheck
     delve # debugger for the Go programming language
     gofumpt
-    gotestsum
+    gotestsum # 'go test' runner with output optimized
     golangci-lint
     go-callvis
+    go-tools
   ];
+
+  home.sessionPath = [
+    "${config.home.homeDirectory}/go/bin"
+  ];
+
+  home.file."${config.home.homeDirectory}/go/bin/gopls".source = "${pkgs.gopls}/bin/gopls";
+  home.file."${config.home.homeDirectory}/go/bin/staticcheck".source = "${pkgs.go-tools}/bin/staticcheck";
+
+  # home.mkOutOfStoreSymlink = "go" "${config.home.homeDirectory}/go" {
+  #   src = "${pkgs.go_1_23}";
+  # };
+  # home.homeDirectory. config.lib.file.mkOutOfStoreSymlink "${config.dotfiles}/config/zsh/p10k.zsh";
 
 }
