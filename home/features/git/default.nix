@@ -96,7 +96,7 @@ in
     };
 
     hooks = {
-      pre-commit = ./pre-commit-script;
+      # pre-commit = ./pre-commit-script;
     };
 
     lfs = {
