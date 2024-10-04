@@ -19,22 +19,25 @@ function Status:name()
   return ui.Line(" " .. h.name .. linked)
 end
 
+local catppuccin_theme = require("yatline-catppuccin"):setup("mocha") -- or "latte" | "frappe" | "macchiato"
+
 -- Yatline setup
 require("yatline"):setup({
 	section_separator = { open = "", close = "" },
 	part_separator = { open = "", close = "" },
 	inverse_separator = { open = "", close = "" },
 
-	style_a = {
-		fg = "black",
-		bg_mode = {
-			normal = "#a89984",
-			select = "#d79921",
-			un_set = "#d65d0e"
-		}
-	},
-	style_b = { bg = "#665c54", fg = "#ebdbb2" },
-	style_c = { bg = "#3c3836", fg = "#a89984" },
+	theme = catppuccin_theme,
+	-- style_a = {
+	-- 	fg = "black",
+	-- 	bg_mode = {
+	-- 		normal = "#a89984",
+	-- 		select = "#d79921",
+	-- 		un_set = "#d65d0e"
+	-- 	}
+	-- },
+	-- style_b = { bg = "#665c54", fg = "#ebdbb2" },
+	-- style_c = { bg = "#3c3836", fg = "#a89984" },
 
 	permissions_t_fg = "green",
 	permissions_r_fg = "yellow",
