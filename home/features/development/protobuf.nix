@@ -8,8 +8,6 @@
     protobuf
     protoc-gen-rust
     go-protobuf
-    buf-language-server
-    buf
     protolint
   ];
 }
