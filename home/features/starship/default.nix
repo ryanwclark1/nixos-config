@@ -1,6 +1,5 @@
 {
   config,
-  lib,
   pkgs,
   ...
 }:
@@ -10,6 +9,8 @@ with config.lib.stylix.colors.withHashtag;
 {
   programs.starship = {
     enable = true;
+    package = pkgs.starship;
+    # interactiveOnly = false;
     # Configuration written to ~/.config/starship.toml
     settings = {
       format = "[](${base0E})\$os\$username\$hostname\$localip\${custom.yazi}\[](bg:${base07} fg:${base0E})\$directory\[](fg:${base07} bg:${base05})\$git_branch\$git_status\[](fg:${base05} bg:${base0F})\$bun\$c\$cmake\$dart\$golang\$haskell\$java\$kotlin\$kubernetes\$lua\$nodejs\$php\$python\$rust\$swift\$zig[](fg:${base0F} bg:${base06})\$docker_context\[](fg:${base06})\$character";
