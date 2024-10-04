@@ -23,7 +23,7 @@
 
   programs.ags = {
     enable = true;
-    # configDir = ./config;
+    # configDir = ./backup;
     extraPackages = with pkgs; [
       gtksourceview
       webkitgtk
