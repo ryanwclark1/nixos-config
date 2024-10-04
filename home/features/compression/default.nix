@@ -5,13 +5,10 @@
 
 {
   home.packages = with pkgs; [
-    atool
+    ouch
     p7zip # needed for 7z files
     zip
     unzip
-    pigz
     rar
-    zstd
-    zpaq
   ];
 }
