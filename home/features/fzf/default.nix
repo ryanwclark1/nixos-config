@@ -1,11 +1,14 @@
 # TODO add config for fzf
 # A command-line fuzzy finder
 {
+  lib,
+  config,
   pkgs,
   ...
 }:
 
 {
+
   home.packages = with pkgs; [
     fzf-git-sh
   ];
@@ -38,6 +41,9 @@
       "--sort"
       "--exact"
     ];
+    enableBashIntegration = lib.mkIf config.programs.bash.enable true;
+    enableFishIntegration = lib.mkIf config.programs.fish.enable true;
+    enableZshIntegration = lib.mkIf config.programs.zsh.enable true;
   };
 
 }
