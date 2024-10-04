@@ -9,12 +9,17 @@
     package = pkgs.gh;
     gitCredentialHelper = {
       enable = true;
+      hosts = [
+        "https://github.com"
+        "https://gist.github.com"
+      ];
     };
     settings = {
       aliases = {
         co = "pr checkout";
         pv = "pr view";
       };
+      editor = "$EDITOR";
       git_protocal = "https";
     };
     extensions = with pkgs; [
@@ -23,6 +28,8 @@
       gh-dash # A beautiful CLI dashboard for GitHub 🚀
       gh-copilot # Ask for assistance right in your terminal
       gh-f # GitHub CLI ultimate FZF extension
+      gh-poi
+      gh-eco
     ];
   };
 
