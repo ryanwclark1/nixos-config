@@ -277,6 +277,7 @@ with config.lib.stylix.colors.withHashtag;
       custom.yazi = {
         description = "Indicate when the shell was launched by `yazi`";
         symbol = " ";
+        style = "bg:${base0E} fg:${base00}";
         when = '' test -n "$YAZI_LEVEL" '';
       };
 
