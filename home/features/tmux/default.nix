@@ -132,7 +132,7 @@ in
     escapeTime = 0;
     keyMode = "vi";
     mouse = true;
-    shell = "${pkgs.nushell}/bin/nu";
+    shell = "${pkgs.bashInteractive}/bin/bash";
     extraConfig = ''
       set-option -sa terminal-overrides ",xterm*:Tc"
       bind v copy-mode
@@ -157,8 +157,6 @@ in
       set-option -g window-status-format "${window_status}"
       set-option -g window-status-separator ""
     '';
-  };
-}
 
     # extraConfig = ''
     #   # Enable mouse
@@ -177,3 +175,6 @@ in
     #   set -g automatic-rename
     #   set -g automatic-rename-format '#{pane_current_command}'
     # '';
+
+  };
+}
