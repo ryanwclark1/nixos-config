@@ -17,7 +17,7 @@
     enableVteIntegration = true;
     initExtra = ''
       if [ -x "$(command -v fastfetch)" ]; then
-        fastfetch --config all 2>/dev/null
+        fastfetch 2>/dev/null
       fi
     '';
     bashrcExtra = ''
