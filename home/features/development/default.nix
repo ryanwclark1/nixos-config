@@ -10,7 +10,7 @@
     ./build.nix
     # ./devpod.nix
     # ./gitops.nix
-    ./gitui.nix
+    # ./gitui.nix
     ./go.nix
     ./grpc.nix
     ./js.nix
