@@ -28,6 +28,8 @@
     wl-mirror # Simple Wayland output mirror client
     ydotool # Command-line tool for automation which emulates input devices
     file-roller # Archive manager
+    webkitgtk # Web rendering engine
+    libsoup
   ];
 
 }
