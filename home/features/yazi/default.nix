@@ -37,6 +37,7 @@
     plugins = {
       arrow = ./plugins/arrow.yazi;
       chmod = ./plugins/chmod.yazi;
+      eza-preview = ./plugins/eza-preview.yazi;
       folder-rules = ./plugins/folder-rules.yazi;
       full-border = ./plugins/full-border.yazi;
       fzfbm = ./plugins/fzfbm.yazi;
@@ -46,11 +47,14 @@
       lazygit = ./plugins/lazygit.yazi;
       max-preview = ./plugins/max-preview.yazi;
       mediainfo = ./plugins/mediainfo.yazi;
+      ouch = ./plugins/ouch.yazi;
       parent-arrow = ./plugins/parent-arrow.yazi;
       smart-enter = ./plugins/smart-enter.yazi;
       smart-filter = ./plugins/smart-filter.yazi;
       smart-paste = ./plugins/smart-paste.yazi;
       starship = ./plugins/starship.yazi;
+      yatline = ./plugins/yatline.yazi;
+      yatline-catppuccin = ./plugins/yatline-catppuccin.yazi;
     };
     keymap = {
       manager.prepend_keymap = [
