@@ -23,6 +23,7 @@
     editor = "nvim";
     ripdrag = lib.getExe pkgs.ripdrag;
     wl-copy = "${pkgs.wl-clipboard}/bin/wl-copy";
+    pdf = "${pkgs.poppler_utils}/bin/pdftoppm";
   in
   {
     enable = true;
@@ -53,6 +54,7 @@
     };
     keymap = {
       manager.prepend_keymap = [
+        # https://yazi-rs.github.io/docs/tips/#dropping-to-shell
         {
           on   = "!";
           run  = ''shell "$SHELL" --block --confirm'';
@@ -128,6 +130,12 @@
           on = ["c,m"];
           run = "plugin chmod";
           desc = "Chmod the selected files";
+        }
+        # Compress files
+        {
+          on = ["C"];
+          run = "plugin ouch --args=zip";
+          desc = "Compress with ouch";
         }
       ];
       manager.keymap = [
@@ -2201,7 +2209,59 @@
             name = "*/";
             run = "eza-preview";
           }
-
+          {
+            mime = "application/*zip";
+            run = "ouch";
+          }
+          {
+            mime = "application/x-tar";
+            run = "ouch";
+          }
+          {
+            mime = "application/x-bzip2";
+            run = "ouch";
+          }
+          {
+            mime = "application/x-7z-compressed";
+            run = "ouch";
+          }
+          {
+            mime = "application/x-rar";
+            run = "ouch";
+          }
+          {
+            mime = "application/x-xz";
+            run = "ouch";
+          }
+          {
+            mime = "application/epub";
+            run = "${pdf}";
+          }
+          {
+            mime = "application/pdf";
+            run = "${pdf}";
+          }
+          # markdown files to glow
+          # {
+          #   name = "*.md";
+          #   run = "glow";
+          # }
+          # {
+          #   mime = "text/markdown";
+          #   run = "glow";
+          # }
+          {
+            mime = "{image,audio,video}/*";
+            run = "mediainfo";
+          }
+          {
+            mime = "application/x-subrip";
+            run = "mediainfo";
+          }
+          {
+            mime = "application/octet-stream";
+            run = "hexyl";
+          }
         ];
 
         previewers = [
@@ -2248,7 +2308,7 @@
           # PDF
           {
             mime = "application/pdf";
-            run = "pdf";
+            run = "${pdf}";
           }
 
           # Archive
@@ -2377,13 +2437,12 @@
     #       mpv = lib.getExe pkgs.mpv;
     #       xdg-utils = "${pkgs.xdg-utils}/bin/xdg-open";
     #       thumbnailer = lib.getExe pkgs.ffmpegthumbnailer;
-    #       pdftoppm = "${pkgs.poppler_utils}/bin/pdftoppm";
+
     #       dragon = lib.getExe pkgs.xdragon;
     #       ripdrag = lib.getExe pkgs.ripdrag;
     #       wl-copy = "${pkgs.wl-clipboard}/bin/wl-copy";
     #     in
     # {
-    #
     #     manager = {
     #       #  3-element array
     #       ratio = [
@@ -2400,68 +2459,6 @@
     #       show_symlink = false;
     #       prepend_keymap = [
 
-    #         # https://yazi-rs.github.io/docs/tips/#dropping-to-shell
-    #         {
-    #           on = ["!"];
-    #           run = ''shell $SHELL --block --confirm'';
-    #           desc = "Open shell here";
-    #         }
-    #         # Close input by once Esc press
-    #         {
-    #           on = ["<Esc>"];
-    #           run = "close";
-    #           desc = "Cancel input";
-    #         }
-
-    #         # Smart paste: paste files without entering the directory
-    #         {
-    #           on   = ["p"];
-    #           run  = "plugin --sync smart-paste";
-    #           desc = "Paste into the hovered directory or CWD";
-    #         }
-
-
-    #         # https://yazi-rs.github.io/docs/tips/#navigation-wraparound
-    #         # Navigation in the parent directory without leaving the CWD
-    #         {
-    #           on = ["K"];
-    #           run = "plugin --sync parent-arrow --args=-1";
-    #           desc = "Move the cursor down in the parent directory";
-    #         }
-    #         {
-    #           on = ["J"];
-    #           run = "plugin --sync parent-arrow --args=1";
-    #           desc = "Move the cursor up in the parent directory";
-    #         }
-    #         {
-    #           on = ["o"];
-    #           run = "open";
-    #           desc = "Open the selected files";
-    #         }
-    #         {
-    #           on = ["O"];
-    #           run = "open --interactive";
-    #           desc = "Open the selected files interactively";
-    #         }
-    #         {
-    #           on = ["Y"];
-    #           run = "unyank";
-    #           desc = "Cancel the yank status of files";
-    #         }
-    #         {
-    #           on = ["<PageUp>"];
-    #           run = "arrow -100%";
-    #           desc = "Move cursor up one page";
-    #         }
-    #         {
-    #           on = ["<PageDown>"];
-    #           run = "arrow 100%";
-    #           desc = "Move cursor down one page";
-    #         }
-    #         {
-    #           on = ["c,m"];
-    #           run = "plugin chmod";
-    #           desc = "Chmod the selected files";
     #         }
     #         # fzf bookmark
     #         # {
