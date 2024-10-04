@@ -30,7 +30,7 @@
     l = "eza -lhg";
     ll = "eza -alhg";
     lt = "eza --tree";
-    t = "eza -la --git-ignore --icons --tree --hyperlink --level 4";
+    # t = "eza -la --git-ignore --icons --tree --hyperlink --level 4";
     tree = "eza -la --git-ignore --icons --tree --hyperlink --level 4";
   };
 }
