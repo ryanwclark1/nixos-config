@@ -3,6 +3,8 @@
 # Updated when enter is pressed select not execute.
 
 {
+  config,
+  lib,
   pkgs,
   ...
 }:
@@ -11,9 +13,8 @@
   programs.atuin = {
     enable = true;
     package = pkgs.atuin;
-    # flags = [
-    #   "--disable-up-arrow"
-    # ];
+    flags = [
+    ];
     # https://docs.atuin.sh/configuration/config/
     settings = {
       # sync_address = "https://atuin.techcasa.io";
@@ -39,6 +40,10 @@
       keymap_mode = "vim-normal";
       prefers_reduced_motion = false;
     };
+    enableBashIntegration = lib.mkIf config.programs.bash.enable true;
+    enableFishIntegration = lib.mkIf config.programs.fish.enable true;
+    enableZshIntegration = lib.mkIf config.programs.zsh.enable true;
+    enableNushellIntegration = lib.mkIf config.programs.nushell.enable true;
 
   };
 }
