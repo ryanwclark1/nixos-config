@@ -9,7 +9,7 @@
   programs = {
     bash = {
       enable = true;
-      package = pkgs.bash;
+      package = pkgs.bashInteractive;
       blesh = {
         enable = true;
       };
