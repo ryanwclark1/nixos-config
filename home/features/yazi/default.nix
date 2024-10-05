@@ -55,6 +55,7 @@
       starship = ./plugins/starship.yazi;
       yatline = ./plugins/yatline.yazi;
       yatline-catppuccin = ./plugins/yatline-catppuccin.yazi;
+      yatline-githead = ./plugins/yatline-githead.yazi;
     };
     keymap = {
       manager.prepend_keymap = [
