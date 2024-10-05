@@ -23,7 +23,6 @@
     editor = "nvim";
     ripdrag = lib.getExe pkgs.ripdrag;
     wl-copy = "${pkgs.wl-clipboard}/bin/wl-copy";
-    pdf = "${pkgs.poppler_utils}/bin/pdftoppm";
   in
   {
     enable = true;
@@ -1991,8 +1990,8 @@
         max_width = 1200;
         max_height = 1800;
         cache_dir = "${config.home.homeDirectory}/.local/cache/yazi";
-        image_delay = 30;
-        image_filter = "triangle";
+        image_delay = 5;
+        # image_filter = "triangle";
         image_quality = 75;
         sixel_fraction = 15;
         ueberzug_scale = 1;
@@ -2162,7 +2161,6 @@
         suppress_preload = false;
       };
       plugin = {
-
         fetchers = [
           # Mimetype
           {
@@ -2171,7 +2169,6 @@
             run = ''"mime", if = "!mime", prio = "high"'';
           }
         ];
-
         preloaders = [
           # Image
           {
@@ -2208,74 +2205,25 @@
           }
 
         ];
-
-        prepend_previewers = [
-          {
-            name = "*/";
-            run = "eza-preview";
-          }
-          {
-            mime = "application/*zip";
-            run = "ouch";
-          }
-          {
-            mime = "application/x-tar";
-            run = "ouch";
-          }
-          {
-            mime = "application/x-bzip2";
-            run = "ouch";
-          }
-          {
-            mime = "application/x-7z-compressed";
-            run = "ouch";
-          }
-          {
-            mime = "application/x-rar";
-            run = "ouch";
-          }
-          {
-            mime = "application/x-xz";
-            run = "ouch";
-          }
-          {
-            mime = "application/epub";
-            run = "${pdf}";
-          }
-          {
-            mime = "application/pdf";
-            run = "${pdf}";
-          }
-          # markdown files to glow
-          # {
-          #   name = "*.md";
-          #   run = "glow";
-          # }
-          # {
-          #   mime = "text/markdown";
-          #   run = "glow";
-          # }
-          {
-            mime = "{image,audio,video}/*";
-            run = "mediainfo";
-          }
-          {
-            mime = "application/x-subrip";
-            run = "mediainfo";
-          }
-          {
-            mime = "application/octet-stream";
-            run = "hexyl";
-          }
-        ];
-
+        # prepend_previewers = [
+        #   {
+        #     name = "*/";
+        #     run = "eza-preview";
+        #   }
+        #   {
+        #     mime = "{image,audio,video}/*";
+        #     run = "mediainfo";
+        #   }
+        #   {
+        #     mime = "application/x-subrip";
+        #     run = "mediainfo";
+        #   }
+        #   {
+        #     mime = "application/octet-stream";
+        #     run = "hexyl";
+        #   }
+        # ];
         previewers = [
-          {
-            name = "*/";
-            run = "folder";
-            sync = true;
-          }
-
           # Code
           {
             mime = "text/*";
@@ -2313,7 +2261,7 @@
           # PDF
           {
             mime = "application/pdf";
-            run = "${pdf}";
+            run = "pdf";
           }
 
           # Archive
@@ -2345,7 +2293,8 @@
           }
 
           # Fallback
-          { name = "*";
+          {
+            name = "*";
             run = "file";
           }
         ];
