@@ -120,47 +120,67 @@ in
 
   programs.tmux = {
     enable = true;
+    package = pkgs.tmux;
     plugins = with pkgs.tmuxPlugins; [
       vim-tmux-navigator
       yank
+      fzf-tmux-url
     ];
-    prefix = "C-Space";
-    customPaneNavigationAndResize = true;
     aggressiveResize = true;
-    shortcut = "a";
     baseIndex = 1;
+    clock24 = true;
+    customPaneNavigationAndResize = true; # Override the hjkl and HJKL bindings for pane navigation and resizing in VI mode.
+    disableConfirmationPrompt = false;
     escapeTime = 0;
+    historyLimit = 10000;
     keyMode = "vi";
     mouse = true;
-    shell = "${pkgs.bashInteractive}/bin/bash";
+    newSession = false;
+    prefix = null;
+    resizeAmount = 5;
+    reverseSplit = false;
+    secureSocket = true;
+    sensibleOnTop = true;
+    shell = "${pkgs.zsh}/bin/zsh";
+    shortcut = "b";
+    terminal = "tmux-256color";
     extraConfig = ''
-      set-option -sa terminal-overrides ",xterm*:Tc"
-      bind v copy-mode
-      bind-key -T copy-mode-vi v send-keys -X begin-selection
-      bind-key -T copy-mode-vi C-v send-keys -X rectangle-toggle
-      bind-key -T copy-mode-vi y send-keys -X copy-selection-and-cancel
-      bind-key b set-option status
-      bind '"' split-window -v -c "#{pane_current_path}"
-      bind % split-window -h -c "#{pane_current_path}"
+      set -g renumber-windows on   # renumber all windows when any window is closed
+      set -g set-clipboard on      # use system clipboard
+      set -g status-interval 3     # update the status bar every 3 seconds
 
-      set-option -g default-terminal "screen-256color"
-      set-option -g status-right-length 100
-      set-option -g @indicator_color "yellow"
-      set-option -g @window_color "magenta"
-      set-option -g @main_accent "blue"
-      set-option -g pane-active-border fg=black
-      set-option -g pane-border-style fg=black
-      set-option -g status-style "bg=${bg} fg=${fg}"
-      set-option -g status-left "${indicator}"
-      set-option -g status-right "${git} ${pwd} ${separator} ${battery} ${time}"
-      set-option -g window-status-current-format "${current_window}"
-      set-option -g window-status-format "${window_status}"
-      set-option -g window-status-separator ""
+
+      set -g status-left "${indicator}"
+      set -g status-right "${git} ${pwd} ${separator} ${battery} ${time}"
+      set -g status-left-length 200    # increase length (from 10)
+      set -g status-right-length 200   # increase length (from 10)
+      set -g status-style "bg=default"
+
+      set -g @indicator_color "yellow"
+      set -g @window_color "magenta"
+      set -g @main_accent "blue"
+      set -g pane-active-border fg=black
+      set -g pane-border-style fg=black
+
+      set -g window-status-current-format "${current_window}"
+      set -g window-status-format "${window_status}"
+      set -g window-status-separator ""
+
+      # https://yazi-rs.github.io/docs/image-preview
+      set -g allow-passthrough all
+      set -ga update-environment TERM
+      set -ga update-environment TERM_PROGRAM
     '';
 
     # extraConfig = ''
-    #   # Enable mouse
-    #   set -g mouse on
+
+      # set -sa terminal-overrides ",xterm*:Tc"
+      # bind v copy-mode
+      # bind-key -T copy-mode-vi v send-keys -X begin-selection
+      # bind-key -T copy-mode-vi C-v send-keys -X rectangle-toggle
+      # bind-key -T copy-mode-vi y send-keys -X copy-selection-and-cancel
+      # bind '"' split-window -v -c "#{pane_current_path}"
+      # bind % split-window -h -c "#{pane_current_path}"
 
     #   # 2x C-a goes back and fourth between most recent windows
     #   bind-key C-a last-window
