@@ -3,7 +3,7 @@
 -- }
 
 -- require("starship"):setup{}
-require("folder-rules"):setup{}
+-- require("folder-rules"):setup{}
 
 -- Show symlink in status bar
 function Status:name()

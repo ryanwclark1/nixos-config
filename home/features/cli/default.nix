@@ -5,13 +5,9 @@
 
 {
   imports = [
-    ./aichat.nix
     ./bat.nix
     ./btop.nix
-    ./exiftool.nix
-    ./fx.nix
     ./gh.nix
-    ./gum.nix
     ./jq.nix
     ./mprocs.nix
     ./navi.nix
@@ -20,8 +16,6 @@
     ./nixtools.nix
     ./noti.nix
     ./tealdeer.nix
-    ./viu.nix
-    ./yq.nix
     ./zk.nix
   ];
   home.packages = with pkgs; [
@@ -33,5 +27,10 @@
     jdupes # Find duplicate files
     ncdu # TUI disk usage
     lazydocker # A simple terminal UI for both docker and docker-compose
+    gum # shell scripts
+    viu # Terminal image viewer with native support for iTerm and Kitty
+    yq-go #jq for yaml, command-line YAML processor https://github.com/mikefarah/yq
+    fx # Terminal JSON viewer
+    aichat # Use GPT-4(V), Gemini, LocalAI, Ollama and other LLMs in the terminal.
   ];
 }
