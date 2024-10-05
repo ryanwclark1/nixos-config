@@ -12,7 +12,7 @@
 
   programs.bash = {
     enable = true;
-    package = pkgs.bash;
+    package = pkgs.bashInteractive;
     enableCompletion = true;
     enableVteIntegration = true;
     initExtra = ''
@@ -20,10 +20,10 @@
         fastfetch 2>/dev/null
       fi
     '';
-    bashrcExtra = ''
-      eval "$(zoxide init bash)"
-      set -o vi
-    '';
+    # bashrcExtra = ''
+    #   eval "$(zoxide init bash)"
+    #   set -o vi
+    # '';
   };
 
 
