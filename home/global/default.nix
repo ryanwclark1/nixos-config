@@ -41,9 +41,9 @@
     username = lib.mkDefault "administrator";
     homeDirectory = lib.mkDefault "/home/${config.home.username}";
     stateVersion = lib.mkDefault "24.11";
-    sessionPath = [ "$HOME/.local/bin" ];
+    sessionPath = [ "${config.home.homeDirectory}/.local/bin" ];
     sessionVariables = {
-      FLAKE = lib.mkDefault "$HOME/nixos-config";
+      FLAKE = lib.mkDefault "${config.home.homeDirectory}/nixos-config";
       EDITOR = lib.mkDefault "${editor}";
     };
     shellAliases = rec{
