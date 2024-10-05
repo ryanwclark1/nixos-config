@@ -78,9 +78,10 @@ require("yatline"):setup({
         			{type = "string", custom = false, name = "date", params = {"%A, %d %B %Y"}},
 			},
 			section_b = {
-        			{type = "string", custom = false, name = "date", params = {"%X"}},
+        			{type = "string", custom = false, name = "date", params = {"%H:%M:%S"}},
 			},
 			section_c = {
+				{type = "coloreds", custom = false, name = "githead"},
 			}
 		}
 	},
@@ -111,4 +112,35 @@ require("yatline"):setup({
 			}
 		}
 	},
+})
+
+require("yatline-githead"):setup({
+	theme = catppuccin_theme,
+
+	show_branch = true,
+  branch_prefix = "on",
+  branch_symbol = "",
+  branch_borders = "()",
+
+  commit_symbol = "@",
+
+  show_behind_ahead = true,
+  behind_symbol = "⇣",
+  ahead_symbol = "⇡",
+
+  show_stashes = true,
+  stashes_symbol = "$",
+
+  show_state = true,
+  show_state_prefix = true,
+  state_symbol = "~",
+
+  show_staged = true,
+  staged_symbol = "+",
+
+  show_unstaged = true,
+  unstaged_symbol = "!",
+
+  show_untracked = true,
+  untracked_symbol = "?",
 })
