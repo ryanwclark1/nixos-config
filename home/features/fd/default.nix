@@ -20,7 +20,4 @@
     ];
   };
 
-  home.shellAliases = {
-    find = "fd";
-  };
 }
