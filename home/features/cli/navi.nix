@@ -30,7 +30,7 @@
         };
       };
       finder = {
-        command = "${pkgs.fzf}/bin/fzf";
+        command = "fzf";
         # overrides: --tac # equivalent to the --fzf-overrides option
         # overrides_var: --tac # equivalent to the --fzf-overrides-var option
       };
@@ -43,7 +43,7 @@
         tealdeer = true;
       };
       shell = {
-        command = "${pkgs.bash}/bin/bash";
+        command = "bash";
         finder_command = "bash";
       };
     };
