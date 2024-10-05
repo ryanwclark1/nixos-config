@@ -19,6 +19,7 @@
     ./network.nix
     ./nixtools.nix
     ./noti.nix
+    ./tealdeer.nix
     ./viu.nix
     ./yq.nix
     ./zk.nix
