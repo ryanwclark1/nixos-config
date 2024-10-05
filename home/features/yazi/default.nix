@@ -1948,19 +1948,19 @@
         ];
         conds = [
           # Special files
-          # { if = "orphan"; text = ""; }
-          # { if = "link"; text = ""; }
-          # { if = "block"; text = ""; }
-          # { if = "char"; text = ""; }
-          # { if = "fifo"; text = ""; }
-          # { if = "sock"; text = ""; }
-          # { if = "sticky"; text = ""; }
-          # { if = "dummy";  text = ""; }
+          { "if" = "orphan"; text = ""; }
+          { "if" = "link"; text = ""; }
+          { "if" = "block"; text = ""; }
+          { "if" = "char"; text = ""; }
+          { "if" = "fifo"; text = ""; }
+          { "if" = "sock"; text = ""; }
+          { "if" = "sticky"; text = ""; }
+          { "if" = "dummy";  text = ""; }
 
-          # # Fallback
-          # { if = "dir"; text = "󰉋"; }
-          # { if = "exec"; text = ""; }
-          # { if = "!dir"; text = "󰈔"; }
+          # Fallback
+          { "if" = "dir"; text = "󰉋"; }
+          { "if" = "exec"; text = ""; }
+          { "if" = "!dir"; text = "󰈔"; }
         ];
       };
     };
@@ -2161,12 +2161,26 @@
         suppress_preload = false;
       };
       plugin = {
-        fetchers = [
+        prepend_fetchers = [
+          # Mimetype
+          {
+            id = "mime";
+            "if" = "!mime";
+            name = "*";
+            run = "mime-ext";
+            prio = "high";
+          }
+        ];
+
+        fetchers =
+        [
           # Mimetype
           {
             id = "mime";
             name = "*";
-            run = ''"mime", if = "!mime", prio = "high"'';
+            run = "mime";
+            "if" = "!mime";
+            prio = "high";
           }
         ];
         preloaders = [
