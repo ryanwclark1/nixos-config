@@ -4,6 +4,6 @@
 
 {
   imports = [
-    ./cast_reciever.nix
+    ./cast_receiver.nix
   ]
 }
