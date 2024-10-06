@@ -34,7 +34,6 @@
     ../common/optional/webcam.nix
     ../common/optional/wireshark.nix
     ../common/optional/zsh.nix
-    ../common/optional/shanocast.nix
 
     ../common/optional/displaymanager/gdm.nix
     ../common/optional/gnome
