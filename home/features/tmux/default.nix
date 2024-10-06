@@ -1,113 +1,61 @@
 {
+  lib,
   pkgs,
+  stdenv,
   ...
 }:
 let
-  bg = "default";
-  fg = "default";
-  bg2 = "brightblack";
-  fg2 = "white";
-  color = c: "#{@${c}}";
+  # Define the path for tmux plugins
+  rtpPath = "share/tmux-plugins";
 
-  indicator = let
-    accent = color "indicator_color";
-    content = "  ";
-  in "#[reverse,fg=${accent}]#{?client_prefix,${content},}";
+  # Define the function to add tmux plugin
+  addRtp = path: rtpFilePath: attrs: derivation:
+    derivation // { rtp = "${derivation}/${path}/${rtpFilePath}"; } // {
+      overrideAttrs = f: mkTmuxPlugin (attrs // f attrs);
+    };
 
-  current_window = let
-    accent = color "main_accent";
-    index = "#[reverse,fg=${accent},bg=${fg}] #I ";
-    name = "#[fg=${bg2},bg=${fg2}] #W ";
-    # flags = "#{?window_flags,#{window_flags}, }";
-  in "${index}${name}";
+  # Define a tmux plugin derivation
+  mkTmuxPlugin = a@{
+    pluginName,
+    rtpFilePath ? (builtins.replaceStrings ["-"] ["_"] pluginName) + ".tmux",
+    namePrefix ? "tmuxplugin-",
+    src,
+    unpackPhase ? "",
+    configurePhase ? ":",
+    buildPhase ? ":",
+    addonInfo ? null,
+    preInstall ? "",
+    postInstall ? "",
+    path ? lib.getName pluginName,
+    ...
+  }:
+    if lib.hasAttr "dependencies" a then
+      throw "dependencies attribute is obsolete."
+    else addRtp "${rtpPath}/${path}" rtpFilePath a (stdenv.mkDerivation (a // {
+      pname = namePrefix + pluginName;
 
-  window_status = let
-    accent = color "window_color";
-    index = "#[reverse,fg=${accent},bg=${fg}] #I ";
-    name = "#[fg=${bg2},bg=${fg2}] #W ";
-    # flags = "#{?window_flags,#{window_flags}, }";
-  in "${index}${name}";
+      inherit pluginName unpackPhase configurePhase buildPhase addonInfo preInstall postInstall;
 
-  time = let
-    accent = color "main_accent";
-    format = "%H:%M";
-    icon = pkgs.writeShellScript "icon" ''
-      hour=$(date +%H)
-      if   [ "$hour" == "00" ] || [ "$hour" == "12" ]; then printf "󱑖"
-      elif [ "$hour" == "01" ] || [ "$hour" == "13" ]; then printf "󱑋"
-      elif [ "$hour" == "02" ] || [ "$hour" == "14" ]; then printf "󱑌"
-      elif [ "$hour" == "03" ] || [ "$hour" == "15" ]; then printf "󱑍"
-      elif [ "$hour" == "04" ] || [ "$hour" == "16" ]; then printf "󱑎"
-      elif [ "$hour" == "05" ] || [ "$hour" == "17" ]; then printf "󱑏"
-      elif [ "$hour" == "06" ] || [ "$hour" == "18" ]; then printf "󱑐"
-      elif [ "$hour" == "07" ] || [ "$hour" == "19" ]; then printf "󱑑"
-      elif [ "$hour" == "08" ] || [ "$hour" == "20" ]; then printf "󱑒"
-      elif [ "$hour" == "09" ] || [ "$hour" == "21" ]; then printf "󱑓"
-      elif [ "$hour" == "10" ] || [ "$hour" == "22" ]; then printf "󱑔"
-      elif [ "$hour" == "11" ] || [ "$hour" == "23" ]; then printf "󱑕"
-      fi
-    '';
-  in "#[reverse,fg=${accent}] ${format} #(${icon}) ";
+      installPhase = ''
+        runHook preInstall
 
-  battery = let
-    percentage = pkgs.writeShellScript "percentage" (
-      if pkgs.stdenv.isDarwin
-      then ''
-        echo $(pmset -g batt | grep -o "[0-9]\+%" | tr '%' ' ')
-      ''
-      else ''
-        path="/org/freedesktop/UPower/devices/DisplayDevice"
-        echo $(${pkgs.upower}/bin/upower -i $path | grep -o "[0-9]\+%" | tr '%' ' ')
-      ''
-    );
-    state = pkgs.writeShellScript "state" (
-      if pkgs.stdenv.isDarwin
-      then ''
-        echo $(pmset -g batt | awk '{print $4}')
-      ''
-      else ''
-        path="/org/freedesktop/UPower/devices/DisplayDevice"
-        echo $(${pkgs.upower}/bin/upower -i $path | grep state | awk '{print $2}')
-      ''
-    );
-    icon = pkgs.writeShellScript "icon" ''
-      percentage=$(${percentage})
-      state=$(${state})
-      if [ "$state" == "charging" ] || [ "$state" == "fully-charged" ]; then echo "󰂄"
-      elif [ $percentage -ge 75 ]; then echo "󱊣"
-      elif [ $percentage -ge 50 ]; then echo "󱊢"
-      elif [ $percentage -ge 25 ]; then echo "󱊡"
-      elif [ $percentage -ge 0  ]; then echo "󰂎"
-      fi
-    '';
-    color = pkgs.writeShellScript "color" ''
-      percentage=$(${percentage})
-      state=$(${state})
-      if [ "$state" == "charging" ] || [ "$state" == "fully-charged" ]; then echo "green"
-      elif [ $percentage -ge 75 ]; then echo "green"
-      elif [ $percentage -ge 50 ]; then echo "${fg2}"
-      elif [ $percentage -ge 30 ]; then echo "yellow"
-      elif [ $percentage -ge 0  ]; then echo "red"
-      fi
-    '';
-  in "#[fg=#(${color})]#(${icon}) #[fg=${fg}]#(${percentage})%";
+        target=$out/${rtpPath}/${path}
+        mkdir -p $out/${rtpPath}
+        cp -r . $target
+        if [ -n "$addonInfo" ]; then
+          echo "$addonInfo" > $target/addon-info.json
+        fi
 
-  pwd = let
-    accent = color "main_accent";
-    icon = "#[fg=${accent}] ";
-    format = "#[fg=${fg}]#{b:pane_current_path}";
-  in "${icon}${format}";
+        runHook postInstall
+      '';
+    }));
 
-  git = let
-    icon = pkgs.writeShellScript "branch" ''
-      git -C "$1" branch && echo " "
-    '';
-    branch = pkgs.writeShellScript "branch" ''
-      git -C "$1" rev-parse --abbrev-ref HEAD
-    '';
-  in "#[fg=magenta]#(${icon} #{pane_current_path})#(${branch} #{pane_current_path})";
-
-  separator = "#[fg=${fg}]|";
+  tmux-powerline = mkTmuxPlugin {
+    pluginName = "tmux-power";
+    version = "1.0";
+    rtpFilePath = "tmux-power.tmux";
+    src = ./plugins/tmux-power;
+  };
 in
 {
   home.shellAliases = {
@@ -121,11 +69,10 @@ in
   programs.tmux = {
     enable = true;
     package = pkgs.tmux;
-    plugins = with pkgs.tmuxPlugins; [
-      vim-tmux-navigator
-      yank
-      fzf-tmux-url
+    plugins = [
+      tmux-powerline
     ];
+    # with pkgs.tmuxPlugins;
     aggressiveResize = true;
     baseIndex = 1;
     clock24 = true;
@@ -144,7 +91,115 @@ in
     shell = "${pkgs.zsh}/bin/zsh";
     shortcut = "b";
     terminal = "tmux-256color";
-    extraConfig = ''
+    extraConfig =
+    let
+      bg = "default";
+      fg = "default";
+      bg2 = "brightblack";
+      fg2 = "white";
+      color = c: "#{@${c}}";
+
+      indicator = let
+        accent = color "indicator_color";
+        content = "  ";
+      in "#[reverse,fg=${accent}]#{?client_prefix,${content},}";
+
+      current_window = let
+        accent = color "main_accent";
+        index = "#[reverse,fg=${accent},bg=${fg}] #I ";
+        name = "#[fg=${bg2},bg=${fg2}] #W ";
+        # flags = "#{?window_flags,#{window_flags}, }";
+      in "${index}${name}";
+
+      window_status = let
+        accent = color "window_color";
+        index = "#[reverse,fg=${accent},bg=${fg}] #I ";
+        name = "#[fg=${bg2},bg=${fg2}] #W ";
+        # flags = "#{?window_flags,#{window_flags}, }";
+      in "${index}${name}";
+
+      time = let
+        accent = color "main_accent";
+        format = "%H:%M";
+        icon = pkgs.writeShellScript "icon" ''
+          hour=$(date +%H)
+          if   [ "$hour" == "00" ] || [ "$hour" == "12" ]; then printf "󱑖"
+          elif [ "$hour" == "01" ] || [ "$hour" == "13" ]; then printf "󱑋"
+          elif [ "$hour" == "02" ] || [ "$hour" == "14" ]; then printf "󱑌"
+          elif [ "$hour" == "03" ] || [ "$hour" == "15" ]; then printf "󱑍"
+          elif [ "$hour" == "04" ] || [ "$hour" == "16" ]; then printf "󱑎"
+          elif [ "$hour" == "05" ] || [ "$hour" == "17" ]; then printf "󱑏"
+          elif [ "$hour" == "06" ] || [ "$hour" == "18" ]; then printf "󱑐"
+          elif [ "$hour" == "07" ] || [ "$hour" == "19" ]; then printf "󱑑"
+          elif [ "$hour" == "08" ] || [ "$hour" == "20" ]; then printf "󱑒"
+          elif [ "$hour" == "09" ] || [ "$hour" == "21" ]; then printf "󱑓"
+          elif [ "$hour" == "10" ] || [ "$hour" == "22" ]; then printf "󱑔"
+          elif [ "$hour" == "11" ] || [ "$hour" == "23" ]; then printf "󱑕"
+          fi
+        '';
+      in "#[reverse,fg=${accent}] ${format} #(${icon}) ";
+
+      battery = let
+        percentage = pkgs.writeShellScript "percentage" (
+          if pkgs.stdenv.isDarwin
+          then ''
+            echo $(pmset -g batt | grep -o "[0-9]\+%" | tr '%' ' ')
+          ''
+          else ''
+            path="/org/freedesktop/UPower/devices/DisplayDevice"
+            echo $(${pkgs.upower}/bin/upower -i $path | grep -o "[0-9]\+%" | tr '%' ' ')
+          ''
+        );
+        state = pkgs.writeShellScript "state" (
+          if pkgs.stdenv.isDarwin
+          then ''
+            echo $(pmset -g batt | awk '{print $4}')
+          ''
+          else ''
+            path="/org/freedesktop/UPower/devices/DisplayDevice"
+            echo $(${pkgs.upower}/bin/upower -i $path | grep state | awk '{print $2}')
+          ''
+        );
+        icon = pkgs.writeShellScript "icon" ''
+          percentage=$(${percentage})
+          state=$(${state})
+          if [ "$state" == "charging" ] || [ "$state" == "fully-charged" ]; then echo "󰂄"
+          elif [ $percentage -ge 75 ]; then echo "󱊣"
+          elif [ $percentage -ge 50 ]; then echo "󱊢"
+          elif [ $percentage -ge 25 ]; then echo "󱊡"
+          elif [ $percentage -ge 0  ]; then echo "󰂎"
+          fi
+        '';
+        color = pkgs.writeShellScript "color" ''
+          percentage=$(${percentage})
+          state=$(${state})
+          if [ "$state" == "charging" ] || [ "$state" == "fully-charged" ]; then echo "green"
+          elif [ $percentage -ge 75 ]; then echo "green"
+          elif [ $percentage -ge 50 ]; then echo "${fg2}"
+          elif [ $percentage -ge 30 ]; then echo "yellow"
+          elif [ $percentage -ge 0  ]; then echo "red"
+          fi
+        '';
+      in "#[fg=#(${color})]#(${icon}) #[fg=${fg}]#(${percentage})%";
+
+      pwd = let
+        accent = color "main_accent";
+        icon = "#[fg=${accent}] ";
+        format = "#[fg=${fg}]#{b:pane_current_path}";
+      in "${icon}${format}";
+
+      git = let
+        icon = pkgs.writeShellScript "branch" ''
+          git -C "$1" branch && echo " "
+        '';
+        branch = pkgs.writeShellScript "branch" ''
+          git -C "$1" rev-parse --abbrev-ref HEAD
+        '';
+      in "#[fg=magenta]#(${icon} #{pane_current_path})#(${branch} #{pane_current_path})";
+
+      separator = "#[fg=${fg}]|";
+    in
+    ''
       set -g renumber-windows on   # renumber all windows when any window is closed
       set -g set-clipboard on      # use system clipboard
       set -g status-interval 3     # update the status bar every 3 seconds
