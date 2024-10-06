@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   ...
 }:
@@ -12,19 +13,23 @@
     tmk = "tmux kill-session -t";
   };
 
+  home.file.".config/tmux/plugins" = {
+    source = ./plugins;
+    recursive = true;
+  };
+
   programs.tmux = {
     enable = true;
     package = pkgs.tmux;
     plugins = with pkgs.tmuxPlugins; [
-      battery
       better-mouse-mode
-      # catppuccin
       copycat
       t-smart-tmux-session-manager
       sidebar
       fzf-tmux-url
-      power-theme
+      # power-theme
       resurrect
+      continuum
       session-wizard
       yank
     ];
@@ -156,32 +161,35 @@
       separator = "#[fg=${fg}]|";
     in
     ''
-      set -g renumber-windows on   # renumber all windows when any window is closed
-      set -g set-clipboard on      # use system clipboard
-      set -g status-interval 3     # update the status bar every 3 seconds
-
-
-      set -g status-left "${indicator}"
-      set -g status-right "${git} ${pwd} ${separator} ${battery} ${time}"
-      set -g status-left-length 200    # increase length (from 10)
-      set -g status-right-length 200   # increase length (from 10)
-      set -g status-style "bg=default"
-
-      set -g @indicator_color "yellow"
-      set -g @window_color "magenta"
-      set -g @main_accent "blue"
-      set -g pane-active-border fg=black
-      set -g pane-border-style fg=black
-
-      set -g window-status-current-format "${current_window}"
-      set -g window-status-format "${window_status}"
-      set -g window-status-separator ""
-
       # https://yazi-rs.github.io/docs/image-preview
       set -g allow-passthrough all
       set -ga update-environment TERM
       set -ga update-environment TERM_PROGRAM
+      run-shell "${config.home.homeDirectory}/.config/tmux/plugins/tmux-which-key/plugin.sh.tmux"
+      run-shell "${config.home.homeDirectory}/.config/tmux/plugins/tmux-powerline/main.tmux"
+
     '';
+
+      # set -g renumber-windows on   # renumber all windows when any window is closed
+      # set -g set-clipboard on      # use system clipboard
+      # set -g status-interval 3     # update the status bar every 3 seconds
+
+
+      # set -g status-left "${indicator}"
+      # set -g status-right "${git} ${pwd} ${separator} ${battery} ${time}"
+      # set -g status-left-length 200    # increase length (from 10)
+      # set -g status-right-length 200   # increase length (from 10)
+      # set -g status-style "bg=default"
+
+      # set -g @indicator_color "yellow"
+      # set -g @window_color "magenta"
+      # set -g @main_accent "blue"
+      # set -g pane-active-border fg=black
+      # set -g pane-border-style fg=black
+
+      # set -g window-status-current-format "${current_window}"
+      # set -g window-status-format "${window_status}"
+      # set -g window-status-separator ""
 
     # extraConfig = ''
 
@@ -206,6 +214,5 @@
     #   set -g automatic-rename
     #   set -g automatic-rename-format '#{pane_current_command}'
     # '';
-
   };
 }
