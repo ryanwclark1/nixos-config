@@ -1,62 +1,8 @@
 {
-  lib,
   pkgs,
-  stdenv,
   ...
 }:
-let
-  # Define the path for tmux plugins
-  rtpPath = "share/tmux-plugins";
 
-  # Define the function to add tmux plugin
-  addRtp = path: rtpFilePath: attrs: derivation:
-    derivation // { rtp = "${derivation}/${path}/${rtpFilePath}"; } // {
-      overrideAttrs = f: mkTmuxPlugin (attrs // f attrs);
-    };
-
-  # Define a tmux plugin derivation
-  mkTmuxPlugin = a@{
-    pluginName,
-    rtpFilePath ? (builtins.replaceStrings ["-"] ["_"] pluginName) + ".tmux",
-    namePrefix ? "tmuxplugin-",
-    src,
-    unpackPhase ? "",
-    configurePhase ? ":",
-    buildPhase ? ":",
-    addonInfo ? null,
-    preInstall ? "",
-    postInstall ? "",
-    path ? lib.getName pluginName,
-    ...
-  }:
-    if lib.hasAttr "dependencies" a then
-      throw "dependencies attribute is obsolete."
-    else addRtp "${rtpPath}/${path}" rtpFilePath a (stdenv.mkDerivation (a // {
-      pname = namePrefix + pluginName;
-
-      inherit pluginName unpackPhase configurePhase buildPhase addonInfo preInstall postInstall;
-
-      installPhase = ''
-        runHook preInstall
-
-        target=$out/${rtpPath}/${path}
-        mkdir -p $out/${rtpPath}
-        cp -r . $target
-        if [ -n "$addonInfo" ]; then
-          echo "$addonInfo" > $target/addon-info.json
-        fi
-
-        runHook postInstall
-      '';
-    }));
-
-  tmux-powerline = mkTmuxPlugin {
-    pluginName = "tmux-power";
-    version = "1.0";
-    rtpFilePath = "tmux-power.tmux";
-    src = ./plugins/tmux-power;
-  };
-in
 {
   home.shellAliases = {
     tm = "tmux";
@@ -69,8 +15,18 @@ in
   programs.tmux = {
     enable = true;
     package = pkgs.tmux;
-    plugins = [
-      tmux-powerline
+    plugins = with pkgs.tmuxPlugins; [
+      battery
+      better-mouse-mode
+      # catppuccin
+      copycat
+      t-smart-tmux-session-manager
+      sidebar
+      fzf-tmux-url
+      power-theme
+      resurrect
+      session-wizard
+      yank
     ];
     # with pkgs.tmuxPlugins;
     aggressiveResize = true;
