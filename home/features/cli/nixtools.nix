@@ -1,4 +1,6 @@
 {
+  config,
+  lib,
   pkgs,
   ...
 }:
@@ -33,6 +35,10 @@ in
 
   programs.nix-index = {
     enable = true;
+    package = pkgs.nix-index;
+    enableBashIntegration = lib.mkIf config.programs.bash.enable true;
+    enableFishIntegration = lib.mkIf config.programs.fish.enable true;
+    enableZshIntegration = lib.mkIf config.programs.zsh.enable true;
   };
 
   systemd.user.services.nix-index-database-sync = {
