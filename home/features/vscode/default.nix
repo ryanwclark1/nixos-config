@@ -306,7 +306,6 @@
           "xsl" = true;
           "yaml" = true;
         };
-        "github.copilot.inlineSuggest.enable" = true;
 
         "github.copilot.chat.experimental.generateTests.codeLens" = true;
         "github.copilot.chat.experimental.inlineChatCompletionTrigger.enabled" = true;
@@ -317,7 +316,6 @@
         "github.copilot.chat.useProjectTemplates" = true;
         "github.copilot.chat.welcomeMessage" = "never";
         "github.copilot.editor.enableCodeActions" = true;
-        # "github.copilot.preferredAccount" = "ryanwclark";
         "github.copilot.renameSuggestions.triggerAutomatically" = true;
 
 
