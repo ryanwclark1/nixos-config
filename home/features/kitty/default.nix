@@ -35,9 +35,12 @@ in
       enable_audio_bell = false;
       dynamic_background_opacity = true;
       allow_remote_control = true;
-      shellIntegration.enableZshIntegration = lib.mkIf config.programs.kitty.enable true;
-      shellIntegration.enableBashIntegration = lib.mkIf config.programs.kitty.enable true;
-      shellIntegration.enableFishIntegration = lib.mkIf config.programs.kitty.enable true;
+
+    };
+    shellIntegration = {
+      enableZshIntegration = lib.mkIf config.programs.kitty.enable true;
+      enableBashIntegration = lib.mkIf config.programs.kitty.enable true;
+      enableFishIntegration = lib.mkIf config.programs.kitty.enable true;
     };
   };
 }
