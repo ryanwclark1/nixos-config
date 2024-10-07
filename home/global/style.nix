@@ -79,7 +79,7 @@ in
         enable = true;
         variant256Colors = false;
       };
-      lazygit.enable = true;
+      lazygit.enable = false;
       mako.enable = false;
       neovim = {
         enable = true;
