@@ -10,13 +10,12 @@
     hidden = true;
     ignores = [
       ".git/"
-      "*.bak"
       ".env/"
       ".venv/"
       "node_modules/"
     ];
     extraOptions = [
-      "--absolute-path"
+      "--color auto"
     ];
   };
 
