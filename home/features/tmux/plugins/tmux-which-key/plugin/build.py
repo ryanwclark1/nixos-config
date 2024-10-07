@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/usr/bin/env nix-shell
+#!nix-shell -i python3 -p "python3.withPackages(ps: [ ps.pyyaml ])"
 
 import argparse
 import logging
@@ -7,7 +8,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
 
-from pyyaml.lib import yaml
+# from pyyaml.lib import yaml
+import yaml
 
 special_key_chars: List[str] = ['~']
 

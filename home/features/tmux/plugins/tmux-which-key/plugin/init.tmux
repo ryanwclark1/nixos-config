@@ -10,7 +10,6 @@ display -p '[tmux-which-key] Loading plugin ...'
 # User options
 #
 
-# set -g @wk_cfg_key_root_table "C-Space"
 set -g @wk_cfg_key_prefix_table "Space"
 set -g @wk_cfg_title_style "align=centre,bold"
 set -g @wk_cfg_title_prefix "tmux"
@@ -162,9 +161,6 @@ respawnp -k -c #{pane_current_path}'
 #
 # Keybindings
 #
-
-# display -p "[tmux-which-key] Binding root table key to #{@wk_cfg_key_root_table} ..."
-# run-shell "tmux bind-key -Troot #{@wk_cfg_key_root_table} show-wk-menu-root"
 
 display -p "[tmux-which-key] Binding prefix table key to #{@wk_cfg_key_prefix_table} ..."
 run-shell "tmux bind-key -Tprefix #{@wk_cfg_key_prefix_table} show-wk-menu-root"
