@@ -16,25 +16,33 @@
   programs.fzf = {
     enable = true;
     package = pkgs.fzf;
-    changeDirWidgetCommand = "fd --type directory";
+    tmux = {
+      enableShellIntegration = lib.mkIf config.programs.tmux.enable true;
+      # fzf-tmux --help
+      shellIntegrationOptions = [
+        "-d 50%"
+      ];
+    };
+    changeDirWidgetCommand = "fd --type directory --hidden --strip-cwd-prefix --exclude .git";
     changeDirWidgetOptions =
     [
-      "--preview 'tree -C {} | head -200'"
+      "--preview 'eza --tree --color=always {} | head -200'"
     ];
-    defaultCommand = "fd --type file --exclude .git";
+    defaultCommand = "fd --hidden --strip-cwd-prefix --exclude .git";
     defaultOptions = [
       # "--preview='pistol {}'"
-      "--height=40%"
-      "--layout=reverse"
-      "--info=inline"
-      "--border"
-      "--margin=1"
-      "--padding=1"
-      "--border"
+      # "--ansi"
+      # "--height=40%"
+      # "--layout=reverse"
+      # "--info=inline"
+      # "--border"
+      # "--margin=1"
+      # "--padding=1"
+      # "--border"
     ];
-    fileWidgetCommand = "fd --type file --exclude .git";
+    fileWidgetCommand = "fd --type file --follow --hidden --strip-cwd-prefix --exclude .git";
     fileWidgetOptions = [
-      "--preview 'bat --color=always {}'"
+      "--preview 'bat --style=numbers --line-range=:500 {}'"
       # "--preview 'head {}'"
     ];
     historyWidgetOptions = [
