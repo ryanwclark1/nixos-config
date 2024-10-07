@@ -49,7 +49,7 @@
       MANPAGER = lib.mkDefault "sh -c 'col -bx | bat -l man -p'";
     };
     shellAliases = rec{
-      jqless = "jq -C | less -r";
+      jqless = "jq -C | bat --pager 'less RF' --style=numbers --color=always";
 
       n = "nix";
       nd = "nix develop -c $SHELL";
