@@ -1,5 +1,7 @@
 # An interactive cheatsheet tool for the command-line
 {
+  config,
+  lib,
   pkgs,
   ...
 }:
@@ -9,9 +11,9 @@
     enable = true;
     package = pkgs.navi;
     # conflicts with Control G -> GH
-    # enableBashIntegration = lib.mkIf config.programs.bash.enable true;
-    # enableFishIntegration = lib.mkIf config.programs.fish.enable true;
-    # enableZshIntegration = lib.mkIf config.programs.zsh.enable true;
+    enableBashIntegration = lib.mkIf config.programs.bash.enable false;
+    enableFishIntegration = lib.mkIf config.programs.fish.enable false;
+    enableZshIntegration = lib.mkIf config.programs.zsh.enable false;
     settings = {
       # finder = {
       #   command = "fzf";
