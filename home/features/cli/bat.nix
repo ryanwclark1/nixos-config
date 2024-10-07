@@ -18,6 +18,7 @@
   };
 
   home.shellAliases = {
-    cat = "bat -p";
+    cat = "bat --plain --color=always";
+    less = "bat --pager 'less RF' --style=numbers --color=always";
   };
 }
