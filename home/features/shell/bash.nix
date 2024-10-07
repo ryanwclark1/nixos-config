@@ -27,8 +27,5 @@
   };
 
 
-  programs.nix-index.enableBashIntegration = lib.mkIf config.programs.nix-index.enable true;
-  programs.kitty.shellIntegration.enableBashIntegration = lib.mkIf config.programs.kitty.enable true;
-  programs.zellij.enableBashIntegration = lib.mkIf config.programs.zellij.enable false;
 
 }
