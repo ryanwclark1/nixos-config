@@ -16,6 +16,7 @@
     ./nixtools.nix
     ./noti.nix
     ./tealdeer.nix
+    ./thefuck.nix
     ./zk.nix
   ];
   home.packages = with pkgs; [
