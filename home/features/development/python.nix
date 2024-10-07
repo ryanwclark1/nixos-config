@@ -11,7 +11,7 @@
     functiontrace-server
   ]) ++ (with pkgs.python312Packages; [
     pip
-    pyaml
+    pyyaml
   ]);
 
   programs = {
