@@ -18,8 +18,7 @@
     enable = true;
     package = pkgs.zellij;
     # https://zellij.dev/documentation/options
-    settings =
-    {
+    settings ={
       on_force_close = "detach";
       simplified_ui = false;
       default_shell = zsh;
@@ -47,6 +46,9 @@
       scrollback_lines_to_serialize = 0;
       disable_session_metadata = false;
     };
+    enableBashIntegration = lib.mkIf config.programs.bash.enable false;
+    enableFishIntegration = lib.mkIf config.programs.fish.enable false;
+    enableZshIntegration = lib.mkIf config.programs.zsh.enable false;
   };
 
   home.shellAliases = {
@@ -54,9 +56,6 @@
   };
 
 
-  programs.bash.enableBashIntegration = lib.mkIf config.programs.bash.enable false;
-  programs.fish.enableFishIntegration = lib.mkIf config.programs.fish.enable false;
-  programs.zsh.enableZshIntegration = lib.mkIf config.programs.zsh.enable false;
 
 
 }
