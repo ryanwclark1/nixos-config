@@ -47,10 +47,10 @@ in
       };
     };
     opacity = {
-      applications = 0.95;
+      applications = 0.90;
       desktop = 0.95;
       popups = 0.80;
-      terminal = 0.85;
+      terminal = 0.80;
     };
     targets = {
       alacritty.enable = true;
@@ -61,7 +61,7 @@ in
         # profileNames = ["default"];
       };
       fish.enable = true;
-      fzf.enable = true;
+      fzf.enable = false;
       gedit.enable = true;
       gitui.enable = true;
       gnome.enable = true;
@@ -77,7 +77,7 @@ in
       kde.enable = false;
       kitty = {
         enable = true;
-        # variant256Colors = true;
+        variant256Colors = false;
       };
       lazygit.enable = true;
       mako.enable = false;

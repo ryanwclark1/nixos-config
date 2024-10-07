@@ -79,7 +79,7 @@ in
       decoration = {
         rounding = 10;
         active_opacity = .97;
-        inactive_opacity = 0.77;
+        inactive_opacity = 0.87;
         fullscreen_opacity = 1.0;
         drop_shadow = true;
         shadow_range = 12;
@@ -97,7 +97,7 @@ in
           enabled = true;
           size = 8;
           passes = 4;
-          ignore_opacity = true;
+          ignore_opacity = false;
           new_optimizations = true;
           xray = true;
           noise = 0.0117;
