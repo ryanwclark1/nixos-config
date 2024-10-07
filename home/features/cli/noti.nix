@@ -18,7 +18,4 @@
     espeak-classic
   ];
 
-  home.shellAliases = {
-    espeak = "espeak-ng";
-  };
 }
