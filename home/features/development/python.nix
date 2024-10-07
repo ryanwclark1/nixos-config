@@ -4,11 +4,15 @@
 }:
 
 {
-  home.packages = with pkgs; [
+  home.packages = (with pkgs; [
     python312
     python312Packages.pip
+    python312Packages.pyaml
     functiontrace-server
-  ];
+  ]) ++ (with pkgs.python312Packages; [
+    pip
+    pyaml
+  ]);
 
   programs = {
     poetry = {
