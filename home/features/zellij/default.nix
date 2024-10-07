@@ -53,4 +53,10 @@
     zj = "zellij";
   };
 
+
+  programs.bash.enableBashIntegration = lib.mkIf config.programs.bash.enable false;
+  programs.fish.enableFishIntegration = lib.mkIf config.programs.fish.enable false;
+  programs.zsh.enableZshIntegration = lib.mkIf config.programs.zsh.enable false;
+
+
 }
