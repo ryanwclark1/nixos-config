@@ -45,6 +45,8 @@
     sessionVariables = {
       FLAKE = lib.mkDefault "${config.home.homeDirectory}/nixos-config";
       EDITOR = lib.mkDefault "${editor}";
+      VISUAL = lib.mkDefault "${editor}";
+      MANPAGER = lib.mkDefault "sh -c 'col -bx | bat -l man -p'";
     };
     shellAliases = rec{
       jqless = "jq -C | less -r";
