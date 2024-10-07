@@ -47,14 +47,14 @@ in
       };
     };
     homeManagerIntegration = {
-      followSystem = true;
+      followSystem = false;
       # autoImport = false;
     };
     opacity = {
       applications = 0.90;
       desktop = 0.95;
       popups = 0.80;
-      terminal = 0.85;
+      terminal = 0.80;
     };
     targets = {
       console.enable = true;
