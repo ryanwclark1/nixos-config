@@ -5,10 +5,10 @@
 
 set -e
 
-script_path="$(readlink -f "$0")"
+`script_path`="$(readlink -f "$0")"
 readonly cmd_show_menu=$script_path
 readonly menu_name=${1:-tmux}
-readonly plugins_dir="$HOME/.tmux/plugins"
+readonly plugins_dir="$HOME/.config/tmux/plugins"
 
 show_menu() {
     tmux menu -x R -y P -T "#[align=centre,bold fg=green]$menu_name" "$@"
