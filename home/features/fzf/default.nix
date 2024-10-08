@@ -12,6 +12,7 @@
   home.packages = [
     (pkgs.writeScriptBin "fzf-git" (builtins.readFile ./fzf-git.sh))
     (pkgs.writeScriptBin "rgf" (builtins.readFile ./rgf.sh))
+    (pkgs.writeScriptBin "sysz" (builtins.readFile ./sysz.sh))
   ];
 
   programs.fzf = {
@@ -48,7 +49,9 @@
     defaultOptions = [
       "--height=40%"
       "--layout=reverse"
-      "--preview 'bat --style=numbers --color=always --line-range=:500 {}'"
+      "--preview 'if [ -d {} ]; then eza --tree --color=always {} | head -200; else bat --style=numbers --color=always --line-range=:500 {}; fi'"
+
+
 
       # "--preview='pistol {}'"
       # "--ansi"
