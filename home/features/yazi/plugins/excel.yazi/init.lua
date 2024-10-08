@@ -2,28 +2,14 @@ local M = {}
 
 function M:peek()
 	local child
-	local l = self.file.cha.length
-	if l == 0 then
 		child = Command("xlsx2csv")
 			:args({
+				"-i"
 				tostring(self.file.url),
 			})
 			:stdout(Command.PIPED)
 			:stderr(Command.PIPED)
 			:spawn()
-	else
-		child = Command("xlsx2csv")
-			:args({
-				"--border",
-				"none",
-				"--terminal-width",
-				tostring(self.area.w),
-				tostring(self.file.url),
-			})
-			:stdout(Command.PIPED)
-			:stderr(Command.PIPED)
-			:spawn()
-	end
 
 	local limit = self.area.h
 	local i, lines = 0, ""
