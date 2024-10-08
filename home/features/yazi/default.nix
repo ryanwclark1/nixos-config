@@ -15,6 +15,7 @@
     hexyl
     ripdrag
     xlsx2csv
+    miller
   ];
 
   programs.yazi =
@@ -24,7 +25,6 @@
     editor = "nvim";
     ripdrag = lib.getExe pkgs.ripdrag;
     wl-copy = "${pkgs.wl-clipboard}/bin/wl-copy";
-    xlsx2csv = "${pkgs.xlsx2csv}/bin/xlsx2csv";
   in
   {
     enable = true;
