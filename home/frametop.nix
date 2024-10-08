@@ -33,7 +33,6 @@
     ./features/media
     ./features/networking-utils
     ./features/nixvim
-    # ./features/osint
     # ./features/pistol
     ./features/productivity
     ./features/qutebrowser

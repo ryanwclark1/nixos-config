@@ -26,7 +26,6 @@
     ./features/fzf
     ./features/games
     ./features/git
-    # ./features/gpu
     # ./features/helix
     # ./features/kdeconnect
     ./features/kitty
@@ -35,7 +34,6 @@
     ./features/media
     ./features/networking-utils
     ./features/nixvim
-    # ./features/osint
     # ./features/pistol
     ./features/productivity
     ./features/qutebrowser
