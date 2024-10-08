@@ -47,6 +47,7 @@
       EDITOR = lib.mkDefault "${editor}";
       VISUAL = lib.mkDefault "${editor}";
       MANPAGER = lib.mkDefault "sh -c 'col -bx | bat -l man -p'";
+      MANROFFOPT="-c";
     };
     shellAliases = rec{
       jqless = "jq -C | bat --pager 'less RF' --style=numbers --color=always";
