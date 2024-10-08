@@ -186,6 +186,7 @@
         "editor.parameterHints.enabled" = true;
         "editor.quickSuggestionsDelay" = 3;
         "editor.renderWhitespace" = "all";
+        "editor.semanticHighlighting.enabled" = true;
         "editor.snippetSuggestions" = "top";
         "editor.suggest.localityBonus" = true;
         "editor.suggest.showStatusBar" = true;
@@ -225,17 +226,19 @@
         "files.autoSave" = "afterDelay";
         "files.trimTrailingWhitespace" = true;
         "telemetry.telemetryLevel" = "off";
-        "terminal.integrated.fontFamily" = "JetBrainsMono Nerd Font";
+        # "terminal.integrated.fontFamily" = "JetBrainsMono Nerd Font";
         "terminal.integrated.copyOnSelection" = true;
         "terminal.integrated.defaultProfile.linux" = "bash";
         "terminal.integrated.fontSize" = 12;
+        "terminal.integrated.minimumContrastRatio" = 1;
         "terminal.integrated.mouseWheelZoom" = true;
         "terminal.integrated.enableImages" = true;
         "terminal.integrated.customGlyphs" = true;
         "terminal.integrated.environmentChangesIndicator" = "off";
+        "window.titleBarStyle" = "custom";
         "window.zoomLevel" = 1;
         "workbench.editor.enablePreview" = true;
-        "workbench.colorTheme" = "Catppuccin Frappé";
+        # "workbench.colorTheme" = "Catppuccin Frappé";
         "workbench.externalBrowser" = "chrome";
 
         "html-css-class-completion.enableEmmetSupport" = true;
@@ -440,6 +443,7 @@
           "ui.navigation.symbolMatcher" = "Fuzzy";
           "ui.navigation.symbolScope" = "all";
           "ui.navigation.symbolStyle" = "Dynamic";
+          "ui.semanticTokens" = true;
         };
 
         # JSON
