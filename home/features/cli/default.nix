@@ -5,7 +5,6 @@
 
 {
   imports = [
-    ./bat.nix
     ./btop.nix
     ./gh.nix
     ./jq.nix
