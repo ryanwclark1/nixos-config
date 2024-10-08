@@ -4,14 +4,16 @@ function M:peek()
 	local child
 		child = Command("xlsx2csv")
 			:args({
-				"-i"
+				"--ignoreempty",
+				"--skipemptycolumns",
+				"--",
 				tostring(self.file.url),
 			})
 			:stdout(Command.PIPED)
 			:stderr(Command.PIPED)
 			:spawn()
 
-	local limit = self.area.h
+local limit = self.area.h
 	local i, lines = 0, ""
 	repeat
 		local next, event = child:read_line()
