@@ -1,11 +1,12 @@
 {
+  pkgs,
   ...
 }:
 
 {
   programs.btop = {
     enable = true;
-
+    package = pkgs.btop;
     settings = {
       color_theme = "theme";
       theme_background = false;
@@ -298,5 +299,4 @@
       theme[process_end]="#ca9ee6"
     '';
   };
-
 }
