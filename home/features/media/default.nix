@@ -7,7 +7,7 @@
     # ./blender.nix
     # ./darktable.nix
     # ./digikam.nix
-    ./drawio.nix
+    # ./drawio.nix
     ./eye.nix
     ./ffmpeg.nix
     # ./gimp.nix
