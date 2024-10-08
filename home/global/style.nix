@@ -55,7 +55,7 @@ in
     targets = {
       alacritty.enable = false;
       bat.enable = false;
-      btop.enable = true;
+      btop.enable = false;
       firefox = {
         enable = true;
         # profileNames = ["default"];
@@ -97,7 +97,7 @@ in
       };
       qutebrowser.enable = true;
       rofi.enable = false;
-      vscode.enable = false;
+      vscode.enable = true;
       waybar = {
         enable = false;
         enableCenterBackColors = false;
