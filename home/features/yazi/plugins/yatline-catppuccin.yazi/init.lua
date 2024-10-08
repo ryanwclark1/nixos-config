@@ -186,7 +186,7 @@ local function catppuccin_theme(flavor)
 end
 
 return { setup = function(_, args)
-  args = args or "mocha"
+  args = args or "frappe"
 
   return catppuccin_theme(args)
 end }
