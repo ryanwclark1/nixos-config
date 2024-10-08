@@ -14,6 +14,7 @@
     ./features/alacritty
     ./features/ansible
     ./features/atuin
+    ./features/bat
     ./features/cli
     ./features/compression
     ./features/discord
