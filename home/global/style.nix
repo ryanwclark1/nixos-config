@@ -53,8 +53,8 @@ in
       terminal = 0.80;
     };
     targets = {
-      alacritty.enable = true;
-      bat.enable = true;
+      alacritty.enable = false;
+      bat.enable = false;
       btop.enable = true;
       firefox = {
         enable = true;
@@ -71,12 +71,12 @@ in
         #   @import url("file://${pkgs.stylix}/share/themes/${currentScheme}.css");
         # '';
       };
-      hyprland.enable = false;
+      hyprland.enable = true;
       hyprpaper.enable = true;
-      k9s.enable = true;
+      k9s.enable = false;
       kde.enable = false;
       kitty = {
-        enable = true;
+        enable = false;
         variant256Colors = false;
       };
       lazygit.enable = false;
