@@ -14,6 +14,7 @@
     mediainfo
     hexyl
     ripdrag
+    xlsx2csv
   ];
 
   programs.yazi =
@@ -23,6 +24,7 @@
     editor = "nvim";
     ripdrag = lib.getExe pkgs.ripdrag;
     wl-copy = "${pkgs.wl-clipboard}/bin/wl-copy";
+    xlsx2csv = "${pkgs.xlsx2csv}/bin/xlsx2csv";
   in
   {
     enable = true;
@@ -36,6 +38,7 @@
     plugins = {
       arrow = ./plugins/arrow.yazi;
       chmod = ./plugins/chmod.yazi;
+      excel = ./plugins/excel.yazi;
       eza-preview = ./plugins/eza-preview.yazi;
       folder-rules = ./plugins/folder-rules.yazi;
       full-border = ./plugins/full-border.yazi;
@@ -1348,7 +1351,6 @@
         icon_error = "";
       };
       filetype = {
-
         rules = [
           # Images
           { mime = "image/*"; fg = "yellow"; }
@@ -2163,17 +2165,15 @@
       plugin = {
         prepend_fetchers = [
           # Mimetype
-          {
-            id = "mime";
-            "if" = "!mime";
-            name = "*";
-            run = "mime-ext";
-            prio = "high";
-          }
+          # {
+          #   id = "mime";
+          #   "if" = "!mime";
+          #   name = "*";
+          #   run = "mime-ext";
+          #   prio = "high";
+          # }
         ];
-
-        fetchers =
-        [
+        fetchers = [
           # Mimetype
           {
             id = "mime";
@@ -2219,24 +2219,56 @@
           }
 
         ];
-        # prepend_previewers = [
-        #   {
-        #     name = "*/";
-        #     run = "eza-preview";
-        #   }
-        #   {
-        #     mime = "{image,audio,video}/*";
-        #     run = "mediainfo";
-        #   }
-        #   {
-        #     mime = "application/x-subrip";
-        #     run = "mediainfo";
-        #   }
-        #   {
-        #     mime = "application/octet-stream";
-        #     run = "hexyl";
-        #   }
-        # ];
+        prepend_previewers = [
+          {
+            name = "*/";
+            run = "eza-preview";
+          }
+          {
+            mime = "{image,audio,video}/*";
+            run = "mediainfo";
+          }
+          {
+            mime = "application/x-subrip";
+            run = "mediainfo";
+          }
+          {
+            mime = "application/*zip";
+            run = "ouch";
+          }
+          {
+            mime = "application/x-tar";
+            run = "ouch";
+          }
+          {
+            mime = "application/x-bzip2";
+            run = "ouch";
+          }
+          {
+            mime = "application/x-7z-compressed";
+            run = "ouch";
+          }
+          {
+            mime = "application/x-rar";
+            run = "ouch";
+          }
+          {
+            mime = "application/x-xz";
+            run = "ouch";
+          }
+          {
+            mime = "application/vnd.excel";
+            run = "excel";
+          }
+          {
+            mime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            run = "excel";
+          }
+          {
+            mime = "application/octet-stream";
+            run = "hexyl";
+          }
+        ];
         previewers = [
           # Code
           {
@@ -2410,21 +2442,7 @@
     #       ripdrag = lib.getExe pkgs.ripdrag;
     #       wl-copy = "${pkgs.wl-clipboard}/bin/wl-copy";
     #     in
-    # {
-    #     manager = {
-    #       #  3-element array
-    #       ratio = [
-    #         1 # parent
-    #         3 # current
-    #         4 # preview
-    #       ];
-    #       sort_by = "natural";
-    #       sort_sensitive = false;
-    #       sort_reverse = false;
-    #       sort_dir_first = true;
-    #       sort_translit = true;
-    #       show_hidden = true;
-    #       show_symlink = false;
+
     #       prepend_keymap = [
 
     #         }
@@ -2510,10 +2528,7 @@
     #           mime = "application/x-subrip";
     #           run = "mediainfo";
     #         }
-    #         {
-    #           mime = "application/octet-stream";
-    #           run = "hexyl";
-    #         }
+
     #       ];
     #     };
     #     opener ={
