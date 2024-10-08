@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   ...
 }:
@@ -16,7 +17,7 @@
       };
       hotkey = {
         # Make sure this is camel case
-        hotKey = {
+        hotKeys = {
           shift-0 = {
             shortCut = "Shift-0";
             description = "Viewing pods";
@@ -43,6 +44,34 @@
             "$CLUSTER"
           ];
         };
+        # Manage cert-manager Certificate resouces via cmctl.
+        # See: https://github.com/cert-manager/cmctl
+        cert-status = {
+          shortCut = "Shift-S";
+          confirm = false; description = "Certificate status";
+          scopes = [ "certificates" ];
+          command = "bash";
+          background = false;
+          args = [ "-c" "cmctl status certificate --context $CONTEXT -n $NAMESPACE $NAME |& less" ];
+        };
+        cert-renew = {
+          shortCut = "Shift-R";
+          confirm = false;
+          description = "Certificate renew";
+          scopes = [ "certificates" ];
+          command = "bash";
+          background = false;
+          args = [ "-c" "cmctl renew --context $CONTEXT -n $NAMESPACE $NAME |& less" ];
+        };
+        secret-inspect = {
+          shortCut = "Shift-I";
+          confirm = false;
+          description = "Inspect secret";
+          scopes = [ "secrets" ];
+          command = "bash";
+          background = false;
+          args = [ "-c" "cmctl inspect secret --context $CONTEXT -n $NAMESPACE $NAME |& less" ];
+        };
       };
       skins = {
         default_skin = {
@@ -57,12 +86,19 @@
               bgColor = "default";
               suggestColor = "#8caaee";
             };
-            help = {
-              fgColor = "#c6d0f5";
+            info = {
+              fgColor = "#ef9f76";
+              sectionColor = "#c6d0f5";
+            };
+            dialog = {
+              fgColor = "#e5c890";
               bgColor = "default";
-              sectionColor = "#a6d189";
-              keyColor = "#8caaee";
-              numKeyColor = "#ea999c";
+              buttonFgColor = "#303446";
+              buttonBgColor = "default";
+              buttonFocusFgColor = "#303446";
+              buttonFocusBgColor = "#f4b8e4";
+              labelFgColor = "#f2d5cf";
+              fieldFgColor = "#c6d0f5";
             };
             frame = {
               title = {
@@ -97,10 +133,6 @@
                 completedColor = "#737994";
               };
             };
-            info = {
-              fgColor = "#ef9f76";
-              sectionColor = "#c6d0f5";
-            };
             views = {
               table = {
                 fgColor = "#c6d0f5";
@@ -120,6 +152,7 @@
                 cursorColor = "#51576d";
                 cursorTextColor = "#303446";
                 graphicColor = "#f4b8e4";
+                showIcons = true;
               };
               charts = {
                 bgColor = "default";
@@ -160,15 +193,12 @@
                 };
               };
             };
-            dialog = {
-              fgColor = "#e5c890";
+            help = {
+              fgColor = "#c6d0f5";
               bgColor = "default";
-              buttonFgColor = "#303446";
-              buttonBgColor = "default";
-              buttonFocusFgColor = "#303446";
-              buttonFocusBgColor = "#f4b8e4";
-              labelFgColor = "#f2d5cf";
-              fieldFgColor = "#c6d0f5";
+              sectionColor = "#a6d189";
+              keyColor = "#8caaee";
+              numKeyColor = "#ea999c";
             };
           };
         };
@@ -177,7 +207,7 @@
         k9s ={
           skin = "default_skin";
           liveViewAutoRefresh = true;
-          screenDumpDir = "/home/administrator/.local/state/k9s/screen-dumps";
+          screenDumpDir = "${config.home.homeDirectory}/.local/state/k9s/screen-dumps";
           refreshRate = 2;
           maxConnRetry = 5;
           readOnly = false;
@@ -202,7 +232,7 @@
             };
           };
           imageScans = {
-            enable = false;
+            enable = true;
             exclusions = {
               namespaces = [];
               labels = {};
