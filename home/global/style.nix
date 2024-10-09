@@ -108,7 +108,7 @@ in
       # xfce.enable = true;
       # xresources.enable = true;
       yazi.enable = false;
-      zathura.enable = true;
+      zathura.enable = false;
       zellij.enable = true;
     };
   };
