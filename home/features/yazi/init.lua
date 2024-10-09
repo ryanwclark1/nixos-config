@@ -19,7 +19,7 @@ function Status:name()
   return ui.Line(" " .. h.name .. linked)
 end
 
-local catppuccin_theme = require("yatline-catppuccin"):setup("mocha") -- or "latte" | "frappe" | "macchiato"
+local catppuccin_theme = require("yatline-catppuccin"):setup("frappe") -- or "latte" | "frappe" | "macchiato"
 
 -- Yatline setup
 require("yatline"):setup({
@@ -58,7 +58,7 @@ require("yatline"):setup({
 	found = { icon = "󰮕", fg = "blue" },
 	processed = { icon = "󰐍", fg = "green" },
 
-	show_background = true,
+	show_background = false,
 
 	display_header_line = true,
 	display_status_line = true,
