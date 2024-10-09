@@ -35,7 +35,7 @@ in
       enable_audio_bell = false;
       dynamic_background_opacity = true;
       allow_remote_control = true;
-      background_opacity = "0.70";
+      background_opacity = "0.65";
       background_blur = 1;
 
       # The basic colors";
