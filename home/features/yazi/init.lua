@@ -23,9 +23,13 @@ local catppuccin_theme = require("yatline-catppuccin"):setup("frappe") -- or "la
 
 -- Yatline setup
 require("yatline"):setup({
-	section_separator = { open = "", close = "" },
-	part_separator = { open = "", close = "" },
-	inverse_separator = { open = "", close = "" },
+	-- section_separator = { open = "", close = "" },
+	-- part_separator = { open = "", close = "" },
+	-- inverse_separator = { open = "", close = "" },
+
+	section_seperator = { open = "", close = "" },
+	part_seperator = { open = "", close = "" },
+	-- inverse_seperator = { open = "", close = "" },
 
 	theme = catppuccin_theme,
 	-- style_a = {
@@ -60,7 +64,7 @@ require("yatline"):setup({
 
 	show_background = false,
 
-	display_header_line = true,
+	display_header_line = false,
 	display_status_line = true,
 
 	header_line = {
