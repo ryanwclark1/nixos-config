@@ -27,6 +27,7 @@
     ./features/fzf
     ./features/games
     ./features/git
+    ./feature/imv
     # ./features/helix
     # ./features/kdeconnect
     ./features/kitty
