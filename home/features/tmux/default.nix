@@ -335,7 +335,7 @@
       set -ga update-environment TERM
       set -ga update-environment TERM_PROGRAM
 
-      set -g @catppuccin_flavor "macchiato"
+      set -g @catppuccin_flavor "frappe"
       set -g @catppuccin_window_status_style "rounded"
       # leave this unset to let applications set the window title
       set -g @catppuccin_window_default_text " #W"
