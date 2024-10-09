@@ -9,13 +9,13 @@
     xdg-utils
   ];
 
-
   xdg = {
     enable = true;
     configFile."mimeapps.list".force = true;
     cacheHome = "${config.home.homeDirectory}/.local/cache";
     configHome = "${config.home.homeDirectory}/.config";
     dataHome = "${config.home.homeDirectory}/.local/share";
+    stateHome = "${config.home.homeDirectory}/.local/state";
     systemDirs = {
       config = [ "${config.home.homeDirectory}/.config" ];
       data = [ "${config.home.homeDirectory}/.local/share" "/usr/share" "/usr/share/applications/" "/usr/local/share/applications/" ];
@@ -26,76 +26,45 @@
       desktop = "${config.home.homeDirectory}/Desktop";
       documents = "${config.home.homeDirectory}/Documents";
       download = "${config.home.homeDirectory}/Downloads";
-      videos = "${config.home.homeDirectory}/Videos";
       music = "${config.home.homeDirectory}/Music";
       pictures = "${config.home.homeDirectory}/Pictures";
       publicShare = "${config.home.homeDirectory}/Public";
       templates = "${config.home.homeDirectory}/Templates";
+      videos = "${config.home.homeDirectory}/Videos";
       extraConfig = {
         XDG_SCREENSHOTS_DIR = "${config.xdg.userDirs.pictures}/Screenshots";
         XDG_SCREENCAST_DIR = "${config.xdg.userDirs.videos}/Screencast";
       };
     };
     desktopEntries = {
-      firefox = {
-        name = "Firefox";
-        genericName = "Web Browser";
-        exec = "firefox %U";
-        terminal = false;
-        categories = [ "Application" "Network" "WebBrowser" ];
-        mimeType = [
-          "text/html"
-          "text/xml"
-          "x-scheme-handler/http"
-          "x-scheme-handler/https"
-          "x-scheme-handler/chrome"
-          "application/x-extension-htm"
-          "application/x-extension-html"
-          "application/x-extension-shtml"
-          "application/xhtml+xml"
-          "application/x-extension-xhtml"
-          "application/x-extension-xht"
-        ];
-      };
-      eog = {
-        name = "eog";
-        genericName = "Image Viewer";
-        exec = "eog %U";
-        terminal = false;
-        categories = [ "Application" "Graphics" "Viewer" ];
-        mimeType = [
-          "image/png"
-          "image/heic"
-          "image/heif"
-          "image/jpeg"
-          "image/gif"
-          "image/bmp"
-          "image/jpg"
-          "image/tiff"
-          "image/x-bmp"
-          "image/x-ico"
-        ];
-      };
     };
-    mimeApps =
-    {
+    mimeApps = {
       enable = true;
       defaultApplications =
         let
           browser = [
+            "chrome.desktop"
             "firefox.desktop"
+            "chromium.desktop"
           ];
+
           videoPlayers = [
             "mpv"
             "vlc"
           ];
+
           imageViewers = [
-            "eog.desktop"
             "imv.desktop"
+            "eog.desktop"
           ];
 
           codeEditors = [
+            "nvim.desktop"
             "code.desktop"
+          ];
+
+          pdfViewers = [
+            "zathura.desktop"
           ];
         in
         {
@@ -139,19 +108,7 @@
           "text/x-scheme" = codeEditors;
           "text/css" = codeEditors;
 
-          # "text/plain" = textEditors;
-          "text/csv" = [ "libreoffice" ];
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" = [ "libreoffice" ];
-          "application/vnd.ms-excel" = [ "libreoffice" ];
-          "application/msword" = [ "libreoffice" ];
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document" = [
-            "libreoffice"
-          ];
-          "application/vnd.openxmlformats-officedocument.presentationml.presentation" = [
-            "libreoffice"
-          ];
-          "application/vnd.ms-powerpoint" = [ "libreoffice" ];
-          # "application/pdf" = [ "wps-office-pdf.desktop" ];
+          "application/pdf" = pdfViewers;
 
           #web
           "text/html" = browser;
