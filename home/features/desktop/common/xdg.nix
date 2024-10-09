@@ -59,7 +59,6 @@
           ];
 
           codeEditors = [
-            "nvim.desktop"
             "code.desktop"
           ];
 
