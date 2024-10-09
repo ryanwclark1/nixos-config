@@ -48,7 +48,7 @@
     resizeAmount = 5;
     reverseSplit = false;
     secureSocket = true;
-    sensibleOnTop = false;
+    sensibleOnTop = true;
     shell = "${pkgs.zsh}/bin/zsh";
     shortcut = "b";
     terminal = "tmux-256color";
@@ -320,40 +320,21 @@
 
     in
     ''
-      run-shell ${sensible_mod}
+      # run-shell ${sensible_mod}
 
       # emacs key bindings in tmux command prompt (prefix + :) are better than
       # vi keys, even for vim users
-      set -g status-keys emacs
       set -g mode-keys vi
       # https://yazi-rs.github.io/docs/image-preview
       set -g allow-passthrough all
       set -g renumber-windows on # renumber all windows when any window is closed
       set -g status-interval 1 # update the status bar every 3 seconds
-      set -g focus-events on # For neovim
 
       set -ga update-environment TERM
-      set -ga update-environment TERM_PROGRAM
-
-      set -g @catppuccin_flavor "frappe"
-      set -g @catppuccin_window_status_style "rounded"
-      # leave this unset to let applications set the window title
-      set -g @catppuccin_window_default_text " #W"
-      set -g @catppuccin_window_current_text " #W"
-      set -g @catppuccin_window_status "icon"
-      set -g @catppuccin_window_current_background "#{@thm_mauve}"
-
-      run "${config.home.homeDirectory}/.config/tmux/plugins/catppucin/tmux/catppucin.tmux"
-      # run-shell "${config.home.homeDirectory}/.config/tmux/plugins/tmux-which-key/plugin.sh.tmux"
-      # run-shell "${config.home.homeDirectory}/.config/tmux/plugins/tmux-powerline/main.tmux"
-      # run-shell "${config.home.homeDirectory}/.config/tmux/plugins/tmux-power/tmux-power.tmux"
-
-      # set -g @tmux_power_theme 'default'
 
     '';
 
       # set -g set-clipboard on      # use system clipboard
-
       # set -g status-left "${indicator}"
       # set -g status-right "${git} ${pwd} ${separator} ${battery} ${time}"
       # set -g status-left-length 200    # increase length (from 10)
