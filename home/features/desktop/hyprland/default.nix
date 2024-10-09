@@ -12,7 +12,6 @@
     ./hypr
     ./hypridle
     ./hyprlock
-    ./imv.nix
     ./rofi
     # ./swaync
     ./wlogout
