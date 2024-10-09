@@ -7,6 +7,7 @@
 let
   terminal = lib.getExe pkgs.alacritty;
   files = "${pkgs.nautilus}/bin/nautilus";
+  code = lib.getExe config.programs.vscode.package;
   defaultApp = type: "${lib.getExe pkgs.handlr-regex} launch ${type}";
   browser = "${pkgs.google-chrome}/bin/google-chrome-stable";
   remote = lib.getExe (pkgs.writeShellScriptBin "remote" ''
@@ -59,7 +60,7 @@ in
           # "SUPER, Return,exec,${terminal}"
           # "SUPER, W,exec,${browser}"
           "SUPER, S,exec,screenshooting"
-          "SUPER, e,exec,${defaultApp "text/plain"}"
+          "SUPER, e,exec,${code}"
           "SUPER, b,exec,${defaultApp "x-scheme-handler/https"}"
           "SUPER ALT, space,exec,${files}"
           "SUPER, backspace,exec,${pkgs.wlogout}/bin/wlogout"
@@ -146,6 +147,7 @@ in
         in
         lib.optionals config.programs.rofi.enable [
           "SUPER, x,exec,${rofi} -show drun -theme ${config.home.homeDirectory}/.config/rofi/style/launcher-center.rasi"
+
           # "SUPER, s,exec,${rofi} -show drun -theme ${config.home.homeDirectory}/.config/rofi/style/launcher-full.rasi"
         # "$mod, Space, exec, $menu --show drun"
           "SUPERSHIFT, W,exec,web-search"
