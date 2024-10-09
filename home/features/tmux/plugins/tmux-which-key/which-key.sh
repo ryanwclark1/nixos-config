@@ -130,7 +130,7 @@ Client)
         Detach D detach \
         'Suspend' Z suspendc \
         '' \
-        'Reload config' r "source $HOME/.tmux.conf \; display \"#{E:'\\ueb37'}\" Config loaded" \
+        'Reload config' r "source $HOME/.config/tmux/.tmux.conf \; display \"#{E:'\\ueb37'}\" Config loaded" \
         'Customize' , 'customize-mode -Z'
     ;;
 Plugins)

@@ -332,6 +332,39 @@
 
       set -ga update-environment TERM
 
+      ###################################
+      # Configure the catppuccin plugin
+
+      set -g @catppuccin_flavor "frappe"
+      set -g @catppuccin_window_status "icon"
+
+      set -g @catppuccin_window_status_style "rounded"
+      set -g @catppuccin_window_number_position "right"
+
+      set -g @catppuccin_window_default_fill "number"
+      # leave this unset to let applications set the window title
+      set -g @catppuccin_window_default_text "#W"
+
+      set -g @catppuccin_window_current_fill "number"
+      set -g @catppuccin_window_current_text "#W"
+
+      set -g @catppuccin_status_left_separator  " "
+      set -g @catppuccin_status_right_separator ""
+      set -g @catppuccin_status_fill "icon"
+      set -g @catppuccin_status_connect_separator "no"
+
+      set -g @catppuccin_directory_text "#{pane_current_path}"
+      set -g @catppuccin_window_current_background "#{@thm_mauve}"
+
+      run ${config.home.homeDirectory}/.config/tmux/plugins/catppucin/tmux/catppuccin.tmux
+      run ${config.home.homeDirectory}/.config/tmux/plugins/tmux-digits.tmux
+
+      # Make the status line pretty and add some modules
+      set -g status-left ""
+      set -g  status-right "#{E:@catppuccin_status_directory}"
+      set -ag status-right "#{E:@catppuccin_status_user}"
+      set -ag status-right "#{E:@catppuccin_status_host}"
+      set -ag status-right "#{E:@catppuccin_status_session}"
     '';
 
       # set -g set-clipboard on      # use system clipboard
