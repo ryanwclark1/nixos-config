@@ -23,6 +23,10 @@
     package = pkgs.tmux;
     plugins = with pkgs.tmuxPlugins; [
       better-mouse-mode
+      cpu
+      battery
+      weather
+      tmux-fzf
       # copycat
       # t-smart-tmux-session-manager
       # sidebar
@@ -335,22 +339,22 @@
       ###################################
       # Configure the catppuccin plugin
 
-      set -g @catppuccin_flavor "frappe"
+      # set -g @catppuccin_flavor "frappe"
       set -g @catppuccin_window_status "icon"
 
       set -g @catppuccin_window_status_style "rounded"
       set -g @catppuccin_window_number_position "right"
 
-      set -g @catppuccin_window_default_fill "number"
+      # set -g @catppuccin_window_default_fill "number"
       # leave this unset to let applications set the window title
-      set -g @catppuccin_window_default_text "#W"
+      # set -g @catppuccin_window_default_text "#W"
 
-      set -g @catppuccin_window_current_fill "number"
-      set -g @catppuccin_window_current_text "#W"
+      # set -g @catppuccin_window_current_fill "number"
+      # set -g @catppuccin_window_current_text "#W"
 
-      set -g @catppuccin_status_left_separator  " "
+      # set -g @catppuccin_status_left_separator  " "
       set -g @catppuccin_status_right_separator ""
-      set -g @catppuccin_status_fill "icon"
+      # set -g @catppuccin_status_fill "icon"
       set -g @catppuccin_status_connect_separator "no"
 
       set -g @catppuccin_directory_text "#{pane_current_path}"
@@ -359,19 +363,31 @@
       run ${config.home.homeDirectory}/.config/tmux/plugins/catppucin/tmux/catppuccin.tmux
       run ${config.home.homeDirectory}/.config/tmux/plugins/tmux-digits.tmux
 
+      set -g status-left-length 200    # increase length (from 10)
+      set -g status-right-length 200   # increase length (from 10)
+
+      # Digits
+      # set -g set-titles-string "#S:#I"
+      # set -g status-left "#S"
+      # set -g status-right "#S"
+      # set -g window-status-current-format "#I"
+      # set -g window-status-format "#I"
+
       # Make the status line pretty and add some modules
       set -g status-left ""
       set -g  status-right "#{E:@catppuccin_status_directory}"
       set -ag status-right "#{E:@catppuccin_status_user}"
       set -ag status-right "#{E:@catppuccin_status_host}"
       set -ag status-right "#{E:@catppuccin_status_session}"
+      set -ag status-right "#{E:@catppuccin_status_cpu}"
+      set -ag status-right "#{E:@catppuccin_status_time}"
+      set -ag status-right "#{E:@catppuccin_status_date}"
     '';
 
       # set -g set-clipboard on      # use system clipboard
       # set -g status-left "${indicator}"
       # set -g status-right "${git} ${pwd} ${separator} ${battery} ${time}"
-      # set -g status-left-length 200    # increase length (from 10)
-      # set -g status-right-length 200   # increase length (from 10)
+
       # set -g status-style "bg=default"
 
       # set -g @indicator_color "yellow"
