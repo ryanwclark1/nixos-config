@@ -22,14 +22,14 @@ session_icon="$(tmux_get '@tmux_power_session_icon' '')"
 user_icon="$(tmux_get '@tmux_power_user_icon' '')"
 time_icon="$(tmux_get '@tmux_power_time_icon' '')"
 date_icon="$(tmux_get '@tmux_power_date_icon' '')"
-show_upload_speed="$(tmux_get @tmux_power_show_upload_speed false)"
-show_download_speed="$(tmux_get @tmux_power_show_download_speed false)"
-show_web_reachable="$(tmux_get @tmux_power_show_web_reachable false)"
+show_upload_speed="$(tmux_get @tmux_power_show_upload_speed true)"
+show_download_speed="$(tmux_get @tmux_power_show_download_speed true)"
+show_web_reachable="$(tmux_get @tmux_power_show_web_reachable true)"
 prefix_highlight_pos=$(tmux_get @tmux_power_prefix_highlight_pos)
 time_format=$(tmux_get @tmux_power_time_format '%T')
 date_format=$(tmux_get @tmux_power_date_format '%F')
 # short for Theme-Colour
-TC=$(tmux_get '@tmux_power_theme' 'gold')
+TC=$(tmux_get '@tmux_power_theme' 'moon')
 case $TC in
     'gold' )
         TC='#ffb86c'
