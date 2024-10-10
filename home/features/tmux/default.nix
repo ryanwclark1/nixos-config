@@ -23,10 +23,9 @@
     package = pkgs.tmux;
     plugins = with pkgs.tmuxPlugins; [
       better-mouse-mode
-      cpu
-      battery
-      weather
-      tmux-fzf
+      # battery
+      # weather
+      # tmux-fzf
       # copycat
       # t-smart-tmux-session-manager
       # sidebar
@@ -324,7 +323,6 @@
 
     in
     ''
-      # run-shell ${sensible_mod}
 
       # emacs key bindings in tmux command prompt (prefix + :) are better than
       # vi keys, even for vim users
@@ -337,51 +335,43 @@
       set -ga update-environment TERM
 
       ###################################
-      # Configure the catppuccin plugin
+      # Configure the forceline plugin
 
-      # set -g @catppuccin_flavor "frappe"
-      set -g @catppuccin_window_status "icon"
+      set -g @forceline_flavor "catppuccin_frappe"
+      set -g @forceline_window_status "icon"
 
-      set -g @catppuccin_window_status_style "rounded"
-      set -g @catppuccin_window_number_position "right"
+      set -g @forceline_window_status_style "rounded"
+      set -g @forceline_window_number_position "right"
 
-      # set -g @catppuccin_window_default_fill "number"
+      # set -g @forceline_window_default_fill "number"
       # leave this unset to let applications set the window title
-      # set -g @catppuccin_window_default_text "#W"
+      # set -g @forceline_window_default_text "#W"
 
-      # set -g @catppuccin_window_current_fill "number"
-      # set -g @catppuccin_window_current_text "#W"
+      # set -g @forceline_window_current_fill "number"
+      # set -g @forceline_window_current_text "#W"
 
-      # set -g @catppuccin_status_left_separator  " "
-      set -g @catppuccin_status_right_separator ""
-      # set -g @catppuccin_status_fill "icon"
-      set -g @catppuccin_status_connect_separator "no"
+      # set -g @forceline_status_left_separator  " "
+      set -g @forceline_status_right_separator ""
+      # set -g @forceline_status_fill "icon"
+      set -g @forceline_status_connect_separator "no"
 
-      set -g @catppuccin_directory_text "#{pane_current_path}"
-      set -g @catppuccin_window_current_background "#{@thm_mauve}"
+      set -g @forceline_directory_text "#{pane_current_path}"
+      set -g @forceline_window_current_background "#{@thm_mauve}"
 
-      run ${config.home.homeDirectory}/.config/tmux/plugins/catppucin/tmux/catppuccin.tmux
-      run ${config.home.homeDirectory}/.config/tmux/plugins/tmux-digits.tmux
+      run ${config.home.homeDirectory}/.config/tmux/plugins/forceline/forceline.tmux
 
       set -g status-left-length 200    # increase length (from 10)
       set -g status-right-length 200   # increase length (from 10)
 
-      # Digits
-      # set -g set-titles-string "#S:#I"
-      # set -g status-left "#S"
-      # set -g status-right "#S"
-      # set -g window-status-current-format "#I"
-      # set -g window-status-format "#I"
-
       # Make the status line pretty and add some modules
       set -g status-left ""
-      set -g  status-right "#{E:@catppuccin_status_directory}"
-      set -ag status-right "#{E:@catppuccin_status_user}"
-      set -ag status-right "#{E:@catppuccin_status_host}"
-      set -ag status-right "#{E:@catppuccin_status_session}"
-      set -ag status-right "#{E:@catppuccin_status_cpu}"
-      set -ag status-right "#{E:@catppuccin_status_time}"
-      set -ag status-right "#{E:@catppuccin_status_date}"
+      set -g  status-right "#{E:@forceline_status_directory}"
+      set -ag status-right "#{E:@forceline_status_user}"
+      set -ag status-right "#{E:@forceline_status_host}"
+      set -ag status-right "#{E:@forceline_status_session}"
+      set -agF status-right "#{E:@forceline_status_cpu}"
+      set -ag status-right "#{E:@forceline_status_time}"
+      set -ag status-right "#{E:@forceline_status_date}"
     '';
 
       # set -g set-clipboard on      # use system clipboard
