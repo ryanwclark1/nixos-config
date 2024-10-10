@@ -337,7 +337,7 @@
       ###################################
       # Configure the forceline plugin
 
-      set -g @forceline_flavor "catppuccin_frappe"
+      set -g @forceline_theme "catppuccin_frappe"
       set -g @forceline_window_status "icon"
 
       set -g @forceline_window_status_style "rounded"
@@ -358,7 +358,7 @@
       set -g @forceline_directory_text "#{pane_current_path}"
       set -g @forceline_window_current_background "#{@thm_mauve}"
 
-      run ${config.home.homeDirectory}/.config/tmux/plugins/forceline/forceline.tmux
+      run ${config.home.homeDirectory}/.config/tmux/plugins/tmux-forceline/forceline.tmux
 
       set -g status-left-length 200    # increase length (from 10)
       set -g status-right-length 200   # increase length (from 10)
@@ -370,8 +370,7 @@
       set -ag status-right "#{E:@forceline_status_host}"
       set -ag status-right "#{E:@forceline_status_session}"
       set -agF status-right "#{E:@forceline_status_cpu}"
-      set -ag status-right "#{E:@forceline_status_time}"
-      set -ag status-right "#{E:@forceline_status_date}"
+      set -agF status-right "#{E:@forceline_status_weather}"
     '';
 
       # set -g set-clipboard on      # use system clipboard
