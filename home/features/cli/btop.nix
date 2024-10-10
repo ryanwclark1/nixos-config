@@ -209,7 +209,6 @@
 
   home.shellAliases = {
     htop = "btop";
-    top = "btop";
   };
 
   home.file.".config/btop/themes/theme.theme" = {
