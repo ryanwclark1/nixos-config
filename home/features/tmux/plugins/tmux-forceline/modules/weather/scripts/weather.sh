@@ -4,12 +4,12 @@ CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$CURRENT_DIR/helpers.sh"
 
 get_weather() {
-  local location=$(get_tmux_option "@tmux-weather-location")
+  local location=$(get_tmux_option "@tmux-weather-location" "New York")
   local format=$(get_tmux_option "@tmux-weather-format" 1)
-  local units=$(get_tmux_option "@tmux-weather-units" "m")
+  local units=$(get_tmux_option "@tmux-weather-units" "u")
 
   if [ "$units" != "m" ] && [ "$units" != "u" ]; then
-    units="m"
+    units="u"
   fi
 
   curl -s "https://wttr.in/$location?$units&format=$format" | sed "s/[[:space:]]km/km/g"
