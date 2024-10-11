@@ -15,7 +15,17 @@
       ];
     };
   };
-  services = {
-    tumbler.enable = true;
+
+  environment.systemPackages = with pkgs; [
+    ffmpegthumbnailer
+  ];
+
+  services.tumbler = {
+    enable = true;
   };
+
+  # services.gvfs = {
+  #   enable = true;
+  #   package = pkgs.gvfs;
+  # };
 }
