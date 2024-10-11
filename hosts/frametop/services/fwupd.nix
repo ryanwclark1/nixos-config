@@ -4,10 +4,8 @@
 }:
 
 {
-  services = {
-    fwupd = {
-      enable = true;
-      package = pkgs.fwupd;
-    };
+  services.fwupd = {
+    enable = true;
+    package = pkgs.fwupd;
   };
 }

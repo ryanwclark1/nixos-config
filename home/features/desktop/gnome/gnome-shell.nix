@@ -4,12 +4,22 @@
 }:
 
 {
+  # TODO: remove when new upstream release is available
+
+
   programs.gnome-shell = {
     enable = true;
-    theme = {
-      name = "Plata-Noir";
-      package = pkgs.plata-theme;
-    };
+    # theme = {
+    #   name = "Colloid-Default-Dark-Catppuccin";
+    #   package = pkgs.colloid-gtk-theme.override {
+    #     colorVariants = [ "dark" ];
+    #     # "default" = blue
+    #     themeVariants = [ "default" ];
+    #     sizeVariants = [ "standard" ];
+    #     # "black" = mocha variant
+    #     tweaks = [ "catppuccin" "rimless" ];
+    #   };
+    # };
     extensions = [
       {package = pkgs.gnomeExtensions.vitals;}
       {package = pkgs.gnomeExtensions.bing-wallpaper-changer;}

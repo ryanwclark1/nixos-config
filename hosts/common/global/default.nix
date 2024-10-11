@@ -8,7 +8,6 @@
 {
   imports = [
     inputs.home-manager.nixosModules.home-manager
-    # ./auto-upgrade.nix
     ./fail2ban.nix
     ./locale.nix
     ./networking.nix
@@ -18,7 +17,7 @@
     # ./optin-persistence.nix
     ./prometheus-node-exporter.nix
     ./sops.nix
-    # ./ssh-serve-store.nix
+
   ] ++ (builtins.attrValues outputs.nixosModules);
 
   home-manager.useGlobalPkgs = true;
@@ -34,9 +33,9 @@
     };
   };
 
-  environment.profileRelativeSessionVariables = {
-    QT_PLUGIN_PATH = ["/lib/qt-6/plugins"];
-  };
+  # environment.profileRelativeSessionVariables = {
+  #   QT_PLUGIN_PATH = ["/lib/qt-6/plugins"];
+  # };
 
   hardware.enableRedistributableFirmware = true;
 
