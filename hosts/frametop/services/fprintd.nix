@@ -4,10 +4,8 @@
 }:
 
 {
-  services = {
-    fprintd = {
-      enable = true;
-      package = pkgs.fprintd;
-    };
+  services.fprintd = {
+    enable = true;
+    package = pkgs.fprintd;
   };
 }

@@ -17,7 +17,6 @@
       noto-fonts
       noto-fonts-emoji
       liberation_ttf
-      # powerline-fonts
       powerline-symbols
     ];
   };

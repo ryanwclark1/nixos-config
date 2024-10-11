@@ -47,8 +47,8 @@ in
       };
     };
     opacity = {
-      applications = 0.90;
-      desktop = 0.95;
+      applications = 0.80;
+      desktop = 0.90;
       popups = 0.80;
       terminal = 0.80;
     };
@@ -105,8 +105,8 @@ in
         enableRightBackColors = false;
       };
       wofi.enable = false;
-      # xfce.enable = true;
-      # xresources.enable = true;
+      xfce.enable = true;
+      xresources.enable = true;
       yazi.enable = false;
       zathura.enable = false;
       zellij.enable = true;

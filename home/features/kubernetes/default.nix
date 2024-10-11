@@ -14,5 +14,6 @@
     tilt
     kubeshark
     talosctl
+    seabird
   ];
 }
