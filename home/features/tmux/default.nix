@@ -372,6 +372,7 @@
       set -agF status-right "#{E:@forceline_status_cpu}"
       set -agF status-right "#{E:@forceline_status_weather}"
       set -agF status-right "#{E:@forceline_status_ipwan}"
+      set -agF status-right "#{E:@forceline_status_test}"
     '';
 
       # set -g set-clipboard on      # use system clipboard
