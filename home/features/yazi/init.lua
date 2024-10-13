@@ -31,7 +31,20 @@ require("yatline"):setup({
 	part_seperator = { open = "", close = "" },
 	-- inverse_seperator = { open = "", close = "" },
 
-	theme = catppuccin_theme,
+	-- theme = catppuccin_theme,
+
+	 style_a = {
+      fg = "#292c3c",
+      bg_mode = {
+        normal = "#8caaee",
+        select = "#ca9ee6",
+        un_set = "#e78284"
+      }
+    },
+    style_b = { bg = "#414559", fg = "#c6d0f5" },
+    style_c = { bg = "#292c3c", fg = "#c6d0f5" },
+
+
 	-- style_a = {
 	-- 	fg = "black",
 	-- 	bg_mode = {
@@ -67,59 +80,59 @@ require("yatline"):setup({
 	display_header_line = false,
 	display_status_line = true,
 
-	header_line = {
-		left = {
-			section_a = {
-        			{type = "line", custom = false, name = "tabs", params = {"left"}},
-			},
-			section_b = {
-			},
-			section_c = {
-			}
-		},
-		right = {
-			section_a = {
-        			{type = "string", custom = false, name = "date", params = {"%A, %d %B %Y"}},
-			},
-			section_b = {
-        			{type = "string", custom = false, name = "date", params = {"%H:%M:%S"}},
-			},
-			section_c = {
-				{type = "coloreds", custom = false, name = "githead"},
-			}
-		}
-	},
+	-- header_line = {
+	-- 	left = {
+	-- 		section_a = {
+  --       			{type = "line", custom = false, name = "tabs", params = {"left"}},
+	-- 		},
+	-- 		section_b = {
+	-- 		},
+	-- 		section_c = {
+	-- 		}
+	-- 	},
+	-- 	right = {
+	-- 		section_a = {
+  --       			{type = "string", custom = false, name = "date", params = {"%A, %d %B %Y"}},
+	-- 		},
+	-- 		section_b = {
+  --       			{type = "string", custom = false, name = "date", params = {"%H:%M:%S"}},
+	-- 		},
+	-- 		section_c = {
+	-- 			{type = "coloreds", custom = false, name = "githead"},
+	-- 		}
+	-- 	}
+	-- },
 
-	status_line = {
-		left = {
-			section_a = {
-        			{type = "string", custom = false, name = "tab_mode"},
-			},
-			section_b = {
-        			{type = "string", custom = false, name = "hovered_size"},
-			},
-			section_c = {
-        			{type = "string", custom = false, name = "hovered_name"},
-        			{type = "coloreds", custom = false, name = "count"},
-			}
-		},
-		right = {
-			section_a = {
-        			{type = "string", custom = false, name = "cursor_position"},
-			},
-			section_b = {
-        			{type = "string", custom = false, name = "cursor_percentage"},
-			},
-			section_c = {
-        			{type = "string", custom = false, name = "hovered_file_extension", params = {true}},
-        			{type = "coloreds", custom = false, name = "permissions"},
-			}
-		}
-	},
+	-- status_line = {
+	-- 	left = {
+	-- 		section_a = {
+  --       			{type = "string", custom = false, name = "tab_mode"},
+	-- 		},
+	-- 		section_b = {
+  --       			{type = "string", custom = false, name = "hovered_size"},
+	-- 		},
+	-- 		section_c = {
+  --       			{type = "string", custom = false, name = "hovered_name"},
+  --       			{type = "coloreds", custom = false, name = "count"},
+	-- 		}
+	-- 	},
+	-- 	right = {
+	-- 		section_a = {
+  --       			{type = "string", custom = false, name = "cursor_position"},
+	-- 		},
+	-- 		section_b = {
+  --       			{type = "string", custom = false, name = "cursor_percentage"},
+	-- 		},
+	-- 		section_c = {
+  --       			{type = "string", custom = false, name = "hovered_file_extension", params = {true}},
+  --       			{type = "coloreds", custom = false, name = "permissions"},
+	-- 		}
+	-- 	}
+	-- },
 })
 
 require("yatline-githead"):setup({
-	theme = catppuccin_theme,
+	-- theme = catppuccin_theme,
 
 	show_branch = true,
   branch_prefix = "on",
