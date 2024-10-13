@@ -11,14 +11,14 @@
       inlayHints = true;
       servers = {
         dockerls = {enable = true;};
-        docker-compose-language-service = {enable = true;};
-        emmet-ls = {enable = true;};
+        docker_compose_language_service = {enable = true;};
+        emmet_ls = {enable = true;};
         graphql = {enable = true;};
         htmx = {enable = true;};
-        jsonnet-ls = {enable = true;};
+        jsonnet_ls = {enable = true;};
         nixd = {enable = true;};
         ruff = {enable = true;};
-        rust-analyzer = {
+        rust_analyzer = {
           enable = true;
           installRustc = true;
           installCargo = true;
@@ -26,22 +26,22 @@
         sqls = {enable = true;};
         tailwindcss = {enable = true;};
         templ = {enable = true;};
-        typos-lsp = {enable = true;};
+        typos_lsp = {enable = true;};
         html = {enable = true;};
-        lua-ls = {enable = true;};
-        nil-ls = {enable = true;};
+        lua_ls = {enable = true;};
+        nil_ls = {enable = true;};
         marksman = {enable = true;};
         pyright = {enable = true;};
         gopls = {enable = true;};
         terraformls = {enable = true;};
-        ts-ls = {enable = true;};
+        ts_ls = {enable = true;};
         ansiblels = {enable = true;};
         jsonls = {enable = true;};
-        helm-ls = {
+        helm_ls = {
           enable = true;
           extraOptions = {
             settings = {
-              "helm-ls" = {
+              "helm_ls" = {
                 yamlls = {
                   path = "${pkgs.yaml-language-server}/bin/yaml-language-server";
                 };
