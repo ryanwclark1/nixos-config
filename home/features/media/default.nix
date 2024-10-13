@@ -1,28 +1,36 @@
 {
+  pkgs,
   ...
 }:
 
 {
   imports = [
-    # ./blender.nix
-    # ./darktable.nix
-    # ./digikam.nix
-    # ./drawio.nix
-    ./eye.nix
-    ./ffmpeg.nix
-    # ./gimp.nix
-    ./graphviz.nix
     ./gstreamer.nix
-    # ./handbrake.nix
-    ./imagemagick.nix
-    # ./inkscape.nix
-    # ./kdenlive.nix
-    # ./krita.nix
     ./mpv.nix
-    ./music.nix
+    ./ncmp.nix
     # ./obs.nix
     ./playerctl.nix
-    ./vlc.nix
     ./yt-dlp.nix
   ];
+
+  home.packages = with pkgs; [
+    # blender-hip # Includes blender and thumbnailer
+    # darktable # RAW photo editor
+    # digikam # Photo management
+    # drawio # Diagram editor
+    eog # Gnome Image viewer
+    ffmpeg # Multimedia framework
+    # gimp # Image editor
+    graphviz # Graph visualization
+    # handbrake # Video transcoder
+    imagemagick # Image manipulation
+    # inkscape # Vector graphics editor
+    # kdenlive # Video editor
+    # krita # Digital painting
+    spotify
+    termusic
+    vlc # Media player
+  ];
 }
+
+
