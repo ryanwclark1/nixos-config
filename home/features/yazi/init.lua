@@ -19,7 +19,7 @@ function Status:name()
   return ui.Line(" " .. h.name .. linked)
 end
 
-local catppuccin_theme = require("yatline-catppuccin"):setup("frappe") -- or "latte" | "frappe" | "macchiato"
+-- local catppuccin_theme = require("yatline-catppuccin"):setup("frappe") -- or "latte" | "frappe" | "macchiato"
 
 -- Yatline setup
 require("yatline"):setup({
@@ -56,24 +56,24 @@ require("yatline"):setup({
 	-- style_b = { bg = "#665c54", fg = "#ebdbb2" },
 	-- style_c = { bg = "#3c3836", fg = "#a89984" },
 
-	permissions_t_fg = "green",
-	permissions_r_fg = "yellow",
-	permissions_w_fg = "red",
-	permissions_x_fg = "cyan",
+	permissions_t_fg = "#a6d189",
+	permissions_r_fg = "#e5c890",
+	permissions_w_fg = "#e78284",
+	permissions_x_fg = "#81c8be",
 	permissions_s_fg = "darkgray",
 
 	tab_width = 20,
 	tab_use_inverse = false,
 
-	selected = { icon = "󰻭", fg = "yellow" },
-	copied = { icon = "", fg = "green" },
-	cut = { icon = "", fg = "red" },
+	selected = { icon = "󰻭", fg = "#e5c890" },
+	copied = { icon = "", fg = "#a6d189" },
+	cut = { icon = "", fg = "#e78284" },
 
-	total = { icon = "󰮍", fg = "yellow" },
-	succ = { icon = "", fg = "green" },
-	fail = { icon = "", fg = "red" },
-	found = { icon = "󰮕", fg = "blue" },
-	processed = { icon = "󰐍", fg = "green" },
+	total = { icon = "󰮍", fg = "#e5c890" },
+	succ = { icon = "", fg = "#a6d189" },
+	fail = { icon = "", fg = "#e78284" },
+	found = { icon = "󰮕", fg = "#8caaee" },
+	processed = { icon = "󰐍", fg = "#a6d189" },
 
 	show_background = false,
 
