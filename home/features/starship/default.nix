@@ -220,7 +220,7 @@ with config.lib.stylix.colors.withHashtag;
       lua = {
         symbol = "";
         style = "bg:${base0F}";
-        format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]";
+        format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
         disabled = false;
       };
 
@@ -263,7 +263,7 @@ with config.lib.stylix.colors.withHashtag;
       zig = {
         symbol = "";
         style = "bg:${base0F}";
-        format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]";
+        format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
         disabled = true;
       };
 
@@ -278,7 +278,7 @@ with config.lib.stylix.colors.withHashtag;
         description = "Indicate when the shell was launched by `yazi`";
         symbol = " ";
         style = "bg:${base0E} fg:${base00}";
-        when = '' test -n "$YAZI_LEVEL" '';
+        when = ''test -n "$YAZI_LEVEL"'';
       };
 
       line_break.disabled = true;
