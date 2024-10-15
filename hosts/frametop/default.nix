@@ -18,6 +18,7 @@
     ../common/optional/docker.nix
     ../common/optional/direnv.nix
     # ../common/optional/k3s.nix
+    ../common/optional/nautilus.nix
     ../common/optional/nfs.nix
     ../common/optional/audio.nix
     ../common/optional/printing.nix
