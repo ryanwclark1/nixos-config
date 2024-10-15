@@ -20,6 +20,9 @@
       nautilus
       nautilus-python
     ];
-};
+  };
+
+  # Enable preview for files in Nautilus
+  services.gnome.sushi.enable = true;
 
 }
