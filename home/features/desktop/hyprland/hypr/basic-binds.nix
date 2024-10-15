@@ -5,7 +5,8 @@
   ...
 }:
 let
-  terminal = lib.getExe pkgs.alacritty;
+  # terminal = lib.getExe pkgs.alacritty;
+  terminal = lib.getExe pkgs.kitty;
   files = "${pkgs.nautilus}/bin/nautilus";
   code = lib.getExe config.programs.vscode.package;
   defaultApp = type: "${lib.getExe pkgs.handlr-regex} launch ${type}";
@@ -94,7 +95,6 @@ in
           brightnessctl = lib.getExe pkgs.brightnessctl;
         in
         [
-
           ",XF86MonBrightnessUp,exec,${brightnessctl} -q set +10%"
           ",XF86MonBrightnessDown,exec,${brightnessctl} -q set 10%-"
           ",XF86KbdBrightnessUp,   exec, ${brightnessctl} -d asus::kbd_backlight set +1"
@@ -201,7 +201,7 @@ in
           ",XF86Launch4,   ${e} -r 'recorder.start()'"
           ",Print,         exec, ${screenshot}"
           "SHIFT,Print,    exec, ${screenshot} --full"
-          "SUPER, Return, exec, xterm" # xterm is a symlink, not actually xterm
+          "SUPER, Return, exec, ${terminal}" # xterm is a symlink, not actually xterm
           "SUPER, W, exec, firefox"
           # "SUPER, E, exec, wezterm -e lf"
 

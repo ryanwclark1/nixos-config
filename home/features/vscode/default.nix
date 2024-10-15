@@ -56,6 +56,7 @@
         mikestead.dotenv
         njpwerner.autodocstring
         pkief.material-icon-theme
+        quicktype.quicktype
         redhat.vscode-xml
         redhat.vscode-yaml
         rust-lang.rust-analyzer
@@ -83,17 +84,17 @@
           version = "0.0.15";
           sha256 = "sha256-9aoDDO7hh+YPTKh64z3rZhnTW5H8Se3+ZTncGrsKyJ0=";
         }
-{
+        {
           name = "copilot";
           publisher = "github";
-          version = "1.229.0";
-          sha256 = "sha256-UCwBfScsbAVxuDj5ThUIObF/GsJ/bFMkp8n6Rd7HPEQ=";
+          version = "1.238.0";
+          sha256 = "sha256-9Vis8D4FJAHq+TKiqvhMmEVo26AGr63JRDmApLhmbx4=";
         }
         {
           name = "copilot-chat";
           publisher = "github";
-          version = "0.20.1";
-          sha256 = "sha256-HCPUufTZdukDmvP4/90K1x6bPq281Y02RpRds0vDL3U=";
+          version = "0.21.0";
+          sha256 = "sha256-DnfzPTMifgSFpio6YGdlzH9pQmYbg3v16/LVVYvTaKg=";
         }
         {
           name = "htmx-attributes";
@@ -146,8 +147,8 @@
         {
           name = "vscode-speech";
           publisher = "ms-vscode";
-          version = "0.10.0";
-          sha256 = "sha256-ef5uzpXVS92snyM47PwTcAhCKKwfn4iQFvZxMev4X58=";
+          version = "0.11.2024091917";
+          sha256 = "sha256-yvpvEc8f0FeSHtCsq8GF2FcPc3yZVMTr1FW1pVxlTe4=";
         }
         {
           name = "vscode-thunder-client";
