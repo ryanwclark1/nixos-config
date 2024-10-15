@@ -17,8 +17,8 @@
     ];
 
     systemPackages = with pkgs; [
-      gnome.nautilus
-      gnome.nautilus-python
+      nautilus
+      nautilus-python
     ];
 };
 
