@@ -23,6 +23,7 @@
     # ../common/optional/k3s.nix
     ../common/optional/nfs.nix
     ../common/optional/audio.nix
+    ../common/optional/nautilus.nix
     ../common/optional/printing.nix
     ../common/optional/qemu.nix
     ../common/optional/steam.nix
