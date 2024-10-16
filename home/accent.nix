@@ -7,7 +7,6 @@
   imports = [
     ./global
 
-    ./features/alacritty
     ./features/atuin
     ./features/bat
     ./features/cli
@@ -17,7 +16,6 @@
     ./features/fd
     ./features/fzf
     ./features/git
-    ./features/kitty
     ./features/kubernetes
     ./features/lazygit
     ./features/networking-utils
