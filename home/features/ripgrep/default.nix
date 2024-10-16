@@ -7,6 +7,7 @@
   programs = {
     ripgrep = {
       enable = true;
+      package = pkgs.ripgrep;
       arguments = [
         "--glob=!.git/*"
         "--glob=!node_modules/*"
