@@ -11,9 +11,6 @@
     kubectl
     kubernetes-helm
     minikube
-    tilt
-    kubeshark
     talosctl
-
   ];
 }

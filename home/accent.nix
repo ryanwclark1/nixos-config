@@ -32,4 +32,6 @@
   home.username = lib.mkForce "administrator";
   # Disable impermanence
   # home.persistence = lib.mkForce {};
+
+  
 }
