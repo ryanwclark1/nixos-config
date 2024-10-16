@@ -159,6 +159,16 @@
           inherit inputs outputs;
         };
       };
+      "root@vlad" = lib.homeManagerConfiguration {
+        modules = [
+          stylix.homeManagerModules.stylix
+          ./home/vlad.nix
+        ];
+        pkgs = pkgsFor.x86_64-linux;
+        extraSpecialArgs = {
+          inherit inputs outputs;
+        };
+      };
     };
   };
 }
