@@ -239,7 +239,6 @@
         "window.titleBarStyle" = "custom";
         "window.zoomLevel" = 1;
         "workbench.editor.enablePreview" = true;
-        # "workbench.colorTheme" = "Catppuccin Frappé";
         "workbench.externalBrowser" = "chrome";
 
         "html-css-class-completion.enableEmmetSupport" = true;
