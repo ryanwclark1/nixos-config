@@ -1,4 +1,5 @@
 {
+  config,
   ...
 }:
 
@@ -6,7 +7,7 @@
   programs.browserpass.enable = true;
   programs.firefox = {
     enable = true;
-    profiles.administrator = {
+    profiles.${config.home.username} = {
       bookmarks = { };
       # extensions = with pkgs.inputs.firefox-addons; [
       #   ublock-origin

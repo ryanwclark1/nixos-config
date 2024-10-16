@@ -1,8 +1,8 @@
 # TODO: Configure XDG_CONFIG_HOME for config directory
 { inputs, lib, config, pkgs, ... }:
 let
-  user = "administrator";
-  homeDirectory = "/home/${user}/.config";
+  user = "${config.home.username}";
+  homeDirectory = "${config.home.homeDirectory}/.config";
 in
 {
     programs = {
