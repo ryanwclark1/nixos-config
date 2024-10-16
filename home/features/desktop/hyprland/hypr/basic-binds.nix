@@ -30,8 +30,7 @@ in
         "ALT, F4,killactive"
         "SUPER SHIFT, e,exit"
 
-        "SUPER, f,fullscreen,1"
-        "SUPER SHIFT, f,fullscreen,0"
+
         "SUPER SHIFT, space,togglefloating"
 
         "SUPER, minus,splitratio,-0.25"
@@ -50,16 +49,11 @@ in
         "SUPER SHIFT, u,movetoworkspacesilent,special"
         "SUPER, i,pseudo"
 
-        # "ALT, Tab,cyclenext"
-        # "ALT, Tab,bringactivetotop"
       ]
       ++
       (
-
         [
           # Program bindings
-          # "SUPER, Return,exec,${terminal}"
-          # "SUPER, W,exec,${browser}"
           "SUPER, S,exec,screenshooting"
           "SUPER, e,exec,${code}"
           "SUPER, b,exec,${defaultApp "x-scheme-handler/https"}"
@@ -68,6 +62,8 @@ in
           # "SUPER ALT,Return,exec,${remote} ${defaultApp "x-scheme-handler/terminal"}"
           # "SUPER ALT,e,exec,${remote} ${defaultApp "text/plain"}"
           # "SUPER ALT,b,exec,${remote} ${defaultApp "x-scheme-handler/https"}"
+          "SUPER, Return, exec, ${terminal}" # xterm is a symlink, not actually xterm
+          "SUPER, W, exec, ${browser}"
         ]
       )
       ++
@@ -147,9 +143,7 @@ in
         in
         lib.optionals config.programs.rofi.enable [
           "SUPER, x,exec,${rofi} -show drun -theme ${config.home.homeDirectory}/.config/rofi/style/launcher-center.rasi"
-
-          # "SUPER, s,exec,${rofi} -show drun -theme ${config.home.homeDirectory}/.config/rofi/style/launcher-full.rasi"
-        # "$mod, Space, exec, $menu --show drun"
+          "SUPER, z,exec,${rofi} -show drun -theme ${config.home.homeDirectory}/.config/rofi/style/launcher-full.rasi"
           "SUPERSHIFT, W,exec,web-search"
         ]
         ++
@@ -158,7 +152,7 @@ in
             cliphist = lib.getExe config.services.cliphist.package;
           in
           lib.optionals config.services.cliphist.enable [
-            ''SUPER, c,exec,selected=$(${cliphist} list | ${rofi} -S dmenu) && echo "$selected" | ${cliphist} decode | wl-copy''
+            ''SUPER, c,exec,selected=$(${cliphist} list | ${rofi} -show drun) && echo "$selected" | ${cliphist} decode | wl-copy''
           ]
         )
       )
@@ -201,20 +195,17 @@ in
           ",XF86Launch4,   ${e} -r 'recorder.start()'"
           ",Print,         exec, ${screenshot}"
           "SHIFT,Print,    exec, ${screenshot} --full"
-          "SUPER, Return, exec, ${terminal}" # xterm is a symlink, not actually xterm
-          "SUPER, W, exec, firefox"
-          # "SUPER, E, exec, wezterm -e lf"
 
-          # youtube
-          # ", XF86Launch1,  exec, ${yt}"
 
           "ALT, Tab, focuscurrentorlast"
           "CTRL ALT, Delete, exit"
           "ALT, Q, killactive"
-          # "SUPER, F, togglefloating"
+          "SUPER, F, togglefloating"
           # "SUPER, G, fullscreen"
           # "SUPER, O, fakefullscreen"
           "SUPER, P, togglesplit"
+          "SUPER, G,fullscreen,1"
+          "SUPER SHIFT, G,fullscreen,0"
 
           (mvfocus "k" "u")
           (mvfocus "j" "d")
