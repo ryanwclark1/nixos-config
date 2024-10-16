@@ -256,7 +256,7 @@ in
       in [
         (f "")
         (f "org.gnome.Calculator")
-        (f "org.gnome.Nautilus")
+        # (f "org.gnome.Nautilus")
         (f "${pwvucontrol}")
         (f "${nm-connection-editor}")
         (f "blueberry.py")
@@ -273,7 +273,6 @@ in
       windowrulev2 = [
         "stayfocused, title:^()$,class:^(${steam})$"
         "minsize 1 1, title:^()$,class:^(${steam})$"
-
       ];
 
       layerrule = [
