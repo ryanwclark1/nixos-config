@@ -6,9 +6,7 @@
 {
 
   imports = [
-    ./insomnia
     ./build.nix
-    # ./devpod.nix
     # ./gitops.nix
     # ./gitui.nix
     ./go.nix
