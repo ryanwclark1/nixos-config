@@ -18,7 +18,6 @@
     ./features/cli
     ./features/compression
     ./features/discord
-    ./features/fragments
     ./features/development
     ./features/eza
     ./features/fastfetch
@@ -47,7 +46,6 @@
     ./features/tmux
     ./features/virtviewer
     ./features/virtualisation
-    ./features/vhs
     ./features/vscode
     ./features/yazi
     ./features/zed
