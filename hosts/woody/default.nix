@@ -1,4 +1,5 @@
 {
+  config,
   inputs,
   pkgs,
   ...
@@ -17,12 +18,12 @@
     ../common/users/administrator
 
     # ../common/optional/arion.nix
+    ../common/optional/audio.nix
     ../common/optional/bluetooth.nix
     ../common/optional/direnv.nix
     ../common/optional/docker.nix
     # ../common/optional/k3s.nix
     ../common/optional/nfs.nix
-    ../common/optional/audio.nix
     ../common/optional/nautilus.nix
     ../common/optional/printing.nix
     ../common/optional/qemu.nix

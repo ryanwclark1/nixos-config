@@ -33,6 +33,5 @@ in
       # generate a new key if none is found
       generateKey = true;
     };
-
   };
 }
