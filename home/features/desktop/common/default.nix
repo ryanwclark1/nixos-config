@@ -31,6 +31,8 @@
     webkitgtk # Web rendering engine
     libsoup
     fragments # Torrent client
+    seabird # Kubernetes native desktop app that simplifies working with Kubernetes.
+
   ];
 
 }
