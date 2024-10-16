@@ -35,6 +35,7 @@
     ../common/optional/thunar.nix
     ../common/optional/webcam.nix
     ../common/optional/wireshark.nix
+    ../common/optional/wireguard.nix
     ../common/optional/zsh.nix
 
     ../common/optional/displaymanager/gdm.nix
