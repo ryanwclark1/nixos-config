@@ -8,12 +8,10 @@
     ./btop.nix
     ./gh.nix
     ./jq.nix
-    ./mprocs.nix
     ./navi.nix
     ./neomutt.nix
     ./network.nix
     ./nixtools.nix
-    ./noti.nix
     ./tealdeer.nix
     ./thefuck.nix
     ./vhs.nix

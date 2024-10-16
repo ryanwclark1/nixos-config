@@ -6,6 +6,7 @@
 {
   imports = [
     ./gtk.nix
+    ./noti.nix
     ./qt.nix
     ./xdg.nix
   ];
@@ -38,6 +39,7 @@
     postman # API Development Environment
     dbeaver-bin # Universal Database Tool
     sqlitebrowser # Visual tool to create, design, and edit database files compatible with SQLite
+    kubeshark # Kubernetes packet capture tool
   ];
 
 }
