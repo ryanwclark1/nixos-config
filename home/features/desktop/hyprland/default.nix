@@ -19,7 +19,7 @@
     # ./scripts/screenshot.nix
     # ./eww
     # ./mako
-    # ./wofi.nix
+
   ];
 
   home = {
