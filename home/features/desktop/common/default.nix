@@ -30,6 +30,7 @@
     file-roller # Archive manager
     webkitgtk # Web rendering engine
     libsoup
+    fragments # Torrent client
   ];
 
 }
