@@ -19,7 +19,6 @@
         co = "pr checkout";
         pv = "pr view";
       };
-      editor = "$EDITOR";
       git_protocal = "https";
     };
     extensions = with pkgs; [
