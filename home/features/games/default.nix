@@ -9,7 +9,7 @@
     ./dolphinemu.nix
     # ./factorio.nix
     # ./heroic.nix
-    ./lutris.nix
+    # ./lutris.nix
     # ./steam.nix
     # ./gamescope.nix
     # ./zeroad.nix
