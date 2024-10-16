@@ -27,9 +27,7 @@
     ./features/starship
     ./features/sys-stats
     ./features/tmux
-    ./features/virtviewer
     ./features/yazi
-    ./features/zellij
     ./features/zoxide
   ];
 
