@@ -28,6 +28,7 @@
     jdupes # Find duplicate files
     ncdu # TUI disk usage
     lazydocker # A simple terminal UI for both docker and docker-compose
+    dive # A tool for exploring each layer in a docker image.
     gum # shell scripts
     viu # Terminal image viewer with native support for iTerm and Kitty
     yq-go #jq for yaml, command-line YAML processor https://github.com/mikefarah/yq
