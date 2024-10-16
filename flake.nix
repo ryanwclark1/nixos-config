@@ -149,6 +149,16 @@
           inherit inputs outputs;
         };
       };
+       "administrator@accent" = lib.homeManagerConfiguration {
+        modules = [
+          stylix.homeManagerModules.stylix
+          ./home/accent.nix
+        ];
+        pkgs = pkgsFor.x86_64-linux;
+        extraSpecialArgs = {
+          inherit inputs outputs;
+        };
+      };
     };
   };
 }
