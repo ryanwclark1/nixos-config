@@ -12,7 +12,6 @@
     ./grpc.nix
     ./js.nix
     ./lua.nix
-    ./postman.nix
     ./protobuf.nix
     ./python.nix
     ./rust.nix
