@@ -7,7 +7,6 @@
 
   imports = [
     ./build.nix
-    # ./gitops.nix
     # ./gitui.nix
     ./go.nix
     ./grpc.nix
