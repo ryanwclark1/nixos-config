@@ -8,7 +8,6 @@
 }:
 
 {
-
   home.packages = [
     (pkgs.writeScriptBin "fzf-git" (builtins.readFile ./fzf-git.sh))
     (pkgs.writeScriptBin "rgf" (builtins.readFile ./rgf.sh))
@@ -20,7 +19,6 @@
     package = pkgs.fzf;
     tmux = {
       enableShellIntegration = lib.mkIf config.programs.tmux.enable true;
-      # fzf-tmux --help
       shellIntegrationOptions = [
         "-d 50%"
       ];
@@ -50,25 +48,15 @@
       "--height=40%"
       "--layout=reverse"
       "--preview 'if [ -d {} ]; then eza --tree --color=always {} | head -200; else bat --style=numbers --color=always --line-range=:500 {}; fi'"
-
-
-
-      # "--preview='pistol {}'"
-      # "--ansi"
-      # "--info=inline"
-      # "--border"
-      # "--margin=1"
-      # "--padding=1"
-      # "--border"
     ];
     fileWidgetCommand = "fd --type file --follow --hidden --strip-cwd-prefix --exclude .git";
     fileWidgetOptions = [
       "--preview 'bat --style=numbers --color=always --line-range=:500 {}'"
     ];
-    # historyWidgetOptions = [
-    #   "--sort"
-    #   "--exact"
-    # ];
+    historyWidgetOptions = [
+      "--sort"
+      "--exact"
+    ];
     enableBashIntegration = lib.mkIf config.programs.bash.enable true;
     enableFishIntegration = lib.mkIf config.programs.fish.enable true;
     enableZshIntegration = lib.mkIf config.programs.zsh.enable true;
