@@ -59,14 +59,6 @@
             type = "custom";
             format = "┌─────────────────────Hardware──────────────────────┐";
           }
-          # {
-            # type = "command";
-          #   shell = "/bin/sh";
-          #   test = "echo $HOSTNAME";
-          #   key = " PC";
-          #   keyColor = "${base0E}";
-
-          # }
           {
             type = "title";
             key = "  PC";
