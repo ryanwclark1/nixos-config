@@ -36,7 +36,6 @@
     ];
 
     utils = [
-      rust-analyzer
       rust-audit-info
       rust-code-analysis
       rust-script
@@ -44,10 +43,8 @@
       trunk # for wasm
     ];
   in
-  rustBasics
-  ++ cargoSubCommands
+  cargoSubCommands
   ++ rustBasics
-  ++ externalLibs
   ++ utils;
 
   home.sessionPath = [ "${config.home.homeDirectory}/.cargo/bin" "${config.home.homeDirectory}/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin" ];
