@@ -1,6 +1,4 @@
 {
-  config,
-  lib,
   pkgs,
   ...
 }:
@@ -20,12 +18,5 @@
         fastfetch 2>/dev/null
       fi
     '';
-    # bashrcExtra = ''
-    #   eval "$(zoxide init bash)"
-    #   set -o vi
-    # '';
   };
-
-
-
 }
