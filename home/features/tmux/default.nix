@@ -205,14 +205,14 @@
 
       # Make the status line pretty and add some modules
       set -g status-left ""
-      set -g  status-right "#{E:@forceline_status_directory}"
+      # set -g  status-right "#{E:@forceline_status_directory}"
       set -ag status-right "#{E:@forceline_status_user}"
       set -ag status-right "#{E:@forceline_status_host}"
       set -ag status-right "#{E:@forceline_status_session}"
-      set -agF status-right "#{E:@forceline_status_cpu}"
-      set -agF status-right "#{E:@forceline_status_weather}"
-      set -agF status-right "#{E:@forceline_status_ipwan}"
-      set -agF status-right "#{E:@forceline_status_test}"
+      # set -agF status-right "#{E:@forceline_status_cpu}"
+      # set -agF status-right "#{E:@forceline_status_weather}"
+      # set -agF status-right "#{E:@forceline_status_ipwan}"
+      # set -agF status-right "#{E:@forceline_status_test}"
     '';
 
       # set -g set-clipboard on      # use system clipboard
