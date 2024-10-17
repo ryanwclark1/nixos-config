@@ -27,11 +27,15 @@
     ./features/tmux
     ./features/yazi
     ./features/zoxide
+
+    ./features/development/build.nix
+    ./features/development/go.nix
+    ./features/development/python.nix
   ];
 
   home.username = lib.mkForce "administrator";
   # Disable impermanence
   # home.persistence = lib.mkForce {};
 
-  
+
 }
