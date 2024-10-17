@@ -40,6 +40,7 @@
     dbeaver-bin # Universal Database Tool
     sqlitebrowser # Visual tool to create, design, and edit database files compatible with SQLite
     kubeshark # Kubernetes packet capture tool
+    weave-gitops # GitOps for Kubernetes
   ];
 
 }
