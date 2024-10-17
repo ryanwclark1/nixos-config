@@ -31,6 +31,7 @@
     ./features/development/build.nix
     ./features/development/go.nix
     ./features/development/python.nix
+    ./features/development/js.nix
   ];
 
   home.username = lib.mkForce "administrator";
