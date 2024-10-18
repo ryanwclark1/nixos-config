@@ -3,9 +3,6 @@
   ...
 }:
 let
-  # ssh = "${pkgs.openssh}/bin/ssh";
-
-  # git commit --amend, but for older commits
   git-fixup = pkgs.writeShellScriptBin "git-fixup" ''
     rev="$(git rev-parse "$1")"
     git commit --fixup "$@"
