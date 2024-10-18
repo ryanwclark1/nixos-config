@@ -14,9 +14,9 @@
     enableCompletion = true;
     enableVteIntegration = true;
     initExtra = ''
-      if [ -x "$(command -v fastfetch)" ]; then
-        fastfetch 2>/dev/null
-      fi
+      # if [ -x "$(command -v fastfetch)" ]; then
+      #   fastfetch 2>/dev/null
+      # fi
     '';
   };
 }
