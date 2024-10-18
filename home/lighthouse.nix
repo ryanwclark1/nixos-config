@@ -34,7 +34,7 @@
     ./features/development/js.nix
   ];
 
-  home.username = lib.mkForce "administrator";
+  home.username = lib.mkForce "ryanc";
   # Disable impermanence
   # home.persistence = lib.mkForce {};
 
