@@ -13,6 +13,4 @@
     #   downloader-args = "aria2c: '-c -x16 -j16 -s16'";
     # };
   };
-
-
 }
