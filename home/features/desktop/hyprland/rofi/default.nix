@@ -17,30 +17,18 @@
       recursive = true;
     };
   };
-  programs = {
-    rofi =
-    let
-      terminal = lib.getExe pkgs.alacritty;
-    in {
+  programs.rofi = {
+    enable = true;
+    package = pkgs.rofi-wayland;
+    plugins = [
+      pkgs.rofi-emoji-wayland
+    ];
+    pass = {
       enable = true;
-      package = pkgs.rofi-wayland;
-      # configPath = "${config.home.homeDirectory}/.config/rofi/config.rasi";
-      # cycle = true;
-      # font = "JetBrainsMono";
-      # location = "center";
-      # terminal = "${terminal}";
-      # xoffset = 0;
-      # yoffset = 0;
-      plugins = [
-        pkgs.rofi-emoji-wayland
+      package = pkgs.rofi-pass-wayland;
+      stores = [
+        "${config.home.homeDirectory}/.local/share/keyrings"
       ];
-      pass = {
-        enable = true;
-        package = pkgs.rofi-pass-wayland;
-        stores = [
-          "${config.home.homeDirectory}/.local/share/keyrings"
-        ];
-      };
     };
   };
 }
