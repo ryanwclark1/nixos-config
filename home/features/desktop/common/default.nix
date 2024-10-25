@@ -8,6 +8,7 @@
     ./gtk.nix
     ./noti.nix
     ./qt.nix
+    ./trayscale.nix
     ./xdg.nix
   ];
 
