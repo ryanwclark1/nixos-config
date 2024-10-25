@@ -36,7 +36,7 @@
     ./features/nixvim
     # ./features/pistol
     ./features/productivity
-    ./features/qutebrowser
+    # ./features/qutebrowser
     # ./features/remmina
     ./features/ripgrep
     ./features/slack
