@@ -4,6 +4,7 @@
   ...
 }:
 
+
 {
   imports = [
     inputs.sops-nix.homeManagerModules.sops
@@ -26,6 +27,14 @@
     secrets = {
       administrator-password = {};
       "private_keys/administrator" = {};
+      "accent-email/accent-email-address" = {};
+      "accent-email/accent-email-username" = {};
+      "accent-email/accent-email-name" = {};
+      "accent-email/accent-email-realname" = {};
+      "accent-email/accent-email-password" = {};
+      "accent-email/accent-email-imap-host" = {};
+      "accent-email/accent-email-smtp-host" = {};
+      "accent-email/accent-email-flavor" = {};
     };
   };
 }

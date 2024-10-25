@@ -4,13 +4,7 @@
   inputs,
   ...
 }:
-let
-  secretsDirectory = builtins.toString inputs.nix-secrets;
-  secretsFile = "${secretsDirectory}/secrets.yaml";
-  isEd25519 = k: k.type == "ed25519";
-  getKeyPath = k: k.path;
-  keys = builtins.filter isEd25519 config.services.openssh.hostKeys;
-in
+
 {
   imports = [
     inputs.sops-nix.nixosModules.sops
@@ -18,7 +12,7 @@ in
 
   # sops-nix options: https://dl.thalheim.io/
   sops = {
-    defaultSopsFile = "${secretsFile}";
+    defaultSopsFile = ../../../secrets/secrets.yaml;
     # defaultSopsFile = ../../../secrets/secrets.yaml;
     validateSopsFiles = true;
     age = {
