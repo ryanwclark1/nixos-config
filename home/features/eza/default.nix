@@ -10,7 +10,7 @@
   programs.eza = {
     enable = true;
     package = pkgs.eza;
-    icons = true;
+    icons = "auto";
     git = true;
     extraOptions = [
       "--group-directories-first"
@@ -28,6 +28,7 @@
   home.shellAliases = {
     ls = "eza -a --icons";
     l = "eza -lhg";
+    la = "eza -a";
     ll = "eza -alhg";
     lt = "eza --tree";
     tree = "eza -la --git-ignore --icons --tree --hyperlink --level 4";
