@@ -9,7 +9,7 @@
     ./gh.nix
     ./jq.nix
     ./navi.nix
-    ./neomutt.nix
+    # ./neomutt.nix
     ./network.nix
     ./nixtools.nix
     ./tealdeer.nix

@@ -11,6 +11,7 @@
     ./features/desktop/gnome
     ./features/desktop/common
 
+    ./features/accounts
     ./features/alacritty
     ./features/ansible
     ./features/atuin
