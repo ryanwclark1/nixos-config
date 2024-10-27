@@ -16,13 +16,14 @@
             accent_email = "$(${pkgs.coreutils}/bin/cat ${config.sops.secrets."accent-email/accent-email-address".path})";
           in
           {
-          address = accent_email;
+          address = "ryanc@accentservices.com";
           flavor = "gmail.com";
-          # name = config.sops.secrets.accent-email-name.path;
           realName = "Ryan Clark";
+          userName = "ryanc@accentservices.com";
           # userName = config.sops.secrets."accent-email/accent-email-username".path;
-          # username = "ryanc@accentservices.com";
-          passwordCommand = ''${pkgs.coreutils}/bin/cat ${config.sops.secrets."accent-email/accent-email-password".path}'';
+          passwordCommand = ''
+            ${pkgs.coreutils}/bin/cat ${config.sops.secrets."accent-email/accent-email-password".path}
+          '';
           primary = true;
           # imap = {
             # host = builtins.readFile config.sops.secrets."accent-email/accent-email-imap-host".path;
