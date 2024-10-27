@@ -70,17 +70,22 @@
     kernelPackages = pkgs.linuxKernel.packages.linux_6_10;
   };
 
+  # Added for nixd lsp
+  # nix.nixPath = [
+  #   "nixpkgs=${inputs.nixpkgs.path}"
+  # ];
+
   hardware = {
     enableAllFirmware = true;
     enableRedistributableFirmware = true;
     amdgpu = {
       amdvlk = {
         enable = true;
-        package = pkgs.amdvlk;
+        # package = pkgs.amdvlk;
         supportExperimental.enable = true;
         support32Bit = {
           enable = true;
-          package = pkgs.driversi686Linux.amdvlk;
+          # package = pkgs.driversi686Linux.amdvlk;
         };
       };
       initrd.enable = true;
