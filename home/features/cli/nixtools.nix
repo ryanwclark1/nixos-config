@@ -18,19 +18,19 @@ let
 in
 {
   home.packages = with pkgs; [
-    alejandra
     comma
     deadnix
-    nil # Nix LSP
     niv
     nix-diff
     nvd
     nix-tree # Interactively browse dependency graphs of Nix derivations
+    nixfmt-rfc-style
     nix-update
     nixpkgs-lint
     nurl # Generate Nix fetcher calls from repository URLs
     patchelf
-    # sops
+    sops
+    nixd
   ];
 
   programs.nix-index = {

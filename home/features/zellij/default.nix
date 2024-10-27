@@ -8,25 +8,19 @@
 }:
 
 {
-  programs.zellij =
-  let
-    # fish = lib.getExe pkgs.fish;
-    zsh = lib.getExe pkgs.zsh;
-    wl-copy = "${pkgs.wl-clipboard}/bin/wl-copy";
-  in
-  {
+  programs.zellij = {
     enable = true;
     package = pkgs.zellij;
     # https://zellij.dev/documentation/options
     settings ={
       on_force_close = "detach";
       simplified_ui = false;
-      default_shell = zsh;
+      default_shell = lib.getExe pkgs.zsh;
       default_layout = "default";
       default_mode = "locked";
       mouse_mode = true;
       scroll_buffer_size = 25000;
-      copy_command = "${wl-copy}";
+      copy_command = "${pkgs.wl-clipboard}/bin/wl-copy";
       copy_clipboard = "system";
       copy_on_select = true;
       scrollback_editor = "$EDITOR";
