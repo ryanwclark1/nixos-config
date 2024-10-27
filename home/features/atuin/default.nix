@@ -35,9 +35,17 @@
       history_format = "history list";
       store_failed = true;
       secrets_filter = false;
+      network_timeout = 30;
+      network_connection_timeout = 5;
+      local_timeout = 5;
       enter_accept = false;
       # TODO: Switch to vim-normal?
       keymap_mode = "vim-normal";
+      keymap_cursor = {
+        emacs = "blink-block";
+        vim_insert = "blink-block";
+        vim_normal = "steady-block";
+      };
       prefers_reduced_motion = false;
     };
     enableBashIntegration = lib.mkIf config.programs.bash.enable true;
