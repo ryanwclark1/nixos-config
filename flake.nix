@@ -12,7 +12,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-
     #################### Utilities ####################
 
     systems.url = "github:nix-systems/default-linux";
@@ -57,10 +56,6 @@
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # nixvim = {
-    #   url = "github:ryanwclark1/nixvim";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
     ags.url = "github:Aylur/ags";
     matugen = {
       url = "github:/InioX/Matugen";
@@ -83,7 +78,6 @@
   let
     inherit (self) outputs;
     lib = nixpkgs.lib // home-manager.lib;
-    # systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
     forEachSystem = f: lib.genAttrs (import systems) (system: f pkgsFor.${system});
     pkgsFor = lib.genAttrs (import systems) (
     system:

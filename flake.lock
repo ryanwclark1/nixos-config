@@ -780,11 +780,11 @@
         "systems": "systems_3"
       },
       "locked": {
-        "lastModified": 1729004211,
-        "narHash": "sha256-CsfD5g/+s0sUj0DwkD29t4cVC3jo2ooTbYxcSRU6Lg4=",
+        "lastModified": 1729932025,
+        "narHash": "sha256-4aQm1o/u8koSiU0vnT0CGinLzv/bjMxREsSEuwqUOaE=",
         "owner": "InioX",
         "repo": "Matugen",
-        "rev": "6361ff9974ceaf1a06ae7ca9c6051d16b109ade9",
+        "rev": "d28336aff7ab7c99fde96122f24a67129b4f2822",
         "type": "github"
       },
       "original": {

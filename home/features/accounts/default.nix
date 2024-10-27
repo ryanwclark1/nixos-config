@@ -12,9 +12,6 @@
       maildirBasePath = "Mail";
       accounts = {
         "accent" =
-          let
-            accent_email = "$(${pkgs.coreutils}/bin/cat ${config.sops.secrets."accent-email/accent-email-address".path})";
-          in
           {
           address = "ryanc@accentservices.com";
           flavor = "gmail.com";
