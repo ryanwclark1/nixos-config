@@ -67,7 +67,7 @@
     #   enable = true;
     #   pkiBundle = "/etc/secureboot";
     # };
-    kernelPackages = pkgs.linuxKernel.packages.linux_6_10;
+    kernelPackages = pkgs.linuxKernel.packages.linux_6_11;
   };
 
   # Added for nixd lsp
