@@ -47,6 +47,33 @@
         vim_normal = "steady-block";
       };
       prefers_reduced_motion = false;
+      stats = {
+        common_subcommands = [
+          "apt"
+          "cargo"
+          "composer"
+          "dnf"
+          "docker"
+          "git"
+          "go"
+          "ip"
+          "kubectl"
+          "nix"
+          "nmcli"
+          "npm"
+          "pecl"
+          "pnpm"
+          "podman"
+          "port"
+          "systemctl"
+          "tmux"
+          "yarn"
+        ];
+        common_prefix = [
+          "sudo"
+          "noti"
+        ];
+      };
     };
     enableBashIntegration = lib.mkIf config.programs.bash.enable true;
     enableFishIntegration = lib.mkIf config.programs.fish.enable true;
