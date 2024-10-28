@@ -6,7 +6,7 @@
 {
   home = {
     packages = with pkgs; [
-      dolphinEmu
+      dolphin-emu
     ];
   };
 }
