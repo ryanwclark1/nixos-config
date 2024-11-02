@@ -9,6 +9,5 @@
     deviceName = config.networking.hostName;
     checkForUpdates = true;
     enableWebUI = false;
-
   };
 }
