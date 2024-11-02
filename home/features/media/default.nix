@@ -24,7 +24,7 @@
     ffmpeg # Multimedia framework
     # gimp # Image editor
     graphviz # Graph visualization
-    # handbrake # Video transcoder
+    handbrake # Video transcoder
     imagemagick # Image manipulation
     # inkscape # Vector graphics editor
     # kdenlive # Video editor
