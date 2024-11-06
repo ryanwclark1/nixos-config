@@ -29,6 +29,7 @@
     ../common/optional/system-packages.nix
     ../common/optional/tailscale.nix
     ../common/optional/thunar.nix
+    ../common/optional/virt-viewer.nix
     ../common/optional/webcam.nix
     ../common/optional/wireshark.nix
     # ../common/optional/semaphore.nix
@@ -56,7 +57,7 @@
     # kernelPackages = pkgs.linuxKernel.packages.linux_6_9;
     binfmt.emulatedSystems = [ "aarch64-linux" "i686-linux" ];
   };
-  
+
   # Added for nixd lsp
   # nix.nixPath = [
   #   "nixpkgs=${inputs.nixpkgs.path}"
