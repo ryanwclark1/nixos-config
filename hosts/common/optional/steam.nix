@@ -4,7 +4,6 @@
 }:
 
 {
-
   programs = {
     gamemode = {
       enable = true;
