@@ -21,7 +21,6 @@
       enable = true;
       package = pkgs.bun;
       enableGitIntegration = true;
-
     };
   };
 }
