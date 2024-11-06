@@ -12,7 +12,6 @@
     ./xdg.nix
   ];
 
-
   home.packages = with pkgs; [
     d-spy # Dbus debugger
     ventoy-full #balena type tool
@@ -42,6 +41,6 @@
     sqlitebrowser # Visual tool to create, design, and edit database files compatible with SQLite
     kubeshark # Kubernetes packet capture tool
     weave-gitops # GitOps for Kubernetes
+    spice-vdagent # Spice agent
   ];
-
 }
