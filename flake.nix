@@ -8,6 +8,7 @@
 
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+    nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
 
     nixos-hardware.url = "github:nixos/nixos-hardware";
     home-manager = {
@@ -132,7 +133,8 @@
           inherit inputs outputs;
         };
         modules = [
-          nix-darwin.nixosModules.darwin
+          # nix-darwin.nixosModules.darwin
+          # nix-homebrew.darwinModules.nix-homebrew
           ./hosts/mini
         ];
       };
