@@ -182,7 +182,7 @@
         modules = [
           ./home/mini.nix
         ];
-        pkgs = pkgsFor.aarch64-darwin;
+        # pkgs = pkgsFor.aarch64-darwin;
         extraSpecialArgs = {
           inherit inputs outputs;
         };
