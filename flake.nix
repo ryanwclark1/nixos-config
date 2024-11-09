@@ -82,7 +82,7 @@
   } @ inputs:
   let
     inherit (self) outputs;
-    lib = nixpkgs.lib // home-manager.lib;
+    lib = nixpkgs.lib // nix-darwin.lib // home-manager.lib;
     forEachSystem = f: lib.genAttrs (import systems) (system: f pkgsFor.${system});
     pkgsFor = lib.genAttrs (import systems) (
     system:
@@ -129,6 +129,7 @@
 
     darwinConfigurations = {
       mini = nix-darwin.lib.darwinSystem {
+        system = "aarch64-darwin";
         specialArgs = {
           inherit inputs outputs;
         };
@@ -162,12 +163,21 @@
           inherit inputs outputs;
         };
       };
-       "administrator@accent" = lib.homeManagerConfiguration {
+      "administrator@accent" = lib.homeManagerConfiguration {
         modules = [
           stylix.homeManagerModules.stylix
           ./home/accent.nix
         ];
         pkgs = pkgsFor.x86_64-linux;
+        extraSpecialArgs = {
+          inherit inputs outputs;
+        };
+      };
+      "administrator@mini" = lib.homeManagerConfiguration {
+        modules = [
+          ./home/mini.nix
+        ];
+        pkgs = pkgsFor.aarch64-darwin;
         extraSpecialArgs = {
           inherit inputs outputs;
         };
