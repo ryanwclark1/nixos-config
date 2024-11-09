@@ -16,6 +16,7 @@
       pkgs.alacritty
       pkgs.mkalias
       pkgs.tmux
+      pkgs.git
     ];
 
   homebrew = {
