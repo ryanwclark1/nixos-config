@@ -18,22 +18,22 @@
     pkgs.git
   ];
 
-  homebrew = {
-    enable = true;
-    brews = [
-      "mas"
-    ];
-    casks = [
-      "hammerspoon"
-      "firefox"
-      "iina"
-      "the-unarchiver"
-    ];
-    # masApps = {
-    #   "Yoink" = 457622435;
-    # };
-    onActivation.cleanup = "zap";
-  };
+  # homebrew = {
+  #   enable = true;
+  #   brews = [
+  #     "mas"
+  #   ];
+  #   casks = [
+  #     "hammerspoon"
+  #     "firefox"
+  #     "iina"
+  #     "the-unarchiver"
+  #   ];
+  #   # masApps = {
+  #   #   "Yoink" = 457622435;
+  #   # };
+  #   onActivation.cleanup = "zap";
+  # };
 
   fonts.packages = [
     (pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
@@ -63,11 +63,11 @@
     dock.autohide  = true;
     dock.persistent-apps = [
       "${pkgs.alacritty}/Applications/Alacritty.app"
-      "/Applications/Firefox.app"
+      # "/Applications/Firefox.app"
       "/System/Applications/Calendar.app"
     ];
     finder.FXPreferredViewStyle = "clmv";
-    loginwindow.GuestEnabled  = false;
+    # loginwindow.GuestEnabled  = false;
     NSGlobalDomain.AppleICUForce24HourTime = true;
     NSGlobalDomain.AppleInterfaceStyle = "Dark";
     NSGlobalDomain.KeyRepeat = 2;
