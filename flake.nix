@@ -6,6 +6,9 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-24.05";
 
+    nix-darwin.url = "github:LnL7/nix-darwin";
+    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+
     nixos-hardware.url = "github:nixos/nixos-hardware";
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -64,12 +67,13 @@
 
   outputs = {
     self,
-    nixpkgs,
-    home-manager,
-    nixos-hardware,
     disko,
+    home-manager,
     lanzaboote,
+    nix-darwin,
     nixos-cosmic,
+    nixos-hardware,
+    nixpkgs,
     nixvim,
     stylix,
     systems,
@@ -120,8 +124,21 @@
           ./hosts/woody
         ];
       };
-
     };
+
+    darwinConfigurations = {
+      mini = nix-darwin.lib.darwinSystem {
+        specialArgs = {
+          inherit inputs outputs;
+        };
+        modules = [
+          nix-darwin.nixosModules.darwin
+          ./hosts/mini
+        ];
+      };
+      # darwinPackages = self.darwinConfigurations."mini".pkgs;
+    };
+
     homeConfigurations = {
       "administrator@frametop" = lib.homeManagerConfiguration {
         modules = [

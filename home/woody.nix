@@ -45,7 +45,7 @@
     ./features/starship
     ./features/sys-stats
     ./features/tmux
-    ./features/virtviewer
+    # ./features/virtviewer
     ./features/virtualisation
     ./features/vscode
     ./features/yazi
