@@ -34,6 +34,9 @@
     ./features/development/js.nix
   ];
 
+  # Whether to enable settings that make Home Manager work better on GNU/Linux distributions other than NixOS.
+  targets.genericLinux.enable = true;
+
   home.username = lib.mkForce "administrator";
   # Disable impermanence
   # home.persistence = lib.mkForce {};

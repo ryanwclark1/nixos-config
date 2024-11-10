@@ -33,6 +33,9 @@
     [[ -f /opt/vultr/vultr_app.sh ]] && . /opt/vultr/vultr_app.sh
   '';
 
+  # Whether to enable settings that make Home Manager work better on GNU/Linux distributions other than NixOS.
+  targets.genericLinux.enable = true;
+
   home.username = lib.mkForce "root";
   home.homeDirectory = lib.mkForce "/root";
 }
