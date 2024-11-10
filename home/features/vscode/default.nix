@@ -328,6 +328,7 @@
           "yaml" = true;
         };
 
+        "github.copilot.chat.startDebugging.enabled" = true;
         "github.copilot.chat.experimental.generateTests.codeLens" = true;
         "github.copilot.chat.experimental.inlineChatCompletionTrigger.enabled" = true;
         "github.copilot.chat.experimental.startDebugging.enabled" = true;
@@ -338,7 +339,6 @@
         "github.copilot.chat.welcomeMessage" = "never";
         "github.copilot.editor.enableCodeActions" = true;
         "github.copilot.renameSuggestions.triggerAutomatically" = true;
-
 
         # Dev Containers
         "dev.containers.dockerComposePath" = "${pkgs.docker}/bin/docker compose";
