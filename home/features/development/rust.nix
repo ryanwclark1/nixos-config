@@ -13,7 +13,7 @@
       cargo-vet
       cargo-shuttle
       cargo-temp
-      cargo-sweep
+      # cargo-sweep
       cargo-audit
       cargo-tarpaulin
       cargo-semver-checks
