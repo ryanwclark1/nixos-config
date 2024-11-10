@@ -35,6 +35,9 @@
   #   onActivation.cleanup = "zap";
   # };
 
+  programs.home-manager.enable = true;
+
+  fonts.fontDir.enable = true;
   fonts.packages = [
     (pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
@@ -59,24 +62,37 @@
       done
     '';
 
+
   system.defaults = {
-    dock.autohide  = true;
-    dock.persistent-apps = [
-      "${pkgs.alacritty}/Applications/Alacritty.app"
-      # "/Applications/Firefox.app"
-      "/System/Applications/Calendar.app"
-    ];
-    finder.FXPreferredViewStyle = "clmv";
+    dock = {
+      autohide  = true;
+      persistent-apps = [
+        "${pkgs.alacritty}/Applications/Alacritty.app"
+        # "/Applications/Firefox.app"
+        "/System/Applications/Calendar.app"
+      ];
+    };
+
+    finder = {
+      AppleShowAllExtensions = true;
+      ShowPathbar = true;
+      FXEnableExtensionChangeWarning = false;
+      FXPreferredViewStyle = "clmv";
+    };
+
     # loginwindow.GuestEnabled  = false;
-    NSGlobalDomain.AppleICUForce24HourTime = true;
-    NSGlobalDomain.AppleInterfaceStyle = "Dark";
-    NSGlobalDomain.KeyRepeat = 2;
+    NSGlobalDomain = {
+      AppleICUForce24HourTime = true;
+      AppleInterfaceStyle = "Dark";
+      KeyRepeat = 2;
+    };
   };
 
   # Auto upgrade nix package and the daemon service.
   services.nix-daemon.enable = true;
   # nix.package = pkgs.nix;
 
+  nix.package = pkgs.nix;
   # Necessary for using flakes on this system.
   nix.settings.experimental-features = "nix-command flakes";
 
