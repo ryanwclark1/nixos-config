@@ -13,9 +13,9 @@
     ./network.nix
     ./nixtools.nix
     ./tealdeer.nix
-    ./thefuck.nix
+    ./tf.nix
     ./vhs.nix
-    ./zk.nix
+    # ./zk.nix
   ];
   home.packages = with pkgs; [
     distrobox # Nice escape hatch, integrates docker images with my environment
