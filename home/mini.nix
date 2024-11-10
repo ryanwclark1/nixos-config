@@ -5,7 +5,7 @@
 
 {
   imports = [
-    ./global
+    # ./global
 
     ./features/atuin
     ./features/bat
