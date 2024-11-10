@@ -144,12 +144,12 @@
           version = "0.6.1";
           sha256 ="sha256-8t/9EJs9Ly6C89jM6HdCbeAdIvjSfePKD2WQwBtuJI0=";
         }
-        {
-          name = "vscode-speech";
-          publisher = "ms-vscode";
-          version = "0.11.2024091917";
-          sha256 = "sha256-MjPsaSudv+gR47KlAI9st2xCGbvi9Mx5H6nN05Mp5AQ=";
-        }
+        # {
+        #   name = "vscode-speech";
+        #   publisher = "ms-vscode";
+        #   version = "0.11.2024091917";
+        #   sha256 = "sha256-yvpvEc8f0FeSHtCsq8GF2FcPc3yZVMTr1FW1pVxlTe4=";
+        # }
         {
           name = "vscode-thunder-client";
           publisher = "rangav";
