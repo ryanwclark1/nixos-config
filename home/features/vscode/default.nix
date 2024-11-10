@@ -23,8 +23,8 @@
       enableUpdateCheck = false;
       extensions = with pkgs.vscode-extensions; [
         github.codespaces
-        # github.copilot
-        # github.copilot-chat
+        github.copilot
+        github.copilot-chat
         github.github-vscode-theme
         github.vscode-github-actions
         github.vscode-pull-request-github
@@ -75,92 +75,110 @@
         {
           name = "ansible";
           publisher = "redhat";
-          version = "24.9.5152897";
-          sha256 = "sha256-USQT2kZ6R2fuV+jOmqfHoeTGEMuZn/zN7OsDkq/Kz9M=";
+          sha256 = "sha256-NDIGyVCo3Az6oncnKR9PXXnZ4ynwF7HBeIiNyiGTPko=";
+          version = "24.10.0";
         }
         {
           name = "bun-vscode";
           publisher = "oven";
-          version = "0.0.15";
           sha256 = "sha256-9aoDDO7hh+YPTKh64z3rZhnTW5H8Se3+ZTncGrsKyJ0=";
+          version = "0.0.15";
         }
-        {
-          name = "copilot";
-          publisher = "github";
-          version = "1.238.0";
-          sha256 = "sha256-9Vis8D4FJAHq+TKiqvhMmEVo26AGr63JRDmApLhmbx4=";
-        }
-        {
-          name = "copilot-chat";
-          publisher = "github";
-          version = "0.21.0";
-          sha256 = "sha256-DnfzPTMifgSFpio6YGdlzH9pQmYbg3v16/LVVYvTaKg=";
-        }
+        # {
+        #   name = "copilot";
+        #   publisher = "github";
+        #   sha256 = "sha256-IJGNIPmCq96Xi9UfYrUoD5lKItnoWd1be5EYJv0ngXE=";
+        #   version = "1.244.0";
+        # }
+        # {
+        #   name = "copilot-chat";
+        #   publisher = "github";
+        #   sha256 = "sha256-nsdgpjPmHY3AmD/Hs55iCiwBaK0+X9g+f8tR0mrQxzA=";
+        #   version = "0.21.0";
+        # }
         {
           name = "htmx-attributes";
           publisher = "craigrbroughton";
-          version = "0.8.0";
           sha256 = "sha256-TsemPZkq2Z13/vahRaP7z206BJaCZ1TR6OVv6aeDvyk=";
+          version = "0.8.0";
         }
         {
           name = "remote-explorer";
           publisher = "ms-vscode";
-          version = "0.5.2024070409";
-          sha256 = "sha256-YwmsZii8TvBhloNQi6mezusEf/SmIq3i1ZNyKN5j1sU=";
+          sha256 = "sha256-U7P4GkjIk+WRAY1Ng5AMx2EiCwEsXY0Rt+b+4fBSJms=";
+          version = "0.5.2024103109";
         }
         {
           name = "remotehub";
           publisher = "github";
-          version = "0.64.0";
           sha256 = "sha256-Nh4PxYVdgdDb8iwHHUbXwJ5ZbMruFB6juL4Yg/wdKMY=";
+          version = "0.64.0";
         }
         {
           name = "sqlite-viewer";
           publisher = "qwtel";
-          version = "0.6.4";
-          sha256 = "sha256-wDSWQ36j6zMUD43PqP+x9VRxgDJJexFpxMyuHpbCi2s=";
+          sha256 = "sha256-b7x28eme4v0gOP0hBFMXGG8NFQvIsTP7rRdWZJ04EnA=";
+          version = "0.9.3";
+        }
+        {
+          name = "sqltools";
+          publisher = "mtxr";
+          sha256 = "sha256-bTrHAhj8uwzRIImziKsOizZf8+k3t+VrkOeZrFx7SH8=";
+          version = "0.28.3";
+        }
+        {
+          name = "sqltools-driver-pg";
+          publisher = "mtxr";
+          sha256 = "sha256-XnPTMFNgMGT2tJe8WlmhMB3DluvMZx9Ee2w7xMCzLYM=";
+          version = "0.5.4";
+        }
+        {
+          name = "sqltools-driver-sqlite";
+          publisher = "mtxr";
+          sha256 = "sha256-wFgb6wDSgPbPtEVKbHcUeURqbVAqDsEEhFUcBhQtmF8=";
+          version = "0.5.1";
         }
         {
           name = "tailwind-color-matcher";
           publisher = "OmriGrossman";
-          version = "1.0.8";
           sha256 = "sha256-WfFg1h5tY43W9YqgXkHDlxjRquFupuvLBwotTw0XoNk=";
+          version = "1.0.8";
         }
         {
           name = "templ";
           publisher = "a-h";
-          version = "0.0.29";
           sha256 = "sha256-RZ++wxL2OqBh3hiLAwKIw5QLjU/imsK7irQUHbJ/tqM=";
+          version = "0.0.29";
         }
         {
           name = "vscode-gitops-tools";
           publisher = "weaveworks";
-          version = "0.27.0";
           sha256 = "sha256-7MCKDnHCot/CL/SqZ2WuTxbqFdF75EC5WC+OxW0dcaE=";
+          version = "0.27.0";
         }
         {
           name = "vscode-jsonnet";
           publisher = "grafana";
-          version = "0.6.1";
-          sha256 ="sha256-8t/9EJs9Ly6C89jM6HdCbeAdIvjSfePKD2WQwBtuJI0=";
+          sha256 = "sha256-Q8VzXzTdHo9h5+eCHHF1bPomPEbRsvouJcUfmFUDGMU=";
+          version = "0.7.2";
         }
-        # {
-        #   name = "vscode-speech";
-        #   publisher = "ms-vscode";
-        #   version = "0.11.2024091917";
-        #   sha256 = "sha256-yvpvEc8f0FeSHtCsq8GF2FcPc3yZVMTr1FW1pVxlTe4=";
-        # }
+        {
+          name = "vscode-speech";
+          publisher = "ms-vscode";
+          sha256 = "sha256-fxmaPI7uq7DQlzgJc8RcZzHDOwMuodSCf9TkLU9+/+k=";
+          version = "0.12.1";
+        }
         {
           name = "vscode-thunder-client";
           publisher = "rangav";
-          version = "2.25.5";
-          sha256 = "sha256-uwHsTMi1huo8VhVuAynzGbZbBiEPBSqBOAsz3CCvvgM=";
+          sha256 = "sha256-91zjmzovEu6HRZZUK38oENlWUKyQcxgDKLIAMDdi5WE=";
+          version = "2.29.12";
         }
         {
           name = "yuck";
           publisher = "eww-yuck";
-          version = "0.0.3";
           sha256 = "sha256-DITgLedaO0Ifrttu+ZXkiaVA7Ua5RXc4jXQHPYLqrcM=";
+          version = "0.0.3";
         }
       ];
 
