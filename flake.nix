@@ -135,12 +135,13 @@
         modules = [
           # lib.nixosModules.darwin
           # nix-homebrew.darwinModules.nix-homebrew
+          ./hosts/mini
+          ./home/mini.nix
           home-manager.darwinModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
           }
-          ./hosts/mini
         ];
       };
       # darwinPackages = self.darwinConfigurations."mini".pkgs;
