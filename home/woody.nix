@@ -40,6 +40,7 @@
     ./features/productivity
     ./features/qutebrowser
     ./features/ripgrep
+    ./features/remmina
     ./features/slack
     ./features/shell
     ./features/starship

@@ -11,9 +11,9 @@
       addRdpMimeTypeAssoc = true;
       systemdService = {
         enable = true;
-        startupFlags = [
-          "--icon"
-        ];
+        # startupFlags = [
+        #   "--icon"
+        # ];
       };
     };
   };
