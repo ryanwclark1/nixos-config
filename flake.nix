@@ -96,45 +96,44 @@
     inherit lib;
     nixosModules = import ./modules/nixos;
     homeManagerModules = import ./modules/home-manager;
-    # templates = import ./templates;
+
+    overlays = import ./overlays { inherit inputs outputs; };
 
     packages = forEachSystem (pkgs: import ./pkgs { inherit pkgs; });
     devShells = forEachSystem (pkgs: import ./shell.nix { inherit pkgs; });
     formatter = forEachSystem (pkgs: pkgs.nixpkgs-fmt);
-    overlays = import ./overlays { inherit inputs outputs; };
 
     nixosConfigurations = {
+
       frametop = lib.nixosSystem {
-        specialArgs = {
-          inherit inputs outputs;
-        };
-        modules = [
+         modules = [
           stylix.nixosModules.stylix
-          disko.nixosModules.disko
-          nixos-cosmic.nixosModules.default
           ./hosts/frametop
         ];
-      };
-      woody = lib.nixosSystem {
         specialArgs = {
           inherit inputs outputs;
         };
+      };
+      woody = lib.nixosSystem {
         modules = [
           stylix.nixosModules.stylix
           nixos-cosmic.nixosModules.default
           ./hosts/woody
         ];
+        specialArgs = {
+          inherit inputs outputs;
+        };
       };
     };
 
     darwinConfigurations = {
-      mini = nix-darwin.lib.darwinSystem {
+      mini = lib.darwinSystem {
         # system = "aarch64-darwin";
         specialArgs = {
           inherit inputs outputs;
         };
         modules = [
-          # nix-darwin.nixosModules.darwin
+          lib.nixosModules.darwin
           # nix-homebrew.darwinModules.nix-homebrew
           home-manager.darwinModules.home-manager
           {
@@ -182,7 +181,7 @@
         modules = [
           ./home/mini.nix
         ];
-        # pkgs = pkgsFor.aarch64-darwin;
+        pkgs = pkgsFor.aarch64-darwin;
         extraSpecialArgs = {
           inherit inputs outputs;
         };
