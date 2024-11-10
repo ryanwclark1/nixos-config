@@ -133,7 +133,7 @@
           inherit inputs outputs;
         };
         modules = [
-          lib.nixosModules.darwin
+          # lib.nixosModules.darwin
           # nix-homebrew.darwinModules.nix-homebrew
           home-manager.darwinModules.home-manager
           {
