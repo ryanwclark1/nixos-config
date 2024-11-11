@@ -42,7 +42,7 @@
     git.enable = true;
   };
 
-  username = lib.mkDefault "administrator";
+  home.username = lib.mkDefault "administrator";
   home.stateVersion = lib.mkDefault "24.11";
   # home.username = lib.mkForce "administrator";
   # Disable impermanence
