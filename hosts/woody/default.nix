@@ -1,5 +1,4 @@
 {
-  config,
   inputs,
   pkgs,
   ...
@@ -70,11 +69,6 @@
     # };
     kernelPackages = pkgs.linuxKernel.packages.linux_6_11;
   };
-
-  # Added for nixd lsp
-  # nix.nixPath = [
-  #   "nixpkgs=${inputs.nixpkgs.path}"
-  # ];
 
   hardware = {
     enableAllFirmware = true;

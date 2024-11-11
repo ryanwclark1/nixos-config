@@ -15,7 +15,7 @@
   ]
   ++ (builtins.attrValues outputs.homeManagerModules);
 
-# duplicated in host/common/global/nix.nix
+  # duplicated in host/common/global/nix.nix
   nix = {
     package = lib.mkDefault pkgs.nixVersions.latest;
     settings = {
@@ -33,6 +33,7 @@
     home-manager.enable = true;
     git.enable = true;
   };
+  
   home =
   let
     editor = lib.getExe config.programs.nixvim.package;
