@@ -172,6 +172,7 @@
       };
       "administrator@mini" = lib.homeManagerConfiguration {
         modules = [
+          stylix.homeManagerModules.stylix
           ./home/mini.nix
         ];
         pkgs = pkgsFor.aarch64-darwin;
