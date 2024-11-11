@@ -11,6 +11,4 @@
     ./vscode-server.nix
     ./xserver.nix
   ];
-
-
 }

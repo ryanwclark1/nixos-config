@@ -64,12 +64,12 @@ in
   };
 
 
-# Passwordless sudo when SSH'ing with keys
-  # security.pam.sshAgentAuth = {
-  #   enable = true;
-  #   authorizedKeysFiles = [ "/etc/ssh/authorized_keys.d/%u" ];
-  # };
-# Passwordless sudo when SSH'ing with keys
+  # Passwordless sudo when SSH'ing with keys
+    # security.pam.sshAgentAuth = {
+    #   enable = true;
+    #   authorizedKeysFiles = [ "/etc/ssh/authorized_keys.d/%u" ];
+    # };
+  # Passwordless sudo when SSH'ing with keys
   security.pam.services.sudo = {config, ...}: {
     rules.auth.rssh = {
       order = config.rules.auth.ssh_agent_auth.order - 1;
