@@ -13,10 +13,10 @@
   #   inputs.home-manager.nixosModules.home-manager
   # ];
 
-  home-manager.useGlobalPkgs = true;
-  home-manager.extraSpecialArgs = {
-    inherit inputs outputs;
-  };
+  # home-manager.useGlobalPkgs = true;
+  # home-manager.extraSpecialArgs = {
+  #   inherit inputs outputs;
+  # };
 
   # The platform the configuration will be used on.
   nixpkgs = {
