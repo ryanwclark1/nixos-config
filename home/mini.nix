@@ -34,7 +34,7 @@
     # ./features/development/js.nix
   ];
 
-  targets.darwin.search = "google";
+  targets.darwin.search = "Google";
 
   # git also optional with full configuration
   programs = {
