@@ -11,11 +11,11 @@
     ./fail2ban.nix
     ./locale.nix
     ./networking.nix
+    ./nh.nix
     ./nix.nix
     ./nix-ld.nix
     ./openssh.nix
     # ./optin-persistence.nix
-    ./prometheus-node-exporter.nix
     ./sops.nix
 
   ] ++ (builtins.attrValues outputs.nixosModules);
