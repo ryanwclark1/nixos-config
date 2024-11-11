@@ -52,7 +52,7 @@
   # };
 
   programs.home-manager.enable = true;
-  programs.zsh.enable = true; 
+  programs.zsh.enable = true;
 
   fonts = {
     fontDir.enable = true;
@@ -136,6 +136,6 @@
 
   users.users.administrator = {
     name = "administrator";
-    home = "/Users/administrator";
+    # home = "/Users/administrator";
   };
 }
