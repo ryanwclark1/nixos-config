@@ -31,7 +31,7 @@
     # ./features/helix
     # ./features/kdeconnect
     ./features/kitty
-    ./features/kody
+    ./features/kodi
     ./features/kubernetes
     ./features/lazygit
     ./features/media
