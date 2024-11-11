@@ -1,11 +1,15 @@
 {
   self,
   config,
+  lib,
   pkgs,
   ...
 }:
 
 {
+
+  # The platform the configuration will be used on.
+  nixpkgs.hostPlatform = "aarch64-darwin";
 
   nixpkgs.config.allowUnfree = true;
   # List packages installed in system profile. To search by name, run:
@@ -92,9 +96,19 @@
   services.nix-daemon.enable = true;
   # nix.package = pkgs.nix;
 
-  nix.package = pkgs.nix;
+  nix = {
+    package = lib.mkDefault pkgs.nixVersions.latest;
+    settings = {
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
+      warn-dirty = false;
+    };
+  };
+  # nix.package = pkgs.nix;
   # Necessary for using flakes on this system.
-  nix.settings.experimental-features = "nix-command flakes";
+  # nix.settings.experimental-features = "nix-command flakes";
 
   # Enable alternative shell support in nix-darwin.
   # programs.fish.enable = true;
@@ -106,8 +120,7 @@
   # $ darwin-rebuild changelog
   system.stateVersion = 5;
 
-  # The platform the configuration will be used on.
-  nixpkgs.hostPlatform = "aarch64-darwin";
+
 
   users.users.administrator = {
     name = "administrator";
