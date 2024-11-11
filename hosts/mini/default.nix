@@ -52,7 +52,7 @@
   # };
 
   # programs.home-manager.enable = true;
-  programs.zsh.enable = true;
+  # programs.zsh.enable = true;
 
   fonts = {
     fontDir.enable = true;
@@ -108,20 +108,20 @@
   };
 
   # Auto upgrade nix package and the daemon service.
-  services.nix-daemon.enable = true;
+  # services.nix-daemon.enable = true;
   # nix.package = pkgs.nix;
 
-  nix = {
-    package = lib.mkDefault pkgs.nixVersions.latest;
-    settings = {
-      # Necessary for using flakes on this system.
-      experimental-features = [
-        "nix-command"
-        "flakes"
-      ];
-      warn-dirty = false;
-    };
-  };
+  # nix = {
+  #   package = lib.mkDefault pkgs.nixVersions.latest;
+  #   settings = {
+  #     # Necessary for using flakes on this system.
+  #     experimental-features = [
+  #       "nix-command"
+  #       "flakes"
+  #     ];
+  #     warn-dirty = false;
+  #   };
+  # };
   # nix.package = pkgs.nix;
 
   # Enable alternative shell support in nix-darwin.
