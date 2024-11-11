@@ -55,7 +55,6 @@
   programs.zsh.enable = true;
 
   fonts = {
-    fontDir.enable = true;
     packages = [
       (pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
     ];
