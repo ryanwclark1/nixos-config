@@ -126,7 +126,7 @@
     };
 
     darwinConfigurations = {
-      mini = lib.darwinSystem {
+      mini = nix-darwin.lib.darwinSystem  {
         # system = "aarch64-darwin";
         specialArgs = {
           inherit inputs outputs;
