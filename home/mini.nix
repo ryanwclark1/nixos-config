@@ -41,6 +41,8 @@
     home-manager.enable = true;
     git.enable = true;
   };
+
+  home.stateVersion = lib.mkDefault "24.11";
   # home.username = lib.mkForce "administrator";
   # Disable impermanence
   # home.persistence = lib.mkForce {};
