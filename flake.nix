@@ -82,7 +82,7 @@
   } @ inputs:
   let
     inherit (self) outputs;
-    lib = nixpkgs.lib // home-manager.lib; # // nix-darwin.lib 
+    lib = nixpkgs.lib // home-manager.lib; # // nix-darwin.lib
     forEachSystem = f: lib.genAttrs (import systems) (system: f pkgsFor.${system});
     pkgsFor = lib.genAttrs (import systems) (
     system:
@@ -127,6 +127,7 @@
 
    darwinConfigurations = {
       mini = nix-darwin.lib.darwinSystem {
+        system = "aarch64-darwin";
         specialArgs = {
           inherit inputs outputs;
         };
