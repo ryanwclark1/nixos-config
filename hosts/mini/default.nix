@@ -9,17 +9,19 @@
 {
 
   # The platform the configuration will be used on.
-  nixpkgs.hostPlatform = "aarch64-darwin";
+  nixpkgs = {
+    hostPlatform = "aarch64-darwin";
+    config.allowUnfree = true;
+  };
 
-  nixpkgs.config.allowUnfree = true;
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
-  environment.systemPackages = [
-    pkgs.neovim
-    pkgs.alacritty
-    pkgs.mkalias
-    pkgs.tmux
-    pkgs.git
+  environment.systemPackages = with pkgs; [
+    neovim
+    alacritty
+    mkalias
+    tmux
+    git
   ];
 
   # homebrew = {
@@ -41,10 +43,12 @@
 
   programs.home-manager.enable = true;
 
-  fonts.fontDir.enable = true;
-  fonts.packages = [
-    (pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
-  ];
+  fonts = {
+    fontDir.enable = true;
+    packages = [
+      (pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+    ];
+  };
 
   system.activationScripts.applications.text = let
     env = pkgs.buildEnv {
@@ -99,6 +103,7 @@
   nix = {
     package = lib.mkDefault pkgs.nixVersions.latest;
     settings = {
+      # Necessary for using flakes on this system.
       experimental-features = [
         "nix-command"
         "flakes"
@@ -107,8 +112,6 @@
     };
   };
   # nix.package = pkgs.nix;
-  # Necessary for using flakes on this system.
-  # nix.settings.experimental-features = "nix-command flakes";
 
   # Enable alternative shell support in nix-darwin.
   # programs.fish.enable = true;
@@ -119,8 +122,6 @@
   # Used for backwards compatibility, please read the changelog before changing.
   # $ darwin-rebuild changelog
   system.stateVersion = 5;
-
-
 
   users.users.administrator = {
     name = "administrator";
