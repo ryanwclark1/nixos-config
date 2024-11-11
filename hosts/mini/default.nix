@@ -51,7 +51,7 @@
   #   onActivation.cleanup = "zap";
   # };
 
-  programs.home-manager.enable = true;
+  # programs.home-manager.enable = true;
   programs.zsh.enable = true;
 
   fonts = {
