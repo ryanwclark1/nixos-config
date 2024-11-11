@@ -136,7 +136,7 @@
           # lib.nixosModules.darwin
           # nix-homebrew.darwinModules.nix-homebrew
           ./hosts/mini
-          ./home/mini.nix
+          # ./home/mini.nix
           home-manager.darwinModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
