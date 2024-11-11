@@ -131,17 +131,17 @@
         specialArgs = {
           inherit inputs outputs;
         };
-        modules = [
+        # modules = [
           # lib.nixosModules.darwin
           # nix-homebrew.darwinModules.nix-homebrew
-          ./hosts/mini
+          # ./hosts/mini
           # ./home/mini.nix
           # home-manager.darwinModules.home-manager
           # {
           #   home-manager.useGlobalPkgs = true;
           #   home-manager.useUserPackages = true;
           # }
-        ];
+        # ];
       };
       # darwinPackages = self.darwinConfigurations."mini".pkgs;
     };

@@ -9,14 +9,14 @@
 }:
 
 {
-  imports = [
-    inputs.home-manager.nixosModules.home-manager
-  ];
+  # imports = [
+  #   inputs.home-manager.nixosModules.home-manager
+  # ];
 
-  # home-manager.useGlobalPkgs = true;
-  # home-manager.extraSpecialArgs = {
-  #   inherit inputs outputs;
-  # };
+  home-manager.useGlobalPkgs = true;
+  home-manager.extraSpecialArgs = {
+    inherit inputs outputs;
+  };
 
   # The platform the configuration will be used on.
   nixpkgs = {
@@ -51,8 +51,8 @@
   #   onActivation.cleanup = "zap";
   # };
 
-  # programs.home-manager.enable = true;
-  # programs.zsh.enable = true;
+  programs.home-manager.enable = true;
+  programs.zsh.enable = true;
 
   fonts = {
     fontDir.enable = true;
@@ -108,27 +108,27 @@
   };
 
   # Auto upgrade nix package and the daemon service.
-  # services.nix-daemon.enable = true;
+  services.nix-daemon.enable = true;
   # nix.package = pkgs.nix;
 
-  # nix = {
-  #   package = lib.mkDefault pkgs.nixVersions.latest;
-  #   settings = {
-  #     # Necessary for using flakes on this system.
-  #     experimental-features = [
-  #       "nix-command"
-  #       "flakes"
-  #     ];
-  #     warn-dirty = false;
-  #   };
-  # };
+  nix = {
+    package = lib.mkDefault pkgs.nixVersions.latest;
+    settings = {
+      # Necessary for using flakes on this system.
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
+      warn-dirty = false;
+    };
+  };
   # nix.package = pkgs.nix;
 
   # Enable alternative shell support in nix-darwin.
   # programs.fish.enable = true;
 
   # Set Git commit hash for darwin-version.
-  # system.configurationRevision = self.rev or self.dirtyRev or null;
+  system.configurationRevision = self.rev or self.dirtyRev or null;
 
   # Used for backwards compatibility, please read the changelog before changing.
   # $ darwin-rebuild changelog
