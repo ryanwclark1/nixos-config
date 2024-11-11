@@ -82,7 +82,7 @@
   } @ inputs:
   let
     inherit (self) outputs;
-    lib = nixpkgs.lib // nix-darwin.lib // home-manager.lib;
+    lib = nixpkgs.lib // home-manager.lib; # // nix-darwin.lib 
     forEachSystem = f: lib.genAttrs (import systems) (system: f pkgsFor.${system});
     pkgsFor = lib.genAttrs (import systems) (
     system:
@@ -125,23 +125,15 @@
       };
     };
 
-    darwinConfigurations = {
-      mini = nix-darwin.lib.darwinSystem  {
-        # system = "aarch64-darwin";
+   darwinConfigurations = {
+      mini = nix-darwin.lib.darwinSystem {
         specialArgs = {
           inherit inputs outputs;
         };
-        # modules = [
-          # lib.nixosModules.darwin
-          # nix-homebrew.darwinModules.nix-homebrew
-          # ./hosts/mini
-          # ./home/mini.nix
-          # home-manager.darwinModules.home-manager
-          # {
-          #   home-manager.useGlobalPkgs = true;
-          #   home-manager.useUserPackages = true;
-          # }
-        # ];
+        modules = [
+          nix-darwin.nixosModules.darwin
+          ./hosts/mini
+        ];
       };
       # darwinPackages = self.darwinConfigurations."mini".pkgs;
     };
