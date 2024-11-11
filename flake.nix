@@ -104,7 +104,6 @@
     formatter = forEachSystem (pkgs: pkgs.nixpkgs-fmt);
 
     nixosConfigurations = {
-
       frametop = lib.nixosSystem {
          modules = [
           stylix.nixosModules.stylix
@@ -137,11 +136,11 @@
           # nix-homebrew.darwinModules.nix-homebrew
           ./hosts/mini
           # ./home/mini.nix
-          home-manager.darwinModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-          }
+          # home-manager.darwinModules.home-manager
+          # {
+          #   home-manager.useGlobalPkgs = true;
+          #   home-manager.useUserPackages = true;
+          # }
         ];
       };
       # darwinPackages = self.darwinConfigurations."mini".pkgs;
