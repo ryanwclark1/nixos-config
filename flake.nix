@@ -132,7 +132,7 @@
           inherit inputs outputs;
         };
         modules = [
-          nix-darwin.nixosModules.darwin
+          # nix-darwin.nixosModules.darwin
           ./hosts/mini
         ];
       };
