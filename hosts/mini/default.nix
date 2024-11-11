@@ -134,8 +134,8 @@
   # $ darwin-rebuild changelog
   system.stateVersion = 5;
 
-  users.users.administrator = {
-    name = "administrator";
-    # home = "/Users/administrator";
-  };
+  # users.users.administrator = {
+  #   name = "administrator";
+  #   home = "/Users/administrator";
+  # };
 }
