@@ -18,7 +18,7 @@
 
     #################### Utilities ####################
 
-    systems.url = "github:nix-systems/default-linux";
+    systems.url = "github:nix-systems/default";
     impermanence.url = "github:nix-community/impermanence";
     disko = {
       url = "github:nix-community/disko";
