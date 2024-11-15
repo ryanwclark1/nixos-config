@@ -58,7 +58,7 @@ in
       bat.enable = lib.mkDefault false;
       btop.enable = lib.mkDefault false;
       firefox = {
-        enable = lib.mkDefault true;
+        enable = lib.mkDefault false;
         # profileNames = ["default"];
       };
       fish.enable = lib.mkDefault false;
@@ -96,21 +96,21 @@ in
           signColumn = lib.mkDefault true;
         };
       };
-      qutebrowser.enable = lib.mkDefault true;
+      qutebrowser.enable = lib.mkDefault false;
       rofi.enable = lib.mkDefault false;
       vscode.enable = lib.mkDefault true;
       waybar = {
         enable = lib.mkDefault false;
-        enableCenterBackColors = lib.mkDefaultfalse;
+        enableCenterBackColors = lib.mkDefault false;
         enableLeftBackColors = lib.mkDefault false;
         enableRightBackColors = lib.mkDefault false;
       };
       wofi.enable = lib.mkDefault false;
       xfce.enable = lib.mkDefault false;
-      xresources.enable = lib.mkDefaultfalse;
-      yazi.enable = lib.mkDefaultfalse;
-      zathura.enable = lib.mkDefaultfalse;
-      zellij.enable = lib.mkDefault true;
+      xresources.enable = lib.mkDefault false;
+      yazi.enable = lib.mkDefault false;
+      zathura.enable = lib.mkDefault false;
+      zellij.enable = lib.mkDefault false;
     };
   };
 }
