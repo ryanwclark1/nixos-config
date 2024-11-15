@@ -41,5 +41,6 @@
   # Disable impermanence
   # home.persistence = lib.mkForce {};
 
-
+  stylix.targets.gnome.enable = lib.mkForce false;
+  stylix.targets.gtk.enable = lib.mkForce false;
 }
