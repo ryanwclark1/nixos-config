@@ -18,7 +18,7 @@
 
     #################### Utilities ####################
 
-    systems.url = "github:nix-systems/default-linux";
+    systems.url = "github:nix-systems/default";
     impermanence.url = "github:nix-community/impermanence";
     disko = {
       url = "github:nix-community/disko";
@@ -82,7 +82,7 @@
   } @ inputs:
   let
     inherit (self) outputs;
-    lib = nixpkgs.lib // nix-darwin.lib // home-manager.lib;
+    lib = nixpkgs.lib // home-manager.lib; # // nix-darwin.lib
     forEachSystem = f: lib.genAttrs (import systems) (system: f pkgsFor.${system});
     pkgsFor = lib.genAttrs (import systems) (
     system:
@@ -104,7 +104,6 @@
     formatter = forEachSystem (pkgs: pkgs.nixpkgs-fmt);
 
     nixosConfigurations = {
-
       frametop = lib.nixosSystem {
          modules = [
           stylix.nixosModules.stylix
@@ -126,22 +125,15 @@
       };
     };
 
-    darwinConfigurations = {
-      mini = lib.darwinSystem {
-        # system = "aarch64-darwin";
+   darwinConfigurations = {
+      mini = nix-darwin.lib.darwinSystem {
+        system = "aarch64-darwin";
         specialArgs = {
           inherit inputs outputs;
         };
         modules = [
-          # lib.nixosModules.darwin
-          # nix-homebrew.darwinModules.nix-homebrew
+          # nix-darwin.nixosModules.darwin
           ./hosts/mini
-          ./home/mini.nix
-          home-manager.darwinModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-          }
         ];
       };
       # darwinPackages = self.darwinConfigurations."mini".pkgs;
@@ -180,6 +172,7 @@
       };
       "administrator@mini" = lib.homeManagerConfiguration {
         modules = [
+          stylix.homeManagerModules.stylix
           ./home/mini.nix
         ];
         pkgs = pkgsFor.aarch64-darwin;

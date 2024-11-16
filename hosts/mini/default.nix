@@ -1,21 +1,36 @@
 {
-  self,
+  inputs,
+  outputs,
   config,
+  lib,
   pkgs,
   ...
 }:
 
 {
+  # imports = [
+  #   inputs.home-manager.nixosModules.home-manager
+  # ];
 
-  nixpkgs.config.allowUnfree = true;
+  # home-manager.useGlobalPkgs = true;
+  # home-manager.extraSpecialArgs = {
+  #   inherit inputs outputs;
+  # };
+
+  # The platform the configuration will be used on.
+  nixpkgs = {
+    hostPlatform = "aarch64-darwin";
+    config.allowUnfree = true;
+  };
+
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
-  environment.systemPackages = [
-    pkgs.neovim
-    pkgs.alacritty
-    pkgs.mkalias
-    pkgs.tmux
-    pkgs.git
+  environment.systemPackages = with pkgs; [
+    neovim
+    alacritty
+    mkalias
+    tmux
+    git
   ];
 
   # homebrew = {
@@ -35,12 +50,14 @@
   #   onActivation.cleanup = "zap";
   # };
 
-  programs.home-manager.enable = true;
+  # programs.home-manager.enable = true;
+  programs.zsh.enable = true;
 
-  fonts.fontDir.enable = true;
-  fonts.packages = [
-    (pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
-  ];
+  fonts = {
+    packages = [
+      (pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+    ];
+  };
 
   system.activationScripts.applications.text = let
     env = pkgs.buildEnv {
@@ -92,9 +109,18 @@
   services.nix-daemon.enable = true;
   # nix.package = pkgs.nix;
 
-  nix.package = pkgs.nix;
-  # Necessary for using flakes on this system.
-  nix.settings.experimental-features = "nix-command flakes";
+  nix = {
+    package = lib.mkDefault pkgs.nixVersions.latest;
+    settings = {
+      # Necessary for using flakes on this system.
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
+      warn-dirty = false;
+    };
+  };
+  # nix.package = pkgs.nix;
 
   # Enable alternative shell support in nix-darwin.
   # programs.fish.enable = true;
@@ -106,11 +132,8 @@
   # $ darwin-rebuild changelog
   system.stateVersion = 5;
 
-  # The platform the configuration will be used on.
-  nixpkgs.hostPlatform = "aarch64-darwin";
-
-  users.users.administrator = {
-    name = "administrator";
-    home = "/Users/administrator";
-  };
+  # users.users.administrator = {
+  #   name = "administrator";
+  #   home = "/Users/administrator";
+  # };
 }

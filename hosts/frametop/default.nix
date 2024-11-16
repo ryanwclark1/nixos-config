@@ -1,7 +1,5 @@
 {
-  config,
   inputs,
-  lib,
   pkgs,
   ...
 }:
@@ -57,11 +55,6 @@
     # kernelPackages = pkgs.linuxKernel.packages.linux_6_9;
     binfmt.emulatedSystems = [ "aarch64-linux" "i686-linux" ];
   };
-
-  # Added for nixd lsp
-  # nix.nixPath = [
-  #   "nixpkgs=${inputs.nixpkgs.path}"
-  # ];
 
   hardware = {
     graphics = {

@@ -1,5 +1,4 @@
 {
-  config,
   inputs,
   pkgs,
   ...
@@ -33,7 +32,7 @@
     ../common/optional/system-packages.nix
     ../common/optional/tailscale.nix
     ../common/optional/thunar.nix
-    ../common/optional/virt-viewer.nix
+    # ../common/optional/virt-viewer.nix
     ../common/optional/webcam.nix
     ../common/optional/wireshark.nix
     ../common/optional/wireguard.nix
@@ -70,11 +69,6 @@
     # };
     kernelPackages = pkgs.linuxKernel.packages.linux_6_11;
   };
-
-  # Added for nixd lsp
-  # nix.nixPath = [
-  #   "nixpkgs=${inputs.nixpkgs.path}"
-  # ];
 
   hardware = {
     enableAllFirmware = true;

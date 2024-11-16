@@ -4,10 +4,9 @@
 }:
 
 {
-
   programs.nautilus-open-any-terminal = {
-  enable = true;
-  terminal = "kitty";
+    enable = true;
+    terminal = "kitty";
   };
 
   environment = {
@@ -24,5 +23,4 @@
 
   # Enable preview for files in Nautilus
   services.gnome.sushi.enable = true;
-
 }
