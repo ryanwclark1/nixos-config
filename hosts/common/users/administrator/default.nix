@@ -18,8 +18,8 @@ in
   # switch back to mutableusers = false
   users.mutableUsers = true;
   users = {
-    users.administrator = {
-      name = "administrator";
+    users."${user}" = {
+      name = "${user}";
       isNormalUser = true;
       home = "/home/${user}";
       shell = "${pkgs.zsh}/bin/zsh";
@@ -55,7 +55,7 @@ in
 
   nix.settings.trusted-users = [ "${user}" ];
 
-  home-manager.users.administrator = import ../../../../home/${config.networking.hostName}.nix;
+  home-manager.users."${user}" = import ../../../../home/${config.networking.hostName}.nix;
 
   # security.pam.services = {
   #   swaylock = {};

@@ -1,5 +1,6 @@
 # Docs: https://stylix.danth.me/
 {
+  lib,
   pkgs,
   ...
 }:
@@ -12,8 +13,8 @@ in
     base16-schemes
   ];
   stylix = {
-    enable = true;
-    autoEnable = false;
+    enable = lib.mkDefault true;
+    autoEnable = lib.mkDefault false;
     image = ../../hosts/common/wallpaper/FormulaOne_Vettel_2.jpg;
     imageScalingMode = "fill";
     base16Scheme = "${pkgs.base16-schemes}/share/themes/${currentScheme}.yaml";
@@ -40,76 +41,76 @@ in
         name = "Noto Color Emoji";
       };
       sizes = {
-        applications = 12;
-        desktop = 10;
-        popups = 10;
-        terminal = 12;
+        applications = lib.mkDefault 12;
+        desktop = lib.mkDefault 10;
+        popups = lib.mkDefault 10;
+        terminal = lib.mkDefault 12;
       };
     };
     opacity = {
-      applications = 0.80;
-      desktop = 0.90;
-      popups = 0.80;
-      terminal = 0.80;
+      applications = lib.mkDefault 0.80;
+      desktop = lib.mkDefault 0.90;
+      popups = lib.mkDefault 0.80;
+      terminal = lib.mkDefault 0.80;
     };
     targets = {
-      alacritty.enable = false;
-      bat.enable = false;
-      btop.enable = false;
+      alacritty.enable = lib.mkDefault false;
+      bat.enable = lib.mkDefault false;
+      btop.enable = lib.mkDefault false;
       firefox = {
-        enable = true;
+        enable = lib.mkDefault false;
         # profileNames = ["default"];
       };
-      fish.enable = true;
-      fzf.enable = false;
-      gedit.enable = true;
-      gitui.enable = true;
-      gnome.enable = true;
+      fish.enable = lib.mkDefault false;
+      fzf.enable = lib.mkDefault false;
+      gedit.enable = lib.mkDefault false;
+      gitui.enable = lib.mkDefault true;
+      gnome.enable = lib.mkDefault true;
       gtk = {
-        enable = true;
+        enable = lib.mkDefault true;
         # extraCss = ''
         #   @import url("file://${pkgs.stylix}/share/themes/${currentScheme}.css");
         # '';
       };
-      hyprland.enable = true;
-      hyprpaper.enable = true;
-      k9s.enable = false;
-      kde.enable = false;
+      hyprland.enable = lib.mkDefault true;
+      hyprpaper.enable = lib.mkDefault true;
+      k9s.enable = lib.mkDefault false;
+      kde.enable = lib.mkDefault false;
       kitty = {
-        enable = false;
-        variant256Colors = false;
+        enable = lib.mkDefault false;
+        variant256Colors = lib.mkDefault false;
       };
-      lazygit.enable = false;
-      mako.enable = false;
+      lazygit.enable = lib.mkDefault false;
+      mako.enable = lib.mkDefault false;
       neovim = {
-        enable = true;
+        enable = lib.mkDefault true;
         transparentBackground = {
-          main = true;
-          signColumn = true;
+          main =lib.mkDefault  true;
+          signColumn = lib.mkDefault true;
         };
       };
       nixvim = {
-        enable = true;
+        enable = lib.mkDefault true;
         transparentBackground = {
-          main = true;
-          signColumn = true;
+          main = lib.mkDefault true;
+          signColumn = lib.mkDefault true;
         };
       };
-      qutebrowser.enable = true;
-      rofi.enable = false;
-      vscode.enable = true;
+      qutebrowser.enable = lib.mkDefault false;
+      rofi.enable = lib.mkDefault false;
+      vscode.enable = lib.mkDefault true;
       waybar = {
-        enable = false;
-        enableCenterBackColors = false;
-        enableLeftBackColors = false;
-        enableRightBackColors = false;
+        enable = lib.mkDefault false;
+        enableCenterBackColors = lib.mkDefault false;
+        enableLeftBackColors = lib.mkDefault false;
+        enableRightBackColors = lib.mkDefault false;
       };
-      wofi.enable = false;
-      xfce.enable = true;
-      xresources.enable = true;
-      yazi.enable = false;
-      zathura.enable = false;
-      zellij.enable = true;
+      wofi.enable = lib.mkDefault false;
+      xfce.enable = lib.mkDefault false;
+      xresources.enable = lib.mkDefault false;
+      yazi.enable = lib.mkDefault false;
+      zathura.enable = lib.mkDefault false;
+      zellij.enable = lib.mkDefault false;
     };
   };
 }

@@ -40,6 +40,4 @@
   home.username = lib.mkForce "ryanc";
   # Disable impermanence
   # home.persistence = lib.mkForce {};
-
-
 }
