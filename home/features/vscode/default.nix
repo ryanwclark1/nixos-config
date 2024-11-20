@@ -341,8 +341,8 @@
         "github.copilot.renameSuggestions.triggerAutomatically" = true;
 
         # Dev Containers
-        "dev.containers.dockerComposePath" = "${pkgs.docker}/bin/docker compose";
-        "dev.containers.dockerPath" = "${pkgs.docker}/bin/docker";
+        # "dev.containers.dockerComposePath" = "${pkgs.docker}/bin/docker compose";
+        # "dev.containers.dockerPath" = "${pkgs.docker}/bin/docker";
         "dev.containers.defaultExtensionsIfInstalledLocally" = [
           "GitHub.copilot"
           "GitHub.copilot-chat"
@@ -353,7 +353,7 @@
         # Docker
         "docker.composeCommand" = "docker compose";
         "docker.contexts.showInStatusBar" = true;
-        "docker.dockerPath" = "${pkgs.docker}/bin/docker";
+        # "docker.dockerPath" = "${pkgs.docker}/bin/docker";
 
         # Draw.io
         "hediet.vscode-drawio.plugins" = [
