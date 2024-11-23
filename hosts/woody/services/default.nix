@@ -10,5 +10,6 @@
     # ./spice.nix
     ./vscode-server.nix
     ./xserver.nix
+    ./tailscale.nix
   ];
 }
