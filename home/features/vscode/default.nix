@@ -363,14 +363,14 @@
 
         # Nix IDE
         "nix.enableLanguageServer" = true;
-        "nix.serverPath" = "${pkgs.nil}/bin/nil";
+        # "nix.serverPath" = "${pkgs.nil}/bin/nil";
 
         # Redhat
         "redhat.telemetry.enabled" = false;
 
         # Even Better TOML
-        "evenBetterToml.taplo.bundled" = false;
-        "evenBetterToml.taplo.path" = "${pkgs.taplo}/bin/taplo";
+        "evenBetterToml.taplo.bundled" = true;
+        # "evenBetterToml.taplo.path" = "${pkgs.taplo}/bin/taplo";
 
         # Go
         "go.alternateTools" = {
@@ -414,8 +414,8 @@
           "run" = true;
           "share" = true;
         };
-        "go.gopath" = "${config.home.homeDirectory}/go";
-        "go.goroot" = "${lib.getExe config.programs.go.package}";
+        # "go.gopath" = "${config.home.homeDirectory}/go";
+        # "go.goroot" = "${lib.getExe config.programs.go.package}";
         "go.lintOnSave" = "golangci-lint";
         "go.inferGopath" = true;
         "go.showWelcome" = false;
@@ -489,9 +489,9 @@
         "vs-kubernetes" = {
           "vs-kubernetes.crd-code-completion" = "enabled";
         };
-        "vscode-kubernetes.helm-path.linux" = "${pkgs.kubernetes-helm}/bin/helm";
-        "vscode-kubernetes.kubectl-path.linux" = "${pkgs.kubectl}/bin/kubectl";
-        "vscode-kubernetes.minikube-path.linux" = "${pkgs.minikube}/bin/minikube";
+        # "vscode-kubernetes.helm-path.linux" = "${pkgs.kubernetes-helm}/bin/helm";
+        # "vscode-kubernetes.kubectl-path.linux" = "${pkgs.kubectl}/bin/kubectl";
+        # "vscode-kubernetes.minikube-path.linux" = "${pkgs.minikube}/bin/minikube";
         "vscode-kubernetes.log-viewer.autorun" = true;
         "vscode-kubernetes.log-viewer.destination" = "Terminal";
         "vscode-kubernetes.log-viewer.follow" = true;
