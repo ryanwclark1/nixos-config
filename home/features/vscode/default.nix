@@ -39,6 +39,7 @@
         ms-vscode.cmake-tools
         ms-vscode.hexeditor
         ms-vscode.makefile-tools
+        ms-vscode.live-server
         bradlc.vscode-tailwindcss
         catppuccin.catppuccin-vsc
         charliermarsh.ruff
@@ -63,7 +64,9 @@
         tailscale.vscode-tailscale
         tamasfe.even-better-toml
         vscodevim.vim
-        wholroyd.jinja # Prefer Better Jinja
+        # wholroyd.jinja # Prefer Better Jinja
+        samuelcolvin.jinjahtml
+
         yzhang.markdown-all-in-one
       ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
         {
@@ -143,6 +146,18 @@
           publisher = "OmriGrossman";
           sha256 = "sha256-WfFg1h5tY43W9YqgXkHDlxjRquFupuvLBwotTw0XoNk=";
           version = "1.0.8";
+        }
+        {
+          name = "tailwind-docs";
+          publisher = "austenc";
+          sha256 = "sha256-EB3ggxo2NqiH8yVpsNzDRb+fvsd6Qd5aXRM6FoZn5k8=";
+          version = "2.1.0";
+        }
+        {
+          name = "tailwind-fold";
+          publisher = "stivo";
+          sha256 = "sha256-yH3eA5jgBwxqnpFQkg91KQMkQps5iM1v783KQkQcWUU=";
+          version = "0.2.0";
         }
         {
           name = "templ";
@@ -329,10 +344,6 @@
         };
 
         "github.copilot.chat.startDebugging.enabled" = true;
-        "github.copilot.chat.experimental.generateTests.codeLens" = true;
-        "github.copilot.chat.experimental.inlineChatCompletionTrigger.enabled" = true;
-        "github.copilot.chat.experimental.startDebugging.enabled" = true;
-        "github.copilot.chat.experimental.temporalContext.enabled" = true;
         "github.copilot.chat.localeOverride" = "en";
         "github.copilot.chat.runCommand.enabled" = true;
         "github.copilot.chat.useProjectTemplates" = true;
@@ -373,17 +384,17 @@
         # "evenBetterToml.taplo.path" = "${pkgs.taplo}/bin/taplo";
 
         # Go
-        "go.alternateTools" = {
-          "dlv" = "${pkgs.delve}/bin/dlv";
-          "dlv-dap" = "${pkgs.delve}/bin/dlv-dap";
-          "gopls" = "${pkgs.gopls}/bin/gopls";
-          "go" = "${lib.getExe config.programs.go.package}";
-          "gofumpt" = "${pkgs.gofumpt}/bin/gofumpt";
-          "golangci-lint" = "${pkgs.golangci-lint}/bin/golangci-lint";
-          "gotestsum" = "${pkgs.gotestsum}/bin/gotestsum";
-          "staticcheck" = "${pkgs.go-tools}/bin/staticcheck";
-          "templ" = "${pkgs.templ}/bin/templ";
-        };
+        # "go.alternateTools" = {
+        #   "dlv" = "${pkgs.delve}/bin/dlv";
+        #   "dlv-dap" = "${pkgs.delve}/bin/dlv-dap";
+        #   "gopls" = "${pkgs.gopls}/bin/gopls";
+        #   "go" = "${lib.getExe config.programs.go.package}";
+        #   "gofumpt" = "${pkgs.gofumpt}/bin/gofumpt";
+        #   "golangci-lint" = "${pkgs.golangci-lint}/bin/golangci-lint";
+        #   "gotestsum" = "${pkgs.gotestsum}/bin/gotestsum";
+        #   "staticcheck" = "${pkgs.go-tools}/bin/staticcheck";
+        #   "templ" = "${pkgs.templ}/bin/templ";
+        # };
         "go.delveConfig" = {
           "apiVersion" = 2;
           "debugAdapter" = "dlv-dap";
