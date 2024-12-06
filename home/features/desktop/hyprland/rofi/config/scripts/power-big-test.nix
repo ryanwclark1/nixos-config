@@ -6,13 +6,14 @@
 }:
 
 {
-  home.file.".config/rofi/scripts/power-big.sh" = {
+  home.file.".config/rofi/scripts/power-big-test.sh" = {
     text = ''
+
       #!/usr/bin/env bash
 
       # Current Theme
       dir="$HOME/.config/rofi/style/"
-      theme='power-big'
+      theme='power-big-test'
       background="$(hyprctl hyprpaper listloaded)"
 
       # CMDs
@@ -32,9 +33,9 @@
       # Rofi CMD
       rofi_cmd() {
         rofi -dmenu \
-          -p "Goodbye $USER" \
+          -p "Goodbye ${USER}" \
           -mesg "Uptime: $uptime" \
-          -theme "$dir/$theme.rasi"
+          -theme "${dir}/${theme}.rasi"
       }
 
       # Confirmation CMD
@@ -42,7 +43,7 @@
         rofi -dmenu \
           -p 'Confirmation' \
           -mesg 'Are You Sure?' \
-          -theme "$dir/shared/confirm-big.rasi"
+          -theme "${dir}/shared/confirm-big.rasi"
       }
 
       # Ask for confirmation
@@ -92,7 +93,7 @@
 
       # Actions
       chosen="$(run_rofi)"
-      case $chosen in
+      case ${chosen} in
         $shutdown)
           run_cmd --shutdown
           ;;
@@ -114,6 +115,6 @@
           ;;
       esac
     '';
-    executable = false;
+    executable = true;
   };
 }

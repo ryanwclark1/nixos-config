@@ -71,7 +71,7 @@
 			fi
 
 			# Options
-			layout=`cat ${theme} | grep 'USE_ICON' | cut -d'=' -f2`
+			layout=`cat $theme | grep 'USE_ICON' | cut -d'=' -f2`
 			if [[ "$layout" == 'NO' ]]; then
 				option_1=" Increase"
 				option_2="$sicon $stext"
@@ -94,9 +94,9 @@
 					-dmenu \
 					-p "$prompt" \
 					-mesg "$mesg" \
-					${active} ${urgent} \
+					$active $urgent \
 					-markup-rows \
-					-theme ${theme}
+					-theme $theme
 			}
 
 			# Pass variables to rofi dmenu
@@ -121,7 +121,7 @@
 
 			# Actions
 			chosen="$(run_rofi)"
-			case ${chosen} in
+			case $chosen in
 					$option_1)
 					run_cmd --opt1
 							;;

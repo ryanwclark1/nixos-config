@@ -37,7 +37,7 @@
 			setting_cmd='xfce4-settings-manager'
 
 			# Options
-			layout=`cat ${theme} | grep 'USE_ICON' | cut -d'=' -f2`
+			layout=`cat $theme | grep 'USE_ICON' | cut -d'=' -f2`
 			if [[ "$layout" == 'NO' ]]; then
 				option_1=" Terminal <span weight='light' size='small'><i>($term_cmd)</i></span>"
 				option_2=" Files <span weight='light' size='small'><i>($file_cmd)</i></span>"
@@ -62,7 +62,7 @@
 					-p "$prompt" \
 					-mesg "$mesg" \
 					-markup-rows \
-					-theme ${theme}
+					-theme $theme
 			}
 
 			# Pass variables to rofi dmenu
@@ -73,23 +73,23 @@
 			# Execute Command
 			run_cmd() {
 				if [[ "$1" == '--opt1' ]]; then
-					${term_cmd}
+					$term_cmd
 				elif [[ "$1" == '--opt2' ]]; then
-					${file_cmd}
+					$file_cmd
 				elif [[ "$1" == '--opt3' ]]; then
-					${text_cmd}
+					$text_cmd
 				elif [[ "$1" == '--opt4' ]]; then
-					${web_cmd}
+					$web_cmd
 				elif [[ "$1" == '--opt5' ]]; then
-					${music_cmd}
+					$music_cmd
 				elif [[ "$1" == '--opt6' ]]; then
-					${setting_cmd}
+					$setting_cmd
 				fi
 			}
 
 			# Actions
 			chosen="$(run_rofi)"
-			case ${chosen} in
+			case $chosen in
 					$option_1)
 					run_cmd --opt1
 							;;

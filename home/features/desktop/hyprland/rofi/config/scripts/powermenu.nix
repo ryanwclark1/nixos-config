@@ -29,7 +29,7 @@
 			fi
 
 			# Options
-			layout=`cat ${theme} | grep 'USE_ICON' | cut -d'=' -f2`
+			layout=`cat $theme | grep 'USE_ICON' | cut -d'=' -f2`
 			if [[ "$layout" == 'NO' ]]; then
 				option_1=" Lock"
 				option_2=" Logout"
@@ -58,7 +58,7 @@
 					-p "$prompt" \
 					-mesg "$mesg" \
 					-markup-rows \
-					-theme ${theme}
+					-theme $theme
 			}
 
 			# Pass variables to rofi dmenu
@@ -76,7 +76,7 @@
 					-dmenu \
 					-p 'Confirmation' \
 					-mesg 'Are you Sure?' \
-					-theme ${theme}
+					-theme $theme
 			}
 
 			# Ask for confirmation
@@ -88,7 +88,7 @@
 			confirm_run () {
 				selected="$(confirm_exit)"
 				if [[ "$selected" == "$yes" ]]; then
-							${1} && ${2} && ${3}
+							$1 && $2 && $3
 					else
 							exit
 					fi
@@ -113,7 +113,7 @@
 
 			# Actions
 			chosen="$(run_rofi)"
-			case ${chosen} in
+			case $chosen in
 					$option_1)
 					run_cmd --opt1
 							;;
