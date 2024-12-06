@@ -1,10 +1,10 @@
 {
-  ...,
   pkgs,
+  ...
 }:
 
 {
-  home.packages = [
+  home.packages = with pkgs; [
     # Fonts
     nerd-fonts.dejavu-sans-mono
     nerd-fonts.droid-sans-mono
@@ -23,4 +23,6 @@
     liberation_ttf
     powerline-symbols
   ];
+
+  fonts.fontconfig.enable = true;
 }
