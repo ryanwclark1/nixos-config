@@ -83,10 +83,10 @@ in
       lazygit.enable = lib.mkDefault false;
       mako.enable = lib.mkDefault false;
       neovim = {
-        enable = lib.mkDefault true;
+        enable = lib.mkDefault false;
         transparentBackground = {
-          main =lib.mkDefault  true;
-          signColumn = lib.mkDefault true;
+          main =lib.mkDefault  false;
+          signColumn = lib.mkDefault false;
         };
       };
       nixvim = {
