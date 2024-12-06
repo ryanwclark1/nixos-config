@@ -4,7 +4,7 @@
 
 {
   imports = [
-    ./shared
+    ./scripts
     ./style
     ./config.nix
     ./config-emoji.nix
