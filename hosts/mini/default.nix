@@ -55,8 +55,17 @@
 
   fonts = {
     packages = [
+      pkgs.nerd-fonts.dejavu-sans-mono
+      pkgs.nerd-fonts.droid-sans-mono
+      pkgs.nerd-fonts.fira-code
+      pkgs.nerd-fonts.fira-mono
       pkgs.nerd-fonts.jetbrains-mono
+      pkgs.nerd-fonts.monaspace
+      pkgs.nerd-fonts.mplus
+      pkgs.nerd-fonts.noto
+      pkgs.nerd-fonts.ubuntu
       pkgs.nerd-fonts.ubuntu-mono
+      pkgs.nerd-fonts.ubuntu-sans
     ];
   };
 
