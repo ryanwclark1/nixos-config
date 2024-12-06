@@ -28,7 +28,7 @@
 
 			# Theme Elements
 			prompt="$status"
-			mesg="${battery}: ${percentage}%,${time}"
+			mesg="$battery: $percentage%,$time"
 
 			if [[ "$theme" == *'type-1'* ]]; then
 				list_col='1'
@@ -76,9 +76,9 @@
 			fi
 
 			# Options
-			layout=`cat ${theme} | grep 'USE_ICON' | cut -d'=' -f2`
+			layout=`cat $theme | grep 'USE_ICON' | cut -d'=' -f2`
 			if [[ "$layout" == 'NO' ]]; then
-				option_1=" Remaining ${percentage}%"
+				option_1=" Remaining $percentage%"
 				option_2=" $status"
 				option_3=" Power Manager"
 				option_4=" Diagnose"
@@ -97,9 +97,9 @@
 					-dmenu \
 					-p "$prompt" \
 					-mesg "$mesg" \
-					${active} ${urgent} \
+					$active $urgent \
 					-markup-rows \
-					-theme ${theme}
+					-theme $theme
 			}
 
 			# Pass variables to rofi dmenu
@@ -111,19 +111,19 @@
 			run_cmd() {
 				polkit_cmd="pkexec env PATH=$PATH DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY"
 				if [[ "$1" == '--opt1' ]]; then
-					notify-send -u low " Remaining : ${percentage}%"
+					notify-send -u low " Remaining : $percentage%"
 				elif [[ "$1" == '--opt2' ]]; then
 					notify-send -u low "$ICON_CHRG Status : $status"
 				elif [[ "$1" == '--opt3' ]]; then
 					xfce4-power-manager-settings
 				elif [[ "$1" == '--opt4' ]]; then
-					${polkit_cmd} alacritty -e powertop
+					$polkit_cmd alacritty -e powertop
 				fi
 			}
 
 			# Actions
 			chosen="$(run_rofi)"
-			case ${chosen} in
+			case $chosen in
 					$option_1)
 					run_cmd --opt1
 							;;

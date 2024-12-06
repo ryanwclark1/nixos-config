@@ -31,8 +31,8 @@
 			fi
 
 			# Theme Elements
-			prompt="${backlight}%"
-			mesg="Device: ${card}, Level: $level"
+			prompt="$backlight%"
+			mesg="Device: $card, Level: $level"
 
 			if [[ "$theme" == *'type-1'* ]]; then
 				list_col='1'
@@ -53,7 +53,7 @@
 			fi
 
 			# Options
-			layout=`cat ${theme} | grep 'USE_ICON' | cut -d'=' -f2`
+			layout=`cat $theme | grep 'USE_ICON' | cut -d'=' -f2`
 			if [[ "$layout" == 'NO' ]]; then
 				option_1=" Increase"
 				option_2=" Optimal"
@@ -75,7 +75,7 @@
 					-p "$prompt" \
 					-mesg "$mesg" \
 					-markup-rows \
-					-theme ${theme}
+					-theme $theme
 			}
 
 			# Pass variables to rofi dmenu
@@ -98,7 +98,7 @@
 
 			# Actions
 			chosen="$(run_rofi)"
-			case ${chosen} in
+			case $chosen in
 					$option_1)
 					run_cmd --opt1
 							;;

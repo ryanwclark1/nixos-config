@@ -39,7 +39,7 @@
 			fi
 
 			# Options
-			layout=`cat ${theme} | grep 'USE_ICON' | cut -d'=' -f2`
+			layout=`cat $theme | grep 'USE_ICON' | cut -d'=' -f2`
 			if [[ "$layout" == 'NO' ]]; then
 				option_1=" Alacritty"
 				option_2=" Thunar"
@@ -63,7 +63,7 @@
 					-p "$prompt" \
 					-mesg "$mesg" \
 					-markup-rows \
-					-theme ${theme}
+					-theme $theme
 			}
 
 			# Pass variables to rofi dmenu
@@ -75,21 +75,21 @@
 			run_cmd() {
 				polkit_cmd="pkexec env PATH=$PATH DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY"
 				if [[ "$1" == '--opt1' ]]; then
-					${polkit_cmd} alacritty
+					$polkit_cmd alacritty
 				elif [[ "$1" == '--opt2' ]]; then
-					${polkit_cmd} dbus-run-session thunar
+					$polkit_cmd dbus-run-session thunar
 				elif [[ "$1" == '--opt3' ]]; then
-					${polkit_cmd} geany
+					$polkit_cmd geany
 				elif [[ "$1" == '--opt4' ]]; then
-					${polkit_cmd} alacritty -e ranger
+					$polkit_cmd alacritty -e ranger
 				elif [[ "$1" == '--opt5' ]]; then
-					${polkit_cmd} alacritty -e vim
+					$polkit_cmd alacritty -e vim
 				fi
 			}
 
 			# Actions
 			chosen="$(run_rofi)"
-			case ${chosen} in
+			case $chosen in
 					$option_1)
 					run_cmd --opt1
 							;;
