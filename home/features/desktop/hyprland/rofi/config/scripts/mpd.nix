@@ -61,8 +61,8 @@
 			fi
 
 			# Toggle Actions
-			active=''
-			urgent=''
+			active=""
+			urgent=""
 			# Repeat
 			if [[ $status == *"repeat: on"* ]]; then
 					active="-a 4"
