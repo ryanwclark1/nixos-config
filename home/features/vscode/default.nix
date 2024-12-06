@@ -226,6 +226,7 @@
 
         "editor.accessibilityPageSize" = 5000;
         "editor.experimental.treeSitterTelemetry" = false;
+        "editor.fontFamily" = "UbuntuMono Nerd Font, JetBrains Mono, Symbols Nerd Font Mono";
         "editor.fontLigatures" = true;
         "editor.foldingMaximumRegions" = 10000;
         "editor.foldingStrategy" = "auto";
@@ -277,7 +278,7 @@
         "files.autoSave" = "afterDelay";
         "files.trimTrailingWhitespace" = true;
         "telemetry.telemetryLevel" = "off";
-        # "terminal.integrated.fontFamily" = "Ubuntu Mono";
+        "terminal.integrated.fontFamily" = "UbuntuMono Nerd Font";
         "terminal.integrated.copyOnSelection" = true;
         "terminal.integrated.defaultProfile.linux" = "bash";
         "terminal.integrated.fontSize" = 12;

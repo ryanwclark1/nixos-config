@@ -59,7 +59,7 @@ const options = mkOptions(OPTIONS, {
 
     font: {
         size: opt(13),
-        name: opt("Ubuntu Mono"),
+        name: opt("UbuntuMono Nerd Font"),
     },
 
     bar: {

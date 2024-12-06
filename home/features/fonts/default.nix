@@ -18,10 +18,15 @@
     nerd-fonts.ubuntu-mono
     nerd-fonts.ubuntu-sans
     nerd-fonts.symbols-only
+    nerd-fonts.hack
     noto-fonts
     noto-fonts-emoji
     liberation_ttf
     powerline-symbols
+    font-awesome
+
+    # Font Manager
+    font-manager
   ];
 
   fonts.fontconfig.enable = true;
