@@ -56,7 +56,7 @@ with config.lib.stylix.colors.withHashtag;
     ];
     style = ''
       * {
-        font-family: "JetBrainsMono NF", FontAwesome, sans-serif;
+        font-family: "Ubuntu Mono", FontAwesome, sans-serif;
       	background-image: none;
       	transition: 20ms;
       }

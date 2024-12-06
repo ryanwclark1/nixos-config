@@ -73,7 +73,7 @@
       };
       style = ''
         * {
-            font-family: JetBrainsMono Nerd Font Mono;
+            font-family: Ubuntu Mono;
             font-weight: bold;
           }
           .control-center .notification-row:focus,
