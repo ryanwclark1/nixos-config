@@ -12,18 +12,17 @@
     inputs.nixos-hardware.nixosModules.common-pc-ssd
     ./hardware-configuration.nix
     ./services
-
     ../common/global
     ../common/users/administrator
-
-    # ../common/optional/arion.nix
     ../common/optional/audio.nix
     ../common/optional/bluetooth.nix
     ../common/optional/direnv.nix
+    ../common/optional/displaymanager/gdm.nix
     ../common/optional/docker.nix
-    # ../common/optional/k3s.nix
-    ../common/optional/nfs.nix
+    ../common/optional/gnome
+    ../common/optional/hyprland
     ../common/optional/nautilus.nix
+    ../common/optional/nfs.nix
     ../common/optional/printing.nix
     ../common/optional/qemu.nix
     ../common/optional/steam.nix
@@ -31,28 +30,21 @@
     ../common/optional/syncthing.nix
     ../common/optional/system-packages.nix
     ../common/optional/thunar.nix
-    # ../common/optional/virt-viewer.nix
     ../common/optional/webcam.nix
-    ../common/optional/wireshark.nix
     ../common/optional/wireguard.nix
+    ../common/optional/wireshark.nix
     ../common/optional/zsh.nix
-
-    ../common/optional/displaymanager/gdm.nix
-    ../common/optional/gnome
-    ../common/optional/hyprland
   ];
 
   networking = {
     hostName = "woody";
   };
-
   boot = {
     loader = {
       systemd-boot = {
         enable = true;
         configurationLimit = 20;
         consoleMode = "keep";
-
       };
       efi.canTouchEfiVariables = true;
     };
@@ -66,7 +58,7 @@
     #   enable = true;
     #   pkiBundle = "/etc/secureboot";
     # };
-    kernelPackages = pkgs.linuxKernel.packages.linux_6_11;
+    kernelPackages = pkgs.linuxKernel.packages.linux_6_12;
   };
 
   hardware = {
@@ -95,7 +87,6 @@
         driversi686Linux.mesa
       ];
     };
-
     logitech = {
       wireless = {
         enable = true;
@@ -103,6 +94,5 @@
       };
     };
   };
-
   system.stateVersion = "24.05";
 }
