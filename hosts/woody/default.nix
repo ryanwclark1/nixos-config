@@ -17,10 +17,7 @@
     ../common/optional/audio.nix
     ../common/optional/bluetooth.nix
     ../common/optional/direnv.nix
-    ../common/optional/displaymanager/gdm.nix
     ../common/optional/docker.nix
-    ../common/optional/gnome
-    ../common/optional/hyprland
     ../common/optional/nautilus.nix
     ../common/optional/nfs.nix
     ../common/optional/printing.nix
@@ -34,6 +31,10 @@
     ../common/optional/wireguard.nix
     ../common/optional/wireshark.nix
     ../common/optional/zsh.nix
+
+    ../common/optional/gnome
+    ../common/optional/hyprland
+    ../common/optional/displaymanager/gdm.nix
   ];
 
   networking = {
