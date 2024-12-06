@@ -8,7 +8,6 @@
     ./features/desktop/hyprland
     ./features/desktop/plasma
     ./features/desktop/common
-
     ./features/accounts
     ./features/alacritty
     ./features/ansible
@@ -22,6 +21,7 @@
     ./features/fastfetch
     ./features/fd
     ./features/firefox
+    ./features/fonts
     ./features/fzf
     ./features/games
     ./features/git

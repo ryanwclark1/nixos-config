@@ -6,7 +6,6 @@
 {
   imports = [
     ./global
-
     ./features/atuin
     ./features/bat
     ./features/cli
@@ -14,6 +13,7 @@
     ./features/eza
     ./features/fastfetch
     ./features/fd
+    ./features/fonts
     ./features/fzf
     ./features/git
     ./features/kubernetes
