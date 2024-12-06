@@ -33,7 +33,7 @@ in
       };
       monospace = {
         package = pkgs.nerd-fonts.ubuntu-mono;
-        name = "Ubuntu Mono";
+        name = "UbuntuMono Nerd Font";
       };
       emoji = {
         package = pkgs.noto-fonts-emoji;
