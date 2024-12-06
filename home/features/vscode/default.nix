@@ -278,7 +278,7 @@
         "files.autoSave" = "afterDelay";
         "files.trimTrailingWhitespace" = true;
         "telemetry.telemetryLevel" = "off";
-        # "terminal.integrated.fontFamily" = "JetBrainsMono Nerd Font";
+        # "terminal.integrated.fontFamily" = "Ubuntu Mono";
         "terminal.integrated.copyOnSelection" = true;
         "terminal.integrated.defaultProfile.linux" = "bash";
         "terminal.integrated.fontSize" = 12;

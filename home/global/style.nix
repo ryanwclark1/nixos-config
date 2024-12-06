@@ -33,8 +33,8 @@ in
         name = "DejaVu Sans";
       };
       monospace = {
-        package = pkgs.nerdfonts.override {fonts = ["JetBrainsMono"];};
-        name = "JetBrainsMono Nerd Font";
+        package = pkgs.nerd-fonts.ubuntu-mono;
+        name = "Ubuntu Mono";
       };
       emoji = {
         package = pkgs.noto-fonts-emoji;
