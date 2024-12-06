@@ -5,42 +5,25 @@
   ...
 }:
 
-with config.lib.stylix.colors.withHashtag;
-with config.stylix.fonts;
-
 {
-  home.file.".config/rofi/style/launcher-center.rasi" = {
+  home.file.".config/rofi/style/shared/launcher-center-alt2.rasi" = {
     text = ''
+
       /*****----- Configuration -----*****/
       configuration {
-        modi:                       "drun,run,filebrowser,ssh,window";
+        modi:                       "drun,run,filebrowser,window";
         show-icons:                 true;
         display-drun:               " Apps";
         display-run:                " Run";
         display-filebrowser:        " Files";
         display-window:             " Windows";
-        display-ssh:                " SSH";
         drun-display-format:        "{name}";
         window-format:              "{w} · {c} · {t}";
-
-        /*---------- SSH settings ----------*/
-        ssh-client: "ssh";
-        ssh-command: "{terminal} -e {ssh-client} {host} [-p {port}]";
-        parse-hosts: true;
-        parse-known-hosts: true;
-        terminal: "alacritty";
       }
 
       /*****----- Global Properties -----*****/
-      * {
-        background:     #1E1D2FFF;
-        background-alt: #282839FF;
-        foreground:     #D9E0EEFF;
-        selected:       #7AA2F7FF;
-        active:         #ABE9B3FF;
-        urgent:         #F28FADFF;
-        font: "JetBrains Mono Nerd Font 12";
-      }
+      @import                          "shared/colors.rasi"
+      @import                          "shared/fonts.rasi"
 
       * {
         border-colour:               var(selected);
@@ -67,7 +50,6 @@ with config.stylix.fonts;
         alternate-active-background: var(active);
         alternate-active-foreground: var(background);
       }
-
 
       /*****----- Main Window -----*****/
       window {
@@ -103,26 +85,26 @@ with config.stylix.fonts;
       /*****----- Main Box -----*****/
       mainbox {
         enabled:                     true;
-        spacing:                     0px;
+        spacing:                     10px;
         margin:                      0px;
         padding:                     20px;
         border:                      0px solid;
         border-radius:               0px 0px 0px 0px;
         border-color:                @border-colour;
         background-color:            transparent;
-        children:                    [ "inputbar", "message", "mode-switcher", "listview" ];
+        children:                    [ "inputbar", "mode-switcher", "message", "listview" ];
       }
 
       /*****----- Inputbar -----*****/
       inputbar {
         enabled:                     true;
         spacing:                     10px;
-        margin:                      0px 0px 10px 0px;
-        padding:                     5px 10px;
+        margin:                      0px;
+        padding:                     0px;
         border:                      0px solid;
-        border-radius:               10px;
+        border-radius:               0px;
         border-color:                @border-colour;
-        background-color:            @alternate-background;
+        background-color:            transparent;
         text-color:                  @foreground-colour;
         children:                    [ "textbox-prompt-colon", "entry" ];
       }
@@ -136,7 +118,7 @@ with config.stylix.fonts;
         enabled:                     true;
         padding:                     5px 0px;
         expand:                      false;
-        str:                         " ";
+        str:                         "";
         background-color:            inherit;
         text-color:                  inherit;
       }
@@ -178,7 +160,7 @@ with config.stylix.fonts;
       listview {
         enabled:                     true;
         columns:                     1;
-        lines:                       12;
+        lines:                       8;
         cycle:                       true;
         dynamic:                     true;
         scrollbar:                   false;
@@ -189,9 +171,9 @@ with config.stylix.fonts;
 
         spacing:                     5px;
         margin:                      0px;
-        padding:                     10px;
-        border:                      0px 2px 2px 2px ;
-        border-radius:               0px 0px 10px 10px;
+        padding:                     0px;
+        border:                      0px solid;
+        border-radius:               0px;
         border-color:                @border-colour;
         background-color:            transparent;
         text-color:                  @foreground-colour;
@@ -209,9 +191,9 @@ with config.stylix.fonts;
         enabled:                     true;
         spacing:                     10px;
         margin:                      0px;
-        padding:                     6px;
+        padding:                     10px;
         border:                      0px solid;
-        border-radius:               6px;
+        border-radius:               8px;
         border-color:                @border-colour;
         background-color:            transparent;
         text-color:                  @foreground-colour;
@@ -272,7 +254,7 @@ with config.stylix.fonts;
       mode-switcher{
         enabled:                     true;
         expand:                      false;
-        spacing:                     0px;
+        spacing:                     10px;
         margin:                      0px;
         padding:                     0px;
         border:                      0px solid;
@@ -282,26 +264,23 @@ with config.stylix.fonts;
         text-color:                  @foreground-colour;
       }
       button {
-        padding:                     10px;
-        border:                      0px 0px 2px 0px ;
-        border-radius:               10px 10px 0px 0px;
+        padding:                     12px;
+        border:                      0px solid;
+        border-radius:               8px;
         border-color:                @border-colour;
-        background-color:            @background-colour;
+        background-color:            @alternate-background;
         text-color:                  inherit;
         cursor:                      pointer;
       }
       button selected {
-        border:                      2px 2px 0px 2px ;
-        border-radius:               10px 10px 0px 0px;
-        border-color:                @border-colour;
-        background-color:            var(normal-background);
-        text-color:                  var(normal-foreground);
+        background-color:            var(selected-normal-background);
+        text-color:                  var(selected-normal-foreground);
       }
 
       /*****----- Message -----*****/
       message {
         enabled:                     true;
-        margin:                      0px 0px 10px 0px;
+        margin:                      0px;
         padding:                     0px;
         border:                      0px solid;
         border-radius:               0px 0px 0px 0px;
@@ -310,9 +289,9 @@ with config.stylix.fonts;
         text-color:                  @foreground-colour;
       }
       textbox {
-        padding:                     10px;
+        padding:                     12px;
         border:                      0px solid;
-        border-radius:               10px;
+        border-radius:               8px;
         border-color:                @border-colour;
         background-color:            @alternate-background;
         text-color:                  @foreground-colour;
@@ -324,9 +303,9 @@ with config.stylix.fonts;
         markup:                      true;
       }
       error-message {
-        padding:                     10px;
+        padding:                     0px;
         border:                      2px solid;
-        border-radius:               10px;
+        border-radius:               8px;
         border-color:                @border-colour;
         background-color:            @background-colour;
         text-color:                  @foreground-colour;

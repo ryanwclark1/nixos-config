@@ -10,7 +10,7 @@
         show-icons = true;
         icon-theme = "Papirus";
         location = 0;
-        font = "UbuntuMono Nerd Font 12";
+        font = "${config.stylix.fonts.monospace.name} 12";
         drun-display-format = "{icon} {name}";
         display-drun = " Apps";
         display-run = " Run";
@@ -184,7 +184,7 @@
           };
           "element-text" = {
             background-color = mkLiteral "transparent";
-            font = "UbuntuMono Nerd Font 12";
+            font = "${config.stylix.fonts.monospace.name} 12";
             text-color = mkLiteral "inherit";
             cursor = mkLiteral "inherit";
             vertical-align = mkLiteral "0.5";

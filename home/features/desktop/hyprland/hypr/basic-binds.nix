@@ -30,7 +30,6 @@ in
         "ALT, F4,killactive"
         "SUPER SHIFT, e,exit"
 
-
         "SUPER SHIFT, space,togglefloating"
 
         "SUPER, minus,splitratio,-0.25"
@@ -48,7 +47,6 @@ in
         "SUPER, u,togglespecialworkspace"
         "SUPER SHIFT, u,movetoworkspacesilent,special"
         "SUPER, i,pseudo"
-
       ]
       ++
       (

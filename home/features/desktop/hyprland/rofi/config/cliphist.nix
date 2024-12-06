@@ -5,24 +5,12 @@
   ...
 }:
 
-with config.lib.stylix.colors.withHashtag;
-with config.stylix.fonts;
 
 {
   home =
-  let
-    font = "${monospace.name} 12";
-    background = "${base00}";
-    # style_dir = "${config.home.homeDirectory}/.config/rofi/style";
-  in
   {
     file.".config/rofi/style/cliphist.rasi" = {
       text = ''
-        /*
-        TEST-Font - ${font}
-        TEST-Background - ${background}
-        */
-
         /*****----- Global Properties -----*****/
         @import                          "shared/colors.rasi"
         @import                          "shared/fonts.rasi"

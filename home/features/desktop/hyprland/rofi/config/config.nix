@@ -5,9 +5,6 @@
   ...
 }:
 
-with config.lib.stylix.colors.withHashtag;
-with config.stylix.fonts;
-
 {
   home.file.".config/rofi/config.rasi" = {
     text = ''
@@ -89,7 +86,7 @@ with config.stylix.fonts;
 
         /*---------- Misc setting ----------*/
         terminal: "rofi-sensible-terminal";
-        font: "Mono 12";
+        font: "UbuntuMono Nerd Font 12";
         sort: false;
         threads: 0;
         click-to-exit: true;

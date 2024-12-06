@@ -270,6 +270,7 @@
         "extensions.autoUpdate" = false;
         "files.associations" = {
           "*.css" = "tailwindcss";
+          "*.env" = "dotenv";
         };
         "files.exclude" = {
           "**/node_modules/**" = true;
@@ -547,7 +548,6 @@
         # Templ
         "templ.pprof" = true;
         "templ.goplsRPCTrace" = true;
-
 
         # YAML
         "yaml.completion" = true;
