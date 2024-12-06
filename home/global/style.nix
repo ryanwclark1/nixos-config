@@ -64,7 +64,7 @@ in
       fish.enable = lib.mkDefault false;
       fzf.enable = lib.mkDefault false;
       gedit.enable = lib.mkDefault false;
-      gitui.enable = lib.mkDefault true;
+      gitui.enable = lib.mkDefault false;
       gnome.enable = lib.mkDefault true;
       gtk = {
         enable = lib.mkDefault true;
@@ -72,7 +72,7 @@ in
         #   @import url("file://${pkgs.stylix}/share/themes/${currentScheme}.css");
         # '';
       };
-      hyprland.enable = lib.mkDefault true;
+      hyprland.enable = lib.mkDefault false;
       hyprpaper.enable = lib.mkDefault true;
       k9s.enable = lib.mkDefault false;
       kde.enable = lib.mkDefault false;
@@ -98,7 +98,7 @@ in
       };
       qutebrowser.enable = lib.mkDefault false;
       rofi.enable = lib.mkDefault false;
-      vscode.enable = lib.mkDefault true;
+      vscode.enable = lib.mkDefault false;
       waybar = {
         enable = lib.mkDefault false;
         enableCenterBackColors = lib.mkDefault false;

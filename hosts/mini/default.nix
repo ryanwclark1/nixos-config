@@ -54,18 +54,22 @@
   programs.zsh.enable = true;
 
   fonts = {
-    packages = [
-      pkgs.nerd-fonts.dejavu-sans-mono
-      pkgs.nerd-fonts.droid-sans-mono
-      pkgs.nerd-fonts.fira-code
-      pkgs.nerd-fonts.fira-mono
-      pkgs.nerd-fonts.jetbrains-mono
-      pkgs.nerd-fonts.monaspace
-      pkgs.nerd-fonts.mplus
-      pkgs.nerd-fonts.noto
-      pkgs.nerd-fonts.ubuntu
-      pkgs.nerd-fonts.ubuntu-mono
-      pkgs.nerd-fonts.ubuntu-sans
+    packages = with pkgs; [
+      nerd-fonts.dejavu-sans-mono
+      nerd-fonts.droid-sans-mono
+      nerd-fonts.fira-code
+      nerd-fonts.fira-mono
+      nerd-fonts.jetbrains-mono
+      nerd-fonts.monaspace
+      nerd-fonts.mplus
+      nerd-fonts.noto
+      nerd-fonts.ubuntu
+      nerd-fonts.ubuntu-mono
+      nerd-fonts.ubuntu-sans
+      noto-fonts
+      noto-fonts-emoji
+      liberation_ttf
+      powerline-symbols
     ];
   };
 
