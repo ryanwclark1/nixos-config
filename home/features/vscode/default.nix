@@ -22,83 +22,89 @@
       enableExtensionUpdateCheck = true;
       enableUpdateCheck = false;
       extensions = with pkgs.vscode-extensions; [
+        bradlc.vscode-tailwindcss
+        cameron.vscode-pytest
+        catppuccin.catppuccin-vsc
+        charliermarsh.ruff
+        coder.coder-remote
+        codezombiech.gitignore
+        cweijan.vscode-database-client2
+        dbaeumer.vscode-eslint
+        donjayamanne.githistory
+        dotenv.dotenv-vscode
+        ecmel.vscode-html-css
+        editorconfig.editorconfig
+        esbenp.prettier-vscode
+        esbenp.prettier-vscode
+        formulahendry.code-runner
+        gencer.html-slim-scss-css-class-completion
         github.codespaces
         github.copilot
         github.copilot-chat
         github.github-vscode-theme
         github.vscode-github-actions
         github.vscode-pull-request-github
-        ms-azuretools.vscode-docker
-        ms-kubernetes-tools.vscode-kubernetes-tools
-        ms-python.python
-        ms-python.vscode-pylance
-        ms-python.debugpy
-        ms-vscode-remote.remote-ssh-edit
-        ms-vscode-remote.remote-ssh
-        ms-vscode-remote.remote-containers
-        ms-vscode.cmake-tools
-        ms-vscode.hexeditor
-        ms-vscode.makefile-tools
-        ms-vscode.live-server
-        bradlc.vscode-tailwindcss
-        catppuccin.catppuccin-vsc
-        charliermarsh.ruff
-        dbaeumer.vscode-eslint
-        donjayamanne.githistory
-        esbenp.prettier-vscode
-        formulahendry.code-runner
-        gencer.html-slim-scss-css-class-completion
         golang.go
         griimick.vhs
         hediet.vscode-drawio
         jdinhlife.gruvbox
+        jetmartin.bats
+        jnoortheen.nix-ide
         jnoortheen.nix-ide
         jock.svg
         mikestead.dotenv
+        ms-azuretools.vscode-docker
+        ms-kubernetes-tools.vscode-kubernetes-tools
+        ms-pyright.pyright
+        ms-python.debugpy
+        ms-python.python
+        ms-python.vscode-pylance
+        ms-vscode-remote.remote-containers
+        ms-vscode-remote.remote-ssh
+        ms-vscode-remote.remote-ssh-edit
+        ms-vscode.cmake-tools
+        ms-vscode.hexeditor
+        ms-vscode.live-server
+        ms-vscode.makefile-tools
         njpwerner.autodocstring
         pkief.material-icon-theme
         quicktype.quicktype
         redhat.vscode-xml
         redhat.vscode-yaml
         rust-lang.rust-analyzer
+        samuelcolvin.jinjahtml
+        shyykoserhiy.vscode-spotify
+        sourcery.sourcery
         tailscale.vscode-tailscale
         tamasfe.even-better-toml
         vscodevim.vim
-        # wholroyd.jinja # Prefer Better Jinja
-        samuelcolvin.jinjahtml
-
         yzhang.markdown-all-in-one
+        # wholroyd.jinja # Prefer Better Jinja
       ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
         {
           name = "alpine-js-intellisense";
           publisher = "adrianwilczynski";
-          version = "1.2.0";
           sha256 = "sha256-Klx5ZvV06lXIJ3Q/mzq3KBjPpdROoxDkgEu7MBO+RhI=";
+          version = "1.2.0";
         }
         {
           name = "ansible";
           publisher = "redhat";
-          sha256 = "sha256-NDIGyVCo3Az6oncnKR9PXXnZ4ynwF7HBeIiNyiGTPko=";
-          version = "24.10.0";
+          sha256 = "sha256-c7TB9gZGU68Kj2HXhhsmUusfH6S4fcW7mR6JTmDZ68w=";
+          version = "24.12.0";
         }
         {
           name = "bun-vscode";
           publisher = "oven";
-          sha256 = "sha256-9aoDDO7hh+YPTKh64z3rZhnTW5H8Se3+ZTncGrsKyJ0=";
-          version = "0.0.15";
+          sha256 = "sha256-CB9NrBVxHVF/rexAgPpqDFxiYnrZCzP/e7jxRhHUBmI=";
+          version = "0.0.25";
         }
-        # {
-        #   name = "copilot";
-        #   publisher = "github";
-        #   sha256 = "sha256-IJGNIPmCq96Xi9UfYrUoD5lKItnoWd1be5EYJv0ngXE=";
-        #   version = "1.244.0";
-        # }
-        # {
-        #   name = "copilot-chat";
-        #   publisher = "github";
-        #   sha256 = "sha256-nsdgpjPmHY3AmD/Hs55iCiwBaK0+X9g+f8tR0mrQxzA=";
-        #   version = "0.21.0";
-        # }
+        {
+          name = "grafana-vscode";
+          publisher = "grafana";
+          sha256 = "sha256-TpLOMwdaEdgzWVwUcn+fO4rgLiQammWQM8LQobt8gLw=";
+          version = "0.0.19";
+        }
         {
           name = "htmx-attributes";
           publisher = "craigrbroughton";
@@ -106,22 +112,28 @@
           version = "0.8.0";
         }
         {
+          name = "prom";
+          publisher = "ventura";
+          sha256 = "sha256-h8pRrPzmu8+5ZiOLALjackr4zWuFAqi1ex7Gp2iOZKk=";
+          version = "1.3.3";
+        }
+        {
           name = "remote-explorer";
           publisher = "ms-vscode";
-          sha256 = "sha256-U7P4GkjIk+WRAY1Ng5AMx2EiCwEsXY0Rt+b+4fBSJms=";
-          version = "0.5.2024103109";
+          sha256 = "sha256-ji7h/spvkxn/ljnF6OaKSx8OVNh7h4YrY3QhKKKH5sc=";
+          version = "0.5.2024111900";
         }
         {
           name = "remotehub";
           publisher = "github";
-          sha256 = "sha256-Nh4PxYVdgdDb8iwHHUbXwJ5ZbMruFB6juL4Yg/wdKMY=";
-          version = "0.64.0";
+          sha256 = "sha256-Xb28yff0tiQDUuwC5Mv0rwXqLgZOU4B3KZAht78NfFU=";
+          version = "0.65.2024112101";
         }
         {
           name = "sqlite-viewer";
           publisher = "qwtel";
-          sha256 = "sha256-b7x28eme4v0gOP0hBFMXGG8NFQvIsTP7rRdWZJ04EnA=";
-          version = "0.9.3";
+          sha256 = "sha256-hij0nA/MAi7pelI0aMWAHD1YWEmJaON7/psIIUJeJc8=";
+          version = "0.9.5";
         }
         {
           name = "sqltools";
@@ -178,6 +190,12 @@
           version = "0.7.2";
         }
         {
+          name = "vscode-postgresql-client2";
+          publisher = "cweijan";
+          sha256 = "sha256-0dDYuzL+0lA/W1ZHX3FFrnrjl+TROlf8DOFASfe25s0=";
+          version = "7.7.4";
+        }
+        {
           name = "vscode-speech";
           publisher = "ms-vscode";
           sha256 = "sha256-fxmaPI7uq7DQlzgJc8RcZzHDOwMuodSCf9TkLU9+/+k=";
@@ -186,8 +204,8 @@
         {
           name = "vscode-thunder-client";
           publisher = "rangav";
-          sha256 = "sha256-91zjmzovEu6HRZZUK38oENlWUKyQcxgDKLIAMDdi5WE=";
-          version = "2.29.12";
+          sha256 = "sha256-NvGAbszItsZf71D6fI0/IOSAxKXUHjDJoQ58ROF/NAk=";
+          version = "2.32.3";
         }
         {
           name = "yuck";
