@@ -23,6 +23,7 @@
       nerd-fonts.ubuntu
       nerd-fonts.ubuntu-mono
       nerd-fonts.ubuntu-sans
+      nerd-fonts.symbols-only
       noto-fonts
       noto-fonts-emoji
       liberation_ttf
