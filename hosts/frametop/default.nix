@@ -26,6 +26,7 @@
     ../common/optional/webcam.nix
     ../common/optional/wireshark.nix
     ../common/optional/zsh.nix
+    
     ../common/optional/displaymanager/sddm
     ../common/optional/plasma
     ../common/optional/hyprland
