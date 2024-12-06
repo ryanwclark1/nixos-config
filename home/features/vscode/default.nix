@@ -565,6 +565,10 @@
         "[templ]" = {
           "editor.defaultFormatter" = "a-h.templ";
         };
+
+        "database-client.autoSync" = false;
+        "database-client.telemetry.usesOnlineServices" = false;
+
       };
     };
   };
