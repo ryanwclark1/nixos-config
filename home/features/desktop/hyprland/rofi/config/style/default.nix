@@ -1,0 +1,31 @@
+{
+  ...
+}:
+
+{
+  imports = [
+    ./shared
+    ./applet2-1.nix
+    ./applet2-2.nix
+    ./applet2-3.nix
+    ./applet3-1.nix
+    ./applet3-2.nix
+    ./applet3-3.nix
+    ./cliphist-2.nix
+    ./cliphist.nix
+    ./launcher-center-alt1.nix
+    ./launcher-center-alt2.nix
+    ./launcher-center.nix
+    ./launcher-full.nix
+    ./launcher-long.nix
+    ./power-big.nix
+    ./power-small-round.nix
+    ./power-small-square.nix
+    ./shared/border.nix
+    ./shared/colors.nix
+    ./shared/confirm-big.nix
+    ./shared/confirm.nix
+    ./shared/default.nix
+    ./shared/fonts.nix
+    ];
+}

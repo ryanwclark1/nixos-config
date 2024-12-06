@@ -8,8 +8,7 @@
 # TODO: Fix ssh functionality
 {
   imports = [
-    ./style
-    
+    ./config
   ];
   programs.rofi = {
     enable = true;
