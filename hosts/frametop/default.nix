@@ -9,31 +9,23 @@
     inputs.nixos-hardware.nixosModules.framework-12th-gen-intel
     ./hardware-configuration.nix
     ./services
-
     ../common/global
     ../common/users/administrator
-
+    ../common/optional/audio.nix
     ../common/optional/bluetooth.nix
-    ../common/optional/docker.nix
     ../common/optional/direnv.nix
-    # ../common/optional/k3s.nix
+    ../common/optional/docker.nix
     ../common/optional/nautilus.nix
     ../common/optional/nfs.nix
-    ../common/optional/audio.nix
     ../common/optional/printing.nix
     ../common/optional/qemu.nix
     ../common/optional/steam.nix
     ../common/optional/style.nix
     ../common/optional/system-packages.nix
     ../common/optional/thunar.nix
-    # ../common/optional/virt-viewer.nix
     ../common/optional/webcam.nix
     ../common/optional/wireshark.nix
-    # ../common/optional/semaphore.nix
     ../common/optional/zsh.nix
-
-    # ../common/optional/displaymanager/cosmic.nix
-    # ../common/optional/cosmic
     ../common/optional/displaymanager/sddm
     ../common/optional/plasma
     ../common/optional/hyprland
