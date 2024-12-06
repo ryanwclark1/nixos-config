@@ -10,7 +10,6 @@
     ./features/desktop/hyprland
     ./features/desktop/gnome
     ./features/desktop/common
-
     ./features/accounts
     ./features/alacritty
     ./features/ansible
@@ -24,12 +23,11 @@
     ./features/fastfetch
     ./features/fd
     ./features/firefox
+    ./features/fonts
     ./features/fzf
     ./features/games
     ./features/git
     ./features/imv
-    # ./features/helix
-    # ./features/kdeconnect
     ./features/kitty
     ./features/kodi
     ./features/kubernetes
@@ -37,7 +35,6 @@
     ./features/media
     ./features/networking-utils
     ./features/nixvim
-    # ./features/pistol
     ./features/productivity
     ./features/qutebrowser
     ./features/ripgrep
@@ -47,7 +44,6 @@
     ./features/starship
     ./features/sys-stats
     ./features/tmux
-    # ./features/virtviewer
     ./features/virtualisation
     ./features/vscode
     ./features/yazi
