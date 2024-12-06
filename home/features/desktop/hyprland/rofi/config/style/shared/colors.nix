@@ -5,8 +5,6 @@
   ...
 }:
 
-with config.lib.stylix.colors.withHashtag;
-
 {
   home.file.".config/rofi/style/shared/colors.rasi" = {
     text = ''
