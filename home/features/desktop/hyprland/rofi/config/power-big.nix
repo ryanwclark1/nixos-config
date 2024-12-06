@@ -5,11 +5,8 @@
   ...
 }:
 
-with config.lib.stylix.colors.withHashtag;
-with config.stylix.fonts;
-
 {
-  home.file.".config/rofi/style/shared/confirm-big.rasi" = {
+  home.file.".config/rofi/style/power-big.rasi" = {
     text = ''
       /*****----- Configuration -----*****/
       configuration {
@@ -17,8 +14,8 @@ with config.stylix.fonts;
       }
 
       /*****----- Global Properties -----*****/
-      @import                          "colors.rasi"
-      @import                          "fonts.rasi"
+      @import                          "shared/colors.rasi"
+      @import                          "shared/fonts.rasi"
 
       /*****----- Global Properties -----*****/
       * {
@@ -31,15 +28,14 @@ with config.stylix.fonts;
         element-padding: 35px 40px;
         element-border-radius: 20px;
 
-        prompt-font: "JetBrains Mono Nerd Font Bold Italic 64";
-        textbox-font: "JetBrains Mono Nerd Font 16";
+        prompt-font: "${config.stylix.fonts.monospace.name} Bold Italic 64";
+        textbox-font: "${config.stylix.fonts.monospace.name} 16";
         element-icon-font: "feather 64"; /* Larger font for icons */
         element-text-font: "feather 64"; /* Smaller font for text */
 
         background-window: black/70%;
         background-normal: white/5%;
         background-selected: white/15%;
-        foreground-normal: @foreground;
       }
 
       /*****----- Main Window -----*****/
@@ -100,7 +96,7 @@ with config.stylix.fonts;
       listview {
         enabled: true;
         expand: false;
-        columns: 2;
+        columns: 5;
         lines: 1;
         cycle: true;
         dynamic: true;

@@ -9,14 +9,8 @@
 {
   imports = [
     ./style
+    
   ];
-  home =
-  {
-    file.".config/rofi" = {
-      source = ./config;
-      recursive = true;
-    };
-  };
   programs.rofi = {
     enable = true;
     package = pkgs.rofi-wayland;

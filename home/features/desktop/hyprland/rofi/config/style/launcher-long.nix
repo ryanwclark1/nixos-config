@@ -5,17 +5,15 @@
   ...
 }:
 
-with config.lib.stylix.colors.withHashtag;
-with config.stylix.fonts;
-
 {
-  home.file.".config/rofi/style/launcher-full.rasi" = {
+  home.file.".config/rofi/style/shared/launcher-long.rasi" = {
     text = ''
+
       /*****----- Configuration -----*****/
       configuration {
         modi:                       "drun";
         show-icons:                 true;
-        display-drun:               " ";
+        display-drun:               "";
         drun-display-format:        "{name}";
       }
 
@@ -23,31 +21,33 @@ with config.stylix.fonts;
       @import                          "shared/colors.rasi"
       @import                          "shared/fonts.rasi"
 
-
       /*****----- Main Window -----*****/
       window {
         transparency:                "real";
-        location:                    center;
-        anchor:                      center;
-        fullscreen:                  true;
+        location:                    west;
+        anchor:                      west;
+        fullscreen:                  false;
+        width:                       450px;
+        height:                      100%;
         x-offset:                    0px;
         y-offset:                    0px;
+
         enabled:                     true;
         margin:                      0px;
         padding:                     0px;
         border:                      0px solid;
         border-radius:               0px;
         border-color:                @selected;
-        background-color:            black / 50%;
+        background-color:            @background;
         cursor:                      "default";
       }
 
       /*****----- Main Box -----*****/
       mainbox {
         enabled:                     true;
-        spacing:                     100px;
+        spacing:                     0px;
         margin:                      0px;
-        padding:                     100px 225px;
+        padding:                     0px;
         border:                      0px solid;
         border-radius:               0px 0px 0px 0px;
         border-color:                @selected;
@@ -59,42 +59,42 @@ with config.stylix.fonts;
       inputbar {
         enabled:                     true;
         spacing:                     10px;
-        margin:                      0% 25%;
-        padding:                     18px;
+        margin:                      0px;
+        padding:                     12px;
         border:                      0px solid;
-        border-radius:               10px;
+        border-radius:               0px;
         border-color:                @selected;
-        background-color:            white / 5%;
-        text-color:                  @foreground;
+        background-color:            @selected;
+        text-color:                  @background;
         children:                    [ "prompt", "entry" ];
       }
 
       prompt {
         enabled:                     true;
-        background-color:            transparent;
+        background-color:            inherit;
         text-color:                  inherit;
       }
       textbox-prompt-colon {
         enabled:                     true;
         expand:                      false;
         str:                         "::";
-        background-color:            transparent;
+        background-color:            inherit;
         text-color:                  inherit;
       }
       entry {
         enabled:                     true;
-        background-color:            transparent;
+        background-color:            inherit;
         text-color:                  inherit;
         cursor:                      text;
-        placeholder:                 "Search";
+        placeholder:                 "Search...";
         placeholder-color:           inherit;
       }
 
       /*****----- Listview -----*****/
       listview {
         enabled:                     true;
-        columns:                     8;
-        lines:                       4;
+        columns:                     1;
+        lines:                       6;
         cycle:                       true;
         dynamic:                     true;
         scrollbar:                   false;
@@ -103,7 +103,7 @@ with config.stylix.fonts;
         fixed-height:                true;
         fixed-columns:               true;
 
-        spacing:                     0px;
+        spacing:                     5px;
         margin:                      0px;
         padding:                     0px;
         border:                      0px solid;
@@ -123,29 +123,28 @@ with config.stylix.fonts;
       /*****----- Elements -----*****/
       element {
         enabled:                     true;
-        spacing:                     15px;
+        spacing:                     10px;
         margin:                      0px;
-        padding:                     35px 10px;
+        padding:                     6px;
         border:                      0px solid;
-        border-radius:               15px;
+        border-radius:               0px;
         border-color:                @selected;
         background-color:            transparent;
         text-color:                  @foreground;
-        orientation:                 vertical;
         cursor:                      pointer;
       }
       element normal.normal {
-        background-color:            transparent;
+        background-color:            @background;
         text-color:                  @foreground;
       }
       element selected.normal {
-        background-color:            white / 5%;
+        background-color:            @background-alt;
         text-color:                  @foreground;
       }
       element-icon {
         background-color:            transparent;
         text-color:                  inherit;
-        size:                        72px;
+        size:                        32px;
         cursor:                      inherit;
       }
       element-text {
@@ -154,26 +153,26 @@ with config.stylix.fonts;
         highlight:                   inherit;
         cursor:                      inherit;
         vertical-align:              0.5;
-        horizontal-align:            0.5;
+        horizontal-align:            0.0;
       }
 
       /*****----- Message -----*****/
       error-message {
-        padding:                     100px;
+        padding:                     15px;
         border:                      0px solid;
         border-radius:               0px;
         border-color:                @selected;
-        background-color:            black / 10%;
+        background-color:            @background;
         text-color:                  @foreground;
       }
       textbox {
-        background-color:            transparent;
+        background-color:            @background;
         text-color:                  @foreground;
         vertical-align:              0.5;
         horizontal-align:            0.0;
         highlight:                   none;
       }
     '';
-  executable = false;
+    executable = false;
   };
 }
