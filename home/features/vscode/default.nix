@@ -55,7 +55,6 @@
         mikestead.dotenv
         ms-azuretools.vscode-docker
         ms-kubernetes-tools.vscode-kubernetes-tools
-        ms-pyright.pyright
         ms-python.debugpy
         ms-python.python
         ms-python.vscode-pylance
