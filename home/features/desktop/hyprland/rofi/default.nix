@@ -16,7 +16,7 @@
     plugins = [
       pkgs.rofi-emoji-wayland
     ];
-    configPath = "${config.home.homeDirectory}/.config/rofi/config2.rasi";
+    configPath = "${config.home.homeDirectory}/.config/rofi/config.rasi";
     pass = {
       enable = true;
       package = pkgs.rofi-pass-wayland;
