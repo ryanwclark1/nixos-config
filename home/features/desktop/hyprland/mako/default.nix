@@ -5,22 +5,9 @@
   ...
 }:
 
-with config.lib.stylix.colors.withHashtag;
-with config.stylix.fonts;
-
 {
   services.mako =
   let
-
-    font = "${monospace.name}";
-    background-default = "${base00}";
-    border = "${base0D}";
-    progress = "${base01}";
-    text-color = "${base0A}";
-    background-low = "${base06}";
-    text-color-low = "${base0A}";
-    backgroud-high = "${base0F}";
-    test-color-high = "${base06}";
     opacity = lib.toHexString (((builtins.ceil (config.stylix.opacity.popups * 100)) * 255) / 100);
   in
   {
@@ -28,23 +15,23 @@ with config.stylix.fonts;
     package = pkgs.mako;
     actions = true;
     anchor = "top-center";
-    backgroundColor = "${background-default}${opacity}";
-    borderColor = "${border}";
+    backgroundColor = "${config.lib.stylix.colors.withHashtag.base00}${opacity}";
+    borderColor = "${config.lib.stylix.colors.withHashtag.base0D}";
     borderRadius = 0;
     borderSize = 2;
     defaultTimeout = 2000;
     extraConfig = ''
       [urgency=low]
-      background-color = "${background-low}${opacity}"
-      border-color = "${border}"
-      text-color = "${text-color-low}"
+      background-color = "${config.lib.stylix.colors.withHashtag.base06}${opacity}"
+      border-color = "${config.lib.stylix.colors.withHashtag.base0D}"
+      text-color = "${config.lib.stylix.colors.withHashtag.base0A}"
 
       [urgency=high]
-      background-color = "${backgroud-high}${opacity}"
-      border-color = "${border}"
-      text-color = "${test-color-high}"
+      background-color = "${config.lib.stylix.colors.withHashtag.base0F}${opacity}"
+      border-color = "${config.lib.stylix.colors.withHashtag.base0D}"
+      text-color = "${config.lib.stylix.colors.withHashtag.base06}"
     '';
-    font = "${font} 12";
+    font = "${config.stylix.fonts.monospace.name} 12";
     format = "<b>%s</b>\\n%b";
     groupBy = null;
     height = 500;
@@ -56,9 +43,9 @@ with config.stylix.fonts;
     maxIconSize = 64;
     maxVisible = 5;
     padding = "10,20";
-    progressColor = "over ${progress}";
+    progressColor = "over ${config.lib.stylix.colors.withHashtag.base01}";
     sort = "-time";
-    textColor = "${text-color}";
+    textColor = "${config.lib.stylix.colors.withHashtag.base0A}";
     width = 800;
   };
 }
