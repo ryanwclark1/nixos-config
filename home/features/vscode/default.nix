@@ -270,7 +270,7 @@
         "extensions.autoUpdate" = false;
         "files.associations" = {
           "*.css" = "tailwindcss";
-          "*.env" = "dotenv";
+          ".env" = "dotenv";
         };
         "files.exclude" = {
           "**/node_modules/**" = true;
