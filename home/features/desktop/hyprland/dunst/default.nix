@@ -5,22 +5,11 @@
   ...
 }:
 
-with config.lib.stylix.colors.withHashtag;
-with config.stylix.fonts;
 
 {
   services = {
     dunst =
     let
-      font = "${monospace.name}";
-      background-default = "${base00}";
-      border = "${base0D}";
-      progress = "${base01}";
-      text-color = "${base0A}";
-      background-low = "${base06}";
-      text-color-low = "${base0A}";
-      backgroud-high = "${base0F}";
-      test-color-high = "${base06}";
       opacity = lib.toHexString (((builtins.ceil (config.stylix.opacity.popups * 100)) * 255) / 100);
       rofi = lib.getExe config.programs.rofi.package;
     in
@@ -56,13 +45,13 @@ with config.stylix.fonts;
           text_icon_padding = 0;
           frame_width = 3;
           gap_size = 0;
-          frame_color = "${border}";
-          seperator_color = "${border}";
+          frame_color = "${config.lib.stylix.colors.withHashtag.base0D}";
+          seperator_color = "${config.lib.stylix.colors.withHashtag.base0D}";
           sort = true;
           idle_threshold = 0;
           layer = "overlay";
           force_xwayland = false;
-          font = "${font} 12";
+          font = "${config.stylix.fonts.monospace.name} 12";
           line_height = 0;
           format = ''<b>%s</b>\n%b'';
           vertical_alignment = "center";
@@ -94,20 +83,20 @@ with config.stylix.fonts;
           override_pause_level = 0;
         };
         urgency_low = {
-          background = "${background-low}${opacity}";
-          foreground = "${text-color-low}";
+          background = "${config.lib.stylix.colors.withHashtag.base06}${opacity}";
+          foreground = "${config.lib.stylix.colors.withHashtag.base0A}";
           timeout = 15;
         };
 
         urgency_normal = {
-          background = "${background-default}${opacity}";
-          foreground = "${text-color}";
+          background = "${config.lib.stylix.colors.withHashtag.base00}${opacity}";
+          foreground = "${config.lib.stylix.colors.withHashtag.base0A}";
           timeout = 15;
         };
 
         urgency_critical = {
-          background = "${backgroud-high}${opacity}";
-          foreground = "${test-color-high}";
+          background = "${config.lib.stylix.colors.withHashtag.base0F}${opacity}";
+          foreground = "${config.lib.stylix.colors.withHashtag.base06}";
           timeout = 20;
         };
 
