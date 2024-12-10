@@ -4,7 +4,9 @@
   pkgs,
   ...
 }:
-
+let
+    EWW_BIN = lib.getExe config.programs.eww.package;
+in
 {
   home.file.".config/eww/scripts/pop.sh" = {
     text = ''

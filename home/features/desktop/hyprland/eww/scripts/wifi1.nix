@@ -20,7 +20,7 @@
 
       else
           icon="󰖪"
-          text="${essid}"
+          text="$essid"
           col="#a1bdce"
       fi
 
