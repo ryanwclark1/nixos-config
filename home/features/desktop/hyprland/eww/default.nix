@@ -1,59 +1,69 @@
 # TODO: Configure XDG_CONFIG_HOME for config directory
-{ inputs, lib, config, pkgs, ... }:
-let
-  user = "${config.home.username}";
-  homeDirectory = "${config.home.homeDirectory}/.config";
-in
 {
-    programs = {
-        eww = {
-            enable = true;
-            package = pkgs.eww;
-            enableZshIntegration = true;
-            enableBashIntegration = true;
-            enableFishIntegration = true;
-            # configDir = "${XDG_CONFIG_HOME}/eww";
-            # configDir = "${homeDirectory}/eww";
-        };
+  inputs,
+  lib,
+  config,
+  pkgs,
+  ...
+}:
+
+
+{
+  imports = [
+    ./scripts
+    ./launch_bar.nix
+  ];
+
+  programs = {
+    eww = {
+      enable = true;
+      package = pkgs.eww;
+      enableZshIntegration = true;
+      enableBashIntegration = true;
+      enableFishIntegration = true;
+      configDir = "${config.home.homeDirectory}/eww";
     };
+  };
 
-    # home.packages = with pkgs; [
-    #     brightnessctl
-    #     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
-    # ];
+  home.packages = with pkgs; [
+    brightnessctl
+  ];
 
-    # configuration
-    # home.file.".config/eww/eww.scss".source = ./eww.scss;
-    # home.file.".config/eww/eww.yuck".source = ./eww.yuck;
+  # configuration
+  home.file.".config/eww/eww.scss".source = ./eww.scss;
+  home.file.".config/eww/eww.yuck".source = ./eww.yuck;
+  home.file.".config/eww/eww_windows.yuck".source = ./eww_windows.yuck;
+  home.file.".config/eww/eww_widgets.yuck".source = ./eww_widgets.yuck;
+  home.file.".config/eww/eww_variables.yuck".source = ./eww_variables.yuck;
 
-    # # scripts
-    # home.file.".config/eww/scripts" = {
-    #     source = ./scripts;
-    #     recursive = true;
-    # };
+  # # scripts
+  # home.file.".config/eww/scripts" = {
+  #   source = ./scripts;
+  #   recursive = true;
+  # };
 
-    # home.file.".config/eww/scripts/battery.sh" = {
-    #     source = ./scripts/battery.sh;
-    #     executable = true;
-    # };
+  # home.file.".config/eww/scripts/battery.sh" = {
+  #   source = ./scripts/battery.sh;
+  #   executable = true;
+  # };
 
-    # home.file.".config/eww/scripts/wifi.sh" = {
-    #     source = ./scripts/wifi.sh;
-    #     executable = true;
-    # };
+  # home.file.".config/eww/scripts/wifi.sh" = {
+  #   source = ./scripts/wifi.sh;
+  #   executable = true;
+  # };
 
-    # home.file.".config/eww/scripts/brightness.sh" = {
-    #     source = ./scripts/brightness.sh;
-    #     executable = true;
-    # };
+  # home.file.".config/eww/scripts/brightness.sh" = {
+  #   source = ./scripts/brightness.sh;
+  #   executable = true;
+  # };
 
-    # home.file.".config/eww/scripts/workspaces.sh" = {
-    #     source = ./scripts/workspaces.sh;
-    #     executable = true;
-    # };
+  # home.file.".config/eww/scripts/workspaces.sh" = {
+  #   source = ./scripts/workspaces.sh;
+  #   executable = true;
+  # };
 
-    # home.file.".config/eww/scripts/workspaces.lua" = {
-    #     source = ./scripts/workspaces.lua;
-    #     executable = true;
-    # };
+  # home.file.".config/eww/scripts/workspaces.lua" = {
+  #   source = ./scripts/workspaces.lua;
+  #   executable = true;
+  # };
 }
