@@ -9,6 +9,7 @@
   imports = [
     inputs.ags.homeManagerModules.default
     inputs.matugen.nixosModules.default
+    # inputs.astal.nixosModules.default
   ];
 
   home.packages = with pkgs; [
@@ -16,19 +17,17 @@
     dart-sass
   ];
 
-    # home.file.".config/ags/" = {
-    #     source = ./config;
-    #     recursive = true;
-    # };
-
   programs.ags = {
     enable = true;
-    # configDir = ./backup;
-    extraPackages = with pkgs; [
-      gtksourceview
-      webkitgtk_6_0
-      accountsservice
-    ];
+ 
+      # ags.packages.x86_64-linux.battery
+      # ags.packages.x86_64-linux.hyperland
+    # ];
+    # extraPackages = with pkgs; [
+    #   gtksourceview
+    #   webkitgtk_6_0
+    #   accountsservice
+    # ];
   };
   programs.matugen = {
     enable = true;
