@@ -12,6 +12,7 @@
   ]) ++ (with pkgs.python312Packages; [
     pip
     pyyaml
+    uv
   ]);
 
   programs = {
