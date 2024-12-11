@@ -78,7 +78,7 @@
         tamasfe.even-better-toml
         vscodevim.vim
         yzhang.markdown-all-in-one
-        # wholroyd.jinja # Prefer Better Jinja
+        wholroyd.jinja # Prefer Better Jinja
       ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
         {
           name = "alpine-js-intellisense";
@@ -386,10 +386,10 @@
         # "docker.dockerPath" = "${pkgs.docker}/bin/docker";
 
         # Draw.io
-        "hediet.vscode-drawio.plugins" = [
-          "number"
-          "sql"
-        ];
+        # "hediet.vscode-drawio.plugins" = [
+        #   "number"
+        #   "sql"
+        # ];
 
         # Nix IDE
         "nix.enableLanguageServer" = true;
@@ -565,10 +565,8 @@
         "[templ]" = {
           "editor.defaultFormatter" = "a-h.templ";
         };
-
         "database-client.autoSync" = false;
         "database-client.telemetry.usesOnlineServices" = false;
-
       };
     };
   };
