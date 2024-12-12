@@ -79,6 +79,7 @@
         vscodevim.vim
         yzhang.markdown-all-in-one
         wholroyd.jinja # Prefer Better Jinja
+        marp-team.marp-vscode
       ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
         {
           name = "alpine-js-intellisense";
@@ -397,6 +398,8 @@
 
         # Redhat
         "redhat.telemetry.enabled" = false;
+
+        "ruff.nativeServer" = "auto";
 
         # Even Better TOML
         "evenBetterToml.taplo.bundled" = true;
