@@ -9,4 +9,7 @@
     enable = true;
     package = pkgs.jq;
   };
+  home.packages = with pkgs; [
+    jnv  # https://github.com/ynqa/jnv
+  ];
 }
