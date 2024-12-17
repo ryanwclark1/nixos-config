@@ -13,7 +13,7 @@
     ./js.nix
     ./lua.nix
     ./protobuf.nix
-    ./python.nix
+    # ./python.nix
     ./rust.nix
     ./sql.nix
   ];
