@@ -17,7 +17,7 @@
     ./wlogout
     ./waybar
     # ./scripts/screenshot.nix
-    ./eww
+    # ./eww
     # ./mako
 
   ];

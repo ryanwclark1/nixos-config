@@ -6,18 +6,15 @@
 {
   home.packages = (with pkgs; [
     python312
-    python312Packages.pip
-    python312Packages.pyaml
     functiontrace-server
   ]) ++ (with pkgs.python312Packages; [
     pip
     pyyaml
-    uv
   ]);
 
   programs = {
     poetry = {
-      enable = true;
+      enable = false;
       package = pkgs.poetry.withPlugins (ps: with ps; [ poetry-plugin-up ]);
       settings = {
         virtualenvs.create = true;
