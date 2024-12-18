@@ -33,11 +33,6 @@
     };
   };
 
-  environment.systemPackages = with pkgs; [
-    nix-prefetch-git
-    # other packages...
-  ];
-
   hardware.enableRedistributableFirmware = true;
 
   # Increase open file limit for sudoers
