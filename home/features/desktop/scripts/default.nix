@@ -3,8 +3,12 @@
   ...
 }:
 
+let
+  scriptFile = ./nix-prefetch-git.sh; # Path to your shell script file
+  myBinary = pkgs.writeShellScriptBin "nix-prefetch-git" (pkgs.readFile scriptFile);
+in
+
 {
-  imports = [
-    ./nix-prefetch-git.nix
-  ];
+  # Exporting the binary
+  myBinary = myBinary;
 }
