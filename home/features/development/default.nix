@@ -23,7 +23,7 @@
     tokei # code statistics
     cachix
     nix-prefetch-git # nix development
-    nix-prefetch-url # nix Development
+    uv # for python
   ];
 
 }
