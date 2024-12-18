@@ -9,12 +9,23 @@
 , gtk3
 , at-spi2-core
 , xdg-utils
+, makeDesktopItem
 }:
 
 let
   pname = "f1multiviewer";
   version = "1.36.2";
   build = "203624822";
+
+  desktopItem = makeDesktopItem {
+    name = "f1multiviewer";
+    exec = "f1multiviewer %U";
+    icon = "f1multiviewer";
+    desktopName = "MultiViewer for F1";
+    comment = "Unofficial desktop client for F1TV";
+    categories = [ "AudioVideo" "Video" "TV" ];
+    mimeTypes = [ "x-scheme-handler/multiviewer" ];
+  };
 in
 stdenv.mkDerivation {
   inherit pname version;
@@ -40,16 +51,9 @@ stdenv.mkDerivation {
     mkdir -p $out/opt/f1multiviewer
     cp -r ./* $out/opt/f1multiviewer/
 
-    # Create desktop entry
+    # Install desktop entry
     mkdir -p $out/share/applications
-    cat > $out/share/applications/f1multiviewer.desktop << EOF
-    [Desktop Entry]
-    Name=MultiViewer for F1
-    Exec=$out/bin/f1multiviewer
-    Icon=$out/share/pixmaps/f1multiviewer.png
-    Type=Application
-    Categories=AudioVideo;
-    EOF
+    cp ${desktopItem}/share/applications/* $out/share/applications/
 
     # Install icon
     mkdir -p $out/share/pixmaps
@@ -58,7 +62,8 @@ stdenv.mkDerivation {
     # Create wrapper script
     mkdir -p $out/bin
     makeWrapper "$out/opt/f1multiviewer/MultiViewer for F1" $out/bin/f1multiviewer \
-      --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath buildInputs}
+      --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath buildInputs} \
+      --prefix PATH : ${lib.makeBinPath [ xdg-utils ]}
 
     # Install license files
     mkdir -p $out/share/licenses/f1multiviewer
@@ -68,8 +73,15 @@ stdenv.mkDerivation {
     runHook postInstall
   '';
 
+  # Create a setup hook to register the MIME type handler
+  setupHook = writeShellScript "setup-hook" ''
+    postInstall() {
+      ${xdg-utils}/bin/xdg-mime default f1multiviewer.desktop x-scheme-handler/multiviewer
+    }
+  '';
+
   meta = with lib; {
-    description = "Unofficial motorsports desktop client";
+    description = "Unofficial desktop client for F1TV";
     homepage = "https://multiviewer.app";
     license = licenses.unfree;
     platforms = [ "x86_64-linux" ];
