@@ -1,5 +1,10 @@
 {
+  inputs,
+  outputs,
+}:
+
+{
   imports = [
-    ./f1multiviewer.nix
+    ./f1multiviewer
   ];
 }
