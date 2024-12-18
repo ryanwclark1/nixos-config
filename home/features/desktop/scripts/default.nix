@@ -1,14 +1,17 @@
 {
+  configs,
   pkgs,
   ...
 }:
 
 let
   scriptFile = ./nix-prefetch-git; # Path to your shell script file
-  myBinary = pkgs.writeShellScriptBin "nix-prefetch-git" (pkgs.readFile scriptFile);
+  myBinary = pkgs.writeShellScriptBin "nix-prefetch-git" (builtins.readFile scriptFile);
 in
 
 {
   # Exporting the binary
-  myBinary = myBinary;
+ home.packages = [
+    myBinary
+  ];
 }
