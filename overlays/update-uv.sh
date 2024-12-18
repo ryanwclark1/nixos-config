@@ -2,7 +2,7 @@
 
 # Get the source hash
 echo "Fetching source hash..."
-src_hash=$(nix-prefetch-github --rev refs/tags/0.5.10 astral-sh uv)
+src_hash=$(nix-prefetch-git --url https://github.com/astral-sh/uv.git --rev refs/tags/0.5.10 | grep 'hash' | cut -d'"' -f4)
 echo "Source hash obtained"
 
 # Create a temporary Nix expression to get the cargo hash
