@@ -5,22 +5,37 @@ show_help() {
     cat << EOF
 Usage: $(basename "$0") [OPTIONS]
 
-Update the UV package overlay for Nix.
+Generate or update a Nix overlay for a GitHub repository with Rust dependencies.
 
 Options:
-    -h, --help          Show this help message
-    -v, --version VER   Specify UV version (e.g., 0.5.10)
-                        If not specified, latest version will be used
+    -h, --help              Show this help message
+    -v, --version VER      Specify package version (e.g., 0.5.10)
+                          If not specified, latest version will be used
+    -u, --user NAME       GitHub username/organization (default: astral-sh)
+    -r, --repo NAME       GitHub repository name (default: uv)
+
+Capabilities:
+    - Fetches latest release version from GitHub if not specified
+    - Generates Nix overlay with correct source and cargo hashes
+    - Handles git dependencies in Cargo.lock automatically
+    - Generates overlay file named after the repository
+    - Supports any GitHub repository with Rust/Cargo projects
+    - Provides proper SHA256 hashes in base64 format
+    - Creates importCargoLock configuration with outputHashes
 
 Examples:
-    $(basename "$0")              # Use latest version
-    $(basename "$0") -v 0.5.10    # Use specific version
+    $(basename "$0")                            # Use latest version of astral-sh/uv
+    $(basename "$0") -v 0.5.10                  # Use specific version of astral-sh/uv
+    $(basename "$0") -u userName -r repoName    # Use different GitHub repository
 EOF
     exit 0
 }
 
 # Parse command line arguments
 VERSION=""
+GITHUB_USER="astral-sh"
+GITHUB_REPO="uv"
+
 while [[ $# -gt 0 ]]; do
     case $1 in
         -h|--help)
@@ -35,6 +50,24 @@ while [[ $# -gt 0 ]]; do
                 exit 1
             fi
             ;;
+        -u|--user)
+            if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
+                GITHUB_USER=$2
+                shift 2
+            else
+                echo "Error: GitHub user/organization is missing" >&2
+                exit 1
+            fi
+            ;;
+        -r|--repo)
+            if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
+                GITHUB_REPO=$2
+                shift 2
+            else
+                echo "Error: Repository name is missing" >&2
+                exit 1
+            fi
+            ;;
         *)
             echo "Unknown option: $1" >&2
             show_help
@@ -44,7 +77,9 @@ done
 
 # Function to get latest version from GitHub releases
 get_latest_version() {
-    curl -s https://api.github.com/repos/astral-sh/uv/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'
+    local user=$1
+    local repo=$2
+    curl -s "https://api.github.com/repos/${user}/${repo}/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'
 }
 
 # Function to get hash for a git repository
@@ -58,11 +93,13 @@ get_git_hash() {
 
 # Function to extract git dependencies from Cargo.lock
 parse_cargo_lock() {
-    local version=$1
+    local user=$1
+    local repo=$2
+    local version=$3
     local temp_file=$(mktemp)
     local output_hashes=""
 
-    curl -s "https://raw.githubusercontent.com/astral-sh/uv/${version}/Cargo.lock" > "$temp_file"
+    curl -s "https://raw.githubusercontent.com/${user}/${repo}/${version}/Cargo.lock" > "$temp_file"
 
     local current_name=""
     local current_version=""
@@ -92,12 +129,14 @@ parse_cargo_lock() {
 
 # Function to get hashes
 get_hashes() {
-    local version=$1
+    local user=$1
+    local repo=$2
+    local version=$3
 
-    local src_hash=$(nix-prefetch-url --unpack https://github.com/astral-sh/uv/archive/refs/tags/${version}.tar.gz)
+    local src_hash=$(nix-prefetch-url --unpack "https://github.com/${user}/${repo}/archive/refs/tags/${version}.tar.gz")
     src_hash="sha256-$(nix hash convert --hash-algo sha256 --to base64 $src_hash)"
 
-    local cargo_lock_hash=$(nix-prefetch-url "https://raw.githubusercontent.com/astral-sh/uv/${version}/Cargo.lock")
+    local cargo_lock_hash=$(nix-prefetch-url "https://raw.githubusercontent.com/${user}/${repo}/${version}/Cargo.lock")
     cargo_lock_hash="sha256-$(nix hash convert --hash-algo sha256 --to base64 $cargo_lock_hash)"
 
     echo "${src_hash} ${cargo_lock_hash}"
@@ -105,27 +144,29 @@ get_hashes() {
 
 # Function to update the overlay file
 update_overlay() {
-    local version=$1
-    local src_hash=$2
-    local cargo_lock_hash=$3
-    local output_hashes=$4
-    local overlay_file="uv-overlay.nix"
+    local user=$1
+    local repo=$2
+    local version=$3
+    local src_hash=$4
+    local cargo_lock_hash=$5
+    local output_hashes=$6
+    local overlay_file="${repo}-overlay.nix"
 
     cat > "${overlay_file}" << EOF
 final: prev: {
-  uv = prev.uv.overrideAttrs (_: rec {
+  ${repo} = prev.${repo}.overrideAttrs (_: rec {
     version = "${version}";
 
     src = prev.fetchFromGitHub {
-      owner = "astral-sh";
-      repo = "uv";
+      owner = "${user}";
+      repo = "${repo}";
       rev = "refs/tags/\${version}";
       hash = "${src_hash}";
     };
 
     cargoDeps = prev.rustPlatform.importCargoLock {
       lockFile = prev.fetchurl {
-        url = "https://raw.githubusercontent.com/astral-sh/uv/\${version}/Cargo.lock";
+        url = "https://raw.githubusercontent.com/${user}/${repo}/\${version}/Cargo.lock";
         hash = "${cargo_lock_hash}";
       };
       outputHashes = {
@@ -138,23 +179,23 @@ EOF
 }
 
 # Main execution
-echo "Checking UV version..." >&2
+echo "Checking repository version..." >&2
 if [ -z "$VERSION" ]; then
-    VERSION=$(get_latest_version)
+    VERSION=$(get_latest_version "$GITHUB_USER" "$GITHUB_REPO")
     echo "Using latest version: ${VERSION}" >&2
 else
     echo "Using specified version: ${VERSION}" >&2
 fi
 
 echo "Getting hashes..." >&2
-read src_hash cargo_lock_hash <<< $(get_hashes "${VERSION}")
+read src_hash cargo_lock_hash <<< $(get_hashes "$GITHUB_USER" "$GITHUB_REPO" "$VERSION")
 echo "Source hash: ${src_hash}" >&2
 echo "Cargo.lock hash: ${cargo_lock_hash}" >&2
 
 echo "Parsing Cargo.lock for git dependencies..." >&2
-OUTPUT_HASHES=$(parse_cargo_lock "${VERSION}")
+OUTPUT_HASHES=$(parse_cargo_lock "$GITHUB_USER" "$GITHUB_REPO" "$VERSION")
 echo "Found git dependencies" >&2
 
 echo "Updating overlay..." >&2
-update_overlay "${VERSION}" "${src_hash}" "${cargo_lock_hash}" "${OUTPUT_HASHES}"
-echo "Overlay updated successfully!" >&2
+update_overlay "$GITHUB_USER" "$GITHUB_REPO" "$VERSION" "$src_hash" "$cargo_lock_hash" "$OUTPUT_HASHES"
+echo "Overlay updated successfully as ${GITHUB_REPO}-overlay.nix!" >&2
