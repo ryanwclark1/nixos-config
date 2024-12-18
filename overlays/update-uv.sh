@@ -11,7 +11,7 @@ get_hashes() {
 
     # Get source hash
     local src_hash=$(nix-prefetch-url --unpack https://github.com/astral-sh/uv/archive/refs/tags/${version}.tar.gz)
-    src_hash="sha256-$(nix-hash --type sha256 --to-base64 $src_hash)"
+    src_hash="sha256-$(nix hash convert --hash-algo sha256 --to base64 $src_hash)"
 
     # Create temporary nix file for cargo hash
     cat > temp.nix << EOF
