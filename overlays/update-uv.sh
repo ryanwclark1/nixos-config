@@ -1,5 +1,58 @@
 #!/usr/bin/env bash
 
+# Function to check if repository exists
+check_repository() {
+    local user=$1
+    local repo=$2
+    local response=$(curl -s -o /dev/null -w "%{http_code}" "https://api.github.com/repos/${user}/${repo}")
+    if [ "$response" != "200" ]; then
+        echo "Error: Repository ${user}/${repo} does not exist" >&2
+        exit 1
+    fi
+}
+
+# Function to check if version exists
+check_version() {
+    local user=$1
+    local repo=$2
+    local version=$3
+    local response=$(curl -s -o /dev/null -w "%{http_code}" "https://api.github.com/repos/${user}/${repo}/releases/tags/${version}")
+    if [ "$response" != "200" ]; then
+        local latest=$(get_latest_version "$user" "$repo")
+        echo "Error: Version ${version} does not exist for ${user}/${repo}" >&2
+        echo "Latest available version is: ${latest}" >&2
+        exit 1
+    fi
+}
+
+# Function to get Rust version from toolchain file
+get_rust_version() {
+    local user=$1
+    local repo=$2
+    local version=$3
+    local rust_version
+
+    # Try to fetch rust-toolchain.toml
+    local toolchain_content=$(curl -s "https://raw.githubusercontent.com/${user}/${repo}/${version}/rust-toolchain.toml")
+    if [ $? -eq 0 ] && [ -n "$toolchain_content" ]; then
+        rust_version=$(echo "$toolchain_content" | grep "channel" | cut -d'"' -f2)
+        if [ -n "$rust_version" ]; then
+            echo "$rust_version"
+            return 0
+        fi
+    fi
+
+    # Fallback to rust-toolchain file if .toml doesn't exist
+    local toolchain_simple=$(curl -s "https://raw.githubusercontent.com/${user}/${repo}/${version}/rust-toolchain")
+    if [ $? -eq 0 ] && [ -n "$toolchain_simple" ]; then
+        echo "$toolchain_simple"
+        return 0
+    fi
+
+    echo "unknown"
+    return 1
+}
+
 # Help function
 show_help() {
     cat << EOF
@@ -142,7 +195,7 @@ get_hashes() {
     echo "${src_hash} ${cargo_lock_hash}"
 }
 
-# Function to update the overlay file
+# Updated overlay generation function
 update_overlay() {
     local user=$1
     local repo=$2
@@ -150,9 +203,11 @@ update_overlay() {
     local src_hash=$4
     local cargo_lock_hash=$5
     local output_hashes=$6
+    local rust_version=$7
     local overlay_file="${repo}-overlay.nix"
 
     cat > "${overlay_file}" << EOF
+# ${repo} version ${version} uses Rust ${rust_version}
 final: prev: {
   ${repo} = prev.${repo}.overrideAttrs (_: rec {
     version = "${version}";
@@ -179,13 +234,24 @@ EOF
 }
 
 # Main execution
+echo "Checking repository existence..." >&2
+check_repository "$GITHUB_USER" "$GITHUB_REPO"
+
 echo "Checking repository version..." >&2
 if [ -z "$VERSION" ]; then
     VERSION=$(get_latest_version "$GITHUB_USER" "$GITHUB_REPO")
+    if [ -z "$VERSION" ]; then
+        echo "Error: Could not determine latest version" >&2
+        exit 1
+    fi
     echo "Using latest version: ${VERSION}" >&2
 else
+    check_version "$GITHUB_USER" "$GITHUB_REPO" "$VERSION"
     echo "Using specified version: ${VERSION}" >&2
 fi
+
+echo "Getting Rust version information..." >&2
+RUST_VERSION=$(get_rust_version "$GITHUB_USER" "$GITHUB_REPO" "$VERSION")
 
 echo "Getting hashes..." >&2
 read src_hash cargo_lock_hash <<< $(get_hashes "$GITHUB_USER" "$GITHUB_REPO" "$VERSION")
@@ -197,5 +263,5 @@ OUTPUT_HASHES=$(parse_cargo_lock "$GITHUB_USER" "$GITHUB_REPO" "$VERSION")
 echo "Found git dependencies" >&2
 
 echo "Updating overlay..." >&2
-update_overlay "$GITHUB_USER" "$GITHUB_REPO" "$VERSION" "$src_hash" "$cargo_lock_hash" "$OUTPUT_HASHES"
+update_overlay "$GITHUB_USER" "$GITHUB_REPO" "$VERSION" "$src_hash" "$cargo_lock_hash" "$OUTPUT_HASHES" "$RUST_VERSION"
 echo "Overlay updated successfully as ${GITHUB_REPO}-overlay.nix!" >&2

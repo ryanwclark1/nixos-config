@@ -56,6 +56,10 @@
     amdgpu_top
   ];
 
+  programs.f1multiviewer = {
+    enable = true;
+  };
+
   # Disable impermanence
   # home.persistence = lib.mkForce {};
 }
