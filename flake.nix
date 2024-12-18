@@ -104,10 +104,10 @@
 
     packages = forEachSystem (pkgs: import ./pkgs { inherit pkgs; });
     devShells = forEachSystem (pkgs: import ./shell.nix { inherit pkgs; });
-    formatter = forEachSystem (pkgs: pkgs.nixpkgs-fmt);
+    formatter = forEachSystem (pkgs: pkgs.nixfmt);
 
     nixosConfigurations = {
-      frametop = lib.nixosSystem {
+      frametop = nixpkgs.lib.nixosSystem {
          modules = [
           stylix.nixosModules.stylix
           ./hosts/frametop
@@ -116,7 +116,7 @@
           inherit inputs outputs;
         };
       };
-      woody = lib.nixosSystem {
+      woody = nixpkgs.lib.nixosSystem {
         modules = [
           stylix.nixosModules.stylix
           nixos-cosmic.nixosModules.default
