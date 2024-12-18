@@ -11,7 +11,7 @@ in
 
 {
   # Exporting the binary
- home.packages = [
-    myBinary
-  ];
+#  home.packages = [
+#     myBinary
+#   ];
 }
