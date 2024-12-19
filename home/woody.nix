@@ -54,7 +54,7 @@
 
   home.packages = with pkgs; [
     amdgpu_top
-    f1multiviewer
+    # f1multiviewer
   ];
 
   # programs.f1multiviewer = {
