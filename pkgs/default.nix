@@ -1,9 +1,9 @@
-{ pkgs ? import <nixpkgs> { } }: {
+{ pkgs ? import <nixpkgs> { }, ...}: rec {
 
   # gitkraken = pkgs.callPackage ./gitkraken { };
   # shellcolord = pkgs.callPackage ./shellcolord { };
 
-  nix-inspect = pkgs.callPackage ./nix-inspect { };
+  nix-inspect = pkgs.callPackage ./nix-inspect {};
   # wallpapers = pkgs.callPackage ./wallpapers { };
-  multiviewer = pkgs.callPackage ./multiviewer { };
+  f1multiviewer = pkgs.callPackage ./multiviewer {};
 }
