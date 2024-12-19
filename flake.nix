@@ -71,11 +71,8 @@
 
   outputs = {
     self,
-    disko,
     home-manager,
-    lanzaboote,
     nix-darwin,
-    nixos-cosmic,
     nixos-hardware,
     nixpkgs,
     nixvim,
@@ -107,7 +104,7 @@
     formatter = forEachSystem (pkgs: pkgs.nixfmt);
 
     nixosConfigurations = {
-      frametop = nixpkgs.lib.nixosSystem {
+      frametop = lib.nixosSystem {
          modules = [
           stylix.nixosModules.stylix
           ./hosts/frametop
@@ -116,7 +113,7 @@
           inherit inputs outputs;
         };
       };
-      woody = nixpkgs.lib.nixosSystem {
+      woody = lib.nixosSystem {
         modules = [
           stylix.nixosModules.stylix
           nixos-cosmic.nixosModules.default
