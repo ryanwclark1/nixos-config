@@ -48,8 +48,8 @@ stdenv.mkDerivation {
   installPhase = ''
     runHook preInstall
 
-    mkdir -p $out/opt/f1multiviewer
-    cp -r ./* $out/opt/f1multiviewer/
+    mkdir -p $out/opt/${pname}
+    cp -r ./* $out/opt/${pname}/
 
     # Install desktop entry
     mkdir -p $out/share/applications
