@@ -14,6 +14,7 @@ with config.lib.stylix.colors.withHashtag;
     # Configuration written to ~/.config/starship.toml
     settings = {
       format = "[](${base0E})\$os\$username\$hostname\$localip\${custom.yazi}\[](bg:${base07} fg:${base0E})\$directory\[](fg:${base07} bg:${base05})\$git_branch\$git_status\[](fg:${base05} bg:${base0F})\$bun\$c\$cmake\$dart\$golang\$haskell\$java\$kotlin\$kubernetes\$lua\$nodejs\$php\$python\$rust\$swift\$zig[](fg:${base0F} bg:${base06})\$docker_context\[](fg:${base06})\$line_break$character";
+      right_format = "[](${base0E})\$time\[](${base0E})";
       add_newline = true;
       scan_timeout = 30;
       command_timeout = 500;
@@ -225,6 +226,8 @@ with config.lib.stylix.colors.withHashtag;
         version_format = "$raw";
         format = "[[ $symbol( $version )(\($virtualenv\) )](fg:${base00} bg:${base0F})]($style)";
         disabled = false;
+        detect_folders = [".venv"]
+        pyenv_version_name = true;
       };
       rust = {
         symbol = "";
@@ -269,7 +272,9 @@ with config.lib.stylix.colors.withHashtag;
         min_time = 2000;
       };
       time = {
-        format = "\\\[[$time]($style)\\\]";
+        style = "bg:${base0E} fg:${base00}";
+        format = "[[ $time](bg:${base0E} fg:${base00})]($style)";
+        use_12hr = false;
         disabled = false;
       };
     };
