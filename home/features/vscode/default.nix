@@ -73,13 +73,13 @@
         rust-lang.rust-analyzer
         samuelcolvin.jinjahtml
         shyykoserhiy.vscode-spotify
-        sourcery.sourcery
         tailscale.vscode-tailscale
         tamasfe.even-better-toml
         vscodevim.vim
         yzhang.markdown-all-in-one
         wholroyd.jinja # Prefer Better Jinja
         marp-team.marp-vscode
+        esbenp.prettier-vscode
       ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
         {
           name = "alpine-js-intellisense";
@@ -177,12 +177,12 @@
           sha256 = "sha256-RZ++wxL2OqBh3hiLAwKIw5QLjU/imsK7irQUHbJ/tqM=";
           version = "0.0.29";
         }
-        {
-          name = "vscode-gitops-tools";
-          publisher = "weaveworks";
-          sha256 = "sha256-7MCKDnHCot/CL/SqZ2WuTxbqFdF75EC5WC+OxW0dcaE=";
-          version = "0.27.0";
-        }
+        # {
+        #   name = "vscode-gitops-tools";
+        #   publisher = "weaveworks";
+        #   sha256 = "sha256-7MCKDnHCot/CL/SqZ2WuTxbqFdF75EC5WC+OxW0dcaE=";
+        #   version = "0.27.0";
+        # }
         {
           name = "vscode-jsonnet";
           publisher = "grafana";
