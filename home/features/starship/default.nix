@@ -226,7 +226,7 @@ with config.lib.stylix.colors.withHashtag;
         version_format = "$raw";
         format = "[[ $symbol( $version )(\($virtualenv\) )](fg:${base00} bg:${base0F})]($style)";
         disabled = false;
-        detect_folders = [".venv"]
+        detect_folders = [".venv"];
         pyenv_version_name = true;
       };
       rust = {
