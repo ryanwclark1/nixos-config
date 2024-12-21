@@ -56,6 +56,7 @@
     nix-prefetch-git # nix development
     uv # for python
     jsonnet-bundler
+    jsonnet
   ];
 
 }
