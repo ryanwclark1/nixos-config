@@ -5,8 +5,6 @@
   ...
 }:
 
-with config.lib.stylix.colors.withHashtag;
-
 {
   home.file.".config/wlogout/icons" = {
     source = ./icons;
@@ -64,22 +62,22 @@ with config.lib.stylix.colors.withHashtag;
       	background-color: rgba(12, 12, 12, 0.1);
       }
       button {
-      	color: ${base05};
+      	color: ${config.lib.stylix.colors.withHashtag.base05};
         font-size:20px;
         background-repeat: no-repeat;
       	background-position: center;
       	background-size: 25%;
       	border-style: solid;
       	background-color: rgba(12, 12, 12, 0.3);
-      	border: 3px solid ${base05};
+      	border: 3px solid ${config.lib.stylix.colors.withHashtag.base05};
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
       }
       /* button:hover */
       button:focus,
       button:active {
-        color: ${base0E};
+        color: ${config.lib.stylix.colors.withHashtag.base0E};
         background-color: rgba(12, 12, 12, 0.5);
-        border: 3px solid ${base0E};
+        border: 3px solid ${config.lib.stylix.colors.withHashtag.base0E};
       }
       #logout {
       	margin: 10px;

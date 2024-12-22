@@ -43,6 +43,7 @@
     };
 
     packages = with pkgs; [
+      brightnessctl
       wf-recorder # Utility program for screen recording of wlroots-based compositors
       wl-clipboard # Wayland clipboard
       grim # Screenshot tool,

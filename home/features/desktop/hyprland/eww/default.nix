@@ -21,13 +21,11 @@
       enableZshIntegration = true;
       enableBashIntegration = true;
       enableFishIntegration = true;
-      configDir = "${config.home.homeDirectory}/.config/eww";
+      # configDir = "${config.home.homeDirectory}/.config/eww";
     };
   };
 
-  home.packages = with pkgs; [
-    brightnessctl
-  ];
+
 
   # configuration
   home.file.".config/eww/eww.scss".source = ./eww.scss;
