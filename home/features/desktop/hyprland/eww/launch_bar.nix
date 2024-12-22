@@ -17,8 +17,7 @@ in
 
       ## Files and cmd
       FILE="$HOME/.cache/eww_launch.xyz"
-      # EWW="$HOME/.local/bin/eww/eww -c $HOME/.config/eww"
-      EWW="eww -c /home/administrator/nixos-config/home/features/desktop/hyprland/eww"
+      EWW="$HOME/.local/bin/eww/eww -c $HOME/.config/eww"
       EWW=${EWW}
 
       ## Run eww daemon if not running already
