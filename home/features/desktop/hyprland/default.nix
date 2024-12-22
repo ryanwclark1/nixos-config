@@ -9,6 +9,7 @@
     ./ags
     ./cliphist
     # ./dunst
+    ./eww
     ./hypr
     ./hypridle
     ./hyprlock
