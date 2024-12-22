@@ -31,8 +31,8 @@
 (defpoll pfp :interval "1s" "./scripts/pfp.sh")
 (defpoll username :interval "1s" "./scripts/user.sh")
 
-; (defpoll br_icon :interval "1s" "./scripts/brightness.sh icon")
-; (defpoll br :interval "1s" "./scripts/brightness.sh br")
+(defpoll br_icon :interval "1s" "./scripts/brightness.sh icon")
+(defpoll br :interval "1s" "./scripts/brightness.sh br")
 
 (defpoll bluetooth_state :interval "1s" "./scripts/bluetooth state")
 (defpoll redshift_state :interval "1s" "./scripts/redshift state")
