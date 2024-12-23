@@ -6,7 +6,7 @@
 }:
 
 {
-  home.file.".config/rofi/style/shared/applet2-2.rasi" = {
+  home.file.".config/rofi/style/applet2-2.rasi" = {
     text = ''
       /*****----- Configuration -----*****/
       configuration {

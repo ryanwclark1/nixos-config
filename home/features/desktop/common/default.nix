@@ -31,7 +31,7 @@
     ydotool # Command-line tool for automation which emulates input devices
     file-roller # Archive manager
     webkitgtk_6_0 # Web rendering engine
-    libsoup
+    libsoup_3
     fragments # Torrent client
     seabird # Kubernetes native desktop app that simplifies working with Kubernetes.
     insomnia # API Client for REST, GraphQL, GRPC and OpenAPI design tool for developers.

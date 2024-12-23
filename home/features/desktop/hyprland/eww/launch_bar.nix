@@ -6,7 +6,8 @@
 }:
 let
     opacity = lib.toHexString (((builtins.ceil (config.stylix.opacity.popups * 100)) * 255) / 100);
-    EWW_BIN = lib.getExe config.programs.eww.package;
+    HOME = "${config.home.homeDirectory}";
+    EWW_BIN = "${pkgs.eww}/bin/eww";
     EWW = "${EWW_BIN} -c ${config.home.homeDirectory}/.config/eww";
 
 in
@@ -16,8 +17,7 @@ in
       #!/usr/bin/env bash
 
       ## Files and cmd
-      FILE="$HOME/.cache/eww_launch.xyz"
-      EWW="$HOME/.local/bin/eww/eww -c $HOME/.config/eww"
+      FILE="${HOME}/.cache/eww_launch.xyz"
       EWW=${EWW}
 
       ## Run eww daemon if not running already

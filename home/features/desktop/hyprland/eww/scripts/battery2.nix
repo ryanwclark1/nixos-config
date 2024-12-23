@@ -38,9 +38,6 @@
 							icon=""
 			fi
 
-
-
-
 			if [ -s /sys/class/power_supply/BAT1/capacity ]; then
 					echo "{\"percent\": \"$per\", \"icon\": \"$icon\", \"charging\": \"$charging\", \"visible\": \"true\", \"status\": \"$status\"}"
 			else

@@ -6,7 +6,7 @@
 }:
 
 {
-  home.file.".config/rofi/style/shared/launcher-center-alt1.rasi" = {
+  home.file.".config/rofi/style/launcher-center-alt1.rasi" = {
     text = ''
 
       /*****----- Configuration -----*****/

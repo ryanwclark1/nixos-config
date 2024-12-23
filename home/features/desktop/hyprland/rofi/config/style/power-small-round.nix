@@ -6,7 +6,7 @@
 }:
 
 {
-  home.file.".config/rofi/style/shared/power-small-round.rasi" = {
+  home.file.".config/rofi/style/power-small-round.rasi" = {
     text = ''
 
       /*****----- Configuration -----*****/
