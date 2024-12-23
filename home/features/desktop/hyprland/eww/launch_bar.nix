@@ -4,21 +4,15 @@
   pkgs,
   ...
 }:
-let
-    opacity = lib.toHexString (((builtins.ceil (config.stylix.opacity.popups * 100)) * 255) / 100);
-    HOME = "${config.home.homeDirectory}";
-    EWW_BIN = "${pkgs.eww}/bin/eww";
-    EWW = "${EWW_BIN} -c ${config.home.homeDirectory}/.config/eww";
 
-in
 {
   home.file.".config/eww/launch_bar.sh" = {
     text = ''
       #!/usr/bin/env bash
 
       ## Files and cmd
-      FILE="${HOME}/.cache/eww_launch.xyz"
-      EWW=${EWW}
+      FILE="~/.cache/eww_launch.xyz"
+      EWW="eww -c ${config.home.homeDirectory}/.config/eww"
 
       ## Run eww daemon if not running already
       if [[ ! `pidof eww` ]]; then

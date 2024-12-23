@@ -12,11 +12,11 @@
       configuration {
         modi:                       "drun,run,filebrowser,ssh,window";
         show-icons:                 true;
-        display-drun:               " Apps";
-        display-run:                " Run";
-        display-filebrowser:        " Files";
-        display-window:             " Windows";
-        display-ssh:                " SSH";
+        display-drun:               "  Apps";
+        display-run:                "  Run";
+        display-filebrowser:        "  Files";
+        display-window:             "  Windows";
+        display-ssh:                "  SSH";
         drun-display-format:        "{name}";
         window-format:              "{w} · {c} · {t}";
 
