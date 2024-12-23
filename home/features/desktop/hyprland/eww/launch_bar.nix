@@ -22,6 +22,8 @@
 
       ## Open widgets
       run_eww() {
+        ${EWW} open bar$i
+        [[ $i == 0 ]] &&
         $EWW open-many \
               searchapps \
               musicplayer \
@@ -43,8 +45,9 @@
       ## Launch or close widgets accordingly
       if [[ ! -f "$FILE" ]]; then
         touch "$FILE"
-        run_eww
-        # && bspc config -m LVDS-1 top_padding 49
+        NB_MONITORS=($(hyprctl monitors -j | jq -r '.[] | .id'))
+        for i in "${!NB_MONITORS[@]}"; do
+          run_eww
       else
         $EWW close-all && pkill eww
         rm "$FILE"

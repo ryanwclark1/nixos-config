@@ -5,7 +5,7 @@
 {
   imports = [
     ./airplane_mode.nix
-    ./battery1.nix
+    ./battery.nix
     ./battery2.nix
     ./brightness.nix
     ./mem-ad.nix
