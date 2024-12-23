@@ -6,12 +6,13 @@
 }:
 
 {
-  home.file.".config/eww/scripts/wifi1.sh" = {
+  home.file.".config/eww/scripts/wifi.sh" = {
     text = ''
       #!/usr/bin/env bash
 
       status=$(nmcli g | grep -oE "disconnected")
-      essid=$(nmcli c | grep wlp2s0 | awk '{print ($1)}')
+      essid=$(nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d: -f2)
+      # essid=$(nmcli c | grep wlp2s0 | awk '{print ($1)}')
 
       if [ $status ] ; then
           icon="󰖩"

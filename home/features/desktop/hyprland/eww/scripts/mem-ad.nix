@@ -9,6 +9,7 @@
   home.file.".config/eww/scripts/mem-ad.sh" = {
     text = ''
       #!/bin/sh
+      
       total="$(free -m | grep Mem: | awk '{ print $2 }')"
       used="$(free -m | grep Mem: | awk '{ print $3 }')"
 

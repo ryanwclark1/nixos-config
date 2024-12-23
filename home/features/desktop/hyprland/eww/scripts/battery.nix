@@ -6,15 +6,17 @@
 }:
 
 {
-  home.file.".config/eww/scripts/battery1.sh" = {
+  home.file.".config/eww/scripts/battery.sh" = {
     text = ''
 		#!/usr/bin/env bash
+
+		BAT=`ls /sys/class/power_supply | grep BAT | head -n 1`
+
 		battery() {
-			BAT=`ls /sys/class/power_supply | grep BAT | head -n 1`
 			cat /sys/class/power_supply/$BAT/capacity
 		}
+
 		battery_stat() {
-			BAT=`ls /sys/class/power_supply | grep BAT | head -n 1`
 			cat /sys/class/power_supply/$BAT/status
 		}
 
