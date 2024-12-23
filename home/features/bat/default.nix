@@ -23,7 +23,7 @@
 
   home.shellAliases = {
     cat = "bat --plain --color=always";
-    less = "bat --pager 'less RF' --style=numbers --color=always";
+    less = "bat --pager --style=numbers --color=always";
   };
 
 home.file.".config/bat/themes/theme.tmTheme" = {

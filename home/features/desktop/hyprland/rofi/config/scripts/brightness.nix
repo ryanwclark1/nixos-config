@@ -113,6 +113,6 @@
 							;;
 			esac
     '';
-    executable = false;
+    executable = true;
   };
 }

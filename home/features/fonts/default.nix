@@ -41,6 +41,7 @@
     liberation_ttf
     powerline-fonts
     powerline-symbols
+    icomoon-feather
     font-awesome
 
     # Font Manager

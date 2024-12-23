@@ -3,7 +3,7 @@
 ## Files and cmd
 FILE="$HOME/.cache/eww_launch.xyz"
 # EWW="$HOME/.local/bin/eww/eww -c $HOME/.config/eww"
-EWW="eww -c /home/administrator/nixos-config/home/features/desktop/hyprland/eww"
+EWW="eww -c ~/.config/eww"
 
 ## Run eww daemon if not running already
 if [[ ! `pidof eww` ]]; then
