@@ -6,7 +6,7 @@
 }:
 
 {
-  home.file.".config/rofi/style/shared/launcher-long.rasi" = {
+  home.file.".config/rofi/style/launcher-long.rasi" = {
     text = ''
 
       /*****----- Configuration -----*****/

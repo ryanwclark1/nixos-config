@@ -6,7 +6,7 @@
 }:
 
 {
-  home.file.".config/rofi/style/shared/cliphist-2.rasi" = {
+  home.file.".config/rofi/style/cliphist-2.rasi" = {
     text = ''
       /*
       #  ____        __ _
