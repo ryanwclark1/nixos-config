@@ -6,7 +6,7 @@
 }:
 
 {
-  home.file.".config/eww/scripts/appname.sh" = {
+  home.file.".config/eww/scripts/workspace.sh" = {
     text = ''
       #!/usr/bin/env bash
       #define icons for workspaces 1-9

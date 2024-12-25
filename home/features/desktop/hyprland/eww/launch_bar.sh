@@ -3,7 +3,7 @@
 ## Files and cmd
 FILE="$HOME/.cache/eww_launch.xyz"
 # EWW="$HOME/.local/bin/eww/eww -c $HOME/.config/eww"
-EWW="eww -c ~/.config/eww"
+EWW="eww -c $HOME/.config/eww"
 
 ## Run eww daemon if not running already
 if [[ ! `pidof eww` ]]; then
@@ -13,7 +13,9 @@ fi
 
 ## Open widgets
 run_eww() {
-	${EWW} open-many \
+	${EWW} open bar$i
+	[[ $i == 0 ]] &&
+	$EWW open-many \
 				searchapps \
 				musicplayer \
 				network \
@@ -33,10 +35,12 @@ run_eww() {
 
 ## Launch or close widgets accordingly
 if [[ ! -f "$FILE" ]]; then
-	touch "$FILE"
-	run_eww
-	# && bspc config -m LVDS-1 top_padding 49
+    touch "$FILE"
+    NB_MONITORS=($(hyprctl monitors -j | jq -r '.[] | .id'))
+    for i in "${!NB_MONITORS[@]}"; do
+        run_eww
+    done
 else
-	${EWW} close-all && pkill eww
-	rm "$FILE"
+    $EWW close-all && pkill eww
+    rm "$FILE"
 fi
