@@ -1386,7 +1386,7 @@
     ©️ copyright ip license circle law legal
     ®️ registered alphabet circle
     ™️ trade mark trademark brand law legal
-#️⃣ keycap  symbol blue-square twitter
+    #️⃣ keycap  symbol blue-square twitter
     *️⃣ keycap  star keycap
     0️⃣ keycap 0 0 numbers blue-square null
     1️⃣ keycap 1 blue-square numbers 1
