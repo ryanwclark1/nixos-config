@@ -13,5 +13,6 @@
     rathole # similar to ngrok - NAT traversal and reverse proxy
     tcpdump
     wireguard-tools
+    netscanner # A simple network scanner
   ];
 }

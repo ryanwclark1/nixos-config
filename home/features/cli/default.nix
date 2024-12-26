@@ -14,7 +14,6 @@
     ./nixtools.nix
     ./tealdeer.nix
     ./tf.nix
-    ./vhs.nix
     # ./zk.nix
   ];
   home.packages = with pkgs; [
@@ -33,5 +32,7 @@
     lazysql # SQL Tui
     mprocs # multiple commands in parallel
     vultr-cli # vultr cli
+    serie # A rich git commit graph in your terminal, like magic.
+    vhs # A tool for generating terminal GIFs with code
   ];
 }

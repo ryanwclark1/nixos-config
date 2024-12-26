@@ -28,5 +28,6 @@
   home.packages = with pkgs; [
     ripgrep-all
     sd
+    repgrep # ripgrep with replacement support
   ];
 }
