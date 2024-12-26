@@ -13,6 +13,8 @@
     ./applet3-3.nix
     ./cliphist-2.nix
     ./cliphist.nix
+    ./config-emoji.nix
+    ./config-long.nix
     ./launcher-center-alt1.nix
     ./launcher-center-alt2.nix
     ./launcher-center.nix
