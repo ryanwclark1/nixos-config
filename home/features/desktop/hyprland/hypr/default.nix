@@ -52,7 +52,7 @@ in
         "systemctl --user import-environment QT_QPA_PLATFORMTHEME WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "${hypridle} &"
         "killall -q ${swww};sleep .5 && ${swww} init"
-        "killall -q ${ags}; sleep .5 && ${ags} -b hypr"
+        # "killall -q ${ags}; sleep .5 && ${ags} -b hypr"
         "nm-applet --indicator &"
         "${wl-paste} --watch ${cliphist} store"
         # "sleep 1.5 && swww img /home/${username}/Pictures/Wallpapers/xyz.jpg"
