@@ -17,8 +17,8 @@ pkgs.writeShellScriptBin "update-checker" ''
   }
 
   # Parse command line arguments
-  flake_path=""
-  nixos_config_name=""
+  flake_path="$HOME/nixos-config"
+  nixos_config_name="$HOSTNAME"
   while [[ "$#" -gt 0 ]]; do
     case $1 in
       --flake) flake_path="$2"; shift ;;
