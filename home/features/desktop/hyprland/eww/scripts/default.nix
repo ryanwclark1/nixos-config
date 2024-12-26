@@ -20,9 +20,8 @@
     # ./weather.nix
     # ./wifi.nix
     # ./wifi2.nix
-    ./workspace_code.nix
-    ./workspace.nix
-    ./workspaces.nix
+    # ./workspace.nix
+    # ./workspaces.nix
   ];
 
   home.file.".config/eww/scripts/airplane_mode.sh" = {

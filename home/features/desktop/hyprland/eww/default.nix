@@ -11,7 +11,6 @@
 {
   imports = [
     ./scripts
-    ./launch_bar.nix
   ];
 
   home.packages = with pkgs; [
@@ -26,6 +25,11 @@
   home.file.".config/eww/eww_widgets.yuck".source = ./eww_widgets.yuck;
   home.file.".config/eww/eww_windows.yuck".source = ./eww_windows.yuck;
   home.file.".config/eww/variables.yuck".source = ./variables.yuck;
+
+  home.file.".config/eww/launch_bar.sh" = {
+    source = ./launch_bar.sh;
+    executable = true;
+  };
 
   # scripts
   home.file.".config/eww/actions" = {
