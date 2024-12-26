@@ -24,7 +24,7 @@
     executable = true;
   };
   home.file.".config/rofi/scripts/power-big.sh" = {
-    source = ./music.sh;
+    source = ./power-big.sh;
     executable = true;
   };
   home.file.".config/rofi/scripts/powermenu.sh" = {
