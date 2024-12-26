@@ -104,8 +104,8 @@
     executable = true;
   };
 
-  home.file.".config/eww/scripts/workspace.lua" = {
-    source = ./workspace.lua;
+  home.file.".config/eww/scripts/workspaces.lua" = {
+    source = ./workspaces.lua;
     executable = true;
   };
 
