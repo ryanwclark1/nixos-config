@@ -105,5 +105,20 @@
     executable = true;
   };
 
+  home.file.".config/eww/scripts/workspace.lua" = {
+    source = ./workspace.lua;
+    executable = true;
+  };
+
+  home.file.".config/eww/scripts/workspace.sh" = {
+    source = ./workspaces.sh;
+    executable = true;
+  };
+
+  home.file.".config/eww/scripts/workspaces.sh" = {
+    source = ./workspaces.sh;
+    executable = true;
+  };
+
 
 }
