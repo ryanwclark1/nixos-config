@@ -46,9 +46,9 @@
         spacing:                      0px;
         padding:                      0px;
         margin:                       0px;
-        color:                        #FFFFFF;
+        color:                      #FFFFFF;
         border:                       @border-width;
-        border-color:                 #FFFFFF;
+        border-color:               #FFFFFF;
         cursor:                       "default";
         transparency:                 "real";
         location:                     northeast;
