@@ -28,6 +28,11 @@
       recursive = true;
   };
 
+  home.file.".config/.emoji" = {
+    source = ./scripts/.emoji;
+    executable = false;
+  };
+
   home.file.".config/swappy/config" = {
     text = ''
       [Default]
