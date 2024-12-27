@@ -5,7 +5,10 @@
 
 pkgs.writeShellScriptBin "emopicker9000" ''
   # Get user selection via rofi from emoji file.
-  chosen=$(cat $HOME/.emoji | ${pkgs.rofi-wayland}/bin/rofi -dmenu | awk '{print $1}')
+  dir="$HOME/.config/rofi/style"
+  theme='config-emoji'
+
+  chosen=$(cat $HOME/.config/.emoji | ${pkgs.rofi-wayland}/bin/rofi -dmenu  -theme "$dir/$theme.rasi" | awk '{print $1}')
 
   # Exit if none chosen.
   [ -z "$chosen" ] && exit

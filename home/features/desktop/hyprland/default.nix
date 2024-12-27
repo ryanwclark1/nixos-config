@@ -74,6 +74,7 @@
     (import ./scripts/cliphist-copy.nix { inherit pkgs; })
     (import ./scripts/cliphist-delete.nix { inherit pkgs; })
     (import ./scripts/emopicker9000.nix { inherit pkgs; })
+    (import ./scripts/grimblast.nix { inherit pkgs; })
     (import ./scripts/list-hypr-bindings.nix { inherit pkgs; })
     (import ./scripts/microphone-status.nix { inherit pkgs; })
     (import ./scripts/power-big.nix { inherit pkgs; })
