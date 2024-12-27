@@ -150,7 +150,7 @@ in
             cliphist = lib.getExe config.services.cliphist.package;
           in
           lib.optionals config.services.cliphist.enable [
-            ''SUPER, c,exec,selected=$(${cliphist} list | ${rofi} -show drun) && echo "$selected" | ${cliphist} decode | wl-copy''
+            ''SUPER, c,exec,selected=$(${cliphist} list | ${rofi} -show drun -theme ${config.home.homeDirectory}/.config/rofi/style/cliphist.rasi) && echo "$selected" | ${cliphist} decode | wl-copy''
           ]
         )
       )
