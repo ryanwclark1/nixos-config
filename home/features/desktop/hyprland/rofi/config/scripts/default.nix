@@ -19,6 +19,10 @@
     source = ./brightness.sh;
     executable = true;
   };
+  home.file.".config/rofi/scripts/grimblast.sh" = {
+    source = ./grimblast.sh;
+    executable = true;
+  };
   home.file.".config/rofi/scripts/mpd.sh" = {
     source = ./mpd.sh;
     executable = true;
