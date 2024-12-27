@@ -39,6 +39,10 @@
     source = ./screenshot.sh;
     executable = true;
   };
+  home.file.".config/rofi/scripts/screenshot2.sh" = {
+    source = ./screenshot2.sh;
+    executable = true;
+  };
   home.file.".config/rofi/scripts/volume.sh" = {
     source = ./volume.sh;
     executable = true;
