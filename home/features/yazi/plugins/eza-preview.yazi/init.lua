@@ -25,7 +25,7 @@ function M:entry(_)
     ya.manager_emit("seek", { 0 })
 end
 
-function M:peek()
+function M:peek(job)
     local args = {
         "-a",
         "--oneline",
@@ -33,7 +33,7 @@ function M:peek()
         "--icons=always",
         "--group-directories-first",
         "--no-quotes",
-        tostring(self.file.url)
+        tostring(job.file.url)
     }
 
     if is_tree_view_mode() then
@@ -46,7 +46,7 @@ function M:peek()
         :stderr(Command.PIPED)
         :spawn()
 
-    local limit = self.area.h
+    local limit = job.area.h
     local lines = ""
     local num_lines = 1
     local num_skip = 0
@@ -60,7 +60,7 @@ function M:peek()
             break
         end
 
-        if num_skip >= self.skip then
+        if num_skip >= job.skip then
             lines = lines .. line
             num_lines = num_lines + 1
         else
@@ -75,18 +75,22 @@ function M:peek()
     end
 
     child:start_kill()
-    if self.skip > 0 and num_lines < limit then
+    if job.skip > 0 and num_lines < limit then
         ya.manager_emit(
             "peek",
-            { tostring(math.max(0, self.skip - (limit - num_lines))), only_if = tostring(self.file.url), upper_bound = "" }
+            { tostring(math.max(0, job.skip - (limit - num_lines))), only_if = tostring(job.file.url), upper_bound = "" }
         )
     elseif empty_output then
         ya.preview_widgets(self, {
-            ui.Paragraph(self.area, { ui.Line("No items") })
-                :align(ui.Paragraph.CENTER),
+            ui.Text({ ui.Line("No items") })
+                :area(job.area)
+                :align(ui.text.CENTER),
+            -- ui.Paragraph(self.area, { ui.Line("No items") })
+            --     :align(ui.Paragraph.CENTER),
         })
     else
-        ya.preview_widgets(self, { ui.Paragraph.parse(self.area, lines) })
+        ya.preview_widgets(self, { ui.Text.parse(job.area, lines) })
+        -- ya.preview_widgets(self, { ui.Paragraph.parse(self.area, lines) })
     end
 end
 
