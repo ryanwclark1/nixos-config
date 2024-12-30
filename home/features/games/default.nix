@@ -6,7 +6,7 @@
 
 {
   imports = [
-    ./dolphinemu.nix
+    # ./dolphinemu.nix
     # ./factorio.nix
     # ./heroic.nix
     # ./lutris.nix
@@ -16,8 +16,7 @@
     # ./openra.nix
     # ./xonotic.nix
   ];
-  home = {
-    packages = with pkgs; [gamescope];
+
 
     # persistence = {
     #   "/persist/${config.home.homeDirectory}" = {
@@ -27,5 +26,4 @@
     #     ];
     #   };
     # };
-  };
 }
