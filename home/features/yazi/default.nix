@@ -123,9 +123,15 @@
         {
           on = ["g" "r"];
           run = ''
-            shell 'ya pub dds-cd --str "$(git rev-parse --show-toplevel)"' --confirm
+            shell 'ya emit cd "$(git rev-parse --show-toplevel)"' --confirm
             '';
           desc = "Go to the root of the current Git repository";
+        }
+        # Runs lazygit
+        {
+          on   = ["g" "i"];
+          run  = ''plugin lazygit'';
+          desc = "run lazygit";
         }
         # preview directories using eza, can be switched between list and tree modes.
         {
