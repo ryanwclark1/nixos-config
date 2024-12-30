@@ -54,7 +54,7 @@
   };
 
   home.packages = with pkgs; [
-    brightnessctl
+    # hyprland-qtutils
     wf-recorder # Utility program for screen recording of wlroots-based compositors
     wl-clipboard # Wayland clipboard
     grim # Screenshot tool,
@@ -70,6 +70,7 @@
     qalculate-gtk
     wayshot
     gtk3
+    gtk4
     (import ./scripts/applauncher-fullscreen.nix { inherit pkgs; })
     (import ./scripts/cliphist-copy.nix { inherit pkgs; })
     (import ./scripts/cliphist-delete.nix { inherit pkgs; })
