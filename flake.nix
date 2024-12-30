@@ -64,7 +64,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     ags = {
-      url = "github:aylur/ags";
+      url = "github:aylur/ags/v1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     matugen = {
