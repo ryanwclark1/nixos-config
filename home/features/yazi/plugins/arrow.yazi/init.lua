@@ -1,3 +1,4 @@
+--- @sync entry
 return {
 	entry = function(_, args)
 		local current = cx.active.current
