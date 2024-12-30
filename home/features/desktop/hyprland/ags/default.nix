@@ -8,7 +8,7 @@
 {
   imports = [
     inputs.ags.homeManagerModules.default
-    inputs.matugen.nixosModules.default
+    # inputs.matugen.nixosModules.default
     # inputs.astal.nixosModules.default
   ];
 
@@ -19,7 +19,7 @@
 
   programs.ags = {
     enable = true;
- 
+
       # ags.packages.x86_64-linux.battery
       # ags.packages.x86_64-linux.hyperland
     # ];
@@ -29,10 +29,10 @@
     #   accountsservice
     # ];
   };
-  programs.matugen = {
-    enable = true;
-    variant = "dark";
-    jsonFormat = "hex";
-  };
+  # programs.matugen = {
+  #   enable = true;
+  #   variant = "dark";
+  #   jsonFormat = "hex";
+  # };
 
 }
