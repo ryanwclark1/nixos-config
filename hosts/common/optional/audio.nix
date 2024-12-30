@@ -5,8 +5,20 @@
 
 {
   services.mpd = {
-    enable = false;
-    musicDirectory = ''$HOME/Music'';
+    enable = true;
+    user = "userRunningPipeWire";
+    startWhenNeeded = false;
+    extraConfig = ''
+      audio_output {
+        type "pipewire"
+        name "My PipeWire Output"
+      }
+    '';
+    # Optional:
+    network = {
+      listenAddress = "any"; # if you want to allow non-localhost connections
+      port = 6600;
+    };
   };
 
   hardware.pulseaudio.enable = false;
@@ -17,7 +29,7 @@
     # Enabling system-wide PipeWire is not recommended and disabled by default according to https://github.com/PipeWire/pipewire/blob/master/NEWS
     socketActivation = true;
     # Opens UDP/6001-6002, required by RAOP/Airplay for timing and control data.
-    raopOpenFirewall = false;
+    raopOpenFirewall = true;
     alsa = {
       enable = true;
       support32Bit = true;
