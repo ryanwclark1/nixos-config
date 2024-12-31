@@ -1,6 +1,5 @@
 # Host level sops configuration
 {
-  config,
   inputs,
   ...
 }:
