@@ -29,6 +29,7 @@
       typescript
       dart-sass
       gobject-introspection
+      libgtop
       (python3.withPackages (ps:
         with ps; [
           gpustat
