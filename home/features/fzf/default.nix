@@ -62,11 +62,12 @@
     enableZshIntegration = lib.mkIf config.programs.zsh.enable true;
   };
 
-  programs.bash.bashrcExtra = ''
-    source fzf-git
-  '';
+# This appears before the interactive shell if statement and creates issue with home manager startups in systemd
+  # programs.bash.bashrcExtra = ''
+  #   source fzf-git
+  # '';
 
-  programs.zsh.initExtra = ''
-    source fzf-git
-  '';
+  # programs.zsh.initExtra = ''
+  #   source fzf-git
+  # '';
 }
