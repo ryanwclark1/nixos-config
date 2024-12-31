@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   ...
 }:
@@ -6,7 +7,7 @@
 {
   services.mpd = {
     enable = true;
-    user = "userRunningPipeWire";
+    user = "administrator";
     startWhenNeeded = false;
     extraConfig = ''
       audio_output {
