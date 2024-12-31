@@ -18,30 +18,27 @@
     };
   };
 
-  systemd.user.startServices = "sd-switch";
+  # systemd.user.startServices = "sd-switch";
+  systemd.user.startServices = "suggest";
 
   programs = {
     home-manager.enable = true;
     git.enable = true;
   };
 
-  home =
-  let
-    editor = lib.getExe config.programs.nixvim.package;
-  in
-  {
+  home = {
     username = lib.mkDefault "administrator";
     homeDirectory = lib.mkDefault "/home/${config.home.username}";
     stateVersion = lib.mkDefault "24.11";
     sessionPath = [ "${config.home.homeDirectory}/.local/bin" ];
     sessionVariables = {
       FLAKE = lib.mkDefault "${config.home.homeDirectory}/nixos-config";
-      EDITOR = lib.mkDefault "${editor}";
-      VISUAL = lib.mkDefault "${editor}";
+      EDITOR = lib.mkDefault "nvim";
+      VISUAL = lib.mkDefault "nvim";
       MANPAGER = lib.mkDefault "sh -c 'col -bx | bat -l man -p'";
       MANROFFOPT="-c";
     };
-    shellAliases = rec{
+    shellAliases = rec {
       jqless = "jq -C | bat --pager 'less RF' --style=numbers --color=always";
 
       n = "nix";
@@ -53,11 +50,11 @@
       nf = "nix flake";
 
       nr = "nixos-rebuild --flake .";
-      nrs = "nixos-rebuild --flake . switch";
+      nrs = "nixos-rebuild switch --flake .";
       snr = "sudo nixos-rebuild --flake .";
-      snrs = "sudo nixos-rebuild --flake . switch";
+      snrs = "sudo nixos-rebuild switch --flake .";
       hm = "home-manager --flake .";
-      hms = "home-manager --flake . switch";
+      hms = "home-manager switch --flake .";
 
       wifi = "nmtui";
 
