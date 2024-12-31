@@ -10,5 +10,6 @@
     inxi
     dmidecode
     glxinfo
+    libgtop
   ];
 }
