@@ -8,12 +8,6 @@
 {
   imports = [
     inputs.ags.homeManagerModules.default
-    # inputs.astal.nixosModules.default
-  ];
-
-  home.packages = with pkgs; [
-    bun
-    dart-sass
   ];
 
   programs.ags = {
@@ -30,6 +24,7 @@
       inputs.ags.packages.x86_64-linux.notifd
       inputs.ags.packages.x86_64-linux.powerprofiles
       inputs.ags.packages.x86_64-linux.wireplumber
+      inputs.ags.packages.x86_64-linux.io # Astal cli
     ] ++ (with pkgs; [
       typescript
       dart-sass
@@ -47,5 +42,4 @@
   #   variant = "dark";
   #   jsonFormat = "hex";
   # };
-
 }
