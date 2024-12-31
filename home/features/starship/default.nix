@@ -221,7 +221,7 @@ with config.lib.stylix.colors.withHashtag;
         disabled = false;
       };
       python = {
-        symbol = "";
+        symbol = "󰌠";
         style = "bg:${base0F}";
         version_format = "$raw";
         format = "[[ $symbol( $version )(\($virtualenv\) )](fg:${base00} bg:${base0F})]($style)";
