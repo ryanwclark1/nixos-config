@@ -11,7 +11,6 @@
     powerOnBoot = true;
     settings = {
       General = {
-        Name = "Hello";
         ControllerMode = "dual";
         FastConnectable = "true";
         Experimental = "true";
@@ -22,6 +21,9 @@
     };
   };
 
+  environment.systemPackages = [
+    pkgs.bluez-tools
+  ];
   # Blueman is a GTK+ Bluetooth Manager
   services.blueman.enable = true;
 }
