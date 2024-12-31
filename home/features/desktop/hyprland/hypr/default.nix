@@ -56,7 +56,7 @@ in
         "nm-applet --indicator &"
         "${wl-paste} --watch ${cliphist} store"
         # "sleep 1.5 && swww img /home/${username}/Pictures/Wallpapers/xyz.jpg"
-        "systemctl --user start waybar"
+        # "systemctl --user start waybar"
       ];
 
       general = {
