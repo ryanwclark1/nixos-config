@@ -27,7 +27,6 @@
     gpu-viewer # GPU info
     waypipe # Network proxy for Wayland clients (applications)
     wf-recorder # Utility program for screen recording of wlroots-based compositors
-    wl-mirror # Simple Wayland output mirror client
     ydotool # Command-line tool for automation which emulates input devices
     file-roller # Archive manager
     webkitgtk_6_0 # Web rendering engine
