@@ -77,9 +77,7 @@
     home-manager,
     nix-darwin,
     nixos-cosmic,
-    nixos-hardware,
     nixpkgs,
-    nixvim,
     stylix,
     systems,
     ...
