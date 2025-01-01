@@ -18,10 +18,12 @@
     vscode = {
       enable = true;
       package = pkgs.vscode;
-      mutableExtensionsDir = false;
+      mutableExtensionsDir = true;
       enableExtensionUpdateCheck = true;
       enableUpdateCheck = false;
       extensions = with pkgs.vscode-extensions; [
+        mkhl.direnv
+        tauri-apps.tauri-vscode
         bradlc.vscode-tailwindcss
         cameron.vscode-pytest
         catppuccin.catppuccin-vsc
@@ -165,12 +167,12 @@
           sha256 = "sha256-EB3ggxo2NqiH8yVpsNzDRb+fvsd6Qd5aXRM6FoZn5k8=";
           version = "2.1.0";
         }
-        {
-          name = "tailwind-fold";
-          publisher = "stivo";
-          sha256 = "sha256-yH3eA5jgBwxqnpFQkg91KQMkQps5iM1v783KQkQcWUU=";
-          version = "0.2.0";
-        }
+        # {
+        #   name = "tailwind-fold";
+        #   publisher = "stivo";
+        #   sha256 = "sha256-yH3eA5jgBwxqnpFQkg91KQMkQps5iM1v783KQkQcWUU=";
+        #   version = "0.2.0";
+        # }
         {
           name = "templ";
           publisher = "a-h";
