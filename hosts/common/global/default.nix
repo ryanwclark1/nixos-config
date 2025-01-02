@@ -34,6 +34,7 @@
   };
 
   hardware.enableRedistributableFirmware = true;
+  networking.domain = "techcasa.io";
 
   # Increase open file limit for sudoers
   security.pam.loginLimits = [
@@ -50,4 +51,6 @@
       value = "1048576";
     }
   ];
+  
+  services.speechd.enable = false;
 }
