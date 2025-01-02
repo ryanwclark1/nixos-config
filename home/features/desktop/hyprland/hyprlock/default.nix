@@ -74,11 +74,8 @@ with config.stylix.fonts;
           fail_color = "#${config.lib.stylix.colors.base08}";
           fail_text = ''<i>$FAIL <b>($ATTEMPTS)</b></i>'';
           capslock_color = "#${config.lib.stylix.colors.base0A}";
-<<<<<<< Updated upstream
-=======
           numlock_color = "#${config.lib.stylix.colors.base0A}";
           bothlock_color = "#${config.lib.stylix.colors.base0A}";
->>>>>>> Stashed changes
           position = "0, -100";
           halign = "center";
           valign = "center";
