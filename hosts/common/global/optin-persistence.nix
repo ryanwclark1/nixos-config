@@ -4,7 +4,6 @@
 #
 # It works even if / is tmpfs, btrfs snapshot, or even not ephemeral at all.
 {
-  lib,
   inputs,
   config,
   ...

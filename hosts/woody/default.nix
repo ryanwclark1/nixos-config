@@ -65,6 +65,9 @@
   hardware = {
     enableAllFirmware = true;
     enableRedistributableFirmware = true;
+    # firmware = [
+    #   pkgs.linux-firmware
+    # ];
     amdgpu = {
       amdvlk = {
         enable = true;

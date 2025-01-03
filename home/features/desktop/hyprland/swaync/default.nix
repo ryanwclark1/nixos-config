@@ -7,7 +7,7 @@
 {
   services = {
     swaync = {
-      enable = true;
+      enable = false;
       package = pkgs.swaynotificationcenter;
       settings = {
         positionX = "right";

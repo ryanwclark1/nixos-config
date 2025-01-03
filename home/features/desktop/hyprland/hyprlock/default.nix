@@ -19,20 +19,25 @@ with config.stylix.fonts;
           grace = 0;
           no_fade_in = false;
           no_fade_out = true;
+          text_trim = true;
+          fractional_scaling = 2;
         };
 
         # BACKGROUND
         background = {
           # monitor =
           path = "${config.stylix.image}";
-          # color = "${base00}";
+          color = "#${config.lib.stylix.colors.base00}";
           blur_passes = 1; # 0 disables blurring
           blur_size = 7;
           noise = 0.0117;
           contrast = 0.8916;
           brightness = 0.8172;
           vibrancy = 0.1696;
-          vibrancy_darkness = 0.0;
+          vibrancy_darkness = 0.05;
+          reload_time = -1;
+          crossfade_time = -1.0;
+          zindex = -1;
         };
 
         # TIME
@@ -44,6 +49,7 @@ with config.stylix.fonts;
           font_family = "${config.stylix.fonts.sansSerif.name}";
           shadow_passes = 1;
           shadow_size = 1;
+          rotate = 0;
           position = "0, -200";
           halign = "center";
           valign = "top";
@@ -68,9 +74,12 @@ with config.stylix.fonts;
           fail_color = "#${config.lib.stylix.colors.base08}";
           fail_text = ''<i>$FAIL <b>($ATTEMPTS)</b></i>'';
           capslock_color = "#${config.lib.stylix.colors.base0A}";
+          numlock_color = "#${config.lib.stylix.colors.base0A}";
+          bothlock_color = "#${config.lib.stylix.colors.base0A}";
           position = "0, -100";
           halign = "center";
           valign = "center";
+          zindex = 0;
         };
       };
     };
