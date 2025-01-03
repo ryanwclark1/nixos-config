@@ -21,7 +21,6 @@
   programs.yazi =
   let
     # TODO: better ref to nixvim?
-    # editor = lib.getExe config.programs.nixvim.package;
     editor = "nvim";
     ripdrag = lib.getExe pkgs.ripdrag;
     wl-copy = "${pkgs.wl-clipboard}/bin/wl-copy";
@@ -2495,18 +2494,7 @@
     #         # }
     #       ];
     #     };
-    #     preview = {
-    #       tab_size = 2;
-    #       max_height = 1200;
-    #       max_width = 800;
-    #       cache_dir = "${config.home.homeDirectory}/.local/cache/yazi";
-    #       # image_filter = "lanczos3";
-    #       # image_quality = 90;
-    #       # sixel_fraction = 15;
-    #       # https://github.com/jstkdng/ueberzugpp/issues/122
-    #       ueberzug_scale = 1;
-    #       ueberzug_offset = [(0.5) (0.5) (-0.5) (-0.5)];
-    #     };
+
     #     plugin = {
     #       prepend_previewers = [
     #         {
