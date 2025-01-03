@@ -11,8 +11,7 @@ let
   wl-paste = "${pkgs.wl-clipboard}/bin/wl-paste";
   cliphist = lib.getExe config.services.cliphist.package;
   steam = "${pkgs.steam}/bin/steam";
-  swaync = "${pkgs.swaynotificationcenter}/bin/swaync";
-  swww = "${pkgs.swww}/bin/swww";
+  # swaync = "${pkgs.swaynotificationcenter}/bin/swaync";
   # ags = lib.getExe config.programs.ags.package;
   pwvucontrol = "${pkgs.pwvucontrol}/bin/pwvucontrol";
   nm-connection-editor = "${pkgs.networkmanagerapplet}/bin/nm-connection-editor";
@@ -51,11 +50,10 @@ in
         "dbus-update-activation-environment --systemd --all"
         "systemctl --user import-environment QT_QPA_PLATFORMTHEME WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "${hypridle} &"
-        "killall -q ${swww};sleep .5 && ${swww} init"
+        "killall -q ags; sleep .5 && ags run ~/.config/ags/app.ts"
         # "killall -q ${ags}; sleep .5 && ${ags} -b hypr"
         "nm-applet --indicator &"
         "${wl-paste} --watch ${cliphist} store"
-        # "sleep 1.5 && swww img /home/${username}/Pictures/Wallpapers/xyz.jpg"
         # "systemctl --user start waybar"
       ];
 
