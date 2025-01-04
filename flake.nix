@@ -73,6 +73,9 @@
     ghostty = {
       url = "github:ghostty-org/ghostty";
     };
+    textfox = {
+      url = "github:adriankarlen/textfox";
+    };
   };
 
   outputs = {
@@ -110,7 +113,8 @@
 
     nixosConfigurations = {
       frametop = lib.nixosSystem {
-         modules = [
+        system = "x86_64-linux";
+        modules = [
           stylix.nixosModules.stylix
           ./hosts/frametop
         ];
@@ -119,6 +123,7 @@
         };
       };
       woody = lib.nixosSystem {
+        system = "x86_64-linux";
         modules = [
           stylix.nixosModules.stylix
           nixos-cosmic.nixosModules.default
