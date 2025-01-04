@@ -8,19 +8,13 @@
   imports = [
     ./ags
     ./cliphist
-    # ./dunst
-    ./eww
     ./hypr
     ./hypridle
     ./hyprlock
     ./rofi
-    # ./swaync
     ./wlogout
     ./waybar
     # ./scripts/screenshot.nix
-    # ./eww
-    # ./mako
-
   ];
 
   home.file."Pictures/wallpapers" = {
@@ -55,22 +49,22 @@
 
   home.packages = with pkgs; [
     # hyprland-qtutils
-    wf-recorder # Utility program for screen recording of wlroots-based compositors
-    wl-clipboard # Wayland clipboard
-    grim # Screenshot tool,
-    slurp # Screenshot tool, select area
-    grimblast
-    hyprpicker
-    swww # Sway window switcher
-    yad # Yet another dialog
     brightnessctl # Adjust screen brightness
-    swappy # Wayland native snapshot editing tool, inspired by Snappy on macOS
-    networkmanagerapplet
-    mission-center
-    qalculate-gtk
-    wayshot
+    grim # Screenshot tool,
+    grimblast
     gtk3
     gtk4
+    hyprpicker
+    mission-center
+    networkmanagerapplet
+    qalculate-gtk
+    slurp # Screenshot tool, select area
+    swappy # Wayland native snapshot editing tool, inspired by Snappy on macOS
+    swww # Sway window switcher
+    wayshot
+    wf-recorder # Utility program for screen recording of wlroots-based compositors
+    wl-clipboard # Wayland clipboard
+    yad # Yet another dialog
     (import ./scripts/applauncher-fullscreen.nix { inherit pkgs; })
     (import ./scripts/cliphist-copy.nix { inherit pkgs; })
     (import ./scripts/cliphist-delete.nix { inherit pkgs; })
