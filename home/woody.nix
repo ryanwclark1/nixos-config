@@ -27,6 +27,7 @@
     ./features/fzf
     ./features/games
     ./features/git
+    ./features/ghostty
     ./features/imv
     ./features/kitty
     ./features/kodi
