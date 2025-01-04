@@ -50,7 +50,7 @@ in
         "dbus-update-activation-environment --systemd --all"
         "systemctl --user import-environment QT_QPA_PLATFORMTHEME WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "${hypridle} &"
-        "killall -q ags; sleep .5 && ags run ~/.config/ags/app.ts"
+        # "killall -q ags; sleep .5 && ags run ~/.config/ags/app.ts"
         # "killall -q ${ags}; sleep .5 && ${ags} -b hypr"
         "nm-applet --indicator &"
         "${wl-paste} --watch ${cliphist} store"
