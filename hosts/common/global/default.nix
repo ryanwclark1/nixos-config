@@ -2,6 +2,7 @@
 {
   inputs,
   outputs,
+  lib,
   ...
 }:
 
@@ -51,6 +52,6 @@
       value = "1048576";
     }
   ];
-  
-  services.speechd.enable = false;
+
+  services.speechd.enable = lib.mkDefault false;
 }
