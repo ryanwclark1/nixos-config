@@ -13,7 +13,6 @@
     ./hyprlock
     ./rofi
     ./wlogout
-    ./waybar
     # ./scripts/screenshot.nix
   ];
 
