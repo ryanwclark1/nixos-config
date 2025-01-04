@@ -70,6 +70,9 @@
     matugen = {
       url = "github:/InioX/Matugen";
     };
+    ghostty = {
+      url = "github:ghostty-org/ghostty";
+    };
   };
 
   outputs = {
