@@ -13,7 +13,7 @@
         dockerls = {enable = true;};
         docker_compose_language_service = {enable = true;};
         emmet_ls = {enable = true;};
-        graphql = {enable = true;};
+        # graphql = {enable = true;};
         htmx = {enable = true;};
         jsonnet_ls = {enable = true;};
         nixd = {enable = true;};
