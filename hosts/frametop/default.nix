@@ -27,8 +27,8 @@
     ../common/optional/wireshark.nix
     ../common/optional/zsh.nix
     
-    ../common/optional/displaymanager/sddm
-    ../common/optional/plasma
+    ../common/optional/gnome
+    ../common/optional/displaymanager/gdm.nix
     ../common/optional/hyprland
   ];
 
