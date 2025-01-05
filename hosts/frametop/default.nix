@@ -1,5 +1,6 @@
 {
   inputs,
+  lib,
   pkgs,
   ...
 }:
@@ -62,7 +63,7 @@
   };
 
   powerManagement.powertop.enable = true;
-  security.pam.services.login.fprintAuth = true;
+  security.pam.services.login.fprintAuth = lib.mkForce true;
   environment.systemPackages = with pkgs; [
     fw-ectool  # EC-Tool adjusted for usage with framework embedded controller.
   ];

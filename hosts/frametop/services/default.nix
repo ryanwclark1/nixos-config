@@ -5,7 +5,7 @@
 {
   imports = [
     # ./auto-cpufreq.nix
-    ./fprintd.nix
+    # ./fprintd.nix
     ./fwupd.nix
     ./libinput.nix
     ./logind.nix
