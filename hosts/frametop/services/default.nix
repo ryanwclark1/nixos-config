@@ -12,7 +12,7 @@
     ./prometheus-node-exporter.nix
     ./upower.nix
     ./vscode-server.nix
-    ./tailscale.nix
+    # ./tailscale.nix
   ];
 
 }
