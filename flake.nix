@@ -43,9 +43,6 @@
       url = "github:hyprwm/hyprland-plugins";
       inputs.hyprland.follows = "hyprland";
     };
-    # hyprland-qtutils = {
-    #   url = "github:hyprwm/hyprland-qtutils";
-    # };
     stylix = {
       url = "github:danth/stylix";
       inputs.nixpkgs.follows = "nixpkgs";
