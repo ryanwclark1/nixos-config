@@ -53,5 +53,5 @@
     }
   ];
 
-  services.speechd.enable = lib.mkDefault false;
+  # services.speechd.enable = lib.mkDefault false;
 }
