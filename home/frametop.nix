@@ -6,7 +6,7 @@
   imports = [
     ./global
     ./features/desktop/hyprland
-    ./features/desktop/plasma
+    ./features/desktop/gnome
     ./features/desktop/common
     ./features/accounts
     ./features/alacritty
