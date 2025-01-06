@@ -147,8 +147,8 @@ sudo systemctl daemon-reload || echo "Warning: Failed to reload systemd daemon"
 
 # Copy and configure hardware configuration
 echo "Copying hardware configuration..."
-sudo cp /etc/nixos/hardware-configuration.nix "/home/administrator/nixos-config/host/frametop/hardware-configuration.nix"
-sudo chown administrator:users "/home/administrator/nixos-config/host/frametop/hardware-configuration.nix"
+sudo cp /etc/nixos/hardware-configuration.nix /home/administrator/nixos-config/host/frametop/hardware-configuration.nix
+sudo chown administrator:users /home/administrator/nixos-config/host/frametop/hardware-configuration.nix
 nix-shell -p git --run "git add /home/administrator/nixos-config/host/frametop/hardware-configuration.nix"
 
 # Create temporary file for build output
