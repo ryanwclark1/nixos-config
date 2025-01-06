@@ -46,30 +46,30 @@ nix-shell -p git gnumake --run "$(declare -f manage_git_repo); manage_git_repo"
 
 # Create necessary directories with appropriate permissions
 echo "Creating required directories..."
-mkdir -p ~/nixos-config/host/frametop
-mkdir -p ~/.ssh
-mkdir -p ~/.config/sops/age
+mkdir -p /home/administrator/nixos-config/host/frametop
+mkdir -p /home/administrator/.ssh
+mkdir -p /home/administrator/.config/sops/age
 
 # Set restrictive permissions for sensitive directories
-chmod 700 ~/.ssh
-chmod 700 ~/.config/sops
-chmod 700 ~/.config/sops/age
+chmod 700 /home/administrator/.ssh
+chmod 700 /home/administrator/.config/sops
+chmod 700 /home/administrator/.config/sops/age
 
 # Copy hardware configuration with root privileges
 echo "Copying hardware configuration..."
-sudo cp /etc/nixos/hardware-configuration.nix ~/nixos-config/host/frametop/hardware-configuration.nix
+sudo cp /etc/nixos/hardware-configuration.nix /home/administratornixos-config/host/frametop/hardware-configuration.nix
 
 # Securely copy SSH keys and SOPS age key with proper permissions
 echo "Copying security credentials..."
-scp administrator@10.10.100.58:~/.ssh/ssh_host_ed25519_key.pub ~/.ssh/ssh_host_ed25519_key.pub
-scp administrator@10.10.100.58:~/.ssh/ssh_host_ed25519_key ~/.ssh/ssh_host_ed25519_key
-scp administrator@10.10.100.58:~/.config/sops/age/keys.txt ~/.config/sops/age/keys.txt
+scp administrator@10.10.100.58:/home/administrator/.ssh/ssh_host_ed25519_key.pub /home/administrator/.ssh/ssh_host_ed25519_key.pub
+scp administrator@10.10.100.58:/home/administrator/.ssh/ssh_host_ed25519_key /home/administrator/.ssh/ssh_host_ed25519_key
+scp administrator@10.10.100.58:/home/administrator/.config/sops/age/keys.txt /home/administrator/.config/sops/age/keys.txt
 
 # Set appropriate permissions for security files
 echo "Setting secure file permissions..."
-chmod 600 ~/.ssh/ssh_host_ed25519_key
-chmod 644 ~/.ssh/ssh_host_ed25519_key.pub
-chmod 600 ~/.config/sops/age/keys.txt
+chmod 600 /home/administrator/.ssh/ssh_host_ed25519_key
+chmod 644 /home/administrator/.ssh/ssh_host_ed25519_key.pub
+chmod 600 /home/administrator/.config/sops/age/keys.txt
 
 # Manage system services with proper error handling
 echo "Managing systemd services..."
@@ -85,7 +85,7 @@ sudo systemctl daemon-reload || {
 
 # Rebuild NixOS configuration
 echo "Rebuilding NixOS configuration..."
-sudo nixos-rebuild test --flake ~/nixos-config#frametop
+sudo nixos-rebuild test --flake /home/administrator/nixos-config#frametop
 
 # Set up administrator credentials with proper permissions
 echo "Configuring administrator security settings..."
@@ -93,8 +93,8 @@ sudo mkdir -p /home/administrator/.ssh
 sudo mkdir -p /home/administrator/.config/sops/age
 
 # Copy security files to administrator's home
-sudo cp -r ~/.ssh/* /home/administrator/.ssh/
-sudo cp -r ~/.config/sops/age/keys.txt /home/administrator/.config/sops/age/
+sudo cp -r /home/administrator/.ssh/* /home/administrator/.ssh/
+sudo cp -r /home/administrator/.config/sops/age/keys.txt /home/administrator/.config/sops/age/
 
 # Set proper ownership and permissions for administrator files
 sudo chown -R administrator:administrator /home/administrator/.ssh
