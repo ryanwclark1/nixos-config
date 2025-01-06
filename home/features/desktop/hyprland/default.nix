@@ -11,6 +11,8 @@
     ./hypr
     ./hypridle
     ./hyprlock
+    ./hyprpaper
+    ./hyprpanel
     ./rofi
     ./wlogout
     # ./scripts/screenshot.nix
