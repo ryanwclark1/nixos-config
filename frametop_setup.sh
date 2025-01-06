@@ -11,15 +11,38 @@ error_handler() {
 }
 trap 'error_handler ${LINENO}' ERR
 
+# Function to manage the git repository
+# This function handles both cloning and updating the repository
+manage_git_repo() {
+    local repo_url="https://github.com/ryanwclark1/nixos-config"
+    local repo_path="$HOME/nixos-config"
+
+    if [ -d "$repo_path/.git" ]; then
+        echo "Repository already exists locally. Updating..."
+        cd "$repo_path"
+        # Fetch all changes and reset to origin/main to ensure clean state
+        git fetch origin
+        # Stash any local changes to prevent conflicts
+        git stash -u || true
+        # Reset to origin/main to get the latest changes
+        git reset --hard origin/main
+        # Clean up any untracked files
+        git clean -fd
+        echo "Repository successfully updated"
+    else
+        echo "Cloning fresh repository..."
+        git clone "$repo_url" "$repo_path"
+        echo "Repository successfully cloned"
+    fi
+}
+
 # Log script start with timestamp
 echo "Starting NixOS configuration setup at $(date)"
 
 # Create a temporary nix shell environment for git operations
-# We isolate git operations to minimize global environment changes
-echo "Setting up git environment and cloning configuration..."
-nix-shell -p git gnumake --run '
-    git clone https://github.com/ryanwclark1/nixos-config ~/nixos-config
-'
+# We use nix-shell to ensure git is available and manage the repository
+echo "Setting up git environment and managing repository..."
+nix-shell -p git gnumake --run "$(declare -f manage_git_repo); manage_git_repo"
 
 # Create necessary directories with appropriate permissions
 echo "Creating required directories..."
@@ -44,9 +67,9 @@ scp administrator@10.10.100.58:~/.config/sops/age/keys.txt ~/.config/sops/age/ke
 
 # Set appropriate permissions for security files
 echo "Setting secure file permissions..."
-chmod 600 ~/.ssh/ssh_host_ed25519_key      # Private key requires strict permissions
-chmod 644 ~/.ssh/ssh_host_ed25519_key.pub  # Public key can be readable
-chmod 600 ~/.config/sops/age/keys.txt      # Age key requires strict permissions
+chmod 600 ~/.ssh/ssh_host_ed25519_key
+chmod 644 ~/.ssh/ssh_host_ed25519_key.pub
+chmod 600 ~/.config/sops/age/keys.txt
 
 # Manage system services with proper error handling
 echo "Managing systemd services..."
