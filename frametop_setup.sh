@@ -37,7 +37,7 @@ create_secure_dir() {
     local mode="$2"
     sudo mkdir -p "$dir_path"
     sudo chmod "$mode" "$dir_path"
-    sudo chown administrator:administrator "$dir_path"
+    sudo chown administrator "$dir_path"
 }
 
 # Function to securely copy and set permissions for files
@@ -48,7 +48,7 @@ secure_copy_file() {
 
     scp "administrator@10.10.100.58:$src" "$dest"
     sudo chmod "$mode" "$dest"
-    sudo chown administrator:administrator "$dest"
+    sudo chown administrator "$dest"
 }
 
 # Log script start with timestamp
@@ -67,7 +67,7 @@ create_secure_dir "/home/administrator/.config/sops/age" 700
 # Copy hardware configuration
 echo "Copying hardware configuration..."
 sudo cp /etc/nixos/hardware-configuration.nix "/home/administrator/nixos-config/host/frametop/hardware-configuration.nix"
-sudo chown administrator:administrator "/home/administrator/nixos-config/host/frametop/hardware-configuration.nix"
+sudo chown administrator "/home/administrator/nixos-config/host/frametop/hardware-configuration.nix"
 
 # Copy security credentials with proper permissions
 echo "Copying security credentials..."
