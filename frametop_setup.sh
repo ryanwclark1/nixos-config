@@ -43,15 +43,38 @@ create_secure_dir() {
 
 # Function to securely copy and set permissions for files
 # Updated to use 'users' as default group, with option for system files
+# Function to securely copy and set permissions for files
 secure_copy_file() {
     local src="$1"
     local dest="$2"
     local mode="$3"
     local owner="${4:-administrator:users}"
+    local temp_dir="/tmp/secure_copy_$$"
 
-    scp "administrator@10.10.100.58:$src" "$dest"
+    # Create temporary directory with restrictive permissions
+    mkdir -p "$temp_dir"
+    chmod 700 "$temp_dir"
+
+    # Extract filename from destination path
+    local filename=$(basename "$dest")
+    local temp_file="$temp_dir/$filename"
+
+    echo "Copying $src to temporary location..."
+    # Copy to temporary location first
+    if ! scp "administrator@10.10.100.58:$src" "$temp_file"; then
+        echo "Error: SCP failed for $src"
+        rm -rf "$temp_dir"
+        return 1
+    fi
+
+    echo "Moving $filename to final destination with proper permissions..."
+    # Move to final destination with sudo
+    sudo mv "$temp_file" "$dest"
     sudo chmod "$mode" "$dest"
     sudo chown "$owner" "$dest"
+
+    # Clean up
+    rm -rf "$temp_dir"
 }
 
 # Log script start with timestamp
