@@ -150,19 +150,37 @@ for action in "stop" "disable"; do
 done
 sudo systemctl daemon-reload || echo "Warning: Failed to reload systemd daemon"
 
-# Create temporary file for build output
+# Create temporary files for build output and errors
 BUILD_LOG=$(mktemp)
-trap 'rm -f $BUILD_LOG' EXIT
+ERROR_LOG=$(mktemp)
+trap 'rm -f $BUILD_LOG $ERROR_LOG' EXIT
 
-# Rebuild NixOS configuration with output handling
+# Rebuild NixOS configuration with comprehensive error capturing
 echo "Rebuilding NixOS configuration..."
-if sudo nixos-rebuild test --flake /home/administrator/nixos-config#frametop 2>&1 | tee "$BUILD_LOG"; then
-    echo "Configuration build successful. Build output saved to: $BUILD_LOG"
+echo "Starting build at $(date)" > "$BUILD_LOG"
+
+# Run nixos-rebuild with error handling
+if sudo nixos-rebuild test --flake /home/administrator/nixos-config#frametop > >(tee -a "$BUILD_LOG") 2> >(tee -a "$ERROR_LOG" >&2); then
+    echo "Configuration build successful at $(date)"
     echo "Summary of changes:"
     grep -E "^(building|installing|activating)" "$BUILD_LOG" || true
+
+    if [ -s "$ERROR_LOG" ]; then
+        echo "Warnings during build:"
+        cat "$ERROR_LOG"
+    fi
 else
-    echo "Configuration build failed. Full error log:"
+    echo "Configuration build failed at $(date)"
+    echo "=== Full Build Log ==="
     cat "$BUILD_LOG"
+    echo "=== Full Error Log ==="
+    cat "$ERROR_LOG"
+    echo "=== End of Logs ==="
+
+    # Archive logs for later inspection
+    sudo cp "$BUILD_LOG" "/var/log/nixos-rebuild-build-$(date +%Y%m%d_%H%M%S).log"
+    sudo cp "$ERROR_LOG" "/var/log/nixos-rebuild-error-$(date +%Y%m%d_%H%M%S).log"
+    echo "Build and error logs have been archived to /var/log/"
     exit 1
 fi
 
