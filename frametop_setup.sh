@@ -111,18 +111,13 @@ echo "Starting NixOS configuration setup at $(date)"
 
 # Initialize git repository through nix-shell
 echo "Setting up git environment and managing repository..."
-nix-shell -p git gnumake --run "$(declare -f manage_git_repo); manage_git_repo"
+nix-shell -p git --run "$(declare -f manage_git_repo); manage_git_repo"
 
 # Create necessary directory structure
 echo "Creating required directories..."
 create_secure_dir "/home/administrator/nixos-config/host/frametop" 755
 create_secure_dir "/home/administrator/.ssh" 700
 create_secure_dir "/home/administrator/.config/sops/age" 700
-
-# Copy and configure hardware configuration
-echo "Copying hardware configuration..."
-sudo cp /etc/nixos/hardware-configuration.nix "/home/administrator/nixos-config/host/frametop/hardware-configuration.nix"
-sudo chown administrator:users "/home/administrator/nixos-config/host/frametop/hardware-configuration.nix"
 
 # Copy and set up security credentials
 echo "Copying security credentials..."
@@ -150,37 +145,25 @@ for action in "stop" "disable"; do
 done
 sudo systemctl daemon-reload || echo "Warning: Failed to reload systemd daemon"
 
-# Create temporary files for build output and errors
+# Copy and configure hardware configuration
+echo "Copying hardware configuration..."
+sudo cp /etc/nixos/hardware-configuration.nix "/home/administrator/nixos-config/host/frametop/hardware-configuration.nix"
+sudo chown administrator:users "/home/administrator/nixos-config/host/frametop/hardware-configuration.nix"
+nix-shell -p git --run "git add /home/administrator/nixos-config/host/frametop/hardware-configuration.nix"
+
+# Create temporary file for build output
 BUILD_LOG=$(mktemp)
-ERROR_LOG=$(mktemp)
-trap 'rm -f $BUILD_LOG $ERROR_LOG' EXIT
+trap 'rm -f $BUILD_LOG' EXIT
 
-# Rebuild NixOS configuration with comprehensive error capturing
+# Rebuild NixOS configuration with output handling
 echo "Rebuilding NixOS configuration..."
-echo "Starting build at $(date)" > "$BUILD_LOG"
-
-# Run nixos-rebuild with error handling
-if sudo nixos-rebuild test --flake /home/administrator/nixos-config#frametop > >(tee -a "$BUILD_LOG") 2> >(tee -a "$ERROR_LOG" >&2); then
-    echo "Configuration build successful at $(date)"
+if sudo nixos-rebuild test --flake /home/administrator/nixos-config#frametop --verbose --show-trace 2>&1 | tee "$BUILD_LOG"; then
+    echo "Configuration build successful. Build output saved to: $BUILD_LOG"
     echo "Summary of changes:"
     grep -E "^(building|installing|activating)" "$BUILD_LOG" || true
-
-    if [ -s "$ERROR_LOG" ]; then
-        echo "Warnings during build:"
-        cat "$ERROR_LOG"
-    fi
 else
-    echo "Configuration build failed at $(date)"
-    echo "=== Full Build Log ==="
+    echo "Configuration build failed. Full error log:"
     cat "$BUILD_LOG"
-    echo "=== Full Error Log ==="
-    cat "$ERROR_LOG"
-    echo "=== End of Logs ==="
-
-    # Archive logs for later inspection
-    sudo cp "$BUILD_LOG" "/var/log/nixos-rebuild-build-$(date +%Y%m%d_%H%M%S).log"
-    sudo cp "$ERROR_LOG" "/var/log/nixos-rebuild-error-$(date +%Y%m%d_%H%M%S).log"
-    echo "Build and error logs have been archived to /var/log/"
     exit 1
 fi
 
