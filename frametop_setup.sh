@@ -12,21 +12,16 @@ error_handler() {
 trap 'error_handler ${LINENO}' ERR
 
 # Function to manage the git repository
-# This function handles both cloning and updating the repository
 manage_git_repo() {
     local repo_url="https://github.com/ryanwclark1/nixos-config"
-    local repo_path="$HOME/nixos-config"
+    local repo_path="/home/administrator/nixos-config"
 
     if [ -d "$repo_path/.git" ]; then
         echo "Repository already exists locally. Updating..."
         cd "$repo_path"
-        # Fetch all changes and reset to origin/main to ensure clean state
         git fetch origin
-        # Stash any local changes to prevent conflicts
         git stash -u || true
-        # Reset to origin/main to get the latest changes
         git reset --hard origin/main
-        # Clean up any untracked files
         git clean -fd
         echo "Repository successfully updated"
     else
@@ -36,77 +31,65 @@ manage_git_repo() {
     fi
 }
 
+# Function to create directory with specific permissions and ownership
+create_secure_dir() {
+    local dir_path="$1"
+    local mode="$2"
+    sudo mkdir -p "$dir_path"
+    sudo chmod "$mode" "$dir_path"
+    sudo chown administrator:administrator "$dir_path"
+}
+
+# Function to securely copy and set permissions for files
+secure_copy_file() {
+    local src="$1"
+    local dest="$2"
+    local mode="$3"
+
+    scp "administrator@10.10.100.58:$src" "$dest"
+    sudo chmod "$mode" "$dest"
+    sudo chown administrator:administrator "$dest"
+}
+
 # Log script start with timestamp
 echo "Starting NixOS configuration setup at $(date)"
 
 # Create a temporary nix shell environment for git operations
-# We use nix-shell to ensure git is available and manage the repository
 echo "Setting up git environment and managing repository..."
 nix-shell -p git gnumake --run "$(declare -f manage_git_repo); manage_git_repo"
 
-# Create necessary directories with appropriate permissions
+# Create directory structure with appropriate permissions
 echo "Creating required directories..."
-mkdir -p /home/administrator/nixos-config/host/frametop
-mkdir -p /home/administrator/.ssh
-mkdir -p /home/administrator/.config/sops/age
+create_secure_dir "/home/administrator/nixos-config/host/frametop" 755
+create_secure_dir "/home/administrator/.ssh" 700
+create_secure_dir "/home/administrator/.config/sops/age" 700
 
-# Set restrictive permissions for sensitive directories
-chmod 700 /home/administrator/.ssh
-chmod 700 /home/administrator/.config/sops
-chmod 700 /home/administrator/.config/sops/age
-
-# Copy hardware configuration with root privileges
+# Copy hardware configuration
 echo "Copying hardware configuration..."
-sudo cp /etc/nixos/hardware-configuration.nix /home/administratornixos-config/host/frametop/hardware-configuration.nix
+sudo cp /etc/nixos/hardware-configuration.nix "/home/administrator/nixos-config/host/frametop/hardware-configuration.nix"
+sudo chown administrator:administrator "/home/administrator/nixos-config/host/frametop/hardware-configuration.nix"
 
-# Securely copy SSH keys and SOPS age key with proper permissions
+# Copy security credentials with proper permissions
 echo "Copying security credentials..."
-scp administrator@10.10.100.58:/home/administrator/.ssh/ssh_host_ed25519_key.pub /home/administrator/.ssh/ssh_host_ed25519_key.pub
-scp administrator@10.10.100.58:/home/administrator/.ssh/ssh_host_ed25519_key /home/administrator/.ssh/ssh_host_ed25519_key
-scp administrator@10.10.100.58:/home/administrator/.config/sops/age/keys.txt /home/administrator/.config/sops/age/keys.txt
+secure_copy_file "/home/administrator/.ssh/ssh_host_ed25519_key.pub" \
+    "/home/administrator/.ssh/ssh_host_ed25519_key.pub" 644
+secure_copy_file "/home/administrator/.ssh/ssh_host_ed25519_key" \
+    "/home/administrator/.ssh/ssh_host_ed25519_key" 600
+secure_copy_file "/home/administrator/.config/sops/age/keys.txt" \
+    "/home/administrator/.config/sops/age/keys.txt" 600
 
-# Set appropriate permissions for security files
-echo "Setting secure file permissions..."
-chmod 600 /home/administrator/.ssh/ssh_host_ed25519_key
-chmod 644 /home/administrator/.ssh/ssh_host_ed25519_key.pub
-chmod 600 /home/administrator/.config/sops/age/keys.txt
-
-# Manage system services with proper error handling
+# Manage system services
 echo "Managing systemd services..."
-sudo systemctl stop efi.automount || {
-    echo "Warning: Failed to stop efi.automount service"
-}
-sudo systemctl disable efi.automount || {
-    echo "Warning: Failed to disable efi.automount service"
-}
-sudo systemctl daemon-reload || {
-    echo "Warning: Failed to reload systemd daemon"
-}
+for action in "stop" "disable"; do
+    sudo systemctl $action efi.automount || echo "Warning: Failed to $action efi.automount service"
+done
+sudo systemctl daemon-reload || echo "Warning: Failed to reload systemd daemon"
 
 # Rebuild NixOS configuration
 echo "Rebuilding NixOS configuration..."
 sudo nixos-rebuild test --flake /home/administrator/nixos-config#frametop
 
-# Set up administrator credentials with proper permissions
-echo "Configuring administrator security settings..."
-sudo mkdir -p /home/administrator/.ssh
-sudo mkdir -p /home/administrator/.config/sops/age
-
-# Copy security files to administrator's home
-sudo cp -r /home/administrator/.ssh/* /home/administrator/.ssh/
-sudo cp -r /home/administrator/.config/sops/age/keys.txt /home/administrator/.config/sops/age/
-
-# Set proper ownership and permissions for administrator files
-sudo chown -R administrator:administrator /home/administrator/.ssh
-sudo chown -R administrator:administrator /home/administrator/.config
-sudo chmod 700 /home/administrator/.ssh
-sudo chmod 700 /home/administrator/.config/sops
-sudo chmod 700 /home/administrator/.config/sops/age
-sudo chmod 600 /home/administrator/.ssh/ssh_host_ed25519_key
-sudo chmod 644 /home/administrator/.ssh/ssh_host_ed25519_key.pub
-sudo chmod 600 /home/administrator/.config/sops/age/keys.txt
-
-# Generate password hash with error handling
+# Generate password hash
 echo "Generating password hash..."
 PASSWORD_HASH=$(echo "password" | mkpasswd -s) || {
     echo "Error: Failed to generate password hash"
@@ -114,5 +97,5 @@ PASSWORD_HASH=$(echo "password" | mkpasswd -s) || {
 }
 echo "Password hash: $PASSWORD_HASH"
 
-# Log script completion with timestamp
+# Log script completion
 echo "NixOS configuration setup completed successfully at $(date)"
