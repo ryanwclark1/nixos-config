@@ -16,7 +16,6 @@
     ./nix.nix
     ./nix-ld.nix
     ./openssh.nix
-    # ./optin-persistence.nix
     ./sops.nix
 
   ] ++ (builtins.attrValues outputs.nixosModules);
@@ -52,6 +51,4 @@
       value = "1048576";
     }
   ];
-
-  # services.speechd.enable = lib.mkDefault false;
 }
