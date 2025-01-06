@@ -6,7 +6,7 @@
 
 {
   imports = [
-    inputs.impermanence.nixosModules.home-manager.impermanence
+
     ./style.nix
     ./sops.nix
     ./home.nix
