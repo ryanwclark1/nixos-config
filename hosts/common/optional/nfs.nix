@@ -7,7 +7,7 @@
 {
   nixpkgs.overlays = [
     (
-      final: prev: {
+      _: prev: {
         autofs5 = prev.autofs5.overrideAttrs (_: pattr: {
           patches =
             pattr.patches
