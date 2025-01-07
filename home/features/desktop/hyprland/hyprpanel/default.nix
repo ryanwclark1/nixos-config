@@ -23,7 +23,7 @@
     # Fix the overwrite issue with HyprPanel.
     # See below for more information.
     # Default: false
-    overwrite.enable = false;
+    # overwrite.enable = false;
 
     # Import a specific theme from './themes/*.json'.
     # Default: ""
