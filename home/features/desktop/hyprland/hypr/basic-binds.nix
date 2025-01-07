@@ -11,11 +11,11 @@ let
   code = lib.getExe config.programs.vscode.package;
   defaultApp = type: "${lib.getExe pkgs.handlr-regex} launch ${type}";
   browser = "${pkgs.google-chrome}/bin/google-chrome-stable";
-  remote = lib.getExe (pkgs.writeShellScriptBin "remote" ''
-    socket="$(basename "$(find ~/.ssh -name 'administrator@*' | head -1 | cut -d ':' -f1)")"
-    host="''${socket#master-}"
-    ssh "$host" "$@"
-  '');
+  # remote = lib.getExe (pkgs.writeShellScriptBin "remote" ''
+  #   socket="$(basename "$(find ~/.ssh -name 'administrator@*' | head -1 | cut -d ':' -f1)")"
+  #   host="''${socket#master-}"
+  #   ssh "$host" "$@"
+  # '');
 in
 {
   wayland.windowManager.hyprland.settings = {

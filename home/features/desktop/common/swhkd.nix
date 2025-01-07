@@ -1,8 +1,5 @@
-{ pkgs
-, envir
-, brightnesctrl
-, uservars
-, ...
+{
+  pkgs, envir, brightnesctrl, ...
 }:
 {
   services.swhkd = {

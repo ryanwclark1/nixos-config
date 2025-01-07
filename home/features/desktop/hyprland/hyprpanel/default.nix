@@ -1,5 +1,9 @@
 # *.nix
-{ config, pkgs, inputs, ... }:
+{
+  inputs,
+  ...
+}:
+
 {
   imports = [ inputs.hyprpanel.homeManagerModules.hyprpanel ];
 

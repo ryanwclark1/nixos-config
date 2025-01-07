@@ -2,7 +2,7 @@
 , stdenv
 , fetchurl
 , makeWrapper
-, electron
+# , electron
 , writeShellScript
 , nss
 , alsaLib
