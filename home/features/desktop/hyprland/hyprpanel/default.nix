@@ -13,17 +13,17 @@
     # Useful when updating your config so that you
     # don't need to manually restart it.
     # Default: false
-    systemd.enable = true;
+    # systemd.enable = true;
 
     # Add '/nix/store/.../hyprpanel' to the
     # 'exec-once' in your Hyprland config.
     # Default: false
-    hyprland.enable = true;
+    # hyprland.enable = true;
 
     # Fix the overwrite issue with HyprPanel.
     # See below for more information.
     # Default: false
-    overwrite.enable = true;
+    overwrite.enable = false;
 
     # Import a specific theme from './themes/*.json'.
     # Default: ""
