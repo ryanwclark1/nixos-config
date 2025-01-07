@@ -57,10 +57,10 @@
     terminal = "tmux-256color";
     extraConfig =
     let
-      bg = "default";
-      fg = "default";
-      bg2 = "brightblack";
-      fg2 = "white";
+      # bg = "default";
+      # fg = "default";
+      # bg2 = "brightblack";
+      # fg2 = "white";
       color = c: "#{@${c}}";
 
       indicator = let
