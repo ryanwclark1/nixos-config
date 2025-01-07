@@ -57,6 +57,12 @@
     terminal = "tmux-256color";
     extraConfig =
     let
+      # bg = "default";
+      # fg = "default";
+      # bg2 = "brightblack";
+      # fg2 = "white";
+      color = c: "#{@${c}}";
+
       indicator = let
         accent = color "indicator_color";
         content = "  ";
@@ -154,6 +160,8 @@
           git -C "$1" rev-parse --abbrev-ref HEAD
         '';
       in "#[fg=magenta]#(${icon} #{pane_current_path})#(${branch} #{pane_current_path})";
+
+      separator = "#[fg=${fg}]|";
 
     in
     ''
