@@ -12,7 +12,7 @@
     ./hypridle
     ./hyprlock
     ./hyprpaper
-    ./hyprpanel
+    # ./hyprpanel
     ./rofi
     ./wlogout
     # ./scripts/screenshot.nix
