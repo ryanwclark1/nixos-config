@@ -1,3 +1,11 @@
+{
+  ...
+}:
+
+{
+
+}
+
 # { inputs }: final: prev: {
 #   vscode = prev.vscode.overrideAttrs (_: rec {
 #     version = "1.90.2";
