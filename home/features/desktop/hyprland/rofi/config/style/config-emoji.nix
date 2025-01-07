@@ -1,4 +1,6 @@
-{ ... }:
+{
+  ...
+}:
 
 {
   home.file.".config/rofi/style/config-emoji.rasi" = {

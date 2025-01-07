@@ -1,8 +1,5 @@
 # TODO: Configure XDG_CONFIG_HOME for config directory
 {
-  inputs,
-  lib,
-  config,
   pkgs,
   ...
 }:

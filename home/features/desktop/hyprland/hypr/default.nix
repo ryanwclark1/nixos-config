@@ -5,7 +5,6 @@
   ...
 }:
 let
-  waybar = lib.getExe pkgs.waybar;
   rofi = lib.getExe config.programs.rofi.package;
   hypridle = lib.getExe config.services.hypridle.package;
   wl-paste = "${pkgs.wl-clipboard}/bin/wl-paste";

@@ -10,7 +10,6 @@ with config.stylix.fonts;
 let
   cat = "${pkgs.coreutils}/bin/cat";
   cliphist = "${pkgs.cliphist}/bin/cliphist";
-  hypridle = lib.getExe config.services.hypridle.package;
   hyprlock = lib.getExe config.programs.hyprlock.package;
   terminal = "${pkgs.alacritty}/bin/alacritty";
   missioncenter = "${pkgs.mission-center}/bin/missioncenter";
@@ -18,12 +17,10 @@ let
   nmtui = "${pkgs.networkmanager}/bin/nmtui";
   pwvucontrol = "${pkgs.pwvucontrol}/bin/pwvucontrol";
   wpctl = "${pkgs.wireplumber}/bin/wpctl";
-  rofi = "${pkgs.rofi}/bin/rofi";
   chrome = "${pkgs.google-chrome}/bin/google-chrome-stable";
   firefox = lib.getExe config.programs.firefox.package;
-  # thunar = "${pkgs.thunar}/bin/thunar";
   thunar = "thunar";
-  betterTransition = "all 0.3s cubic-bezier(.55,-0.68,.48,1.682)";
+  # betterTransition = "all 0.3s cubic-bezier(.55,-0.68,.48,1.682)";
 in
 {
 
