@@ -1,7 +1,6 @@
 # This file defines overlays
 {
-  inputs,
-  outputs,
+  # inputs,
   ...
 }:
 
@@ -15,10 +14,10 @@
   # unstable-packages = import ./unstable-packages.nix { inherit inputs; };
 
   # Combined overlays
-  default = final: prev:
+  # default = final: prev:
     # (import ./uv.nix { inherit inputs; }) final prev //
   #   (import ./vscode.nix { inherit inputs; }) final prev //
   #   (import ./newpackage.nix { inherit inputs; }) final prev //
-    (import ./unstable-packages.nix { inherit inputs; }) final prev;
+    # (import ./unstable-packages.nix { inherit inputs; }) final prev;
 }
 
