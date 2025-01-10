@@ -136,7 +136,7 @@
       };
     };
 
-   darwinConfigurations = {
+    darwinConfigurations = {
       mini = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
         specialArgs = {
