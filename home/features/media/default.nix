@@ -6,6 +6,7 @@
 {
   imports = [
     ./aria.nix
+    ./cava.nix
     ./gstreamer.nix
     ./freetube.nix
     ./mpv.nix
@@ -33,7 +34,6 @@
     termusic
     vlc # Media player
     tartube-yt-dlp
-
   ];
 }
 
