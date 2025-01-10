@@ -12,18 +12,19 @@
   programs.ags = {
     enable = true;
     extraPackages = with pkgs; [
-      inputs.ags.packages.x86_64-linux.battery
-      inputs.ags.packages.x86_64-linux.hyprland
-      inputs.ags.packages.x86_64-linux.tray
       inputs.ags.packages.x86_64-linux.apps
+      inputs.ags.packages.x86_64-linux.auth
       inputs.ags.packages.x86_64-linux.battery
       inputs.ags.packages.x86_64-linux.bluetooth
+      inputs.ags.packages.x86_64-linux.cava
+      inputs.ags.packages.x86_64-linux.hyprland
+      inputs.ags.packages.x86_64-linux.io # Astal cli
       inputs.ags.packages.x86_64-linux.mpris
       inputs.ags.packages.x86_64-linux.network
       inputs.ags.packages.x86_64-linux.notifd
       inputs.ags.packages.x86_64-linux.powerprofiles
+      inputs.ags.packages.x86_64-linux.tray
       inputs.ags.packages.x86_64-linux.wireplumber
-      inputs.ags.packages.x86_64-linux.io # Astal cli
     ] ++ (with pkgs; [
       typescript
       dart-sass
