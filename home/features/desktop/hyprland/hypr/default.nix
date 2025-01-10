@@ -11,7 +11,7 @@ let
   cliphist = lib.getExe config.services.cliphist.package;
   steam = "${pkgs.steam}/bin/steam";
   # swaync = "${pkgs.swaynotificationcenter}/bin/swaync";
-  # ags = lib.getExe config.programs.ags.package;
+  ags = lib.getExe config.programs.ags.package;
   pwvucontrol = "${pkgs.pwvucontrol}/bin/pwvucontrol";
   nm-connection-editor = "${pkgs.networkmanagerapplet}/bin/nm-connection-editor";
 in
@@ -49,8 +49,7 @@ in
         "dbus-update-activation-environment --systemd --all"
         "systemctl --user import-environment QT_QPA_PLATFORMTHEME WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "${hypridle} &"
-        # "killall -q ags; sleep .5 && ags run ~/.config/ags/app.ts"
-        # "killall -q ${ags}; sleep .5 && ${ags} -b hypr"
+        "killall -q ags; sleep .5 && ags run ~/.config/ags/app.ts"
         "nm-applet --indicator &"
         "${wl-paste} --watch ${cliphist} store"
         # "systemctl --user start waybar"
