@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+select_from() {
+  local c
+  for c; do
+    if command -v "${c%% *}" &> /dev/null; then
+      echo "$c"
+      return 0
+    fi
+  done
+  return 1
+}
+
+preview=$(select_from 'bat --color=always --style=header,numbers -H {2} {1}' \
+    'awk "BEGIN{a=\"'"{2}"'\";gsub(\"'"'"'\", \"\", a)} NR==(a+0){print \"\033[1;31m\" \$0 \"\033[0m\"; next} {print}" {1}' \
+    'cat {1}')
+
+command=$(select_from 'rg -n --color=always' 'grep -Rn --color=always')
+
+fzf -d: \
+--ansi \
+--query="$1" \
+--phony \
+--bind="change:reload:$command {q}" \
+--bind="start:reload:$command {q}" \
+--bind='enter:execute:$EDITOR {1}' \
+--preview-window='+{2}-/2' \
+--preview="[[ -n {1} ]] && $preview"
