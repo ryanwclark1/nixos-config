@@ -16,21 +16,14 @@
           ignore_dbus_inhibit = false;
           lock_cmd = "pidof hyprlock || hyprlock"; # avoid starting multiple hyprlock instances.
         };
-
         listener = [
           {
-            timeout = 975;                            # 9 min
-            on-timeout = "notify-send 'You are idle!'"; # command to run when timeout has passed
-            on-resume = "notify-send 'Welcome back!'"; # command to run when user is back
-
-          }
-          {
             timeout = 1000;
-            on-timeout = "loginctl lock-session";
+            on-timeout = "hyprlock";
           }
           # dpms
           {
-            timeout = 2000;
+            timeout = 1800;
             on-timeout = "hyprctl dispatch dpms off";
             on-resume = "hyprctl dispatch dpms on";
           }
