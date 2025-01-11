@@ -10,7 +10,6 @@
     ./jq.nix
     ./navi.nix
     # ./neomutt.nix
-    ./network.nix
     ./nixtools.nix
     ./tealdeer.nix
     ./tf.nix

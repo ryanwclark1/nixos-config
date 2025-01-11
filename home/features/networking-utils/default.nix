@@ -15,7 +15,7 @@
     wireguard-tools
     netscanner # A simple network scanner
     mtr # A network diagnostic tool
-    iperf1
+    iperf
     ethtool # A utility for controlling network drivers and hardware
     socat # replacement of openbsd-netcat
   ];
