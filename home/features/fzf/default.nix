@@ -12,6 +12,10 @@
     (pkgs.writeScriptBin "fzf-git" (builtins.readFile ./fzf-git.sh))
     (pkgs.writeScriptBin "rgf" (builtins.readFile ./rgf.sh))
     (pkgs.writeScriptBin "sysz" (builtins.readFile ./sysz.sh))
+    (pkgs.writeScriptBin "dkr" (builtins.readFile ./dkr.sh))
+    (pkgs.writeScriptBin "fzmv" (builtins.readFile ./fzmv.sh))
+    (pkgs.writeScriptBin "igr" (builtins.readFile ./igr.sh))
+    (pkgs.writeScriptBin "wifi" (builtins.readFile ./wifi.sh))
   ];
 
   programs.fzf = {

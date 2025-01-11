@@ -14,5 +14,9 @@
     tcpdump
     wireguard-tools
     netscanner # A simple network scanner
+    mtr # A network diagnostic tool
+    iperf1
+    ethtool # A utility for controlling network drivers and hardware
+    socat # replacement of openbsd-netcat
   ];
 }
