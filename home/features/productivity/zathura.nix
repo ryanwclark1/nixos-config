@@ -2,7 +2,6 @@
   config,
   ...
 }:
-with config.stylix.fonts;
 
 {
   programs.zathura = {
@@ -12,7 +11,7 @@ with config.stylix.fonts;
       ###########
       # Options #
       ###########
-      font = "${monospace.name}";
+      font = "${config.stylix.fonts.monospace.name}";
 
       abort-clear-search = true;
       adjust-open = "best-fit";
