@@ -79,6 +79,5 @@
     enableFishIntegration = lib.mkIf config.programs.fish.enable true;
     enableZshIntegration = lib.mkIf config.programs.zsh.enable true;
     enableNushellIntegration = lib.mkIf config.programs.nushell.enable true;
-
   };
 }

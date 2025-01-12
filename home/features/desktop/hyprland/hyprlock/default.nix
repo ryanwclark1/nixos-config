@@ -1,12 +1,8 @@
 {
   config,
-  lib,
   pkgs,
   ...
 }:
-
-with config.lib.stylix.colors.withHashtag;
-with config.stylix.fonts;
 
 {
   programs = {
