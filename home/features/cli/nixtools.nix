@@ -32,6 +32,7 @@ in
     sops
     nixd
     nil
+    update-script
   ];
 
   programs.nix-index = {
