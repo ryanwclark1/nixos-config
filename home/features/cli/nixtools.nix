@@ -31,6 +31,7 @@ in
     patchelf
     sops
     nixd
+    nil
   ];
 
   programs.nix-index = {
