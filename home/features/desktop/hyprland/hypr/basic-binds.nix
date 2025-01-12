@@ -5,8 +5,7 @@
   ...
 }:
 let
-  # terminal = lib.getExe pkgs.alacritty;
-  terminal = lib.getExe pkgs.kitty;
+  terminal = lib.getExe pkgs.ghosty;
   files = "${pkgs.nautilus}/bin/nautilus";
   code = lib.getExe config.programs.vscode.package;
   defaultApp = type: "${lib.getExe pkgs.handlr-regex} launch ${type}";
