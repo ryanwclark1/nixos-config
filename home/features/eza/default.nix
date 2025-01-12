@@ -25,6 +25,11 @@
     enableIonIntegration = lib.mkIf config.programs.ion.enable true;
   };
 
+  home.file.".config/eza/theme.yml" = {
+    source = ./theme.yml;
+    executable = false;
+  };
+
   home.shellAliases = {
     ls = "eza -a --icons";
     l = "eza -lhg";
