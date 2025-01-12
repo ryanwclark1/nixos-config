@@ -27,7 +27,7 @@
     ../common/optional/webcam.nix
     ../common/optional/wireshark.nix
     ../common/optional/zsh.nix
-    
+
     ../common/optional/gnome
     ../common/optional/displaymanager/gdm.nix
     ../common/optional/hyprland
@@ -41,15 +41,23 @@
     loader = {
       systemd-boot = {
         enable = true;
-        # consoleMode = "keep";
+        consoleMode = "keep";
       };
       efi.canTouchEfiVariables = true;
     };
-    # kernelPackages = pkgs.linuxKernel.packages.linux_6_9;
+    plymouth = {
+      enable = true;
+    };
+    tmp = {
+      cleanOnBoot = true;
+    };
+    kernelPackages = pkgs.linuxKernel.packages.linux_6_12;
     binfmt.emulatedSystems = [ "aarch64-linux" "i686-linux" ];
   };
 
   hardware = {
+    enableAllFirmware = true;
+    enableRedistributableFirmware = true;
     graphics = {
       enable = true;
       enable32Bit = true;
