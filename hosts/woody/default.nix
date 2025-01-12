@@ -55,10 +55,6 @@
     tmp = {
       cleanOnBoot = true;
     };
-    # lanzaboote = {
-    #   enable = true;
-    #   pkiBundle = "/etc/secureboot";
-    # };
     kernelPackages = pkgs.linuxKernel.packages.linux_6_12;
   };
 
