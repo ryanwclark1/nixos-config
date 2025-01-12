@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs,
   ...
 }:
@@ -23,11 +24,18 @@ with config.stylix.fonts;
           fractional_scaling = 2;
         };
 
+        auth = {
+          # fingerprint = lib.mkIf config.services.fprintd.enable true;
+          fingerprint = {
+            enabled = true;
+          };
+        };
+
         # BACKGROUND
         background = {
           # monitor =
           path = "${config.stylix.image}";
-          color = "#${config.lib.stylix.colors.base00}";
+          color = "rgb(48,52,70)";
           blur_passes = 1; # 0 disables blurring
           blur_size = 7;
           noise = 0.0117;
@@ -44,8 +52,8 @@ with config.stylix.fonts;
         label = {
           # monitor =
           text = "$TIME";
-          color = "#${config.lib.stylix.colors.base00}";
-          font_size = 60;
+          color = "rgb(48,52,70)";
+          font_size = 72;
           font_family = "${config.stylix.fonts.sansSerif.name}";
           shadow_passes = 1;
           shadow_size = 1;
@@ -65,17 +73,17 @@ with config.stylix.fonts;
           dots_center = false;
           dots_rounding = -1; # -1 default circle, -2 follow input-field rounding
           # outer_color = $accent;
-          inner_color = "#${config.lib.stylix.colors.base05}";
-          font_color = "#${config.lib.stylix.colors.base00}";
+          inner_color = "rgb(198,208,245)";
+          font_color = "rgb(48,52,70)";
           fade_on_empty = false;
           placeholder_text = "<span><i>󰌾  Logged in as </i><span>$USER</span></span>";
           hide_input = false;
           # check_color = $accent;
-          fail_color = "#${config.lib.stylix.colors.base08}";
+          fail_color = "rgb(231,130,132)";
           fail_text = ''<i>$FAIL <b>($ATTEMPTS)</b></i>'';
-          capslock_color = "#${config.lib.stylix.colors.base0A}";
-          numlock_color = "#${config.lib.stylix.colors.base0A}";
-          bothlock_color = "#${config.lib.stylix.colors.base0A}";
+          capslock_color = "rgb(229,200,144)";
+          numlock_color = "rgb(229,200,144)";
+          bothlock_color = "rgb(229,200,144)";
           position = "0, -100";
           halign = "center";
           valign = "center";
@@ -84,93 +92,4 @@ with config.stylix.fonts;
       };
     };
   };
-
 }
-
-    # USER AVATAR
-    # image {
-    #   monitor =
-    #   path = ~/Pictures/pp/pp.png
-    #   size = 125
-    #   border_color = $accent
-    #   position = 0, -450
-    #   halign = center
-    #   valign = center
-    # }
-
-#   # wallpaper
-#   background {
-#       monitor =
-#       path = ${wallpaper.package}/${wallpaper.name}   # supports png, jpg, webp (no animations, though)
-#       color = ${mkRGBA colors.background 1.0}
-#       blur_passes = 1 # 0 disables blurring
-#       blur_size = 7
-#       noise = 0.0117
-#       contrast = 0.8916
-#       brightness = 0.8172
-#       vibrancy = 0.1696
-#       vibrancy_darkness = 0.0
-#   }
-
-#   shape {
-#       monitor =
-#       size = 1200, 800
-#       color = ${mkRGBA colors.background 0.5}
-#       rounding = ${builtins.toString radius}
-#       border_size = 0
-#       rotate = 0
-#       xray = false # if true, make a "hole" in the background (rectangle of specified size, no rotation)
-#       position = 150, 0
-#       halign = left
-#       valign = center
-#       shadow_passes = 3
-#   }
-
-
-#   # avatar picture
-#   image {
-#       monitor =
-#       path = /home/vagahbond/Pictures/avatar.png
-#       size = 600 # lesser side if not 1:1 ratio
-#       rounding = -1 # negative values mean circle
-#       border_size = 0
-#       border_color =${mkRGB colors.accent}
-#       reload_time = -1 # seconds between reloading, 0 to reload with SIGUSR2
-#       position = 650, 0
-#       halign = center
-#       valign = center
-#       shadow_passes = 3
-#   }
-
-
-#   # input field, just in case
-#   input-field {
-#       monitor =
-#       size = 400, 50
-#       outline_thickness = 1
-#       dots_size = 0.33 # Scale of input-field height, 0.2 - 0.8
-#       dots_spacing = 0.15 # Scale of dots' absolute size, 0.0 - 1.0
-#       dots_center = false
-#       dots_rounding = -1 # -1 default circle, -2 follow input-field rounding
-#       outer_color = ${mkRGB colors.accent}
-#       inner_color = ${mkRGB colors.background}
-#       font_color = ${mkRGB colors.text}
-#       fade_on_empty = true
-#       fade_timeout = 1000 # Milliseconds before fade_on_empty is triggered.
-#       placeholder_text = <i>Input Password...</i> # Text rendered in the input box when it's empty.
-#       hide_input = false
-#       rounding = ${builtins.toString radius} # -1 means complete rounding (circle/oval)
-#       check_color = ${mkRGB colors.warning}
-#       fail_color = ${mkRGB colors.bad} # if authentication failed, changes outer_color and fail message color
-#       fail_text = <i>$FAIL <b>($ATTEMPTS)</b></i> # can be set to empty
-#       fail_transition = 300 # transition time in ms between normal outer_color and fail_color
-#       capslock_color = ${mkRGB colors.warning}
-#       numlock_color = -1
-#       bothlock_color = -1 # when both locks are active. -1 means don't change outer color (same for above)
-#       invert_numlock = false # change color if numlock is off
-#       swap_font_color = false # see below
-#       position = -150, -300
-#       halign = center
-#       valign = center
-#       shadow_passes = 3
-#   }
