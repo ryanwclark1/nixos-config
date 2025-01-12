@@ -10,7 +10,7 @@
       package = pkgs.remmina;
       addRdpMimeTypeAssoc = true;
       systemdService = {
-        enable = true;
+        enable = false;
         # startupFlags = [
         #   "--icon"
         # ];

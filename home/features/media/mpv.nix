@@ -17,6 +17,7 @@
             mpvScripts.autoload
             mpvScripts.uosc
             mpvScripts.thumbfast
+            mpvScripts.mpv-notify-send
           ]);
       };
     };
