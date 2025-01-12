@@ -1,6 +1,5 @@
 # Configs https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md
 {
-  config,
   pkgs,
   ...
 }:
@@ -17,36 +16,36 @@
         };
         theme = {
           activeBorderColor = [
-            "${config.lib.stylix.colors.withHashtag.base07}"
+            "#ca9ee6"
             "bold"
           ];
           inactiveBorderColor = [
-            "${config.lib.stylix.colors.withHashtag.base04}"
+            "#a5adce"
           ];
           optionsTextColor = [
-            "${config.lib.stylix.colors.withHashtag.base0D}"
+            "#8caaee"
           ];
           selectedLineBgColor = [
-            "${config.lib.stylix.colors.withHashtag.base02}"
+            "#414559"
           ];
           cherryPickedCommitBgColor = [
-            "${config.lib.stylix.colors.withHashtag.base03}"
+            "#51576d"
           ];
           cherryPickedCommitFgColor = [
-            "${config.lib.stylix.colors.withHashtag.base07}"
+            "#ca9ee6"
           ];
           unstagedChangesColor = [
-            "${config.lib.stylix.colors.withHashtag.base08}"
+            "#e78284}"
           ];
           defaultFgColor = [
-            "${config.lib.stylix.colors.withHashtag.base05}"
+            "#c6d0f5"
           ];
           searchingActiveBorderColor = [
-            "${config.lib.stylix.colors.withHashtag.base0A}"
+            "#e5c890"
           ];
         };
         authorColors = {
-          "*" = "${config.lib.stylix.colors.withHashtag.base07}";
+          "*" = "#babbf1";
         };
       };
     };
