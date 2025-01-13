@@ -1,9 +1,9 @@
 {
-  config,
+  pkgs,
   lib,
+  config,
   ...
-}:
-let
+}: let
   mbsync = "${config.programs.mbsync.package}/bin/mbsync";
   pass = "${config.programs.password-store.package}/bin/pass";
 
@@ -17,36 +17,38 @@ let
       '';
     };
   };
-in
-{
+in {
+  # home.persistence = {
+  #   "/persist/${config.home.homeDirectory}".directories = ["Mail"];
+  # };
 
   accounts.email = {
     maildirBasePath = "Mail";
     accounts = {
-      accent =
+      personal =
         rec {
           primary = true;
           address = "ryanc@accentservices.com";
           flavor = "gmail.com";
-          realName = "Ryan Clark";
-          userName = address;
-          # userName = config.sops.secrets."accent-email/accent-email-username".path;
-          # passwordCommand = ''
-          #   ${pkgs.coreutils}/bin/cat ${config.sops.secrets."accent-email/accent-email-password".path}
-          # '';
-        passwordCommand = "${pass} ${smtp.host}/${address}";
-          imap = {
-            host = "imap.gmail.com";
-            port = 993;
+          userName = "ryanc@accentservices.com";
+
+
+          passwordCommand = "${pass} ${smtp.host}/${address}";
+
+          imap.host = "mail.m7.rs";
+          mbsync = {
+            enable = true;
+            create = "maildir";
+            expunge = "both";
           };
-          smtp = {
-            host = config.sops.secrets."accent-email/accent-email-smtp-host".path;
-            port = 465;
+          folders = {
+            inbox = "Inbox";
+            drafts = "Drafts";
+            sent = "Sent";
+            trash = "Trash";
           };
           neomutt = {
             enable = true;
-            mailboxType = "imap";
-            showDefaultMailbox = true;
             extraMailboxes = [
               "Archive"
               "Drafts"
@@ -55,27 +57,26 @@ in
               "Trash"
             ];
           };
+
+
+          smtp.host = "mail.m7.rs";
+          userName = address;
+        }
+        // common;
+
+      college =
+        rec {
+          address = "g.fontes@usp.br";
+          passwordCommand = "${pass} ${smtp.host}/${address}";
+
           msmtp.enable = true;
+          smtp.host = "smtp.gmail.com";
+          userName = address;
         }
         // common;
     };
   };
-  # programs.neomutt = {
-  #   enable = true;
-  #   package = pkgs.neomutt;
-  #   editor = "$EDITOR";
-  #   vimKeys = true;
-  # };
 
-  # home.file = {
-  #   ".config/accent-email" = {
-  #     text =
-  #       ''
-  #         password = ''$(${pkgs.coreutils}/bin/cat ${config.sops.secrets."accent-email/accent-email-password".path}')'
-  #         username = ${config.sops.secrets."accent-email/accent-email-username".key}
-  #     '';
-  #   };
-  # };
   programs.mbsync.enable = true;
   programs.msmtp.enable = true;
 
@@ -83,8 +84,13 @@ in
     Unit = {
       Description = "mbsync synchronization";
     };
-    Service =  {
+    Service = let
+      gpgCmds = import ../cli/gpg-commands.nix {inherit pkgs;};
+    in {
       Type = "oneshot";
+      ExecCondition = ''
+        /bin/sh -c "${gpgCmds.isUnlocked}"
+      '';
       ExecStart = "${mbsync} -a";
     };
   };
