@@ -15,11 +15,11 @@
     [ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh"
   '';
 
-  home = {
-    sessionVariables = {
-      TERMINAL = "kitty -1";
-    };
-  };
+  # home = {
+  #   sessionVariables = {
+  #     TERMINAL = "kitty -1";
+  #   };
+  # };
   programs.kitty = {
     enable = true;
     package = pkgs.kitty;

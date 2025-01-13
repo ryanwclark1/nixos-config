@@ -1,13 +1,18 @@
 {
   inputs,
-  pkgs,
   ...
 }:
 let
   ghostty = inputs.ghostty.packages.x86_64-linux.default;
 in
 {
-  home.packages = (with pkgs; [ ghostty ]);
+  home.packages = (
+    [ ghostty ]
+  );
+
+  home.sessionVariables = {
+      TERMINAL = "ghostty";
+    };
 
   xdg.configFile."ghostty/config".text = ''
     # Font
