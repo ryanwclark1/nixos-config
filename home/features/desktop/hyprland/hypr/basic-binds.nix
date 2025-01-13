@@ -5,7 +5,6 @@
   ...
 }:
 let
-  terminal = lib.getExe pkgs.ghosty;
   files = "${pkgs.nautilus}/bin/nautilus";
   code = lib.getExe config.programs.vscode.package;
   defaultApp = type: "${lib.getExe pkgs.handlr-regex} launch ${type}";
@@ -59,7 +58,7 @@ in
           # "SUPER ALT,Return,exec,${remote} ${defaultApp "x-scheme-handler/terminal"}"
           # "SUPER ALT,e,exec,${remote} ${defaultApp "text/plain"}"
           # "SUPER ALT,b,exec,${remote} ${defaultApp "x-scheme-handler/https"}"
-          "SUPER, Return, exec, ${terminal}" # xterm is a symlink, not actually xterm
+          "SUPER, Return, exec, ghostty" # xterm is a symlink, not actually xterm
           "SUPER, W, exec, ${browser}"
         ]
       )
