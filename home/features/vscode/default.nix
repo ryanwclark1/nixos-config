@@ -165,12 +165,6 @@
           sha256 = "sha256-EB3ggxo2NqiH8yVpsNzDRb+fvsd6Qd5aXRM6FoZn5k8=";
           version = "2.1.0";
         }
-        # {
-        #   name = "tailwind-fold";
-        #   publisher = "stivo";
-        #   sha256 = "sha256-yH3eA5jgBwxqnpFQkg91KQMkQps5iM1v783KQkQcWUU=";
-        #   version = "0.2.0";
-        # }
         {
           name = "templ";
           publisher = "a-h";

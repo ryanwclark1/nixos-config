@@ -44,6 +44,7 @@
     ./features/tmux
     ./features/virtualisation
     ./features/vscode
+    ./features/wireless
     ./features/yazi
     ./features/zed
     ./features/zellij
