@@ -85,7 +85,7 @@
       inputbar-fg = "rgba(198,208,245,1)";
       inputbar-bg = "rgba(65,69,89,1)";
 
-      recolor = "true";
+      recolor = true;
       recolor-lightcolor = "rgba(48,52,70,1)";
       recolor-darkcolor = "rgba(198,208,245,1)";
 
