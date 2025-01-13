@@ -20,6 +20,7 @@
     ./features/lazygit
     ./features/networking-utils
     ./features/nixvim
+    ./features/pass
     ./features/ripgrep
     ./features/shell
     ./features/starship
