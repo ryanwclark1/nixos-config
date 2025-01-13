@@ -17,12 +17,10 @@ in
       extraPackages = with pkgs; [
         lua-language-server
         gopls
-        xclip
         wl-clipboard
         luajitPackages.lua-lsp
         nil
         rust-analyzer
-        #nodePackages.bash-language-server
         yaml-language-server
         pyright
         marksman
