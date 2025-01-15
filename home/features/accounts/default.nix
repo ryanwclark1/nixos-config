@@ -34,15 +34,15 @@ in
           # passwordCommand = ''
           #   ${pkgs.coreutils}/bin/cat ${config.sops.secrets."accent-email/accent-email-password".path}
           # '';
-        passwordCommand = "${pass} ${smtp.host}/${address}";
+          smtp = {
+            host = "smtp.gmail.com";
+            port = 465;
+          };
           imap = {
             host = "imap.gmail.com";
             port = 993;
           };
-          smtp = {
-            host = config.sops.secrets."accent-email/accent-email-smtp-host".path;
-            port = 465;
-          };
+          passwordCommand = "${pass} ${smtp.host}/${address}";
           neomutt = {
             enable = true;
             mailboxType = "imap";
