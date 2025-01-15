@@ -30,25 +30,25 @@ in {
           primary = true;
           address = "ryanc@accentservices.com";
           flavor = "gmail.com";
-          userName = "ryanc@accentservices.com";
-
-
+          realName = "Ryan Clark";
+          userName = address;
+          # userName = config.sops.secrets."accent-email/accent-email-username".path;
+          # passwordCommand = ''
+          #   ${pkgs.coreutils}/bin/cat ${config.sops.secrets."accent-email/accent-email-password".path}
+          # '';
+          smtp = {
+            host = "smtp.gmail.com";
+            port = 465;
+          };
+          imap = {
+            host = "imap.gmail.com";
+            port = 993;
+          };
           passwordCommand = "${pass} ${smtp.host}/${address}";
-
-          imap.host = "mail.m7.rs";
-          mbsync = {
-            enable = true;
-            create = "maildir";
-            expunge = "both";
-          };
-          folders = {
-            inbox = "Inbox";
-            drafts = "Drafts";
-            sent = "Sent";
-            trash = "Trash";
-          };
           neomutt = {
             enable = true;
+            mailboxType = "imap";
+            showDefaultMailbox = true;
             extraMailboxes = [
               "Archive"
               "Drafts"
@@ -57,21 +57,7 @@ in {
               "Trash"
             ];
           };
-
-
-          smtp.host = "mail.m7.rs";
-          userName = address;
-        }
-        // common;
-
-      college =
-        rec {
-          address = "g.fontes@usp.br";
-          passwordCommand = "${pass} ${smtp.host}/${address}";
-
           msmtp.enable = true;
-          smtp.host = "smtp.gmail.com";
-          userName = address;
         }
         // common;
     };
@@ -84,13 +70,8 @@ in {
     Unit = {
       Description = "mbsync synchronization";
     };
-    Service = let
-      gpgCmds = import ../cli/gpg-commands.nix {inherit pkgs;};
-    in {
+    Service =  {
       Type = "oneshot";
-      ExecCondition = ''
-        /bin/sh -c "${gpgCmds.isUnlocked}"
-      '';
       ExecStart = "${mbsync} -a";
     };
   };
