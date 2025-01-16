@@ -6,7 +6,7 @@
 
 {
   home.packages = with pkgs; [
-    ghostty
+    code-cursor
   ];
 
   # xdg.configFile."ghostty/config".text = ''
