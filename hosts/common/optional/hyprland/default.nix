@@ -1,4 +1,5 @@
 {
+  inputs,
   lib,
   pkgs,
   ...
@@ -18,14 +19,9 @@
   programs = {
     hyprland = {
       enable = true;
-      package = (pkgs.hyprland.override { # or inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland
-        enableXWayland = true;  # whether to enable XWayland
-        legacyRenderer = false; # whether to use the legacy renderer (for old GPUs)
-        withSystemd = true;     # whether to build with systemd support
-      });
-      # systemd.setPath.enable = true;
-      # xwayland.enable = true;
-      # portalPackage = pkgs.xdg-desktop-portal-hyprland;
+      package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+      # make sure to also set the portal package, so that they are in sync
+      portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
     };
     mtr.enable = true;
     gnupg.agent = {
