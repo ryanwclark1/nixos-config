@@ -11,11 +11,28 @@
 
   xdg = {
     enable = true;
+    mime.enable = true;
     configFile."mimeapps.list".force = true;
     cacheHome = "${config.home.homeDirectory}/.local/cache";
     configHome = "${config.home.homeDirectory}/.config";
     dataHome = "${config.home.homeDirectory}/.local/share";
     stateHome = "${config.home.homeDirectory}/.local/state";
+    portal = {
+      enable = true;
+      xdgOpenUsePortal = true;
+      extraPortals = with pkgs; [
+        xdg-desktop-portal-gtk
+        xdg-desktop-portal-hyprland
+      ];
+      config = {
+        common = {
+          default = [
+            "hyprland"
+            "gtk"
+          ];
+        };
+      };
+    };
     systemDirs = {
       config = [ "${config.home.homeDirectory}/.config" ];
       data = [ "${config.home.homeDirectory}/.local/share" "/usr/share" "/usr/share/applications/" "/usr/local/share/applications/" ];

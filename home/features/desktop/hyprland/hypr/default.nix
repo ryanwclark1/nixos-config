@@ -11,7 +11,7 @@ let
   cliphist = lib.getExe config.services.cliphist.package;
   steam = "${pkgs.steam}/bin/steam";
   # swaync = "${pkgs.swaynotificationcenter}/bin/swaync";
-  ags = lib.getExe config.programs.ags.package;
+  # ags = lib.getExe config.programs.ags.package;
   pwvucontrol = "${pkgs.pwvucontrol}/bin/pwvucontrol";
   nm-connection-editor = "${pkgs.networkmanagerapplet}/bin/nm-connection-editor";
 in
