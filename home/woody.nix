@@ -16,6 +16,7 @@
     ./features/bat
     ./features/cli
     ./features/compression
+    ./features/cursor
     ./features/discord
     ./features/development
     ./features/eza
