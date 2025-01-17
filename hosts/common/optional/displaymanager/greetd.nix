@@ -1,54 +1,33 @@
 {
   config,
   lib,
-  pkgs,
   ...
-}:
-let
-  homeCfgs = config.home-manager.users;
-  homeSharePaths = lib.mapAttrsToList (_: v: "${v.home.path}/share") homeCfgs;
-  vars = ''XDG_DATA_DIRS="$XDG_DATA_DIRS:${lib.concatStringsSep ":" homeSharePaths}" GTK_USE_PORTAL=0'';
-
-  adminCfg = homeCfgs.admin;
-  gtkTheme = adminCfg.gtk.theme;
-  iconTheme = adminCfg.gtk.iconTheme;
-  wallpaper = adminCfg.wallpaper;
-
-  sway-kiosk = command: "${lib.getExe pkgs.sway} --config ${pkgs.writeText "kiosk.config" ''
-    output * bg #000000 solid_color
-    xwayland disable
-    input "type:touchpad" {
-      tap enabled
-    }
-    exec '${vars} ${command}; ${pkgs.sway}/bin/swaymsg exit'
-  ''}";
-in
-{
-  users.extraUsers.greeter = {
-    packages = [
-      gtkTheme.package
-      iconTheme.package
-    ];
-    # For caching and such
-    home = "/tmp/greeter-home";
-    createHome = true;
-  };
-
-  programs.regreet = {
+}: {
+  # greetd display manager
+  services.greetd = let
+    session = {
+      command = "${lib.getExe config.programs.uwsm.package} start hyprland-uwsm.desktop";
+      user = "administrator";
+    };
+  in {
     enable = true;
     settings = {
-      GTK = {
-        icon_theme_name = "Papirus";
-        theme_name = gtkTheme.name;
-      };
-      background = {
-        path = wallpaper;
-        fit = "Cover";
-      };
+      terminal.vt = 1;
+      default_session = session;
+      initial_session = session;
     };
   };
-  services.greetd = {
+
+  programs.uwsm = {
     enable = true;
-    settings.default_session.command = sway-kiosk (lib.getExe config.programs.regreet.package);
+    waylandCompositors.hyprland = {
+      binPath = "/run/current-system/sw/bin/Hyprland";
+      prettyName = "Hyprland";
+      comment = "Hyprland managed by UWSM";
+    };
   };
+
+  # unlock GPG keyring on login
+  # disabled as it doesn't work with autologin
+  security.pam.services.greetd.enableGnomeKeyring = true;
 }
