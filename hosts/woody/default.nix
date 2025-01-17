@@ -18,6 +18,7 @@
     ../common/optional/bluetooth.nix
     ../common/optional/direnv.nix
     ../common/optional/docker.nix
+    ../common/optional/gnome-services.nix
     ../common/optional/nautilus.nix
     ../common/optional/nfs.nix
     ../common/optional/printing.nix
