@@ -62,7 +62,8 @@
       defaultApplications =
         let
           browser = [
-            "chrome.desktop"
+            "zen.desktop"
+            "google-chrome.desktop"
             "firefox.desktop"
             "chromium.desktop"
           ];
