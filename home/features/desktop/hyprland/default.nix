@@ -55,6 +55,7 @@
     grimblast
     gtk3
     gtk4
+    handlr-regex
     hyprpicker
     mission-center
     networkmanagerapplet
