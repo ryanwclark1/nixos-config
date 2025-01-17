@@ -55,6 +55,7 @@
 
   environment.systemPackages = with pkgs; [
       pwvucontrol
+      pulsemixer
       alsa-lib
       alsa-utils
   ];
