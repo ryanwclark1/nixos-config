@@ -28,15 +28,15 @@
       render-loading = true;
 
       scroll-hstep = -1;
-      scroll-step = 40;
-      scroll-full-overlap = 0;
+      scroll-step = "100";
+      scroll-full-overlap = "0.01";
       scroll-wrap = false;
 
       show-directories = true;
       show-hidden = true;
       show-recent = 10;
 
-      scroll-page-aware = false;
+      scroll-page-aware = true;
       smooth-scroll = false;
 
       link-zoom = true;

@@ -30,7 +30,6 @@
     # inkscape # Vector graphics editor
     # kdenlive # Video editor
     # krita # Digital painting
-    spotify
     termusic
     vlc # Media player
   ];
