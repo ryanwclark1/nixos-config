@@ -6,6 +6,7 @@
 {
   inputs,
   config,
+  lib,
   ...
 }: {
   imports = [inputs.impermanence.nixosModules.impermanence];
