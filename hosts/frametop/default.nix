@@ -49,9 +49,9 @@
     plymouth = {
       enable = true;
     };
-    tmp = {
-      cleanOnBoot = true;
-    };
+    # tmp = {
+    #   cleanOnBoot = true;
+    # };
     kernelPackages = pkgs.linuxKernel.packages.linux_6_12;
     binfmt.emulatedSystems = [ "aarch64-linux" "i686-linux" ];
   };
