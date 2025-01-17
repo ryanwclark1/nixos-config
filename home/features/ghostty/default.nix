@@ -27,7 +27,7 @@ in
 
     # Theme
     theme = "catppuccin-mocha"
-    background-opacity = 0.8
+    background-opacity = 0.7
 
     cursor-style = bar
     cursor-style-blink = true
