@@ -49,17 +49,15 @@ in
 
       hashedPasswordFile = config.sops.secrets.administrator-password.path;
 
-      packages = [ pkgs.home-manager ];
+      packages = [
+        pkgs.home-manager
+      ];
     };
   };
 
   nix.settings.trusted-users = [ "${user}" ];
 
   home-manager.users."${user}" = import ../../../../home/${config.networking.hostName}.nix;
-
-  # security.pam.services = {
-  #   swaylock = {};
-  # };
 
     # Persist entire home
   # environment.persistence = {};
