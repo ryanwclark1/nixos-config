@@ -43,14 +43,6 @@
             right = 2;
             left = 0;
           };
-          # width = 40; # 22
-          # height = 25; # 11
-        };
-        display = {
-          # color = {
-          #   keys = "35";
-          #   output = "90";
-          # };
         };
         modules = [
           "break"
@@ -129,27 +121,6 @@
             type = "custom";
             format = "└────────────────────────────────────────────────────┘";
           }
-          # "break"
-          # {
-          #   type = "custom";
-          #   format = "┌────────────────────Uptime/Age────────────────────┐";
-          # }
-          # {
-          #   type = "command";
-          #   key = " 󱦟 OS Age ";
-          #   keyColor = "magenta";
-          #   text = "birth_install=$(stat -c %W /); current=$(date +%s); time_progression=$((current - birth_install)); days_difference=$((time_progression / 86400)); echo $days_difference days";
-          # }
-          # {
-          #   type = "uptime";
-          #   key = " 󱫐 Uptime ";
-          #   keyColor = "magenta";
-          # }
-          # {
-          #   type = "custom";
-          #   format = "└──────────────────────────────────────────────────┘";
-          # }
-          # "break"
           {
             type = "custom";
             format = "┌──────────────────────Network───────────────────────┐";
