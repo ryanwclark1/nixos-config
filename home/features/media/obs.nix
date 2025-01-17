@@ -5,7 +5,7 @@
 
 {
   programs.obs-studio = {
-    enable = true;
+    enable = false;
     package = pkgs.obs-studio;
     plugins = with pkgs.obs-studio-plugins; [
       wlrobs

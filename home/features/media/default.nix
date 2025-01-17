@@ -11,8 +11,9 @@
     ./freetube.nix
     ./mpv.nix
     ./ncmp.nix
-    # ./obs.nix
+    ./obs.nix
     ./playerctl.nix
+    ./spotify.nix
     ./yt-dlp.nix
   ];
 

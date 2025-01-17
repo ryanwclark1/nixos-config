@@ -17,5 +17,4 @@
   home.packages = with pkgs; [
     espeak-classic
   ];
-
 }
