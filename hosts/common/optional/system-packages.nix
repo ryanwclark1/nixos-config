@@ -8,7 +8,7 @@
 {
   environment.systemPackages = with pkgs; [
     sbctl # Secure Boot key manager
-    gitMinimal
+    git
     wget
     lm_sensors # Tools for reading hardware sensors
     pciutils # lspci
