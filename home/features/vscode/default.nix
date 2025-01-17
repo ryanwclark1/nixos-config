@@ -135,24 +135,24 @@
           sha256 = "sha256-hij0nA/MAi7pelI0aMWAHD1YWEmJaON7/psIIUJeJc8=";
           version = "0.9.5";
         }
-        {
-          name = "sqltools";
-          publisher = "mtxr";
-          sha256 = "sha256-bTrHAhj8uwzRIImziKsOizZf8+k3t+VrkOeZrFx7SH8=";
-          version = "0.28.3";
-        }
-        {
-          name = "sqltools-driver-pg";
-          publisher = "mtxr";
-          sha256 = "sha256-XnPTMFNgMGT2tJe8WlmhMB3DluvMZx9Ee2w7xMCzLYM=";
-          version = "0.5.4";
-        }
-        {
-          name = "sqltools-driver-sqlite";
-          publisher = "mtxr";
-          sha256 = "sha256-wFgb6wDSgPbPtEVKbHcUeURqbVAqDsEEhFUcBhQtmF8=";
-          version = "0.5.1";
-        }
+        # {
+        #   name = "sqltools";
+        #   publisher = "mtxr";
+        #   sha256 = "sha256-bTrHAhj8uwzRIImziKsOizZf8+k3t+VrkOeZrFx7SH8=";
+        #   version = "0.28.3";
+        # }
+        # {
+        #   name = "sqltools-driver-pg";
+        #   publisher = "mtxr";
+        #   sha256 = "sha256-XnPTMFNgMGT2tJe8WlmhMB3DluvMZx9Ee2w7xMCzLYM=";
+        #   version = "0.5.4";
+        # }
+        # {
+        #   name = "sqltools-driver-sqlite";
+        #   publisher = "mtxr";
+        #   sha256 = "sha256-wFgb6wDSgPbPtEVKbHcUeURqbVAqDsEEhFUcBhQtmF8=";
+        #   version = "0.5.1";
+        # }
         {
           name = "tailwind-color-matcher";
           publisher = "OmriGrossman";
