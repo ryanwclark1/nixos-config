@@ -1,8 +1,8 @@
 local M = {}
 
-function M:peek()
+function M:peek(job)
 	local child
-	local l = self.file.cha.length
+	local l = self.file.cha.len
 	if l == 0 then
 		child = Command("hexyl")
 			:args({
@@ -49,7 +49,7 @@ function M:peek()
 		)
 	else
 		lines = lines:gsub("\t", string.rep(" ", PREVIEW.tab_size))
-		ya.preview_widgets(self, { ui.Paragraph.parse(self.area, lines) })
+		ya.preview_widgets(self, { ui.Text.parse(self.area, lines) })
 	end
 end
 
