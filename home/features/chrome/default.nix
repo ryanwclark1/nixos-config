@@ -4,8 +4,10 @@
 }:
 
 {
-  home.packages = with pkgs; [
-    google-chrome
+  home.packages = [
+    (pkgs.google-chrome-stable.override {
+      commandLineArgs = "--enable-features=UseOzonePlatform --ozone-platform=wayland --force-dark-mode";
+    })
   ];
 
   home.shellAliases = {
