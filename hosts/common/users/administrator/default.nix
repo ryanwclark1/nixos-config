@@ -8,7 +8,7 @@ let
   user = "administrator";
 in
 {
-  imports = [ ./packages.nix ];
+  # imports = [ ./packages.nix ];
 
   sops.secrets.administrator-password = {
     sopsFile = ../../../../secrets/secrets.yaml;
