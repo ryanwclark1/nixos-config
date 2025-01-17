@@ -15,6 +15,7 @@
     ./features/bat
     ./features/cli
     ./features/compression
+    ./features/cursor
     ./features/discord
     ./features/development
     ./features/eza
@@ -47,6 +48,7 @@
     ./features/wireless
     ./features/yazi
     ./features/zed
+    ./features/zen
     ./features/zellij
     ./features/zoxide
   ];
