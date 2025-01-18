@@ -47,13 +47,13 @@
       hide-preview = ./plugins/hide-preview.yazi;
       lazygit = ./plugins/lazygit.yazi;
       max-preview = ./plugins/max-preview.yazi;
+      # https://github.com/boydaihungst/mediainfo.yazi
       mediainfo = ./plugins/mediainfo.yazi;
       ouch = ./plugins/ouch.yazi;
       parent-arrow = ./plugins/parent-arrow.yazi;
       smart-enter = ./plugins/smart-enter.yazi;
       smart-filter = ./plugins/smart-filter.yazi;
       smart-paste = ./plugins/smart-paste.yazi;
-      starship = ./plugins/starship.yazi;
       yatline = ./plugins/yatline.yazi;
       yatline-catppuccin = ./plugins/yatline-catppuccin.yazi;
       yatline-githead = ./plugins/yatline-githead.yazi;
