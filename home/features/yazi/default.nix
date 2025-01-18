@@ -40,7 +40,6 @@
       excel = ./plugins/excel.yazi;
       eza-preview = ./plugins/eza-preview.yazi;
       folder-rules = ./plugins/folder-rules.yazi;
-      full-border = ./plugins/full-border.yazi;
       fzfbm = ./plugins/fzfbm.yazi;
       glow = ./plugins/glow.yazi;
       hexyl = ./plugins/hexyl.yazi;
