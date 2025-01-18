@@ -35,8 +35,8 @@
     ventoy-full #balena type tool
     waypipe # Network proxy for Wayland clients (applications)
     webkitgtk_6_0 # Web rendering engine
-    # wf-recorder # Utility program for screen recording of wlroots-based compositors
-    # wl-clipboard # Wayland clipboard
+    wf-recorder # Utility program for screen recording of wlroots-based compositors
+    wl-clipboard # Wayland clipboard
     ydotool # Command-line tool for automation which emulates input devices
   ];
 }
