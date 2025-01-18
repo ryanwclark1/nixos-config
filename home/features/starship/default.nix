@@ -13,52 +13,53 @@ with config.lib.stylix.colors.withHashtag;
     # interactiveOnly = false;
     # Configuration written to ~/.config/starship.toml
     settings = {
-      format = "[](${base0E})\$os\$username\$hostname\$localip\${custom.yazi}\[](bg:${base07} fg:${base0E})\$directory\[](fg:${base07} bg:${base05})\$git_branch\$git_status\[](fg:${base05} bg:${base0F})\$bun\$c\$cmake\$dart\$golang\$haskell\$java\$kotlin\$kubernetes\$lua\$nodejs\$php\$python\$rust\$swift\$zig[](fg:${base0F} bg:${base06})\$docker_context\[](fg:${base06})\$line_break$character";
-      # right_format = "[](${base0E})\$time\[](${base0E})";
-      add_newline = false;
+      format = "[](${base0E})\$os\$username\$hostname\$localip\${custom.yazi}\[](bg:${base07} fg:${base0E})\$directory\[](fg:${base07} bg:${base05})\$git_branch\$git_status\[](fg:${base05} bg:${base0F})\$bun\$c\$cmake\$dart\$golang\$haskell\$java\$kotlin\$kubernetes\$lua\$nodejs\$php\$python\$rust\$swift\$zig[](fg:${base0F} bg:${base06})\$docker_context\$nix_shell\[](fg:${base06})\$fill\[](${base0E})\$time\[](${base0E})\$line_break$character";
+      add_newline = true;
       line_break.disabled = false;
       scan_timeout = 30;
       command_timeout = 500;
       follow_symlinks = true;
-      aws.disabled = true;
-      gcloud.disabled = true;
       azure.disabled = true;
 
       os = {
         disabled = false;
         style = "bg:${base0E} fg:${base00}";
+        format = "[$symbol]($style)";
         symbols = {
-          AlmaLinux = "";
-          Alpine = "";
+          AlmaLinux = " ";
+          Alpine = " ";
           Amazon = "";
           Android = "";
           Arch = "󰣇";
           Artix = "󰣇";
-          CentOS = "";
-          Debian = "󰣚";
-          Fedora = "󰣛";
-          FreeBSD = "";
-          Gentoo = "󰣨";
+          CentOS = " ";
+          Debian = "󰣚 ";
+          Fedora = "󰣛 ";
+          FreeBSD = " ";
+          Gentoo = "󰣨 ";
           Kali = " ";
-          Linux = "󰌽";
-          Macos = "󰀵";
-          Manjaro = "";
-          Mint = "󰣭";
-          NixOS = "";
+          Linux = "󰌽 ";
+          Macos = "󰀵 ";
+          Manjaro = " ";
+          Mint = "󰣭 ";
+          NixOS = " ";
           Pop = " ";
-          Raspbian = "󰐿";
-          Redhat = "󱄛";
-          RedHatEnterprise = "󱄛";
+          Raspbian = " ";
+          Redhat = " ";
+          RedHatEnterprise = "󱄛 ";
+          RockyLinux = " ";
           SUSE = " ";
-          Ubuntu = "󰕈";
-          Windows = "󰍲";
+          Ubuntu = "󰕈 ";
+          Unknown = "";
+          Void = " ";
+          Windows = "󰍲 ";
         };
       };
 
       username = {
         show_always = true;
         disabled = false;
-        detect_env_var = [
+        detect_env_vars = [
           "SSH_CONNECTION"
           "SSH_CLIENT"
           "SSH_TTY"
@@ -104,27 +105,29 @@ with config.lib.stylix.colors.withHashtag;
 
       # Cloud
       gcloud = {
+        disabled = true;
         format = "on [$symbol$active(/$project)(\\($region\\))]($style)";
+        symbol = "󱇶 ";
       };
       aws = {
+        disabled = true;
+        symbol = "";
         format = "on [$symbol$profile(\\($region\\))]($style)";
       };
 
-      # Icon changes only \/
-      aws.symbol = "  ";
+      # Icon changes only
       conda.symbol = " ";
-      # directory.read_only = " ";
       elixir.symbol = " ";
       elm.symbol = " ";
-      gcloud.symbol = " ";
       hg_branch.symbol = " ";
       julia.symbol = " ";
       memory_usage.symbol = "󰍛 ";
       nim.symbol = "󰆥 ";
       perl.symbol = " ";
       ruby.symbol = " ";
-      scala.symbol = " ";
+      scala.symbol = "";
       terraform.symbol = "󱁢";
+
       shlvl = {
         symbol = "";
         format = "[$shlvl]($style) ";
@@ -134,7 +137,7 @@ with config.lib.stylix.colors.withHashtag;
         disabled = false;
       };
       container = {
-        symbol = "";
+        symbol = " ";
         style = "fg:${base00} bg:${base07}";
         format = "[$symbol\ [$name]]($style)";
         disabled = false;
@@ -214,6 +217,15 @@ with config.lib.stylix.colors.withHashtag;
         format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
         disabled = false;
       };
+      nix_shell = {
+        symbol = "";
+        style = "bg:${base0F}";
+        format = "[[$symbol$state( \($name\))](fg:${base00} bg:${base0F})]($style)";
+        impure_msg = "impure";
+        pure_msg = "pure";
+        heuristic	= false;
+        disabled = false;
+      };
       nodejs = {
         symbol = "";
         style = "bg:${base0F}";
@@ -276,9 +288,13 @@ with config.lib.stylix.colors.withHashtag;
       cmd_duration = {
         min_time = 2000;
       };
+      fill = {
+        symbol = " ";
+        style = "bg:none fg:none";
+      };
       time = {
         style = "bg:${base0E} fg:${base00}";
-        format = "[[  $time](bg:${base0E} fg:${base00})]($style)";
+        format = "[[  $time ](bg:${base0E} fg:${base00})]($style)";
         use_12hr = false;
         disabled = false;
       };
