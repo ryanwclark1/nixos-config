@@ -127,7 +127,7 @@
   } @ inputs:
   let
     inherit (self) outputs;
-    lib = nixpkgs.lib // home-manager.lib; # // nix-darwin.lib
+    lib = nixpkgs.lib // home-manager.lib // nix-darwin.lib;
     forEachSystem = f: lib.genAttrs (import systems) (system: f pkgsFor.${system});
     pkgsFor = lib.genAttrs (import systems) (
     system:
@@ -179,11 +179,19 @@
           inherit inputs outputs;
         };
         modules = [
-          # nix-darwin.nixosModules.darwin
           ./hosts/mini
+          # ./home/mini.nix
+          home-manager.darwinModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.users.administrator = import ./home/mini2.nix;
+
+            # Optionally, use home-manager.extraSpecialArgs to pass
+            # arguments to home.nix
+          }
         ];
       };
-      # darwinPackages = self.darwinConfigurations."mini".pkgs;
     };
 
     homeConfigurations = {
