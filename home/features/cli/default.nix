@@ -1,6 +1,5 @@
 {
   pkgs,
-  system,
   ...
 }:
 
@@ -31,7 +30,7 @@
     vultr-cli # vultr cli
     serie # A rich git commit graph in your terminal, like magic.
     vhs # A tool for generating terminal GIFs with code
-  ] ++ (if system == "x86_64-linux" then [
+  ] ++ (if pkgs.stdenv.hostPlatform.system == "x86_64-linux" then [
     distrobox # Nice escape hatch, integrates docker images with my environment
   ] else []);
 }
