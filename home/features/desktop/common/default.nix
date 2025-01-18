@@ -27,7 +27,6 @@
     insomnia # API Client for REST, GraphQL, GRPC and OpenAPI design tool for developers.
     libnotify # Notification library
     libsoup_3
-    mediainfo # Media info
     mimeo # Open files with the right program
     postman # API Development Environment
     # slurp # Screenshot tool, select area

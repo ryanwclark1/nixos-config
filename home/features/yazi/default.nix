@@ -18,14 +18,7 @@
     miller
   ];
 
-  programs.yazi =
-  let
-    # TODO: better ref to nixvim?
-    editor = "nvim";
-    ripdrag = lib.getExe pkgs.ripdrag;
-    wl-copy = "${pkgs.wl-clipboard}/bin/wl-copy";
-  in
-  {
+  programs.yazi = {
     enable = true;
     package = pkgs.yazi;
     initLua = ./init.lua;
@@ -46,7 +39,6 @@
       hide-preview = ./plugins/hide-preview.yazi;
       lazygit = ./plugins/lazygit.yazi;
       max-preview = ./plugins/max-preview.yazi;
-      # https://github.com/boydaihungst/mediainfo.yazi
       mediainfo = ./plugins/mediainfo.yazi;
       ouch = ./plugins/ouch.yazi;
       parent-arrow = ./plugins/parent-arrow.yazi;
@@ -82,7 +74,7 @@
           on = ["y"];
           run = [
             ''
-              shell 'for path in "$@"; do echo "file://$path"; done | ${wl-copy} -t text/uri-list' --confirm
+              shell 'for path in "$@"; do echo "file://$path"; done | wl-copy -t text/uri-list' --confirm
             ''
             "yank"
           ];
@@ -92,7 +84,7 @@
         {
           on = ["<C-n>"];
           run = [''
-            shell '${ripdrag} "$@" -x 2>/dev/null &' --confirm
+            shell 'ripdrag "$@" -x 2>/dev/null &' --confirm
           ''
           ''echo "Control + N Pressed"
           ''
@@ -2006,8 +1998,8 @@
       opener = {
         edit = [
           {
-            run = ''${editor} "$@"'';
-            desc = "$EDITOR";
+            run = ''nvim "$@"'';
+            desc = "nvim";
             block = true;
             for = "unix";
           }
@@ -2427,150 +2419,3 @@
     };
   };
 }
-
-
-    # # https://yazi-rs.github.io/docs/configuration/keymap
-    # # https://yazi-rs.github.io/docs/quick-start/#keybindings
-    # # https://github.com/sxyazi/yazi/blob/latest/yazi-config/preset/keymap.toml
-    # settings =
-    #   let
-    #       # TODO: better ref to nixvim?
-    #       # editor = lib.getExe config.programs.nixvim.package;
-    #       editor = "nvim";
-    #       alacrity = lib.getExe pkgs.alacritty;
-    #       mpv = lib.getExe pkgs.mpv;
-    #       xdg-utils = "${pkgs.xdg-utils}/bin/xdg-open";
-    #       thumbnailer = lib.getExe pkgs.ffmpegthumbnailer;
-
-    #       dragon = lib.getExe pkgs.xdragon;
-    #       ripdrag = lib.getExe pkgs.ripdrag;
-    #       wl-copy = "${pkgs.wl-clipboard}/bin/wl-copy";
-    #     in
-
-    #       prepend_keymap = [
-
-    #         }
-    #         # fzf bookmark
-    #         # {
-    #         #   on = [ "u" "a"];
-    #         #   run = "plugin fzfbm --args=save";
-    #         #   desc = "Add bookmark";
-    #         # }
-    #         # {
-    #         #   on = [ "u" "g"];
-    #         #   run = "plugin fzfbm --args=jump_by_key";
-    #         #   desc = "Jump bookmark by key";
-    #         # }
-    #         # {
-    #         #   on = [ "u" "G"];
-    #         #   run = "plugin fzfbm --args=jump_by_fzf";
-    #         #   desc = "Jump bookmark by fzf";
-    #         # }
-    #         # {
-    #         #   on = [ "u" "d"];
-    #         #   run = "plugin fzfbm --args=delete_by_key";
-    #         #   desc = "Delete bookmark by key";
-    #         # }
-    #         # {
-    #         #   on = [ "u" "D"];
-    #         #   run = "plugin fzfbm --args=delete_by_fzf";
-    #         #   desc = "Delete bookmark by fzf";
-    #         # }
-    #         # {
-    #         #   on = [ "u" "A"];
-    #         #   run = "plugin fzfbm --args=delete_all";
-    #         #   desc = "Delete all bookmarks";
-    #         # }
-    #         # {
-    #         #   on = [ "u" "r"];
-    #         #   run = "plugin fzfbm --args=rename_by_key";
-    #         #   desc = "Rename bookmark by key";
-    #         # }
-    #         # {
-    #         #   on = [ "u" "R"];
-    #         #   run = "plugin fzfbm --args=rename_by_fzf";
-    #         #   desc = "Rename bookmark by fzf";
-    #         # }
-    #       ];
-    #     };
-
-    #     plugin = {
-    #       prepend_previewers = [
-    #         {
-    #           mime = "application/epub";
-    #           run = "pdf";
-    #         }
-    #         {
-    #           mime = "application/pdf";
-    #           run = "pdf";
-    #         }
-    #         # markdown files to glow
-    #         {
-    #           name = "*.md";
-    #           run = "glow";
-    #         }
-    #         {
-    #           mime = "text/markdown";
-    #           run = "glow";
-    #         }
-    #         {
-    #           mime = "{image,audio,video}/*";
-    #           run = "mediainfo";
-    #         }
-    #         {
-    #           mime = "application/x-subrip";
-    #           run = "mediainfo";
-    #         }
-
-    #       ];
-    #     };
-    #     opener ={
-    #       edit-text = [
-    #         {
-    #           run = ''${editor} "$@"'';
-    #           block = true;
-    #         }
-    #       ];
-    #       play = [
-    #         {
-    #           run = ''${mpv} "$@"'';
-    #           orphan = true;
-    #         }
-    #       ];
-    #       terminal = [
-    #         {
-    #           run = ''${alacrity} -e "$0"'';
-    #           orphan = true;
-    #         }
-    #       ];
-    #       open = [
-    #         {
-    #           run = ''${xdg-utils} "$@"'';
-    #           orphan = true;
-    #         }
-    #       ];
-    #     };
-    #     open.rules = [
-    #       {
-    #         mime = "text/*";
-    #         use = ["edit-text"];
-    #       }
-    #       {
-    #         mime = "application/json";
-    #         use = ["edit-text"];
-    #       }
-    #       {
-    #         mime = "inode/directory";
-    #         use = ["terminal"];
-    #       }
-    #       {
-    #         mime = "*";
-    #         use = ["open"];
-    #       }
-    #       {
-    #         name = "*";
-    #         use = ["open"];
-    #       }
-    #     ];
-    # };
-  # };
