@@ -2,7 +2,7 @@ local M = {}
 
 function M:peek(job)
 	local child
-	local l = job.file.cha.len
+	local l = self.file.cha.len
 	if l == 0 then
 		child = Command("hexyl")
 			:args({
@@ -43,25 +43,15 @@ function M:peek(job)
 
 	child:start_kill()
 	if job.skip > 0 and i < job.skip + limit then
-		ya.manager_emit(
-			"peek",
-			{ tostring(math.max(0, i - limit)), only_if = tostring(job.file.url), upper_bound = "" }
-		)
+		ya.manager_emit("peek", { math.max(0, i - limit), only_if = job.file.url, upper_bound = true })
 	else
 		lines = lines:gsub("\t", string.rep(" ", PREVIEW.tab_size))
-		ya.preview_widgets(self, { ui.Text.parse(job.area, lines) })
+		ya.preview_widgets(job, { ui.Text.parse(lines):area(job.area) })
 	end
 end
 
 function M:seek(units)
-	local h = cx.active.current.hovered
-	if h and h.url == job.file.url then
-		local step = math.floor(units * job.area.h / 10)
-		ya.manager_emit("peek", {
-			tostring(math.max(0, cx.active.preview.skip + step)),
-			only_if = tostring(job.file.url),
-		})
-	end
+	require("code").seek(job, units)
 end
 
 return M
