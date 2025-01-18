@@ -1,8 +1,4 @@
--- require("full-border"):setup {
--- 	type = ui.Border.ROUNDED,
--- }
 
--- require("starship"):setup{}
 -- require("folder-rules"):setup{}
 
 -- Show symlink in status bar
