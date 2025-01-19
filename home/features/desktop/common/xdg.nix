@@ -6,8 +6,17 @@
 }:
 
 {
-  home.packages = with pkgs; [
-    xdg-utils
+  # use ghostty as an terminal emulator to open terminal apps (like yazi or nvim) with xdg-open
+  home.packages = [
+    pkgs.xdg-utils
+    (
+      pkgs.writeTextFile {
+        name = "xdg-terminal-exec";
+        destination = "/bin/xdg-terminal-exec";
+        text = "#!${pkgs.runtimeShell}\nghostty -e \"$@\"";
+        executable = true;
+      }
+    )
   ];
 
   xdg = {
@@ -80,6 +89,7 @@
 
           codeEditors = [
             "code.desktop"
+            "nvim.desktop"
           ];
 
           pdfViewers = [
@@ -91,9 +101,12 @@
           "audio/mp3" = videoPlayers;
           "audio/aac" = videoPlayers;
           "audio/wav" = videoPlayers;
+          "audio/*" = videoPlayers;
+
           "video/mp4" = videoPlayers;
           "video/mpeg" = videoPlayers;
           "video/mov" = videoPlayers;
+          "video/*" = videoPlayers;
 
           #images
           "image/png" = imageViewers;
@@ -106,6 +119,7 @@
           "image/x-ico" = imageViewers;
           "image/heic" = imageViewers;
           "image/heif" = imageViewers;
+          "image/*" = imageViewers;
 
           #vscode for text etc
           "text/plain" = codeEditors;
@@ -141,6 +155,9 @@
           "application/x-extension-xht" = browser;
           "x-scheme-handler/ftp" = browser;
           "x-scheme-handler/chrome" = "google-chrome.desktop";
+
+          "inode/director" = ["yazi"];
+          "application/x-xz-compressed-tar" = ["org.gnome.FileRoller.desktop"];
         };
     };
   };
