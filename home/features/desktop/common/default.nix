@@ -23,13 +23,13 @@
     file-roller # Archive manager
     fragments # Torrent client
     gpu-viewer # GPU info
-    # grim # Screenshot tool,
+    grim # Screenshot tool,
     insomnia # API Client for REST, GraphQL, GRPC and OpenAPI design tool for developers.
     libnotify # Notification library
     libsoup_3
     mimeo # Open files with the right program
     postman # API Development Environment
-    # slurp # Screenshot tool, select area
+    slurp # Screenshot tool, select area
     spice-vdagent # Spice agent
     sqlitebrowser # Visual tool to create, design, and edit database files compatible with SQLite
     ventoy-full #balena type tool

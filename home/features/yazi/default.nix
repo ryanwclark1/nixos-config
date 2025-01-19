@@ -1240,7 +1240,6 @@
       manager = {
         cwd = { fg = "cyan"; };
 
-
         # Hovered
         hovered = { reversed = true; };
         preview_hovered = { underline = true; };
@@ -1383,7 +1382,7 @@
           { name = ".config"; text = ""; }
           { name = ".git"; text = ""; }
           { name = "Desktop"; text = ""; }
-          { name = "Development"; text = ""; }
+          { name = "Code"; text = ""; }
           { name = "Documents"; text = ""; }
           { name = "Downloads"; text = ""; }
           { name = "Library"; text = ""; }

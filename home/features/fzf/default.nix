@@ -28,8 +28,7 @@
       ];
     };
     changeDirWidgetCommand = "fd --type directory --hidden --strip-cwd-prefix --exclude .git";
-    changeDirWidgetOptions =
-    [
+    changeDirWidgetOptions = [
       "--preview 'eza --tree --color=always {} | head -200'"
     ];
     colors = {
@@ -66,12 +65,4 @@
     enableZshIntegration = lib.mkIf config.programs.zsh.enable true;
   };
 
-# This appears before the interactive shell if statement and creates issue with home manager startups in systemd
-  # programs.bash.bashrcExtra = ''
-  #   source fzf-git
-  # '';
-
-  # programs.zsh.initExtra = ''
-  #   source fzf-git
-  # '';
 }

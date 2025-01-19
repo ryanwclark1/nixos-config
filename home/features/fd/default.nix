@@ -16,6 +16,8 @@
     ];
     extraOptions = [
       "--color auto"
+      "--follow"
+      "--no-require-git"
     ];
   };
 }
