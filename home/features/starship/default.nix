@@ -10,7 +10,6 @@ with config.lib.stylix.colors.withHashtag;
   programs.starship = {
     enable = true;
     package = pkgs.starship;
-    # interactiveOnly = false;
     # Configuration written to ~/.config/starship.toml
     settings = {
       format = "[](${base0E})\$os\$username\$hostname\$localip\${custom.yazi}\[](bg:${base07} fg:${base0E})\$directory\[](fg:${base07} bg:${base05})\$git_branch\$git_status\[](fg:${base05} bg:${base0F})\$bun\$c\$cmake\$dart\$golang\$haskell\$java\$kotlin\$kubernetes\$lua\$nodejs\$php\$python\$rust\$swift\$zig[](fg:${base0F} bg:${base06})\$docker_context\$nix_shell\[](fg:${base06})\$fill\[](${base0E})\$time\[](${base0E})\$line_break$character";
@@ -218,7 +217,7 @@ with config.lib.stylix.colors.withHashtag;
         disabled = false;
       };
       nix_shell = {
-        symbol = "";
+        symbol = " ";
         style = "bg:${base0F}";
         format = "[[$symbol$state( \($name\))](fg:${base00} bg:${base0F})]($style)";
         impure_msg = "impure";
