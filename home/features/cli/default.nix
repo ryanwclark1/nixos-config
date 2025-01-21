@@ -5,7 +5,6 @@
 
 {
   imports = [
-    ./btop.nix
     ./gh.nix
     ./jq.nix
     ./navi.nix
