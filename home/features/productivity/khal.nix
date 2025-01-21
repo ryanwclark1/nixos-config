@@ -15,3 +15,4 @@
       timeformat = %H:%M
       dateformat = %d/%m/%Y
     '';
+}
