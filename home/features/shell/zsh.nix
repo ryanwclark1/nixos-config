@@ -10,7 +10,7 @@
     package = pkgs.zsh;
     enableCompletion = true;
     enableVteIntegration = true;
-    defaultKeymap = "vicmd";
+    # defaultKeymap = "vicmd";
     syntaxHighlighting = {
       enable = true;
     };
