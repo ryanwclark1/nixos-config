@@ -12,6 +12,7 @@
     ./features/ansible
     ./features/atuin
     ./features/bat
+    ./features/btop
     ./features/cli
     ./features/chrome
     ./features/compression
