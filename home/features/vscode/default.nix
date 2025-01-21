@@ -31,7 +31,6 @@
         cweijan.vscode-database-client2
         dbaeumer.vscode-eslint
         donjayamanne.githistory
-        dotenv.dotenv-vscode
         ecmel.vscode-html-css
         editorconfig.editorconfig
         esbenp.prettier-vscode
@@ -49,7 +48,6 @@
         hediet.vscode-drawio
         jdinhlife.gruvbox
         jetmartin.bats
-        jnoortheen.nix-ide
         jnoortheen.nix-ide
         jock.svg
         mikestead.dotenv
@@ -75,7 +73,7 @@
         shyykoserhiy.vscode-spotify
         tailscale.vscode-tailscale
         tamasfe.even-better-toml
-        vscodevim.vim
+        # vscodevim.vim
         yzhang.markdown-all-in-one
         wholroyd.jinja # Prefer Better Jinja
         marp-team.marp-vscode
