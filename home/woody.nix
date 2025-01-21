@@ -15,7 +15,7 @@
     ./features/cli
     ./features/chrome
     ./features/compression
-    # ./features/cursor
+    ./features/cursor
     ./features/discord
     ./features/development
     ./features/eza
