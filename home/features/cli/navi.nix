@@ -15,11 +15,11 @@
     enableFishIntegration = lib.mkIf config.programs.fish.enable false;
     enableZshIntegration = lib.mkIf config.programs.zsh.enable false;
     settings = {
-      # finder = {
-      #   command = "fzf";
+      finder = {
+        command = "fzf";
       #   # overrides: --tac # equivalent to the --fzf-overrides option
       #   # overrides_var: --tac # equivalent to the --fzf-overrides-var option
-      # };
+      };
       # cheats = {
       #   paths = [];
       # };
@@ -28,10 +28,10 @@
       client = {
         tealdeer = true;
       };
-      # shell = {
-      #   command = "bash";
-      #   finder_command = "bash";
-      # };
+      shell = {
+        command = "zsh";
+        finder_command = "zsh";
+      };
     };
   };
 }
