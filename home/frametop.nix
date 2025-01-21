@@ -11,6 +11,7 @@
     ./features/ansible
     ./features/atuin
     ./features/bat
+    ./features/btop
     ./features/cli
     ./features/compression
     ./features/cursor
