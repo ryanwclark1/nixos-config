@@ -31,6 +31,7 @@
     ./features/kubernetes
     ./features/lazygit
     ./features/media
+    ./features/navi
     ./features/networking-utils
     ./features/nixvim
     ./features/productivity
@@ -41,6 +42,7 @@
     ./features/shell
     ./features/starship
     ./features/sys-stats
+    ./features/tealdeer
     ./features/tmux
     ./features/virtualisation
     ./features/vscode
