@@ -4,7 +4,7 @@
 
 pkgs.writeShellScriptBin "web-search" ''
   dir="$HOME/.config/rofi"
-  theme='default'
+  theme='config'
 
   declare -A URLS
 
