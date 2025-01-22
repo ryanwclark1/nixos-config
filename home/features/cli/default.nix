@@ -7,9 +7,7 @@
   imports = [
     ./gh.nix
     ./jq.nix
-    ./navi.nix
     ./nixtools.nix
-    ./tealdeer.nix
     ./tf.nix
   ];
   home.packages = with pkgs; [
@@ -27,7 +25,6 @@
     lazysql # SQL Tui
     mprocs # multiple commands in parallel
     vultr-cli # vultr cli
-    serie # A rich git commit graph in your terminal, like magic.
     vhs # A tool for generating terminal GIFs with code
   ] ++ (if pkgs.stdenv.hostPlatform.system == "x86_64-linux" then [
     distrobox # Nice escape hatch, integrates docker images with my environment
