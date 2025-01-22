@@ -8,6 +8,6 @@ source "${script_dir}/helpers.sh"
 tmux source "${script_dir}/../forceline_options_tmux.conf"
 tmux source "${script_dir}/../forceline_tmux.conf"
 
-print_option @forceline_theme
+print_option @forceline_flavor
 print_option @forceline_menu_selected_style
 print_option @forceline_pane_active_border_style

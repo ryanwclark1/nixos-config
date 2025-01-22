@@ -1,1 +1,1 @@
-@forceline_status_application #[fg=#f5c2e7,nobold,nounderscore,noitalics]#[fg=#11111b,bg=#f5c2e7] #[fg=#f5c2e7,bg=#45475a]#[fg=#cdd6f4] #{E:@forceline_application_text}#[fg=#45475a]█
+@forceline_status_application #[fg=#eba0ac]#[fg=#11111b,bg=#eba0ac] #[fg=#cdd6f4,bg=#313244]#{E:@forceline_application_text}#[fg=#313244]

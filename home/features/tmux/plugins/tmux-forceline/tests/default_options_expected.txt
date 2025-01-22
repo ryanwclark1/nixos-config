@@ -1,3 +1,3 @@
-@forceline_theme catppuccin_mocha
-@forceline_menu_selected_style fg=#{@thm_surface_0},bg=#{@thm_yellow}
+@forceline_flavor mocha
+@forceline_menu_selected_style fg=#{@thm_fg},bold,bg=#{@thm_overlay_0}
 @forceline_pane_active_border_style ##{?pane_in_mode,fg=#{@thm_lavender},##{?pane_synchronized,fg=#{@thm_mauve},fg=#{@thm_lavender}}}
