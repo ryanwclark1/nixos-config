@@ -23,13 +23,10 @@
     package = pkgs.tmux;
     plugins = with pkgs.tmuxPlugins; [
       better-mouse-mode
-      # battery
-      # weather
       # tmux-fzf
       # copycat
       # t-smart-tmux-session-manager
       # fzf-tmux-url
-      # power-theme
       resurrect
       continuum
       # session-wizard
@@ -89,6 +86,8 @@
       set -ag status-right "#{E:@forceline_status_user}"
       set -ag status-right "#{E:@forceline_status_host}"
       set -ag status-right "#{E:@forceline_status_session}"
+
+      run ${config.home.homeDirectory}/.config/tmux/plugins/tmux-digits/digits.tmux
     '';
   };
 }
