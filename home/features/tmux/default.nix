@@ -74,36 +74,21 @@
       ###################################
       # Configure the forceline plugin
 
-      set -g @forceline_theme "catppuccin_frappe"
+      set -g @forceline_theme "frappe"
       set -g @forceline_window_status "icon"
 
       run ${config.home.homeDirectory}/.config/tmux/plugins/tmux-forceline/forceline.tmux
-      set -g @forceline_status_left_separator  " "
-      # set -g @forceline_window_middle_separator " █"
-      set -g @forceline_window_middle_separator " "
-      set -g @forceline_status_right_separator ""
-      set -g @forceline_status_fill "icon"
       set -g @forceline_status_connect_separator "no"
       set -g @forceline_window_status_style "rounded"
-      set -g @forceline_window_number_position "right"
-      set -g @forceline_window_default_fill "number"
-      set -g @forceline_window_default_text "#W"
-      set -g @forceline_window_current_fill "number"
-      set -g @forceline_window_current_text "#W#{?window_zoomed_flag,(),}"
-      set -g @forceline_directory_text "#{pane_current_path}"
       set -g status-left-length 200    # increase length (from 10)
       set -g status-right-length 200   # increase length (from 10)
 
-      # Make the status line pretty and add some modules
       set -g status-left ""
+
       set -g  status-right "#{E:@forceline_status_directory}"
       set -ag status-right "#{E:@forceline_status_user}"
       set -ag status-right "#{E:@forceline_status_host}"
       set -ag status-right "#{E:@forceline_status_session}"
-      # set -agF status-right "#{E:@forceline_status_cpu}"
-      # set -agF status-right "#{E:@forceline_status_weather}"
-      # set -agF status-right "#{E:@forceline_status_ipwan}"
-      # set -agF status-right "#{E:@forceline_status_test}"
     '';
   };
 }
