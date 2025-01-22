@@ -218,12 +218,14 @@ with config.lib.stylix.colors.withHashtag;
       };
       nix_shell = {
         symbol = " ";
-        style = "bg:${base0F}";
-        format = "[[$symbol$state( \($name\))](fg:${base00} bg:${base0F})]($style)";
-        impure_msg = "impure";
-        pure_msg = "pure";
+        style = "bg:${base06}";
+        format = "[[$symbol$state( \($name\))](fg:${base00} bg:${base06})]($style)";
+        impure_msg = "";
+        # impure_msg = "impure";
+        pure_msg = "";
+        # pure_msg = "pure";
         heuristic	= false;
-        disabled = false;
+        disabled = true;
       };
       nodejs = {
         symbol = "";
@@ -267,7 +269,7 @@ with config.lib.stylix.colors.withHashtag;
       docker_context = {
         symbol = "";
         style = "bg:${base06}";
-        format = "[[ $symbol( $context) ](fg:${base0C} bg:${base06})]($style)";
+        format = "[[ $symbol( $context) ](fg:${base00} bg:${base06})]($style)";
         disabled = false;
       };
       custom.yazi = {

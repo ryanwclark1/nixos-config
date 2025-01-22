@@ -26,7 +26,6 @@
       continuum
       resurrect
       tmux-fzf
-      tmux-logging
       yank
     ];
     aggressiveResize = true;
@@ -77,11 +76,15 @@
       set -g status-right-length 200   # increase length (from 10)
 
       set -g status-left ""
+      set -g window-status-format ""
+      set -g window-status-current-format ""
+      set -g status-style "bg=default,fg=#cdd6f4"
+      set -g @forceline_pane_background_color "default"
 
-      set -g  status-right "#{E:@forceline_status_directory}"
+      set -g status-left "#{E:@forceline_status_host}"
+      set -ag status-left "#{E:@forceline_status_session}"
+      set -g status-right "#{E:@forceline_status_directory}"
       set -ag status-right "#{E:@forceline_status_user}"
-      set -ag status-right "#{E:@forceline_status_host}"
-      set -ag status-right "#{E:@forceline_status_session}"
 
       run ${config.home.homeDirectory}/.config/tmux/plugins/tmux-menus/menus.tmux
       set -g @menus_trigger m

@@ -26,7 +26,7 @@ in
     adjust-box-thickness = 1
 
     # Theme
-    theme = "catppuccin-mocha"
+    theme = "catppuccin-frappe"
     background-opacity = 0.7
 
     cursor-style = bar
@@ -55,9 +55,6 @@ in
     auto-update = off
   '';
   xdg.configFile."ghostty/themes/catppuccin-mocha".text = ''
-    background = #181825
-    foreground = #585b70
-
     palette = 0=#45475a
     palette = 1=#f38ba8
     palette = 2=#a6e3a1
@@ -74,10 +71,33 @@ in
     palette = 13=#f5c2e7
     palette = 14=#94e2d5
     palette = 15=#a6adc8
-    background = 181825
+    background = 1e1e2e
     foreground = cdd6f4
     cursor-color = f5e0dc
     selection-background = 353749
     selection-foreground = cdd6f4
+  '';
+    xdg.configFile."ghostty/themes/catppuccin-frappe".text = ''
+    palette = 0=#51576d
+    palette = 1=#e78284
+    palette = 2=#a6d189
+    palette = 3=#e5c890
+    palette = 4=#8caaee
+    palette = 5=#f4b8e4
+    palette = 6=#81c8be
+    palette = 7=#b5bfe2
+    palette = 8=#626880
+    palette = 9=#e78284
+    palette = 10=#a6d189
+    palette = 11=#e5c890
+    palette = 12=#8caaee
+    palette = 13=#f4b8e4
+    palette = 14=#81c8be
+    palette = 15=#a5adce
+    background = 303446
+    foreground = c6d0f5
+    cursor-color = f2d5cf
+    selection-background = 44495d
+    selection-foreground = c6d0f5
   '';
 }
