@@ -28,7 +28,6 @@
       # tmux-fzf
       # copycat
       # t-smart-tmux-session-manager
-      # sidebar
       # fzf-tmux-url
       # power-theme
       resurrect
@@ -57,7 +56,6 @@
     terminal = "tmux-256color";
     extraConfig =
     ''
-
       # emacs key bindings in tmux command prompt (prefix + :) are better than
       set -g base-index 1              # start indexing windows at 1 instead of 0
       set -g detach-on-destroy off     # don't exit from tmux when closing a session
@@ -81,7 +79,8 @@
 
       run ${config.home.homeDirectory}/.config/tmux/plugins/tmux-forceline/forceline.tmux
       set -g @forceline_status_left_separator  " "
-      set -g @catppuccin_window_middle_separator " █"
+      # set -g @forceline_window_middle_separator " █"
+      set -g @forceline_window_middle_separator " "
       set -g @forceline_status_right_separator ""
       set -g @forceline_status_fill "icon"
       set -g @forceline_status_connect_separator "no"
