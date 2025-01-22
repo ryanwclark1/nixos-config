@@ -23,16 +23,12 @@
     package = pkgs.tmux;
     plugins = with pkgs.tmuxPlugins; [
       better-mouse-mode
-      # tmux-fzf
-      # copycat
-      # t-smart-tmux-session-manager
-      # fzf-tmux-url
-      resurrect
       continuum
-      # session-wizard
+      resurrect
+      tmux-fzf
+      tmux-logging
       yank
     ];
-    # with pkgs.tmuxPlugins;
     aggressiveResize = true;
     baseIndex = 1;
     clock24 = true;
@@ -87,7 +83,10 @@
       set -ag status-right "#{E:@forceline_status_host}"
       set -ag status-right "#{E:@forceline_status_session}"
 
-      run ${config.home.homeDirectory}/.config/tmux/plugins/tmux-digits/digits.tmux
+      run ${config.home.homeDirectory}/.config/tmux/plugins/tmux-menus/menus.tmux
+      set -g @menus_trigger m
+
+      run ${config.home.homeDirectory}/.config/tmux/plugins/tmux-pass/plugin.tmux
     '';
   };
 }
