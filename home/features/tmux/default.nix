@@ -78,7 +78,7 @@
       set -g status-left ""
       set -g window-status-format ""
       set -g window-status-current-format ""
-      set -g status-style "bg=default,fg=#cdd6f4"
+      set -g status-style "bg=default,fg=default"
       set -g @forceline_pane_background_color "default"
 
       set -g status-left "#{E:@forceline_status_host}"

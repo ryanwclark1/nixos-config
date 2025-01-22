@@ -5,7 +5,6 @@
 {
   home.file.".config/rofi/style/power-small-round.rasi" = {
     text = ''
-
       /*****----- Configuration -----*****/
       configuration {
         show-icons:                 false;

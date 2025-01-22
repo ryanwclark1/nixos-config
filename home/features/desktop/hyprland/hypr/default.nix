@@ -270,6 +270,7 @@ in
       windowrulev2 = [
         "stayfocused, title:^()$,class:^(${steam})$"
         "minsize 1 1, title:^()$,class:^(${steam})$"
+        "opacity 0.70, class:^(com.mitchellh.ghostty)$"
       ];
 
       layerrule = [
