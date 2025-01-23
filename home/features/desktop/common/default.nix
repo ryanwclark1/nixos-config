@@ -15,8 +15,6 @@
 
   # Comment out screenshot, clipboard and recording tools
   home.packages = with pkgs; [
-    bluez-tools # bt-adapter
-    czkawka # Duplicate file finder
     d-spy # Dbus debugger
     dbeaver-bin # Universal Database Tool
     devpod-desktop # Codespaces but open-source, client-only and unopinionated: Works with any IDE
