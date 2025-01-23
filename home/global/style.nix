@@ -65,15 +65,15 @@ in
       fzf.enable = lib.mkDefault false;
       gedit.enable = lib.mkDefault false;
       gitui.enable = lib.mkDefault false;
-      gnome.enable = lib.mkDefault true;
+      gnome.enable = lib.mkDefault false;
       gtk = {
-        enable = lib.mkDefault true;
+        enable = lib.mkDefault false;
         # extraCss = ''
         #   @import url("file://${pkgs.stylix}/share/themes/${currentScheme}.css");
         # '';
       };
       hyprland.enable = lib.mkDefault false;
-      hyprpaper.enable = lib.mkDefault true;
+      hyprpaper.enable = lib.mkDefault false;
       k9s.enable = lib.mkDefault false;
       kde.enable = lib.mkDefault false;
       kitty = {
