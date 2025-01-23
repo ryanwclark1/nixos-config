@@ -27,15 +27,8 @@
       }
 
       /*****----- Global Properties -----*****/
-      * {
-        background:     #1E1D2FFF;
-        background-alt: #282839FF;
-        foreground:     #D9E0EEFF;
-        selected:       #7AA2F7FF;
-        active:         #ABE9B3FF;
-        urgent:         #F28FADFF;
-        font: "${config.stylix.fonts.monospace.name} 12";
-      }
+      @import                          "shared/colors.rasi"
+      @import                          "shared/fonts.rasi"
 
       * {
         border-colour:               var(selected);
