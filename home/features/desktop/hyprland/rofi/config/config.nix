@@ -1,5 +1,4 @@
 {
-  config,
   ...
 }:
 
@@ -84,7 +83,7 @@
 
         /*---------- Misc setting ----------*/
         terminal: "rofi-sensible-terminal";
-        font: "${config.stylix.fonts.monospace.name} 12";
+        font: "UbuntuMono Nerd Font 12";
         sort: false;
         threads: 0;
         click-to-exit: true;
