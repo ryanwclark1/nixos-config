@@ -286,6 +286,7 @@
         "window.zoomLevel" = 1;
         "workbench.editor.enablePreview" = true;
         "workbench.externalBrowser" = "chrome";
+        "workbench.colorTheme" = "Catppuccin Frappé";
 
         "html-css-class-completion.enableEmmetSupport" = true;
         "html-css-class-completion.enableFindUsage" = true;
