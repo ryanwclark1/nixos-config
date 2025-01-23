@@ -269,7 +269,7 @@
         "window.zoomLevel" = 1;
         "workbench.editor.enablePreview" = true;
         "workbench.externalBrowser" = "chrome";
-        "workbench.colorTheme" = "Catppuccin Frappé";
+        "workbench.colorTheme" = "Catppuccin Frappe";
 
         "html-css-class-completion.enableEmmetSupport" = true;
         "html-css-class-completion.enableFindUsage" = true;
