@@ -12,7 +12,6 @@ let
   steam = "${pkgs.steam}/bin/steam";
   # swaync = "${pkgs.swaynotificationcenter}/bin/swaync";
   # ags = lib.getExe config.programs.ags.package;
-  pwvucontrol = "${pkgs.pwvucontrol}/bin/pwvucontrol";
   nm-connection-editor = "${pkgs.networkmanagerapplet}/bin/nm-connection-editor";
 in
 
@@ -254,8 +253,8 @@ in
         (f "")
         (f "org.gnome.Calculator")
         # (f "org.gnome.Nautilus")
-        (f "${pwvucontrol}")
-        (f "${nm-connection-editor}")
+        (f "pwvucontrol")
+        (f "nm-connection-editor")
         (f "blueberry.py")
         (f "org.gnome.Settings")
         (f "org.gnome.design.Palette")
@@ -271,6 +270,7 @@ in
         "stayfocused, title:^()$,class:^(${steam})$"
         "minsize 1 1, title:^()$,class:^(${steam})$"
         "opacity 0.70, class:^(com.mitchellh.ghostty)$"
+        "opacity 0.70, class:^(code)$"
       ];
 
       layerrule = [
@@ -284,8 +284,8 @@ in
         "blur,notifications"
         "ignorezero,notifications"
 
-        "blur,${rofi}"
-        "ignorezero,${rofi}"
+        "blur,rofi"
+        "ignorezero,rofi"
 
         "noanim,wallpaper"
       ];
