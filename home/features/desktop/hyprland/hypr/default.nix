@@ -8,15 +8,12 @@ let
   hypridle = lib.getExe config.services.hypridle.package;
   wl-paste = "${pkgs.wl-clipboard}/bin/wl-paste";
   cliphist = lib.getExe config.services.cliphist.package;
-  steam = "${pkgs.steam}/bin/steam";
-  # swaync = "${pkgs.swaynotificationcenter}/bin/swaync";
-  # ags = lib.getExe config.programs.ags.package;
+  # steam = "${pkgs.steam}/bin/steam";
 in
 
 {
   imports = [
     ./basic-binds.nix
-    # ./hyprbars.nix
   ];
 
   wayland.windowManager.hyprland = {
@@ -248,9 +245,7 @@ in
       windowrule = let
         f = regex: "float, ^(${regex})$";
       in [
-        (f "")
         (f "org.gnome.Calculator")
-        # (f "org.gnome.Nautilus")
         (f "pwvucontrol")
         (f "nm-connection-editor")
         (f "blueberry.py")
@@ -261,14 +256,13 @@ in
         (f "xdg-desktop-portal-gnome")
         (f "de.haeckerfelix.Fragments")
         (f "com.github.Aylur.ags")
-        "workspace 7, title:Spotify"
       ];
 
       windowrulev2 = [
-        "stayfocused, title:^()$,class:^(${steam})$"
-        "minsize 1 1, title:^()$,class:^(${steam})$"
+        "stayfocused, title:^()$,class:^(steam)$"
+        "minsize 1 1, title:^()$,class:^(steam)$"
         "opacity 0.70, class:^(com.mitchellh.ghostty)$"
-        "opacity 0.80, class:^(code)$"
+        "opacity 0.90, class:^(code)$"
       ];
 
       layerrule = [
