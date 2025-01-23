@@ -16,26 +16,25 @@
       name = "Papirus-Dark";
       package = pkgs.papirus-icon-theme;
     };
-    # theme = {
-    #   name = "Colloid-Default-Dark-Catppuccin";
-    #   package = pkgs.colloid-gtk-theme.override {
-    #     colorVariants = [ "dark" ];
-    #     # "default" = blue
-    #     themeVariants = [ "default" ];
-    #     sizeVariants = [ "standard" ];
-    #     # "black" = mocha variant
-    #     tweaks = [ "catppuccin" "rimless" ];
-    #   };
-    # };
+    font = {
+      name = "DejaVu Sans";
+      package = pkgs.dejavu_fonts;
+      size = 12;
+    };
     gtk2 = {
       configLocation = "${config.home.homeDirectory}/.config/gtk-2.0/gtkrc";
       extraConfig = ''
-        gtk-application-prefer-dark-theme = 1;
+        gtk-application-prefer-dark-theme = 1
       '';
     };
     gtk3 = {
       bookmarks = [
            "file:///mnt/share"
+           "file:///mnt/conf"
+           "file:///mnt/sync"
+           "file:///mnt/family"
+           "file:///mnt/rclark"
+           "file:///mnt/ryan"
       ];
       extraConfig = {
         gtk-application-prefer-dark-theme = 1;
@@ -48,26 +47,4 @@
       };
     };
   };
-
-  # xdg.configFile = {
-  #   "gtk-3.0/assets".source =
-  #     "${gtk.theme.package}/share/themes/${gtk.theme.name}/gtk-3.0/assets";
-  #   "gtk-3.0/gtk.css".source =
-  #     "${gtk.theme.package}/share/themes/${gtk.theme.name}/gtk-3.0/gtk.css";
-  #   "gtk-3.0/gtk-dark.css".source =
-  #     "${gtk.theme.package}/share/themes/${gtk.theme.name}/gtk-3.0/gtk-dark.css";
-
-  #   "gtk-4.0/assets".source =
-  #     "${gtk.theme.package}/share/themes/${gtk.theme.name}/gtk-4.0/assets";
-  #   "gtk-4.0/gtk.css".source =
-  #     "${gtk.theme.package}/share/themes/${gtk.theme.name}/gtk-4.0/gtk.css";
-  #   "gtk-4.0/gtk-dark.css".source =
-  #     "${gtk.theme.package}/share/themes/${gtk.theme.name}/gtk-4.0/gtk-dark.css";
-  # };
-
-  # dconf.settings = {
-  #   "org/gnome/desktop/interface" = {
-  #     color-scheme = "prefer-dark";
-  #   };
-  # };
 }
