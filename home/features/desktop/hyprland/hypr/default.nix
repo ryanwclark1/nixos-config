@@ -5,14 +5,12 @@
   ...
 }:
 let
-  rofi = lib.getExe config.programs.rofi.package;
   hypridle = lib.getExe config.services.hypridle.package;
   wl-paste = "${pkgs.wl-clipboard}/bin/wl-paste";
   cliphist = lib.getExe config.services.cliphist.package;
   steam = "${pkgs.steam}/bin/steam";
   # swaync = "${pkgs.swaynotificationcenter}/bin/swaync";
   # ags = lib.getExe config.programs.ags.package;
-  nm-connection-editor = "${pkgs.networkmanagerapplet}/bin/nm-connection-editor";
 in
 
 {
@@ -270,7 +268,7 @@ in
         "stayfocused, title:^()$,class:^(${steam})$"
         "minsize 1 1, title:^()$,class:^(${steam})$"
         "opacity 0.70, class:^(com.mitchellh.ghostty)$"
-        "opacity 0.70, class:^(code)$"
+        "opacity 0.80, class:^(code)$"
       ];
 
       layerrule = [
