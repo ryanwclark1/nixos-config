@@ -11,8 +11,8 @@
   ];
 
   home.file = {
-    ".config/rofi/config.rasi" = {
-      source = ./config.rasi;
+    ".config/rofi/config2.rasi" = {
+      source = ./config2.rasi;
     };
     ".config/rofi/style/applet2-1.rasi" = {
       source = ./style/applet2-1.rasi;
@@ -97,6 +97,38 @@
       stores = [
         "${config.home.homeDirectory}/.local/share/keyrings"
       ];
+    };
+    theme =
+    let
+    # Use `mkLiteral` for string-like values that should show without
+    # quotes, e.g.:
+    # {
+    #   foo = "abc"; =&gt; foo: "abc";
+    #   bar = mkLiteral "abc"; =&gt; bar: abc;
+    # };
+    inherit (config.lib.formats.rasi) mkLiteral;
+    in {
+
+      /*****----- Global Properties -----*****/
+      @import                          "shared/colors.rasi"
+      @import                          "shared/fonts.rasi"
+      "*" = {
+        background-color = mkLiteral "#000000";
+        foreground-color = mkLiteral "rgba ( 250, 251, 252, 100 % )";
+        border-color = mkLiteral "#FFFFFF";
+        width = 512;
+      };
+
+      "#inputbar" = {
+        children = map mkLiteral [ "prompt" "entry" ];
+      };
+
+      "#textbox-prompt-colon" = {
+        expand = false;
+        str = ":";
+        margin = mkLiteral "0px 0.3em 0em 0em";
+        text-color = mkLiteral "@foreground-color";
+      };
     };
   };
 }
