@@ -1,0 +1,3 @@
+/*****----- Global Properties -----*****/
+@import                          "./style/colors.rasi"
+@import                          "./style/fonts.rasi"
