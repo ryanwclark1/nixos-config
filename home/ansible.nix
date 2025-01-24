@@ -32,9 +32,6 @@
     ./features/yazi
     ./features/zoxide
     ./features/development/build.nix
-    ./features/development/go.nix
-    ./features/development/python.nix
-    ./features/development/js.nix
   ];
 
   # Whether to enable settings that make Home Manager work better on GNU/Linux distributions other than NixOS.
