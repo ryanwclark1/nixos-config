@@ -91,6 +91,7 @@
     plugins = [
       pkgs.rofi-emoji-wayland
     ];
+    terminal = "ghostty";
     pass = {
       enable = true;
       package = pkgs.rofi-pass-wayland;
@@ -108,14 +109,10 @@
     # };
     inherit (config.lib.formats.rasi) mkLiteral;
     in {
-
-      /*****----- Global Properties -----*****/
-      @import                          "shared/colors.rasi"
-      @import                          "shared/fonts.rasi"
       "*" = {
-        background-color = mkLiteral "#000000";
-        foreground-color = mkLiteral "rgba ( 250, 251, 252, 100 % )";
-        border-color = mkLiteral "#FFFFFF";
+        background-color = mkLiteral "var(background)";
+        foreground-color = mkLiteral "var(foreground)";
+        border-color = mkLiteral "var(selected);";
         width = 512;
       };
 
@@ -129,6 +126,11 @@
         margin = mkLiteral "0px 0.3em 0em 0em";
         text-color = mkLiteral "@foreground-color";
       };
+      extraConfig = ''
+        /*****----- Global Properties -----*****/
+        @import                          "style/shared/colors.rasi"
+        @import                          "style/shared/fonts.rasi"
+      '';
     };
   };
 }
