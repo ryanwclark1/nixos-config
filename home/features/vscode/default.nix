@@ -86,12 +86,12 @@
           sha256 = "sha256-Klx5ZvV06lXIJ3Q/mzq3KBjPpdROoxDkgEu7MBO+RhI=";
           version = "1.2.0";
         }
-        # {
-        #   name = "ansible";
-        #   publisher = "redhat";
-        #   sha256 = "sha256-c7TB9gZGU68Kj2HXhhsmUusfH6S4fcW7mR6JTmDZ68w=";
-        #   version = "24.12.0";
-        # }
+        {
+          name = "ansible";
+          publisher = "redhat";
+          sha256 = "sha256-/kLg+msRu6GvkENVu3jw9uDbfEo/x0eZgsKfXvLaO3I=";
+          version = "25.1.0";
+        }
         {
           name = "bun-vscode";
           publisher = "oven";
