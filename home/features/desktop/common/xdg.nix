@@ -62,6 +62,7 @@
         XDG_MAIL_DIR = "${config.home.homeDirectory}/Mail";
         XDG_SCREENSHOTS_DIR = "${config.xdg.userDirs.pictures}/Screenshots";
         XDG_SCREENCAST_DIR = "${config.xdg.userDirs.videos}/Screencast";
+        XDG_CODE_DIR = "${config.xdg.userDirs.documents}/Code";
       };
     };
     desktopEntries = {
