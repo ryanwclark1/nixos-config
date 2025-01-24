@@ -1,14 +1,22 @@
 
 /*****----- Configuration -----*****/
 configuration {
-  modi:                       "drun,run,filebrowser,window";
+  modi:                       "drun,run,filebrowser,ssh,window";
   show-icons:                 true;
-  display-drun:               "";
-  display-run:                "";
-  display-filebrowser:        "";
-  display-window:             "";
+  display-drun:               " ";
+  display-run:                " ";
+  display-filebrowser:        " ";
+  display-window:             " ";
+  display-ssh:                " ";
   drun-display-format:        "{name}";
   window-format:              "{w} · {c} · {t}";
+
+  /*---------- SSH settings ----------*/
+  ssh-client: "ssh";
+  ssh-command: "{terminal} -e {ssh-client} {host} [-p {port}]";
+  parse-hosts: true;
+  parse-known-hosts: true;
+  terminal: "ghostty";
 }
 
 /*****----- Global Properties -----*****/
@@ -108,7 +116,7 @@ textbox-prompt-colon {
   enabled:                     true;
   padding:                     5px 0px;
   expand:                      false;
-  str:                         "";
+  str:                         " ";
   background-color:            inherit;
   text-color:                  inherit;
 }

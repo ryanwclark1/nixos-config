@@ -91,6 +91,10 @@
   programs.rofi = {
     enable = true;
     package = pkgs.rofi-wayland;
+    cycle = true;
+    xoffset = 0;
+    yoffset = 0;
+    location = "center";
     plugins = [
       pkgs.rofi-emoji-wayland
     ];
