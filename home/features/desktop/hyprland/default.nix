@@ -67,22 +67,22 @@
     wf-recorder # Utility program for screen recording of wlroots-based compositors
     wl-clipboard # Wayland clipboard
     yad # Yet another dialog
-    (import ./scripts/applauncher-fullscreen.nix { inherit pkgs; })
-    (import ./scripts/cliphist-copy.nix { inherit pkgs; })
-    (import ./scripts/cliphist-delete.nix { inherit pkgs; })
-    (import ./scripts/emopicker9000.nix { inherit pkgs; })
-
-    (import ./scripts/list-hypr-bindings.nix { inherit pkgs; })
-    (import ./scripts/microphone-status.nix { inherit pkgs; })
-    (import ./scripts/power-big.nix { inherit pkgs; })
-    (import ./scripts/rofi-launcher.nix { inherit pkgs; })
-    (import ./scripts/screenshooting.nix { inherit pkgs; })
-    (import ./scripts/task-waybar.nix { inherit pkgs; })
-    (import ./scripts/update-checker.nix { inherit pkgs; })
-    (import ./scripts/wallsetter.nix { inherit pkgs; })
-    (import ./scripts/web-search.nix { inherit pkgs; })
-    (import ./scripts/wttr.nix { inherit pkgs; })
-    (import ./scripts/yt.nix { inherit pkgs; })
+    (writeShellScriptBin "applauncher-fullscreen" (builtins.readFile ./scripts/applauncher-fullscreen.sh))
+    (writeShellScriptBin "cliphist-copy" (builtins.readFile ./scripts/cliphist-copy.sh))
+    (writeShellScriptBin "cliphist-delete" (builtins.readFile ./scripts/cliphist-delete.sh))
+    (writeShellScriptBin "dontkillsteam" (builtins.readFile ./scripts/dontkillsteam.sh))
+    (writeShellScriptBin "emopicker9000" (builtins.readFile ./scripts/emopicker9000.sh))
+    (writeShellScriptBin "list-hypr-bindings" (builtins.readFile ./scripts/list-hypr-bindings.sh))
+    (writeShellScriptBin "microphone-status" (builtins.readFile ./scripts/microphone-status.sh))
+    (writeShellScriptBin "power-big" (builtins.readFile ./scripts/power-big.sh))
+    (writeShellScriptBin "rofi-launcher" (builtins.readFile ./scripts/rofi-launcher.sh))
+    (writeShellScriptBin "screenshooting" (builtins.readFile ./scripts/screenshooting.sh))
+    (writeShellScriptBin "task-waybar" (builtins.readFile ./scripts/task-waybar.sh))
+    (writeShellScriptBin "update-checker" (builtins.readFile ./scripts/update-checker.sh))
+    (writeShellScriptBin "wallsetter" (builtins.readFile ./scripts/wallsetter.sh))
+    (writeShellScriptBin "web-search" (builtins.readFile ./scripts/web-search.sh))
+    (writeShellScriptBin "wttr" (builtins.readFile ./scripts/wttr.sh))
+    (writeShellScriptBin "yt" (builtins.readFile ./scripts/yt.sh))
   ];
 }
 
