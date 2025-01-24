@@ -134,12 +134,9 @@ in
       # ++
       # Launcher
       (
-        let
-          rofi = lib.getExe config.programs.rofi.package;
-        in
         lib.optionals config.programs.rofi.enable [
-          "SUPER, x,exec,${rofi} -show drun -theme ${config.home.homeDirectory}/.config/rofi/style/launcher-center.rasi"
-          "SUPER, z,exec,${rofi} -show drun -theme ${config.home.homeDirectory}/.config/rofi/style/launcher-full.rasi"
+          "SUPER, x,exec,rofi -show drun -theme ${config.home.homeDirectory}/.config/rofi/style/launcher-center.rasi"
+          "SUPER, z,exec,rofi -show drun -theme ${config.home.homeDirectory}/.config/rofi/style/launcher-full.rasi"
           "SUPERSHIFT, W,exec,web-search"
         ]
         ++
@@ -148,7 +145,7 @@ in
             cliphist = lib.getExe config.services.cliphist.package;
           in
           lib.optionals config.services.cliphist.enable [
-            ''SUPER, c,exec,selected=$(${cliphist} list | ${rofi} -show drun -theme ${config.home.homeDirectory}/.config/rofi/style/cliphist.rasi) && echo "$selected" | ${cliphist} decode | wl-copy''
+            ''SUPER, c,exec,selected=$(${cliphist} list | rofi -show drun -theme ${config.home.homeDirectory}/.config/rofi/style/cliphist.rasi) && echo "$selected" | ${cliphist} decode | wl-copy''
           ]
         )
       )

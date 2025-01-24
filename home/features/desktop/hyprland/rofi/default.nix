@@ -11,9 +11,9 @@
   ];
 
   home.file = {
-    ".config/rofi/custom.rasi" = {
-      source = ./custom.rasi;
-    };
+    # ".config/rofi/custom.rasi" = {
+    #   source = ./custom.rasi;
+    # };
     ".config/rofi/config2.rasi" = {
       source = ./config2.rasi;
     };
@@ -106,36 +106,41 @@
         "${config.home.homeDirectory}/.local/share/keyrings"
       ];
     };
-    theme =
-    let
-      # Use `mkLiteral` for string-like values that should show without
-      # quotes, e.g.:
-      # {
-      #   foo = "abc"; =&gt; foo: "abc";
-      #   bar = mkLiteral "abc"; =&gt; bar: abc;
-      # };
-      inherit (config.lib.formats.rasi) mkLiteral;
-    in {
-      "*" = {
-        background = mkLiteral "#303446";
-        background-alt = mkLiteral "rgba(48, 52, 70, .50)";
-        foreground = mkLiteral "#c6d0f5";
-        selected = mkLiteral "#8caaee";
-        active = mkLiteral "#a6d189";
-        urgent = mkLiteral "#e78284";
-        width = 512;
-      };
+    # theme = let
+    #   # Use `mkLiteral` for string-like values that should show without
+    #   # quotes, e.g.:
+    #   # {
+    #   #   foo = "abc"; =&gt; foo: "abc";
+    #   #   bar = mkLiteral "abc"; =&gt; bar: abc;
+    #   # };
+    #   inherit (config.lib.formats.rasi) mkLiteral;
+    # in {
+    #   "*" = {
+    #     background = mkLiteral "#303446";
+    #     background-alt = mkLiteral "rgba(48, 52, 70, .50)";
+    #     foreground = mkLiteral "#c6d0f5";
+    #     selected = mkLiteral "#8caaee";
+    #     active = mkLiteral "#a6d189";
+    #     urgent = mkLiteral "#e78284";
+    #     width = 512;
+    #   };
 
-      "#inputbar" = {
-        children = map mkLiteral [ "prompt" "entry" ];
-      };
+    #   "#inputbar" = {
+    #     children = map mkLiteral [ "prompt" "entry" ];
+    #   };
 
-      "#textbox-prompt-colon" = {
-        expand = false;
-        str = ":";
-        margin = mkLiteral "0px 0.3em 0em 0em";
-        text-color = mkLiteral "@foreground-color";
-      };
+    #   "#textbox-prompt-colon" = {
+    #     expand = false;
+    #     str = ":";
+    #     margin = mkLiteral "0px 0.3em 0em 0em";
+    #     text-color = mkLiteral "@foreground-color";
+    #   };
+    # };
+    extraConfig ={
+      modi = "drun,emoji,ssh,run,filebrowser,window";
+      font = "Fira Code 12";
+      kb-primary-paste = "Control+V,Shift+Insert";
+      kb-secondary-paste = "Control+v,Insert";
     };
   };
 }
