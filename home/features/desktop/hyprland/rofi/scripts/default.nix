@@ -11,10 +11,6 @@
     source = ./apps.sh;
     executable = true;
   };
-  home.file.".config/rofi/scripts/battery.sh" = {
-    source = ./battery.sh;
-    executable = true;
-  };
   home.file.".config/rofi/scripts/brightness.sh" = {
     source = ./brightness.sh;
     executable = true;
