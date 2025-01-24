@@ -11,6 +11,9 @@
   ];
 
   home.file = {
+    ".config/rofi/custom.rasi" = {
+      source = ./custom.rasi;
+    };
     ".config/rofi/config2.rasi" = {
       source = ./config2.rasi;
     };
@@ -101,18 +104,21 @@
     };
     theme =
     let
-    # Use `mkLiteral` for string-like values that should show without
-    # quotes, e.g.:
-    # {
-    #   foo = "abc"; =&gt; foo: "abc";
-    #   bar = mkLiteral "abc"; =&gt; bar: abc;
-    # };
-    inherit (config.lib.formats.rasi) mkLiteral;
+      # Use `mkLiteral` for string-like values that should show without
+      # quotes, e.g.:
+      # {
+      #   foo = "abc"; =&gt; foo: "abc";
+      #   bar = mkLiteral "abc"; =&gt; bar: abc;
+      # };
+      inherit (config.lib.formats.rasi) mkLiteral;
     in {
       "*" = {
-        background-color = mkLiteral "var(background)";
-        foreground-color = mkLiteral "var(foreground)";
-        border-color = mkLiteral "var(selected);";
+        background = mkLiteral "#303446";
+        background-alt = mkLiteral "rgba(48, 52, 70, .50)";
+        foreground = mkLiteral "#c6d0f5";
+        selected = mkLiteral "#8caaee";
+        active = mkLiteral "#a6d189";
+        urgent = mkLiteral "#e78284";
         width = 512;
       };
 
@@ -126,11 +132,6 @@
         margin = mkLiteral "0px 0.3em 0em 0em";
         text-color = mkLiteral "@foreground-color";
       };
-      extraConfig = ''
-        /*****----- Global Properties -----*****/
-        @import                          "style/shared/colors.rasi"
-        @import                          "style/shared/fonts.rasi"
-      '';
     };
   };
 }
