@@ -1,7 +1,7 @@
 
 * {
   background:     #303446;
-  background-alt:rgba(48, 52, 70, .50);
+  background-alt:rgba(48, 52, 70, 70%);
   foreground:     #c6d0f5;
   selected:       #8caaee;
   active:         #a6d189;
