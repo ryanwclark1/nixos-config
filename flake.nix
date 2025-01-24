@@ -254,6 +254,15 @@
         extraSpecialArgs = {
           inherit inputs outputs;
         };
+        "ryanc@ansible" = lib.homeManagerConfiguration {
+        modules = [
+          stylix.homeManagerModules.stylix
+          ./home/ansible.nix
+        ];
+        pkgs = pkgsFor.x86_64-linux;
+        extraSpecialArgs = {
+          inherit inputs outputs;
+        };
       };
     };
   };
