@@ -5,8 +5,6 @@
   ...
 }:
 let
-  files = "${pkgs.nautilus}/bin/nautilus";
-  code = lib.getExe config.programs.vscode.package;
   defaultApp = type: "${lib.getExe pkgs.handlr-regex} launch ${type}";
   browser = "${pkgs.google-chrome}/bin/google-chrome-stable";
   # remote = lib.getExe (pkgs.writeShellScriptBin "remote" ''
@@ -51,10 +49,10 @@ in
         [
           # Program bindings
           "SUPER, S,exec,screenshooting"
-          "SUPER, e,exec,${code}"
+          "SUPER, e,exec,code"
           "SUPER, b,exec,${defaultApp "x-scheme-handler/https"}"
-          "SUPER ALT, space,exec,${files}"
-          "SUPER, backspace,exec,${pkgs.wlogout}/bin/wlogout"
+          "SUPER ALT, space,exec,nautilus"
+          "SUPER, backspace,exec,wlogout"
           # "SUPER ALT,Return,exec,${remote} ${defaultApp "x-scheme-handler/terminal"}"
           # "SUPER ALT,e,exec,${remote} ${defaultApp "text/plain"}"
           # "SUPER ALT,b,exec,${remote} ${defaultApp "x-scheme-handler/https"}"
