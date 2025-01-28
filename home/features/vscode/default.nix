@@ -259,6 +259,7 @@
         "terminal.integrated.fontFamily" = "UbuntuMono Nerd Font";
         "terminal.integrated.copyOnSelection" = true;
         "terminal.integrated.defaultProfile.linux" = "bash";
+        "terminal.integrated.scrollback" = 5000;
         "terminal.integrated.fontSize" = 12;
         "terminal.integrated.minimumContrastRatio" = 1;
         "terminal.integrated.mouseWheelZoom" = true;
