@@ -78,7 +78,7 @@ with config.lib.stylix.colors.withHashtag;
       hostname = {
         disabled = false;
         ssh_only = true;
-        ssh_symbol = "";
+        ssh_symbol = " ";
         style = "bg:${base0E} fg:${base00}";
         format = "[$ssh_symbol]($style)";
       };
@@ -89,14 +89,14 @@ with config.lib.stylix.colors.withHashtag;
         truncation_length = 8;
         truncate_to_repo = true;
         truncation_symbol = "…/";
-        read_only = "";
+        read_only = " ";
         home_symbol = "~";
         substitutions = {
           "Documents" = "󰈙 ";
           "Downloads" = " ";
           "Music" = " ";
           "Pictures" = " ";
-          "/code" = "/󰲋 ";
+          "Code" = "󰲋 ";
           "Videos" = " ";
           "Desktop" = " ";
         };
@@ -110,7 +110,7 @@ with config.lib.stylix.colors.withHashtag;
       };
       aws = {
         disabled = true;
-        symbol = "";
+        symbol = " ";
         format = "on [$symbol$profile(\\($region\\))]($style)";
       };
 
@@ -125,10 +125,12 @@ with config.lib.stylix.colors.withHashtag;
       perl.symbol = " ";
       ruby.symbol = " ";
       scala.symbol = "";
-      terraform.symbol = "󱁢";
+      terraform.symbol = "󱁢 ";
+      erlang.symbol = " ";
+      r.symbol = " ";
 
       shlvl = {
-        symbol = "";
+        symbol = " ";
         format = "[$shlvl]($style) ";
         style = "bold cyan";
         threshold = 2;
@@ -142,7 +144,7 @@ with config.lib.stylix.colors.withHashtag;
         disabled = false;
       };
       git_branch = {
-        symbol = "";
+        symbol = " ";
         style = "bg:${base05}";
         format = "[[ $symbol $branch ](fg:${base00} bg:${base05})]($style)";
         disabled = false;
@@ -159,7 +161,7 @@ with config.lib.stylix.colors.withHashtag;
         disabled = false;
       };
       bun = {
-        symbol = "";
+        symbol = " ";
         style = "bg:${base0F}";
         format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
         disabled = false;
@@ -182,13 +184,13 @@ with config.lib.stylix.colors.withHashtag;
         disabled = true;
       };
       golang = {
-        symbol = "";
+        symbol = " ";
         style = "bg:${base0F}";
         format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
         disabled = false;
       };
       haskell = {
-        symbol = "";
+        symbol = " ";
         style = "bg:${base0F}";
         format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
       };
@@ -199,13 +201,13 @@ with config.lib.stylix.colors.withHashtag;
         disabled = true;
       };
       kotlin = {
-        symbol = "";
+        symbol = " ";
         style = "bg:${base0F}";
         format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
         disabled = true;
       };
       kubernetes = {
-        symbol = "󱃾";
+        symbol = "󱃾 ";
         style = "bg:${base0F}";
         format = "[[ $symbol$context( \$namespace\ ) ](fg:${base00} bg:${base0F})]($style)";
         disabled = false;
@@ -228,19 +230,19 @@ with config.lib.stylix.colors.withHashtag;
         disabled = true;
       };
       nodejs = {
-        symbol = "";
+        symbol = " ";
         style = "bg:${base0F}";
         format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
         disabled = false;
       };
       php = {
-        symbol = "";
+        symbol = " ";
         style = "bg:${base0F}";
         format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
         disabled = false;
       };
       python = {
-        symbol = "󰌠";
+        symbol = " ";
         style = "bg:${base0F}";
         version_format = "$raw";
         format = "[[ $symbol( $version )(\($virtualenv\) )](fg:${base00} bg:${base0F})]($style)";
@@ -249,25 +251,25 @@ with config.lib.stylix.colors.withHashtag;
         pyenv_version_name = true;
       };
       rust = {
-        symbol = "";
+        symbol = " ";
         style = "bg:${base0F}";
         format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
         disabled = false;
       };
       swift = {
-        symbol = "";
+        symbol = " ";
         style = "bg:${base0F}";
         format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
         disabled = true;
       };
       zig = {
-        symbol = "";
+        symbol = " ";
         style = "bg:${base0F}";
         format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
         disabled = true;
       };
       docker_context = {
-        symbol = "";
+        symbol = " ";
         style = "bg:${base06}";
         format = "[[ $symbol( $context) ](fg:${base00} bg:${base06})]($style)";
         disabled = false;
