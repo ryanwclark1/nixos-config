@@ -18,6 +18,7 @@
     (pkgs.writeScriptBin "wifi" (builtins.readFile ./scripts/wifi.sh))
   ];
 
+  # Copy these scripts to the user's home directory for dotfiles repo
   home.file.".config/scripts" = {
     source = ./scripts;
     recursive = true;
