@@ -21,23 +21,15 @@
       enableExtensionUpdateCheck = true;
       enableUpdateCheck = false;
       extensions = with pkgs.vscode-extensions; [
-        mkhl.direnv
-        tauri-apps.tauri-vscode
         bradlc.vscode-tailwindcss
-        cameron.vscode-pytest
         catppuccin.catppuccin-vsc
         charliermarsh.ruff
         coder.coder-remote
-        codezombiech.gitignore
-        cweijan.vscode-database-client2
         dbaeumer.vscode-eslint
         donjayamanne.githistory
         ecmel.vscode-html-css
-        editorconfig.editorconfig
-        esbenp.prettier-vscode
         esbenp.prettier-vscode
         formulahendry.code-runner
-        gencer.html-slim-scss-css-class-completion
         github.codespaces
         github.copilot
         github.copilot-chat
@@ -47,11 +39,12 @@
         golang.go
         griimick.vhs
         hediet.vscode-drawio
-        jdinhlife.gruvbox
         jetmartin.bats
         jnoortheen.nix-ide
         jock.svg
+        marp-team.marp-vscode
         mikestead.dotenv
+        mkhl.direnv
         ms-azuretools.vscode-docker
         ms-kubernetes-tools.vscode-kubernetes-tools
         ms-python.debugpy
@@ -60,10 +53,8 @@
         ms-vscode-remote.remote-containers
         ms-vscode-remote.remote-ssh
         ms-vscode-remote.remote-ssh-edit
-        ms-vscode.cmake-tools
         ms-vscode.hexeditor
         ms-vscode.live-server
-        ms-vscode.makefile-tools
         njpwerner.autodocstring
         pkief.material-icon-theme
         quicktype.quicktype
@@ -74,11 +65,8 @@
         shyykoserhiy.vscode-spotify
         tailscale.vscode-tailscale
         tamasfe.even-better-toml
-        # vscodevim.vim
-        yzhang.markdown-all-in-one
         wholroyd.jinja # Prefer Better Jinja
-        marp-team.marp-vscode
-        esbenp.prettier-vscode
+        yzhang.markdown-all-in-one
       ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
         {
           name = "alpine-js-intellisense";
@@ -165,12 +153,6 @@
           version = "0.7.2";
         }
         {
-          name = "vscode-postgresql-client2";
-          publisher = "cweijan";
-          sha256 = "sha256-0dDYuzL+0lA/W1ZHX3FFrnrjl+TROlf8DOFASfe25s0=";
-          version = "7.7.4";
-        }
-        {
           name = "vscode-speech";
           publisher = "ms-vscode";
           sha256 = "sha256-fxmaPI7uq7DQlzgJc8RcZzHDOwMuodSCf9TkLU9+/+k=";
@@ -252,14 +234,14 @@
         "files.exclude" = {
           "**/node_modules/**" = true;
           "**/venv/**" = true;
+          "**/.venv/**" = true;
         };
         "files.autoSave" = "afterDelay";
-        "files.trimTrailingWhitespace" = true;
         "telemetry.telemetryLevel" = "off";
         "terminal.integrated.fontFamily" = "UbuntuMono Nerd Font";
         "terminal.integrated.copyOnSelection" = true;
         "terminal.integrated.defaultProfile.linux" = "bash";
-        "terminal.integrated.scrollback" = 5000;
+        "terminal.integrated.scrollback" = 10000;
         "terminal.integrated.fontSize" = 12;
         "terminal.integrated.minimumContrastRatio" = 1;
         "terminal.integrated.mouseWheelZoom" = true;
@@ -270,7 +252,6 @@
         "window.zoomLevel" = 1;
         "workbench.editor.enablePreview" = true;
         "workbench.externalBrowser" = "chrome";
-        "workbench.colorTheme" = "Catppuccin Frappe";
 
         "html-css-class-completion.enableEmmetSupport" = true;
         "html-css-class-completion.enableFindUsage" = true;
@@ -348,14 +329,13 @@
         "github.copilot.renameSuggestions.triggerAutomatically" = true;
 
         # Dev Containers
-        # "dev.containers.dockerComposePath" = "${pkgs.docker}/bin/docker compose";
-        # "dev.containers.dockerPath" = "${pkgs.docker}/bin/docker";
         "dev.containers.defaultExtensionsIfInstalledLocally" = [
           "GitHub.copilot"
           "GitHub.copilot-chat"
           "GitHub.vscode-pull-request-github"
         ];
         "dotfiles.repository" = "https://github.com/ryanwclark1/dotfiles.git";
+        "dotfiles.installCommand" = "bootstrap.sh";
 
         # Docker
         "docker.composeCommand" = "docker compose";
