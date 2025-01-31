@@ -127,7 +127,7 @@ with config.lib.stylix.colors.withHashtag;
       scala.symbol = "";
       terraform.symbol = "󱁢 ";
       erlang.symbol = " ";
-      r.symbol = " ";
+      rlang.symbol = " ";
 
       shlvl = {
         symbol = " ";
