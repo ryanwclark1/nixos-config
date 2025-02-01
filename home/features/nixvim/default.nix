@@ -43,7 +43,7 @@
 
     # LSP and formatting
     ./plugins/lsp/conform.nix
-    ./plugins/lsp/fidget.nix
+    # ./plugins/lsp/fidget.nix
     ./plugins/lsp/lsp.nix
 
     # Git
