@@ -11,7 +11,7 @@
   ];
 
   home.packages = with pkgs; [
-    pkgs.eww
+    eww
   ];
 
   # # configuration
