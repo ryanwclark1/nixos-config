@@ -4,8 +4,10 @@
   };
   programs.nixvim.plugins.copilot-lua = {
     enable = true;
-    suggestion = {enabled = false;};
-    panel = {enabled = false;};
+    settings = {
+      suggestion = {enabled = false;};
+      panel = {enabled = false;};
+    };
   };
 
   programs.nixvim.extraConfigLua = ''
