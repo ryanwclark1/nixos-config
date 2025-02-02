@@ -17,6 +17,7 @@
     ./features/chrome
     ./features/compression
     ./features/cursor
+    ./features/dotfiles
     ./features/discord
     ./features/development
     ./features/eza
