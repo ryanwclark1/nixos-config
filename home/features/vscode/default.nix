@@ -214,7 +214,7 @@
         "window.zoomLevel" = 2;
         "workbench.editor.enablePreview" = true;
         "workbench.externalBrowser" = "chrome";
-        "workbench.colorTheme" = "Catppuccin Latte";
+        "workbench.colorTheme" = "Catppuccin Mocha";
 
         #############################
         #    Extension Settings     #
