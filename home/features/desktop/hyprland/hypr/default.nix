@@ -262,7 +262,7 @@ in
         "stayfocused, title:^()$,class:^(steam)$"
         "minsize 1 1, title:^()$,class:^(steam)$"
         "opacity 0.70, class:^(com.mitchellh.ghostty)$"
-        "opacity 0.90, class:^(code)$"
+        "opacity 0.97, class:^(code)$"
       ];
 
       layerrule = [
