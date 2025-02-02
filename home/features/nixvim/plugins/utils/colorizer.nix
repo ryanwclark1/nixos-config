@@ -2,7 +2,7 @@
 {
 
   programs.nixvim.plugins = {
-    nvim-colorizer = {
+    colorizer = {
       enable = false;
     };
   };
