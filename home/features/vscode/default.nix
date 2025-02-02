@@ -21,19 +21,18 @@
       enableExtensionUpdateCheck = true;
       enableUpdateCheck = false;
       extensions = with pkgs.vscode-extensions; [
+        aaron-bond.better-comments
+        bierner.markdown-mermaid
         bradlc.vscode-tailwindcss
         catppuccin.catppuccin-vsc
         charliermarsh.ruff
-        coder.coder-remote
         dbaeumer.vscode-eslint
         donjayamanne.githistory
-        ecmel.vscode-html-css
         esbenp.prettier-vscode
         formulahendry.code-runner
         github.codespaces
         github.copilot
         github.copilot-chat
-        github.github-vscode-theme
         github.vscode-github-actions
         github.vscode-pull-request-github
         golang.go
@@ -44,7 +43,6 @@
         jock.svg
         marp-team.marp-vscode
         mikestead.dotenv
-        mkhl.direnv
         ms-azuretools.vscode-docker
         ms-kubernetes-tools.vscode-kubernetes-tools
         ms-python.debugpy
@@ -56,16 +54,12 @@
         ms-vscode.hexeditor
         ms-vscode.live-server
         njpwerner.autodocstring
-        pkief.material-icon-theme
         quicktype.quicktype
         redhat.vscode-xml
         redhat.vscode-yaml
-        rust-lang.rust-analyzer
         samuelcolvin.jinjahtml
         shyykoserhiy.vscode-spotify
         tailscale.vscode-tailscale
-        tamasfe.even-better-toml
-        wholroyd.jinja # Prefer Better Jinja
         yzhang.markdown-all-in-one
       ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
         {
@@ -79,12 +73,6 @@
           publisher = "redhat";
           sha256 = "sha256-/kLg+msRu6GvkENVu3jw9uDbfEo/x0eZgsKfXvLaO3I=";
           version = "25.1.0";
-        }
-        {
-          name = "bun-vscode";
-          publisher = "oven";
-          sha256 = "sha256-CB9NrBVxHVF/rexAgPpqDFxiYnrZCzP/e7jxRhHUBmI=";
-          version = "0.0.25";
         }
         {
           name = "grafana-vscode";
@@ -117,12 +105,6 @@
           version = "0.65.2024112101";
         }
         {
-          name = "sqlite-viewer";
-          publisher = "qwtel";
-          sha256 = "sha256-hij0nA/MAi7pelI0aMWAHD1YWEmJaON7/psIIUJeJc8=";
-          version = "0.9.5";
-        }
-        {
           name = "tailwind-color-matcher";
           publisher = "OmriGrossman";
           sha256 = "sha256-WfFg1h5tY43W9YqgXkHDlxjRquFupuvLBwotTw0XoNk=";
@@ -140,35 +122,17 @@
           sha256 = "sha256-RZ++wxL2OqBh3hiLAwKIw5QLjU/imsK7irQUHbJ/tqM=";
           version = "0.0.29";
         }
-        # {
-        #   name = "vscode-gitops-tools";
-        #   publisher = "weaveworks";
-        #   sha256 = "sha256-7MCKDnHCot/CL/SqZ2WuTxbqFdF75EC5WC+OxW0dcaE=";
-        #   version = "0.27.0";
-        # }
         {
           name = "vscode-jsonnet";
           publisher = "grafana";
           sha256 = "sha256-Q8VzXzTdHo9h5+eCHHF1bPomPEbRsvouJcUfmFUDGMU=";
           version = "0.7.2";
         }
-        # {
-        #   name = "vscode-speech";
-        #   publisher = "ms-vscode";
-        #   sha256 = "sha256-fxmaPI7uq7DQlzgJc8RcZzHDOwMuodSCf9TkLU9+/+k=";
-        #   version = "0.12.1";
-        # }
         {
           name = "vscode-thunder-client";
           publisher = "rangav";
           sha256 = "sha256-NvGAbszItsZf71D6fI0/IOSAxKXUHjDJoQ58ROF/NAk=";
           version = "2.32.3";
-        }
-        {
-          name = "yuck";
-          publisher = "eww-yuck";
-          sha256 = "sha256-DITgLedaO0Ifrttu+ZXkiaVA7Ua5RXc4jXQHPYLqrcM=";
-          version = "0.0.3";
         }
       ];
 
