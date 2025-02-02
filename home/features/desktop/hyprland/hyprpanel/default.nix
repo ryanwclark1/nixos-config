@@ -1,7 +1,7 @@
 # *.nix
 {
   lib,
-  inputs,
+
   ...
 }:
 
