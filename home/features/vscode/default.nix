@@ -145,13 +145,11 @@
       userSettings = {
         "accessibility.dimUnfocused.enabled" = true;
         "breadcrumbs.enabled" = true;
-
         "diffEditor.codeLens" = true;
-        "diffEditor.experimental.showMoves" = true;
+        "diffEditor.experimental.showcoloves" = true;
         "diffEditor.diffAlgorithm" = "advanced";
         "diffEditor.maxFileSize" = 0;
         "diffEditor.renderIndicators" = true;
-
         "editor.accessibilityPageSize" = 5000;
         "editor.experimental.treeSitterTelemetry" = false;
         "editor.fontFamily" = "UbuntuMono Nerd Font, JetBrains Mono, Symbols Nerd Font Mono";
@@ -185,17 +183,8 @@
           80
           120
         ];
-
-        "emmet.showSuggestionsAsSnippets" = true;
-        "emmet.includeLanguages" = {
-          "javascript" = "javascriptreact";
-          "typescript" = "typescriptreact";
-          "vue-html" = "html";
-          "templ" = "html";
-        };
-        "emmet.triggerExpansionOnTab" = true;
-
         "extensions.autoUpdate" = false;
+        
         "files.associations" = {
           "*.css" = "tailwindcss";
           ".env" = "dotenv";
@@ -205,8 +194,11 @@
           "**/node_modules/**" = true;
           "**/venv/**" = true;
           "**/.venv/**" = true;
+          ".git" = true;
+          "**/.git" = false;
         };
         "files.autoSave" = "afterDelay";
+        "security.workspace.trust.untrustedFiles" = "open";
         "telemetry.telemetryLevel" = "off";
         "terminal.integrated.fontFamily" = "UbuntuMono Nerd Font";
         "terminal.integrated.copyOnSelection" = true;
@@ -219,84 +211,43 @@
         "terminal.integrated.customGlyphs" = true;
         "terminal.integrated.environmentChangesIndicator" = "off";
         "window.titleBarStyle" = "custom";
-        "window.zoomLevel" = 1;
+        "window.zoomLevel" = 2;
         "workbench.editor.enablePreview" = true;
         "workbench.externalBrowser" = "chrome";
+        "workbench.colorTheme" = "Catppuccin Latte";
 
-        "html-css-class-completion.enableEmmetSupport" = true;
-        "html-css-class-completion.enableFindUsage" = true;
-        "html-css-class-completion.enableScssFindUsage" = true;
+        #############################
+        #    Extension Settings     #
+        #############################
+
+        "emmet.showSuggestionsAsSnippets" = true;
+        "emmet.includeLanguages" = {
+          "javascript" = "javascriptreact";
+          "typescript" = "typescriptreact";
+          "vue-html" = "html";
+          "templ" = "html";
+        };
+        "emmet.triggerExpansionOnTab" = true;
 
         # Code Runner
         "code-runner.enableAppInsights" = false;
 
+        # Copilot
+        "github.copilot.chat.temporalContext.enabled" = true;
+        "github.copilot.chat.completionContext.typescript.mode" = "on";
         "github.copilot.editor.enableAutoCompletions" = true;
-        "github.copilot.enable" = {
-          "c" = true;
-          "cpp" = true;
-          "csharp" = true;
-          "dockercompose" = true;
-          "css" = true;
-          "cuda-cpp" = true;
-          "diff" = true;
-          "dockerfile" = true;
-          "erlang" = true;
-          "fsharp" = true;
-          "git-commit" = true;
-          "git-rebase" = true;
-          "go" = true;
-          "groovy" = true;
-          "handlebars" = true;
-          "haml" = true;
-          "haskell" = true;
-          "html" = true;
-          "ini" = true;
-          "java" = true;
-          "javascript" = true;
-          "javascriptreact" = true;
-          "json" = true;
-          "jsonc" = true;
-          "julia" = true;
-          "latex" = true;
-          "less" = true;
-          "lua" = true;
-          "makefile" = true;
-          "markdown" = true;
-          "objective-c" = true;
-          "objective-cpp" = true;
-          "ocaml" = true;
-          "perl" = true;
-          "php" = true;
-          "plaintext" = true;
-          "powershell" = true;
-          "pug" = true;
-          "python" = true;
-          "r" = true;
-          "ruby" = true;
-          "rust" = true;
-          "scss" = true;
-          "sass" = true;
-          "shellscript" = true;
-          "slim" = true;
-          "sql" = true;
-          "stylus" = true;
-          "svelte" = true;
-          "swift" = true;
-          "typescript" = true;
-          "typescriptreact" = true;
-          "tex" = true;
-          "vue" = true;
-          "vue-html" = true;
-          "xml" = true;
-          "xsl" = true;
-          "yaml" = true;
-        };
-
         "github.copilot.chat.startDebugging.enabled" = true;
         "github.copilot.chat.localeOverride" = "en";
         "github.copilot.chat.useProjectTemplates" = true;
         "github.copilot.editor.enableCodeActions" = true;
         "github.copilot.renameSuggestions.triggerAutomatically" = true;
+        "github.copilot.advanced" = {
+          "listCount" = 3;
+        };
+        "github.copilot.enable" = {
+          "*" = true;
+          "plaintext" = false;
+        };
 
         # Dev Containers
         "dev.containers.defaultExtensionsIfInstalledLocally" = [
@@ -310,7 +261,6 @@
         # Docker
         "docker.composeCommand" = "docker compose";
         "docker.contexts.showInStatusBar" = true;
-        # "docker.dockerPath" = "${pkgs.docker}/bin/docker";
 
         # Draw.io
         # "hediet.vscode-drawio.plugins" = [
@@ -327,22 +277,9 @@
 
         "ruff.nativeServer" = "auto";
 
-        # Even Better TOML
-        "evenBetterToml.taplo.bundled" = true;
-        # "evenBetterToml.taplo.path" = "${pkgs.taplo}/bin/taplo";
-
-        # Go
-        # "go.alternateTools" = {
-        #   "dlv" = "${pkgs.delve}/bin/dlv";
-        #   "dlv-dap" = "${pkgs.delve}/bin/dlv-dap";
-        #   "gopls" = "${pkgs.gopls}/bin/gopls";
-        #   "go" = "${lib.getExe config.programs.go.package}";
-        #   "gofumpt" = "${pkgs.gofumpt}/bin/gofumpt";
-        #   "golangci-lint" = "${pkgs.golangci-lint}/bin/golangci-lint";
-        #   "gotestsum" = "${pkgs.gotestsum}/bin/gotestsum";
-        #   "staticcheck" = "${pkgs.go-tools}/bin/staticcheck";
-        #   "templ" = "${pkgs.templ}/bin/templ";
-        # };
+        #############################
+        #            GO             #
+        #############################
         "go.delveConfig" = {
           "apiVersion" = 2;
           "debugAdapter" = "dlv-dap";
@@ -373,8 +310,6 @@
           "run" = true;
           "share" = true;
         };
-        # "go.gopath" = "${config.home.homeDirectory}/go";
-        # "go.goroot" = "${lib.getExe config.programs.go.package}";
         "go.lintOnSave" = "golangci-lint";
         "go.inferGopath" = true;
         "go.showWelcome" = false;
@@ -442,17 +377,12 @@
           "Github.copilot-chat"
           "Github.copilot"
         ];
-        "github.copilot.advanced" = {
-          "listCount" = 3;
-        };
+
 
         # Kubernetes
         "vs-kubernetes" = {
           "vs-kubernetes.crd-code-completion" = "enabled";
         };
-        # "vscode-kubernetes.helm-path.linux" = "${pkgs.kubernetes-helm}/bin/helm";
-        # "vscode-kubernetes.kubectl-path.linux" = "${pkgs.kubectl}/bin/kubectl";
-        # "vscode-kubernetes.minikube-path.linux" = "${pkgs.minikube}/bin/minikube";
         "vscode-kubernetes.log-viewer.autorun" = true;
         "vscode-kubernetes.log-viewer.destination" = "Terminal";
         "vscode-kubernetes.log-viewer.follow" = true;
@@ -479,6 +409,9 @@
         # Templ
         "templ.pprof" = true;
         "templ.goplsRPCTrace" = true;
+        "[templ]" = {
+          "editor.defaultFormatter" = "a-h.templ";
+        };
 
         # YAML
         "yaml.completion" = true;
@@ -493,11 +426,6 @@
         "yaml.schemaStore.url" = "https://www.schemastore.org/api/json/catalog.json";
         "yaml.validate" = true;
         "yaml.yamlVersion" = "1.2";
-        "[templ]" = {
-          "editor.defaultFormatter" = "a-h.templ";
-        };
-        "database-client.autoSync" = false;
-        "database-client.telemetry.usesOnlineServices" = false;
       };
     };
   };
