@@ -13,6 +13,7 @@
     ./features/bat
     ./features/btop
     ./features/cli
+    ./features/chrome
     ./features/compression
     ./features/cursor
     ./features/discord

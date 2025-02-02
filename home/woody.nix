@@ -7,7 +7,6 @@
   imports = [
     ./global
 
-    # ./features/accounts
     ./features/alacritty
     ./features/ansible
     ./features/atuin
@@ -63,12 +62,7 @@
 
   home.packages = with pkgs; [
     amdgpu_top
-    # f1multiviewer
   ];
-
-  # programs.f1multiviewer = {
-  #   enable = true;
-  # };
 
   # Disable impermanence
   # home.persistence = lib.mkForce {};
