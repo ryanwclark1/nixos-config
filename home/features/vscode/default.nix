@@ -123,6 +123,12 @@
           version = "0.0.29";
         }
         {
+          name = "vscode-gitops-tools";
+          publisher = "weaveworks";
+          sha256 = "sha256-7MCKDnHCot/CL/SqZ2WuTxbqFdF75EC5WC+OxW0dcaE=";
+          version = "0.27.0";
+        }
+        {
           name = "vscode-jsonnet";
           publisher = "grafana";
           sha256 = "sha256-Q8VzXzTdHo9h5+eCHHF1bPomPEbRsvouJcUfmFUDGMU=";
