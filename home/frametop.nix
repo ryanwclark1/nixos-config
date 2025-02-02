@@ -6,7 +6,7 @@
   imports = [
     ./global
 
-    ./features/accounts
+    # ./features/accounts
     ./features/alacritty
     ./features/ansible
     ./features/atuin
