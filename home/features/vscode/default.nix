@@ -5,8 +5,6 @@
 
 
 {
-# Overlay for VSCode version
-
   home.packages = with pkgs; [
     tailwindcss
     fluxctl
