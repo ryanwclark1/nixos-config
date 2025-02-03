@@ -1,0 +1,22 @@
+{
+  "name": "theme",
+  "displayName": "Theme",
+  "version": "0.0.0",
+  "publisher": "clark",
+  "description": "Custom Theme for VS Code",
+  "categories": [
+    "Themes"
+  ],
+  "engines": {
+    "vscode": "^1.43.0"
+  },
+  "contributes": {
+    "themes": [
+      {
+        "label": "Clark",
+        "uiTheme": "vs",
+        "path": "./themes/theme.json"
+      }
+    ]
+  }
+}
