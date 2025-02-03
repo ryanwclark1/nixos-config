@@ -2,7 +2,7 @@
   "name": "theme",
   "displayName": "Theme",
   "version": "0.0.0",
-  "publisher": "clark",
+  "publisher": "custom",
   "description": "Custom Theme for VS Code",
   "categories": [
     "Themes"
@@ -13,7 +13,7 @@
   "contributes": {
     "themes": [
       {
-        "label": "Clark",
+        "label": "Custom Theme",
         "uiTheme": "vs",
         "path": "./themes/theme.json"
       }
