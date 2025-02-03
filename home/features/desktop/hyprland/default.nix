@@ -19,8 +19,8 @@
   ];
 
   home.file."Pictures/wallpapers" = {
-      source = ../../../../hosts/common/wallpaper;
-      recursive = true;
+    source = ../../../../hosts/common/wallpaper;
+    recursive = true;
   };
 
   home.file.".config/.emoji" = {
