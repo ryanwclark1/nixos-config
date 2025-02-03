@@ -5,7 +5,6 @@
 
 {
   imports = [
-    ../scripts
     ./gtk.nix
     ./noti.nix
     ./qt.nix
