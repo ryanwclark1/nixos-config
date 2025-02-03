@@ -158,16 +158,15 @@
       "accessibility.dimUnfocused.enabled" = true;
       "breadcrumbs.enabled" = true;
       "diffEditor.codeLens" = true;
-      "diffEditor.experimental.showcoloves" = true;
       "diffEditor.diffAlgorithm" = "advanced";
+      "diffEditor.experimental.showcoloves" = true;
       "diffEditor.maxFileSize" = 0;
       "diffEditor.renderIndicators" = true;
       "editor.accessibilityPageSize" = 5000;
       "editor.experimental.treeSitterTelemetry" = false;
-      # "editor.fontFamily" = "UbuntuMono Nerd Font, JetBrains Mono, Symbols Nerd Font Mono";
-      "editor.fontLigatures" = true;
       "editor.foldingMaximumRegions" = 10000;
       "editor.foldingStrategy" = "auto";
+      "editor.fontLigatures" = true;
       "editor.formatOnPaste" = true;
       "editor.formatOnSave" = true;
       "editor.formatOnType" = true;
@@ -212,23 +211,21 @@
       "files.autoSave" = "afterDelay";
       "security.workspace.trust.untrustedFiles" = "open";
       "telemetry.telemetryLevel" = "off";
-      "terminal.integrated.fontFamily" = "UbuntuMono Nerd Font";
       "terminal.integrated.copyOnSelection" = true;
+      "terminal.integrated.customGlyphs" = true;
       "terminal.integrated.defaultProfile.linux" = "bash";
-      "terminal.integrated.scrollback" = 10000;
-      # "terminal.integrated.fontSize" = 12;
+      "terminal.integrated.enableImages" = true;
+      "terminal.integrated.environmentChangesIndicator" = "off";
+      "terminal.integrated.fontFamily" = "UbuntuMono Nerd Font";
       "terminal.integrated.minimumContrastRatio" = 1;
       "terminal.integrated.mouseWheelZoom" = true;
-      "terminal.integrated.enableImages" = true;
-      "terminal.integrated.customGlyphs" = true;
-      "terminal.integrated.environmentChangesIndicator" = "off";
+      "terminal.integrated.scrollback" = 10000;
+      "window.newWindowProfile" = "Default";
       "window.titleBarStyle" = "custom";
       "window.zoomLevel" = 2;
+      "workbench.colorTheme" = "Custom Theme";
       "workbench.editor.enablePreview" = true;
       "workbench.externalBrowser" = "chrome";
-      # "workbench.colorTheme" = "Catppuccin Mocha";
-      "workbench.colorTheme" = "Custom Theme";
-
       #############################
       #    Extension Settings     #
       #############################
@@ -242,10 +239,10 @@
       };
       "emmet.triggerExpansionOnTab" = true;
 
-      # Code Runner
+      ##### Code Runner ####
       "code-runner.enableAppInsights" = false;
 
-      # Copilot
+      #####  Copilot ##### 
       "github.copilot.chat.temporalContext.enabled" = true;
       "github.copilot.chat.completionContext.typescript.mode" = "on";
       "github.copilot.editor.enableAutoCompletions" = true;
@@ -262,7 +259,7 @@
         "plaintext" = false;
       };
 
-      # Dev Containers
+      #####  Dev Containers #####
       "dev.containers.defaultExtensionsIfInstalledLocally" = [
         "GitHub.copilot"
         "GitHub.copilot-chat"
@@ -271,28 +268,19 @@
       "dotfiles.repository" = "https://github.com/ryanwclark1/dotfiles.git";
       "dotfiles.installCommand" = "bootstrap.sh";
 
-      # Docker
+      ##### Docker #####
       "docker.composeCommand" = "docker compose";
       "docker.contexts.showInStatusBar" = true;
 
-      # Draw.io
-      # "hediet.vscode-drawio.plugins" = [
-      #   "number"
-      #   "sql"
-      # ];
-
-      # Nix IDE
+      ##### Nix IDE #####
       "nix.enableLanguageServer" = true;
-      # "nix.serverPath" = "${pkgs.nil}/bin/nil";
 
-      # Redhat
+      ##### Redhat #####
       "redhat.telemetry.enabled" = false;
 
       "ruff.nativeServer" = "auto";
 
-      #############################
-      #            GO             #
-      #############################
+      ##### GO #####
       "go.delveConfig" = {
         "apiVersion" = 2;
         "debugAdapter" = "dlv-dap";
@@ -375,15 +363,16 @@
       "[json]"."editor.defaultFormatter" = "vscode.json-language-features";
       "[jsonc]"."editor.defaultFormatter" = "vscode.json-language-features";
 
+      ##### Typescript #####
       "[typescriptreact]"."editor.defaultFormatter" = "vscode.typescript-language-features";
 
-      # Git
+      ##### Git #####
       "git.autofetch" = true;
       "git.autofetchPeriod" = 30;
       "git.confirmSync" = false;
       "git.enableSmartCommit" = true;
 
-      #Github
+      ##### Github #####
       "github.codespaces.defaultExtensions" = [
         "GitHub.codespaces"
         "GitHub.vscode-pull-request-github"
@@ -392,7 +381,7 @@
       ];
 
 
-      # Kubernetes
+      ##### Kubernetes #####
       "vs-kubernetes" = {
         "vs-kubernetes.crd-code-completion" = "enabled";
       };
@@ -402,6 +391,7 @@
       "vscode-kubernetes.log-viewer.timestamp" = true;
       "vsdocker.imageUser" = "docker.io/ryanwclark";
 
+      ##### Tailwind CSS #####
       # Configurations: https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss
       "tailwindCSS.includeLanguages" = {
         "plaintext" = "html";
@@ -419,14 +409,14 @@
       "tailwindCSS.suggestions" = true;
       "tailwindCSS.validate" = true;
 
-      # Templ
+      ##### Templ #####
       "templ.pprof" = true;
       "templ.goplsRPCTrace" = true;
       "[templ]" = {
         "editor.defaultFormatter" = "a-h.templ";
       };
 
-      # YAML
+      ##### YAML #####
       "yaml.completion" = true;
       "yaml.extension.recommendations" = true;
       "yaml.format.bracketSpacing" = true;
