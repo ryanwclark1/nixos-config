@@ -12,18 +12,17 @@
       input.method = "pipewire";
       smoothing.noise_reduction = 88;
       color = {
-        background = "'#1e1e2e'";
+        background = "'#303446'";
 
         gradient = "1";
-
-        gradient_color_1 = "'#94e2d5'";
-        gradient_color_2 = "'#89dceb'";
-        gradient_color_3 = "'#74c7ec'";
-        gradient_color_4 = "'#89b4fa'";
-        gradient_color_5 = "'#cba6f7'";
-        gradient_color_6 = "'#f5c2e7'";
-        gradient_color_7 = "'#eba0ac'";
-        gradient_color_8 = "'#f38ba8'";
+        gradient_color_1 = "'#ca9ee6'";
+        gradient_color_2 = "'#8caaee'";
+        gradient_color_3 = "'#81c8be'";
+        gradient_color_4 = "'#a6d189'";
+        gradient_color_5 = "'#e5c890'";
+        gradient_color_6 = "'#ef9f76'";
+        gradient_color_7 = "'#e78284'";
+        gradient_count = "7";
       };
     };
 
