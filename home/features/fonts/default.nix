@@ -31,7 +31,7 @@
     powerline-symbols
     icomoon-feather
     font-awesome
-
+    material-symbols
     # Font Manager
     font-manager
   ];
