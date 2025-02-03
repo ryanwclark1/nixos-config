@@ -16,29 +16,33 @@ in
     enable = lib.mkDefault true;
     autoEnable = lib.mkDefault false;
     image = ../../hosts/common/wallpaper/FormulaOne_Vettel_2.jpg;
-    imageScalingMode = "fill";
+    imageScalingMode = lib.mkDefault "fill";
     base16Scheme = "${pkgs.base16-schemes}/share/themes/${currentScheme}.yaml";
     cursor = {
-      package = pkgs.bibata-cursors;
-      name = "Bibata-Modern-Classic";
-      size = 16;
+      package = lib.mkDefault pkgs.bibata-cursors;
+      name = lib.mkDefault "Bibata-Modern-Classic";
+      size = lib.mkDefault 16;
+    };
+    iconTheme = {
+      enable = lib.mkDefault false;
+      package = lib.mkDefault pkgs.adwaita-icon-theme;
     };
     fonts = {
       serif = {
-        package = pkgs.dejavu_fonts;
-        name = "DejaVu Serif";
+        package = lib.mkDefault pkgs.dejavu_fonts;
+        name = lib.mkDefault "DejaVu Serif";
       };
       sansSerif = {
-        package = pkgs.dejavu_fonts;
-        name = "DejaVu Sans";
+        package = lib.mkDefault pkgs.dejavu_fonts;
+        name = lib.mkDefault "DejaVu Sans";
       };
       monospace = {
-        package = pkgs.nerd-fonts.ubuntu-mono;
-        name = "UbuntuMono Nerd Fonto";
+        package = lib.mkDefault pkgs.nerd-fonts.ubuntu-mono;
+        name = lib.mkDefault "UbuntuMono Nerd Font";
       };
       emoji = {
-        package = pkgs.noto-fonts-emoji;
-        name = "Noto Color Emoji";
+        package = lib.mkDefault pkgs.noto-fonts-emoji;
+        name = lib.mkDefault "Noto Color Emoji";
       };
       sizes = {
         applications = lib.mkDefault 12;
