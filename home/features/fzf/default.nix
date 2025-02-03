@@ -9,13 +9,15 @@
 
 {
   home.packages = [
-    (pkgs.writeScriptBin "fzf-git" (builtins.readFile ./scripts/fzf-git.sh))
-    (pkgs.writeScriptBin "rgf" (builtins.readFile ./scripts/rgf.sh))
-    (pkgs.writeScriptBin "sysz" (builtins.readFile ./scripts/sysz.sh))
-    (pkgs.writeScriptBin "dkr" (builtins.readFile ./scripts/dkr.sh))
-    (pkgs.writeScriptBin "fzmv" (builtins.readFile ./scripts/fzmv.sh))
-    (pkgs.writeScriptBin "igr" (builtins.readFile ./scripts/igr.sh))
-    (pkgs.writeScriptBin "wifi" (builtins.readFile ./scripts/wifi.sh))
+    (pkgs.writeScriptBin "dkr" (builtins.readFile ./scripts/dkr))
+    (pkgs.writeScriptBin "fv" (builtins.readFile ./scripts/fv)) 
+    (pkgs.writeScriptBin "fzf-git" (builtins.readFile ./scripts/fzf-git))
+    (pkgs.writeScriptBin "fzmv" (builtins.readFile ./scripts/fzmv))
+    (pkgs.writeScriptBin "igr" (builtins.readFile ./scripts/igr))
+    (pkgs.writeScriptBin "rgf" (builtins.readFile ./scripts/rgf))
+    (pkgs.writeScriptBin "sshget" (builtins.readFile ./scripts/sshget))
+    (pkgs.writeScriptBin "sysz" (builtins.readFile ./scripts/sysz))
+    (pkgs.writeScriptBin "wifi" (builtins.readFile ./scripts/wifi))
   ];
 
   # Copy these scripts to the user's home directory for dotfiles repo
