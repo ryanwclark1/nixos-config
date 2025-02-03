@@ -36,5 +36,6 @@
     wf-recorder # Utility program for screen recording of wlroots-based compositors
     wl-clipboard # Wayland clipboard
     ydotool # Command-line tool for automation which emulates input devices
+    wayland-utils # Wayland utilities
   ];
 }
