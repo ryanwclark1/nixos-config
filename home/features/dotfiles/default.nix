@@ -1,4 +1,5 @@
 {
+  config,
   ...
 }:
 
@@ -12,8 +13,8 @@
 
     Service = {
       Type = "oneshot";
-      ExecStart = "${builtins.getEnv "HOME"}/Code/dotfiles/update_dots.sh";
-      WorkingDirectory = "${builtins.getEnv "HOME"}/Code/dotfiles";
+      ExecStart = "${config.home.homeDirectory}/Code/dotfiles/update_dots.sh";
+      WorkingDirectory = "${config.home.homeDirectory}/Code/dotfiles";
       Environment = "PATH=/run/current-system/sw/bin";
     };
 
