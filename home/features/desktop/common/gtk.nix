@@ -16,12 +16,13 @@
     };
     iconTheme = {
       name = lib.mkDefault "Papirus-Dark";
-      package = lib.mkDefault pkgs.papirus-icon-theme;
-      # name = "adwaita-icon-theme";
-      # package = pkgs.adwaita-icon-theme;
+      package = pkgs.catppuccin-papirus-folders.override {
+        flavor = "frappe";
+        accent = "lavender";
+      };
     };
     theme = {
-      name = "adw-gtk3";
+      name = "adw-gtk3-dark";
       package = pkgs.adw-gtk3;
       # name = "Adwaita-purple";
       # package = pkgs.gnomeExtensions.gnome-shell-extension-auto-adwaita-colors;
