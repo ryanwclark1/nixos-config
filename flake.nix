@@ -95,9 +95,6 @@
       url = "github:Jas-SinghFSU/HyprPanel";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    matugen = {
-      url = "github:/InioX/Matugen";
-    };
     ghostty = {
       url = "github:ghostty-org/ghostty";
     };
