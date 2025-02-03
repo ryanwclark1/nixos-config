@@ -29,7 +29,7 @@
         ''
           mkdir -p "$out/share/vscode/extensions/$vscodeExtUniqueId/themes"
           ln -s ${./custom.theme/package.json} "$out/share/vscode/extensions/$vscodeExtUniqueId/package.json"
-          ln -s ${./custom.theme/themes/theme.json} "$out/share/vscode/extensions/$vscodeExtUniqueId/themes/stylix.json"
+          ln -s ${./custom.theme/themes/theme.json} "$out/share/vscode/extensions/$vscodeExtUniqueId/themes/theme.json"
         '';
     in
     [
