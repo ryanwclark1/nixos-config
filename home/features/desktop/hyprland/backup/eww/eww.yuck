@@ -1,8 +1,0 @@
-;;;; Including Window script, which calls everyone else
-; (include "eww_windows.yuck")
-
-(include "variables.yuck")
-(include "bar/bar.yuck")
-(include "powermenu/powermenu.yuck")
-(include "date/date.yuck")
-(include "actions/actions.yuck")
