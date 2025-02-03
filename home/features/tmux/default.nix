@@ -90,6 +90,7 @@
       set -g @menus_trigger m
 
       run ${config.home.homeDirectory}/.config/tmux/plugins/tmux-pass/plugin.tmux
+      run ${config.home.homeDirectory}/.config/tmux/plugins/tmux-fzf/main.tmux
     '';
   };
 }
