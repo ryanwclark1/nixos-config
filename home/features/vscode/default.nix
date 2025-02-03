@@ -22,14 +22,14 @@
     extensions = let
       themeExtension = pkgs.runCommandLocal "custom-vscode"
         {
-          vscodeExtUniqueId = "clark.theme";
-          vscodeExtPublisher = "clark";
+          vscodeExtUniqueId = "custom.theme";
+          vscodeExtPublisher = "custom";
           version = "0.0.0";
         }
         ''
           mkdir -p "$out/share/vscode/extensions/$vscodeExtUniqueId/themes"
-          ln -s ${./clark.theme/package.json} "$out/share/vscode/extensions/$vscodeExtUniqueId/package.json"
-          ln -s ${./clark.theme/themes/theme.json} "$out/share/vscode/extensions/$vscodeExtUniqueId/themes/stylix.json"
+          ln -s ${./custom.theme/package.json} "$out/share/vscode/extensions/$vscodeExtUniqueId/package.json"
+          ln -s ${./custom.theme/themes/theme.json} "$out/share/vscode/extensions/$vscodeExtUniqueId/themes/stylix.json"
         '';
     in
     [
@@ -229,7 +229,7 @@
       "workbench.editor.enablePreview" = true;
       "workbench.externalBrowser" = "chrome";
       # "workbench.colorTheme" = "Catppuccin Mocha";
-      "workbench.colorTheme" = "Theme";
+      "workbench.colorTheme" = "Custom Theme";
 
       #############################
       #    Extension Settings     #
