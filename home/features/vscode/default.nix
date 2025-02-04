@@ -380,7 +380,6 @@
         "Github.copilot"
       ];
 
-
       ##### Kubernetes #####
       "vs-kubernetes" = {
         "vs-kubernetes.crd-code-completion" = "enabled";
@@ -412,9 +411,6 @@
       ##### Templ #####
       "templ.pprof" = true;
       "templ.goplsRPCTrace" = true;
-      "[templ]" = {
-        "editor.defaultFormatter" = "a-h.templ";
-      };
 
       ##### YAML #####
       "yaml.completion" = true;
