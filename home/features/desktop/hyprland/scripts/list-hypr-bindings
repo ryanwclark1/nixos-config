@@ -11,8 +11,8 @@ yad --width=1000 --height=800 \
   --column=Command: \
   --timeout=90 \
   --timeout-indicator=right \
-  " = Windows/Super/CAPS LOCK" "Modifier Key, used for keybindings" "Nothing" \
-  " + ENTER" "Terminal" "Alacritty" \
+  " = Super Key/CAPS LOCK" "Modifier Key, used for keybindings" "Nothing" \
+  " + ENTER" "Terminal" "ghostty" \
   " + SHIFT + ENTER" "App Launcher" "rofi" \
   " + ALT + W" "Change Wallpaper" "wallsetter" \
   " + Q" "Kill Focused Window" "killactive" \
@@ -50,4 +50,4 @@ yad --width=1000 --height=800 \
   " + SHIFT + 1...0" "Move Focused Window To Workspace 1 - 10" "movetoworkspace,X" \
   " + MOUSE_LEFT" "Move/Drag Window" "movewindow" \
   " + MOUSE_RIGHT" "Resize Window" "resizewindow" \
-  "ALT + TAB" "Cycle Window Focus + Bring To Front" "cyclenext & bringactivetotop" \
+  # "ALT + TAB" "Cycle Window Focus + Bring To Front" "cyclenext & bringactivetotop" \
