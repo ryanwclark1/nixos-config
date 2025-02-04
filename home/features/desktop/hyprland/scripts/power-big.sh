@@ -12,10 +12,10 @@ host="$(hostname)"
 
 # Options
 shutdown=' '
-reboot=''
-lock=''
-suspend='󰏦'
-logout='󰍃'
+reboot=' '
+lock=' '
+suspend='󰏦 '
+logout='󰍃 '
 yes=' '
 no=' '
 
