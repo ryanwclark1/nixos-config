@@ -411,7 +411,7 @@ in
 
           "custom/applauncher" = {
             "format" = "󱗼";
-            "on-click" = "applauncher-fullscreen";
+            "on-click" = "rofi -show drun -theme $HOME/.config/rofi/style/launcher-full.rasi";
             "tooltip-format" = "Application Launcher";
           };
 
