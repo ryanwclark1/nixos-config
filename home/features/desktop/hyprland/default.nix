@@ -23,11 +23,6 @@
     recursive = true;
   };
 
-  home.file.".config/.emoji" = {
-    source = ./scripts/.emoji;
-    executable = false;
-  };
-
   home.file.".config/swappy/config" = {
     text = ''
       [Default]
@@ -67,13 +62,10 @@
     wf-recorder # Utility program for screen recording of wlroots-based compositors
     wl-clipboard # Wayland clipboard
     yad # Yet another dialog
-    (writeShellScriptBin "applauncher-fullscreen" (builtins.readFile ./scripts/applauncher-fullscreen.sh))
-    (writeShellScriptBin "cliphist-copy" (builtins.readFile ./scripts/cliphist-copy.sh))
-    (writeShellScriptBin "cliphist-delete" (builtins.readFile ./scripts/cliphist-delete.sh))
+    (writeShellScriptBin "cliphist-rofi-copy" (builtins.readFile ./scripts/cliphist-rofi-copy))
+    (writeShellScriptBin "cliphist-rofi-img-copy" (builtins.readFile ./scripts/cliphist-rofi-img-copy))
     (writeShellScriptBin "dontkillsteam" (builtins.readFile ./scripts/dontkillsteam.sh))
-    (writeShellScriptBin "emopicker9000" (builtins.readFile ./scripts/emopicker9000.sh))
     (writeShellScriptBin "list-hypr-bindings" (builtins.readFile ./scripts/list-hypr-bindings.sh))
-    (writeShellScriptBin "microphone-status" (builtins.readFile ./scripts/microphone-status.sh))
     (writeShellScriptBin "power-big" (builtins.readFile ./scripts/power-big.sh))
     (writeShellScriptBin "rofi-launcher" (builtins.readFile ./scripts/rofi-launcher.sh))
     (writeShellScriptBin "screenshooting" (builtins.readFile ./scripts/screenshooting.sh))
