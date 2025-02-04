@@ -1,14 +1,10 @@
 {
   lib,
   config,
-  pkgs,
   ...
 }:
 let
   hypridle = lib.getExe config.services.hypridle.package;
-  wl-paste = "${pkgs.wl-clipboard}/bin/wl-paste";
-  cliphist = lib.getExe config.services.cliphist.package;
-  # steam = "${pkgs.steam}/bin/steam";
 in
 
 {
@@ -44,8 +40,9 @@ in
         "systemctl --user import-environment QT_QPA_PLATFORMTHEME WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "${hypridle} &"
         "killall -q ags; sleep .5 && cd ~/.config/ags && ags run ~/.config/ags/app.ts &"
-        "nm-applet --indicator &"
-        "${wl-paste} --watch ${cliphist} store"
+        "nm-applet --indicator"
+        # The cliphist service is now systemd 
+        # "${wl-paste} --watch ${cliphist} store"
         # "systemctl --user start waybar"
       ];
 
