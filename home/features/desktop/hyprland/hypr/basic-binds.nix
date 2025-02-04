@@ -87,24 +87,19 @@ in
         [
           ",XF86MonBrightnessUp,exec,${brightnessctl} -q set +10%"
           ",XF86MonBrightnessDown,exec,${brightnessctl} -q set 10%-"
-          ",XF86KbdBrightnessUp,   exec, ${brightnessctl} -d asus::kbd_backlight set +1"
-          ",XF86KbdBrightnessDown, exec, ${brightnessctl} -d asus::kbd_backlight set  1-"
         ]
       )
       ++
       # Volume control
       (
-        let
-          wpctl = "${pkgs.wireplumber}/bin/wpctl";
-        in
         [
-          ",XF86AudioRaiseVolume,exec,${wpctl} set-mute @DEFAULT_AUDIO_SINK@ 0 && ${wpctl} set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"
-          ",XF86AudioLowerVolume,exec,${wpctl} set-volume @DEFAULT_AUDIO_SINK@ 5%-"
-          ",XF86AudioMute,exec,${wpctl} set-mute @DEFAULT_AUDIO_SINK@ toggle"
-          "SHIFT,XF86AudioRaiseVolume,exec,${wpctl} set-volume -l 1 @DEFAULT_AUDIO_SOURCE@ 5%+"
-          "SHIFT,XF86AudioLowerVolume,exec,${wpctl} set-volume @DEFAULT_AUDIO_SOURCE@ 5%-"
-          "SHIFT,XF86AudioMute,exec,${wpctl} set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
-          ",XF86AudioMicMute,exec,${wpctl} set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
+          ",XF86AudioRaiseVolume,exec,wpctl set-mute @DEFAULT_AUDIO_SINK@ 0 && wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"
+          ",XF86AudioLowerVolume,exec,wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
+          ",XF86AudioMute,exec,wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+          "SHIFT,XF86AudioRaiseVolume,exec,wpctl set-volume -l 1 @DEFAULT_AUDIO_SOURCE@ 5%+"
+          "SHIFT,XF86AudioLowerVolume,exec,wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 5%-"
+          "SHIFT,XF86AudioMute,exec,wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
+          ",XF86AudioMicMute,exec,wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
         ]
       )
       ++
@@ -139,11 +134,8 @@ in
         ]
         ++
         (
-          let
-            cliphist = lib.getExe config.services.cliphist.package;
-          in
           lib.optionals config.services.cliphist.enable [
-            ''SUPER, c,exec,selected=$(${cliphist} list | rofi -show drun -theme ${config.home.homeDirectory}/.config/rofi/style/cliphist.rasi) && echo "$selected" | ${cliphist} decode | wl-copy''
+            ''SUPER, c,exec,selected=$(cliphist list | rofi -dmenu -theme ${config.home.homeDirectory}/.config/rofi/style/cliphist.rasi) | cliphist decode | wl-copy''
           ]
         )
       )
