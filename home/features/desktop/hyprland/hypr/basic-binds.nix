@@ -163,17 +163,17 @@ in
           resizeactive = binding "SUPER CTRL" "resizeactive";
           mvactive = binding "SUPER ALT" "moveactive";
           mvtows = binding "SUPER SHIFT" "movetoworkspace";
-          e = "exec, ags -b hypr";
+          e = "exec, ags request --instance hyprpanel";
           arr = [1 2 3 4 5 6 7 8 9];
         in
         [
-          "CTRL SHIFT, R,  ${e} quit; ags -b hypr"
-          "SUPER, R,       ${e} -t launcher"
-          "SUPER, Tab,     ${e} -t overview"
-          ",XF86PowerOff,  ${e} -r 'powermenu.shutdown()'"
-          ",XF86Launch4,   ${e} -r 'recorder.start()'"
-          ",Print,         exec, ${screenshot}"
-          "SHIFT,Print,    exec, ${screenshot} --full"
+          "CTRL SHIFT, R, ${e} quit; ags -b hypr"
+          "SUPER, R, ${e} -t launcher"
+          "SUPER, Tab, ${e} -t overview"
+          ",XF86PowerOff, ${e} -r 'powermenu.shutdown()'"
+          ",XF86Launch4, ${e} -r 'recorder.start()'"
+          ",Print, exec, ${screenshot}"
+          "SHIFT,Print, exec, ${screenshot} --full"
 
 
           "ALT, Tab, focuscurrentorlast"
