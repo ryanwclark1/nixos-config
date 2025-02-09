@@ -2,10 +2,11 @@
   config,
   inputs,
   lib,
+  pkgs,
   ...
 }:
 let
-  ghostty = inputs.ghostty.packages.x86_64-linux.default;
+  ghostty = inputs.ghostty.packages.${pkgs.stdenv.hostPlatform.system}.default;
 in
 {
   programs.ghostty = {
