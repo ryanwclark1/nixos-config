@@ -27,7 +27,7 @@
       "LS_COLORS" = "1";
     };
     font = {
-      name = "${config.stylix.fonts.monospace.name}";
+      name = "DejaVu Sans";
       size = 12;
     };
     shellIntegration = {
