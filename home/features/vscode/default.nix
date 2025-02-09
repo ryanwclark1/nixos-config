@@ -39,6 +39,7 @@
       bradlc.vscode-tailwindcss
       catppuccin.catppuccin-vsc
       charliermarsh.ruff
+      christian-kohler.path-intellisense
       dbaeumer.vscode-eslint
       donjayamanne.githistory
       esbenp.prettier-vscode
@@ -73,6 +74,7 @@
       samuelcolvin.jinjahtml
       shyykoserhiy.vscode-spotify
       tailscale.vscode-tailscale
+      tamasfe.even-better-toml
       yzhang.markdown-all-in-one
     ]) ++ (pkgs.vscode-utils.extensionsFromVscodeMarketplace [
       {
@@ -98,6 +100,12 @@
         publisher = "craigrbroughton";
         sha256 = "sha256-TsemPZkq2Z13/vahRaP7z206BJaCZ1TR6OVv6aeDvyk=";
         version = "0.8.0";
+      }
+      {
+        name = "mypy-type-checker";
+        publisher = "ms-python";
+        sha256 = "sha256-boKUxLOAgQJP13zX/NMhg1MtcrPVQJt5gLbxI7gVSu4=";
+        version = "2025.1.10381011";
       }
       {
         name = "prom";
