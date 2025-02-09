@@ -11,7 +11,6 @@
     ./tf.nix
   ];
   home.packages = with pkgs; [
-    killall # A command-line tool to kill processes by name
     duf # Disk Usage/Free Utility
     ncdu # TUI disk usage
     lazydocker # A simple terminal UI for both docker and docker-compose
@@ -28,5 +27,6 @@
   ] ++ (if pkgs.stdenv.hostPlatform.system == "x86_64-linux" then [
     distrobox # Nice escape hatch, integrates docker images with my environment
     scrot # A command-line screen capture utility
+    killall # A command-line tool to kill processes by name
   ] else []);
 }
