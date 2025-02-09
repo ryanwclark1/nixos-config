@@ -398,6 +398,9 @@
       "vscode-kubernetes.log-viewer.timestamp" = true;
       "vsdocker.imageUser" = "docker.io/ryanwclark";
 
+      ##### CSS #####
+      "[css]"."editor.defaultFormatter" = "esbenp.prettier-vscode";
+
       ##### Tailwind CSS #####
       # Configurations: https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss
       "tailwindCSS.includeLanguages" = {
