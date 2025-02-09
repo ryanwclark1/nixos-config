@@ -16,14 +16,17 @@ in
     # ../../home/mini.nix
   ];
   # ++ 
-  # (builtins.attrValues outputs.nixosModules);
+  # (builtins.attrValues outputs.darwinModules);
 
-  home-manager.useGlobalPkgs = true;
-  home-manager.useUserPackages = true;
-  home-manager.backupFileExtension = "bak";
-  home-manager.extraSpecialArgs = {
-    inherit inputs outputs;
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    backupFileExtension = "bak";
+    extraSpecialArgs = {
+      inherit inputs outputs;
+    };
   };
+  
   home-manager.users."${user}" = import ../../home/${hostName}.nix;
 
   users.users."${user}" = {
