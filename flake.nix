@@ -177,7 +177,7 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.users.administrator = import ./home/mini2.nix;
+            # home-manager.users.administrator = import ./home/mini2.nix;
 
             # Optionally, use home-manager.extraSpecialArgs to pass
             # arguments to home.nix
