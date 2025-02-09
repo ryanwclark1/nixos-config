@@ -14,8 +14,8 @@
     ./features/fastfetch
     ./features/fd
     ./features/fzf
-    ./features/ghostty
     ./features/git
+    ./features/kitty
     ./features/lazygit
     ./features/ripgrep
     ./features/starship
