@@ -11,7 +11,7 @@
       ###########
       # Options #
       ###########
-      font = "${config.stylix.fonts.monospace.name}";
+      font = "DejaVu Sans";
 
       abort-clear-search = true;
       adjust-open = "best-fit";
