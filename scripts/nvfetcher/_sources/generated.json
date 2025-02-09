@@ -64,12 +64,12 @@
         },
         "pinned": false,
         "src": {
-            "name": "copilot-1.259.1335.zip",
-            "sha256": "sha256-KuFayfzVmhpliTPFOSyJZd4Fv0foXikKvq0E6Z2MDGM=",
+            "name": "copilot-1.266.1363.zip",
+            "sha256": "sha256-paT/fZMIjSh7Bp4bBg4ZT/c1wVc0ecQLJxulSQZjRdg=",
             "type": "url",
-            "url": "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot/1.259.1335/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot/1.266.1363/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "1.259.1335"
+        "version": "1.266.1363"
     },
     "copilot-chat": {
         "cargoLocks": null,
@@ -82,12 +82,12 @@
         },
         "pinned": false,
         "src": {
-            "name": "copilot-chat-0.24.2025012402.zip",
-            "sha256": "sha256-gLU/lxuOFvyLcPgRc5MGAYry0FoHMyep694PRCoIDtc=",
+            "name": "copilot-chat-0.25.2025020703.zip",
+            "sha256": "sha256-CGniMwvaCCc4tbwtXkH4aToYMNIOCo72AX2D7PNjdqw=",
             "type": "url",
-            "url": "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot-chat/0.24.2025012402/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot-chat/0.25.2025020703/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "0.24.2025012402"
+        "version": "0.25.2025020703"
     },
     "gopls": {
         "cargoLocks": null,
@@ -105,6 +105,7 @@
             "repo": "tools",
             "rev": "gopls/v0.17.1",
             "sha256": "sha256-NLUIFNooOOA4LEL5nZNdP9TvDkQUqLjKi44kZtOxeuI=",
+            "sparseCheckout": [],
             "type": "github"
         },
         "version": "gopls/v0.17.1"
@@ -144,6 +145,24 @@
             "url": "https://craigrbroughton.gallery.vsassets.io/_apis/public/gallery/publisher/craigrbroughton/extension/htmx-attributes/0.8.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
         "version": "0.8.0"
+    },
+    "mypy-type-checker": {
+        "cargoLocks": null,
+        "date": null,
+        "extract": null,
+        "name": "mypy-type-checker",
+        "passthru": {
+            "name": "mypy-type-checker",
+            "publisher": "ms-python"
+        },
+        "pinned": false,
+        "src": {
+            "name": "mypy-type-checker-2025.1.10381011.zip",
+            "sha256": "sha256-boKUxLOAgQJP13zX/NMhg1MtcrPVQJt5gLbxI7gVSu4=",
+            "type": "url",
+            "url": "https://ms-python.gallery.vsassets.io/_apis/public/gallery/publisher/ms-python/extension/mypy-type-checker/2025.1.10381011/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+        },
+        "version": "2025.1.10381011"
     },
     "prom": {
         "cargoLocks": null,
@@ -210,12 +229,12 @@
         },
         "pinned": false,
         "src": {
-            "name": "sqlite-viewer-0.9.6.zip",
-            "sha256": "sha256-TXB28TZAY/GCPoEBfbQTtZcElNsZpeZ6x8lEsGbrIE8=",
+            "name": "sqlite-viewer-0.10.0.zip",
+            "sha256": "sha256-rsfS0yVIK5YUZbQqUVWNHqdnGrODbJ9W4SwZLozmjH0=",
             "type": "url",
-            "url": "https://qwtel.gallery.vsassets.io/_apis/public/gallery/publisher/qwtel/extension/sqlite-viewer/0.9.6/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://qwtel.gallery.vsassets.io/_apis/public/gallery/publisher/qwtel/extension/sqlite-viewer/0.10.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "0.9.6"
+        "version": "0.10.0"
     },
     "sqltools": {
         "cargoLocks": null,
@@ -390,12 +409,12 @@
         },
         "pinned": false,
         "src": {
-            "name": "vscode-postgresql-client2-8.1.3.zip",
-            "sha256": "sha256-h5akVN5Sq4SOhZfAYSYTgESqp7g76LPZaxLx0BFuQIw=",
+            "name": "vscode-postgresql-client2-8.1.4.zip",
+            "sha256": "sha256-hfsYLvE0itiRZD9lzMSNTwcMeYgrwKRY+hX+nFLvIeI=",
             "type": "url",
-            "url": "https://cweijan.gallery.vsassets.io/_apis/public/gallery/publisher/cweijan/extension/vscode-postgresql-client2/8.1.3/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://cweijan.gallery.vsassets.io/_apis/public/gallery/publisher/cweijan/extension/vscode-postgresql-client2/8.1.4/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "8.1.3"
+        "version": "8.1.4"
     },
     "vscode-speech": {
         "cargoLocks": null,
@@ -426,12 +445,12 @@
         },
         "pinned": false,
         "src": {
-            "name": "vscode-thunder-client-2.33.2.zip",
-            "sha256": "sha256-Q+jI4dJ4RrZg/4A7CKmaKMGFGj6VOi+9uCbW5dflCfg=",
+            "name": "vscode-thunder-client-2.34.0.zip",
+            "sha256": "sha256-f2SiiJfMAZUlIjCTU23c0LP/lljd/SePMJCMRvbOQjs=",
             "type": "url",
-            "url": "https://rangav.gallery.vsassets.io/_apis/public/gallery/publisher/rangav/extension/vscode-thunder-client/2.33.2/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://rangav.gallery.vsassets.io/_apis/public/gallery/publisher/rangav/extension/vscode-thunder-client/2.34.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "2.33.2"
+        "version": "2.34.0"
     },
     "yuck": {
         "cargoLocks": null,

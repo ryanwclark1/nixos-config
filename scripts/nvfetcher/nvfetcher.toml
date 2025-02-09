@@ -122,3 +122,8 @@ passthru = { publisher = "ventura", name = "prom" }
 src.vsmarketplace = "grafana.grafana-vscode"
 fetch.vsmarketplace = "grafana.grafana-vscode"
 passthru = { publisher = "grafana", name = "grafana-vscode" }
+
+[mypy-type-checker]
+src.vsmarketplace = "ms-python.mypy-type-checker"
+fetch.vsmarketplace = "ms-python.mypy-type-checker"
+passthru = { publisher = "ms-python", name = "mypy-type-checker"}
