@@ -13,6 +13,7 @@ in
 {
   imports = [
     inputs.home-manager.darwinModules.home-manager
+    # ../../home/mini.nix
   ];
   # ++ 
   # (builtins.attrValues outputs.nixosModules);
@@ -23,7 +24,7 @@ in
   home-manager.extraSpecialArgs = {
     inherit inputs outputs;
   };
-  home-manager.users."${user}" = import ../../../../home/${hostName}.nix;
+  home-manager.users."${user}" = import ../../home/${hostName}.nix;
 
   users.users."${user}" = {
     name = "${user}";
