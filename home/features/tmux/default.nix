@@ -24,8 +24,6 @@
     plugins = with pkgs.tmuxPlugins; [
       better-mouse-mode
       continuum
-      resurrect
-      tmux-fzf
       yank
     ];
     aggressiveResize = true;
