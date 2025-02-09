@@ -6,6 +6,7 @@
 
 {
   imports = [
+    ./features/shell
     ./features/atuin
     ./features/bat
     ./features/cli
@@ -13,6 +14,7 @@
     ./features/fastfetch
     ./features/fd
     ./features/fzf
+    ./features/ghostty
     ./features/git
     ./features/lazygit
     ./features/ripgrep
