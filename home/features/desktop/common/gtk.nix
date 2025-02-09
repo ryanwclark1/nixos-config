@@ -25,7 +25,7 @@
       name = "adw-gtk3-dark";
       package = pkgs.adw-gtk3;
       # name = "Adwaita-purple";
-      # package = pkgs.gnomeExtensions.gnome-shell-extension-auto-adwaita-colors;
+      # package = pkgs.gnomeExtensions.auto-adwaita-colors;
     };
     font = {
       name = lib.mkForce "DejaVu Sans";
