@@ -94,10 +94,10 @@ in
         };
       };
       nixvim = {
-        enable = lib.mkDefault true;
+        enable = lib.mkDefault false;
         transparentBackground = {
-          main = lib.mkDefault true;
-          signColumn = lib.mkDefault true;
+          main = lib.mkDefault false;
+          signColumn = lib.mkDefault false;
         };
       };
       qutebrowser.enable = lib.mkDefault false;
