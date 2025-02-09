@@ -32,7 +32,6 @@
     };
   };
 
-  hardware.enableRedistributableFirmware = true;
   networking.domain = "techcasa.io";
 
   # Increase open file limit for sudoers
