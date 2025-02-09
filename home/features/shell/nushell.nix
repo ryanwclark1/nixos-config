@@ -5,7 +5,7 @@
 
 {
   programs.nushell = {
-    enable = false;
+    enable = true;
     package = pkgs.nushell;
   };
 }
