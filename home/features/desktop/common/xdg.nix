@@ -141,6 +141,10 @@
           "text/x-scala" = codeEditors;
           "text/x-scheme" = codeEditors;
           "text/css" = codeEditors;
+          "text/javascript" = codeEditors;
+          "application/json" = codeEditors;
+          "application/ld+json" = codeEditors;
+          
 
           "application/pdf" = pdfViewers;
 
