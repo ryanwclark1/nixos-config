@@ -32,8 +32,10 @@ in
   };
 
   # The platform the configuration will be used on.
+  # Remove allowBroken
   nixpkgs = {
-    hostPlatform = "aarch64-darwin";
+    hostPlatform = lib.mkDefault "aarch64-darwin";
+    allowBroken = true;
     config.allowUnfree = true;
   };
 
