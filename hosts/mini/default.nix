@@ -1,4 +1,6 @@
 {
+  inputs,
+  outputs,
   config,
   lib,
   pkgs,
@@ -6,14 +8,21 @@
 }:
 
 {
-  # imports = [
-  #   inputs.home-manager.nixosModules.home-manager
-  # ];
+  imports = [
+    inputs.home-manager.darwinModules.home-manager
+  ];
+  # ++ 
+  # (builtins.attrValues outputs.nixosModules);
 
-  # home-manager.useGlobalPkgs = true;
-  # home-manager.extraSpecialArgs = {
-  #   inherit inputs outputs;
-  # };
+  home-manager.useGlobalPkgs = true;
+  home-manager.extraSpecialArgs = {
+    inherit inputs outputs;
+  };
+
+  users.users.administrator = {
+    name = "administrator";
+    home = "/Users/administrator";
+  };
 
   # The platform the configuration will be used on.
   nixpkgs = {
@@ -144,8 +153,5 @@
   # $ darwin-rebuild changelog
   system.stateVersion = 5;
 
-  # users.users.administrator = {
-  #   name = "administrator";
-  #   home = "/Users/administrator";
-  # };
+
 }
