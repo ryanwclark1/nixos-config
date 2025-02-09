@@ -4,7 +4,6 @@
   pkgs,
   ...
 }:
-with config.lib.stylix.colors.withHashtag;
 # TODO: Add pyenv, nvm, rbenv, rustup, etc. support
 
 {
@@ -18,7 +17,7 @@ with config.lib.stylix.colors.withHashtag;
     enableIonIntegration = lib.mkIf config.programs.ion.enable true;
     # Configuration written to ~/.config/starship.toml
     settings = {
-      format = "[](${base0E})\$os\$username\$hostname\$localip\${custom.yazi}\[](bg:${base07} fg:${base0E})\$directory\[](fg:${base07} bg:${base05})\$git_branch\$git_status\[](fg:${base05} bg:${base0F})\$bun\$c\$cmake\$dart\$golang\$haskell\$java\$kotlin\$kubernetes\$lua\$nodejs\$php\$python\$rust\$swift\$zig[](fg:${base0F} bg:${base06})\$docker_context\$nix_shell\[](fg:${base06})\$fill\[](fg:${base0E})\$time\[](${base0E})\$line_break$character";
+      format = "[](#ca9ee6)\$os\$username\$hostname\$localip\$container\${custom.yazi}\[](bg:#babbf1 fg:#ca9ee6)\$directory\[](fg:#babbf1 bg:#c6d0f5)\$git_branch\$git_status\[](fg:#c6d0f5 bg:#eebebe)\$python\$bun\$c\$cmake\$dart\$golang\$haskell\$java\$kotlin\$kubernetes\$lua\$nodejs\$php\$rust\$swift\$zig[](fg:#eebebe bg:#f2d5cf)\$docker_context\$nix_shell\[](fg:#f2d5cf)\$fill\[](fg:#ca9ee6)\$time\[](#ca9ee6)\$line_break$character";
       add_newline = true;
       line_break.disabled = false;
       scan_timeout = 30;
@@ -27,7 +26,7 @@ with config.lib.stylix.colors.withHashtag;
 
       os = {
         disabled = false;
-        style = "bg:${base0E} fg:${base00}";
+        style = "bg:#ca9ee6 fg:#303446";
         format = "[$symbol]($style)";
         symbols = {
           AlmaLinux = " ";
@@ -68,15 +67,15 @@ with config.lib.stylix.colors.withHashtag;
           "SSH_CLIENT"
           "SSH_TTY"
         ];
-        style_user = "bg:${base0E} fg:${base00}";
-        style_root = "bg:${base0E} fg:${base00}";
+        style_user = "bg:#ca9ee6 fg:#303446";
+        style_root = "bg:#ca9ee6 fg:#303446";
         format = "[ $user ]($style)";
       };
 
       localip = {
         disabled = false;
         ssh_only = true;
-        style = "bg:${base0E} fg:${base00}";
+        style = "bg:#ca9ee6 fg:#303446";
         format = "[ $localipv4 ]($style)";
       };
 
@@ -84,12 +83,19 @@ with config.lib.stylix.colors.withHashtag;
         disabled = false;
         ssh_only = true;
         ssh_symbol = " ";
-        style = "bg:${base0E} fg:${base00}";
+        style = "bg:#ca9ee6 fg:#303446";
         format = "[$ssh_symbol]($style)";
       };
 
+      container = {
+        symbol = " ";
+        style = "bg:#ca9ee6 fg:#303446";
+        format = "[$symbol\ [$name]]($style)";
+        disabled = false;
+      };
+
       directory = {
-        style = "fg:${base00} bg:${base07}";
+        style = "fg:#303446 bg:#babbf1";
         format = "[ $path ]($style)";
         truncation_length = 8;
         truncate_to_repo = true;
@@ -147,91 +153,86 @@ with config.lib.stylix.colors.withHashtag;
         repeat = true;
         disabled = false;
       };
-      container = {
-        symbol = " ";
-        style = "fg:${base00} bg:${base07}";
-        format = "[$symbol\ [$name]]($style)";
-        disabled = false;
-      };
+
       git_branch = {
         symbol = " ";
-        style = "bg:${base05}";
-        format = "[[ $symbol $branch ](fg:${base00} bg:${base05})]($style)";
+        style = "bg:#c6d0f5";
+        format = "[[ $symbol $branch ](fg:#303446 bg:#c6d0f5)]($style)";
         disabled = false;
       };
       git_status = {
-        style = "bg:${base05}";
-        format = "[[($all_status$ahead_behind )](fg:${base00} bg:${base05})]($style)";
+        style = "bg:#c6d0f5";
+        format = "[[($all_status$ahead_behind )](fg:#303446 bg:#c6d0f5)]($style)";
         disabled = false;
       };
       package = {
         symbol = "󰏗 ";
         version_format = "v$raw";
-        format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
+        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
         disabled = false;
       };
       bun = {
         symbol = " ";
-        style = "bg:${base0F}";
-        format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
+        style = "bg:#eebebe";
+        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
         disabled = false;
       };
       c = {
         symbol = " ";
-        style = "bg:${base0F}";
-        format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
+        style = "bg:#eebebe";
+        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
         disabled = false;
       };
       cmake = {
         symbol = " ";
-        style = "bg:${base0F}";
-        format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
+        style = "bg:#eebebe";
+        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
       };
       dart = {
         symbol = " ";
-        style = "bg:${base0F}";
-        format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
+        style = "bg:#eebebe";
+        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
         disabled = true;
       };
       golang = {
         symbol = " ";
-        style = "bg:${base0F}";
-        format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
+        style = "bg:#eebebe";
+        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
         disabled = false;
       };
       haskell = {
         symbol = " ";
-        style = "bg:${base0F}";
-        format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
+        style = "bg:#eebebe";
+        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
       };
       java = {
         symbol = " ";
-        style = "bg:${base0F}";
-        format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
+        style = "bg:#eebebe";
+        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
         disabled = true;
       };
       kotlin = {
         symbol = " ";
-        style = "bg:${base0F}";
-        format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
+        style = "bg:#eebebe";
+        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
         disabled = true;
       };
       kubernetes = {
         symbol = "󱃾 ";
-        style = "bg:${base0F}";
-        format = "[[ $symbol$context( \$namespace\ ) ](fg:${base00} bg:${base0F})]($style)";
+        style = "bg:#eebebe";
+        format = "[[ $symbol$context( \$namespace\ ) ](fg:#303446 bg:#eebebe)]($style)";
         disabled = false;
       };
       lua = {
         symbol = "";
-        style = "bg:${base0F}";
-        format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
+        style = "bg:#eebebe";
+        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
         disabled = false;
       };
       nix_shell = {
         symbol = " ";
-        style = "bg:${base06}";
-        format = "[[$symbol$state( \($name\))](fg:${base00} bg:${base06})]($style)";
+        style = "bg:#f2d5cf";
+        format = "[[$symbol$state( \($name\))](fg:#303446 bg:#f2d5cf)]($style)";
         impure_msg = "";
         # impure_msg = "impure";
         pure_msg = "";
@@ -241,62 +242,62 @@ with config.lib.stylix.colors.withHashtag;
       };
       nodejs = {
         symbol = " ";
-        style = "bg:${base0F}";
-        format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
+        style = "bg:#eebebe";
+        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
         disabled = false;
       };
       php = {
         symbol = " ";
-        style = "bg:${base0F}";
-        format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
+        style = "bg:#eebebe";
+        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
         disabled = false;
       };
       python = {
         symbol = " ";
-        style = "bg:${base0F}";
+        style = "bg:#eebebe";
         version_format = "$raw";
-        format = "[[ $symbol( $version )(\($virtualenv\) )](fg:${base00} bg:${base0F})]($style)";
+        format = "[[ $symbol( $version )(\($virtualenv\) )](fg:#303446 bg:#eebebe)]($style)";
         disabled = false;
         detect_folders = [".venv"];
         pyenv_version_name = true;
       };
       rust = {
         symbol = " ";
-        style = "bg:${base0F}";
-        format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
+        style = "bg:#eebebe";
+        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
         disabled = false;
       };
       swift = {
         symbol = " ";
-        style = "bg:${base0F}";
-        format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
+        style = "bg:#eebebe";
+        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
         disabled = true;
       };
       zig = {
         symbol = " ";
-        style = "bg:${base0F}";
-        format = "[[ $symbol( $version) ](fg:${base00} bg:${base0F})]($style)";
+        style = "bg:#eebebe";
+        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
         disabled = true;
       };
       docker_context = {
         symbol = " ";
-        style = "bg:${base06}";
-        format = "[[ $symbol( $context) ](fg:${base00} bg:${base06})]($style)";
+        style = "bg:#f2d5cf";
+        format = "[[ $symbol( $context) ](fg:#303446 bg:#f2d5cf)]($style)";
         disabled = false;
       };
       custom.yazi = {
         description = "Indicate when the shell was launched by `yazi`";
         symbol = " ";
-        style = "bg:${base0E} fg:${base00}";
+        style = "bg:#ca9ee6 fg:#303446";
         when = ''test -n "$YAZI_LEVEL"'';
       };
       character = {
-        error_symbol = "[~>](bold ${base08})";
-        success_symbol = "[](bold ${base0B})";
-        vimcmd_symbol = "[](bold ${base0B})";
-        vimcmd_visual_symbol = "[](bold ${base0A})";
-        vimcmd_replace_symbol = "[](bold ${base0E})";
-        vimcmd_replace_one_symbol = "[](bold ${base0E})";
+        error_symbol = "[~>](bold #e78284)";
+        success_symbol = "[](bold #a6d189)";
+        vimcmd_symbol = "[](bold #a6d189)";
+        vimcmd_visual_symbol = "[](bold #e5c890)";
+        vimcmd_replace_symbol = "[](bold #ca9ee6)";
+        vimcmd_replace_one_symbol = "[](bold #ca9ee6)";
       };
       cmd_duration = {
         min_time = 2000;
@@ -306,8 +307,8 @@ with config.lib.stylix.colors.withHashtag;
         style = "bg:none fg:none";
       };
       time = {
-        style = "bg:${base0E} fg:${base00}";
-        format = "[[  $time ](bg:${base0E} fg:${base00})]($style)";
+        style = "bg:#ca9ee6 fg:#303446";
+        format = "[[  $time ](bg:#ca9ee6 fg:#303446)]($style)";
         use_12hr = false;
         disabled = false;
       };
