@@ -35,7 +35,7 @@ in
   # Remove allowBroken
   nixpkgs = {
     hostPlatform = lib.mkDefault "aarch64-darwin";
-    allowBroken = true;
+    config.allowBroken = lib.mkDefault true;
     config.allowUnfree = true;
   };
 
