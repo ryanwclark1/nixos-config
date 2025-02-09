@@ -6,7 +6,10 @@
   pkgs,
   ...
 }:
-
+let
+  user = "administrator";
+  hostName = "mini";
+in
 {
   imports = [
     inputs.home-manager.darwinModules.home-manager
@@ -15,13 +18,16 @@
   # (builtins.attrValues outputs.nixosModules);
 
   home-manager.useGlobalPkgs = true;
+  home-manager.useUserPackages = true;
+  home-manager.backupFileExtension = "bak";
   home-manager.extraSpecialArgs = {
     inherit inputs outputs;
   };
+  home-manager.users."${user}" = import ../../../../home/${hostName}.nix;
 
-  users.users.administrator = {
-    name = "administrator";
-    home = "/Users/administrator";
+  users.users."${user}" = {
+    name = "${user}";
+    home = "/Users/${user}";
   };
 
   # The platform the configuration will be used on.
@@ -152,6 +158,4 @@
   # Used for backwards compatibility, please read the changelog before changing.
   # $ darwin-rebuild changelog
   system.stateVersion = 5;
-
-
 }

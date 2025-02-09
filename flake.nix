@@ -167,22 +167,12 @@
     darwinConfigurations = {
       mini = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
+        modules = [
+          ./hosts/mini
+        ];
         specialArgs = {
           inherit inputs outputs;
         };
-        modules = [
-          ./hosts/mini
-          # ./home/mini.nix
-          home-manager.darwinModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            # home-manager.users.administrator = import ./home/mini2.nix;
-
-            # Optionally, use home-manager.extraSpecialArgs to pass
-            # arguments to home.nix
-          }
-        ];
       };
     };
 
