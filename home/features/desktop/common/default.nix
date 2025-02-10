@@ -15,24 +15,17 @@
   # Comment out screenshot, clipboard and recording tools
   home.packages = with pkgs; [
     d-spy # Dbus debugger
-    dbeaver-bin # Universal Database Tool
-    devpod-desktop # Codespaces but open-source, client-only and unopinionated: Works with any IDE
     file-roller # Archive manager
     fragments # Torrent client
     gpu-viewer # GPU info
-    grim # Screenshot tool,
-    insomnia # API Client for REST, GraphQL, GRPC and OpenAPI design tool for developers.
-    libnotify # Notification library
     libsoup_3
     mimeo # Open files with the right program
-    postman # API Development Environment
-    slurp # Screenshot tool, select area
-    spice-vdagent # Spice agent
-    sqlitebrowser # Visual tool to create, design, and edit database files compatible with SQLite
+    # spice-vdagent # Spice agent
+    virt-viewer # View virtual machines
+
     ventoy-full #balena type tool
     waypipe # Network proxy for Wayland clients (applications)
-    webkitgtk_6_0 # Web rendering engine
-    wf-recorder # Utility program for screen recording of wlroots-based compositors
+    webkitgtk # Web rendering engine
     wl-clipboard # Wayland clipboard
     ydotool # Command-line tool for automation which emulates input devices
     wayland-utils # Wayland utilities
