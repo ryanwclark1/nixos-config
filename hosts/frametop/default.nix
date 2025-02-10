@@ -20,11 +20,11 @@
     ../common/optional/nautilus.nix
     ../common/optional/nfs.nix
     ../common/optional/printing.nix
-    ../common/optional/qemu.nix
     ../common/optional/steam.nix
     ../common/optional/style.nix
     ../common/optional/system-packages.nix
     ../common/optional/thunar.nix
+    ../common/optional/virtualisation.nix
     ../common/optional/webcam.nix
     ../common/optional/wireshark.nix
     ../common/optional/zsh.nix
