@@ -1,6 +1,5 @@
 # ./host/common/global/virtualisation.nix
 {
-  pkgs,
   ...
 }:
 
@@ -13,7 +12,6 @@
       qemu = {
         ovmf = {
           enable = true;
-          packages = [ pkgs.OVMFFull.fd ];
         };
         # virtual tpm
         swtpm.enable = true;
@@ -22,8 +20,8 @@
     # USB redirection support
     spiceUSBRedirection.enable = true;
   };
-  programs.virt-viewer = {
+  programs.virt-manager = {
     enable = true;
-    package = pkgs.virt-viewer;
   };
+  
 }
