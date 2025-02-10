@@ -15,6 +15,7 @@
     # ./hyprpanel
     ./rofi
     ./wlogout
+    ./waypaper
     # ./scripts/screenshot.nix
   ];
 
@@ -43,6 +44,11 @@
     executable = true;
   };
 
+  home.file.".config/hypr/scripts/wallpaper.sh" = {
+    source = ./scripts/wallpaper.sh;
+    executable = true;
+  };
+
   home.packages = with pkgs; [
     # hyprland-qtutils
     brightnessctl # Adjust screen brightness
@@ -52,12 +58,14 @@
     gtk4
     handlr-regex
     hyprpicker
+    libnotify # Notification library
     mission-center
     networkmanagerapplet
     qalculate-gtk
     slurp # Screenshot tool, select area
     swappy # Wayland native snapshot editing tool, inspired by Snappy on macOS
     swww # Sway window switcher
+    tesseract # OCR tool
     wayshot
     wf-recorder # Utility program for screen recording of wlroots-based compositors
     wl-clipboard # Wayland clipboard
