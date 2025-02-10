@@ -9,7 +9,7 @@
     recursive = true;
   };
 
-  home.file."..config/wlogout/style.css" = {
+  home.file.".config/wlogout/style.css" = {
     source = ./style.css;
   };
 
