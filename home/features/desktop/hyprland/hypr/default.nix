@@ -12,11 +12,31 @@ in
     ./basic-binds.nix
   ];
 
+  home.file.".config/hypr/conf" = {
+    source = ./conf;
+    recursive = true;
+  };
+
+  home.file.".config/hypr/effects" = {
+    source = ./effects;
+    recursive = true;
+  };
+
+  home.file.".config/hypr/shaders" = {
+    source = ./shaders;
+    recursive = true;
+  };
+
   wayland.windowManager.hyprland = {
     enable = true;
     xwayland.enable = true;
     systemd.enable = true;
     settings ={
+
+      source = [
+        "~/.config/hypr/conf/monitor.conf"
+      ];
+
       env = [
         "XDG_CURRENT_DESKTOP,Hyprland"
         "XDG_SESSION_TYPE,wayland"
@@ -39,8 +59,8 @@ in
         "dbus-update-activation-environment --systemd --all"
         "systemctl --user import-environment QT_QPA_PLATFORMTHEME WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "${hypridle} &"
-        "killall -q ags; sleep .5 && cd ~/.config/ags && ags run ~/.config/ags/app.ts &"
-        "nm-applet --indicator"
+        # "killall -q ags; sleep .5 && cd ~/.config/ags && ags run ~/.config/ags/app.ts &"
+        # "nm-applet --indicator"
         # The cliphist service is now systemd 
         # "${wl-paste} --watch ${cliphist} store"
         # "systemctl --user start waybar"
