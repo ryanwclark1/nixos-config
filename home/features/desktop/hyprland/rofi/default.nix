@@ -10,6 +10,17 @@
     ./scripts
   ];
 
+
+  home.file.".config/rofi/applets" = {
+    source = ./applets;
+    recursive = true;
+  };
+
+  home.file.".config/rofi/powermenu" = {
+    source = ./powermenu;
+    recursive = true;
+  };
+
   home.file = {
     # ".config/rofi/custom.rasi" = {
     #   source = ./custom.rasi;
@@ -106,6 +117,61 @@
         "${config.home.homeDirectory}/.local/share/keyrings"
       ];
     };
+    theme = let 
+     inherit (config.lib.formats.rasi) mkLiteral;
+    in {
+      "@import" = [
+        "style/shared/border.rasi"
+        "style/shared/colors.rasi"
+        "style/shared/fonts.rasi"
+      ];
+
+      window = {
+        location = mkLiteral "center";
+        anchor = mkLiteral "center";
+        x-offset = mkLiteral "0px";
+        y-offset = mkLiteral "0px";
+        width = mkLiteral "800px";
+        height = mkLiteral "600px";
+        margin = mkLiteral "0px";
+        padding = mkLiteral "0px";
+        border = mkLiteral "0px solid";
+        border-radius = mkLiteral "0px";
+        background-color = mkLiteral "@background";
+      };
+
+      mainbox = {
+        children = map mkLiteral [ "inputbar" "message" "listview" ];
+        spacing = mkLiteral "15px";
+        margin = mkLiteral "0px";
+        padding = mkLiteral "30px";
+        background-color = mkLiteral "transparent";
+      };
+
+      inputbar = {
+        children = map mkLiteral [ "textbox-prompt-colon" "prompt" ];
+        spacing = mkLiteral "10px";
+        padding = mkLiteral "0px";
+        border-radius = mkLiteral "0px";
+        background-color = mkLiteral "@background-alt";
+      };
+
+      textbox-prompt-colon = {
+        expand = false;
+        str = ": ";
+        padding = mkLiteral "10px 13px";
+        border-radius = mkLiteral "0px";
+        background-color = mkLiteral "@urgent";
+      };
+
+      prompt = {
+        padding = mkLiteral "10px 13px 10px 10px";
+      };
+
+      listview = {
+        lines = 12;
+      };
+    };
     # theme = let
     #   # Use `mkLiteral` for string-like values that should show without
     #   # quotes, e.g.:
@@ -137,6 +203,7 @@
     #   };
     # };
     extraConfig ={
+      
       modi = "drun,emoji,ssh,run,filebrowser,window";
       font = "Fira Code 12";
       kb-primary-paste = "Control+V,Shift+Insert";
