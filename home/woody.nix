@@ -47,7 +47,7 @@
     ./features/sys-stats
     ./features/tealdeer
     ./features/tmux
-    ./features/virtualisation
+    # ./features/virtualisation
     ./features/vscode
     ./features/yazi
     ./features/zed
