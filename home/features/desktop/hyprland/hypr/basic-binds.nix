@@ -148,9 +148,9 @@ in
           notify-send = lib.getExe' pkgs.libnotify "notify-send";
         in
         [
-          ",Print,exec,${grimblast} --notify --freeze copy area"
-          "SHIFT,Print,exec,${grimblast} --notify --freeze copy output"
-          "ALT,Print,exec,${grimblast} --freeze save area - | ${tesseract} - - | wl-copy && ${notify-send} -t 3000 'OCR result copied to buffer'"
+          ",Print,exec,grimblast --notify --freeze copy area"
+          "SHIFT,Print,exec,grimblast --notify --freeze copy output"
+          "ALT,Print,exec,grimblast --freeze save area - | tesseract - - | wl-copy && notify-send -t 3000 'OCR result copied to buffer'"
         ]
       )
       ++
