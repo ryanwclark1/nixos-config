@@ -27,6 +27,12 @@ in
     recursive = true;
   };
 
+  home.file.".config/hypr/scripts" = {
+    source = ./scripts;
+    recursive = true;
+    executable = true;
+  };
+
   wayland.windowManager.hyprland = {
     enable = true;
     xwayland.enable = true;

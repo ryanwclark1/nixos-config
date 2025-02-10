@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #  ____                               _           _
 # / ___|  ___ _ __ ___  ___ _ __  ___| |__   ___ | |_
 # \___ \ / __| '__/ _ \/ _ \ '_ \/ __| '_ \ / _ \| __|
@@ -110,7 +110,7 @@ type_screenshot_cmd() {
 
 # Ask for confirmation
 type_screenshot_exit() {
-    echo -e "$option_capture_1\n$option_capture_2\n$option_capture_3" | type_screenshot_cmd
+  echo -e "$option_capture_1\n$option_capture_2\n$option_capture_3" | type_screenshot_cmd
 }
 
 # Confirm and execute
@@ -182,10 +182,8 @@ timer() {
 takescreenshot() {
     sleep 1
     grimblast --notify "$option_chosen" "$option_type_screenshot" $NAME
-    if [ -f $HOME/$NAME ]; then
-        if [ -d $screenshot_folder ]; then
-            mv $HOME/$NAME $screenshot_folder/
-        fi
+    if [ -f $HOME/$NAME ] ;then
+        mv $HOME/$NAME $screenshot_folder
     fi
 }
 
@@ -193,10 +191,8 @@ takescreenshot_timer() {
     sleep 1
     timer
     grimblast --notify "$option_chosen" "$option_type_screenshot" $NAME
-    if [ -f $HOME/$NAME ]; then
-        if [ -d $screenshot_folder ]; then
-            mv $HOME/$NAME $screenshot_folder/
-        fi
+    if [ -f $HOME/$NAME ] ;then
+        mv $HOME/$NAME $screenshot_folder
     fi
 }
 
@@ -215,10 +211,10 @@ run_cmd() {
 # Actions
 chosen="$(run_rofi)"
 case ${chosen} in
-    $option_1)
-        run_cmd --opt1
-        ;;
-    $option_2)
-        run_cmd --opt2
-        ;;
+$option_1)
+    run_cmd --opt1
+    ;;
+$option_2)
+    run_cmd --opt2
+    ;;
 esac
