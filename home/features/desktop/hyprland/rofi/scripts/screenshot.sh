@@ -114,6 +114,11 @@ shot10 () {
 		notify_view
 }
 
+            # grim -g "$GEOMETRY" "$FILE"
+            # wl-copy < "$FILE" 
+            # cliphist store < "$FILE" 
+            # notify-send "Screen Captured" "Window image copied to clipboard."
+
 shotwin () {
 		# Get the active window ID using `wayland-info` or any compatible tool
 		active_window_id=$(wayland-info | grep -oP 'Window ID: \K[0-9]+')

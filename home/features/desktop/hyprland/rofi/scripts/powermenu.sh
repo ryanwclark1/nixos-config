@@ -10,6 +10,16 @@ theme="$type/$style"
 prompt="`hostname`"
 mesg="Uptime : `uptime | sed -e 's/up //g'`"
 
+
+shutdown=' '
+reboot=''
+lock=''
+suspend='󰏦'
+hibernate = '󰒲'
+logout='󰍃'
+yes=' '
+no=' '
+
 if [[ ( "$theme" == *'type-1'* ) || ( "$theme" == *'type-3'* ) || ( "$theme" == *'type-5'* ) ]]; then
 	list_col='1'
 	list_row='6'
@@ -21,23 +31,23 @@ fi
 # Options
 layout=`cat $theme | grep 'USE_ICON' | cut -d'=' -f2`
 if [[ "$layout" == 'NO' ]]; then
-	option_1=" Lock"
-	option_2=" Logout"
-	option_3=" Suspend"
-	option_4=" Hibernate"
-	option_5=" Reboot"
-	option_6=" Shutdown"
-	yes=' Yes'
-	no=' No'
+	option_1="$lock Lock"
+	option_2="$logout Logout"
+	option_3="$suspend Suspend"
+	option_4="$hibernate Hibernate"
+	option_5="$reboot Reboot"
+	option_6="$shutdown Shutdown"
+	yes="$yes Yes"
+	no="$no No"
 else
-	option_1=""
-	option_2=""
-	option_3=""
-	option_4=""
-	option_5=""
-	option_6=""
-	yes=''
-	no=''
+	option_1="$shutdown"
+	option_2="$logout"
+	option_3="$suspend"
+	option_4="$hibernate"
+	option_5="$reboot"
+	option_6="$shutdown"
+	yes="$yes"
+	no="$no"
 fi
 
 # Rofi CMD
