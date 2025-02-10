@@ -14,6 +14,7 @@
     ./hyprpaper
     # ./hyprpanel
     ./rofi
+    ./swaync
     ./wlogout
     ./waypaper
     # ./scripts/screenshot.nix
