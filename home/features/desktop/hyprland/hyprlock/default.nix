@@ -50,7 +50,7 @@
           text = "$TIME";
           color = "rgb(48,52,70)";
           font_size = 72;
-          font_family = "${config.stylix.fonts.sansSerif.name}";
+          font_family = "DejaVu Sans";
           shadow_passes = 1;
           shadow_size = 1;
           rotate = 0;
