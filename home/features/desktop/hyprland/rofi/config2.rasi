@@ -9,9 +9,9 @@ configuration {
   normalize-match: true;
   show-icons: true;
   icon-theme: "Papirus";
-/*  cache-dir: ;*/
   steal-focus: false;
 /*  dpi: -1;*/
+/*  cache-dir: ;*/
 
   /*---------- Matching setting ----------*/
   matching: "normal";

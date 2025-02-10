@@ -31,7 +31,7 @@
     # inkscape # Vector graphics editor
     # kdenlive # Video editor
     # krita # Digital painting
-    termusic
+    # termusic
     vlc # Media player
   ];
 }

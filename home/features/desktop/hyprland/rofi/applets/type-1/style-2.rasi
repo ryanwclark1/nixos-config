@@ -13,8 +13,8 @@ configuration {
 }
 
 /*****----- Global Properties -----*****/
-@import                          "../shared/colors.rasi"
-@import                          "../shared/fonts.rasi"
+@import                          "~/.config/rofi/style/shared/colors.rasi"
+@import                          "~/.config/rofi/style/shared/fonts.rasi"
 
 /*
 USE_ICON=NO

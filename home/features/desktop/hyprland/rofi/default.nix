@@ -102,14 +102,9 @@
   programs.rofi = {
     enable = true;
     package = pkgs.rofi-wayland;
-    cycle = true;
-    xoffset = 0;
-    yoffset = 0;
-    location = "center";
     plugins = [
       pkgs.rofi-emoji-wayland
     ];
-    terminal = "ghostty";
     pass = {
       enable = true;
       package = pkgs.rofi-pass-wayland;
@@ -117,14 +112,40 @@
         "${config.home.homeDirectory}/.local/share/keyrings"
       ];
     };
+    # configPath = "${config.xdg.configHome}/rofi/config.rasi";
+    cycle = true;
+    xoffset = 0;
+    yoffset = 0;
+    location = "center";
+    terminal = "ghostty";
+    
     theme = let 
      inherit (config.lib.formats.rasi) mkLiteral;
     in {
-      "@import" = [
-        "style/shared/border.rasi"
-        "style/shared/colors.rasi"
-        "style/shared/fonts.rasi"
-      ];
+      "*" = {
+        background = "#303446";
+        background-alt = "#303446";
+        foreground = "#c6d0f5";
+        selected = "#8caaee";
+        active = "#a6d189";
+        urgent = "#e78284";
+        base00 = "#303446";
+        base01 = "#292c3c";
+        base02 = "#414559";
+        base03 = "#51576d";
+        base04 = "#626880";
+        base05 = "#c6d0f5";
+        base06 = "#f2d5cf";
+        base07 = "#babbf1";
+        base08 = "#e78284";
+        base09 = "#ef9f76";
+        base0A = "#e5c890";
+        base0B = "#a6d189";
+        base0C = "#81c8be";
+        base0D = "#8caaee";
+        base0E = "#ca9ee6";
+        base0F = "#eebebe";
+      };
 
       window = {
         location = mkLiteral "center";
@@ -158,7 +179,7 @@
 
       textbox-prompt-colon = {
         expand = false;
-        str = ": ";
+        str = " = ";
         padding = mkLiteral "10px 13px";
         border-radius = mkLiteral "0px";
         background-color = mkLiteral "@urgent";
@@ -176,7 +197,7 @@
     #   # Use `mkLiteral` for string-like values that should show without
     #   # quotes, e.g.:
     #   # {
-    #   #   foo = "abc"; =&gt; foo: "abc";
+    #   #   foo = "abc"; =&gt; foo = "abc";
     #   #   bar = mkLiteral "abc"; =&gt; bar: abc;
     #   # };
     #   inherit (config.lib.formats.rasi) mkLiteral;
@@ -203,11 +224,31 @@
     #   };
     # };
     extraConfig ={
-      
       modi = "drun,emoji,ssh,run,filebrowser,window";
       font = "Fira Code 12";
       kb-primary-paste = "Control+V,Shift+Insert";
       kb-secondary-paste = "Control+v,Insert";
+      case-sensitive = false;
+      cycle = true;
+      filter = "";
+      scroll-method = 0;
+      normalize-match = true;
+      show-icons = true;
+      icon-theme = "Papirus";
+      steal-focus = false;
+      matching = "normal";
+      tokenize = true;
+      ssh-client = "ssh";
+      ssh-command = "{terminal} -e {ssh-client} {host} [-p {port}]";
+      parse-hosts = true;
+      parse-known-hosts = true;
+      drun-categories = "";
+      drun-match-fields = "name,generic,exec,categories,keywords";
+      drun-display-format = "{name} [<span weight='light' size='small'><i>({generic})</i></span>]";
+      drun-show-actions = false;
+      drun-url-launcher = "xdg-open";
+      drun-use-desktop-cache = false;
+      drun-reload-desktop-cache = false;
     };
   };
 }
