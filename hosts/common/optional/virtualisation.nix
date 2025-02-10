@@ -22,4 +22,8 @@
     # USB redirection support
     spiceUSBRedirection.enable = true;
   };
+  programs.virt-viewer = {
+    enable = true;
+    package = pkgs.virt-viewer;
+  };
 }
