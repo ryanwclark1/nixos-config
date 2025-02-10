@@ -1,9 +1,11 @@
 {
   config,
+  lib,
   pkgs,
   ...
 }:
 
+with lib;
 # TODO: Fix ssh functionality
 {
   imports = [
@@ -120,7 +122,7 @@
     terminal = "ghostty";
     
     theme = let 
-     inherit (config.lib.formats.rasi) mkLiteral;
+      inherit (config.lib.formats.rasi) mkLiteral;
     in {
       "*" = {
         background = "#303446";
@@ -193,6 +195,7 @@
         lines = 12;
       };
     };
+    #  + (optionalString (themeName != null) (toRasi { "@theme" = themeName; }));
     # theme = let
     #   # Use `mkLiteral` for string-like values that should show without
     #   # quotes, e.g.:
@@ -223,7 +226,7 @@
     #     text-color = mkLiteral "@foreground-color";
     #   };
     # };
-    extraConfig ={
+    extraConfig = {
       modi = "drun,emoji,ssh,run,filebrowser,window";
       font = "Fira Code 12";
       kb-primary-paste = "Control+V,Shift+Insert";
