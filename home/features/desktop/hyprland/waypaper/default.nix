@@ -10,5 +10,5 @@
 
   home.file."waypaper/config.ini" = {
     source = ./config.ini;
-  }
+  };
 }
