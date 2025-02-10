@@ -32,17 +32,17 @@ fi
 # Options
 layout=`cat $theme | grep 'USE_ICON' | cut -d'=' -f2`
 if [[ "$layout" == 'NO' ]]; then
-	option_1=" Alacritty"
-	option_2=" Thunar"
+	option_1="󰊠 Ghostty"
+	option_2=" VSCode"
 	option_3=" Geany"
 	option_4=" Ranger"
-	option_5=" Vim"
+	option_5=" Vim"
 else
 	option_1=""
 	option_2=""
 	option_3=""
 	option_4=""
-	option_5=""
+	option_5=""
 fi
 
 # Rofi CMD
@@ -64,17 +64,18 @@ run_rofi() {
 
 # Execute Command
 run_cmd() {
-	polkit_cmd="pkexec env PATH=$PATH DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY"
+	polkit_cmd=="pkexec env PATH=$PATH WAYLAND_DISPLAY=$WAYLAND_DISPLAY XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR"
+"
 	if [[ "$1" == '--opt1' ]]; then
-		$polkit_cmd alacritty
+		$polkit_cmd ghostty
 	elif [[ "$1" == '--opt2' ]]; then
 		$polkit_cmd dbus-run-session thunar
 	elif [[ "$1" == '--opt3' ]]; then
 		$polkit_cmd geany
 	elif [[ "$1" == '--opt4' ]]; then
-		$polkit_cmd alacritty -e ranger
+		$polkit_cmd ghostty -e yazi
 	elif [[ "$1" == '--opt5' ]]; then
-		$polkit_cmd alacritty -e vim
+		$polkit_cmd ghostty -e nvim
 	fi
 }
 
