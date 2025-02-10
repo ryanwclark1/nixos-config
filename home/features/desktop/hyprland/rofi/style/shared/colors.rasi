@@ -1,7 +1,7 @@
 
 * {
   background:     #303446;
-  background-alt:rgba(48, 52, 70, 70%);
+  background-alt:   rgba(48, 52, 70, 70%);
   foreground:     #c6d0f5;
   selected:       #8caaee;
   active:         #a6d189;
@@ -23,4 +23,5 @@
   base0E:         #ca9ee6;
   base0F:         #eebebe;
 }
+
 
