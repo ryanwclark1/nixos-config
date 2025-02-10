@@ -1,4 +1,9 @@
-{pkgs, ...}: {
+{
+  pkgs, 
+  ...
+}: 
+
+{
   xdg.portal = {
     enable = true;
     xdgOpenUsePortal = true;
