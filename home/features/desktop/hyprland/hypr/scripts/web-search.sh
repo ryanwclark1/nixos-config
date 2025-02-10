@@ -20,10 +20,10 @@ gen_list() {
 
 main() {
   # Pass the list to rofi
-  platform=$( (gen_list) | ${pkgs.rofi}/bin/rofi -dmenu -theme "$dir/$theme.rasi" )
+  platform=$( (gen_list) | rofi -dmenu -theme "$dir/$theme.rasi" )
 
   if [[ -n "$platform" ]]; then
-    query=$( (echo ) | ${pkgs.rofi}/bin/rofi -dmenu -theme "$dir/$theme.rasi" )
+    query=$( (echo ) | rofi -dmenu -theme "$dir/$theme.rasi" )
 
     if [[ -n "$query" ]]; then
 url=''${URLS[$platform]}$query
