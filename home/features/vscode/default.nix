@@ -251,7 +251,7 @@
       "code-runner.enableAppInsights" = false;
 
       #####  Copilot ##### 
-      "github.copilot.chat.temporalContext.enabled" = true;
+      # "github.copilot.chat.temporalContext.enabled" = true;
       "github.copilot.chat.completionContext.typescript.mode" = "on";
       "github.copilot.editor.enableAutoCompletions" = true;
       "github.copilot.chat.startDebugging.enabled" = true;
@@ -266,6 +266,7 @@
         "*" = true;
         "plaintext" = false;
       };
+      "github.copilot.chat.editor.temporalContext.enabled" = true;
 
       #####  Dev Containers #####
       "dev.containers.defaultExtensionsIfInstalledLocally" = [
