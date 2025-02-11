@@ -22,95 +22,78 @@ in
 
     bind =
       [
-        "SUPER, q,killactive"
-        "ALT, F4,killactive"
+        "SUPER, q, killactive" # Kill active window
+        "ALT, F4, killactive"  # Kill active window
         "SUPER SHIFT, e,exit"
 
-        "SUPER SHIFT, space,togglefloating"
+        "SUPER SHIFT, space, togglefloating"
 
-        "SUPER, minus,splitratio,-0.25"
-        "SUPER SHIFT, minus,splitratio,-0.3333333"
-
+        "SUPER, minus, splitratio,-0.25"
         "SUPER,equal, splitratio,0.25"
-        "SUPER SHIFT, equal,splitratio,0.3333333"
 
-        "SUPER, g,togglegroup"
-        "SUPER, t,lockactivegroup,toggle"
+        # "SUPER SHIFT, minus,splitratio,-0.3333333"
+        # "SUPER SHIFT, equal,splitratio,0.3333333"
 
-        "SUPER, apostrophe,workspace,previous"
-        "SUPER SHIFT, apostrophe,workspace,next"
+        "SUPER, g, togglegroup"
+        "SUPER, t, lockactivegroup,toggle"
 
-        "SUPER, u,togglespecialworkspace"
-        "SUPER SHIFT, u,movetoworkspacesilent,special"
-        "SUPER, i,pseudo"
-      ]
-      ++
-      (
-        [
-          # Program bindings
-          "SUPER, S,exec,screenshooting"
-          "SUPER, e,exec,code"
-          "SUPER, b,exec,${defaultApp "x-scheme-handler/https"}"
-          "SUPER ALT, space,exec,nautilus"
-          "SUPER, backspace,exec,wlogout"
-          # "SUPER ALT,Return,exec,${remote} ${defaultApp "x-scheme-handler/terminal"}"
-          # "SUPER ALT,e,exec,${remote} ${defaultApp "text/plain"}"
-          # "SUPER ALT,b,exec,${remote} ${defaultApp "x-scheme-handler/https"}"
-          "SUPER, Return, exec, ghostty" # xterm is a symlink, not actually xterm
-          "SUPER, W, exec, ${browser}"
-        ]
-      )
-      ++
+        "SUPER, apostrophe, workspace, previous"
+        "SUPER SHIFT, apostrophe, workspace, next"
+
+        "SUPER, u, togglespecialworkspace"
+        "SUPER SHIFT, u, movetoworkspacesilent, special"
+        "SUPER, i, pseudo"
+      ] ++
+      ([
+        # Program bindings
+        "SUPER, S, exec, screenshooting"
+        "SUPER, e, exec, code"
+        "SUPER, b,  exec, ${defaultApp "x-scheme-handler/https"}"
+        "SUPER ALT, space, exec, nautilus"
+        "SUPER, backspace, exec, wlogout"
+        # "SUPER ALT,Return, exec,${remote} ${defaultApp "x-scheme-handler/terminal"}"
+        # "SUPER ALT,e, exec,${remote} ${defaultApp "text/plain"}"
+        # "SUPER ALT,b, exec,${remote} ${defaultApp "x-scheme-handler/https"}"
+        "SUPER, Return, exec, ghostty" # xterm is a symlink, not actually xterm
+        "SUPER, W, exec, ${browser}"
+      ]) ++
       # Media control
       (
-        let
-          playerctl = lib.getExe' config.services.playerctld.package "playerctl";
-          playerctld = lib.getExe' config.services.playerctld.package "playerctld";
-        in
         lib.optionals config.services.playerctld.enable [
           # Media control
-          ",XF86AudioNext,exec,${playerctl} next"
-          ",XF86AudioPrev,exec,${playerctl} previous"
-          ",XF86AudioPlay,exec,${playerctl} play-pause"
-          ",XF86AudioStop,exec,${playerctl} stop"
-          "SHIFT,XF86AudioNext,exec,${playerctld} shift"
-          "SHIFT,XF86AudioPrev,exec,${playerctld} unshift"
-          "SHIFT,XF86AudioPlay,exec,systemctl --user restart playerctld"
+          ",XF86AudioNext, exec, playerctl next"
+          ",XF86AudioPrev, exec, playerctl previous"
+          ",XF86AudioPlay, exec, playerctl play-pause"
+          ",XF86AudioStop, exec, playerctl stop"
+          "SHIFT,XF86AudioNext, exec, playerctld shift"
+          "SHIFT,XF86AudioPrev, exec, playerctld unshift"
+          "SHIFT,XF86AudioPlay, exec, systemctl --user restart playerctld"
         ]
-      )
-      ++
+      ) ++
       # Brightness control
-      (
-        let
-          brightnessctl = lib.getExe pkgs.brightnessctl;
-        in
-        [
-          ",XF86MonBrightnessUp,exec,${brightnessctl} -q set +10%"
-          ",XF86MonBrightnessDown,exec,${brightnessctl} -q set 10%-"
-        ]
-      )
+      ([
+          ",XF86MonBrightnessUp, exec, brightnessctl -q set +10%"
+          ",XF86MonBrightnessDown, exec, brightnessctl -q set 10%-"
+      ])
       ++
       # Volume control
-      (
-        [
-          ",XF86AudioRaiseVolume,exec,wpctl set-mute @DEFAULT_AUDIO_SINK@ 0 && wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"
-          ",XF86AudioLowerVolume,exec,wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
-          ",XF86AudioMute,exec,wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
-          "SHIFT,XF86AudioRaiseVolume,exec,wpctl set-volume -l 1 @DEFAULT_AUDIO_SOURCE@ 5%+"
-          "SHIFT,XF86AudioLowerVolume,exec,wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 5%-"
-          "SHIFT,XF86AudioMute,exec,wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
-          ",XF86AudioMicMute,exec,wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
-        ]
-      )
-      ++
+      ([
+        ",XF86AudioRaiseVolume, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ 0 && wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"
+        ",XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
+        ",XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+        "SHIFT,XF86AudioRaiseVolume, exec, wpctl set-volume -l 1 @DEFAULT_AUDIO_SOURCE@ 5%+"
+        "SHIFT,XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 5%-"
+        "SHIFT,XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
+        ",XF86AudioMicMute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
+      ]) ++
       # Screen lock
       # (
       #   let
       #     hyprlock = lib.getExe config.programs.hyprlock.package;
       #   in
       #   lib.optionals config.programs.hyprlock.enable [
-      #     "SUPER,backspace,exec,${config.home.homeDirectory}/.config/rofi/scripts/powermenu_t4"
-      #     "SUPER,XF86Calculator,exec,${config.home.homeDirectory}/.config/rofi/scripts/powermenu_t4"
+      #     "SUPER,backspace, exec,${config.home.homeDirectory}/.config/rofi/scripts/powermenu_t4"
+      #     "SUPER,XF86Calculator, exec,${config.home.homeDirectory}/.config/rofi/scripts/powermenu_t4"
       #   ]
       # )
       # ++
@@ -120,35 +103,30 @@ in
       #     makoctl = lib.getExe' config.services.mako.package "makoctl";
       #   in
       #     lib.optionals config.services.mako.enable [
-      #       "SUPER,w,exec,${makoctl} dismiss"
-      #       "SUPER SHIFT,w,exec,${makoctl} restore"
+      #       "SUPER,w, exec,${makoctl} dismiss"
+      #       "SUPER SHIFT,w, exec,${makoctl} restore"
       #     ]
       # )
       # ++
       # Launcher
       (
         lib.optionals config.programs.rofi.enable [
-          "SUPER, x,exec,rofi -show drun -theme ${config.home.homeDirectory}/.config/rofi/style/launcher-center.rasi"
-          "SUPER, z,exec,rofi -show drun -theme ${config.home.homeDirectory}/.config/rofi/style/launcher-full.rasi"
-          "SUPERSHIFT, W,exec,web-search"
-        ]
-        ++
+          "SUPER, x, exec, rofi -show drun -theme ${config.home.homeDirectory}/.config/rofi/style/launcher-center.rasi"
+          "SUPER, z, exec, rofi -show drun -theme ${config.home.homeDirectory}/.config/rofi/style/launcher-full.rasi"
+          "SUPERSHIFT, W, exec,web-search"
+        ] ++
         (
           lib.optionals config.services.cliphist.enable [
-            ''SUPER, c,exec,selected=$(cliphist list | rofi -dmenu -theme ${config.home.homeDirectory}/.config/rofi/style/cliphist.rasi) | cliphist decode | wl-copy''
+            ''SUPER, c, exec,selected=$(cliphist list | rofi -dmenu -theme ${config.home.homeDirectory}/.config/rofi/style/cliphist.rasi) | cliphist decode | wl-copy''
           ]
         )
-      )
-      ++
+      ) ++
       # Screenshot and OCR
-      (
-        [
-          ",Print,exec,grimblast --notify --freeze copy area"
-          "SHIFT,Print,exec,grimblast --notify --freeze copy output"
-          "ALT,Print,exec,grimblast --freeze save area - | tesseract - - | wl-copy && notify-send -t 3000 'OCR result copied to buffer'"
-        ]
-      )
-      ++
+      ([
+        ",Print, exec,grimblast --notify --freeze copy area"
+        "SHIFT,Print, exec,grimblast --notify --freeze copy output"
+        "ALT,Print, exec,grimblast --freeze save area - | tesseract - - | wl-copy && notify-send -t 3000 'OCR result copied to buffer'"
+      ]) ++
       (
         let
           screenshot = "screenshooting";
@@ -169,7 +147,6 @@ in
           ",XF86Launch4, ${e} -r 'recorder.start()'"
           ",Print, exec, ${screenshot}"
           "SHIFT,Print, exec, ${screenshot} --full"
-
 
           "ALT, Tab, focuscurrentorlast"
           "CTRL ALT, Delete, exit"
@@ -200,7 +177,6 @@ in
         ]
         ++ (map (i: ws (toString i) (toString i)) arr)
         ++ (map (i: mvtows (toString i) (toString i)) arr)
-
       );
       # ++
       # # Bindings for moving windows and workspaces
