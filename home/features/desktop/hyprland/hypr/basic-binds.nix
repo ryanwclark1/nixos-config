@@ -142,11 +142,6 @@ in
       ++
       # Screenshot and OCR
       (
-         let
-          grimblast = lib.getExe pkgs.grimblast;
-          tesseract = lib.getExe pkgs.tesseract;
-          notify-send = lib.getExe' pkgs.libnotify "notify-send";
-        in
         [
           ",Print,exec,grimblast --notify --freeze copy area"
           "SHIFT,Print,exec,grimblast --notify --freeze copy output"
