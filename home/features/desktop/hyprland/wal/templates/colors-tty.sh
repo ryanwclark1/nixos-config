@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 # Check if running in a Linux virtual console and apply colors
-[ "${{TERM:-none}}" = "linux" ] && \
+[ "${{ "{{" }} TERM:-none {{ "}}" }}" = "linux" ] && \
     printf '%b' '\e]P0{{ color0 | strip }}
                  \e]P1{{ color1 | strip }}
                  \e]P2{{ color2 | strip }}
