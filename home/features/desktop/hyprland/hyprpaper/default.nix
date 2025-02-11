@@ -9,6 +9,8 @@
         ipc = "on";
         splash = false;
         splash_offset = 2.0;
+        preload = "$HOME/.config/ml4w/assets/blank.png";
+        wallpaper = ",$HOME/.config/ml4w/assets/blank.png";
       };
     };
   };
