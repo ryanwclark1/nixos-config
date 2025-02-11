@@ -1,30 +1,28 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
-let
-  defaultApp = type: "${lib.getExe pkgs.handlr-regex} launch ${type}";
-  browser = "${pkgs.google-chrome}/bin/google-chrome-stable";
+# let
+
   # remote = lib.getExe (pkgs.writeShellScriptBin "remote" ''
   #   socket="$(basename "$(find ~/.ssh -name 'administrator@*' | head -1 | cut -d ':' -f1)")"
   #   host="''${socket#master-}"
   #   ssh "$host" "$@"
   # '');
-in
+# in
 {
   wayland.windowManager.hyprland.settings = {
     bindm = [
-      "SUPER,mouse:272,movewindow"
-      "SUPER,mouse:273,resizewindow"
+      "SUPER, mouse:272, movewindow"
+      "SUPER, mouse:273, resizewindow"
     ];
 
     bind =
       [
         "SUPER, q, killactive" # Kill active window
         "ALT, F4, killactive"  # Kill active window
-        "SUPER SHIFT, e,exit"
+        "SUPER SHIFT, e, exit"
 
         "SUPER SHIFT, space, togglefloating"
 
@@ -35,7 +33,7 @@ in
         # "SUPER SHIFT, equal,splitratio,0.3333333"
 
         "SUPER, g, togglegroup"
-        "SUPER, t, lockactivegroup,toggle"
+        "SUPER, t, lockactivegroup, toggle"
 
         "SUPER, apostrophe, workspace, previous"
         "SUPER SHIFT, apostrophe, workspace, next"
@@ -48,14 +46,13 @@ in
         # Program bindings
         "SUPER, S, exec, screenshooting"
         "SUPER, e, exec, code"
-        "SUPER, b,  exec, ${defaultApp "x-scheme-handler/https"}"
+        "SUPER, b,  exec, handlr launch x-scheme-handler/https"
         "SUPER ALT, space, exec, nautilus"
         "SUPER, backspace, exec, wlogout"
         # "SUPER ALT,Return, exec,${remote} ${defaultApp "x-scheme-handler/terminal"}"
         # "SUPER ALT,e, exec,${remote} ${defaultApp "text/plain"}"
         # "SUPER ALT,b, exec,${remote} ${defaultApp "x-scheme-handler/https"}"
         "SUPER, Return, exec, ghostty" # xterm is a symlink, not actually xterm
-        "SUPER, W, exec, ${browser}"
       ]) ++
       # Media control
       (
@@ -123,9 +120,9 @@ in
       ) ++
       # Screenshot and OCR
       ([
-        ",Print, exec,grimblast --notify --freeze copy area"
-        "SHIFT,Print, exec,grimblast --notify --freeze copy output"
-        "ALT,Print, exec,grimblast --freeze save area - | tesseract - - | wl-copy && notify-send -t 3000 'OCR result copied to buffer'"
+        ",Print, exec, grimblast --notify --freeze copy area"
+        "SHIFT,Print, exec, grimblast --notify --freeze copy output"
+        "ALT,Print, exec, grimblast --freeze save area - | tesseract - - | wl-copy && notify-send -t 3000 'OCR result copied to buffer'"
       ]) ++
       (
         let
