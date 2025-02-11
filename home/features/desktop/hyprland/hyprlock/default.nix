@@ -6,7 +6,7 @@
 
 
 {
-  home.file."hyprlock.conf" = {
+  home.file.".config/hypr/hyprlock.conf" = {
     source = ./hyprlock.conf;
   };
 
