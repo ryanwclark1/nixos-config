@@ -58,7 +58,7 @@ threshold = 20
 #  * softlight16     - softlight with color variation
 #  * softlightcomp   - softlight with complementary colors
 #  * softlightcomp16 - softlight with complementary colors with colors
-palette = "dark16"
+palette = "darkcomp16"
 
 # This field chooses a method to use when the gathered colors aren't enough:
 #  * interpolation - (default) Tries to pick two colors and built gradients over them
@@ -95,22 +95,31 @@ generation = "interpolate"
 #alacritty.src = 'alacrittycfg'
 #alacritty.dst = '~/.config/alacritty/alacritty.toml'
 # css = { src = "colors.css", dst = "~/.config/" }
-hypr = { src = "colors-hyprland.conf", dst = "~/.cache/wal/colors-hyprland.conf" }
-kitty = { src = "colors-kitty.conf", dst = "~/.cache/wal/colors-kitty.conf", alpha_dec = ".8"}
 colors = { src = "colors", dst = "~/.cache/wal/colors" }
+colors-base16 = { src = "colors-base16.yml", dst = "~/.cache/wal/colors-base16.yml" }
 colors-css = { src = "colors.css", dst = "~/.cache/wal/colors.css" }
-colors-waybar = { src = "colors-waybar.css", dst = "~/.cache/wal/colors-waybar.css" }
-colors-wlogout = { src = "colors-wlogout.css", dst = "~/.cache/wal/colors-wlogout.css" }
+colors-hs = { src = "colors.hs", dst = "~/.cache/wal/colors.hs" }
+colors-hyprland = { src = "colors-hyprland.conf", dst = "~/.cache/wal/colors-hyprland.conf" }
 colors-json = { src = "colors.json", dst = "~/.cache/wal/colors.json", new_engine = true }
-colors-scss = { src = "colors.scss", dst = "~/.cache/wal/colors.scss" }
-colors-styl = { src = "colors.styl", dst = "~/.cache/wal/colors.styl" }
-colors-sh = { src = "colors.sh", dst = "~/.cache/wal/colors.sh" }
+colors-kitty = { src = "colors-kitty.conf", dst = "~/.cache/wal/colors-kitty.conf" }
+colors-material-you = { src = "colors-material-you.j2", dst = "~/.cache/wal/colors-material-you.j2", new_engine = true }
+colors-oomox = { src = "colors-oomox", dst = "~/.cache/wal/colors-oomox" }
 colors-rofi-dark = { src = "colors-rofi-dark.rasi", dst = "~/.cache/wal/colors-rofi-dark.rasi", new_engine = true }
 colors-rofi-light = { src = "colors-rofi-light.rasi", dst = "~/.cache/wal/colors-rofi-light.rasi", new_engine = true }
 colors-rofi-set-colors = { src = "colors-rofi-set-colors.rasi", dst = "~/.cache/wal/colors-rofi-set-colors.rasi", new_engine = true }
+colors-scss = { src = "colors.scss", dst = "~/.cache/wal/colors.scss" }
+colors-sh = { src = "colors.sh", dst = "~/.cache/wal/colors.sh" }
+colors-styl = { src = "colors.styl", dst = "~/.cache/wal/colors.styl" }
 colors-themer = { src = "colors-themer.js", dst = "~/.cache/wal/colors-themer.js", new_engine = true }
 colors-tty = { src = "colors-tty.sh", dst = "~/.cache/wal/colors-tty.sh", new_engine = true }
-colors-base16 = { src = "colors-base16.yml", dst = "~/.cache/wal/colors-base16.yml" }
+colors-vscode = { src = "colors-vscode.json", dst = "~/.cache/wal/colors-vscode.json", new_engine = true }
+colors-wal-st = { src = "colors-wal-st.h", dst = "~/.cache/wal/colors-wal-st.h" }
+colors-waltabbed = { src = "colors-wal-tabbed.h", dst = "~/.cache/wal/colors-waltabbed.h" }
+colors-wal-vim = { src = "colors-wal-vim.vim", dst = "~/.cache/wal/colors-wal-vim.vim" }
+colors-waybar = { src = "colors-waybar.css", dst = "~/.cache/wal/colors-waybar.css" }
+colors-wlogout = { src = "colors-wlogout.css", dst = "~/.cache/wal/colors-wlogout.css" }
+colors-xresources = { src = "colors.Xresources", dst = "~/.cache/wal/colors.Xresources" }
+colors-yml = { src = "colors.yml", dst = "~/.cache/wal/colors.yml" }
 
 # REMINDER Variables and methods that can be used with templating:
 #  wallpaper:  The full path to the current wallpaper, colorscheme file or the name of the theme in use.
