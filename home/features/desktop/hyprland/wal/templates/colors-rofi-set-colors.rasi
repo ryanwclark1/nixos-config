@@ -1,4 +1,4 @@
-* {{{{
+* {
     background: rgba(0,0,1,0.5);
     foreground: #FFFFFF;
     color0:     {{ color0 }};
@@ -17,4 +17,4 @@
     color13:    {{ color13 }};
     color14:    {{ color14 }};
     color15:    {{ color15 }};
-}}}}
+}
