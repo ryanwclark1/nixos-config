@@ -1,4 +1,5 @@
 {
+  lib,
   pkgs,
   ...
 }:
@@ -63,6 +64,8 @@
   home.packages = with pkgs; [
     amdgpu_top
   ];
+
+  # stylix.targets.hyprland.enable = lib.mkForce true;
 
   # Disable impermanence
   # home.persistence = lib.mkForce {};
