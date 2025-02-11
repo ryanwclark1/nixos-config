@@ -21,7 +21,7 @@
   programs.yazi = {
     enable = true;
     package = pkgs.yazi;
-    initLua = ./init.lua;
+    initLua = ./main.lua;
     shellWrapperName = "yy";
     enableBashIntegration = lib.mkIf config.programs.bash.enable true;
     enableFishIntegration = lib.mkIf config.programs.fish.enable true;
