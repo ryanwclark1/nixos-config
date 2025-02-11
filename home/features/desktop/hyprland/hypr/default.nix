@@ -38,10 +38,12 @@
 
   wayland.windowManager.hyprland = {
     enable = true;
-    xwayland.enable = true;
-    systemd.enable = true;
+    # xwayland.enable = true;
+    # systemd.enable = true;
     settings ={
-
+      "exec-once" = [
+        "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
+      ];
       source = [
         "~/.config/hypr/conf/monitor.conf"
         "~/.config/hypr/conf/cursor.conf"
@@ -59,9 +61,6 @@
         "~/.config/hypr/conf/animation.conf"
         "~/.config/hypr/conf/ml4w.conf"
         "~/.config/hypr/conf/custom.conf"
-      ];
-      "exec-once" = [
-        "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
       ];
     };
     #   env = [
