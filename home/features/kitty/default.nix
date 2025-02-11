@@ -31,9 +31,9 @@
       size = 12;
     };
     shellIntegration = {
-      enableZshIntegration = lib.mkIf config.programs.kitty.enable true;
-      enableBashIntegration = lib.mkIf config.programs.kitty.enable true;
-      enableFishIntegration = lib.mkIf config.programs.kitty.enable true;
+      enableBashIntegration = lib.mkIf config.programs.bash.enable true;
+      enableFishIntegration = lib.mkIf config.programs.fish.enable true;
+      enableZshIntegration = lib.mkIf config.programs.zsh.enable true;
     };
     settings = {
       bold_font = "auto";
