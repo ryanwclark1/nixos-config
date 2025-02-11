@@ -126,7 +126,7 @@ with lib;
     in {
       "*" = {
         background = "#303446";
-        background-alt = "#303446";
+        background-alt = "#30344699";
         foreground = "#c6d0f5";
         selected = "#8caaee";
         active = "#a6d189";
@@ -147,48 +147,85 @@ with lib;
         base0D = "#8caaee";
         base0E = "#ca9ee6";
         base0F = "#eebebe";
+        border-color = mkLiteral "var(selected)";
+        handle-color = mkLiteral "var(selected)";
+        background-color = mkLiteral "var(background)";
+        foreground-color = mkLiteral "var(foreground)";
+        alternate-background = mkLiteral "var(background-alt)";
+        normal-background = mkLiteral "var(background)";
+        normal-foreground = mkLiteral "var(foreground)";
+        urgent-background = mkLiteral "var(urgent)";
+        urgent-foreground = mkLiteral "var(background)";
+        active-background = mkLiteral "var(active)";
+        active-foreground = mkLiteral "var(background)";
+        selected-normal-background = mkLiteral "var(selected)";
+        selected-normal-foreground = mkLiteral "var(background)";
+        selected-urgent-background = mkLiteral "var(active)";
+        selected-urgent-foreground = mkLiteral "var(background)";
+        selected-active-background = mkLiteral "var(urgent)";
+        selected-active-foreground = mkLiteral "var(background)";
+        alternate-normal-background = mkLiteral "var(background)";
+        alternate-normal-foreground = mkLiteral "var(foreground)";
+        alternate-urgent-background = mkLiteral "var(urgent)";
+        alternate-urgent-foreground = mkLiteral "var(background)";
+        alternate-active-background = mkLiteral "var(active)";
+        alternate-active-foreground = mkLiteral "var(background)";
       };
 
       window = {
+      transparency = "real";
         location = mkLiteral "center";
         anchor = mkLiteral "center";
         x-offset = mkLiteral "0px";
         y-offset = mkLiteral "0px";
-        width = mkLiteral "800px";
-        height = mkLiteral "600px";
+        width = mkLiteral "1000px";
+        # height = mkLiteral "600px";
         margin = mkLiteral "0px";
         padding = mkLiteral "0px";
         border = mkLiteral "0px solid";
-        border-radius = mkLiteral "0px";
+        border-radius = mkLiteral "10px";
+        cursor = "default";
         background-color = mkLiteral "@background";
       };
 
       mainbox = {
-        children = map mkLiteral [ "inputbar" "message" "listview" ];
+        enabled = mkLiteral "true";
         spacing = mkLiteral "15px";
         margin = mkLiteral "0px";
         padding = mkLiteral "30px";
+        border = mkLiteral "0px solid";
+        border-radius = mkLiteral "0px 0px 0px 0px";
+        border-color = mkLiteral "@border-color";
         background-color = mkLiteral "transparent";
+        children = map mkLiteral [ "inputbar" "message" "mode-switcher" "listview" ];
       };
 
       inputbar = {
-        children = map mkLiteral [ "textbox-prompt-colon" "prompt" ];
+        enabled = mkLiteral "true";
         spacing = mkLiteral "10px";
-        padding = mkLiteral "0px";
-        border-radius = mkLiteral "0px";
-        background-color = mkLiteral "@background-alt";
-      };
-
-      textbox-prompt-colon = {
-        expand = false;
-        str = " = ";
-        padding = mkLiteral "10px 13px";
-        border-radius = mkLiteral "0px";
-        background-color = mkLiteral "@urgent";
+        margin = mkLiteral "0px 0px 10px 0px";
+        padding = mkLiteral "5px 10px";
+        border = mkLiteral "0px solid";
+        border-radius = mkLiteral "10px";
+        border-color = mkLiteral "@border-color";
+        background-color = mkLiteral "@alternative-background";
+        children = map mkLiteral [ "textbox-prompt-colon" "entry" ];
       };
 
       prompt = {
-        padding = mkLiteral "10px 13px 10px 10px";
+        enabled = mkLiteral "true";
+        background-color = mkLiteral "inherit";
+        text-color = mkLiteral "inherit";
+        # padding = mkLiteral "10px 13px 10px 10px";
+      };
+
+      textbox-prompt-colon = {
+        enabled = mkLiteral "true";
+        padding = mkLiteral "5px 0px";
+        expand = mkLiteral "false";
+        str = " ";
+        background-color = mkLiteral "inherit";
+        text-color = mkLiteral "inherit";
       };
 
       listview = {
@@ -227,7 +264,7 @@ with lib;
     #   };
     # };
     extraConfig = {
-      modi = "drun,emoji,ssh,run,filebrowser,window";
+      modi = "drun,emoji,ssh,run,filebrowser,window,keys";
       font = "Fira Code 12";
       kb-primary-paste = "Control+V,Shift+Insert";
       kb-secondary-paste = "Control+v,Insert";
