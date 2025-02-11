@@ -1,11 +1,12 @@
 
 * {
   background:     #303446;
-  background-alt:   rgba(48, 52, 70, 70%);
+  background-alt:   #30344699; /* Opacity 60% */
   foreground:     #c6d0f5;
   selected:       #8caaee;
   active:         #a6d189;
   urgent:         #e78284;
+  
   base00:         #303446;
   base01:         #292c3c;
   base02:         #414559;
