@@ -12,10 +12,10 @@
     cursorTheme = {
       package = pkgs.bibata-cursors;
       name = "Bibata-Modern-Classic";
-      size = 16;
+      size = 22;
     };
     iconTheme = {
-      name = lib.mkDefault "Papirus-Dark";
+      name = lib.mkDefault "Papirus";
       package = pkgs.catppuccin-papirus-folders.override {
         flavor = "frappe";
         accent = "lavender";
@@ -42,7 +42,19 @@
         "file:///mnt/rclark"
         "file:///mnt/ryan"
       ];
-      # extraConfig = {
+      extraConfig = {
+        gtk-toolbar-style = "GTK_TOOLBAR_ICONS";
+        gtk-toolbar-icon-size = "GTK_ICON_SIZE_LARGE_TOOLBAR";
+        gtk-button-images = 0;
+        gtk-menu-images = 0;
+        gtk-enable-event-sounds = 1;
+        gtk-enable-input-feedback-sounds = 0;
+        gtk-xft-antialias = 1;
+        gtk-xft-hinting = 1;
+        gtk-xft-hintstyle = "hintslight";
+        gtk-xft-rgba = "rgb";
+        gtk-application-prefer-dark-theme = 1;
+      };
       #   gtk-application-prefer-dark-theme = 1;
       #   gtk-recent-files-limit = 20;
       # };
@@ -138,9 +150,9 @@
       '';
     };
     gtk4 = {
-      # extraConfig = {
-      #   gtk-application-prefer-dark-theme = 1;
-      # };
+      extraConfig = {
+        gtk-application-prefer-dark-theme = true;
+      };
       extraCss = ''
         @define-color accent_color #8caaee;
         @define-color accent_bg_color #8caaee;
