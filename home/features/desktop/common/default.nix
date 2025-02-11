@@ -25,7 +25,7 @@
 
     ventoy-full #balena type tool
     waypipe # Network proxy for Wayland clients (applications)
-    webkitgtk # Web rendering engine
+    webkitgtk_6_0 # Web rendering engine
     wl-clipboard # Wayland clipboard
     ydotool # Command-line tool for automation which emulates input devices
     wayland-utils # Wayland utilities
