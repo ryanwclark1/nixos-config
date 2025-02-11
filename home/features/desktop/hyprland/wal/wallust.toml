@@ -13,7 +13,7 @@
 #  * kmeans     - Kmeans is an algo that divides and picks pixels all around the image
 #                  Requires more tweaking and more in depth testing but for the most part
 #                  it just werks
-backend = "wal"
+backend = "full"
 
 # What color space to use to produce and select the most prominent colors:
 #  * lab      - Uses Cie L a b color space
@@ -58,12 +58,12 @@ threshold = 20
 #  * softlight16     - softlight with color variation
 #  * softlightcomp   - softlight with complementary colors
 #  * softlightcomp16 - softlight with complementary colors with colors
-# palette = "dark"
+palette = "dark16"
 
 # This field chooses a method to use when the gathered colors aren't enough:
 #  * interpolation - (default) Tries to pick two colors and built gradients over them
 #  * complementary - Uses the complementary colors of two colors, or more (if needed), colors.
-#generation = "interpolate"
+generation = "interpolate"
 
 # Ensures a "readable contrast" (OPTIONAL, disabled by default)
 # Should only be enabled when you notice an unreadable contrast frequently happening
@@ -101,15 +101,15 @@ colors = { src = "colors", dst = "~/.cache/wal/colors" }
 colors-css = { src = "colors.css", dst = "~/.cache/wal/colors.css" }
 colors-waybar = { src = "colors-waybar.css", dst = "~/.cache/wal/colors-waybar.css" }
 colors-wlogout = { src = "colors-wlogout.css", dst = "~/.cache/wal/colors-wlogout.css" }
-colors-json = { src = "colors.json", dst = "~/.cache/wal/colors.json" }
+colors-json = { src = "colors.json", dst = "~/.cache/wal/colors.json", new_engine = true }
 colors-scss = { src = "colors.scss", dst = "~/.cache/wal/colors.scss" }
 colors-styl = { src = "colors.styl", dst = "~/.cache/wal/colors.styl" }
 colors-sh = { src = "colors.sh", dst = "~/.cache/wal/colors.sh" }
-colors-rofi-dark = { src = "colors-rofi-dark.rasi", dst = "~/.cache/wal/colors-rofi-dark.rasi" }
-colors-rofi-light = { src = "colors-rofi-light.rasi", dst = "~/.cache/wal/colors-rofi-light.rasi" }
-colors-rofi-set-colors = { src = "colors-rofi-set-colors.rasi", dst = "~/.cache/wal/colors-rofi-set-colors.rasi" }
-colors-themer = { src = "colors-themer.js", dst = "~/.cache/wal/colors-themer.js" }
-colors-tty = { src = "colors-tty.sh", dst = "~/.cache/wal/colors-tty.sh" }
+colors-rofi-dark = { src = "colors-rofi-dark.rasi", dst = "~/.cache/wal/colors-rofi-dark.rasi", new_engine = true }
+colors-rofi-light = { src = "colors-rofi-light.rasi", dst = "~/.cache/wal/colors-rofi-light.rasi", new_engine = true }
+colors-rofi-set-colors = { src = "colors-rofi-set-colors.rasi", dst = "~/.cache/wal/colors-rofi-set-colors.rasi", new_engine = true }
+colors-themer = { src = "colors-themer.js", dst = "~/.cache/wal/colors-themer.js", new_engine = true }
+colors-tty = { src = "colors-tty.sh", dst = "~/.cache/wal/colors-tty.sh", new_engine = true }
 colors-base16 = { src = "colors-base16.yml", dst = "~/.cache/wal/colors-base16.yml" }
 
 # REMINDER Variables and methods that can be used with templating:
