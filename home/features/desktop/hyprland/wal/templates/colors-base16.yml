@@ -1,0 +1,16 @@
+base00: "{{ color0 }}"   # Background
+base01: "{{ color8 }}"
+base02: "{{ color9 }}"
+base03: "{{ color10 }}"
+base04: "{{ color11 }}"
+base05: "{{ color7 }}"   # Foreground
+base06: "{{ color12 }}"
+base07: "{{ color15 }}"
+base08: "{{ color1 }}"    # Red
+base09: "{{ color2 }}"    # Orange
+base0A: "{{ color3 }}"    # Yellow
+base0B: "{{ color4 }}"    # Green
+base0C: "{{ color6 }}"    # Cyan
+base0D: "{{ color5 }}"    # Blue
+base0E: "{{ color13 }}"   # Magenta
+base0F: "{{ color14 }}"   # Brown
