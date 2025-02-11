@@ -11,15 +11,15 @@
       settings =
       {
         general = {
-          after_sleep_cmd = "hyprctl dispatch dpms on"; # to avoid having to press a key twice to turn on the display.
-          before_sleep_cmd = "loginctl lock-session"; # lock before suspend.
-          ignore_dbus_inhibit = false;
           lock_cmd = "pidof hyprlock || hyprlock"; # avoid starting multiple hyprlock instances.
+          before_sleep_cmd = "loginctl lock-session"; # lock before suspend.
+          after_sleep_cmd = "hyprctl dispatch dpms on"; # to avoid having to press a key twice to turn on the display.
+          ignore_dbus_inhibit = false;
         };
         listener = [
           {
             timeout = 1000;
-            on-timeout = "hyprlock";
+            on-timeout = "loginctl lock-session";
           }
           # dpms
           {
