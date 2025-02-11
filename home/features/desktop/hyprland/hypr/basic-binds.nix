@@ -120,9 +120,9 @@
       ) ++
       # Screenshot and OCR
       ([
-        ",Print, exec, grimblast --notify --freeze copy area"
-        "SHIFT,Print, exec, grimblast --notify --freeze copy output"
-        "ALT,Print, exec, grimblast --freeze save area - | tesseract - - | wl-copy && notify-send -t 3000 'OCR result copied to buffer'"
+        ", Print, exec, grimblast --notify --freeze copy area"
+        "SHIFT, Print, exec, grimblast --notify --freeze copy output"
+        "ALT, Print, exec, grimblast --freeze save area - | tesseract - - | wl-copy && notify-send -t 3000 'OCR result copied to buffer'"
       ]) ++
       (
         let
@@ -140,10 +140,10 @@
           "CTRL SHIFT, R, ${e} quit; ags -b hypr"
           "SUPER, R, ${e} -t launcher"
           "SUPER, Tab, ${e} -t overview"
-          ",XF86PowerOff, ${e} -r 'powermenu.shutdown()'"
-          ",XF86Launch4, ${e} -r 'recorder.start()'"
-          ",Print, exec, ${screenshot}"
-          "SHIFT,Print, exec, ${screenshot} --full"
+          ", XF86PowerOff, ${e} -r 'powermenu.shutdown()'"
+          ", XF86Launch4, ${e} -r 'recorder.start()'"
+          ", Print, exec, ${screenshot}"
+          "SHIFT, Print, exec, ${screenshot} --full"
 
           "ALT, Tab, focuscurrentorlast"
           "CTRL ALT, Delete, exit"
