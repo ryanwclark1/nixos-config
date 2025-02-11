@@ -25,10 +25,10 @@ configuration {
 @import                          "shared/fonts.rasi"
 
 * {
-  border-color:               var(selected);
-  handle-color:               var(selected);
-  background-color:           var(background);
-  foreground-color:           var(foreground);
+  border-color:                var(selected);
+  handle-color:                var(selected);
+  background-color:            var(background);
+  foreground-color:            var(foreground);
   alternate-background:        var(background-alt);
   normal-background:           var(background);
   normal-foreground:           var(foreground);
@@ -70,7 +70,6 @@ window {
   border-radius:               10px;
   border-color:                @border-color;
   cursor:                      "default";
-  /* Backgroud Colors */
   background-color:            @background-color;
   /* Backgroud Image */
   //background-image:          url("/path/to/image.png", none);
