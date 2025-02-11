@@ -15,8 +15,9 @@
     # ./hyprpanel
     ./rofi
     ./swaync
-    ./wlogout
+    ./wal
     ./waypaper
+    ./wlogout
     # ./scripts/screenshot.nix
   ];
 
@@ -67,7 +68,6 @@
     libnotify # Notification library
     mission-center
     networkmanagerapplet
-    pywal
     qalculate-gtk
     slurp # Screenshot tool, select area
     swappy # Wayland native snapshot editing tool, inspired by Snappy on macOS
