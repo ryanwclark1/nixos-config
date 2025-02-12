@@ -6,14 +6,10 @@
 {
   imports = [
     ./aria.nix
-    ./cava.nix
     ./gstreamer.nix
     ./freetube.nix
     ./mpv.nix
-    ./ncmp.nix
     ./obs.nix
-    ./playerctl.nix
-    ./spotify.nix
     ./yt-dlp.nix
   ];
 
