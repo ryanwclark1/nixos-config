@@ -61,15 +61,4 @@
 
   # Disable impermanence
   # home.persistence = lib.mkForce {};
-  # stylix.targets.gnome.enable = lib.mkForce true;
-  # stylix.targets.gtk.enable = lib.mkForce true;
-  # stylix.targets.ghostty.enable = lib.mkForce true;
-  # stylix.polarity = lib.mkForce "dark";
-  # stylix.iconTheme.enable = lib.mkForce true;
-  # stylix.iconTheme.package = lib.mkForce pkgs.papirus-icon-theme;
-  # stylix.iconTheme.dark = lib.mkForce "Papirus-Dark";
-  # stylix.iconTheme.light = lib.mkForce "Papirus";
-  # stylix.targets.cava.enable = lib.mkForce true;
-  # stylix.targets.cava.rainbow.enable = lib.mkForce true;
-  # stylix.targets.vscode.enable = lib.mkForce true;
 }
