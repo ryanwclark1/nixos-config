@@ -71,19 +71,19 @@
           "image-radius": 0
         },
         "volume": {
-          "label": "󰕾"
+          "label": "󰕾 "
         },
         "backlight": {
-          "label": "󰃟"
+          "label": "󰃟 "
         },
         "buttons-grid": {
           "actions": [
             {
-              "label": "",
+              "label": " ",
               "command": "hyprlock"
             },
             {
-              "label": "󰝟",
+              "label": "󰝟 ",
               "command": "pactl set-sink-mute @DEFAULT_SINK@ toggle"
             },
             {
@@ -91,7 +91,7 @@
               "command": "blueman-manager"
             },
             {
-              "label": "",
+              "label": " ",
               "command": "bash -c $HOME/.config/ml4w/scripts/wlogout.sh"
             }
           ]
