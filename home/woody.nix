@@ -1,5 +1,4 @@
 {
-  lib,
   pkgs,
   ...
 }:
@@ -11,6 +10,7 @@
     ./features/alacritty
     ./features/ansible
     ./features/atuin
+    ./features/audio
     ./features/bat
     ./features/btop
     ./features/cli
