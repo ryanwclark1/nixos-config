@@ -4,8 +4,6 @@
 }:
 
 {
-  security.rtkit.enable = true;
-
   services.pipewire = {
     enable = true;
     package = pkgs.pipewire;
@@ -33,17 +31,12 @@
     };
   };
 
-  environment.systemPackages = with pkgs; [
-      pwvucontrol
-      pulsemixer
-      alsa-lib
-      alsa-utils
-  ];
-
   services.udev.extraRules = ''
     KERNEL=="rtc0", GROUP="audio"
     KERNEL=="hpet", GROUP="audio"
   '';
+
+  security.rtkit.enable = true;
 
   security.pam.loginLimits = [
     {
@@ -70,5 +63,12 @@
       type = "hard";
       value = "524288";
     }
+  ];
+
+  environment.systemPackages = with pkgs; [
+    pwvucontrol
+    pulsemixer
+    alsa-lib
+    alsa-utils
   ];
 }
