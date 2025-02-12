@@ -13,7 +13,7 @@
   ];
 
   home.packages = with pkgs; [
-    termusic
+    # termusic # Build issue
     mpc
   ];
 }
