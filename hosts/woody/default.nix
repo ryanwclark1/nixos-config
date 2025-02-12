@@ -29,7 +29,6 @@
     ../common/optional/thunar.nix
     ../common/optional/virtualisation.nix
     ../common/optional/webcam.nix
-    ../common/optional/wireguard.nix
     ../common/optional/wireshark.nix
     ../common/optional/zsh.nix
 
