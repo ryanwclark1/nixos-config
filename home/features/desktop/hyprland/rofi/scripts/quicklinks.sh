@@ -28,25 +28,25 @@ fi
 # Options
 layout=`cat $theme | grep 'USE_ICON' | cut -d'=' -f2`
 if [[ "$layout" == 'NO' ]]; then
-	option_1=" Google"
-	option_2=" Gmail"
-	option_3=" Youtube"
-	option_4=" Github"
-	option_5=" Reddit"
-	option_6=" Twitter"
+	option_1="  Google"
+	option_2="  Gmail"
+	option_3="  Youtube"
+	option_4="  Github"
+	option_5="  Reddit"
+	option_6="  Twitter"
 else
-	option_1=""
-	option_2=""
-	option_3=""
-	option_4=""
-	option_5=""
-	option_6=""
+	option_1=" "
+	option_2=" "
+	option_3=" "
+	option_4=" "
+	option_5=" "
+	option_6=" "
 fi
 
 # Rofi CMD
 rofi_cmd() {
 	rofi -theme-str "listview {columns: $list_col; lines: $list_row;}" \
-		-theme-str 'textbox-prompt-colon {str: "";}' \
+		-theme-str 'textbox-prompt-colon {str: " ";}' \
 		-theme-str "element-text {font: \"$efonts\";}" \
 		-dmenu \
 		-p "$prompt" \
