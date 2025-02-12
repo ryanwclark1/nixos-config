@@ -1,5 +1,4 @@
 {
-  pkgs,
   ...
 }:
 
@@ -16,7 +15,6 @@
     # Enable automatic display configuration for SPICE sessions
     spice-autorandr = {
       enable = true;
-
     };
   };
 }
