@@ -112,9 +112,7 @@
     self,
     home-manager,
     nix-darwin,
-    nixos-cosmic,
     nixpkgs,
-    stylix,
     systems,
     ...
   } @ inputs:
@@ -145,7 +143,6 @@
       frametop = lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
-          stylix.nixosModules.stylix
           ./hosts/frametop
         ];
         specialArgs = {
@@ -155,8 +152,6 @@
       woody = lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
-          stylix.nixosModules.stylix
-          nixos-cosmic.nixosModules.default
           ./hosts/woody
         ];
         specialArgs = {
@@ -180,7 +175,6 @@
     homeConfigurations = {
       "administrator@frametop" = lib.homeManagerConfiguration {
         modules = [
-          stylix.homeManagerModules.stylix
           ./home/frametop.nix
         ];
         pkgs = pkgsFor.x86_64-linux;
@@ -190,7 +184,6 @@
       };
       "administrator@woody" = lib.homeManagerConfiguration {
         modules = [
-          stylix.homeManagerModules.stylix
           ./home/woody.nix
         ];
         pkgs = pkgsFor.x86_64-linux;
@@ -200,7 +193,6 @@
       };
       "administrator@accent" = lib.homeManagerConfiguration {
         modules = [
-          stylix.homeManagerModules.stylix
           ./home/accent.nix
         ];
         pkgs = pkgsFor.x86_64-linux;
@@ -210,7 +202,6 @@
       };
       "administrator@mini" = lib.homeManagerConfiguration {
         modules = [
-          stylix.homeManagerModules.stylix
           ./home/mini.nix
         ];
         pkgs = pkgsFor.aarch64-darwin;
@@ -220,7 +211,6 @@
       };
       "root@vlad" = lib.homeManagerConfiguration {
         modules = [
-          stylix.homeManagerModules.stylix
           ./home/vlad.nix
         ];
         pkgs = pkgsFor.x86_64-linux;
@@ -230,7 +220,6 @@
       };
       "ryanc@lighthouse" = lib.homeManagerConfiguration {
         modules = [
-          stylix.homeManagerModules.stylix
           ./home/lighthouse.nix
         ];
         pkgs = pkgsFor.x86_64-linux;
@@ -240,7 +229,6 @@
       };
       "ryanc@ansible" = lib.homeManagerConfiguration {
         modules = [
-          stylix.homeManagerModules.stylix
           ./home/ansible.nix
         ];
         pkgs = pkgsFor.x86_64-linux;

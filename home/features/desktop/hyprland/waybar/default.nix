@@ -4,12 +4,11 @@
   pkgs,
   ...
 }:
-with config.lib.stylix.colors.withHashtag;
-with config.stylix.fonts;
+# with config.lib.stylix.colors.withHashtag;
+# with config.stylix.fonts;
 
 let
   cat = "${pkgs.coreutils}/bin/cat";
-  cliphist = "${pkgs.cliphist}/bin/cliphist";
   hyprlock = lib.getExe config.programs.hyprlock.package;
   terminal = "${pkgs.alacritty}/bin/alacritty";
   missioncenter = "${pkgs.mission-center}/bin/missioncenter";
@@ -132,12 +131,12 @@ in
               "mode-mon-col" = 3;
               "weeks-pos" = "right";
               "on-scroll" = 1;
-              "format" = {
-                "months" = "<span color='${base07}'><b>{}</b></span>";
-                "days" = "<span color='${base05}'><b>{}</b></span>";
-                "weekdays" = "<span color='${base0A}'><b>{}</b></span>";
-                "today" = "<span color='${base08}'><b><u>{}</u></b></span>";
-              };
+              # "format" = {
+              #   "months" = "<span color='${base07}'><b>{}</b></span>";
+              #   "days" = "<span color='${base05}'><b>{}</b></span>";
+              #   "weekdays" = "<span color='${base0A}'><b>{}</b></span>";
+              #   "today" = "<span color='${base08}'><b><u>{}</u></b></span>";
+              # };
             };
             "actions" = {
               "on-click-right" = "mode";
@@ -173,7 +172,7 @@ in
             format = "";
             on-click = "cliphist-copy";
             on-click-right = "cliphist-delete";
-            on-click-middle = "${cliphist} wipe";
+            on-click-middle = "cliphist wipe";
             tooltip-format = "Clipboard Manager";
           };
 
