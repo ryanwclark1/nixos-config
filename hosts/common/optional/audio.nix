@@ -4,25 +4,6 @@
 }:
 
 {
-  services.mpd = {
-    enable = true;
-    user = "administrator";
-    startWhenNeeded = false;
-    extraConfig = ''
-      audio_output {
-        type "pipewire"
-        name "My PipeWire Output"
-      }
-    '';
-    # Optional:
-    network = {
-      listenAddress = "any"; # if you want to allow non-localhost connections
-      port = 6600;
-    };
-  };
-
-  # hardware.pulseaudio.enable = lib.mkForce false;
-
   security.rtkit.enable = true;
 
   services.pipewire = {

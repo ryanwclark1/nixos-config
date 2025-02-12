@@ -6,8 +6,8 @@
   services.mpd = {
     enable = true;
     startWhenNeeded = true;
-    musicDirectory = "nfs://10.10.100.210:/mnt/tank/share/music";
-    playlistDirectory = "nfs://10.10.100.210:/mnt/tank/share/music/playlists";
+    musicDirectory = "/mnt/share/music"; # Mounts to local nfs directory nfs:// did not work
+    playlistDirectory = "/mnt/share/music/playlists";
     dbFile = "/var/lib/mpd/tag_cache";
     user = "mpd";
     group = "audio";
