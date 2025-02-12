@@ -14,8 +14,7 @@
 
     autoMaster =
       let
-        # intr param depricated in nfs4
-        mapConf = pkgs.writeText "auto.mnt" ''
+        mapConf = pkgs.writeText "auto" ''
           share -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/share
           scans -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/scans
           rclark -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/users/rclark
@@ -24,10 +23,8 @@
           sync -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/sync
           family -fstype=nfs4,rw,soft 10.10.100.210:/mnt/tank/users/family
         '';
-      in
-      ''
-        /mnt ${mapConf}
+      in ''
+        /mnt file:${mapConf}
       '';
   };
 }
-
