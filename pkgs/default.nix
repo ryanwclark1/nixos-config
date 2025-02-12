@@ -1,4 +1,4 @@
-{ pkgs ? import <nixpkgs> { }, ...}: rec {
+{pkgs ? import <nixpkgs> { }, ...}: rec {
 
   # gitkraken = pkgs.callPackage ./gitkraken { };
   # shellcolord = pkgs.callPackage ./shellcolord { };
