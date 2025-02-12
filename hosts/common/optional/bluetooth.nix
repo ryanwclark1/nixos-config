@@ -7,7 +7,7 @@
 {
   hardware.bluetooth = {
     enable = true;
-    package = pkgs.bluez-experimental;
+    hsphfpd.enable = true;
     powerOnBoot = true;
     settings = {
       General = {
@@ -25,8 +25,8 @@
     };
   };
 
-  environment.systemPackages = [
-    pkgs.bluez-tools
+  environment.systemPackages = with pkgs; [
+    bluez-tools
   ];
   # Blueman is a GTK+ Bluetooth Manager
   services.blueman.enable = true;
