@@ -1,3 +1,3 @@
 {
-
+  colors = import ./colors.nix;
 }

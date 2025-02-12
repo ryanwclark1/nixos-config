@@ -6,7 +6,7 @@
 
 {
   imports = [
-    ./ags
+    # ./ags
     ./cliphist
     ./hypr
     ./hypridle
