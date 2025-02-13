@@ -1,4 +1,8 @@
-{ config, pkgs, ... }:
+{ 
+  config, 
+  pkgs, 
+  ... 
+}:
 
 let
   wallpapersDir = "${config.home.homeDirectory}/Pictures/wallpapers";
@@ -28,7 +32,7 @@ let
   '';
 in
 {
-  home.packages = with pkgs; [ git feh ];
+  home.packages = with pkgs; [ git swww ];
 
   home.activation.initWallpapers = config.lib.dag.entryAfter [ "writeBoundary" ] ''
     if [ ! -d "${wallpapersDir}" ]; then
