@@ -12,6 +12,6 @@
       "-max-items"
       "500"
     ];
-    systemdTarget = "hyprland-session.target";
+    systemdTargets = "hyprland-session.target";
   };
 }
