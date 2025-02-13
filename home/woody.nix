@@ -65,7 +65,7 @@
     amdgpu_top
   ];
 
-  wallpaper = pkgs.wallpapers.aenami-lost-in-between;
+  # wallpaper = pkgs.wallpapers.aenami-lost-in-between;
   # stylix.targets.hyprland.enable = lib.mkForce true;
 
   # Disable impermanence

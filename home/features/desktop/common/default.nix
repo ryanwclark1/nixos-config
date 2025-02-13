@@ -9,6 +9,7 @@
     ./noti.nix
     ./qt.nix
     ./trayscale.nix
+    ./wallpapers.nix
     ./xdg.nix
   ];
 

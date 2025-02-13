@@ -21,11 +21,6 @@
     # ./scripts/screenshot.nix
   ];
 
-  home.file."Pictures/wallpapers" = {
-    source = ../../../../hosts/common/wallpaper;
-    recursive = true;
-  };
-
   home.file.".config/ml4w" = {
     source = ./ml4w;
     recursive = true;
