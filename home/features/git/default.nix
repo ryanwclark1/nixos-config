@@ -22,7 +22,7 @@ in
     enable = true;
     package = pkgs.git;
     userName = "Ryan Clark";
-    userEmail = "ryanc@accentservices.com";
+    userEmail = "36689148+ryanwclark1@users.noreply.github.com";
 
     aliases = {
       p = "pull --ff-only";
