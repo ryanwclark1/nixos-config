@@ -11,7 +11,7 @@ theme="$type/$style"
 
 # Theme Elements
 prompt='Applications'
-mesg="Installed Packages : `pacman -Q | wc -l` (pacman)"
+mesg="Installed Packages : `nix-env -q | wc -l` (nix-env)"
 
 if [[ ( "$theme" == *'type-1'* ) || ( "$theme" == *'type-3'* ) || ( "$theme" == *'type-5'* ) ]]; then
 	list_col='1'
@@ -25,27 +25,26 @@ fi
 term_cmd='ghostty'
 file_cmd='nautilus'
 text_cmd='geany'
-web_cmd='firefox'
-music_cmd='alacritty -e ncmpcpp'
+web_cmd='google-chrome'
+music_cmd='ghostty -e ncmpcpp'
 setting_cmd='xfce4-settings-manager'
 
 # Options
 layout=`cat $theme | grep 'USE_ICON' | cut -d'=' -f2`
 if [[ "$layout" == 'NO' ]]; then
 	option_1="  Terminal <span weight='light' size='small'><i>($term_cmd)</i></span>"
-	option_2=" Files <span weight='light' size='small'><i>($file_cmd)</i></span>"
-	option_3=" Editor <span weight='light' size='small'><i>($text_cmd)</i></span>"
-	option_4=" Browser <span weight='light' size='small'><i>($web_cmd)</i></span>"
-	option_5=" Music <span weight='light' size='small'><i>($music_cmd)</i></span>"
-	option_6=" Settings <span weight='light' size='small'><i>($setting_cmd)</i></span>"
+	option_2="  Files <span weight='light' size='small'><i>($file_cmd)</i></span>"
+	option_3="  Editor <span weight='light' size='small'><i>($text_cmd)</i></span>"
+	option_4="  Browser <span weight='light' size='small'><i>($web_cmd)</i></span>"
+	option_5="  Music <span weight='light' size='small'><i>($music_cmd)</i></span>"
+	option_6="  Settings <span weight='light' size='small'><i>($setting_cmd)</i></span>"
 else
 	option_1=" "
-	option_2=""
-	option_3=""
-	option_4=""
-	option_5=""
-	option_6=""
-fi
+	option_2="c"
+	option_3=" "
+	option_4="c"
+	option_5="c"
+	option_6="c"
 
 # Rofi CMD
 rofi_cmd() {
