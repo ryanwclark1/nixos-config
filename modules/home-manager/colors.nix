@@ -9,11 +9,11 @@
 
   hexColor = types.strMatching "#([0-9a-fA-F]{3}){1,2}";
 
-  removeFilterPrefixAttrs = prefix: attrs:
-    lib.mapAttrs' (n: v: {
-      name = lib.removePrefix prefix n;
-      value = v;
-    }) (lib.filterAttrs (n: _: lib.hasPrefix prefix n) attrs);
+  # removeFilterPrefixAttrs = prefix: attrs:
+  #   lib.mapAttrs' (n: v: {
+  #     name = lib.removePrefix prefix n;
+  #     value = v;
+  #   }) (lib.filterAttrs (n: _: lib.hasPrefix prefix n) attrs);
 
 in {
   options.colorscheme = {
