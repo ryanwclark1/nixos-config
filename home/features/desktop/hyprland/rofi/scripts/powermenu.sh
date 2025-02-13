@@ -11,7 +11,7 @@ prompt="`hostname`"
 mesg="Uptime : `uptime | sed -e 's/up //g'`"
 
 
-shutdown=' '
+shutdown=''
 reboot=''
 lock=''
 suspend='󰏦'
