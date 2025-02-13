@@ -5,7 +5,7 @@
 
 {
   imports = [
-    ./colorscheme.nix
+    # ./colorscheme.nix
     # ./style.nix
     ./sops.nix
     ./home.nix

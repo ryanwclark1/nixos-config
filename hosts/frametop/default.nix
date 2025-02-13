@@ -21,7 +21,7 @@
     ../common/optional/nfs.nix
     ../common/optional/printing.nix
     ../common/optional/steam.nix
-    ../common/optional/style.nix
+    # ../common/optional/style.nix
     ../common/optional/system-packages.nix
     ../common/optional/thunar.nix
     ../common/optional/virtualisation.nix
