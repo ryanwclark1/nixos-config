@@ -90,7 +90,7 @@
       container = {
         symbol = " ";
         style = "bg:#ca9ee6 fg:#303446";
-        format = "[$symbol\ [$name]]($style)";
+        format = "[$symbol\ [$name\]]($style)";
         disabled = false;
       };
 
