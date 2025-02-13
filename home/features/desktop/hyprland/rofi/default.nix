@@ -124,6 +124,7 @@ in
     theme =        
     {
       "*" = {
+        font ="UbuntuMono Nerd Font 14";
         background = mkLiteral "#303446";
         background-alt = mkLiteral "#30344699";
         foreground = mkLiteral "#c6d0f5";
@@ -197,8 +198,8 @@ in
         children = map mkLiteral [ "inputbar" "message" "mode-switcher" "listview" ];
         enabled = mkLiteral "true";
         margin = mkLiteral "0px";
-        padding = mkLiteral "30px";
-        spacing = mkLiteral "15px";
+        padding = mkLiteral "20px";
+        spacing = mkLiteral "0px";
       };
 
       inputbar = {
@@ -274,6 +275,7 @@ in
         background-color = mkLiteral "transparent";
         border = mkLiteral "0px 2px 2px 2px";
         border-color = mkLiteral "@border-color";
+        border-radius = mkLiteral "0px 0px 10px 10px";
         columns = mkLiteral "1";
         cursor = "default";
         cycle = mkLiteral "true";
