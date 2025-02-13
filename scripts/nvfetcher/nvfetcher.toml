@@ -127,3 +127,8 @@ passthru = { publisher = "grafana", name = "grafana-vscode" }
 src.vsmarketplace = "ms-python.mypy-type-checker"
 fetch.vsmarketplace = "ms-python.mypy-type-checker"
 passthru = { publisher = "ms-python", name = "mypy-type-checker"}
+
+[rasi]
+src.vsmarketplace = "dlasagno.rasi"
+fetch.vsmarketplace = "dlasagno.rasi"
+passthru = { publisher = "dlasagno", name = "rasi" }
