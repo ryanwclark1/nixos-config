@@ -161,6 +161,12 @@
         sha256 = "sha256-NvGAbszItsZf71D6fI0/IOSAxKXUHjDJoQ58ROF/NAk=";
         version = "2.32.3";
       }
+      {
+        name = "rasi";
+        publisher = "dlasagno";
+        version = "1.0.0";
+        sha256 = "sha256-s60alej3cNAbSJxsRlIRE2Qha6oAsmcOBbWoqp+w6fk=";
+      }
     ]);
     userSettings = {
       "accessibility.dimUnfocused.enabled" = true;
