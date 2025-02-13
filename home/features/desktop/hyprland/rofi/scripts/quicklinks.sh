@@ -35,12 +35,12 @@ if [[ "$layout" == 'NO' ]]; then
 	option_5="  Reddit"
 	option_6="  Twitter"
 else
-	option_1=" "
-	option_2=" "
-	option_3=" "
-	option_4=" "
-	option_5=" "
-	option_6=" "
+	option_1=""
+	option_2=""
+	option_3=""
+	option_4=""
+	option_5=""
+	option_6=""
 fi
 
 # Rofi CMD

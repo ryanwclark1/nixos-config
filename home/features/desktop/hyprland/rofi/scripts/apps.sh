@@ -11,7 +11,7 @@ theme="$type/$style"
 
 # Theme Elements
 prompt='Applications'
-mesg="Installed Packages : `nix-env -q | wc -l` (nix-env)"
+# mesg="Installed Packages : `nix-env -q | wc -l` (nix-env)"
 
 if [[ ( "$theme" == *'type-1'* ) || ( "$theme" == *'type-3'* ) || ( "$theme" == *'type-5'* ) ]]; then
 	list_col='1'
@@ -52,7 +52,7 @@ rofi_cmd() {
 		-theme-str 'textbox-prompt-colon {str: " ";}' \
 		-dmenu \
 		-p "$prompt" \
-		-mesg "$mesg" \
+		# -mesg "$mesg" \
 		-markup-rows \
 		-theme $theme
 }
