@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-rofi -modes "window,run,ssh,Workspaces:hyprland-workspaces" -show Workspaces
