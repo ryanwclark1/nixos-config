@@ -74,10 +74,10 @@
     yad # Yet another dialog
     (writeShellScriptBin "cliphist-rofi-copy" (builtins.readFile ./scripts/cliphist-rofi-copy))
     (writeShellScriptBin "cliphist-rofi-img-copy" (builtins.readFile ./scripts/cliphist-rofi-img-copy))
-    # (writeShellScriptBin "dontkillsteam" (builtins.readFile ./scripts/dontkillsteam.sh))
+
     (writeShellScriptBin "list-hypr-bindings" (builtins.readFile ./scripts/list-hypr-bindings))
-    # (writeShellScriptBin "power-big" (builtins.readFile ./scripts/power-big.sh))
-    # (writeShellScriptBin "rofi-launcher" (builtins.readFile ./scripts/rofi-launcher.sh))
+    (writeShellScriptBin "hyprland-workspace" (builtins.readFile ./scripts/hyprland-workspace))
+    # (writeShellScriptBin "switch-workspace" (builtins.readFile ./scripts/switch-workspace))
     (writeShellScriptBin "screenshooting" (builtins.readFile ./scripts/screenshooting.sh))
     # (writeShellScriptBin "update-checker" (builtins.readFile ./scripts/update-checker.sh))
     # (writeShellScriptBin "web-search" (builtins.readFile ./scripts/web-search.sh))
