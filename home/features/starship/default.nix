@@ -17,7 +17,47 @@
     enableIonIntegration = lib.mkIf config.programs.ion.enable true;
     # Configuration written to ~/.config/starship.toml
     settings = {
-      format = "[](#ca9ee6)\$os\$username\$hostname\$localip\$container\${custom.yazi}\[](bg:#babbf1 fg:#ca9ee6)\$directory\[](fg:#babbf1 bg:#c6d0f5)\$git_branch\$git_status\[](fg:#c6d0f5 bg:#eebebe)\$python\$bun\$c\$cmake\$dart\$golang\$haskell\$java\$kotlin\$kubernetes\$lua\$nodejs\$php\$rust\$swift\$zig[](fg:#eebebe bg:#f2d5cf)\$docker_context\$nix_shell\[](fg:#f2d5cf)\$fill\[](fg:#ca9ee6)\$time\[](#ca9ee6)\$line_break$character";
+      format = lib.concatStrings [
+        "[](fg:#ca9ee6)"
+        "$os"
+        "$username"
+        "$hostname"
+        "$localip"
+        "$container"
+        "[](bg:#babbf1 fg:#ca9ee6)"
+        "$directory"
+        "[](fg:#babbf1 bg:#c6d0f5)"
+        "$git_branch"
+        "$git_status"
+        "[](fg:#c6d0f5 bg:#eebebe)"
+        "$python"
+        "$bun"
+        "$c"
+        "$cmake"
+        "$dart"
+        "$golang"
+        "$haskell"
+        "$java"
+        "$kotlin"
+        "$kubernetes"
+        "$lua"
+        "$nodejs"
+        "$php"
+        "$rust"
+        "$swift"
+        "$zig"
+        "[](fg:#eebebe bg:#f2d5cf)"
+        "$docker_context"
+        "$nix_shell"
+        "[](fg:#f2d5cf)"
+        "$fill"
+        "[](fg:#ca9ee6)"
+        "$time"
+        "[](fg:#ca9ee6)"
+        "$line_break"
+        "$character"
+      ];
+      # format = "[](#ca9ee6)\$os\$username\$hostname\$localip\$container\${custom.yazi}\[](bg:#babbf1 fg:#ca9ee6)\$directory\[](fg:#babbf1 bg:#c6d0f5)\$git_branch\$git_status\[](fg:#c6d0f5 bg:#eebebe)\$python\$bun\$c\$cmake\$dart\$golang\$haskell\$java\$kotlin\$kubernetes\$lua\$nodejs\$php\$rust\$swift\$zig[](fg:#eebebe bg:#f2d5cf)\$docker_context\$nix_shell\[](fg:#f2d5cf)\$fill\[](fg:#ca9ee6)\$time\[](#ca9ee6)\$line_break$character";
       add_newline = true;
       line_break.disabled = false;
       scan_timeout = 30;
@@ -42,7 +82,7 @@
           Gentoo = "󰣨 ";
           Kali = " ";
           Linux = "󰌽 ";
-          Macos = "󰀵 ";
+          Macos = "󰀵";
           Manjaro = " ";
           Mint = "󰣭 ";
           NixOS = " ";
@@ -97,7 +137,7 @@
       directory = {
         style = "fg:#303446 bg:#babbf1";
         format = "[ $path ]($style)";
-        truncation_length = 8;
+        truncation_length = 10;
         truncate_to_repo = true;
         truncation_symbol = "…/";
         read_only = " ";
@@ -147,15 +187,15 @@
 
       shlvl = {
         symbol = " ";
+        style = "bg:#c6d0f5";
         format = "[$shlvl]($style) ";
-        style = "bold cyan";
         threshold = 2;
         repeat = true;
         disabled = false;
       };
 
       git_branch = {
-        symbol = " ";
+        symbol = "";
         style = "bg:#c6d0f5";
         format = "[[ $symbol $branch ](fg:#303446 bg:#c6d0f5)]($style)";
         disabled = false;
@@ -167,6 +207,7 @@
       };
       package = {
         symbol = "󰏗 ";
+        style = "bg:#eebebe";
         version_format = "v$raw";
         format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
         disabled = false;
@@ -308,7 +349,7 @@
       };
       time = {
         style = "bg:#ca9ee6 fg:#303446";
-        format = "[[  $time ](bg:#ca9ee6 fg:#303446)]($style)";
+        format = "[  $time]($style)";
         use_12hr = false;
         disabled = false;
       };
