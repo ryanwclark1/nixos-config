@@ -92,6 +92,9 @@ let
 
     echo "Files and directories copied successfully to ${dotrepoDir}. Text replacement completed."
 
+    # Change to the dotfiles repository directory
+    cd "${dotrepoDir}"
+
     if [[ -n $(git status --porcelain) ]]; then
         git add .
         git commit -m "Auto-update: $(date)"
