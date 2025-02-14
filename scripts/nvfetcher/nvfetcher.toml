@@ -132,3 +132,8 @@ passthru = { publisher = "ms-python", name = "mypy-type-checker"}
 src.vsmarketplace = "dlasagno.rasi"
 fetch.vsmarketplace = "dlasagno.rasi"
 passthru = { publisher = "dlasagno", name = "rasi" }
+
+[explorer]
+src.vsmarketplace = "vitest.explorer"
+fetch.vsmarketplace = "vitest.explorer"
+passthru = { publisher = "vitest", name = "explorer" }

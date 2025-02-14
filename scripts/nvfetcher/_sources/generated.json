@@ -28,12 +28,12 @@
         },
         "pinned": false,
         "src": {
-            "name": "ansible-25.1.0.zip",
-            "sha256": "sha256-/kLg+msRu6GvkENVu3jw9uDbfEo/x0eZgsKfXvLaO3I=",
+            "name": "ansible-25.2.0.zip",
+            "sha256": "sha256-jgb12UJ+YtBKgdYWtZDq9KXWpsSq6NzMOIMNPGXwDe0=",
             "type": "url",
-            "url": "https://redhat.gallery.vsassets.io/_apis/public/gallery/publisher/redhat/extension/ansible/25.1.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://redhat.gallery.vsassets.io/_apis/public/gallery/publisher/redhat/extension/ansible/25.2.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "25.1.0"
+        "version": "25.2.0"
     },
     "bun-vscode": {
         "cargoLocks": null,
@@ -64,12 +64,12 @@
         },
         "pinned": false,
         "src": {
-            "name": "copilot-1.270.1376.zip",
-            "sha256": "sha256-Y+l1GzVMkkfUXc5oAJx0XvqKB9SGvNavvAmPaorthtE=",
+            "name": "copilot-1.271.0.zip",
+            "sha256": "sha256-uSN7JUfyi8y0sn7XijgEwDxa+9RsghU3FlNVV3SlHro=",
             "type": "url",
-            "url": "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot/1.270.1376/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot/1.271.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "1.270.1376"
+        "version": "1.271.0"
     },
     "copilot-chat": {
         "cargoLocks": null,
@@ -88,6 +88,24 @@
             "url": "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot-chat/0.25.2025021301/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
         "version": "0.25.2025021301"
+    },
+    "explorer": {
+        "cargoLocks": null,
+        "date": null,
+        "extract": null,
+        "name": "explorer",
+        "passthru": {
+            "name": "explorer",
+            "publisher": "vitest"
+        },
+        "pinned": false,
+        "src": {
+            "name": "explorer-1.14.0.zip",
+            "sha256": "sha256-74IlnOBrznyQzq9u+s6j2R017XPAkjXZT4h76M+wYCc=",
+            "type": "url",
+            "url": "https://vitest.gallery.vsassets.io/_apis/public/gallery/publisher/vitest/extension/explorer/1.14.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+        },
+        "version": "1.14.0"
     },
     "gopls": {
         "cargoLocks": null,
