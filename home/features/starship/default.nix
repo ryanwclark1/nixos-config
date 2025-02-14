@@ -90,7 +90,7 @@
       container = {
         symbol = " ";
         style = "bg:#ca9ee6 fg:#303446";
-        format = "[$symbol\ [$name\]]($style)";
+        format = "[$symbol \[$name\]]($style)";
         disabled = false;
       };
 
@@ -281,8 +281,8 @@
       };
       docker_context = {
         symbol = " ";
-        style = "bg:#f2d5cf";
-        format = "[[ $symbol( $context) ](fg:#303446 bg:#f2d5cf)]($style)";
+        style = "fg:#303446 bg:#f2d5cf";
+        format = "[ $symbol( $context) ]($style)";
         disabled = false;
       };
       custom.yazi = {
