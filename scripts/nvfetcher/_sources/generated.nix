@@ -14,11 +14,11 @@
   };
   ansible = {
     pname = "ansible";
-    version = "25.1.0";
+    version = "25.2.0";
     src = fetchurl {
-      url = "https://redhat.gallery.vsassets.io/_apis/public/gallery/publisher/redhat/extension/ansible/25.1.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "ansible-25.1.0.zip";
-      sha256 = "sha256-/kLg+msRu6GvkENVu3jw9uDbfEo/x0eZgsKfXvLaO3I=";
+      url = "https://redhat.gallery.vsassets.io/_apis/public/gallery/publisher/redhat/extension/ansible/25.2.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "ansible-25.2.0.zip";
+      sha256 = "sha256-jgb12UJ+YtBKgdYWtZDq9KXWpsSq6NzMOIMNPGXwDe0=";
     };
     publisher = "redhat";
     name = "ansible";
@@ -36,11 +36,11 @@
   };
   copilot = {
     pname = "copilot";
-    version = "1.270.1376";
+    version = "1.271.0";
     src = fetchurl {
-      url = "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot/1.270.1376/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "copilot-1.270.1376.zip";
-      sha256 = "sha256-Y+l1GzVMkkfUXc5oAJx0XvqKB9SGvNavvAmPaorthtE=";
+      url = "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot/1.271.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "copilot-1.271.0.zip";
+      sha256 = "sha256-uSN7JUfyi8y0sn7XijgEwDxa+9RsghU3FlNVV3SlHro=";
     };
     publisher = "github";
     name = "copilot";
@@ -55,6 +55,17 @@
     };
     publisher = "github";
     name = "copilot-chat";
+  };
+  explorer = {
+    pname = "explorer";
+    version = "1.14.0";
+    src = fetchurl {
+      url = "https://vitest.gallery.vsassets.io/_apis/public/gallery/publisher/vitest/extension/explorer/1.14.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "explorer-1.14.0.zip";
+      sha256 = "sha256-74IlnOBrznyQzq9u+s6j2R017XPAkjXZT4h76M+wYCc=";
+    };
+    publisher = "vitest";
+    name = "explorer";
   };
   gopls = {
     pname = "gopls";
