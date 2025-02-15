@@ -9,6 +9,7 @@
 {
   imports = [
     ./basic-binds.nix
+    ./colors-hyprland.nix
   ];
 
   home.file.".config/hypr/conf" = {
@@ -49,7 +50,7 @@
         "~/.config/hypr/conf/cursor.conf"
         "~/.config/hypr/conf/environment.conf"
         "~/.config/hypr/conf/keyboard.conf"
-        "~/.cache/wal/colors-hyprland.conf"
+        "~/.config/hypr/conf/colors-hyprland.conf"
         "~/.config/hypr/conf/autostart.conf"
         "~/.config/hypr/conf/window.conf"
         "~/.config/hypr/conf/decoration.conf"
