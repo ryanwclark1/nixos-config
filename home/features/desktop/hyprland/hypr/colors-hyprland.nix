@@ -25,25 +25,25 @@ in
 {
   home.file.".config/hypr/conf/colors-hyprland.conf" = {
     text = ''
-    color0 = ${base00}
-    color1 = ${base01}
-    color2 = ${base02}
-    color3 = ${base03}
-    color4 = ${base04}
-    color5 = ${base05}
-    color6 = ${base06}
-    color7 = ${base07}
-    color8 = ${base08}
-    color9 = ${base09}
-    color10 = ${base0A}
-    color11 = ${base0B}
-    color12 = ${base0C}
-    color13 = ${base0D}
-    color14 = ${base0E}
-    color15 = ${base0F}
-    scheme = "${scheme}"
-    author = "${author}"
-    slug = "${slug}"
-  '';
+      $color0 = rgb(${base00})
+      $color1 = rgb(${base01})
+      $color2 = rgb(${base02})
+      $color3 = rgb(${base03})
+      $color4 = rgb(${base04})
+      $color5 = rgb(${base05})
+      $color6 = rgb(${base06})
+      $color7 = rgb(${base07})
+      $color8 = rgb(${base08})
+      $color9 = rgb(${base09})
+      $color10 = rgb(${base0A})
+      $color11 = rgb(${base0B})
+      $color12 = rgb(${base0C})
+      $color13 = rgb(${base0D})
+      $color14 = rgb(${base0E})
+      $color15 = rgb(${base0F})
+      $scheme = "${scheme}"
+      $author = "${author}"
+      $slug = "${slug}"
+    '';
   };
 }
