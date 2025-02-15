@@ -21,10 +21,6 @@
     # ./scripts/screenshot.nix
   ];
 
-  home.file.".config/ml4w" = {
-    source = ./ml4w;
-    recursive = true;
-  };
 
   home.file.".config/swappy/config" = {
     text = ''
