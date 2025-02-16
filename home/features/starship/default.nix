@@ -5,7 +5,32 @@
   ...
 }:
 # TODO: Add pyenv, nvm, rbenv, rustup, etc. support
-
+let
+  base00 = "303446"; # base
+  base01 = "292c3c"; # mantle
+  base02 = "414559"; # surface0
+  base03 = "51576d"; # surface1
+  base04 = "626880"; # surface2
+  base05 = "c6d0f5"; # text
+  base06 = "f2d5cf"; # rosewater
+  base07 = "babbf1"; # lavender
+  base08 = "e78284"; # red
+  base09 = "ef9f76"; # peach
+  base0A = "e5c890"; # yellow
+  base0B = "a6d189"; # green
+  base0C = "81c8be"; # teal
+  base0D = "8caaee"; # blue
+  base0E = "ca9ee6"; # mauve
+  base0F = "eebebe"; # flamingo
+  base10 = "292c3c"; # mantle - darker background
+  base11 = "232634"; # crust - darkest background
+  base12 = "ea999c"; # maroon - bright red
+  base13 = "f2d5cf"; # rosewater - bright yellow
+  base14 = "a6d189"; # green - bright green
+  base15 = "99d1db"; # sky - bright cyan
+  base16 = "85c1dc"; # sapphire - bright blue
+  base17 = "f4b8e4"; # pink - bright purple
+in
 {
   programs.starship = {
     enable = true;
@@ -18,18 +43,18 @@
     # Configuration written to ~/.config/starship.toml
     settings = {
       format = lib.concatStrings [
-        "[](fg:#ca9ee6)"
+        "[](fg:#${base0E})"
         "$os"
         "$username"
         "$hostname"
         "$localip"
         "$container"
-        "[](bg:#babbf1 fg:#ca9ee6)"
+        "[](bg:#${base07} fg:#${base0E})"
         "$directory"
-        "[](fg:#babbf1 bg:#c6d0f5)"
+        "[](fg:#${base07} bg:#${base05})"
         "$git_branch"
         "$git_status"
-        "[](fg:#c6d0f5 bg:#eebebe)"
+        "[](fg:#${base05} bg:#${base0F})"
         "$python"
         "$bun"
         "$c"
@@ -46,18 +71,18 @@
         "$rust"
         "$swift"
         "$zig"
-        "[](fg:#eebebe bg:#f2d5cf)"
+        "[](fg:#${base0F} bg:#${base06})"
         "$docker_context"
         "$nix_shell"
-        "[](fg:#f2d5cf)"
+        "[](fg:#${base06})"
         "$fill"
-        "[](fg:#ca9ee6)"
+        "[](fg:#${base0E})"
         "$time"
-        "[](fg:#ca9ee6)"
+        "[](fg:#${base0E})"
         "$line_break"
         "$character"
       ];
-      # format = "[](#ca9ee6)\$os\$username\$hostname\$localip\$container\${custom.yazi}\[](bg:#babbf1 fg:#ca9ee6)\$directory\[](fg:#babbf1 bg:#c6d0f5)\$git_branch\$git_status\[](fg:#c6d0f5 bg:#eebebe)\$python\$bun\$c\$cmake\$dart\$golang\$haskell\$java\$kotlin\$kubernetes\$lua\$nodejs\$php\$rust\$swift\$zig[](fg:#eebebe bg:#f2d5cf)\$docker_context\$nix_shell\[](fg:#f2d5cf)\$fill\[](fg:#ca9ee6)\$time\[](#ca9ee6)\$line_break$character";
+      # format = "[](#${base0E})\$os\$username\$hostname\$localip\$container\${custom.yazi}\[](bg:#${base07} fg:#${base0E})\$directory\[](fg:#${base07} bg:#${base05})\$git_branch\$git_status\[](fg:#${base05} bg:#${base0F})\$python\$bun\$c\$cmake\$dart\$golang\$haskell\$java\$kotlin\$kubernetes\$lua\$nodejs\$php\$rust\$swift\$zig[](fg:#${base0F} bg:#${base06})\$docker_context\$nix_shell\[](fg:#${base06})\$fill\[](fg:#${base0E})\$time\[](#${base0E})\$line_break$character";
       add_newline = true;
       line_break.disabled = false;
       scan_timeout = 30;
@@ -66,7 +91,7 @@
 
       os = {
         disabled = false;
-        style = "bg:#ca9ee6 fg:#303446";
+        style = "bg:#${base0E} fg:#${base00}";
         format = "[$symbol]($style)";
         symbols = {
           AlmaLinux = " ";
@@ -107,15 +132,15 @@
           "SSH_CLIENT"
           "SSH_TTY"
         ];
-        style_user = "bg:#ca9ee6 fg:#303446";
-        style_root = "bg:#ca9ee6 fg:#303446";
+        style_user = "bg:#${base0E} fg:#${base00}";
+        style_root = "bg:#${base0E} fg:#${base00}";
         format = "[ $user ]($style)";
       };
 
       localip = {
         disabled = false;
         ssh_only = true;
-        style = "bg:#ca9ee6 fg:#303446";
+        style = "bg:#${base0E} fg:#${base00}";
         format = "[ $localipv4 ]($style)";
       };
 
@@ -123,19 +148,19 @@
         disabled = false;
         ssh_only = true;
         ssh_symbol = " ";
-        style = "bg:#ca9ee6 fg:#303446";
+        style = "bg:#${base0E} fg:#${base00}";
         format = "[$ssh_symbol]($style)";
       };
 
       container = {
         symbol = " ";
-        style = "bg:#ca9ee6 fg:#303446";
+        style = "bg:#${base0E} fg:#${base00}";
         format = "[$symbol \[$name\]]($style)";
         disabled = false;
       };
 
       directory = {
-        style = "fg:#303446 bg:#babbf1";
+        style = "fg:#${base00} bg:#${base07}";
         format = "[ $path ]($style)";
         truncation_length = 10;
         truncate_to_repo = true;
@@ -187,7 +212,7 @@
 
       shlvl = {
         symbol = " ";
-        style = "bg:#c6d0f5";
+        style = "bg:#${base05}";
         format = "[$shlvl]($style) ";
         threshold = 2;
         repeat = true;
@@ -196,84 +221,84 @@
 
       git_branch = {
         symbol = "";
-        style = "bg:#c6d0f5";
-        format = "[[ $symbol $branch ](fg:#303446 bg:#c6d0f5)]($style)";
+        style = "bg:#${base05}";
+        format = "[[ $symbol $branch ](fg:#${base00} bg:#${base05})]($style)";
         disabled = false;
       };
       git_status = {
-        style = "bg:#c6d0f5";
-        format = "[[($all_status$ahead_behind )](fg:#303446 bg:#c6d0f5)]($style)";
+        style = "bg:#${base05}";
+        format = "[[($all_status$ahead_behind )](fg:#${base00} bg:#${base05})]($style)";
         disabled = false;
       };
       package = {
         symbol = "󰏗 ";
-        style = "bg:#eebebe";
+        style = "bg:#${base0F}";
         version_format = "v$raw";
-        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
+        format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
         disabled = false;
       };
       bun = {
         symbol = " ";
-        style = "bg:#eebebe";
-        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
+        style = "bg:#${base0F}";
+        format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
         disabled = false;
       };
       c = {
         symbol = " ";
-        style = "bg:#eebebe";
-        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
+        style = "bg:#${base0F}";
+        format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
         disabled = false;
       };
       cmake = {
         symbol = " ";
-        style = "bg:#eebebe";
-        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
+        style = "bg:#${base0F}";
+        format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
       };
       dart = {
         symbol = " ";
-        style = "bg:#eebebe";
-        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
+        style = "bg:#${base0F}";
+        format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
         disabled = true;
       };
       golang = {
         symbol = " ";
-        style = "bg:#eebebe";
-        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
+        style = "bg:#${base0F}";
+        format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
         disabled = false;
       };
       haskell = {
         symbol = " ";
-        style = "bg:#eebebe";
-        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
+        style = "bg:#${base0F}";
+        format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
       };
       java = {
         symbol = " ";
-        style = "bg:#eebebe";
-        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
+        style = "bg:#${base0F}";
+        format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
         disabled = true;
       };
       kotlin = {
         symbol = " ";
-        style = "bg:#eebebe";
-        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
+        style = "bg:#${base0F}";
+        format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
         disabled = true;
       };
       kubernetes = {
         symbol = "󱃾 ";
-        style = "bg:#eebebe";
-        format = "[[ $symbol$context( \$namespace\ ) ](fg:#303446 bg:#eebebe)]($style)";
+        style = "bg:#${base0F}";
+        format = "[[ $symbol$context( \$namespace\ ) ](fg:#${base00} bg:#${base0F})]($style)";
         disabled = false;
       };
       lua = {
         symbol = "";
-        style = "bg:#eebebe";
-        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
+        style = "bg:#${base0F}";
+        format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
         disabled = false;
       };
       nix_shell = {
         symbol = " ";
-        style = "bg:#f2d5cf";
-        format = "[[$symbol$state( \($name\))](fg:#303446 bg:#f2d5cf)]($style)";
+        style = "bg:#${base06}";
+        format = "[[$symbol$state( \($name\))](fg:#${base00} bg:#${base06})]($style)";
         impure_msg = "";
         # impure_msg = "impure";
         pure_msg = "";
@@ -283,62 +308,62 @@
       };
       nodejs = {
         symbol = " ";
-        style = "bg:#eebebe";
-        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
+        style = "bg:#${base0F}";
+        format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
         disabled = false;
       };
       php = {
         symbol = " ";
-        style = "bg:#eebebe";
-        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
+        style = "bg:#${base0F}";
+        format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
         disabled = false;
       };
       python = {
         symbol = " ";
-        style = "bg:#eebebe";
+        style = "bg:#${base0F}";
         version_format = "$raw";
-        format = "[[ $symbol( $version )(\($virtualenv\) )](fg:#303446 bg:#eebebe)]($style)";
+        format = "[[ $symbol( $version )(\($virtualenv\) )](fg:#${base00} bg:#${base0F})]($style)";
         disabled = false;
         detect_folders = [".venv"];
         pyenv_version_name = true;
       };
       rust = {
         symbol = " ";
-        style = "bg:#eebebe";
-        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
+        style = "bg:#${base0F}";
+        format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
         disabled = false;
       };
       swift = {
         symbol = " ";
-        style = "bg:#eebebe";
-        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
+        style = "bg:#${base0F}";
+        format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
         disabled = true;
       };
       zig = {
         symbol = " ";
-        style = "bg:#eebebe";
-        format = "[[ $symbol( $version) ](fg:#303446 bg:#eebebe)]($style)";
+        style = "bg:#${base0F}";
+        format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
         disabled = true;
       };
       docker_context = {
         symbol = " ";
-        style = "fg:#303446 bg:#f2d5cf";
+        style = "fg:#${base00} bg:#${base06}";
         format = "[ $symbol( $context) ]($style)";
         disabled = false;
       };
       custom.yazi = {
         description = "Indicate when the shell was launched by `yazi`";
         symbol = " ";
-        style = "bg:#ca9ee6 fg:#303446";
+        style = "bg:#${base0E} fg:#${base00}";
         when = ''test -n "$YAZI_LEVEL"'';
       };
       character = {
-        error_symbol = "[~>](bold #e78284)";
-        success_symbol = "[](bold #a6d189)";
-        vimcmd_symbol = "[](bold #a6d189)";
-        vimcmd_visual_symbol = "[](bold #e5c890)";
-        vimcmd_replace_symbol = "[](bold #ca9ee6)";
-        vimcmd_replace_one_symbol = "[](bold #ca9ee6)";
+        error_symbol = "[~>](bold #${base08})";
+        success_symbol = "[](bold #${base0B})";
+        vimcmd_symbol = "[](bold #${base0B})";
+        vimcmd_visual_symbol = "[](bold #${base0A})";
+        vimcmd_replace_symbol = "[](bold #${base0E})";
+        vimcmd_replace_one_symbol = "[](bold #${base0E})";
       };
       cmd_duration = {
         min_time = 2000;
@@ -348,7 +373,7 @@
         style = "bg:none fg:none";
       };
       time = {
-        style = "bg:#ca9ee6 fg:#303446";
+        style = "bg:#${base0E} fg:#${base00}";
         format = "[  $time]($style)";
         use_12hr = false;
         disabled = false;
