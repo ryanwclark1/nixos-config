@@ -4,7 +4,32 @@
   pkgs,
   ...
 }:
-
+let
+  base00 = "303446"; # base
+  base01 = "292c3c"; # mantle
+  base02 = "414559"; # surface0
+  base03 = "51576d"; # surface1
+  base04 = "626880"; # surface2
+  base05 = "c6d0f5"; # text
+  base06 = "f2d5cf"; # rosewater
+  base07 = "babbf1"; # lavender
+  base08 = "e78284"; # red
+  base09 = "ef9f76"; # peach
+  base0A = "e5c890"; # yellow
+  base0B = "a6d189"; # green
+  base0C = "81c8be"; # teal
+  base0D = "8caaee"; # blue
+  base0E = "ca9ee6"; # mauve
+  base0F = "eebebe"; # flamingo
+  base10 = "292c3c"; # mantle - darker background
+  base11 = "232634"; # crust - darkest background
+  base12 = "ea999c"; # maroon - bright red
+  base13 = "f2d5cf"; # rosewater - bright yellow
+  base14 = "a6d189"; # green - bright green
+  base15 = "99d1db"; # sky - bright cyan
+  base16 = "85c1dc"; # sapphire - bright blue
+  base17 = "f4b8e4"; # pink - bright purple
+in
 
 {
   programs.bash.bashrcExtra = ''
@@ -113,75 +138,75 @@
         (builtins.concatStringsSep "," mappings) + " Symbols Nerd Font";
 
       # The basic colors";
-      foreground = "#c6d0f5";
-      background = "#303446";
-      selection_foreground = "#303446";
-      selection_background = "#f2d5cf";
+      foreground = "#${base05}";
+      background = "#${base00}";
+      selection_foreground = "#${base00}";
+      selection_background = "#${base06}";
 
       # Cursor colors
-      cursor = "#f2d5cf";
-      cursor_text_color = "#303446";
+      cursor = "#${base06}";
+      cursor_text_color = "#${base00}";
 
       # URL underline color when hovering with mouse
-      url_color = "#f2d5cf";
+      url_color = "#${base06}";
 
       # Kitty window border colors
-      active_border_color = "#babbf1";
-      inactive_border_color = "#737994";
-      bell_border_color = "#e5c890";
+      active_border_color = "#${base07}";
+      inactive_border_color = "#${base04}";
+      bell_border_color = "#${base0A}";
 
       # OS Window titlebar colors
       wayland_titlebar_color = "system";
       macos_titlebar_color = "system";
 
       # Tab bar colors";
-      active_tab_foreground = "#232634";
-      active_tab_background = "#ca9ee6";
-      inactive_tab_foreground = "#c6d0f5";
-      inactive_tab_background = "#292c3c";
-      tab_bar_background = "#232634";
+      active_tab_foreground = "#${base11}";
+      active_tab_background = "#${base0E}";
+      inactive_tab_foreground = "#${base05}";
+      inactive_tab_background = "#${base01}";
+      tab_bar_background = "#${base11}";
 
       # Colors for marks (marked text in the terminal)
-      mark1_foreground = "#303446";
-      mark1_background = "#babbf1";
-      mark2_foreground = "#303446";
-      mark2_background = "#ca9ee6";
-      mark3_foreground = "#303446";
-      mark3_background = "#85c1dc";
+      mark1_foreground = "#${base00}";
+      mark1_background = "#${base07}";
+      mark2_foreground = "#${base00}";
+      mark2_background = "#${base0E}";
+      mark3_foreground = "#${base00}";
+      mark3_background = "#${base16}";
 
       # The 16 terminal colors
 
       # black
-      color0 = "#51576d";
-      color8 = "#626880";
+      color0 = "#${base03}";
+      color8 = "#${base04}";
 
       # red
-      color1 = "#e78284";
-      color9 = "#e78284";
+      color1 = "#${base08}";
+      color9 = "#${base12}";
 
       # green
-      color2 = "#a6d189";
-      color10 = "#a6d189";
+      color2 = "#${base0B}";
+      color10 = "#${base14}";
 
       # yellow
-      color3 = "#e5c890";
-      color11 = "#e5c890";
+      color3 = "#${base0A}";
+      color11 = "#${base13}";
 
       # blue
-      color4 = "#8caaee";
-      color12 = "#8caaee";
+      color4 = "#${base0D}";
+      color12 = "#${base16}";
 
       # magenta
-      color5 = "#f4b8e4";
-      color13 = "#f4b8e4";
+      color5 = "#${base0F}";
+      color13 = "#${base17}";
 
       # cyan
-      color6 = "#81c8be";
-      color14 = "#81c8be";
+      color6 = "#${base0C}";
+      color14 = "#${base15}";
 
       # white
-      color7 = "#b5bfe2";
-      color15 = "#a5adce";
+      color7 = "#${base05}";
+      color15 = "#${base05}";
     };
   };
 }
