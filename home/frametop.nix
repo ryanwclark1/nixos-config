@@ -10,12 +10,14 @@
     ./features/alacritty
     ./features/ansible
     ./features/atuin
+    ./features/audio
     ./features/bat
     ./features/btop
     ./features/cli
     ./features/chrome
     ./features/compression
     ./features/cursor
+    ./features/dotfiles
     ./features/discord
     ./features/development
     ./features/eza
@@ -35,6 +37,7 @@
     ./features/navi
     ./features/networking-utils
     ./features/nixvim
+    # ./features/pass
     ./features/productivity
     ./features/qutebrowser
     ./features/remmina

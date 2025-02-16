@@ -32,23 +32,8 @@ in
     ".config/rofi/config2.rasi" = {
       source = ./config2.rasi;
     };
-    ".config/rofi/style/applet2-1.rasi" = {
-      source = ./style/applet2-1.rasi;
-    };
-    ".config/rofi/style/applet2-2.rasi" = {
-      source = ./style/applet2-2.rasi;
-    };
-    ".config/rofi/style/applet2-3.rasi" = {
-      source = ./style/applet2-3.rasi;
-    };
-    ".config/rofi/style/applet3-1.rasi" = {
-      source = ./style/applet3-1.rasi;
-    };
-    ".config/rofi/style/applet3-2.rasi" = {
-      source = ./style/applet3-2.rasi;
-    };
-    ".config/rofi/style/applet3-3.rasi" = {
-      source = ./style/applet3-3.rasi;
+    ".config/rofi/style/app-toggle.rasi" = {
+      source = ./style/app-toggle.rasi;
     };
     ".config/rofi/style/cliphist-2.rasi" = {
       source = ./style/cliphist-2.rasi;

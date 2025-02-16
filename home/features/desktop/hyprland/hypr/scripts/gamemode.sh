@@ -7,9 +7,9 @@
 #
 #
 
-if [ -f $HOME/.config/ml4w/settings/gamemode-enabled ]; then
+if [ -f $HOME/.config/hypr/scripts/settings/gamemode-enabled ]; then
     hyprctl reload
-    rm $HOME/.config/ml4w/settings/gamemode-enabled
+    rm $HOME/.config/hypr/scripts/settings/gamemode-enabled
     notify-send "Gamemode deactivated" "Animations and blur enabled"
 else
     hyprctl --batch "\
@@ -20,6 +20,6 @@ else
         keyword general:gaps_out 0;\
         keyword general:border_size 1;\
         keyword decoration:rounding 0"
-    touch $HOME/.config/ml4w/settings/gamemode-enabled
+    touch $HOME/.config/hypr/scripts/settings/gamemode-enabled
     notify-send "Gamemode activated" "Animations and blur disabled"
 fi
