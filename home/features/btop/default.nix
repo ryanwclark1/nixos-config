@@ -9,7 +9,7 @@
   #   executable = false;
   # };
 
-  import = [ ./theme.theme.nix ];
+  imports = [ ./theme.theme.nix ];
 
   programs.btop = {
     enable = true;

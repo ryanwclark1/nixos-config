@@ -7,7 +7,7 @@
 }:
 
 {
-  import = [ ./theme.yml.nix ];
+  imports = [ ./theme.yml.nix ];
 
   # home.file.".config/eza/theme.yml" = {
   #   source = ./theme.yml;
