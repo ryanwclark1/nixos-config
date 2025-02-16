@@ -28,7 +28,7 @@ let
   base17 = "f4b8e4"; # pink - bright purple
 in
 {
-  home.file.".config/" = {
+  home.file.".config/custom.theme/themes/theme.json" = {
     text = ''
     {
       "$schema": "vscode://schemas/color-theme",

@@ -5,6 +5,12 @@
 
 
 {
+  import = [ ./custom.theme/themes/theme.json.nix ];
+
+  home.file.".config/vscode/plugins/custom.theme/package.json" = {
+    source = ./custom.theme/package.json;
+  };
+
   home.packages = with pkgs; [
     tailwindcss
     fluxctl
