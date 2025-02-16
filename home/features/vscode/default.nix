@@ -5,7 +5,7 @@
 
 
 {
-  import = [ ./custom.theme/themes/theme.json.nix ];
+  imports = [ ./custom.theme/themes/theme.json.nix ];
 
   home.file.".config/vscode/plugins/custom.theme/package.json" = {
     source = ./custom.theme/package.json;
@@ -32,8 +32,8 @@
         }
         ''
           mkdir -p "$out/share/vscode/extensions/$vscodeExtUniqueId/themes"
-          ln -s ${./custom.theme/package.json} "$out/share/vscode/extensions/$vscodeExtUniqueId/package.json"
-          ln -s ${./custom.theme/themes/theme.json} "$out/share/vscode/extensions/$vscodeExtUniqueId/themes/theme.json"
+          ln -s $HOME/.config/vscode/custom.theme/package.json "$out/share/vscode/extensions/$vscodeExtUniqueId/package.json"
+          ln -s $HOME/.config/vscode/custom.theme/themes/theme.json "$out/share/vscode/extensions/$vscodeExtUniqueId/themes/theme.json"
         '';
     in
     [
