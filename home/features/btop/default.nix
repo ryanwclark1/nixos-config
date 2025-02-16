@@ -4,6 +4,13 @@
 }:
 
 {
+  # home.file.".config/btop/themes/theme.theme" = {
+  #   source = ./theme.theme;
+  #   executable = false;
+  # };
+
+  import = [ ./theme.theme.nix ];
+
   programs.btop = {
     enable = true;
     package = pkgs.btop;
@@ -209,10 +216,5 @@
 
   home.shellAliases = {
     htop = "btop";
-  };
-
-  home.file.".config/btop/themes/theme.theme" = {
-    source = ./theme.theme;
-    executable = false;
   };
 }
