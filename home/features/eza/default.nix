@@ -7,6 +7,13 @@
 }:
 
 {
+  import = [ ./theme.yml.nix ];
+
+  # home.file.".config/eza/theme.yml" = {
+  #   source = ./theme.yml;
+  #   executable = false;
+  # };
+
   programs.eza = {
     enable = true;
     package = pkgs.eza;
@@ -23,11 +30,6 @@
     enableZshIntegration = lib.mkIf config.programs.zsh.enable true;
     enableNushellIntegration = lib.mkIf config.programs.nushell.enable true;
     enableIonIntegration = lib.mkIf config.programs.ion.enable true;
-  };
-
-  home.file.".config/eza/theme.yml" = {
-    source = ./theme.yml;
-    executable = false;
   };
 
   home.shellAliases = {
