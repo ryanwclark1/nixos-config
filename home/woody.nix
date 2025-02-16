@@ -13,6 +13,7 @@
     ./features/audio
     ./features/bat
     ./features/btop
+    ./features/cava
     ./features/cli
     ./features/chrome
     ./features/compression
