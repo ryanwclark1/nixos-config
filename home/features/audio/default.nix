@@ -5,7 +5,6 @@
 
 {
   imports = [
-    ./cava.nix
     ./mpris.nix
     ./ncmp.nix
     ./playerctl.nix
