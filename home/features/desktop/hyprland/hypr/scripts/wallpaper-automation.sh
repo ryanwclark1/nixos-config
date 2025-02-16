@@ -6,7 +6,7 @@
 # /_/   \_\__,_|\__\___/     \_/\_/  |_|
 #
 
-sec=$(cat ~/.config/ml4w/settings/wallpaper-automation.sh)
+sec=$(cat ~/.config/hypr/scripts/settings/wallpaper-automation.sh)
 _setWallpaperRandomly() {
     waypaper --random
     echo ":: Next wallpaper in 60 seconds..."
@@ -14,13 +14,13 @@ _setWallpaperRandomly() {
     _setWallpaperRandomly
 }
 
-if [ ! -f ~/.config/ml4w/cache/wallpaper-automation ]; then
-    touch ~/.config/ml4w/cache/wallpaper-automation
+if [ ! -f ~/.config/hypr/scripts/cache/wallpaper-automation ]; then
+    touch ~/.config/hypr/scripts/cache/wallpaper-automation
     echo ":: Start wallpaper automation script"
     notify-send "Wallpaper automation process started" "Wallpaper will be changed every $sec seconds."
     _setWallpaperRandomly
 else
-    rm ~/.config/ml4w/cache/wallpaper-automation
+    rm ~/.config/hypr/scripts/cache/wallpaper-automation
     notify-send "Wallpaper automation process stopped."
     echo ":: Wallpaper automation script process $wp stopped"
     wp=$(pgrep -f wallpaper-automation.sh)

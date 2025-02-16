@@ -6,7 +6,24 @@
   pkgs,
   ...
 }:
-
+let
+  base00 = "303446"; # base
+  base01 = "292c3c"; # mantle
+  base02 = "414559"; # surface0
+  base03 = "51576d"; # surface1
+  base04 = "626880"; # surface2
+  base05 = "c6d0f5"; # text
+  base06 = "f2d5cf"; # rosewater
+  base07 = "babbf1"; # lavender
+  base08 = "e78284"; # red
+  base09 = "ef9f76"; # peach
+  base0A = "e5c890"; # yellow
+  base0B = "a6d189"; # green
+  base0C = "81c8be"; # teal
+  base0D = "8caaee"; # blue
+  base0E = "ca9ee6"; # mauve
+  base0F = "eebebe"; # flamingo
+in
 {
   home.packages = [
     (pkgs.writeScriptBin "dkr" (builtins.readFile ./scripts/dkr))
@@ -40,19 +57,19 @@
       "--preview 'eza --tree --color=always {} | head -200'"
     ];
     colors = {
-      "bg+" = "#414559";
-      # bg = "#303446";
-      spinner = "#f2d5cf";
-      hl = "#e78284";
-      fg = "#c6d0f5";
-      header = "#e78284";
-      info = "#ca9ee6";
-      pointer = "#f2d5cf";
-      marker = "#babbf1";
-      "fg+" = "#c6d0f5";
-      prompt = "#ca9ee6";
-      "hl+" = "#e78284";
-      selected-bg = "#51576d";
+      "bg+" = "#${base02}";
+      bg = "#${base00}";
+      spinner = "#${base06}";
+      hl = "#${base08}";
+      fg = "#${base05}";
+      header = "#${base08}";
+      info = "#${base0E}";
+      pointer = "#${base06}";
+      marker = "#${base07}";
+      "fg+" = "#${base05}";
+      prompt = "#${base0E}";
+      "hl+" = "#${base08}";
+      selected-bg = "#${base03}";
     };
     defaultCommand = "fd --hidden --strip-cwd-prefix --exclude .git";
     defaultOptions = [

@@ -6,17 +6,17 @@ You can reload waybar with SUPER + SHIFT + B
 {
     "custom/quicklink_browser": {
         "format": "",
-        "on-click": "~/.config/ml4w/settings/browser.sh",
+        "on-click": "~/.config/hypr/scripts/settings/browser.sh",
         "tooltip-format": "Open Browser"
     },
     "custom/quicklink_filemanager": {
         "format": "",
-        "on-click": "~/.config/ml4w/settings/filemanager.sh",
+        "on-click": "~/.config/hypr/scripts/settings/filemanager.sh",
         "tooltip-format": "Open Filemanager"
     },
     "custom/quicklink_email": {
         "format": "",
-        "on-click": "~/.config/ml4w/settings/email.sh",
+        "on-click": "~/.config/hypr/scripts/settings/email.sh",
         "tooltip-format": "Open Email Client"
     },
     "custom/quicklink_chromium": {
@@ -41,26 +41,23 @@ You can reload waybar with SUPER + SHIFT + B
     },
     "custom/quicklink_calculator": {
         "format": "",
-        "on-click": "~/.config/ml4w/settings/calculator.sh",
+        "on-click": "~/.config/hypr/scripts/settings/calculator.sh",
         "tooltip-format": "Open calculator"
     },
-/*
+    /*
 Don't remove the quicklinkempty
 */
-    "custom/quicklinkempty": {
-    },
-/*
+    "custom/quicklinkempty": {},
+    /*
 Add your quicklinks in your desired order to the status bar
 */
     "group/quicklinks": {
         "orientation": "horizontal",
         "modules": [
-
             "custom/quicklink_browser",
             "custom/quicklink_email",
             "custom/quicklink_filemanager",
-
-/*
+            /*
 Don't remove the quicklinkempty
 */
             "custom/quicklinkempty"

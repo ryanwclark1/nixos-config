@@ -40,8 +40,8 @@
     ./features/nixvim
     ./features/productivity
     ./features/qutebrowser
-    ./features/ripgrep
     ./features/remmina
+    ./features/ripgrep
     ./features/slack
     ./features/shell
     ./features/starship
