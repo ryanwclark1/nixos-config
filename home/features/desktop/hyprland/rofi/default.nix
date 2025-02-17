@@ -12,6 +12,7 @@ in
 {
   imports = [
     ./scripts
+    ./colors.rasi.nix
   ];
 
   home.file.".config/rofi/applets" = {
@@ -64,9 +65,9 @@ in
     ".config/rofi/style/shared/border.rasi" = {
       source = ./style/shared/border.rasi;
     };
-    ".config/rofi/style/shared/colors.rasi" = {
-      source = ./style/shared/colors.rasi;
-    };
+    # ".config/rofi/style/shared/colors.rasi" = {
+    #   source = ./style/shared/colors.rasi;
+    # };
     ".config/rofi/style/shared/confirm-big.rasi" = {
       source = ./style/shared/confirm-big.rasi;
     };

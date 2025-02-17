@@ -3,6 +3,7 @@
 @import                          "shared/colors.rasi"
 @import                          "shared/fonts.rasi"
 @import                          "shared/border.rasi"
+@import                          "shared/yoffset.rasi"
 
 /* ---- Configuration ---- */
 configuration {
@@ -23,13 +24,13 @@ configuration {
 window {
   width:                        600px;
   x-offset:                     0px;
-  y-offset:                     0px;
+  y-offset:                     @yoffset;
   spacing:                      0px;
   padding:                      0px;
   margin:                       0px;
-  color:                      #FFFFFF;
+  color:                        @foreground;
   border:                       @border-width;
-  border-color:               #FFFFFF;
+  border-color:                 @border;
   cursor:                       "default";
   transparency:                 "real";
   location:                     northeast;
@@ -46,7 +47,7 @@ mainbox {
   orientation:                  horizontal;
   spacing:                      0px;
   margin:                       0px;
-  background-color:             @background;
+  background-color:             @background-alt;
   children:                     ["listbox"];
 }
 
@@ -97,7 +98,7 @@ entry {
   background-color:             transparent;
   text-color:                   inherit;
   cursor:                       text;
-  placeholder:                  "Search";
+  placeholder:                  "Search Clipboard";
   placeholder-color:            inherit;
 }
 
@@ -139,7 +140,7 @@ listview {
   padding:                      10px;
   margin:                       0px;
   background-color:             @background;
-  border:0px;
+  border:                       0px;
 }
 
 /* ---- Element ---- */
@@ -150,7 +151,7 @@ element {
   cursor:                       pointer;
   background-color:             @background;
   border-radius:                10px;
-  border:                       @border-width;
+  border:                       0px;
 }
 
 element normal.normal {
