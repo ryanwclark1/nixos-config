@@ -4,6 +4,18 @@
 }:
 
 {
+  fonts = {
+    fontconfig = {
+      enable = true;
+      defaultFonts = {
+        monospace = [ "JetBrains Mono" "FiraCode Nerd Font" "Ubuntu Nerd Font"];
+        sansSerif = [ "NotoSans Nerd Font" "DejaVu Sans" "UbuntuSans Nerd Font"];
+        serif = [ "NotoSerif Nerd Font" ];
+        emoji = [ "Noto Color Emoji" ];
+      };
+    };
+  };
+
   home.packages = with pkgs; [
     # Fonts
     nerd-fonts.arimo
@@ -25,17 +37,19 @@
     nerd-fonts.ubuntu-mono
     nerd-fonts.ubuntu-sans
     nerd-fonts.symbols-only
-    noto-fonts-emoji
+    
+    font-awesome_5
+    icomoon-feather
     jetbrains-mono
     liberation_ttf
+    material-symbols
+    noto-fonts
+    noto-fonts-extra
+    noto-fonts-emoji
     powerline-fonts
     powerline-symbols
-    icomoon-feather
-    font-awesome
-    material-symbols
     # Font Manager
     font-manager
   ];
 
-  fonts.fontconfig.enable = true;
 }
