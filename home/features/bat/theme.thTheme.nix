@@ -28,7 +28,7 @@ let
   base17 = "f4b8e4"; # pink - bright purple
 in
 {
-  home.file.".config/bat/theme.thTheme" = {
+  home.file.".config/bat/themes/theme.thTheme" = {
     text = ''
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
