@@ -5,7 +5,7 @@
 
 {
   imports = [
-    ./theme.thTheme.nix
+    ./theme.tmTheme.nix
   ];
 
   programs.bat = {
@@ -30,8 +30,8 @@
     less = "bat --pager --style=numbers --color=always";
   };
 
-  home.file.".config/bat/themes/test.tmTheme" = {
-    source = ./test.tmTheme;
-    executable = false;
-  };
+  # home.file.".config/bat/themes/test.tmTheme" = {
+  #   source = ./test.tmTheme;
+  #   executable = false;
+  # };
 }
