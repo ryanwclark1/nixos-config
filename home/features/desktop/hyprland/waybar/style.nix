@@ -9,7 +9,7 @@ in
     text = ''
       @define-color backgrounddark1 #303446;
       @define-color backgrounddark2 #292c3c;
-      @define-color backgrounddark3 #414559};
+      @define-color backgrounddark3 #414559;
       @define-color workspacesbackground1 #FFFFFF;
       @define-color workspacesbackground2 #CCCCCC;
       @define-color bordercolor #FFFFFF;
