@@ -8,9 +8,9 @@
     fontconfig = {
       enable = true;
       defaultFonts = {
-        monospace = [ "JetBrains Mono" "FiraCode Nerd Font" "Ubuntu Nerd Font"];
-        sansSerif = [ "NotoSans Nerd Font" "DejaVu Sans" "UbuntuSans Nerd Font"];
-        serif = [ "NotoSerif Nerd Font" ];
+        monospace = [ "DejaVu Sans Mono" ];
+        sansSerif = [ "DejaVu Sans" ];
+        serif = [ "DejaVu Serif" ];
         emoji = [ "Noto Color Emoji" ];
       };
     };
@@ -18,12 +18,7 @@
 
   home.packages = with pkgs; [
     # Fonts
-    nerd-fonts.arimo
     nerd-fonts.bigblue-terminal
-    nerd-fonts.code-new-roman
-    nerd-fonts.comic-shanns-mono
-    nerd-fonts.commit-mono
-    nerd-fonts.cousine
     nerd-fonts.d2coding
     nerd-fonts.dejavu-sans-mono
     nerd-fonts.departure-mono
@@ -31,23 +26,26 @@
     nerd-fonts.envy-code-r
     nerd-fonts.fira-code
     nerd-fonts.fira-mono
+    nerd-fonts.jetbrains-mono
     nerd-fonts.mplus
-    nerd-fonts.noto
     nerd-fonts.ubuntu
     nerd-fonts.ubuntu-mono
     nerd-fonts.ubuntu-sans
     nerd-fonts.symbols-only
-    
+
+    dejavu-fonts
+    fira-code-symbols
     font-awesome_5
     icomoon-feather
     jetbrains-mono
     liberation_ttf
     material-symbols
     noto-fonts
-    noto-fonts-extra
     noto-fonts-emoji
+    noto-fonts-extra
     powerline-fonts
     powerline-symbols
+    
     # Font Manager
     font-manager
   ];
