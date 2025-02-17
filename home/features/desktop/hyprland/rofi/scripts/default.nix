@@ -39,10 +39,6 @@
     source = ./rofi-code.sh;
     executable = true;
   };
-  home.file.".config/rofi/scripts/rofi-code.sh" = {
-    source = ./rofi-code.sh;
-    executable = true;
-  };
   home.file.".config/rofi/scripts/rofi-launcher.sh" = {
     source = ./rofi-launcher.sh;
     executable = true;
