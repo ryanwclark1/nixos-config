@@ -28,16 +28,16 @@ let
   base17 = "f4b8e4"; # pink - bright purple
 in
 {
-  home.file.".config/yazi/flavors/custom.yazi/tmtheme.xml" = {
+  home.file.".config/yazi/flavors/theme.yazi/tmtheme.xml" = {
     text = ''
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
     <plist version="1.0">
       <dict>
         <key>name</key>
-        <string>Custom</string>
+        <string>Theme</string>
         <key>semanticClass</key>
-        <string>custom</string>
+        <string>theme</string>
         <key>uuid</key>
         <string>e0ada983-8938-490c-86f0-97a1a0ec58e4</string>
         <key>author</key>
