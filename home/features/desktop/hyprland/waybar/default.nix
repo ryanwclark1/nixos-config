@@ -216,7 +216,7 @@ in
 
           "custom/mic" = {
             # tooltip = true;
-            exec = "microphone-status";
+            # exec = "microphone-status";
             # exec = "${pkgs.microphone-status}/bin/microphone-status";
             interval = 1;
             on-click = "${pwvucontrol}";
