@@ -11,6 +11,21 @@
     ./flavors/theme.yazi/tmtheme.xml.nix
   ];
 
+  home.file.".config/yazi/flavors/theme.yazi/README.md" = {
+    source = ./flavors/theme.yazi/README.md;
+    executable = false;
+  };
+
+  home.file.".config/yazi/flavors/theme.yazi/preview.png" = {
+    source = ./flavors/theme.yazi/preview.png;
+    executable = false;
+  };
+
+  home.file.".config/yazi/flavors/theme.yazi/LICENSE" = {
+    source = ./flavors/theme.yazi/LICENSE;
+    executable = false;
+  };
+
   home.packages = with pkgs; [
     exiftool
     ueberzugpp
