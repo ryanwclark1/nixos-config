@@ -16,12 +16,12 @@
     ../common/optional/bluetooth.nix
     ../common/optional/direnv.nix
     ../common/optional/docker.nix
+    ../common/optional/fonts.nix
     ../common/optional/gnome-services.nix
     ../common/optional/nautilus.nix
     ../common/optional/nfs.nix
     ../common/optional/printing.nix
     ../common/optional/steam.nix
-    # ../common/optional/style.nix
     ../common/optional/system-packages.nix
     ../common/optional/thunar.nix
     ../common/optional/virtualisation.nix
