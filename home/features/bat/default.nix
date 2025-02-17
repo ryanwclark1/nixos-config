@@ -4,6 +4,10 @@
 }:
 
 {
+  imports = [
+    ./theme.thTheme.nix
+  ];
+
   programs.bat = {
     enable = true;
     package = pkgs.bat;
@@ -17,7 +21,7 @@
     ];
     config = {
       pager = "less -FR";
-      theme = "theme";
+      theme = "custom";
     };
   };
 
@@ -26,8 +30,8 @@
     less = "bat --pager --style=numbers --color=always";
   };
 
-  home.file.".config/bat/themes/theme.tmTheme" = {
-    source = ./theme.tmTheme;
-    executable = false;
-  };
+  # home.file.".config/bat/themes/theme.tmTheme" = {
+  #   source = ./theme.tmTheme;
+  #   executable = false;
+  # };
 }

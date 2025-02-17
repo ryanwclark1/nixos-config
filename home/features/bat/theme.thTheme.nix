@@ -35,13 +35,13 @@ in
     <plist version="1.0">
       <dict>
         <key>name</key>
-        <string>Theme</string>
+        <string>Custom</string>
         <key>semanticClass</key>
-        <string>theme</string>
+        <string>custom</string>
         <key>uuid</key>
         <string>e0ada983-8938-490c-86f0-97a1a0ec58e4</string>
         <key>author</key>
-        <string></string>
+        <string>Custom</string>
         <key>colorSpaceName</key>
         <string>sRGB</string>
         <key>settings</key>
