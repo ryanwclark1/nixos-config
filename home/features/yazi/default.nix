@@ -6,9 +6,9 @@
 }:
 
 {
-  import = [
+  imports = [
     ./flavors/theme.yazi/flavor.toml.nix
-    ./flavors/theme.yazi/tmTheme.xml.nix
+    ./flavors/theme.yazi/tmtheme.xml.nix
   ];
 
   home.packages = with pkgs; [
