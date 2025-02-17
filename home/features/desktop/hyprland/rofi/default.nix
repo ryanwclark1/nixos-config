@@ -14,7 +14,6 @@ in
     ./scripts
   ];
 
-
   home.file.".config/rofi/applets" = {
     source = ./applets;
     recursive = true;
@@ -26,17 +25,8 @@ in
   };
 
   home.file = {
-    # ".config/rofi/custom.rasi" = {
-    #   source = ./custom.rasi;
-    # };
-    ".config/rofi/config2.rasi" = {
-      source = ./config2.rasi;
-    };
     ".config/rofi/style/app-toggle.rasi" = {
       source = ./style/app-toggle.rasi;
-    };
-    ".config/rofi/style/cliphist-2.rasi" = {
-      source = ./style/cliphist-2.rasi;
     };
     ".config/rofi/style/cliphist.rasi" = {
       source = ./style/cliphist.rasi;
@@ -105,9 +95,7 @@ in
     cycle = true;
     location = "center";
     terminal = "ghostty";
-    
-    theme =        
-    {
+    theme = {
       "*" = {
         font ="UbuntuMono Nerd Font 14";
         background = mkLiteral "#303446";

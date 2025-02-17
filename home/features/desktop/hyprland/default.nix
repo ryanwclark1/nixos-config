@@ -51,6 +51,7 @@
   home.packages = with pkgs; [
     # hyprland-qtutils
     brightnessctl # Adjust screen brightness
+    figlet # Print large characters
     grim # Screenshot tool,
     grimblast
     gtk3
