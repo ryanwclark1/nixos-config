@@ -1,7 +1,9 @@
 {
+  config,
   pkgs,
   ...
 }:
+
 
 
 {
@@ -32,8 +34,8 @@
         }
         ''
           mkdir -p "$out/share/vscode/extensions/$vscodeExtUniqueId/themes"
-          ln -s $HOME/.config/vscode/custom.theme/package.json "$out/share/vscode/extensions/$vscodeExtUniqueId/package.json"
-          ln -s $HOME/.config/vscode/custom.theme/themes/theme.json "$out/share/vscode/extensions/$vscodeExtUniqueId/themes/theme.json"
+          ln -s ${config.home.homeDirectory}/.config/vscode/plugins/custom.theme/package.json "$out/share/vscode/extensions/$vscodeExtUniqueId/package.json"
+          ln -s ${config.home.homeDirectory}/vscode/plugins/custom.theme/themes/theme.json "$out/share/vscode/extensions/$vscodeExtUniqueId/themes/theme.json"
         '';
     in
     [
