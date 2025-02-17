@@ -15,8 +15,8 @@
     source = ./brightness.sh;
     executable = true;
   };
-  home.file.".config/rofi/scripts/clipboard.sh" = {
-    source = ./clipboard.sh;
+  home.file.".config/rofi/scripts/cliphist.sh" = {
+    source = ./cliphist.sh;
     executable = true;
   };
   home.file.".config/rofi/scripts/mpd.sh" = {
@@ -35,6 +35,18 @@
     source = ./quicklinks.sh;
     executable = true;
   };
+  home.file.".config/rofi/scripts/rofi-code.sh" = {
+    source = ./rofi-code.sh;
+    executable = true;
+  };
+  home.file.".config/rofi/scripts/rofi-code.sh" = {
+    source = ./rofi-code.sh;
+    executable = true;
+  };
+  home.file.".config/rofi/scripts/rofi-launcher.sh" = {
+    source = ./rofi-launcher.sh;
+    executable = true;
+  };
   home.file.".config/rofi/scripts/screenshot.sh" = {
     source = ./screenshot.sh;
     executable = true;
@@ -45,6 +57,10 @@
   };
   home.file.".config/rofi/scripts/volume.sh" = {
     source = ./volume.sh;
+    executable = true;
+  };
+  home.file.".config/rofi/scripts/web-search.sh" = {
+    source = ./web-search.sh;
     executable = true;
   };
 }
