@@ -10,7 +10,6 @@ style='style-3.rasi'
 theme="$type/$style"
 
 
-
 # Theme Elements
 prompt='Applications'
 # mesg="Installed Packages : `nix-env -q | wc -l` (nix-env)"
@@ -26,7 +25,7 @@ fi
 # CMDs (add your apps here)
 term_cmd='ghostty'
 file_cmd='nautilus'
-text_cmd='geany'
+text_cmd='code'
 web_cmd='google-chrome'
 music_cmd='ghostty -e ncmpcpp'
 setting_cmd='xfce4-settings-manager'
@@ -42,33 +41,38 @@ if [[ "$layout" == 'NO' ]]; then
 	option_6="  Settings <span weight='light' size='small'><i>($setting_cmd)</i></span>"
 else
 	option_1=" "
-	option_2="c"
+	option_2=" "
 	option_3=" "
-	option_4="c"
-	option_5="c"
-	option_6="c"
+	option_4=" "
+	option_5=" "
+	option_6=" "
+fi
 
 # Rofi CMD
 rofi_cmd() {
+	echo "$theme"
 	rofi -theme-str "listview {columns: $list_col; lines: $list_row;}" \
 		-theme-str 'textbox-prompt-colon {str: " ";}' \
 		-dmenu \
 		-p "$prompt" \
-		# -mesg "$mesg" \
+		-mesg "$mesg" \
 		-markup-rows \
 		-theme $theme
 }
 
 # Pass variables to rofi dmenu
 run_rofi() {
-	echo -e "$option_1\n$option_2\n$option_3\n$option_4\n$option_5\n$option_6" | rofi_cmd
+	echo -e "$option_1\n$option_2\n$option_3\n$option_4\n$option_5\n$option_6" | 
+	rofi_cmd
 }
 
 # Execute Command
 run_cmd() {
 	if [[ "$1" == '--opt1' ]]; then
+		echo $term_cmd
 		$term_cmd
 	elif [[ "$1" == '--opt2' ]]; then
+		echo $file_cmd
 		$file_cmd
 	elif [[ "$1" == '--opt3' ]]; then
 		$text_cmd
