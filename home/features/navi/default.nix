@@ -28,10 +28,10 @@
       client = {
         tealdeer = true;
       };
-      # shell = {
-      #   command = "bash";
-      #   finder_command = "bash";
-      # };
+      shell = {
+        command = "bash";
+        finder_command = "bash";
+      };
     };
   };
 }
