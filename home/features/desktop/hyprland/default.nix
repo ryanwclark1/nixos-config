@@ -6,20 +6,17 @@
 
 {
   imports = [
-    # ./ags
     ./cliphist
     ./hypr
     ./hypridle
     ./hyprlock
     ./hyprpaper
-    # ./hyprpanel
     ./rofi
     ./swaync
     ./wal
     ./waybar
     ./waypaper
     ./wlogout
-    # ./scripts/screenshot.nix
   ];
 
 
@@ -37,16 +34,6 @@
       fill_shape=false
     '';
   };
-
-  # home.file.".config/hypr/binds.py" = {
-  #   source = ./scripts/binds.py;
-  #   executable = true;
-  # };
-
-  # home.file.".config/hypr/scripts/wallpaper.sh" = {
-  #   source = ./scripts/wallpaper.sh;
-  #   executable = true;
-  # };
 
   home.packages = with pkgs; [
     # hyprland-qtutils
@@ -72,15 +59,10 @@
     yad # Yet another dialog
     (writeShellScriptBin "cliphist-rofi-copy" (builtins.readFile ./scripts/cliphist-rofi-copy))
     (writeShellScriptBin "cliphist-rofi-img-copy" (builtins.readFile ./scripts/cliphist-rofi-img-copy))
-
     (writeShellScriptBin "list-hypr-bindings" (builtins.readFile ./scripts/list-hypr-bindings))
     (writeShellScriptBin "hyprland-workspace" (builtins.readFile ./scripts/hyprland-workspace))
     # (writeShellScriptBin "switch-workspace" (builtins.readFile ./scripts/switch-workspace))
     (writeShellScriptBin "screenshooting" (builtins.readFile ./scripts/screenshooting.sh))
-    # (writeShellScriptBin "update-checker" (builtins.readFile ./scripts/update-checker.sh))
-    # (writeShellScriptBin "web-search" (builtins.readFile ./scripts/web-search.sh))
-    # (writeShellScriptBin "wttr" (builtins.readFile ./scripts/wttr.sh))
-    # (writeShellScriptBin "yt" (builtins.readFile ./scripts/yt.sh))
   ];
 }
 
