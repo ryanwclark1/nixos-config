@@ -30,8 +30,8 @@
     less = "bat --pager --style=numbers --color=always";
   };
 
-  # home.file.".config/bat/themes/theme.tmTheme" = {
-  #   source = ./theme.tmTheme;
-  #   executable = false;
-  # };
+  home.file.".config/bat/themes/test.tmTheme" = {
+    source = ./test.tmTheme;
+    executable = false;
+  };
 }
