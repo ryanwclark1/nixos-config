@@ -5,7 +5,8 @@ SORT_OPTION="time"
 FULLPATH=false
 OUTPUT=false
 INSENSITIVE=false
-ROFI_CMD="rofi -dmenu -p 'Open workspace' -no-custom"
+ROFI_STYLE="$HOME/.config/rofi/style/config-code.rasi"
+ROFI_CMD="rofi -dmenu -p 'Open workspace' -no-custom -theme $ROFI_STYLE"
 CODE_CMD=""
 
 # Function to detect VS Code or Codium
