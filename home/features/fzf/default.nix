@@ -30,6 +30,8 @@ in
     (pkgs.writeScriptBin "fv" (builtins.readFile ./scripts/fv)) 
     (pkgs.writeScriptBin "fzf-git" (builtins.readFile ./scripts/fzf-git))
     (pkgs.writeScriptBin "fzmv" (builtins.readFile ./scripts/fzmv))
+    (pkgs.writeScriptBin "fztop" (builtins.readFile ./scripts/fztop))
+    (pkgs.writeScriptBin "gitup" (builtins.readFile ./scripts/gitup))
     (pkgs.writeScriptBin "igr" (builtins.readFile ./scripts/igr))
     (pkgs.writeScriptBin "rgf" (builtins.readFile ./scripts/rgf))
     (pkgs.writeScriptBin "sshget" (builtins.readFile ./scripts/sshget))
