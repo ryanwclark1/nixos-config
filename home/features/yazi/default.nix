@@ -7,8 +7,8 @@
 
 {
   imports = [
-    ./flavors/custom.yazi/flavor.toml.nix
-    ./flavors/custom.yazi/tmtheme.xml.nix
+    ./flavors/theme.yazi/flavor.toml.nix
+    ./flavors/theme.yazi/tmtheme.xml.nix
   ];
 
   home.packages = with pkgs; [
@@ -56,7 +56,7 @@
     };
     theme = {
       flavor = {
-        use = "custom";
+        dark = "theme";
       };
     };
     # keymap = {

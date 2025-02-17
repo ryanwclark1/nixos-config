@@ -35,9 +35,9 @@ in
     <plist version="1.0">
       <dict>
         <key>name</key>
-        <string>Custom</string>
+        <string>Theme</string>
         <key>semanticClass</key>
-        <string>custom</string>
+        <string>theme</string>
         <key>uuid</key>
         <string>e0ada983-8938-490c-86f0-97a1a0ec58e4</string>
         <key>author</key>

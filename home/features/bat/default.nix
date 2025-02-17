@@ -21,7 +21,7 @@
     ];
     config = {
       pager = "less -FR";
-      theme = "custom";
+      theme = "theme";
     };
   };
 
