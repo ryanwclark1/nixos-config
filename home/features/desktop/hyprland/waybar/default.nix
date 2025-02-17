@@ -10,13 +10,13 @@
 let
   cat = "${pkgs.coreutils}/bin/cat";
   hyprlock = lib.getExe config.programs.hyprlock.package;
-  terminal = "${pkgs.alacritty}/bin/alacritty";
+  terminal = "ghostty";
   missioncenter = "${pkgs.mission-center}/bin/missioncenter";
   nm-connection = "${pkgs.networkmanagerapplet}/bin/nm-connection-editor";
   nmtui = "${pkgs.networkmanager}/bin/nmtui";
   pwvucontrol = "${pkgs.pwvucontrol}/bin/pwvucontrol";
   wpctl = "${pkgs.wireplumber}/bin/wpctl";
-  chrome = "${pkgs.google-chrome}/bin/google-chrome-stable";
+  chrome = "google-chrome-stable";
   firefox = lib.getExe config.programs.firefox.package;
   thunar = "thunar";
   # betterTransition = "all 0.3s cubic-bezier(.55,-0.68,.48,1.682)";
@@ -262,6 +262,7 @@ in
               active = "";
               urgent = "";
             };
+            on-click = "hyprctl dispatch workspace e{index}";
             on-scroll-up = "hyprctl dispatch workspace e+1";
             on-scroll-down = "hyprctl dispatch workspace e-1";
           };

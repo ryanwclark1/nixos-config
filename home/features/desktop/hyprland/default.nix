@@ -16,6 +16,7 @@
     ./rofi
     ./swaync
     ./wal
+    ./waybar
     ./waypaper
     ./wlogout
     # ./scripts/screenshot.nix
