@@ -133,6 +133,17 @@ if [[ -n "$1" ]]; then
 fi
 
 case "$search_cmd" in
+  'rg')
+    search_opts+=( '--color=always' )
+    if [[ -n "$allfiles" ]]; then
+      search_opts+=( '--hidden' '--no-ignore' )
+    fi
+    if [[ -z "$search_str" ]]; then
+      search_opts+=( '-l' )
+    fi
+    if [[ -z "$allfiles" ]]; then
+      search_opts+=( '--glob=!{bower_components,node_modules,jspm_packages,.cvs,.git,.hg,.svn}' )
+    fi ;;
   'ag')
     search_opts+=( '--color' )
     if [[ -n "$allfiles" ]]; then
