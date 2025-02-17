@@ -55,11 +55,9 @@
       set -g set-clipboard on          # use system clipboard
 
       # https://yazi-rs.github.io/docs/image-preview
-      set -g allow-passthrough all
-      set -g renumber-windows on # renumber all windows when any window is closed
-      set -g status-interval 1 # update the status bar every 3 seconds
-
+      set -g allow-passthrough on
       set -ga update-environment TERM
+      set -ga update-environment TERM_PROGRAM
 
       ###################################
       # Configure the forceline plugin
