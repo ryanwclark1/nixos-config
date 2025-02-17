@@ -25,6 +25,7 @@
     nerd-fonts.ubuntu-mono
     nerd-fonts.ubuntu-sans
     nerd-fonts.symbols-only
+    noto-fonts-emoji
     jetbrains-mono
     liberation_ttf
     powerline-fonts
