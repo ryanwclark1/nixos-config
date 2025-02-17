@@ -3,7 +3,9 @@
 ## Applets : Volume (PipeWire)
 
 # Import Current Theme
-source "$HOME"/.config/rofi/applets/shared/theme.bash
+# source "$HOME"/.config/rofi/applets/shared/theme.bash
+type="$HOME/.config/rofi/applets/type-3"
+style='style-3.rasi'
 theme="$type/$style"
 
 # Volume Info (Using PipeWire)

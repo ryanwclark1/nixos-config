@@ -32,6 +32,9 @@ in
     ".config/rofi/style/cliphist.rasi" = {
       source = ./style/cliphist.rasi;
     };
+    ".config/rofi/style/config-code.rasi" = {
+      source = ./style/config-code.rasi;
+    };
     ".config/rofi/style/config-emoji.rasi" = {
       source = ./style/config-emoji.rasi;
     };
@@ -65,9 +68,6 @@ in
     ".config/rofi/style/shared/border.rasi" = {
       source = ./style/shared/border.rasi;
     };
-    # ".config/rofi/style/shared/colors.rasi" = {
-    #   source = ./style/shared/colors.rasi;
-    # };
     ".config/rofi/style/shared/confirm-big.rasi" = {
       source = ./style/shared/confirm-big.rasi;
     };
@@ -76,6 +76,9 @@ in
     };
     ".config/rofi/style/shared/fonts.rasi" = {
       source = ./style/shared/fonts.rasi;
+    };
+    ".config/rofi/style/shared/yoffset.rasi" = {
+      source = ./style/shared/yoffset.rasi;
     };
   };
 
