@@ -72,6 +72,7 @@
     theme = {
       flavor = {
         dark = "theme";
+        light = "theme";
       };
     };
     # keymap = {
