@@ -1,28 +1,12 @@
 {
   config,
-  lib,
   pkgs,
   ...
 }:
-# with config.lib.stylix.colors.withHashtag;
-# with config.stylix.fonts;
-
-let
-  cat = "${pkgs.coreutils}/bin/cat";
-  hyprlock = lib.getExe config.programs.hyprlock.package;
-  terminal = "ghostty";
-  missioncenter = "${pkgs.mission-center}/bin/missioncenter";
-  nm-connection = "${pkgs.networkmanagerapplet}/bin/nm-connection-editor";
-  nmtui = "${pkgs.networkmanager}/bin/nmtui";
-  pwvucontrol = "${pkgs.pwvucontrol}/bin/pwvucontrol";
-  wpctl = "${pkgs.wireplumber}/bin/wpctl";
-  chrome = "google-chrome-stable";
-  firefox = lib.getExe config.programs.firefox.package;
-  thunar = "thunar";
+# let
   # betterTransition = "all 0.3s cubic-bezier(.55,-0.68,.48,1.682)";
-in
+# in
 {
-
   imports = [
     ./style.nix
   ];
@@ -151,7 +135,7 @@ in
             interval = 5;
             format = " {usage}%";
             tooltip = true;
-            on-click = "${missioncenter}";
+            on-click = "missioncenter";
           };
 
           # Calculator
@@ -179,16 +163,16 @@ in
           # Power Menu
           "custom/exit" = {
             format = "";
-            on-click = "${pkgs.wlogout}/bin/wlogout";
+            on-click = "wlogout";
             tooltip-format = "Power Menu";
           };
 
           "custom/gpu" = {
               interval = 20;
-              exec = "${cat} /sys/class/drm/card0/device/gpu_busy_percent";
+              exec = "cat /sys/class/drm/card0/device/gpu_busy_percent";
               format = "󰢮 {}%";
               tooltip = true;
-              on-click = "${missioncenter}";
+              on-click = "missioncenter";
           };
 
           "custom/hyprbindings" = {
@@ -206,7 +190,7 @@ in
             interval = 60;
             exec = "${config.home.homeDirectory}/.config/hypr/scripts/hypridle.sh status";
             on-click = "${config.home.homeDirectory}/.config/hypr/scripts/hypridle.sh toggle";
-            on-click-right = "${hyprlock}";
+            on-click-right = "hyprlock";
           };
 
           "custom/logo" = {
@@ -219,7 +203,7 @@ in
             # exec = "microphone-status";
             # exec = "${pkgs.microphone-status}/bin/microphone-status";
             interval = 1;
-            on-click = "${pwvucontrol}";
+            on-click = "pwvucontrol";
             format = "{}";
           };
 
@@ -227,7 +211,7 @@ in
             format = "󰇅";
             tooltip = true;
             tooltip-format = "System Information";
-            on-click = "${missioncenter}";
+            on-click = "missioncenter";
           };
 
           "custom/nix-updates" = {
@@ -247,7 +231,7 @@ in
             interval = 60;
             format = " {free}";
             tooltip = true;
-            on-click = "${missioncenter}";
+            on-click = "missioncenter";
           };
 
           "hyprland/window" = {
@@ -337,7 +321,7 @@ in
             interval = 5;
             format = " {}%";
             tooltip = true;
-            on-click = "${missioncenter}";
+            on-click = "missioncenter";
           };
 
           network = {
@@ -374,8 +358,8 @@ in
               : {bandwidthUpBits} : {bandwidthDownBits}
             '';
             max-length = 50;
-            on-click = "${terminal} -e ${nmtui}";
-            on-click-right = "${nm-connection}";
+            on-click = "ghostty -e nmtui";
+            on-click-right = "nm-connection-editor";
             tooltip = true;
           };
 
@@ -384,10 +368,10 @@ in
             format-muted = " ";
             max-length = 2;
             scroll-step = 1;
-            on-scroll-up = "${wpctl} set-volume -l 1 @DEFAULT_AUDIO_SINK@ 2%+";
-            on-scroll-down = "${wpctl} set-volume @DEFAULT_AUDIO_SINK@ 2%-";
+            on-scroll-up = "wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 2%+";
+            on-scroll-down = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%-";
             format-icons = [ " " " " " " ];
-            on-click = "${pwvucontrol}";
+            on-click = "pwvucontrol";
             max-volume = 100.0;
             tooltip = true;
             tooltip-format = ''
@@ -417,19 +401,19 @@ in
 
           "custom/chrome" = {
               "format" = "";
-              "on-click" = "${chrome}";
+              "on-click" = "google-chrome-stable";
               "tooltip-format" = "Open Chromium";
           };
 
           "custom/firefox" = {
               "format" = "";
-              "on-click" = "${firefox}";
+              "on-click" = "firefox";
               "tooltip-format" = "Open Firefox";
           };
 
           "custom/thunar" = {
               "format" = "";
-              "on-click" = "${thunar}";
+              "on-click" = "thunar";
               "tooltip-format" = "Open filemanager";
           };
 
