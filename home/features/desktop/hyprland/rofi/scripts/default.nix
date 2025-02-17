@@ -15,6 +15,10 @@
     source = ./brightness.sh;
     executable = true;
   };
+  home.file.".config/rofi/scripts/clipboard.sh" = {
+    source = ./clipboard.sh;
+    executable = true;
+  };
   home.file.".config/rofi/scripts/mpd.sh" = {
     source = ./mpd.sh;
     executable = true;
