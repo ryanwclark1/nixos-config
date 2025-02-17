@@ -41,7 +41,7 @@ in
         <key>uuid</key>
         <string>e0ada983-8938-490c-86f0-97a1a0ec58e4</string>
         <key>author</key>
-        <string>Custom</string>
+        <string></string>
         <key>colorSpaceName</key>
         <string>sRGB</string>
         <key>settings</key>
