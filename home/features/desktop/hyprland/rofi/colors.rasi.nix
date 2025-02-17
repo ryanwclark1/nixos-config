@@ -37,9 +37,9 @@ in
         selected:         #${base0D};
         active:           #${base0B};
         urgent:           #${base08};
-        border-color:     #${base0F};
+        border-color:     #${base0E};
       }
-    ''
+    '';
   };
 }
   

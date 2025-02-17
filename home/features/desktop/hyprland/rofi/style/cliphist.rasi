@@ -30,7 +30,7 @@ window {
   margin:                       0px;
   color:                        @foreground;
   border:                       @border-width;
-  border-color:                 @border;
+  border-color:                 @border-color;
   cursor:                       "default";
   transparency:                 "real";
   location:                     northeast;
@@ -47,7 +47,7 @@ mainbox {
   orientation:                  horizontal;
   spacing:                      0px;
   margin:                       0px;
-  background-color:             @background-alt;
+  background-color:             @background;
   children:                     ["listbox"];
 }
 
