@@ -28,7 +28,7 @@ let
   base17 = "f4b8e4"; # pink - bright purple
 in
 {
-  home.file.".config/yazi/flavors/theme.yazi/flavor.toml" = {
+  home.file.".config/yazi/flavors/custom.yazi/flavor.toml" = {
     text = ''
       # vim:fileencoding=utf-8:foldmethod=marker
 
