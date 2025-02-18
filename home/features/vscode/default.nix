@@ -184,6 +184,7 @@
       "diffEditor.maxFileSize" = 0;
       "diffEditor.renderIndicators" = true;
       "editor.accessibilityPageSize" = 5000;
+      "editor.fontFamily" = "FiraCode Nerd Font";
       "editor.experimental.treeSitterTelemetry" = false;
       "editor.foldingMaximumRegions" = 10000;
       "editor.foldingStrategy" = "auto";
