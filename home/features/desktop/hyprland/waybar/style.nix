@@ -44,7 +44,7 @@ in
 
       /* Global Styles */
       * {
-          font-size: 14px;
+          font-size: 16px;
           font-family: DejaVu Sans, UbuntuMono Nerd Font;
           font-weight: bold;
       }

@@ -245,6 +245,22 @@
             on-scroll-down = "hyprctl dispatch workspace e-1";
           };
 
+          "wlr/taskbar" = {
+              format = "{icon}";
+              icon-size = 18;
+              tooltip-format = "{title}";
+              on-click = "activate";
+              on-click-middle = "close";
+              ignore-list = ["Alacritty" "kitty"];
+              app_ids-mapping = {
+                "firefoxdeveloperedition" = "firefox-developer-edition";
+              };
+              rewrite = {
+                "Firefox Web Browser" = "Firefox";
+                "Foot Server" = "Terminal";
+              };
+            };
+
           # Group Hardware
           "group/hardware" = {
             orientation = "inherit";
@@ -422,6 +438,27 @@
                 "custom/quicklinkempty"
                 "custom/thunar"
               ];
+          };
+
+          "custom/notification" =  {
+            tooltip-format =  "Left =  Notifications\nRight =  Do not disturb";
+            format =  "{icon}";
+            format-icons =  {
+              "notification" =  "<span foreground='red'><sup></sup></span>";
+              "none" =  "";
+              "dnd-notification" =  "<span foreground='red'><sup></sup></span>";
+              "dnd-none" =  "";
+              "inhibited-notification" =  "<span foreground='red'><sup></sup></span>";
+              "inhibited-none" =  "";
+              "dnd-inhibited-notification" =  "<span foreground='red'><sup></sup></span>";
+              "dnd-inhibited-none" =  "";
+            };
+            return-type =  "json";
+            exec-if =  "which swaync-client";
+            exec =  "swaync-client -swb";
+            on-click =  "swaync-client -t -sw";
+            on-click-right =  "swaync-client -d -sw";
+            escape =  true;
           };
         }
       ];
