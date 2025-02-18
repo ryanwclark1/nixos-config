@@ -32,7 +32,7 @@ in
     text = ''
     {
       "$schema": "vscode://schemas/color-theme",
-      "name": "Catppuccin Frappe",
+      "name": "custom",
       "type": "dark",
       "colors": {
         "contrastActiveBorder": null,
