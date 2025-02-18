@@ -138,12 +138,6 @@
             on-click = "missioncenter";
           };
 
-          # Calculator
-          "custom/calculator" = {
-            format = "";
-            on-click = "qalculate-gtk";
-            tooltip-format = "Open calculator";
-          };
 
           "custom/chatgpt" = {
             format = "";
