@@ -59,18 +59,18 @@ in
       "--preview 'eza --tree --color=always {} | head -200'"
     ];
     colors = {
-      "bg+" = "#${base02}";
       bg = "#${base00}";
-      spinner = "#${base06}";
-      hl = "#${base08}";
-      fg = "#${base05}";
-      header = "#${base08}";
+      "bg+" = "#${base01}";
+      fg = "#${base04}";
+      "fg+" = "#${base06}";
+      header = "#${base0D}";
+      hl = "#${base0D}";
+      "hl+" = "#${base0D}";
       info = "#${base0E}";
-      pointer = "#${base06}";
       marker = "#${base07}";
-      "fg+" = "#${base05}";
+      pointer = "#${base06}";
+      spinner = "#${base06}";
       prompt = "#${base0E}";
-      "hl+" = "#${base08}";
       selected-bg = "#${base03}";
     };
     defaultCommand = "fd --hidden --strip-cwd-prefix --exclude .git";
