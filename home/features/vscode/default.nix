@@ -35,7 +35,7 @@
         ''
           mkdir -p "$out/share/vscode/extensions/$vscodeExtUniqueId/themes"
           ln -s ${config.home.homeDirectory}/.config/vscode/plugins/custom.theme/package.json "$out/share/vscode/extensions/$vscodeExtUniqueId/package.json"
-          ln -s ${config.home.homeDirectory}/vscode/plugins/custom.theme/themes/theme.json "$out/share/vscode/extensions/$vscodeExtUniqueId/themes/theme.json"
+          ln -s ${config.home.homeDirectory}/.config/vscode/plugins/custom.theme/themes/theme.json "$out/share/vscode/extensions/$vscodeExtUniqueId/themes/theme.json"
         '';
     in
     [
@@ -45,7 +45,6 @@
       aaron-bond.better-comments
       bierner.markdown-mermaid
       bradlc.vscode-tailwindcss
-      catppuccin.catppuccin-vsc
       charliermarsh.ruff
       christian-kohler.path-intellisense
       dbaeumer.vscode-eslint
