@@ -209,17 +209,17 @@
           };
 
           "custom/nix-updates" = {
-              exec = "update-checker";
-              on-click = "update-checker && notify-send 'The system has been updated'"; # refresh on click
-              interval = 3600; # refresh every hour
-              tooltip = true;
-              return-type = "json";
-              format = "{} {icon}";
-              format-icons = {
-                  has-updates = ""; # icon when updates needed
-                  updated = ""; # icon when all packages updated
-              };
+            exec = "update-checker";
+            on-click = "update-checker && notify-send 'The system has been updated'"; # refresh on click
+            interval = 3600; # refresh every hour
+            tooltip = true;
+            return-type = "json";
+            format = "{} {icon}";
+            format-icons = {
+                has-updates = ""; # icon when updates needed
+                updated = ""; # icon when all packages updated
             };
+          };
 
           disk = {
             interval = 60;
