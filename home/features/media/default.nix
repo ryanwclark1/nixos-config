@@ -14,6 +14,7 @@
   ];
 
   home.packages = with pkgs; [
+    mkvtoolnix # Matroska tools
     # blender-hip # Includes blender and thumbnailer
     # darktable # RAW photo editor
     # digikam # Photo management
