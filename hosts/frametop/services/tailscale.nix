@@ -32,6 +32,7 @@
     #   "--timeout=0s"
     # ];
     extraUpFlags = [
+      "--accept-dns=true"
       "--exit-node=homeassistant"
       "--exit-node-allow-lan-access"
       "--operator=administrator"
