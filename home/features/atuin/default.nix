@@ -9,7 +9,7 @@
   ...
 }:
 
-{
+{ 
   programs.atuin = {
     enable = true;
     package = pkgs.atuin;
@@ -19,10 +19,12 @@
     settings = {
       # sync_address = "https://atuin.techcasa.io";
       auto_sync = true;
+      sync_address = "http://atuin.tail5825d.ts.net";
       sync_frequency = "1m";
       search_mode = "fuzzy";
       dialect = "us";
-      update_check = true;
+      update_check = false;
+
       filter_mode = "global";
       search_mode_shell_up_key_binding = "fuzzy";
       filter_mode_shell_up_key_binding = "global";
