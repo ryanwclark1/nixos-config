@@ -153,9 +153,10 @@ in
       };
 
       container = {
-        symbol = " ";
+        # symbol = " ";
+        symbole = " ";
         style = "bg:#${base0E} fg:#${base00}";
-        format = "[$symbol \[$name\]]($style)";
+        format = "[ $symbol $name ]($style)";
         disabled = false;
       };
 
@@ -290,7 +291,7 @@ in
         disabled = false;
       };
       lua = {
-        symbol = "";
+        symbol = " ";
         style = "bg:#${base0F}";
         format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
         disabled = false;
@@ -307,13 +308,13 @@ in
         disabled = true;
       };
       nodejs = {
-        symbol = " ";
+        symbol = " ";
         style = "bg:#${base0F}";
         format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
         disabled = false;
       };
       php = {
-        symbol = " ";
+        symbol = " ";
         style = "bg:#${base0F}";
         format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
         disabled = false;
