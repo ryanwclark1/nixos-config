@@ -9,7 +9,13 @@
   ...
 }:
 
-{ 
+{
+   sops.secrets = {
+    atuin-key = {
+      sopsFile = ../../../secrets/secrets.yaml;
+    };
+  };
+
   programs.atuin = {
     enable = true;
     package = pkgs.atuin;
@@ -19,7 +25,8 @@
     settings = {
       # sync_address = "https://atuin.techcasa.io";
       auto_sync = true;
-      sync_address = "http://atuin.tail5825d.ts.net";
+      sync_address = "http://100.112.124.7:8888";
+      key_path = config.sops.secrets.atuin-key.path;
       sync_frequency = "1m";
       search_mode = "fuzzy";
       dialect = "us";
