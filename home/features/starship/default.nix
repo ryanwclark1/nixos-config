@@ -154,7 +154,7 @@ in
 
       container = {
         # symbol = " ";
-        symbole = " ";
+        symbol = " ";
         style = "bg:#${base0E} fg:#${base00}";
         format = "[ $symbol $name ]($style)";
         disabled = false;
