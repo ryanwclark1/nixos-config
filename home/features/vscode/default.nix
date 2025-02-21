@@ -466,9 +466,6 @@
         "editor.tabSize" = 2;
       };
 
-      # JSON
-      "[json]"."editor.defaultFormatter" = "vscode.json-language-features";
-      "[jsonc]"."editor.defaultFormatter" = "vscode.json-language-features";
 
       ##### Typescript #####
       "[typescriptreact]"."editor.defaultFormatter" = "vscode.typescript-language-features";
