@@ -101,7 +101,7 @@ in
           Arch = "󰣇";
           Artix = "󰣇";
           CentOS = " ";
-          Debian = "󰣚 ";
+          Debian = " ";
           Fedora = "󰣛 ";
           FreeBSD = " ";
           Gentoo = "󰣨 ";
@@ -256,7 +256,7 @@ in
         format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
       };
       dart = {
-        symbol = " ";
+        symbol = " ";
         style = "bg:#${base0F}";
         format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
         disabled = true;
@@ -308,9 +308,9 @@ in
         disabled = true;
       };
       nodejs = {
-        symbol = " ";
+        symbol = " ";
         style = "bg:#${base0F}";
-        format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
+        format = "[[ $symbol($version) ](fg:#${base00} bg:#${base0F})]($style)";
         disabled = false;
       };
       php = {
@@ -320,16 +320,17 @@ in
         disabled = false;
       };
       python = {
-        symbol = " ";
+        symbol = " ";
         style = "bg:#${base0F}";
         version_format = "$raw";
-        format = "[[ $symbol( $version )(\($virtualenv\) )](fg:#${base00} bg:#${base0F})]($style)";
+        format = "[[ $symbol($version)(\($virtualenv\))](fg:#${base00} bg:#${base0F})]($style)";
         disabled = false;
         detect_folders = [".venv"];
-        pyenv_version_name = true;
+        python_binary	= ["python" "python3"];
+        pyenv_version_name = false;
       };
       rust = {
-        symbol = " ";
+        symbol = " ";
         style = "bg:#${base0F}";
         format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
         disabled = false;
@@ -347,7 +348,7 @@ in
         disabled = true;
       };
       docker_context = {
-        symbol = " ";
+        symbol = " ";
         style = "fg:#${base00} bg:#${base06}";
         format = "[ $symbol( $context) ]($style)";
         disabled = false;
