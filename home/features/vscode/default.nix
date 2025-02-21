@@ -268,6 +268,13 @@
       #    Extension Settings     #
       #############################
 
+      ##### Autodoc Strings #####
+      "autodocstring.docstringFormat" = "google";
+      "autoDocstring.generateDocstringOnEnter" = true;
+      "autoDocstring.guessTypes" = true;
+      "autoDocstring.startOnNewLine" = true;
+
+
       "emmet.showSuggestionsAsSnippets" = true;
       "emmet.includeLanguages" = {
         "javascript" = "javascriptreact";
