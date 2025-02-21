@@ -17,6 +17,7 @@
     tailwindcss
     fluxctl
     taplo # Even Better TOML
+    nvfetcher
   ];
 
   programs.vscode = {
@@ -82,6 +83,7 @@
       shyykoserhiy.vscode-spotify
       tailscale.vscode-tailscale
       tamasfe.even-better-toml
+      usernamehw.errorlens
       yzhang.markdown-all-in-one
     ]) ++ (pkgs.vscode-utils.extensionsFromVscodeMarketplace [
       {
@@ -111,8 +113,8 @@
       {
         name = "mypy-type-checker";
         publisher = "ms-python";
-        sha256 = "sha256-boKUxLOAgQJP13zX/NMhg1MtcrPVQJt5gLbxI7gVSu4=";
-        version = "2025.1.10381011";
+        sha256 = "sha256-Z6i2zal3uhzdG1nBZsp5/fOqki5Soo7JDkfunnx/FVo=";
+        version = "2025.1.10511014";
       }
       {
         name = "prom";
@@ -123,8 +125,8 @@
       {
         name = "remote-explorer";
         publisher = "ms-vscode";
-        sha256 = "sha256-ji7h/spvkxn/ljnF6OaKSx8OVNh7h4YrY3QhKKKH5sc=";
-        version = "0.5.2024111900";
+        sha256 = "sha256-tCNkC7qa59oL9TXA+OKN0Tq5wl0TOLJhHpiKRLmMlgo=";
+        version = "0.5.2025021709";
       }
       {
         name = "remotehub";
@@ -174,6 +176,18 @@
         version = "1.0.0";
         sha256 = "sha256-s60alej3cNAbSJxsRlIRE2Qha6oAsmcOBbWoqp+w6fk=";
       }
+      {
+        name = "hadolint";
+        publisher = "exiasr";
+        version = "1.1.2";
+        sha256 = "sha256-6GO1f8SP4CE8yYl87/tm60FdGHqHsJA4c2B6UKVdpgM=";
+      }
+      {
+        name = "vsc-python-indent";
+        publisher = "kevinrose";
+        version = "1.19.0";
+        sha256 = "sha256-gX0L416RXIQ9S4kFguEJJ7u4GSo7WbpifXmL/mWCU08=";
+      }
     ]);
     userSettings = {
       "accessibility.dimUnfocused.enabled" = true;
@@ -217,7 +231,7 @@
         120
       ];
       "extensions.autoUpdate" = false;
-      
+
       "files.associations" = {
         "*.css" = "tailwindcss";
         ".env" = "dotenv";
@@ -231,6 +245,8 @@
         "**/.git" = false;
       };
       "files.autoSave" = "afterDelay";
+      "files.insertFinalNewline" = true;
+      "files.trimTrailingWhitespace" = true;
       "security.workspace.trust.untrustedFiles" = "open";
       "telemetry.telemetryLevel" = "off";
       "terminal.integrated.copyOnSelection" = true;
@@ -264,7 +280,7 @@
       ##### Code Runner ####
       "code-runner.enableAppInsights" = false;
 
-      #####  Copilot ##### 
+      #####  Copilot #####
       # "github.copilot.chat.temporalContext.enabled" = true;
       "github.copilot.chat.completionContext.typescript.mode" = "on";
       "github.copilot.editor.enableAutoCompletions" = true;
@@ -380,6 +396,74 @@
         "ui.navigation.symbolScope" = "all";
         "ui.navigation.symbolStyle" = "Dynamic";
         "ui.semanticTokens" = true;
+      };
+
+      ##### Python #####
+      "python.testing.autoTestDiscoverOnSaveEnabled" = false;
+      "python.testing.pytestEnabled" = true;
+      "python.testing.pytestArgs" = [
+        "tests"
+      ];
+      "python.testing.unittestEnabled" = false;
+
+      ##### Docker Compose #####
+      "[dockercompose]" = {
+        "editor.autoIndent" = "advanced";
+        "editor.defaultFormatter" = "redhat.vscode-yaml";
+        "editor.formatOnSave" = true;
+        "editor.insertSpaces" = true;
+        "editor.quickSuggestions" = {
+          "other" = true;
+          "comments" = false;
+          "strings" = true;
+        };
+        "editor.tabSize" = 4;
+      };
+
+      "[dockerfile]" = {
+        "editor.defaultFormatter" = "ms-azuretools.vscode-docker";
+        "editor.formatOnSave" = true;
+      };
+
+      "[github-actions-workflow]" = {
+        "editor.autoIndent" = "advanced";
+        "editor.defaultFormatter" = "redhat.vscode-yaml";
+        "editor.insertSpaces" = true;
+        "editor.quickSuggestions" = {
+          "other" = true;
+          "comments" = false;
+          "strings" = true;
+        };
+        "editor.tabSize" = 2;
+      };
+
+      "[json][jsonc]" = {
+        "editor.defaultFormatter" = "vscode.json-language-features";
+        "editor.formatOnSave" = true;
+        "editor.insertSpaces" = true;
+        "editor.tabSize" = 4;
+      };
+      "[python]" = {
+        "editor.codeActionsOnSave" = {
+          "source.fixAll" = "explicit";
+          "source.organizeImports" = "explicit";
+        };
+        "editor.defaultFormatter" = "charliermarsh.ruff";
+        "editor.formatOnSave" = true;
+        "editor.tabSize" = 4;
+      };
+      "[toml]" = {
+        "editor.defaultFormatter" = "tamasfe.even-better-toml";
+        "editor.formatOnSave" = true;
+        "editor.insertSpaces" = true;
+        "editor.tabSize" = 4;
+      };
+      "[yaml]" = {
+        "editor.autoIndent" = "advanced";
+        "editor.defaultFormatter" = "redhat.vscode-yaml";
+        "editor.formatOnSave" = true;
+        "editor.insertSpaces" = true;
+        "editor.tabSize" = 2;
       };
 
       # JSON

@@ -36,46 +36,46 @@
   };
   copilot = {
     pname = "copilot";
-    version = "1.271.0";
+    version = "1.273.1389";
     src = fetchurl {
-      url = "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot/1.271.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "copilot-1.271.0.zip";
-      sha256 = "sha256-uSN7JUfyi8y0sn7XijgEwDxa+9RsghU3FlNVV3SlHro=";
+      url = "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot/1.273.1389/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "copilot-1.273.1389.zip";
+      sha256 = "sha256-jTNsX4YFnXfPug3Ak1DcumL06x2n76COVFE4H+9W318=";
     };
     publisher = "github";
     name = "copilot";
   };
   copilot-chat = {
     pname = "copilot-chat";
-    version = "0.25.2025021301";
+    version = "0.25.2025022101";
     src = fetchurl {
-      url = "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot-chat/0.25.2025021301/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "copilot-chat-0.25.2025021301.zip";
-      sha256 = "sha256-JXjd1y0OotxkcQzl70E6/hiW/0L0jXmjVwoOq9vFad4=";
+      url = "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot-chat/0.25.2025022101/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "copilot-chat-0.25.2025022101.zip";
+      sha256 = "sha256-hT9XbD0E9N5uB6ZVqk0YZmFYQ24Fu10gR2syjjdmnH4=";
     };
     publisher = "github";
     name = "copilot-chat";
   };
   explorer = {
     pname = "explorer";
-    version = "1.14.0";
+    version = "1.14.3";
     src = fetchurl {
-      url = "https://vitest.gallery.vsassets.io/_apis/public/gallery/publisher/vitest/extension/explorer/1.14.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "explorer-1.14.0.zip";
-      sha256 = "sha256-74IlnOBrznyQzq9u+s6j2R017XPAkjXZT4h76M+wYCc=";
+      url = "https://vitest.gallery.vsassets.io/_apis/public/gallery/publisher/vitest/extension/explorer/1.14.3/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "explorer-1.14.3.zip";
+      sha256 = "sha256-L/VpdB1pTt5O+84I7vShEfoKAi+S7PGDhYhpYmRUfX8=";
     };
     publisher = "vitest";
     name = "explorer";
   };
   gopls = {
     pname = "gopls";
-    version = "gopls/v0.17.1";
+    version = "gopls/v0.18.0";
     src = fetchFromGitHub {
       owner = "golang";
       repo = "tools";
-      rev = "gopls/v0.17.1";
+      rev = "gopls/v0.18.0";
       fetchSubmodules = false;
-      sha256 = "sha256-NLUIFNooOOA4LEL5nZNdP9TvDkQUqLjKi44kZtOxeuI=";
+      sha256 = "sha256-YFAJH3jepOcgAdnSBP0G0e/GoNx9crLuQxgUFDBecwY=";
     };
   };
   grafana-vscode = {
@@ -88,6 +88,17 @@
     };
     publisher = "grafana";
     name = "grafana-vscode";
+  };
+  hadolint = {
+    pname = "hadolint";
+    version = "1.1.2";
+    src = fetchurl {
+      url = "https://exiasr.gallery.vsassets.io/_apis/public/gallery/publisher/exiasr/extension/hadolint/1.1.2/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "hadolint-1.1.2.zip";
+      sha256 = "sha256-6GO1f8SP4CE8yYl87/tm60FdGHqHsJA4c2B6UKVdpgM=";
+    };
+    publisher = "exiasr";
+    name = "hadolint";
   };
   htmx-attributes = {
     pname = "htmx-attributes";
@@ -102,11 +113,11 @@
   };
   mypy-type-checker = {
     pname = "mypy-type-checker";
-    version = "2025.1.10381011";
+    version = "2025.1.10511014";
     src = fetchurl {
-      url = "https://ms-python.gallery.vsassets.io/_apis/public/gallery/publisher/ms-python/extension/mypy-type-checker/2025.1.10381011/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "mypy-type-checker-2025.1.10381011.zip";
-      sha256 = "sha256-boKUxLOAgQJP13zX/NMhg1MtcrPVQJt5gLbxI7gVSu4=";
+      url = "https://ms-python.gallery.vsassets.io/_apis/public/gallery/publisher/ms-python/extension/mypy-type-checker/2025.1.10511014/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "mypy-type-checker-2025.1.10511014.zip";
+      sha256 = "sha256-Z6i2zal3uhzdG1nBZsp5/fOqki5Soo7JDkfunnx/FVo=";
     };
     publisher = "ms-python";
     name = "mypy-type-checker";
@@ -135,11 +146,11 @@
   };
   remote-explorer = {
     pname = "remote-explorer";
-    version = "0.5.2025010909";
+    version = "0.5.2025021709";
     src = fetchurl {
-      url = "https://ms-vscode.gallery.vsassets.io/_apis/public/gallery/publisher/ms-vscode/extension/remote-explorer/0.5.2025010909/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "remote-explorer-0.5.2025010909.zip";
-      sha256 = "sha256-wAxei9TYi23O+KkG6cxoCv9dkJi9FolFTUeDoQCzYB4=";
+      url = "https://ms-vscode.gallery.vsassets.io/_apis/public/gallery/publisher/ms-vscode/extension/remote-explorer/0.5.2025021709/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "remote-explorer-0.5.2025021709.zip";
+      sha256 = "sha256-tCNkC7qa59oL9TXA+OKN0Tq5wl0TOLJhHpiKRLmMlgo=";
     };
     publisher = "ms-vscode";
     name = "remote-explorer";
@@ -157,44 +168,44 @@
   };
   sqlite-viewer = {
     pname = "sqlite-viewer";
-    version = "0.10.1";
+    version = "0.10.2";
     src = fetchurl {
-      url = "https://qwtel.gallery.vsassets.io/_apis/public/gallery/publisher/qwtel/extension/sqlite-viewer/0.10.1/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "sqlite-viewer-0.10.1.zip";
-      sha256 = "sha256-dEaD2GH7aNWcF3hvXtZ2wh5/IUE1KZzHBgTxIP35ZwI=";
+      url = "https://qwtel.gallery.vsassets.io/_apis/public/gallery/publisher/qwtel/extension/sqlite-viewer/0.10.2/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "sqlite-viewer-0.10.2.zip";
+      sha256 = "sha256-5TqcxSJPSmLRBhrhVbAd1VdL2kyszezl8sSrlSynOms=";
     };
     publisher = "qwtel";
     name = "sqlite-viewer";
   };
   sqltools = {
     pname = "sqltools";
-    version = "0.28.3";
+    version = "0.28.4";
     src = fetchurl {
-      url = "https://mtxr.gallery.vsassets.io/_apis/public/gallery/publisher/mtxr/extension/sqltools/0.28.3/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "sqltools-0.28.3.zip";
-      sha256 = "sha256-bTrHAhj8uwzRIImziKsOizZf8+k3t+VrkOeZrFx7SH8=";
+      url = "https://mtxr.gallery.vsassets.io/_apis/public/gallery/publisher/mtxr/extension/sqltools/0.28.4/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "sqltools-0.28.4.zip";
+      sha256 = "sha256-ExeerCI5yDa/DJqNOwENDjw+xhMPNil6JgCAUNdTXy8=";
     };
     publisher = "mtxr";
     name = "sqltools";
   };
   sqltools-driver-pg = {
     pname = "sqltools-driver-pg";
-    version = "0.5.4";
+    version = "0.5.5";
     src = fetchurl {
-      url = "https://mtxr.gallery.vsassets.io/_apis/public/gallery/publisher/mtxr/extension/sqltools-driver-pg/0.5.4/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "sqltools-driver-pg-0.5.4.zip";
-      sha256 = "sha256-XnPTMFNgMGT2tJe8WlmhMB3DluvMZx9Ee2w7xMCzLYM=";
+      url = "https://mtxr.gallery.vsassets.io/_apis/public/gallery/publisher/mtxr/extension/sqltools-driver-pg/0.5.5/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "sqltools-driver-pg-0.5.5.zip";
+      sha256 = "sha256-B1wycDFSWPaQ87HF54+GrNX0b5f3tODLStuxqICdkjs=";
     };
     publisher = "mtxr";
     name = "sqltools-driver-pg";
   };
   sqltools-driver-sqlite = {
     pname = "sqltools-driver-sqlite";
-    version = "0.5.1";
+    version = "0.5.2";
     src = fetchurl {
-      url = "https://mtxr.gallery.vsassets.io/_apis/public/gallery/publisher/mtxr/extension/sqltools-driver-sqlite/0.5.1/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "sqltools-driver-sqlite-0.5.1.zip";
-      sha256 = "sha256-wFgb6wDSgPbPtEVKbHcUeURqbVAqDsEEhFUcBhQtmF8=";
+      url = "https://mtxr.gallery.vsassets.io/_apis/public/gallery/publisher/mtxr/extension/sqltools-driver-sqlite/0.5.2/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "sqltools-driver-sqlite-0.5.2.zip";
+      sha256 = "sha256-aT4gFllyaQSoozblz1FnbQyHyZbBqXDjWAXVODQA2mU=";
     };
     publisher = "mtxr";
     name = "sqltools-driver-sqlite";
@@ -243,6 +254,17 @@
     publisher = "a-h";
     name = "templ";
   };
+  vsc-python-indent = {
+    pname = "vsc-python-indent";
+    version = "1.19.0";
+    src = fetchurl {
+      url = "https://kevinrose.gallery.vsassets.io/_apis/public/gallery/publisher/kevinrose/extension/vsc-python-indent/1.19.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "vsc-python-indent-1.19.0.zip";
+      sha256 = "sha256-gX0L416RXIQ9S4kFguEJJ7u4GSo7WbpifXmL/mWCU08=";
+    };
+    publisher = "kevinrose";
+    name = "vsc-python-indent";
+  };
   vscode-gitops-tools = {
     pname = "vscode-gitops-tools";
     version = "0.27.0";
@@ -267,11 +289,11 @@
   };
   vscode-postgresql-client2 = {
     pname = "vscode-postgresql-client2";
-    version = "8.1.4";
+    version = "8.1.6";
     src = fetchurl {
-      url = "https://cweijan.gallery.vsassets.io/_apis/public/gallery/publisher/cweijan/extension/vscode-postgresql-client2/8.1.4/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "vscode-postgresql-client2-8.1.4.zip";
-      sha256 = "sha256-hfsYLvE0itiRZD9lzMSNTwcMeYgrwKRY+hX+nFLvIeI=";
+      url = "https://cweijan.gallery.vsassets.io/_apis/public/gallery/publisher/cweijan/extension/vscode-postgresql-client2/8.1.6/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "vscode-postgresql-client2-8.1.6.zip";
+      sha256 = "sha256-FGTTarCGd0PK7CTH/liUnNYi9PH2oHvEQqqhPaWXvm0=";
     };
     publisher = "cweijan";
     name = "vscode-postgresql-client2";
