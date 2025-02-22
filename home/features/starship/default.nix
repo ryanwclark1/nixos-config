@@ -323,7 +323,7 @@ in
         symbol = " ";
         style = "bg:#${base0F}";
         version_format = "$raw";
-        format = "[[ $symbol($version)(\($virtualenv\))](fg:#${base00} bg:#${base0F})]($style)";
+        format = "[[ $symbol($version) (\($virtualenv\))](fg:#${base00} bg:#${base0F})]($style)";
         disabled = false;
         detect_folders = [".venv"];
         python_binary	= ["python" "python3"];
