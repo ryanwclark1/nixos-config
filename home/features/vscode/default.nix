@@ -84,6 +84,7 @@
       tailscale.vscode-tailscale
       tamasfe.even-better-toml
       usernamehw.errorlens
+      # vue.volar
       yzhang.markdown-all-in-one
     ]) ++ (pkgs.vscode-utils.extensionsFromVscodeMarketplace [
       {
@@ -187,6 +188,12 @@
         publisher = "kevinrose";
         version = "1.19.0";
         sha256 = "sha256-gX0L416RXIQ9S4kFguEJJ7u4GSo7WbpifXmL/mWCU08=";
+      }
+      {
+        name = "explorer";
+        publisher = "vitest";
+        version = "1.14.3";
+        sha256 = "sha256-L/VpdB1pTt5O+84I7vShEfoKAi+S7PGDhYhpYmRUfX8=";
       }
     ]);
     userSettings = {
