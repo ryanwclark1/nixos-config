@@ -168,8 +168,8 @@
       {
         name = "vscode-thunder-client";
         publisher = "rangav";
-        sha256 = "sha256-NvGAbszItsZf71D6fI0/IOSAxKXUHjDJoQ58ROF/NAk=";
-        version = "2.32.3";
+        sha256 = "sha256-dz7wf6GecpRBQCuZXfwRDGIEbVYCaptWi7nxKUveFTI=";
+        version = "2.34.2";
       }
       {
         name = "rasi";
@@ -194,6 +194,12 @@
         publisher = "vitest";
         version = "1.14.3";
         sha256 = "sha256-L/VpdB1pTt5O+84I7vShEfoKAi+S7PGDhYhpYmRUfX8=";
+      }
+      {
+        name = "biome";
+        publisher = "biomejs";
+        version = "2025.2.72227";
+        sha256 = "sha256-Lj5+Vy8IbU70y6ee42cjxyz/mwpIAhWSF4KtL9OYo2Q=";
       }
     ]);
     userSettings = {

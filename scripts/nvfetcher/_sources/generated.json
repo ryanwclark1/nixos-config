@@ -35,6 +35,24 @@
         },
         "version": "25.2.0"
     },
+    "biome": {
+        "cargoLocks": null,
+        "date": null,
+        "extract": null,
+        "name": "biome",
+        "passthru": {
+            "name": "biome",
+            "publisher": "biomejs"
+        },
+        "pinned": false,
+        "src": {
+            "name": "biome-2025.2.72227.zip",
+            "sha256": "sha256-Lj5+Vy8IbU70y6ee42cjxyz/mwpIAhWSF4KtL9OYo2Q=",
+            "type": "url",
+            "url": "https://biomejs.gallery.vsassets.io/_apis/public/gallery/publisher/biomejs/extension/biome/2025.2.72227/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+        },
+        "version": "2025.2.72227"
+    },
     "bun-vscode": {
         "cargoLocks": null,
         "date": null,
@@ -64,12 +82,12 @@
         },
         "pinned": false,
         "src": {
-            "name": "copilot-1.273.1389.zip",
-            "sha256": "sha256-jTNsX4YFnXfPug3Ak1DcumL06x2n76COVFE4H+9W318=",
+            "name": "copilot-1.276.1398.zip",
+            "sha256": "sha256-3ge/JMyzalCgTuOPQPWCrqZMeH0IQRCT+tleg/6mc5A=",
             "type": "url",
-            "url": "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot/1.273.1389/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot/1.276.1398/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "1.273.1389"
+        "version": "1.276.1398"
     },
     "copilot-chat": {
         "cargoLocks": null,
@@ -82,12 +100,12 @@
         },
         "pinned": false,
         "src": {
-            "name": "copilot-chat-0.25.2025022101.zip",
-            "sha256": "sha256-hT9XbD0E9N5uB6ZVqk0YZmFYQ24Fu10gR2syjjdmnH4=",
+            "name": "copilot-chat-0.25.2025022601.zip",
+            "sha256": "sha256-CJGKGoWB3VfZUgyNTC7Svxvm0g3NEdmwLKyT71R9LVU=",
             "type": "url",
-            "url": "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot-chat/0.25.2025022101/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot-chat/0.25.2025022601/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "0.25.2025022101"
+        "version": "0.25.2025022601"
     },
     "explorer": {
         "cargoLocks": null,
@@ -100,12 +118,12 @@
         },
         "pinned": false,
         "src": {
-            "name": "explorer-1.14.3.zip",
-            "sha256": "sha256-L/VpdB1pTt5O+84I7vShEfoKAi+S7PGDhYhpYmRUfX8=",
+            "name": "explorer-1.14.4.zip",
+            "sha256": "sha256-mOdA1h3xzJE7PxwXKBVQonKdLRn78ZoMzhUdJBhV/ws=",
             "type": "url",
-            "url": "https://vitest.gallery.vsassets.io/_apis/public/gallery/publisher/vitest/extension/explorer/1.14.3/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://vitest.gallery.vsassets.io/_apis/public/gallery/publisher/vitest/extension/explorer/1.14.4/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "1.14.3"
+        "version": "1.14.4"
     },
     "gopls": {
         "cargoLocks": null,
@@ -121,12 +139,12 @@
             "name": null,
             "owner": "golang",
             "repo": "tools",
-            "rev": "gopls/v0.18.0",
-            "sha256": "sha256-YFAJH3jepOcgAdnSBP0G0e/GoNx9crLuQxgUFDBecwY=",
+            "rev": "gopls/v0.18.1",
+            "sha256": "sha256-5w6R3kaYwrZyhIYjwLqfflboXT/z3HVpZiowxeUyaWg=",
             "sparseCheckout": [],
             "type": "github"
         },
-        "version": "gopls/v0.18.0"
+        "version": "gopls/v0.18.1"
     },
     "grafana-vscode": {
         "cargoLocks": null,
@@ -193,12 +211,30 @@
         },
         "pinned": false,
         "src": {
-            "name": "mypy-type-checker-2025.1.10511014.zip",
-            "sha256": "sha256-Z6i2zal3uhzdG1nBZsp5/fOqki5Soo7JDkfunnx/FVo=",
+            "name": "mypy-type-checker-2025.1.10561011.zip",
+            "sha256": "sha256-jCwByztRS/B2aF5Y9cKXQ1mAZOtoKzHesqNRe6FiLbI=",
             "type": "url",
-            "url": "https://ms-python.gallery.vsassets.io/_apis/public/gallery/publisher/ms-python/extension/mypy-type-checker/2025.1.10511014/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://ms-python.gallery.vsassets.io/_apis/public/gallery/publisher/ms-python/extension/mypy-type-checker/2025.1.10561011/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "2025.1.10511014"
+        "version": "2025.1.10561011"
+    },
+    "playwright": {
+        "cargoLocks": null,
+        "date": null,
+        "extract": null,
+        "name": "playwright",
+        "passthru": {
+            "name": "playwright",
+            "publisher": "ms-playwright"
+        },
+        "pinned": false,
+        "src": {
+            "name": "playwright-1.1.13.zip",
+            "sha256": "sha256-gSIWwD8WHKMM5wpuPpSKpBB+oxaqO2vO8wHTN43jmrM=",
+            "type": "url",
+            "url": "https://ms-playwright.gallery.vsassets.io/_apis/public/gallery/publisher/ms-playwright/extension/playwright/1.1.13/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+        },
+        "version": "1.1.13"
     },
     "prom": {
         "cargoLocks": null,
@@ -517,12 +553,12 @@
         },
         "pinned": false,
         "src": {
-            "name": "vscode-thunder-client-2.34.1.zip",
-            "sha256": "sha256-dz7wf6GecpRBQCuZXfwRDGIEbVYCaptWi7nxKUveFTI=",
+            "name": "vscode-thunder-client-2.34.2.zip",
+            "sha256": "sha256-bsbSYNs2+X8JIv3t3S9ftlCUe60gktpQwzhg9Yzgy5o=",
             "type": "url",
-            "url": "https://rangav.gallery.vsassets.io/_apis/public/gallery/publisher/rangav/extension/vscode-thunder-client/2.34.1/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://rangav.gallery.vsassets.io/_apis/public/gallery/publisher/rangav/extension/vscode-thunder-client/2.34.2/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "2.34.1"
+        "version": "2.34.2"
     },
     "yuck": {
         "cargoLocks": null,

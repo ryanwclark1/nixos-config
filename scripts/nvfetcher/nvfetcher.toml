@@ -147,3 +147,13 @@ passthru = { publisher = "exiasr", name = "hadolint" }
 src.vsmarketplace = "kevinrose.vsc-python-indent"
 fetch.vsmarketplace = "kevinrose.vsc-python-indent"
 passthru = { publisher = "kevinrose", name = "vsc-python-indent" }
+
+[biome]
+src.vsmarketplace = "biomejs.biome"
+fetch.vsmarketplace = "biomejs.biome"
+passthru = { publisher = "biomejs", name = "biome" }
+
+[playwright]
+src.vsmarketplace = "ms-playwright.playwright"
+fetch.vsmarketplace = "ms-playwright.playwright"
+passthru = { publisher = "ms-playwright", name = "playwright" }
