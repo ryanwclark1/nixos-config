@@ -168,7 +168,7 @@
       {
         name = "vscode-thunder-client";
         publisher = "rangav";
-        sha256 = "sha256-dz7wf6GecpRBQCuZXfwRDGIEbVYCaptWi7nxKUveFTI=";
+        sha256 = "sha256-bsbSYNs2+X8JIv3t3S9ftlCUe60gktpQwzhg9Yzgy5o=";
         version = "2.34.2";
       }
       {
