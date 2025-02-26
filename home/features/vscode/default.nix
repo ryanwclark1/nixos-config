@@ -201,6 +201,12 @@
         version = "2025.2.72227";
         sha256 = "sha256-Lj5+Vy8IbU70y6ee42cjxyz/mwpIAhWSF4KtL9OYo2Q=";
       }
+      {
+        name = "playwright";
+        publisher = "ms-playwright";
+        version = "1.1.13";
+        sha256 = "sha256-gSIWwD8WHKMM5wpuPpSKpBB+oxaqO2vO8wHTN43jmrM=";
+      }
     ]);
     userSettings = {
       "accessibility.dimUnfocused.enabled" = true;
