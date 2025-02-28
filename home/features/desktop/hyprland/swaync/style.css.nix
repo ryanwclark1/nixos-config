@@ -1,7 +1,7 @@
 {
   ...
 }:
-let   
+let
   base00 = "303446"; # base
   base01 = "292c3c"; # mantle
   base02 = "414559"; # surface0
@@ -32,7 +32,7 @@ in
     text = ''
     /* Colors */
 
-    @import '~/.cache/wal/colors-waybar.css';
+    /*  @import '~/.cache/wal/colors-waybar.css'; */
     @define-color background #${base00};
     @define-color groupbackground #363636;
     @define-color buttoncolor #4a4a4a;
