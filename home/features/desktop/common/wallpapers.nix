@@ -1,7 +1,7 @@
-{ 
-  config, 
-  pkgs, 
-  ... 
+{
+  config,
+  pkgs,
+  ...
 }:
 
 let
@@ -58,7 +58,7 @@ in
     Unit = { Description = "Run Wallpapers Sync every 6 hours"; };
     Timer = {
       OnBootSec = "5m";
-      OnUnitActiveSec = "6h";
+      OnUnitActiveSec = "1h";
       Persistent = true;
     };
     Install = { WantedBy = [ "timers.target" ]; };

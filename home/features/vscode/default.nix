@@ -5,7 +5,6 @@
 }:
 
 
-
 {
   imports = [ ./custom.theme/themes/theme.json.nix ];
 
