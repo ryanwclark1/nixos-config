@@ -10,6 +10,5 @@
     insomnia # API Client for REST, GraphQL, GRPC and OpenAPI design tool for developers.
     postman # API Development Environment
     sqlitebrowser # Visual tool to create, design, and edit database files compatible with SQLite
-    windsurf
   ];
 }
