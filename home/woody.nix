@@ -52,7 +52,6 @@
     # ./features/virtualisation
     ./features/vscode
     ./features/yazi
-    ./features/zed
     ./features/zen
     ./features/zellij
     ./features/zoxide
