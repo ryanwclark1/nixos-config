@@ -19,14 +19,12 @@
     ./features/git
     ./features/kubernetes
     ./features/lazygit
-    ./features/navi
     ./features/networking-utils
     ./features/nixvim
     ./features/ripgrep
     ./features/shell
     ./features/starship
     ./features/sys-stats
-    ./features/tealdeer
     ./features/tmux
     ./features/yazi
     ./features/zoxide
