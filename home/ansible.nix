@@ -17,7 +17,6 @@
     ./features/fonts
     ./features/fzf
     ./features/git
-    ./features/helix
     ./features/kubernetes
     ./features/lazygit
     ./features/navi
