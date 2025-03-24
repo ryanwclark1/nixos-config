@@ -36,7 +36,7 @@ in
     (pkgs.writeScriptBin "rgf" (builtins.readFile ./scripts/rgf))
     (pkgs.writeScriptBin "sshget" (builtins.readFile ./scripts/sshget))
     (pkgs.writeScriptBin "sysz" (builtins.readFile ./scripts/sysz))
-    (pkgs.writeScriptBin "wifiz" (builtins.readFile ./scripts/wifi))
+    (pkgs.writeScriptBin "wifiz" (builtins.readFile ./scripts/wifiz))
   ];
 
   # Copy these scripts to the user's home directory for dotfiles repo
