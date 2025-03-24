@@ -51,6 +51,7 @@
     ./features/tmux
     # ./features/virtualisation
     ./features/vscode
+    ./features/windsurf
     ./features/yazi
     ./features/zen
     ./features/zellij
