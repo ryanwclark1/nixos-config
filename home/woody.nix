@@ -37,7 +37,7 @@
     ./features/kubernetes
     ./features/lazygit
     ./features/media
-    ./features/multiviewer
+    ./features/multiviewer/override.nix
     ./features/networking-utils
     ./features/nixvim
     ./features/productivity
