@@ -6,7 +6,6 @@
   imports = [
     ./global
 
-    # ./features/accounts
     ./features/alacritty
     ./features/ansible
     ./features/atuin
@@ -14,14 +13,14 @@
     ./features/bat
     ./features/btop
     ./features/cava
-    ./features/cli
     ./features/chrome
+    ./features/cli
     ./features/compression
     ./features/cursor
+    ./features/development
+    ./features/discord
     ./features/docs
     ./features/dotfiles
-    ./features/discord
-    ./features/development
     ./features/eza
     ./features/fastfetch
     ./features/fd
@@ -29,8 +28,8 @@
     ./features/fonts
     ./features/fzf
     ./features/games
-    ./features/git
     ./features/ghostty
+    ./features/git
     ./features/imv
     ./features/kitty
     ./features/kubernetes
@@ -38,24 +37,21 @@
     ./features/media
     ./features/networking-utils
     ./features/nixvim
-    # ./features/pass
     ./features/productivity
     ./features/qutebrowser
     ./features/remmina
     ./features/ripgrep
-    ./features/slack
     ./features/shell
+    ./features/slack
     ./features/starship
     ./features/sys-stats
-
     ./features/tmux
-    # ./features/virtualisation
     ./features/vscode
     ./features/windsurf
     ./features/wireless
     ./features/yazi
-    ./features/zen
     ./features/zellij
+    ./features/zen
     ./features/zoxide
 
     ./features/desktop/hyprland
