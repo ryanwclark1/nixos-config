@@ -55,6 +55,7 @@
     uv # for python
     jsonnet-bundler
     jsonnet
+    windsurf
   ];
 
 }
