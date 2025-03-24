@@ -171,7 +171,6 @@
         apps = [
           "nvim.desktop"
           "DevPod.desktop"
-          "Helix.desktop"
           "insomnia.desktop"
           "dbeaver.desktop"
           # "org.flameshot.Flameshot.desktop"
