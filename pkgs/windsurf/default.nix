@@ -2,7 +2,6 @@
   lib,
   stdenv,
   callPackage,
-  vscode-generic,
   fetchurl,
   nixosTests,
   commandLineArgs ? "",
@@ -13,7 +12,7 @@ let
     (lib.importJSON ./info.json)."${stdenv.hostPlatform.system}"
       or (throw "windsurf: unsupported system ${stdenv.hostPlatform.system}");
 in
-callPackage vscode-generic {
+callPackage (../vscode-generic/generic.nix) {
   inherit commandLineArgs useVSCodeRipgrep;
   inherit (info) version vscodeVersion;
   pname = "windsurf";

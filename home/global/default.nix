@@ -9,8 +9,8 @@
     # ./style.nix
     ./sops.nix
     ./home.nix
-  ]
-  ++ (builtins.attrValues outputs.homeManagerModules);
+  ];
+  # ++ (builtins.attrValues outputs.homeManagerModules);
 
   # home.file = {
   #   ".colorscheme".text = config.colorscheme.slug;

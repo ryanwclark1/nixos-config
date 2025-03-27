@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  outputs,
   ...
 }:
 
@@ -80,13 +81,13 @@
     # };
   };
 
-  # nixpkgs = {
-  #   overlays = builtins.attrValues outputs.overlays;
-  #   config = {
-  #     allowUnfree = true;
-  #     allowUnfreePredicate = _: true;
-  #   };
-  # };
+  nixpkgs = {
+    overlays = builtins.attrValues outputs.overlays;
+    config = {
+      allowUnfree = true;
+      allowUnfreePredicate = _: true;
+    };
+  };
 
   # home.file = {
   #   ".colorscheme".text = config.colorscheme.slug;
