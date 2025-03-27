@@ -1,13 +1,13 @@
 # This file defines overlays
 {
-  inputs,
+  # inputs,
   ...
 }:
 
 {
 
   # https://nixos.wiki/wiki/Overlays
-  windsurf = import ./windsurf.nix { inherit inputs; };
+  # windsurf = import ./windsurf.nix { inherit inputs; };
   # Export individual overlays
   # uv = import ./uv.nix { inherit inputs; };
   # vscode = import ./vscode.nix { inherit inputs; };
