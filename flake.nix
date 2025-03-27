@@ -100,7 +100,6 @@
       url = "github:youwen5/zen-browser-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nix-colors.url = "github:misterio77/nix-colors";
   };
 
   outputs = {
@@ -125,9 +124,6 @@
   in
   {
     inherit lib;
-    nixosModules = import ./modules/nixos;
-    homeManagerModules = import ./modules/home-manager;
-
     overlays = import ./overlays { inherit inputs outputs; };
 
     packages = forEachSystem (pkgs: import ./pkgs { inherit pkgs; });
