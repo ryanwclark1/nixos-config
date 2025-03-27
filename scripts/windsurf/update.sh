@@ -1,18 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Path to the info.json file
+# Path to the info.json file - updated for the correct relative path
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-INFO_JSON_PATH="$SCRIPT_DIR/info.json"
+INFO_JSON_PATH="$SCRIPT_DIR/../../pkgs/windsurf/info.json"
 
 # Function to get latest info for a target system
 get_info() {
   local target_system="$1"
-  local url="https://windsurf-stable.codeium.com/api/update/${target_system}/stable/latest"
+  echo $target_system
+  local url="https://windsurf-stable.codeiumdata.com/api/update/${target_system}/stable/latest"
 
   # Fetch the latest info
   local response=$(curl -s "$url")
 
+  echo "Response: $response"
   # Extract the required fields
   local windsurf_version=$(echo "$response" | jq -r '.windsurfVersion')
   local product_version=$(echo "$response" | jq -r '.productVersion')
@@ -31,10 +33,17 @@ get_info() {
 
 # Function to update the info.json file
 update_info_json() {
+  # Check if info.json file exists
+  if [ ! -f "$INFO_JSON_PATH" ]; then
+    echo "Error: info.json file not found at $INFO_JSON_PATH"
+    exit 1
+  fi
+
   # Get information for each platform
   local aarch64_darwin_info=$(get_info "darwin-arm64")
   local x86_64_darwin_info=$(get_info "darwin-x64")
   local x86_64_linux_info=$(get_info "linux-x64")
+
 
   # Create the new JSON structure
   local new_info=$(cat <<EOF
@@ -85,7 +94,7 @@ main() {
   if ! command -v curl &> /dev/null; then
     echo "Error: curl is required but not installed."
     exit 1
-  }
+  fi
 
   # Update the info.json file
   update_info_json
