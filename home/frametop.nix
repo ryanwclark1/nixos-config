@@ -18,7 +18,7 @@
     ./features/compression
     ./features/cursor
     ./features/development
-    ./features/discord
+    # ./features/discord
     ./features/docs
     ./features/dotfiles
     ./features/eza
@@ -42,7 +42,7 @@
     ./features/remmina
     ./features/ripgrep
     ./features/shell
-    ./features/slack
+    # ./features/slack
     ./features/starship
     ./features/sys-stats
     ./features/tmux
