@@ -44,7 +44,7 @@
   pname,
   libraryName ? "vscode",
   iconName ? "vs${executableName}",
-  updateScript,
+  # updateScript,
   dontFixup ? false,
   rev ? null,
   vscodeServer ? null,
@@ -140,7 +140,7 @@ stdenv.mkDerivation (
           executableName
           longName
           tests
-          updateScript
+          # updateScript
           ;
         fhs = fhs { };
         fhsWithPackages = f: fhs { additionalPkgs = f; };

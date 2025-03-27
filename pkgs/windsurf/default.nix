@@ -5,7 +5,7 @@
   fetchurl,
   nixosTests,
   commandLineArgs ? "",
-  useVSCodeRipgrep ? stdenv.hostPlatform.isDarwin,
+  # useVSCodeRipgrep ? stdenv.hostPlatform.isDarwin,
 }:
 let
   info =
@@ -13,7 +13,7 @@ let
       or (throw "windsurf: unsupported system ${stdenv.hostPlatform.system}");
 in
 callPackage (../vscode-generic/generic.nix) {
-  inherit commandLineArgs useVSCodeRipgrep;
+  inherit commandLineArgs; # useVSCodeRipgrep;
   inherit (info) version vscodeVersion;
   pname = "windsurf";
   executableName = "windsurf";
