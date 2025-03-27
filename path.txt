@@ -1,0 +1,1145 @@
+nixos-config/.
+├── nixos-config/checks/checks
+│   └── nixos-config/checks/defaults.nix/defaults.nix
+├── nixos-config/docs/docs
+│   ├── nixos-config/docs/diagrams/diagrams
+│   │   └── nixos-config/docs/diagrams/nix-config.drawio/nix-config.drawio
+│   ├── nixos-config/docs/hyprland.md/hyprland.md
+│   └── nixos-config/docs/secrets.md/secrets.md
+├── nixos-config/env/env
+│   ├── nixos-config/env/accent-email-address/accent-email-address
+│   └── nixos-config/env/accent-email-name/accent-email-name
+├── nixos-config/home/home
+│   ├── nixos-config/home/features/features
+│   │   ├── nixos-config/home/features/accounts/accounts
+│   │   │   └── nixos-config/home/features/accounts/default.nix/default.nix
+│   │   ├── nixos-config/home/features/alacritty/alacritty
+│   │   │   └── nixos-config/home/features/alacritty/default.nix/default.nix
+│   │   ├── nixos-config/home/features/ansible/ansible
+│   │   │   └── nixos-config/home/features/ansible/default.nix/default.nix
+│   │   ├── nixos-config/home/features/atuin/atuin
+│   │   │   └── nixos-config/home/features/atuin/default.nix/default.nix
+│   │   ├── nixos-config/home/features/audio/audio
+│   │   │   ├── nixos-config/home/features/audio/default.nix/default.nix
+│   │   │   ├── nixos-config/home/features/audio/mpris.nix/mpris.nix
+│   │   │   ├── nixos-config/home/features/audio/ncmp.nix/ncmp.nix
+│   │   │   ├── nixos-config/home/features/audio/playerctl.nix/playerctl.nix
+│   │   │   └── nixos-config/home/features/audio/spotify.nix/spotify.nix
+│   │   ├── nixos-config/home/features/bat/bat
+│   │   │   ├── nixos-config/home/features/bat/default.nix/default.nix
+│   │   │   ├── nixos-config/home/features/bat/test.tmTheme/test.tmTheme
+│   │   │   └── nixos-config/home/features/bat/theme.tmTheme.nix/theme.tmTheme.nix
+│   │   ├── nixos-config/home/features/btop/btop
+│   │   │   ├── nixos-config/home/features/btop/default.nix/default.nix
+│   │   │   ├── nixos-config/home/features/btop/theme.theme/theme.theme
+│   │   │   └── nixos-config/home/features/btop/theme.theme.nix/theme.theme.nix
+│   │   ├── nixos-config/home/features/cava/cava
+│   │   │   └── nixos-config/home/features/cava/default.nix/default.nix
+│   │   ├── nixos-config/home/features/chrome/chrome
+│   │   │   └── nixos-config/home/features/chrome/default.nix/default.nix
+│   │   ├── nixos-config/home/features/cli/cli
+│   │   │   ├── nixos-config/home/features/cli/default.nix/default.nix
+│   │   │   ├── nixos-config/home/features/cli/gh.nix/gh.nix
+│   │   │   ├── nixos-config/home/features/cli/jq.nix/jq.nix
+│   │   │   ├── nixos-config/home/features/cli/nixtools.nix/nixtools.nix
+│   │   │   └── nixos-config/home/features/cli/tf.nix/tf.nix
+│   │   ├── nixos-config/home/features/compression/compression
+│   │   │   └── nixos-config/home/features/compression/default.nix/default.nix
+│   │   ├── nixos-config/home/features/cursor/cursor
+│   │   │   └── nixos-config/home/features/cursor/default.nix/default.nix
+│   │   ├── nixos-config/home/features/desktop/desktop
+│   │   │   ├── nixos-config/home/features/desktop/common/common
+│   │   │   │   ├── nixos-config/home/features/desktop/common/default.nix/default.nix
+│   │   │   │   ├── nixos-config/home/features/desktop/common/gtk.nix/gtk.nix
+│   │   │   │   ├── nixos-config/home/features/desktop/common/noti.nix/noti.nix
+│   │   │   │   ├── nixos-config/home/features/desktop/common/pointercursor.nix/pointercursor.nix
+│   │   │   │   ├── nixos-config/home/features/desktop/common/qt.nix/qt.nix
+│   │   │   │   ├── nixos-config/home/features/desktop/common/trayscale.nix/trayscale.nix
+│   │   │   │   ├── nixos-config/home/features/desktop/common/wallpapers.nix/wallpapers.nix
+│   │   │   │   └── nixos-config/home/features/desktop/common/xdg.nix/xdg.nix
+│   │   │   ├── nixos-config/home/features/desktop/gnome/gnome
+│   │   │   │   ├── nixos-config/home/features/desktop/gnome/dconf.nix/dconf.nix
+│   │   │   │   ├── nixos-config/home/features/desktop/gnome/default.nix/default.nix
+│   │   │   │   └── nixos-config/home/features/desktop/gnome/gnome-shell.nix/gnome-shell.nix
+│   │   │   └── nixos-config/home/features/desktop/hyprland/hyprland
+│   │   │       ├── nixos-config/home/features/desktop/hyprland/ags/ags
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/backup
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/assets/assets
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/assets/battery-flash-symbolic.svg/battery-flash-symbolic.svg
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/assets/chat-bubbles-symbolic.svg/chat-bubbles-symbolic.svg
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/assets/controller-symbolic.svg/controller-symbolic.svg
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/assets/controls-symbolic.svg/controls-symbolic.svg
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/assets/dark-mode-symbolic.svg/dark-mode-symbolic.svg
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/assets/hourglass-symbolic.svg/hourglass-symbolic.svg
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/assets/light-mode-symbolic.svg/light-mode-symbolic.svg
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/assets/mixer-symbolic.svg/mixer-symbolic.svg
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/assets/nix-snowflake-symbolic.svg/nix-snowflake-symbolic.svg
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/assets/preferences-desktop-theme-symbolic.svg/preferences-desktop-theme-symbolic.svg
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/assets/processor-symbolic.svg/processor-symbolic.svg
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/assets/terminal-symbolic.svg/terminal-symbolic.svg
+│   │   │       │   │   │   └── nixos-config/home/features/desktop/hyprland/ags/backup/assets/toolbars-symbolic.svg/toolbars-symbolic.svg
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/greeter/greeter
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/greeter/auth.ts/auth.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/greeter/greeter.ts/greeter.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/greeter/session.ts/session.ts
+│   │   │       │   │   │   └── nixos-config/home/features/desktop/hyprland/ags/backup/greeter/statusbar.ts/statusbar.ts
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/lib/lib
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/lib/battery.ts/battery.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/lib/gtk.ts/gtk.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/lib/hyprland.ts/hyprland.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/lib/icons.ts/icons.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/lib/init.ts/init.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/lib/matugen.ts/matugen.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/lib/notifications.ts/notifications.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/lib/option.ts/option.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/lib/session.ts/session.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/lib/tmux.ts/tmux.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/lib/utils.ts/utils.ts
+│   │   │       │   │   │   └── nixos-config/home/features/desktop/hyprland/ags/backup/lib/variables.ts/variables.ts
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/service/service
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/service/asusctl.ts/asusctl.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/service/brightness.ts/brightness.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/service/colorpicker.ts/colorpicker.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/service/nix.ts/nix.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/service/powermenu.ts/powermenu.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/service/screenrecord.ts/screenrecord.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/service/sh.ts/sh.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/service/wallpaper.ts/wallpaper.ts
+│   │   │       │   │   │   └── nixos-config/home/features/desktop/hyprland/ags/backup/service/weather.ts/weather.ts
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/style/style
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/style/mixins/mixins
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/style/mixins/a11y-button.scss/a11y-button.scss
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/style/mixins/button.scss/button.scss
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/style/mixins/floating-widget.scss/floating-widget.scss
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/style/mixins/hidden.scss/hidden.scss
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/style/mixins/media.scss/media.scss
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/style/mixins/scrollable.scss/scrollable.scss
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/style/mixins/slider.scss/slider.scss
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/style/mixins/spacing.scss/spacing.scss
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/style/mixins/switch.scss/switch.scss
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/style/mixins/unset.scss/unset.scss
+│   │   │       │   │   │   │   └── nixos-config/home/features/desktop/hyprland/ags/backup/style/mixins/widget.scss/widget.scss
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/style/widgets/widgets
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/style/widgets/bar.scss/bar.scss
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/style/widgets/datemenu.scss/datemenu.scss
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/style/widgets/greeter.scss/greeter.scss
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/style/widgets/launcher.scss/launcher.scss
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/style/widgets/notifications.scss/notifications.scss
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/style/widgets/osd.scss/osd.scss
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/style/widgets/overview.scss/overview.scss
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/style/widgets/powermenu.scss/powermenu.scss
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/style/widgets/quicksettings.scss/quicksettings.scss
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/style/widgets/screencorner.scss/screencorner.scss
+│   │   │       │   │   │   │   └── nixos-config/home/features/desktop/hyprland/ags/backup/style/widgets/settingsdialog.scss/settingsdialog.scss
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/style/extra.scss/extra.scss
+│   │   │       │   │   │   └── nixos-config/home/features/desktop/hyprland/ags/backup/style/style.ts/style.ts
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/widget
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/bar/bar
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/bar/buttons/buttons
+│   │   │       │   │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/bar/buttons/BatteryBar.ts/BatteryBar.ts
+│   │   │       │   │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/bar/buttons/ColorPicker.ts/ColorPicker.ts
+│   │   │       │   │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/bar/buttons/Date.ts/Date.ts
+│   │   │       │   │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/bar/buttons/Launcher.ts/Launcher.ts
+│   │   │       │   │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/bar/buttons/Media.ts/Media.ts
+│   │   │       │   │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/bar/buttons/Messages.ts/Messages.ts
+│   │   │       │   │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/bar/buttons/PowerMenu.ts/PowerMenu.ts
+│   │   │       │   │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/bar/buttons/ScreenRecord.ts/ScreenRecord.ts
+│   │   │       │   │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/bar/buttons/SystemIndicators.ts/SystemIndicators.ts
+│   │   │       │   │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/bar/buttons/SysTray.ts/SysTray.ts
+│   │   │       │   │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/bar/buttons/Taskbar.ts/Taskbar.ts
+│   │   │       │   │   │   │   │   └── nixos-config/home/features/desktop/hyprland/ags/backup/widget/bar/buttons/Workspaces.ts/Workspaces.ts
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/bar/Bar.ts/Bar.ts
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/bar/PanelButton.ts/PanelButton.ts
+│   │   │       │   │   │   │   └── nixos-config/home/features/desktop/hyprland/ags/backup/widget/bar/ScreenCorners.ts/ScreenCorners.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/datemenu/datemenu
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/datemenu/DateColumn.ts/DateColumn.ts
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/datemenu/DateMenu.ts/DateMenu.ts
+│   │   │       │   │   │   │   └── nixos-config/home/features/desktop/hyprland/ags/backup/widget/datemenu/NotificationColumn.ts/NotificationColumn.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/desktop/desktop
+│   │   │       │   │   │   │   └── nixos-config/home/features/desktop/hyprland/ags/backup/widget/desktop/Desktop.ts/Desktop.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/launcher/launcher
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/launcher/AppLauncher.ts/AppLauncher.ts
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/launcher/Launcher.ts/Launcher.ts
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/launcher/NixRun.ts/NixRun.ts
+│   │   │       │   │   │   │   └── nixos-config/home/features/desktop/hyprland/ags/backup/widget/launcher/ShRun.ts/ShRun.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/notifications/notifications
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/notifications/Notification.ts/Notification.ts
+│   │   │       │   │   │   │   └── nixos-config/home/features/desktop/hyprland/ags/backup/widget/notifications/NotificationPopups.ts/NotificationPopups.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/osd/osd
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/osd/OSD.ts/OSD.ts
+│   │   │       │   │   │   │   └── nixos-config/home/features/desktop/hyprland/ags/backup/widget/osd/Progress.ts/Progress.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/overview/overview
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/overview/Overview.ts/Overview.ts
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/overview/Window.ts/Window.ts
+│   │   │       │   │   │   │   └── nixos-config/home/features/desktop/hyprland/ags/backup/widget/overview/Workspace.ts/Workspace.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/powermenu/powermenu
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/powermenu/PowerMenu.ts/PowerMenu.ts
+│   │   │       │   │   │   │   └── nixos-config/home/features/desktop/hyprland/ags/backup/widget/powermenu/Verification.ts/Verification.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/quicksettings/quicksettings
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/quicksettings/widgets/widgets
+│   │   │       │   │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/quicksettings/widgets/Bluetooth.ts/Bluetooth.ts
+│   │   │       │   │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/quicksettings/widgets/Brightness.ts/Brightness.ts
+│   │   │       │   │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/quicksettings/widgets/DarkMode.ts/DarkMode.ts
+│   │   │       │   │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/quicksettings/widgets/DND.ts/DND.ts
+│   │   │       │   │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/quicksettings/widgets/Header.ts/Header.ts
+│   │   │       │   │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/quicksettings/widgets/Media.ts/Media.ts
+│   │   │       │   │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/quicksettings/widgets/MicMute.ts/MicMute.ts
+│   │   │       │   │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/quicksettings/widgets/Network.ts/Network.ts
+│   │   │       │   │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/quicksettings/widgets/PowerProfile.ts/PowerProfile.ts
+│   │   │       │   │   │   │   │   └── nixos-config/home/features/desktop/hyprland/ags/backup/widget/quicksettings/widgets/Volume.ts/Volume.ts
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/quicksettings/QuickSettings.ts/QuickSettings.ts
+│   │   │       │   │   │   │   └── nixos-config/home/features/desktop/hyprland/ags/backup/widget/quicksettings/ToggleButton.ts/ToggleButton.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/settings/settings
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/settings/Group.ts/Group.ts
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/settings/layout.ts/layout.ts
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/settings/Page.ts/Page.ts
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/settings/Row.ts/Row.ts
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/settings/Setter.ts/Setter.ts
+│   │   │       │   │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/settings/SettingsDialog.ts/SettingsDialog.ts
+│   │   │       │   │   │   │   └── nixos-config/home/features/desktop/hyprland/ags/backup/widget/settings/Wallpaper.ts/Wallpaper.ts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/widget/PopupWindow.ts/PopupWindow.ts
+│   │   │       │   │   │   └── nixos-config/home/features/desktop/hyprland/ags/backup/widget/RegularWindow.ts/RegularWindow.ts
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/config.js/config.js
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/default.nix/default.nix
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/greeter.js/greeter.js
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/main.ts/main.ts
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/options.ts/options.ts
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/ags/backup/package.json/package.json
+│   │   │       │   │   └── nixos-config/home/features/desktop/hyprland/ags/backup/tsconfig.json/tsconfig.json
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/ags/config/config
+│   │   │       │   └── nixos-config/home/features/desktop/hyprland/ags/default.nix/default.nix
+│   │   │       ├── nixos-config/home/features/desktop/hyprland/cliphist/cliphist
+│   │   │       │   └── nixos-config/home/features/desktop/hyprland/cliphist/default.nix/default.nix
+│   │   │       ├── nixos-config/home/features/desktop/hyprland/hypr/hypr
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/conf
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/animations/animations
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/animations/animations-classic.conf/animations-classic.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/animations/animations-dynamic.conf/animations-dynamic.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/animations/animations-fast.conf/animations-fast.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/animations/animations-high.conf/animations-high.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/animations/animations-moving.conf/animations-moving.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/animations/default.conf/default.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/animations/disabled.conf/disabled.conf
+│   │   │       │   │   │   └── nixos-config/home/features/desktop/hyprland/hypr/conf/animations/standard.conf/standard.conf
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/decorations/decorations
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/decorations/default.conf/default.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/decorations/no-rounding-more-blur.conf/no-rounding-more-blur.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/decorations/no-rounding.conf/no-rounding.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/decorations/rounding-all-blur-no-shadows.conf/rounding-all-blur-no-shadows.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/decorations/rounding-all-blur.conf/rounding-all-blur.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/decorations/rounding-more-blur.conf/rounding-more-blur.conf
+│   │   │       │   │   │   └── nixos-config/home/features/desktop/hyprland/hypr/conf/decorations/rounding.conf/rounding.conf
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/environments/environments
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/environments/default.conf/default.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/environments/kvm.conf/kvm.conf
+│   │   │       │   │   │   └── nixos-config/home/features/desktop/hyprland/hypr/conf/environments/nvidia.conf/nvidia.conf
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/keybindings/keybindings
+│   │   │       │   │   │   └── nixos-config/home/features/desktop/hyprland/hypr/conf/keybindings/default.conf/default.conf
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/layouts/layouts
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/layouts/default.conf/default.conf
+│   │   │       │   │   │   └── nixos-config/home/features/desktop/hyprland/hypr/conf/layouts/laptop.conf/laptop.conf
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/monitors/monitors
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/monitors/1366x768.conf/1366x768.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/monitors/1440x1080.conf/1440x1080.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/monitors/1600x900.conf/1600x900.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/monitors/1920x1080.conf/1920x1080.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/monitors/1920x1200.conf/1920x1200.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/monitors/2560x1440.conf/2560x1440.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/monitors/2560x1440@120.conf/2560x1440@120.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/monitors/2560x1440@120x125.conf/2560x1440@120x125.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/monitors/3440x1440.conf/3440x1440.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/monitors/default.conf/default.conf
+│   │   │       │   │   │   └── nixos-config/home/features/desktop/hyprland/hypr/conf/monitors/highres.conf/highres.conf
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/windowrules/windowrules
+│   │   │       │   │   │   └── nixos-config/home/features/desktop/hyprland/hypr/conf/windowrules/default.conf/default.conf
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/windows/windows
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/windows/border-1-reverse.conf/border-1-reverse.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/windows/border-1.conf/border-1.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/windows/border-2-reverse.conf/border-2-reverse.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/windows/border-2.conf/border-2.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/windows/border-3-reverse.conf/border-3-reverse.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/windows/border-3.conf/border-3.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/windows/border-4-reverse.conf/border-4-reverse.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/windows/border-4.conf/border-4.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/windows/default.conf/default.conf
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/windows/no-border-more-gaps.conf/no-border-more-gaps.conf
+│   │   │       │   │   │   └── nixos-config/home/features/desktop/hyprland/hypr/conf/windows/no-border.conf/no-border.conf
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/workspaces/workspaces
+│   │   │       │   │   │   └── nixos-config/home/features/desktop/hyprland/hypr/conf/workspaces/default.conf/default.conf
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/animation.conf/animation.conf
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/autostart.conf/autostart.conf
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/cursor.conf/cursor.conf
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/custom.conf/custom.conf
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/decoration.conf/decoration.conf
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/environment.conf/environment.conf
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/keybinding.conf/keybinding.conf
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/keyboard.conf/keyboard.conf
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/layout.conf/layout.conf
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/misc.conf/misc.conf
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/ml4w.conf/ml4w.conf
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/monitor.conf/monitor.conf
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/window.conf/window.conf
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/conf/windowrule.conf/windowrule.conf
+│   │   │       │   │   └── nixos-config/home/features/desktop/hyprland/hypr/conf/workspace.conf/workspace.conf
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/hypr/effects/effects
+│   │   │       │   │   └── nixos-config/home/features/desktop/hyprland/hypr/effects/wallpaper/wallpaper
+│   │   │       │   │       ├── nixos-config/home/features/desktop/hyprland/hypr/effects/wallpaper/blackwhite/blackwhite
+│   │   │       │   │       ├── nixos-config/home/features/desktop/hyprland/hypr/effects/wallpaper/blackwhite-blur/blackwhite-blur
+│   │   │       │   │       ├── nixos-config/home/features/desktop/hyprland/hypr/effects/wallpaper/blackwhite-brightness40/blackwhite-brightness40
+│   │   │       │   │       ├── nixos-config/home/features/desktop/hyprland/hypr/effects/wallpaper/blackwhite-brightness60/blackwhite-brightness60
+│   │   │       │   │       ├── nixos-config/home/features/desktop/hyprland/hypr/effects/wallpaper/blackwhite-brightness80/blackwhite-brightness80
+│   │   │       │   │       ├── nixos-config/home/features/desktop/hyprland/hypr/effects/wallpaper/blur1/blur1
+│   │   │       │   │       ├── nixos-config/home/features/desktop/hyprland/hypr/effects/wallpaper/blur1-brightness40/blur1-brightness40
+│   │   │       │   │       ├── nixos-config/home/features/desktop/hyprland/hypr/effects/wallpaper/blur1-brightness60/blur1-brightness60
+│   │   │       │   │       ├── nixos-config/home/features/desktop/hyprland/hypr/effects/wallpaper/blur1-brightness80/blur1-brightness80
+│   │   │       │   │       ├── nixos-config/home/features/desktop/hyprland/hypr/effects/wallpaper/blur2/blur2
+│   │   │       │   │       ├── nixos-config/home/features/desktop/hyprland/hypr/effects/wallpaper/negate/negate
+│   │   │       │   │       ├── nixos-config/home/features/desktop/hyprland/hypr/effects/wallpaper/negate-brightness40/negate-brightness40
+│   │   │       │   │       ├── nixos-config/home/features/desktop/hyprland/hypr/effects/wallpaper/negate-brightness60/negate-brightness60
+│   │   │       │   │       └── nixos-config/home/features/desktop/hyprland/hypr/effects/wallpaper/negate-brightness80/negate-brightness80
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/scripts
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/login/login
+│   │   │       │   │   │   └── nixos-config/home/features/desktop/hyprland/hypr/scripts/login/issue/issue
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/settings
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/sddm/sddm
+│   │   │       │   │   │   │   └── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/sddm/theme.tpl/theme.tpl
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/ai.sh/ai.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/aur.sh/aur.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/blur.sh/blur.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/browser.sh/browser.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/calculator.sh/calculator.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/calendar.sh/calendar.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/dotfiles-folder.sh/dotfiles-folder.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/dunst_position.sh/dunst_position.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/editor.sh/editor.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/email.sh/email.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/emojipicker.sh/emojipicker.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/eww-monitor.sh/eww-monitor.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/filemanager.sh/filemanager.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/hypridle_dpms_timeout.sh/hypridle_dpms_timeout.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/hypridle_hyprlock_timeout.sh/hypridle_hyprlock_timeout.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/hypridle_suspend_timeout.sh/hypridle_suspend_timeout.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/hyprpaper.tpl/hyprpaper.tpl
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/hyprpicker.sh/hyprpicker.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/hyprshade.sh/hyprshade.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/ml4w-sidebar.sh/ml4w-sidebar.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/networkmanager.sh/networkmanager.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/printer-drivers.sh/printer-drivers.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/rofi-border-radius.rasi/rofi-border-radius.rasi
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/rofi-border.rasi/rofi-border.rasi
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/rofi-font.rasi/rofi-font.rasi
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/rofi_bordersize.sh/rofi_bordersize.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/screenshot-editor.sh/screenshot-editor.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/screenshot-filename.sh/screenshot-filename.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/screenshot-folder.sh/screenshot-folder.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/software.sh/software.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/system-monitor.sh/system-monitor.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/terminal.sh/terminal.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/wallpaper-automation.sh/wallpaper-automation.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/wallpaper-effect.sh/wallpaper-effect.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/wallpaper-engine.sh/wallpaper-engine.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/wallpaper-folder.sh/wallpaper-folder.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/waybar-quicklinks.json/waybar-quicklinks.json
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/waybar_appmenu.sh/waybar_appmenu.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/waybar_backlight.sh/waybar_backlight.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/waybar_chatgpt.sh/waybar_chatgpt.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/waybar_custom_timedateformat.sh/waybar_custom_timedateformat.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/waybar_dateformat.sh/waybar_dateformat.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/waybar_network.sh/waybar_network.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/waybar_quicklinks.sh/waybar_quicklinks.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/waybar_screenlock.sh/waybar_screenlock.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/waybar_settings.sh/waybar_settings.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/waybar_systray.sh/waybar_systray.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/waybar_taskbar.sh/waybar_taskbar.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/waybar_timeformat.sh/waybar_timeformat.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/waybar_timezone.sh/waybar_timezone.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/waybar_toggle.sh/waybar_toggle.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/waybar_window.sh/waybar_window.sh
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/waybar_workspaces.sh/waybar_workspaces.sh
+│   │   │       │   │   │   └── nixos-config/home/features/desktop/hyprland/hypr/scripts/settings/wlogout-parameters.sh/wlogout-parameters.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/tpl/tpl
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/binds.py/binds.py
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/cleanup.sh/cleanup.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/dontkillsteam.sh/dontkillsteam.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/figlet.sh/figlet.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/gamemode.sh/gamemode.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/grimblast.sh/grimblast.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/gtk.py/gtk.py
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/gtk.sh/gtk.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/hypridle.sh/hypridle.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/hyprshade.sh/hyprshade.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/init-wallpaper-engine.sh/init-wallpaper-engine.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/keybindings.sh/keybindings.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/loadconfig.sh/loadconfig.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/moveTo.sh/moveTo.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/nm-applet.sh/nm-applet.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/power-big.sh/power-big.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/power.sh/power.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/restart-hypridle.sh/restart-hypridle.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/sddm-wallpaper.sh/sddm-wallpaper.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/shell.sh/shell.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/systeminfo.sh/systeminfo.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/thunarterminal.sh/thunarterminal.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/toggle-animations.sh/toggle-animations.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/toggleallfloat.sh/toggleallfloat.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/update-checker.sh/update-checker.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/wallpaper-automation.sh/wallpaper-automation.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/wallpaper-cache.sh/wallpaper-cache.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/wallpaper-effects.sh/wallpaper-effects.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/wallpaper-restore.sh/wallpaper-restore.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/wallpaper.sh/wallpaper.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/wlogout.sh/wlogout.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/wttr.sh/wttr.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/scripts/xdg.sh/xdg.sh
+│   │   │       │   │   └── nixos-config/home/features/desktop/hyprland/hypr/scripts/yt.sh/yt.sh
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/hypr/shaders/shaders
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/shaders/blue-light-filter-25.glsl/blue-light-filter-25.glsl
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/shaders/blue-light-filter-50.glsl/blue-light-filter-50.glsl
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/hypr/shaders/blue-light-filter-75.glsl/blue-light-filter-75.glsl
+│   │   │       │   │   └── nixos-config/home/features/desktop/hyprland/hypr/shaders/invert-colors.glsl/invert-colors.glsl
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/hypr/basic-binds.nix/basic-binds.nix
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/hypr/colors-hyprland.nix/colors-hyprland.nix
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/hypr/default.nix/default.nix
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/hypr/hyprbars.nix/hyprbars.nix
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/hypr/hyprland-vnc.nix/hyprland-vnc.nix
+│   │   │       │   └── nixos-config/home/features/desktop/hyprland/hypr/hyprland.conf/hyprland.conf
+│   │   │       ├── nixos-config/home/features/desktop/hyprland/hypridle/hypridle
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/hypridle/default.nix/default.nix
+│   │   │       │   └── nixos-config/home/features/desktop/hyprland/hypridle/hypridle.conf/hypridle.conf
+│   │   │       ├── nixos-config/home/features/desktop/hyprland/hyprlock/hyprlock
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/hyprlock/default.nix/default.nix
+│   │   │       │   └── nixos-config/home/features/desktop/hyprland/hyprlock/hyprlock.conf/hyprlock.conf
+│   │   │       ├── nixos-config/home/features/desktop/hyprland/hyprpanel/hyprpanel
+│   │   │       │   └── nixos-config/home/features/desktop/hyprland/hyprpanel/default.nix/default.nix
+│   │   │       ├── nixos-config/home/features/desktop/hyprland/hyprpaper/hyprpaper
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/hyprpaper/default.nix/default.nix
+│   │   │       │   └── nixos-config/home/features/desktop/hyprland/hyprpaper/hyprpaper.conf/hyprpaper.conf
+│   │   │       ├── nixos-config/home/features/desktop/hyprland/rofi/rofi
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/rofi/applets/applets
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/applets/shared/shared
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/applets/type-1/type-1
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/applets/type-1/style-1.rasi/style-1.rasi
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/applets/type-1/style-2.rasi/style-2.rasi
+│   │   │       │   │   │   └── nixos-config/home/features/desktop/hyprland/rofi/applets/type-1/style-3.rasi/style-3.rasi
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/applets/type-2/type-2
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/applets/type-2/style-1.rasi/style-1.rasi
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/applets/type-2/style-2.rasi/style-2.rasi
+│   │   │       │   │   │   └── nixos-config/home/features/desktop/hyprland/rofi/applets/type-2/style-3.rasi/style-3.rasi
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/applets/type-3/type-3
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/applets/type-3/style-1.rasi/style-1.rasi
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/applets/type-3/style-2.rasi/style-2.rasi
+│   │   │       │   │   │   └── nixos-config/home/features/desktop/hyprland/rofi/applets/type-3/style-3.rasi/style-3.rasi
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/applets/type-4/type-4
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/applets/type-4/style-1.rasi/style-1.rasi
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/applets/type-4/style-2.rasi/style-2.rasi
+│   │   │       │   │   │   └── nixos-config/home/features/desktop/hyprland/rofi/applets/type-4/style-3.rasi/style-3.rasi
+│   │   │       │   │   └── nixos-config/home/features/desktop/hyprland/rofi/applets/type-5/type-5
+│   │   │       │   │       ├── nixos-config/home/features/desktop/hyprland/rofi/applets/type-5/style-1.rasi/style-1.rasi
+│   │   │       │   │       ├── nixos-config/home/features/desktop/hyprland/rofi/applets/type-5/style-2.rasi/style-2.rasi
+│   │   │       │   │       └── nixos-config/home/features/desktop/hyprland/rofi/applets/type-5/style-3.rasi/style-3.rasi
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/rofi/powermenu/powermenu
+│   │   │       │   │   └── nixos-config/home/features/desktop/hyprland/rofi/powermenu/type-4/type-4
+│   │   │       │   │       ├── nixos-config/home/features/desktop/hyprland/rofi/powermenu/type-4/shared/shared
+│   │   │       │   │       │   ├── nixos-config/home/features/desktop/hyprland/rofi/powermenu/type-4/shared/colors.rasi/colors.rasi
+│   │   │       │   │       │   ├── nixos-config/home/features/desktop/hyprland/rofi/powermenu/type-4/shared/confirm.rasi/confirm.rasi
+│   │   │       │   │       │   └── nixos-config/home/features/desktop/hyprland/rofi/powermenu/type-4/shared/fonts.rasi/fonts.rasi
+│   │   │       │   │       └── nixos-config/home/features/desktop/hyprland/rofi/powermenu/type-4/style-3.rasi/style-3.rasi
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/rofi/scripts/scripts
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/scripts/appasroot.sh/appasroot.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/scripts/apps.sh/apps.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/scripts/battery.sh/battery.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/scripts/brightness.sh/brightness.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/scripts/cliphist.sh/cliphist.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/scripts/default.nix/default.nix
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/scripts/mpd.sh/mpd.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/scripts/power-big.sh/power-big.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/scripts/powermenu.sh/powermenu.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/scripts/powermenu2.sh/powermenu2.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/scripts/quicklinks.sh/quicklinks.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/scripts/rofi-code.sh/rofi-code.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/scripts/rofi-launcher.sh/rofi-launcher.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/scripts/screenshot.sh/screenshot.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/scripts/screenshot2.sh/screenshot2.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/scripts/screenshot3.sh/screenshot3.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/scripts/volume.sh/volume.sh
+│   │   │       │   │   └── nixos-config/home/features/desktop/hyprland/rofi/scripts/web-search.sh/web-search.sh
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/rofi/style/style
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/style/shared/shared
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/style/shared/border.rasi/border.rasi
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/style/shared/colors.rasi/colors.rasi
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/style/shared/confirm-big.rasi/confirm-big.rasi
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/style/shared/confirm.rasi/confirm.rasi
+│   │   │       │   │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/style/shared/fonts.rasi/fonts.rasi
+│   │   │       │   │   │   └── nixos-config/home/features/desktop/hyprland/rofi/style/shared/yoffset.rasi/yoffset.rasi
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/style/app-toggle.rasi/app-toggle.rasi
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/style/cliphist.rasi/cliphist.rasi
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/style/config-code.rasi/config-code.rasi
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/style/config-emoji.rasi/config-emoji.rasi
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/style/config-long.rasi/config-long.rasi
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/style/config2.rasi/config2.rasi
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/style/fullscreen-preview.rasi/fullscreen-preview.rasi
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/style/launcher-center-alt1.rasi/launcher-center-alt1.rasi
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/style/launcher-center-alt2.rasi/launcher-center-alt2.rasi
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/style/launcher-center.rasi/launcher-center.rasi
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/style/launcher-full.rasi/launcher-full.rasi
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/style/launcher-long.rasi/launcher-long.rasi
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/style/power-big.rasi/power-big.rasi
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/rofi/style/power-small-round.rasi/power-small-round.rasi
+│   │   │       │   │   └── nixos-config/home/features/desktop/hyprland/rofi/style/power-small-square.rasi/power-small-square.rasi
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/rofi/colors.rasi.nix/colors.rasi.nix
+│   │   │       │   └── nixos-config/home/features/desktop/hyprland/rofi/default.nix/default.nix
+│   │   │       ├── nixos-config/home/features/desktop/hyprland/scripts/scripts
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/scripts/cliphist-rofi-copy/cliphist-rofi-copy
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/scripts/cliphist-rofi-img-copy/cliphist-rofi-img-copy
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/scripts/hyprland-workspace/hyprland-workspace
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/scripts/list-hypr-bindings/list-hypr-bindings
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/scripts/screenshooting.sh/screenshooting.sh
+│   │   │       │   └── nixos-config/home/features/desktop/hyprland/scripts/switch-workspace.sh/switch-workspace.sh
+│   │   │       ├── nixos-config/home/features/desktop/hyprland/swaync/swaync
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/swaync/default.nix/default.nix
+│   │   │       │   └── nixos-config/home/features/desktop/hyprland/swaync/style.css.nix/style.css.nix
+│   │   │       ├── nixos-config/home/features/desktop/hyprland/wal/wal
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/templates
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors/colors
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-alacritty.toml/colors-alacritty.toml
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-base16.yml/colors-base16.yml
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-cava/colors-cava
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-discord.css/colors-discord.css
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-hyprland.conf/colors-hyprland.conf
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-kitty.conf/colors-kitty.conf
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-konsole.colorscheme/colors-konsole.colorscheme
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-material-you.j2/colors-material-you.j2
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-oomox/colors-oomox
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-qutebrowser.yml/colors-qutebrowser.yml
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-rofi-dark.rasi/colors-rofi-dark.rasi
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-rofi-light.rasi/colors-rofi-light.rasi
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-rofi-set-colors.rasi/colors-rofi-set-colors.rasi
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-speedcrunch.json/colors-speedcrunch.json
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-sway/colors-sway
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-swaync.css/colors-swaync.css
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-themer.js/colors-themer.js
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-tilix.json/colors-tilix.json
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-tty.sh/colors-tty.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-vscode.json/colors-vscode.json
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-wal-dmenu.h/colors-wal-dmenu.h
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-wal-dwm.h/colors-wal-dwm.h
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-wal-st.h/colors-wal-st.h
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-wal-tabbed.h/colors-wal-tabbed.h
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-wal-vim.vim/colors-wal-vim.vim
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-waybar.css/colors-waybar.css
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-westerm.toml/colors-westerm.toml
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-wlogout.css/colors-wlogout.css
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors-zathura/colors-zathura
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors.css/colors.css
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors.hs/colors.hs
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors.json/colors.json
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors.scss/colors.scss
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors.sh/colors.sh
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors.styl/colors.styl
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors.Xresources/colors.Xresources
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/templates/colors.yml/colors.yml
+│   │   │       │   │   └── nixos-config/home/features/desktop/hyprland/wal/templates/README.md/README.md
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/wal/themes/themes
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/themes/catppuccin-frappe.json/catppuccin-frappe.json
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/themes/catppuccin-latte.json/catppuccin-latte.json
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/themes/catppuccin-macchiato.json/catppuccin-macchiato.json
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wal/themes/catppuccin-mocha.json/catppuccin-mocha.json
+│   │   │       │   │   └── nixos-config/home/features/desktop/hyprland/wal/themes/dracula.json/dracula.json
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/wal/default.nix/default.nix
+│   │   │       │   └── nixos-config/home/features/desktop/hyprland/wal/wallust.toml/wallust.toml
+│   │   │       ├── nixos-config/home/features/desktop/hyprland/waybar/waybar
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/waybar/default.nix/default.nix
+│   │   │       │   └── nixos-config/home/features/desktop/hyprland/waybar/style.nix/style.nix
+│   │   │       ├── nixos-config/home/features/desktop/hyprland/waypaper/waypaper
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/waypaper/config.ini/config.ini
+│   │   │       │   └── nixos-config/home/features/desktop/hyprland/waypaper/default.nix/default.nix
+│   │   │       ├── nixos-config/home/features/desktop/hyprland/wlogout/wlogout
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/wlogout/icons/icons
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wlogout/icons/hibernate.png/hibernate.png
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wlogout/icons/lock.png/lock.png
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wlogout/icons/logout.png/logout.png
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wlogout/icons/reboot.png/reboot.png
+│   │   │       │   │   ├── nixos-config/home/features/desktop/hyprland/wlogout/icons/shutdown.png/shutdown.png
+│   │   │       │   │   └── nixos-config/home/features/desktop/hyprland/wlogout/icons/suspend.png/suspend.png
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/wlogout/colors-wlogout.nix/colors-wlogout.nix
+│   │   │       │   ├── nixos-config/home/features/desktop/hyprland/wlogout/default.nix/default.nix
+│   │   │       │   └── nixos-config/home/features/desktop/hyprland/wlogout/style.css/style.css
+│   │   │       └── nixos-config/home/features/desktop/hyprland/default.nix/default.nix
+│   │   ├── nixos-config/home/features/development/development
+│   │   │   ├── nixos-config/home/features/development/build.nix/build.nix
+│   │   │   ├── nixos-config/home/features/development/default.nix/default.nix
+│   │   │   ├── nixos-config/home/features/development/desktop-tools.nix/desktop-tools.nix
+│   │   │   ├── nixos-config/home/features/development/go.nix/go.nix
+│   │   │   ├── nixos-config/home/features/development/grpc.nix/grpc.nix
+│   │   │   ├── nixos-config/home/features/development/js.nix/js.nix
+│   │   │   ├── nixos-config/home/features/development/lua.nix/lua.nix
+│   │   │   ├── nixos-config/home/features/development/protobuf.nix/protobuf.nix
+│   │   │   ├── nixos-config/home/features/development/python.nix/python.nix
+│   │   │   ├── nixos-config/home/features/development/rust.nix/rust.nix
+│   │   │   └── nixos-config/home/features/development/sql.nix/sql.nix
+│   │   ├── nixos-config/home/features/discord/discord
+│   │   │   ├── nixos-config/home/features/discord/custom.css/custom.css
+│   │   │   └── nixos-config/home/features/discord/default.nix/default.nix
+│   │   ├── nixos-config/home/features/docs/docs
+│   │   │   ├── nixos-config/home/features/docs/default.nix/default.nix
+│   │   │   ├── nixos-config/home/features/docs/navi.nix/navi.nix
+│   │   │   └── nixos-config/home/features/docs/tealdeer.nix/tealdeer.nix
+│   │   ├── nixos-config/home/features/dolphin/dolphin
+│   │   │   └── nixos-config/home/features/dolphin/default.nix/default.nix
+│   │   ├── nixos-config/home/features/dotfiles/dotfiles
+│   │   │   └── nixos-config/home/features/dotfiles/default.nix/default.nix
+│   │   ├── nixos-config/home/features/eza/eza
+│   │   │   ├── nixos-config/home/features/eza/default.nix/default.nix
+│   │   │   ├── nixos-config/home/features/eza/theme.yml/theme.yml
+│   │   │   └── nixos-config/home/features/eza/theme.yml.nix/theme.yml.nix
+│   │   ├── nixos-config/home/features/fastfetch/fastfetch
+│   │   │   ├── nixos-config/home/features/fastfetch/assets/assets
+│   │   │   │   └── nixos-config/home/features/fastfetch/assets/nixos.png/nixos.png
+│   │   │   └── nixos-config/home/features/fastfetch/default.nix/default.nix
+│   │   ├── nixos-config/home/features/fd/fd
+│   │   │   └── nixos-config/home/features/fd/default.nix/default.nix
+│   │   ├── nixos-config/home/features/firefox/firefox
+│   │   │   └── nixos-config/home/features/firefox/default.nix/default.nix
+│   │   ├── nixos-config/home/features/fonts/fonts
+│   │   │   └── nixos-config/home/features/fonts/default.nix/default.nix
+│   │   ├── nixos-config/home/features/fzf/fzf
+│   │   │   ├── nixos-config/home/features/fzf/scripts/scripts
+│   │   │   │   ├── nixos-config/home/features/fzf/scripts/dkr/dkr
+│   │   │   │   ├── nixos-config/home/features/fzf/scripts/fv/fv
+│   │   │   │   ├── nixos-config/home/features/fzf/scripts/fzf-git/fzf-git
+│   │   │   │   ├── nixos-config/home/features/fzf/scripts/fzmv/fzmv
+│   │   │   │   ├── nixos-config/home/features/fzf/scripts/fztop/fztop
+│   │   │   │   ├── nixos-config/home/features/fzf/scripts/gitup/gitup
+│   │   │   │   ├── nixos-config/home/features/fzf/scripts/igr/igr
+│   │   │   │   ├── nixos-config/home/features/fzf/scripts/rgf/rgf
+│   │   │   │   ├── nixos-config/home/features/fzf/scripts/sshget/sshget
+│   │   │   │   ├── nixos-config/home/features/fzf/scripts/sysz/sysz
+│   │   │   │   └── nixos-config/home/features/fzf/scripts/wifiz/wifiz
+│   │   │   └── nixos-config/home/features/fzf/default.nix/default.nix
+│   │   ├── nixos-config/home/features/games/games
+│   │   │   ├── nixos-config/home/features/games/default.nix/default.nix
+│   │   │   ├── nixos-config/home/features/games/dolphinemu.nix/dolphinemu.nix
+│   │   │   ├── nixos-config/home/features/games/factorio.nix/factorio.nix
+│   │   │   ├── nixos-config/home/features/games/gamescope.nix/gamescope.nix
+│   │   │   ├── nixos-config/home/features/games/heroic.nix/heroic.nix
+│   │   │   ├── nixos-config/home/features/games/lutris.nix/lutris.nix
+│   │   │   └── nixos-config/home/features/games/steam.nix/steam.nix
+│   │   ├── nixos-config/home/features/ghostty/ghostty
+│   │   │   ├── nixos-config/home/features/ghostty/default.nix/default.nix
+│   │   │   └── nixos-config/home/features/ghostty/theme.conf.nix/theme.conf.nix
+│   │   ├── nixos-config/home/features/git/git
+│   │   │   └── nixos-config/home/features/git/default.nix/default.nix
+│   │   ├── nixos-config/home/features/imv/imv
+│   │   │   └── nixos-config/home/features/imv/default.nix/default.nix
+│   │   ├── nixos-config/home/features/kdeconnect/kdeconnect
+│   │   │   └── nixos-config/home/features/kdeconnect/default.nix/default.nix
+│   │   ├── nixos-config/home/features/kitty/kitty
+│   │   │   └── nixos-config/home/features/kitty/default.nix/default.nix
+│   │   ├── nixos-config/home/features/kodi/kodi
+│   │   │   └── nixos-config/home/features/kodi/default.nix/default.nix
+│   │   ├── nixos-config/home/features/kubernetes/kubernetes
+│   │   │   ├── nixos-config/home/features/kubernetes/default.nix/default.nix
+│   │   │   └── nixos-config/home/features/kubernetes/k9s.nix/k9s.nix
+│   │   ├── nixos-config/home/features/lazygit/lazygit
+│   │   │   └── nixos-config/home/features/lazygit/default.nix/default.nix
+│   │   ├── nixos-config/home/features/media/media
+│   │   │   ├── nixos-config/home/features/media/aria.nix/aria.nix
+│   │   │   ├── nixos-config/home/features/media/default.nix/default.nix
+│   │   │   ├── nixos-config/home/features/media/freetube.nix/freetube.nix
+│   │   │   ├── nixos-config/home/features/media/gstreamer.nix/gstreamer.nix
+│   │   │   ├── nixos-config/home/features/media/mpv.nix/mpv.nix
+│   │   │   ├── nixos-config/home/features/media/obs.nix/obs.nix
+│   │   │   └── nixos-config/home/features/media/yt-dlp.nix/yt-dlp.nix
+│   │   ├── nixos-config/home/features/multiviewer/multiviewer
+│   │   │   └── nixos-config/home/features/multiviewer/default.nix/default.nix
+│   │   ├── nixos-config/home/features/networking-utils/networking-utils
+│   │   │   └── nixos-config/home/features/networking-utils/default.nix/default.nix
+│   │   ├── nixos-config/home/features/nixvim/nixvim
+│   │   │   ├── nixos-config/home/features/nixvim/plugins/plugins
+│   │   │   │   ├── nixos-config/home/features/nixvim/plugins/cmp/cmp
+│   │   │   │   │   ├── nixos-config/home/features/nixvim/plugins/cmp/autopairs.nix/autopairs.nix
+│   │   │   │   │   ├── nixos-config/home/features/nixvim/plugins/cmp/cmp-copilot.nix/cmp-copilot.nix
+│   │   │   │   │   ├── nixos-config/home/features/nixvim/plugins/cmp/cmp.nix/cmp.nix
+│   │   │   │   │   └── nixos-config/home/features/nixvim/plugins/cmp/lspkind.nix/lspkind.nix
+│   │   │   │   ├── nixos-config/home/features/nixvim/plugins/editor/editor
+│   │   │   │   │   ├── nixos-config/home/features/nixvim/plugins/editor/copilot-chat.nix/copilot-chat.nix
+│   │   │   │   │   ├── nixos-config/home/features/nixvim/plugins/editor/harpoon.nix/harpoon.nix
+│   │   │   │   │   ├── nixos-config/home/features/nixvim/plugins/editor/illuminate.nix/illuminate.nix
+│   │   │   │   │   ├── nixos-config/home/features/nixvim/plugins/editor/indent-blankline.nix/indent-blankline.nix
+│   │   │   │   │   ├── nixos-config/home/features/nixvim/plugins/editor/navic.nix/navic.nix
+│   │   │   │   │   ├── nixos-config/home/features/nixvim/plugins/editor/neo-tree.nix/neo-tree.nix
+│   │   │   │   │   ├── nixos-config/home/features/nixvim/plugins/editor/todo-comments.nix/todo-comments.nix
+│   │   │   │   │   ├── nixos-config/home/features/nixvim/plugins/editor/treesitter.nix/treesitter.nix
+│   │   │   │   │   └── nixos-config/home/features/nixvim/plugins/editor/undotree.nix/undotree.nix
+│   │   │   │   ├── nixos-config/home/features/nixvim/plugins/git/git
+│   │   │   │   │   ├── nixos-config/home/features/nixvim/plugins/git/gitsigns.nix/gitsigns.nix
+│   │   │   │   │   └── nixos-config/home/features/nixvim/plugins/git/lazygit.nix/lazygit.nix
+│   │   │   │   ├── nixos-config/home/features/nixvim/plugins/lsp/lsp
+│   │   │   │   │   ├── nixos-config/home/features/nixvim/plugins/lsp/conform.nix/conform.nix
+│   │   │   │   │   ├── nixos-config/home/features/nixvim/plugins/lsp/fidget.nix/fidget.nix
+│   │   │   │   │   ├── nixos-config/home/features/nixvim/plugins/lsp/lsp.nix/lsp.nix
+│   │   │   │   │   ├── nixos-config/home/features/nixvim/plugins/lsp/none-ls.nix/none-ls.nix
+│   │   │   │   │   └── nixos-config/home/features/nixvim/plugins/lsp/trouble.nix/trouble.nix
+│   │   │   │   ├── nixos-config/home/features/nixvim/plugins/snippets/snippets
+│   │   │   │   │   └── nixos-config/home/features/nixvim/plugins/snippets/luasnip.nix/luasnip.nix
+│   │   │   │   ├── nixos-config/home/features/nixvim/plugins/themes/themes
+│   │   │   │   │   └── nixos-config/home/features/nixvim/plugins/themes/default.nix/default.nix
+│   │   │   │   ├── nixos-config/home/features/nixvim/plugins/ui/ui
+│   │   │   │   │   ├── nixos-config/home/features/nixvim/plugins/ui/alpha.nix/alpha.nix
+│   │   │   │   │   ├── nixos-config/home/features/nixvim/plugins/ui/bufferline.nix/bufferline.nix
+│   │   │   │   │   ├── nixos-config/home/features/nixvim/plugins/ui/lualine.nix/lualine.nix
+│   │   │   │   │   └── nixos-config/home/features/nixvim/plugins/ui/startup.nix/startup.nix
+│   │   │   │   └── nixos-config/home/features/nixvim/plugins/utils/utils
+│   │   │   │       ├── nixos-config/home/features/nixvim/plugins/utils/colorizer.nix/colorizer.nix
+│   │   │   │       ├── nixos-config/home/features/nixvim/plugins/utils/extra_plugins.nix/extra_plugins.nix
+│   │   │   │       ├── nixos-config/home/features/nixvim/plugins/utils/markdown-preview.nix/markdown-preview.nix
+│   │   │   │       ├── nixos-config/home/features/nixvim/plugins/utils/mini.nix/mini.nix
+│   │   │   │       ├── nixos-config/home/features/nixvim/plugins/utils/notify.nix/notify.nix
+│   │   │   │       ├── nixos-config/home/features/nixvim/plugins/utils/telescope.nix/telescope.nix
+│   │   │   │       ├── nixos-config/home/features/nixvim/plugins/utils/toggleterm.nix/toggleterm.nix
+│   │   │   │       ├── nixos-config/home/features/nixvim/plugins/utils/whichkey.nix/whichkey.nix
+│   │   │   │       ├── nixos-config/home/features/nixvim/plugins/utils/yazi.nix/yazi.nix
+│   │   │   │       └── nixos-config/home/features/nixvim/plugins/utils/zellij.nix/zellij.nix
+│   │   │   ├── nixos-config/home/features/nixvim/auto_cmds.nix/auto_cmds.nix
+│   │   │   ├── nixos-config/home/features/nixvim/default.nix/default.nix
+│   │   │   ├── nixos-config/home/features/nixvim/file_types.nix/file_types.nix
+│   │   │   ├── nixos-config/home/features/nixvim/icons.nix/icons.nix
+│   │   │   ├── nixos-config/home/features/nixvim/keymaps.nix/keymaps.nix
+│   │   │   └── nixos-config/home/features/nixvim/settings.nix/settings.nix
+│   │   ├── nixos-config/home/features/nvim/nvim
+│   │   │   ├── nixos-config/home/features/nvim/plugins/plugins
+│   │   │   │   ├── nixos-config/home/features/nvim/plugins/alpha.lua/alpha.lua
+│   │   │   │   ├── nixos-config/home/features/nvim/plugins/auto-session.lua/auto-session.lua
+│   │   │   │   ├── nixos-config/home/features/nvim/plugins/autopairs.lua/autopairs.lua
+│   │   │   │   ├── nixos-config/home/features/nvim/plugins/cmp.lua/cmp.lua
+│   │   │   │   ├── nixos-config/home/features/nvim/plugins/comment.lua/comment.lua
+│   │   │   │   ├── nixos-config/home/features/nvim/plugins/fine-cmdline.lua/fine-cmdline.lua
+│   │   │   │   ├── nixos-config/home/features/nvim/plugins/lsp.lua/lsp.lua
+│   │   │   │   ├── nixos-config/home/features/nvim/plugins/nvim-tree.lua/nvim-tree.lua
+│   │   │   │   ├── nixos-config/home/features/nvim/plugins/telescope.lua/telescope.lua
+│   │   │   │   ├── nixos-config/home/features/nvim/plugins/todo-comments.lua/todo-comments.lua
+│   │   │   │   └── nixos-config/home/features/nvim/plugins/treesitter.lua/treesitter.lua
+│   │   │   ├── nixos-config/home/features/nvim/default.nix/default.nix
+│   │   │   ├── nixos-config/home/features/nvim/keymaps.lua/keymaps.lua
+│   │   │   └── nixos-config/home/features/nvim/options.lua/options.lua
+│   │   ├── nixos-config/home/features/pass/pass
+│   │   │   └── nixos-config/home/features/pass/default.nix/default.nix
+│   │   ├── nixos-config/home/features/pistol/pistol
+│   │   │   ├── nixos-config/home/features/pistol/default.nix/default.nix
+│   │   │   └── nixos-config/home/features/pistol/preview2.sh/preview2.sh
+│   │   ├── nixos-config/home/features/productivity/productivity
+│   │   │   ├── nixos-config/home/features/productivity/default.nix/default.nix
+│   │   │   ├── nixos-config/home/features/productivity/flameshot.nix/flameshot.nix
+│   │   │   ├── nixos-config/home/features/productivity/khal.nix/khal.nix
+│   │   │   ├── nixos-config/home/features/productivity/khard.nix/khard.nix
+│   │   │   ├── nixos-config/home/features/productivity/mail.nix/mail.nix
+│   │   │   ├── nixos-config/home/features/productivity/neomutt.nix/neomutt.nix
+│   │   │   ├── nixos-config/home/features/productivity/office.nix/office.nix
+│   │   │   ├── nixos-config/home/features/productivity/scim.nix/scim.nix
+│   │   │   ├── nixos-config/home/features/productivity/vdirsyncer.nix/vdirsyncer.nix
+│   │   │   └── nixos-config/home/features/productivity/zathura.nix/zathura.nix
+│   │   ├── nixos-config/home/features/qutebrowser/qutebrowser
+│   │   │   └── nixos-config/home/features/qutebrowser/default.nix/default.nix
+│   │   ├── nixos-config/home/features/remmina/remmina
+│   │   │   └── nixos-config/home/features/remmina/default.nix/default.nix
+│   │   ├── nixos-config/home/features/ripgrep/ripgrep
+│   │   │   └── nixos-config/home/features/ripgrep/default.nix/default.nix
+│   │   ├── nixos-config/home/features/shell/shell
+│   │   │   ├── nixos-config/home/features/shell/bash.nix/bash.nix
+│   │   │   ├── nixos-config/home/features/shell/default.nix/default.nix
+│   │   │   ├── nixos-config/home/features/shell/fish.nix/fish.nix
+│   │   │   ├── nixos-config/home/features/shell/nushell.nix/nushell.nix
+│   │   │   └── nixos-config/home/features/shell/zsh.nix/zsh.nix
+│   │   ├── nixos-config/home/features/slack/slack
+│   │   │   └── nixos-config/home/features/slack/default.nix/default.nix
+│   │   ├── nixos-config/home/features/starship/starship
+│   │   │   └── nixos-config/home/features/starship/default.nix/default.nix
+│   │   ├── nixos-config/home/features/sys-stats/sys-stats
+│   │   │   └── nixos-config/home/features/sys-stats/default.nix/default.nix
+│   │   ├── nixos-config/home/features/tmux/tmux
+│   │   │   ├── nixos-config/home/features/tmux/plugins/plugins
+│   │   │   │   ├── nixos-config/home/features/tmux/plugins/fzf-url/fzf-url
+│   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/fzf-url/fzf-url.sh/fzf-url.sh
+│   │   │   │   │   └── nixos-config/home/features/tmux/plugins/fzf-url/fzf-url.tmux/fzf-url.tmux
+│   │   │   │   ├── nixos-config/home/features/tmux/plugins/t-smart-tmux-session-manager/t-smart-tmux-session-manager
+│   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/t-smart-tmux-session-manager/t-smart-tmux-session-manager.tmux/t-smart-tmux-session-manager.tmux
+│   │   │   │   │   └── nixos-config/home/features/tmux/plugins/t-smart-tmux-session-manager/t.sh/t.sh
+│   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/tmux-forceline
+│   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/modules
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/count/count
+│   │   │   │   │   │   │   └── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/count/count.sh/count.sh
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/cpu
+│   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/scripts
+│   │   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/cpu_bg_color.sh/cpu_bg_color.sh
+│   │   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/cpu_fg_color.sh/cpu_fg_color.sh
+│   │   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/cpu_icon.sh/cpu_icon.sh
+│   │   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/cpu_percentage.sh/cpu_percentage.sh
+│   │   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/cpu_temp.sh/cpu_temp.sh
+│   │   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/cpu_temp_bg_color.sh/cpu_temp_bg_color.sh
+│   │   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/cpu_temp_fg_color.sh/cpu_temp_fg_color.sh
+│   │   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/cpu_temp_icon.sh/cpu_temp_icon.sh
+│   │   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/gpu_bg_color.sh/gpu_bg_color.sh
+│   │   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/gpu_fg_color.sh/gpu_fg_color.sh
+│   │   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/gpu_icon.sh/gpu_icon.sh
+│   │   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/gpu_percentage.sh/gpu_percentage.sh
+│   │   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/gpu_temp.sh/gpu_temp.sh
+│   │   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/gpu_temp_bg_color.sh/gpu_temp_bg_color.sh
+│   │   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/gpu_temp_fg_color.sh/gpu_temp_fg_color.sh
+│   │   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/gpu_temp_icon.sh/gpu_temp_icon.sh
+│   │   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/gram_bg_color.sh/gram_bg_color.sh
+│   │   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/gram_fg_color.sh/gram_fg_color.sh
+│   │   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/gram_icon.sh/gram_icon.sh
+│   │   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/gram_percentage.sh/gram_percentage.sh
+│   │   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/helpers.sh/helpers.sh
+│   │   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/ram_bg_color.sh/ram_bg_color.sh
+│   │   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/ram_fg_color.sh/ram_fg_color.sh
+│   │   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/ram_icon.sh/ram_icon.sh
+│   │   │   │   │   │   │   │   └── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/scripts/ram_percentage.sh/ram_percentage.sh
+│   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/cpu.sh/cpu.sh
+│   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/cpu.tmux/cpu.tmux
+│   │   │   │   │   │   │   └── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/cpu/README.md/README.md
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/ipwan/ipwan
+│   │   │   │   │   │   │   └── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/ipwan/ipwan.sh/ipwan.sh
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/weather/weather
+│   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/weather/scripts/scripts
+│   │   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/weather/scripts/helpers.sh/helpers.sh
+│   │   │   │   │   │   │   │   └── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/weather/scripts/weather.sh/weather.sh
+│   │   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/weather/README.md/README.md
+│   │   │   │   │   │   │   └── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/weather/weather.sh/weather.sh
+│   │   │   │   │   │   └── nixos-config/home/features/tmux/plugins/tmux-forceline/modules/test.sh/test.sh
+│   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/status/status
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/status/application.conf/application.conf
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/status/battery.conf/battery.conf
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/status/clima.conf/clima.conf
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/status/cpu.conf/cpu.conf
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/status/date.conf/date.conf
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/status/date_time.conf/date_time.conf
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/status/directory.conf/directory.conf
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/status/gitmux.conf/gitmux.conf
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/status/host.conf/host.conf
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/status/iplocal.conf/iplocal.conf
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/status/ipwan.conf/ipwan.conf
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/status/kube.conf/kube.conf
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/status/load.conf/load.conf
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/status/pomodoro_plus.conf/pomodoro_plus.conf
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/status/session.conf/session.conf
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/status/time.conf/time.conf
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/status/uptime.conf/uptime.conf
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/status/user.conf/user.conf
+│   │   │   │   │   │   └── nixos-config/home/features/tmux/plugins/tmux-forceline/status/weather.conf/weather.conf
+│   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/tests/tests
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/tests/application_module.sh/application_module.sh
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/tests/application_module_expected.txt/application_module_expected.txt
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/tests/battery_module.sh/battery_module.sh
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/tests/battery_module_expected.txt/battery_module_expected.txt
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/tests/cpu_module.sh/cpu_module.sh
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/tests/cpu_module_expected.txt/cpu_module_expected.txt
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/tests/default_options.sh/default_options.sh
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/tests/default_options_expected.txt/default_options_expected.txt
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/tests/harness.sh/harness.sh
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/tests/helpers.sh/helpers.sh
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/tests/pane_styling.sh/pane_styling.sh
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/tests/pane_styling_expected.txt/pane_styling_expected.txt
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/tests/window_status_styling.sh/window_status_styling.sh
+│   │   │   │   │   │   └── nixos-config/home/features/tmux/plugins/tmux-forceline/tests/window_status_styling_expected.txt/window_status_styling_expected.txt
+│   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/themes/themes
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/themes/catppuccin_frappe.conf/catppuccin_frappe.conf
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/themes/catppuccin_latte.conf/catppuccin_latte.conf
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/themes/catppuccin_macchiato.conf/catppuccin_macchiato.conf
+│   │   │   │   │   │   └── nixos-config/home/features/tmux/plugins/tmux-forceline/themes/catppuccin_mocha.conf/catppuccin_mocha.conf
+│   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/utils/utils
+│   │   │   │   │   │   └── nixos-config/home/features/tmux/plugins/tmux-forceline/utils/status_module.conf/status_module.conf
+│   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/forceline.tmux/forceline.tmux
+│   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/forceline_options_tmux.conf/forceline_options_tmux.conf
+│   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-forceline/forceline_tmux.conf/forceline_tmux.conf
+│   │   │   │   │   └── nixos-config/home/features/tmux/plugins/tmux-forceline/run_tests.sh/run_tests.sh
+│   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-fzf/tmux-fzf
+│   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-fzf/scripts/scripts
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-fzf/scripts/clipboard.sh/clipboard.sh
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-fzf/scripts/command.sh/command.sh
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-fzf/scripts/copy-mode.sh/copy-mode.sh
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-fzf/scripts/keybinding.sh/keybinding.sh
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-fzf/scripts/menu.sh/menu.sh
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-fzf/scripts/pane.sh/pane.sh
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-fzf/scripts/process.sh/process.sh
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-fzf/scripts/session.sh/session.sh
+│   │   │   │   │   │   └── nixos-config/home/features/tmux/plugins/tmux-fzf/scripts/window.sh/window.sh
+│   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-fzf/main.sh/main.sh
+│   │   │   │   │   └── nixos-config/home/features/tmux/plugins/tmux-fzf/main.tmux/main.tmux
+│   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-pass/tmux-pass
+│   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-pass/scripts/scripts
+│   │   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-pass/scripts/main.sh/main.sh
+│   │   │   │   │   │   └── nixos-config/home/features/tmux/plugins/tmux-pass/scripts/utils.sh/utils.sh
+│   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-pass/test/test
+│   │   │   │   │   │   └── nixos-config/home/features/tmux/plugins/tmux-pass/test/shellcheck.sh/shellcheck.sh
+│   │   │   │   │   ├── nixos-config/home/features/tmux/plugins/tmux-pass/plugin.tmux/plugin.tmux
+│   │   │   │   │   └── nixos-config/home/features/tmux/plugins/tmux-pass/README.md/README.md
+│   │   │   │   └── nixos-config/home/features/tmux/plugins/tmux-which-key/tmux-which-key
+│   │   │   │       ├── nixos-config/home/features/tmux/plugins/tmux-which-key/plugin/plugin
+│   │   │   │       │   ├── nixos-config/home/features/tmux/plugins/tmux-which-key/plugin/build.py/build.py
+│   │   │   │       │   ├── nixos-config/home/features/tmux/plugins/tmux-which-key/plugin/init.example.tmux/init.example.tmux
+│   │   │   │       │   └── nixos-config/home/features/tmux/plugins/tmux-which-key/plugin/init.tmux/init.tmux
+│   │   │   │       ├── nixos-config/home/features/tmux/plugins/tmux-which-key/config.example.yaml/config.example.yaml
+│   │   │   │       ├── nixos-config/home/features/tmux/plugins/tmux-which-key/config.schema.yaml/config.schema.yaml
+│   │   │   │       ├── nixos-config/home/features/tmux/plugins/tmux-which-key/config.yaml/config.yaml
+│   │   │   │       ├── nixos-config/home/features/tmux/plugins/tmux-which-key/plugin.sh.tmux/plugin.sh.tmux
+│   │   │   │       └── nixos-config/home/features/tmux/plugins/tmux-which-key/which-key.sh/which-key.sh
+│   │   │   └── nixos-config/home/features/tmux/default.nix/default.nix
+│   │   ├── nixos-config/home/features/virtualisation/virtualisation
+│   │   │   └── nixos-config/home/features/virtualisation/default.nix/default.nix
+│   │   ├── nixos-config/home/features/vscode/vscode
+│   │   │   ├── nixos-config/home/features/vscode/custom.theme/custom.theme
+│   │   │   │   ├── nixos-config/home/features/vscode/custom.theme/themes/themes
+│   │   │   │   │   ├── nixos-config/home/features/vscode/custom.theme/themes/theme.json/theme.json
+│   │   │   │   │   └── nixos-config/home/features/vscode/custom.theme/themes/theme.json.nix/theme.json.nix
+│   │   │   │   └── nixos-config/home/features/vscode/custom.theme/package.json/package.json
+│   │   │   └── nixos-config/home/features/vscode/default.nix/default.nix
+│   │   ├── nixos-config/home/features/windsurf/windsurf
+│   │   │   └── nixos-config/home/features/windsurf/default.nix/default.nix
+│   │   ├── nixos-config/home/features/wireless/wireless
+│   │   │   └── nixos-config/home/features/wireless/default.nix/default.nix
+│   │   ├── nixos-config/home/features/yazi/yazi
+│   │   │   ├── nixos-config/home/features/yazi/flavors/flavors
+│   │   │   │   └── nixos-config/home/features/yazi/flavors/theme.yazi/theme.yazi
+│   │   │   │       ├── nixos-config/home/features/yazi/flavors/theme.yazi/flavor.toml.nix/flavor.toml.nix
+│   │   │   │       ├── nixos-config/home/features/yazi/flavors/theme.yazi/LICENSE/LICENSE
+│   │   │   │       ├── nixos-config/home/features/yazi/flavors/theme.yazi/preview.png/preview.png
+│   │   │   │       ├── nixos-config/home/features/yazi/flavors/theme.yazi/README.md/README.md
+│   │   │   │       └── nixos-config/home/features/yazi/flavors/theme.yazi/tmtheme.xml.nix/tmtheme.xml.nix
+│   │   │   ├── nixos-config/home/features/yazi/plugins/plugins
+│   │   │   │   ├── nixos-config/home/features/yazi/plugins/arrow.yazi/arrow.yazi
+│   │   │   │   │   └── nixos-config/home/features/yazi/plugins/arrow.yazi/main.lua/main.lua
+│   │   │   │   ├── nixos-config/home/features/yazi/plugins/chmod.yazi/chmod.yazi
+│   │   │   │   │   └── nixos-config/home/features/yazi/plugins/chmod.yazi/main.lua/main.lua
+│   │   │   │   ├── nixos-config/home/features/yazi/plugins/excel.yazi/excel.yazi
+│   │   │   │   │   └── nixos-config/home/features/yazi/plugins/excel.yazi/main.lua/main.lua
+│   │   │   │   ├── nixos-config/home/features/yazi/plugins/eza-preview.yazi/eza-preview.yazi
+│   │   │   │   │   └── nixos-config/home/features/yazi/plugins/eza-preview.yazi/main.lua/main.lua
+│   │   │   │   ├── nixos-config/home/features/yazi/plugins/folder-rules.yazi/folder-rules.yazi
+│   │   │   │   │   └── nixos-config/home/features/yazi/plugins/folder-rules.yazi/main.lua/main.lua
+│   │   │   │   ├── nixos-config/home/features/yazi/plugins/fzfbm.yazi/fzfbm.yazi
+│   │   │   │   │   └── nixos-config/home/features/yazi/plugins/fzfbm.yazi/main.lua/main.lua
+│   │   │   │   ├── nixos-config/home/features/yazi/plugins/glow.yazi/glow.yazi
+│   │   │   │   │   └── nixos-config/home/features/yazi/plugins/glow.yazi/main.lua/main.lua
+│   │   │   │   ├── nixos-config/home/features/yazi/plugins/hexyl.yazi/hexyl.yazi
+│   │   │   │   │   └── nixos-config/home/features/yazi/plugins/hexyl.yazi/main.lua/main.lua
+│   │   │   │   ├── nixos-config/home/features/yazi/plugins/hide-preview.yazi/hide-preview.yazi
+│   │   │   │   │   └── nixos-config/home/features/yazi/plugins/hide-preview.yazi/main.lua/main.lua
+│   │   │   │   ├── nixos-config/home/features/yazi/plugins/lazygit.yazi/lazygit.yazi
+│   │   │   │   │   └── nixos-config/home/features/yazi/plugins/lazygit.yazi/main.lua/main.lua
+│   │   │   │   ├── nixos-config/home/features/yazi/plugins/max-preview.yazi/max-preview.yazi
+│   │   │   │   │   └── nixos-config/home/features/yazi/plugins/max-preview.yazi/main.lua/main.lua
+│   │   │   │   ├── nixos-config/home/features/yazi/plugins/mediainfo.yazi/mediainfo.yazi
+│   │   │   │   │   └── nixos-config/home/features/yazi/plugins/mediainfo.yazi/main.lua/main.lua
+│   │   │   │   ├── nixos-config/home/features/yazi/plugins/ouch.yazi/ouch.yazi
+│   │   │   │   │   └── nixos-config/home/features/yazi/plugins/ouch.yazi/main.lua/main.lua
+│   │   │   │   ├── nixos-config/home/features/yazi/plugins/parent-arrow.yazi/parent-arrow.yazi
+│   │   │   │   │   └── nixos-config/home/features/yazi/plugins/parent-arrow.yazi/main.lua/main.lua
+│   │   │   │   ├── nixos-config/home/features/yazi/plugins/preview.yazi/preview.yazi
+│   │   │   │   │   ├── nixos-config/home/features/yazi/plugins/preview.yazi/main.lua/main.lua
+│   │   │   │   │   └── nixos-config/home/features/yazi/plugins/preview.yazi/preview.sh/preview.sh
+│   │   │   │   ├── nixos-config/home/features/yazi/plugins/smart-enter.yazi/smart-enter.yazi
+│   │   │   │   │   └── nixos-config/home/features/yazi/plugins/smart-enter.yazi/main.lua/main.lua
+│   │   │   │   ├── nixos-config/home/features/yazi/plugins/smart-filter.yazi/smart-filter.yazi
+│   │   │   │   │   └── nixos-config/home/features/yazi/plugins/smart-filter.yazi/main.lua/main.lua
+│   │   │   │   ├── nixos-config/home/features/yazi/plugins/smart-paste.yazi/smart-paste.yazi
+│   │   │   │   │   └── nixos-config/home/features/yazi/plugins/smart-paste.yazi/main.lua/main.lua
+│   │   │   │   ├── nixos-config/home/features/yazi/plugins/yatline-catppuccin.yazi/yatline-catppuccin.yazi
+│   │   │   │   │   └── nixos-config/home/features/yazi/plugins/yatline-catppuccin.yazi/main.lua/main.lua
+│   │   │   │   ├── nixos-config/home/features/yazi/plugins/yatline-githead.yazi/yatline-githead.yazi
+│   │   │   │   │   └── nixos-config/home/features/yazi/plugins/yatline-githead.yazi/main.lua/main.lua
+│   │   │   │   └── nixos-config/home/features/yazi/plugins/yatline.yazi/yatline.yazi
+│   │   │   │       └── nixos-config/home/features/yazi/plugins/yatline.yazi/main.lua/main.lua
+│   │   │   ├── nixos-config/home/features/yazi/default.nix/default.nix
+│   │   │   └── nixos-config/home/features/yazi/main.lua/main.lua
+│   │   ├── nixos-config/home/features/zellij/zellij
+│   │   │   └── nixos-config/home/features/zellij/default.nix/default.nix
+│   │   ├── nixos-config/home/features/zen/zen
+│   │   │   └── nixos-config/home/features/zen/default.nix/default.nix
+│   │   └── nixos-config/home/features/zoxide/zoxide
+│   │       └── nixos-config/home/features/zoxide/default.nix/default.nix
+│   ├── nixos-config/home/global/global
+│   │   ├── nixos-config/home/global/colorscheme.nix/colorscheme.nix
+│   │   ├── nixos-config/home/global/default.nix/default.nix
+│   │   ├── nixos-config/home/global/home.nix/home.nix
+│   │   ├── nixos-config/home/global/sops.nix/sops.nix
+│   │   └── nixos-config/home/global/style.nix/style.nix
+│   ├── nixos-config/home/accent.nix/accent.nix
+│   ├── nixos-config/home/ansible.nix/ansible.nix
+│   ├── nixos-config/home/frametop.nix/frametop.nix
+│   ├── nixos-config/home/lighthouse.nix/lighthouse.nix
+│   ├── nixos-config/home/mini.nix/mini.nix
+│   ├── nixos-config/home/vlad.nix/vlad.nix
+│   └── nixos-config/home/woody.nix/woody.nix
+├── nixos-config/hosts/hosts
+│   ├── nixos-config/hosts/common/common
+│   │   ├── nixos-config/hosts/common/global/global
+│   │   │   ├── nixos-config/hosts/common/global/default.nix/default.nix
+│   │   │   ├── nixos-config/hosts/common/global/fail2ban.nix/fail2ban.nix
+│   │   │   ├── nixos-config/hosts/common/global/locale.nix/locale.nix
+│   │   │   ├── nixos-config/hosts/common/global/networking.nix/networking.nix
+│   │   │   ├── nixos-config/hosts/common/global/nh.nix/nh.nix
+│   │   │   ├── nixos-config/hosts/common/global/nix-ld.nix/nix-ld.nix
+│   │   │   ├── nixos-config/hosts/common/global/nix.nix/nix.nix
+│   │   │   ├── nixos-config/hosts/common/global/openssh.nix/openssh.nix
+│   │   │   ├── nixos-config/hosts/common/global/podman.nix/podman.nix
+│   │   │   ├── nixos-config/hosts/common/global/sops.nix/sops.nix
+│   │   │   └── nixos-config/hosts/common/global/systemd-initrd.nix/systemd-initrd.nix
+│   │   ├── nixos-config/hosts/common/optional/optional
+│   │   │   ├── nixos-config/hosts/common/optional/cosmic/cosmic
+│   │   │   │   └── nixos-config/hosts/common/optional/cosmic/default.nix/default.nix
+│   │   │   ├── nixos-config/hosts/common/optional/displaymanager/displaymanager
+│   │   │   │   ├── nixos-config/hosts/common/optional/displaymanager/sddm/sddm
+│   │   │   │   │   ├── nixos-config/hosts/common/optional/displaymanager/sddm/default.nix/default.nix
+│   │   │   │   │   └── nixos-config/hosts/common/optional/displaymanager/sddm/sddm-theme.nix/sddm-theme.nix
+│   │   │   │   ├── nixos-config/hosts/common/optional/displaymanager/cosmic.nix/cosmic.nix
+│   │   │   │   ├── nixos-config/hosts/common/optional/displaymanager/gdm.nix/gdm.nix
+│   │   │   │   ├── nixos-config/hosts/common/optional/displaymanager/greetd.nix/greetd.nix
+│   │   │   │   └── nixos-config/hosts/common/optional/displaymanager/lightdm.nix/lightdm.nix
+│   │   │   ├── nixos-config/hosts/common/optional/gnome/gnome
+│   │   │   │   └── nixos-config/hosts/common/optional/gnome/default.nix/default.nix
+│   │   │   ├── nixos-config/hosts/common/optional/hyprland/hyprland
+│   │   │   │   └── nixos-config/hosts/common/optional/hyprland/default.nix/default.nix
+│   │   │   ├── nixos-config/hosts/common/optional/plasma/plasma
+│   │   │   │   └── nixos-config/hosts/common/optional/plasma/default.nix/default.nix
+│   │   │   ├── nixos-config/hosts/common/optional/audio.nix/audio.nix
+│   │   │   ├── nixos-config/hosts/common/optional/bash.nix/bash.nix
+│   │   │   ├── nixos-config/hosts/common/optional/bluetooth.nix/bluetooth.nix
+│   │   │   ├── nixos-config/hosts/common/optional/direnv.nix/direnv.nix
+│   │   │   ├── nixos-config/hosts/common/optional/docker.nix/docker.nix
+│   │   │   ├── nixos-config/hosts/common/optional/fish.nix/fish.nix
+│   │   │   ├── nixos-config/hosts/common/optional/fonts.nix/fonts.nix
+│   │   │   ├── nixos-config/hosts/common/optional/gnome-services.nix/gnome-services.nix
+│   │   │   ├── nixos-config/hosts/common/optional/k3s.nix/k3s.nix
+│   │   │   ├── nixos-config/hosts/common/optional/kdeconnect.nix/kdeconnect.nix
+│   │   │   ├── nixos-config/hosts/common/optional/keyboard.nix/keyboard.nix
+│   │   │   ├── nixos-config/hosts/common/optional/nautilus.nix/nautilus.nix
+│   │   │   ├── nixos-config/hosts/common/optional/nfs.nix/nfs.nix
+│   │   │   ├── nixos-config/hosts/common/optional/optin-persistence.nix/optin-persistence.nix
+│   │   │   ├── nixos-config/hosts/common/optional/postgres.nix/postgres.nix
+│   │   │   ├── nixos-config/hosts/common/optional/printing.nix/printing.nix
+│   │   │   ├── nixos-config/hosts/common/optional/resilio.nix/resilio.nix
+│   │   │   ├── nixos-config/hosts/common/optional/steam.nix/steam.nix
+│   │   │   ├── nixos-config/hosts/common/optional/style.nix/style.nix
+│   │   │   ├── nixos-config/hosts/common/optional/syncthing.nix/syncthing.nix
+│   │   │   ├── nixos-config/hosts/common/optional/system-packages.nix/system-packages.nix
+│   │   │   ├── nixos-config/hosts/common/optional/thunar.nix/thunar.nix
+│   │   │   ├── nixos-config/hosts/common/optional/virtualisation.nix/virtualisation.nix
+│   │   │   ├── nixos-config/hosts/common/optional/webcam.nix/webcam.nix
+│   │   │   ├── nixos-config/hosts/common/optional/wireguard.nix/wireguard.nix
+│   │   │   ├── nixos-config/hosts/common/optional/wireshark.nix/wireshark.nix
+│   │   │   ├── nixos-config/hosts/common/optional/xdg.nix/xdg.nix
+│   │   │   └── nixos-config/hosts/common/optional/zsh.nix/zsh.nix
+│   │   └── nixos-config/hosts/common/users/users
+│   │       └── nixos-config/hosts/common/users/administrator/administrator
+│   │           └── nixos-config/hosts/common/users/administrator/default.nix/default.nix
+│   ├── nixos-config/hosts/frametop/frametop
+│   │   ├── nixos-config/hosts/frametop/services/services
+│   │   │   ├── nixos-config/hosts/frametop/services/auto-cpufreq.nix/auto-cpufreq.nix
+│   │   │   ├── nixos-config/hosts/frametop/services/default.nix/default.nix
+│   │   │   ├── nixos-config/hosts/frametop/services/fprintd.nix/fprintd.nix
+│   │   │   ├── nixos-config/hosts/frametop/services/fwupd.nix/fwupd.nix
+│   │   │   ├── nixos-config/hosts/frametop/services/libinput.nix/libinput.nix
+│   │   │   ├── nixos-config/hosts/frametop/services/logind.nix/logind.nix
+│   │   │   ├── nixos-config/hosts/frametop/services/prometheus-node-exporter.nix/prometheus-node-exporter.nix
+│   │   │   ├── nixos-config/hosts/frametop/services/tailscale.nix/tailscale.nix
+│   │   │   ├── nixos-config/hosts/frametop/services/thermald.nix/thermald.nix
+│   │   │   ├── nixos-config/hosts/frametop/services/upower.nix/upower.nix
+│   │   │   └── nixos-config/hosts/frametop/services/vscode-server.nix/vscode-server.nix
+│   │   ├── nixos-config/hosts/frametop/default.nix/default.nix
+│   │   ├── nixos-config/hosts/frametop/disk.nix/disk.nix
+│   │   ├── nixos-config/hosts/frametop/hardware-configuration.nix/hardware-configuration.nix
+│   │   └── nixos-config/hosts/frametop/ssh_host_ed25519_key.pub/ssh_host_ed25519_key.pub
+│   ├── nixos-config/hosts/mini/mini
+│   │   └── nixos-config/hosts/mini/default.nix/default.nix
+│   └── nixos-config/hosts/woody/woody
+│       ├── nixos-config/hosts/woody/services/services
+│       │   ├── nixos-config/hosts/woody/services/default.nix/default.nix
+│       │   ├── nixos-config/hosts/woody/services/fwupd.nix/fwupd.nix
+│       │   ├── nixos-config/hosts/woody/services/gvfs.nix/gvfs.nix
+│       │   ├── nixos-config/hosts/woody/services/mpd.nix/mpd.nix
+│       │   ├── nixos-config/hosts/woody/services/prometheus-node-exporter.nix/prometheus-node-exporter.nix
+│       │   ├── nixos-config/hosts/woody/services/spice.nix/spice.nix
+│       │   ├── nixos-config/hosts/woody/services/tailscale.nix/tailscale.nix
+│       │   ├── nixos-config/hosts/woody/services/vscode-server.nix/vscode-server.nix
+│       │   └── nixos-config/hosts/woody/services/xserver.nix/xserver.nix
+│       ├── nixos-config/hosts/woody/default.nix/default.nix
+│       ├── nixos-config/hosts/woody/hardware-configuration.nix/hardware-configuration.nix
+│       └── nixos-config/hosts/woody/ssh_host_ed25519_key.pub/ssh_host_ed25519_key.pub
+├── nixos-config/modules/modules
+│   └── nixos-config/modules/home-manager/home-manager
+│       ├── nixos-config/modules/home-manager/f1multiviewer/f1multiviewer
+│       │   └── nixos-config/modules/home-manager/f1multiviewer/default.nix/default.nix
+│       ├── nixos-config/modules/home-manager/colors.nix/colors.nix
+│       ├── nixos-config/modules/home-manager/default.nix/default.nix
+│       ├── nixos-config/modules/home-manager/f1multiviewer.nix/f1multiviewer.nix
+│       ├── nixos-config/modules/home-manager/monitors.nix/monitors.nix
+│       ├── nixos-config/modules/home-manager/pass-secret-service.nix/pass-secret-service.nix
+│       └── nixos-config/modules/home-manager/wallpaper.nix/wallpaper.nix
+├── nixos-config/overlays/overlays
+│   ├── nixos-config/overlays/default.nix/default.nix
+│   ├── nixos-config/overlays/unstable-packages.nix/unstable-packages.nix
+│   ├── nixos-config/overlays/update-uv.sh/update-uv.sh
+│   ├── nixos-config/overlays/uv.nix/uv.nix
+│   └── nixos-config/overlays/vscode.nix/vscode.nix
+├── nixos-config/pkgs/pkgs
+│   ├── nixos-config/pkgs/colorschemes/colorschemes
+│   │   ├── nixos-config/pkgs/colorschemes/default.nix/default.nix
+│   │   └── nixos-config/pkgs/colorschemes/generator.nix/generator.nix
+│   ├── nixos-config/pkgs/multiviewer/multiviewer
+│   │   ├── nixos-config/pkgs/multiviewer/backup.nix/backup.nix
+│   │   └── nixos-config/pkgs/multiviewer/default.nix/default.nix
+│   ├── nixos-config/pkgs/nix-inspect/nix-inspect
+│   │   └── nixos-config/pkgs/nix-inspect/default.nix/default.nix
+│   ├── nixos-config/pkgs/wallpapers/wallpapers
+│   │   ├── nixos-config/pkgs/wallpapers/default.nix/default.nix
+│   │   ├── nixos-config/pkgs/wallpapers/from_album.sh/from_album.sh
+│   │   ├── nixos-config/pkgs/wallpapers/list.json/list.json
+│   │   └── nixos-config/pkgs/wallpapers/single_image.sh/single_image.sh
+│   └── nixos-config/pkgs/default.nix/default.nix
+├── nixos-config/scripts/scripts
+│   ├── nixos-config/scripts/nvfetcher/nvfetcher
+│   │   ├── nixos-config/scripts/nvfetcher/_sources/_sources
+│   │   │   ├── nixos-config/scripts/nvfetcher/_sources/generated.json/generated.json
+│   │   │   └── nixos-config/scripts/nvfetcher/_sources/generated.nix/generated.nix
+│   │   ├── nixos-config/scripts/nvfetcher/nvfetcher.toml/nvfetcher.toml
+│   │   └── nixos-config/scripts/nvfetcher/vscodefetch.sh/vscodefetch.sh
+│   └── nixos-config/scripts/multiviewer-update.sh/multiviewer-update.sh
+├── nixos-config/secrets/secrets
+│   └── nixos-config/secrets/secrets.yaml/secrets.yaml
+├── nixos-config/templates/templates
+│   ├── nixos-config/templates/c/c
+│   │   ├── nixos-config/templates/c/src/src
+│   │   │   └── nixos-config/templates/c/src/main.cpp/main.cpp
+│   │   ├── nixos-config/templates/c/default.nix/default.nix
+│   │   ├── nixos-config/templates/c/flake.nix/flake.nix
+│   │   ├── nixos-config/templates/c/Makefile/Makefile
+│   │   └── nixos-config/templates/c/shell.nix/shell.nix
+│   ├── nixos-config/templates/node/node
+│   │   ├── nixos-config/templates/node/src/src
+│   │   │   └── nixos-config/templates/node/src/index.ts/index.ts
+│   │   ├── nixos-config/templates/node/default.nix/default.nix
+│   │   ├── nixos-config/templates/node/flake.nix/flake.nix
+│   │   ├── nixos-config/templates/node/package-lock.json/package-lock.json
+│   │   ├── nixos-config/templates/node/package.json/package.json
+│   │   ├── nixos-config/templates/node/shell.nix/shell.nix
+│   │   └── nixos-config/templates/node/tsconfig.json/tsconfig.json
+│   ├── nixos-config/templates/rust/rust
+│   │   ├── nixos-config/templates/rust/src/src
+│   │   │   └── nixos-config/templates/rust/src/main.rs/main.rs
+│   │   ├── nixos-config/templates/rust/Cargo.lock/Cargo.lock
+│   │   ├── nixos-config/templates/rust/Cargo.toml/Cargo.toml
+│   │   ├── nixos-config/templates/rust/default.nix/default.nix
+│   │   ├── nixos-config/templates/rust/flake.nix/flake.nix
+│   │   └── nixos-config/templates/rust/shell.nix/shell.nix
+│   └── nixos-config/templates/default.nix/default.nix
+├── nixos-config/flake.lock/flake.lock
+├── nixos-config/flake.nix/flake.nix
+├── nixos-config/frametop_setup.sh/frametop_setup.sh
+├── nixos-config/home-manager.md/home-manager.md
+├── nixos-config/Makefile/Makefile
+├── nixos-config/path.txt/path.txt
+├── nixos-config/README.md/README.md
+├── nixos-config/sample.css/sample.css
+├── nixos-config/shell.nix/shell.nix
+└── nixos-config/sops.md/sops.md
