@@ -4,11 +4,6 @@
 }:
 
 {
-  # home.file.".config/btop/themes/theme.theme" = {
-  #   source = ./theme.theme;
-  #   executable = false;
-  # };
-
   imports = [ ./theme.theme.nix ];
 
   programs.btop = {
