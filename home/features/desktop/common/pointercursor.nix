@@ -3,8 +3,6 @@
   pkgs,
 }:
 
-
-# Look into hyprcursor
 {
   pointerCursor = {
     package = lib.mkDefault pkgs.bibata-cursors;
