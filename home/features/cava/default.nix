@@ -37,8 +37,6 @@ in
       input.method = "pipewire";
       smoothing.noise_reduction = 88;
       color = {
-        # background = "'#303446'";
-
         gradient = "1";
         gradient_color_1 = "'#${base0E}'";
         gradient_color_2 = "'#${base0D}'";
