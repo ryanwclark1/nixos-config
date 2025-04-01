@@ -3,11 +3,11 @@
   config,
   ...
 }:
-let 
+let
   configDir = "${config.home.homeDirectory}/.config";
   dotrepoDir = "${config.home.homeDirectory}/Code/dotfiles";
   defaultFileList = [ "starship.toml" ];
-  defaultDirList = [ "atuin" "bat" "eza" "fd" "k9s" "navi" "ripgrep" "ripgrep-all" "scripts" "tealdeer" ];
+  defaultDirList = [ "atuin" "bat" "eza" "fd" "k9s" "navi" "ripgrep" "ripgrep-all" "scripts" "tealdeer" "tmux" "yazi"];
   updatedDots = pkgs.writeShellScriptBin "update-dots" ''
     #!/usr/bin/env bash
     set -e
@@ -19,7 +19,7 @@ let
     # Function to remove existing files
     remove_files() {
         local dest_file="${dotrepoDir}/$1"
-        
+
         if [[ -f "$dest_file" ]]; then
             rm -f "$dest_file"
             echo "Removed existing file: $dest_file"
@@ -29,7 +29,7 @@ let
     # Function to remove existing directories
     remove_directories() {
         local dest_dir="${dotrepoDir}/$1"
-        
+
         if [[ -d "$dest_dir" ]]; then
             rm -rf "$dest_dir"
             echo "Removed existing directory: $dest_dir"
