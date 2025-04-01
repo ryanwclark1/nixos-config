@@ -15,18 +15,18 @@ in
     inputs.home-manager.darwinModules.home-manager
     # ../../home/mini.nix
   ];
-  # ++ 
+  # ++
   # (builtins.attrValues outputs.darwinModules);
 
   home-manager = {
-    useGlobalPkgs = true;
+    # useGlobalPkgs = true;
     useUserPackages = true;
     backupFileExtension = "bak";
     extraSpecialArgs = {
       inherit inputs outputs;
     };
   };
-  
+
   home-manager.users."${user}" = import ../../home/${hostName}.nix;
 
   users.users."${user}" = {
