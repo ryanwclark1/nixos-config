@@ -19,7 +19,6 @@ let
   };
 in
 {
-
   accounts.email = {
     maildirBasePath = "Mail";
     accounts = {
