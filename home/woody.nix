@@ -50,6 +50,7 @@
     ./features/sys-stats
     ./features/tmux
     ./features/vscode
+    ./features/whispar
     ./features/windsurf
     ./features/yazi
     ./features/zellij
