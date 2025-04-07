@@ -79,8 +79,7 @@ let
   base15 = "99d1db"; # sky - bright cyan
   base16 = "85c1dc"; # sapphire - bright blue
   base17 = "f4b8e4"; # pink - bright purple
-in
- {
+in {
   home.file.".config/waybar/style.css" = {
     text = ''
       @define-color backgrounddark1 #${base00};
@@ -112,13 +111,20 @@ in
       .modules-center,
       .modules-right {
         padding: 0 15px;
-        spacing: 10px;
       }
 
       .modules-left > widget,
       .modules-center > widget,
       .modules-right > widget {
         margin: 0 5px;
+      }
+
+      .modules-left > widget:first-child > #workspaces {
+          margin-left: 5px;
+      }
+
+      .modules-right > widget:last-child > #workspaces {
+          margin-right: 5px;
       }
 
       .modules-left > widget:hover,
