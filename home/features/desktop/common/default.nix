@@ -15,6 +15,7 @@
 
   # Comment out screenshot, clipboard and recording tools
   home.packages = with pkgs; [
+    cairo
     d-spy # Dbus debugger
     file-roller # Archive manager
     fragments # Torrent client

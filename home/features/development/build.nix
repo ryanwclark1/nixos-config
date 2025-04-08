@@ -7,6 +7,9 @@
 
 {
   home.packages = with pkgs; [
+    gcc
+    meson
+    ninja
     pkg-config
     cmake
     gnumake
