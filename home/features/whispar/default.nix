@@ -1,14 +1,17 @@
 {
   pkgs,
   inputs,
+  ...
 }:
 # This is a home-manager config module
 {
+  imports = [
+    inputs.whisper-overlay.homeManagerModules.default
+  ];
 
   # Also make sure to enable cuda support in nixpkgs, otherwise transcription will
   # be painfully slow. But be prepared to let your computer build packages for 2-3 hours.
-  # nixpkgs.config.cudaSupport = true;
-
+  nixpkgs.config.cudaSupport = false;
   # Enable the user service
   services.realtime-stt-server.enable = true;
   # If you want to automatically start the service with your graphical session,

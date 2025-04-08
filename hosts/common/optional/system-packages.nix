@@ -7,6 +7,7 @@
 # Additional system statistics in home/features/sys-stats
 {
   environment.systemPackages = with pkgs; [
+    cairo
     sbctl # Secure Boot key manager
     git
     wget
