@@ -8,5 +8,6 @@
     sqlfluff
     pgcli
     sqlite
+    postgresql
   ];
 }
