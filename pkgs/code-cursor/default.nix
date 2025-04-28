@@ -2,33 +2,72 @@
   lib,
   stdenvNoCC,
   fetchurl,
+
+  # build
   appimageTools,
+
+  # linux dependencies
+  alsa-lib,
+  at-spi2-atk,
+  autoPatchelfHook,
+  cairo,
+  cups,
+  curlWithGnuTls,
+  egl-wayland,
+  expat,
+  fontconfig,
+  freetype,
+  ffmpeg,
+  glib,
+  glibc,
+  glibcLocales,
+  gtk3,
+  libappindicator-gtk3,
+  libdrm,
+  libgbm,
+  libGL,
+  libnotify,
+  libva-minimal,
+  libxkbcommon,
+  libxkbfile,
   makeWrapper,
-  writeScript,
+  nspr,
+  nss,
+  pango,
+  pciutils,
+  pulseaudio,
+  vivaldi-ffmpeg-codecs,
+  vulkan-loader,
+  wayland,
+
+  # linux installation
+  rsync,
+
+  # darwin build
   undmg,
 }:
 let
   pname = "cursor";
-  version = "0.47.9";
+  version = "0.48.9";
 
   inherit (stdenvNoCC) hostPlatform;
 
   sources = {
     x86_64-linux = fetchurl {
-      url = "https://downloads.cursor.com/production/b6fb41b5f36bda05cab7109606e7404a65d1ff32/linux/x64/Cursor-0.47.9-x86_64.AppImage";
-      hash = "sha256-L0ZODGHmO8SDhqrnkq7jwi30c6l+/ESj+FXHVKghsfc=";
+      url = "https://downloads.cursor.com/production/61e99179e4080fecf9d8b92c6e2e3e00fbfb53f4/linux/x64/Cursor-0.48.9-x86_64.AppImage";
+      hash = "sha256-Rw96CIN+vL1bIj5o68gWkHeiqgxExzbjwcW4ad10M2I=";
     };
     aarch64-linux = fetchurl {
-      url = "https://downloads.cursor.com/production/b6fb41b5f36bda05cab7109606e7404a65d1ff32/linux/arm64/Cursor-0.47.9-aarch64.AppImage";
-      hash = "sha256-OhaKujLXt06DL43fY5vRaGZe3p8Y1mt22y5OrzM3mMk=";
+      url = "https://downloads.cursor.com/production/61e99179e4080fecf9d8b92c6e2e3e00fbfb53f4/linux/arm64/Cursor-0.48.9-aarch64.AppImage";
+      hash = "sha256-RMDYoQSIO0jukhC5j1TjpwCcK0tEnvoVpXbFOxp/K8o=";
     };
     x86_64-darwin = fetchurl {
-      url = "https://downloads.cursor.com/production/82ef0f61c01d079d1b7e5ab04d88499d5af500e3/darwin/x64/Cursor-darwin-x64.dmg";
-      hash = "sha256-T5N8b/6HexQ2ZchWUb9CL3t9ks93O9WJgrDtxfE1SgU=";
+      url = "https://downloads.cursor.com/production/61e99179e4080fecf9d8b92c6e2e3e00fbfb53f4/darwin/x64/Cursor-darwin-x64.dmg";
+      hash = "sha256-172BGNNVvpZhk99rQN19tTsxvRADjmtEzgkZazke/v4=";
     };
     aarch64-darwin = fetchurl {
-      url = "https://downloads.cursor.com/production/82ef0f61c01d079d1b7e5ab04d88499d5af500e3/darwin/arm64/Cursor-darwin-arm64.dmg";
-      hash = "sha256-ycroylfEZY/KfRiXvfOuTdyyglbg/J7DU12u6Xrsk0s=";
+      url = "https://downloads.cursor.com/production/61e99179e4080fecf9d8b92c6e2e3e00fbfb53f4/darwin/arm64/Cursor-darwin-arm64.dmg";
+      hash = "sha256-IQ4UZwEBVGMaGUrNVHWxSRjbw8qhLjOJ2KYc9Y26LZU=";
     };
   };
 
@@ -52,8 +91,54 @@ stdenvNoCC.mkDerivation {
   src = if hostPlatform.isLinux then wrappedAppimage else source;
 
   nativeBuildInputs =
-    lib.optionals hostPlatform.isLinux [ makeWrapper ]
+    lib.optionals hostPlatform.isLinux [
+      autoPatchelfHook
+      glibcLocales
+      makeWrapper
+      rsync
+    ]
     ++ lib.optionals hostPlatform.isDarwin [ undmg ];
+
+  buildInputs = lib.optionals hostPlatform.isLinux [
+    alsa-lib
+    at-spi2-atk
+    cairo
+    cups
+    curlWithGnuTls
+    egl-wayland
+    expat
+    ffmpeg
+    glib
+    gtk3
+    libdrm
+    libgbm
+    libGL
+    libGL
+    libva-minimal
+    libxkbcommon
+    libxkbfile
+    nspr
+    nss
+    pango
+    pulseaudio
+    vivaldi-ffmpeg-codecs
+    vulkan-loader
+    wayland
+  ];
+
+  runtimeDependencies = lib.optionals hostPlatform.isLinux [
+    egl-wayland
+    ffmpeg
+    glibc
+    libappindicator-gtk3
+    libnotify
+    libxkbfile
+    pciutils
+    pulseaudio
+    wayland
+    fontconfig
+    freetype
+  ];
 
   sourceRoot = lib.optionalString hostPlatform.isDarwin ".";
 
@@ -68,13 +153,13 @@ stdenvNoCC.mkDerivation {
 
     ${lib.optionalString hostPlatform.isLinux ''
       cp -r bin $out/bin
-      mkdir -p $out/share/cursor
+      # mkdir -p $out/share/cursor
+      # cp -ar ${appimageContents}/usr/share $out/
 
-      # Copy icon
-      install -Dm 644 ${appimageContents}/co.anysphere.cursor.png -t $out/share/icons/hicolor/256x256/apps/
+      rsync -a -q ${appimageContents}/usr/share $out/ --exclude "*.so"
 
-      # Copy desktop file
-      install -Dm 644 ${appimageContents}/cursor.desktop -t $out/share/applications/
+      # Fix the desktop file to point to the correct location
+      substituteInPlace $out/share/applications/cursor.desktop --replace-fail "/usr/share/cursor/cursor" "$out/bin/cursor"
 
       wrapProgram $out/bin/cursor \
         --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations --enable-wayland-ime=true}} --no-update"
@@ -82,15 +167,10 @@ stdenvNoCC.mkDerivation {
 
     ${lib.optionalString hostPlatform.isDarwin ''
       APP_DIR="$out/Applications"
-      CURSOR_APP="$APP_DIR/Cursor.app"
       mkdir -p "$APP_DIR"
       cp -Rp Cursor.app "$APP_DIR"
       mkdir -p "$out/bin"
-      cat << EOF > "$out/bin/cursor"
-      #!${stdenvNoCC.shell}
-      open -na "$CURSOR_APP" --args "\$@"
-      EOF
-      chmod +x "$out/bin/cursor"
+      ln -s "$APP_DIR/Cursor.app/Contents/Resources/app/bin/cursor" "$out/bin/cursor"
     ''}
 
     runHook postInstall
@@ -98,39 +178,7 @@ stdenvNoCC.mkDerivation {
 
   passthru = {
     inherit sources;
-    updateScript = writeScript "update.sh" ''
-      #!/usr/bin/env nix-shell
-      #!nix-shell -i bash -p curl yq coreutils gnused trurl common-updater-scripts
-      set -eu -o pipefail
-
-      # Check the latest version from Cursor's website
-      version=$(curl -s "https://download.cursor.sh/latest-versions.json" | jq -r '.latestVers.main.ver')
-      buildId=$(curl -s "https://download.cursor.sh/latest-versions.json" | jq -r '.latestVers.main.buildId')
-      baseUrl="https://downloads.cursor.com/production/$buildId"
-
-      currentVersion=$(nix-instantiate --eval -E "with import ./. {}; code-cursor.version or (lib.getVersion code-cursor)" | tr -d '"')
-
-      if [[ "$version" != "$currentVersion" ]]; then
-          for platform in "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin"; do
-              if [ $platform = "x86_64-linux" ]; then
-                  url="$baseUrl/linux/x64/Cursor-$version-x86_64.AppImage"
-              elif [ $platform = "aarch64-linux" ]; then
-                  url="$baseUrl/linux/arm64/Cursor-$version-arm64.AppImage"
-              elif [ $platform = "x86_64-darwin" ]; then
-                  url="$baseUrl/darwin/x64/Cursor-$version-x64.dmg"
-              elif [ $platform = "aarch64-darwin" ]; then
-                  url="$baseUrl/darwin/arm64/Cursor-$version-arm64.dmg"
-              else
-                  echo "Unsupported platform: $platform"
-                  exit 1
-              fi
-
-              url=$(trurl --accept-space "$url")
-              hash=$(nix-hash --to-sri --type sha256 "$(nix-prefetch-url "$url" --name "cursor-$version")")
-              update-source-version code-cursor $version $hash $url --system=$platform --ignore-same-version --source-key="sources.$platform"
-          done
-      fi
-    '';
+    updateScript = ./update.sh;
   };
 
   meta = {
