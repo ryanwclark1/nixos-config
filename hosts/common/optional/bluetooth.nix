@@ -24,9 +24,6 @@
     };
   };
 
-  environment.systemPackages = with pkgs; [
-    bluez-tools
-  ];
   # Blueman is a GTK+ Bluetooth Manager
   services.blueman.enable = true;
 }

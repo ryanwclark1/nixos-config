@@ -26,8 +26,9 @@ let
 in
 {
   home.packages = [
+    (pkgs.writeScriptBin "bluetoothz" (builtins.readFile ./scripts/bluetoothz))
     (pkgs.writeScriptBin "dkr" (builtins.readFile ./scripts/dkr))
-    (pkgs.writeScriptBin "fv" (builtins.readFile ./scripts/fv)) 
+    (pkgs.writeScriptBin "fv" (builtins.readFile ./scripts/fv))
     (pkgs.writeScriptBin "fzf-git" (builtins.readFile ./scripts/fzf-git))
     (pkgs.writeScriptBin "fzmv" (builtins.readFile ./scripts/fzmv))
     (pkgs.writeScriptBin "fztop" (builtins.readFile ./scripts/fztop))
