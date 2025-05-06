@@ -9,8 +9,13 @@ let
   defaultFileList = [ "starship.toml" ];
   defaultDirList = [ "atuin" "bat" "eza" "fd" "k9s" "navi" "ripgrep" "ripgrep-all" "scripts" "tealdeer" "tmux" "yazi"];
   updatedDots = pkgs.writeShellScriptBin "update-dots" ''
-    #!/usr/bin/env bash
+    !/usr/bin/env bash
     set -e
+
+  # ensure we own everything under dotrepoDir
+    USER="$(id -un)"
+    GROUP="$(id -gn)"
+    chown -R "$USER:$GROUP" "${dotrepoDir}" || true
 
     # Default file and directory lists (relative to "${configDir}")
     DEFAULT_FILE_LIST=(${toString defaultFileList})
@@ -18,22 +23,18 @@ let
 
     # Function to remove existing files
     remove_files() {
-        local dest_file="${dotrepoDir}/$1"
-
-        if [[ -f "$dest_file" ]]; then
-            rm -f "$dest_file"
-            echo "Removed existing file: $dest_file"
-        fi
+      local dest_file="${dotrepoDir}/$1"
+      [[ -f "$dest_file" ]] || return
+      rm -f "$dest_file"
+      echo "Removed existing file: $dest_file"
     }
 
     # Function to remove existing directories
     remove_directories() {
-        local dest_dir="${dotrepoDir}/$1"
-
-        if [[ -d "$dest_dir" ]]; then
-            rm -rf "$dest_dir"
-            echo "Removed existing directory: $dest_dir"
-        fi
+      local dest_dir="${dotrepoDir}/$1"
+      [[ -d "$dest_dir" ]] || return
+      rm -rf "$dest_dir"
+      echo "Removed existing directory: $dest_dir"
     }
 
     # Function to copy files and modify permissions
@@ -106,7 +107,10 @@ let
 
   in
 {
-  home.packages = with pkgs; [ git ];
+  home.packages = with pkgs; [
+    git
+    updatedDots
+  ];
 
   systemd.user.services.update-dots = {
     Unit = {
@@ -117,7 +121,7 @@ let
 
     Service = {
       Type = "oneshot";
-      ExecStart = "${updatedDots}/bin/update-dots";
+      ExecStart = "${config.home.homeDirectory}/.nix-profile/bin/update-dots";
     };
 
     Install = {
