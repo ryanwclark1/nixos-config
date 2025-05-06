@@ -45,6 +45,9 @@
 
   # darwin build
   undmg,
+  rsync,
+  autoPatchelfHook,
+  glibcLocales,
 }:
 let
   pname = "cursor";
@@ -155,9 +158,14 @@ stdenvNoCC.mkDerivation {
       cp -r bin $out/bin
       # mkdir -p $out/share/cursor
       # cp -ar ${appimageContents}/usr/share $out/
+      # mkdir -p $out/share/cursor
+      # cp -ar ${appimageContents}/usr/share $out/
 
       rsync -a -q ${appimageContents}/usr/share $out/ --exclude "*.so"
+      rsync -a -q ${appimageContents}/usr/share $out/ --exclude "*.so"
 
+      # Fix the desktop file to point to the correct location
+      substituteInPlace $out/share/applications/cursor.desktop --replace-fail "/usr/share/cursor/cursor" "$out/bin/cursor"
       # Fix the desktop file to point to the correct location
       substituteInPlace $out/share/applications/cursor.desktop --replace-fail "/usr/share/cursor/cursor" "$out/bin/cursor"
 
@@ -170,6 +178,7 @@ stdenvNoCC.mkDerivation {
       mkdir -p "$APP_DIR"
       cp -Rp Cursor.app "$APP_DIR"
       mkdir -p "$out/bin"
+      ln -s "$APP_DIR/Cursor.app/Contents/Resources/app/bin/cursor" "$out/bin/cursor"
       ln -s "$APP_DIR/Cursor.app/Contents/Resources/app/bin/cursor" "$out/bin/cursor"
     ''}
 
