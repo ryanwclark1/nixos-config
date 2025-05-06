@@ -5,7 +5,7 @@
 
 {
   home.packages = with pkgs; [
-    bluetoothz
+    bluez
     bluetui
   ];
 }
