@@ -32,7 +32,11 @@ let
   '';
 in
 {
-  home.packages = with pkgs; [ git swww ];
+  home.packages = with pkgs; [
+    git
+    swww
+    syncScript
+  ];
 
   home.activation.initWallpapers = config.lib.dag.entryAfter [ "writeBoundary" ] ''
     if [ ! -d "${wallpapersDir}" ]; then
