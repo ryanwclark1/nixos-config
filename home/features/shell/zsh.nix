@@ -20,7 +20,7 @@
     shellGlobalAliases = {
       "--help" = "--help 2>&1 | bat --language=help --style=plain";
     };
-    initExtra = ''
+    initContent = ''
     show_file_or_dir_preview="if [ -d {} ]; then eza --tree --color=always {} | head -200; else bat --style=numbers --color=always --line-range=:500 {}; fi"
 
     _fzf_comprun() {
