@@ -20,7 +20,6 @@
     ./features/development
     # ./features/discord
     ./features/docs
-    ./features/dotfiles
     ./features/eza
     ./features/fastfetch
     ./features/fd
