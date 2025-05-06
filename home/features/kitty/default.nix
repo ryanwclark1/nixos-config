@@ -36,7 +36,7 @@ in
     [ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh"
   '';
 
-  programs.zsh.initExtra = ''
+  programs.zsh.initContent = ''
     [ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh"
   '';
 
