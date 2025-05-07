@@ -83,63 +83,67 @@ in
 
   home.file = {
     ".config/rofi/scripts/appasroot.sh" = {
-      source = ./appasroot.sh;
+      source = ./scripts/appasroot.sh;
       executable = true;
     };
     ".config/rofi/scripts/apps.sh" = {
-      source = ./apps.sh;
+      source = ./scripts/apps.sh;
       executable = true;
     };
     ".config/rofi/scripts/brightness.sh" = {
-      source = ./brightness.sh;
+      source = ./scripts/brightness.sh;
       executable = true;
     };
     ".config/rofi/scripts/cliphist.sh" = {
-      source = ./cliphist.sh;
+      source = ./scripts/cliphist.sh;
+      executable = true;
+    };
+    ".config/rofi/scripts/keybindings.sh" = {
+      source = ./scripts/keybindings.sh;
       executable = true;
     };
     ".config/rofi/scripts/mpd.sh" = {
-      source = ./mpd.sh;
+      source = ./scripts/mpd.sh;
       executable = true;
     };
     ".config/rofi/scripts/power-big.sh" = {
-      source = ./power-big.sh;
+      source = ./scripts/power-big.sh;
       executable = true;
     };
     ".config/rofi/scripts/powermenu.sh" = {
-      source = ./powermenu.sh;
+      source = ./scripts/powermenu.sh;
       executable = true;
     };
     ".config/rofi/scripts/quicklinks.sh" = {
-      source = ./quicklinks.sh;
+      source = ./scripts/quicklinks.sh;
       executable = true;
     };
     ".config/rofi/scripts/rofi-code.sh" = {
-      source = ./rofi-code.sh;
+      source = ./scripts/rofi-code.sh;
       executable = true;
     };
     ".config/rofi/scripts/rofi-launcher.sh" = {
-      source = ./rofi-launcher.sh;
+      source = ./scripts/rofi-launcher.sh;
       executable = true;
     };
     ".config/rofi/scripts/screenshot.sh" = {
-      source = ./screenshot.sh;
+      source = ./scripts/screenshot.sh;
       executable = true;
     };
     ".config/rofi/scripts/screenshot2.sh" = {
-      source = ./screenshot2.sh;
+      source = ./scripts/screenshot2.sh;
       executable = true;
     };
     ".config/rofi/scripts/screenshot3.sh" = {
-      source = ./screenshot3.sh;
+      source = ./scripts/screenshot3.sh;
       executable = true;
     };
     ".config/rofi/scripts/volume.sh" = {
-      source = ./volume.sh;
+      source = ./scripts/volume.sh;
       executable = true;
     };
     ".config/rofi/scripts/web-search.sh" = {
-      source = ./web-search.sh;
+      source = ./scripts/web-search.sh;
       executable = true;
     };
   };
