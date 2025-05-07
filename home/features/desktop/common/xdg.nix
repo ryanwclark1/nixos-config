@@ -17,10 +17,12 @@
         executable = true;
       }
     )
+    pkgs.xdg-desktop-portal-hyprland
   ];
 
   xdg = {
     enable = true;
+    autostart.enable = true;
     mime.enable = true;
     configFile."mimeapps.list".force = true;
     cacheHome = "${config.home.homeDirectory}/.local/cache";
