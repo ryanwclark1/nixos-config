@@ -11,33 +11,41 @@
     enable = true;
     settings = {
       positionX = "right";
-      positionY = "top";
       layer = "overlay";
-      control-center-layer = "top";
       layer-shell = true;
-      cssPriority = "user";
+      layer-shell-cover-screen = true;
+      cssPriority = "application";
+      positionY = "top";
+      control-center-positionX = "none";
+      control-center-positionY = "none";
       control-center-margin-top = 13;
       control-center-margin-bottom = 0;
       control-center-margin-right = 14;
       control-center-margin-left = 0;
+      control-center-layer = "top";
+      control-center-exclusive-zone = true;
       notification-2fa-action = true;
       notification-inline-replies = false;
-      notification-icon-size = 24;
+      notification-icon-size = 48;
       notification-body-image-height = 100;
-      notification-body-image-width = 100;
-      notification-window-width = 300;
-      timeout = 6;
-      timeout-low = 3;
+      notification-body-image-width = 200;
+      timeout = 10;
+      timeout-low = 5;
       timeout-critical = 0;
+      notification-window-width = 500;
       fit-to-screen = false;
+      relative-timestamps = true;
+      control-center-height = 600;
       control-center-width = 400;
-      control-center-height = 720;
       keyboard-shortcuts = true;
+      image-visibility = "when-available";
       transition-time = 200;
       hide-on-clear = false;
       hide-on-action = true;
+      text-empty = "No notifications";
       script-fail-notify = true;
       widgets = [
+        "inhibitors"
         "dnd"
         "buttons-grid"
         "mpris"
@@ -49,7 +57,7 @@
         title = {
           text = "Notifications";
           clear-all-button = true;
-          button-text = "Clear";
+          button-text = "Clear All";
         };
         dnd = {
           text = "Do Not Disturb";
@@ -59,15 +67,23 @@
           text = "Notification";
         };
         mpris = {
-          image-size = 50;
-          image-radius = 0;
+          image-size = 96;
         };
         volume = {
           label = "󰕾 ";
+          show-per-app = true;
+          show-per-app-icon = true;
+          show-per-app-label = true;
+          empty-list-label = "No active sink input";
+          expand-button-lablel = "⇧";
+          collapse-button-label = "⇩";
+          icon-size = 24;
+          animation-type = "slide_down";
+          animation-duration = 250;
         };
-        backlight = {
-          label = "󰃟 ";
-        };
+        # backlight = {
+        #   label = "󰃟 ";
+        # };
         buttons-grid = {
           actions = [
             {
@@ -87,6 +103,11 @@
               command = "bash -c $HOME/.config/hypr/scripts/scripts/wlogout.sh";
             }
           ];
+        };
+        inhibitors = {
+          text = "Inhibitors";
+          clear-all-button = true;
+          button-text = "Clear All";
         };
       };
     };
