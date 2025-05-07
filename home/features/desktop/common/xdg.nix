@@ -32,7 +32,8 @@
       xdgOpenUsePortal = true;
       extraPortals = with pkgs; [
         # inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland
-        xdg-desktop-portal-gtk
+        # xdg-desktop-portal-gtk
+        xdg-desktop-portal-hyprland
       ];
       config = {
         common = {
@@ -144,7 +145,7 @@
           "text/javascript" = codeEditors;
           "application/json" = codeEditors;
           "application/ld+json" = codeEditors;
-          
+
 
           "application/pdf" = pdfViewers;
 

@@ -4,8 +4,6 @@
   lib,
   ...
 }:
-# with config.lib.stylix.colors;
-# with config.stylix.fonts;
 
 # TODO: Figure out toggle
 # Option1: hyprctl -j getoption plugin:hyprbars:bar_height | jq -re '.int != 0' (Can't find)
