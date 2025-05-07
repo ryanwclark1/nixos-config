@@ -24,5 +24,6 @@
   # Prometheus Service Discovery for Tailscale.
   environment.systemPackages = with pkgs; [
     tailscalesd
+    trayscale
   ];
 }
