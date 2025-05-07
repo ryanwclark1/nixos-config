@@ -80,7 +80,7 @@ let
   base16 = "85c1dc"; # sapphire - bright blue
   base17 = "f4b8e4"; # pink - bright purple
 in {
-  home.file.".config/waybar/style.css" = {
+  home.file.".config/waybar/colors.css" = {
     text = ''
       @define-color backgrounddark1 #${base00};
       @define-color backgrounddark2 #${base01};
@@ -90,100 +90,8 @@ in {
       @define-color textcolor2 #FFFFFF;
       @define-color textcolor3 #FFFFFF;
       @define-color iconcolor #${base0E};
+      @define-color backgroundhex ${hexToRgba base00 "0.75"};
 
-      * {
-        font-family: DejaVu Sans, UbuntuMono Nerd Font;
-        font-size: 16px;
-        font-weight: bold;
-        border: none;
-        border-radius: 0px;
-      }
-
-      window#waybar {
-        background-color: ${hexToRgba base00 "0.75"};
-        color: #FFFFFF;
-        border: none;
-        transition: background-color;
-        transition-duration: 0.5s;
-      }
-
-      window#waybar.hidden {
-        opacity: 0.2;
-      }
-
-      .modules-left > widget:first-child > #workspaces {
-          margin-left: 10px;
-      }
-
-      .modules-right > widget:last-child > #workspaces {
-          margin-right: 10px;
-      }
-
-      #workspaces {
-          margin: 5px 1px 6px 1px;
-          padding: 0px 1px;
-          border-radius: 15px;
-          border: 0px;
-          font-weight: bold;
-          font-style: normal;
-          font-size: 16px;
-          color: #${base05};
-      }
-
-      #workspaces button {
-        padding: 0px 5px;
-        margin: 4px 3px;
-        border-radius: 15px;
-        border: 0px;
-        color: @textcolor3;
-        transition: all 0.3s cubic-bezier(.55,-0.68,.48,1.682);
-      }
-
-      #workspaces button.active {
-        background-color: @backgrounddark3;
-        border-radius: 6px;
-        color: @textcolor3;
-      }
-
-      .modules-left > widget:hover,
-      .modules-right > widget:hover {
-        background-color: @backgrounddark3;
-        border-radius: 6px;
-        transition: background-color 0.3s ease-in-out;
-      }
-
-      #tray > * {
-        transition: all 0.3s ease;
-        margin: 0 5px;
-      }
-
-      tooltip {
-        background-color: ${hexToRgba base01 "0.95"};
-        color: #${base05};
-        padding: 12px 16px;
-        font-size: 14px;
-        font-weight: normal;
-        border-radius: 8px;
-        border: 1px solid @bordercolor;
-      }
-
-      #clock:hover,
-      #battery:hover,
-      #network:hover,
-      #custom-exit:hover {
-        background-color: @backgrounddark3;
-        border-radius: 4px;
-        transition: background-color 0.2s;
-      }
-
-      #network.icon,
-      #bluetooth.icon,
-      #custom-nix-updates.icon,
-      #custom-hyprbindings.icon,
-      #custom-cliphist.icon {
-        color: @iconcolor;
-        font-size: 18px;
-      }
     '';
     executable = false;
   };

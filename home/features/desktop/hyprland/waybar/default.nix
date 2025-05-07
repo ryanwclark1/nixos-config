@@ -14,7 +14,7 @@
   };
 
   home.file.".config/waybar/style.css" = {
-    source = ./style;
+    source = ./style.css;
   };
 
   programs = {

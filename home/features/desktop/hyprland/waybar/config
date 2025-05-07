@@ -28,7 +28,7 @@
       }
     },
     "modules-left": [
-      "custom/applauncher",
+      // "custom/applauncher",
       "hyprland/workspaces"
     ],
     "modules-center": [
@@ -88,38 +88,39 @@
     //   "on-click": "blueman-manager",
     //   "tooltip-format": "Bluetooth"
     // },
-    // "clock": {
-    //   "actions": {
-    //     "on-click-backward": "tz_down",
-    //     "on-click-forward": "tz_up",
-    //     "on-click-right": "mode",
-    //     "on-scroll-down": "shift_down",
-    //     "on-scroll-up": "shift_up"
-    //   },
-    //   "calendar": {
-    //     "mode": "year",
-    //     "mode-mon-col": 3,
-    //     "on-scroll": 1,
-    //     "weeks-pos": "right"
-    //   },
-    //   "format": "{:%H:%M}",
-    //   "format-alt": "{:%Y-%m-%d %H:%M:%S}",
-    //   "interval": 60,
-    //   "max-length": 25,
-    //   "on-click-left": "mode",
-    //   "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
-    // },
+    "clock": {
+      "actions": {
+        "on-click-backward": "tz_down",
+        "on-click-forward": "tz_up",
+        "on-click-right": "mode",
+        "on-scroll-down": "shift_down",
+        "on-scroll-up": "shift_up"
+      },
+      "calendar": {
+        "mode": "year",
+        "mode-mon-col": 3,
+        "on-scroll": 1,
+        "weeks-pos": "right"
+      },
+      "format": "{:%H:%M}",
+      "format-alt": "{:%Y-%m-%d %H:%M:%S}",
+      "interval": 60,
+      "max-length": 25,
+      "on-click-left": "mode",
+      "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+    }
+    // ,
     // "cpu": {
     //   "format": " {usage}%",
     //   "interval": 5,
     //   "on-click": "missioncenter",
     //   "tooltip": true
     // },
-    "custom/applauncher": {
-      "format": "󱗼",
-      "on-click": "rofi -show drun -theme $HOME/.config/rofi/style/launcher-full.rasi",
-      "tooltip-format": "Application Launcher"
-    }
+    // "custom/applauncher": {
+    //   "format": "󱗼",
+    //   "on-click": "rofi -show drun -theme $HOME/.config/rofi/style/launcher-full.rasi",
+    //   "tooltip-format": "Application Launcher"
+    // }
     // ,
     // "custom/chatgpt": {
     //   "format": "",
