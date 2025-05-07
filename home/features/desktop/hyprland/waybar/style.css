@@ -12,7 +12,7 @@
 /* -----------------------------------------------------
  * Import Pywal colors
  * ----------------------------------------------------- */
-/* @import 'style-light.css'; */
+@import 'colors.css';
 @define-color backgroundlight #FFFFFF;
 @define-color backgrounddark #FFFFFF;
 @define-color workspacesbackground1 #FFFFFF;
@@ -28,7 +28,7 @@
  * ----------------------------------------------------- */
 
 * {
-    font-family: "Fira Sans Semibold", "Font Awesome 6 Free", FontAwesome,  Roboto, Helvetica, Arial, sans-serif;
+    font-family: DejaVu Sans, UbuntuMono Nerd Font;
     border: none;
     border-radius: 0px;
 }
