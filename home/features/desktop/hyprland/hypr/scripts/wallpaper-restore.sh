@@ -14,7 +14,7 @@
 # Set defaults
 # -----------------------------------------------------
 
-defaultwallpaper="$HOME/wallpaper/default.jpg"
+defaultwallpaper="$HOME/Pictures/wallpaper/default.png"
 cachefile="$HOME/.config/hypr/scripts/cache/current_wallpaper"
 
 # -----------------------------------------------------

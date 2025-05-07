@@ -51,7 +51,6 @@
     qalculate-gtk
     slurp # Screenshot tool, select area
     swappy # Wayland native snapshot editing tool, inspired by Snappy on macOS
-    swww # Sway window switcher
     tesseract # OCR tool
     wayshot
     wf-recorder # Utility program for screen recording of wlroots-based compositors
