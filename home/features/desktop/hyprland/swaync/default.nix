@@ -33,7 +33,6 @@
       control-center-width = 400;
       control-center-height = 720;
       keyboard-shortcuts = true;
-      image-visibility = "when available";
       transition-time = 200;
       hide-on-clear = false;
       hide-on-action = true;
@@ -43,7 +42,6 @@
         "buttons-grid"
         "mpris"
         "volume"
-        "backlight"
         "title"
         "notifications"
       ];

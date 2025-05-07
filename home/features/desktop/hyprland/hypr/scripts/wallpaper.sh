@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-#  _      __     ____                      
+#  _      __     ____
 # | | /| / /__ _/ / /__  ___ ____  ___ ____
 # | |/ |/ / _ `/ / / _ \/ _ `/ _ \/ -_) __/
-# |__/|__/\_,_/_/_/ .__/\_,_/ .__/\__/_/   
-#                /_/       /_/             
+# |__/|__/\_,_/_/_/ .__/\_,_/ .__/\__/_/
+#                /_/       /_/
 # -----------------------------------------------------
 # Check to use wallpaper cache
 # -----------------------------------------------------
@@ -28,7 +28,7 @@ blurredwallpaper="$HOME/.config/hypr/scripts/cache/blurred_wallpaper.png"
 squarewallpaper="$HOME/.config/hypr/scripts/cache/square_wallpaper.png"
 rasifile="$HOME/.config/hypr/scripts/cache/current_wallpaper.rasi"
 blurfile="$HOME/.config/hypr/scripts/settings/blur.sh"
-defaultwallpaper="$HOME/wallpaper/default.jpg"
+defaultwallpaper="$HOME/Pictures/wallpaper/default.png"
 wallpapereffect="$HOME/.config/hypr/scripts/settings/wallpaper-effect.sh"
 blur="50x30"
 blur=$(cat $blurfile)
