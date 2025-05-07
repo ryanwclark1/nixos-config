@@ -9,99 +9,96 @@ let
   defaultFileList = [ "starship.toml" ];
   defaultDirList = [ "atuin" "bat" "eza" "fd" "k9s" "navi" "ripgrep" "ripgrep-all" "scripts" "tealdeer" "tmux" "yazi"];
   updatedDots = pkgs.writeShellScriptBin "update-dots" ''
-    !/usr/bin/env bash
-    set -e
+    set -euxo pipefail
 
-  # ensure we own everything under dotrepoDir
+    # ensure we own everything under dotrepoDir
     USER="$(id -un)"
     GROUP="$(id -gn)"
+    echo "Updating dotfiles repository at ${dotrepoDir} as $USER:$GROUP"
+
+    # ensure we own the repo before we start
     chown -R "$USER:$GROUP" "${dotrepoDir}" || true
 
     # Default file and directory lists (relative to "${configDir}")
     DEFAULT_FILE_LIST=(${toString defaultFileList})
     DEFAULT_DIR_LIST=(${toString defaultDirList})
 
-    # Function to remove existing files
-    remove_files() {
-      local dest_file="${dotrepoDir}/$1"
-      [[ -f "$dest_file" ]] || return
-      rm -f "$dest_file"
-      echo "Removed existing file: $dest_file"
-    }
+    sync_file() {
+      local src="${configDir}/$1"
+      local dst="${dotrepoDir}/$1"
 
-    # Function to remove existing directories
-    remove_directories() {
-      local dest_dir="${dotrepoDir}/$1"
-      [[ -d "$dest_dir" ]] || return
-      rm -rf "$dest_dir"
-      echo "Removed existing directory: $dest_dir"
-    }
+      # removed upstream?
+      if [[ ! -e "$src" && -e "$dst" ]]; then
+        rm -f "$dst"
+        echo "  [removed] $1"
+        return
+      fi
 
-    # Function to copy files and modify permissions
-    copy_files() {
-        local src_file="${configDir}/$1"
-        local dest_file="${dotrepoDir}/$1"
-
-        if [[ -f "$src_file" ]]; then
-            cp -L "$src_file" "$dest_file"  # Use -L to dereference symbolic links
-            chown "$USER" "$dest_file"
-            chmod u+w "$dest_file"
-            echo "Copied file: $src_file -> $dest_file"
+      # new file?
+      if [[ -f "$src" && ! -e "$dst" ]]; then
+        mkdir -p "$(dirname "$dst")"
+        cp -L "$src" "$dst"
+        echo "  [added]   $1"
+      # updated file?
+      elif [[ -f "$src" && -f "$dst" ]]; then
+        if ! cmp -s "$src" "$dst"; then
+          cp -L "$src" "$dst"
+          echo "  [updated] $1"
         else
-            echo "Warning: File $src_file does not exist."
+          echo "  [skip]    $1 (unchanged)"
         fi
+      fi
+
+      # fix perms on anything we copied
+      if [[ -e "$dst" ]]; then
+        chown "''${USER}:''${GROUP}" "$dst"
+        chmod u+w "$dst"
+      fi
     }
 
-    # Function to copy directories recursively and modify permissions
-    copy_directories() {
-        local src_dir="${configDir}/$1"
-        local dest_dir="${dotrepoDir}/$1"
+    sync_dir() {
+      local src="${configDir}/$1/"
+      local dst="${dotrepoDir}/$1/"
 
-        if [[ -d "$src_dir" ]]; then
-            echo "Copying directory: $src_dir -> $dest_dir"
-            cp -rfL "$src_dir" "$dest_dir"  # Use -rL to dereference symbolic links
-            chown -R "$USER" "$dest_dir"
-            find "$dest_dir" -type f -exec chmod u+w {} \;
-            echo "Copied directory: $src_dir -> $dest_dir"
-        else
-            echo "Warning: Directory $src_dir does not exist."
-        fi
+      # removed upstream?
+      if [[ ! -d "${configDir}/$1" && -d "${dotrepoDir}/$1" ]]; then
+        rm -rf "${dotrepoDir}/$1"
+        echo "  [removed] dir/$1"
+        return
+      fi
+
+      # only sync if the source exists
+      if [[ -d "${configDir}/$1" ]]; then
+        echo "  [sync]    dir/$1"
+        rsync -aL --delete --force --itemize-changes \
+          "''${src}" "''${dst}" | sed 's/^/            /'
+        # fix ownership
+        chown -R "''${USER}:''${GROUP}" "${dotrepoDir}/$1"
+        find "${dotrepoDir}/$1" -type f -exec chmod u+w {} +
+      fi
     }
 
-    # Remove existing files
-    for file in "''${DEFAULT_FILE_LIST[@]}"; do
-        remove_files "$file"
+    # --- sync files ---
+    echo "→ Files:"
+    for f in "''${DEFAULT_FILE_LIST[@]}"; do
+      sync_file "$f"
     done
 
-    # Remove existing directories
-    for dir in "''${DEFAULT_DIR_LIST[@]}"; do
-        remove_directories "$dir"
+    # --- sync directories ---
+    echo "→ Directories:"
+    for d in "''${DEFAULT_DIR_LIST[@]}"; do
+      sync_dir "$d"
     done
 
-    # Ensure destination directory exists
-    mkdir -p "${dotrepoDir}"
-
-    # Copy default files
-    for file in "''${DEFAULT_FILE_LIST[@]}"; do
-        copy_files "$file"
-    done
-
-    # Copy default directories
-    for dir in "''${DEFAULT_DIR_LIST[@]}"; do
-        copy_directories "$dir"
-    done
-
-    echo "Files and directories copied successfully to ${dotrepoDir}. Text replacement completed."
-
-    # Change to the dotfiles repository directory
+    # commit & push if anything changed
     cd "${dotrepoDir}"
-
     if [[ -n $(git status --porcelain) ]]; then
-        git add .
-        git commit -m "Auto-update: $(date)"
-        git push origin main  # Change 'main' to your branch name if different
+      echo "→ Git: committing changes"
+      git add .
+      git commit -m "Auto-update: $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+      git push origin main
     else
-        echo "No changes to commit."
+      echo "→ No changes to commit."
     fi
   '';
 
@@ -122,6 +119,10 @@ let
     Service = {
       Type = "oneshot";
       ExecStart = "${config.home.homeDirectory}/.nix-profile/bin/update-dots";
+      WorkingDirectory = "${config.home.homeDirectory}/Code/dotfiles";
+      Environment      = "HOME=${config.home.homeDirectory}";
+      StandardOutput   = "journal";
+      StandardError    = "journal";
     };
 
     Install = {

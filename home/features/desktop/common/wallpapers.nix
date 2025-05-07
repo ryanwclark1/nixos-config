@@ -8,7 +8,6 @@ let
   wallpapersDir = "${config.home.homeDirectory}/Pictures/wallpapers";
   repoUrl = "https://github.com/ryanwclark1/wallpapers.git";
   syncScript = pkgs.writeShellScriptBin "wallpapers-sync" ''
-    #!/usr/bin/env bash
 
     if [ ! -d "${wallpapersDir}" ]; then
         echo "Wallpapers directory not found. Cloning repository..."
