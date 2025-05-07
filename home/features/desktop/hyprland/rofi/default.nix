@@ -114,6 +114,10 @@ in
       source = ./scripts/powermenu.sh;
       executable = true;
     };
+    ".config/rofi/scripts/powermenu2.sh" = {
+      source = ./scripts/powermenu2.sh;
+      executable = true;
+    };
     ".config/rofi/scripts/quicklinks.sh" = {
       source = ./scripts/quicklinks.sh;
       executable = true;

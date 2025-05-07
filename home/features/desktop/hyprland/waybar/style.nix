@@ -87,44 +87,62 @@ in {
       @define-color backgrounddark3 #${base02};
       @define-color bordercolor #FFFFFF;
       @define-color textcolor1 #${base05};
+      @define-color textcolor2 #FFFFFF;
       @define-color textcolor3 #FFFFFF;
       @define-color iconcolor #${base0E};
 
       * {
-        font-size: 16px;
         font-family: DejaVu Sans, UbuntuMono Nerd Font;
+        font-size: 16px;
         font-weight: bold;
+        border: none;
+        border-radius: 0px;
       }
 
       window#waybar {
         background-color: ${hexToRgba base00 "0.75"};
-        color: @textcolor1;
+        color: #FFFFFF;
         border: none;
-        transition: background-color 0.5s;
+        transition: background-color;
+        transition-duration: 0.5s;
       }
 
       window#waybar.hidden {
         opacity: 0.2;
       }
 
-      .modules-left,
-      .modules-center,
-      .modules-right {
-        padding: 0 15px;
-      }
-
-      .modules-left > widget,
-      .modules-center > widget,
-      .modules-right > widget {
-        margin: 0 5px;
-      }
-
       .modules-left > widget:first-child > #workspaces {
-          margin-left: 5px;
+          margin-left: 10px;
       }
 
       .modules-right > widget:last-child > #workspaces {
-          margin-right: 5px;
+          margin-right: 10px;
+      }
+
+      #workspaces {
+          margin: 5px 1px 6px 1px;
+          padding: 0px 1px;
+          border-radius: 15px;
+          border: 0px;
+          font-weight: bold;
+          font-style: normal;
+          font-size: 16px;
+          color: #${base05};
+      }
+
+      #workspaces button {
+        padding: 0px 5px;
+        margin: 4px 3px;
+        border-radius: 15px;
+        border: 0px;
+        color: @textcolor3;
+        transition: all 0.3s cubic-bezier(.55,-0.68,.48,1.682);
+      }
+
+      #workspaces button.active {
+        background-color: @backgrounddark3;
+        border-radius: 6px;
+        color: @textcolor3;
       }
 
       .modules-left > widget:hover,
@@ -139,19 +157,9 @@ in {
         margin: 0 5px;
       }
 
-      #workspaces button {
-        transition: all 0.3s cubic-bezier(.55,-0.68,.48,1.682);
-      }
-
-      #workspaces button.active {
-        background-color: @backgrounddark3;
-        border-radius: 6px;
-        color: @textcolor3;
-      }
-
       tooltip {
         background-color: ${hexToRgba base01 "0.95"};
-        color: @textcolor1;
+        color: #${base05};
         padding: 12px 16px;
         font-size: 14px;
         font-weight: normal;
@@ -168,7 +176,6 @@ in {
         transition: background-color 0.2s;
       }
 
-      #battery.icon,
       #network.icon,
       #bluetooth.icon,
       #custom-nix-updates.icon,
