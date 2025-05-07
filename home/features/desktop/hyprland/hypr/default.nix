@@ -1,4 +1,5 @@
 {
+  pkgs,
   ...
 }:
 
@@ -44,11 +45,12 @@
         "--all"
       ];
     };
+    plugins = with pkgs.hyprlandPlugins; [
+      hyprexpo
+      hyprwinwrap
+      hyprgrass
+    ];
     settings ={
-      # "exec-once" = [
-      #   "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
-      # ];
-      # Colors is auto generated
       source = [
         "~/.config/hypr/conf/animation.conf"
         "~/.config/hypr/conf/autostart.conf"

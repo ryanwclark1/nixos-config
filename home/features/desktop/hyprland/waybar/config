@@ -1,0 +1,376 @@
+//                   _
+// __ __ ____ _ _  _| |__  __ _ _ _
+// \ V  V / _` | || | '_ \/ _` | '_|
+//  \_/\_/\__,_|\_, |_.__/\__,_|_|
+//              |__/
+[
+  {
+    "position": "top",
+    "reload_style_on_change": true,
+    "hyprland/workspaces": {
+      "format": "{icon}",
+      "format-icons": {
+        "active": "",
+        "default": "",
+        "urgent": ""
+      },
+      "on-click": "hyprctl dispatch workspace e{index}",
+      "on-scroll-down": "hyprctl dispatch workspace e-1",
+      "on-scroll-up": "hyprctl dispatch workspace e+1"
+    },
+    "backlight": {
+      "format": "{icon} {percentage}%",
+      "format-icons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "scroll-step": 1
+    },
+    "battery": {
+      "bat": "BAT1",
+      "format": "{icon} {capacity}%",
+      "format-charging": "󰂄 {capacity}%",
+      "format-icons": [
+        " ",
+        " ",
+        " ",
+        " ",
+        " "
+      ],
+      "format-plugged": " {capacity}%",
+      "interval": 10,
+      "on-click": "",
+      "states": {
+        "critical": 10,
+        "good": 95,
+        "warning": 20
+      },
+      "tooltip": false
+    },
+    "bluetooth": {
+      "format": "",
+      "format-disabled": "󰂲",
+      "format-no-controller": "",
+      "format-off": "",
+      "interval": 30,
+      "on-click": "blueman-manager",
+      "tooltip-format": "Bluetooth"
+    },
+    "clock": {
+      "actions": {
+        "on-click-backward": "tz_down",
+        "on-click-forward": "tz_up",
+        "on-click-right": "mode",
+        "on-scroll-down": "shift_down",
+        "on-scroll-up": "shift_up"
+      },
+      "calendar": {
+        "mode": "year",
+        "mode-mon-col": 3,
+        "on-scroll": 1,
+        "weeks-pos": "right"
+      },
+      "format": "{:%H:%M}",
+      "format-alt": "{:%Y-%m-%d %H:%M:%S}",
+      "interval": 60,
+      "max-length": 25,
+      "on-click-left": "mode",
+      "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+    },
+    "cpu": {
+      "format": " {usage}%",
+      "interval": 5,
+      "on-click": "missioncenter",
+      "tooltip": true
+    },
+    "custom/applauncher": {
+      "format": "󱗼",
+      "on-click": "rofi -show drun -theme $HOME/.config/rofi/style/launcher-full.rasi",
+      "tooltip-format": "Application Launcher"
+    },
+    "custom/chatgpt": {
+      "format": "",
+      "on-click": "",
+      "tooltip-format": "AI Support"
+    },
+    "custom/chrome": {
+      "format": "",
+      "on-click": "google-chrome-stable",
+      "tooltip-format": "Open Chromium"
+    },
+    "custom/cliphist": {
+      "format": "",
+      "on-click": "cliphist-copy",
+      "on-click-middle": "cliphist wipe",
+      "on-click-right": "cliphist-delete",
+      "tooltip-format": "Clipboard Manager"
+    },
+    "custom/exit": {
+      "format": "",
+      "on-click": "wlogout",
+      "tooltip-format": "Power Menu"
+    },
+    "custom/firefox": {
+      "format": "",
+      "on-click": "firefox",
+      "tooltip-format": "Open Firefox"
+    },
+    "custom/gpu": {
+      "exec": "cat /sys/class/drm/card0/device/gpu_busy_percent",
+      "format": "󰢮 {}%",
+      "interval": 20,
+      "on-click": "missioncenter",
+      "tooltip": true
+    },
+    "custom/hyprbindings": {
+      "format": "󱕴",
+      "on-click": "sleep 0.1 && list-hypr-bindings",
+      "tooltip": false
+    },
+    "custom/hypridle": {
+      "escape": true,
+      "exec": "/home/administrator/.config/hypr/scripts/hypridle.sh status",
+      "exec-on-event": true,
+      "format": "",
+      "interval": 60,
+      "on-click": "/home/administrator/.config/hypr/scripts/hypridle.sh toggle",
+      "on-click-right": "hyprlock",
+      "return-type": "json"
+    },
+    "custom/logo": {
+      "exec": "echo ' '",
+      "format": "{}"
+    },
+    "custom/mic": {
+      "format": "{}",
+      "interval": 1,
+      "on-click": "pwvucontrol"
+    },
+    "custom/nix-updates": {
+      "exec": "update-checker",
+      "format": "{} {icon}",
+      "format-icons": {
+        "has-updates": "",
+        "updated": ""
+      },
+      "interval": 3600,
+      "on-click": "update-checker && notify-send 'The system has been updated'",
+      "return-type": "json",
+      "tooltip": true
+    },
+    "custom/notification": {
+      "escape": true,
+      "exec": "swaync-client -swb",
+      "exec-if": "which swaync-client",
+      "format": "{icon}",
+      "format-icons": {
+        "dnd-inhibited-none": "",
+        "dnd-inhibited-notification": "<span foreground='red'><sup></sup></span>",
+        "dnd-none": "",
+        "dnd-notification": "<span foreground='red'><sup></sup></span>",
+        "inhibited-none": "",
+        "inhibited-notification": "<span foreground='red'><sup></sup></span>",
+        "none": "",
+        "notification": "<span foreground='red'><sup></sup></span>"
+      },
+      "on-click": "swaync-client -t -sw",
+      "on-click-right": "swaync-client -d -sw",
+      "return-type": "json",
+      "tooltip-format": "Left =  Notifications\nRight =  Do not disturb"
+    },
+    "custom/quicklinkempty": {},
+    "custom/system": {
+      "format": "󰇅",
+      "on-click": "missioncenter",
+      "tooltip": true,
+      "tooltip-format": "System Information"
+    },
+    "custom/thunar": {
+      "format": "",
+      "on-click": "thunar",
+      "tooltip-format": "Open filemanager"
+    },
+    "disk": {
+      "format": " {free}",
+      "interval": 60,
+      "on-click": "missioncenter",
+      "tooltip": true
+    },
+    "fixed-center": true,
+    "group/hardware": {
+      "drawer": {
+        "children-class": "child-hardware",
+        "transition-duration": 300,
+        "transition-left-to-right": false
+      },
+      "modules": [
+        "custom/system",
+        "disk",
+        "cpu",
+        "memory"
+      ],
+      "orientation": "inherit"
+    },
+    "group/links": {
+      "modules": [
+        "custom/chatgpt",
+        "custom/empty"
+      ],
+      "orientation": "horizontal"
+    },
+    "group/quicklinks": {
+      "modules": [
+        "custom/chrome",
+        "custom/firefox",
+        "custom/quicklinkempty",
+        "custom/thunar"
+      ],
+      "orientation": "horizontal"
+    },
+    "group/settings": {
+      "drawer": {
+        "children-class": "child-settings",
+        "transition-duration": 300,
+        "transition-left-to-right": true
+      },
+      "modules": [
+        "custom/settings",
+        "custom/waybarthemes",
+        "custom/wallpaper"
+      ],
+      "orientation": "inherit"
+    },
+    "group/tools": {
+      "drawer": {
+        "children-class": "child-tools",
+        "transition-duration": 300,
+        "transition-left-to-right": false
+      },
+      "modules": [
+        "custom/tools",
+        "custom/cliphist",
+        "custom/hypridle",
+        "custom/hyprshade"
+      ],
+      "orientation": "inherit"
+    },
+    "hyprland/window": {
+      "max-length": 60,
+      "separate-outputs": false
+    },
+
+    "idle_inhibitor": {
+      "format": "{icon}",
+      "format-icons": {
+        "activated": "󰒳",
+        "deactivated": "󰒲"
+      }
+    },
+    "layer": "top",
+    "memory": {
+      "format": " {}%",
+      "interval": 5,
+      "on-click": "missioncenter",
+      "tooltip": true
+    },
+    "modules-center": [
+      "clock"
+    ],
+    "modules-left": [
+      "custom/applauncher",
+      "hyprland/workspaces"
+    ],
+    "modules-right": [
+      "group/hardware",
+      "custom/nix-updates",
+      "network",
+      "battery",
+      "wireplumber",
+      "custom/mic",
+      "custom/hyprbindings",
+      "custom/cliphist",
+      "bluetooth",
+      "custom/exit"
+    ],
+    "network": {
+      "format-disconnected": "󰤮",
+      "format-ethernet": "",
+      "format-icons": [
+        "󰤯",
+        "󰤟",
+        "󰤢",
+        "󰤥",
+        "󰤨"
+      ],
+      "format-wifi": "{icon}",
+      "interval": 5,
+      "max-length": 50,
+      "on-click": "ghostty -e nmtui",
+      "on-click-right": "nm-connection-editor",
+      "tooltip": true,
+      "tooltip-format": "Network\nInterface: {ifname}\nIP: {ipaddr}/{cidr}\n: {bandwidthUpBits} : {bandwidthDownBits}\n",
+      "tooltip-format-disconnected": "Disconnected",
+      "tooltip-format-ethernet": "Ethernet\n : {ifname}\nIP: {ipaddr}/{cidr}\n: {bandwidthUpBits} : {bandwidthDownBits}\n",
+      "tooltip-format-wifi": "Wi-Fi\n : {ifname} @ {essid}\nIP: {ipaddr}/{cidr}\nStrength: {signalStrength}%\nFreq: {frequency}MHz\n: {bandwidthUpBits} : {bandwidthDownBits}\n"
+    },
+    "tray": {
+      "icon-size": 21,
+      "spacing": 10
+    },
+    "user": {
+      "format": "{user}",
+      "icon": false,
+      "interval": 60
+    },
+    "wireplumber": {
+      "format": "{icon}",
+      "format-icons": [
+        " ",
+        " ",
+        " "
+      ],
+      "format-muted": " ",
+      "max-length": 2,
+      "max-volume": 100.0,
+      "on-click": "pwvucontrol",
+      "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%-",
+      "on-scroll-up": "wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 2%+",
+      "reverse-scrolling": 1,
+      "scroll-step": 1,
+      "tooltip": true,
+      "tooltip-format": "{volume}%\n{node_name}\n"
+    },
+    "wlr/taskbar": {
+      "app_ids-mapping": {
+        "firefoxdeveloperedition": "firefox-developer-edition"
+      },
+      "format": "{icon}",
+      "icon-size": 18,
+      "ignore-list": [
+        "Alacritty",
+        "kitty"
+      ],
+      "on-click": "activate",
+      "on-click-middle": "close",
+      "rewrite": {
+        "Firefox Web Browser": "Firefox",
+        "Foot Server": "Terminal"
+      },
+      "tooltip-format": "{title}"
+    }
+  }
+]
+
