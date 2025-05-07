@@ -35,4 +35,4 @@ keybinds=$(awk -F'[=#]' '
 ' "$config_file")
 
 sleep 0.2
-rofi -dmenu -i -markup -eh 2 -replace -p "Keybinds" -config ~/.config/rofi/config-compact.rasi <<<"$keybinds"
+rofi -dmenu -i -markup -eh 2 -replace -p "Keybinds" <<< "$keybinds"
