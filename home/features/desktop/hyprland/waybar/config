@@ -4,6 +4,12 @@
     "position": "top",
     "reload_style_on_change": true,
     "fixed-center": true,
+    "margin-top": 0,
+    "margin-bottom": 0,
+    "margin-left": 14,
+    "margin-right": 14,
+    "spacing": 0,
+
 
     "hyprland/workspaces": {
       "format": "{}",
@@ -29,6 +35,7 @@
     },
     "modules-left": [
       // "custom/applauncher",
+      "custom/appmenu",
       "hyprland/workspaces"
     ],
     "modules-center": [
@@ -108,6 +115,17 @@
       "max-length": 25,
       "on-click-left": "mode",
       "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+    },
+
+    "custom/appmenu": {
+      "format": "Apps",
+      "on-click": "sleep 0.2;pkill rofi ||rofi -show drun -theme $HOME/.config/rofi/style/launcher-full.rasi -replace",
+      "tooltip-format": "Application Launcher"
+    },
+    "custom/appmenuicon": {
+      "format": "󱗼",
+      "on-click": "sleep 0.2;pkill rofi ||rofi -show drun -theme $HOME/.config/rofi/style/launcher-full.rasi -replace",
+      "tooltip-format": "Application Launcher"
     }
     // ,
     // "cpu": {

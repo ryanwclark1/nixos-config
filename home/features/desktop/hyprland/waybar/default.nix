@@ -5,9 +5,9 @@
 }:
 
 {
-  # imports = [
-  #   ./style.nix
-  # ];
+  imports = [
+    ./style.nix
+  ];
 
   home.file.".config/waybar/config" = {
     source = ./config;
