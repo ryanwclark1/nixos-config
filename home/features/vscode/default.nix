@@ -98,8 +98,8 @@
             {
               name = "ansible";
               publisher = "redhat";
-              sha256 = "sha256-/kLg+msRu6GvkENVu3jw9uDbfEo/x0eZgsKfXvLaO3I=";
-              version = "25.1.0";
+              sha256 = "sha256-E/BogNtax4dkv6hlYcaRinTxr4jnVyV9hVCdkIkul9s=";
+              version = "25.4.0";
             }
             {
               name = "grafana-vscode";
@@ -188,8 +188,8 @@
             {
               name = "vsc-python-indent";
               publisher = "kevinrose";
-              version = "1.19.0";
-              sha256 = "sha256-gX0L416RXIQ9S4kFguEJJ7u4GSo7WbpifXmL/mWCU08=";
+              version = "1.21.0";
+              sha256 = "sha256-SvJhVG8sofzV0PebZG4IIORX3AcfmErDQ00tRF9fk/4=";
             }
             {
               name = "explorer";
@@ -208,6 +208,12 @@
               publisher = "ms-playwright";
               version = "1.1.13";
               sha256 = "sha256-gSIWwD8WHKMM5wpuPpSKpBB+oxaqO2vO8wHTN43jmrM=";
+            }
+            {
+              name = "ty";
+              publisher = "astral-sh";
+              version = "2025.3.11272138";
+              sha256 = "sha256-Lgm+rwBmUJEmWKGOuuxXbyGHGKoOie8a3RDK9ez0+4E=";
             }
           ]);
         userSettings = {
@@ -285,6 +291,13 @@
           "workbench.colorTheme" = "Custom Theme";
           "workbench.editor.enablePreview" = true;
           "workbench.externalBrowser" = "chrome";
+
+          "remote.defaultExtensionsIfInstalledLocally" = [
+            "GitHub.copilot"
+            "GitHub.copilot-chat"
+            "GitHub.vscode-pull-request-github"
+          ];
+
           #############################
           #    Extension Settings     #
           #############################

@@ -157,3 +157,8 @@ passthru = { publisher = "biomejs", name = "biome" }
 src.vsmarketplace = "ms-playwright.playwright"
 fetch.vsmarketplace = "ms-playwright.playwright"
 passthru = { publisher = "ms-playwright", name = "playwright" }
+
+[ty]
+src.vsmarketplace = "astral-sh.ty"
+fetch.vsmarketplace = "astral-sh.ty"
+passthru = { publisher = "astral-sh", name = "ty" }
