@@ -20,7 +20,7 @@
   services.printing = {
     enable = true;
     browsing = true;
-    drivers = with pkgs; [ hplip ];
+    drivers = with pkgs; [ hplipWithPlugin ];
   };
 
 }
