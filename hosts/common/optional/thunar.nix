@@ -6,7 +6,7 @@
 
 {
   # xfce not desktop allows preference to be saved
-  programs.xconf.enable = true;
+  programs.xfconf.enable = true;
   programs.thunar = {
     enable = true;
     plugins = with pkgs.xfce;
