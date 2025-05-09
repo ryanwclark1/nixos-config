@@ -7,6 +7,7 @@
   imports = [
     # ./basic-binds.nix
     ./colors-hyprland.nix
+    ./hyprpolkitagent.nix
   ];
 
   home.file.".config/hypr/conf" = {
