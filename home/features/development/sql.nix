@@ -8,5 +8,6 @@
     sqlfluff
     pgcli
     sqlite
+    lazysql # SQL Tui
   ];
 }
