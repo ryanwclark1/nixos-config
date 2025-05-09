@@ -12,6 +12,7 @@
     # ./trayscale.nix
     # ./wallpapers.nix
     ./xdg.nix
+    ./xfce.nix
   ];
 
   # Comment out screenshot, clipboard and recording tools
