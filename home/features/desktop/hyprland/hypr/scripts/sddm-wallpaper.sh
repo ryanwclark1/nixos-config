@@ -6,8 +6,6 @@
 #  \___/| .__/ \__,_|\__,_|\__\___| |___/\__,_|\__,_|_| |_| |_|
 #       |_|
 #
-# by Stephan Raabe (2024)
-# -----------------------------------------------------
 sleep 1
 clear
 cache_file="$HOME/.config/hypr/scripts/cache/current_wallpaper"
