@@ -7,6 +7,7 @@
   imports = [
     ./gtk.nix
     ./noti.nix
+    ./pointercursor.nix
     ./qt.nix
     # ./trayscale.nix
     # ./wallpapers.nix
