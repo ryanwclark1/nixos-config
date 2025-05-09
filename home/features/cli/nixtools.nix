@@ -4,6 +4,7 @@
   pkgs,
   ...
 }:
+# TODO: Look at cache dir maybe XDG Cache
 let
   update-script = pkgs.writeShellApplication {
     name = "fetch-nix-index-database";
