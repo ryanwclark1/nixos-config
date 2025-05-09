@@ -4,6 +4,9 @@
 }:
 
 {
+  home.packages = with pkgs; [
+    waypaper
+  ];
   services = {
     hyprpaper = {
       enable = true;
