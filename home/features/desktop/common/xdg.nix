@@ -37,6 +37,9 @@
         # xdg-desktop-portal-gtk
         xdg-desktop-portal-hyprland
       ];
+      configPackages = [
+        pkgs.hyprland
+      ];
       config = {
         common = {
           default = [
