@@ -20,6 +20,7 @@ fi
 # Set defaults
 # -----------------------------------------------------
 
+wallpaper_dir="$HOME/Pictures/wallpapers/"
 force_generate=0
 generatedversions="$HOME/.config/hypr/scripts/cache/wallpaper-generated"
 waypaperrunning=$HOME/.config/hypr/scripts/cache/waypaper-running
@@ -28,7 +29,7 @@ blurredwallpaper="$HOME/.config/hypr/scripts/cache/blurred_wallpaper.png"
 squarewallpaper="$HOME/.config/hypr/scripts/cache/square_wallpaper.png"
 rasifile="$HOME/.config/hypr/scripts/cache/current_wallpaper.rasi"
 blurfile="$HOME/.config/hypr/scripts/settings/blur.sh"
-defaultwallpaper="$HOME/Pictures/wallpaper/default.png"
+defaultwallpaper="$(find "$wallpaper_dir" -type f | shuf -n 1)"
 wallpapereffect="$HOME/.config/hypr/scripts/settings/wallpaper-effect.sh"
 blur="50x30"
 blur=$(cat $blurfile)
