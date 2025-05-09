@@ -1,4 +1,10 @@
-{pkgs, ...}: {
+{
+  lib,
+  pkgs,
+  ...
+}:
+
+{
   services = {
     # needed for GNOME services outside of GNOME Desktop
     dbus.packages = with pkgs; [
@@ -6,8 +12,8 @@
       gnome-settings-daemon
     ];
 
-    gnome.gnome-keyring.enable = true;
+    gnome.gnome-keyring.enable = lib.mkDefault true;
 
-    gvfs.enable = true;
+    gvfs.enable = lib.mkDefault true;
   };
 }
