@@ -25,7 +25,7 @@
     autostart.enable = true;
     mime.enable = true;
     configFile."mimeapps.list".force = true;
-    cacheHome = "${config.home.homeDirectory}/.local/cache";
+    cacheHome = "${config.home.homeDirectory}/.cache";
     configHome = "${config.home.homeDirectory}/.config";
     dataHome = "${config.home.homeDirectory}/.local/share";
     stateHome = "${config.home.homeDirectory}/.local/state";
