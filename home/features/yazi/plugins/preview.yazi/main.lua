@@ -69,7 +69,6 @@ function M:peek()
     local code = status and status:code() or 0
 
     if code == 3 then
-      -- 3 表示: 预览滚动溢出,需要往上退一下
       ya.manager_emit(
         "peek",
         { tostring(math.max(0, offset - 1)), only_if = tostring(self.file.url), upper_bound = "" }
