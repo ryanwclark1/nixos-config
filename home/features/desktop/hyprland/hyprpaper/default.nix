@@ -4,9 +4,6 @@
 }:
 
 {
-  home.packages = with pkgs; [
-    waypaper
-  ];
   services = {
     hyprpaper = {
       enable = true;
@@ -15,8 +12,8 @@
         ipc = "on";
         splash = false;
         splash_offset = 2.0;
-        preload = "$HOME/Pictures/wallpapers/default.png";
-        wallpaper = ",$HOME/Pictures/wallpapers/default.png";
+        # preload = "$HOME/Pictures/wallpapers/default.png";
+        # wallpaper = ",$HOME/Pictures/wallpapers/default.png";
       };
     };
   };
