@@ -31,20 +31,14 @@
     executable = true;
   };
 
+  # programs.uwsm = {};
 
   wayland.windowManager.hyprland = {
     enable = true;
     xwayland.enable = true;
     systemd = {
-      enable = true;
-      enableXdgAutostart = true;
-      extraCommands = [
-        "systemctl --user stop hyprland-session.target"
-        "systemctl --user start hyprland-session.target"
-      ];
-      variables = [
-        "--all"
-      ];
+      enable = false;
+      enableXdgAutostart = false;
     };
     plugins = with pkgs.hyprlandPlugins; [
       hyprexpo
@@ -69,7 +63,6 @@
         "~/.config/hypr/conf/window.conf"
         "~/.config/hypr/conf/windowrule.conf"
         "~/.config/hypr/conf/workspace.conf"
-
       ];
     };
   };
