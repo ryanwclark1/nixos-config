@@ -32,7 +32,6 @@
       package = pkgs.dejavu_fonts;
       size = 12;
     };
-    
     gtk3 = {
       bookmarks = [
         "file:///mnt/share"
@@ -151,7 +150,7 @@
     };
     gtk4 = {
       extraConfig = {
-        gtk-application-prefer-dark-theme = true;
+        gtk-application-prefer-dark-theme=1;
       };
       extraCss = ''
         @define-color accent_color #8caaee;
