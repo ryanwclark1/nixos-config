@@ -14,8 +14,6 @@
     dysk # DF with flair
     duf # Disk Usage/Free Utility
     ncdu # TUI disk usage
-
-    
     gum # shell scripts
     viu # Terminal image viewer with native support for iTerm and Kitty
     yq-go #jq for yaml, command-line YAML processor https://github.com/mikefarah/yq
