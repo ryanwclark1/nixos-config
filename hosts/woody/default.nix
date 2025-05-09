@@ -64,6 +64,7 @@
     # firmware = [
     #   pkgs.linux-firmware
     # ];
+    
     amdgpu = {
       amdvlk = {
         enable = true;

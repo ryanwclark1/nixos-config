@@ -48,7 +48,8 @@
     settings ={
       source = [
         "~/.config/hypr/conf/animation.conf"
-        "~/.config/hypr/conf/autostart.conf"
+        # "~/.config/hypr/conf/autostart.conf"
+        "~/.config/hypr/conf/autostart-uwsm.conf"
         "~/.config/hypr/conf/colors-hyprland.conf"
         "~/.config/hypr/conf/cursor.conf"
         "~/.config/hypr/conf/custom.conf"
