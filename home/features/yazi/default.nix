@@ -56,7 +56,6 @@
       fzfbm = ./plugins/fzfbm.yazi;
       glow = ./plugins/glow.yazi;
       hexyl = ./plugins/hexyl.yazi;
-      hide-preview = ./plugins/hide-preview.yazi;
       lazygit = ./plugins/lazygit.yazi;
       max-preview = ./plugins/max-preview.yazi;
       mediainfo = ./plugins/mediainfo.yazi;
