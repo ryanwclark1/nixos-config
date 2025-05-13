@@ -123,7 +123,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base17}</string>
+              <string>#${base0F}</string>
             </dict>
           </dict>
           <dict>
@@ -257,7 +257,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base12}</string>
+              <string>#${base0F}</string>
               <key>fontStyle</key>
               <string>italic</string>
             </dict>
@@ -301,7 +301,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base15}</string>
+              <string>#${base0C}</string>
             </dict>
           </dict>
           <dict>
@@ -499,7 +499,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base15}</string>
+              <string>#${base0C}</string>
             </dict>
           </dict>
           <dict>
@@ -510,7 +510,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base12}</string>
+              <string>#${base0F}</string>
             </dict>
           </dict>
           <dict>
@@ -602,7 +602,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base17}</string>
+              <string>#${base0F}</string>
             </dict>
           </dict>
           <dict>
@@ -613,7 +613,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base17}</string>
+              <string>#${base0F}</string>
             </dict>
           </dict>
           <dict>
@@ -624,7 +624,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base17}</string>
+              <string>#${base0F}</string>
             </dict>
           </dict>
           <dict>
@@ -723,7 +723,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base12}</string>
+              <string>#${base0F}</string>
             </dict>
           </dict>
           <dict>
@@ -846,7 +846,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base17}</string>
+              <string>#${base0F}</string>
               <key>fontStyle</key>
               <string/>
             </dict>
@@ -903,7 +903,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base12}</string>
+              <string>#${base0F}</string>
             </dict>
           </dict>
           <dict>
@@ -925,7 +925,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base12}</string>
+              <string>#${base0F}</string>
               <key>fontStyle</key>
               <string/>
             </dict>
@@ -1059,7 +1059,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base12}</string>
+              <string>#${base0F}</string>
             </dict>
           </dict>
           <dict>
@@ -1081,7 +1081,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base15}</string>
+              <string>#${base0C}</string>
             </dict>
           </dict>
           <dict>
@@ -1247,7 +1247,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base15}</string>
+              <string>#${base0C}</string>
             </dict>
           </dict>
           <dict>
@@ -1269,7 +1269,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base17}</string>
+              <string>#${base0F}</string>
             </dict>
           </dict>
           <dict>
@@ -1339,7 +1339,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base17}</string>
+              <string>#${base0F}</string>
               <key>fontStyle</key>
               <string/>
             </dict>
@@ -1363,7 +1363,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base12}</string>
+              <string>#${base0F}</string>
             </dict>
           </dict>
           <dict>
@@ -1385,7 +1385,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base15}</string>
+              <string>#${base0C}</string>
             </dict>
           </dict>
           <dict>
@@ -1418,7 +1418,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base15}</string>
+              <string>#${base0C}</string>
               <key>fontStyle</key>
               <string>italic</string>
             </dict>
@@ -1466,7 +1466,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base15}</string>
+              <string>#${base0C}</string>
             </dict>
           </dict>
           <dict>
@@ -1501,7 +1501,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base17}</string>
+              <string>#${base0F}</string>
             </dict>
           </dict>
           <dict>
@@ -1545,7 +1545,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base12}</string>
+              <string>#${base0F}</string>
               <key>fontStyle</key>
               <string>italic</string>
             </dict>
@@ -1582,7 +1582,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base17}</string>
+              <string>#${base0F}</string>
             </dict>
           </dict>
           <dict>
@@ -1637,7 +1637,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base17}</string>
+              <string>#${base0F}</string>
             </dict>
           </dict>
           <dict>
@@ -1849,7 +1849,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base17}</string>
+              <string>#${base0F}</string>
             </dict>
           </dict>
           <dict>
@@ -1882,7 +1882,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base15}</string>
+              <string>#${base0C}</string>
             </dict>
           </dict>
           <dict>
@@ -1904,7 +1904,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base12}</string>
+              <string>#${base0F}</string>
             </dict>
           </dict>
           <dict>
@@ -1937,7 +1937,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base17}</string>
+              <string>#${base0F}</string>
             </dict>
           </dict>
           <dict>
@@ -1948,7 +1948,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base17}</string>
+              <string>#${base0F}</string>
               <key>fontStyle</key>
               <string>italic</string>
             </dict>
@@ -2045,7 +2045,7 @@ in
             <key>settings</key>
             <dict>
               <key>foreground</key>
-              <string>#${base17}</string>
+              <string>#${base0F}</string>
             </dict>
           </dict>
           <dict>

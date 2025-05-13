@@ -35,7 +35,7 @@ in
       # : Manager {{{
 
       [manager]
-      cwd = { fg = "#${base0C}" }
+      cwd = { fg = "#${base0E}" }
 
       # Hovered
       hovered         = { reversed = true }
@@ -43,7 +43,7 @@ in
 
       # Find
       find_keyword  = { fg = "#${base0A}", bold = true, italic = true, underline = true }
-      find_position = { fg = "#${base17}", bg = "reset", bold = true, italic = true }
+      find_position = { fg = "#${base0F}", bg = "reset", bold = true, italic = true }
 
       # Marker
       marker_copied   = { fg = "#${base0B}", bg = "#${base0B}" }
@@ -63,7 +63,7 @@ in
 
       # Border
       border_symbol = "│"
-      border_style  = { fg = "#838ba7" }
+      border_style  = { fg = "#${base0E}" }
 
       # : }}}
 
@@ -72,16 +72,16 @@ in
 
       [mode]
 
-      normal_main = { fg = "#${base00}", bg = "#${base0D}", bold = true }
-      normal_alt  = { fg = "#${base0D}", bg = "#${base02}" }
+      normal_main = { fg = "#${base00}", bg = "#${base0E}", bold = true }
+      normal_alt  = { fg = "#${base0E}", bg = "#${base00}" }
 
       # Select mode
-      select_main = { fg = "#${base00}", bg = "#${base0C}", bold = true }
-      select_alt  = { fg = "#${base0C}", bg = "#${base02}" }
+      select_main = { fg = "#${base00}", bg = "#${base07}", bold = true }
+      select_alt  = { fg = "#${base07}", bg = "#${base00}" }
 
       # Unset mode
       unset_main = { fg = "#${base00}", bg = "#${base0F}", bold = true }
-      unset_alt  = { fg = "#${base0F}", bg = "#${base02}" }
+      unset_alt  = { fg = "#${base0F}", bg = "#${base00}" }
 
       # : }}}
 
@@ -93,13 +93,13 @@ in
       separator_close = ""
 
       # Progress
-      progress_label  = { fg = "#ffffff", bold = true }
-      progress_normal = { fg = "#${base0D}", bg = "#51576d" }
-      progress_error  = { fg = "#${base08}", bg = "#51576d" }
+      progress_label  = { bold = true }
+      progress_normal = { fg = "#${base00}", bg = "#${base07}" }
+      progress_error  = { fg = "#${base08}", bg = "#${base07}" }
 
       # Permissions
-      perm_sep   = { fg = "#838ba7" }
-      perm_type  = { fg = "#${base0D}" }
+      perm_sep   = { fg = "#${base07}" }
+      perm_type  = { fg = "#${base07}" }
       perm_read  = { fg = "#${base0A}" }
       perm_write = { fg = "#${base08}" }
       perm_exec  = { fg = "#${base0B}" }
@@ -110,8 +110,8 @@ in
       # : Pick {{{
 
       [pick]
-      border   = { fg = "#${base0D}" }
-      active   = { fg = "#${base17}", bold = true }
+      border   = { fg = "#${base07}" }
+      active   = { fg = "#${base0F}", bold = true }
       inactive = {}
 
       # : }}}
@@ -120,7 +120,7 @@ in
       # : Input {{{
 
       [input]
-      border   = { fg = "#${base0D}" }
+      border   = { fg = "#${base07}" }
       title    = {}
       value    = {}
       selected = { reversed = true }
@@ -131,7 +131,7 @@ in
       # : Completion {{{
 
       [completion]
-      border = { fg = "#${base0D}" }
+      border = { fg = "#${base07}" }
 
       # : }}}
 
@@ -139,9 +139,9 @@ in
       # : Tasks {{{
 
       [tasks]
-      border  = { fg = "#${base0D}" }
+      border  = { fg = "#${base07}" }
       title   = {}
-      hovered = { fg = "#${base17}", underline = true }
+      hovered = { fg = "#${base0F}", underline = true }
 
       # : }}}
 
@@ -149,12 +149,12 @@ in
       # : Which {{{
 
       [which]
-      mask            = { bg = "#${base02}" }
-      cand            = { fg = "#${base0C}" }
-      rest            = { fg = "#949cbb" }
-      desc            = { fg = "#${base17}" }
+      mask            = { bg = "#${base00}" }
+      cand            = { fg = "#${base0E}" }
+      rest            = { fg = "#${base07}" }
+      desc            = { fg = "#${base0F}" }
       separator       = "  "
-      separator_style = { fg = "#${base04}" }
+      separator_style = { fg = "#${base00}" }
 
       # : }}}
 
@@ -162,10 +162,10 @@ in
       # : Help {{{
 
       [help]
-      on      = { fg = "#${base0C}" }
-      run     = { fg = "#${base17}" }
+      on      = { fg = "#${base0E}" }
+      run     = { fg = "#${base0F}" }
       hovered = { reversed = true, bold = true }
-      footer  = { fg = "#${base02}", bg = "#${base05}" }
+      footer  = { fg = "#${base00}", bg = "#${base05}" }
 
       # : }}}
 
@@ -186,20 +186,20 @@ in
 
       rules = [
         # Images
-        { mime = "image/*", fg = "#${base0C}" },
+        { mime = "image/*", fg = "#${base0E}" },
 
         # Media
         { mime = "{audio,video}/*", fg = "#${base0A}" },
 
         # Archives
-        { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "#${base17}" },
+        { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "#${base0F}" },
 
         # Documents
         { mime = "application/{pdf,doc,rtf}", fg = "#${base0B}" },
 
         # Fallback
         { name = "*", fg = "#${base05}" },
-        { name = "*/", fg = "#${base0D}" }
+        { name = "*/", fg = "#${base07}" }
       ]
 
       # : }}}
