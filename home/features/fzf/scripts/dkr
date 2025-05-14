@@ -320,15 +320,24 @@ subcmd_compose() {
 nocmd() {
   check_deps
 
-  cmd_list=""
+  # Create a clean formatted list of commands with descriptions
+  local formatted_list=""
   for c in "${subcmds_avail[@]}"; do
-    cmd_list+="$c:${helptext[$c]}\n"
+    formatted_list+="${GREEN}$c${NC}\t${helptext[$c]}\n"
   done
 
-  selected=$(echo -e "$cmd_list" | column -t -s ':' | fzf --ansi --height=50% --reverse --header="Select Docker FZF command:")
+  # Use fzf with proper options to avoid bat preview issues
+  selected=$(echo -e "$formatted_list" |
+    column -t -s $'\t' |
+    fzf --ansi \
+        --height=50% \
+        --reverse \
+        --header="Select Docker FZF command:" \
+        --no-preview)  # Disable preview to avoid the bat error
 
   if [[ -n "$selected" ]]; then
-    command=$(echo "$selected" | awk '{print $1}')
+    # Extract just the command (first word) without colors
+    command=$(echo "$selected" | sed 's/\x1B\[[0-9;]*[JKmsu]//g' | awk '{print $1}')
     if type "subcmd_$command" &>/dev/null; then
       subcmd_"$command"
     fi
