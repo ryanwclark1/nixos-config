@@ -61,10 +61,11 @@ in
       gnome.enable = true;
       grub = {
         enable = true;
-        useImage = false;
+        useWallpaper = true;
       };
       gtk.enable = true;
       nixos-icons.enable = true;
+      qt.enable = true;
       # nixvim = {
       #   enable = true;
       #   transparentBackground = {
@@ -72,7 +73,7 @@ in
       #     signColumn = true;
       #   };
       # };
-      plymouth.enable = true;
+      plymouth.enable = false;
     };
   };
 }

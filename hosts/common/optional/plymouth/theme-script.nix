@@ -3,11 +3,11 @@
   ...
 }:
 let
-  logoAnimated = lib.mkDefault true;
+  logoAnimated = true;
   backgroundColor = "48,52,70";
   foregroundColor = "140,170,238";
 in
-builtins.toFile "stylix-plymouth-theme" ''
+builtins.toFile "custom-plymouth-theme" ''
   center_x = Window.GetWidth() / 2;
   center_y = Window.GetHeight() / 2;
   baseline_y = Window.GetHeight() * 0.9;
