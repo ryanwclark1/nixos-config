@@ -27,6 +27,7 @@
     ../common/optional/steam.nix
     ../common/optional/syncthing.nix
     ../common/optional/system-packages.nix
+    ../common/optional/style.nix
     ../common/optional/thunar.nix
     ../common/optional/virtualisation.nix
     ../common/optional/webcam.nix
@@ -50,9 +51,9 @@
       };
       efi.canTouchEfiVariables = true;
     };
-    plymouth = {
-        enable = true;
-      };
+    # plymouth = {
+    #   enable = true;
+    # };
     # tmp = {
     #   cleanOnBoot = true;
     # };

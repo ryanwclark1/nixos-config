@@ -1,36 +1,47 @@
-{ config, lib, pkgs, ... }:
-
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}@args:
 let
+  logo = "${pkgs.nixos-icons}/share/icons/hicolor/256x256/apps/nix-snowflake.png";
+  logoAnimated = true;
 
-  themeScript = import ./theme-script.nix { inherit lib config; };
 
-  theme = pkgs.runCommand "custom-plymouth-theme" { } ''
+  themeScript = import ./theme-script.nix args;
+
+  theme = pkgs.runCommand "custom-plymouth" { } ''
     themeDir="$out/share/plymouth/themes/custom"
-    mkdir -p "$themeDir"
+    mkdir -p $themeDir
 
     ${lib.getExe' pkgs.imagemagick "convert"} \
       -background transparent \
       -bordercolor transparent \
-       "-border 42%" \
-      "$themeDir/logo.png"
+      ${
+        # A transparent border ensures the image is not clipped when rotated
+        lib.optionalString logoAnimated "-border 42%"
+      } \
+      ${logo} \
+      $themeDir/logo.png
 
-    cp "${themeScript}" "$themeDir/custom.script"
+    cp ${themeScript} $themeDir/custom.script
 
-    cat > "$themeDir/custom.plymouth" <<EOF
-[Plymouth Theme]
-Name=Custom
-ModuleName=script
+    echo "
+    [Plymouth Theme]
+    Name=Custom
+    ModuleName=script
 
-[script]
-ImageDir=$themeDir
-ScriptFile=$themeDir/custom.script
-EOF
+    [script]
+    ImageDir=$themeDir
+    ScriptFile=$themeDir/custom.script
+    " > $themeDir/custom.plymouth
   '';
 in {
   boot.plymouth = {
     enable = true;
-    logo = "${pkgs.nixos-icons}/share/icons/hicolor/256x256/apps/nix-snowflake.png";
-    theme = "custom";
+    logo = logo;
     themePackages = [ theme ];
+    theme = "custom"; # Uncomment when ready
   };
 }
