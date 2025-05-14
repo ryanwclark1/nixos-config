@@ -44,6 +44,10 @@ cleanup() {
 }
 trap cleanup SIGHUP SIGINT SIGTERM
 
+# Remove existing FIFO if it exists
+[[ -e "$fifo" ]] && rm -f "$fifo"
+
+# Create new FIFO
 mkfifo "$fifo"
 
 if (( $# < 1 )); then

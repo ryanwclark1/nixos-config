@@ -150,18 +150,16 @@ subcmd_logs() {
   [[ -z "$container" ]] && return 0
 
   # Then view logs with options
+  docker logs --tail 100 "$container" |
   fzf \
-    --bind="start:reload:docker logs --tail 100 $container" \
-    --bind="enter:reload:docker logs -f $container" \
-    --bind="ctrl-a:reload:docker logs $container" \
-    --bind="ctrl-t:reload:read -p 'How many lines to tail? ' n && docker logs --tail \$n $container" \
-    --bind="ctrl-s:reload:read -p 'Search term: ' s && docker logs $container | grep -i \"\$s\"" \
+    --bind="enter:execute:docker logs -f $container | less +F" \
+    --bind="ctrl-a:execute:docker logs $container | less" \
+    --bind="ctrl-t:execute:read -p 'How many lines to tail? ' n && docker logs --tail \$n $container | less" \
+    --bind="ctrl-s:execute:read -p 'Search term: ' s && docker logs $container | grep -i \"\$s\" | less" \
     --header="$header" \
     --reverse \
     --height=100% \
-    --preview-window=down:100% \
-    --ansi \
-    --disabled
+    --ansi
 }
 
 # Images management command
@@ -171,7 +169,7 @@ subcmd_images() {
   if ! docker images &>/dev/null; then
     err "Cannot connect to Docker daemon. Is Docker running?"
     return 1
-  }
+  fi
 
   local header="${GREEN}<Enter>${NC} inspect, ${RED}<Ctrl-D>${NC} delete, ${YELLOW}<Ctrl-R>${NC} run, ${BLUE}<Ctrl-H>${NC} history"
 
@@ -179,7 +177,7 @@ subcmd_images() {
     --bind='start:reload:docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.ID}}\t{{.Size}}\t{{.CreatedSince}}"' \
     --bind='enter:execute:docker inspect {3} | less' \
     --bind='ctrl-d:execute-silent(docker rmi {3})+reload:docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.ID}}\t{{.Size}}\t{{.CreatedSince}}"' \
-    --bind='ctrl-r:execute:read -p "Run command (e.g., -it --rm): " opts && docker run $opts {1}' \
+    --bind='ctrl-r:execute:read -p "Run command (e.g., -it --rm): " opts && docker run $opts {1}:{2}' \
     --bind='ctrl-h:execute:docker history {3} | less' \
     --bind='?:preview:echo -e "KEYBINDINGS:\n\n<Enter> - Inspect image\n<Ctrl-D> - Delete image\n<Ctrl-R> - Run image\n<Ctrl-H> - Show history\n? - Show this help"' \
     --header="$header" \
@@ -196,15 +194,15 @@ subcmd_volumes() {
   if ! docker volume ls &>/dev/null; then
     err "Cannot connect to Docker daemon. Is Docker running?"
     return 1
-  }
+  fi
 
   local header="${GREEN}<Enter>${NC} inspect, ${RED}<Ctrl-D>${NC} delete, ${YELLOW}<Ctrl-P>${NC} prune unused"
 
   fzf \
-    --bind='start:reload:docker volume ls --format "table {{.Name}}\t{{.Driver}}\t{{.Mountpoint}}"' \
+    --bind='start:reload:docker volume ls' \
     --bind='enter:execute:docker volume inspect {1} | less' \
-    --bind='ctrl-d:execute-silent(docker volume rm {1})+reload:docker volume ls --format "table {{.Name}}\t{{.Driver}}\t{{.Mountpoint}}"' \
-    --bind='ctrl-p:execute-silent(docker volume prune -f)+reload:docker volume ls --format "table {{.Name}}\t{{.Driver}}\t{{.Mountpoint}}"' \
+    --bind='ctrl-d:execute-silent(docker volume rm {1})+reload:docker volume ls' \
+    --bind='ctrl-p:execute-silent(docker volume prune -f)+reload:docker volume ls' \
     --bind='?:preview:echo -e "KEYBINDINGS:\n\n<Enter> - Inspect volume\n<Ctrl-D> - Delete volume\n<Ctrl-P> - Prune unused volumes\n? - Show this help"' \
     --header="$header" \
     --reverse \
@@ -220,15 +218,15 @@ subcmd_networks() {
   if ! docker network ls &>/dev/null; then
     err "Cannot connect to Docker daemon. Is Docker running?"
     return 1
-  }
+  fi
 
   local header="${GREEN}<Enter>${NC} inspect, ${RED}<Ctrl-D>${NC} delete, ${YELLOW}<Ctrl-P>${NC} prune unused"
 
   fzf \
-    --bind='start:reload:docker network ls --format "table {{.ID}}\t{{.Name}}\t{{.Driver}}\t{{.Scope}}"' \
+    --bind='start:reload:docker network ls' \
     --bind='enter:execute:docker network inspect {2} | less' \
-    --bind='ctrl-d:execute-silent(docker network rm {2})+reload:docker network ls --format "table {{.ID}}\t{{.Name}}\t{{.Driver}}\t{{.Scope}}"' \
-    --bind='ctrl-p:execute-silent(docker network prune -f)+reload:docker network ls --format "table {{.ID}}\t{{.Name}}\t{{.Driver}}\t{{.Scope}}"' \
+    --bind='ctrl-d:execute-silent(docker network rm {2})+reload:docker network ls' \
+    --bind='ctrl-p:execute-silent(docker network prune -f)+reload:docker network ls' \
     --bind='?:preview:echo -e "KEYBINDINGS:\n\n<Enter> - Inspect network\n<Ctrl-D> - Delete network\n<Ctrl-P> - Prune unused networks\n? - Show this help"' \
     --header="$header" \
     --reverse \
@@ -244,7 +242,7 @@ subcmd_exec() {
   if ! docker ps &>/dev/null; then
     err "Cannot connect to Docker daemon. Is Docker running?"
     return 1
-  }
+  fi
 
   # First select container
   local container=$(docker ps --format "{{.ID}}\t{{.Names}}\t{{.Image}}" |
@@ -322,20 +320,23 @@ subcmd_compose() {
 nocmd() {
   check_deps
 
-  cmd=$(for c in "${subcmds_avail[@]}"; do
-    printf "${GREEN}%-12s${NC}%s\n" "$c" "${helptext[$c]}"
-  done)
+  cmd_list=""
+  for c in "${subcmds_avail[@]}"; do
+    cmd_list+="$c:${helptext[$c]}\n"
+  done
 
-  selected=$(echo -e "$cmd" | fzf --ansi --height=50% --reverse --header="Select Docker FZF command:")
+  selected=$(echo -e "$cmd_list" | column -t -s ':' | fzf --ansi --height=50% --reverse --header="Select Docker FZF command:")
 
   if [[ -n "$selected" ]]; then
     command=$(echo "$selected" | awk '{print $1}')
-    subcmd_"$command"
+    if type "subcmd_$command" &>/dev/null; then
+      subcmd_"$command"
+    fi
   fi
 }
 
 # Get available subcommands
-mapfile -t subcmds_avail < <(compgen -A function | awk '/^subcmd_/ { sub(/^subcmd_/, "", $0); print }')
+mapfile -t subcmds_avail < <(compgen -A function | grep -o 'subcmd_[a-z]*' | sed 's/subcmd_//')
 
 # Main execution logic
 check_deps
@@ -343,7 +344,7 @@ check_deps
 if (( $# < 1 )); then
   nocmd
   exit 0
-elif has "subcmd_$1"; then
+elif type "subcmd_$1" &>/dev/null; then
   subcmd="subcmd_$1"
   shift
   "$subcmd" "$@"
