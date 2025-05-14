@@ -18,7 +18,7 @@
       "--color=auto"
       "--follow"
       "--no-require-git"
-      "--hyperlink=auto"
+      # "--hyperlink=auto"
     ];
   };
 }
