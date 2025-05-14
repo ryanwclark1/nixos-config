@@ -76,7 +76,6 @@
       smart-paste = ./plugins/smart-paste.yazi;
       yatline = ./plugins/yatline.yazi;
       yatline-catppuccin = ./plugins/yatline-catppuccin.yazi;
-      yatline-githead = ./plugins/yatline-githead.yazi;
     };
     theme = {
       flavor = {

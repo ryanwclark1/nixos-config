@@ -9,15 +9,11 @@
 {
   imports = [ ./theme.yml.nix ];
 
-  # home.file.".config/eza/theme.yml" = {
-  #   source = ./theme.yml;
-  #   executable = false;
-  # };
-
   programs.eza = {
     enable = true;
     package = pkgs.eza;
     icons = "auto";
+    colors = "always";
     git = true;
     extraOptions = [
       "--group-directories-first"
@@ -33,11 +29,8 @@
   };
 
   home.shellAliases = {
-    ls = "eza -a --icons";
-    l = "eza -lhg";
-    la = "eza -a";
-    ll = "eza -alhg";
-    lt = "eza --tree";
-    tree = "eza -la --git-ignore --icons --tree --hyperlink --level 4";
+    ls = "eza --all --icons";
+    l = "eza --all --long --header --group";
+    lt = "eza --long --all --git-ignore --icons --tree --hyperlink";
   };
 }
