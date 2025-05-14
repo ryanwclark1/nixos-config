@@ -80,7 +80,8 @@ in
     defaultOptions = [
       "--height=40%"
       "--layout=reverse"
-      "--preview 'if [ -d {} ]; then eza --tree --color=always {} | head -200; else bat --style=numbers --color=always --line-range=:500 {}; fi'"
+      "--bind=ctrl-j:down,ctrl-k:up,ctrl-h:toggle-preview"
+      "--preview '([[ -d {} ]] && eza -T --color=always {} | head -200) || (file {} | grep -q binary && echo {} is binary) || bat --style=numbers --color=always --line-range=:500 {}'"
     ];
     fileWidgetCommand = "fd --type file --follow --hidden --strip-cwd-prefix --exclude .git";
     fileWidgetOptions = [
