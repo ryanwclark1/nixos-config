@@ -13,6 +13,7 @@
     ./hardware-configuration.nix
     ./services
     ../common/global
+    ../common/optional/plymouth
     ../common/users/administrator
     ../common/optional/audio.nix
     ../common/optional/bluetooth.nix
@@ -64,7 +65,7 @@
     # firmware = [
     #   pkgs.linux-firmware
     # ];
-    
+
     amdgpu = {
       amdvlk = {
         enable = true;
