@@ -17,7 +17,6 @@
     };
 
     #################### Utilities ####################
-
     systems.url = "github:nix-systems/default";
     impermanence.url = "github:nix-community/impermanence";
     disko = {
@@ -112,6 +111,7 @@
     nix-darwin,
     nixpkgs,
     systems,
+    stylix,
     ...
   } @ inputs:
   let
@@ -129,7 +129,6 @@
   {
     inherit lib;
     overlays = import ./overlays { inherit inputs outputs; };
-
     packages = forEachSystem (pkgs: import ./pkgs { inherit pkgs; });
     devShells = forEachSystem (pkgs: import ./shell.nix { inherit pkgs; });
     formatter = forEachSystem (pkgs: pkgs.nixfmt);
@@ -147,6 +146,7 @@
       woody = lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
+          stylix.nixosModules.stylix
           ./hosts/woody
         ];
         specialArgs = {
@@ -154,11 +154,11 @@
         };
       };
     };
-
     darwinConfigurations = {
       mini = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
         modules = [
+          stylix.nixosModules.stylix
           ./hosts/mini
         ];
         specialArgs = {
