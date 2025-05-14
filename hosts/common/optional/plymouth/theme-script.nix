@@ -4,8 +4,8 @@
 }:
 let
   logoAnimated = true;
-  backgroundColor = "48,52,70";
-  foregroundColor = "140,170,238";
+  backgroundColor = "0.187500, 0.203125, 0.273438";
+  foregroundColor = "0.773438, 0.812500, 0.957031";
 in
 builtins.toFile "custom-plymouth-theme" ''
   center_x = Window.GetWidth() / 2;

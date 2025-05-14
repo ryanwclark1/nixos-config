@@ -1,7 +1,0 @@
-[Plymouth Theme]
-Name=Stylix
-ModuleName=script
-
-[script]
-ImageDir=/nix/store/8jspf4anii5qwz4ma7p9djinf5z52vcw-stylix-plymouth/share/plymouth/themes/stylix
-ScriptFile=/nix/store/8jspf4anii5qwz4ma7p9djinf5z52vcw-stylix-plymouth/share/plymouth/themes/stylix/stylix.script
