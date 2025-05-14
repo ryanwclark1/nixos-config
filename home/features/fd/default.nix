@@ -15,10 +15,10 @@
       "node_modules/"
     ];
     extraOptions = [
-      "--color auto"
+      "--color=auto"
       "--follow"
       "--no-require-git"
-      "--hyperlink auto"
+      "--hyperlink=auto"
     ];
   };
 }
