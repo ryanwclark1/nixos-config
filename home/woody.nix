@@ -12,7 +12,7 @@
     ./features/atuin
     ./features/audio
     ./features/bat
-    ./features/bluetooth
+    # ./features/bluetooth
     ./features/btop
     ./features/cava
     ./features/chrome
