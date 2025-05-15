@@ -12,8 +12,6 @@ in
 {
   home.packages = with pkgs; [
     git-fixup
-    git-gone
-    git-bug
     git-workspace
     codeberg-cli
   ];

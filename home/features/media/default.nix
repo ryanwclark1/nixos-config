@@ -19,7 +19,7 @@
     # darktable # RAW photo editor
     # digikam # Photo management
     # drawio # Diagram editor
-    eog # Gnome Image viewer
+    # eog # Gnome Image viewer
     ffmpeg # Multimedia framework
     # gimp # Image editor
     graphviz # Graph visualization
