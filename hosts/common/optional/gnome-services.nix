@@ -11,9 +11,7 @@
       gcr
       gnome-settings-daemon
     ];
-
     gnome.gnome-keyring.enable = lib.mkDefault true;
-
     gvfs.enable = lib.mkDefault true;
   };
 }
