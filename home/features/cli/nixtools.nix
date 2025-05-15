@@ -25,14 +25,12 @@ in
     nix-diff
     nvd
     nix-tree # Interactively browse dependency graphs of Nix derivations
-    nixfmt-rfc-style
-    nix-update
-    nixpkgs-lint
     nurl # Generate Nix fetcher calls from repository URLs
     patchelf
     sops
     nixd
     nil
+    nix-prefetch-git # nix development    nix-prefetch-git # nix development
     update-script
   ];
 

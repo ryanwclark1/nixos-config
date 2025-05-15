@@ -11,6 +11,8 @@
     ./tf.nix
   ];
   home.packages = with pkgs; [
+    so  # Stackoverflow search
+    tokei # code statistics
     dysk # DF with flair
     duf # Disk Usage/Free Utility
     ncdu # TUI disk usage

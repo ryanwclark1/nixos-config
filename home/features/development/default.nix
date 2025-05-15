@@ -48,11 +48,8 @@
   # ];
 
   home.packages = with pkgs; [
-    so
-    tokei # code statistics
-    cachix
-    nix-prefetch-git # nix development
-    uv # for python
+
+
     jsonnet-bundler
     jsonnet
   ];

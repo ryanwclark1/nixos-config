@@ -9,7 +9,7 @@
     enable = true;
     hyprcursor = {
       enable = true;
-      size = 222;
+      size = 22;
     };
     package = lib.mkDefault pkgs.bibata-cursors;
     name = lib.mkDefault "Bibata-Modern-Classic";
