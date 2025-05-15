@@ -11,19 +11,21 @@ let
   };
 in
 pkgs.stdenv.mkDerivation {
-  name = "sddm-theme";
+  name = "sddm-astronaut-theme";
 
   src = pkgs.fetchFromGitHub {
-    owner = "MarianArlt";
-    repo = "sddm-sugar-dark";
-    rev = "ceb2c455663429be03ba62d9f898c571650ef7fe";
-    sha256 = "0153z1kylbhc9d12nxy9vpn0spxgrhgy36wy37pk6ysq7akaqlvy";
+    owner = "Keyitdev";
+    repo = "sddm-astronaut-theme";
+    rev = "bf4d01732084be29cedefe9815731700da865956";
+    sha256 = "sha256-JMCG7oviLqwaymfgxzBkpCiNi18BUzPGvd3AF9BYSeo=";
   };
   installPhase = ''
     mkdir -p $out
     cp -R ./* $out/
     cd $out/
-    rm Background.jpg
+    if [ -f Background.jpg ]; then
+      rm Background.jpg
+    fi
     cp -r ${image} $out/Background.jpg
   '';
 }

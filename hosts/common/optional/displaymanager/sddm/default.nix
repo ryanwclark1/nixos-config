@@ -1,23 +1,31 @@
 {
   lib,
+  pkgs,
   ...
 }:
 let
-  sddmTheme = "breeze";
-  # sddmTheme = import ./sddm-theme.nix { inherit pkgs; };
+  # sddmTheme = "breeze";
+  sddmTheme = import ./sddm-theme.nix { inherit pkgs; };
 in
 {
 
+
   services = {
-    xserver = {
-      enable = lib.mkDefault true;
-    };
     displayManager = {
-      defaultSession = "plasma";
+      defaultSession = lib.mkDefault "hyprland-uwsm";
       sddm = {
         enable = true;
         wayland.enable = true;
-        theme = "${sddmTheme}";
+        autoNumlock = true;
+        enableHidpi = true;
+        extraPackages = [
+          sddmTheme
+          # sddm
+          # sddm-greeter
+          # sddm-theme
+        ];
+        # theme "= "${sddmTheme}";
+        theme = "sddm-astronaut-theme";
       };
     };
   };
