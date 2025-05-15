@@ -41,14 +41,11 @@
     figlet # Print large characters
     grim # Screenshot tool,
     grimblast
-    gtk3
-    gtk4
     handlr-regex
     hyprpicker
     libnotify # Notification library
     mission-center
     networkmanagerapplet
-    qalculate-gtk
     slurp # Screenshot tool, select area
     swappy # Wayland native snapshot editing tool, inspired by Snappy on macOS
     tesseract # OCR tool
