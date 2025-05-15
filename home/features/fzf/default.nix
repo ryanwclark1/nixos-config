@@ -26,6 +26,7 @@ let
 in
 {
   home.packages = [
+    pkgs.file
     (pkgs.writeScriptBin "bluetoothz" (builtins.readFile ./scripts/bluetoothz))
     (pkgs.writeScriptBin "dkr" (builtins.readFile ./scripts/dkr))
     (pkgs.writeScriptBin "fv" (builtins.readFile ./scripts/fv))
@@ -52,12 +53,12 @@ in
     tmux = {
       enableShellIntegration = lib.mkIf config.programs.tmux.enable true;
       shellIntegrationOptions = [
-        "-d 50%"
+        "-p 80%,60%"
       ];
     };
-    changeDirWidgetCommand = "fd --type directory --hidden --strip-cwd-prefix --exclude .git";
+    changeDirWidgetCommand = "fd --type directory --hidden --strip-cwd-prefix --exclude .git --exclude node_modules --exclude __pycache__ --exclude .venv";
     changeDirWidgetOptions = [
-      "--preview 'eza --tree --color=always {} | head -200'"
+      "--preview 'eza --tree --level=2 --color=always {} | head -100'"
     ];
     colors = {
       bg = "-1";
@@ -76,20 +77,24 @@ in
       border = "#${base0D}";
       label = "#${base05}";
     };
-    defaultCommand = "fd --hidden --strip-cwd-prefix --exclude .git";
+    defaultCommand = "fd --hidden --strip-cwd-prefix --exclude .git --exclude node_modules --exclude __pycache__ --exclude .venv";
     defaultOptions = [
       "--height=40%"
       "--layout=reverse"
       "--bind=ctrl-j:down,ctrl-k:up,ctrl-h:toggle-preview"
-      "--preview '([[ -d {} ]] && eza -T --color=always {} | head -200) || (file {} | grep -q binary && echo {} is binary) || bat --style=numbers --color=always --line-range=:500 {}'"
+      "--preview='([[ -d {} ]] && eza --tree --level=2 --color=always {} | head -200) || (file {} | grep -q binary && echo {} is binary) || bat --style=numbers --color=always --line-range=:500 {}'"
+      "--color=bg:-1,bg+:#${base02},border:#${base0D},fg:#${base05},fg+:#${base05},header:#${base08},hl:#${base08},hl+:#${base08},info:#${base0E},label:#${base05},marker:#${base07},pointer:#${base06},prompt:#${base0E},selected-bg:#${base03},spinner:#${base06}"
     ];
-    fileWidgetCommand = "fd --type file --follow --hidden --strip-cwd-prefix --exclude .git";
+    fileWidgetCommand = "fd --type file --follow --hidden --strip-cwd-prefix --exclude .git --exclude node_modules --exclude __pycache__ --exclude .venv";
     fileWidgetOptions = [
-      "--preview 'bat --style=numbers --color=always --line-range=:500 {}'"
+      "--preview '([[ -d {} ]] && eza --tree --level=2 --color=always {} | head -100) || (file {} | grep -q binary && echo {} is binary) || bat --style=numbers --color=always --line-range=:500 {}'"
     ];
     historyWidgetOptions = [
       "--sort"
       "--exact"
+      "--preview 'echo {}'"
+      "--preview-window=up:3:hidden:wrap"
+      "--bind ctrl-h:toggle-preview"
     ];
     enableBashIntegration = lib.mkIf config.programs.bash.enable true;
     enableFishIntegration = lib.mkIf config.programs.fish.enable true;

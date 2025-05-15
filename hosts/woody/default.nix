@@ -34,9 +34,9 @@
     ../common/optional/wireshark.nix
     ../common/optional/zsh.nix
 
-    ../common/optional/gnome
+    # ../common/optional/gnome
     ../common/optional/hyprland
-    ../common/optional/displaymanager/gdm.nix
+    ../common/optional/displaymanager/sddm
   ];
 
   networking = {
