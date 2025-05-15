@@ -28,8 +28,6 @@ in
     nurl # Generate Nix fetcher calls from repository URLs
     patchelf
     sops
-    nixd
-    nil
     nix-prefetch-git # nix development    nix-prefetch-git # nix development
     update-script
   ];
