@@ -60,6 +60,7 @@ in
         "$c"
         "$cmake"
         "$dart"
+        "$deno"
         "$golang"
         "$haskell"
         "$java"
@@ -162,7 +163,7 @@ in
 
       directory = {
         style = "fg:#${base00} bg:#${base07}";
-        format = "[ $path ]($style)";
+        format = "[$path]($style)";
         truncation_length = 10;
         truncate_to_repo = true;
         truncation_symbol = "…/";
@@ -198,9 +199,7 @@ in
 
       # Icon changes only
       conda.symbol = " ";
-      elixir.symbol = " ";
-      elm.symbol = " ";
-      hg_branch.symbol = " ";
+      hg_branch.symbol = "";
       julia.symbol = " ";
       memory_usage.symbol = "󰍛 ";
       nim.symbol = "󰆥 ";
@@ -208,7 +207,6 @@ in
       ruby.symbol = " ";
       scala.symbol = "";
       terraform.symbol = "󱁢 ";
-      erlang.symbol = " ";
       rlang.symbol = " ";
 
       shlvl = {
@@ -221,9 +219,9 @@ in
       };
 
       git_branch = {
-        symbol = "";
+        symbol = "";
         style = "bg:#${base05}";
-        format = "[[ $symbol $branch ](fg:#${base00} bg:#${base05})]($style)";
+        format = "[[ $symbol$branch ](fg:#${base00} bg:#${base05})]($style)";
         disabled = false;
       };
       git_status = {
@@ -250,6 +248,12 @@ in
         format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
         disabled = false;
       };
+      # cpp = {
+      #   symbol = " ";
+      #   style = "bg:#${base0F}";
+      #   format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
+      #   disabled = false;
+      # };
       cmake = {
         symbol = " ";
         style = "bg:#${base0F}";
@@ -260,6 +264,36 @@ in
         style = "bg:#${base0F}";
         format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
         disabled = true;
+      };
+      deno = {
+        symbol = " ";
+        style = "bg:#${base0F}";
+        format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
+        disabled = false;
+      };
+      dotnet = {
+        symbol = " ";
+        style = "bg:#${base0F}";
+        format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
+        disabled = false;
+      };
+      elixir = {
+        symbol = " ";
+        style = "bg:#${base0F}";
+        format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
+        disabled = false;
+      };
+      elm = {
+        symbol = " ";
+        style = "bg:#${base0F}";
+        format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
+        disabled = false;
+      };
+      erlang = {
+        symbol = " ";
+        style = "bg:#${base0F}";
+        format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
+        disabled = false;
       };
       golang = {
         symbol = " ";
@@ -376,7 +410,7 @@ in
       };
       time = {
         style = "bg:#${base0E} fg:#${base00}";
-        format = "[  $time]($style)";
+        format = "[ $time]($style)";
         use_12hr = false;
         disabled = false;
       };
