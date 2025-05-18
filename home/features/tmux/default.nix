@@ -1,8 +1,38 @@
 {
   config,
+  lib,
   pkgs,
   ...
 }:
+let
+  tmux-which-key =
+    pkgs.tmuxPlugins.mkTmuxPlugin
+    {
+      pluginName = "tmux-which-key";
+      version = "2025-05-15";
+      src = pkgs.fetchFromGitHub {
+        owner = "alexwforsythe";
+        repo = "tmux-which-key";
+        rev = "1f419775caf136a60aac8e3a269b51ad10b51eb6";
+        sha256 = "sha256-X7FunHrAexDgAlZfN+JOUJvXFZeyVj9yu6WRnxMEA8E=";
+      };
+      rtpFilePath = "plugin.sh.tmux";
+    };
+
+  tmux-menus =
+    pkgs.tmuxPlugins.mkTmuxPlugin
+    {
+      pluginName = "tmux-menus";
+      version = "v2.2.6";
+      src = pkgs.fetchFromGitHub {
+        owner = "jaclu";
+        repo = "tmux-menus";
+        tag = "v2.2.6";
+        sha256 = "sha256-N2RMatxmpcbziiCfz0B1j6TfOpmZ4Bkx2kTdOs8R2ug=";
+      };
+      rtpFilePath = "plugin.sh.tmux";
+    };
+in
 
 {
   home.shellAliases = {
@@ -13,18 +43,34 @@
     tmk = "tmux kill-session -t";
   };
 
-  home.file.".config/tmux/plugins" = {
-    source = ./plugins;
+  home.file.".config/tmux/plugins/tmux-forceline" = {
+    source = ./plugins/tmux-forceline;
     recursive = true;
   };
+
+  # home.file = {
+  #   ".config/tmux/plugins/tmux-which-key/config.yaml" = {
+  #     source = ./plugins/tmux-which-key/config.yaml;
+  #     executable = false;
+  #   };
+  # };
 
   programs.tmux = {
     enable = true;
     package = pkgs.tmux;
-    plugins = with pkgs.tmuxPlugins; [
-      better-mouse-mode
-      continuum
-      yank
+    plugins = [
+      pkgs.tmuxPlugins.better-mouse-mode
+      pkgs.tmuxPlugins.continuum
+      pkgs.tmuxPlugins.yank
+      pkgs.tmuxPlugins.tmux-resurrect
+      pkgs.tmuxPlugins.tmux-fzf
+      {
+        plugin = tmux-menus;
+        extraConfig = ''
+          set -g @menus_trigger 'Space';
+          set -g @menus_config_file "~/.configs/tmux.conf"
+        '';
+      }
     ];
     aggressiveResize = true;
     baseIndex = 1;
@@ -32,7 +78,7 @@
     customPaneNavigationAndResize = true; # Override the hjkl and HJKL bindings for pane navigation and resizing in VI mode.
     disableConfirmationPrompt = false;
     escapeTime = 0;
-    historyLimit = 10000;
+    historyLimit = 50000;
     keyMode = "vi"; # emacs key bindings in tmux command prompt (prefix + :) are better than vi keys, even for vim users
     mouse = true;
     newSession = false;
@@ -47,10 +93,7 @@
     extraConfig =
     ''
       # emacs key bindings in tmux command prompt (prefix + :) are better than
-      set -g base-index 1              # start indexing windows at 1 instead of 0
       set -g detach-on-destroy off     # don't exit from tmux when closing a session
-      set -g escape-time 0             # zero-out escape time delay
-      set -g history-limit 1000000     # increase history size (from 2,000)
       set -g renumber-windows on       # renumber all windows when any window is closed
       set -g set-clipboard on          # use system clipboard
 
@@ -81,12 +124,6 @@
       set -ag status-left "#{E:@forceline_status_session}"
       set -g status-right "#{E:@forceline_status_directory}"
       set -ag status-right "#{E:@forceline_status_user}"
-
-      run ${config.home.homeDirectory}/.config/tmux/plugins/tmux-menus/menus.tmux
-      set -g @menus_trigger m
-
-      run ${config.home.homeDirectory}/.config/tmux/plugins/tmux-pass/plugin.tmux
-      run ${config.home.homeDirectory}/.config/tmux/plugins/tmux-fzf/main.tmux
     '';
   };
 }
