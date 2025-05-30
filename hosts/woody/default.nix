@@ -38,7 +38,9 @@
     ../common/optional/hyprland
     ../common/optional/displaymanager/sddm
   ];
-
+  environment.systemPackages = with pkgs; [
+    cacert
+  ];
   networking = {
     hostName = "woody";
   };
