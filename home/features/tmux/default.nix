@@ -62,7 +62,7 @@ in
       pkgs.tmuxPlugins.better-mouse-mode
       pkgs.tmuxPlugins.continuum
       pkgs.tmuxPlugins.yank
-      pkgs.tmuxPlugins.tmux-resurrect
+      # pkgs.tmuxPlugins.tmux-resurrect
       pkgs.tmuxPlugins.tmux-fzf
       {
         plugin = tmux-menus;

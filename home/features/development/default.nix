@@ -7,6 +7,7 @@
 
   imports = [
     ./build.nix
+    ./claude.nix
     ./go.nix
     ./grpc.nix
     ./js.nix
