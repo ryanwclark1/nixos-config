@@ -12,6 +12,7 @@
     ./grpc.nix
     ./js.nix
     ./lua.nix
+    ./n8n.nix
     ./protobuf.nix
     # ./python.nix
     # ./rust.nix
