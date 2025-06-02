@@ -7,6 +7,7 @@
     ./fwupd.nix
     ./gvfs.nix
     ./mpd.nix
+    ./n8n.nix
     ./prometheus-node-exporter.nix
     ./spice.nix
     ./vscode-server.nix
