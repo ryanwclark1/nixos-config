@@ -87,7 +87,6 @@
             tailscale.vscode-tailscale
             tamasfe.even-better-toml
             usernamehw.errorlens
-            # vue.volar
             yzhang.markdown-all-in-one
           ]) ++ (pkgs.vscode-utils.extensionsFromVscodeMarketplace [
             {

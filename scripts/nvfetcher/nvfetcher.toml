@@ -8,20 +8,60 @@ src.vsmarketplace = "redhat.ansible"
 fetch.vsmarketplace = "redhat.ansible"
 passthru = { publisher = "redhat", name = "ansible" }
 
+[biome]
+src.vsmarketplace = "biomejs.biome"
+fetch.vsmarketplace = "biomejs.biome"
+passthru = { publisher = "biomejs", name = "biome" }
+
 [bun-vscode]
 src.vsmarketplace = "oven.bun-vscode"
 fetch.vsmarketplace = "oven.bun-vscode"
 passthru = { publisher = "oven", name = "bun-vscode" }
+
+[explorer]
+src.vsmarketplace = "vitest.explorer"
+fetch.vsmarketplace = "vitest.explorer"
+passthru = { publisher = "vitest", name = "explorer" }
+
+[gopls]
+src.github_tag = "golang/tools"
+src.include_regex = "gopls/v[0-9]+\\.[0-9]+\\.[0-9]+"
+fetch.github = "golang/tools"
+
+[grafana-vscode]
+src.vsmarketplace = "grafana.grafana-vscode"
+fetch.vsmarketplace = "grafana.grafana-vscode"
+passthru = { publisher = "grafana", name = "grafana-vscode" }
+
+[hadolint]
+src.vsmarketplace = "exiasr.hadolint"
+fetch.vsmarketplace = "exiasr.hadolint"
+passthru = { publisher = "exiasr", name = "hadolint" }
 
 [htmx-attributes]
 src.vsmarketplace = "craigrbroughton.htmx-attributes"
 fetch.vsmarketplace = "craigrbroughton.htmx-attributes"
 passthru = { publisher = "craigrbroughton", name = "htmx-attributes" }
 
-[templ]
-src.vsmarketplace = "a-h.templ"
-fetch.vsmarketplace = "a-h.templ"
-passthru = { publisher = "a-h", name = "templ" }
+[mypy-type-checker]
+src.vsmarketplace = "ms-python.mypy-type-checker"
+fetch.vsmarketplace = "ms-python.mypy-type-checker"
+passthru = { publisher = "ms-python", name = "mypy-type-checker"}
+
+[playwright]
+src.vsmarketplace = "ms-playwright.playwright"
+fetch.vsmarketplace = "ms-playwright.playwright"
+passthru = { publisher = "ms-playwright", name = "playwright" }
+
+[prom]
+src.vsmarketplace = "ventura.prom"
+fetch.vsmarketplace = "ventura.prom"
+passthru = { publisher = "ventura", name = "prom" }
+
+[rasi]
+src.vsmarketplace = "dlasagno.rasi"
+fetch.vsmarketplace = "dlasagno.rasi"
+passthru = { publisher = "dlasagno", name = "rasi" }
 
 [sqlite-viewer]
 src.vsmarketplace = "qwtel.sqlite-viewer"
@@ -43,6 +83,16 @@ src.vsmarketplace = "stivo.tailwind-fold"
 fetch.vsmarketplace = "stivo.tailwind-fold"
 passthru = { publisher = "stivo", name = "tailwind-fold" }
 
+[templ]
+src.vsmarketplace = "a-h.templ"
+fetch.vsmarketplace = "a-h.templ"
+passthru = { publisher = "a-h", name = "templ" }
+
+[ty]
+src.vsmarketplace = "astral-sh.ty"
+fetch.vsmarketplace = "astral-sh.ty"
+passthru = { publisher = "astral-sh", name = "ty" }
+
 [vscode-thunder-client]
 src.vsmarketplace = "rangav.vscode-thunder-client"
 fetch.vsmarketplace = "rangav.vscode-thunder-client"
@@ -58,68 +108,17 @@ src.vsmarketplace = "weaveworks.vscode-gitops-tools"
 fetch.vsmarketplace = "weaveworks.vscode-gitops-tools"
 passthru = { publisher = "weaveworks", name = "vscode-gitops-tools" }
 
-[vscode-speech]
-src.vsmarketplace = "ms-vscode.vscode-speech"
-fetch.vsmarketplace = "ms-vscode.vscode-speech"
-passthru = { publisher = "ms-vscode", name = "vscode-speech" }
-
-[gopls]
-src.github_tag = "golang/tools"
-src.include_regex = "gopls/v[0-9]+\\.[0-9]+\\.[0-9]+"
-fetch.github = "golang/tools"
-
-[prom]
-src.vsmarketplace = "ventura.prom"
-fetch.vsmarketplace = "ventura.prom"
-passthru = { publisher = "ventura", name = "prom" }
-
-[grafana-vscode]
-src.vsmarketplace = "grafana.grafana-vscode"
-fetch.vsmarketplace = "grafana.grafana-vscode"
-passthru = { publisher = "grafana", name = "grafana-vscode" }
-
-[mypy-type-checker]
-src.vsmarketplace = "ms-python.mypy-type-checker"
-fetch.vsmarketplace = "ms-python.mypy-type-checker"
-passthru = { publisher = "ms-python", name = "mypy-type-checker"}
-
-[rasi]
-src.vsmarketplace = "dlasagno.rasi"
-fetch.vsmarketplace = "dlasagno.rasi"
-passthru = { publisher = "dlasagno", name = "rasi" }
-
-[explorer]
-src.vsmarketplace = "vitest.explorer"
-fetch.vsmarketplace = "vitest.explorer"
-passthru = { publisher = "vitest", name = "explorer" }
-
-[hadolint]
-src.vsmarketplace = "exiasr.hadolint"
-fetch.vsmarketplace = "exiasr.hadolint"
-passthru = { publisher = "exiasr", name = "hadolint" }
-
 [vsc-python-indent]
 src.vsmarketplace = "kevinrose.vsc-python-indent"
 fetch.vsmarketplace = "kevinrose.vsc-python-indent"
 passthru = { publisher = "kevinrose", name = "vsc-python-indent" }
-
-[biome]
-src.vsmarketplace = "biomejs.biome"
-fetch.vsmarketplace = "biomejs.biome"
-passthru = { publisher = "biomejs", name = "biome" }
-
-[playwright]
-src.vsmarketplace = "ms-playwright.playwright"
-fetch.vsmarketplace = "ms-playwright.playwright"
-passthru = { publisher = "ms-playwright", name = "playwright" }
-
-[ty]
-src.vsmarketplace = "astral-sh.ty"
-fetch.vsmarketplace = "astral-sh.ty"
-passthru = { publisher = "astral-sh", name = "ty" }
 
 [vscode-pgsql]
 src.vsmarketplace = "ms-ossdata.vscode-pgsql"
 fetch.vsmarketplace = "ms-ossdata.vscode-pgsql"
 passthru = { publisher = "ms-ossdata", name = "vscode-pgsql" }
 
+[vscode-speech]
+src.vsmarketplace = "ms-vscode.vscode-speech"
+fetch.vsmarketplace = "ms-vscode.vscode-speech"
+passthru = { publisher = "ms-vscode", name = "vscode-speech" }
