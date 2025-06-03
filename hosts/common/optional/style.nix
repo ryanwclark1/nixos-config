@@ -17,7 +17,7 @@ in
   stylix = {
     enable = true;
     autoEnable = false;
-    image = ../wallpaper/FormulaOne_Vettel_2.jpg;
+    # image = ../wallpaper/FormulaOne_Vettel_2.jpg;
     # image = "~/Pictures/wallpaper/FormulaOne_Vettel_2.jpg";
     imageScalingMode = "fill";
     base16Scheme = "${pkgs.base16-schemes}/share/themes/${currentScheme}.yaml";
@@ -58,14 +58,14 @@ in
     };
     targets = {
       console.enable = true;
-      gnome.enable = true;
+      gnome.enable = false;
       grub = {
-        enable = true;
+        enable = false;
         useWallpaper = true;
       };
-      gtk.enable = true;
+      gtk.enable = false;
       nixos-icons.enable = true;
-      qt.enable = true;
+      qt.enable = false;
       # nixvim = {
       #   enable = true;
       #   transparentBackground = {

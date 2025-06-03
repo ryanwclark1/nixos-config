@@ -15,7 +15,7 @@ in
   stylix = {
     enable = lib.mkDefault true;
     autoEnable = lib.mkDefault false;
-    image = ../../hosts/common/wallpaper/FormulaOne_Vettel_2.jpg;
+    # image = ../../hosts/common/wallpaper/FormulaOne_Vettel_2.jpg;
     imageScalingMode = lib.mkDefault "fill";
     base16Scheme = "${pkgs.base16-schemes}/share/themes/${currentScheme}.yaml";
     cursor = {
