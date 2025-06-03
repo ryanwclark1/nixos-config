@@ -16,6 +16,7 @@
     tailwindcss # Tailwind CSS IntelliSense
     taplo # Even Better TOML
     nvfetcher # Generate nix sources expr for the latest version of packages
+    nil
   ];
 
   programs.vscode = {
@@ -161,18 +162,6 @@
               version = "1.0.0";
             }
             {
-              name = "remote-explorer";
-              publisher = "ms-vscode";
-              sha256 = "sha256-5uLb+UCcttgW5oPUcr8rKWks5Wdu+CzxPshJhpDK61s=";
-              version = "0.6.2025051209";
-            }
-            {
-              name = "remotehub";
-              publisher = "github";
-              sha256 = "sha256-Xb28yff0tiQDUuwC5Mv0rwXqLgZOU4B3KZAht78NfFU=";
-              version = "0.65.2024112101";
-            }
-            {
               name = "sqlite-viewer";
               publisher = "qwtel";
               sha256 = "sha256-u8vLGDRL6VAxPclhSIINE0rvxWY3BHxUiImYxGgb5uQ=";
@@ -225,12 +214,6 @@
               publisher = "grafana";
               sha256 = "sha256-Q8VzXzTdHo9h5+eCHHF1bPomPEbRsvouJcUfmFUDGMU=";
               version = "0.7.2";
-            }
-            {
-              name = "vscode-postgresql-client2";
-              publisher = "cweijan";
-              sha256 = "sha256-9GfY780Mi+nKB0tF5Vk8IFqgtCCrvEEELtRT7usY9b4=";
-              version = "8.3.4";
             }
             {
               name = "vscode-speech";
@@ -389,6 +372,7 @@
 
           ##### Nix IDE #####
           "nix.enableLanguageServer" = true;
+          "nix.serverPath" = "nil";
 
           ##### Redhat #####
           "redhat.telemetry.enabled" = false;
