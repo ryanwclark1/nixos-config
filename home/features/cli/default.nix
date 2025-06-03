@@ -8,7 +8,7 @@
     ./gh.nix
     ./jq.nix
     ./nixtools.nix
-    ./tf.nix
+    ./respects.nix
   ];
   home.packages = with pkgs; [
     so  # Stackoverflow search
