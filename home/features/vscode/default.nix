@@ -17,6 +17,7 @@
     taplo # Even Better TOML
     nvfetcher # Generate nix sources expr for the latest version of packages
     nil
+    biome
   ];
 
   programs.vscode = {
