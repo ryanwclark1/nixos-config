@@ -20,6 +20,7 @@
     ../common/optional/gnome-services.nix
     ../common/optional/nautilus.nix
     ../common/optional/nfs.nix
+    ../common/optional/plymouth.nix
     ../common/optional/printing.nix
     ../common/optional/steam.nix
     ../common/optional/system-packages.nix
@@ -52,7 +53,7 @@
     # tmp = {
     #   cleanOnBoot = true;
     # };
-    kernelPackages = pkgs.linuxKernel.packages.linux_6_13;
+    kernelPackages = pkgs.linuxKernel.packages.linux_6_14;
     binfmt.emulatedSystems = [ "aarch64-linux" "i686-linux" ];
   };
 
