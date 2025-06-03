@@ -20,7 +20,7 @@
     ../common/optional/gnome-services.nix
     ../common/optional/nautilus.nix
     ../common/optional/nfs.nix
-    ../common/optional/plymouth.nix
+    # ../common/optional/plymouth.nix
     ../common/optional/printing.nix
     ../common/optional/steam.nix
     ../common/optional/system-packages.nix
