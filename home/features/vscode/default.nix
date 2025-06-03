@@ -342,7 +342,6 @@
           #####  Copilot #####
           # "github.copilot.chat.temporalContext.enabled" = true;
           "github.copilot.chat.completionContext.typescript.mode" = "on";
-          "github.copilot.editor.enableAutoCompletions" = true;
           "github.copilot.chat.startDebugging.enabled" = true;
           "github.copilot.chat.localeOverride" = "en";
           "github.copilot.chat.useProjectTemplates" = true;
@@ -410,7 +409,7 @@
             "run" = true;
             "share" = true;
           };
-          "go.lintOnSave" = "golangci-lint";
+          "go.lintOnSave" = "workspace";
           "go.inferGopath" = true;
           "go.showWelcome" = false;
           "go.survey.prompt" = false;
@@ -445,7 +444,7 @@
             };
             "ui.completion.completeFunctionCalls" = true;
             "ui.completion.experimentalPostfixCompletions" = true;
-            "ui.completion.matcher" = "fuzzy";
+            "ui.completion.matcher" = "Fuzzy";
             "ui.completion.usePlaceholders" = true;
             "ui.diagnostic.analysisProgressReporting" = true;
             "ui.diagnostic.diagnosticsTrigger" = "Edit";
