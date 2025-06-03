@@ -7,7 +7,7 @@
 {
   programs.go = {
     enable = true;
-    package = pkgs.go_1_23;
+    package = pkgs.go; # May need to change to a specific version like pkgs.go_1_23
     goPath = "go";
     goBin = "go/bin";
     packages = {
