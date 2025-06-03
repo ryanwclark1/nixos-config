@@ -25,11 +25,11 @@
   };
   biome = {
     pname = "biome";
-    version = "2025.5.40952";
+    version = "2025.5.251939";
     src = fetchurl {
-      url = "https://biomejs.gallery.vsassets.io/_apis/public/gallery/publisher/biomejs/extension/biome/2025.5.40952/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "biome-2025.5.40952.zip";
-      sha256 = "sha256-km5+KnfNI1QwZ5ao7jaBdvzeiepUHmFa4rMFvmH78aw=";
+      url = "https://biomejs.gallery.vsassets.io/_apis/public/gallery/publisher/biomejs/extension/biome/2025.5.251939/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "biome-2025.5.251939.zip";
+      sha256 = "sha256-k0/aQnkHSICIQ5n6CSUGF0Z/HiTeet0BCf0UxQRxq7g=";
     };
     publisher = "biomejs";
     name = "biome";
@@ -45,35 +45,13 @@
     publisher = "oven";
     name = "bun-vscode";
   };
-  copilot = {
-    pname = "copilot";
-    version = "1.316.1553";
-    src = fetchurl {
-      url = "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot/1.316.1553/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "copilot-1.316.1553.zip";
-      sha256 = "sha256-hgohe3BYf5wyMP+7DLZfJz1wkuxsYBOWm1T6EYJcYOU=";
-    };
-    publisher = "github";
-    name = "copilot";
-  };
-  copilot-chat = {
-    pname = "copilot-chat";
-    version = "0.28.2025050803";
-    src = fetchurl {
-      url = "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot-chat/0.28.2025050803/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "copilot-chat-0.28.2025050803.zip";
-      sha256 = "sha256-glqxhe93fBOCGBSNQEEFp1anERZLVI7eQ58W6uBLTDk=";
-    };
-    publisher = "github";
-    name = "copilot-chat";
-  };
   explorer = {
     pname = "explorer";
-    version = "1.18.0";
+    version = "1.18.1";
     src = fetchurl {
-      url = "https://vitest.gallery.vsassets.io/_apis/public/gallery/publisher/vitest/extension/explorer/1.18.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "explorer-1.18.0.zip";
-      sha256 = "sha256-U4NYmn8p2CfZIHUrcYaxt6kGayMEzjzhkag7XfyeEGA=";
+      url = "https://vitest.gallery.vsassets.io/_apis/public/gallery/publisher/vitest/extension/explorer/1.18.1/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "explorer-1.18.1.zip";
+      sha256 = "sha256-M/eC7nmFj3BQGlx9J2kqLAKObPYhAit7hVdKYuQlfKw=";
     };
     publisher = "vitest";
     name = "explorer";
@@ -168,11 +146,11 @@
   };
   remote-explorer = {
     pname = "remote-explorer";
-    version = "0.6.2025050822";
+    version = "0.6.2025051209";
     src = fetchurl {
-      url = "https://ms-vscode.gallery.vsassets.io/_apis/public/gallery/publisher/ms-vscode/extension/remote-explorer/0.6.2025050822/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "remote-explorer-0.6.2025050822.zip";
-      sha256 = "sha256-cVnAKDyuxn9VCVFufNtT2T1LfqIvJ5jOfYe1+iW2aWs=";
+      url = "https://ms-vscode.gallery.vsassets.io/_apis/public/gallery/publisher/ms-vscode/extension/remote-explorer/0.6.2025051209/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "remote-explorer-0.6.2025051209.zip";
+      sha256 = "sha256-5uLb+UCcttgW5oPUcr8rKWks5Wdu+CzxPshJhpDK61s=";
     };
     publisher = "ms-vscode";
     name = "remote-explorer";
@@ -190,47 +168,14 @@
   };
   sqlite-viewer = {
     pname = "sqlite-viewer";
-    version = "25.5.2";
+    version = "25.5.4";
     src = fetchurl {
-      url = "https://qwtel.gallery.vsassets.io/_apis/public/gallery/publisher/qwtel/extension/sqlite-viewer/25.5.2/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "sqlite-viewer-25.5.2.zip";
-      sha256 = "sha256-HTOT+C4KYsa1mcnPlncAw7xxAX+mtwiv+K1+XXvxK3c=";
+      url = "https://qwtel.gallery.vsassets.io/_apis/public/gallery/publisher/qwtel/extension/sqlite-viewer/25.5.4/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "sqlite-viewer-25.5.4.zip";
+      sha256 = "sha256-u8vLGDRL6VAxPclhSIINE0rvxWY3BHxUiImYxGgb5uQ=";
     };
     publisher = "qwtel";
     name = "sqlite-viewer";
-  };
-  sqltools = {
-    pname = "sqltools";
-    version = "0.28.4";
-    src = fetchurl {
-      url = "https://mtxr.gallery.vsassets.io/_apis/public/gallery/publisher/mtxr/extension/sqltools/0.28.4/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "sqltools-0.28.4.zip";
-      sha256 = "sha256-ExeerCI5yDa/DJqNOwENDjw+xhMPNil6JgCAUNdTXy8=";
-    };
-    publisher = "mtxr";
-    name = "sqltools";
-  };
-  sqltools-driver-pg = {
-    pname = "sqltools-driver-pg";
-    version = "0.5.5";
-    src = fetchurl {
-      url = "https://mtxr.gallery.vsassets.io/_apis/public/gallery/publisher/mtxr/extension/sqltools-driver-pg/0.5.5/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "sqltools-driver-pg-0.5.5.zip";
-      sha256 = "sha256-B1wycDFSWPaQ87HF54+GrNX0b5f3tODLStuxqICdkjs=";
-    };
-    publisher = "mtxr";
-    name = "sqltools-driver-pg";
-  };
-  sqltools-driver-sqlite = {
-    pname = "sqltools-driver-sqlite";
-    version = "0.5.2";
-    src = fetchurl {
-      url = "https://mtxr.gallery.vsassets.io/_apis/public/gallery/publisher/mtxr/extension/sqltools-driver-sqlite/0.5.2/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "sqltools-driver-sqlite-0.5.2.zip";
-      sha256 = "sha256-aT4gFllyaQSoozblz1FnbQyHyZbBqXDjWAXVODQA2mU=";
-    };
-    publisher = "mtxr";
-    name = "sqltools-driver-sqlite";
   };
   tailwind-color-matcher = {
     pname = "tailwind-color-matcher";
@@ -278,11 +223,11 @@
   };
   ty = {
     pname = "ty";
-    version = "2025.3.11272138";
+    version = "2025.15.11531247";
     src = fetchurl {
-      url = "https://astral-sh.gallery.vsassets.io/_apis/public/gallery/publisher/astral-sh/extension/ty/2025.3.11272138/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "ty-2025.3.11272138.zip";
-      sha256 = "sha256-Lgm+rwBmUJEmWKGOuuxXbyGHGKoOie8a3RDK9ez0+4E=";
+      url = "https://astral-sh.gallery.vsassets.io/_apis/public/gallery/publisher/astral-sh/extension/ty/2025.15.11531247/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "ty-2025.15.11531247.zip";
+      sha256 = "sha256-DqLkC1GY+UB778AnxD9bebbvhWb19fE3CA4fc15Fdmg=";
     };
     publisher = "astral-sh";
     name = "ty";
@@ -322,33 +267,33 @@
   };
   vscode-postgresql-client2 = {
     pname = "vscode-postgresql-client2";
-    version = "8.2.9";
+    version = "8.3.4";
     src = fetchurl {
-      url = "https://cweijan.gallery.vsassets.io/_apis/public/gallery/publisher/cweijan/extension/vscode-postgresql-client2/8.2.9/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "vscode-postgresql-client2-8.2.9.zip";
-      sha256 = "sha256-HH6P5Mv11vtFSsUMDoteKe58J+R1dyKYo273LZF4wtk=";
+      url = "https://cweijan.gallery.vsassets.io/_apis/public/gallery/publisher/cweijan/extension/vscode-postgresql-client2/8.3.4/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "vscode-postgresql-client2-8.3.4.zip";
+      sha256 = "sha256-9GfY780Mi+nKB0tF5Vk8IFqgtCCrvEEELtRT7usY9b4=";
     };
     publisher = "cweijan";
     name = "vscode-postgresql-client2";
   };
   vscode-speech = {
     pname = "vscode-speech";
-    version = "0.14.0";
+    version = "0.15.2025052212";
     src = fetchurl {
-      url = "https://ms-vscode.gallery.vsassets.io/_apis/public/gallery/publisher/ms-vscode/extension/vscode-speech/0.14.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "vscode-speech-0.14.0.zip";
-      sha256 = "sha256-4KeusQtE2O7A9w0p9wcu91p0C33eFHi7bGlRrwjwnto=";
+      url = "https://ms-vscode.gallery.vsassets.io/_apis/public/gallery/publisher/ms-vscode/extension/vscode-speech/0.15.2025052212/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "vscode-speech-0.15.2025052212.zip";
+      sha256 = "sha256-vQ1zpWydrKtBlek4+XATH02BtqwPCtF2sRl+KboEA5E=";
     };
     publisher = "ms-vscode";
     name = "vscode-speech";
   };
   vscode-thunder-client = {
     pname = "vscode-thunder-client";
-    version = "2.34.3";
+    version = "2.35.0";
     src = fetchurl {
-      url = "https://rangav.gallery.vsassets.io/_apis/public/gallery/publisher/rangav/extension/vscode-thunder-client/2.34.3/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "vscode-thunder-client-2.34.3.zip";
-      sha256 = "sha256-zXDCcudNzpkTlQtXaiv/APxdYZOPzIeKmlNOIACJLsE=";
+      url = "https://rangav.gallery.vsassets.io/_apis/public/gallery/publisher/rangav/extension/vscode-thunder-client/2.35.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "vscode-thunder-client-2.35.0.zip";
+      sha256 = "sha256-K0zsgtX1lZptLbeNBA6kFTdNhNWDwtwGfs/4kAHvNW8=";
     };
     publisher = "rangav";
     name = "vscode-thunder-client";

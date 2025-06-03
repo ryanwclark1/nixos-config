@@ -13,16 +13,6 @@ src.vsmarketplace = "oven.bun-vscode"
 fetch.vsmarketplace = "oven.bun-vscode"
 passthru = { publisher = "oven", name = "bun-vscode" }
 
-[copilot]
-src.vsmarketplace = "github.copilot"
-fetch.vsmarketplace = "github.copilot"
-passthru = { publisher = "github", name = "copilot" }
-
-[copilot-chat]
-src.vsmarketplace = "github.copilot-chat"
-fetch.vsmarketplace = "github.copilot-chat"
-passthru = { publisher = "github", name = "copilot-chat" }
-
 [htmx-attributes]
 src.vsmarketplace = "craigrbroughton.htmx-attributes"
 fetch.vsmarketplace = "craigrbroughton.htmx-attributes"
@@ -47,21 +37,6 @@ passthru = { publisher = "a-h", name = "templ" }
 src.vsmarketplace = "qwtel.sqlite-viewer"
 fetch.vsmarketplace = "qwtel.sqlite-viewer"
 passthru = { publisher = "qwtel", name = "sqlite-viewer" }
-
-[sqltools-driver-pg]
-src.vsmarketplace = "mtxr.sqltools-driver-pg"
-fetch.vsmarketplace = "mtxr.sqltools-driver-pg"
-passthru = { publisher = "mtxr", name = "sqltools-driver-pg" }
-
-[sqltools-driver-sqlite]
-src.vsmarketplace = "mtxr.sqltools-driver-sqlite"
-fetch.vsmarketplace = "mtxr.sqltools-driver-sqlite"
-passthru = { publisher = "mtxr", name = "sqltools-driver-sqlite" }
-
-[sqltools]
-src.vsmarketplace = "mtxr.sqltools"
-fetch.vsmarketplace = "mtxr.sqltools"
-passthru = { publisher = "mtxr", name = "sqltools" }
 
 [tailwind-color-matcher]
 src.vsmarketplace = "OmriGrossman.tailwind-color-matcher"
@@ -97,11 +72,6 @@ passthru = { publisher = "weaveworks", name = "vscode-gitops-tools" }
 src.vsmarketplace = "ms-vscode.vscode-speech"
 fetch.vsmarketplace = "ms-vscode.vscode-speech"
 passthru = { publisher = "ms-vscode", name = "vscode-speech" }
-
-[yuck]
-src.vsmarketplace = "eww-yuck.yuck"
-fetch.vsmarketplace = "eww-yuck.yuck"
-passthru = { publisher = "eww-yuck", name = "yuck" }
 
 [gopls]
 src.github_tag = "golang/tools"
@@ -162,3 +132,9 @@ passthru = { publisher = "ms-playwright", name = "playwright" }
 src.vsmarketplace = "astral-sh.ty"
 fetch.vsmarketplace = "astral-sh.ty"
 passthru = { publisher = "astral-sh", name = "ty" }
+
+[vscode-pgsql]
+src.vsmarketplace = "ms-ossdata.vscode-pgsql"
+fetch.vsmarketplace = "ms-ossdata.vscode-pgsql"
+passthru = { publisher = "ms-ossdata", name = "vscode-pgsql" }
+
