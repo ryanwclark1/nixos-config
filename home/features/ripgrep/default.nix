@@ -7,7 +7,6 @@
   programs = {
     ripgrep = {
       enable = true;
-      package = pkgs.ripgrep;
       arguments = [
         "--glob=!.git/*"
         "--glob=!node_modules/*"
@@ -29,5 +28,6 @@
     ripgrep-all
     sd
     repgrep # ripgrep with replacement support
+    fselect
   ];
 }
