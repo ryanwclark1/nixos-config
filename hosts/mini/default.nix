@@ -80,7 +80,6 @@ in
       nerd-fonts.fira-mono
       nerd-fonts.jetbrains-mono
       nerd-fonts.monaspace
-      nerd-fonts.mplus
       nerd-fonts.noto
       nerd-fonts.ubuntu
       nerd-fonts.ubuntu-mono

@@ -67,7 +67,6 @@
     nerd-fonts.monofur
     nerd-fonts.monoid
     nerd-fonts.mononoki
-    nerd-fonts.mplus
     nerd-fonts.noto
     nerd-fonts.open-dyslexic
     nerd-fonts.overpass
@@ -96,7 +95,7 @@
     # noto-fonts-extra
     powerline-fonts
     powerline-symbols
-    
+
     # Font Manager
     font-manager
   ];
