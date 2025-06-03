@@ -18,16 +18,6 @@ src.vsmarketplace = "craigrbroughton.htmx-attributes"
 fetch.vsmarketplace = "craigrbroughton.htmx-attributes"
 passthru = { publisher = "craigrbroughton", name = "htmx-attributes" }
 
-[remote-explorer]
-src.vsmarketplace = "ms-vscode.remote-explorer"
-fetch.vsmarketplace = "ms-vscode.remote-explorer"
-passthru = { publisher = "ms-vscode", name = "remote-explorer" }
-
-[remotehub]
-src.vsmarketplace = "github.remotehub"
-fetch.vsmarketplace = "github.remotehub"
-passthru = { publisher = "github", name = "remotehub" }
-
 [templ]
 src.vsmarketplace = "a-h.templ"
 fetch.vsmarketplace = "a-h.templ"
@@ -77,11 +67,6 @@ passthru = { publisher = "ms-vscode", name = "vscode-speech" }
 src.github_tag = "golang/tools"
 src.include_regex = "gopls/v[0-9]+\\.[0-9]+\\.[0-9]+"
 fetch.github = "golang/tools"
-
-[vscode-postgresql-client2]
-src.vsmarketplace = "cweijan.vscode-postgresql-client2"
-fetch.vsmarketplace = "cweijan.vscode-postgresql-client2"
-passthru = { publisher = "cweijan", name = "vscode-postgresql-client2" }
 
 [prom]
 src.vsmarketplace = "ventura.prom"
