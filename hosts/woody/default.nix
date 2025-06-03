@@ -59,7 +59,7 @@
     # tmp = {
     #   cleanOnBoot = true;
     # };
-    kernelPackages = pkgs.linuxKernel.packages.linux_6_13;
+    kernelPackages = pkgs.linuxKernel.packages.linux_6_14;
   };
 
   hardware = {
