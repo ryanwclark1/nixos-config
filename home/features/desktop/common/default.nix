@@ -26,7 +26,6 @@
     mimeo # Open files with the right program
     # spice-vdagent # Spice agent
     virt-viewer # View virtual machines
-    ventoy-full #balena type tool
     waypipe # Network proxy for Wayland clients (applications)
     webkitgtk_6_0 # Web rendering engine
     wl-clipboard # Wayland clipboard
