@@ -13,10 +13,9 @@
   };
 
   home.packages = with pkgs; [
-    tailwindcss
-    fluxctl
+    tailwindcss # Tailwind CSS IntelliSense
     taplo # Even Better TOML
-    nvfetcher
+    nvfetcher # Generate nix sources expr for the latest version of packages
   ];
 
   programs.vscode = {
