@@ -17,6 +17,7 @@
       # if [ -x "$(command -v fastfetch)" ]; then
       #   fastfetch 2>/dev/null
       # fi
+      alias claude="/home/administrator/.claude/local/claude"
     '';
   };
 }
