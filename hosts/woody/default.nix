@@ -6,15 +6,21 @@
 
 {
   imports = [
+    # Hardware modules
     inputs.nixos-hardware.nixosModules.common-gpu-amd
     inputs.nixos-hardware.nixosModules.common-cpu-amd
     inputs.nixos-hardware.nixosModules.common-pc
     inputs.nixos-hardware.nixosModules.common-pc-ssd
+
+    # Host-specific files
     ./hardware-configuration.nix
     ./services
+
+    # Common configurations
     ../common/global
-    ../common/optional/plymouth
     ../common/users/administrator
+
+    # Optional features
     ../common/optional/audio.nix
     ../common/optional/bluetooth.nix
     ../common/optional/direnv.nix
@@ -33,58 +39,37 @@
     ../common/optional/webcam.nix
     ../common/optional/wireshark.nix
     ../common/optional/zsh.nix
-
-    # ../common/optional/gnome
     ../common/optional/hyprland
     ../common/optional/displaymanager/sddm
   ];
-  environment.systemPackages = with pkgs; [
-    cacert
-  ];
-  networking = {
-    hostName = "woody";
-  };
+
+  # Host-specific settings
+  networking.hostName = "woody";
+
+  # Override boot settings for desktop
   boot = {
-    loader = {
-      systemd-boot = {
-        enable = true;
-        configurationLimit = 20;
-        consoleMode = "keep";
-      };
-      efi.canTouchEfiVariables = true;
-    };
-    # plymouth = {
-    #   enable = true;
-    # };
-    # tmp = {
-    #   cleanOnBoot = true;
-    # };
-    kernelPackages = pkgs.linuxKernel.packages.linux_6_14;
+    # Override tmp settings for desktop
+    tmp.cleanOnBoot = true;
+
+    # Override loader settings for desktop
+    loader.systemd-boot.configurationLimit = 20;
   };
 
+  # AMD-specific hardware settings
   hardware = {
-    enableAllFirmware = true;
-    enableRedistributableFirmware = true;
-    # firmware = [
-    #   pkgs.linux-firmware
-    # ];
-
     amdgpu = {
       amdvlk = {
         enable = true;
-        # package = pkgs.amdvlk;
         supportExperimental.enable = true;
         support32Bit = {
           enable = true;
-          # package = pkgs.driversi686Linux.amdvlk;
         };
       };
       initrd.enable = true;
       opencl.enable = true;
     };
+
     graphics = {
-      enable = true;
-      enable32Bit = true;
       extraPackages = with pkgs; [
         mesa
       ];
@@ -92,6 +77,7 @@
         driversi686Linux.mesa
       ];
     };
+
     logitech = {
       wireless = {
         enable = true;
@@ -99,5 +85,11 @@
       };
     };
   };
+
+  # Desktop-specific power management
+  powerManagement = {
+    cpuFreqGovernor = "performance";
+  };
+
   system.stateVersion = "24.05";
 }
