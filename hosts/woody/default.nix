@@ -15,6 +15,7 @@
     # Host-specific files
     ./hardware-configuration.nix
     ./services
+    ./performance.nix
 
     # Common configurations
     ../common/global

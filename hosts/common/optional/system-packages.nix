@@ -8,7 +8,7 @@
 {
   environment.systemPackages = with pkgs; [
     # System monitoring
-    htop
+    btop  # Modern system monitor
     iotop
     nethogs
     smartmontools
