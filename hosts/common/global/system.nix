@@ -7,11 +7,15 @@
 {
   # Add system-wide performance improvements
   services = {
-    # Enable systemd-oomd for better memory management
-    systemd-oomd.enable = true;
-
     # Enable fstrim for SSD optimization
     fstrim.enable = true;
+  };
+
+  # Enable systemd-oomd for better memory management
+  systemd.oomd = {
+    enable = true;
+    enableRootSlice = true;
+    enableUserServices = true;
   };
 
   # Common hardware settings
