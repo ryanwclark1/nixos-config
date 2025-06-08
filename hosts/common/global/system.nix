@@ -12,12 +12,6 @@
 
     # Enable fstrim for SSD optimization
     fstrim.enable = true;
-
-    # Enable automatic system updates
-    nixos-update = {
-      enable = true;
-      channel = "https://nixos.org/channels/nixos-unstable";
-    };
   };
 
   # Common hardware settings
