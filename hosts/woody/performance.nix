@@ -29,7 +29,14 @@
   hardware = {
     opengl = {
       enable = true;
-      enable32Bit = true;
+      extraPackages = with pkgs; [
+        mesa
+        rocm-opencl-icd
+        rocm-opencl-runtime
+      ];
+      extraPackages32 = with pkgs; [
+        driversi686Linux.mesa
+      ];
     };
     amdgpu = {
       amdvlk = {
