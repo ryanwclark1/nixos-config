@@ -23,14 +23,25 @@
   services = {
     # Enable performance governor for desktop
     power-profiles-daemon.enable = true;
+  };
 
-    # Enable AMD GPU performance features
-    amdgpu = {
+  # AMD GPU configuration
+  hardware = {
+    opengl = {
       enable = true;
-      powerManagement = {
+      driSupport = true;
+      driSupport32Bit = true;
+    };
+    amdgpu = {
+      amdvlk = {
         enable = true;
-        dynamicPowerManagement = true;
+        supportExperimental.enable = true;
+        support32Bit = {
+          enable = true;
+        };
       };
+      initrd.enable = true;
+      opencl.enable = true;
     };
   };
 
