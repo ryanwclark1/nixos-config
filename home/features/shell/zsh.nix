@@ -35,7 +35,7 @@
       esac
     }
 
-    alias claude="/home/administrator/.claude/local/claude"
+    # alias claude="/home/administrator/.claude/local/claude"
     '';
   };
 

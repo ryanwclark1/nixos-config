@@ -7,17 +7,23 @@
 # Additional system statistics in home/features/sys-stats
 {
   environment.systemPackages = with pkgs; [
+    # System monitoring
+    htop
+    iotop
+    nethogs
+    smartmontools
+    lm_sensors
+
+    # Hardware tools
     cairo
-    sbctl # Secure Boot key manager
+    sbctl
+    pciutils
+    usbutils
+    lshw
+    lsof
+
+    # Development tools
     git
     wget
-    lm_sensors # Tools for reading hardware sensors
-    pciutils # lspci
-    usbutils # lsusb
-    lshw # Hardware lister
-    lsof # List open files
-    # base16-schemes # Base16 color schemes
-    sops
-    ssh-to-age
   ];
 }

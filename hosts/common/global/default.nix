@@ -15,7 +15,10 @@
     ./nix.nix
     ./nix-ld.nix
     ./openssh.nix
-    ./sops.nix
+    ./sops-config.nix
+    ./system.nix
+    ./boot.nix
+    ./security.nix
   ]; # ++ (builtins.attrValues outputs.nixosModules);
 
   # home-manager.useGlobalPkgs = true;
@@ -34,20 +37,4 @@
   };
 
   networking.domain = "techcasa.io";
-
-  # Increase open file limit for sudoers
-  security.pam.loginLimits = [
-    {
-      domain = "@wheel";
-      item = "nofile";
-      type = "soft";
-      value = "524288";
-    }
-    {
-      domain = "@wheel";
-      item = "nofile";
-      type = "hard";
-      value = "1048576";
-    }
-  ];
 }
