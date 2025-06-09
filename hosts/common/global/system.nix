@@ -15,7 +15,7 @@
   systemd.oomd = {
     enable = true;
     enableRootSlice = true;
-    enableUserServices = true;
+    enableUserSlices = true;
   };
 
   # Common hardware settings

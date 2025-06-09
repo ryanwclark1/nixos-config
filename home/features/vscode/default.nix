@@ -116,8 +116,8 @@
             {
               name = "explorer";
               publisher = "vitest";
-              sha256 = "sha256-M/eC7nmFj3BQGlx9J2kqLAKObPYhAit7hVdKYuQlfKw=";
-              version = "1.18.1";
+              sha256 = "sha256-gRsnCDUaRPPRGKAXNxcnzXFMAYKzOC2vWZ1gbAiFA/Y=";
+              version = "1.20.3";
             }
             {
               name = "grafana-vscode";
@@ -146,8 +146,8 @@
             {
               name = "playwright";
               publisher = "ms-playwright";
-              sha256 = "sha256-OhXpqP5PX/E2125MZQVOz+kdJybh0D6DV202HL5gjO0=";
-              version = "1.1.14";
+              sha256 = "sha256-1fdUyzJitFfl/cVMOjEiuBS/+FTGttilXoZ8txZMmVs=";
+              version = "1.1.15";
             }
             {
               name = "prom";
@@ -204,6 +204,12 @@
               version = "1.21.0";
             }
             {
+              name = "vscode-containers";
+              publisher = "ms-azuretools";
+              sha256 = "sha256-MAeE99XmjIjYbr72UymnkrDKsNRSjNiB1jdffKTosHQ=";
+              version = "2.0.3";
+            }
+            {
               name = "vscode-gitops-tools";
               publisher = "weaveworks";
               sha256 = "sha256-7MCKDnHCot/CL/SqZ2WuTxbqFdF75EC5WC+OxW0dcaE=";
@@ -216,10 +222,10 @@
               version = "0.7.2";
             }
             {
-              name = "vscode-speech";
-              publisher = "ms-vscode";
-              sha256 = "sha256-ScIg1Rs0BN9TQn+IYjJeKQZPOmFJzBUkV7vbBC9CosY=";
-              version = "0.15.2025052212";
+              name = "vscode-pgsql";
+              publisher = "ms-ossdata";
+              sha256 = "sha256-/EvO6/mwFWMGzuYcRvdFZK5dKn1JSVT3CDsdHAjiRYQ=";
+              version = "1.4.2";
             }
             {
               name = "vscode-thunder-client";
@@ -227,12 +233,7 @@
               sha256 = "sha256-K0zsgtX1lZptLbeNBA6kFTdNhNWDwtwGfs/4kAHvNW8=";
               version = "2.35.0";
             }
-            {
-              name = "yuck";
-              publisher = "eww-yuck";
-              sha256 = "sha256-DITgLedaO0Ifrttu+ZXkiaVA7Ua5RXc4jXQHPYLqrcM=";
-              version = "0.0.3";
-            }
+
           ]);
         userSettings = {
           "accessibility.dimUnfocused.enabled" = true;

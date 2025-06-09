@@ -27,8 +27,8 @@
     };
   };
 
-  # Ensure sops-nix is available in the system
+  # Add sops-nix package to system packages
   environment.systemPackages = with pkgs; [
-    inputs.sops-nix.packages.${pkgs.system}.sops
+    sops
   ];
 }

@@ -47,11 +47,11 @@
   };
   explorer = {
     pname = "explorer";
-    version = "1.18.1";
+    version = "1.20.3";
     src = fetchurl {
-      url = "https://vitest.gallery.vsassets.io/_apis/public/gallery/publisher/vitest/extension/explorer/1.18.1/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "explorer-1.18.1.zip";
-      sha256 = "sha256-M/eC7nmFj3BQGlx9J2kqLAKObPYhAit7hVdKYuQlfKw=";
+      url = "https://vitest.gallery.vsassets.io/_apis/public/gallery/publisher/vitest/extension/explorer/1.20.3/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "explorer-1.20.3.zip";
+      sha256 = "sha256-gRsnCDUaRPPRGKAXNxcnzXFMAYKzOC2vWZ1gbAiFA/Y=";
     };
     publisher = "vitest";
     name = "explorer";
@@ -113,11 +113,11 @@
   };
   playwright = {
     pname = "playwright";
-    version = "1.1.14";
+    version = "1.1.15";
     src = fetchurl {
-      url = "https://ms-playwright.gallery.vsassets.io/_apis/public/gallery/publisher/ms-playwright/extension/playwright/1.1.14/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "playwright-1.1.14.zip";
-      sha256 = "sha256-OhXpqP5PX/E2125MZQVOz+kdJybh0D6DV202HL5gjO0=";
+      url = "https://ms-playwright.gallery.vsassets.io/_apis/public/gallery/publisher/ms-playwright/extension/playwright/1.1.15/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "playwright-1.1.15.zip";
+      sha256 = "sha256-1fdUyzJitFfl/cVMOjEiuBS/+FTGttilXoZ8txZMmVs=";
     };
     publisher = "ms-playwright";
     name = "playwright";
@@ -143,28 +143,6 @@
     };
     publisher = "dlasagno";
     name = "rasi";
-  };
-  remote-explorer = {
-    pname = "remote-explorer";
-    version = "0.6.2025051209";
-    src = fetchurl {
-      url = "https://ms-vscode.gallery.vsassets.io/_apis/public/gallery/publisher/ms-vscode/extension/remote-explorer/0.6.2025051209/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "remote-explorer-0.6.2025051209.zip";
-      sha256 = "sha256-5uLb+UCcttgW5oPUcr8rKWks5Wdu+CzxPshJhpDK61s=";
-    };
-    publisher = "ms-vscode";
-    name = "remote-explorer";
-  };
-  remotehub = {
-    pname = "remotehub";
-    version = "0.65.2024112101";
-    src = fetchurl {
-      url = "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/remotehub/0.65.2024112101/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "remotehub-0.65.2024112101.zip";
-      sha256 = "sha256-Xb28yff0tiQDUuwC5Mv0rwXqLgZOU4B3KZAht78NfFU=";
-    };
-    publisher = "github";
-    name = "remotehub";
   };
   sqlite-viewer = {
     pname = "sqlite-viewer";
@@ -243,6 +221,17 @@
     publisher = "kevinrose";
     name = "vsc-python-indent";
   };
+  vscode-containers = {
+    pname = "vscode-containers";
+    version = "2.0.3";
+    src = fetchurl {
+      url = "https://ms-azuretools.gallery.vsassets.io/_apis/public/gallery/publisher/ms-azuretools/extension/vscode-containers/2.0.3/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "vscode-containers-2.0.3.zip";
+      sha256 = "sha256-MAeE99XmjIjYbr72UymnkrDKsNRSjNiB1jdffKTosHQ=";
+    };
+    publisher = "ms-azuretools";
+    name = "vscode-containers";
+  };
   vscode-gitops-tools = {
     pname = "vscode-gitops-tools";
     version = "0.27.0";
@@ -265,27 +254,16 @@
     publisher = "grafana";
     name = "vscode-jsonnet";
   };
-  vscode-postgresql-client2 = {
-    pname = "vscode-postgresql-client2";
-    version = "8.3.4";
+  vscode-pgsql = {
+    pname = "vscode-pgsql";
+    version = "1.4.2";
     src = fetchurl {
-      url = "https://cweijan.gallery.vsassets.io/_apis/public/gallery/publisher/cweijan/extension/vscode-postgresql-client2/8.3.4/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "vscode-postgresql-client2-8.3.4.zip";
-      sha256 = "sha256-9GfY780Mi+nKB0tF5Vk8IFqgtCCrvEEELtRT7usY9b4=";
+      url = "https://ms-ossdata.gallery.vsassets.io/_apis/public/gallery/publisher/ms-ossdata/extension/vscode-pgsql/1.4.2/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "vscode-pgsql-1.4.2.zip";
+      sha256 = "sha256-/EvO6/mwFWMGzuYcRvdFZK5dKn1JSVT3CDsdHAjiRYQ=";
     };
-    publisher = "cweijan";
-    name = "vscode-postgresql-client2";
-  };
-  vscode-speech = {
-    pname = "vscode-speech";
-    version = "0.15.2025052212";
-    src = fetchurl {
-      url = "https://ms-vscode.gallery.vsassets.io/_apis/public/gallery/publisher/ms-vscode/extension/vscode-speech/0.15.2025052212/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "vscode-speech-0.15.2025052212.zip";
-      sha256 = "sha256-vQ1zpWydrKtBlek4+XATH02BtqwPCtF2sRl+KboEA5E=";
-    };
-    publisher = "ms-vscode";
-    name = "vscode-speech";
+    publisher = "ms-ossdata";
+    name = "vscode-pgsql";
   };
   vscode-thunder-client = {
     pname = "vscode-thunder-client";
@@ -297,16 +275,5 @@
     };
     publisher = "rangav";
     name = "vscode-thunder-client";
-  };
-  yuck = {
-    pname = "yuck";
-    version = "0.0.3";
-    src = fetchurl {
-      url = "https://eww-yuck.gallery.vsassets.io/_apis/public/gallery/publisher/eww-yuck/extension/yuck/0.0.3/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "yuck-0.0.3.zip";
-      sha256 = "sha256-DITgLedaO0Ifrttu+ZXkiaVA7Ua5RXc4jXQHPYLqrcM=";
-    };
-    publisher = "eww-yuck";
-    name = "yuck";
   };
 }
