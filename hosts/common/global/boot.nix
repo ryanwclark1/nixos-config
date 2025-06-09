@@ -1,5 +1,6 @@
 {
   pkgs,
+  lib,
   ...
 }:
 
@@ -26,8 +27,8 @@
       "net.ipv4.tcp_syncookies" = 1;
 
       # Performance settings
-      "vm.swappiness" = 10;
-      "vm.vfs_cache_pressure" = 50;
+      "vm.swappiness" = lib.mkDefault 10;
+      "vm.vfs_cache_pressure" = lib.mkDefault 50;
       "net.core.somaxconn" = 65535;
     };
   };

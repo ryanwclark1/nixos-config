@@ -46,7 +46,7 @@ passthru = { publisher = "craigrbroughton", name = "htmx-attributes" }
 [mypy-type-checker]
 src.vsmarketplace = "ms-python.mypy-type-checker"
 fetch.vsmarketplace = "ms-python.mypy-type-checker"
-passthru = { publisher = "ms-python", name = "mypy-type-checker"}
+passthru = { publisher = "ms-python", name = "mypy-type-checker" }
 
 [playwright]
 src.vsmarketplace = "ms-playwright.playwright"
@@ -93,32 +93,32 @@ src.vsmarketplace = "astral-sh.ty"
 fetch.vsmarketplace = "astral-sh.ty"
 passthru = { publisher = "astral-sh", name = "ty" }
 
-[vscode-thunder-client]
-src.vsmarketplace = "rangav.vscode-thunder-client"
-fetch.vsmarketplace = "rangav.vscode-thunder-client"
-passthru = { publisher = "rangav", name = "vscode-thunder-client" }
-
-[vscode-jsonnet]
-src.vsmarketplace = "grafana.vscode-jsonnet"
-fetch.vsmarketplace = "grafana.vscode-jsonnet"
-passthru = { publisher = "grafana", name = "vscode-jsonnet" }
+[vscode-containers]
+src.vsmarketplace = "ms-azuretools.vscode-containers"
+fetch.vsmarketplace = "ms-azuretools.vscode-containers"
+passthru = { publisher = "ms-azuretools", name = "vscode-containers" }
 
 [vscode-gitops-tools]
 src.vsmarketplace = "weaveworks.vscode-gitops-tools"
 fetch.vsmarketplace = "weaveworks.vscode-gitops-tools"
 passthru = { publisher = "weaveworks", name = "vscode-gitops-tools" }
 
-[vsc-python-indent]
-src.vsmarketplace = "kevinrose.vsc-python-indent"
-fetch.vsmarketplace = "kevinrose.vsc-python-indent"
-passthru = { publisher = "kevinrose", name = "vsc-python-indent" }
+[vscode-jsonnet]
+src.vsmarketplace = "grafana.vscode-jsonnet"
+fetch.vsmarketplace = "grafana.vscode-jsonnet"
+passthru = { publisher = "grafana", name = "vscode-jsonnet" }
 
 [vscode-pgsql]
 src.vsmarketplace = "ms-ossdata.vscode-pgsql"
 fetch.vsmarketplace = "ms-ossdata.vscode-pgsql"
 passthru = { publisher = "ms-ossdata", name = "vscode-pgsql" }
 
-[vscode-speech]
-src.vsmarketplace = "ms-vscode.vscode-speech"
-fetch.vsmarketplace = "ms-vscode.vscode-speech"
-passthru = { publisher = "ms-vscode", name = "vscode-speech" }
+[vscode-thunder-client]
+src.vsmarketplace = "rangav.vscode-thunder-client"
+fetch.vsmarketplace = "rangav.vscode-thunder-client"
+passthru = { publisher = "rangav", name = "vscode-thunder-client" }
+
+[vsc-python-indent]
+src.vsmarketplace = "kevinrose.vsc-python-indent"
+fetch.vsmarketplace = "kevinrose.vsc-python-indent"
+passthru = { publisher = "kevinrose", name = "vsc-python-indent" }
