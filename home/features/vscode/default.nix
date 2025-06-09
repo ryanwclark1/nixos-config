@@ -322,7 +322,7 @@
           #############################
 
           ##### Autodoc Strings #####
-          "autodocstring.docstringFormat" = "google";
+          "autoDocstring.docstringFormat" = "google";
           "autoDocstring.generateDocstringOnEnter" = true;
           "autoDocstring.guessTypes" = true;
           "autoDocstring.startOnNewLine" = true;
@@ -358,17 +358,13 @@
           "github.copilot.chat.editor.temporalContext.enabled" = true;
 
           #####  Dev Containers #####
-          "dev.containers.defaultExtensionsIfInstalledLocally" = [
-            "GitHub.copilot"
-            "GitHub.copilot-chat"
-            "GitHub.vscode-pull-request-github"
-          ];
+          # "dev.containers.defaultExtensionsIfInstalledLocally" = [
+          #   "GitHub.copilot"
+          #   "GitHub.copilot-chat"
+          #   "GitHub.vscode-pull-request-github"
+          # ];
           "dotfiles.repository" = "https://github.com/ryanwclark1/dotfiles.git";
           "dotfiles.installCommand" = "bootstrap.sh";
-
-          ##### Docker #####
-          "docker.composeCommand" = "docker compose";
-          "docker.contexts.showInStatusBar" = true;
 
           ##### Nix IDE #####
           "nix.enableLanguageServer" = true;
@@ -481,7 +477,7 @@
           };
 
           "[dockerfile]" = {
-            "editor.defaultFormatter" = "ms-azuretools.vscode-docker";
+            "editor.defaultFormatter" = "ms-azuretools.vscode-containers";
             "editor.formatOnSave" = true;
           };
 
