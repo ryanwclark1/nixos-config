@@ -31,8 +31,8 @@
       enable = true;
       extraPackages = with pkgs; [
         mesa
-        rocm-opencl-icd
-        rocm-opencl-runtime
+        rocmPackages.clr
+        rocmPackages.clr.icd
       ];
       extraPackages32 = with pkgs; [
         driversi686Linux.mesa
@@ -56,7 +56,7 @@
     # AMD GPU monitoring and control
     amdgpu_top
     radeontop
-    rocm-smi  # ROCm System Management Interface
+    rocmPackages.rocm-smi  # ROCm System Management Interface
 
     # Performance monitoring
     corectrl  # GUI for CPU/GPU control
