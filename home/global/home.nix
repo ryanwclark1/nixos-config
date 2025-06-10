@@ -7,17 +7,7 @@
 }:
 
 {
-  # duplicated in host/common/global/nix.nix
-  nix = {
-    package = lib.mkDefault pkgs.nixVersions.latest;
-    settings = {
-      experimental-features = [
-        "nix-command"
-        "flakes"
-      ];
-      warn-dirty = false;
-    };
-  };
+  # Nix configuration handled by system-level config in hosts/common/global/nix.nix
 
   # systemd.user.startServices = "sd-switch";
   systemd.user.startServices = "suggest";
@@ -30,7 +20,7 @@
   home = {
     username = lib.mkDefault "administrator";
     homeDirectory = lib.mkDefault "/home/${config.home.username}";
-    stateVersion = lib.mkDefault "25.05";
+    stateVersion = lib.mkDefault "24.11";
     sessionPath = [ "${config.home.homeDirectory}/.local/bin" ];
     sessionVariables = {
       FLAKE = lib.mkDefault "${config.home.homeDirectory}/nixos-config";
