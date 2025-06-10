@@ -52,7 +52,7 @@ in
       "LS_COLORS" = "1";
     };
     font = {
-      name = "DejaVu Sans";
+      name = "JetBrainsMono Nerd Font";
       size = 12;
     };
     shellIntegration = {

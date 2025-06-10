@@ -13,7 +13,6 @@
   };
 
   home.packages = with pkgs; [
-    tailwindcss # Tailwind CSS IntelliSense
     taplo # Even Better TOML
     nvfetcher # Generate nix sources expr for the latest version of packages
     nil
@@ -300,7 +299,7 @@
           "terminal.integrated.defaultProfile.linux" = "bash";
           "terminal.integrated.enableImages" = true;
           "terminal.integrated.environmentChangesIndicator" = "off";
-          "terminal.integrated.fontFamily" = "UbuntuMono Nerd Font";
+          "terminal.integrated.fontFamily" = "JetBrainsMono Nerd Font";
           "terminal.integrated.minimumContrastRatio" = 1;
           "terminal.integrated.mouseWheelZoom" = true;
           "terminal.integrated.scrollback" = 10000;

@@ -19,8 +19,8 @@ configuration {
   element-padding: 35px 40px;
   element-border-radius: 20px;
 
-  prompt-font: "UbuntuMono Nerd Font Bold Italic 64";
-  textbox-font: "UbuntuMono Nerd Font 16";
+  prompt-font: "JetBrainsMono Nerd Font Bold Italic 64";
+  textbox-font: "JetBrainsMono Nerd Font 16";
   element-icon-font: "feather 64"; /* Larger font for icons */
   element-text-font: "feather 64"; /* Smaller font for text */
 
