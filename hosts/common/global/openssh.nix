@@ -22,6 +22,10 @@ in
       settings = {
         PasswordAuthentication = true;
         PermitRootLogin = lib.mkDefault "no";
+        # Security hardening while allowing password auth
+        MaxAuthTries = 3;
+        LoginGraceTime = 60;
+        MaxStartups = "10:30:60";
         # Automatically remove stale sockets
         StreamLocalBindUnlink = "yes";
         # Allow forwarding ports to everywhere
@@ -29,6 +33,9 @@ in
         # Let WAYLAND_DISPLAY be forwarded
         AcceptEnv = "WAYLAND_DISPLAY";
         X11Forwarding = true;
+        # Additional security
+        ClientAliveInterval = 300;
+        ClientAliveCountMax = 2;
       };
 
       hostKeys = [
