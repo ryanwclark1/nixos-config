@@ -171,7 +171,7 @@ in
     terminal = "ghostty";
     theme = {
       "*" = {
-        font ="UbuntuMono Nerd Font 14";
+        font ="JetBrainsMono Nerd Font 14";
         background = mkLiteral "#303446";
         background-alt = mkLiteral "#30344699";
         foreground = mkLiteral "#c6d0f5";

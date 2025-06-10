@@ -37,10 +37,12 @@ in
         name = lib.mkDefault "DejaVu Sans";
       };
       monospace = {
-        package = lib.mkDefault pkgs.nerd-fonts.ubuntu-mono;
-        name = lib.mkDefault "UbuntuMono Nerd Font";
+        # Package provided by system-level fonts
+        package = lib.mkDefault pkgs.nerd-fonts.jetbrains-mono;
+        name = lib.mkDefault "JetBrainsMono Nerd Font";
       };
       emoji = {
+        # Package provided by fonts/default.nix  
         package = lib.mkDefault pkgs.noto-fonts-emoji;
         name = lib.mkDefault "Noto Color Emoji";
       };

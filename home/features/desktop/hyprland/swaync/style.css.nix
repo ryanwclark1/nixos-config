@@ -51,7 +51,7 @@ in
     * {
       all: unset;
       font-size: 14px;
-      font-family: "Ubuntu Nerd Font";
+      font-family: "JetBrainsMono Nerd Font";
       transition: 200ms;
     }
 

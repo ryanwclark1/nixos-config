@@ -77,7 +77,7 @@ run,drun {
 
   /*---------- Misc setting ----------*/
   terminal: "rofi-sensible-terminal";
-  font: "UbuntuMono Nerd Font 12";
+  font: "JetBrainsMono Nerd Font 12";
   sort: false;
   threads: 0;
   click-to-exit: true;

@@ -6,7 +6,7 @@
   imports = [
     ./global
 
-    ./features/alacritty
+    # ./features/alacritty    # Removed: using ghostty as primary terminal
     ./features/ansible
     ./features/atuin
     ./features/audio
@@ -30,7 +30,7 @@
     ./features/ghostty
     ./features/git
     ./features/imv
-    ./features/kitty
+    # ./features/kitty        # Removed: using ghostty as primary terminal
     ./features/kubernetes
     ./features/lazygit
     ./features/media
