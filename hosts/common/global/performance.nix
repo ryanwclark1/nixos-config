@@ -28,8 +28,8 @@
 
       # File system performance
       "fs.file-max" = 2097152;
-      "fs.inotify.max_user_watches" = 524288;
-      "fs.inotify.max_user_instances" = 512;
+      "fs.inotify.max_user_watches" = 1048576;
+      "fs.inotify.max_user_instances" = 1024;
     };
   };
 

@@ -289,6 +289,17 @@
             ".git" = true;
             "**/.git" = false;
           };
+          "files.watcherExclude" = {
+            "**/.git/objects/**" = true;
+            "**/.git/subtree-cache/**" = true;
+            "**/node_modules/*/**" = true; # Note: your original had '**/node_modules/**', this is slightly more specific
+            "**/__pycache__/**" = true;
+            "**/.pytest_cache/**" = true;
+            "**/dist/**" = true;
+            "**/build/**" = true;
+            "**/.venv/**" = true;
+            "**/.ruff_cache/**" = true;
+          };
           "files.autoSave" = "afterDelay";
           "files.insertFinalNewline" = true;
           "files.trimTrailingWhitespace" = true;
@@ -454,14 +465,72 @@
           };
 
           ##### Python #####
-          "python.testing.autoTestDiscoverOnSaveEnabled" = false;
+
+          "python.testing.autoTestDiscoverOnSaveEnabled" = true; # Updated from false
           "python.testing.pytestEnabled" = true;
           "python.testing.pytestArgs" = [
             "tests"
           ];
           "python.testing.unittestEnabled" = false;
+          "python.testing.debugPort" = 3030;
+
+          # Python specific settings
+          "python.analysis.aiCodeActions" = {
+            "convertFormatString" = true;
+            "implementAbstractClasses" = true;
+            "convertLambdaToNamedFunction" = true;
+            "generateDocstring" = true;
+            "generateSymbol" = true;
+          };
+          "python.analysis.autoFormatStrings" = true;
+          "python.analysis.autoImportCompletions" = true;
+          "python.analysis.cacheLSPData" = true;
+          "python.analysis.completeFunctionParens" = true;
+          "python.analysis.disableTaggedHints" = true;
+          "python.analysis.enableColorPicker" = true;
+          "python.analysis.enablePytestSupport" = true;
+          "python.analysis.exclude" = [
+            "**/node_modules"
+            "**/__pycache__"
+            "**/.ruff_cache"
+            "**/.pytest_cache"
+            "**/.mypy_cache"
+            "**/.venv"
+            "**/venv"
+          ];
+          "python.analysis.generateWithTypeAnnotation" = true;
+          "python.analysis.fixAll" = [
+            "source.convertImportFormat"
+            "source.unusedImports"
+          ];
+          "python.analysis.inlayHints.callArgumentNames" = "all";
+          "python.analysis.inlayHints.functionReturnTypes" = true;
+          "python.analysis.inlayHints.pytestParameters" = true;
+          "python.analysis.inlayHints.variableTypes" = true;
+          "python.analysis.regenerateStdLibIndices" = true;
+          "python.analysis.supportAllPythonDocuments" = true;
+          "python.analysis.supportDocstringTemplate" = true;
+          "python.analysis.supportRestructuredText" = true;
+          "python.analysis.typeEvaluation.deprecateTypingAliases" = true;
+          "python.analysis.typeEvaluation.enableReachabilityAnalysis" = true;
+          "python.analysis.typeEvaluation.strictDictionaryInference" = true;
+          "python.analysis.typeEvaluation.strictListInference" = true;
+          "python.analysis.typeEvaluation.strictSetInference" = true;
+          "python.analysis.typeshedPaths" = ["typings"];
+          "python.analysis.nodeArguments" = [
+            "--max-old-space-size=16384"
+          ];
+          "python.analysis.userFileIndexingLimit" = -1;
+
+          "python.createEnvironment.contentButton" = "show";
+          "python.terminal.activateEnvInCurrentTerminal" = true;
+          "python.terminal.shellIntegration.enabled" = true;
+          "python.venvFolders" = [ ".venv" ]; # Corrected to a list of strings
+          "pythonIndent.trimLinesWithOnlyWhitespace" = true;
+
 
           ##### Docker Compose #####
+
           "[dockercompose]" = {
             "editor.autoIndent" = "advanced";
             "editor.defaultFormatter" = "redhat.vscode-yaml";
