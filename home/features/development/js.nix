@@ -8,7 +8,7 @@
     bun
     nodejs
     yarn
-    deno
+    # deno
     tailwindcss
   ])
   ++ (with pkgs.nodePackages; [
