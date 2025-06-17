@@ -17,12 +17,13 @@
     nvfetcher # Generate nix sources expr for the latest version of packages
     nil
     biome
+    hadolint
   ];
 
   programs.vscode = {
     enable = true;
     package = pkgs.vscode;
-    mutableExtensionsDir = false;
+    mutableExtensionsDir = true;
 
     profiles = {
       default = {
@@ -545,13 +546,11 @@
           };
 
           "[dockerfile]" = {
-            "editor.defaultFormatter" = "ms-azuretools.vscode-containers";
             "editor.formatOnSave" = true;
           };
 
           "[github-actions-workflow]" = {
             "editor.autoIndent" = "advanced";
-            "editor.defaultFormatter" = "redhat.vscode-yaml";
             "editor.insertSpaces" = true;
             "editor.quickSuggestions" = {
               "other" = true;
@@ -572,19 +571,16 @@
               "source.fixAll" = "explicit";
               "source.organizeImports" = "explicit";
             };
-            "editor.defaultFormatter" = "charliermarsh.ruff";
             "editor.formatOnSave" = true;
             "editor.tabSize" = 4;
           };
           "[toml]" = {
-            "editor.defaultFormatter" = "tamasfe.even-better-toml";
             "editor.formatOnSave" = true;
             "editor.insertSpaces" = true;
             "editor.tabSize" = 4;
           };
           "[yaml]" = {
             "editor.autoIndent" = "advanced";
-            "editor.defaultFormatter" = "redhat.vscode-yaml";
             "editor.formatOnSave" = true;
             "editor.insertSpaces" = true;
             "editor.tabSize" = 2;
@@ -619,7 +615,7 @@
           "vsdocker.imageUser" = "docker.io/ryanwclark";
 
           ##### CSS #####
-          "[css]"."editor.defaultFormatter" = "esbenp.prettier-vscode";
+          # "[css]"."editor.defaultFormatter" = "esbenp.prettier-vscode";
 
           ##### Tailwind CSS #####
           # Configurations: https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss

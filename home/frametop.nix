@@ -30,7 +30,7 @@
     ./features/ghostty
     ./features/git
     ./features/imv
-    # ./features/kitty        # Removed: using ghostty as primary terminal
+    ./features/kitty        # Removed: using ghostty as primary terminal
     ./features/kubernetes
     ./features/lazygit
     ./features/media
