@@ -11,6 +11,7 @@
     ./hypridle
     ./hyprlock
     ./hyprpaper
+    ./hyprpolkitagent
     ./rofi
     ./swaync
     ./wal
