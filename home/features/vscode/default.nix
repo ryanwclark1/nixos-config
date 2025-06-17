@@ -19,19 +19,19 @@
     nil
     biome
     hadolint
+    vscode-js-debug
+    tailwindcss_4
+    ty
   ];
 
   programs.vscode = {
     enable = true;
     package = pkgs.vscode;
     mutableExtensionsDir = false;
-    enableUpdateCheck = false;
-    enableExtensionUpdateCheck = lib.mkForce false;
-
     profiles = {
       default = {
         enableExtensionUpdateCheck = lib.mkForce false;
-        enableUpdateCheck = false;
+        enableUpdateCheck = lib.mkDefault false;
         extensions = let
           themeExtension = pkgs.runCommandLocal "custom-vscode"
             {
