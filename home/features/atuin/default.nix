@@ -76,6 +76,10 @@
           "systemctl"
           "tmux"
           "yarn"
+          "yt-dlp"
+          "uv"
+          "poetry"
+          "claude"
         ];
         common_prefix = [
           "sudo"
