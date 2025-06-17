@@ -16,7 +16,8 @@
   home.packages = with pkgs; [
     taplo # Even Better TOML
     nvfetcher # Generate nix sources expr for the latest version of packages
-    nil
+    nil # Nix language server
+    nixfmt-rfc-style # Nix formatter
     biome
     hadolint
     vscode-js-debug
@@ -383,6 +384,31 @@
           ##### Nix IDE #####
           "nix.enableLanguageServer" = true;
           "nix.serverPath" = "nil";
+          "nix.serverSettings" = {
+            "nil" = {
+              "formatting" = {
+                "command" = ["nixfmt"];
+              };
+              "diagnostics" = {
+                "ignored" = ["unused_binding" "unused_with"];
+              };
+              "nixpkgs" = {
+                "expr" = "import (builtins.getFlake \"${config.home.homeDirectory}/nixos-config\").inputs.nixpkgs {}";
+              };
+              "options" = {
+                "nixos" = {
+                  "expr" = "(builtins.getFlake \"${config.home.homeDirectory}/nixos-config\").nixosConfigurations.<name>.options";
+                };
+                "home-manager" = {
+                  "expr" = "(builtins.getFlake \"${config.home.homeDirectory}/nixos-config\").homeConfigurations.<name>.options";
+                };
+              };
+            };
+          };
+          "[nix]" = {
+            "editor.defaultFormatter" = "jnoortheen.nix-ide";
+            "editor.formatOnSave" = true;
+          };
 
           ##### Redhat #####
           "redhat.telemetry.enabled" = false;
