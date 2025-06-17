@@ -13,14 +13,8 @@
     enable = true;
     package = pkgs.eza;
     icons = "auto";
-    colors = "always";
+    colors = "auto";
     git = true;
-    extraOptions = [
-      "--group-directories-first"
-      "--header"
-      "--octal-permissions"
-      "--hyperlink"
-    ];
     enableBashIntegration = lib.mkIf config.programs.bash.enable true;
     enableFishIntegration = lib.mkIf config.programs.fish.enable true;
     enableZshIntegration = lib.mkIf config.programs.zsh.enable true;
@@ -29,8 +23,8 @@
   };
 
   home.shellAliases = {
-    ls = "eza --all --icons";
-    l = "eza --all --long --header --group";
+    ls = "eza --all --long --icons --octal-permissions --header --smart-group --group-directories-first --hyperlink";
+    l = "eza --all --header --group-directories-first";
     lt = "eza --long --all --git-ignore --icons --tree --hyperlink";
   };
 }
