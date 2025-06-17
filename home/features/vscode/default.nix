@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  lib,
   ...
 }:
 
@@ -23,11 +24,13 @@
   programs.vscode = {
     enable = true;
     package = pkgs.vscode;
-    mutableExtensionsDir = true;
+    mutableExtensionsDir = false;
+    enableUpdateCheck = false;
+    enableExtensionUpdateCheck = lib.mkForce false;
 
     profiles = {
       default = {
-        enableExtensionUpdateCheck = true;
+        enableExtensionUpdateCheck = lib.mkForce false;
         enableUpdateCheck = false;
         extensions = let
           themeExtension = pkgs.runCommandLocal "custom-vscode"

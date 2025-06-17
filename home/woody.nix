@@ -20,9 +20,8 @@
     ./features/compression
     ./features/cursor
     ./features/development
-    # ./features/discord
-    ./features/docs
     ./features/docker
+    ./features/docs
     ./features/dotfiles
     ./features/eza
     ./features/fastfetch
@@ -34,7 +33,7 @@
     ./features/ghostty
     ./features/git
     ./features/imv
-    ./features/kitty        # Removed: using ghostty as primary terminal
+    ./features/kitty
     ./features/kodi
     ./features/kubernetes
     ./features/lazygit
@@ -47,7 +46,6 @@
     ./features/remmina
     ./features/ripgrep
     ./features/shell
-    # ./features/slack
     ./features/starship
     ./features/sys-stats
     ./features/tmux

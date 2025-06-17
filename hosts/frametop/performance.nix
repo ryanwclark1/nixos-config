@@ -21,32 +21,17 @@
 
   # Laptop-specific services
   services = {
-    # Enable power management
-    power-profiles-daemon.enable = true;
+    # Enable thermal management
     thermald.enable = true;
-    tlp = {
-      enable = true;
-      settings = {
-        CPU_SCALING_GOVERNOR_ON_AC = "performance";
-        CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
-        CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
-        CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
-        CPU_MIN_PERF_ON_AC = 0;
-        CPU_MAX_PERF_ON_AC = 100;
-        CPU_MIN_PERF_ON_BAT = 0;
-        CPU_MAX_PERF_ON_BAT = 80;
-      };
-    };
   };
 
   # Laptop-specific packages
   environment.systemPackages = with pkgs; [
     # Power management
     powertop
-    tlp
 
     # Temperature monitoring
-    psensor
+    mission-center  # Replaced psensor (removed from nixpkgs)
     s-tui
 
     # Battery monitoring
