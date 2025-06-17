@@ -17,7 +17,6 @@
 
     utils = [
       rust-script
-      taplo
       trunk # for wasm
     ];
   in

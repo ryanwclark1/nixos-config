@@ -7,7 +7,6 @@
 
   imports = [
     ./build.nix
-    ./claude.nix
     ./go.nix
     ./grpc.nix
     ./js.nix
@@ -49,10 +48,16 @@
   # ];
 
   home.packages = with pkgs; [
-
-
     jsonnet-bundler
     jsonnet
+    # GRPC
+    grpcurl
+    evans
+    grpc
+    # Protobuf
+    protobuf
+    go-protobuf
+    protolint
   ];
 
 }

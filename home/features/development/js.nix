@@ -5,11 +5,9 @@
 
 {
   home.packages = (with pkgs; [
-    bun
     nodejs
     yarn
     # deno
-    tailwindcss
   ])
   ++ (with pkgs.nodePackages; [
     npm
