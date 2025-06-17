@@ -41,13 +41,10 @@
       enable = false;
       enableXdgAutostart = true;
     };
-    portalPackage = [
-       inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland
-    ];
+    portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
     plugins = [
-      inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprexpo
-      inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprwinwrap
-      inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprgrass
+      inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}.hyprexpo
+      inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}.hyprwinwrap
     ];
     settings ={
       source = [
