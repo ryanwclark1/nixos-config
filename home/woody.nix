@@ -22,6 +22,7 @@
     ./features/development
     # ./features/discord
     ./features/docs
+    ./features/docker
     ./features/dotfiles
     ./features/eza
     ./features/fastfetch
@@ -33,7 +34,7 @@
     ./features/ghostty
     ./features/git
     ./features/imv
-    # ./features/kitty        # Removed: using ghostty as primary terminal
+    ./features/kitty        # Removed: using ghostty as primary terminal
     ./features/kodi
     ./features/kubernetes
     ./features/lazygit
