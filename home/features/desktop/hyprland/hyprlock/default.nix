@@ -1,5 +1,6 @@
 {
   # config,
+  inputs,
   pkgs,
   ...
 }:
@@ -13,7 +14,7 @@
   programs = {
     hyprlock = {
       enable = true;
-      package = pkgs.hyprlock;
+      package = inputs.hyprlock.packages.${pkgs.stdenv.hostPlatform.system}.default;
       # settings = {
       #   general = {
       #     ignore_empty_input = true;

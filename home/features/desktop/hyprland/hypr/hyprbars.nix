@@ -1,5 +1,6 @@
 {
   config,
+  inputs,
   pkgs,
   lib,
   ...
@@ -12,7 +13,7 @@
 {
   wayland.windowManager.hyprland = {
     plugins = [
-      pkgs.hyprlandPlugins.hyprbars
+      inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}.hyprbars
       ];
     settings = {
       "plugin:hyprbars" = {
@@ -39,7 +40,7 @@
         #   "rgb(${base0A}),12,,${minimizeAction}"
         # #   # Green "maximize" (fullscreen) button
         #   "rgb(${base0B}),12,,${maximizeAction}"
-        ];
+
       };
       bind =
         let

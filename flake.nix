@@ -69,6 +69,10 @@
         systems.follows = "hyprland/systems";
       };
     };
+    hyprpolkitagent = {
+      url = "github:hyprwm/hyprpolkitagent";
+      inputs.hyprland.follows = "hyprland";
+    };
     stylix = {
       url = "github:danth/stylix";
       inputs.nixpkgs.follows = "nixpkgs";
