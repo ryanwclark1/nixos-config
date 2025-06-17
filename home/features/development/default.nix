@@ -8,10 +8,8 @@
   imports = [
     ./build.nix
     ./go.nix
-    ./grpc.nix
     ./js.nix
     ./lua.nix
-    ./protobuf.nix
     # ./python.nix
     # ./rust.nix
     ./sql.nix
