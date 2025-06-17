@@ -5,7 +5,6 @@
   ...
 }:
 
-
 {
   imports = [ ./custom.theme/themes/theme.json.nix ];
 
@@ -33,23 +32,25 @@
       default = {
         enableExtensionUpdateCheck = lib.mkForce false;
         enableUpdateCheck = lib.mkDefault false;
-        extensions = let
-          themeExtension = pkgs.runCommandLocal "custom-vscode"
-            {
-              vscodeExtUniqueId = "custom.theme";
-              vscodeExtPublisher = "custom";
-              version = "0.0.0";
-            }
-            ''
-              mkdir -p "$out/share/vscode/extensions/$vscodeExtUniqueId/themes"
-              ln -s ${config.home.homeDirectory}/.config/vscode/plugins/custom.theme/package.json "$out/share/vscode/extensions/$vscodeExtUniqueId/package.json"
-              ln -s ${config.home.homeDirectory}/.config/vscode/plugins/custom.theme/themes/theme.json "$out/share/vscode/extensions/$vscodeExtUniqueId/themes/theme.json"
-            '';
+        extensions =
+          let
+            themeExtension =
+              pkgs.runCommandLocal "custom-vscode"
+                {
+                  vscodeExtUniqueId = "custom.theme";
+                  vscodeExtPublisher = "custom";
+                  version = "0.0.0";
+                }
+                ''
+                  mkdir -p "$out/share/vscode/extensions/$vscodeExtUniqueId/themes"
+                  ln -s ${config.home.homeDirectory}/.config/vscode/plugins/custom.theme/package.json "$out/share/vscode/extensions/$vscodeExtUniqueId/package.json"
+                  ln -s ${config.home.homeDirectory}/.config/vscode/plugins/custom.theme/themes/theme.json "$out/share/vscode/extensions/$vscodeExtUniqueId/themes/theme.json"
+                '';
           in
           [
             themeExtension
-          ] ++
-          (with pkgs.vscode-extensions; [
+          ]
+          ++ (with pkgs.vscode-extensions; [
             aaron-bond.better-comments
             bierner.markdown-mermaid
             bradlc.vscode-tailwindcss
@@ -92,7 +93,8 @@
             tamasfe.even-better-toml
             usernamehw.errorlens
             yzhang.markdown-all-in-one
-          ]) ++ (pkgs.vscode-utils.extensionsFromVscodeMarketplace [
+          ])
+          ++ (pkgs.vscode-utils.extensionsFromVscodeMarketplace [
             {
               name = "alpine-js-intellisense";
               publisher = "adrianwilczynski";
@@ -342,7 +344,6 @@
           "autoDocstring.guessTypes" = true;
           "autoDocstring.startOnNewLine" = true;
 
-
           "emmet.showSuggestionsAsSnippets" = true;
           "emmet.includeLanguages" = {
             "javascript" = "javascriptreact";
@@ -387,20 +388,26 @@
           "nix.serverSettings" = {
             "nil" = {
               "formatting" = {
-                "command" = ["nixfmt"];
+                "command" = [ "nixfmt" ];
               };
               "diagnostics" = {
-                "ignored" = ["unused_binding" "unused_with"];
+                "ignored" = [
+                  "unused_binding"
+                  "unused_with"
+                ];
               };
               "nixpkgs" = {
-                "expr" = "import (builtins.getFlake \"${config.home.homeDirectory}/nixos-config\").inputs.nixpkgs {}";
+                "expr" =
+                  "import (builtins.getFlake \"${config.home.homeDirectory}/nixos-config\").inputs.nixpkgs {}";
               };
               "options" = {
                 "nixos" = {
-                  "expr" = "(builtins.getFlake \"${config.home.homeDirectory}/nixos-config\").nixosConfigurations.<name>.options";
+                  "expr" =
+                    "(builtins.getFlake \"${config.home.homeDirectory}/nixos-config\").nixosConfigurations.<name>.options";
                 };
                 "home-manager" = {
-                  "expr" = "(builtins.getFlake \"${config.home.homeDirectory}/nixos-config\").homeConfigurations.<name>.options";
+                  "expr" =
+                    "(builtins.getFlake \"${config.home.homeDirectory}/nixos-config\").homeConfigurations.<name>.options";
                 };
               };
             };
@@ -546,7 +553,7 @@
           "python.analysis.typeEvaluation.strictDictionaryInference" = true;
           "python.analysis.typeEvaluation.strictListInference" = true;
           "python.analysis.typeEvaluation.strictSetInference" = true;
-          "python.analysis.typeshedPaths" = ["typings"];
+          "python.analysis.typeshedPaths" = [ "typings" ];
           "python.analysis.nodeArguments" = [
             "--max-old-space-size=16384"
           ];
@@ -557,7 +564,6 @@
           "python.terminal.shellIntegration.enabled" = true;
           "python.venvFolders" = [ ".venv" ]; # Corrected to a list of strings
           "pythonIndent.trimLinesWithOnlyWhitespace" = true;
-
 
           ##### Docker Compose #####
 
@@ -614,7 +620,6 @@
             "editor.insertSpaces" = true;
             "editor.tabSize" = 2;
           };
-
 
           ##### Typescript #####
           "[typescriptreact]"."editor.defaultFormatter" = "vscode.typescript-language-features";
