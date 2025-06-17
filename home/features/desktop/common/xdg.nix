@@ -1,24 +1,24 @@
 {
   config,
-  # inputs,
+  inputs,
   pkgs,
   ...
 }:
 
 {
   # use ghostty as an terminal emulator to open terminal apps (like yazi or nvim) with xdg-open
-  home.packages = [
-    pkgs.xdg-utils
-    (
-      pkgs.writeTextFile {
-        name = "xdg-terminal-exec";
-        destination = "/bin/xdg-terminal-exec";
-        text = "#!${pkgs.runtimeShell}\nghostty -e \"$@\"";
-        executable = true;
-      }
-    )
-    pkgs.xdg-desktop-portal-hyprland
-  ];
+  # home.packages = [
+  #   pkgs.xdg-utils
+  #   (
+  #     pkgs.writeTextFile {
+  #       name = "xdg-terminal-exec";
+  #       destination = "/bin/xdg-terminal-exec";
+  #       text = "#!${pkgs.runtimeShell}\nghostty -e \"$@\"";
+  #       executable = true;
+  #     }
+  #   )
+  #   inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland
+  # ];
 
   xdg = {
     enable = true;
@@ -32,14 +32,12 @@
     portal = {
       enable = true;
       xdgOpenUsePortal = true;
-      extraPortals = with pkgs; [
-        # inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland
-        # xdg-desktop-portal-gtk
-        xdg-desktop-portal-hyprland
-        xdg-desktop-portal
+      extraPortals = [
+        inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland
+        pkgs.xdg-desktop-portal
       ];
       configPackages = [
-        pkgs.hyprland
+        inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.default
       ];
       config = {
         common = {
@@ -69,7 +67,7 @@
         XDG_MAIL_DIR = "${config.home.homeDirectory}/Mail";
         XDG_SCREENSHOTS_DIR = "${config.xdg.userDirs.pictures}/Screenshots";
         XDG_SCREENCAST_DIR = "${config.xdg.userDirs.videos}/Screencast";
-        XDG_CODE_DIR = "${config.xdg.userDirs.documents}/Code";
+        # XDG_CODE_DIR = "${config.xdg.userDirs.documents}/Code";
       };
     };
     desktopEntries = {
