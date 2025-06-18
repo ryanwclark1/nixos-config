@@ -73,7 +73,6 @@
             jock.svg
             marp-team.marp-vscode
             mikestead.dotenv
-            ms-azuretools.vscode-docker
             ms-kubernetes-tools.vscode-kubernetes-tools
             ms-python.debugpy
             ms-python.python
