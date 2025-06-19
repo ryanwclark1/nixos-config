@@ -67,6 +67,7 @@
             github.vscode-pull-request-github
             golang.go
             griimick.vhs
+            hashicorp.terraform
             hediet.vscode-drawio
             jetmartin.bats
             jnoortheen.nix-ide
@@ -121,8 +122,8 @@
             {
               name = "explorer";
               publisher = "vitest";
-              sha256 = "sha256-gRsnCDUaRPPRGKAXNxcnzXFMAYKzOC2vWZ1gbAiFA/Y=";
-              version = "1.20.3";
+              sha256 = "sha256-ElmQ9iLKkcDMpNbTiNrJDB2NLV7lhmkevY+pOnm9AP0=";
+              version = "1.24.7";
             }
             {
               name = "grafana-vscode";
@@ -199,8 +200,8 @@
             {
               name = "ty";
               publisher = "astral-sh";
-              sha256 = "sha256-DqLkC1GY+UB778AnxD9bebbvhWb19fE3CA4fc15Fdmg=";
-              version = "2025.15.11531247";
+              sha256 = "sha256-Nps/ZsH8n0HZmf63SFUh7oGuvOz7PVu08maZzmU/2eg=";
+              version = "2025.21.11682058";
             }
             {
               name = "vsc-python-indent";
@@ -235,8 +236,8 @@
             {
               name = "vscode-thunder-client";
               publisher = "rangav";
-              sha256 = "sha256-K0zsgtX1lZptLbeNBA6kFTdNhNWDwtwGfs/4kAHvNW8=";
-              version = "2.35.0";
+              sha256 = "sha256-imClO22XcLA50rR7WXLiRsdXDF2gleS7iMUDlSFyDP4=";
+              version = "2.35.2";
             }
 
           ]);
@@ -501,13 +502,12 @@
           };
 
           ##### Python #####
-
           "python.testing.autoTestDiscoverOnSaveEnabled" = true; # Updated from false
           "python.testing.pytestEnabled" = true;
           "python.testing.pytestArgs" = [
             "tests"
           ];
-          "python.testing.unittestEnabled" = false;
+          "python.testing.unittestEnabled" = true;
           "python.testing.debugPort" = 3030;
 
           # Python specific settings
@@ -559,9 +559,9 @@
           "python.analysis.userFileIndexingLimit" = -1;
 
           "python.createEnvironment.contentButton" = "show";
-          "python.terminal.activateEnvInCurrentTerminal" = true;
+          # "python.terminal.activateEnvInCurrentTerminal" = true;
           "python.terminal.shellIntegration.enabled" = true;
-          "python.venvFolders" = [ ".venv" ]; # Corrected to a list of strings
+          # "python.venvFolders" = [ ".venv" ]; # Corrected to a list of strings
           "pythonIndent.trimLinesWithOnlyWhitespace" = true;
 
           ##### Docker Compose #####
