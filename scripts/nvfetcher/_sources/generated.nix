@@ -47,24 +47,24 @@
   };
   explorer = {
     pname = "explorer";
-    version = "1.20.3";
+    version = "1.24.7";
     src = fetchurl {
-      url = "https://vitest.gallery.vsassets.io/_apis/public/gallery/publisher/vitest/extension/explorer/1.20.3/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "explorer-1.20.3.zip";
-      sha256 = "sha256-gRsnCDUaRPPRGKAXNxcnzXFMAYKzOC2vWZ1gbAiFA/Y=";
+      url = "https://vitest.gallery.vsassets.io/_apis/public/gallery/publisher/vitest/extension/explorer/1.24.7/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "explorer-1.24.7.zip";
+      sha256 = "sha256-ElmQ9iLKkcDMpNbTiNrJDB2NLV7lhmkevY+pOnm9AP0=";
     };
     publisher = "vitest";
     name = "explorer";
   };
   gopls = {
     pname = "gopls";
-    version = "gopls/v0.18.1";
+    version = "gopls/v0.19.0";
     src = fetchFromGitHub {
       owner = "golang";
       repo = "tools";
-      rev = "gopls/v0.18.1";
+      rev = "gopls/v0.19.0";
       fetchSubmodules = false;
-      sha256 = "sha256-5w6R3kaYwrZyhIYjwLqfflboXT/z3HVpZiowxeUyaWg=";
+      sha256 = "sha256-2K93S7ApzHmsbeReKoSmIhgXuZR3oFODiTWDTO5wDOU=";
     };
   };
   grafana-vscode = {
@@ -201,11 +201,11 @@
   };
   ty = {
     pname = "ty";
-    version = "2025.15.11531247";
+    version = "2025.21.11682058";
     src = fetchurl {
-      url = "https://astral-sh.gallery.vsassets.io/_apis/public/gallery/publisher/astral-sh/extension/ty/2025.15.11531247/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "ty-2025.15.11531247.zip";
-      sha256 = "sha256-DqLkC1GY+UB778AnxD9bebbvhWb19fE3CA4fc15Fdmg=";
+      url = "https://astral-sh.gallery.vsassets.io/_apis/public/gallery/publisher/astral-sh/extension/ty/2025.21.11682058/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "ty-2025.21.11682058.zip";
+      sha256 = "sha256-Nps/ZsH8n0HZmf63SFUh7oGuvOz7PVu08maZzmU/2eg=";
     };
     publisher = "astral-sh";
     name = "ty";
@@ -267,11 +267,11 @@
   };
   vscode-thunder-client = {
     pname = "vscode-thunder-client";
-    version = "2.35.0";
+    version = "2.35.2";
     src = fetchurl {
-      url = "https://rangav.gallery.vsassets.io/_apis/public/gallery/publisher/rangav/extension/vscode-thunder-client/2.35.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "vscode-thunder-client-2.35.0.zip";
-      sha256 = "sha256-K0zsgtX1lZptLbeNBA6kFTdNhNWDwtwGfs/4kAHvNW8=";
+      url = "https://rangav.gallery.vsassets.io/_apis/public/gallery/publisher/rangav/extension/vscode-thunder-client/2.35.2/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "vscode-thunder-client-2.35.2.zip";
+      sha256 = "sha256-imClO22XcLA50rR7WXLiRsdXDF2gleS7iMUDlSFyDP4=";
     };
     publisher = "rangav";
     name = "vscode-thunder-client";
