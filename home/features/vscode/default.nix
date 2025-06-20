@@ -18,7 +18,6 @@
     nil # Nix language server
     nixfmt-rfc-style # Nix formatter
     biome
-    hadolint
     vscode-js-debug
     tailwindcss_4
     ty
@@ -55,14 +54,11 @@
             bierner.markdown-mermaid
             bradlc.vscode-tailwindcss
             charliermarsh.ruff
-            christian-kohler.path-intellisense
             dbaeumer.vscode-eslint
             donjayamanne.githistory
             esbenp.prettier-vscode
             formulahendry.code-runner
             github.codespaces
-            github.copilot
-            github.copilot-chat
             github.vscode-github-actions
             github.vscode-pull-request-github
             golang.go
@@ -73,7 +69,6 @@
             jnoortheen.nix-ide
             jock.svg
             marp-team.marp-vscode
-            mikestead.dotenv
             ms-kubernetes-tools.vscode-kubernetes-tools
             ms-python.debugpy
             ms-python.python
@@ -83,7 +78,6 @@
             ms-vscode-remote.remote-ssh-edit
             ms-vscode.hexeditor
             ms-vscode.live-server
-            njpwerner.autodocstring
             quicktype.quicktype
             redhat.vscode-xml
             redhat.vscode-yaml
@@ -95,151 +89,168 @@
             yzhang.markdown-all-in-one
           ])
           ++ (pkgs.vscode-utils.extensionsFromVscodeMarketplace [
-            {
-              name = "alpine-js-intellisense";
-              publisher = "adrianwilczynski";
-              sha256 = "sha256-Klx5ZvV06lXIJ3Q/mzq3KBjPpdROoxDkgEu7MBO+RhI=";
-              version = "1.2.0";
-            }
-            {
-              name = "ansible";
-              publisher = "redhat";
-              sha256 = "sha256-E/BogNtax4dkv6hlYcaRinTxr4jnVyV9hVCdkIkul9s=";
-              version = "25.4.0";
-            }
-            {
-              name = "biome";
-              publisher = "biomejs";
-              sha256 = "sha256-k0/aQnkHSICIQ5n6CSUGF0Z/HiTeet0BCf0UxQRxq7g=";
-              version = "2025.5.251939";
-            }
-            {
-              name = "bun-vscode";
-              publisher = "oven";
-              sha256 = "sha256-WlGqqKbfrV0gqCCdVo/UFF+Gnxhq0TNJ4LuHwFaFYXA=";
-              version = "0.0.28";
-            }
-            {
-              name = "explorer";
-              publisher = "vitest";
-              sha256 = "sha256-ElmQ9iLKkcDMpNbTiNrJDB2NLV7lhmkevY+pOnm9AP0=";
-              version = "1.24.7";
-            }
-            {
-              name = "grafana-vscode";
-              publisher = "grafana";
-              sha256 = "sha256-TpLOMwdaEdgzWVwUcn+fO4rgLiQammWQM8LQobt8gLw=";
-              version = "0.0.19";
-            }
-            {
-              name = "hadolint";
-              publisher = "exiasr";
-              sha256 = "sha256-6GO1f8SP4CE8yYl87/tm60FdGHqHsJA4c2B6UKVdpgM=";
-              version = "1.1.2";
-            }
-            {
-              name = "htmx-attributes";
-              publisher = "craigrbroughton";
-              sha256 = "sha256-TsemPZkq2Z13/vahRaP7z206BJaCZ1TR6OVv6aeDvyk=";
-              version = "0.8.0";
-            }
-            {
-              name = "mypy-type-checker";
-              publisher = "ms-python";
-              sha256 = "sha256-HdciyEMybqkXMF8mixNHn/GYnHQv46XOrhZ5iJHya7Q=";
-              version = "2025.3.11071011";
-            }
-            {
-              name = "playwright";
-              publisher = "ms-playwright";
-              sha256 = "sha256-1fdUyzJitFfl/cVMOjEiuBS/+FTGttilXoZ8txZMmVs=";
-              version = "1.1.15";
-            }
-            {
-              name = "prom";
-              publisher = "ventura";
-              sha256 = "sha256-h8pRrPzmu8+5ZiOLALjackr4zWuFAqi1ex7Gp2iOZKk=";
-              version = "1.3.3";
-            }
-            {
-              name = "rasi";
-              publisher = "dlasagno";
-              sha256 = "sha256-s60alej3cNAbSJxsRlIRE2Qha6oAsmcOBbWoqp+w6fk=";
-              version = "1.0.0";
-            }
-            {
-              name = "sqlite-viewer";
-              publisher = "qwtel";
-              sha256 = "sha256-u8vLGDRL6VAxPclhSIINE0rvxWY3BHxUiImYxGgb5uQ=";
-              version = "25.5.4";
-            }
-            {
-              name = "tailwind-color-matcher";
-              publisher = "OmriGrossman";
-              sha256 = "sha256-WfFg1h5tY43W9YqgXkHDlxjRquFupuvLBwotTw0XoNk=";
-              version = "1.0.8";
-            }
-            {
-              name = "tailwind-docs";
-              publisher = "austenc";
-              sha256 = "sha256-EB3ggxo2NqiH8yVpsNzDRb+fvsd6Qd5aXRM6FoZn5k8=";
-              version = "2.1.0";
-            }
-            {
-              name = "tailwind-fold";
-              publisher = "stivo";
-              sha256 = "sha256-yH3eA5jgBwxqnpFQkg91KQMkQps5iM1v783KQkQcWUU=";
-              version = "0.2.0";
-            }
-            {
-              name = "templ";
-              publisher = "a-h";
-              sha256 = "sha256-WIBJorljcnoPUrQCo1eyFb6vQ5lcxV0i+QJlJdzZYE0=";
-              version = "0.0.35";
-            }
-            {
-              name = "ty";
-              publisher = "astral-sh";
-              sha256 = "sha256-Nps/ZsH8n0HZmf63SFUh7oGuvOz7PVu08maZzmU/2eg=";
-              version = "2025.21.11682058";
-            }
-            {
-              name = "vsc-python-indent";
-              publisher = "kevinrose";
-              sha256 = "sha256-SvJhVG8sofzV0PebZG4IIORX3AcfmErDQ00tRF9fk/4=";
-              version = "1.21.0";
-            }
-            {
-              name = "vscode-containers";
-              publisher = "ms-azuretools";
-              sha256 = "sha256-MAeE99XmjIjYbr72UymnkrDKsNRSjNiB1jdffKTosHQ=";
-              version = "2.0.3";
-            }
-            {
-              name = "vscode-gitops-tools";
-              publisher = "weaveworks";
-              sha256 = "sha256-7MCKDnHCot/CL/SqZ2WuTxbqFdF75EC5WC+OxW0dcaE=";
-              version = "0.27.0";
-            }
-            {
-              name = "vscode-jsonnet";
-              publisher = "grafana";
-              sha256 = "sha256-Q8VzXzTdHo9h5+eCHHF1bPomPEbRsvouJcUfmFUDGMU=";
-              version = "0.7.2";
-            }
-            {
-              name = "vscode-pgsql";
-              publisher = "ms-ossdata";
-              sha256 = "sha256-/EvO6/mwFWMGzuYcRvdFZK5dKn1JSVT3CDsdHAjiRYQ=";
-              version = "1.4.2";
-            }
-            {
-              name = "vscode-thunder-client";
-              publisher = "rangav";
-              sha256 = "sha256-imClO22XcLA50rR7WXLiRsdXDF2gleS7iMUDlSFyDP4=";
-              version = "2.35.2";
-            }
-
+          {
+            name = "alpine-js-intellisense";
+            publisher = "adrianwilczynski";
+            sha256 = "sha256-Klx5ZvV06lXIJ3Q/mzq3KBjPpdROoxDkgEu7MBO+RhI=";
+            version = "1.2.0";
+          }
+          {
+            name = "ansible";
+            publisher = "redhat";
+            sha256 = "sha256-E/BogNtax4dkv6hlYcaRinTxr4jnVyV9hVCdkIkul9s=";
+            version = "25.4.0";
+          }
+          {
+            name = "biome";
+            publisher = "biomejs";
+            sha256 = "sha256-k0/aQnkHSICIQ5n6CSUGF0Z/HiTeet0BCf0UxQRxq7g=";
+            version = "2025.5.251939";
+          }
+          {
+            name = "claude-code-chat";
+            publisher = "AndrePimenta";
+            sha256 = "sha256-eq5nc59QoB6/BSSv5dUkOeSthif/DX69Em0FdI1PSwc=";
+            version = "0.0.7";
+          }
+          {
+            name = "claude-dev";
+            publisher = "saoudrizwan";
+            sha256 = "sha256-pYO1uy1Xd2+74rbc0D+MwK8xvSpmDeRLAVIjAR/F23w=";
+            version = "3.17.14";
+          }
+          {
+            name = "copilot";
+            publisher = "github";
+            sha256 = "sha256-7IiYfOX3Xl3cW5FcG+7FjGAmkw7Wa9802eguRmaFE5Y=";
+            version = "1.336.0";
+          }
+          {
+            name = "explorer";
+            publisher = "vitest";
+            sha256 = "sha256-ElmQ9iLKkcDMpNbTiNrJDB2NLV7lhmkevY+pOnm9AP0=";
+            version = "1.24.7";
+          }
+          {
+            name = "grafana-vscode";
+            publisher = "grafana";
+            sha256 = "sha256-TpLOMwdaEdgzWVwUcn+fO4rgLiQammWQM8LQobt8gLw=";
+            version = "0.0.19";
+          }
+          {
+            name = "htmx-attributes";
+            publisher = "craigrbroughton";
+            sha256 = "sha256-TsemPZkq2Z13/vahRaP7z206BJaCZ1TR6OVv6aeDvyk=";
+            version = "0.8.0";
+          }
+          {
+            name = "mypy-type-checker";
+            publisher = "ms-python";
+            sha256 = "sha256-HdciyEMybqkXMF8mixNHn/GYnHQv46XOrhZ5iJHya7Q=";
+            version = "2025.3.11071011";
+          }
+          {
+            name = "pdf";
+            publisher = "tomoki1207";
+            sha256 = "sha256-i3Rlizbw4RtPkiEsodRJEB3AUzoqI95ohyqZ0ksROps=";
+            version = "1.2.2";
+          }
+          {
+            name = "playwright";
+            publisher = "ms-playwright";
+            sha256 = "sha256-1fdUyzJitFfl/cVMOjEiuBS/+FTGttilXoZ8txZMmVs=";
+            version = "1.1.15";
+          }
+          {
+            name = "prom";
+            publisher = "ventura";
+            sha256 = "sha256-h8pRrPzmu8+5ZiOLALjackr4zWuFAqi1ex7Gp2iOZKk=";
+            version = "1.3.3";
+          }
+          {
+            name = "pwc";
+            publisher = "SureshNettur";
+            sha256 = "sha256-e9Z6PZQ8yWs83jpBuVdBLlePOYO0qUvBcbYkOOc4vVI=";
+            version = "1.0.1";
+          }
+          {
+            name = "remotehub";
+            publisher = "GitHub";
+            sha256 = "sha256-Xb28yff0tiQDUuwC5Mv0rwXqLgZOU4B3KZAht78NfFU=";
+            version = "0.65.2024112101";
+          }
+          {
+            name = "snyk-vulnerability-scanner";
+            publisher = "snyk-security";
+            sha256 = "sha256-IaFwA5qPkL2zCq1uTrAeEcOIeAb/T+7QP2tqdiGcpeU=";
+            version = "2.22.0";
+          }
+          {
+            name = "specstory-vscode";
+            publisher = "specstory";
+            sha256 = "sha256-g8hyeunCErKW4l8lEd7QBsohuOi2iSJoaBod46xoBOA=";
+            version = "0.12.1";
+          }
+          {
+            name = "sqlite-viewer";
+            publisher = "qwtel";
+            sha256 = "sha256-u8vLGDRL6VAxPclhSIINE0rvxWY3BHxUiImYxGgb5uQ=";
+            version = "25.5.4";
+          }
+          {
+            name = "tailwind-color-matcher";
+            publisher = "OmriGrossman";
+            sha256 = "sha256-WfFg1h5tY43W9YqgXkHDlxjRquFupuvLBwotTw0XoNk=";
+            version = "1.0.8";
+          }
+          {
+            name = "tailwind-fold";
+            publisher = "stivo";
+            sha256 = "sha256-yH3eA5jgBwxqnpFQkg91KQMkQps5iM1v783KQkQcWUU=";
+            version = "0.2.0";
+          }
+          {
+            name = "templ";
+            publisher = "a-h";
+            sha256 = "sha256-WIBJorljcnoPUrQCo1eyFb6vQ5lcxV0i+QJlJdzZYE0=";
+            version = "0.0.35";
+          }
+          {
+            name = "ty";
+            publisher = "astral-sh";
+            sha256 = "sha256-Nps/ZsH8n0HZmf63SFUh7oGuvOz7PVu08maZzmU/2eg=";
+            version = "2025.21.11682058";
+          }
+          {
+            name = "vscode-containers";
+            publisher = "ms-azuretools";
+            sha256 = "sha256-MAeE99XmjIjYbr72UymnkrDKsNRSjNiB1jdffKTosHQ=";
+            version = "2.0.3";
+          }
+          {
+            name = "vscode-gitops-tools";
+            publisher = "weaveworks";
+            sha256 = "sha256-7MCKDnHCot/CL/SqZ2WuTxbqFdF75EC5WC+OxW0dcaE=";
+            version = "0.27.0";
+          }
+          {
+            name = "vscode-jsonnet";
+            publisher = "grafana";
+            sha256 = "sha256-Q8VzXzTdHo9h5+eCHHF1bPomPEbRsvouJcUfmFUDGMU=";
+            version = "0.7.2";
+          }
+          {
+            name = "vscode-pgsql";
+            publisher = "ms-ossdata";
+            sha256 = "sha256-/EvO6/mwFWMGzuYcRvdFZK5dKn1JSVT3CDsdHAjiRYQ=";
+            version = "1.4.2";
+          }
+          {
+            name = "vscode-thunder-client";
+            publisher = "rangav";
+            sha256 = "sha256-imClO22XcLA50rR7WXLiRsdXDF2gleS7iMUDlSFyDP4=";
+            version = "2.35.2";
+          }
           ]);
         userSettings = {
           "accessibility.dimUnfocused.enabled" = true;
@@ -328,21 +339,21 @@
           "workbench.editor.enablePreview" = true;
           "workbench.externalBrowser" = "chrome";
 
-          "remote.defaultExtensionsIfInstalledLocally" = [
-            "GitHub.copilot"
-            "GitHub.copilot-chat"
-            "GitHub.vscode-pull-request-github"
-          ];
+          # "remote.defaultExtensionsIfInstalledLocally" = [
+          #   "GitHub.copilot"
+          #   "GitHub.copilot-chat"
+          #   "GitHub.vscode-pull-request-github"
+          # ];
 
           #############################
           #    Extension Settings     #
           #############################
 
           ##### Autodoc Strings #####
-          "autoDocstring.docstringFormat" = "google";
-          "autoDocstring.generateDocstringOnEnter" = true;
-          "autoDocstring.guessTypes" = true;
-          "autoDocstring.startOnNewLine" = true;
+          # "autoDocstring.docstringFormat" = "google";
+          # "autoDocstring.generateDocstringOnEnter" = true;
+          # "autoDocstring.guessTypes" = true;
+          # "autoDocstring.startOnNewLine" = true;
 
           "emmet.showSuggestionsAsSnippets" = true;
           "emmet.includeLanguages" = {
@@ -630,12 +641,12 @@
           "git.enableSmartCommit" = true;
 
           ##### Github #####
-          "github.codespaces.defaultExtensions" = [
-            "GitHub.codespaces"
-            "GitHub.vscode-pull-request-github"
-            "Github.copilot-chat"
-            "Github.copilot"
-          ];
+          # "github.codespaces.defaultExtensions" = [
+          #   "GitHub.codespaces"
+          #   "GitHub.vscode-pull-request-github"
+          #   "Github.copilot-chat"
+          #   "Github.copilot"
+          # ];
 
           ##### Kubernetes #####
           "vs-kubernetes" = {
@@ -646,6 +657,9 @@
           "vscode-kubernetes.log-viewer.follow" = true;
           "vscode-kubernetes.log-viewer.timestamp" = true;
           "vsdocker.imageUser" = "docker.io/ryanwclark";
+
+          ##### Synk #####
+          "snyk.advanced.cliPath" = "/home/administrator/home/administrator/.local/share/snyk/vscode-cli/snyk-linux";
 
           ##### CSS #####
           # "[css]"."editor.defaultFormatter" = "esbenp.prettier-vscode";

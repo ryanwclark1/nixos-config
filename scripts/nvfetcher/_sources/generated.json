@@ -53,23 +53,59 @@
         },
         "version": "2025.5.251939"
     },
-    "bun-vscode": {
+    "claude-code-chat": {
         "cargoLocks": null,
         "date": null,
         "extract": null,
-        "name": "bun-vscode",
+        "name": "claude-code-chat",
         "passthru": {
-            "name": "bun-vscode",
-            "publisher": "oven"
+            "name": "claude-code-chat",
+            "publisher": "AndrePimenta"
         },
         "pinned": false,
         "src": {
-            "name": "bun-vscode-0.0.28.zip",
-            "sha256": "sha256-WlGqqKbfrV0gqCCdVo/UFF+Gnxhq0TNJ4LuHwFaFYXA=",
+            "name": "claude-code-chat-0.0.7.zip",
+            "sha256": "sha256-eq5nc59QoB6/BSSv5dUkOeSthif/DX69Em0FdI1PSwc=",
             "type": "url",
-            "url": "https://oven.gallery.vsassets.io/_apis/public/gallery/publisher/oven/extension/bun-vscode/0.0.28/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://AndrePimenta.gallery.vsassets.io/_apis/public/gallery/publisher/AndrePimenta/extension/claude-code-chat/0.0.7/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "0.0.28"
+        "version": "0.0.7"
+    },
+    "claude-dev": {
+        "cargoLocks": null,
+        "date": null,
+        "extract": null,
+        "name": "claude-dev",
+        "passthru": {
+            "name": "claude-dev",
+            "publisher": "saoudrizwan"
+        },
+        "pinned": false,
+        "src": {
+            "name": "claude-dev-3.17.14.zip",
+            "sha256": "sha256-pYO1uy1Xd2+74rbc0D+MwK8xvSpmDeRLAVIjAR/F23w=",
+            "type": "url",
+            "url": "https://saoudrizwan.gallery.vsassets.io/_apis/public/gallery/publisher/saoudrizwan/extension/claude-dev/3.17.14/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+        },
+        "version": "3.17.14"
+    },
+    "copilot": {
+        "cargoLocks": null,
+        "date": null,
+        "extract": null,
+        "name": "copilot",
+        "passthru": {
+            "name": "copilot",
+            "publisher": "github"
+        },
+        "pinned": false,
+        "src": {
+            "name": "copilot-1.336.0.zip",
+            "sha256": "sha256-7IiYfOX3Xl3cW5FcG+7FjGAmkw7Wa9802eguRmaFE5Y=",
+            "type": "url",
+            "url": "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot/1.336.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+        },
+        "version": "1.336.0"
     },
     "explorer": {
         "cargoLocks": null,
@@ -103,12 +139,12 @@
             "name": null,
             "owner": "golang",
             "repo": "tools",
-            "rev": "gopls/v0.19.0",
-            "sha256": "sha256-2K93S7ApzHmsbeReKoSmIhgXuZR3oFODiTWDTO5wDOU=",
+            "rev": "gopls/v0.19.1",
+            "sha256": "sha256-QJnLJNgFtc/MmJ5WWooKcavnPPTYuM4XhUHcbwlvMLY=",
             "sparseCheckout": [],
             "type": "github"
         },
-        "version": "gopls/v0.19.0"
+        "version": "gopls/v0.19.1"
     },
     "grafana-vscode": {
         "cargoLocks": null,
@@ -127,24 +163,6 @@
             "url": "https://grafana.gallery.vsassets.io/_apis/public/gallery/publisher/grafana/extension/grafana-vscode/0.0.19/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
         "version": "0.0.19"
-    },
-    "hadolint": {
-        "cargoLocks": null,
-        "date": null,
-        "extract": null,
-        "name": "hadolint",
-        "passthru": {
-            "name": "hadolint",
-            "publisher": "exiasr"
-        },
-        "pinned": false,
-        "src": {
-            "name": "hadolint-1.1.2.zip",
-            "sha256": "sha256-6GO1f8SP4CE8yYl87/tm60FdGHqHsJA4c2B6UKVdpgM=",
-            "type": "url",
-            "url": "https://exiasr.gallery.vsassets.io/_apis/public/gallery/publisher/exiasr/extension/hadolint/1.1.2/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
-        },
-        "version": "1.1.2"
     },
     "htmx-attributes": {
         "cargoLocks": null,
@@ -182,6 +200,24 @@
         },
         "version": "2025.3.11071011"
     },
+    "pdf": {
+        "cargoLocks": null,
+        "date": null,
+        "extract": null,
+        "name": "pdf",
+        "passthru": {
+            "name": "pdf",
+            "publisher": "tomoki1207"
+        },
+        "pinned": false,
+        "src": {
+            "name": "pdf-1.2.2.zip",
+            "sha256": "sha256-i3Rlizbw4RtPkiEsodRJEB3AUzoqI95ohyqZ0ksROps=",
+            "type": "url",
+            "url": "https://tomoki1207.gallery.vsassets.io/_apis/public/gallery/publisher/tomoki1207/extension/pdf/1.2.2/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+        },
+        "version": "1.2.2"
+    },
     "playwright": {
         "cargoLocks": null,
         "date": null,
@@ -218,23 +254,77 @@
         },
         "version": "1.3.3"
     },
-    "rasi": {
+    "pwc": {
         "cargoLocks": null,
         "date": null,
         "extract": null,
-        "name": "rasi",
+        "name": "pwc",
         "passthru": {
-            "name": "rasi",
-            "publisher": "dlasagno"
+            "name": "pwc",
+            "publisher": "SureshNettur"
         },
         "pinned": false,
         "src": {
-            "name": "rasi-1.0.0.zip",
-            "sha256": "sha256-s60alej3cNAbSJxsRlIRE2Qha6oAsmcOBbWoqp+w6fk=",
+            "name": "pwc-1.0.1.zip",
+            "sha256": "sha256-e9Z6PZQ8yWs83jpBuVdBLlePOYO0qUvBcbYkOOc4vVI=",
             "type": "url",
-            "url": "https://dlasagno.gallery.vsassets.io/_apis/public/gallery/publisher/dlasagno/extension/rasi/1.0.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://SureshNettur.gallery.vsassets.io/_apis/public/gallery/publisher/SureshNettur/extension/pwc/1.0.1/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "1.0.0"
+        "version": "1.0.1"
+    },
+    "remotehub": {
+        "cargoLocks": null,
+        "date": null,
+        "extract": null,
+        "name": "remotehub",
+        "passthru": {
+            "name": "remotehub",
+            "publisher": "GitHub"
+        },
+        "pinned": false,
+        "src": {
+            "name": "remotehub-0.65.2024112101.zip",
+            "sha256": "sha256-Xb28yff0tiQDUuwC5Mv0rwXqLgZOU4B3KZAht78NfFU=",
+            "type": "url",
+            "url": "https://GitHub.gallery.vsassets.io/_apis/public/gallery/publisher/GitHub/extension/remotehub/0.65.2024112101/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+        },
+        "version": "0.65.2024112101"
+    },
+    "snyk-vulnerability-scanner": {
+        "cargoLocks": null,
+        "date": null,
+        "extract": null,
+        "name": "snyk-vulnerability-scanner",
+        "passthru": {
+            "name": "snyk-vulnerability-scanner",
+            "publisher": "snyk-security"
+        },
+        "pinned": false,
+        "src": {
+            "name": "snyk-vulnerability-scanner-2.22.0.zip",
+            "sha256": "sha256-IaFwA5qPkL2zCq1uTrAeEcOIeAb/T+7QP2tqdiGcpeU=",
+            "type": "url",
+            "url": "https://snyk-security.gallery.vsassets.io/_apis/public/gallery/publisher/snyk-security/extension/snyk-vulnerability-scanner/2.22.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+        },
+        "version": "2.22.0"
+    },
+    "specstory-vscode": {
+        "cargoLocks": null,
+        "date": null,
+        "extract": null,
+        "name": "specstory-vscode",
+        "passthru": {
+            "name": "specstory-vscode",
+            "publisher": "specstory"
+        },
+        "pinned": false,
+        "src": {
+            "name": "specstory-vscode-0.12.1.zip",
+            "sha256": "sha256-g8hyeunCErKW4l8lEd7QBsohuOi2iSJoaBod46xoBOA=",
+            "type": "url",
+            "url": "https://specstory.gallery.vsassets.io/_apis/public/gallery/publisher/specstory/extension/specstory-vscode/0.12.1/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+        },
+        "version": "0.12.1"
     },
     "sqlite-viewer": {
         "cargoLocks": null,
@@ -271,24 +361,6 @@
             "url": "https://OmriGrossman.gallery.vsassets.io/_apis/public/gallery/publisher/OmriGrossman/extension/tailwind-color-matcher/1.0.8/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
         "version": "1.0.8"
-    },
-    "tailwind-docs": {
-        "cargoLocks": null,
-        "date": null,
-        "extract": null,
-        "name": "tailwind-docs",
-        "passthru": {
-            "name": "tailwind-docs",
-            "publisher": "austenc"
-        },
-        "pinned": false,
-        "src": {
-            "name": "tailwind-docs-2.1.0.zip",
-            "sha256": "sha256-EB3ggxo2NqiH8yVpsNzDRb+fvsd6Qd5aXRM6FoZn5k8=",
-            "type": "url",
-            "url": "https://austenc.gallery.vsassets.io/_apis/public/gallery/publisher/austenc/extension/tailwind-docs/2.1.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
-        },
-        "version": "2.1.0"
     },
     "tailwind-fold": {
         "cargoLocks": null,
@@ -343,24 +415,6 @@
             "url": "https://astral-sh.gallery.vsassets.io/_apis/public/gallery/publisher/astral-sh/extension/ty/2025.21.11682058/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
         "version": "2025.21.11682058"
-    },
-    "vsc-python-indent": {
-        "cargoLocks": null,
-        "date": null,
-        "extract": null,
-        "name": "vsc-python-indent",
-        "passthru": {
-            "name": "vsc-python-indent",
-            "publisher": "kevinrose"
-        },
-        "pinned": false,
-        "src": {
-            "name": "vsc-python-indent-1.21.0.zip",
-            "sha256": "sha256-SvJhVG8sofzV0PebZG4IIORX3AcfmErDQ00tRF9fk/4=",
-            "type": "url",
-            "url": "https://kevinrose.gallery.vsassets.io/_apis/public/gallery/publisher/kevinrose/extension/vsc-python-indent/1.21.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
-        },
-        "version": "1.21.0"
     },
     "vscode-containers": {
         "cargoLocks": null,

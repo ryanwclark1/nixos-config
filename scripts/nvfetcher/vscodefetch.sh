@@ -9,5 +9,5 @@ result=$(jq '.[] | select(.passthru != null) | {name: .passthru.name, publisher:
 formatted_result=$(echo "$result" | sed -e 's/"name"/name/' -e 's/"publisher"/publisher/' -e 's/"sha256"/sha256/' -e 's/"version"/version/' -e 's/: / = /g' -e 's/,/;/g')
 formatted_result=$(echo "$formatted_result" | sed -e 's/\([^;]\)"$/\1";/')
 echo "$formatted_result"
-echo "$formatted_result" > generated-vscide-nix.txt
+echo "$formatted_result" > generated-vscode-nix.txt
 
