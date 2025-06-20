@@ -13,10 +13,25 @@ src.vsmarketplace = "biomejs.biome"
 fetch.vsmarketplace = "biomejs.biome"
 passthru = { publisher = "biomejs", name = "biome" }
 
-[bun-vscode]
-src.vsmarketplace = "oven.bun-vscode"
-fetch.vsmarketplace = "oven.bun-vscode"
-passthru = { publisher = "oven", name = "bun-vscode" }
+[claude-code-chat]
+src.vsmarketplace = "AndrePimenta.claude-code-chat"
+fetch.vsmarketplace = "AndrePimenta.claude-code-chat"
+passthru = { publisher = "AndrePimenta", name = "claude-code-chat" }
+
+[pwc]
+src.vsmarketplace = "SureshNettur.pwc"
+fetch.vsmarketplace = "SureshNettur.pwc"
+passthru = { publisher = "SureshNettur", name = "pwc" }
+
+[claude-dev]
+src.vsmarketplace = "saoudrizwan.claude-dev"
+fetch.vsmarketplace = "saoudrizwan.claude-dev"
+passthru = { publisher = "saoudrizwan", name = "claude-dev" }
+
+[copilot]
+src.vsmarketplace = "github.copilot"
+fetch.vsmarketplace = "github.copilot"
+passthru = { publisher = "github", name = "copilot" }
 
 [explorer]
 src.vsmarketplace = "vitest.explorer"
@@ -33,11 +48,6 @@ src.vsmarketplace = "grafana.grafana-vscode"
 fetch.vsmarketplace = "grafana.grafana-vscode"
 passthru = { publisher = "grafana", name = "grafana-vscode" }
 
-[hadolint]
-src.vsmarketplace = "exiasr.hadolint"
-fetch.vsmarketplace = "exiasr.hadolint"
-passthru = { publisher = "exiasr", name = "hadolint" }
-
 [htmx-attributes]
 src.vsmarketplace = "craigrbroughton.htmx-attributes"
 fetch.vsmarketplace = "craigrbroughton.htmx-attributes"
@@ -47,6 +57,11 @@ passthru = { publisher = "craigrbroughton", name = "htmx-attributes" }
 src.vsmarketplace = "ms-python.mypy-type-checker"
 fetch.vsmarketplace = "ms-python.mypy-type-checker"
 passthru = { publisher = "ms-python", name = "mypy-type-checker" }
+
+[pdf]
+src.vsmarketplace = "tomoki1207.pdf"
+fetch.vsmarketplace = "tomoki1207.pdf"
+passthru = { publisher = "tomoki1207", name = "pdf" }
 
 [playwright]
 src.vsmarketplace = "ms-playwright.playwright"
@@ -58,25 +73,30 @@ src.vsmarketplace = "ventura.prom"
 fetch.vsmarketplace = "ventura.prom"
 passthru = { publisher = "ventura", name = "prom" }
 
-[rasi]
-src.vsmarketplace = "dlasagno.rasi"
-fetch.vsmarketplace = "dlasagno.rasi"
-passthru = { publisher = "dlasagno", name = "rasi" }
+[remotehub]
+src.vsmarketplace = "GitHub.remotehub"
+fetch.vsmarketplace = "GitHub.remotehub"
+passthru = { publisher = "GitHub", name = "remotehub" }
+
+[specstory-vscode]
+src.vsmarketplace = "specstory.specstory-vscode"
+fetch.vsmarketplace = "specstory.specstory-vscode"
+passthru = { publisher = "specstory", name = "specstory-vscode" }
 
 [sqlite-viewer]
 src.vsmarketplace = "qwtel.sqlite-viewer"
 fetch.vsmarketplace = "qwtel.sqlite-viewer"
 passthru = { publisher = "qwtel", name = "sqlite-viewer" }
 
+[snyk-vulnerability-scanner]
+src.vsmarketplace = "snyk-security.snyk-vulnerability-scanner"
+fetch.vsmarketplace = "snyk-security.snyk-vulnerability-scanner"
+passthru = { publisher = "snyk-security", name = "snyk-vulnerability-scanner" }
+
 [tailwind-color-matcher]
 src.vsmarketplace = "OmriGrossman.tailwind-color-matcher"
 fetch.vsmarketplace = "OmriGrossman.tailwind-color-matcher"
 passthru = { publisher = "OmriGrossman", name = "tailwind-color-matcher" }
-
-[tailwind-docs]
-src.vsmarketplace = "austenc.tailwind-docs"
-fetch.vsmarketplace = "austenc.tailwind-docs"
-passthru = { publisher = "austenc", name = "tailwind-docs" }
 
 [tailwind-fold]
 src.vsmarketplace = "stivo.tailwind-fold"
@@ -117,8 +137,3 @@ passthru = { publisher = "ms-ossdata", name = "vscode-pgsql" }
 src.vsmarketplace = "rangav.vscode-thunder-client"
 fetch.vsmarketplace = "rangav.vscode-thunder-client"
 passthru = { publisher = "rangav", name = "vscode-thunder-client" }
-
-[vsc-python-indent]
-src.vsmarketplace = "kevinrose.vsc-python-indent"
-fetch.vsmarketplace = "kevinrose.vsc-python-indent"
-passthru = { publisher = "kevinrose", name = "vsc-python-indent" }
