@@ -30,6 +30,6 @@
     enable = true;
     alsa.enable = true;
     pulse.enable = true;
-    bluetooth.enable = true;
+    # bluetooth.enable = true;
   };
 }

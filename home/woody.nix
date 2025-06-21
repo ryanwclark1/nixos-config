@@ -51,6 +51,7 @@
     ./features/tmux
     ./features/vscode
     # ./features/whispar
+    ./features/wireless
     ./features/windsurf
     ./features/yazi
     ./features/zellij
