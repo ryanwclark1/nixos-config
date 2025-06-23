@@ -20,7 +20,6 @@
     biome
     vscode-js-debug
     tailwindcss_4
-    ty
   ];
 
   programs.vscode = {
@@ -440,12 +439,6 @@
           "ruff.organizeImports" = true;
           "ruff.fixAll" = true;
           "ruff.configurationPreference" = "filesystemFirst";
-          "ruff.path" = [
-            "/workspace/.venv/bin/ruff"
-          ];
-          "ruff.interpreter" = [
-            "/workspace/.venv/bin/python"
-          ];
           "ruff.nativeServer" = "auto";
 
           ##### GO #####
@@ -529,48 +522,12 @@
 
           ##### Postgres #####
           "pgsql.copilot.enable" = true;
-          "pgsql.connections" = [
-            {
-              "host" = "db";
-              "dbname" = "accent_ai_dev";
-              "user" = "postgres";
-              "password" = "devpass123";
-              "port" = "5432";
-              "sslmode" = "Prefer";
-              "name" = "Accent AI Dev";
-              "id" = "4F0FA409-4775-47C0-B8D7-B0607946ACD8";
-              "server" = "db";
-              "database" = "accent_ai_dev";
-              "profileName" = "accent-ai-db-dev";
-              "groupId" = "F3BF326B-1754-4962-B567-E35226A96297";
-              "expiresOn" = 0;
-            }
-          ];
-          "pgsql.serverGroups" = [
-            {
-              name = "Development Servers";
-              id = "F3BF326B-1754-4962-B567-E35226A96297";
-              isDefault = true;
-            }
-          ];
+
 
           ##### Python #####
           "python.testing.autoTestDiscoverOnSaveEnabled" = true; # Updated from false
           "python.testing.pytestEnabled" = true;
-          "python.testing.pytestArgs" = [
-            "tests"
-            "service/accent-core/tests"
-            "service/accent-user-sync/tests" 
-            "service/accent-audio-sync/tests"
-            "service/accent-core/app/agent_tools_v2/tests"
-          ];
           "python.testing.unittestEnabled" = false;
-          "python.testing.pytestPath" = "/workspace/.venv/bin/pytest";
-          "python.defaultInterpreterPath" = "/workspace/.venv/bin/python";
-          "python.venvPath" = "/workspace";
-          "python.terminal.activateEnvInCurrentTerminal" = true;
-          "python.terminal.activateEnvironment" = true;
-          "python.testing.debugPort" = 3030;
 
           # Python specific settings
           "python.analysis.aiCodeActions" = {
@@ -594,7 +551,7 @@
             "**/.pytest_cache"
             "**/.mypy_cache"
             "**/.venv"
-            "**/venv"
+            "**/.venv*"
           ];
           "python.analysis.generateWithTypeAnnotation" = true;
           "python.analysis.fixAll" = [
@@ -615,14 +572,6 @@
           "python.analysis.typeEvaluation.strictListInference" = true;
           "python.analysis.typeEvaluation.strictSetInference" = true;
           "python.analysis.typeshedPaths" = [ "typings" ];
-          "python.analysis.extraPaths" = [
-            "/workspace/service/accent-core"
-            "/workspace/service/accent-user-sync"
-            "/workspace/service/accent-audio-sync"
-            "/workspace/service/accent-core/app/agent_tools_v2"
-            "/workspace/library"
-            "/workspace/sdks/python"
-          ];
           "python.analysis.include" = [ "**/*.py" ];
           "python.analysis.autoSearchPaths" = true;
           "python.analysis.nodeArguments" = [
@@ -632,7 +581,7 @@
 
           "python.createEnvironment.contentButton" = "show";
           "python.terminal.shellIntegration.enabled" = true;
-          "python.venvFolders" = [ ".venv" "/workspace" ];
+          "python.venvFolders" = [ ".venv"];
           "pythonIndent.trimLinesWithOnlyWhitespace" = true;
 
           ##### Docker Compose #####
@@ -691,8 +640,6 @@
             "editor.tabSize" = 2;
           };
 
-          ##### Biome #####
-          "biome.configurationPath" = "/workspace/service/accent-core/.biome.json";
 
           ##### Typescript #####
           "[javascript]" = {
