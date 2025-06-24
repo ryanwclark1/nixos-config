@@ -52,7 +52,7 @@
     ./features/zoxide
 
     ./features/desktop/hyprland
-    ./features/desktop/gnome
+    # ./features/desktop/gnome
     ./features/desktop/common
   ];
 
