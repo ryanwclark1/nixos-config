@@ -7,33 +7,45 @@
 
 {
   imports = [
-    inputs.home-manager.nixosModules.home-manager
-    ./fail2ban.nix
-    ./locale.nix
-    ./networking.nix
-    ./nh.nix
-    ./nix.nix
-    ./nix-ld.nix
-    ./openssh.nix
-    ./sops-config.nix
-    ./system.nix
-    ./boot.nix
-    ./security.nix
-  ]; # ++ (builtins.attrValues outputs.nixosModules);
+    # Core system modules
+    ./core
 
-  # home-manager.useGlobalPkgs = true;
+    # Networking
+    ./networking
+
+    # Security
+    ./security
+
+    # Nix ecosystem
+    ./nix
+
+    # Performance tuning
+    ./performance
+
+    # Virtualisation
+    ./virtualisation
+
+    # Monitoring
+    ./monitoring
+
+    # Configuration validation
+    ./validation
+
+    # Secrets management
+    ./sops.nix
+
+    # Home manager
+    inputs.home-manager.nixosModules.home-manager
+  ];
+
+  # Global settings
   home-manager.useUserPackages = true;
   home-manager.backupFileExtension = "bak";
-  home-manager.extraSpecialArgs = {
-    inherit inputs outputs;
-  };
+  home-manager.extraSpecialArgs = { inherit inputs outputs; };
 
-  # allowUnfree isn't being inherited from the global flake
   nixpkgs = {
     overlays = builtins.attrValues outputs.overlays;
-    config = {
-      allowUnfree = true;
-    };
+    config.allowUnfree = true;
   };
 
   networking.domain = "techcasa.io";

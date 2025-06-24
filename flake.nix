@@ -108,132 +108,133 @@
     };
   };
 
-  outputs = {
-    self,
-    home-manager,
-    nix-darwin,
-    nixpkgs,
-    systems,
-    stylix,
-    ...
-  } @ inputs:
-  let
-    inherit (self) outputs;
-    lib = nixpkgs.lib // home-manager.lib // nix-darwin.lib;
-    forEachSystem = f: lib.genAttrs (import systems) (system: f pkgsFor.${system});
-    pkgsFor = lib.genAttrs (import systems) (
-    system:
-      import nixpkgs {
-        inherit system;
-        config.allowUnfree = true;
-      }
-    );
-  in
-  {
-    inherit lib;
-    overlays = import ./overlays { inherit inputs outputs; };
-    packages = forEachSystem (pkgs: import ./pkgs { inherit pkgs; });
-    devShells = forEachSystem (pkgs: import ./shell.nix { inherit pkgs; });
-    formatter = forEachSystem (pkgs: pkgs.nixfmt);
+  outputs =
+    {
+      self,
+      home-manager,
+      nix-darwin,
+      nixpkgs,
+      systems,
+      stylix,
+      ...
+    }@inputs:
+    let
+      inherit (self) outputs;
+      lib = nixpkgs.lib // home-manager.lib // nix-darwin.lib;
+      forEachSystem = f: lib.genAttrs (import systems) (system: f pkgsFor.${system});
+      pkgsFor = lib.genAttrs (import systems) (
+        system:
+        import nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+        }
+      );
+    in
+    {
+      inherit lib;
+      overlays = import ./overlays { inherit inputs outputs; };
+      packages = forEachSystem (pkgs: import ./pkgs { inherit pkgs; });
+      devShells = forEachSystem (pkgs: import ./shell.nix { inherit pkgs; });
+      formatter = forEachSystem (pkgs: pkgs.nixfmt-rfc-style);
 
-    nixosConfigurations = {
-      frametop = lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          ./hosts/frametop
-        ];
-        specialArgs = {
-          inherit inputs outputs;
+      nixosConfigurations = {
+        frametop = lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            ./hosts/frametop
+          ];
+          specialArgs = {
+            inherit inputs outputs;
+          };
+        };
+        woody = lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            stylix.nixosModules.stylix
+            ./hosts/woody
+          ];
+          specialArgs = {
+            inherit inputs outputs;
+          };
         };
       };
-      woody = lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          stylix.nixosModules.stylix
-          ./hosts/woody
-        ];
-        specialArgs = {
-          inherit inputs outputs;
+      darwinConfigurations = {
+        mini = nix-darwin.lib.darwinSystem {
+          system = "aarch64-darwin";
+          modules = [
+            stylix.nixosModules.stylix
+            ./hosts/mini
+          ];
+          specialArgs = {
+            inherit inputs outputs;
+          };
         };
       };
-    };
-    darwinConfigurations = {
-      mini = nix-darwin.lib.darwinSystem {
-        system = "aarch64-darwin";
-        modules = [
-          stylix.nixosModules.stylix
-          ./hosts/mini
-        ];
-        specialArgs = {
-          inherit inputs outputs;
-        };
-      };
-    };
 
-    homeConfigurations = {
-      "administrator@frametop" = lib.homeManagerConfiguration {
-        modules = [
-          ./home/frametop.nix
-        ];
-        pkgs = pkgsFor.x86_64-linux;
-        extraSpecialArgs = {
-          inherit inputs outputs;
+      homeConfigurations = {
+        "administrator@frametop" = lib.homeManagerConfiguration {
+          modules = [
+            ./home/frametop.nix
+          ];
+          pkgs = pkgsFor.x86_64-linux;
+          extraSpecialArgs = {
+            inherit inputs outputs;
+          };
         };
-      };
-      "administrator@woody" = lib.homeManagerConfiguration {
-        modules = [
-          ./home/woody.nix
-        ];
-        pkgs = pkgsFor.x86_64-linux;
-        extraSpecialArgs = {
-          inherit inputs outputs;
+        "administrator@woody" = lib.homeManagerConfiguration {
+          modules = [
+            ./home/woody.nix
+          ];
+          pkgs = pkgsFor.x86_64-linux;
+          extraSpecialArgs = {
+            inherit inputs outputs;
+          };
         };
-      };
-      "administrator@accent" = lib.homeManagerConfiguration {
-        modules = [
-          ./home/accent.nix
-        ];
-        pkgs = pkgsFor.x86_64-linux;
-        extraSpecialArgs = {
-          inherit inputs outputs;
+        "administrator@accent" = lib.homeManagerConfiguration {
+          modules = [
+            ./home/accent.nix
+          ];
+          pkgs = pkgsFor.x86_64-linux;
+          extraSpecialArgs = {
+            inherit inputs outputs;
+          };
         };
-      };
-      "administrator@mini" = lib.homeManagerConfiguration {
-        modules = [
-          ./home/mini.nix
-        ];
-        pkgs = pkgsFor.aarch64-darwin;
-        extraSpecialArgs = {
-          inherit inputs outputs;
+        "administrator@mini" = lib.homeManagerConfiguration {
+          modules = [
+            ./home/mini.nix
+          ];
+          pkgs = pkgsFor.aarch64-darwin;
+          extraSpecialArgs = {
+            inherit inputs outputs;
+          };
         };
-      };
-      "root@vlad" = lib.homeManagerConfiguration {
-        modules = [
-          ./home/vlad.nix
-        ];
-        pkgs = pkgsFor.x86_64-linux;
-        extraSpecialArgs = {
-          inherit inputs outputs;
+        "root@vlad" = lib.homeManagerConfiguration {
+          modules = [
+            ./home/vlad.nix
+          ];
+          pkgs = pkgsFor.x86_64-linux;
+          extraSpecialArgs = {
+            inherit inputs outputs;
+          };
         };
-      };
-      "ryanc@lighthouse" = lib.homeManagerConfiguration {
-        modules = [
-          ./home/lighthouse.nix
-        ];
-        pkgs = pkgsFor.x86_64-linux;
-        extraSpecialArgs = {
-          inherit inputs outputs;
+        "ryanc@lighthouse" = lib.homeManagerConfiguration {
+          modules = [
+            ./home/lighthouse.nix
+          ];
+          pkgs = pkgsFor.x86_64-linux;
+          extraSpecialArgs = {
+            inherit inputs outputs;
+          };
         };
-      };
-      "ryanc@ansible" = lib.homeManagerConfiguration {
-        modules = [
-          ./home/ansible.nix
-        ];
-        pkgs = pkgsFor.x86_64-linux;
-        extraSpecialArgs = {
-          inherit inputs outputs;
+        "ryanc@ansible" = lib.homeManagerConfiguration {
+          modules = [
+            ./home/ansible.nix
+          ];
+          pkgs = pkgsFor.x86_64-linux;
+          extraSpecialArgs = {
+            inherit inputs outputs;
+          };
         };
       };
     };
-  };
 }

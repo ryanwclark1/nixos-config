@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs,
   ...
 }:
@@ -19,15 +20,16 @@
   };
 
   networking.firewall = {
-    allowedUDPPorts = [ 51820 ]; # Clients and peers can use the same port, see listenport
+    allowedUDPPorts = [ 51820 ]; # WireGuard port
   };
+
   # Enable WireGuard
   networking.wireguard.interfaces = {
     # "wg0" is the network interface name. You can name the interface arbitrarily.
     wg0 = {
       # Determines the IP address and subnet of the client's end of the tunnel interface.
       ips = [ "10.11.11.17/32" ];
-      listenPort = 51820; # to match firewall allowedUDPPorts (without this wg uses random port numbers)
+      listenPort = 51820; # to match firewall allowedUDPPorts
 
       privateKeyFile = config.sops.secrets.wg-key.path;
 
@@ -52,4 +54,21 @@
     };
   };
 
+  # Ensure WireGuard starts after SOPS secrets are decrypted
+  # This is important for services that depend on encrypted secrets
+  systemd.services.wg-quick-wg0 = {
+    wantedBy = [ "multi-user.target" ];
+    after = [
+      "network-online.target"
+      "sops-nix.service"
+    ];
+    requires = [
+      "network-online.target"
+      "sops-nix.service"
+    ];
+    restartTriggers = [
+      config.sops.secrets.wg-key.path
+      config.sops.secrets.accent-wg-server.path
+    ];
+  };
 }

@@ -3,26 +3,15 @@
   ...
 }:
 
-# Core system packages that are useful on all systems
-# Additional system statistics in home/features/sys-stats
+# Optional system packages that may not be needed on all systems
+# Universal packages are now in hosts/common/global/performance/performance.nix
 {
   environment.systemPackages = with pkgs; [
-    # System monitoring
-    iotop
-    nethogs
-    smartmontools
-    lm_sensors
-
-    # Hardware tools
-    cairo
-    sbctl
-    pciutils
-    usbutils
-    lshw
-    lsof
-
-    # Development tools
-    git
-    wget
+    # Optional development tools
+    # Add any truly optional packages here that aren't universally needed
+    # Examples:
+    # - Language-specific tools
+    # - Specialized hardware tools
+    # - Development frameworks
   ];
 }

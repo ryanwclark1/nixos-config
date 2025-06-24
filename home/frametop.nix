@@ -6,6 +6,7 @@
   imports = [
     ./global
 
+    ./features/ai
     ./features/ansible
     ./features/atuin
     ./features/audio

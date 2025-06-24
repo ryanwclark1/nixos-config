@@ -30,7 +30,6 @@
     ../common/optional/nfs.nix
     ../common/optional/printing.nix
     ../common/optional/steam.nix
-    ../common/optional/system-packages.nix
     ../common/optional/thunar.nix
     ../common/optional/virtualisation.nix
     ../common/optional/webcam.nix
@@ -48,18 +47,17 @@
     # Disable tmp cleaning for laptop
     tmp.cleanOnBoot = false;
 
-    # Enable binary format support
-    binfmt.emulatedSystems = [ "aarch64-linux" "i686-linux" ];
-  };
+    # Note: Uses global configurationLimit of 10 boot entries
+    # - Appropriate for laptop systems with limited disk space
+    # - Still provides sufficient rollback capability for normal use
+    # - Balances functionality with storage constraints
+    # - Can be overridden if needed for specific laptop use cases
 
-  # Framework-specific hardware settings
-  hardware = {
-    logitech = {
-      wireless = {
-        enable = true;
-        enableGraphical = true;
-      };
-    };
+    # Enable binary format support
+    binfmt.emulatedSystems = [
+      "aarch64-linux"
+      "i686-linux"
+    ];
   };
 
   # Laptop-specific power management
@@ -73,7 +71,7 @@
 
   # Framework-specific packages
   environment.systemPackages = with pkgs; [
-    fw-ectool  # EC-Tool adjusted for usage with framework embedded controller
+    fw-ectool # EC-Tool adjusted for usage with framework embedded controller
   ];
 
   system.stateVersion = "24.11";

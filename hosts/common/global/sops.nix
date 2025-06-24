@@ -1,5 +1,8 @@
-# Host level sops configuration
+# SOPS secrets management configuration
 {
+  config,
+  lib,
+  pkgs,
   inputs,
   ...
 }:
@@ -24,4 +27,9 @@
       generateKey = true;
     };
   };
+
+  # Add sops-nix package to system packages
+  environment.systemPackages = with pkgs; [
+    sops
+  ];
 }

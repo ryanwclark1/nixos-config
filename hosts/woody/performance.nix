@@ -5,27 +5,37 @@
 }:
 
 {
-  # Desktop-specific performance settings
+  # Desktop-specific sysctl overrides
+  boot.kernel.sysctl = {
+    # More aggressive swapping for desktop
+    "vm.swappiness" = lib.mkOverride 50 60;
+    "vm.vfs_cache_pressure" = lib.mkOverride 50 100;
+    # Desktop-specific scheduler tweaks
+    "kernel.sched_autogroup" = 1;
+    "kernel.sched_rr_timeslice_ms" = 1;
+  };
+
+  # Desktop-specific boot optimizations
   boot = {
-    kernel.sysctl = {
-      # Optimize for desktop workloads
-      "vm.swappiness" = 60;  # More aggressive swapping for desktop
-      "vm.vfs_cache_pressure" = 100;  # More aggressive cache pressure
+    # Faster boot for desktop
+    kernelParams = [
+      # Desktop-specific optimizations
+      "acpi_osi=Linux"
+      "acpi_backlight=vendor"
+      "i915.fastboot=1"
+      "i915.enable_guc=2"
+      "i915.enable_fbc=1"
+      "i915.enable_psr=1"
+    ];
 
-      # Optimize for gaming
-      "kernel.sched_autogroup" = 1;
-      "kernel.sched_rr_timeslice_ms" = 1;
-      "kernel.sched_rt_runtime_us" = 950000;
-    };
+    # Enable early KMS for faster graphics initialization
+    kernelModules = [
+      "i915"
+      "amdgpu"
+    ];
   };
 
-  # Desktop-specific services
-  services = {
-    # Enable performance governor for desktop
-    power-profiles-daemon.enable = true;
-  };
-
-  # AMD GPU configuration
+  # AMD GPU configuration (desktop-specific)
   hardware = {
     graphics = {
       enable = true;
@@ -53,13 +63,10 @@
 
   # Desktop-specific packages
   environment.systemPackages = with pkgs; [
-    # AMD GPU monitoring and control
     amdgpu_top
     radeontop
-    rocmPackages.rocm-smi  # ROCm System Management Interface
-
-    # Performance monitoring
-    corectrl  # GUI for CPU/GPU control
-    gamemode  # Game mode optimization
+    rocmPackages.rocm-smi
+    corectrl
+    gamemode
   ];
 }
