@@ -57,9 +57,10 @@
   };
 
   # cAdvisor - Container metrics (Docker, Kubernetes, etc.)
-  services.prometheus.exporters.cadvisor = {
+  services.cadvisor = {
     enable = true;
     port = 8080;
+    listenAddress = "0.0.0.0";
   };
 
   # Network Exporter - Network interface metrics
