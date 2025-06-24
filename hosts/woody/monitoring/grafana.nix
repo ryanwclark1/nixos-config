@@ -1,0 +1,80 @@
+{
+  pkgs,
+  config,
+  ...
+}:
+{
+  services.grafana = {
+    enable = true;
+    port = 3001;
+    addr = "0.0.0.0";
+    domain = "woody";
+    rootUrl = "http://woody:3001/";
+
+    # Security settings
+    security = {
+      adminUser = "admin";
+      adminPassword = "admin"; # Change this in production!
+    };
+
+    # Database settings (using SQLite for simplicity)
+    database = {
+      type = "sqlite3";
+      path = "/var/lib/grafana/grafana.db";
+    };
+
+    # Server settings
+    server = {
+      httpPort = 3001;
+      httpAddr = "0.0.0.0";
+    };
+
+    # Provisioning
+    provision = {
+      enable = true;
+      datasources = {
+        settings = {
+          apiVersion = 1;
+          datasources = [
+            {
+              name = "Prometheus";
+              type = "prometheus";
+              url = "http://localhost:9090";
+              access = "proxy";
+              isDefault = true;
+            }
+          ];
+        };
+      };
+
+      # Pre-configure useful dashboards
+      dashboards = {
+        settings = {
+          apiVersion = 1;
+          providers = [
+            {
+              name = "default";
+              orgId = 1;
+              folder = "";
+              type = "file";
+              disableDeletion = false;
+              updateIntervalSeconds = 10;
+              allowUiUpdates = true;
+              options = {
+                path = "/var/lib/grafana/dashboards";
+              };
+            }
+          ];
+        };
+      };
+    };
+  };
+
+  # Create dashboard directory
+  systemd.services.grafana.preStart = ''
+    mkdir -p /var/lib/grafana/dashboards
+  '';
+
+  # Open firewall for Grafana
+  networking.firewall.allowedTCPPorts = [ 3001 ];
+}
