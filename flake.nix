@@ -162,7 +162,7 @@
         mini = nix-darwin.lib.darwinSystem {
           system = "aarch64-darwin";
           modules = [
-            stylix.nixosModules.stylix
+            # stylix.nixosModules.stylix
             ./hosts/mini
           ];
           specialArgs = {
