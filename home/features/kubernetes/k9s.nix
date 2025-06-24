@@ -41,14 +41,11 @@ in
           pp = "v1/pods";
         };
       };
-      hotkey = {
-        # Make sure this is camel case
-        hotKeys = {
-          shift-0 = {
-            shortCut = "Shift-0";
-            description = "Viewing pods";
-            command = "pods";
-          };
+      hotKeys = {
+        shift-0 = {
+          shortCut = "Shift-0";
+          description = "Viewing pods";
+          command = "pods";
         };
       };
       plugins = {
@@ -74,11 +71,15 @@ in
         # See: https://github.com/cert-manager/cmctl
         cert-status = {
           shortCut = "Shift-S";
-          confirm = false; description = "Certificate status";
+          confirm = false;
+          description = "Certificate status";
           scopes = [ "certificates" ];
           command = "bash";
           background = false;
-          args = [ "-c" "cmctl status certificate --context $CONTEXT -n $NAMESPACE $NAME |& less" ];
+          args = [
+            "-c"
+            "cmctl status certificate --context $CONTEXT -n $NAMESPACE $NAME |& less"
+          ];
         };
         cert-renew = {
           shortCut = "Shift-R";
@@ -87,7 +88,10 @@ in
           scopes = [ "certificates" ];
           command = "bash";
           background = false;
-          args = [ "-c" "cmctl renew --context $CONTEXT -n $NAMESPACE $NAME |& less" ];
+          args = [
+            "-c"
+            "cmctl renew --context $CONTEXT -n $NAMESPACE $NAME |& less"
+          ];
         };
         secret-inspect = {
           shortCut = "Shift-I";
@@ -96,7 +100,10 @@ in
           scopes = [ "secrets" ];
           command = "bash";
           background = false;
-          args = [ "-c" "cmctl inspect secret --context $CONTEXT -n $NAMESPACE $NAME |& less" ];
+          args = [
+            "-c"
+            "cmctl inspect secret --context $CONTEXT -n $NAMESPACE $NAME |& less"
+          ];
         };
       };
       skins = {
@@ -184,11 +191,11 @@ in
                 bgColor = "default";
                 chartBgColor = "default";
                 dialBgColor = "default";
-                defaultDialColors =[
+                defaultDialColors = [
                   "#${base0B}"
                   "#${base08}"
                 ];
-                defaultChartColors =[
+                defaultChartColors = [
                   "#${base0B}"
                   "#${base08}"
                 ];
@@ -230,7 +237,7 @@ in
         };
       };
       settings = {
-        k9s ={
+        k9s = {
           skin = "default_skin";
           liveViewAutoRefresh = true;
           screenDumpDir = "${config.home.homeDirectory}/.local/state/k9s/screen-dumps";
@@ -260,8 +267,8 @@ in
           imageScans = {
             enable = true;
             exclusions = {
-              namespaces = [];
-              labels = {};
+              namespaces = [ ];
+              labels = { };
             };
           };
           logger = {

@@ -7,7 +7,7 @@
   home.packages = with pkgs; [
     lmstudio
     claude-code
-    aider-chat-full
+    # aider-chat
   ];
   services.ollama = {
     enable = true;
