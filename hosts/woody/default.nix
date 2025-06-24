@@ -54,7 +54,7 @@
 
     # Override kernel to use zen kernel for better desktop performance
     # Zen kernel provides better latency and responsiveness for desktop workloads
-    kernelPackages = pkgs.linuxKernel.packages.linux_zen;
+    kernelPackages = lib.mkForce pkgs.linuxKernel.packages.linux_zen;
 
     # Override loader settings for desktop
     # Keep more boot entries for desktop (20 vs global default of 10)
