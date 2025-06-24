@@ -51,7 +51,7 @@ in
           };
         };
       };
-      plugin = {
+      plugins = {
         # Defines a plugin to provide a `ctrl-l` shortcut to
         # tail the logs while in pod view.
         fred = {

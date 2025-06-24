@@ -38,7 +38,7 @@
     ./features/networking-utils
     ./features/nixvim
     ./features/productivity
-    ./features/qutebrowser
+    # ./features/qutebrowser
     ./features/remmina
     ./features/ripgrep
     ./features/shell
