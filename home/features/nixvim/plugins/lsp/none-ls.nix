@@ -14,7 +14,7 @@
         gofmt.enable = true;
         goimports.enable = true;
         ktlint.enable = true;
-        nixfmt.enable = true;
+        nixfmt-rfc-style.enable = true;
         markdownlint.enable = true;
         shellharden.enable = true;
         shfmt.enable = true;

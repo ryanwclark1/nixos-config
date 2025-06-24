@@ -1,6 +1,7 @@
 {
   inputs,
   pkgs,
+  lib,
   ...
 }:
 
@@ -33,7 +34,6 @@
     ../common/optional/printing.nix
     ../common/optional/steam.nix
     ../common/optional/syncthing.nix
-    ../common/optional/system-packages.nix
     ../common/optional/style.nix
     ../common/optional/thunar.nix
     ../common/optional/virtualisation.nix
@@ -53,38 +53,12 @@
     tmp.cleanOnBoot = true;
 
     # Override loader settings for desktop
-    loader.systemd-boot.configurationLimit = 20;
-  };
-
-  # AMD-specific hardware settings
-  hardware = {
-    amdgpu = {
-      amdvlk = {
-        enable = true;
-        supportExperimental.enable = true;
-        support32Bit = {
-          enable = true;
-        };
-      };
-      initrd.enable = true;
-      opencl.enable = true;
-    };
-
-    graphics = {
-      extraPackages = with pkgs; [
-        mesa
-      ];
-      extraPackages32 = with pkgs; [
-        driversi686Linux.mesa
-      ];
-    };
-
-    logitech = {
-      wireless = {
-        enable = true;
-        enableGraphical = true;
-      };
-    };
+    # Keep more boot entries for desktop (20 vs global default of 10)
+    # - Desktop systems often need more entries for development/testing
+    # - Allows for more experimentation with configurations
+    # - Provides extended rollback capability for complex setups
+    # - Desktop typically has more disk space available
+    loader.systemd-boot.configurationLimit = lib.mkForce 20;
   };
 
   # Desktop-specific power management

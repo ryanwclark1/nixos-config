@@ -6,7 +6,6 @@
 {
 
   imports = [
-    ./ai.nix
     ./build.nix
     ./go.nix
     ./js.nix

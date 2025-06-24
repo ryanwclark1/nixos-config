@@ -7,6 +7,7 @@
   imports = [
     ./global
 
+    ./features/ai
     # ./features/alacritty    # Removed: using ghostty as primary terminal
     ./features/ansible
     ./features/atuin
