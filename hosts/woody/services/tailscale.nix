@@ -1,29 +1,64 @@
 {
+  config,
   lib,
   pkgs,
   ...
 }:
+
 {
+  # SOPS secrets for Tailscale auth
+  sops.secrets = {
+    tailscale-auth-key = {
+      sopsFile = ../../../../secrets/secrets.yaml;
+      key = "tailscale-auth-keys.woody";
+      neededForUsers = true;
+    };
+  };
+
+  # Ensure Tailscale starts after SOPS secrets are decrypted
+  systemd.services.tailscaled = {
+    after = [ "sops-nix.service" ];
+    requires = [ "sops-nix.service" ];
+    restartTriggers = [ config.sops.secrets.tailscale-auth-key.path ];
+  };
+
+  # Common Tailscale configuration
   services.tailscale = {
     enable = true;
     package = pkgs.tailscale;
-    useRoutingFeatures = lib.mkDefault "client";
+    # Automatically start Tailscale on boot
+    # This ensures the service is enabled and started with the system
+    useRoutingFeatures = "server";
     openFirewall = true;
     port = 41641;
-    # extraSetFlags = [
-    # ];
+
+    # Use encrypted auth key for automatic connection
+    authKeyFile = config.sops.secrets.tailscale-auth-key.path;
+
+    # Desktop-specific flags
     extraUpFlags = [
-      "--exit-node=homeassistant"
-      "--exit-node-allow-lan-access"
       "--operator=administrator"
-      "--advertise-tags=tag:client,tag:desktop,tag:no-exit"
+      "--advertise-tags=tag:server,tag:desktop,tag:exit-node"
       "--accept-routes=true"
+      "--advertise-exit-node"
+      "--accept-dns"
+      "--ssh"
+      "--stateful-filtering"
+      "--hostname=woody"
     ];
   };
 
-  # Prometheus Service Discovery for Tailscale.
+  # Make tailscale command available to users
   environment.systemPackages = with pkgs; [
+    tailscale
+    jq
     tailscalesd
-    trayscale
+
   ];
+
+  # Ensure Tailscale interface is trusted in firewall
+  networking.firewall = {
+    allowedUDPPorts = [ 41641 ];
+    trustedInterfaces = [ "tailscale0" ];
+  };
 }
