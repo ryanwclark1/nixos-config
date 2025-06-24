@@ -6,7 +6,7 @@
 {
   home.packages = with pkgs; [
     lmstudio
-    claude-code
+    # claude-code
     # aider-chat
   ];
   services.ollama = {

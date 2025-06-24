@@ -25,26 +25,15 @@
       "ksmd"
       "processes"
       "systemd"
-      "tcpstat"
-      "wifi"
-      "diskstats"
       "filefd"
       "hwmon"
-      "infiniband"
-      "ipvs"
-      "mdadm"
-      "meminfo_numa"
       "mountstats"
-      "nfs"
-      "nfsd"
       "sockstat"
       "stat"
-      "textfile"
-      "time"
-      "uname"
-      "vmstat"
-      "xfs"
-      "zfs"
+    ];
+    extraFlags = [
+      "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)"
+      "--collector.filesystem.ignored-fs-types=^(sys|proc|auto)fs$$"
     ];
   };
 
@@ -67,14 +56,16 @@
   services.prometheus.exporters.process = {
     enable = true;
     port = 9256;
-    settings.process_names = [
-      "(prometheus)"
-      "(grafana)"
-      "(node_exporter)"
-      "(systemd_exporter)"
-      "(cadvisor)"
-      "(process_exporter)"
-    ];
+    settings = {
+      process_names = [
+        "(prometheus)"
+        "(grafana)"
+        "(node_exporter)"
+        "(systemd_exporter)"
+        "(cadvisor)"
+        "(process_exporter)"
+      ];
+    };
   };
 
   # Open firewall ports for all exporters on Tailscale interface
