@@ -6,22 +6,6 @@
 }:
 
 {
-  # SOPS secrets for Tailscale auth
-  sops.secrets = {
-    tailscale-auth-key = {
-      sopsFile = ../../../../secrets/secrets.yaml;
-      key = "tailscale-auth-keys.woody";
-      neededForUsers = true;
-    };
-  };
-
-  # Ensure Tailscale starts after SOPS secrets are decrypted
-  systemd.services.tailscaled = {
-    after = [ "sops-nix.service" ];
-    requires = [ "sops-nix.service" ];
-    restartTriggers = [ config.sops.secrets.tailscale-auth-key.path ];
-  };
-
   # Common Tailscale configuration
   services.tailscale = {
     enable = true;
@@ -33,17 +17,18 @@
     port = 41641;
 
     # Use encrypted auth key for automatic connection
-    authKeyFile = config.sops.secrets.tailscale-auth-key.path;
+    # authKeyFile = config.sops.secrets.tailscale-auth-key.path;
 
     # Desktop-specific flags
     extraUpFlags = [
       "--operator=administrator"
       "--advertise-tags=tag:server,tag:desktop,tag:exit-node"
-      "--accept-routes=true"
+      "--accept-routes"
       "--advertise-exit-node"
       "--accept-dns"
       "--ssh"
       "--stateful-filtering"
+      "--accept-risk=all"
       "--hostname=woody"
     ];
   };
@@ -61,4 +46,5 @@
     allowedUDPPorts = [ 41641 ];
     trustedInterfaces = [ "tailscale0" ];
   };
+
 }

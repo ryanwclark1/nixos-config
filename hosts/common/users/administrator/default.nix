@@ -13,7 +13,7 @@ in
   sops.secrets.administrator-password = {
     sopsFile = ../../../../secrets/secrets.yaml;
     # Decrypt password to /run/secrets-fo-users/ so it can be used to create the user
-    neededForUsers = true;
+    # neededForUsers = true;
   };
   # switch back to mutableusers = false
   users.mutableUsers = true;

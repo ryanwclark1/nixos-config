@@ -7,20 +7,12 @@
 
 {
   # SOPS secrets for Tailscale auth
-  sops.secrets = {
-    tailscale-auth-key = {
-      sopsFile = ../../../../secrets/secrets.yaml;
-      key = "tailscale-auth-keys.frametop";
-      neededForUsers = true;
-    };
-  };
-
-  # Ensure Tailscale starts after SOPS secrets are decrypted
-  systemd.services.tailscaled = {
-    after = [ "sops-nix.service" ];
-    requires = [ "sops-nix.service" ];
-    restartTriggers = [ config.sops.secrets.tailscale-auth-key.path ];
-  };
+  # sops.secrets = {
+  #   tailscale-auth-key = {
+  #     sopsFile = ../../../../secrets/secrets.yaml;
+  #     key = "tailscale-auth-keys.frametop";
+  #   };
+  # };
 
   # Common Tailscale configuration
   services.tailscale = {
@@ -33,7 +25,8 @@
     port = 41641;
 
     # Use encrypted auth key for automatic connection
-    authKeyFile = config.sops.secrets.tailscale-auth-key.path;
+    # authKeyFile = "$(cat ${config.sops.secrets.tailscale-auth-key.path})";
+    # authKeyFile = config.sops.secrets.tailscale-auth-key.path;
 
     # Laptop-specific flags
     extraUpFlags = [
@@ -43,6 +36,7 @@
       "--exit-node-allow-lan-access"
       "--accept-dns"
       "--shields-up"
+      "--accept-risk=all"
       "--hostname=frametop"
     ];
   };
@@ -58,4 +52,11 @@
     allowedUDPPorts = [ 41641 ];
     trustedInterfaces = [ "tailscale0" ];
   };
+
+  # Ensure Tailscale starts after SOPS secrets are decrypted
+  # systemd.services.tailscaled = {
+  #   after = [ "sops-nix.service" ];
+  #   requires = [ "sops-nix.service" ];
+  #   restartTriggers = [ config.sops.secrets.tailscale-auth-key.path ];
+  # };
 }
