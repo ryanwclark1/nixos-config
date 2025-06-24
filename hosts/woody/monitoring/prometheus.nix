@@ -108,21 +108,21 @@
           }
         ];
       }
-      # Docker exporter on woody
+      # cAdvisor on woody
       {
-        job_name = "woody-docker";
+        job_name = "woody-cadvisor";
         static_configs = [
           {
-            targets = [ "localhost:9323" ];
+            targets = [ "localhost:8080" ];
           }
         ];
       }
-      # Docker exporter on frametop (via Tailscale)
+      # cAdvisor on frametop (via Tailscale)
       {
-        job_name = "frametop-docker";
+        job_name = "frametop-cadvisor";
         static_configs = [
           {
-            targets = [ "frametop:9323" ];
+            targets = [ "frametop:8080" ];
           }
         ];
       }
