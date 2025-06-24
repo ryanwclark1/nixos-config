@@ -52,8 +52,8 @@
   services.prometheus.exporters.systemd = {
     enable = true;
     port = 9558;
-    unitWhitelist = [ ".*" ];
-    unitBlacklist = [ ".+\\.slice" ];
+    # unitWhitelist = [ ".*" ];
+    # unitBlacklist = [ ".+\\.slice" ];
   };
 
   # cAdvisor - Container metrics (Docker, Kubernetes, etc.)
@@ -63,21 +63,14 @@
     listenAddress = "0.0.0.0";
   };
 
-  # Network Exporter - Network interface metrics
-  services.prometheus.exporters.network = {
-    enable = true;
-    port = 9107;
-  };
-
   # Process Exporter - Process metrics
   services.prometheus.exporters.process = {
     enable = true;
     port = 9256;
-    processNames = [
+    settings.process_names = [
       "(node_exporter)"
       "(systemd_exporter)"
       "(cadvisor)"
-      "(network_exporter)"
       "(process_exporter)"
     ];
   };
@@ -87,8 +80,7 @@
     allowedTCPPorts = [
       config.services.prometheus.exporters.node.port
       config.services.prometheus.exporters.systemd.port
-      config.services.prometheus.exporters.cadvisor.port
-      config.services.prometheus.exporters.network.port
+      config.services.cadvisor.port
       config.services.prometheus.exporters.process.port
     ];
   };

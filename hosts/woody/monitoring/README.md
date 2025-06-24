@@ -33,7 +33,7 @@ This directory contains the monitoring stack configuration for woody and frameto
 
 1. **Node Exporter** (Port 9100)
    - System metrics (CPU, memory, disk, network, etc.)
-   - Comprehensive collector configuration
+   - Comprehensive collector configuration including network metrics
 
 2. **Systemd Exporter** (Port 9558)
    - Systemd service metrics
@@ -44,11 +44,7 @@ This directory contains the monitoring stack configuration for woody and frameto
    - Provides detailed container resource usage
    - Replaces the non-existent Docker exporter
 
-4. **Network Exporter** (Port 9107)
-   - Network interface metrics
-   - Detailed network statistics
-
-5. **Process Exporter** (Port 9256)
+4. **Process Exporter** (Port 9256)
    - Process-specific metrics
    - Monitors monitoring stack processes
 
@@ -75,7 +71,6 @@ The following ports are opened on Tailscale interface only:
 - 9100: Node Exporter
 - 9558: Systemd Exporter
 - 8080: cAdvisor
-- 9107: Network Exporter
 - 9256: Process Exporter
 
 ## Next Steps
@@ -94,7 +89,6 @@ The following ports are opened on Tailscale interface only:
 - Node Exporter Full: 1860
 - Docker and System Monitoring: 893
 - Systemd Services: 9578
-- Network Monitoring: 1621
 - Process Monitoring: 249
 - cAdvisor: 14282
 
@@ -114,3 +108,11 @@ cAdvisor provides comprehensive container metrics including:
 - Network I/O statistics
 - Disk I/O metrics
 - Container lifecycle events
+
+## Network Monitoring
+
+Network metrics are collected by the Node Exporter, which includes:
+- Network interface statistics
+- Network device metrics
+- Network protocol statistics
+- Connection tracking information

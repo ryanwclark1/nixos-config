@@ -126,24 +126,6 @@
           }
         ];
       }
-      # Network exporter on woody
-      {
-        job_name = "woody-network";
-        static_configs = [
-          {
-            targets = [ "localhost:9107" ];
-          }
-        ];
-      }
-      # Network exporter on frametop (via Tailscale)
-      {
-        job_name = "frametop-network";
-        static_configs = [
-          {
-            targets = [ "frametop:9107" ];
-          }
-        ];
-      }
       # Process exporter on woody
       {
         job_name = "woody-process";

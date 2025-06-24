@@ -6,27 +6,27 @@
 {
   services.grafana = {
     enable = true;
-    port = 3001;
-    addr = "0.0.0.0";
-    domain = "woody";
-    rootUrl = "http://woody:3001/";
+    settings = {
 
-    # Security settings
-    security = {
-      adminUser = "admin";
-      adminPassword = "admin"; # Change this in production!
-    };
+      # Server settings
+      server = {
+        http_port = 3001;
+        http_addr = "0.0.0.0";
+        domain = "woody";
+        root_url = "http://woody:3001/";
+      };
 
-    # Database settings (using SQLite for simplicity)
-    database = {
-      type = "sqlite3";
-      path = "/var/lib/grafana/grafana.db";
-    };
+      # Security settings
+      security = {
+        adminUser = "admin";
+        adminPassword = "admin"; # Change this in production!
+      };
 
-    # Server settings
-    server = {
-      httpPort = 3001;
-      httpAddr = "0.0.0.0";
+      # Database settings (using SQLite for simplicity)
+      database = {
+        # type = "sqlite3";
+        path = "${config.services.grafana.dataDir}/grafana.db";
+      };
     };
 
     # Provisioning
