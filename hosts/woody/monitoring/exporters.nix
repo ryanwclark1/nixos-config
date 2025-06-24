@@ -56,10 +56,10 @@
     unitBlacklist = [ ".+\\.slice" ];
   };
 
-  # Docker Exporter - Container metrics
-  services.prometheus.exporters.docker = {
+  # cAdvisor - Container metrics (Docker, Kubernetes, etc.)
+  services.prometheus.exporters.cadvisor = {
     enable = true;
-    port = 9323;
+    port = 8080;
   };
 
   # Network Exporter - Network interface metrics
@@ -77,7 +77,7 @@
       "(grafana)"
       "(node_exporter)"
       "(systemd_exporter)"
-      "(docker_exporter)"
+      "(cadvisor)"
       "(network_exporter)"
       "(process_exporter)"
     ];
@@ -88,7 +88,7 @@
     allowedTCPPorts = [
       config.services.prometheus.exporters.node.port
       config.services.prometheus.exporters.systemd.port
-      config.services.prometheus.exporters.docker.port
+      config.services.prometheus.exporters.cadvisor.port
       config.services.prometheus.exporters.network.port
       config.services.prometheus.exporters.process.port
     ];

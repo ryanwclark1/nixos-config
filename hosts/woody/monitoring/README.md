@@ -39,9 +39,10 @@ This directory contains the monitoring stack configuration for woody and frameto
    - Systemd service metrics
    - Monitors all services except slices
 
-3. **Docker Exporter** (Port 9323)
-   - Container metrics
-   - Requires Docker to be running
+3. **cAdvisor** (Port 8080)
+   - Container metrics (Docker, Kubernetes, etc.)
+   - Provides detailed container resource usage
+   - Replaces the non-existent Docker exporter
 
 4. **Network Exporter** (Port 9107)
    - Network interface metrics
@@ -73,7 +74,7 @@ The following ports are opened on Tailscale interface only:
 - 9093: Alertmanager
 - 9100: Node Exporter
 - 9558: Systemd Exporter
-- 9323: Docker Exporter
+- 8080: cAdvisor
 - 9107: Network Exporter
 - 9256: Process Exporter
 
@@ -95,6 +96,7 @@ The following ports are opened on Tailscale interface only:
 - Systemd Services: 9578
 - Network Monitoring: 1621
 - Process Monitoring: 249
+- cAdvisor: 14282
 
 ## Alerting
 
@@ -103,3 +105,12 @@ Alertmanager is configured with:
 - Grouping by alertname, cluster, and service
 - Inhibition rules to prevent alert spam
 - 30s initial wait, 5m grouping interval, 4h repeat interval
+
+## Container Monitoring
+
+cAdvisor provides comprehensive container metrics including:
+- CPU usage per container
+- Memory usage and limits
+- Network I/O statistics
+- Disk I/O metrics
+- Container lifecycle events
