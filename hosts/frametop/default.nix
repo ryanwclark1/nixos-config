@@ -36,8 +36,7 @@
     ../common/optional/webcam.nix
     ../common/optional/wireshark.nix
     ../common/optional/zsh.nix
-    ../common/optional/gnome
-    ../common/optional/displaymanager/gdm.nix
+    ../common/optional/displaymanager/sddm
     ../common/optional/hyprland
   ];
 
