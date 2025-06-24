@@ -1,6 +1,8 @@
-{config, ...}: let
+{ config, ... }:
+let
   dockerEnabled = config.virtualisation.docker.enable;
-in {
+in
+{
   virtualisation.podman = {
     enable = true;
     dockerCompat = !dockerEnabled;
