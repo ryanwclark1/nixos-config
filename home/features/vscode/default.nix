@@ -111,14 +111,14 @@
           {
             name = "claude-code-chat";
             publisher = "AndrePimenta";
-            sha256 = "sha256-eq5nc59QoB6/BSSv5dUkOeSthif/DX69Em0FdI1PSwc=";
-            version = "0.0.7";
+            sha256 = "sha256-1tgTQrWAN+y+b9eehp8iwsVLwTyr/hR6w6fKXRmCih8=";
+            version = "0.1.2";
           }
           {
             name = "claude-dev";
             publisher = "saoudrizwan";
-            sha256 = "sha256-pYO1uy1Xd2+74rbc0D+MwK8xvSpmDeRLAVIjAR/F23w=";
-            version = "3.17.14";
+            sha256 = "sha256-1OQoo48B7HAqY64b+hEMU4Wl3PCDcs2LjQBDfyt3elM=";
+            version = "3.17.15";
           }
           {
             name = "copilot";
@@ -129,8 +129,8 @@
           {
             name = "explorer";
             publisher = "vitest";
-            sha256 = "sha256-ElmQ9iLKkcDMpNbTiNrJDB2NLV7lhmkevY+pOnm9AP0=";
-            version = "1.24.7";
+            sha256 = "sha256-8W30ouGXUCRNiRwNAhK0WREj7Pnhz2PVtj38bpH1WNU=";
+            version = "1.26.0";
           }
           {
             name = "grafana-vscode";
@@ -195,8 +195,8 @@
           {
             name = "sqlite-viewer";
             publisher = "qwtel";
-            sha256 = "sha256-u8vLGDRL6VAxPclhSIINE0rvxWY3BHxUiImYxGgb5uQ=";
-            version = "25.5.4";
+            sha256 = "sha256-fgt7UE363q0cqaVU0D628c+MX/ZkIhdbJFz2x2G9j5o=";
+            version = "25.6.0";
           }
           {
             name = "tailwind-color-matcher";
@@ -243,8 +243,8 @@
           {
             name = "vscode-pgsql";
             publisher = "ms-ossdata";
-            sha256 = "sha256-/EvO6/mwFWMGzuYcRvdFZK5dKn1JSVT3CDsdHAjiRYQ=";
-            version = "1.4.2";
+            sha256 = "sha256-qaa9qS87z4z27AN6dW/6rAnZfJPszFfBYLbaDXgDjlo=";
+            version = "1.5.0";
           }
           {
             name = "vscode-thunder-client";

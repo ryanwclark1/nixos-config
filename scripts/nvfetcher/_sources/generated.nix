@@ -36,22 +36,22 @@
   };
   claude-code-chat = {
     pname = "claude-code-chat";
-    version = "0.0.7";
+    version = "0.1.2";
     src = fetchurl {
-      url = "https://AndrePimenta.gallery.vsassets.io/_apis/public/gallery/publisher/AndrePimenta/extension/claude-code-chat/0.0.7/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "claude-code-chat-0.0.7.zip";
-      sha256 = "sha256-eq5nc59QoB6/BSSv5dUkOeSthif/DX69Em0FdI1PSwc=";
+      url = "https://AndrePimenta.gallery.vsassets.io/_apis/public/gallery/publisher/AndrePimenta/extension/claude-code-chat/0.1.2/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "claude-code-chat-0.1.2.zip";
+      sha256 = "sha256-1tgTQrWAN+y+b9eehp8iwsVLwTyr/hR6w6fKXRmCih8=";
     };
     publisher = "AndrePimenta";
     name = "claude-code-chat";
   };
   claude-dev = {
     pname = "claude-dev";
-    version = "3.17.14";
+    version = "3.17.15";
     src = fetchurl {
-      url = "https://saoudrizwan.gallery.vsassets.io/_apis/public/gallery/publisher/saoudrizwan/extension/claude-dev/3.17.14/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "claude-dev-3.17.14.zip";
-      sha256 = "sha256-pYO1uy1Xd2+74rbc0D+MwK8xvSpmDeRLAVIjAR/F23w=";
+      url = "https://saoudrizwan.gallery.vsassets.io/_apis/public/gallery/publisher/saoudrizwan/extension/claude-dev/3.17.15/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "claude-dev-3.17.15.zip";
+      sha256 = "sha256-1OQoo48B7HAqY64b+hEMU4Wl3PCDcs2LjQBDfyt3elM=";
     };
     publisher = "saoudrizwan";
     name = "claude-dev";
@@ -69,11 +69,11 @@
   };
   explorer = {
     pname = "explorer";
-    version = "1.24.7";
+    version = "1.26.0";
     src = fetchurl {
-      url = "https://vitest.gallery.vsassets.io/_apis/public/gallery/publisher/vitest/extension/explorer/1.24.7/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "explorer-1.24.7.zip";
-      sha256 = "sha256-ElmQ9iLKkcDMpNbTiNrJDB2NLV7lhmkevY+pOnm9AP0=";
+      url = "https://vitest.gallery.vsassets.io/_apis/public/gallery/publisher/vitest/extension/explorer/1.26.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "explorer-1.26.0.zip";
+      sha256 = "sha256-8W30ouGXUCRNiRwNAhK0WREj7Pnhz2PVtj38bpH1WNU=";
     };
     publisher = "vitest";
     name = "explorer";
@@ -201,11 +201,11 @@
   };
   sqlite-viewer = {
     pname = "sqlite-viewer";
-    version = "25.5.4";
+    version = "25.6.0";
     src = fetchurl {
-      url = "https://qwtel.gallery.vsassets.io/_apis/public/gallery/publisher/qwtel/extension/sqlite-viewer/25.5.4/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "sqlite-viewer-25.5.4.zip";
-      sha256 = "sha256-u8vLGDRL6VAxPclhSIINE0rvxWY3BHxUiImYxGgb5uQ=";
+      url = "https://qwtel.gallery.vsassets.io/_apis/public/gallery/publisher/qwtel/extension/sqlite-viewer/25.6.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "sqlite-viewer-25.6.0.zip";
+      sha256 = "sha256-fgt7UE363q0cqaVU0D628c+MX/ZkIhdbJFz2x2G9j5o=";
     };
     publisher = "qwtel";
     name = "sqlite-viewer";
@@ -289,11 +289,11 @@
   };
   vscode-pgsql = {
     pname = "vscode-pgsql";
-    version = "1.4.2";
+    version = "1.5.0";
     src = fetchurl {
-      url = "https://ms-ossdata.gallery.vsassets.io/_apis/public/gallery/publisher/ms-ossdata/extension/vscode-pgsql/1.4.2/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "vscode-pgsql-1.4.2.zip";
-      sha256 = "sha256-/EvO6/mwFWMGzuYcRvdFZK5dKn1JSVT3CDsdHAjiRYQ=";
+      url = "https://ms-ossdata.gallery.vsassets.io/_apis/public/gallery/publisher/ms-ossdata/extension/vscode-pgsql/1.5.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "vscode-pgsql-1.5.0.zip";
+      sha256 = "sha256-qaa9qS87z4z27AN6dW/6rAnZfJPszFfBYLbaDXgDjlo=";
     };
     publisher = "ms-ossdata";
     name = "vscode-pgsql";
