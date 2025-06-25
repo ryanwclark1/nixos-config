@@ -76,9 +76,11 @@
     };
   };
 
-  # Create dashboard directory and copy dashboard files
+  # Create dashboard directory and copy dashboard files with proper permissions
   systemd.services.grafana.preStart = ''
     mkdir -p /var/lib/grafana/dashboards
+    chown grafana:grafana /var/lib/grafana/dashboards
+    chmod 755 /var/lib/grafana/dashboards
 
     # Copy all dashboard JSON files
     cp ${./dashboards}/*.json /var/lib/grafana/dashboards/
