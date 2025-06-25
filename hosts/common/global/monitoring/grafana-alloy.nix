@@ -8,10 +8,6 @@
   services.alloy = {
     enable = true;
     configPath = "/etc/alloy/config.alloy";
-    extraFlags = [
-      "--server.http.listen-address=127.0.0.1"
-      "--server.http.listen-port=12345"
-    ];
   };
 
   # Create Alloy configuration directory and config file
@@ -112,12 +108,12 @@
                 host: ${config.networking.hostName}
   '';
 
-  # Set proper permissions
+  # Set proper permissions and override conflicting settings
   systemd.services.alloy.serviceConfig = {
     User = "alloy";
     Group = "alloy";
     Restart = "always";
-    RestartSec = "10";
+    RestartSec = lib.mkForce "10";
   };
 
   # Create alloy user and group
