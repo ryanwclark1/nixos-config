@@ -518,11 +518,11 @@
         "zon2nix": "zon2nix"
       },
       "locked": {
-        "lastModified": 1750766911,
-        "narHash": "sha256-xmGe6sSovG7NfOzgoeF+TEii97KNrP6+o5Kr4TNOVFQ=",
+        "lastModified": 1750803264,
+        "narHash": "sha256-RDyuXHyp4fiieHCfOWEorLU+guZUPPj9/8nFaAqnAUQ=",
         "owner": "ghostty-org",
         "repo": "ghostty",
-        "rev": "4c3db76733d34d3e3357457f3c6689541f841a7c",
+        "rev": "977cd530c7bb9551de93900170bdaec4601b1b5b",
         "type": "github"
       },
       "original": {
@@ -901,11 +901,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1750778528,
-        "narHash": "sha256-X0QpVEhpkhf0RvU0n5+qsBH3JIXY2uZ8m56HhP7FzU8=",
+        "lastModified": 1750799801,
+        "narHash": "sha256-Oqn6gHIVfgkzzuigwNk9UZbgKdyzAzU/JoywB6z1O+M=",
         "owner": "hyprwm",
         "repo": "hyprland-plugins",
-        "rev": "aa23323de3325e3026fc26f9c23205954be4d337",
+        "rev": "c1fdf38bfcd716130ce022cf21a1fca7582482d1",
         "type": "github"
       },
       "original": {

@@ -1,5 +1,6 @@
 {
   inputs,
+  outputs,
   lib,
   pkgs,
   ...
@@ -19,6 +20,7 @@
     # Common configurations
     ../common/global
     ../common/users/administrator
+    ../common/global/monitoring/grafana-alloy.nix
 
     # Optional features
     ../common/optional/audio.nix
@@ -38,6 +40,62 @@
     ../common/optional/displaymanager/sddm
     ../common/optional/hyprland
   ];
+
+  # Override global monitoring with frametop's comprehensive setup
+  services.prometheus.exporters.node = lib.mkForce {
+    enable = true;
+    port = 9100;
+    enabledCollectors = [
+      "cpu"
+      "diskstats"
+      "filesystem"
+      "loadavg"
+      "meminfo"
+      "netdev"
+      "netstat"
+      "textfile"
+      "time"
+      "uname"
+      "vmstat"
+      "logind"
+      "interrupts"
+      "ksmd"
+      "processes"
+      "systemd"
+      "filefd"
+      "hwmon"
+      "mountstats"
+      "sockstat"
+      "stat"
+    ];
+    extraFlags = [
+      "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)"
+      "--collector.filesystem.ignored-fs-types=^(sys|proc|auto)fs$$"
+    ];
+  };
+
+  services.prometheus.exporters.process = lib.mkForce {
+    enable = true;
+    port = 9256;
+    settings.process_names = [
+      {
+        name = "{{.Comm}}";
+        cmdline = [ "node_exporter" ];
+      }
+      {
+        name = "{{.Comm}}";
+        cmdline = [ "systemd_exporter" ];
+      }
+      {
+        name = "{{.Comm}}";
+        cmdline = [ "cadvisor" ];
+      }
+      {
+        name = "{{.Comm}}";
+        cmdline = [ "process_exporter" ];
+      }
+    ];
+  };
 
   # Host-specific settings
   networking.hostName = "frametop";

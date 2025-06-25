@@ -144,6 +144,24 @@
           }
         ];
       }
+      # Alloy metrics on woody
+      {
+        job_name = "woody-alloy";
+        static_configs = [
+          {
+            targets = [ "localhost:12345" ];
+          }
+        ];
+      }
+      # Alloy metrics on frametop (via Tailscale)
+      {
+        job_name = "frametop-alloy";
+        static_configs = [
+          {
+            targets = [ "frametop:12345" ];
+          }
+        ];
+      }
     ];
 
     # Enable web interface

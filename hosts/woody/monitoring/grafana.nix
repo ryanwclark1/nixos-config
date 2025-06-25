@@ -43,6 +43,12 @@
               access = "proxy";
               isDefault = true;
             }
+            {
+              name = "Loki";
+              type = "loki";
+              url = "http://localhost:3100";
+              access = "proxy";
+            }
           ];
         };
       };
@@ -70,9 +76,16 @@
     };
   };
 
-  # Create dashboard directory
+  # Create dashboard directory and copy dashboard files
   systemd.services.grafana.preStart = ''
     mkdir -p /var/lib/grafana/dashboards
+
+    # Copy all dashboard JSON files
+    cp ${./dashboards}/*.json /var/lib/grafana/dashboards/
+
+    # Set proper permissions
+    chown -R grafana:grafana /var/lib/grafana/dashboards
+    chmod 644 /var/lib/grafana/dashboards/*.json
   '';
 
   # Open firewall for Grafana
