@@ -21,15 +21,11 @@
     server:
       http_listen_address: 127.0.0.1
       http_listen_port: 12345
-      grpc_listen_address: 127.0.0.1
-      grpc_listen_port: 12346
 
-    # Log collection configuration
     integrations:
       agent:
         enabled: true
 
-      # Loki client configuration
       loki:
         positions_directory: /var/lib/alloy/positions
         clients:
@@ -39,16 +35,6 @@
               job: alloy-logs
 
         scrape_configs:
-          # System logs from /var/log
-          - job_name: system_logs
-            static_configs:
-              - targets: [localhost]
-                labels:
-                  job: varlogs
-                  host: ${config.networking.hostName}
-                  __path__: /var/log/*log
-
-          # Journald logs
           - job_name: journal
             journal:
               path: /run/log/journal
@@ -61,37 +47,7 @@
                 target_label: 'hostname'
               - source_labels: ['__journal__priority']
                 target_label: 'priority'
-              - source_labels: ['__journal__boot_id']
-                target_label: 'boot_id'
 
-          # Docker container logs (if Docker is running)
-          - job_name: docker
-            static_configs:
-              - targets: [localhost]
-                labels:
-                  job: docker
-                  host: ${config.networking.hostName}
-                  __path__: /var/lib/docker/containers/*/*log
-
-          # Nginx logs (if nginx is running)
-          - job_name: nginx
-            static_configs:
-              - targets: [localhost]
-                labels:
-                  job: nginx
-                  host: ${config.networking.hostName}
-                  __path__: /var/log/nginx/*.log
-
-          # Custom application logs
-          - job_name: applications
-            static_configs:
-              - targets: [localhost]
-                labels:
-                  job: applications
-                  host: ${config.networking.hostName}
-                  __path__: /var/log/apps/*.log
-
-    # Metrics collection for Alloy itself
     metrics:
       global:
         scrape_interval: 15s
