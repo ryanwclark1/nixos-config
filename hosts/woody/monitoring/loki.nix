@@ -17,7 +17,7 @@
       storage_config = {
         tsdb_shipper = {
           active_index_directory = "/var/lib/loki/tsdb-index";
-          shared_store = "filesystem";
+          cache_location = "/var/lib/loki/tsdb-cache";
         };
         filesystem = {
           directory = "/var/lib/loki/chunks";
@@ -43,6 +43,7 @@
         retention_period = "30d";
         reject_old_samples = true;
         reject_old_samples_max_age = "168h";
+        allow_structured_metadata = false;
       };
 
       # Ingester configuration
@@ -60,13 +61,11 @@
         max_chunk_age = "1h";
         chunk_target_size = 999999;
         chunk_retain_period = "30s";
-        max_transfer_retries = 0;
       };
 
       # Compactor configuration
       compactor = {
         working_directory = "/var/lib/loki";
-        shared_store = "filesystem";
         compactor_ring = {
           kvstore = {
             store = "inmemory";
