@@ -1,5 +1,6 @@
 {
   inputs,
+  outputs,
   pkgs,
   lib,
   ...
@@ -43,6 +44,70 @@
     ../common/optional/hyprland
     ../common/optional/displaymanager/sddm
   ];
+
+  # Override global monitoring with woody's comprehensive setup
+  services.prometheus.exporters.node = lib.mkForce {
+    enable = true;
+    port = 9100;
+    enabledCollectors = [
+      "cpu"
+      "diskstats"
+      "filesystem"
+      "loadavg"
+      "meminfo"
+      "netdev"
+      "netstat"
+      "textfile"
+      "time"
+      "uname"
+      "vmstat"
+      "logind"
+      "interrupts"
+      "ksmd"
+      "processes"
+      "systemd"
+      "filefd"
+      "hwmon"
+      "mountstats"
+      "sockstat"
+      "stat"
+    ];
+    extraFlags = [
+      "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)"
+      "--collector.filesystem.ignored-fs-types=^(sys|proc|auto)fs$$"
+    ];
+  };
+
+  services.prometheus.exporters.process = lib.mkForce {
+    enable = true;
+    port = 9256;
+    settings.process_names = [
+      {
+        name = "{{.Comm}}";
+        cmdline = [ "prometheus" ];
+      }
+      {
+        name = "{{.Comm}}";
+        cmdline = [ "grafana" ];
+      }
+      {
+        name = "{{.Comm}}";
+        cmdline = [ "node_exporter" ];
+      }
+      {
+        name = "{{.Comm}}";
+        cmdline = [ "systemd_exporter" ];
+      }
+      {
+        name = "{{.Comm}}";
+        cmdline = [ "cadvisor" ];
+      }
+      {
+        name = "{{.Comm}}";
+        cmdline = [ "process_exporter" ];
+      }
+    ];
+  };
 
   # Host-specific settings
   networking.hostName = "woody";
