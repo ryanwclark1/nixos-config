@@ -84,9 +84,23 @@ This directory contains Grafana dashboard JSON files that are automatically prov
       - Systemd unit logs by host
       - Host and unit templating variables
 
+### Alloy Monitoring Dashboards
+
+11. **alloy-overview.json** (UID: `alloy-overview`)
+    - **Purpose**: Grafana Alloy log collection agent monitoring
+    - **Tags**: `alloy`, `logs`, `monitoring`
+    - **Coverage**: Alloy build info, journal logs rate, file logs rate, logs sent to Loki
+    - **Usage**: Monitor Alloy's performance and log collection metrics
+    - **Features**:
+      - Alloy build information
+      - Journal logs collection rate
+      - File logs collection rate
+      - Logs sent to Loki rate
+      - Real-time monitoring of log collection pipeline
+
 ## Data Sources
 
-- **Prometheus**: Metrics from all exporters (Node Exporter, Systemd Exporter, cAdvisor, Process Exporter)
+- **Prometheus**: Metrics from all exporters (Node Exporter, Systemd Exporter, cAdvisor, Process Exporter, Alloy)
 - **Loki**: Logs from Grafana Alloy (journald, /var/log, Docker, Nginx, applications)
 
 ## Usage Instructions
@@ -126,6 +140,7 @@ This directory contains Grafana dashboard JSON files that are automatically prov
    - `systemctl status prometheus-systemd-exporter`
    - `systemctl status prometheus-cadvisor`
    - `systemctl status prometheus-process-exporter`
+   - `systemctl status alloy`
 2. Check Prometheus targets: `http://woody:9090/targets`
 3. Verify Loki is receiving logs: `http://woody:3100/ready`
 
@@ -153,6 +168,19 @@ This directory contains Grafana dashboard JSON files that are automatically prov
 2. Add to the `datasources` list
 3. Rebuild and deploy
 
+## Architecture Notes
+
+### Dashboard Provisioning
+- All dashboards are stored as JSON files in this directory
+- Grafana automatically provisions them on startup via the file provider
+- No hardcoded dashboards in Nix configuration - all are external JSON files
+- This allows for easier version control and dashboard sharing
+
+### Host-Specific Configuration
+- Dashboard configuration is now host-specific (woody) rather than global
+- Each host can have its own set of dashboards
+- Configuration is more modular and maintainable
+
 ## Future Enhancements
 
 - [ ] Add alerting rules for critical metrics
@@ -162,3 +190,4 @@ This directory contains Grafana dashboard JSON files that are automatically prov
 - [ ] Add authentication and authorization
 - [ ] Create backup and restore procedures
 - [ ] Add performance optimization for large log volumes
+- [ ] Create dashboard templates for new hosts

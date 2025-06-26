@@ -5,6 +5,6 @@
     ./alertmanager.nix
     ./exporters.nix
     ./loki.nix
-    ../../common/global/monitoring/grafana-alloy.nix
+    ./grafana-alloy.nix
   ];
 }

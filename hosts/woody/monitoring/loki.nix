@@ -6,6 +6,8 @@
 {
   services.loki = {
     enable = true;
+    user = "loki";
+    group = "loki";
     configuration = {
       server = {
         http_listen_port = 3100;
