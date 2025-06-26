@@ -19,26 +19,32 @@
 {
   name = "claude-code-chat";
   publisher = "AndrePimenta";
-  sha256 = "sha256-1tgTQrWAN+y+b9eehp8iwsVLwTyr/hR6w6fKXRmCih8=";
-  version = "0.1.2";
+  sha256 = "sha256-6KQANjZz78ist3j+g2pfMMMd3OZBHwJH7ej9hvqxQVI=";
+  version = "0.1.3";
 }
 {
   name = "claude-dev";
   publisher = "saoudrizwan";
-  sha256 = "sha256-1OQoo48B7HAqY64b+hEMU4Wl3PCDcs2LjQBDfyt3elM=";
-  version = "3.17.15";
+  sha256 = "sha256-TfE1jLRC20PRwAWzIVNBcqAEnYX4Q1cqx+MfNpUXe6k=";
+  version = "3.17.16";
 }
 {
   name = "copilot";
   publisher = "github";
-  sha256 = "sha256-7IiYfOX3Xl3cW5FcG+7FjGAmkw7Wa9802eguRmaFE5Y=";
-  version = "1.336.0";
+  sha256 = "sha256-3gJ+msqn6pdb1ryoPF3bM8c9AaQatDrvQrQHSZJFcWA=";
+  version = "1.337.1642";
 }
 {
   name = "explorer";
   publisher = "vitest";
   sha256 = "sha256-8W30ouGXUCRNiRwNAhK0WREj7Pnhz2PVtj38bpH1WNU=";
   version = "1.26.0";
+}
+{
+  name = "grafana-alloy";
+  publisher = "grafana";
+  sha256 = "sha256-XcoiEDCPp6GzYQDhJArZBEWxSnZrSTHofIyLFegsbh0=";
+  version = "0.2.0";
 }
 {
   name = "grafana-vscode";
@@ -127,8 +133,8 @@
 {
   name = "ty";
   publisher = "astral-sh";
-  sha256 = "sha256-Nps/ZsH8n0HZmf63SFUh7oGuvOz7PVu08maZzmU/2eg=";
-  version = "2025.21.11682058";
+  sha256 = "sha256-0tXyDGS/WuwOVUwgKsLzlDxVQSdKvm0MKdunLWmfUvs=";
+  version = "2025.23.11761208";
 }
 {
   name = "vscode-containers";

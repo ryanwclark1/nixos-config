@@ -43,6 +43,11 @@ src.github_tag = "golang/tools"
 src.include_regex = "gopls/v[0-9]+\\.[0-9]+\\.[0-9]+"
 fetch.github = "golang/tools"
 
+[grafana-alloy]
+src.vsmarketplace = "grafana.grafana-alloy"
+fetch.vsmarketplace = "grafana.grafana-alloy"
+passthru = { publisher = "grafana", name = "grafana-alloy" }
+
 [grafana-vscode]
 src.vsmarketplace = "grafana.grafana-vscode"
 fetch.vsmarketplace = "grafana.grafana-vscode"
