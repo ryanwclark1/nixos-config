@@ -16,7 +16,7 @@
 # in
 {
   # Create the Alloy configuration file with enhanced features
-  environment.etc."alloy/config.alloy".source = {
+  environment.etc."alloy/config.alloy" = {
     source = ./alloy/config.alloy;
     # mode = "0770";
     # user = "alloy";
