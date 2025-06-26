@@ -426,19 +426,19 @@ loki.process "log_processing" {
 // =============================================================================
 
 // Self-monitoring for Alloy health
-prometheus.scrape "alloy_self" {
-  targets = [
-    {
-      "__address__" = "127.0.0.1:12345",
-      "job" = "alloy_self",
-    },
-  ]
-  forward_to = [
-    prometheus.remote_write.local.receiver,
-  ]
-  scrape_interval = "30s"
-  scrape_timeout = "10s"
-  honor_labels = true
-  honor_timestamps = true
-  metrics_path = "/metrics"
-  scheme = "http"
+// prometheus.scrape "alloy_self" {
+  // targets = [
+  //   {
+  //     "__address__" = "127.0.0.1:12345",
+  //     "job" = "alloy_self",
+  //   },
+  // ]
+  // forward_to = [
+  //   prometheus.remote_write.local.receiver,
+  // ]
+  // scrape_interval = "30s"
+  // scrape_timeout = "10s"
+  // honor_labels = true
+  // honor_timestamps = true
+  // metrics_path = "/metrics"
+  // scheme = "http"

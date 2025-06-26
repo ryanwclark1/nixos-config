@@ -27,6 +27,46 @@ loki.relabel "journal" {
     source_labels = ["__journal__hostname"]
     target_label  = "instance"
   }
+    rule {
+    source_labels = ["__journal__machine_id"]
+    target_label  = "machine_id"
+  }
+  rule {
+    source_labels = ["__journal__user_id"]
+    target_label  = "user_id"
+  }
+  rule {
+    source_labels = ["__journal__user_name"]
+    target_label  = "user_name"
+  }
+  rule {
+    source_labels = ["__journal__session_id"]
+    target_label  = "session_id"
+  }
+  rule {
+    source_labels = ["__journal__slice"]
+    target_label  = "slice"
+  }
+  rule {
+    source_labels = ["__journal__invocation_id"]
+    target_label  = "invocation_id"
+  }
+  rule {
+    source_labels = ["__journal__message_id"]
+    target_label  = "message_id"
+  }
+  rule {
+    source_labels = ["__journal__cursor"]
+    target_label  = "cursor"
+  }
+  rule {
+    source_labels = ["__journal__realtime_timestamp"]
+    target_label  = "realtime_timestamp"
+  }
+  rule {
+    source_labels = ["__journal__monotonic_timestamp"]
+    target_label  = "monotonic_timestamp"
+  }
 }
 
 loki.source.journal "read" {
