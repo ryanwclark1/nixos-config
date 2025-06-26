@@ -20,7 +20,6 @@
     # Common configurations
     ../common/global
     ../common/users/administrator
-    ../common/global/monitoring/grafana-alloy.nix
 
     # Optional features
     ../common/optional/services/audio.nix
