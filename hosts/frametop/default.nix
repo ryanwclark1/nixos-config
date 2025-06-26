@@ -23,22 +23,22 @@
     ../common/global/monitoring/grafana-alloy.nix
 
     # Optional features
-    ../common/optional/audio.nix
-    ../common/optional/bluetooth.nix
-    ../common/optional/direnv.nix
-    ../common/optional/fonts.nix
-    ../common/optional/gnome-services.nix
-    ../common/optional/nautilus.nix
-    ../common/optional/nfs.nix
-    ../common/optional/printing.nix
-    ../common/optional/steam.nix
-    ../common/optional/thunar.nix
-    ../common/optional/virtualisation.nix
-    ../common/optional/webcam.nix
-    ../common/optional/wireshark.nix
-    ../common/optional/zsh.nix
-    ../common/optional/displaymanager/sddm
-    ../common/optional/hyprland
+    ../common/optional/services/audio.nix
+    ../common/optional/services/bluetooth.nix
+    ../common/optional/tools/direnv.nix
+    ../common/optional/tools/fonts.nix
+    ../common/optional/services/gnome-services.nix
+    ../common/optional/desktop/nautilus.nix
+    ../common/optional/services/nfs.nix
+    ../common/optional/services/printing.nix
+    ../common/optional/services/steam.nix
+    ../common/optional/desktop/thunar.nix
+    ../common/optional/services/virtualisation.nix
+    ../common/optional/services/webcam.nix
+    ../common/optional/tools/wireshark.nix
+    ../common/optional/tools/zsh.nix
+    ../common/optional/desktop/displaymanager/sddm
+    ../common/optional/desktop/hyprland
   ];
 
   # Override global monitoring with frametop's comprehensive setup
