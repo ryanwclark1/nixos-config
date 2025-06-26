@@ -4,68 +4,68 @@
   ...
 }:
 {
-  environment.etc."grafana/dashboards/alloy-overview.json" = {
-    source = ./grafana/dashboards/alloy-overview.json;
+  environment.etc."grafana/dashboards/default/alloy-overview.json" = {
+    source = ./grafana/dashboards/default/alloy-overview.json;
     mode = "0750";
     user = "grafana";
     group = "grafana";
   };
-  environment.etc."grafana/dashboards/enhanced-container-monitoring.json" = {
-    source = ./grafana/dashboards/enhanced-container-monitoring.json;
+  environment.etc."grafana/dashboards/default/enhanced-container-monitoring.json" = {
+    source = ./grafana/dashboards/default/enhanced-container-monitoring.json;
     mode = "0750";
     user = "grafana";
     group = "grafana";
   };
-  environment.etc."grafana/dashboards/log-exploration.json" = {
-    source = ./grafana/dashboards/log-exploration.json;
+  environment.etc."grafana/dashboards/default/log-exploration.json" = {
+    source = ./grafana/dashboards/default/log-exploration.json;
     mode = "0750";
     user = "grafana";
     group = "grafana";
   };
-  environment.etc."grafana/dashboards/multi-machine-dashboard.json" = {
-    source = ./grafana/dashboards/multi-machine-dashboard.json;
+  environment.etc."grafana/dashboards/default/multi-machine-dashboard.json" = {
+    source = ./grafana/dashboards/default/multi-machine-dashboard.json;
     mode = "0750";
     user = "grafana";
     group = "grafana";
   };
-  environment.etc."grafana/dashboards/overview-dashboard.json" = {
-    source = ./grafana/dashboards/overview-dashboard.json;
+  environment.etc."grafana/dashboards/default/overview-dashboard.json" = {
+    source = ./grafana/dashboards/default/overview-dashboard.json;
     mode = "0750";
     user = "grafana";
     group = "grafana";
   };
-  environment.etc."grafana/dashboards/docker-monitoring.json" = {
-    source = ./grafana/dashboards/docker-monitoring.json;
+  environment.etc."grafana/dashboards/default/docker-monitoring.json" = {
+    source = ./grafana/dashboards/default/docker-monitoring.json;
     mode = "0750";
     user = "grafana";
     group = "grafana";
   };
-  environment.etc."grafana/dashboards/enhanced-node-exporter.json" = {
-    source = ./grafana/dashboards/enhanced-node-exporter.json;
+  environment.etc."grafana/dashboards/default/enhanced-node-exporter.json" = {
+    source = ./grafana/dashboards/default/enhanced-node-exporter.json;
     mode = "0750";
     user = "grafana";
     group = "grafana";
   };
-  environment.etc."grafana/dashboards/multi-host-logs.json" = {
-    source = ./grafana/dashboards/multi-host-logs.json;
+  environment.etc."grafana/dashboards/default/multi-host-logs.json" = {
+    source = ./grafana/dashboards/default/multi-host-logs.json;
     mode = "0750";
     user = "grafana";
     group = "grafana";
   };
-  environment.etc."grafana/dashboards/node-exporter.json" = {
-    source = ./grafana/dashboards/node-exporter.json;
+  environment.etc."grafana/dashboards/default/node-exporter.json" = {
+    source = ./grafana/dashboards/default/node-exporter.json;
     mode = "0750";
     user = "grafana";
     group = "grafana";
   };
-  environment.etc."grafana/dashboards/process-monitoring.json" = {
-    source = ./grafana/dashboards/process-monitoring.json;
+  environment.etc."grafana/dashboards/default/process-monitoring.json" = {
+    source = ./grafana/dashboards/default/process-monitoring.json;
     mode = "0750";
     user = "grafana";
     group = "grafana";
   };
-  environment.etc."grafana/dashboards/systemd-services.json" = {
-    source = ./grafana/dashboards/systemd-services.json;
+  environment.etc."grafana/dashboards/default/systemd-services.json" = {
+    source = ./grafana/dashboards/default/systemd-services.json;
     mode = "0750";
     user = "grafana";
     group = "grafana";
