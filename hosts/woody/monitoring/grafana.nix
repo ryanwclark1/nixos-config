@@ -71,8 +71,8 @@
     group = "grafana";
   };
 
-  environment.etc."grafana/provisioning/dashboards/dashboard.yml" = {
-    source = ./grafana/provisioning/dashboards/dashboard.yml;
+  environment.etc."grafana/provisioning/dashboards/dashboards.yml" = {
+    source = ./grafana/provisioning/dashboards/dashboards.yml;
     mode = "0750";
     user = "grafana";
     group = "grafana";

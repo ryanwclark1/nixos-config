@@ -32,34 +32,34 @@
   };
 
   # Create alloy user and group with enhanced security
-  users.users.alloy = {
-    isSystemUser = true;
-    group = "alloy";
-    home = "/var/lib/alloy";
-    createHome = true;
-    shell = "${pkgs.bash}/bin/bash";
-    extraGroups = [
-      "systemd-journal"
-      "docker"
-    ];
-  };
+  # users.users.alloy = {
+  #   isSystemUser = true;
+  #   group = "alloy";
+  #   home = "/var/lib/alloy";
+  #   createHome = true;
+  #   shell = "${pkgs.bash}/bin/bash";
+  #   extraGroups = [
+  #     "systemd-journal"
+  #     "docker"
+  #   ];
+  # };
 
-  users.groups.alloy = { };
+  # users.groups.alloy = { };
 
   # Create necessary directories with proper permissions
-  systemd.tmpfiles.rules = [
-    # Main data directory
-    "d /var/lib/alloy 0750 alloy alloy -"
-    "d /var/lib/alloy/positions 0750 alloy alloy -"
-    "d /var/lib/alloy/cache 0750 alloy alloy -"
-    "d /var/lib/alloy/tmp 0750 alloy alloy -"
+  # systemd.tmpfiles.rules = [
+  #   # Main data directory
+  #   "d /var/lib/alloy 0750 alloy alloy -"
+  #   "d /var/lib/alloy/positions 0750 alloy alloy -"
+  #   "d /var/lib/alloy/cache 0750 alloy alloy -"
+  #   "d /var/lib/alloy/tmp 0750 alloy alloy -"
 
-    # Log directory
-    "d /var/log/alloy 0750 alloy alloy -"
+  #   # Log directory
+  #   "d /var/log/alloy 0750 alloy alloy -"
 
-    # Config directory
-    "d /etc/alloy 0750 alloy alloy -"
-  ];
+  #   # Config directory
+  #   "d /etc/alloy 0750 alloy alloy -"
+  # ];
 
   # Create custom systemd service for Alloy with enhanced configuration
   # systemd.services.alloy = {
@@ -127,19 +127,19 @@
   # };
 
   # Add Alloy to the monitoring group for access to system metrics
-  users.groups.monitoring = {
-    members = [ "alloy" ];
-  };
+  # users.groups.monitoring = {
+  #   members = [ "alloy" ];
+  # };
 
   # Create logrotate configuration for Alloy logs
-  services.logrotate.settings.alloy = {
-    files = "/var/log/alloy/*.log";
-    compress = true;
-    copytruncate = true;
-    daily = true;
-    rotate = 7;
-    missingok = true;
-    notifempty = true;
-    create = "0640 alloy alloy";
-  };
+  # services.logrotate.settings.alloy = {
+  #   files = "/var/log/alloy/*.log";
+  #   compress = true;
+  #   copytruncate = true;
+  #   daily = true;
+  #   rotate = 7;
+  #   missingok = true;
+  #   notifempty = true;
+  #   create = "0640 alloy alloy";
+  # };
 }
