@@ -4,9 +4,10 @@
 }:
 
 {
-  # Add util-linux to system packages to provide mountpoint command
+  # Add util-linux and coreutils to system packages to provide mountpoint and timeout commands
   environment.systemPackages = with pkgs; [
     util-linux
+    coreutils
   ];
 
   services.mpd = {
@@ -43,9 +44,9 @@
       # Add dependency on autofs but don't fail if it's not ready
       # Wait for the NFS mount to be available before starting
       ExecStartPre = [
-        "/bin/sh -c 'systemctl is-active --quiet autofs.service || echo \"autofs not ready, continuing anyway\"'"
-        "/bin/sh -c 'timeout 30 sh -c \"until grep -q /mnt/share /proc/mounts; do sleep 1; done\"'"
-        "/bin/sh -c 'timeout 30 sh -c \"until [ -d /mnt/share/music ]; do sleep 1; done\"'"
+        "${pkgs.bash}/bin/bash -c 'systemctl is-active --quiet autofs.service || echo \"autofs not ready, continuing anyway\"'"
+        "${pkgs.bash}/bin/bash -c 'for i in {1..30}; do if grep -q /mnt/share /proc/mounts; then break; fi; sleep 1; done'"
+        "${pkgs.bash}/bin/bash -c 'for i in {1..30}; do if [ -d /mnt/share/music ]; then break; fi; sleep 1; done'"
       ];
       # Restart if the mount becomes unavailable
       Restart = "always";
