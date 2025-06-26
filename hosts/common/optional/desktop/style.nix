@@ -7,7 +7,7 @@ let
 in
 {
   imports = [
-    ./fonts.nix
+    ../tools/fonts.nix
   ];
 
   environment.systemPackages = with pkgs; [
