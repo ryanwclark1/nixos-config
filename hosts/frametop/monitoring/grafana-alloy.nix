@@ -4,16 +4,16 @@
   lib,
   ...
 }:
-let
-  # Helper function to create secure directories
-  createSecureDir = path: {
-    "${path}" = {
-      mode = "0750";
-      user = "alloy";
-      group = "alloy";
-    };
-  };
-in
+# let
+#   # Helper function to create secure directories
+#   createSecureDir = path: {
+#     "${path}" = {
+#       mode = "0750";
+#       user = "alloy";
+#       group = "alloy";
+#     };
+#   };
+# in
 {
   # Create the Alloy configuration file with enhanced features
   environment.etc."alloy/config.alloy".source = {
@@ -21,6 +21,14 @@ in
     # mode = "0770";
     # user = "alloy";
     # group = "alloy";
+  };
+
+  services.alloy = {
+    enable = true;
+    configPath = "/etc/alloy";
+    extraFlags = [
+      "--disable-reporting"
+    ];
   };
 
   # Create alloy user and group with enhanced security
