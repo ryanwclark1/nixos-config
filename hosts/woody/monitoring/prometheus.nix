@@ -72,78 +72,7 @@
           }
         ];
       }
-      # Node exporter on woody
-      {
-        job_name = "woody-node";
-        static_configs = [
-          {
-            targets = [ "localhost:9100" ];
-          }
-        ];
-      }
-      # Node exporter on frametop (via Tailscale)
-      {
-        job_name = "frametop-node";
-        static_configs = [
-          {
-            targets = [ "frametop:9100" ];
-          }
-        ];
-      }
-      # Systemd exporter on woody
-      {
-        job_name = "woody-systemd";
-        static_configs = [
-          {
-            targets = [ "localhost:9558" ];
-          }
-        ];
-      }
-      # Systemd exporter on frametop (via Tailscale)
-      {
-        job_name = "frametop-systemd";
-        static_configs = [
-          {
-            targets = [ "frametop:9558" ];
-          }
-        ];
-      }
-      # cAdvisor on woody
-      {
-        job_name = "woody-cadvisor";
-        static_configs = [
-          {
-            targets = [ "localhost:8080" ];
-          }
-        ];
-      }
-      # cAdvisor on frametop (via Tailscale)
-      {
-        job_name = "frametop-cadvisor";
-        static_configs = [
-          {
-            targets = [ "frametop:8080" ];
-          }
-        ];
-      }
-      # Process exporter on woody
-      {
-        job_name = "woody-process";
-        static_configs = [
-          {
-            targets = [ "localhost:9256" ];
-          }
-        ];
-      }
-      # Process exporter on frametop (via Tailscale)
-      {
-        job_name = "frametop-process";
-        static_configs = [
-          {
-            targets = [ "frametop:9256" ];
-          }
-        ];
-      }
+      
       # Alloy metrics on woody
       {
         job_name = "woody-alloy";

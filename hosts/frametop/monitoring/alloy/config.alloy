@@ -134,6 +134,30 @@ loki.relabel "file_logs" {
   }
 }
 
+// Generic relabel rule to extract log levels from messages
+loki.relabel "log_level" {
+  forward_to = []
+
+  rule {
+    source_labels = ["__raw_log_message__"]
+    regex = ".*level=(debug|info|warn|error|fatal).*"
+    target_label = "level"
+    replacement = "$1"
+  }
+  rule {
+    source_labels = ["__raw_log_message__"]
+    regex = ".*severity=(debug|info|warning|error|critical).*"
+    target_label = "level"
+    replacement = "$1"
+  }
+  rule {
+    source_labels = ["__raw_log_message__"]
+    regex = ".*\[(DEBUG|INFO|WARN|ERROR|FATAL)\]:?.*"
+    target_label = "level"
+    replacement = "$1"
+  }
+}
+
 // =============================================================================
 // LOG SOURCES
 // =============================================================================
@@ -143,12 +167,15 @@ loki.source.journal "read" {
   forward_to = [
     loki.write.local.receiver,
   ]
-  relabel_rules = loki.relabel.journal.rules
+  relabel_rules = [
+    loki.relabel.journal.rules,
+    loki.relabel.log_level.rules,
+  ]
   labels = {
-    "job" = "journal"
-    "host" = "frametop"
-    "component" = "alloy"
-    "source" = "systemd-journal"
+    "job" = "journal",
+    "host" = "frametop",
+    "component" = "alloy",
+    "source" = "systemd-journal",
   }
   // Enhanced journal configuration
   journal {
@@ -156,10 +183,10 @@ loki.source.journal "read" {
     max_age = "12h"
     path = "/var/log/journal"
     matches = [
-      "_SYSTEMD_UNIT=systemd-*"
-      "_SYSTEMD_UNIT=*.service"
-      "_SYSTEMD_UNIT=*.socket"
-      "_SYSTEMD_UNIT=*.timer"
+      "_SYSTEMD_UNIT=systemd-*",
+      "_SYSTEMD_UNIT=*.service",
+      "_SYSTEMD_UNIT=*.socket",
+      "_SYSTEMD_UNIT=*.timer",
     ]
   }
 }
@@ -202,12 +229,15 @@ loki.source.file "local_files" {
   forward_to = [
     loki.write.local.receiver,
   ]
-  relabel_rules = loki.relabel.file_logs.rules
+  relabel_rules = [
+    loki.relabel.file_logs.rules,
+    loki.relabel.log_level.rules,
+  ]
   labels = {
-    "job" = "varlogs"
-    "host" = "frametop"
-    "component" = "alloy"
-    "source" = "file"
+    "job" = "varlogs",
+    "host" = "frametop",
+    "component" = "alloy",
+    "source" = "file",
   }
   // Enhanced file reading configuration
   positions_directory = "/var/lib/alloy/positions"
@@ -223,46 +253,38 @@ loki.source.file "local_files" {
 }
 
 // Docker container logs source
-local.file_match "docker_logs" {
-  path_targets = [
-    {"__path__" = "/var/lib/docker/containers/*/*.log"},
-  ]
-}
-
-loki.source.file "docker" {
-  targets = local.file_match.docker_logs.targets
+loki.source.docker "docker" {
+  host = "unix:///var/run/docker.sock"
   forward_to = [
     loki.write.local.receiver,
   ]
-  relabel_rules = loki.relabel.file_logs.rules
+  relabel_rules = [
+    loki.relabel.log_level.rules,
+  ]
   labels = {
-    "job" = "docker"
-    "host" = "frametop"
-    "component" = "alloy"
-    "source" = "docker"
+    "job" = "docker",
+    "host" = "frametop",
+    "component" = "alloy",
+    "source" = "docker",
   }
-  positions_directory = "/var/lib/alloy/positions"
-  encoding = "utf-8"
-  follow_symlinks = true
-  read_from_beginning = false
 }
 
 // =============================================================================
 // METRICS COLLECTION
 // =============================================================================
 
-// Prometheus scrape for Alloy's own metrics with enhanced configuration
-prometheus.scrape "alloy" {
+// Self-monitoring for Alloy health
+prometheus.scrape "self" {
   targets = [
     {
       "__address__" = "127.0.0.1:12345",
-      "job" = "alloy",
+      "job" = "alloy_self",
     },
   ]
   forward_to = [
     prometheus.remote_write.local.receiver,
   ]
-  scrape_interval = "15s"
+  scrape_interval = "30s"
   scrape_timeout = "10s"
   honor_labels = true
   honor_timestamps = true
@@ -270,59 +292,39 @@ prometheus.scrape "alloy" {
   scheme = "http"
 }
 
-// Node exporter for comprehensive system metrics
-prometheus.exporter.unix "node" {
+// Unix exporter for comprehensive system metrics
+prometheus.exporter.unix "unix" {
   enabled_collectors = [
-    "cpu"
-    "diskstats"
-    "filesystem"
-    "loadavg"
-    "meminfo"
-    "netdev"
-    "netstat"
-    "textfile"
-    "time"
-    "uname"
-    "vmstat"
-    "logind"
-    "systemd"
-    "interrupts"
-    "ksmd"
-    "processes"
-    "stat"
-    "tcpstat"
-    "wifi"
-    "xfs"
-    "zfs"
-    "bonding"
-    "conntrack"
-    "diskstats"
-    "entropy"
-    "filefd"
-    "hwmon"
-    "infiniband"
-    "ipvs"
-    "mdadm"
-    "meminfo_numa"
-    "mountstats"
-    "nfs"
-    "nfsd"
-    "sockstat"
-    "supervisord"
-    "systemd"
-    "tcpstat"
-    "textfile"
-    "time"
-    "uname"
-    "vmstat"
-    "wifi"
-    "xfs"
-    "zfs"
+    "cpu",
+    "diskstats",
+    "filesystem",
+    "loadavg",
+    "meminfo",
+    "netdev",
+    "netstat",
+    "textfile",
+    "time",
+    "uname",
+    "vmstat",
+    "logind",
+    "interrupts",
+    "ksmd",
+    "processes",
+    "systemd",
+    "filefd",
+    "hwmon",
+    "mountstats",
+    "sockstat",
+    "stat",
   ]
+  filesystem {
+    mount_points_exclude = "^/(sys|proc|dev|host|etc)($|/)"
+    fs_types_exclude = "^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$"
+  }
 }
 
-prometheus.scrape "linux_node" {
-  targets = prometheus.exporter.unix.node.targets
+prometheus.scrape "unix" {
+  targets = prometheus.exporter.unix.unix.targets
   forward_to = [
     prometheus.remote_write.local.receiver,
   ]
@@ -332,15 +334,31 @@ prometheus.scrape "linux_node" {
   honor_timestamps = true
   metrics_path = "/metrics"
   scheme = "http"
+  labels = {
+    "job" = "unix",
+  }
+}
+
+// Discover all processes
+discovery.process "all_processes" {
+  procfs = "/proc"
+  cgroupfs = "/sys/fs/cgroup"
+}
+
+// Filter processes for monitoring
+discovery.relabel "filtered_processes" {
+  targets = discovery.process.all_processes.targets
+
+  rule {
+    action = "keep"
+    regex = "^(prometheus|grafana|node_exporter|systemd_exporter|cadvisor|process_exporter)$"
+    source_labels = ["__meta_process_name"]
+  }
 }
 
 // Process exporter for detailed process monitoring
-prometheus.exporter.process "processes" {
-  process_names = [
-    "{{.Comm}}"
-    "{{.ExeBase}}"
-    "{{.Matches}}"
-  ]
+prometheus.exporter.process "process" {
+  targets = discovery.relabel.filtered_processes.targets
   procfs = "/proc"
   cgroupfs = "/sys/fs/cgroup"
   smaps = true
@@ -348,8 +366,8 @@ prometheus.exporter.process "processes" {
   gopsutil = true
 }
 
-prometheus.scrape "processes" {
-  targets = prometheus.exporter.process.processes.targets
+prometheus.scrape "process" {
+  targets = prometheus.exporter.process.process.targets
   forward_to = [
     prometheus.remote_write.local.receiver,
   ]
@@ -359,13 +377,78 @@ prometheus.scrape "processes" {
   honor_timestamps = true
   metrics_path = "/metrics"
   scheme = "http"
+  labels = {
+    "job" = "process",
+  }
+}
+
+// Blackbox exporter for probing endpoints
+prometheus.exporter.blackbox "blackbox" {
+  config_file = "/etc/alloy/blackbox.yml"
+}
+
+prometheus.scrape "blackbox" {
+  targets = [
+    {"__address__" = "http://prometheus.io", "module" = "http_2xx"},
+  ]
+  forward_to = [prometheus.remote_write.local.receiver]
+  relabel_configs {
+    source_labels = ["__address__"]
+    target_label = "__param_target"
+  }
+  relabel_configs {
+    source_labels = ["__param_target"]
+    target_label = "instance"
+  }
+  relabel_configs {
+    target_label = "__address__"
+    replacement = "localhost:9115"
+  }
+}
+
+// cAdvisor exporter for container metrics
+prometheus.exporter.cadvisor "cadvisor" {
+}
+
+prometheus.scrape "cadvisor" {
+  targets = prometheus.exporter.cadvisor.cadvisor.targets
+  forward_to = [
+    prometheus.remote_write.local.receiver,
+  ]
+  labels = {
+    "job" = "cadvisor",
+  }
+}
+
+// SNMP exporter for network devices
+prometheus.exporter.snmp "snmp" {
+  config_file = "/etc/alloy/snmp.yml"
+}
+
+prometheus.scrape "snmp" {
+  targets = [
+    {"__address__" = "1.1.1.1", "module" = "default"},
+  ]
+  forward_to = [prometheus.remote_write.local.receiver]
+  relabel_configs {
+    source_labels = ["__address__"]
+    target_label = "__param_target"
+  }
+  relabel_configs {
+    source_labels = ["__param_target"]
+    target_label = "instance"
+  }
+  relabel_configs {
+    target_label = "__address__"
+    replacement = "localhost:9116"
+  }
 }
 
 // Systemd exporter for service monitoring
 prometheus.exporter.systemd "systemd" {
   unit_whitelist = [".*"]
   unit_blacklist = [
-    "(autovt@|dev-mapper|sys-devices|sys-subsystem|user@|session)\.(service|socket)"
+    "(autovt@|dev-mapper|sys-devices|sys-subsystem|user@|session)\\.(service|socket)"
   ]
   enable_restarts_metrics = true
   enable_start_time_metrics = true
@@ -383,6 +466,9 @@ prometheus.scrape "systemd" {
   honor_timestamps = true
   metrics_path = "/metrics"
   scheme = "http"
+  labels = {
+    "job" = "systemd",
+  }
 }
 
 // =============================================================================
@@ -426,19 +512,20 @@ loki.process "log_processing" {
 // =============================================================================
 
 // Self-monitoring for Alloy health
-// prometheus.scrape "alloy_self" {
-  // targets = [
-  //   {
-  //     "__address__" = "127.0.0.1:12345",
-  //     "job" = "alloy_self",
-  //   },
-  // ]
-  // forward_to = [
-  //   prometheus.remote_write.local.receiver,
-  // ]
-  // scrape_interval = "30s"
-  // scrape_timeout = "10s"
-  // honor_labels = true
-  // honor_timestamps = true
-  // metrics_path = "/metrics"
-  // scheme = "http"
+prometheus.scrape "alloy_self" {
+  targets = [
+    {
+      "__address__" = "127.0.0.1:12345",
+      "job" = "alloy_self",
+    },
+  ]
+  forward_to = [
+    prometheus.remote_write.local.receiver,
+  ]
+  scrape_interval = "30s"
+  scrape_timeout = "10s"
+  honor_labels = true
+  honor_timestamps = true
+  metrics_path = "/metrics"
+  scheme = "http"
+}
