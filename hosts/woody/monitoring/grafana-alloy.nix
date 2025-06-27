@@ -13,6 +13,20 @@
     # user = "alloy";
     # group = "alloy";
   };
+
+  environment.etc."alloy/blackbox.yml" = {
+    source = ./alloy/blackbox.yml;
+    # mode = "0644";
+    # user = "root";
+    # group = "root";
+  };
+
+  environment.etc."alloy/snmp.yml" = {
+    source = ./alloy/snmp.yml;
+    # mode = "0644";
+    # user = "root";
+    # group = "root";
+  };
   services.alloy = {
     enable = true;
     configPath = "/etc/alloy";
