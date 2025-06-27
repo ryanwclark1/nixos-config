@@ -42,7 +42,7 @@ loki.relabel "log_level" {
   }
   rule {
     source_labels = ["__raw_log_message__"]
-    regex = ".*\[(DEBUG|INFO|WARN|ERROR|FATAL)\]:?.*"
+    regex = ".*\\[(DEBUG|INFO|WARN|ERROR|FATAL)\\]:?.*"
     target_label = "level"
     replacement = "$1"
   }
@@ -64,17 +64,17 @@ loki.source.journal "read" {
     "source" = "systemd-journal",
   }
   // Enhanced journal configuration
-  journal {
-    json = false
-    max_age = "12h"
-    path = "/var/log/journal"
-    matches = [
-      "_SYSTEMD_UNIT=systemd-*",
-      "_SYSTEMD_UNIT=*.service",
-      "_SYSTEMD_UNIT=*.socket",
-      "_SYSTEMD_UNIT=*.timer",
-    ]
-  }
+  // journal {
+  //   json = false
+  //   max_age = "12h"
+  //   path = "/var/log/journal"
+  //   matches = [
+  //     "_SYSTEMD_UNIT=systemd-*",
+  //     "_SYSTEMD_UNIT=*.service",
+  //     "_SYSTEMD_UNIT=*.socket",
+  //     "_SYSTEMD_UNIT=*.timer",
+  //   ]
+  // }
 }
 
 // Enhanced file source patterns for application logs
@@ -115,27 +115,27 @@ loki.source.file "local_files" {
   forward_to = [
     loki.write.local.receiver,
   ]
-  relabel_rules = [
-    loki.relabel.file_logs.rules,
-    loki.relabel.log_level.rules,
-  ]
-  labels = {
-    "job" = "varlogs",
-    "host" = "woody",
-    "component" = "alloy",
-    "source" = "file",
-  }
+  // relabel_rules = [
+  //   loki.relabel.file_logs.rules,
+  //   loki.relabel.log_level.rules,
+  // ]
+  // labels = {
+  //   "job" = "varlogs",
+  //   "host" = "woody",
+  //   "component" = "alloy",
+  //   "source" = "file",
+  // }
   // Enhanced file reading configuration
-  positions_directory = "/var/lib/alloy/positions"
-  encoding = "utf-8"
-  follow_symlinks = true
-  read_from_beginning = false
-  // Rate limiting to prevent overwhelming the system
-  rate_limiter {
-    enabled = true
-    rate = 10000
-    burst = 20000
-  }
+  // positions_directory = "/var/lib/alloy/positions"
+  // encoding = "utf-8"
+  // follow_symlinks = true
+  // read_from_beginning = false
+  // // Rate limiting to prevent overwhelming the system
+  // rate_limiter {
+  //   enabled = true
+  //   rate = 10000
+  //   burst = 20000
+  // }
 }
 
 // Docker container logs source
@@ -180,32 +180,51 @@ prometheus.scrape "self" {
 
 // Unix exporter for comprehensive system metrics
 prometheus.exporter.unix "unix" {
+  disable_collectors = [
+    "ipvs",
+    "infiniband",
+    "xfs",
+    "zfs",
+  ]
   enabled_collectors = [
     "cpu",
     "diskstats",
+    "filefd",
     "filesystem",
+    "hwmon",
+    "interrupts",
+    "ksmd",
     "loadavg",
+    "logind",
     "meminfo",
+    "mountstats",
     "netdev",
     "netstat",
+    "processes",
+    "sockstat",
+    "stat",
+    "systemd",
     "textfile",
     "time",
     "uname",
     "vmstat",
-    "logind",
-    "interrupts",
-    "ksmd",
-    "processes",
-    "systemd",
-    "filefd",
-    "hwmon",
-    "mountstats",
-    "sockstat",
-    "stat",
   ]
   filesystem {
-    mount_points_exclude = "^/(sys|proc|dev|host|etc)($|/)"
-    fs_types_exclude = "^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$"
+    // Exclude mount points that aren't relevant for monitoring
+    mount_points_exclude = "^/(dev|proc|run/credentials/.+|sys|var/lib/docker/.+)($|/)"
+    // Exclude filesystem types that aren't relevant for monitoring
+    fs_types_exclude     = "^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|tmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$"
+    // Timeout for filesystem operations
+    mount_timeout        = "5s"
+  }
+  netclass {
+    // Ignore virtual and container network interfaces
+    ignored_devices = "^(veth.*|cali.*|[a-f0-9]{15})$"
+  }
+
+  netdev {
+    // Exclude virtual and container network interfaces from device metrics
+    device_exclude = "^(veth.*|cali.*|[a-f0-9]{15})$"
   }
 }
 
@@ -294,6 +313,7 @@ prometheus.scrape "blackbox" {
 
 // cAdvisor exporter for container metrics
 prometheus.exporter.cadvisor "cadvisor" {
+  docker_host = "unix:///var/run/docker.sock"
 }
 
 prometheus.scrape "cadvisor" {
@@ -333,9 +353,9 @@ prometheus.scrape "snmp" {
 // Systemd exporter for service monitoring
 prometheus.exporter.systemd "systemd" {
   unit_whitelist = [".*"]
-  unit_blacklist = [
-    "(autovt@|dev-mapper|sys-devices|sys-subsystem|user@|session)\.(service|socket)"
-  ]
+  // unit_blacklist = [
+  //   "(autovt@|dev-mapper|sys-devices|sys-subsystem|user@|session)\\.(service|socket)",
+  // ]
   enable_restarts_metrics = true
   enable_start_time_metrics = true
   enable_task_metrics = true
