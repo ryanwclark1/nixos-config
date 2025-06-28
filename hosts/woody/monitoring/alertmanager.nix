@@ -13,8 +13,8 @@
     source = ./grafana/provisioning/alerting/rules/alloy-health.yml;
   };
 
-  environment.etc."grafana/provisioning/alerts/rulescontainers.yml" = {
-    source = ./grafana/provisioning/alerts/rules/containers.yml;
+  environment.etc."grafana/provisioning/alerting/rules/container-metrics.yml" = {
+    source = ./grafana/provisioning/alerting/rules/container-metrics.yml;
   };
 
 
@@ -210,7 +210,7 @@
           name = "workdays";
           time_intervals = [
             {
-              weekdays = [ "monday:friday" ];
+              weekdays = [ "monday" "tuesday" "wednesday" "thursday" "friday" ];
               times = [
                 {
                   start_time = "09:00";
@@ -224,7 +224,7 @@
           name = "weekends";
           time_intervals = [
             {
-              weekdays = [ "saturday:sunday" ];
+              weekdays = [ "saturday" "sunday" ];
             }
           ];
         }
