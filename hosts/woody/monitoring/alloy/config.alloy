@@ -29,14 +29,8 @@ loki.write "local" {
     batch_wait = "5s"
     batch_size = "1MB"
     
-    // Timeout configuration
-    timeout = "10s"
-    
-    // Retry configuration
+    // Enable retry on rate limit errors
     retry_on_http_429 = true
-    min_backoff = "1s"
-    max_backoff = "30s"
-    max_retries = 10
   }
 
   // Buffer configuration for log reliability
