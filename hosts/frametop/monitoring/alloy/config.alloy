@@ -968,31 +968,60 @@ discovery.relabel "filtered_docker_containers" {
   }
 }
 
-// Discover log files dynamically
-discovery.file "log_files" {
-  files = [
-    "/var/log/*.log",
-    "/var/log/syslog",
-    "/var/log/auth.log",
-    "/var/log/kern.log",
-    "/var/log/dmesg",
-    "/var/log/daemon.log",
-    "/var/log/messages",
-    "/var/log/postgresql/*.log",
-    "/var/lib/docker/containers/*/*.log",
-    "/var/log/applications/*.log",
-    "/opt/*/logs/*.log",
-    "/var/log/audit/audit.log",
-    "/var/log/fail2ban.log",
-    "/var/log/ufw.log",
-    "/var/log/iptables.log",
+// Discover log files dynamically using file match
+local.file_match "log_files" {
+  path_targets = [
+    {
+      __path__ = "/var/log/*.log",
+    },
+    {
+      __path__ = "/var/log/syslog",
+    },
+    {
+      __path__ = "/var/log/auth.log",
+    },
+    {
+      __path__ = "/var/log/kern.log",
+    },
+    {
+      __path__ = "/var/log/dmesg",
+    },
+    {
+      __path__ = "/var/log/daemon.log",
+    },
+    {
+      __path__ = "/var/log/messages",
+    },
+    {
+      __path__ = "/var/log/postgresql/*.log",
+    },
+    {
+      __path__ = "/var/lib/docker/containers/*/*.log",
+    },
+    {
+      __path__ = "/var/log/applications/*.log",
+    },
+    {
+      __path__ = "/opt/*/logs/*.log",
+    },
+    {
+      __path__ = "/var/log/audit/audit.log",
+    },
+    {
+      __path__ = "/var/log/fail2ban.log",
+    },
+    {
+      __path__ = "/var/log/ufw.log",
+    },
+    {
+      __path__ = "/var/log/iptables.log",
+    },
   ]
-  refresh_interval = "60s"
 }
 
 // Filter discovered log files
 discovery.relabel "filtered_log_files" {
-  targets = discovery.file.log_files.targets
+  targets = local.file_match.log_files.targets
 
   rule {
     source_labels = ["__path__"]
