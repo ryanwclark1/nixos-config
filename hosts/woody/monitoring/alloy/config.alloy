@@ -1081,21 +1081,21 @@ prometheus.scrape "blackbox_http" {
   honor_timestamps = true
   
   params = {
-    module = ["http_2xx"]
+    module = ["http_2xx"],
   }
   
   relabel_rules = [
     {
-      target_label = "__param_target"
-      replacement = "http://woody:9090"
+      target_label = "__param_target",
+      replacement = "http://woody:9090",
     },
     {
-      source_labels = ["__param_target"]
-      target_label = "instance"
+      source_labels = ["__param_target"],
+      target_label = "instance",
     },
     {
-      source_labels = ["__param_target"]
-      target_label = "target"
+      source_labels = ["__param_target"],
+      target_label = "target",
     },
   ]
 }
@@ -1110,21 +1110,21 @@ prometheus.scrape "blackbox_http_grafana" {
   scrape_timeout = "10s"
   
   params = {
-    module = ["http_2xx"]
+    module = ["http_2xx"],
   }
   
   relabel_rules = [
     {
-      target_label = "__param_target"
-      replacement = "http://woody:3000"
+      target_label = "__param_target",
+      replacement = "http://woody:3000",
     },
     {
-      source_labels = ["__param_target"]
-      target_label = "instance"
+      source_labels = ["__param_target"],
+      target_label = "instance",
     },
     {
-      source_labels = ["__param_target"]
-      target_label = "target"
+      source_labels = ["__param_target"],
+      target_label = "target",
     },
   ]
 }
@@ -1138,21 +1138,21 @@ prometheus.scrape "blackbox_http_gateway" {
   scrape_timeout = "10s"
   
   params = {
-    module = ["http_2xx"]
+    module = ["http_2xx"],
   }
   
   relabel_rules = [
     {
-      target_label = "__param_target"
-      replacement = "http://10.10.100.1"
+      target_label = "__param_target",
+      replacement = "http://10.10.100.1",
     },
     {
-      source_labels = ["__param_target"]
-      target_label = "instance"
+      source_labels = ["__param_target"],
+      target_label = "instance",
     },
     {
-      source_labels = ["__param_target"]
-      target_label = "target"
+      source_labels = ["__param_target"],
+      target_label = "target",
     },
   ]
 }
@@ -1166,21 +1166,21 @@ prometheus.scrape "blackbox_icmp_gateway" {
   scrape_timeout = "10s"
   
   params = {
-    module = ["icmp"]
+    module = ["icmp"],
   }
   
   relabel_rules = [
     {
-      target_label = "__param_target"
-      replacement = "10.10.100.1"
+      target_label = "__param_target",
+      replacement = "10.10.100.1",
     },
     {
-      source_labels = ["__param_target"]
-      target_label = "instance"
+      source_labels = ["__param_target"],
+      target_label = "instance",
     },
     {
-      source_labels = ["__param_target"]
-      target_label = "target"
+      source_labels = ["__param_target"],
+      target_label = "target",
     },
   ]
 }
@@ -1194,21 +1194,21 @@ prometheus.scrape "blackbox_icmp_dns" {
   scrape_timeout = "10s"
   
   params = {
-    module = ["icmp"]
+    module = ["icmp"],
   }
   
   relabel_rules = [
     {
-      target_label = "__param_target"
-      replacement = "8.8.8.8"
+      target_label = "__param_target",
+      replacement = "8.8.8.8",
     },
     {
-      source_labels = ["__param_target"]
-      target_label = "instance"
+      source_labels = ["__param_target"],
+      target_label = "instance",
     },
     {
-      source_labels = ["__param_target"]
-      target_label = "target"
+      source_labels = ["__param_target"],
+      target_label = "target",
     },
   ]
 }
@@ -1222,21 +1222,21 @@ prometheus.scrape "blackbox_icmp_cloudflare" {
   scrape_timeout = "10s"
   
   params = {
-    module = ["icmp"]
+    module = ["icmp"],
   }
   
   relabel_rules = [
     {
-      target_label = "__param_target"
-      replacement = "1.1.1.1"
+      target_label = "__param_target",
+      replacement = "1.1.1.1",
     },
     {
-      source_labels = ["__param_target"]
-      target_label = "instance"
+      source_labels = ["__param_target"],
+      target_label = "instance",
     },
     {
-      source_labels = ["__param_target"]
-      target_label = "target"
+      source_labels = ["__param_target"],
+      target_label = "target",
     },
   ]
 }
