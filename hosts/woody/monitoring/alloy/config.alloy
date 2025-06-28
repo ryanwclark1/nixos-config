@@ -1068,177 +1068,55 @@ prometheus.scrape "cadvisor" {
 // Blackbox exporter for network probing
 prometheus.exporter.blackbox "blackbox" {
   config_file = "/etc/alloy/blackbox.yml"
+  target {
+    name = "http_woody_prometheus"
+    address = "http://woody:9090"
+    module = "http_2xx"
+  }
+  target {
+    name = "http_woody_grafana"
+    address = "http://woody:3000"
+    module = "http_2xx"
+  }
+  target {
+    name = "http_woody_alertmanager"
+    address = "http://woody:9093"
+    module = "http_2xx"
+  }
+  target {
+    name = "http_gateway"
+    address = "http://10.10.100.1"
+    module = "http_2xx"
+  }
+  target {
+    name = "https_gateway"
+    address = "https://10.10.100.1"
+    module = "https_2xx"
+  }
+  target {
+    name = "icmp_gateway"
+    address = "10.10.100.1"
+    module = "icmp"
+  }
+  target {
+    name = "icmp_google_dns"
+    address = "8.8.8.8"
+    module = "icmp"
+  }
+  target {
+    name = "icmp_cloudflare_dns"
+    address = "1.1.1.1"
+    module = "icmp"
+  }
 }
 
-prometheus.scrape "blackbox_http" {
+prometheus.scrape "blackbox" {
   targets = prometheus.exporter.blackbox.blackbox.targets
   forward_to = [
     prometheus.relabel.blackbox_metrics.receiver,
   ]
   scrape_interval = "60s"
   scrape_timeout = "10s"
-  honor_labels = true
-  honor_timestamps = true
-  
-  params = {
-    module = ["http_2xx"],
-  }
-  
-  relabel_rules = [
-    {
-      target_label = "__param_target",
-      replacement = "http://woody:9090",
-    },
-    {
-      source_labels = ["__param_target"],
-      target_label = "instance",
-    },
-    {
-      source_labels = ["__param_target"],
-      target_label = "target",
-    },
-  ]
-}
-
-// Additional blackbox scrape configs for different targets
-prometheus.scrape "blackbox_http_grafana" {
-  targets = prometheus.exporter.blackbox.blackbox.targets
-  forward_to = [
-    prometheus.relabel.blackbox_metrics.receiver,
-  ]
-  scrape_interval = "60s"
-  scrape_timeout = "10s"
-  
-  params = {
-    module = ["http_2xx"],
-  }
-  
-  relabel_rules = [
-    {
-      target_label = "__param_target",
-      replacement = "http://woody:3000",
-    },
-    {
-      source_labels = ["__param_target"],
-      target_label = "instance",
-    },
-    {
-      source_labels = ["__param_target"],
-      target_label = "target",
-    },
-  ]
-}
-
-prometheus.scrape "blackbox_http_gateway" {
-  targets = prometheus.exporter.blackbox.blackbox.targets
-  forward_to = [
-    prometheus.relabel.blackbox_metrics.receiver,
-  ]
-  scrape_interval = "60s"
-  scrape_timeout = "10s"
-  
-  params = {
-    module = ["http_2xx"],
-  }
-  
-  relabel_rules = [
-    {
-      target_label = "__param_target",
-      replacement = "http://10.10.100.1",
-    },
-    {
-      source_labels = ["__param_target"],
-      target_label = "instance",
-    },
-    {
-      source_labels = ["__param_target"],
-      target_label = "target",
-    },
-  ]
-}
-
-prometheus.scrape "blackbox_icmp_gateway" {
-  targets = prometheus.exporter.blackbox.blackbox.targets
-  forward_to = [
-    prometheus.relabel.blackbox_metrics.receiver,
-  ]
-  scrape_interval = "30s"
-  scrape_timeout = "10s"
-  
-  params = {
-    module = ["icmp"],
-  }
-  
-  relabel_rules = [
-    {
-      target_label = "__param_target",
-      replacement = "10.10.100.1",
-    },
-    {
-      source_labels = ["__param_target"],
-      target_label = "instance",
-    },
-    {
-      source_labels = ["__param_target"],
-      target_label = "target",
-    },
-  ]
-}
-
-prometheus.scrape "blackbox_icmp_dns" {
-  targets = prometheus.exporter.blackbox.blackbox.targets
-  forward_to = [
-    prometheus.relabel.blackbox_metrics.receiver,
-  ]
-  scrape_interval = "30s"
-  scrape_timeout = "10s"
-  
-  params = {
-    module = ["icmp"],
-  }
-  
-  relabel_rules = [
-    {
-      target_label = "__param_target",
-      replacement = "8.8.8.8",
-    },
-    {
-      source_labels = ["__param_target"],
-      target_label = "instance",
-    },
-    {
-      source_labels = ["__param_target"],
-      target_label = "target",
-    },
-  ]
-}
-
-prometheus.scrape "blackbox_icmp_cloudflare" {
-  targets = prometheus.exporter.blackbox.blackbox.targets
-  forward_to = [
-    prometheus.relabel.blackbox_metrics.receiver,
-  ]
-  scrape_interval = "30s"
-  scrape_timeout = "10s"
-  
-  params = {
-    module = ["icmp"],
-  }
-  
-  relabel_rules = [
-    {
-      target_label = "__param_target",
-      replacement = "1.1.1.1",
-    },
-    {
-      source_labels = ["__param_target"],
-      target_label = "instance",
-    },
-    {
-      source_labels = ["__param_target"],
-      target_label = "target",
-    },
-  ]
 }
 
 // SNMP exporter for network devices
