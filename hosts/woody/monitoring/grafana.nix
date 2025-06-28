@@ -202,16 +202,26 @@
     provision = {
       enable = true;
 
-      datasources = {
-        path = "/etc/grafana/provisioning/datasources";
+      datasources.settings = {
+        apiVersion = 1;
+        deleteDatasources = [];
+        datasources = [];
       };
 
-      dashboards = {
-        path = "/etc/grafana/provisioning/dashboards";
-      };
-
-      alerting = {
-        path = "/etc/grafana/provisioning/alerting";
+      dashboards.settings = {
+        apiVersion = 1;
+        providers = [{
+          name = "default";
+          orgId = 1;
+          folder = "";
+          type = "file";
+          disableDeletion = false;
+          updateIntervalSeconds = 10;
+          allowUiUpdates = true;
+          options = {
+            path = "/etc/grafana/dashboards/default";
+          };
+        }];
       };
     };
   };

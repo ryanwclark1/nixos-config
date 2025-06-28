@@ -3,7 +3,21 @@
   config,
   ...
 }:
+
 {
+  environment.etc."grafana/provisioning/alerting/prometheus.yml" = {
+    source = ./grafana/provisioning/alerting/prometheus.yml;
+  };
+
+  environment.etc."grafana/provisioning/alerting/rules/alloy-health.yml" = {
+    source = ./grafana/provisioning/alerting/rules/alloy-health.yml;
+  };
+
+  environment.etc."grafana/provisioning/alerts/rulescontainers.yml" = {
+    source = ./grafana/provisioning/alerts/rules/containers.yml;
+  };
+
+
   services.prometheus.alertmanager = {
     enable = true;
     port = 9093;
