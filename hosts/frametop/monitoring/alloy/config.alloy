@@ -1102,32 +1102,50 @@ prometheus.scrape "cadvisor" {
 // Blackbox exporter for network probing
 prometheus.exporter.blackbox "blackbox" {
   config_file = "/etc/alloy/blackbox.yml"
+  
+  // HTTP probes
+  target {
+    name = "gateway_http"
+    address = "http://10.10.100.1"
+    module = "http_2xx"
+  }
+  target {
+    name = "gateway_https"
+    address = "https://10.10.100.1"
+    module = "https_2xx"
+  }
+  target {
+    name = "woody_prometheus"
+    address = "http://woody:9090"
+    module = "http_2xx"
+  }
+  target {
+    name = "woody_grafana"
+    address = "http://woody:3000"
+    module = "http_2xx"
+  }
+  
+  // ICMP probes
+  target {
+    name = "gateway_ping"
+    address = "10.10.100.1"
+    module = "icmp"
+  }
+  target {
+    name = "google_dns_ping"
+    address = "8.8.8.8"
+    module = "icmp"
+  }
+  target {
+    name = "cloudflare_dns_ping"
+    address = "1.1.1.1"
+    module = "icmp"
+  }
 }
 
-prometheus.scrape "blackbox_http" {
-  targets = [
-    {"__address__" = "10.10.100.1", "__param_module" = "http_2xx", "__param_target" = "http://10.10.100.1"},
-    {"__address__" = "10.10.100.1", "__param_module" = "https_2xx", "__param_target" = "https://10.10.100.1"},
-    {"__address__" = "woody", "__param_module" = "http_2xx", "__param_target" = "http://woody:9090"},
-    {"__address__" = "woody", "__param_module" = "http_2xx", "__param_target" = "http://woody:3000"},
-  ]
-  forward_to = [
-    prometheus.relabel.blackbox_metrics.receiver,
-  ]
-  scrape_interval = "60s"
-  scrape_timeout = "10s"
-  honor_labels = true
-  honor_timestamps = true
-  metrics_path = "/probe"
-  scheme = "http"
-}
-
-prometheus.scrape "blackbox_icmp" {
-  targets = [
-    {"__address__" = "10.10.100.1", "__param_module" = "icmp", "__param_target" = "10.10.100.1"},
-    {"__address__" = "8.8.8.8", "__param_module" = "icmp", "__param_target" = "8.8.8.8"},
-    {"__address__" = "1.1.1.1", "__param_module" = "icmp", "__param_target" = "1.1.1.1"},
-  ]
+// Scrape all blackbox targets
+prometheus.scrape "blackbox_probes" {
+  targets = prometheus.exporter.blackbox.blackbox.targets
   forward_to = [
     prometheus.relabel.blackbox_metrics.receiver,
   ]
@@ -1135,8 +1153,6 @@ prometheus.scrape "blackbox_icmp" {
   scrape_timeout = "10s"
   honor_labels = true
   honor_timestamps = true
-  metrics_path = "/probe"
-  scheme = "http"
 }
 
 // SNMP exporter for network devices
