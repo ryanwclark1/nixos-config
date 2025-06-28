@@ -70,7 +70,7 @@
       ./grafana/provisioning/alerting/rules/alloy-health.yml
       ./grafana/provisioning/alerting/rules/system-metrics.yml
       ./grafana/provisioning/alerting/rules/network-monitoring.yml
-      ./grafana/provisioning/alerting/rules/log-monitoring.yml
+      # ./grafana/provisioning/alerting/rules/log-monitoring.yml  # This contains LogQL queries for Loki, not PromQL
       ./grafana/provisioning/alerting/rules/container-metrics.yml
     ];
     
