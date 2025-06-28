@@ -1,260 +1,258 @@
 {
-    "dashboard": {
-        "id": null,
-        "title": "Security Monitoring",
-        "tags": [
-            "security",
-            "monitoring",
-            "logs"
-        ],
-        "style": "dark",
-        "timezone": "browser",
-        "panels": [
-            {
-                "id": 1,
-                "title": "Failed Login Attempts",
-                "type": "stat",
-                "targets": [
-                    {
-                        "expr": "sum(rate({job=\"journal\", service_category=\"remote_access\", level=\"error\"}[5m]))",
-                        "legendFormat": "Failed Logins/sec"
-                    }
-                ],
-                "fieldConfig": {
-                    "defaults": {
-                        "color": {
-                            "mode": "thresholds"
-                        },
-                        "thresholds": {
-                            "steps": [
-                                {
-                                    "color": "green",
-                                    "value": null
-                                },
-                                {
-                                    "color": "yellow",
-                                    "value": 5
-                                },
-                                {
-                                    "color": "red",
-                                    "value": 20
-                                }
-                            ]
-                        }
-                    }
-                },
-                "gridPos": {
-                    "h": 8,
-                    "w": 6,
-                    "x": 0,
-                    "y": 0
-                }
-            },
-            {
-                "id": 2,
-                "title": "Firewall Block Events",
-                "type": "stat",
-                "targets": [
-                    {
-                        "expr": "sum(rate({job=\"journal\", log_category=\"firewall\", level=\"warning\"}[5m]))",
-                        "legendFormat": "Blocks/sec"
-                    }
-                ],
-                "fieldConfig": {
-                    "defaults": {
-                        "color": {
-                            "mode": "thresholds"
-                        },
-                        "thresholds": {
-                            "steps": [
-                                {
-                                    "color": "green",
-                                    "value": null
-                                },
-                                {
-                                    "color": "yellow",
-                                    "value": 10
-                                },
-                                {
-                                    "color": "red",
-                                    "value": 50
-                                }
-                            ]
-                        }
-                    }
-                },
-                "gridPos": {
-                    "h": 8,
-                    "w": 6,
-                    "x": 6,
-                    "y": 0
-                }
-            },
-            {
-                "id": 3,
-                "title": "SSL/TLS Errors",
-                "type": "stat",
-                "targets": [
-                    {
-                        "expr": "sum(rate({job=\"journal\", level=\"error\"} =~ \".*SSL.*|.*TLS.*\" [5m]))",
-                        "legendFormat": "SSL Errors/sec"
-                    }
-                ],
-                "fieldConfig": {
-                    "defaults": {
-                        "color": {
-                            "mode": "thresholds"
-                        },
-                        "thresholds": {
-                            "steps": [
-                                {
-                                    "color": "green",
-                                    "value": null
-                                },
-                                {
-                                    "color": "yellow",
-                                    "value": 3
-                                },
-                                {
-                                    "color": "red",
-                                    "value": 10
-                                }
-                            ]
-                        }
-                    }
-                },
-                "gridPos": {
-                    "h": 8,
-                    "w": 6,
-                    "x": 12,
-                    "y": 0
-                }
-            },
-            {
-                "id": 4,
-                "title": "Authentication Events Timeline",
-                "type": "timeseries",
-                "targets": [
-                    {
-                        "expr": "sum(rate({job=\"journal\", service_category=\"remote_access\"}[5m])) by (level)",
-                        "legendFormat": "{{level}}"
-                    }
-                ],
-                "fieldConfig": {
-                    "defaults": {
-                        "color": {
-                            "mode": "palette-classic"
-                        }
-                    }
-                },
-                "gridPos": {
-                    "h": 8,
-                    "w": 12,
-                    "x": 18,
-                    "y": 0
-                }
-            },
-            {
-                "id": 5,
-                "title": "Top Source IPs (Failed Logins)",
-                "type": "table",
-                "targets": [
-                    {
-                        "expr": "topk(10, sum(rate({job=\"journal\", service_category=\"remote_access\", level=\"error\"}[5m])) by (source_ip))",
-                        "format": "table"
-                    }
-                ],
-                "fieldConfig": {
-                    "defaults": {
-                        "custom": {
-                            "align": "left"
-                        }
-                    }
-                },
-                "gridPos": {
-                    "h": 8,
-                    "w": 12,
-                    "x": 0,
-                    "y": 8
-                }
-            },
-            {
-                "id": 6,
-                "title": "Firewall Events by Action",
-                "type": "piechart",
-                "targets": [
-                    {
-                        "expr": "sum(rate({job=\"journal\", log_category=\"firewall\"}[5m])) by (action)",
-                        "legendFormat": "{{action}}"
-                    }
-                ],
-                "fieldConfig": {
-                    "defaults": {
-                        "color": {
-                            "mode": "palette-classic"
-                        }
-                    }
-                },
-                "gridPos": {
-                    "h": 8,
-                    "w": 12,
-                    "x": 12,
-                    "y": 8
-                }
-            },
-            {
-                "id": 7,
-                "title": "Security Events by Category",
-                "type": "barchart",
-                "targets": [
-                    {
-                        "expr": "sum(rate({job=\"journal\", level=\"error\"}[5m])) by (service_category)",
-                        "legendFormat": "{{service_category}}"
-                    }
-                ],
-                "fieldConfig": {
-                    "defaults": {
-                        "color": {
-                            "mode": "palette-classic"
-                        }
-                    }
-                },
-                "gridPos": {
-                    "h": 8,
-                    "w": 12,
-                    "x": 0,
-                    "y": 16
-                }
-            },
-            {
-                "id": 8,
-                "title": "Recent Security Alerts",
-                "type": "logs",
-                "targets": [
-                    {
-                        "expr": "{job=\"journal\", level=\"error\"} |= \"security\" | json",
-                        "refId": "A"
-                    }
-                ],
-                "fieldConfig": {
-                    "defaults": {
-                        "custom": {
-                            "lineWidth": 1
-                        }
-                    }
-                },
-                "gridPos": {
-                    "h": 8,
-                    "w": 12,
-                    "x": 12,
-                    "y": 16
-                }
-            }
-        ],
-        "time": {
-            "from": "now-1h",
-            "to": "now"
-        },
-        "refresh": "30s"
+  "id": null,
+  "title": "Security Monitoring",
+  "tags": [
+    "security",
+    "monitoring",
+    "logs"
+  ],
+  "style": "dark",
+  "timezone": "browser",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Failed Login Attempts",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "sum(rate({job=\"journal\", service_category=\"remote_access\", level=\"error\"}[5m]))",
+          "legendFormat": "Failed Logins/sec"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 5
+              },
+              {
+                "color": "red",
+                "value": 20
+              }
+            ]
+          }
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": 2,
+      "title": "Firewall Block Events",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "sum(rate({job=\"journal\", log_category=\"firewall\", level=\"warning\"}[5m]))",
+          "legendFormat": "Blocks/sec"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 10
+              },
+              {
+                "color": "red",
+                "value": 50
+              }
+            ]
+          }
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      }
+    },
+    {
+      "id": 3,
+      "title": "SSL/TLS Errors",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "sum(rate({job=\"journal\", level=\"error\"} =~ \".*SSL.*|.*TLS.*\" [5m]))",
+          "legendFormat": "SSL Errors/sec"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 3
+              },
+              {
+                "color": "red",
+                "value": 10
+              }
+            ]
+          }
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      }
+    },
+    {
+      "id": 4,
+      "title": "Authentication Events Timeline",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum(rate({job=\"journal\", service_category=\"remote_access\"}[5m])) by (level)",
+          "legendFormat": "{{level}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 18,
+        "y": 0
+      }
+    },
+    {
+      "id": 5,
+      "title": "Top Source IPs (Failed Logins)",
+      "type": "table",
+      "targets": [
+        {
+          "expr": "topk(10, sum(rate({job=\"journal\", service_category=\"remote_access\", level=\"error\"}[5m])) by (source_ip))",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "left"
+          }
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      }
+    },
+    {
+      "id": 6,
+      "title": "Firewall Events by Action",
+      "type": "piechart",
+      "targets": [
+        {
+          "expr": "sum(rate({job=\"journal\", log_category=\"firewall\"}[5m])) by (action)",
+          "legendFormat": "{{action}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      }
+    },
+    {
+      "id": 7,
+      "title": "Security Events by Category",
+      "type": "barchart",
+      "targets": [
+        {
+          "expr": "sum(rate({job=\"journal\", level=\"error\"}[5m])) by (service_category)",
+          "legendFormat": "{{service_category}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      }
+    },
+    {
+      "id": 8,
+      "title": "Recent Security Alerts",
+      "type": "logs",
+      "targets": [
+        {
+          "expr": "{job=\"journal\", level=\"error\"} |= \"security\" | json",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "lineWidth": 1
+          }
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      }
     }
+  ],
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "refresh": "30s"
 }
