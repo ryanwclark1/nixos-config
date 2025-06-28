@@ -50,6 +50,25 @@ prometheus.remote_write "local" {
 // RELABELING RULES
 // =============================================================================
 
+// Volume filter for journal logs to reduce ingestion rate
+loki.relabel "journal_volume_filter" {
+  forward_to = []  // This is used only for rules
+  
+  // Drop debug and info level logs to reduce volume
+  rule {
+    source_labels = ["__journal_priority"]
+    regex = "[5-7]"  // 5=notice, 6=info, 7=debug
+    action = "drop"
+  }
+  
+  // Drop noisy services that generate too many logs
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    regex = "(systemd-journal|systemd-logind|NetworkManager|chronyd|audit)\\.service"
+    action = "drop"
+  }
+}
+
 // Enhanced relabel rules for journal logs
 loki.relabel "journal" {
   forward_to = [
@@ -784,7 +803,7 @@ prometheus.relabel "cadvisor_metrics" {
 // Journal source for reading systemd journal logs with enhanced relabeling
 loki.source.journal "read" {
   forward_to = [
-    loki.process.journal_parser.receiver,
+    loki.relabel.journal_volume_filter.receiver,
   ]
   labels = {
     "job" = "journal",
