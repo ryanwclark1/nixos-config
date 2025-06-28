@@ -20,10 +20,23 @@
 // REMOTE WRITE CONFIGURATIONS
 // =============================================================================
 
-// Loki remote write for log aggregation
+// Loki remote write for log aggregation with rate limiting
 loki.write "local" {
   endpoint {
     url = "http://woody:3100/loki/api/v1/push"
+    
+    // Batch configuration to reduce request rate
+    batch_wait = "5s"
+    batch_size = "1MB"
+    
+    // Timeout configuration
+    timeout = "10s"
+    
+    // Retry configuration
+    retry_on_http_429 = true
+    min_backoff = "1s"
+    max_backoff = "30s"
+    max_retries = 10
   }
 
   // Buffer configuration for log reliability
@@ -31,6 +44,12 @@ loki.write "local" {
     "host" = "woody",
     "component" = "alloy",
     "environment" = "production",
+  }
+  
+  // WAL configuration to handle bursts
+  wal {
+    enabled = true
+    max_segment_age = "1h"
   }
 }
 
@@ -52,7 +71,9 @@ prometheus.remote_write "local" {
 
 // Volume filter for journal logs to reduce ingestion rate
 loki.relabel "journal_volume_filter" {
-  forward_to = []  // This is used only for rules
+  forward_to = [
+    loki.process.journal_parser.receiver,
+  ]
   
   // Drop debug and info level logs to reduce volume
   rule {
@@ -65,6 +86,14 @@ loki.relabel "journal_volume_filter" {
   rule {
     source_labels = ["__journal__systemd_unit"]
     regex = "(systemd-journal|systemd-logind|NetworkManager|chronyd|audit)\\.service"
+    action = "drop"
+  }
+  
+  // Also drop repetitive kernel messages (info/debug only)
+  rule {
+    source_labels = ["__journal__comm", "__journal_priority"]
+    regex = "kernel;[6-7]"
+    separator = ";"
     action = "drop"
   }
 }
