@@ -102,36 +102,36 @@ groups:
 
       # Disk space critical
       - alert: DiskSpaceCritical
-        expr: sum(rate({job="journal", level="error"} =~ ".*No space left on device.*" [5m])) > 0
+        expr: (node_filesystem_avail_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"} / node_filesystem_size_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"}) < 0.05
         for: 1m
         labels:
           severity: critical
           component: system
         annotations:
           summary: "Disk space critical on {{ $labels.host }}"
-          description: "No space left on device error detected on {{ $labels.host }}"
+          description: "Filesystem {{ $labels.mountpoint }} has less than 5% space available on {{ $labels.host }}"
 
       # Network interface errors
       - alert: NetworkInterfaceErrors
-        expr: sum(rate({job="journal", log_category="system", level="error"} =~ ".*network.*" [5m])) > 5
+        expr: rate(node_network_receive_errs_total[5m]) > 0 or rate(node_network_transmit_errs_total[5m]) > 0
         for: 2m
         labels:
           severity: warning
           component: network
         annotations:
           summary: "Network interface errors on {{ $labels.host }}"
-          description: "Network interface errors detected on {{ $labels.host }}"
+          description: "Network interface {{ $labels.device }} is experiencing errors on {{ $labels.host }}"
 
-      # SSL/TLS errors
-      - alert: SSLTLSErrors
-        expr: sum(rate({job="journal", level="error"} =~ ".*SSL.*|.*TLS.*" [5m])) > 3
+      # SSL/TLS certificate expiry
+      - alert: SSLCertificateExpiringSoon
+        expr: probe_ssl_earliest_cert_expiry - time() < 86400 * 7
         for: 2m
         labels:
           severity: warning
           component: security
         annotations:
-          summary: "SSL/TLS errors on {{ $labels.host }}"
-          description: "SSL/TLS errors detected on {{ $labels.host }}"
+          summary: "SSL certificate expiring soon on {{ $labels.instance }}"
+          description: "SSL certificate for {{ $labels.instance }} will expire in less than 7 days"
 
       # Application errors
       - alert: ApplicationErrors
