@@ -179,20 +179,13 @@
         feedback_links_enabled = false;
       };
 
-      # Alerting settings
-      alerting = {
-        enabled = true;
-        execute_alerts = true;
-        error_or_timeout = "30s";
-        nodata_or_nullvalues = "alerting";
-        evaluation_timeout_seconds = 30;
-        notification_timeout_seconds = 30;
-        max_attempts = 3;
-      };
-
-      # Unified alerting (Grafana 8+)
+      # Unified alerting (Grafana 9+)
       unified_alerting = {
         enabled = true;
+        execute_alerts = true;
+        evaluation_timeout = "30s";
+        notification_timeout = "30s";
+        max_attempts = 3;
       };
 
       # Security settings
