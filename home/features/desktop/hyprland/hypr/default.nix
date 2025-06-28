@@ -43,7 +43,7 @@
     };
     portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
     plugins = [
-      # inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}.hyprexpo
+      inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}.hyprexpo
       # inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}.hyprwinwrap
     ];
     settings ={
@@ -65,6 +65,8 @@
         "~/.config/hypr/conf/window.conf"
         "~/.config/hypr/conf/windowrule.conf"
         "~/.config/hypr/conf/workspace.conf"
+        "~/.config/hypr/conf/plugin-hyprexpo.conf"
+        "~/.config/hypr/conf/host-specific.conf"
       ];
     };
   };

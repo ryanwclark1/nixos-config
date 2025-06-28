@@ -53,6 +53,7 @@
     ./features/zoxide
 
     ./features/desktop/hyprland
+    ./features/desktop/hyprland/host-specific/frametop.nix
     # ./features/desktop/gnome
     ./features/desktop/common
   ];

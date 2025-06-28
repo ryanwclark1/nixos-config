@@ -60,6 +60,7 @@
     ./features/zoxide
 
     ./features/desktop/hyprland
+    ./features/desktop/hyprland/host-specific/woody.nix
     # ./features/desktop/gnome
     ./features/desktop/common
   ];
