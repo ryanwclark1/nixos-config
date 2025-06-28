@@ -35,6 +35,14 @@
     ];
   };
 
+  # Give Alloy supplementary groups to read process and system information
+  systemd.services.alloy.serviceConfig = {
+    SupplementaryGroups = [ "proc" "systemd-journal" "docker" ];
+    # Add capabilities for process monitoring
+    AmbientCapabilities = [ "CAP_SYS_PTRACE" "CAP_DAC_READ_SEARCH" ];
+    CapabilityBoundingSet = [ "CAP_SYS_PTRACE" "CAP_DAC_READ_SEARCH" ];
+  };
+
   # Create alloy user and group with enhanced security
   # users.users.alloy = {
   #   isSystemUser = true;
