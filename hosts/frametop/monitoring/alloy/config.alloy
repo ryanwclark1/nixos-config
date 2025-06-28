@@ -17,6 +17,15 @@
 // =============================================================================
 
 // =============================================================================
+// HTTP SERVER CONFIGURATION
+// =============================================================================
+
+// Configure Alloy's internal HTTP server for metrics and debugging
+// The Alloy server exposes its own metrics on this endpoint
+prometheus.exporter.self "default" {
+}
+
+// =============================================================================
 // REMOTE WRITE CONFIGURATIONS
 // =============================================================================
 
@@ -832,12 +841,7 @@ loki.source.docker "docker" {
 
 // Self-monitoring for Alloy health and performance
 prometheus.scrape "self" {
-  targets = [
-    {
-      "__address__" = "127.0.0.1:12345",
-      "job" = "alloy_self",
-    },
-  ]
+  targets = prometheus.exporter.self.default.targets
   forward_to = [
     prometheus.remote_write.local.receiver,
   ]
@@ -845,6 +849,7 @@ prometheus.scrape "self" {
   scrape_timeout = "10s"
   honor_labels = true
   honor_timestamps = true
+  job_name = "alloy_self"
   metrics_path = "/metrics"
   scheme = "http"
 }
