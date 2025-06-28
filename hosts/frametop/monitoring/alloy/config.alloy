@@ -1111,31 +1111,34 @@ prometheus.scrape "blackbox_icmp" {
 }
 
 // SNMP exporter for network devices
-prometheus.exporter.snmp "snmp" {
-  config_file = "/etc/alloy/snmp.yml"
-}
+// Note: Disabled due to configuration format issues
+// TODO: Fix SNMP exporter configuration for Alloy
+// prometheus.exporter.snmp "snmp" {
+//   config_file = "/etc/alloy/snmp.yml"
+// }
 
-prometheus.scrape "snmp" {
-  targets = [
-    // Ubiquiti Gateway/Router
-    {"__address__" = "10.10.100.1", "module" = "default", "community" = "public"},
-
-    // Add your other Ubiquiti devices here:
-    // {"__address__" = "10.10.100.2", "module" = "default", "community" = "public"}, // UniFi AP
-    // {"__address__" = "10.10.100.3", "module" = "default", "community" = "public"}, // UniFi Switch
-    // {"__address__" = "10.10.100.4", "module" = "default", "community" = "public"}, // Another AP
-    // {"__address__" = "10.10.100.5", "module" = "default", "community" = "public"}, // Another Switch
-  ]
-  forward_to = [
-    prometheus.relabel.snmp_metrics.receiver,
-  ]
-  scrape_interval = "60s"
-  scrape_timeout = "30s"
-  honor_labels = true
-  honor_timestamps = true
-  metrics_path = "/metrics"
-  scheme = "http"
-}
+// SNMP scraping - disabled until exporter is properly configured
+// prometheus.scrape "snmp" {
+//   targets = [
+//     // Ubiquiti Gateway/Router
+//     {"__address__" = "10.10.100.1", "module" = "default", "community" = "public"},
+//
+//     // Add your other Ubiquiti devices here:
+//     // {"__address__" = "10.10.100.2", "module" = "default", "community" = "public"}, // UniFi AP
+//     // {"__address__" = "10.10.100.3", "module" = "default", "community" = "public"}, // UniFi Switch
+//     // {"__address__" = "10.10.100.4", "module" = "default", "community" = "public"}, // Another AP
+//     // {"__address__" = "10.10.100.5", "module" = "default", "community" = "public"}, // Another Switch
+//   ]
+//   forward_to = [
+//     prometheus.relabel.snmp_metrics.receiver,
+//   ]
+//   scrape_interval = "60s"
+//   scrape_timeout = "30s"
+//   honor_labels = true
+//   honor_timestamps = true
+//   metrics_path = "/metrics"
+//   scheme = "http"
+// }
 
 // DNS-based service discovery for external services
 // TODO: DNS discovery is not yet implemented in Alloy
