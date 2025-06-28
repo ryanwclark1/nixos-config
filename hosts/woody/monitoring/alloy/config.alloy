@@ -796,7 +796,7 @@ loki.source.journal "read" {
 
 // File source for reading application logs with enhanced configuration
 loki.source.file "local_files" {
-  targets = discovery.relabel.filtered_log_files.targets
+  targets = discovery.relabel.filtered_log_files.output
   forward_to = [
     loki.process.json_parser.receiver,
     loki.process.auth_log_parser.receiver,
@@ -1019,7 +1019,7 @@ prometheus.exporter.process "process" {
 }
 
 prometheus.scrape "process" {
-  targets = discovery.relabel.filtered_processes.targets
+  targets = discovery.relabel.filtered_processes.output
   forward_to = [
     prometheus.relabel.process_metrics.receiver,
   ]
@@ -1032,26 +1032,27 @@ prometheus.scrape "process" {
 }
 
 // Filter DNS-discovered services
-discovery.relabel "filtered_external_services" {
-  targets = discovery.dns.external_services.targets
-
-  rule {
-    source_labels = ["__meta_dns_name"]
-    target_label = "__param_target"
-  }
-  rule {
-    source_labels = ["__meta_dns_name"]
-    target_label = "instance"
-  }
-  rule {
-    source_labels = ["__meta_dns_name"]
-    target_label = "service_name"
-  }
-  rule {
-    source_labels = ["__meta_dns_srv_record_target"]
-    target_label = "target"
-  }
-}
+// Commented out since DNS discovery is disabled
+// discovery.relabel "filtered_external_services" {
+//   targets = discovery.dns.external_services.output
+// 
+//   rule {
+//     source_labels = ["__meta_dns_name"]
+//     target_label = "__param_target"
+//   }
+//   rule {
+//     source_labels = ["__meta_dns_name"]
+//     target_label = "instance"
+//   }
+//   rule {
+//     source_labels = ["__meta_dns_name"]
+//     target_label = "service_name"
+//   }
+//   rule {
+//     source_labels = ["__meta_dns_srv_record_target"]
+//     target_label = "target"
+//   }
+// }
 
 // cAdvisor exporter for container metrics
 prometheus.exporter.cadvisor "cadvisor" {
@@ -1120,44 +1121,45 @@ prometheus.scrape "blackbox" {
 }
 
 // SNMP exporter for network devices
-prometheus.exporter.snmp "snmp" {
-  config_file = "/etc/alloy/snmp.yml"
-}
+// Commented out - SNMP config format needs to be updated for Alloy
+// prometheus.exporter.snmp "snmp" {
+//   config_file = "/etc/alloy/snmp.yml"
+// }
 
-prometheus.scrape "snmp" {
-  targets = [
-    // Ubiquiti Gateway/Router
-    {"__address__" = "10.10.100.1", "module" = "default", "community" = "public"},
-
-    // Add your other Ubiquiti devices here:
-    // {"__address__" = "10.10.100.2", "module" = "default", "community" = "public"}, // UniFi AP
-    // {"__address__" = "10.10.100.3", "module" = "default", "community" = "public"}, // UniFi Switch
-    // {"__address__" = "10.10.100.4", "module" = "default", "community" = "public"}, // Another AP
-    // {"__address__" = "10.10.100.5", "module" = "default", "community" = "public"}, // Another Switch
-  ]
-  forward_to = [
-    prometheus.relabel.snmp_metrics.receiver,
-  ]
-  scrape_interval = "60s"
-  scrape_timeout = "30s"
-  honor_labels = true
-  honor_timestamps = true
-  metrics_path = "/metrics"
-  scheme = "http"
-}
+// prometheus.scrape "snmp" {
+//   targets = [
+//     // Ubiquiti Gateway/Router
+//     {"__address__" = "10.10.100.1", "module" = "default", "community" = "public"},
+//
+//     // Add your other Ubiquiti devices here:
+//     // {"__address__" = "10.10.100.2", "module" = "default", "community" = "public"}, // UniFi AP
+//     // {"__address__" = "10.10.100.3", "module" = "default", "community" = "public"}, // UniFi Switch
+//     // {"__address__" = "10.10.100.4", "module" = "default", "community" = "public"}, // Another AP
+//     // {"__address__" = "10.10.100.5", "module" = "default", "community" = "public"}, // Another Switch
+//   ]
+//   forward_to = [
+//     prometheus.relabel.snmp_metrics.receiver,
+//   ]
+//   scrape_interval = "60s"
+//   scrape_timeout = "30s"
+//   honor_labels = true
+//   honor_timestamps = true
+//   metrics_path = "/metrics"
+//   scheme = "http"
+// }
 
 // DNS-based service discovery for external services
-discovery.dns "external_services" {
-  names = [
-    "prometheus.io",
-    "grafana.com",
-    "google.com",
-    "8.8.8.8",
-    "1.1.1.1",
-  ]
-  refresh_interval = "300s"
-  type = "A"
-}
+// Commented out - DNS discovery requires port for A records
+// discovery.dns "external_services" {
+//   names = [
+//     "prometheus.io:443",
+//     "grafana.com:443",
+//     "google.com:443",
+//   ]
+//   refresh_interval = "300s"
+//   type = "A"
+//   port = 443
+// }
 
 // =============================================================================
 // LOKI PROCESSING COMPONENTS
