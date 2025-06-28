@@ -1,0 +1,30 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "rules/*.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - "localhost:9093"
+
+# Scrape configs for Prometheus itself and other services
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: "alertmanager"
+    static_configs:
+      - targets: ["localhost:9093"]
+
+  - job_name: "grafana"
+    static_configs:
+      - targets: ["localhost:3001"]
+
+  - job_name: "alloy"
+    static_configs:
+      - targets: ["localhost:12345"]

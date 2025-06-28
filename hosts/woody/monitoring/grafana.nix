@@ -10,6 +10,24 @@
     user = "grafana";
     group = "grafana";
   };
+  environment.etc."grafana/dashboards/default/enhanced-alloy-overview.json" = {
+    source = ./grafana/dashboards/default/enhanced-alloy-overview.json;
+    mode = "0750";
+    user = "grafana";
+    group = "grafana";
+  };
+  environment.etc."grafana/dashboards/default/security-monitoring.json" = {
+    source = ./grafana/dashboards/default/security-monitoring.json;
+    mode = "0750";
+    user = "grafana";
+    group = "grafana";
+  };
+  environment.etc."grafana/dashboards/default/network-monitoring.json" = {
+    source = ./grafana/dashboards/default/network-monitoring.json;
+    mode = "0750";
+    user = "grafana";
+    group = "grafana";
+  };
   environment.etc."grafana/dashboards/default/enhanced-container-monitoring.json" = {
     source = ./grafana/dashboards/default/enhanced-container-monitoring.json;
     mode = "0750";
@@ -18,6 +36,12 @@
   };
   environment.etc."grafana/dashboards/default/log-exploration.json" = {
     source = ./grafana/dashboards/default/log-exploration.json;
+    mode = "0750";
+    user = "grafana";
+    group = "grafana";
+  };
+  environment.etc."grafana/dashboards/default/multi-host-logs.json" = {
+    source = ./grafana/dashboards/default/multi-host-logs.json;
     mode = "0750";
     user = "grafana";
     group = "grafana";
@@ -46,12 +70,6 @@
     user = "grafana";
     group = "grafana";
   };
-  environment.etc."grafana/dashboards/default/multi-host-logs.json" = {
-    source = ./grafana/dashboards/default/multi-host-logs.json;
-    mode = "0750";
-    user = "grafana";
-    group = "grafana";
-  };
   environment.etc."grafana/dashboards/default/node-exporter.json" = {
     source = ./grafana/dashboards/default/node-exporter.json;
     mode = "0750";
@@ -71,6 +89,44 @@
     group = "grafana";
   };
 
+  # Alerting rules
+  environment.etc."grafana/provisioning/alerting/rules/alloy-health.yml" = {
+    source = ./grafana/provisioning/alerting/rules/alloy-health.yml;
+    mode = "0750";
+    user = "grafana";
+    group = "grafana";
+  };
+  environment.etc."grafana/provisioning/alerting/rules/system-metrics.yml" = {
+    source = ./grafana/provisioning/alerting/rules/system-metrics.yml;
+    mode = "0750";
+    user = "grafana";
+    group = "grafana";
+  };
+  environment.etc."grafana/provisioning/alerting/rules/container-metrics.yml" = {
+    source = ./grafana/provisioning/alerting/rules/container-metrics.yml;
+    mode = "0750";
+    user = "grafana";
+    group = "grafana";
+  };
+  environment.etc."grafana/provisioning/alerting/rules/network-monitoring.yml" = {
+    source = ./grafana/provisioning/alerting/rules/network-monitoring.yml;
+    mode = "0750";
+    user = "grafana";
+    group = "grafana";
+  };
+  environment.etc."grafana/provisioning/alerting/rules/log-monitoring.yml" = {
+    source = ./grafana/provisioning/alerting/rules/log-monitoring.yml;
+    mode = "0750";
+    user = "grafana";
+    group = "grafana";
+  };
+  environment.etc."grafana/provisioning/alerting/prometheus.yml" = {
+    source = ./grafana/provisioning/alerting/prometheus.yml;
+    mode = "0750";
+    user = "grafana";
+    group = "grafana";
+  };
+
   environment.etc."grafana/provisioning/dashboards/dashboards.yml" = {
     source = ./grafana/provisioning/dashboards/dashboards.yml;
     mode = "0750";
@@ -84,7 +140,6 @@
     user = "grafana";
     group = "grafana";
   };
-
 
   services.grafana = {
     enable = true;
@@ -124,6 +179,22 @@
         feedback_links_enabled = false;
       };
 
+      # Alerting settings
+      alerting = {
+        enabled = true;
+        execute_alerts = true;
+        error_or_timeout = "30s";
+        nodata_or_nullvalues = "alerting";
+        evaluation_timeout_seconds = 30;
+        notification_timeout_seconds = 30;
+        max_attempts = 3;
+      };
+
+      # Unified alerting (Grafana 8+)
+      unified_alerting = {
+        enabled = true;
+      };
+
       # Security settings
     };
 
@@ -136,7 +207,11 @@
       };
 
       dashboards = {
-        path = "/etc/grafana/dashboards";
+        path = "/etc/grafana/provisioning/dashboards";
+      };
+
+      alerting = {
+        path = "/etc/grafana/provisioning/alerting";
       };
     };
   };

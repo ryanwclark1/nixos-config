@@ -1,0 +1,440 @@
+{
+    "dashboard": {
+        "id": null,
+        "title": "Enhanced Alloy Overview",
+        "tags": [
+            "alloy",
+            "monitoring",
+            "overview"
+        ],
+        "style": "dark",
+        "timezone": "browser",
+        "panels": [
+            {
+                "id": 1,
+                "title": "Alloy Process Health",
+                "type": "stat",
+                "targets": [
+                    {
+                        "expr": "up{job=\"alloy_self\"}",
+                        "legendFormat": "Alloy Status"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "thresholds"
+                        },
+                        "thresholds": {
+                            "steps": [
+                                {
+                                    "color": "red",
+                                    "value": null
+                                },
+                                {
+                                    "color": "green",
+                                    "value": 1
+                                }
+                            ]
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 6,
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "id": 2,
+                "title": "Alloy Memory Usage",
+                "type": "stat",
+                "targets": [
+                    {
+                        "expr": "process_resident_memory_bytes{job=\"alloy_self\"} / 1024 / 1024",
+                        "legendFormat": "Memory (MB)"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "thresholds"
+                        },
+                        "thresholds": {
+                            "steps": [
+                                {
+                                    "color": "green",
+                                    "value": null
+                                },
+                                {
+                                    "color": "yellow",
+                                    "value": 512
+                                },
+                                {
+                                    "color": "red",
+                                    "value": 1024
+                                }
+                            ]
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 6,
+                    "x": 6,
+                    "y": 0
+                }
+            },
+            {
+                "id": 3,
+                "title": "Alloy CPU Usage",
+                "type": "stat",
+                "targets": [
+                    {
+                        "expr": "rate(process_cpu_seconds_total{job=\"alloy_self\"}[5m]) * 100",
+                        "legendFormat": "CPU %"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "thresholds"
+                        },
+                        "thresholds": {
+                            "steps": [
+                                {
+                                    "color": "green",
+                                    "value": null
+                                },
+                                {
+                                    "color": "yellow",
+                                    "value": 50
+                                },
+                                {
+                                    "color": "red",
+                                    "value": 80
+                                }
+                            ]
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 6,
+                    "x": 12,
+                    "y": 0
+                }
+            },
+            {
+                "id": 4,
+                "title": "Alloy Uptime",
+                "type": "stat",
+                "targets": [
+                    {
+                        "expr": "time() - process_start_time_seconds{job=\"alloy_self\"}",
+                        "legendFormat": "Uptime (seconds)"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "thresholds"
+                        },
+                        "thresholds": {
+                            "steps": [
+                                {
+                                    "color": "red",
+                                    "value": null
+                                },
+                                {
+                                    "color": "yellow",
+                                    "value": 3600
+                                },
+                                {
+                                    "color": "green",
+                                    "value": 86400
+                                }
+                            ]
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 6,
+                    "x": 18,
+                    "y": 0
+                }
+            },
+            {
+                "id": 5,
+                "title": "Remote Write Success Rate",
+                "type": "timeseries",
+                "targets": [
+                    {
+                        "expr": "rate(alloy_remote_write_succeeded_total[5m])",
+                        "legendFormat": "Success Rate"
+                    },
+                    {
+                        "expr": "rate(alloy_remote_write_failed_total[5m])",
+                        "legendFormat": "Failure Rate"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "palette-classic"
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 8
+                }
+            },
+            {
+                "id": 6,
+                "title": "Configuration Reload Status",
+                "type": "stat",
+                "targets": [
+                    {
+                        "expr": "alloy_config_last_reload_successful{job=\"alloy_self\"}",
+                        "legendFormat": "Last Reload Success"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "thresholds"
+                        },
+                        "thresholds": {
+                            "steps": [
+                                {
+                                    "color": "red",
+                                    "value": null
+                                },
+                                {
+                                    "color": "green",
+                                    "value": 1
+                                }
+                            ]
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 8
+                }
+            },
+            {
+                "id": 7,
+                "title": "Metrics Collection Status",
+                "type": "stat",
+                "targets": [
+                    {
+                        "expr": "up{job=\"unix\"}",
+                        "legendFormat": "Unix Exporter"
+                    },
+                    {
+                        "expr": "up{job=\"process\"}",
+                        "legendFormat": "Process Exporter"
+                    },
+                    {
+                        "expr": "up{job=\"cadvisor\"}",
+                        "legendFormat": "cAdvisor"
+                    },
+                    {
+                        "expr": "up{job=\"snmp\"}",
+                        "legendFormat": "SNMP Exporter"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "thresholds"
+                        },
+                        "thresholds": {
+                            "steps": [
+                                {
+                                    "color": "red",
+                                    "value": null
+                                },
+                                {
+                                    "color": "green",
+                                    "value": 1
+                                }
+                            ]
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 16
+                }
+            },
+            {
+                "id": 8,
+                "title": "Log Collection Status",
+                "type": "stat",
+                "targets": [
+                    {
+                        "expr": "up{job=\"journal\"}",
+                        "legendFormat": "Journal Logs"
+                    },
+                    {
+                        "expr": "up{job=\"docker\"}",
+                        "legendFormat": "Docker Logs"
+                    },
+                    {
+                        "expr": "up{job=\"file_logs\"}",
+                        "legendFormat": "File Logs"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "thresholds"
+                        },
+                        "thresholds": {
+                            "steps": [
+                                {
+                                    "color": "red",
+                                    "value": null
+                                },
+                                {
+                                    "color": "green",
+                                    "value": 1
+                                }
+                            ]
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 16
+                }
+            },
+            {
+                "id": 9,
+                "title": "Alloy Performance Metrics",
+                "type": "timeseries",
+                "targets": [
+                    {
+                        "expr": "rate(alloy_remote_write_succeeded_total[5m])",
+                        "legendFormat": "Remote Write Success/sec"
+                    },
+                    {
+                        "expr": "rate(alloy_remote_write_failed_total[5m])",
+                        "legendFormat": "Remote Write Failures/sec"
+                    },
+                    {
+                        "expr": "rate(process_cpu_seconds_total{job=\"alloy_self\"}[5m])",
+                        "legendFormat": "CPU Usage/sec"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "palette-classic"
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 24
+                }
+            },
+            {
+                "id": 10,
+                "title": "Alloy Resource Usage",
+                "type": "timeseries",
+                "targets": [
+                    {
+                        "expr": "process_resident_memory_bytes{job=\"alloy_self\"} / 1024 / 1024",
+                        "legendFormat": "Memory Usage (MB)"
+                    },
+                    {
+                        "expr": "process_open_fds{job=\"alloy_self\"}",
+                        "legendFormat": "Open File Descriptors"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "palette-classic"
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 24
+                }
+            },
+            {
+                "id": 11,
+                "title": "Component Health Overview",
+                "type": "table",
+                "targets": [
+                    {
+                        "expr": "up",
+                        "format": "table"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "custom": {
+                            "align": "left"
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 32
+                }
+            },
+            {
+                "id": 12,
+                "title": "Recent Alloy Logs",
+                "type": "logs",
+                "targets": [
+                    {
+                        "expr": "{job=\"journal\", component=\"alloy\"} | json",
+                        "refId": "A"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "custom": {
+                            "lineWidth": 1
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 32
+                }
+            }
+        ],
+        "time": {
+            "from": "now-1h",
+            "to": "now"
+        },
+        "refresh": "30s"
+    }
+}

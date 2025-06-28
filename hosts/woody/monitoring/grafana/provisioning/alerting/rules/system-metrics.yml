@@ -1,0 +1,123 @@
+groups:
+  - name: system-metrics
+    rules:
+      # High CPU usage
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is above 80% on {{ $labels.instance }}"
+
+      # Critical CPU usage
+      - alert: CriticalCPUUsage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 95
+        for: 2m
+        labels:
+          severity: critical
+          component: system
+        annotations:
+          summary: "Critical CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is above 95% on {{ $labels.instance }}"
+
+      # High memory usage
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: "Memory usage is above 85% on {{ $labels.instance }}"
+
+      # Critical memory usage
+      - alert: CriticalMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 95
+        for: 2m
+        labels:
+          severity: critical
+          component: system
+        annotations:
+          summary: "Critical memory usage on {{ $labels.instance }}"
+          description: "Memory usage is above 95% on {{ $labels.instance }}"
+
+      # High disk usage
+      - alert: HighDiskUsage
+        expr: (node_filesystem_size_bytes - node_filesystem_free_bytes) / node_filesystem_size_bytes * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High disk usage on {{ $labels.instance }}"
+          description: "Disk usage is above 85% on {{ $labels.mountpoint }}"
+
+      # Critical disk usage
+      - alert: CriticalDiskUsage
+        expr: (node_filesystem_size_bytes - node_filesystem_free_bytes) / node_filesystem_size_bytes * 100 > 95
+        for: 2m
+        labels:
+          severity: critical
+          component: system
+        annotations:
+          summary: "Critical disk usage on {{ $labels.instance }}"
+          description: "Disk usage is above 95% on {{ $labels.mountpoint }}"
+
+      # High load average
+      - alert: HighLoadAverage
+        expr: node_load1 > count by(instance) (node_cpu_seconds_total{mode="idle"}) * 0.8
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High load average on {{ $labels.instance }}"
+          description: "Load average is above 80% of CPU cores on {{ $labels.instance }}"
+
+      # Network interface down
+      - alert: NetworkInterfaceDown
+        expr: node_network_up == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: system
+        annotations:
+          summary: "Network interface down on {{ $labels.instance }}"
+          description: "Network interface {{ $labels.device }} is down on {{ $labels.instance }}"
+
+      # High network errors
+      - alert: HighNetworkErrors
+        expr: rate(node_network_receive_errs_total[5m]) + rate(node_network_transmit_errs_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High network errors on {{ $labels.instance }}"
+          description: "Network interface {{ $labels.device }} has high error rate on {{ $labels.instance }}"
+
+      # Systemd service failed
+      - alert: SystemdServiceFailed
+        expr: node_systemd_unit_state{state="failed"} == 1
+        for: 1m
+        labels:
+          severity: critical
+          component: system
+        annotations:
+          summary: "Systemd service failed on {{ $labels.instance }}"
+          description: "Systemd service {{ $labels.name }} is in failed state on {{ $labels.instance }}"
+
+      # High file descriptor usage
+      - alert: HighFileDescriptorUsage
+        expr: node_filefd_allocated / node_filefd_maximum * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High file descriptor usage on {{ $labels.instance }}"
+          description: "File descriptor usage is above 80% on {{ $labels.instance }}"

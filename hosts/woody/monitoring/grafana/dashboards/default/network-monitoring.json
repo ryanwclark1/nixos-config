@@ -1,0 +1,329 @@
+{
+    "dashboard": {
+        "id": null,
+        "title": "Network Monitoring",
+        "tags": [
+            "network",
+            "monitoring",
+            "snmp",
+            "blackbox"
+        ],
+        "style": "dark",
+        "timezone": "browser",
+        "panels": [
+            {
+                "id": 1,
+                "title": "SNMP Device Status",
+                "type": "stat",
+                "targets": [
+                    {
+                        "expr": "up{job=\"snmp\"}",
+                        "legendFormat": "{{instance}}"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "thresholds"
+                        },
+                        "thresholds": {
+                            "steps": [
+                                {
+                                    "color": "red",
+                                    "value": null
+                                },
+                                {
+                                    "color": "green",
+                                    "value": 1
+                                }
+                            ]
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 6,
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "id": 2,
+                "title": "Blackbox Probe Success Rate",
+                "type": "stat",
+                "targets": [
+                    {
+                        "expr": "sum(up{job=~\"blackbox.*\"}) / count(up{job=~\"blackbox.*\"}) * 100",
+                        "legendFormat": "Success Rate %"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "thresholds"
+                        },
+                        "thresholds": {
+                            "steps": [
+                                {
+                                    "color": "red",
+                                    "value": null
+                                },
+                                {
+                                    "color": "yellow",
+                                    "value": 80
+                                },
+                                {
+                                    "color": "green",
+                                    "value": 95
+                                }
+                            ]
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 6,
+                    "x": 6,
+                    "y": 0
+                }
+            },
+            {
+                "id": 3,
+                "title": "Network Interface Utilization",
+                "type": "timeseries",
+                "targets": [
+                    {
+                        "expr": "rate(ifInOctets{job=\"snmp\"}[5m]) * 8 / ifSpeed{job=\"snmp\"} * 100",
+                        "legendFormat": "{{instance}} - {{ifName}} (In)"
+                    },
+                    {
+                        "expr": "rate(ifOutOctets{job=\"snmp\"}[5m]) * 8 / ifSpeed{job=\"snmp\"} * 100",
+                        "legendFormat": "{{instance}} - {{ifName}} (Out)"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "palette-classic"
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 0
+                }
+            },
+            {
+                "id": 4,
+                "title": "Network Interface Errors",
+                "type": "timeseries",
+                "targets": [
+                    {
+                        "expr": "rate(ifInErrors{job=\"snmp\"}[5m])",
+                        "legendFormat": "{{instance}} - {{ifName}} (In Errors)"
+                    },
+                    {
+                        "expr": "rate(ifOutErrors{job=\"snmp\"}[5m])",
+                        "legendFormat": "{{instance}} - {{ifName}} (Out Errors)"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "palette-classic"
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 8
+                }
+            },
+            {
+                "id": 5,
+                "title": "Probe Response Times",
+                "type": "timeseries",
+                "targets": [
+                    {
+                        "expr": "probe_duration_seconds{job=~\"blackbox.*\"}",
+                        "legendFormat": "{{instance}} - {{probe_type}}"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "palette-classic"
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 8
+                }
+            },
+            {
+                "id": 6,
+                "title": "HTTP Status Codes",
+                "type": "stat",
+                "targets": [
+                    {
+                        "expr": "probe_http_status_code{job=~\"blackbox.*\"}",
+                        "legendFormat": "{{instance}} - {{status_code}}"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "thresholds"
+                        },
+                        "thresholds": {
+                            "steps": [
+                                {
+                                    "color": "red",
+                                    "value": null
+                                },
+                                {
+                                    "color": "yellow",
+                                    "value": 200
+                                },
+                                {
+                                    "color": "green",
+                                    "value": 299
+                                }
+                            ]
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 6,
+                    "x": 0,
+                    "y": 16
+                }
+            },
+            {
+                "id": 7,
+                "title": "SSL Certificate Expiry",
+                "type": "stat",
+                "targets": [
+                    {
+                        "expr": "probe_ssl_earliest_cert_expiry{job=~\"blackbox.*\"} - time()",
+                        "legendFormat": "{{instance}} - Days to Expiry"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "thresholds"
+                        },
+                        "thresholds": {
+                            "steps": [
+                                {
+                                    "color": "red",
+                                    "value": null
+                                },
+                                {
+                                    "color": "yellow",
+                                    "value": 2592000
+                                },
+                                {
+                                    "color": "green",
+                                    "value": 7776000
+                                }
+                            ]
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 6,
+                    "x": 6,
+                    "y": 16
+                }
+            },
+            {
+                "id": 8,
+                "title": "Network Interface Status",
+                "type": "table",
+                "targets": [
+                    {
+                        "expr": "ifOperStatus{job=\"snmp\"}",
+                        "format": "table"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "custom": {
+                            "align": "left"
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 16
+                }
+            },
+            {
+                "id": 9,
+                "title": "Top Network Interfaces by Traffic",
+                "type": "barchart",
+                "targets": [
+                    {
+                        "expr": "topk(10, rate(ifInOctets{job=\"snmp\"}[5m]) + rate(ifOutOctets{job=\"snmp\"}[5m]))",
+                        "legendFormat": "{{instance}} - {{ifName}}"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "palette-classic"
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 24
+                }
+            },
+            {
+                "id": 10,
+                "title": "Probe Failures by Type",
+                "type": "piechart",
+                "targets": [
+                    {
+                        "expr": "sum(up{job=~\"blackbox.*\"} == 0) by (probe_type)",
+                        "legendFormat": "{{probe_type}}"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "palette-classic"
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 24
+                }
+            }
+        ],
+        "time": {
+            "from": "now-1h",
+            "to": "now"
+        },
+        "refresh": "30s"
+    }
+}

@@ -1,0 +1,112 @@
+groups:
+  - name: container-metrics
+    rules:
+      # Container down
+      - alert: ContainerDown
+        expr: absent(container_last_seen)
+        for: 1m
+        labels:
+          severity: critical
+          component: container
+        annotations:
+          summary: "Container down on {{ $labels.instance }}"
+          description: "Container {{ $labels.name }} is down on {{ $labels.instance }}"
+
+      # High container CPU usage
+      - alert: HighContainerCPUUsage
+        expr: (rate(container_cpu_usage_seconds_total{name!=""}[5m]) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: container
+        annotations:
+          summary: "High CPU usage in container on {{ $labels.instance }}"
+          description: "Container {{ $labels.name }} CPU usage is above 80% on {{ $labels.instance }}"
+
+      # Critical container CPU usage
+      - alert: CriticalContainerCPUUsage
+        expr: (rate(container_cpu_usage_seconds_total{name!=""}[5m]) * 100) > 95
+        for: 2m
+        labels:
+          severity: critical
+          component: container
+        annotations:
+          summary: "Critical CPU usage in container on {{ $labels.instance }}"
+          description: "Container {{ $labels.name }} CPU usage is above 95% on {{ $labels.instance }}"
+
+      # High container memory usage
+      - alert: HighContainerMemoryUsage
+        expr: (container_memory_usage_bytes{name!=""} / container_spec_memory_limit_bytes{name!=""}) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          component: container
+        annotations:
+          summary: "High memory usage in container on {{ $labels.instance }}"
+          description: "Container {{ $labels.name }} memory usage is above 85% on {{ $labels.instance }}"
+
+      # Critical container memory usage
+      - alert: CriticalContainerMemoryUsage
+        expr: (container_memory_usage_bytes{name!=""} / container_spec_memory_limit_bytes{name!=""}) * 100 > 95
+        for: 2m
+        labels:
+          severity: critical
+          component: container
+        annotations:
+          summary: "Critical memory usage in container on {{ $labels.instance }}"
+          description: "Container {{ $labels.name }} memory usage is above 95% on {{ $labels.instance }}"
+
+      # Container OOM killed
+      - alert: ContainerOOMKilled
+        expr: increase(container_oom_events_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          component: container
+        annotations:
+          summary: "Container OOM killed on {{ $labels.instance }}"
+          description: "Container {{ $labels.name }} was killed due to OOM on {{ $labels.instance }}"
+
+      # High container restart rate
+      - alert: HighContainerRestartRate
+        expr: increase(container_start_time_seconds[5m]) > 5
+        for: 5m
+        labels:
+          severity: warning
+          component: container
+        annotations:
+          summary: "High container restart rate on {{ $labels.instance }}"
+          description: "Container {{ $labels.name }} has restarted more than 5 times in 5 minutes on {{ $labels.instance }}"
+
+      # Container health check failed
+      - alert: ContainerHealthCheckFailed
+        expr: container_health_status{name!=""} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: container
+        annotations:
+          summary: "Container health check failed on {{ $labels.instance }}"
+          description: "Container {{ $labels.name }} health check is failing on {{ $labels.instance }}"
+
+      # High container network errors
+      - alert: HighContainerNetworkErrors
+        expr: rate(container_network_receive_errors_total{name!=""}[5m]) + rate(container_network_transmit_errors_total{name!=""}[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+          component: container
+        annotations:
+          summary: "High network errors in container on {{ $labels.instance }}"
+          description: "Container {{ $labels.name }} has high network error rate on {{ $labels.instance }}"
+
+      # Container disk I/O high
+      - alert: HighContainerDiskIO
+        expr: rate(container_fs_reads_total{name!=""}[5m]) + rate(container_fs_writes_total{name!=""}[5m]) > 1000
+        for: 5m
+        labels:
+          severity: warning
+          component: container
+        annotations:
+          summary: "High disk I/O in container on {{ $labels.instance }}"
+          description: "Container {{ $labels.name }} has high disk I/O rate on {{ $labels.instance }}"
