@@ -4,6 +4,91 @@ loki.write "local" {
   }
 }
 
+// PROMETHEUS CONFIGURATION
+// =============================================================================
+
+// Prometheus remote write for metrics with retry and timeout
+prometheus.remote_write "local" {
+  endpoint {
+    url = "http://woody:9090/api/v1/write"
+  }
+  external_labels = {
+    "host" = "woody",
+    "component" = "alloy",
+    "environment" = "production",
+  }
+}
+
+// =============================================================================
+// RELABELING RULES
+// =============================================================================
+
+// Enhanced relabel rules for journal logs
+loki.relabel "journal" {
+  forward_to = []
+
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    target_label  = "unit"
+  }
+  rule {
+    source_labels = ["__journal__boot_id"]
+    target_label  = "boot_id"
+  }
+  rule {
+    source_labels = ["__journal__transport"]
+    target_label  = "transport"
+  }
+  rule {
+    source_labels = ["__journal_priority_keyword"]
+    target_label  = "level"
+  }
+  rule {
+    source_labels = ["__journal__hostname"]
+    target_label  = "instance"
+  }
+  rule {
+    source_labels = ["__journal__machine_id"]
+    target_label  = "machine_id"
+  }
+  rule {
+    source_labels = ["__journal__user_id"]
+    target_label  = "user_id"
+  }
+  rule {
+    source_labels = ["__journal__user_name"]
+    target_label  = "user_name"
+  }
+  rule {
+    source_labels = ["__journal__session_id"]
+    target_label  = "session_id"
+  }
+  rule {
+    source_labels = ["__journal__slice"]
+    target_label  = "slice"
+  }
+  rule {
+    source_labels = ["__journal__invocation_id"]
+    target_label  = "invocation_id"
+  }
+  rule {
+    source_labels = ["__journal__message_id"]
+    target_label  = "message_id"
+  }
+  rule {
+    source_labels = ["__journal__cursor"]
+    target_label  = "cursor"
+  }
+  rule {
+    source_labels = ["__journal__realtime_timestamp"]
+    target_label  = "realtime_timestamp"
+  }
+  rule {
+    source_labels = ["__journal__monotonic_timestamp"]
+    target_label  = "monotonic_timestamp"
+  }
+}
+
 // Relabel rules for file logs
 loki.relabel "file_logs" {
   forward_to = []
@@ -48,6 +133,10 @@ loki.relabel "log_level" {
   }
 }
 
+// =============================================================================
+// LOG SOURCES
+// =============================================================================
+
 // Journal source for reading systemd journal logs with enhanced relabeling
 loki.source.journal "read" {
   forward_to = [
@@ -63,84 +152,18 @@ loki.source.journal "read" {
     "component" = "alloy",
     "source" = "systemd-journal",
   }
-  // Enhanced journal configuration
-  // journal {
-  //   json = false
-  //   max_age = "12h"
-  //   path = "/var/log/journal"
-  //   matches = [
-  //     "_SYSTEMD_UNIT=systemd-*",
-  //     "_SYSTEMD_UNIT=*.service",
-  //     "_SYSTEMD_UNIT=*.socket",
-  //     "_SYSTEMD_UNIT=*.timer",
-  //   ]
-  // }
-}
-
-// Enhanced file source patterns for application logs
-local.file_match "applogs" {
-  path_targets = [
-    // System logs
-    {"__path__" = "/var/log/*.log"},
-    {"__path__" = "/var/log/syslog"},
-    {"__path__" = "/var/log/auth.log"},
-    {"__path__" = "/var/log/kern.log"},
-    {"__path__" = "/var/log/dmesg"},
-    {"__path__" = "/var/log/daemon.log"},
-    {"__path__" = "/var/log/messages"},
-
-    // Application specific logs
-    {"__path__" = "/var/log/postgresql/*.log"},
-
-    // Docker logs
-    {"__path__" = "/var/lib/docker/containers/*/*.log"},
-
-    // Custom application logs
-    {"__path__" = "/var/log/applications/*.log"},
-    {"__path__" = "/opt/*/logs/*.log"},
-
-    // Security logs
-    {"__path__" = "/var/log/audit/audit.log"},
-    {"__path__" = "/var/log/fail2ban.log"},
-
-    // Network logs
-    {"__path__" = "/var/log/ufw.log"},
-    {"__path__" = "/var/log/iptables.log"},
-  ]
 }
 
 // File source for reading application logs with enhanced configuration
 loki.source.file "local_files" {
-  targets = local.file_match.applogs.targets
-  forward_to = [
-    loki.write.local.receiver,
-  ]
-  // relabel_rules = [
-  //   loki.relabel.file_logs.rules,
-  //   loki.relabel.log_level.rules,
-  // ]
-  // labels = {
-  //   "job" = "varlogs",
-  //   "host" = "woody",
-  //   "component" = "alloy",
-  //   "source" = "file",
-  // }
-  // Enhanced file reading configuration
-  // positions_directory = "/var/lib/alloy/positions"
-  // encoding = "utf-8"
-  // follow_symlinks = true
-  // read_from_beginning = false
-  // // Rate limiting to prevent overwhelming the system
-  // rate_limiter {
-  //   enabled = true
-  //   rate = 10000
-  //   burst = 20000
-  // }
+  targets = discovery.relabel.filtered_log_files.targets
+  forward_to = [loki.write.local.receiver]
 }
 
 // Docker container logs source
 loki.source.docker "docker" {
   host = "unix:///var/run/docker.sock"
+  targets = []
   forward_to = [
     loki.write.local.receiver,
   ]
@@ -186,7 +209,7 @@ prometheus.exporter.unix "unix" {
     "xfs",
     "zfs",
   ]
-  enabled_collectors = [
+  enable_collectors = [
     "cpu",
     "diskstats",
     "filefd",
@@ -239,15 +262,14 @@ prometheus.scrape "unix" {
   honor_timestamps = true
   metrics_path = "/metrics"
   scheme = "http"
-  labels = {
-    "job" = "unix",
-  }
 }
+
+// =============================================================================
+// DISCOVERY COMPONENTS
+// =============================================================================
 
 // Discover all processes
 discovery.process "all_processes" {
-  procfs = "/proc"
-  cgroupfs = "/sys/fs/cgroup"
 }
 
 // Filter processes for monitoring
@@ -256,23 +278,100 @@ discovery.relabel "filtered_processes" {
 
   rule {
     action = "keep"
-    regex = "^(prometheus|grafana|node_exporter|systemd_exporter|cadvisor|process_exporter)$"
+    regex = "^(prometheus|grafana|node_exporter|systemd_exporter|cadvisor|process_exporter|alloy)$"
     source_labels = ["__meta_process_name"]
+  }
+}
+
+// Discover Docker containers for enhanced monitoring
+discovery.docker "docker_containers" {
+  host = "unix:///var/run/docker.sock"
+  refresh_interval = "30s"
+}
+
+// Filter Docker containers for monitoring
+discovery.relabel "filtered_docker_containers" {
+  targets = discovery.docker.docker_containers.targets
+
+  rule {
+    action = "keep"
+    regex = ".*"
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    target_label = "container_name"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_image"]
+    target_label = "container_image"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    target_label = "service"
+  }
+}
+
+// Discover log files dynamically
+discovery.file "log_files" {
+  files = [
+    "/var/log/*.log",
+    "/var/log/syslog",
+    "/var/log/auth.log",
+    "/var/log/kern.log",
+    "/var/log/dmesg",
+    "/var/log/daemon.log",
+    "/var/log/messages",
+    "/var/log/postgresql/*.log",
+    "/var/lib/docker/containers/*/*.log",
+    "/var/log/applications/*.log",
+    "/opt/*/logs/*.log",
+    "/var/log/audit/audit.log",
+    "/var/log/fail2ban.log",
+    "/var/log/ufw.log",
+    "/var/log/iptables.log",
+  ]
+  refresh_interval = "60s"
+}
+
+// Filter discovered log files
+discovery.relabel "filtered_log_files" {
+  targets = discovery.file.log_files.targets
+
+  rule {
+    source_labels = ["__path__"]
+    target_label = "file_path"
+  }
+
+  rule {
+    source_labels = ["__filename__"]
+    target_label = "filename"
+  }
+
+  rule {
+    source_labels = ["__path__"]
+    regex = ".*/([^/]+)\\.log"
+    target_label = "service"
+    replacement = "$1"
+  }
+
+  rule {
+    source_labels = ["__path__"]
+    regex = ".*/docker/containers/([^/]+)/.*"
+    target_label = "container_id"
+    replacement = "$1"
   }
 }
 
 // Process exporter for detailed process monitoring
 prometheus.exporter.process "process" {
-  targets = discovery.relabel.filtered_processes.targets
-  procfs = "/proc"
-  cgroupfs = "/sys/fs/cgroup"
-  smaps = true
-  threads = true
-  gopsutil = true
 }
 
 prometheus.scrape "process" {
-  targets = prometheus.exporter.process.process.targets
+  targets = discovery.relabel.filtered_processes.targets
   forward_to = [
     prometheus.remote_write.local.receiver,
   ]
@@ -282,8 +381,27 @@ prometheus.scrape "process" {
   honor_timestamps = true
   metrics_path = "/metrics"
   scheme = "http"
-  labels = {
-    "job" = "process",
+}
+
+// Filter DNS-discovered services
+discovery.relabel "filtered_external_services" {
+  targets = discovery.dns.external_services.targets
+
+  rule {
+    source_labels = ["__meta_dns_name"]
+    target_label = "__param_target"
+  }
+  rule {
+    source_labels = ["__meta_dns_name"]
+    target_label = "instance"
+  }
+  rule {
+    source_labels = ["__meta_dns_name"]
+    target_label = "service_name"
+  }
+  rule {
+    source_labels = ["__meta_dns_srv_record_target"]
+    target_label = "target"
   }
 }
 
@@ -293,27 +411,37 @@ prometheus.exporter.blackbox "blackbox" {
 }
 
 prometheus.scrape "blackbox" {
-  targets = [
-    {"__address__" = "http://prometheus.io", "module" = "http_2xx"},
-  ]
+  targets = discovery.relabel.filtered_external_services.targets
   forward_to = [prometheus.remote_write.local.receiver]
-  relabel_configs {
-    source_labels = ["__address__"]
-    target_label = "__param_target"
-  }
-  relabel_configs {
-    source_labels = ["__param_target"]
-    target_label = "instance"
-  }
-  relabel_configs {
-    target_label = "__address__"
-    replacement = "localhost:9115"
-  }
+  scrape_interval = "60s"
+  scrape_timeout = "10s"
+  honor_labels = true
+  honor_timestamps = true
+  metrics_path = "/probe"
+  scheme = "http"
 }
 
 // cAdvisor exporter for container metrics
 prometheus.exporter.cadvisor "cadvisor" {
   docker_host = "unix:///var/run/docker.sock"
+  // Enhanced settings for server environment
+  disable_metrics = [
+    "accelerator",  // GPU metrics (usually not needed on servers)
+    "disk_io",      // Can be noisy, enable if needed
+  ]
+  enable_metrics = [
+    "cpu",
+    "memory",
+    "network",
+    "disk",
+    "processes",
+    "tcp",
+    "udp",
+  ]
+  // Container filtering for better performance
+  container_hints = "/etc/cadvisor/container_hints.json"
+  // Storage driver optimization
+  storage_driver = "overlay2"
 }
 
 prometheus.scrape "cadvisor" {
@@ -321,14 +449,25 @@ prometheus.scrape "cadvisor" {
   forward_to = [
     prometheus.remote_write.local.receiver,
   ]
-  labels = {
-    "job" = "cadvisor",
-  }
 }
 
 // SNMP exporter for network devices
 prometheus.exporter.snmp "snmp" {
   config_file = "/etc/alloy/snmp.yml"
+  // Enhanced SNMP settings for network monitoring
+  walk_params = {
+    default = {
+      version = "2c",
+      auth_protocols = ["MD5", "SHA"],
+      priv_protocols = ["DES", "AES"],
+      retries = 3,
+      timeout = "10s",
+    },
+  }
+  // Optimize for network devices
+  max_repetitions = 10
+  retries = 3
+  timeout = "10s"
 }
 
 prometheus.scrape "snmp" {
@@ -336,45 +475,17 @@ prometheus.scrape "snmp" {
     {"__address__" = "1.1.1.1", "module" = "default"},
   ]
   forward_to = [prometheus.remote_write.local.receiver]
-  relabel_configs {
-    source_labels = ["__address__"]
-    target_label = "__param_target"
-  }
-  relabel_configs {
-    source_labels = ["__param_target"]
-    target_label = "instance"
-  }
-  relabel_configs {
-    target_label = "__address__"
-    replacement = "localhost:9116"
-  }
 }
 
-// Systemd exporter for service monitoring
-prometheus.exporter.systemd "systemd" {
-  unit_whitelist = [".*"]
-  // unit_blacklist = [
-  //   "(autovt@|dev-mapper|sys-devices|sys-subsystem|user@|session)\\.(service|socket)",
-  // ]
-  enable_restarts_metrics = true
-  enable_start_time_metrics = true
-  enable_task_metrics = true
-}
-
-prometheus.scrape "systemd" {
-  targets = prometheus.exporter.systemd.systemd.targets
-  forward_to = [
-    prometheus.remote_write.local.receiver,
+// DNS-based service discovery for external services
+discovery.dns "external_services" {
+  names = [
+    "prometheus.io",
+    "grafana.com",
+    "google.com",
   ]
-  scrape_interval = "15s"
-  scrape_timeout = "10s"
-  honor_labels = true
-  honor_timestamps = true
-  metrics_path = "/metrics"
-  scheme = "http"
-  labels = {
-    "job" = "systemd",
-  }
+  refresh_interval = "300s"
+  type = "A"
 }
 
 
