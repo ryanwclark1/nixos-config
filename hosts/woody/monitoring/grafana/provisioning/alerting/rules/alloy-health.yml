@@ -1,0 +1,57 @@
+groups:
+  - name: alloy-health
+    rules:
+      # Alloy process health
+      - alert: AlloyDown
+        expr: up{job="alloy_self"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: alloy
+        annotations:
+          summary: "Alloy is down on {{ $labels.instance }}"
+          description: "Alloy has been down for more than 1 minute on {{ $labels.instance }}"
+
+      # Alloy configuration reload failures
+      - alert: AlloyConfigReloadFailed
+        expr: increase(alloy_config_last_reload_successful[5m]) == 0
+        for: 5m
+        labels:
+          severity: warning
+          component: alloy
+        annotations:
+          summary: "Alloy configuration reload failed on {{ $labels.instance }}"
+          description: "Alloy configuration reload has failed in the last 5 minutes on {{ $labels.instance }}"
+
+      # Alloy remote write failures
+      - alert: AlloyRemoteWriteFailed
+        expr: increase(alloy_remote_write_failed_total[5m]) > 0
+        for: 2m
+        labels:
+          severity: critical
+          component: alloy
+        annotations:
+          summary: "Alloy remote write failures on {{ $labels.instance }}"
+          description: "Alloy is experiencing remote write failures on {{ $labels.instance }}"
+
+      # Alloy high memory usage
+      - alert: AlloyHighMemoryUsage
+        expr: (process_resident_memory_bytes{job="alloy_self"} / process_start_time_seconds{job="alloy_self"}) > 1e9
+        for: 5m
+        labels:
+          severity: warning
+          component: alloy
+        annotations:
+          summary: "High memory usage in Alloy on {{ $labels.instance }}"
+          description: "Alloy is using more than 1GB of memory on {{ $labels.instance }}"
+
+      # Alloy high CPU usage
+      - alert: AlloyHighCPUUsage
+        expr: rate(process_cpu_seconds_total{job="alloy_self"}[5m]) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+          component: alloy
+        annotations:
+          summary: "High CPU usage in Alloy on {{ $labels.instance }}"
+          description: "Alloy CPU usage is above 50% on {{ $labels.instance }}"

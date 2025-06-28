@@ -1,0 +1,145 @@
+groups:
+  - name: log-monitoring
+    rules:
+      # High error log rate
+      - alert: HighErrorLogRate
+        expr: sum(rate({job="journal", level="error"}[5m])) > 10
+        for: 2m
+        labels:
+          severity: warning
+          component: logging
+        annotations:
+          summary: "High error log rate on {{ $labels.host }}"
+          description: "Error log rate is above 10 logs per second on {{ $labels.host }}"
+
+      # Critical error log rate
+      - alert: CriticalErrorLogRate
+        expr: sum(rate({job="journal", level="error"}[5m])) > 50
+        for: 1m
+        labels:
+          severity: critical
+          component: logging
+        annotations:
+          summary: "Critical error log rate on {{ $labels.host }}"
+          description: "Error log rate is above 50 logs per second on {{ $labels.host }}"
+
+      # High failed login attempts
+      - alert: HighFailedLoginAttempts
+        expr: sum(rate({job="journal", service_category="remote_access", level="error"}[5m])) > 5
+        for: 2m
+        labels:
+          severity: warning
+          component: security
+        annotations:
+          summary: "High failed login attempts on {{ $labels.host }}"
+          description: "Failed login attempts are above 5 per second on {{ $labels.host }}"
+
+      # Brute force attack detected
+      - alert: BruteForceAttackDetected
+        expr: sum(rate({job="journal", service_category="remote_access", level="error"}[5m])) > 20
+        for: 1m
+        labels:
+          severity: critical
+          component: security
+        annotations:
+          summary: "Brute force attack detected on {{ $labels.host }}"
+          description: "Possible brute force attack detected with more than 20 failed logins per second on {{ $labels.host }}"
+
+      # Service restart loop
+      - alert: ServiceRestartLoop
+        expr: sum(rate({job="journal", service_category="system", level="error"}[5m])) > 10
+        for: 2m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "Service restart loop detected on {{ $labels.host }}"
+          description: "Multiple service restarts detected on {{ $labels.host }}"
+
+      # Database connection errors
+      - alert: DatabaseConnectionErrors
+        expr: sum(rate({job="journal", service_category="database", level="error"}[5m])) > 5
+        for: 2m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "Database connection errors on {{ $labels.host }}"
+          description: "Database connection errors are above 5 per second on {{ $labels.host }}"
+
+      # Container crash detected
+      - alert: ContainerCrashDetected
+        expr: sum(rate({job="docker", container_category="monitoring", level="error"}[5m])) > 3
+        for: 2m
+        labels:
+          severity: critical
+          component: container
+        annotations:
+          summary: "Container crash detected on {{ $labels.host }}"
+          description: "Container crashes detected on {{ $labels.host }}"
+
+      # Firewall block events
+      - alert: HighFirewallBlocks
+        expr: sum(rate({job="journal", log_category="firewall", level="warning"}[5m])) > 10
+        for: 2m
+        labels:
+          severity: warning
+          component: security
+        annotations:
+          summary: "High firewall block events on {{ $labels.host }}"
+          description: "Firewall is blocking more than 10 connections per second on {{ $labels.host }}"
+
+      # Kernel panic detected
+      - alert: KernelPanicDetected
+        expr: sum(rate({job="journal", log_category="kernel", level="critical"}[5m])) > 0
+        for: 1m
+        labels:
+          severity: critical
+          component: system
+        annotations:
+          summary: "Kernel panic detected on {{ $labels.host }}"
+          description: "Kernel panic detected on {{ $labels.host }}"
+
+      # Disk space critical
+      - alert: DiskSpaceCritical
+        expr: sum(rate({job="journal", level="error"} =~ ".*No space left on device.*" [5m])) > 0
+        for: 1m
+        labels:
+          severity: critical
+          component: system
+        annotations:
+          summary: "Disk space critical on {{ $labels.host }}"
+          description: "No space left on device error detected on {{ $labels.host }}"
+
+      # Network interface errors
+      - alert: NetworkInterfaceErrors
+        expr: sum(rate({job="journal", log_category="system", level="error"} =~ ".*network.*" [5m])) > 5
+        for: 2m
+        labels:
+          severity: warning
+          component: network
+        annotations:
+          summary: "Network interface errors on {{ $labels.host }}"
+          description: "Network interface errors detected on {{ $labels.host }}"
+
+      # SSL/TLS errors
+      - alert: SSLTLSErrors
+        expr: sum(rate({job="journal", level="error"} =~ ".*SSL.*|.*TLS.*" [5m])) > 3
+        for: 2m
+        labels:
+          severity: warning
+          component: security
+        annotations:
+          summary: "SSL/TLS errors on {{ $labels.host }}"
+          description: "SSL/TLS errors detected on {{ $labels.host }}"
+
+      # Application errors
+      - alert: ApplicationErrors
+        expr: sum(rate({job="journal", service_category="web_server", level="error"}[5m])) > 10
+        for: 2m
+        labels:
+          severity: warning
+          component: application
+        annotations:
+          summary: "Application errors on {{ $labels.host }}"
+          description: "Application errors are above 10 per second on {{ $labels.host }}"

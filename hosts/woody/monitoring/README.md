@@ -1,118 +1,301 @@
-# Monitoring Stack Setup
+# Woody Monitoring Setup
 
-This directory contains the monitoring stack configuration for woody and frametop.
+This directory contains the comprehensive monitoring configuration for the Woody server using Grafana Alloy, Prometheus, Grafana, and Alertmanager.
 
-## Architecture
+## Architecture Overview
 
-- **woody**: Central monitoring server with Prometheus, Grafana, and Alertmanager
-- **frametop**: Client with exporters only
-- **Communication**: Secure communication via Tailscale network
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Data Sources  │    │   Grafana Alloy │    │   Storage       │
+│                 │    │                 │    │                 │
+│ • System Metrics│───▶│ • Collection    │───▶│ • Prometheus    │
+│ • Container Logs│    │ • Processing    │    │ • Loki          │
+│ • Network SNMP  │    │ • Relabeling    │    │                 │
+│ • Blackbox Probes│   │ • Remote Write  │    │                 │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+                                │
+                                ▼
+                       ┌─────────────────┐
+                       │   Grafana       │
+                       │                 │
+                       │ • Dashboards    │
+                       │ • Alerting      │
+                       │ • Visualization │
+                       └─────────────────┘
+                                │
+                                ▼
+                       ┌─────────────────┐
+                       │   Alertmanager  │
+                       │                 │
+                       │ • Notifications │
+                       │ • Routing       │
+                       │ • Grouping      │
+                       └─────────────────┘
+```
 
-## Services
+## Components
 
-### On woody (Central Server)
+### 1. Grafana Alloy (`config.alloy`)
+- **Purpose**: Central data collection and processing agent
+- **Features**:
+  - System metrics collection via Unix exporter
+  - Container monitoring via cAdvisor
+  - Network device monitoring via SNMP
+  - Network connectivity monitoring via Blackbox
+  - Comprehensive log collection and processing
+  - Advanced relabeling and processing pipelines
 
-1. **Prometheus** (Port 9090)
-   - URL: http://woody:9090
-   - Collects metrics from both woody and frametop via Tailscale
-   - Scrapes exporters every 15 seconds
-   - Integrated with Alertmanager
+### 2. Prometheus
+- **Purpose**: Time-series metrics storage and querying
+- **Port**: 9090
+- **Features**:
+  - Metrics storage
+  - Alert rule evaluation
+  - Service discovery
 
-2. **Grafana** (Port 3001)
-   - URL: http://woody:3001
-   - Default credentials: admin/admin
-   - Pre-configured with Prometheus data source
-   - Dashboard provisioning enabled
+### 3. Grafana
+- **Purpose**: Visualization and alerting interface
+- **Port**: 3001
+- **Features**:
+  - Dashboard visualization
+  - Unified alerting
+  - Log exploration
+  - Multi-datasource queries
 
-3. **Alertmanager** (Port 9093)
-   - URL: http://woody:9093
-   - Handles alert routing and notifications
-   - Webhook receiver configured
+### 4. Alertmanager
+- **Purpose**: Alert routing and notification management
+- **Port**: 9093
+- **Features**:
+  - Alert grouping and deduplication
+  - Multi-channel notifications
+  - Time-based routing
+  - Inhibition rules
 
-### Exporters (Both woody and frametop)
+## Dashboards
 
-1. **Node Exporter** (Port 9100)
-   - System metrics (CPU, memory, disk, network, etc.)
-   - Comprehensive collector configuration including network metrics
+### System Monitoring
+- **Enhanced Alloy Overview**: Alloy health, performance, and data flow
+- **Enhanced Node Exporter**: Comprehensive system metrics
+- **Process Monitoring**: Detailed process-level monitoring
+- **Systemd Services**: Service health and status
 
-2. **Systemd Exporter** (Port 9558)
-   - Systemd service metrics
-   - Monitors all services except slices
+### Container Monitoring
+- **Enhanced Container Monitoring**: Docker container metrics and health
+- **Docker Monitoring**: Container resource usage and performance
 
-3. **cAdvisor** (Port 8080)
-   - Container metrics (Docker, Kubernetes, etc.)
-   - Provides detailed container resource usage
-   - Replaces the non-existent Docker exporter
+### Network Monitoring
+- **Network Monitoring**: SNMP device status, Blackbox probes, connectivity
+- **Security Monitoring**: Authentication events, firewall logs, security alerts
 
-4. **Process Exporter** (Port 9256)
-   - Process-specific metrics
-   - Monitors monitoring stack processes
+### Logging
+- **Log Exploration**: Interactive log querying and analysis
+- **Multi-Host Logs**: Cross-host log correlation and analysis
 
-## Access
+### Overview
+- **Overview Dashboard**: High-level system overview
+- **Multi-Machine Dashboard**: Multi-host monitoring view
 
-After deployment:
+## Alerting Rules
 
-1. **Prometheus**: http://woody:9090
-2. **Grafana**: http://woody:3001 (admin/admin)
-3. **Alertmanager**: http://woody:9093
+### Alloy Health (`alloy-health.yml`)
+- Alloy process health monitoring
+- Configuration reload failures
+- Remote write failures
+- Resource usage alerts
 
-## Security
+### System Metrics (`system-metrics.yml`)
+- CPU, memory, and disk usage
+- Network interface status
+- Systemd service failures
+- Load average monitoring
 
-- All exporter communication is secured via Tailscale
-- Firewall rules only allow access on Tailscale interface
-- No ports exposed to public internet
+### Container Metrics (`container-metrics.yml`)
+- Container health and status
+- Resource usage alerts
+- OOM events
+- Restart rate monitoring
 
-## Firewall Configuration
+### Network Monitoring (`network-monitoring.yml`)
+- SNMP device connectivity
+- Interface errors and utilization
+- Blackbox probe failures
+- SSL certificate expiry
 
-The following ports are opened on Tailscale interface only:
-- 9090: Prometheus
-- 3001: Grafana
-- 9093: Alertmanager
-- 9100: Node Exporter
-- 9558: Systemd Exporter
-- 8080: cAdvisor
-- 9256: Process Exporter
+### Log Monitoring (`log-monitoring.yml`)
+- High error rates
+- Security events (failed logins, brute force)
+- Service restart loops
+- Database connection errors
 
-## Next Steps
+## Alerting Configuration
 
-1. Deploy the configuration
-2. Access Grafana and change the default password
-3. Import useful dashboards:
-   - Node Exporter Full: 1860
-   - Docker and System Monitoring: 893
-   - Systemd Services: 9578
-4. Configure Alertmanager notifications
-5. Set up custom alerts as needed
+### Routing Rules
+- **Critical Alerts**: Immediate notification with email
+- **Security Alerts**: Fast notification for security events
+- **Alloy Alerts**: Dedicated routing for monitoring system
+- **Network Alerts**: Network-specific notification handling
+- **Container Alerts**: Container-specific notification handling
 
-## Useful Grafana Dashboards
+### Notification Channels
+- **Webhook**: HTTP notifications to external systems
+- **Email**: SMTP-based email notifications
+- **Time-based**: Different handling for workdays/weekends
 
-- Node Exporter Full: 1860
-- Docker and System Monitoring: 893
-- Systemd Services: 9578
-- Process Monitoring: 249
-- cAdvisor: 14282
+### Inhibition Rules
+- Critical alerts suppress warning alerts for same component
+- Alloy down suppresses other Alloy-related alerts
+- Container down suppresses container-specific alerts
 
-## Alerting
+## Operational Procedures
 
-Alertmanager is configured with:
-- Webhook receiver for notifications
-- Grouping by alertname, cluster, and service
-- Inhibition rules to prevent alert spam
-- 30s initial wait, 5m grouping interval, 4h repeat interval
+### Daily Monitoring Tasks
+1. **Check Alloy Health**: Verify Alloy is running and collecting data
+2. **Review Alert History**: Check for any alerts that fired
+3. **Validate Data Flow**: Ensure metrics and logs are flowing
+4. **Check Resource Usage**: Monitor system resource consumption
 
-## Container Monitoring
+### Weekly Maintenance Tasks
+1. **Dashboard Review**: Update dashboards based on usage patterns
+2. **Alert Rule Tuning**: Adjust thresholds based on historical data
+3. **Log Analysis**: Review log patterns and adjust processing rules
+4. **Performance Review**: Analyze monitoring system performance
 
-cAdvisor provides comprehensive container metrics including:
-- CPU usage per container
-- Memory usage and limits
-- Network I/O statistics
-- Disk I/O metrics
-- Container lifecycle events
+### Monthly Tasks
+1. **Capacity Planning**: Review storage and resource requirements
+2. **Security Review**: Audit access and review security events
+3. **Backup Verification**: Ensure monitoring data is backed up
+4. **Documentation Update**: Update runbooks and procedures
 
-## Network Monitoring
+## Troubleshooting
 
-Network metrics are collected by the Node Exporter, which includes:
-- Network interface statistics
-- Network device metrics
-- Network protocol statistics
-- Connection tracking information
+### Common Issues
+
+#### Alloy Not Starting
+```bash
+# Check Alloy logs
+journalctl -u alloy -f
+
+# Verify configuration
+alloy check-config /etc/alloy/config.alloy
+
+# Check file permissions
+ls -la /etc/alloy/
+```
+
+#### Missing Metrics
+```bash
+# Check Alloy targets
+curl http://localhost:12345/api/v1/targets
+
+# Verify exporters are running
+systemctl status prometheus-exporter-unix
+systemctl status prometheus-exporter-cadvisor
+```
+
+#### Alertmanager Not Sending Notifications
+```bash
+# Check Alertmanager status
+curl http://localhost:9093/api/v1/status
+
+# Verify configuration
+alertmanager --config.file=/etc/alertmanager/alertmanager.yml --check-config
+```
+
+#### Grafana Dashboard Issues
+```bash
+# Check Grafana logs
+journalctl -u grafana -f
+
+# Verify datasource connectivity
+curl http://localhost:3001/api/datasources
+```
+
+### Performance Tuning
+
+#### Alloy Performance
+- Adjust scrape intervals based on monitoring needs
+- Optimize relabeling rules for better performance
+- Monitor memory usage and adjust limits
+
+#### Storage Optimization
+- Configure retention policies for metrics and logs
+- Use recording rules for frequently queried metrics
+- Implement log aggregation and archiving
+
+#### Network Optimization
+- Use local caching for frequently accessed data
+- Optimize SNMP polling intervals
+- Configure appropriate timeouts for probes
+
+## Security Considerations
+
+### Access Control
+- Use strong authentication for Grafana
+- Implement role-based access control
+- Regular security audits of monitoring data
+
+### Data Protection
+- Encrypt sensitive monitoring data
+- Implement proper log retention policies
+- Regular backup of monitoring configuration
+
+### Network Security
+- Use SNMP community strings other than 'public'
+- Implement proper firewall rules
+- Monitor for suspicious access patterns
+
+## Configuration Files
+
+### Alloy Configuration
+- `config.alloy`: Main Alloy configuration
+- `snmp.yml`: SNMP exporter configuration
+- `blackbox.yml`: Blackbox exporter configuration
+
+### Grafana Configuration
+- `grafana.nix`: Grafana service configuration
+- `dashboards/`: Dashboard JSON files
+- `provisioning/`: Datasource and dashboard provisioning
+
+### Alerting Configuration
+- `alertmanager.nix`: Alertmanager service configuration
+- `grafana/provisioning/alerting/rules/`: Alert rule files
+- `grafana/provisioning/alerting/prometheus.yml`: Prometheus alerting config
+
+## Monitoring Best Practices
+
+### Metrics Collection
+- Use consistent labeling across all metrics
+- Implement proper cardinality management
+- Regular validation of metric collection
+
+### Alerting
+- Set appropriate thresholds based on historical data
+- Use proper alert grouping and inhibition
+- Implement escalation procedures
+
+### Logging
+- Use structured logging where possible
+- Implement proper log levels
+- Regular log analysis and pattern recognition
+
+### Documentation
+- Keep runbooks updated
+- Document configuration changes
+- Maintain troubleshooting guides
+
+## Support and Maintenance
+
+### Regular Updates
+- Keep monitoring components updated
+- Review and update alert rules
+- Maintain dashboard relevance
+
+### Capacity Planning
+- Monitor storage growth
+- Plan for scaling requirements
+- Regular performance reviews
+
+### Disaster Recovery
+- Backup monitoring configurations
+- Document recovery procedures
+- Test recovery processes regularly

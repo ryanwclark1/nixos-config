@@ -1,0 +1,134 @@
+groups:
+  - name: network-monitoring
+    rules:
+      # SNMP device down
+      - alert: SNMPDeviceDown
+        expr: up{job="snmp"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: network
+        annotations:
+          summary: "SNMP device down on {{ $labels.instance }}"
+          description: "SNMP device {{ $labels.instance }} is not responding"
+
+      # High SNMP interface errors
+      - alert: HighSNMPInterfaceErrors
+        expr: rate(ifInErrors{job="snmp"}[5m]) + rate(ifOutErrors{job="snmp"}[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+          component: network
+        annotations:
+          summary: "High interface errors on SNMP device {{ $labels.instance }}"
+          description: "Interface {{ $labels.ifName }} has high error rate on {{ $labels.instance }}"
+
+      # SNMP interface down
+      - alert: SNMPInterfaceDown
+        expr: ifOperStatus{job="snmp"} == 2
+        for: 1m
+        labels:
+          severity: critical
+          component: network
+        annotations:
+          summary: "SNMP interface down on {{ $labels.instance }}"
+          description: "Interface {{ $labels.ifName }} is down on {{ $labels.instance }}"
+
+      # High SNMP interface utilization
+      - alert: HighSNMPInterfaceUtilization
+        expr: (ifInOctets{job="snmp"} + ifOutOctets{job="snmp"}) / ifSpeed{job="snmp"} * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: network
+        annotations:
+          summary: "High interface utilization on SNMP device {{ $labels.instance }}"
+          description: "Interface {{ $labels.ifName }} utilization is above 80% on {{ $labels.instance }}"
+
+      # Blackbox probe down
+      - alert: BlackboxProbeDown
+        expr: up{job=~"blackbox.*"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: network
+        annotations:
+          summary: "Blackbox probe down for {{ $labels.instance }}"
+          description: "Blackbox probe for {{ $labels.instance }} is failing"
+
+      # High probe duration
+      - alert: HighProbeDuration
+        expr: probe_duration_seconds{job=~"blackbox.*"} > 5
+        for: 2m
+        labels:
+          severity: warning
+          component: network
+        annotations:
+          summary: "High probe duration for {{ $labels.instance }}"
+          description: "Probe duration is above 5 seconds for {{ $labels.instance }}"
+
+      # HTTP probe failed
+      - alert: HTTPProbeFailed
+        expr: probe_http_status_code{job=~"blackbox.*"} >= 400
+        for: 1m
+        labels:
+          severity: critical
+          component: network
+        annotations:
+          summary: "HTTP probe failed for {{ $labels.instance }}"
+          description: "HTTP probe returned status code {{ $value }} for {{ $labels.instance }}"
+
+      # ICMP probe failed
+      - alert: ICMPProbeFailed
+        expr: probe_icmp_duration_seconds{job=~"blackbox.*"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: network
+        annotations:
+          summary: "ICMP probe failed for {{ $labels.instance }}"
+          description: "ICMP probe is failing for {{ $labels.instance }}"
+
+      # DNS probe failed
+      - alert: DNSProbeFailed
+        expr: probe_dns_duration_seconds{job=~"blackbox.*"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: network
+        annotations:
+          summary: "DNS probe failed for {{ $labels.instance }}"
+          description: "DNS probe is failing for {{ $labels.instance }}"
+
+      # TCP probe failed
+      - alert: TCPProbeFailed
+        expr: probe_tcp_duration_seconds{job=~"blackbox.*"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: network
+        annotations:
+          summary: "TCP probe failed for {{ $labels.instance }}"
+          description: "TCP probe is failing for {{ $labels.instance }}"
+
+      # SSL certificate expiring soon
+      - alert: SSLCertificateExpiringSoon
+        expr: probe_ssl_earliest_cert_expiry{job=~"blackbox.*"} - time() < 86400 * 30
+        for: 1m
+        labels:
+          severity: warning
+          component: network
+        annotations:
+          summary: "SSL certificate expiring soon for {{ $labels.instance }}"
+          description: "SSL certificate for {{ $labels.instance }} expires in less than 30 days"
+
+      # SSL certificate expired
+      - alert: SSLCertificateExpired
+        expr: probe_ssl_earliest_cert_expiry{job=~"blackbox.*"} - time() < 0
+        for: 1m
+        labels:
+          severity: critical
+          component: network
+        annotations:
+          summary: "SSL certificate expired for {{ $labels.instance }}"
+          description: "SSL certificate for {{ $labels.instance }} has expired"
