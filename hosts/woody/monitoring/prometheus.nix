@@ -73,24 +73,17 @@
         ];
       }
       
-      # Alloy metrics on woody
-      {
-        job_name = "woody-alloy";
-        static_configs = [
-          {
-            targets = [ "localhost:12345" ];
-          }
-        ];
-      }
-      # Alloy metrics on frametop (via Tailscale)
-      {
-        job_name = "frametop-alloy";
-        static_configs = [
-          {
-            targets = [ "frametop:12345" ];
-          }
-        ];
-      }
+      # Alloy metrics on woody are sent via remote write
+      # {
+      #   job_name = "woody-alloy";
+      #   static_configs = [
+      #     {
+      #       targets = [ "localhost:12345" ];
+      #     }
+      #   ];
+      # }
+      # Alloy metrics from frametop are now sent via remote write
+      # No need for direct scraping
     ];
 
     # Enable web interface

@@ -156,4 +156,7 @@
   #   notifempty = true;
   #   create = "0640 alloy alloy";
   # };
+
+  # Open firewall for Alloy
+  networking.firewall.allowedTCPPorts = [ 12345 ];
 }
