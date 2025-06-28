@@ -1,8 +1,8 @@
 // =============================================================================
-// GRAFANA ALLOY CONFIGURATION FOR WOODY
+// GRAFANA ALLOY CONFIGURATION FOR FRAMETOP
 // =============================================================================
 //
-// This configuration provides comprehensive monitoring for the woody server:
+// This configuration provides comprehensive monitoring for the frametop server:
 // - System metrics collection (CPU, memory, disk, network)
 // - Process monitoring and filtering
 // - Container metrics via cAdvisor
@@ -28,7 +28,7 @@ loki.write "local" {
 
   // Buffer configuration for log reliability
   external_labels = {
-    "host" = "woody",
+    "host" = "frametop",
     "component" = "alloy",
     "environment" = "production",
   }
@@ -40,7 +40,7 @@ prometheus.remote_write "local" {
     url = "http://woody:9090/api/v1/write"
   }
   external_labels = {
-    "host" = "woody",
+    "host" = "frametop",
     "component" = "alloy",
     "environment" = "production",
   }
@@ -127,7 +127,7 @@ loki.relabel "journal_enhanced" {
   // Add host label
   rule {
     target_label = "host"
-    replacement = "woody"
+    replacement = "frametop"
   }
 
   // Add component label
@@ -256,7 +256,7 @@ loki.relabel "file_logs_enhanced" {
   // Add host label
   rule {
     target_label = "host"
-    replacement = "woody"
+    replacement = "frametop"
   }
 
   // Add component label
@@ -351,7 +351,7 @@ loki.relabel "docker_logs_enhanced" {
   // Add host label
   rule {
     target_label = "host"
-    replacement = "woody"
+    replacement = "frametop"
   }
 
   // Add component label
@@ -589,7 +589,7 @@ prometheus.relabel "process_metrics" {
   // Add host label
   rule {
     target_label = "host"
-    replacement = "woody"
+    replacement = "frametop"
   }
 
   // Add component label
@@ -634,7 +634,7 @@ prometheus.relabel "snmp_metrics" {
   // Add host label
   rule {
     target_label = "host"
-    replacement = "woody"
+    replacement = "frametop"
   }
 
   // Add component label
@@ -683,7 +683,7 @@ prometheus.relabel "blackbox_metrics" {
   // Add host label
   rule {
     target_label = "host"
-    replacement = "woody"
+    replacement = "frametop"
   }
 
   // Add component label
@@ -742,7 +742,7 @@ prometheus.relabel "cadvisor_metrics" {
   // Add host label
   rule {
     target_label = "host"
-    replacement = "woody"
+    replacement = "frametop"
   }
 
   // Add component label
@@ -788,7 +788,7 @@ loki.source.journal "read" {
   ]
   labels = {
     "job" = "journal",
-    "host" = "woody",
+    "host" = "frametop",
     "component" = "alloy",
     "source" = "systemd-journal",
   }
@@ -796,7 +796,7 @@ loki.source.journal "read" {
 
 // File source for reading application logs with enhanced configuration
 loki.source.file "local_files" {
-  targets = discovery.relabel.filtered_log_files.targets
+  targets = discovery.relabel.filtered_log_files.output
   forward_to = [
     loki.process.json_parser.receiver,
     loki.process.auth_log_parser.receiver,
@@ -820,7 +820,7 @@ loki.source.docker "docker" {
   ]
   labels = {
     "job" = "docker",
-    "host" = "woody",
+    "host" = "frametop",
     "component" = "alloy",
     "source" = "docker",
   }
@@ -1016,10 +1016,11 @@ discovery.relabel "filtered_log_files" {
 
 // Process exporter for detailed process monitoring
 prometheus.exporter.process "process" {
+  // Process exporter configuration
 }
 
 prometheus.scrape "process" {
-  targets = discovery.relabel.filtered_processes.targets
+  targets = discovery.relabel.filtered_processes.output
   forward_to = [
     prometheus.relabel.process_metrics.receiver,
   ]
@@ -1027,31 +1028,30 @@ prometheus.scrape "process" {
   scrape_timeout = "10s"
   honor_labels = true
   honor_timestamps = true
-  metrics_path = "/metrics"
-  scheme = "http"
 }
 
 // Filter DNS-discovered services
-discovery.relabel "filtered_external_services" {
-  targets = discovery.dns.external_services.targets
-
-  rule {
-    source_labels = ["__meta_dns_name"]
-    target_label = "__param_target"
-  }
-  rule {
-    source_labels = ["__meta_dns_name"]
-    target_label = "instance"
-  }
-  rule {
-    source_labels = ["__meta_dns_name"]
-    target_label = "service_name"
-  }
-  rule {
-    source_labels = ["__meta_dns_srv_record_target"]
-    target_label = "target"
-  }
-}
+// TODO: Add DNS discovery configuration
+// discovery.relabel "filtered_external_services" {
+//   targets = discovery.dns.external_services.targets
+//
+//   rule {
+//     source_labels = ["__meta_dns_name"]
+//     target_label = "__param_target"
+//   }
+//   rule {
+//     source_labels = ["__meta_dns_name"]
+//     target_label = "instance"
+//   }
+//   rule {
+//     source_labels = ["__meta_dns_name"]
+//     target_label = "service_name"
+//   }
+//   rule {
+//     source_labels = ["__meta_dns_srv_record_target"]
+//     target_label = "target"
+//   }
+// }
 
 // cAdvisor exporter for container metrics
 prometheus.exporter.cadvisor "cadvisor" {
@@ -1133,17 +1133,18 @@ prometheus.scrape "snmp" {
 }
 
 // DNS-based service discovery for external services
-discovery.dns "external_services" {
-  names = [
-    "prometheus.io",
-    "grafana.com",
-    "google.com",
-    "8.8.8.8",
-    "1.1.1.1",
-  ]
-  refresh_interval = "300s"
-  type = "A"
-}
+// TODO: DNS discovery is not yet implemented in Alloy
+// discovery.dns "external_services" {
+//   names = [
+//     "prometheus.io",
+//     "grafana.com",
+//     "google.com",
+//     "8.8.8.8",
+//     "1.1.1.1",
+//   ]
+//   refresh_interval = "300s"
+//   type = "A"
+// }
 
 // =============================================================================
 // LOKI PROCESSING COMPONENTS
