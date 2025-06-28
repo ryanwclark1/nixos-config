@@ -46,6 +46,21 @@
         reject_old_samples = true;
         reject_old_samples_max_age = "168h";
         allow_structured_metadata = false;
+        
+        # Increase ingestion limits to handle high log volume
+        ingestion_rate_mb = 16;  # 16 MB/s (default is 4)
+        ingestion_burst_size_mb = 32;  # 32 MB burst (default is 6)
+        
+        # Per-stream limits
+        per_stream_rate_limit = "8MB";  # 8 MB/s per stream
+        per_stream_rate_limit_burst = "16MB";  # 16 MB burst per stream
+        
+        # Other limits to prevent resource exhaustion
+        max_entries_limit_per_query = 10000;
+        max_streams_per_user = 10000;
+        max_global_streams_per_user = 10000;
+        max_query_length = "0h";  # Unlimited query length
+        max_query_parallelism = 32;
       };
 
       # Ingester configuration
