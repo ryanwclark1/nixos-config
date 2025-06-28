@@ -90,6 +90,14 @@ loki.relabel "journal_volume_filter" {
     separator = ";"
     action = "drop"
   }
+  
+  // Drop Alloy process discovery permission errors
+  rule {
+    source_labels = ["__journal__systemd_unit", "__journal__message"]
+    regex = "alloy\\.service;.*failed to get process info.*permission denied.*"
+    separator = ";"
+    action = "drop"
+  }
 }
 
 // Enhanced relabel rules for journal logs
