@@ -219,18 +219,6 @@
     };
   };
 
-  # # Create dashboard directory with proper permissions
-  # systemd.tmpfiles.rules = [
-  #   "d /var/lib/grafana/dashboards 0755 grafana grafana -"
-  # ];
-
-  # # Copy dashboard files from the dashboards directory
-  # systemd.services.grafana.preStart = ''
-  #   mkdir -p /var/lib/grafana/dashboards
-  #   cp ${./dashboards}/*.json /var/lib/grafana/dashboards/
-  #   chown -R grafana:grafana /var/lib/grafana/dashboards
-  # '';
-
   # Open firewall for Grafana
   networking.firewall.allowedTCPPorts = [ 3001 ];
 }
