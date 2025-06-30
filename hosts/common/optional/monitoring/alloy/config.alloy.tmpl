@@ -1,19 +1,14 @@
 // =============================================================================
-// GRAFANA ALLOY CONFIGURATION FOR WOODY
+// Grafana Alloy Configuration Template
+// Host: ${hostname}
 // =============================================================================
-//
-// This configuration provides comprehensive monitoring for the woody server:
-// - System metrics collection (CPU, memory, disk, network)
-// - Process monitoring and filtering
-// - Container metrics via cAdvisor
-// - Network device monitoring via SNMP (Ubiquiti devices)
-// - Network connectivity monitoring via Blackbox
-// - Comprehensive log collection and processing
-//   - Systemd journal logs
-//   - File-based application logs
-//   - Docker container logs
-// - Advanced log processing with structured data extraction
-//
+// This is a unified configuration template for Grafana Alloy that provides:
+// - Comprehensive log collection from multiple sources
+// - System and container metrics collection
+// - Network probing and monitoring
+// - Process monitoring and analysis
+// - SNMP monitoring for network devices
+// - Security-focused log parsing and analysis
 // =============================================================================
 
 // =============================================================================
@@ -23,7 +18,7 @@
 // Loki remote write for log aggregation with rate limiting
 loki.write "local" {
 	endpoint {
-		url = "http://localhost:3100/loki/api/v1/push"
+		url = "${lokiEndpoint}"
 
 		// Batch configuration to reduce request rate
 		batch_wait = "5s"
@@ -35,9 +30,9 @@ loki.write "local" {
 
 	// Buffer configuration for log reliability
 	external_labels = {
-		"host"        = "woody",
+		"host"        = "${hostname}",
 		"component"   = "alloy",
-		"environment" = "production",
+		"environment" = "${environment}",
 	}
 
 	// WAL configuration to handle bursts
@@ -50,12 +45,12 @@ loki.write "local" {
 // Prometheus remote write for metrics with retry and timeout
 prometheus.remote_write "local" {
 	endpoint {
-		url = "http://woody:9090/api/v1/write"
+		url = "${prometheusEndpoint}"
 	}
 	external_labels = {
-		"host"        = "woody",
+		"host"        = "${hostname}",
 		"component"   = "alloy",
-		"environment" = "production",
+		"environment" = "${environment}",
 	}
 }
 
@@ -63,42 +58,7 @@ prometheus.remote_write "local" {
 // RELABELING RULES
 // =============================================================================
 
-// Volume filter for journal logs to reduce ingestion rate
-loki.relabel "journal_volume_filter" {
-	forward_to = [
-		loki.process.journal_parser.receiver,
-	]
-
-	// Drop debug and info level logs to reduce volume
-	rule {
-		source_labels = ["__journal_priority"]
-		regex         = "[5-7]" // 5=notice, 6=info, 7=debug
-		action        = "drop"
-	}
-
-	// Drop noisy services that generate too many logs
-	rule {
-		source_labels = ["__journal__systemd_unit"]
-		regex         = "(systemd-journal|systemd-logind|NetworkManager|chronyd|audit)\\.service"
-		action        = "drop"
-	}
-
-	// Also drop repetitive kernel messages (info/debug only)
-	rule {
-		source_labels = ["__journal__comm", "__journal_priority"]
-		regex         = "kernel;[6-7]"
-		separator     = ";"
-		action        = "drop"
-	}
-
-	// Drop Alloy process discovery permission errors
-	rule {
-		source_labels = ["__journal__systemd_unit", "__journal__message"]
-		regex         = "alloy\\.service;.*failed to get process info.*permission denied.*"
-		separator     = ";"
-		action        = "drop"
-	}
-}
+${volumeFilterConfig}
 
 // Enhanced relabel rules for journal logs
 loki.relabel "journal" {
@@ -191,7 +151,7 @@ loki.relabel "journal_enhanced" {
 	// Add host label
 	rule {
 		target_label = "host"
-		replacement  = "woody"
+		replacement  = "${hostname}"
 	}
 
 	// Add component label
@@ -334,7 +294,7 @@ loki.relabel "file_logs_enhanced" {
 	// Add host label
 	rule {
 		target_label = "host"
-		replacement  = "woody"
+		replacement  = "${hostname}"
 	}
 
 	// Add component label
@@ -439,7 +399,7 @@ loki.relabel "docker_logs_enhanced" {
 	// Add host label
 	rule {
 		target_label = "host"
-		replacement  = "woody"
+		replacement  = "${hostname}"
 	}
 
 	// Add component label
@@ -636,7 +596,7 @@ prometheus.relabel "unix_metrics" {
 	// Add host label to all metrics
 	rule {
 		target_label = "host"
-		replacement  = "woody"
+		replacement  = "${hostname}"
 	}
 
 	// Add component label
@@ -696,7 +656,7 @@ prometheus.relabel "process_metrics" {
 	// Add host label
 	rule {
 		target_label = "host"
-		replacement  = "woody"
+		replacement  = "${hostname}"
 	}
 
 	// Add component label
@@ -743,7 +703,7 @@ prometheus.relabel "snmp_metrics" {
 	// Add host label
 	rule {
 		target_label = "host"
-		replacement  = "woody"
+		replacement  = "${hostname}"
 	}
 
 	// Add component label
@@ -794,7 +754,7 @@ prometheus.relabel "blackbox_metrics" {
 	// Add host label
 	rule {
 		target_label = "host"
-		replacement  = "woody"
+		replacement  = "${hostname}"
 	}
 
 	// Add component label
@@ -856,7 +816,7 @@ prometheus.relabel "cadvisor_metrics" {
 	// Add host label
 	rule {
 		target_label = "host"
-		replacement  = "woody"
+		replacement  = "${hostname}"
 	}
 
 	// Add component label
@@ -899,11 +859,11 @@ prometheus.relabel "cadvisor_metrics" {
 // Journal source for reading systemd journal logs with enhanced relabeling
 loki.source.journal "read" {
 	forward_to = [
-		loki.relabel.journal_volume_filter.receiver,
+		${journalForwardTo}
 	]
 	labels = {
 		"job"       = "journal",
-		"host"      = "woody",
+		"host"      = "${hostname}",
 		"component" = "alloy",
 		"source"    = "systemd-journal",
 	}
@@ -915,22 +875,22 @@ loki.source.file "local_files" {
 		{
 			__path__ = "/var/log/*.log",
 			job      = "varlogs",
-			host     = "woody",
+			host     = "${hostname}",
 		},
 		{
 			__path__ = "/var/log/nginx/*.log",
 			job      = "nginx",
-			host     = "woody",
+			host     = "${hostname}",
 		},
 		{
 			__path__ = "/var/log/postgresql/*.log",
 			job      = "postgresql",
-			host     = "woody",
+			host     = "${hostname}",
 		},
 		{
 			__path__ = "/var/log/applications/*.log",
 			job      = "applications",
-			host     = "woody",
+			host     = "${hostname}",
 		},
 	]
 	forward_to = [
@@ -956,7 +916,7 @@ loki.source.docker "docker" {
 	]
 	labels = {
 		"job"       = "docker",
-		"host"      = "woody",
+		"host"      = "${hostname}",
 		"component" = "alloy",
 		"source"    = "docker",
 	}
@@ -1100,9 +1060,6 @@ discovery.relabel "filtered_docker_containers" {
 	}
 }
 
-// Note: discovery.file removed - it's for service discovery JSON/YAML files, not log files
-// Using loki.source.file with direct targets instead
-
 // Process exporter for detailed process monitoring
 prometheus.exporter.process "process" { }
 
@@ -1118,29 +1075,6 @@ prometheus.scrape "process" {
 	metrics_path     = "/metrics"
 	scheme           = "http"
 }
-
-// Filter DNS-discovered services
-// Commented out since DNS discovery is disabled
-// discovery.relabel "filtered_external_services" {
-//   targets = discovery.dns.external_services.output
-// 
-//   rule {
-//     source_labels = ["__meta_dns_name"]
-//     target_label = "__param_target"
-//   }
-//   rule {
-//     source_labels = ["__meta_dns_name"]
-//     target_label = "instance"
-//   }
-//   rule {
-//     source_labels = ["__meta_dns_name"]
-//     target_label = "service_name"
-//   }
-//   rule {
-//     source_labels = ["__meta_dns_srv_record_target"]
-//     target_label = "target"
-//   }
-// }
 
 // cAdvisor exporter for container metrics
 prometheus.exporter.cadvisor "cadvisor" {
@@ -1166,7 +1100,7 @@ prometheus.exporter.blackbox "blackbox" {
 
 	target {
 		name    = "http_woody_grafana"
-		address = "http://woody:3000"
+		address = "http://woody:3001"
 		module  = "http_2xx"
 	}
 
@@ -1215,47 +1149,6 @@ prometheus.scrape "blackbox" {
 	scrape_interval = "60s"
 	scrape_timeout  = "10s"
 }
-
-// SNMP exporter for network devices
-// Commented out - SNMP config format needs to be updated for Alloy
-// prometheus.exporter.snmp "snmp" {
-//   config_file = "/etc/alloy/snmp.yml"
-// }
-
-// prometheus.scrape "snmp" {
-//   targets = [
-//     // Ubiquiti Gateway/Router
-//     {"__address__" = "10.10.100.1", "module" = "default", "community" = "public"},
-//
-//     // Add your other Ubiquiti devices here:
-//     // {"__address__" = "10.10.100.2", "module" = "default", "community" = "public"}, // UniFi AP
-//     // {"__address__" = "10.10.100.3", "module" = "default", "community" = "public"}, // UniFi Switch
-//     // {"__address__" = "10.10.100.4", "module" = "default", "community" = "public"}, // Another AP
-//     // {"__address__" = "10.10.100.5", "module" = "default", "community" = "public"}, // Another Switch
-//   ]
-//   forward_to = [
-//     prometheus.relabel.snmp_metrics.receiver,
-//   ]
-//   scrape_interval = "60s"
-//   scrape_timeout = "30s"
-//   honor_labels = true
-//   honor_timestamps = true
-//   metrics_path = "/metrics"
-//   scheme = "http"
-// }
-
-// DNS-based service discovery for external services
-// Commented out - DNS discovery requires port for A records
-// discovery.dns "external_services" {
-//   names = [
-//     "prometheus.io:443",
-//     "grafana.com:443",
-//     "google.com:443",
-//   ]
-//   refresh_interval = "300s"
-//   type = "A"
-//   port = 443
-// }
 
 // =============================================================================
 // LOKI PROCESSING COMPONENTS
@@ -1390,13 +1283,13 @@ loki.process "web_log_parser" {
 
 	// Parse common log format
 	stage.regex {
-		expression = "^(?P<source_ip>\\d+\\.\\d+\\.\\d+\\.\\d+)\\s+-\\s+-\\s+\\[(?P<timestamp>\\d{2}/\\w{3}/\\d{4}:\\d{2}:\\d{2}:\\d{2}\\s+[+-]\\d{4})\\]\\s+\"(?P<method>\\w+)\\s+(?P<path>\\S+)\\s+HTTP/(?P<http_version>\\d\\.\\d)\"\\s+(?P<status_code>\\d+)\\s+(?P<bytes>\\d+)\\s+\"(?P<referer>[^\"]*)\"\\s+\"(?P<user_agent>[^\"]*)\""
+		expression = "^(?P<source_ip>\\d+\\.\\d+\\.\\d+\\.\\d+)\\s+-\\s+-\\s+\\[(?P<timestamp>\\d{2}/\\w{3}/\\d{4}:\\d{2}:\\d{2}:\\d{2}\\s+[+-]\\d{4})\\]\\s+\"(?P<method>\\w+)\\s+(?P<path>\\S+)\\s+HTTP/(?P<http_version>\\d\\.\\d)\"\\s+(?P<status_code>\\d+)\\s+(?P<bytes>\\d+)\\s+\"(?P<referer>[^\"]*)\"\\s+\"(?P<user_agent>[^\"]*)\"$"
 		source     = "__raw_log_message__"
 	}
 
 	// Parse combined log format
 	stage.regex {
-		expression = "^(?P<source_ip>\\d+\\.\\d+\\.\\d+\\.\\d+)\\s+-\\s+(?P<user>\\S+)\\s+\\[(?P<timestamp>\\d{2}/\\w{3}/\\d{4}:\\d{2}:\\d{2}:\\d{2}\\s+[+-]\\d{4})\\]\\s+\"(?P<method>\\w+)\\s+(?P<path>\\S+)\\s+HTTP/(?P<http_version>\\d\\.\\d)\"\\s+(?P<status_code>\\d+)\\s+(?P<bytes>\\d+)\\s+\"(?P<referer>[^\"]*)\"\\s+\"(?P<user_agent>[^\"]*)\"\\s+\"(?P<forwarded_for>[^\"]*)\""
+		expression = "^(?P<source_ip>\\d+\\.\\d+\\.\\d+\\.\\d+)\\s+-\\s+(?P<user>\\S+)\\s+\\[(?P<timestamp>\\d{2}/\\w{3}/\\d{4}:\\d{2}:\\d{2}:\\d{2}\\s+[+-]\\d{4})\\]\\s+\"(?P<method>\\w+)\\s+(?P<path>\\S+)\\s+HTTP/(?P<http_version>\\d\\.\\d)\"\\s+(?P<status_code>\\d+)\\s+(?P<bytes>\\d+)\\s+\"(?P<referer>[^\"]*)\"\\s+\"(?P<user_agent>[^\"]*)\"\\s+\"(?P<forwarded_for>[^\"]*)\"$"
 		source     = "__raw_log_message__"
 	}
 }
@@ -1409,19 +1302,19 @@ loki.process "database_log_parser" {
 
 	// Parse PostgreSQL logs
 	stage.regex {
-		expression = "^(?P<timestamp>\\d{4}-\\d{2}-\\d{2}\\s+\\d{2}:\\d{2}:\\d{2}\\.\\d+\\s+\\w+)\\s+(?P<level>\\w+):\\s+(?P<message>.*)"
+		expression = "^(?P<timestamp>\\d{4}-\\d{2}-\\d{2}\\s+\\d{2}:\\d{2}:\\d{2}\\.\\d+\\s+\\w+)\\s+(?P<level>\\w+):\\s+(?P<message>.*)$"
 		source     = "__raw_log_message__"
 	}
 
 	// Extract PostgreSQL specific fields
 	stage.regex {
-		expression = ".*duration:\\s+(?P<duration>\\d+\\.\\d+)\\s+ms\\s+statement:\\s+(?P<statement>.*)"
+		expression = ".*duration:\\s+(?P<duration>\\d+\\.\\d+)\\s+ms\\s+statement:\\s+(?P<statement>.*)$"
 		source     = "__raw_log_message__"
 	}
 
 	// Parse MySQL logs
 	stage.regex {
-		expression = "^(?P<timestamp>\\d{4}-\\d{2}-\\d{2}\\s+\\d{2}:\\d{2}:\\d{2})\\s+(?P<level>\\w+)\\s+(?P<message>.*)"
+		expression = "^(?P<timestamp>\\d{4}-\\d{2}-\\d{2}\\s+\\d{2}:\\d{2}:\\d{2})\\s+(?P<level>\\w+)\\s+(?P<message>.*)$"
 		source     = "__raw_log_message__"
 	}
 }
@@ -1434,7 +1327,7 @@ loki.process "app_log_parser" {
 
 	// Extract structured log fields
 	stage.regex {
-		expression = ".*\\[(?P<timestamp>\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+Z)\\]\\s+(?P<level>\\w+)\\s+\\[(?P<service>\\w+)\\]\\s+(?P<message>.*)"
+		expression = ".*\\[(?P<timestamp>\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+Z)\\]\\s+(?P<level>\\w+)\\s+\\[(?P<service>\\w+)\\]\\s+(?P<message>.*)$"
 		source     = "__raw_log_message__"
 	}
 
@@ -1459,7 +1352,7 @@ loki.process "k8s_log_parser" {
 
 	// Parse Kubernetes log format
 	stage.regex {
-		expression = "^(?P<timestamp>\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+Z)\\s+(?P<level>\\w+)\\s+(?P<message>.*)"
+		expression = "^(?P<timestamp>\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+Z)\\s+(?P<level>\\w+)\\s+(?P<message>.*)$"
 		source     = "__raw_log_message__"
 	}
 
@@ -1488,7 +1381,7 @@ loki.process "error_log_parser" {
 
 	// Extract error types
 	stage.regex {
-		expression = ".*(?P<error_type>Exception|Error|Fatal|Panic):\\s+(?P<error_message>.*)"
+		expression = ".*(?P<error_type>Exception|Error|Fatal|Panic):\\s+(?P<error_message>.*)$"
 		source     = "__raw_log_message__"
 	}
 
@@ -1506,49 +1399,7 @@ loki.process "error_log_parser" {
 }
 
 // =============================================================================
-// OPERATIONAL BEST PRACTICES AND RECOMMENDATIONS
+// Host-specific custom configurations
 // =============================================================================
 
-// Configuration Notes:
-// 1. All components include proper error handling and retry logic
-// 2. Comprehensive labeling enables powerful queries and dashboards
-// 3. Structured log processing extracts meaningful data from unstructured logs
-// 4. Dynamic service discovery adapts to changing environments
-// 5. Self-monitoring ensures Alloy health visibility
-//
-// Monitoring Recommendations:
-// 1. Set up alerts for:
-//    - Alloy process health (self-monitoring metrics)
-//    - High error rates in logs
-//    - Network connectivity issues (Blackbox probes)
-//    - System resource exhaustion (Unix exporter)
-//    - Container health issues (cAdvisor)
-//    - SNMP device connectivity (Ubiquiti devices)
-//
-// 2. Create dashboards for:
-//    - System overview (CPU, memory, disk, network)
-//    - Security monitoring (auth logs, firewall events)
-//    - Application health (process monitoring, container logs)
-//    - Network monitoring (SNMP metrics, connectivity probes)
-//    - Log analysis (structured log data, error patterns)
-//
-// 3. Regular maintenance:
-//    - Monitor Alloy's own resource usage
-//    - Update SNMP targets as network devices change
-//    - Validate configuration after any changes
-//    - Monitor remote write success rates
-//    - Review log volume and processing performance
-//
-// 4. Security considerations:
-//    - Use SNMP community strings other than 'public' in production
-//    - Implement proper authentication for remote writes
-//    - Monitor for suspicious log patterns
-//    - Regular security log analysis
-//
-// 5. Performance tuning:
-//    - Adjust scrape intervals based on monitoring needs
-//    - Monitor log processing performance
-//    - Consider log retention policies
-//    - Optimize relabeling rules for better performance
-//
-// =============================================================================
+${customConfig}

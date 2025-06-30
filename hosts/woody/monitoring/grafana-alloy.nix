@@ -1,39 +1,15 @@
 {
-  pkgs,
-  config,
-  lib,
-  ...
-}:
+  imports = [
+    ../../common/optional/monitoring/grafana-alloy.nix
+  ];
 
-{
-  # Create the Alloy configuration file with enhanced features
-  environment.etc."alloy/config.alloy" = {
-    source = ./alloy/config.alloy;
-  };
-
-  environment.etc."alloy/blackbox.yml" = {
-    source = ./alloy/blackbox.yml;
-  };
-
-  environment.etc."alloy/snmp.yml" = {
-    source = ./alloy/snmp.yml;
-  };
-  
-  services.alloy = {
+  services.alloy-unified = {
     enable = true;
-    configPath = "/etc/alloy";
-    extraFlags = [
-      "--disable-reporting"
-    ];
+    hostname = "woody";
+    lokiEndpoint = "http://localhost:3100/loki/api/v1/push";
+    prometheusEndpoint = "http://localhost:9090/api/v1/write";
+    environment = "production";
+    enableVolumeFilter = true; # woody has high log volume
+    extraCapabilities = [ "CAP_NET_RAW" ]; # for network probing
   };
-
-  # Give Alloy supplementary groups to read process and system information
-  systemd.services.alloy.serviceConfig = {
-    SupplementaryGroups = [ "systemd-journal" "docker" ];
-    # Add capabilities for process monitoring and network probing
-    AmbientCapabilities = [ "CAP_SYS_PTRACE" "CAP_DAC_READ_SEARCH" "CAP_NET_RAW" ];
-    CapabilityBoundingSet = [ "CAP_SYS_PTRACE" "CAP_DAC_READ_SEARCH" "CAP_NET_RAW" ];
-  };
-
-  networking.firewall.allowedTCPPorts = [ 12345 ];
 }
