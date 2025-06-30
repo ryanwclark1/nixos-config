@@ -66,7 +66,7 @@ prometheus.remote_write "local" {
 // Volume filter for journal logs to reduce ingestion rate
 loki.relabel "journal_volume_filter" {
 	forward_to = [
-		loki.process.journal_parser.receiver,
+		loki.relabel.journal.receiver,
 	]
 
 	// Drop debug and info level logs to reduce volume
@@ -687,52 +687,53 @@ prometheus.relabel "unix_metrics" {
 	}
 }
 
-// Relabel rules for process metrics
-prometheus.relabel "process_metrics" {
-	forward_to = [
-		prometheus.remote_write.local.receiver,
-	]
-
-	// Add host label
-	rule {
-		target_label = "host"
-		replacement  = "woody"
-	}
-
-	// Add component label
-	rule {
-		target_label = "component"
-		replacement  = "process"
-	}
-
-	// Clean up process names
-	rule {
-		source_labels = ["__meta_process_name"]
-		target_label  = "process_name"
-	}
-
-	// Add process group labels
-	rule {
-		source_labels = ["process_name"]
-		regex         = ".*(prometheus|grafana|alloy).*"
-		target_label  = "process_group"
-		replacement   = "monitoring"
-	}
-
-	rule {
-		source_labels = ["process_name"]
-		regex         = ".*(docker|containerd).*"
-		target_label  = "process_group"
-		replacement   = "container_runtime"
-	}
-
-	rule {
-		source_labels = ["process_name"]
-		regex         = ".*(systemd|init).*"
-		target_label  = "process_group"
-		replacement   = "system"
-	}
-}
+// Relabel rules for process metrics - currently not used
+// This would be used if we were scraping metrics FROM processes that expose them
+// prometheus.relabel "process_metrics" {
+// 	forward_to = [
+// 		prometheus.remote_write.local.receiver,
+// 	]
+// 
+// 	// Add host label
+// 	rule {
+// 		target_label = "host"
+// 		replacement  = "woody"
+// 	}
+// 
+// 	// Add component label
+// 	rule {
+// 		target_label = "component"
+// 		replacement  = "process"
+// 	}
+// 
+// 	// Clean up process names
+// 	rule {
+// 		source_labels = ["__meta_process_name"]
+// 		target_label  = "process_name"
+// 	}
+// 
+// 	// Add process group labels
+// 	rule {
+// 		source_labels = ["process_name"]
+// 		regex         = ".*(prometheus|grafana|alloy).*"
+// 		target_label  = "process_group"
+// 		replacement   = "monitoring"
+// 	}
+// 
+// 	rule {
+// 		source_labels = ["process_name"]
+// 		regex         = ".*(docker|containerd).*"
+// 		target_label  = "process_group"
+// 		replacement   = "container_runtime"
+// 	}
+// 
+// 	rule {
+// 		source_labels = ["process_name"]
+// 		regex         = ".*(systemd|init).*"
+// 		target_label  = "process_group"
+// 		replacement   = "system"
+// 	}
+// }
 
 // Relabel rules for SNMP metrics
 prometheus.relabel "snmp_metrics" {
@@ -1054,21 +1055,31 @@ prometheus.scrape "unix" {
 // DISCOVERY COMPONENTS
 // =============================================================================
 
-// Discover all processes
-discovery.process "all_processes" { }
+// Process discovery - currently not used but kept for reference
+// The process exporter handles process monitoring internally
+// These components would be used if we wanted to discover and scrape metrics FROM processes
+// that expose Prometheus endpoints (which most don't)
 
-// Filter processes for monitoring
-discovery.relabel "filtered_processes" {
-	targets = discovery.process.all_processes.targets
-
-	rule {
-		action        = "keep"
-		regex         = "^(prometheus|grafana|node_exporter|systemd_exporter|cadvisor|process_exporter|alloy|docker|containerd|systemd|sshd|nginx|apache|postgres|mysql|redis)$"
-		source_labels = ["__meta_process_name"]
-	}
-}
+// discovery.process "all_processes" { }
+// 
+// discovery.relabel "filtered_processes" {
+// 	targets = discovery.process.all_processes.targets
+// 
+// 	rule {
+// 		action        = "keep"
+// 		regex         = "^(prometheus|grafana|node_exporter|systemd_exporter|cadvisor|process_exporter|alloy|docker|containerd|systemd|sshd|nginx|apache|postgres|mysql|redis)$"
+// 		source_labels = ["__meta_process_name"]
+// 	}
+// }
 
 // Discover Docker containers for enhanced monitoring
+// Containers can expose metrics in several ways:
+// 1. Using Docker labels:
+//    - prometheus.io/scrape: "true"
+//    - prometheus.io/port: "9090"
+//    - prometheus.io/path: "/metrics"
+// 2. Exposing metrics on standard ports (e.g., :9090/metrics)
+// 3. Through cAdvisor for resource metrics (CPU, memory, network, disk)
 discovery.docker "docker_containers" {
 	host             = "unix:///var/run/docker.sock"
 	refresh_interval = "30s"
@@ -1100,24 +1111,153 @@ discovery.relabel "filtered_docker_containers" {
 	}
 }
 
-// Note: discovery.file removed - it's for service discovery JSON/YAML files, not log files
-// Using loki.source.file with direct targets instead
-
-// Process exporter for detailed process monitoring
-prometheus.exporter.process "process" { }
-
-prometheus.scrape "process" {
-	targets    = discovery.relabel.filtered_processes.output
+// Scrape metrics from Docker containers
+// This is for containers that might expose metrics but don't have explicit labels
+prometheus.scrape "docker_containers" {
+	targets    = discovery.relabel.filtered_docker_containers.output
 	forward_to = [
-		prometheus.relabel.process_metrics.receiver,
+		prometheus.relabel.docker_container_metrics.receiver,
 	]
-	scrape_interval  = "15s"
+	
+	// Scrape configuration for container metrics
+	scrape_interval  = "30s"
 	scrape_timeout   = "10s"
 	honor_labels     = true
 	honor_timestamps = true
 	metrics_path     = "/metrics"
-	scheme           = "http"
 }
+
+// Relabel metrics from Docker containers
+prometheus.relabel "docker_container_metrics" {
+	forward_to = [
+		prometheus.remote_write.local.receiver,
+	]
+
+	// Add job label if not present
+	rule {
+		target_label = "job"
+		replacement  = "docker_containers"
+		regex        = ""
+		source_labels = ["job"]
+	}
+
+	// Keep essential container labels
+	rule {
+		action = "labelkeep"
+		regex  = "job|instance|container_name|container_image|service|__name__|__scheme__|__metrics_path__"
+	}
+}
+
+// Additional scraper for containers exposing metrics on specific ports
+discovery.relabel "docker_metrics_endpoints" {
+	targets = discovery.docker.docker_containers.targets
+
+	// Keep only containers that expose metrics
+	rule {
+		action        = "keep"
+		regex         = ".*"
+		source_labels = ["__meta_docker_container_label_prometheus_io_scrape"]
+	}
+
+	// Set the address from the container's exposed port
+	rule {
+		source_labels = ["__meta_docker_container_ip", "__meta_docker_container_label_prometheus_io_port"]
+		separator     = ":"
+		target_label  = "__address__"
+		replacement   = "${1}:${2}"
+	}
+
+	// Set metrics path from label or use default
+	rule {
+		source_labels = ["__meta_docker_container_label_prometheus_io_path"]
+		target_label  = "__metrics_path__"
+		regex         = "(.+)"
+	}
+
+	// Copy all relevant container labels
+	rule {
+		regex         = "__meta_docker_container_label_(.+)"
+		action        = "labelmap"
+		replacement   = "$1"
+	}
+
+	rule {
+		source_labels = ["__meta_docker_container_name"]
+		target_label  = "container_name"
+	}
+
+	rule {
+		source_labels = ["__meta_docker_container_image"]
+		target_label  = "container_image"
+	}
+}
+
+// Scrape metrics from containers with prometheus annotations
+prometheus.scrape "docker_metrics" {
+	targets    = discovery.relabel.docker_metrics_endpoints.output
+	forward_to = [
+		prometheus.remote_write.local.receiver,
+	]
+	
+	scrape_interval  = "30s"
+	scrape_timeout   = "10s"
+	honor_labels     = true
+	honor_timestamps = true
+}
+
+// Removed duplicate cadvisor scraper - using the built-in exporter instead (see below)
+
+// Docker daemon metrics
+prometheus.scrape "docker_daemon" {
+	targets = [
+		{
+			__address__ = "localhost:9323",
+			job         = "docker",
+			instance    = "woody",
+		},
+	]
+	forward_to = [
+		prometheus.remote_write.local.receiver,
+	]
+	
+	scrape_interval  = "30s"
+	scrape_timeout   = "10s"
+	metrics_path     = "/metrics"
+}
+
+// Note: discovery.file removed - it's for service discovery JSON/YAML files, not log files
+// Using loki.source.file with direct targets instead
+
+// Process exporter for detailed process monitoring
+prometheus.exporter.process "process" { 
+	// The process exporter runs internally and exposes metrics about processes
+}
+
+// Scrape the process exporter's own metrics
+prometheus.scrape "process_exporter" {
+	targets    = prometheus.exporter.process.process.targets
+	forward_to = [
+		prometheus.remote_write.local.receiver,
+	]
+	scrape_interval  = "15s"
+	scrape_timeout   = "10s"
+	job_name         = "process_exporter"
+}
+
+// This would be for scraping metrics FROM the discovered processes if they expose any
+// But most processes don't expose Prometheus metrics, so this is likely not useful
+// prometheus.scrape "process" {
+// 	targets    = discovery.relabel.filtered_processes.output
+// 	forward_to = [
+// 		prometheus.relabel.process_metrics.receiver,
+// 	]
+// 	scrape_interval  = "15s"
+// 	scrape_timeout   = "10s"
+// 	honor_labels     = true
+// 	honor_timestamps = true
+// 	metrics_path     = "/metrics"
+// 	scheme           = "http"
+// }
 
 // Filter DNS-discovered services
 // Commented out since DNS discovery is disabled
