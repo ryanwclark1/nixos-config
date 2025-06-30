@@ -1,14 +1,40 @@
 {
-  imports = [
-    ../../common/optional/monitoring/grafana-alloy.nix
-  ];
+  pkgs,
+  config,
+  lib,
+  ...
+}:
 
-  services.alloy-unified = {
-    enable = true;
-    hostname = "frametop";
-    lokiEndpoint = "http://woody:3100/loki/api/v1/push"; # Send to woody
-    prometheusEndpoint = "http://woody:9090/api/v1/write";
-    environment = "production";
-    enableVolumeFilter = false; # frametop doesn't need aggressive filtering
+{
+  # Create the Alloy configuration file with enhanced features
+  environment.etc."alloy/config.alloy" = {
+    source = ./alloy/config.alloy;
   };
+
+  environment.etc."alloy/blackbox.yml" = {
+    source = ./alloy/blackbox.yml;
+  };
+
+  environment.etc."alloy/snmp.yml" = {
+    source = ./alloy/snmp.yml;
+  };
+
+  services.alloy = {
+    enable = true;
+    configPath = "/etc/alloy";
+    extraFlags = [
+      "--disable-reporting"
+    ];
+  };
+
+  # Give Alloy supplementary groups to read process and system information
+  systemd.services.alloy.serviceConfig = {
+    SupplementaryGroups = [ "systemd-journal" "docker" ];
+    # Add capabilities for process monitoring
+    AmbientCapabilities = [ "CAP_SYS_PTRACE" "CAP_DAC_READ_SEARCH" ];
+    CapabilityBoundingSet = [ "CAP_SYS_PTRACE" "CAP_DAC_READ_SEARCH" ];
+  };
+
+  # Open firewall for Alloy
+  networking.firewall.allowedTCPPorts = [ 12345 ];
 }
