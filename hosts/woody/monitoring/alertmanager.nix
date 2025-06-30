@@ -56,6 +56,17 @@
             group_wait = "10s";
             group_interval = "2m";
             repeat_interval = "1h";
+            continue = true;
+          }
+          {
+            match = {
+              severity = "critical";
+              component = "database";
+            };
+            receiver = "database.oncall";
+            group_wait = "5s";
+            group_interval = "1m";
+            repeat_interval = "30m";
           }
           {
             match = {
@@ -65,6 +76,15 @@
             group_wait = "30s";
             group_interval = "5m";
             repeat_interval = "2h";
+            routes = [
+              {
+                match = {
+                  alertname = "AlloyConfigError";
+                };
+                receiver = "alloy.config.alerts";
+                group_wait = "10s";
+              }
+            ];
           }
           {
             match = {
@@ -74,6 +94,23 @@
             group_wait = "10s";
             group_interval = "2m";
             repeat_interval = "30m";
+            routes = [
+              {
+                match = {
+                  security_type = "brute_force";
+                };
+                receiver = "security.urgent";
+                group_wait = "5s";
+                repeat_interval = "15m";
+              }
+              {
+                match = {
+                  security_type = "firewall";
+                };
+                receiver = "security.firewall";
+                group_wait = "30s";
+              }
+            ];
           }
           {
             match = {
@@ -83,12 +120,60 @@
             group_wait = "30s";
             group_interval = "5m";
             repeat_interval = "1h";
+            routes = [
+              {
+                match = {
+                  alertname = "SSLCertificateExpiry";
+                };
+                receiver = "ssl.alerts";
+                group_wait = "1m";
+                repeat_interval = "12h";
+              }
+            ];
           }
           {
             match = {
               component = "container";
             };
             receiver = "container.alerts";
+            group_wait = "30s";
+            group_interval = "5m";
+            repeat_interval = "2h";
+          }
+          {
+            match = {
+              environment = "production";
+            };
+            receiver = "production.alerts";
+            group_wait = "15s";
+            group_interval = "3m";
+            repeat_interval = "1h";
+            mute_time_intervals = [ "maintenance" ];
+          }
+          {
+            match = {
+              environment = "staging";
+            };
+            receiver = "staging.alerts";
+            group_wait = "1m";
+            group_interval = "10m";
+            repeat_interval = "4h";
+            active_time_intervals = [ "workdays" ];
+          }
+          {
+            match = {
+              severity = "info";
+            };
+            receiver = "info.alerts";
+            group_wait = "5m";
+            group_interval = "30m";
+            repeat_interval = "12h";
+          }
+          {
+            match_re = {
+              service = "(prometheus|grafana|loki)";
+            };
+            receiver = "monitoring.alerts";
             group_wait = "30s";
             group_interval = "5m";
             repeat_interval = "2h";
@@ -103,6 +188,9 @@
             {
               url = "http://127.0.0.1:5001/";
               send_resolved = true;
+              http_config = {
+                bearer_token = "default-webhook-token";
+              };
             }
           ];
         }
@@ -112,12 +200,60 @@
             {
               url = "http://127.0.0.1:5001/critical";
               send_resolved = true;
+              max_alerts = 10;
+              http_config = {
+                bearer_token = "critical-webhook-token";
+              };
+            }
+            {
+              url = "http://127.0.0.1:5002/pagerduty";
+              send_resolved = false;
             }
           ];
           email_configs = [
             {
               to = "admin@woody";
               send_resolved = true;
+              headers = {
+                Priority = "urgent";
+                X-Alert-Type = "critical";
+              };
+            }
+            {
+              to = "oncall@woody";
+              send_resolved = true;
+            }
+          ];
+          pagerduty_configs = [
+            {
+              service_key = "YOUR-PAGERDUTY-SERVICE-KEY";
+              severity = "critical";
+            }
+          ];
+        }
+        {
+          name = "database.oncall";
+          webhook_configs = [
+            {
+              url = "http://127.0.0.1:5001/database/critical";
+              send_resolved = true;
+            }
+          ];
+          email_configs = [
+            {
+              to = "dba-oncall@woody";
+              send_resolved = true;
+              headers = {
+                Priority = "urgent";
+                X-Alert-Component = "database";
+              };
+            }
+          ];
+          pagerduty_configs = [
+            {
+              service_key = "DATABASE-PAGERDUTY-KEY";
+              severity = "critical";
+              client = "Woody Database Alerts";
             }
           ];
         }
@@ -129,6 +265,30 @@
               send_resolved = true;
             }
           ];
+          slack_configs = [
+            {
+              api_url = "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK";
+              channel = "#monitoring-alerts";
+              title = "Alloy Alert";
+              text = "{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}";
+            }
+          ];
+        }
+        {
+          name = "alloy.config.alerts";
+          webhook_configs = [
+            {
+              url = "http://127.0.0.1:5001/alloy/config";
+              send_resolved = true;
+            }
+          ];
+          email_configs = [
+            {
+              to = "ops@woody";
+              send_resolved = true;
+              html = "{{ template \"email.to.html\" . }}";
+            }
+          ];
         }
         {
           name = "security.alerts";
@@ -137,11 +297,60 @@
               url = "http://127.0.0.1:5001/security";
               send_resolved = true;
             }
+            {
+              url = "http://127.0.0.1:5003/siem";
+              send_resolved = false;
+            }
           ];
           email_configs = [
             {
               to = "security@woody";
               send_resolved = true;
+              headers = {
+                X-Security-Alert = "true";
+              };
+            }
+          ];
+        }
+        {
+          name = "security.urgent";
+          webhook_configs = [
+            {
+              url = "http://127.0.0.1:5001/security/urgent";
+              send_resolved = true;
+              max_alerts = 5;
+            }
+          ];
+          email_configs = [
+            {
+              to = "security-urgent@woody";
+              send_resolved = true;
+              headers = {
+                Priority = "urgent";
+                X-Security-Type = "brute-force";
+              };
+            }
+          ];
+          pagerduty_configs = [
+            {
+              service_key = "SECURITY-PAGERDUTY-KEY";
+              severity = "critical";
+            }
+          ];
+        }
+        {
+          name = "security.firewall";
+          webhook_configs = [
+            {
+              url = "http://127.0.0.1:5001/security/firewall";
+              send_resolved = true;
+            }
+          ];
+          slack_configs = [
+            {
+              api_url = "https://hooks.slack.com/services/YOUR/SECURITY/WEBHOOK";
+              channel = "#security-firewall";
+              title = "Firewall Alert";
             }
           ];
         }
@@ -153,12 +362,113 @@
               send_resolved = true;
             }
           ];
+          email_configs = [
+            {
+              to = "network@woody";
+              send_resolved = true;
+            }
+          ];
+        }
+        {
+          name = "ssl.alerts";
+          webhook_configs = [
+            {
+              url = "http://127.0.0.1:5001/ssl";
+              send_resolved = true;
+            }
+          ];
+          email_configs = [
+            {
+              to = "ssl-admin@woody";
+              send_resolved = true;
+              headers = {
+                X-Certificate-Alert = "true";
+              };
+            }
+          ];
         }
         {
           name = "container.alerts";
           webhook_configs = [
             {
               url = "http://127.0.0.1:5001/container";
+              send_resolved = true;
+            }
+          ];
+          slack_configs = [
+            {
+              api_url = "https://hooks.slack.com/services/YOUR/CONTAINER/WEBHOOK";
+              channel = "#container-alerts";
+              title = "Container Alert";
+              text = "{{ .GroupLabels.container_name }} - {{ .CommonAnnotations.summary }}";
+            }
+          ];
+        }
+        {
+          name = "production.alerts";
+          webhook_configs = [
+            {
+              url = "http://127.0.0.1:5001/production";
+              send_resolved = true;
+              http_config = {
+                bearer_token = "prod-webhook-token";
+              };
+            }
+          ];
+          email_configs = [
+            {
+              to = "prod-alerts@woody";
+              send_resolved = true;
+            }
+          ];
+          opsgenie_configs = [
+            {
+              api_key = "YOUR-OPSGENIE-API-KEY";
+              responders = [
+                {
+                  type = "team";
+                  name = "production-team";
+                }
+              ];
+              priority = "P1";
+            }
+          ];
+        }
+        {
+          name = "staging.alerts";
+          webhook_configs = [
+            {
+              url = "http://127.0.0.1:5001/staging";
+              send_resolved = true;
+            }
+          ];
+          slack_configs = [
+            {
+              api_url = "https://hooks.slack.com/services/YOUR/STAGING/WEBHOOK";
+              channel = "#staging-alerts";
+            }
+          ];
+        }
+        {
+          name = "info.alerts";
+          webhook_configs = [
+            {
+              url = "http://127.0.0.1:5001/info";
+              send_resolved = false;
+            }
+          ];
+        }
+        {
+          name = "monitoring.alerts";
+          webhook_configs = [
+            {
+              url = "http://127.0.0.1:5001/monitoring";
+              send_resolved = true;
+            }
+          ];
+          email_configs = [
+            {
+              to = "monitoring@woody";
               send_resolved = true;
             }
           ];
@@ -182,6 +492,18 @@
         }
         {
           source_match = {
+            severity = "critical";
+          };
+          target_match = {
+            severity = "info";
+          };
+          equal = [
+            "alertname"
+            "instance"
+          ];
+        }
+        {
+          source_match = {
             alertname = "AlloyDown";
           };
           target_match = {
@@ -189,6 +511,18 @@
           };
           equal = [
             "instance"
+          ];
+        }
+        {
+          source_match = {
+            alertname = "AlloyConfigError";
+          };
+          target_match = {
+            alertname = "AlloyUnhealthy";
+          };
+          equal = [
+            "instance"
+            "job"
           ];
         }
         {
@@ -201,6 +535,68 @@
           equal = [
             "instance"
             "container_name"
+          ];
+        }
+        {
+          source_match = {
+            alertname = "NodeDown";
+          };
+          target_match = {
+            alertname = ".*";
+          };
+          equal = [
+            "instance"
+          ];
+        }
+        {
+          source_match = {
+            alertname = "NetworkInterfaceDown";
+          };
+          target_match = {
+            component = "network";
+            severity = "warning";
+          };
+          equal = [
+            "instance"
+            "interface"
+          ];
+        }
+        {
+          source_match = {
+            alertname = "DatabaseDown";
+          };
+          target_match = {
+            component = "application";
+          };
+          equal = [
+            "instance"
+            "database"
+          ];
+        }
+        {
+          source_match = {
+            environment = "production";
+            severity = "critical";
+          };
+          target_match = {
+            environment = "production";
+            severity = "warning";
+          };
+          equal = [
+            "service"
+            "component"
+          ];
+        }
+        {
+          source_match = {
+            alertname = "DiskSpaceCritical";
+          };
+          target_match = {
+            alertname = "DiskSpaceWarning";
+          };
+          equal = [
+            "instance"
+            "mountpoint"
           ];
         }
       ];
@@ -225,6 +621,144 @@
           time_intervals = [
             {
               weekdays = [ "saturday" "sunday" ];
+            }
+          ];
+        }
+        {
+          name = "office-hours";
+          time_intervals = [
+            {
+              weekdays = [ "monday" "tuesday" "wednesday" "thursday" "friday" ];
+              times = [
+                {
+                  start_time = "08:00";
+                  end_time = "18:00";
+                }
+              ];
+            }
+          ];
+        }
+        {
+          name = "after-hours";
+          time_intervals = [
+            {
+              weekdays = [ "monday" "tuesday" "wednesday" "thursday" "friday" ];
+              times = [
+                {
+                  start_time = "18:00";
+                  end_time = "23:59";
+                }
+                {
+                  start_time = "00:00";
+                  end_time = "08:00";
+                }
+              ];
+            }
+            {
+              weekdays = [ "saturday" "sunday" ];
+            }
+          ];
+        }
+        {
+          name = "maintenance";
+          time_intervals = [
+            {
+              weekdays = [ "sunday" ];
+              times = [
+                {
+                  start_time = "02:00";
+                  end_time = "06:00";
+                }
+              ];
+            }
+          ];
+        }
+        {
+          name = "business-critical";
+          time_intervals = [
+            {
+              weekdays = [ "monday" "tuesday" "wednesday" "thursday" "friday" ];
+              times = [
+                {
+                  start_time = "07:00";
+                  end_time = "19:00";
+                }
+              ];
+            }
+          ];
+        }
+        {
+          name = "overnight";
+          time_intervals = [
+            {
+              times = [
+                {
+                  start_time = "22:00";
+                  end_time = "23:59";
+                }
+                {
+                  start_time = "00:00";
+                  end_time = "06:00";
+                }
+              ];
+            }
+          ];
+        }
+        {
+          name = "holidays";
+          time_intervals = [
+            {
+              months = [ "december" ];
+              days_of_month = [ "25" "26" ];
+            }
+            {
+              months = [ "january" ];
+              days_of_month = [ "1" ];
+            }
+            {
+              months = [ "july" ];
+              days_of_month = [ "4" ];
+            }
+          ];
+        }
+        {
+          name = "peak-hours";
+          time_intervals = [
+            {
+              weekdays = [ "monday" "tuesday" "wednesday" "thursday" "friday" ];
+              times = [
+                {
+                  start_time = "10:00";
+                  end_time = "12:00";
+                }
+                {
+                  start_time = "14:00";
+                  end_time = "16:00";
+                }
+              ];
+            }
+          ];
+        }
+        {
+          name = "low-priority-hours";
+          time_intervals = [
+            {
+              weekdays = [ "monday" "tuesday" "wednesday" "thursday" "friday" ];
+              times = [
+                {
+                  start_time = "12:00";
+                  end_time = "13:00";
+                }
+              ];
+            }
+            {
+              weekdays = [ "saturday" "sunday" ];
+              times = [
+                {
+                  start_time = "10:00";
+                  end_time = "18:00";
+                }
+              ];
             }
           ];
         }
