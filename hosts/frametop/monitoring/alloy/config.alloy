@@ -1102,42 +1102,43 @@ prometheus.scrape "cadvisor" {
 // Blackbox exporter for network probing
 prometheus.exporter.blackbox "blackbox" {
   config_file = "/etc/alloy/blackbox.yml"
-  
-  // HTTP probes
   target {
-    name = "gateway_http"
-    address = "http://10.10.100.1"
-    module = "http_2xx"
-  }
-  target {
-    name = "gateway_https"
-    address = "https://10.10.100.1"
-    module = "https_2xx"
-  }
-  target {
-    name = "woody_prometheus"
+    name = "http_woody_prometheus"
     address = "http://woody:9090"
     module = "http_2xx"
   }
   target {
-    name = "woody_grafana"
+    name = "http_woody_grafana"
     address = "http://woody:3000"
     module = "http_2xx"
   }
-  
-  // ICMP probes
   target {
-    name = "gateway_ping"
+    name = "http_woody_alertmanager"
+    address = "http://woody:9093"
+    module = "http_2xx"
+  }
+  target {
+    name = "http_gateway"
+    address = "http://10.10.100.1"
+    module = "http_2xx"
+  }
+  target {
+    name = "https_gateway"
+    address = "https://10.10.100.1"
+    module = "https_2xx"
+  }
+  target {
+    name = "icmp_gateway"
     address = "10.10.100.1"
     module = "icmp"
   }
   target {
-    name = "google_dns_ping"
+    name = "icmp_google_dns"
     address = "8.8.8.8"
     module = "icmp"
   }
   target {
-    name = "cloudflare_dns_ping"
+    name = "icmp_cloudflare_dns"
     address = "1.1.1.1"
     module = "icmp"
   }

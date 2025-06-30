@@ -1,0 +1,151 @@
+# Alertmanager Webhook Configuration Reference
+# This file documents the webhook endpoints and their expected payloads
+
+webhooks:
+  # Default webhook - receives all alerts not matched by specific routes
+  default:
+    url: "http://127.0.0.1:5001/"
+    auth:
+      bearer_token: "default-webhook-token"
+    description: "Default webhook for general alerts"
+
+  # Critical alerts webhook
+  critical:
+    url: "http://127.0.0.1:5001/critical"
+    auth:
+      bearer_token: "critical-webhook-token"
+    description: "Handles all critical severity alerts"
+    features:
+      - max_alerts: 10
+      - send_resolved: true
+      - retry_attempts: 3
+
+  # PagerDuty integration
+  pagerduty:
+    url: "http://127.0.0.1:5002/pagerduty"
+    description: "PagerDuty webhook for incident management"
+    features:
+      - send_resolved: false
+      - critical_only: true
+
+  # Database alerts
+  database:
+    url: "http://127.0.0.1:5001/database/critical"
+    description: "Database-specific critical alerts"
+
+  # Monitoring component alerts
+  alloy:
+    url: "http://127.0.0.1:5001/alloy"
+    description: "Grafana Alloy monitoring agent alerts"
+    
+  alloy_config:
+    url: "http://127.0.0.1:5001/alloy/config"
+    description: "Alloy configuration error alerts"
+
+  # Security alerts
+  security:
+    url: "http://127.0.0.1:5001/security"
+    description: "General security alerts"
+    
+  security_urgent:
+    url: "http://127.0.0.1:5001/security/urgent"
+    description: "Urgent security alerts (brute force, intrusions)"
+    features:
+      - max_alerts: 5
+      
+  security_firewall:
+    url: "http://127.0.0.1:5001/security/firewall"
+    description: "Firewall-specific security alerts"
+    
+  siem:
+    url: "http://127.0.0.1:5003/siem"
+    description: "SIEM integration for security event correlation"
+    features:
+      - send_resolved: false
+
+  # Network and SSL alerts
+  network:
+    url: "http://127.0.0.1:5001/network"
+    description: "Network connectivity and performance alerts"
+    
+  ssl:
+    url: "http://127.0.0.1:5001/ssl"
+    description: "SSL certificate expiry and validation alerts"
+
+  # Container/Docker alerts
+  container:
+    url: "http://127.0.0.1:5001/container"
+    description: "Docker container health and resource alerts"
+
+  # Environment-specific alerts
+  production:
+    url: "http://127.0.0.1:5001/production"
+    auth:
+      bearer_token: "prod-webhook-token"
+    description: "Production environment alerts"
+    
+  staging:
+    url: "http://127.0.0.1:5001/staging"
+    description: "Staging environment alerts"
+
+  # Low priority alerts
+  info:
+    url: "http://127.0.0.1:5001/info"
+    description: "Informational alerts"
+    features:
+      - send_resolved: false
+
+  # Monitoring stack alerts
+  monitoring:
+    url: "http://127.0.0.1:5001/monitoring"
+    description: "Prometheus/Grafana/Loki stack alerts"
+
+# Webhook Payload Format
+# All webhooks receive the following JSON payload structure:
+#
+# {
+#   "version": "4",
+#   "groupKey": "{}:{alertname=\"<ALERT_NAME>\"}",
+#   "status": "firing|resolved",
+#   "receiver": "<RECEIVER_NAME>",
+#   "groupLabels": {
+#     "alertname": "<ALERT_NAME>"
+#   },
+#   "commonLabels": {
+#     "alertname": "<ALERT_NAME>",
+#     "severity": "critical|warning|info",
+#     "component": "<COMPONENT>",
+#     "instance": "<INSTANCE>"
+#   },
+#   "commonAnnotations": {
+#     "summary": "<ALERT_SUMMARY>",
+#     "description": "<ALERT_DESCRIPTION>"
+#   },
+#   "externalURL": "http://woody:9093/",
+#   "alerts": [
+#     {
+#       "labels": {
+#         "alertname": "<ALERT_NAME>",
+#         "severity": "<SEVERITY>",
+#         "instance": "<INSTANCE>"
+#       },
+#       "annotations": {
+#         "summary": "<ALERT_SUMMARY>",
+#         "description": "<ALERT_DESCRIPTION>"
+#       },
+#       "startsAt": "<RFC3339_TIMESTAMP>",
+#       "endsAt": "<RFC3339_TIMESTAMP>",
+#       "generatorURL": "<PROMETHEUS_URL>"
+#     }
+#   ]
+# }
+
+# Webhook Implementation Tips:
+# 1. Always validate the bearer token if configured
+# 2. Handle both 'firing' and 'resolved' status appropriately
+# 3. Implement proper error handling and logging
+# 4. Consider rate limiting to prevent webhook spam
+# 5. Use the groupKey for deduplication
+# 6. Process alerts asynchronously to avoid blocking
+# 7. Return 2xx status code to acknowledge receipt
+# 8. Implement retry logic for downstream services

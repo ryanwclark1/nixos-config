@@ -23,7 +23,7 @@
 // Loki remote write for log aggregation with rate limiting
 loki.write "local" {
   endpoint {
-    url = "http://woody:3100/loki/api/v1/push"
+    url = "http://localhost:3100/loki/api/v1/push"
     
     // Batch configuration to reduce request rate
     batch_wait = "5s"
@@ -846,7 +846,28 @@ loki.source.journal "read" {
 
 // File source for reading application logs with enhanced configuration
 loki.source.file "local_files" {
-  targets = discovery.relabel.filtered_log_files.output
+  targets = [
+    {
+      __path__ = "/var/log/*.log",
+      job = "varlogs",
+      host = "woody",
+    },
+    {
+      __path__ = "/var/log/nginx/*.log",
+      job = "nginx",
+      host = "woody",
+    },
+    {
+      __path__ = "/var/log/postgresql/*.log",
+      job = "postgresql",
+      host = "woody",
+    },
+    {
+      __path__ = "/var/log/applications/*.log",
+      job = "applications",
+      host = "woody",
+    },
+  ]
   forward_to = [
     loki.process.json_parser.receiver,
     loki.process.auth_log_parser.receiver,
@@ -1014,6 +1035,8 @@ discovery.relabel "filtered_docker_containers" {
 }
 
 // Discover log files dynamically
+// DISABLED: discovery.file is for service discovery, not log files
+/*
 discovery.file "log_files" {
   files = [
     "/var/log/*.log",
@@ -1034,8 +1057,11 @@ discovery.file "log_files" {
   ]
   refresh_interval = "60s"
 }
+*/
 
 // Filter discovered log files
+// DISABLED: Depends on discovery.file which is incorrect for log files
+/*
 discovery.relabel "filtered_log_files" {
   targets = discovery.file.log_files.targets
 
@@ -1063,6 +1089,7 @@ discovery.relabel "filtered_log_files" {
     replacement = "$1"
   }
 }
+*/
 
 // Process exporter for detailed process monitoring
 prometheus.exporter.process "process" {
