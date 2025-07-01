@@ -1,0 +1,143 @@
+// =============================================================================
+// SERVICE DISCOVERY
+// =============================================================================
+//
+// This module contains all service discovery configurations for:
+// - Docker container discovery
+// - Dynamic target management
+// - Container metrics scraping
+//
+// =============================================================================
+
+// Discover Docker containers for enhanced monitoring
+// Containers can expose metrics in several ways:
+// 1. Using Docker labels:
+//    - prometheus.io/scrape: "true"
+//    - prometheus.io/port: "9090"
+//    - prometheus.io/path: "/metrics"
+// 2. Exposing metrics on standard ports (e.g., :9090/metrics)
+// 3. Through cAdvisor for resource metrics (CPU, memory, network, disk)
+discovery.docker "docker_containers" {
+	host             = "unix:///var/run/docker.sock"
+	refresh_interval = "30s"
+}
+
+// Filter Docker containers for monitoring
+discovery.relabel "filtered_docker_containers" {
+	targets = discovery.docker.docker_containers.targets
+
+	rule {
+		action        = "keep"
+		regex         = ".*"
+		source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+	}
+
+	rule {
+		source_labels = ["__meta_docker_container_name"]
+		target_label  = "container_name"
+	}
+
+	rule {
+		source_labels = ["__meta_docker_container_image"]
+		target_label  = "container_image"
+	}
+
+	rule {
+		source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+		target_label  = "service"
+	}
+}
+
+// Scrape metrics from Docker containers
+// This is for containers that might expose metrics but don't have explicit labels
+prometheus.scrape "docker_containers" {
+	targets    = discovery.relabel.filtered_docker_containers.output
+	forward_to = [
+		prometheus.relabel.docker_container_metrics.receiver,
+	]
+
+	// Scrape configuration for container metrics
+	scrape_interval  = "30s"
+	scrape_timeout   = "10s"
+	honor_labels     = true
+	honor_timestamps = true
+	metrics_path     = "/metrics"
+}
+
+// Relabel metrics from Docker containers
+prometheus.relabel "docker_container_metrics" {
+	forward_to = [
+		prometheus.remote_write.local.receiver,
+	]
+
+	// Add job label if not present
+	rule {
+		target_label = "job"
+		replacement  = "docker_containers"
+		regex        = ""
+		source_labels = ["job"]
+	}
+
+	// Keep essential container labels
+	rule {
+		action = "labelkeep"
+		regex  = "job|instance|container_name|container_image|service|__name__|__scheme__|__metrics_path__"
+	}
+}
+
+// Additional scraper for containers exposing metrics on specific ports
+discovery.relabel "docker_metrics_endpoints" {
+	targets = discovery.docker.docker_containers.targets
+
+	// Keep only containers that expose metrics
+	rule {
+		action        = "keep"
+		regex         = ".*"
+		source_labels = ["__meta_docker_container_label_prometheus_io_scrape"]
+	}
+
+	// Set the address from the container's exposed port
+	rule {
+		source_labels = ["__meta_docker_container_ip", "__meta_docker_container_label_prometheus_io_port"]
+		separator     = ":"
+		target_label  = "__address__"
+		replacement   = "${1}:${2}"
+	}
+
+	// Set metrics path from label or use default
+	rule {
+		source_labels = ["__meta_docker_container_label_prometheus_io_path"]
+		target_label  = "__metrics_path__"
+		regex         = "(.+)"
+	}
+
+	// Copy all relevant container labels
+	rule {
+		regex         = "__meta_docker_container_label_(.+)"
+		action        = "labelmap"
+		replacement   = "$1"
+	}
+
+	rule {
+		source_labels = ["__meta_docker_container_name"]
+		target_label  = "container_name"
+	}
+
+	rule {
+		source_labels = ["__meta_docker_container_image"]
+		target_label  = "container_image"
+	}
+}
+
+// Scrape metrics from containers with prometheus annotations
+prometheus.scrape "docker_metrics" {
+	targets    = discovery.relabel.docker_metrics_endpoints.output
+	forward_to = [
+		prometheus.remote_write.local.receiver,
+	]
+
+	scrape_interval  = "30s"
+	scrape_timeout   = "10s"
+	honor_labels     = true
+	honor_timestamps = true
+}

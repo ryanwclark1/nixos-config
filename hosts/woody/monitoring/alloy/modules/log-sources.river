@@ -1,0 +1,77 @@
+// =============================================================================
+// LOG SOURCES
+// =============================================================================
+//
+// This module contains all log source configurations for:
+// - Systemd journal logs
+// - File-based application logs
+// - Docker container logs
+// - Log processing pipelines
+//
+// =============================================================================
+
+// Journal source for reading systemd journal logs with enhanced relabeling
+loki.source.journal "read" {
+	forward_to = [
+		loki.relabel.journal_volume_filter.receiver,
+	]
+	labels = {
+		"job"       = "journal",
+		"host"      = "woody",
+		"component" = "alloy",
+		"source"    = "systemd-journal",
+	}
+}
+
+// File source for reading application logs with enhanced configuration
+loki.source.file "local_files" {
+	targets = [
+		{
+			__path__ = "/var/log/*.log",
+			job      = "varlogs",
+			host     = "woody",
+		},
+		{
+			__path__ = "/var/log/nginx/*.log",
+			job      = "nginx",
+			host     = "woody",
+		},
+		{
+			__path__ = "/var/log/postgresql/*.log",
+			job      = "postgresql",
+			host     = "woody",
+		},
+		{
+			__path__ = "/var/log/applications/*.log",
+			job      = "applications",
+			host     = "woody",
+		},
+	]
+	forward_to = [
+		loki.process.json_parser.receiver,
+		loki.process.auth_log_parser.receiver,
+		loki.process.firewall_log_parser.receiver,
+		loki.process.web_log_parser.receiver,
+		loki.process.database_log_parser.receiver,
+		loki.process.app_log_parser.receiver,
+		loki.process.error_log_parser.receiver,
+		loki.relabel.file_logs.receiver,
+	]
+}
+
+// Docker container logs source
+loki.source.docker "docker" {
+	host       = "unix:///var/run/docker.sock"
+	targets    = []
+	forward_to = [
+		loki.process.docker_json_parser.receiver,
+		loki.process.k8s_log_parser.receiver,
+		loki.relabel.docker_logs_enhanced.receiver,
+	]
+	labels = {
+		"job"       = "docker",
+		"host"      = "woody",
+		"component" = "alloy",
+		"source"    = "docker",
+	}
+}

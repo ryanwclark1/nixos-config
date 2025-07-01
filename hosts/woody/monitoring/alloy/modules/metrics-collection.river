@@ -1,0 +1,204 @@
+// =============================================================================
+// METRICS COLLECTION
+// =============================================================================
+//
+// This module contains all metrics collection configurations for:
+// - System metrics (Unix exporter)
+// - Process monitoring
+// - Container metrics (cAdvisor)
+// - Network monitoring (Blackbox)
+// - Self-monitoring
+//
+// =============================================================================
+
+// Self-monitoring for Alloy health and performance
+prometheus.scrape "self" {
+	targets = [
+		{
+			"__address__" = "127.0.0.1:12345",
+			"job"         = "alloy_self",
+		},
+	]
+	forward_to = [
+		prometheus.remote_write.local.receiver,
+	]
+	scrape_interval  = "30s"
+	scrape_timeout   = "10s"
+	honor_labels     = true
+	honor_timestamps = true
+	metrics_path     = "/metrics"
+	scheme           = "http"
+}
+
+// Unix exporter for comprehensive system metrics
+prometheus.exporter.unix "unix" {
+	disable_collectors = [
+		"ipvs",
+		"infiniband",
+		"xfs",
+		"zfs",
+	]
+	enable_collectors = [
+		"cpu",
+		"diskstats",
+		"filefd",
+		"filesystem",
+		"hwmon",
+		"interrupts",
+		"ksmd",
+		"loadavg",
+		"logind",
+		"meminfo",
+		"mountstats",
+		"netdev",
+		"netstat",
+		"processes",
+		"sockstat",
+		"stat",
+		"systemd",
+		"textfile",
+		"time",
+		"uname",
+		"vmstat",
+	]
+
+	filesystem {
+		// Exclude mount points that aren't relevant for monitoring
+		mount_points_exclude = "^/(dev|proc|run/credentials/.+|sys|var/lib/docker/.+)($|/)"
+		// Exclude filesystem types that aren't relevant for monitoring
+		fs_types_exclude = "^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|tmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$"
+		// Timeout for filesystem operations
+		mount_timeout = "5s"
+	}
+
+	netclass {
+		// Ignore virtual and container network interfaces
+		ignored_devices = "^(veth.*|cali.*|[a-f0-9]{15})$"
+	}
+
+	netdev {
+		// Exclude virtual and container network interfaces from device metrics
+		device_exclude = "^(veth.*|cali.*|[a-f0-9]{15})$"
+	}
+}
+
+prometheus.scrape "unix" {
+	targets    = prometheus.exporter.unix.unix.targets
+	forward_to = [
+		prometheus.relabel.unix_metrics.receiver,
+	]
+	scrape_interval  = "15s"
+	scrape_timeout   = "10s"
+	honor_labels     = true
+	honor_timestamps = true
+	metrics_path     = "/metrics"
+	scheme           = "http"
+}
+
+// Process exporter for detailed process monitoring
+prometheus.exporter.process "process" {
+	// The process exporter runs internally and exposes metrics about processes
+}
+
+// Scrape the process exporter's own metrics
+prometheus.scrape "process_exporter" {
+	targets    = prometheus.exporter.process.process.targets
+	forward_to = [
+		prometheus.remote_write.local.receiver,
+	]
+	scrape_interval  = "15s"
+	scrape_timeout   = "10s"
+	job_name         = "process_exporter"
+}
+
+// cAdvisor exporter for container metrics
+prometheus.exporter.cadvisor "cadvisor" {
+	docker_host = "unix:///var/run/docker.sock"
+}
+
+prometheus.scrape "cadvisor" {
+	targets    = prometheus.exporter.cadvisor.cadvisor.targets
+	forward_to = [
+		prometheus.relabel.cadvisor_metrics.receiver,
+	]
+}
+
+// Blackbox exporter for network probing
+prometheus.exporter.blackbox "blackbox" {
+	config_file = "/etc/alloy/blackbox.yml"
+
+	target {
+		name    = "http_woody_prometheus"
+		address = "http://woody:9090"
+		module  = "http_2xx"
+	}
+
+	target {
+		name    = "http_woody_grafana"
+		address = "http://woody:3000"
+		module  = "http_2xx"
+	}
+
+	target {
+		name    = "http_woody_alertmanager"
+		address = "http://woody:9093"
+		module  = "http_2xx"
+	}
+
+	target {
+		name    = "http_gateway"
+		address = "http://10.10.100.1"
+		module  = "http_2xx"
+	}
+
+	target {
+		name    = "https_gateway"
+		address = "https://10.10.100.1"
+		module  = "https_2xx"
+	}
+
+	target {
+		name    = "icmp_gateway"
+		address = "10.10.100.1"
+		module  = "icmp"
+	}
+
+	target {
+		name    = "icmp_google_dns"
+		address = "8.8.8.8"
+		module  = "icmp"
+	}
+
+	target {
+		name    = "icmp_cloudflare_dns"
+		address = "1.1.1.1"
+		module  = "icmp"
+	}
+}
+
+prometheus.scrape "blackbox" {
+	targets    = prometheus.exporter.blackbox.blackbox.targets
+	forward_to = [
+		prometheus.relabel.blackbox_metrics.receiver,
+	]
+	scrape_interval = "60s"
+	scrape_timeout  = "10s"
+}
+
+// Docker daemon metrics
+prometheus.scrape "docker_daemon" {
+	targets = [
+		{
+			__address__ = "localhost:9323",
+			job         = "docker",
+			instance    = "woody",
+		},
+	]
+	forward_to = [
+		prometheus.remote_write.local.receiver,
+	]
+
+	scrape_interval  = "30s"
+	scrape_timeout   = "10s"
+	metrics_path     = "/metrics"
+}

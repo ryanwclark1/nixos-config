@@ -1,0 +1,49 @@
+// =============================================================================
+// REMOTE WRITE CONFIGURATIONS
+// =============================================================================
+//
+// This module contains all remote write configurations for:
+// - Loki log aggregation
+// - Prometheus metrics forwarding
+// - Rate limiting and reliability settings
+//
+// =============================================================================
+
+// Loki remote write for log aggregation with rate limiting
+loki.write "local" {
+	endpoint {
+		url = "http://localhost:3100/loki/api/v1/push"
+
+		// Batch configuration to reduce request rate
+		batch_wait = "5s"
+		batch_size = "1MB"
+
+		// Enable retry on rate limit errors
+		retry_on_http_429 = true
+	}
+
+	// Buffer configuration for log reliability
+	external_labels = {
+		"host"        = "woody",
+		"component"   = "alloy",
+		"environment" = "production",
+	}
+
+	// WAL configuration to handle bursts
+	wal {
+		enabled         = true
+		max_segment_age = "1h"
+	}
+}
+
+// Prometheus remote write for metrics with retry and timeout
+prometheus.remote_write "local" {
+	endpoint {
+		url = "http://woody:9090/api/v1/write"
+	}
+	external_labels = {
+		"host"        = "woody",
+		"component"   = "alloy",
+		"environment" = "production",
+	}
+}
