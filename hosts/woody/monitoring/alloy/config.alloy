@@ -344,16 +344,119 @@ prometheus.exporter.unix "unix" {
 }
 
 prometheus.scrape "unix" {
-	targets    = prometheus.exporter.unix.unix.targets
-	forward_to = [
-		prometheus.remote_write.local.receiver,
-	]
-	scrape_interval  = "15s"
-	scrape_timeout   = "10s"
-	honor_labels     = true
-	honor_timestamps = true
-	metrics_path     = "/metrics"
-	scheme           = "http"
+  targets = prometheus.exporter.unix.unix.targets
+  forward_to = [
+    prometheus.relabel.unix_metrics.receiver,
+  ]
+  scrape_interval = "15s"
+  scrape_timeout = "10s"
+  honor_labels = true
+  honor_timestamps = true
+  metrics_path = "/metrics"
+  scheme = "http"
+}
+
+// =============================================================================
+// DISCOVERY COMPONENTS
+// =============================================================================
+
+// Discover all processes
+// NOTE: Disabled due to excessive permission denied errors
+// discovery.process "all_processes" {
+// }
+
+// Filter processes for monitoring
+// discovery.relabel "filtered_processes" {
+//   targets = discovery.process.all_processes.targets
+//
+//   rule {
+//     action = "keep"
+//     regex = "^(prometheus|grafana|node_exporter|systemd_exporter|cadvisor|process_exporter|alloy|docker|containerd|systemd|sshd|nginx|apache|postgres|mysql|redis)$"
+//     source_labels = ["__meta_process_name"]
+//   }
+// }
+
+// Discover Docker containers for enhanced monitoring
+discovery.docker "docker_containers" {
+  host = "unix:///var/run/docker.sock"
+  refresh_interval = "30s"
+}
+
+// Filter Docker containers for monitoring
+discovery.relabel "filtered_docker_containers" {
+  targets = discovery.docker.docker_containers.targets
+
+  rule {
+    action = "keep"
+    regex = ".*"
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    target_label = "container_name"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_image"]
+    target_label = "container_image"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    target_label = "service"
+  }
+}
+
+// Discover log files dynamically
+discovery.file "log_files" {
+  files = [
+    "/var/log/*.log",
+    "/var/log/syslog",
+    "/var/log/auth.log",
+    "/var/log/kern.log",
+    "/var/log/dmesg",
+    "/var/log/daemon.log",
+    "/var/log/messages",
+    "/var/log/postgresql/*.log",
+    "/var/lib/docker/containers/*/*.log",
+    "/var/log/applications/*.log",
+    "/opt/*/logs/*.log",
+    "/var/log/audit/audit.log",
+    "/var/log/fail2ban.log",
+    "/var/log/ufw.log",
+    "/var/log/iptables.log",
+  ]
+  refresh_interval = "60s"
+}
+
+// Filter discovered log files
+discovery.relabel "filtered_log_files" {
+  targets = discovery.file.log_files.targets
+
+  rule {
+    source_labels = ["__path__"]
+    target_label = "file_path"
+  }
+
+  rule {
+    source_labels = ["__filename__"]
+    target_label = "filename"
+  }
+
+  rule {
+    source_labels = ["__path__"]
+    regex = ".*/([^/]+)\\.log"
+    target_label = "service"
+    replacement = "$1"
+  }
+
+  rule {
+    source_labels = ["__path__"]
+    regex = ".*/docker/containers/([^/]+)/.*"
+    target_label = "container_id"
+    replacement = "$1"
+  }
 }
 
 // Process exporter for detailed process monitoring

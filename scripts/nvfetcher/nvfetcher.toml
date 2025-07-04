@@ -33,6 +33,11 @@ src.vsmarketplace = "github.copilot"
 fetch.vsmarketplace = "github.copilot"
 passthru = { publisher = "github", name = "copilot" }
 
+[copilot-chat]
+src.vsmarketplace = "github.copilot-chat"
+fetch.vsmarketplace = "github.copilot-chat"
+passthru = { publisher = "github", name = "copilot-chat" }
+
 [explorer]
 src.vsmarketplace = "vitest.explorer"
 fetch.vsmarketplace = "vitest.explorer"
