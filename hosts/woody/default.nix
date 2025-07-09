@@ -45,6 +45,8 @@
     ../common/optional/desktop/displaymanager/sddm
   ];
 
+  hardware.opengl.enable = true;
+
   # Override global monitoring with woody's comprehensive setup
   services.prometheus.exporters.node = lib.mkForce {
     enable = true;

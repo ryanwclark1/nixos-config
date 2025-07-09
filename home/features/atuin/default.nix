@@ -25,7 +25,7 @@
     settings = {
       # sync_address = "https://atuin.techcasa.io";
       auto_sync = true;
-      sync_address = "http://100.112.124.7:8888";
+      # sync_address = "http://100.112.124.7:8888";
       # key_path = config.sops.secrets.atuin-key.path;
       sync_frequency = "1m";
       dialect = "us";
@@ -80,6 +80,7 @@
           "uv"
           "poetry"
           "claude"
+          "yt-dlp"
         ];
         common_prefix = [
           "sudo"
