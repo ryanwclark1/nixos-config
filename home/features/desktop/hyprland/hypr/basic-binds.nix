@@ -198,7 +198,7 @@
       #   # Move window to workspace
       #   (map (n: "SUPER SHIFT,${n},movetoworkspacesilent,name:${n}") workspaces)
       #   ++
-      #   # Move focus
+      #   # Move focusWallpaper managers (hyprpaper, waypaper)
       #   (lib.mapAttrsToList (key: direction: "SUPER,${key},movefocus,${direction}") directions)
       #   ++
       #   # Swap windows

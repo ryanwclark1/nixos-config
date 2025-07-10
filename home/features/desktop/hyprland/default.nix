@@ -53,6 +53,7 @@
     wl-clipboard # Wayland clipboard
     xdg-desktop-portal-gtk # File picker support for portal
     yad # Yet another dialog
+    pwvucontrol # Volume control GUI
     (writeShellScriptBin "cliphist-rofi-copy" (builtins.readFile ./scripts/cliphist-rofi-copy))
     (writeShellScriptBin "cliphist-rofi-img-copy" (builtins.readFile ./scripts/cliphist-rofi-img-copy))
     (writeShellScriptBin "list-hypr-bindings" (builtins.readFile ./scripts/list-hypr-bindings))
