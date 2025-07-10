@@ -6,29 +6,32 @@ TARGET="$SCREENSHOTS/$NOW.png"
 
 mkdir -p $SCREENSHOTS
 
-if [[ -n "$1" ]]; then
-    "wayshot" -f $TARGET
+# Use grimblast for better screenshot functionality
+if [[ "$1" == "screen" ]]; then
+    grimblast --notify copysave screen "$TARGET"
+elif [[ "$1" == "window" ]]; then
+    grimblast --notify copysave active "$TARGET"
 else
-    "wayshot" -f $TARGET -s "$("slurp")"
+    # Default to area selection
+    grimblast --notify copysave area "$TARGET"
 fi
 
-"wl-copy" < $TARGET
+# Grimblast already handles notifications, but we can add actions
+if [[ -f "$TARGET" ]]; then
+    RES=$("notify-send" \
+        -a "Screenshot" \
+        -i "image-x-generic-symbolic" \
+        -h string:image-path:$TARGET \
+        -A "file=Show in Files" \
+        -A "view=View" \
+        -A "edit=Edit" \
+        "Screenshot Actions" \
+        "What would you like to do?")
 
-RES=$("notify-send" \
-    -a "Screenshot" \
-    -i "image-x-generic-symbolic" \
-    -h string:image-path:$TARGET \
-    -A "file=Show in Files" \
-    -A "view=View" \
-    -A "edit=Edit" \
-    "Screenshot Taken" \
-    $TARGET)
-
-case "$RES" in
-    "file") xdg-open "$SCREENSHOTS" ;;
-    "view") xdg-open $TARGET ;;
-    "edit") swappy = "swappy" -f $TARGET ;;
-    *) ;;
-esac
-
-# grim -g "$(slurp)" - | swappy -f -
+    case "$RES" in
+        "file") xdg-open "$SCREENSHOTS" ;;
+        "view") xdg-open "$TARGET" ;;
+        "edit") swappy -f "$TARGET" ;;
+        *) ;;
+    esac
+fi

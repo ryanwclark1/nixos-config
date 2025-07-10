@@ -40,8 +40,7 @@
     # hyprland-qtutils
     brightnessctl # Adjust screen brightness
     figlet # Print large characters
-    grim # Screenshot tool,
-    grimblast
+    grimblast # Best screenshot tool - wrapper around grim with more features
     handlr-regex
     hyprpicker
     libnotify # Notification library
@@ -50,9 +49,9 @@
     slurp # Screenshot tool, select area
     swappy # Wayland native snapshot editing tool, inspired by Snappy on macOS
     tesseract # OCR tool
-    wayshot
     wf-recorder # Utility program for screen recording of wlroots-based compositors
     wl-clipboard # Wayland clipboard
+    xdg-desktop-portal-gtk # File picker support for portal
     yad # Yet another dialog
     (writeShellScriptBin "cliphist-rofi-copy" (builtins.readFile ./scripts/cliphist-rofi-copy))
     (writeShellScriptBin "cliphist-rofi-img-copy" (builtins.readFile ./scripts/cliphist-rofi-img-copy))

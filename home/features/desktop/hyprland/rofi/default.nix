@@ -134,14 +134,6 @@ in
       source = ./scripts/screenshot.sh;
       executable = true;
     };
-    ".config/rofi/scripts/screenshot2.sh" = {
-      source = ./scripts/screenshot2.sh;
-      executable = true;
-    };
-    ".config/rofi/scripts/screenshot3.sh" = {
-      source = ./scripts/screenshot3.sh;
-      executable = true;
-    };
     ".config/rofi/scripts/volume.sh" = {
       source = ./scripts/volume.sh;
       executable = true;
