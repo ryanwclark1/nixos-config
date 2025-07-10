@@ -44,7 +44,7 @@
       ] ++
       ([
         # Program bindings
-        "SUPER, S, exec, screenshooting"
+        "SUPER, S, exec, screenshooting"  # Area selection by default
         "SUPER, e, exec, code"
         "SUPER, b,  exec, handlr launch x-scheme-handler/https"
         "SUPER ALT, space, exec, nautilus"
@@ -120,8 +120,9 @@
       ) ++
       # Screenshot and OCR
       ([
-        ", Print, exec, grimblast --notify --freeze copy area"
-        "SHIFT, Print, exec, grimblast --notify --freeze copy output"
+        ", Print, exec, screenshooting"  # Area selection
+        "SHIFT, Print, exec, screenshooting screen"  # Full screen
+        "CTRL, Print, exec, screenshooting window"  # Active window
         "ALT, Print, exec, grimblast --freeze save area - | tesseract - - | wl-copy && notify-send -t 3000 'OCR result copied to buffer'"
       ]) ++
       (
@@ -142,8 +143,7 @@
           "SUPER, Tab, ${e} -t overview"
           ", XF86PowerOff, ${e} -r 'powermenu.shutdown()'"
           ", XF86Launch4, ${e} -r 'recorder.start()'"
-          ", Print, exec, ${screenshot}"
-          "SHIFT, Print, exec, ${screenshot} --full"
+          # Additional screenshot bindings (duplicates removed since we have them above)
 
           "ALT, Tab, focuscurrentorlast"
           "CTRL ALT, Delete, exit"
