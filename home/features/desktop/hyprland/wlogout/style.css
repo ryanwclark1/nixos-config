@@ -10,9 +10,9 @@ __      _| | ___   __ _  ___  _   _| |_
 */
 
 /* -----------------------------------------------------
- * Import Pywal colors
+ * Import Pywal colors - Disabled for NixOS
  * ----------------------------------------------------- */
-@import '~/.cache/wal/colors-wlogout.css';
+/* @import '~/.cache/wal/colors-wlogout.css'; */
 
 /* -----------------------------------------------------
  * General

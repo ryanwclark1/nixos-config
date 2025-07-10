@@ -60,7 +60,6 @@
         "~/.config/hypr/conf/keyboard.conf"
         "~/.config/hypr/conf/layout.conf"
         "~/.config/hypr/conf/misc.conf"
-        "~/.config/hypr/conf/ml4w.conf"
         "~/.config/hypr/conf/monitor.conf"
         "~/.config/hypr/conf/window.conf"
         "~/.config/hypr/conf/windowrule.conf"
