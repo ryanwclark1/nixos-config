@@ -4,12 +4,9 @@
 }:
 
 {
-  # Overlays for package modifications and custom packages
-  # Example:
-  # nixpkgs.overlays = [
-  #   (final: prev: {
-  #     myCustomPackage = prev.myPackage.override { enableFeature = true; };
-  #   })
-  # ];
+  # Custom packages overlay
+  custom = final: prev: {
+    custom = import ../pkgs { pkgs = final; };
+  };
 }
 
