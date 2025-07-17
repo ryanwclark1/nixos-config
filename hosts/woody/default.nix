@@ -31,7 +31,10 @@
     ../common/optional/tools/fonts.nix
     ../common/optional/services/gnome-services.nix
     ../common/optional/desktop/nautilus.nix
+    ../common/optional/services/docling.nix
     ../common/optional/services/nfs.nix
+    ../common/optional/services/ollama.nix
+    ../common/optional/services/open-webui.nix
     ../common/optional/services/printing.nix
     ../common/optional/services/steam.nix
     ../common/optional/services/syncthing.nix
@@ -45,7 +48,7 @@
     ../common/optional/desktop/displaymanager/sddm
   ];
 
-  hardware.opengl.enable = true;
+  hardware.graphics.enable = true;
 
   # Override global monitoring with woody's comprehensive setup
   services.prometheus.exporters.node = lib.mkForce {

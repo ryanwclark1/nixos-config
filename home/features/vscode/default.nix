@@ -6,7 +6,10 @@
 }:
 
 {
-  imports = [ ./custom.theme/themes/theme.json.nix ];
+  imports = [
+    ./custom.theme/themes/theme.json.nix
+    ./mcp-servers.nix
+  ];
 
   home.file.".config/vscode/plugins/custom.theme/package.json" = {
     source = ./custom.theme/package.json;
@@ -207,7 +210,7 @@
           {
             name = "sqlite-viewer";
             publisher = "qwtel";
-            sha256 = "sha256-PEkd5mJlrKjW49bv8lyLTMKGM2ZwtVKkv5kDEqZk8K0=";
+            sha256 = "sha256-gUKmcJa2XqV53mNlt3Vq4EDRhpyxGKtROI5O+CFpaaE=";
             version = "25.6.1";
           }
           {
@@ -397,6 +400,10 @@
             "plaintext" = false;
           };
           "github.copilot.chat.editor.temporalContext.enabled" = true;
+
+          ##### MCP (Model Context Protocol) Settings #####
+          # Enable MCP servers in Copilot
+          "github.copilot.chat.mcpServers.enable" = true;
 
           #####  Dev Containers #####
           # "dev.containers.defaultExtensionsIfInstalledLocally" = [
