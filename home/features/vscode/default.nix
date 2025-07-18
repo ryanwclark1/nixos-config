@@ -210,7 +210,7 @@
           {
             name = "sqlite-viewer";
             publisher = "qwtel";
-            sha256 = "sha256-gUKmcJa2XqV53mNlt3Vq4EDRhpyxGKtROI5O+CFpaaE=";
+            sha256 = "sha256-PEkd5mJlrKjW49bv8lyLTMKGM2ZwtVKkv5kDEqZk8K0=";
             version = "25.6.1";
           }
           {
