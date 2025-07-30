@@ -6,7 +6,7 @@
 
 {
   imports = [
-    # ./basic-binds.nix
+    ./basic-binds.nix
     ./colors-hyprland.nix
   ];
 
@@ -31,8 +31,6 @@
     executable = true;
   };
 
-  # programs.uwsm = {};
-
   wayland.windowManager.hyprland = {
     enable = true;
     package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.default;
@@ -41,32 +39,30 @@
       enable = false;
       enableXdgAutostart = true;
     };
-    portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
     plugins = [
       inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}.hyprexpo
-      # inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}.hyprwinwrap
     ];
-    settings ={
-      source = [
-        "~/.config/hypr/conf/animation.conf"
-        # "~/.config/hypr/conf/autostart.conf"
-        "~/.config/hypr/conf/autostart-uwsm.conf"
-        "~/.config/hypr/conf/colors-hyprland.conf"
-        "~/.config/hypr/conf/cursor.conf"
-        "~/.config/hypr/conf/custom.conf"
-        "~/.config/hypr/conf/decoration.conf"
-        "~/.config/hypr/conf/environment.conf"
-        "~/.config/hypr/conf/keybinding.conf"
-        "~/.config/hypr/conf/keyboard.conf"
-        "~/.config/hypr/conf/layout.conf"
-        "~/.config/hypr/conf/misc.conf"
-        "~/.config/hypr/conf/monitor.conf"
-        "~/.config/hypr/conf/window.conf"
-        "~/.config/hypr/conf/windowrule.conf"
-        "~/.config/hypr/conf/workspace.conf"
-        "~/.config/hypr/conf/plugin-hyprexpo.conf"
-        "~/.config/hypr/conf/host-specific.conf"
-      ];
-    };
+    
+    extraConfig = ''
+      # Source all configuration files
+      source = ~/.config/hypr/conf/monitor.conf
+      source = ~/.config/hypr/conf/environment.conf
+      source = ~/.config/hypr/conf/autostart.conf
+      source = ~/.config/hypr/conf/keyboard.conf
+      source = ~/.config/hypr/conf/cursor.conf
+      source = ~/.config/hypr/conf/layout.conf
+      source = ~/.config/hypr/conf/misc.conf
+      source = ~/.config/hypr/conf/decoration.conf
+      source = ~/.config/hypr/conf/animation.conf
+      source = ~/.config/hypr/conf/window.conf
+      source = ~/.config/hypr/conf/windowrule.conf
+      source = ~/.config/hypr/conf/workspace.conf
+      source = ~/.config/hypr/conf/keybinding.conf
+      source = ~/.config/hypr/conf/plugin-hyprexpo.conf
+      source = ~/.config/hypr/conf/custom.conf
+      
+      # Source color scheme
+      source = ~/.config/hypr/conf/colors-hyprland.conf
+    '';
   };
 }
