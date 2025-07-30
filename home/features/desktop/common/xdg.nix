@@ -29,25 +29,8 @@
     configHome = "${config.home.homeDirectory}/.config";
     dataHome = "${config.home.homeDirectory}/.local/share";
     stateHome = "${config.home.homeDirectory}/.local/state";
-    portal = {
-      enable = true;
-      xdgOpenUsePortal = true;
-      extraPortals = [
-        inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland
-        pkgs.xdg-desktop-portal
-      ];
-      configPackages = [
-        inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.default
-      ];
-      config = {
-        common = {
-          default = [
-            "hyprland"
-            "gtk"
-          ];
-        };
-      };
-    };
+    # Portal configuration moved to system level to avoid conflicts
+    # See: hosts/common/optional/services/xdg.nix
     systemDirs = {
       config = [ "${config.home.homeDirectory}/.config" ];
       data = [ "${config.home.homeDirectory}/.local/share" "/usr/share" "/usr/share/applications/" "/usr/local/share/applications/" ];
