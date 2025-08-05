@@ -13,8 +13,18 @@ let
       "connections": {
         "github": {
           "type": "github",
+          "token": {
+            "secret": "sourcehub_personal"
+          },
           "repos": [
             "sourcebot-dev/sourcebot"
+          ],
+          "users": [
+            "ryanwclark",
+            "ryanwclark1"
+          ],
+          "orgs": [
+            "AccentCommunications"
           ]
         }
       },
@@ -103,7 +113,20 @@ let
           "displayName": "Qwen3 Coder 32B (Ollama)",
           "baseUrl": "http://localhost:11434/v1"
         }
-      ]
+      ],
+      "settings": {
+        "maxFileSize": 2097152,
+        "maxTrigramCount": 20000,
+        "reindexIntervalMs": 3600000,
+        "resyncConnectionIntervalMs": 86400000,
+        "resyncConnectionPollingIntervalMs": 1000,
+        "reindexRepoPollingIntervalMs": 1000,
+        "maxConnectionSyncJobConcurrency": 8,
+        "maxRepoIndexingJobConcurrency": 8,
+        "maxRepoGarbageCollectionJobConcurrency": 8,
+        "repoGarbageCollectionGracePeriodMs": 10000,
+        "repoIndexTimeoutMs": 7200000
+      }
     }
   '';
 in
@@ -132,7 +155,10 @@ in
     };
     environment = lib.mkOption {
       type = lib.types.attrsOf lib.types.str;
-      default = { };
+      default = {
+        AUTH_URL = "http://localhost:3002";
+        CONFIG_PATH = "/data/config.json";
+      };
       description = "Environment variables for Sourcebot";
     };
   };
@@ -193,7 +219,6 @@ in
               "--name sourcebot"
               "-p ${toString cfg.host}:${toString cfg.port}:3000"
               "-v ${cfg.dataDir}:/data"
-              "-e CONFIG_PATH=/data/config.json"
               (lib.optionalString (cfg.configFile != null) "-v ${cfg.configFile}:/data/config.json:ro")
               (lib.optionalString (cfg.configFile == null) "-v ${sourcebotConfig}:/data/config.json:ro")
             ]
