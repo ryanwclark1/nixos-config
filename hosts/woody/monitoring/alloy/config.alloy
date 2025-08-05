@@ -80,23 +80,23 @@ loki.source.journal "read" {
 loki.source.file "local_files" {
 	targets = [
 		{
-			__path__ = "/var/log/*.log",
-			job      = "varlogs",
+			__path__ = "/var/log/boot.log",
+			job      = "boot",
 			host     = "woody",
 		},
 		{
-			__path__ = "/var/log/nginx/*.log",
-			job      = "nginx",
+			__path__ = "/var/log/btmp",
+			job      = "auth",
 			host     = "woody",
 		},
 		{
-			__path__ = "/var/log/postgresql/*.log",
-			job      = "postgresql",
+			__path__ = "/var/log/wtmp",
+			job      = "auth",
 			host     = "woody",
 		},
 		{
-			__path__ = "/var/log/applications/*.log",
-			job      = "applications",
+			__path__ = "/var/log/lastlog",
+			job      = "auth",
 			host     = "woody",
 		},
 	]
@@ -405,57 +405,6 @@ discovery.relabel "filtered_docker_containers" {
   rule {
     source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
     target_label = "service"
-  }
-}
-
-// Discover log files dynamically
-discovery.file "log_files" {
-  files = [
-    "/var/log/*.log",
-    "/var/log/syslog",
-    "/var/log/auth.log",
-    "/var/log/kern.log",
-    "/var/log/dmesg",
-    "/var/log/daemon.log",
-    "/var/log/messages",
-    "/var/log/postgresql/*.log",
-    "/var/lib/docker/containers/*/*.log",
-    "/var/log/applications/*.log",
-    "/opt/*/logs/*.log",
-    "/var/log/audit/audit.log",
-    "/var/log/fail2ban.log",
-    "/var/log/ufw.log",
-    "/var/log/iptables.log",
-  ]
-  refresh_interval = "60s"
-}
-
-// Filter discovered log files
-discovery.relabel "filtered_log_files" {
-  targets = discovery.file.log_files.targets
-
-  rule {
-    source_labels = ["__path__"]
-    target_label = "file_path"
-  }
-
-  rule {
-    source_labels = ["__filename__"]
-    target_label = "filename"
-  }
-
-  rule {
-    source_labels = ["__path__"]
-    regex = ".*/([^/]+)\\.log"
-    target_label = "service"
-    replacement = "$1"
-  }
-
-  rule {
-    source_labels = ["__path__"]
-    regex = ".*/docker/containers/([^/]+)/.*"
-    target_label = "container_id"
-    replacement = "$1"
   }
 }
 
