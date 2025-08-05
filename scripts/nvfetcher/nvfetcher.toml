@@ -18,10 +18,10 @@ src.vsmarketplace = "AndrePimenta.claude-code-chat"
 fetch.vsmarketplace = "AndrePimenta.claude-code-chat"
 passthru = { publisher = "AndrePimenta", name = "claude-code-chat" }
 
-[pwc]
-src.vsmarketplace = "SureshNettur.pwc"
-fetch.vsmarketplace = "SureshNettur.pwc"
-passthru = { publisher = "SureshNettur", name = "pwc" }
+[context7-mcp]
+src.vsmarketplace = "upstash.context7-mcp"
+fetch.vsmarketplace = "upstash.context7-mcp"
+passthru = { publisher = "upstash", name = "context7-mcp" }
 
 [claude-dev]
 src.vsmarketplace = "saoudrizwan.claude-dev"
@@ -82,6 +82,11 @@ passthru = { publisher = "ms-playwright", name = "playwright" }
 src.vsmarketplace = "ventura.prom"
 fetch.vsmarketplace = "ventura.prom"
 passthru = { publisher = "ventura", name = "prom" }
+
+[pwc]
+src.vsmarketplace = "SureshNettur.pwc"
+fetch.vsmarketplace = "SureshNettur.pwc"
+passthru = { publisher = "SureshNettur", name = "pwc" }
 
 [remotehub]
 src.vsmarketplace = "GitHub.remotehub"
@@ -147,3 +152,4 @@ passthru = { publisher = "ms-ossdata", name = "vscode-pgsql" }
 src.vsmarketplace = "rangav.vscode-thunder-client"
 fetch.vsmarketplace = "rangav.vscode-thunder-client"
 passthru = { publisher = "rangav", name = "vscode-thunder-client" }
+

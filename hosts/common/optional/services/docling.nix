@@ -6,9 +6,7 @@
 }:
 
 {
-    environment.systemPackages = [
-    pkgs.python312Packages.gradio
-  ];
+
 
   services.docling-serve = {
     enable = true;
