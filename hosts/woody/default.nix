@@ -38,7 +38,7 @@
     ../common/optional/services/ollama.nix
     ../common/optional/services/open-webui.nix
     ../common/optional/services/printing.nix
-    ../common/optional/services/searxng.nix
+    ../common/optional/services/searx.nix
     ../common/optional/services/sourcebot.nix
     ../common/optional/services/steam.nix
     ../common/optional/services/syncthing.nix
@@ -147,7 +147,7 @@
   # Sourcebot configuration
   services.sourcebot = {
     enable = true;
-    port = 3001;
+    port = 3002;
     host = "127.0.0.1";
     dataDir = "/var/lib/sourcebot";
     environment = {
