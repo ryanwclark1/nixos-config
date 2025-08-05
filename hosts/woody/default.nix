@@ -27,6 +27,8 @@
     # Optional features
     ../common/optional/services/audio.nix
     ../common/optional/services/bluetooth.nix
+    ../common/optional/services/chroma.nix
+    ../common/optional/services/docling.nix
     ../common/optional/tools/direnv.nix
     ../common/optional/tools/fonts.nix
     ../common/optional/services/gnome-services.nix
@@ -36,6 +38,8 @@
     ../common/optional/services/ollama.nix
     ../common/optional/services/open-webui.nix
     ../common/optional/services/printing.nix
+    ../common/optional/services/searxng.nix
+    ../common/optional/services/sourcebot.nix
     ../common/optional/services/steam.nix
     ../common/optional/services/syncthing.nix
     ../common/optional/desktop/style.nix
@@ -138,6 +142,17 @@
   # Desktop-specific power management
   powerManagement = {
     cpuFreqGovernor = "performance";
+  };
+
+  # Sourcebot configuration
+  services.sourcebot = {
+    enable = true;
+    port = 3001;
+    host = "127.0.0.1";
+    dataDir = "/var/lib/sourcebot";
+    environment = {
+      SOURCEBOT_TELEMETRY_DISABLED = "true";
+    };
   };
 
   system.stateVersion = "24.05";

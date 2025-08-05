@@ -11,7 +11,5 @@
 
   services.searx = {
     enable = true;
-    
-
   };
 }

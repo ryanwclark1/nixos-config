@@ -7,44 +7,50 @@
 {
   name = "ansible";
   publisher = "redhat";
-  sha256 = "sha256-ou/5MHiTFopeHSyEAspppejcvWnIz2qM62yCpedNW6s=";
-  version = "25.7.0";
+  sha256 = "sha256-TXXOuayVohQPp+yQAHbsZDr/UYtyHmUkaLU+lADpjDU=";
+  version = "25.8.1";
 }
 {
   name = "biome";
   publisher = "biomejs";
-  sha256 = "sha256-k0/aQnkHSICIQ5n6CSUGF0Z/HiTeet0BCf0UxQRxq7g=";
-  version = "2025.5.251939";
+  sha256 = "sha256-wWyLIjNOBjIe72ed+wwfQWGH7Vzuea/0Xux0XJkhAkY=";
+  version = "2025.7.41733";
 }
 {
   name = "claude-code-chat";
   publisher = "AndrePimenta";
-  sha256 = "sha256-6KQANjZz78ist3j+g2pfMMMd3OZBHwJH7ej9hvqxQVI=";
-  version = "0.1.3";
+  sha256 = "sha256-6ijv2MLYji5amcxGKJ3+MhQTk+yLiFKVsXPJMqGgyc0=";
+  version = "1.0.5";
 }
 {
   name = "claude-dev";
   publisher = "saoudrizwan";
-  sha256 = "sha256-k4H7fXo6XA4sT3yb+4fjTa7mYnntGPaBJ6A+0F43Bbs=";
-  version = "3.18.3";
+  sha256 = "sha256-DEIH9cSVFAa4GSrMTGmfeuBKDsPxyVD/hZpXvylZDs4=";
+  version = "3.20.9";
+}
+{
+  name = "context7-mcp";
+  publisher = "upstash";
+  sha256 = "sha256-q6SkIy7eZ9H1yOnZygkcXQcpTK4eu6/jjud1wqEL2Mw=";
+  version = "1.0.1";
 }
 {
   name = "copilot";
   publisher = "github";
-  sha256 = "sha256-zxsmL6dUWiH4xyo0KP+VthbvP+D7j/0IHGxMgmd7s04=";
-  version = "1.339.1658";
+  sha256 = "sha256-38v4uE8C3Wena3tkiUbq7juYbALonjGSNqwpZZjcyZY=";
+  version = "1.353.1718";
 }
 {
   name = "copilot-chat";
   publisher = "github";
-  sha256 = "sha256-idYuAYIspZ5b9U6phe5mmCkzzJrvAwjrycoq349Sexw=";
-  version = "0.29.2025070401";
+  sha256 = "sha256-1d+6XllBJzuFm4S41NmBP+Tk3L+xJBWeaNVXJol9xg8=";
+  version = "0.30.2025080503";
 }
 {
   name = "explorer";
   publisher = "vitest";
-  sha256 = "sha256-8W30ouGXUCRNiRwNAhK0WREj7Pnhz2PVtj38bpH1WNU=";
-  version = "1.26.0";
+  sha256 = "sha256-cAcWmGdRci/6vINWVry958aElSxxwsIkzH15DOHTfAM=";
+  version = "1.26.4";
 }
 {
   name = "grafana-alloy";
@@ -97,26 +103,26 @@
 {
   name = "remotehub";
   publisher = "GitHub";
-  sha256 = "sha256-1Bd9uaCpd9Fe4WSMCfHIucbqrNBvv1sNM6/yjNN7SC4=";
-  version = "0.65.2025063001";
+  sha256 = "sha256-AJNAoYsvAww6Fn7QOTA0GYlhCRQeldXEuWN+LYgvFAI=";
+  version = "0.65.2025072801";
 }
 {
   name = "snyk-vulnerability-scanner";
   publisher = "snyk-security";
-  sha256 = "sha256-IaFwA5qPkL2zCq1uTrAeEcOIeAb/T+7QP2tqdiGcpeU=";
-  version = "2.22.0";
+  sha256 = "sha256-4K5+hkPYqPoL9+ykJaKXp9CHXNgUoZXuVYi0zbu6rl8=";
+  version = "2.23.1";
 }
 {
   name = "specstory-vscode";
   publisher = "specstory";
-  sha256 = "sha256-kkcazc3ysv0d/k8Tzi1dCRScLCkLQGWVgfmxAK2S8og=";
-  version = "0.13.0";
+  sha256 = "sha256-kMb8Gf706puSeIU7Cx3Kj8cP6zNbveqI//sQ8kbMgLY=";
+  version = "0.17.1";
 }
 {
   name = "sqlite-viewer";
   publisher = "qwtel";
-  sha256 = "sha256-PEkd5mJlrKjW49bv8lyLTMKGM2ZwtVKkv5kDEqZk8K0=";
-  version = "25.6.1";
+  sha256 = "sha256-3mbwiDL/jKvN8hB6iFr9EdEujs+7fljfai4F4Cm63tA=";
+  version = "25.8.0";
 }
 {
   name = "tailwind-color-matcher";
@@ -139,14 +145,14 @@
 {
   name = "ty";
   publisher = "astral-sh";
-  sha256 = "sha256-yQkCKG3yxllmdC5kOnQF+dWqCNB2DhN1cLHY0IcwHdM=";
-  version = "2025.25.11831801";
+  sha256 = "sha256-DqtavW81rUh9HHfLchLV74YW0dZwGBhc+pngerZH2iw=";
+  version = "2025.31.12061409";
 }
 {
   name = "vscode-containers";
   publisher = "ms-azuretools";
-  sha256 = "sha256-MAeE99XmjIjYbr72UymnkrDKsNRSjNiB1jdffKTosHQ=";
-  version = "2.0.3";
+  sha256 = "sha256-96JLAM2b/FUR1TA/u9GPdQJmhSGUNMarbuhEhID8c6g=";
+  version = "2.1.0";
 }
 {
   name = "vscode-gitops-tools";
@@ -163,12 +169,12 @@
 {
   name = "vscode-pgsql";
   publisher = "ms-ossdata";
-  sha256 = "sha256-5odotR4NBA5aupQVLxQUV9yCYaxTbEpfa0K9xXtOmk0=";
-  version = "1.6.0";
+  sha256 = "sha256-/d4/AsQMm9XGEytgsZA94qbR19kWTAysm0GFG2tcm9s=";
+  version = "1.8.0";
 }
 {
   name = "vscode-thunder-client";
   publisher = "rangav";
-  sha256 = "sha256-p9DA6r2pX7KAVO5ecu7cinBOXbtAP9HO3Y1m4+pzSYg=";
-  version = "2.35.3";
+  sha256 = "sha256-qJII7+70coj4M5hxC+zw/zo2FwoDflBPXJw6ACNSsr4=";
+  version = "2.37.3";
 }
