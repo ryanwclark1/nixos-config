@@ -150,6 +150,7 @@ in
     users.users.sourcebot = {
       isSystemUser = true;
       group = "sourcebot";
+      extraGroups = [ "docker" ];
       description = "Sourcebot service user";
     };
     users.groups.sourcebot = { };
@@ -181,20 +182,26 @@ in
           # Pull the latest image
           "${pkgs.docker}/bin/docker pull ghcr.io/sourcebot-dev/sourcebot:latest"
         ];
-        ExecStart = lib.concatStringsSep " " [
-          "${pkgs.docker}/bin/docker run"
-          "--rm"
-          "--name sourcebot"
-          "-p ${toString cfg.host}:${toString cfg.port}:3000"
-          "-v ${cfg.dataDir}:/data"
-          "-e CONFIG_PATH=/data/config.json"
-          (lib.optionalString (cfg.configFile != null) "-v ${cfg.configFile}:/data/config.json:ro")
-          (lib.optionalString (cfg.configFile == null) "-v ${sourcebotConfig}:/data/config.json:ro")
-          (lib.concatMapStringsSep " " (name: value: "-e ${name}=${value}") (
-            lib.mapAttrsToList (name: value: "${name}=${value}") cfg.environment
-          ))
-          "ghcr.io/sourcebot-dev/sourcebot:latest"
-        ];
+        ExecStart =
+          let
+            envArgs = lib.mapAttrsToList (name: value: "-e ${name}=${value}") cfg.environment;
+          in
+          lib.concatStringsSep " " (
+            [
+              "${pkgs.docker}/bin/docker run"
+              "--rm"
+              "--name sourcebot"
+              "-p ${toString cfg.host}:${toString cfg.port}:3000"
+              "-v ${cfg.dataDir}:/data"
+              "-e CONFIG_PATH=/data/config.json"
+              (lib.optionalString (cfg.configFile != null) "-v ${cfg.configFile}:/data/config.json:ro")
+              (lib.optionalString (cfg.configFile == null) "-v ${sourcebotConfig}:/data/config.json:ro")
+            ]
+            ++ envArgs
+            ++ [
+              "ghcr.io/sourcebot-dev/sourcebot:latest"
+            ]
+          );
         ExecStop = "${pkgs.docker}/bin/docker stop sourcebot";
         ExecStopPost = "${pkgs.docker}/bin/docker rm sourcebot";
         TimeoutStartSec = "300";
