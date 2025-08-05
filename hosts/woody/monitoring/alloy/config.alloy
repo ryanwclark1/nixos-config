@@ -346,7 +346,7 @@ prometheus.exporter.unix "unix" {
 prometheus.scrape "unix" {
   targets = prometheus.exporter.unix.unix.targets
   forward_to = [
-    prometheus.relabel.unix_metrics.receiver,
+    prometheus.remote_write.local.receiver,
   ]
   scrape_interval = "15s"
   scrape_timeout = "10s"
@@ -522,33 +522,6 @@ prometheus.scrape "blackbox" {
 // =============================================================================
 // SERVICE DISCOVERY
 // =============================================================================
-
-// Discover Docker containers for enhanced monitoring
-discovery.docker "docker_containers" {
-	host             = "unix:///var/run/docker.sock"
-	refresh_interval = "30s"
-}
-
-// Filter Docker containers for monitoring
-discovery.relabel "filtered_docker_containers" {
-	targets = discovery.docker.docker_containers.targets
-
-	rule {
-		action        = "keep"
-		regex         = ".*"
-		source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
-	}
-
-	rule {
-		source_labels = ["__meta_docker_container_name"]
-		target_label  = "container_name"
-	}
-
-	rule {
-		source_labels = ["__meta_docker_container_image"]
-		target_label  = "container_image"
-	}
-}
 
 // Scrape metrics from Docker containers
 prometheus.scrape "docker_containers" {
