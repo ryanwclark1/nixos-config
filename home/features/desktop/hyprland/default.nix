@@ -14,6 +14,7 @@
     ./hyprpolkitagent
     ./rofi
     ./swaync
+    ./swayosd
     ./wal
     ./waybar
     ./waypaper
@@ -38,6 +39,7 @@
 
   home.packages = with pkgs; [
     # hyprland-qtutils
+    wluma
     brightnessctl # Adjust screen brightness
     figlet # Print large characters
     grimblast # Best screenshot tool - wrapper around grim with more features
