@@ -19,17 +19,18 @@
   boot = {
     # Framework-specific kernel parameters
     kernelParams = [
-      # Framework laptop optimizations
-      "acpi_osi=Linux"
-      "acpi_backlight=vendor"
+      # Consider removing this unless you need it for a specific quirk:
+      # "acpi_osi=Linux"
+
+      # ✅ Use native Intel backlight
+      "acpi_backlight=native"
+      "video.use_native_backlight=1"
+      "mem_sleep_default=deep"
+
       "i915.fastboot=1"
       "i915.enable_guc=2"
       "i915.enable_fbc=1"
       "i915.enable_psr=1"
-      # Power management
-      "intel_pstate=performance"
-      "processor.max_cstate=1"
-      "intel_idle.max_cstate=1"
     ];
 
     # Enable early KMS for faster graphics initialization
