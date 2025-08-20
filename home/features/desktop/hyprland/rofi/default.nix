@@ -160,7 +160,7 @@ in
     # configPath = "${config.xdg.configHome}/rofi/config.rasi";
     cycle = true;
     location = "center";
-    terminal = "ghostty";
+    terminal = "kitty";
     theme = {
       "*" = {
         font ="JetBrainsMono Nerd Font 14";
