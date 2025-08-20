@@ -56,10 +56,10 @@
     xdg-desktop-portal-gtk # File picker support for portal
     yad # Yet another dialog
     pwvucontrol # Volume control GUI
-    (writeShellScriptBin "cliphist-rofi-copy" (builtins.readFile ./scripts/cliphist-rofi-copy))
-    (writeShellScriptBin "cliphist-rofi-img-copy" (builtins.readFile ./scripts/cliphist-rofi-img-copy))
+    (writeShellScriptBin "cliphist-rofi-copy" (builtins.readFile ./scripts/cliphist-rofi-copy.sh))
+    (writeShellScriptBin "cliphist-rofi-img-copy" (builtins.readFile ./scripts/cliphist-rofi-img-copy.sh))
     (writeShellScriptBin "list-hypr-bindings" (builtins.readFile ./scripts/list-hypr-bindings))
-    (writeShellScriptBin "hyprland-workspace" (builtins.readFile ./scripts/hyprland-workspace))
+    (writeShellScriptBin "hyprland-workspace" (builtins.readFile ./scripts/hyprland-workspace.sh))
     # (writeShellScriptBin "switch-workspace" (builtins.readFile ./scripts/switch-workspace))
     (writeShellScriptBin "screenshooting" (builtins.readFile ./scripts/screenshooting.sh))
   ];
