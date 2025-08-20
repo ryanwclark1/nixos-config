@@ -53,9 +53,9 @@
 
       # Applications
       [
-        "SUPER, Return, exec, ghostty"
+        "SUPER, Return, exec, kitty"
         "SUPER, E, exec, code"
-        "SUPER, B, exec, firefox"
+        "SUPER, B, exec, google-chrome-stable"
         "SUPER, N, exec, nautilus"
         "SUPER ALT, SPACE, exec, nautilus"
       ]

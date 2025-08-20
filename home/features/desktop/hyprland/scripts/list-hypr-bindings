@@ -12,7 +12,7 @@ yad --width=1000 --height=800 \
   --timeout=90 \
   --timeout-indicator=right \
   " = Super Key/CAPS LOCK" "Modifier Key, used for keybindings" "Nothing" \
-  " + ENTER" "Terminal" "ghostty" \
+  " + ENTER" "Terminal" "kitty" \
   " + SHIFT + ENTER" "App Launcher" "rofi" \
   " + ALT + W" "Change Wallpaper" "wallsetter" \
   " + Q" "Kill Focused Window" "killactive" \

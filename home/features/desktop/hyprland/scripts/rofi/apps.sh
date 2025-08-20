@@ -23,11 +23,11 @@ elif [[ ( "$theme" == *'type-2'* ) || ( "$theme" == *'type-4'* ) ]]; then
 fi
 
 # CMDs (add your apps here)
-term_cmd='ghostty'
+term_cmd='kitty'
 file_cmd='nautilus'
 text_cmd='code'
 web_cmd='google-chrome'
-music_cmd='ghostty -e ncmpcpp'
+music_cmd='kitty -e ncmpcpp'
 setting_cmd='xfce4-settings-manager'
 
 # Options

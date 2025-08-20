@@ -57,10 +57,10 @@
       "max-length": 40,
       "separate-outputs": true,
       "rewrite": {
-        "(.*) — Mozilla Firefox": "🌐 $1",
+        "(.*) — Google Chrome": "🌐 $1",
         "(.*) - Code - OSS": " $1",
         "(.*) - VSCode": " $1",
-        "(.*) - Ghostty": " $1"
+        "(.*) - kitty": " $1"
       }
     },
 
@@ -166,13 +166,13 @@
     "cpu": {
       "format": "󰻠 {usage}%",
       "tooltip": false,
-      "on-click": "ghostty -e htop"
+      "on-click": "kitty -e htop"
     },
 
     "memory": {
       "format": "󰍛 {}%",
       "tooltip-format": "Memory: {used:0.1f}G/{total:0.1f}G",
-      "on-click": "ghostty -e htop"
+      "on-click": "kitty -e htop"
     },
 
     "temperature": {
