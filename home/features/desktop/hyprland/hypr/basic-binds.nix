@@ -76,12 +76,12 @@
         "CTRL, Print, exec, screenshooting window"
         "ALT, Print, exec, grimblast --freeze save area - | tesseract - - | wl-copy && notify-send -t 3000 'OCR result copied to buffer'"
         "SUPER, S, exec, screenshooting"
-        "SUPER SHIFT, S, exec, rofi -dmenu -theme ${config.home.homeDirectory}/.config/rofi/scripts/screenshot.sh"
+        "SUPER SHIFT, S, exec, ${config.home.homeDirectory}/.config/hypr/scripts/rofi/screenshot-menu.sh"
       ]
 
       # Power menu
       [
-        "SUPER, Escape, exec, wlogout"
+        "SUPER, Escape, exec, ${config.home.homeDirectory}/.config/hypr/scripts/rofi/powermenu-unified.sh"
         "SUPER, BackSpace, exec, wlogout"
       ]
 
@@ -123,7 +123,7 @@
 
       # Function keys
       [
-        "SUPER, F1, exec, ${config.home.homeDirectory}/.config/hypr/scripts/keybindings.sh"
+        "SUPER, F1, exec, ${config.home.homeDirectory}/.config/hypr/scripts/rofi/keybindings.sh"
       ]
 
       # Media keys
