@@ -100,7 +100,7 @@
             }
             {
               label = " ";
-              command = "bash -c $HOME/.config/hypr/scripts/scripts/wlogout.sh";
+              command = "bash -c $HOME/.config/hypr/scripts/system/hypr-utils.sh wlogout";
             }
           ];
         };
