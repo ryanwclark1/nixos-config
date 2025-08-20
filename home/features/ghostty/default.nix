@@ -35,6 +35,8 @@ in
 {
   home.sessionVariables = {
     TERMINAL = "ghostty";
+    # Additional OpenGL fallbacks for Ghostty specifically
+    LIBGL_ALWAYS_SOFTWARE = "1";
   };
 
   programs.ghostty = {
@@ -53,6 +55,9 @@ in
       background-opacity = 0.7;
       background-blur = true;
       copy-on-select = true;
+      
+      # Fix for EGL display errors
+      gtk-titlebar = false;
     };
     themes = {
       theme = {
