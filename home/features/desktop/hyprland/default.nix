@@ -3,6 +3,7 @@
   pkgs,
   ...
 }:
+# Scripts reorganized 2025-08-20
 
 {
   imports = [
