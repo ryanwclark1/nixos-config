@@ -14,13 +14,13 @@ if [ "$wallpaper_engine" == "swww" ]; then
     swww init
     swww-daemon --format xrgb
     sleep 0.5
-    ~/.config/hypr/scripts/wallpaper.sh init
+    ~/.config/hypr/scripts/hypr/wallpaper-manager.sh restore
 elif [ "$wallpaper_engine" == "hyprpaper" ]; then
     # hyprpaper
     echo ":: Using hyprpaper"
     sleep 0.5
-    ~/.config/hypr/scripts/wallpaper.sh init
+    ~/.config/hypr/scripts/hypr/wallpaper-manager.sh restore
 else
     echo ":: Wallpaper Engine disabled"
-    ~/.config/hypr/scripts/wallpaper.sh init
+    ~/.config/hypr/scripts/hypr/wallpaper-manager.sh restore
 fi
