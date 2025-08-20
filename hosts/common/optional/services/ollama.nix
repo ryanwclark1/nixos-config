@@ -13,8 +13,9 @@
     acceleration = "rocm";
     openFirewall = true;
     loadModels = [
-      "deepseek-r1:8b-0528-qwen3-q8_0"
+      "deepseek-r1:8b"
       "qwen3-coder:30b"
+      "gpt-oss:latest"
     ];
   };
 }
