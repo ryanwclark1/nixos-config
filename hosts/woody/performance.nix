@@ -22,6 +22,12 @@
       # Desktop-specific optimizations
       "acpi_osi=Linux"
       "acpi_backlight=vendor"
+      # AMD GPU specific settings
+      "amdgpu.si_support=1"
+      "amdgpu.cik_support=1"
+      "radeon.si_support=0"
+      "radeon.cik_support=0"
+      # Intel GPU optimizations (if present)
       "i915.fastboot=1"
       "i915.enable_guc=2"
       "i915.enable_fbc=1"
@@ -39,13 +45,24 @@
   hardware = {
     graphics = {
       enable = true;
+      enable32Bit = true; # 32-bit app support
       extraPackages = with pkgs; [
+        # Mesa drivers
         mesa
+        # AMD Vulkan drivers
+        amdvlk
+        driversi686Linux.amdvlk
+        # ROCm packages for compute
         rocmPackages.clr
         rocmPackages.clr.icd
+        # Video acceleration
+        libva
+        libvdpau-va-gl
+        vaapiVdpau
       ];
-      extraPackages32 = with pkgs; [
-        driversi686Linux.mesa
+      extraPackages32 = with pkgs.driversi686Linux; [
+        mesa
+        amdvlk
       ];
     };
     amdgpu = {
@@ -59,6 +76,15 @@
       initrd.enable = true;
       opencl.enable = true;
     };
+  };
+
+  # Environment variables for AMD graphics
+  environment.variables = {
+    # Force AMD GPU for applications
+    AMD_VULKAN_ICD = "RADV";
+    VK_ICD_FILENAMES = "/run/opengl-driver/share/vulkan/icd.d/radeon_icd.x86_64.json";
+    # Mesa configuration for better compatibility
+    MESA_LOADER_DRIVER_OVERRIDE = "radeonsi";
   };
 
   # Desktop-specific packages

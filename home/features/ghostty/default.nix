@@ -34,16 +34,45 @@ let
 in
 {
   home.sessionVariables = {
-    TERMINAL = "ghostty";
-    # Additional OpenGL fallbacks for Ghostty specifically
-    LIBGL_ALWAYS_SOFTWARE = "1";
+    # Ghostty has compatibility issues with this AMD setup
+    # Using Kitty as primary terminal until resolved
+    TERMINAL = "kitty";
+    # Ghostty available for testing
+    GHOSTTY_TERMINAL = "ghostty";
   };
 
   programs.ghostty = {
     enable = true;
-    package = ghostty;
+    package = pkgs.writeShellScriptBin "ghostty" ''
+      # Set proper Mesa/AMD environment for NixOS
+      export MESA_LOADER_DRIVER_OVERRIDE=radeonsi
+      export AMD_VULKAN_ICD=RADV
+      export VK_ICD_FILENAMES=/run/opengl-driver/share/vulkan/icd.d/radeon_icd.x86_64.json
+      export LIBGL_DRIVERS_PATH=/run/opengl-driver/lib/dri
+      export LIBVA_DRIVERS_PATH=/run/opengl-driver/lib/dri
+      
+      # Try hardware-accelerated first
+      ${ghostty}/bin/ghostty "$@" 2>/dev/null || {
+        # Fallback to software rendering if hardware fails
+        export LIBGL_ALWAYS_SOFTWARE=1
+        export GSK_RENDERER=cairo
+        export MESA_LOADER_DRIVER_OVERRIDE=llvmpipe
+        export GDK_BACKEND=x11
+        export WAYLAND_DISPLAY=""
+        export DISPLAY=''${DISPLAY:-:0}
+        export EGL_PLATFORM=x11
+        export MESA_EGL_BIND_SYNC_CONTROL=false  
+        export GDK_GL=disabled
+        export CLUTTER_BACKEND=x11
+        
+        ${ghostty}/bin/ghostty "$@" 2>/dev/null || {
+          echo "Ghostty failed - using Kitty fallback"
+          exec kitty "$@"
+        }
+      }
+    '';
     installVimSyntax = true;
-    installBatSyntax = true;
+    installBatSyntax = false;  # Disabled due to missing syntax file
     clearDefaultKeybinds = false;
     enableBashIntegration = lib.mkIf config.programs.bash.enable true;
     enableFishIntegration = lib.mkIf config.programs.fish.enable true;

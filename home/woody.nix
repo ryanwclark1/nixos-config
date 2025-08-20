@@ -42,7 +42,8 @@
     ./features/media
     ./features/multiviewer
     ./features/networking-utils
-    ./features/nixvim
+    # ./features/nixvim  # Replaced with neovim-hybrid
+    ./features/neovim-hybrid
     ./features/productivity
     # ./features/qutebrowser
     ./features/remmina
