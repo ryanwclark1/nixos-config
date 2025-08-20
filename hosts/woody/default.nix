@@ -52,7 +52,7 @@
     ../common/optional/desktop/displaymanager/sddm
   ];
 
-  hardware.graphics.enable = true;
+  # AMD Graphics - configuration handled in performance.nix
 
   # Override global monitoring with woody's comprehensive setup
   services.prometheus.exporters.node = lib.mkForce {
