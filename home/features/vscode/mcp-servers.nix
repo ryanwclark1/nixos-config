@@ -4,9 +4,7 @@
   ...
 }: {
   # MCP Server packages
-  home.packages = with pkgs; [
-    nodejs_22  # Required for npx commands
-  ];
+  # nodejs_22 is provided by development/js.nix
 
   # MCP Server configurations for VSCode
   # These servers provide additional context and capabilities to GitHub Copilot
