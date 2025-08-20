@@ -8,12 +8,13 @@
     ./global
 
     ./features/ai
+    ./features/aichat
     # ./features/alacritty    # Removed: using ghostty as primary terminal
     ./features/ansible
     ./features/atuin
     ./features/audio
     ./features/bat
-    # ./features/bluetooth
+    ./features/bluetooth
     ./features/btop
     ./features/cava
     ./features/chrome
