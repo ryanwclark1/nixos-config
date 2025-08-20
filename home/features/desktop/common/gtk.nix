@@ -7,6 +7,14 @@
 
 # rec
 {
+  # Environment variables for GTK rendering compatibility
+  home.sessionVariables = {
+    # Force software rendering for problematic graphics setups
+    GSK_RENDERER = lib.mkDefault "cairo";
+    # Disable problematic graphics APIs
+    GDK_DISABLE = "gles-api,vulkan";
+  };
+
   gtk = {
     enable = lib.mkDefault true;
     cursorTheme = {
@@ -52,7 +60,7 @@
         gtk-xft-hinting = 1;
         gtk-xft-hintstyle = "hintslight";
         gtk-xft-rgba = "rgb";
-        gtk-application-prefer-dark-theme = 1;
+        # Removed gtk-application-prefer-dark-theme for libadwaita compatibility
       };
       #   gtk-application-prefer-dark-theme = 1;
       #   gtk-recent-files-limit = 20;
@@ -150,7 +158,8 @@
     };
     gtk4 = {
       extraConfig = {
-        gtk-application-prefer-dark-theme=1;
+        # Removed gtk-application-prefer-dark-theme for libadwaita compatibility
+        # Dark theme is handled by AdwStyleManager:color-scheme instead
       };
       extraCss = ''
         @define-color accent_color #8caaee;
