@@ -13,7 +13,7 @@ in
       viAlias = true;
       vimAlias = true;
       vimdiffAlias = true;
-      withNodeJs = true;
+      withNodeJs = false;
       extraPackages = with pkgs; [
         lua-language-server
         gopls

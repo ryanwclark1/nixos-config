@@ -4,16 +4,13 @@
 }:
 
 {
-  home.packages = (with pkgs; [
-    nodejs
+  home.packages = with pkgs; [
+    nodejs_22
     yarn
+    # npm is included with nodejs_22
+    # nodePackages may cause conflicts
     # deno
-  ])
-  ++ (with pkgs.nodePackages; [
-    npm
-    pnpm
-    ts-node
-  ]);
+  ];
   programs = {
     bun = {
       enable = true;
