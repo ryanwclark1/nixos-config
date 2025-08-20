@@ -82,66 +82,7 @@ in
   };
 
   home.file = {
-    ".config/rofi/scripts/appasroot.sh" = {
-      source = ./scripts/appasroot.sh;
-      executable = true;
-    };
-    ".config/rofi/scripts/apps.sh" = {
-      source = ./scripts/apps.sh;
-      executable = true;
-    };
-    ".config/rofi/scripts/brightness.sh" = {
-      source = ./scripts/brightness.sh;
-      executable = true;
-    };
-    ".config/rofi/scripts/cliphist.sh" = {
-      source = ./scripts/cliphist.sh;
-      executable = true;
-    };
-    ".config/rofi/scripts/keybindings.sh" = {
-      source = ./scripts/keybindings.sh;
-      executable = true;
-    };
-    ".config/rofi/scripts/mpd.sh" = {
-      source = ./scripts/mpd.sh;
-      executable = true;
-    };
-    ".config/rofi/scripts/power-big.sh" = {
-      source = ./scripts/power-big.sh;
-      executable = true;
-    };
-    ".config/rofi/scripts/powermenu.sh" = {
-      source = ./scripts/powermenu.sh;
-      executable = true;
-    };
-    ".config/rofi/scripts/powermenu2.sh" = {
-      source = ./scripts/powermenu2.sh;
-      executable = true;
-    };
-    ".config/rofi/scripts/quicklinks.sh" = {
-      source = ./scripts/quicklinks.sh;
-      executable = true;
-    };
-    ".config/rofi/scripts/rofi-code.sh" = {
-      source = ./scripts/rofi-code.sh;
-      executable = true;
-    };
-    ".config/rofi/scripts/rofi-launcher.sh" = {
-      source = ./scripts/rofi-launcher.sh;
-      executable = true;
-    };
-    ".config/rofi/scripts/screenshot.sh" = {
-      source = ./scripts/screenshot.sh;
-      executable = true;
-    };
-    ".config/rofi/scripts/volume.sh" = {
-      source = ./scripts/volume.sh;
-      executable = true;
-    };
-    ".config/rofi/scripts/web-search.sh" = {
-      source = ./scripts/web-search.sh;
-      executable = true;
-    };
+    # Power menu scripts are now accessible via ~/.config/hypr/scripts/rofi/powermenu-unified.sh
   };
 
   programs.rofi = {
