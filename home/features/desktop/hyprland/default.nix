@@ -11,7 +11,6 @@
     ./hypr
     ./hypridle
     ./hyprlock
-    # ./hyprpaper
     ./hyprpolkitagent
     ./rofi
     ./swaync
@@ -50,7 +49,9 @@
     mission-center
     networkmanagerapplet
     slurp # Screenshot tool, select area
+    swaybg # Wayland wallpaper daemon
     swappy # Wayland native snapshot editing tool, inspired by Snappy on macOS
+    swww # Efficient animated wallpaper daemon for wayland
     tesseract # OCR tool
     wf-recorder # Utility program for screen recording of wlroots-based compositors
     wl-clipboard # Wayland clipboard
