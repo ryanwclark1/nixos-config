@@ -132,6 +132,8 @@ window#waybar.empty #window {
     padding: 0 12px;
     color: @accent-blue;
     font-weight: normal;
+    border-radius: 8px;
+    margin: 2px;
 }
 
 /* -----------------------------------------------------
@@ -316,4 +318,26 @@ tooltip label {
 #custom-notification:hover {
     background: @bg-light;
     transition: background 0.2s ease;
+}
+
+/* Action buttons grouping */
+.action-button {
+    background: rgba(140, 170, 238, 0.1);
+    border: 1px solid rgba(140, 170, 238, 0.3);
+    border-radius: 8px;
+    margin: 2px;
+    padding: 0 8px;
+    min-width: 28px;
+}
+
+.action-button:hover {
+    background: rgba(140, 170, 238, 0.2);
+    border-color: rgba(140, 170, 238, 0.5);
+}
+
+/* Separator styling */
+#custom-separator {
+    color: rgba(140, 170, 238, 0.4);
+    margin: 0 4px;
+    font-weight: bold;
 }

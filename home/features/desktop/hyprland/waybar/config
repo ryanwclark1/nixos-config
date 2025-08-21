@@ -16,16 +16,15 @@
       "hyprland/workspaces",
       "hyprland/window"
     ],
-    
+
     "modules-center": [
       "clock"
     ],
-    
+
     "modules-right": [
       "tray",
       "custom/notification",
-      "custom/screenshot",
-      "custom/settings",
+      "idle_inhibitor",
       "network",
       "bluetooth",
       "pulseaudio",
@@ -34,12 +33,15 @@
       "temperature",
       "backlight",
       "battery",
+      "custom/separator",
+      "custom/screenshot",
+      "custom/settings",
       "custom/wallpaper",
       "custom/power"
     ],
 
     "custom/launcher": {
-      "format": "",
+      "format": "",
       "on-click": "~/.config/hypr/scripts/rofi/apps-unified.sh",
       "on-click-right": "~/.config/hypr/scripts/rofi/apps-unified.sh --root",
       "tooltip": "Applications • Left: User Apps • Right: Root Apps"
@@ -47,24 +49,40 @@
 
     "hyprland/workspaces": {
       "format": "{name}",
+      "format-icons": {
+        "urgent": "󰀨",
+        "active": "󰮯",
+        "default": "󰧞"
+      },
       "on-click": "activate",
       "persistent-workspaces": {
         "*": 5
       },
       "on-scroll-up": "~/.config/hypr/scripts/hypr/workspace-switcher.sh next",
-      "on-scroll-down": "~/.config/hypr/scripts/hypr/workspace-switcher.sh prev"
+      "on-scroll-down": "~/.config/hypr/scripts/hypr/workspace-switcher.sh prev",
+      "sort-by-number": true
     },
 
     "hyprland/window": {
-      "format": "{}",
-      "max-length": 40,
+      "format": "󰖲 {}",
+      "max-length": 50,
       "separate-outputs": true,
       "rewrite": {
-        "(.*) — Google Chrome": "🌐 $1",
-        "(.*) - Code - OSS": " $1",
-        "(.*) - VSCode": " $1",
-        "(.*) - kitty": " $1"
-      }
+        "(.*) — Mozilla Firefox": "󰈹 $1",
+        "(.*) — Google Chrome": "󰊯 $1",
+        "(.*) - Code - OSS": "󰨞 $1",
+        "(.*) - VSCode": "󰨞 $1",
+        "(.*) - Cursor": "󰨞 $1",
+        "(.*) - kitty": "󰊠 $1",
+        "(.*) - Alacritty": "󰊠 $1",
+        "(.*)Discord(.*)": "󰙯 Discord",
+        "(.*)Spotify(.*)": "󰓇 Spotify",
+        "(.*)Steam(.*)": "󰓓 Steam",
+        "(.*)Telegram(.*)": "󰭹 Telegram",
+        "(.*)Files(.*)": "󰉋 Files",
+        "(.*)thunar(.*)": "󰉋 Files"
+      },
+      "tooltip": true
     },
 
     "clock": {
@@ -101,29 +119,35 @@
     },
 
     "custom/notification": {
-      "tooltip": false,
+      "tooltip": "{tooltip}",
       "format": "{icon}",
       "format-icons": {
-        "notification": "<span foreground='red'><sup></sup></span>",
-        "none": "",
-        "dnd-notification": "<span foreground='red'><sup></sup></span>",
-        "dnd-none": "",
-        "inhibited-notification": "<span foreground='red'><sup></sup></span>",
-        "inhibited-none": "",
-        "dnd-inhibited-notification": "<span foreground='red'><sup></sup></span>",
-        "dnd-inhibited-none": ""
+        "notification": "󰂚",
+        "none": "󰂜",
+        "dnd-notification": "󰂛",
+        "dnd-none": "󰪑",
+        "inhibited-notification": "󰂚",
+        "inhibited-none": "󰂜",
+        "dnd-inhibited-notification": "󰂛",
+        "dnd-inhibited-none": "󰪑"
       },
       "return-type": "json",
       "exec-if": "which swaync-client",
       "exec": "swaync-client -swb",
-      "on-click": "swaync-client -t -sw",
-      "on-click-right": "swaync-client -d -sw",
+      "on-click": "swaync-client -t",
+      "on-click-right": "swaync-client -d",
       "escape": true
+    },
+
+    "custom/separator": {
+      "format": "│",
+      "tooltip": false
     },
 
     "network": {
       "interface": "wlan0",
       "format": "{ifname}",
+      "swap-icon-label": false,
       "format-wifi": "󰤨 {essid} ({signalStrength}%)",
       "format-ethernet": "󰈀 {ipaddr}/{cidr}",
       "format-disconnected": "󰤭 Disconnected",
@@ -137,6 +161,7 @@
 
     "bluetooth": {
       "format": "󰂯 {status}",
+      "swap-icon-label": false,
       "format-connected": "󰂱 {device_alias}",
       "format-connected-battery": "󰂱 {device_alias} {device_battery_percentage}%",
       "tooltip-format": "{controller_alias}\t{controller_address}\n\n{num_connections} connected",
@@ -148,6 +173,7 @@
 
     "pulseaudio": {
       "format": "{icon} {volume}% {format_source}",
+      "swap-icon-label": false,
       "format-bluetooth": "{icon} {volume}% {format_source}",
       "format-bluetooth-muted": " {icon} {format_source}",
       "format-muted": "󰝟 {format_source}",
@@ -169,6 +195,7 @@
 
     "cpu": {
       "format": "󰻠 {usage}%",
+      "swap-icon-label": false,
       "tooltip": false,
       "on-click": "kitty -e htop",
       "on-click-right": "kitty -e btop"
@@ -176,6 +203,7 @@
 
     "memory": {
       "format": "󰍛 {}%",
+      "swap-icon-label": false,
       "tooltip-format": "Memory: {used:0.1f}G/{total:0.1f}G",
       "on-click": "kitty -e htop",
       "on-click-right": "kitty -e btop"
@@ -183,6 +211,7 @@
 
     "temperature": {
       "thermal-zone": 2,
+      "swap-icon-label": false,
       "hwmon-path": "/sys/class/hwmon/hwmon2/temp1_input",
       "critical-threshold": 80,
       "format-critical": "{icon} {temperatureC}°C",
@@ -192,6 +221,7 @@
 
     "backlight": {
       "device": "intel_backlight",
+      "swap-icon-label": false,
       "format": "{icon} {percent}%",
       "format-icons": ["󰁎", "󰁏", "󰁐", "󰁑", "󰁒", "󰁓", "󰁔", "󰁕", "󰁖"],
       "on-scroll-up": "brightnessctl set +5%",
@@ -199,6 +229,7 @@
     },
 
     "battery": {
+      "swap-icon-label": false,
       "states": {
         "good": 95,
         "warning": 30,
@@ -212,28 +243,89 @@
     },
 
     "custom/screenshot": {
-      "format": "󰩭",
+      "format": "󰩭 ",
       "on-click": "~/.config/hypr/scripts/rofi/screenshot-menu.sh",
-      "tooltip": "Screenshot"
+      "tooltip": "Screenshot",
+      "class": "action-button"
     },
 
     "custom/settings": {
-      "format": "󰒓",
+      "format": "󰒓 ",
       "on-click": "~/.config/hypr/scripts/rofi/settings-menu.sh",
-      "tooltip": "Settings"
+      "tooltip": "Settings",
+      "class": "action-button"
     },
 
     "custom/wallpaper": {
-      "format": "󰏩",
+      "format": "󰸉 ",
       "on-click": "sh -c 'cd ~/.config/hypr/scripts/hypr && ./wallpaper-manager.sh random'",
       "on-click-right": "waypaper",
-      "tooltip": "Wallpaper • Left: Random • Right: Waypaper"
+      "tooltip": "Wallpaper • Left: Random • Right: Waypaper",
+      "class": "action-button"
+    },
+
+    "keyboard-state": {
+      "numlock": true,
+      "capslock": true,
+      "format": {
+        "numlock": "N {icon}",
+        "capslock": "󰘲 {icon}"
+      },
+      "format-icons": {
+        "locked": "󰌾",
+        "unlocked": "󰌿"
+      }
+    },
+
+    "hyprland/language": {
+      "format": "󰌌 {}",
+      "format-en": "EN",
+      "format-es": "ES",
+      "format-fr": "FR",
+      "format-de": "DE",
+      "on-click": "hyprctl switchxkblayout next"
+    },
+
+    "idle_inhibitor": {
+      "format": "{icon}",
+      "format-icons": {
+        "activated": "󰒳",
+        "deactivated": "󰒲"
+      },
+      "tooltip": "Idle Inhibitor • Prevents screen lock"
+    },
+
+    "disk": {
+      "interval": 30,
+      "format": "󰋊 {percentage_used}%",
+      "path": "/",
+      "tooltip-format": "Used: {used} / {total} ({percentage_used}%)\nFree: {free}",
+      "on-click": "kitty -e ncdu /"
+    },
+
+    "custom/updates": {
+      "format": "󰏕 {}",
+      "interval": 3600,
+      "exec": "checkupdates | wc -l || echo '0'",
+      "exec-if": "command -v checkupdates",
+      "on-click": "kitty -e sudo pacman -Syu",
+      "tooltip": "System Updates • Click to upgrade"
+    },
+
+    "custom/weather": {
+      "format": "{}",
+      "tooltip": true,
+      "interval": 1800,
+      "exec": "curl -s 'https://wttr.in/?format=%C+%t&u' || echo '󰖕 Weather unavailable'",
+      "return-type": "",
+      "on-click": "xdg-open https://wttr.in"
     },
 
     "custom/power": {
-      "format": "󰐥",
+      "format": "⏻",
       "on-click": "~/.config/hypr/scripts/rofi/powermenu-unified.sh",
-      "tooltip": "Power Menu"
+      "tooltip": "Power Menu",
+      "class": "action-button"
     }
   }
 ]
