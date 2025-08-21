@@ -11,7 +11,7 @@
     ./hypr
     ./hypridle
     ./hyprlock
-    ./hyprpaper
+    # ./hyprpaper
     ./hyprpolkitagent
     ./rofi
     ./swaync
@@ -57,12 +57,12 @@
     xdg-desktop-portal-gtk # File picker support for portal
     yad # Yet another dialog
     pwvucontrol # Volume control GUI
-    (writeShellScriptBin "cliphist-rofi-copy" (builtins.readFile ./scripts/rofi/cliphist-rofi-copy.sh))
-    (writeShellScriptBin "cliphist-rofi-img-copy" (builtins.readFile ./scripts/rofi/cliphist-rofi-img-copy.sh))
-    (writeShellScriptBin "list-hypr-bindings" (builtins.readFile ./scripts/list-hypr-bindings.sh))
-    (writeShellScriptBin "hyprland-workspace" (builtins.readFile ./scripts/hyprland-workspace.sh))
+    # (writeShellScriptBin "cliphist-rofi-copy" (builtins.readFile ./scripts/rofi/cliphist-rofi-copy.sh))
+    # (writeShellScriptBin "cliphist-rofi-img-copy" (builtins.readFile ./scripts/rofi/cliphist-rofi-img-copy.sh))
+    # (writeShellScriptBin "list-hypr-bindings" (builtins.readFile ./scripts/list-hypr-bindings))
+    # (writeShellScriptBin "hyprland-workspace" (builtins.readFile ./scripts/hyprland-workspace.sh))
     # (writeShellScriptBin "switch-workspace" (builtins.readFile ./scripts/switch-workspace))
-    (writeShellScriptBin "screenshooting" (builtins.readFile ./scripts/screenshooting.sh))
+    # (writeShellScriptBin "screenshooting" (builtins.readFile ./scripts/screenshooting.sh))
   ];
 }
 

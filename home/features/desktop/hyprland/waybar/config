@@ -24,6 +24,8 @@
     "modules-right": [
       "tray",
       "custom/notification",
+      "custom/screenshot",
+      "custom/settings",
       "network",
       "bluetooth",
       "pulseaudio",
@@ -32,14 +34,15 @@
       "temperature",
       "backlight",
       "battery",
+      "custom/wallpaper",
       "custom/power"
     ],
 
     "custom/launcher": {
       "format": "",
-      "on-click": "rofi -show drun -theme ~/.config/rofi/style/launcher-center.rasi",
-      "on-click-right": "rofi -show drun -theme ~/.config/rofi/style/launcher-full.rasi",
-      "tooltip": false
+      "on-click": "~/.config/hypr/scripts/rofi/apps-unified.sh",
+      "on-click-right": "~/.config/hypr/scripts/rofi/apps-unified.sh --root",
+      "tooltip": "Applications • Left: User Apps • Right: Root Apps"
     },
 
     "hyprland/workspaces": {
@@ -48,8 +51,8 @@
       "persistent-workspaces": {
         "*": 5
       },
-      "on-scroll-up": "hyprctl dispatch workspace e+1",
-      "on-scroll-down": "hyprctl dispatch workspace e-1"
+      "on-scroll-up": "~/.config/hypr/scripts/hypr/workspace-switcher.sh next",
+      "on-scroll-down": "~/.config/hypr/scripts/hypr/workspace-switcher.sh prev"
     },
 
     "hyprland/window": {
@@ -151,28 +154,31 @@
       "format-source": "󰍬 {volume}%",
       "format-source-muted": "󰍭",
       "format-icons": {
-        "headphone": "",
-        "hands-free": "",
-        "headset": "",
-        "phone": "",
-        "portable": "",
-        "car": "",
-        "default": ["", "", ""]
+        "headphone": "󰋋",
+        "hands-free": "󰋎",
+        "headset": "󰋎",
+        "phone": "󰏲",
+        "portable": "󰦧",
+        "car": "󰄋",
+        "default": ["󰖀", "󰕾", "󰕾"]
       },
       "on-click": "pwvucontrol",
-      "on-click-right": "pactl set-sink-mute @DEFAULT_SINK@ toggle"
+      "on-click-right": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
+      "on-click-middle": "~/.config/hypr/scripts/rofi/settings-menu.sh"
     },
 
     "cpu": {
       "format": "󰻠 {usage}%",
       "tooltip": false,
-      "on-click": "kitty -e htop"
+      "on-click": "kitty -e htop",
+      "on-click-right": "kitty -e btop"
     },
 
     "memory": {
       "format": "󰍛 {}%",
       "tooltip-format": "Memory: {used:0.1f}G/{total:0.1f}G",
-      "on-click": "kitty -e htop"
+      "on-click": "kitty -e htop",
+      "on-click-right": "kitty -e btop"
     },
 
     "temperature": {
@@ -181,7 +187,7 @@
       "critical-threshold": 80,
       "format-critical": "{icon} {temperatureC}°C",
       "format": "{icon} {temperatureC}°C",
-      "format-icons": ["󱔐", "󱔑", "󱔒", "󱔓", "󱔔"]
+      "format-icons": ["󰜗", "󰔏", "󱃃", "󰸁", "󰸂"]
     },
 
     "backlight": {
@@ -205,10 +211,29 @@
       "format-icons": ["󰁺", "󰁻", "󰁼", "󰁽", "󰁹"]
     },
 
+    "custom/screenshot": {
+      "format": "󰩭",
+      "on-click": "~/.config/hypr/scripts/rofi/screenshot-menu.sh",
+      "tooltip": "Screenshot"
+    },
+
+    "custom/settings": {
+      "format": "󰒓",
+      "on-click": "~/.config/hypr/scripts/rofi/settings-menu.sh",
+      "tooltip": "Settings"
+    },
+
+    "custom/wallpaper": {
+      "format": "󰏩",
+      "on-click": "sh -c 'cd ~/.config/hypr/scripts/hypr && ./wallpaper-manager.sh random'",
+      "on-click-right": "waypaper",
+      "tooltip": "Wallpaper • Left: Random • Right: Waypaper"
+    },
+
     "custom/power": {
-      "format": "󰁿",
-      "on-click": "wlogout",
-      "tooltip": false
+      "format": "󰐥",
+      "on-click": "~/.config/hypr/scripts/rofi/powermenu-unified.sh",
+      "tooltip": "Power Menu"
     }
   }
 ]
