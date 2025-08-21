@@ -48,6 +48,25 @@ is_cache_enabled() {
     [[ -f "$CACHE_ENABLED" ]]
 }
 
+# Ensure swww daemon is running
+ensure_swww_daemon() {
+    if command -v swww >/dev/null; then
+        if ! pgrep -x "swww-daemon" > /dev/null; then
+            log "INFO" "Starting swww daemon"
+            swww-daemon &
+            sleep 1
+            # Wait for daemon to be ready
+            local attempts=0
+            while ! swww query >/dev/null 2>&1 && [ $attempts -lt 10 ]; do
+                sleep 0.5
+                attempts=$((attempts + 1))
+            done
+        fi
+        return 0
+    fi
+    return 1
+}
+
 # Set current wallpaper
 set_current_wallpaper() {
     local wallpaper="$1"
@@ -60,16 +79,25 @@ set_current_wallpaper() {
     # Store current wallpaper
     echo "$wallpaper" > "$CURRENT_WALLPAPER"
     
-    # Set wallpaper using available tools
-    if command -v waypaper >/dev/null; then
+    # Set wallpaper using available tools (prioritize swww)
+    if ensure_swww_daemon; then
+        # Add buffer management flags to reduce errors
+        swww img "$wallpaper" --transition-fps 30 --transition-type fade --transition-duration 1 --no-resize 2>/dev/null || {
+            log "WARNING" "swww failed, retrying with fallback settings"
+            sleep 0.5
+            swww img "$wallpaper" --no-resize 2>/dev/null || {
+                log "ERROR" "swww completely failed, falling back to swaybg"
+                pkill swaybg 2>/dev/null || true
+                swaybg -i "$wallpaper" &
+            }
+        }
+    elif command -v waypaper >/dev/null; then
         waypaper --wallpaper "$wallpaper"
-    elif command -v hyprpaper >/dev/null; then
-        hyprctl hyprpaper wallpaper ",$wallpaper"
     elif command -v swaybg >/dev/null; then
         pkill swaybg 2>/dev/null || true
         swaybg -i "$wallpaper" &
     else
-        log "ERROR" "No wallpaper tool found (waypaper, hyprpaper, swaybg)"
+        log "ERROR" "No wallpaper tool found (swww, waypaper, swaybg)"
         return 1
     fi
     
@@ -309,6 +337,30 @@ toggle_cache() {
     fi
 }
 
+# Set swww transition options
+set_swww_transition() {
+    local transition_type="${1:-wipe}"
+    local duration="${2:-2}"
+    local fps="${3:-60}"
+    
+    if ! ensure_swww_daemon; then
+        log "ERROR" "swww not available"
+        return 1
+    fi
+    
+    if [[ -f "$CURRENT_WALLPAPER" ]]; then
+        local wallpaper=$(cat "$CURRENT_WALLPAPER")
+        wallpaper="${wallpaper/#\~/$HOME}"
+        
+        log "INFO" "Applying transition: $transition_type (${duration}s, ${fps}fps)"
+        swww img "$wallpaper" --transition-type "$transition_type" --transition-duration "$duration" --transition-fps "$fps"
+        notify "Transition Applied" "$transition_type transition"
+    else
+        log "ERROR" "No current wallpaper set"
+        return 1
+    fi
+}
+
 # Usage information
 usage() {
     cat << EOF
@@ -328,6 +380,8 @@ Commands:
     effect <name>           Apply wallpaper effect
     effect select           Select effect interactively
     effect off              Disable effects
+    
+    transition <type> [dur] [fps]  Set swww transition (types: wipe, fade, center, etc.)
     
     cache clear             Clear wallpaper cache
     cache toggle            Toggle cache generation
@@ -396,6 +450,13 @@ main() {
                     set_effect "$2"
                     ;;
             esac
+            ;;
+        "transition")
+            if [[ -z "${2:-}" ]]; then
+                echo "Error: transition requires type" >&2
+                exit 1
+            fi
+            set_swww_transition "$2" "${3:-2}" "${4:-60}"
             ;;
         "cache")
             case "${2:-}" in

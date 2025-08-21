@@ -7,20 +7,19 @@
 #                                 |___/
 #
 
-wallpaper_engine=$(cat $HOME/.config/hypr/scripts/settings/wallpaper-engine.sh)
-if [ "$wallpaper_engine" == "swww" ]; then
-    # swww
-    echo ":: Using swww"
-    swww init
-    swww-daemon --format xrgb
+# Initialize wallpaper engine with swww support
+echo ":: Initializing wallpaper engine"
+
+# Start swww daemon if available
+if command -v swww >/dev/null; then
+    echo ":: Starting swww daemon"
+    # Kill any existing daemon first
+    pkill swww-daemon 2>/dev/null || true
     sleep 0.5
-    ~/.config/hypr/scripts/hypr/wallpaper-manager.sh restore
-elif [ "$wallpaper_engine" == "hyprpaper" ]; then
-    # hyprpaper
-    echo ":: Using hyprpaper"
-    sleep 0.5
-    ~/.config/hypr/scripts/hypr/wallpaper-manager.sh restore
-else
-    echo ":: Wallpaper Engine disabled"
-    ~/.config/hypr/scripts/hypr/wallpaper-manager.sh restore
+    # Start with conservative settings to reduce buffer errors
+    SWWW_TRANSITION_FPS=30 SWWW_TRANSITION_DURATION=1 swww-daemon &
+    sleep 2
 fi
+
+# Restore wallpaper
+~/.config/hypr/scripts/hypr/wallpaper-manager.sh restore
