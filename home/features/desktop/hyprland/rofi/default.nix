@@ -40,6 +40,10 @@ in
     ".config/rofi/style/config-long.rasi" = {
       source = ./style/config-long.rasi;
     };
+    ".config/rofi/style/fullscreen-preview.rasi" = {
+      source = ./style/fullscreen-preview.rasi;
+    };
+
     ".config/rofi/style/launcher-center-alt1.rasi" = {
       source = ./style/launcher-center-alt1.rasi;
     };

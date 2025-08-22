@@ -18,14 +18,17 @@
       [
         "SUPER, Q, killactive"
         "ALT, F4, killactive"
+        "SUPER SHIFT, Q, exec, hyprctl activewindow | grep pid | tr -d 'pid:' | xargs kill"
         "SUPER SHIFT, E, exit"
         "SUPER SHIFT, SPACE, togglefloating"
         "SUPER, F, fullscreen, 1"
         "SUPER SHIFT, F, fullscreen, 0"
+        "SUPER, M, fullscreen, 0"
         "SUPER, P, togglesplit"
         "SUPER, G, togglegroup"
         "SUPER, T, lockactivegroup, toggle"
         "SUPER, I, pseudo"
+        "SUPER, K, swapsplit"
       ]
 
       # Window sizing
@@ -41,8 +44,16 @@
         "SUPER, Tab, workspace, e+1"
         "SUPER SHIFT, Tab, workspace, e-1"
         "SUPER, apostrophe, workspace, previous"
+        "SUPER, left, workspace, e-1"
+        "SUPER, right, workspace, e+1"
         "SUPER, mouse_down, workspace, e+1"
         "SUPER, mouse_up, workspace, e-1"
+      ]
+
+      # Move window to workspace
+      [
+        "SUPER SHIFT, left, movetoworkspace, e-1"
+        "SUPER SHIFT, right, movetoworkspace, e+1"
       ]
 
       # Special workspace
@@ -60,6 +71,12 @@
         "SUPER ALT, SPACE, exec, nautilus"
       ]
 
+      # Utility applications (conditional on availability)
+      [
+        "SUPER CTRL, E, exec, pkill rofi || rofi -modi emoji -show emoji"
+        "SUPER CTRL, C, exec, pkill rofi || rofi -show calc -modi calc -no-show-match -no-sort"
+      ]
+
       # Rofi menus
       (lib.optionals config.programs.rofi.enable [
         "SUPER, SPACE, exec, rofi -show drun -theme ${config.home.homeDirectory}/.config/rofi/style/launcher-center.rasi"
@@ -71,11 +88,8 @@
 
       # Screenshot
       [
-        ", Print, exec, screenshooting"
-        "SHIFT, Print, exec, screenshooting screen"
-        "CTRL, Print, exec, screenshooting window"
-        "ALT, Print, exec, grimblast --freeze save area - | tesseract - - | wl-copy && notify-send -t 3000 'OCR result copied to buffer'"
-        "SUPER, S, exec, screenshooting"
+        ", Print, exec, ${config.home.homeDirectory}/.config/hypr/scripts/rofi/screenshot-menu.sh"
+        "SUPER, S, exec, ${config.home.homeDirectory}/.config/hypr/scripts/rofi/screenshot-menu.sh"
         "SUPER SHIFT, S, exec, ${config.home.homeDirectory}/.config/hypr/scripts/rofi/screenshot-menu.sh"
       ]
 
@@ -101,15 +115,16 @@
         (resizeactive "up" "0 -20") (resizeactive "down" "0 20")
       ])
 
-      # Workspace switching (numbers)
+      # Workspace switching (numbers 1-10)
       (builtins.concatLists (builtins.genList (
         i: let
           ws = toString (i + 1);
+          key = if i == 9 then "0" else ws;
         in [
-          "SUPER, ${ws}, workspace, ${ws}"
-          "SUPER SHIFT, ${ws}, movetoworkspace, ${ws}"
+          "SUPER, ${key}, workspace, ${ws}"
+          "SUPER SHIFT, ${key}, movetoworkspace, ${ws}"
         ]
-      ) 9))
+      ) 10))
 
       # Workspace switching (numpad)
       (builtins.concatLists (builtins.genList (
@@ -119,11 +134,21 @@
           "SUPER, KP_${ws}, workspace, ${ws}"
           "SUPER SHIFT, KP_${ws}, movetoworkspace, ${ws}"
         ]
-      ) 9))
+      ) 10))
+
+      # System management
+      [
+        "SUPER CTRL, R, exec, hyprctl reload"
+        "SUPER SHIFT, R, exec, pkill waybar; sleep 0.5; waybar &"
+        "SUPER SHIFT, B, exec, pkill waybar; sleep 0.5; waybar &"
+        "SUPER CTRL, B, exec, pkill waybar || waybar &"
+        "SUPER CTRL, L, exec, hyprlock"
+      ]
 
       # Function keys
       [
         "SUPER, F1, exec, ${config.home.homeDirectory}/.config/hypr/scripts/rofi/keybindings.sh"
+        "SUPER CTRL, K, exec, ${config.home.homeDirectory}/.config/hypr/scripts/rofi/keybindings.sh"
       ]
 
       # Media keys
@@ -137,21 +162,32 @@
         "SHIFT, XF86AudioPlay, exec, systemctl --user restart playerctld"
       ])
 
-      # Volume control
+      # Volume control (SwayOSD with fallbacks)
       [
-        ", XF86AudioRaiseVolume, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ 0 && wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"
-        ", XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
-        ", XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
-        "SHIFT, XF86AudioRaiseVolume, exec, wpctl set-volume -l 1 @DEFAULT_AUDIO_SOURCE@ 5%+"
-        "SHIFT, XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 5%-"
-        "SHIFT, XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
-        ", XF86AudioMicMute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
+        ", XF86AudioRaiseVolume, exec, command -v swayosd-client >/dev/null && swayosd-client --output-volume raise || (wpctl set-mute @DEFAULT_AUDIO_SINK@ 0 && wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+)"
+        ", XF86AudioLowerVolume, exec, command -v swayosd-client >/dev/null && swayosd-client --output-volume lower || wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
+        ", XF86AudioMute, exec, command -v swayosd-client >/dev/null && swayosd-client --output-volume mute-toggle || wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+        "SHIFT, XF86AudioRaiseVolume, exec, command -v swayosd-client >/dev/null && swayosd-client --input-volume raise || wpctl set-volume -l 1 @DEFAULT_AUDIO_SOURCE@ 5%+"
+        "SHIFT, XF86AudioLowerVolume, exec, command -v swayosd-client >/dev/null && swayosd-client --input-volume lower || wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 5%-"
+        "SHIFT, XF86AudioMute, exec, command -v swayosd-client >/dev/null && swayosd-client --input-volume mute-toggle || wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
+        ", XF86AudioMicMute, exec, command -v swayosd-client >/dev/null && swayosd-client --input-volume mute-toggle || wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
       ]
 
-      # Brightness control
+      # Brightness control (SwayOSD with fallbacks)
       [
-        ", XF86MonBrightnessUp, exec, brightnessctl -q set +10%"
-        ", XF86MonBrightnessDown, exec, brightnessctl -q set 10%-"
+        ", XF86MonBrightnessUp, exec, command -v swayosd-client >/dev/null && swayosd-client --brightness raise || brightnessctl -q set +10%"
+        ", XF86MonBrightnessDown, exec, command -v swayosd-client >/dev/null && swayosd-client --brightness lower || brightnessctl -q set 10%-"
+      ]
+
+      # Hardware keys
+      [
+        ", XF86Calculator, exec, pkill rofi || rofi -show calc -modi calc -no-show-match -no-sort"
+        ", XF86Lock, exec, hyprlock"
+      ]
+
+      # SwayOSD additional bindings
+      [
+        ", Caps_Lock, exec, ${../scripts/caps-lock-osd.sh}"
       ]
 
       # Plugin bindings

@@ -13,11 +13,11 @@
       positionX = "right";
       layer = "overlay";
       layer-shell = true;
-      layer-shell-cover-screen = true;
+      layer-shell-cover-screen = false;
       cssPriority = "application";
       positionY = "top";
-      control-center-positionX = "none";
-      control-center-positionY = "none";
+      control-center-positionX = "right";
+      control-center-positionY = "top";
       control-center-margin-top = 13;
       control-center-margin-bottom = 0;
       control-center-margin-right = 14;

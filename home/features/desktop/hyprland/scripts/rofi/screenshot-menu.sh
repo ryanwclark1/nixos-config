@@ -45,28 +45,47 @@ fi
 
 # Show rofi menu - adjust lines based on options count
 LINES_COUNT=${#options[@]}
-choice=$(printf '%s\n' "${options[@]}" | rofi -dmenu -i -p "Screenshot/Record" -theme-str "listview { lines: $LINES_COUNT; }")
+choice=$(printf '%s\n' "${options[@]}" | rofi -dmenu -i -p "Screenshot/Record" -theme-str "listview { lines: $LINES_COUNT; } inputbar { children: [prompt,textbox-prompt-colon,entry]; margin: 0px 0px 2px 0px; border: 0px 0px 2px 0px; border-color: @selected-normal-foreground; }")
 
-# Get the script directory
-SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-SCREENSHOT_SCRIPT="$SCRIPT_DIR/../screenshooting.sh"
+# Screenshots directory
+SCREENSHOTS_DIR="$HOME/Pictures/Screenshots"
+mkdir -p "$SCREENSHOTS_DIR"
+TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 
 # Execute based on choice
 case "$choice" in
     "$AREA_ICON  Select Area")
-        exec "$SCREENSHOT_SCRIPT" area
+        # Kill any rofi processes and wait for menu to disappear
+        pkill rofi 2>/dev/null || true
+        sleep 0.2
+        OUTPUT_FILE="$SCREENSHOTS_DIR/screenshot_area_$TIMESTAMP.png"
+        grimblast --notify --freeze save area "$OUTPUT_FILE"
         ;;
     "$SCREEN_ICON  Full Screen")
-        exec "$SCREENSHOT_SCRIPT" screen
+        # Kill any rofi processes and wait for menu to disappear
+        pkill rofi 2>/dev/null || true
+        sleep 0.3
+        OUTPUT_FILE="$SCREENSHOTS_DIR/screenshot_screen_$TIMESTAMP.png"
+        grimblast --notify --freeze save output "$OUTPUT_FILE"
         ;;
     "$WINDOW_ICON  Active Window")
-        exec "$SCREENSHOT_SCRIPT" window
+        # Kill any rofi processes and wait for menu to disappear
+        pkill rofi 2>/dev/null || true
+        sleep 0.2
+        OUTPUT_FILE="$SCREENSHOTS_DIR/screenshot_window_$TIMESTAMP.png"
+        grimblast --notify --freeze save active "$OUTPUT_FILE"
         ;;
     "$CLIPBOARD_ICON  Area to Clipboard")
+        # Kill any rofi processes and wait for menu to disappear
+        pkill rofi 2>/dev/null || true
+        sleep 0.2
         # Take area screenshot and copy to clipboard only (don't save)
         grimblast --notify copy area
         ;;
     "$OCR_ICON  OCR Area (Copy Text)")
+        # Kill any rofi processes and wait for menu to disappear
+        pkill rofi 2>/dev/null || true
+        sleep 0.2
         # OCR functionality - extract text from selected area
         grimblast --freeze save area - | tesseract - - | wl-copy && notify-send -t 3000 "OCR" "Text copied to clipboard"
         ;;
