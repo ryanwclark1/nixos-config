@@ -3,26 +3,11 @@
 # Unified Power Menu Script
 # Consolidates functionality from powermenu.sh, powermenu2.sh, and power-big.sh
 
-# Configuration
-CONFIG_DIR="$HOME/.config/rofi"
-STYLE_TYPE="${ROFI_POWERMENU_STYLE:-type-3}"  # Allow override via env var
-STYLE_NAME="${ROFI_POWERMENU_STYLE_NAME:-style-3}"
-THEME_DIR="$CONFIG_DIR/powermenu/$STYLE_TYPE"
-THEME="$THEME_DIR/$STYLE_NAME.rasi"
-
-# Fallback themes if primary not found
-if [[ ! -f "$THEME" ]]; then
-    THEME_DIR="$CONFIG_DIR/applets/$STYLE_TYPE"
-    THEME="$THEME_DIR/$STYLE_NAME.rasi"
-    if [[ ! -f "$THEME" ]]; then
-        THEME_DIR="$CONFIG_DIR/style"
-        THEME="$THEME_DIR/power-big.rasi"
-    fi
-fi
+# Configuration - use built-in styling instead of theme files
 
 # System Info
 HOST=$(hostname)
-UPTIME=$(uptime -p | sed -e 's/up //g')
+UPTIME=$(uptime | awk '{print $3,$4}' | sed 's/,//' || echo "Unknown")
 LASTLOGIN=$(last -n 1 "$USER" 2>/dev/null | tr -s ' ' | cut -d' ' -f5-7 || echo "Unknown")
 
 # Messages
@@ -37,36 +22,23 @@ SUSPEND_ICON="${POWERMENU_SUSPEND_ICON:-󰏦}"
 LOGOUT_ICON="${POWERMENU_LOGOUT_ICON:-󰍃}"
 HIBERNATE_ICON="${POWERMENU_HIBERNATE_ICON:-󰤄}"
 
-# Layout detection
-layout=$(grep -E '^[[:space:]]*USE_ICON' "$THEME" 2>/dev/null | cut -d'=' -f2 | tr -d ' "'"'" || echo "YES")
-
-if [[ "$layout" == "NO" ]]; then
-    # Text layout
-    option_shutdown="$SHUTDOWN_ICON Shutdown"
-    option_reboot="$REBOOT_ICON Reboot"
-    option_lock="$LOCK_ICON Lock"
-    option_suspend="$SUSPEND_ICON Suspend"
-    option_logout="$LOGOUT_ICON Logout"
-    option_hibernate="$HIBERNATE_ICON Hibernate"
-else
-    # Icon-only layout
-    option_shutdown="$SHUTDOWN_ICON"
-    option_reboot="$REBOOT_ICON"
-    option_lock="$LOCK_ICON"
-    option_suspend="$SUSPEND_ICON"
-    option_logout="$LOGOUT_ICON"
-    option_hibernate="$HIBERNATE_ICON"
-fi
+# Always use text layout for clarity
+option_shutdown="$SHUTDOWN_ICON Shutdown"
+option_reboot="$REBOOT_ICON Reboot"
+option_lock="$LOCK_ICON Lock"
+option_suspend="$SUSPEND_ICON Suspend"
+option_logout="$LOGOUT_ICON Logout"
+option_hibernate="$HIBERNATE_ICON Hibernate"
 
 # Rofi command with error handling
 rofi_cmd() {
-    if [[ ! -f "$THEME" ]]; then
-        echo "Error: Theme file not found: $THEME" >&2
-        # Fallback to basic rofi
-        rofi -dmenu -p "$PROMPT" -mesg "$MESG"
-    else
-        rofi -dmenu -p "$PROMPT" -mesg "$MESG" -theme "$THEME"
-    fi
+    # Use simple text menu with consistent styling
+    rofi -dmenu -i -p "$PROMPT" -mesg "$MESG" \
+        -theme-str 'listview { lines: 6; spacing: 5px; }' \
+        -theme-str 'inputbar { children: [prompt,textbox-prompt-colon,entry]; margin: 0px 0px 2px 0px; border: 0px 0px 2px 0px; border-color: @selected-normal-foreground; }' \
+        -theme-str 'window { width: 350px; }' \
+        -theme-str 'element { padding: 8px; border-radius: 4px; }' \
+        -theme-str 'element selected { background-color: @selected-normal-background; }'
 }
 
 # Show menu and get choice

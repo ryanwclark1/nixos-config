@@ -81,7 +81,7 @@
               "rust_analyzer",
               "gopls",
               "pyright",
-              "tsserver",
+              "ts_ls",
               "html",
               "cssls",
               "jsonls",
@@ -94,7 +94,7 @@
               "docker_compose_language_service",
               "htmx",
               "jsonnet_ls",
-              "ruff_lsp",
+              "ruff",
               "tailwindcss",
               "templ",
               "typos_lsp",
@@ -128,11 +128,20 @@
               },
             })
             
-            -- Configure diagnostic display
+            -- Configure diagnostic display (using new API)
             local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
             for type, icon in pairs(signs) do
               local hl = "DiagnosticSign" .. type
-              vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
+              vim.diagnostic.config({
+                signs = {
+                  text = {
+                    [vim.diagnostic.severity.ERROR] = signs.Error,
+                    [vim.diagnostic.severity.WARN] = signs.Warn,
+                    [vim.diagnostic.severity.HINT] = signs.Hint,
+                    [vim.diagnostic.severity.INFO] = signs.Info,
+                  },
+                },
+              })
             end
             
             vim.diagnostic.config({
@@ -308,7 +317,6 @@
                 "css",
                 "markdown",
                 "markdown_inline",
-                "bash",
                 "lua",
                 "vim",
                 "dockerfile",
@@ -319,7 +327,7 @@
                 "rust",
                 "python",
               },
-              auto_install = true,
+              auto_install = false,
             })
           end,
         },
