@@ -39,10 +39,10 @@
 
   home.packages = with pkgs; [
     # hyprland-qtutils
-    wluma
-    brightnessctl # Adjust screen brightness
     figlet # Print large characters
+    grim # Screenshot utility for Wayland
     grimblast # Best screenshot tool - wrapper around grim with more features
+    hdrop # Emulate 'tdrop' in Hyprland (run, show and hide specific programs per keybind)
     handlr-regex
     hyprpicker
     libnotify # Notification library
