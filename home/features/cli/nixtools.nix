@@ -4,14 +4,13 @@
   pkgs,
   ...
 }:
-# TODO: Look at cache dir maybe XDG Cache
 let
   update-script = pkgs.writeShellApplication {
     name = "fetch-nix-index-database";
     runtimeInputs = with pkgs; [ wget coreutils ];
     text = ''
       filename="index-$(uname -m | sed 's/^arm64$/aarch64/')-$(uname | tr '[:upper:]' '[:lower:]')"
-      mkdir -p ~/.local/cache/nix-index && cd ~/.local/cache/nix-index
+      mkdir -p ~/.cache/nix-index && cd ~/.cache/nix-index
       wget -q -N "https://github.com/nix-community/nix-index-database/releases/latest/download/$filename"
       ln -f "$filename" files
     '';
@@ -28,7 +27,7 @@ in
     nurl # Generate Nix fetcher calls from repository URLs
     patchelf
     sops
-    nix-prefetch-git # nix development    nix-prefetch-git # nix development
+    nix-prefetch-git # nix development
     update-script
   ];
 
