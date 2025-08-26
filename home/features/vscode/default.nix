@@ -8,11 +8,166 @@
 {
   imports = [
     ./custom.theme/themes/theme.json.nix
-# ./mcp-servers.nix  # Consolidated into main config to avoid conflicts
   ];
 
   home.file.".config/vscode/plugins/custom.theme/package.json" = {
     source = ./custom.theme/package.json;
+  };
+
+  # MCP Configuration
+  home.file.".config/Code/User/mcp.json".text = builtins.toJSON {
+    servers = {
+      filesystem = {
+        command = "npx";
+        args = [
+          "@modelcontextprotocol/server-filesystem"
+          config.home.homeDirectory
+        ];
+        description = "Provides filesystem access to home directory";
+      };
+      git = {
+        command = "docker";
+        args = [
+          "run"
+          "-i"
+          "--rm"
+          "--name"
+          "mcp-git"
+          "-v"
+          "${config.home.homeDirectory}:${config.home.homeDirectory}:rw"
+          "-v"
+          "${config.home.homeDirectory}/.gitconfig:/root/.gitconfig:ro"
+          "mcp/git"
+        ];
+        description = "Provides git repository information and operations";
+      };
+      memory = {
+        command = "docker";
+        args = [
+          "run"
+          "-i"
+          "--rm"
+          "--name"
+          "mcp-memory"
+          "-v"
+          "mcp-memory-data:/data"
+          "mcp/memory"
+        ];
+        env = {
+          DATABASE_URL = "sqlite:///data/memory.db";
+        };
+        description = "Maintains context and memory across sessions";
+      };
+      time = {
+        command = "docker";
+        args = [
+          "run"
+          "-i"
+          "--rm"
+          "--name"
+          "mcp-time"
+          "mcp/time"
+          "--local-timezone=America/Chicago"
+        ];
+        env = {
+          TZ = "America/Chicago";
+        };
+        description = "Provides date and time information and operations";
+      };
+      fetch = {
+        command = "docker";
+        args = [
+          "run"
+          "-i"
+          "--rm"
+          "--name"
+          "mcp-fetch"
+          "--network"
+          "bridge"
+          "mcp/fetch"
+        ];
+        description = "Fetches and analyzes web content";
+      };
+      sequential-thinking = {
+        command = "npx";
+        args = [ "@modelcontextprotocol/server-sequential-thinking@latest" ];
+        env = {
+          NODE_ENV = "production";
+        };
+        description = "Helps break down complex problems into sequential steps";
+      };
+      context7 = {
+        command = "docker";
+        args = [
+          "run"
+          "-i"
+          "--rm"
+          "--name"
+          "mcp-context7"
+          "mcp/context7"
+        ];
+        env = {
+          CONTEXT7_TOKEN = "$(cat ${config.sops.secrets.context7-token.path})";
+          MCP_TRANSPORT = "stdio";
+        };
+        description = "Provides up-to-date code documentation for AI code editors";
+      };
+      github = {
+        command = "docker";
+        args = [
+          "run"
+          "-i"
+          "--rm"
+          "--name"
+          "mcp-github"
+          "ghcr.io/github/github-mcp-server"
+        ];
+        env = {
+          GITHUB_PERSONAL_ACCESS_TOKEN = "$(cat ${config.sops.secrets.github-pat.path})";
+          GITHUB_TOOLSETS = "repos,issues,pull_requests,actions,code_security,discussions";
+          MCP_TRANSPORT = "stdio";
+        };
+        description = "GitHub repository and workflow management via MCP";
+      };
+      playwright = {
+        command = "${pkgs.playwright-mcp}/bin/mcp-server-playwright";
+        args = [ "--headless" ];
+        description = "Browser automation and web scraping via Playwright";
+      };
+      serena = {
+        command = "docker";
+        args = [
+          "run"
+          "-i"
+          "--rm"
+          "--name"
+          "mcp-serena"
+          "-v"
+          "/home/administrator/Code:/workspace/Code:rw"
+          "--network"
+          "host"
+          "ghcr.io/oraios/serena:latest"
+          "serena"
+          "start-mcp-server"
+          "--transport"
+          "stdio"
+        ];
+        env = {
+          SERENA_DOCKER = "1";
+        };
+        description = "AI-powered development assistant with Code directory access";
+      };
+      sourcebot = {
+        command = "npx";
+        args = [ "@sourcebot/mcp@latest" ];
+        env = {
+          NODE_ENV = "production";
+          SOURCEBOT_HOST = "http://localhost:3002";
+          SOURCEBOT_API_KEY = "$(cat ${config.sops.secrets."sourcebot/api-key".path})";
+        };
+        description = "Code understanding and search via Sourcebot";
+      };
+    };
   };
 
   home.packages = with pkgs; [
@@ -209,12 +364,12 @@
             sha256 = "sha256-boKDVKLo8Na799OtoPnT6JxsAvQ/HoqL3FispnN6bOA=";
             version = "0.65.2025081801";
           }
-          {
-            name = "snyk-vulnerability-scanner";
-            publisher = "snyk-security";
-            sha256 = "sha256-4K5+hkPYqPoL9+ykJaKXp9CHXNgUoZXuVYi0zbu6rl8=";
-            version = "2.23.1";
-          }
+          # {
+          #   name = "snyk-vulnerability-scanner";
+          #   publisher = "snyk-security";
+          #   sha256 = "sha256-4K5+hkPYqPoL9+ykJaKXp9CHXNgUoZXuVYi0zbu6rl8=";
+          #   version = "2.23.1";
+          # }
           # {
           #   name = "specstory-vscode";  # Removed: very niche BDD tool
           #   publisher = "specstory";
@@ -283,7 +438,6 @@
           "breadcrumbs.enabled" = true;
           "diffEditor.codeLens" = true;
           "diffEditor.diffAlgorithm" = "advanced";
-          "diffEditor.experimental.showcoloves" = true;
           "diffEditor.maxFileSize" = 0;
           "diffEditor.renderIndicators" = true;
           "editor.accessibilityPageSize" = 5000;
@@ -409,11 +563,9 @@
           "emmet.triggerExpansionOnTab" = true;
 
           ##### Code Runner ####
-          "code-runner.enableAppInsights" = false;
 
           #####  Copilot #####
           # "github.copilot.chat.temporalContext.enabled" = true;
-          "github.copilot.chat.completionContext.typescript.mode" = "on";
           "github.copilot.chat.startDebugging.enabled" = true;
           "github.copilot.chat.localeOverride" = "en";
           "github.copilot.chat.useProjectTemplates" = true;
@@ -429,91 +581,19 @@
           "github.copilot.chat.editor.temporalContext.enabled" = true;
 
           ##### MCP (Model Context Protocol) Settings #####
-          # Enable MCP servers in Copilot
-          "github.copilot.chat.mcpServers.enable" = true;
-          
           # MCP Core Settings
           "chat.mcp.enabled" = true;  # Enable MCP functionality
-          "chat.mcp.autostart" = "always";  # Auto-start MCP servers (vs "never")
+          "chat.mcp.autostart" = "newAndOutdated";  # Auto-start MCP servers (vs "never")
           "chat.mcp.discovery.enabled" = true;  # Enable MCP server discovery
-          
+
           # Disable specific MCP features
           "chat.mcp.assisted.nuget.enabled" = false;  # Disable NuGet assistance (not needed)
-          
+
           # MCP Server Sampling (empty = use defaults)
           "chat.mcp.serverSampling" = {};
-          
+
           # Context7 Integration
           "github.copilot.chat.newWorkspace.useContext7" = true;  # Enable Context7 for new workspaces
-          "github.copilot.chat.mcpServers.servers" = {
-            "filesystem" = {
-              "command" = "npx";
-              "args" = [
-                "@modelcontextprotocol/server-filesystem"
-                "${config.home.homeDirectory}"
-              ];
-              "description" = "Provides filesystem access to home directory";
-            };
-            "git" = {
-              "command" = "npx";
-              "args" = ["@modelcontextprotocol/server-git"];
-              "description" = "Provides git repository information and operations";
-            };
-            "memory" = {
-              "command" = "npx";
-              "args" = ["@modelcontextprotocol/server-memory"];
-              "description" = "Maintains context and memory across Copilot sessions";
-            };
-            "time" = {
-              "command" = "npx";
-              "args" = ["@modelcontextprotocol/server-time"];
-              "env" = {
-                "TZ" = "America/Chicago";
-              };
-              "description" = "Provides date and time information and operations";
-            };
-            "fetch" = {
-              "command" = "npx";
-              "args" = ["@modelcontextprotocol/server-fetch"];
-              "description" = "Fetches and analyzes web content";
-            };
-            "sequential-thinking" = {
-              "command" = "npx";
-              "args" = ["@modelcontextprotocol/server-sequential-thinking"];
-              "description" = "Helps break down complex problems into sequential steps";
-            };
-            "context7" = {
-              "command" = "npx";
-              "args" = ["@context7/mcp"];
-              "env" = {
-                "CONTEXT7_API_KEY" = "\${cat ${config.sops.secrets.context7-token.path}}";
-              };
-              "description" = "Up-to-date code documentation and examples";
-            };
-            "github" = {
-              "command" = "npx";
-              "args" = ["@modelcontextprotocol/server-github"];
-              "env" = {
-                "GITHUB_TOKEN" = "\${cat ${config.sops.secrets.github-pat.path}}";
-                "GITHUB_TOOLSETS" = "repos,issues,pull_requests,actions,code_security,discussions";
-              };
-              "description" = "GitHub repository insights and operations with full toolset access";
-            };
-            "playwright" = {
-              "command" = "${pkgs.playwright-mcp}/bin/mcp-server-playwright";
-              "args" = ["--headless"];
-              "description" = "Browser automation and web scraping via Playwright";
-            };
-            "serena" = {
-              "command" = "npx";
-              "args" = ["@serena/mcp"];
-              "env" = {
-                "WORKSPACE_DIR" = "${config.home.homeDirectory}/Code";
-                "NODE_ENV" = "production";
-              };
-              "description" = "AI-powered development assistant with Code directory access";
-            };
-          };
 
           #####  Dev Containers #####
           # "dev.containers.defaultExtensionsIfInstalledLocally" = [
@@ -711,7 +791,6 @@
           "python.createEnvironment.contentButton" = "show";
           "python.terminal.shellIntegration.enabled" = true;
           "python.venvFolders" = [ ".venv" ];
-          "pythonIndent.trimLinesWithOnlyWhitespace" = true;
 
           ##### Docker Compose #####
 
@@ -814,26 +893,26 @@
           # ];
 
           ##### Kubernetes #####
-          "vs-kubernetes" = {
-            "vs-kubernetes.crd-code-completion" = "enabled";
-          };
-          "vscode-kubernetes.log-viewer.autorun" = true;
-          "vscode-kubernetes.log-viewer.destination" = "Terminal";
-          "vscode-kubernetes.log-viewer.follow" = true;
-          "vscode-kubernetes.log-viewer.timestamp" = true;
-          "vsdocker.imageUser" = "docker.io/ryanwclark";
+          # "vs-kubernetes" = {
+          #   "vs-kubernetes.crd-code-completion" = "enabled";
+          # };
+          # "vscode-kubernetes.log-viewer.autorun" = true;
+          # "vscode-kubernetes.log-viewer.destination" = "Terminal";
+          # "vscode-kubernetes.log-viewer.follow" = true;
+          # "vscode-kubernetes.log-viewer.timestamp" = true;
+
 
           ##### Snyk #####
-          "snyk.advanced.cliPath" = "${config.home.homeDirectory}/.local/share/snyk/vscode-cli/snyk-linux";
-          "snyk.folderConfigs" = [
-            {
-              "folderPath" = "${config.home.homeDirectory}/nixos-config";
-              "baseBranch" = "main";
-              "localBranches" = [
-                "main"
-              ];
-            }
-          ];
+          # "snyk.advanced.cliPath" = "${config.home.homeDirectory}/.local/share/snyk/vscode-cli/snyk-linux";
+          # "snyk.folderConfigs" = [
+          #   {
+          #     "baseBranch" = "main";
+          #     "folderPath" = "${config.home.homeDirectory}/nixos-config";
+          #     "localBranches" = [
+          #       "main"
+          #     ];
+          #   }
+          # ];
 
           ##### CSS #####
           # "[css]"."editor.defaultFormatter" = "esbenp.prettier-vscode";
