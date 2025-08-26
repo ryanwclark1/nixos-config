@@ -50,7 +50,7 @@
     ./features/wireless
     ./features/yazi
     ./features/zellij
-    ./features/zen
+    # ./features/zen
     ./features/zoxide
 
     ./features/desktop/hyprland
