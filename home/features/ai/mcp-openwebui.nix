@@ -148,7 +148,7 @@
       env = {
         NODE_ENV = "production";
         SOURCEBOT_HOST = "http://localhost:3002";
-        SOURCEBOT_API_KEY = "$(curl -sf http://localhost:3002/api/keys 2>/dev/null | jq -r '.keys[0].key' 2>/dev/null || echo '')";
+        SOURCEBOT_API_KEY = "$(cat ${config.sops.secrets."sourcebot/api-key".path})";
       };
       description = "Code understanding and search via Sourcebot";
     };
@@ -250,17 +250,17 @@
       echo "[ERROR] Node.js is not available"
     fi
     
-    # Test API key availability (optional)
-    echo "Checking for Sourcebot API key..."
-    if ${pkgs.curl}/bin/curl -sf http://localhost:3002/api/keys >/dev/null 2>&1; then
-      API_KEY=$(${pkgs.curl}/bin/curl -sf http://localhost:3002/api/keys 2>/dev/null | ${pkgs.jq}/bin/jq -r '.keys[0].key' 2>/dev/null || echo "")
+    # Test SOPS API key availability
+    echo "Checking for Sourcebot API key from SOPS..."
+    if [ -f "${config.sops.secrets."sourcebot/api-key".path}" ]; then
+      API_KEY=$(cat ${config.sops.secrets."sourcebot/api-key".path} 2>/dev/null)
       if [ -n "$API_KEY" ] && [ "$API_KEY" != "null" ]; then
-        echo "[OK] Sourcebot API key found"
+        echo "[OK] Sourcebot API key found in SOPS secrets"
       else
-        echo "[WARN] No valid API key found. You may need to create one in Sourcebot settings."
+        echo "[WARN] API key file exists but appears empty"
       fi
     else
-      echo "[WARN] Could not check API keys endpoint"
+      echo "[WARN] SOPS API key file not found at ${config.sops.secrets."sourcebot/api-key".path}"
     fi
     
     echo ""
