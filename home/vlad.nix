@@ -19,7 +19,8 @@
     ./features/kubernetes
     ./features/lazygit
     ./features/networking-utils
-    ./features/nixvim
+    # ./features/nixvim  # Replaced with neovim
+    ./features/neovim
     ./features/ripgrep
     ./features/shell
     ./features/starship
