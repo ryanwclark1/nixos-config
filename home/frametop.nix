@@ -36,7 +36,8 @@
     ./features/lazygit
     ./features/media
     ./features/networking-utils
-    ./features/nixvim
+
+    ./features/neovim
     ./features/productivity
     # ./features/qutebrowser
     ./features/remmina

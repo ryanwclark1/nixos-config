@@ -20,7 +20,7 @@
     ./features/kubernetes
     ./features/lazygit
     ./features/networking-utils
-    ./features/nixvim
+    ./features/neovim
     ./features/ripgrep
     ./features/shell
     ./features/starship

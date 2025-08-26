@@ -19,7 +19,7 @@
     ./features/kubernetes
     ./features/lazygit
     ./features/networking-utils
-    ./features/nixvim
+    ./features/neovim
     ./features/pass
     ./features/ripgrep
     ./features/shell

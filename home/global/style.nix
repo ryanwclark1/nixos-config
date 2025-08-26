@@ -95,13 +95,6 @@ in
           signColumn = lib.mkDefault false;
         };
       };
-      nixvim = {
-        enable = lib.mkDefault false;
-        transparentBackground = {
-          main = lib.mkDefault false;
-          signColumn = lib.mkDefault false;
-        };
-      };
       qutebrowser.enable = lib.mkDefault false;
       rofi.enable = lib.mkDefault false;
       vscode.enable = lib.mkDefault false;
