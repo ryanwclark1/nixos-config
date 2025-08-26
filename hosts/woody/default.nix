@@ -28,15 +28,14 @@
     ../common/optional/services/audio.nix
     ../common/optional/services/bluetooth.nix
     ../common/optional/services/chroma.nix
-    ../common/optional/services/docling.nix
+    ../common/optional/services/docling.nix  # Temporarily disabled due to build failures
     ../common/optional/tools/direnv.nix
     ../common/optional/tools/fonts.nix
     ../common/optional/services/gnome-services.nix
     ../common/optional/desktop/nautilus.nix
-    ../common/optional/services/docling.nix
     ../common/optional/services/nfs.nix
     ../common/optional/services/ollama.nix
-    ../common/optional/services/open-webui.nix
+    ../common/optional/services/open-webui.nix # Temporarily disabled due to build failures
     ../common/optional/services/printing.nix
     ../common/optional/services/searx.nix
     ../common/optional/services/sourcebot.nix
