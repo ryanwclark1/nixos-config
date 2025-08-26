@@ -42,6 +42,7 @@
       "sourcebot/database/user" = {};
       "sourcebot/database/password" = {};
       "sourcebot/database/name" = {};
+      "sourcebot/api-key" = {};
     };
   };
 }
