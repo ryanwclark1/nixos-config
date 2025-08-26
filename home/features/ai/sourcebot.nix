@@ -32,15 +32,17 @@
       };
 
       # Local repository connections
-      code-repos = {
-        type = "git";
-        url = "file:///workspace/Code/*";  # All repos in ~/Code
-      };
-
       nixos-config = {
         type = "git";
-        url = "file:///workspace/nixos-config";  # NixOS configuration
+        url = "file:///repos/nixos-config";
       };
+
+      # All repositories in Code directory using glob pattern
+      code-repositories = {
+        type = "git";
+        url = "file:///repos/Code/*";
+      };
+
     };
 
     # Language models aligned with system Ollama configuration
@@ -96,8 +98,8 @@
         volumes:
           - sourcebot-data:/data
           - "${config.home.homeDirectory}/.config/sourcebot/config.json:/data/config.json:ro"
-          - "${config.home.homeDirectory}/Code:/workspace/Code:ro"
-          - "${config.home.homeDirectory}/nixos-config:/workspace/nixos-config:ro"
+          - "${config.home.homeDirectory}/Code:/repos/Code:ro"
+          - "${config.home.homeDirectory}/nixos-config:/repos/nixos-config:ro"
         environment:
           # Core Configuration
           - CONFIG_PATH=/data/config.json
@@ -140,6 +142,7 @@
           - WORKER_CONCURRENCY=4
           - INDEXING_BATCH_SIZE=100
 
+
           # File Processing & Indexing
           - INDEXING_EXCLUDE_PATTERNS=node_modules/**,.git/**,**/*.min.js,**/*.min.css,**/*.map,**/dist/**,**/build/**,**/.next/**,**/.venv/**,**/__pycache__/**,**/.pytest_cache/**,**/.ruff_cache/**,**/target/**,**/vendor/**
           - MAX_FILE_SIZE_BYTES=2097152  # 2 MB
@@ -165,7 +168,7 @@
           - "127.0.0.1:5433:5432"  # Use 5433 to avoid conflicts
         environment:
           - POSTGRES_DB  # Loaded from SOPS via environment file
-          - POSTGRES_USER  # Loaded from SOPS via environment file  
+          - POSTGRES_USER  # Loaded from SOPS via environment file
           - POSTGRES_PASSWORD  # Loaded from SOPS via environment file
           - PGDATA=/var/lib/postgresql/data/pgdata
         volumes:
@@ -237,14 +240,14 @@
           # Create environment file for Sourcebot (disable shell coloring to avoid ANSI codes)
           export NO_COLOR=1
           export TERM=dumb
-          
+
           # Read secrets from SOPS (hierarchical structure)
           GITHUB_TOKEN=$(cat ${config.sops.secrets.github-pat.path} 2>/dev/null | tr -d '[:cntrl:]' || echo "fake-token")
           AUTH_SECRET=$(cat ${config.sops.secrets."sourcebot/auth-secret".path} 2>/dev/null | tr -d '[:cntrl:]' || echo "fallback-secret")
           DB_USER=$(cat ${config.sops.secrets."sourcebot/database/user".path} 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
           DB_PASSWORD=$(cat ${config.sops.secrets."sourcebot/database/password".path} 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
           DB_NAME=$(cat ${config.sops.secrets."sourcebot/database/name".path} 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
-          
+
           # Create environment file with all secrets
           cat > ${config.home.homeDirectory}/.config/sourcebot/.env <<EOF
           GITHUB_PERSONAL_ACCESS_TOKEN=$GITHUB_TOKEN
@@ -369,14 +372,14 @@
         # Recreate environment file with fresh SOPS secrets (disable shell coloring)
         export NO_COLOR=1
         export TERM=dumb
-        
+
         # Read secrets from SOPS (hierarchical structure)
         GITHUB_TOKEN=$(cat ${config.sops.secrets.github-pat.path} 2>/dev/null | tr -d '[:cntrl:]' || echo "fake-token")
         AUTH_SECRET=$(cat ${config.sops.secrets."sourcebot/auth-secret".path} 2>/dev/null | tr -d '[:cntrl:]' || echo "fallback-secret")
         DB_USER=$(cat ${config.sops.secrets."sourcebot/database/user".path} 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
         DB_PASSWORD=$(cat ${config.sops.secrets."sourcebot/database/password".path} 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
         DB_NAME=$(cat ${config.sops.secrets."sourcebot/database/name".path} 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
-        
+
         # Create environment file with all secrets
         cat > "$ENV_FILE" <<EOF
         GITHUB_PERSONAL_ACCESS_TOKEN=$GITHUB_TOKEN
@@ -554,14 +557,14 @@
     # Create environment file with SOPS secrets (disable shell coloring)
     export NO_COLOR=1
     export TERM=dumb
-    
+
     # Read secrets from SOPS (hierarchical structure)
     GITHUB_TOKEN=$(cat ${config.sops.secrets.github-pat.path} 2>/dev/null | tr -d '[:cntrl:]' || echo "fake-token")
     AUTH_SECRET=$(cat ${config.sops.secrets."sourcebot/auth-secret".path} 2>/dev/null | tr -d '[:cntrl:]' || echo "fallback-secret")
     DB_USER=$(cat ${config.sops.secrets."sourcebot/database/user".path} 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
     DB_PASSWORD=$(cat ${config.sops.secrets."sourcebot/database/password".path} 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
     DB_NAME=$(cat ${config.sops.secrets."sourcebot/database/name".path} 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
-    
+
     # Create environment file with all secrets
     cat > "$ENV_FILE" <<EOF
     GITHUB_PERSONAL_ACCESS_TOKEN=$GITHUB_TOKEN
