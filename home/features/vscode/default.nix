@@ -8,7 +8,7 @@
 {
   imports = [
     ./custom.theme/themes/theme.json.nix
-    ./mcp-servers.nix
+# ./mcp-servers.nix  # Consolidated into main config to avoid conflicts
   ];
 
   home.file.".config/vscode/plugins/custom.theme/package.json" = {
@@ -58,88 +58,94 @@
             charliermarsh.ruff
             dbaeumer.vscode-eslint
             donjayamanne.githistory
-            esbenp.prettier-vscode
-            formulahendry.code-runner
+            # esbenp.prettier-vscode  # Removed: conflicts with biomejs.biome
+            # formulahendry.code-runner  # Removed: interferes with proper debugging workflows
             github.codespaces
             github.vscode-github-actions
             github.vscode-pull-request-github
             golang.go
-            griimick.vhs
+            # griimick.vhs  # Removed: very niche terminal GIF recording tool
             hashicorp.terraform
-            hediet.vscode-drawio
-            jetmartin.bats
+            # hediet.vscode-drawio  # Removed: only needed for diagram creation
+            # jetmartin.bats  # Removed: only needed for Bash testing
             jnoortheen.nix-ide
             jock.svg
             marp-team.marp-vscode
-            ms-kubernetes-tools.vscode-kubernetes-tools
-            ms-python.black-formatter
+            # ms-kubernetes-tools.vscode-kubernetes-tools  # Disabled: no active K8s clusters
+            # ms-python.black-formatter  # Removed: Ruff handles formatting
             ms-python.debugpy
-            ms-python.isort
-            ms-python.python
+            # ms-python.isort  # Removed: Ruff handles import sorting
+            # ms-python.python  # Temporarily disabled due to pygls build failure
             ms-python.vscode-pylance
             ms-vscode-remote.remote-containers
             ms-vscode-remote.remote-ssh
             ms-vscode-remote.remote-ssh-edit
             ms-vscode.hexeditor
-            ms-vscode.live-server
-            quicktype.quicktype
+            # ms-vscode.live-server  # Removed: modern frameworks have better dev servers
+            # quicktype.quicktype  # Removed: niche JSON-to-types conversion
             redhat.vscode-xml
             redhat.vscode-yaml
             samuelcolvin.jinjahtml
-            shyykoserhiy.vscode-spotify
+            # shyykoserhiy.vscode-spotify  # Removed: non-development related
             tailscale.vscode-tailscale
             tamasfe.even-better-toml
-            usernamehw.errorlens
+            usernamehw.errorlens  # Removed: can be visually noisy
             yzhang.markdown-all-in-one
           ])
           ++ (pkgs.vscode-utils.extensionsFromVscodeMarketplace [
-          {
-            name = "alpine-js-intellisense";
-            publisher = "adrianwilczynski";
-            sha256 = "sha256-Klx5ZvV06lXIJ3Q/mzq3KBjPpdROoxDkgEu7MBO+RhI=";
-            version = "1.2.0";
-          }
+          # {
+          #   name = "alpine-js-intellisense";  # Removed: only needed if using Alpine.js
+          #   publisher = "adrianwilczynski";
+          #   sha256 = "sha256-Klx5ZvV06lXIJ3Q/mzq3KBjPpdROoxDkgEu7MBO+RhI=";
+          #   version = "1.2.0";
+          # }
           {
             name = "ansible";
             publisher = "redhat";
-            sha256 = "sha256-ou/5MHiTFopeHSyEAspppejcvWnIz2qM62yCpedNW6s=";
-            version = "25.7.0";
+            sha256 = "sha256-TXXOuayVohQPp+yQAHbsZDr/UYtyHmUkaLU+lADpjDU=";
+            version = "25.8.1";
           }
           {
             name = "biome";
             publisher = "biomejs";
-            sha256 = "sha256-k0/aQnkHSICIQ5n6CSUGF0Z/HiTeet0BCf0UxQRxq7g=";
-            version = "2025.5.251939";
+            sha256 = "sha256-wWyLIjNOBjIe72ed+wwfQWGH7Vzuea/0Xux0XJkhAkY=";
+            version = "2025.7.41733";
           }
-          {
-            name = "claude-code-chat";
-            publisher = "AndrePimenta";
-            sha256 = "sha256-6KQANjZz78ist3j+g2pfMMMd3OZBHwJH7ej9hvqxQVI=";
-            version = "0.1.3";
-          }
+          # {
+          #   name = "claude-code-chat";  # Removed: redundant with claude-dev
+          #   publisher = "AndrePimenta";
+          #   sha256 = "sha256-6ijv2MLYji5amcxGKJ3+MhQTk+yLiFKVsXPJMqGgyc0=";
+          #   version = "1.0.5";
+          # }
           {
             name = "claude-dev";
             publisher = "saoudrizwan";
-            sha256 = "sha256-k4H7fXo6XA4sT3yb+4fjTa7mYnntGPaBJ6A+0F43Bbs=";
-            version = "3.18.3";
+            sha256 = "sha256-bomhvgLWQk3rwLweJJEuLlN6+s1vfvzxpJgik+Yyygo=";
+            version = "3.26.5";
           }
+          # {
+          #   name = "context7-mcp";  # Removed: conflicts with home-manager MCP setup
+          #   publisher = "upstash";
+          #   sha256 = "sha256-q6SkIy7eZ9H1yOnZygkcXQcpTK4eu6/jjud1wqEL2Mw=";
+          #   version = "1.0.1";
+          # }
           {
             name = "copilot";
             publisher = "github";
-            sha256 = "sha256-zxsmL6dUWiH4xyo0KP+VthbvP+D7j/0IHGxMgmd7s04=";
-            version = "1.339.1658";
+            sha256 = "sha256-UVNHbNmfu6F622ISU8uCjDOsJ/86JLbO9lTsouDMIgI=";
+            version = "1.362.1759";
           }
           {
             name = "copilot-chat";
             publisher = "github";
-            sha256 = "sha256-idYuAYIspZ5b9U6phe5mmCkzzJrvAwjrycoq349Sexw=";
-            version = "0.29.2025070401";
+            sha256 = "sha256-p+y8MzogsLYFAAUTwHcSHaW2eW9uYXxbWLEVH5X7uFM=";
+            version = "0.31.2025082602";
           }
           {
             name = "explorer";
             publisher = "vitest";
-            sha256 = "sha256-8W30ouGXUCRNiRwNAhK0WREj7Pnhz2PVtj38bpH1WNU=";
-            version = "1.26.0";
+            sha256 = "sha256-r1KCT6UYgoCPRRxy+dmJLkwUW2yRixBwfYra4kSJYB0=";
+            version = "1.28.2";
           }
           {
             name = "grafana-alloy";
@@ -153,17 +159,17 @@
             sha256 = "sha256-TpLOMwdaEdgzWVwUcn+fO4rgLiQammWQM8LQobt8gLw=";
             version = "0.0.19";
           }
-          {
-            name = "htmx-attributes";
-            publisher = "craigrbroughton";
-            sha256 = "sha256-TsemPZkq2Z13/vahRaP7z206BJaCZ1TR6OVv6aeDvyk=";
-            version = "0.8.0";
-          }
+          # {
+          #   name = "htmx-attributes";  # Removed: only needed if using HTMX
+          #   publisher = "craigrbroughton";
+          #   sha256 = "sha256-TsemPZkq2Z13/vahRaP7z206BJaCZ1TR6OVv6aeDvyk=";
+          #   version = "0.8.0";
+          # }
           {
             name = "mypy-type-checker";
             publisher = "ms-python";
-            sha256 = "sha256-9/Wo/U5xAJKJ1BvADvZZts1Ca3wybpG5Ujcld1FP5Ig=";
-            version = "2025.3.11821011";
+            sha256 = "sha256-IeWhMA1ht2npPVDqJmv3IOmrlKp9uuhycGNT7h+rNks=";
+            version = "2025.3.12271015";
           }
           {
             name = "pdf";
@@ -183,48 +189,42 @@
             sha256 = "sha256-h8pRrPzmu8+5ZiOLALjackr4zWuFAqi1ex7Gp2iOZKk=";
             version = "1.3.3";
           }
-          {
-            name = "pwc";
-            publisher = "SureshNettur";
-            sha256 = "sha256-e9Z6PZQ8yWs83jpBuVdBLlePOYO0qUvBcbYkOOc4vVI=";
-            version = "1.0.1";
-          }
+          # {
+          #   name = "pwc";  # Removed: very niche/specific extension
+          #   publisher = "SureshNettur";
+          #   sha256 = "sha256-e9Z6PZQ8yWs83jpBuVdBLlePOYO0qUvBcbYkOOc4vVI=";
+          #   version = "1.0.1";
+          # }
           {
             name = "remotehub";
             publisher = "GitHub";
-            sha256 = "sha256-1Bd9uaCpd9Fe4WSMCfHIucbqrNBvv1sNM6/yjNN7SC4=";
-            version = "0.65.2025063001";
+            sha256 = "sha256-boKDVKLo8Na799OtoPnT6JxsAvQ/HoqL3FispnN6bOA=";
+            version = "0.65.2025081801";
           }
           {
             name = "snyk-vulnerability-scanner";
             publisher = "snyk-security";
-            sha256 = "sha256-IaFwA5qPkL2zCq1uTrAeEcOIeAb/T+7QP2tqdiGcpeU=";
-            version = "2.22.0";
+            sha256 = "sha256-4K5+hkPYqPoL9+ykJaKXp9CHXNgUoZXuVYi0zbu6rl8=";
+            version = "2.23.1";
           }
-          {
-            name = "specstory-vscode";
-            publisher = "specstory";
-            sha256 = "sha256-kkcazc3ysv0d/k8Tzi1dCRScLCkLQGWVgfmxAK2S8og=";
-            version = "0.13.0";
-          }
-          {
-            name = "sqlite-viewer";
-            publisher = "qwtel";
-            sha256 = "sha256-PEkd5mJlrKjW49bv8lyLTMKGM2ZwtVKkv5kDEqZk8K0=";
-            version = "25.6.1";
-          }
-          {
-            name = "tailwind-color-matcher";
-            publisher = "OmriGrossman";
-            sha256 = "sha256-WfFg1h5tY43W9YqgXkHDlxjRquFupuvLBwotTw0XoNk=";
-            version = "1.0.8";
-          }
-          {
-            name = "tailwind-fold";
-            publisher = "stivo";
-            sha256 = "sha256-yH3eA5jgBwxqnpFQkg91KQMkQps5iM1v783KQkQcWUU=";
-            version = "0.2.0";
-          }
+          # {
+          #   name = "specstory-vscode";  # Removed: very niche BDD tool
+          #   publisher = "specstory";
+          #   sha256 = "sha256-kMb8Gf706puSeIU7Cx3Kj8cP6zNbveqI//sQ8kbMgLY=";
+          #   version = "0.17.1";
+          # }
+          # {
+          #   name = "tailwind-color-matcher";  # Removed: minor utility, main tailwind extension sufficient
+          #   publisher = "OmriGrossman";
+          #   sha256 = "sha256-WfFg1h5tY43W9YqgXkHDlxjRquFupuvLBwotTw0XoNk=";
+          #   version = "1.0.8";
+          # }
+          # {
+          #   name = "tailwind-fold";  # Removed: minor utility, main tailwind extension sufficient
+          #   publisher = "stivo";
+          #   sha256 = "sha256-yH3eA5jgBwxqnpFQkg91KQMkQps5iM1v783KQkQcWUU=";
+          #   version = "0.2.0";
+          # }
           {
             name = "templ";
             publisher = "a-h";
@@ -234,14 +234,14 @@
           {
             name = "ty";
             publisher = "astral-sh";
-            sha256 = "sha256-yQkCKG3yxllmdC5kOnQF+dWqCNB2DhN1cLHY0IcwHdM=";
-            version = "2025.25.11831801";
+            sha256 = "sha256-GyVau+TebJfE+Wf9N9Z3uutaGlDza80ed69skprUR4k=";
+            version = "2025.37.12311339";
           }
           {
             name = "vscode-containers";
             publisher = "ms-azuretools";
-            sha256 = "sha256-MAeE99XmjIjYbr72UymnkrDKsNRSjNiB1jdffKTosHQ=";
-            version = "2.0.3";
+            sha256 = "sha256-96JLAM2b/FUR1TA/u9GPdQJmhSGUNMarbuhEhID8c6g=";
+            version = "2.1.0";
           }
           {
             name = "vscode-gitops-tools";
@@ -258,15 +258,16 @@
           {
             name = "vscode-pgsql";
             publisher = "ms-ossdata";
-            sha256 = "sha256-5odotR4NBA5aupQVLxQUV9yCYaxTbEpfa0K9xXtOmk0=";
-            version = "1.6.0";
+            sha256 = "sha256-/d4/AsQMm9XGEytgsZA94qbR19kWTAysm0GFG2tcm9s=";
+            version = "1.8.0";
           }
           {
             name = "vscode-thunder-client";
             publisher = "rangav";
-            sha256 = "sha256-p9DA6r2pX7KAVO5ecu7cinBOXbtAP9HO3Y1m4+pzSYg=";
-            version = "2.35.3";
+            sha256 = "sha256-P50jK4hg8GFg+rQ8HbeLzcMXCzvD72mF7kaGW6a1L7Y=";
+            version = "2.37.5";
           }
+
 
           ]);
         userSettings = {
@@ -311,6 +312,8 @@
             120
           ];
           "extensions.autoUpdate" = false;
+          "extensions.autoCheckUpdates" = false;
+          "update.mode" = "none";
 
           "files.associations" = {
             "*.css" = "tailwindcss";
@@ -355,6 +358,22 @@
           "workbench.colorTheme" = "Custom Theme";
           "workbench.editor.enablePreview" = true;
           "workbench.externalBrowser" = "chrome";
+
+          # Performance and UX improvements
+          "editor.bracketPairColorization.enabled" = true;
+          "editor.largeFileOptimizations" = true;
+          "editor.maxTokenizationLineLength" = 20000;
+          "editor.suggest.preview" = true;
+          "editor.codeActionWidget.includeNearbyQuickFixes" = true;
+          "editor.autoClosingBrackets" = "languageDefined";
+          "editor.autoClosingQuotes" = "languageDefined";
+          "editor.autoSurround" = "languageDefined";
+          "editor.codeLens" = true;
+          "editor.colorDecorators" = true;
+          "files.hotExit" = "onExit";
+          "workbench.startupEditor" = "none"; # Skip welcome page for faster startup
+          "workbench.editor.limit.enabled" = true; # Limit open editors for performance
+          "workbench.editor.limit.value" = 20; # Max 20 open editors
 
           # "remote.defaultExtensionsIfInstalledLocally" = [
           #   "GitHub.copilot"
@@ -404,6 +423,75 @@
           ##### MCP (Model Context Protocol) Settings #####
           # Enable MCP servers in Copilot
           "github.copilot.chat.mcpServers.enable" = true;
+          "github.copilot.chat.mcpServers.servers" = {
+            "filesystem" = {
+              "command" = "npx";
+              "args" = [
+                "@modelcontextprotocol/server-filesystem"
+                "${config.home.homeDirectory}"
+              ];
+              "description" = "Provides filesystem access to home directory";
+            };
+            "git" = {
+              "command" = "npx";
+              "args" = ["@modelcontextprotocol/server-git"];
+              "description" = "Provides git repository information and operations";
+            };
+            "memory" = {
+              "command" = "npx";
+              "args" = ["@modelcontextprotocol/server-memory"];
+              "description" = "Maintains context and memory across Copilot sessions";
+            };
+            "time" = {
+              "command" = "npx";
+              "args" = ["@modelcontextprotocol/server-time"];
+              "env" = {
+                "TZ" = "America/Chicago";
+              };
+              "description" = "Provides date and time information and operations";
+            };
+            "fetch" = {
+              "command" = "npx";
+              "args" = ["@modelcontextprotocol/server-fetch"];
+              "description" = "Fetches and analyzes web content";
+            };
+            "sequential-thinking" = {
+              "command" = "npx";
+              "args" = ["@modelcontextprotocol/server-sequential-thinking"];
+              "description" = "Helps break down complex problems into sequential steps";
+            };
+            "context7" = {
+              "command" = "npx";
+              "args" = ["@context7/mcp"];
+              "env" = {
+                "CONTEXT7_API_KEY" = "$(cat ${config.sops.secrets."context7/api-key".path})";
+              };
+              "description" = "Up-to-date code documentation and examples";
+            };
+            "github" = {
+              "command" = "npx";
+              "args" = ["@modelcontextprotocol/server-github"];
+              "env" = {
+                "GITHUB_TOKEN" = "$(cat ${config.sops.secrets.github-pat.path})";
+                "GITHUB_TOOLSETS" = "repos,issues,pull_requests,actions,code_security,discussions";
+              };
+              "description" = "Enhanced GitHub repository insights and operations";
+            };
+            "playwright" = {
+              "command" = "${pkgs.playwright-mcp}/bin/mcp-server-playwright";
+              "args" = ["--headless"];
+              "description" = "Browser automation and web scraping via Playwright";
+            };
+            "serena" = {
+              "command" = "npx";
+              "args" = ["@serena/mcp"];
+              "env" = {
+                "WORKSPACE_DIR" = "${config.home.homeDirectory}/Code";
+                "NODE_ENV" = "production";
+              };
+              "description" = "AI-powered development assistant with Code directory access";
+            };
+          };
 
           #####  Dev Containers #####
           # "dev.containers.defaultExtensionsIfInstalledLocally" = [
@@ -721,7 +809,6 @@
               "baseBranch" = "main";
               "localBranches" = [
                 "main"
-                "develop"
               ];
             }
           ];
