@@ -6,18 +6,22 @@
 {
   imports = [
     ./mcp-openwebui.nix
+    ./sourcebot.nix  # Docker Compose-based Sourcebot with PostgreSQL and Redis
   ];
   home.packages = with pkgs; [
     lmstudio
-    mlflow-server
+    # mlflow-server  # Temporarily disabled due to missing fastapi/uvicorn dependencies
     # claude-code
     # aider-chat
     
-    # MCP support
+    # Docker for running MCP servers
+    docker
+    docker-compose
+    
+    # MCP support - MCPO proxy for MCP-to-OpenAPI conversion
     (python3.withPackages (ps: with ps; [
       # Install mcpo for MCP proxy functionality
     ]))
-    uv  # For installing mcpo and MCP servers
   ];
 
 }

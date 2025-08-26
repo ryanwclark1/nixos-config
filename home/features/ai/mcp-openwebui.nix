@@ -6,230 +6,265 @@
 
 {
   # MCP Server configuration for Open WebUI
-  # This configures MCP servers to work with Open WebUI via mcpo proxy
+  # MCP servers are launched on-demand by clients, not as persistent services
   
   home.packages = with pkgs; [
-    # Required for MCP server operations
-    uv
+    # Required for on-demand Docker-based MCP servers
+    docker
+    # Native MCP servers
+    playwright-mcp
+    # Required for Sourcebot MCP server
+    nodejs
+    jq
   ];
 
   # Create MCP configuration directory and files
   home.file.".config/open-webui/mcp-servers.json".text = builtins.toJSON {
-    # Filesystem MCP Server - Access to specific directories
-    filesystem = {
-      command = "uvx";
-      args = [
-        "mcpo"
-        "--port" "8200"
-        "--"
-        "uvx" 
-        "@modelcontextprotocol/server-filesystem"
-        config.home.homeDirectory
-      ];
-      description = "Provides filesystem access to home directory";
-      port = 8200;
-    };
-
     # Git MCP Server - Repository insights and operations  
     git = {
-      command = "uvx";
+      command = "docker";
       args = [
-        "mcpo"
-        "--port" "8201" 
-        "--"
-        "uvx"
-        "@modelcontextprotocol/server-git"
+        "run"
+        "-i" "--rm"
+        "--name" "mcp-git"
+        "-v" "${config.home.homeDirectory}:${config.home.homeDirectory}:rw"
+        "-v" "${config.home.homeDirectory}/.gitconfig:/root/.gitconfig:ro"
+        "mcp/git"
       ];
       description = "Provides git repository information and operations";
-      port = 8201;
     };
 
     # Memory MCP Server - Persistent context across sessions
     memory = {
-      command = "uvx";
+      command = "docker";
       args = [
-        "mcpo"
-        "--port" "8202"
-        "--"
-        "uvx"
-        "@modelcontextprotocol/server-memory"
+        "run"
+        "-i" "--rm"
+        "--name" "mcp-memory"
+        "-v" "mcp-memory-data:/data"
+        "mcp/memory"
       ];
+      env = {
+        DATABASE_URL = "sqlite:///data/memory.db";
+      };
       description = "Maintains context and memory across sessions";
-      port = 8202;
     };
 
     # Time MCP Server - Date/time operations
     time = {
-      command = "uvx";
+      command = "docker";
       args = [
-        "mcpo"
-        "--port" "8203"
-        "--"
-        "uvx"
-        "mcp-server-time"
-        "--local-timezone=America/New_York"
+        "run"
+        "-i" "--rm"
+        "--name" "mcp-time"
+        "mcp/time"
+        "--local-timezone=America/Chicago"
       ];
+      env = {
+        TZ = "America/Chicago";
+      };
       description = "Provides date and time information and operations";
-      port = 8203;
     };
 
     # Fetch MCP Server - Web content fetching
     fetch = {
-      command = "uvx"; 
+      command = "docker"; 
       args = [
-        "mcpo"
-        "--port" "8204"
-        "--"
-        "uvx"
-        "@modelcontextprotocol/server-fetch"
+        "run"
+        "-i" "--rm"
+        "--name" "mcp-fetch"
+        "--network" "bridge"
+        "mcp/fetch"
       ];
       description = "Fetches and analyzes web content";
-      port = 8204;
+    };
+
+    # Context7 MCP Server - Up-to-date code documentation
+    context7 = {
+      command = "docker";
+      args = [
+        "run"
+        "-i" "--rm"
+        "--name" "mcp-context7"
+        "mcp/context7"
+      ];
+      env = {
+        CONTEXT7_TOKEN = "$(cat ${config.sops.secrets.context7-token.path})";
+        MCP_TRANSPORT = "stdio";
+      };
+      description = "Provides up-to-date code documentation for AI code editors";
+    };
+
+    # GitHub MCP Server - GitHub repository and workflow management
+    github = {
+      command = "docker";
+      args = [
+        "run"
+        "-i" "--rm"
+        "--name" "mcp-github"
+        "ghcr.io/github/github-mcp-server"
+      ];
+      env = {
+        GITHUB_PERSONAL_ACCESS_TOKEN = "$(cat ${config.sops.secrets.github-pat.path})";
+        GITHUB_TOOLSETS = "repos,issues,pull_requests,actions,code_security,discussions";
+        MCP_TRANSPORT = "stdio";
+      };
+      description = "GitHub repository and workflow management via MCP";
+    };
+
+    # Playwright MCP Server - Browser automation and web scraping
+    playwright = {
+      command = "${pkgs.playwright-mcp}/bin/mcp-server-playwright";
+      args = [
+        "--headless"
+      ];
+      description = "Browser automation and web scraping via Playwright";
+    };
+
+    # Serena MCP Server - AI-powered development assistant
+    serena = {
+      command = "docker";
+      args = [
+        "run"
+        "-i" "--rm"
+        "--name" "mcp-serena"
+        "-v" "/home/administrator/Code:/workspace/Code:rw"
+        "--network" "host"
+        "ghcr.io/oraios/serena:latest"
+        "serena" "start-mcp-server" "--transport" "stdio"
+      ];
+      env = {
+        SERENA_DOCKER = "1";
+      };
+      description = "AI-powered development assistant with Code directory access";
+    };
+
+    # Sourcebot MCP Server - Code understanding and search
+    sourcebot = {
+      command = "npx";
+      args = [
+        "@sourcebot/mcp@latest"
+      ];
+      env = {
+        NODE_ENV = "production";
+        SOURCEBOT_HOST = "http://localhost:3002";
+        SOURCEBOT_API_KEY = "$(curl -sf http://localhost:3002/api/keys 2>/dev/null | jq -r '.keys[0].key' 2>/dev/null || echo '')";
+      };
+      description = "Code understanding and search via Sourcebot";
+    };
+
+    # Sequential Thinking MCP Server - Step-by-step problem solving
+    sequential-thinking = {
+      command = "npx";
+      args = [
+        "@modelcontextprotocol/server-sequential-thinking@latest"
+      ];
+      env = {
+        NODE_ENV = "production";
+      };
+      description = "Helps break down complex problems into sequential steps";
     };
   };
 
-  # Create systemd services for MCP servers
-  systemd.user.services = {
-    mcp-filesystem = {
-      Unit = {
-        Description = "MCP Filesystem Server for Open WebUI";
-        After = [ "network.target" ];
-      };
-      Service = {
-        Type = "simple";
-        ExecStart = "${pkgs.uv}/bin/uvx mcpo --port 8200 -- uvx @modelcontextprotocol/server-filesystem ${config.home.homeDirectory}";
-        Restart = "always";
-        RestartSec = 5;
-        Environment = [
-          "PATH=${config.home.homeDirectory}/.local/bin:$PATH"
-        ];
-      };
-      Install = {
-        WantedBy = [ "default.target" ];
-      };
-    };
-
-    mcp-git = {
-      Unit = {
-        Description = "MCP Git Server for Open WebUI";
-        After = [ "network.target" ];
-      };
-      Service = {
-        Type = "simple";
-        ExecStart = "${pkgs.uv}/bin/uvx mcpo --port 8201 -- uvx @modelcontextprotocol/server-git";
-        Restart = "always";
-        RestartSec = 5;
-        Environment = [
-          "PATH=${config.home.homeDirectory}/.local/bin:$PATH"
-        ];
-      };
-      Install = {
-        WantedBy = [ "default.target" ];
-      };
-    };
-
-    mcp-memory = {
-      Unit = {
-        Description = "MCP Memory Server for Open WebUI";
-        After = [ "network.target" ];
-      };
-      Service = {
-        Type = "simple";
-        ExecStart = "${pkgs.uv}/bin/uvx mcpo --port 8202 -- uvx @modelcontextprotocol/server-memory";
-        Restart = "always";
-        RestartSec = 5;
-        Environment = [
-          "PATH=${config.home.homeDirectory}/.local/bin:$PATH"
-        ];
-      };
-      Install = {
-        WantedBy = [ "default.target" ];
-      };
-    };
-
-    mcp-time = {
-      Unit = {
-        Description = "MCP Time Server for Open WebUI";
-        After = [ "network.target" ];
-      };
-      Service = {
-        Type = "simple";
-        ExecStart = "${pkgs.uv}/bin/uvx mcpo --port 8203 -- uvx mcp-server-time --local-timezone=America/New_York";
-        Restart = "always";
-        RestartSec = 5;
-        Environment = [
-          "PATH=${config.home.homeDirectory}/.local/bin:$PATH"
-        ];
-      };
-      Install = {
-        WantedBy = [ "default.target" ];
-      };
-    };
-
-    mcp-fetch = {
-      Unit = {
-        Description = "MCP Fetch Server for Open WebUI";
-        After = [ "network.target" ];
-      };
-      Service = {
-        Type = "simple";
-        ExecStart = "${pkgs.uv}/bin/uvx mcpo --port 8204 -- uvx @modelcontextprotocol/server-fetch";
-        Restart = "always";
-        RestartSec = 5;
-        Environment = [
-          "PATH=${config.home.homeDirectory}/.local/bin:$PATH"
-        ];
-      };
-      Install = {
-        WantedBy = [ "default.target" ];
-      };
-    };
-  };
-
-  # Create helper scripts for managing MCP servers
-  home.file.".local/bin/mcp-start-all".source = pkgs.writeShellScript "mcp-start-all" ''
-    #!${pkgs.bash}/bin/bash
-    echo "Starting all MCP servers..."
-    systemctl --user start mcp-filesystem
-    systemctl --user start mcp-git  
-    systemctl --user start mcp-memory
-    systemctl --user start mcp-time
-    systemctl --user start mcp-fetch
-    echo "All MCP servers started. Check status with 'mcp-status'"
+  # Simple management scripts for MCP troubleshooting
+  home.file.".local/bin/mcp-test-docker".source = pkgs.writeShellScript "mcp-test-docker" ''
+    #!/usr/bin/env bash
+    echo "Testing Docker access for MCP servers..."
+    if ${pkgs.docker}/bin/docker info >/dev/null 2>&1; then
+      echo "[OK] Docker is accessible"
+    else
+      echo "[ERROR] Docker is not accessible. MCP servers that use Docker will fail."
+      echo "Make sure Docker is running and your user has access."
+    fi
   '';
+  home.file.".local/bin/mcp-test-docker".executable = true;
 
-  home.file.".local/bin/mcp-stop-all".source = pkgs.writeShellScript "mcp-stop-all" ''
-    #!${pkgs.bash}/bin/bash
-    echo "Stopping all MCP servers..."
-    systemctl --user stop mcp-filesystem
-    systemctl --user stop mcp-git
-    systemctl --user stop mcp-memory
-    systemctl --user stop mcp-time
-    systemctl --user stop mcp-fetch
-    echo "All MCP servers stopped."
-  '';
-
-  home.file.".local/bin/mcp-status".source = pkgs.writeShellScript "mcp-status" ''
-    #!${pkgs.bash}/bin/bash
-    echo "MCP Server Status:"
-    echo "=================="
-    systemctl --user status mcp-filesystem --no-pager -l
-    systemctl --user status mcp-git --no-pager -l  
-    systemctl --user status mcp-memory --no-pager -l
-    systemctl --user status mcp-time --no-pager -l
-    systemctl --user status mcp-fetch --no-pager -l
+  home.file.".local/bin/mcp-list-servers".source = pkgs.writeShellScript "mcp-list-servers" ''
+    #!/usr/bin/env bash
+    echo "Available MCP Servers:"
+    echo "====================="
+    echo "Git: Repository operations and insights"
+    echo "Memory: Persistent context across sessions"  
+    echo "Time: Date and time operations"
+    echo "Fetch: Web content fetching and analysis"
+    echo "Context7: Up-to-date code documentation"
+    echo "GitHub: GitHub repository and workflow management"
+    echo "Playwright: Browser automation and web scraping"
+    echo "Serena: AI-powered development assistant"
+    echo "Sourcebot: Code understanding and search"
+    echo "Sequential Thinking: Step-by-step problem solving"
     echo ""
-    echo "API Endpoints:"
-    echo "=============="
-    echo "Filesystem API: http://localhost:8200/docs"
-    echo "Git API: http://localhost:8201/docs" 
-    echo "Memory API: http://localhost:8202/docs"
-    echo "Time API: http://localhost:8203/docs"
-    echo "Fetch API: http://localhost:8204/docs"
+    echo "These servers are launched automatically when MCP clients need them."
+    echo "Configuration: ~/.config/open-webui/mcp-servers.json"
   '';
+  home.file.".local/bin/mcp-list-servers".executable = true;
 
-  # Make scripts executable
-  home.file.".local/bin/mcp-start-all".executable = true;
-  home.file.".local/bin/mcp-stop-all".executable = true;
-  home.file.".local/bin/mcp-status".executable = true;
+  home.file.".local/bin/mcp-test-playwright".source = pkgs.writeShellScript "mcp-test-playwright" ''
+    #!/usr/bin/env bash
+    set -e
+    
+    echo "Testing Playwright MCP server..."
+    echo "Browser path: ${pkgs.playwright-driver.browsers}"
+    
+    # Check if browsers are available
+    if [ -d "${pkgs.playwright-driver.browsers}" ]; then
+      echo "[OK] Playwright browsers directory found"
+      
+      # Check for Chromium specifically
+      CHROMIUM_PATH="${pkgs.playwright-driver.browsers}/chromium-1181/chrome-linux/chrome"
+      if [ -f "$CHROMIUM_PATH" ]; then
+        echo "[OK] Chromium browser found"
+        "$CHROMIUM_PATH" --version 2>/dev/null || echo "Version check failed"
+      else
+        echo "[WARN] Chromium not found at expected path, but may be auto-detected"
+      fi
+    else
+      echo "[ERROR] Playwright browsers directory not found"
+    fi
+    
+    echo ""
+    echo "Testing MCP server initialization (using auto-detected browsers)..."
+    echo '{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"protocolVersion": "2024-11-05", "capabilities": {"tools": {}, "resources": {}}, "clientInfo": {"name": "test", "version": "1.0"}}}' | \
+      ${pkgs.playwright-mcp}/bin/mcp-server-playwright --headless || echo "MCP server test failed"
+    
+    echo "[OK] Playwright MCP test completed"
+  '';
+  home.file.".local/bin/mcp-test-playwright".executable = true;
+
+  home.file.".local/bin/mcp-test-sourcebot".source = pkgs.writeShellScript "mcp-test-sourcebot" ''
+    #!/usr/bin/env bash
+    echo "Testing Sourcebot MCP server dependencies..."
+    
+    # Test Sourcebot availability
+    if ${pkgs.curl}/bin/curl -sf http://localhost:3002/health >/dev/null 2>&1; then
+      echo "[OK] Sourcebot is running at http://localhost:3002"
+    else
+      echo "[ERROR] Sourcebot is not running. Start with 'sourcebot-start'"
+      exit 1
+    fi
+    
+    # Test Node.js
+    if ${pkgs.nodejs}/bin/node --version >/dev/null 2>&1; then
+      echo "[OK] Node.js is available: $(${pkgs.nodejs}/bin/node --version)"
+    else
+      echo "[ERROR] Node.js is not available"
+    fi
+    
+    # Test API key availability (optional)
+    echo "Checking for Sourcebot API key..."
+    if ${pkgs.curl}/bin/curl -sf http://localhost:3002/api/keys >/dev/null 2>&1; then
+      API_KEY=$(${pkgs.curl}/bin/curl -sf http://localhost:3002/api/keys 2>/dev/null | ${pkgs.jq}/bin/jq -r '.keys[0].key' 2>/dev/null || echo "")
+      if [ -n "$API_KEY" ] && [ "$API_KEY" != "null" ]; then
+        echo "[OK] Sourcebot API key found"
+      else
+        echo "[WARN] No valid API key found. You may need to create one in Sourcebot settings."
+      fi
+    else
+      echo "[WARN] Could not check API keys endpoint"
+    fi
+    
+    echo ""
+    echo "Sourcebot MCP server should be ready to use."
+  '';
+  home.file.".local/bin/mcp-test-sourcebot".executable = true;
 }
