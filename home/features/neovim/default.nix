@@ -20,49 +20,35 @@
     withPython3 = true;
     withRuby = true;
     
-    # Essential packages that your LSP servers need
+    # Essential packages for neovim functionality
+    # Note: LSP servers are now managed by Mason
     extraPackages = with pkgs; [
-      # Language servers (managed by nixpkgs)
-      nixd                    # Nix LSP
-      nil                     # Alternative Nix LSP
-      lua-language-server     # Lua LSP
-      rust-analyzer           # Rust LSP
-      gopls                   # Go LSP
-      pyright                 # Python LSP
-      nodePackages.typescript-language-server  # TypeScript/JavaScript LSP
-      nodePackages.vscode-langservers-extracted # HTML/CSS/JSON LSP
-      yaml-language-server    # YAML LSP
-      marksman               # Markdown LSP
-      terraform-ls           # Terraform LSP
-      ansible-language-server # Ansible LSP
-      helm-ls                # Helm LSP
-      docker-compose-language-service # Docker Compose LSP
-      dockerfile-language-server-nodejs # Docker LSP
-      htmx-lsp               # HTMX LSP
-      jsonnet-language-server # Jsonnet LSP
-      ruff                   # Python linting (includes LSP)
-      tailwindcss-language-server # Tailwind CSS
-      templ                  # Templ LSP
-      typos-lsp              # Typos LSP
-      emmet-ls               # Emmet LSP
-      sqls                   # SQL LSP
-      
-      # Formatters and linters
-      stylua                 # Lua formatter
-      nixpkgs-fmt           # Nix formatter
-      prettier              # JS/TS/HTML/CSS formatter
-      eslint_d              # JS/TS linter
-      # Note: ruff (above) handles Python formatting and linting
-      
-      # Tools
-      ripgrep               # Fast grep
-      fd                    # Fast find
+      # Core tools needed by neovim and plugins
+      ripgrep               # Fast grep (required by Telescope)
+      fd                    # Fast find (required by Telescope)
       tree-sitter           # Syntax highlighting
       git                   # Git integration
       
       # Clipboard support
       wl-clipboard          # Wayland clipboard
       xclip                 # X11 clipboard
+      
+      # Node.js for some plugins that need it
+      nodejs                # Some plugins require Node.js
+      
+      # Keep essential formatters that Mason might not handle well
+      nixpkgs-fmt           # Nix formatter (better to use system version)
+      
+      # Specialized language servers that work better from nixpkgs
+      nil                   # Alternative Nix LSP (nixd is handled by Mason)
+      terraform-ls          # Terraform LSP
+      ansible-language-server # Ansible LSP  
+      helm-ls               # Helm LSP
+      docker-compose-language-service # Docker Compose LSP
+      dockerfile-language-server-nodejs # Docker LSP
+      htmx-lsp              # HTMX LSP
+      jsonnet-language-server # Jsonnet LSP
+      typos-lsp             # Typos LSP
     ];
     
     # Basic Neovim configuration

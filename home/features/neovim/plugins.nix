@@ -8,245 +8,21 @@
 {
   # Plugin configurations that can be managed via Nix
   home.file = {
-    # LSP configuration
+    # LSP configuration is now handled in mason.lua
+    # This file is kept for any custom LSP configurations that don't go through Mason
     ".config/nvim/lua/plugins/lsp.lua".text = ''
       return {
+        -- Custom LSP configurations that bypass Mason can go here
+        -- Most LSP setup is now handled by mason-lspconfig in mason.lua
+        
+        -- LSP file operations support
         {
-          "neovim/nvim-lspconfig",
-          event = { "BufReadPre", "BufNewFile" },
+          "antosha417/nvim-lsp-file-operations",
           dependencies = {
-            "hrsh7th/cmp-nvim-lsp",
-            { "antosha417/nvim-lsp-file-operations", config = true },
+            "nvim-lua/plenary.nvim",
+            "nvim-tree/nvim-tree.lua",
           },
-          config = function()
-            local lspconfig = require("lspconfig")
-            local cmp_nvim_lsp = require("cmp_nvim_lsp")
-            
-            -- LSP keymaps
-            local keymap = vim.keymap
-            local opts = { noremap = true, silent = true }
-            
-            local on_attach = function(client, bufnr)
-              opts.buffer = bufnr
-              
-              -- Set keybinds
-              opts.desc = "Show LSP references"
-              keymap.set("n", "gR", "<cmd>Telescope lsp_references<CR>", opts)
-              
-              opts.desc = "Go to declaration"
-              keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-              
-              opts.desc = "Show LSP definitions"
-              keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts)
-              
-              opts.desc = "Show LSP implementations"
-              keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts)
-              
-              opts.desc = "Show LSP type definitions"
-              keymap.set("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", opts)
-              
-              opts.desc = "See available code actions"
-              keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)
-              
-              opts.desc = "Smart rename"
-              keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-              
-              opts.desc = "Show buffer diagnostics"
-              keymap.set("n", "<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", opts)
-              
-              opts.desc = "Show line diagnostics"
-              keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts)
-              
-              opts.desc = "Go to previous diagnostic"
-              keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
-              
-              opts.desc = "Go to next diagnostic"
-              keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
-              
-              opts.desc = "Show documentation for what is under cursor"
-              keymap.set("n", "K", vim.lsp.buf.hover, opts)
-              
-              opts.desc = "Restart LSP"
-              keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts)
-            end
-            
-            -- Used to enable autocompletion (assign to every lsp server config)
-            local capabilities = cmp_nvim_lsp.default_capabilities()
-            
-            -- Configure LSP servers (these binaries are provided by nixpkgs)
-            -- Basic servers that work out of the box
-            local basic_servers = {
-              "nixd",
-              "lua_ls", 
-              "rust_analyzer",
-              "gopls",
-              "marksman",
-              "yamlls",
-              "jsonls",
-              "html",
-              "cssls",
-              "tailwindcss",
-              "templ",
-              "emmet_ls",
-              "sqls",
-            }
-            
-            for _, server in ipairs(basic_servers) do
-              lspconfig[server].setup({
-                capabilities = capabilities,
-                on_attach = on_attach,
-              })
-            end
-            
-            -- Servers that need custom command configuration
-            -- Python LSP Setup: Pyright + Ruff
-            -- Pyright: Type checking, intellisense, go-to-definition
-            -- Ruff: Fast linting, formatting, import sorting
-            -- Pyright (safe setup with error handling)
-            if vim.fn.executable("pyright-langserver") == 1 then
-              lspconfig.pyright.setup({
-                capabilities = capabilities,
-                on_attach = on_attach,
-                cmd = { "pyright-langserver", "--stdio" },
-                filetypes = { "python" },
-                root_dir = require("lspconfig.util").root_pattern(
-                  "pyproject.toml",
-                  "setup.py",
-                  "setup.cfg",
-                  "requirements.txt",
-                  "Pipfile",
-                  "pyrightconfig.json",
-                  ".git"
-                ),
-                single_file_support = true,
-                settings = {
-                  python = {
-                    analysis = {
-                      autoSearchPaths = true,
-                      useLibraryCodeForTypes = true,
-                      diagnosticMode = "workspace",
-                    },
-                  },
-                },
-              })
-            end
-            
-            -- Ruff (modern versions have built-in LSP server)
-            if vim.fn.executable("ruff") == 1 then
-              lspconfig.ruff.setup({
-                capabilities = capabilities,
-                on_attach = function(client, bufnr)
-                  -- Disable hover in favor of Pyright
-                  client.server_capabilities.hoverProvider = false
-                  on_attach(client, bufnr)
-                end,
-                cmd = { "ruff", "server" },
-                filetypes = { "python" },
-                root_dir = require("lspconfig.util").root_pattern(
-                  "pyproject.toml",
-                  "ruff.toml", 
-                  ".ruff.toml",
-                  "setup.py",
-                  "setup.cfg",
-                  ".git"
-                ),
-                single_file_support = true,
-                settings = {
-                  args = {},
-                },
-              })
-            end
-            
-            -- TypeScript/JavaScript
-            if vim.fn.executable("typescript-language-server") == 1 then
-              lspconfig.ts_ls.setup({
-                capabilities = capabilities,
-                on_attach = on_attach,
-                cmd = { "typescript-language-server", "--stdio" },
-              })
-            end
-            
-            -- Terraform
-            if vim.fn.executable("terraform-ls") == 1 then
-              lspconfig.terraformls.setup({
-                capabilities = capabilities,
-                on_attach = on_attach,
-                cmd = { "terraform-ls", "serve" },
-              })
-            end
-            
-            -- Ansible
-            if vim.fn.executable("ansible-language-server") == 1 then
-              lspconfig.ansiblels.setup({
-                capabilities = capabilities,
-                on_attach = on_attach,
-                cmd = { "ansible-language-server", "--stdio" },
-              })
-            end
-            
-            -- Docker
-            if vim.fn.executable("docker-langserver") == 1 then
-              lspconfig.dockerls.setup({
-                capabilities = capabilities,
-                on_attach = on_attach,
-                cmd = { "docker-langserver", "--stdio" },
-              })
-            end
-            
-            -- Nil (alternative Nix LSP)
-            if vim.fn.executable("nil") == 1 then
-              lspconfig.nil_ls.setup({
-                capabilities = capabilities,
-                on_attach = on_attach,
-                cmd = { "nil" },
-              })
-            end
-            
-            -- Special configurations for specific servers
-            lspconfig.lua_ls.setup({
-              capabilities = capabilities,
-              on_attach = on_attach,
-              settings = {
-                Lua = {
-                  diagnostics = {
-                    globals = { "vim" },
-                  },
-                  workspace = {
-                    library = {
-                      [vim.fn.expand("$VIMRUNTIME/lua")] = true,
-                      [vim.fn.stdpath("config") .. "/lua"] = true,
-                    },
-                  },
-                },
-              },
-            })
-            
-            -- Configure diagnostic display (using new API)
-            local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
-            for type, icon in pairs(signs) do
-              local hl = "DiagnosticSign" .. type
-              vim.diagnostic.config({
-                signs = {
-                  text = {
-                    [vim.diagnostic.severity.ERROR] = signs.Error,
-                    [vim.diagnostic.severity.WARN] = signs.Warn,
-                    [vim.diagnostic.severity.HINT] = signs.Hint,
-                    [vim.diagnostic.severity.INFO] = signs.Info,
-                  },
-                },
-              })
-            end
-            
-            vim.diagnostic.config({
-              virtual_text = {
-                prefix = "●",
-              },
-              update_in_insert = true,
-              float = {
-                source = "always",
-              },
-            })
-          end,
+          config = true,
         },
       }
     '';
@@ -604,14 +380,14 @@
             -- Set menu buttons
             dashboard.section.buttons.val = {
               dashboard.button("n", "󰈔  New File", "<cmd>ene<CR>"),
-              dashboard.button("r", "  Recent Files", "<cmd>Telescope oldfiles<CR>"),
-              dashboard.button("f", "  Find Files", "<cmd>Telescope find_files<CR>"),
+              dashboard.button("r", "󰋚  Recent Files", "<cmd>Telescope oldfiles<CR>"),
+              dashboard.button("f", "󰈞  Find Files", "<cmd>Telescope find_files<CR>"),
               dashboard.button("w", "󰾹  Find Text", "<cmd>Telescope live_grep<CR>"),
-              dashboard.button("e", "  File Explorer", "<cmd>Neotree toggle<CR>"),
-              dashboard.button("c", "  Edit Config", "<cmd>edit ~/.config/nvim/lua/config/init.lua<CR>"),
+              dashboard.button("e", "󰙅  File Explorer", "<cmd>Neotree toggle<CR>"),
+              dashboard.button("c", "󰒓  Edit Config", "<cmd>edit ~/.config/nvim/lua/config/init.lua<CR>"),
               dashboard.button("l", "󰒲  Lazy", "<cmd>Lazy<CR>"),
-              dashboard.button("m", "  Mason", "<cmd>Mason<CR>"),
-              dashboard.button("q", "  Quit", "<cmd>qa<CR>"),
+              dashboard.button("m", "󰏗  Mason", "<cmd>Mason<CR>"),
+              dashboard.button("q", "󰗼  Quit", "<cmd>qa<CR>"),
             }
             
             -- Footer with plugin count
@@ -657,12 +433,14 @@
       }
     '';
     
-    # Mason for LSP management (optional since we use nixpkgs LSPs)
+    # Mason for LSP server management
     ".config/nvim/lua/plugins/mason.lua".text = ''
       return {
         {
           "williamboman/mason.nvim",
+          priority = 1000,
           cmd = { "Mason", "MasonInstall", "MasonUninstall", "MasonUpdate" },
+          build = ":MasonUpdate",
           config = function()
             require("mason").setup({
               ui = {
@@ -672,6 +450,139 @@
                   package_uninstalled = "✗",
                 },
               },
+              install_root_dir = vim.fn.stdpath("data") .. "/mason",
+            })
+          end,
+        },
+        {
+          "williamboman/mason-lspconfig.nvim",
+          dependencies = { 
+            "mason.nvim",
+            "nvim-lspconfig",
+          },
+          priority = 999,
+          config = function()
+            local mason_lspconfig = require("mason-lspconfig")
+            mason_lspconfig.setup({
+              -- Automatically install these LSP servers
+              ensure_installed = {
+                "lua_ls",          -- Lua
+                "nixd",            -- Nix  
+                "yamlls",          -- YAML
+                "jsonls",          -- JSON
+                "html",            -- HTML
+                "cssls",           -- CSS
+                "tailwindcss",     -- Tailwind CSS
+                "emmet_ls",        -- Emmet
+                "pyright",         -- Python
+                "ruff",            -- Python linting/formatting
+                "rust_analyzer",   -- Rust
+                "gopls",           -- Go
+                "marksman",        -- Markdown
+                "templ",           -- Templ
+                "sqls",            -- SQL
+              },
+              -- Automatically install LSP servers when opening supported files
+              automatic_installation = true,
+            })
+            
+            -- Set up LSP configuration after VimEnter to ensure everything is loaded
+            vim.api.nvim_create_autocmd("VimEnter", {
+              callback = function()
+                -- Add a small delay to ensure all plugins are fully loaded
+                vim.defer_fn(function()
+                  local lspconfig_ok, lspconfig = pcall(require, "lspconfig")
+                  local cmp_ok, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
+                  
+                  if not lspconfig_ok or not cmp_ok then
+                    vim.notify("LSP dependencies not available", vim.log.levels.WARN)
+                    return
+                  end
+                  
+                  local capabilities = cmp_nvim_lsp.default_capabilities()
+                  
+                  -- Common on_attach function
+                  local function on_attach(client, bufnr)
+                    local opts = { noremap = true, silent = true, buffer = bufnr }
+                    vim.keymap.set("n", "gR", "<cmd>Telescope lsp_references<CR>", opts)
+                    vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
+                    vim.keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts)
+                    vim.keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts)
+                    vim.keymap.set("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", opts)
+                    vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)
+                    vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+                    vim.keymap.set("n", "<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", opts)
+                    vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts)
+                    vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
+                    vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
+                    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+                    vim.keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts)
+                  end
+                  
+                  -- Set up handlers for automatic LSP configuration
+                  mason_lspconfig.setup_handlers({
+                    -- Default handler for all servers
+                    function(server_name)
+                      lspconfig[server_name].setup({
+                        capabilities = capabilities,
+                        on_attach = on_attach,
+                      })
+                    end,
+                    
+                    -- Custom configurations for specific servers
+                    ["lua_ls"] = function()
+                      lspconfig.lua_ls.setup({
+                        capabilities = capabilities,
+                        on_attach = on_attach,
+                        settings = {
+                          Lua = {
+                            runtime = { version = 'LuaJIT' },
+                            diagnostics = { globals = {'vim'} },
+                            workspace = {
+                              library = vim.api.nvim_get_runtime_file("", true),
+                              checkThirdParty = false,
+                            },
+                            telemetry = { enable = false },
+                          },
+                        },
+                      })
+                    end,
+                  })
+                end, 100)
+              end,
+            })
+          end,
+        },
+        {
+          "neovim/nvim-lspconfig",
+          event = { "BufReadPre", "BufNewFile" },
+          dependencies = {
+            "williamboman/mason.nvim",
+            "williamboman/mason-lspconfig.nvim",
+            "hrsh7th/cmp-nvim-lsp",
+          },
+          config = function()
+            -- LSP setup is handled by the separate lsp-setup plugin below
+            -- This just ensures nvim-lspconfig is loaded
+          end,
+        },
+        {
+          "WhoIsSethDaniel/mason-tool-installer.nvim",
+          dependencies = { "mason.nvim" },
+          config = function()
+            require("mason-tool-installer").setup({
+              ensure_installed = {
+                -- Formatters
+                "stylua",          -- Lua formatter
+                "prettier",        -- JS/TS/HTML/CSS formatter
+                "nixpkgs-fmt",     -- Nix formatter
+                
+                -- Linters  
+                "eslint_d",        -- JS/TS linter
+                "shellcheck",      -- Shell script linter
+              },
+              auto_update = false,
+              run_on_start = true,
             })
           end,
         },
