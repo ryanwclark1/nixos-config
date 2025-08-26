@@ -98,11 +98,6 @@ src.vsmarketplace = "specstory.specstory-vscode"
 fetch.vsmarketplace = "specstory.specstory-vscode"
 passthru = { publisher = "specstory", name = "specstory-vscode" }
 
-[sqlite-viewer]
-src.vsmarketplace = "qwtel.sqlite-viewer"
-fetch.vsmarketplace = "qwtel.sqlite-viewer"
-passthru = { publisher = "qwtel", name = "sqlite-viewer" }
-
 [snyk-vulnerability-scanner]
 src.vsmarketplace = "snyk-security.snyk-vulnerability-scanner"
 fetch.vsmarketplace = "snyk-security.snyk-vulnerability-scanner"
