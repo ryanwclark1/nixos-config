@@ -35,10 +35,10 @@
     ../common/optional/desktop/nautilus.nix
     ../common/optional/services/nfs.nix
     ../common/optional/services/ollama.nix
-    ../common/optional/services/open-webui.nix # Temporarily disabled due to build failures
+    ../common/optional/services/open-webui.nix
     ../common/optional/services/printing.nix
     ../common/optional/services/searx.nix
-    ../common/optional/services/sourcebot.nix
+    # ../common/optional/services/sourcebot.nix  # Migrated to home-manager configuration
     ../common/optional/services/steam.nix
     ../common/optional/services/syncthing.nix
     ../common/optional/desktop/style.nix
@@ -143,16 +143,8 @@
     cpuFreqGovernor = "performance";
   };
 
-  # Sourcebot configuration
-  services.sourcebot = {
-    enable = true;
-    port = 3002;
-    host = "127.0.0.1";
-    dataDir = "/var/lib/sourcebot";
-    environment = {
-      SOURCEBOT_TELEMETRY_DISABLED = "true";
-    };
-  };
+  # Sourcebot configuration migrated to home-manager
+  # See: home/features/ai/sourcebot.nix for the new Docker Compose setup
 
   system.stateVersion = "24.05";
 }

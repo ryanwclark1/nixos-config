@@ -61,6 +61,7 @@
             # esbenp.prettier-vscode  # Removed: conflicts with biomejs.biome
             # formulahendry.code-runner  # Removed: interferes with proper debugging workflows
             github.codespaces
+            # github.copilot-chat  # Use nixpkgs version (0.30.1) for VS Code 1.103.2 compatibility
             github.vscode-github-actions
             github.vscode-pull-request-github
             golang.go
@@ -75,7 +76,7 @@
             # ms-python.black-formatter  # Removed: Ruff handles formatting
             ms-python.debugpy
             # ms-python.isort  # Removed: Ruff handles import sorting
-            # ms-python.python  # Temporarily disabled due to pygls build failure
+            # ms-python.python  # Moved to extensionsFromVscodeMarketplace for version control
             ms-python.vscode-pylance
             ms-vscode-remote.remote-containers
             ms-vscode-remote.remote-ssh
@@ -99,12 +100,12 @@
           #   sha256 = "sha256-Klx5ZvV06lXIJ3Q/mzq3KBjPpdROoxDkgEu7MBO+RhI=";
           #   version = "1.2.0";
           # }
-          {
-            name = "ansible";
-            publisher = "redhat";
-            sha256 = "sha256-TXXOuayVohQPp+yQAHbsZDr/UYtyHmUkaLU+lADpjDU=";
-            version = "25.8.1";
-          }
+          # {
+          #   name = "ansible";  # Temporarily disabled due to Python extension dependency
+          #   publisher = "redhat";
+          #   sha256 = "sha256-TXXOuayVohQPp+yQAHbsZDr/UYtyHmUkaLU+lADpjDU=";
+          #   version = "25.8.1";
+          # }
           {
             name = "biome";
             publisher = "biomejs";
@@ -135,11 +136,12 @@
             sha256 = "sha256-UVNHbNmfu6F622ISU8uCjDOsJ/86JLbO9lTsouDMIgI=";
             version = "1.362.1759";
           }
+          # Use nixpkgs version instead of marketplace version for better compatibility
           {
             name = "copilot-chat";
             publisher = "github";
-            sha256 = "sha256-p+y8MzogsLYFAAUTwHcSHaW2eW9uYXxbWLEVH5X7uFM=";
-            version = "0.31.2025082602";
+            sha256 = "sha256-itANvwMSzFBPnU4B6erEXO/x3SNlqHygXlTE6jLc+0U=";
+            version = "0.30.1";
           }
           {
             name = "explorer";
@@ -170,6 +172,12 @@
             publisher = "ms-python";
             sha256 = "sha256-IeWhMA1ht2npPVDqJmv3IOmrlKp9uuhycGNT7h+rNks=";
             version = "2025.3.12271015";
+          }
+          {
+            name = "python";
+            publisher = "ms-python";
+            sha256 = "sha256-3hd940mfxnvqoblIrx/S0A8KwHtYLFuonu52/HGGfak=";
+            version = "2025.10.1";
           }
           {
             name = "pdf";
@@ -423,6 +431,20 @@
           ##### MCP (Model Context Protocol) Settings #####
           # Enable MCP servers in Copilot
           "github.copilot.chat.mcpServers.enable" = true;
+          
+          # MCP Core Settings
+          "chat.mcp.enabled" = true;  # Enable MCP functionality
+          "chat.mcp.autostart" = "always";  # Auto-start MCP servers (vs "never")
+          "chat.mcp.discovery.enabled" = true;  # Enable MCP server discovery
+          
+          # Disable specific MCP features
+          "chat.mcp.assisted.nuget.enabled" = false;  # Disable NuGet assistance (not needed)
+          
+          # MCP Server Sampling (empty = use defaults)
+          "chat.mcp.serverSampling" = {};
+          
+          # Context7 Integration
+          "github.copilot.chat.newWorkspace.useContext7" = true;  # Enable Context7 for new workspaces
           "github.copilot.chat.mcpServers.servers" = {
             "filesystem" = {
               "command" = "npx";
@@ -464,7 +486,7 @@
               "command" = "npx";
               "args" = ["@context7/mcp"];
               "env" = {
-                "CONTEXT7_API_KEY" = "$(cat ${config.sops.secrets."context7/api-key".path})";
+                "CONTEXT7_API_KEY" = "\${cat ${config.sops.secrets.context7-token.path}}";
               };
               "description" = "Up-to-date code documentation and examples";
             };
@@ -472,10 +494,10 @@
               "command" = "npx";
               "args" = ["@modelcontextprotocol/server-github"];
               "env" = {
-                "GITHUB_TOKEN" = "$(cat ${config.sops.secrets.github-pat.path})";
+                "GITHUB_TOKEN" = "\${cat ${config.sops.secrets.github-pat.path}}";
                 "GITHUB_TOOLSETS" = "repos,issues,pull_requests,actions,code_security,discussions";
               };
-              "description" = "Enhanced GitHub repository insights and operations";
+              "description" = "GitHub repository insights and operations with full toolset access";
             };
             "playwright" = {
               "command" = "${pkgs.playwright-mcp}/bin/mcp-server-playwright";
