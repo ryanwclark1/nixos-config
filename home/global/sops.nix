@@ -35,6 +35,13 @@
       "accent-email/accent-email-imap-host" = {};
       "accent-email/accent-email-smtp-host" = {};
       "accent-email/accent-email-flavor" = {};
+      context7-token = {};
+      github-pat = {};
+      # Sourcebot secrets
+      "sourcebot/auth-secret" = {};
+      "sourcebot/database/user" = {};
+      "sourcebot/database/password" = {};
+      "sourcebot/database/name" = {};
     };
   };
 }
