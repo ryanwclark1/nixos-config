@@ -9,7 +9,7 @@
 
 
   services.docling-serve = {
-    enable = true;
+    enable = false;
     host = "0.0.0.0";
     openFirewall = true;
     port = 5051;

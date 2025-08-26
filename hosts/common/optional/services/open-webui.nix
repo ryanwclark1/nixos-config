@@ -4,8 +4,10 @@
 }:
 
 {
+  # Temporarily disable Open WebUI due to langfuse build failures
+  # TODO: Re-enable when langfuse/opentelemetry dependency issues are resolved
   services.open-webui = {
-    enable = true;
+    enable = false;
     port = 8180;
     host = "0.0.0.0";
     openFirewall = true;
