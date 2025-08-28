@@ -45,25 +45,38 @@
 
     };
 
-    # Language models aligned with system Ollama configuration
+    # OPTIMIZED for AMD RX 7800 XT (16GB VRAM) + 62GB RAM
+    # Prioritizing largest models with tools + thinking capabilities
     models = [
       {
         provider = "openai-compatible";
-        model = "deepseek-r1:8b";
-        displayName = "DeepSeek R1 8B (Ollama)";
-        baseUrl = "http://host.docker.internal:11434/v1";
+        model = "qwen3:30b-thinking";
+        displayName = "Qwen3 30B Thinking (Latest Gen + 256K Context + Tools) - PRIMARY";
+        baseUrl = "http://172.17.0.1:11434/v1";
       }
       {
         provider = "openai-compatible";
-        model = "qwen3-coder:30b";
-        displayName = "Qwen3 Coder 30B (Ollama)";
-        baseUrl = "http://host.docker.internal:11434/v1";
+        model = "deepseek-r1:70b";
+        displayName = "DeepSeek-R1 70B (O3-Level Reasoning + Tools + Thinking)";
+        baseUrl = "http://172.17.0.1:11434/v1";
+      }
+      {
+        provider = "openai-compatible";
+        model = "qwen3-coder:30b-a3b-q8_0";
+        displayName = "Qwen3 Coder 30B Q8 (Coding Specialist + Higher Precision)";
+        baseUrl = "http://172.17.0.1:11434/v1";
+      }
+      {
+        provider = "openai-compatible";
+        model = "magistral:24b-small-2506-q8_0";
+        displayName = "Magistral 24B Q8 (Efficient Reasoning + Higher Precision)";
+        baseUrl = "http://172.17.0.1:11434/v1";
       }
       {
         provider = "openai-compatible";
         model = "gpt-oss:latest";
-        displayName = "GPT OSS (Ollama)";
-        baseUrl = "http://host.docker.internal:11434/v1";
+        displayName = "GPT-OSS (OpenAI Reasoning + Tools + Thinking) - Reliable";
+        baseUrl = "http://172.17.0.1:11434/v1";
       }
     ];
 
