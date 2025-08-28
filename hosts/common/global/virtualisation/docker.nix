@@ -20,4 +20,9 @@
       dates = "weekly";
     };
   };
+
+  # Add Docker Buildx for advanced build features
+  environment.systemPackages = with pkgs; [
+    docker-buildx
+  ];
 }
