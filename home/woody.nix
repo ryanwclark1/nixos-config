@@ -67,11 +67,34 @@
     ./features/desktop/window-managers # Window managers and shared WM tools
     ./features/desktop/window-managers/hyprland/host-specific/woody.nix
     # ./features/desktop/window-managers/niri/host-specific/woody.nix
+    
+    # Application launcher cleanup
+    ./features/desktop-entries
   ];
 
   home.packages = with pkgs; [
     amdgpu_top
   ];
+
+  # Woody-specific USB DAC configuration
+  # Set USB DAC (PCM2704) as default audio output on startup
+  # This ensures volume controls work with the correct device
+  home.file.".config/wireplumber/main.lua.d/51-usb-dac-default.lua".text = ''
+    -- Set USB DAC (PCM2704) as default audio sink with higher priority
+    rule = {
+      matches = {
+        {
+          { "node.name", "matches", "*PCM2704*Pro*" },
+        },
+      },
+      apply_properties = {
+        ["audio.priority"] = 1000,
+        ["priority.driver"] = 1000,
+      },
+    }
+    
+    table.insert(alsa_monitor.rules, rule)
+  '';
 
   # wallpaper = pkgs.wallpapers.aenami-lost-in-between;
   # stylix.targets.hyprland.enable = lib.mkForce true;
