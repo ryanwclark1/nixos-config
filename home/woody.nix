@@ -53,6 +53,7 @@
     ./features/sys-stats
     ./features/tmux
     ./features/vscode
+    ./features/webapps
     # ./features/whispar
     ./features/wireless
     ./features/windsurf
