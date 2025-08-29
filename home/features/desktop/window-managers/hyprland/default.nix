@@ -55,14 +55,14 @@
         # Source global variables first (required for all other configs)
         source = ~/.config/hypr/conf/variables.conf
 
-        # Source all configuration files  
+        # Source all configuration files
         source = ~/.config/hypr/conf/animation.conf
         source = ~/.config/hypr/conf/autostart.conf
         source = ~/.config/hypr/conf/core.conf
         source = ~/.config/hypr/conf/decoration.conf
         source = ~/.config/hypr/conf/environment.conf
         source = ~/.config/hypr/conf/keybinding.conf
-        source = ~/.config/hypr/conf/plugin-hyprexpo.conf
+        source = ~/.config/hypr/conf/plugin.conf
         source = ~/.config/hypr/conf/window.conf
         source = ~/.config/hypr/conf/windowrule.conf
         source = ~/.config/hypr/conf/workspace.conf
