@@ -19,14 +19,16 @@
       #   inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}.hyprexpo
       # ];
     };
-    mtr.enable = true;
+    mtr.enable = lib.mkDefault true;
     gnupg.agent = {
-      enable = true;
+      enable = lib.mkDefault true;
       enableSSHSupport = true;
     };
     dconf.enable = lib.mkDefault true;
-    seahorse.enable = true;
+    seahorse.enable = lib.mkDefault true;
   };
+
+  security.polkit.enable = lib.mkDefault true;
 
   environment.variables.NIXOS_OZONE_WL = "1";
 }
