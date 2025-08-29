@@ -48,6 +48,7 @@
     ../common/optional/tools/wireshark.nix
     ../common/optional/tools/zsh.nix
     ../common/optional/desktop/hyprland
+    # ../common/optional/desktop/niri  # Cache permission issues - re-enable after reboot
     ../common/optional/desktop/displaymanager/sddm
   ];
 

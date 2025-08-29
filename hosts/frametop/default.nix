@@ -38,6 +38,7 @@
     ../common/optional/tools/zsh.nix
     ../common/optional/desktop/displaymanager/sddm
     ../common/optional/desktop/hyprland
+    ../common/optional/desktop/niri
   ];
 
   # Override global monitoring with frametop's comprehensive setup
