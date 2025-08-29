@@ -26,22 +26,22 @@
   home.file = {
     # Main Hyprland config directories
     ".config/hypr/conf" = {
-      source = ../conf;
+      source = ./conf;
       recursive = true;
     };
 
     ".config/hypr/effects" = {
-      source = ../effects;
+      source = ./effects;
       recursive = true;
     };
 
     ".config/hypr/shaders" = {
-      source = ../shaders;
+      source = ./shaders;
       recursive = true;
     };
 
     ".config/hypr/scripts" = {
-      source = ../scripts;
+      source = ./scripts;
       recursive = true;
       executable = true;
     };
