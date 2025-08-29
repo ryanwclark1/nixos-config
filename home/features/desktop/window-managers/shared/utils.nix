@@ -16,7 +16,8 @@
 
     # wlroots-based compositor tools
     wlr-randr # Display configuration for wlroots compositors (Hyprland, Sway, etc.)
-    swaybg # Wayland wallpaper daemon
-    swww # Animated wallpaper daemon
+    swaybg # Wayland wallpaper daemon (fallback)
+    swww # Animated wallpaper daemon for wlroots compositors
   ];
 }
+

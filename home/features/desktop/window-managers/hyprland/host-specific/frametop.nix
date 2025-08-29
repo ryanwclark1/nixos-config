@@ -18,11 +18,17 @@
       # Host-specific configuration for Frametop (Framework laptop)
       # -----------------------------------------------------
 
+      # Platform-specific variables for laptop
+      $IS_LAPTOP = true
+      $IS_HIDPI = true
+      $IS_NVIDIA = false
+      $IS_AMD = false
+
       # Use laptop layout with touchpad gestures
       source = ~/.config/hypr/conf/layouts/laptop.conf
 
-      # Intel GPU environment (if needed)
-      # source = ~/.config/hypr/conf/environments/default.conf
+      # Intel GPU environment (default is fine for Intel)
+      source = ~/.config/hypr/conf/environments/default.conf
 
       # Framework laptop typically has HiDPI display
       # Adjust if your model differs
@@ -33,12 +39,9 @@
     '';
   };
 
-  # Ensure laptop layout is used
-  wayland.windowManager.hyprland.settings = {
-    source = lib.mkAfter [
-      "~/.config/hypr/conf/host-specific.conf"
-    ];
-  };
+  # Note: Using system-level Hyprland with UWSM
+  # Host-specific configuration is automatically loaded via host-specific.conf
+  # No need for wayland.windowManager.hyprland.settings when using system-level Hyprland
 
   # SwayOSD configuration for frametop (Framework laptop)
   # services.swayosd = {
