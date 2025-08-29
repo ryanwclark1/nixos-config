@@ -48,6 +48,7 @@
     ./features/sys-stats
     ./features/tmux
     ./features/vscode
+    ./features/webapps
     ./features/wireless
     ./features/yazi
     ./features/zellij

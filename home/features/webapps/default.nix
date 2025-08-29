@@ -6,6 +6,18 @@
     (writeShellScriptBin "launch-webapp" ''
       #!/usr/bin/env bash
       
+      # Parse arguments
+      URL="$1"
+      PROFILE=""
+      
+      # Check if second argument is a profile specification
+      if [[ "$2" =~ ^--profile= ]]; then
+        PROFILE="''${2#--profile=}"
+        shift 2
+      else
+        shift 1
+      fi
+      
       # Get the default browser
       browser=$(${pkgs.xdg-utils}/bin/xdg-settings get default-web-browser 2>/dev/null || echo "")
       
@@ -47,9 +59,24 @@
         esac
       fi
       
+      # Build browser arguments
+      browser_args=("--app=$URL")
+      
+      # Add profile support for Chrome-based browsers
+      if [[ -n "$PROFILE" ]]; then
+        case $browser_exec in
+          google-chrome-stable|brave|chromium)
+            browser_args+=("--profile-directory=$PROFILE")
+            ;;
+          firefox)
+            browser_args=("-P" "$PROFILE" "--app=$URL")
+            ;;
+        esac
+      fi
+      
       # Launch the webapp
       if command -v "$browser_exec" >/dev/null; then
-        exec setsid "$browser_exec" --app="$1" "''${@:2}" &
+        exec setsid "$browser_exec" "''${browser_args[@]}" "$@" &
       else
         echo "Error: Browser executable '$browser_exec' not found"
         exit 1
@@ -73,6 +100,11 @@
       url = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/github-light.png";
       sha256 = "1an7pcsyfx2sc6irj6zrxyyds4mm8s937f94fypdhml6vsqx8lh4";
     };
+    
+    ".local/share/applications/icons/outlook.png".source = pkgs.fetchurl {
+      url = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/microsoft-outlook.png";
+      sha256 = "1yz1s5x2i2vamw5c6d379lnldlcpmqaryrkaj545s6wn8df36x2y";
+    };
   };
 
   # Create webapp desktop entries
@@ -80,7 +112,7 @@
     chatgpt = {
       name = "ChatGPT";
       comment = "ChatGPT Web Application";
-      exec = "launch-webapp https://chatgpt.com/";
+      exec = "launch-webapp https://chatgpt.com/ --profile=\"Default\"";
       terminal = false;
       type = "Application";
       icon = "${config.home.homeDirectory}/.local/share/applications/icons/chatgpt.png";
@@ -91,7 +123,7 @@
     youtube = {
       name = "YouTube";
       comment = "YouTube Web Application";
-      exec = "launch-webapp https://youtube.com/";
+      exec = "launch-webapp https://youtube.com/ --profile=\"Default\"";
       terminal = false;
       type = "Application";
       icon = "${config.home.homeDirectory}/.local/share/applications/icons/youtube.png";
@@ -102,12 +134,23 @@
     github = {
       name = "GitHub";
       comment = "GitHub Web Application";
-      exec = "launch-webapp https://github.com/";
+      exec = "launch-webapp https://github.com/ --profile=\"Default\"";
       terminal = false;
       type = "Application"; 
       icon = "${config.home.homeDirectory}/.local/share/applications/icons/github.png";
       startupNotify = true;
       categories = [ "Development" "Network" ];
+    };
+
+    outlook = {
+      name = "Outlook";
+      comment = "Microsoft Outlook Web Application";
+      exec = "launch-webapp https://outlook.office.com/ --profile=\"Profile 1\"";
+      terminal = false;
+      type = "Application";
+      icon = "${config.home.homeDirectory}/.local/share/applications/icons/outlook.png";
+      startupNotify = true;
+      categories = [ "Office" "Email" "Network" ];
     };
   };
 }
