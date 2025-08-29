@@ -76,37 +76,49 @@ in
       # Allow password changes
       hashedPassword = null;
 
-      packages = [
-        pkgs.home-manager
-        pkgs.btop
-        pkgs.iotop
-        pkgs.nvme-cli
-        pkgs.smartmontools
-        pkgs.lsof
-        pkgs.strace
-        pkgs.tcpdump
-        pkgs.wireshark
-        pkgs.nmap
-        pkgs.openssl
-        pkgs.gnupg
-        pkgs.pass
-        pkgs.git
-        pkgs.curl
-        pkgs.wget
-        pkgs.jq
-        pkgs.bat
-        pkgs.fd
-        pkgs.ripgrep
-        pkgs.fzf
-        pkgs.tmux
-        pkgs.zsh
-        pkgs.neovim
-        pkgs.util-linux
+      packages = with pkgs; [
+        home-manager
+        btop
+        iotop
+        nvme-cli
+        smartmontools
+        lsof
+        strace
+        tcpdump
+        wireshark
+        nmap
+        openssl
+        gnupg
+        pass
+        git
+        curl
+        wget
+        jq
+        bat
+        fd
+        ripgrep
+        fzf
+        tmux
+        zsh
+        neovim
+        util-linux
       ];
     };
   };
 
   nix.settings.trusted-users = [ "${user}" ];
+
+  # Set Tailscale operator for this user
+  systemd.services.tailscale-set-operator = {
+    description = "Set Tailscale operator user";
+    after = [ "tailscale.service" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.tailscale}/bin/tailscale set --operator=${user}";
+      RemainAfterExit = true;
+    };
+  };
 
   # Administrator-specific environment variables
   environment.variables = {
