@@ -72,6 +72,11 @@
     hyprpolkitagent = {
       url = "github:hyprwm/hyprpolkitagent";
     };
+    # Niri
+    niri = {
+      url = "github:sodiboo/niri-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     stylix = {
       url = "github:danth/stylix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -102,6 +107,10 @@
       url = "github:oddlama/whisper-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    silentSDDM = {
+      url = "github:uiriansan/SilentSDDM";
+      inputs.nixpkgs.follows = "nixpkgs";
+   };
   };
 
   outputs =

@@ -53,8 +53,11 @@
     # ./features/zen
     ./features/zoxide
 
-    ./features/desktop/hyprland
-    ./features/desktop/hyprland/host-specific/frametop.nix
+    # ./features/desktop/hyprland  # Migrated to system-level
+    # ./features/desktop/hyprland/host-specific/frametop.nix
+    ./features/desktop/hyprland-minimal  # Minimal config for system-level Hyprland
+    ./features/desktop/niri
+    ./features/desktop/niri/host-specific/frametop.nix
     # ./features/desktop/gnome
     ./features/desktop/common
   ];

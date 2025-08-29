@@ -60,8 +60,11 @@
     # ./features/zen
     ./features/zoxide
 
-    ./features/desktop/hyprland
-    ./features/desktop/hyprland/host-specific/woody.nix
+    # ./features/desktop/hyprland  # Migrated to system-level
+    # ./features/desktop/hyprland/host-specific/woody.nix
+    ./features/desktop/hyprland-minimal  # Minimal config for system-level Hyprland
+    # ./features/desktop/niri  # Cache permission issues - re-enable after reboot
+    # ./features/desktop/niri/host-specific/woody.nix
     # ./features/desktop/gnome
     ./features/desktop/common
   ];
