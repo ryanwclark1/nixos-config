@@ -168,5 +168,72 @@
       mimeType = ["application/ogg" "application/x-ogg" "audio/ogg" "audio/vorbis" "audio/x-vorbis" "audio/x-vorbis+ogg" "video/ogg" "video/x-ogm" "video/x-ogm+ogg" "video/x-theora+ogg" "video/x-theora" "audio/x-speex" "audio/opus" "application/x-ogm-audio" "application/x-ogm-video" "audio/webm" "video/webm" "audio/x-matroska" "video/x-matroska" "video/mp4" "video/3gpp" "video/3gpp2" "audio/mp4" "audio/3gpp" "audio/3gpp2" "video/mp2t" "audio/mp2t" "video/avi" "video/msvideo" "video/x-msvideo" "video/quicktime" "video/x-anim" "video/x-avi" "video/x-ms-asf" "video/x-ms-wmv" "audio/x-ms-wma" "application/x-mplayer2" "audio/mpeg" "audio/x-mpeg" "audio/mp3" "audio/x-mp3" "audio/mpeg3" "audio/x-mpeg3" "audio/mpegurl" "audio/x-mpegurl" "audio/x-mpg" "video/mpeg" "video/x-mpeg" "video/x-mpeg2" "audio/x-scpls" "audio/x-wav" "audio/wav" "audio/flac" "audio/x-flac"];
       categories = ["AudioVideo" "Audio" "Video" "Player" "TV"];
     };
+    
+    # Wayland-optimized application launchers
+    "firefox" = {
+      name = "Firefox";
+      exec = "firefox --name firefox %U";
+      terminal = false;
+      mimeType = ["text/html" "text/xml" "application/xhtml+xml" "application/vnd.mozilla.xul+xml" "x-scheme-handler/http" "x-scheme-handler/https"];
+      categories = ["Network" "WebBrowser"];
+      settings = {
+        StartupNotify = "true";
+        StartupWMClass = "firefox";
+      };
+      actions = {
+        new-private-window = {
+          name = "New Private Window";
+          exec = "firefox --private-window %U";
+        };
+        new-window = {
+          name = "New Window";  
+          exec = "firefox --new-window %U";
+        };
+        profile-manager-window = {
+          name = "Profile Manager";
+          exec = "firefox --ProfileManager";
+        };
+      };
+    };
+    
+    "google-chrome" = {
+      name = "Google Chrome";
+      exec = "google-chrome-stable --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime %U";
+      terminal = false;
+      mimeType = ["application/pdf" "application/rdf+xml" "application/rss+xml" "application/xhtml+xml" "application/xhtml_xml" "application/xml" "image/gif" "image/jpeg" "image/png" "image/webp" "text/html" "text/xml" "x-scheme-handler/http" "x-scheme-handler/https"];
+      categories = ["Network" "WebBrowser"];
+      icon = "google-chrome";
+      settings = {
+        StartupNotify = "true";
+      };
+      actions = {
+        new-window = {
+          name = "New Window";
+          exec = "google-chrome-stable --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime";
+        };
+        new-private-window = {
+          name = "New Incognito Window";
+          exec = "google-chrome-stable --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime --incognito";
+        };
+      };
+    };
+    
+    "code" = {
+      name = "Visual Studio Code";
+      exec = "code --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime %F";
+      terminal = false;
+      categories = ["Utility" "TextEditor" "Development" "IDE"];
+      icon = "vscode";
+      settings = {
+        StartupNotify = "true";
+        StartupWMClass = "Code";
+      };
+      actions = {
+        new-empty-window = {
+          name = "New Empty Window";
+          exec = "code --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime --new-window %F";
+        };
+      };
+    };
   };
 }
