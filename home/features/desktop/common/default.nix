@@ -18,4 +18,28 @@
     libsoup_3 # HTTP library (required by desktop components) 
     webkitgtk_6_0 # Web rendering engine (required by desktop components)
   ];
+
+  # Desktop common scripts - available to all desktop environments/window managers
+  home.file = {
+    # System-level scripts (independent of window manager/DE)
+    ".local/bin/scripts/system" = {
+      source = ./scripts/system;
+      recursive = true;
+      executable = true;
+    };
+
+    # Wayland-specific scripts (for all Wayland compositors)
+    ".local/bin/scripts/wayland" = {
+      source = ./scripts/wayland;
+      recursive = true;
+      executable = true;
+    };
+
+    # Rofi scripts (common across window managers)
+    ".local/bin/scripts/rofi" = {
+      source = ./scripts/rofi;
+      recursive = true;
+      executable = true;
+    };
+  };
 }
