@@ -7,29 +7,27 @@
 
 {
   # Copy Hyprland configuration files for system-level Hyprland
-  # This module provides configs without enabling home-manager's Hyprland
+  # This consolidates both hyprland-configs and hyprland-minimal functionality
   
-  # Note: imports removed to avoid dependency on home-manager hyprland module
-
   home.file = {
     # Main Hyprland config directories
     ".config/hypr/conf" = {
-      source = ../hyprland/hypr/conf;
+      source = ../conf;
       recursive = true;
     };
 
     ".config/hypr/effects" = {
-      source = ../hyprland/hypr/effects;
+      source = ../effects;
       recursive = true;
     };
 
     ".config/hypr/shaders" = {
-      source = ../hyprland/hypr/shaders;
+      source = ../shaders;
       recursive = true;
     };
 
     ".config/hypr/scripts" = {
-      source = ../hyprland/scripts;
+      source = ../scripts;
       recursive = true;
       executable = true;
     };
@@ -66,14 +64,4 @@
     };
   };
 
-  # Add some basic packages that work well with Hyprland
-  home.packages = with pkgs; [
-    # Essential Hyprland tools
-    wl-clipboard
-    grim
-    slurp
-    
-    # Additional tools
-    wlr-randr
-  ];
 }

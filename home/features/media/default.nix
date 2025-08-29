@@ -9,7 +9,6 @@
     ./gstreamer.nix
     ./freetube.nix
     ./mpv.nix
-    ./obs.nix
     ./yt-dlp.nix
   ];
 
@@ -30,6 +29,8 @@
     # krita # Digital painting
     # termusic
     vlc # Media player
+    # P2P/Download (moved from desktop/common)
+    fragments # BitTorrent client
   ];
 }
 

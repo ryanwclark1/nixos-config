@@ -34,6 +34,7 @@
     ./features/games
     ./features/ghostty
     ./features/git
+    ./features/gui-tools
     ./features/imv
     ./features/kitty
     ./features/kodi
@@ -60,13 +61,11 @@
     # ./features/zen
     ./features/zoxide
 
-    # ./features/desktop/hyprland  # Migrated to system-level
-    # ./features/desktop/hyprland/host-specific/woody.nix
-    ./features/desktop/hyprland-minimal  # Minimal config for system-level Hyprland
-    # ./features/desktop/niri  # Cache permission issues - re-enable after reboot
-    # ./features/desktop/niri/host-specific/woody.nix
-    # ./features/desktop/gnome
-    ./features/desktop/common
+    # Desktop environment configuration
+    ./features/desktop/common # Core desktop components
+    ./features/desktop/window-managers # Window managers and shared WM tools
+    ./features/desktop/window-managers/hyprland/host-specific/woody.nix
+    # ./features/desktop/window-managers/niri/host-specific/woody.nix
   ];
 
   home.packages = with pkgs; [

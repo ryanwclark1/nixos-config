@@ -121,14 +121,10 @@
     };
   };
 
-  # Add some basic packages that work well with Niri
+  # Niri-specific packages would go here
+  # Note: Basic Wayland tools (wl-clipboard, grim, slurp) are provided by common/wayland/
+  # Note: wlroots tools (wlr-randr) are provided by window-managers/shared/utils.nix
   home.packages = with pkgs; [
-    # Basic utilities
-    wl-clipboard
-    grim
-    slurp
-    
-    # Additional tools
-    wlr-randr
+    # Currently no Niri-specific packages needed
   ];
 }

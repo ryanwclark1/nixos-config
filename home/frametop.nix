@@ -30,6 +30,7 @@
     ./features/games
     ./features/ghostty
     ./features/git
+    ./features/gui-tools
     ./features/imv
     ./features/kitty
     ./features/kubernetes
@@ -53,13 +54,11 @@
     # ./features/zen
     ./features/zoxide
 
-    # ./features/desktop/hyprland  # Migrated to system-level
-    # ./features/desktop/hyprland/host-specific/frametop.nix
-    ./features/desktop/hyprland-minimal  # Minimal config for system-level Hyprland
-    ./features/desktop/niri
-    ./features/desktop/niri/host-specific/frametop.nix
-    # ./features/desktop/gnome
-    ./features/desktop/common
+    # Desktop environment configuration
+    ./features/desktop/common # Core desktop components
+    ./features/desktop/window-managers # Window managers and shared WM tools
+    ./features/desktop/window-managers/hyprland/host-specific/frametop.nix
+    # ./features/desktop/window-managers/niri/host-specific/frametop.nix
   ];
 
   # Disable impermanence

@@ -5,31 +5,17 @@
 
 {
   imports = [
-    ./gtk.nix
-    ./noti.nix
-    ./pointercursor.nix
-    ./qt.nix
-    # ./trayscale.nix
+    ./theming
+    ./services
     # ./wallpapers.nix
-    ./xdg.nix
-    ./xfce.nix
+    ./xdg
+    ./wayland
   ];
 
-  # Comment out screenshot, clipboard and recording tools
+  # Core desktop dependencies - other packages moved to appropriate feature directories
   home.packages = with pkgs; [
-    cairo
-    d-spy # Dbus debugger
-    file-roller # Archive manager
-    fragments # Torrent client
-    gpu-viewer # GPU info
-    libsoup_3
-    mimeo # Open files with the right program
-    # spice-vdagent # Spice agent
-    virt-viewer # View virtual machines
-    waypipe # Network proxy for Wayland clients (applications)
-    webkitgtk_6_0 # Web rendering engine
-    wl-clipboard # Wayland clipboard
-    ydotool # Command-line tool for automation which emulates input devices
-    wayland-utils # Wayland utilities
+    cairo # Graphics library (required by desktop components)
+    libsoup_3 # HTTP library (required by desktop components) 
+    webkitgtk_6_0 # Web rendering engine (required by desktop components)
   ];
 }

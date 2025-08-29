@@ -56,6 +56,8 @@
     protobuf
     go-protobuf
     protolint
+    # System debugging (moved from desktop/common)
+    d-spy # D-Bus debugger
   ];
 
 }

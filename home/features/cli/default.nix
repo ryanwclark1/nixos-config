@@ -8,6 +8,7 @@
     ./gh.nix
     ./jq.nix
     ./nixtools.nix
+    ./noti.nix
     ./respects.nix
   ];
   home.packages = with pkgs; [
@@ -24,6 +25,10 @@
     mprocs # multiple commands in parallel
     vultr-cli # vultr cli
     vhs # A tool for generating terminal GIFs with code
+    figlet # Print large characters (moved from desktop)
+    # File/system utilities (moved from desktop/common)
+    mimeo # Open files with the right program
+    ydotool # Input automation tool
   ] ++ (if pkgs.stdenv.hostPlatform.system == "x86_64-linux" then [
     distrobox # Nice escape hatch, integrates docker images with my environment
     scrot # A command-line screen capture utility
