@@ -42,8 +42,8 @@
 
     "custom/launcher": {
       "format": "",
-      "on-click": "~/.config/hypr/scripts/rofi/apps-unified.sh",
-      "on-click-right": "~/.config/hypr/scripts/rofi/apps-unified.sh --root",
+      "on-click": "~/.local/bin/scripts/rofi/apps-unified.sh",
+      "on-click-right": "~/.local/bin/scripts/rofi/apps-unified.sh --root",
       "tooltip": "Applications • Left: User Apps • Right: Root Apps"
     },
 
@@ -244,7 +244,7 @@
 
     "custom/screenshot": {
       "format": "󰩭 ",
-      "on-click": "~/.config/hypr/scripts/rofi/screenshot-menu.sh",
+      "on-click": "~/.local/bin/scripts/wayland/screenshot.sh area",
       "tooltip": "Screenshot",
       "class": "action-button"
     },
@@ -323,7 +323,7 @@
 
     "custom/power": {
       "format": "⏻",
-      "on-click": "~/.config/hypr/scripts/rofi/powermenu-unified.sh",
+      "on-click": "~/.local/bin/scripts/system/power.sh",
       "tooltip": "Power Menu",
       "class": "action-button"
     }

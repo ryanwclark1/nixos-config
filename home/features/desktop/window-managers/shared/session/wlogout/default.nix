@@ -19,31 +19,31 @@
     layout = [
       {
         label = "lock";
-        action = "~/.config/hypr/scripts/system/power.sh lock";
+        action = "~/.local/bin/scripts/system/power.sh lock";
         text = "Lock";
         keybind = "l";
       }
       {
         label = "logout";
-        action = "~/.config/hypr/scripts/system/power.sh logout";
+        action = "~/.local/bin/scripts/system/power.sh logout";
         text = "Exit";
         keybind = "e";
       }
       {
         label = "suspend";
-        action = "~/.config/hypr/scripts/system/power.sh suspend";
+        action = "~/.local/bin/scripts/system/power.sh suspend";
         text = "Suspend";
         keybind = "u";
       }
       {
         label = "reboot";
-        action = "~/.config/hypr/scripts/system/power.sh reboot";
+        action = "~/.local/bin/scripts/system/power.sh reboot";
         text = "Reboot";
         keybind = "r";
       }
       {
         label = "shutdown";
-        action = "~/.config/hypr/scripts/system/power.sh shutdown";
+        action = "~/.local/bin/scripts/system/power.sh shutdown";
         text = "Shutdown";
         keybind = "s";
       }
