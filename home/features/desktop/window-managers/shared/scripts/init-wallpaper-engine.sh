@@ -21,5 +21,11 @@ if command -v swww >/dev/null; then
     sleep 2
 fi
 
-# Restore wallpaper
-~/.config/hypr/scripts/hypr/wallpaper-manager.sh restore
+# Restore wallpaper (try multiple locations)
+if [[ -f ~/.config/hypr/scripts/hypr/wallpaper-manager.sh ]]; then
+    ~/.config/hypr/scripts/hypr/wallpaper-manager.sh restore
+elif [[ -f ~/.config/niri/scripts/wallpaper-manager.sh ]]; then
+    ~/.config/niri/scripts/wallpaper-manager.sh restore
+else
+    echo ":: No wallpaper manager found, skipping restore"
+fi
