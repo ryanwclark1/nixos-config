@@ -12,6 +12,12 @@
       # Host-specific configuration for Woody (Desktop)
       # -----------------------------------------------------
 
+      # Platform-specific variables for desktop
+      $IS_LAPTOP = false
+      $IS_HIDPI = false
+      $IS_NVIDIA = false
+      $IS_AMD = true
+
       # Use default desktop layout (no touchpad gestures)
       source = ~/.config/hypr/conf/layouts/default.conf
 
@@ -26,12 +32,9 @@
     '';
   };
 
-  # Ensure desktop layout is used
-  wayland.windowManager.hyprland.settings = {
-    source = lib.mkAfter [
-      "~/.config/hypr/conf/host-specific.conf"
-    ];
-  };
+  # Note: Using system-level Hyprland with UWSM  
+  # Host-specific configuration is automatically loaded via host-specific.conf
+  # No need for wayland.windowManager.hyprland.settings when using system-level Hyprland
 
     # SwayOSD configuration for woody (Desktop)
   # services.swayosd = {
