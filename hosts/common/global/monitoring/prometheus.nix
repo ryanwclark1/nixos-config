@@ -12,6 +12,7 @@
       # Node exporter for system metrics
       node = {
         enable = lib.mkDefault true;
+        port = lib.mkDefault 9100;
         enabledCollectors = [
           "cpu"
           "diskstats"
@@ -22,10 +23,18 @@
           "netstat"
           "textfile"
           "time"
+          "uname"
           "vmstat"
           "logind"
           "interrupts"
           "ksmd"
+          "processes"
+          "systemd"
+          "filefd"
+          "hwmon"
+          "mountstats"
+          "sockstat"
+          "stat"
         ];
         extraFlags = [
           "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)"
@@ -35,8 +44,22 @@
 
       # Process exporter for process metrics
       process = {
-        enable = lib.mkDefault false;
-        port = 9256;
+        enable = lib.mkDefault true;
+        port = lib.mkDefault 9256;
+        settings.process_names = lib.mkDefault [
+          {
+            name = "{{.Comm}}";
+            cmdline = [ "node_exporter" ];
+          }
+          {
+            name = "{{.Comm}}";
+            cmdline = [ "systemd_exporter" ];
+          }
+          {
+            name = "{{.Comm}}";
+            cmdline = [ "process_exporter" ];
+          }
+        ];
       };
 
       # Blackbox exporter for network monitoring

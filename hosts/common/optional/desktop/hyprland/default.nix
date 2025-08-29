@@ -14,10 +14,10 @@
       portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
       withUWSM = true;
       xwayland.enable = true;
-      # Plugins need to be handled differently for system-level Hyprland
-      # plugins = [
-      #   inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}.hyprexpo
-      # ];
+      # Plugins for system-level Hyprland
+      plugins = [
+        inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}.hyprexpo
+      ];
     };
     mtr.enable = lib.mkDefault true;
     gnupg.agent = {

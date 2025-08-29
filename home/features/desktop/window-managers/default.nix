@@ -1,0 +1,7 @@
+{
+  imports = [
+    ./shared
+    ./hyprland
+    ./niri
+  ];
+}

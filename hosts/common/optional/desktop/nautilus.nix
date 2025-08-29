@@ -18,6 +18,7 @@
     systemPackages = with pkgs; [
       nautilus
       nautilus-python
+      file-roller # Archive manager integration for Nautilus
     ];
   };
 
