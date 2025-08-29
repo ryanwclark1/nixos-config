@@ -5,22 +5,24 @@
 
 {
   home.packages = with pkgs; [
-    dnsutils # `dig` + `nslookup`
-    ngrep # Network packet analyzer.
-    sngrep # CLI tool for visualizing SIP messages in a terminal UI
-    nload # Monitors network traffic and bandwidth usage with ncurses graphs.
-    nmap # A utility for network discovery and security auditing
-    openresolv # a resolv.conf management framework
+    # Cross-platform networking utilities
+    dnsutils # `dig` + `nslookup` - works on all platforms
+    nmap # A utility for network discovery and security auditing - cross-platform
+    tcpdump # Network sniffer - available on macOS
+    wireguard-tools # WireGuard utilities - cross-platform
+    mtr # A network diagnostic tool - cross-platform  
+    iperf # Tool to measure IP bandwidth using UDP or TCP - cross-platform
+    socat # replacement of openbsd-netcat - cross-platform
     # rathole # similar to ngrok - NAT traversal and reverse proxy
-    tcpdump # Network sniffer
-    wireguard-tools # Supplies the main userspace tooling for using and configuring WireGuard tunnels, including the wg(8) and wg-quick(8) utilities.
-    netscanner # A simple network scanner
-    mtr # A network diagnostic tool
-    iperf # Tool to measure IP bandwidth using UDP or TCP.
-    socat # replacement of openbsd-netcat
-  ] ++ (if pkgs.stdenv.hostPlatform.system == "x86_64-linux" then [
-    ethtool # A utility for controlling network drivers and hardware
+  ] ++ (if pkgs.stdenv.hostPlatform.isLinux then [
+    # Linux-specific networking utilities
+    inetutils # Basic networking utilities - Linux-focused implementation
+    ngrep # Network packet analyzer - Linux-specific features
+    sngrep # CLI tool for visualizing SIP messages - primarily Linux
+    nload # Network traffic monitor with ncurses - Linux-specific
+    openresolv # resolv.conf management framework - Linux-specific
+    netscanner # Network scanner - Linux-specific
+    ethtool # Ethernet hardware control - Linux kernel specific
   ] else []);
-
 
 }
