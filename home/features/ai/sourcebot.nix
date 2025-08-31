@@ -246,6 +246,7 @@
 
       ExecStartPre = [
         "${pkgs.writeShellScript "sourcebot-prepare" ''
+          PATH="${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:$PATH"
           # Ensure required directories exist
           mkdir -p ${config.home.homeDirectory}/Code
           mkdir -p ${config.home.homeDirectory}/.config/sourcebot
@@ -277,6 +278,7 @@
       ];
 
       ExecStart = "${pkgs.writeShellScript "sourcebot-start" ''
+        PATH="${pkgs.coreutils}/bin:${pkgs.docker}/bin:${pkgs.gnugrep}/bin:${pkgs.nettools}/bin:$PATH"
         set -e
 
         COMPOSE_FILE="${config.home.homeDirectory}/.config/sourcebot/docker-compose.yml"
@@ -358,6 +360,7 @@
       ''}";
 
       ExecStop = "${pkgs.writeShellScript "sourcebot-stop" ''
+        PATH="${pkgs.coreutils}/bin:${pkgs.docker}/bin:$PATH"
         COMPOSE_FILE="${config.home.homeDirectory}/.config/sourcebot/docker-compose.yml"
 
         echo "[INFO] Stopping Sourcebot services..."
@@ -377,6 +380,7 @@
       ''}";
 
       ExecReload = "${pkgs.writeShellScript "sourcebot-reload" ''
+        PATH="${pkgs.coreutils}/bin:${pkgs.docker}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:$PATH"
         COMPOSE_FILE="${config.home.homeDirectory}/.config/sourcebot/docker-compose.yml"
         ENV_FILE="${config.home.homeDirectory}/.config/sourcebot/.env"
 
@@ -556,6 +560,7 @@
   # Manual Docker Compose management (bypassing systemd)
   home.file.".local/bin/sourcebot-docker-start".source = pkgs.writeShellScript "sourcebot-docker-start" ''
     #!/usr/bin/env bash
+    PATH="${pkgs.coreutils}/bin:${pkgs.docker}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:$PATH"
     set -e
 
     COMPOSE_FILE="${config.home.homeDirectory}/.config/sourcebot/docker-compose.yml"
@@ -601,6 +606,7 @@
 
   home.file.".local/bin/sourcebot-docker-stop".source = pkgs.writeShellScript "sourcebot-docker-stop" ''
     #!/usr/bin/env bash
+    PATH="${pkgs.coreutils}/bin:${pkgs.docker}/bin:$PATH"
     COMPOSE_FILE="${config.home.homeDirectory}/.config/sourcebot/docker-compose.yml"
 
     echo "Stopping Sourcebot Docker services..."

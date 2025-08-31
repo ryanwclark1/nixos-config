@@ -3,7 +3,7 @@
  * ----------------------------------------------------- */
 
 /* Import color scheme */
-@import 'colors.css';
+/* @import 'colors.css'; */
 
 /* Define color variables */
 @define-color bg-dark rgba(48, 52, 70, 0.8);
@@ -19,7 +19,7 @@
 @define-color accent-purple #ca9ee6;
 
 /* -----------------------------------------------------
- * General 
+ * General
  * ----------------------------------------------------- */
 
 * {
@@ -41,7 +41,7 @@ window#waybar.hidden {
 }
 
 /* -----------------------------------------------------
- * Workspaces 
+ * Workspaces
  * ----------------------------------------------------- */
 
 #workspaces {
@@ -141,8 +141,8 @@ window#waybar.empty #window {
  * ----------------------------------------------------- */
 
 #clock {
-    background: @bg-accent;
-    color: @bg-dark;
+    background: @bg-dark;
+    color: @accent-blue;
     font-weight: bold;
     font-size: 17px;
 }
@@ -320,19 +320,23 @@ tooltip label {
     transition: background 0.2s ease;
 }
 
-/* Action buttons grouping */
-.action-button {
-    background: rgba(140, 170, 238, 0.1);
-    border: 1px solid rgba(140, 170, 238, 0.3);
-    border-radius: 8px;
-    margin: 2px;
-    padding: 0 8px;
-    min-width: 28px;
+/* Action buttons to match workspace picker style */
+#custom-screenshot,
+#custom-settings,
+#custom-wallpaper {
+    background: @bg-dark;
+    color: @accent-blue;
+    border-radius: 16px;
+    margin: 2px 4px;
+    padding: 0 10px;
+    border: none;
 }
 
-.action-button:hover {
+#custom-screenshot:hover,
+#custom-settings:hover,
+#custom-wallpaper:hover {
     background: rgba(140, 170, 238, 0.2);
-    border-color: rgba(140, 170, 238, 0.5);
+    color: @accent-blue;
 }
 
 /* Separator styling */
