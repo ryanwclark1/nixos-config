@@ -32,7 +32,7 @@
 
       # Framework laptop typically has HiDPI display
       # Adjust if your model differs
-      # monitor = eDP-1, 2256x1504@60, 0x0, 1.5
+      monitor = eDP-1, 2256x1504@60, 0x0, 1.0
 
       # Laptop-specific keybindings
       # bind = , XF86Launch1, exec, ags -t launcher  # Framework key
