@@ -6,6 +6,10 @@
 }:
 
 {
+
+  imports = [
+    inputs.niri.nixosModules.niri
+  ];
   # Only import the overlay, not the NixOS module to avoid conflicts
   # The niri program itself will be managed through home-manager
   nixpkgs.overlays = [
@@ -13,6 +17,8 @@
   ];
 
   programs = {
+    niri.enable = true;  # niri window manager
+    
     # Enable dconf for settings management (needed for various desktop apps)
     dconf.enable = lib.mkDefault true;
   };
@@ -38,6 +44,7 @@
 
   environment = {
     systemPackages = with pkgs; [
+      # niri package is automatically provided by programs.niri.enable
       niriswitcher  # backup switcher
     ];
 
