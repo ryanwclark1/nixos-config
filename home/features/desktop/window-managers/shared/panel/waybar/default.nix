@@ -10,7 +10,7 @@
   ];
 
   home.file.".config/waybar/config" = {
-    source = ./config;
+    source = ./config.jsonc;
   };
 
   home.file.".config/waybar/style.css" = {
@@ -21,10 +21,6 @@
     waybar = {
       enable = true;
       package = pkgs.waybar;
-      # systemd = {
-      #   enable = true;
-      #   enableInspect = true;
-      # };
     };
   };
 }

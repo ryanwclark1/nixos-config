@@ -5,7 +5,7 @@
 {
   programs.niri.settings.outputs = {
     "eDP-1" = {
-      scale = 1.0;
+      scale = 2.0;
     };
   };
 }

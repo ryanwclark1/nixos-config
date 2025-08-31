@@ -25,8 +25,9 @@
         "DOCKER_BUILDKIT=1"
       ];
       
-      # Start command - use docker compose without the deprecated version
+      # Start command - use docker compose without the deprecated version  
       ExecStart = pkgs.writeShellScript "start-open-webui" ''
+        PATH="${pkgs.coreutils}/bin:${pkgs.docker}/bin:${pkgs.docker-compose}/bin:$PATH"
         set -euo pipefail
         
         # Create docker-compose.yml in runtime directory
@@ -126,6 +127,7 @@
       
       # Stop command
       ExecStop = pkgs.writeShellScript "stop-open-webui" ''
+        PATH="${pkgs.coreutils}/bin:${pkgs.docker}/bin:${pkgs.docker-compose}/bin:$PATH"
         set -euo pipefail
         cd $HOME/.config/open-webui
         ${pkgs.docker-compose}/bin/docker-compose down
@@ -133,6 +135,7 @@
       
       # Reload command
       ExecReload = pkgs.writeShellScript "reload-open-webui" ''
+        PATH="${pkgs.coreutils}/bin:${pkgs.docker}/bin:${pkgs.docker-compose}/bin:$PATH"
         set -euo pipefail
         cd $HOME/.config/open-webui
         ${pkgs.docker-compose}/bin/docker-compose down
