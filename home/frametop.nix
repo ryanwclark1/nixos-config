@@ -59,7 +59,7 @@
     ./features/desktop/common # Core desktop components
     ./features/desktop/window-managers # Window managers and shared WM tools
     ./features/desktop/window-managers/hyprland/host-specific/frametop.nix
-    # ./features/desktop/window-managers/niri/host-specific/frametop.nix
+    ./features/desktop/window-managers/niri/host-specific/frametop.nix
   ];
 
   # Disable impermanence
