@@ -70,7 +70,7 @@
               
               # Security Headers
               - ENABLE_SECURITY_HEADERS=True
-              - CORS_ALLOW_ORIGIN=*
+              - CORS_ALLOW_ORIGIN=http://localhost:8180
               
               # Session & Auth Settings
               - WEBUI_AUTH=False
@@ -125,12 +125,17 @@
         ${pkgs.docker-compose}/bin/docker-compose up -d
       '';
       
-      # Stop command
+      # Stop command with proper error handling
       ExecStop = pkgs.writeShellScript "stop-open-webui" ''
         PATH="${pkgs.coreutils}/bin:${pkgs.docker}/bin:${pkgs.docker-compose}/bin:$PATH"
-        set -euo pipefail
-        cd $HOME/.config/open-webui
-        ${pkgs.docker-compose}/bin/docker-compose down
+        
+        # Check if Docker is still running before attempting to stop container
+        if ${pkgs.docker}/bin/docker info >/dev/null 2>&1; then
+          cd $HOME/.config/open-webui
+          ${pkgs.docker-compose}/bin/docker-compose down --timeout 30 || true
+        else
+          echo "Docker daemon not available, skipping container stop"
+        fi
       '';
       
       # Reload command
