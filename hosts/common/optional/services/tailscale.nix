@@ -36,4 +36,15 @@
   # Tailscale will start automatically with the system
   # No need to wait for network-online.target as it can handle
   # network connectivity changes dynamically
+  
+  # Improve shutdown ordering to prevent timeout errors
+  systemd.services.tailscaled = {
+    before = [ "shutdown.target" ];
+    conflicts = [ "shutdown.target" ];
+    serviceConfig = {
+      TimeoutStopSec = "30s";
+      KillMode = "mixed";
+      KillSignal = "SIGTERM";
+    };
+  };
 }
