@@ -9,7 +9,7 @@
     ./style.nix
   ];
 
-  home.file.".config/waybar/config" = {
+  home.file.".config/waybar/config.jsonc" = {
     source = ./config.jsonc;
   };
 
