@@ -7,9 +7,10 @@
 }:
 
 {
-  imports = [
-    inputs.niri.homeModules.niri
-  ];
+  # Don't import the home module when using the system module to avoid conflicts
+  # imports = [
+  #   inputs.niri.homeModules.niri
+  # ];
 
   programs = {
     # Configure niriswitcher
@@ -22,8 +23,10 @@
       settings = {
         environment."NIXOS_OZONE_WL" = "1";
         input = {
-          keyboard.xkb = {
-            layout = "us";
+          keyboard = {
+            xkb = {
+              layout = "us";
+            };
           };
 
           touchpad = {
@@ -42,7 +45,7 @@
             { proportion = 0.5; }
             { proportion = 0.66667; }
           ];
-          default-column-width = { proportion = 0.5; };
+          # default-column-width = { proportion = 0.5; };
         };
 
         spawn-at-startup = [
