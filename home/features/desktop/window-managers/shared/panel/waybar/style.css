@@ -1,4 +1,4 @@
-@import 'color.css';
+@import './color.css';
 
 * {
   background-color: @background;
