@@ -6,7 +6,6 @@
   imports = [
     ./global
 
-    ./features/ai
     ./features/ansible
     ./features/atuin
     ./features/audio
@@ -52,7 +51,6 @@
     ./features/wireless
     ./features/yazi
     ./features/zellij
-    # ./features/zen
     ./features/zoxide
 
     # Desktop environment configuration
