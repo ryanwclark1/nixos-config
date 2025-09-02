@@ -151,8 +151,8 @@
         "max-length": 50,
         "separate-outputs": true,
         "rewrite": {
-            "(.*) — Mozilla Firefox": "󰈹 $1",
-            "(.*) — Google Chrome": "󰊯 $1",
+            "(.*) - Mozilla Firefox": "󰈹 $1",
+            "(.*) - Google Chrome": "󰊯 $1",
             "(.*) - Code - OSS": "󰨞 $1",
             "(.*) - VSCode": "󰨞 $1",
             "(.*) - Visal Studio Code": "󰨞 $1",

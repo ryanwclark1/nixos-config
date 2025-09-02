@@ -35,23 +35,23 @@
 #battery,
 #network,
 #bluetooth,
-#pulseaudio,
-#custom-omarchy,
-#custom-update {
+#pulseaudio {
   min-width: 12px;
   margin: 0 7.5px;
 }
+
+#custom-launcher {
+  margin-right: 7px;
+}
+
 
 #custom-expand-icon {
   margin-right: 7px;
 }
 
+
 tooltip {
   padding: 2px;
-}
-
-#custom-update {
-  font-size: 10px;
 }
 
 #clock {
@@ -60,4 +60,17 @@ tooltip {
 
 .hidden {
   opacity: 0;
+}
+
+/* -----------------------------------------------------
+  Window Title
+ ----------------------------------------------------- */
+
+#window {
+    /* padding: 0 10px; */
+    margin: 2px 4px;
+}
+
+window#waybar.empty #window {
+    background: transparent;
 }
