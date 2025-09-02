@@ -66,10 +66,9 @@
     ./features/desktop/common # Core desktop components
     ./features/desktop/window-managers # Window managers and shared WM tools
     ./features/desktop/window-managers/hyprland/host-specific/woody.nix
-    # ./features/desktop/window-managers/niri/host-specific/woody.nix
-    
+    ./features/desktop/window-managers/niri/host-specific/woody.nix
+
     # Application launcher cleanup
-    ./features/desktop-entries
   ];
 
   home.packages = with pkgs; [
@@ -92,7 +91,7 @@
         ["priority.driver"] = 1000,
       },
     }
-    
+
     table.insert(alsa_monitor.rules, rule)
   '';
 
