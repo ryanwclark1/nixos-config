@@ -15,30 +15,30 @@
     ./hardware-configuration.nix
     ./services
     ./performance.nix
-    ./monitoring
+    # ./monitoring
 
     # Common configurations
     ../common/global
     ../common/users/administrator
 
     # Optional features
+    ../common/optional/desktop/displaymanager/sddm
+    ../common/optional/desktop/hyprland
+    ../common/optional/desktop/nautilus.nix
+    ../common/optional/desktop/niri
+    ../common/optional/desktop/thunar.nix
     ../common/optional/services/audio.nix
     ../common/optional/services/bluetooth.nix
-    ../common/optional/tools/direnv.nix
-    ../common/optional/tools/fonts.nix
     ../common/optional/services/gnome-services.nix
-    ../common/optional/desktop/nautilus.nix
     ../common/optional/services/nfs.nix
     ../common/optional/services/printing.nix
     ../common/optional/services/steam.nix
-    ../common/optional/desktop/thunar.nix
     ../common/optional/services/virtualisation.nix
     ../common/optional/services/webcam.nix
+    ../common/optional/tools/direnv.nix
+    ../common/optional/tools/fonts.nix
     ../common/optional/tools/wireshark.nix
     ../common/optional/tools/zsh.nix
-    ../common/optional/desktop/displaymanager/sddm
-    ../common/optional/desktop/hyprland
-    ../common/optional/desktop/niri
   ];
 
   # Frametop-specific monitoring additions
