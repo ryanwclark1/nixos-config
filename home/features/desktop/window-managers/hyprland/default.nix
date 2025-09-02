@@ -12,6 +12,8 @@
     ./hypridle # Idle management
     ./hyprlock # Screen locking
     ./hyprpolkitagent # Authentication agent
+    ./scripts/utilities.nix # Hyprland utility scripts
+    ./scripts/keybindings-menu.nix # Interactive keybinding reference
     ./wal # Wallpaper automation (if hyprland-specific)
   ];
 
