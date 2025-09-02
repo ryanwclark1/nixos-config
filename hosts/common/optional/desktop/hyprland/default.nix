@@ -34,6 +34,15 @@ in
     seahorse.enable = lib.mkDefault true;
   };
 
+  # Enable seatd for proper seat management with Hyprland
+  services.seatd = {
+    enable = true;
+    group = "seat";
+  };
+
+  # Add users to the seat group for Hyprland
+  users.groups.seat = {};
+
   security.polkit.enable = lib.mkDefault true;
 
   # Hyprland plugins as system packages

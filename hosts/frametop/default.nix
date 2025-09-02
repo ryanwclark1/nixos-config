@@ -24,8 +24,9 @@
     # Optional features
     ../common/optional/desktop/displaymanager/sddm
     ../common/optional/desktop/hyprland
+    # ../common/optional/desktop/niri
+
     ../common/optional/desktop/nautilus.nix
-    ../common/optional/desktop/niri
     ../common/optional/desktop/thunar.nix
     ../common/optional/services/audio.nix
     ../common/optional/services/bluetooth.nix

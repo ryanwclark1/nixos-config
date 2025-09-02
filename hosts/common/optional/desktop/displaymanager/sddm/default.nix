@@ -31,15 +31,15 @@ in
   ];
   qt.enable = true;
   services = {
-    xserver.enable = lib.mkDefault true;
+    xserver.enable = lib.mkDefault false;
     displayManager = {
       defaultSession = "hyprland-uwsm";
       sddm = {
         enable = true;
-        # wayland = {
-        #   enable = true;
-        #   compositor = "weston";
-        # };
+        wayland = {
+          enable = true;
+          compositor = "weston";
+        };
         # autoNumlock = true;
         # enableHidpi = true;
         package = pkgs.kdePackages.sddm;

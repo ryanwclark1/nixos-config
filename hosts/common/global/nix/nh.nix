@@ -19,7 +19,7 @@
     clean = {
       enable = true;
       dates = "weekly";
-      extraArgs = "--keep-since 4d --keep 3";
+      extraArgs = "--keep-since 10d --keep 15";
     };
 
     # Point nh to your flake configuration
