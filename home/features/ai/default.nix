@@ -6,8 +6,8 @@
 {
   imports = [
     ./mcp-openwebui.nix
-    # ./sourcebot.nix  # Docker Compose-based Sourcebot with PostgreSQL and Redis
-    ./open-webui-docker.nix
+    ./sourcebot.nix  # Docker Compose-based Sourcebot with PostgreSQL and Redis
+    # ./open-webui-docker.nix
   ];
   home.packages = with pkgs; [
     lmstudio

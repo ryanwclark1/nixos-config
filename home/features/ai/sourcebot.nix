@@ -241,7 +241,7 @@
       TimeoutStopSec = "120";
 
       Environment = [
-        "GITHUB_PERSONAL_ACCESS_TOKEN_FILE=${config.sops.secrets.github-pat.path}"
+        "PATH=${pkgs.findutils}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:$PATH"
       ];
 
       ExecStartPre = [
@@ -255,12 +255,13 @@
           export NO_COLOR=1
           export TERM=dumb
 
-          # Read secrets from SOPS (hierarchical structure)
-          GITHUB_TOKEN=$(cat ${config.sops.secrets.github-pat.path} 2>/dev/null | tr -d '[:cntrl:]' || echo "fake-token")
-          AUTH_SECRET=$(cat ${config.sops.secrets."sourcebot/auth-secret".path} 2>/dev/null | tr -d '[:cntrl:]' || echo "fallback-secret")
-          DB_USER=$(cat ${config.sops.secrets."sourcebot/database/user".path} 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
-          DB_PASSWORD=$(cat ${config.sops.secrets."sourcebot/database/password".path} 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
-          DB_NAME=$(cat ${config.sops.secrets."sourcebot/database/name".path} 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
+          # Read secrets from SOPS runtime locations
+          SOPS_BASE="/run/user/$(id -u)/secrets.d"
+          GITHUB_TOKEN=$(find "$SOPS_BASE" -name "github-pat" -type f -exec cat {} \; 2>/dev/null | tr -d '[:cntrl:]' || echo "fake-token")
+          AUTH_SECRET=$(find "$SOPS_BASE" -path "*/sourcebot/auth-secret" -type f -exec cat {} \; 2>/dev/null | tr -d '[:cntrl:]' || echo "fallback-secret")
+          DB_USER=$(find "$SOPS_BASE" -path "*/sourcebot/database/user" -type f -exec cat {} \; 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
+          DB_PASSWORD=$(find "$SOPS_BASE" -path "*/sourcebot/database/password" -type f -exec cat {} \; 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
+          DB_NAME=$(find "$SOPS_BASE" -path "*/sourcebot/database/name" -type f -exec cat {} \; 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
 
           # Create environment file with all secrets
           cat > ${config.home.homeDirectory}/.config/sourcebot/.env <<EOF
@@ -390,12 +391,13 @@
         export NO_COLOR=1
         export TERM=dumb
 
-        # Read secrets from SOPS (hierarchical structure)
-        GITHUB_TOKEN=$(cat ${config.sops.secrets.github-pat.path} 2>/dev/null | tr -d '[:cntrl:]' || echo "fake-token")
-        AUTH_SECRET=$(cat ${config.sops.secrets."sourcebot/auth-secret".path} 2>/dev/null | tr -d '[:cntrl:]' || echo "fallback-secret")
-        DB_USER=$(cat ${config.sops.secrets."sourcebot/database/user".path} 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
-        DB_PASSWORD=$(cat ${config.sops.secrets."sourcebot/database/password".path} 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
-        DB_NAME=$(cat ${config.sops.secrets."sourcebot/database/name".path} 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
+        # Read secrets from SOPS runtime locations
+        SOPS_BASE="/run/user/$(id -u)/secrets.d"
+        GITHUB_TOKEN=$(find "$SOPS_BASE" -name "github-pat" -type f -exec cat {} \; 2>/dev/null | tr -d '[:cntrl:]' || echo "fake-token")
+        AUTH_SECRET=$(find "$SOPS_BASE" -path "*/sourcebot/auth-secret" -type f -exec cat {} \; 2>/dev/null | tr -d '[:cntrl:]' || echo "fallback-secret")
+        DB_USER=$(find "$SOPS_BASE" -path "*/sourcebot/database/user" -type f -exec cat {} \; 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
+        DB_PASSWORD=$(find "$SOPS_BASE" -path "*/sourcebot/database/password" -type f -exec cat {} \; 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
+        DB_NAME=$(find "$SOPS_BASE" -path "*/sourcebot/database/name" -type f -exec cat {} \; 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
 
         # Create environment file with all secrets
         cat > "$ENV_FILE" <<EOF
@@ -576,12 +578,13 @@
     export NO_COLOR=1
     export TERM=dumb
 
-    # Read secrets from SOPS (hierarchical structure)
-    GITHUB_TOKEN=$(cat ${config.sops.secrets.github-pat.path} 2>/dev/null | tr -d '[:cntrl:]' || echo "fake-token")
-    AUTH_SECRET=$(cat ${config.sops.secrets."sourcebot/auth-secret".path} 2>/dev/null | tr -d '[:cntrl:]' || echo "fallback-secret")
-    DB_USER=$(cat ${config.sops.secrets."sourcebot/database/user".path} 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
-    DB_PASSWORD=$(cat ${config.sops.secrets."sourcebot/database/password".path} 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
-    DB_NAME=$(cat ${config.sops.secrets."sourcebot/database/name".path} 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
+    # Read secrets from SOPS runtime locations
+    SOPS_BASE="/run/user/$(id -u)/secrets.d"
+    GITHUB_TOKEN=$(find "$SOPS_BASE" -name "github-pat" -type f -exec cat {} \; 2>/dev/null | tr -d '[:cntrl:]' || echo "fake-token")
+    AUTH_SECRET=$(find "$SOPS_BASE" -path "*/sourcebot/auth-secret" -type f -exec cat {} \; 2>/dev/null | tr -d '[:cntrl:]' || echo "fallback-secret")
+    DB_USER=$(find "$SOPS_BASE" -path "*/sourcebot/database/user" -type f -exec cat {} \; 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
+    DB_PASSWORD=$(find "$SOPS_BASE" -path "*/sourcebot/database/password" -type f -exec cat {} \; 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
+    DB_NAME=$(find "$SOPS_BASE" -path "*/sourcebot/database/name" -type f -exec cat {} \; 2>/dev/null | tr -d '[:cntrl:]' || echo "sourcebot")
 
     # Create environment file with all secrets
     cat > "$ENV_FILE" <<EOF
