@@ -27,8 +27,8 @@
       annotation-size-factor = 2
       # Filename to use for saving action. Omit to disable saving to file. Might contain format specifiers: https://docs.rs/chrono/latest/chrono/format/strftime/index.html
       output-filename = "${config.home.homeDirectory}/Pictures/Screenshots/satty-%Y-%m-%d_%H:%M:%S.png"
-      # After copying the screenshot, save it to a file as well
-      save-after-copy = false
+      # After copying the screenshot, save it to a file as well (omarchy enhancement)
+      save-after-copy = true
       # Hide toolbars by default
       default-hide-toolbars = false
       # Experimental: whether window focus shows/hides toolbars. This does not affect initial state of toolbars, see default-hide-toolbars.

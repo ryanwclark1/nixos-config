@@ -57,10 +57,18 @@
 
     # Desktop environment configuration
     ./features/desktop/common # Core desktop components
+    ./features/battery-monitor.nix # Laptop-specific battery monitoring
     ./features/desktop/window-managers # Window managers and shared WM tools
     ./features/desktop/window-managers/hyprland/host-specific/frametop.nix
     ./features/desktop/window-managers/niri/host-specific/frametop.nix
   ];
+
+  # Frametop-specific configuration
+  features.battery-monitor = {
+    enable = true;
+    threshold = 15;  # Framework laptops benefit from slightly higher threshold
+    interval = 30;   # Check every 30 seconds
+  };
 
   # Disable impermanence
   # home.persistence = lib.mkForce {};

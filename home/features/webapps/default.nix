@@ -1,6 +1,10 @@
 { config, lib, pkgs, ... }:
 
 {
+  imports = [
+    ./scripts.nix  # Browser and webapp utility scripts
+  ];
+
   # Custom webapp launcher script (adapted from omarchy-launch-webapp)
   home.packages = with pkgs; [
     (writeShellScriptBin "launch-webapp" ''
