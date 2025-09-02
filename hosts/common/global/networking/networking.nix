@@ -68,7 +68,6 @@ in
         "tftp"
         "amanda"
         "h323"
-        "netbios_sn"
         "pptp"
         "snmp"
       ];
@@ -100,17 +99,23 @@ in
     fallbackDns = [
       "1.1.1.1"
       "1.0.0.1"
+      "8.8.8.8"
+      "8.8.4.4"
     ];
     extraConfig = ''
-      DNS=1.1.1.1 1.0.0.1
+      DNS=10.10.100.1 1.1.1.1 1.0.0.1
       DNSOverTLS=opportunistic
       MulticastDNS=yes
       LLMNR=yes
       # Additional DNS settings
       Cache=yes
-      CacheFromLocalhost=no
+      CacheFromLocalhost=yes
       DNSStubListener=yes
+      DNSStubListenerExtra=127.0.0.53
       ReadEtcHosts=yes
+      # Improve DNS resilience
+      Domains=~.
+      ResolveUnicastSingleLabel=yes
     '';
   };
 
