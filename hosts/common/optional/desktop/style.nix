@@ -17,8 +17,6 @@ in
   stylix = {
     enable = true;
     autoEnable = false;
-    # image = ../wallpaper/FormulaOne_Vettel_2.jpg;
-    # image = "~/Pictures/wallpaper/FormulaOne_Vettel_2.jpg";
     imageScalingMode = "fill";
     base16Scheme = "${pkgs.base16-schemes}/share/themes/${currentScheme}.yaml";
     polarity = "either";

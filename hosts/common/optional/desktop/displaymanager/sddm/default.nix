@@ -33,7 +33,7 @@ in
   services = {
     xserver.enable = lib.mkDefault true;
     displayManager = {
-      defaultSession = lib.mkDefault "hyprland-uwsm";
+      defaultSession = "hyprland-uwsm";
       sddm = {
         enable = true;
         # wayland = {

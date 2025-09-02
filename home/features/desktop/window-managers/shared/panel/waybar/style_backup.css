@@ -1,0 +1,347 @@
+/* -----------------------------------------------------
+ * Waybar Style Configuration
+ * ----------------------------------------------------- */
+
+/* Import color scheme */
+/* @import 'color.css'; */
+
+/* Define color variables */
+@define-color bg-dark rgba(48, 52, 70, 0.8);
+@define-color bg-light rgba(65, 69, 89, 0.8);
+@define-color bg-accent rgba(140, 170, 238, 0.9);
+@define-color text-primary #c6d0f5;
+@define-color text-secondary #a5adce;
+@define-color text-urgent #e78284;
+@define-color accent-blue #8caaee;
+@define-color accent-green #a6d189;
+@define-color accent-orange #ef9f76;
+@define-color accent-red #e78284;
+@define-color accent-purple #ca9ee6;
+
+/* -----------------------------------------------------
+ * General
+ * ----------------------------------------------------- */
+
+* {
+    font-family: "JetBrainsMono Nerd Font", "Font Awesome 6 Free", "DejaVu Sans", sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+}
+
+window#waybar {
+    background: transparent;
+    color: @text-primary;
+}
+
+window#waybar.hidden {
+    opacity: 0.2;
+}
+
+/* -----------------------------------------------------
+ * Workspaces
+ * ----------------------------------------------------- */
+
+#workspaces {
+    background: @bg-dark;
+    margin: 2px 4px;
+    padding: 0 2px;
+    border-radius: 16px;
+}
+
+#workspaces button {
+    color: @text-secondary;
+    padding: 0 6px;
+    margin: 0 1px;
+    min-width: 28px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+#workspaces button.visible {
+    color: @text-primary;
+}
+
+#workspaces button.active {
+    color: @accent-blue;
+    background: rgba(140, 170, 238, 0.2);
+    border-radius: 12px;
+}
+
+#workspaces button.urgent {
+    background-color: @accent-red;
+    color: @bg-dark;
+    border-radius: 12px;
+}
+
+#workspaces button:hover {
+    background: rgba(140, 170, 238, 0.2);
+    border-radius: 12px;
+}
+
+/* -----------------------------------------------------
+ * Window Title
+ * ----------------------------------------------------- */
+
+#window {
+    background: @bg-dark;
+    padding: 0 10px;
+    margin: 2px 4px;
+    border-radius: 16px;
+}
+
+window#waybar.empty #window {
+    background: transparent;
+}
+
+/* -----------------------------------------------------
+ * Modules Common Style
+ * ----------------------------------------------------- */
+
+#custom-launcher,
+#clock,
+#battery,
+#cpu,
+#memory,
+#temperature,
+#backlight,
+#network,
+#pulseaudio,
+#custom-media,
+#tray,
+#mode,
+#idle_inhibitor,
+#mpd,
+#bluetooth,
+#custom-notification,
+#custom-power {
+    background: @bg-dark;
+    padding: 0 10px;
+    margin: 2px 4px;
+    border-radius: 16px;
+}
+
+/* -----------------------------------------------------
+ * Custom Launcher
+ * ----------------------------------------------------- */
+
+#custom-launcher {
+    font-size: 22px;
+    padding: 0 12px;
+    color: @accent-blue;
+    font-weight: normal;
+    border-radius: 8px;
+    margin: 2px;
+}
+
+/* -----------------------------------------------------
+ * Clock
+ * ----------------------------------------------------- */
+
+#clock {
+    background: @bg-dark;
+    color: @accent-blue;
+    font-weight: bold;
+    font-size: 17px;
+}
+
+/* -----------------------------------------------------
+ * System Info Modules
+ * ----------------------------------------------------- */
+
+#cpu {
+    color: @accent-blue;
+}
+
+#memory {
+    color: @accent-green;
+}
+
+#temperature {
+    color: @accent-orange;
+}
+
+#temperature.critical {
+    background-color: @accent-red;
+    color: @bg-dark;
+}
+
+/* -----------------------------------------------------
+ * Battery
+ * ----------------------------------------------------- */
+
+#battery {
+    color: @accent-green;
+}
+
+#battery.charging,
+#battery.plugged {
+    color: @accent-blue;
+}
+
+#battery.warning:not(.charging) {
+    background-color: @accent-orange;
+    color: @bg-dark;
+}
+
+#battery.critical:not(.charging) {
+    background-color: @accent-red;
+    color: @bg-dark;
+    animation: blink 0.5s linear infinite alternate;
+}
+
+@keyframes blink {
+    to {
+        background-color: @bg-dark;
+        color: @accent-red;
+    }
+}
+
+/* -----------------------------------------------------
+ * Network
+ * ----------------------------------------------------- */
+
+#network {
+    color: @accent-purple;
+}
+
+#network.disconnected {
+    background-color: @accent-red;
+    color: @bg-dark;
+}
+
+/* -----------------------------------------------------
+ * Bluetooth
+ * ----------------------------------------------------- */
+
+#bluetooth {
+    color: @accent-blue;
+}
+
+#bluetooth.connected {
+    color: @accent-green;
+}
+
+#bluetooth.off {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+}
+
+/* -----------------------------------------------------
+ * Pulseaudio
+ * ----------------------------------------------------- */
+
+#pulseaudio {
+    color: @accent-orange;
+}
+
+#pulseaudio.muted {
+    background-color: @bg-light;
+    color: @text-secondary;
+}
+
+/* -----------------------------------------------------
+ * Backlight
+ * ----------------------------------------------------- */
+
+#backlight {
+    color: @accent-orange;
+}
+
+/* -----------------------------------------------------
+ * Tray
+ * ----------------------------------------------------- */
+
+#tray {
+    background: @bg-dark;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
+}
+
+/* -----------------------------------------------------
+ * Custom Notification
+ * ----------------------------------------------------- */
+
+#custom-notification {
+    font-family: "Font Awesome 6 Free";
+    color: @accent-blue;
+}
+
+/* -----------------------------------------------------
+ * Custom Power
+ * ----------------------------------------------------- */
+
+#custom-power {
+    color: @accent-red;
+    font-size: 16px;
+    padding: 0 8px;
+}
+
+/* -----------------------------------------------------
+ * Tooltip
+ * ----------------------------------------------------- */
+
+tooltip {
+    background: @bg-dark;
+    border: 1px solid @accent-blue;
+    border-radius: 12px;
+}
+
+tooltip label {
+    color: @text-primary;
+    padding: 5px;
+}
+
+/* -----------------------------------------------------
+ * Hover Effects
+ * ----------------------------------------------------- */
+
+#custom-launcher:hover,
+#custom-power:hover,
+#cpu:hover,
+#memory:hover,
+#temperature:hover,
+#battery:hover,
+#network:hover,
+#bluetooth:hover,
+#pulseaudio:hover,
+#backlight:hover,
+#custom-notification:hover {
+    background: @bg-light;
+    transition: background 0.2s ease;
+}
+
+/* Action buttons to match workspace picker style */
+#custom-screenshot,
+#custom-settings,
+#custom-wallpaper {
+    background: @bg-dark;
+    color: @accent-blue;
+    border-radius: 16px;
+    margin: 2px 4px;
+    padding: 0 10px;
+    border: none;
+}
+
+#custom-screenshot:hover,
+#custom-settings:hover,
+#custom-wallpaper:hover {
+    background: rgba(140, 170, 238, 0.2);
+    color: @accent-blue;
+}
+
+/* Separator styling */
+#custom-separator {
+    color: rgba(140, 170, 238, 0.4);
+    margin: 0 4px;
+    font-weight: bold;
+}

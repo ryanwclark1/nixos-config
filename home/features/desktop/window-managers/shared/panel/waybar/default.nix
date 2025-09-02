@@ -17,6 +17,10 @@
     source = ./style.css;
   };
 
+  home.file.".config/waybar/color.css" = {
+    source = ./color.css;
+  };
+
   programs = {
     waybar = {
       enable = true;
