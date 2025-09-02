@@ -57,6 +57,7 @@ in
           "postgres"
           "syncthing"
           "wireshark"
+          "seat"
         ];
 
       # SSH authorized keys for secure remote access

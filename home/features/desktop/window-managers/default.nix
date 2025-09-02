@@ -2,7 +2,7 @@
   imports = [
     ./shared
     ./hyprland
-    ./niri
+    # ./niri
   ];
 }
 

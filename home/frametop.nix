@@ -60,7 +60,7 @@
     ./features/battery-monitor.nix # Laptop-specific battery monitoring
     ./features/desktop/window-managers # Window managers and shared WM tools
     ./features/desktop/window-managers/hyprland/host-specific/frametop.nix
-    ./features/desktop/window-managers/niri/host-specific/frametop.nix
+    # ./features/desktop/window-managers/niri/host-specific/frametop.nix
   ];
 
   # Frametop-specific configuration
