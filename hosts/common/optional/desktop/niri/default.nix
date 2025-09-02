@@ -10,14 +10,9 @@
   imports = [
     inputs.niri.nixosModules.niri
   ];
-  # Only import the overlay, not the NixOS module to avoid conflicts
-  # The niri program itself will be managed through home-manager
-  nixpkgs.overlays = [
-    inputs.niri.overlays.niri
-  ];
 
   programs = {
-    niri.enable = true;  # niri window manager
+    niri.enable = true;  # Enable niri at system level to register the session
     
     # Enable dconf for settings management (needed for various desktop apps)
     dconf.enable = lib.mkDefault true;
