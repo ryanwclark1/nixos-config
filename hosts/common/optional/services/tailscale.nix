@@ -39,12 +39,19 @@
   
   # Improve shutdown ordering to prevent timeout errors
   systemd.services.tailscaled = {
+    after = [ "network-online.target" "systemd-resolved.service" ];
+    wants = [ "network-online.target" ];
     before = [ "shutdown.target" ];
     conflicts = [ "shutdown.target" ];
     serviceConfig = {
       TimeoutStopSec = "30s";
       KillMode = "mixed";
       KillSignal = "SIGTERM";
+      # Add retry logic for network connectivity
+      Restart = "on-failure";
+      RestartSec = "5s";
+      StartLimitBurst = 5;
+      StartLimitIntervalSec = 60;
     };
   };
 }
