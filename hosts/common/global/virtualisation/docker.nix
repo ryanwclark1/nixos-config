@@ -13,6 +13,12 @@
     ];
     enableOnBoot = true;
     logDriver = "journald";
+    
+    # Fix DNS resolution issues
+    daemon.settings = {
+      dns = [ "8.8.8.8" "1.1.1.1" ];
+      dns-opts = [ "ndots:0" ];
+    };
 
     autoPrune = {
       enable = true;
