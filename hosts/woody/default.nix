@@ -147,6 +147,17 @@
     cpuFreqGovernor = "performance";
   };
 
+  # Logitech wireless device configuration
+  # Based on NixOS Discourse: https://discourse.nixos.org/t/logi-master-mouse-3/18829
+  hardware = {
+    logitech = {
+      wireless = {
+        enable = true;
+        enableGraphical = true;
+      };
+    };
+  };
+
   # Sourcebot configuration migrated to home-manager
   # See: home/features/ai/sourcebot.nix for the new Docker Compose setup
 
