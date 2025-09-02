@@ -76,6 +76,8 @@
     # - Balances functionality with storage constraints
     # - Can be overridden if needed for specific laptop use cases
 
+    loader.systemd-boot.configurationLimit = lib.mkForce 20;
+
     # Enable binary format support
     binfmt.emulatedSystems = [
       "aarch64-linux"
