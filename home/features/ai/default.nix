@@ -18,11 +18,6 @@
     # Docker for running MCP servers
     docker
     docker-compose
-
-    # MCP support - MCPO proxy for MCP-to-OpenAPI conversion
-    (python3.withPackages (ps: with ps; [
-      # Install mcpo for MCP proxy functionality
-    ]))
   ];
 
 }
