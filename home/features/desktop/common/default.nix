@@ -17,6 +17,12 @@
     cairo # Graphics library (required by desktop components)
     libsoup_3 # HTTP library (required by desktop components) 
     webkitgtk_6_0 # Web rendering engine (required by desktop components)
+
+    # Audio utility scripts
+    (writeShellScriptBin "audio-switch" (builtins.readFile ./scripts/system/audio-switch.sh))
+    (writeShellScriptBin "audio-volume-up" (builtins.readFile ./scripts/system/audio-volume-up.sh))
+    (writeShellScriptBin "audio-volume-down" (builtins.readFile ./scripts/system/audio-volume-down.sh))
+    (writeShellScriptBin "audio-volume-mute" (builtins.readFile ./scripts/system/audio-volume-mute.sh))
   ];
 
   # Desktop common scripts - available to all desktop environments/window managers

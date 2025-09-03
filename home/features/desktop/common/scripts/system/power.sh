@@ -45,9 +45,37 @@ notify() {
 
 # Detect and execute lock screen
 lock_screen() {
-    # Preferred order: hyprlock most likely, but try all available options
+    local lock_method=""
+    local lock_success=false
+    
+    # Method 1: Hypridle integration (preferred for Hyprland)
+    if command -v hyprctl >/dev/null && pgrep -x hypridle >/dev/null; then
+        lock_method="hypridle integration"
+        log "Attempting lock via loginctl (hypridle integration)"
+        
+        # Use loginctl to trigger D-Bus lock event, hypridle will handle hyprlock
+        if loginctl lock-session 2>/dev/null; then
+            log "Lock command sent via loginctl"
+            # Give hypridle/hyprlock time to respond to the D-Bus event
+            sleep 0.5
+            
+            # Verify lock screen actually started (check for hyprlock process)
+            if pgrep -x hyprlock >/dev/null; then
+                log "Screen locked successfully via hypridle integration"
+                notify "System" "Screen locked"
+                return 0
+            else
+                log "Warning: loginctl succeeded but hyprlock not detected, trying fallback"
+                # Don't return here - fall through to direct methods
+            fi
+        else
+            log "Warning: loginctl lock-session failed (exit code: $?)"
+        fi
+    fi
+    
+    # Method 2: Direct lock screen programs (fallback)
     local lock_commands=(
-        "hyprlock"           # Most likely choice for Hyprland setups
+        "hyprlock"           # Direct hyprlock (if hypridle not running or failed)
         "waylock"            # Minimal Wayland lock with good security
         "swaylock -f"        # Sway/generic Wayland lock (fork to background)
         "gtklock"            # GTK-based lock screen
@@ -55,25 +83,36 @@ lock_screen() {
         "xscreensaver-command -lock"  # Xscreensaver (X11 fallback)
     )
     
+    log "Trying direct lock screen programs as fallback"
     for lock_cmd in "${lock_commands[@]}"; do
         local cmd_name="${lock_cmd%% *}"  # Get first word (command name)
         if command -v "$cmd_name" >/dev/null; then
-            log "Locking screen with: $lock_cmd"
-            notify "System" "Screen locked"
+            log "Attempting lock with: $lock_cmd"
             
-            # Execute lock command with proper error handling
-            if eval "$lock_cmd" 2>/dev/null; then
+            # Execute lock command with timeout and error handling
+            if timeout 10 bash -c "eval '$lock_cmd'" 2>/dev/null; then
                 log "Screen locked successfully with $cmd_name"
+                notify "System" "Screen locked"
                 return 0
             else
-                log "Warning: $lock_cmd failed, trying next option"
+                log "Warning: $lock_cmd failed or timed out"
             fi
         fi
     done
     
-    # If no lock screen found
-    notify "Error" "No lock screen program found"
-    log "Error: No lock screen program available"
+    # Method 3: Emergency fallback - try to at least blank the screen
+    log "All lock methods failed, attempting screen blanking as emergency fallback"
+    if command -v hyprctl >/dev/null; then
+        hyprctl dispatch dpms off 2>/dev/null && log "Screen blanked via hyprctl dpms off"
+    elif command -v wlr-randr >/dev/null; then
+        wlr-randr --output '*' --off 2>/dev/null && log "Displays turned off via wlr-randr"
+    elif command -v xset >/dev/null; then
+        xset dpms force off 2>/dev/null && log "Display blanked via xset (X11)"
+    fi
+    
+    # Final failure
+    notify "Error" "Screen lock failed - all methods exhausted"
+    log "Error: No functional lock screen program found"
     return 1
 }
 
@@ -163,11 +202,18 @@ suspend_system() {
     
     # Optional: Lock screen before suspend
     if [[ "${LOCK_BEFORE_SUSPEND:-true}" == "true" ]]; then
-        # Background the lock screen to prevent blocking suspend
-        lock_screen &
-        # Give lock screen time to initialize and display
-        # Most modern lock screens are fast but need a moment to set up
-        sleep 1.5
+        log "Locking screen before suspend"
+        # Try to lock synchronously first, but don't block suspend if it fails
+        if ! lock_screen; then
+            log "Warning: Screen lock failed, proceeding with suspend anyway"
+            # Emergency: at least try to blank the screen
+            if command -v hyprctl >/dev/null; then
+                hyprctl dispatch dpms off 2>/dev/null
+            fi
+        fi
+        
+        # Brief pause to ensure lock screen is established
+        sleep 0.5
     fi
     
     # Use UWSM if available for better session management
@@ -231,10 +277,18 @@ hibernate_system() {
     
     # Optional: Lock screen before hibernate
     if [[ "${LOCK_BEFORE_HIBERNATE:-true}" == "true" ]]; then
-        # Background the lock screen to prevent blocking hibernate
-        lock_screen &
-        # Give lock screen time to initialize and display
-        sleep 1.5
+        log "Locking screen before hibernate"
+        # Try to lock synchronously first, but don't block hibernate if it fails
+        if ! lock_screen; then
+            log "Warning: Screen lock failed, proceeding with hibernate anyway"
+            # Emergency: at least try to blank the screen
+            if command -v hyprctl >/dev/null; then
+                hyprctl dispatch dpms off 2>/dev/null
+            fi
+        fi
+        
+        # Brief pause to ensure lock screen is established
+        sleep 0.5
     fi
     
     # Use UWSM if available for better session management
@@ -260,6 +314,7 @@ hibernate_system() {
 show_status() {
     local uwsm_status="not detected"
     local lock_screen_available="none"
+    local hypridle_status="not running"
     
     # Check UWSM status
     if command -v uwsm >/dev/null; then
@@ -270,6 +325,13 @@ show_status() {
         fi
     fi
     
+    # Check hypridle status
+    if command -v hyprctl >/dev/null && pgrep -x hypridle >/dev/null; then
+        hypridle_status="running (integrated)"
+    elif command -v hypridle >/dev/null; then
+        hypridle_status="available but not running"
+    fi
+    
     # Check available lock screens (in preference order)
     local lock_screens=()
     for lock_cmd in "hyprlock" "waylock" "swaylock" "gtklock" "i3lock"; do
@@ -278,8 +340,10 @@ show_status() {
         fi
     done
     
-    # Show first available as preferred if multiple exist
-    if [[ ${#lock_screens[@]} -gt 1 ]]; then
+    # Show lock method based on hypridle integration
+    if [[ "$hypridle_status" == "running (integrated)" ]]; then
+        lock_screen_available="loginctl → hypridle → hyprlock (integrated)"
+    elif [[ ${#lock_screens[@]} -gt 1 ]]; then
         lock_screen_available="${lock_screens[0]} (preferred), ${lock_screens[*]:1}"
     else
         lock_screen_available="${lock_screens[*]:-none}"
@@ -297,7 +361,8 @@ Session Information:
   UWSM Status: $uwsm_status
   
 Screen Lock:
-  Available: $lock_screen_available
+  Hypridle: $hypridle_status
+  Method: $lock_screen_available
   
 Power Management:
   Hibernation: $(systemctl hibernate --dry-run &>/dev/null && echo "supported" || echo "not available")

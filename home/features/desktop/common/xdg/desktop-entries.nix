@@ -254,17 +254,18 @@
       };
     };
     
-    "DevPod" = {
-      name = "DevPod";
-      exec = "\"DevPod Desktop\" --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime %u";
-      terminal = false;
-      categories = ["Development"];
-      icon = "DevPod-Desktop";
-      mimeType = ["x-scheme-handler/devpod"];
-      settings = {
-        StartupWMClass = "DevPod Desktop";
-      };
-    };
+    # DevPod desktop entry - disabled due to package build issues
+    # "DevPod" = {
+    #   name = "DevPod";
+    #   exec = "\"DevPod Desktop\" --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime %u";
+    #   terminal = false;
+    #   categories = ["Development"];
+    #   icon = "DevPod-Desktop";
+    #   mimeType = ["x-scheme-handler/devpod"];
+    #   settings = {
+    #     StartupWMClass = "DevPod Desktop";
+    #   };
+    # };
     
     # Hide URL handlers and additional system tools
     "code-url-handler" = {
