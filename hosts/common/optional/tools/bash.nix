@@ -9,7 +9,6 @@
   programs = {
     bash = {
       enable = true;
-      package = pkgs.bashInteractive;
       blesh = {
         enable = true;
       };
@@ -17,6 +16,7 @@
         enable = true;
         package = pkgs.bash-completion;
       };
+      # enableLsColors = true;
     };
   };
 }

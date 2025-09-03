@@ -39,7 +39,7 @@
       xdg-desktop-portal-gtk
 
       # KDE portal (for KDE applications)
-      xdg-desktop-portal-kde
+      kdePackages.xdg-desktop-portal-kde
 
       # Additional portals for specific functionality
       xdg-desktop-portal-gnome # GNOME applications
