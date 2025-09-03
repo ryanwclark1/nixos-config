@@ -72,6 +72,15 @@
     hyprpolkitagent = {
       url = "github:hyprwm/hyprpolkitagent";
     };
+    hyprsunset = {
+      url = "github:hyprwm/hyprsunset";
+      inputs = {
+        hyprlang.follows = "hyprland/hyprlang";
+        hyprutils.follows = "hyprland/hyprutils";
+        nixpkgs.follows = "hyprland/nixpkgs";
+        systems.follows = "hyprland/systems";
+      };
+    };
     # Niri
     niri = {
       url = "github:sodiboo/niri-flake";
