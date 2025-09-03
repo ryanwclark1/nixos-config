@@ -6,6 +6,7 @@
 {
   imports = [
     ./global
+    
     ./features/atuin
     ./features/bat
     ./features/btop
