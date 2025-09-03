@@ -15,6 +15,14 @@
     # claude-code
     # aider-chat
 
+    amp-cli
+    codex
+    crush
+    goose-cli
+    claude-code
+    qwen-code
+    gemini-cli
+
     # Docker for running MCP servers
     docker
     docker-compose
