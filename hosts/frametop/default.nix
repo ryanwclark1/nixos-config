@@ -36,7 +36,12 @@
     ../common/optional/services/steam.nix
     ../common/optional/services/virtualisation.nix
     ../common/optional/services/webcam.nix
+    ../common/optional/services/xdg.nix
+
+    ../common/optional/tools/bash.nix
+    ../common/optional/tools/console.nix
     ../common/optional/tools/direnv.nix
+    ../common/optional/tools/fish.nix
     ../common/optional/tools/fonts.nix
     ../common/optional/tools/wireshark.nix
     ../common/optional/tools/zsh.nix
