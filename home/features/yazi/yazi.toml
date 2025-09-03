@@ -17,8 +17,8 @@ title_format = "Yazi: {cwd}"
 [preview]
 wrap = "no"
 tab_size = 2
-max_width = 1200
-max_height = 1800
+max_width = 800
+max_height = 600
 cache_dir = "/home/administrator/.cache/yazi"
 image_delay = 30
 image_filter = "triangle"
@@ -82,7 +82,7 @@ macro_workers = 25
 bizarre_retry = 5
 image_alloc = 536870912  # 512MB
 image_bound = [0, 0]
-suppress_preload = false
+suppress_preload = true
 
 [plugin]
 fetchers = [
@@ -98,7 +98,7 @@ spotters = [
     { mime = "image/svg+xml", run = "svg" },
     { mime = "image/*", run = "image" },
     # Video
-    { mime = "video/*", run = "video" },
+    { mime = "video/*", run = "preview" },
     # Fallback
     { name = "*", run = "file" },
 ]
@@ -108,7 +108,7 @@ preloaders = [
     { mime = "image/svg+xml", run = "svg" },
     { mime = "image/*", run = "image" },
     # Video
-    { mime = "video/*", run = "video" },
+    { mime = "video/*", run = "preview" },
     # PDF
     { mime = "application/pdf", run = "pdf" },
     # Font
@@ -116,6 +116,12 @@ preloaders = [
     { mime = "application/vnd.ms-opentype", run = "font" },
 ]
 # prepend_previewers = [
+#     { mime = "video/*", run = "ffmpeg" },
+# ]
+# prepend_preloaders = [
+#     { mime = "video/*", run = "ffmpeg" },
+# ]
+# Alternative previewers:
 #     # { mime = "*/", run = "eza-preview"},q
 #     { mime = "{image,audio,video}/*", run = "mediainfo"},
 #     { mime = "{image,audio,video}/*", run = "mediainfo"},
@@ -148,7 +154,7 @@ previewers = [
     { mime = "image/svg+xml", run = "svg" },
     { mime = "image/*", run = "image" },
     # Video
-    { mime = "video/*", run = "video" },
+    { mime = "video/*", run = "preview" },
     # PDF
     { mime = "application/pdf", run = "pdf" },
     # Archive
