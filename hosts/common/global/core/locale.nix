@@ -16,12 +16,12 @@
   location.provider = "geoclue2";
 
   services.geoclue2 = {
-    enable = true;
-    submitData = false;
+    enable = lib.mkDefault true;
+    submitData = lib.mkDefault false;
   };
 
   services.timesyncd = {
-    enable = true;
+    enable = lib.mkDefault true;
     servers = [
       "time.cloudflare.com"
       "time.google.com"
@@ -34,7 +34,7 @@
   };
 
   time = {
-    hardwareClockInLocalTime = false;
+    hardwareClockInLocalTime = lib.mkDefault false;
     timeZone = lib.mkDefault "America/Chicago";
   };
 }

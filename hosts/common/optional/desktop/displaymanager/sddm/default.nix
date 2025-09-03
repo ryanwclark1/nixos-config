@@ -31,9 +31,9 @@ in
   ];
   qt.enable = true;
   services = {
-    xserver.enable = lib.mkDefault false;
+    xserver.enable = lib.mkDefault true;
     displayManager = {
-      defaultSession = "hyprland-uwsm";
+      defaultSession = lib.mkDefault "hyprland-uwsm";
       sddm = {
         enable = true;
         wayland = {

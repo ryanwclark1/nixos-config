@@ -78,31 +78,31 @@ in
       hashedPassword = null;
 
       packages = with pkgs; [
-        home-manager
+        bat
         btop
+        curl
+        fd
+        fzf
+        git
+        gnupg
+        home-manager
         iotop
-        nvme-cli
-        smartmontools
+        jq
         lsof
+        neovim
+        nmap
+        nvme-cli
+        openssl
+        pass
+        ripgrep
+        smartmontools
         strace
         tcpdump
-        wireshark
-        nmap
-        openssl
-        gnupg
-        pass
-        git
-        curl
-        wget
-        jq
-        bat
-        fd
-        ripgrep
-        fzf
         tmux
-        zsh
-        neovim
         util-linux
+        wget
+        wireshark
+        zsh
       ];
     };
   };

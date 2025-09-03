@@ -8,9 +8,9 @@
   boot = {
     # Common boot loader configuration
     loader = {
-      timeout = 3;
+      timeout = lib.mkDefault 3;
       systemd-boot = {
-        enable = true;
+        enable = lib.mkDefault true;
         consoleMode = "keep";
         # Enable secure boot support (uncomment to enable)
         # Must run setup-secureboot.sh to generate keys
@@ -25,7 +25,7 @@
         # - Can be overridden per host for specific needs (e.g., desktop vs laptop)
         configurationLimit = 10;
       };
-      efi.canTouchEfiVariables = true;
+      efi.canTouchEfiVariables = lib.mkDefault true;
     };
 
     # Common kernel settings
@@ -33,11 +33,11 @@
 
     # Enable systemd in initrd for better boot process
     initrd = {
-      systemd.enable = true;
+      systemd.enable = lib.mkDefault true;
       # Enable verbose output for debugging
-      verbose = false;
+      verbose = lib.mkDefault false;
       # Enable network support in initrd (useful for remote unlocking)
-      network.enable = false;
+      network.enable = lib.mkDefault false;
       # Enable SSH in initrd for remote unlocking (optional)
       # network.ssh.enable = true;
     };
