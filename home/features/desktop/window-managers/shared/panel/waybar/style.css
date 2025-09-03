@@ -19,6 +19,10 @@
   margin-right: 8px;
 }
 
+#workspaces {
+  margin-right: 6px;
+}
+
 #workspaces button {
   all: initial;
   padding: 0 6px;
@@ -42,6 +46,7 @@
 
 #custom-launcher {
   margin-right: 7px;
+  font-size: 14px;
 }
 
 

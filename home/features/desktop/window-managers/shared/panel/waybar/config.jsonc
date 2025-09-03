@@ -155,7 +155,7 @@
             "(.*) - Google Chrome": "󰊯 $1",
             "(.*) - Code - OSS": "󰨞 $1",
             "(.*) - VSCode": "󰨞 $1",
-            "(.*) - Visal Studio Code": "󰨞 $1",
+            "(.*) - Visual Studio Code": "󰨞 $1",
             "(.*) - Cursor": "󰨞 $1",
             "(.*) - kitty": "󰄛 $1",
             "(.*) - Alacritty": "󰊠 $1",
@@ -164,7 +164,8 @@
             "(.*)Steam(.*)": "󰓓 Steam",
             "(.*)Telegram(.*)": "󰭹 Telegram",
             "(.*)Files(.*)": "󰉋 Files",
-            "(.*)thunar(.*)": "󰉋 Files"
+            "(.*)thunar(.*)": "󰉋 Files",
+            "(.*)tmux(.*)": " TMUX"
         },
         "tooltip": true
     },
