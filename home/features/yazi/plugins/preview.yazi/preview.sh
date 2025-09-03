@@ -40,6 +40,9 @@ FILE_EXTENSION="${FILE_PATH##*.}"
 FILE_EXTENSION_LOWER="$(printf "%s" "${FILE_EXTENSION}" | tr '[:upper:]' '[:lower:]')"
 FILE_NAME="${FILE_PATH##*/}"
 
+# Standardized EXIF tags for consistent metadata display
+EXIF_TAGS="-FileName -FileSize -FileModifyDate -FilePermissions -FileTypeExtension -MIMEType -ImageSize"
+
 exist_command() {
   command -v "$1" &>/dev/null
 }
@@ -77,9 +80,18 @@ handle_text() {
 }
 
 handle_json() {
+  # Show EXIF metadata first
+  exiftool -s $EXIF_TAGS "$FILE_PATH" | bat -l yaml
+  echo -e "\n--- JSON Content ---"
+  
+  # Use jq for better JSON formatting if available
+  if exist_command jq; then
+    jq --color-output . "$FILE_PATH" 2>/dev/null | head -n 100 && exit
+  fi
+  
+  # Fallback to bat
   bat -l json "$FILE_PATH" --theme=TwoDark && exit
-  # jq -C --tab . "${FILE_PATH}" && exit
-  # handle_text
+  handle_text
 }
 
 echo_image_path() {
@@ -164,14 +176,115 @@ handle_audio() {
   #   -sexagesimal -v quiet -of flat "${FILE_PATH}" | bat -l ini
 }
 
+# Freedesktop.org thumbnail specification functions
+get_xdg_cache_home() {
+  if [ -n "$XDG_CACHE_HOME" ]; then
+    echo "$XDG_CACHE_HOME"
+  else
+    echo "$HOME/.cache"
+  fi
+}
+
+# Generate MD5 hash for freedesktop thumbnail naming
+get_file_uri_hash() {
+  local file_path="$1"
+  local file_uri="file://$(realpath "$file_path")"
+  echo -n "$file_uri" | md5sum | cut -d' ' -f1
+}
+
+# Determine best freedesktop thumbnail size for yazi dimensions
+get_thumbnail_size_info() {
+  local target_width="$1"
+  local target_height="$2"
+  local max_dim=$((target_width > target_height ? target_width : target_height))
+  
+  if [ "$max_dim" -le 128 ]; then
+    echo "normal 128"
+  elif [ "$max_dim" -le 256 ]; then
+    echo "large 256"
+  elif [ "$max_dim" -le 512 ]; then
+    echo "x-large 512"
+  else
+    echo "xx-large 1024"
+  fi
+}
+
+# Get or create freedesktop thumbnail
+get_freedesktop_thumbnail() {
+  local file_path="$1"
+  local time_offset="${2:-0}"
+  
+  local cache_home="$(get_xdg_cache_home)"
+  local file_hash="$(get_file_uri_hash "$file_path")"
+  local size_info="$(get_thumbnail_size_info 800 600)"
+  local size_name="$(echo "$size_info" | cut -d' ' -f1)"
+  local size_px="$(echo "$size_info" | cut -d' ' -f2)"
+  
+  local thumb_dir="$cache_home/thumbnails/$size_name"
+  local thumb_file="$thumb_dir/${file_hash}.png"
+  
+  # Check if thumbnail exists and is newer than source
+  if [ -f "$thumb_file" ] && [ "$thumb_file" -nt "$file_path" ]; then
+    echo_image_path "$thumb_file"
+    return 0
+  fi
+  
+  # Create thumbnail directory if it doesn't exist
+  mkdir -p "$thumb_dir" 2>/dev/null || true
+  
+  # Generate thumbnail using ffmpeg with proper freedesktop sizing
+  local temp_thumb="$(mktemp --suffix=.png)"
+  if ffmpeg -v quiet -ss "$time_offset" -i "$file_path" -frames:v 1 \
+    -vf "scale=$size_px:$size_px:force_original_aspect_ratio=decrease,pad=$size_px:$size_px:(ow-iw)/2:(oh-ih)/2:color=black@0" \
+    -f image2 "$temp_thumb" 2>/dev/null; then
+    
+    # Add freedesktop metadata to thumbnail
+    if exist_command exiftool; then
+      local file_uri="file://$(realpath "$file_path")"
+      local file_mtime="$(stat -c %Y "$file_path" 2>/dev/null || stat -f %m "$file_path" 2>/dev/null)"
+      local file_size="$(stat -c %s "$file_path" 2>/dev/null || stat -f %z "$file_path" 2>/dev/null)"
+      
+      exiftool -overwrite_original \
+        -Subject="$file_uri" \
+        -Comment="Thumb::URI=$file_uri" \
+        -UserComment="Thumb::MTime=$file_mtime" \
+        -ImageDescription="Thumb::Size=$file_size" \
+        "$temp_thumb" 2>/dev/null || true
+    fi
+    
+    # Move to final location atomically
+    if mv "$temp_thumb" "$thumb_file" 2>/dev/null; then
+      echo_image_path "$thumb_file"
+      return 0
+    fi
+  fi
+  
+  # Cleanup on failure
+  rm -f "$temp_thumb" 2>/dev/null || true
+  return 1
+}
+
 handle_video() {
-  # mediainfo "${FILE_PATH}" && exit 5
-  #   exiftool "${FILE_PATH}" && exit 5
   if [ "$PREVIEW_OFFSET" -gt 9 ] || [ "$PREVIEW_OFFSET" -lt 0 ]; then
     exit 3
   fi
-  with_cache -ext "$PREVIEW_OFFSET" -img -- ffmpegthumbnailer -q 6 -c jpeg -i "$FILE_PATH" -o /dev/stdout -t $((PREVIEW_OFFSET * 10)) -s 600
+  
+  # Simple thumbnail generation and display
+  local thumb_file="${TMPDIR:-/tmp}/yazi_video_$(basename "$FILE_PATH" | tr ' ' '_')_${PREVIEW_OFFSET}.jpg"
+  
+  if [ ! -f "$thumb_file" ] || [ "$FILE_PATH" -nt "$thumb_file" ]; then
+    ffmpeg -v quiet -ss $((PREVIEW_OFFSET * 10)) -i "$FILE_PATH" -frames:v 1 -q:v 2 -f image2 \
+      -vf "scale=800:600:force_original_aspect_ratio=decrease,pad=800:600:(ow-iw)/2:(oh-ih)/2" \
+      "$thumb_file" 2>/dev/null
+  fi
+  
+  if [ -f "$thumb_file" ]; then
+    echo_image_path "$thumb_file"
+  fi
+  
   echo "$PREVIEW_OFFSET"
+  
+  # Show video metadata
   if exist_command ffprobe; then
     ffprobe -select_streams v:0 \
       -show_entries format=duration,bit_rate:stream=codec_name,width,height,avg_frame_rate,r_frame_rate,display_aspect_ratio,duration:format_tags \
@@ -182,8 +295,36 @@ handle_video() {
 }
 
 process_compress_file() {
+  # Show EXIF metadata first
+  exiftool -s $EXIF_TAGS "$FILE_PATH" | bat -l yaml
+  echo -e "\n--- Archive Contents ---"
+  
+  # Choose best tool based on file type
+  case "${FILE_EXTENSION_LOWER}" in
+    7z|bz2|bzip2)
+      if exist_command 7z; then
+        7z l "$FILE_PATH" | awk '/Date/{print}' | bat -l plain
+        return
+      fi
+      ;;
+    zip)
+      if exist_command atool; then
+        atool --list -- "$FILE_PATH" | bat -l plain
+        return
+      fi
+      ;;
+    tar|gz|xz|tgz)
+      if exist_command atool; then
+        echo -e "Permission\tUID/GID\t\tSize\tDate\tTime\tFileName"
+        echo -e "---------\t-------\t\t----\t----\t----\t--------"
+        atool --list -- "$FILE_PATH" | bat -l plain
+        return
+      fi
+      ;;
+  esac
+  
+  # Fallback to original method
   (bsdtar --list --file "${FILE_PATH}" || (lsar "${FILE_PATH}" | tail -n +2)) | tree -C --fromfile .
-  # bsdtar --list --file "${FILE_PATH}" | tree -C --fromfile .
 }
 
 handle_compress() {
@@ -235,7 +376,23 @@ handle_ipynb() {
 
 handle_image() {
   echo_image_path "$FILE_PATH"
-  exiftool '-ImageSize' '-*' "${FILE_PATH}" | bat -l yaml
+  
+  # Show standardized EXIF data
+  exiftool -s $EXIF_TAGS "${FILE_PATH}" | bat -l yaml
+  
+  # Optional: Add chafa preview for terminal image viewing
+  if exist_command chafa && [ "$TESTING" = true ]; then
+    echo -e "\n--- Terminal Preview ---"
+    case "$TERM" in
+      *kitty)
+        chafa --format=kitty --size="${PREVIEW_WIDTH}x$((PREVIEW_HEIGHT/2))" "${FILE_PATH}" 2>/dev/null || \
+        chafa --format=symbols --size="${PREVIEW_WIDTH}x$((PREVIEW_HEIGHT/2))" "${FILE_PATH}"
+        ;;
+      *)
+        chafa --format=symbols --size="${PREVIEW_WIDTH}x$((PREVIEW_HEIGHT/2))" "${FILE_PATH}"
+        ;;
+    esac
+  fi
 }
 
 process_docx() {
@@ -264,19 +421,14 @@ mlr() {
 }
 
 preview_sqlite3() {
-  # if [ "$PREVIEW_OFFSET" == 0 ]; then
+  # Show EXIF metadata
+  exiftool -s $EXIF_TAGS "$FILE_PATH" | bat -l yaml
+  
+  echo -e "\n--- Database Tables ---"
+  sqlite3 "$FILE_PATH" .tables | tr ' ' '\n' | sort | bat -l plain
+  
+  echo -e "\n--- Database Schema ---" 
   sqlite3 "$FILE_PATH" .schema | sed "s/;/;\n/g" | bat -l sql
-  # else
-  #   disable_auto_peek
-  #   local table="$(sqlite3 -header "$FILE_PATH" .tables | tr '\n' " " | tr -s " " | cut -d " " -f "$PREVIEW_OFFSET")"
-  #   if [ -z "$table" ]; then
-  #     exit 3
-  #   fi
-  #   local sql="SELECT * FROM $table LIMIT 100;"
-  #   echo -e "${sql}\n" | bat -l sql
-  #   # sqlite3 will append hex d4 to the end of last column name, which will crash preview, so remove it
-  #   sqlite3 -header -csv "$FILE_PATH" "$sql" | sed 's/\xd4//g' | mlr
-  # fi
 }
 
 process_netease_uc() {

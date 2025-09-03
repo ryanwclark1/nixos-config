@@ -37,15 +37,51 @@
   };
 
   home.packages = with pkgs; [
-    exiftool
-    ueberzugpp
-    ffmpegthumbnailer
-    poppler_utils
-    mediainfo
-    hexyl
-    ripdrag
-    xlsx2csv
-    miller
+    # Core file analysis
+    file              # File type detection (MIME types)
+    exiftool          # Metadata extraction
+
+    # Image/Video processing
+    ueberzugpp        # Yazi image display
+    ffmpegthumbnailer # Legacy video thumbnails (can be removed eventually)
+    ffmpeg           # Modern video thumbnail generation
+    chafa            # Terminal image display
+    librsvg          # SVG handling
+
+    # Document processing
+    poppler_utils    # PDF text extraction (pdftotext, pdfinfo)
+    epub2txt2        # EPUB text extraction
+    xlsx2csv         # Excel/spreadsheet conversion
+    odt2txt          # OpenDocument text extraction
+
+    # Archive handling
+    atool            # Universal archive tool
+    p7zip            # 7z archive support
+
+    # Data processing
+    mediainfo        # Audio/video metadata
+    hexyl            # Binary file viewer
+    miller           # CSV/data processing (mlr)
+    jq               # JSON formatting and processing
+
+    # Web content
+    elinks           # HTML text rendering
+
+    # Additional document tools
+    glow             # Markdown rendering
+    pandoc           # Document conversion
+
+    # Archive utilities
+    unzip            # ZIP extraction
+    unar             # Archive listing (provides lsar command)
+
+    # Development tools
+    bat              # Syntax highlighting (should be available via programs.bat)
+
+    # Utilities
+    ripdrag          # Drag and drop support
+    sqlite           # Database inspection
+    transmission_4     # Torrent info (transmission-show)
   ];
 
   programs.yazi = {
@@ -59,23 +95,24 @@
     enableNushellIntegration = lib.mkIf config.programs.nushell.enable true;
     plugins = {
       arrow = ./plugins/arrow.yazi;
-      chmod = ./plugins/chmod.yazi;
+      chmod = pkgs.yaziPlugins.chmod;
       excel = ./plugins/excel.yazi;
       eza-preview = ./plugins/eza-preview.yazi;
       folder-rules = ./plugins/folder-rules.yazi;
       fzfbm = ./plugins/fzfbm.yazi;
-      glow = ./plugins/glow.yazi;
+      glow = pkgs.yaziPlugins.glow;
       hexyl = ./plugins/hexyl.yazi;
-      lazygit = ./plugins/lazygit.yazi;
+      lazygit = pkgs.yaziPlugins.lazygit;
       max-preview = ./plugins/max-preview.yazi;
-      mediainfo = ./plugins/mediainfo.yazi;
-      ouch = ./plugins/ouch.yazi;
+      mediainfo = pkgs.yaziPlugins.mediainfo;
+      ouch = pkgs.yaziPlugins.ouch;
       parent-arrow = ./plugins/parent-arrow.yazi;
-      smart-enter = ./plugins/smart-enter.yazi;
-      smart-filter = ./plugins/smart-filter.yazi;
-      smart-paste = ./plugins/smart-paste.yazi;
-      yatline = ./plugins/yatline.yazi;
-      yatline-catppuccin = ./plugins/yatline-catppuccin.yazi;
+      preview = ./plugins/preview.yazi;
+      smart-enter = pkgs.yaziPlugins.smart-enter;
+      smart-filter = pkgs.yaziPlugins.smart-filter;
+      smart-paste = pkgs.yaziPlugins.smart-paste;
+      yatline = pkgs.yaziPlugins.yatline;
+      yatline-catppuccin = pkgs.yaziPlugins.yatline-catppuccin;
     };
     theme = {
       flavor = {
