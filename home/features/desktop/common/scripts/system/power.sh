@@ -45,12 +45,13 @@ notify() {
 
 # Detect and execute lock screen
 lock_screen() {
+    # Preferred order: hyprlock most likely, but try all available options
     local lock_commands=(
-        "hyprlock"           # Hyprland lock screen
-        "swaylock"           # Sway/generic Wayland lock
+        "hyprlock"           # Most likely choice for Hyprland setups
+        "waylock"            # Minimal Wayland lock with good security
+        "swaylock -f"        # Sway/generic Wayland lock (fork to background)
         "gtklock"            # GTK-based lock screen
-        "waylock"            # Minimal Wayland lock
-        "i3lock"             # i3 lock screen (X11 fallback)
+        "i3lock -n"          # i3 lock screen (X11 fallback, no fork)
         "xscreensaver-command -lock"  # Xscreensaver (X11 fallback)
     )
     
@@ -60,9 +61,9 @@ lock_screen() {
             log "Locking screen with: $lock_cmd"
             notify "System" "Screen locked"
             
-            # Execute lock command
-            if $lock_cmd; then
-                log "Screen locked successfully"
+            # Execute lock command with proper error handling
+            if eval "$lock_cmd" 2>/dev/null; then
+                log "Screen locked successfully with $cmd_name"
                 return 0
             else
                 log "Warning: $lock_cmd failed, trying next option"
@@ -78,6 +79,14 @@ lock_screen() {
 
 # Detect and execute logout
 logout_session() {
+    # Check for UWSM (Universal Wayland Session Manager) first
+    if command -v uwsm >/dev/null && [[ -n "${UWSM_ID:-}" ]]; then
+        log "Logging out via UWSM"
+        notify "System" "Logging out..."
+        uwsm stop
+        return 0
+    fi
+    
     # Try window manager specific logout commands
     if command -v hyprctl >/dev/null; then
         log "Logging out from Hyprland"
@@ -154,11 +163,24 @@ suspend_system() {
     
     # Optional: Lock screen before suspend
     if [[ "${LOCK_BEFORE_SUSPEND:-true}" == "true" ]]; then
+        # Background the lock screen to prevent blocking suspend
         lock_screen &
-        sleep 1  # Give lock screen time to start
+        # Give lock screen time to initialize and display
+        # Most modern lock screens are fast but need a moment to set up
+        sleep 1.5
     fi
     
-    if systemctl suspend; then
+    # Use UWSM if available for better session management
+    if command -v uwsm >/dev/null && [[ -n "${UWSM_ID:-}" ]]; then
+        log "Suspending via UWSM"
+        if uwsm app -- systemctl suspend; then
+            log "System suspended successfully"
+        else
+            log "Failed to suspend system via UWSM"
+            notify "Error" "Failed to suspend system"
+            return 1
+        fi
+    elif systemctl suspend; then
         log "System suspended successfully"
     else
         log "Failed to suspend system"
@@ -209,11 +231,23 @@ hibernate_system() {
     
     # Optional: Lock screen before hibernate
     if [[ "${LOCK_BEFORE_HIBERNATE:-true}" == "true" ]]; then
+        # Background the lock screen to prevent blocking hibernate
         lock_screen &
-        sleep 1  # Give lock screen time to start
+        # Give lock screen time to initialize and display
+        sleep 1.5
     fi
     
-    if systemctl hibernate; then
+    # Use UWSM if available for better session management
+    if command -v uwsm >/dev/null && [[ -n "${UWSM_ID:-}" ]]; then
+        log "Hibernating via UWSM"
+        if uwsm app -- systemctl hibernate; then
+            log "System hibernated successfully"
+        else
+            log "Failed to hibernate system via UWSM"
+            notify "Error" "Failed to hibernate system"
+            return 1
+        fi
+    elif systemctl hibernate; then
         log "System hibernated successfully"
     else
         log "Failed to hibernate system"
@@ -224,6 +258,33 @@ hibernate_system() {
 
 # Show system status
 show_status() {
+    local uwsm_status="not detected"
+    local lock_screen_available="none"
+    
+    # Check UWSM status
+    if command -v uwsm >/dev/null; then
+        if [[ -n "${UWSM_ID:-}" ]]; then
+            uwsm_status="active (ID: ${UWSM_ID})"
+        else
+            uwsm_status="installed but not active"
+        fi
+    fi
+    
+    # Check available lock screens (in preference order)
+    local lock_screens=()
+    for lock_cmd in "hyprlock" "waylock" "swaylock" "gtklock" "i3lock"; do
+        if command -v "$lock_cmd" >/dev/null; then
+            lock_screens+=("$lock_cmd")
+        fi
+    done
+    
+    # Show first available as preferred if multiple exist
+    if [[ ${#lock_screens[@]} -gt 1 ]]; then
+        lock_screen_available="${lock_screens[0]} (preferred), ${lock_screens[*]:1}"
+    else
+        lock_screen_available="${lock_screens[*]:-none}"
+    fi
+    
     cat << EOF
 System Power Status:
   Uptime: $(uptime -p 2>/dev/null || echo "unknown")
@@ -233,6 +294,10 @@ Session Information:
   User: $USER
   Desktop: ${XDG_CURRENT_DESKTOP:-unknown}
   Session Type: ${XDG_SESSION_TYPE:-unknown}
+  UWSM Status: $uwsm_status
+  
+Screen Lock:
+  Available: $lock_screen_available
   
 Power Management:
   Hibernation: $(systemctl hibernate --dry-run &>/dev/null && echo "supported" || echo "not available")
@@ -268,7 +333,8 @@ Environment Variables:
 
 Dependencies:
     - systemd (systemctl)
-    - Lock screen program (hyprlock, swaylock, etc.) for lock action
+    - Lock screen program (hyprlock, waylock, swaylock, etc.) for lock action
+    - uwsm (Universal Wayland Session Manager) - optional but recommended for Wayland sessions
 EOF
 }
 
