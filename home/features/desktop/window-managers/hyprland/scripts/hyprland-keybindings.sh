@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
 # Hyprland keybindings display with auto-generated descriptions
-# Dependencies: hyprctl, jq, rofi-wayland
+# Dependencies: hyprctl, jq, rofi-wayland or walker
+# Supports both rofi (default) and walker interfaces
+# Usage: hyprland-keybindings.sh [--walker|-w]
 
 # Check for required dependencies
 if ! command -v hyprctl >/dev/null 2>&1; then
@@ -14,8 +16,21 @@ if ! command -v jq >/dev/null 2>&1; then
     exit 1
 fi
 
-if ! command -v rofi >/dev/null 2>&1; then
-    echo "Error: rofi not found. Please install rofi-wayland package." >&2
+# Check for available display method (prioritize rofi, allow walker override)
+launcher=""
+if [[ "$1" == "--walker" || "$1" == "-w" ]]; then
+    if command -v walker >/dev/null 2>&1; then
+        launcher="walker"
+    else
+        echo "Error: walker not found but requested via parameter." >&2
+        exit 1
+    fi
+elif command -v rofi >/dev/null 2>&1; then
+    launcher="rofi"
+elif command -v walker >/dev/null 2>&1; then
+    launcher="walker"
+else
+    echo "Error: Neither rofi nor walker found. Please install one of them." >&2
     exit 1
 fi
 
@@ -142,5 +157,95 @@ if [ -z "$organized_keybinds" ]; then
     exit 1
 fi
 
-# Display in rofi
-rofi -dmenu -i -markup -eh 2 -replace -p "Keybinds" <<< "$organized_keybinds"
+# Create keybinding lookup table for execution
+keybind_lookup=$(hyprctl binds -j | jq -r '.[] | .key + "\t" + .modmask + "\t" + .dispatcher + "\t" + .arg' 2>/dev/null)
+
+# Display with appropriate launcher and capture selection
+selected=""
+if [ "$launcher" = "walker" ]; then
+    # Walker format: simpler, arrow-based like the .nix version
+    walker_keybinds=$(echo "$organized_keybinds" | sed -E \
+        -e 's/\t/ → /' \
+        -e 's/--- (.+) ---/\n# \1:/' \
+        -e '/^$/d')
+    selected=$(walker --dmenu -p 'Hyprland Keybindings' <<< "$walker_keybinds")
+else
+    # Rofi format: categorized with single-line keybindings
+    rofi_keybinds=$(echo "$organized_keybinds" | sed -E \
+        -e 's/\t/ → /' \
+        -e 's/\r/ /')
+    selected=$(rofi -dmenu -i -markup -eh 2 -replace -p "Keybinds" <<< "$rofi_keybinds")
+fi
+
+# Execute selected keybinding if one was chosen
+if [ -n "$selected" ] && [[ ! "$selected" =~ ^(---|#) ]]; then
+    # Extract the key combination from the selected line
+    key_combo=$(echo "$selected" | sed 's/ →.*//' | sed 's/^ *//;s/ *$//')
+    
+    if [ -n "$key_combo" ]; then
+        # Convert key combo back to modmask and key for lookup
+        case "$key_combo" in
+            "SUPER + ALT + "*) 
+                modmask="72"
+                key=$(echo "$key_combo" | sed 's/SUPER + ALT + //')
+                ;;
+            "SUPER + CTRL + "*) 
+                modmask="68"
+                key=$(echo "$key_combo" | sed 's/SUPER + CTRL + //')
+                ;;
+            "SUPER + SHIFT + "*) 
+                modmask="65"
+                key=$(echo "$key_combo" | sed 's/SUPER + SHIFT + //')
+                ;;
+            "CTRL + ALT + "*) 
+                modmask="12"
+                key=$(echo "$key_combo" | sed 's/CTRL + ALT + //')
+                ;;
+            "SHIFT + ALT + "*) 
+                modmask="9"
+                key=$(echo "$key_combo" | sed 's/SHIFT + ALT + //')
+                ;;
+            "SHIFT + CTRL + "*) 
+                modmask="5"
+                key=$(echo "$key_combo" | sed 's/SHIFT + CTRL + //')
+                ;;
+            "SUPER + "*) 
+                modmask="64"
+                key=$(echo "$key_combo" | sed 's/SUPER + //')
+                ;;
+            "ALT + "*) 
+                modmask="8"
+                key=$(echo "$key_combo" | sed 's/ALT + //')
+                ;;
+            "CTRL + "*) 
+                modmask="4"
+                key=$(echo "$key_combo" | sed 's/CTRL + //')
+                ;;
+            "SHIFT + "*) 
+                modmask="1"
+                key=$(echo "$key_combo" | sed 's/SHIFT + //')
+                ;;
+            *) 
+                modmask="0"
+                key="$key_combo"
+                ;;
+        esac
+        
+        # Find matching binding and execute
+        binding_info=$(echo "$keybind_lookup" | awk -F'\t' -v key="$key" -v mask="$modmask" '$1 == key && $2 == mask {print $3 "\t" $4}' | head -n1)
+        
+        if [ -n "$binding_info" ]; then
+            dispatcher=$(echo "$binding_info" | cut -f1)
+            arg=$(echo "$binding_info" | cut -f2)
+            
+            # Execute the binding
+            if [ -n "$arg" ] && [ "$arg" != "null" ]; then
+                hyprctl dispatch "$dispatcher" "$arg"
+            else
+                hyprctl dispatch "$dispatcher"
+            fi
+        else
+            notify-send "Keybinding" "Could not find binding for: $key_combo" -t 2000
+        fi
+    fi
+fi
