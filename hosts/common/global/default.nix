@@ -7,31 +7,13 @@
 
 {
   imports = [
-    # Core system modules
     ./core
-
-    # Networking
     ./networking
-
-    # Security
     ./security
-
-    # Nix ecosystem
     ./nix
-
-    # Performance tuning
-    ./performance
-
-    # Virtualisation
     ./virtualisation
-
-    # Monitoring
     ./monitoring
-
-    # Configuration validation
     ./validation
-
-    # Secrets management
     ./sops.nix
 
     # Home manager

@@ -8,23 +8,26 @@
   # Add system-wide performance improvements
   services = {
     # Enable fstrim for SSD optimization
-    fstrim.enable = true;
+    fstrim.enable = lib.mkDefault true;
+
+    # Enable irqbalance for better CPU interrupt handling
+    irqbalance.enable = lib.mkDefault true;
   };
 
   # Enable systemd-oomd for better memory management
   systemd.oomd = {
-    enable = true;
-    enableRootSlice = true;
-    enableUserSlices = true;
+    enable = lib.mkDefault true;
+    enableRootSlice = lib.mkDefault true;
+    enableUserSlices = lib.mkDefault true;
   };
 
   # Common hardware settings
   hardware = {
-    enableAllFirmware = true;
-    enableRedistributableFirmware = true;
+    enableAllFirmware = lib.mkDefault true;
+    enableRedistributableFirmware = lib.mkDefault true;
     graphics = {
-      enable = true;
-      enable32Bit = true;
+      enable = lib.mkDefault true;
+      enable32Bit = lib.mkDefault true;
     };
   };
 }

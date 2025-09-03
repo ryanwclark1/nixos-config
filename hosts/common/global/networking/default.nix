@@ -1,6 +1,6 @@
 {
   imports = [
     ./networking.nix
-    ./resolved-fixes.nix
+    # ./resolved-fixes.nix
   ];
 }
