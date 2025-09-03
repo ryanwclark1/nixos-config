@@ -1,4 +1,4 @@
-@define-color foreground #4c4f69; /* text */
-@define-color background #eff1f5; /* base */
-@define-color border     #dce0e8; /* crust */
-@define-color accent     #1e66f5; /* blue */
+@define-color foreground #c6d0f5; /* text */
+@define-color background rgba(48, 52, 70, 0.75); /* base */
+@define-color border     #292c3c; /* crust */
+@define-color accent     #ca9ee6; /* blue */
