@@ -23,7 +23,8 @@ Platform and window manager independent utilities:
 - **`volume.sh`** - Audio volume control with rofi interface
 - **`brightness.sh`** - Display brightness control with rofi interface  
 - **`power.sh`** - Power management (lock/logout/suspend/reboot/shutdown)
-- **`launch-webapp.sh`** - Web application launcher with UWSM support
+- **`battery.sh`** - Battery status and power management with rofi interface
+- **`figlet.sh`** - ASCII art text generator with clipboard support
 
 **Dependencies**: Core system utilities, optional rofi/notifications
 **Usage**: Works with any desktop environment or window manager
