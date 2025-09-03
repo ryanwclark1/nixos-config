@@ -9,7 +9,7 @@
 
     ./features/ai
     ./features/aichat
-    # ./features/alacritty    # Removed: using ghostty as primary terminal
+    ./features/alacritty
     ./features/ansible
     ./features/atuin
     ./features/audio
@@ -22,6 +22,7 @@
     ./features/compression
     ./features/cursor
     ./features/development
+    ./features/discord
     ./features/docker
     ./features/docs
     ./features/dotfiles
@@ -42,16 +43,18 @@
     ./features/lazygit
     ./features/media
     ./features/multiviewer
-    ./features/networking-utils
     ./features/neovim
+    ./features/networking-utils
     ./features/productivity
-    # ./features/qutebrowser
+    ./features/qutebrowser
     ./features/remmina
     ./features/ripgrep
     ./features/shell
+    ./features/slack
     ./features/starship
     ./features/sys-stats
     ./features/tmux
+    ./features/virtualisation
     ./features/vscode
     ./features/webapps
     # ./features/whispar
@@ -59,14 +62,14 @@
     ./features/windsurf
     ./features/yazi
     ./features/zellij
-    # ./features/zen
     ./features/zoxide
 
     # Desktop environment configuration
     ./features/desktop/common # Core desktop components
-    ./features/desktop/window-managers # Window managers and shared WM tools
+    ./features/desktop/window-managers/shared # Window managers and shared WM tools
+    ./features/desktop/window-managers/hyprland # Hyprland window manager
     ./features/desktop/window-managers/hyprland/host-specific/woody.nix
-    ./features/desktop/window-managers/niri/host-specific/woody.nix
+    # ./features/desktop/window-managers/niri/host-specific/woody.nix
 
     # Application launcher cleanup
   ];
