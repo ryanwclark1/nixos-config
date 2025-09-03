@@ -261,175 +261,180 @@
           #   sha256 = "sha256-TXXOuayVohQPp+yQAHbsZDr/UYtyHmUkaLU+lADpjDU=";
           #   version = "25.8.1";
           # }
-          {
-            name = "biome";
-            publisher = "biomejs";
-            sha256 = "sha256-wWyLIjNOBjIe72ed+wwfQWGH7Vzuea/0Xux0XJkhAkY=";
-            version = "2025.7.41733";
-          }
-          # {
-          #   name = "claude-code-chat";  # Removed: redundant with claude-dev
-          #   publisher = "AndrePimenta";
-          #   sha256 = "sha256-6ijv2MLYji5amcxGKJ3+MhQTk+yLiFKVsXPJMqGgyc0=";
-          #   version = "1.0.5";
-          # }
-          {
-            name = "claude-dev";
-            publisher = "saoudrizwan";
-            sha256 = "sha256-bomhvgLWQk3rwLweJJEuLlN6+s1vfvzxpJgik+Yyygo=";
-            version = "3.26.5";
-          }
-          # {
-          #   name = "context7-mcp";  # Removed: conflicts with home-manager MCP setup
-          #   publisher = "upstash";
-          #   sha256 = "sha256-q6SkIy7eZ9H1yOnZygkcXQcpTK4eu6/jjud1wqEL2Mw=";
-          #   version = "1.0.1";
-          # }
-          {
-            name = "copilot";
-            publisher = "github";
-            sha256 = "sha256-UVNHbNmfu6F622ISU8uCjDOsJ/86JLbO9lTsouDMIgI=";
-            version = "1.362.1759";
-          }
-          # Use nixpkgs version instead of marketplace version for better compatibility
-          {
-            name = "copilot-chat";
-            publisher = "github";
-            sha256 = "sha256-itANvwMSzFBPnU4B6erEXO/x3SNlqHygXlTE6jLc+0U=";
-            version = "0.30.1";
-          }
-          {
-            name = "explorer";
-            publisher = "vitest";
-            sha256 = "sha256-r1KCT6UYgoCPRRxy+dmJLkwUW2yRixBwfYra4kSJYB0=";
-            version = "1.28.2";
-          }
-          {
-            name = "grafana-alloy";
-            publisher = "grafana";
-            sha256 = "sha256-XcoiEDCPp6GzYQDhJArZBEWxSnZrSTHofIyLFegsbh0=";
-            version = "0.2.0";
-          }
-          {
-            name = "grafana-vscode";
-            publisher = "grafana";
-            sha256 = "sha256-TpLOMwdaEdgzWVwUcn+fO4rgLiQammWQM8LQobt8gLw=";
-            version = "0.0.19";
-          }
-          # {
+            {
+              name = "biome";
+              publisher = "biomejs";
+              sha256 = "sha256-wWyLIjNOBjIe72ed+wwfQWGH7Vzuea/0Xux0XJkhAkY=";
+              version = "2025.7.41733";
+            }
+            # {
+            #   name = "claude-code-chat";  # Removed: redundant with claude-dev
+            #   publisher = "AndrePimenta";
+            #   sha256 = "sha256-tPY9mXpfzhRwbrbo0evInzLnKoaCc3zki6akFGaFQsg=";
+            #   version = "1.0.6";
+            # }
+            {
+              name = "claude-dev";
+              publisher = "saoudrizwan";
+              sha256 = "sha256-6sE0nwgB7FSnAlnj/2NRxPP0JdH+KKez4ifPnCcLsrQ=";
+              version = "3.27.0";
+            }
+            # {
+            #   name = "context7-mcp";  # Removed: conflicts with home-manager MCP setup
+            #   publisher = "upstash";
+            #   sha256 = "sha256-q6SkIy7eZ9H1yOnZygkcXQcpTK4eu6/jjud1wqEL2Mw=";
+            #   version = "1.0.1";
+            # }
+            {
+              name = "copilot";
+              publisher = "github";
+              sha256 = "sha256-Irp2xqVySCo5cKHxTGXVcr8koPyJBRk0VH+RfQ+eZec=";
+              version = "1.366.1775";
+            }
+            {
+              name = "copilot-chat";
+              publisher = "github";
+              sha256 = "sha256-99Ez7lIK9IoTk3lfaCRBRYSoaC3v50tFJvO2t+Tflm0=";
+              version = "0.31.2025090302";
+            }
+            {
+              name = "explorer";
+              publisher = "vitest";
+              sha256 = "sha256-r1KCT6UYgoCPRRxy+dmJLkwUW2yRixBwfYra4kSJYB0=";
+              version = "1.28.2";
+            }
+            {
+              name = "grafana-alloy";
+              publisher = "grafana";
+              sha256 = "sha256-XcoiEDCPp6GzYQDhJArZBEWxSnZrSTHofIyLFegsbh0=";
+              version = "0.2.0";
+            }
+            {
+              name = "grafana-vscode";
+              publisher = "grafana";
+              sha256 = "sha256-TpLOMwdaEdgzWVwUcn+fO4rgLiQammWQM8LQobt8gLw=";
+              version = "0.0.19";
+            }
+            # {
           #   name = "htmx-attributes";  # Removed: only needed if using HTMX
-          #   publisher = "craigrbroughton";
-          #   sha256 = "sha256-TsemPZkq2Z13/vahRaP7z206BJaCZ1TR6OVv6aeDvyk=";
-          #   version = "0.8.0";
-          # }
-          {
-            name = "mypy-type-checker";
-            publisher = "ms-python";
-            sha256 = "sha256-IeWhMA1ht2npPVDqJmv3IOmrlKp9uuhycGNT7h+rNks=";
-            version = "2025.3.12271015";
-          }
-          {
+            #   publisher = "craigrbroughton";
+            #   sha256 = "sha256-TsemPZkq2Z13/vahRaP7z206BJaCZ1TR6OVv6aeDvyk=";
+            #   version = "0.8.0";
+            # }
+            {
+              name = "hyprland";
+              publisher = "ewen-lbh";
+              sha256 = "sha256-GaDpbkqNyIElSBnHwxc2ntmEVAGwL9XlNIBWNo7pvwM=";
+              version = "0.1.2";
+            }
+            {
+              name = "mypy-type-checker";
+              publisher = "ms-python";
+              sha256 = "sha256-IeWhMA1ht2npPVDqJmv3IOmrlKp9uuhycGNT7h+rNks=";
+              version = "2025.3.12271015";
+            }
+            {
             name = "python";
             publisher = "ms-python";
             sha256 = "sha256-3hd940mfxnvqoblIrx/S0A8KwHtYLFuonu52/HGGfak=";
             version = "2025.10.1";
           }
-          {
-            name = "pdf";
-            publisher = "tomoki1207";
-            sha256 = "sha256-i3Rlizbw4RtPkiEsodRJEB3AUzoqI95ohyqZ0ksROps=";
-            version = "1.2.2";
-          }
-          {
-            name = "playwright";
-            publisher = "ms-playwright";
-            sha256 = "sha256-1fdUyzJitFfl/cVMOjEiuBS/+FTGttilXoZ8txZMmVs=";
-            version = "1.1.15";
-          }
-          {
-            name = "prom";
-            publisher = "ventura";
-            sha256 = "sha256-h8pRrPzmu8+5ZiOLALjackr4zWuFAqi1ex7Gp2iOZKk=";
-            version = "1.3.3";
-          }
-          # {
+            {
+              name = "pdf";
+              publisher = "tomoki1207";
+              sha256 = "sha256-i3Rlizbw4RtPkiEsodRJEB3AUzoqI95ohyqZ0ksROps=";
+              version = "1.2.2";
+            }
+            {
+              name = "playwright";
+              publisher = "ms-playwright";
+              sha256 = "sha256-1fdUyzJitFfl/cVMOjEiuBS/+FTGttilXoZ8txZMmVs=";
+              version = "1.1.15";
+            }
+            {
+              name = "prom";
+              publisher = "ventura";
+              sha256 = "sha256-h8pRrPzmu8+5ZiOLALjackr4zWuFAqi1ex7Gp2iOZKk=";
+              version = "1.3.3";
+            }
+            # {
           #   name = "pwc";  # Removed: very niche/specific extension
-          #   publisher = "SureshNettur";
-          #   sha256 = "sha256-e9Z6PZQ8yWs83jpBuVdBLlePOYO0qUvBcbYkOOc4vVI=";
-          #   version = "1.0.1";
-          # }
-          {
-            name = "remotehub";
-            publisher = "GitHub";
-            sha256 = "sha256-boKDVKLo8Na799OtoPnT6JxsAvQ/HoqL3FispnN6bOA=";
-            version = "0.65.2025081801";
-          }
-          # {
-          #   name = "snyk-vulnerability-scanner";
-          #   publisher = "snyk-security";
-          #   sha256 = "sha256-4K5+hkPYqPoL9+ykJaKXp9CHXNgUoZXuVYi0zbu6rl8=";
-          #   version = "2.23.1";
-          # }
-          # {
-          #   name = "specstory-vscode";  # Removed: very niche BDD tool
-          #   publisher = "specstory";
-          #   sha256 = "sha256-kMb8Gf706puSeIU7Cx3Kj8cP6zNbveqI//sQ8kbMgLY=";
-          #   version = "0.17.1";
-          # }
-          # {
-          #   name = "tailwind-color-matcher";  # Removed: minor utility, main tailwind extension sufficient
-          #   publisher = "OmriGrossman";
-          #   sha256 = "sha256-WfFg1h5tY43W9YqgXkHDlxjRquFupuvLBwotTw0XoNk=";
-          #   version = "1.0.8";
-          # }
-          # {
-          #   name = "tailwind-fold";  # Removed: minor utility, main tailwind extension sufficient
-          #   publisher = "stivo";
-          #   sha256 = "sha256-yH3eA5jgBwxqnpFQkg91KQMkQps5iM1v783KQkQcWUU=";
-          #   version = "0.2.0";
-          # }
-          {
-            name = "templ";
-            publisher = "a-h";
-            sha256 = "sha256-WIBJorljcnoPUrQCo1eyFb6vQ5lcxV0i+QJlJdzZYE0=";
-            version = "0.0.35";
-          }
-          {
-            name = "ty";
-            publisher = "astral-sh";
-            sha256 = "sha256-GyVau+TebJfE+Wf9N9Z3uutaGlDza80ed69skprUR4k=";
-            version = "2025.37.12311339";
-          }
-          {
-            name = "vscode-containers";
-            publisher = "ms-azuretools";
-            sha256 = "sha256-96JLAM2b/FUR1TA/u9GPdQJmhSGUNMarbuhEhID8c6g=";
-            version = "2.1.0";
-          }
-          {
-            name = "vscode-gitops-tools";
-            publisher = "weaveworks";
-            sha256 = "sha256-7MCKDnHCot/CL/SqZ2WuTxbqFdF75EC5WC+OxW0dcaE=";
-            version = "0.27.0";
-          }
-          {
-            name = "vscode-jsonnet";
-            publisher = "grafana";
-            sha256 = "sha256-Q8VzXzTdHo9h5+eCHHF1bPomPEbRsvouJcUfmFUDGMU=";
-            version = "0.7.2";
-          }
-          {
-            name = "vscode-pgsql";
-            publisher = "ms-ossdata";
-            sha256 = "sha256-/d4/AsQMm9XGEytgsZA94qbR19kWTAysm0GFG2tcm9s=";
-            version = "1.8.0";
-          }
-          {
-            name = "vscode-thunder-client";
-            publisher = "rangav";
-            sha256 = "sha256-P50jK4hg8GFg+rQ8HbeLzcMXCzvD72mF7kaGW6a1L7Y=";
-            version = "2.37.5";
-          }
+            #   publisher = "SureshNettur";
+            #   sha256 = "sha256-e9Z6PZQ8yWs83jpBuVdBLlePOYO0qUvBcbYkOOc4vVI=";
+            #   version = "1.0.1";
+            # }
+            {
+              name = "remotehub";
+              publisher = "GitHub";
+              sha256 = "sha256-boKDVKLo8Na799OtoPnT6JxsAvQ/HoqL3FispnN6bOA=";
+              version = "0.65.2025081801";
+            }
+            # {
+            #   name = "snyk-vulnerability-scanner";
+            #   publisher = "snyk-security";
+            #   sha256 = "sha256-enhX0h14zmZLmXDSTAwHO1OO7hiQ9rRVlXFsKKpOTUU=";
+            #   version = "2.24.0";
+            # }
+            # {
+            #   name = "specstory-vscode";  # Removed: very niche BDD tool
+            #   publisher = "specstory";
+            #   sha256 = "sha256-RFqGGiFHmGxwoyXuW5pHnyq+OPyjZFryCkwYm8E+lpg=";
+            #   version = "0.18.0";
+            # }
+            # {
+            #   name = "tailwind-color-matcher";  # Removed: minor utility, main tailwind extension sufficient
+            #   publisher = "OmriGrossman";
+            #   sha256 = "sha256-WfFg1h5tY43W9YqgXkHDlxjRquFupuvLBwotTw0XoNk=";
+            #   version = "1.0.8";
+            # }
+            # {
+            #   name = "tailwind-fold";  # Removed: minor utility, main tailwind extension sufficient
+            #   publisher = "stivo";
+            #   sha256 = "sha256-yH3eA5jgBwxqnpFQkg91KQMkQps5iM1v783KQkQcWUU=";
+            #   version = "0.2.0";
+            # }
+            {
+              name = "templ";
+              publisher = "a-h";
+              sha256 = "sha256-WIBJorljcnoPUrQCo1eyFb6vQ5lcxV0i+QJlJdzZYE0=";
+              version = "0.0.35";
+            }
+            {
+              name = "ty";
+              publisher = "astral-sh";
+              sha256 = "sha256-pd0pOg6AVRwHe/OoJOBYAU3NL9RstXsvGzMR3sktzII=";
+              version = "2025.41.12461352";
+            }
+            {
+              name = "vscode-containers";
+              publisher = "ms-azuretools";
+              sha256 = "sha256-96JLAM2b/FUR1TA/u9GPdQJmhSGUNMarbuhEhID8c6g=";
+              version = "2.1.0";
+            }
+            {
+              name = "vscode-gitops-tools";
+              publisher = "weaveworks";
+              sha256 = "sha256-7MCKDnHCot/CL/SqZ2WuTxbqFdF75EC5WC+OxW0dcaE=";
+              version = "0.27.0";
+            }
+            {
+              name = "vscode-jsonnet";
+              publisher = "grafana";
+              sha256 = "sha256-Q8VzXzTdHo9h5+eCHHF1bPomPEbRsvouJcUfmFUDGMU=";
+              version = "0.7.2";
+            }
+            {
+              name = "vscode-pgsql";
+              publisher = "ms-ossdata";
+              sha256 = "sha256-/d4/AsQMm9XGEytgsZA94qbR19kWTAysm0GFG2tcm9s=";
+              version = "1.8.0";
+            }
+            {
+              name = "vscode-thunder-client";
+              publisher = "rangav";
+              sha256 = "sha256-P50jK4hg8GFg+rQ8HbeLzcMXCzvD72mF7kaGW6a1L7Y=";
+              version = "2.37.5";
+            }
 
 
           ]);

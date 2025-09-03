@@ -36,22 +36,22 @@
   };
   claude-code-chat = {
     pname = "claude-code-chat";
-    version = "1.0.5";
+    version = "1.0.6";
     src = fetchurl {
-      url = "https://AndrePimenta.gallery.vsassets.io/_apis/public/gallery/publisher/AndrePimenta/extension/claude-code-chat/1.0.5/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "claude-code-chat-1.0.5.zip";
-      sha256 = "sha256-6ijv2MLYji5amcxGKJ3+MhQTk+yLiFKVsXPJMqGgyc0=";
+      url = "https://AndrePimenta.gallery.vsassets.io/_apis/public/gallery/publisher/AndrePimenta/extension/claude-code-chat/1.0.6/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "claude-code-chat-1.0.6.zip";
+      sha256 = "sha256-tPY9mXpfzhRwbrbo0evInzLnKoaCc3zki6akFGaFQsg=";
     };
     publisher = "AndrePimenta";
     name = "claude-code-chat";
   };
   claude-dev = {
     pname = "claude-dev";
-    version = "3.26.5";
+    version = "3.27.0";
     src = fetchurl {
-      url = "https://saoudrizwan.gallery.vsassets.io/_apis/public/gallery/publisher/saoudrizwan/extension/claude-dev/3.26.5/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "claude-dev-3.26.5.zip";
-      sha256 = "sha256-bomhvgLWQk3rwLweJJEuLlN6+s1vfvzxpJgik+Yyygo=";
+      url = "https://saoudrizwan.gallery.vsassets.io/_apis/public/gallery/publisher/saoudrizwan/extension/claude-dev/3.27.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "claude-dev-3.27.0.zip";
+      sha256 = "sha256-6sE0nwgB7FSnAlnj/2NRxPP0JdH+KKez4ifPnCcLsrQ=";
     };
     publisher = "saoudrizwan";
     name = "claude-dev";
@@ -69,22 +69,22 @@
   };
   copilot = {
     pname = "copilot";
-    version = "1.362.1759";
+    version = "1.366.1775";
     src = fetchurl {
-      url = "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot/1.362.1759/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "copilot-1.362.1759.zip";
-      sha256 = "sha256-UVNHbNmfu6F622ISU8uCjDOsJ/86JLbO9lTsouDMIgI=";
+      url = "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot/1.366.1775/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "copilot-1.366.1775.zip";
+      sha256 = "sha256-Irp2xqVySCo5cKHxTGXVcr8koPyJBRk0VH+RfQ+eZec=";
     };
     publisher = "github";
     name = "copilot";
   };
   copilot-chat = {
     pname = "copilot-chat";
-    version = "0.31.2025082602";
+    version = "0.31.2025090302";
     src = fetchurl {
-      url = "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot-chat/0.31.2025082602/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "copilot-chat-0.31.2025082602.zip";
-      sha256 = "sha256-p+y8MzogsLYFAAUTwHcSHaW2eW9uYXxbWLEVH5X7uFM=";
+      url = "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot-chat/0.31.2025090302/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "copilot-chat-0.31.2025090302.zip";
+      sha256 = "sha256-99Ez7lIK9IoTk3lfaCRBRYSoaC3v50tFJvO2t+Tflm0=";
     };
     publisher = "github";
     name = "copilot-chat";
@@ -143,6 +143,17 @@
     };
     publisher = "craigrbroughton";
     name = "htmx-attributes";
+  };
+  hyprland = {
+    pname = "hyprland";
+    version = "0.1.2";
+    src = fetchurl {
+      url = "https://ewen-lbh.gallery.vsassets.io/_apis/public/gallery/publisher/ewen-lbh/extension/hyprland/0.1.2/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "hyprland-0.1.2.zip";
+      sha256 = "sha256-GaDpbkqNyIElSBnHwxc2ntmEVAGwL9XlNIBWNo7pvwM=";
+    };
+    publisher = "ewen-lbh";
+    name = "hyprland";
   };
   mypy-type-checker = {
     pname = "mypy-type-checker";
@@ -212,36 +223,25 @@
   };
   snyk-vulnerability-scanner = {
     pname = "snyk-vulnerability-scanner";
-    version = "2.23.1";
+    version = "2.24.0";
     src = fetchurl {
-      url = "https://snyk-security.gallery.vsassets.io/_apis/public/gallery/publisher/snyk-security/extension/snyk-vulnerability-scanner/2.23.1/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "snyk-vulnerability-scanner-2.23.1.zip";
-      sha256 = "sha256-4K5+hkPYqPoL9+ykJaKXp9CHXNgUoZXuVYi0zbu6rl8=";
+      url = "https://snyk-security.gallery.vsassets.io/_apis/public/gallery/publisher/snyk-security/extension/snyk-vulnerability-scanner/2.24.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "snyk-vulnerability-scanner-2.24.0.zip";
+      sha256 = "sha256-enhX0h14zmZLmXDSTAwHO1OO7hiQ9rRVlXFsKKpOTUU=";
     };
     publisher = "snyk-security";
     name = "snyk-vulnerability-scanner";
   };
   specstory-vscode = {
     pname = "specstory-vscode";
-    version = "0.17.1";
+    version = "0.18.0";
     src = fetchurl {
-      url = "https://specstory.gallery.vsassets.io/_apis/public/gallery/publisher/specstory/extension/specstory-vscode/0.17.1/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "specstory-vscode-0.17.1.zip";
-      sha256 = "sha256-kMb8Gf706puSeIU7Cx3Kj8cP6zNbveqI//sQ8kbMgLY=";
+      url = "https://specstory.gallery.vsassets.io/_apis/public/gallery/publisher/specstory/extension/specstory-vscode/0.18.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "specstory-vscode-0.18.0.zip";
+      sha256 = "sha256-RFqGGiFHmGxwoyXuW5pHnyq+OPyjZFryCkwYm8E+lpg=";
     };
     publisher = "specstory";
     name = "specstory-vscode";
-  };
-  sqlite-viewer = {
-    pname = "sqlite-viewer";
-    version = "25.8.2";
-    src = fetchurl {
-      url = "https://qwtel.gallery.vsassets.io/_apis/public/gallery/publisher/qwtel/extension/sqlite-viewer/25.8.2/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "sqlite-viewer-25.8.2.zip";
-      sha256 = "sha256-G/lYsIrun7ZEg0BAmhsNW4oUi9KPB79r6uNVBunpTrw=";
-    };
-    publisher = "qwtel";
-    name = "sqlite-viewer";
   };
   tailwind-color-matcher = {
     pname = "tailwind-color-matcher";
@@ -278,11 +278,11 @@
   };
   ty = {
     pname = "ty";
-    version = "2025.37.12311339";
+    version = "2025.41.12461352";
     src = fetchurl {
-      url = "https://astral-sh.gallery.vsassets.io/_apis/public/gallery/publisher/astral-sh/extension/ty/2025.37.12311339/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "ty-2025.37.12311339.zip";
-      sha256 = "sha256-GyVau+TebJfE+Wf9N9Z3uutaGlDza80ed69skprUR4k=";
+      url = "https://astral-sh.gallery.vsassets.io/_apis/public/gallery/publisher/astral-sh/extension/ty/2025.41.12461352/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "ty-2025.41.12461352.zip";
+      sha256 = "sha256-pd0pOg6AVRwHe/OoJOBYAU3NL9RstXsvGzMR3sktzII=";
     };
     publisher = "astral-sh";
     name = "ty";
