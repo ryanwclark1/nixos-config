@@ -63,6 +63,11 @@ src.vsmarketplace = "craigrbroughton.htmx-attributes"
 fetch.vsmarketplace = "craigrbroughton.htmx-attributes"
 passthru = { publisher = "craigrbroughton", name = "htmx-attributes" }
 
+[hyprland]
+src.vsmarketplace = "ewen-lbh.hyprland"
+fetch.vsmarketplace = "ewen-lbh.hyprland"
+passthru = { publisher = "ewen-lbh", name = "hyprland" }
+
 [mypy-type-checker]
 src.vsmarketplace = "ms-python.mypy-type-checker"
 fetch.vsmarketplace = "ms-python.mypy-type-checker"
@@ -147,4 +152,5 @@ passthru = { publisher = "ms-ossdata", name = "vscode-pgsql" }
 src.vsmarketplace = "rangav.vscode-thunder-client"
 fetch.vsmarketplace = "rangav.vscode-thunder-client"
 passthru = { publisher = "rangav", name = "vscode-thunder-client" }
+
 
