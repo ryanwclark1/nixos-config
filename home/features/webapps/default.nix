@@ -1,91 +1,32 @@
 { config, lib, pkgs, ... }:
 
 {
-  imports = [
-    ./scripts.nix  # Browser and webapp utility scripts
-  ];
 
-  # Custom webapp launcher script (adapted from omarchy-launch-webapp)
+  # Web application and browser launcher utilities - using external scripts
   home.packages = with pkgs; [
-    (writeShellScriptBin "launch-webapp" ''
-      #!/usr/bin/env bash
-
-      # Parse arguments
-      URL="$1"
-      PROFILE=""
-
-      # Check if second argument is a profile specification
-      if [[ "$2" =~ ^--profile= ]]; then
-        PROFILE="''${2#--profile=}"
-        shift 2
-      else
-        shift 1
-      fi
-
-      # Get the default browser
-      browser=$(${pkgs.xdg-utils}/bin/xdg-settings get default-web-browser 2>/dev/null || echo "")
-
-      # Fallback to available browsers in order of preference
-      case $browser in
-        google-chrome* | brave-browser* | microsoft-edge* | opera* | vivaldi*) ;;
-        *)
-          # Try to find an available browser
-          if command -v google-chrome-stable >/dev/null; then
-            browser="google-chrome.desktop"
-          elif command -v brave >/dev/null; then
-            browser="brave-browser.desktop"
-          elif command -v chromium >/dev/null; then
-            browser="chromium.desktop"
-          elif command -v firefox >/dev/null; then
-            browser="firefox.desktop"
-          else
-            echo "Error: No suitable browser found for webapp mode"
-            exit 1
-          fi
-          ;;
-      esac
-
-      # Find the browser executable
-      browser_exec=$(${pkgs.gnused}/bin/sed -n 's/^Exec=\([^ ]*\).*/\1/p' \
-        ~/.local/share/applications/$browser \
-        ~/.nix-profile/share/applications/$browser \
-        /run/current-system/sw/share/applications/$browser \
-        2>/dev/null | head -1)
-
-      if [[ -z "$browser_exec" ]]; then
-        # Fallback to direct command names
-        case $browser in
-          google-chrome*) browser_exec="google-chrome-stable" ;;
-          brave-browser*) browser_exec="brave" ;;
-          chromium*) browser_exec="chromium" ;;
-          firefox*) browser_exec="firefox" ;;
-          *) browser_exec="chromium" ;;
-        esac
-      fi
-
-      # Build browser arguments
-      browser_args=("--app=$URL")
-
-      # Add profile support for Chrome-based browsers
-      if [[ -n "$PROFILE" ]]; then
-        case $browser_exec in
-          google-chrome-stable|brave|chromium)
-            browser_args+=("--profile-directory=$PROFILE")
-            ;;
-          firefox)
-            browser_args=("-P" "$PROFILE" "--app=$URL")
-            ;;
-        esac
-      fi
-
-      # Launch the webapp
-      if command -v "$browser_exec" >/dev/null; then
-        exec setsid "$browser_exec" "''${browser_args[@]}" "$@" &
-      else
-        echo "Error: Browser executable '$browser_exec' not found"
-        exit 1
-      fi
-    '')
+    # Main webapp launcher with profile support
+    (writeShellScriptBin "launch-webapp" (''\
+      PATH="${pkgs.xdg-utils}/bin:${pkgs.coreutils}/bin:${pkgs.gnused}/bin:${pkgs.libnotify}/bin:${pkgs.procps}/bin:$PATH"
+      
+    '' + builtins.readFile (./. + "/launch-webapp.sh")))
+    
+    # Smart browser launcher with fallbacks
+    (writeShellScriptBin "launch-browser" (''\
+      PATH="${pkgs.xdg-utils}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gnused}/bin:${pkgs.libnotify}/bin:$PATH"
+      
+    '' + builtins.readFile (./. + "/launch-browser.sh")))
+    
+    # URL opener with webapp option
+    (writeShellScriptBin "open-url" (''\
+      PATH="${pkgs.coreutils}/bin:$PATH"
+      
+    '' + builtins.readFile (./. + "/open-url.sh")))
+    
+    # Bookmark launcher with rofi and walker support
+    (writeShellScriptBin "launch-bookmarks" (''\
+      PATH="${pkgs.rofi}/bin:${pkgs.walker}/bin:${pkgs.coreutils}/bin:$PATH"
+      
+    '' + builtins.readFile (./. + "/launch-bookmarks.sh")))
   ];
 
   # Download webapp icons
@@ -121,7 +62,7 @@
     chatgpt = {
       name = "ChatGPT";
       comment = "ChatGPT Web Application";
-      exec = "launch-webapp https://chatgpt.com/ --profile=\"Default\"";
+      exec = "launch-webapp https://chatgpt.com/ --profile=Default";
       terminal = false;
       type = "Application";
       icon = "${config.home.homeDirectory}/.local/share/applications/icons/chatgpt.png";
@@ -132,7 +73,7 @@
     youtube = {
       name = "YouTube";
       comment = "YouTube Web Application";
-      exec = "launch-webapp https://youtube.com/ --profile=\"Default\"";
+      exec = "launch-webapp https://youtube.com/ --profile=Default";
       terminal = false;
       type = "Application";
       icon = "${config.home.homeDirectory}/.local/share/applications/icons/youtube.png";
@@ -143,7 +84,7 @@
     github = {
       name = "GitHub";
       comment = "GitHub Web Application";
-      exec = "launch-webapp https://github.com/ --profile=\"Default\"";
+      exec = "launch-webapp https://github.com/ --profile=Default";
       terminal = false;
       type = "Application";
       icon = "${config.home.homeDirectory}/.local/share/applications/icons/github.png";
