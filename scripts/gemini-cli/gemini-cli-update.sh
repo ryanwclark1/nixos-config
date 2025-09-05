@@ -77,10 +77,39 @@ get_version_hash() {
     echo "$sri_hash"
 }
 
+# Get npm dependencies hash for specific version
+get_npm_deps_hash() {
+    local version="$1"
+    
+    echo "Calculating npm dependencies hash for version $version..." >&2
+    
+    local temp_dir="/tmp/gemini-cli-$version"
+    rm -rf "$temp_dir"
+    
+    # Download and extract the source
+    local url="https://github.com/google-gemini/gemini-cli/archive/v${version}.tar.gz"
+    curl -sL "$url" | tar -xz -C /tmp || {
+        echo "Error: Failed to download source for version $version" >&2
+        return 1
+    }
+    
+    # Use prefetch-npm-deps to get the correct hash
+    local npm_hash
+    npm_hash=$(nix run nixpkgs#prefetch-npm-deps "$temp_dir/gemini-cli-$version/package-lock.json" 2>/dev/null) || {
+        echo "Error: Failed to calculate npm dependencies hash" >&2
+        rm -rf "$temp_dir"
+        return 1
+    }
+    
+    rm -rf "$temp_dir"
+    echo "$npm_hash"
+}
+
 # Update the override file (similar to how multiviewer outputs the result)
 update_override_file() {
     local version="$1"
     local hash="$2"
+    local npm_hash="$3"
     
     if [[ ! -f "$OVERRIDE_FILE" ]]; then
         echo "Error: Override file not found at $OVERRIDE_FILE" >&2
@@ -93,9 +122,10 @@ update_override_file() {
     # Create backup
     cp "$OVERRIDE_FILE" "${OVERRIDE_FILE}.backup"
     
-    # Update version and hash (SRI format already includes sha256- prefix)
+    # Update version, source hash, and npm deps hash
     sed -i "s/version = \".*\";/version = \"$version\";/" "$OVERRIDE_FILE"
     sed -i "s/hash = \"sha256-.*\";/hash = \"$hash\";/" "$OVERRIDE_FILE"
+    sed -i "s/npmDepsHash = \"sha256-.*\";/npmDepsHash = \"$npm_hash\";/" "$OVERRIDE_FILE"
     
     # Update the comment to reflect current version being checked
     sed -i "s/# Use: gemini-cli-version check .*/# Use: gemini-cli-version check $version/" "$OVERRIDE_FILE"
@@ -147,17 +177,19 @@ main() {
             echo "Updating to latest release..."
             local version
             version=$(get_latest_release)
-            local hash
+            local hash npm_hash
             hash=$(get_version_hash "$version")
-            update_override_file "$version" "$hash"
+            npm_hash=$(get_npm_deps_hash "$version")
+            update_override_file "$version" "$hash" "$npm_hash"
             ;;
         *)
             # Assume it's a specific version
             if [[ "$target" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
                 echo "Updating to version $target..."
-                local hash
+                local hash npm_hash
                 hash=$(get_version_hash "$target")
-                update_override_file "$target" "$hash"
+                npm_hash=$(get_npm_deps_hash "$target")
+                update_override_file "$target" "$hash" "$npm_hash"
             else
                 echo "Error: Invalid version '$target'. Use format like '0.3.0' or 'latest'" >&2
                 usage

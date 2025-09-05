@@ -216,7 +216,8 @@
             # esbenp.prettier-vscode  # Removed: conflicts with biomejs.biome
             # formulahendry.code-runner  # Removed: interferes with proper debugging workflows
             github.codespaces
-            # github.copilot-chat  # Use nixpkgs version (0.30.1) for VS Code 1.103.2 compatibility
+            github.copilot
+            github.copilot-chat  # Use nixpkgs version (0.30.1) for VS Code 1.103.2 compatibility
             github.vscode-github-actions
             github.vscode-pull-request-github
             golang.go
@@ -286,18 +287,18 @@
             #   sha256 = "sha256-q6SkIy7eZ9H1yOnZygkcXQcpTK4eu6/jjud1wqEL2Mw=";
             #   version = "1.0.1";
             # }
-            {
-              name = "copilot";
-              publisher = "github";
-              sha256 = "sha256-Irp2xqVySCo5cKHxTGXVcr8koPyJBRk0VH+RfQ+eZec=";
-              version = "1.366.1775";
-            }
-            {
-              name = "copilot-chat";
-              publisher = "github";
-              sha256 = "sha256-99Ez7lIK9IoTk3lfaCRBRYSoaC3v50tFJvO2t+Tflm0=";
-              version = "0.31.2025090302";
-            }
+            # {
+            #   name = "copilot";
+            #   publisher = "github";
+            #   sha256 = "sha256-Irp2xqVySCo5cKHxTGXVcr8koPyJBRk0VH+RfQ+eZec=";
+            #   version = "1.366.1775";
+            # }
+            # {
+            #   name = "copilot-chat";
+            #   publisher = "github";
+            #   sha256 = "sha256-99Ez7lIK9IoTk3lfaCRBRYSoaC3v50tFJvO2t+Tflm0=";
+            #   version = "0.31.2025090302";
+            # }
             {
               name = "explorer";
               publisher = "vitest";

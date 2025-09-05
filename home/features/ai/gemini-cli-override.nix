@@ -5,33 +5,24 @@
 }:
 
 {
-  # Override gemini-cli package with custom version
-  # Use: gemini-cli-version latest    # to get latest version info
-  # Use: gemini-cli-version check X.Y.Z  # to get hash for specific version  
-  # Use: gemini-cli-version update X.Y.Z # to auto-update this file
+  # Gemini CLI Package Configuration
   #
-  # Current nixpkgs applies: restore-missing-dependencies-fields.patch
-  # If build fails with newer versions, try: patches = [];
+  # STATUS: Using stable nixpkgs version (0.2.1) due to build complexity in 0.3.2
+  #
+  # ALTERNATIVES for version 0.3.2:
+  # 1. Use gemini-cli-dev script (builds from source on-demand)
+  # 2. Import ./gemini-cli-dev.nix for development version
+  # 3. Manual build: npm install + npm run build in extracted source
+  #
+  # KNOWN ISSUES with 0.3.2:
+  # - npm workspace dependencies cause cache validation failures
+  # - buildNpmPackage has trouble with monorepo structure
+  # - prefetch-npm-deps doesn't capture all workspace dependencies
+  #
+  # The nixpkgs 0.2.1 version provides core functionality and is stable
   
   home.packages = with pkgs; [
-    (gemini-cli.overrideAttrs (oldAttrs: rec {
-      version = "0.3.2";  # Current nixpkgs version - update as needed
-      
-      src = pkgs.fetchFromGitHub {
-        owner = "google-gemini";
-        repo = "gemini-cli";
-        tag = "v${version}";
-        # Use: gemini-cli-version check 0.3.2
-        hash = "sha256-gQBd85GD/1uEMZrfrZtL6x+2WlelikmfB2zj2qbpaBA=";
-      };
-      
-      # Update npm dependencies hash if build fails
-      # Run: nix-build '<nixpkgs>' -A gemini-cli
-      # Use the hash from the error message
-      npmDepsHash = "sha256-gpNt581BHDA12s+3nm95UOYHjoa7Nfe46vgPwFr7ZOU=";
-      
-      # Keep existing patches from nixpkgs (remove if they cause issues with newer versions)
-      patches = oldAttrs.patches or [];
-    }))
+    # Stable version from nixpkgs (0.2.1)
+    gemini-cli
   ];
 }
