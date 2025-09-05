@@ -22,7 +22,7 @@
         repo = "gemini-cli";
         tag = "v${version}";
         # Use: gemini-cli-version check 0.3.2
-        hash = "sha256-0438x6kdmqvc0yglk2m5axdbc7zb9fdsvpws6625pzw3j7rms041";
+        hash = "sha256-gQBd85GD/1uEMZrfrZtL6x+2WlelikmfB2zj2qbpaBA=";
       };
       
       # Update npm dependencies hash if build fails
