@@ -5,7 +5,8 @@
 # PipeWire/WirePlumber volume management with rofi interface
 # -----------------------------------------------------
 #
-# This script provides a rofi-based interface for volume control
+# This script provides volume control using wpctl by default
+# SwayOSD is used for display notifications when available
 # Compatible with any window manager that supports rofi
 # Uses PipeWire/WirePlumber for audio management
 # -----------------------------------------------------
@@ -15,6 +16,7 @@ set -euo pipefail
 # Configuration
 SCRIPT_NAME="$(basename "$0")"
 DEFAULT_ROFI_THEME="${HOME}/.config/rofi/applets/type-3/style-3.rasi"
+PATH="/run/current-system/sw/bin:/usr/bin:$PATH"
 
 # Dependency check function
 check_dependencies() {
@@ -22,8 +24,6 @@ check_dependencies() {
 
     # Core dependencies
     command -v wpctl >/dev/null || missing_deps+=("wpctl (wireplumber)")
-    command -v rofi >/dev/null || missing_deps+=("rofi")
-    command -v awk >/dev/null || missing_deps+=("awk")
 
     if [[ ${#missing_deps[@]} -gt 0 ]]; then
         echo "Error: Missing required dependencies:" >&2
@@ -38,10 +38,23 @@ log() {
     echo "[$SCRIPT_NAME] $1" >&2
 }
 
-# Notification wrapper
-notify() {
+# Notification function using notify-send with nerd font icons
+notify_volume() {
+    local title="$1"
+    local message="$2"
+    local icon="$3"
+
     if command -v notify-send >/dev/null; then
-        notify-send -t 2000 "$@"
+        notify-send "$icon $title" "$message" -t 1000
+    fi
+
+    # Also send to SwayOSD if available for consistent display
+    if command -v swayosd-client >/dev/null; then
+        case "$icon" in
+            "󰝝") swayosd-client --output-volume raise --max-volume 100 >/dev/null 2>&1 || true ;;
+            "󰝞") swayosd-client --output-volume lower --max-volume 100 >/dev/null 2>&1 || true ;;
+            "󰝟") swayosd-client --output-volume mute-toggle >/dev/null 2>&1 || true ;;
+        esac
     fi
 }
 
@@ -106,12 +119,11 @@ build_rofi_options() {
 
     # Clear status indicators - green for active/good, red for muted/bad
     local active_args="" urgent_args=""
-    local speaker_status mic_status speaker_color mic_color
 
     # Simple clean options - just show volume levels
     if [[ "$USE_ICONS" == "NO" ]]; then
         OPTION_1="󰝝 Volume Up"
-        OPTION_2="󰝞 Volume Down" 
+        OPTION_2="󰝞 Volume Down"
         OPTION_3="$([ "$SPEAKER_MUTE" == *"Muted"* ] && echo "󰖁 Unmute" || echo "󰕿 Mute")"
         OPTION_4="󰍬 Mic Toggle"
         OPTION_5="󰍃 Settings"
@@ -140,6 +152,12 @@ build_rofi_options() {
 
 # Execute rofi command
 run_rofi() {
+    # Check rofi dependency for GUI mode
+    command -v rofi >/dev/null || {
+        echo "Error: rofi is required for GUI mode" >&2
+        exit 1
+    }
+
     build_rofi_options  # This now calls get_theme_config internally
 
     local rofi_cmd=(
@@ -164,123 +182,87 @@ run_rofi() {
     echo -e "$OPTION_1\n$OPTION_2\n$OPTION_3\n$OPTION_4\n$OPTION_5" | "${rofi_cmd[@]}"
 }
 
-# Execute volume commands with SwayOSD integration
+# Execute volume commands with wpctl as default
 execute_action() {
     local action="$1"
     local result=0
 
     case "$action" in
         "increase")
-            # Use SwayOSD if available, otherwise wpctl with notification
-            if command -v swayosd-client >/dev/null; then
-                log "Increasing volume via SwayOSD"
-                swayosd-client --output-volume raise
+            log "Increasing volume via wpctl"
+            # Ensure unmuted and increase volume
+            if wpctl set-mute @DEFAULT_AUDIO_SINK@ 0 && wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+ 2>/dev/null; then
+                get_audio_info
+                notify_volume "Volume" "$(wpctl get-volume @DEFAULT_AUDIO_SINK@)" ""
+                log "Volume increased to ${SPEAKER_VOL}%"
             else
-                log "Increasing volume via wpctl"
-                # Ensure unmuted and increase volume (matching your keybind)
-                if wpctl set-mute @DEFAULT_AUDIO_SINK@ 0 && wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+ 2>/dev/null; then
-                    get_audio_info
-                    notify "Volume" "Increased to ${SPEAKER_VOL}%"
-                    log "Volume increased to ${SPEAKER_VOL}%"
-                else
-                    log "Failed to increase volume"
-                    result=1
-                fi
+                log "Failed to increase volume"
+                result=1
             fi
             ;;
         "decrease")
-            # Use SwayOSD if available, otherwise wpctl with notification
-            if command -v swayosd-client >/dev/null; then
-                log "Decreasing volume via SwayOSD"
-                swayosd-client --output-volume lower
+            log "Decreasing volume via wpctl"
+            if wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- 2>/dev/null; then
+                get_audio_info
+                notify_volume "Volume" "$(wpctl get-volume @DEFAULT_AUDIO_SINK@)" ""
+                log "Volume decreased to ${SPEAKER_VOL}%"
             else
-                log "Decreasing volume via wpctl"
-                if wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- 2>/dev/null; then
-                    get_audio_info
-                    notify "Volume" "Decreased to ${SPEAKER_VOL}%"
-                    log "Volume decreased to ${SPEAKER_VOL}%"
-                else
-                    log "Failed to decrease volume"
-                    result=1
-                fi
+                log "Failed to decrease volume"
+                result=1
             fi
             ;;
         "toggle_speaker")
-            # Use SwayOSD if available, otherwise wpctl with notification
-            if command -v swayosd-client >/dev/null; then
-                log "Toggling speaker mute via SwayOSD"
-                swayosd-client --output-volume mute-toggle
-            else
-                log "Toggling speaker mute via wpctl"
-                if wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle 2>/dev/null; then
-                    get_audio_info
-                    if [[ "$SPEAKER_MUTE" == *"Muted"* ]]; then
-                        notify "Audio" "Speaker muted"
-                        log "Speaker muted"
-                    else
-                        notify "Audio" "Speaker unmuted (${SPEAKER_VOL}%)"
-                        log "Speaker unmuted"
-                    fi
+            log "Toggling speaker mute via wpctl"
+            if wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle 2>/dev/null; then
+                get_audio_info
+                if [[ "$SPEAKER_MUTE" == *"Muted"* ]]; then
+                    notify_volume "Audio" "Muted" "󰝟"
+                    log "Speaker muted"
                 else
-                    log "Failed to toggle speaker mute"
-                    result=1
+                    notify_volume "Audio" "Unmuted" ""
+                    log "Speaker unmuted"
                 fi
+            else
+                log "Failed to toggle speaker mute"
+                result=1
             fi
             ;;
         "toggle_mic")
-            # Use SwayOSD if available, otherwise wpctl with notification
-            if command -v swayosd-client >/dev/null; then
-                log "Toggling microphone mute via SwayOSD"
-                swayosd-client --input-volume mute-toggle
-            else
-                log "Toggling microphone mute via wpctl"
-                if wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle 2>/dev/null; then
-                    get_audio_info
-                    if [[ "$MIC_MUTE" == *"Muted"* ]]; then
-                        notify "Audio" "Microphone muted"
-                        log "Microphone muted"
-                    else
-                        notify "Audio" "Microphone unmuted (${MIC_VOL}%)"
-                        log "Microphone unmuted"
-                    fi
+            log "Toggling microphone mute via wpctl"
+            if wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle 2>/dev/null; then
+                get_audio_info
+                if [[ "$MIC_MUTE" == *"Muted"* ]]; then
+                    notify_volume "Audio" "Microphone muted" "󰍭"
+                    log "Microphone muted"
                 else
-                    log "Failed to toggle microphone mute"
-                    result=1
+                    notify_volume "Audio" "Microphone unmuted" "󰍬"
+                    log "Microphone unmuted"
                 fi
+            else
+                log "Failed to toggle microphone mute"
+                result=1
             fi
             ;;
         "mic_increase")
-            # New action for microphone volume increase (SHIFT+XF86AudioRaiseVolume)
-            if command -v swayosd-client >/dev/null; then
-                log "Increasing microphone volume via SwayOSD"
-                swayosd-client --input-volume raise
+            log "Increasing microphone volume via wpctl"
+            if wpctl set-volume -l 1 @DEFAULT_AUDIO_SOURCE@ 5%+ 2>/dev/null; then
+                get_audio_info
+                notify_volume "Microphone" "$(wpctl get-volume @DEFAULT_AUDIO_SOURCE@)" "󰍬"
+                log "Microphone volume increased to ${MIC_VOL}%"
             else
-                log "Increasing microphone volume via wpctl"
-                if wpctl set-volume -l 1 @DEFAULT_AUDIO_SOURCE@ 5%+ 2>/dev/null; then
-                    get_audio_info
-                    notify "Microphone" "Increased to ${MIC_VOL}%"
-                    log "Microphone volume increased to ${MIC_VOL}%"
-                else
-                    log "Failed to increase microphone volume"
-                    result=1
-                fi
+                log "Failed to increase microphone volume"
+                result=1
             fi
             ;;
         "mic_decrease")
-            # New action for microphone volume decrease (SHIFT+XF86AudioLowerVolume)
-            if command -v swayosd-client >/dev/null; then
-                log "Decreasing microphone volume via SwayOSD"
-                swayosd-client --input-volume lower
+            log "Decreasing microphone volume via wpctl"
+            if wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 5%- 2>/dev/null; then
+                get_audio_info
+                notify_volume "Microphone" "$(wpctl get-volume @DEFAULT_AUDIO_SOURCE@)" "󰍬"
+                log "Microphone volume decreased to ${MIC_VOL}%"
             else
-                log "Decreasing microphone volume via wpctl"
-                if wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 5%- 2>/dev/null; then
-                    get_audio_info
-                    notify "Microphone" "Decreased to ${MIC_VOL}%"
-                    log "Microphone volume decreased to ${MIC_VOL}%"
-                else
-                    log "Failed to decrease microphone volume"
-                    result=1
-                fi
+                log "Failed to decrease microphone volume"
+                result=1
             fi
             ;;
         "settings")
@@ -294,7 +276,7 @@ execute_action() {
                 log "Opening audio settings with ${audio_settings[0]}"
                 "${audio_settings[0]}" &
             else
-                notify "Error" "No audio settings application found"
+                notify_volume "Error" "No audio settings application found" ""
                 log "No audio settings application found"
                 result=1
             fi
@@ -316,27 +298,29 @@ System Volume Control Script
 Usage: $0 [COMMAND]
 
 Commands:
-    gui           Show rofi volume interface (default)
-    increase      Increase speaker volume by 5%
+    increase      Increase speaker volume by 5% (default)
     decrease      Decrease speaker volume by 5%
     toggle        Toggle speaker mute
     toggle-mic    Toggle microphone mute
     mic-up        Increase microphone volume by 5%
     mic-down      Decrease microphone volume by 5%
+    gui           Show rofi volume interface
     status        Show current audio status
     settings      Open audio settings
     help          Show this help
 
 Examples:
-    $0              # Show rofi interface
-    $0 increase     # Increase volume
+    $0              # Increase volume (default)
+    $0 decrease     # Decrease volume
     $0 toggle       # Toggle mute
+    $0 gui          # Show rofi interface
     $0 status       # Show volume info
 
 Dependencies:
     - wpctl (wireplumber)
-    - rofi
-    - awk
+    - notify-send (optional, for notifications)
+    - rofi (optional, for GUI mode)
+    - swayosd-client (optional, for display notifications)
 EOF
 }
 
@@ -357,7 +341,7 @@ EOF
 
 # Main function
 main() {
-    local command="${1:-gui}"
+    local command="${1:-increase}"  # Default to increase instead of gui
 
     # Handle help first (no dependency check needed)
     if [[ "$command" == "help" || "$command" == "-h" || "$command" == "--help" ]]; then
@@ -369,7 +353,7 @@ main() {
     check_dependencies
 
     case "$command" in
-        "gui"|"")
+        "gui")
             local choice
             choice=$(run_rofi)
 
