@@ -1,0 +1,127 @@
+{
+  "git": {
+    "command": "docker",
+    "args": [
+      "run",
+      "-i", "--rm",
+      "--name", "mcp-git",
+      "-v", "{{HOME}}:{{HOME}}:rw",
+      "-v", "{{HOME}}/.gitconfig:/root/.gitconfig:ro",
+      "mcp/git"
+    ],
+    "description": "Provides git repository information and operations"
+  },
+  "memory": {
+    "command": "docker",
+    "args": [
+      "run",
+      "-i", "--rm",
+      "--name", "mcp-memory",
+      "-v", "mcp-memory-data:/data",
+      "mcp/memory"
+    ],
+    "env": {
+      "DATABASE_URL": "sqlite:///data/memory.db"
+    },
+    "description": "Maintains context and memory across sessions"
+  },
+  "time": {
+    "command": "docker",
+    "args": [
+      "run",
+      "-i", "--rm",
+      "--name", "mcp-time",
+      "mcp/time",
+      "--local-timezone=America/Chicago"
+    ],
+    "env": {
+      "TZ": "America/Chicago"
+    },
+    "description": "Provides date and time information and operations"
+  },
+  "fetch": {
+    "command": "docker",
+    "args": [
+      "run",
+      "-i", "--rm",
+      "--name", "mcp-fetch",
+      "--network", "bridge",
+      "mcp/fetch"
+    ],
+    "description": "Fetches and analyzes web content"
+  },
+  "context7": {
+    "command": "docker",
+    "args": [
+      "run",
+      "-i", "--rm",
+      "--name", "mcp-context7",
+      "mcp/context7"
+    ],
+    "env": {
+      "CONTEXT7_TOKEN": "{{SOPS:context7-token}}",
+      "MCP_TRANSPORT": "stdio"
+    },
+    "description": "Provides up-to-date code documentation for AI code editors"
+  },
+  "github": {
+    "command": "docker",
+    "args": [
+      "run",
+      "-i", "--rm",
+      "--name", "mcp-github",
+      "ghcr.io/github/github-mcp-server"
+    ],
+    "env": {
+      "GITHUB_PERSONAL_ACCESS_TOKEN": "{{SOPS:github-pat}}",
+      "GITHUB_TOOLSETS": "repos,issues,pull_requests,actions,code_security,discussions",
+      "MCP_TRANSPORT": "stdio"
+    },
+    "description": "GitHub repository and workflow management via MCP"
+  },
+  "playwright": {
+    "command": "mcp-server-playwright",
+    "args": [
+      "--headless"
+    ],
+    "description": "Browser automation and web scraping via Playwright"
+  },
+  "serena": {
+    "command": "docker",
+    "args": [
+      "run",
+      "-i", "--rm",
+      "--name", "mcp-serena",
+      "-v", "/home/administrator/Code:/workspace/Code:rw",
+      "--network", "host",
+      "ghcr.io/oraios/serena:latest",
+      "serena", "start-mcp-server", "--transport", "stdio"
+    ],
+    "env": {
+      "SERENA_DOCKER": "1"
+    },
+    "description": "AI-powered development assistant with Code directory access"
+  },
+  "sourcebot": {
+    "command": "npx",
+    "args": [
+      "@sourcebot/mcp@latest"
+    ],
+    "env": {
+      "NODE_ENV": "production",
+      "SOURCEBOT_HOST": "http://localhost:3002",
+      "SOURCEBOT_API_KEY": "{{SOPS:sourcebot/api-key}}"
+    },
+    "description": "Code understanding and search via Sourcebot"
+  },
+  "sequential-thinking": {
+    "command": "npx",
+    "args": [
+      "@modelcontextprotocol/server-sequential-thinking@latest"
+    ],
+    "env": {
+      "NODE_ENV": "production"
+    },
+    "description": "Helps break down complex problems into sequential steps"
+  }
+}
