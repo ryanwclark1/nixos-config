@@ -241,6 +241,7 @@
             # quicktype.quicktype  # Removed: niche JSON-to-types conversion
             redhat.vscode-xml
             redhat.vscode-yaml
+            rust-lang.rust-analyzer
             samuelcolvin.jinjahtml
             # shyykoserhiy.vscode-spotify  # Removed: non-development related
             tailscale.vscode-tailscale
