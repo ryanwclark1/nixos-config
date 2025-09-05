@@ -60,15 +60,21 @@ get_version_hash() {
     
     local url="https://github.com/google-gemini/gemini-cli/archive/v${version}.tar.gz"
     
-    # Use nix-prefetch-url to get the hash (similar to multiviewer approach)
-    local hash
-    hash=$(nix-prefetch-url --unpack "$url" 2>/dev/null) || {
+    # Use nix-prefetch-url to get the hash and convert to SRI format
+    local raw_hash sri_hash
+    raw_hash=$(nix-prefetch-url --unpack "$url" 2>/dev/null) || {
         echo "Error: Failed to fetch or calculate hash for version $version" >&2
         echo "URL: $url" >&2
         return 1
     }
     
-    echo "$hash"
+    # Convert to SRI format
+    sri_hash=$(nix hash convert --hash-algo sha256 --to-sri "$raw_hash" 2>/dev/null) || {
+        echo "Error: Failed to convert hash to SRI format" >&2
+        return 1
+    }
+    
+    echo "$sri_hash"
 }
 
 # Update the override file (similar to how multiviewer outputs the result)
@@ -87,9 +93,9 @@ update_override_file() {
     # Create backup
     cp "$OVERRIDE_FILE" "${OVERRIDE_FILE}.backup"
     
-    # Update version and hash (ensure sha256- prefix is included)
+    # Update version and hash (SRI format already includes sha256- prefix)
     sed -i "s/version = \".*\";/version = \"$version\";/" "$OVERRIDE_FILE"
-    sed -i "s/hash = \"sha256-.*\";/hash = \"sha256-$hash\";/" "$OVERRIDE_FILE"
+    sed -i "s/hash = \"sha256-.*\";/hash = \"$hash\";/" "$OVERRIDE_FILE"
     
     # Update the comment to reflect current version being checked
     sed -i "s/# Use: gemini-cli-version check .*/# Use: gemini-cli-version check $version/" "$OVERRIDE_FILE"
@@ -104,7 +110,7 @@ update_override_file() {
     # Output the Nix attribute format (similar to multiviewer)
     echo "Updated Nix attributes:"
     echo "version = \"$version\";"
-    echo "hash = \"sha256-$hash\";"
+    echo "hash = \"$hash\";"
     echo ""
     echo "Note: Patches from nixpkgs are preserved. If build fails, consider removing patches."
 }
