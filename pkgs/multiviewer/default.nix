@@ -14,8 +14,8 @@
 
 let
   pname = "f1multiviewer";
-  version = "1.36.2";
-  build = "203624822";
+  version = "2.1.0";
+  build = "289869947";
 
   desktopItem = makeDesktopItem {
     name = "f1multiviewer";
@@ -32,7 +32,7 @@ stdenv.mkDerivation {
 
   src = fetchurl {
     url = "https://releases.multiviewer.app/download/${build}/MultiViewer.for.F1-linux-x64-${version}.zip";
-    sha256 = "2508aaeb29f92c9ddc3c8d242cdd5a82f48172bd532b1ed62e48cff3354dc66e";
+    sha256 = "0iambn2ammkz2k9dz43vr4w4qd2ji0ivns8wb1j4rmckb3c6vsqz";
   };
 
   nativeBuildInputs = [ makeWrapper ];
