@@ -23,6 +23,17 @@
     (writeShellScriptBin "audio-volume-up" (builtins.readFile ./scripts/system/audio-volume-up.sh))
     (writeShellScriptBin "audio-volume-down" (builtins.readFile ./scripts/system/audio-volume-down.sh))
     (writeShellScriptBin "audio-volume-mute" (builtins.readFile ./scripts/system/audio-volume-mute.sh))
+
+    # MCP utility scripts
+    (writeShellScriptBin "mcp-test-docker" (builtins.readFile ./scripts/system/mcp-test-docker.sh))
+    (writeShellScriptBin "mcp-list-servers" (builtins.readFile ./scripts/system/mcp-list-servers.sh))
+    (writeShellScriptBin "mcp-test-playwright" (builtins.readFile ./scripts/system/mcp-test-playwright.sh))
+    (writeShellScriptBin "mcp-test-sourcebot" (builtins.readFile ./scripts/system/mcp-test-sourcebot.sh))
+    (writeShellScriptBin "mcp-cli" (builtins.readFile ./scripts/system/mcp-cli-launcher.sh))
+    (writeShellScriptBin "mcp-process-config" (builtins.readFile ./scripts/system/mcp-process-config.sh))
+    (writeShellScriptBin "qwen-env" (builtins.readFile ./scripts/system/qwen-env-manager.sh))
+    (writeShellScriptBin "update-gemini-cli" (builtins.readFile ./scripts/system/update-gemini-cli.sh))
+    (writeShellScriptBin "gemini-cli-version" (builtins.readFile ./scripts/system/gemini-cli-version.sh))
   ];
 
   # Desktop common scripts - available to all desktop environments/window managers
