@@ -82,18 +82,18 @@ get_theme_config() {
 
     # Default theme configuration
     local list_col="1"
-    local list_row="5"
+    local list_row="6"
     local win_width="400px"
 
     # Detect theme type and adjust layout
     if [[ "$theme" == *'type-1'* ]]; then
-        list_col='1'; list_row='5'; win_width='400px'
+        list_col='1'; list_row='6'; win_width='400px'
     elif [[ "$theme" == *'type-3'* ]]; then
-        list_col='1'; list_row='5'; win_width='120px'
+        list_col='1'; list_row='6'; win_width='120px'
     elif [[ "$theme" == *'type-5'* ]]; then
-        list_col='1'; list_row='5'; win_width='520px'
+        list_col='1'; list_row='6'; win_width='520px'
     elif [[ "$theme" == *'type-2'* || "$theme" == *'type-4'* ]]; then
-        list_col='5'; list_row='1'; win_width='670px'
+        list_col='6'; list_row='1'; win_width='800px'
     fi
 
     # Check if theme uses icons or text
@@ -126,13 +126,15 @@ build_rofi_options() {
         OPTION_2="󰝞 Volume Down"
         OPTION_3="$([ "$SPEAKER_MUTE" == *"Muted"* ] && echo "󰖁 Unmute" || echo "󰕿 Mute")"
         OPTION_4="󰍬 Mic Toggle"
-        OPTION_5="󰍃 Settings"
+        OPTION_5=" Switch Output"
+        OPTION_6="󰍃 Settings"
     else
         OPTION_1="󰝝"
         OPTION_2="󰝞"
         OPTION_3="$([ "$SPEAKER_MUTE" == *"Muted"* ] && echo "󰖁" || echo "󰕿")"
         OPTION_4="󰍬"
-        OPTION_5="󰍃"
+        OPTION_5=""
+        OPTION_6="󰍃"
     fi
 
     # Simple highlighting
@@ -141,7 +143,7 @@ build_rofi_options() {
     fi
 
     # Export options for use in main function
-    export OPTION_1 OPTION_2 OPTION_3 OPTION_4 OPTION_5
+    export OPTION_1 OPTION_2 OPTION_3 OPTION_4 OPTION_5 OPTION_6
 
     # Export for rofi command
     export ROFI_PROMPT="Audio Control"
@@ -179,7 +181,7 @@ run_rofi() {
     [[ -f "$THEME_FILE" ]] && rofi_cmd+=(-theme "$THEME_FILE")
 
     # Run rofi with options
-    echo -e "$OPTION_1\n$OPTION_2\n$OPTION_3\n$OPTION_4\n$OPTION_5" | "${rofi_cmd[@]}"
+    echo -e "$OPTION_1\n$OPTION_2\n$OPTION_3\n$OPTION_4\n$OPTION_5\n$OPTION_6" | "${rofi_cmd[@]}"
 }
 
 # Execute volume commands with wpctl as default
@@ -219,7 +221,7 @@ execute_action() {
                     notify_volume "Audio" "Muted" "󰝟"
                     log "Speaker muted"
                 else
-                    notify_volume "Audio" "Unmuted" ""
+                    notify_volume "Audio" "Unmuted" "󰖀"
                     log "Speaker unmuted"
                 fi
             else
@@ -265,6 +267,49 @@ execute_action() {
                 result=1
             fi
             ;;
+        "switch_output")
+            log "Switching audio output via wpctl"
+            # Find all audio sinks, exit if none found
+            local sinks
+            sinks=($(wpctl status | sed -n '/Sinks:/,/Sources:/p' | grep -E '^\s*│\s+\*?\s*[0-9]+\.' | sed -E 's/^[^0-9]*([0-9]+)\..*/\1/'))
+            if [[ ${#sinks[@]} -eq 0 ]]; then
+                notify_volume "Error" "No audio sinks found" ""
+                log "No audio sinks found"
+                result=1
+            elif [[ ${#sinks[@]} -eq 1 ]]; then
+                notify_volume "Audio Output" "Only one output device available" ""
+                log "Only one audio output device available"
+            else
+                # Find current active audio sink
+                local current next sink_name
+                current=$(wpctl status | sed -n '/Sinks:/,/Sources:/p' | grep '^\s*│\s*\*' | sed -E 's/^[^0-9]*([0-9]+)\..*/\1/')
+                
+                # Find the next sink (cycling through available sinks)
+                next=""
+                for i in "${!sinks[@]}"; do
+                    if [[ "${sinks[$i]}" = "$current" ]]; then
+                        next="${sinks[$(((i + 1) % ${#sinks[@]}))]}"
+                        break
+                    fi
+                done
+                
+                # Fallback to first sink if current not found
+                next="${next:-${sinks[0]}}"
+                
+                # Get sink name for notification
+                sink_name=$(wpctl status | sed -n '/Sinks:/,/Sources:/p' | grep "^\s*│\s*\*\?\s*$next\." | sed -E 's/^[^.]*\.\s*//')
+                
+                # Switch to next sink and unmute it
+                if wpctl set-default "$next" && wpctl set-mute "$next" 0 2>/dev/null; then
+                    notify_volume "Audio Output" "Switched to: $sink_name" ""
+                    log "Audio output switched to: $sink_name"
+                else
+                    notify_volume "Error" "Failed to switch audio output" ""
+                    log "Failed to switch audio output"
+                    result=1
+                fi
+            fi
+            ;;
         "settings")
             # Try different audio control applications
             local audio_settings=()
@@ -304,6 +349,7 @@ Commands:
     toggle-mic    Toggle microphone mute
     mic-up        Increase microphone volume by 5%
     mic-down      Decrease microphone volume by 5%
+    switch        Switch audio output device
     gui           Show rofi volume interface
     status        Show current audio status
     settings      Open audio settings
@@ -365,7 +411,8 @@ main() {
                 "$OPTION_2") execute_action "decrease" ;;
                 "$OPTION_3") execute_action "toggle_speaker" ;;
                 "$OPTION_4") execute_action "toggle_mic" ;;
-                "$OPTION_5") execute_action "settings" ;;
+                "$OPTION_5") execute_action "switch_output" ;;
+                "$OPTION_6") execute_action "settings" ;;
                 "") log "No option selected" ;;
                 *) log "Unknown option: $choice" ;;
             esac
@@ -387,6 +434,9 @@ main() {
             ;;
         "mic-down"|"mic-decrease"|"mic-")
             execute_action "mic_decrease"
+            ;;
+        "switch"|"switch-output"|"output")
+            execute_action "switch_output"
             ;;
         "settings")
             execute_action "settings"
