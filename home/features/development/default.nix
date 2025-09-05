@@ -11,7 +11,7 @@
     ./js.nix
     ./lua.nix
     # ./python.nix
-    # ./rust.nix
+    ./rust.nix
     ./sql.nix
   ];
 
