@@ -88,15 +88,21 @@ get_version_hash() {
     
     local url="https://github.com/google-gemini/gemini-cli/archive/v${version}.tar.gz"
     
-    # Use nix-prefetch-url to get the hash
-    local hash
-    hash=$(nix-prefetch-url --unpack "$url" 2>/dev/null) || {
+    # Use nix-prefetch-url to get the hash and convert to SRI format
+    local raw_hash sri_hash
+    raw_hash=$(nix-prefetch-url --unpack "$url" 2>/dev/null) || {
         echo "Error: Unable to fetch or calculate hash for version $version" >&2
         echo "URL: $url" >&2
         return 1
     }
     
-    echo "$hash"
+    # Convert to SRI format
+    sri_hash=$(nix hash convert --hash-algo sha256 --to-sri "$raw_hash" 2>/dev/null) || {
+        echo "Error: Failed to convert hash to SRI format" >&2
+        return 1
+    }
+    
+    echo "$sri_hash"
 }
 
 # Check specific version (show hash and info)
@@ -237,7 +243,7 @@ EOF
         cp "$GEMINI_OVERRIDE_FILE" "${GEMINI_OVERRIDE_FILE}.backup"
         
         sed -i "s/version = \".*\";/version = \"$new_version\";/" "$GEMINI_OVERRIDE_FILE"
-        sed -i "s/hash = \"sha256-.*\";/hash = \"sha256-$hash\";/" "$GEMINI_OVERRIDE_FILE"
+        sed -i "s/hash = \"sha256-.*\";/hash = \"$hash\";/" "$GEMINI_OVERRIDE_FILE"
         sed -i "s/# Use: gemini-cli-version check .*/# Use: gemini-cli-version check $new_version/" "$GEMINI_OVERRIDE_FILE"
     fi
     
