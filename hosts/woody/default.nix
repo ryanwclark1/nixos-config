@@ -47,8 +47,12 @@
     ../common/optional/services/syncthing.nix
     ../common/optional/services/virtualisation.nix
     ../common/optional/services/webcam.nix
+    ../common/optional/tools/bash.nix
+    ../common/optional/tools/console.nix
     ../common/optional/tools/direnv.nix
+    ../common/optional/tools/fish.nix
     ../common/optional/tools/fonts.nix
+    ../common/optional/tools/keyboard.nix
     ../common/optional/tools/wireshark.nix
     ../common/optional/tools/zsh.nix
     # ../common/optional/services/sourcebot.nix  # Migrated to home-manager configuration
