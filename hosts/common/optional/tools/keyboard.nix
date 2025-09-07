@@ -5,12 +5,13 @@
 
 {
   hardware.keyboard.qmk.enable = true;
-  
-  environment.systemPackages = [
-    pkgs.via
+
+  environment.systemPackages = with pkgs; [
+    via
+    libxkbcommon
   ];
-  
-  services.udev.packages = [ 
-    pkgs.via 
+
+  services.udev.packages = [
+    pkgs.via
   ];
 }
