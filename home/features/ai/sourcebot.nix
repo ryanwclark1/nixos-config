@@ -107,7 +107,7 @@
         container_name: sourcebot
         restart: unless-stopped
         ports:
-          - "127.0.0.1:3002:3000"
+          - "127.0.0.1:3003:3000"
         volumes:
           - sourcebot-data:/data
           - "${config.home.homeDirectory}/.config/sourcebot/config.json:/data/config.json:ro"
@@ -120,7 +120,7 @@
           - DATA_CACHE_DIR=/data/.sourcebot
 
           # Authentication & Security
-          - AUTH_URL=http://localhost:3002
+          - AUTH_URL=http://localhost:3003
           - AUTH_CREDENTIALS_LOGIN_ENABLED=true   # Enable standard username/password auth
           - AUTH_EMAIL_CODE_LOGIN_ENABLED=false   # Keep email login disabled for simplicity
           - AUTH_SECRET  # Loaded from SOPS via environment file
@@ -297,11 +297,11 @@
 
         # Check for port conflicts before starting
         echo "[INFO] Checking for port conflicts..."
-        PORTS=(3002 5433 6380)
+        PORTS=(3003 5433 6380)
         for port in "''${PORTS[@]}"; do
           if ${pkgs.nettools}/bin/netstat -tuln 2>/dev/null | grep -q ":$port "; then
             echo "[WARNING] Port $port is already in use"
-            if [ "$port" = "3002" ]; then
+            if [ "$port" = "3003" ]; then
               echo "[INFO] Checking if existing Sourcebot container is running..."
               if ${pkgs.docker}/bin/docker ps --format "table {{.Names}}\t{{.Status}}" | grep -q "sourcebot.*Up"; then
                 echo "[ERROR] Sourcebot container already running. Stop it first with: docker stop sourcebot"
@@ -355,7 +355,7 @@
         fi
 
         echo "[SUCCESS] Sourcebot services started!"
-        echo "Web interface: http://localhost:3002"
+        echo "Web interface: http://localhost:3003"
         echo "PostgreSQL: localhost:5433 (user: sourcebot, db: sourcebot)"
         echo "Redis: localhost:6380"
       ''}";
@@ -455,9 +455,9 @@
     echo ""
     echo "Service Health:"
     echo "==============="
-    echo "Sourcebot: http://localhost:3002"
+    echo "Sourcebot: http://localhost:3003"
     echo -n "Status: "
-    if ${pkgs.curl}/bin/curl -sf http://localhost:3002/health >/dev/null 2>&1; then
+    if ${pkgs.curl}/bin/curl -sf http://localhost:3003/health >/dev/null 2>&1; then
       echo "✅ Healthy"
     else
       echo "❌ Not responding"
@@ -602,7 +602,7 @@
     ${pkgs.docker}/bin/docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d
 
     echo "Sourcebot started manually!"
-    echo "Web interface: http://localhost:3002"
+    echo "Web interface: http://localhost:3003"
     echo "Use 'sourcebot-docker-stop' to stop"
   '';
   home.file.".local/bin/sourcebot-docker-start".executable = true;
