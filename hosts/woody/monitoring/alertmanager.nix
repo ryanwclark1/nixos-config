@@ -25,8 +25,6 @@
 
     configuration = {
       global = {
-        smtp_smarthost = "localhost:587";
-        smtp_from = "alertmanager@woody";
         resolve_timeout = "5m";
       };
 
@@ -205,30 +203,6 @@
                 bearer_token = "critical-webhook-token";
               };
             }
-            {
-              url = "http://127.0.0.1:5002/pagerduty";
-              send_resolved = false;
-            }
-          ];
-          email_configs = [
-            {
-              to = "admin@woody";
-              send_resolved = true;
-              headers = {
-                Priority = "urgent";
-                X-Alert-Type = "critical";
-              };
-            }
-            {
-              to = "oncall@woody";
-              send_resolved = true;
-            }
-          ];
-          pagerduty_configs = [
-            {
-              service_key = "YOUR-PAGERDUTY-SERVICE-KEY";
-              severity = "critical";
-            }
           ];
         }
         {
@@ -237,23 +211,6 @@
             {
               url = "http://127.0.0.1:5001/database/critical";
               send_resolved = true;
-            }
-          ];
-          email_configs = [
-            {
-              to = "dba-oncall@woody";
-              send_resolved = true;
-              headers = {
-                Priority = "urgent";
-                X-Alert-Component = "database";
-              };
-            }
-          ];
-          pagerduty_configs = [
-            {
-              service_key = "DATABASE-PAGERDUTY-KEY";
-              severity = "critical";
-              client = "Woody Database Alerts";
             }
           ];
         }
@@ -282,13 +239,6 @@
               send_resolved = true;
             }
           ];
-          email_configs = [
-            {
-              to = "ops@woody";
-              send_resolved = true;
-              html = "{{ template \"email.to.html\" . }}";
-            }
-          ];
         }
         {
           name = "security.alerts";
@@ -302,15 +252,6 @@
               send_resolved = false;
             }
           ];
-          email_configs = [
-            {
-              to = "security@woody";
-              send_resolved = true;
-              headers = {
-                X-Security-Alert = "true";
-              };
-            }
-          ];
         }
         {
           name = "security.urgent";
@@ -319,22 +260,6 @@
               url = "http://127.0.0.1:5001/security/urgent";
               send_resolved = true;
               max_alerts = 5;
-            }
-          ];
-          email_configs = [
-            {
-              to = "security-urgent@woody";
-              send_resolved = true;
-              headers = {
-                Priority = "urgent";
-                X-Security-Type = "brute-force";
-              };
-            }
-          ];
-          pagerduty_configs = [
-            {
-              service_key = "SECURITY-PAGERDUTY-KEY";
-              severity = "critical";
             }
           ];
         }
@@ -346,25 +271,12 @@
               send_resolved = true;
             }
           ];
-          slack_configs = [
-            {
-              api_url = "https://hooks.slack.com/services/YOUR/SECURITY/WEBHOOK";
-              channel = "#security-firewall";
-              title = "Firewall Alert";
-            }
-          ];
         }
         {
           name = "network.alerts";
           webhook_configs = [
             {
               url = "http://127.0.0.1:5001/network";
-              send_resolved = true;
-            }
-          ];
-          email_configs = [
-            {
-              to = "network@woody";
               send_resolved = true;
             }
           ];
@@ -375,15 +287,6 @@
             {
               url = "http://127.0.0.1:5001/ssl";
               send_resolved = true;
-            }
-          ];
-          email_configs = [
-            {
-              to = "ssl-admin@woody";
-              send_resolved = true;
-              headers = {
-                X-Certificate-Alert = "true";
-              };
             }
           ];
         }
@@ -413,24 +316,6 @@
               http_config = {
                 bearer_token = "prod-webhook-token";
               };
-            }
-          ];
-          email_configs = [
-            {
-              to = "prod-alerts@woody";
-              send_resolved = true;
-            }
-          ];
-          opsgenie_configs = [
-            {
-              api_key = "YOUR-OPSGENIE-API-KEY";
-              responders = [
-                {
-                  type = "team";
-                  name = "production-team";
-                }
-              ];
-              priority = "P1";
             }
           ];
         }
@@ -463,12 +348,6 @@
           webhook_configs = [
             {
               url = "http://127.0.0.1:5001/monitoring";
-              send_resolved = true;
-            }
-          ];
-          email_configs = [
-            {
-              to = "monitoring@woody";
               send_resolved = true;
             }
           ];
