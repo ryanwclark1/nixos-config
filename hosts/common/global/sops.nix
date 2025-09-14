@@ -26,6 +26,14 @@
       # generate a new key if none is found
       generateKey = true;
     };
+    # System-level secrets that need to be available to system services
+    secrets = {
+      # WireGuard secrets (will be overridden in individual service configs for specific ownership)
+      wg-key = {};
+      accent-wg-server = {};
+      # Add other system-level secrets here as needed
+      administrator-password = {};
+    };
   };
 
   # Add sops-nix package to system packages
