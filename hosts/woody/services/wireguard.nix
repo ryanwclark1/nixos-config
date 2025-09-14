@@ -10,12 +10,17 @@
     pkgs.wireguard-tools
   ];
 
+  # Override ownership/permissions for WireGuard secrets (defined globally)
   sops.secrets = {
     wg-key = {
-      sopsFile = ../../../secrets/secrets.yaml;
+      owner = "systemd-network";
+      group = "systemd-network";
+      mode = "0400";
     };
     accent-wg-server = {
-      sopsFile = ../../../secrets/secrets.yaml;
+      owner = "systemd-network";
+      group = "systemd-network";
+      mode = "0400";
     };
   };
 
