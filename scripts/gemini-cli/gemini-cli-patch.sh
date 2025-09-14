@@ -15,7 +15,14 @@ TAG="${1:?Supply target tag/branch, e.g. v0.4.1}"
 PATCH_IN="${2:?Supply path to the existing .patch (email-style)}"
 PATCH_OUT="${3:-gemini-cli-${TAG}-ported.patch}"
 
-REPO_URL="${REPO_URL:-https://github.com/google-gemini/gemini-cli.git}"  # change if your upstream differs
+# Use the repo URL you actually used (per your log)
+REPO_URL="${REPO_URL:-https://github.com/google-gemini/gemini-cli.git}"
+
+# Make PATCH_IN absolute so it survives cd
+if [[ "$PATCH_IN" != /* ]]; then
+  PATCH_IN="$(cd "$(dirname "$PATCH_IN")" && pwd)/$(basename "$PATCH_IN")"
+fi
+
 WORKDIR="$(mktemp -d -t gemini-cli-port-XXXXXX)"
 trap 'echo "Workdir: $WORKDIR"' EXIT
 
@@ -23,44 +30,43 @@ echo "==> Cloning $REPO_URL at $TAG to $WORKDIR/repo"
 git clone --depth 1 --branch "$TAG" "$REPO_URL" "$WORKDIR/repo"
 
 cd "$WORKDIR/repo"
-
-# Minimal identity so we can create a commit if we need to resolve anything
 git config user.name  "Patch Porter"
 git config user.email "patch.porter@example.invalid"
 
 echo "==> Attempting 3-way apply with git am -3"
-set +e
-git am -3 "$PATCH_IN"
-AM_STATUS=$?
-set -e
-
-if [[ $AM_STATUS -ne 0 ]]; then
-  echo "==> git am failed; aborting am and attempting git apply --3way"
+if git am -3 "$PATCH_IN"; then
+  echo "==> git am succeeded"
+else
+  echo "==> git am failed; aborting and trying git apply strategies"
   git am --abort || true
 
-  # Try to apply the patch hunks with 3-way; may leave conflict markers
-  if git apply --3way --reject "$PATCH_IN"; then
-    echo "==> Patch applied with git apply --3way"
-    # If there are any .rej files or conflict markers, stop for manual fix.
-    REJECTS=$(git ls-files -o --exclude-standard | grep -E '\.rej$' || true)
-    CONFLICTS=$(git diff --name-only --diff-filter=U || true)
-    if [[ -n "$REJECTS$CONFLICTS" ]]; then
-      echo "!! Manual resolution required."
-      echo "   Rejects:    ${REJECTS:-<none>}"
-      echo "   Conflicts:  ${CONFLICTS:-<none>}"
-      echo "   Resolve, then run: git add -A && git commit -m 'Port local ripgrep patch to ${TAG}'"
-      echo "   Then produce patch with: git format-patch -1 --stdout > '$PATCH_OUT'"
-      exit 2
-    fi
+  # First try a 3-way apply (uses index/BASE for context)
+  if git apply --3way "$PATCH_IN"; then
+    echo "==> git apply --3way succeeded"
     git add -A
     git commit -m "Port: replace npm's ripgrep with local (ported to ${TAG})"
   else
-    echo "!! Could not apply patch automatically."
-    echo "   Inspect workdir: $WORKDIR/repo"
-    exit 1
+    echo "==> git apply --3way failed; trying --reject to produce .rej hunks"
+    if git apply --reject "$PATCH_IN"; then
+      echo "==> Patch applied with rejects; check *.rej to resolve manually"
+      REJECTS=$(git ls-files -o --exclude-standard | grep -E '\.rej$' || true)
+      if [[ -n "$REJECTS" ]]; then
+        echo "Rejects present:"
+        echo "$REJECTS"
+        echo "Resolve rejects/conflicts, then:"
+        echo "  git add -A"
+        echo "  git commit -m 'Port local ripgrep patch to ${TAG}'"
+        echo "  git format-patch -1 --stdout > '$PATCH_OUT'"
+        exit 2
+      fi
+      git add -A
+      git commit -m "Port: replace npm's ripgrep with local (ported to ${TAG})"
+    else
+      echo "!! Could not apply patch automatically."
+      echo "   Inspect workdir: $WORKDIR/repo"
+      exit 1
+    fi
   fi
-else
-  echo "==> git am succeeded"
 fi
 
 echo "==> Emitting new patch to $PATCH_OUT"
