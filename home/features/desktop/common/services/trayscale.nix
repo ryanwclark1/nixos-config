@@ -3,8 +3,9 @@
 }:
 
 {
+  # Temporary turned off until we can fix the issues with it
   services.trayscale = {
-    enable = true;
+    enable = false;
     hideWindow = false;
   };
 }
