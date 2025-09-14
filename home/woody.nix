@@ -78,24 +78,23 @@
     amdgpu_top
   ];
 
-  # Woody-specific USB DAC configuration
+  # Woody-specific USB DAC configuration (migrated to WirePlumber 0.5+ JSON format)
   # Set USB DAC (PCM2704) as default audio output on startup
   # This ensures volume controls work with the correct device
-  home.file.".config/wireplumber/main.lua.d/51-usb-dac-default.lua".text = ''
-    -- Set USB DAC (PCM2704) as default audio sink with higher priority
-    rule = {
-      matches = {
-        {
-          { "node.name", "matches", "*PCM2704*Pro*" },
-        },
-      },
-      apply_properties = {
-        ["audio.priority"] = 1000,
-        ["priority.driver"] = 1000,
-      },
-    }
-
-    table.insert(alsa_monitor.rules, rule)
+  home.file.".config/wireplumber/wireplumber.conf.d/51-usb-dac-default.conf".text = ''
+    monitor.alsa.rules = [
+      {
+        matches = [
+          { node.name = "*PCM2704*Pro*" }
+        ]
+        actions = {
+          update-props = {
+            audio.priority = 1000
+            priority.driver = 1000
+          }
+        }
+      }
+    ]
   '';
 
   # wallpaper = pkgs.wallpapers.aenami-lost-in-between;
