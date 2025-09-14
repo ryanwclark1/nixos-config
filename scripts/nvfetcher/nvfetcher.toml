@@ -13,20 +13,21 @@ src.vsmarketplace = "biomejs.biome"
 fetch.vsmarketplace = "biomejs.biome"
 passthru = { publisher = "biomejs", name = "biome" }
 
-[claude-code-chat]
-src.vsmarketplace = "AndrePimenta.claude-code-chat"
-fetch.vsmarketplace = "AndrePimenta.claude-code-chat"
-passthru = { publisher = "AndrePimenta", name = "claude-code-chat" }
+[chatgpt]
+src.vsmarketplace = "openai.chatgpt"
+fetch.vsmarketplace = "openai.chatgpt"
+passthru = { publisher = "openai", name = "chatgpt" }
+
+
+[claude-code]
+src.vsmarketplace = "anthropic.claude-code"
+fetch.vsmarketplace = "anthropic.claude-code"
+passthru = { publisher = "anthropic", name = "claude-code" }
 
 [context7-mcp]
 src.vsmarketplace = "upstash.context7-mcp"
 fetch.vsmarketplace = "upstash.context7-mcp"
 passthru = { publisher = "upstash", name = "context7-mcp" }
-
-[claude-dev]
-src.vsmarketplace = "saoudrizwan.claude-dev"
-fetch.vsmarketplace = "saoudrizwan.claude-dev"
-passthru = { publisher = "saoudrizwan", name = "claude-dev" }
 
 [copilot]
 src.vsmarketplace = "github.copilot"
@@ -42,6 +43,11 @@ passthru = { publisher = "github", name = "copilot-chat" }
 src.vsmarketplace = "vitest.explorer"
 fetch.vsmarketplace = "vitest.explorer"
 passthru = { publisher = "vitest", name = "explorer" }
+
+[gemini-cli-vscode-ide-companion]
+src.vsmarketplace = "Google.gemini-cli-vscode-ide-companion"
+fetch.vsmarketplace = "Google.gemini-cli-vscode-ide-companion"
+passthru = { publisher = "Google", name = "gemini-cli-vscode-ide-companion" }
 
 [gopls]
 src.github_tag = "golang/tools"
