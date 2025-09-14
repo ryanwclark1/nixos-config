@@ -24,12 +24,4 @@
 
   # Enable BlueZ service
   services.blueman.enable = true;
-
-  # Enable PipeWire Bluetooth support
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    pulse.enable = true;
-    # bluetooth.enable = true;
-  };
 }
