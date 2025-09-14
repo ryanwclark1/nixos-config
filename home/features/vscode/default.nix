@@ -269,17 +269,17 @@
               sha256 = "sha256-wWyLIjNOBjIe72ed+wwfQWGH7Vzuea/0Xux0XJkhAkY=";
               version = "2025.7.41733";
             }
-            # {
-            #   name = "claude-code-chat";  # Removed: redundant with claude-dev
-            #   publisher = "AndrePimenta";
-            #   sha256 = "sha256-tPY9mXpfzhRwbrbo0evInzLnKoaCc3zki6akFGaFQsg=";
-            #   version = "1.0.6";
-            # }
             {
-              name = "claude-dev";
-              publisher = "saoudrizwan";
-              sha256 = "sha256-6sE0nwgB7FSnAlnj/2NRxPP0JdH+KKez4ifPnCcLsrQ=";
-              version = "3.27.0";
+              name = "chatgpt";
+              publisher = "openai";
+              sha256 = "sha256-drpduDyHT/Aem/55Cjnu01aNe/ijlNgLSpKvtg9WU40=";
+              version = "0.5.5";
+            }
+            {
+              name = "claude-code";
+              publisher = "anthropic";
+              sha256 = "sha256-g79/+Jzh8HBhndFMQ+qmP2iNMqJw75c5BrLPsiJg0gc=";
+              version = "1.0.109";
             }
             # {
             #   name = "context7-mcp";  # Removed: conflicts with home-manager MCP setup
@@ -304,6 +304,12 @@
               publisher = "vitest";
               sha256 = "sha256-r1KCT6UYgoCPRRxy+dmJLkwUW2yRixBwfYra4kSJYB0=";
               version = "1.28.2";
+            }
+            {
+              name = "gemini-cli-vscode-ide-companion";
+              publisher = "Google";
+              sha256 = "sha256-zQ8616UT9pR8+PYP903m5/VVfbIHpZ0DEVq+XO0e4i0=";
+              version = "0.2.2";
             }
             {
               name = "grafana-alloy";
@@ -601,6 +607,10 @@
 
           # Context7 Integration
           "github.copilot.chat.newWorkspace.useContext7" = true;  # Enable Context7 for new workspaces
+
+          ###  Chatgpt - Codex ###
+          "chatgpt.openOnStartup" = true;
+
 
           #####  Dev Containers #####
           # "dev.containers.defaultExtensionsIfInstalledLocally" = [
