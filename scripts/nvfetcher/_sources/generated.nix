@@ -34,27 +34,27 @@
     publisher = "biomejs";
     name = "biome";
   };
-  claude-code-chat = {
-    pname = "claude-code-chat";
-    version = "1.0.6";
+  chatgpt = {
+    pname = "chatgpt";
+    version = "0.5.5";
     src = fetchurl {
-      url = "https://AndrePimenta.gallery.vsassets.io/_apis/public/gallery/publisher/AndrePimenta/extension/claude-code-chat/1.0.6/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "claude-code-chat-1.0.6.zip";
-      sha256 = "sha256-tPY9mXpfzhRwbrbo0evInzLnKoaCc3zki6akFGaFQsg=";
+      url = "https://openai.gallery.vsassets.io/_apis/public/gallery/publisher/openai/extension/chatgpt/0.5.5/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "chatgpt-0.5.5.zip";
+      sha256 = "sha256-drpduDyHT/Aem/55Cjnu01aNe/ijlNgLSpKvtg9WU40=";
     };
-    publisher = "AndrePimenta";
-    name = "claude-code-chat";
+    publisher = "openai";
+    name = "chatgpt";
   };
-  claude-dev = {
-    pname = "claude-dev";
-    version = "3.27.0";
+  claude-code = {
+    pname = "claude-code";
+    version = "1.0.109";
     src = fetchurl {
-      url = "https://saoudrizwan.gallery.vsassets.io/_apis/public/gallery/publisher/saoudrizwan/extension/claude-dev/3.27.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "claude-dev-3.27.0.zip";
-      sha256 = "sha256-6sE0nwgB7FSnAlnj/2NRxPP0JdH+KKez4ifPnCcLsrQ=";
+      url = "https://anthropic.gallery.vsassets.io/_apis/public/gallery/publisher/anthropic/extension/claude-code/1.0.109/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "claude-code-1.0.109.zip";
+      sha256 = "sha256-g79/+Jzh8HBhndFMQ+qmP2iNMqJw75c5BrLPsiJg0gc=";
     };
-    publisher = "saoudrizwan";
-    name = "claude-dev";
+    publisher = "anthropic";
+    name = "claude-code";
   };
   context7-mcp = {
     pname = "context7-mcp";
@@ -69,22 +69,22 @@
   };
   copilot = {
     pname = "copilot";
-    version = "1.366.1775";
+    version = "1.367.1777";
     src = fetchurl {
-      url = "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot/1.366.1775/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "copilot-1.366.1775.zip";
-      sha256 = "sha256-Irp2xqVySCo5cKHxTGXVcr8koPyJBRk0VH+RfQ+eZec=";
+      url = "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot/1.367.1777/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "copilot-1.367.1777.zip";
+      sha256 = "sha256-6cfVLuzoMy6bVd8u8nZh7QU6lKvO20/G9IHmRe6yNVs=";
     };
     publisher = "github";
     name = "copilot";
   };
   copilot-chat = {
     pname = "copilot-chat";
-    version = "0.31.2025090302";
+    version = "0.31.2025090803";
     src = fetchurl {
-      url = "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot-chat/0.31.2025090302/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "copilot-chat-0.31.2025090302.zip";
-      sha256 = "sha256-99Ez7lIK9IoTk3lfaCRBRYSoaC3v50tFJvO2t+Tflm0=";
+      url = "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot-chat/0.31.2025090803/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "copilot-chat-0.31.2025090803.zip";
+      sha256 = "sha256-pgBNrRF8SRWUKyUFuiMyQXn6ap0Ds0eeVOrfVQn5RRs=";
     };
     publisher = "github";
     name = "copilot-chat";
@@ -99,6 +99,17 @@
     };
     publisher = "vitest";
     name = "explorer";
+  };
+  gemini-cli-vscode-ide-companion = {
+    pname = "gemini-cli-vscode-ide-companion";
+    version = "0.2.2";
+    src = fetchurl {
+      url = "https://Google.gallery.vsassets.io/_apis/public/gallery/publisher/Google/extension/gemini-cli-vscode-ide-companion/0.2.2/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "gemini-cli-vscode-ide-companion-0.2.2.zip";
+      sha256 = "sha256-zQ8616UT9pR8+PYP903m5/VVfbIHpZ0DEVq+XO0e4i0=";
+    };
+    publisher = "Google";
+    name = "gemini-cli-vscode-ide-companion";
   };
   gopls = {
     pname = "gopls";
@@ -234,11 +245,11 @@
   };
   specstory-vscode = {
     pname = "specstory-vscode";
-    version = "0.18.0";
+    version = "0.19.1";
     src = fetchurl {
-      url = "https://specstory.gallery.vsassets.io/_apis/public/gallery/publisher/specstory/extension/specstory-vscode/0.18.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "specstory-vscode-0.18.0.zip";
-      sha256 = "sha256-RFqGGiFHmGxwoyXuW5pHnyq+OPyjZFryCkwYm8E+lpg=";
+      url = "https://specstory.gallery.vsassets.io/_apis/public/gallery/publisher/specstory/extension/specstory-vscode/0.19.1/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "specstory-vscode-0.19.1.zip";
+      sha256 = "sha256-ivCZL7lJ1G3sb2VQyoxO4KdG7dHJldagpYlmYpOdmVo=";
     };
     publisher = "specstory";
     name = "specstory-vscode";
@@ -333,11 +344,11 @@
   };
   vscode-thunder-client = {
     pname = "vscode-thunder-client";
-    version = "2.37.5";
+    version = "2.37.7";
     src = fetchurl {
-      url = "https://rangav.gallery.vsassets.io/_apis/public/gallery/publisher/rangav/extension/vscode-thunder-client/2.37.5/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "vscode-thunder-client-2.37.5.zip";
-      sha256 = "sha256-P50jK4hg8GFg+rQ8HbeLzcMXCzvD72mF7kaGW6a1L7Y=";
+      url = "https://rangav.gallery.vsassets.io/_apis/public/gallery/publisher/rangav/extension/vscode-thunder-client/2.37.7/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "vscode-thunder-client-2.37.7.zip";
+      sha256 = "sha256-6uTT2WlWylc7xkvVIZTvFCMZEluKUM3epLZm4I0FaT4=";
     };
     publisher = "rangav";
     name = "vscode-thunder-client";

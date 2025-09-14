@@ -17,16 +17,16 @@
   version = "2025.7.41733";
 }
 {
-  name = "claude-code-chat";
-  publisher = "AndrePimenta";
-  sha256 = "sha256-tPY9mXpfzhRwbrbo0evInzLnKoaCc3zki6akFGaFQsg=";
-  version = "1.0.6";
+  name = "chatgpt";
+  publisher = "openai";
+  sha256 = "sha256-drpduDyHT/Aem/55Cjnu01aNe/ijlNgLSpKvtg9WU40=";
+  version = "0.5.5";
 }
 {
-  name = "claude-dev";
-  publisher = "saoudrizwan";
-  sha256 = "sha256-6sE0nwgB7FSnAlnj/2NRxPP0JdH+KKez4ifPnCcLsrQ=";
-  version = "3.27.0";
+  name = "claude-code";
+  publisher = "anthropic";
+  sha256 = "sha256-g79/+Jzh8HBhndFMQ+qmP2iNMqJw75c5BrLPsiJg0gc=";
+  version = "1.0.109";
 }
 {
   name = "context7-mcp";
@@ -37,20 +37,26 @@
 {
   name = "copilot";
   publisher = "github";
-  sha256 = "sha256-Irp2xqVySCo5cKHxTGXVcr8koPyJBRk0VH+RfQ+eZec=";
-  version = "1.366.1775";
+  sha256 = "sha256-6cfVLuzoMy6bVd8u8nZh7QU6lKvO20/G9IHmRe6yNVs=";
+  version = "1.367.1777";
 }
 {
   name = "copilot-chat";
   publisher = "github";
-  sha256 = "sha256-99Ez7lIK9IoTk3lfaCRBRYSoaC3v50tFJvO2t+Tflm0=";
-  version = "0.31.2025090302";
+  sha256 = "sha256-pgBNrRF8SRWUKyUFuiMyQXn6ap0Ds0eeVOrfVQn5RRs=";
+  version = "0.31.2025090803";
 }
 {
   name = "explorer";
   publisher = "vitest";
   sha256 = "sha256-r1KCT6UYgoCPRRxy+dmJLkwUW2yRixBwfYra4kSJYB0=";
   version = "1.28.2";
+}
+{
+  name = "gemini-cli-vscode-ide-companion";
+  publisher = "Google";
+  sha256 = "sha256-zQ8616UT9pR8+PYP903m5/VVfbIHpZ0DEVq+XO0e4i0=";
+  version = "0.2.2";
 }
 {
   name = "grafana-alloy";
@@ -121,8 +127,8 @@
 {
   name = "specstory-vscode";
   publisher = "specstory";
-  sha256 = "sha256-RFqGGiFHmGxwoyXuW5pHnyq+OPyjZFryCkwYm8E+lpg=";
-  version = "0.18.0";
+  sha256 = "sha256-ivCZL7lJ1G3sb2VQyoxO4KdG7dHJldagpYlmYpOdmVo=";
+  version = "0.19.1";
 }
 {
   name = "tailwind-color-matcher";
@@ -175,6 +181,6 @@
 {
   name = "vscode-thunder-client";
   publisher = "rangav";
-  sha256 = "sha256-P50jK4hg8GFg+rQ8HbeLzcMXCzvD72mF7kaGW6a1L7Y=";
-  version = "2.37.5";
+  sha256 = "sha256-6uTT2WlWylc7xkvVIZTvFCMZEluKUM3epLZm4I0FaT4=";
+  version = "2.37.7";
 }
