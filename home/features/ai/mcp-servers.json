@@ -143,5 +143,14 @@
       "NODE_ENV": "production"
     },
     "description": "Helps break down complex problems into sequential steps"
+  },
+  "nixos": {
+    "command": "docker",
+    "args": [
+      "run",
+      "--rm",
+      "-i",
+      "ghcr.io/utensils/mcp-nixos"
+    ]
   }
 }
