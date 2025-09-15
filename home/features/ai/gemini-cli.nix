@@ -8,8 +8,7 @@
   programs.gemini-cli = {
     enable = true;
 
-    package = with pkgs; [
-      (pkgs.buildNpmPackage rec {
+    package = pkgs.buildNpmPackage rec {
         pname = "gemini-cli";
         version = "0.4.1";
 
@@ -75,15 +74,21 @@
           maintainers = [ ];
           mainProgram = "gemini";
         };
-      })
-    ];
+      };
 
     # Default model configuration
     # defaultModel = "gemini-1.5-flash";
 
     # JSON configuration settings
     settings = {
-      # Add any specific configuration options here
+      theme = "Default";
+      selectedAuthType = "oauth-personal";
+      autoAccept = true;
+      vimMode = true;
+      ideMode = true;
+      hasSeenIdeIntegrationNudge = true;
+      # Import MCP servers configuration
+      mcpServers = (builtins.fromJSON (builtins.readFile ./mcp-servers.json));
     };
 
     # Custom commands (if needed)
