@@ -8,7 +8,7 @@
   imports = [
     ./mcp-openwebui.nix
     ./sourcebot.nix  # Docker Compose-based Sourcebot with PostgreSQL and Redis
-    ./gemini-cli-override.nix  # Custom gemini-cli version override
+    ./gemini-cli.nix  # Custom gemini-cli version override
     # ./open-webui-docker.nix
   ];
   home.packages = with pkgs; [

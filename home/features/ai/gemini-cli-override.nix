@@ -46,23 +46,29 @@
         echo "export const GIT_COMMIT_INFO = { commitHash: '${src.rev}' };" > packages/generated/git-commit.ts
       '';
 
-      # Custom install phase to handle workspace structure
+      # Use nixpkgs-style install phase for proper workspace handling
       installPhase = ''
         runHook preInstall
-        
-        mkdir -p $out/lib/node_modules/@google/gemini-cli
-        
-        # Copy the entire source to preserve workspace structure
-        cp -r . $out/lib/node_modules/@google/gemini-cli/
-        
-        # Create the main binary
-        mkdir -p $out/bin
-        cat > $out/bin/gemini << 'EOF'
-        #!/usr/bin/env bash
-        exec ${pkgs.nodejs}/bin/node $out/lib/node_modules/@google/gemini-cli/bundle/gemini.js "$@"
-        EOF
-        chmod +x $out/bin/gemini
-        
+        mkdir -p $out/{bin,share/gemini-cli}
+
+        cp -r node_modules $out/share/gemini-cli/
+
+        # Remove workspace symlinks that would be broken
+        rm -f $out/share/gemini-cli/node_modules/@google/gemini-cli
+        rm -f $out/share/gemini-cli/node_modules/@google/gemini-cli-core
+        rm -f $out/share/gemini-cli/node_modules/@google/gemini-cli-a2a-server
+        rm -f $out/share/gemini-cli/node_modules/@google/gemini-cli-test-utils
+        rm -f $out/share/gemini-cli/node_modules/gemini-cli-vscode-ide-companion
+
+        # Copy actual packages to replace broken symlinks
+        cp -r packages/cli $out/share/gemini-cli/node_modules/@google/gemini-cli
+        cp -r packages/core $out/share/gemini-cli/node_modules/@google/gemini-cli-core
+        cp -r packages/a2a-server $out/share/gemini-cli/node_modules/@google/gemini-cli-a2a-server
+
+        # Create main binary symlink
+        ln -s $out/share/gemini-cli/node_modules/@google/gemini-cli/dist/index.js $out/bin/gemini
+        chmod +x "$out/bin/gemini"
+
         runHook postInstall
       '';
 
