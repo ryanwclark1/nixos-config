@@ -7,16 +7,16 @@
     # Main webapp launcher with profile support
     (writeShellScriptBin "launch-webapp" (''\
       PATH="${pkgs.xdg-utils}/bin:${pkgs.coreutils}/bin:${pkgs.gnused}/bin:${pkgs.libnotify}/bin:${pkgs.procps}/bin:$PATH"
-      
+
     '' + builtins.readFile (./. + "/launch-webapp.sh")))
-    
+
     # Logged webapp launcher that adds usage tracking
     (writeShellScriptBin "launch-webapp-logged" ''
       #!/usr/bin/env bash
-      
+
       LOGFILE="$HOME/.local/share/webapp-usage.log"
       WEBAPP_NAME=""
-      
+
       # Extract webapp name from URL
       case "$1" in
         *youtube.com*) WEBAPP_NAME="YouTube" ;;
@@ -26,10 +26,10 @@
         *teams.microsoft.com*) WEBAPP_NAME="Teams" ;;
         *) WEBAPP_NAME="$(echo "$1" | sed 's|https\?://\([^/]*\).*|\1|')" ;;
       esac
-      
+
       # Create log directory if it doesn't exist
       mkdir -p "$(dirname "$LOGFILE")"
-      
+
       # Log the launch with timestamp and additional info
       {
         echo "$(date '+%Y-%m-%d %H:%M:%S'): Launching $WEBAPP_NAME webapp"
@@ -39,35 +39,35 @@
         echo "  Desktop: $XDG_CURRENT_DESKTOP"
         echo "---"
       } >> "$LOGFILE"
-      
+
       # Launch the actual webapp
       exec launch-webapp "$@"
     '')
-    
+
     # Smart browser launcher with fallbacks
     (writeShellScriptBin "launch-browser" (''\
       PATH="${pkgs.xdg-utils}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gnused}/bin:${pkgs.libnotify}/bin:$PATH"
-      
+
     '' + builtins.readFile (./. + "/launch-browser.sh")))
-    
+
     # URL opener with webapp option
     (writeShellScriptBin "open-url" (''\
       PATH="${pkgs.coreutils}/bin:$PATH"
-      
+
     '' + builtins.readFile (./. + "/open-url.sh")))
-    
+
     # Bookmark launcher with rofi and walker support
     (writeShellScriptBin "launch-bookmarks" (''\
       PATH="${pkgs.rofi}/bin:${pkgs.walker}/bin:${pkgs.coreutils}/bin:$PATH"
-      
+
     '' + builtins.readFile (./. + "/launch-bookmarks.sh")))
-    
+
     # Webapp usage log viewer
     (writeShellScriptBin "webapp-logs" ''
       #!/usr/bin/env bash
-      
+
       LOGFILE="$HOME/.local/share/webapp-usage.log"
-      
+
       case "''${1:-view}" in
         view|show)
           if [[ -f "$LOGFILE" ]]; then
@@ -149,6 +149,11 @@
       sha256 = "14qkmr3hp2wnmiwrmlmxfk4dsvar42yfk2va3hm08gsdk2aphigg";
     };
 
+    ".local/share/applications/icons/claude.png".source = pkgs.fetchurl {
+      url = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/claude-ai.png";
+      sha256 = "efa1d055f726a949e2c172810bf1390e2688754311d0ade8556036e87c1275f0";
+    };
+
     # Webapp desktop entries
     ".local/share/applications/chatgpt.desktop".text = ''
       [Desktop Entry]
@@ -208,6 +213,18 @@
       Icon=${config.home.homeDirectory}/.local/share/applications/icons/teams.png
       StartupNotify=true
       Categories=Office;Network;Chat;
+    '';
+
+    ".local/share/applications/claude.desktop".text = ''
+      [Desktop Entry]
+      Name=Claude Code
+      Comment=Claude Code Web Application
+      Exec=bash -c 'echo "$(date): Launching Claude Code webapp" >> ~/.local/share/webapp-usage.log; launch-webapp https://claude.ai/ --profile=Default'
+      Terminal=false
+      Type=Application
+      Icon=${config.home.homeDirectory}/.local/share/applications/icons/claude.png
+      StartupNotify=true
+      Categories=Development;Network;AI;
     '';
   };
 }
