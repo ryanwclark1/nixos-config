@@ -12,8 +12,6 @@
     # Required for on-demand Docker-based MCP servers
     docker
     # Native MCP servers
-    playwright-mcp
-    # Required for Sourcebot MCP server
     nodejs
     jq
   ];

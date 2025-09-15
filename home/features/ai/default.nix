@@ -11,20 +11,20 @@
     ./gemini-cli.nix  # Custom gemini-cli version override
     # ./open-webui-docker.nix
     ./claude.nix
+    ./qwen.nix
   ];
   home.packages = with pkgs; [
     lmstudio
     # mlflow-server  # Temporarily disabled due to missing fastapi/uvicorn dependencies
-    # claude-code
     # aider-chat
 
+    playwright-mcp
+    # Required for Sourcebot MCP server
     amp-cli
     codex
     crush
     goose-cli
-    claude-code
-    qwen-code
-    # gemini-cli  # Using override instead (imported above)
+
 
     # Docker for running MCP servers
     docker
@@ -39,10 +39,10 @@
 
     # Tool-specific environment variables
     AIDER_MCP_CONFIG = "${config.home.homeDirectory}/.config/open-webui/mcp-servers-processed.json";
-    CLAUDE_CODE_MCP_CONFIG = "${config.home.homeDirectory}/.config/open-webui/mcp-servers-processed.json";
+    # CLAUDE_CODE_MCP_CONFIG = "${config.home.homeDirectory}/.config/open-webui/mcp-servers-processed.json";
     GOOSE_MCP_CONFIG = "${config.home.homeDirectory}/.config/open-webui/mcp-servers-processed.json";
     QWEN_MCP_CONFIG = "${config.home.homeDirectory}/.config/open-webui/mcp-servers-processed.json";
-    GEMINI_MCP_CONFIG = "${config.home.homeDirectory}/.config/open-webui/mcp-servers-processed.json";
+    # GEMINI_MCP_CONFIG = "${config.home.homeDirectory}/.config/open-webui/mcp-servers-processed.json";
 
     # Generic fallbacks
     MCP_TRANSPORT = "stdio";
