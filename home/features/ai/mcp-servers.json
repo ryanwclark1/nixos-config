@@ -3,8 +3,10 @@
     "command": "docker",
     "args": [
       "run",
-      "-i", "--rm",
-      "--name", "mcp-git",
+      "-i",
+      "--rm",
+      "--name",
+      "mcp-git",
       "-v", "{{HOME}}:{{HOME}}:rw",
       "-v", "{{HOME}}/.gitconfig:/root/.gitconfig:ro",
       "mcp/git"
@@ -15,9 +17,12 @@
     "command": "docker",
     "args": [
       "run",
-      "-i", "--rm",
-      "--name", "mcp-memory",
-      "-v", "mcp-memory-data:/data",
+      "-i",
+      "--rm",
+      "--name",
+      "mcp-memory",
+      "-v",
+      "mcp-memory-data:/data",
       "mcp/memory"
     ],
     "env": {
@@ -29,8 +34,10 @@
     "command": "docker",
     "args": [
       "run",
-      "-i", "--rm",
-      "--name", "mcp-time",
+      "-i",
+      "--rm",
+      "--name",
+      "mcp-time",
       "mcp/time",
       "--local-timezone=America/Chicago"
     ],
@@ -43,9 +50,12 @@
     "command": "docker",
     "args": [
       "run",
-      "-i", "--rm",
-      "--name", "mcp-fetch",
-      "--network", "bridge",
+      "-i",
+      "--rm",
+      "--name",
+      "mcp-fetch",
+      "--network",
+      "bridge",
       "mcp/fetch"
     ],
     "description": "Fetches and analyzes web content"
@@ -54,13 +64,14 @@
     "command": "docker",
     "args": [
       "run",
-      "-i", "--rm",
-      "--name", "mcp-context7",
+      "-i",
+      "--rm",
+      "--name",
+      "mcp-context7",
       "mcp/context7"
     ],
     "env": {
-      "CONTEXT7_TOKEN": "{{SOPS:context7-token}}",
-      "MCP_TRANSPORT": "stdio"
+      "CONTEXT7_TOKEN": "{{SOPS:context7-token}}"
     },
     "description": "Provides up-to-date code documentation for AI code editors"
   },
@@ -68,8 +79,10 @@
     "command": "docker",
     "args": [
       "run",
-      "-i", "--rm",
-      "--name", "mcp-github",
+      "-i",
+      "--rm",
+      "--name",
+      "mcp-github",
       "ghcr.io/github/github-mcp-server"
     ],
     "env": {
@@ -90,12 +103,19 @@
     "command": "docker",
     "args": [
       "run",
-      "-i", "--rm",
-      "--name", "mcp-serena",
-      "-v", "/home/administrator/Code:/workspace/Code:rw",
-      "--network", "host",
+      "-i",
+      "--rm",
+      "--name",
+      "mcp-serena",
+      "-v",
+      "/home/administrator/Code:/workspace/Code:rw",
+      "--network",
+      "host",
       "ghcr.io/oraios/serena:latest",
-      "serena", "start-mcp-server", "--transport", "stdio"
+      "serena",
+      "start-mcp-server",
+      "--transport",
+      "stdio"
     ],
     "env": {
       "SERENA_DOCKER": "1"
@@ -109,7 +129,7 @@
     ],
     "env": {
       "NODE_ENV": "production",
-      "SOURCEBOT_HOST": "http://localhost:3002",
+      "SOURCEBOT_HOST": "http://localhost:3003",
       "SOURCEBOT_API_KEY": "{{SOPS:sourcebot/api-key}}"
     },
     "description": "Code understanding and search via Sourcebot"
