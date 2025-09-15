@@ -1,6 +1,7 @@
 {
   pkgs,
   lib,
+  config,
   ...
 }:
 
@@ -87,7 +88,7 @@
       vimMode = true;
       ideMode = true;
       hasSeenIdeIntegrationNudge = true;
-      # Import MCP servers configuration
+      # Import MCP servers configuration (will be processed by activation script)
       mcpServers = (builtins.fromJSON (builtins.readFile ./mcp-servers.json));
     };
 
@@ -96,4 +97,37 @@
       # Example: "mycommand" = "echo 'custom command'";
     };
   };
+
+  # Process SOPS secrets in the generated settings file
+  home.activation.processGeminiMcpSecrets = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    gemini_settings="$HOME/.gemini/settings.json"
+    
+    if [ -f "$gemini_settings" ]; then
+      echo "Processing SOPS secrets in Gemini CLI settings..."
+      
+      # Create a temporary file
+      tmp_file=$(mktemp)
+      
+      # Read and process the settings file
+      settings_content=$(cat "$gemini_settings")
+      
+      # Replace SOPS placeholders with actual secret values
+      settings_content=$(echo "$settings_content" | sed "s|{{SOPS:context7-token}}|$(cat ${config.sops.secrets.context7-token.path})|g")
+      settings_content=$(echo "$settings_content" | sed "s|{{SOPS:github-pat}}|$(cat ${config.sops.secrets.github-pat.path})|g")
+      settings_content=$(echo "$settings_content" | sed "s|{{SOPS:sourcebot/api-key}}|$(cat ${config.sops.secrets."sourcebot/api-key".path})|g")
+      settings_content=$(echo "$settings_content" | sed "s|{{HOME}}|$HOME|g")
+      
+      # Write the processed content back
+      echo "$settings_content" > "$tmp_file"
+      
+      # Validate JSON and replace if valid
+      if ${pkgs.jq}/bin/jq . "$tmp_file" >/dev/null 2>&1; then
+        mv "$tmp_file" "$gemini_settings"
+        echo "SOPS secrets processed successfully in Gemini CLI settings"
+      else
+        echo "Error: Invalid JSON generated, keeping original settings"
+        rm -f "$tmp_file"
+      fi
+    fi
+  '';
 }
