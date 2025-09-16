@@ -11,17 +11,16 @@ let
   settingsPath = "${claudeHome}/settings.json";
 in
 {
+  home.file.".claude/statusline.sh" = {
+    source = ./statusline.sh;
+    executable = true;
+  };
+
   programs.claude-code = {
     enable  = true;
 
     package = pkgs.claude-code;  # Change if you use an overlay/unstable attr
 
-    # Point optional asset dirs to the official ~/.claude layout
-    # agentsDir   = "${claudeHome}/agents";
-    # commandsDir = "${claudeHome}/commands";
-    # hooksDir    = "${claudeHome}/hooks";
-
-    # settings.json — keys match Claude Code docs
     settings = {
       # Example: global env vars applied to sessions
       env = {
@@ -50,7 +49,7 @@ in
       hooks = {
         PreToolUse = [
           {
-            matcher = { tools = ["Bash"]; };
+            matcher = "Bash";
             hooks = [
               { type = "command"; command = "echo 'Running tool…' >&2"; }
             ];
@@ -58,7 +57,7 @@ in
         ];
         PostToolUse = [
           {
-            matcher = { tools = ["Bash"]; };
+            matcher = "Bash";
             hooks = [
               { type = "command"; command = "echo 'Tool done.' >&2"; }
             ];
@@ -68,26 +67,19 @@ in
 
       outputStyle = "Explanatory";
       model = "sonnet";
+
       statusLine = {
         type = "command";
-        command = "input=$(cat); echo \"[$(echo \"$input\" | jq -r '.model.display_name')] 📁 $(basename \"$(echo \"$input\" | jq -r '.workspace.current_dir')\")\"";
+        command = "${claudeHome}/statusline.sh";
+        padding = 0; # Optional: set to 0 to let status line go to
       };
+
+      # statusLine = {
+      #   type = "command";
+      #   command = "input=$(cat); echo \"[$(echo \"$input\" | jq -r '.model.display_name')] 📁 $(basename \"$(echo \"$input\" | jq -r '.workspace.current_dir')\")\"";
+      # };
       forceLoginMethod = "console";
 
-
-      # Enable / filter project .mcp.json servers
-      # enableAllProjectMcpServers = true;
-      # enabledMcpjsonServers = [ ];
-      # disabledMcpjsonServers = [ ];
-
-      # Example secret placeholders to be swapped in activation step
-      apiKeyHelper = "${claudeHome}/bin/generate_api_key.sh";
-      # Custom “integrations” block—just JSON that your workflows expect
-      # integrations = {
-      #   context7 = { token = "{{SOPS:context7-token}}"; };
-      #   github   = { pat   = "{{SOPS:github-pat}}"; };
-      #   sourcebot = { apiKey = "{{SOPS:sourcebot/api-key}}"; };
-      # };
 
       # Example memory settings (user-level)
       memory = {
@@ -96,23 +88,27 @@ in
         scope = "per-project";
         maxItems = 200;
       };
-      
+
       # Load MCP servers from a JSON file next to this module (adjust path as needed)
-      mcpServers = builtins.fromJSON (builtins.readFile ./mcp-servers.json);
+      # mcpServers = builtins.fromJSON (builtins.readFile ./mcp-servers.json);
     };
+
+    mcpServers = builtins.fromJSON (builtins.readFile ./mcp-servers.json);
 
     # You can still define inline agents/commands if you want:
     agents = {
       reviewer = ''
+        ---
+        name: reviewer
+        model: claude-sonnet
+        system_prompt: Prefer minimal actionable diffs; prioritize correctness/security.
+        tools: git, filesystem
+        description: Minimal-diff code reviewer that focuses on providing actionable, security-focused code review feedback.
+        ---
+
         # Minimal-diff code reviewer
 
-        **Model**: claude-3-7-sonnet
-
-        **System Prompt**: Prefer minimal actionable diffs; prioritize correctness/security.
-
-        **Tools**: git, filesystem
-
-        **Description**: Minimal-diff code reviewer that focuses on providing actionable, security-focused code review feedback.
+        A code review agent that prioritizes minimal, actionable diffs with a focus on correctness and security.
       '';
     };
 
@@ -130,37 +126,31 @@ in
     };
   };
 
-  # Ensure ~/.claude exists and seed a couple of helper files (optional)
-  home.file."${claudeHome}/.keep".text = "";
-
-  # Post-write activation hook: replace SOPS placeholders and {{HOME}} in ~/.claude/settings.json
-  home.activation.processClaudeSecrets = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    set -eu
-
-    settings="${settingsPath}"
-    if [ -f "$settings" ]; then
-      echo "Processing SOPS secrets in Claude Code settings…"
-
-      tmp=$(${pkgs.coreutils}/bin/mktemp)
-      content="$(${pkgs.coreutils}/bin/cat "$settings")"
-
-      # Replace SOPS placeholders with real secrets
-      content=$(echo "$content" | ${pkgs.gnused}/bin/sed "s|{{SOPS:context7-token}}|$(${pkgs.coreutils}/bin/cat ${config.sops.secrets.context7-token.path})|g")
-      content=$(echo "$content" | ${pkgs.gnused}/bin/sed "s|{{SOPS:github-pat}}|$(${pkgs.coreutils}/bin/cat ${config.sops.secrets.github-pat.path})|g")
-      content=$(echo "$content" | ${pkgs.gnused}/bin/sed "s|{{SOPS:sourcebot/api-key}}|$(${pkgs.coreutils}/bin/cat ${config.sops.secrets."sourcebot/api-key".path})|g")
-
-      # Expand {{HOME}}
-      content=$(echo "$content" | ${pkgs.gnused}/bin/sed "s|{{HOME}}|$HOME|g")
-
-      echo "$content" > "$tmp"
-
-      if ${pkgs.jq}/bin/jq . "$tmp" >/dev/null 2>&1; then
-        ${pkgs.coreutils}/bin/mv "$tmp" "$settings"
-        echo "Claude Code settings updated with SOPS secrets."
-      else
-        echo "Error: Invalid JSON after substitution; keeping original file."
-        ${pkgs.coreutils}/bin/rm -f "$tmp"
+  # Create .env file with secrets from SOPS
+  home.file."${claudeHome}/.env" = {
+    force = true;
+    text = ''
+      # MCP Server Environment Variables
+      CONTEXT7_TOKEN=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets.context7-token.path})
+      GITHUB_PERSONAL_ACCESS_TOKEN=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets.github-pat.path})
+      SOURCEBOT_API_KEY=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets."sourcebot/api-key".path})
+    '';
+    onChange = ''
+      # Expand SOPS secrets in .env file
+      if [ -f "${claudeHome}/.env" ]; then
+        tmp=$(${pkgs.coreutils}/bin/mktemp)
+        while IFS= read -r line; do
+          if [[ "$line" =~ ^([A-Z_]+)=\$\((.+)\)$ ]]; then
+            var_name="''${BASH_REMATCH[1]}"
+            cmd="''${BASH_REMATCH[2]}"
+            value=$(eval "$cmd" 2>/dev/null || echo "")
+            echo "$var_name=$value" >> "$tmp"
+          else
+            echo "$line" >> "$tmp"
+          fi
+        done < "${claudeHome}/.env"
+        ${pkgs.coreutils}/bin/mv "$tmp" "${claudeHome}/.env"
       fi
-    fi
-  '';
+    '';
+  };
 }
