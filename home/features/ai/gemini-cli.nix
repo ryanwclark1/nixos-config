@@ -9,7 +9,6 @@ let
   geminiHome = "${config.home.homeDirectory}/.gemini";
   settingsPath = "${geminiHome}/settings.json";
 in
-
 {
   programs.gemini-cli = {
     enable = true;
@@ -82,8 +81,6 @@ in
         };
       };
 
-    # Default model configuration
-    # defaultModel = "gemini-1.5-flash";
 
     # JSON configuration settings
     settings = {
@@ -93,45 +90,41 @@ in
       vimMode = true;
       ideMode = true;
       hasSeenIdeIntegrationNudge = true;
-      # Import MCP servers configuration (will be processed by activation script)
+      # Import MCP servers configuration
       mcpServers = (builtins.fromJSON (builtins.readFile ./mcp-servers.json));
     };
 
     # Custom commands (if needed)
-    commands = {
-      # Example: "mycommand" = "echo 'custom command'";
-    };
+    # commands = {
+    #   # Example: "mycommand" = "echo 'custom command'";
+    # };
   };
 
-  # Process SOPS secrets in the generated settings file
-  home.activation.processGeminiMcpSecrets = lib.hm.dag.entryAfter ["writeBoundary"] ''
-    set -eu
-
-    settings="${settingsPath}"
-
-    if [ -f "$settings" ]; then
-      echo "Processing SOPS secrets in Gemini CLI settings..."
-
-      tmp=$(${pkgs.coreutils}/bin/mktemp)
-      content="$(${pkgs.coreutils}/bin/cat "$settings")"
-
-      # Replace SOPS placeholders with real secrets
-      content=$(echo "$content" | ${pkgs.gnused}/bin/sed "s|{{SOPS:context7-token}}|$(${pkgs.coreutils}/bin/cat ${config.sops.secrets.context7-token.path})|g")
-      content=$(echo "$content" | ${pkgs.gnused}/bin/sed "s|{{SOPS:github-pat}}|$(${pkgs.coreutils}/bin/cat ${config.sops.secrets.github-pat.path})|g")
-      content=$(echo "$content" | ${pkgs.gnused}/bin/sed "s|{{SOPS:sourcebot/api-key}}|$(${pkgs.coreutils}/bin/cat ${config.sops.secrets."sourcebot/api-key".path})|g")
-
-       # Expand {{HOME}}
-      content=$(echo "$content" | ${pkgs.gnused}/bin/sed "s|{{HOME}}|$HOME|g")
-
-      echo "$content" > "$tmp"
-
-      if ${pkgs.jq}/bin/jq . "$tmp" >/dev/null 2>&1; then
-        ${pkgs.coreutils}/bin/mv "$tmp" "$settings"
-        echo "SOPS secrets processed successfully in Gemini CLI settings"
-      else
-        echo "Error: Invalid JSON after substitution; keeping original file."
-        ${pkgs.coreutils}/bin/rm -f "$tmp"
+  # Create .env file with secrets from SOPS
+  home.file."${geminiHome}/.env" = {
+    force = true;
+    text = ''
+      # MCP Server Environment Variables
+      CONTEXT7_TOKEN=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets.context7-token.path})
+      GITHUB_PERSONAL_ACCESS_TOKEN=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets.github-pat.path})
+      SOURCEBOT_API_KEY=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets."sourcebot/api-key".path})
+    '';
+    onChange = ''
+      # Expand SOPS secrets in .env file
+      if [ -f "${geminiHome}/.env" ]; then
+        tmp=$(${pkgs.coreutils}/bin/mktemp)
+        while IFS= read -r line; do
+          if [[ "$line" =~ ^([A-Z_]+)=\$\((.+)\)$ ]]; then
+            var_name="''${BASH_REMATCH[1]}"
+            cmd="''${BASH_REMATCH[2]}"
+            value=$(eval "$cmd" 2>/dev/null || echo "")
+            echo "$var_name=$value" >> "$tmp"
+          else
+            echo "$line" >> "$tmp"
+          fi
+        done < "${geminiHome}/.env"
+        ${pkgs.coreutils}/bin/mv "$tmp" "${geminiHome}/.env"
       fi
-    fi
-  '';
+    '';
+  };
 }

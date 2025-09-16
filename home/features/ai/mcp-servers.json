@@ -5,12 +5,15 @@
       "run",
       "-i",
       "--rm",
-      "--name",
-      "mcp-git",
-      "-v", "{{HOME}}:{{HOME}}:rw",
-      "-v", "{{HOME}}/.gitconfig:/root/.gitconfig:ro",
+      "--mount",
+      "type=bind,src=${PWD},dst=${PWD}",
+
       "mcp/git"
     ],
+    "env" : {
+      "HOME": "${HOME}",
+      "PWD": "${PWD}"
+    },
     "description": "Provides git repository information and operations"
   },
   "memory": {
@@ -19,14 +22,13 @@
       "run",
       "-i",
       "--rm",
-      "--name",
-      "mcp-memory",
       "-v",
       "mcp-memory-data:/data",
       "mcp/memory"
     ],
     "env": {
-      "DATABASE_URL": "sqlite:///data/memory.db"
+      "HOME": "${HOME}",
+      "MEMORY_FILE_PATH": "${HOME}/memory.json"
     },
     "description": "Maintains context and memory across sessions"
   },
@@ -36,10 +38,8 @@
       "run",
       "-i",
       "--rm",
-      "--name",
-      "mcp-time",
       "mcp/time",
-      "--local-timezone=America/Chicago"
+      "--local-timezone=$TZ"
     ],
     "env": {
       "TZ": "America/Chicago"
@@ -58,6 +58,11 @@
       "bridge",
       "mcp/fetch"
     ],
+    "env":{
+      "DEFAULT_USER_AGENT_AUTONOMOUS": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+      "DEFAULT_USER_AGENT_MANUAL": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+
+    },
     "description": "Fetches and analyzes web content"
   },
   "context7": {
@@ -66,12 +71,10 @@
       "run",
       "-i",
       "--rm",
-      "--name",
-      "mcp-context7",
       "mcp/context7"
     ],
     "env": {
-      "CONTEXT7_TOKEN": "{{SOPS:context7-token}}"
+      "CONTEXT7_TOKEN": "${CONTEXT7_TOKEN}"
     },
     "description": "Provides up-to-date code documentation for AI code editors"
   },
@@ -81,21 +84,23 @@
       "run",
       "-i",
       "--rm",
-      "--name",
-      "mcp-github",
+      "-e",
+      "GITHUB_PERSONAL_ACCESS_TOKEN",
+      "-e",
+      "GITHUB_DYNAMIC_TOOLSETS",
       "ghcr.io/github/github-mcp-server"
     ],
     "env": {
-      "GITHUB_PERSONAL_ACCESS_TOKEN": "{{SOPS:github-pat}}",
-      "GITHUB_TOOLSETS": "repos,issues,pull_requests,actions,code_security,discussions",
-      "MCP_TRANSPORT": "stdio"
+      "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}",
+      "GITHUB_DYNAMIC_TOOLSETS" : "1"
     },
     "description": "GitHub repository and workflow management via MCP"
   },
   "playwright": {
     "command": "mcp-server-playwright",
     "args": [
-      "--headless"
+      "--browser=chrome",
+      "--extension"
     ],
     "description": "Browser automation and web scraping via Playwright"
   },
@@ -105,12 +110,12 @@
       "run",
       "-i",
       "--rm",
-      "--name",
-      "mcp-serena",
-      "-v",
-      "/home/administrator/Code:/workspace/Code:rw",
       "--network",
       "host",
+
+      "-v",
+      "/home/administrator/Code:/workspace/Code:rw",
+
       "ghcr.io/oraios/serena:latest",
       "serena",
       "start-mcp-server",
@@ -130,18 +135,18 @@
     "env": {
       "NODE_ENV": "production",
       "SOURCEBOT_HOST": "http://localhost:3003",
-      "SOURCEBOT_API_KEY": "{{SOPS:sourcebot/api-key}}"
+      "SOURCEBOT_API_KEY": "${SOURCEBOT_API_KEY}"
     },
     "description": "Code understanding and search via Sourcebot"
   },
   "sequential-thinking": {
-    "command": "npx",
+    "command": "docker",
     "args": [
-      "@modelcontextprotocol/server-sequential-thinking@latest"
+      "run",
+      "-i",
+      "--rm",
+      "mcp/sequentialthinking"
     ],
-    "env": {
-      "NODE_ENV": "production"
-    },
     "description": "Helps break down complex problems into sequential steps"
   },
   "nixos": {
@@ -152,5 +157,16 @@
       "-i",
       "ghcr.io/utensils/mcp-nixos"
     ]
+  },
+  "task-master-ai": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "--package=task-master-ai",
+      "task-master-ai"
+    ],
+    "env": {
+      "OLLAMA_BASE_URL": "http://localhost:11434/api"
+    }
   }
 }
