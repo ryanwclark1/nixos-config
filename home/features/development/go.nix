@@ -8,7 +8,7 @@
 {
   programs.go = {
     enable = true;
-    package = pkgs.go_1_23; # Use latest stable Go version
+    package = pkgs.go; # Use latest stable Go version
   };
 
   home.packages = with pkgs; [
