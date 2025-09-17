@@ -27,20 +27,44 @@ SEP_RIGHT="\uE0B4"  # 
 
 # Toggle modules (set to 0 to disable)
 SHOW_OS=1
-SHOW_USER=1
+SHOW_USER=0
 SHOW_HOST=0
 SHOW_LOCAL_IP=0
 SHOW_CONTAINER=1
 SHOW_DIR=1
 SHOW_GIT=1
-SHOW_LANGS=0
 SHOW_DOCKER=1
-SHOW_NIX=1
 SHOW_TIME=0
-SHOW_CLAUDE=1
+SHOW_NIX_SHELL=0
+SHOW_COST=0
+SHOW_MODEL=1
+SHOW_DURATION=0
+SHOW_HOOK_EVENT=1
+SHOW_SESSION=0
+SHOW_OUTPUT_STYLE=0
+
+# Individual language toggles
+SHOW_PYTHON=0
+SHOW_NODE=0
+SHOW_RUST=0
+SHOW_GO=0
+SHOW_DENO=0
+SHOW_BUN=0
+SHOW_C=0
+SHOW_JAVA=0
+SHOW_KOTLIN=0
+SHOW_LUA=0
+SHOW_PHP=0
+SHOW_SWIFT=0
+SHOW_ZIG=0
 
 # Performance: keep git checks cheap
 GIT_TIMEOUT=80   # ms budget for git calls (best-effort)
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/claude-statusline"
+CACHE_TTL=5      # Cache TTL in seconds for expensive operations
+
+# Create cache directory if it doesn't exist
+mkdir -p "$CACHE_DIR" 2>/dev/null
 
 # ------------- Helpers ---------------------------------------
 # Read the JSON once (Claude sends session info on stdin)
@@ -51,9 +75,99 @@ if command -v jq >/dev/null 2>&1; then
 fi
 CWD="${CWD:-$PWD}"
 
+# Claude Code JSON helper functions
+get_model_name() {
+  if command -v jq >/dev/null 2>&1 && [ -n "$INPUT" ]; then
+    printf '%s' "$INPUT" | jq -r '.model.display_name // .model // empty'
+  fi
+}
+get_current_dir() {
+  if command -v jq >/dev/null 2>&1 && [ -n "$INPUT" ]; then
+    printf '%s' "$INPUT" | jq -r '.workspace.current_dir // empty'
+  fi
+}
+get_project_dir() {
+  if command -v jq >/dev/null 2>&1 && [ -n "$INPUT" ]; then
+    printf '%s' "$INPUT" | jq -r '.workspace.project_dir // empty'
+  fi
+}
+get_version() {
+  if command -v jq >/dev/null 2>&1 && [ -n "$INPUT" ]; then
+    printf '%s' "$INPUT" | jq -r '.version // empty'
+  fi
+}
+get_cost() {
+  if command -v jq >/dev/null 2>&1 && [ -n "$INPUT" ]; then
+    printf '%s' "$INPUT" | jq -r '.cost.total_cost_usd // empty'
+  fi
+}
+get_duration() {
+  if command -v jq >/dev/null 2>&1 && [ -n "$INPUT" ]; then
+    printf '%s' "$INPUT" | jq -r '.cost.total_duration_ms // empty'
+  fi
+}
+get_lines_added() {
+  if command -v jq >/dev/null 2>&1 && [ -n "$INPUT" ]; then
+    printf '%s' "$INPUT" | jq -r '.cost.total_lines_added // empty'
+  fi
+}
+get_lines_removed() {
+  if command -v jq >/dev/null 2>&1 && [ -n "$INPUT" ]; then
+    printf '%s' "$INPUT" | jq -r '.cost.total_lines_removed // empty'
+  fi
+}
+get_session_id() {
+  if command -v jq >/dev/null 2>&1 && [ -n "$INPUT" ]; then
+    printf '%s' "$INPUT" | jq -r '.session.id // empty'
+  fi
+}
+get_hook_event() {
+  if command -v jq >/dev/null 2>&1 && [ -n "$INPUT" ]; then
+    printf '%s' "$INPUT" | jq -r '.hook.event_name // .hook.event // empty'
+  fi
+}
+get_output_style() {
+  if command -v jq >/dev/null 2>&1 && [ -n "$INPUT" ]; then
+    printf '%s' "$INPUT" | jq -r '.output_style // empty'
+  fi
+}
+
 basename_fast() { printf '%s' "${1##*/}"; }
 
 has_cmd() { command -v "$1" >/dev/null 2>&1; }
+
+# Caching utilities for expensive operations
+cache_get() {
+  local key="$1"
+  local cache_file="$CACHE_DIR/$key"
+  if [ -f "$cache_file" ]; then
+    # Use a more portable approach for checking file age
+    local cache_time current_time
+    if command -v stat >/dev/null 2>&1; then
+      # Try Linux stat first, then macOS stat
+      cache_time="$(stat -c %Y "$cache_file" 2>/dev/null || stat -f %m "$cache_file" 2>/dev/null)"
+    fi
+    # Fallback if stat fails
+    if [ -z "$cache_time" ]; then
+      # Simple existence check - just use the cache if it exists
+      cat "$cache_file"
+      return 0
+    fi
+    current_time="$(date +%s)"
+    if [ "$cache_time" ] && [ "$current_time" ] && [ $((current_time - cache_time)) -lt $CACHE_TTL ]; then
+      cat "$cache_file"
+      return 0
+    fi
+  fi
+  return 1
+}
+
+cache_set() {
+  local key="$1"
+  local value="$2"
+  local cache_file="$CACHE_DIR/$key"
+  printf '%s' "$value" > "$cache_file" 2>/dev/null
+}
 
 # Cheap local IP (prefers non-loopback)
 local_ip() {
@@ -73,93 +187,203 @@ in_container() {
 }
 
 git_branch() {
+  # Use caching for git branch to avoid repeated expensive operations
+  local pwd_hash; pwd_hash="$(printf '%s' "$PWD" | cksum | cut -d' ' -f1)"
+  local cache_key="git_branch_${pwd_hash}"
+
+  # Try cache first
+  local cached_result; cached_result="$(cache_get "$cache_key")"
+  if [ $? -eq 0 ]; then
+    printf '%s' "$cached_result"
+    return 0
+  fi
+
+  local branch=""
   # Very fast branch check without invoking multiple processes when possible
   if [ -d ".git" ]; then
     # Detached/head read
     local head; head=$(2>/dev/null < .git/HEAD tr -d '\n')
     case "$head" in
-      ref:\ refs/heads/*) printf '%s' "${head#ref: refs/heads/}"; return 0;;
+      ref:\ refs/heads/*) branch="${head#ref: refs/heads/}";;
     esac
   fi
-  # Fallback to git (with a timeout)
-  if has_cmd git; then
+
+  # Fallback to git (with a timeout) if direct read failed
+  if [ -z "$branch" ] && has_cmd git; then
     ( git branch --show-current 2>/dev/null & pid=$!; \
       sleep 0.$GIT_TIMEOUT; kill -0 $pid 2>/dev/null && kill $pid 2>/dev/null; true ) >/dev/null
-    git branch --show-current 2>/dev/null
+    branch="$(git branch --show-current 2>/dev/null)"
   fi
+
+  # Cache result
+  cache_set "$cache_key" "$branch"
+  printf '%s' "$branch"
 }
 
-git_dirty() {
-  # Fast dirtiness check
+git_status_info() {
+  # Enhanced git status matching Starship's git_status module with caching
   if has_cmd git && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    # Porcelain short; any output = dirty
-    git status --porcelain -uno 2>/dev/null | head -n1 | wc -l | tr -d ' '
-  else
-    printf '0'
+    local pwd_hash; pwd_hash="$(printf '%s' "$PWD" | cksum | cut -d' ' -f1)"
+    local cache_key="git_status_${pwd_hash}"
+
+    # Try cache first
+    local cached_result; cached_result="$(cache_get "$cache_key")"
+    if [ $? -eq 0 ]; then
+      printf '%s' "$cached_result"
+      return 0
+    fi
+
+    local status; status="$(git status --porcelain=v1 2>/dev/null)"
+    local ahead_behind=""
+
+    # Check for ahead/behind (most expensive operation)
+    if git rev-parse --abbrev-ref '@{upstream}' >/dev/null 2>&1; then
+      local ahead; ahead="$(git rev-list --count '@{upstream}..HEAD' 2>/dev/null)"
+      local behind; behind="$(git rev-list --count 'HEAD..@{upstream}' 2>/dev/null)"
+      [ "$ahead" -gt 0 ] && ahead_behind+="⇡${ahead}"
+      [ "$behind" -gt 0 ] && ahead_behind+="⇣${behind}"
+    fi
+
+    # Parse status efficiently
+    local all_status=""
+    [ -n "$(echo "$status" | grep '^[MADRC]')" ] && all_status+="●"
+    [ -n "$(echo "$status" | grep '^ [MD]')" ] && all_status+="!"
+    [ -n "$(echo "$status" | grep '^??')" ] && all_status+="?"
+    [ -n "$(echo "$status" | grep '^ R')" ] && all_status+="»"
+
+    local result="${all_status}${ahead_behind}"
+    cache_set "$cache_key" "$result"
+    printf '%s' "$result"
   fi
 }
 
 docker_context() {
   if has_cmd docker; then
+    # Cache docker context since it rarely changes during a session
+    local cache_key="docker_context"
+    local cached_result; cached_result="$(cache_get "$cache_key")"
+    if [ $? -eq 0 ]; then
+      printf '%s' "$cached_result"
+      return 0
+    fi
+
     local ctx; ctx="$(docker context show 2>/dev/null)"
-    [ -n "$ctx" ] && printf " %s" "$ctx"
+    local result=""
+    [ -n "$ctx" ] && result=" $ctx"
+
+    cache_set "$cache_key" "$result"
+    printf '%s' "$result"
   fi
 }
 
-nix_shell() {
-  if [ -n "$IN_NIX_SHELL" ]; then
-    printf ' %s' "${name:-nix-shell}"
-  elif [ -n "$NIX_PROFILES" ]; then
-    printf ' nix'
-  fi
-}
 
 lang_badges() {
+  # Cache language versions since they rarely change
+  local cache_key="lang_versions"
+  local cached_result; cached_result="$(cache_get "$cache_key")"
+  if [ $? -eq 0 ]; then
+    printf '%s' "$cached_result"
+    return 0
+  fi
+
   local out=""
-  # Python venv / version - matches your Starship config
-  if [ -n "$VIRTUAL_ENV" ] || has_cmd python3; then
+  # Python venv / version
+  if [ $SHOW_PYTHON -eq 1 ] && ([ -n "$VIRTUAL_ENV" ] || has_cmd python3); then
     local pyv; pyv="$(python3 -V 2>/dev/null | awk '{print $2}')"
-    [ -n "$pyv" ] && out+="${out:+ }🐍${pyv}"
+    local venv_name=""
+    [ -n "$VIRTUAL_ENV" ] && venv_name="($(basename "$VIRTUAL_ENV"))"
+    [ -n "$pyv" ] && out+="${out:+ } ${pyv}${venv_name:+ $venv_name}"
   fi
-  # Node - matches your Starship config
-  if has_cmd node; then
+  # Node
+  if [ $SHOW_NODE -eq 1 ] && has_cmd node; then
     local nv; nv="$(node -v 2>/dev/null)"
-    [ -n "$nv" ] && out+="${out:+ }⬢${nv#v}"
+    [ -n "$nv" ] && out+="${out:+ } ${nv#v}"
   fi
-  # Rust - matches your Starship config
-  if has_cmd rustc; then
+  # Rust
+  if [ $SHOW_RUST -eq 1 ] && has_cmd rustc; then
     local rv; rv="$(rustc --version 2>/dev/null | awk '{print $2}')"
-    [ -n "$rv" ] && out+="${out:+ }🦀${rv}"
+    [ -n "$rv" ] && out+="${out:+ } ${rv}"
   fi
   # Go
-  if has_cmd go; then
+  if [ $SHOW_GO -eq 1 ] && has_cmd go; then
     local gv; gv="$(go version 2>/dev/null | awk '{print $3}' | sed 's/go//')"
-    [ -n "$gv" ] && out+="${out:+ }🐹${gv}"
+    [ -n "$gv" ] && out+="${out:+ } ${gv}"
   fi
   # Deno
-  if has_cmd deno; then
+  if [ $SHOW_DENO -eq 1 ] && has_cmd deno; then
     local dv; dv="$(deno --version 2>/dev/null | head -n1 | awk '{print $2}')"
-    [ -n "$dv" ] && out+="${out:+ }🦕${dv}"
+    [ -n "$dv" ] && out+="${out:+ } ${dv}"
   fi
   # Bun
-  if has_cmd bun; then
+  if [ $SHOW_BUN -eq 1 ] && has_cmd bun; then
     local bv; bv="$(bun --version 2>/dev/null)"
-    [ -n "$bv" ] && out+="${out:+ }🥟${bv}"
+    [ -n "$bv" ] && out+="${out:+ } ${bv}"
   fi
+  # C compiler
+  if [ $SHOW_C -eq 1 ] && has_cmd gcc; then
+    local cv; cv="$(gcc --version 2>/dev/null | head -n1 | awk '{print $4}')"
+    [ -n "$cv" ] && out+="${out:+ } ${cv}"
+  fi
+  # Java
+  if [ $SHOW_JAVA -eq 1 ] && has_cmd java; then
+    local jv; jv="$(java -version 2>&1 | head -n1 | awk -F'"' '{print $2}')"
+    [ -n "$jv" ] && out+="${out:+ } ${jv}"
+  fi
+  # Kotlin
+  if [ $SHOW_KOTLIN -eq 1 ] && has_cmd kotlin; then
+    local kv; kv="$(kotlin -version 2>/dev/null | awk '{print $3}')"
+    [ -n "$kv" ] && out+="${out:+ } ${kv}"
+  fi
+  # Lua
+  if [ $SHOW_LUA -eq 1 ] && has_cmd lua; then
+    local lv; lv="$(lua -v 2>/dev/null | head -n1 | awk '{print $2}')"
+    [ -n "$lv" ] && out+="${out:+ } ${lv}"
+  fi
+  # PHP
+  if [ $SHOW_PHP -eq 1 ] && has_cmd php; then
+    local pv; pv="$(php -v 2>/dev/null | head -n1 | awk '{print $2}')"
+    [ -n "$pv" ] && out+="${out:+ } ${pv}"
+  fi
+  # Swift
+  if [ $SHOW_SWIFT -eq 1 ] && has_cmd swift; then
+    local sv; sv="$(swift --version 2>/dev/null | head -n1 | awk '{print $4}')"
+    [ -n "$sv" ] && out+="${out:+ } ${sv}"
+  fi
+  # Zig
+  if [ $SHOW_ZIG -eq 1 ] && has_cmd zig; then
+    local zv; zv="$(zig version 2>/dev/null)"
+    [ -n "$zv" ] && out+="${out:+ } ${zv}"
+  fi
+
+  # Cache for longer since versions change infrequently
+  cache_set "$cache_key" "$out"
   printf '%s' "$out"
 }
 
 claude_info() {
-  if [ $SHOW_CLAUDE -eq 1 ] && [ -n "$INPUT" ]; then
+  if [ -n "$INPUT" ] && ([ $SHOW_CLAUDE -eq 1 ] || [ $SHOW_MODEL -eq 1 ] || [ $SHOW_COST -eq 1 ] || [ $SHOW_DURATION -eq 1 ] || [ $SHOW_SESSION -eq 1 ]); then
     local claude_context=""
-    # Extract model info if available
-    if command -v jq >/dev/null 2>&1; then
-      local model; model="$(printf '%s' "$INPUT" | jq -r '.model // empty' 2>/dev/null)"
-      local session; session="$(printf '%s' "$INPUT" | jq -r '.session.id // empty' 2>/dev/null | head -c 8)"
-      [ -n "$model" ] && claude_context+="$model"
-      [ -n "$session" ] && claude_context+="${claude_context:+ }#$session"
+    # Use helper functions for cleaner extraction
+    local model; model="$(get_model_name)"
+    local session; session="$(printf '%s' "$INPUT" | jq -r '.session.id // empty' 2>/dev/null | head -c 8)"
+    local cost; cost="$(get_cost)"
+    local duration; duration="$(get_duration)"
+
+    # Build context string using individual toggles
+    [ $SHOW_MODEL -eq 1 ] && [ -n "$model" ] && claude_context+="$model"
+    [ $SHOW_SESSION -eq 1 ] && [ -n "$session" ] && claude_context+="${claude_context:+ }#$session"
+
+    # Add cost/duration if individual toggles are enabled
+    if [ $SHOW_COST -eq 1 ] && [ -n "$cost" ] && [ "$cost" != "0" ] && [ "$cost" != "null" ]; then
+      local formatted_cost; formatted_cost="$(printf "%.3f" "$cost")"
+      claude_context+="${claude_context:+ }\$${formatted_cost}"
     fi
-    [ -n "$claude_context" ] && printf "🤖 %s" "$claude_context" || printf "🤖 Claude"
+    if [ $SHOW_DURATION -eq 1 ] && [ -n "$duration" ] && [ "$duration" != "0" ] && [ "$duration" != "null" ]; then
+      local dur_sec; dur_sec="$((duration / 1000))"
+      claude_context+="${claude_context:+ }${dur_sec}s"
+    fi
+
+    [ -n "$claude_context" ] && printf " %s" "$claude_context"
   fi
 }
 
@@ -175,22 +399,39 @@ s_os()        {
   if [ $SHOW_OS -eq 1 ]; then
     case "$(uname -s)" in
       Linux)
-        # Check for specific distro - matches your Starship config
+        # Check for specific distro - matches your Starship config exactly
         if [ -f /etc/os-release ]; then
           . /etc/os-release
           case "$ID" in
-            nixos) printf " " ;;
+            nixos) printf " " ;;
             arch) printf "󰣇" ;;
+            artix) printf "󰣇" ;;
             ubuntu) printf "󰕈 " ;;
             fedora) printf "󰣛 " ;;
-            debian) printf " " ;;
-            *) printf "󰌽 " ;;
+            debian) printf " " ;;
+            almalinux) printf " " ;;
+            alpine) printf " " ;;
+            centos) printf " " ;;
+            freebsd) printf " " ;;
+            gentoo) printf "󰣨 " ;;
+            kali) printf " " ;;
+            manjaro) printf " " ;;
+            mint) printf "󰣭 " ;;
+            pop) printf " " ;;
+            raspbian) printf " " ;;
+            redhat) printf " " ;;
+            rhel) printf "󱄛" ;;
+            rocky) printf " " ;;
+            suse) printf " " ;;
+            void) printf " " ;;
+            *) printf "󰌽" ;;
           esac
         else
-          printf "󰌽 "
+          printf "󰌽"
         fi
         ;;
       Darwin) printf "󰀵" ;;
+      CYGWIN*|MINGW*|MSYS*) printf "󰍲 " ;;
       *) printf "$(uname -s)" ;;
     esac
   fi
@@ -214,31 +455,85 @@ s_dir()       {
     # Directory substitutions matching your Starship config
     case "$dir" in
       "Code") printf "󰲋 " ;;
-      "Desktop") printf " " ;;
+      "Desktop") printf " " ;;
       "Documents") printf "󰈙 " ;;
-      "Downloads") printf " " ;;
-      "Music") printf " " ;;
-      "Pictures") printf " " ;;
-      "Videos") printf " " ;;
+      "Downloads") printf " " ;;
+      "Music") printf " " ;;
+      "Pictures") printf " " ;;
+      "Videos") printf " " ;;
       *) printf "%s" "$dir" ;;
     esac
   fi
 }
 s_git() {
   if [ $SHOW_GIT -eq 1 ]; then
-    local br dirty
+    local br status_info
     br="$(git_branch)"
     if [ -n "$br" ]; then
-      dirty="$(git_dirty)"
-      [ "$dirty" != "0" ] && printf " %s%s" "$br" "${FG_DIM}*${FG_RESET}" || printf " %s" "$br"
+      status_info="$(git_status_info)"
+      # Format like Starship: [ branch  status ]
+      printf " %s" "$br"
+      [ -n "$status_info" ] && printf " %s" "$status_info"
     fi
   fi
 }
-s_langs()     { [ $SHOW_LANGS -eq 1 ] && lang_badges; }
+s_langs()     { lang_badges; }
 s_docker()    { [ $SHOW_DOCKER -eq 1 ] && docker_context; }
-s_nix()       { [ $SHOW_NIX -eq 1 ] && nix_shell; }
-s_claude()    { [ $SHOW_CLAUDE -eq 1 ] && claude_info; }
+s_claude()    { claude_info; }
 s_time()      { [ $SHOW_TIME -eq 1 ] && date '+%H:%M'; }
+s_cost()      {
+  if [ $SHOW_COST -eq 1 ]; then
+    local cost; cost="$(get_cost)"
+    if [ -n "$cost" ] && [ "$cost" != "0" ] && [ "$cost" != "null" ]; then
+      printf "\$%.3f" "$cost"
+    fi
+  fi
+}
+s_model()     {
+  if [ $SHOW_MODEL -eq 1 ]; then
+    local model; model="$(get_model_name)"
+    [ -n "$model" ] && printf "%s" "$model"
+  fi
+}
+s_nix_shell() {
+  if [ $SHOW_NIX_SHELL -eq 1 ]; then
+    if [ -n "$IN_NIX_SHELL" ]; then
+      printf "❄ %s" "${name:-nix-shell}"
+    elif [ -n "$NIX_PROFILES" ]; then
+      printf "❄ nix"
+    fi
+  fi
+}
+s_duration()  {
+  if [ $SHOW_DURATION -eq 1 ]; then
+    local duration; duration="$(get_duration)"
+    if [ -n "$duration" ] && [ "$duration" != "0" ] && [ "$duration" != "null" ]; then
+      local dur_sec; dur_sec="$((duration / 1000))"
+      printf "%ss" "$dur_sec"
+    fi
+  fi
+}
+s_hook_event() {
+  if [ $SHOW_HOOK_EVENT -eq 1 ]; then
+    local event; event="$(get_hook_event)"
+    [ -n "$event" ] && printf "🪝 %s" "$event"
+  fi
+}
+s_session()   {
+  if [ $SHOW_SESSION -eq 1 ]; then
+    local session; session="$(get_session_id)"
+    if [ -n "$session" ]; then
+      local short_session; short_session="$(printf '%s' "$session" | head -c 8)"
+      printf "#%s" "$short_session"
+    fi
+  fi
+}
+s_output_style() {
+  if [ $SHOW_OUTPUT_STYLE -eq 1 ]; then
+    local style; style="$(get_output_style)"
+    [ -n "$style" ] && printf "📝 %s" "$style"
+  fi
+}
 
 # Build powerline segments with background colors (matching Starship format)
 left_block=""
@@ -254,55 +549,76 @@ if [ -n "$seg1" ]; then
   left_block+="${BASE0E}${SEP_LEFT}${FG_RESET}${BG_BASE0E}${BASE00}$seg1${FG_RESET}"
 fi
 
-# Segment 2: Directory (lavender background)
-mod_dir="$(s_dir)"
-if [ -n "$mod_dir" ]; then
-  # Transition from mauve to lavender (or start with lavender)
-  if [ -n "$left_block" ]; then
-    left_block+="${BG_BASE07}${BASE0E}${SEP_RIGHT}${FG_RESET}"
-  else
-    left_block+="${BASE07}${SEP_LEFT}${FG_RESET}"
-  fi
-  left_block+="${BG_BASE07}${BASE00} $mod_dir ${FG_RESET}"
+# Segment 2: Directory (lavender background) - Always show
+seg2=""
+mod_dir="$(s_dir)"; [ -n "$mod_dir" ] && seg2+="$mod_dir"
+# Always show segment 2, even if empty
+if [ -n "$left_block" ]; then
+  left_block+="${BG_BASE07}${BASE0E}${SEP_RIGHT}${FG_RESET}"
+else
+  left_block+="${BASE07}${SEP_LEFT}${FG_RESET}"
+fi
+if [ -n "$seg2" ]; then
+  left_block+="${BG_BASE07}${BASE00} $seg2 ${FG_RESET}"
+else
+  left_block+="${BG_BASE07}${BASE00} ${FG_RESET}"
 fi
 
-# Segment 3: Git (text background)
-mod_git="$(s_git)"
-if [ -n "$mod_git" ]; then
+# Segment 3: Nix Shell (text background)
+seg3=""
+mod_nix_shell="$(s_nix_shell)"; [ -n "$mod_nix_shell" ] && seg3+="$mod_nix_shell"
+if [ -n "$seg3" ]; then
   # Transition from lavender to text (or start with text)
   if [ -n "$left_block" ]; then
     left_block+="${BG_BASE05}${BASE07}${SEP_RIGHT}${FG_RESET}"
   else
     left_block+="${BASE05}${SEP_LEFT}${FG_RESET}"
   fi
-  left_block+="${BG_BASE05}${BASE00}$mod_git ${FG_RESET}"
+  left_block+="${BG_BASE05}${BASE00} $seg3 ${FG_RESET}"
 fi
 
-# Segment 4: Languages (flamingo background)
-mod_langs="$(s_langs)"
-if [ -n "$mod_langs" ]; then
+# Segment 4: Git (flamingo background)
+seg4=""
+mod_git="$(s_git)"; [ -n "$mod_git" ] && seg4+="$mod_git"
+if [ -n "$seg4" ]; then
   # Transition from text to flamingo (or start with flamingo)
   if [ -n "$left_block" ]; then
     left_block+="${BG_BASE0F}${BASE05}${SEP_RIGHT}${FG_RESET}"
   else
     left_block+="${BASE0F}${SEP_LEFT}${FG_RESET}"
   fi
-  left_block+="${BG_BASE0F}${BASE00} $mod_langs ${FG_RESET}"
+  left_block+="${BG_BASE0F}${BASE00}$seg4 ${FG_RESET}"
 fi
 
-# Segment 5: Docker/Nix/Claude (rosewater background)
+# Segment 5: Languages (rosewater background) - Always show
 seg5=""
-mod_docker="$(s_docker)";   [ -n "$mod_docker" ] && seg5+="$mod_docker"
-mod_nix="$(s_nix)";         [ -n "$mod_nix" ] && seg5+="$mod_nix"
-mod_claude="$(s_claude)";   [ -n "$mod_claude" ] && seg5+="${seg5:+ }$mod_claude"
+mod_langs="$(s_langs)"; [ -n "$mod_langs" ] && seg5+="$mod_langs"
+# Always show segment 5, even if empty
+if [ -n "$left_block" ]; then
+  left_block+="${BG_BASE06}${BASE0F}${SEP_RIGHT}${FG_RESET}"
+else
+  left_block+="${BASE06}${SEP_LEFT}${FG_RESET}"
+fi
 if [ -n "$seg5" ]; then
-  # Transition from flamingo to rosewater (or start with rosewater)
-  if [ -n "$left_block" ]; then
-    left_block+="${BG_BASE06}${BASE0F}${SEP_RIGHT}${FG_RESET}"
-  else
-    left_block+="${BASE06}${SEP_LEFT}${FG_RESET}"
-  fi
   left_block+="${BG_BASE06}${BASE00} $seg5 ${FG_RESET}"
+else
+  left_block+="${BG_BASE06}${BASE00} ${FG_RESET}"
+fi
+
+# Segment 6: Docker/Claude/New Modules (continue rosewater background)
+seg6=""
+mod_docker="$(s_docker)";     [ -n "$mod_docker" ] && seg6+="$mod_docker"
+mod_claude="$(s_claude)";     [ -n "$mod_claude" ] && seg6+="${seg6:+ }$mod_claude"
+mod_hook="$(s_hook_event)";   [ -n "$mod_hook" ] && seg6+="${seg6:+ }$mod_hook"
+mod_output_style="$(s_output_style)"; [ -n "$mod_output_style" ] && seg6+="${seg6:+ }$mod_output_style"
+if [ -n "$seg6" ]; then
+  # Continue or start with rosewater background
+  if [ -n "$left_block" ]; then
+    # Continue with rosewater background
+    left_block+="${BG_BASE06}${BASE00} $seg6 ${FG_RESET}"
+  else
+    left_block+="${BASE06}${SEP_LEFT}${FG_RESET}${BG_BASE06}${BASE00} $seg6 ${FG_RESET}"
+  fi
 fi
 
 # End the powerline
@@ -318,5 +634,9 @@ if [ -n "$mod_time" ]; then
 fi
 
 # Output single line (Claude uses only the first line of stdout)
-# We can’t truly right-align, so we add a neutral spacer in between.
-printf "%b%s%b\n" "$left_block" "$(spacer)" "$right_block"
+# We can't truly right-align, so we add a neutral spacer in between only if there's a right block.
+if [ -n "$right_block" ]; then
+  printf "%b%s%b\n" "$left_block" "$(spacer)" "$right_block"
+else
+  printf "%b\n" "$left_block"
+fi
