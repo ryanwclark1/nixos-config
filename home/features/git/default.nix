@@ -35,29 +35,37 @@ in
     ];
 
     ignores = [
+      # Nix
       ".direnv"
       "result"
+      "result-*"
+
+      # Environment files
       ".env"
+      ".env.local"
       ".venv"
-      "node_modules"
       ".envrc"
 
-       # Compiled source #
-      ###################
+      # Dependencies
+      "node_modules"
+      "vendor"
+
+      # Compiled source
       "*.class"
       "*.dll"
       "*.exe"
       "*.o"
       "*.so"
+      "*.pyc"
+      "__pycache__/"
 
-      # Temporary files #
-      ###################
+      # Temporary files
       "*.swp"
       "*.swo"
       "*~"
+      ".netrwhist"
 
-      # Packages #
-      ############
+      # Packages
       "*.7z"
       "*.dmg"
       "*.gz"
@@ -67,16 +75,25 @@ in
       "*.tar"
       "*.zip"
 
-      # Logs #
-      ######################
+      # Logs
       "*.log"
+      "npm-debug.log*"
+      "yarn-debug.log*"
+      "yarn-error.log*"
 
-      # OS generated files #
-      ######################
-      ".DS_Store*"
+      # OS generated files
+      ".DS_Store"
+      ".DS_Store?"
+      "._*"
+      ".Spotlight-V100"
+      ".Trashes"
       "ehthumbs.db"
       "Icon?"
       "Thumbs.db"
+
+      # Personal notes
+      ".notes/"
+      "TODO.md"
     ];
 
     delta = {
