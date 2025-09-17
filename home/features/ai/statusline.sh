@@ -3,19 +3,19 @@
 
 # -------- Config (tweak colors/modules here) ------------------
 # Catppuccin Frappé palette matching Starship configuration
-BASE00="\e[38;2;48;52;70m"         # base (text on colored backgrounds)
-BASE0E="\e[38;2;202;158;230m"      # mauve (primary segment bg)
-BASE07="\e[38;2;186;187;241m"      # lavender (directory bg)
-BASE05="\e[38;2;198;208;245m"      # text (git bg)
-BASE0F="\e[38;2;238;190;190m"      # flamingo (languages bg)
-BASE06="\e[38;2;242;213;207m"      # rosewater (docker/nix bg)
+  BASE00="\e[38;2;48;52;70m"         # base (text on colored backgrounds)
+  BASE0E="\e[38;2;202;158;230m"      # mauve (primary segment bg)
+  BASE07="\e[38;2;186;187;241m"      # lavender (directory bg)
+  BASE05="\e[38;2;198;208;245m"      # text (git bg)
+  BASE0F="\e[38;2;238;190;190m"      # flamingo (languages bg)
+  BASE06="\e[38;2;242;213;207m"      # rosewater (docker/nix bg)
 
 # Background colors
-BG_BASE0E="\e[48;2;202;158;230m"   # mauve background
-BG_BASE07="\e[48;2;186;187;241m"   # lavender background
-BG_BASE05="\e[48;2;198;208;245m"   # text background
-BG_BASE0F="\e[48;2;238;190;190m"   # flamingo background
-BG_BASE06="\e[48;2;242;213;207m"   # rosewater background
+  BG_BASE0E="\e[48;2;202;158;230m"   # mauve background
+  BG_BASE07="\e[48;2;186;187;241m"   # lavender background
+  BG_BASE05="\e[48;2;198;208;245m"   # text background
+  BG_BASE0F="\e[48;2;238;190;190m"   # flamingo background
+  BG_BASE06="\e[48;2;242;213;207m"   # rosewater background
 
 # Utility colors
 FG_DIM="\e[2m"

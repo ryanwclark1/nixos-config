@@ -1,3 +1,4 @@
+---
 name: rust-pro
 description: >
   Elite Rust 1.80+ specialist for high-performance distributed systems, WebAssembly,
