@@ -186,30 +186,8 @@ in
       dots = "cd ~/.config";
     };
     
-    # Key bindings
-    binds = [
-      {
-        name = "edit_command_buffer";
-        key = "\\ee";
-        mode = "default";
-        description = "Edit command buffer in editor";
-      }
-      {
-        name = "accept-autosuggestion";
-        key = "\\e[C";  # Right arrow
-        mode = "default";
-      }
-      {
-        name = "history-search-backward";
-        key = "\\e[A";  # Up arrow
-        mode = "default";
-      }
-      {
-        name = "history-search-forward";
-        key = "\\e[B";  # Down arrow
-        mode = "default";
-      }
-    ];
+    # Key bindings using interactiveShellInit instead
+    # (binds attribute is not well documented, using interactiveShellInit for key bindings)
     
     # Plugins configuration
     plugins = [
@@ -351,6 +329,15 @@ in
     interactiveShellInit = ''
       # Remove fish greeting
       set -U fish_greeting
+      
+      # Key bindings
+      bind \ee edit_command_buffer
+      bind \e\[C forward-char  # Right arrow accepts autosuggestion
+      bind \e\[A history-search-backward  # Up arrow
+      bind \e\[B history-search-forward   # Down arrow
+      bind \cf accept-autosuggestion  # Ctrl+F also accepts autosuggestion
+      bind \ck up-or-search  # Ctrl+K for up
+      bind \cj down-or-search  # Ctrl+J for down
       
       # Vi mode indicator
       function fish_mode_prompt
