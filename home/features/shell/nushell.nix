@@ -54,8 +54,7 @@
       update = "nix flake update";
       cleanup = "sudo nix-collect-garbage -d";
       
-      # Better defaults
-      cat = "bat";
+      # Better defaults (cat alias handled by bat module)
       ls = "eza";
       ll = "eza -l";
       la = "eza -la";
