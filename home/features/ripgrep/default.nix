@@ -53,97 +53,21 @@
     enable = true;
     package = pkgs.ripgrep-all;
 
-    custom_adapters = [
-      # Enhanced PDF adapter with OCR support
-      {
-        name = "pdf-enhanced";
-        description = "PDF text extraction with fallback to OCR";
-        extensions = [ "pdf" ];
-        command = "${pkgs.poppler_utils}/bin/pdftotext";
-        args = [ "-layout" "-nopgbrk" "-" "-" ];
-        binary = false;
-      }
-
-      # Jupyter notebook content extraction
-      {
-        name = "jupyter";
-        description = "Extract code and markdown from Jupyter notebooks";
-        extensions = [ "ipynb" ];
-        command = "${pkgs.jq}/bin/jq";
-        args = [
-          "-r"
-          ".cells[] | select(.source != null) | .source | if type == \"array\" then .[] else . end"
-        ];
-        binary = false;
-      }
-
-      # SQLite database content
-      {
-        name = "sqlite";
-        description = "Dump SQLite database schema and data";
-        extensions = [ "db" "sqlite" "sqlite3" ];
-        command = "${pkgs.sqlite}/bin/sqlite3";
-        args = [ "-readonly" "-" ".schema" ".dump" ];
-        binary = true;
-      }
-
-      # Extract strings from binary files
-      {
-        name = "binary";
-        description = "Extract readable strings from binary files";
-        extensions = [ "exe" "dll" "so" "dylib" "bin" ];
-        command = "${pkgs.binutils}/bin/strings";
-        args = [ "-a" "-n" "8" "-" ];
-        binary = true;
-      }
-
-      # Archive contents listing
-      {
-        name = "archive";
-        description = "List contents of compressed archives";
-        extensions = [ "tar" "gz" "bz2" "xz" "zip" "7z" ];
-        command = "${pkgs.atool}/bin/atool";
-        args = [ "-l" "-q" "-" ];
-        binary = true;
-      }
-
-      # EXIF data from images
-      {
-        name = "image-meta";
-        description = "Extract metadata from image files";
-        extensions = [ "jpg" "jpeg" "png" "gif" "bmp" "tiff" "webp" "heic" ];
-        command = "${pkgs.exiftool}/bin/exiftool";
-        args = [ "-All" "-" ];
-        binary = true;
-      }
-
-      # Markdown code block extraction
-      {
-        name = "markdown";
-        description = "Extract code blocks from markdown";
-        extensions = [ "md" "mdx" ];
-        command = "${pkgs.gawk}/bin/awk";
-        args = [
-          "/^```/,/^```/ { print }"
-          "-"
-        ];
-        binary = false;
-      }
-
-      # Log file filtering
-      {
-        name = "logs";
-        description = "Extract errors and warnings from logs";
-        extensions = [ "log" ];
-        command = "${pkgs.gnugrep}/bin/grep";
-        args = [
-          "-E"
-          "(ERROR|WARN|FAIL|CRITICAL|Exception|Traceback|panic|fatal)"
-          "-C" "3"
-        ];
-        binary = false;
-      }
-    ];
+    # Note: ripgrep-all in Home Manager may have limited custom adapter support
+    # The configuration below is commented out due to option compatibility issues
+    # For advanced adapters, consider using a standalone ripgrep-all config file
+    
+    # custom_adapters = [
+    #   # Enhanced PDF adapter with OCR support
+    #   {
+    #     name = "pdf-enhanced";
+    #     description = "PDF text extraction with fallback to OCR";
+    #     extensions = [ "pdf" ];
+    #     command = "${pkgs.poppler_utils}/bin/pdftotext";
+    #     args = [ "-layout" "-nopgbrk" "-" "-" ];
+    #     binary = false;
+    #   }
+    # ];
   };
 
   # Additional search tools
