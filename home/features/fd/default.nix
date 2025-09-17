@@ -9,10 +9,24 @@
     package = pkgs.fd;
     hidden = true;
     ignores = [
-      ".git/"
-      ".env/"
-      ".venv/"
-      "node_modules/"
+      ".git"
+      ".direnv"
+      "node_modules"
+      "target"
+      "build"
+      "dist"
+      "out"
+      ".venv"
+      "venv"
+      "__pycache__"
+      ".cache"
+      ".mypy_cache"
+      ".pytest_cache"
+      ".ruff_cache"
+      ".terraform"
+      ".next"
+      ".pnpm-store"
+      "coverage"
     ];
     extraOptions = [
       "--color=auto"
