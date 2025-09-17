@@ -128,14 +128,7 @@
       "....." = "cd ../../../..";
       "-" = "cd -";
       
-      # Enhanced ls
-      l = "eza";
-      ls = "eza";
-      ll = "eza -l";
-      la = "eza -la";
-      lt = "eza --tree";
-      lla = "eza -la";
-      llt = "eza -l --tree";
+      # Enhanced ls (handled by eza module)
       
       # Git shortcuts
       g = "git";
@@ -268,7 +261,7 @@
           owner = "zdharma-continuum";
           repo = "fast-syntax-highlighting";
           rev = "master";
-          sha256 = "sha256-qpK05YscMHWhxJuPNEZT5qpLr0u43ez/grL4ShgYqJs=";
+          sha256 = "sha256-ZihUL4JAVk9V+IELSakytlb24BvEEJ161CQEHZYYoSA=";
         };
       }
       {
@@ -287,7 +280,7 @@
           owner = "MichaelAquilina";
           repo = "zsh-you-should-use";
           rev = "master";
-          sha256 = "sha256-2Uj1z0oL4mPJXROVGpeXQqomYcVmXTIaY8XRH5Ui7jU=";
+          sha256 = "sha256-u3abhv9ewq3m4QsnsxT017xdlPm3dYq5dqHNmQhhcpI=";
         };
       }
     ];

@@ -54,11 +54,7 @@
       update = "nix flake update";
       cleanup = "sudo nix-collect-garbage -d";
       
-      # Better defaults (cat alias handled by bat module)
-      ls = "eza";
-      ll = "eza -l";
-      la = "eza -la";
-      tree = "eza --tree";
+      # Better defaults (cat/ls aliases handled by bat/eza modules)
       grep = "rg";
       find = "fd";
       
