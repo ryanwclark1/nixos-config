@@ -35,24 +35,18 @@
       esac
     }
 
-    # Zoxide integration with error handling and fallback
+    # Claude Code zoxide compatibility fix
+    # Ensures cd works properly even when shell snapshots contain broken functions
     if command -v zoxide > /dev/null 2>&1; then
-      # Initialize zoxide with error handling
-      if eval "$(zoxide init --cmd cd zsh 2>/dev/null)"; then
-        # Successfully initialized zoxide
-        :
-      else
-        # Fallback: create a simple cd wrapper that tries zoxide then falls back to builtin cd
+      # Check if __zoxide_z function exists and is callable
+      if ! command -v __zoxide_z > /dev/null 2>&1; then
+        # Create a robust cd function that falls back to builtin cd
         cd() {
-          if command -v __zoxide_z > /dev/null 2>&1; then
-            __zoxide_z "$@" 2>/dev/null || builtin cd "$@"
-          else
-            builtin cd "$@"
-          fi
+          builtin cd "$@"
         }
       fi
     fi
-    
+
     # Docker helper functions for non-interactive environments
     docker-exec() {
       local container="$1"
@@ -65,7 +59,7 @@
         docker exec "$container" "$@"
       fi
     }
-    
+
     # Common Docker patterns with fallback
     docker-bash() {
       local container="$1"
@@ -76,7 +70,7 @@
         docker exec "$container" bash "$@"
       fi
     }
-    
+
     docker-sh() {
       local container="$1"
       shift
@@ -87,7 +81,6 @@
       fi
     }
 
-    # alias claude="/home/administrator/.claude/local/claude"
     '';
   };
 

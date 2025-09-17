@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(unset:*)",
+      "Bash(builtin cd /tmp)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
