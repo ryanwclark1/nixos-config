@@ -10,6 +10,7 @@
     hidden = true;
     ignores = [
       ".git"
+      ".svn"
       ".direnv"
       "node_modules"
       "target"
@@ -19,6 +20,7 @@
       ".venv"
       "venv"
       "__pycache__"
+      "*.pyc"
       ".cache"
       ".mypy_cache"
       ".pytest_cache"
@@ -27,6 +29,8 @@
       ".next"
       ".pnpm-store"
       "coverage"
+      ".DS_Store"
+      "Thumbs.db"
     ];
     extraOptions = [
       "--color=auto"
