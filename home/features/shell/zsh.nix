@@ -158,8 +158,7 @@
       upgrade = "nix flake update && sudo nixos-rebuild switch --flake .#$(hostname)";
       cleanup = "sudo nix-collect-garbage -d && nix store optimise";
       
-      # Better defaults
-      cat = "bat";
+      # Better defaults (cat alias handled by bat module)
       grep = "rg";
       find = "fd";
       ps = "procs";
