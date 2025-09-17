@@ -280,44 +280,45 @@
       }
     ];
 
+# TODO: Comback to fzf-tab configuration later
     # Completion initialization
-    completionInit = ''
-      # Initialize completion system
-      autoload -Uz compinit && compinit
-      autoload -Uz bashcompinit && bashcompinit
+    # completionInit = ''
+    #   # Initialize completion system
+    #   autoload -Uz compinit && compinit
+    #   autoload -Uz bashcompinit && bashcompinit
 
-      # Completion options
-      zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=* l:|=*'
-      zstyle ':completion:*' list-colors ''${(s.:.)LS_COLORS}
-      zstyle ':completion:*' menu select
-      zstyle ':completion:*' group-name ""
-      zstyle ':completion:*:descriptions' format '%F{cyan}-- %d --%f'
-      zstyle ':completion:*:messages' format '%F{yellow}-- %d --%f'
-      zstyle ':completion:*:warnings' format '%F{red}-- no matches found --%f'
-      zstyle ':completion:*' use-cache on
-      zstyle ':completion:*' cache-path ~/.config/zsh/cache
+    #   # Completion options
+    #   zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=* l:|=*'
+    #   zstyle ':completion:*' list-colors ''${(s.:.)LS_COLORS}
+    #   zstyle ':completion:*' menu select
+    #   zstyle ':completion:*' group-name ""
+    #   zstyle ':completion:*:descriptions' format '%F{cyan}-- %d --%f'
+    #   zstyle ':completion:*:messages' format '%F{yellow}-- %d --%f'
+    #   zstyle ':completion:*:warnings' format '%F{red}-- no matches found --%f'
+    #   zstyle ':completion:*' use-cache on
+    #   zstyle ':completion:*' cache-path ~/.config/zsh/cache
 
-      # Fuzzy completion
-      zstyle ':completion:*' completer _complete _match _approximate
-      zstyle ':completion:*:match:*' original only
-      zstyle ':completion:*:approximate:*' max-errors 2
+    #   # Fuzzy completion
+    #   zstyle ':completion:*' completer _complete _match _approximate
+    #   zstyle ':completion:*:match:*' original only
+    #   zstyle ':completion:*:approximate:*' max-errors 2
 
-      # fzf-tab configuration
-      zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
-      zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always $realpath'
-      zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
-    '';
+    #   # fzf-tab configuration
+    #   zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
+    #   zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always $realpath'
+    #   zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
+    # '';
 
     # Extra environment configuration
-    envExtra = ''
-      # Set up PATH
-      export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$HOME/go/bin:$PATH"
+    # envExtra = ''
+    #   # Set up PATH
+    #   export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$HOME/go/bin:$PATH"
 
-      # Set up fzf
-      if [[ ! "$PATH" == *${pkgs.fzf}/bin* ]]; then
-        export PATH="${pkgs.fzf}/bin:$PATH"
-      fi
-    '';
+    #   # Set up fzf
+    #   if [[ ! "$PATH" == *${pkgs.fzf}/bin* ]]; then
+    #     export PATH="${pkgs.fzf}/bin:$PATH"
+    #   fi
+    # '';
 
     # Profile extra (sourced before .zshrc)
     # profileExtra = ''

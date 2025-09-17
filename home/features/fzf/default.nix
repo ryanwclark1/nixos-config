@@ -1,4 +1,3 @@
-# TODO add config for fzf
 # A command-line fuzzy finder
 {
   lib,
@@ -116,50 +115,44 @@ in
       label = "#${base06}";
       query = "#${base06}";
     };
-    # Default --exclude opetions moved to fd configuration can explicitly state if desiredfuzzyCompletion
-    # Consider adding back --strip-cwd-prefix
+    # Default --exclude options moved to fd configuration
+    # Can explicitly state excludes in fd commands if desired
 
     defaultCommand = "fd --hidden --follow";
     defaultOptions = [
       "--height=40%"
       "--layout=reverse"
       "--border=rounded"
-
-
+      "--info=inline"
       "--ansi"
       "--tabstop=2"
       "--preview-window=right,60%,border-rounded"
       "--preview=${previewCmd}"
-      # "--preview-window=right:50%:wrap"
-      # "--multi"
-      # "--cycle"
-      # "--reverse"
-      # "--info=inline"
+      "--multi"
+      "--cycle"
       "--marker=▶"
       "--pointer=◀"
       "--prompt=❯ "
 
       # --- Keybinds ---
-      # Toggle/show preview & move it around
-      "--bind=?:toggle-preview"
+      # Toggle preview with ctrl+/
+      "--bind=ctrl-/:toggle-preview"
       "--bind=alt-p:change-preview-window(right,60%,border-rounded|down,40%,border-rounded)"
-      # Scroll preview
-      "--bind=ctrl-u:preview-half-page-up,ctrl-d:preview-half-page-down"
-      "--bind=alt-u:preview-up,alt-d:preview-down"
       # Navigation
       "--bind=ctrl-j:down"
       "--bind=ctrl-k:up"
       "--bind=ctrl-f:page-down"
       "--bind=ctrl-b:page-up"
       "--bind=ctrl-l:clear-query"
+      # Sorting (ctrl-s toggles between relevance and alphabetical)
       "--bind=ctrl-s:toggle-sort"
-      "--bind=alt-a:toggle-all"
-      # Open selection(s) in editor
-      "--bind=ctrl-o:execute(nvim {+} < /dev/tty > /dev/tty 2>&1)"
-      # Copy selected paths to clipboard
-      "--bind=ctrl-y:execute-silent(echo -n {+} | wl-copy)"
-      # Show file type quickly (helps on binaries)
-      "--bind=ctrl-i:execute-silent(file --brief --mime {+} 2>/dev/null || true)"
+      # Select all with ctrl-a (more standard than alt-a)
+      "--bind=ctrl-a:select-all"
+      "--bind=ctrl-d:deselect-all"
+      # Open in editor - using become to replace fzf process with nvim
+      "--bind=ctrl-o:become(nvim {+})"
+      # Copy to clipboard
+      "--bind=ctrl-y:execute-silent(echo {+} | wl-copy)"
     ];
 
     fileWidgetCommand = "fd --type f --hidden --follow";
@@ -167,26 +160,24 @@ in
       "--preview=${previewCmd}"
 
       # --- Keybinds ---
-      # Toggle/show preview & move it around
-      "--bind=?:toggle-preview"
+      # Toggle preview with ctrl+/
+      "--bind=ctrl-/:toggle-preview"
       "--bind=alt-p:change-preview-window(right,60%,border-rounded|down,40%,border-rounded)"
-      # Scroll preview
-      "--bind=ctrl-u:preview-half-page-up,ctrl-d:preview-half-page-down"
-      "--bind=alt-u:preview-up,alt-d:preview-down"
       # Navigation
       "--bind=ctrl-j:down"
       "--bind=ctrl-k:up"
       "--bind=ctrl-f:page-down"
       "--bind=ctrl-b:page-up"
       "--bind=ctrl-l:clear-query"
+      # Sorting (ctrl-s toggles between relevance and alphabetical)
       "--bind=ctrl-s:toggle-sort"
-      "--bind=alt-a:toggle-all"
-      # Open selection(s) in editor
-      "--bind=ctrl-o:execute(nvim {+} < /dev/tty > /dev/tty 2>&1)"
-      # Copy selected paths to clipboard
-      "--bind=ctrl-y:execute-silent(echo -n {+} | wl-copy)"
-      # Show file type quickly (helps on binaries)
-      "--bind=ctrl-i:execute-silent(file --brief --mime {+} 2>/dev/null || true)"
+      # Select all with ctrl-a (more standard than alt-a)
+      "--bind=ctrl-a:select-all"
+      "--bind=ctrl-d:deselect-all"
+      # Open in editor - using become to replace fzf process with nvim
+      "--bind=ctrl-o:become(nvim {+})"
+      # Copy to clipboard
+      "--bind=ctrl-y:execute-silent(echo {+} | wl-copy)"
       # Reuse global binds; add one to open parent directory of selection
       "--bind=alt-o:execute(cd $(dirname -- {q}) && $SHELL)"
     ];
@@ -195,7 +186,18 @@ in
     changeDirWidgetOptions = [
       "--preview=${previewCmd}"
 
-      # Enter directory (default behavior)
+      # Navigation bindings consistent with other widgets
+      "--bind=ctrl-j:down"
+      "--bind=ctrl-k:up"
+      "--bind=ctrl-f:page-down"
+      "--bind=ctrl-b:page-up"
+      "--bind=ctrl-l:clear-query"
+
+      # Preview control
+      "--bind=ctrl-/:toggle-preview"
+      "--bind=alt-p:change-preview-window(right,60%,border-rounded|down,40%,border-rounded)"
+
+      # Directory-specific: enter accepts the directory
       "--bind=enter:accept"
     ];
 
@@ -203,16 +205,16 @@ in
       # Keep shell order (recency)
       "--no-sort"
       "--tiebreak=index"
-      
+
       # Simple preview showing the command
       "--preview=echo {}"
       "--preview-window=up:3:wrap"
-      
+
       # Basic navigation
       "--bind=ctrl-k:up"
       "--bind=ctrl-j:down"
-      "--bind=?:toggle-preview"
-      
+      "--bind=ctrl-/:toggle-preview"
+
       # Copy command to clipboard
       "--bind=ctrl-y:execute-silent(echo -n {} | wl-copy)"
     ];
@@ -220,28 +222,4 @@ in
     enableFishIntegration = lib.mkIf config.programs.fish.enable true;
     enableZshIntegration = lib.mkIf config.programs.zsh.enable true;
   };
-
 }
-
-
-      # "--bind=ctrl-j:down,ctrl-k:up,ctrl-h:toggle-preview"
-      # "--bind=ctrl-/:toggle-preview"
-      # "--bind=ctrl-u:preview-half-page-up"
-      # "--bind=ctrl-d:preview-half-page-down"
-      # "--bind=ctrl-f:preview-page-down"
-      # "--bind=ctrl-b:preview-page-up"
-      # "--bind=ctrl-g:preview-top"
-      # "--bind=ctrl-shift-g:preview-bottom"
-      # "--bind=alt-a:select-all"
-      # "--bind=alt-d:deselect-all"
-
-
-      # "--bind=ctrl-o:execute(xdg-open {} &)"
-      # "--bind=ctrl-e:execute($EDITOR {} || nvim {})"
-      # "--bind=ctrl-y:execute-silent(echo -n {} | wl-copy)"
-      # "--header='CTRL-O: open | CTRL-E: edit | CTRL-Y: copy path'"
-
-      # "--preview 'eza --tree --level=2 --color=always {} | head -100'"
-      # "--bind=ctrl-o:execute(xdg-open {} &)"
-      # "--bind=ctrl-e:execute($EDITOR {} || nvim {})"
-      # "--header='CTRL-O: open | CTRL-E: edit'"
