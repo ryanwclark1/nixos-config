@@ -24,12 +24,10 @@
     ../common/global
     ../common/users/administrator
 
-
+    ../common/optional/desktop/displaymanager/sddm
     ../common/optional/desktop/hyprland
     ../common/optional/desktop/niri  # Cache permission issues - re-enable after reboot
-    ../common/optional/desktop/displaymanager/sddm
 
-    # Optional features
     ../common/optional/desktop/nautilus.nix
     ../common/optional/desktop/style.nix
     ../common/optional/desktop/thunar.nix
@@ -47,6 +45,7 @@
     ../common/optional/services/syncthing.nix
     ../common/optional/services/virtualisation.nix
     ../common/optional/services/webcam.nix
+
     ../common/optional/tools/bash.nix
     ../common/optional/tools/console.nix
     ../common/optional/tools/direnv.nix
@@ -55,8 +54,6 @@
     ../common/optional/tools/keyboard.nix
     ../common/optional/tools/wireshark.nix
     ../common/optional/tools/zsh.nix
-    # ../common/optional/services/sourcebot.nix  # Migrated to home-manager configuration
-
   ];
 
   # AMD Graphics - configuration handled in performance.nix

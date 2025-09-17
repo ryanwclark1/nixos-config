@@ -6,6 +6,9 @@
   imports = [
     ./global
 
+    ./features/ai
+    ./features/aichat
+    ./features/alacritty
     ./features/ansible
     ./features/atuin
     ./features/audio
@@ -36,10 +39,9 @@
     ./features/lazygit
     ./features/media
     ./features/networking-utils
-
     ./features/neovim
     ./features/productivity
-    # ./features/qutebrowser
+    ./features/qutebrowser
     ./features/remmina
     ./features/ripgrep
     ./features/shell
@@ -56,7 +58,8 @@
     # Desktop environment configuration
     ./features/desktop/common # Core desktop components
     ./features/battery-monitor.nix # Laptop-specific battery monitoring
-    ./features/desktop/window-managers # Window managers and shared WM tools
+    # Desktop environment configuration
+    ./features/desktop/window-managers/shared # Window managers and shared WM tools
     ./features/desktop/window-managers/hyprland/host-specific/frametop.nix
     # ./features/desktop/window-managers/niri/host-specific/frametop.nix
   ];

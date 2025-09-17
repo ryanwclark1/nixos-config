@@ -57,7 +57,6 @@
     ./features/virtualisation
     ./features/vscode
     ./features/webapps
-    # ./features/whispar
     ./features/wireless
     ./features/windsurf
     ./features/yazi
@@ -67,20 +66,14 @@
     # Desktop environment configuration
     ./features/desktop/common # Core desktop components
     ./features/desktop/window-managers/shared # Window managers and shared WM tools
-    ./features/desktop/window-managers/hyprland # Hyprland window manager
     ./features/desktop/window-managers/hyprland/host-specific/woody.nix
     # ./features/desktop/window-managers/niri/host-specific/woody.nix
-
-    # Application launcher cleanup
   ];
 
   home.packages = with pkgs; [
     amdgpu_top
   ];
 
-  # Woody-specific USB DAC configuration (migrated to WirePlumber 0.5+ JSON format)
-  # Set USB DAC (PCM2704) as default audio output on startup
-  # This ensures volume controls work with the correct device
   home.file.".config/wireplumber/wireplumber.conf.d/51-usb-dac-default.conf".text = ''
     monitor.alsa.rules = [
       {
