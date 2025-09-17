@@ -18,11 +18,9 @@ in
 
   programs.claude-code = {
     enable  = true;
-
-    package = pkgs.claude-code;  # Change if you use an overlay/unstable attr
+    package = pkgs.claude-code;
 
     settings = {
-      # Example: global env vars applied to sessions
       env = {
         # Toggle telemetry etc. via env (can also be set externally)
         DISABLE_TELEMETRY = "1";
@@ -33,16 +31,8 @@ in
       # Permissions (deny sensitive files; allow/ask examples)
       permissions = {
         allow = [
-          "Bash(npm run lint)"
-          "Bash(npm run test:*)"
-          "Read(~/.zshrc)"
+          "*"
         ];
-        ask = [
-          "Bash(git push:*)"
-        ];
-        additionalDirectories = [ "../docs/" ];
-        defaultMode = "acceptEdits";
-        disableBypassPermissionsMode = "disable";
       };
 
       # Hooks: run before/after tool use (example)
@@ -73,13 +63,7 @@ in
         command = "${claudeHome}/statusline.sh";
         padding = 0; # Optional: set to 0 to let status line go to
       };
-
-      # statusLine = {
-      #   type = "command";
-      #   command = "input=$(cat); echo \"[$(echo \"$input\" | jq -r '.model.display_name')] 📁 $(basename \"$(echo \"$input\" | jq -r '.workspace.current_dir')\")\"";
-      # };
       forceLoginMethod = "console";
-
 
       # Example memory settings (user-level)
       memory = {
@@ -95,21 +79,25 @@ in
 
     mcpServers = builtins.fromJSON (builtins.readFile ./mcp-servers.json);
 
-    # You can still define inline agents/commands if you want:
+    # Import agents from the agents/ directory
     agents = {
-      reviewer = ''
-        ---
-        name: reviewer
-        model: claude-sonnet
-        system_prompt: Prefer minimal actionable diffs; prioritize correctness/security.
-        tools: git, filesystem
-        description: Minimal-diff code reviewer that focuses on providing actionable, security-focused code review feedback.
-        ---
-
-        # Minimal-diff code reviewer
-
-        A code review agent that prioritizes minimal, actionable diffs with a focus on correctness and security.
-      '';
+      ai-engineer = (builtins.readFile ./agents/ai-engineer.md);
+      architect-review = (builtins.readFile ./agents/architect-review.md);
+      backend-architect = (builtins.readFile ./agents/backend-architect.md);
+      code-reviewer = (builtins.readFile ./agents/code-reviewer.md);
+      debugger = (builtins.readFile ./agents/debugger.md);
+      docs-architect = (builtins.readFile ./agents/docs-architect.md);
+      error-dectective = (builtins.readFile ./agents/error-detective.md);
+      mermaid-expert = (builtins.readFile ./agents/mermaid-expert.md);
+      python-pro = (builtins.readFile ./agents/python-pro.md);
+      refactoring-expert = (builtins.readFile ./agents/refactoring-expert.md);
+      requirements-analyst = (builtins.readFile ./agents/requirements-analyst.md);
+      root-cause-analyst = (builtins.readFile ./agents/root-cause-analyst.md);
+      rust-pro = (builtins.readFile ./agents/rust-pro.md);
+      socratic-mentor = (builtins.readFile ./agents/socratic-mentor.md);
+      sql-pro = (builtins.readFile ./agents/sql-pro.md);
+      test-automator = (builtins.readFile ./agents/test-automator.md);
+      typescript-pro = (builtins.readFile ./agents/typescript-pro.md);
     };
 
     commands = {
@@ -139,17 +127,45 @@ in
       # Expand SOPS secrets in .env file
       if [ -f "${claudeHome}/.env" ]; then
         tmp=$(${pkgs.coreutils}/bin/mktemp)
-        while IFS= read -r line; do
-          if [[ "$line" =~ ^([A-Z_]+)=\$\((.+)\)$ ]]; then
-            var_name="''${BASH_REMATCH[1]}"
-            cmd="''${BASH_REMATCH[2]}"
-            value=$(eval "$cmd" 2>/dev/null || echo "")
-            echo "$var_name=$value" >> "$tmp"
+
+        # Process each line to expand shell commands
+        while IFS= read -r line || [[ -n "$line" ]]; do
+          # Skip empty lines and comments
+          if [[ -z "$line" ]] || [[ "$line" =~ ^# ]]; then
+            echo "$line" >> "$tmp"
+            continue
+          fi
+
+          # Handle lines with command substitution
+          if [[ "$line" == *'=$('* ]] && [[ "$line" == *')'* ]]; then
+            # Extract variable name and command
+            var_name="''${line%%=*}"
+            cmd_part="''${line#*=}"
+
+            # Remove $( and ) from command using string manipulation
+            if [[ "$cmd_part" == \$\(* ]] && [[ "$cmd_part" == *\) ]]; then
+              cmd="''${cmd_part#\$\(}"   # Remove $( from start
+              cmd="''${cmd%\)}"          # Remove ) from end
+
+              # Execute the command and capture the result
+              if value=$(eval "$cmd" 2>/dev/null); then
+                echo "$var_name=$value" >> "$tmp"
+              else
+                # If command fails, keep original line
+                echo "$line" >> "$tmp"
+              fi
+            else
+              echo "$line" >> "$tmp"
+            fi
           else
+            # Line doesn't contain command substitution, keep as-is
             echo "$line" >> "$tmp"
           fi
         done < "${claudeHome}/.env"
+
+        # Replace the original file
         ${pkgs.coreutils}/bin/mv "$tmp" "${claudeHome}/.env"
+        ${pkgs.coreutils}/bin/chmod 600 "${claudeHome}/.env"
       fi
     '';
   };
