@@ -6,7 +6,6 @@
 }:
 
 let
-  # Official user-level settings & dirs (per docs)
   claudeHome = "${config.home.homeDirectory}/.claude";
   settingsPath = "${claudeHome}/settings.json";
 in
@@ -22,10 +21,8 @@ in
 
     settings = {
       env = {
-        # Toggle telemetry etc. via env (can also be set externally)
         DISABLE_TELEMETRY = "1";
         USE_BUILTIN_RIPGREP = "0"; # prefer system rg
-
       };
 
       # Permissions (deny sensitive files; allow/ask examples)
@@ -73,8 +70,6 @@ in
         maxItems = 200;
       };
 
-      # Load MCP servers from a JSON file next to this module (adjust path as needed)
-      # mcpServers = builtins.fromJSON (builtins.readFile ./mcp-servers.json);
     };
 
     mcpServers = builtins.fromJSON (builtins.readFile ./mcp-servers.json);

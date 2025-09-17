@@ -13,7 +13,6 @@
   ];
   home.packages = with pkgs; [
     # Cross-platform CLI utilities
-    aichat # Use GPT-4(V), Gemini, LocalAI, Ollama and other LLMs in the terminal - cross-platform
     duf # Disk Usage/Free Utility - cross-platform
     dust # More intuitive version of du in rust - cross-platform
     figlet # Print large characters - cross-platform
