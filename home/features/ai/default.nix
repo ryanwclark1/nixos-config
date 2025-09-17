@@ -6,9 +6,9 @@
 
 {
   imports = [
-    ./mcp-openwebui.nix
-    ./sourcebot.nix  # Docker Compose-based Sourcebot with PostgreSQL and Redis
-    ./gemini-cli-override.nix  # Custom gemini-cli version override
+    # ./mcp-openwebui.nix
+    # ./sourcebot.nix  # Docker Compose-based Sourcebot with PostgreSQL and Redis
+    ./gemini-cli.nix  # Custom gemini-cli version override
     # ./open-webui-docker.nix
     ./claude.nix
     ./qwen.nix
@@ -17,9 +17,10 @@
   home.packages = with pkgs; [
     lmstudio
     # mlflow-server  # Temporarily disabled due to missing fastapi/uvicorn dependencies
-    # claude-code
     # aider-chat
 
+    playwright-mcp
+    # Required for Sourcebot MCP server
     amp-cli
     # codex
     crush
