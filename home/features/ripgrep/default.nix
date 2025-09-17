@@ -152,7 +152,7 @@
     repgrep         # Ripgrep with replacement support
     fselect         # Find files with SQL-like queries
     fd              # Modern find replacement
-    the-silver-searcher  # ag - another fast searcher
+    silver-searcher  # ag - another fast searcher
   ];
 
   # Shell aliases for convenience
