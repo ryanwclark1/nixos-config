@@ -21,22 +21,12 @@
     username = lib.mkDefault "administrator";
     homeDirectory = lib.mkDefault "/home/${config.home.username}";
     stateVersion = lib.mkDefault "24.11";
-    sessionPath = [ "${config.home.homeDirectory}/.local/bin" ];
+    # sessionPath moved to shell/common.nix
     sessionVariables = {
       FLAKE = lib.mkDefault "${config.home.homeDirectory}/nixos-config";
-      EDITOR = lib.mkDefault "nvim";
-      VISUAL = lib.mkDefault "nvim";
-      MANPAGER = lib.mkDefault "sh -c 'col -bx | bat -l man -p'";
-      MANROFFOPT="-c";
+      # EDITOR, VISUAL, and MANPAGER moved to shell/common.nix
     };
-    shellAliases = rec {
-      jqless = "jq -C | bat --pager 'less RF' --style=numbers --color=always";
-
-      wifi = "nmtui";
-
-      cik = lib.mkIf config.programs.kitty.enable "clone-in-kitty --type os-window";
-      ck = cik;
-    };
+    # shellAliases moved to shell/common.nix
 
 
     # persistence = {};
