@@ -70,22 +70,22 @@ in
   programs.fish = {
     enable = true;
     package = pkgs.fish;
-    
+
     # Use abbreviations for better auto-expansion
     preferAbbrs = true;
-    
+
     # Shell aliases - matching ZSH/Bash configuration
     shellAliases = {
       # Clear screen and scrollback
       clear = "printf '\\033[2J\\033[3J\\033[1;1H'";
-      
+
       # Directory navigation
       ".." = "cd ..";
       "..." = "cd ../..";
       "...." = "cd ../../..";
       "....." = "cd ../../../..";
       "-" = "cd -";
-      
+
       # Git shortcuts
       g = "git";
       ga = "git add";
@@ -100,13 +100,13 @@ in
       gpu = "git pull";
       gs = "git status -sb";
       gst = "git status";
-      
+
       # System management
       rebuild = "sudo nixos-rebuild switch --flake .#(hostname)";
       update = "nix flake update";
       upgrade = "nix flake update && sudo nixos-rebuild switch --flake .#(hostname)";
       cleanup = "sudo nix-collect-garbage -d && nix store optimise";
-      
+
       # Better defaults
       grep = "rg";
       find = "fd";
@@ -119,19 +119,19 @@ in
       # ls aliases handled by eza module
       la = "ls -a";  # Will use eza's ls alias
       ll = "ls -l";  # Will use eza's ls alias
-      
+
       # Safety nets
       cp = "cp -i";
       mv = "mv -i";
       rm = "rm -I";
-      
+
       # Shortcuts
       v = "nvim";
       vim = "nvim";
       vi = "nvim";
       e = "$EDITOR";
       o = "xdg-open";
-      
+
       # Docker shortcuts
       d = "docker";
       dc = "docker compose";
@@ -140,16 +140,16 @@ in
       dimg = "docker images";
       drm = "docker rm";
       drmi = "docker rmi";
-      
+
       # Systemctl shortcuts
       sc = "systemctl";
       scu = "systemctl --user";
       scs = "sudo systemctl";
-      
+
       # Network
       ip = "ip --color=auto";
       ports = "ss -tulanp";
-      
+
       # Misc
       h = "history";
       help = "man";
@@ -162,7 +162,7 @@ in
       kx = "kubectx";
       kns = "kubens";
     };
-    
+
     # Shell abbreviations for expansion
     shellAbbrs = {
       # Expanded git commands
@@ -171,13 +171,13 @@ in
       grbi = "git rebase -i";
       grhh = "git reset --hard HEAD";
       gwip = "git add -A; git commit -m 'WIP'";
-      
+
       # Nix shortcuts
       nrs = "nix run nixpkgs#";
       nsh = "nix shell nixpkgs#";
       ndev = "nix develop";
       nbuild = "nix build";
-      
+
       # Quick directory access
       dl = "cd ~/Downloads";
       docs = "cd ~/Documents";
@@ -185,16 +185,17 @@ in
       nix = "cd ~/nixos-config";
       dots = "cd ~/.config";
     };
-    
+
     # Key bindings using interactiveShellInit instead
     # (binds attribute is not well documented, using interactiveShellInit for key bindings)
-    
+
     # Plugins configuration
     plugins = [
-      {
-        name = "z";
-        src = pkgs.fishPlugins.z.src;
-      }
+      # TODO: Determine interaction between zoxide and z plugin
+      # {
+      #   name = "z";
+      #   src = pkgs.fishPlugins.z.src;
+      # }
       {
         name = "fzf-fish";
         src = pkgs.fishPlugins.fzf-fish.src;
@@ -212,19 +213,19 @@ in
         src = pkgs.fishPlugins.sponge.src;
       }
     ];
-    
+
     # Functions
     functions = {
       # Directory functions
       mkcd = ''
         mkdir -p $argv[1] && cd $argv[1]
       '';
-      
+
       # Git functions
       gclone = ''
         git clone $argv[1] && cd (basename $argv[1] .git)
       '';
-      
+
       # Archive extraction
       extract = ''
         if test -f $argv[1]
@@ -258,7 +259,7 @@ in
           echo "'$argv[1]' is not a valid file"
         end
       '';
-      
+
       # System info
       sysinfo = ''
         echo "Hostname: "(hostname)
@@ -268,7 +269,7 @@ in
         echo "Disk: "(df -h / | awk 'NR==2 {print $3 "/" $2}')
         echo "Load: "(uptime | awk -F'load average:' '{print $2}')
       '';
-      
+
       # Docker helpers
       docker-exec = ''
         set -l container $argv[1]
@@ -279,23 +280,23 @@ in
           docker exec $container $argv
         end
       '';
-      
+
       # Quick backup
       backup = ''
         cp -r $argv[1] "$argv[1].bak."(date +%Y%m%d_%H%M%S)
       '';
-      
+
       # Weather
       weather = ''
         curl -s "wttr.in/$argv[1]"
       '';
-      
+
       # Cheat sheet
       cheat = ''
         curl -s "cheat.sh/$argv[1]"
       '';
     };
-    
+
     # Shell initialization
     shellInit = ''
       # Set environment variables
@@ -305,18 +306,18 @@ in
       set -gx LESS "-R"
       set -gx MANPAGER "sh -c 'col -bx | bat -l man -p'"
       set -gx BAT_THEME "Catppuccin-frappe"
-      
+
       # Set PATH
       set -gx PATH $HOME/.local/bin $HOME/.cargo/bin $HOME/go/bin $PATH
-      
+
       # FZF configuration handled by fzf module
-      
+
       # LS_COLORS using vivid
       if command -v vivid >/dev/null
         set -gx LS_COLORS (vivid generate catppuccin-frappe)
       end
     '';
-    
+
     # Login shell initialization
     loginShellInit = ''
       # Display system info on login (only in interactive sessions)
@@ -324,12 +325,12 @@ in
         fastfetch
       end
     '';
-    
+
     # Interactive shell initialization
     interactiveShellInit = ''
       # Remove fish greeting
       set -U fish_greeting
-      
+
       # Key bindings
       bind \ee edit_command_buffer
       bind \e\[C forward-char  # Right arrow accepts autosuggestion
@@ -338,7 +339,7 @@ in
       bind \cf accept-autosuggestion  # Ctrl+F also accepts autosuggestion
       bind \ck up-or-search  # Ctrl+K for up
       bind \cj down-or-search  # Ctrl+J for down
-      
+
       # Vi mode indicator
       function fish_mode_prompt
         switch $fish_bind_mode
@@ -352,19 +353,19 @@ in
             echo -n "(V) "
         end
       end
-      
+
       # Zoxide integration handled by zoxide module with --cmd cd
-      
+
       # Initialize starship prompt if available
       if command -v starship >/dev/null
         starship init fish | source
       end
-      
+
       # Set up direnv hook if available
       if command -v direnv >/dev/null
         direnv hook fish | source
       end
-      
+
       # Colored man pages
       set -gx LESS_TERMCAP_mb (printf '\e[1;32m')
       set -gx LESS_TERMCAP_md (printf '\e[1;32m')

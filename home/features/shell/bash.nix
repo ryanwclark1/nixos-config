@@ -223,32 +223,53 @@
       # Enhanced prompt command for updating terminal title
       PROMPT_COMMAND='history -a; history -n; printf "\033]0;%s@%s:%s\007" "''${USER}" "''${HOSTNAME%%.*}" "''${PWD/#$HOME/\~}"'
 
-      # Bash-specific completion enhancements
-      bind "set completion-ignore-case on"
-      bind "set completion-map-case on"
-      bind "set show-all-if-ambiguous on"
-      bind "set mark-symlinked-directories on"
-      bind "set colored-stats on"
-      bind "set visible-stats on"
-      bind "set page-completions off"
-      bind "set menu-complete-display-prefix on"
-      bind "set completion-query-items 200"
+      # Bash-specific completion enhancements (only if bind is available)
+      if command -v bind &>/dev/null 2>&1 || builtin bind 2>/dev/null; then
+        bind "set completion-ignore-case on" 2>/dev/null || true
+        bind "set completion-map-case on" 2>/dev/null || true
+        bind "set show-all-if-ambiguous on" 2>/dev/null || true
+        bind "set mark-symlinked-directories on" 2>/dev/null || true
+        bind "set colored-stats on" 2>/dev/null || true
+        bind "set visible-stats on" 2>/dev/null || true
+        bind "set page-completions off" 2>/dev/null || true
+        bind "set menu-complete-display-prefix on" 2>/dev/null || true
+        bind "set completion-query-items 200" 2>/dev/null || true
 
-      # Better history search with arrow keys
-      bind '"\e[A": history-search-backward'
-      bind '"\e[B": history-search-forward'
-      bind '"\e[C": forward-char'
-      bind '"\e[D": backward-char'
+        # Better history search with arrow keys
+        bind '"\e[A": history-search-backward' 2>/dev/null || true
+        bind '"\e[B": history-search-forward' 2>/dev/null || true
+        bind '"\e[C": forward-char' 2>/dev/null || true
+        bind '"\e[D": backward-char' 2>/dev/null || true
+      fi
+
+      # bind "set completion-ignore-case on"
+      # bind "set completion-map-case on"
+      # bind "set show-all-if-ambiguous on"
+      # bind "set mark-symlinked-directories on"
+      # bind "set colored-stats on"
+      # bind "set visible-stats on"
+      # bind "set page-completions off"
+      # bind "set menu-complete-display-prefix on"
+      # bind "set completion-query-items 200"
+
+      # # Better history search with arrow keys
+      # bind '"\e[A": history-search-backward'
+      # bind '"\e[B": history-search-forward'
+      # bind '"\e[C": forward-char'
+      # bind '"\e[D": backward-char'
+
 
       # Ctrl+R handled by atuin if available, fallback to fzf
       if ! command -v atuin &> /dev/null && command -v fzf &> /dev/null; then
-        bind -x '"\C-r": __fzf_history'
-        __fzf_history() {
-          local output
-          output=$(history | fzf --tac --no-sort --exact --query "$READLINE_LINE" | sed 's/^[ ]*[0-9]*[ ]*//')
-          READLINE_LINE=$output
-          READLINE_POINT=''${#READLINE_LINE}
-        }
+        if command -v bind &>/dev/null 2>&1 || builtin bind 2>/dev/null; then
+          bind -x '"\C-r": __fzf_history' 2>/dev/null || true
+          __fzf_history() {
+            local output
+            output=$(history | fzf --tac --no-sort --exact --query "$READLINE_LINE" | sed 's/^[ ]*[0-9]*[ ]*//')
+            READLINE_LINE=$output
+            READLINE_POINT=''${#READLINE_LINE}
+          }
+        fi
       fi
 
       # Directory shortcuts (similar to ZSH's hash -d)
