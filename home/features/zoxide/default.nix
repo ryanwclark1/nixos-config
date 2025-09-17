@@ -12,7 +12,7 @@
     package = pkgs.zoxide;
     options = [
       "--cmd cd"
-      "--hook pwd"
+      # Removed --hook pwd as it can cause issues in Claude Code environment
     ];
     enableBashIntegration = lib.mkIf config.programs.bash.enable true;
     enableFishIntegration = lib.mkIf config.programs.fish.enable true;

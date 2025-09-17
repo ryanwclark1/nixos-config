@@ -87,8 +87,9 @@ in
       code-reviewer = (builtins.readFile ./agents/code-reviewer.md);
       debugger = (builtins.readFile ./agents/debugger.md);
       docs-architect = (builtins.readFile ./agents/docs-architect.md);
-      error-dectective = (builtins.readFile ./agents/error-detective.md);
+      error-detective = (builtins.readFile ./agents/error-detective.md);
       mermaid-expert = (builtins.readFile ./agents/mermaid-expert.md);
+      nix-systems-specialist = (builtins.readFile ./agents/nix-systems-specialist.md);
       python-pro = (builtins.readFile ./agents/python-pro.md);
       refactoring-expert = (builtins.readFile ./agents/refactoring-expert.md);
       requirements-analyst = (builtins.readFile ./agents/requirements-analyst.md);
@@ -101,16 +102,11 @@ in
     };
 
     commands = {
-      "fix-ruff" = ''
-        # Auto-fix imports & format via Ruff
-
-        **Description**: Auto-fix imports & format via Ruff
-
-        **Command**:
-        ```bash
-        uv run ruff check --select I --fix . && uv run ruff format .
-        ```
-      '';
+      analyze = (builtins.readFile ./commands/analyze.md);
+      cleanup = (builtins.readFile ./commands/cleanup.md);
+      test = (builtins.readFile ./commands/test.md);
+      troubleshoot = (builtins.readFile ./commands/troubleshoot.md);
+      workflow = (builtins.readFile ./commands/workflow.md);
     };
   };
 
