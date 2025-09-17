@@ -31,8 +31,8 @@
       source = ~/.config/hypr/conf/environments/default.conf
 
       # Framework laptop typically has HiDPI display
-      # Adjust if your model differs
-      monitor = eDP-1, 2256x1504@60, 0x0, 1.0
+      # Adjust if your model differs - scaling to 1.5 for better readability
+      monitor = eDP-1, 2256x1504@60, 0x0, 1.5
 
       # Laptop-specific keybindings
       # bind = , XF86Launch1, exec, ags -t launcher  # Framework key
