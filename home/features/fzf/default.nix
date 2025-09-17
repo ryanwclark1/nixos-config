@@ -23,6 +23,42 @@ let
   base0D = "8caaee"; # blue
   base0E = "ca9ee6"; # mauve
   base0F = "eebebe"; # flamingo
+
+  previewCmd = ''
+    p="{}"
+    if [ -d "$p" ]; then
+      if command -v eza >/dev/null 2>&1; then
+        eza --tree --level=2 --color=always "$p" | head -200
+      else
+        ls -la --color=always "$p" 2>/dev/null || tree -L 2 "$p" 2>/dev/null
+      fi
+    elif [ -f "$p" ]; then
+      mime="$(file --mime-type -Lb "$p" 2>/dev/null || echo)"
+      case "$mime" in
+        text/*|application/json|application/xml|application/x-sh|application/x-yaml|application/yaml)
+          if command -v bat >/dev/null 2>&1; then
+            bat --style=numbers --color=always --line-range :500 "$p"
+          else
+            sed -n "1,500p" "$p"
+          fi
+          ;;
+        *)
+          # Binary/unknown: show type + a safe hex/ascii preview
+          file -b "$p" 2>/dev/null || true
+          if command -v hexdump >/dev/null 2>&1; then
+            hexdump -C -n 1024 "$p"
+          elif command -v xxd >/dev/null 2>&1; then
+            xxd -g 1 -l 1024 "$p"
+          else
+            head -c 1024 "$p" | od -An -tx1 -v
+          fi
+          ;;
+      esac
+    else
+      file --brief --mime "$p" 2>/dev/null || true
+    fi
+  '';
+
 in
 {
   home.packages = [
@@ -48,15 +84,9 @@ in
     recursive = true;
   };
 
-  # Set FZF environment variables
-  home.sessionVariables = {
-    FZF_DEFAULT_COMMAND = "fd --type f --hidden --follow --exclude .git --exclude node_modules --exclude __pycache__ --exclude .venv --exclude target --exclude dist --exclude build";
-    FZF_CTRL_T_COMMAND = "fd --type f --hidden --follow --exclude .git --exclude node_modules --exclude __pycache__ --exclude .venv --exclude target --exclude dist --exclude build";
-    FZF_ALT_C_COMMAND = "fd --type d --hidden --follow --exclude .git --exclude node_modules --exclude __pycache__ --exclude .venv --exclude target --exclude dist --exclude build";
-    # Additional preview options for keybindings
-    FZF_CTRL_T_OPTS = "--preview 'bat --style=numbers --color=always --line-range=:500 {}'";
-    FZF_ALT_C_OPTS = "--preview 'eza --tree --level=2 --color=always {}'";
-  };
+  # FZF module automatically sets FZF_DEFAULT_COMMAND, FZF_CTRL_T_COMMAND, and FZF_ALT_C_COMMAND
+  # based on defaultCommand, fileWidgetCommand, and changeDirWidgetCommand respectively.
+  # We only need to set additional options that aren't covered by the module.
 
   programs.fzf = {
     enable = true;
@@ -64,76 +94,127 @@ in
     tmux = {
       enableShellIntegration = lib.mkIf config.programs.tmux.enable true;
       shellIntegrationOptions = [
-        "-p 80%,60%"
+        "-p 80%,80%"
       ];
     };
-    changeDirWidgetCommand = "fd --type d --hidden --strip-cwd-prefix --exclude .git --exclude node_modules --exclude __pycache__ --exclude .venv --exclude target --exclude dist --exclude build";
-    changeDirWidgetOptions = [
-      "--preview 'eza --tree --level=2 --color=always {} | head -100'"
-      "--bind=ctrl-o:execute(xdg-open {} &)"
-      "--bind=ctrl-e:execute($EDITOR {} || nvim {})"
-      "--header='CTRL-O: open | CTRL-E: edit'"
-    ];
+
     colors = {
-      bg = "-1";
-      "bg+" = "#${base02}";
       fg = "#${base05}";
+      bg = "-1";              # use terminal background
+      hl = "#${base0E}";
       "fg+" = "#${base05}";
-      header = "#${base08}";
-      hl = "#${base08}";
-      "hl+" = "#${base08}";
-      info = "#${base0E}";
-      marker = "#${base07}";
-      pointer = "#${base06}";
-      spinner = "#${base06}";
-      prompt = "#${base0E}";
-      selected-bg = "#${base03}";
-      border = "#${base0D}";
-      label = "#${base05}";
+      "bg+" = "#${base02}";      # selected line background
+      "hl+" = "#${base0D}";
+      info = "#${base0C}";
+      border = "#${base03}";
+      prompt = "#${base0A}";
+      pointer = "#${base08}";
+      marker = "#${base0B}";
+      spinner = "#${base0C}";
+      header = "#${base07}";
+      gutter = "#${base01}";
+      label = "#${base06}";
+      query = "#${base06}";
     };
-    defaultCommand = "fd --type f --hidden --strip-cwd-prefix --exclude .git --exclude node_modules --exclude __pycache__ --exclude .venv --exclude target --exclude dist --exclude build";
+    # Default --exclude opetions moved to fd configuration can explicitly state if desiredfuzzyCompletion
+    # Consider adding back --strip-cwd-prefix
+
+    defaultCommand = "fd --hidden --follow";
     defaultOptions = [
       "--height=40%"
       "--layout=reverse"
       "--border=rounded"
-      "--info=inline"
-      "--bind=ctrl-j:down,ctrl-k:up,ctrl-h:toggle-preview"
-      "--bind=ctrl-/:toggle-preview"
-      "--bind=ctrl-u:preview-half-page-up"
-      "--bind=ctrl-d:preview-half-page-down"
-      "--bind=ctrl-f:preview-page-down"
-      "--bind=ctrl-b:preview-page-up"
-      "--bind=ctrl-g:preview-top"
-      "--bind=ctrl-shift-g:preview-bottom"
-      "--bind=alt-a:select-all"
-      "--bind=alt-d:deselect-all"
-      "--preview='([[ -d {} ]] && eza --tree --level=2 --color=always {} | head -200) || (file {} | grep -q binary && echo {} is binary) || bat --style=numbers --color=always --line-range=:500 {}'"
-      "--preview-window=right:50%:wrap"
-      "--multi"
-      "--cycle"
-      "--reverse"
+
+
+      "--ansi"
+      "--tabstop=2"
+      "--preview-window=right,60%,border-rounded"
+      "--preview=${previewCmd}"
+      # "--preview-window=right:50%:wrap"
+      # "--multi"
+      # "--cycle"
+      # "--reverse"
+      # "--info=inline"
       "--marker=▶"
       "--pointer=◀"
       "--prompt=❯ "
+
+      # --- Keybinds ---
+      # Toggle/show preview & move it around
+      "--bind=?:toggle-preview"
+      "--bind=alt-p:change-preview-window(right,60%,border-rounded|down,40%,border-rounded)"
+      # Scroll preview
+      "--bind=ctrl-u:preview-half-page-up,ctrl-d:preview-half-page-down"
+      "--bind=alt-u:preview-up,alt-d:preview-down"
+      # Navigation
+      "--bind=ctrl-j:down"
+      "--bind=ctrl-k:up"
+      "--bind=ctrl-f:page-down"
+      "--bind=ctrl-b:page-up"
+      "--bind=ctrl-l:clear-query"
+      "--bind=ctrl-s:toggle-sort"
+      "--bind=alt-a:toggle-all"
+      # Open selection(s) in editor
+      "--bind=ctrl-o:execute(nvim {+} < /dev/tty > /dev/tty 2>&1)"
+      # Copy selected paths to clipboard
+      "--bind=ctrl-y:execute-silent(echo -n {+} | wl-copy)"
+      # Show file type quickly (helps on binaries)
+      "--bind=ctrl-i:execute-silent(file --brief --mime {+} 2>/dev/null || true)"
     ];
-    fileWidgetCommand = "fd --type f --follow --hidden --strip-cwd-prefix --exclude .git --exclude node_modules --exclude __pycache__ --exclude .venv --exclude target --exclude dist --exclude build";
+
+    fileWidgetCommand = "fd --type f --hidden --follow";
     fileWidgetOptions = [
-      "--preview '([[ -d {} ]] && eza --tree --level=2 --color=always {} | head -100) || (file {} | grep -q binary && echo {} is binary) || bat --style=numbers --color=always --line-range=:500 {}'"
-      "--bind=ctrl-o:execute(xdg-open {} &)"
-      "--bind=ctrl-e:execute($EDITOR {} || nvim {})"
-      "--bind=ctrl-y:execute-silent(echo -n {} | wl-copy)"
-      "--header='CTRL-O: open | CTRL-E: edit | CTRL-Y: copy path'"
+      "--preview=${previewCmd}"
+
+      # --- Keybinds ---
+      # Toggle/show preview & move it around
+      "--bind=?:toggle-preview"
+      "--bind=alt-p:change-preview-window(right,60%,border-rounded|down,40%,border-rounded)"
+      # Scroll preview
+      "--bind=ctrl-u:preview-half-page-up,ctrl-d:preview-half-page-down"
+      "--bind=alt-u:preview-up,alt-d:preview-down"
+      # Navigation
+      "--bind=ctrl-j:down"
+      "--bind=ctrl-k:up"
+      "--bind=ctrl-f:page-down"
+      "--bind=ctrl-b:page-up"
+      "--bind=ctrl-l:clear-query"
+      "--bind=ctrl-s:toggle-sort"
+      "--bind=alt-a:toggle-all"
+      # Open selection(s) in editor
+      "--bind=ctrl-o:execute(nvim {+} < /dev/tty > /dev/tty 2>&1)"
+      # Copy selected paths to clipboard
+      "--bind=ctrl-y:execute-silent(echo -n {+} | wl-copy)"
+      # Show file type quickly (helps on binaries)
+      "--bind=ctrl-i:execute-silent(file --brief --mime {+} 2>/dev/null || true)"
+      # Reuse global binds; add one to open parent directory of selection
+      "--bind=alt-o:execute(cd $(dirname -- {q}) && $SHELL)"
     ];
+
+    changeDirWidgetCommand = "fd --type d --hidden --follow";
+    changeDirWidgetOptions = [
+      "--preview=${previewCmd}"
+
+      # Enter directory (default behavior)
+      "--bind=enter:accept"
+    ];
+
     historyWidgetOptions = [
-      "--sort"
-      "--exact"
-      "--tac"
+      # Keep shell order (recency)
+      "--no-sort"
       "--tiebreak=index"
-      "--preview 'echo {}'"
-      "--preview-window=up:3:hidden:wrap"
-      "--bind=ctrl-h:toggle-preview"
+      
+      # Simple preview showing the command
+      "--preview=echo {}"
+      "--preview-window=up:3:wrap"
+      
+      # Basic navigation
+      "--bind=ctrl-k:up"
+      "--bind=ctrl-j:down"
+      "--bind=?:toggle-preview"
+      
+      # Copy command to clipboard
       "--bind=ctrl-y:execute-silent(echo -n {} | wl-copy)"
-      "--header='Press CTRL-Y to copy command into clipboard'"
     ];
     enableBashIntegration = lib.mkIf config.programs.bash.enable true;
     enableFishIntegration = lib.mkIf config.programs.fish.enable true;
@@ -141,3 +222,26 @@ in
   };
 
 }
+
+
+      # "--bind=ctrl-j:down,ctrl-k:up,ctrl-h:toggle-preview"
+      # "--bind=ctrl-/:toggle-preview"
+      # "--bind=ctrl-u:preview-half-page-up"
+      # "--bind=ctrl-d:preview-half-page-down"
+      # "--bind=ctrl-f:preview-page-down"
+      # "--bind=ctrl-b:preview-page-up"
+      # "--bind=ctrl-g:preview-top"
+      # "--bind=ctrl-shift-g:preview-bottom"
+      # "--bind=alt-a:select-all"
+      # "--bind=alt-d:deselect-all"
+
+
+      # "--bind=ctrl-o:execute(xdg-open {} &)"
+      # "--bind=ctrl-e:execute($EDITOR {} || nvim {})"
+      # "--bind=ctrl-y:execute-silent(echo -n {} | wl-copy)"
+      # "--header='CTRL-O: open | CTRL-E: edit | CTRL-Y: copy path'"
+
+      # "--preview 'eza --tree --level=2 --color=always {} | head -100'"
+      # "--bind=ctrl-o:execute(xdg-open {} &)"
+      # "--bind=ctrl-e:execute($EDITOR {} || nvim {})"
+      # "--header='CTRL-O: open | CTRL-E: edit'"
