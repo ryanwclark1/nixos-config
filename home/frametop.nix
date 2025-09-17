@@ -7,7 +7,6 @@
     ./global
 
     ./features/ai
-    ./features/aichat
     ./features/alacritty
     ./features/ansible
     ./features/atuin

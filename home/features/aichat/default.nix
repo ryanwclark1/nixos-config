@@ -7,7 +7,6 @@
 }:
 
 {
-
   programs.aichat = {
     enable = true;
     settings = {
