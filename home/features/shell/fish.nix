@@ -1,4 +1,7 @@
 {
+  config,
+  pkgs,
+  lib,
   ...
 }:
 let
@@ -66,21 +69,323 @@ in
 
   programs.fish = {
     enable = true;
-    # loginShellInit = /* fish */ ''
-    #   # Remove fish greeting
-    #   set -U fish_greeting
-    # '';
+    package = pkgs.fish;
+    
+    # Use abbreviations for better auto-expansion
+    preferAbbrs = true;
+    
+    # Shell aliases - matching ZSH/Bash configuration
     shellAliases = {
       # Clear screen and scrollback
       clear = "printf '\\033[2J\\033[3J\\033[1;1H'";
+      
+      # Directory navigation
+      ".." = "cd ..";
+      "..." = "cd ../..";
+      "...." = "cd ../../..";
+      "....." = "cd ../../../..";
+      "-" = "cd -";
+      
+      # Git shortcuts
+      g = "git";
+      ga = "git add";
+      gc = "git commit";
+      gca = "git commit -a";
+      gcam = "git commit -am";
+      gco = "git checkout";
+      gd = "git diff";
+      gds = "git diff --staged";
+      gl = "git log --oneline --graph";
+      gp = "git push";
+      gpu = "git pull";
+      gs = "git status -sb";
+      gst = "git status";
+      
+      # System management
+      rebuild = "sudo nixos-rebuild switch --flake .#(hostname)";
+      update = "nix flake update";
+      upgrade = "nix flake update && sudo nixos-rebuild switch --flake .#(hostname)";
+      cleanup = "sudo nix-collect-garbage -d && nix store optimise";
+      
+      # Better defaults
+      grep = "rg";
+      find = "fd";
+      ps = "procs";
+      top = "btop";
+      htop = "btop";
+      du = "dust";
+      df = "duf";
+      # cat alias handled by bat module
+      # ls aliases handled by eza module
+      la = "ls -a";  # Will use eza's ls alias
+      ll = "ls -l";  # Will use eza's ls alias
+      
+      # Safety nets
+      cp = "cp -i";
+      mv = "mv -i";
+      rm = "rm -I";
+      
+      # Shortcuts
+      v = "nvim";
+      vim = "nvim";
+      vi = "nvim";
+      e = "$EDITOR";
+      o = "xdg-open";
+      
+      # Docker shortcuts
+      d = "docker";
+      dc = "docker compose";
+      dps = "docker ps";
+      dpsa = "docker ps -a";
+      dimg = "docker images";
+      drm = "docker rm";
+      drmi = "docker rmi";
+      
+      # Systemctl shortcuts
+      sc = "systemctl";
+      scu = "systemctl --user";
+      scs = "sudo systemctl";
+      
+      # Network
+      ip = "ip --color=auto";
+      ports = "ss -tulanp";
+      
+      # Misc
+      h = "history";
+      help = "man";
+      # j/jj aliases not needed - zoxide replaces cd directly
+      mk = "mkdir -p";
+      path = "echo $PATH | tr ' ' '\\n'";
+      reload = "exec fish";
+      tf = "terraform";
+      k = "kubectl";
+      kx = "kubectx";
+      kns = "kubens";
     };
-
-    interactiveShellInit = /* fish */ ''
-        # Remove fish greeting
-        # set -U fish_greeting
-
-        # Open command buffer in vim when alt+e is pressed
-        bind \ee edit_command_buffer
+    
+    # Shell abbreviations for expansion
+    shellAbbrs = {
+      # Expanded git commands
+      gcmsg = "git commit -m";
+      gpsup = "git push --set-upstream origin (git branch --show-current)";
+      grbi = "git rebase -i";
+      grhh = "git reset --hard HEAD";
+      gwip = "git add -A; git commit -m 'WIP'";
+      
+      # Nix shortcuts
+      nrs = "nix run nixpkgs#";
+      nsh = "nix shell nixpkgs#";
+      ndev = "nix develop";
+      nbuild = "nix build";
+      
+      # Quick directory access
+      dl = "cd ~/Downloads";
+      docs = "cd ~/Documents";
+      dev = "cd ~/Code";
+      nix = "cd ~/nixos-config";
+      dots = "cd ~/.config";
+    };
+    
+    # Key bindings
+    binds = [
+      {
+        name = "edit_command_buffer";
+        key = "\\ee";
+        mode = "default";
+        description = "Edit command buffer in editor";
+      }
+      {
+        name = "accept-autosuggestion";
+        key = "\\e[C";  # Right arrow
+        mode = "default";
+      }
+      {
+        name = "history-search-backward";
+        key = "\\e[A";  # Up arrow
+        mode = "default";
+      }
+      {
+        name = "history-search-forward";
+        key = "\\e[B";  # Down arrow
+        mode = "default";
+      }
+    ];
+    
+    # Plugins configuration
+    plugins = [
+      {
+        name = "z";
+        src = pkgs.fishPlugins.z.src;
+      }
+      {
+        name = "fzf-fish";
+        src = pkgs.fishPlugins.fzf-fish.src;
+      }
+      {
+        name = "done";
+        src = pkgs.fishPlugins.done.src;
+      }
+      {
+        name = "autopair";
+        src = pkgs.fishPlugins.autopair.src;
+      }
+      {
+        name = "sponge";
+        src = pkgs.fishPlugins.sponge.src;
+      }
+    ];
+    
+    # Functions
+    functions = {
+      # Directory functions
+      mkcd = ''
+        mkdir -p $argv[1] && cd $argv[1]
+      '';
+      
+      # Git functions
+      gclone = ''
+        git clone $argv[1] && cd (basename $argv[1] .git)
+      '';
+      
+      # Archive extraction
+      extract = ''
+        if test -f $argv[1]
+          switch $argv[1]
+            case "*.tar.bz2"
+              tar xjf $argv[1]
+            case "*.tar.gz"
+              tar xzf $argv[1]
+            case "*.bz2"
+              bunzip2 $argv[1]
+            case "*.rar"
+              unrar e $argv[1]
+            case "*.gz"
+              gunzip $argv[1]
+            case "*.tar"
+              tar xf $argv[1]
+            case "*.tbz2"
+              tar xjf $argv[1]
+            case "*.tgz"
+              tar xzf $argv[1]
+            case "*.zip"
+              unzip $argv[1]
+            case "*.Z"
+              uncompress $argv[1]
+            case "*.7z"
+              7z x $argv[1]
+            case '*'
+              echo "'$argv[1]' cannot be extracted"
+          end
+        else
+          echo "'$argv[1]' is not a valid file"
+        end
+      '';
+      
+      # System info
+      sysinfo = ''
+        echo "Hostname: "(hostname)
+        echo "Kernel: "(uname -r)
+        echo "Uptime: "(uptime -p)
+        echo "Memory: "(free -h | awk '/^Mem:/ {print $3 "/" $2}')
+        echo "Disk: "(df -h / | awk 'NR==2 {print $3 "/" $2}')
+        echo "Load: "(uptime | awk -F'load average:' '{print $2}')
+      '';
+      
+      # Docker helpers
+      docker-exec = ''
+        set -l container $argv[1]
+        set -e argv[1]
+        if test -t 0 && test -t 1
+          docker exec -it $container $argv
+        else
+          docker exec $container $argv
+        end
+      '';
+      
+      # Quick backup
+      backup = ''
+        cp -r $argv[1] "$argv[1].bak."(date +%Y%m%d_%H%M%S)
+      '';
+      
+      # Weather
+      weather = ''
+        curl -s "wttr.in/$argv[1]"
+      '';
+      
+      # Cheat sheet
+      cheat = ''
+        curl -s "cheat.sh/$argv[1]"
+      '';
+    };
+    
+    # Shell initialization
+    shellInit = ''
+      # Set environment variables
+      set -gx EDITOR nvim
+      set -gx VISUAL nvim
+      set -gx PAGER less
+      set -gx LESS "-R"
+      set -gx MANPAGER "sh -c 'col -bx | bat -l man -p'"
+      set -gx BAT_THEME "Catppuccin-frappe"
+      
+      # Set PATH
+      set -gx PATH $HOME/.local/bin $HOME/.cargo/bin $HOME/go/bin $PATH
+      
+      # FZF configuration handled by fzf module
+      
+      # LS_COLORS using vivid
+      if command -v vivid >/dev/null
+        set -gx LS_COLORS (vivid generate catppuccin-frappe)
+      end
+    '';
+    
+    # Login shell initialization
+    loginShellInit = ''
+      # Display system info on login (only in interactive sessions)
+      if status is-interactive && command -v fastfetch >/dev/null
+        fastfetch
+      end
+    '';
+    
+    # Interactive shell initialization
+    interactiveShellInit = ''
+      # Remove fish greeting
+      set -U fish_greeting
+      
+      # Vi mode indicator
+      function fish_mode_prompt
+        switch $fish_bind_mode
+          case default
+            echo -n "(N) "
+          case insert
+            echo -n "(I) "
+          case replace_one
+            echo -n "(R) "
+          case visual
+            echo -n "(V) "
+        end
+      end
+      
+      # Zoxide integration handled by zoxide module with --cmd cd
+      
+      # Initialize starship prompt if available
+      if command -v starship >/dev/null
+        starship init fish | source
+      end
+      
+      # Set up direnv hook if available
+      if command -v direnv >/dev/null
+        direnv hook fish | source
+      end
+      
+      # Colored man pages
+      set -gx LESS_TERMCAP_mb (printf '\e[1;32m')
+      set -gx LESS_TERMCAP_md (printf '\e[1;32m')
+      set -gx LESS_TERMCAP_me (printf '\e[0m')
+      set -gx LESS_TERMCAP_se (printf '\e[0m')
+      set -gx LESS_TERMCAP_so (printf '\e[01;33m')
+      set -gx LESS_TERMCAP_ue (printf '\e[0m')
+      set -gx LESS_TERMCAP_us (printf '\e[1;4;31m')
     '';
   };
 }
