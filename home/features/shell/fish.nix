@@ -218,11 +218,6 @@ in
     shellInit = ''
       # Terminal
       set -gx TERM xterm-256color
-
-      # LS_COLORS using vivid
-      if command -v vivid >/dev/null
-        set -gx LS_COLORS (vivid generate catppuccin-frappe)
-      end
     '';
 
     # Login shell initialization

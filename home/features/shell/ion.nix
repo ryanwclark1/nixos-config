@@ -15,11 +15,6 @@
       # Ion-specific environment variables (most are in common.nix)
       export TERM="xterm-256color"
 
-      # LS_COLORS using vivid if available (Ion-specific syntax)
-      if test -x $(which vivid)
-        export LS_COLORS="$(vivid generate catppuccin-frappe)"
-      end
-
       # Ion-specific aliases (inherits from common.nix)
       alias ionrc = $EDITOR ~/.config/ion/initrc
       alias reload = exec ion
