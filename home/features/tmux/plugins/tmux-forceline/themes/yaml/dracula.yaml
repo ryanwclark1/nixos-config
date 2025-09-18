@@ -1,0 +1,29 @@
+system: "base24"
+name: "Dracula"
+author: "https://github.com/dracula/dracula-theme"
+variant: "dark"
+palette:
+  base00: "#282a36" # background
+  base01: "#3a3c4e" # current line
+  base02: "#4d4f68" # selection
+  base03: "#626483" # comment
+  base04: "#62d6e8" # cyan
+  base05: "#e9e9f4" # foreground
+  base06: "#f1f2f8" # light foreground
+  base07: "#f7f7fb" # lightest foreground
+  base08: "#ea51b2" # pink/magenta
+  base09: "#b45bcf" # purple
+  base0A: "#00f769" # green
+  base0B: "#ebff87" # yellow
+  base0C: "#a4ffff" # cyan
+  base0D: "#62d6e8" # blue
+  base0E: "#b45bcf" # purple
+  base0F: "#00f769" # green
+  base10: "#21222c" # darker background
+  base11: "#191a21" # darkest background
+  base12: "#ff6e6e" # bright red
+  base13: "#ffffa5" # bright yellow
+  base14: "#69ff94" # bright green
+  base15: "#a4ffff" # bright cyan
+  base16: "#d6acff" # bright blue
+  base17: "#ff92df" # bright purple
