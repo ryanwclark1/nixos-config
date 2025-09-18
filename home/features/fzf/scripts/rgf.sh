@@ -201,8 +201,7 @@ main() {
     info "Searching for: $search_pattern"
     
     # Execute search with FZF
-    local selected
-    selected=$("${rg_cmd[@]}" 2>/dev/null |
+    "${rg_cmd[@]}" 2>/dev/null |
         fzf --ansi \
             --color "hl:-1:underline,hl+:-1:underline:reverse" \
             --delimiter : \
@@ -215,18 +214,14 @@ main() {
             --bind "ctrl-l:toggle-preview" \
             --bind "ctrl-/:change-preview-window(right,60%,border-left|down,60%,border-top|hidden|)" \
             --bind '?:preview:echo -e "KEYBINDINGS:\n\n<Enter> - Open file at line in editor\n<Ctrl-O> - Open file in editor\n<Ctrl-Y> - Copy file:line to clipboard\n<Ctrl-L> - Toggle preview\n<Ctrl-/> - Change preview window\n? - Show this help"' \
-    ) || {
-        case $? in
-            1) warn "No matches found for: $search_pattern" ;;
-            2) err "FZF error occurred" ;;
-            130) info "Search cancelled by user" ;;
-            *) err "Unknown error occurred" ;;
-        esac
-        exit $?
-    }
-    
-    # If we get here without becoming an editor, something went wrong
-    [[ -n "$selected" ]] || exit 1
+        || {
+            case $? in
+                1) warn "No matches found for: $search_pattern" ;;
+                2) err "FZF error occurred" ;;
+                130) info "Search cancelled by user" ;;
+                *) err "Unknown error occurred" ;;
+            esac
+        }
 }
 
 # Handle if sourced vs executed
