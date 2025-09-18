@@ -6,7 +6,7 @@
 {
   home.packages = with pkgs; [
     # Cross-platform networking utilities
-    dnsutils # `dig` + `nslookup` - works on all platforms
+    bind.dnsutils # `dig` + `nslookup` - works on all platforms
     nmap # A utility for network discovery and security auditing - cross-platform
     tcpdump # Network sniffer - available on macOS
     wireguard-tools # WireGuard utilities - cross-platform
