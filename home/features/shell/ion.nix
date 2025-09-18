@@ -40,30 +40,30 @@
       # Archive extraction
       fn extract file
         if test -f $file
-          case $file
-            when *.tar.bz2
+          match $file
+            case *.tar.bz2
               tar xjf $file
-            when *.tar.gz
+            case *.tar.gz
               tar xzf $file
-            when *.bz2
+            case *.bz2
               bunzip2 $file
-            when *.rar
+            case *.rar
               unrar e $file
-            when *.gz
+            case *.gz
               gunzip $file
-            when *.tar
+            case *.tar
               tar xf $file
-            when *.tbz2
+            case *.tbz2
               tar xjf $file
-            when *.tgz
+            case *.tgz
               tar xzf $file
-            when *.zip
+            case *.zip
               unzip $file
-            when *.Z
+            case *.Z
               uncompress $file
-            when *.7z
+            case *.7z
               7z x $file
-            when *
+            case _
               echo "'$file' cannot be extracted"
           end
         else
@@ -101,8 +101,8 @@
         curl -s "cheat.sh/$topic"
       end
 
-      # Docker helper functions
-      fn docker-exec container @args
+      # Docker helper functions (using underscores instead of hyphens)
+      fn docker_exec container @args
         if test -t 0 && test -t 1
           docker exec -it $container @args
         else
@@ -110,7 +110,7 @@
         end
       end
 
-      fn docker-bash container @args
+      fn docker_bash container @args
         if test -t 0 && test -t 1
           docker exec -it $container bash @args
         else
@@ -118,13 +118,18 @@
         end
       end
 
-      fn docker-sh container @args
+      fn docker_sh container @args
         if test -t 0 && test -t 1
           docker exec -it $container sh @args
         else
           docker exec $container sh @args
         end
       end
+      
+      # Create aliases for hyphenated versions
+      alias docker-exec = docker_exec
+      alias docker-bash = docker_bash
+      alias docker-sh = docker_sh
 
       # Zoxide integration handled by zoxide module with --cmd cd
 

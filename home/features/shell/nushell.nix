@@ -14,12 +14,22 @@
     # TERM/COLORTERM is set in common.nix
 
     # Nushell-specific shell aliases (inherits from common.nix)
+    # Override aliases that use shell-specific syntax
     shellAliases = {
       # Nushell-specific quick edits
       nuconfig = "$EDITOR ~/.config/nushell/config.nu";
 
       # Nushell-specific reload
       reload = "exec nu";
+      
+      # Override common aliases that use && (not supported in Nushell)
+      # Use ; for sequential commands in Nushell
+      upgrade = lib.mkForce "nix flake update; sudo nixos-rebuild switch --flake .#$(hostname)";
+      cleanup = lib.mkForce "sudo nix-collect-garbage -d; nix store optimise";
+      
+      # Override rust aliases from development/rust.nix
+      "rust-update" = lib.mkForce "rustup update; cargo install-update -a";
+      "rust-clean" = lib.mkForce "cargo clean; rm -rf ~/.cargo/registry/cache";
     };
 
     # Nushell-specific settings
