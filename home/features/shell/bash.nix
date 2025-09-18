@@ -6,15 +6,16 @@
 }:
 
 {
-  home.packages = with pkgs; [
-    blesh
-  ];
+  # Blesh disabled due to file descriptor errors and compatibility issues
+  # home.packages = with pkgs; [
+  #   blesh
+  # ];
 
   programs.bash = {
     enable = true;
     package = pkgs.bashInteractive;
-    enableCompletion = true;
-    enableVteIntegration = true;
+    enableCompletion = false;  # Disabled due to progcomp errors
+    enableVteIntegration = false;  # Disabled due to prompt escape sequence issues
 
     # History configuration - matching ZSH's robust history
     historySize = 100000;
@@ -40,36 +41,28 @@
       "kill *"
     ];
 
-    # Shell options for better interactive experience
     shellOptions = [
       # History options
-      "histappend"  # Append to history file, don't overwrite
-      "histverify"  # Review history substitution before executing
-      "histreedit"  # Allow re-editing of failed history substitutions
-
+      "histappend"  # Append to history file,
       # Completion and expansion options
       "cdspell"     # Correct minor spelling errors in cd commands
-      "dirspell"    # Spell check directory names during completion
       "dotglob"     # Include hidden files in pathname expansion
       "extglob"     # Extended pattern matching
       "globstar"    # ** matches all files recursively
       "nocaseglob"  # Case-insensitive pathname expansion
       "nocasematch" # Case-insensitive pattern matching
-
       # Job control
       "checkjobs"   # Check for running jobs before exiting
       "huponexit"   # Send SIGHUP to all jobs on exit
-
       # Interactive behavior
       "autocd"      # cd into directory by typing its name
       "cdable_vars" # cd into variable values
       "checkwinsize" # Update LINES and COLUMNS after each command
       "cmdhist"     # Save multi-line commands as single history entry
-      "direxpand"   # Expand directory names on completion
       "lithist"     # Save multi-line commands with newlines
-
-      # Error handling
-      "no_empty_cmd_completion" # Don't complete on empty command line
+      # Additional options from your environment that might be useful
+      "inherit_errexit" # Child processes inherit errexit
+      "interactive_comments" # Allow comments in interactive shell
     ];
 
     # Bash-specific session variables
@@ -94,12 +87,15 @@
       # Skip initialization for non-interactive shells early
       [[ $- != *i* ]] && return
 
+      # Ensure terminal supports colors
+      case "$TERM" in
+        xterm*|rxvt*|screen*|tmux*|alacritty*|kitty*) ;;
+        *) export TERM=xterm-256color ;;
+      esac
+
       # Safer handling for restricted environments
       # Only enable restricted mode if bash is actually restricted
-      if [[ -n "$BASH_EXECUTION_STRING" ]] || ! shopt -q restricted_shell 2>/dev/null; then
-        # Normal bash - full features enabled
-        :
-      else
+      if shopt -q restricted_shell 2>/dev/null; then
         # Restricted shell detected
         export BASH_RESTRICTED_MODE=1
       fi
@@ -110,32 +106,20 @@
         export VSCODE_TERMINAL=1
       fi
 
-      # Only apply shell options if not in restricted mode
-      if [[ -z "$BASH_RESTRICTED_MODE" ]]; then
-        # Test if shopt works before using it
-        if shopt -o nounset 2>/dev/null; then
-          # shopt is available and working
-          :
-        else
-          # shopt is not available or restricted
-          export BASH_RESTRICTED_MODE=1
-        fi
-      fi
+      # No need for additional shopt testing - the above check is sufficient
 
-      # Enhanced prompt command for updating terminal title
-      PROMPT_COMMAND='history -a; history -n; printf "\033]0;%s@%s:%s\007" "''${USER}" "''${HOSTNAME%%.*}" "''${PWD/#$HOME/\~}"'
+      # Simple prompt command for history
+      export PROMPT_COMMAND='history -a; history -n'
+      
+      # Set a simple fallback prompt (starship will override this)
+      export PS1='\\u@\\h:\\w\\$ '
 
-      # Bash-specific completion enhancements (only if not restricted)
+      # Bash-specific completion enhancements (only if not restricted and completion works)
       if [[ -z "$BASH_RESTRICTED_MODE" ]] && command -v bind &>/dev/null 2>&1; then
+        # Only set readline options, not completion-specific ones that may fail
         bind "set completion-ignore-case on" 2>/dev/null || true
-        bind "set completion-map-case on" 2>/dev/null || true
         bind "set show-all-if-ambiguous on" 2>/dev/null || true
-        bind "set mark-symlinked-directories on" 2>/dev/null || true
-        bind "set colored-stats on" 2>/dev/null || true
-        bind "set visible-stats on" 2>/dev/null || true
         bind "set page-completions off" 2>/dev/null || true
-        bind "set menu-complete-display-prefix on" 2>/dev/null || true
-        bind "set completion-query-items 200" 2>/dev/null || true
 
         # Better history search with arrow keys
         bind '"\e[A": history-search-backward' 2>/dev/null || true
@@ -177,16 +161,19 @@
         fi
         return
       fi
+      
+      # Ensure we have a working prompt before starship takes over
+      # This prevents the lone @ if starship initialization is delayed
+      [[ -z "$PS1" ]] && export PS1='[\u@\h \W]\$ '
 
-      # Initialize blesh if available and not in VS Code (where it may cause issues)
-      if [[ -z "$VSCODE_TERMINAL" ]] && [[ -f "${pkgs.blesh}/share/blesh/ble.sh" ]]; then
-        source "${pkgs.blesh}/share/blesh/ble.sh" --noattach 2>/dev/null || true
-        
-        # Attach blesh only if initialization succeeded
-        if declare -f ble-attach &>/dev/null; then
-          ble-attach 2>/dev/null || true
-        fi
-      fi
+      # Blesh disabled due to file descriptor errors
+      # To re-enable, uncomment the package above and this block:
+      # if [[ -z "$VSCODE_TERMINAL" ]] && [[ -f "${pkgs.blesh}/share/blesh/ble.sh" ]]; then
+      #   source "${pkgs.blesh}/share/blesh/ble.sh" --noattach 2>/dev/null || true
+      #   if declare -f ble-attach &>/dev/null; then
+      #     ble-attach 2>/dev/null || true
+      #   fi
+      # fi
 
       # Enhanced FZF completion preview customization
       # This complements the basic integration from programs.fzf
