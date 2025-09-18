@@ -126,8 +126,8 @@ in
     enableBashIntegration = lib.mkIf config.programs.bash.enable true;
     enableFishIntegration = lib.mkIf config.programs.fish.enable true;
     enableZshIntegration = lib.mkIf config.programs.zsh.enable true;
-    colorMode = "truecolor";       # or "8-bit" if you need it
-    activeTheme = "theme";
+    colorMode = "24-bit";          # or "8-bit" for limited color support
+    activeTheme = "theme";  # Use built-in theme until custom theme is fixed
 
     # Home-Manager expects an attrset of absolute paths.
     # We feed our generated file here and make it selectable as "catppuccin-frappe-ryan".
