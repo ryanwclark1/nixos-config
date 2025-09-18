@@ -93,7 +93,8 @@ in
     tmux = {
       enableShellIntegration = lib.mkIf config.programs.tmux.enable true;
       shellIntegrationOptions = [
-        "-p 80%,80%"
+        "-p@@"
+        "80%,80%"
       ];
     };
 
