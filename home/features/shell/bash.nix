@@ -6,10 +6,11 @@
 }:
 
 {
-  # Blesh disabled due to file descriptor errors and compatibility issues
-  # home.packages = with pkgs; [
-  #   blesh
-  # ];
+  # Blesh (Bash Line Editor) is not currently installed
+  # Uncomment to enable enhanced bash line editing:
+  home.packages = with pkgs; [
+    blesh
+  ];
 
   programs.bash = {
     enable = true;
@@ -100,9 +101,9 @@
         export BASH_RESTRICTED_MODE=1
       fi
 
-      # VS Code specific handling - not necessarily restricted, just different
+      # VS Code specific handling for terminal compatibility
       if [[ -n "$VSCODE_INJECTION" ]] || [[ "$TERM_PROGRAM" == "vscode" ]]; then
-        # VS Code terminal - be cautious with blesh
+        # VS Code terminal detected
         export VSCODE_TERMINAL=1
       fi
 
@@ -110,9 +111,6 @@
 
       # Simple prompt command for history
       export PROMPT_COMMAND='history -a; history -n'
-      
-      # Set a simple fallback prompt (starship will override this)
-      export PS1='\\u@\\h:\\w\\$ '
 
       # Bash-specific completion enhancements (only if not restricted and completion works)
       if [[ -z "$BASH_RESTRICTED_MODE" ]] && command -v bind &>/dev/null 2>&1; then
@@ -128,7 +126,7 @@
         bind '"\e[D": backward-char' 2>/dev/null || true
       fi
 
-      # Ctrl+R handled by atuin if available, fallback to fzf
+      # Fallback to FZF for Ctrl+R history search if Atuin is not available
       if [[ -z "$BASH_RESTRICTED_MODE" ]] && ! command -v atuin &> /dev/null && command -v fzf &> /dev/null; then
         if command -v bind &>/dev/null 2>&1; then
           bind -x '"\C-r": __fzf_history' 2>/dev/null || true
@@ -161,13 +159,14 @@
         fi
         return
       fi
-      
-      # Ensure we have a working prompt before starship takes over
-      # This prevents the lone @ if starship initialization is delayed
-      [[ -z "$PS1" ]] && export PS1='[\u@\h \W]\$ '
 
-      # Blesh disabled due to file descriptor errors
-      # To re-enable, uncomment the package above and this block:
+      # Set a proper fallback prompt before starship takes over
+      # This prevents display issues if starship initialization is delayed
+      export PS1='[\u@\h \W]\$ '
+
+      # Blesh (Bash Line Editor) is not currently installed
+      # To enable enhanced bash line editing, uncomment the package declaration above
+      # and this initialization block:
       # if [[ -z "$VSCODE_TERMINAL" ]] && [[ -f "${pkgs.blesh}/share/blesh/ble.sh" ]]; then
       #   source "${pkgs.blesh}/share/blesh/ble.sh" --noattach 2>/dev/null || true
       #   if declare -f ble-attach &>/dev/null; then
