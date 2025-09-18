@@ -91,40 +91,42 @@
     '';
 
     bashrcExtra = ''
-      # Override shopt to handle restricted shells gracefully
-      if ! type shopt &>/dev/null 2>&1; then
-        shopt() { return 0; }
-        export -f shopt
-      else
-        # Wrap original shopt to suppress errors
-        _original_shopt=$(which shopt 2>/dev/null || echo shopt)
-        shopt() {
-          $_original_shopt "$@" 2>/dev/null || return 0
-        }
-        export -f shopt
-      fi
-
-      # Override complete builtin if it doesn't exist
-      if ! type complete &>/dev/null 2>&1; then
-        complete() { return 0; }
-        builtin() {
-          case "$1" in
-            complete) return 0 ;;
-            *) command builtin "$@" 2>/dev/null || return 0 ;;
-          esac
-        }
-        export -f complete
-        export -f builtin
-      fi
-
-      # Skip further initialization for non-interactive shells
+      # Skip initialization for non-interactive shells early
       [[ $- != *i* ]] && return
+
+      # Safer handling for restricted environments
+      # Only enable restricted mode if bash is actually restricted
+      if [[ -n "$BASH_EXECUTION_STRING" ]] || ! shopt -q restricted_shell 2>/dev/null; then
+        # Normal bash - full features enabled
+        :
+      else
+        # Restricted shell detected
+        export BASH_RESTRICTED_MODE=1
+      fi
+
+      # VS Code specific handling - not necessarily restricted, just different
+      if [[ -n "$VSCODE_INJECTION" ]] || [[ "$TERM_PROGRAM" == "vscode" ]]; then
+        # VS Code terminal - be cautious with blesh
+        export VSCODE_TERMINAL=1
+      fi
+
+      # Only apply shell options if not in restricted mode
+      if [[ -z "$BASH_RESTRICTED_MODE" ]]; then
+        # Test if shopt works before using it
+        if shopt -o nounset 2>/dev/null; then
+          # shopt is available and working
+          :
+        else
+          # shopt is not available or restricted
+          export BASH_RESTRICTED_MODE=1
+        fi
+      fi
 
       # Enhanced prompt command for updating terminal title
       PROMPT_COMMAND='history -a; history -n; printf "\033]0;%s@%s:%s\007" "''${USER}" "''${HOSTNAME%%.*}" "''${PWD/#$HOME/\~}"'
 
-      # Bash-specific completion enhancements (only if bind is available)
-      if command -v bind &>/dev/null 2>&1 || builtin bind 2>/dev/null; then
+      # Bash-specific completion enhancements (only if not restricted)
+      if [[ -z "$BASH_RESTRICTED_MODE" ]] && command -v bind &>/dev/null 2>&1; then
         bind "set completion-ignore-case on" 2>/dev/null || true
         bind "set completion-map-case on" 2>/dev/null || true
         bind "set show-all-if-ambiguous on" 2>/dev/null || true
@@ -143,8 +145,8 @@
       fi
 
       # Ctrl+R handled by atuin if available, fallback to fzf
-      if ! command -v atuin &> /dev/null && command -v fzf &> /dev/null; then
-        if command -v bind &>/dev/null 2>&1 || builtin bind 2>/dev/null; then
+      if [[ -z "$BASH_RESTRICTED_MODE" ]] && ! command -v atuin &> /dev/null && command -v fzf &> /dev/null; then
+        if command -v bind &>/dev/null 2>&1; then
           bind -x '"\C-r": __fzf_history' 2>/dev/null || true
           __fzf_history() {
             local output
@@ -156,7 +158,9 @@
       fi
 
       # Directory shortcuts (similar to ZSH's hash -d)
-      shopt -s cdable_vars 2>/dev/null || true
+      if [[ -z "$BASH_RESTRICTED_MODE" ]]; then
+        shopt -s cdable_vars 2>/dev/null || true
+      fi
       export dl="$HOME/Downloads"
       export docs="$HOME/Documents"
       export dev="$HOME/Code"
@@ -165,10 +169,31 @@
     '';
 
     initExtra = ''
-      # FZF integration for file and directory preview
+      # Skip complex initialization in truly restricted environments
+      if [[ -n "$BASH_RESTRICTED_MODE" ]]; then
+        # Minimal setup for restricted environments
+        if [ -f "$HOME/.config/shell/functions.sh" ]; then
+          source "$HOME/.config/shell/functions.sh"
+        fi
+        return
+      fi
+
+      # Initialize blesh if available and not in VS Code (where it may cause issues)
+      if [[ -z "$VSCODE_TERMINAL" ]] && [[ -f "${pkgs.blesh}/share/blesh/ble.sh" ]]; then
+        source "${pkgs.blesh}/share/blesh/ble.sh" --noattach 2>/dev/null || true
+        
+        # Attach blesh only if initialization succeeded
+        if declare -f ble-attach &>/dev/null; then
+          ble-attach 2>/dev/null || true
+        fi
+      fi
+
+      # Enhanced FZF completion preview customization
+      # This complements the basic integration from programs.fzf
       if command -v fzf &> /dev/null; then
         show_file_or_dir_preview="if [ -d {} ]; then eza --tree --color=always {} | head -200; else bat --style=numbers --color=always --line-range=:500 {}; fi"
 
+        # Custom preview for different completion contexts
         _fzf_comprun() {
           local command=$1
           shift
@@ -180,15 +205,6 @@
             *)            fzf --preview "$show_file_or_dir_preview" "$@" ;;
           esac
         }
-
-        # Setup fzf key bindings if available
-        if [ -f "${pkgs.fzf}/share/fzf/key-bindings.bash" ]; then
-          source "${pkgs.fzf}/share/fzf/key-bindings.bash"
-        fi
-
-        if [ -f "${pkgs.fzf}/share/fzf/completion.bash" ]; then
-          source "${pkgs.fzf}/share/fzf/completion.bash"
-        fi
       fi
 
       # Source common shell functions

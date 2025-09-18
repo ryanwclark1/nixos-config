@@ -1,122 +1,193 @@
 # home/vivid.nix
 { pkgs, lib, config, ... }:
 let
-  # Catppuccin Frappé palette (your values)
-  base00 = "303446"; # base
-  base01 = "292c3c"; # mantle
-  base02 = "414559"; # surface0
-  base03 = "51576d"; # surface1
-  base04 = "626880"; # surface2
-  base05 = "c6d0f5"; # text
-  base06 = "f2d5cf"; # rosewater
-  base07 = "babbf1"; # lavender
-  base08 = "e78284"; # red
-  base09 = "ef9f76"; # peach
-  base0A = "e5c890"; # yellow
-  base0B = "a6d189"; # green
-  base0C = "81c8be"; # teal
-  base0D = "8caaee"; # blue
-  base0E = "ca9ee6"; # mauve
-  base0F = "eebebe"; # flamingo
-  base10 = "292c3c"; # mantle - darker
-  base11 = "232634"; # crust - darkest
-  base12 = "ea999c"; # maroon-ish
-  base13 = "f2d5cf"; # bright yellow-ish (rosewater)
-  base14 = "a6d189"; # bright green
-  base15 = "99d1db"; # sky
-  base16 = "85c1dc"; # sapphire
-  base17 = "f4b8e4"; # pink
+  # Base24 palette mapping
+  base00 = "303446"; # Default Background
+  base01 = "292c3c"; # Lighter Background (Used for status bars, line number and folding marks)
+  base02 = "414559"; # Selection Background
+  base03 = "51576d"; # Comments, Invisibles, Line Highlighting
+  base04 = "626880"; # Dark Foreground (Used for status bars)
+  base05 = "c6d0f5"; # Default Foreground, Caret, Delimiters, Operators
+  base06 = "f2d5cf"; # Light Foreground (Not often used)
+  base07 = "babbf1"; # Light Background (Not often used)
+  base08 = "e78284"; # Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted
+  base09 = "ef9f76"; # Integers, Boolean, Constants, XML Attributes, Markup Link Url
+  base0A = "e5c890"; # Classes, Markup Bold, Search Text Background
+  base0B = "a6d189"; # Strings, Inherited Class, Markup Code, Diff Inserted
+  base0C = "81c8be"; # Support, Regular Expressions, Escape Characters, Markup Quotes
+  base0D = "8caaee"; # Functions, Methods, Attribute IDs, Headings
+  base0E = "ca9ee6"; # Keywords, Storage, Selector, Markup Italic, Diff Changed
+  base0F = "eebebe"; # Deprecated, Opening/Closing Embedded Language Tags
+  base10 = "292c3c"; # Darker Background
+  base11 = "232634"; # Darkest Background  
+  base12 = "ea999c"; # Bright Red
+  base13 = "f2d5cf"; # Bright Orange
+  base14 = "a6d189"; # Bright Yellow
+  base15 = "99d1db"; # Bright Green
+  base16 = "85c1dc"; # Bright Cyan
+  base17 = "f4b8e4"; # Bright Blue
 
-  # Write the vivid theme YAML (validated by schemas/theme.json)
-  # Note: vivid expects YAML themes; the JSON schema is just for validation.
+  # Write the vivid theme YAML following the correct schema
   themeYml = pkgs.writeText "theme.yml" ''
-    # $schema: https://raw.githubusercontent.com/sharkdp/vivid/master/schemas/theme.json
     colors:
-      text:        "${base05}"
-      muted:       "${base04}"
-      subtle:      "${base03}"
-      bg:          "${base00}"
-      bg-alt:      "${base01}"
-      crust:       "${base11}"
+      # Base24 colors mapped to simple names for use in the theme
+      base00: "${base00}"  # Default Background
+      base01: "${base01}"  # Lighter Background
+      base02: "${base02}"  # Selection Background  
+      base03: "${base03}"  # Comments, Invisibles
+      base04: "${base04}"  # Dark Foreground
+      base05: "${base05}"  # Default Foreground
+      base06: "${base06}"  # Light Foreground
+      base07: "${base07}"  # Light Background
+      base08: "${base08}"  # Variables, Diff Deleted
+      base09: "${base09}"  # Constants, Integers
+      base0A: "${base0A}"  # Classes, Markup Bold
+      base0B: "${base0B}"  # Strings, Diff Inserted
+      base0C: "${base0C}"  # Support, Escape Characters
+      base0D: "${base0D}"  # Functions, Methods
+      base0E: "${base0E}"  # Keywords, Storage
+      base0F: "${base0F}"  # Deprecated
 
-      red:         "${base08}"
-      peach:       "${base09}"
-      yellow:      "${base0A}"
-      green:       "${base0B}"
-      teal:        "${base0C}"
-      blue:        "${base0D}"
-      mauve:       "${base0E}"
-      flamingo:    "${base0F}"
-      rosewater:   "${base06}"
-      lavender:    "${base07}"
-      sky:         "${base15}"
-      sapphire:    "${base16}"
-      pink:        "${base17}"
+    core:
+      normal_text: {}
+      regular_file: {}
+      reset_to_normal: {}
 
-    # Style helpers (foreground/background/font_style)
-    # font_style may be a string or array: ["bold","underline"]
-    ui:
-      # fallbacks for unspecified items
-      default:        { foreground: "text" }
-      regular:        { foreground: "text" }
-      special:        { foreground: "mauve",            font_style: "bold" }
-      warning:        { foreground: "peach",            font_style: "bold" }
-      danger:         { foreground: "red",              font_style: "bold" }
-      good:           { foreground: "green",            font_style: "bold" }
-      dim:            { foreground: "muted" }
-      invert:         { foreground: "bg", background: "text" }
+      directory:
+        foreground: base0D
+        font-style: bold
 
-    # File-type classes map to styles
-    # (Names come from vivid's filetype DB; anything not listed uses ui.default)
-    classes:
-      directory:        { foreground: "blue",     font_style: "bold" }
-      symlink:          { foreground: "teal",     font_style: "bold" }
-      broken_symlink:   { foreground: "red",      font_style: "bold" }
-      executable:       { foreground: "green",    font_style: "bold" }
-      multi_hard_link:  { foreground: "mauve",    font_style: "bold" }
-      fifo:             { foreground: "yellow" }
-      socket:           { foreground: "peach" }
-      block_device:     { foreground: "sapphire", background: "bg-alt", font_style: "bold" }
-      char_device:      { foreground: "sky",      background: "bg-alt", font_style: "bold" }
-      door:             { foreground: "pink" }
-      setuid:           { foreground: "red",      background: "crust",  font_style: "bold" }
-      setgid:           { foreground: "peach",    background: "crust",  font_style: "bold" }
-      capability:       { foreground: "yellow",   background: "crust",  font_style: "bold" }
-      sticky_other_writable: { foreground: "bg",  background: "peach",  font_style: "bold" }
-      other_writable:   { foreground: "bg",       background: "muted",  font_style: "bold" }
-      sticky:           { foreground: "bg",       background: "blue",   font_style: "bold" }
-      missing:          { foreground: "red",      font_style: "bold" }
+      symlink:
+        foreground: base0C
+        font-style: bold
 
-    # Language/framework/file hints (a few tasteful picks)
-    # Expand freely — these match keys from vivid's filetypes.yml
-    filekinds:
-      # archives & compressed
-      archive:          { foreground: "peach" }
-      compressed:       { foreground: "peach" }
-      image:            { foreground: "rosewater" }
-      audio:            { foreground: "lavender" }
-      video:            { foreground: "pink" }
-      document:         { foreground: "text" }
-      pdf:              { foreground: "mauve" }
-      source:           { foreground: "text" }
-      header:           { foreground: "sky" }
-      markup:           { foreground: "yellow" }
-      config:           { foreground: "teal" }
-      binary:           { foreground: "muted" }
-      temp:             { foreground: "muted", font_style: "italic" }
-      vcs_ignored:      { foreground: "muted", font_style: "italic" }
-      hidden:           { foreground: "subtle" }
+      multi_hard_link:
+        foreground: base0E
+        font-style: bold
 
-    # Dotfiles & VCS
-    special:
-      ".git":           { foreground: "mauve",   font_style: "bold" }
-      ".gitignore":     { foreground: "muted",   font_style: "italic" }
-      ".env":           { foreground: "teal" }
+      fifo:
+        foreground: base00
+        background: base0A
 
-    # Emphasize readme & license
-    by_name:
-      "README":         { foreground: "yellow",  font_style: ["bold","underline"] }
-      "LICENSE":        { foreground: "green",   font_style: "bold" }
+      socket:
+        foreground: base00
+        background: base09
+
+      door:
+        foreground: base00
+        background: base0E
+
+      block_device:
+        foreground: base0C
+        background: base01
+        font-style: bold
+
+      character_device:
+        foreground: base0A
+        background: base01
+        font-style: bold
+
+      broken_symlink:
+        foreground: base00
+        background: base08
+        font-style: bold
+
+      missing_symlink_target:
+        foreground: base00
+        background: base08
+
+      setuid:
+        foreground: base00
+        background: base08
+        font-style: bold
+
+      setgid:
+        foreground: base00
+        background: base09
+        font-style: bold
+
+      file_with_capability:
+        foreground: base00
+        background: base0A
+
+      sticky_other_writable:
+        foreground: base00
+        background: base0B
+        font-style: bold
+
+      other_writable:
+        foreground: base00
+        background: base04
+        font-style: bold
+
+      sticky:
+        foreground: base00
+        background: base0D
+        font-style: bold
+
+      executable_file:
+        foreground: base0B
+        font-style: bold
+
+    text:
+      special:
+        foreground: base00
+        background: base0A
+
+      todo:
+        foreground: base0A
+        font-style: bold
+
+      licenses:
+        foreground: base04
+
+      configuration:
+        foreground: base0C
+
+      other:
+        foreground: base0A
+
+    markup:
+      foreground: base0A
+
+    programming:
+      source:
+        foreground: base0B
+
+      tooling:
+        foreground: base0C
+
+        continuous-integration:
+          foreground: base0B
+
+    media:
+      image:
+        foreground: base06
+      
+      video:
+        foreground: base0E
+      
+      audio:
+        foreground: base07
+
+    office:
+      foreground: base08
+
+    archives:
+      foreground: base09
+      font-style: underline
+
+    executable:
+      foreground: base0B
+      font-style: bold
+
+    unimportant:
+      foreground: base03
+
+    # Additional file type categories
+    vcs:
+      foreground: base0E
+      font-style: bold
   '';
 in
 {
@@ -126,14 +197,15 @@ in
     enableBashIntegration = lib.mkIf config.programs.bash.enable true;
     enableFishIntegration = lib.mkIf config.programs.fish.enable true;
     enableZshIntegration = lib.mkIf config.programs.zsh.enable true;
-    colorMode = "24-bit";          # or "8-bit" for limited color support
-    activeTheme = "theme";  # Use built-in theme until custom theme is fixed
-
-    # Home-Manager expects an attrset of absolute paths.
-    # We feed our generated file here and make it selectable as "catppuccin-frappe-ryan".
     themes = {
       theme = themeYml;
     };
+    colorMode = "24-bit";          # or "8-bit" for limited color support
+    activeTheme = "theme";  # Use our base24 theme
+
+    # Home-Manager expects an attrset of absolute paths.
+    # We feed our generated base24 theme file here.
+
 
     # If you maintain a theme filetype DB, you can also add it like:
     # filetypes = pkgs.fetchurl { url = ".../filetypes.yml"; hash = "sha256-..."; };
