@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-# TODO: Update to use XDG_CACHE_DIR then fall back
 declare -r esc=$'\033'
 declare -r c_reset="${esc}[0m"
 declare -r c_red="${esc}[31m"
@@ -56,13 +55,19 @@ pick_files() {
 pick_destination() {
   local cwd browse_dir browse_info query dirs
   cwd=$(pwd)
+  
+  # Use XDG cache directory for history
+  local cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/fzmv"
+  mkdir -p "$cache_dir"
+  local history_file="$cache_dir/history"
+  
   while [[ "$browse_dir" != "$cwd" ]]; do
     mapfile -t browse_info < <(
     { echo '..'; find . -maxdepth 1 -type d 2> /dev/null; } |
       sed 's|^./||' |
       sort -h |
       fzf --print-query \
-      --history="${HOME}/.cache/fzmv_history" \
+      --history="$history_file" \
       --header="${errors:-move files here}")
     query=${browse_info[0]}
     browse_dir=${browse_info[1]}
