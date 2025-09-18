@@ -29,7 +29,7 @@ let
 
   # Write the vivid theme YAML (validated by schemas/theme.json)
   # Note: vivid expects YAML themes; the JSON schema is just for validation.
-  catppuccinFrappeYml = pkgs.writeText "catppuccin-frappe-ryan.yml" ''
+  themeYml = pkgs.writeText "theme.yml" ''
     # $schema: https://raw.githubusercontent.com/sharkdp/vivid/master/schemas/theme.json
     colors:
       text:        "${base05}"
@@ -123,20 +123,22 @@ in
   programs.vivid = {
     enable = true;
     package = pkgs.vivid;
-    enableZshIntegration = true;   # also available: enableBashIntegration / enableFishIntegration
+    enableBashIntegration = lib.mkIf config.programs.bash.enable true;
+    enableFishIntegration = lib.mkIf config.programs.fish.enable true;
+    enableZshIntegration = lib.mkIf config.programs.zsh.enable true;
     colorMode = "truecolor";       # or "8-bit" if you need it
-    activeTheme = "catppuccin-frappe-ryan";
+    activeTheme = "theme";
 
     # Home-Manager expects an attrset of absolute paths.
     # We feed our generated file here and make it selectable as "catppuccin-frappe-ryan".
     themes = {
-      catppuccin-frappe-ryan = catppuccinFrappeYml;
+      theme = themeYml;
     };
 
-    # If you maintain a custom filetype DB, you can also add it like:
+    # If you maintain a theme filetype DB, you can also add it like:
     # filetypes = pkgs.fetchurl { url = ".../filetypes.yml"; hash = "sha256-..."; };
   };
 
   # (Optional) Also keep a copy under ~/.config/vivid/themes/ for easy inspection
-  home.file.".config/vivid/themes/catppuccin-frappe-ryan.yml".source = catppuccinFrappeYml;
+  home.file.".config/vivid/themes/theme.yml".source = themeYml;
 }

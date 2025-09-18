@@ -56,6 +56,7 @@
     ./features/sys-stats
     ./features/tmux
     ./features/virtualisation
+    ./features/vivid
     ./features/vscode
     ./features/webapps
     ./features/wireless
