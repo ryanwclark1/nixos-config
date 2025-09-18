@@ -13,7 +13,7 @@
     # Ion shell initialization script
     initExtra = ''
       # Ion-specific environment variables (most are in common.nix)
-      export TERM="xterm-256color"
+      # TERM is set in common.nix as COLORTERM
 
       # Ion-specific aliases (inherits from common.nix)
       alias ionrc = $EDITOR ~/.config/ion/initrc
@@ -133,10 +133,8 @@
         fastfetch
       end
 
-      # History configuration
+      # History configuration (ion uses Ion's internal history system)
       export HISTFILE="$HOME/.config/ion/history"
-      export HISTSIZE=100000
-      export SAVEHIST=100000
 
       # Set prompt (Ion uses PS1)
       export PS1='$(if test $? -eq 0; echo "\[\033[01;32m\]✓"; else echo "\[\033[01;31m\]✗"; end) \[\033[01;34m\]\w\[\033[00m\] $(if test -d .git; echo "\[\033[01;33m\][$(git branch --show-current 2>/dev/null)]\[\033[00m\] "; end)> '

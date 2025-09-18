@@ -143,13 +143,6 @@
       UNIQ = "| sort | uniq";
     };
 
-    # ZSH-specific session variables
-    sessionVariables = {};
-
-    # Local variables (set at top of .zshrc)
-    localVariables = {
-      TERM = "xterm-256color";
-    };
 
     # Plugins
     plugins = [
