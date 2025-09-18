@@ -8,7 +8,7 @@ export SHELL=bash
 
 PROG=$(basename "$0")
 SYSZ_VERSION=1.4.3
-SYSZ_HISTORY=${SYSZ_HISTORY:-${XDG_CACHE_HOME:-~/.cache}/sysz/history}
+SYSZ_HISTORY=${SYSZ_HISTORY:-${XDG_CACHE_HOME:-$HOME/.cache}/sysz/history}
 declare -a STATES
 
 _sysz_keys() {
