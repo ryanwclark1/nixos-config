@@ -2385,6 +2385,358 @@ in
             </dict>
           </dict>
           <dict>
+            <key>name</key>
+            <string>Raku programming source</string>
+            <key>scope</key>
+            <string>programming.source.raku, source.raku, programming.source.perl6, source.perl6</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Perl programming source</string>
+            <key>scope</key>
+            <string>programming.source.perl, source.perl</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Ruby programming source</string>
+            <key>scope</key>
+            <string>programming.source.ruby, source.ruby</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Python programming source</string>
+            <key>scope</key>
+            <string>programming.source.python, source.python</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>JavaScript programming source</string>
+            <key>scope</key>
+            <string>programming.source.js, source.js, programming.source.javascript, source.javascript</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>TypeScript programming source</string>
+            <key>scope</key>
+            <string>programming.source.ts, source.ts, programming.source.typescript, source.typescript</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Java programming source</string>
+            <key>scope</key>
+            <string>programming.source.java, source.java</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>C programming source</string>
+            <key>scope</key>
+            <string>programming.source.c, source.c</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>C++ programming source</string>
+            <key>scope</key>
+            <string>programming.source.cpp, source.cpp, programming.source.c++, source.c++</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>C# programming source</string>
+            <key>scope</key>
+            <string>programming.source.csharp, source.csharp, programming.source.cs, source.cs</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Go programming source</string>
+            <key>scope</key>
+            <string>programming.source.go, source.go</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Rust programming source</string>
+            <key>scope</key>
+            <string>programming.source.rust, source.rust</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Swift programming source</string>
+            <key>scope</key>
+            <string>programming.source.swift, source.swift</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>PHP programming source</string>
+            <key>scope</key>
+            <string>programming.source.php, source.php</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>HTML programming source</string>
+            <key>scope</key>
+            <string>programming.source.html, source.html, text.html</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>CSS programming source</string>
+            <key>scope</key>
+            <string>programming.source.css, source.css, text.css</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>SQL programming source</string>
+            <key>scope</key>
+            <string>programming.source.sql, source.sql</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>YAML programming source</string>
+            <key>scope</key>
+            <string>programming.source.yaml, source.yaml, text.yaml</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>JSON programming source</string>
+            <key>scope</key>
+            <string>programming.source.json, source.json, text.json</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>XML programming source</string>
+            <key>scope</key>
+            <string>programming.source.xml, source.xml, text.xml</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>TOML programming source</string>
+            <key>scope</key>
+            <string>programming.source.toml, source.toml, text.toml</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>INI programming source</string>
+            <key>scope</key>
+            <string>programming.source.ini, source.ini, text.ini</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Markdown text source</string>
+            <key>scope</key>
+            <string>text.markdown, source.markdown, text.md, source.md</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Dockerfile source</string>
+            <key>scope</key>
+            <string>programming.source.dockerfile, source.dockerfile</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Makefile source</string>
+            <key>scope</key>
+            <string>programming.source.makefile, source.makefile</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>CMake source</string>
+            <key>scope</key>
+            <string>programming.source.cmake, source.cmake</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Nix source</string>
+            <key>scope</key>
+            <string>programming.source.nix, source.nix</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>TeX/LaTeX source</string>
+            <key>scope</key>
+            <string>programming.source.tex, source.tex, text.tex, programming.source.latex, source.latex, text.latex</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Vim script source</string>
+            <key>scope</key>
+            <string>programming.source.vim, source.vim, programming.source.viml, source.viml</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Emacs Lisp source</string>
+            <key>scope</key>
+            <string>programming.source.emacs-lisp, source.emacs-lisp, programming.source.elisp, source.elisp</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Generic text files</string>
+            <key>scope</key>
+            <string>text.plain, source.text, text.txt</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Generic programming source</string>
+            <key>scope</key>
+            <string>programming.source, source</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
             <key>scope</key>
             <string>markup.heading.synopsis.man, markup.heading.title.man, markup.heading.other.man, markup.heading.env.man</string>
             <key>settings</key>
