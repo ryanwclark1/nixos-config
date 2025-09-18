@@ -19,7 +19,7 @@ let
   base0E = "ca9ee6"; # Keywords, Storage, Selector, Markup Italic, Diff Changed
   base0F = "eebebe"; # Deprecated, Opening/Closing Embedded Language Tags
   base10 = "292c3c"; # Darker Background
-  base11 = "232634"; # Darkest Background  
+  base11 = "232634"; # Darkest Background
   base12 = "ea999c"; # Bright Red
   base13 = "f2d5cf"; # Bright Orange
   base14 = "a6d189"; # Bright Yellow
@@ -30,164 +30,127 @@ let
   # Write the vivid theme YAML following the correct schema
   themeYml = pkgs.writeText "theme.yml" ''
     colors:
-      # Base24 colors mapped to simple names for use in the theme
-      base00: "${base00}"  # Default Background
-      base01: "${base01}"  # Lighter Background
-      base02: "${base02}"  # Selection Background  
-      base03: "${base03}"  # Comments, Invisibles
-      base04: "${base04}"  # Dark Foreground
-      base05: "${base05}"  # Default Foreground
-      base06: "${base06}"  # Light Foreground
-      base07: "${base07}"  # Light Background
-      base08: "${base08}"  # Variables, Diff Deleted
-      base09: "${base09}"  # Constants, Integers
-      base0A: "${base0A}"  # Classes, Markup Bold
-      base0B: "${base0B}"  # Strings, Diff Inserted
-      base0C: "${base0C}"  # Support, Escape Characters
-      base0D: "${base0D}"  # Functions, Methods
-      base0E: "${base0E}"  # Keywords, Storage
-      base0F: "${base0F}"  # Deprecated
+      # Expose Base24 keys directly for use below
+      base00: "${base00}"
+      base01: "${base01}"
+      base02: "${base02}"
+      base03: "${base03}"
+      base04: "${base04}"
+      base05: "${base05}"
+      base06: "${base06}"
+      base07: "${base07}"
+      base08: "${base08}"
+      base09: "${base09}"
+      base0A: "${base0A}"
+      base0B: "${base0B}"
+      base0C: "${base0C}"
+      base0D: "${base0D}"
+      base0E: "${base0E}"
+      base0F: "${base0F}"
+      base10: "${base10}"
+      base11: "${base11}"
+      base12: "${base12}"
+      base13: "${base13}"
+      base14: "${base14}"
+      base15: "${base15}"
+      base16: "${base16}"
+      base17: "${base17}"
 
     core:
+      # --- Top-level classes (structure matches your example) ---
       normal_text: {}
       regular_file: {}
       reset_to_normal: {}
 
       directory:
-        foreground: base0D
-        font-style: bold
+        foreground: base0D      # blue
 
       symlink:
-        foreground: base0C
-        font-style: bold
+        foreground: base17      # pink (your hex f4b8e4)
 
-      multi_hard_link:
-        foreground: base0E
-        font-style: bold
+      multi_hard_link: {}
 
       fifo:
-        foreground: base00
-        background: base0A
+        foreground: base11      # crust
+        background: base0D      # blue bg
 
       socket:
-        foreground: base00
-        background: base09
+        foreground: base11
+        background: base17
 
       door:
-        foreground: base00
-        background: base0E
+        foreground: base11
+        background: base17
 
       block_device:
-        foreground: base0C
-        background: base01
-        font-style: bold
+        foreground: base16      # sapphire
+        background: base02      # surface0
 
       character_device:
-        foreground: base0A
-        background: base01
-        font-style: bold
+        foreground: base17      # pink
+        background: base02
 
       broken_symlink:
-        foreground: base00
-        background: base08
-        font-style: bold
+        foreground: base11
+        background: base08      # red
 
       missing_symlink_target:
-        foreground: base00
+        foreground: base11
         background: base08
 
-      setuid:
-        foreground: base00
-        background: base08
-        font-style: bold
+      setuid: {}
+      setgid: {}
+      file_with_capability: {}
 
-      setgid:
-        foreground: base00
-        background: base09
-        font-style: bold
-
-      file_with_capability:
-        foreground: base00
-        background: base0A
-
-      sticky_other_writable:
-        foreground: base00
-        background: base0B
-        font-style: bold
-
-      other_writable:
-        foreground: base00
-        background: base04
-        font-style: bold
-
-      sticky:
-        foreground: base00
-        background: base0D
-        font-style: bold
+      sticky_other_writable: {}
+      other_writable: {}
+      sticky: {}
 
       executable_file:
-        foreground: base0B
+        foreground: base08      # red
         font-style: bold
 
+    # --- Category sections ---
     text:
       special:
-        foreground: base00
-        background: base0A
-
+        foreground: base00     # base background as text color on…
+        background: base0A     # yellow highlight
       todo:
-        foreground: base0A
         font-style: bold
-
       licenses:
-        foreground: base04
-
+        foreground: base04     # overlay-ish (surface2)
       configuration:
-        foreground: base0C
-
+        foreground: base0A     # yellow
       other:
         foreground: base0A
 
     markup:
-      foreground: base0A
+      foreground: base0A       # yellow
 
     programming:
       source:
-        foreground: base0B
-
+        foreground: base0B     # green
       tooling:
-        foreground: base0C
-
+        foreground: base0C     # teal
         continuous-integration:
-          foreground: base0B
+          foreground: base0B   # green
 
     media:
-      image:
-        foreground: base06
-      
-      video:
-        foreground: base0E
-      
-      audio:
-        foreground: base07
+      foreground: base0F       # flamingo
 
     office:
-      foreground: base08
+      foreground: base08       # red
 
     archives:
-      foreground: base09
+      foreground: base16       # sapphire
       font-style: underline
 
     executable:
-      foreground: base0B
+      foreground: base08       # red
       font-style: bold
 
     unimportant:
-      foreground: base03
-
-    # Additional file type categories
-    vcs:
-      foreground: base0E
-      font-style: bold
+      foreground: base04       # surface2
   '';
 in
 {
@@ -197,9 +160,7 @@ in
     enableBashIntegration = lib.mkIf config.programs.bash.enable true;
     enableFishIntegration = lib.mkIf config.programs.fish.enable true;
     enableZshIntegration = lib.mkIf config.programs.zsh.enable true;
-    themes = {
-      theme = themeYml;
-    };
+    themes.theme = themeYml;
     colorMode = "24-bit";          # or "8-bit" for limited color support
     activeTheme = "theme";  # Use our base24 theme
 
