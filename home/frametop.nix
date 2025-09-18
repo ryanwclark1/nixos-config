@@ -48,11 +48,11 @@
     ./features/starship
     ./features/sys-stats
     ./features/tmux
+    ./features/vivid
     ./features/vscode
     ./features/webapps
     ./features/wireless
     ./features/yazi
-    ./features/zellij
     ./features/zoxide
 
     # Desktop environment configuration
