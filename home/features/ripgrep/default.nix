@@ -18,10 +18,14 @@
       "--hidden"
       "--max-columns=150"
       "--max-columns-preview"
+      "--no-ignore-parent"  # Use .gitignore files
 
       # Exclude patterns
       "--glob=!.git/*"
+      "--glob=!.svn/*"
       "--glob=!node_modules/*"
+      "--glob=!.npm/*"
+      "--glob=!vendor/*"
       "--glob=!dist/*"
       "--glob=!build/*"
       "--glob=!target/*"
@@ -29,10 +33,22 @@
       "--glob=!venv/*"
       "--glob=!.next/*"
       "--glob=!.nuxt/*"
+      "--glob=!.cache/*"
+      "--glob=!.vscode/*"
+      "--glob=!.idea/*"
       "--glob=!/proc"
       "--glob=!/sys"
       "--glob=!*.min.js"
+      "--glob=!*.min.css"
       "--glob=!*.map"
+
+      # Colors
+      "--colors=line:fg:yellow"
+      "--colors=line:style:bold"
+      "--colors=path:fg:green"
+      "--colors=path:style:bold"
+      "--colors=match:fg:red"
+      "--colors=match:style:bold"
 
       # Performance
       "--threads=0"
@@ -45,6 +61,8 @@
       "--type-add=docker:Dockerfile*,docker-compose*.{yml,yaml}"
       "--type-add=terraform:*.{tf,tfvars}"
       "--type-add=ansible:*.{yml,yaml}"
+      "--type-add=vue:*.vue"
+      "--type-add=scss:*.scss"
     ];
   };
 
