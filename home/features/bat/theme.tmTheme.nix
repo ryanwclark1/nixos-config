@@ -2022,6 +2022,17 @@ in
             </dict>
           </dict>
           <dict>
+            <key>name</key>
+            <string>Shell programming source</string>
+            <key>scope</key>
+            <string>programming.source.shell, source.shell</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
             <key>scope</key>
             <string>markup.heading.synopsis.man, markup.heading.title.man, markup.heading.other.man, markup.heading.env.man</string>
             <key>settings</key>
