@@ -1,0 +1,36 @@
+# Example Custom YAML Theme for tmux-forceline
+# This demonstrates how to create a custom Base24 theme
+system: "base24"
+name: "My Custom Theme"
+author: "Your Name <your.email@example.com>"
+variant: "dark"  # or "light"
+palette:
+  # Core colors (required)
+  base00: "#1a1a1a" # background
+  base01: "#2a2a2a" # mantle (darker background)
+  base02: "#3a3a3a" # surface0
+  base03: "#4a4a4a" # surface1
+  base04: "#5a5a5a" # surface2
+  base05: "#e0e0e0" # text (foreground)
+  base06: "#f0f0f0" # rosewater
+  base07: "#ffffff" # lavender
+  
+  # Standard color semantics
+  base08: "#ff6b6b" # red (error, deletion)
+  base09: "#ffa500" # orange (warning, modification)
+  base0A: "#ffff00" # yellow (attention, highlight)
+  base0B: "#51cf66" # green (success, addition)
+  base0C: "#22b8cf" # cyan (info, secondary)
+  base0D: "#4c6ef5" # blue (primary, links)
+  base0E: "#cc5de8" # magenta (accent, special)
+  base0F: "#795548" # brown (deprecated, muted)
+  
+  # Extended palette (Base24 specific)
+  base10: "#0f0f0f" # darker background
+  base11: "#050505" # darkest background
+  base12: "#ff8a80" # bright red
+  base13: "#ffff8d" # bright yellow
+  base14: "#69f0ae" # bright green
+  base15: "#18ffff" # bright cyan
+  base16: "#82b1ff" # bright blue
+  base17: "#ea80fc" # bright purple

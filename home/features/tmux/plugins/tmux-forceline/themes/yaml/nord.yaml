@@ -1,0 +1,29 @@
+system: "base24"
+name: "Nord"
+author: "https://github.com/arcticicestudio/nord"
+variant: "dark"
+palette:
+  base00: "#2e3440" # polar night 0
+  base01: "#3b4252" # polar night 1
+  base02: "#434c5e" # polar night 2
+  base03: "#4c566a" # polar night 3
+  base04: "#d8dee9" # snow storm 0
+  base05: "#e5e9f0" # snow storm 1
+  base06: "#eceff4" # snow storm 2
+  base07: "#8fbcbb" # frost 0
+  base08: "#bf616a" # aurora red
+  base09: "#d08770" # aurora orange
+  base0A: "#ebcb8b" # aurora yellow
+  base0B: "#a3be8c" # aurora green
+  base0C: "#88c0d0" # frost 1
+  base0D: "#81a1c1" # frost 2
+  base0E: "#b48ead" # aurora purple
+  base0F: "#5e81ac" # frost 3
+  base10: "#3b4252" # polar night 1 - darker background
+  base11: "#2e3440" # polar night 0 - darkest background
+  base12: "#bf616a" # aurora red - bright red
+  base13: "#ebcb8b" # aurora yellow - bright yellow
+  base14: "#a3be8c" # aurora green - bright green
+  base15: "#8fbcbb" # frost 0 - bright cyan
+  base16: "#81a1c1" # frost 2 - bright blue
+  base17: "#b48ead" # aurora purple - bright purple

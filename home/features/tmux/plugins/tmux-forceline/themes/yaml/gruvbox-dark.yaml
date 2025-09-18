@@ -1,0 +1,29 @@
+system: "base24"
+name: "Gruvbox Dark"
+author: "https://github.com/morhetz/gruvbox"
+variant: "dark"
+palette:
+  base00: "#282828" # bg0
+  base01: "#3c3836" # bg1
+  base02: "#504945" # bg2
+  base03: "#665c54" # bg3
+  base04: "#bdae93" # fg2
+  base05: "#d5c4a1" # fg1
+  base06: "#ebdbb2" # fg0
+  base07: "#fbf1c7" # fg0 hard
+  base08: "#fb4934" # bright red
+  base09: "#fe8019" # bright orange
+  base0A: "#fabd2f" # bright yellow
+  base0B: "#b8bb26" # bright green
+  base0C: "#8ec07c" # bright aqua
+  base0D: "#83a598" # bright blue
+  base0E: "#d3869b" # bright purple
+  base0F: "#d65d0e" # orange
+  base10: "#1d2021" # bg0 hard - darker background
+  base11: "#1d2021" # bg0 hard - darkest background
+  base12: "#cc241d" # red - bright red
+  base13: "#d79921" # yellow - bright yellow
+  base14: "#98971a" # green - bright green
+  base15: "#689d6a" # aqua - bright cyan
+  base16: "#458588" # blue - bright blue
+  base17: "#b16286" # purple - bright purple
