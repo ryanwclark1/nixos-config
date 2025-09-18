@@ -27,7 +27,8 @@
 
   home.shellAliases = {
     cat = "bat --plain --color=always";
-    less = "bat --pager --style=numbers --color=always";
+    # Note: batpipe is automatically used by less through LESSOPEN
+    # configured in shell/common.nix
   };
 
   # home.file.".config/bat/themes/test.tmTheme" = {
