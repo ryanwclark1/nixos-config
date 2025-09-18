@@ -39,6 +39,7 @@
     ./features/media
     ./features/networking-utils
     ./features/neovim
+    ./features/not-found
     ./features/productivity
     ./features/qutebrowser
     ./features/remmina

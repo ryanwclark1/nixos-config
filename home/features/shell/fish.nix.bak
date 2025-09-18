@@ -74,13 +74,93 @@ in
     # Use abbreviations for better auto-expansion
     preferAbbrs = true;
 
-    # Fish-specific shell aliases (inherits from common.nix)
+    # Shell aliases - matching ZSH/Bash configuration
     shellAliases = {
-      # Clear screen and scrollback (Fish-specific)
+      # Clear screen and scrollback
       clear = "printf '\\033[2J\\033[3J\\033[1;1H'";
 
-      # Fish-specific reload
+      # Directory navigation
+      ".." = "cd ..";
+      "..." = "cd ../..";
+      "...." = "cd ../../..";
+      "....." = "cd ../../../..";
+      "-" = "cd -";
+
+      # Git shortcuts
+      g = "git";
+      ga = "git add";
+      gc = "git commit";
+      gca = "git commit -a";
+      gcam = "git commit -am";
+      gco = "git checkout";
+      gd = "git diff";
+      gds = "git diff --staged";
+      gl = "git log --oneline --graph";
+      gp = "git push";
+      gpu = "git pull";
+      gs = "git status -sb";
+      gst = "git status";
+
+      # System management
+      rebuild = "sudo nixos-rebuild switch --flake .#(hostname)";
+      update = "nix flake update";
+      upgrade = "nix flake update && sudo nixos-rebuild switch --flake .#(hostname)";
+      cleanup = "sudo nix-collect-garbage -d && nix store optimise";
+
+      # Better defaults
+      grep = "rg";
+      find = "fd";
+      ps = "procs";
+      top = "btop";
+      htop = "btop";
+      du = "dust";
+      df = "duf";
+      # cat alias handled by bat module
+      # ls aliases handled by eza module
+      la = "ls -a";  # Will use eza's ls alias
+      ll = "ls -l";  # Will use eza's ls alias
+
+      # Safety nets
+      cp = "cp -i";
+      mv = "mv -i";
+      rm = "rm -I";
+
+      # Shortcuts
+      v = "nvim";
+      vim = "nvim";
+      vi = "nvim";
+      e = "$EDITOR";
+      o = "xdg-open";
+
+      # Docker shortcuts
+      d = "docker";
+      dc = "docker compose";
+      dps = "docker ps";
+      dpsa = "docker ps -a";
+      dimg = "docker images";
+      drm = "docker rm";
+      drmi = "docker rmi";
+
+      # Systemctl shortcuts
+      sc = "systemctl";
+      scu = "systemctl --user";
+      scs = "sudo systemctl";
+
+      # Network
+      ip = "ip --color=auto";
+      ports = "ss -tulanp";
+
+      # Misc
+      h = "history";
+      help = "man";
+      # j/jj aliases not needed - zoxide replaces cd directly
+      mk = "mkdir -p";
+      path = "echo $PATH | tr ' ' '\\n'";
       reload = "exec fish";
+      tf = "terraform";
+      k = "kubectl";
+      kx = "kubectx";
+      kns = "kubens";
     };
 
     # Shell abbreviations for expansion
@@ -98,13 +178,16 @@ in
       ndev = "nix develop";
       nbuild = "nix build";
 
-      # Quick directory access (Fish-specific syntax)
+      # Quick directory access
       dl = "cd ~/Downloads";
       docs = "cd ~/Documents";
       dev = "cd ~/Code";
       nix = "cd ~/nixos-config";
       dots = "cd ~/.config";
     };
+
+    # Key bindings using interactiveShellInit instead
+    # (binds attribute is not well documented, using interactiveShellInit for key bindings)
 
     # Plugins configuration
     plugins = [
@@ -214,10 +297,20 @@ in
       '';
     };
 
-    # Shell initialization (Fish-specific environment variables)
+    # Shell initialization
     shellInit = ''
-      # Terminal
-      set -gx TERM xterm-256color
+      # Set environment variables
+      set -gx EDITOR nvim
+      set -gx VISUAL nvim
+      set -gx PAGER less
+      set -gx LESS "-R"
+      set -gx MANPAGER "sh -c 'col -bx | bat -l man -p'"
+      set -gx BAT_THEME "Catppuccin-frappe"
+
+      # Set PATH
+      set -gx PATH $HOME/.local/bin $HOME/.cargo/bin $HOME/go/bin $PATH
+
+      # FZF configuration handled by fzf module
 
       # LS_COLORS using vivid
       if command -v vivid >/dev/null
@@ -273,7 +366,7 @@ in
         direnv hook fish | source
       end
 
-      # Colored man pages (Fish-specific syntax)
+      # Colored man pages
       set -gx LESS_TERMCAP_mb (printf '\e[1;32m')
       set -gx LESS_TERMCAP_md (printf '\e[1;32m')
       set -gx LESS_TERMCAP_me (printf '\e[0m')
