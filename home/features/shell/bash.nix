@@ -178,6 +178,7 @@
             cd)           fzf --preview 'eza --tree --color=always {} | head -200' "$@" ;;
             export|unset) fzf --preview 'printenv {}' "$@" ;;
             ssh)          fzf --preview 'dig {}' "$@" ;;
+            kill|killall) fzf --preview 'ps -p {} -o pid,ppid,user,start,time,command 2>/dev/null || echo "Process not found"' --preview-window=up:3:wrap "$@" ;;
             *)            fzf --preview "$show_file_or_dir_preview" "$@" ;;
           esac
         }
