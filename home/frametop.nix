@@ -42,6 +42,7 @@
     ./features/not-found
     ./features/productivity
     ./features/qutebrowser
+    ./features/readline
     ./features/remmina
     ./features/ripgrep
     ./features/shell
