@@ -14,6 +14,9 @@
     autocd = true;  # Automatically cd into directory by typing its name
     defaultKeymap = "emacs";  # Can be "emacs" or "vicmd" for vi mode
 
+    # Use XDG config directory for ZSH files
+    dotDir = "${config.xdg.configHome}/zsh";
+
     # Directory shortcuts
     dirHashes = {
       dl = "$HOME/Downloads";
@@ -117,7 +120,7 @@
       # ZSH-specific quick edits
       zshrc = "$EDITOR ~/.config/zsh/.zshrc";
       zshenv = "$EDITOR ~/.config/zsh/.zshenv";
-      
+
       # ZSH-specific reload
       reload = "exec zsh";
     };
@@ -146,7 +149,6 @@
     # Local variables (set at top of .zshrc)
     localVariables = {
       TERM = "xterm-256color";
-      LS_COLORS = "$(${pkgs.vivid}/bin/vivid generate catppuccin-frappe)";
     };
 
     # Plugins

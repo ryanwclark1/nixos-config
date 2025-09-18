@@ -31,6 +31,13 @@
       XDG_DATA_HOME = lib.mkDefault "$HOME/.local/share";
       XDG_STATE_HOME = lib.mkDefault "$HOME/.local/state";
 
+      # History control (common across all shells)
+      HISTCONTROL = lib.mkDefault "ignoreboth:erasedups";
+      HISTTIMEFORMAT = lib.mkDefault "%F %T ";
+
+      # Terminal capabilities
+      COLORTERM = lib.mkDefault "truecolor";
+
       # Colored man pages
       LESS_TERMCAP_mb = lib.mkDefault "$(printf '\e[1;32m')";
       LESS_TERMCAP_md = lib.mkDefault "$(printf '\e[1;32m')";
@@ -58,7 +65,7 @@
       "..." = "cd ../..";
       "...." = "cd ../../..";
       "....." = "cd ../../../..";
-      "-" = "cd -";
+      # Note: "-" alias removed - not valid in Fish shell
 
       # Git shortcuts
       g = "git";

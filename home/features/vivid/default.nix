@@ -1,5 +1,5 @@
 # home/vivid.nix
-{ pkgs, lib, ... }:
+{ pkgs, lib, config, ... }:
 let
   # Catppuccin Frappé palette (your values)
   base00 = "303446"; # base
@@ -139,6 +139,6 @@ in
     # filetypes = pkgs.fetchurl { url = ".../filetypes.yml"; hash = "sha256-..."; };
   };
 
-  # (Optional) Also keep a copy under ~/.config/vivid/themes/ for easy inspection
-  home.file.".config/vivid/themes/theme.yml".source = themeYml;
+  # Note: Vivid program configuration automatically manages theme files
+  # No need to manually create theme files
 }

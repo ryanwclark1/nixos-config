@@ -81,16 +81,13 @@
     shellAliases = {
       # Bash-specific quick edits
       bashrc = "$EDITOR ~/.bashrc";
-      
+
       # Bash-specific reload
       reload = "exec bash";
     };
 
     profileExtra = ''
-      # LS_COLORS using vivid
-      if command -v vivid &> /dev/null; then
-        export LS_COLORS="$(vivid generate catppuccin-frappe)"
-      fi
+      # Additional bash profile customizations can go here
     '';
 
     bashrcExtra = ''
