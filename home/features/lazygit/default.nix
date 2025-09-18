@@ -30,49 +30,48 @@ let
   base17 = "f4b8e4"; # pink - bright purple
 in
 {
-  programs = {
-    lazygit = {
-      enable = true;
-      package = pkgs.lazygit;
-      settings = {
-        git = {
-            log.order = "default";
-            fetchAll = false;
-        };
-        theme = {
-          activeBorderColor = [
-            "#${base0E}"
-            "bold"
-          ];
-          inactiveBorderColor = [
-            "#${base05}"
-          ];
-          optionsTextColor = [
-            "#${base0D}"
-          ];
-          selectedLineBgColor = [
-            "#${base02}"
-          ];
-          cherryPickedCommitBgColor = [
-            "#${base03}"
-          ];
-          cherryPickedCommitFgColor = [
-            "#${base0E}"
-          ];
-          unstagedChangesColor = [
-            "#${base08}"
-          ];
-          defaultFgColor = [
-            "#${base05}"
-          ];
-          searchingActiveBorderColor = [
-            "#${base0A}"
-          ];
-        };
-        authorColors = {
-          "*" = "#${base07}";
-        };
+  programs.lazygit = {
+    enable = true;
+    package = pkgs.lazygit;
+    settings = {
+      git = {
+          log.order = "default";
+          fetchAll = false;
       };
+      theme = {
+        activeBorderColor = [
+          "#${base0E}"
+          "bold"
+        ];
+        inactiveBorderColor = [
+          "#${base05}"
+        ];
+        optionsTextColor = [
+          "#${base0D}"
+        ];
+        selectedLineBgColor = [
+          "#${base02}"
+        ];
+        cherryPickedCommitBgColor = [
+          "#${base03}"
+        ];
+        cherryPickedCommitFgColor = [
+          "#${base0E}"
+        ];
+        unstagedChangesColor = [
+          "#${base08}"
+        ];
+        defaultFgColor = [
+          "#${base05}"
+        ];
+        searchingActiveBorderColor = [
+          "#${base0A}"
+        ];
+      };
+      authorColors = {
+        "*" = "#${base07}";
+      };
+
     };
   };
   home.shellAliases = {
