@@ -2077,6 +2077,314 @@ in
             </dict>
           </dict>
           <dict>
+            <key>name</key>
+            <string>OCaml programming source</string>
+            <key>scope</key>
+            <string>programming.source.ocaml, source.ocaml</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Haskell programming source</string>
+            <key>scope</key>
+            <string>programming.source.haskell, source.haskell</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Erlang programming source</string>
+            <key>scope</key>
+            <string>programming.source.erlang, source.erlang</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Elixir programming source</string>
+            <key>scope</key>
+            <string>programming.source.elixir, source.elixir</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Clojure programming source</string>
+            <key>scope</key>
+            <string>programming.source.clojure, source.clojure</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Scheme programming source</string>
+            <key>scope</key>
+            <string>programming.source.scheme, source.scheme</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Racket programming source</string>
+            <key>scope</key>
+            <string>programming.source.racket, source.racket</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>F# programming source</string>
+            <key>scope</key>
+            <string>programming.source.fsharp, source.fsharp</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Scala programming source</string>
+            <key>scope</key>
+            <string>programming.source.scala, source.scala</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Kotlin programming source</string>
+            <key>scope</key>
+            <string>programming.source.kotlin, source.kotlin</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Dart programming source</string>
+            <key>scope</key>
+            <string>programming.source.dart, source.dart</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Julia programming source</string>
+            <key>scope</key>
+            <string>programming.source.julia, source.julia</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>R programming source</string>
+            <key>scope</key>
+            <string>programming.source.r, source.r</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>MATLAB programming source</string>
+            <key>scope</key>
+            <string>programming.source.matlab, source.matlab</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Fortran programming source</string>
+            <key>scope</key>
+            <string>programming.source.fortran, source.fortran</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Pascal programming source</string>
+            <key>scope</key>
+            <string>programming.source.pascal, source.pascal</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Assembly programming source</string>
+            <key>scope</key>
+            <string>programming.source.assembly, source.assembly</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Verilog programming source</string>
+            <key>scope</key>
+            <string>programming.source.verilog, source.verilog</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>VHDL programming source</string>
+            <key>scope</key>
+            <string>programming.source.vhdl, source.vhdl</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Prolog programming source</string>
+            <key>scope</key>
+            <string>programming.source.prolog, source.prolog</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Lisp programming source</string>
+            <key>scope</key>
+            <string>programming.source.lisp, source.lisp</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Nim programming source</string>
+            <key>scope</key>
+            <string>programming.source.nim, source.nim</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Crystal programming source</string>
+            <key>scope</key>
+            <string>programming.source.crystal, source.crystal</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Zig programming source</string>
+            <key>scope</key>
+            <string>programming.source.zig, source.zig</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>V programming source</string>
+            <key>scope</key>
+            <string>programming.source.v, source.v</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Configuration files</string>
+            <key>scope</key>
+            <string>text.configuration, source.configuration</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Documentation files</string>
+            <key>scope</key>
+            <string>text.documentation, source.documentation</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Data files</string>
+            <key>scope</key>
+            <string>text.data, source.data</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
             <key>scope</key>
             <string>markup.heading.synopsis.man, markup.heading.title.man, markup.heading.other.man, markup.heading.env.man</string>
             <key>settings</key>
