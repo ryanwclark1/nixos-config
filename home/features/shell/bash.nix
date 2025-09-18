@@ -126,18 +126,8 @@
         bind '"\e[D": backward-char' 2>/dev/null || true
       fi
 
-      # Fallback to FZF for Ctrl+R history search if Atuin is not available
-      if [[ -z "$BASH_RESTRICTED_MODE" ]] && ! command -v atuin &> /dev/null && command -v fzf &> /dev/null; then
-        if command -v bind &>/dev/null 2>&1; then
-          bind -x '"\C-r": __fzf_history' 2>/dev/null || true
-          __fzf_history() {
-            local output
-            output=$(history | fzf --tac --no-sort --exact --query "$READLINE_LINE" | sed 's/^[ ]*[0-9]*[ ]*//')
-            READLINE_LINE=$output
-            READLINE_POINT=''${#READLINE_LINE}
-          }
-        fi
-      fi
+      # Note: Ctrl+R history search is handled by Atuin (initialized later)
+      # FZF shell integration provides Ctrl+T (files) and Alt+C (directories)
 
       # Directory shortcuts (similar to ZSH's hash -d)
       if [[ -z "$BASH_RESTRICTED_MODE" ]]; then
