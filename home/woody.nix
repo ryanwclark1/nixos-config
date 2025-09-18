@@ -45,6 +45,7 @@
     ./features/multiviewer
     ./features/neovim
     ./features/networking-utils
+    ./features/not-found
     ./features/productivity
     ./features/qutebrowser
     ./features/remmina
