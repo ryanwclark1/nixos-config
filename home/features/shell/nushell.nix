@@ -11,10 +11,7 @@
     package = pkgs.nushell;
 
     # Nushell-specific environment variables (inherits from common.nix)
-    environmentVariables = {
-      # Terminal (might be overridden)
-      TERM = "xterm-256color";
-    };
+    # TERM/COLORTERM is set in common.nix
 
     # Nushell-specific shell aliases (inherits from common.nix)
     shellAliases = {
