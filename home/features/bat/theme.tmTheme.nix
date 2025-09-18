@@ -2737,6 +2737,292 @@ in
             </dict>
           </dict>
           <dict>
+            <key>name</key>
+            <string>Programming tooling</string>
+            <key>scope</key>
+            <string>programming.tooling</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Programming tooling code-style</string>
+            <key>scope</key>
+            <string>programming.tooling.code-style</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Programming tooling code-style Python</string>
+            <key>scope</key>
+            <string>programming.tooling.code-style.python</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Programming tooling code-style JavaScript</string>
+            <key>scope</key>
+            <string>programming.tooling.code-style.javascript, programming.tooling.code-style.js</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Programming tooling code-style TypeScript</string>
+            <key>scope</key>
+            <string>programming.tooling.code-style.typescript, programming.tooling.code-style.ts</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Programming tooling code-style Java</string>
+            <key>scope</key>
+            <string>programming.tooling.code-style.java</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Programming tooling code-style C</string>
+            <key>scope</key>
+            <string>programming.tooling.code-style.c, programming.tooling.code-style.cpp, programming.tooling.code-style.c++</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Programming tooling code-style C#</string>
+            <key>scope</key>
+            <string>programming.tooling.code-style.csharp, programming.tooling.code-style.cs</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Programming tooling code-style Go</string>
+            <key>scope</key>
+            <string>programming.tooling.code-style.go</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Programming tooling code-style Rust</string>
+            <key>scope</key>
+            <string>programming.tooling.code-style.rust</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Programming tooling code-style Ruby</string>
+            <key>scope</key>
+            <string>programming.tooling.code-style.ruby</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Programming tooling code-style PHP</string>
+            <key>scope</key>
+            <string>programming.tooling.code-style.php</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Programming tooling code-style Swift</string>
+            <key>scope</key>
+            <string>programming.tooling.code-style.swift</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Programming tooling code-style Kotlin</string>
+            <key>scope</key>
+            <string>programming.tooling.code-style.kotlin</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Programming tooling code-style Scala</string>
+            <key>scope</key>
+            <string>programming.tooling.code-style.scala</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Programming tooling code-style Dart</string>
+            <key>scope</key>
+            <string>programming.tooling.code-style.dart</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Programming tooling build</string>
+            <key>scope</key>
+            <string>programming.tooling.build</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Programming tooling test</string>
+            <key>scope</key>
+            <string>programming.tooling.test</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Programming tooling debug</string>
+            <key>scope</key>
+            <string>programming.tooling.debug</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Programming tooling package</string>
+            <key>scope</key>
+            <string>programming.tooling.package</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Programming tooling linter</string>
+            <key>scope</key>
+            <string>programming.tooling.linter</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Programming tooling formatter</string>
+            <key>scope</key>
+            <string>programming.tooling.formatter</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Programming config</string>
+            <key>scope</key>
+            <string>programming.config</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Programming language all wildcards</string>
+            <key>scope</key>
+            <string>programming.language, programming.language.python, programming.language.javascript, programming.language.java, programming.language.c, programming.language.cpp, programming.language.go, programming.language.rust, programming.language.ruby, programming.language.php, programming.language.swift, programming.language.kotlin, programming.language.scala, programming.language.dart, programming.language.typescript, programming.language.csharp</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Text wildcards</string>
+            <key>scope</key>
+            <string>text, text.log, text.output, text.console</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>Universal fallback</string>
+            <key>scope</key>
+            <string>*</string>
+            <key>settings</key>
+            <dict>
+              <key>foreground</key>
+              <string>#${base05}</string>
+            </dict>
+          </dict>
+          <dict>
             <key>scope</key>
             <string>markup.heading.synopsis.man, markup.heading.title.man, markup.heading.other.man, markup.heading.env.man</string>
             <key>settings</key>
