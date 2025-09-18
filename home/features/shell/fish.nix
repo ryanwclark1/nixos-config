@@ -70,9 +70,9 @@ in
   programs.fish = {
     enable = true;
     package = pkgs.fish;
-
     # Use abbreviations for better auto-expansion
     preferAbbrs = true;
+    generateCompletions = true;
 
     # Fish-specific shell aliases (inherits from common.nix)
     shellAliases = {

@@ -23,7 +23,7 @@
       MANROFFOPT = lib.mkDefault "-c";
 
       # Theme settings
-      BAT_THEME = lib.mkDefault "Catppuccin-frappe";
+      BAT_THEME = lib.mkDefault "theme";
 
       # XDG Base Directory Specification
       XDG_CONFIG_HOME = lib.mkDefault "$HOME/.config";
@@ -151,6 +151,7 @@
       # Kitty specific (conditionally applied)
       cik = lib.mkIf config.programs.kitty.enable "clone-in-kitty --type os-window";
     };
+
   };
 
   # Common packages for shell utilities
@@ -171,7 +172,6 @@
     fzf           # Fuzzy finder
     zoxide        # Smart cd
     direnv        # Directory-specific environments
-    vivid         # LS_COLORS generator
 
     # Archive tools
     unzip
