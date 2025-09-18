@@ -1,19 +1,57 @@
 #!/usr/bin/env bash
 # YAML Theme Parser for tmux-forceline
-# Converts Base24 YAML theme files to tmux configuration
+# Converts Base24 YAML theme files to tmux configuration using core POSIX tools
 
 set -euo pipefail
 
-# Function to check if yq is available
-check_yq() {
-    if ! command -v yq >/dev/null 2>&1; then
-        echo "Error: 'yq' is required for YAML theme parsing but not found in PATH" >&2
-        echo "Install yq: https://github.com/mikefarah/yq#install" >&2
-        return 1
-    fi
+# Function to parse YAML values using core tools
+parse_yaml_value() {
+    local file="$1"
+    local key="$2"
+    
+    # Simple YAML parsing using grep and awk
+    # Handles: key: "value", key: value, key: '#value'
+    grep "^[[:space:]]*${key}:" "$file" | \
+    awk -F': *' '{print $2}' | \
+    sed 's/^["'\'']*//; s/["'\'']*$//; s/[[:space:]]*#.*//' | \
+    sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
 }
 
-# Function to validate YAML theme structure
+# Function to parse palette colors
+parse_palette_colors() {
+    local file="$1"
+    local output_file="$2"
+    
+    # Use awk to extract all base24 colors from palette section
+    awk '
+        /^[[:space:]]*palette:[[:space:]]*$/ { in_palette = 1; next }
+        /^[a-zA-Z]/ && in_palette { exit }
+        in_palette && /^[[:space:]]*base[0-9A-F]+: / {
+            # Extract key and value
+            match($0, /^[[:space:]]*([^:]+):[[:space:]]*(.*)$/, parts)
+            key = parts[1]
+            gsub(/^[[:space:]]*/, "", key)
+            
+            value = parts[2]
+            # Remove quotes first
+            gsub(/^[[:space:]]*["'\'']/, "", value)
+            gsub(/["'\''][[:space:]]*#.*$/, "", value)
+            gsub(/["'\''][[:space:]]*$/, "", value)
+            # Trim whitespace
+            gsub(/^[[:space:]]*/, "", value)
+            gsub(/[[:space:]]*$/, "", value)
+            
+            # Validate hex color format
+            if (value ~ /^#[0-9a-fA-F]{6}$/) {
+                print "set -ogq @fl_" key " \"" value "\""
+            } else {
+                print "Warning: Invalid color format for " key ": " value > "/dev/stderr"
+            }
+        }
+    ' "$file" >> "$output_file"
+}
+
+# Function to validate YAML theme structure using core tools
 validate_theme() {
     local yaml_file="$1"
     
@@ -23,35 +61,50 @@ validate_theme() {
     fi
     
     # Check required top-level fields
-    local required_fields=("system" "name" "palette")
-    for field in "${required_fields[@]}"; do
-        if ! yq eval "has(\"$field\")" "$yaml_file" | grep -q "true"; then
-            echo "Error: Required field '$field' missing from theme file" >&2
-            return 1
-        fi
-    done
+    local system name
+    system=$(parse_yaml_value "$yaml_file" "system")
+    name=$(parse_yaml_value "$yaml_file" "name")
+    
+    if [[ -z "$system" ]]; then
+        echo "Error: Required field 'system' missing from theme file" >&2
+        return 1
+    fi
+    
+    if [[ -z "$name" ]]; then
+        echo "Error: Required field 'name' missing from theme file" >&2
+        return 1
+    fi
     
     # Validate system is base24
-    local system
-    system=$(yq eval '.system' "$yaml_file")
     if [[ "$system" != "base24" ]]; then
         echo "Error: Only 'base24' color system is supported, found: $system" >&2
         return 1
     fi
     
-    # Validate required base24 colors
+    # Check if palette section exists
+    if ! grep -q "^[[:space:]]*palette:[[:space:]]*$" "$yaml_file"; then
+        echo "Error: Required 'palette' section missing from theme file" >&2
+        return 1
+    fi
+    
+    # Validate required base24 colors exist
     local required_colors=(
         "base00" "base01" "base02" "base03" "base04" "base05" "base06" "base07"
         "base08" "base09" "base0A" "base0B" "base0C" "base0D" "base0E" "base0F"
         "base10" "base11" "base12" "base13" "base14" "base15" "base16" "base17"
     )
     
+    local missing_colors=()
     for color in "${required_colors[@]}"; do
-        if ! yq eval ".palette | has(\"$color\")" "$yaml_file" | grep -q "true"; then
-            echo "Error: Required Base24 color '$color' missing from palette" >&2
-            return 1
+        if ! grep -q "^[[:space:]]*${color}:[[:space:]]" "$yaml_file"; then
+            missing_colors+=("$color")
         fi
     done
+    
+    if [[ ${#missing_colors[@]} -gt 0 ]]; then
+        echo "Error: Required Base24 colors missing from palette: ${missing_colors[*]}" >&2
+        return 1
+    fi
     
     return 0
 }
@@ -66,13 +119,15 @@ yaml_to_tmux() {
         return 1
     fi
     
-    # Extract theme metadata
-    local theme_name
-    local theme_author
-    local theme_variant
-    theme_name=$(yq eval '.name' "$yaml_file")
-    theme_author=$(yq eval '.author // "Unknown"' "$yaml_file")
-    theme_variant=$(yq eval '.variant // "unknown"' "$yaml_file")
+    # Extract theme metadata using core tools
+    local theme_name theme_author theme_variant
+    theme_name=$(parse_yaml_value "$yaml_file" "name")
+    theme_author=$(parse_yaml_value "$yaml_file" "author")
+    theme_variant=$(parse_yaml_value "$yaml_file" "variant")
+    
+    # Set defaults if empty
+    theme_author=${theme_author:-"Unknown"}
+    theme_variant=${theme_variant:-"unknown"}
     
     # Generate tmux configuration
     cat > "$output_file" << EOF
@@ -83,21 +138,11 @@ yaml_to_tmux() {
 # Generated at: $(date -Iseconds)
 # Base24 Theme System for tmux-forceline
 
+# Base24 Color Palette
 EOF
     
     # Convert Base24 palette to tmux variables
-    local base24_colors=(
-        "base00" "base01" "base02" "base03" "base04" "base05" "base06" "base07"
-        "base08" "base09" "base0A" "base0B" "base0C" "base0D" "base0E" "base0F"
-        "base10" "base11" "base12" "base13" "base14" "base15" "base16" "base17"
-    )
-    
-    echo "# Base24 Color Palette" >> "$output_file"
-    for color in "${base24_colors[@]}"; do
-        local hex_value
-        hex_value=$(yq eval ".palette.$color" "$yaml_file" | sed 's/^"\(.*\)"$/\1/')
-        echo "set -ogq @fl_$color \"$hex_value\"" >> "$output_file"
-    done
+    parse_palette_colors "$yaml_file" "$output_file"
     
     # Add semantic color aliases
     cat >> "$output_file" << 'EOF'
@@ -149,10 +194,10 @@ list_yaml_themes() {
     fi
     
     find "$themes_dir/yaml" -name "*.yaml" -type f | while IFS= read -r theme_file; do
-        local theme_name
+        local theme_name display_name
         theme_name=$(basename "$theme_file" .yaml)
-        local display_name
-        display_name=$(yq eval '.name // "Unknown"' "$theme_file" 2>/dev/null || echo "Invalid Theme")
+        display_name=$(parse_yaml_value "$theme_file" "name")
+        display_name=${display_name:-"Unknown Theme"}
         echo "$theme_name:$display_name"
     done
 }
@@ -184,11 +229,6 @@ main() {
     local action="${1:-}"
     local theme_name="${2:-}"
     local themes_dir="${3:-$(dirname "$0")/../}"
-    
-    # Ensure yq is available
-    if ! check_yq; then
-        exit 1
-    fi
     
     case "$action" in
         "validate")
