@@ -1,0 +1,45 @@
+{
+  "metadata": {
+    "timestamp": "2025-09-19T13:35:35-05:00",
+    "version": "3.0",
+    "total_modules": 20,
+    "analysis_id": "20250919_133535"
+  },
+  "modules": {
+    "transient": {
+      "module": "transient",
+      "conversion_category": "ENHANCED_SHELL",
+      "performance_impact": 30,
+      "analysis": {
+        "shell_commands": 27,
+        "tmux_references": 14,
+        "external_dependencies": 1,
+        "file_operations": 54,
+        "network_operations": 23
+      },
+      "files_analyzed": 1,
+      "native_opportunities": [
+        ""
+      ],
+      "hybrid_opportunities": [
+        ""
+      ],
+      "optimization_opportunities": [
+        "High shell command usage: 27 commands",
+        "External dependencies: 1",
+        "Network operations: 23"
+      ],
+      "priority": 3,
+      "estimated_effort": "1-2 days"
+    }
+  },
+  "summary": {
+    "total_performance_gain": 30,
+    "average_performance_gain": 1,
+    "priority_distribution": {
+      "high": 0,
+      "medium": 0,
+      "low": 1
+    }
+  }
+}

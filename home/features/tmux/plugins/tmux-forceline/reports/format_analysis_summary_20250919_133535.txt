@@ -1,0 +1,46 @@
+# tmux-forceline Format Analysis Report
+Generated: Fri Sep 19 01:35:35 PM CDT 2025
+Version: 3.0
+
+## Executive Summary
+Total Performance Gain: 30%
+Average Performance Gain: 1%
+
+Priority Distribution:
+  High Priority: 0 modules
+  Medium Priority: 0 modules
+  Low Priority: 1 modules
+
+## High Priority Conversions (Immediate Impact)
+
+
+## Medium Priority Conversions (Significant Impact)
+
+
+## Low Priority Conversions (Minor Impact)
+
+
+## Conversion Categories Overview
+
+### NATIVE Format Candidates (100% improvement potential)
+
+
+### HYBRID Format Candidates (60% improvement potential)
+
+
+### ENHANCED_SHELL Candidates (30% improvement potential)
+- transient
+
+## Implementation Recommendations
+
+### Phase 1: Quick Wins (Native Conversions)
+
+
+### Phase 2: Hybrid Integration
+
+
+### Phase 3: Shell Optimization
+
+
+## Raw Data Location
+Detailed analysis data: /home/administrator/nixos-config/home/features/tmux/plugins/tmux-forceline/reports/format_analysis_20250919_133535.json
