@@ -208,11 +208,15 @@
           ]
           ++ (with pkgs.vscode-extensions; [
             aaron-bond.better-comments
+            alefragnani.bookmarks
             bierner.markdown-mermaid
             bradlc.vscode-tailwindcss
             charliermarsh.ruff
+            christian-kohler.path-intellisense
+            davidanson.vscode-markdownlint
             dbaeumer.vscode-eslint
             donjayamanne.githistory
+            eamodio.gitlens
             # esbenp.prettier-vscode  # Removed: conflicts with biomejs.biome
             # formulahendry.code-runner  # Removed: interferes with proper debugging workflows
             github.codespaces
@@ -221,6 +225,7 @@
             github.vscode-github-actions
             github.vscode-pull-request-github
             golang.go
+            gruntfuggly.todo-tree
             # griimick.vhs  # Removed: very niche terminal GIF recording tool
             hashicorp.terraform
             # hediet.vscode-drawio  # Removed: only needed for diagram creation
@@ -230,6 +235,9 @@
             marp-team.marp-vscode
             # ms-kubernetes-tools.vscode-kubernetes-tools  # Disabled: no active K8s clusters
             # ms-python.black-formatter  # Removed: Ruff handles formatting
+            mikestead.dotenv
+            ms-toolsai.jupyter
+            ms-kubernetes-tools.vscode-kubernetes-tools
             ms-python.debugpy
             # ms-python.isort  # Removed: Ruff handles import sorting
             # ms-python.python  # Moved to extensionsFromVscodeMarketplace for version control
@@ -244,6 +252,7 @@
             redhat.vscode-yaml
             rust-lang.rust-analyzer
             samuelcolvin.jinjahtml
+            streetsidesoftware.code-spell-checker
             # shyykoserhiy.vscode-spotify  # Removed: non-development related
             tailscale.vscode-tailscale
             tamasfe.even-better-toml
@@ -651,10 +660,10 @@
               };
             };
           };
-          "[nix]" = {
-            "editor.defaultFormatter" = "jnoortheen.nix-ide";
-            "editor.formatOnSave" = true;
-          };
+          # "[nix]" = {
+          #   "editor.defaultFormatter" = "jnoortheen.nix-ide";
+          #   "editor.formatOnSave" = true;
+          # };
 
           ##### Redhat #####
           "redhat.telemetry.enabled" = false;
