@@ -1,16 +1,28 @@
 #!/usr/bin/env bash
-# WAN IP color script for tmux-forceline v2.0
+# WAN IP color script for tmux-forceline v3.0
 # Provides Base24 colors based on WAN IP status
 
-CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$CURRENT_DIR/wan_ip_helpers.sh"
-
-# Get tmux option or use default
-get_tmux_option() {
-    local option="$1"
-    local default="$2"
-    tmux show-option -gqv "$option" 2>/dev/null || echo "$default"
-}
+# Source centralized tmux functions
+UTILS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../utils" && pwd)"
+if [[ -f "$UTILS_DIR/common.sh" ]]; then
+    # shellcheck source=../../../utils/common.sh
+    source "$UTILS_DIR/common.sh"
+    
+    # Source helpers using centralized path management
+    HELPERS_PATH="$(get_forceline_path "modules/wan_ip/scripts/wan_ip_helpers.sh")"
+    source "$HELPERS_PATH"
+else
+    # Fallback implementation if common.sh not available
+    CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    source "$CURRENT_DIR/wan_ip_helpers.sh"
+    
+    # Fallback implementation
+    get_tmux_option() {
+        local option="$1"
+        local default="$2"
+        tmux show-option -gqv "$option" 2>/dev/null || echo "$default"
+    }
+fi
 
 # Main color function
 main() {

@@ -1,13 +1,20 @@
 #!/usr/bin/env bash
-# Disk usage script for tmux-forceline v2.0
+# Disk usage script for tmux-forceline v3.0
 # Enhanced disk monitoring with configurable paths and thresholds
 
-# Get tmux option or use default
-get_tmux_option() {
-    local option="$1"
-    local default="$2"
-    tmux show-option -gqv "$option" 2>/dev/null || echo "$default"
-}
+# Source centralized path management
+UTILS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../utils" && pwd)"
+if [[ -f "$UTILS_DIR/common.sh" ]]; then
+    # shellcheck source=../../../utils/common.sh
+    source "$UTILS_DIR/common.sh"
+else
+    # Fallback implementation if common.sh not available
+    get_tmux_option() {
+        local option="$1"
+        local default="$2"
+        tmux show-option -gqv "$option" 2>/dev/null || echo "$default"
+    }
+fi
 
 # Check if command exists
 command_exists() {

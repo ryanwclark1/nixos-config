@@ -2,7 +2,14 @@
 # Battery Setup Script for tmux-forceline
 # Initializes battery monitoring and sets up tmux format variables
 
-CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Source centralized path management
+UTILS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../utils" && pwd)"
+if [[ -f "$UTILS_DIR/common.sh" ]]; then
+    source "$UTILS_DIR/common.sh"
+else
+    # Fallback implementation if common.sh not available
+    CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+fi
 
 # Set up tmux format variables for battery monitoring
 # This creates #{battery_percentage}, #{battery_status}, #{battery_icon} etc.

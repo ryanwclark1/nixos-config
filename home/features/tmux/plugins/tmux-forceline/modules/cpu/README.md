@@ -3,26 +3,6 @@
 Enables displaying CPU and GPU information in Tmux `status-right` and `status-left`.
 Configurable percentage and icon display.
 
-## Installation
-### Installation with [Tmux Plugin Manager](https://github.com/tmux-plugins/tpm) (recommended)
-
-Add plugin to the list of TPM plugins in `.tmux.conf`:
-
-```shell
-set -g @plugin 'tmux-plugins/tmux-cpu'
-```
-
-Hit `prefix + I` to fetch the plugin and source it.
-
-If format strings are added to `status-right`, they should now be visible.
-
-### Manual Installation
-
-Clone the repo:
-
-```shell
-$ git clone https://github.com/tmux-plugins/tmux-cpu ~/clone/path
-```
 
 Add this line to the bottom of `.tmux.conf`:
 

@@ -1,16 +1,19 @@
 #!/usr/bin/env bash
-# Day of week script for tmux-forceline v2.0
+# Day of week script for tmux-forceline v3.0
 # Displays current day of week with format options
 
-CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$CURRENT_DIR/datetime_helpers.sh"
-
-# Get tmux option or use default
-get_tmux_option() {
-    local option="$1"
-    local default="$2"
-    tmux show-option -gqv "$option" 2>/dev/null || echo "$default"
-}
+# Source centralized path management
+UTILS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../utils" && pwd)"
+if [[ -f "$UTILS_DIR/common.sh" ]]; then
+    source "$UTILS_DIR/common.sh"
+    # shellcheck source=scripts/helpers.sh
+    HELPERS_PATH="$(get_forceline_path "modules/datetime/scripts/datetime_helpers.sh")"
+    source "$HELPERS_PATH"
+else
+    # Fallback implementation if common.sh not available
+    CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    source "$CURRENT_DIR/datetime_helpers.sh"
+fi
 
 # Main day of week function
 main() {
