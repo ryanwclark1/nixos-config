@@ -30,14 +30,8 @@
   };
 
   # Add Docker Buildx and Compose for advanced build features
-  # Add Kubernetes tools for container orchestration
   environment.systemPackages = with pkgs; [
     docker-buildx
     docker-compose
-    minikube
-    kubectl
-    kubernetes-helm
-    kubectx
-    kubens
   ];
 }
