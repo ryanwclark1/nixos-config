@@ -1,0 +1,195 @@
+{
+  "name": "tmux-forceline Development Environment",
+  "dockerFile": "Dockerfile",
+  "context": "..",
+  
+  // Container configuration
+  "runArgs": [
+    "--init",
+    "--privileged",
+    "--cap-add=SYS_PTRACE",
+    "--security-opt", "seccomp=unconfined"
+  ],
+  
+  // Development server ports
+  "forwardPorts": [
+    3000,
+    8080,
+    9090
+  ],
+  "portsAttributes": {
+    "3000": {
+      "label": "Development Server",
+      "onAutoForward": "notify"
+    },
+    "8080": {
+      "label": "Documentation Server",
+      "onAutoForward": "silent"
+    },
+    "9090": {
+      "label": "Monitoring Dashboard",
+      "onAutoForward": "silent"
+    }
+  },
+  
+  // VS Code configuration
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        // Shell scripting
+        "timonwong.shellcheck",
+        "foxundermoon.shell-format",
+        "mads-hartmann.bash-ide-vscode",
+        
+        // Documentation
+        "yzhang.markdown-all-in-one",
+        "davidanson.vscode-markdownlint",
+        "bierner.markdown-mermaid",
+        
+        // Git and version control
+        "eamodio.gitlens",
+        "github.vscode-pull-request-github",
+        
+        // YAML and configuration
+        "redhat.vscode-yaml",
+        "ms-vscode.vscode-json",
+        
+        // Docker and containers
+        "ms-azuretools.vscode-docker",
+        "ms-vscode-remote.remote-containers",
+        
+        // Testing and debugging
+        "hbenl.vscode-test-explorer",
+        "formulahendry.code-runner",
+        
+        // Productivity
+        "streetsidesoftware.code-spell-checker",
+        "gruntfuggly.todo-tree",
+        "oderwat.indent-rainbow",
+        "aaron-bond.better-comments"
+      ],
+      
+      "settings": {
+        // Shell script formatting
+        "shellformat.effectLanguages": [
+          "shellscript",
+          "dockerfile",
+          "dotenv",
+          "hosts",
+          "jvmoptions",
+          "ignore",
+          "gitignore",
+          "spring-boot-properties",
+          "azcli"
+        ],
+        "shellformat.useEditorConfig": true,
+        
+        // Bash IDE settings
+        "bashIde.globPattern": "**/*.{sh,inc,bash,command}",
+        "bashIde.backgroundAnalysisMaxFiles": 500,
+        
+        // File associations
+        "files.associations": {
+          "*.tmux": "shellscript",
+          "*.conf": "properties",
+          "*.policy": "properties",
+          "*.profile": "properties",
+          "Dockerfile*": "dockerfile"
+        },
+        
+        // Editor settings
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true,
+        "editor.detectIndentation": true,
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll": true
+        },
+        
+        // Terminal settings
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "/bin/bash",
+            "args": ["--login"]
+          },
+          "tmux": {
+            "path": "/usr/bin/tmux",
+            "args": ["new-session", "-d", "-s", "dev"]
+          }
+        },
+        
+        // Git settings
+        "git.enableSmartCommit": true,
+        "git.confirmSync": false,
+        "git.autofetch": true,
+        
+        // Spell checker
+        "cSpell.words": [
+          "tmux",
+          "forceline",
+          "FORCELINE",
+          "HIPAA",
+          "GDPR",
+          "seccomp",
+          "chroot",
+          "observability",
+          "kubernetes"
+        ]
+      }
+    }
+  },
+  
+  // Development environment setup
+  "postCreateCommand": ".devcontainer/post-create.sh",
+  "postStartCommand": ".devcontainer/post-start.sh",
+  
+  // Mount development workspace
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+    "source=tmux-forceline-node-modules,target=/workspace/node_modules,type=volume",
+    "source=tmux-forceline-cache,target=/home/vscode/.cache,type=volume"
+  ],
+  
+  // Environment variables
+  "containerEnv": {
+    "FORCELINE_DEV": "true",
+    "FORCELINE_DIR": "/workspace",
+    "ENTERPRISE_DIR": "/workspace/enterprise",
+    "NODE_ENV": "development",
+    "DEBIAN_FRONTEND": "noninteractive"
+  },
+  
+  // Remote user configuration
+  "remoteUser": "vscode",
+  "workspaceFolder": "/workspace",
+  
+  // Features to include
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "installOhMyZsh": true,
+      "configureZshAsDefaultShell": false,
+      "username": "vscode",
+      "userUid": "1000",
+      "userGid": "1000"
+    },
+    "ghcr.io/devcontainers/features/git:1": {
+      "version": "latest",
+      "ppa": false
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "moby": true,
+      "dockerDashComposeVersion": "v2"
+    },
+    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
+      "version": "latest",
+      "helm": "latest",
+      "minikube": "latest"
+    }
+  }
+}

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# VCS Helper Functions for tmux-forceline v2.0
+# VCS Helper Functions for tmux-forceline v3.0
 # Git repository detection and status monitoring
 
 # Default configurations

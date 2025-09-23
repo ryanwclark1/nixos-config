@@ -1,13 +1,21 @@
-get_tmux_option() {
-	local option="$1"
-	local default_value="$2"
-	local option_value="$(tmux show-option -gqv "$option")"
-	if [ -z "$option_value" ]; then
-		echo "$default_value"
-	else
-		echo "$option_value"
-	fi
-}
+# Source centralized tmux functions instead of local implementation
+UTILS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../utils" && pwd)"
+
+if [[ -f "$UTILS_DIR/common.sh" ]]; then
+    # shellcheck source=../../../utils/common.sh
+    source "$UTILS_DIR/common.sh"
+else
+    # Fallback implementation if common.sh not available
+    get_tmux_option() {
+        local option="$1"
+        local default="$2"
+        tmux show-option -gqv "$option" 2>/dev/null || echo "$default"
+    }
+    
+    get_forceline_dir() {
+        echo "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+    }
+fi
 
 is_osx() {
 	[ $(uname) == "Darwin" ]

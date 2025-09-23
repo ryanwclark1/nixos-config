@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Now Playing Helper Functions for tmux-forceline v2.0
+# Now Playing Helper Functions for tmux-forceline v3.0
 # Cross-platform media player detection and monitoring
 
 # Default configurations
@@ -85,6 +85,38 @@ get_apple_music_status() {
     return 1
 }
 
+# Get playing status from Spotifyd via MPRIS when playing
+get_spotifyd_status() {
+    # Check if spotifyd is running
+    if ! pgrep -f spotifyd >/dev/null 2>&1; then
+        return 1
+    fi
+    
+    # Try to get info via MPRIS - Spotifyd only exposes this when playing
+    local mpris_service
+    mpris_service=$(dbus-send --print-reply --dest=org.freedesktop.DBus /org/freedesktop/DBus org.freedesktop.DBus.ListNames 2>/dev/null | grep -o 'org\.mpris\.MediaPlayer2\.spotifyd' | head -1)
+    
+    if [ -n "$mpris_service" ]; then
+        local status artist title
+        status=$(dbus-send --print-reply --dest="$mpris_service" /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Get string:org.mpris.MediaPlayer2.Player string:PlaybackStatus 2>/dev/null | grep -o 'Playing\|Paused' | head -1)
+        
+        if [ -n "$status" ]; then
+            local metadata
+            metadata=$(dbus-send --print-reply --dest="$mpris_service" /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Get string:org.mpris.MediaPlayer2.Player string:Metadata 2>/dev/null)
+            
+            artist=$(echo "$metadata" | grep -A1 'xesam:artist' | grep 'string' | sed 's/.*string "\([^"]*\)".*/\1/' | head -1)
+            title=$(echo "$metadata" | grep -A1 'xesam:title' | grep 'string' | sed 's/.*string "\([^"]*\)".*/\1/' | head -1)
+            
+            if [ -n "$title" ]; then
+                echo "$(echo "$status" | tr '[:upper:]' '[:lower:]'):spotifyd:${artist:-Unknown}:$title"
+                return 0
+            fi
+        fi
+    fi
+    
+    return 1
+}
+
 # Get playing status from MPD
 get_mpd_status() {
     if ! command_exists mpc; then
@@ -135,8 +167,11 @@ get_now_playing_status() {
     # Try different players in order of preference
     local status_output=""
     
-    # Try Spotify first (most common)
+    # Try Spotify first (desktop app)
     if status_output=$(get_spotify_status); then
+        :
+    # Try Spotifyd (headless Spotify daemon)
+    elif status_output=$(get_spotifyd_status); then
         :
     # Try Apple Music on macOS
     elif status_output=$(get_apple_music_status); then
@@ -196,6 +231,8 @@ get_player_icon() {
     
     if status_output=$(get_spotify_status); then
         echo "󰓇"  # Spotify icon
+    elif status_output=$(get_spotifyd_status); then
+        echo "󰓇"  # Spotify icon (same as regular Spotify)
     elif status_output=$(get_apple_music_status); then
         echo "󰎆"  # Apple Music icon
     elif status_output=$(get_mpd_status); then

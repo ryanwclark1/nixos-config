@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# DateTime Helper Functions for tmux-forceline v2.0
+# DateTime Helper Functions for tmux-forceline v3.0
 # Cross-platform date and time utilities with timezone support
 
 # Default configurations

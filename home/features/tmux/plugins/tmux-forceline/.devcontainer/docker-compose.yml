@@ -1,0 +1,188 @@
+version: '3.8'
+
+services:
+  # Main development container
+  tmux-forceline-dev:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    container_name: tmux-forceline-dev
+    hostname: tmux-forceline-dev
+    
+    # Development environment
+    environment:
+      - FORCELINE_DEV=true
+      - FORCELINE_DIR=/workspace
+      - ENTERPRISE_DIR=/workspace/enterprise
+      - NODE_ENV=development
+      - TERM=xterm-256color
+    
+    # Volume mounts
+    volumes:
+      - ../:/workspace:cached
+      - tmux-forceline-cache:/home/vscode/.cache
+      - tmux-forceline-config:/home/vscode/.config
+      - /var/run/docker.sock:/var/run/docker.sock
+    
+    # Network configuration
+    ports:
+      - "3000:3000"   # Live reload server
+      - "8080:8080"   # Documentation server
+      - "9090:9090"   # Monitoring dashboard
+      - "2222:22"     # SSH access
+    
+    # Keep container running
+    stdin_open: true
+    tty: true
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "/workspace/forceline.tmux", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # Restart policy
+    restart: unless-stopped
+    
+    # Security configuration
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+    
+    # Init process
+    init: true
+
+  # Documentation server
+  docs-server:
+    image: nginx:alpine
+    container_name: tmux-forceline-docs
+    
+    volumes:
+      - ../docs:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    
+    ports:
+      - "8081:80"
+    
+    depends_on:
+      - tmux-forceline-dev
+    
+    restart: unless-stopped
+
+  # Monitoring stack (optional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: tmux-forceline-prometheus
+    
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.enable-lifecycle'
+    
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    
+    ports:
+      - "9091:9090"
+    
+    restart: unless-stopped
+    
+    profiles:
+      - monitoring
+
+  # Grafana for monitoring visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: tmux-forceline-grafana
+    
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
+    
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana-dashboards:/var/lib/grafana/dashboards
+    
+    ports:
+      - "3001:3000"
+    
+    depends_on:
+      - prometheus
+    
+    restart: unless-stopped
+    
+    profiles:
+      - monitoring
+
+  # Testing environment
+  test-runner:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    container_name: tmux-forceline-test
+    
+    environment:
+      - FORCELINE_DEV=true
+      - FORCELINE_TEST=true
+      - CI=true
+    
+    volumes:
+      - ../:/workspace:ro
+    
+    command: ["./scripts/dev-test.sh"]
+    
+    profiles:
+      - testing
+
+  # Security scanner
+  security-scanner:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    container_name: tmux-forceline-security
+    
+    environment:
+      - FORCELINE_DEV=true
+      - SECURITY_SCAN=true
+    
+    volumes:
+      - ../:/workspace:ro
+    
+    command: ["./enterprise/security_hardening.sh", "scan"]
+    
+    profiles:
+      - security
+
+# Named volumes
+volumes:
+  tmux-forceline-cache:
+    driver: local
+  tmux-forceline-config:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+
+# Networks
+networks:
+  default:
+    name: tmux-forceline-dev
+    driver: bridge

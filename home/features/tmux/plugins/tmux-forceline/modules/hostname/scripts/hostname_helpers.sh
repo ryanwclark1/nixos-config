@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Hostname Helper Functions for tmux-forceline v2.0
+# Hostname Helper Functions for tmux-forceline v3.0
 # Cross-platform hostname detection and formatting
 
 # Default configurations

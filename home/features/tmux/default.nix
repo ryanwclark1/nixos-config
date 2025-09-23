@@ -105,24 +105,6 @@ in
       ###################################
       # Configure the forceline plugin
 
-      set -g @forceline_theme "frappe"
-      set -g @forceline_window_status "icon"
-
-      run ${config.home.homeDirectory}/.config/tmux/plugins/tmux-forceline/forceline.tmux
-      set -g @forceline_status_connect_separator "no"
-      set -g @forceline_window_status_style "rounded"
-      set -g status-left-length 200    # increase length (from 10)
-      set -g status-right-length 200   # increase length (from 10)
-
-      set -g status-left ""
-      set -g window-status-format ""
-      set -g window-status-current-format ""
-      set -g status-style "bg=default,fg=default"
-      set -g @forceline_pane_background_color "default"
-      set -g status-left "#{E:@forceline_status_host}"
-      set -ag status-left "#{E:@forceline_status_session}"
-      set -g status-right "#{E:@forceline_status_directory}"
-      set -ag status-right "#{E:@forceline_status_user}"
 
       # Reload configuration with Prefix + r
       bind r source-file ~/.config/tmux/tmux.conf \; display-message "Config reloaded!"

@@ -2,8 +2,18 @@
 # Battery Color Generator for tmux-forceline
 # Provides dynamic colors based on battery level and charging status
 
-CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$CURRENT_DIR/helpers.sh"
+# Source centralized path management
+UTILS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../utils" && pwd)"
+if [[ -f "$UTILS_DIR/common.sh" ]]; then
+    source "$UTILS_DIR/common.sh"
+    # shellcheck source=scripts/helpers.sh
+    HELPERS_PATH="$(get_forceline_path "modules/battery/scripts/helpers.sh")"
+    source "$HELPERS_PATH"
+else
+    # Fallback implementation if common.sh not available
+    CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    source "$CURRENT_DIR/helpers.sh"
+fi
 
 get_battery_color() {
     local color_type="$1"  # bg or fg

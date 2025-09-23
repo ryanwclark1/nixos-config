@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# WAN IP Helper Functions for tmux-forceline v2.0
+# WAN IP Helper Functions for tmux-forceline v3.0
 # Network IP detection with intelligent caching and fallback providers
 
 # Default configurations

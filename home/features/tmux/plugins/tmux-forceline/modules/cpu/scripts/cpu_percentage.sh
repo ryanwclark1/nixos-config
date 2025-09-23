@@ -1,9 +1,21 @@
 #!/usr/bin/env bash
 
-CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-# shellcheck source=scripts/helpers.sh
-source "$CURRENT_DIR/helpers.sh"
+# Source centralized utilities and path management
+UTILS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../utils" && pwd)"
+if [[ -f "$UTILS_DIR/common.sh" ]]; then
+    # shellcheck source=../../../utils/common.sh
+    source "$UTILS_DIR/common.sh"
+    
+    # Use centralized path management for helpers
+    HELPERS_PATH="$(get_forceline_path "modules/cpu/scripts/helpers.sh")"
+    # shellcheck source=helpers.sh
+    source "$HELPERS_PATH"
+else
+    # Fallback implementation if common.sh not available
+    CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    # shellcheck source=scripts/helpers.sh
+    source "$CURRENT_DIR/helpers.sh"
+fi
 
 cpu_percentage_format="%3.1f%%"
 

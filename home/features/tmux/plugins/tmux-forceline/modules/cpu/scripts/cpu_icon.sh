@@ -1,9 +1,17 @@
 #!/usr/bin/env bash
 
-CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-# shellcheck source=scripts/helpers.sh
-source "$CURRENT_DIR/helpers.sh"
+# Source centralized path management
+UTILS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../utils" && pwd)"
+if [[ -f "$UTILS_DIR/common.sh" ]]; then
+    source "$UTILS_DIR/common.sh"
+    # shellcheck source=scripts/helpers.sh
+    HELPERS_PATH="$(get_forceline_path "modules/cpu/scripts/helpers.sh")"
+    source "$HELPERS_PATH"
+else
+    # Fallback implementation if common.sh not available
+    CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    source "$CURRENT_DIR/helpers.sh"
+fi
 
 # script global variables
 cpu_low_icon=""
@@ -24,7 +32,11 @@ get_icon_settings() {
 print_icon() {
   local cpu_percentage
   local load_status
-  cpu_percentage=$("$CURRENT_DIR"/cpu_percentage.sh | sed -e 's/%//')
+  if command -v get_forceline_script >/dev/null 2>&1; then
+    cpu_percentage=$(get_forceline_script "modules/cpu/scripts/cpu_percentage.sh" | sed -e 's/%//')
+  else
+    cpu_percentage=$("${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"/cpu_percentage.sh | sed -e 's/%//')
+  fi
   load_status=$(load_status "$cpu_percentage" "cpu")
   if [ "$load_status" == "low" ]; then
     echo "$cpu_low_icon"

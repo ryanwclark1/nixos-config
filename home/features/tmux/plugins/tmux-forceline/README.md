@@ -1,10 +1,10 @@
-# tmux-forceline v2.0
+# tmux-forceline v3.0
 
 A comprehensive, modular tmux status line system with Base24 theming and extensive plugin ecosystem.
 
 ## Overview
 
-tmux-forceline v2.0 is a complete rewrite featuring:
+tmux-forceline v3.0 is a complete rewrite featuring:
 
 - **Base24 Theme System**: Standardized 24-color palette with semantic aliases
 - **Modular Plugin Architecture**: Core and extended modules with dynamic loading

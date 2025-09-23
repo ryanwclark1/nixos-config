@@ -1,24 +1,27 @@
 #!/usr/bin/env bash
+# Helper functions for CPU module
+# Shared utilities for CPU monitoring, temperature tracking, and performance analysis
 
 export LANG=C
 export LC_ALL=C
 
-get_tmux_option() {
-  local option
-  local default_value
-  local option_value
-  option="$1"
-  default_value="$2"
-  option_value="$(tmux show-option -qv "$option")"
-  if [ -z "$option_value" ]; then
-    option_value="$(tmux show-option -gqv "$option")"
-  fi
-  if [ -z "$option_value" ]; then
-    echo "$default_value"
-  else
-    echo "$option_value"
-  fi
-}
+# Source centralized path management
+UTILS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../utils" && pwd)"
+if [[ -f "$UTILS_DIR/common.sh" ]]; then
+    # shellcheck source=../../../utils/common.sh
+    source "$UTILS_DIR/common.sh"
+else
+    # Fallback implementation if common.sh not available
+    get_tmux_option() {
+        local option="$1"
+        local default="$2"
+        tmux show-option -gqv "$option" 2>/dev/null || echo "$default"
+    }
+    
+    get_forceline_dir() {
+        echo "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+    }
+fi
 
 is_osx() {
   [ "$(uname)" == "Darwin" ]
@@ -96,57 +99,57 @@ command_exists() {
   command -v "$command" &>/dev/null
 }
 
-get_tmp_dir() {
-  local tmpdir
-  tmpdir="${TMPDIR:-${TMP:-${TEMP:-/tmp}}}"
-  [ -d "$tmpdir" ] || local tmpdir=~/tmp
-  echo "$tmpdir/tmux-$EUID-cpu"
+# Get cache directory for CPU module
+get_cache_dir() {
+  local cache_dir="${TMUX_TMPDIR:-${TMPDIR:-/tmp}}/tmux-forceline-cpu"
+  mkdir -p "$cache_dir" 2>/dev/null || {
+    echo "/tmp" # Fallback
+    return 1
+  }
+  echo "$cache_dir"
 }
 
-get_time() {
-  date +%s.%N
-}
-
-get_cache_val() {
-  local key
-  local timeout
-  local cache
-  key="$1"
-  # seconds after which cache is invalidated
-  timeout="${2:-2}"
-  cache="$(get_tmp_dir)/$key"
-  if [ -f "$cache" ]; then
-    awk -v cache="$(head -n1 "$cache")" -v timeout="$timeout" -v now="$(get_time)" \
-      'BEGIN {if (now - timeout < cache) exit 0; exit 1}' &&
-      tail -n+2 "$cache"
-  fi
-}
-
-put_cache_val() {
-  local key
-  local val
-  local tmpdir
-  key="$1"
-  val="${*:2}"
-  tmpdir="$(get_tmp_dir)"
-  [ ! -d "$tmpdir" ] && mkdir -p "$tmpdir" && chmod 0700 "$tmpdir"
-  (
-    get_time
-    echo -n "$val"
-  ) >"$tmpdir/$key"
-  echo -n "$val"
-}
-
-cached_eval() {
-  local command
-  local key
-  local val
-  command="$1"
-  key="$(basename "$command")"
-  val="$(get_cache_val "$key")"
-  if [ -z "$val" ]; then
-    put_cache_val "$key" "$($command "${@:2}")"
+# Check if cached result is still valid
+is_cache_valid() {
+  local cache_file="$1"
+  local max_age="$2"
+  
+  [[ -f "$cache_file" ]] || return 1
+  
+  local file_age
+  if command -v stat >/dev/null 2>&1; then
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+      file_age=$(stat -f %m "$cache_file" 2>/dev/null || echo 0)
+    else
+      file_age=$(stat -c %Y "$cache_file" 2>/dev/null || echo 0)
+    fi
   else
-    echo -n "$val"
+    return 1
   fi
+  
+  local current_time
+  current_time=$(date +%s)
+  
+  [ $((current_time - file_age)) -lt "$max_age" ]
+}
+
+# Cache command output with TTL optimized for CPU monitoring
+cached_eval() {
+  local cache_dir cache_file command_hash
+  cache_dir=$(get_cache_dir) || {
+    eval "$*"
+    return
+  }
+  
+  # Create hash of command for cache filename
+  command_hash=$(echo "$*" | cksum | cut -d' ' -f1)
+  cache_file="$cache_dir/cmd_${command_hash}.cache"
+  
+  # Return cached result if valid (1 second TTL for CPU - faster than memory)
+  if is_cache_valid "$cache_file" 1; then
+    cat "$cache_file" 2>/dev/null && return 0
+  fi
+  
+  # Execute and cache result
+  eval "$*" | tee "$cache_file" 2>/dev/null || eval "$*"
 }

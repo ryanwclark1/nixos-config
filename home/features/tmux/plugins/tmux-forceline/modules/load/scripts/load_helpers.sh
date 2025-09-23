@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Load Average Helper Functions for tmux-forceline v2.0
+# Load Average Helper Functions for tmux-forceline v3.0
 # Cross-platform system load monitoring
 
 # Default configurations
