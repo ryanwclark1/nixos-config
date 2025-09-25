@@ -1,0 +1,163 @@
+{
+  "git": {
+    "command": "docker",
+    "args": [
+      "run",
+      "-i",
+      "--rm",
+      "--mount",
+      "type=bind,src=${PWD},dst=${PWD}",
+
+      "mcp/git"
+    ],
+    "env" : {
+      "HOME": "${HOME}",
+      "PWD": "${PWD}"
+    },
+    "description": "Provides git repository information and operations"
+  },
+  "memory": {
+    "command": "docker",
+    "args": [
+      "run",
+      "-i",
+      "--rm",
+      "-v",
+      "mcp-memory-data:/data",
+      "mcp/memory"
+    ],
+    "env": {
+      "HOME": "${HOME}",
+      "MEMORY_FILE_PATH": "${HOME}/memory.json"
+    },
+    "description": "Maintains context and memory across sessions"
+  },
+  "time": {
+    "command": "docker",
+    "args": [
+      "run",
+      "-i",
+      "--rm",
+      "mcp/time",
+      "--local-timezone=$TZ"
+    ],
+    "env": {
+      "TZ": "America/Chicago"
+    },
+    "description": "Provides date and time information and operations"
+  },
+  "fetch": {
+    "command": "docker",
+    "args": [
+      "run",
+      "-i",
+      "--rm",
+      "--name",
+      "mcp-fetch",
+      "--network",
+      "bridge",
+      "mcp/fetch"
+    ],
+    "env":{
+      "DEFAULT_USER_AGENT_AUTONOMOUS": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+      "DEFAULT_USER_AGENT_MANUAL": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+
+    },
+    "description": "Fetches and analyzes web content"
+  },
+  "context7": {
+    "command": "docker",
+    "args": [
+      "run",
+      "-i",
+      "--rm",
+      "mcp/context7"
+    ],
+    "env": {
+      "CONTEXT7_TOKEN": "${CONTEXT7_TOKEN}"
+    },
+    "description": "Provides up-to-date code documentation for AI code editors"
+  },
+  "github": {
+    "command": "docker",
+    "args": [
+      "run",
+      "-i",
+      "--rm",
+      "-e",
+      "GITHUB_PERSONAL_ACCESS_TOKEN",
+      "-e",
+      "GITHUB_DYNAMIC_TOOLSETS",
+      "ghcr.io/github/github-mcp-server"
+    ],
+    "env": {
+      "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}",
+      "GITHUB_DYNAMIC_TOOLSETS" : "1"
+    },
+    "description": "GitHub repository and workflow management via MCP"
+  },
+  "playwright": {
+    "command": "mcp-server-playwright",
+    "args": [
+      "--browser=chrome",
+      "--extension"
+    ],
+    "description": "Browser automation and web scraping via Playwright"
+  },
+  "serena": {
+    "command": "docker",
+    "args": [
+      "run",
+      "-i",
+      "--rm",
+      "--network",
+      "host",
+
+      "-v",
+      "/home/administrator/Code:/workspace/Code:rw",
+
+      "ghcr.io/oraios/serena:latest",
+      "serena",
+      "start-mcp-server",
+      "--transport",
+      "stdio"
+    ],
+    "env": {
+      "SERENA_DOCKER": "1"
+    },
+    "description": "AI-powered development assistant with Code directory access"
+  },
+  "sourcebot": {
+    "command": "npx",
+    "args": [
+      "@sourcebot/mcp@latest"
+    ],
+    "env": {
+      "NODE_ENV": "production",
+      "SOURCEBOT_HOST": "http://localhost:3003",
+      "SOURCEBOT_API_KEY": "${SOURCEBOT_API_KEY}"
+    },
+    "description": "Code understanding and search via Sourcebot"
+  },
+  "sequential-thinking": {
+    "command": "docker",
+    "args": [
+      "run",
+      "-i",
+      "--rm",
+      "mcp/sequentialthinking"
+    ],
+    "description": "Helps break down complex problems into sequential steps"
+  },
+  "task-master-ai": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "--package=task-master-ai",
+      "task-master-ai"
+    ],
+    "env": {
+      "OLLAMA_BASE_URL": "http://localhost:11434/api"
+    }
+  }
+}

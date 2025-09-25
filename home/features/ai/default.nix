@@ -10,7 +10,7 @@
     # ./sourcebot.nix  # Docker Compose-based Sourcebot with PostgreSQL and Redis
     ./gemini-cli.nix  # Custom gemini-cli version override
     # ./open-webui-docker.nix
-    ./claude.nix
+    # ./claude.nix  # Currently missing
     ./qwen.nix
     ./codex.nix
   ];
