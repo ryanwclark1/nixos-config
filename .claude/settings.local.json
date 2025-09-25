@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(for file in /home/administrator/nixos-config/home/features/ai/agents/*.md)",
+      "Bash(do if ! grep -q \"^name:\" \"$file\")",
+      "Bash(then echo \"Missing name field: $file\")",
+      "Bash(done)",
+      "Bash(head:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

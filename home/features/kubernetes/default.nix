@@ -24,8 +24,7 @@
     tilt # Local Kubernetes development Local to manage your developer instance when your team deploys to Kubernetes in production.
     stern # Multi-pod and container log tailing
     kustomize # Kubernetes native configuration management
-    kubectx # Switch between Kubernetes contexts
-    kubens # Switch between Kubernetes namespaces
+    kubectx # Switch between Kubernetes contexts (includes kubens)
   ];
 
   # Shell completions and aliases for Kubernetes tools

@@ -154,9 +154,15 @@ src.vsmarketplace = "ms-ossdata.vscode-pgsql"
 fetch.vsmarketplace = "ms-ossdata.vscode-pgsql"
 passthru = { publisher = "ms-ossdata", name = "vscode-pgsql" }
 
+[vscode-python-test-adapter]
+src.vsmarketplace = "littlefoxteam.vscode-python-test-adapter"
+fetch.vsmarketplace = "littlefoxteam.vscode-python-test-adapter"
+passthru = { publisher = "littlefoxteam", name = "vscode-python-test-adapter" }
+
 [vscode-thunder-client]
 src.vsmarketplace = "rangav.vscode-thunder-client"
 fetch.vsmarketplace = "rangav.vscode-thunder-client"
 passthru = { publisher = "rangav", name = "vscode-thunder-client" }
+
 
 

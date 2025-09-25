@@ -60,17 +60,16 @@ get_version_hash() {
     
     local url="https://github.com/google-gemini/gemini-cli/archive/v${version}.tar.gz"
     
-    # Use nix-prefetch-url to get the hash and convert to SRI format
-    local raw_hash sri_hash
-    raw_hash=$(nix-prefetch-url --unpack "$url" 2>/dev/null) || {
+    # Use nix-prefetch-url to get the store path and then hash it
+    local store_path sri_hash
+        store_path=$(nix-prefetch-url --print-path "$url" 2>/dev/null | grep '/nix/store' | head -n 1) || {
         echo "Error: Failed to fetch or calculate hash for version $version" >&2
         echo "URL: $url" >&2
         return 1
     }
     
-    # Convert to SRI format
-    sri_hash=$(nix hash convert --hash-algo sha256 --to-sri "$raw_hash" 2>/dev/null) || {
-        echo "Error: Failed to convert hash to SRI format" >&2
+    sri_hash=$(nix hash path --sri "$store_path") || {
+        echo "Error: Failed to convert path to SRI format" >&2
         return 1
     }
     
@@ -83,26 +82,22 @@ get_npm_deps_hash() {
     
     echo "Calculating npm dependencies hash for version $version..." >&2
     
-    local temp_dir="/tmp/gemini-cli-$version"
-    rm -rf "$temp_dir"
+    local url="https://raw.githubusercontent.com/google-gemini/gemini-cli/v${version}/package-lock.json"
     
-    # Download and extract the source
-    local url="https://github.com/google-gemini/gemini-cli/archive/v${version}.tar.gz"
-    curl -sL "$url" | tar -xz -C /tmp || {
-        echo "Error: Failed to download source for version $version" >&2
+    # Use nix-prefetch-url to get the store path and then hash it
+    local store_path sri_hash
+    store_path=$(nix-prefetch-url --print-path "$url" 2>/dev/null | grep '/nix/store' | head -n 1) || {
+        echo "Error: Failed to fetch or calculate hash for version $version" >&2
+        echo "URL: $url" >&2
         return 1
     }
     
-    # Use prefetch-npm-deps to get the correct hash
-    local npm_hash
-    npm_hash=$(nix run nixpkgs#prefetch-npm-deps "$temp_dir/gemini-cli-$version/package-lock.json" 2>/dev/null) || {
-        echo "Error: Failed to calculate npm dependencies hash" >&2
-        rm -rf "$temp_dir"
+    sri_hash=$(nix hash path --sri "$store_path") || {
+        echo "Error: Failed to convert path to SRI format" >&2
         return 1
     }
     
-    rm -rf "$temp_dir"
-    echo "$npm_hash"
+    echo "$sri_hash"
 }
 
 # Update the override file (similar to how multiviewer outputs the result)
@@ -110,40 +105,50 @@ update_override_file() {
     local version="$1"
     local hash="$2"
     local npm_hash="$3"
-    
+    local output_file="$SCRIPT_DIR/gemini-cli-version.txt"
+
     if [[ ! -f "$OVERRIDE_FILE" ]]; then
         echo "Error: Override file not found at $OVERRIDE_FILE" >&2
         echo "Please create the gemini-cli-override.nix file first" >&2
         return 1
     fi
-    
+
     echo "Updating override file..." >&2
-    
+
     # Create backup
     cp "$OVERRIDE_FILE" "${OVERRIDE_FILE}.backup"
-    
+
     # Update version, source hash, and npm deps hash
-    sed -i "s/version = \".*\";/version = \"$version\";/" "$OVERRIDE_FILE"
-    sed -i "s/hash = \"sha256-.*\";/hash = \"$hash\";/" "$OVERRIDE_FILE"
-    sed -i "s/npmDepsHash = \"sha256-.*\";/npmDepsHash = \"$npm_hash\";/" "$OVERRIDE_FILE"
-    
+    sed -i "s/version = ".*";/version = \"$version\";/" "$OVERRIDE_FILE"
+    escaped_hash=$(echo "$hash" | sed 's/[\/&]/\\&/g')
+    sed -i "s/hash = \"sha256-.*\";/hash = \"$escaped_hash\";/" "$OVERRIDE_FILE"
+    escaped_npm_hash=$(echo "$npm_hash" | sed 's/[\/&]/\\&/g')
+    sed -i "s/npmDepsHash = \"sha256-.*\";/npmDepsHash = \"$escaped_npm_hash\";/" "$OVERRIDE_FILE"
+
     # Update the comment to reflect current version being checked
     sed -i "s/# Use: gemini-cli-version check .*/# Use: gemini-cli-version check $version/" "$OVERRIDE_FILE"
-    
+
     echo "" >&2
     echo "✅ Updated gemini-cli-override.nix:" >&2
     echo "   Version: $version" >&2
     echo "   Hash: $hash" >&2
     echo "   Backup: ${OVERRIDE_FILE}.backup" >&2
     echo "" >&2
-    
+
+    # Output the Nix attribute format to a file
+    echo "Writing version info to $output_file" >&2
+    {
+        echo "version = \"$version\";"
+        echo "hash = \"$hash\";"
+    } > "$output_file"
+
     # Output the Nix attribute format (similar to multiviewer)
     echo "Updated Nix attributes:"
-    echo "version = \"$version\";"
-    echo "hash = \"$hash\";"
+    cat "$output_file"
     echo ""
     echo "Note: Patches from nixpkgs are preserved. If build fails, consider removing patches."
 }
+
 
 # Show current configuration
 show_current() {
