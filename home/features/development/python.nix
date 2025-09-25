@@ -5,9 +5,9 @@
 
 {
   home.packages = (with pkgs; [
-    python312
+    python313
     functiontrace-server
-  ]) ++ (with pkgs.python312Packages; [
+  ]) ++ (with pkgs.python313Packages; [
     pip
     pyyaml
   ]);
