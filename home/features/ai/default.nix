@@ -8,11 +8,13 @@
   imports = [
     # ./mcp-openwebui.nix
     # ./sourcebot.nix  # Docker Compose-based Sourcebot with PostgreSQL and Redis
-    ./gemini-cli.nix  # Custom gemini-cli version override
+    # ./gemini-cli.nix  # Custom gemini-cli version override
     # ./open-webui-docker.nix
     ./claude  # Currently missing
-    ./qwen.nix
-    ./codex.nix
+    ./gemini
+    ./qwen
+    ./codex
+    ./opencode
   ];
   home.packages = with pkgs; [
     lmstudio

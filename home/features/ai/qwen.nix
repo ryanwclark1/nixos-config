@@ -56,7 +56,7 @@ in
     maxSessionTurns = -1; # unlimited
     memoryImportFormat = "tree";
     memoryDiscoveryMaxDirs = 200;
-    contextFileName = [ "QWEN.md" "README.md" ];
+    contextFileName = [ "QWEN.md" "README.md" "CLAUDE.md" "GEMINI.md" "CODEX.md" "CONTEXT.md" ];
     model = "hf.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL";
     hasSeenIdeIntegrationNudge = false;
     folderTrustFeature = false;
@@ -276,36 +276,6 @@ in
     # QWEN_BACKUP_FILES=true
   '';
 
-  # Create MCP servers configuration for Qwen Code
-  # home.file.".qwen/mcp-servers.json".text = builtins.toJSON {
-  #   # MCP server configurations
-  #   # These can be used with Qwen Code's MCP integration
-  #   servers = {
-  #     filesystem = {
-  #       command = "npx";
-  #       args = [ "@modelcontextprotocol/server-filesystem" "/home/administrator" ];
-  #       env = {};
-  #     };
-  #     git = {
-  #       command = "npx";
-  #       args = [ "@modelcontextprotocol/server-git" ];
-  #       env = {};
-  #     };
-  #     github = {
-  #       command = "npx";
-  #       args = [ "@modelcontextprotocol/server-github" ];
-  #       env = {
-  #         GITHUB_TOKEN = "\${GITHUB_TOKEN}";
-  #       };
-  #     };
-  #     search = {
-  #       command = "npx";
-  #       args = [ "@modelcontextprotocol/server-search" ];
-  #       env = {};
-  #     };
-  #   };
-  # };
-
   # # Create a launcher script for Qwen Code with environment
   # home.file.".local/bin/qwen-code-launch" = {
   #   text = ''
@@ -339,7 +309,5 @@ in
   #   qc = "qwen-code-launch";
   #   qwen = "qwen-code-launch";
   # };
-
-
 
 }
