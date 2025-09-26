@@ -91,13 +91,13 @@ in
 
   programs.rofi = {
     enable = true;
-    package = pkgs.rofi-wayland;
+    package = pkgs.rofi;
     plugins = [
-      pkgs.rofi-emoji-wayland
+      pkgs.rofi-emoji
     ];
     pass = {
       enable = true;
-      package = pkgs.rofi-pass-wayland;
+      package = pkgs.rofi-pass;
       stores = [
         "${config.home.homeDirectory}/.local/share/keyrings"
       ];

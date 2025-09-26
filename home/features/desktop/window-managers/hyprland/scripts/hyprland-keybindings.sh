@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Hyprland keybindings display with auto-generated descriptions
-# Dependencies: hyprctl, jq, rofi-wayland or walker
+# Dependencies: hyprctl, jq, rofi or walker
 # Supports both rofi (default) and walker interfaces
 # Usage: hyprland-keybindings.sh [--walker|-w]
 
@@ -37,13 +37,13 @@ fi
 # Get and process keybindings with auto-generated descriptions
 organized_keybinds=$(hyprctl binds -j | jq -r '
   def clean_nix_path: gsub("/nix/store/[^/]+/bin/"; "");
-  
+
   def autogenerate_comment(dispatcher; params):
     if dispatcher == "killactive" then "Close window"
     elif dispatcher == "togglefloating" then "Float/unfloat window"
     elif dispatcher == "fullscreen" then
       if params == "0" then "Toggle fullscreen"
-      elif params == "1" then "Toggle maximization" 
+      elif params == "1" then "Toggle maximization"
       else "Toggle fullscreen" end
     elif dispatcher == "movefocus" then
       if params == "l" then "Focus window left"
@@ -53,7 +53,7 @@ organized_keybinds=$(hyprctl binds -j | jq -r '
       else "Move focus " + params end
     elif dispatcher == "movewindow" then
       if params == "l" then "Move window left"
-      elif params == "r" then "Move window right" 
+      elif params == "r" then "Move window right"
       elif params == "u" then "Move window up"
       elif params == "d" then "Move window down"
       else "Move window " + params end
@@ -66,7 +66,7 @@ organized_keybinds=$(hyprctl binds -j | jq -r '
       else "Go to workspace " + params end
     elif dispatcher == "movetoworkspace" then
       if params == "e+1" then "Move window to next workspace"
-      elif params == "e-1" then "Move window to previous workspace" 
+      elif params == "e-1" then "Move window to previous workspace"
       else "Move window to workspace " + params end
     elif dispatcher == "togglespecialworkspace" then "Toggle special workspace"
     elif dispatcher == "swapsplit" then "Swap window split"
@@ -96,12 +96,12 @@ organized_keybinds=$(hyprctl binds -j | jq -r '
       else "Execute: " + (params | clean_nix_path) end
     else dispatcher + " " + params
     end;
-  
+
   def get_category(dispatcher; params):
     if dispatcher == "exec" then
       if (params | test("rofi|dmenu|cliphist|emoji|calc|web-search")) then "🔍 Menus & Search"
       elif (params | test("kitty|terminal")) then "💻 Terminal"
-      elif (params | test("chrome|firefox|browser")) then "🌐 Browser"  
+      elif (params | test("chrome|firefox|browser")) then "🌐 Browser"
       elif (params | test("code|cursor|editor")) then "📝 Editor"
       elif (params | test("screenshot|grimblast")) then "📸 Screenshot"
       elif (params | test("swayosd-client|playerctl|wpctl")) then "🔊 Media & Volume"
@@ -112,12 +112,12 @@ organized_keybinds=$(hyprctl binds -j | jq -r '
       else "🚀 Applications" end
     elif dispatcher == "killactive" then "❌ Window Control"
     elif (dispatcher | test("movewindow|resizeactive|movefocus|swapsplit|splitratio")) then "🪟 Window Management"
-    elif (dispatcher | test("togglefloating|fullscreen|pseudo|togglegroup|lockactivegroup")) then "🪟 Window Management" 
+    elif (dispatcher | test("togglefloating|fullscreen|pseudo|togglegroup|lockactivegroup")) then "🪟 Window Management"
     elif (dispatcher | test("workspace|movetoworkspace|togglespecialworkspace")) then "🏠 Workspaces"
     else "⚙️ System Management"
     end;
-  
-  .[] | 
+
+  .[] |
   {
     dispatcher: .dispatcher,
     arg: .arg,
@@ -125,7 +125,7 @@ organized_keybinds=$(hyprctl binds -j | jq -r '
     modmask: .modmask,
     combo: (if .modmask == 64 then "SUPER"
            elif .modmask == 8 then "ALT"
-           elif .modmask == 4 then "CTRL" 
+           elif .modmask == 4 then "CTRL"
            elif .modmask == 1 then "SHIFT"
            elif .modmask == 72 then "SUPER + ALT"
            elif .modmask == 68 then "SUPER + CTRL"
@@ -181,63 +181,63 @@ fi
 if [ -n "$selected" ] && [[ ! "$selected" =~ ^(---|#) ]]; then
     # Extract the key combination from the selected line
     key_combo=$(echo "$selected" | sed 's/ →.*//' | sed 's/^ *//;s/ *$//')
-    
+
     if [ -n "$key_combo" ]; then
         # Convert key combo back to modmask and key for lookup
         case "$key_combo" in
-            "SUPER + ALT + "*) 
+            "SUPER + ALT + "*)
                 modmask="72"
                 key=$(echo "$key_combo" | sed 's/SUPER + ALT + //')
                 ;;
-            "SUPER + CTRL + "*) 
+            "SUPER + CTRL + "*)
                 modmask="68"
                 key=$(echo "$key_combo" | sed 's/SUPER + CTRL + //')
                 ;;
-            "SUPER + SHIFT + "*) 
+            "SUPER + SHIFT + "*)
                 modmask="65"
                 key=$(echo "$key_combo" | sed 's/SUPER + SHIFT + //')
                 ;;
-            "CTRL + ALT + "*) 
+            "CTRL + ALT + "*)
                 modmask="12"
                 key=$(echo "$key_combo" | sed 's/CTRL + ALT + //')
                 ;;
-            "SHIFT + ALT + "*) 
+            "SHIFT + ALT + "*)
                 modmask="9"
                 key=$(echo "$key_combo" | sed 's/SHIFT + ALT + //')
                 ;;
-            "SHIFT + CTRL + "*) 
+            "SHIFT + CTRL + "*)
                 modmask="5"
                 key=$(echo "$key_combo" | sed 's/SHIFT + CTRL + //')
                 ;;
-            "SUPER + "*) 
+            "SUPER + "*)
                 modmask="64"
                 key=$(echo "$key_combo" | sed 's/SUPER + //')
                 ;;
-            "ALT + "*) 
+            "ALT + "*)
                 modmask="8"
                 key=$(echo "$key_combo" | sed 's/ALT + //')
                 ;;
-            "CTRL + "*) 
+            "CTRL + "*)
                 modmask="4"
                 key=$(echo "$key_combo" | sed 's/CTRL + //')
                 ;;
-            "SHIFT + "*) 
+            "SHIFT + "*)
                 modmask="1"
                 key=$(echo "$key_combo" | sed 's/SHIFT + //')
                 ;;
-            *) 
+            *)
                 modmask="0"
                 key="$key_combo"
                 ;;
         esac
-        
+
         # Find matching binding and execute
         binding_info=$(echo "$keybind_lookup" | awk -F'\t' -v key="$key" -v mask="$modmask" '$1 == key && $2 == mask {print $3 "\t" $4}' | head -n1)
-        
+
         if [ -n "$binding_info" ]; then
             dispatcher=$(echo "$binding_info" | cut -f1)
             arg=$(echo "$binding_info" | cut -f2)
-            
+
             # Execute the binding
             if [ -n "$arg" ] && [ "$arg" != "null" ]; then
                 hyprctl dispatch "$dispatcher" "$arg"
