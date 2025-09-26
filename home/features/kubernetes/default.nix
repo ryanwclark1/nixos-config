@@ -68,7 +68,7 @@
       source <(kubectl completion bash)
       complete -F __start_kubectl k
     fi
-    
+
     # Minikube completion
     if command -v minikube &> /dev/null; then
       source <(minikube completion bash)
@@ -85,7 +85,7 @@
     if command -v kubectl &> /dev/null
       kubectl completion fish | source
     end
-    
+
     # Minikube completion
     if command -v minikube &> /dev/null
       minikube completion fish | source
@@ -97,13 +97,13 @@
     end
   '';
 
-  programs.zsh.initExtra = lib.mkIf config.programs.zsh.enable ''
+  programs.zsh.initContent = lib.mkIf config.programs.zsh.enable ''
     # Kubectl completion
     if command -v kubectl &> /dev/null; then
       source <(kubectl completion zsh)
       compdef __start_kubectl k
     fi
-    
+
     # Minikube completion
     if command -v minikube &> /dev/null; then
       source <(minikube completion zsh)
