@@ -1,0 +1,59 @@
+{
+  "time": {
+    "command": "uvx",
+    "args": [
+      "mcp-server-time"
+    ],
+    "description": "Provides date and time information and operations"
+  },
+  "git": {
+    "command": "uvx",
+    "args": [
+      "mcp-server-git"
+    ],
+    "description": "Git operations for Accent AI project"
+  },
+  "fetch": {
+    "command": "uvx",
+    "args": [
+      "mcp-server-fetch"
+    ],
+    "description": "Web content fetching for Accent AI research and documentation"
+  },
+  "sequential-thinking": {
+    "command": "npx",
+    "args": [
+      "@modelcontextprotocol/server-sequential-thinking@latest"
+    ],
+    "description": "Complex problem-solving for Accent AI architecture",
+    "env": {
+      "NODE_ENV": "production"
+    }
+  },
+  "github": {
+    "command": "docker",
+    "args": [
+      "run",
+      "-i",
+      "--rm",
+      "-e",
+      "GITHUB_PERSONAL_ACCESS_TOKEN",
+      "-e",
+      "GITHUB_DYNAMIC_TOOLSETS",
+      "ghcr.io/github/github-mcp-server"
+    ],
+    "env": {
+      "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}",
+      "GITHUB_DYNAMIC_TOOLSETS": "1"
+    },
+    "description": "GitHub repository and workflow management via MCP"
+  },
+  "playwright": {
+    "command": "mcp-server-playwright",
+    "args": [
+      "--browser=chrome",
+      "--extension"
+    ],
+    "description": "Browser automation and web scraping via Playwright"
+  }
+}
