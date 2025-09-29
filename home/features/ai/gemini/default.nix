@@ -96,75 +96,58 @@ in
   };
 
   # COMMANDS
-  home.file."${geminiHome}/commands/sg/analyze.md" = {
-    source = ./config/commands/sg/analyze.md;
+  home.file."${geminiHome}/commands/sg/analyze.toml" = {
+    source = ./config/commands/sg/analyze.toml;
   };
-  home.file."${geminiHome}/commands/sg/build.md" = {
-    source = ./config/commands/sg/build.md;
+  home.file."${geminiHome}/commands/sg/build.toml" = {
+    source = ./config/commands/sg/build.toml;
   };
-  home.file."${geminiHome}/commands/sg/cleanup.md" = {
-    source = ./config/commands/sg/cleanup.md;
+  home.file."${geminiHome}/commands/sg/cleanup.toml" = {
+    source = ./config/commands/sg/cleanup.toml;
   };
-  home.file."${geminiHome}/commands/sg/design.md" = {
-    source = ./config/commands/sg/design.md;
+  home.file."${geminiHome}/commands/sg/design.toml" = {
+    source = ./config/commands/sg/design.toml;
   };
-  home.file."${geminiHome}/commands/sg/document.md" = {
-    source = ./config/commands/sg/document.md;
+  home.file."${geminiHome}/commands/sg/document.toml" = {
+    source = ./config/commands/sg/document.toml;
   };
-  home.file."${geminiHome}/commands/sg/estimate.md" = {
-    source = ./config/commands/sg/estimate.md;
+  home.file."${geminiHome}/commands/sg/estimate.toml" = {
+    source = ./config/commands/sg/estimate.toml;
   };
-  home.file."${geminiHome}/commands/sg/explain.md" = {
-    source = ./config/commands/sg/explain.md;
+  home.file."${geminiHome}/commands/sg/explain.toml" = {
+    source = ./config/commands/sg/explain.toml;
   };
-  home.file."${geminiHome}/commands/sg/git.md" = {
-    source = ./config/commands/sg/git.md;
+  home.file."${geminiHome}/commands/sg/git.toml" = {
+    source = ./config/commands/sg/git.toml;
   };
-  home.file."${geminiHome}/commands/sg/help.md" = {
-    source = ./config/commands/sg/help.md;
+  home.file."${geminiHome}/commands/sg/implement.toml" = {
+    source = ./config/commands/sg/implement.toml;
   };
-  home.file."${geminiHome}/commands/sg/implement.md" = {
-    source = ./config/commands/sg/implement.md;
+  home.file."${geminiHome}/commands/sg/improve.toml" = {
+    source = ./config/commands/sg/improve.toml;
   };
-  home.file."${geminiHome}/commands/sg/improve.md" = {
-    source = ./config/commands/sg/improve.md;
+  home.file."${geminiHome}/commands/sg/index.toml" = {
+    source = ./config/commands/sg/index.toml;
   };
-  home.file."${geminiHome}/commands/sg/index.md" = {
-    source = ./config/commands/sg/index.md;
+  home.file."${geminiHome}/commands/sg/load.toml" = {
+    source = ./config/commands/sg/load.toml;
   };
-  home.file."${geminiHome}/commands/sg/load.md" = {
-    source = ./config/commands/sg/load.md;
+  home.file."${geminiHome}/commands/sg/reflect.toml" = {
+    source = ./config/commands/sg/reflect.toml;
   };
-  home.file."${geminiHome}/commands/sg/reflect.md" = {
-    source = ./config/commands/sg/reflect.md;
+  home.file."${geminiHome}/commands/sg/save.toml" = {
+    source = ./config/commands/sg/save.toml;
   };
-  home.file."${geminiHome}/commands/sg/research.md" = {
-    source = ./config/commands/sg/research.md;
+  home.file."${geminiHome}/commands/sg/select-tool.toml" = {
+    source = ./config/commands/sg/select-tool.toml;
   };
-  home.file."${geminiHome}/commands/sg/save.md" = {
-    source = ./config/commands/sg/save.md;
+  home.file."${geminiHome}/commands/sg/test.toml" = {
+    source = ./config/commands/sg/test.toml;
   };
-  home.file."${geminiHome}/commands/sg/select-tool.md" = {
-    source = ./config/commands/sg/select-tool.md;
+  home.file."${geminiHome}/commands/sg/troubleshoot.toml" = {
+    source = ./config/commands/sg/troubleshoot.toml;
   };
-  home.file."${geminiHome}/commands/sg/spawn.md" = {
-    source = ./config/commands/sg/spawn.md;
-  };
-  home.file."${geminiHome}/commands/sg/spec-panel.md" = {
-    source = ./config/commands/sg/spec-panel.md;
-  };
-  home.file."${geminiHome}/commands/sg/task.md" = {
-    source = ./config/commands/sg/task.md;
-  };
-  home.file."${geminiHome}/commands/sg/test.md" = {
-    source = ./config/commands/sg/test.md;
-  };
-  home.file."${geminiHome}/commands/sg/troubleshoot.md" = {
-    source = ./config/commands/sg/troubleshoot.md;
-  };
-  home.file."${geminiHome}/commands/sg/workflow.md" = {
-    source = ./config/commands/sg/workflow.md;
-  };
+
 
   programs.gemini-cli = {
     enable = true;

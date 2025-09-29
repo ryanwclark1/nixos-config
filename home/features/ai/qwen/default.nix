@@ -100,74 +100,56 @@ in
   };
 
   # COMMANDS
-  home.file."${qwenHome}/commands/sq/analyze.md" = {
-    source = ./config/commands/sq/analyze.md;
+  home.file."${qwenHome}/commands/sq/analyze.toml" = {
+    source = ./config/commands/sq/analyze.toml;
   };
-  home.file."${qwenHome}/commands/sq/build.md" = {
-    source = ./config/commands/sq/build.md;
+  home.file."${qwenHome}/commands/sq/build.toml" = {
+    source = ./config/commands/sq/build.toml;
   };
-  home.file."${qwenHome}/commands/sq/cleanup.md" = {
-    source = ./config/commands/sq/cleanup.md;
+  home.file."${qwenHome}/commands/sq/cleanup.toml" = {
+    source = ./config/commands/sq/cleanup.toml;
   };
-  home.file."${qwenHome}/commands/sq/design.md" = {
-    source = ./config/commands/sq/design.md;
+  home.file."${qwenHome}/commands/sq/design.toml" = {
+    source = ./config/commands/sq/design.toml;
   };
-  home.file."${qwenHome}/commands/sq/document.md" = {
-    source = ./config/commands/sq/document.md;
+  home.file."${qwenHome}/commands/sq/document.toml" = {
+    source = ./config/commands/sq/document.toml;
   };
-  home.file."${qwenHome}/commands/sq/estimate.md" = {
-    source = ./config/commands/sq/estimate.md;
+  home.file."${qwenHome}/commands/sq/estimate.toml" = {
+    source = ./config/commands/sq/estimate.toml;
   };
-  home.file."${qwenHome}/commands/sq/explain.md" = {
-    source = ./config/commands/sq/explain.md;
+  home.file."${qwenHome}/commands/sq/explain.toml" = {
+    source = ./config/commands/sq/explain.toml;
   };
-  home.file."${qwenHome}/commands/sq/git.md" = {
-    source = ./config/commands/sq/git.md;
+  home.file."${qwenHome}/commands/sq/git.toml" = {
+    source = ./config/commands/sq/git.toml;
   };
-  home.file."${qwenHome}/commands/sq/help.md" = {
-    source = ./config/commands/sq/help.md;
+  home.file."${qwenHome}/commands/sq/implement.toml" = {
+    source = ./config/commands/sq/implement.toml;
   };
-  home.file."${qwenHome}/commands/sq/implement.md" = {
-    source = ./config/commands/sq/implement.md;
+  home.file."${qwenHome}/commands/sq/improve.toml" = {
+    source = ./config/commands/sq/improve.toml;
   };
-  home.file."${qwenHome}/commands/sq/improve.md" = {
-    source = ./config/commands/sq/improve.md;
+  home.file."${qwenHome}/commands/sq/index.toml" = {
+    source = ./config/commands/sq/index.toml;
   };
-  home.file."${qwenHome}/commands/sq/index.md" = {
-    source = ./config/commands/sq/index.md;
+  home.file."${qwenHome}/commands/sq/load.toml" = {
+    source = ./config/commands/sq/load.toml;
   };
-  home.file."${qwenHome}/commands/sq/load.md" = {
-    source = ./config/commands/sq/load.md;
+  home.file."${qwenHome}/commands/sq/reflect.toml" = {
+    source = ./config/commands/sq/reflect.toml;
   };
-  home.file."${qwenHome}/commands/sq/reflect.md" = {
-    source = ./config/commands/sq/reflect.md;
+  home.file."${qwenHome}/commands/sq/save.toml" = {
+    source = ./config/commands/sq/save.toml;
   };
-  home.file."${qwenHome}/commands/sq/research.md" = {
-    source = ./config/commands/sq/research.md;
+  home.file."${qwenHome}/commands/sq/select-tool.toml" = {
+    source = ./config/commands/sq/select-tool.toml;
   };
-  home.file."${qwenHome}/commands/sq/save.md" = {
-    source = ./config/commands/sq/save.md;
+  home.file."${qwenHome}/commands/sq/test.toml" = {
+    source = ./config/commands/sq/test.toml;
   };
-  home.file."${qwenHome}/commands/sq/select-tool.md" = {
-    source = ./config/commands/sq/select-tool.md;
-  };
-  home.file."${qwenHome}/commands/sq/spawn.md" = {
-    source = ./config/commands/sq/spawn.md;
-  };
-  home.file."${qwenHome}/commands/sq/spec-panel.md" = {
-    source = ./config/commands/sq/spec-panel.md;
-  };
-  home.file."${qwenHome}/commands/sq/task.md" = {
-    source = ./config/commands/sq/task.md;
-  };
-  home.file."${qwenHome}/commands/sq/test.md" = {
-    source = ./config/commands/sq/test.md;
-  };
-  home.file."${qwenHome}/commands/sq/troubleshoot.md" = {
-    source = ./config/commands/sq/troubleshoot.md;
-  };
-  home.file."${qwenHome}/commands/sq/workflow.md" = {
-    source = ./config/commands/sq/workflow.md;
+  home.file."${qwenHome}/commands/sq/troubleshoot.toml" = {
+    source = ./config/commands/sq/troubleshoot.toml;
   };
 
   home.packages = with pkgs; [
