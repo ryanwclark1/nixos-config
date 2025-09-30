@@ -23,11 +23,11 @@ let
     pkgs.tmuxPlugins.mkTmuxPlugin
     {
       pluginName = "tmux-menus";
-      version = "v2.2.6";
+      version = "v2.2.22";
       src = pkgs.fetchFromGitHub {
         owner = "jaclu";
         repo = "tmux-menus";
-        tag = "v2.2.6";
+        tag = "v2.2.22";
         sha256 = "sha256-N2RMatxmpcbziiCfz0B1j6TfOpmZ4Bkx2kTdOs8R2ug=";
       };
       rtpFilePath = "plugin.sh.tmux";
@@ -58,19 +58,11 @@ in
   programs.tmux = {
     enable = true;
     package = pkgs.tmux;
-    plugins = [
-      pkgs.tmuxPlugins.better-mouse-mode
-      pkgs.tmuxPlugins.continuum
-      pkgs.tmuxPlugins.yank
+    plugins = with pkgs; [
+      tmuxPlugins.continuum
+      tmuxPlugins.yank
       # pkgs.tmuxPlugins.tmux-resurrect
-      pkgs.tmuxPlugins.tmux-fzf
-      {
-        plugin = tmux-menus;
-        extraConfig = ''
-          set -g @menus_trigger 'Space';
-          set -g @menus_config_file "~/.configs/tmux.conf"
-        '';
-      }
+      tmuxPlugins.tmux-fzf
     ];
     aggressiveResize = true;
     baseIndex = 1;
@@ -78,6 +70,7 @@ in
     customPaneNavigationAndResize = true; # Override the hjkl and HJKL bindings for pane navigation and resizing in VI mode.
     disableConfirmationPrompt = false;
     escapeTime = 0;
+    focusEvents = true;
     historyLimit = 50000;
     keyMode = "vi"; # emacs key bindings in tmux command prompt (prefix + :) are better than vi keys, even for vim users
     mouse = true;
@@ -92,6 +85,7 @@ in
     terminal = "tmux-256color";
     extraConfig =
     ''
+
       # emacs key bindings in tmux command prompt (prefix + :) are better than
       set -g detach-on-destroy off     # don't exit from tmux when closing a session
       set -g renumber-windows on       # renumber all windows when any window is closed
