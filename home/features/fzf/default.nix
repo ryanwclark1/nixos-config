@@ -93,8 +93,7 @@ in
     tmux = {
       enableShellIntegration = lib.mkIf config.programs.tmux.enable true;
       shellIntegrationOptions = [
-        "-p@@"
-        "80%,80%"
+        "-d 80%"
       ];
     };
 
@@ -119,7 +118,7 @@ in
     # Default --exclude options moved to fd configuration
     # Can explicitly state excludes in fd commands if desired
 
-    defaultCommand = "fd --hidden --follow";
+    defaultCommand = "fd --type f";
     defaultOptions = [
       "--height=40%"
       "--layout=reverse"
@@ -128,7 +127,7 @@ in
       "--ansi"
       "--tabstop=2"
       "--preview-window=right,60%,border-rounded"
-      "--preview=${previewScript} {}"
+      # "--preview=${previewScript}"
       "--multi"
       "--cycle"
       "--marker=▶"
@@ -137,28 +136,28 @@ in
 
       # --- Keybinds ---
       # Toggle preview with ctrl+/
-      "--bind=ctrl-/:toggle-preview"
-      "--bind=alt-p:change-preview-window(right,60%,border-rounded|down,40%,border-rounded)"
+      # "--bind=ctrl-/:toggle-preview"
+      # "--bind=alt-p:change-preview-window(right,60%,border-rounded|down,40%,border-rounded)"
       # Navigation
-      "--bind=ctrl-j:down"
-      "--bind=ctrl-k:up"
-      "--bind=ctrl-f:page-down"
-      "--bind=ctrl-b:page-up"
-      "--bind=ctrl-l:clear-query"
+      # "--bind=ctrl-j:down"
+      # "--bind=ctrl-k:up"
+      # "--bind=ctrl-f:page-down"
+      # "--bind=ctrl-b:page-up"
+      # "--bind=ctrl-l:clear-query"
       # Sorting (ctrl-s toggles between relevance and alphabetical)
-      "--bind=ctrl-s:toggle-sort"
+      # "--bind=ctrl-s:toggle-sort"
       # Select all with ctrl-a (more standard than alt-a)
-      "--bind=ctrl-a:select-all"
-      "--bind=ctrl-d:deselect-all"
+      # "--bind=ctrl-a:select-all"
+      # "--bind=ctrl-d:deselect-all"
       # Open in editor - using become to replace fzf process with nvim
-      "--bind=ctrl-o:become(nvim {+})"
+      # "--bind=ctrl-o:become(nvim \\{+\\})"  # Temporarily disabled due to placeholder issues
       # Copy to clipboard
-      "--bind=ctrl-y:execute-silent(echo {+} | wl-copy)"
+      # "--bind=ctrl-y:execute-silent(echo \\{+\\} | wl-copy)"  # Temporarily disabled due to placeholder issues
     ];
 
-    fileWidgetCommand = "fd --type f --hidden --follow";
+    fileWidgetCommand = "fd --type f";
     fileWidgetOptions = [
-      "--preview=${previewScript} {}"
+      # "--preview=${previewScript}"
 
       # --- Keybinds ---
       # Toggle preview with ctrl+/
@@ -176,16 +175,16 @@ in
       "--bind=ctrl-a:select-all"
       "--bind=ctrl-d:deselect-all"
       # Open in editor - using become to replace fzf process with nvim
-      "--bind=ctrl-o:become(nvim {+})"
+      # "--bind=ctrl-o:become(nvim \\{+\\})"  # Temporarily disabled due to placeholder issues
       # Copy to clipboard
-      "--bind=ctrl-y:execute-silent(echo {+} | wl-copy)"
+      # "--bind=ctrl-y:execute-silent(echo \\{+\\} | wl-copy)"  # Temporarily disabled due to placeholder issues
       # Reuse global binds; add one to open parent directory of selection
-      "--bind=alt-o:execute(cd $(dirname -- {q}) && $SHELL)"
+      # "--bind=alt-o:execute(cd $(dirname -- \\{q\\}) && $SHELL)"  # Temporarily disabled due to placeholder issues
     ];
 
-    changeDirWidgetCommand = "fd --type d --hidden --follow";
+    changeDirWidgetCommand = "fd --type d";
     changeDirWidgetOptions = [
-      "--preview=${previewScript} {}"
+      # "--preview=${previewScript}"
 
       # Navigation bindings consistent with other widgets
       "--bind=ctrl-j:down"
@@ -202,23 +201,24 @@ in
       "--bind=enter:accept"
     ];
 
-    historyWidgetOptions = [
-      # Keep shell order (recency)
-      "--no-sort"
-      "--tiebreak=index"
+    # historyWidgetOptions = [
+    #   # Keep shell order (recency)
+    #   "--no-sort"
+    #   "--tiebreak=index"
 
-      # Simple preview showing the command
-      "--preview=echo {}"
-      "--preview-window=up:3:wrap"
+    #   # Simple preview showing the command
+    #   "--preview=echo {}"
+    #   "--preview-window=up:3:wrap"
 
-      # Basic navigation
-      "--bind=ctrl-k:up"
-      "--bind=ctrl-j:down"
-      "--bind=ctrl-/:toggle-preview"
+    #   # Basic navigation
+    #   "--bind=ctrl-k:up"
+    #   "--bind=ctrl-j:down"
+    #   "--bind=ctrl-/:toggle-preview"
 
-      # Copy command to clipboard
-      "--bind=ctrl-y:execute-silent(echo -n {} | wl-copy)"
-    ];
+    #   # Copy command to clipboard
+    #   # "--bind=ctrl-y:execute-silent(echo -n \\{\\} | wl-copy)"  # Temporarily disabled due to placeholder issues
+    # ];
+
     enableBashIntegration = lib.mkIf config.programs.bash.enable true;
     enableFishIntegration = lib.mkIf config.programs.fish.enable true;
     enableZshIntegration = lib.mkIf config.programs.zsh.enable true;
