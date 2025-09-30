@@ -53,10 +53,4 @@
       allowUnfreePredicate = _: true;
     };
   };
-
-  # home.file = {
-  #   ".colorscheme".text = config.colorscheme.slug;
-  #   ".colorscheme.json".text = builtins.toJSON config.colorscheme;
-  # };
-
 }

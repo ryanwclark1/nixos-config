@@ -1,4 +1,8 @@
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  ...
+}:
 let
   inherit (lib) stringToCharacters reverseList imap0 foldl mod toLower;
   inherit (builtins) stringLength substring add;
@@ -50,7 +54,7 @@ let
       b = hexToDec (substring 4 2 hex);
     };
 
-  hexToRgba = hex: alpha:
+  hexToRGBA = hex: alpha:
     let rgb = hexToRGB hex;
     in "rgba(${toString rgb.r}, ${toString rgb.g}, ${toString rgb.b}, ${alpha})";
 
@@ -79,7 +83,8 @@ let
   base15 = "99d1db"; # sky - bright cyan
   base16 = "85c1dc"; # sapphire - bright blue
   base17 = "f4b8e4"; # pink - bright purple
-in {
+in
+{
   home.file.".config/waybar/colors.css" = {
     text = ''
       @define-color backgrounddark1 #${base00};
@@ -90,7 +95,7 @@ in {
       @define-color textcolor2 #FFFFFF;
       @define-color textcolor3 #FFFFFF;
       @define-color iconcolor #${base0E};
-      @define-color backgroundhex ${hexToRgba base00 "0.75"};
+      @define-color backgroundhex ${hexToRGBA base00 "0.75"};
 
     '';
     executable = false;
