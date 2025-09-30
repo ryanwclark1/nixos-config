@@ -28,76 +28,89 @@ This script will:
 EOF
 }
 
-# Get latest release from GitHub API
+# Get latest release from GitHub API that matches our version format
 get_latest_release() {
-    echo "Fetching latest release from GitHub API..." >&2
-    local latest_json
-    latest_json=$(curl -sf https://api.github.com/repos/google-gemini/gemini-cli/releases/latest) || {
-        echo "Error: Failed to fetch latest release" >&2
+    echo "Fetching latest compatible release from GitHub API..." >&2
+
+    # Get all release tag names and filter for valid semantic versions
+    local releases_tags
+    releases_tags=$(curl -sf https://api.github.com/repos/google-gemini/gemini-cli/releases | jq -r '.[].tag_name') || {
+        echo "Error: Failed to fetch releases" >&2
         return 1
     }
-    
-    local tag_name version published_at
-    tag_name=$(echo "$latest_json" | jq -r '.tag_name')
-    version=$(echo "$tag_name" | sed 's/^v//')
-    published_at=$(echo "$latest_json" | jq -r '.published_at' | cut -d'T' -f1)
-    
-    echo "Latest release: $version (published $published_at)" >&2
-    echo "$version"
+
+    # Process each tag to find the first valid semantic version
+    local found_version=""
+    local skipped_count=0
+
+    while IFS= read -r tag_name; do
+        local version
+        version=$(echo "$tag_name" | sed 's/^v//')
+
+        # Check if version matches our semantic versioning pattern
+        if [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            found_version="$version"
+            break
+        else
+            echo "Skipping incompatible version: $version" >&2
+            ((skipped_count++))
+        fi
+    done <<< "$releases_tags"
+
+    if [[ -z "$found_version" ]]; then
+        echo "Error: No compatible release found matching version format ^[0-9]+\.[0-9]+\.[0-9]+$" >&2
+        return 1
+    fi
+
+    # Get publication date for the found version
+    local published_at
+    published_at=$(curl -sf "https://api.github.com/repos/google-gemini/gemini-cli/releases/tags/v${found_version}" | jq -r '.published_at' | cut -d'T' -f1)
+
+    echo "Found compatible release: $found_version (published $published_at)" >&2
+    if [[ $skipped_count -gt 0 ]]; then
+        echo "Note: Skipped $skipped_count newer pre-release/beta versions" >&2
+    fi
+    echo "$found_version"
 }
 
-# Get hash for specific version
+# Get hash for specific version using nix-prefetch-github for fetchFromGitHub compatibility
 get_version_hash() {
     local version="$1"
-    
+
     echo "Calculating hash for version $version..." >&2
-    
+
     # Validate version format
     if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
         echo "Error: Invalid version format. Use semantic versioning (e.g., 0.3.0)" >&2
         return 1
     fi
-    
-    local url="https://github.com/google-gemini/gemini-cli/archive/v${version}.tar.gz"
-    
-    # Use nix-prefetch-url to get the store path and then hash it
-    local store_path sri_hash
-        store_path=$(nix-prefetch-url --print-path "$url" 2>/dev/null | grep '/nix/store' | head -n 1) || {
+
+    # Use nix-prefetch-github for fetchFromGitHub compatibility
+    local sri_hash
+    sri_hash=$(nix-prefetch-github google-gemini gemini-cli --rev "v${version}" 2>/dev/null | jq -r '.sha256') || {
         echo "Error: Failed to fetch or calculate hash for version $version" >&2
-        echo "URL: $url" >&2
         return 1
     }
-    
-    sri_hash=$(nix hash path --sri "$store_path") || {
-        echo "Error: Failed to convert path to SRI format" >&2
+
+    # Convert to SRI format
+    sri_hash=$(nix hash to-sri "sha256:$sri_hash") || {
+        echo "Error: Failed to convert to SRI format" >&2
         return 1
     }
-    
+
     echo "$sri_hash"
 }
 
 # Get npm dependencies hash for specific version
 get_npm_deps_hash() {
     local version="$1"
-    
+
     echo "Calculating npm dependencies hash for version $version..." >&2
-    
-    local url="https://raw.githubusercontent.com/google-gemini/gemini-cli/v${version}/package-lock.json"
-    
-    # Use nix-prefetch-url to get the store path and then hash it
-    local store_path sri_hash
-    store_path=$(nix-prefetch-url --print-path "$url" 2>/dev/null | grep '/nix/store' | head -n 1) || {
-        echo "Error: Failed to fetch or calculate hash for version $version" >&2
-        echo "URL: $url" >&2
-        return 1
-    }
-    
-    sri_hash=$(nix hash path --sri "$store_path") || {
-        echo "Error: Failed to convert path to SRI format" >&2
-        return 1
-    }
-    
-    echo "$sri_hash"
+    echo "Warning: npm deps hash calculation is complex - may need manual verification" >&2
+
+    # For now, return a placeholder that will need to be updated by build error
+    # This is because npmDepsHash calculation requires actually running the build
+    echo "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
 }
 
 # Update the override file (similar to how multiviewer outputs the result)
@@ -146,6 +159,7 @@ update_override_file() {
     echo "Updated Nix attributes:"
     cat "$output_file"
     echo ""
+    echo "Note: npm deps hash may need manual verification via build error messages."
     echo "Note: Patches from nixpkgs are preserved. If build fails, consider removing patches."
 }
 
