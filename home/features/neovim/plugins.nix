@@ -519,35 +519,69 @@
                     vim.keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts)
                   end
                   
-                  -- Set up handlers for automatic LSP configuration
-                  mason_lspconfig.setup_handlers({
-                    -- Default handler for all servers
-                    function(server_name)
-                      lspconfig[server_name].setup({
-                        capabilities = capabilities,
-                        on_attach = on_attach,
-                      })
-                    end,
-                    
-                    -- Custom configurations for specific servers
-                    ["lua_ls"] = function()
-                      lspconfig.lua_ls.setup({
-                        capabilities = capabilities,
-                        on_attach = on_attach,
-                        settings = {
-                          Lua = {
-                            runtime = { version = 'LuaJIT' },
-                            diagnostics = { globals = {'vim'} },
-                            workspace = {
-                              library = vim.api.nvim_get_runtime_file("", true),
-                              checkThirdParty = false,
+                  -- Check if setup_handlers function exists before calling it
+                  if mason_lspconfig.setup_handlers then
+                    -- Set up handlers for automatic LSP configuration
+                    mason_lspconfig.setup_handlers({
+                      -- Default handler for all servers
+                      function(server_name)
+                        lspconfig[server_name].setup({
+                          capabilities = capabilities,
+                          on_attach = on_attach,
+                        })
+                      end,
+
+                      -- Custom configurations for specific servers
+                      ["lua_ls"] = function()
+                        lspconfig.lua_ls.setup({
+                          capabilities = capabilities,
+                          on_attach = on_attach,
+                          settings = {
+                            Lua = {
+                              runtime = { version = 'LuaJIT' },
+                              diagnostics = { globals = {'vim'} },
+                              workspace = {
+                                library = vim.api.nvim_get_runtime_file("", true),
+                                checkThirdParty = false,
+                              },
+                              telemetry = { enable = false },
                             },
-                            telemetry = { enable = false },
                           },
-                        },
-                      })
-                    end,
-                  })
+                        })
+                      end,
+                    })
+                  else
+                    -- Fallback: manually configure common LSP servers
+                    vim.notify("setup_handlers not available, using manual LSP setup", vim.log.levels.WARN)
+
+                    -- Get list of installed servers
+                    local installed_servers = mason_lspconfig.get_installed_servers()
+
+                    for _, server_name in ipairs(installed_servers) do
+                      if server_name == "lua_ls" then
+                        lspconfig.lua_ls.setup({
+                          capabilities = capabilities,
+                          on_attach = on_attach,
+                          settings = {
+                            Lua = {
+                              runtime = { version = 'LuaJIT' },
+                              diagnostics = { globals = {'vim'} },
+                              workspace = {
+                                library = vim.api.nvim_get_runtime_file("", true),
+                                checkThirdParty = false,
+                              },
+                              telemetry = { enable = false },
+                            },
+                          },
+                        })
+                      else
+                        lspconfig[server_name].setup({
+                          capabilities = capabilities,
+                          on_attach = on_attach,
+                        })
+                      end
+                    end
+                  end
                 end, 100)
               end,
             })
