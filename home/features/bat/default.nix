@@ -31,8 +31,4 @@
     # configured in shell/common.nix
   };
 
-  # home.file.".config/bat/themes/test.tmTheme" = {
-  #   source = ./test.tmTheme;
-  #   executable = false;
-  # };
 }

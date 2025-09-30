@@ -1,2 +1,2 @@
-version = "0.5.4";
-hash = "sha256-iVwdDIwIvrYZpDvVc5Xy32A4o0B3EVQl6gh1blmqGbI=";
+version = "0.6.1";
+hash = "sha256-1QeVFPl6IH1iQFxrDZ0U8eTeLd+fIgSw1CkAiSGaL/s=";
