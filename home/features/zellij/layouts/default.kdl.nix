@@ -1,5 +1,5 @@
 {
-
+  ...
 }:
 
 {
@@ -20,7 +20,7 @@
     '';
   };
 
-  home.file.".config/zellij/layouts/default.kdl" = {
+  home.file.".config/zellij/layouts/rustexample.kdl" = {
     text = ''
       layout {
         default_tab_template {

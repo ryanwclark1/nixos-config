@@ -47,15 +47,19 @@ let
       decimals = imap0 (i: c: base16To10 i (hexCharToDec c)) reversed;
     in foldl add 0 decimals;
 
-  hexToRGB = hex:
+  hexToRGBMap = hex:
     {
       r = hexToDec (substring 0 2 hex);
       g = hexToDec (substring 2 2 hex);
       b = hexToDec (substring 4 2 hex);
     };
 
+  hexToRGB = hex:
+    let rgb = hexToRGBMap hex;
+    in "${toString rgb.r} ${toString rgb.g} ${toString rgb.b}";
+
   hexToRGBA = hex: alpha:
-    let rgb = hexToRGB hex;
+    let rgb = hexToRGBMap hex;
     in "rgba(${toString rgb.r}, ${toString rgb.g}, ${toString rgb.b}, ${alpha})";
 
 
@@ -90,124 +94,123 @@ in
       themes {
         theme {
           text_unselected {
-            base ${hexToRGB base05}.r ${hexToRGB base05}.g ${hexToRGB base05}.b;
-            background ${hexToRGB base00}.r ${hexToRGB base00}.g ${hexToRGB base00}.b;
-            emphasis_0 ${hexToRGB base09}.r ${hexToRGB base09}.g ${hexToRGB base09}.b;
-            emphasis_1 ${hexToRGB base15}.r ${hexToRGB base15}.g ${hexToRGB base15}.b;
-            emphasis_2 ${hexToRGB base0B}.r ${hexToRGB base0B}.g ${hexToRGB base0B}.b;
-            emphasis_3 ${hexToRGB base17}.r ${hexToRGB base17}.g ${hexToRGB base17}.b;
+            base ${hexToRGB base05}
+            background ${hexToRGB base00}
+            emphasis_0 ${hexToRGB base09}
+            emphasis_1 ${hexToRGB base15}
+            emphasis_2 ${hexToRGB base0B}
+            emphasis_3 ${hexToRGB base17}
           }
           text_selected {
-            base ${hexToRGB base05}.r ${hexToRGB base05}.g ${hexToRGB base05}.b;
-            background ${hexToRGB base04}.r ${hexToRGB base04}.g ${hexToRGB base04}.b;
-            emphasis_0 ${hexToRGB base09}.r ${hexToRGB base09}.g ${hexToRGB base09}.b;
-            emphasis_1   ${hexToRGB base15}.r ${hexToRGB base15}.g ${hexToRGB base15}.b;
-            emphasis_2 ${hexToRGB base0B}.r ${hexToRGB base0B}.g ${hexToRGB base0B}.b;
-            emphasis_3 ${hexToRGB base17}.r ${hexToRGB base17}.g ${hexToRGB base17}.b;
+            base ${hexToRGB base05}
+            background ${hexToRGB base04}
+            emphasis_0 ${hexToRGB base09}
+            emphasis_1   ${hexToRGB base15}
+            emphasis_2 ${hexToRGB base0B}
+            emphasis_3 ${hexToRGB base17}
           }
           ribbon_selected {
-            base ${hexToRGB base10}.r ${hexToRGB base10}.g ${hexToRGB base10}.b;
-            background ${hexToRGB base0B}.r ${hexToRGB base0B}.g ${hexToRGB base0B}.b;
-            emphasis_0 ${hexToRGB base08}.r ${hexToRGB base08}.g ${hexToRGB base08}.b;
-            emphasis_1 ${hexToRGB base09}.r ${hexToRGB base09}.g ${hexToRGB base09}.b;
-            emphasis_2 ${hexToRGB base17}.r ${hexToRGB base17}.g ${hexToRGB base17}.b;
-            emphasis_3 ${hexToRGB base0D}.r ${hexToRGB base0D}.g ${hexToRGB base0D}.b;
+            base ${hexToRGB base10}
+            background ${hexToRGB base0B}
+            emphasis_0 ${hexToRGB base08}
+            emphasis_1 ${hexToRGB base09}
+            emphasis_2 ${hexToRGB base17}
+            emphasis_3 ${hexToRGB base0D}
           }
           ribbon_unselected {
-            base ${hexToRGB base10}.r ${hexToRGB base10}.g ${hexToRGB base10}.b;
-            background ${hexToRGB base05}.r ${hexToRGB base05}.g ${hexToRGB base05}.b;
-            emphasis_0 ${hexToRGB base08}.r ${hexToRGB base08}.g ${hexToRGB base08}.b;
-            emphasis_1 ${hexToRGB base05}.r ${hexToRGB base05}.g ${hexToRGB base05}.b;
-            emphasis_2 ${hexToRGB base0D}.r ${hexToRGB base0D}.g ${hexToRGB base0D}.b;
-            emphasis_3 ${hexToRGB base17}.r ${hexToRGB base17}.g ${hexToRGB base17}.b;
+            base ${hexToRGB base10}
+            background ${hexToRGB base05}
+            emphasis_0 ${hexToRGB base08}
+            emphasis_1 ${hexToRGB base05}
+            emphasis_2 ${hexToRGB base0D}
+            emphasis_3 ${hexToRGB base17}
           }
           table_title {
-            base ${hexToRGB base0B}.r ${hexToRGB base0B}.g ${hexToRGB base0B}.b;
+            base ${hexToRGB base0B}
             background 0
-            emphasis_0 ${hexToRGB base09}.r ${hexToRGB base09}.g ${hexToRGB base09}.b;
-            emphasis_1   ${hexToRGB base15}.r ${hexToRGB base15}.g ${hexToRGB base15}.b;
-            emphasis_2 ${hexToRGB base0B}.r ${hexToRGB base0B}.g ${hexToRGB base0B}.b;
-            emphasis_3 ${hexToRGB base17}.r ${hexToRGB base17}.g ${hexToRGB base17}.b;
+            emphasis_0 ${hexToRGB base09}
+            emphasis_1 ${hexToRGB base15}
+            emphasis_2 ${hexToRGB base0B}
+            emphasis_3 ${hexToRGB base17}
           }
           table_cell_selected {
-            base ${hexToRGB base05}.r ${hexToRGB base05}.g ${hexToRGB base05}.b;
-            background ${hexToRGB base04}.r ${hexToRGB base04}.g ${hexToRGB base04}.b;
-            emphasis_0 ${hexToRGB base09}.r ${hexToRGB base09}.g ${hexToRGB base09}.b;
-            emphasis_1   ${hexToRGB base15}.r ${hexToRGB base15}.g ${hexToRGB base15}.b;
-            emphasis_2 ${hexToRGB base0B}.r ${hexToRGB base0B}.g ${hexToRGB base0B}.b;
-            emphasis_3 ${hexToRGB base17}.r ${hexToRGB base17}.g ${hexToRGB base17}.b;
+            base ${hexToRGB base05}
+            background ${hexToRGB base04}
+            emphasis_0 ${hexToRGB base09}
+            emphasis_1 ${hexToRGB base15}
+            emphasis_2 ${hexToRGB base0B}
+            emphasis_3 ${hexToRGB base17}
           }
           table_cell_unselected {
-            base ${hexToRGB base05}.r ${hexToRGB base05}.g ${hexToRGB base05}.b;
-            background ${hexToRGB base10}.r ${hexToRGB base10}.g ${hexToRGB base10}.b;
-            emphasis_0 ${hexToRGB base09}.r ${hexToRGB base09}.g ${hexToRGB base09}.b;
-            emphasis_1   ${hexToRGB base15}.r ${hexToRGB base15}.g ${hexToRGB base15}.b;
-            emphasis_2 ${hexToRGB base0B}.r ${hexToRGB base0B}.g ${hexToRGB base0B}.b;
-            emphasis_3 ${hexToRGB base17}.r ${hexToRGB base17}.g ${hexToRGB base17}.b;
+            base ${hexToRGB base05}
+            background ${hexToRGB base10}
+            emphasis_0 ${hexToRGB base09}
+            emphasis_1 ${hexToRGB base15}
+            emphasis_2 ${hexToRGB base0B}
+            emphasis_3 ${hexToRGB base17}
           }
           list_selected {
-            base ${hexToRGB base05}.r ${hexToRGB base05}.g ${hexToRGB base05}.b;
-            background ${hexToRGB base04}.r ${hexToRGB base04}.g ${hexToRGB base04}.b;
-            emphasis_0 ${hexToRGB base09}.r ${hexToRGB base09}.g ${hexToRGB base09}.b;
-            emphasis_1   ${hexToRGB base15}.r ${hexToRGB base15}.g ${hexToRGB base15}.b;
-            emphasis_2 ${hexToRGB base0B}.r ${hexToRGB base0B}.g ${hexToRGB base0B}.b;
-            emphasis_3 ${hexToRGB base17}.r ${hexToRGB base17}.g ${hexToRGB base17}.b;
+            base ${hexToRGB base05}
+            background ${hexToRGB base04}
+            emphasis_0 ${hexToRGB base09}
+            emphasis_1 ${hexToRGB base15}
+            emphasis_2 ${hexToRGB base0B}
+            emphasis_3 ${hexToRGB base17}
           }
           list_unselected {
-            base ${hexToRGB base05}.r ${hexToRGB base05}.g ${hexToRGB base05}.b;
-            background ${hexToRGB base10}.r ${hexToRGB base10}.g ${hexToRGB base10}.b;
-            emphasis_0 ${hexToRGB base09}.r ${hexToRGB base09}.g ${hexToRGB base09}.b;
-            emphasis_1   ${hexToRGB base15}.r ${hexToRGB base15}.g ${hexToRGB base15}.b;
-            emphasis_2 ${hexToRGB base0B}.r ${hexToRGB base0B}.g ${hexToRGB base0B}.b;
-            emphasis_3 ${hexToRGB base17}.r ${hexToRGB base17}.g ${hexToRGB base17}.b;
+            base ${hexToRGB base05}
+            background ${hexToRGB base10}
+            emphasis_0 ${hexToRGB base09}
+            emphasis_1 ${hexToRGB base15}
+            emphasis_2 ${hexToRGB base0B}
+            emphasis_3 ${hexToRGB base17}
           }
           frame_selected {
-            base ${hexToRGB base0B}.r ${hexToRGB base0B}.g ${hexToRGB base0B}.b;
+            base ${hexToRGB base0B}
             background 0
-            emphasis_0 ${hexToRGB base09}.r ${hexToRGB base09}.g ${hexToRGB base09}.b;
-            emphasis_1   ${hexToRGB base15}.r ${hexToRGB base15}.g ${hexToRGB base15}.b;
-            emphasis_2 ${hexToRGB base17}.r ${hexToRGB base17}.g ${hexToRGB base17}.b;
+            emphasis_0 ${hexToRGB base09}
+            emphasis_1   ${hexToRGB base15}
+            emphasis_2 ${hexToRGB base17}
             emphasis_3 0
           }
           frame_highlight {
-            base ${hexToRGB base09}.r ${hexToRGB base09}.g ${hexToRGB base09}.b;
+            base ${hexToRGB base09}
             background 0
-            emphasis_0 ${hexToRGB base17}.r ${hexToRGB base17}.g ${hexToRGB base17}.b;
-            emphasis_1 ${hexToRGB base09}.r ${hexToRGB base09}.g ${hexToRGB base09}.b;
-            emphasis_2 ${hexToRGB base09}.r ${hexToRGB base09}.g ${hexToRGB base09}.b;
-            emphasis_3 ${hexToRGB base09}.r ${hexToRGB base09}.g ${hexToRGB base09}.b;
+            emphasis_0 ${hexToRGB base17}
+            emphasis_1 ${hexToRGB base09}
+            emphasis_2 ${hexToRGB base09}
+            emphasis_3 ${hexToRGB base09}
           }
           exit_code_success {
-            base ${hexToRGB base0B}.r ${hexToRGB base0B}.g ${hexToRGB base0B}.b;
+            base ${hexToRGB base0B}
             background 0
-            emphasis_0   ${hexToRGB base15}.r ${hexToRGB base15}.g ${hexToRGB base15}.b;
-            emphasis_1 ${hexToRGB base10}.r ${hexToRGB base10}.g ${hexToRGB base10}.b;
-            emphasis_2 ${hexToRGB base17}.r ${hexToRGB base17}.g ${hexToRGB base17}.b;
-            emphasis_3 ${hexToRGB base0D}.r ${hexToRGB base0D}.g ${hexToRGB base0D}.b;
+            emphasis_0   ${hexToRGB base15}
+            emphasis_1 ${hexToRGB base10}
+            emphasis_2 ${hexToRGB base17}
+            emphasis_3 ${hexToRGB base0D}
           }
           exit_code_error {
-            base ${hexToRGB base08}.r ${hexToRGB base08}.g ${hexToRGB base08}.b;
+            base ${hexToRGB base08}
             background 0
-            emphasis_0 ${hexToRGB base0A}.r ${hexToRGB base0A}.g ${hexToRGB base0A}.b;
+            emphasis_0 ${hexToRGB base0A}
             emphasis_1 0
             emphasis_2 0
             emphasis_3 0
           }
           multiplayer_user_colors {
-            player_1 ${hexToRGB base17}.r ${hexToRGB base17}.g ${hexToRGB base17}.b;
-            player_2 ${hexToRGB base0D}.r ${hexToRGB base0D}.g ${hexToRGB base0D}.b;
+            player_1 ${hexToRGB base17}
+            player_2 ${hexToRGB base0D}
             player_3 0
-            player_4 ${hexToRGB base0A}.r ${hexToRGB base0A}.g ${hexToRGB base0A}.b;
-            player_5   ${hexToRGB base15}.r ${hexToRGB base15}.g ${hexToRGB base15}.b;
+            player_4 ${hexToRGB base0A}
+            player_5 ${hexToRGB base15}
             player_6 0
-            player_7 ${hexToRGB base08}.r ${hexToRGB base08}.g ${hexToRGB base08}.b;
+            player_7 ${hexToRGB base08}
             player_8 0
             player_9 0
             player_10 0
           }
         }
       }
-
     '';
     executable = false;
   };
