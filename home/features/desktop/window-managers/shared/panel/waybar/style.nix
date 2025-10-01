@@ -47,15 +47,19 @@ let
       decimals = imap0 (i: c: base16To10 i (hexCharToDec c)) reversed;
     in foldl add 0 decimals;
 
-  hexToRGB = hex:
+  hexToRGBMap = hex:
     {
       r = hexToDec (substring 0 2 hex);
       g = hexToDec (substring 2 2 hex);
       b = hexToDec (substring 4 2 hex);
     };
 
+  hexToRGB = hex:
+    let rgb = hexToRGBMap hex;
+    in "${toString rgb.r} ${toString rgb.g} ${toString rgb.b}";
+
   hexToRGBA = hex: alpha:
-    let rgb = hexToRGB hex;
+    let rgb = hexToRGBMap hex;
     in "rgba(${toString rgb.r}, ${toString rgb.g}, ${toString rgb.b}, ${alpha})";
 
 
