@@ -18,7 +18,7 @@ in
   ];
 
   accounts.email = {
-    basePath = "${config.home.homeDirectory}/Maildir";
+    maildirBasePath = "${config.home.homeDirectory}/Maildir";
     accounts.accent = {
       enable = true;
       primary = true;
