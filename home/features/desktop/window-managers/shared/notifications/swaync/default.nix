@@ -11,39 +11,44 @@
     enable = true;
     settings = {
       positionX = "right";
-      layer = "overlay";
-      layer-shell = true;
-      layer-shell-cover-screen = false;
-      cssPriority = "application";
       positionY = "top";
-      control-center-positionX = "right";
-      control-center-positionY = "top";
-      control-center-margin-top = 13;
-      control-center-margin-bottom = 0;
-      control-center-margin-right = 14;
-      control-center-margin-left = 0;
-      control-center-layer = "top";
-      control-center-exclusive-zone = true;
-      notification-2fa-action = true;
-      notification-inline-replies = false;
-      notification-icon-size = 48;
+
+      control-center-positionX = "none";
+      control-center-positionY = "none";
+      control-center-margin-top = 8;
+      control-center-margin-bottom = 8;
+      control-center-margin-right = 8;
+      control-center-margin-left = 8;
+      control-center-width = 500;
+      control-center-height = -1;
+
+      fit-to-screen = false;
+
+      layer-shell-cover-screen = true;
+      layer-shell = true;
+      layer = "overlay";
+
+      control-center-layer = "overlay";
+
+      cssPriority = "application";
+
       notification-body-image-height = 100;
       notification-body-image-width = 200;
+      notification-inline-replies = true;
       timeout = 10;
       timeout-low = 5;
       timeout-critical = 0;
       notification-window-width = 500;
-      fit-to-screen = false;
-      relative-timestamps = true;
-      control-center-height = 600;
-      control-center-width = 400;
       keyboard-shortcuts = true;
-      image-visibility = "when-available";
+      image-visibility = "always";
+
       transition-time = 200;
-      hide-on-clear = false;
+      hide-on-clear = true;
       hide-on-action = true;
-      text-empty = "No notifications";
       script-fail-notify = true;
+
+      notification-2fa-action = true;
+
       widgets = [
         "inhibitors"
         "dnd"
@@ -53,7 +58,16 @@
         "title"
         "notifications"
       ];
+
       widget-config = {
+        "notifications": {
+          "vexpand": false
+        },
+        inhibitors = {
+          text = "Inhibitors";
+          clear-all-button = true;
+          button-text = "Clear All";
+        };
         title = {
           text = "Notifications";
           clear-all-button = true;
@@ -63,11 +77,11 @@
           text = "Do Not Disturb";
         };
         label = {
-          max-lines = 1;
-          text = "Notification";
+          max-lines = 5;
+          text = "Lavel Text";
         };
         mpris = {
-          image-size = 96;
+          autohide = true
         };
         volume = {
           label = "󰕾 ";
@@ -103,11 +117,6 @@
               command = "bash -c $HOME/.config/hypr/scripts/system/hypr-utils.sh wlogout";
             }
           ];
-        };
-        inhibitors = {
-          text = "Inhibitors";
-          clear-all-button = true;
-          button-text = "Clear All";
         };
       };
     };
