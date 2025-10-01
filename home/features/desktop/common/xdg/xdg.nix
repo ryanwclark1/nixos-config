@@ -47,7 +47,9 @@
       templates = "${config.home.homeDirectory}/Templates";
       videos = "${config.home.homeDirectory}/Videos";
       extraConfig = {
-        XDG_MAIL_DIR = "${config.home.homeDirectory}/Mail";
+        XDG_MAIL_DIR = "${config.home.homeDirectory}/Maildir";
+        XDG_CONTACT_DIR = "${config.home.homeDirectory}/Contacts";
+        XDG_CALENDAR_DIR = "${config.home.homeDirectory}/Calendars";
         XDG_SCREENSHOTS_DIR = "${config.xdg.userDirs.pictures}/Screenshots";
         XDG_SCREENCAST_DIR = "${config.xdg.userDirs.videos}/Screencast";
         XDG_CODE_DIR = "${config.home.homeDirectory}/Code";
