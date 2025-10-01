@@ -36,9 +36,9 @@ in {
 
       [storage contacts_remote]
       type = "carddav"
-      url = ""
-      username = ""
-      password.fetch = ["command", "${pass}", "/"]
+      url = "https://outlook.office365.com/dav/ryanc@accentvoice.com/contacts/"
+      username = "ryanc@accentvoice.com"
+      password.fetch = ["command", "${pass}", "smtp.office365.com/ryanc@accentvoice.com"]
 
       [pair calendars]
       a = "calendars_local"
@@ -54,9 +54,9 @@ in {
 
       [storage calendars_remote]
       type = "caldav"
-      url = ""
-      username = ""
-      password.fetch = ["command", "${pass}", "/"]
+      url = "https://outlook.office365.com/dav/ryanc@accentvoice.com/calendar/"
+      username = "ryanc@accentvoice.com"
+      password.fetch = ["command", "${pass}", "smtp.office365.com/ryanc@accentvoice.com"]
     '';
 
   systemd.user.services.vdirsyncer = {
