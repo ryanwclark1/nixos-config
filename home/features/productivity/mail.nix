@@ -17,84 +17,87 @@ in
     oama
   ];
 
-  accounts.email.accounts.accent = {
-    enable = true;
-    primary = true;
-    flavor = "outlook.office365.com";
-    address = "ryanc@accentvoice.com";
-    userName = "ryanc@accentvoice.com";
-    realName = "Ryan Clark";
-    signature = {
-      delimiter = "----";
-      text = ''
-      Ryan Clark
-      ryanc@accentvoice.com
-      Accent Voice
-      www.accentvoice.com
-    '';
-    };
-    # folders = {
-    #   inbox = "Inbox";
-    #   drafts = "Drafts";
-    #   sent = "Sent";
-    #   trash = "Trash";
-    # };
-    # Use oama with Thunderbird micrsoft client id
-    passwordCommand = "${pkgs.oama}/bin/oama access ryanc@accentvoice.com";
-    # smtp = {
-    #   host = "smtp-mail.outlook.com";
-    #   port = 587;
-    #   tls = {
-    #     enable = true;
-    #     useStartTls = true;
-    #   };
-    # };
-
-    # imap = {
-    #   host = "outlook.office365.com";
-    #   port = 993;
-    #   tls.enable = true;
-    # };
-
-    # neomutt is the default email client in NixOS
-    neomutt = {
+  accounts.email = {
+    basePath = "${config.home.homeDirectory}/Maildir";
+    accounts.accent = {
       enable = true;
-      # settings = {};
-    };
-
-    msmtp = {
-      enable = true;
-      extraConfig = {
-
+      primary = true;
+      flavor = "outlook.office365.com";
+      address = "ryanc@accentvoice.com";
+      userName = "ryanc@accentvoice.com";
+      realName = "Ryan Clark";
+      signature = {
+        delimiter = "----";
+        text = ''
+        Ryan Clark
+        ryanc@accentvoice.com
+        Accent Voice
+        www.accentvoice.com
+      '';
       };
-    };
+      # folders = {
+      #   inbox = "Inbox";
+      #   drafts = "Drafts";
+      #   sent = "Sent";
+      #   trash = "Trash";
+      # };
+      # Use oama with Thunderbird micrsoft client id
+      passwordCommand = "${pkgs.oama}/bin/oama access ryanc@accentvoice.com";
+      # smtp = {
+      #   host = "smtp-mail.outlook.com";
+      #   port = 587;
+      #   tls = {
+      #     enable = true;
+      #     useStartTls = true;
+      #   };
+      # };
 
-    mbsync = {
-      enable = true;
-      create = "both";
-      # expunge = "both";
-      extraConfig.account = {
-        AuthMechs = "XOAUTH2";
+      # imap = {
+      #   host = "outlook.office365.com";
+      #   port = 993;
+      #   tls.enable = true;
+      # };
+
+      # neomutt is the default email client in NixOS
+      neomutt = {
+        enable = true;
+        # settings = {};
       };
 
-      patterns = [ "*" ];
-      # extraConfig = {};
-    };
+      msmtp = {
+        enable = true;
+        extraConfig = {
 
-    imapnotify = {
-      enable = true;
-      # settings = {};
-    };
+        };
+      };
 
-    # himalaya = {
-      # enable = true;
-      # settings = {};
-    # };
+      mbsync = {
+        enable = true;
+        create = "both";
+        # expunge = "both";
+        extraConfig.account = {
+          AuthMechs = "XOAUTH2";
+        };
 
-    gpg = {
-      key = "4BB841BD1D5E3903";
-      signByDefault = true;
-      encryptByDefault = false;
+        patterns = [ "*" ];
+        # extraConfig = {};
+      };
+
+      imapnotify = {
+        enable = true;
+        # settings = {};
+      };
+
+      # himalaya = {
+        # enable = true;
+        # settings = {};
+      # };
+
+      gpg = {
+        key = "4BB841BD1D5E3903";
+        signByDefault = true;
+        encryptByDefault = false;
+      };
     };
   };
 
