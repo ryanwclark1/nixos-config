@@ -2,8 +2,6 @@
   ...
 }:
 
-
-
 {
   imports = [ ./style.css.nix ];
 
@@ -24,13 +22,13 @@
 
       fit-to-screen = false;
 
-      layer-shell-cover-screen = true;
+      layer-shell-cover-screen = false;
       layer-shell = true;
       layer = "overlay";
 
       control-center-layer = "overlay";
 
-      cssPriority = "application";
+      cssPriority = "user";
 
       notification-body-image-height = 100;
       notification-body-image-width = 200;
@@ -60,9 +58,9 @@
       ];
 
       widget-config = {
-        "notifications": {
-          "vexpand": false
-        },
+        notifications = {
+          vexpand = false;
+        };
         inhibitors = {
           text = "Inhibitors";
           clear-all-button = true;
@@ -81,7 +79,7 @@
           text = "Lavel Text";
         };
         mpris = {
-          autohide = true
+          autohide = true;
         };
         volume = {
           label = "󰕾 ";
