@@ -15,7 +15,7 @@
   # Core desktop dependencies - other packages moved to appropriate feature directories
   home.packages = with pkgs; [
     cairo # Graphics library (required by desktop components)
-    libsoup_3 # HTTP library (required by desktop components) 
+    libsoup_3 # HTTP library (required by desktop components)
     webkitgtk_6_0 # Web rendering engine (required by desktop components)
 
     # Audio utility scripts
@@ -48,6 +48,7 @@
       executable = true;
     };
 
+    # TODO: Relocate
     # Rofi scripts (common across window managers)
     ".local/bin/scripts/rofi" = {
       source = ./scripts/rofi;
