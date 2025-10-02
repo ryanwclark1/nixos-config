@@ -45,6 +45,7 @@ die() {
 # -------- Helpers --------
 has() {
   local o verbose=0 c
+  local OPTIND=1        # <<< reset OPTIND for getopts in this function
   while getopts 'v' o; do
     case "$o" in v) verbose=1 ;; esac
   done
@@ -55,10 +56,12 @@ has() {
       return 1
     fi
   done
+  return 0
 }
 
 select_from() {
   local o cmd='command -v' c
+  local OPTIND=1        # <<< reset OPTIND for getopts in this function
   while getopts 'c:' o; do
     case "$o" in
       c) cmd="$OPTARG" ;;
@@ -112,13 +115,16 @@ fi
 [[ -z "$cmd" ]] && die "No suitable editor found."
 
 # Search Tool
-if [[ -v FV_SEARCH ]]; then
+if [[ -v FV_SEARCH && -n "$FV_SEARCH" ]]; then
   search_cmd="$FV_SEARCH"
 else
   search_cmd=$(select_from 'rg' 'ag' 'ack' 'grep')
 fi
 [[ -z "$search_cmd" ]] && die "No search tool found (install rg/ag/ack/grep)"
-[[ "$search_cmd" == "grep" ]] && err "Warning: grep is slow. Consider installing rg or ag." && sleep .75
+if [[ "$search_cmd" == "grep" ]]; then
+  err "Warning: grep is slow. Consider installing rg or ag."
+  sleep .75
+fi
 
 # Input
 if [[ -n "$1" ]]; then
@@ -155,7 +161,7 @@ case "$search_cmd" in
     if [[ -z "$allfiles" ]]; then
       if [[ -r ~/.ignore ]]; then
         while read -r line; do
-          search_opts+=( "--exclude-dir=$line" )
+          [[ -n "$line" ]] && search_opts+=( "--exclude-dir=$line" )
         done < ~/.ignore
       else
         search_opts+=( '--exclude-dir={bower_components,node_modules,jspm_packages,.cvs,.git,.hg,.svn}' )
@@ -173,7 +179,9 @@ main() {
   preview=$(get_preview_command)
 
   choices=$($search_cmd "${search_opts[@]}" 2> /dev/null |
-    fzf --ansi --multi --preview="[[ \$(file -ib {}) == text/* ]] && $preview {} || echo 'Binary file'" --preview-window=right:60%) || return 1
+    fzf --ansi --multi \
+        --preview="[[ \$(file -ib {}) == text/* ]] && $preview {} || echo 'Binary file'" \
+        --preview-window=right:60%) || return 1
 
   # Handle results
   [[ "$search_str" != '' && "$search_cmd" == 'ag' ]] && choices=$(cut -d: -f1 <<< "$choices")
@@ -181,16 +189,16 @@ main() {
   mapfile -t choices <<< "$choices"
   [[ ${#choices[@]} -eq 0 ]] && return 1
 
-  if [[ $dtach ]]; then
-    ($cmd "${cmdopts[@]}" "${choices[@]}" &> /dev/null &)
+  if [[ -n "$dtach" ]]; then
+    ( "$cmd" "${cmdopts[@]}" "${choices[@]}" &> /dev/null & )
   else
-    $cmd "${cmdopts[@]}" "${choices[@]}"
+    "$cmd" "${cmdopts[@]}" "${choices[@]}"
   fi
 }
 
 # -------- Loop Mode --------
 if [[ -n "$loop" ]]; then
-  while main; do true; done
+  while main; do :; done
 else
   main
 fi
