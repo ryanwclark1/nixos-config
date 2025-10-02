@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
-set -eo pipefail
+set -euo pipefail
+
+# Ensure we are actually running under Bash (not sh/zsh/ash)
+if [[ -z "${BASH_VERSION:-}" ]]; then
+  echo "[ERROR] This script must be run with bash" >&2
+  exit 1
+fi
 
 # Colors for better readability
 readonly RED='\033[0;31m'
@@ -31,17 +37,19 @@ warn() {
 }
 
 has() {
-  local v c
-  if [[ $1 = '-v' ]]; then
+  local v=0 c
+  if [[ ${1:-} == '-v' ]]; then
     v=1
     shift
   fi
-  for c; do c="${c%% *}"
+  for c; do
+    c="${c%% *}"
     if ! command -v "$c" &> /dev/null; then
       (( v > 0 )) && err "$c not found"
       return 1
     fi
   done
+  return 0
 }
 
 # Check dependencies
@@ -77,9 +85,11 @@ helptext[compose]='Manage Docker Compose projects'
 subcmd_help() {
   local formattedhelptext
 
-  formattedhelptext=$(for c in "${subcmds_avail[@]}"; do
-    printf "  ${GREEN}%-10s${NC}%s\n" "$c" "${helptext[$c]}"
-  done)
+  formattedhelptext=$(
+    for c in "${subcmds_avail[@]}"; do
+      printf "  ${GREEN}%-10s${NC}%s\n" "$c" "${helptext[$c]}"
+    done
+  )
 
   cat <<-HELP
 ${BLUE}Docker FZF Interactive CLI${NC}
@@ -143,23 +153,26 @@ subcmd_logs() {
   local header="${GREEN}<Enter>${NC} follow logs, ${YELLOW}<Ctrl-A>${NC} all logs, ${GREEN}<Ctrl-T>${NC} tail, ${BLUE}<Ctrl-S>${NC} search"
 
   # First select container
-  local container=$(docker ps -a --format "{{.ID}}\t{{.Names}}\t{{.Status}}" |
-    fzf --header="Select container to view logs" --height=50% --reverse |
-    awk '{print $1}')
+  local container
+  container=$(
+    docker ps -a --format "{{.ID}}\t{{.Names}}\t{{.Status}}" |
+      fzf --header="Select container to view logs" --height=50% --reverse |
+      awk '{print $1}'
+  )
 
-  [[ -z "$container" ]] && return 0
+  [[ -z "${container:-}" ]] && return 0
 
   # Then view logs with options
   docker logs --tail 100 "$container" |
-  fzf \
-    --bind="enter:execute:docker logs -f $container | less +F" \
-    --bind="ctrl-a:execute:docker logs $container | less" \
-    --bind="ctrl-t:execute:read -p 'How many lines to tail? ' n && docker logs --tail \$n $container | less" \
-    --bind="ctrl-s:execute:read -p 'Search term: ' s && docker logs $container | grep -i \"\$s\" | less" \
-    --header="$header" \
-    --reverse \
-    --height=100% \
-    --ansi
+    fzf \
+      --bind="enter:execute:docker logs -f $container | less +F" \
+      --bind="ctrl-a:execute:docker logs $container | less" \
+      --bind="ctrl-t:execute:read -p 'How many lines to tail? ' n && docker logs --tail \$n $container | less" \
+      --bind="ctrl-s:execute:read -p 'Search term: ' s && docker logs $container | grep -i \"\$s\" | less" \
+      --header="$header" \
+      --reverse \
+      --height=100% \
+      --ansi
 }
 
 # Images management command
@@ -245,15 +258,18 @@ subcmd_exec() {
   fi
 
   # First select container
-  local container=$(docker ps --format "{{.ID}}\t{{.Names}}\t{{.Image}}" |
-    fzf --header="Select container to execute command in" --height=50% --reverse |
-    awk '{print $1}')
+  local container
+  container=$(
+    docker ps --format "{{.ID}}\t{{.Names}}\t{{.Image}}" |
+      fzf --header="Select container to execute command in" --height=50% --reverse |
+      awk '{print $1}'
+  )
 
-  [[ -z "$container" ]] && return 0
+  [[ -z "${container:-}" ]] && return 0
 
   # Then get command to execute
   local cmd
-  read -p "Command to execute (default: sh): " cmd
+  read -rp "Command to execute (default: sh): " cmd
   cmd=${cmd:-sh}
 
   # Execute command
@@ -263,12 +279,12 @@ subcmd_exec() {
 # Docker Compose command
 subcmd_compose() {
   local header_lines=1
-  local compose_files=()
+  local -a compose_files=()
 
-  # Find docker-compose files in current directory
+  # Find docker-compose files in current directory (grouped names)
   while IFS= read -r file; do
     compose_files+=("$file")
-  done < <(find . -maxdepth 2 -name "docker-compose*.yml" -o -name "compose*.yml" | sort)
+  done < <(find . -maxdepth 2 \( -name "docker-compose*.yml" -o -name "compose*.yml" \) | sort)
 
   if [[ ${#compose_files[@]} -eq 0 ]]; then
     err "No Docker Compose files found in the current directory"
@@ -280,23 +296,27 @@ subcmd_compose() {
   if [[ ${#compose_files[@]} -eq 1 ]]; then
     compose_file="${compose_files[0]}"
   else
-    compose_file=$(printf "%s\n" "${compose_files[@]}" |
-      fzf --header="Select Docker Compose file" --height=50% --reverse)
+    compose_file=$(
+      printf "%s\n" "${compose_files[@]}" |
+        fzf --header="Select Docker Compose file" --height=50% --reverse
+    )
   fi
 
-  [[ -z "$compose_file" ]] && return 0
+  [[ -z "${compose_file:-}" ]] && return 0
 
   # Select action
-  local action=$(echo -e "up\ndown\nps\nlogs\nrestart\npull\nbuild" |
-    fzf --header="Select Docker Compose action" --height=50% --reverse)
-
-  [[ -z "$action" ]] && return 0
+  local action
+  action=$(
+    echo -e "up\ndown\nps\nlogs\nrestart\npull\nbuild" |
+      fzf --header="Select Docker Compose action" --height=50% --reverse
+  )
+  [[ -z "${action:-}" ]] && return 0
 
   # Execute action
   case "$action" in
     up)
       local detach
-      read -p "Run in detached mode? (y/n): " detach
+      read -rp "Run in detached mode? (y/n): " detach
       if [[ "$detach" == "y" ]]; then
         docker compose -f "$compose_file" up -d
       else
@@ -307,7 +327,7 @@ subcmd_compose() {
       local service
       service=$(docker compose -f "$compose_file" ps --services |
         fzf --header="Select service to view logs" --height=50% --reverse)
-      [[ -z "$service" ]] && return 0
+      [[ -z "${service:-}" ]] && return 0
       docker compose -f "$compose_file" logs -f "$service"
       ;;
     restart|down|ps|pull|build)
@@ -316,12 +336,23 @@ subcmd_compose() {
   esac
 }
 
+# -------- Subcommand discovery (no compgen) --------
+# Build the list of available subcommands based on defined functions
+subcmds_avail=()
+while IFS= read -r line; do
+  # 'declare -F' outputs lines like: "declare -f subcmd_ps"
+  # Grab the last whitespace-separated field for portability.
+  name=${line##* }
+  if [[ $name == subcmd_* ]]; then
+    subcmds_avail+=("${name#subcmd_}")
+  fi
+done < <(declare -F)
+
 # No command selected - Interactive menu
 nocmd() {
   check_deps
 
-  # Create a clean formatted list of commands with descriptions
-  local formatted_list=""
+  local formatted_list="" selected command
   for c in "${subcmds_avail[@]}"; do
     formatted_list+="${GREEN}$c${NC}\t${helptext[$c]}\n"
   done
@@ -333,19 +364,16 @@ nocmd() {
         --height=50% \
         --reverse \
         --header="Select Docker FZF command:" \
-        --no-preview)  # Disable preview to avoid the bat error
+        --no-preview)  # Disable preview to avoid bat errors in some envs
 
-  if [[ -n "$selected" ]]; then
+  if [[ -n "${selected:-}" ]]; then
     # Extract just the command (first word) without colors
     command=$(echo "$selected" | sed 's/\x1B\[[0-9;]*[JKmsu]//g' | awk '{print $1}')
     if type "subcmd_$command" &>/dev/null; then
-      subcmd_"$command"
+      "subcmd_$command"
     fi
   fi
 }
-
-# Get available subcommands
-mapfile -t subcmds_avail < <(compgen -A function | grep -o 'subcmd_[a-z]*' | sed 's/subcmd_//')
 
 # Main execution logic
 check_deps
@@ -353,12 +381,12 @@ check_deps
 if (( $# < 1 )); then
   nocmd
   exit 0
-elif type "subcmd_$1" &>/dev/null; then
-  subcmd="subcmd_$1"
+elif type "subcmd_${1}" &>/dev/null; then
+  subcmd="subcmd_${1}"
   shift
   "$subcmd" "$@"
 elif [[ -v aliases[$1] ]]; then
-  subcmd=subcmd_${aliases[$1]}
+  subcmd="subcmd_${aliases[$1]}"
   shift
   "$subcmd" "$@"
 else
