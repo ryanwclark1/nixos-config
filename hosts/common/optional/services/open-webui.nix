@@ -4,6 +4,12 @@
 }:
 
 {
+  networking.firewall = {
+    allowedTCPPorts = [
+      8180 # open-webui
+    ];
+  };
+
   services.open-webui = {
     enable = false;
     port = 8180;

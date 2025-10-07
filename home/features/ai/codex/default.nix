@@ -16,24 +16,24 @@ in
 
     package = pkgs.codex;
     settings = {
-      model = "hf.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL";
-      model_provider = "ollama";
-      model_providers = {
-        ollama = {
-          name = "Ollama";
-          baseURL = "http://localhost:11434/v1";
-          envKey = "";
-        };
-      };
+      # model = "hf.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL";
+      # model_provider = "ollama";
+      # model_providers = {
+      #   ollama = {
+      #     name = "Ollama";
+      #     baseURL = "http://localhost:11434/v1";
+      #     envKey = "";
+      #   };
+      # };
 
       mcpServers = builtins.fromJSON (builtins.readFile ./mcp-servers.json);
     };
+  };
 
     # custom-instructions = {
     #   # Example custom instruction
     #   "Always use markdown for code snippets" = "Whenever you provide code, format it using markdown code blocks with the appropriate language specified. This ensures proper syntax highlighting and readability.";
     # };
-  };
 
 
   # Create .env file with secrets from SOPS

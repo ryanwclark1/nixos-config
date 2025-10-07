@@ -50,8 +50,8 @@
         # Mesa drivers
         mesa
         # AMD Vulkan drivers
-        amdvlk
-        driversi686Linux.amdvlk
+        # amdvlk
+        # driversi686Linux.amdvlk
         # ROCm packages for compute
         rocmPackages.clr
         rocmPackages.clr.icd
@@ -62,20 +62,20 @@
       ];
       extraPackages32 = with pkgs.driversi686Linux; [
         mesa
-        amdvlk
+        # amdvlk
       ];
     };
-    amdgpu = {
-      amdvlk = {
-        enable = true;
-        supportExperimental.enable = true;
-        support32Bit = {
-          enable = true;
-        };
-      };
-      initrd.enable = true;
-      opencl.enable = true;
-    };
+    # amdgpu = {
+    #   amdvlk = {
+    #     enable = true;
+    #     supportExperimental.enable = true;
+    #     support32Bit = {
+    #       enable = true;
+    #     };
+    #   };
+    #   initrd.enable = true;
+    #   opencl.enable = true;
+    # };
   };
 
   # Environment variables for AMD graphics
