@@ -10,7 +10,7 @@
     ./spice.nix
     ./upower.nix
     ./vscode-server.nix
-    ./xserver.nix
+    # ./xserver.nix
     ./tailscale.nix
     ./wireguard.nix
   ];

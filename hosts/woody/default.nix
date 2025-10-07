@@ -31,6 +31,7 @@
     ../common/optional/desktop/nautilus.nix
     ../common/optional/desktop/style.nix
     ../common/optional/desktop/thunar.nix
+    
     ../common/optional/services/audio.nix
     ../common/optional/services/bluetooth.nix
     ../common/optional/services/chroma.nix
@@ -39,6 +40,7 @@
     ../common/optional/services/nfs.nix
     ../common/optional/services/ollama.nix
     ../common/optional/services/open-webui.nix
+    ../common/optional/services/openvscode-server.nix
     ../common/optional/services/printing.nix
     ../common/optional/services/searx.nix
     ../common/optional/services/steam.nix

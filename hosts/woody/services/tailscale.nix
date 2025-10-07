@@ -38,7 +38,6 @@
     tailscale
     jq
     tailscalesd
-
   ];
 
   # Ensure Tailscale interface is trusted in firewall

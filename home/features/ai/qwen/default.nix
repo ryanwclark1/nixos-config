@@ -287,6 +287,9 @@ in
     text = ''
       # MCP Server Environment Variables
       # This file is generated at runtime by the .env-generator script
+      OPENAI_API_KEY="sk-not-required-for-ollama"
+      OPENAI_API_BASE="http://localhost:11434/v1/"
+      OPENAI_MODEL="hf.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL"
       CONTEXT7_TOKEN=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets.context7-token.path})
       GITHUB_PERSONAL_ACCESS_TOKEN=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets.github-pat.path})
       SOURCEBOT_API_KEY=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets."sourcebot/api-key".path})
