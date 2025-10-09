@@ -134,19 +134,32 @@
     let
       inherit (self) outputs;
       lib = nixpkgs.lib // home-manager.lib // nix-darwin.lib;
+
+      # 1) overlays as an ATTRSET (convention)
+      overlaysSet = {
+        cmake-compat = import ./overlays/cmake-compat.nix;
+        # passthrough = import ./overlays/passthrough.nix; # optional
+      };
+
+      # 2) Convert to LIST when importing nixpkgs
+      myOverlays = builtins.attrValues overlaysSet;
+
       forEachSystem = f: lib.genAttrs (import systems) (system: f pkgsFor.${system});
       pkgsFor = lib.genAttrs (import systems) (
         system:
         import nixpkgs {
           inherit system;
+          overlays = myOverlays; # apply overlays globally
           config.allowUnfree = true;
         }
       );
     in
     {
       inherit lib;
-      overlays = import ./overlays { inherit inputs outputs; };
+      # Expose overlays (attrset) for consumers that may do attr lookups or attrValues
+      overlays = overlaysSet; # exposed as an attrset
       packages = forEachSystem (pkgs: import ./pkgs { inherit pkgs; });
+
       devShells = forEachSystem (pkgs: import ./shell.nix { inherit pkgs; });
       formatter = forEachSystem (pkgs: pkgs.nixfmt-rfc-style);
 
