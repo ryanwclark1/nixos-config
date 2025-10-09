@@ -38,7 +38,7 @@
     ./features/gui-tools
     ./features/imv
     ./features/kitty
-    ./features/kodi
+    # ./features/kodi
     ./features/kubernetes
     ./features/lazygit
     ./features/media
