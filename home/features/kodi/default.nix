@@ -5,8 +5,7 @@
 
 {
   programs.kodi = {
-    enable = true;
-    package = pkgs.kodi-wayland;
+    enable = false;
     # addonSettings = [
     #   {
     #     name = "plugin.video.youtube";

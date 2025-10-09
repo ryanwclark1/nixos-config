@@ -11,7 +11,6 @@
     meson
     ninja
     pkg-config
-    cmake
     gnumake
     just
   ];
