@@ -10,9 +10,10 @@
       enable = true;
       onBoot = "ignore";
       qemu = {
-        ovmf = {
-          enable = true;
-        };
+        # All OVMF images distributed with QEMU are now available by default
+        # ovmf = {
+        #   enable = true;
+        # };
         # virtual tpm
         swtpm.enable = true;
       };
@@ -23,5 +24,5 @@
   programs.virt-manager = {
     enable = true;
   };
-  
+
 }
