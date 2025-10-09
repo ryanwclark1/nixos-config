@@ -1,3 +1,4 @@
+# hosts/common/global/nix/default.nix
 {
   lib,
   pkgs,
@@ -21,7 +22,7 @@
       log-lines = 25;
       min-free = 134217728; # 128MB
       max-free = 1000000000; # 1GB
-      download-buffer-size = 134217728; # 128MB (default is 64MB)
+      download-buffer-size = 536870912; # 128MB (default is 64MB)
       experimental-features = [
         "nix-command"
         "flakes"
