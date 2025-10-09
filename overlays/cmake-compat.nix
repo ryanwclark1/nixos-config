@@ -1,0 +1,10 @@
+# overlay: add the policy flag to older CMake projects
+final: prev: {
+  clblast = prev.clblast.overrideAttrs (old: {
+    cmakeFlags = (old.cmakeFlags or []) ++ [ "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" ];
+  });
+
+  p8-platform = prev.p8-platform.overrideAttrs (old: {
+    cmakeFlags = (old.cmakeFlags or []) ++ [ "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" ];
+  });
+}
