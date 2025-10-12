@@ -138,6 +138,7 @@
       # 1) overlays as an ATTRSET (convention)
       overlaysSet = {
         cmake-compat = import ./overlays/cmake-compat.nix;
+        goose-bump = import ./overlays/goose-bump.nix;
         # passthrough = import ./overlays/passthrough.nix; # optional
       };
 
