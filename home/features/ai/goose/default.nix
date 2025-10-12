@@ -11,11 +11,11 @@ let
 in
 {
   home.packages = with pkgs; [
-    goose
+    goose-cli
   ];
 
-  home.file."${gooseHome}/goose.json" = {
-    force = true;
-    source = ./goose.json;
-  };
+  # home.file."${gooseHome}/goose.json" = {
+  #   force = true;
+  #   source = ./goose.json;
+  # };
 }

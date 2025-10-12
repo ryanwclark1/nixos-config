@@ -1,28 +1,26 @@
 # overlays/goose-bump.nix
+# FIX: use prev.lib, not final.lib, to avoid infinite recursion
+
 final: prev:
 let
-  lib = final.lib;
+  lib = prev.lib;
 
-  # <<< pick the version you want >>>
   newVersion = "1.9.3";
-
-  overrideGoose = old:
-    old.overrideAttrs (_final: super: {
-      version = newVersion;
-
-      src = prev.fetchFromGitHub {
-        owner = "block";
-        repo  = "goose";
-        tag   = "v${newVersion}";
-        # First run: use fakeHash and let Nix tell you the real one
-        hash  = lib.fakeHash;
-      };
-
-      # First run: use fakeHash; Nix will print the correct cargoHash
-      cargoHash = lib.fakeHash;
-    });
 in
-  # Apply to whichever attribute exists in your pinned nixpkgs
-  lib.optionalAttrs (prev ? goose) { goose = overrideGoose prev.goose; }
-  //
-  lib.optionalAttrs (prev ? goose-cli) { goose-cli = overrideGoose prev."goose-cli"; }
+{
+  goose-cli = prev.goose-cli.overrideAttrs (_: super: {
+    version = newVersion;
+
+    src = prev.fetchFromGitHub {
+      owner = "block";
+      repo  = "goose";
+      tag   = "v${newVersion}";
+      # This is the *source* tarball hash you showed earlier:
+      hash  = "sha256-cw4iGvfgJ2dGtf6om0WLVVmieeVGxSPPuUYss1rYcS8=";
+    };
+
+    cargoSha256 = "";
+    # Leave empty once, build to learn the vendor hash, then paste it
+    cargoHash = lib.fakeHash;
+  });
+}
