@@ -1,5 +1,10 @@
 # overlay: add the policy flag to older CMake projects
 final: prev: {
+  # Fix CMake policy error on recent CMake (>=3.30)
+  intel-graphics-compiler = prev.intel-graphics-compiler.overrideAttrs (old: {
+    cmakeFlags = (old.cmakeFlags or []) ++ [ "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" ];
+  });
+
   clblast = prev.clblast.overrideAttrs (old: {
     cmakeFlags = (old.cmakeFlags or []) ++ [ "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" ];
   });
@@ -20,4 +25,3 @@ final: prev: {
     cmakeFlags = (old.cmakeFlags or []) ++ [ "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" ];
   });
 }
-
