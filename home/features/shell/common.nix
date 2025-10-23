@@ -64,9 +64,7 @@
       IN_NIX_SHELL = lib.mkDefault "";
 
       # Performance optimizations
-      FZF_DEFAULT_OPTS = lib.mkDefault "--height 40% --layout=reverse --border --inline-info";
-      FZF_CTRL_T_COMMAND = lib.mkDefault "fd --type f --hidden --follow --exclude .git";
-      FZF_ALT_C_COMMAND = lib.mkDefault "fd --type d --hidden --follow --exclude .git";
+      # FZF environment variables are handled by programs.fzf module
 
       # Better man page experience
       MANWIDTH = lib.mkDefault "80";

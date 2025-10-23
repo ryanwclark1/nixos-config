@@ -153,6 +153,7 @@
 
       # Note: Ctrl+R history search is handled by Atuin (initialized later)
       # FZF shell integration provides Ctrl+T (files) and Alt+C (directories)
+      # Bash history is still maintained for Atuin to sync with
 
       # Directory shortcuts (similar to ZSH's hash -d)
       if [[ -z "$BASH_RESTRICTED_MODE" ]]; then

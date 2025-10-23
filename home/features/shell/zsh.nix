@@ -184,25 +184,9 @@
           sha256 = "sha256-u3abhv9ewq3m4QsnsxT017xdlPm3dYq5dqHNmQhhcpI=";
         };
       }
-      # Additional useful plugins
-      {
-        name = "zsh-autosuggestions";
-        src = pkgs.fetchFromGitHub {
-          owner = "zsh-users";
-          repo = "zsh-autosuggestions";
-          rev = "master";
-          sha256 = "sha256-KUYrIxQ7J7XjJjJjJjJjJjJjJjJjJjJjJjJjJjJjJj=";
-        };
-      }
-      {
-        name = "zsh-history-substring-search";
-        src = pkgs.fetchFromGitHub {
-          owner = "zsh-users";
-          repo = "zsh-history-substring-search";
-          rev = "master";
-          sha256 = "sha256-KUYrIxQ7J7XjJjJjJjJjJjJjJjJjJjJjJjJjJjJjJj=";
-        };
-      }
+      # Note: Additional plugins like zsh-autosuggestions and zsh-history-substring-search
+      # are already provided by home-manager's built-in autosuggestion and historySubstringSearch
+      # features, so we don't need to add them manually
     ];
 
     # Login extra
