@@ -15,140 +15,183 @@ let
 in
 {
   home.file."${qwenHome}/AGENTS.md" = {
+    force = true;
     source = ./config/AGENTS.md;
   };
   home.file."${qwenHome}/FLAGS.md" = {
+    force = true;
     source = ./config/FLAGS.md;
   };
   home.file."${qwenHome}/PRINCIPLES.md" = {
+    force = true;
     source = ./config/PRINCIPLES.md;
   };
   home.file."${qwenHome}/RULES.md" = {
+    force = true;
     source = ./config/RULES.md;
   };
 
   # MODES
   home.file."${qwenHome}/MODE_Brainstorming.md" = {
+    force = true;
     source = ./config/MODE_Brainstorming.md;
   };
   home.file."${qwenHome}/MODE_Introspection.md" = {
+    force = true;
     source = ./config/MODE_Introspection.md;
   };
   home.file."${qwenHome}/MODE_Orchestration.md" = {
+    force = true;
     source = ./config/MODE_Orchestration.md;
   };
   home.file."${qwenHome}/MODE_Task_Management.md" = {
+    force = true;
     source = ./config/MODE_Task_Management.md;
   };
   home.file."${qwenHome}/MODE_Token_Efficiency.md" = {
+    force = true;
     source = ./config/MODE_Token_Efficiency.md;
   };
 
   # MCP SERVERS
   home.file."${qwenHome}/MCP_Context7.md" = {
+    force = true;
     source = ./config/MCP_Context7.md;
   };
   home.file."${qwenHome}/MCP_Playwright.md" = {
+    force = true;
     source = ./config/MCP_Playwright.md;
   };
   home.file."${qwenHome}/MCP_Sequential.md" = {
+    force = true;
     source = ./config/MCP_Sequential.md;
   };
   home.file."${qwenHome}/MCP_Serena.md" = {
+    force = true;
     source = ./config/MCP_Serena.md;
   };
 
   # AGENTS
   home.file."${qwenHome}/agents/backend-architect.md" = {
+    force = true;
     source = ./config/agents/backend-architect.md;
   };
   home.file."${qwenHome}/agents/devops-architect.md" = {
+    force = true;
     source = ./config/agents/devops-architect.md;
   };
   home.file."${qwenHome}/agents/frontend-architect.md" = {
+    force = true;
     source = ./config/agents/frontend-architect.md;
   };
   home.file."${qwenHome}/agents/learning-guide.md" = {
+    force = true;
     source = ./config/agents/learning-guide.md;
   };
   home.file."${qwenHome}/agents/performance-engineer.md" = {
+    force = true;
     source = ./config/agents/performance-engineer.md;
   };
   home.file."${qwenHome}/agents/python-expert.md" = {
+    force = true;
     source = ./config/agents/python-expert.md;
   };
   home.file."${qwenHome}/agents/quality-engineer.md" = {
+    force = true;
     source = ./config/agents/quality-engineer.md;
   };
   home.file."${qwenHome}/agents/refactoring-expert.md" = {
+    force = true;
     source = ./config/agents/refactoring-expert.md;
   };
   home.file."${qwenHome}/agents/requirements-analyst.md" = {
+    force = true;
     source = ./config/agents/requirements-analyst.md;
   };
   home.file."${qwenHome}/agents/root-cause-analyst.md" = {
+    force = true;
     source = ./config/agents/root-cause-analyst.md;
   };
   home.file."${qwenHome}/agents/security-engineer.md" = {
+    force = true;
     source = ./config/agents/security-engineer.md;
   };
   home.file."${qwenHome}/agents/system-architect.md" = {
+    force = true;
     source = ./config/agents/system-architect.md;
   };
   home.file."${qwenHome}/agents/technical-writer.md" = {
+    force = true;
     source = ./config/agents/technical-writer.md;
   };
 
   # COMMANDS
   home.file."${qwenHome}/commands/sq/analyze.toml" = {
+    force = true;
     source = ./config/commands/sq/analyze.toml;
   };
   home.file."${qwenHome}/commands/sq/build.toml" = {
+    force = true;
     source = ./config/commands/sq/build.toml;
   };
   home.file."${qwenHome}/commands/sq/cleanup.toml" = {
+    force = true;
     source = ./config/commands/sq/cleanup.toml;
   };
   home.file."${qwenHome}/commands/sq/design.toml" = {
+    force = true;
     source = ./config/commands/sq/design.toml;
   };
   home.file."${qwenHome}/commands/sq/document.toml" = {
+    force = true;
     source = ./config/commands/sq/document.toml;
   };
   home.file."${qwenHome}/commands/sq/estimate.toml" = {
+    force = true;
     source = ./config/commands/sq/estimate.toml;
   };
   home.file."${qwenHome}/commands/sq/explain.toml" = {
+    force = true;
     source = ./config/commands/sq/explain.toml;
   };
   home.file."${qwenHome}/commands/sq/git.toml" = {
+    force = true;
     source = ./config/commands/sq/git.toml;
   };
   home.file."${qwenHome}/commands/sq/implement.toml" = {
+    force = true;
     source = ./config/commands/sq/implement.toml;
   };
   home.file."${qwenHome}/commands/sq/improve.toml" = {
+    force = true;
     source = ./config/commands/sq/improve.toml;
   };
   home.file."${qwenHome}/commands/sq/index.toml" = {
+    force = true;
     source = ./config/commands/sq/index.toml;
   };
   home.file."${qwenHome}/commands/sq/load.toml" = {
+    force = true;
     source = ./config/commands/sq/load.toml;
   };
   home.file."${qwenHome}/commands/sq/reflect.toml" = {
+    force = true;
     source = ./config/commands/sq/reflect.toml;
   };
   home.file."${qwenHome}/commands/sq/save.toml" = {
+    force = true;
     source = ./config/commands/sq/save.toml;
   };
   home.file."${qwenHome}/commands/sq/select-tool.toml" = {
+    force = true;
     source = ./config/commands/sq/select-tool.toml;
   };
   home.file."${qwenHome}/commands/sq/test.toml" = {
+    force = true;
     source = ./config/commands/sq/test.toml;
   };
   home.file."${qwenHome}/commands/sq/troubleshoot.toml" = {
+    force = true;
     source = ./config/commands/sq/troubleshoot.toml;
   };
 

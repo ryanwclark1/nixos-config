@@ -44,6 +44,7 @@ in
   };
 
   home.file.".config/tmux/plugins/tmux-forceline" = {
+    force = true;
     source = ./plugins/tmux-forceline;
     recursive = true;
   };

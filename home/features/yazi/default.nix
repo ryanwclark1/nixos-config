@@ -12,33 +12,27 @@
   ];
 
   home.file.".config/yazi/flavors/theme.yazi/README.md" = {
+    force = true;
     source = ./flavors/theme.yazi/README.md;
     executable = false;
   };
 
   home.file.".config/yazi/flavors/theme.yazi/preview.png" = {
+    force = true;
     source = ./flavors/theme.yazi/preview.png;
     executable = false;
   };
 
   home.file.".config/yazi/flavors/theme.yazi/LICENSE" = {
+    force = true;
     source = ./flavors/theme.yazi/LICENSE;
     executable = false;
   };
 
   home.file.".local/bin/yazi-performance-monitor" = {
+    force = true;
     source = ./scripts/yazi-performance-monitor.sh;
     executable = true;
-  };
-
-  home.file.".config/yazi/keymap.toml" = {
-    source = ./keymap.toml;
-    executable = false;
-  };
-
-  home.file.".config/yazi/yazi.toml" = {
-    source = ./yazi.toml;
-    executable = false;
   };
 
   home.packages = with pkgs; [
@@ -2483,4 +2477,5 @@
     #   };
     # };
   };
+};
 }

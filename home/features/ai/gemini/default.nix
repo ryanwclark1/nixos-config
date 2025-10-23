@@ -11,140 +11,183 @@ let
 in
 {
   home.file."${geminiHome}/AGENTS.md" = {
+    force = true;
     source = ./config/AGENTS.md;
   };
   home.file."${geminiHome}/FLAGS.md" = {
+    force = true;
     source = ./config/FLAGS.md;
   };
   home.file."${geminiHome}/PRINCIPLES.md" = {
+    force = true;
     source = ./config/PRINCIPLES.md;
   };
   home.file."${geminiHome}/RULES.md" = {
+    force = true;
     source = ./config/RULES.md;
   };
 
   # MODES
   home.file."${geminiHome}/MODE_Brainstorming.md" = {
+    force = true;
     source = ./config/MODE_Brainstorming.md;
   };
   home.file."${geminiHome}/MODE_Introspection.md" = {
+    force = true;
     source = ./config/MODE_Introspection.md;
   };
   home.file."${geminiHome}/MODE_Orchestration.md" = {
+    force = true;
     source = ./config/MODE_Orchestration.md;
   };
   home.file."${geminiHome}/MODE_Task_Management.md" = {
+    force = true;
     source = ./config/MODE_Task_Management.md;
   };
   home.file."${geminiHome}/MODE_Token_Efficiency.md" = {
+    force = true;
     source = ./config/MODE_Token_Efficiency.md;
   };
 
   # MCP SERVERS
   home.file."${geminiHome}/MCP_Context7.md" = {
+    force = true;
     source = ./config/MCP_Context7.md;
   };
   home.file."${geminiHome}/MCP_Playwright.md" = {
+    force = true;
     source = ./config/MCP_Playwright.md;
   };
   home.file."${geminiHome}/MCP_Sequential.md" = {
+    force = true;
     source = ./config/MCP_Sequential.md;
   };
   home.file."${geminiHome}/MCP_Serena.md" = {
+    force = true;
     source = ./config/MCP_Serena.md;
   };
 
   # AGENTS
   home.file."${geminiHome}/agents/backend-architect.md" = {
+    force = true;
     source = ./config/agents/backend-architect.md;
   };
   home.file."${geminiHome}/agents/devops-architect.md" = {
+    force = true;
     source = ./config/agents/devops-architect.md;
   };
   home.file."${geminiHome}/agents/frontend-architect.md" = {
+    force = true;
     source = ./config/agents/frontend-architect.md;
   };
   home.file."${geminiHome}/agents/learning-guide.md" = {
+    force = true;
     source = ./config/agents/learning-guide.md;
   };
   home.file."${geminiHome}/agents/performance-engineer.md" = {
+    force = true;
     source = ./config/agents/performance-engineer.md;
   };
   home.file."${geminiHome}/agents/python-expert.md" = {
+    force = true;
     source = ./config/agents/python-expert.md;
   };
   home.file."${geminiHome}/agents/quality-engineer.md" = {
+    force = true;
     source = ./config/agents/quality-engineer.md;
   };
   home.file."${geminiHome}/agents/refactoring-expert.md" = {
+    force = true;
     source = ./config/agents/refactoring-expert.md;
   };
   home.file."${geminiHome}/agents/requirements-analyst.md" = {
+    force = true;
     source = ./config/agents/requirements-analyst.md;
   };
   home.file."${geminiHome}/agents/root-cause-analyst.md" = {
+    force = true;
     source = ./config/agents/root-cause-analyst.md;
   };
   home.file."${geminiHome}/agents/security-engineer.md" = {
+    force = true;
     source = ./config/agents/security-engineer.md;
   };
   home.file."${geminiHome}/agents/system-architect.md" = {
+    force = true;
     source = ./config/agents/system-architect.md;
   };
   home.file."${geminiHome}/agents/technical-writer.md" = {
+    force = true;
     source = ./config/agents/technical-writer.md;
   };
 
   # COMMANDS
   home.file."${geminiHome}/commands/sg/analyze.toml" = {
+    force = true;
     source = ./config/commands/sg/analyze.toml;
   };
   home.file."${geminiHome}/commands/sg/build.toml" = {
+    force = true;
     source = ./config/commands/sg/build.toml;
   };
   home.file."${geminiHome}/commands/sg/cleanup.toml" = {
+    force = true;
     source = ./config/commands/sg/cleanup.toml;
   };
   home.file."${geminiHome}/commands/sg/design.toml" = {
+    force = true;
     source = ./config/commands/sg/design.toml;
   };
   home.file."${geminiHome}/commands/sg/document.toml" = {
+    force = true;
     source = ./config/commands/sg/document.toml;
   };
   home.file."${geminiHome}/commands/sg/estimate.toml" = {
+    force = true;
     source = ./config/commands/sg/estimate.toml;
   };
   home.file."${geminiHome}/commands/sg/explain.toml" = {
+    force = true;
     source = ./config/commands/sg/explain.toml;
   };
   home.file."${geminiHome}/commands/sg/git.toml" = {
+    force = true;
     source = ./config/commands/sg/git.toml;
   };
   home.file."${geminiHome}/commands/sg/implement.toml" = {
+    force = true;
     source = ./config/commands/sg/implement.toml;
   };
   home.file."${geminiHome}/commands/sg/improve.toml" = {
+    force = true;
     source = ./config/commands/sg/improve.toml;
   };
   home.file."${geminiHome}/commands/sg/index.toml" = {
+    force = true;
     source = ./config/commands/sg/index.toml;
   };
   home.file."${geminiHome}/commands/sg/load.toml" = {
+    force = true;
     source = ./config/commands/sg/load.toml;
   };
   home.file."${geminiHome}/commands/sg/reflect.toml" = {
+    force = true;
     source = ./config/commands/sg/reflect.toml;
   };
   home.file."${geminiHome}/commands/sg/save.toml" = {
+    force = true;
     source = ./config/commands/sg/save.toml;
   };
   home.file."${geminiHome}/commands/sg/select-tool.toml" = {
+    force = true;
     source = ./config/commands/sg/select-tool.toml;
   };
   home.file."${geminiHome}/commands/sg/test.toml" = {
+    force = true;
     source = ./config/commands/sg/test.toml;
   };
   home.file."${geminiHome}/commands/sg/troubleshoot.toml" = {
+    force = true;
     source = ./config/commands/sg/troubleshoot.toml;
   };
 

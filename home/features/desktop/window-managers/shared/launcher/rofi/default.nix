@@ -15,72 +15,93 @@ in
   ];
 
   home.file.".config/rofi/applets" = {
+    force = true;
     source = ./applets;
     recursive = true;
   };
 
   home.file.".config/rofi/powermenu" = {
+    force = true;
     source = ./powermenu;
     recursive = true;
   };
 
   home.file = {
     ".config/rofi/style/app-toggle.rasi" = {
+      force = true;
       source = ./style/app-toggle.rasi;
     };
     ".config/rofi/style/cliphist.rasi" = {
+      force = true;
       source = ./style/cliphist.rasi;
     };
     ".config/rofi/style/config-code.rasi" = {
+      force = true;
       source = ./style/config-code.rasi;
     };
     ".config/rofi/style/config-emoji.rasi" = {
+      force = true;
       source = ./style/config-emoji.rasi;
     };
     ".config/rofi/style/config-long.rasi" = {
+      force = true;
       source = ./style/config-long.rasi;
     };
     ".config/rofi/style/fullscreen-preview.rasi" = {
+      force = true;
       source = ./style/fullscreen-preview.rasi;
     };
 
     ".config/rofi/style/launcher-center-alt1.rasi" = {
+      force = true;
       source = ./style/launcher-center-alt1.rasi;
     };
     ".config/rofi/style/launcher-center-alt2.rasi" = {
+      force = true;
       source = ./style/launcher-center-alt2.rasi;
     };
     ".config/rofi/style/launcher-center.rasi" = {
+      force = true;
       source = ./style/launcher-center.rasi;
     };
     ".config/rofi/style/launcher-full.rasi" = {
+      force = true;
       source = ./style/launcher-full.rasi;
     };
     ".config/rofi/style/launcher-long.rasi" = {
+      force = true;
       source = ./style/launcher-long.rasi;
     };
     ".config/rofi/style/power-big.rasi" = {
+      force = true;
       source = ./style/power-big.rasi;
     };
     ".config/rofi/style/power-small-round.rasi" = {
+      force = true;
       source = ./style/power-small-round.rasi;
     };
     ".config/rofi/style/power-small-square.rasi" = {
+      force = true;
       source = ./style/power-small-square.rasi;
     };
     ".config/rofi/style/shared/border.rasi" = {
+      force = true;
       source = ./style/shared/border.rasi;
     };
     ".config/rofi/style/shared/confirm-big.rasi" = {
+      force = true;
       source = ./style/shared/confirm-big.rasi;
     };
     ".config/rofi/style/shared/confirm.rasi" = {
+      force = true;
       source = ./style/shared/confirm.rasi;
     };
     ".config/rofi/style/shared/fonts.rasi" = {
+      force = true;
       source = ./style/shared/fonts.rasi;
     };
     ".config/rofi/style/shared/yoffset.rasi" = {
+      force = true;
       source = ./style/shared/yoffset.rasi;
     };
   };
