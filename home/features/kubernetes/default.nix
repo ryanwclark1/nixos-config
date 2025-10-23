@@ -27,39 +27,8 @@
     kubectx # Switch between Kubernetes contexts (includes kubens)
   ];
 
-  # Shell completions and aliases for Kubernetes tools
-  programs.bash.shellAliases = lib.mkIf config.programs.bash.enable {
-    k = "kubectl";
-    kgp = "kubectl get pods";
-    kgs = "kubectl get services";
-    kgd = "kubectl get deployments";
-    kgn = "kubectl get nodes";
-    kns = "kubens";
-    kctx = "kubectx";
-    kustomize-build = "kustomize build";
-  };
-
-  programs.fish.shellAliases = lib.mkIf config.programs.fish.enable {
-    k = "kubectl";
-    kgp = "kubectl get pods";
-    kgs = "kubectl get services";
-    kgd = "kubectl get deployments";
-    kgn = "kubectl get nodes";
-    kns = "kubens";
-    kctx = "kubectx";
-    kustomize-build = "kustomize build";
-  };
-
-  programs.zsh.shellAliases = lib.mkIf config.programs.zsh.enable {
-    k = "kubectl";
-    kgp = "kubectl get pods";
-    kgs = "kubectl get services";
-    kgd = "kubectl get deployments";
-    kgn = "kubectl get nodes";
-    kns = "kubens";
-    kctx = "kubectx";
-    kustomize-build = "kustomize build";
-  };
+  # Note: Kubernetes aliases are now defined in common.nix to avoid duplication
+  # This ensures consistent aliases across all shells
 
   # Enable kubectl completion for supported shells
   programs.bash.initExtra = lib.mkIf config.programs.bash.enable ''
