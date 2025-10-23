@@ -230,16 +230,8 @@ in
         src = pkgs.fishPlugins.tide.src;
       }
 
-      # Additional useful plugins
-      {
-        name = "z";
-        src = pkgs.fishPlugins.z.src;
-      }
-
-      {
-        name = "puffer";
-        src = pkgs.fishPlugins.puffer.src;
-      }
+      # Note: z plugin conflicts with zoxide, so we use zoxide instead
+      # puffer plugin might conflict with fzf-fish, so we keep it minimal
     ];
 
     # Enhanced functions
@@ -530,13 +522,8 @@ in
         direnv hook fish | source
       end
 
-      # Initialize fzf if available
-      if command -v fzf >/dev/null
-        set -gx FZF_DEFAULT_OPTS "--height 40% --layout=reverse --border"
-        set -gx FZF_DEFAULT_COMMAND "fd --type f --hidden --follow --exclude .git"
-        set -gx FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
-        set -gx FZF_ALT_C_COMMAND "fd --type d --hidden --follow --exclude .git"
-      end
+      # FZF environment variables are set in common.nix to avoid duplication
+      # Fish-specific FZF initialization is handled by the fzf-fish plugin
 
       # Enhanced completion
       set -gx FISH_COMPLETE_DIR_EXPAND 1
