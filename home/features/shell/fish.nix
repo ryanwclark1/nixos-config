@@ -103,6 +103,9 @@ in
       # Better history management
       set -gx FISH_HISTORY_FILE_SIZE 1000000
       set -gx FISH_HISTORY_MAX_COMMANDS 10000
+
+      # Fish-specific path additions
+      set -gx PATH $PATH ~/.local/bin ~/.cargo/bin ~/go/bin
     '';
 
     # Fish-specific shell aliases (inherits from common.nix)
@@ -219,10 +222,10 @@ in
       }
 
       # Better git integration
-      {
-        name = "gitnow";
-        src = pkgs.fishPlugins.gitnow.src;
-      }
+      # {
+      #   name = "gitnow";
+      #   src = pkgs.fishPlugins.gitnow.src;
+      # }
 
       # Enhanced prompt (optional - can be disabled if using starship)
       {
@@ -427,26 +430,6 @@ in
         $EDITOR ~/.config/fish/config.fish
       '';
     };
-
-    # Shell initialization (Fish-specific environment variables)
-    shellInit = ''
-      # Terminal settings inherited from common.nix
-
-      # Fish-specific environment variables
-      set -gx FISH_COMPLETE_DIR_EXPAND 1
-      set -gx FISH_COMPLETE_DIR_EXPAND_STRATEGY "descend"
-      set -gx FISH_COMPLETE_DIR_EXPAND_STRATEGY_DESCEND_DEPTH 1
-
-      # Improve completion performance
-      set -gx FISH_COMPLETE_DIR_EXPAND_STRATEGY_DESCEND_DEPTH 1
-
-      # Better history management
-      set -gx FISH_HISTORY_FILE_SIZE 1000000
-      set -gx FISH_HISTORY_MAX_COMMANDS 10000
-
-      # Fish-specific path additions
-      set -gx PATH $PATH ~/.local/bin ~/.cargo/bin ~/go/bin
-    '';
 
     # Login shell initialization
     loginShellInit = ''
