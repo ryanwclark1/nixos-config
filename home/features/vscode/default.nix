@@ -675,7 +675,6 @@
           "ruff.organizeImports" = true;
           "ruff.fixAll" = true;
           "ruff.configurationPreference" = "filesystemFirst";
-          "ruff.nativeServer" = "auto";
 
           ##### GO #####
           "go.delveConfig" = {
