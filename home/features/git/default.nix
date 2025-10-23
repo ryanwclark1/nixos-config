@@ -19,15 +19,48 @@ in
   programs.git = {
     enable = true;
     package = pkgs.git;
-    userName = "Ryan Clark";
-    userEmail = "36689148+ryanwclark1@users.noreply.github.com";
 
-    aliases = {
-      p = "pull --ff-only";
-      ff = "merge --ff-only";
-      graph = "log --decorate --oneline --graph";
-      pushall = "!git remote | xargs -L1 git push --all";
-      add-nowhitespace = "!git diff -U0 -w --no-color | git apply --cached --ignore-whitespace --unidiff-zero -";
+    settings = {
+      user.name = "Ryan Clark";
+      user.email = "36689148+ryanwclark1@users.noreply.github.com";
+
+      alias = {
+        p = "pull --ff-only";
+        ff = "merge --ff-only";
+        graph = "log --decorate --oneline --graph";
+        pushall = "!git remote | xargs -L1 git push --all";
+        add-nowhitespace = "!git diff -U0 -w --no-color | git apply --cached --ignore-whitespace --unidiff-zero -";
+      };
+
+      core.editor = "$EDITOR";
+      github.user = "ryanwclark1";
+      init.defaultBranch = "main";
+      advice.objectNameWarning = false;
+      pull.rebase = true;
+      push.autoSetupRemote = true; # automatically create upstream branch on push
+      rebase.autosquash = true;
+      rebase.autoStash = true;
+      trim.bases = "develop,master,main";
+      url = {
+        "https://github.com/" = {
+          insteadOf = [
+            "gh:"
+            "github:"
+          ];
+        };
+        "https://gitlab.com/" = {
+          insteadOf = [
+            "gl:"
+            "gitlab:"
+          ];
+        };
+        "https://codeberg.org/" = {
+          insteadOf = [
+            "cb:"
+            "codeberg:"
+          ];
+        };
+      };
     };
 
     attributes = [
@@ -96,17 +129,6 @@ in
       "TODO.md"
     ];
 
-    delta = {
-      enable = true;
-      options = {
-        diff-so-fancy = true;
-        line-numbers = true;
-        side-by-side = true;
-        decorations = true;
-        true-color = "always";
-      };
-    };
-
     hooks = {
       # pre-commit = ./pre-commit-script;
     };
@@ -115,37 +137,17 @@ in
       enable = true;
       skipSmudge = false;
     };
+  };
 
-    extraConfig = {
-      core.editor = "$EDITOR";
-      github.user = "ryanwclark1";
-      init.defaultBranch = "main";
-      advice.objectNameWarning = false;
-      pull.rebase = true;
-      push.autoSetupRemote = true; # automatically create upstream branch on push
-      rebase.autosquash = true;
-      rebase.autoStash = true;
-      trim.bases = "develop,master,main";
-      url = {
-        "https://github.com/" = {
-          insteadOf = [
-            "gh:"
-            "github:"
-          ];
-        };
-        "https://gitlab.com/" = {
-          insteadOf = [
-            "gl:"
-            "gitlab:"
-          ];
-        };
-        "https://codeberg.org/" = {
-          insteadOf = [
-            "cb:"
-            "codeberg:"
-          ];
-        };
-      };
+  programs.delta = {
+    enable = true;
+    enableGitIntegration = true;
+    options = {
+      diff-so-fancy = true;
+      line-numbers = true;
+      side-by-side = true;
+      decorations = true;
+      true-color = "always";
     };
   };
 }
