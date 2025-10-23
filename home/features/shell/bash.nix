@@ -6,17 +6,12 @@
 }:
 
 {
-  # Blesh (Bash Line Editor) is not currently installed
-  # Uncomment to enable enhanced bash line editing:
-  home.packages = with pkgs; [
-    blesh
-  ];
-
+  # Enhanced bash configuration with modern tooling
   programs.bash = {
     enable = true;
     package = pkgs.bashInteractive;
-    enableCompletion = false;  # Disabled due to progcomp errors
-    enableVteIntegration = false;  # Disabled due to prompt escape sequence issues
+    enableCompletion = true;  # Re-enabled with Carapace handling completions
+    enableVteIntegration = true;  # Re-enabled for better terminal integration
 
     # History configuration - matching ZSH's robust history
     historySize = 100000;
@@ -69,19 +64,41 @@
     # Bash-specific session variables
     sessionVariables = {
       BASH_INTERACTIVE = "${pkgs.bashInteractive}/bin/bash";
+      # Enhanced bash-specific variables
+      BASH_SILENCE_DEPRECATION_WARNING = "1";  # Silence macOS deprecation warnings
+      BASH_COMPLETION_USER_FILE = "${config.home.homeDirectory}/.config/bash/bash_completion";
     };
 
     # Bash-specific shell aliases (inherits from common.nix)
     shellAliases = {
       # Bash-specific quick edits
       bashrc = "$EDITOR ~/.bashrc";
+      bashprofile = "$EDITOR ~/.bash_profile";
 
       # Bash-specific reload
       reload = "exec bash";
+      reload-profile = "source ~/.bash_profile";
+
+      # Enhanced bash-specific utilities
+      bash-version = "echo \"Bash version: $BASH_VERSION\"";
+      bash-options = "set -o";
+      bash-functions = "declare -f";
     };
 
     profileExtra = ''
-      # Additional bash profile customizations can go here
+      # Bash profile customizations
+      # This runs for login shells (SSH, terminal login, etc.)
+
+      # Ensure we have a proper PATH
+      if [[ -z "$PATH_SETUP" ]]; then
+        export PATH_SETUP=1
+        # Add local bin directories if they exist
+        for dir in "$HOME/.local/bin" "$HOME/.cargo/bin" "$HOME/go/bin"; do
+          if [[ -d "$dir" ]] && [[ ":$PATH:" != *":$dir:"* ]]; then
+            PATH="$dir:$PATH"
+          fi
+        done
+      fi
     '';
 
     bashrcExtra = ''
@@ -112,18 +129,20 @@
       # Simple prompt command for history
       export PROMPT_COMMAND='history -a; history -n'
 
-      # Bash-specific completion enhancements (only if not restricted and completion works)
-      if [[ -z "$BASH_RESTRICTED_MODE" ]] && command -v bind &>/dev/null 2>&1; then
-        # Only set readline options, not completion-specific ones that may fail
-        bind "set completion-ignore-case on" 2>/dev/null || true
-        bind "set show-all-if-ambiguous on" 2>/dev/null || true
-        bind "set page-completions off" 2>/dev/null || true
+      # Enhanced completion setup (Carapace handles most completions)
+      if [[ -z "$BASH_RESTRICTED_MODE" ]]; then
+        # Enable programmable completion if available
+        if [[ -f /usr/share/bash-completion/bash_completion ]] || [[ -f /etc/bash_completion ]]; then
+          # Source system bash completion
+          for file in /usr/share/bash-completion/bash_completion /etc/bash_completion; do
+            [[ -f "$file" ]] && source "$file" 2>/dev/null && break
+          done
+        fi
 
-        # Better history search with arrow keys
-        bind '"\e[A": history-search-backward' 2>/dev/null || true
-        bind '"\e[B": history-search-forward' 2>/dev/null || true
-        bind '"\e[C": forward-char' 2>/dev/null || true
-        bind '"\e[D": backward-char' 2>/dev/null || true
+        # Source user-specific completions
+        if [[ -f "$HOME/.config/bash/bash_completion" ]]; then
+          source "$HOME/.config/bash/bash_completion"
+        fi
       fi
 
       # Note: Ctrl+R history search is handled by Atuin (initialized later)
@@ -154,15 +173,20 @@
       # This prevents display issues if starship initialization is delayed
       export PS1='[\u@\h \W]\$ '
 
-      # Blesh (Bash Line Editor) is not currently installed
-      # To enable enhanced bash line editing, uncomment the package declaration above
-      # and this initialization block:
-      # if [[ -z "$VSCODE_TERMINAL" ]] && [[ -f "${pkgs.blesh}/share/blesh/ble.sh" ]]; then
-      #   source "${pkgs.blesh}/share/blesh/ble.sh" --noattach 2>/dev/null || true
-      #   if declare -f ble-attach &>/dev/null; then
-      #     ble-attach 2>/dev/null || true
-      #   fi
-      # fi
+      # Blesh (Bash Line Editor) initialization
+      # Enhanced bash line editing with syntax highlighting and auto-suggestions
+      if [[ -z "$VSCODE_TERMINAL" ]] && [[ -z "$BASH_RESTRICTED_MODE" ]]; then
+        # Check for blesh in multiple possible locations
+        for blesh_path in "${pkgs.blesh}/share/blesh/ble.sh" "/usr/share/blesh/ble.sh" "/usr/local/share/blesh/ble.sh"; do
+          if [[ -f "$blesh_path" ]]; then
+            source "$blesh_path" --noattach 2>/dev/null || true
+            if declare -f ble-attach &>/dev/null; then
+              ble-attach 2>/dev/null || true
+            fi
+            break
+          fi
+        done
+      fi
 
       # Enhanced FZF completion preview customization
       # This complements the basic integration from programs.fzf
@@ -189,15 +213,23 @@
         source "$HOME/.config/shell/functions.sh"
       fi
 
-      # Better command not found handler
+      # Enhanced command not found handler
       command_not_found_handle() {
         local cmd="$1"
+
+        # Try nix-locate first
         if command -v nix-locate &> /dev/null; then
           echo "Command '$cmd' not found. Searching in nixpkgs..." >&2
-          nix-locate --top-level --minimal --at-root "/bin/$cmd"
-        else
-          echo "bash: $cmd: command not found" >&2
+          nix-locate --top-level --minimal --at-root "/bin/$cmd" 2>/dev/null || true
         fi
+
+        # Try to suggest similar commands
+        if command -v fzf &> /dev/null && command -v compgen &> /dev/null; then
+          echo "Did you mean one of these?" >&2
+          compgen -c | fzf --height=10 --reverse --query="$cmd" --preview="which {}" 2>/dev/null || true
+        fi
+
+        echo "bash: $cmd: command not found" >&2
         return 127
       }
     '';
@@ -209,5 +241,68 @@
       # Save history
       history -a
     '';
+  };
+
+  # Create custom bash completion file
+  home.file.".config/bash/bash_completion" = {
+    text = ''
+      # Custom bash completions
+
+      # Git completion enhancements
+      if command -v git &> /dev/null; then
+        # Complete git branches with better formatting
+        _git_branch_complete() {
+          local cur="${COMP_WORDS[COMP_CWORD]}"
+          COMPREPLY=($(git branch --format='%(refname:short)' 2>/dev/null | grep "^$cur" | head -20))
+        }
+
+        # Complete git remotes
+        _git_remote_complete() {
+          local cur="${COMP_WORDS[COMP_CWORD]}"
+          COMPREPLY=($(git remote 2>/dev/null | grep "^$cur"))
+        }
+
+        # Complete git tags
+        _git_tag_complete() {
+          local cur="${COMP_WORDS[COMP_CWORD]}"
+          COMPREPLY=($(git tag 2>/dev/null | grep "^$cur" | head -20))
+        }
+      fi
+
+      # Docker completion enhancements
+      if command -v docker &> /dev/null; then
+        # Complete docker containers
+        _docker_container_complete() {
+          local cur="${COMP_WORDS[COMP_CWORD]}"
+          COMPREPLY=($(docker ps --format "table {{.Names}}" 2>/dev/null | tail -n +2 | grep "^$cur"))
+        }
+
+        # Complete docker images
+        _docker_image_complete() {
+          local cur="${COMP_WORDS[COMP_CWORD]}"
+          COMPREPLY=($(docker images --format "table {{.Repository}}:{{.Tag}}" 2>/dev/null | tail -n +2 | grep "^$cur"))
+        }
+      fi
+
+      # Nix completion enhancements
+      if command -v nix &> /dev/null; then
+        # Complete nix flake inputs
+        _nix_flake_input_complete() {
+          local cur="${COMP_WORDS[COMP_CWORD]}"
+          if [[ -f flake.nix ]] || [[ -f flake.lock ]]; then
+            COMPREPLY=($(nix flake metadata --json 2>/dev/null | jq -r '.locks.nodes | keys[]' | grep "^$cur"))
+          fi
+        }
+      fi
+
+      # Custom completions for common commands
+      complete -F _git_branch_complete git-checkout git-checkout
+      complete -F _git_remote_complete git-push git-pull
+      complete -F _git_tag_complete git-tag
+      complete -F _docker_container_complete docker-exec docker-logs docker-stop
+      complete -F _docker_image_complete docker-run docker-pull
+      complete -F _nix_flake_input_complete nix-flake-update
+    '';
+    executable = false;
   };
 }
