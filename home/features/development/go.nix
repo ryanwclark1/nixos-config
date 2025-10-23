@@ -32,40 +32,28 @@
   # Additional session environment variables for Go
   home.sessionVariables = {
     # Go telemetry settings
-    GOTELEMETRY = "off"; # Disable telemetry completely
-    GOTELEMETRYDIR = "${config.home.homeDirectory}/.cache/go-telemetry"; # Telemetry data directory if enabled
-    
+    GOTELEMETRY = "off";
+
     # Go workspace
     GOPATH = "${config.home.homeDirectory}/go";
     GOBIN = "${config.home.homeDirectory}/go/bin";
-    
+
     # Go module settings
     GOPROXY = "https://proxy.golang.org,direct";
     GOSUMDB = "sum.golang.org";
     GOPRIVATE = "github.com/accent-ai/*,gitlab.com/*";
-    GO111MODULE = "on";
-    
-    # Build performance
-    GOMAXPROCS = "0"; # Use all available CPU cores (0 = auto)
-    
+
     # Testing
     GORACE = "halt_on_error=1";
   };
 
-  home.file."${config.home.homeDirectory}/go/bin/gopls".source = "${pkgs.gopls}/bin/gopls";
-  home.file."${config.home.homeDirectory}/go/bin/staticcheck".source = "${pkgs.go-tools}/bin/staticcheck";
-
-  # Create Go workspace directories
-  home.file."${config.home.homeDirectory}/go/src/.keep".text = "";
-  home.file."${config.home.homeDirectory}/go/pkg/.keep".text = "";
+  # Create Go workspace bin directory (only bin is needed for installed tools)
   home.file."${config.home.homeDirectory}/go/bin/.keep".text = "";
-  
+
   # Go configuration file for default module proxy and sumdb
-  home.file."${config.home.homeDirectory}/.config/go/env" = {
+  xdg.configFile."go/env" = {
     text = ''
       GOTELEMETRY=off
-      GOTELEMETRYDIR=${config.home.homeDirectory}/.cache/go-telemetry
-      GO111MODULE=on
       GOPROXY=https://proxy.golang.org,direct
       GOSUMDB=sum.golang.org
       GOPRIVATE=github.com/accent-ai/*,gitlab.com/*

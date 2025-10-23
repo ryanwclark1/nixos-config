@@ -7,7 +7,7 @@
 
   imports = [
     ./build.nix
-    # ./go.nix
+    ./go.nix
     ./js.nix
     ./lua.nix
     # ./python.nix
