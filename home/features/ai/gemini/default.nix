@@ -7,7 +7,6 @@
 
 let
   geminiHome = "${config.home.homeDirectory}/.gemini";
-  settingsPath = "${geminiHome}/settings.json";
 in
 {
   home.file."${geminiHome}/AGENTS.md" = {
@@ -194,7 +193,6 @@ in
 
   programs.gemini-cli = {
     enable = true;
-    package = pkgs.gemini-cli;
     settings = {
       autoAccept = true;
       hasSeenIdeIntegrationNudge = true;
