@@ -13,7 +13,7 @@
     package = pkgs.bat;
     extraPackages = with pkgs.bat-extras; [
       batdiff
-      batgrep
+      # batgrep  # Temporarily disabled due to test suite failures in nixpkgs-unstable
       batman
       batpipe
       batwatch
