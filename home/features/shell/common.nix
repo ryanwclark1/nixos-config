@@ -49,6 +49,28 @@
 
       # Development
       CDPATH = lib.mkDefault ".:$HOME:$HOME/Code:$HOME/nixos-config";
+
+      # Enhanced shell experience
+      SHELL_SESSION_ID = lib.mkDefault "$(date +%s)";
+      HISTSIZE = lib.mkDefault "100000";
+      SAVEHIST = lib.mkDefault "100000";
+
+      # Better terminal experience
+      TERM_PROGRAM = lib.mkDefault "unknown";
+      TERM_PROGRAM_VERSION = lib.mkDefault "unknown";
+
+      # Development environment indicators
+      NIX_SHELL = lib.mkDefault "";
+      IN_NIX_SHELL = lib.mkDefault "";
+
+      # Performance optimizations
+      FZF_DEFAULT_OPTS = lib.mkDefault "--height 40% --layout=reverse --border --inline-info";
+      FZF_CTRL_T_COMMAND = lib.mkDefault "fd --type f --hidden --follow --exclude .git";
+      FZF_ALT_C_COMMAND = lib.mkDefault "fd --type d --hidden --follow --exclude .git";
+
+      # Better man page experience
+      MANWIDTH = lib.mkDefault "80";
+      MANOPT = lib.mkDefault "--no-hyphenation --no-justification";
     };
 
     # Session path additions
@@ -138,9 +160,17 @@
       mk = "mkdir -p";
       path = "echo $PATH | tr ':' '\\n'";
       tf = "terraform";
+
+      # Kubernetes shortcuts (consolidated from kubernetes/default.nix)
       k = "kubectl";
       kx = "kubectx";
       kns = "kubens";
+      kgp = "kubectl get pods";
+      kgs = "kubectl get services";
+      kgd = "kubectl get deployments";
+      kgn = "kubectl get nodes";
+      kctx = "kubectx";
+      kustomize-build = "kustomize build";
 
       # JSON processing
       jqless = "jq -C | bat --pager 'less RF' --style=numbers --color=always";
@@ -167,6 +197,11 @@
     duf           # Better df
     delta         # Better diff
     hyperfine     # Benchmarking tool
+    bottom        # Alternative to htop/btop
+    gitui         # Terminal UI for git
+    lazygit       # Another git UI
+    neofetch      # System info display
+    onefetch      # Git repository info
 
     # File management
     fzf           # Fuzzy finder
@@ -276,14 +311,78 @@
         echo "Load: $(uptime | awk -F'load average:' '{print $2}')"
       }
 
-      # Weather function
+      # Weather function with better error handling
       weather() {
-        curl -s "wttr.in/''${1:-}"
+        local location="''${1:-}"
+        if command -v curl >/dev/null 2>&1; then
+          curl -s "wttr.in/$location" || echo "Failed to fetch weather data"
+        else
+          echo "curl not available for weather lookup"
+        fi
       }
 
-      # Cheat sheet function
+      # Cheat sheet function with better error handling
       cheat() {
-        curl -s "cheat.sh/''${1}"
+        local topic="''${1:-}"
+        if command -v curl >/dev/null 2>&1; then
+          curl -s "cheat.sh/$topic" || echo "Failed to fetch cheat sheet"
+        else
+          echo "curl not available for cheat sheet lookup"
+        fi
+      }
+
+      # Enhanced directory navigation
+      up() {
+        local levels="''${1:-1}"
+        for ((i=1; i<=levels; i++)); do
+          cd ..
+        done
+      }
+
+      # Quick file operations
+      mkdir-cd() {
+        mkdir -p "$1" && cd "$1"
+      }
+
+      # Enhanced git functions
+      git-branch-name() {
+        git branch --show-current 2>/dev/null || echo "not-a-git-repo"
+      }
+
+      git-status-check() {
+        if git rev-parse --git-dir >/dev/null 2>&1; then
+          local status=$(git status --porcelain 2>/dev/null | wc -l)
+          if [ "$status" -gt 0 ]; then
+            echo "⚠️  $status uncommitted changes"
+          else
+            echo "✅ clean working tree"
+          fi
+        fi
+      }
+
+      # Enhanced system monitoring
+      disk-usage() {
+        if command -v dust >/dev/null 2>&1; then
+          dust "$@"
+        else
+          du -h "$@" | sort -hr | head -20
+        fi
+      }
+
+      # Process management
+      kill-port() {
+        local port="$1"
+        if [ -z "$port" ]; then
+          echo "Usage: kill-port <port>"
+          return 1
+        fi
+        local pid=$(lsof -ti:$port)
+        if [ -n "$pid" ]; then
+          kill -9 "$pid"
+          echo "Killed process $pid on port $port"
+        else
+          echo "No process found on port $port"
+        fi
       }
 
       # FZF preview helper

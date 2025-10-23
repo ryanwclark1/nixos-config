@@ -224,10 +224,21 @@ in
         src = pkgs.fishPlugins.gitnow.src;
       }
 
-      # Enhanced prompt
+      # Enhanced prompt (optional - can be disabled if using starship)
       {
         name = "tide";
         src = pkgs.fishPlugins.tide.src;
+      }
+
+      # Additional useful plugins
+      {
+        name = "z";
+        src = pkgs.fishPlugins.z.src;
+      }
+
+      {
+        name = "puffer";
+        src = pkgs.fishPlugins.puffer.src;
       }
     ];
 

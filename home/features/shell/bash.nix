@@ -39,7 +39,8 @@
 
     shellOptions = [
       # History options
-      "histappend"  # Append to history file,
+      "histappend"  # Append to history file
+      "histverify"  # Verify history expansion before execution
       # Completion and expansion options
       "cdspell"     # Correct minor spelling errors in cd commands
       "dotglob"     # Include hidden files in pathname expansion
@@ -56,9 +57,14 @@
       "checkwinsize" # Update LINES and COLUMNS after each command
       "cmdhist"     # Save multi-line commands as single history entry
       "lithist"     # Save multi-line commands with newlines
-      # Additional options from your environment that might be useful
+      # Error handling and safety
       "inherit_errexit" # Child processes inherit errexit
       "interactive_comments" # Allow comments in interactive shell
+      "failglob"    # Fail on glob patterns that don't match
+      "nullglob"    # Expand globs to empty string if no matches
+      # Modern bash features
+      "assoc_expand_once" # Only expand associative arrays once
+      "autocd"      # Change to directory if command is directory name
     ];
 
     # Bash-specific session variables
