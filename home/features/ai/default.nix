@@ -6,6 +6,7 @@
 
 {
   imports = [
+    ./aichat
     ./claude
     ./crush
     ./gemini
