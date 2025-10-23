@@ -259,19 +259,19 @@
       if command -v git &> /dev/null; then
         # Complete git branches with better formatting
         _git_branch_complete() {
-          local cur="${COMP_WORDS[COMP_CWORD]}"
+          local cur="$${COMP_WORDS[COMP_CWORD]}"
           COMPREPLY=($(git branch --format='%(refname:short)' 2>/dev/null | grep "^$cur" | head -20))
         }
 
         # Complete git remotes
         _git_remote_complete() {
-          local cur="${COMP_WORDS[COMP_CWORD]}"
+          local cur="$${COMP_WORDS[COMP_CWORD]}"
           COMPREPLY=($(git remote 2>/dev/null | grep "^$cur"))
         }
 
         # Complete git tags
         _git_tag_complete() {
-          local cur="${COMP_WORDS[COMP_CWORD]}"
+          local cur="$${COMP_WORDS[COMP_CWORD]}"
           COMPREPLY=($(git tag 2>/dev/null | grep "^$cur" | head -20))
         }
       fi
@@ -280,13 +280,13 @@
       if command -v docker &> /dev/null; then
         # Complete docker containers
         _docker_container_complete() {
-          local cur="${COMP_WORDS[COMP_CWORD]}"
+          local cur="$${COMP_WORDS[COMP_CWORD]}"
           COMPREPLY=($(docker ps --format "table {{.Names}}" 2>/dev/null | tail -n +2 | grep "^$cur"))
         }
 
         # Complete docker images
         _docker_image_complete() {
-          local cur="${COMP_WORDS[COMP_CWORD]}"
+          local cur="$${COMP_WORDS[COMP_CWORD]}"
           COMPREPLY=($(docker images --format "table {{.Repository}}:{{.Tag}}" 2>/dev/null | tail -n +2 | grep "^$cur"))
         }
       fi
@@ -295,7 +295,7 @@
       if command -v nix &> /dev/null; then
         # Complete nix flake inputs
         _nix_flake_input_complete() {
-          local cur="${COMP_WORDS[COMP_CWORD]}"
+          local cur="$${COMP_WORDS[COMP_CWORD]}"
           if [[ -f flake.nix ]] || [[ -f flake.lock ]]; then
             COMPREPLY=($(nix flake metadata --json 2>/dev/null | jq -r '.locks.nodes | keys[]' | grep "^$cur"))
           fi
