@@ -26,6 +26,11 @@
     executable = false;
   };
 
+  home.file.".local/bin/yazi-performance-monitor" = {
+    source = ./scripts/yazi-performance-monitor.sh;
+    executable = true;
+  };
+
   home.file.".config/yazi/keymap.toml" = {
     source = ./keymap.toml;
     executable = false;
@@ -47,6 +52,7 @@
     ffmpeg           # Modern video thumbnail generation
     chafa            # Terminal image display
     librsvg          # SVG handling
+    imagemagick      # Enhanced image processing for AVIF, HEIF, JPEG XL
 
     # Document processing
     poppler_utils    # PDF text extraction (pdftotext, pdfinfo)
@@ -57,6 +63,7 @@
     # Archive handling
     atool            # Universal archive tool
     p7zip            # 7z archive support
+    ouch             # Fast archive operations
 
     # Data processing
     mediainfo        # Audio/video metadata
@@ -82,6 +89,11 @@
     ripdrag          # Drag and drop support
     sqlite           # Database inspection
     transmission_4     # Torrent info (transmission-show)
+
+    # Enhanced preview tools
+    tree             # Directory tree visualization
+    fd               # Fast file finding
+    ripgrep          # Fast text searching
   ];
 
   programs.yazi = {
@@ -98,6 +110,7 @@
       chmod = pkgs.yaziPlugins.chmod;
       excel = ./plugins/excel.yazi;
       eza-preview = ./plugins/eza-preview.yazi;
+      enhanced-preview = ./plugins/enhanced-preview.yazi;
       folder-rules = ./plugins/folder-rules.yazi;
       fzfbm = ./plugins/fzfbm.yazi;
       glow = pkgs.yaziPlugins.glow;
@@ -120,98 +133,80 @@
         light = "theme";
       };
     };
-    # keymap = {
-    #   manager.prepend_keymap = [
-    #     # https://yazi-rs.github.io/docs/tips/#dropping-to-shell
-    #     {
-    #       on   = "!";
-    #       run  = ''shell "$SHELL" --block --confirm'';
-    #       desc = "Open shell here";
-    #     }
-    #     # Smart enter: enter for directory, open for file
-    #     {
-    #       on   = ["l"];
-    #       run  = "plugin smart-enter";
-    #       desc = "Enter the child directory, or open the file";
-    #     }
-    #     #  Smart paste: paste files without entering the directory
-    #     {
-    #       on   = ["p"];
-    #       run  = "plugin smart-paste";
-    #       desc = "Paste into the hovered directory or CWD";
-    #     }
-    #     # Copy selected files to the system clipboard while yanking
-    #     {
-    #       on = ["y"];
-    #       run = [
-    #         ''
-    #           shell 'for path in "$@"; do echo "file://$path"; done | wl-copy -t text/uri-list' --confirm
-    #         ''
-    #         "yank"
-    #       ];
-    #       desc = "Copy the selected files to the system clipboard while yanking";
-    #     }
-    #     # https://yazi-rs.github.io/docs/tips/#drag-and-drop
-    #     {
-    #       on = ["<C-n>"];
-    #       run = [''
-    #         shell 'ripdrag "$@" -x 2>/dev/null &' --confirm
-    #       ''
-    #       ''echo "Control + N Pressed"
-    #       ''
-    #       ];
-    #       desc = "Drag and drop via ripdrag";
-    #     }
-    #     # Maximize preview pane
-    #     # https://github.com/yazi-rs/plugins/tree/main/max-preview.yazi
-    #     {
-    #       on   = ["T"];
-    #       run  = "plugin max-preview";
-    #       desc = "Maximize or restore preview pane";
-    #     }
-    #     # https://yazi-rs.github.io/docs/tips/#navigation-wraparound
-    #     {
-    #       on = ["k"];
-    #       run = "plugin arrow --args=-1";
-    #       desc = "Move the cursor down";
-    #     }
-    #     {
-    #       on = ["j"];
-    #       run = "plugin arrow --args=1";
-    #       desc = "Move the cursor up";
-    #     }
-    #     # cd back to the root of the current Git repository
-    #     {
-    #       on = ["g" "r"];
-    #       run = ''
-    #         shell 'ya emit cd "$(git rev-parse --show-toplevel)"' --confirm
-    #         '';
-    #       desc = "Go to the root of the current Git repository";
-    #     }
-    #     # Runs lazygit
-    #     {
-    #       on   = ["g" "i"];
-    #       run  = ''plugin lazygit'';
-    #       desc = "run lazygit";
-    #     }
-    #     # preview directories using eza, can be switched between list and tree modes.
-    #     {
-    #       on = ["E"];
-    #       run = "plugin eza-preview";
-    #       desc = "Toggle tree/list dir preview";
-    #     }
-    #     {
-    #       on = ["c,m"];
-    #       run = "plugin chmod";
-    #       desc = "Chmod the selected files";
-    #     }
-    #     # Compress files
-    #     {
-    #       on = ["C"];
-    #       run = "plugin ouch --args=zip";
-    #       desc = "Compress with ouch";
-    #     }
-    #   ];
+    keymap = {
+      manager.prepend_keymap = [
+        # Smart enter: enter for directory, open for file
+        {
+          on   = ["l"];
+          run  = "plugin smart-enter";
+          desc = "Enter the child directory, or open the file";
+        }
+        # Smart paste: paste files without entering the directory
+        {
+          on   = ["p"];
+          run  = "plugin smart-paste";
+          desc = "Paste into the hovered directory or CWD";
+        }
+        # Copy selected files to the system clipboard while yanking
+        {
+          on = ["y"];
+          run = [
+            ''
+              shell 'for path in "$@"; do echo "file://$path"; done | wl-copy -t text/uri-list' --confirm
+            ''
+            "yank"
+          ];
+          desc = "Copy the selected files to the system clipboard while yanking";
+        }
+        # Maximize preview pane
+        {
+          on   = ["T"];
+          run  = "plugin max-preview";
+          desc = "Maximize or restore preview pane";
+        }
+        # Navigation wraparound
+        {
+          on = ["k"];
+          run = "plugin arrow --args=-1";
+          desc = "Move the cursor up";
+        }
+        {
+          on = ["j"];
+          run = "plugin arrow --args=1";
+          desc = "Move the cursor down";
+        }
+        # cd back to the root of the current Git repository
+        {
+          on = ["g" "r"];
+          run = ''
+            shell 'ya emit cd "$(git rev-parse --show-toplevel)"' --confirm
+            '';
+          desc = "Go to the root of the current Git repository";
+        }
+        # Runs lazygit
+        {
+          on   = ["g" "i"];
+          run  = ''plugin lazygit'';
+          desc = "run lazygit";
+        }
+        # preview directories using eza, can be switched between list and tree modes.
+        {
+          on = ["E"];
+          run = "plugin eza-preview";
+          desc = "Toggle tree/list dir preview";
+        }
+        {
+          on = ["c,m"];
+          run = "plugin chmod";
+          desc = "Chmod the selected files";
+        }
+        # Compress files
+        {
+          on = ["C"];
+          run = "plugin ouch --args=zip";
+          desc = "Compress with ouch";
+        }
+      ];
     #   manager.keymap = [
     #     {
     #       on = "<Esc>";
