@@ -46,6 +46,7 @@ in
 
   # Copy these scripts to the user's home directory for dotfiles repo
   home.file.".config/scripts" = {
+    force = true;
     source = ./scripts;
     recursive = true;
   };

@@ -36,6 +36,7 @@
   home.file = {
     # System-level scripts (independent of window manager/DE)
     ".local/bin/scripts/system" = {
+      force = true;
       source = ./scripts/system;
       recursive = true;
       executable = true;
@@ -43,6 +44,7 @@
 
     # Wayland-specific scripts (for all Wayland compositors)
     ".local/bin/scripts/wayland" = {
+      force = true;
       source = ./scripts/wayland;
       recursive = true;
       executable = true;
@@ -51,6 +53,7 @@
     # TODO: Relocate
     # Rofi scripts (common across window managers)
     ".local/bin/scripts/rofi" = {
+      force = true;
       source = ./scripts/rofi;
       recursive = true;
       executable = true;

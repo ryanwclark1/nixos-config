@@ -11,11 +11,14 @@
   ];
 
   home.file.".config/vscode/plugins/custom.theme/package.json" = {
+    force = true;
     source = ./custom.theme/package.json;
   };
 
   # MCP Configuration
-  home.file.".config/Code/User/mcp.json".text = builtins.toJSON {
+  home.file.".config/Code/User/mcp.json" = {
+    force = true;
+    text = builtins.toJSON {
     servers = {
       filesystem = {
         command = "npx";
@@ -169,6 +172,7 @@
       };
     };
   };
+};
 
   home.packages = with pkgs; [
     taplo # Even Better TOML
