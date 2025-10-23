@@ -17,12 +17,13 @@ title_format = "Yazi: {cwd}"
 [preview]
 wrap = "no"
 tab_size = 2
-max_width = 800
-max_height = 600
+max_width = 1200
+max_height = 1800
 cache_dir = "/home/administrator/.cache/yazi"
-image_delay = 30
+image_delay = 5
 image_filter = "triangle"
 image_quality = 75
+sixel_fraction = 15
 ueberzug_scale = 1
 ueberzug_offset = [0, 0, 0, 0]
 
@@ -42,7 +43,7 @@ reveal = [
     { run = 'xdg-open "$(dirname "$1")"', desc = "Reveal", for = "linux" },
     { run = 'open -R "$1"', desc = "Reveal", for = "macos" },
     { run = 'explorer /select,"%1"', orphan = true, desc = "Reveal", for = "windows" },
-    { run = 'termux-open "$(dirname "$1")"',        desc = "Reveal", for = "android" },
+    { run = 'termux-open "$(dirname "$1")"', desc = "Reveal", for = "android" },
     { run = '''clear; exiftool "$1"; echo "Press enter to exit"; read _''', block = true, desc = "Show EXIF", for = "unix" },
 ]
 extract = [
@@ -58,36 +59,62 @@ play = [
 [open]
 rules = [
     # Folder
-    { name = "*/", use = ["edit", "open", "reveal"] },
+    { name = "*/", use = [
+        "edit",
+        "open",
+        "reveal",
+    ] },
     # Text
-    { mime = "text/*", use = ["edit", "reveal"] },
+    { mime = "text/*", use = [
+        "edit",
+        "reveal",
+    ] },
     # Image
-    { mime = "image/*", use = ["open", "reveal"] },
+    { mime = "image/*", use = [
+        "open",
+        "reveal",
+    ] },
     # Media
-    { mime = "{audio,video}/*", use = ["play", "reveal"] },
+    { mime = "{audio,video}/*", use = [
+        "play",
+        "reveal",
+    ] },
     # Archive
-    { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", use = [ "extract", "reveal" ] },
+    { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", use = [
+        "extract",
+        "reveal",
+    ] },
     # JSON
-    { mime = "application/{json,x-ndjson}", use = ["edit", "reveal"] },
-    { mime = "*/javascript", use = ["edit", "reveal"] },
+    { mime = "application/{json,x-ndjson}", use = [
+        "edit",
+        "reveal",
+    ] },
+    { mime = "*/javascript", use = [
+        "edit",
+        "reveal",
+    ] },
     # Empty file
-    { mime = "inode/x-empty", use = ["edit", "reveal"] },
+    { mime = "inode/x-empty", use = [
+        "edit",
+        "reveal",
+    ] },
     # Fallback
-    { name = "*", use = ["open", "reveal"] },
+    { name = "*", use = [
+        "open",
+        "reveal",
+    ] },
 ]
 
 [tasks]
-micro_workers = 10
-macro_workers = 25
-bizarre_retry = 5
-image_alloc = 536870912  # 512MB
+micro_workers = 20
+macro_workers = 50
+bizarre_retry = 3
+image_alloc = 1073741824 # 1GB
 image_bound = [0, 0]
-suppress_preload = true
+suppress_preload = false
 
 [plugin]
-fetchers = [
-    { id = "mime", name = "*", run = "mime", prio = "high" },
-]
+fetchers = [{ id = "mime", name = "*", run = "mime", prio = "high" }]
 spotters = [
     { name = "*/", run = "folder" },
     # Code
@@ -143,7 +170,7 @@ preloaders = [
 #     { mime = "application/octet-stream", run = "hexyl"}
 # ]
 previewers = [
-    { name = "*/", run = "folder"},
+    { name = "*/", run = "folder" },
     # Code
     { mime = "text/*", run = "code" },
     { mime = "*/{xml,javascript,x-wine-extension-ini}", run = "code" },
@@ -216,26 +243,26 @@ shell_offset = [0, 2, 50, 3]
 
 [confirm]
 # trash
-trash_title     = "Trash {n} selected file{s}?"
-trash_origin    = "center"
-trash_offset    = [ 0, 0, 70, 20 ]
+trash_title = "Trash {n} selected file{s}?"
+trash_origin = "center"
+trash_offset = [0, 0, 70, 20]
 
 # delete
-delete_title     = "Permanently delete {n} selected file{s}?"
-delete_origin    = "center"
-delete_offset    = [ 0, 0, 70, 20 ]
+delete_title = "Permanently delete {n} selected file{s}?"
+delete_origin = "center"
+delete_offset = [0, 0, 70, 20]
 
 # overwrite
-overwrite_title   = "Overwrite file?"
+overwrite_title = "Overwrite file?"
 overwrite_content = "Will overwrite the following file:"
-overwrite_origin  = "center"
-overwrite_offset  = [ 0, 0, 50, 15 ]
+overwrite_origin = "center"
+overwrite_offset = [0, 0, 50, 15]
 
 # quit
-quit_title   = "Quit?"
+quit_title = "Quit?"
 quit_content = "The following tasks are still running, are you sure you want to quit?"
-quit_origin  = "center"
-quit_offset  = [ 0, 0, 50, 15 ]
+quit_origin = "center"
+quit_offset = [0, 0, 50, 15]
 
 [pick]
 open_placeholder = "Open with:"
@@ -247,5 +274,3 @@ sort_by = "none"
 sort_sensitive = false
 sort_reverse = false
 sort_translit = false
-
-
