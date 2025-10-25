@@ -34,8 +34,9 @@ in
 {
   programs.ghostty = {
     enable = true;
+    package = inputs.ghostty.packages.${pkgs.stdenv.hostPlatform.system}.default;
     installVimSyntax = true;
-    installBatSyntax = true;  # Disabled due to missing syntax file
+    installBatSyntax = true;
     clearDefaultKeybinds = false;
     settings = {
       theme = "theme";
