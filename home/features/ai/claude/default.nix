@@ -213,7 +213,7 @@ in
     agents = {
       # ai-engineer = (builtins.readFile ./config/agents/ai-engineer.md);
       # architect-review = (builtins.readFile ./config/agents/architect-review.md);
-      # code-reviewer = (builtins.readFile ./config/agents/code-reviewer.md);
+      code-reviewer = (builtins.readFile ./config/agents/code-reviewer.md);
       # debugger = (builtins.readFile ./config/agents/debugger.md);
       # docs-architect = (builtins.readFile ./config/agents/docs-architect.md);
       # error-detective = (builtins.readFile ./config/agents/error-detective.md);
