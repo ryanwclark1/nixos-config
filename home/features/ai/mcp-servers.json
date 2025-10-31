@@ -7,10 +7,9 @@
       "--rm",
       "--mount",
       "type=bind,src=${PWD},dst=${PWD}",
-
       "mcp/git"
     ],
-    "env" : {
+    "env": {
       "HOME": "${HOME}",
       "PWD": "${PWD}"
     },
@@ -58,10 +57,9 @@
       "bridge",
       "mcp/fetch"
     ],
-    "env":{
+    "env": {
       "DEFAULT_USER_AGENT_AUTONOMOUS": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
       "DEFAULT_USER_AGENT_MANUAL": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
-
     },
     "description": "Fetches and analyzes web content"
   },
@@ -92,7 +90,7 @@
     ],
     "env": {
       "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}",
-      "GITHUB_DYNAMIC_TOOLSETS" : "1"
+      "GITHUB_DYNAMIC_TOOLSETS": "1"
     },
     "description": "GitHub repository and workflow management via MCP"
   },
@@ -105,26 +103,15 @@
     "description": "Browser automation and web scraping via Playwright"
   },
   "serena": {
-    "command": "docker",
+    "command": "uvx",
     "args": [
-      "run",
-      "-i",
-      "--rm",
-      "--network",
-      "host",
-
-      "-v",
-      "/home/administrator/Code:/workspace/Code:rw",
-
-      "ghcr.io/oraios/serena:latest",
+      "--from",
+      "git+https://github.com/oraios/serena",
       "serena",
       "start-mcp-server",
       "--transport",
       "stdio"
     ],
-    "env": {
-      "SERENA_DOCKER": "1"
-    },
     "description": "AI-powered development assistant with Code directory access"
   },
   "sourcebot": {
