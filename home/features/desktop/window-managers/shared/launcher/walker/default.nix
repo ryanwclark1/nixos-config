@@ -5,7 +5,7 @@
 
 {
   programs.walker = {
-    enable = false;
+    enable = true;
     package = pkgs.walker;
     systemd.enable = true;
   };
