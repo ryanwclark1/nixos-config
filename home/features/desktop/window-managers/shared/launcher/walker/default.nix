@@ -3,111 +3,169 @@
   ...
 }:
 
+# Walker - Fast, extensible application launcher for Wayland/X11
+#
+# Features:
+# - Application launcher with fuzzy search
+# - Inline calculator (prefix: =)
+# - File finder (prefix: .)
+# - Emoji picker (prefix: :)
+# - Hyprland keybindings viewer
+# - Window switcher
+# - UWSM integration for proper session management
+#
+# Keybindings:
+# - SUPER+SPACE or SUPER+X - Launch walker
+#
+# See README.md for detailed configuration and usage
+
 {
   programs.walker = {
     enable = true;
     package = pkgs.walker;
-    systemd.enable = true;
+    systemd.enable = true;  # Run as systemd user service for proper session management
   };
 
 
-  # Walker configuration
-  home.file.".config.walker/config.toml" = {
+  # Walker main configuration
+  # This configures walker's behavior, providers, and feature toggles
+  home.file.".config/walker/config.toml" = {
     force = true;
     text = ''
-    close_when_open = true
-    theme = "catppuccin"
-    hotreload_theme = true
-    force_keyboard_focus = true
-    timeout = 60
+    # Walker Main Configuration
+    # See: https://github.com/abenz1267/walker
 
+    # General behavior
+    close_when_open = true           # Close walker after launching an app
+    theme = "catppuccin"             # Theme to use (must match theme file name)
+    hotreload_theme = true           # Auto-reload theme on changes
+    force_keyboard_focus = true      # Keep focus in walker
+    timeout = 60                     # Close after N seconds of inactivity
+
+    # AI Integration (if using walker AI features)
     [keys.ai]
     run_last_response = ["ctrl e"]
 
+    # List appearance and behavior
     [list]
-    max_entries = 200
-    cycle = true
+    max_entries = 200                # Maximum number of results to show
+    cycle = true                     # Wrap around at list edges
 
+    # Search input configuration
     [search]
-    placeholder = " Search..."
+    placeholder = " Search..."      # Placeholder text in search box
 
+    # =========================================================================
+    # Built-in Providers Configuration
+    # Enable/disable and configure walker's built-in functionality
+    # =========================================================================
+
+    # Hyprland Keybindings Viewer
+    # Shows keybindings from your Hyprland config
     [builtins.hyprland_keybinds]
     path = "~/.config/hypr/hyprland.conf"
-    hidden = true
+    hidden = true                    # Hidden: Use SUPER+K keybindings-menu script instead
 
+    # Application Launcher
+    # Launch desktop applications
     [builtins.applications]
-    launch_prefix = "uwsm app -- "
-    placeholder = " Search..."
-    prioritize_new = false
-    context_aware = false
-    show_sub_when_single = false
-    history = false
-    icon = ""
-    hidden = true
+    launch_prefix = "uwsm app -- "   # Launch via UWSM for proper session management
+    placeholder = " Search..."      # Placeholder for app search
+    prioritize_new = false           # Don't prioritize recently installed apps
+    context_aware = false            # Don't adjust based on context
+    show_sub_when_single = false     # Don't show subcategories for single results
+    history = false                  # Don't track launch history
+    icon = ""                      # Icon for application entries
+    hidden = true                    # Hidden by default, shows when typing
 
     [builtins.applications.actions]
-    enabled = false
-    hide_category = true
+    enabled = false                  # Disable application-specific actions
+    hide_category = true             # Hide category information
 
+    # Bookmarks
+    # Quick access to bookmarked locations
     [builtins.bookmarks]
-    hidden = true
+    hidden = true                    # Disabled: Not commonly used
 
+    # Calculator
+    # Inline calculations with = prefix
     [builtins.calc]
     name = "Calculator"
     icon = ""
-    min_chars = 3
-    prefix = "="
+    min_chars = 3                    # Minimum characters before calculating
+    prefix = "="                     # Use: =2+2, =sqrt(16), etc.
 
+    # Window Switcher
+    # Switch between open windows
     [builtins.windows]
-    switcher_only = true
-    hidden = true
+    switcher_only = true             # Only show in dedicated window switcher mode
+    hidden = true                    # Hidden: Use ALT+TAB instead
 
+    # Clipboard History
+    # Access clipboard history
     [builtins.clipboard]
-    hidden = true
+    hidden = true                    # Hidden: Use SUPER+V with rofi+cliphist instead
 
+    # Commands
+    # Run arbitrary commands
     [builtins.commands]
-    hidden = true
+    hidden = true                    # Disabled: Use terminal or runner instead
 
+    # Custom Commands
+    # User-defined custom commands
     [builtins.custom_commands]
-    hidden = true
+    hidden = true                    # Disabled: Not configured
 
+    # Emoji and Symbols Picker
+    # Insert emojis and special characters
     [builtins.emojis]
     name = "Emojis"
     icon = ""
-    prefix = ":"
+    prefix = ":"                     # Use: :smile, :heart, :fire, etc.
 
+    # Symbols (Alternative emoji interface)
     [builtins.symbols]
-    after_copy = ""
-    hidden = true
+    after_copy = ""                  # No action after copying
+    hidden = true                    # Hidden: Use emojis instead
 
+    # File Finder
+    # Search for files in home directory
     [builtins.finder]
-    use_fd = true
-    cmd_alt = "xdg-open $(dirname ~/%RESULT%)"
+    use_fd = true                    # Use fd (fast alternative to find)
+    cmd_alt = "xdg-open $(dirname ~/%RESULT%)"  # Alt+Enter: Open parent directory
     icon = "file"
     name = "Finder"
-    preview_images = true
-    hidden = false
-    prefix = "."
+    preview_images = true            # Show image previews
+    hidden = false                   # Always available with . prefix
+    prefix = "."                     # Use: .myfile.txt, .*.conf, etc.
 
+    # Command Runner
+    # Run shell commands
     [builtins.runner]
-    shell_config = ""
-    switcher_only = true
-    hidden = true
+    shell_config = ""                # Use default shell
+    switcher_only = true             # Only in dedicated runner mode
+    hidden = true                    # Hidden: Use terminal instead
 
+    # SSH Connections
+    # Quick SSH to known hosts
     [builtins.ssh]
-    hidden = true
+    hidden = true                    # Disabled: Use terminal for SSH
 
+    # Web Search
+    # Search the web directly
     [builtins.websearch]
     switcher_only = true
-    hidden = true
+    hidden = true                    # Hidden: Use SUPER+SHIFT+W with rofi web-search instead
 
+    # Translation
+    # Translate text
     [builtins.translation]
-    hidden = true
+    hidden = true                    # Disabled: Not commonly used
     '';
   };
 
   # Catppuccin theme files
-  home.file.".config.walker/themes/catppuccin.css" = {
+  home.file.".config/walker/themes/catppuccin.css" = {
     force = true;
     text = ''
       @define-color rosewater #f2d5cf;
@@ -290,7 +348,7 @@
     '';
   };
 
-  home.file.".config.walker/themes/catppuccin.toml" =
+  home.file.".config/walker/themes/catppuccin.toml" =
   {
     force = true;
     text = ''
@@ -398,4 +456,3 @@
     '';
   };
 }
-
