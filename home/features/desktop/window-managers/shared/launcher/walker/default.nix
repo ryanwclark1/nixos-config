@@ -4,12 +4,12 @@
 }:
 
 {
-  programs.walker = {
-    enable = true;
-    package = pkgs.walker;
-    systemd.enable = true;
-  };
-
+  # programs.walker = {
+  #   enable = true;
+  #   package = pkgs.walker;
+  #   systemd.enable = true;
+  # };
+  home.packages = [ pkgs.walker ];
 
   # Walker configuration
   home.file.".config.walker/config.toml" = {
