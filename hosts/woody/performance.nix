@@ -58,7 +58,7 @@
         # Video acceleration
         libva
         libvdpau-va-gl
-        vaapiVdpau
+        libva-vdpau-driver
       ];
       extraPackages32 = with pkgs.driversi686Linux; [
         mesa
