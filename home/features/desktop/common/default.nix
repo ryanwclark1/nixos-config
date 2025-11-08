@@ -47,6 +47,14 @@
     (writeShellScriptBin "toggle-idle" (''
       PATH="${pkgs.procps}/bin:${pkgs.libnotify}/bin:$PATH"
     '' + builtins.readFile ./scripts/wayland/toggle-idle.sh))
+
+    (writeShellScriptBin "toggle-transparency" (''
+      PATH="${pkgs.hyprland}/bin:${pkgs.jq}/bin:${pkgs.libnotify}/bin:$PATH"
+    '' + builtins.readFile ./scripts/wayland/toggle-transparency.sh))
+
+    (writeShellScriptBin "window-pop" (''
+      PATH="${pkgs.hyprland}/bin:${pkgs.jq}/bin:${pkgs.libnotify}/bin:$PATH"
+    '' + builtins.readFile ./scripts/wayland/window-pop.sh))
   ];
 
   # Desktop common scripts - available to all desktop environments/window managers

@@ -38,6 +38,8 @@ Wayland compositor compatible utilities:
 - **`workspace-toggle-gaps.sh`** - Toggle workspace gaps on/off (Hyprland)
 - **`toggle-nightlight.sh`** - Toggle hyprsunset nightlight mode
 - **`toggle-idle.sh`** - Toggle hypridle idle management on/off
+- **`toggle-transparency.sh`** - Toggle window opacity/transparency (Hyprland)
+- **`window-pop.sh`** - Pop window out (float and pin across workspaces) (Hyprland)
 
 **Dependencies**: Wayland compositor, wayland-specific tools
 **Usage**: Works with any Wayland compositor (Hyprland, Sway, etc.)
