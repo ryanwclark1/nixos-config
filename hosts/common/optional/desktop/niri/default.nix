@@ -13,7 +13,7 @@
 
   programs = {
     niri.enable = true;  # Enable niri at system level to register the session
-    
+
     # Enable dconf for settings management (needed for various desktop apps)
     dconf.enable = lib.mkDefault true;
   };
@@ -29,10 +29,6 @@
   # System services
   services = {
     gnome.gnome-keyring.enable = lib.mkDefault true;  # secret service
-  };
-
-  security = {
-    polkit.enable = true;
   };
 
   hardware.graphics = { enable = true; enable32Bit = true; };

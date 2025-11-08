@@ -31,7 +31,7 @@
     ../common/optional/desktop/style.nix
     ../common/optional/desktop/common/nautilus.nix
     ../common/optional/desktop/common/thunar.nix
-    ../common/optional/desktop/common/1password-gui.nix.nix
+    ../common/optional/desktop/common/1password-gui.nix
 
     ../common/optional/services/audio.nix
     ../common/optional/services/bluetooth.nix

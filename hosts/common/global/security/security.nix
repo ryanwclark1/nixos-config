@@ -6,14 +6,14 @@
 {
   security = {
     # Enable audit system
-    auditd.enable = true;
-    audit.enable = true;
+    auditd.enable = lib.mkDefault true;
+    audit.enable = lib.mkDefault true;
 
     # Enable real-time scheduling
-    rtkit.enable = true;
+    rtkit.enable = lib.mkDefault true;
 
     # Enable polkit
-    polkit.enable = true;
+    polkit.enable = lib.mkDefault true;
 
     # Increase open file limit for sudoers
     pam.loginLimits = [
