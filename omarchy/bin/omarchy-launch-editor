@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 omarchy-cmd-present "$EDITOR" || EDITOR=nvim
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Drive, like /dev/nvme0, to display information about
 if (($# == 0)); then

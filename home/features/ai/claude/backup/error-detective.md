@@ -732,7 +732,7 @@ examples:
       ```bash
       # Create memory pressure handling script
       cat > memory-pressure-handler.sh << 'EOF'
-      #!/bin/bash
+      #!/usr/bin/env bash
       # Monitor and respond to memory pressure
       while true; do
         # Check for memory pressure
@@ -1108,7 +1108,7 @@ examples:
       ```bash
       # Create JWT security monitoring script
       cat > jwt-security-monitor.sh << 'EOF'
-      #!/bin/bash
+      #!/usr/bin/env bash
       # Monitor for JWT security anomalies
 
       while true; do

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # omarchy-theme-set-obsidian: Bootstrap and update Omarchy theme for Obsidian
 #

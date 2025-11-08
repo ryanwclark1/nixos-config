@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 omarchy-refresh-config swayosd/config.toml
 omarchy-refresh-config swayosd/style.css

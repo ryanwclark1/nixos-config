@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 PINNED_PACKAGES_FILE="$OMARCHY_PATH/install/packages.pinned"
 

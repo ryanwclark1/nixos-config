@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Note: We cannot use `jq` to update settings.json because it’s JSONC (allows comments),
 # which jq doesn’t support.

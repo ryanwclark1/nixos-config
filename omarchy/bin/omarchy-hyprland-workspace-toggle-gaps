@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 workspace_id=$(hyprctl activeworkspace -j | jq -r .id)
 gaps=$(hyprctl workspacerules -j | jq -r ".[] | select(.workspaceString==\"$workspace_id\") | .gapsOut[0] // 0")

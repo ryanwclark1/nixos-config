@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # omarchy-theme-install: Install a new theme from a git repo for Omarchy
 # Usage: omarchy-theme-install <git-repo-url>

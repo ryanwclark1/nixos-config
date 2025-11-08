@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # omarchy-theme-remove: Remove a theme from Omarchy by name
 # Usage: omarchy-theme-remove <theme-name>

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if omarchy-pkg-missing "$@"; then
   sudo pacman -S --noconfirm --needed "$@" || exit 1
