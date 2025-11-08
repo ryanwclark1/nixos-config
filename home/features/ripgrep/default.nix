@@ -81,7 +81,7 @@
     #     name = "pdf-enhanced";
     #     description = "PDF text extraction with fallback to OCR";
     #     extensions = [ "pdf" ];
-    #     command = "${pkgs.poppler_utils}/bin/pdftotext";
+    #     command = "${pkgs.poppler-utils}/bin/pdftotext";
     #     args = [ "-layout" "-nopgbrk" "-" "-" ];
     #     binary = false;
     #   }

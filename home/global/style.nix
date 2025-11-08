@@ -42,8 +42,8 @@ in
         name = lib.mkDefault "JetBrainsMono Nerd Font";
       };
       emoji = {
-        # Package provided by fonts/default.nix  
-        package = lib.mkDefault pkgs.noto-fonts-emoji;
+        # Package provided by fonts/default.nix
+        package = lib.mkDefault pkgs.noto-fonts-color-emoji;
         name = lib.mkDefault "Noto Color Emoji";
       };
       sizes = {

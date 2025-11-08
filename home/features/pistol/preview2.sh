@@ -43,7 +43,7 @@ case "$MIMETYPE" in
     ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n"; ${pkgs.atool}/bin/atool --list -- "$1"
     ;;
   application/pdf)
-    ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n"; ${pkgs.poppler_utils}/bin/pdftotext -l 4 -nopgbrk -q -- "$1" - | fmt -w $(tput cols)
+    ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n"; ${pkgs.poppler-utils}/bin/pdftotext -l 4 -nopgbrk -q -- "$1" - | fmt -w $(tput cols)
     ;;
   application/epub+zip)
     ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n"; ${pkgs.epub2txt2}/bin/epub2txt "$1"

@@ -85,7 +85,7 @@ in
       nerd-fonts.ubuntu-mono
       nerd-fonts.ubuntu-sans
       noto-fonts
-      noto-fonts-emoji
+      noto-fonts-color-emoji
       liberation_ttf
       powerline-symbols
     ];
