@@ -31,6 +31,15 @@
     (writeShellScriptBin "update-gemini-cli" (builtins.readFile ./scripts/system/update-gemini-cli.sh))
     (writeShellScriptBin "gemini-cli-version" (builtins.readFile ./scripts/system/gemini-cli-version.sh))
 
+    # System info notification scripts
+    (writeShellScriptBin "show-battery" (''
+      PATH="${pkgs.coreutils}/bin:${pkgs.libnotify}/bin:$PATH"
+    '' + builtins.readFile ./scripts/system/show-battery.sh))
+
+    (writeShellScriptBin "show-time" (''
+      PATH="${pkgs.coreutils}/bin:${pkgs.libnotify}/bin:$PATH"
+    '' + builtins.readFile ./scripts/system/show-time.sh))
+
     # Wayland utility scripts (Hyprland-compatible)
     (writeShellScriptBin "keybindings-menu" (''
       PATH="${pkgs.hyprland}/bin:${pkgs.jq}/bin:${pkgs.libxkbcommon}/bin:${pkgs.walker}/bin:${pkgs.gawk}/bin:${pkgs.gnused}/bin:${pkgs.coreutils}/bin:$PATH"

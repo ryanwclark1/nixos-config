@@ -21,10 +21,12 @@ This directory contains scripts organized by scope and compatibility level, foll
 Platform and window manager independent utilities:
 
 - **`volume.sh`** - Audio volume control with rofi interface
-- **`brightness.sh`** - Display brightness control with rofi interface  
+- **`brightness.sh`** - Display brightness control with rofi interface
 - **`power.sh`** - Power management (lock/logout/suspend/reboot/shutdown)
 - **`battery.sh`** - Battery status and power management with rofi interface
 - **`figlet.sh`** - ASCII art text generator with clipboard support
+- **`show-battery.sh`** - Display battery status notification
+- **`show-time.sh`** - Display current time and date notification
 
 **Dependencies**: Core system utilities, optional rofi/notifications
 **Usage**: Works with any desktop environment or window manager
