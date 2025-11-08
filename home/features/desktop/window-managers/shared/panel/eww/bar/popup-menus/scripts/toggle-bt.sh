@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [[ -z $(eww active-windows | grep 'toggle-menu-bt') ]]; then
     /usr/bin/eww open toggle-menu-bt && /usr/bin/eww update tgbrev=true

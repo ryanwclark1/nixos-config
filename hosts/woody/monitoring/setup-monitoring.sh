@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Woody Monitoring Setup Script
 # This script helps set up and configure the monitoring stack

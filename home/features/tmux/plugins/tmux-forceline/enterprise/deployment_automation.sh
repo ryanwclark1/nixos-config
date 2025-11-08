@@ -21,32 +21,32 @@ readonly DEFAULT_DEPLOYMENT_MODE="staged"
 # Initialize deployment automation framework
 init_deployment_framework() {
     echo "🚀 Initializing tmux-forceline Deployment Automation Framework..."
-    
+
     # Create deployment directory structure
     mkdir -p "$DEPLOYMENT_DIR"/{playbooks,templates,inventory,scripts,packages,configs}
     mkdir -p "$PLAYBOOKS_DIR"/{install,configure,update,rollback}
     mkdir -p "$TEMPLATES_DIR"/{configs,systemd,docker,kubernetes}
     mkdir -p "$INVENTORY_DIR"/{staging,production,development}
     mkdir -p "$PACKAGES_DIR"/{deb,rpm,arch,brew,universal}
-    
+
     # Create deployment playbooks
     create_deployment_playbooks
-    
+
     # Create configuration templates
     create_configuration_templates
-    
+
     # Set up package building
     setup_package_building
-    
+
     # Create deployment scripts
     create_deployment_scripts
-    
+
     # Initialize container support
     setup_container_deployment
-    
+
     # Create orchestration tools
     setup_orchestration_tools
-    
+
     echo "✅ Deployment automation framework initialized successfully"
 }
 
@@ -61,18 +61,18 @@ deployment_config:
   name: "tmux-forceline Installation"
   version: "3.0"
   target_platforms: ["linux", "macos", "bsd", "wsl"]
-  
+
 pre_install_tasks:
   - name: "Detect system platform and package manager"
     script: "detect_system.sh"
-    
+
   - name: "Validate system requirements"
     requirements:
       - tmux_version: ">=2.6"
-      - bash_version: ">=4.0" 
+      - bash_version: ">=4.0"
       - disk_space: ">=100MB"
       - memory: ">=512MB"
-      
+
   - name: "Create backup of existing configuration"
     backup:
       - path: "~/.tmux.conf"
@@ -86,14 +86,14 @@ install_tasks:
       - copy_files: "src/*" -> "~/.config/tmux/forceline/"
       - set_permissions: "executable" -> "~/.config/tmux/forceline/*.sh"
       - create_symlinks: "~/.config/tmux/forceline/forceline.tmux" -> "~/.tmux/plugins/tmux-forceline"
-      
+
   - name: "Install enterprise components"
     condition: "enterprise_deployment == true"
     actions:
       - copy_files: "enterprise/*" -> "~/.config/tmux/forceline/enterprise/"
       - set_permissions: "executable" -> "~/.config/tmux/forceline/enterprise/*.sh"
       - initialize_security: "enterprise/security_hardening.sh init"
-      
+
   - name: "Configure system integration"
     actions:
       - add_to_path: "~/.config/tmux/forceline/bin"
@@ -104,10 +104,10 @@ post_install_tasks:
   - name: "Apply configuration profile"
     script: "apply_profile.sh"
     args: ["${profile:-auto}"]
-    
+
   - name: "Run validation tests"
     script: "validate_installation.sh"
-    
+
   - name: "Generate installation report"
     script: "generate_install_report.sh"
 
@@ -124,26 +124,26 @@ EOF
 deployment_config:
   name: "Enterprise Configuration Deployment"
   environments: ["development", "staging", "production"]
-  
+
 configuration_tasks:
   - name: "Deploy security policies"
     source: "templates/security_policies/"
     destination: "~/.config/tmux/forceline/enterprise/security/policies/"
     validation: "validate_security_policies.sh"
-    
+
   - name: "Configure monitoring and alerting"
     actions:
       - deploy_config: "monitoring_config.conf"
       - start_services: ["health_monitor", "metric_collectors"]
       - configure_alerts: "alert_rules.conf"
-      
+
   - name: "Set up compliance reporting"
     condition: "compliance_enabled == true"
     actions:
       - deploy_templates: "compliance_templates/"
       - configure_audit_logging: "audit_config.conf"
       - initialize_reporting: "compliance_reporter.sh init"
-      
+
   - name: "Apply environment-specific settings"
     environment_configs:
       development:
@@ -162,10 +162,10 @@ configuration_tasks:
 validation_tasks:
   - name: "Validate configuration integrity"
     script: "validate_enterprise_config.sh"
-    
+
   - name: "Run security assessment"
     script: "security_assessment.sh"
-    
+
   - name: "Test monitoring systems"
     script: "test_monitoring.sh"
 EOF
@@ -179,15 +179,15 @@ deployment_config:
   strategy: "rolling"
   max_unavailable: "25%"
   health_check_timeout: "300s"
-  
+
 pre_update_tasks:
   - name: "Backup current installation"
     script: "backup_installation.sh"
-    
+
   - name: "Check system health"
     script: "pre_update_health_check.sh"
     exit_on_failure: true
-    
+
   - name: "Download and verify update packages"
     actions:
       - download_package: "${update_url}"
@@ -200,20 +200,20 @@ update_tasks:
       - stop_service: "health_monitor"
       - stop_service: "metric_collectors"
       - wait_for_completion: "30s"
-      
+
   - name: "Update core components"
     actions:
       - update_files: "core/*"
       - preserve_configs: ["enterprise/", "themes/", "plugins/custom/"]
       - update_permissions: "executable"
-      
+
   - name: "Update enterprise components"
     condition: "enterprise_enabled == true"
     actions:
       - update_files: "enterprise/*"
       - migrate_configs: "config_migration.sh"
       - update_security_policies: "security_update.sh"
-      
+
   - name: "Restart services"
     actions:
       - start_service: "health_monitor"
@@ -223,10 +223,10 @@ update_tasks:
 post_update_tasks:
   - name: "Run post-update validation"
     script: "post_update_validation.sh"
-    
+
   - name: "Generate update report"
     script: "generate_update_report.sh"
-    
+
   - name: "Clean up temporary files"
     script: "cleanup_update.sh"
 
@@ -411,19 +411,19 @@ MAINTAINER="tmux-forceline team <team@tmux-forceline.org>"
 build_debian_package() {
     local build_dir="deb_build"
     local package_dir="${build_dir}/${PACKAGE_NAME}_${VERSION}"
-    
+
     echo "🏗️ Building Debian package..."
-    
+
     # Create package structure
     mkdir -p "$package_dir"/DEBIAN
     mkdir -p "$package_dir"/usr/share/tmux-forceline
     mkdir -p "$package_dir"/usr/bin
     mkdir -p "$package_dir"/etc/tmux-forceline
     mkdir -p "$package_dir"/usr/share/doc/tmux-forceline
-    
+
     # Copy files
     cp -r ../../../* "$package_dir"/usr/share/tmux-forceline/
-    
+
     # Create control file
     cat > "$package_dir"/DEBIAN/control << EOF
 Package: $PACKAGE_NAME
@@ -441,7 +441,7 @@ EOF
 
     # Create postinst script
     cat > "$package_dir"/DEBIAN/postinst << 'EOF'
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
 # Create tmux-forceline symlink
@@ -455,11 +455,11 @@ echo "Run 'tmux-forceline install' to complete setup."
 EOF
 
     chmod +x "$package_dir"/DEBIAN/postinst
-    
+
     # Build package
     dpkg-deb --build "$package_dir"
     mv "${package_dir}.deb" "./tmux-forceline_${VERSION}_${ARCHITECTURE}.deb"
-    
+
     echo "✅ Debian package built: tmux-forceline_${VERSION}_${ARCHITECTURE}.deb"
 }
 
@@ -478,13 +478,13 @@ RELEASE="1"
 
 build_rpm_package() {
     echo "🏗️ Building RPM package..."
-    
+
     # Create RPM build structure
     mkdir -p rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
-    
+
     # Create source tarball
     tar czf "rpmbuild/SOURCES/${PACKAGE_NAME}-${VERSION}.tar.gz" ../../../*
-    
+
     # Create spec file
     cat > "rpmbuild/SPECS/${PACKAGE_NAME}.spec" << EOF
 Name:           $PACKAGE_NAME
@@ -528,7 +528,7 @@ EOF
 
     # Build RPM
     rpmbuild --define "_topdir $(pwd)/rpmbuild" -ba "rpmbuild/SPECS/${PACKAGE_NAME}.spec"
-    
+
     echo "✅ RPM package built in rpmbuild/RPMS/noarch/"
 }
 
@@ -587,18 +587,18 @@ PLAYBOOK_DIR="$PLAYBOOKS_DIR"
 
 deploy_tmux_forceline() {
     local mode="$1"
-    local env="$2" 
+    local env="$2"
     local hosts="$3"
-    
+
     echo "🚀 Starting tmux-forceline deployment..."
     echo "   Mode: $mode"
     echo "   Environment: $env"
     echo "   Targets: $hosts"
     echo
-    
+
     # Validate deployment prerequisites
     validate_deployment_prerequisites
-    
+
     # Execute deployment based on mode
     case "$mode" in
         "single")
@@ -618,26 +618,26 @@ deploy_tmux_forceline() {
             exit 1
             ;;
     esac
-    
+
     echo "✅ Deployment completed successfully!"
 }
 
 # Validate deployment prerequisites
 validate_deployment_prerequisites() {
     echo "🔍 Validating deployment prerequisites..."
-    
+
     # Check inventory file
     if [[ ! -f "$INVENTORY_FILE" ]]; then
         echo "❌ Inventory file not found: $INVENTORY_FILE"
         exit 1
     fi
-    
+
     # Check SSH connectivity
     while IFS= read -r line; do
         if [[ "$line" =~ ^[a-zA-Z0-9-]+ ]]; then
             local host=$(echo "$line" | awk '{print $1}')
             local ansible_host=$(echo "$line" | grep -o 'ansible_host=[^ ]*' | cut -d= -f2 || echo "$host")
-            
+
             echo "   Testing connectivity to $host ($ansible_host)..."
             if ! ssh -o ConnectTimeout=10 -o BatchMode=yes "$ansible_host" "echo 'Connection test successful'" >/dev/null 2>&1; then
                 echo "❌ Cannot connect to $host ($ansible_host)"
@@ -645,7 +645,7 @@ validate_deployment_prerequisites() {
             fi
         fi
     done < "$INVENTORY_FILE"
-    
+
     echo "✅ Prerequisites validated"
 }
 
@@ -653,15 +653,15 @@ validate_deployment_prerequisites() {
 deploy_single_host() {
     local env="$1"
     local host="$2"
-    
+
     echo "📦 Deploying to single host: $host"
-    
+
     # Run installation playbook
     run_playbook "install/main_install.yml" "$env" "$host"
-    
+
     # Run configuration playbook
     run_playbook "configure/enterprise_config.yml" "$env" "$host"
-    
+
     # Validate deployment
     validate_deployment "$env" "$host"
 }
@@ -670,26 +670,26 @@ deploy_single_host() {
 deploy_staged() {
     local env="$1"
     local hosts="$2"
-    
+
     echo "🎭 Starting staged deployment..."
-    
+
     local stages=("development" "staging" "production")
     local target_stage_found=false
-    
+
     for stage in "${stages[@]}"; do
         if [[ "$stage" == "$env" ]]; then
             target_stage_found=true
         fi
-        
+
         if [[ "$target_stage_found" == "true" ]]; then
             echo "📦 Deploying to $stage environment..."
-            
+
             # Deploy to stage
             deploy_to_environment "$stage" "$hosts"
-            
+
             # Validate stage deployment
             validate_deployment "$stage" "$hosts"
-            
+
             # Wait for approval if not development
             if [[ "$stage" != "development" ]]; then
                 wait_for_approval "$stage"
@@ -702,9 +702,9 @@ deploy_staged() {
 deploy_rolling() {
     local env="$1"
     local hosts="$2"
-    
+
     echo "🔄 Starting rolling deployment..."
-    
+
     # Get list of hosts
     local host_list=()
     while IFS= read -r line; do
@@ -712,20 +712,20 @@ deploy_rolling() {
             host_list+=($(echo "$line" | awk '{print $1}'))
         fi
     done < "$INVENTORY_FILE"
-    
+
     # Deploy to each host with health checks
     for host in "${host_list[@]}"; do
         echo "📦 Deploying to host: $host"
-        
+
         # Deploy to host
         deploy_single_host "$env" "$host"
-        
+
         # Health check
         if ! validate_host_health "$host"; then
             echo "❌ Health check failed for $host, stopping deployment"
             exit 1
         fi
-        
+
         echo "✅ Host $host deployed successfully"
         sleep 10  # Brief pause between hosts
     done
@@ -735,9 +735,9 @@ deploy_rolling() {
 deploy_blue_green() {
     local env="$1"
     local hosts="$2"
-    
+
     echo "🔵🟢 Starting blue-green deployment..."
-    
+
     # Implement blue-green logic
     echo "Note: Blue-green deployment requires load balancer configuration"
     echo "Falling back to rolling deployment"
@@ -749,9 +749,9 @@ run_playbook() {
     local playbook="$1"
     local environment="$2"
     local hosts="${3:-all}"
-    
+
     echo "📋 Running playbook: $playbook"
-    
+
     if command -v ansible-playbook >/dev/null 2>&1; then
         ansible-playbook \
             -i "$INVENTORY_DIR/$environment/hosts.ini" \
@@ -768,13 +768,13 @@ execute_playbook_manually() {
     local playbook="$1"
     local environment="$2"
     local hosts="$3"
-    
+
     echo "⚠️  Ansible not available, executing playbook manually"
-    
+
     # Parse YAML playbook and execute tasks
     # This is a simplified implementation
     echo "Executing $playbook for $environment on $hosts"
-    
+
     case "$playbook" in
         "install/main_install.yml")
             execute_install_tasks "$environment" "$hosts"
@@ -789,26 +789,26 @@ execute_playbook_manually() {
 execute_install_tasks() {
     local environment="$1"
     local hosts="$2"
-    
+
     echo "🔧 Executing installation tasks..."
-    
+
     # Copy files to target hosts
     while IFS= read -r line; do
         if [[ "$line" =~ ^[a-zA-Z0-9-]+ ]]; then
             local host=$(echo "$line" | awk '{print $1}')
             local ansible_host=$(echo "$line" | grep -o 'ansible_host=[^ ]*' | cut -d= -f2 || echo "$host")
-            
+
             echo "   Installing on $host..."
-            
+
             # Copy tmux-forceline
             scp -r ../../../* "$ansible_host:~/.config/tmux/forceline/" 2>/dev/null || {
                 ssh "$ansible_host" "mkdir -p ~/.config/tmux/forceline"
                 scp -r ../../../* "$ansible_host:~/.config/tmux/forceline/"
             }
-            
+
             # Set permissions
             ssh "$ansible_host" "find ~/.config/tmux/forceline -name '*.sh' -exec chmod +x {} \;"
-            
+
             # Initialize enterprise components
             ssh "$ansible_host" "~/.config/tmux/forceline/enterprise/config_manager.sh init corporate"
         fi
@@ -819,30 +819,30 @@ execute_install_tasks() {
 validate_deployment() {
     local environment="$1"
     local hosts="$2"
-    
+
     echo "✅ Validating deployment..."
-    
+
     while IFS= read -r line; do
         if [[ "$line" =~ ^[a-zA-Z0-9-]+ ]]; then
             local host=$(echo "$line" | awk '{print $1}')
             local ansible_host=$(echo "$line" | grep -o 'ansible_host=[^ ]*' | cut -d= -f2 || echo "$host")
-            
+
             if ! validate_host_health "$ansible_host"; then
                 echo "❌ Validation failed for $host"
                 return 1
             fi
         fi
     done < "$INVENTORY_DIR/$environment/hosts.ini"
-    
+
     echo "✅ All hosts validated successfully"
 }
 
 # Validate individual host health
 validate_host_health() {
     local host="$1"
-    
+
     echo "🏥 Checking health of $host..."
-    
+
     # Check if tmux-forceline is installed and working
     if ssh "$host" "test -f ~/.config/tmux/forceline/forceline.tmux" && \
        ssh "$host" "~/.config/tmux/forceline/forceline.tmux status" >/dev/null 2>&1; then
@@ -857,7 +857,7 @@ validate_host_health() {
 # Wait for deployment approval
 wait_for_approval() {
     local stage="$1"
-    
+
     echo "⏳ Waiting for approval to deploy to $stage..."
     echo "Press Enter to continue or Ctrl+C to abort"
     read -r
@@ -867,7 +867,7 @@ wait_for_approval() {
 deploy_to_environment() {
     local env="$1"
     local hosts="$2"
-    
+
     run_playbook "install/main_install.yml" "$env" "$hosts"
     run_playbook "configure/enterprise_config.yml" "$env" "$hosts"
 }
@@ -893,7 +893,7 @@ DEPLOYMENT MODES:
 
 ENVIRONMENTS:
   development Development environment
-  staging     Staging environment  
+  staging     Staging environment
   production  Production environment
 
 EXAMPLES:
@@ -915,7 +915,7 @@ EOF
 
 detect_platform() {
     local platform="unknown"
-    
+
     if [[ "$OSTYPE" =~ ^linux ]]; then
         platform="linux"
     elif [[ "$OSTYPE" =~ ^darwin ]]; then
@@ -925,13 +925,13 @@ detect_platform() {
     elif [[ -n "${WSL_DISTRO_NAME:-}" ]]; then
         platform="wsl"
     fi
-    
+
     echo "$platform"
 }
 
 detect_package_manager() {
     local package_manager="unknown"
-    
+
     if command -v apt-get >/dev/null 2>&1; then
         package_manager="apt"
     elif command -v yum >/dev/null 2>&1; then
@@ -947,14 +947,14 @@ detect_package_manager() {
     elif command -v zypper >/dev/null 2>&1; then
         package_manager="zypper"
     fi
-    
+
     echo "$package_manager"
 }
 
 detect_system_info() {
     local platform=$(detect_platform)
     local package_manager=$(detect_package_manager)
-    
+
     cat << EOF
 {
   "platform": "$platform",
@@ -1033,19 +1033,19 @@ DEPLOYMENT_NAME="tmux-forceline"
 
 deploy_to_kubernetes() {
     echo "🚀 Deploying tmux-forceline to Kubernetes..."
-    
+
     # Create namespace if it doesn't exist
     kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
-    
+
     # Apply deployment
     kubectl apply -f "$TEMPLATES_DIR/kubernetes/deployment.yaml" -n "$NAMESPACE"
-    
+
     # Wait for deployment
     kubectl rollout status deployment/"$DEPLOYMENT_NAME" -n "$NAMESPACE"
-    
+
     # Show status
     kubectl get pods -n "$NAMESPACE" -l app="$DEPLOYMENT_NAME"
-    
+
     echo "✅ Kubernetes deployment completed"
 }
 
@@ -1092,12 +1092,12 @@ DEFAULT_HEALTH_CHECK_TIMEOUT="300"
 orchestrate_deployment() {
     local strategy="${1:-$DEFAULT_DEPLOYMENT_STRATEGY}"
     local environments="${2:-development}"
-    
+
     echo "🎼 Orchestrating tmux-forceline deployment..."
     echo "   Strategy: $strategy"
     echo "   Environments: $environments"
     echo
-    
+
     case "$strategy" in
         "pipeline")
             run_deployment_pipeline "$environments"
@@ -1121,22 +1121,22 @@ orchestrate_deployment() {
 # Run deployment pipeline (sequential environments)
 run_deployment_pipeline() {
     local target_envs="$1"
-    
+
     echo "🔄 Running deployment pipeline..."
-    
+
     IFS=',' read -ra ENVS <<< "$target_envs"
     for env in "${ENVS[@]}"; do
         echo "📦 Deploying to $env environment..."
-        
+
         # Run deployment
         "$SCRIPTS_DIR/deploy.sh" staged "$env" all
-        
+
         # Run tests
         run_deployment_tests "$env"
-        
+
         # Generate report
         generate_deployment_report "$env"
-        
+
         echo "✅ $env deployment completed"
     done
 }
@@ -1144,12 +1144,12 @@ run_deployment_pipeline() {
 # Run parallel deployment (multiple environments simultaneously)
 run_parallel_deployment() {
     local target_envs="$1"
-    
+
     echo "⚡ Running parallel deployment..."
-    
+
     local pids=()
     IFS=',' read -ra ENVS <<< "$target_envs"
-    
+
     for env in "${ENVS[@]}"; do
         echo "🚀 Starting deployment to $env..."
         (
@@ -1158,28 +1158,28 @@ run_parallel_deployment() {
         ) &
         pids+=($!)
     done
-    
+
     # Wait for all deployments to complete
     for pid in "${pids[@]}"; do
         wait "$pid"
     done
-    
+
     echo "✅ All parallel deployments completed"
 }
 
 # Run canary deployment (gradual traffic shifting)
 run_canary_deployment() {
     local environment="$1"
-    
+
     echo "🐤 Running canary deployment to $environment..."
-    
+
     # Deploy to canary hosts (subset)
     echo "📦 Deploying to canary hosts..."
     "$SCRIPTS_DIR/deploy.sh" single "$environment" "canary"
-    
+
     # Monitor canary metrics
     monitor_canary_metrics "$environment"
-    
+
     # If canary is healthy, deploy to remaining hosts
     if validate_canary_health "$environment"; then
         echo "✅ Canary validation passed, deploying to remaining hosts..."
@@ -1195,25 +1195,25 @@ run_canary_deployment() {
 monitor_canary_metrics() {
     local environment="$1"
     local monitor_duration=300  # 5 minutes
-    
+
     echo "📊 Monitoring canary metrics for ${monitor_duration}s..."
-    
+
     local start_time=$(date +%s)
     while [[ $(($(date +%s) - start_time)) -lt $monitor_duration ]]; do
         # Check error rates, response times, etc.
         echo "   Checking metrics... $(date '+%H:%M:%S')"
         sleep 30
     done
-    
+
     echo "✅ Canary monitoring completed"
 }
 
 # Validate canary health
 validate_canary_health() {
     local environment="$1"
-    
+
     echo "🏥 Validating canary health..."
-    
+
     # Implement health validation logic
     # For now, return success
     return 0
@@ -1222,19 +1222,19 @@ validate_canary_health() {
 # Run deployment tests
 run_deployment_tests() {
     local environment="$1"
-    
+
     echo "🧪 Running deployment tests for $environment..."
-    
+
     # Run functional tests
     if [[ -f "$SCRIPTS_DIR/test_deployment.sh" ]]; then
         "$SCRIPTS_DIR/test_deployment.sh" "$environment"
     fi
-    
+
     # Run performance tests
     if [[ -f "$SCRIPTS_DIR/test_performance.sh" ]]; then
         "$SCRIPTS_DIR/test_performance.sh" "$environment"
     fi
-    
+
     echo "✅ Tests completed for $environment"
 }
 
@@ -1243,9 +1243,9 @@ generate_deployment_report() {
     local environment="$1"
     local timestamp=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
     local report_file="$DEPLOYMENT_DIR/reports/deployment_${environment}_$(date +%Y%m%d_%H%M%S).txt"
-    
+
     mkdir -p "$(dirname "$report_file")"
-    
+
     cat > "$report_file" << EOF
 # Deployment Report - $environment
 Generated: $timestamp
@@ -1272,7 +1272,7 @@ EOF
 # Rollback deployment
 rollback_deployment() {
     local environment="$1"
-    
+
     echo "🔄 Rolling back deployment in $environment..."
     "$SCRIPTS_DIR/deploy.sh" rollback "$environment" all
     echo "✅ Rollback completed"
@@ -1343,7 +1343,7 @@ main_deployment() {
             case "${2:-deb}" in
                 "deb") "$PACKAGES_DIR/deb/build_deb.sh" ;;
                 "rpm") "$PACKAGES_DIR/rpm/build_rpm.sh" ;;
-                "all") 
+                "all")
                     "$PACKAGES_DIR/deb/build_deb.sh"
                     "$PACKAGES_DIR/rpm/build_rpm.sh"
                     echo "✅ All packages built"
@@ -1353,7 +1353,7 @@ main_deployment() {
             ;;
         "container")
             case "${2:-docker}" in
-                "docker") 
+                "docker")
                     cd "$DEPLOYMENT_DIR" && docker-compose up -d
                     ;;
                 "kubernetes")
@@ -1389,7 +1389,7 @@ DEPLOYMENT MODES:
   blue_green    Blue-green deployment (requires load balancer)
 
 ORCHESTRATION STRATEGIES:
-  pipeline      Sequential deployment through environments  
+  pipeline      Sequential deployment through environments
   parallel      Deploy to multiple environments simultaneously
   canary        Canary deployment with traffic shifting
   rolling       Rolling deployment with health checks

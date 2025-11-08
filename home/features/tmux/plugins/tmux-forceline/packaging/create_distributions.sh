@@ -56,7 +56,7 @@ Distribution Creation Options:
   --homebrew         Create Homebrew formula
   --snap             Create Snap package
   --deb              Create Debian package
-  --rpm              Create RPM package  
+  --rpm              Create RPM package
   --arch             Create Arch Linux PKGBUILD
   --nix              Create Nix package
   --tarball          Create tarball distribution (default)
@@ -128,10 +128,10 @@ parse_arguments() {
 setup_output_dir() {
     print_status "info" "Setting up output directory: $OUTPUT_DIR"
     mkdir -p "$OUTPUT_DIR"
-    
+
     # Clean previous builds
     rm -rf "${OUTPUT_DIR:?}"/*
-    
+
     print_status "success" "Output directory ready"
 }
 
@@ -140,31 +140,31 @@ create_source_tarball() {
     if [[ "$CREATE_TARBALL" != "yes" ]]; then
         return
     fi
-    
+
     print_status "info" "Creating source tarball..."
-    
+
     local tarball_name="${PACKAGE_NAME}-${VERSION}.tar.gz"
     local temp_dir="/tmp/${PACKAGE_NAME}-${VERSION}"
-    
+
     # Create temporary directory
     rm -rf "$temp_dir"
     mkdir -p "$temp_dir"
-    
+
     # Copy source files
     cp -r "$PROJECT_DIR"/* "$temp_dir/"
-    
+
     # Remove unwanted files
     find "$temp_dir" -name ".git*" -exec rm -rf {} + 2>/dev/null || true
     find "$temp_dir" -name "*.backup*" -exec rm -f {} + 2>/dev/null || true
     find "$temp_dir" -name ".DS_Store" -exec rm -f {} + 2>/dev/null || true
     rm -rf "$temp_dir/packaging/dist" 2>/dev/null || true
-    
+
     # Create tarball
     (cd "$(dirname "$temp_dir")" && tar -czf "$OUTPUT_DIR/$tarball_name" "$(basename "$temp_dir")")
-    
+
     # Cleanup
     rm -rf "$temp_dir"
-    
+
     print_status "success" "Source tarball created: $tarball_name"
 }
 
@@ -173,12 +173,12 @@ create_homebrew_formula() {
     if [[ "$CREATE_HOMEBREW" != "yes" ]]; then
         return
     fi
-    
+
     print_status "info" "Creating Homebrew formula..."
-    
+
     local formula_dir="$OUTPUT_DIR/homebrew"
     mkdir -p "$formula_dir"
-    
+
     cat > "$formula_dir/${PACKAGE_NAME}.rb" << EOF
 class TmuxForceline < Formula
   desc "$DESCRIPTION"
@@ -194,15 +194,15 @@ class TmuxForceline < Formula
   def install
     # Install main files
     prefix.install Dir["*"]
-    
+
     # Make scripts executable
     bin.install_symlink prefix/"install.sh" => "tmux-forceline"
-    
+
     # Install shell completions if available
     if File.exist?("completions/bash")
       bash_completion.install "completions/bash/tmux-forceline"
     end
-    
+
     if File.exist?("completions/zsh")
       zsh_completion.install "completions/zsh/_tmux-forceline"
     end
@@ -222,14 +222,14 @@ class TmuxForceline < Formula
 
   test do
     system bin/"tmux-forceline", "--help"
-    
+
     # Test tmux integration
     system "tmux", "new-session", "-d", "-s", "test-session"
     system "tmux", "kill-session", "-t", "test-session"
   end
 end
 EOF
-    
+
     print_status "success" "Homebrew formula created: homebrew/${PACKAGE_NAME}.rb"
 }
 
@@ -238,12 +238,12 @@ create_snap_package() {
     if [[ "$CREATE_SNAP" != "yes" ]]; then
         return
     fi
-    
+
     print_status "info" "Creating Snap package..."
-    
+
     local snap_dir="$OUTPUT_DIR/snap"
     mkdir -p "$snap_dir"
-    
+
     cat > "$snap_dir/snapcraft.yaml" << EOF
 name: $PACKAGE_NAME
 base: core22
@@ -251,7 +251,7 @@ version: '$VERSION'
 summary: $DESCRIPTION
 description: |
   tmux-forceline v3.0 is a revolutionary tmux status bar system featuring:
-  
+
   - Native tmux format integration (100% performance improvement)
   - Hybrid architecture (60% performance improvement)
   - Adaptive configuration system
@@ -281,7 +281,7 @@ parts:
       craftctl default
       chmod +x \$CRAFTCTL_PART_INSTALL/install.sh
       chmod +x \$CRAFTCTL_PART_INSTALL/utils/*.sh
-      
+
   dependencies:
     plugin: nil
     stage-packages:
@@ -289,7 +289,7 @@ parts:
       - curl
       - git
 EOF
-    
+
     print_status "success" "Snap package created: snap/snapcraft.yaml"
 }
 
@@ -298,15 +298,15 @@ create_debian_package() {
     if [[ "$CREATE_DEB" != "yes" ]]; then
         return
     fi
-    
+
     print_status "info" "Creating Debian package..."
-    
+
     local deb_dir="$OUTPUT_DIR/debian"
     mkdir -p "$deb_dir/DEBIAN"
     mkdir -p "$deb_dir/usr/share/tmux-forceline"
     mkdir -p "$deb_dir/usr/bin"
     mkdir -p "$deb_dir/usr/share/doc/tmux-forceline"
-    
+
     # Control file
     cat > "$deb_dir/DEBIAN/control" << EOF
 Package: $PACKAGE_NAME
@@ -323,10 +323,10 @@ Description: $DESCRIPTION
  adaptive configuration, and cross-platform compatibility.
 Homepage: $HOMEPAGE
 EOF
-    
+
     # Install script
     cat > "$deb_dir/DEBIAN/postinst" << 'EOF'
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
 echo "Setting up tmux-forceline..."
@@ -346,22 +346,22 @@ echo ""
 
 exit 0
 EOF
-    
+
     chmod +x "$deb_dir/DEBIAN/postinst"
-    
+
     # Copy files
     cp -r "$PROJECT_DIR"/* "$deb_dir/usr/share/tmux-forceline/"
-    
+
     # Remove unwanted files
     rm -rf "$deb_dir/usr/share/tmux-forceline/packaging"
-    
+
     # Create symlink
     ln -s "../share/tmux-forceline/install.sh" "$deb_dir/usr/bin/tmux-forceline"
-    
+
     # Documentation
     cp "$PROJECT_DIR/README_v3.md" "$deb_dir/usr/share/doc/tmux-forceline/"
     cp -r "$PROJECT_DIR/docs" "$deb_dir/usr/share/doc/tmux-forceline/"
-    
+
     print_status "success" "Debian package structure created: debian/"
 }
 
@@ -370,12 +370,12 @@ create_rpm_spec() {
     if [[ "$CREATE_RPM" != "yes" ]]; then
         return
     fi
-    
+
     print_status "info" "Creating RPM spec..."
-    
+
     local rpm_dir="$OUTPUT_DIR/rpm"
     mkdir -p "$rpm_dir"
-    
+
     cat > "$rpm_dir/${PACKAGE_NAME}.spec" << EOF
 Name:           $PACKAGE_NAME
 Version:        $VERSION
@@ -445,7 +445,7 @@ echo ""
 - Adaptive configuration system
 - Cross-platform compatibility
 EOF
-    
+
     print_status "success" "RPM spec created: rpm/${PACKAGE_NAME}.spec"
 }
 
@@ -454,12 +454,12 @@ create_arch_pkgbuild() {
     if [[ "$CREATE_ARCH" != "yes" ]]; then
         return
     fi
-    
+
     print_status "info" "Creating Arch Linux PKGBUILD..."
-    
+
     local arch_dir="$OUTPUT_DIR/arch"
     mkdir -p "$arch_dir"
-    
+
     cat > "$arch_dir/PKGBUILD" << EOF
 # Maintainer: $AUTHOR
 pkgname=$PACKAGE_NAME
@@ -476,28 +476,28 @@ sha256sums=('SKIP')
 
 package() {
     cd "\$srcdir/\$pkgname-\$pkgver"
-    
+
     # Install main files
     install -dm755 "\$pkgdir/usr/share/\$pkgname"
     cp -r * "\$pkgdir/usr/share/\$pkgname/"
-    
+
     # Remove packaging files
     rm -rf "\$pkgdir/usr/share/\$pkgname/packaging"
-    
+
     # Make scripts executable
     find "\$pkgdir/usr/share/\$pkgname" -name "*.sh" -exec chmod +x {} \\;
-    
+
     # Create binary symlink
     install -dm755 "\$pkgdir/usr/bin"
     ln -s "/usr/share/\$pkgname/install.sh" "\$pkgdir/usr/bin/\$pkgname"
-    
+
     # Install documentation
     install -dm755 "\$pkgdir/usr/share/doc/\$pkgname"
     install -m644 README_v3.md "\$pkgdir/usr/share/doc/\$pkgname/"
     cp -r docs "\$pkgdir/usr/share/doc/\$pkgname/"
 }
 EOF
-    
+
     print_status "success" "Arch Linux PKGBUILD created: arch/PKGBUILD"
 }
 
@@ -506,12 +506,12 @@ create_nix_package() {
     if [[ "$CREATE_NIX" != "yes" ]]; then
         return
     fi
-    
+
     print_status "info" "Creating Nix package..."
-    
+
     local nix_dir="$OUTPUT_DIR/nix"
     mkdir -p "$nix_dir"
-    
+
     cat > "$nix_dir/default.nix" << EOF
 { lib
 , stdenv
@@ -535,7 +535,7 @@ stdenv.mkDerivation rec {
   };
 
   buildInputs = [ bash ];
-  
+
   propagatedBuildInputs = [ tmux yq curl git ];
 
   dontBuild = true;
@@ -543,13 +543,13 @@ stdenv.mkDerivation rec {
   installPhase = ''
     mkdir -p \$out/share/tmux-forceline
     cp -r * \$out/share/tmux-forceline/
-    
+
     # Remove packaging files
     rm -rf \$out/share/tmux-forceline/packaging
-    
+
     # Make scripts executable
     find \$out/share/tmux-forceline -name "*.sh" -exec chmod +x {} \\;
-    
+
     # Create wrapper script
     mkdir -p \$out/bin
     cat > \$out/bin/tmux-forceline << 'WRAPPER'
@@ -557,7 +557,7 @@ stdenv.mkDerivation rec {
 exec \$out/share/tmux-forceline/install.sh "\$@"
 WRAPPER
     chmod +x \$out/bin/tmux-forceline
-    
+
     # Install documentation
     mkdir -p \$out/share/doc/tmux-forceline
     cp README_v3.md \$out/share/doc/tmux-forceline/
@@ -573,14 +573,14 @@ WRAPPER
   };
 }
 EOF
-    
+
     print_status "success" "Nix package created: nix/default.nix"
 }
 
 # Function: Generate installation instructions
 generate_install_instructions() {
     print_status "info" "Generating installation instructions..."
-    
+
     cat > "$OUTPUT_DIR/INSTALL_PACKAGES.md" << EOF
 # tmux-forceline v$VERSION Package Installation
 
@@ -700,14 +700,14 @@ yq --version  # Should show 4.0+
 3. **Enjoy**: Experience 100% performance improvement!
 
 EOF
-    
+
     print_status "success" "Installation instructions created: INSTALL_PACKAGES.md"
 }
 
 # Function: Create release checklist
 create_release_checklist() {
     print_status "info" "Creating release checklist..."
-    
+
     cat > "$OUTPUT_DIR/RELEASE_CHECKLIST.md" << EOF
 # tmux-forceline v$VERSION Release Checklist
 
@@ -832,7 +832,7 @@ EOF
 - [ ] Update documentation based on feedback
 
 EOF
-    
+
     print_status "success" "Release checklist created: RELEASE_CHECKLIST.md"
 }
 
@@ -840,10 +840,10 @@ EOF
 main() {
     print_status "header" "tmux-forceline v$VERSION Distribution Creator"
     echo
-    
+
     parse_arguments "$@"
     setup_output_dir
-    
+
     # Create packages
     create_source_tarball
     create_homebrew_formula
@@ -852,11 +852,11 @@ main() {
     create_rpm_spec
     create_arch_pkgbuild
     create_nix_package
-    
+
     # Generate documentation
     generate_install_instructions
     create_release_checklist
-    
+
     # Summary
     echo
     print_status "success" "Distribution packages created in: $OUTPUT_DIR"

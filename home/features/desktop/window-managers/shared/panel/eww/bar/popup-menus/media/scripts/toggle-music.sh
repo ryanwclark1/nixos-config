@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [[ -z $(eww active-windows | grep 'media') ]]; then
 	eww open media && eww update mediarev=true

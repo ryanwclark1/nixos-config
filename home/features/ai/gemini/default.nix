@@ -229,7 +229,7 @@ in
     Service = {
       Type = "oneshot";
       ExecStart = pkgs.writeShellScript "generate-gemini-env" ''
-        #!/bin/bash
+        #!/usr/bin/env bash
         # Generate .env file with actual secret values at runtime
 
         # Check if secrets exist

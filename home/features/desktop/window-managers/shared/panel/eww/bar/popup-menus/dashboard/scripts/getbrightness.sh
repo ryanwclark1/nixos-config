@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 print_json() {
 	# Get brightness percentage as an integer
