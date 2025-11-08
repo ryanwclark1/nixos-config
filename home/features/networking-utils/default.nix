@@ -10,7 +10,7 @@
     nmap # A utility for network discovery and security auditing - cross-platform
     tcpdump # Network sniffer - available on macOS
     wireguard-tools # WireGuard utilities - cross-platform
-    mtr # A network diagnostic tool - cross-platform  
+    mtr # A network diagnostic tool - cross-platform
     iperf # Tool to measure IP bandwidth using UDP or TCP - cross-platform
     socat # replacement of openbsd-netcat - cross-platform
     # rathole # similar to ngrok - NAT traversal and reverse proxy
