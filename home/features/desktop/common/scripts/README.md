@@ -34,9 +34,14 @@ Wayland compositor compatible utilities:
 
 - **`screenshot.sh`** - Advanced screenshot tool (grimblast/grim+slurp)
 - **`clipboard-manager.sh`** - Clipboard history management (cliphist)
+- **`keybindings-menu.sh`** - Interactive keybindings reference with walker (Hyprland)
+- **`workspace-toggle-gaps.sh`** - Toggle workspace gaps on/off (Hyprland)
+- **`toggle-nightlight.sh`** - Toggle hyprsunset nightlight mode
+- **`toggle-idle.sh`** - Toggle hypridle idle management on/off
 
 **Dependencies**: Wayland compositor, wayland-specific tools
 **Usage**: Works with any Wayland compositor (Hyprland, Sway, etc.)
+**Note**: Some scripts are Hyprland-specific (keybindings-menu, workspace-toggle-gaps)
 
 ### Rofi Scripts (`~/.local/bin/scripts/rofi/`)
 Rofi-based menu interfaces:
