@@ -28,7 +28,6 @@ let
   base17 = "f4b8e4"; # pink - bright purple
 in
 {
-
   console = {
     enable = true;
     colors = [

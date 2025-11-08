@@ -5,7 +5,6 @@
 
 {
   environment.pathsToLink = [ "/share/zsh" ];
-
   programs.zsh = {
     enable = true;
     syntaxHighlighting = {
@@ -17,7 +16,5 @@
     enableBashCompletion = true;
     enableCompletion = true;
     enableGlobalCompInit = true;
-    enableLsColors = true;
-
   };
 }

@@ -6,8 +6,6 @@
 }:
 
 {
-
-
   services.docling-serve = {
     enable = false;
     host = "0.0.0.0";

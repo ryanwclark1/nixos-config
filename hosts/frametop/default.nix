@@ -26,8 +26,9 @@
     ../common/optional/desktop/hyprland
     # ../common/optional/desktop/niri
 
-    ../common/optional/desktop/nautilus.nix
-    ../common/optional/desktop/thunar.nix
+    ../common/optional/desktop/common/nautilus.nix
+    ../common/optional/desktop/common/thunar.nix
+    ../common/optional/desktop/common/1password-gui.nix.nix
     ../common/optional/services/audio.nix
     ../common/optional/services/bluetooth.nix
     ../common/optional/services/gnome-services.nix
