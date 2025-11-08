@@ -82,6 +82,7 @@ in
       # Dependencies
       "node_modules"
       "vendor"
+      ".venv"
 
       # Compiled source
       "*.class"

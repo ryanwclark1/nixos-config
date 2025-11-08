@@ -16,7 +16,6 @@
         enable = true;
         package = pkgs.bash-completion;
       };
-      # enableLsColors = true;
     };
   };
 }
