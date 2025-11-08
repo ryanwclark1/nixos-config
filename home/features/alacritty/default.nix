@@ -27,6 +27,7 @@ let
   base15 = "99d1db"; # sky - bright cyan
   base16 = "85c1dc"; # sapphire - bright blue
   base17 = "f4b8e4"; # pink - bright purple
+  font = "CaskaydiaMono";
 in
 {
   programs.alacritty = {
@@ -43,9 +44,23 @@ in
           x = 2;
           y = 2;
         };
-        decorations = "Full"; # Borders and title bar
+        decorations = "None";
         blur = true; # works on macOS/KDE Wayland
-        title = "alacritty";
+      };
+      font = {
+        normal = {
+          family = "${font}";
+          style = "Regular";
+        };
+        bold = {
+          family = "${font}";
+          style = "Bold";
+        };
+        italic = {
+          family = "${font}";
+          style = "Italic";
+        };
+        size = 9;
       };
       scrolling = {
         history = 25000;
