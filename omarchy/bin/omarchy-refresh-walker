@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 omarchy-refresh-config walker/config.toml
 omarchy-refresh-config elephant/calc.toml

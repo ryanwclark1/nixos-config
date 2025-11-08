@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [ "$#" -ne 4 ]; then
   echo -e "\e[32mLet's create a TUI shortcut you can start with the app launcher.\n\e[0m"

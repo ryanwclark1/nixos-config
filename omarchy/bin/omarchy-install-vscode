@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo "Installing VSCode..."
 omarchy-pkg-add visual-studio-code-bin

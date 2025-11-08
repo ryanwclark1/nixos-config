@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Where we store an empty file for each migration that has already been performed.
 STATE_DIR="$HOME/.local/state/omarchy/migrations"

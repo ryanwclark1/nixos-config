@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 THEMES_DIR="$HOME/.config/omarchy/themes/"
 CURRENT_THEME_LINK="$HOME/.config/omarchy/current/theme"

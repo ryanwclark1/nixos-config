@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 for pkg in "$@"; do
   if pacman -Q "$pkg" &>/dev/null; then

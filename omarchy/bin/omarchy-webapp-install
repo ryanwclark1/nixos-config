@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [ "$#" -lt 3 ]; then
   echo -e "\e[32mLet's create a new web app you can start with the app launcher.\n\e[0m"

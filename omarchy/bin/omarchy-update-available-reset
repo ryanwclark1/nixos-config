@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Ensure Waybar icon offering the available update is removed
 pkill -RTMIN+7 waybar

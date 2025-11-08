@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 omarchy-refresh-config hypr/autostart.conf
 omarchy-refresh-config hypr/bindings.conf

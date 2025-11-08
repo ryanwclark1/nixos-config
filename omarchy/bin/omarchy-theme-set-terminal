@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [[ -f ~/.config/alacritty/alacritty.toml ]]; then
   touch ~/.config/alacritty/alacritty.toml

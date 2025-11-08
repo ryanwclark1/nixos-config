@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Resetting sudo lockout for user
 su -c "faillock --reset --user $USER"
