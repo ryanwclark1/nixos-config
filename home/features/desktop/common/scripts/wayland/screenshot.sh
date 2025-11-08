@@ -22,20 +22,20 @@ QUALITY=95  # For JPEG format
 check_dependencies() {
     local missing_deps=()
     local screenshot_tools=()
-    
+
     # Core utilities
     command -v date >/dev/null || missing_deps+=("date")
     command -v mkdir >/dev/null || missing_deps+=("mkdir")
-    
+
     # Screenshot tools (at least one required)
     command -v grimblast >/dev/null && screenshot_tools+=("grimblast")
     command -v grim >/dev/null && screenshot_tools+=("grim")
     command -v slurp >/dev/null && screenshot_tools+=("slurp")  # Area selection
-    
+
     if [[ ${#screenshot_tools[@]} -eq 0 ]]; then
         missing_deps+=("screenshot tool (grimblast or grim+slurp)")
     fi
-    
+
     if [[ ${#missing_deps[@]} -gt 0 ]]; then
         echo "Error: Missing required dependencies:" >&2
         printf "  - %s\n" "${missing_deps[@]}" >&2
@@ -47,7 +47,7 @@ check_dependencies() {
         echo "  Ubuntu: apt install grim slurp" >&2
         exit 1
     fi
-    
+
     # Set preferred screenshot tool
     if command -v grimblast >/dev/null; then
         SCREENSHOT_TOOL="grimblast"
@@ -57,7 +57,7 @@ check_dependencies() {
         echo "Error: No suitable screenshot tool found" >&2
         exit 1
     fi
-    
+
     export SCREENSHOT_TOOL
 }
 
@@ -78,7 +78,7 @@ notify_with_actions() {
     local title="$1"
     local message="$2"
     local screenshot_path="$3"
-    
+
     if command -v notify-send >/dev/null; then
         local result
         result=$(notify-send \
@@ -91,17 +91,17 @@ notify_with_actions() {
             -A "copy=Copy Path" \
             "$title" \
             "$message" 2>/dev/null || echo "")
-        
+
         case "$result" in
-            "file") 
+            "file")
                 log "Opening file manager"
-                xdg-open "$(dirname "$screenshot_path")" 2>/dev/null & 
+                xdg-open "$(dirname "$screenshot_path")" 2>/dev/null &
                 ;;
-            "view") 
+            "view")
                 log "Opening image viewer"
-                xdg-open "$screenshot_path" 2>/dev/null & 
+                xdg-open "$screenshot_path" 2>/dev/null &
                 ;;
-            "edit") 
+            "edit")
                 edit_screenshot "$screenshot_path"
                 ;;
             "copy")
@@ -117,17 +117,17 @@ notify_with_actions() {
 # Edit screenshot with available editor
 edit_screenshot() {
     local screenshot_path="$1"
-    
+
     # Try different image editors
     local editors=(
         "swappy -f"      # Wayland screenshot editor
         "krita"          # Full featured editor
-        "gimp"           # Full featured editor  
+        "gimp"           # Full featured editor
         "pinta"          # Simple editor
         "drawing"        # GNOME simple editor
         "kolourpaint"    # KDE simple editor
     )
-    
+
     for editor in "${editors[@]}"; do
         local editor_cmd="${editor%% *}"  # Get first word
         if command -v "$editor_cmd" >/dev/null; then
@@ -137,7 +137,7 @@ edit_screenshot() {
             return 0
         fi
     done
-    
+
     # Fallback to any image viewer/editor
     log "No image editor found, opening with default application"
     xdg-open "$screenshot_path" &
@@ -148,18 +148,18 @@ generate_filename() {
     local prefix="${1:-screenshot}"
     local format="${2:-$DEFAULT_FORMAT}"
     local timestamp
-    
+
     # Create screenshots directory if it doesn't exist
     mkdir -p "$SCREENSHOTS_DIR"
-    
+
     # Generate timestamp
     timestamp=$(date '+%Y-%m-%d_%H-%M-%S')
-    
+
     # Add milliseconds for uniqueness if available
     if command -v date >/dev/null && date --help 2>&1 | grep -q '%3N'; then
         timestamp="${timestamp}-$(date '+%3N')"
     fi
-    
+
     echo "$SCREENSHOTS_DIR/${prefix}_${timestamp}.${format}"
 }
 
@@ -170,26 +170,26 @@ screenshot_with_grimblast() {
     local freeze_flag="$3"
     local wait_time="$4"
     local copy_to_clipboard="$5"
-    
+
     local args=()
-    
+
     # Add freeze flag if requested
     [[ "$freeze_flag" == "true" ]] && args+=("--freeze")
-    
+
     # Add wait time if specified
     [[ -n "$wait_time" ]] && args+=("--wait" "$wait_time")
-    
-    # Add cursor flag for screen/area shots
-    if [[ "$mode" == "screen" || "$mode" == "area" ]]; then
+
+    # Add cursor flag only for screen shots (not area - grimblast doesn't support it)
+    if [[ "$mode" == "screen" ]]; then
         args+=("--cursor")
     fi
-    
+
     # Determine action based on clipboard preference
     local action="save"
     if [[ "$copy_to_clipboard" == "true" ]]; then
         action="copysave"  # Both copy to clipboard and save to file
     fi
-    
+
     # Execute grimblast
     case "$mode" in
         "screen")
@@ -215,12 +215,12 @@ screenshot_with_grim() {
     local freeze_flag="$3"
     local wait_time="$4"
     local copy_to_clipboard="$5"
-    
+
     # Wait if specified
     [[ -n "$wait_time" ]] && sleep "$wait_time"
-    
+
     local grim_args=()
-    
+
     case "$mode" in
         "screen")
             # Full screen
@@ -235,7 +235,7 @@ screenshot_with_grim() {
             else
                 geometry=$(slurp 2>/dev/null)
             fi
-            
+
             if [[ -n "$geometry" ]]; then
                 grim -g "$geometry" "$output_file"
             else
@@ -250,10 +250,10 @@ screenshot_with_grim() {
                 # Hyprland specific
                 window_geometry=$(hyprctl activewindow -j | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' 2>/dev/null)
             elif command -v swaymsg >/dev/null; then
-                # Sway specific  
+                # Sway specific
                 window_geometry=$(swaymsg -t get_tree | jq -r '.. | select(.focused?) | "\(.rect.x),\(.rect.y) \(.rect.width)x\(.rect.height)"' 2>/dev/null)
             fi
-            
+
             if [[ -n "$window_geometry" ]]; then
                 grim -g "$window_geometry" "$output_file"
             else
@@ -271,7 +271,7 @@ screenshot_with_grim() {
             return 1
             ;;
     esac
-    
+
     # Copy to clipboard if requested
     if [[ "$copy_to_clipboard" == "true" ]] && command -v wl-copy >/dev/null; then
         if [[ -f "$output_file" ]]; then
@@ -284,18 +284,18 @@ screenshot_with_grim() {
 # Main screenshot function
 take_screenshot() {
     local mode="$1"
-    local output_file="$2" 
+    local output_file="$2"
     local freeze="${3:-false}"
     local wait_time="${4:-}"
     local copy_to_clipboard="${5:-true}"
     local format="${6:-$DEFAULT_FORMAT}"
-    
+
     log "Taking $mode screenshot"
     log "Output: $output_file"
     [[ "$freeze" == "true" ]] && log "Using freeze mode"
     [[ -n "$wait_time" ]] && log "Wait time: ${wait_time}s"
     [[ "$copy_to_clipboard" == "true" ]] && log "Will copy to clipboard"
-    
+
     # Take screenshot based on available tool
     local result=0
     case "$SCREENSHOT_TOOL" in
@@ -306,18 +306,18 @@ take_screenshot() {
             screenshot_with_grim "$mode" "$output_file" "$freeze" "$wait_time" "$copy_to_clipboard" || result=$?
             ;;
     esac
-    
+
     if [[ $result -eq 0 && -f "$output_file" ]]; then
         local file_size
         file_size=$(du -h "$output_file" | cut -f1)
         log "Screenshot saved: $output_file ($file_size)"
-        
+
         # Show notification with actions
         notify_with_actions \
             "Screenshot Captured" \
             "Saved to $(basename "$output_file") ($file_size)" \
             "$output_file"
-        
+
         return 0
     else
         log "Screenshot failed"
@@ -342,7 +342,7 @@ Options:
     -f, --freeze       Freeze screen during area selection
     -w, --wait TIME    Wait TIME seconds before capture
     -o, --output FILE  Specify output file
-    -F, --format FMT   Image format (png, jpg, webp) 
+    -F, --format FMT   Image format (png, jpg, webp)
     --no-copy          Don't copy to clipboard
     --no-notify        Disable notifications
     -h, --help         Show this help
@@ -374,7 +374,7 @@ main() {
     local format="$DEFAULT_FORMAT"
     local copy_to_clipboard="true"
     local show_notifications="true"
-    
+
     # Parse arguments
     while [[ $# -gt 0 ]]; do
         case $1 in
@@ -432,21 +432,21 @@ main() {
                 ;;
         esac
     done
-    
+
     # Check dependencies
     check_dependencies
-    
+
     # Generate output filename if not specified
     if [[ -z "$output_file" ]]; then
         output_file=$(generate_filename "screenshot" "$format")
     fi
-    
+
     # Disable notifications if requested
     if [[ "$show_notifications" == "false" ]]; then
         notify() { :; }
         notify_with_actions() { :; }
     fi
-    
+
     # Take screenshot
     take_screenshot "$mode" "$output_file" "$freeze" "$wait_time" "$copy_to_clipboard" "$format"
 }
