@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [[ -z $(eww active-windows | grep 'calender') ]]; then
     eww open calender && eww update calrev=true

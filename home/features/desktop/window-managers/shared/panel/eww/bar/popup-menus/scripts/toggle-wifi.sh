@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [[ -z $(eww active-windows | grep 'toggle-menu-wifi') ]]; then
     eww open toggle-menu-wifi && eww update tgwrev=true
