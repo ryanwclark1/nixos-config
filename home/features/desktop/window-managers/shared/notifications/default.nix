@@ -1,5 +1,6 @@
 {
   imports = [
-    ./swaync
+    ./mako
+    # ./swaync  # Disabled - using mako instead
   ];
 }

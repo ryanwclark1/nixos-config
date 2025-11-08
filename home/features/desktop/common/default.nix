@@ -30,6 +30,40 @@
     (writeShellScriptBin "qwen-env" (builtins.readFile ./scripts/system/qwen-env-manager.sh))
     (writeShellScriptBin "update-gemini-cli" (builtins.readFile ./scripts/system/update-gemini-cli.sh))
     (writeShellScriptBin "gemini-cli-version" (builtins.readFile ./scripts/system/gemini-cli-version.sh))
+
+    # System info notification scripts
+    (writeShellScriptBin "show-battery" (''
+      PATH="${pkgs.coreutils}/bin:${pkgs.libnotify}/bin:$PATH"
+    '' + builtins.readFile ./scripts/system/show-battery.sh))
+
+    (writeShellScriptBin "show-time" (''
+      PATH="${pkgs.coreutils}/bin:${pkgs.libnotify}/bin:$PATH"
+    '' + builtins.readFile ./scripts/system/show-time.sh))
+
+    # Wayland utility scripts (Hyprland-compatible)
+    (writeShellScriptBin "keybindings-menu" (''
+      PATH="${pkgs.hyprland}/bin:${pkgs.jq}/bin:${pkgs.libxkbcommon}/bin:${pkgs.walker}/bin:${pkgs.gawk}/bin:${pkgs.gnused}/bin:${pkgs.coreutils}/bin:$PATH"
+    '' + builtins.readFile ./scripts/wayland/keybindings-menu.sh))
+
+    (writeShellScriptBin "workspace-toggle-gaps" (''
+      PATH="${pkgs.hyprland}/bin:${pkgs.jq}/bin:${pkgs.libnotify}/bin:$PATH"
+    '' + builtins.readFile ./scripts/wayland/workspace-toggle-gaps.sh))
+
+    (writeShellScriptBin "toggle-nightlight" (''
+      PATH="${pkgs.hyprland}/bin:${pkgs.procps}/bin:${pkgs.gnugrep}/bin:${pkgs.libnotify}/bin:${pkgs.coreutils}/bin:$PATH"
+    '' + builtins.readFile ./scripts/wayland/toggle-nightlight.sh))
+
+    (writeShellScriptBin "toggle-idle" (''
+      PATH="${pkgs.procps}/bin:${pkgs.libnotify}/bin:$PATH"
+    '' + builtins.readFile ./scripts/wayland/toggle-idle.sh))
+
+    (writeShellScriptBin "toggle-transparency" (''
+      PATH="${pkgs.hyprland}/bin:${pkgs.jq}/bin:${pkgs.libnotify}/bin:$PATH"
+    '' + builtins.readFile ./scripts/wayland/toggle-transparency.sh))
+
+    (writeShellScriptBin "window-pop" (''
+      PATH="${pkgs.hyprland}/bin:${pkgs.jq}/bin:${pkgs.libnotify}/bin:$PATH"
+    '' + builtins.readFile ./scripts/wayland/window-pop.sh))
   ];
 
   # Desktop common scripts - available to all desktop environments/window managers

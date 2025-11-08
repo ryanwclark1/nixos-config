@@ -23,6 +23,7 @@
     hyprpicker # Color picker for Hyprland
     grimblast # Enhanced screenshot tool (hyprland wrapper around grim)
     hdrop # Dropdown terminal for Hyprland
+    hyprland-qtutils # Qt utilities for Hyprland
 
     # Hyprland utility scripts - maintained as external files
 
