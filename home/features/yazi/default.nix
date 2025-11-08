@@ -49,7 +49,7 @@
     imagemagick      # Enhanced image processing for AVIF, HEIF, JPEG XL
 
     # Document processing
-    poppler_utils    # PDF text extraction (pdftotext, pdfinfo)
+    poppler-utils    # PDF text extraction (pdftotext, pdfinfo)
     epub2txt2        # EPUB text extraction
     xlsx2csv         # Excel/spreadsheet conversion
     odt2txt          # OpenDocument text extraction
@@ -1583,7 +1583,7 @@
     # #       { name = "7z"; text = ""; fg_dark = "#eca517"; fg_light = "#76520c"; }
     # #       { name = "a"; text = ""; fg_dark = "#dcddd6"; fg_light = "#494a47"; }
     # #       { name = "aac"; text = ""; fg_dark = "#00afff"; fg_light = "#0075aa"; }
-    # #       { name = "ai"; text = ""; fg_dark = "#cbcb41"; fg_light = "#666620"; }
+       # #       { name = "ai"; text = ""; fg_dark = "#cbcb41"; fg_light = "#666620"; }
     # #       { name = "aif"; text = ""; fg_dark = "#00afff"; fg_light = "#0075aa"; }
     # #       { name = "aiff"; text = ""; fg_dark = "#00afff"; fg_light = "#0075aa"; }
     # #       { name = "android"; text = ""; fg_dark = "#34a853"; fg_light = "#277e3e"; }
@@ -2212,7 +2212,7 @@
     #   tasks = {
     #     micro_workers = 10;
     #     macro_workers = 25;
-    #     bizarre_retry = 5;
+    #         bizarre_retry = 5;
     #     image_alloc = 536870912;  # 512MB
     #     image_bound = [ 0 0 ];
     #     suppress_preload = false;

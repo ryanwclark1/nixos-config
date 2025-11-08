@@ -67,7 +67,7 @@
     # liberation_ttf
     # material-symbols
     # noto-fonts
-    noto-fonts-emoji
+    noto-fonts-color-emoji
     # noto-fonts-extra
     powerline-fonts
     powerline-symbols

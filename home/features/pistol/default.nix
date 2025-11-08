@@ -10,7 +10,7 @@
     file #A program that shows the type of files.
     exiftool #A program that shows the metadata of files.
     mediainfo
-    poppler_utils #pdftotext and pdfinfo
+    poppler-utils #pdftotext and pdfinfo
     epub2txt2
     xlsx2csv #for xlsx files
     librsvg
