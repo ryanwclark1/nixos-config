@@ -69,6 +69,70 @@ The file finder is configured to:
 - Preview images
 - Open parent directory with Alt+Enter: `xdg-open $(dirname ~/file)`
 
+## Dmenu Mode
+
+Walker includes a powerful dmenu mode for creating custom menus and scripts. This is used by the system menu to provide hierarchical navigation.
+
+### System Menu
+
+The `system-menu` command provides comprehensive system management through walker's dmenu mode:
+
+```bash
+# Main menu (shows all categories)
+system-menu
+
+# Jump directly to a specific menu
+system-menu trigger    # Screenshot, screenrecord, color picker
+system-menu setup      # System configuration
+system-menu system     # Power options
+```
+
+### Menu Structure
+
+Inspired by Omarchy, the system menu provides:
+
+| Menu | Description |
+|------|-------------|
+| **Apps** | Launch walker for application search |
+| **Learn** | Access documentation (Keybindings, Hyprland Wiki, NixOS Manual) |
+| **Trigger** | Actions: Capture (screenshots, recording), Share, Toggle |
+| **Style** | Theming and appearance settings |
+| **Setup** | System configuration (Audio, WiFi, Bluetooth, Monitors, Config) |
+| **Update** | System updates and process restarts |
+| **Utilities** | Quick access to common tools |
+| **System** | Power management (Lock, Suspend, Restart, Shutdown) |
+
+### Dmenu Configuration
+
+Walker's dmenu mode is configured with Omarchy-style dimensions:
+
+```toml
+[dmenu]
+scrollbar = false
+print_index = false
+```
+
+Command-line arguments:
+- `--width 295` - Menu width
+- `--minheight 1` - Minimum height
+- `--maxheight 600` - Maximum height
+
+### Keybindings Menu
+
+The `keybindings-menu` command uses walker's dmenu mode to display all Hyprland keybindings in a searchable interface:
+
+```bash
+# Show all keybindings
+keybindings-menu
+```
+
+Features:
+- Dynamic binding detection from Hyprland
+- Keyboard code to symbol translation
+- Prioritized display (most important bindings first)
+- 40% monitor height for optimal viewing
+- 800px width for readable key combinations
+
 ## Customization
 
 ### Enable Hidden Features

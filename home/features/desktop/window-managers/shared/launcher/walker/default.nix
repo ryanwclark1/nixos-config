@@ -42,6 +42,11 @@
     force_keyboard_focus = true      # Keep focus in walker
     timeout = 60                     # Close after N seconds of inactivity
 
+    # Dmenu mode configuration (used by system-menu and other scripts)
+    [dmenu]
+    scrollbar = false                # Hide scrollbar in dmenu mode
+    print_index = false              # Print selection value, not index
+
     # AI Integration (if using walker AI features)
     [keys.ai]
     run_last_response = ["ctrl e"]
