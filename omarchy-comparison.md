@@ -107,6 +107,52 @@ Focus on workflow-enhancing utilities rather than 1:1 script porting. NixOS's de
 - Chromium privacy and troubleshooting documentation
 - System packages analysis document
 
+### ✅ Logging & Monitoring Infrastructure
+
+**System-wide Logging** (`hosts/common/global/core/logging.nix`):
+- **Systemd journald** configured with:
+  - Size limits: 1GB max, 1GB keep free
+  - File size: 100MB max per file
+  - Retention: 1 month
+  - Compression enabled
+  - Forwarding to syslog, kmsg, console, wall
+
+**Log Aggregation Stack** (woody - monitoring server):
+- **Loki** (port 3100):
+  - 30-day log retention
+  - TSDB storage engine
+  - 16 MB/s ingestion rate
+  - 32 MB burst capacity
+  - Filesystem-based storage at `/var/lib/loki`
+
+- **Grafana Alloy** (log collection agent):
+  - Collects from systemd journald
+  - Volume filtering to reduce noise:
+    - Drops debug/info level logs (priority 5-7)
+    - Filters noisy systemd services
+    - Removes repetitive kernel messages
+  - Ships logs to Loki with labels
+  - Member of `systemd-journal` group for access
+
+**Visualization & Alerting**:
+- **Grafana dashboards**:
+  - Log Exploration dashboard
+  - Multi-host Logs dashboard
+  - Real-time log streaming
+  - LogQL query builder
+- **Alert rules** for log monitoring
+- **Multi-host correlation** (woody, frametop, mini, etc.)
+
+**Configuration files**:
+- `/etc/alloy/config.alloy` - Main Alloy configuration
+- `/home/user/nixos-config/hosts/woody/monitoring/alloy/modules/log-processing.river`
+- `/home/user/nixos-config/hosts/woody/monitoring/alloy/modules/log-sources.river`
+- `/home/user/nixos-config/hosts/woody/monitoring/grafana/dashboards/default/log-exploration.json`
+
+**Omarchy Comparison**:
+- ❌ Omarchy: No centralized logging infrastructure
+- ✅ NixOS: Full observability stack with 30-day retention
+
 ## Detailed Installation Status
 
 ### ✅ Development Tools (Good Coverage)
@@ -292,10 +338,18 @@ The NixOS configuration has **excellent coverage** with recent Omarchy integrati
 ### Key Differences from Omarchy
 
 **What NixOS has that Omarchy lacks:**
+- **Comprehensive logging & monitoring infrastructure**:
+  - **Loki** for log aggregation with 30-day retention
+  - **Grafana Alloy** for log collection from journald
+  - **Prometheus** for metrics collection and storage
+  - **Grafana** with custom dashboards (log exploration, multi-host logs)
+  - **Alertmanager** for alert routing and management
+  - Systemd journald with size limits (1G), compression, and 1-month retention
+  - Multi-host log correlation and visualization
 - More comprehensive development environment
 - Advanced Kubernetes and cloud-native tools
 - Modern Rust-based CLI alternatives
-- AI/ML development tools
+- AI/ML development tools and model serving infrastructure
 
 **What Omarchy has that NixOS lacks:**
 - Input method support (fcitx5)
@@ -367,6 +421,11 @@ The modular, feature-based architecture provides:
 - **Privacy-first defaults**: Ungoogled-chromium, blocked trackers, no telemetry
 - **Wayland-native**: Full Ozone/VA-API support for modern graphics stack
 - **UWSM integration**: Proper session management for all Wayland applications
+- **Professional observability**: Loki + Grafana Alloy + Prometheus + Grafana stack
+  - 30-day log retention across all hosts
+  - Multi-host log correlation and search
+  - Custom dashboards and alerting
+  - Automated log filtering and processing
 
 ### Quality vs Quantity
 
