@@ -17,8 +17,17 @@ in
   home.file."${claudeHome}/BUSINESS_SYMBOLS.md" = {
     source = ./config/BUSINESS_SYMBOLS.md;
   };
+  home.file."${claudeHome}/CONTRIBUTING.md" = {
+    source = ./config/CONTRIBUTING.md;
+  };
   home.file."${claudeHome}/FLAGS.md" = {
     source = ./config/FLAGS.md;
+  };
+  home.file."${claudeHome}/KNOWLEDGE.md" = {
+    source = ./config/KNOWLEDGE.md;
+  };
+  home.file."${claudeHome}/PLANNING.md" = {
+    source = ./config/PLANNING.md;
   };
   home.file."${claudeHome}/PRINCIPLES.md" = {
     source = ./config/PRINCIPLES.md;
@@ -28,6 +37,9 @@ in
   };
   home.file."${claudeHome}/RULES.md" = {
     source = ./config/RULES.md;
+  };
+  home.file."${claudeHome}/TASK.md" = {
+    source = ./config/TASK.md;
   };
 
   # MODES
@@ -211,14 +223,14 @@ in
 
     # Import agents from the agents/ directory
     agents = {
-      # ai-engineer = (builtins.readFile ./config/agents/ai-engineer.md);
+      ai-engineer = (builtins.readFile ./config/agents/ai-engineer.md);
       # architect-review = (builtins.readFile ./config/agents/architect-review.md);
       code-reviewer = (builtins.readFile ./config/agents/code-reviewer.md);
-      # debugger = (builtins.readFile ./config/agents/debugger.md);
+      debugger = (builtins.readFile ./config/agents/debugger.md);
       # docs-architect = (builtins.readFile ./config/agents/docs-architect.md);
       # error-detective = (builtins.readFile ./config/agents/error-detective.md);
       # mermaid-expert = (builtins.readFile ./config/agents/mermaid-expert.md);
-      # nix-systems-specialist = (builtins.readFile ./config/agents/nix-systems-specialist.md);
+      nix-systems-specialist = (builtins.readFile ./config/agents/nix-systems-specialist.md);
       # rust-pro = (builtins.readFile ./config/agents/rust-pro.md);
       # sql-pro = (builtins.readFile ./config/agents/sql-pro.md);
       # test-automator = (builtins.readFile ./config/agents/test-automator.md);
