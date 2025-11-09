@@ -54,8 +54,12 @@ These computers are managed by this Nix flake ❄️
 
 - `home/`: Home Manager configurations accessible via `home-manager --flake`
   - `features/`: Modular feature configurations organized by category
-    - `ai/`: AI tools and assistants (Claude, Gemini, Qwen, Cursor, etc.)
+    - `ai/`: AI tools and assistants with **SuperClaude Framework**
+      - Claude with 20 specialized agents and MCP server integration
+      - Gemini, Qwen, Cursor, Windsurf, and more
     - `desktop/`: Desktop environments and window managers (Hyprland, GNOME, etc.)
+      - Omarchy-inspired utilities and keybindings
+      - Modern Wayland compositor configurations
     - `development/`: Development tools and languages (Rust, Go, Python, etc.)
     - `shell/`: Shell configurations (Bash, Fish, Zsh, etc.)
     - `media/`: Media applications and tools
@@ -83,6 +87,7 @@ These computers are managed by this Nix flake ❄️
 - `scripts/`: Update scripts for custom packages
 - `secrets/`: Encrypted secrets managed by [sops-nix]
 - `docs/`: Documentation and configuration guides
+- `omarchy/`: Omarchy-inspired configuration and utilities
 - [flake.nix]: Entrypoint for hosts and home configurations
 - [Makefile]: Commands for managing Nix, secrets, and system operations
 
@@ -178,7 +183,11 @@ Here is the directory structure I'm using.
 ├── home/
 │   ├── features/
 │   │   ├── ai/                    # AI tools and assistants
-│   │   │   ├── claude/            # Claude configurations
+│   │   │   ├── claude/            # Claude configurations with SuperClaude Framework
+│   │   │   │   ├── config/        # Framework documentation and agents
+│   │   │   │   │   ├── PLANNING.md, TASK.md, KNOWLEDGE.md, CONTRIBUTING.md
+│   │   │   │   │   ├── agents/    # 20 specialized AI agents
+│   │   │   │   │   └── MCP servers, modes, and configurations
 │   │   │   ├── gemini/            # Gemini configurations
 │   │   │   ├── qwen/              # Qwen configurations
 │   │   │   ├── cursor/            # Cursor IDE
@@ -187,6 +196,7 @@ Here is the directory structure I'm using.
 │   │   │   ├── window-managers/   # Hyprland, Niri configurations
 │   │   │   ├── environments/      # GNOME, XFCE configurations
 │   │   │   └── common/            # Shared desktop components
+│   │   │       └── scripts/       # System, Wayland, and Rofi utilities
 │   │   ├── development/           # Development tools
 │   │   │   ├── rust.nix          # Rust toolchain
 │   │   │   ├── go.nix            # Go toolchain
@@ -230,6 +240,7 @@ Here is the directory structure I'm using.
 ├── scripts/                      # Update scripts
 ├── secrets/                       # Encrypted secrets
 ├── docs/                         # Documentation
+├── omarchy/                      # Omarchy-inspired configuration
 ├── flake.nix                     # Main flake configuration
 └── Makefile                      # Management commands
 ```
@@ -258,10 +269,42 @@ Multiple shell configurations are supported:
 
 ### AI Tools & Assistants 🤖
 
-This configuration includes comprehensive AI tooling:
+This configuration includes comprehensive AI tooling with the **SuperClaude Framework** for advanced development workflows.
+
+#### SuperClaude Framework
+
+An elite AI development framework integrating **20 specialized agents** and structured knowledge management:
+
+**Core Documentation:**
+- **PLANNING.md**: Architecture principles, design decisions, and absolute rules for NixOS configuration
+- **TASK.md**: Task management system with priorities, backlog, and completion tracking
+- **KNOWLEDGE.md**: Accumulated insights, best practices, and NixOS/Nix troubleshooting
+- **CONTRIBUTING.md**: Comprehensive contribution guidelines covering git workflow, commit standards, and code style
+
+**Specialized Agents (20):**
+- **nix-systems-specialist**: Elite Nix ecosystem expert for NixOS, Home Manager, and flakes
+- **ai-engineer**: Advanced AI/LLM systems specialist for RAG architectures and multi-agent orchestration
+- **debugger**: Modern distributed systems debugging with cloud-native observability
+- **system-architect**: System design and architecture patterns
+- **backend-architect**: Backend systems and API design
+- **frontend-architect**: Frontend architecture and UX patterns
+- **devops-architect**: Infrastructure and deployment automation
+- **security-engineer**: Security analysis and hardening
+- **performance-engineer**: Performance optimization and profiling
+- **quality-engineer**: Testing strategies and quality assurance
+- **code-reviewer**: Code review and best practices
+- **refactoring-expert**: Code refactoring and technical debt management
+- **technical-writer**: Documentation and communication
+- **requirements-analyst**: Requirements gathering and analysis
+- **root-cause-analyst**: Root cause analysis and incident response
+- **python-expert**: Python development and ecosystem
+- **learning-guide**: Educational content and mentoring
+- **socratic-mentor**: Socratic method teaching approach
+- **deep-research-agent**: In-depth research and analysis
+- **business-panel-experts**: Business strategy and decision-making
 
 **AI Assistants:**
-- **Claude**: Anthropic's Claude with MCP server integration
+- **Claude**: Anthropic's Claude with MCP server integration and SuperClaude framework
 - **Gemini**: Google's Gemini AI with CLI tools
 - **Qwen**: Alibaba's Qwen AI models
 - **Sourcebot**: Custom AI assistant for code analysis
@@ -273,9 +316,11 @@ This configuration includes comprehensive AI tooling:
 - **Ollama**: Local AI model management
 
 **Features:**
-- MCP (Model Context Protocol) server configurations
+- MCP (Model Context Protocol) server configurations (Context7, Serena, Sequential, Playwright)
+- Multiple operation modes (Brainstorming, Deep Research, Task Management, Orchestration)
 - Docker-based AI service deployments
 - Local model hosting capabilities
+- Structured knowledge base and best practices
 - Integration with development workflows
 
 ### Monitoring & Observability 📊
@@ -315,6 +360,8 @@ This configuration supports multiple desktop environments and window managers:
   - Custom keybindings and workspace management
   - Waybar integration with custom modules
   - Screenshot utilities and media controls
+  - Omarchy-inspired utilities and keybindings
+  - Mako notification daemon with system info notifications
   - See [docs/hyprland.md](docs/hyprland.md) for complete keybinding reference
 - **Niri**: Alternative Wayland compositor (experimental)
 
@@ -340,6 +387,37 @@ This configuration supports multiple desktop environments and window managers:
 |   XFCE   |     X11     |  Lightweight setup   |       Adwaita        |
 |  Plasma  | X11/Wayland |      KDE Plasma      |        Breeze        |
 
+### Omarchy Integration 🎨
+
+This configuration includes utilities and features inspired by [Omarchy](https://omarchy.org), DHH's beautiful, modern & opinionated Linux distribution.
+
+**System Notification Utilities:**
+- **show-battery**: Display battery status, level, charging state, and time remaining with smart icons
+  - Keybinding: `SUPER+CTRL+B`
+- **show-time**: Display current time, date, week number, and timezone information
+  - Keybinding: `SUPER+CTRL+T`
+
+**Wayland Utilities:**
+- **keybindings-menu**: Interactive keybindings reference with walker
+  - Keybinding: `SUPER+/`
+- **toggle-nightlight**: Toggle hyprsunset nightlight mode for eye comfort
+  - Keybinding: `SUPER+CTRL+N`
+- **toggle-idle**: Toggle hypridle idle management on/off
+  - Keybinding: `SUPER+CTRL+I`
+- **toggle-transparency**: Toggle window opacity/transparency in Hyprland
+  - Keybinding: `SUPER+CTRL+O`
+- **window-pop**: Pop window out (float and pin across workspaces)
+  - Keybinding: `SUPER+CTRL+P`
+- **workspace-toggle-gaps**: Toggle workspace gaps on/off for maximized screen space
+  - Keybinding: `SUPER+CTRL+G`
+
+**Features:**
+- Mako notification daemon for clean, minimal notifications
+- System information at a glance without requiring a status bar
+- Enhanced window management for improved productivity
+- Modern Wayland-native utilities
+
+All scripts are organized in `~/.local/bin/scripts/` with proper categorization by scope (system, wayland, rofi).
 
 ![Alt](https://repobeats.axiom.co/api/embed/5ef4c6a66687d5e71cbe2ed39ec352a4d055aabf.svg "Repobeats analytics image")
 
