@@ -15,7 +15,10 @@ This comprehensive analysis compares Omarchy's default package set with the curr
 | **Not Installed** | 48 (39.7%) | Mostly optional/niche tools |
 | **Not Applicable** | 1 (0.8%) | yay (Arch-specific AUR helper) |
 | **Perfect Categories** | 2 | CLI Tools (100%), Hyprland/Wayland (100%) |
+| **Custom Scripts Added** | 10 | Not counted in package statistics |
 | **Last Updated** | November 2024 | Post-integration work |
+
+**Note**: The 72 packages counted above represent traditional software packages only. The 10 custom utility scripts adapted from Omarchy are tracked separately as they are NixOS-specific implementations (`writeShellScriptBin`) rather than upstream packages.
 
 ### Coverage by Category
 
@@ -39,8 +42,59 @@ The NixOS configuration has been significantly enhanced with Omarchy-inspired fe
 ### ✅ Wayland/Hyprland Tools (100% Coverage Achieved)
 - **Enabled existing tools**: hypridle, hyprsunset, hyprshot
 - **Added new tools**: mako (notifications), walker (launcher), hyprland-qtutils
-- **Custom scripts**: 10+ utility scripts (keybindings-menu, workspace-toggle-gaps, toggle-nightlight, etc.)
+- **Custom scripts**: 10 utility scripts adapted from Omarchy (see below)
 - **Keybindings**: 13+ new Omarchy-inspired keybindings integrated
+
+### ✅ Custom Scripts Integration
+
+All scripts adapted to NixOS using `writeShellScriptBin` pattern with proper PATH setup:
+
+| Script | Location | Function | Omarchy Equivalent |
+|--------|----------|----------|-------------------|
+| `keybindings-menu` | `desktop/common/scripts/wayland/` | Interactive keybindings viewer (walker/rofi) | ✅ Yes |
+| `workspace-toggle-gaps` | `desktop/common/scripts/wayland/` | Toggle workspace gaps on/off | ✅ Yes |
+| `toggle-nightlight` | `desktop/common/scripts/wayland/` | Toggle hyprsunset blue light filter | ✅ Yes |
+| `toggle-idle` | `desktop/common/scripts/wayland/` | Toggle hypridle daemon | ✅ Yes |
+| `toggle-transparency` | `desktop/common/scripts/wayland/` | Toggle window opacity | ✅ Yes |
+| `window-pop` | `desktop/common/scripts/wayland/` | Float & pin active window | ✅ Yes |
+| `close-all-windows` | `desktop/common/scripts/wayland/` | Close all windows (CTRL+ALT+DEL) | ✅ Yes |
+| `show-battery` | `desktop/common/scripts/system/` | Display battery status notification | ✅ Yes |
+| `show-time` | `desktop/common/scripts/system/` | Display current time notification | ✅ Yes |
+| `audio-switch` | `desktop/common/` | Audio output switching | ✅ Pre-existing |
+
+**Integration Method:**
+- All scripts use `writeShellScriptBin` for proper NixOS packaging
+- Explicit PATH setup with required dependencies (hyprland, jq, libnotify, etc.)
+- Stored in `home/features/desktop/common/scripts/` directory structure
+- Registered in `desktop/common/default.nix` for automatic installation
+- Bound to keybindings in Hyprland configuration
+
+**NixOS Advantages:**
+- Dependencies declared explicitly in Nix (reproducible)
+- Scripts available system-wide in PATH
+- Version-controlled with configuration
+- No manual installation required
+
+**Omarchy Script Coverage Analysis:**
+
+Omarchy includes 134 scripts in `/omarchy/bin/`. Key scripts integrated:
+- ✅ **Keybindings viewer**: Implemented as `keybindings-menu` using walker/rofi
+- ✅ **Workspace management**: `workspace-toggle-gaps` with notification feedback
+- ✅ **Display settings**: `toggle-nightlight` using hyprsunset
+- ✅ **Power management**: `toggle-idle` for hypridle control
+- ✅ **Window utilities**: `toggle-transparency`, `window-pop`, `close-all-windows`
+- ✅ **System info**: `show-battery`, `show-time` with notification display
+- ✅ **Audio switching**: `audio-switch` (pre-existing in config)
+
+Not implemented (less critical or NixOS-incompatible):
+- ❌ Package management scripts (yay, pacman - Arch-specific)
+- ❌ AUR helper scripts (not applicable to NixOS)
+- ❌ Arch system update scripts (different paradigm in NixOS)
+- ⚠️ Theme switching scripts (handled differently via home-manager/stylix)
+- ⚠️ Some wallpaper scripts (waypaper already configured)
+
+**Script Implementation Strategy:**
+Focus on workflow-enhancing utilities rather than 1:1 script porting. NixOS's declarative nature eliminates need for many imperative Arch scripts.
 
 ### ✅ Desktop Applications
 - **Chromium**: Added ungoogled-chromium with privacy focus, Wayland support, VA-API acceleration
@@ -295,7 +349,10 @@ This updated analysis (November 2024) shows the NixOS configuration provides **e
 Recent integration work has significantly improved the configuration by:
 1. **100% Hyprland/Wayland coverage**: All 20 core tools now enabled/configured
 2. **100% CLI tool coverage**: All 13 essential CLI utilities installed
-3. **Custom workflow integration**: 10+ utility scripts from Omarchy adapted for NixOS
+3. **10 custom utility scripts**: Fully adapted from Omarchy with NixOS integration
+   - Wayland scripts (7): keybindings-menu, workspace-toggle-gaps, toggle-nightlight, toggle-idle, toggle-transparency, window-pop, close-all-windows
+   - System scripts (2): show-battery, show-time
+   - Audio script (1): audio-switch (pre-existing)
 4. **Enhanced keybindings**: 13+ new shortcuts for improved productivity
 5. **Browser diversity**: Three options (ungoogled-chromium, Chrome, Firefox)
 6. **Complete printing stack**: CUPS backend + GUI frontend
