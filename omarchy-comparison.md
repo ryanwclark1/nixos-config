@@ -9,8 +9,8 @@ This analysis corrects significant errors in the previous comparison by performi
 ## Summary Statistics
 
 - **Total Omarchy Packages Analyzed**: 121
-- **Currently Installed**: 71 packages (58.7%)
-- **Not Installed**: 49 packages (40.5%)
+- **Currently Installed**: 72 packages (59.5%)
+- **Not Installed**: 48 packages (39.7%)
 - **Not Applicable**: 1 package (yay - Arch-specific)
 - **Architecture Note**: Some packages are host-specific (e.g., brightnessctl only on frametop laptop)
 - **Last Updated**: November 2024 (Omarchy features integration complete)
@@ -157,7 +157,7 @@ The following packages were **incorrectly marked as missing** in the previous co
 | postgresql-libs | ❌ | - | Database libraries |
 | power-profiles-daemon | ❌ | - | Power management |
 | python-gobject | ❌ | - | Python bindings |
-| system-config-printer | ❌ | - | Printer config |
+| system-config-printer | ✅ | system-config-printer | Printer config GUI (ADDED 2024-11) |
 | tzupdate | ❌ | - | Timezone updater |
 | ufw | ❌ | - | Firewall |
 | ufw-docker | ❌ | - | Docker firewall |
@@ -227,14 +227,13 @@ The NixOS configuration has **excellent coverage** with recent Omarchy integrati
 - AI/ML development tools
 
 **What Omarchy has that NixOS lacks:**
-- Complete printing stack (CUPS ecosystem)
 - Input method support (fcitx5)
-- Some desktop integration tools
-- Traditional Linux system administration tools
+- Some desktop integration tools (gnome-calculator, kvantum-qt5)
+- Traditional Linux system administration tools (ufw, power-profiles-daemon)
 
-## Installation Coverage: 58.7% (Updated November 2024)
+## Installation Coverage: 59.5% (Updated November 2024)
 
-The installation rate is now **58.7%** (71/121 packages), a significant improvement from the initial 43.3%. Recent Omarchy integration work has achieved:
+The installation rate is now **59.5%** (72/121 packages), a significant improvement from the initial 43.3%. Recent Omarchy integration work has achieved:
 
 - ✅ **Perfect CLI tool coverage** (100%)
 - ✅ **Perfect Hyprland/Wayland tool coverage** (100%)
@@ -261,7 +260,7 @@ The NixOS configuration now provides **excellent coverage of core functionality*
 2. ✅ **Browser**: Chromium (ungoogled-chromium) with privacy focus
 3. ✅ **Terminal**: Alacritty configuration
 4. ✅ **Utility Scripts**: 10+ custom scripts from Omarchy
-5. ✅ **Printing**: CUPS stack fully configured
+5. ✅ **Printing**: CUPS stack fully configured + system-config-printer GUI
 
 ### Host-Specific Notes
 - **brightnessctl**: Correctly installed only on frametop (laptop) host
@@ -270,7 +269,7 @@ The NixOS configuration now provides **excellent coverage of core functionality*
 
 ## Conclusion
 
-This updated analysis (November 2024) shows the NixOS configuration provides **excellent coverage** (58.7%) of the Omarchy package set, with perfect performance in:
+This updated analysis (November 2024) shows the NixOS configuration provides **excellent coverage** (59.5%) of the Omarchy package set, with perfect performance in:
 
 - ✅ **CLI Tools**: 100% coverage (13/13 packages)
 - ✅ **Hyprland/Wayland Tools**: 100% coverage (20/20 packages)
