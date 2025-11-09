@@ -312,9 +312,12 @@ This configuration supports multiple desktop environments and window managers:
 
 **Window Managers:**
 - **Hyprland**: Primary Wayland compositor with comprehensive configuration
-  - Custom keybindings and workspace management
+  - Custom keybindings and workspace management (Omarchy-inspired)
   - Waybar integration with custom modules
   - Screenshot utilities and media controls
+  - Mako notification daemon
+  - Walker application launcher
+  - 10+ custom utility scripts (keybindings-menu, workspace-toggle-gaps, etc.)
   - See [docs/hyprland.md](docs/hyprland.md) for complete keybinding reference
 - **Niri**: Alternative Wayland compositor (experimental)
 
@@ -322,6 +325,16 @@ This configuration supports multiple desktop environments and window managers:
 - **GNOME**: Full GNOME desktop with extensions
 - **XFCE**: Lightweight desktop environment
 - **Plasma**: KDE Plasma desktop
+
+**Browsers:**
+- **Chromium**: Privacy-focused ungoogled-chromium with Wayland support
+  - Hardware-accelerated video (VA-API)
+  - Force dark mode
+  - Privacy policies (DuckDuckGo, blocked trackers)
+  - uBlock Origin + HTTPS Everywhere
+  - See `home/features/chromium/README.md` for details
+- **Chrome**: Google Chrome with sync support
+- **Firefox**: Mozilla Firefox with Browserpass integration
 
 **Common Features:**
 - Font configuration using [Work Sans](https://fonts.google.com/specimen/Work+Sans) and [Fira Code](https://fonts.google.com/specimen/Fira+Code)
@@ -332,10 +345,11 @@ This configuration supports multiple desktop environments and window managers:
 - [SANE] for scanner support
 - [NetworkManager] for network management
 - Stylix theming integration
+- Catppuccin Mocha color scheme
 
 | Desktop  |   System    |    Configuration     |        Theme         |
 | :------: | :---------: | :------------------: | :------------------: |
-| Hyprland |   Wayland   | Custom configuration |    Nord-inspired     |
+| Hyprland |   Wayland   | Custom configuration |  Catppuccin Mocha   |
 |  GNOME   | Wayland/X11 |    Standard GNOME    | Adwaita + Extensions |
 |   XFCE   |     X11     |  Lightweight setup   |       Adwaita        |
 |  Plasma  | X11/Wayland |      KDE Plasma      |        Breeze        |
