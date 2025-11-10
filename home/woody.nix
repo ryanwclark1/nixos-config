@@ -16,7 +16,7 @@
     ./features/bluetooth
     ./features/btop
     ./features/cava
-    ./features/chrome
+    ./features/chromium
     ./features/cli
     ./features/compression
     ./features/cursor

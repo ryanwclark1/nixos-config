@@ -71,9 +71,14 @@
             "chromium.desktop"
           ];
 
+          audioPlayers = [
+            "mpv.desktop"
+            "vlc.desktop"
+          ];
+
           videoPlayers = [
-            "mpv"
-            "vlc"
+            "mpv.desktop"
+            "vlc.desktop"
           ];
 
           imageViewers = [
@@ -92,33 +97,55 @@
         in
         {
           #audio video
-          "audio/mp3" = videoPlayers;
-          "audio/aac" = videoPlayers;
-          "audio/wav" = videoPlayers;
-          "audio/*" = videoPlayers;
+          "audio/mp3" = audioPlayers;
+          "audio/aac" = audioPlayers;
+          "audio/wav" = audioPlayers;
+          "audio/*" = audioPlayers;
 
+          "application/ogg" = videoPlayers;
+          "video/3gpp" = videoPlayers;
+          "video/3gpp2" = videoPlayers;
+          "video/mov" = videoPlayers;
           "video/mp4" = videoPlayers;
           "video/mpeg" = videoPlayers;
-          "video/mov" = videoPlayers;
+          "video/ogg" = videoPlayers;
+          "video/quicktime" = videoPlayers;
+          "video/webm" = videoPlayers;
+          "video/x-flv" = videoPlayers;
+          "video/x-matroska" = videoPlayers;
+          "video/x-ms-asf" = videoPlayers;
+          "video/x-ms-wmv" = videoPlayers;
+          "video/x-msvideo" = videoPlayers;
+          "video/x-ogm+ogg" = videoPlayers;
+          "video/x-theora+ogg" = videoPlayers;
           "video/*" = videoPlayers;
 
           #images
-          "image/png" = imageViewers;
-          "image/jpeg" = imageViewers;
-          "image/gif" = imageViewers;
           "image/bmp" = imageViewers;
-          "image/jpg" = imageViewers;
-          "image/tiff" = imageViewers;
-          "image/x-bmp" = imageViewers;
-          "image/x-ico" = imageViewers;
+          "image/gif" = imageViewers;
           "image/heic" = imageViewers;
           "image/heif" = imageViewers;
+          "image/jpeg" = imageViewers;
+          "image/jpg" = imageViewers;
+          "image/png" = imageViewers;
+          "image/tiff" = imageViewers;
+          "image/webp" = imageViewers;
+          "image/x-bmp" = imageViewers;
+          "image/x-ico" = imageViewers;
           "image/*" = imageViewers;
 
           #vscode for text etc
+          "application/json" = codeEditors;
+          "application/ld+json" = codeEditors;
+          "application/x-shellscript" = codeEditors;
+          "application/xml" = codeEditors;
+          "text/css" = codeEditors;
+          "text/english" = codeEditors;
+          "text/javascript" = codeEditors;
           "text/plain" = codeEditors;
           "text/x-c" = codeEditors;
           "text/x-c++" = codeEditors;
+          "text/x-c++hdr" = codeEditors;
           "text/x-c++src" = codeEditors;
           "text/x-chdr" = codeEditors;
           "text/x-csrc" = codeEditors;
@@ -128,34 +155,30 @@
           "text/x-java" = codeEditors;
           "text/x-makefile" = codeEditors;
           "text/x-moc" = codeEditors;
+          "text/x-pascal" = codeEditors;
           "text/x-pcs-gcd" = codeEditors;
           "text/x-perl" = codeEditors;
           "text/x-python" = codeEditors;
           "text/x-scala" = codeEditors;
           "text/x-scheme" = codeEditors;
-          "text/css" = codeEditors;
-          "text/javascript" = codeEditors;
-          "application/json" = codeEditors;
-          "application/ld+json" = codeEditors;
+          "text/x-tcl" = codeEditors;
+          "text/x-tex" = codeEditors;
+          "text/xml" = codeEditors;
 
 
           "application/pdf" = pdfViewers;
 
           #web
-          "text/html" = browser;
-          "x-scheme-handler/http" = browser;
-          "x-scheme-handler/https" = browser;
           "application/x-extension-htm" = browser;
           "application/x-extension-html" = browser;
           "application/x-extension-shtml" = browser;
-          "application/xhtml+xml" = browser;
-          "application/x-extension-xhtml" = browser;
           "application/x-extension-xht" = browser;
-          "x-scheme-handler/ftp" = browser;
+          "application/x-extension-xhtml" = browser;
+          "application/xhtml+xml" = browser;
           "x-scheme-handler/chrome" = "google-chrome.desktop";
-
-          "inode/director" = ["yazi"];
-          "application/x-xz-compressed-tar" = ["org.gnome.FileRoller.desktop"];
+          "x-scheme-handler/ftp" = browser;
+          "x-scheme-handler/http" = browser;
+          "x-scheme-handler/https" = browser;
         };
     };
   };

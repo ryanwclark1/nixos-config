@@ -80,33 +80,6 @@
 
     # Common shell aliases for all shells
     shellAliases = rec {
-      # Directory navigation
-      ".." = "cd ..";
-      "..." = "cd ../..";
-      "...." = "cd ../../..";
-      "....." = "cd ../../../..";
-      # Note: "-" alias removed - not valid in Fish shell
-
-      # Git shortcuts
-      g = "git";
-      ga = "git add";
-      gc = "git commit";
-      gca = "git commit -a";
-      gcam = "git commit -am";
-      gco = "git checkout";
-      gd = "git diff";
-      gds = "git diff --staged";
-      gl = "git log --oneline --graph";
-      gp = "git push";
-      gpu = "git pull";
-      gs = "git status -sb";
-      gst = "git status";
-
-      # System management
-      rebuild = "sudo nixos-rebuild switch --flake .#$(hostname)";
-      update = "nix flake update";
-      upgrade = "nix flake update && sudo nixos-rebuild switch --flake .#$(hostname)";
-      cleanup = "sudo nix-collect-garbage -d && nix store optimise";
 
       # Additional ls aliases for compatibility
       la = "ls -a";  # Will use eza's ls alias
@@ -125,7 +98,6 @@
       rm = "rm -I";
 
       # Editor shortcuts
-      v = "nvim";
       vim = "nvim";
       vi = "nvim";
       e = "$EDITOR";

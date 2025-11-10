@@ -1,15 +1,49 @@
 {
   pkgs,
+  inputs,
+  lib,
   ...
 }:
 
-{
+let
+  epkgs = if lib.hasAttr pkgs.system inputs.elephant.packages then inputs.elephant.packages.${pkgs.system} else {};
+  elephantPkgNames = [
+    "elephant"
+    "elephant-calc"
+    "elephant-clipboard"
+    "elephant-bluetooth"
+    "elephant-desktopapplications"
+    "elephant-files"
+    "elephant-menus"
+    "elephant-providerlist"
+    "elephant-runner"
+    "elephant-symbols"
+    "elephant-unicode"
+    "elephant-websearch"
+    "elephant-todo"
+  ];
+  elephantPkgs = builtins.concatLists (map (name: lib.optional (lib.hasAttr name epkgs) epkgs.${name}) elephantPkgNames);
+in {
   # programs.walker = {
   #   enable = true;
   #   package = pkgs.walker;
   #   systemd.enable = true;
   # };
-  home.packages = [ pkgs.walker ];
+  home.packages = [ pkgs.walker ] ++ elephantPkgs;
+
+  # Ship Omarchy defaults for Walker/Elephant under .local/share so refresh scripts can deploy them
+  home.file.".local/share/omarchy/config/walker/config.toml" = {
+    force = true;
+    text = builtins.readFile ./config.toml;
+  };
+  home.file.".local/share/omarchy/config/elephant/calc.toml" = {
+    force = true;
+    text = builtins.readFile ./elephant/calc.toml;
+  };
+  home.file.".local/share/omarchy/config/elephant/desktopapplications.toml" = {
+    force = true;
+    text = builtins.readFile ./elephant/desktopapplications.toml;
+  };
 
   # Walker configuration
   home.file.".config.walker/config.toml" = {
@@ -398,4 +432,3 @@
     '';
   };
 }
-

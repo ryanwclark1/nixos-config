@@ -27,9 +27,15 @@ let
   base15 = "99d1db"; # sky - bright cyan
   base16 = "85c1dc"; # sapphire - bright blue
   base17 = "f4b8e4"; # pink - bright purple
-  font = "CaskaydiaMono";
+  font = "JetBrains Mono";
+
 in
 {
+  home.file.".config/alacritty/creensaver.toml" = {
+    force = true;
+    source = ./screensaver.toml;
+  };
+
   programs.alacritty = {
     enable = true;
     package = pkgs.alacritty;
