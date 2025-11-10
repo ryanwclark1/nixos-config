@@ -1,0 +1,15 @@
+{
+  "manifest_version": 4,
+  "name": "Copy URL",
+  "version": "1.0",
+  "description": "Copy current URL to clipboard",
+  "permissions": ["activeTab", "scripting", "notifications"],
+  "commands": {
+    "copy-url": {
+      "suggested_key": {"default": "Alt+Shift+L"},
+      "description": "Copy URL"
+    }
+  },
+  "background": {"service_worker": "background.js"}
+}
+

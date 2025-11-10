@@ -9,43 +9,12 @@
   programs.zsh = {
     enable = true;
     package = pkgs.zsh;
+    # Place zsh dotfiles under XDG config directory
+    dotDir = ".config/zsh";
     enableCompletion = true;
     enableVteIntegration = true;
     autocd = true;  # Automatically cd into directory by typing its name
-    defaultKeymap = "emacs";  # Can be "emacs" or "vicmd" for vi mode
-
-    # Use XDG config directory for ZSH files
-    dotDir = "${config.xdg.configHome}/zsh";
-
-    # Directory shortcuts
-    dirHashes = {
-      dl = "$HOME/Downloads";
-      docs = "$HOME/Documents";
-      dev = "$HOME/Code";
-      nix = "$HOME/nixos-config";
-      dots = "$HOME/.config";
-    };
-
-    # Search paths for cd command (handled by CDPATH in common.nix)
-    cdpath = [];  # Using sessionVariables.CDPATH instead
-
-    # History configuration
-    history = {
-      size = 100000;
-      save = 100000;
-      path = "${config.home.homeDirectory}/.config/zsh/history";
-      extended = true;  # Save timestamps
-      ignoreDups = true;  # Don't save duplicates
-      ignoreSpace = true;  # Don't save commands starting with space
-      ignorePatterns = [
-        "rm *"
-        "pkill *"
-        "kill *"
-        "history *"
-      ];
-      share = true;  # Share history between sessions
-      expireDuplicatesFirst = true;
-    };
+    defaultKeymap = "vicmd";  # Can be "emacs" or "vicmd" for vi mode
 
     # Syntax highlighting configuration
     syntaxHighlighting = {
@@ -128,7 +97,6 @@
     # Global aliases (can be used anywhere in command)
     shellGlobalAliases = {
       "--help" = "--help 2>&1 | bat --language=help --style=plain";
-      "......" = "../../../../..";
       G = "| grep";
       L = "| less";
       H = "| head";

@@ -107,6 +107,10 @@
       url = "github:uiriansan/SilentSDDM";
       inputs.nixpkgs.follows = "nixpkgs";
    };
+    # Walker providers and services
+    elephant = {
+      url = "github:abenz1267/elephant";
+    };
   };
 
   outputs =

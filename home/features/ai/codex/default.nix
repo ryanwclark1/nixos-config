@@ -30,6 +30,10 @@ in
     };
   };
 
+  # Ensure Codex config files can be overwritten if they already exist
+  # home.file."${codexHome}/config.toml".force = true;
+  # home.file."${codexHome}/settings.json".force = true;
+
     # custom-instructions = {
     #   # Example custom instruction
     #   "Always use markdown for code snippets" = "Whenever you provide code, format it using markdown code blocks with the appropriate language specified. This ensures proper syntax highlighting and readability.";

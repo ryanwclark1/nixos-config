@@ -161,22 +161,8 @@ in
       dl = "cd ~/Downloads";
       docs = "cd ~/Documents";
       dev = "cd ~/Code";
-      nix = "cd ~/nixos-config";
       dots = "cd ~/.config";
       tmp = "cd /tmp";
-
-      # System shortcuts
-      rebuild = "sudo nixos-rebuild switch --flake .#(hostname)";
-      update = "nix flake update";
-      upgrade = "nix flake update; sudo nixos-rebuild switch --flake .#(hostname)";
-      cleanup = "sudo nix-collect-garbage -d; nix store optimise";
-
-      # Development shortcuts
-      py = "python3";
-      pip = "pip3";
-      node = "nodejs";
-      npm = "npm";
-      yarn = "yarn";
 
       # Docker shortcuts
       dps = "docker ps";
@@ -419,11 +405,6 @@ in
       # Enhanced history
       h = ''
         history | head -20
-      '';
-
-      # Quick config edits
-      nixconf = ''
-        $EDITOR ~/nixos-config/flake.nix
       '';
 
       fishconfig = ''

@@ -57,13 +57,13 @@ check_networkmanager() {
         err "Install NetworkManager or use your distribution's network manager"
         return 1
     fi
-    
+
     if ! systemctl is-active --quiet NetworkManager 2>/dev/null; then
         err "NetworkManager service is not running"
         err "Try: sudo systemctl start NetworkManager"
         return 1
     fi
-    
+
     # Check if WiFi is enabled
     if [[ "$(nmcli radio wifi)" == "disabled" ]]; then
         warn "WiFi is disabled"
@@ -80,12 +80,12 @@ check_networkmanager() {
 get_wifi_device() {
     local device
     device=$(nmcli -t -f DEVICE,TYPE device status | grep "wifi" | head -1 | cut -d: -f1)
-    
+
     if [[ -z "$device" ]]; then
         err "No WiFi device found"
         return 1
     fi
-    
+
     echo "$device"
 }
 
@@ -131,7 +131,7 @@ main() {
     local force_rescan=false
     local saved_only=false
     local show_hidden=false
-    
+
     # Parse arguments
     while [[ $# -gt 0 ]]; do
         case $1 in
@@ -167,43 +167,43 @@ main() {
                 ;;
         esac
     done
-    
+
     # Check dependencies
     if ! has -v fzf; then
         err "This script requires fzf to be installed"
         exit 1
     fi
-    
+
     if ! check_networkmanager; then
         exit 1
     fi
-    
+
     # Get WiFi device
     local wifi_device
     if ! wifi_device=$(get_wifi_device); then
         exit 1
     fi
-    
+
     info "Using WiFi device: $wifi_device"
-    
+
     # Force rescan if requested
     if [[ "$force_rescan" == true ]]; then
         info "Scanning for networks..."
         nmcli device wifi rescan
         sleep 3
     fi
-    
+
     # Create header
-    local header="${BLUE}WiFi Network Selector${RESET} | ${GREEN}<Enter>${RESET} connect | ${YELLOW}<Ctrl-R>${RESET} rescan | ${CYAN}?${RESET} help"
-    
+    local header="WiFi Network Selector | <Enter> connect | <Ctrl-R> rescan | ? help"
+
     # Build nmcli command
     local nmcli_cmd=(nmcli -f 'bssid,signal,bars,freq,security,ssid' --color yes device wifi)
-    
+
     if [[ "$saved_only" == true ]]; then
         info "Showing saved connections only..."
         nmcli_cmd=(nmcli -f 'name,type,autoconnect,state' --color yes connection show)
     fi
-    
+
     # Main FZF interface
     local selected
     selected=$(
@@ -222,13 +222,13 @@ main() {
             --cycle \
             --inline-info
     ) || exit $?
-    
+
     # Parse selection
     local key="${selected%%$'\n'*}"
     local network_line="${selected#*$'\n'}"
-    
+
     [[ -z "$network_line" ]] && exit 0
-    
+
     # Extract network information
     local bssid ssid
     if [[ "$saved_only" == true ]]; then
@@ -238,7 +238,7 @@ main() {
         # Handle SSIDs with spaces
         ssid="${network_line##* }"
     fi
-    
+
     case "$key" in
         ctrl-r)
             info "Rescanning networks..."

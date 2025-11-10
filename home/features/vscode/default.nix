@@ -265,199 +265,197 @@
           ])
           ++ (pkgs.vscode-utils.extensionsFromVscodeMarketplace [
           # {
-          #   name = "alpine-js-intellisense";  # Removed: only needed if using Alpine.js
+          #   name = "alpine-js-intellisense";
           #   publisher = "adrianwilczynski";
           #   sha256 = "sha256-Klx5ZvV06lXIJ3Q/mzq3KBjPpdROoxDkgEu7MBO+RhI=";
           #   version = "1.2.0";
           # }
           # {
-          #   name = "ansible";  # Temporarily disabled due to Python extension dependency
+          #   name = "ansible";
           #   publisher = "redhat";
-          #   sha256 = "sha256-TXXOuayVohQPp+yQAHbsZDr/UYtyHmUkaLU+lADpjDU=";
-          #   version = "25.8.1";
+          #   sha256 = "sha256-Z0oUhqoHfVALG5k1dbSBpJiq0AEjaqeh8yLJ8FjvfcY=";
+          #   version = "25.9.0";
           # }
-            {
-              name = "biome";
-              publisher = "biomejs";
-              sha256 = "sha256-wWyLIjNOBjIe72ed+wwfQWGH7Vzuea/0Xux0XJkhAkY=";
-              version = "2025.7.41733";
-            }
-            {
-              name = "chatgpt";
-              publisher = "openai";
-              sha256 = "sha256-drpduDyHT/Aem/55Cjnu01aNe/ijlNgLSpKvtg9WU40=";
-              version = "0.5.5";
-            }
-            {
-              name = "claude-code";
-              publisher = "anthropic";
-              sha256 = "sha256-g79/+Jzh8HBhndFMQ+qmP2iNMqJw75c5BrLPsiJg0gc=";
-              version = "1.0.109";
-            }
-            # {
-            #   name = "context7-mcp";  # Removed: conflicts with home-manager MCP setup
-            #   publisher = "upstash";
-            #   sha256 = "sha256-q6SkIy7eZ9H1yOnZygkcXQcpTK4eu6/jjud1wqEL2Mw=";
-            #   version = "1.0.1";
-            # }
-            # {
-            #   name = "copilot";
-            #   publisher = "github";
-            #   sha256 = "sha256-Irp2xqVySCo5cKHxTGXVcr8koPyJBRk0VH+RfQ+eZec=";
-            #   version = "1.366.1775";
-            # }
-            # {
-            #   name = "copilot-chat";
-            #   publisher = "github";
-            #   sha256 = "sha256-99Ez7lIK9IoTk3lfaCRBRYSoaC3v50tFJvO2t+Tflm0=";
-            #   version = "0.31.2025090302";
-            # }
-            {
-              name = "explorer";
-              publisher = "vitest";
-              sha256 = "sha256-r1KCT6UYgoCPRRxy+dmJLkwUW2yRixBwfYra4kSJYB0=";
-              version = "1.28.2";
-            }
-            {
-              name = "gemini-cli-vscode-ide-companion";
-              publisher = "Google";
-              sha256 = "sha256-zQ8616UT9pR8+PYP903m5/VVfbIHpZ0DEVq+XO0e4i0=";
-              version = "0.2.2";
-            }
-            {
-              name = "grafana-alloy";
-              publisher = "grafana";
-              sha256 = "sha256-XcoiEDCPp6GzYQDhJArZBEWxSnZrSTHofIyLFegsbh0=";
-              version = "0.2.0";
-            }
-            {
-              name = "grafana-vscode";
-              publisher = "grafana";
-              sha256 = "sha256-TpLOMwdaEdgzWVwUcn+fO4rgLiQammWQM8LQobt8gLw=";
-              version = "0.0.19";
-            }
-            # {
-          #   name = "htmx-attributes";  # Removed: only needed if using HTMX
-            #   publisher = "craigrbroughton";
-            #   sha256 = "sha256-TsemPZkq2Z13/vahRaP7z206BJaCZ1TR6OVv6aeDvyk=";
-            #   version = "0.8.0";
-            # }
-            {
-              name = "hyprland";
-              publisher = "ewen-lbh";
-              sha256 = "sha256-GaDpbkqNyIElSBnHwxc2ntmEVAGwL9XlNIBWNo7pvwM=";
-              version = "0.1.2";
-            }
-            {
-              name = "mypy-type-checker";
-              publisher = "ms-python";
-              sha256 = "sha256-IeWhMA1ht2npPVDqJmv3IOmrlKp9uuhycGNT7h+rNks=";
-              version = "2025.3.12271015";
-            }
-            {
-            name = "python";
-            publisher = "ms-python";
-            sha256 = "sha256-3hd940mfxnvqoblIrx/S0A8KwHtYLFuonu52/HGGfak=";
-            version = "2025.10.1";
+          {
+            name = "biome";
+            publisher = "biomejs";
+            sha256 = "sha256-tihEFcDDYr/khLIcJbR5VSC/RujEvp/gcnWlokAqNBc=";
+            version = "2025.10.241456";
           }
-            {
-              name = "pdf";
-              publisher = "tomoki1207";
-              sha256 = "sha256-i3Rlizbw4RtPkiEsodRJEB3AUzoqI95ohyqZ0ksROps=";
-              version = "1.2.2";
-            }
-            {
-              name = "playwright";
-              publisher = "ms-playwright";
-              sha256 = "sha256-1fdUyzJitFfl/cVMOjEiuBS/+FTGttilXoZ8txZMmVs=";
-              version = "1.1.15";
-            }
-            {
-              name = "prom";
-              publisher = "ventura";
-              sha256 = "sha256-h8pRrPzmu8+5ZiOLALjackr4zWuFAqi1ex7Gp2iOZKk=";
-              version = "1.3.3";
-            }
-            # {
-          #   name = "pwc";  # Removed: very niche/specific extension
-            #   publisher = "SureshNettur";
-            #   sha256 = "sha256-e9Z6PZQ8yWs83jpBuVdBLlePOYO0qUvBcbYkOOc4vVI=";
-            #   version = "1.0.1";
-            # }
-            {
-              name = "remotehub";
-              publisher = "GitHub";
-              sha256 = "sha256-boKDVKLo8Na799OtoPnT6JxsAvQ/HoqL3FispnN6bOA=";
-              version = "0.65.2025081801";
-            }
-            # {
-            #   name = "snyk-vulnerability-scanner";
-            #   publisher = "snyk-security";
-            #   sha256 = "sha256-enhX0h14zmZLmXDSTAwHO1OO7hiQ9rRVlXFsKKpOTUU=";
-            #   version = "2.24.0";
-            # }
-            # {
-            #   name = "specstory-vscode";  # Removed: very niche BDD tool
-            #   publisher = "specstory";
-            #   sha256 = "sha256-RFqGGiFHmGxwoyXuW5pHnyq+OPyjZFryCkwYm8E+lpg=";
-            #   version = "0.18.0";
-            # }
-            # {
-            #   name = "tailwind-color-matcher";  # Removed: minor utility, main tailwind extension sufficient
-            #   publisher = "OmriGrossman";
-            #   sha256 = "sha256-WfFg1h5tY43W9YqgXkHDlxjRquFupuvLBwotTw0XoNk=";
-            #   version = "1.0.8";
-            # }
-            # {
-            #   name = "tailwind-fold";  # Removed: minor utility, main tailwind extension sufficient
-            #   publisher = "stivo";
-            #   sha256 = "sha256-yH3eA5jgBwxqnpFQkg91KQMkQps5iM1v783KQkQcWUU=";
-            #   version = "0.2.0";
-            # }
-            {
-              name = "templ";
-              publisher = "a-h";
-              sha256 = "sha256-WIBJorljcnoPUrQCo1eyFb6vQ5lcxV0i+QJlJdzZYE0=";
-              version = "0.0.35";
-            }
-            {
-              name = "ty";
-              publisher = "astral-sh";
-              sha256 = "sha256-pd0pOg6AVRwHe/OoJOBYAU3NL9RstXsvGzMR3sktzII=";
-              version = "2025.41.12461352";
-            }
-            {
-              name = "vscode-containers";
-              publisher = "ms-azuretools";
-              sha256 = "sha256-96JLAM2b/FUR1TA/u9GPdQJmhSGUNMarbuhEhID8c6g=";
-              version = "2.1.0";
-            }
-            {
-              name = "vscode-gitops-tools";
-              publisher = "weaveworks";
-              sha256 = "sha256-7MCKDnHCot/CL/SqZ2WuTxbqFdF75EC5WC+OxW0dcaE=";
-              version = "0.27.0";
-            }
-            {
-              name = "vscode-jsonnet";
-              publisher = "grafana";
-              sha256 = "sha256-Q8VzXzTdHo9h5+eCHHF1bPomPEbRsvouJcUfmFUDGMU=";
-              version = "0.7.2";
-            }
-            {
-              name = "vscode-pgsql";
-              publisher = "ms-ossdata";
-              sha256 = "sha256-/d4/AsQMm9XGEytgsZA94qbR19kWTAysm0GFG2tcm9s=";
-              version = "1.8.0";
-            }
-            {
-              name = "vscode-thunder-client";
-              publisher = "rangav";
-              sha256 = "sha256-P50jK4hg8GFg+rQ8HbeLzcMXCzvD72mF7kaGW6a1L7Y=";
-              version = "2.37.5";
-            }
-
-
+          {
+            name = "chatgpt";
+            publisher = "openai";
+            sha256 = "sha256-xDynv+0LYr3OTpZzFOllJLO4Vn35Iyrfi7YHcfjJrjI=";
+            version = "0.5.38";
+          }
+          {
+            name = "claude-code";
+            publisher = "anthropic";
+            sha256 = "sha256-1wN82mZk3zCGGFQ8FNwLFm1793U8GEC8p46BJiPNaUo=";
+            version = "2.0.35";
+          }
+          # {
+          #   name = "context7-mcp";
+          #   publisher = "upstash";
+          #   sha256 = "sha256-q6SkIy7eZ9H1yOnZygkcXQcpTK4eu6/jjud1wqEL2Mw=";
+          #   version = "1.0.1";
+          # }
+          # {
+          #   name = "copilot";
+          #   publisher = "github";
+          #   sha256 = "sha256-7RjK8+PNI+rIuRQfCwpvswAiz991dacRO2qYhcv1vhk=";
+          #   version = "1.388.0";
+          # }
+          # {
+          #   name = "copilot-chat";
+          #   publisher = "github";
+          #   sha256 = "sha256-EinZRjMJ0kndrWL824TVPBK2Q7jLZSLjEjyD281Xevk=";
+          #   version = "0.33.2025111002";
+          # }
+          {
+            name = "explorer";
+            publisher = "vitest";
+            sha256 = "sha256-MAfjS/oFfFuiE+Q2w6leSlao436QSw2fKjd7/BE/Q8Y=";
+            version = "1.32.1";
+          }
+          {
+            name = "gemini-cli-vscode-ide-companion";
+            publisher = "Google";
+            sha256 = "sha256-VzaCRe6yqyQ8+z3NWMPk0T7Zd2+xh6z684wt0SabGhE=";
+            version = "0.7.0";
+          }
+          {
+            name = "grafana-alloy";
+            publisher = "grafana";
+            sha256 = "sha256-XcoiEDCPp6GzYQDhJArZBEWxSnZrSTHofIyLFegsbh0=";
+            version = "0.2.0";
+          }
+          {
+            name = "grafana-vscode";
+            publisher = "grafana";
+            sha256 = "sha256-TpLOMwdaEdgzWVwUcn+fO4rgLiQammWQM8LQobt8gLw=";
+            version = "0.0.19";
+          }
+          # {
+          #   name = "htmx-attributes";
+          #   publisher = "craigrbroughton";
+          #   sha256 = "sha256-TsemPZkq2Z13/vahRaP7z206BJaCZ1TR6OVv6aeDvyk=";
+          #   version = "0.8.0";
+          # }
+          {
+            name = "hyprland";
+            publisher = "ewen-lbh";
+            sha256 = "sha256-GaDpbkqNyIElSBnHwxc2ntmEVAGwL9XlNIBWNo7pvwM=";
+            version = "0.1.2";
+          }
+          {
+            name = "mypy-type-checker";
+            publisher = "ms-python";
+            sha256 = "sha256-qVYgUZV2HgzYxL3dGEtOdx2pQE+QOSKMhhpiBLeBpZA=";
+            version = "2025.3.12581007";
+          }
+          {
+            name = "pdf";
+            publisher = "tomoki1207";
+            sha256 = "sha256-i3Rlizbw4RtPkiEsodRJEB3AUzoqI95ohyqZ0ksROps=";
+            version = "1.2.2";
+          }
+          {
+            name = "playwright";
+            publisher = "ms-playwright";
+            sha256 = "sha256-t5PJtBDkjh80IhOpfjsX8kZCSfhGoQ1dePEYMYgw66c=";
+            version = "1.1.16";
+          }
+          {
+            name = "prom";
+            publisher = "ventura";
+            sha256 = "sha256-h8pRrPzmu8+5ZiOLALjackr4zWuFAqi1ex7Gp2iOZKk=";
+            version = "1.3.3";
+          }
+          # {
+          #   name = "pwc";
+          #   publisher = "SureshNettur";
+          #   sha256 = "sha256-qVKs90Dd5ejgzYK7ptGBloU/aPuZ1Nm/ydidSDJwq2I=";
+          #   version = "1.1.0";
+          # }
+          {
+            name = "remotehub";
+            publisher = "GitHub";
+            sha256 = "sha256-boKDVKLo8Na799OtoPnT6JxsAvQ/HoqL3FispnN6bOA=";
+            version = "0.65.2025081801";
+          }
+          # {
+          #   name = "snyk-vulnerability-scanner";
+          #   publisher = "snyk-security";
+          #   sha256 = "sha256-f+x4ZgrRVpfherVX87AFHT0xEZKJukW7waYU2P3uyyo=";
+          #   version = "2.26.0";
+          # }
+          # {
+          #   name = "specstory-vscode";
+          #   publisher = "specstory";
+          #   sha256 = "sha256-u0y4NvZapJT/Mu7mVdCQ9mBTZwSwALnzV33PChzTnfM=";
+          #   version = "0.24.2";
+          # }
+          # {
+          #   name = "tailwind-color-matcher";
+          #   publisher = "OmriGrossman";
+          #   sha256 = "sha256-WfFg1h5tY43W9YqgXkHDlxjRquFupuvLBwotTw0XoNk=";
+          #   version = "1.0.8";
+          # }
+          # {
+          #   name = "tailwind-fold";
+          #   publisher = "stivo";
+          #   sha256 = "sha256-yH3eA5jgBwxqnpFQkg91KQMkQps5iM1v783KQkQcWUU=";
+          #   version = "0.2.0";
+          # }
+          {
+            name = "templ";
+            publisher = "a-h";
+            sha256 = "sha256-WIBJorljcnoPUrQCo1eyFb6vQ5lcxV0i+QJlJdzZYE0=";
+            version = "0.0.35";
+          }
+          # {
+          #   name = "ty";
+          #   publisher = "astral-sh";
+          #   sha256 = "sha256-gkJtg0ncV46UNBiupxnetytCNfZJ2L9iSqpMyvmDftU=";
+          #   version = "2025.51.13022037";
+          # }
+          {
+            name = "vscode-containers";
+            publisher = "ms-azuretools";
+            sha256 = "sha256-UxWsu7AU28plnT0QMdpPJrcYZIV09FeC+rmYKf39a6M=";
+            version = "2.2.0";
+          }
+          {
+            name = "vscode-gitops-tools";
+            publisher = "weaveworks";
+            sha256 = "sha256-7MCKDnHCot/CL/SqZ2WuTxbqFdF75EC5WC+OxW0dcaE=";
+            version = "0.27.0";
+          }
+          {
+            name = "vscode-jsonnet";
+            publisher = "grafana";
+            sha256 = "sha256-Q8VzXzTdHo9h5+eCHHF1bPomPEbRsvouJcUfmFUDGMU=";
+            version = "0.7.2";
+          }
+          {
+            name = "vscode-pgsql";
+            publisher = "ms-ossdata";
+            sha256 = "sha256-BoL0DM0r8gnSmehDUHSS2i4UuEATsCni3rlMVM0OWXo=";
+            version = "1.11.3";
+          }
+          {
+            name = "vscode-python-test-adapter";
+            publisher = "littlefoxteam";
+            sha256 = "sha256-TwBPGr8bam1NSX2KRrm92DOQWeVa0k+pXT4q/isWYOI=";
+            version = "0.8.2";
+          }
+          {
+            name = "vscode-thunder-client";
+            publisher = "rangav";
+            sha256 = "sha256-Eg10vZTq76LmXpUwzGcLGRFzT9RKZvlhJvhf8lA0u5c=";
+            version = "2.38.4";
+          }
           ]);
         userSettings = {
           "accessibility.dimUnfocused.enabled" = true;
