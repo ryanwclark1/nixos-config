@@ -9,8 +9,8 @@
   programs.zsh = {
     enable = true;
     package = pkgs.zsh;
-    # Place zsh dotfiles under XDG config directory
-    dotDir = ".config/zsh";
+    # Place zsh dotfiles under XDG config directory (absolute path to avoid deprecation)
+    dotDir = "${config.xdg.configHome}/zsh";
     enableCompletion = true;
     enableVteIntegration = true;
     autocd = true;  # Automatically cd into directory by typing its name
