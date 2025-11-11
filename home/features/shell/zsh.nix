@@ -282,6 +282,9 @@
       if [ -f "$HOME/.config/shell/functions.sh" ]; then
         source "$HOME/.config/shell/functions.sh"
       fi
+
+      # Export Vultr API key from sops secret for CLI and Terraform
+      # Note: VULTR_API_KEY is exported globally via home.sessionVariables in common.nix
     '';
   };
 }

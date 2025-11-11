@@ -69,6 +69,10 @@
       # Better man page experience
       MANWIDTH = lib.mkDefault "80";
       MANOPT = lib.mkDefault "--no-hyphenation --no-justification";
+
+      # Cloud providers
+      # Expose Vultr API key from sops-nix secret for all shells (Vultr CLI & Terraform)
+      # VULTR_API_KEY = lib.mkDefault "$( [ -r \"${config.sops.secrets.\"vultr/api-key\".path}\" ] && cat ${config.sops.secrets."vultr/api-key".path} )";
     };
 
     # Session path additions
