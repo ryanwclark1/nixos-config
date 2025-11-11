@@ -40,12 +40,27 @@ in
     clearDefaultKeybinds = false;
     settings = {
       theme = "theme";
-      font-size = 14;
+      font-family = "CaskaydiaMono Nerd Font";
+      font-style = "Regular";
+      font-size = 9;
+      window-theme = "ghostty";
+      window-padding-x = 14;
+      window-padding-y = 14;
+      confirm-close-surface = false;
+      resize-overlay = "never";
+      gtk-toolbar-style = "flat";
+      cursor-style = "block";
+      cursor-style-blink = false;
+      shell-integration-features = "no-cursor,ssh-env";
       auto-update = "off";
       background-opacity = 0.7;
       background-blur = true;
       copy-on-select = true;
       gtk-titlebar = false;
+      keybind = [
+        "shift+insert=paste_from_clipboard"
+        "control+insert=copy_to_clipboard"
+      ];
     };
     themes = {
       theme = {
