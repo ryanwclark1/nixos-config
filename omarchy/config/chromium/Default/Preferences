@@ -4,12 +4,79 @@
       "id": "",
       "use_system": false,
       "use_custom": false
+    },
+    "settings": {
+      "chrome://extensions/": {
+        "preferences": {
+          "toolbar_icon": true
+        }
+      }
     }
   },
   "browser": {
     "theme": {
       "color_scheme": 2,
       "user_color": 2
+    },
+    "has_seen_welcome_page": true,
+    "check_default_browser": false,
+    "custom_chrome_frame": false,
+    "show_home_button": false
+  },
+  "profile": {
+    "default_content_setting_values": {
+      "notifications": 1,
+      "geolocation": 1,
+      "media_stream_mic": 1,
+      "media_stream_camera": 1
+    },
+    "content_settings": {
+      "pattern_pairs": {}
+    },
+    "password_manager_enabled": true,
+    "form_autofill_enabled": true
+  },
+  "privacy": {
+    "websites": {
+      "do_not_track_enabled": false
     }
+  },
+  "webkit": {
+    "webprefs": {
+      "default_encoding": "utf-8",
+      "minimum_font_size": 0,
+      "minimum_logical_font_size": 0,
+      "default_font_size": 16,
+      "default_fixed_font_size": 13
+    }
+  },
+  "translate": {
+    "enabled": true
+  },
+  "spellcheck": {
+    "dictionaries": [
+      "en-US"
+    ]
+  },
+  "download": {
+    "default_directory": "",
+    "directory_upgrade": true,
+    "extensions_to_open": ""
+  },
+  "session": {
+    "restore_on_startup": 1,
+    "startup_urls": []
+  },
+  "homepage": "",
+  "homepage_is_newtabpage": true,
+  "bookmark_bar": {
+    "show_on_all_tabs": false
+  },
+  "signin": {
+    "allowed": true
+  },
+  "first_run_tabs": [],
+  "distribution": {
+    "skip_first_run_ui": true
   }
 }
