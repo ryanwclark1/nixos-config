@@ -11,24 +11,37 @@
     "args": [
       "mcp-server-git"
     ],
-    "description": "Git operations for Accent AI project"
+    "description": "Git operations for repository management"
   },
   "fetch": {
     "command": "uvx",
     "args": [
       "mcp-server-fetch"
     ],
-    "description": "Web content fetching for Accent AI research and documentation"
+    "description": "Web content fetching for research and documentation"
   },
   "sequential-thinking": {
     "command": "npx",
     "args": [
       "@modelcontextprotocol/server-sequential-thinking@latest"
     ],
-    "description": "Complex problem-solving for Accent AI architecture",
+    "description": "Complex problem-solving with sequential reasoning",
     "env": {
       "NODE_ENV": "production"
     }
+  },
+  "context7": {
+    "command": "docker",
+    "args": [
+      "run",
+      "-i",
+      "--rm",
+      "mcp/context7"
+    ],
+    "env": {
+      "CONTEXT7_TOKEN": "${CONTEXT7_TOKEN}"
+    },
+    "description": "Official library documentation lookup and framework pattern guidance"
   },
   "github": {
     "command": "docker",
@@ -55,5 +68,29 @@
       "--extension"
     ],
     "description": "Browser automation and web scraping via Playwright"
+  },
+  "serena": {
+    "command": "uvx",
+    "args": [
+      "--from",
+      "git+https://github.com/oraios/serena",
+      "serena",
+      "start-mcp-server",
+      "--transport",
+      "stdio"
+    ],
+    "description": "AI-powered development assistant with code directory access"
+  },
+  "sourcebot": {
+    "command": "npx",
+    "args": [
+      "@sourcebot/mcp@latest"
+    ],
+    "env": {
+      "NODE_ENV": "production",
+      "SOURCEBOT_HOST": "http://localhost:3003",
+      "SOURCEBOT_API_KEY": "${SOURCEBOT_API_KEY}"
+    },
+    "description": "Code understanding and search via Sourcebot"
   }
 }

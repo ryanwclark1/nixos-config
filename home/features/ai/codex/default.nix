@@ -8,16 +8,20 @@
 let
   # Official user-level settings & dirs (per docs)
   codexHome = "${config.home.homeDirectory}/.codex";
-  settingsPath = "${codexHome}/settings.json";
+  configDir = ./config;
 in
 {
   programs.codex = {
-    enable  = true;
-
+    enable = true;
     package = pkgs.codex;
+
     settings = {
-      # model = "hf.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL";
-      # model_provider = "ollama";
+      # Model configuration
+      # Default: "gpt-5-codex" on macOS/Linux, "gpt-5" on Windows
+      # model = "gpt-5-codex";
+      # model_provider = "openai";
+
+      # Optional: Configure custom model providers (e.g., Ollama)
       # model_providers = {
       #   ollama = {
       #     name = "Ollama";
@@ -26,27 +30,107 @@ in
       #   };
       # };
 
+      # MCP Servers configuration
       mcpServers = builtins.fromJSON (builtins.readFile ./mcp-servers.json);
+
+      # Feature flags (can also be set in config.toml)
+      # features = {
+      #   streamable_shell = true;
+      #   web_search_request = true;
+      #   view_image_tool = true;
+      # };
     };
   };
 
-  # Ensure Codex config files can be overwritten if they already exist
-  # home.file."${codexHome}/config.toml".force = true;
-  # home.file."${codexHome}/settings.json".force = true;
+  # Create config.toml with comprehensive settings
+  # Codex uses TOML format for its main configuration file
+  home.file."${codexHome}/config.toml" = {
+    force = true;
+    text = ''
+      # Codex Configuration
+      # See: https://github.com/openai/codex/blob/main/docs/config.md
 
-    # custom-instructions = {
-    #   # Example custom instruction
-    #   "Always use markdown for code snippets" = "Whenever you provide code, format it using markdown code blocks with the appropriate language specified. This ensures proper syntax highlighting and readability.";
-    # };
+      # Model selection
+      # model = "gpt-5-codex"  # Default on macOS/Linux
+      # model_provider = "openai"
 
+      # Feature flags
+      [features]
+      streamable_shell = false          # Experimental: Use streamable exec tool
+      web_search_request = true         # Allow model to request web searches
+      view_image_tool = true            # Include view_image tool (default: true)
+      apply_patch_freeform = false      # Beta: Include freeform apply_patch tool
+      unified_exec = false              # Experimental: Use unified PTY-backed exec tool
+      rmcp_client = false              # Experimental: OAuth support for streamable HTTP MCP servers
+      experimental_sandbox_command_assessment = false  # Model-based sandbox risk assessment
+      ghost_commit = false              # Experimental: Create ghost commit each turn
+      enable_experimental_windows_sandbox = false  # Windows restricted-token sandbox
+
+      # Execution environment
+      [shell_environment_policy]
+      inherit = "all"                   # Options: all, core, none
+      # exclude = ["AWS_*", "AZURE_*"]  # Exclude patterns
+      # include_only = ["PATH", "HOME", "USER"]  # Include only these
+      # set = { CI = "1" }              # Force-set values
+
+      # Sandbox configuration
+      # approval_policy = "untrusted"    # Options: untrusted, on-failure, on-request, never
+      # sandbox_mode = "workspace-write" # Options: read-only, workspace-write, danger-full-access
+
+      # MCP server timeouts
+      # [mcp_servers.context7]
+      # startup_timeout_sec = 10
+      # tool_timeout_sec = 60
+
+      # Project documentation
+      # project_doc_max_bytes = 100000  # Max bytes to read from AGENTS.md
+
+      # History persistence
+      # [history]
+      # persistence = "save-all"        # Options: save-all, none
+      # max_bytes = 1000000              # Currently ignored
+
+      # TUI settings
+      # [tui]
+      # notifications = false           # Enable desktop notifications
+
+      # Model reasoning (for supported models like o3, o4-mini, codex-*)
+      # model_reasoning_effort = "medium"  # Options: minimal, low, medium, high
+      # model_reasoning_summary = "auto"   # Options: auto, concise, detailed, none
+      # model_verbosity = "medium"         # Options: low, medium, high (GPT-5 Responses API)
+
+      # File opener for clickable citations
+      # file_opener = "vscode"          # Options: vscode, vscode-insiders, windsurf, cursor, none
+    '';
+  };
+
+  # Copy configuration documentation files (similar to Claude setup)
+  home.file."${codexHome}/RULES.md" = {
+    source = "${configDir}/RULES.md";
+  };
+  home.file."${codexHome}/PRINCIPLES.md" = {
+    source = "${configDir}/PRINCIPLES.md";
+  };
+  home.file."${codexHome}/MCP_Context7.md" = {
+    source = "${configDir}/MCP_Context7.md";
+  };
+  home.file."${codexHome}/MCP_Playwright.md" = {
+    source = "${configDir}/MCP_Playwright.md";
+  };
+  home.file."${codexHome}/MCP_Sequential.md" = {
+    source = "${configDir}/MCP_Sequential.md";
+  };
+  home.file."${codexHome}/MCP_Serena.md" = {
+    source = "${configDir}/MCP_Serena.md";
+  };
 
   # Create .env file with secrets from SOPS
-  # Create a script that generates the .env file at runtime
+  # This file is generated at runtime by the systemd service
   home.file."${codexHome}/.env" = {
     force = true;
     text = ''
       # MCP Server Environment Variables
-      # This file is generated at runtime by the .env-generator script
+      # This file is generated at runtime by the generate-codex-env service
       CONTEXT7_TOKEN=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets.context7-token.path})
       GITHUB_PERSONAL_ACCESS_TOKEN=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets.github-pat.path})
       SOURCEBOT_API_KEY=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets."sourcebot/api-key".path})
@@ -77,13 +161,14 @@ in
         # Generate the .env file with actual values
         cat > "${codexHome}/.env" << EOF
         # MCP Server Environment Variables
+        # Generated by systemd service: generate-codex-env
         CONTEXT7_TOKEN=$(cat "${config.sops.secrets.context7-token.path}")
         GITHUB_PERSONAL_ACCESS_TOKEN=$(cat "${config.sops.secrets.github-pat.path}")
         SOURCEBOT_API_KEY=$(cat "${config.sops.secrets."sourcebot/api-key".path}")
         EOF
 
         chmod 600 "${codexHome}/.env"
-        echo "Generated .env file with actual secret values"
+        echo "Generated Codex .env file with actual secret values"
       '';
       RemainAfterExit = true;
     };
