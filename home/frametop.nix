@@ -9,7 +9,7 @@
     ./features/ai
     ./features/alacritty
     ./features/ansible
-    # ./features/atuin  # Temporarily disabled to debug YAML error
+    ./features/atuin
     ./features/audio
     ./features/bat
     ./features/bluetooth
