@@ -93,7 +93,7 @@ in
   # Using home.file instead of programs.atuin to have full control
   home.file."${atuinConfigDir}/config.toml" = {
     force = true;
-    text = tomlFormat.generate "atuin-config" atuinSettings;
+    source = tomlFormat.generate "atuin-config" atuinSettings;
   };
 
   # Enable shell integrations manually since we're not using programs.atuin
