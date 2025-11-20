@@ -12,6 +12,9 @@
   # User config handles: connection behavior, ControlMaster, per-user preferences
   programs.ssh = {
     enable = true;
+    # Disable default config to avoid deprecation warning
+    # We explicitly set the defaults we want in matchBlocks."*"
+    enableDefaultConfig = false;
 
     # Global SSH client configuration
     # These settings apply to ~/.ssh/config (user-specific)
@@ -49,6 +52,16 @@
 
     # Per-host configurations can be added here
     matchBlocks = {
+      # Default settings for all hosts (replaces enableDefaultConfig defaults)
+      "*" = {
+        # Default behavior: don't automatically add keys to agent
+        addKeysToAgent = "no";
+        # Default behavior: only use identities explicitly specified
+        identitiesOnly = false;
+        # Default behavior: don't hash known hosts (we manage them explicitly)
+        hashKnownHosts = false;
+      };
+
       # Woody host configuration
       "woody" = {
         hostname = "woody";

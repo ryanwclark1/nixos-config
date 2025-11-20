@@ -6,7 +6,7 @@
 }:
 
 let
-  epkgs = if lib.hasAttr pkgs.system inputs.elephant.packages then inputs.elephant.packages.${pkgs.system} else {};
+  epkgs = if lib.hasAttr pkgs.stdenv.hostPlatform.system inputs.elephant.packages then inputs.elephant.packages.${pkgs.stdenv.hostPlatform.system} else {};
   elephantPkgNames = [
     "elephant"
     "elephant-calc"
