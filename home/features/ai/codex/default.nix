@@ -11,11 +11,15 @@ let
   configDir = ./config;
 in
 {
-  programs.codex = {
-    enable = true;
-    package = pkgs.codex;
-    # Note: settings are managed via home.file below to avoid conflicts
-    # The config.toml file is created manually to have full control over the format
+  # Install codex package manually to avoid conflicts with manual config.toml management
+  # The programs.codex module automatically generates config.toml, which conflicts with
+  # our manual home.file entry below. We manage the config file manually for full control.
+  home.packages = [ pkgs.codex ];
+
+  # Write MCP servers configuration to Codex home directory
+  # This ensures Codex can read the MCP servers configuration
+  home.file."${codexHome}/mcp-servers.json" = {
+    source = ./mcp-servers.json;
   };
 
   # Create config.toml with comprehensive settings
@@ -53,7 +57,16 @@ in
       # approval_policy = "untrusted"    # Options: untrusted, on-failure, on-request, never
       # sandbox_mode = "workspace-write" # Options: read-only, workspace-write, danger-full-access
 
-      # MCP server timeouts
+      # MCP Servers Configuration
+      # MCP servers are configured via:
+      # 1. programs.codex.settings.mcpServers (if supported by the NixOS module)
+      # 2. ${codexHome}/mcp-servers.json (primary file-based configuration)
+      # The source file is ./mcp-servers.json in the Nix configuration.
+      # The TOML format for MCP servers is not the primary configuration method
+      # and may not be fully supported by Codex.
+
+      # MCP server timeouts (per-server configuration)
+      # Example timeout configuration (if supported):
       # [mcp_servers.context7]
       # startup_timeout_sec = 10
       # tool_timeout_sec = 60

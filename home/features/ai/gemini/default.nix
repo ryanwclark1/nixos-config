@@ -9,6 +9,9 @@ let
   geminiHome = "${config.home.homeDirectory}/.gemini";
 in
 {
+  # Install gemini-cli package
+  home.packages = [ pkgs.gemini-cli ];
+
   home.file."${geminiHome}/AGENTS.md" = {
     force = true;
     source = ./config/AGENTS.md;
@@ -191,9 +194,11 @@ in
   };
 
 
-  programs.gemini-cli = {
-    enable = true;
-    settings = {
+  # Manually manage settings.json to avoid backup conflicts
+  # Using home.file instead of programs.gemini-cli to have full control
+  home.file."${geminiHome}/settings.json" = {
+    force = true;
+    text = builtins.toJSON {
       autoAccept = true;
       hasSeenIdeIntegrationNudge = true;
       ideMode = true;
