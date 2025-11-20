@@ -9,7 +9,7 @@
     ./features/ai
     ./features/alacritty
     ./features/ansible
-    ./features/atuin
+    # ./features/atuin  # Temporarily disabled to debug YAML error
     ./features/audio
     ./features/bat
     ./features/bluetooth
@@ -46,6 +46,7 @@
     ./features/remmina
     ./features/ripgrep
     ./features/shell
+    ./features/ssh
     ./features/starship
     ./features/sys-stats
     ./features/tmux

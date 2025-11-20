@@ -28,7 +28,8 @@ if [[ -n "$default_browser" ]]; then
 fi
 
 # Fallback: try common browsers in order of preference
-browsers=(firefox chromium chrome google-chrome-stable brave-browser vivaldi opera)
+# Prioritize Chrome/Chromium, exclude Firefox
+browsers=(chromium chrome google-chrome-stable brave-browser vivaldi opera)
 
 for browser in "${browsers[@]}"; do
   if command -v "$browser" >/dev/null 2>&1; then
