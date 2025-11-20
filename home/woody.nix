@@ -52,6 +52,7 @@
     ./features/ripgrep
     ./features/shell
     ./features/slack
+    ./features/ssh
     ./features/starship
     ./features/sys-stats
     ./features/tmux

@@ -17,9 +17,6 @@ in
   home.file."${claudeHome}/BUSINESS_SYMBOLS.md" = {
     source = ./config/BUSINESS_SYMBOLS.md;
   };
-  home.file."${claudeHome}/CONTRIBUTING.md" = {
-    source = ./config/CONTRIBUTING.md;
-  };
   home.file."${claudeHome}/FLAGS.md" = {
     source = ./config/FLAGS.md;
   };

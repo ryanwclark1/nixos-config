@@ -14,32 +14,8 @@ in
   programs.codex = {
     enable = true;
     package = pkgs.codex;
-
-    settings = {
-      # Model configuration
-      # Default: "gpt-5-codex" on macOS/Linux, "gpt-5" on Windows
-      # model = "gpt-5-codex";
-      # model_provider = "openai";
-
-      # Optional: Configure custom model providers (e.g., Ollama)
-      # model_providers = {
-      #   ollama = {
-      #     name = "Ollama";
-      #     baseURL = "http://localhost:11434/v1";
-      #     envKey = "";
-      #   };
-      # };
-
-      # MCP Servers configuration
-      mcpServers = builtins.fromJSON (builtins.readFile ./mcp-servers.json);
-
-      # Feature flags (can also be set in config.toml)
-      # features = {
-      #   streamable_shell = true;
-      #   web_search_request = true;
-      #   view_image_tool = true;
-      # };
-    };
+    # Note: settings are managed via home.file below to avoid conflicts
+    # The config.toml file is created manually to have full control over the format
   };
 
   # Create config.toml with comprehensive settings

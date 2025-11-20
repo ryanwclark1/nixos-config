@@ -35,8 +35,8 @@
       "accent-email/accent-email-flavor" = {};
       context7-token = {};
       github-pat = {};
-      # Vultr API
-      "vultr/api-key" = {};
+      # Vultr API (commented out - not in secrets.yaml)
+      # "vultr/api-key" = {};
       # Sourcebot secrets
       "sourcebot/auth-secret" = {};
       "sourcebot/database/user" = {};
