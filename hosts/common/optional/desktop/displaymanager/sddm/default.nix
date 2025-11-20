@@ -10,7 +10,7 @@
 # in
 let
    # an exhaustive example can be found in flake.nix
-   sddm-theme = inputs.silentSDDM.packages.${pkgs.system}.default.override {
+   sddm-theme = inputs.silentSDDM.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
       theme = "default"; # select the config of your choice
    };
 in

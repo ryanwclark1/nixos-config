@@ -108,7 +108,7 @@ in
       ${pkgs.atuin}/bin/atuin init fish | source
     '')
   ];
-  programs.zsh.initExtra = lib.mkMerge [
+  programs.zsh.initContent = lib.mkMerge [
     (lib.mkIf config.programs.zsh.enable ''
       eval "$(${pkgs.atuin}/bin/atuin init zsh)"
     '')
