@@ -128,6 +128,10 @@
       ip = "ip --color=auto";
       ports = "ss -tulanp";
 
+      # SSH - direct SSH that bypasses kssh (Kitty's SSH wrapper)
+      # Use 'sshd' when you want to bypass kssh and use standard SSH
+      sshd = "/run/current-system/sw/bin/ssh";
+
       # Misc utilities
       h = "history";
       help = "man";

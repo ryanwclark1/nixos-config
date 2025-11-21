@@ -40,7 +40,7 @@ in
     clearDefaultKeybinds = false;
     settings = {
       theme = "theme";
-      font-family = "CaskaydiaMono Nerd Font";
+      font-family = "JetBrainsMono Nerd Font";
       font-style = "Regular";
       font-size = 9;
       window-theme = "ghostty";
