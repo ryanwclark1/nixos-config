@@ -9,36 +9,6 @@
   # - Sets the active theme via ~/.config/omarchy/current/theme/mako.ini
   # - Points Mako to load the theme through ~/.config/mako/config
 
-  # services.mako = {
-  #   enable = true;
-
-  #   # Position and layout
-  #   anchor = "top-right";
-  #   width = 420;
-  #   height = 150;
-  #   margin = "20";
-  #   padding = "10,15";
-  #   borderSize = 2;
-  #   borderRadius = 8;
-
-  #   # Typography
-  #   font = "sans-serif 14";
-
-  #   # Icons
-  #   maxIconSize = 32;
-  #   iconPath = "${pkgs.papirus-icon-theme}/share/icons/Papirus-Dark";
-
-  #   # Timing
-  #   defaultTimeout = 5000; # 5 seconds
-  #   ignoreTimeout = false;
-
-  #   # Layers
-  #   layer = "overlay";
-
-  #   # Behavior
-  #   sort = "-time";
-  #   maxVisible = 5;
-
   #   # Catppuccin Mocha theme colors
   #   backgroundColor = "#24273a";
   #   textColor = "#cad3f5";
