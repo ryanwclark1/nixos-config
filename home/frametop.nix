@@ -9,7 +9,7 @@
     ./features/ai
     ./features/alacritty
     ./features/ansible
-    ./features/antigravity
+    # ./features/antigravity
     ./features/atuin
     ./features/audio
     ./features/bat
