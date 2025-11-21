@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   # Hide system/configuration applications from the application launcher
@@ -157,16 +162,95 @@
       name = "Neovim";
       exec = "kitty --class=nvim --title=nvim -e nvim -- %F";
       terminal = false;
-      mimeType = ["text/plain" "text/x-makefile" "text/x-c++hdr" "text/x-c++src" "text/x-chdr" "text/x-csrc" "text/x-java" "text/x-moc" "text/x-pascal" "text/x-tcl" "text/x-tex" "application/x-shellscript" "text/x-c" "text/x-c++"];
-      categories = ["Utility" "TextEditor"];
+      mimeType = [
+        "text/plain"
+        "text/x-makefile"
+        "text/x-c++hdr"
+        "text/x-c++src"
+        "text/x-chdr"
+        "text/x-csrc"
+        "text/x-java"
+        "text/x-moc"
+        "text/x-pascal"
+        "text/x-tcl"
+        "text/x-tex"
+        "application/x-shellscript"
+        "text/x-c"
+        "text/x-c++"
+      ];
+      categories = [
+        "Utility"
+        "TextEditor"
+      ];
     };
 
     "mpv" = {
       name = "mpv Media Player";
       exec = "mpv --player-operation-mode=pseudo-gui -- %U";
       terminal = false;
-      mimeType = ["application/ogg" "application/x-ogg" "audio/ogg" "audio/vorbis" "audio/x-vorbis" "audio/x-vorbis+ogg" "video/ogg" "video/x-ogm" "video/x-ogm+ogg" "video/x-theora+ogg" "video/x-theora" "audio/x-speex" "audio/opus" "application/x-ogm-audio" "application/x-ogm-video" "audio/webm" "video/webm" "audio/x-matroska" "video/x-matroska" "video/mp4" "video/3gpp" "video/3gpp2" "audio/mp4" "audio/3gpp" "audio/3gpp2" "video/mp2t" "audio/mp2t" "video/avi" "video/msvideo" "video/x-msvideo" "video/quicktime" "video/x-anim" "video/x-avi" "video/x-ms-asf" "video/x-ms-wmv" "audio/x-ms-wma" "application/x-mplayer2" "audio/mpeg" "audio/x-mpeg" "audio/mp3" "audio/x-mp3" "audio/mpeg3" "audio/x-mpeg3" "audio/mpegurl" "audio/x-mpegurl" "audio/x-mpg" "video/mpeg" "video/x-mpeg" "video/x-mpeg2" "audio/x-scpls" "audio/x-wav" "audio/wav" "audio/flac" "audio/x-flac"];
-      categories = ["AudioVideo" "Audio" "Video" "Player" "TV"];
+      mimeType = [
+        "application/ogg"
+        "application/x-ogg"
+        "audio/ogg"
+        "audio/vorbis"
+        "audio/x-vorbis"
+        "audio/x-vorbis+ogg"
+        "video/ogg"
+        "video/x-ogm"
+        "video/x-ogm+ogg"
+        "video/x-theora+ogg"
+        "video/x-theora"
+        "audio/x-speex"
+        "audio/opus"
+        "application/x-ogm-audio"
+        "application/x-ogm-video"
+        "audio/webm"
+        "video/webm"
+        "audio/x-matroska"
+        "video/x-matroska"
+        "video/mp4"
+        "video/3gpp"
+        "video/3gpp2"
+        "audio/mp4"
+        "audio/3gpp"
+        "audio/3gpp2"
+        "video/mp2t"
+        "audio/mp2t"
+        "video/avi"
+        "video/msvideo"
+        "video/x-msvideo"
+        "video/quicktime"
+        "video/x-anim"
+        "video/x-avi"
+        "video/x-ms-asf"
+        "video/x-ms-wmv"
+        "audio/x-ms-wma"
+        "application/x-mplayer2"
+        "audio/mpeg"
+        "audio/x-mpeg"
+        "audio/mp3"
+        "audio/x-mp3"
+        "audio/mpeg3"
+        "audio/x-mpeg3"
+        "audio/mpegurl"
+        "audio/x-mpegurl"
+        "audio/x-mpg"
+        "video/mpeg"
+        "video/x-mpeg"
+        "video/x-mpeg2"
+        "audio/x-scpls"
+        "audio/x-wav"
+        "audio/wav"
+        "audio/flac"
+        "audio/x-flac"
+      ];
+      categories = [
+        "AudioVideo"
+        "Audio"
+        "Video"
+        "Player"
+        "TV"
+      ];
     };
 
     # Wayland-optimized application launchers
@@ -174,8 +258,18 @@
       name = "Firefox";
       exec = "firefox --name firefox %U";
       terminal = false;
-      mimeType = ["text/html" "text/xml" "application/xhtml+xml" "application/vnd.mozilla.xul+xml" "x-scheme-handler/http" "x-scheme-handler/https"];
-      categories = ["Network" "WebBrowser"];
+      mimeType = [
+        "text/html"
+        "text/xml"
+        "application/xhtml+xml"
+        "application/vnd.mozilla.xul+xml"
+        "x-scheme-handler/http"
+        "x-scheme-handler/https"
+      ];
+      categories = [
+        "Network"
+        "WebBrowser"
+      ];
       settings = {
         StartupNotify = "true";
         StartupWMClass = "firefox";
@@ -200,8 +294,26 @@
       name = "Google Chrome";
       exec = "google-chrome-stable --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime %U";
       terminal = false;
-      mimeType = ["application/pdf" "application/rdf+xml" "application/rss+xml" "application/xhtml+xml" "application/xhtml_xml" "application/xml" "image/gif" "image/jpeg" "image/png" "image/webp" "text/html" "text/xml" "x-scheme-handler/http" "x-scheme-handler/https"];
-      categories = ["Network" "WebBrowser"];
+      mimeType = [
+        "application/pdf"
+        "application/rdf+xml"
+        "application/rss+xml"
+        "application/xhtml+xml"
+        "application/xhtml_xml"
+        "application/xml"
+        "image/gif"
+        "image/jpeg"
+        "image/png"
+        "image/webp"
+        "text/html"
+        "text/xml"
+        "x-scheme-handler/http"
+        "x-scheme-handler/https"
+      ];
+      categories = [
+        "Network"
+        "WebBrowser"
+      ];
       icon = "google-chrome";
       settings = {
         StartupNotify = "true";
@@ -222,7 +334,12 @@
       name = "Visual Studio Code";
       exec = "code --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime %F";
       terminal = false;
-      categories = ["Utility" "TextEditor" "Development" "IDE"];
+      categories = [
+        "Utility"
+        "TextEditor"
+        "Development"
+        "IDE"
+      ];
       icon = "vscode";
       settings = {
         StartupNotify = "true";
@@ -240,7 +357,12 @@
       name = "Cursor";
       exec = "cursor --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime %F";
       terminal = false;
-      categories = ["Utility" "TextEditor" "Development" "IDE"];
+      categories = [
+        "Utility"
+        "TextEditor"
+        "Development"
+        "IDE"
+      ];
       icon = "cursor";
       settings = {
         StartupNotify = "true";
@@ -250,6 +372,30 @@
         new-empty-window = {
           name = "New Empty Window";
           exec = "cursor --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime --new-window %F";
+        };
+      };
+    };
+
+    "antigravity" = {
+      name = "Antigravity";
+      exec = "antigravity --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime %F";
+      terminal = false;
+      categories = [
+        "Utility"
+        "TextEditor"
+        "Development"
+        "IDE"
+      ];
+      icon = "antigravity";
+      mimeType = [ "x-scheme-handler/antigravity" ];
+      settings = {
+        StartupNotify = "true";
+        StartupWMClass = "Antigravity";
+      };
+      actions = {
+        new-empty-window = {
+          name = "New Empty Window";
+          exec = "antigravity --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime --new-window %F";
         };
       };
     };
@@ -270,22 +416,37 @@
     # Hide URL handlers and additional system tools
     "code-url-handler" = {
       name = "Visual Studio Code - URL Handler";
-      settings = { Hidden = "true"; };
+      settings = {
+        Hidden = "true";
+      };
     };
 
     "cursor-url-handler" = {
       name = "Cursor - URL Handler";
-      settings = { Hidden = "true"; };
+      settings = {
+        Hidden = "true";
+      };
     };
 
     "windsurf-url-handler" = {
       name = "Windsurf - URL Handler";
-      settings = { Hidden = "true"; };
+      settings = {
+        Hidden = "true";
+      };
+    };
+
+    "antigravity-url-handler" = {
+      name = "Antigravity - URL Handler";
+      settings = {
+        Hidden = "true";
+      };
     };
 
     "blueman-manager" = {
       name = "Bluetooth Manager";
-      settings = { Hidden = "true"; };
+      settings = {
+        Hidden = "true";
+      };
     };
   };
 }

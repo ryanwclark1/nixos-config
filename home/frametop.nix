@@ -9,6 +9,7 @@
     ./features/ai
     ./features/alacritty
     ./features/ansible
+    ./features/antigravity
     ./features/atuin
     ./features/audio
     ./features/bat
@@ -68,8 +69,8 @@
   # Frametop-specific configuration
   features.battery-monitor = {
     enable = true;
-    threshold = 15;  # Framework laptops benefit from slightly higher threshold
-    interval = 30;   # Check every 30 seconds
+    threshold = 15; # Framework laptops benefit from slightly higher threshold
+    interval = 30; # Check every 30 seconds
   };
 
   # Disable impermanence
