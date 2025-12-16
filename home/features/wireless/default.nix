@@ -1,3 +1,6 @@
 { pkgs, ...}: {
-  home.packages = [pkgs.wpa_supplicant_gui];
+  home.packages = with pkgs; [
+    wpa_supplicant_gui
+    impala
+  ];
 }

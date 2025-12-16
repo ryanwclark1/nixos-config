@@ -267,7 +267,6 @@ in
         text-color = mkLiteral "inherit";
       };
 
-
       case-indicator = {
         # expand = mkLiteral "false";
         # str = "Aa";

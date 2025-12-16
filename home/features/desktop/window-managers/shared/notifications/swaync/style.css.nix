@@ -50,61 +50,122 @@ in
     @define-color crust #${base01};
 
     :root {
-      --border-radius: 22px;
-      --cc-bg: transparent;
+      --radius: 22px;
+      --gap: 12px;
 
-      --widget-background: rgba(46, 46, 46, 0.7);
-      --noti-bg-alpha: 0.6;
-
-      --padding: calc(var(--border-radius) / 2);
+      --cc-bg: rgba(30, 30, 46, 0.75);
+      --popup-bg: rgba(30, 30, 46, 0.65);
+      --card-bg: rgba(46, 46, 46, 0.7);
     }
+
+    /* =========================
+    POPUP NOTIFICATIONS
+    ========================= */
+
+    .notification-window {
+      background: transparent;
+    }
+
+    .notification {
+      background: var(--popup-bg);
+      margin: var(--gap) 0;
+      padding: 14px;
+      border-radius: var(--radius);
+    }
+
+    .notification-content {
+      spacing: 10px;
+    }
+
+    .notification-title {
+      font-weight: bold;
+      color: @text;
+    }
+
+    .notification-body {
+      color: @text;
+      opacity: 0.9;
+    }
+
+    /* =========================
+      CONTROL CENTER
+      ========================= */
 
     .control-center {
-      border-radius: 0;
+      background: var(--cc-bg);
+      border-radius: var(--radius);
+      padding: var(--gap);
+      backdrop-filter: blur(20px); 
     }
 
-    .widgets > .widget,
-    .widget-mpris > carouselindicatordots,
-    .widget-mpris > box > button {
-      background: var(--widget-background);
-      border-radius: var(--border-radius);
-      padding: calc(var(--border-radius) / 2);
-      border: var(--border);
+    .widgets {
+      spacing: var(--gap);
     }
 
-    .control-center-list-placeholder {
-      padding: var(--border-radius);
+    /* Widget cards */
+    .widgets > .widget {
+      background: var(--card-bg);
+      padding: var(--gap);
+      border-radius: var(--radius);
     }
+
+    /* =========================
+      TITLE WIDGET
+      ========================= */
+
+    .widget-title {
+      padding-bottom: 6px;
+    }
+
+    .widget-title button {
+      background: @surface0;
+      border-radius: 999px;
+    }
+
+    /* =========================
+      BUTTON GRID
+      ========================= */
+
+    .widget-buttons-grid button {
+      min-width: 42px;
+      min-height: 42px;
+      border-radius: 999px;
+    }
+
+    /* =========================
+      MPRIS
+      ========================= */
+
+    .widget-mpris {
+      background: transparent;
+      padding: 0;
+    }
+
+    .widget-mpris-player {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: var(--gap);
+    }
+
+    /* =========================
+      VOLUME
+      ========================= */
+
+    .widget-volume row {
+      padding: 6px 0;
+    }
+
+    /* =========================
+      NOTIFICATIONS LIST
+      ========================= */
 
     .notification-group {
-      border-radius: var(--border-radius);
-      padding: 8px;
+      background: transparent;
+      padding: 0;
     }
 
-    .widget.widget-mpris {
-      background: transparent;
-      border-radius: 0;
-      padding: 0;
-      border: none;
-    }
-    .widget.widget-mpris > carouselindicatordots {
-      --dots-padding: 4px;
-      padding: var(--dots-padding);
-      padding-left: var(--dots-padding);
-      padding-right: calc(6px + var(--dots-padding));
-      margin: 0;
-      margin-top: var(--padding);
-    }
-    .widget-mpris > box > button:hover {
-      background: rgba(46, 46, 46, 1);
-    }
-    .widget-mpris-player {
-      box-shadow: none;
-      border: var(--border);
-      margin: 0 var(--padding);
-    }
-    .widget-mpris-player:only-child {
-      margin: 0;
+    .notification-group > .notification {
+      margin-bottom: var(--gap);
     }
     '';
   };

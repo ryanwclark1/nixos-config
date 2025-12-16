@@ -221,8 +221,6 @@
             dbaeumer.vscode-eslint
             donjayamanne.githistory
             eamodio.gitlens
-            # esbenp.prettier-vscode  # Removed: conflicts with biomejs.biome
-            # formulahendry.code-runner  # Removed: interferes with proper debugging workflows
             github.codespaces
             github.copilot
             github.copilot-chat  # Use nixpkgs version (0.30.1) for VS Code 1.103.2 compatibility
@@ -230,76 +228,54 @@
             github.vscode-pull-request-github
             golang.go
             gruntfuggly.todo-tree
-            # griimick.vhs  # Removed: very niche terminal GIF recording tool
             hashicorp.terraform
-            # hediet.vscode-drawio  # Removed: only needed for diagram creation
-            # jetmartin.bats  # Removed: only needed for Bash testing
             jnoortheen.nix-ide
             jock.svg
             marp-team.marp-vscode
-            # ms-kubernetes-tools.vscode-kubernetes-tools  # Disabled: no active K8s clusters
-            # ms-python.black-formatter  # Removed: Ruff handles formatting
             mikestead.dotenv
             ms-toolsai.jupyter
             ms-kubernetes-tools.vscode-kubernetes-tools
             ms-python.debugpy
-            # ms-python.isort  # Removed: Ruff handles import sorting
-            # ms-python.python  # Moved to extensionsFromVscodeMarketplace for version control
             ms-python.vscode-pylance
             ms-vscode-remote.remote-containers
             ms-vscode-remote.remote-ssh
             ms-vscode-remote.remote-ssh-edit
             ms-vscode.hexeditor
-            # ms-vscode.live-server  # Removed: modern frameworks have better dev servers
-            # quicktype.quicktype  # Removed: niche JSON-to-types conversion
             redhat.vscode-xml
             redhat.vscode-yaml
             rust-lang.rust-analyzer
             samuelcolvin.jinjahtml
             streetsidesoftware.code-spell-checker
-            # shyykoserhiy.vscode-spotify  # Removed: non-development related
             tailscale.vscode-tailscale
             tamasfe.even-better-toml
             usernamehw.errorlens  # Removed: can be visually noisy
             yzhang.markdown-all-in-one
           ])
           ++ (pkgs.vscode-utils.extensionsFromVscodeMarketplace [
-          # {
-          #   name = "alpine-js-intellisense";
-          #   publisher = "adrianwilczynski";
-          #   sha256 = "sha256-Klx5ZvV06lXIJ3Q/mzq3KBjPpdROoxDkgEu7MBO+RhI=";
-          #   version = "1.2.0";
-          # }
-          # {
-          #   name = "ansible";
-          #   publisher = "redhat";
-          #   sha256 = "sha256-Z0oUhqoHfVALG5k1dbSBpJiq0AEjaqeh8yLJ8FjvfcY=";
-          #   version = "25.9.0";
-          # }
+          {
+            name = "ansible";
+            publisher = "redhat";
+            sha256 = "sha256-mglzlRBGD09RDwzfJvWaTt3btgEF/G818prJcQC8/Is=";
+            version = "25.12.2";
+          }
           {
             name = "biome";
             publisher = "biomejs";
-            sha256 = "sha256-tihEFcDDYr/khLIcJbR5VSC/RujEvp/gcnWlokAqNBc=";
-            version = "2025.10.241456";
+            sha256 = "sha256-TLm2ppAyZoCHNg3RpEFwUr/C04bkI62AK4kNS4R/j2U=";
+            version = "2025.11.271431";
           }
           {
             name = "chatgpt";
             publisher = "openai";
-            sha256 = "sha256-xDynv+0LYr3OTpZzFOllJLO4Vn35Iyrfi7YHcfjJrjI=";
-            version = "0.5.38";
+            sha256 = "sha256-yxhrRDeFTEtyttrBKA5ArH+b6garBV2RIdO1lx7TEEI=";
+            version = "0.5.52";
           }
           {
             name = "claude-code";
             publisher = "anthropic";
-            sha256 = "sha256-1wN82mZk3zCGGFQ8FNwLFm1793U8GEC8p46BJiPNaUo=";
-            version = "2.0.35";
+            sha256 = "sha256-ed2oYB6G9EuSRqgt18W69JS73+uf6vqXtwQ1ZY+eWy8=";
+            version = "2.0.70";
           }
-          # {
-          #   name = "context7-mcp";
-          #   publisher = "upstash";
-          #   sha256 = "sha256-q6SkIy7eZ9H1yOnZygkcXQcpTK4eu6/jjud1wqEL2Mw=";
-          #   version = "1.0.1";
-          # }
           # {
           #   name = "copilot";
           #   publisher = "github";
@@ -309,20 +285,20 @@
           # {
           #   name = "copilot-chat";
           #   publisher = "github";
-          #   sha256 = "sha256-EinZRjMJ0kndrWL824TVPBK2Q7jLZSLjEjyD281Xevk=";
-          #   version = "0.33.2025111002";
+          #   sha256 = "sha256-mOobfNVegGVaQkOHC19QFgiF7Uxq7S7SWElF+R6UZ08=";
+          #   version = "0.36.2025121501";
           # }
           {
             name = "explorer";
             publisher = "vitest";
-            sha256 = "sha256-MAfjS/oFfFuiE+Q2w6leSlao436QSw2fKjd7/BE/Q8Y=";
-            version = "1.32.1";
+            sha256 = "sha256-ic1Gk3jJyyD7WnXjXMymr/5YV2z3tK5VPToWeCkhqyU=";
+            version = "1.36.0";
           }
           {
             name = "gemini-cli-vscode-ide-companion";
             publisher = "Google";
-            sha256 = "sha256-VzaCRe6yqyQ8+z3NWMPk0T7Zd2+xh6z684wt0SabGhE=";
-            version = "0.7.0";
+            sha256 = "sha256-gJ7ghOOrk4kvzReqfB6ZRhFonOdpJXcPh7voBgCwqPg=";
+            version = "0.20.0";
           }
           {
             name = "grafana-alloy";
@@ -336,23 +312,11 @@
             sha256 = "sha256-TpLOMwdaEdgzWVwUcn+fO4rgLiQammWQM8LQobt8gLw=";
             version = "0.0.19";
           }
-          # {
-          #   name = "htmx-attributes";
-          #   publisher = "craigrbroughton";
-          #   sha256 = "sha256-TsemPZkq2Z13/vahRaP7z206BJaCZ1TR6OVv6aeDvyk=";
-          #   version = "0.8.0";
-          # }
-          {
-            name = "hyprland";
-            publisher = "ewen-lbh";
-            sha256 = "sha256-GaDpbkqNyIElSBnHwxc2ntmEVAGwL9XlNIBWNo7pvwM=";
-            version = "0.1.2";
-          }
           {
             name = "mypy-type-checker";
             publisher = "ms-python";
-            sha256 = "sha256-qVYgUZV2HgzYxL3dGEtOdx2pQE+QOSKMhhpiBLeBpZA=";
-            version = "2025.3.12581007";
+            sha256 = "sha256-71/IJAIC21oQjzkPlY7Nt+dkSeQDTsDYU/gdvbKXnsI=";
+            version = "2025.3.13371016";
           }
           {
             name = "pdf";
@@ -363,8 +327,8 @@
           {
             name = "playwright";
             publisher = "ms-playwright";
-            sha256 = "sha256-t5PJtBDkjh80IhOpfjsX8kZCSfhGoQ1dePEYMYgw66c=";
-            version = "1.1.16";
+            sha256 = "sha256-qIQS9rjzTJF0T6RWMJvaxOGcQmoXpIhzVHDMFxGMb/A=";
+            version = "1.1.17";
           }
           {
             name = "prom";
@@ -372,59 +336,35 @@
             sha256 = "sha256-h8pRrPzmu8+5ZiOLALjackr4zWuFAqi1ex7Gp2iOZKk=";
             version = "1.3.3";
           }
-          # {
-          #   name = "pwc";
-          #   publisher = "SureshNettur";
-          #   sha256 = "sha256-qVKs90Dd5ejgzYK7ptGBloU/aPuZ1Nm/ydidSDJwq2I=";
-          #   version = "1.1.0";
-          # }
+          {
+            name = "pwc";
+            publisher = "SureshNettur";
+            sha256 = "sha256-qVKs90Dd5ejgzYK7ptGBloU/aPuZ1Nm/ydidSDJwq2I=";
+            version = "1.1.0";
+          }
+          {
+            name = "pyrefly";
+            publisher = "meta";
+            sha256 = "sha256-pBnnR69+gLMLFNltAmJADtc7vzMl32+quSmrj0BDHsg=";
+            version = "0.46.0";
+          }
           {
             name = "remotehub";
             publisher = "GitHub";
             sha256 = "sha256-boKDVKLo8Na799OtoPnT6JxsAvQ/HoqL3FispnN6bOA=";
             version = "0.65.2025081801";
           }
-          # {
-          #   name = "snyk-vulnerability-scanner";
-          #   publisher = "snyk-security";
-          #   sha256 = "sha256-f+x4ZgrRVpfherVX87AFHT0xEZKJukW7waYU2P3uyyo=";
-          #   version = "2.26.0";
-          # }
-          # {
-          #   name = "specstory-vscode";
-          #   publisher = "specstory";
-          #   sha256 = "sha256-u0y4NvZapJT/Mu7mVdCQ9mBTZwSwALnzV33PChzTnfM=";
-          #   version = "0.24.2";
-          # }
-          # {
-          #   name = "tailwind-color-matcher";
-          #   publisher = "OmriGrossman";
-          #   sha256 = "sha256-WfFg1h5tY43W9YqgXkHDlxjRquFupuvLBwotTw0XoNk=";
-          #   version = "1.0.8";
-          # }
-          # {
-          #   name = "tailwind-fold";
-          #   publisher = "stivo";
-          #   sha256 = "sha256-yH3eA5jgBwxqnpFQkg91KQMkQps5iM1v783KQkQcWUU=";
-          #   version = "0.2.0";
-          # }
           {
-            name = "templ";
-            publisher = "a-h";
-            sha256 = "sha256-WIBJorljcnoPUrQCo1eyFb6vQ5lcxV0i+QJlJdzZYE0=";
-            version = "0.0.35";
+            name = "ty";
+            publisher = "astral-sh";
+            sha256 = "sha256-QvbmvvbJYwfhC6nA0D/NtHoUE6fXUWGx1xFO4LkWQ2M=";
+            version = "2025.71.13500942";
           }
-          # {
-          #   name = "ty";
-          #   publisher = "astral-sh";
-          #   sha256 = "sha256-gkJtg0ncV46UNBiupxnetytCNfZJ2L9iSqpMyvmDftU=";
-          #   version = "2025.51.13022037";
-          # }
           {
             name = "vscode-containers";
             publisher = "ms-azuretools";
-            sha256 = "sha256-UxWsu7AU28plnT0QMdpPJrcYZIV09FeC+rmYKf39a6M=";
-            version = "2.2.0";
+            sha256 = "sha256-zrEZpd2geX2G4u6LkIk3d6C7vhwZZ4lwHGQR3Z0OWY4=";
+            version = "2.3.0";
           }
           {
             name = "vscode-gitops-tools";
@@ -441,8 +381,8 @@
           {
             name = "vscode-pgsql";
             publisher = "ms-ossdata";
-            sha256 = "sha256-BoL0DM0r8gnSmehDUHSS2i4UuEATsCni3rlMVM0OWXo=";
-            version = "1.11.3";
+            sha256 = "sha256-I4cqfLZRDhA9QnhzOZfG/5ZMr/6DVkQFoXB1fS9m03E=";
+            version = "1.13.0";
           }
           {
             name = "vscode-python-test-adapter";
@@ -453,8 +393,8 @@
           {
             name = "vscode-thunder-client";
             publisher = "rangav";
-            sha256 = "sha256-Eg10vZTq76LmXpUwzGcLGRFzT9RKZvlhJvhf8lA0u5c=";
-            version = "2.38.4";
+            sha256 = "sha256-e4kJVvMYsQFWxkTFkcVGr55ZGuSCjEb/9UjNN84lAkI=";
+            version = "2.38.5";
           }
           ]);
         userSettings = {
@@ -729,9 +669,6 @@
               "-**/node_modules"
             ];
             "formatting.gofumpt" = true;
-            "formatting.templateExtensions" = [
-              "tmpl"
-            ];
             "ui.codelenses" = {
               "generate" = true;
               "gc_details" = true;

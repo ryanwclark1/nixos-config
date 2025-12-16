@@ -1,8 +1,3 @@
-[alpine-js-intellisense]
-src.vsmarketplace = "adrianwilczynski.alpine-js-intellisense"
-fetch.vsmarketplace = "adrianwilczynski.alpine-js-intellisense"
-passthru = { publisher = "adrianwilczynski", name = "alpine-js-intellisense" }
-
 [ansible]
 src.vsmarketplace = "redhat.ansible"
 fetch.vsmarketplace = "redhat.ansible"
@@ -18,16 +13,10 @@ src.vsmarketplace = "openai.chatgpt"
 fetch.vsmarketplace = "openai.chatgpt"
 passthru = { publisher = "openai", name = "chatgpt" }
 
-
 [claude-code]
 src.vsmarketplace = "anthropic.claude-code"
 fetch.vsmarketplace = "anthropic.claude-code"
 passthru = { publisher = "anthropic", name = "claude-code" }
-
-[context7-mcp]
-src.vsmarketplace = "upstash.context7-mcp"
-fetch.vsmarketplace = "upstash.context7-mcp"
-passthru = { publisher = "upstash", name = "context7-mcp" }
 
 [copilot]
 src.vsmarketplace = "github.copilot"
@@ -64,16 +53,6 @@ src.vsmarketplace = "grafana.grafana-vscode"
 fetch.vsmarketplace = "grafana.grafana-vscode"
 passthru = { publisher = "grafana", name = "grafana-vscode" }
 
-[htmx-attributes]
-src.vsmarketplace = "craigrbroughton.htmx-attributes"
-fetch.vsmarketplace = "craigrbroughton.htmx-attributes"
-passthru = { publisher = "craigrbroughton", name = "htmx-attributes" }
-
-[hyprland]
-src.vsmarketplace = "ewen-lbh.hyprland"
-fetch.vsmarketplace = "ewen-lbh.hyprland"
-passthru = { publisher = "ewen-lbh", name = "hyprland" }
-
 [mypy-type-checker]
 src.vsmarketplace = "ms-python.mypy-type-checker"
 fetch.vsmarketplace = "ms-python.mypy-type-checker"
@@ -99,35 +78,15 @@ src.vsmarketplace = "SureshNettur.pwc"
 fetch.vsmarketplace = "SureshNettur.pwc"
 passthru = { publisher = "SureshNettur", name = "pwc" }
 
+[pyrefly]
+src.vsmarketplace = "meta.pyrefly"
+fetch.vsmarketplace = "meta.pyrefly"
+passthru = { publisher = "meta", name = "pyrefly" }
+
 [remotehub]
 src.vsmarketplace = "GitHub.remotehub"
 fetch.vsmarketplace = "GitHub.remotehub"
 passthru = { publisher = "GitHub", name = "remotehub" }
-
-[specstory-vscode]
-src.vsmarketplace = "specstory.specstory-vscode"
-fetch.vsmarketplace = "specstory.specstory-vscode"
-passthru = { publisher = "specstory", name = "specstory-vscode" }
-
-[snyk-vulnerability-scanner]
-src.vsmarketplace = "snyk-security.snyk-vulnerability-scanner"
-fetch.vsmarketplace = "snyk-security.snyk-vulnerability-scanner"
-passthru = { publisher = "snyk-security", name = "snyk-vulnerability-scanner" }
-
-[tailwind-color-matcher]
-src.vsmarketplace = "OmriGrossman.tailwind-color-matcher"
-fetch.vsmarketplace = "OmriGrossman.tailwind-color-matcher"
-passthru = { publisher = "OmriGrossman", name = "tailwind-color-matcher" }
-
-[tailwind-fold]
-src.vsmarketplace = "stivo.tailwind-fold"
-fetch.vsmarketplace = "stivo.tailwind-fold"
-passthru = { publisher = "stivo", name = "tailwind-fold" }
-
-[templ]
-src.vsmarketplace = "a-h.templ"
-fetch.vsmarketplace = "a-h.templ"
-passthru = { publisher = "a-h", name = "templ" }
 
 [ty]
 src.vsmarketplace = "astral-sh.ty"
