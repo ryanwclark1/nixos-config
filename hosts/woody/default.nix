@@ -39,7 +39,6 @@
     ../common/optional/services/docling.nix  # Temporarily disabled due to build failures
     ../common/optional/services/gnome-services.nix
     ../common/optional/services/nfs.nix
-    ../common/optional/services/ollama.nix
     ../common/optional/services/open-webui.nix
     ../common/optional/services/openvscode-server.nix
     ../common/optional/services/printing.nix

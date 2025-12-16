@@ -12,5 +12,5 @@
   # })
 
   # The CMake compatibility overlay
-  (import ./cmake-compat.nix)
+  # (import ./cmake-compat.nix)
 ]

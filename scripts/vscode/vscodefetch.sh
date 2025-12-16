@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 
-, nvfetcher || exit 1
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Change to the script's directory
+cd "$SCRIPT_DIR" || exit 1
 
+nvfetcher || exit 1
 
 # The rest of your script (if you want to keep the old output)
 result=$(jq '.[] | select(.passthru != null) | {name: .passthru.name, publisher: .passthru.publisher, sha256: .src.sha256, version: .version}' _sources/generated.json)

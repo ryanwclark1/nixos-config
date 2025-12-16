@@ -8,7 +8,7 @@
   home.packages = with pkgs; let
     # Core Rust toolchain and basics
     rustBasics = [
-      rustup                    # Rust toolchain installer (includes rust-analyzer)
+      # rustup                    # Rust toolchain installer (includes rust-analyzer)
       cargo-binutils           # Utilities for working with binary files
       cargo-expand             # Show macro expansion
       cargo-flamegraph         # Profiling with flamegraphs
@@ -20,7 +20,7 @@
     devTools = [
       cargo-edit               # Add/remove dependencies from command line
       cargo-outdated           # Check for outdated dependencies
-      cargo-audit              # Security audit for dependencies  
+      cargo-audit              # Security audit for dependencies
       cargo-deny               # Lint dependencies for licenses/security
       cargo-generate           # Generate projects from templates
       cargo-make               # Task runner and build tool
@@ -60,7 +60,7 @@
     ];
   in
   rustBasics
-  ++ devTools  
+  ++ devTools
   ++ crossCompile
   ++ wasmTools
   ++ utils
@@ -75,9 +75,9 @@
   };
 
   # Add cargo bin directory to PATH
-  home.sessionPath = [ 
-    "${config.home.homeDirectory}/.cargo/bin" 
-    "${config.home.homeDirectory}/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin" 
+  home.sessionPath = [
+    "${config.home.homeDirectory}/.cargo/bin"
+    "${config.home.homeDirectory}/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin"
   ];
 
   # Create minimal cargo configuration for development environment
@@ -85,10 +85,10 @@
     [net]
     retry = 3
     git-fetch-with-cli = true
-    
+
     [registries.crates-io]
     protocol = "sparse"
-    
+
     # Global aliases for development workflow
     [alias]
     b = "build"

@@ -1,7 +1,6 @@
 { config, lib, pkgs, ... }:
 
 {
-
   # Web application and browser launcher utilities - using external scripts
   home.packages = with pkgs; [
     # Main webapp launcher with profile support

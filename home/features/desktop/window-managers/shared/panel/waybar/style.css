@@ -7,8 +7,9 @@
   border: none;
   border-radius: 0;
   min-height: 0;
-  font-family: JetBrainsMono Nerd Font;
-  font-size: 12px;
+  font-family: "JetBrainsMono Nerd Font", "Font Awesome 6 Free", "DejaVu Sans", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
 }
 
 .modules-left {

@@ -9,8 +9,7 @@
         "--ozone-platform-hint=wayland"
         "--enable-features=TouchpadOverscrollHistoryNavigation"
         # Chromium crash workaround for Wayland color management on Hyprland
-        "--disable-features=WaylandWpColorManagerV1"
-        "--load-extension=${config.home.homeDirectory}/.local/share/omarchy/default/chromium/extensions/copy-url"
+        # "--load-extension=${config.home.homeDirectory}/.local/share/omarchy/defaultchromium/extensions/copy-url"
       ];
     })
     (pkgs.writeShellScriptBin "google-chrome" ''

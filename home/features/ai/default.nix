@@ -14,6 +14,7 @@
     ./qwen
     ./codex
     ./opencode
+    ./ollama
   ];
   home.packages = with pkgs; [
     lmstudio
