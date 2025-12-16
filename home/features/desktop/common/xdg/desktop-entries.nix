@@ -292,7 +292,7 @@
 
     "google-chrome" = {
       name = "Google Chrome";
-      exec = "google-chrome-stable --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime %U";
+      exec = "google-chrome --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime %U";
       terminal = false;
       mimeType = [
         "application/pdf"
@@ -321,11 +321,11 @@
       actions = {
         new-window = {
           name = "New Window";
-          exec = "google-chrome-stable --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime";
+          exec = "google-chrome --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime";
         };
         new-private-window = {
           name = "New Incognito Window";
-          exec = "google-chrome-stable --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime --incognito";
+          exec = "google-chrome --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime --incognito";
         };
       };
     };

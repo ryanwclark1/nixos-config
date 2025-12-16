@@ -5,6 +5,13 @@
   ...
 }:
 
+let
+  # Common host configuration shared across multiple hosts
+  commonHostConfig = {
+    user = "administrator";
+    identityFile = "~/.ssh/ssh_host_ed25519_key";
+  };
+in
 {
   # User-level SSH client configuration
   # This complements the system-level SSH config in hosts/common/global/security/openssh.nix
@@ -16,39 +23,31 @@
     # We explicitly set the defaults we want in matchBlocks."*"
     enableDefaultConfig = false;
 
-    # Per-host configurations can be added here
     matchBlocks = {
       # Default settings for all hosts (replaces enableDefaultConfig defaults)
       "*" = {
-        # Default behavior: don't automatically add keys to agent
-        addKeysToAgent = "no";
-        # Default behavior: only use identities explicitly specified
+        # Key management
+        addKeysToAgent = "confirm";
         identitiesOnly = false;
-        # Default behavior: don't hash known hosts (we manage them explicitly)
         hashKnownHosts = false;
 
-        # Compression for slow connections
+        # Connection optimization
         compression = true;
 
-        # Forward agent (be careful with this)
+        # Security: agent and X11 forwarding disabled by default
         forwardAgent = false;
-
-        # X11 forwarding (disabled by default, enable per-host if needed)
         forwardX11 = false;
         forwardX11Trusted = false;
 
         # Additional options that aren't directly supported in matchBlocks
-        # These are SSH config options that need to be specified as raw key-value pairs
         extraOptions = {
-          # ControlMaster settings for connection multiplexing
-          # This allows reusing SSH connections for faster subsequent connections
+          # ControlMaster: connection multiplexing for faster subsequent connections
           # Note: kssh (Kitty's SSH wrapper) may override these with its own control socket
           ControlMaster = "auto";
           ControlPath = "~/.ssh/control-%r@%h:%p";
-          # Keep master connection alive for 10 minutes after last use
           ControlPersist = "10m";
 
-          # Server alive settings to keep connections alive
+          # Keep connections alive
           ServerAliveInterval = "60";
           ServerAliveCountMax = "5";
           TCPKeepAlive = "yes";
@@ -63,70 +62,74 @@
         };
       };
 
-      # Woody host configuration
-      "woody" = {
+      # Host configurations
+      "woody" = commonHostConfig // {
         hostname = "woody";
-        user = "administrator";
-        identityFile = "~/.ssh/ssh_host_ed25519_key";
       };
 
-      # Frametop host configuration
-      "frametop" = {
+      "frametop" = commonHostConfig // {
         hostname = "frametop";
-        user = "administrator";
-        identityFile = "~/.ssh/ssh_host_ed25519_key";
       };
 
-      # Direct IP connection (10.10.100.129)
-      # Use: ssh 10.10.100.129
-      "10.10.100.129" = {
+      # Direct IP connection
+      "10.10.100.129" = commonHostConfig // {
         hostname = "10.10.100.129";
-        user = "administrator";
-        identityFile = "~/.ssh/ssh_host_ed25519_key";
       };
     };
   };
 
-  # Create a helper script to clean up stale SSH control sockets
+  # Helper script to clean up stale SSH control sockets
   home.file."${config.home.homeDirectory}/.local/bin/ssh-cleanup" = {
     executable = true;
     text = ''
       #!/usr/bin/env bash
       # Clean up stale SSH control sockets
+      set -uo pipefail
 
-      USER_ID=$(id -u)
-      RUNTIME_DIR="/run/user/$USER_ID"
+      readonly USER_ID=$(id -u)
+      readonly RUNTIME_DIR="/run/user/$USER_ID"
+      readonly SSH_DIR="${config.home.homeDirectory}/.ssh"
+      readonly SOCKET_AGE_DAYS=1
+
+      cleanup_socket() {
+        local socket="$1"
+        local socket_type="$2"
+
+        [ ! -e "$socket" ] && return 0
+
+        # Remove sockets older than specified days
+        if find "$socket" -mtime +$SOCKET_AGE_DAYS >/dev/null 2>&1; then
+          rm -f "$socket"
+          echo "Removed old $socket_type socket: $socket"
+          return 0
+        fi
+
+        # For newer sockets, try to validate they're still active
+        # Extract hostname from standard SSH control socket format: control-<user>@<host>:<port>
+        if [[ "$socket" =~ control-([^@]+)@([^:]+):([0-9]+) ]]; then
+          local hostname="''${BASH_REMATCH[2]}"
+          # Check if the control master connection is still alive
+          # Using the extracted hostname for validation
+          if ! timeout 1 ssh -O check -S "$socket" "$hostname" >/dev/null 2>&1; then
+            rm -f "$socket"
+            echo "Removed stale $socket_type socket: $socket"
+          fi
+        fi
+        # For kssh sockets or other formats without extractable hostname,
+        # we rely on age-based cleanup only (handled above)
+      }
 
       # Clean up Kitty SSH control sockets (kssh)
       if [ -d "$RUNTIME_DIR" ]; then
-        # Find and remove stale kssh sockets (older than 1 day or not responding)
-        find "$RUNTIME_DIR" -name "kssh-*" -type s 2>/dev/null | while read -r socket; do
-          # Check if socket is older than 1 day
-          if [ -n "$(find "$socket" -mtime +1 2>/dev/null)" ]; then
-            rm -f "$socket"
-            echo "Removed old kssh socket: $socket"
-          # Or check if socket is not responding
-          elif ! timeout 1 ssh -O check -S "$socket" dummy 2>/dev/null; then
-            rm -f "$socket"
-            echo "Removed stale kssh socket: $socket"
-          fi
+        find "$RUNTIME_DIR" -name "kssh-*" -type s 2>/dev/null | while IFS= read -r socket; do
+          [ -n "$socket" ] && cleanup_socket "$socket" "kssh" || true
         done
       fi
 
       # Clean up standard SSH control sockets
-      if [ -d "${config.home.homeDirectory}/.ssh" ]; then
-        # Remove sockets older than 1 day
-        find "${config.home.homeDirectory}/.ssh" -name "control-*" -type s -mtime +1 -delete 2>/dev/null
-
-        # Also clean up sockets that are not responding
-        for socket in "${config.home.homeDirectory}/.ssh"/control-*; do
-          if [ -S "$socket" ] 2>/dev/null; then
-            # Try to check if the socket is still valid
-            if ! timeout 1 ssh -O check -S "$socket" dummy 2>/dev/null; then
-              rm -f "$socket"
-              echo "Removed stale SSH socket: $socket"
-            fi
-          fi
+      if [ -d "$SSH_DIR" ]; then
+        find "$SSH_DIR" -name "control-*" -type s 2>/dev/null | while IFS= read -r socket; do
+          [ -n "$socket" ] && cleanup_socket "$socket" "SSH" || true
         done
       fi
     '';
@@ -140,6 +143,7 @@
     Timer = {
       OnCalendar = "daily";
       Persistent = true;
+      RandomizedDelaySec = "1h";
     };
     Install = {
       WantedBy = [ "timers.target" ];
@@ -153,7 +157,9 @@
     Service = {
       Type = "oneshot";
       ExecStart = "${config.home.homeDirectory}/.local/bin/ssh-cleanup";
+      # Suppress output unless there are errors
+      StandardOutput = "journal";
+      StandardError = "journal";
     };
   };
 }
-

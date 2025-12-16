@@ -117,7 +117,7 @@ get_default_browser() {
     # Prioritize Chrome/Chromium, exclude Firefox
     if [[ -z "$browser" ]]; then
         local browser_candidates=(
-            "google-chrome-stable:google-chrome.desktop"
+            "google-chrome:google-chrome.desktop"
             "google-chrome:google-chrome.desktop"
             "chrome:google-chrome.desktop"
             "chromium:chromium.desktop"
@@ -185,7 +185,7 @@ find_browser_executable() {
     if [[ -z "$browser_exec" ]]; then
         case "$browser" in
             "google-chrome"*)
-                local chrome_commands=("google-chrome-stable" "google-chrome" "chrome")
+                local chrome_commands=("google-chrome" "chrome")
                 for cmd in "${chrome_commands[@]}"; do
                     if command -v "$cmd" >/dev/null 2>&1; then
                         browser_exec="$cmd"

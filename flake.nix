@@ -106,7 +106,7 @@
     silentSDDM = {
       url = "github:uiriansan/SilentSDDM";
       inputs.nixpkgs.follows = "nixpkgs";
-   };
+    };
     # Walker providers and services
     elephant = {
       url = "github:abenz1267/elephant";
@@ -130,6 +130,7 @@
       # 1) overlays as an ATTRSET (convention)
       overlaysSet = {
         cmake-compat = import ./overlays/cmake-compat.nix;
+        n8n-fix = import ./overlays/n8n-fix.nix;
         # goose-bump = import ./overlays/goose-bump.nix;
         # passthrough = import ./overlays/passthrough.nix; # optional
       };

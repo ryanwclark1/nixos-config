@@ -16,7 +16,7 @@ if [[ "$RUN_AS_ROOT" == "--root" ]] || [[ "$RUN_AS_ROOT" == "root" ]]; then
     PROMPT="Root Applications"
     MESSAGE="Run Applications with Administrator Privileges"
 else
-    MODE="user"  
+    MODE="user"
     PROMPT="Applications"
     MESSAGE="Launch Favorite Applications"
 fi
@@ -24,14 +24,14 @@ fi
 # Theme detection and layout
 if [[ -f "$THEME_PATH" ]]; then
     LAYOUT=$(grep 'USE_ICON' "$THEME_PATH" 2>/dev/null | cut -d'=' -f2 | tr -d ' "'"'" || echo "YES")
-    
+
     # Set grid layout based on theme type
     if [[ "$ROFI_THEME_TYPE" == *"type-1"* ]] || [[ "$ROFI_THEME_TYPE" == *"type-3"* ]] || [[ "$ROFI_THEME_TYPE" == *"type-5"* ]]; then
         COLUMNS=1
         ROWS=6
         WIN_WIDTH="400px"
     else
-        COLUMNS=6  
+        COLUMNS=6
         ROWS=1
         WIN_WIDTH="720px"
     fi
@@ -62,7 +62,7 @@ if [[ "$MODE" == "root" ]]; then
         APP_LOGS="󰌪"
         APP_DISKS="󰆼"
     fi
-    
+
     # Commands for root applications
     CMD_TERMINAL="pkexec env PATH=\$PATH WAYLAND_DISPLAY=\$WAYLAND_DISPLAY XDG_RUNTIME_DIR=\$XDG_RUNTIME_DIR kitty"
     CMD_FILEMANAGER="pkexec env PATH=\$PATH WAYLAND_DISPLAY=\$WAYLAND_DISPLAY XDG_RUNTIME_DIR=\$XDG_RUNTIME_DIR nautilus"
@@ -70,7 +70,7 @@ if [[ "$MODE" == "root" ]]; then
     CMD_SYSTEMCTL="pkexec env PATH=\$PATH WAYLAND_DISPLAY=\$WAYLAND_DISPLAY XDG_RUNTIME_DIR=\$XDG_RUNTIME_DIR kitty -e systemctl"
     CMD_LOGS="pkexec env PATH=\$PATH WAYLAND_DISPLAY=\$WAYLAND_DISPLAY XDG_RUNTIME_DIR=\$XDG_RUNTIME_DIR kitty -e journalctl -f"
     CMD_DISKS="pkexec gparted"
-    
+
     OPTIONS="$APP_TERMINAL\n$APP_FILEMANAGER\n$APP_EDITOR\n$APP_SYSTEMCTL\n$APP_LOGS\n$APP_DISKS"
 else
     # User applications - common daily apps
@@ -83,7 +83,7 @@ else
         APP_MUSIC="󰝚  Music Player"
         APP_SETTINGS="󰒓  System Settings"
     else
-        # Icon-only mode  
+        # Icon-only mode
         APP_TERMINAL="󰊠"
         APP_FILEMANAGER="󰉋"
         APP_EDITOR="󰨞"
@@ -91,15 +91,15 @@ else
         APP_MUSIC="󰝚"
         APP_SETTINGS="󰒓"
     fi
-    
+
     # Commands for user applications
     CMD_TERMINAL="kitty"
     CMD_FILEMANAGER="nautilus"
     CMD_EDITOR="code"
-    CMD_BROWSER="google-chrome-stable"
+    CMD_BROWSER="google-chrome"
     CMD_MUSIC="kitty -e ncmpcpp"
     CMD_SETTINGS="$HOME/.config/hypr/scripts/rofi/settings-menu.sh"
-    
+
     OPTIONS="$APP_TERMINAL\n$APP_FILEMANAGER\n$APP_EDITOR\n$APP_BROWSER\n$APP_MUSIC\n$APP_SETTINGS"
 fi
 

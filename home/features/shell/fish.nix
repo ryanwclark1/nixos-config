@@ -33,7 +33,7 @@ let
 in
 
 {
-  # Enhanced Fish theme configuration
+  # Catppuccin Frappe theme
   home.file.".config/fish/themes/frappe.theme" = {
     text = ''
       # name: 'Catppuccin Frappe Enhanced'
@@ -85,54 +85,20 @@ in
   programs.fish = {
     enable = true;
     package = pkgs.fish;
-
-    # Enhanced Fish settings
     preferAbbrs = true;
     generateCompletions = true;
 
-    # Performance optimizations
-    shellInit = ''
-      # Set Fish-specific environment variables
-      set -gx FISH_COMPLETE_DIR_EXPAND 1
-      set -gx FISH_COMPLETE_DIR_EXPAND_STRATEGY "descend"
-      set -gx FISH_COMPLETE_DIR_EXPAND_STRATEGY_DESCEND_DEPTH 1
-
-      # Improve completion performance
-      set -gx FISH_COMPLETE_DIR_EXPAND_STRATEGY_DESCEND_DEPTH 1
-
-      # Better history management
-      set -gx FISH_HISTORY_FILE_SIZE 1000000
-      set -gx FISH_HISTORY_MAX_COMMANDS 10000
-
-      # Fish-specific path additions
-      set -gx PATH $PATH ~/.local/bin ~/.cargo/bin ~/go/bin
-    '';
-
-    # Fish-specific shell aliases (inherits from common.nix)
+    # Fish-specific shell aliases
     shellAliases = {
-      # Clear screen and scrollback (Fish-specific)
       clear = "printf '\\033[2J\\033[3J\\033[1;1H'";
-
-      # Fish-specific reload
       reload = "exec fish";
-
-      # Fish-specific config edit
       fishconfig = "$EDITOR ~/.config/fish/config.fish";
-
-      # Fish-specific functions edit
       fishfunc = "$EDITOR ~/.config/fish/functions/";
-
-      # Better history
       history = "history | head -20";
 
-      # Fish-specific directory navigation
-      ".." = "cd ..";
-      "..." = "cd ../..";
-      "...." = "cd ../../..";
-      "....." = "cd ../../../..";
     };
 
-    # Enhanced shell abbreviations for expansion
+    # Shell abbreviations
     shellAbbrs = {
       # Git commands
       gcmsg = "git commit -m";
@@ -148,21 +114,7 @@ in
       gpu = "git pull";
       gp = "git push";
 
-      # Nix shortcuts
-      nrs = "nix run nixpkgs#";
-      nsh = "nix shell nixpkgs#";
-      ndev = "nix develop";
-      nbuild = "nix build";
-      nrepl = "nix repl";
-      nsearch = "nix search nixpkgs";
-      nshow = "nix show-derivation";
 
-      # Directory navigation
-      dl = "cd ~/Downloads";
-      docs = "cd ~/Documents";
-      dev = "cd ~/Code";
-      dots = "cd ~/.config";
-      tmp = "cd /tmp";
 
       # Docker shortcuts
       dps = "docker ps";
@@ -181,85 +133,46 @@ in
       kgd = "kubectl get deployments";
     };
 
-    # Enhanced plugins configuration
+    # Plugins
     plugins = [
-      # Fuzzy finder integration
       {
         name = "fzf-fish";
         src = pkgs.fishPlugins.fzf-fish.src;
       }
-
-      # Notification for long-running commands
       {
         name = "done";
         src = pkgs.fishPlugins.done.src;
       }
-
-      # Auto-pair brackets, quotes, etc.
       {
         name = "autopair";
         src = pkgs.fishPlugins.autopair.src;
       }
-
-      # Case-insensitive path expansion
       {
         name = "sponge";
         src = pkgs.fishPlugins.sponge.src;
       }
-
-      # Better git integration
-      # {
-      #   name = "gitnow";
-      #   src = pkgs.fishPlugins.gitnow.src;
-      # }
-
-      # Enhanced prompt (optional - can be disabled if using starship)
       {
         name = "tide";
         src = pkgs.fishPlugins.tide.src;
       }
-
-      # Note: z plugin conflicts with zoxide, so we use zoxide instead
-      # puffer plugin might conflict with fzf-fish, so we keep it minimal
     ];
 
-    # Enhanced functions
+    # Functions
     functions = {
-      # Directory functions
       mkcd = ''
         mkdir -p $argv[1] && cd $argv[1]
       '';
 
-      # Enhanced directory navigation
       up = ''
         for i in (seq 1 $argv[1])
           cd ..
         end
       '';
 
-      # Git functions
       gclone = ''
         git clone $argv[1] && cd (basename $argv[1] .git)
       '';
 
-      # Enhanced git functions
-      gstash = ''
-        git stash push -m "$argv[1]"
-      '';
-
-      gpop = ''
-        git stash pop
-      '';
-
-      gco = ''
-        git checkout $argv[1]
-      '';
-
-      gcb = ''
-        git checkout -b $argv[1]
-      '';
-
-      # Archive extraction
       extract = ''
         if test -f $argv[1]
           switch $argv[1]
@@ -293,19 +206,8 @@ in
         end
       '';
 
-      # Enhanced system info
-      sysinfo = ''
-        echo "Hostname: "(hostname)
-        echo "Kernel: "(uname -r)
-        echo "Uptime: "(uptime -p)
-        echo "Memory: "(free -h | awk '/^Mem:/ {print $3 "/" $2}')
-        echo "Disk: "(df -h / | awk 'NR==2 {print $3 "/" $2}')
-        echo "Load: "(uptime | awk -F'load average:' '{print $2}')
-        echo "Shell: Fish "(fish --version | cut -d' ' -f3)
-        echo "Nix: "(nix --version | cut -d' ' -f3)
-      '';
 
-      # Enhanced Docker helpers
+
       docker-exec = ''
         set -l container $argv[1]
         set -e argv[1]
@@ -336,22 +238,18 @@ in
         end
       '';
 
-      # Quick backup
       backup = ''
         cp -r $argv[1] "$argv[1].bak."(date +%Y%m%d_%H%M%S)
       '';
 
-      # Weather
       weather = ''
         curl -s "wttr.in/$argv[1]"
       '';
 
-      # Cheat sheet
       cheat = ''
         curl -s "cheat.sh/$argv[1]"
       '';
 
-      # Enhanced file operations
       ll = ''
         eza -la --color=always --group-directories-first
       '';
@@ -364,7 +262,6 @@ in
         eza --tree --color=always --level=2
       '';
 
-      # Enhanced search
       find = ''
         fd $argv
       '';
@@ -373,12 +270,10 @@ in
         rg $argv
       '';
 
-      # Process management
       ps = ''
         procs $argv
       '';
 
-      # Disk usage
       du = ''
         dust $argv
       '';
@@ -387,68 +282,49 @@ in
         duf $argv
       '';
 
-      # Network utilities
       ports = ''
         ss -tulanp
       '';
 
-      # JSON processing
       jqless = ''
         jq -C | bat --pager 'less RF' --style=numbers --color=always
       '';
 
-      # Quick file operations
       mkdir = ''
         mkdir -p $argv
       '';
-
-      # Enhanced history
-      h = ''
-        history | head -20
-      '';
-
-      fishconfig = ''
-        $EDITOR ~/.config/fish/config.fish
-      '';
     };
 
-    # Login shell initialization
     loginShellInit = ''
-      # Display system info on login (only in interactive sessions)
       if status is-interactive && command -v fastfetch >/dev/null
         fastfetch
       end
 
-      # Initialize zoxide if available
       if command -v zoxide >/dev/null
         zoxide init fish | source
       end
     '';
 
-    # Enhanced interactive shell initialization
     interactiveShellInit = ''
-      # Remove fish greeting
       set -U fish_greeting
 
-      # Enhanced key bindings
+      # Key bindings
       bind \ee edit_command_buffer
-      bind \e\[C forward-char  # Right arrow accepts autosuggestion
-      bind \e\[A history-search-backward  # Up arrow
-      bind \e\[B history-search-forward   # Down arrow
-      bind \cf accept-autosuggestion  # Ctrl+F also accepts autosuggestion
-      bind \ck up-or-search  # Ctrl+K for up
-      bind \cj down-or-search  # Ctrl+J for down
+      bind \e\[C forward-char
+      bind \e\[A history-search-backward
+      bind \e\[B history-search-forward
+      bind \cf accept-autosuggestion
+      bind \ck up-or-search
+      bind \cj down-or-search
+      bind \e\[1;5C forward-word
+      bind \e\[1;5D backward-word
+      bind \e\[H beginning-of-line
+      bind \e\[F end-of-line
+      bind \e\[3~ delete-char
+      bind \e\[1;5A beginning-of-line
+      bind \e\[1;5B end-of-line
 
-      # Additional useful key bindings
-      bind \e\[1;5C forward-word  # Ctrl+Right
-      bind \e\[1;5D backward-word  # Ctrl+Left
-      bind \e\[H beginning-of-line  # Home
-      bind \e\[F end-of-line  # End
-      bind \e\[3~ delete-char  # Delete
-      bind \e\[1;5A beginning-of-line  # Ctrl+Up
-      bind \e\[1;5B end-of-line  # Ctrl+Down
-
-      # Enhanced vi mode indicator
+      # Vi mode indicator
       function fish_mode_prompt
         switch $fish_bind_mode
           case default
@@ -462,9 +338,8 @@ in
         end
       end
 
-      # Enhanced prompt function
+      # Custom prompt (overridden by starship if available)
       function fish_prompt
-        # Custom prompt with git info
         set -l git_branch (git branch --show-current 2>/dev/null)
         set -l git_status (git status --porcelain 2>/dev/null)
 
@@ -476,29 +351,23 @@ in
         echo -n (set_color blue)(prompt_pwd)(set_color normal)" > "
       end
 
-      # Initialize starship prompt if available (overrides custom prompt)
+      # Initialize tools
       if command -v starship >/dev/null
         starship init fish | source
       end
 
-      # Set up direnv hook if available
       if command -v direnv >/dev/null
         direnv hook fish | source
       end
 
-      # FZF environment variables are set in common.nix to avoid duplication
-      # Fish-specific FZF initialization is handled by the fzf-fish plugin
-
-      # Enhanced completion
+      # Completion settings
       set -gx FISH_COMPLETE_DIR_EXPAND 1
       set -gx FISH_COMPLETE_DIR_EXPAND_STRATEGY "descend"
       set -gx FISH_COMPLETE_DIR_EXPAND_STRATEGY_DESCEND_DEPTH 1
 
-      # Better history
+      # History settings
       set -gx FISH_HISTORY_FILE_SIZE 1000000
       set -gx FISH_HISTORY_MAX_COMMANDS 10000
-
-      # Colored man pages are set in common.nix
     '';
   };
 }

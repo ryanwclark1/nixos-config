@@ -29,7 +29,7 @@ fi
 
 # Fallback: try common browsers in order of preference
 # Prioritize Chrome/Chromium, exclude Firefox
-browsers=(chromium chrome google-chrome-stable brave-browser vivaldi opera)
+browsers=(chromium chrome google-chrome brave-browser vivaldi opera)
 
 for browser in "${browsers[@]}"; do
   if command -v "$browser" >/dev/null 2>&1; then
