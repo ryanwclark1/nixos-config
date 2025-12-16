@@ -61,13 +61,13 @@
 
   # Ensure WireGuard starts after SOPS secrets are decrypted
   # This is important for services that depend on encrypted secrets
+  # Extend the auto-generated service without replacing it
   systemd.services.wg-quick-wg0 = {
-    wantedBy = [ "multi-user.target" ];
-    after = [
+    after = lib.mkAfter [
       "network-online.target"
       "sops-nix.service"
     ];
-    requires = [
+    wants = lib.mkAfter [
       "network-online.target"
       "sops-nix.service"
     ];

@@ -9,13 +9,13 @@
   programs = {
     bash = {
       enable = true;
-      blesh = {
-        enable = true;
-      };
-      completion = {
-        enable = true;
-        package = pkgs.bash-completion;
-      };
+      # blesh = {
+      #   enable = true;
+      # };
+      # completion = {
+      #   enable = true;
+      #   package = pkgs.bash-completion;
+      # };
     };
   };
 }

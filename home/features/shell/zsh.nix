@@ -9,12 +9,11 @@
   programs.zsh = {
     enable = true;
     package = pkgs.zsh;
-    # Place zsh dotfiles under XDG config directory (absolute path to avoid deprecation)
     dotDir = "${config.xdg.configHome}/zsh";
     enableCompletion = true;
     enableVteIntegration = true;
-    autocd = true;  # Automatically cd into directory by typing its name
-    defaultKeymap = "vicmd";  # Can be "emacs" or "vicmd" for vi mode
+    autocd = true;
+    # defaultKeymap = "emacs";
 
     # Syntax highlighting configuration
     syntaxHighlighting = {
@@ -57,52 +56,51 @@
     # History substring search
     historySubstringSearch = {
       enable = true;
-      searchUpKey = [ "^[[A" "^P" ];  # Up arrow and Ctrl+P
-      searchDownKey = [ "^[[B" "^N" ];  # Down arrow and Ctrl+N
+      searchUpKey = [
+        "^[[A"
+        "^P"
+      ];
+      searchDownKey = [
+        "^[[B"
+        "^N"
+      ];
     };
 
     # Shell options
     setOptions = [
-      "AUTO_CD"              # cd by typing directory name
-      "AUTO_PUSHD"           # Make cd push directories onto stack
-      "PUSHD_IGNORE_DUPS"    # Don't push duplicates
-      "PUSHD_SILENT"         # Don't print directory stack
-      "CORRECT"              # Command correction
-      "CORRECT_ALL"          # Argument correction
-      "GLOB_COMPLETE"        # Generate glob matches as completions
-      "EXTENDED_GLOB"        # Extended globbing
-      "NO_CASE_GLOB"         # Case insensitive globbing
-      "MENU_COMPLETE"        # Cycle through completions
-      "LIST_PACKED"          # Compact completion lists
-      "COMPLETE_IN_WORD"     # Complete from cursor position
-      "HIST_VERIFY"          # Reload line into buffer on history expansion
-      "HIST_REDUCE_BLANKS"   # Remove superfluous blanks
-      "HIST_SAVE_NO_DUPS"    # Don't save duplicates
-      "HIST_FIND_NO_DUPS"    # Don't show duplicates in search
-      "INTERACTIVE_COMMENTS" # Allow comments in interactive shell
-      "NO_BEEP"             # Don't beep
-      "PROMPT_SUBST"        # Parameter expansion in prompts
+      # AUTO_CD is enabled via autocd = true above
+      "AUTO_PUSHD"
+      "PUSHD_IGNORE_DUPS"
+      "PUSHD_SILENT"
+      "CORRECT"
+      "CORRECT_ALL"
+      "GLOB_COMPLETE"
+      "EXTENDED_GLOB"
+      "NO_CASE_GLOB"
+      "MENU_COMPLETE"
+      "LIST_PACKED"
+      "COMPLETE_IN_WORD"
+      "HIST_VERIFY"
+      "HIST_REDUCE_BLANKS"
+      "HIST_SAVE_NO_DUPS"
+      "HIST_FIND_NO_DUPS"
+      "INTERACTIVE_COMMENTS"
+      "NO_BEEP"
+      "PROMPT_SUBST"
     ];
 
-    # ZSH-specific shell aliases (inherits from common.nix)
+    # ZSH-specific shell aliases
     shellAliases = {
-      # ZSH-specific quick edits
       zshrc = "$EDITOR ~/.config/zsh/.zshrc";
       zshenv = "$EDITOR ~/.config/zsh/.zshenv";
-
-      # ZSH-specific reload
       reload = "exec zsh";
     };
 
-    # Global aliases (can be used anywhere in command)
+    # Global aliases
     shellGlobalAliases = {
-      "--help" = "--help 2>&1 | bat --language=help --style=plain";
-      G = "| grep";
-      L = "| less";
-      H = "| head";
-      T = "| tail";
       NUL = "> /dev/null 2>&1";
-      ERR = "2>&1";
+      # ERR removed: global alias "2>&1" can cause "Bad file descriptor" errors
+      # Use explicit "2>&1" redirection instead
       JSON = "| jq '.'";
       XML = "| xmllint --format -";
       TABLE = "| column -t";
@@ -111,10 +109,8 @@
       UNIQ = "| sort | uniq";
     };
 
-
-    # Enhanced plugins configuration
+    # Plugins (autosuggestions and history-substring-search are built-in)
     plugins = [
-      # Core functionality plugins
       {
         name = "fzf-tab";
         src = pkgs.fetchFromGitHub {
@@ -152,40 +148,45 @@
           sha256 = "sha256-u3abhv9ewq3m4QsnsxT017xdlPm3dYq5dqHNmQhhcpI=";
         };
       }
-      # Note: Additional plugins like zsh-autosuggestions and zsh-history-substring-search
-      # are already provided by home-manager's built-in autosuggestion and historySubstringSearch
-      # features, so we don't need to add them manually
     ];
 
-    # Login extra
     loginExtra = ''
-      # Display system info on login (only in interactive sessions)
       if [[ -o interactive ]] && [[ -t 0 ]] && command -v fastfetch &> /dev/null; then
         fastfetch
       fi
     '';
 
-    # Logout extra
     logoutExtra = ''
-      # Clear screen on logout
       clear
     '';
 
-    # Init content (main zsh configuration)
     initContent = ''
-      # Disable treating # as a special glob character for flake references
-      # This allows using .#hostname without quotes
+      # Disable # as glob character for flake references (allows .#hostname without quotes)
       disable -p '#'
 
-      # Configure fzf-tab for better systemctl and other completions
+      # Enable vim mode
+      bindkey -v
+
+
+      # fzf-tab configuration
       zstyle ':fzf-tab:*' fzf-command fzf
       zstyle ':fzf-tab:*' fzf-pad 4
+      zstyle ':fzf-tab:*' fzf-flags '--height=70%' '--layout=reverse' '--info=inline' '--border' '--preview-window=right:60%:wrap'
+      zstyle ':fzf-tab:*' fzf-bindings 'tab:down' 'btab:up' 'ctrl-space:toggle' 'ctrl-a:toggle-all'
+      zstyle ':fzf-tab:*' continuous-trigger '/'
+      zstyle ':fzf-tab:*' prefix ""
+      zstyle ':fzf-tab:*' show-group full
+      zstyle ':fzf-tab:*' switch-group ',' '.'
 
-      # Better formatting for completions with descriptions
+      # Completion formatting
       zstyle ':fzf-tab:complete:*:*' fzf-preview 'echo ''${(Q)desc}'
       zstyle ':fzf-tab:complete:*:descriptions' format '[%d]'
+      zstyle ':completion:*' list-separator $'\t'
+      zstyle ':completion:*:*:*:*:descriptions' format '%F{yellow}-- %d --%f'
+      zstyle ':completion:*:*:*:*:*' sort false
+      zstyle ':completion:*' group-name ""
 
-      # Systemctl specific configuration with enhanced preview
+      # Systemctl completion preview
       zstyle ':fzf-tab:complete:systemctl*:*' fzf-preview '
         case "$group" in
           "systemd unit"|"systemd units")
@@ -197,13 +198,12 @@
             man systemctl 2>/dev/null | col -b | sed -n "/^[[:space:]]*$word/,/^[[:space:]]*[a-z]/p" | head -15
             ;;
           "options"|"option")
-            # Inline man page extraction since functions are not available in zstyle context
             local search_opt="''${word#--}"
             search_opt="''${search_opt#-}"
             if man systemctl 2>/dev/null | col -b | grep -A 5 -E "^[[:space:]]*(-[a-z], )?--$search_opt" | head -10; then
-              : # Found and displayed
+              :
             elif man systemctl 2>/dev/null | col -b | grep -A 3 "^[[:space:]]*$word" | head -5; then
-              : # Found and displayed
+              :
             else
               echo "Option: $word"
               echo ""
@@ -216,39 +216,16 @@
         esac
       '
 
-      # Use tmux popup if available, with wider preview for man pages
-      zstyle ':fzf-tab:*' fzf-flags '--height=70%' '--layout=reverse' '--info=inline' '--border' '--preview-window=right:60%:wrap'
-
-      # Tab width for better column alignment
-      zstyle ':fzf-tab:*' fzf-bindings 'tab:down' 'btab:up' 'ctrl-space:toggle' 'ctrl-a:toggle-all'
-      zstyle ':fzf-tab:*' continuous-trigger '/'
-
-      # Use a tab character for padding to align columns
-      zstyle ':fzf-tab:*' prefix ""
-      zstyle ':fzf-tab:*' fzf-pad 4
-
-      # Better column alignment using printf
-      zstyle ':completion:*' list-separator $'\t'
-      zstyle ':completion:*:*:*:*:descriptions' format '%F{yellow}-- %d --%f'
-
-      # Disable sort for better grouping
-      zstyle ':completion:*:*:*:*:*' sort false
-
-      # Group results by category
-      zstyle ':completion:*' group-name ""
-
-      # General command option preview for any command with man pages
+      # General command option preview
       zstyle ':fzf-tab:complete:*:options' fzf-preview '
-        # Try to extract the command name from the context
         local cmd="''${words[1]}"
         if [[ -n "$cmd" ]] && man "$cmd" 2>/dev/null | head -1 | grep -q .; then
-          # Inline man page extraction
           local search_opt="''${word#--}"
           search_opt="''${search_opt#-}"
           if man "$cmd" 2>/dev/null | col -b | grep -A 5 -E "^[[:space:]]*(-[a-z], )?--$search_opt" | head -10; then
-            : # Found and displayed
+            :
           elif man "$cmd" 2>/dev/null | col -b | grep -A 3 "^[[:space:]]*$word" | head -5; then
-            : # Found and displayed
+            :
           else
             echo "Option: $word"
             echo ""
@@ -259,10 +236,6 @@
           [[ -n "$desc" ]] && echo "''${(Q)desc}"
         fi
       '
-
-      # Ensure consistent column width for all groups
-      zstyle ':fzf-tab:*' show-group full
-      zstyle ':fzf-tab:*' switch-group ',' '.'
 
       show_file_or_dir_preview="if [ -d {} ]; then eza --tree --color=always {} | head -200; else bat --style=numbers --color=always --line-range=:500 {}; fi"
 
@@ -282,9 +255,6 @@
       if [ -f "$HOME/.config/shell/functions.sh" ]; then
         source "$HOME/.config/shell/functions.sh"
       fi
-
-      # Export Vultr API key from sops secret for CLI and Terraform
-      # Note: VULTR_API_KEY is exported globally via home.sessionVariables in common.nix
     '';
   };
 }

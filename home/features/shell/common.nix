@@ -8,6 +8,13 @@
 {
   # Common shell configuration shared across all shells
   home = {
+    # Session path additions (automatically added to PATH by Home Manager)
+    sessionPath = [
+      "$HOME/.local/bin"
+      "$HOME/.cargo/bin"
+      "$HOME/go/bin"
+    ];
+
     # Common session variables for all shells
     sessionVariables = {
       # Editor settings
@@ -21,22 +28,8 @@
       BATPIPE = lib.mkDefault "color";
       MANPAGER = lib.mkDefault "sh -c 'col -bx | bat -l man -p'";
       MANROFFOPT = lib.mkDefault "-c";
-
-      # Theme settings
-      BAT_THEME = lib.mkDefault "theme";
-
-      # XDG Base Directory Specification
-      XDG_CONFIG_HOME = lib.mkDefault "$HOME/.config";
-      XDG_CACHE_HOME = lib.mkDefault "$HOME/.cache";
-      XDG_DATA_HOME = lib.mkDefault "$HOME/.local/share";
-      XDG_STATE_HOME = lib.mkDefault "$HOME/.local/state";
-
-      # History control (common across all shells)
-      HISTCONTROL = lib.mkDefault "ignoreboth:erasedups";
-      HISTTIMEFORMAT = lib.mkDefault "%F %T ";
-
-      # Terminal capabilities
-      COLORTERM = lib.mkDefault "truecolor";
+      MANWIDTH = lib.mkDefault "80";
+      MANOPT = lib.mkDefault "--no-hyphenation --no-justification";
 
       # Colored man pages
       LESS_TERMCAP_mb = lib.mkDefault "$(printf '\e[1;32m')";
@@ -47,54 +40,32 @@
       LESS_TERMCAP_ue = lib.mkDefault "$(printf '\e[0m')";
       LESS_TERMCAP_us = lib.mkDefault "$(printf '\e[1;4;31m')";
 
+      # Terminal capabilities
+      COLORTERM = lib.mkDefault "truecolor";
+
+      # Theme settings
+      BAT_THEME = lib.mkDefault "theme";
+
       # Development
       CDPATH = lib.mkDefault ".:$HOME:$HOME/Code:$HOME/nixos-config";
 
-      # Enhanced shell experience
+      # Shell experience
       SHELL_SESSION_ID = lib.mkDefault "$(date +%s)";
       HISTSIZE = lib.mkDefault "100000";
       SAVEHIST = lib.mkDefault "100000";
-
-      # Better terminal experience
-      TERM_PROGRAM = lib.mkDefault "unknown";
-      TERM_PROGRAM_VERSION = lib.mkDefault "unknown";
-
-      # Development environment indicators
-      NIX_SHELL = lib.mkDefault "";
-      IN_NIX_SHELL = lib.mkDefault "";
-
-      # Performance optimizations
-      # FZF environment variables are handled by programs.fzf module
-
-      # Better man page experience
-      MANWIDTH = lib.mkDefault "80";
-      MANOPT = lib.mkDefault "--no-hyphenation --no-justification";
-
-      # Cloud providers
-      # Expose Vultr API key from sops-nix secret for all shells (Vultr CLI & Terraform)
-      # VULTR_API_KEY = lib.mkDefault "$( [ -r \"${config.sops.secrets.\"vultr/api-key\".path}\" ] && cat ${config.sops.secrets."vultr/api-key".path} )";
     };
 
-    # Session path additions
-    sessionPath = [
-      "$HOME/.local/bin"
-      "$HOME/.cargo/bin"
-      "$HOME/go/bin"
-    ];
-
     # Common shell aliases for all shells
-    shellAliases = rec {
+    shellAliases = {
 
-      # Additional ls aliases for compatibility
-      la = "ls -a";  # Will use eza's ls alias
-      ll = "ls -l";  # Will use eza's ls alias
-
-      # Better defaults (modern replacements)
+      # Modern CLI tool replacements
       grep = "rg";
       find = "fd";
       ps = "procs";
       du = "dust";
       df = "duf";
+      la = "ls -a";
+      ll = "ls -l";
 
       # Safety nets
       cp = "cp -i";
@@ -107,7 +78,13 @@
       e = "$EDITOR";
       o = "xdg-open";
 
-      # Docker shortcuts
+      # System management
+      sc = "systemctl";
+      scu = "systemctl --user";
+      scs = "sudo systemctl";
+      wifi = "nmtui";
+
+      # Docker
       d = "docker";
       dc = "docker compose";
       dps = "docker ps";
@@ -116,30 +93,7 @@
       drm = "docker rm";
       drmi = "docker rmi";
 
-      # Systemctl shortcuts
-      sc = "systemctl";
-      scu = "systemctl --user";
-      scs = "sudo systemctl";
-
-      # Quick config edits
-      nixconf = "$EDITOR ~/nixos-config/flake.nix";
-
-      # Network
-      ip = "ip --color=auto";
-      ports = "ss -tulanp";
-
-      # SSH - direct SSH that bypasses kssh (Kitty's SSH wrapper)
-      # Use 'sshd' when you want to bypass kssh and use standard SSH
-      sshd = "/run/current-system/sw/bin/ssh";
-
-      # Misc utilities
-      h = "history";
-      help = "man";
-      mk = "mkdir -p";
-      path = "echo $PATH | tr ':' '\\n'";
-      tf = "terraform";
-
-      # Kubernetes shortcuts (consolidated from kubernetes/default.nix)
+      # Kubernetes
       k = "kubectl";
       kx = "kubectx";
       kns = "kubens";
@@ -150,13 +104,23 @@
       kctx = "kubectx";
       kustomize-build = "kustomize build";
 
-      # JSON processing
+      # Network
+      ip = "ip --color=auto";
+      ports = "ss -tulanp";
+      sshd = "/run/current-system/sw/bin/ssh"; # Bypass Kitty's kssh wrapper
+
+      # Utilities
+      h = "history";
+      help = "man";
+      mk = "mkdir -p";
+      path = "echo $PATH | tr ':' '\\n'";
+      tf = "terraform";
       jqless = "jq -C | bat --pager 'less RF' --style=numbers --color=always";
 
-      # Network management
-      wifi = "nmtui";
+      # Configuration
+      nixconf = "$EDITOR ~/nixos-config/flake.nix";
 
-      # Kitty specific (conditionally applied)
+      # Kitty specific
       cik = lib.mkIf config.programs.kitty.enable "clone-in-kitty --type os-window";
     };
 
@@ -164,63 +128,53 @@
 
   # Common packages for shell utilities
   home.packages = with pkgs; [
-    # Modern CLI tools
-    ripgrep       # Better grep
-    fd            # Better find
-    eza           # Better ls
-    bat           # Better cat
-    procs         # Better ps
-    btop          # Better top
-    dust          # Better du
-    duf           # Better df
-    delta         # Better diff
-    hyperfine     # Benchmarking tool
-    bottom        # Alternative to htop/btop
-    gitui         # Terminal UI for git
-    lazygit       # Another git UI
-    neofetch      # System info display
-    onefetch      # Git repository info
+    # Modern CLI replacements
+    ripgrep
+    fd
+    eza
+    bat
+    procs
+    btop
+    dust
+    duf
+    delta
+    hyperfine
+    bottom
+
+    # Git tools
+    gitui
+    lazygit
+    onefetch
+
+    # System info
+    neofetch
 
     # File management
-    fzf           # Fuzzy finder
-    zoxide        # Smart cd
-    direnv        # Directory-specific environments
+    fzf
+    zoxide
+    direnv
 
     # Archive tools
     unzip
     p7zip
-    # unrar is provided by rar package in compression/default.nix
 
     # Network tools
     curl
     wget
-    # dig is provided by dnsutils in networking-utils
-    # nmap is provided in networking-utils
 
-    # System tools     # Simplified man pages
+    # System utilities
     which
     file
     tree
 
     # Development tools
-    jq            # JSON processor
-    # yq is provided by yq-go in cli/default.nix (Go version is more feature-complete)
-    xmlstarlet    # XML processor
+    jq
+    xmlstarlet
   ];
 
   # Common shell functions (to be sourced by individual shells)
   home.file.".config/shell/functions.sh" = {
     text = ''
-      # Directory functions
-      mkcd() {
-        mkdir -p "$1" && cd "$1"
-      }
-
-      # Git clone and cd
-      gclone() {
-        git clone "$1" && cd "$(basename "''${1}" .git)"
-      }
-
       # Archive extraction
       extract() {
         if [ -f "$1" ]; then
@@ -277,16 +231,6 @@
       # Quick backup function
       backup() {
         cp -r "$1" "$1.bak.$(date +%Y%m%d_%H%M%S)"
-      }
-
-      # System information
-      sysinfo() {
-        echo "Hostname: $(hostname)"
-        echo "Kernel: $(uname -r)"
-        echo "Uptime: $(uptime -p)"
-        echo "Memory: $(free -h | awk '/^Mem:/ {print $3 "/" $2}')"
-        echo "Disk: $(df -h / | awk 'NR==2 {print $3 "/" $2}')"
-        echo "Load: $(uptime | awk -F'load average:' '{print $2}')"
       }
 
       # Weather function with better error handling
