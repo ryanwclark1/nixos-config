@@ -19,10 +19,10 @@ buildNpmPackage (finalAttrs: {
     owner = "google-gemini";
     repo = "gemini-cli";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-6mG9Nvzgp1c0+Odh2soaNKkpCSmxlSu+Pnn3v5e+ZSo=";
+    hash = "sha256-iETTEZyiLdMXOi7Nqm+ivS/iS9V0mW0Ne9ZHmmVA1B4=";
   };
 
-  npmDepsHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; # Will be updated by update script
+  npmDepsHash = "sha256-XDimCRagM1Fsz4FWNQsu4jUAq58xGx6zPwUtQ1nSmIE=";
 
   nativeBuildInputs = [
     jq
@@ -100,4 +100,3 @@ buildNpmPackage (finalAttrs: {
     mainProgram = "gemini";
   };
 })
-
