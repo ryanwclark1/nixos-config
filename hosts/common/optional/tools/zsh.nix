@@ -13,7 +13,7 @@
     autosuggestions = {
       enable = true;
     };
-    enableBashCompletion = true;
+    enableBashCompletion = false;
     enableCompletion = true;
     enableGlobalCompInit = true;
   };

@@ -18,6 +18,7 @@
     ./features/btop
     ./features/cava
     ./features/chromium
+    ./features/chrome
     ./features/cli
     ./features/compression
     ./features/cursor
@@ -62,7 +63,6 @@
     ./features/vscode
     ./features/webapps
     ./features/wireless
-    ./features/windsurf
     ./features/yazi
     ./features/zellij
     ./features/zoxide

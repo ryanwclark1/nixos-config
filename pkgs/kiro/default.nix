@@ -1,119 +1,59 @@
 {
   lib,
   stdenv,
+  callPackage,
   fetchurl,
-  makeWrapper,
-  wrapGAppsHook,
-  autoPatchelfHook,
-  glib,
-  nss,
-  nspr,
-  atk,
-  at-spi2-atk,
-  cups,
-  dbus,
-  libdrm,
-  gtk3,
-  pango,
-  cairo,
-  xorg,
-  expat,
-  libxkbcommon,
-  alsa-lib,
-  mesa,
-  libGL,
-  libnotify,
-  libuuid,
-  libsecret,
-  systemd,
-  gsettings-desktop-schemas,
+  extraCommandLineArgs ? "",
+  useVSCodeRipgrep ? stdenv.hostPlatform.isDarwin,
 }:
 
-stdenv.mkDerivation rec {
+let
+  sources = (lib.importJSON ./sources.json).${stdenv.hostPlatform.system};
+in
+(callPackage ../vscode-generic/generic.nix {
+  inherit useVSCodeRipgrep;
+  commandLineArgs = extraCommandLineArgs;
+
+  version = "0.7.45";
   pname = "kiro";
-  version = "0.1.6";
-  
+
+  # You can find the current VSCode version in the About dialog:
+  # workbench.action.showAboutDialog (Help: About)
+  vscodeVersion = "1.103.2";
+
+  executableName = "kiro";
+  longName = "Kiro";
+  shortName = "kiro";
+  libraryName = "kiro";
+  iconName = "kiro";
+
   src = fetchurl {
-    url = "https://prod.download.desktop.kiro.dev/releases/202507152342--distro-linux-x64-tar-gz/202507152342-distro-linux-x64.tar.gz";
-    sha256 = "1cp53q252yixrzkgspjhqfnnsldxs8sh5zidp276q2c4j70csykq";
+    url = sources.url;
+    hash = sources.hash;
   };
-  
-  nativeBuildInputs = [
-    autoPatchelfHook
-    makeWrapper
-    wrapGAppsHook
-  ];
-  
-  buildInputs = [
-    stdenv.cc.cc.lib
-    glib
-    nss
-    nspr
-    atk
-    at-spi2-atk
-    cups
-    dbus
-    libdrm
-    gtk3
-    pango
-    cairo
-    xorg.libX11
-    xorg.libXcomposite
-    xorg.libXdamage
-    xorg.libXext
-    xorg.libXfixes
-    xorg.libXrandr
-    xorg.libxcb
-    expat
-    libxkbcommon
-    alsa-lib
-    mesa
-    libGL
-    libnotify
-    libuuid
-    libsecret
-    xorg.libXScrnSaver
-    xorg.libXtst
-    xorg.libxkbfile
-  ];
-  
-  sourceRoot = ".";
-  
-  dontWrapGApps = true;
-  
-  installPhase = ''
-    runHook preInstall
-    
-    mkdir -p $out/opt
-    cp -r Kiro $out/opt/
-    
-    chmod +x $out/opt/Kiro/kiro
-    chmod +x $out/opt/Kiro/chrome_crashpad_handler
-    
-    mkdir -p $out/bin
-    
-    makeWrapper $out/opt/Kiro/kiro $out/bin/kiro \
-      --add-flags "--no-sandbox" \
-      --add-flags "--disable-gpu" \
-      --prefix XDG_DATA_DIRS : "${gsettings-desktop-schemas}/share/gsettings-schemas/${gsettings-desktop-schemas.name}" \
-      --prefix XDG_DATA_DIRS : "${gtk3}/share/gsettings-schemas/${gtk3.name}" \
-      --set GTK_THEME "Adwaita" \
-      --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [
-        systemd
-        libGL
-        mesa
-      ]}"
-    
-    runHook postInstall
-  '';
-  
-  passthru.updateScript = ./update.sh;
-  
-  meta = with lib; {
-    description = "Kiro - AI-powered IDE by Amazon";
+  sourceRoot = "Kiro";
+  patchVSCodePath = true;
+
+  tests = { };
+  updateScript = ./update.sh;
+
+  meta = {
+    description = "IDE for Agentic AI workflows based on VS Code";
     homepage = "https://kiro.dev";
-    license = licenses.unfree;
-    platforms = platforms.linux;
-    maintainers = [];
+    license = lib.licenses.amazonsl;
+    sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
+    maintainers = with lib.maintainers; [ vuks ];
+    platforms = [
+      "x86_64-linux"
+      "x86_64-darwin"
+      "aarch64-darwin"
+    ];
+    mainProgram = "kiro";
   };
-}
+
+}).overrideAttrs
+  (oldAttrs: {
+    passthru = (oldAttrs.passthru or { }) // {
+      inherit sources;
+    };
+  })

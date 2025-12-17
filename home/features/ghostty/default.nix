@@ -42,10 +42,10 @@ in
       theme = "theme";
       font-family = "JetBrainsMono Nerd Font";
       font-style = "Regular";
-      font-size = 9;
+      font-size = 12;
       window-theme = "ghostty";
-      window-padding-x = 14;
-      window-padding-y = 14;
+      window-padding-x = 4;
+      window-padding-y = 4;
       confirm-close-surface = false;
       resize-overlay = "never";
       gtk-toolbar-style = "flat";

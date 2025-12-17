@@ -1,101 +1,92 @@
 {
   lib,
   stdenv,
+  callPackage,
   fetchurl,
-  autoPatchelfHook,
-  makeWrapper,
-  alsa-lib,
-  at-spi2-core,
-  gtk3,
-  libdrm,
-  xorg,
-  mesa,
-  nspr,
-  nss,
-  xdg-utils,
+  jq,
+  buildFHSEnv,
+  writeShellScript,
+  coreutils,
+  commandLineArgs ? "",
+  useVSCodeRipgrep ? stdenv.hostPlatform.isDarwin,
 }:
 
-stdenv.mkDerivation rec {
+let
+  inherit (stdenv) hostPlatform;
+  information = (lib.importJSON ./information.json);
+  source =
+    information.sources."${hostPlatform.system}"
+      or (throw "antigravity: unsupported system ${hostPlatform.system}");
+in
+(callPackage ../vscode-generic/generic.nix {
+  inherit commandLineArgs useVSCodeRipgrep;
+  inherit (information) version vscodeVersion;
   pname = "antigravity";
-  version = "1.11.2"; # matches current binary release
 
-  # Upstream binary tarball (from AUR metadata)
-  # https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/1.11.2-6251250307170304/linux-x64/Antigravity.tar.gz
-  src = fetchurl {
-    url = "https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/${version}-6251250307170304/linux-x64/Antigravity.tar.gz";
-    # Build will fail with the correct hash - copy it from the error message
-    sha256 = "sha256-0bERWudsJ1w3bqZg4eTS3CDrPnLWogawllBblEpfZLc=";
-  };
+  executableName = "antigravity";
+  longName = "Antigravity";
+  shortName = "Antigravity";
+  libraryName = "antigravity";
+  iconName = "antigravity";
 
-  # Leave the root as-is so we see `Antigravity/` after unpack
-  sourceRoot = ".";
+  src = fetchurl { inherit (source) url sha256; };
 
-  nativeBuildInputs = [
-    autoPatchelfHook
-    makeWrapper
-  ];
+  sourceRoot = if hostPlatform.isDarwin then "Antigravity.app" else "Antigravity";
 
-  # Runtime deps (mirrors AUR deps as much as makes sense on Nix)
-  buildInputs = [
-    alsa-lib
-    at-spi2-core
-    gtk3
-    libdrm
-    xorg.libXScrnSaver
-    xorg.libXtst
-    mesa
-    nspr
-    nss
-  ];
+  # When running inside an FHS environment, try linking Google Chrome or Chromium
+  # to the hardcoded Playwright search path: /opt/google/chrome/chrome
+  buildFHSEnv =
+    args:
+    buildFHSEnv (
+      args
+      // {
+        extraBuildCommands = (args.extraBuildCommands or "") + ''
+          mkdir -p "$out/opt/google/chrome"
+        '';
+        extraBwrapArgs = (args.extraBwrapArgs or [ ]) ++ [ "--tmpfs /opt/google/chrome" ];
+        runScript = writeShellScript "antigravity-wrapper" ''
+          for candidate in google-chrome-stable google-chrome chromium-browser chromium; do
+            if target=$(command -v "$candidate"); then
+              ${coreutils}/bin/ln -sf "$target" /opt/google/chrome/chrome
+              break
+            fi
+          done
+          exec ${args.runScript} "$@"
+        '';
+      }
+    );
 
-  dontConfigure = true;
-  dontBuild = true;
+  tests = { };
+  updateScript = ./update.sh;
 
-  installPhase = ''
-        runHook preInstall
-
-        mkdir -p $out/opt/antigravity
-        mkdir -p $out/bin
-        mkdir -p $out/share/applications
-        mkdir -p $out/share/icons/hicolor/512x512/apps
-
-        # After unpack, upstream layout is Antigravity/...
-        cp -r Antigravity/* $out/opt/antigravity/
-
-        # Main launcher wrapper
-        makeWrapper "$out/opt/antigravity/antigravity" "$out/bin/antigravity" \
-          --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath buildInputs}" \
-          --prefix PATH : "${lib.makeBinPath [ xdg-utils ]}"
-
-        # Icon – matches what the AUR comments reference (VSCode-style icon)
-        if [ -f Antigravity/resources/app/resources/linux/code.png ]; then
-          install -Dm644 Antigravity/resources/app/resources/linux/code.png \
-            "$out/share/icons/hicolor/512x512/apps/antigravity.png"
-        fi
-
-        # Desktop entry (includes custom URL scheme used for OAuth callback)
-        cat > "$out/share/applications/antigravity.desktop" <<EOF
-    [Desktop Entry]
-    Type=Application
-    Name=Antigravity
-    Comment=Google Antigravity – Agentic Development IDE
-    Icon=antigravity
-    Categories=Development;IDE;
-    StartupWMClass=Antigravity
-    MimeType=x-scheme-handler/antigravity;
-    X-KDE-Protocols=antigravity;
-    Exec=$out/bin/antigravity %U
-    Terminal=false
-    EOF
-
-        runHook postInstall
-  '';
-
-  meta = with lib; {
-    description = "Google Antigravity – VS Code–based agentic development IDE";
-    homepage = "https://antigravity.google/";
-    license = licenses.unfreeRedistributable;
-    platforms = [ "x86_64-linux" ];
+  meta = {
     mainProgram = "antigravity";
+    description = "Agentic development platform, evolving the IDE into the agent-first era";
+    homepage = "https://antigravity.google";
+    downloadPage = "https://antigravity.google/download";
+    changelog = "https://antigravity.google/changelog";
+    license = lib.licenses.unfree;
+    sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
+    platforms = [
+      "x86_64-linux"
+      "aarch64-linux"
+      "x86_64-darwin"
+      "aarch64-darwin"
+    ];
+    maintainers = with lib.maintainers; [
+      xiaoxiangmoe
+      Zaczero
+    ];
   };
-}
+}).overrideAttrs
+  (oldAttrs: {
+    # Disable update checks
+    nativeBuildInputs = (oldAttrs.nativeBuildInputs or [ ]) ++ [ jq ];
+    postPatch = (oldAttrs.postPatch or "") + ''
+      productJson="${
+        if stdenv.hostPlatform.isDarwin then "Contents/Resources" else "resources"
+      }/app/product.json"
+      data=$(jq 'del(.updateUrl)' "$productJson")
+      echo "$data" > "$productJson"
+    '';
+  })

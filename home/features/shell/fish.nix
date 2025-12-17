@@ -114,8 +114,6 @@ in
       gpu = "git pull";
       gp = "git push";
 
-
-
       # Docker shortcuts
       dps = "docker ps";
       dpsa = "docker ps -a";
@@ -205,8 +203,6 @@ in
           echo "'$argv[1]' is not a valid file"
         end
       '';
-
-
 
       docker-exec = ''
         set -l container $argv[1]
@@ -299,10 +295,6 @@ in
       if status is-interactive && command -v fastfetch >/dev/null
         fastfetch
       end
-
-      if command -v zoxide >/dev/null
-        zoxide init fish | source
-      end
     '';
 
     interactiveShellInit = ''
@@ -316,13 +308,9 @@ in
       bind \cf accept-autosuggestion
       bind \ck up-or-search
       bind \cj down-or-search
-      bind \e\[1;5C forward-word
-      bind \e\[1;5D backward-word
       bind \e\[H beginning-of-line
       bind \e\[F end-of-line
       bind \e\[3~ delete-char
-      bind \e\[1;5A beginning-of-line
-      bind \e\[1;5B end-of-line
 
       # Vi mode indicator
       function fish_mode_prompt

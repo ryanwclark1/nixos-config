@@ -131,6 +131,7 @@
       overlaysSet = {
         cmake-compat = import ./overlays/cmake-compat.nix;
         n8n-fix = import ./overlays/n8n-fix.nix;
+        custom-packages = import ./overlays/custom-packages.nix;
         # goose-bump = import ./overlays/goose-bump.nix;
         # passthrough = import ./overlays/passthrough.nix; # optional
       };

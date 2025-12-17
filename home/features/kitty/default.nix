@@ -29,6 +29,7 @@ let
   base15 = "99d1db"; # sky - bright cyan
   base16 = "85c1dc"; # sapphire - bright blue
   base17 = "f4b8e4"; # pink - bright purple
+  font = "JetBrainsMono Nerd Font";
 in
 
 {
@@ -52,7 +53,7 @@ in
       "LS_COLORS" = "1";
     };
     font = {
-      name = "JetBrainsMono Nerd Font";
+      name = "${font}";
       size = 12;
     };
     shellIntegration = {
@@ -107,7 +108,6 @@ in
       notify_on_cmd_finish = "unfocused 5 notify";
       background_opacity = "0.65";
       background_blur = 1;
-      # term = "xterm-256color";
       term = "xterm-kitty";
       terminfo_type = "path";
       forward_stdio = false;
