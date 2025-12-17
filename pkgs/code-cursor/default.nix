@@ -65,6 +65,7 @@ in
     if hostPlatform.isLinux then "${pname}-${version}-extracted/usr/share/cursor" else "Cursor.app";
 
   tests = { };
+  updateScript = ./update.sh;
 
   # Editing the `cursor` binary within the app bundle causes the bundle's signature
   # to be invalidated, which prevents launching starting with macOS Ventura, because Cursor is notarized.
@@ -95,6 +96,5 @@ in
 
     passthru = (oldAttrs.passthru or { }) // {
       inherit sources;
-      updateScript = ./update.sh;
     };
   })
