@@ -78,10 +78,6 @@
       e = "$EDITOR";
       o = "xdg-open";
 
-      # System management
-      sc = "systemctl";
-      scu = "systemctl --user";
-      scs = "sudo systemctl";
       wifi = "nmtui";
 
       # Docker

@@ -27,11 +27,11 @@ let
   base15 = "99d1db"; # sky - bright cyan
   base16 = "85c1dc"; # sapphire - bright blue
   base17 = "f4b8e4"; # pink - bright purple
-  font = "JetBrains Mono";
+  font = "JetBrainsMono Nerd Font";
 
 in
 {
-  home.file.".config/alacritty/creensaver.toml" = {
+  home.file.".config/alacritty/screensaver.toml" = {
     force = true;
     source = ./screensaver.toml;
   };
@@ -40,15 +40,12 @@ in
     enable = true;
     package = pkgs.alacritty;
     settings = {
-      env = {
-        TERM = "xterm-256color";
-      };
       window = {
         dynamic_title = true;
         dynamic_padding = true;
         padding = {
-          x = 2;
-          y = 2;
+          x = 4;
+          y = 4;
         };
         decorations = "None";
         blur = true; # works on macOS/KDE Wayland
@@ -66,7 +63,7 @@ in
           family = "${font}";
           style = "Italic";
         };
-        size = 9;
+        size = 12;
       };
       scrolling = {
         history = 25000;

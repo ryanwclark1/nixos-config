@@ -13,7 +13,7 @@ AGE_PUBLIC_KEY_FILE = $(AGE_DIR)/keys.txt
 RSA_BITS = 4096
 
 # Define the makefile targets and rules
-.PHONY: keygen rsa_key ed25519_key age_key get_age_public_key
+.PHONY: keygen rsa_key ed25519_key age_key get_age_public_key update-packages update-package-status
 
 keygen: rsa_key ed25519_key age_key get_age_public_key
 
@@ -215,6 +215,19 @@ fmt:
 	# format the nix files in this repo
 	nix fmt
 
-.PHONY: clean
+.PHONY: clean update-packages update-package-status
+
 clean:
 	rm -rf result
+
+############################################################################
+#
+#  Update custom packages
+#
+############################################################################
+
+update-packages:
+	@./scripts/update-packages.sh update-all
+
+update-package-status:
+	@./scripts/update-packages.sh status
