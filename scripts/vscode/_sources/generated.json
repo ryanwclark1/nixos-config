@@ -10,12 +10,12 @@
         },
         "pinned": false,
         "src": {
-            "name": "ansible-25.12.2.zip",
-            "sha256": "sha256-mglzlRBGD09RDwzfJvWaTt3btgEF/G818prJcQC8/Is=",
+            "name": "ansible-25.12.3.zip",
+            "sha256": "sha256-6G/CpzSSrRzwtay4+t46gz8aBF7qgu79NUhBypTJMrc=",
             "type": "url",
-            "url": "https://redhat.gallery.vsassets.io/_apis/public/gallery/publisher/redhat/extension/ansible/25.12.2/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://redhat.gallery.vsassets.io/_apis/public/gallery/publisher/redhat/extension/ansible/25.12.3/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "25.12.2"
+        "version": "25.12.3"
     },
     "biome": {
         "cargoLocks": null,
@@ -46,12 +46,12 @@
         },
         "pinned": false,
         "src": {
-            "name": "chatgpt-0.5.52.zip",
-            "sha256": "sha256-yxhrRDeFTEtyttrBKA5ArH+b6garBV2RIdO1lx7TEEI=",
+            "name": "chatgpt-0.5.56.zip",
+            "sha256": "sha256-FAy2Cf2XnOnctBBATloXz8y4cLNHBoXAVnlw42CQzN8=",
             "type": "url",
-            "url": "https://openai.gallery.vsassets.io/_apis/public/gallery/publisher/openai/extension/chatgpt/0.5.52/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://openai.gallery.vsassets.io/_apis/public/gallery/publisher/openai/extension/chatgpt/0.5.56/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "0.5.52"
+        "version": "0.5.56"
     },
     "claude-code": {
         "cargoLocks": null,
@@ -64,12 +64,12 @@
         },
         "pinned": false,
         "src": {
-            "name": "claude-code-2.0.70.zip",
-            "sha256": "sha256-ed2oYB6G9EuSRqgt18W69JS73+uf6vqXtwQ1ZY+eWy8=",
+            "name": "claude-code-2.0.75.zip",
+            "sha256": "sha256-PA7eL4TZTFYVlImXnZCw6aWjrLXl7/KndnkU3D2t1jw=",
             "type": "url",
-            "url": "https://anthropic.gallery.vsassets.io/_apis/public/gallery/publisher/anthropic/extension/claude-code/2.0.70/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://anthropic.gallery.vsassets.io/_apis/public/gallery/publisher/anthropic/extension/claude-code/2.0.75/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "2.0.70"
+        "version": "2.0.75"
     },
     "copilot": {
         "cargoLocks": null,
@@ -100,12 +100,12 @@
         },
         "pinned": false,
         "src": {
-            "name": "copilot-chat-0.36.2025121501.zip",
-            "sha256": "sha256-mOobfNVegGVaQkOHC19QFgiF7Uxq7S7SWElF+R6UZ08=",
+            "name": "copilot-chat-0.36.2025121901.zip",
+            "sha256": "sha256-l5ROuSYk6mDoqxlgGFV0OLw+EyG1OfSNm7BS5b/Fxpc=",
             "type": "url",
-            "url": "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot-chat/0.36.2025121501/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot-chat/0.36.2025121901/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "0.36.2025121501"
+        "version": "0.36.2025121901"
     },
     "explorer": {
         "cargoLocks": null,
@@ -211,12 +211,12 @@
         },
         "pinned": false,
         "src": {
-            "name": "mypy-type-checker-2025.3.13371016.zip",
-            "sha256": "sha256-71/IJAIC21oQjzkPlY7Nt+dkSeQDTsDYU/gdvbKXnsI=",
+            "name": "mypy-type-checker-2025.3.13521012.zip",
+            "sha256": "sha256-CSiQWwpY/43Yx0/ppwq9f21ksqLYhr0Nv/i4+sno2Qs=",
             "type": "url",
-            "url": "https://ms-python.gallery.vsassets.io/_apis/public/gallery/publisher/ms-python/extension/mypy-type-checker/2025.3.13371016/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://ms-python.gallery.vsassets.io/_apis/public/gallery/publisher/ms-python/extension/mypy-type-checker/2025.3.13521012/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "2025.3.13371016"
+        "version": "2025.3.13521012"
     },
     "pdf": {
         "cargoLocks": null,
@@ -283,12 +283,12 @@
         },
         "pinned": false,
         "src": {
-            "name": "pwc-1.1.0.zip",
-            "sha256": "sha256-qVKs90Dd5ejgzYK7ptGBloU/aPuZ1Nm/ydidSDJwq2I=",
+            "name": "pwc-1.2.0.zip",
+            "sha256": "sha256-AElVhTk2YfZXksRWfRlpA0WlYdluHLs0Lo4GCBfpZBg=",
             "type": "url",
-            "url": "https://SureshNettur.gallery.vsassets.io/_apis/public/gallery/publisher/SureshNettur/extension/pwc/1.1.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://SureshNettur.gallery.vsassets.io/_apis/public/gallery/publisher/SureshNettur/extension/pwc/1.2.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "1.1.0"
+        "version": "1.2.0"
     },
     "pyrefly": {
         "cargoLocks": null,
@@ -301,12 +301,12 @@
         },
         "pinned": false,
         "src": {
-            "name": "pyrefly-0.46.0.zip",
-            "sha256": "sha256-pBnnR69+gLMLFNltAmJADtc7vzMl32+quSmrj0BDHsg=",
+            "name": "pyrefly-0.46.2.zip",
+            "sha256": "sha256-g2vBL3WGYia3z/BdAQDDe3iCq6A9H2vCDY1xKqT9zJg=",
             "type": "url",
-            "url": "https://meta.gallery.vsassets.io/_apis/public/gallery/publisher/meta/extension/pyrefly/0.46.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://meta.gallery.vsassets.io/_apis/public/gallery/publisher/meta/extension/pyrefly/0.46.2/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "0.46.0"
+        "version": "0.46.2"
     },
     "remotehub": {
         "cargoLocks": null,
@@ -337,12 +337,12 @@
         },
         "pinned": false,
         "src": {
-            "name": "ty-2025.71.13500942.zip",
-            "sha256": "sha256-QvbmvvbJYwfhC6nA0D/NtHoUE6fXUWGx1xFO4LkWQ2M=",
+            "name": "ty-2025.80.0.zip",
+            "sha256": "sha256-keLL62w9oRLMRH++xuwlarIK8S4VWb3ArQ+TPy99mNE=",
             "type": "url",
-            "url": "https://astral-sh.gallery.vsassets.io/_apis/public/gallery/publisher/astral-sh/extension/ty/2025.71.13500942/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://astral-sh.gallery.vsassets.io/_apis/public/gallery/publisher/astral-sh/extension/ty/2025.80.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "2025.71.13500942"
+        "version": "2025.80.0"
     },
     "vscode-containers": {
         "cargoLocks": null,
@@ -409,12 +409,12 @@
         },
         "pinned": false,
         "src": {
-            "name": "vscode-pgsql-1.13.0.zip",
-            "sha256": "sha256-I4cqfLZRDhA9QnhzOZfG/5ZMr/6DVkQFoXB1fS9m03E=",
+            "name": "vscode-pgsql-1.14.0.zip",
+            "sha256": "sha256-/+VXsppHJlC+suEmu6d8lpryCKwfNWVA/nEYu4nhX3I=",
             "type": "url",
-            "url": "https://ms-ossdata.gallery.vsassets.io/_apis/public/gallery/publisher/ms-ossdata/extension/vscode-pgsql/1.13.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://ms-ossdata.gallery.vsassets.io/_apis/public/gallery/publisher/ms-ossdata/extension/vscode-pgsql/1.14.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "1.13.0"
+        "version": "1.14.0"
     },
     "vscode-python-test-adapter": {
         "cargoLocks": null,

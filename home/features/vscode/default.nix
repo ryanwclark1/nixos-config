@@ -267,14 +267,14 @@
           {
             name = "chatgpt";
             publisher = "openai";
-            sha256 = "sha256-yxhrRDeFTEtyttrBKA5ArH+b6garBV2RIdO1lx7TEEI=";
-            version = "0.5.52";
+            sha256 = "sha256-FAy2Cf2XnOnctBBATloXz8y4cLNHBoXAVnlw42CQzN8=";
+            version = "0.5.56";
           }
           {
             name = "claude-code";
             publisher = "anthropic";
-            sha256 = "sha256-ed2oYB6G9EuSRqgt18W69JS73+uf6vqXtwQ1ZY+eWy8=";
-            version = "2.0.70";
+            sha256 = "sha256-PA7eL4TZTFYVlImXnZCw6aWjrLXl7/KndnkU3D2t1jw=";
+            version = "2.0.75";
           }
           # {
           #   name = "copilot";
