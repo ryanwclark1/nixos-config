@@ -85,17 +85,16 @@ else
   exit 1
 fi
 
-# Set alt text based on the number of updates
-status_text="has-updates"
+# Set alt text and icon based on the number of updates
 if [ "$update_count" -eq 0 ]; then
   status_text="updated"
-fi
-
-# Set tooltip based on the presence of updates
-tooltip_message="System updated"
-if [ "$update_count" -gt 0 ]; then
+  icon_text=""
+  tooltip_message="System updated"
+else
+  status_text="has-updates"
+  icon_text="󰏕 "  # Update icon
   tooltip_message=$(nvd diff /run/current-system ./result | grep -e '\[U' | awk '{ for (i=3; i<NF; i++) printf $i " "; if (NF >= 3) print $NF; }' ORS="\\n" )
 fi
 
 # Output the result as JSON
-echo "{ \"text\":\"$update_count\", \"alt\":\"$status_text\", \"tooltip\":\"$tooltip_message\" }"
+echo "{ \"text\":\"${icon_text}${update_count}\", \"alt\":\"$status_text\", \"tooltip\":\"$tooltip_message\", \"class\":\"$status_text\" }"

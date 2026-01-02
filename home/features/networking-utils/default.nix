@@ -17,7 +17,7 @@
   ] ++ (if pkgs.stdenv.hostPlatform.isLinux then [
     # Linux-specific networking utilities
     inetutils # Basic networking utilities - Linux-focused implementation
-    ngrep # Network packet analyzer - Linux-specific features
+    # ngrep # Network packet analyzer - Linux-specific features (temporarily disabled due to build error)
     sngrep # CLI tool for visualizing SIP messages - primarily Linux
     nload # Network traffic monitor with ncurses - Linux-specific
     openresolv # resolv.conf management framework - Linux-specific

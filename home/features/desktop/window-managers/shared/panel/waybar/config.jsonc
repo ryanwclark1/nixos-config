@@ -7,11 +7,14 @@
     "margin-right": 0,
     "modules-left": [
         "custom/launcher",
+        "custom/system-menu",
         "hyprland/workspaces",
         "hyprland/window"
     ],
     "modules-center": [
-        "clock"
+        "clock",
+        "custom/update",
+        "custom/screenrecording-indicator"
     ],
     "modules-right": [
         "group/tray-expander",
@@ -133,7 +136,7 @@
         "tooltip-format-discharging": "{power:>1.0f}W↓ {capacity}%",
         "tooltip-format-charging": "{power:>1.0f}W↑ {capacity}%",
         "interval": 5,
-        // "on-click": "os-menu power",
+        "on-click": "~/.local/bin/scripts/system/os-menu power",
         "states": {
             "warning": 20,
             "critical": 10
@@ -167,6 +170,12 @@
         "on-click": "~/.local/bin/scripts/rofi/apps-unified.sh",
         "on-click-right": "~/.local/bin/scripts/rofi/apps-unified.sh --root",
         "tooltip": "Applications • Left: User Apps • Right: Root Apps"
+    },
+    "custom/system-menu": {
+        "format": "󰍜",
+        "on-click": "~/.local/bin/scripts/system/os-menu",
+        "on-click-right": "xdg-terminal-exec",
+        "tooltip": "System Menu\n\nLeft: Open Menu\nRight: Open Terminal"
     },
 
     "hyprland/window": {
@@ -235,5 +244,22 @@
     "custom/space": {
         "format": " ",
         "tooltip": false
+    },
+    "custom/update": {
+        "format": "{}",
+        "exec": "~/.local/bin/scripts/system/update-checker.sh --flake $HOME/nixos-config --host $HOSTNAME",
+        "on-click": "kitty -e bash -c 'cd $HOME/nixos-config && nixos-rebuild switch --flake .#$HOSTNAME && read -p \"Press Enter to close...\"'",
+        "tooltip-format": "{}",
+        "signal": 7,
+        "interval": 21600,
+        "return-type": "json",
+        "format-alt": "{}"
+    },
+    "custom/screenrecording-indicator": {
+        "on-click": "~/.local/bin/scripts/system/os-cmd-screenrecord --stop-recording",
+        "exec": "~/.local/bin/scripts/system/screenrecording-indicator.sh",
+        "signal": 8,
+        "return-type": "json",
+        "interval": 2
     }
 }

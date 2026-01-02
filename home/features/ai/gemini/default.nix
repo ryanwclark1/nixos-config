@@ -10,7 +10,9 @@ let
 in
 {
   # Install gemini-cli package
-  home.packages = [ pkgs.gemini-cli ];
+  # Temporarily disabled due to npm build cache issue
+  # home.packages = [ pkgs.gemini-cli ];
+  home.packages = [ ];
 
   home.file."${geminiHome}/AGENTS.md" = {
     force = true;

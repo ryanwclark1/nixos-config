@@ -50,6 +50,28 @@
   font-size: 14px;
 }
 
+#custom-system-menu {
+  margin-right: 7px;
+  font-size: 14px;
+}
+
+#custom-update {
+  margin: 0 7.5px;
+  min-width: 12px;
+}
+
+#custom-update.has-updates {
+  color: #ef9f76; /* accent-orange for updates available */
+}
+
+#custom-screenrecording-indicator {
+  margin: 0 7.5px;
+  min-width: 12px;
+}
+
+#custom-screenrecording-indicator.active {
+  color: #e78284; /* accent-red for active recording */
+}
 
 #custom-expand-icon {
   margin-right: 7px;
