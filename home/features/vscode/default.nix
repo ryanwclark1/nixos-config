@@ -19,160 +19,160 @@
   home.file.".config/Code/User/mcp.json" = {
     force = true;
     text = builtins.toJSON {
-    servers = {
-      filesystem = {
-        command = "npx";
-        args = [
-          "@modelcontextprotocol/server-filesystem"
-          config.home.homeDirectory
-        ];
-        description = "Provides filesystem access to home directory";
-      };
-      git = {
-        command = "docker";
-        args = [
-          "run"
-          "-i"
-          "--rm"
-          "--name"
-          "mcp-git"
-          "-v"
-          "${config.home.homeDirectory}:${config.home.homeDirectory}:rw"
-          "-v"
-          "${config.home.homeDirectory}/.gitconfig:/root/.gitconfig:ro"
-          "mcp/git"
-        ];
-        description = "Provides git repository information and operations";
-      };
-      memory = {
-        command = "docker";
-        args = [
-          "run"
-          "-i"
-          "--rm"
-          "--name"
-          "mcp-memory"
-          "-v"
-          "mcp-memory-data:/data"
-          "mcp/memory"
-        ];
-        env = {
-          DATABASE_URL = "sqlite:///data/memory.db";
+      servers = {
+        filesystem = {
+          command = "npx";
+          args = [
+            "@modelcontextprotocol/server-filesystem"
+            config.home.homeDirectory
+          ];
+          description = "Provides filesystem access to home directory";
         };
-        description = "Maintains context and memory across sessions";
-      };
-      time = {
-        command = "docker";
-        args = [
-          "run"
-          "-i"
-          "--rm"
-          "--name"
-          "mcp-time"
-          "mcp/time"
-          "--local-timezone=America/Chicago"
-        ];
-        env = {
-          TZ = "America/Chicago";
+        git = {
+          command = "docker";
+          args = [
+            "run"
+            "-i"
+            "--rm"
+            "--name"
+            "mcp-git"
+            "-v"
+            "${config.home.homeDirectory}:${config.home.homeDirectory}:rw"
+            "-v"
+            "${config.home.homeDirectory}/.gitconfig:/root/.gitconfig:ro"
+            "mcp/git"
+          ];
+          description = "Provides git repository information and operations";
         };
-        description = "Provides date and time information and operations";
-      };
-      fetch = {
-        command = "docker";
-        args = [
-          "run"
-          "-i"
-          "--rm"
-          "--name"
-          "mcp-fetch"
-          "--network"
-          "bridge"
-          "mcp/fetch"
-        ];
-        description = "Fetches and analyzes web content";
-      };
-      sequential-thinking = {
-        command = "npx";
-        args = [ "@modelcontextprotocol/server-sequential-thinking@latest" ];
-        env = {
-          NODE_ENV = "production";
+        memory = {
+          command = "docker";
+          args = [
+            "run"
+            "-i"
+            "--rm"
+            "--name"
+            "mcp-memory"
+            "-v"
+            "mcp-memory-data:/data"
+            "mcp/memory"
+          ];
+          env = {
+            DATABASE_URL = "sqlite:///data/memory.db";
+          };
+          description = "Maintains context and memory across sessions";
         };
-        description = "Helps break down complex problems into sequential steps";
-      };
-      context7 = {
-        command = "docker";
-        args = [
-          "run"
-          "-i"
-          "--rm"
-          "--name"
-          "mcp-context7"
-          "mcp/context7"
-        ];
-        env = {
-          CONTEXT7_TOKEN = "$(cat ${config.sops.secrets.context7-token.path})";
-          MCP_TRANSPORT = "stdio";
+        time = {
+          command = "docker";
+          args = [
+            "run"
+            "-i"
+            "--rm"
+            "--name"
+            "mcp-time"
+            "mcp/time"
+            "--local-timezone=America/Chicago"
+          ];
+          env = {
+            TZ = "America/Chicago";
+          };
+          description = "Provides date and time information and operations";
         };
-        description = "Provides up-to-date code documentation for AI code editors";
-      };
-      github = {
-        command = "docker";
-        args = [
-          "run"
-          "-i"
-          "--rm"
-          "--name"
-          "mcp-github"
-          "ghcr.io/github/github-mcp-server"
-        ];
-        env = {
-          GITHUB_PERSONAL_ACCESS_TOKEN = "$(cat ${config.sops.secrets.github-pat.path})";
-          GITHUB_TOOLSETS = "repos,issues,pull_requests,actions,code_security,discussions";
-          MCP_TRANSPORT = "stdio";
+        fetch = {
+          command = "docker";
+          args = [
+            "run"
+            "-i"
+            "--rm"
+            "--name"
+            "mcp-fetch"
+            "--network"
+            "bridge"
+            "mcp/fetch"
+          ];
+          description = "Fetches and analyzes web content";
         };
-        description = "GitHub repository and workflow management via MCP";
-      };
-      playwright = {
-        command = "${pkgs.playwright-mcp}/bin/mcp-server-playwright";
-        args = [ "--headless" ];
-        description = "Browser automation and web scraping via Playwright";
-      };
-      serena = {
-        command = "docker";
-        args = [
-          "run"
-          "-i"
-          "--rm"
-          "--name"
-          "mcp-serena"
-          "-v"
-          "/home/administrator/Code:/workspace/Code:rw"
-          "--network"
-          "host"
-          "ghcr.io/oraios/serena:latest"
-          "serena"
-          "start-mcp-server"
-          "--transport"
-          "stdio"
-        ];
-        env = {
-          SERENA_DOCKER = "1";
+        sequential-thinking = {
+          command = "npx";
+          args = [ "@modelcontextprotocol/server-sequential-thinking@latest" ];
+          env = {
+            NODE_ENV = "production";
+          };
+          description = "Helps break down complex problems into sequential steps";
         };
-        description = "AI-powered development assistant with Code directory access";
-      };
-      sourcebot = {
-        command = "npx";
-        args = [ "@sourcebot/mcp@latest" ];
-        env = {
-          NODE_ENV = "production";
-          SOURCEBOT_HOST = "http://localhost:3002";
-          SOURCEBOT_API_KEY = "$(cat ${config.sops.secrets."sourcebot/api-key".path})";
+        context7 = {
+          command = "docker";
+          args = [
+            "run"
+            "-i"
+            "--rm"
+            "--name"
+            "mcp-context7"
+            "mcp/context7"
+          ];
+          env = {
+            CONTEXT7_TOKEN = "$(cat ${config.sops.secrets.context7-token.path})";
+            MCP_TRANSPORT = "stdio";
+          };
+          description = "Provides up-to-date code documentation for AI code editors";
         };
-        description = "Code understanding and search via Sourcebot";
+        github = {
+          command = "docker";
+          args = [
+            "run"
+            "-i"
+            "--rm"
+            "--name"
+            "mcp-github"
+            "ghcr.io/github/github-mcp-server"
+          ];
+          env = {
+            GITHUB_PERSONAL_ACCESS_TOKEN = "$(cat ${config.sops.secrets.github-pat.path})";
+            GITHUB_TOOLSETS = "repos,issues,pull_requests,actions,code_security,discussions";
+            MCP_TRANSPORT = "stdio";
+          };
+          description = "GitHub repository and workflow management via MCP";
+        };
+        playwright = {
+          command = "${pkgs.playwright-mcp}/bin/mcp-server-playwright";
+          args = [ "--headless" ];
+          description = "Browser automation and web scraping via Playwright";
+        };
+        serena = {
+          command = "docker";
+          args = [
+            "run"
+            "-i"
+            "--rm"
+            "--name"
+            "mcp-serena"
+            "-v"
+            "/home/administrator/Code:/workspace/Code:rw"
+            "--network"
+            "host"
+            "ghcr.io/oraios/serena:latest"
+            "serena"
+            "start-mcp-server"
+            "--transport"
+            "stdio"
+          ];
+          env = {
+            SERENA_DOCKER = "1";
+          };
+          description = "AI-powered development assistant with Code directory access";
+        };
+        sourcebot = {
+          command = "npx";
+          args = [ "@sourcebot/mcp@latest" ];
+          env = {
+            NODE_ENV = "production";
+            SOURCEBOT_HOST = "http://localhost:3002";
+            SOURCEBOT_API_KEY = "$(cat ${config.sops.secrets."sourcebot/api-key".path})";
+          };
+          description = "Code understanding and search via Sourcebot";
+        };
       };
     };
   };
-};
 
   home.packages = with pkgs; [
     taplo # Even Better TOML
@@ -223,7 +223,7 @@
             eamodio.gitlens
             github.codespaces
             github.copilot
-            github.copilot-chat  # Use nixpkgs version (0.30.1) for VS Code 1.103.2 compatibility
+            # github.copilot-chat  # Removed: duplicate - using marketplace version below (0.36.2025121901)
             github.vscode-github-actions
             github.vscode-pull-request-github
             golang.go
@@ -248,154 +248,154 @@
             streetsidesoftware.code-spell-checker
             tailscale.vscode-tailscale
             tamasfe.even-better-toml
-            usernamehw.errorlens  # Removed: can be visually noisy
+            usernamehw.errorlens # Removed: can be visually noisy
             yzhang.markdown-all-in-one
           ])
           ++ (pkgs.vscode-utils.extensionsFromVscodeMarketplace [
-          {
-            name = "ansible";
-            publisher = "redhat";
-            sha256 = "sha256-6G/CpzSSrRzwtay4+t46gz8aBF7qgu79NUhBypTJMrc=";
-            version = "25.12.3";
-          }
-          {
-            name = "biome";
-            publisher = "biomejs";
-            sha256 = "sha256-TLm2ppAyZoCHNg3RpEFwUr/C04bkI62AK4kNS4R/j2U=";
-            version = "2025.11.271431";
-          }
-          {
-            name = "chatgpt";
-            publisher = "openai";
-            sha256 = "sha256-FAy2Cf2XnOnctBBATloXz8y4cLNHBoXAVnlw42CQzN8=";
-            version = "0.5.56";
-          }
-          {
-            name = "claude-code";
-            publisher = "anthropic";
-            sha256 = "sha256-PA7eL4TZTFYVlImXnZCw6aWjrLXl7/KndnkU3D2t1jw=";
-            version = "2.0.75";
-          }
-          {
-            name = "copilot";
-            publisher = "github";
-            sha256 = "sha256-7RjK8+PNI+rIuRQfCwpvswAiz991dacRO2qYhcv1vhk=";
-            version = "1.388.0";
-          }
-          {
-            name = "copilot-chat";
-            publisher = "github";
-            sha256 = "sha256-l5ROuSYk6mDoqxlgGFV0OLw+EyG1OfSNm7BS5b/Fxpc=";
-            version = "0.36.2025121901";
-          }
-          {
-            name = "explorer";
-            publisher = "vitest";
-            sha256 = "sha256-ic1Gk3jJyyD7WnXjXMymr/5YV2z3tK5VPToWeCkhqyU=";
-            version = "1.36.0";
-          }
-          {
-            name = "gemini-cli-vscode-ide-companion";
-            publisher = "Google";
-            sha256 = "sha256-gJ7ghOOrk4kvzReqfB6ZRhFonOdpJXcPh7voBgCwqPg=";
-            version = "0.20.0";
-          }
-          {
-            name = "grafana-alloy";
-            publisher = "grafana";
-            sha256 = "sha256-XcoiEDCPp6GzYQDhJArZBEWxSnZrSTHofIyLFegsbh0=";
-            version = "0.2.0";
-          }
-          {
-            name = "grafana-vscode";
-            publisher = "grafana";
-            sha256 = "sha256-TpLOMwdaEdgzWVwUcn+fO4rgLiQammWQM8LQobt8gLw=";
-            version = "0.0.19";
-          }
-          {
-            name = "mypy-type-checker";
-            publisher = "ms-python";
-            sha256 = "sha256-CSiQWwpY/43Yx0/ppwq9f21ksqLYhr0Nv/i4+sno2Qs=";
-            version = "2025.3.13521012";
-          }
-          {
-            name = "pdf";
-            publisher = "tomoki1207";
-            sha256 = "sha256-i3Rlizbw4RtPkiEsodRJEB3AUzoqI95ohyqZ0ksROps=";
-            version = "1.2.2";
-          }
-          {
-            name = "playwright";
-            publisher = "ms-playwright";
-            sha256 = "sha256-qIQS9rjzTJF0T6RWMJvaxOGcQmoXpIhzVHDMFxGMb/A=";
-            version = "1.1.17";
-          }
-          {
-            name = "prom";
-            publisher = "ventura";
-            sha256 = "sha256-h8pRrPzmu8+5ZiOLALjackr4zWuFAqi1ex7Gp2iOZKk=";
-            version = "1.3.3";
-          }
-          {
-            name = "pwc";
-            publisher = "SureshNettur";
-            sha256 = "sha256-AElVhTk2YfZXksRWfRlpA0WlYdluHLs0Lo4GCBfpZBg=";
-            version = "1.2.0";
-          }
-          {
-            name = "pyrefly";
-            publisher = "meta";
-            sha256 = "sha256-o9Nynj6Zf7aot1zzHSwrcayovxlJ3mr/XWNNhI3foBM=";
-            version = "0.46.3";
-          }
-          {
-            name = "remotehub";
-            publisher = "GitHub";
-            sha256 = "sha256-boKDVKLo8Na799OtoPnT6JxsAvQ/HoqL3FispnN6bOA=";
-            version = "0.65.2025081801";
-          }
-          {
-            name = "ty";
-            publisher = "astral-sh";
-            sha256 = "sha256-keLL62w9oRLMRH++xuwlarIK8S4VWb3ArQ+TPy99mNE=";
-            version = "2025.80.0";
-          }
-          {
-            name = "vscode-containers";
-            publisher = "ms-azuretools";
-            sha256 = "sha256-zrEZpd2geX2G4u6LkIk3d6C7vhwZZ4lwHGQR3Z0OWY4=";
-            version = "2.3.0";
-          }
-          {
-            name = "vscode-gitops-tools";
-            publisher = "weaveworks";
-            sha256 = "sha256-7MCKDnHCot/CL/SqZ2WuTxbqFdF75EC5WC+OxW0dcaE=";
-            version = "0.27.0";
-          }
-          {
-            name = "vscode-jsonnet";
-            publisher = "grafana";
-            sha256 = "sha256-Q8VzXzTdHo9h5+eCHHF1bPomPEbRsvouJcUfmFUDGMU=";
-            version = "0.7.2";
-          }
-          {
-            name = "vscode-pgsql";
-            publisher = "ms-ossdata";
-            sha256 = "sha256-/+VXsppHJlC+suEmu6d8lpryCKwfNWVA/nEYu4nhX3I=";
-            version = "1.14.0";
-          }
-          {
-            name = "vscode-python-test-adapter";
-            publisher = "littlefoxteam";
-            sha256 = "sha256-TwBPGr8bam1NSX2KRrm92DOQWeVa0k+pXT4q/isWYOI=";
-            version = "0.8.2";
-          }
-          {
-            name = "vscode-thunder-client";
-            publisher = "rangav";
-            sha256 = "sha256-e4kJVvMYsQFWxkTFkcVGr55ZGuSCjEb/9UjNN84lAkI=";
-            version = "2.38.5";
-          }
+            {
+              name = "ansible";
+              publisher = "redhat";
+              sha256 = "sha256-6G/CpzSSrRzwtay4+t46gz8aBF7qgu79NUhBypTJMrc=";
+              version = "25.12.3";
+            }
+            {
+              name = "biome";
+              publisher = "biomejs";
+              sha256 = "sha256-TLm2ppAyZoCHNg3RpEFwUr/C04bkI62AK4kNS4R/j2U=";
+              version = "2025.11.271431";
+            }
+            {
+              name = "chatgpt";
+              publisher = "openai";
+              sha256 = "sha256-FAy2Cf2XnOnctBBATloXz8y4cLNHBoXAVnlw42CQzN8=";
+              version = "0.5.56";
+            }
+            {
+              name = "claude-code";
+              publisher = "anthropic";
+              sha256 = "sha256-PA7eL4TZTFYVlImXnZCw6aWjrLXl7/KndnkU3D2t1jw=";
+              version = "2.0.75";
+            }
+            {
+              name = "copilot";
+              publisher = "github";
+              sha256 = "sha256-7RjK8+PNI+rIuRQfCwpvswAiz991dacRO2qYhcv1vhk=";
+              version = "1.388.0";
+            }
+            {
+              name = "copilot-chat";
+              publisher = "github";
+              sha256 = "sha256-l5ROuSYk6mDoqxlgGFV0OLw+EyG1OfSNm7BS5b/Fxpc=";
+              version = "0.36.2025121901";
+            }
+            {
+              name = "explorer";
+              publisher = "vitest";
+              sha256 = "sha256-ic1Gk3jJyyD7WnXjXMymr/5YV2z3tK5VPToWeCkhqyU=";
+              version = "1.36.0";
+            }
+            {
+              name = "gemini-cli-vscode-ide-companion";
+              publisher = "Google";
+              sha256 = "sha256-gJ7ghOOrk4kvzReqfB6ZRhFonOdpJXcPh7voBgCwqPg=";
+              version = "0.20.0";
+            }
+            {
+              name = "grafana-alloy";
+              publisher = "grafana";
+              sha256 = "sha256-XcoiEDCPp6GzYQDhJArZBEWxSnZrSTHofIyLFegsbh0=";
+              version = "0.2.0";
+            }
+            {
+              name = "grafana-vscode";
+              publisher = "grafana";
+              sha256 = "sha256-TpLOMwdaEdgzWVwUcn+fO4rgLiQammWQM8LQobt8gLw=";
+              version = "0.0.19";
+            }
+            {
+              name = "mypy-type-checker";
+              publisher = "ms-python";
+              sha256 = "sha256-CSiQWwpY/43Yx0/ppwq9f21ksqLYhr0Nv/i4+sno2Qs=";
+              version = "2025.3.13521012";
+            }
+            {
+              name = "pdf";
+              publisher = "tomoki1207";
+              sha256 = "sha256-i3Rlizbw4RtPkiEsodRJEB3AUzoqI95ohyqZ0ksROps=";
+              version = "1.2.2";
+            }
+            {
+              name = "playwright";
+              publisher = "ms-playwright";
+              sha256 = "sha256-qIQS9rjzTJF0T6RWMJvaxOGcQmoXpIhzVHDMFxGMb/A=";
+              version = "1.1.17";
+            }
+            {
+              name = "prom";
+              publisher = "ventura";
+              sha256 = "sha256-h8pRrPzmu8+5ZiOLALjackr4zWuFAqi1ex7Gp2iOZKk=";
+              version = "1.3.3";
+            }
+            {
+              name = "pwc";
+              publisher = "SureshNettur";
+              sha256 = "sha256-AElVhTk2YfZXksRWfRlpA0WlYdluHLs0Lo4GCBfpZBg=";
+              version = "1.2.0";
+            }
+            {
+              name = "pyrefly";
+              publisher = "meta";
+              sha256 = "sha256-o9Nynj6Zf7aot1zzHSwrcayovxlJ3mr/XWNNhI3foBM=";
+              version = "0.46.3";
+            }
+            {
+              name = "remotehub";
+              publisher = "GitHub";
+              sha256 = "sha256-boKDVKLo8Na799OtoPnT6JxsAvQ/HoqL3FispnN6bOA=";
+              version = "0.65.2025081801";
+            }
+            {
+              name = "ty";
+              publisher = "astral-sh";
+              sha256 = "sha256-keLL62w9oRLMRH++xuwlarIK8S4VWb3ArQ+TPy99mNE=";
+              version = "2025.80.0";
+            }
+            {
+              name = "vscode-containers";
+              publisher = "ms-azuretools";
+              sha256 = "sha256-zrEZpd2geX2G4u6LkIk3d6C7vhwZZ4lwHGQR3Z0OWY4=";
+              version = "2.3.0";
+            }
+            {
+              name = "vscode-gitops-tools";
+              publisher = "weaveworks";
+              sha256 = "sha256-7MCKDnHCot/CL/SqZ2WuTxbqFdF75EC5WC+OxW0dcaE=";
+              version = "0.27.0";
+            }
+            {
+              name = "vscode-jsonnet";
+              publisher = "grafana";
+              sha256 = "sha256-Q8VzXzTdHo9h5+eCHHF1bPomPEbRsvouJcUfmFUDGMU=";
+              version = "0.7.2";
+            }
+            {
+              name = "vscode-pgsql";
+              publisher = "ms-ossdata";
+              sha256 = "sha256-/+VXsppHJlC+suEmu6d8lpryCKwfNWVA/nEYu4nhX3I=";
+              version = "1.14.0";
+            }
+            {
+              name = "vscode-python-test-adapter";
+              publisher = "littlefoxteam";
+              sha256 = "sha256-TwBPGr8bam1NSX2KRrm92DOQWeVa0k+pXT4q/isWYOI=";
+              version = "0.8.2";
+            }
+            {
+              name = "vscode-thunder-client";
+              publisher = "rangav";
+              sha256 = "sha256-e4kJVvMYsQFWxkTFkcVGr55ZGuSCjEb/9UjNN84lAkI=";
+              version = "2.38.5";
+            }
           ]);
         userSettings = {
           "accessibility.dimUnfocused.enabled" = true;
@@ -546,22 +546,21 @@
 
           ##### MCP (Model Context Protocol) Settings #####
           # MCP Core Settings
-          "chat.mcp.enabled" = true;  # Enable MCP functionality
-          "chat.mcp.autostart" = "newAndOutdated";  # Auto-start MCP servers (vs "never")
-          "chat.mcp.discovery.enabled" = true;  # Enable MCP server discovery
+          "chat.mcp.enabled" = true; # Enable MCP functionality
+          "chat.mcp.autostart" = "newAndOutdated"; # Auto-start MCP servers (vs "never")
+          "chat.mcp.discovery.enabled" = true; # Enable MCP server discovery
 
           # Disable specific MCP features
-          "chat.mcp.assisted.nuget.enabled" = false;  # Disable NuGet assistance (not needed)
+          "chat.mcp.assisted.nuget.enabled" = false; # Disable NuGet assistance (not needed)
 
           # MCP Server Sampling (empty = use defaults)
-          "chat.mcp.serverSampling" = {};
+          "chat.mcp.serverSampling" = { };
 
           # Context7 Integration
-          "github.copilot.chat.newWorkspace.useContext7" = true;  # Enable Context7 for new workspaces
+          "github.copilot.chat.newWorkspace.useContext7" = true; # Enable Context7 for new workspaces
 
           ###  Chatgpt - Codex ###
           "chatgpt.openOnStartup" = true;
-
 
           #####  Dev Containers #####
           # "dev.containers.defaultExtensionsIfInstalledLocally" = [
@@ -863,7 +862,6 @@
           # "vscode-kubernetes.log-viewer.destination" = "Terminal";
           # "vscode-kubernetes.log-viewer.follow" = true;
           # "vscode-kubernetes.log-viewer.timestamp" = true;
-
 
           ##### CSS #####
           # "[css]"."editor.defaultFormatter" = "esbenp.prettier-vscode";

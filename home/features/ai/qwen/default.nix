@@ -196,7 +196,7 @@ in
   };
 
   home.packages = with pkgs; [
-    qwen-code
+    # qwen-code # Temporarily disabled due to npm cache build error
   ];
 
   # Create Qwen Code settings.json configuration
