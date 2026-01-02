@@ -7,9 +7,18 @@
     ./session
     ./clipboard
     ./scripts/system-menu.nix  # System menu launcher (walker-based)
-    ./scripts/system-menu-rofi.nix  # System menu launcher (rofi-based)
+    ./scripts/rofi-system-menu.nix  # System menu launcher (rofi-based)
     ./utils.nix
   ];
+
+  # # TODO: Relocate
+  # # Rofi scripts (common across window managers)
+    ".local/bin/scripts/rofi/rofi-apps-unified.sh" = {
+      force = true;
+      source = ./scripts/rofi/rofi-apps-unified.sh;
+      executable = true;
+    };
+
 
   # Shared window manager scripts
   home.file = {

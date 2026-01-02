@@ -66,9 +66,9 @@
         let
           browser = [
             "google-chrome.desktop"
+            "chromium.desktop"
             "firefox.desktop"
             "zen.desktop"
-            "chromium.desktop"
           ];
 
           audioPlayers = [

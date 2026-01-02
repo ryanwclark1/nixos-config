@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+cmd="$*"
+exec setsid uwsm-app -- xdg-terminal-exec --app-id=org.os.terminal --title=OS -e bash -c "os-show-logo; $cmd; os-show-done"

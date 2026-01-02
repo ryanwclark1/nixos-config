@@ -93,14 +93,13 @@
     sd              # Modern find & replace (better sed)
     repgrep         # Ripgrep with replacement support
     fselect         # Find files with SQL-like queries
-    fd              # Modern find replacement
   ];
 
   # Shell aliases for convenience
   home.shellAliases = {
     # Ripgrep shortcuts
     rg = "rg --smart-case";
-    rgf = "rg --files";
+    # rgf = "rg --files";
     rgi = "rg -i";
     rgl = "rg -l";
     rgc = "rg -c";

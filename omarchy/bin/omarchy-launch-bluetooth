@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+rfkill unblock bluetooth
+exec omarchy-launch-or-focus-tui bluetui

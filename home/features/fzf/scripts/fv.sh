@@ -60,7 +60,7 @@ has() {
 }
 
 select_from() {
-  local o cmd='command -v' c
+  local o cmd='command -v' c cmd_path
   local OPTIND=1        # <<< reset OPTIND for getopts in this function
   while getopts 'c:' o; do
     case "$o" in
@@ -69,7 +69,8 @@ select_from() {
   done
   shift "$((OPTIND-1))"
   for c; do
-    if $cmd "${c%% *}" &> /dev/null; then
+    cmd_path=$($cmd "${c%% *}" 2>/dev/null)
+    if [[ -n "$cmd_path" ]] && [[ -x "$cmd_path" ]]; then
       echo "$c"
       return 0
     fi
@@ -117,8 +118,19 @@ fi
 # Search Tool
 if [[ -v FV_SEARCH && -n "$FV_SEARCH" ]]; then
   search_cmd="$FV_SEARCH"
+  # Normalize ripgrep to rg for option handling
+  [[ "$search_cmd" == "ripgrep" ]] && search_cmd="rg"
 else
-  search_cmd=$(select_from 'rg' 'ag' 'ack' 'grep')
+  # Check for ripgrep (rg) first, then ag, ack, grep
+  # Also check for 'ripgrep' in case rg symlink doesn't exist
+  # Use explicit PATH check as fallback for Nix environments
+  if command -v rg &>/dev/null && [[ -x "$(command -v rg)" ]]; then
+    search_cmd="rg"
+  elif command -v ripgrep &>/dev/null && [[ -x "$(command -v ripgrep)" ]]; then
+    search_cmd="rg"  # Normalize to rg
+  else
+    search_cmd=$(select_from 'ag' 'ack' 'grep')
+  fi
 fi
 [[ -z "$search_cmd" ]] && die "No search tool found (install rg/ag/ack/grep)"
 if [[ "$search_cmd" == "grep" ]]; then
@@ -140,9 +152,17 @@ fi
 case "$search_cmd" in
   'rg')
     search_opts+=( '--color=always' )
-    [[ -n "$allfiles" ]] && search_opts+=( '--hidden' '--no-ignore' )
-    [[ -z "$search_str" ]] && search_opts+=( '-l' )
-    [[ -z "$allfiles" ]] && search_opts+=( '--glob=!{bower_components,node_modules,jspm_packages,.cvs,.git,.hg,.svn}' )
+    if [[ -z "$search_str" ]]; then
+      # When no search string, list files instead of searching
+      search_opts+=( '--files' )
+      [[ -n "$allfiles" ]] && search_opts+=( '--hidden' '--no-ignore' )
+      [[ -z "$allfiles" ]] && search_opts+=( '--glob=!{bower_components,node_modules,jspm_packages,.cvs,.git,.hg,.svn}' )
+    else
+      # When searching, use -l to list matching files
+      search_opts+=( '-l' )
+      [[ -n "$allfiles" ]] && search_opts+=( '--hidden' '--no-ignore' )
+      [[ -z "$allfiles" ]] && search_opts+=( '--glob=!{bower_components,node_modules,jspm_packages,.cvs,.git,.hg,.svn}' )
+    fi
     ;;
   'ag')
     search_opts+=( '--color' )

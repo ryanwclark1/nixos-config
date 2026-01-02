@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+os-state clear re*-required
+os-hyprland-window-close-all
+sleep 1 # Allow apps like Chrome to shutdown correctly
+systemctl reboot --no-wall

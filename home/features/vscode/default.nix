@@ -757,7 +757,6 @@
           "python.venvFolders" = [ ".venv" ];
 
           ##### Docker Compose #####
-
           "[dockercompose]" = {
             "editor.autoIndent" = "advanced";
             "editor.defaultFormatter" = "redhat.vscode-yaml";
@@ -865,18 +864,6 @@
           # "vscode-kubernetes.log-viewer.follow" = true;
           # "vscode-kubernetes.log-viewer.timestamp" = true;
 
-
-          ##### Snyk #####
-          # "snyk.advanced.cliPath" = "${config.home.homeDirectory}/.local/share/snyk/vscode-cli/snyk-linux";
-          # "snyk.folderConfigs" = [
-          #   {
-          #     "baseBranch" = "main";
-          #     "folderPath" = "${config.home.homeDirectory}/nixos-config";
-          #     "localBranches" = [
-          #       "main"
-          #     ];
-          #   }
-          # ];
 
           ##### CSS #####
           # "[css]"."editor.defaultFormatter" = "esbenp.prettier-vscode";

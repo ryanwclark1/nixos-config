@@ -6,7 +6,7 @@
 }:
 
 {
-  # Enhanced screenshot utilities with omarchy improvements
+  # Enhanced screenshot utilities
 
   home.packages = with pkgs; [
     hyprshot # Screenshot tool for Hyprland (required for screenshot-enhanced)
