@@ -14,13 +14,13 @@
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "codex";
-  version = "0.77.0";
+  version = "0.73.0";
 
   src = fetchFromGitHub {
     owner = "openai";
     repo = "codex";
-    rev = "rust-v0.77.0";
-    hash = "sha256-d6oPRb56jKRySUE0XGOKlPmzAxAVIQfdsUgysaHDdNI=";
+    rev = "rust-v${finalAttrs.version}";
+    hash = "sha256-6oVSscGpMcJGOJ90JuwmYe6HbFteoTdTPr2AGU84JzQ=";
   };
 
   sourceRoot = "${finalAttrs.src.name}/codex-rs";
@@ -62,7 +62,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   meta = {
     description = "Lightweight coding agent that runs in your terminal";
     homepage = "https://github.com/openai/codex";
-    changelog = "https://raw.githubusercontent.com/openai/codex/refs/tags/rust-v0.77.0/CHANGELOG.md";
+    changelog = "https://raw.githubusercontent.com/openai/codex/refs/tags/rust-v${finalAttrs.version}/CHANGELOG.md";
     license = lib.licenses.asl20;
     mainProgram = "codex";
     maintainers = with lib.maintainers; [

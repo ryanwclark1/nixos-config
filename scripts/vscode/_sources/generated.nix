@@ -179,11 +179,11 @@
   };
   pyrefly = {
     pname = "pyrefly";
-    version = "0.46.2";
+    version = "0.46.3";
     src = fetchurl {
-      url = "https://meta.gallery.vsassets.io/_apis/public/gallery/publisher/meta/extension/pyrefly/0.46.2/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "pyrefly-0.46.2.zip";
-      sha256 = "sha256-g2vBL3WGYia3z/BdAQDDe3iCq6A9H2vCDY1xKqT9zJg=";
+      url = "https://meta.gallery.vsassets.io/_apis/public/gallery/publisher/meta/extension/pyrefly/0.46.3/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "pyrefly-0.46.3.zip";
+      sha256 = "sha256-o9Nynj6Zf7aot1zzHSwrcayovxlJ3mr/XWNNhI3foBM=";
     };
     publisher = "meta";
     name = "pyrefly";
