@@ -29,7 +29,7 @@
     };
 
     # Common kernel settings
-    kernelPackages = pkgs.linuxKernel.packages.linux_6_17;
+    kernelPackages = pkgs.linuxKernel.packages.linux_6_18;
 
     # Enable systemd in initrd for better boot process
     initrd = {
