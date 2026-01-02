@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+if (($# == 0)); then
+  echo "Usage: os-launch-or-focus-webapp [window-pattern] [url-and-flags...]"
+  exit 1
+fi
+
+WINDOW_PATTERN="$1"
+shift
+LAUNCH_COMMAND="os-launch-webapp $@"
+
+exec os-launch-or-focus "$WINDOW_PATTERN" "$LAUNCH_COMMAND"

@@ -5,28 +5,30 @@
   ...
 }:
 
-let
-  opencodeHome = "${config.home.homeDirectory}/opencode";
-in
+
 {
   programs.opencode = {
     enable = true;
     package = pkgs.opencode;
-    # settings = {
-    #   autoAccept = true;
-    #   hasSeenIdeIntegrationNudge = true;
-    #   ideMode = true;
-    #   selectedAuthType = "oauth-personal";
-    #   theme = "Default";
-    #   vimMode = true;
-
-      # Import MCP servers configuration
-    #   mcpServers = (builtins.fromJSON (builtins.readFile ./mcp-servers.json));
-    # };
-  };
-
-  home.file."${opencodeHome}/ollama.json" = {
-    force = true;
-    source = ./ollama.json;
+    settings = {
+      theme = "catppuccin";
+      provider = {
+        ollama = {
+          npm = "@ai-sdk/openai-compatible";
+          name = "Ollama (local)";
+          options = {
+            baseURL = "http://localhost:11434/v1";
+          };
+          models = {
+            "devstral-small-2" = {
+              name = "devstral-small-2";
+            };
+            "qwen3-coder" = {
+              name = "hf.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:Q4_K_M";
+            };
+          };
+        };
+      };
+    };
   };
 }

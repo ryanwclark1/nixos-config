@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-cmd="$*"
-exec setsid uwsm-app -- xdg-terminal-exec --app-id=com.omarchy.Omarchy --title=Omarchy -e bash -c "omarchy-show-logo; $cmd; omarchy-show-done"

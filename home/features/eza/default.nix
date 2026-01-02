@@ -25,6 +25,6 @@
   home.shellAliases = {
     ls = "eza --all --long --icons --octal-permissions --header --smart-group --group-directories-first --hyperlink";
     l = "eza --all --header --group-directories-first";
-    lt = "eza --long --all --git-ignore --icons --tree --hyperlink";
+    lt = "eza --all --git-ignore --icons --tree --hyperlink --level=2 --no-symlinks";
   };
 }

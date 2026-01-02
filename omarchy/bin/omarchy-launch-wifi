@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+rfkill unblock wifi
+omarchy-launch-or-focus-tui impala

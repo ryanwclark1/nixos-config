@@ -83,14 +83,5 @@
       recursive = true;
       executable = true;
     };
-
-    # TODO: Relocate
-    # Rofi scripts (common across window managers)
-    ".local/bin/scripts/rofi" = {
-      force = true;
-      source = ./scripts/rofi;
-      recursive = true;
-      executable = true;
-    };
   };
 }

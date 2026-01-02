@@ -72,8 +72,6 @@
       "AUTO_PUSHD"
       "PUSHD_IGNORE_DUPS"
       "PUSHD_SILENT"
-      "CORRECT"
-      "CORRECT_ALL"
       "GLOB_COMPLETE"
       "EXTENDED_GLOB"
       "NO_CASE_GLOB"
@@ -137,15 +135,6 @@
           repo = "zsh-nix-shell";
           rev = "master";
           sha256 = "sha256-IT3wpfw8zhiNQsrw59lbSWYh0NQ1CUdUtFzRzHlURH0=";
-        };
-      }
-      {
-        name = "you-should-use";
-        src = pkgs.fetchFromGitHub {
-          owner = "MichaelAquilina";
-          repo = "zsh-you-should-use";
-          rev = "master";
-          sha256 = "sha256-u3abhv9ewq3m4QsnsxT017xdlPm3dYq5dqHNmQhhcpI=";
         };
       }
     ];

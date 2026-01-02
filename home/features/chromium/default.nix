@@ -10,14 +10,14 @@
       "--enable-features=TouchpadOverscrollHistoryNavigation"
       # Chromium crash workaround for Wayland color management on Hyprland
       "--disable-features=WaylandWpColorManagerV1"
-      "--load-extension=${config.home.homeDirectory}/.local/share/omarchy/default/chromium/extensions/copy-url"
+      "--load-extension=${config.home.homeDirectory}/.local/share/os/default/chromium/extensions/copy-url"
     ];
     # dictionaries = [ pkgs.hunspellDicts.en_US ];
     extensions = [ ];
     nativeMessagingHosts = [ ];
   };
 
-  # Provide the custom Omarchy extension from the repo in the expected path
-  home.file.".local/share/omarchy/default/chromium/extensions/copy-url".source =
+  # Provide the custom extension from the repo in the expected path
+  home.file.".local/share/os/default/chromium/extensions/copy-url".source =
     ./extensions/copy-url;
 }

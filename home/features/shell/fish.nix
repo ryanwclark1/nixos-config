@@ -157,6 +157,18 @@ in
 
     # Functions
     functions = {
+      # Wrapper for cd to handle paths starting with '-'
+      cd = ''
+        if test (count $argv) -eq 0
+          builtin cd
+        else if string match -q -- '-*' $argv[1]
+          # Path starts with '-', use '--' to prevent option parsing
+          builtin cd -- $argv
+        else
+          builtin cd $argv
+        end
+      '';
+
       mkcd = ''
         mkdir -p $argv[1] && cd $argv[1]
       '';
@@ -244,18 +256,6 @@ in
 
       cheat = ''
         curl -s "cheat.sh/$argv[1]"
-      '';
-
-      ll = ''
-        eza -la --color=always --group-directories-first
-      '';
-
-      la = ''
-        eza -a --color=always --group-directories-first
-      '';
-
-      lt = ''
-        eza --tree --color=always --level=2
       '';
 
       find = ''
