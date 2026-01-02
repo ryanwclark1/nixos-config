@@ -3,11 +3,11 @@
 {
   ansible = {
     pname = "ansible";
-    version = "25.12.2";
+    version = "25.12.3";
     src = fetchurl {
-      url = "https://redhat.gallery.vsassets.io/_apis/public/gallery/publisher/redhat/extension/ansible/25.12.2/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "ansible-25.12.2.zip";
-      sha256 = "sha256-mglzlRBGD09RDwzfJvWaTt3btgEF/G818prJcQC8/Is=";
+      url = "https://redhat.gallery.vsassets.io/_apis/public/gallery/publisher/redhat/extension/ansible/25.12.3/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "ansible-25.12.3.zip";
+      sha256 = "sha256-6G/CpzSSrRzwtay4+t46gz8aBF7qgu79NUhBypTJMrc=";
     };
     publisher = "redhat";
     name = "ansible";
@@ -25,22 +25,22 @@
   };
   chatgpt = {
     pname = "chatgpt";
-    version = "0.5.52";
+    version = "0.5.56";
     src = fetchurl {
-      url = "https://openai.gallery.vsassets.io/_apis/public/gallery/publisher/openai/extension/chatgpt/0.5.52/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "chatgpt-0.5.52.zip";
-      sha256 = "sha256-yxhrRDeFTEtyttrBKA5ArH+b6garBV2RIdO1lx7TEEI=";
+      url = "https://openai.gallery.vsassets.io/_apis/public/gallery/publisher/openai/extension/chatgpt/0.5.56/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "chatgpt-0.5.56.zip";
+      sha256 = "sha256-FAy2Cf2XnOnctBBATloXz8y4cLNHBoXAVnlw42CQzN8=";
     };
     publisher = "openai";
     name = "chatgpt";
   };
   claude-code = {
     pname = "claude-code";
-    version = "2.0.70";
+    version = "2.0.75";
     src = fetchurl {
-      url = "https://anthropic.gallery.vsassets.io/_apis/public/gallery/publisher/anthropic/extension/claude-code/2.0.70/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "claude-code-2.0.70.zip";
-      sha256 = "sha256-ed2oYB6G9EuSRqgt18W69JS73+uf6vqXtwQ1ZY+eWy8=";
+      url = "https://anthropic.gallery.vsassets.io/_apis/public/gallery/publisher/anthropic/extension/claude-code/2.0.75/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "claude-code-2.0.75.zip";
+      sha256 = "sha256-PA7eL4TZTFYVlImXnZCw6aWjrLXl7/KndnkU3D2t1jw=";
     };
     publisher = "anthropic";
     name = "claude-code";
@@ -58,11 +58,11 @@
   };
   copilot-chat = {
     pname = "copilot-chat";
-    version = "0.36.2025121501";
+    version = "0.36.2025121901";
     src = fetchurl {
-      url = "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot-chat/0.36.2025121501/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "copilot-chat-0.36.2025121501.zip";
-      sha256 = "sha256-mOobfNVegGVaQkOHC19QFgiF7Uxq7S7SWElF+R6UZ08=";
+      url = "https://github.gallery.vsassets.io/_apis/public/gallery/publisher/github/extension/copilot-chat/0.36.2025121901/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "copilot-chat-0.36.2025121901.zip";
+      sha256 = "sha256-l5ROuSYk6mDoqxlgGFV0OLw+EyG1OfSNm7BS5b/Fxpc=";
     };
     publisher = "github";
     name = "copilot-chat";
@@ -124,11 +124,11 @@
   };
   mypy-type-checker = {
     pname = "mypy-type-checker";
-    version = "2025.3.13371016";
+    version = "2025.3.13521012";
     src = fetchurl {
-      url = "https://ms-python.gallery.vsassets.io/_apis/public/gallery/publisher/ms-python/extension/mypy-type-checker/2025.3.13371016/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "mypy-type-checker-2025.3.13371016.zip";
-      sha256 = "sha256-71/IJAIC21oQjzkPlY7Nt+dkSeQDTsDYU/gdvbKXnsI=";
+      url = "https://ms-python.gallery.vsassets.io/_apis/public/gallery/publisher/ms-python/extension/mypy-type-checker/2025.3.13521012/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "mypy-type-checker-2025.3.13521012.zip";
+      sha256 = "sha256-CSiQWwpY/43Yx0/ppwq9f21ksqLYhr0Nv/i4+sno2Qs=";
     };
     publisher = "ms-python";
     name = "mypy-type-checker";
@@ -168,22 +168,22 @@
   };
   pwc = {
     pname = "pwc";
-    version = "1.1.0";
+    version = "1.2.0";
     src = fetchurl {
-      url = "https://SureshNettur.gallery.vsassets.io/_apis/public/gallery/publisher/SureshNettur/extension/pwc/1.1.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "pwc-1.1.0.zip";
-      sha256 = "sha256-qVKs90Dd5ejgzYK7ptGBloU/aPuZ1Nm/ydidSDJwq2I=";
+      url = "https://SureshNettur.gallery.vsassets.io/_apis/public/gallery/publisher/SureshNettur/extension/pwc/1.2.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "pwc-1.2.0.zip";
+      sha256 = "sha256-AElVhTk2YfZXksRWfRlpA0WlYdluHLs0Lo4GCBfpZBg=";
     };
     publisher = "SureshNettur";
     name = "pwc";
   };
   pyrefly = {
     pname = "pyrefly";
-    version = "0.46.0";
+    version = "0.46.2";
     src = fetchurl {
-      url = "https://meta.gallery.vsassets.io/_apis/public/gallery/publisher/meta/extension/pyrefly/0.46.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "pyrefly-0.46.0.zip";
-      sha256 = "sha256-pBnnR69+gLMLFNltAmJADtc7vzMl32+quSmrj0BDHsg=";
+      url = "https://meta.gallery.vsassets.io/_apis/public/gallery/publisher/meta/extension/pyrefly/0.46.2/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "pyrefly-0.46.2.zip";
+      sha256 = "sha256-g2vBL3WGYia3z/BdAQDDe3iCq6A9H2vCDY1xKqT9zJg=";
     };
     publisher = "meta";
     name = "pyrefly";
@@ -201,11 +201,11 @@
   };
   ty = {
     pname = "ty";
-    version = "2025.71.13500942";
+    version = "2025.80.0";
     src = fetchurl {
-      url = "https://astral-sh.gallery.vsassets.io/_apis/public/gallery/publisher/astral-sh/extension/ty/2025.71.13500942/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "ty-2025.71.13500942.zip";
-      sha256 = "sha256-QvbmvvbJYwfhC6nA0D/NtHoUE6fXUWGx1xFO4LkWQ2M=";
+      url = "https://astral-sh.gallery.vsassets.io/_apis/public/gallery/publisher/astral-sh/extension/ty/2025.80.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "ty-2025.80.0.zip";
+      sha256 = "sha256-keLL62w9oRLMRH++xuwlarIK8S4VWb3ArQ+TPy99mNE=";
     };
     publisher = "astral-sh";
     name = "ty";
@@ -245,11 +245,11 @@
   };
   vscode-pgsql = {
     pname = "vscode-pgsql";
-    version = "1.13.0";
+    version = "1.14.0";
     src = fetchurl {
-      url = "https://ms-ossdata.gallery.vsassets.io/_apis/public/gallery/publisher/ms-ossdata/extension/vscode-pgsql/1.13.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "vscode-pgsql-1.13.0.zip";
-      sha256 = "sha256-I4cqfLZRDhA9QnhzOZfG/5ZMr/6DVkQFoXB1fS9m03E=";
+      url = "https://ms-ossdata.gallery.vsassets.io/_apis/public/gallery/publisher/ms-ossdata/extension/vscode-pgsql/1.14.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "vscode-pgsql-1.14.0.zip";
+      sha256 = "sha256-/+VXsppHJlC+suEmu6d8lpryCKwfNWVA/nEYu4nhX3I=";
     };
     publisher = "ms-ossdata";
     name = "vscode-pgsql";

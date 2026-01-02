@@ -34,7 +34,7 @@
     ../common/optional/services/gnome-services.nix
     ../common/optional/services/nfs.nix
     ../common/optional/services/printing.nix
-    ../common/optional/services/steam.nix
+    # ../common/optional/services/steam.nix  # Temporarily disabled due to build failures
     ../common/optional/services/virtualisation.nix
     ../common/optional/services/webcam.nix
     ../common/optional/services/xdg.nix
@@ -103,6 +103,27 @@
   # Framework-specific packages
   environment.systemPackages = with pkgs; [
     fw-ectool # EC-Tool adjusted for usage with framework embedded controller
+  ];
+
+  # Disable Intel OpenCL to avoid SSL certificate download issues
+  # The framework-12th-gen-intel module may enable this, but it fails to download
+  # from Intel's servers due to SSL certificate verification issues
+  # Replace intel-ocl with a dummy package to prevent download attempts
+  nixpkgs.overlays = [
+    (final: prev: {
+      intel-ocl = prev.stdenv.mkDerivation {
+        pname = "intel-ocl-dummy";
+        version = "5.0-63503";
+        dontUnpack = true;
+        dontBuild = true;
+        installPhase = "mkdir -p $out";
+        meta = {
+          description = "Dummy Intel OpenCL package (disabled due to SSL certificate issues)";
+          license = prev.lib.licenses.unfree;
+          platforms = prev.lib.platforms.linux;
+        };
+      };
+    })
   ];
 
   system.stateVersion = "24.11";
