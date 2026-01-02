@@ -255,8 +255,8 @@
           {
             name = "ansible";
             publisher = "redhat";
-            sha256 = "sha256-mglzlRBGD09RDwzfJvWaTt3btgEF/G818prJcQC8/Is=";
-            version = "25.12.2";
+            sha256 = "sha256-6G/CpzSSrRzwtay4+t46gz8aBF7qgu79NUhBypTJMrc=";
+            version = "25.12.3";
           }
           {
             name = "biome";
@@ -276,18 +276,18 @@
             sha256 = "sha256-PA7eL4TZTFYVlImXnZCw6aWjrLXl7/KndnkU3D2t1jw=";
             version = "2.0.75";
           }
-          # {
-          #   name = "copilot";
-          #   publisher = "github";
-          #   sha256 = "sha256-7RjK8+PNI+rIuRQfCwpvswAiz991dacRO2qYhcv1vhk=";
-          #   version = "1.388.0";
-          # }
-          # {
-          #   name = "copilot-chat";
-          #   publisher = "github";
-          #   sha256 = "sha256-mOobfNVegGVaQkOHC19QFgiF7Uxq7S7SWElF+R6UZ08=";
-          #   version = "0.36.2025121501";
-          # }
+          {
+            name = "copilot";
+            publisher = "github";
+            sha256 = "sha256-7RjK8+PNI+rIuRQfCwpvswAiz991dacRO2qYhcv1vhk=";
+            version = "1.388.0";
+          }
+          {
+            name = "copilot-chat";
+            publisher = "github";
+            sha256 = "sha256-l5ROuSYk6mDoqxlgGFV0OLw+EyG1OfSNm7BS5b/Fxpc=";
+            version = "0.36.2025121901";
+          }
           {
             name = "explorer";
             publisher = "vitest";
@@ -315,8 +315,8 @@
           {
             name = "mypy-type-checker";
             publisher = "ms-python";
-            sha256 = "sha256-71/IJAIC21oQjzkPlY7Nt+dkSeQDTsDYU/gdvbKXnsI=";
-            version = "2025.3.13371016";
+            sha256 = "sha256-CSiQWwpY/43Yx0/ppwq9f21ksqLYhr0Nv/i4+sno2Qs=";
+            version = "2025.3.13521012";
           }
           {
             name = "pdf";
@@ -339,14 +339,14 @@
           {
             name = "pwc";
             publisher = "SureshNettur";
-            sha256 = "sha256-qVKs90Dd5ejgzYK7ptGBloU/aPuZ1Nm/ydidSDJwq2I=";
-            version = "1.1.0";
+            sha256 = "sha256-AElVhTk2YfZXksRWfRlpA0WlYdluHLs0Lo4GCBfpZBg=";
+            version = "1.2.0";
           }
           {
             name = "pyrefly";
             publisher = "meta";
-            sha256 = "sha256-pBnnR69+gLMLFNltAmJADtc7vzMl32+quSmrj0BDHsg=";
-            version = "0.46.0";
+            sha256 = "sha256-o9Nynj6Zf7aot1zzHSwrcayovxlJ3mr/XWNNhI3foBM=";
+            version = "0.46.3";
           }
           {
             name = "remotehub";
@@ -357,8 +357,8 @@
           {
             name = "ty";
             publisher = "astral-sh";
-            sha256 = "sha256-QvbmvvbJYwfhC6nA0D/NtHoUE6fXUWGx1xFO4LkWQ2M=";
-            version = "2025.71.13500942";
+            sha256 = "sha256-keLL62w9oRLMRH++xuwlarIK8S4VWb3ArQ+TPy99mNE=";
+            version = "2025.80.0";
           }
           {
             name = "vscode-containers";
@@ -381,8 +381,8 @@
           {
             name = "vscode-pgsql";
             publisher = "ms-ossdata";
-            sha256 = "sha256-I4cqfLZRDhA9QnhzOZfG/5ZMr/6DVkQFoXB1fS9m03E=";
-            version = "1.13.0";
+            sha256 = "sha256-/+VXsppHJlC+suEmu6d8lpryCKwfNWVA/nEYu4nhX3I=";
+            version = "1.14.0";
           }
           {
             name = "vscode-python-test-adapter";
