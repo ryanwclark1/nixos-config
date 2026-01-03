@@ -93,7 +93,7 @@
 
   # Laptop-specific power management
   powerManagement = {
-    powertop.enable = true;
+    # powertop.enable = true;  # Disabled: crashes with segfault, auto-cpufreq handles power management
     cpuFreqGovernor = "powersave";
   };
 

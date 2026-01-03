@@ -42,7 +42,7 @@
 
   # Laptop-specific packages (if not already in global)
   environment.systemPackages = with pkgs; [
-    powertop
+    # powertop  # Disabled: service crashes with segfault, use auto-cpufreq instead
     mission-center
   ];
 }
