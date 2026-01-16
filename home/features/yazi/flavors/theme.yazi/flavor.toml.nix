@@ -147,7 +147,7 @@ in
         { mime = "{audio,video}/*", fg = "#${base0A}" },
 
         # Archives
-        { mime = "application/*zip}", fg = "#${base0F}" },
+        { mime = "application/*zip", fg = "#${base0F}" },
         { mime = "application/x-{tar,bzip*,7z-compressed,xz,rar}", fg = "#${base0F}" },
 
         # Documents

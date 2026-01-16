@@ -20,7 +20,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     owner = "openai";
     repo = "codex";
     tag = "rust-v${finalAttrs.version}";
-    hash = "sha256-ZXgGMk4qvrmvuQWM1Q/HD1vS4VPaxuWOdKX1wLxjAc4=";
+    hash = "sha256-XdfB0izL2w5IYLr8RUiP9Dytg6cOONNk9EtVnvzv83k=";
   };
 
   sourceRoot = "${finalAttrs.src.name}/codex-rs";
