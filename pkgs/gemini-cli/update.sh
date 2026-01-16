@@ -52,14 +52,6 @@ fi
 
 echo "Source hash: $SOURCE_HASH"
 
-# For npmDepsHash, we need to build the package to get it
-# This is more complex, so we'll use a placeholder and let the user know
-echo ""
-echo "⚠️  Note: npmDepsHash needs to be computed by building the package."
-echo "   After updating, run: nix build .#gemini-cli"
-echo "   The build will fail with the correct hash - update the package file with it."
-echo ""
-
 # Create backup
 cp "$packageFile" "${packageFile}.bak"
 
@@ -72,15 +64,106 @@ sed -i "s|hash = \"sha256-[^\"]*\"|hash = \"$SOURCE_HASH\"|" "$packageFile"
 # Update rev (fetchFromGitHub uses rev, not tag)
 sed -i "s|rev = \"v\${finalAttrs.version}\"|rev = \"v${latestVersion}\"|" "$packageFile"
 
+echo "✅ Updated version and source hash"
+echo ""
+
+# Check if user wants to skip npmDepsHash computation
+SKIP_NPM_HASH=false
+if [[ "${SKIP_NPM_HASH:-}" == "true" ]] || [[ "${1:-}" == "--skip-npm-hash" ]]; then
+  SKIP_NPM_HASH=true
+  echo "Skipping npmDepsHash computation (--skip-npm-hash flag set)"
+  echo ""
+  NPM_DEPS_HASH=""
+else
+  # Now compute npmDepsHash by attempting to build
+  echo "Computing npmDepsHash..."
+  echo "  This may take a few minutes as we need to fetch npm dependencies..."
+  echo "  (Use --skip-npm-hash to skip this step)"
+  echo ""
+
+  # Get the repo root (assuming we're in a flake-based setup)
+  repoRoot="$(cd "$scriptDir/../.." && pwd)"
+
+  # Detect system architecture
+  SYSTEM="${NIX_SYSTEM:-$(nix eval --impure --expr 'builtins.currentSystem' 2>/dev/null || echo "x86_64-linux")}"
+
+  # Try to build the package and capture the hash from error output
+  # We'll try multiple build commands to find what works
+  BUILD_OUTPUT=""
+  NPM_DEPS_HASH=""
+
+  # Try different build commands in order of preference
+  for build_cmd in \
+    "cd '$repoRoot' && nix build --no-link '.#packages.${SYSTEM}.gemini-cli' 2>&1" \
+    "cd '$repoRoot' && nix build --no-link .#gemini-cli 2>&1" \
+    "nix build --no-link -f '<nixpkgs>' -A gemini-cli 2>&1" \
+    "nix-build --no-out-link -A gemini-cli 2>&1"
+  do
+    echo "  Trying build command..."
+    set +e  # Allow command to fail
+    BUILD_OUTPUT=$(eval "$build_cmd" 2>&1)
+    BUILD_EXIT=$?
+    set -e
+
+    if [[ $BUILD_EXIT -eq 0 ]]; then
+      # Build succeeded - hash was already correct or we got lucky
+      echo "  ✅ Build succeeded! npmDepsHash appears to be correct."
+      break
+    else
+      # Build failed - check if it's a hash mismatch error
+      if echo "$BUILD_OUTPUT" | grep -q "hash mismatch\|got:"; then
+        # Extract the hash from the error message
+        # Nix error format: "got:    sha256-..." or "specified: sha256-... got: sha256-..."
+        # Use sed for portability (works on both GNU and BSD)
+        NPM_DEPS_HASH=$(echo "$BUILD_OUTPUT" | sed -n 's/.*got:[[:space:]]*\(sha256-[A-Za-z0-9+/=]*\).*/\1/p' | head -1)
+
+        if [[ -z "$NPM_DEPS_HASH" ]]; then
+          # Try alternative format: look for sha256- after "got:"
+          NPM_DEPS_HASH=$(echo "$BUILD_OUTPUT" | grep -o "sha256-[A-Za-z0-9+/=]*" | grep -v "specified:" | tail -1 || echo "")
+        fi
+
+        if [[ -n "$NPM_DEPS_HASH" ]]; then
+          echo "  ✅ Found npmDepsHash in build error: $NPM_DEPS_HASH"
+          break
+        fi
+      fi
+
+      # If we didn't find a hash, continue to next build command
+      if [[ -z "$NPM_DEPS_HASH" ]]; then
+        continue
+      fi
+    fi
+  done
+
+  if [[ -z "$NPM_DEPS_HASH" ]]; then
+    echo ""
+    echo "⚠️  Warning: Could not automatically determine npmDepsHash"
+    echo "   The build command may need adjustment, or the hash format may have changed."
+    echo ""
+    echo "   To compute manually:"
+    echo "   1. Try building: cd '$repoRoot' && nix build '.#packages.${SYSTEM}.gemini-cli'"
+    echo "   2. Look for 'got: sha256-...' in the error message"
+    echo "   3. Update npmDepsHash in $packageFile"
+    echo ""
+    echo "   Build output saved to: ${packageFile}.build-error.log"
+    echo "$BUILD_OUTPUT" > "${packageFile}.build-error.log"
+  else
+    # Update npmDepsHash in the file
+    echo "  Updating npmDepsHash in package file..."
+    sed -i "s|npmDepsHash = \"sha256-[^\"]*\"|npmDepsHash = \"$NPM_DEPS_HASH\"|" "$packageFile"
+    echo "  ✅ Updated npmDepsHash: $NPM_DEPS_HASH"
+  fi
+fi
+
+echo ""
 echo "✅ Updated to version $latestVersion"
 echo ""
 echo "Changes:"
 echo "  Version: $currentVersion -> $latestVersion"
 echo "  Source hash: $SOURCE_HASH"
-echo ""
-echo "⚠️  IMPORTANT: You need to compute npmDepsHash by building:"
-echo "   nix build .#gemini-cli"
-echo "   The build will show the correct npmDepsHash - update it in the package file."
+if [[ -n "$NPM_DEPS_HASH" ]]; then
+  echo "  npmDepsHash: $NPM_DEPS_HASH"
+fi
 echo ""
 echo "Please review the changes:"
 echo "  git diff $packageFile"

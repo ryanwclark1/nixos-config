@@ -1,8 +1,8 @@
 {
   name = "ansible";
   publisher = "redhat";
-  sha256 = "sha256-6G/CpzSSrRzwtay4+t46gz8aBF7qgu79NUhBypTJMrc=";
-  version = "25.12.3";
+  sha256 = "sha256-mmimQCXxEbvzmctd5HAs70FUsBPIylrpLw2UG+I8TxM=";
+  version = "26.1.1";
 }
 {
   name = "biome";
@@ -13,14 +13,14 @@
 {
   name = "chatgpt";
   publisher = "openai";
-  sha256 = "sha256-FAy2Cf2XnOnctBBATloXz8y4cLNHBoXAVnlw42CQzN8=";
-  version = "0.5.56";
+  sha256 = "sha256-EA1tQ0zySsbeuVXykte3gp9LhFZQW4ytKYPv6mbf19Y=";
+  version = "0.5.60";
 }
 {
   name = "claude-code";
   publisher = "anthropic";
-  sha256 = "sha256-PA7eL4TZTFYVlImXnZCw6aWjrLXl7/KndnkU3D2t1jw=";
-  version = "2.0.75";
+  sha256 = "sha256-1zrXLaTilKY11FVBGnP4ezRT5LAefGH1UKwqz+E/sFY=";
+  version = "2.1.9";
 }
 {
   name = "copilot";
@@ -31,14 +31,14 @@
 {
   name = "copilot-chat";
   publisher = "github";
-  sha256 = "sha256-l5ROuSYk6mDoqxlgGFV0OLw+EyG1OfSNm7BS5b/Fxpc=";
-  version = "0.36.2025121901";
+  sha256 = "sha256-HIsROMQAxQ0ulyyUGZArbZeAHu/Oiyz0cFdqogTRpM0=";
+  version = "0.37.2026011603";
 }
 {
   name = "explorer";
   publisher = "vitest";
-  sha256 = "sha256-ic1Gk3jJyyD7WnXjXMymr/5YV2z3tK5VPToWeCkhqyU=";
-  version = "1.36.0";
+  sha256 = "sha256-1UTQCy40wNgjkBmVMIo/U5H182lYMdhQBh6mncTctTA=";
+  version = "1.38.0";
 }
 {
   name = "gemini-cli-vscode-ide-companion";
@@ -85,14 +85,14 @@
 {
   name = "pwc";
   publisher = "SureshNettur";
-  sha256 = "sha256-AElVhTk2YfZXksRWfRlpA0WlYdluHLs0Lo4GCBfpZBg=";
-  version = "1.2.0";
+  sha256 = "sha256-e+O8mPGc50eJDvXMcLmsW7ht8jTXylbVoUf+ayaYx6E=";
+  version = "1.2.1";
 }
 {
   name = "pyrefly";
   publisher = "meta";
-  sha256 = "sha256-o9Nynj6Zf7aot1zzHSwrcayovxlJ3mr/XWNNhI3foBM=";
-  version = "0.46.3";
+  sha256 = "sha256-bf/lEZgYEtkxrXX4qdm6mP3oay9L6mYXyWa1K8zsKrA=";
+  version = "0.48.1";
 }
 {
   name = "remotehub";
@@ -103,8 +103,8 @@
 {
   name = "ty";
   publisher = "astral-sh";
-  sha256 = "sha256-keLL62w9oRLMRH++xuwlarIK8S4VWb3ArQ+TPy99mNE=";
-  version = "2025.80.0";
+  sha256 = "sha256-r5vM0G1TnFIQCi31iu3HaF5mFLRi/2h7UnV3SuWMyho=";
+  version = "2026.4.0";
 }
 {
   name = "vscode-containers";
@@ -139,6 +139,6 @@
 {
   name = "vscode-thunder-client";
   publisher = "rangav";
-  sha256 = "sha256-e4kJVvMYsQFWxkTFkcVGr55ZGuSCjEb/9UjNN84lAkI=";
-  version = "2.38.5";
+  sha256 = "sha256-8joP2BzTuUWS0XnpHonoClrfOw03pj2Bs+q9At7LtyI=";
+  version = "2.38.6";
 }

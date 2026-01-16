@@ -5,6 +5,9 @@
   ...
 }:
 
+let
+  marketplaceExtensions = import ./marketplace-extensions.nix;
+in
 {
   imports = [
     ./custom.theme/themes/theme.json.nix
@@ -116,15 +119,8 @@
           description = "Provides up-to-date code documentation for AI code editors";
         };
         github = {
-          command = "docker";
-          args = [
-            "run"
-            "-i"
-            "--rm"
-            "--name"
-            "mcp-github"
-            "ghcr.io/github/github-mcp-server"
-          ];
+          command = "${pkgs.github-mcp-server}/bin/github-mcp-server";
+          args = [ "stdio" ];
           env = {
             GITHUB_PERSONAL_ACCESS_TOKEN = "$(cat ${config.sops.secrets.github-pat.path})";
             GITHUB_TOOLSETS = "repos,issues,pull_requests,actions,code_security,discussions";
@@ -133,9 +129,33 @@
           description = "GitHub repository and workflow management via MCP";
         };
         playwright = {
-          command = "${pkgs.playwright-mcp}/bin/mcp-server-playwright";
+          command = "${pkgs.writeShellScriptBin "mcp-server-playwright-nixos" ''
+            #!/usr/bin/env bash
+            set -euo pipefail
+
+            # Playwright MCP wrapper for NixOS
+            # Ensure Playwright can find browsers in NixOS environments
+
+            # Use Playwright's bundled browsers (most reliable)
+            export PLAYWRIGHT_BROWSERS_PATH="${lib.getLib pkgs.playwright.browsers}"
+
+            # Try to find system Chrome/Chromium as fallback
+            if [ -z "''${PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH:-}" ]; then
+              for candidate in google-chrome-stable google-chrome chromium-browser chromium; do
+                if target=$(command -v "$candidate" 2>/dev/null); then
+                  export PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH="$target"
+                  break
+                fi
+              done
+            fi
+
+            exec ${pkgs.playwright-mcp}/bin/mcp-server-playwright "$@"
+          ''}/bin/mcp-server-playwright-nixos";
           args = [ "--headless" ];
-          description = "Browser automation and web scraping via Playwright";
+          env = {
+            PLAYWRIGHT_BROWSERS_PATH = "${lib.getLib pkgs.playwright.browsers}";
+          };
+          description = "Browser automation and web scraping via Playwright (NixOS-compatible)";
         };
         serena = {
           command = "docker";
@@ -223,7 +243,7 @@
             eamodio.gitlens
             github.codespaces
             github.copilot
-            # github.copilot-chat  # Removed: duplicate - using marketplace version below (0.36.2025121901)
+            github.copilot-chat # Use nixpkgs version (0.30.1) for VS Code 1.103.2 compatibility
             github.vscode-github-actions
             github.vscode-pull-request-github
             golang.go
@@ -248,156 +268,21 @@
             streetsidesoftware.code-spell-checker
             tailscale.vscode-tailscale
             tamasfe.even-better-toml
-            usernamehw.errorlens # Removed: can be visually noisy
+            usernamehw.errorlens
             yzhang.markdown-all-in-one
           ])
-          ++ (pkgs.vscode-utils.extensionsFromVscodeMarketplace [
-            {
-              name = "ansible";
-              publisher = "redhat";
-              sha256 = "sha256-6G/CpzSSrRzwtay4+t46gz8aBF7qgu79NUhBypTJMrc=";
-              version = "25.12.3";
-            }
-            {
-              name = "biome";
-              publisher = "biomejs";
-              sha256 = "sha256-TLm2ppAyZoCHNg3RpEFwUr/C04bkI62AK4kNS4R/j2U=";
-              version = "2025.11.271431";
-            }
-            {
-              name = "chatgpt";
-              publisher = "openai";
-              sha256 = "sha256-FAy2Cf2XnOnctBBATloXz8y4cLNHBoXAVnlw42CQzN8=";
-              version = "0.5.56";
-            }
-            {
-              name = "claude-code";
-              publisher = "anthropic";
-              sha256 = "sha256-PA7eL4TZTFYVlImXnZCw6aWjrLXl7/KndnkU3D2t1jw=";
-              version = "2.0.75";
-            }
-            {
-              name = "copilot";
-              publisher = "github";
-              sha256 = "sha256-7RjK8+PNI+rIuRQfCwpvswAiz991dacRO2qYhcv1vhk=";
-              version = "1.388.0";
-            }
-            {
-              name = "copilot-chat";
-              publisher = "github";
-              sha256 = "sha256-l5ROuSYk6mDoqxlgGFV0OLw+EyG1OfSNm7BS5b/Fxpc=";
-              version = "0.36.2025121901";
-            }
-            {
-              name = "explorer";
-              publisher = "vitest";
-              sha256 = "sha256-ic1Gk3jJyyD7WnXjXMymr/5YV2z3tK5VPToWeCkhqyU=";
-              version = "1.36.0";
-            }
-            {
-              name = "gemini-cli-vscode-ide-companion";
-              publisher = "Google";
-              sha256 = "sha256-gJ7ghOOrk4kvzReqfB6ZRhFonOdpJXcPh7voBgCwqPg=";
-              version = "0.20.0";
-            }
-            {
-              name = "grafana-alloy";
-              publisher = "grafana";
-              sha256 = "sha256-XcoiEDCPp6GzYQDhJArZBEWxSnZrSTHofIyLFegsbh0=";
-              version = "0.2.0";
-            }
-            {
-              name = "grafana-vscode";
-              publisher = "grafana";
-              sha256 = "sha256-TpLOMwdaEdgzWVwUcn+fO4rgLiQammWQM8LQobt8gLw=";
-              version = "0.0.19";
-            }
-            {
-              name = "mypy-type-checker";
-              publisher = "ms-python";
-              sha256 = "sha256-CSiQWwpY/43Yx0/ppwq9f21ksqLYhr0Nv/i4+sno2Qs=";
-              version = "2025.3.13521012";
-            }
-            {
-              name = "pdf";
-              publisher = "tomoki1207";
-              sha256 = "sha256-i3Rlizbw4RtPkiEsodRJEB3AUzoqI95ohyqZ0ksROps=";
-              version = "1.2.2";
-            }
-            {
-              name = "playwright";
-              publisher = "ms-playwright";
-              sha256 = "sha256-qIQS9rjzTJF0T6RWMJvaxOGcQmoXpIhzVHDMFxGMb/A=";
-              version = "1.1.17";
-            }
-            {
-              name = "prom";
-              publisher = "ventura";
-              sha256 = "sha256-h8pRrPzmu8+5ZiOLALjackr4zWuFAqi1ex7Gp2iOZKk=";
-              version = "1.3.3";
-            }
-            {
-              name = "pwc";
-              publisher = "SureshNettur";
-              sha256 = "sha256-AElVhTk2YfZXksRWfRlpA0WlYdluHLs0Lo4GCBfpZBg=";
-              version = "1.2.0";
-            }
-            {
-              name = "pyrefly";
-              publisher = "meta";
-              sha256 = "sha256-o9Nynj6Zf7aot1zzHSwrcayovxlJ3mr/XWNNhI3foBM=";
-              version = "0.46.3";
-            }
-            {
-              name = "remotehub";
-              publisher = "GitHub";
-              sha256 = "sha256-boKDVKLo8Na799OtoPnT6JxsAvQ/HoqL3FispnN6bOA=";
-              version = "0.65.2025081801";
-            }
-            {
-              name = "ty";
-              publisher = "astral-sh";
-              sha256 = "sha256-keLL62w9oRLMRH++xuwlarIK8S4VWb3ArQ+TPy99mNE=";
-              version = "2025.80.0";
-            }
-            {
-              name = "vscode-containers";
-              publisher = "ms-azuretools";
-              sha256 = "sha256-zrEZpd2geX2G4u6LkIk3d6C7vhwZZ4lwHGQR3Z0OWY4=";
-              version = "2.3.0";
-            }
-            {
-              name = "vscode-gitops-tools";
-              publisher = "weaveworks";
-              sha256 = "sha256-7MCKDnHCot/CL/SqZ2WuTxbqFdF75EC5WC+OxW0dcaE=";
-              version = "0.27.0";
-            }
-            {
-              name = "vscode-jsonnet";
-              publisher = "grafana";
-              sha256 = "sha256-Q8VzXzTdHo9h5+eCHHF1bPomPEbRsvouJcUfmFUDGMU=";
-              version = "0.7.2";
-            }
-            {
-              name = "vscode-pgsql";
-              publisher = "ms-ossdata";
-              sha256 = "sha256-/+VXsppHJlC+suEmu6d8lpryCKwfNWVA/nEYu4nhX3I=";
-              version = "1.14.0";
-            }
-            {
-              name = "vscode-python-test-adapter";
-              publisher = "littlefoxteam";
-              sha256 = "sha256-TwBPGr8bam1NSX2KRrm92DOQWeVa0k+pXT4q/isWYOI=";
-              version = "0.8.2";
-            }
-            {
-              name = "vscode-thunder-client";
-              publisher = "rangav";
-              sha256 = "sha256-e4kJVvMYsQFWxkTFkcVGr55ZGuSCjEb/9UjNN84lAkI=";
-              version = "2.38.5";
-            }
-          ]);
+          ++ (pkgs.vscode-utils.extensionsFromVscodeMarketplace marketplaceExtensions);
         userSettings = {
+          # NOTE: Many project-specific settings have been moved to workspace/folder settings.
+          # These include:
+          # - Language-specific formatters ([python], [typescript], etc.)
+          # - File associations and exclude patterns
+          # - Extension-specific settings (Python, Go, Ruff, Tailwind, YAML, etc.)
+          # - Editor tab size and rulers (project-specific)
+          #
+          # To configure these per-project, create .vscode/settings.json in your project root.
+          # Example: https://code.visualstudio.com/docs/getstarted/settings#_settings-file-locations
+
           "accessibility.dimUnfocused.enabled" = true;
           "breadcrumbs.enabled" = true;
           "diffEditor.codeLens" = true;
@@ -424,6 +309,7 @@
           "editor.suggest.showStatusBar" = true;
           "editor.suggestSelection" = "first";
           "editor.tabCompletion" = "on";
+          # Default tab size - projects can override in workspace settings
           "editor.tabSize" = 2;
           "editor.useTabStops" = true;
           "editor.wordBasedSuggestions" = "matchingDocuments";
@@ -433,37 +319,17 @@
             "comments" = true;
             "strings" = true;
           };
-          "editor.rulers" = [
-            80
-            120
-          ];
+          # Editor rulers are project-specific - move to workspace settings
+          # "editor.rulers" = [ 80 120 ];
           "extensions.autoUpdate" = false;
           "extensions.autoCheckUpdates" = false;
           "update.mode" = "none";
 
-          "files.associations" = {
-            "*.css" = "tailwindcss";
-            ".env" = "dotenv";
-            ".env*" = "dotenv";
-          };
-          "files.exclude" = {
-            "**/node_modules/**" = true;
-            "**/venv/**" = true;
-            "**/.venv/**" = true;
-            ".git" = true;
-            "**/.git" = false;
-          };
-          "files.watcherExclude" = {
-            "**/.git/objects/**" = true;
-            "**/.git/subtree-cache/**" = true;
-            "**/node_modules/*/**" = true; # Note: your original had '**/node_modules/**', this is slightly more specific
-            "**/__pycache__/**" = true;
-            "**/.pytest_cache/**" = true;
-            "**/dist/**" = true;
-            "**/build/**" = true;
-            "**/.venv/**" = true;
-            "**/.ruff_cache/**" = true;
-          };
+          # File associations, excludes, and watcher excludes are project-specific
+          # Move these to workspace settings (.vscode/settings.json) per project
+          # "files.associations" = { ... };
+          # "files.exclude" = { ... };
+          # "files.watcherExclude" = { ... };
           "files.autoSave" = "afterDelay";
           "files.insertFinalNewline" = true;
           "files.trimTrailingWhitespace" = true;
@@ -610,235 +476,61 @@
           "redhat.telemetry.enabled" = false;
 
           ##### Ruff #####
+          # Most Ruff settings are project-specific - move to workspace settings
+          # Keep only global enable/disable preference
           "ruff.enable" = true;
-          "ruff.importStrategy" = "fromEnvironment";
-          "ruff.lineLength" = 88;
-          "ruff.organizeImports" = true;
-          "ruff.fixAll" = true;
-          "ruff.configurationPreference" = "filesystemFirst";
+          # "ruff.importStrategy" = "fromEnvironment";
+          # "ruff.lineLength" = 88;
+          # "ruff.organizeImports" = true;
+          # "ruff.fixAll" = true;
+          # "ruff.configurationPreference" = "filesystemFirst";
 
           ##### GO #####
-          "go.delveConfig" = {
-            "apiVersion" = 2;
-            "debugAdapter" = "dlv-dap";
-            "showLog" = true;
-          };
-          "go.editorContextMenuCommands" = {
-            "addImport" = true;
-            "addTags" = true;
-            "benchmarkAtCursor" = false;
-            "debugTestAtCursor" = true;
-            "fillStruct" = false;
-            "generateTestForFile" = false;
-            "generateTestForFunction" = true;
-            "generateTestForPackage" = false;
-            "playground" = true;
-            "removeTags" = false;
-            "testAtCursor" = true;
-            "testCoverage" = true;
-            "testFile" = false;
-            "testPackage" = false;
-            "toggleTestFile" = true;
-          };
-          "go.enableCodeLens" = {
-            "runtest" = true;
-          };
-          "go.playground" = {
-            "openbrowser" = true;
-            "run" = true;
-            "share" = true;
-          };
-          "go.lintOnSave" = "workspace";
-          "go.inferGopath" = true;
-          "go.showWelcome" = false;
-          "go.survey.prompt" = false;
-          "go.tasks.provideDefault" = true;
-          "go.terminal.activateEnvironment" = true;
-          "go.testExplorer.enable" = true;
-          "go.testExplorer.alwaysRunBenchmarks" = true;
-          "go.testExplorer.concatenateMessages" = true;
-          "go.testExplorer.packageDisplayMode" = "nested";
-          "go.testExplorer.showDynamicSubtestsInEditor" = false;
-          "go.testExplorer.showOutput" = true;
-          "go.testTimeout" = "30s";
-          "go.trace.server" = "messages";
-          "go.useLanguageServer" = true;
-          "gopls" = {
-            "build.directoryFilters" = [
-              "-**/node_modules"
-            ];
-            "formatting.gofumpt" = true;
-            "ui.codelenses" = {
-              "generate" = true;
-              "gc_details" = true;
-              "regenerate_cgo" = true;
-              "run_govulncheck" = false;
-              "test" = true;
-              "tidy" = true;
-              "upgrade_dependency" = true;
-              "vendor" = true;
-            };
-            "ui.completion.completeFunctionCalls" = true;
-            "ui.completion.experimentalPostfixCompletions" = true;
-            "ui.completion.matcher" = "Fuzzy";
-            "ui.completion.usePlaceholders" = true;
-            "ui.diagnostic.analysisProgressReporting" = true;
-            "ui.diagnostic.diagnosticsTrigger" = "Edit";
-            "ui.diagnostic.hoverKind" = "Structured";
-            "ui.diagnostic.staticcheck" = true;
-            "ui.navigation.importShortcut" = "Both";
-            "ui.navigation.symbolMatcher" = "Fuzzy";
-            "ui.navigation.symbolScope" = "all";
-            "ui.navigation.symbolStyle" = "Dynamic";
-            "ui.semanticTokens" = true;
-          };
+          # Go settings are project-specific - move to workspace settings
+          # Keep only minimal global preferences if needed
+          # "go.delveConfig" = { ... };
+          # "go.editorContextMenuCommands" = { ... };
+          # "go.enableCodeLens" = { ... };
+          # "go.playground" = { ... };
+          # "go.lintOnSave" = "workspace";
+          # "go.inferGopath" = true;
+          # "go.showWelcome" = false;
+          # "go.survey.prompt" = false;
+          # "go.tasks.provideDefault" = true;
+          # "go.terminal.activateEnvironment" = true;
+          # "go.testExplorer.enable" = true;
+          # "go.testExplorer.alwaysRunBenchmarks" = true;
+          # "go.testExplorer.concatenateMessages" = true;
+          # "go.testExplorer.packageDisplayMode" = "nested";
+          # "go.testExplorer.showDynamicSubtestsInEditor" = false;
+          # "go.testExplorer.showOutput" = true;
+          # "go.testTimeout" = "30s";
+          # "go.trace.server" = "messages";
+          # "go.useLanguageServer" = true;
+          # "gopls" = { ... };
 
           ##### Postgres #####
           "pgsql.copilot.enable" = true;
 
           ##### Python #####
-          "python.testing.autoTestDiscoverOnSaveEnabled" = true; # Updated from false
-          "python.testing.pytestEnabled" = true;
-          "python.testing.unittestEnabled" = false;
+          # Python settings are highly project-specific - move to workspace settings
+          # Keep only minimal global preferences
+          # "python.testing.autoTestDiscoverOnSaveEnabled" = true;
+          # "python.testing.pytestEnabled" = true;
+          # "python.testing.unittestEnabled" = false;
+          # "python.analysis.*" = { ... };
+          # "python.createEnvironment.contentButton" = "show";
+          # "python.terminal.shellIntegration.enabled" = true;
+          # "python.venvFolders" = [ ".venv" ];
 
-          # Python specific settings
-          "python.analysis.aiCodeActions" = {
-            "convertFormatString" = true;
-            "implementAbstractClasses" = true;
-            "convertLambdaToNamedFunction" = true;
-            "generateDocstring" = true;
-            "generateSymbol" = true;
-          };
-          "python.analysis.autoFormatStrings" = true;
-          "python.analysis.autoImportCompletions" = true;
-          "python.analysis.cacheLSPData" = true;
-          "python.analysis.completeFunctionParens" = true;
-          "python.analysis.disableTaggedHints" = true;
-          "python.analysis.enableColorPicker" = true;
-          "python.analysis.enablePytestSupport" = true;
-          "python.analysis.exclude" = [
-            "**/node_modules"
-            "**/__pycache__"
-            "**/.ruff_cache"
-            "**/.pytest_cache"
-            "**/.mypy_cache"
-            "**/.venv"
-            "**/.venv*"
-          ];
-          "python.analysis.generateWithTypeAnnotation" = true;
-          "python.analysis.fixAll" = [
-            "source.convertImportFormat"
-            "source.unusedImports"
-          ];
-          "python.analysis.inlayHints.callArgumentNames" = "all";
-          "python.analysis.inlayHints.functionReturnTypes" = true;
-          "python.analysis.inlayHints.pytestParameters" = true;
-          "python.analysis.inlayHints.variableTypes" = true;
-          "python.analysis.regenerateStdLibIndices" = true;
-          "python.analysis.supportAllPythonDocuments" = true;
-          "python.analysis.supportDocstringTemplate" = true;
-          "python.analysis.supportRestructuredText" = true;
-          "python.analysis.typeEvaluation.deprecateTypingAliases" = true;
-          "python.analysis.typeEvaluation.enableReachabilityAnalysis" = true;
-          "python.analysis.typeEvaluation.strictDictionaryInference" = true;
-          "python.analysis.typeEvaluation.strictListInference" = true;
-          "python.analysis.typeEvaluation.strictSetInference" = true;
-          "python.analysis.typeshedPaths" = [ "typings" ];
-          "python.analysis.include" = [ "**/*.py" ];
-          "python.analysis.autoSearchPaths" = true;
-          "python.analysis.nodeArguments" = [
-            "--max-old-space-size=16384"
-          ];
-          "python.analysis.userFileIndexingLimit" = -1;
-
-          "python.createEnvironment.contentButton" = "show";
-          "python.terminal.shellIntegration.enabled" = true;
-          "python.venvFolders" = [ ".venv" ];
-
-          ##### Docker Compose #####
-          "[dockercompose]" = {
-            "editor.autoIndent" = "advanced";
-            "editor.defaultFormatter" = "redhat.vscode-yaml";
-            "editor.formatOnSave" = true;
-            "editor.insertSpaces" = true;
-            "editor.quickSuggestions" = {
-              "other" = true;
-              "comments" = false;
-              "strings" = true;
-            };
-            "editor.tabSize" = 4;
-          };
-
-          "[dockerfile]" = {
-            "editor.formatOnSave" = true;
-          };
-
-          "[github-actions-workflow]" = {
-            "editor.autoIndent" = "advanced";
-            "editor.insertSpaces" = true;
-            "editor.quickSuggestions" = {
-              "other" = true;
-              "comments" = false;
-              "strings" = true;
-            };
-            "editor.tabSize" = 2;
-          };
-
-          "[json][jsonc]" = {
-            "editor.defaultFormatter" = "vscode.json-language-features";
-            "editor.formatOnSave" = true;
-            "editor.insertSpaces" = true;
-            "editor.tabSize" = 4;
-          };
-          "[python]" = {
-            "editor.codeActionsOnSave" = {
-              "source.fixAll" = "explicit";
-              "source.organizeImports" = "explicit";
-            };
-            "editor.formatOnSave" = true;
-            "editor.tabSize" = 4;
-          };
-          "[toml]" = {
-            "editor.formatOnSave" = true;
-            "editor.insertSpaces" = true;
-            "editor.tabSize" = 4;
-          };
-          "[yaml]" = {
-            "editor.autoIndent" = "advanced";
-            "editor.formatOnSave" = true;
-            "editor.insertSpaces" = true;
-            "editor.tabSize" = 2;
-          };
-
-          ##### Typescript #####
-          "[javascript]" = {
-            "editor.defaultFormatter" = "biomejs.biome";
-            "editor.formatOnSave" = true;
-            "editor.codeActionsOnSave" = {
-              "source.organizeImports" = "explicit";
-            };
-          };
-          "[typescript]" = {
-            "editor.defaultFormatter" = "biomejs.biome";
-            "editor.formatOnSave" = true;
-            "editor.codeActionsOnSave" = {
-              "source.organizeImports" = "explicit";
-            };
-          };
-          "[typescriptreact]" = {
-            "editor.defaultFormatter" = "biomejs.biome";
-            "editor.formatOnSave" = true;
-            "editor.codeActionsOnSave" = {
-              "source.organizeImports" = "explicit";
-            };
-          };
-          "[javascriptreact]" = {
-            "editor.defaultFormatter" = "biomejs.biome";
-            "editor.formatOnSave" = true;
-            "editor.codeActionsOnSave" = {
-              "source.organizeImports" = "explicit";
-            };
-          };
+          # Language-specific formatter settings are project-specific
+          # Move these to workspace settings (.vscode/settings.json) per project
+          # Examples:
+          # "[python]" = { "editor.defaultFormatter" = "..."; "editor.tabSize" = 4; };
+          # "[typescript]" = { "editor.defaultFormatter" = "biomejs.biome"; };
+          # "[javascript]" = { "editor.defaultFormatter" = "biomejs.biome"; };
+          # "[yaml]" = { "editor.tabSize" = 2; };
+          # etc.
 
           ##### Git #####
           "git.autofetch" = true;
@@ -867,40 +559,21 @@
           # "[css]"."editor.defaultFormatter" = "esbenp.prettier-vscode";
 
           ##### Tailwind CSS #####
-          # Configurations: https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss
-          "tailwindCSS.includeLanguages" = {
-            "plaintext" = "html";
-            "templ" = "html";
-            "vue-html" = "html";
-            "javascript" = "javascriptreact";
-            "typescript" = "typescriptreact";
-            "svelte" = "html";
-          };
-          "tailwindCSS.codeActions" = true;
-          "tailwindCSS.colorDecorators" = true;
-          "tailwindCSS.emmetCompletions" = true;
-          "tailwindCSS.hovers" = true;
-          "tailwindCSS.showPixelEquivalents" = true;
-          "tailwindCSS.suggestions" = true;
-          "tailwindCSS.validate" = true;
+          # Tailwind CSS settings are project-specific - move to workspace settings
+          # "tailwindCSS.includeLanguages" = { ... };
+          # "tailwindCSS.codeActions" = true;
+          # etc.
 
           ##### Templ #####
-          "templ.pprof" = true;
-          "templ.goplsRPCTrace" = true;
+          # Templ settings are project-specific - move to workspace settings
+          # "templ.pprof" = true;
+          # "templ.goplsRPCTrace" = true;
 
           ##### YAML #####
-          "yaml.completion" = true;
-          "yaml.extension.recommendations" = true;
-          "yaml.format.bracketSpacing" = true;
-          "yaml.format.enable" = true;
-          "yaml.format.printWidth" = 80;
-          "yaml.format.proseWrap" = "preserve";
-          "yaml.hover" = true;
-          "yaml.maxItemsComputed" = 5000;
-          "yaml.schemaStore.enable" = true;
-          "yaml.schemaStore.url" = "https://www.schemastore.org/api/json/catalog.json";
-          "yaml.validate" = true;
-          "yaml.yamlVersion" = "1.2";
+          # YAML settings are project-specific - move to workspace settings
+          # "yaml.completion" = true;
+          # "yaml.format.*" = { ... };
+          # etc.
         };
       };
     };
