@@ -14,13 +14,13 @@
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "codex";
-  version = "0.77.0";
+  version = "0.87.0";
 
   src = fetchFromGitHub {
     owner = "openai";
     repo = "codex";
-    rev = "rust-v0.77.0";
-    hash = "sha256-05zjzCrVhPLvrqx9UA2dPOjP8mQFUTWBCrmq/iaR3hg=";
+    tag = "rust-v${finalAttrs.version}";
+    hash = "sha256-ZXgGMk4qvrmvuQWM1Q/HD1vS4VPaxuWOdKX1wLxjAc4=";
   };
 
   sourceRoot = "${finalAttrs.src.name}/codex-rs";
@@ -57,7 +57,14 @@ rustPlatform.buildRustPackage (finalAttrs: {
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
 
-  passthru.updateScript = ./update.sh;
+  passthru = {
+    updateScript = nix-update-script {
+      extraArgs = [
+        "--version-regex"
+        "^rust-v(\\d+\\.\\d+\\.\\d+)$"
+      ];
+    };
+  };
 
   meta = {
     description = "Lightweight coding agent that runs in your terminal";

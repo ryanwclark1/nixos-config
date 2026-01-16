@@ -31,16 +31,9 @@
     }
   },
   "github": {
-    "command": "docker",
+    "command": "github-mcp-server",
     "args": [
-      "run",
-      "-i",
-      "--rm",
-      "-e",
-      "GITHUB_PERSONAL_ACCESS_TOKEN",
-      "-e",
-      "GITHUB_DYNAMIC_TOOLSETS",
-      "ghcr.io/github/github-mcp-server"
+      "stdio"
     ],
     "env": {
       "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}",
@@ -49,11 +42,10 @@
     "description": "GitHub repository and workflow management via MCP"
   },
   "playwright": {
-    "command": "mcp-server-playwright",
+    "command": "mcp-server-playwright-nixos",
     "args": [
-      "--browser=chrome",
-      "--extension"
+      "--headless"
     ],
-    "description": "Browser automation and web scraping via Playwright"
+    "description": "Browser automation and web scraping via Playwright (NixOS-compatible wrapper)"
   }
 }

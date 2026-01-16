@@ -1,4 +1,9 @@
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
   programs.chromium = {
@@ -18,6 +23,13 @@
   };
 
   # Provide the custom extension from the repo in the expected path
-  home.file.".local/share/os/default/chromium/extensions/copy-url".source =
-    ./extensions/copy-url;
+  home.file.".local/share/os/default/chromium/extensions/copy-url".source = ./extensions/copy-url;
+
+  # Environment variables for Playwright to find browsers in NixOS
+  # This ensures Playwright MCP can use bundled browsers (Chromium, Firefox, WebKit)
+  # Note: playwright.browsers package is provided by home/features/ai/default.nix
+  home.sessionVariables = {
+    # Point Playwright to use bundled browsers for reliable operation in NixOS
+    PLAYWRIGHT_BROWSERS_PATH = "${lib.getLib pkgs.playwright.browsers}";
+  };
 }
