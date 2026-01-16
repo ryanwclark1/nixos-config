@@ -13,19 +13,20 @@
   services.mpd = {
     enable = true; # Re-enabled after fixing autofs configuration
     startWhenNeeded = false;
-    musicDirectory = "/mnt/share/music"; # Mounts to local nfs directory nfs:// did not work
-    playlistDirectory = "/mnt/share/music/playlists";
-    dbFile = "/var/lib/mpd/tag_cache";
     user = "mpd";
     group = "audio";
-    extraConfig = ''
-      audio_output {
-        type "pipewire"
-        name "PipeWire Sound Server"
-      }
-    '';
-    network = {
-      listenAddress = "127.0.0.1"; # "any" if you want to allow non-localhost connections
+    settings = {
+      audio_output = [
+        {
+          type = "pipewire";
+          name = "PipeWire Sound Server";
+        }
+      ];
+      # Mounts to local nfs directory nfs:// did not work
+      music_directory = "/mnt/share/music";
+      playlist_directory = "/mnt/share/music/playlists";
+      db_file = "/var/lib/mpd/tag_cache";
+      bind_to_address = "127.0.0.1"; # "any" if you want to allow non-localhost connections
       port = 6600;
     };
   };
