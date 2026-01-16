@@ -164,3 +164,4 @@ mcp-server-playwright-nixos --browser=chrome
 - `home/features/vscode/default.nix` - VSCode MCP configuration
 - `home/features/ai/mcp-servers.json` - JSON-based MCP server configs
 
+
