@@ -111,6 +111,11 @@
     elephant = {
       url = "github:abenz1267/elephant";
     };
+    # Beads - issue tracker for AI-supervised coding workflows
+    beads = {
+      url = "github:steveyegge/beads";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -131,7 +136,7 @@
       overlaysSet = {
         cmake-compat = import ./overlays/cmake-compat.nix;
         n8n-fix = import ./overlays/n8n-fix.nix;
-        custom-packages = import ./overlays/custom-packages.nix;
+        custom-packages = import ./overlays/custom-packages.nix { inherit inputs; };
         # goose-bump = import ./overlays/goose-bump.nix;
         # passthrough = import ./overlays/passthrough.nix; # optional
       };

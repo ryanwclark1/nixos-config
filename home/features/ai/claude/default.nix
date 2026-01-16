@@ -152,6 +152,9 @@ in
   home.file."${claudeHome}/commands/sc/workflow.md" = {
     source = ./config/commands/sc/workflow.md;
   };
+  home.file."${claudeHome}/commands/sc/plan-to-beads.md" = {
+    source = ./config/commands/sc/plan-to-beads.md;
+  };
 
   programs.claude-code = {
     enable = true;
@@ -197,7 +200,6 @@ in
       };
 
       outputStyle = "Explanatory";
-      model = "sonnet";
 
       statusLine = {
         type = "command";
@@ -211,7 +213,7 @@ in
         enabled = true;
         dir = "${config.home.homeDirectory}/.local/share/claude-code/memory";
         scope = "per-project";
-        maxItems = 200;
+        maxItems = 500;
       };
 
     };
