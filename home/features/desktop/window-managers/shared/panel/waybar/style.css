@@ -17,7 +17,7 @@
 }
 
 .modules-right {
-  margin-right: 8px;
+  margin-right: 12px;
 }
 
 #workspaces {
@@ -43,11 +43,12 @@
 #pulseaudio {
   min-width: 12px;
   margin: 0 7.5px;
+  font-size: 20px;
 }
 
 #custom-launcher {
   margin-right: 7px;
-  font-size: 14px;
+  font-size: 20px;
 }
 
 #custom-system-menu {
@@ -75,8 +76,13 @@
 
 #custom-expand-icon {
   margin-right: 7px;
+  font-size: 20px;
 }
 
+#custom-notification {
+  font-size: 20px;
+  margin-right: 8px;
+}
 
 tooltip {
   padding: 2px;
