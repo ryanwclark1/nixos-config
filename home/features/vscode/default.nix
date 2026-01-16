@@ -198,7 +198,7 @@ in
     taplo # Even Better TOML
     nvfetcher # Generate nix sources expr for the latest version of packages
     nil # Nix language server
-    nixfmt-rfc-style # Nix formatter
+    nixfmt # Nix formatter
     biome
     vscode-js-debug
     tailwindcss_4
@@ -443,7 +443,7 @@ in
           "nix.serverSettings" = {
             "nil" = {
               "formatting" = {
-                "command" = [ "nixfmt-rfc-style" ];
+                "command" = [ "nixfmt" ];
               };
               "diagnostics" = {
                 "ignored" = [

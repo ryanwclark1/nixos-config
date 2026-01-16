@@ -74,8 +74,9 @@ sed -i "s/version = \"$currentVersion\"/version = \"$latestVersion\"/" "$package
 # Update source hash
 sed -i "s|hash = \"sha256-[^\"]*\"|hash = \"$SOURCE_HASH\"|" "$packageFile"
 
-# Update URL (it uses version variable, so this should be automatic, but let's be explicit)
-sed -i "s|claude-code-\${finalAttrs.version}|claude-code-${latestVersion}|" "$packageFile"
+# Ensure URL uses version variable (don't hardcode version in URL)
+# If URL was hardcoded, restore it to use the variable
+sed -i "s|claude-code-[0-9][0-9.]*\.tgz|claude-code-\${finalAttrs.version}.tgz|" "$packageFile"
 
 echo "✅ Updated to version $latestVersion"
 echo ""
