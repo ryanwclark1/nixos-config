@@ -16,16 +16,10 @@ in
   # our manual home.file entry below. We manage the config file manually for full control.
   home.packages = [ pkgs.codex ];
 
-  # Write MCP servers configuration to Codex home directory
-  # This ensures Codex can read the MCP servers configuration
-  home.file."${codexHome}/mcp-servers.json" = {
-    source = ./mcp-servers.json;
-  };
 
-  # Create config.toml with comprehensive settings
-  # Codex uses TOML format for its main configuration file
-  home.file."${codexHome}/config.toml" = {
-    force = true;
+  # Create config.toml template - will be processed by systemd service
+  # The actual config.toml with secrets will be generated at runtime
+  home.file."${codexHome}/config.toml.template" = {
     text = ''
       # Codex Configuration
       # See: https://developers.openai.com/codex/config-reference
@@ -78,28 +72,51 @@ in
       # writable_roots = []              # Additional writable roots
 
       # MCP Servers Configuration
-      # MCP servers are configured via:
-      # 1. ${codexHome}/mcp-servers.json (primary file-based configuration)
-      # 2. config.toml [mcp_servers.*] sections (for timeouts and overrides)
+      # MCP servers are configured in config.toml using [mcp_servers.*] sections
+      # See: https://developers.openai.com/codex/mcp
 
-      # MCP server timeouts (per-server configuration)
+      # Context7 MCP Server - Official library documentation lookup
       [mcp_servers.context7]
-      startup_timeout_sec = 10
+      command = "npx"
+      args = ["-y", "@upstash/context7-mcp"]
+      startup_timeout_sec = 20  # 20 seconds
       tool_timeout_sec = 60
 
+      [mcp_servers.context7.env]
+      CONTEXT7_TOKEN = "{{CONTEXT7_TOKEN}}"
+
+      # Sequential Thinking MCP Server - Complex problem-solving
       [mcp_servers.sequential-thinking]
+      command = "npx"
+      args = ["@modelcontextprotocol/server-sequential-thinking@latest"]
       startup_timeout_sec = 15
       tool_timeout_sec = 120  # Complex reasoning takes longer
 
+      [mcp_servers.sequential-thinking.env]
+      NODE_ENV = "production"
+
+      # Playwright MCP Server - Browser automation and web scraping
       [mcp_servers.playwright]
+      command = "mcp-server-playwright-nixos"
+      args = ["--headless"]
       startup_timeout_sec = 10
       tool_timeout_sec = 90  # Browser operations can be slow
 
+      # GitHub MCP Server - Repository and workflow management
       [mcp_servers.github]
+      command = "github-mcp-server"
+      args = ["stdio"]
       startup_timeout_sec = 10
       tool_timeout_sec = 60
 
+      [mcp_servers.github.env]
+      GITHUB_PERSONAL_ACCESS_TOKEN = "{{GITHUB_PERSONAL_ACCESS_TOKEN}}"
+      GITHUB_DYNAMIC_TOOLSETS = "1"
+
+      # Serena MCP Server - AI-powered development assistant
       [mcp_servers.serena]
+      command = "uvx"
+      args = ["--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-server", "--transport", "stdio"]
       startup_timeout_sec = 10
       tool_timeout_sec = 60
 
@@ -135,6 +152,50 @@ in
       approval_policy = "on-request"
       sandbox_mode = "workspace-write"
     '';
+  };
+
+  # Generate config.toml with actual secrets at runtime
+  systemd.user.services.generate-codex-config = {
+    Unit = {
+      Description = "Generate Codex config.toml with SOPS secrets";
+      After = [ "sops-nix.service" ];
+      Wants = [ "sops-nix.service" ];
+    };
+    Service = {
+      Type = "oneshot";
+      ExecStart = pkgs.writeShellScript "generate-codex-config" ''
+        #!/usr/bin/env bash
+        # Generate config.toml file with actual secret values at runtime
+
+        # Check if secrets exist
+        if [ ! -f "${config.sops.secrets.context7-token.path}" ] || \
+           [ ! -f "${config.sops.secrets.github-pat.path}" ]; then
+          echo "Warning: Some SOPS secrets are not available yet" >&2
+          exit 1
+        fi
+
+        # Read the template and replace the placeholders
+        if [ -f "${codexHome}/config.toml.template" ]; then
+          CONTEXT7_TOKEN=$(cat "${config.sops.secrets.context7-token.path}")
+          GITHUB_PAT=$(cat "${config.sops.secrets.github-pat.path}")
+          # Use awk for safer substitution that handles special characters
+          awk -v context7_token="$CONTEXT7_TOKEN" -v github_pat="$GITHUB_PAT" '
+            {gsub(/{{CONTEXT7_TOKEN}}/, context7_token);
+             gsub(/{{GITHUB_PERSONAL_ACCESS_TOKEN}}/, github_pat);
+             print}' \
+            "${codexHome}/config.toml.template" > "${codexHome}/config.toml"
+          chmod 600 "${codexHome}/config.toml"
+          echo "Generated Codex config.toml with actual secret values"
+        else
+          echo "Error: config.toml.template not found" >&2
+          exit 1
+        fi
+      '';
+      RemainAfterExit = true;
+    };
+    Install = {
+      WantedBy = [ "default.target" ];
+    };
   };
 
   # Copy configuration documentation files (similar to Claude setup)
