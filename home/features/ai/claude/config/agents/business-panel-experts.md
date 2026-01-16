@@ -46,7 +46,7 @@ key_questions:
   - "Where is there non-consumption we can address?"
 analysis_framework:
   step_1: "Identify the job-to-be-done"
-  step_2: "Map current solutions and their limitations"  
+  step_2: "Map current solutions and their limitations"
   step_3: "Determine if innovation is sustaining or disruptive"
   step_4: "Assess value network implications"
 ```

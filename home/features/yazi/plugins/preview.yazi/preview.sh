@@ -83,12 +83,12 @@ handle_json() {
   # Show EXIF metadata first
   exiftool -s $EXIF_TAGS "$FILE_PATH" | bat -l yaml
   echo -e "\n--- JSON Content ---"
-  
+
   # Use jq for better JSON formatting if available
   if exist_command jq; then
     jq --color-output . "$FILE_PATH" 2>/dev/null | head -n 100 && exit
   fi
-  
+
   # Fallback to bat
   bat -l json "$FILE_PATH" --theme=TwoDark && exit
   handle_text
@@ -197,7 +197,7 @@ get_thumbnail_size_info() {
   local target_width="$1"
   local target_height="$2"
   local max_dim=$((target_width > target_height ? target_width : target_height))
-  
+
   if [ "$max_dim" -le 128 ]; then
     echo "normal 128"
   elif [ "$max_dim" -le 256 ]; then
@@ -213,37 +213,37 @@ get_thumbnail_size_info() {
 get_freedesktop_thumbnail() {
   local file_path="$1"
   local time_offset="${2:-0}"
-  
+
   local cache_home="$(get_xdg_cache_home)"
   local file_hash="$(get_file_uri_hash "$file_path")"
   local size_info="$(get_thumbnail_size_info 800 600)"
   local size_name="$(echo "$size_info" | cut -d' ' -f1)"
   local size_px="$(echo "$size_info" | cut -d' ' -f2)"
-  
+
   local thumb_dir="$cache_home/thumbnails/$size_name"
   local thumb_file="$thumb_dir/${file_hash}.png"
-  
+
   # Check if thumbnail exists and is newer than source
   if [ -f "$thumb_file" ] && [ "$thumb_file" -nt "$file_path" ]; then
     echo_image_path "$thumb_file"
     return 0
   fi
-  
+
   # Create thumbnail directory if it doesn't exist
   mkdir -p "$thumb_dir" 2>/dev/null || true
-  
+
   # Generate thumbnail using ffmpeg with proper freedesktop sizing
   local temp_thumb="$(mktemp --suffix=.png)"
   if ffmpeg -v quiet -ss "$time_offset" -i "$file_path" -frames:v 1 \
     -vf "scale=$size_px:$size_px:force_original_aspect_ratio=decrease,pad=$size_px:$size_px:(ow-iw)/2:(oh-ih)/2:color=black@0" \
     -f image2 "$temp_thumb" 2>/dev/null; then
-    
+
     # Add freedesktop metadata to thumbnail
     if exist_command exiftool; then
       local file_uri="file://$(realpath "$file_path")"
       local file_mtime="$(stat -c %Y "$file_path" 2>/dev/null || stat -f %m "$file_path" 2>/dev/null)"
       local file_size="$(stat -c %s "$file_path" 2>/dev/null || stat -f %z "$file_path" 2>/dev/null)"
-      
+
       exiftool -overwrite_original \
         -Subject="$file_uri" \
         -Comment="Thumb::URI=$file_uri" \
@@ -251,14 +251,14 @@ get_freedesktop_thumbnail() {
         -ImageDescription="Thumb::Size=$file_size" \
         "$temp_thumb" 2>/dev/null || true
     fi
-    
+
     # Move to final location atomically
     if mv "$temp_thumb" "$thumb_file" 2>/dev/null; then
       echo_image_path "$thumb_file"
       return 0
     fi
   fi
-  
+
   # Cleanup on failure
   rm -f "$temp_thumb" 2>/dev/null || true
   return 1
@@ -268,22 +268,22 @@ handle_video() {
   if [ "$PREVIEW_OFFSET" -gt 9 ] || [ "$PREVIEW_OFFSET" -lt 0 ]; then
     exit 3
   fi
-  
+
   # Simple thumbnail generation and display
   local thumb_file="${TMPDIR:-/tmp}/yazi_video_$(basename "$FILE_PATH" | tr ' ' '_')_${PREVIEW_OFFSET}.jpg"
-  
+
   if [ ! -f "$thumb_file" ] || [ "$FILE_PATH" -nt "$thumb_file" ]; then
     ffmpeg -v quiet -ss $((PREVIEW_OFFSET * 10)) -i "$FILE_PATH" -frames:v 1 -q:v 2 -f image2 \
       -vf "scale=800:600:force_original_aspect_ratio=decrease,pad=800:600:(ow-iw)/2:(oh-ih)/2" \
       "$thumb_file" 2>/dev/null
   fi
-  
+
   if [ -f "$thumb_file" ]; then
     echo_image_path "$thumb_file"
   fi
-  
+
   echo "$PREVIEW_OFFSET"
-  
+
   # Show video metadata
   if exist_command ffprobe; then
     ffprobe -select_streams v:0 \
@@ -298,7 +298,7 @@ process_compress_file() {
   # Show EXIF metadata first
   exiftool -s $EXIF_TAGS "$FILE_PATH" | bat -l yaml
   echo -e "\n--- Archive Contents ---"
-  
+
   # Choose best tool based on file type
   case "${FILE_EXTENSION_LOWER}" in
     7z|bz2|bzip2)
@@ -322,7 +322,7 @@ process_compress_file() {
       fi
       ;;
   esac
-  
+
   # Fallback to original method
   (bsdtar --list --file "${FILE_PATH}" || (lsar "${FILE_PATH}" | tail -n +2)) | tree -C --fromfile .
 }
@@ -349,10 +349,7 @@ handle_pdf() {
   pdfinfo "$FILE_PATH" | bat -l yaml
 }
 
-glow() {
-  command glow -s dracula - && return
-  handle_text
-}
+# glow() function removed - using piper plugin for markdown rendering instead
 
 process_svg() {
   if exist_command rsvg-convert; then
@@ -364,7 +361,7 @@ process_svg() {
 
 process_ipynb() {
   if exist_command jupyter-nbconvert; then
-    jupyter-nbconvert "${FILE_PATH}" --to markdown --stdout | glow
+    jupyter-nbconvert "${FILE_PATH}" --to markdown --stdout | handle_text
   else
     handle_json <"${FILE_PATH}"
   fi
@@ -376,10 +373,10 @@ handle_ipynb() {
 
 handle_image() {
   echo_image_path "$FILE_PATH"
-  
+
   # Show standardized EXIF data
   exiftool -s $EXIF_TAGS "${FILE_PATH}" | bat -l yaml
-  
+
   # Optional: Add chafa preview for terminal image viewing
   if exist_command chafa && [ "$TESTING" = true ]; then
     echo -e "\n--- Terminal Preview ---"
@@ -397,7 +394,7 @@ handle_image() {
 
 process_docx() {
   if exist_command pandoc; then
-    pandoc -s -t markdown -- "$FILE_PATH" | glow
+    pandoc -s -t markdown -- "$FILE_PATH" | handle_text
   else
     process_doc
   fi
@@ -423,11 +420,11 @@ mlr() {
 preview_sqlite3() {
   # Show EXIF metadata
   exiftool -s $EXIF_TAGS "$FILE_PATH" | bat -l yaml
-  
+
   echo -e "\n--- Database Tables ---"
   sqlite3 "$FILE_PATH" .tables | tr ' ' '\n' | sort | bat -l plain
-  
-  echo -e "\n--- Database Schema ---" 
+
+  echo -e "\n--- Database Schema ---"
   sqlite3 "$FILE_PATH" .schema | sed "s/;/;\n/g" | bat -l sql
 }
 
@@ -625,7 +622,8 @@ handle_extension() {
     handle_text
     ;;
   md)
-    glow <"$FILE_PATH"
+    # Markdown is handled by piper plugin in yazi.toml
+    handle_text
     ;;
   ipynb)
     handle_ipynb && exit

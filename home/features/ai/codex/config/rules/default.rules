@@ -1,0 +1,199 @@
+# Codex Rules Configuration
+# Rules control which commands Codex can run outside the sandbox
+# See: https://developers.openai.com/codex/rules
+# Syntax: Starlark (Python-like but safe)
+
+# Git Operations - Read-only commands (safe)
+prefix_rule(
+    pattern = ["git", ["status", "diff", "log", "show", "branch", "tag", "remote"]],
+    decision = "allow",
+    justification = "Read-only git commands are safe",
+    match = [
+        "git status",
+        "git diff",
+        "git log --oneline",
+        "git show HEAD",
+        "git branch -a",
+        "git remote -v",
+    ],
+)
+
+# Git Operations - Network operations (require approval)
+prefix_rule(
+    pattern = ["git", ["push", "pull", "fetch", "clone"]],
+    decision = "prompt",
+    justification = "Network operations require approval to prevent accidental pushes",
+    match = [
+        "git push origin main",
+        "git pull origin main",
+        "git fetch --all",
+        "git clone https://github.com/user/repo.git",
+    ],
+)
+
+# Git Operations - Destructive operations (require approval)
+prefix_rule(
+    pattern = ["git", ["reset", "rebase", "cherry-pick", "revert"]],
+    decision = "prompt",
+    justification = "History-modifying operations require approval",
+    match = [
+        "git reset --hard HEAD~1",
+        "git rebase main",
+        "git cherry-pick abc123",
+        "git revert HEAD",
+    ],
+)
+
+# GitHub CLI - Read operations (safe)
+prefix_rule(
+    pattern = ["gh", ["pr", "view"], "list"],
+    decision = "allow",
+    justification = "Viewing PRs and issues is safe",
+    match = [
+        "gh pr view 123",
+        "gh pr list",
+        "gh issue view 456",
+    ],
+)
+
+# GitHub CLI - Write operations (require approval)
+prefix_rule(
+    pattern = ["gh", ["pr", "create", "close", "merge", "comment"]],
+    decision = "prompt",
+    justification = "Creating or modifying PRs requires approval",
+    match = [
+        "gh pr create --draft",
+        "gh pr close 123",
+        "gh pr merge 123",
+        "gh pr comment 123 --body 'LGTM'",
+    ],
+)
+
+# Dangerous file operations (blocked)
+prefix_rule(
+    pattern = ["rm", "-rf"],
+    decision = "forbidden",
+    justification = "Use git clean or explicit file removal instead. Never use rm -rf without explicit approval.",
+    match = [
+        "rm -rf /tmp/test",
+        "rm -rf node_modules",
+    ],
+    not_match = [
+        "rm -f file.txt",  # Single file removal is different
+    ],
+)
+
+# System-level operations (blocked)
+prefix_rule(
+    pattern = ["sudo"],
+    decision = "forbidden",
+    justification = "System-level operations are not allowed. Use appropriate user-level commands instead.",
+    match = [
+        "sudo apt update",
+        "sudo systemctl restart service",
+    ],
+)
+
+# Docker operations - Read operations (safe)
+prefix_rule(
+    pattern = ["docker", ["ps", "images", "logs", "inspect", "exec"]],
+    decision = "allow",
+    justification = "Read-only Docker operations are safe",
+    match = [
+        "docker ps",
+        "docker images",
+        "docker logs container",
+        "docker inspect image",
+    ],
+)
+
+# Docker operations - Write operations (require approval)
+prefix_rule(
+    pattern = ["docker", ["run", "build", "push", "pull", "rm", "stop", "start"]],
+    decision = "prompt",
+    justification = "Docker operations that modify state require approval",
+    match = [
+        "docker run -it image",
+        "docker build -t tag .",
+        "docker push image",
+        "docker rm container",
+    ],
+)
+
+# Network operations - Curl/wget (require approval for non-local)
+prefix_rule(
+    pattern = ["curl"],
+    decision = "prompt",
+    justification = "Network requests require approval to prevent data exfiltration",
+    match = [
+        "curl https://api.example.com/data",
+        "curl -X POST https://api.example.com/endpoint",
+    ],
+)
+
+prefix_rule(
+    pattern = ["wget"],
+    decision = "prompt",
+    justification = "Network requests require approval",
+    match = [
+        "wget https://example.com/file",
+    ],
+)
+
+# Package manager operations (require approval)
+prefix_rule(
+    pattern = ["npm", ["install", "uninstall", "publish"]],
+    decision = "prompt",
+    justification = "Package installation/modification requires approval",
+    match = [
+        "npm install package",
+        "npm uninstall package",
+        "npm publish",
+    ],
+)
+
+prefix_rule(
+    pattern = ["pip", ["install", "uninstall"]],
+    decision = "prompt",
+    justification = "Python package installation requires approval",
+    match = [
+        "pip install package",
+        "pip uninstall package",
+    ],
+)
+
+# Nix operations - Read operations (safe)
+prefix_rule(
+    pattern = ["nix", ["eval", "search", "show", "path-info"]],
+    decision = "allow",
+    justification = "Read-only Nix operations are safe",
+    match = [
+        "nix eval nixpkgs#hello",
+        "nix search nixpkgs python",
+        "nix show-derivation path",
+    ],
+)
+
+# Nix operations - Build operations (require approval)
+prefix_rule(
+    pattern = ["nix", ["build", "shell", "develop", "run"]],
+    decision = "prompt",
+    justification = "Nix build operations require approval",
+    match = [
+        "nix build .#package",
+        "nix shell nixpkgs#python",
+        "nix develop",
+    ],
+)
+
+# NixOS system operations (blocked)
+prefix_rule(
+    pattern = ["nixos-rebuild"],
+    decision = "forbidden",
+    justification = "System rebuilds must be done manually with explicit approval",
+    match = [
+        "nixos-rebuild switch",
+        "nixos-rebuild boot",
+    ],
+)
+

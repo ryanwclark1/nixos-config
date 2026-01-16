@@ -23,7 +23,7 @@ buildGoModule rec {
   # Use proxyVendor to bypass vendor directory issues when tracking main branch
   # This fetches dependencies directly instead of using the vendor directory
   proxyVendor = true;
-  vendorHash = "";
+  vendorHash = "sha256-MeReUVFg2GlfmGVFqGvGn8ZE3VnAdbwGeKA+2pzScBw=";
 
   subPackages = [ "cmd/github-mcp-server" ];
 
