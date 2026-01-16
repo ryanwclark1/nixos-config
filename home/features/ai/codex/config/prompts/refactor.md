@@ -40,3 +40,4 @@ Refactor the specified files ($FILES) with the goal: $GOAL
 - Test results confirming behavior preservation
 - Documentation of changes made
 
+

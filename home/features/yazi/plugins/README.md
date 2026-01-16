@@ -142,3 +142,4 @@ To add a new plugin:
 
 For more information on Yazi plugin development, see the [Yazi documentation](https://yazi-rs.github.io/docs/plugins/overview).
 
+
