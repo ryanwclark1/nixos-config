@@ -113,7 +113,8 @@ image_bound = [0, 0]
 suppress_preload = false
 
 [plugin]
-fetchers = [{ id = "mime", url = "*", run = "mime", prio = "high" }]
+# Only run MIME fetcher if MIME type is not already detected (prevents redundant file command calls)
+fetchers = [{ id = "mime", url = "*", run = "mime", prio = "high", if = "!mime" }]
 spotters = [
     { url = "*/", run = "folder" },
     # Code
