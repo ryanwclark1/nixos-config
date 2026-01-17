@@ -287,7 +287,7 @@ in
       '';
 
       mkdir = ''
-        mkdir -p $argv
+        command mkdir -p $argv
       '';
     };
 
