@@ -33,6 +33,9 @@ in
       [manager]
       cwd = { fg = "#${base0C}" }
 
+      # File list items
+      syntect_theme = "~/.config/yazi/flavors/theme.yazi/tmtheme.xml"
+
       # Hovered
       hovered = { fg = "#${base00}", bg = "#${base0D}" }
       preview_hovered = { fg = "#${base00}", bg = "#${base05}" }
@@ -60,8 +63,6 @@ in
       # Border
       border_symbol = "│"
       border_style = { fg = "#${base04}" }
-
-      syntect_theme = "~/.config/yazi/flavors/tmtheme.xml"
 
       [mode]
       normal_main = { fg = "#${base00}", bg = "#${base0D}", bold = true }

@@ -15,8 +15,9 @@ function Status:name()
   return ui.Line(" " .. h.name .. linked)
 end
 
+-- Temporarily disabled to debug visibility issues
+--[[
 local catppuccin_theme = require("yatline-catppuccin"):setup("frappe")
--- local catppuccin_theme = require
 require("yatline"):setup({
 	theme = catppuccin_theme,
 	-- section_separator = { open = "", close = "" },
@@ -111,3 +112,4 @@ require("yatline"):setup({
 		}
 	},
 })
+--]]
