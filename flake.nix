@@ -136,6 +136,7 @@
       overlaysSet = {
         cmake-compat = import ./overlays/cmake-compat.nix;
         n8n-fix = import ./overlays/n8n-fix.nix;
+        ollama-fix = import ./overlays/ollama-fix.nix;
         custom-packages = import ./overlays/custom-packages.nix;
         # openvscode-server-fix = import ./overlays/openvscode-server-fix.nix;  # Not needed - using vscode-server instead
         # goose-bump = import ./overlays/goose-bump.nix;

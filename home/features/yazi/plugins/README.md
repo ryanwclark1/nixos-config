@@ -9,20 +9,6 @@ This directory contains custom Yazi plugins used in this NixOS configuration. Pl
 **Purpose:** Navigation wrapper that allows cursor movement to wrap around at the top/bottom of the file list.
 **Usage:** Bound to `j`/`k` keys for down/up navigation with wraparound.
 
-### `enhanced-preview.yazi`
-**Type:** Preview Plugin
-**Purpose:** Enhanced file preview with support for multiple file types:
-- **Directories:** Uses `eza` to show tree view (3 levels deep)
-- **Images:** Displays image with `ueberzug` and shows EXIF metadata overlay using `exiftool`
-- **Text files:** Syntax-highlighted preview using `bat` (up to 500 lines)
-- **PDFs:** Text extraction preview using `pdftotext`
-- **Fallback:** Uses `file` command for unknown types
-
-**Features:**
-- Skips files larger than 10MB
-- Optimized previews for different MIME types
-- Metadata overlays for images
-
 ### `excel.yazi`
 **Type:** Preview Plugin
 **Purpose:** Preview Excel/Spreadsheet files (`.xlsx`) by converting them to CSV format using `xlsx2csv`.
@@ -32,16 +18,9 @@ This directory contains custom Yazi plugins used in this NixOS configuration. Pl
 - Tab-to-space conversion for proper display
 
 ### `eza-preview.yazi`
-**Type:** Preview Plugin
-**Purpose:** Directory preview using `eza` with toggleable tree/list view modes.
-**Features:**
-- Toggle between tree and list view modes
-- Configurable tree depth (default: 3 levels)
-- Options to follow symlinks and dereference
-- Color and icon support
-- Group directories first
+**Status:** ⚠️ **Removed** - Directory preview functionality has been integrated into `preview.yazi`
 
-**Usage:** Bound to `E` key to toggle tree/list directory preview.
+**Note:** Directory tree previews are now handled by the unified `preview.yazi` plugin, which uses `eza` for directory tree views (3 levels deep) as part of its comprehensive preview system.
 
 ### `folder-rules.yazi`
 **Type:** Setup Plugin
@@ -86,14 +65,29 @@ This directory contains custom Yazi plugins used in this NixOS configuration. Pl
 
 ### `preview.yazi`
 **Type:** Preview Plugin
-**Purpose:** General-purpose preview plugin that delegates to an external shell script (`preview.sh`) for file preview logic.
+**Purpose:** Comprehensive preview plugin that handles all file types with enhanced features.
 **Features:**
-- Supports image previews with split view (image on top, metadata/text below)
-- Handles various file types through external script
-- Supports scrolling and offset management
-- Can disable auto-peek for certain file types
+- **Freedesktop thumbnail support:** Reuses thumbnails from other applications (file managers, image viewers)
+- **Directory previews:** Enhanced tree view using `eza` (3 levels) with fallback to `tree` or `ls`
+- **Image previews:**
+  - Uses freedesktop thumbnails for cross-app compatibility
+  - Split view: 60% image, 40% metadata overlay
+  - Enhanced EXIF metadata display (focused on key fields)
+- **Text previews:** Syntax-highlighted with `bat` (up to 500 lines, optimized formatting)
+- **File size protection:** Automatically skips files larger than 10MB for performance
+- **Video previews:** Freedesktop-compliant thumbnail generation
+- **Multiple file types:** Archives, PDFs, code files, media files, and more
+- **Supports scrolling and offset management**
+- **Can disable auto-peek for certain file types**
 
 **Dependencies:** Requires `preview.sh` script in the same directory.
+
+**Recent Enhancements:**
+- Added freedesktop.org thumbnail standard support
+- Enhanced directory tree previews with `eza` (3 levels)
+- Improved image metadata display (focused EXIF fields)
+- Better text preview formatting with optimized `bat` settings
+- File size protection (skips files > 10MB for performance)
 
 ### `yatline.yazi`
 **Type:** Status Line Plugin
@@ -112,6 +106,21 @@ This directory contains custom Yazi plugins used in this NixOS configuration. Pl
 - Tab width management
 
 **Note:** This is a local version with the `ya.truncate` → `ui.truncate` deprecation fix applied.
+
+## Builtin Plugins (Built into Yazi)
+
+Yazi includes builtin plugins that are automatically available (no configuration needed):
+
+- **`fzf`** - Fuzzy file finder for quick navigation
+  - **Usage:** Press `z` to jump to a file/directory via fzf
+  - **Requires:** `fzf` command must be installed (already added to packages)
+
+- **`zoxide`** - Smart directory jumping using zoxide database
+  - **Usage:** Press `Z` to jump to a directory via zoxide
+  - **Requires:** `zoxide` command must be installed (already added to packages)
+  - **Note:** Automatically updates zoxide database when changing directories
+
+These builtin plugins are part of Yazi itself and don't need to be added to the plugins configuration - they just require the external tools to be available.
 
 ## Plugins from Nix Packages
 

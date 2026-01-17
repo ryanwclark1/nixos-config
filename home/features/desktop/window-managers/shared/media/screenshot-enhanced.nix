@@ -7,6 +7,19 @@
 
 {
   # Enhanced screenshot utilities
+  #
+  # NOTE: This module provides Hyprland-specific screenshot tools using hyprshot.
+  # For general Wayland screenshot functionality, see:
+  # - home/features/desktop/common/scripts/wayland/screenshot.sh (unified script)
+  # - home/features/desktop/common/scripts/system/os-cmd-screenshot (wrapper)
+  #
+  # This module is kept separate because:
+  # 1. It uses hyprshot which is Hyprland-specific
+  # 2. It provides a simpler, more opinionated interface
+  # 3. It's packaged as Nix binaries for convenience
+  #
+  # The unified screenshot.sh script supports both grim/grimblast (general Wayland)
+  # and can work with Hyprland, but this module provides a Hyprland-optimized workflow.
 
   home.packages = with pkgs; [
     hyprshot # Screenshot tool for Hyprland (required for screenshot-enhanced)

@@ -48,8 +48,10 @@ function M:peek()
       if image_path then
         text_offset = 1
         disable_peek = true
-        limit = limit / 2
-        local top, bottom = self:split_area(0.4)
+        -- Enhanced image preview: use 60% for image, 40% for metadata (from enhanced-preview)
+        -- This provides better balance between image and metadata visibility
+        limit = math.floor(limit * 0.4)  -- Reserve ~40% for metadata/text
+        local top, bottom = self:split_area(0.6)  -- 60% image, 40% metadata
         text_area = bottom
         ya.image_show(Url(image_path), top)
       elseif line == "__disable_auto_peek__\n" then

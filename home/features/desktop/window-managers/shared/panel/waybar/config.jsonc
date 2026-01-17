@@ -24,7 +24,7 @@
         "cpu",
         "battery",
         "custom/notification",
-        "custom/space"
+        "custom/nixos-logo"
     ],
     "hyprland/workspaces": {
         "on-click": "activate",
@@ -164,7 +164,6 @@
             ]
         }
     },
-
     "custom/launcher": {
         "format": "󱄅",
         "on-click": "~/.local/bin/scripts/rofi/apps-unified.sh",
@@ -177,7 +176,6 @@
         "on-click-right": "xdg-terminal-exec",
         "tooltip": "System Menu\n\nLeft: Open Menu\nRight: Open Terminal"
     },
-
     "hyprland/window": {
         "format": " 󰖲 {}",
         "max-length": 50,
@@ -203,10 +201,10 @@
     },
     "custom/notification": {
         "tooltip": true,
-        "format": "<span>{icon}</span>",
+        "format": "{icon}",
         "format-icons": {
-            "notification": "󱅫",
-            "none": "󰂜",
+            "notification": "󰂞",
+            "none": "󰂞",
             "dnd-notification": "󰂠",
             "dnd-none": "󰪓",
             "inhibited-notification": "󰂛",
@@ -215,13 +213,11 @@
             "dnd-inhibited-none": "󰪑"
         },
         "return-type": "json",
-        "exec-if": "which swaync-client",
-        "exec": "swaync-client -swb",
-        "on-click": "swaync-client -t -sw",
-        "on-click-right": "swaync-client -d -sw",
+        "exec": "swaync-client -swb 2>/dev/null || echo '{\"text\":\"󰂞\",\"tooltip\":\"Notifications\",\"class\":\"none\"}'",
+        "on-click": "swaync-client -t -sw 2>/dev/null || true",
+        "on-click-right": "swaync-client -d -sw 2>/dev/null || true",
         "escape": true
     },
-
     "group/tray-expander": {
         "orientation": "inherit",
         "drawer": {
@@ -241,9 +237,11 @@
         "icon-size": 18,
         "spacing": 12
     },
-    "custom/space": {
-        "format": " ",
-        "tooltip": false
+    "custom/nixos-logo": {
+        "format": "󰌓",
+        "tooltip": "NixOS",
+        "on-click": "kitty -e bash -c 'cd $HOME/nixos-config && nixos-rebuild switch --flake .#$HOSTNAME && read -p \"Press Enter to close...\"'",
+        "on-click-right": "xdg-terminal-exec"
     },
     "custom/update": {
         "format": "{}",
@@ -257,7 +255,7 @@
     },
     "custom/screenrecording-indicator": {
         "on-click": "~/.local/bin/scripts/system/os-cmd-screenrecord --stop-recording",
-        "exec": "~/.local/bin/scripts/system/screenrecording-indicator.sh",
+        "exec": "screenrecording-indicator",
         "signal": 8,
         "return-type": "json",
         "interval": 2

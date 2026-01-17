@@ -40,6 +40,11 @@
       PATH="${pkgs.coreutils}/bin:${pkgs.libnotify}/bin:$PATH"
     '' + builtins.readFile ./scripts/system/show-time.sh))
 
+    # Screen recording indicator for Waybar
+    (writeShellScriptBin "screenrecording-indicator" (''
+      PATH="${pkgs.procps}/bin:${pkgs.coreutils}/bin:$PATH"
+    '' + builtins.readFile ./scripts/system/screenrecording-indicator.sh))
+
     # Wayland utility scripts (Hyprland-compatible)
     (writeShellScriptBin "keybindings-menu" (''
       PATH="${pkgs.hyprland}/bin:${pkgs.jq}/bin:${pkgs.libxkbcommon}/bin:${pkgs.walker}/bin:${pkgs.gawk}/bin:${pkgs.gnused}/bin:${pkgs.coreutils}/bin:$PATH"

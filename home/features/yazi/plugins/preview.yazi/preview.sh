@@ -76,7 +76,15 @@ exiftool() {
 }
 
 handle_text() {
-  bat "${FILE_PATH}" && exit
+  # Enhanced text preview with better formatting (from enhanced-preview)
+  bat \
+    --color=always \
+    --paging=never \
+    --style=plain \
+    --wrap=character \
+    --terminal-width="${PREVIEW_WIDTH}" \
+    --line-range=:500 \
+    "${FILE_PATH}" && exit
 }
 
 handle_json() {
@@ -209,8 +217,8 @@ get_thumbnail_size_info() {
   fi
 }
 
-# Get or create freedesktop thumbnail
-get_freedesktop_thumbnail() {
+# Get or create freedesktop thumbnail for videos
+get_freedesktop_video_thumbnail() {
   local file_path="$1"
   local time_offset="${2:-0}"
 
@@ -264,22 +272,109 @@ get_freedesktop_thumbnail() {
   return 1
 }
 
+# Get or create freedesktop thumbnail for images
+# Leverages freedesktop.org thumbnail standard for cross-application compatibility
+get_freedesktop_image_thumbnail() {
+  local file_path="$1"
+  local target_width="${2:-800}"
+  local target_height="${3:-600}"
+
+  local cache_home="$(get_xdg_cache_home)"
+  local file_hash="$(get_file_uri_hash "$file_path")"
+  local size_info="$(get_thumbnail_size_info "$target_width" "$target_height")"
+  local size_name="$(echo "$size_info" | cut -d' ' -f1)"
+  local size_px="$(echo "$size_info" | cut -d' ' -f2)"
+
+  local thumb_dir="$cache_home/thumbnails/$size_name"
+  local thumb_file="$thumb_dir/${file_hash}.png"
+
+  # Check if thumbnail exists and is newer than source (freedesktop standard check)
+  if [ -f "$thumb_file" ] && [ "$thumb_file" -nt "$file_path" ]; then
+    # Verify thumbnail metadata matches (freedesktop standard validation)
+    if exist_command exiftool; then
+      local file_uri="file://$(realpath "$file_path")"
+      local stored_uri="$(exiftool -Comment -b "$thumb_file" 2>/dev/null | grep -o "Thumb::URI=.*" | cut -d'=' -f2-)"
+      if [ "$stored_uri" = "$file_uri" ]; then
+        echo_image_path "$thumb_file"
+        return 0
+      fi
+    else
+      # If exiftool not available, trust file timestamp
+      echo_image_path "$thumb_file"
+      return 0
+    fi
+  fi
+
+  # Create thumbnail directory if it doesn't exist
+  mkdir -p "$thumb_dir" 2>/dev/null || true
+
+  # Generate thumbnail using ImageMagick or convert (freedesktop-compatible)
+  local temp_thumb="$(mktemp --suffix=.png)"
+  local success=false
+
+  # Try ImageMagick first (better quality)
+  if exist_command convert; then
+    if convert "$file_path" -thumbnail "${size_px}x${size_px}>" -background black -gravity center -extent "${size_px}x${size_px}" "$temp_thumb" 2>/dev/null; then
+      success=true
+    fi
+  # Fallback to ffmpeg if ImageMagick not available
+  elif exist_command ffmpeg; then
+    if ffmpeg -v quiet -i "$file_path" -frames:v 1 \
+      -vf "scale=$size_px:$size_px:force_original_aspect_ratio=decrease,pad=$size_px:$size_px:(ow-iw)/2:(oh-ih)/2:color=black@0" \
+      -f image2 "$temp_thumb" 2>/dev/null; then
+      success=true
+    fi
+  fi
+
+  if [ "$success" = true ]; then
+    # Add freedesktop metadata to thumbnail (required by standard)
+    if exist_command exiftool; then
+      local file_uri="file://$(realpath "$file_path")"
+      local file_mtime="$(stat -c %Y "$file_path" 2>/dev/null || stat -f %m "$file_path" 2>/dev/null)"
+      local file_size="$(stat -c %s "$file_path" 2>/dev/null || stat -f %z "$file_path" 2>/dev/null)"
+
+      exiftool -overwrite_original \
+        -Subject="$file_uri" \
+        -Comment="Thumb::URI=$file_uri" \
+        -UserComment="Thumb::MTime=$file_mtime" \
+        -ImageDescription="Thumb::Size=$file_size" \
+        "$temp_thumb" 2>/dev/null || true
+    fi
+
+    # Move to final location atomically
+    if mv "$temp_thumb" "$thumb_file" 2>/dev/null; then
+      echo_image_path "$thumb_file"
+      return 0
+    fi
+  fi
+
+  # Cleanup on failure
+  rm -f "$temp_thumb" 2>/dev/null || true
+  return 1
+}
+
 handle_video() {
   if [ "$PREVIEW_OFFSET" -gt 9 ] || [ "$PREVIEW_OFFSET" -lt 0 ]; then
     exit 3
   fi
 
-  # Simple thumbnail generation and display
-  local thumb_file="${TMPDIR:-/tmp}/yazi_video_$(basename "$FILE_PATH" | tr ' ' '_')_${PREVIEW_OFFSET}.jpg"
+  # Try freedesktop thumbnail first (reuses thumbnails from other apps like file managers)
+  if get_freedesktop_video_thumbnail "$FILE_PATH" $((PREVIEW_OFFSET * 10)) 2>/dev/null; then
+    # Thumbnail found or created successfully
+    :
+  else
+    # Fallback to temporary thumbnail if freedesktop generation fails
+    local thumb_file="${TMPDIR:-/tmp}/yazi_video_$(basename "$FILE_PATH" | tr ' ' '_')_${PREVIEW_OFFSET}.jpg"
 
-  if [ ! -f "$thumb_file" ] || [ "$FILE_PATH" -nt "$thumb_file" ]; then
-    ffmpeg -v quiet -ss $((PREVIEW_OFFSET * 10)) -i "$FILE_PATH" -frames:v 1 -q:v 2 -f image2 \
-      -vf "scale=800:600:force_original_aspect_ratio=decrease,pad=800:600:(ow-iw)/2:(oh-ih)/2" \
-      "$thumb_file" 2>/dev/null
-  fi
+    if [ ! -f "$thumb_file" ] || [ "$FILE_PATH" -nt "$thumb_file" ]; then
+      ffmpeg -v quiet -ss $((PREVIEW_OFFSET * 10)) -i "$FILE_PATH" -frames:v 1 -q:v 2 -f image2 \
+        -vf "scale=800:600:force_original_aspect_ratio=decrease,pad=800:600:(ow-iw)/2:(oh-ih)/2" \
+        "$thumb_file" 2>/dev/null
+    fi
 
-  if [ -f "$thumb_file" ]; then
-    echo_image_path "$thumb_file"
+    if [ -f "$thumb_file" ]; then
+      echo_image_path "$thumb_file"
+    fi
   fi
 
   echo "$PREVIEW_OFFSET"
@@ -372,10 +467,30 @@ handle_ipynb() {
 }
 
 handle_image() {
-  echo_image_path "$FILE_PATH"
+  # Try to use freedesktop thumbnail first (reuses thumbnails from other apps)
+  # Falls back to original image if thumbnail not available or generation fails
+  if get_freedesktop_image_thumbnail "$FILE_PATH" "$PREVIEW_WIDTH" "$PREVIEW_HEIGHT" 2>/dev/null; then
+    # Thumbnail found or created successfully
+    :
+  else
+    # Fallback to original image if thumbnail generation fails
+    echo_image_path "$FILE_PATH"
+  fi
 
-  # Show standardized EXIF data
-  exiftool -s $EXIF_TAGS "${FILE_PATH}" | bat -l yaml
+  # Show enhanced EXIF metadata (from enhanced-preview - more focused metadata)
+  # Only show key fields for cleaner display
+  exiftool -s \
+    -FileName \
+    -FileSize \
+    -ImageSize \
+    -DateTime \
+    -Make \
+    -Model \
+    -ISO \
+    -FNumber \
+    -ExposureTime \
+    -FocalLength \
+    "${FILE_PATH}" 2>/dev/null | bat -l yaml
 
   # Optional: Add chafa preview for terminal image viewing
   if exist_command chafa && [ "$TESTING" = true ]; then
@@ -772,6 +887,31 @@ fi
 
 if ! [[ -r "$FILE_PATH" ]]; then
   die "<Permission denied>"
+fi
+
+# File size check - skip very large files (> 10MB) for performance
+if [[ -f "$FILE_PATH" ]]; then
+  local file_size=$(stat -c%s "$FILE_PATH" 2>/dev/null || stat -f%z "$FILE_PATH" 2>/dev/null || echo "0")
+  if [[ $file_size -gt 10485760 ]]; then  # 10MB
+    echo_err "⚠ File size exceeds 10MB, preview disabled for performance"
+    echo "File size: $(numfmt --to=iec-i --suffix=B $file_size 2>/dev/null || echo "${file_size} bytes")"
+    exit 0
+  fi
+fi
+
+# Handle directories with enhanced tree view (from enhanced-preview)
+if [[ -d "$FILE_PATH" ]]; then
+  if exist_command eza; then
+    # Enhanced directory preview with eza tree view (3 levels)
+    eza --tree --level=3 --icons=never --color=always "$FILE_PATH" 2>/dev/null | head -n "$PREVIEW_HEIGHT" && exit
+  elif exist_command tree; then
+    # Fallback to tree if eza not available
+    tree -C -L 3 "$FILE_PATH" 2>/dev/null | head -n "$PREVIEW_HEIGHT" && exit
+  else
+    # Basic ls fallback
+    ls -lah --color=always "$FILE_PATH" 2>/dev/null | head -n "$PREVIEW_HEIGHT" && exit
+  fi
+  exit
 fi
 
 handle_extension

@@ -20,6 +20,12 @@
       source = ./scripts/rofi/rofi-apps-unified.sh;
       executable = true;
     };
+    # Symlink for backward compatibility
+    ".local/bin/scripts/rofi/apps-unified.sh" = {
+      force = true;
+      source = ./scripts/rofi/rofi-apps-unified.sh;
+      executable = true;
+    };
 
     ".config/desktop/window-managers/shared/scripts" = {
       source = ./scripts;
