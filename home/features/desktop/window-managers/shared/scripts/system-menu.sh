@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
 
-# System menu using walker - adapted from omarchy-menu for NixOS
+# System menu using rofi - adapted from omarchy-menu for NixOS
 
-# Menu function using walker
+# Rofi configuration
+ROFI_OPTS="-show-icons -kb-accept-entry Return -kb-cancel Escape"
+
+# Menu function using rofi
 menu() {
   local prompt="$1"
   local options="$2"
   local extra="$3"
-  
+
   read -r -a args <<<"$extra"
-  echo -e "$options" | walker --dmenu -p "$prompt…" "${args[@]}"
+  echo -e "$options" | rofi -dmenu -p "$prompt" $ROFI_OPTS "${args[@]}"
 }
 
 # Screenshot menu
@@ -32,7 +35,7 @@ show_screenshot_menu() {
   esac
 }
 
-# Screen recording submenu  
+# Screen recording submenu
 show_screenrecord_menu() {
   case $(menu "Screenrecord" "🎬 Region\n🖥️ Fullscreen") in
   *Region*) screenrecord region ;;
@@ -78,11 +81,11 @@ show_power_menu() {
 # Toggle menu for various system states
 show_toggle_menu() {
   case $(menu "Toggle" "🔵 Bluetooth\n📶 WiFi\n🔊 Waybar\n🌙 Night Light") in
-  *Bluetooth*) 
+  *Bluetooth*)
     if rfkill list bluetooth | grep -q "Soft blocked: yes"; then
       rfkill unblock bluetooth && notify-send "Bluetooth" "Enabled"
     else
-      rfkill block bluetooth && notify-send "Bluetooth" "Disabled" 
+      rfkill block bluetooth && notify-send "Bluetooth" "Disabled"
     fi
     ;;
   *WiFi*)
@@ -95,7 +98,7 @@ show_toggle_menu() {
   *Waybar*)
     if pgrep -x waybar >/dev/null; then
       pkill waybar && notify-send "Waybar" "Hidden"
-    else  
+    else
       waybar & notify-send "Waybar" "Shown"
     fi
     ;;
@@ -125,9 +128,9 @@ show_utilities_menu() {
 # Main menu
 show_main_menu() {
   case $(menu "System Menu" "🚀 Apps\n📷 Capture\n⚙️ Settings\n🔀 Toggle\n🛠️ Utilities\n⚡ Power") in
-  *Apps*) walker ;;
+  *Apps*) rofi -show drun -show-icons ;;
   *Capture*) show_capture_menu ;;
-  *Settings*) show_settings_menu ;;  
+  *Settings*) show_settings_menu ;;
   *Toggle*) show_toggle_menu ;;
   *Utilities*) show_utilities_menu ;;
   *Power*) show_power_menu ;;
@@ -137,7 +140,7 @@ show_main_menu() {
 # Entry point
 if [[ -n "$1" ]]; then
   case "${1,,}" in
-  apps) walker ;;
+  apps) rofi -show drun -show-icons ;;
   capture) show_capture_menu ;;
   settings) show_settings_menu ;;
   power) show_power_menu ;;

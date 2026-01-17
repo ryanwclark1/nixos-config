@@ -42,7 +42,7 @@
 #bluetooth,
 #pulseaudio {
   min-width: 12px;
-  margin: 0 7.5px;
+  margin: 0 12px;
   font-size: 22px;
 }
 
@@ -75,18 +75,18 @@
 }
 
 #custom-expand-icon {
-  margin-right: 7px;
+  margin: 0 12px;
   font-size: 22px;
 }
 
 #custom-notification {
   font-size: 22px;
-  margin-right: 8px;
+  margin: 0 12px;
 }
 
 #custom-nixos-logo {
   font-size: 26px;
-  margin-right: 8px;
+  margin: 0 12px;
 }
 
 tooltip {
