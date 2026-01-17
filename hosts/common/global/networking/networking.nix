@@ -102,21 +102,24 @@ in
       "8.8.8.8"
       "8.8.4.4"
     ];
-    extraConfig = ''
-      DNS=10.10.100.1 1.1.1.1 1.0.0.1
-      DNSOverTLS=opportunistic
-      MulticastDNS=yes
-      LLMNR=yes
-      # Additional DNS settings
-      Cache=yes
-      CacheFromLocalhost=yes
-      DNSStubListener=yes
-      DNSStubListenerExtra=127.0.0.53
-      ReadEtcHosts=yes
-      # Improve DNS resilience
-      Domains=~.
-      ResolveUnicastSingleLabel=yes
-    '';
+    # extraConfig is deprecated, use settings instead
+    settings = {
+      DNS = [
+        "10.10.100.1"
+        "1.1.1.1"
+        "1.0.0.1"
+      ];
+      DNSOverTLS = "opportunistic";
+      MulticastDNS = true;
+      LLMNR = true;
+      Cache = true;
+      CacheFromLocalhost = true;
+      DNSStubListener = true;
+      DNSStubListenerExtra = "127.0.0.53";
+      ReadEtcHosts = true;
+      Domains = "~.";
+      ResolveUnicastSingleLabel = true;
+    };
   };
 
   # Disable wait-online services for faster boot

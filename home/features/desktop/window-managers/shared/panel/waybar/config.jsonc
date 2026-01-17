@@ -3,7 +3,7 @@
     "layer": "top",
     "position": "top",
     "spacing": 2,
-    "height": 28,
+    "height": 35,
     "margin-right": 0,
     "modules-left": [
         "custom/launcher",
@@ -99,6 +99,7 @@
         "tooltip-format-disconnected": "Disconnected",
         "interval": 3,
         "spacing": 1,
+        "swap-icon-label": false,
         "on-click": "kitty --class=Impala -e impala"
     },
     "battery": {
