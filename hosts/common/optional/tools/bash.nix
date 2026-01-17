@@ -12,10 +12,10 @@
       # blesh = {
       #   enable = true;
       # };
-      # completion = {
-      #   enable = true;
-      #   package = pkgs.bash-completion;
-      # };
+      completion = {
+        enable = true;
+        package = pkgs.bash-completion;
+      };
     };
   };
 }
