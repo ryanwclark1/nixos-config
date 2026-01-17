@@ -43,7 +43,7 @@
 #pulseaudio {
   min-width: 12px;
   margin: 0 7.5px;
-  font-size: 20px;
+  font-size: 22px;
 }
 
 #custom-launcher {
@@ -76,11 +76,16 @@
 
 #custom-expand-icon {
   margin-right: 7px;
-  font-size: 20px;
+  font-size: 22px;
 }
 
 #custom-notification {
-  font-size: 20px;
+  font-size: 22px;
+  margin-right: 8px;
+}
+
+#custom-nixos-logo {
+  font-size: 26px;
   margin-right: 8px;
 }
 

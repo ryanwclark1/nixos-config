@@ -10,19 +10,23 @@ sort_translit = false
 linemode = "none"
 show_hidden = false
 show_symlink = true
-scrolloff = 5
+scrolloff = 3                              # Reduced from 5 to reduce preloading overhead
 mouse_events = ["click", "scroll", "drag"]
 title_format = "Yazi: {cwd}"
 
 [preview]
 wrap = "no"
 tab_size = 2
-max_width = 1200
-max_height = 1800
+# Optimized dimensions for better performance - smaller previews = faster rendering
+max_width = 800   # Reduced from 1200 for faster image processing
+max_height = 600  # Reduced from 1800 for faster image processing
+# Cache directory - Yazi also uses freedesktop.org thumbnail standard (~/.cache/thumbnails/)
+# This allows sharing thumbnails with other applications (file managers, image viewers, etc.)
 cache_dir = "/home/administrator/.cache/yazi"
-image_delay = 5
-image_filter = "triangle"
-image_quality = 75
+image_delay = 2   # Further reduced from 3 for even faster preview response
+# Using "nearest" filter for fastest rendering (alternative: "linear" for better quality)
+image_filter = "nearest"  # Changed from "triangle" - faster but slightly lower quality
+image_quality = 70        # Reduced from 75 - good balance of quality and speed
 ueberzug_scale = 1
 ueberzug_offset = [0, 0, 0, 0]
 
@@ -105,7 +109,8 @@ rules = [
 ]
 
 [tasks]
-micro_workers = 20
+# Increased micro_workers for better parallel MIME detection and file operations
+micro_workers = 30       # Increased from 20 for better parallelization
 macro_workers = 50
 bizarre_retry = 3
 image_alloc = 1073741824 # 1GB
@@ -113,34 +118,52 @@ image_bound = [0, 0]
 suppress_preload = false
 
 [plugin]
+# Prioritize MIME detection for common file types first (faster for typical workflows)
+prepend_fetchers = [
+    # Common text/code files - detect MIME first for better UX
+    { id = "mime-text", url = "*.{txt,md,json,yaml,yml,toml,ini,conf,cfg,log}", run = "mime", prio = "high", if = "!mime" },
+    # Common code files
+    { id = "mime-code", url = "*.{rs,py,js,ts,jsx,tsx,go,java,cpp,c,cc,h,hpp,sh,bash,zsh,fish,lua,vim,nix}", run = "mime", prio = "high", if = "!mime" },
+    # Common media files
+    { id = "mime-media", url = "*.{jpg,jpeg,png,gif,webp,svg,mp4,mp3,avi,mkv,flac,ogg}", run = "mime", prio = "high", if = "!mime" },
+]
 # Only run MIME fetcher if MIME type is not already detected (prevents redundant file command calls)
-fetchers = [{ id = "mime", url = "*", run = "mime", prio = "high", if = "!mime" }]
+fetchers = [
+    { id = "mime", url = "*", run = "mime", prio = "normal", if = "!mime" },
+]
 spotters = [
     { url = "*/", run = "folder" },
-    # Code
+    # Code - prioritize common text files for faster detection
     { mime = "text/*", run = "code" },
-    { mime = "application/{mbox,javascript,wine-extension-ini}", run = "code" },
-    # Image
+    { mime = "application/{mbox,javascript,wine-extension-ini,json,x-ndjson}", run = "code" },
+    # Image - only spot common formats to reduce overhead
     { mime = "image/{avif,hei?,jxl}", run = "magick" },
     { mime = "image/svg+xml", run = "svg" },
-    { mime = "image/*", run = "image" },
+    { mime = "image/{jpeg,jpg,png,gif,webp}", run = "image" }, # Only spot common image formats
     # Video
     { mime = "video/*", run = "preview" },
     # Fallback
     { url = "*", run = "file" },
 ]
+# Skip expensive preloading in certain directories (network mounts, large directories)
+prepend_preloaders = [
+    # Skip preloading in common network mount points and system directories
+    { url = "/mnt/**", run = "noop" },
+    { url = "/media/**", run = "noop" },
+    { url = "/run/media/**", run = "noop" },
+]
 preloaders = [
-    # Image
-    { mime = "image/{avif,hei?,jxl,svg+xml}", run = "magick" },
-    { mime = "image/svg+xml", run = "svg" },
-    { mime = "image/*", run = "image" },
-    # Video
-    { mime = "video/*", run = "preview" },
-    # PDF
-    { mime = "application/pdf", run = "pdf" },
-    # Font
-    { mime = "font/*", run = "font" },
-    { mime = "application/vnd.ms-opentype", run = "font" },
+    # Image - only preload common formats to reduce overhead, prioritize for speed
+    { mime = "image/{jpeg,jpg,png,gif,webp}", run = "image", prio = "high" },  # Common formats get high priority
+    { mime = "image/{avif,hei?,jxl}", run = "magick", prio = "normal" },
+    { mime = "image/svg+xml", run = "svg", prio = "normal" },
+    # Video - lower priority preloading (can be disabled if too slow)
+    { mime = "video/*", run = "preview", prio = "low" },
+    # PDF - skip preloading PDFs (load on demand for better performance)
+    # { mime = "application/pdf", run = "pdf" },  # Commented out - load PDFs on demand
+    # Font - normal priority
+    { mime = "font/*", run = "font", prio = "normal" },
+    { mime = "application/vnd.ms-opentype", run = "font", prio = "normal" },
 ]
 # prepend_previewers = [
 #     { mime = "video/*", run = "ffmpeg" },
@@ -169,34 +192,42 @@ preloaders = [
 #     { mime = "text/csv", run = "miller" },
 #     { mime = "application/octet-stream", run = "hexyl"}
 # ]
+# Skip expensive previews in network mounts and large files
+prepend_previewers = [
+    # Skip previews in network mount points for better performance
+    { url = "/mnt/**", run = "noop" },
+    { url = "/media/**", run = "noop" },
+    { url = "/run/media/**", run = "noop" },
+]
 previewers = [
     { url = "*/", run = "folder" },
     # Markdown
     { url = "*.{md,markdown}", run = "piper" },
-    # Code
-    { mime = "text/*", run = "code" },
-    { mime = "*/{xml,javascript,x-wine-extension-ini}", run = "code" },
+    # Code - prioritize common text files
+    { mime = "text/*", run = "code", prio = "normal" },
+    { mime = "*/{xml,javascript,x-wine-extension-ini}", run = "code", prio = "normal" },
     # JSON
-    { mime = "application/{json,x-ndjson}", run = "json" },
-    # Image
-    { mime = "image/{avif,hei?,jxl,svg+xml}", run = "magick" },
-    { mime = "image/svg+xml", run = "svg" },
-    { mime = "image/*", run = "image" },
-    # Video
-    { mime = "video/*", run = "preview" },
-    # PDF
-    { mime = "application/pdf", run = "pdf" },
-    # Archive
-    { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", run = "archive" },
-    { mime = "application/{debian*-package,redhat-package-manager,rpm,android.package-archive}", run = "archive" },
-    { url = "*.{AppImage,appimage}", run = "archive" },
-    # Virtual Disk / Disk Image
-    { mime = "application/{iso9660-image,qemu-disk,ms-wim,apple-diskimage}", run = "archive" },
-    { mime = "application/virtualbox-{vhd,vhdx}", run = "archive" },
-    { url = "*.{img,fat,ext,ext2,ext3,ext4,squashfs,ntfs,hfs,hfsx}", run = "archive" },
+    { mime = "application/{json,x-ndjson}", run = "json", prio = "normal" },
+    # Image - optimize for common formats first, prioritize for faster previews
+    { mime = "image/{jpeg,jpg,png,gif,webp}", run = "image", prio = "high" },  # Common formats get high priority
+    { mime = "image/{avif,hei?,jxl}", run = "magick", prio = "normal" },      # Less common formats
+    { mime = "image/svg+xml", run = "svg", prio = "normal" },
+    { mime = "image/*", run = "image", prio = "low" },  # Fallback for other image types
+    # Video - lower priority to avoid blocking other previews
+    { mime = "video/*", run = "preview", prio = "low" },
+    # PDF - lower priority as PDF rendering can be slow
+    { mime = "application/pdf", run = "pdf", prio = "low" },
+    # Archive - lower priority, only when needed
+    { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", run = "archive", prio = "low" },
+    { mime = "application/{debian*-package,redhat-package-manager,rpm,android.package-archive}", run = "archive", prio = "low" },
+    { url = "*.{AppImage,appimage}", run = "archive", prio = "low" },
+    # Virtual Disk / Disk Image - very low priority
+    { mime = "application/{iso9660-image,qemu-disk,ms-wim,apple-diskimage}", run = "archive", prio = "low" },
+    { mime = "application/virtualbox-{vhd,vhdx}", run = "archive", prio = "low" },
+    { url = "*.{img,fat,ext,ext2,ext3,ext4,squashfs,ntfs,hfs,hfsx}", run = "archive", prio = "low" },
     # Font
-    { mime = "font/*", run = "font" },
-    { mime = "application/vnd.ms-opentype", run = "font" },
+    { mime = "font/*", run = "font", prio = "normal" },
+    { mime = "application/vnd.ms-opentype", run = "font", prio = "normal" },
     # Empty file
     { mime = "inode/x-empty", run = "empty" },
     # Fallback

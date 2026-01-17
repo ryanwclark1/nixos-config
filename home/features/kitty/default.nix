@@ -68,7 +68,8 @@ in
       force_ltr = false;
       disable_ligatures = false;
       scrollback_lines = 25000;
-      scrollback_indicator_opacity = 0.8;
+      # scrollback_indicator_opacity is deprecated, use scrollbar instead
+      scrollbar_opacity = 0.8;
       # scrollback_pager
       scrollback_pager_history_size = 2048;
       scrollback_fill_enlarged_window = true;

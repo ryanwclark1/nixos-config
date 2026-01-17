@@ -87,6 +87,10 @@
     tree # Directory tree visualization
     fd # Fast file finding
     ripgrep # Fast text searching
+
+    # Builtin plugin dependencies
+    fzf # Required for builtin fzf plugin (fuzzy file finder)
+    zoxide # Required for builtin zoxide plugin (directory jumping)
   ];
 
   programs.yazi = {
@@ -101,9 +105,9 @@
     plugins = {
       arrow = ./plugins/arrow.yazi;
       chmod = pkgs.yaziPlugins.chmod;
-      enhanced-preview = ./plugins/enhanced-preview.yazi;
       excel = ./plugins/excel.yazi;
       eza-preview = ./plugins/eza-preview.yazi;
+
       folder-rules = ./plugins/folder-rules.yazi;
       fzfbm = ./plugins/fzfbm.yazi;
       hexyl = ./plugins/hexyl.yazi;
@@ -188,7 +192,8 @@
           run = "plugin lazygit";
           desc = "run lazygit";
         }
-        # preview directories using eza, can be switched between list and tree modes.
+        # Directory previews are now handled by the unified preview.yazi plugin
+        # (removed eza-preview as directory preview functionality is integrated)
         {
           on = [ "E" ];
           run = "plugin eza-preview";
