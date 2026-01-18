@@ -330,6 +330,47 @@
       };
     };
 
+    # Fix broken chromium-browser.desktop file with @@EXTRA_DESKTOP_ENTRIES@@ placeholder
+    "chromium-browser" = {
+      name = "Chromium";
+      exec = "chromium --ozone-platform=wayland --ozone-platform-hint=wayland --enable-features=TouchpadOverscrollHistoryNavigation --disable-features=WaylandWpColorManagerV1 %U";
+      terminal = false;
+      mimeType = [
+        "application/pdf"
+        "application/rdf+xml"
+        "application/rss+xml"
+        "application/xhtml+xml"
+        "application/xhtml_xml"
+        "application/xml"
+        "image/gif"
+        "image/jpeg"
+        "image/png"
+        "image/webp"
+        "text/html"
+        "text/xml"
+        "x-scheme-handler/http"
+        "x-scheme-handler/https"
+      ];
+      categories = [
+        "Network"
+        "WebBrowser"
+      ];
+      icon = "chromium";
+      settings = {
+        StartupNotify = "true";
+      };
+      actions = {
+        new-window = {
+          name = "New Window";
+          exec = "chromium --ozone-platform=wayland --ozone-platform-hint=wayland --enable-features=TouchpadOverscrollHistoryNavigation --disable-features=WaylandWpColorManagerV1";
+        };
+        new-private-window = {
+          name = "New Incognito Window";
+          exec = "chromium --ozone-platform=wayland --ozone-platform-hint=wayland --enable-features=TouchpadOverscrollHistoryNavigation --disable-features=WaylandWpColorManagerV1 --incognito";
+        };
+      };
+    };
+
     "code" = {
       name = "Visual Studio Code";
       exec = "code --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime %F";
