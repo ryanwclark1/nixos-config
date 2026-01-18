@@ -17,14 +17,26 @@
       MaxRetentionSec=1month
       MaxFileSec=1week
 
-      # Forward to syslog if available
-      ForwardToSyslog=yes
+      # Forward to syslog only if rsyslog is enabled
+      # ForwardToSyslog is set conditionally below
       ForwardToKMsg=yes
       ForwardToConsole=yes
       ForwardToWall=yes
 
       # Compression
       Compress=yes
+
+      # Rate limiting to prevent log spam
+      RateLimitIntervalSec=30s
+      RateLimitBurst=10000
+
+      # Storage settings
+      Storage=persistent
+      SplitMode=uid
+    ''
+    + lib.optionalString config.services.rsyslogd.enable ''
+      # Only forward to syslog if rsyslog is enabled
+      ForwardToSyslog=yes
     '';
   };
 
