@@ -112,7 +112,9 @@
       "vsyscall=none"
       "debugfs=off"
       "oops=panic"
-      "module.sig_unenforce=1"
+      # WARNING: module.sig_unenforce=1 disables kernel module signature enforcement
+      # This is a security risk - only use if you have a specific need for unsigned modules
+      # "module.sig_unenforce=1"
 
       # Performance
       "mitigations=off" # Can be enabled for better security

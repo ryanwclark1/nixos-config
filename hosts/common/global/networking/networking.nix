@@ -96,30 +96,27 @@ in
   services.resolved = {
     enable = true;
     dnssec = "allow-downgrade";
+    # Primary DNS servers (configured via NetworkManager appendNameservers above)
+    # DNS servers are managed by NetworkManager when using systemd-resolved
+    # If you need to override, uncomment and set:
+    # dns = [
+    #   "10.10.100.1"
+    #   "1.1.1.1"
+    #   "1.0.0.1"
+    # ];
     fallbackDns = [
       "1.1.1.1"
       "1.0.0.1"
       "8.8.8.8"
       "8.8.4.4"
     ];
-    # extraConfig is deprecated, use settings instead
-    settings = {
-      DNS = [
-        "10.10.100.1"
-        "1.1.1.1"
-        "1.0.0.1"
-      ];
-      DNSOverTLS = "opportunistic";
-      MulticastDNS = true;
-      LLMNR = true;
-      Cache = true;
-      CacheFromLocalhost = true;
-      DNSStubListener = true;
-      DNSStubListenerExtra = "127.0.0.53";
-      ReadEtcHosts = true;
-      Domains = "~.";
-      ResolveUnicastSingleLabel = true;
-    };
+    # DNS-over-TLS configuration
+    dnsovertls = "opportunistic";
+    # Domains configuration
+    domains = [ "~." ];
+    # Note: Most advanced settings (MulticastDNS, LLMNR, DNSStubListener, etc.)
+    # are enabled by default in systemd-resolved and don't need explicit configuration.
+    # The 'settings' attribute is very limited and doesn't support these options.
   };
 
   # Disable wait-online services for faster boot
