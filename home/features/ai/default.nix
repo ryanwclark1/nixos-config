@@ -62,7 +62,7 @@ in
     ./qwen
     ./codex
     ./opencode
-    ./ollama
+    # ./ollama
   ];
   home.packages = with pkgs; [
     # mlflow-server  # Temporarily disabled due to missing fastapi/uvicorn dependencies
