@@ -95,7 +95,6 @@ in
 
   services.resolved = {
     enable = true;
-    dnssec = "allow-downgrade";
     # Primary DNS servers (configured via NetworkManager appendNameservers above)
     # DNS servers are managed by NetworkManager when using systemd-resolved
     # If you need to override, uncomment and set:
@@ -104,19 +103,22 @@ in
     #   "1.1.1.1"
     #   "1.0.0.1"
     # ];
-    fallbackDns = [
-      "1.1.1.1"
-      "1.0.0.1"
-      "8.8.8.8"
-      "8.8.4.4"
-    ];
-    # DNS-over-TLS configuration
-    dnsovertls = "opportunistic";
-    # Domains configuration
-    domains = [ "~." ];
-    # Note: Most advanced settings (MulticastDNS, LLMNR, DNSStubListener, etc.)
-    # are enabled by default in systemd-resolved and don't need explicit configuration.
-    # The 'settings' attribute is very limited and doesn't support these options.
+    # Updated to use settings.Resolve.* format (new NixOS API)
+    settings = {
+      Resolve = {
+        DNSSEC = "allow-downgrade";
+        FallbackDNS = [
+          "1.1.1.1"
+          "1.0.0.1"
+          "8.8.8.8"
+          "8.8.4.4"
+        ];
+        DNSOverTLS = "opportunistic";
+        Domains = [ "~." ];
+        # Most other settings (MulticastDNS, LLMNR, DNSStubListener, etc.)
+        # are enabled by default and don't need explicit configuration
+      };
+    };
   };
 
   # Disable wait-online services for faster boot
