@@ -25,7 +25,7 @@
       bump #  CLI tool to draft a GitHub Release for the next semantic version
       gh-markdown-preview # GitHub CLI extension to preview Markdown looks like GitHub.
       gh-dash # A beautiful CLI dashboard for GitHub 🚀
-      gh-copilot # Ask for assistance right in your terminal
+      # gh-copilot has been deprecated and removed - use github-copilot-cli package instead if needed
       gh-f # GitHub CLI ultimate FZF extension
       gh-poi
       gh-eco
