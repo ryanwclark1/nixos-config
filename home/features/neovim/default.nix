@@ -50,7 +50,7 @@
     ];
 
     # Basic Neovim configuration
-    extraLuaConfig = ''
+    initLua = ''
       -- Load our custom configuration
       require('config')
     '';
