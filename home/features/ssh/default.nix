@@ -75,6 +75,10 @@ in
       "10.10.100.129" = commonHostConfig // {
         hostname = "10.10.100.129";
       };
+            # Direct IP connection
+      "155.138.220.196" = commonHostConfig // {
+        hostname = "155.138.220.196";
+      };
     };
   };
 

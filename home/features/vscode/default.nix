@@ -6,7 +6,7 @@
 }:
 
 let
-  marketplaceExtensions = import ./marketplace-extensions.nix;
+  marketplaceExtensions = builtins.fromJSON (builtins.readFile ./marketplace-extensions.json);
 in
 {
   imports = [
