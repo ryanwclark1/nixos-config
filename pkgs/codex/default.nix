@@ -14,13 +14,13 @@
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "codex";
-  version = "0.87.0";
+  version = "0.92.0";
 
   src = fetchFromGitHub {
     owner = "openai";
     repo = "codex";
-    tag = "rust-v${finalAttrs.version}";
-    hash = "sha256-XdfB0izL2w5IYLr8RUiP9Dytg6cOONNk9EtVnvzv83k=";
+    tag = "rust-v0.92.0";
+    hash = "sha256-/7WWKUdIi2ub29zGlzseaHN0/GQiK2Q/XrcNdqdBmz8=";
   };
 
   sourceRoot = "${finalAttrs.src.name}/codex-rs";
