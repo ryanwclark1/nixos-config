@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#!nix-shell -i bash -p curl jq nix-prefetch nix
+#!nix-shell -i bash -p curl jq nix-prefetch-git nix
 set -eu -o pipefail
 
 # Get the directory where this script is located
@@ -37,16 +37,30 @@ fi
 
 echo "Updating to version $latestVersion..."
 
-# Prefetch GitHub source
+# Prefetch GitHub source using nix-prefetch-git (matches fetchFromGitHub)
 echo "Prefetching GitHub source..."
-GITHUB_TARBALL_URL="https://github.com/openai/codex/archive/refs/tags/rust-v${latestVersion}.tar.gz"
-echo "  URL: $GITHUB_TARBALL_URL"
+GITHUB_REPO="https://github.com/openai/codex"
+GITHUB_TAG="rust-v${latestVersion}"
+echo "  Repository: $GITHUB_REPO"
+echo "  Tag: $GITHUB_TAG"
 
-SOURCE_PATH=$(nix-prefetch-url "$GITHUB_TARBALL_URL" --name "codex-rust-v${latestVersion}.tar.gz" 2>&1 | tail -1)
-SOURCE_HASH=$(nix-hash --to-sri --type sha256 "$SOURCE_PATH")
+# Use nix-prefetch-git to get the hash in the correct format for fetchFromGitHub
+# nix-prefetch-git outputs JSON at the end - extract the JSON block and parse it
+PREFETCH_OUTPUT=$(nix-prefetch-git --url "$GITHUB_REPO" --rev "$GITHUB_TAG" 2>&1)
+# Extract JSON object (starts with { and ends with })
+JSON_BLOCK=$(echo "$PREFETCH_OUTPUT" | grep -o '{.*}' | tail -1)
+SOURCE_HASH=$(echo "$JSON_BLOCK" | jq -r '.hash // empty' 2>/dev/null)
 
-if [[ -z "$SOURCE_HASH" ]]; then
-  echo "Error: Failed to get source hash" >&2
+if [[ -z "$SOURCE_HASH" ]] || [[ "$SOURCE_HASH" == "null" ]]; then
+  echo "Warning: Could not extract hash from JSON, trying alternative method..." >&2
+  # Fallback: look for hash in the output directly
+  SOURCE_HASH=$(echo "$PREFETCH_OUTPUT" | grep -oE 'sha256-[A-Za-z0-9+/=]{43}' | head -1)
+fi
+
+if [[ -z "$SOURCE_HASH" ]] || [[ "$SOURCE_HASH" == "null" ]]; then
+  echo "Error: Failed to get source hash from nix-prefetch-git" >&2
+  echo "Output was:" >&2
+  echo "$PREFETCH_OUTPUT" >&2
   exit 1
 fi
 
@@ -58,14 +72,21 @@ cp "$packageFile" "${packageFile}.bak"
 # Update version
 sed -i "s/version = \"$currentVersion\"/version = \"$latestVersion\"/" "$packageFile"
 
-# Update source hash
+# Update source hash (matches fetchFromGitHub hash field)
 sed -i "s|hash = \"sha256-[^\"]*\"|hash = \"$SOURCE_HASH\"|" "$packageFile"
 
-# Update rev
-sed -i "s|rev = \"rust-v\${finalAttrs.version}\"|rev = \"rust-v${latestVersion}\"|" "$packageFile"
+# Note: tag field uses ${finalAttrs.version} so it updates automatically with version
+# No need to update it manually
 
 # Update changelog URL
 sed -i "s|rust-v\${finalAttrs.version}|rust-v${latestVersion}|g" "$packageFile"
+
+# Reset cargoHash to empty string so user can easily update it
+# This makes it clear that cargoHash needs to be recomputed
+if grep -q 'cargoHash = "sha256-' "$packageFile"; then
+  sed -i 's|cargoHash = "sha256-[^"]*"|cargoHash = ""|' "$packageFile"
+  echo "⚠️  Reset cargoHash to empty string - needs to be recomputed"
+fi
 
 echo "✅ Updated to version $latestVersion"
 echo ""
@@ -74,8 +95,10 @@ echo "  Version: $currentVersion -> $latestVersion"
 echo "  Source hash: $SOURCE_HASH"
 echo ""
 echo "⚠️  IMPORTANT: You need to compute cargoHash by building:"
-echo "   nix build .#codex"
-echo "   The build will show the correct cargoHash - update it in the package file."
+echo "   1. Set cargoHash = \"\" in the package file (already done)"
+echo "   2. Build: nix build .#codex"
+echo "   3. Copy the 'got: sha256-...' value from the error message"
+echo "   4. Update cargoHash in the package file with the new hash"
 echo ""
 echo "Please review the changes:"
 echo "  git diff $packageFile"

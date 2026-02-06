@@ -14,20 +14,20 @@
   {
     "name": "chatgpt",
     "publisher": "openai",
-    "sha256": "sha256-s4DULSFqETivP06BcxcQrNwM0NmzEwqkuRsPs4QBM/M=",
-    "version": "0.5.67"
+    "sha256": "sha256-IyIUCA2b09xOWRfHlInuHykZllhCbb6sOvd2CpBBCKw=",
+    "version": "0.5.71"
   },
   {
     "name": "claude-code",
     "publisher": "anthropic",
-    "sha256": "sha256-8r2/bF5zkq4LkMKvI5YcBMaaMzgWAIezdIwTMQQBHsM=",
-    "version": "2.1.20"
+    "sha256": "sha256-6zZCQCUvHcCQ9Td/T6KJQUkiGACWd1cHSs6xHKmKWQI=",
+    "version": "2.1.33"
   },
   {
     "name": "explorer",
     "publisher": "vitest",
-    "sha256": "sha256-pcJgVYXGpkK2SGGvEF9aiRmk3kKte321qP/17awo5MU=",
-    "version": "1.38.1"
+    "sha256": "sha256-+w6mxSsajjmmzJvfG9Z0uyUOkJOmxrWUvCDvZXGOx20=",
+    "version": "1.42.0"
   },
   {
     "name": "gemini-cli-vscode-ide-companion",
@@ -80,26 +80,26 @@
   {
     "name": "pyrefly",
     "publisher": "meta",
-    "sha256": "sha256-GSVas01jBL826ItyyKnWdYKAFYrIwIoKBLflfu9y8u0=",
-    "version": "0.50.0"
+    "sha256": "sha256-HdFlRWTqCpzx8v9DzE6A3dm4wOnNk6JDaFEV8jvmHV4=",
+    "version": "0.51.1"
   },
   {
     "name": "remotehub",
     "publisher": "GitHub",
-    "sha256": "sha256-+8W3jCfyJVtdLJxFhmmay5zefR+aqMtIaMIpMkzyKTs=",
-    "version": "0.65.2026012601"
+    "sha256": "sha256-/rkEJCyI0HWAoc2EyuCV4gwZnad9KMqEI00HUweVe+4=",
+    "version": "0.65.2026012801"
   },
   {
     "name": "ty",
     "publisher": "astral-sh",
-    "sha256": "sha256-cfIpCG8L8+Kf/Fka8CRU8gg8FgMO+TYRfdvMJ5J9h+Q=",
-    "version": "2026.8.0"
+    "sha256": "sha256-epTUX/v+9/CJpMO1wBkAwi0kQaycg69pPOV9e5W5ySc=",
+    "version": "2026.10.0"
   },
   {
     "name": "vscode-containers",
     "publisher": "ms-azuretools",
-    "sha256": "sha256-mGS1fppmcELhztvtnWQfW7MbtagQlVkbPtSaBHExzGA=",
-    "version": "2.4.0"
+    "sha256": "sha256-OwxJJVW15MivWVeSlbFQNQbrxjDgpXePrPf+r3qb+As=",
+    "version": "2.4.1"
   },
   {
     "name": "vscode-gitops-tools",
@@ -116,8 +116,8 @@
   {
     "name": "vscode-pgsql",
     "publisher": "ms-ossdata",
-    "sha256": "sha256-/+VXsppHJlC+suEmu6d8lpryCKwfNWVA/nEYu4nhX3I=",
-    "version": "1.14.0"
+    "sha256": "sha256-ILVSR2zid/uUyK0S2O39ztyC8rsW74nvhhpmIv/cEpM=",
+    "version": "1.16.0"
   },
   {
     "name": "vscode-python-test-adapter",
