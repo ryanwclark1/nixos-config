@@ -9,6 +9,39 @@
   coreutils,
   commandLineArgs ? "",
   useVSCodeRipgrep ? stdenv.hostPlatform.isDarwin,
+  # Get all build dependencies needed by generic.nix
+  gnugrep,
+  copyDesktopItems,
+  makeDesktopItem,
+  unzip,
+  libsecret,
+  buildPackages,
+  at-spi2-atk,
+  autoPatchelfHook,
+  alsa-lib,
+  libgbm,
+  nss,
+  nspr,
+  libxrandr,
+  libxfixes,
+  libxext,
+  libxdamage,
+  libxcomposite,
+  libx11,
+  libxkbfile,
+  libxcb,
+  systemdLibs,
+  fontconfig,
+  imagemagick,
+  libdbusmenu,
+  glib,
+  wayland,
+  libglvnd,
+  openssl,
+  webkitgtk_4_1,
+  ripgrep,
+  asar,
+  bash,
 }:
 
 let
@@ -17,8 +50,21 @@ let
   source =
     information.sources."${hostPlatform.system}"
       or (throw "antigravity: unsupported system ${hostPlatform.system}");
+
+  # Import the generic function
+  genericFunction = import ../vscode-generic/generic.nix;
+
+  # Call the function directly with explicit arguments to avoid callPackage auto-filling meta
+  # First argument set: build dependencies
+  # Second argument set: package-specific arguments
 in
-(callPackage ../vscode-generic/generic.nix {
+(genericFunction {
+  inherit stdenv lib coreutils gnugrep copyDesktopItems makeDesktopItem unzip libsecret;
+  inherit buildPackages at-spi2-atk autoPatchelfHook buildFHSEnv;
+  inherit alsa-lib libgbm nss nspr libxrandr libxfixes libxext libxdamage libxcomposite;
+  inherit libx11 libxkbfile libxcb systemdLibs fontconfig imagemagick libdbusmenu;
+  inherit glib wayland libglvnd openssl webkitgtk_4_1 ripgrep asar bash;
+} {
   inherit commandLineArgs useVSCodeRipgrep;
   inherit (information) version vscodeVersion;
   pname = "antigravity";
@@ -35,7 +81,7 @@ in
 
   # When running inside an FHS environment, try linking Google Chrome or Chromium
   # to the hardcoded Playwright search path: /opt/google/chrome/chrome
-  buildFHSEnv =
+  customizeFHSEnv =
     args:
     buildFHSEnv (
       args

@@ -4,7 +4,23 @@
 # Note: github-mcp-server is now available in nixpkgs and no longer needs a custom package
 final: prev: {
   # Override code-cursor with our custom version
-  code-cursor = final.callPackage ../pkgs/code-cursor { };
+  # Workaround: callPackage incorrectly auto-fills 'meta' from package set
+  # Solution: use lib.callPackageWith to exclude meta from auto-args
+  code-cursor =
+    let
+      # Remove meta from final to prevent callPackage from auto-filling it
+      pkgsWithoutMeta = builtins.removeAttrs final [ "meta" ];
+      # Create a callPackage that excludes meta
+      callPackageWithoutMeta = final.lib.callPackageWith pkgsWithoutMeta;
+      # Import the package definition
+      codeCursorFn = import ../pkgs/code-cursor;
+    in
+    # Call package definition with callPackageWithoutMeta, explicitly excluding meta
+    callPackageWithoutMeta codeCursorFn {
+      # Pass callPackageWithoutMeta so it's used for nested callPackage calls
+      callPackage = callPackageWithoutMeta;
+      # Explicitly do NOT pass meta here - it will be passed in the second argument set
+    };
 
   # Override cursor-cli with our custom version
   cursor-cli = final.callPackage ../pkgs/cursor-cli { };
@@ -19,8 +35,24 @@ final: prev: {
   codex = final.callPackage ../pkgs/codex { };
 
   # Override antigravity with our custom version
-  antigravity = final.callPackage ../pkgs/antigravity { };
+  # Same workaround as code-cursor: exclude meta from auto-filling
+  antigravity =
+    let
+      pkgsWithoutMeta = builtins.removeAttrs final [ "meta" ];
+      callPackageWithoutMeta = final.lib.callPackageWith pkgsWithoutMeta;
+    in
+    callPackageWithoutMeta (import ../pkgs/antigravity) {
+      callPackage = callPackageWithoutMeta;
+    };
 
   # Override kiro with our custom version
-  kiro = final.callPackage ../pkgs/kiro { };
+  # Same workaround as code-cursor: exclude meta from auto-filling
+  kiro =
+    let
+      pkgsWithoutMeta = builtins.removeAttrs final [ "meta" ];
+      callPackageWithoutMeta = final.lib.callPackageWith pkgsWithoutMeta;
+    in
+    callPackageWithoutMeta (import ../pkgs/kiro) {
+      callPackage = callPackageWithoutMeta;
+    };
 }

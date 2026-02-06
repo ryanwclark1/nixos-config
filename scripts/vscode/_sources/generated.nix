@@ -25,33 +25,33 @@
   };
   chatgpt = {
     pname = "chatgpt";
-    version = "0.5.67";
+    version = "0.5.71";
     src = fetchurl {
-      url = "https://openai.gallery.vsassets.io/_apis/public/gallery/publisher/openai/extension/chatgpt/0.5.67/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "chatgpt-0.5.67.zip";
-      sha256 = "sha256-s4DULSFqETivP06BcxcQrNwM0NmzEwqkuRsPs4QBM/M=";
+      url = "https://openai.gallery.vsassets.io/_apis/public/gallery/publisher/openai/extension/chatgpt/0.5.71/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "chatgpt-0.5.71.zip";
+      sha256 = "sha256-IyIUCA2b09xOWRfHlInuHykZllhCbb6sOvd2CpBBCKw=";
     };
     publisher = "openai";
     name = "chatgpt";
   };
   claude-code = {
     pname = "claude-code";
-    version = "2.1.20";
+    version = "2.1.33";
     src = fetchurl {
-      url = "https://anthropic.gallery.vsassets.io/_apis/public/gallery/publisher/anthropic/extension/claude-code/2.1.20/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "claude-code-2.1.20.zip";
-      sha256 = "sha256-8r2/bF5zkq4LkMKvI5YcBMaaMzgWAIezdIwTMQQBHsM=";
+      url = "https://anthropic.gallery.vsassets.io/_apis/public/gallery/publisher/anthropic/extension/claude-code/2.1.33/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "claude-code-2.1.33.zip";
+      sha256 = "sha256-6zZCQCUvHcCQ9Td/T6KJQUkiGACWd1cHSs6xHKmKWQI=";
     };
     publisher = "anthropic";
     name = "claude-code";
   };
   explorer = {
     pname = "explorer";
-    version = "1.38.1";
+    version = "1.42.0";
     src = fetchurl {
-      url = "https://vitest.gallery.vsassets.io/_apis/public/gallery/publisher/vitest/extension/explorer/1.38.1/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "explorer-1.38.1.zip";
-      sha256 = "sha256-pcJgVYXGpkK2SGGvEF9aiRmk3kKte321qP/17awo5MU=";
+      url = "https://vitest.gallery.vsassets.io/_apis/public/gallery/publisher/vitest/extension/explorer/1.42.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "explorer-1.42.0.zip";
+      sha256 = "sha256-+w6mxSsajjmmzJvfG9Z0uyUOkJOmxrWUvCDvZXGOx20=";
     };
     publisher = "vitest";
     name = "explorer";
@@ -157,44 +157,44 @@
   };
   pyrefly = {
     pname = "pyrefly";
-    version = "0.50.0";
+    version = "0.51.1";
     src = fetchurl {
-      url = "https://meta.gallery.vsassets.io/_apis/public/gallery/publisher/meta/extension/pyrefly/0.50.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "pyrefly-0.50.0.zip";
-      sha256 = "sha256-GSVas01jBL826ItyyKnWdYKAFYrIwIoKBLflfu9y8u0=";
+      url = "https://meta.gallery.vsassets.io/_apis/public/gallery/publisher/meta/extension/pyrefly/0.51.1/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "pyrefly-0.51.1.zip";
+      sha256 = "sha256-HdFlRWTqCpzx8v9DzE6A3dm4wOnNk6JDaFEV8jvmHV4=";
     };
     publisher = "meta";
     name = "pyrefly";
   };
   remotehub = {
     pname = "remotehub";
-    version = "0.65.2026012601";
+    version = "0.65.2026012801";
     src = fetchurl {
-      url = "https://GitHub.gallery.vsassets.io/_apis/public/gallery/publisher/GitHub/extension/remotehub/0.65.2026012601/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "remotehub-0.65.2026012601.zip";
-      sha256 = "sha256-+8W3jCfyJVtdLJxFhmmay5zefR+aqMtIaMIpMkzyKTs=";
+      url = "https://GitHub.gallery.vsassets.io/_apis/public/gallery/publisher/GitHub/extension/remotehub/0.65.2026012801/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "remotehub-0.65.2026012801.zip";
+      sha256 = "sha256-/rkEJCyI0HWAoc2EyuCV4gwZnad9KMqEI00HUweVe+4=";
     };
     publisher = "GitHub";
     name = "remotehub";
   };
   ty = {
     pname = "ty";
-    version = "2026.8.0";
+    version = "2026.10.0";
     src = fetchurl {
-      url = "https://astral-sh.gallery.vsassets.io/_apis/public/gallery/publisher/astral-sh/extension/ty/2026.8.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "ty-2026.8.0.zip";
-      sha256 = "sha256-cfIpCG8L8+Kf/Fka8CRU8gg8FgMO+TYRfdvMJ5J9h+Q=";
+      url = "https://astral-sh.gallery.vsassets.io/_apis/public/gallery/publisher/astral-sh/extension/ty/2026.10.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "ty-2026.10.0.zip";
+      sha256 = "sha256-epTUX/v+9/CJpMO1wBkAwi0kQaycg69pPOV9e5W5ySc=";
     };
     publisher = "astral-sh";
     name = "ty";
   };
   vscode-containers = {
     pname = "vscode-containers";
-    version = "2.4.0";
+    version = "2.4.1";
     src = fetchurl {
-      url = "https://ms-azuretools.gallery.vsassets.io/_apis/public/gallery/publisher/ms-azuretools/extension/vscode-containers/2.4.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "vscode-containers-2.4.0.zip";
-      sha256 = "sha256-mGS1fppmcELhztvtnWQfW7MbtagQlVkbPtSaBHExzGA=";
+      url = "https://ms-azuretools.gallery.vsassets.io/_apis/public/gallery/publisher/ms-azuretools/extension/vscode-containers/2.4.1/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "vscode-containers-2.4.1.zip";
+      sha256 = "sha256-OwxJJVW15MivWVeSlbFQNQbrxjDgpXePrPf+r3qb+As=";
     };
     publisher = "ms-azuretools";
     name = "vscode-containers";
@@ -223,11 +223,11 @@
   };
   vscode-pgsql = {
     pname = "vscode-pgsql";
-    version = "1.14.0";
+    version = "1.16.0";
     src = fetchurl {
-      url = "https://ms-ossdata.gallery.vsassets.io/_apis/public/gallery/publisher/ms-ossdata/extension/vscode-pgsql/1.14.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "vscode-pgsql-1.14.0.zip";
-      sha256 = "sha256-/+VXsppHJlC+suEmu6d8lpryCKwfNWVA/nEYu4nhX3I=";
+      url = "https://ms-ossdata.gallery.vsassets.io/_apis/public/gallery/publisher/ms-ossdata/extension/vscode-pgsql/1.16.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "vscode-pgsql-1.16.0.zip";
+      sha256 = "sha256-ILVSR2zid/uUyK0S2O39ztyC8rsW74nvhhpmIv/cEpM=";
     };
     publisher = "ms-ossdata";
     name = "vscode-pgsql";

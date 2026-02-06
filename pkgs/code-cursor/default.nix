@@ -7,6 +7,41 @@
   undmg,
   commandLineArgs ? "",
   useVSCodeRipgrep ? stdenv.hostPlatform.isDarwin,
+  # Get all build dependencies needed by generic.nix
+  coreutils,
+  gnugrep,
+  copyDesktopItems,
+  makeDesktopItem,
+  unzip,
+  libsecret,
+  buildPackages,
+  at-spi2-atk,
+  autoPatchelfHook,
+  buildFHSEnv,
+  alsa-lib,
+  libgbm,
+  nss,
+  nspr,
+  libxrandr,
+  libxfixes,
+  libxext,
+  libxdamage,
+  libxcomposite,
+  libx11,
+  libxkbfile,
+  libxcb,
+  systemdLibs,
+  fontconfig,
+  imagemagick,
+  libdbusmenu,
+  glib,
+  wayland,
+  libglvnd,
+  openssl,
+  webkitgtk_4_1,
+  ripgrep,
+  asar,
+  bash,
 }:
 
 let
@@ -14,6 +49,7 @@ let
   finalCommandLineArgs = "--update=false " + commandLineArgs;
 
   sourcesJson = lib.importJSON ./sources.json;
+  inherit (sourcesJson) version vscodeVersion;
   sources = lib.mapAttrs (
     _: info:
     fetchurl {
@@ -22,13 +58,26 @@ let
   ) sourcesJson.sources;
 
   source = sources.${hostPlatform.system};
+  pname = "cursor";
+
+  # Import the generic function
+  genericFunction = import ../vscode-generic/generic.nix;
+
+  # Call the function directly with explicit arguments to avoid callPackage auto-filling meta
+  # First argument set: build dependencies
+  # Second argument set: package-specific arguments
 in
-(callPackage ../vscode-generic/generic.nix rec {
-  inherit useVSCodeRipgrep;
-  inherit (sourcesJson) version vscodeVersion;
+(genericFunction {
+  inherit stdenv lib coreutils gnugrep copyDesktopItems makeDesktopItem unzip libsecret;
+  inherit buildPackages at-spi2-atk autoPatchelfHook buildFHSEnv;
+  inherit alsa-lib libgbm nss nspr libxrandr libxfixes libxext libxdamage libxcomposite;
+  inherit libx11 libxkbfile libxcb systemdLibs fontconfig imagemagick libdbusmenu;
+  inherit glib wayland libglvnd openssl webkitgtk_4_1 ripgrep asar bash;
+} {
+  inherit useVSCodeRipgrep version vscodeVersion;
   commandLineArgs = finalCommandLineArgs;
 
-  pname = "cursor";
+  inherit pname;
 
   executableName = "cursor";
   longName = "Cursor";
