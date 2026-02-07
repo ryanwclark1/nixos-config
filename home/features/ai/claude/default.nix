@@ -207,6 +207,7 @@ in
         padding = 0; # Optional: set to 0 to let status line go to
       };
       forceLoginMethod = "console";
+      includeCoAuthoredBy = false;
 
       # Example memory settings (user-level)
       memory = {
