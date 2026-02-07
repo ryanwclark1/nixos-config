@@ -47,5 +47,16 @@
       "--headless"
     ],
     "description": "Browser automation and web scraping via Playwright (NixOS-compatible wrapper)"
+  },
+  "context7": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "@upstash/context7-mcp"
+    ],
+    "env": {
+      "CONTEXT7_TOKEN": "${CONTEXT7_TOKEN}"
+    },
+    "description": "Provides up-to-date code documentation for AI code editors"
   }
 }
