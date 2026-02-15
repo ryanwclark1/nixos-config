@@ -246,7 +246,7 @@ main() {
     # Editor open
     --bind="$enter_bind"
     # Extras
-    --bind="ctrl-o:execute(xdg-open {1} 2>/dev/null || open {1} 2>/dev/null)"
+    --bind="ctrl-o:execute(sh -c 'xdg-open \"$1\" 2>/dev/null || (command -v open >/dev/null 2>&1 && open \"$1\" 2>/dev/null) || true' _ \"{1}\")"
     --bind="ctrl-y:execute-silent(echo {1}:{2} | wl-copy 2>/dev/null || echo {1}:{2} | xclip -selection clipboard 2>/dev/null || echo {1}:{2} | pbcopy 2>/dev/null)"
     --bind='?:preview:echo -e "KEYS:\n\nEnter - Open in editor at line/col\nCtrl-O - Open in default app\nCtrl-Y - Copy file:line\nCtrl-L - Toggle preview\nCtrl-R - Reload\nEsc - Quit\n\nSearch Tool: '"${SEARCH_TOOL}"'"'
     --bind="ctrl-l:toggle-preview"

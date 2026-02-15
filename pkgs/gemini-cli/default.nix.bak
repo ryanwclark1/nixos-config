@@ -14,13 +14,13 @@
 
 buildNpmPackage (finalAttrs: {
   pname = "gemini-cli";
-  version = "0.25.2";
+  version = "0.27.2";
 
   src = fetchFromGitHub {
     owner = "google-gemini";
     repo = "gemini-cli";
     rev = "v0.24.0";
-    hash = "sha256-SYH4iDv8VkOZl8I52akHwiURas/7JDmoY+e/i6aoUdQ=";
+    hash = "sha256-9XHsp5U7mbP0GJC9AlTFG8s7NnmbtvHvyizD2oqClqQ=";
   };
 
   nodejs = nodejs_22;

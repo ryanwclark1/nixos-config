@@ -196,12 +196,25 @@ main() {
     # Create header
     local header="WiFi Network Selector | <Enter> connect | <Ctrl-R> rescan | ? help"
 
-    # Build nmcli command
-    local nmcli_cmd=(nmcli -f 'bssid,signal,bars,freq,security,ssid' --color yes device wifi)
+    # Build nmcli command - use tab-separated output to handle SSIDs with spaces
+    local nmcli_cmd preview_cmd reload_cmd
+    local fzf_opts=()
 
     if [[ "$saved_only" == true ]]; then
         info "Showing saved connections only..."
-        nmcli_cmd=(nmcli -f 'name,type,autoconnect,state' --color yes connection show)
+        nmcli_cmd=(nmcli -t -f 'name,type,autoconnect,state' connection show)
+        preview_cmd='nmcli connection show "{1}" 2>/dev/null || echo -e "Name: {1}\nType: {2}\nAuto-connect: {3}\nState: {4}"'
+        reload_cmd='nmcli -t -f "name,type,autoconnect,state" connection show'
+        fzf_opts=(
+            --with-nth=1..
+        )
+    else
+        nmcli_cmd=(nmcli -t -f 'bssid,signal,bars,freq,security,ssid' device wifi)
+        preview_cmd='echo -e "BSSID: {1}\nSignal: {2}%\nBars: {3}\nFrequency: {4} MHz\nSecurity: {5}\nSSID: {6}"'
+        reload_cmd='nmcli device wifi rescan; sleep 2; nmcli -t -f "bssid,signal,bars,freq,security,ssid" device wifi'
+        fzf_opts=(
+            --with-nth=2..
+        )
     fi
 
     # Main FZF interface
@@ -211,11 +224,12 @@ main() {
         fzf --ansi \
             --header="$header" \
             --header-lines=1 \
-            --with-nth=2.. \
+            --delimiter='\t' \
+            "${fzf_opts[@]}" \
             --expect='ctrl-r,ctrl-s,ctrl-f,ctrl-d' \
-            --preview='nmcli connection show {-1} 2>/dev/null || echo "Network: {-1}\nBSSID: {1}\nSignal: {2}\nFrequency: {4}\nSecurity: {5}"' \
+            --preview="$preview_cmd" \
             --preview-window='right,50%,border-left,wrap' \
-            --bind='ctrl-r:reload(nmcli device wifi rescan; sleep 2; nmcli -f "bssid,signal,bars,freq,security,ssid" --color yes device wifi)' \
+            --bind="ctrl-r:reload($reload_cmd)" \
             --bind='?:preview:echo -e "KEYBINDINGS:\n\n<Enter> - Connect to network\n<Ctrl-R> - Rescan networks\n<Ctrl-S> - Show saved connections\n<Ctrl-F> - Forget saved network\n<Ctrl-D> - Disconnect current\n<Esc> - Quit\n\nCOLOR CODES:\n- Green: Connected\n- Yellow: Available\n- Red: Requires password\n- Blue: Open network"' \
             --height=80% \
             --reverse \
@@ -229,14 +243,14 @@ main() {
 
     [[ -z "$network_line" ]] && exit 0
 
-    # Extract network information
+    # Extract network information - fields are tab-separated
     local bssid ssid
     if [[ "$saved_only" == true ]]; then
-        ssid=$(echo "$network_line" | awk '{print $1}')
+        ssid=$(echo "$network_line" | cut -d$'\t' -f1)
     else
-        read -r bssid _ _ _ _ ssid <<< "$network_line"
-        # Handle SSIDs with spaces
-        ssid="${network_line##* }"
+        # Extract fields from tab-separated line: bssid,signal,bars,freq,security,ssid
+        bssid=$(echo "$network_line" | cut -d$'\t' -f1)
+        ssid=$(echo "$network_line" | cut -d$'\t' -f6)
     fi
 
     case "$key" in
@@ -247,7 +261,8 @@ main() {
             ;;
         ctrl-s)
             info "Showing saved connections..."
-            nmcli connection show
+            # Re-run with saved connections view
+            exec "$0" -s
             ;;
         ctrl-f)
             if [[ "$saved_only" == true ]]; then
@@ -277,12 +292,21 @@ main() {
             ;;
         "")
             # Connect to network
-            info "Connecting to: $ssid"
-            if nmcli -a device wifi connect "$bssid" 2>/dev/null || nmcli -a device wifi connect "$ssid"; then
-                success "Successfully connected to: $ssid"
+            if [[ "$saved_only" == true ]]; then
+                info "Activating connection: $ssid"
+                if nmcli connection up "$ssid"; then
+                    success "Successfully activated connection: $ssid"
+                else
+                    err "Failed to activate connection: $ssid"
+                fi
             else
-                err "Failed to connect to: $ssid"
-                warn "Check password or network availability"
+                info "Connecting to: $ssid"
+                if nmcli -a device wifi connect "$bssid" 2>/dev/null || nmcli -a device wifi connect "$ssid"; then
+                    success "Successfully connected to: $ssid"
+                else
+                    err "Failed to connect to: $ssid"
+                    warn "Check password or network availability"
+                fi
             fi
             ;;
     esac
