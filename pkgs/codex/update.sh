@@ -47,8 +47,8 @@ echo "  Tag: $GITHUB_TAG"
 # Use nix-prefetch-git to get the hash in the correct format for fetchFromGitHub
 # nix-prefetch-git outputs JSON at the end - extract the JSON block and parse it
 PREFETCH_OUTPUT=$(nix-prefetch-git --url "$GITHUB_REPO" --rev "$GITHUB_TAG" 2>&1)
-# Extract JSON object (starts with { and ends with })
-JSON_BLOCK=$(echo "$PREFETCH_OUTPUT" | grep -o '{.*}' | tail -1)
+# Extract JSON object (starts with { and ends with }) - handle multiline JSON
+JSON_BLOCK=$(echo "$PREFETCH_OUTPUT" | awk '/^\{/,/^}/')
 SOURCE_HASH=$(echo "$JSON_BLOCK" | jq -r '.hash // empty' 2>/dev/null)
 
 if [[ -z "$SOURCE_HASH" ]] || [[ "$SOURCE_HASH" == "null" ]]; then

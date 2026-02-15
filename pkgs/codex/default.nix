@@ -8,6 +8,7 @@
   cmake,
   gitMinimal,
   libclang,
+  libcap,
   makeBinaryWrapper,
   nix-update-script,
   pkg-config,
@@ -18,18 +19,18 @@
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "codex";
-  version = "0.98.0";
+  version = "0.101.0";
 
   src = fetchFromGitHub {
     owner = "openai";
     repo = "codex";
-    tag = "rust-v${finalAttrs.version}";
-    hash = "sha256-rP5Qo70n5lNrdR6ycE63VObLwcMNRlk8sY/kuJ4Qw9Y=";
+    tag = "rust-v0.101.0";
+    hash = "sha256-m2Jq7fbSXQ/O3bNBr6zbnQERhk2FZXb+AlGZsHn8GuQ=";
   };
 
   sourceRoot = "${finalAttrs.src.name}/codex-rs";
 
-  cargoHash = "sha256-DTLC+s9OfWXkjK2Ab5RKPxRB5SfWNqDLA38jvcraZvg=";
+  cargoHash = "sha256-oOcQv3NFd45WRdn2QtDMxVZwf3KjGWaSDBCjCk0ik/U=";
 
   nativeBuildInputs = [
     clang
@@ -42,6 +43,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   buildInputs = [
     libclang
+    libcap
     openssl
   ];
 
@@ -95,7 +97,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   meta = {
     description = "Lightweight coding agent that runs in your terminal";
     homepage = "https://github.com/openai/codex";
-    changelog = "https://raw.githubusercontent.com/openai/codex/refs/tags/rust-v${finalAttrs.version}/CHANGELOG.md";
+    changelog = "https://raw.githubusercontent.com/openai/codex/refs/tags/rust-v0.101.0/CHANGELOG.md";
     license = lib.licenses.asl20;
     mainProgram = "codex";
     maintainers = with lib.maintainers; [

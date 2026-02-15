@@ -60,12 +60,14 @@ for a; do
   path="${a##*:}"
   domains+=( ["$a"]="$host" )
   paths+=( ["$a"]="$path" )
-  shift
 done
 
 for s in "${!domains[@]}"; do
-  ssh "${domains[$s]}" "find ${paths[$s]}" | sed -r "s|^|${domains[$s]}:|" >> "$fifo" &
+  ssh "${domains[$s]}" "find \"${paths[$s]}\" -type f" | sed -r "s|^|${domains[$s]}:|" >> "$fifo" &
 done
+
+# Wait for all background jobs to finish before reading from FIFO
+wait
 
 mapfile -t files < <(fzf -e --inline-info +s --multi --cycle --bind='Ctrl-A:toggle-all,`:jump' < "$fifo")
 
