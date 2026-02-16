@@ -83,6 +83,7 @@
 
     # Main Hyprland config file
     ".config/hypr/hyprland.conf" = {
+      force = true;
       text = ''
         # Hyprland Configuration for System-Level Installation
         # This config is used with system-level Hyprland + UWSM
