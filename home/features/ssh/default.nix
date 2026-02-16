@@ -10,6 +10,10 @@ let
   commonHostConfig = {
     user = "administrator";
     identityFile = "~/.ssh/ssh_host_ed25519_key";
+    identitiesOnly = true;
+      extraOptions = {
+        PreferredAuthentications = "publickey";
+      };
   };
 in
 {
@@ -78,6 +82,10 @@ in
             # Direct IP connection
       "155.138.220.196" = commonHostConfig // {
         hostname = "155.138.220.196";
+      };
+
+      "10.10.100.113" = commonHostConfig // {
+        hostname = "10.10.100.113";
       };
     };
   };

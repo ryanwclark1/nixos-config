@@ -61,6 +61,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
         "-Wno-error=character-conversion"
       ]
     );
+    # Limit parallelism to reduce memory pressure during compilation
+    # This helps prevent builds from hanging on resource-constrained systems
+    # Adjust the number based on available RAM (4 is a safe default)
+    CARGO_BUILD_JOBS = "4";
   };
 
   # NOTE: part of the test suite requires access to networking, local shells,

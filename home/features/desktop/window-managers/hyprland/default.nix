@@ -87,7 +87,7 @@
         # Hyprland Configuration for System-Level Installation
         # This config is used with system-level Hyprland + UWSM
 
-        # Source global variables first (required for all other configs)
+        # Source global variables first ls (required for all other configs)
         source = ~/.config/hypr/conf/variables.conf
 
         # Source all configuration files
