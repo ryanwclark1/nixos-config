@@ -92,7 +92,7 @@
   };
 
   nix = {
-        # Enable distributed builds (remote builders)
+    # Enable distributed builds (remote builders)
     distributedBuilds = true;
     buildMachines = [
       {
