@@ -35,7 +35,12 @@
     # See: hosts/common/optional/services/xdg.nix
     systemDirs = {
       config = [ "${config.home.homeDirectory}/.config" ];
-      data = [ "${config.home.homeDirectory}/.local/share" "/usr/share" "/usr/share/applications/" "/usr/local/share/applications/" ];
+      data = [
+        "${config.home.homeDirectory}/.local/share"
+        "/usr/share"
+        "/usr/share/applications/"
+        "/usr/local/share/applications/"
+      ];
     };
     userDirs = {
       enable = true;
@@ -49,13 +54,13 @@
       templates = "${config.home.homeDirectory}/Templates";
       videos = "${config.home.homeDirectory}/Videos";
       extraConfig = {
-        XDG_MAIL_DIR = "${config.home.homeDirectory}/Maildir";
-        XDG_CONTACT_DIR = "${config.home.homeDirectory}/Contacts";
-        XDG_CALENDAR_DIR = "${config.home.homeDirectory}/Calendars";
-        XDG_SCREENSHOTS_DIR = "${config.xdg.userDirs.pictures}/Screenshots";
-        XDG_SCREENCAST_DIR = "${config.xdg.userDirs.videos}/Screencast";
-        XDG_CODE_DIR = "${config.home.homeDirectory}/Code";
-        XDG_NOTES_DIR = "${config.home.homeDirectory}/Notes";
+        MAIL = "${config.home.homeDirectory}/Maildir";
+        CONTACT = "${config.home.homeDirectory}/Contacts";
+        CALENDAR = "${config.home.homeDirectory}/Calendars";
+        SCREENSHOTS = "${config.xdg.userDirs.pictures}/Screenshots";
+        SCREENCAST = "${config.xdg.userDirs.videos}/Screencast";
+        CODE = "${config.home.homeDirectory}/Code";
+        NOTES = "${config.home.homeDirectory}/Notes";
       };
     };
     # desktopEntries = {
@@ -164,7 +169,6 @@
           "text/x-tcl" = codeEditors;
           "text/x-tex" = codeEditors;
           "text/xml" = codeEditors;
-
 
           "application/pdf" = pdfViewers;
 

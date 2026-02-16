@@ -91,6 +91,27 @@
     ];
   };
 
+  nix = {
+        # Enable distributed builds (remote builders)
+    distributedBuilds = true;
+    buildMachines = [
+      {
+        hostName = "10.10.100.113";
+        system = "x86_64-linux";
+        maxJobs = 8;
+        speedFactor = 2;
+        supportedFeatures = [
+          "nixos-test"
+          "big-parallel"
+          "kvm"
+        ];
+        mandatoryFeatures = [ ];
+        sshUser = "administrator";
+        sshKey = "/home/administrator/.ssh/ssh_host_ed25519_key";
+      }
+    ];
+  }
+
   # Laptop-specific power management
   powerManagement = {
     # powertop.enable = true;  # Disabled: crashes with segfault, auto-cpufreq handles power management
