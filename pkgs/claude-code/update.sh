@@ -1,10 +1,49 @@
 #!/usr/bin/env nix-shell
-#!nix-shell -i bash -p curl jq nix-prefetch nix
+#!nix-shell -i bash -p curl jq nix nodejs
 set -eu -o pipefail
 
 # Get the directory where this script is located
 scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 packageFile="$scriptDir/default.nix"
+
+extract_npm_deps_hash() {
+  local buildOutput="$1"
+  local hash
+
+  hash=$(echo "$buildOutput" | awk '
+    /npm-deps\.drv/ { inNpmDeps = 1; next }
+    inNpmDeps && /got:[[:space:]]*sha256-/ {
+      if (match($0, /sha256-[A-Za-z0-9+/=]+/)) {
+        print substr($0, RSTART, RLENGTH)
+        exit
+      }
+    }
+  ')
+
+  if [[ -z "$hash" ]]; then
+    hash=$(echo "$buildOutput" | sed -n 's/.*got:[[:space:]]*\(sha256-[A-Za-z0-9+/=]*\).*/\1/p' | head -1)
+  fi
+
+  echo "$hash"
+}
+
+SKIP_NPM_HASH=false
+REFRESH_HASHES=false
+for arg in "$@"; do
+  case "$arg" in
+    --skip-npm-hash)
+      SKIP_NPM_HASH=true
+      ;;
+    --refresh-hashes)
+      REFRESH_HASHES=true
+      ;;
+    *)
+      echo "Unknown argument: $arg" >&2
+      echo "Usage: $0 [--skip-npm-hash] [--refresh-hashes]" >&2
+      exit 1
+      ;;
+  esac
+done
 
 # Extract current version from package.nix
 currentVersion=$(grep -E '^\s*version\s*=' "$packageFile" | sed -E 's/.*version\s*=\s*"([^"]+)".*/\1/' | head -1)
@@ -27,22 +66,26 @@ fi
 
 echo "Latest version: $latestVersion"
 
-if [[ "$latestVersion" == "$currentVersion" ]]; then
+if [[ "$latestVersion" == "$currentVersion" ]] && [[ "$REFRESH_HASHES" != "true" ]]; then
   echo "Already up to date: $currentVersion"
   exit 0
 fi
 
-echo "Updating to version $latestVersion..."
+targetVersion="$latestVersion"
+if [[ "$targetVersion" == "$currentVersion" ]]; then
+  echo "Refreshing hashes for current version $targetVersion..."
+else
+  echo "Updating to version $targetVersion..."
+fi
 
 # Prefetch npm tarball
-echo "Prefetching npm tarball..."
-NPM_URL="https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-${latestVersion}.tgz"
+echo "Prefetching npm tarball source..."
+NPM_URL="https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-${targetVersion}.tgz"
 echo "  URL: $NPM_URL"
 
-SOURCE_PATH=$(nix-prefetch-url "$NPM_URL" --name "claude-code-${latestVersion}.tgz" 2>&1 | tail -1)
-SOURCE_HASH=$(nix-hash --to-sri --type sha256 "$SOURCE_PATH")
+SOURCE_HASH=$(nix store prefetch-file --json --name "claude-code-${targetVersion}.tgz" --unpack "$NPM_URL" | jq -r '.hash')
 
-if [[ -z "$SOURCE_HASH" ]]; then
+if [[ -z "$SOURCE_HASH" ]] || [[ "$SOURCE_HASH" == "null" ]]; then
   echo "Error: Failed to get source hash" >&2
   exit 1
 fi
@@ -50,26 +93,38 @@ fi
 echo "Source hash: $SOURCE_HASH"
 
 # Download and update package-lock.json
-echo "Downloading package-lock.json..."
-# Extract package-lock.json from the tarball
+echo "Updating package-lock.json..."
 TEMP_DIR=$(mktemp -d)
 trap "rm -rf $TEMP_DIR" EXIT
 
-curl -s "$NPM_URL" | tar -xz -C "$TEMP_DIR" package/package-lock.json 2>/dev/null || true
+curl -sL "$NPM_URL" | tar -xz -C "$TEMP_DIR"
 
 if [[ -f "$TEMP_DIR/package/package-lock.json" ]]; then
   cp "$TEMP_DIR/package/package-lock.json" "$scriptDir/package-lock.json"
-  echo "✅ Updated package-lock.json"
+  echo "✅ Updated package-lock.json from upstream tarball"
 else
-  echo "⚠️  Warning: Could not extract package-lock.json from tarball"
-  echo "   You may need to update it manually or generate it"
+  echo "ℹ️  package-lock.json not found in upstream tarball, generating from package.json..."
+  (
+    cd "$TEMP_DIR/package"
+    npm install --package-lock-only --ignore-scripts --no-audit --no-fund >/dev/null
+  )
+
+  if [[ -f "$TEMP_DIR/package/package-lock.json" ]]; then
+    cp "$TEMP_DIR/package/package-lock.json" "$scriptDir/package-lock.json"
+    echo "✅ Generated and updated package-lock.json"
+  else
+    echo "⚠️  Warning: Failed to generate package-lock.json"
+    echo "   You may need to update it manually"
+  fi
 fi
 
 # Create backup
 cp "$packageFile" "${packageFile}.bak"
 
 # Update version
-sed -i "s/version = \"$currentVersion\"/version = \"$latestVersion\"/" "$packageFile"
+if [[ "$targetVersion" != "$currentVersion" ]]; then
+  sed -i "s/version = \"$currentVersion\"/version = \"$targetVersion\"/" "$packageFile"
+fi
 
 # Update source hash
 sed -i "s|hash = \"sha256-[^\"]*\"|hash = \"$SOURCE_HASH\"|" "$packageFile"
@@ -78,20 +133,71 @@ sed -i "s|hash = \"sha256-[^\"]*\"|hash = \"$SOURCE_HASH\"|" "$packageFile"
 # If URL was hardcoded, restore it to use the variable
 sed -i "s|claude-code-[0-9][0-9.]*\.tgz|claude-code-\${finalAttrs.version}.tgz|" "$packageFile"
 
-echo "✅ Updated to version $latestVersion"
+existingNpmDepsHash=$(grep -E '^\s*npmDepsHash\s*=' "$packageFile" | sed -E 's/.*npmDepsHash\s*=\s*"([^"]+)".*/\1/' | head -1 || true)
+NPM_DEPS_HASH=""
+
+if [[ "$SKIP_NPM_HASH" == "true" ]]; then
+  echo "Skipping npmDepsHash computation (--skip-npm-hash flag set)"
+else
+  echo "Computing npmDepsHash..."
+
+  FAKE_NPM_DEPS_HASH="sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+  sed -i "s|npmDepsHash = \"sha256-[^\"]*\"|npmDepsHash = \"$FAKE_NPM_DEPS_HASH\"|" "$packageFile"
+
+  repoRoot="$(cd "$scriptDir/../.." && pwd)"
+  SYSTEM="${NIX_SYSTEM:-$(nix eval --impure --expr 'builtins.currentSystem' 2>/dev/null || echo "x86_64-linux")}"
+
+  BUILD_OUTPUT=""
+  for build_cmd in \
+    "cd '$repoRoot' && nix build --no-link '.#packages.${SYSTEM}.claude-code' 2>&1" \
+    "cd '$repoRoot' && nix build --no-link .#claude-code 2>&1" \
+    "nix build --no-link -f '<nixpkgs>' -A claude-code 2>&1" \
+    "nix-build --no-out-link -A claude-code 2>&1"
+  do
+    set +e
+    BUILD_OUTPUT=$(eval "$build_cmd")
+    BUILD_EXIT=$?
+    set -e
+
+    if [[ $BUILD_EXIT -eq 0 ]]; then
+      break
+    fi
+
+    NPM_DEPS_HASH=$(extract_npm_deps_hash "$BUILD_OUTPUT")
+    if [[ -n "$NPM_DEPS_HASH" ]]; then
+      break
+    fi
+  done
+
+  if [[ -n "$NPM_DEPS_HASH" ]]; then
+    sed -i "s|npmDepsHash = \"$FAKE_NPM_DEPS_HASH\"|npmDepsHash = \"$NPM_DEPS_HASH\"|" "$packageFile"
+    echo "✅ Updated npmDepsHash: $NPM_DEPS_HASH"
+  else
+    if [[ -n "$existingNpmDepsHash" ]]; then
+      sed -i "s|npmDepsHash = \"$FAKE_NPM_DEPS_HASH\"|npmDepsHash = \"$existingNpmDepsHash\"|" "$packageFile"
+    fi
+    echo "⚠️  Warning: Could not automatically determine npmDepsHash"
+    echo "   Build output saved to: ${packageFile}.build-error.log"
+    echo "$BUILD_OUTPUT" > "${packageFile}.build-error.log"
+  fi
+fi
+
+echo ""
+echo "✅ Updated claude-code package metadata"
 echo ""
 echo "Changes:"
-echo "  Version: $currentVersion -> $latestVersion"
+if [[ "$targetVersion" != "$currentVersion" ]]; then
+  echo "  Version: $currentVersion -> $targetVersion"
+else
+  echo "  Version: $currentVersion (unchanged)"
+fi
 echo "  Source hash: $SOURCE_HASH"
-echo ""
-echo "⚠️  IMPORTANT: You need to compute npmDepsHash by building:"
-echo "   nix build .#claude-code"
-echo "   The build will show the correct npmDepsHash - update it in the package file."
+if [[ -n "$NPM_DEPS_HASH" ]]; then
+  echo "  npmDepsHash: $NPM_DEPS_HASH"
+fi
 echo ""
 echo "Please review the changes:"
 echo "  git diff $packageFile"
 echo "  git diff $scriptDir/package-lock.json"
 echo ""
 echo "Backup saved to: ${packageFile}.bak"
-
-
