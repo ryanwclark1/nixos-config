@@ -1,10 +1,49 @@
 #!/usr/bin/env nix-shell
-#!nix-shell -i bash -p curl jq nix-prefetch-git nix
+#!nix-shell -i bash -p curl jq nix
 set -eu -o pipefail
 
 # Get the directory where this script is located
 scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 packageFile="$scriptDir/default.nix"
+
+extract_hash_from_build() {
+  local buildOutput="$1"
+  local hash
+
+  hash=$(echo "$buildOutput" | awk '
+    /vendor-staging\.drv|vendor\.drv/ { inVendor = 1; next }
+    inVendor && /got:[[:space:]]*sha256-/ {
+      if (match($0, /sha256-[A-Za-z0-9+/=]+/)) {
+        print substr($0, RSTART, RLENGTH)
+        exit
+      }
+    }
+  ')
+
+  if [[ -z "$hash" ]]; then
+    hash=$(echo "$buildOutput" | sed -n 's/.*got:[[:space:]]*\(sha256-[A-Za-z0-9+/=]*\).*/\1/p' | head -1)
+  fi
+
+  echo "$hash"
+}
+
+SKIP_CARGO_HASH=false
+REFRESH_HASHES=false
+for arg in "$@"; do
+  case "$arg" in
+    --skip-cargo-hash)
+      SKIP_CARGO_HASH=true
+      ;;
+    --refresh-hashes)
+      REFRESH_HASHES=true
+      ;;
+    *)
+      echo "Unknown argument: $arg" >&2
+      echo "Usage: $0 [--skip-cargo-hash] [--refresh-hashes]" >&2
+      exit 1
+      ;;
+  esac
+done
 
 # Extract current version from package.nix
 currentVersion=$(grep -E '^\s*version\s*=' "$packageFile" | sed -E 's/.*version\s*=\s*"([^"]+)".*/\1/' | head -1)
@@ -30,37 +69,27 @@ latestVersion="${latestRelease#rust-v}"
 
 echo "Latest version: $latestVersion"
 
-if [[ "$latestVersion" == "$currentVersion" ]]; then
+if [[ "$latestVersion" == "$currentVersion" ]] && [[ "$REFRESH_HASHES" != "true" ]]; then
   echo "Already up to date: $currentVersion"
   exit 0
 fi
 
-echo "Updating to version $latestVersion..."
-
-# Prefetch GitHub source using nix-prefetch-git (matches fetchFromGitHub)
-echo "Prefetching GitHub source..."
-GITHUB_REPO="https://github.com/openai/codex"
-GITHUB_TAG="rust-v${latestVersion}"
-echo "  Repository: $GITHUB_REPO"
-echo "  Tag: $GITHUB_TAG"
-
-# Use nix-prefetch-git to get the hash in the correct format for fetchFromGitHub
-# nix-prefetch-git outputs JSON at the end - extract the JSON block and parse it
-PREFETCH_OUTPUT=$(nix-prefetch-git --url "$GITHUB_REPO" --rev "$GITHUB_TAG" 2>&1)
-# Extract JSON object (starts with { and ends with }) - handle multiline JSON
-JSON_BLOCK=$(echo "$PREFETCH_OUTPUT" | awk '/^\{/,/^}/')
-SOURCE_HASH=$(echo "$JSON_BLOCK" | jq -r '.hash // empty' 2>/dev/null)
-
-if [[ -z "$SOURCE_HASH" ]] || [[ "$SOURCE_HASH" == "null" ]]; then
-  echo "Warning: Could not extract hash from JSON, trying alternative method..." >&2
-  # Fallback: look for hash in the output directly
-  SOURCE_HASH=$(echo "$PREFETCH_OUTPUT" | grep -oE 'sha256-[A-Za-z0-9+/=]{43}' | head -1)
+targetVersion="$latestVersion"
+if [[ "$targetVersion" == "$currentVersion" ]]; then
+  echo "Refreshing hashes for current version $targetVersion..."
+else
+  echo "Updating to version $targetVersion..."
 fi
 
+# Prefetch GitHub source archive using unpacked hash (matches fetchFromGitHub)
+echo "Prefetching GitHub source..."
+GITHUB_TAG="rust-v${targetVersion}"
+echo "  Tag: $GITHUB_TAG"
+GITHUB_TARBALL_URL="https://github.com/openai/codex/archive/refs/tags/${GITHUB_TAG}.tar.gz"
+SOURCE_HASH=$(nix store prefetch-file --json --name "codex-${GITHUB_TAG}.tar.gz" --unpack "$GITHUB_TARBALL_URL" | jq -r '.hash')
+
 if [[ -z "$SOURCE_HASH" ]] || [[ "$SOURCE_HASH" == "null" ]]; then
-  echo "Error: Failed to get source hash from nix-prefetch-git" >&2
-  echo "Output was:" >&2
-  echo "$PREFETCH_OUTPUT" >&2
+  echo "Error: Failed to get source hash from archive prefetch" >&2
   exit 1
 fi
 
@@ -70,39 +99,76 @@ echo "Source hash: $SOURCE_HASH"
 cp "$packageFile" "${packageFile}.bak"
 
 # Update version
-sed -i "s/version = \"$currentVersion\"/version = \"$latestVersion\"/" "$packageFile"
-
-# Update source hash (matches fetchFromGitHub hash field)
-sed -i "s|hash = \"sha256-[^\"]*\"|hash = \"$SOURCE_HASH\"|" "$packageFile"
-
-# Note: tag field uses ${finalAttrs.version} so it updates automatically with version
-# No need to update it manually
-
-# Update changelog URL
-sed -i "s|rust-v\${finalAttrs.version}|rust-v${latestVersion}|g" "$packageFile"
-
-# Reset cargoHash to empty string so user can easily update it
-# This makes it clear that cargoHash needs to be recomputed
-if grep -q 'cargoHash = "sha256-' "$packageFile"; then
-  sed -i 's|cargoHash = "sha256-[^"]*"|cargoHash = ""|' "$packageFile"
-  echo "⚠️  Reset cargoHash to empty string - needs to be recomputed"
+if [[ "$targetVersion" != "$currentVersion" ]]; then
+  sed -i "s/version = \"$currentVersion\"/version = \"$targetVersion\"/" "$packageFile"
 fi
 
-echo "✅ Updated to version $latestVersion"
+# Ensure tag and changelog track the version field to avoid drift
+sed -i 's|tag = "rust-v[^"]*"|tag = "rust-v${finalAttrs.version}"|' "$packageFile"
+sed -i 's|changelog = "https://raw.githubusercontent.com/openai/codex/refs/tags/rust-v[^"]*/CHANGELOG.md"|changelog = "https://raw.githubusercontent.com/openai/codex/refs/tags/rust-v${finalAttrs.version}/CHANGELOG.md"|' "$packageFile"
+
+# Update source hash
+sed -i "s|hash = \"sha256-[^\"]*\"|hash = \"$SOURCE_HASH\"|" "$packageFile"
+
+# Compute cargoHash automatically via a controlled mismatch
+if [[ "$SKIP_CARGO_HASH" == "true" ]]; then
+  CARGO_HASH=""
+  echo "Skipping cargoHash computation (--skip-cargo-hash flag set)"
+else
+  echo "Computing cargoHash..."
+  FAKE_CARGO_HASH="sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+  sed -i "s|cargoHash = \"[^\"]*\"|cargoHash = \"$FAKE_CARGO_HASH\"|" "$packageFile"
+
+  repoRoot="$(cd "$scriptDir/../.." && pwd)"
+  SYSTEM="${NIX_SYSTEM:-$(nix eval --impure --expr 'builtins.currentSystem' 2>/dev/null || echo "x86_64-linux")}"
+
+  BUILD_OUTPUT=""
+  CARGO_HASH=""
+  for build_cmd in \
+    "cd '$repoRoot' && nix build --no-link '.#packages.${SYSTEM}.codex' 2>&1" \
+    "cd '$repoRoot' && nix build --no-link .#codex 2>&1" \
+    "nix build --no-link -f '<nixpkgs>' -A codex 2>&1" \
+    "nix-build --no-out-link -A codex 2>&1"
+  do
+    set +e
+    BUILD_OUTPUT=$(eval "$build_cmd")
+    BUILD_EXIT=$?
+    set -e
+
+    if [[ $BUILD_EXIT -eq 0 ]]; then
+      break
+    fi
+
+    CARGO_HASH=$(extract_hash_from_build "$BUILD_OUTPUT")
+    if [[ -n "$CARGO_HASH" ]]; then
+      break
+    fi
+  done
+
+  if [[ -n "$CARGO_HASH" ]]; then
+    sed -i "s|cargoHash = \"$FAKE_CARGO_HASH\"|cargoHash = \"$CARGO_HASH\"|" "$packageFile"
+    echo "✅ Updated cargoHash: $CARGO_HASH"
+  else
+    echo "⚠️  Warning: Could not automatically determine cargoHash"
+    echo "   Build output saved to: ${packageFile}.build-error.log"
+    echo "$BUILD_OUTPUT" > "${packageFile}.build-error.log"
+  fi
+fi
+
+echo "✅ Updated codex package metadata"
 echo ""
 echo "Changes:"
-echo "  Version: $currentVersion -> $latestVersion"
+if [[ "$targetVersion" != "$currentVersion" ]]; then
+  echo "  Version: $currentVersion -> $targetVersion"
+else
+  echo "  Version: $currentVersion (unchanged)"
+fi
 echo "  Source hash: $SOURCE_HASH"
-echo ""
-echo "⚠️  IMPORTANT: You need to compute cargoHash by building:"
-echo "   1. Set cargoHash = \"\" in the package file (already done)"
-echo "   2. Build: nix build .#codex"
-echo "   3. Copy the 'got: sha256-...' value from the error message"
-echo "   4. Update cargoHash in the package file with the new hash"
+if [[ -n "$CARGO_HASH" ]]; then
+  echo "  cargoHash: $CARGO_HASH"
+fi
 echo ""
 echo "Please review the changes:"
 echo "  git diff $packageFile"
 echo ""
 echo "Backup saved to: ${packageFile}.bak"
-
-
