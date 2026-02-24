@@ -13,20 +13,20 @@
 {
   name = "chatgpt";
   publisher = "openai";
-  sha256 = "sha256-IyIUCA2b09xOWRfHlInuHykZllhCbb6sOvd2CpBBCKw=";
-  version = "0.5.71";
+  sha256 = "sha256-f9der+dngQmdTYHWcExVC/md4XTEckSYbRKWKf72C1g=";
+  version = "0.5.76";
 }
 {
   name = "claude-code";
   publisher = "anthropic";
-  sha256 = "sha256-6zZCQCUvHcCQ9Td/T6KJQUkiGACWd1cHSs6xHKmKWQI=";
-  version = "2.1.33";
+  sha256 = "sha256-0dIXlOMqO68cShPrsxHhooIylvckQA9R2OUFKfDSfPI=";
+  version = "2.1.51";
 }
 {
   name = "explorer";
   publisher = "vitest";
-  sha256 = "sha256-+w6mxSsajjmmzJvfG9Z0uyUOkJOmxrWUvCDvZXGOx20=";
-  version = "1.42.0";
+  sha256 = "sha256-z8JQEWSSLw+EDEfJWrHYy7vT2kAdsFybFcVkl5w5WfM=";
+  version = "1.44.0";
 }
 {
   name = "gemini-cli-vscode-ide-companion";
@@ -79,8 +79,8 @@
 {
   name = "pyrefly";
   publisher = "meta";
-  sha256 = "sha256-HdFlRWTqCpzx8v9DzE6A3dm4wOnNk6JDaFEV8jvmHV4=";
-  version = "0.51.1";
+  sha256 = "sha256-Ua2aQN/iS1nPOm6EM1Kgwxd1J8T4p9flUQkHIpW3P8E=";
+  version = "0.54.0";
 }
 {
   name = "remotehub";
@@ -91,8 +91,8 @@
 {
   name = "ty";
   publisher = "astral-sh";
-  sha256 = "sha256-epTUX/v+9/CJpMO1wBkAwi0kQaycg69pPOV9e5W5ySc=";
-  version = "2026.10.0";
+  sha256 = "sha256-5UmE+v9q48RYEQzcgXgDHyyXwdCYC79yC9mLBOMEAmM=";
+  version = "2026.16.0";
 }
 {
   name = "vscode-containers";
@@ -109,8 +109,8 @@
 {
   name = "vscode-jsonnet";
   publisher = "grafana";
-  sha256 = "sha256-Q8VzXzTdHo9h5+eCHHF1bPomPEbRsvouJcUfmFUDGMU=";
-  version = "0.7.2";
+  sha256 = "sha256-oz+oRjea2/ZDZPHvOXRdmHMCingAWWzs3u1e1r0iUTw=";
+  version = "0.7.4";
 }
 {
   name = "vscode-pgsql";
@@ -127,6 +127,6 @@
 {
   name = "vscode-thunder-client";
   publisher = "rangav";
-  sha256 = "sha256-8joP2BzTuUWS0XnpHonoClrfOw03pj2Bs+q9At7LtyI=";
-  version = "2.38.6";
+  sha256 = "sha256-pHshB0DbJwfwEAp7+RyfDkpvANyOcAlLyuXKdM+NNN4=";
+  version = "2.39.9";
 }

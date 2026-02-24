@@ -1,6 +1,6 @@
 {
     "ansible": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": null,
         "extract": null,
         "name": "ansible",
@@ -18,7 +18,7 @@
         "version": "26.1.3"
     },
     "biome": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": null,
         "extract": null,
         "name": "biome",
@@ -36,7 +36,7 @@
         "version": "2025.11.271431"
     },
     "chatgpt": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": null,
         "extract": null,
         "name": "chatgpt",
@@ -46,15 +46,15 @@
         },
         "pinned": false,
         "src": {
-            "name": "chatgpt-0.5.71.zip",
-            "sha256": "sha256-IyIUCA2b09xOWRfHlInuHykZllhCbb6sOvd2CpBBCKw=",
+            "name": "chatgpt-0.5.76.zip",
+            "sha256": "sha256-f9der+dngQmdTYHWcExVC/md4XTEckSYbRKWKf72C1g=",
             "type": "url",
-            "url": "https://openai.gallery.vsassets.io/_apis/public/gallery/publisher/openai/extension/chatgpt/0.5.71/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://openai.gallery.vsassets.io/_apis/public/gallery/publisher/openai/extension/chatgpt/0.5.76/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "0.5.71"
+        "version": "0.5.76"
     },
     "claude-code": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": null,
         "extract": null,
         "name": "claude-code",
@@ -64,15 +64,15 @@
         },
         "pinned": false,
         "src": {
-            "name": "claude-code-2.1.33.zip",
-            "sha256": "sha256-6zZCQCUvHcCQ9Td/T6KJQUkiGACWd1cHSs6xHKmKWQI=",
+            "name": "claude-code-2.1.51.zip",
+            "sha256": "sha256-0dIXlOMqO68cShPrsxHhooIylvckQA9R2OUFKfDSfPI=",
             "type": "url",
-            "url": "https://anthropic.gallery.vsassets.io/_apis/public/gallery/publisher/anthropic/extension/claude-code/2.1.33/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://anthropic.gallery.vsassets.io/_apis/public/gallery/publisher/anthropic/extension/claude-code/2.1.51/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "2.1.33"
+        "version": "2.1.51"
     },
     "explorer": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": null,
         "extract": null,
         "name": "explorer",
@@ -82,15 +82,15 @@
         },
         "pinned": false,
         "src": {
-            "name": "explorer-1.42.0.zip",
-            "sha256": "sha256-+w6mxSsajjmmzJvfG9Z0uyUOkJOmxrWUvCDvZXGOx20=",
+            "name": "explorer-1.44.0.zip",
+            "sha256": "sha256-z8JQEWSSLw+EDEfJWrHYy7vT2kAdsFybFcVkl5w5WfM=",
             "type": "url",
-            "url": "https://vitest.gallery.vsassets.io/_apis/public/gallery/publisher/vitest/extension/explorer/1.42.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://vitest.gallery.vsassets.io/_apis/public/gallery/publisher/vitest/extension/explorer/1.44.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "1.42.0"
+        "version": "1.44.0"
     },
     "gemini-cli-vscode-ide-companion": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": null,
         "extract": null,
         "name": "gemini-cli-vscode-ide-companion",
@@ -108,7 +108,7 @@
         "version": "0.20.0"
     },
     "gopls": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": null,
         "extract": null,
         "name": "gopls",
@@ -121,15 +121,15 @@
             "name": null,
             "owner": "golang",
             "repo": "tools",
-            "rev": "gopls/v0.21.0",
-            "sha256": "sha256-fPG8//DWA0mzqZkYasiBdB5hw5FDRkr/3+ZXm7fNHRg=",
+            "rev": "gopls/v0.21.1",
+            "sha256": "sha256-D/HBqFy5pNSOhMxx/G102HuL+l+oPljsG8rPNLZjUCs=",
             "sparseCheckout": [],
             "type": "github"
         },
-        "version": "gopls/v0.21.0"
+        "version": "gopls/v0.21.1"
     },
     "grafana-alloy": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": null,
         "extract": null,
         "name": "grafana-alloy",
@@ -147,7 +147,7 @@
         "version": "0.2.0"
     },
     "grafana-vscode": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": null,
         "extract": null,
         "name": "grafana-vscode",
@@ -165,7 +165,7 @@
         "version": "0.0.19"
     },
     "mypy-type-checker": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": null,
         "extract": null,
         "name": "mypy-type-checker",
@@ -183,7 +183,7 @@
         "version": "2025.3.13521012"
     },
     "pdf": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": null,
         "extract": null,
         "name": "pdf",
@@ -201,7 +201,7 @@
         "version": "1.2.2"
     },
     "playwright": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": null,
         "extract": null,
         "name": "playwright",
@@ -219,7 +219,7 @@
         "version": "1.1.17"
     },
     "prom": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": null,
         "extract": null,
         "name": "prom",
@@ -237,7 +237,7 @@
         "version": "1.3.3"
     },
     "pwc": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": null,
         "extract": null,
         "name": "pwc",
@@ -255,7 +255,7 @@
         "version": "1.2.1"
     },
     "pyrefly": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": null,
         "extract": null,
         "name": "pyrefly",
@@ -265,15 +265,15 @@
         },
         "pinned": false,
         "src": {
-            "name": "pyrefly-0.51.1.zip",
-            "sha256": "sha256-HdFlRWTqCpzx8v9DzE6A3dm4wOnNk6JDaFEV8jvmHV4=",
+            "name": "pyrefly-0.54.0.zip",
+            "sha256": "sha256-Ua2aQN/iS1nPOm6EM1Kgwxd1J8T4p9flUQkHIpW3P8E=",
             "type": "url",
-            "url": "https://meta.gallery.vsassets.io/_apis/public/gallery/publisher/meta/extension/pyrefly/0.51.1/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://meta.gallery.vsassets.io/_apis/public/gallery/publisher/meta/extension/pyrefly/0.54.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "0.51.1"
+        "version": "0.54.0"
     },
     "remotehub": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": null,
         "extract": null,
         "name": "remotehub",
@@ -291,7 +291,7 @@
         "version": "0.65.2026012801"
     },
     "ty": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": null,
         "extract": null,
         "name": "ty",
@@ -301,15 +301,15 @@
         },
         "pinned": false,
         "src": {
-            "name": "ty-2026.10.0.zip",
-            "sha256": "sha256-epTUX/v+9/CJpMO1wBkAwi0kQaycg69pPOV9e5W5ySc=",
+            "name": "ty-2026.16.0.zip",
+            "sha256": "sha256-5UmE+v9q48RYEQzcgXgDHyyXwdCYC79yC9mLBOMEAmM=",
             "type": "url",
-            "url": "https://astral-sh.gallery.vsassets.io/_apis/public/gallery/publisher/astral-sh/extension/ty/2026.10.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://astral-sh.gallery.vsassets.io/_apis/public/gallery/publisher/astral-sh/extension/ty/2026.16.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "2026.10.0"
+        "version": "2026.16.0"
     },
     "vscode-containers": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": null,
         "extract": null,
         "name": "vscode-containers",
@@ -327,7 +327,7 @@
         "version": "2.4.1"
     },
     "vscode-gitops-tools": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": null,
         "extract": null,
         "name": "vscode-gitops-tools",
@@ -345,7 +345,7 @@
         "version": "0.27.0"
     },
     "vscode-jsonnet": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": null,
         "extract": null,
         "name": "vscode-jsonnet",
@@ -355,15 +355,15 @@
         },
         "pinned": false,
         "src": {
-            "name": "vscode-jsonnet-0.7.2.zip",
-            "sha256": "sha256-Q8VzXzTdHo9h5+eCHHF1bPomPEbRsvouJcUfmFUDGMU=",
+            "name": "vscode-jsonnet-0.7.4.zip",
+            "sha256": "sha256-oz+oRjea2/ZDZPHvOXRdmHMCingAWWzs3u1e1r0iUTw=",
             "type": "url",
-            "url": "https://grafana.gallery.vsassets.io/_apis/public/gallery/publisher/grafana/extension/vscode-jsonnet/0.7.2/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://grafana.gallery.vsassets.io/_apis/public/gallery/publisher/grafana/extension/vscode-jsonnet/0.7.4/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "0.7.2"
+        "version": "0.7.4"
     },
     "vscode-pgsql": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": null,
         "extract": null,
         "name": "vscode-pgsql",
@@ -381,7 +381,7 @@
         "version": "1.16.0"
     },
     "vscode-python-test-adapter": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": null,
         "extract": null,
         "name": "vscode-python-test-adapter",
@@ -399,7 +399,7 @@
         "version": "0.8.2"
     },
     "vscode-thunder-client": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": null,
         "extract": null,
         "name": "vscode-thunder-client",
@@ -409,11 +409,11 @@
         },
         "pinned": false,
         "src": {
-            "name": "vscode-thunder-client-2.38.6.zip",
-            "sha256": "sha256-8joP2BzTuUWS0XnpHonoClrfOw03pj2Bs+q9At7LtyI=",
+            "name": "vscode-thunder-client-2.39.9.zip",
+            "sha256": "sha256-pHshB0DbJwfwEAp7+RyfDkpvANyOcAlLyuXKdM+NNN4=",
             "type": "url",
-            "url": "https://rangav.gallery.vsassets.io/_apis/public/gallery/publisher/rangav/extension/vscode-thunder-client/2.38.6/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://rangav.gallery.vsassets.io/_apis/public/gallery/publisher/rangav/extension/vscode-thunder-client/2.39.9/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "2.38.6"
+        "version": "2.39.9"
     }
 }
