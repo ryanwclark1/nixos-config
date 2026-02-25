@@ -11,21 +11,21 @@
     "args": [
       "mcp-server-git"
     ],
-    "description": "Git operations for Accent AI project"
+    "description": "Git operations and repository management"
   },
   "fetch": {
     "command": "uvx",
     "args": [
       "mcp-server-fetch"
     ],
-    "description": "Web content fetching for Accent AI research and documentation"
+    "description": "Web content fetching and analysis for research and documentation"
   },
   "sequential-thinking": {
     "command": "npx",
     "args": [
       "@modelcontextprotocol/server-sequential-thinking@latest"
     ],
-    "description": "Complex problem-solving for Accent AI architecture",
+    "description": "Multi-step reasoning engine for complex problem-solving and systematic analysis",
     "env": {
       "NODE_ENV": "production"
     }
@@ -46,7 +46,7 @@
     "args": [
       "--headless"
     ],
-    "description": "Browser automation and web scraping via Playwright (NixOS-compatible wrapper)"
+    "description": "Browser automation and E2E testing via Playwright (NixOS-compatible)"
   },
   "context7": {
     "command": "npx",
@@ -57,6 +57,6 @@
     "env": {
       "CONTEXT7_TOKEN": "${CONTEXT7_TOKEN}"
     },
-    "description": "Provides up-to-date code documentation for AI code editors"
+    "description": "Official library documentation lookup and framework pattern guidance"
   }
 }

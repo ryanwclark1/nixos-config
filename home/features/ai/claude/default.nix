@@ -10,10 +10,54 @@ let
   settingsPath = "${claudeHome}/settings.json";
 in
 {
+  # Status line script for Claude Code
   home.file."${claudeHome}/statusline.sh" = {
     source = ./statusline.sh;
     executable = true;
   };
+
+  # Format hook script for Python and TypeScript
+  home.file."${claudeHome}/format-hook.sh" = {
+    source = ./format-hook.sh;
+    executable = true;
+  };
+
+  # Security hook: Block dangerous commands and protect sensitive files
+  home.file."${claudeHome}/security-hook.sh" = {
+    source = ./security-hook.sh;
+    executable = true;
+  };
+
+  # Linting hook: Run linters after code changes
+  home.file."${claudeHome}/lint-hook.sh" = {
+    source = ./lint-hook.sh;
+    executable = true;
+  };
+
+  # Type checking hook: Run type checkers after code changes
+  home.file."${claudeHome}/typecheck-hook.sh" = {
+    source = ./typecheck-hook.sh;
+    executable = true;
+  };
+
+  # Notification hook: Desktop notifications when Claude needs attention
+  home.file."${claudeHome}/notification-hook.sh" = {
+    source = ./notification-hook.sh;
+    executable = true;
+  };
+
+  # Git safety hook: Prevent dangerous git operations
+  home.file."${claudeHome}/git-safety-hook.sh" = {
+    source = ./git-safety-hook.sh;
+    executable = true;
+  };
+
+  # Configuration Documentation Files
+  # These files are reference documentation for Claude Code workflows, modes, and MCP servers.
+  # They are automatically loaded via Cursor rules (.cursor/rules/claude-*.mdc) and should
+  # be referenced when relevant. See .cursor/rules/claude-config.mdc for usage guidelines.
+
+  # Core behavioral and project documentation
   home.file."${claudeHome}/BUSINESS_SYMBOLS.md" = {
     source = ./config/BUSINESS_SYMBOLS.md;
   };
@@ -63,6 +107,9 @@ in
   };
 
   # MCP SERVERS
+  home.file."${claudeHome}/MCP_SERVERS.md" = {
+    source = ./config/MCP_SERVERS.md;
+  };
   home.file."${claudeHome}/MCP_Context7.md" = {
     source = ./config/MCP_Context7.md;
   };
@@ -74,6 +121,9 @@ in
   };
   home.file."${claudeHome}/MCP_Serena.md" = {
     source = ./config/MCP_Serena.md;
+  };
+  home.file."${claudeHome}/MCP_Context7_SETUP.md" = {
+    source = ./config/MCP_Context7_SETUP.md;
   };
 
   # COMMANDS
@@ -88,9 +138,6 @@ in
   };
   home.file."${claudeHome}/commands/sc/business-panel.md" = {
     source = ./config/commands/sc/business-panel.md;
-  };
-  home.file."${claudeHome}/commands/sc/cleanup.md" = {
-    source = ./config/commands/sc/cleanup.md;
   };
   home.file."${claudeHome}/commands/sc/design.md" = {
     source = ./config/commands/sc/design.md;
@@ -131,9 +178,6 @@ in
   home.file."${claudeHome}/commands/sc/save.md" = {
     source = ./config/commands/sc/save.md;
   };
-  home.file."${claudeHome}/commands/sc/select-tool.md" = {
-    source = ./config/commands/sc/select-tool.md;
-  };
   home.file."${claudeHome}/commands/sc/spawn.md" = {
     source = ./config/commands/sc/spawn.md;
   };
@@ -151,9 +195,6 @@ in
   };
   home.file."${claudeHome}/commands/sc/workflow.md" = {
     source = ./config/commands/sc/workflow.md;
-  };
-  home.file."${claudeHome}/commands/sc/plan-to-beads.md" = {
-    source = ./config/commands/sc/plan-to-beads.md;
   };
 
   programs.claude-code = {
@@ -173,9 +214,29 @@ in
         ];
       };
 
-      # Hooks: run before/after tool use (example)
+      # Hooks: run before/after tool use
       hooks = {
         PreToolUse = [
+          # Security: Block dangerous commands and protect sensitive files
+          {
+            matcher = "Bash|Edit|Write";
+            hooks = [
+              {
+                type = "command";
+                command = "${claudeHome}/security-hook.sh";
+              }
+            ];
+          }
+          # Git safety: Prevent dangerous git operations
+          {
+            matcher = "Bash";
+            hooks = [
+              {
+                type = "command";
+                command = "${claudeHome}/git-safety-hook.sh";
+              }
+            ];
+          }
           {
             matcher = "Bash";
             hooks = [
@@ -196,6 +257,42 @@ in
               }
             ];
           }
+          # Format Python and TypeScript files after writes
+          {
+            matcher = "Edit|Write";
+            hooks = [
+              {
+                type = "command";
+                command = "${claudeHome}/format-hook.sh";
+                async = true;
+              }
+              # Lint code after formatting
+              {
+                type = "command";
+                command = "${claudeHome}/lint-hook.sh";
+                async = true;
+              }
+              # Type check after changes
+              {
+                type = "command";
+                command = "${claudeHome}/typecheck-hook.sh";
+                async = true;
+              }
+            ];
+          }
+        ];
+        Notification = [
+          # Desktop notifications when Claude needs attention
+          {
+            matcher = "";
+            hooks = [
+              {
+                type = "command";
+                command = "${claudeHome}/notification-hook.sh";
+                async = true;
+              }
+            ];
+          }
         ];
       };
 
@@ -207,7 +304,10 @@ in
         padding = 0; # Optional: set to 0 to let status line go to
       };
       forceLoginMethod = "console";
-      includeCoAuthoredBy = false;
+
+      # Session management
+      cleanupPeriodDays = 60;
+      showTurnDuration = true;
 
       # Example memory settings (user-level)
       memory = {
@@ -219,6 +319,8 @@ in
 
     };
 
+    # MCP servers configuration - will be processed at runtime to inject SOPS secrets
+    # The actual token injection happens via the systemd service below
     mcpServers = builtins.fromJSON (builtins.readFile ./mcp-servers.json);
 
     # Import agents from the agents/ directory
@@ -228,7 +330,6 @@ in
       code-reviewer = (builtins.readFile ./config/agents/code-reviewer.md);
       debugger = (builtins.readFile ./config/agents/debugger.md);
       # docs-architect = (builtins.readFile ./config/agents/docs-architect.md);
-      # error-detective = (builtins.readFile ./config/agents/error-detective.md);
       # mermaid-expert = (builtins.readFile ./config/agents/mermaid-expert.md);
       nix-systems-specialist = (builtins.readFile ./config/agents/nix-systems-specialist.md);
       # rust-pro = (builtins.readFile ./config/agents/rust-pro.md);
@@ -242,107 +343,107 @@ in
       frontend-architect = (builtins.readFile ./config/agents/frontend-architect.md);
       learning-guide = (builtins.readFile ./config/agents/learning-guide.md);
       performance-engineer = (builtins.readFile ./config/agents/performance-engineer.md);
-      python-expert = (builtins.readFile ./config/agents/python-expert.md);
-      quality-engineer = (builtins.readFile ./config/agents/quality-engineer.md);
+      python-pro = (builtins.readFile ./config/agents/python-pro.md);
       refactoring-expert = (builtins.readFile ./config/agents/refactoring-expert.md);
       requirements-analyst = (builtins.readFile ./config/agents/requirements-analyst.md);
-      root-cause-analyst = (builtins.readFile ./config/agents/root-cause-analyst.md);
       security-engineer = (builtins.readFile ./config/agents/security-engineer.md);
       socratic-mentor = (builtins.readFile ./config/agents/socratic-mentor.md);
       system-architect = (builtins.readFile ./config/agents/system-architect.md);
-      technical-writer = (builtins.readFile ./config/agents/technical-writer.md);
+      test-automator = (builtins.readFile ./config/agents/test-automator.md);
+      docs-architect = (builtins.readFile ./config/agents/docs-architect.md);
     };
 
   };
 
-  # Create .env file with secrets from SOPS
-  # Create a script that generates the .env file at runtime
-  home.file."${claudeHome}/.env" = {
-    force = true;
-    text = ''
-      # Qwen Code Configuration with Local Ollama
-      # This file is loaded by qwen-code automatically
+  # Note: .env file is generated at runtime by the generate-claude-config systemd service
+  # This ensures SOPS secrets are available when the file is created
 
-      # OpenAI API compatible configuration for local Ollama
-      OPENAI_API_BASE=http://localhost:11434/v1
-      OPENAI_BASE_URL=http://localhost:11434/v1
-      OPENAI_API_KEY=ollama
-
-      # Model configuration
-      OPENAI_MODEL=hf.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL
-      MODEL=hf.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL
-
-      # Qwen Code specific settings
-      QWEN_MODEL=hf.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL
-      QWEN_BASE_URL=http://localhost:11434/v1
-      QWEN_API_KEY=ollama
-
-      # MCP Integration for Qwen Code
-      QWEN_MCP_CONFIG=${config.home.homeDirectory}/.config/open-webui/mcp-servers-processed.json
-      MCP_CONFIG_FILE=${config.home.homeDirectory}/.config/open-webui/mcp-servers-processed.json
-      MCP_TRANSPORT=stdio
-
-      # Performance settings
-      MAX_TOKENS=8192
-      TEMPERATURE=0.1
-      TOP_P=0.95
-
-      # Ollama connection settings
-      OLLAMA_HOST=localhost:11434
-      OLLAMA_API_BASE=http://localhost:11434
-
-      # Code generation preferences
-      QWEN_CODE_STYLE=concise
-      QWEN_EXPLAIN_LEVEL=brief
-
-      # Debug settings (excluded from project .env by qwen-code)
-      # DEBUG=false
-      # DEBUG_MODE=false
-
-      # MCP Server Environment Variables
-      # This file is generated at runtime by the .env-generator script
-      CONTEXT7_TOKEN=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets.context7-token.path})
-      GITHUB_PERSONAL_ACCESS_TOKEN=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets.github-pat.path})
-      SOURCEBOT_API_KEY=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets."sourcebot/api-key".path})
-    '';
-  };
-
-  # Create a systemd user service to generate .env file after SOPS secrets are available
-  systemd.user.services.generate-claude-env = {
+  # Create a systemd user service to generate .env file and process mcp-servers.json after SOPS secrets are available
+  systemd.user.services.generate-claude-config = {
     Unit = {
-      Description = "Generate Claude .env file with SOPS secrets";
+      Description = "Generate Claude Code configuration files with SOPS secrets";
       After = [ "sops-nix.service" ];
       Wants = [ "sops-nix.service" ];
     };
     Service = {
       Type = "oneshot";
-      ExecStart = pkgs.writeShellScript "generate-claude-env" ''
+      ExecStart = pkgs.writeShellScript "generate-claude-config" ''
         #!/usr/bin/env bash
-        # Generate .env file with actual secret values at runtime
+        set -euo pipefail
 
         # Check if secrets exist
-        if [ ! -f "${config.sops.secrets.context7-token.path}" ] || \
-           [ ! -f "${config.sops.secrets.github-pat.path}" ] || \
-           [ ! -f "${config.sops.secrets."sourcebot/api-key".path}" ]; then
-          echo "Warning: Some SOPS secrets are not available yet" >&2
+        if [ ! -f "${config.sops.secrets.context7-token.path}" ]; then
+          echo "Error: context7-token secret not found at ${config.sops.secrets.context7-token.path}" >&2
           exit 1
         fi
+
+        if [ ! -f "${config.sops.secrets.github-pat.path}" ]; then
+          echo "Error: github-pat secret not found at ${config.sops.secrets.github-pat.path}" >&2
+          exit 1
+        fi
+
+        # Read secrets
+        CONTEXT7_TOKEN=$(cat "${config.sops.secrets.context7-token.path}")
+        GITHUB_PERSONAL_ACCESS_TOKEN=$(cat "${config.sops.secrets.github-pat.path}")
 
         # Generate the .env file with actual values
         cat > "${claudeHome}/.env" << EOF
         # MCP Server Environment Variables
-        CONTEXT7_TOKEN=$(cat "${config.sops.secrets.context7-token.path}")
-        GITHUB_PERSONAL_ACCESS_TOKEN=$(cat "${config.sops.secrets.github-pat.path}")
-        SOURCEBOT_API_KEY=$(cat "${config.sops.secrets."sourcebot/api-key".path}")
+        # Generated by systemd service: generate-claude-config
+        CONTEXT7_TOKEN=$CONTEXT7_TOKEN
+        GITHUB_PERSONAL_ACCESS_TOKEN=$GITHUB_PERSONAL_ACCESS_TOKEN
         EOF
-
         chmod 600 "${claudeHome}/.env"
-        echo "Generated .env file with actual secret values"
+        echo "✓ Generated ${claudeHome}/.env file"
+
+        # Process mcp-servers.json to inject actual token values
+        # Replace CONTEXT7_TOKEN and GITHUB_PERSONAL_ACCESS_TOKEN placeholders with actual values
+        SOURCE_MCP="${claudeHome}/mcp-servers.json"
+        PROCESSED_MCP="${claudeHome}/mcp-servers-processed.json"
+
+        if [ -f "$SOURCE_MCP" ]; then
+          # Use jq to inject actual token values
+          ${pkgs.jq}/bin/jq \
+            --arg context7_token "$CONTEXT7_TOKEN" \
+            --arg github_token "$GITHUB_PERSONAL_ACCESS_TOKEN" \
+            '.context7.env.CONTEXT7_TOKEN = $context7_token |
+             .github.env.GITHUB_PERSONAL_ACCESS_TOKEN = $github_token' \
+            "$SOURCE_MCP" > "$PROCESSED_MCP"
+
+          chmod 600 "$PROCESSED_MCP"
+          echo "✓ Generated processed MCP config at $PROCESSED_MCP"
+        else
+          echo "Warning: Source MCP config not found at $SOURCE_MCP" >&2
+        fi
       '';
       RemainAfterExit = true;
     };
     Install = {
       WantedBy = [ "default.target" ];
     };
+  };
+
+  # Create a wrapper script that ensures environment variables are set when Claude Code starts
+  home.file."${claudeHome}/claude-code-wrapper.sh" = {
+    text = ''
+      #!/usr/bin/env bash
+      # Wrapper script to ensure CONTEXT7_TOKEN is available when Claude Code starts
+
+      # Load environment variables from .env file if it exists
+      if [ -f "${claudeHome}/.env" ]; then
+        set -a
+        source "${claudeHome}/.env"
+        set +a
+      fi
+
+      # Use processed MCP config if available, otherwise fall back to original
+      if [ -f "${claudeHome}/mcp-servers-processed.json" ]; then
+        export MCP_SERVERS_CONFIG="${claudeHome}/mcp-servers-processed.json"
+      fi
+
+      # Launch Claude Code with environment variables
+      exec ${pkgs.claude-code}/bin/claude-code "$@"
+    '';
+    executable = true;
   };
 }

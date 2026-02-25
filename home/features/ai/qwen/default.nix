@@ -201,129 +201,140 @@ in
 
   # Create Qwen Code settings.json configuration
   home.file.".qwen/settings.json" = {
-    force = true;  # Always overwrite, avoiding conflicts
+    force = true; # Always overwrite, avoiding conflicts
     text = builtins.toJSON {
-    # UI Settings
-    theme = "dark";
-    customThemes = {
-      dark = {
-        name = "Dark";
-        colors = {
-          background = "#1e1e1e";
-          foreground = "#d4d4d4";
-          primary = "#007acc";
-          secondary = "#3e3e42";
-          accent = "#007acc";
-          error = "#f48771";
-          warning = "#cca700";
-          info = "#75beff";
-          success = "#89d185";
+      # UI Settings
+      theme = "dark";
+      customThemes = {
+        dark = {
+          name = "Dark";
+          colors = {
+            background = "#1e1e1e";
+            foreground = "#d4d4d4";
+            primary = "#007acc";
+            secondary = "#3e3e42";
+            accent = "#007acc";
+            error = "#f48771";
+            warning = "#cca700";
+            info = "#75beff";
+            success = "#89d185";
+          };
         };
       };
-    };
-    hideWindowTitle = false;
-    hideTips = false;
-    hideBanner = false;
-    hideFooter = false;
-    showMemoryUsage = true;
-    enableWelcomeBack = true;
+      hideWindowTitle = false;
+      hideTips = false;
+      hideBanner = false;
+      hideFooter = false;
+      showMemoryUsage = true;
+      enableWelcomeBack = true;
 
-    # General Settings
-    usageStatisticsEnabled = true;
-    autoConfigureMaxOldSpaceSize = true;
-    preferredEditor = "nvim";
-    maxSessionTurns = -1; # unlimited
-    memoryImportFormat = "tree";
-    memoryDiscoveryMaxDirs = 200;
-    contextFileName = [ "QWEN.md" "README.md" "CLAUDE.md" "GEMINI.md" "CODEX.md" "CONTEXT.md" ];
-    model = "hf.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL";
-    hasSeenIdeIntegrationNudge = false;
-    folderTrustFeature = false;
-    folderTrust = false;
-    showLineNumbers = true;
-    enableOpenAILogging = false;
-    skipNextSpeakerCheck = false;
-    includeDirectories = [];
-    loadMemoryFromIncludeDirectories = false;
-    excludedProjectEnvVars = [ "DEBUG" "DEBUG_MODE" ];
+      # General Settings
+      usageStatisticsEnabled = true;
+      autoConfigureMaxOldSpaceSize = true;
+      preferredEditor = "nvim";
+      maxSessionTurns = -1; # unlimited
+      memoryImportFormat = "tree";
+      memoryDiscoveryMaxDirs = 200;
+      contextFileName = [
+        "QWEN.md"
+        "README.md"
+        "CLAUDE.md"
+        "GEMINI.md"
+        "CODEX.md"
+        "CONTEXT.md"
+      ];
+      model = "hf.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL";
+      hasSeenIdeIntegrationNudge = false;
+      folderTrustFeature = false;
+      folderTrust = false;
+      showLineNumbers = true;
+      enableOpenAILogging = false;
+      skipNextSpeakerCheck = false;
+      includeDirectories = [ ];
+      loadMemoryFromIncludeDirectories = false;
+      excludedProjectEnvVars = [
+        "DEBUG"
+        "DEBUG_MODE"
+      ];
 
-    # Mode Settings
-    vimMode = false;
-    ideMode = false;
+      # Mode Settings
+      vimMode = false;
+      ideMode = false;
 
-    # Accessibility Settings
-    accessibility = {
-      disableLoadingPhrases = false;
-    };
+      # Accessibility Settings
+      accessibility = {
+        disableLoadingPhrases = false;
+      };
 
-    # Checkpointing Settings
-    checkpointing = {
-      enabled = false;
-    };
+      # Checkpointing Settings
+      checkpointing = {
+        enabled = false;
+      };
 
-    # File Filtering Settings
-    fileFiltering = {
-      respectGitIgnore = true;
-      respectGeminiIgnore = true;
-      enableRecursiveFileSearch = true;
-    };
+      # File Filtering Settings
+      fileFiltering = {
+        respectGitIgnore = true;
+        respectGeminiIgnore = true;
+        enableRecursiveFileSearch = true;
+      };
 
-    # Updates Settings
-    disableAutoUpdate = false;
-    disableUpdateNag = false;
+      # Updates Settings
+      disableAutoUpdate = false;
+      disableUpdateNag = false;
 
-    # Shell Settings
-    shouldUseNodePtyShell = false;
+      # Shell Settings
+      shouldUseNodePtyShell = false;
 
-    # Authentication Settings (using local Ollama)
-    selectedAuthType = "api_key";
-    useExternalAuth = false;
+      # Authentication Settings (using local Ollama)
+      selectedAuthType = "api_key";
+      useExternalAuth = false;
 
-    # Advanced Settings
-    sandbox = false;
-    coreTools = [];
-    excludeTools = [];
-    toolDiscoveryCommand = null;
-    toolCallCommand = null;
-    mcpServerCommand = null;
+      # Advanced Settings
+      sandbox = false;
+      coreTools = [ ];
+      excludeTools = [ ];
+      toolDiscoveryCommand = null;
+      toolCallCommand = null;
+      mcpServerCommand = null;
 
-    # MCP Servers Configuration (imported from mcp-servers.json)
-    inherit mcpServers;
+      # MCP Servers Configuration (imported from mcp-servers.json)
+      inherit mcpServers;
 
-    allowMCPServers = null;
-    excludeMCPServers = null;
-    telemetry = null;
-    bugCommand = null;
-    summarizeToolOutput = null;
-    dnsResolutionOrder = "ipv4first";
+      allowMCPServers = null;
+      excludeMCPServers = null;
+      telemetry = null;
+      bugCommand = null;
+      summarizeToolOutput = null;
+      dnsResolutionOrder = "ipv4first";
 
-    # Chat Compression Settings
-    chatCompression = {
-      enabled = false;
-      maxTokens = 8192;
-    };
+      # Chat Compression Settings
+      chatCompression = {
+        enabled = false;
+        maxTokens = 8192;
+      };
 
-    # Content Generator Settings
-    contentGenerator = {
-      timeout = 30000; # 30 seconds
-      maxRetries = 3;
-      disableCacheControl = false;
-    };
+      # Content Generator Settings
+      contentGenerator = {
+        timeout = 30000; # 30 seconds
+        maxRetries = 3;
+        disableCacheControl = false;
+      };
 
-    # Session Settings
-    sessionTokenLimit = 128000; # Qwen3 Coder context window
+      # Session Settings
+      sessionTokenLimit = 128000; # Qwen3 Coder context window
 
-    # System Prompt Mappings (for Qwen models)
-    systemPromptMappings = {
-      "hf.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL" = "You are Qwen, a coding assistant created by Alibaba Cloud.";
-    };
+      # System Prompt Mappings (for Qwen models)
+      systemPromptMappings = {
+        "hf.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL" =
+          "You are Qwen, a coding assistant created by Alibaba Cloud.";
+      };
 
-    # Tavily API (optional, for web search)
-    tavilyApiKey = null;
+      # Tavily API (optional, for web search)
+      tavilyApiKey = null;
     };
   };
 
-    # Create .env file with secrets from SOPS
+  # Create .env file with secrets from SOPS
   # Create a script that generates the .env file at runtime
   home.file."${qwenHome}/.env" = {
     force = true;
@@ -335,7 +346,6 @@ in
       OPENAI_MODEL="hf.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL"
       CONTEXT7_TOKEN=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets.context7-token.path})
       GITHUB_PERSONAL_ACCESS_TOKEN=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets.github-pat.path})
-      SOURCEBOT_API_KEY=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets."sourcebot/api-key".path})
     '';
   };
 
@@ -354,8 +364,7 @@ in
 
         # Check if secrets exist
         if [ ! -f "${config.sops.secrets.context7-token.path}" ] || \
-           [ ! -f "${config.sops.secrets.github-pat.path}" ] || \
-           [ ! -f "${config.sops.secrets."sourcebot/api-key".path}" ]; then
+           [ ! -f "${config.sops.secrets.github-pat.path}" ]; then
           echo "Warning: Some SOPS secrets are not available yet" >&2
           exit 1
         fi
@@ -365,7 +374,6 @@ in
         # MCP Server Environment Variables
         CONTEXT7_TOKEN=$(cat "${config.sops.secrets.context7-token.path}")
         GITHUB_PERSONAL_ACCESS_TOKEN=$(cat "${config.sops.secrets.github-pat.path}")
-        SOURCEBOT_API_KEY=$(cat "${config.sops.secrets."sourcebot/api-key".path}")
         EOF
 
         chmod 600 "${qwenHome}/.env"

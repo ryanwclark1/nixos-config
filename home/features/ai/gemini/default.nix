@@ -222,7 +222,6 @@ in
       # This file is generated at runtime by the .env-generator script
       CONTEXT7_TOKEN=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets.context7-token.path})
       GITHUB_PERSONAL_ACCESS_TOKEN=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets.github-pat.path})
-      SOURCEBOT_API_KEY=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets."sourcebot/api-key".path})
     '';
   };
 
@@ -241,8 +240,7 @@ in
 
         # Check if secrets exist
         if [ ! -f "${config.sops.secrets.context7-token.path}" ] || \
-           [ ! -f "${config.sops.secrets.github-pat.path}" ] || \
-           [ ! -f "${config.sops.secrets."sourcebot/api-key".path}" ]; then
+           [ ! -f "${config.sops.secrets.github-pat.path}" ]; then
           echo "Warning: Some SOPS secrets are not available yet" >&2
           exit 1
         fi
@@ -252,7 +250,6 @@ in
         # MCP Server Environment Variables
         CONTEXT7_TOKEN=$(cat "${config.sops.secrets.context7-token.path}")
         GITHUB_PERSONAL_ACCESS_TOKEN=$(cat "${config.sops.secrets.github-pat.path}")
-        SOURCEBOT_API_KEY=$(cat "${config.sops.secrets."sourcebot/api-key".path}")
         EOF
 
         chmod 600 "${geminiHome}/.env"
