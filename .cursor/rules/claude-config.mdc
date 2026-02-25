@@ -1,0 +1,55 @@
+---
+description: Claude Code configuration reference system - when and how to use config files
+alwaysApply: true
+---
+
+# Claude Code Configuration System
+
+This project uses a comprehensive configuration system for Claude Code located in `home/features/ai/claude/config/`. These files are deployed to `~/.claude/` and should be referenced when relevant.
+
+## Core Behavioral Rules
+
+- **[RULES.md](mdc:home/features/ai/claude/config/RULES.md)**: Always apply these behavioral rules. Critical workflow patterns, safety rules, and quality standards.
+- **[PRINCIPLES.md](mdc:home/features/ai/claude/config/PRINCIPLES.md)**: Foundational engineering principles. Reference for decision-making and code quality.
+
+## Project-Specific Documentation
+
+- **[PLANNING.md](mdc:home/features/ai/claude/config/PLANNING.md)**: Read at session start. Architecture principles, design decisions, and absolute rules for this NixOS config project.
+- **[KNOWLEDGE.md](mdc:home/features/ai/claude/config/KNOWLEDGE.md)**: Read when encountering issues or learning patterns. Accumulated insights, best practices, troubleshooting.
+- **[TASK.md](mdc:home/features/ai/claude/config/TASK.md)**: Read daily before starting work. Current tasks, priorities, backlog.
+
+## Mode Documentation (Reference When Activated)
+
+- **[MODE_Brainstorming.md](mdc:home/features/ai/claude/config/MODE_Brainstorming.md)**: When user requests are vague or exploratory
+- **[MODE_Business_Panel.md](mdc:home/features/ai/claude/config/MODE_Business_Panel.md)**: When `/sc:business-panel` is used or business analysis is needed
+- **[MODE_DeepResearch.md](mdc:home/features/ai/claude/config/MODE_DeepResearch.md)**: When `/sc:research` is used or research is requested
+- **[MODE_Introspection.md](mdc:home/features/ai/claude/config/MODE_Introspection.md)**: When self-analysis or error recovery is needed
+- **[MODE_Orchestration.md](mdc:home/features/ai/claude/config/MODE_Orchestration.md)**: When multi-tool operations or performance optimization is needed
+- **[MODE_Task_Management.md](mdc:home/features/ai/claude/config/MODE_Task_Management.md)**: When complex multi-step tasks require coordination
+- **[MODE_Token_Efficiency.md](mdc:home/features/ai/claude/config/MODE_Token_Efficiency.md)**: When context usage >75% or `--uc` flag is used
+
+## MCP Server Documentation (Reference When Using MCP Tools)
+
+- **[MCP_SERVERS.md](mdc:home/features/ai/claude/config/MCP_SERVERS.md)**: Complete list of available MCP servers
+- **[MCP_Context7.md](mdc:home/features/ai/claude/config/MCP_Context7.md)**: When using Context7 for library documentation
+- **[MCP_Playwright.md](mdc:home/features/ai/claude/config/MCP_Playwright.md)**: When using Playwright for browser testing
+- **[MCP_Sequential.md](mdc:home/features/ai/claude/config/MCP_Sequential.md)**: When using Sequential for complex reasoning
+- **[MCP_Serena.md](mdc:home/features/ai/claude/config/MCP_Serena.md)**: When using Serena for symbol operations
+
+## Specialized Documentation
+
+- **[RESEARCH_CONFIG.md](mdc:home/features/ai/claude/config/RESEARCH_CONFIG.md)**: Deep research configuration and strategies
+- **[BUSINESS_SYMBOLS.md](mdc:home/features/ai/claude/config/BUSINESS_SYMBOLS.md)**: Business panel symbol system (used with MODE_Business_Panel)
+- **[FLAGS.md](mdc:home/features/ai/claude/config/FLAGS.md)**: SuperClaude framework flags reference
+
+## Usage Guidelines
+
+1. **Always Apply**: RULES.md and PRINCIPLES.md should guide all behavior
+2. **Session Start**: Read PLANNING.md, KNOWLEDGE.md, and TASK.md at session initialization
+3. **Mode Activation**: When a mode is triggered, reference the corresponding MODE_*.md file
+4. **MCP Usage**: When using an MCP server, reference the corresponding MCP_*.md file for best practices
+5. **Project Context**: Reference PLANNING.md and KNOWLEDGE.md when making architectural decisions
+
+## File Locations
+
+All config files are deployed to `~/.claude/` via [default.nix](mdc:home/features/ai/claude/default.nix). They can be read directly from that location or from the source in `home/features/ai/claude/config/`.
