@@ -43,6 +43,10 @@
 
   # AMD GPU configuration (desktop-specific)
   hardware = {
+    # Enable ROCm for GPU compute acceleration (required for Ollama with ROCm)
+    rocm = {
+      enable = true;
+    };
     graphics = {
       enable = true;
       enable32Bit = true; # 32-bit app support

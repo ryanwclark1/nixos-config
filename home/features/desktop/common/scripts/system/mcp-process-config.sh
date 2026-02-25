@@ -32,9 +32,9 @@ while IFS= read -r line; do
     if [[ $line =~ \{\{SOPS:([^}]+)\}\} ]]; then
         local secret_key="${BASH_REMATCH[1]}"
         local secret_value=""
-        
+
         echo "    Processing secret: $secret_key"
-        
+
         # Try to read from various SOPS locations
         local sops_paths=(
             "/run/secrets/${secret_key}"
@@ -43,7 +43,7 @@ while IFS= read -r line; do
             "/var/lib/sops-nix/secrets/${secret_key/\//-}"
             "${HOME}/.config/sops/secrets/${secret_key}"
         )
-        
+
         for path in "${sops_paths[@]}"; do
             if [ -f "$path" ] && [ -r "$path" ]; then
                 secret_value=$(cat "$path" 2>/dev/null || echo "")
@@ -53,14 +53,14 @@ while IFS= read -r line; do
                 fi
             fi
         done
-        
+
         if [ -z "$secret_value" ]; then
             echo "      Warning: Could not read SOPS secret '$secret_key'" >&2
             echo "      Checked paths:"
             printf "        %s\n" "${sops_paths[@]}"
             secret_value="MISSING_SECRET_${secret_key}"
         fi
-        
+
         processed_json=$(echo "$processed_json" | sed "s|{{SOPS:${secret_key}}}|${secret_value}|g")
     fi
 done < <(echo "$processed_json" | grep -o '{{SOPS:[^}]*}}' || true)
@@ -90,4 +90,4 @@ jq -r 'keys[]' "$OUTPUT_CONFIG" 2>/dev/null | while read -r server; do
 done
 
 echo ""
-echo "Configuration ready for OpenWebUI and CLI tools!"
+echo "Configuration ready for MCP-enabled CLI tools!"
