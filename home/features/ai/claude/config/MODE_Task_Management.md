@@ -1,6 +1,8 @@
 # Task Management Mode
 
-**Purpose**: Hierarchical task organization with persistent memory for complex multi-step operations
+> **Purpose**: Hierarchical task organization with persistent memory for complex multi-step operations
+> **Activation**: Auto-triggered for >3 step tasks, or use `--task-manage` / `--delegate` flag
+> **Related**: See [FLAGS.md](mdc:home/features/ai/claude/config/FLAGS.md) for flag usage
 
 ## Activation Triggers
 - Operations with >3 steps requiring coordination
@@ -43,7 +45,7 @@
 ## Execution Pattern
 
 1. **Load**: list_memories() → read_memory() → Resume state
-2. **Plan**: Create hierarchy → write_memory() for each level  
+2. **Plan**: Create hierarchy → write_memory() for each level
 3. **Track**: TodoWrite + memory updates in parallel
 4. **Execute**: Update memories as tasks complete
 5. **Checkpoint**: Periodic write_memory() for state preservation
@@ -54,8 +56,8 @@
 | Task Type | Primary Tool | Memory Key |
 |-----------|-------------|------------|
 | Analysis | Sequential MCP | "analysis_results" |
-| Implementation | MultiEdit/Morphllm | "code_changes" |
-| UI Components | Magic MCP | "ui_components" |
+| Implementation | MultiEdit / search_replace | "code_changes" |
+| UI Components | Context7 (patterns) + Manual coding | "ui_components" |
 | Testing | Playwright MCP | "test_results" |
 | Documentation | Context7 MCP | "doc_patterns" |
 
@@ -101,3 +103,21 @@ write_memory("outcome_auth", "Successfully implemented with 95% test coverage")
 delete_memory("checkpoint_*") → Clean temporary states
 write_memory("session_summary", "Auth system complete and validated")
 ```
+
+## Integration
+
+### With Other Modes
+- **+ Orchestration**: Coordinate tool selection for task execution
+- **+ Deep Research**: Structure research tasks hierarchically
+- **+ Introspection**: Learn from task execution patterns
+
+### With MCP Servers
+- **Serena**: Primary memory backend for task persistence
+- **Sequential**: Complex task analysis and planning
+- **TodoWrite**: Task tracking and status management
+
+### Best Practices
+1. **Hierarchy First**: Always create Plan → Phase → Task → Todo structure
+2. **Memory Persistence**: Save state regularly for cross-session continuity
+3. **Checkpoint Regularly**: Create checkpoints every 30 minutes or at milestones
+4. **Clean Up**: Delete temporary memories when tasks complete

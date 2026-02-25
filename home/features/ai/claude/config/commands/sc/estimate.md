@@ -73,6 +73,13 @@ Key behaviors:
 # Effort breakdown by optimization category and expected impact
 ```
 
+### Risk Assessment with Confidence Intervals
+```
+/sc:estimate "legacy system modernization" --type time --breakdown
+# Comprehensive estimation with risk factors and confidence intervals
+# Identifies high-risk areas requiring additional buffer time
+```
+
 ## Boundaries
 
 **Will:**

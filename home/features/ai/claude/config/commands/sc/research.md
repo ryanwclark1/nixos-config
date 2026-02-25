@@ -1,9 +1,9 @@
 ---
 name: research
 description: Deep web research with adaptive planning and intelligent search
-category: command
+category: special
 complexity: advanced
-mcp-servers: [tavily, sequential, playwright, serena]
+mcp-servers: [sequential, playwright, serena]
 personas: [deep-research-agent]
 ---
 
@@ -13,12 +13,12 @@ personas: [deep-research-agent]
 
 ## Triggers
 - Research questions beyond knowledge cutoff
-- Complex research questions
-- Current events and real-time information
+- Complex research questions requiring multi-hop exploration
+- Current events and real-time information needs
 - Academic or technical research requirements
-- Market analysis and competitive intelligence
+- Market analysis and competitive intelligence gathering
 
-## Context Trigger Pattern
+## Usage
 ```
 /sc:research "[query]" [--depth quick|standard|deep|exhaustive] [--strategy planning|intent|unified]
 ```
@@ -61,6 +61,24 @@ personas: [deep-research-agent]
 - Resolve contradictions
 - Ensure completeness
 
+Key behaviors:
+- Adaptive planning with intelligent search strategy selection
+- Multi-hop reasoning with evidence-based synthesis
+- Parallel-first execution for efficient research workflows
+- Comprehensive validation with source credibility assessment
+
+## MCP Integration
+- **Tavily**: Primary search and extraction engine for web research
+- **Sequential**: Complex reasoning and synthesis for multi-step research analysis
+- **Playwright**: JavaScript-heavy content extraction and dynamic page rendering
+- **Serena**: Research session persistence and cross-session memory management
+
+## Tool Coordination
+- **WebSearch**: Primary research tool for information gathering and source discovery
+- **TodoWrite**: Progress tracking for complex multi-phase research workflows
+- **Read/Write**: Research report generation and documentation
+- **sequentialthinking**: Structured reasoning for complex research question analysis
+
 ## Key Patterns
 
 ### Parallel Execution
@@ -79,12 +97,6 @@ personas: [deep-research-agent]
 - **Deep**: Comprehensive search, 3-4 hops, detailed analysis
 - **Exhaustive**: Maximum depth, 5 hops, complete investigation
 
-## MCP Integration
-- **Tavily**: Primary search and extraction engine
-- **Sequential**: Complex reasoning and synthesis
-- **Playwright**: JavaScript-heavy content extraction
-- **Serena**: Research session persistence
-
 ## Output Standards
 - Save reports to `claudedocs/research_[topic]_[timestamp].md`
 - Include executive summary
@@ -92,12 +104,43 @@ personas: [deep-research-agent]
 - List all sources with citations
 
 ## Examples
+
+### Basic Research Query
 ```
 /sc:research "latest developments in quantum computing 2024"
+# Standard depth research with adaptive planning
+# Generates comprehensive report with citations
+```
+
+### Deep Research Analysis
+```
 /sc:research "competitive analysis of AI coding assistants" --depth deep
+# Comprehensive multi-hop research with detailed analysis
+# 3-4 hop exploration with evidence-based synthesis
+```
+
+### Strategic Research Planning
+```
 /sc:research "best practices for distributed systems" --strategy unified
+# Unified strategy for comprehensive research planning
+# Parallel-first execution with intelligent search coordination
+```
+
+### Exhaustive Investigation
+```
+/sc:research "enterprise microservices architecture patterns" --depth exhaustive
+# Maximum depth research with 5-hop exploration
+# Complete investigation with comprehensive source validation
 ```
 
 ## Boundaries
-**Will**: Current information, intelligent search, evidence-based analysis
-**Won't**: Make claims without sources, skip validation, access restricted content
+
+**Will:**
+- Provide current information through intelligent web search and evidence-based analysis
+- Execute multi-hop research with adaptive planning and parallel-first execution
+- Generate comprehensive research reports with source citations and confidence levels
+
+**Will Not:**
+- Make claims without proper source validation and evidence chains
+- Skip validation procedures or access restricted content
+- Provide financial or legal advice beyond research information gathering

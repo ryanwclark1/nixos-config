@@ -1,6 +1,6 @@
 ---
 name: improve
-description: "Apply systematic improvements to code quality, performance, and maintainability"
+description: "Apply systematic improvements to code quality, performance, maintainability, and cleanup"
 category: workflow
 complexity: standard
 mcp-servers: [sequential, context7]
@@ -14,11 +14,21 @@ personas: [architect, performance, quality, security]
 - Performance optimization and bottleneck resolution needs
 - Maintainability improvements and technical debt reduction
 - Best practices application and coding standards enforcement
+- Code maintenance and technical debt reduction requests
+- Dead code removal and import optimization needs
+- Project structure improvement and organization requirements
+- Codebase hygiene and cleanup initiatives
+
+**Note:** Consider using `/sc:analyze` first to assess current code quality and identify improvement opportunities before applying systematic improvements.
 
 ## Usage
 ```
-/sc:improve [target] [--type quality|performance|maintainability|style] [--safe] [--interactive]
+/sc:improve [target] [--type quality|performance|maintainability|style|cleanup] [--safe] [--interactive] [--aggressive]
 ```
+
+**Cleanup-specific options:**
+- `--type cleanup` with `--subtype code|imports|files|all` for cleanup operations
+- `--aggressive` flag for thorough cleanup (use with caution)
 
 ## Behavioral Flow
 1. **Analyze**: Examine codebase for improvement opportunities and quality issues
@@ -49,6 +59,9 @@ Key behaviors:
 - **Performance Optimization**: Profiling analysis → bottleneck identification → optimization implementation
 - **Maintainability Enhancement**: Structure analysis → complexity reduction → documentation improvement
 - **Security Hardening**: Vulnerability analysis → security pattern application → validation verification
+- **Code Cleanup**: Usage analysis → dead code detection → safe removal with dependency validation
+- **Import Optimization**: Dependency analysis → unused import removal and organization
+- **Structure Cleanup**: Architectural analysis → file organization and modular improvements
 
 ## Examples
 
@@ -80,6 +93,38 @@ Key behaviors:
 # Comprehensive validation ensures security improvements are effective
 ```
 
+### Code Cleanup (Dead Code Removal)
+```
+/sc:improve src/ --type cleanup --subtype code --safe
+# Conservative cleanup with automatic safety validation
+# Removes dead code while preserving all functionality
+# Architect and quality personas coordinate for safe removal
+```
+
+### Import Optimization
+```
+/sc:improve --type cleanup --subtype imports --preview
+# Analyzes and shows unused import cleanup without execution
+# Framework-aware optimization via Context7 patterns
+# Quality persona ensures no breaking changes
+```
+
+### Comprehensive Project Cleanup
+```
+/sc:improve --type cleanup --subtype all --interactive
+# Multi-domain cleanup with user guidance for complex decisions
+# Activates architect, quality, and security personas for comprehensive analysis
+# Sequential MCP provides systematic cleanup workflow
+```
+
+### Aggressive Cleanup
+```
+/sc:improve components/ --type cleanup --aggressive
+# Thorough cleanup with Context7 framework patterns
+# Sequential analysis for complex dependency management
+# Use with caution - validates thoroughly before removal
+```
+
 ## Boundaries
 
 **Will:**
@@ -91,4 +136,7 @@ Key behaviors:
 - Apply risky improvements without proper analysis and user confirmation
 - Make architectural changes without understanding full system impact
 - Override established coding standards or project-specific conventions
+- Remove code without thorough safety analysis and dependency validation (cleanup operations)
+- Override project-specific cleanup exclusions or architectural constraints
+- Apply cleanup operations that compromise functionality or introduce bugs
 

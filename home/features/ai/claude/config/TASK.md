@@ -2,15 +2,17 @@
 
 > **Purpose**: Current tasks, priorities, and backlog for this NixOS configuration project.
 > **Read**: Daily before starting work, update as tasks progress
+> **Last Updated**: 2025-01-XX (update when modifying this file)
 
 ## Active Tasks (In Progress)
 
-### 🔄 Current Session
-- **Migrate SuperClaude Settings** (Branch: `claude/migrate-superclause-settings-011CUy8uVwUk1LmG1DSA5yj7`)
-  - [ ] Create essential documentation files (PLANNING, TASK, KNOWLEDGE, CONTRIBUTING)
-  - [ ] Activate high-priority agents from backup
-  - [ ] Update default.nix configuration
-  - [ ] Test and validate changes
+### 🔄 Current Focus
+- **Claude Code Configuration Integration**
+  - [x] Create Cursor rules for config file integration
+  - [x] Update agent references to config files
+  - [x] Improve FLAGS.md with examples and cross-references
+  - [ ] Update remaining MODE_*.md and MCP_*.md files with cross-references
+  - [ ] Test config file integration in practice
 
 ## High Priority (Next Up)
 
@@ -20,6 +22,8 @@
 - [ ] Optimize boot time (analyze systemd-analyze)
 
 ### AI Tooling Enhancement
+- [x] Integrate config files into Cursor rules system
+- [x] Update FLAGS.md with comprehensive examples
 - [ ] Validate all MCP server configurations
 - [ ] Test agent routing and activation
 - [ ] Create custom /sc: commands for common NixOS tasks
@@ -61,8 +65,17 @@
 
 ## Completed Tasks ✅
 
-### Recent Completions
-- ✅ Added Omarchy-inspired keybindings and utilities (PR #34)
+### Recent Completions (2025)
+- ✅ Integrated Claude Code config files into Cursor rules system
+- ✅ Created master config reference (claude-config.mdc)
+- ✅ Converted RULES.md and PRINCIPLES.md to Cursor rules
+- ✅ Enhanced FLAGS.md with examples and cross-references
+- ✅ Updated agent files to reference config documentation
+- ✅ Updated version numbers in agent files (TypeScript 5.8+, Rust 1.82+, etc.)
+- ✅ Renamed python-expert.md to python-pro.md for consistency
+
+### Previous Completions
+- ✅ Added Omarchy-inspired keybindings and utilities
 - ✅ Fixed SUPER+K keybinding conflict
 - ✅ Added battery and time notification utilities
 - ✅ Refactored shebang lines for better portability
@@ -121,15 +134,15 @@
 
 ## Sprint Planning (Optional)
 
-### Week of [Current Week]
-- **Goal**: Enhance AI tooling and documentation
-- **Tasks**: Complete SuperClaude migration, validate configurations
-- **Success Metrics**: All agents working, documentation complete
+### Current Focus
+- **Goal**: Make config files meaningful and well-integrated
+- **Tasks**: Improve MODE_*.md and MCP_*.md files, add cross-references
+- **Success Metrics**: All config files have clear purpose and cross-references
 
-### Next Week
-- **Goal**: System optimization and cleanup
-- **Tasks**: Service audit, boot time optimization
-- **Success Metrics**: Faster boot, reduced service count
+### Next Priorities
+- **Goal**: System optimization and validation
+- **Tasks**: Service audit, boot time optimization, MCP server testing
+- **Success Metrics**: Faster boot, reduced service count, all MCP servers validated
 
 ## Notes & Reminders
 

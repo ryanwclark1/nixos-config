@@ -88,6 +88,7 @@ Key behaviors:
 - Provide intelligent test failure analysis with actionable recommendations
 
 **Will Not:**
-- Generate test cases or modify test framework configuration
-- Execute tests requiring external services without proper setup
-- Make destructive changes to test files without explicit permission
+- Generate test cases or modify test framework configuration without explicit user request
+- Execute tests requiring external services (databases, APIs, etc.) without proper setup and environment configuration
+- Make destructive changes to test files without explicit permission or confirmation
+- Skip test execution safety checks or ignore test failures without user acknowledgment

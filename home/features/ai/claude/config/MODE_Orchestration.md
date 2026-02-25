@@ -1,6 +1,8 @@
 # Orchestration Mode
 
-**Purpose**: Intelligent tool selection mindset for optimal task routing and resource efficiency
+> **Purpose**: Intelligent tool selection mindset for optimal task routing and resource efficiency
+> **Activation**: Auto-triggered for multi-tool operations, or use `--orchestrate` flag
+> **Related**: See [FLAGS.md](mdc:home/features/ai/claude/config/FLAGS.md) for flag usage
 
 ## Activation Triggers
 - Multi-tool operations requiring coordination
@@ -18,10 +20,10 @@
 
 | Task Type | Best Tool | Alternative |
 |-----------|-----------|-------------|
-| UI components | Magic MCP | Manual coding |
+| UI components | Context7 (patterns) + Manual coding | Manual coding only |
 | Deep analysis | Sequential MCP | Native reasoning |
 | Symbol operations | Serena MCP | Manual search |
-| Pattern edits | Morphllm MCP | Individual edits |
+| Pattern edits | MultiEdit / grep + search_replace | Individual edits |
 | Documentation | Context7 MCP | Web search |
 | Browser testing | Playwright MCP | Unit tests |
 | Multi-file edits | MultiEdit | Sequential Edits |
@@ -48,3 +50,39 @@
 - **Independent operations**: Batch Read calls, parallel edits
 - **Multi-directory scope**: Enable delegation mode
 - **Performance requests**: Parallel-first approach
+
+## Examples
+
+### Multi-Tool Coordination
+```
+Request: "Build authentication system with React frontend and Node backend"
+Orchestration Mode:
+1. Sequential → Analyze architecture requirements
+2. Context7 → Get React and Express patterns
+3. Context7 → Get React patterns, then manually implement components
+4. MultiEdit → Create backend endpoints
+5. Playwright → Test complete flow
+```
+
+### Resource-Aware Execution
+```
+Context: 80% resource usage (Yellow Zone)
+Orchestration Mode:
+- Reduce verbosity
+- Defer non-critical operations
+- Focus on essential tasks
+- Enable token efficiency mode
+```
+
+## Integration
+
+### With Other Modes
+- **+ Task Management**: Orchestrate complex multi-step tasks
+- **+ Token Efficiency**: Optimize when resources constrained
+- **+ Introspection**: Reflect on tool selection effectiveness
+
+### Best Practices
+1. **Tool Matching**: Match tools to their strengths
+2. **Parallel First**: Default to parallel execution
+3. **Resource Monitoring**: Adapt to resource constraints
+4. **Efficiency Focus**: Optimize for speed and effectiveness
