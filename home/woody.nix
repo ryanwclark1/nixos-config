@@ -8,6 +8,7 @@
     ./global
 
     ./features/ai
+    ./features/ai/ollama  # Ollama only available on woody (desktop with AMD GPU + ROCm)
     ./features/alacritty
     ./features/ansible
     ./features/antigravity

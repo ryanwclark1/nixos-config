@@ -180,16 +180,6 @@ in
           };
           description = "AI-powered development assistant with Code directory access";
         };
-        sourcebot = {
-          command = "npx";
-          args = [ "@sourcebot/mcp@latest" ];
-          env = {
-            NODE_ENV = "production";
-            SOURCEBOT_HOST = "http://localhost:3002";
-            SOURCEBOT_API_KEY = "$(cat ${config.sops.secrets."sourcebot/api-key".path})";
-          };
-          description = "Code understanding and search via Sourcebot";
-        };
       };
     };
   };

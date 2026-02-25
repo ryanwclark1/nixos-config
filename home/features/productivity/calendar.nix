@@ -7,7 +7,7 @@
 
 {
   home.packages = with pkgs; [
-    khal
+    # khal  # Temporarily disabled due to build failure - Sphinx extension error
   ];
 
   accounts.calendar = {

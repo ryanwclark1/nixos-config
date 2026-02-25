@@ -37,12 +37,6 @@
       github-pat = {};
       # Vultr API (commented out - not in secrets.yaml)
       # "vultr/api-key" = {};
-      # Sourcebot secrets
-      "sourcebot/auth-secret" = {};
-      "sourcebot/database/user" = {};
-      "sourcebot/database/password" = {};
-      "sourcebot/database/name" = {};
-      "sourcebot/api-key" = {};
     };
   };
 }

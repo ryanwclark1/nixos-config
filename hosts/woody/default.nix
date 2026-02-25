@@ -39,7 +39,7 @@
     ../common/optional/services/docling.nix # Temporarily disabled due to build failures
     ../common/optional/services/gnome-services.nix
     ../common/optional/services/nfs.nix
-    ../common/optional/services/open-webui.nix
+    # ../common/optional/services/open-webui.nix  # Disabled - not using OpenWebUI anymore
     # ../common/optional/services/openvscode-server.nix  # Disabled - using vscode-server instead
     ../common/optional/services/printing.nix
     ../common/optional/services/searx.nix
@@ -161,8 +161,14 @@
     };
   };
 
-  # Sourcebot configuration migrated to home-manager
-  # See: home/features/ai/sourcebot.nix for the new Docker Compose setup
+  # Sourcebot removed - no longer using it
+
+  # Firewall configuration for Ollama (managed via home-manager)
+  networking.firewall = {
+    allowedTCPPorts = [
+      11434 # Ollama API port
+    ];
+  };
 
   system.stateVersion = "24.05";
 }
