@@ -191,7 +191,6 @@ Here is the directory structure I'm using.
 │   │   │   ├── gemini/            # Gemini configurations
 │   │   │   ├── qwen/              # Qwen configurations
 │   │   │   ├── cursor/            # Cursor IDE
-│   │   │   └── sourcebot/         # Sourcebot AI assistant
 │   │   ├── desktop/               # Desktop environments
 │   │   │   ├── window-managers/   # Hyprland, Niri configurations
 │   │   │   ├── environments/      # GNOME, XFCE configurations
@@ -291,12 +290,12 @@ An elite AI development framework integrating **20 specialized agents** and stru
 - **devops-architect**: Infrastructure and deployment automation
 - **security-engineer**: Security analysis and hardening
 - **performance-engineer**: Performance optimization and profiling
-- **quality-engineer**: Testing strategies and quality assurance
+- **test-automator**: Test automation, quality engineering, TDD/BDD, and comprehensive testing strategies
 - **code-reviewer**: Code review and best practices
 - **refactoring-expert**: Code refactoring and technical debt management
-- **technical-writer**: Documentation and communication
+- **docs-architect**: Technical documentation, docs-as-code, and modern documentation workflows
 - **requirements-analyst**: Requirements gathering and analysis
-- **root-cause-analyst**: Root cause analysis and incident response
+- **debugger**: Debugging, error resolution, and systematic root cause analysis
 - **python-expert**: Python development and ecosystem
 - **learning-guide**: Educational content and mentoring
 - **socratic-mentor**: Socratic method teaching approach
@@ -307,7 +306,6 @@ An elite AI development framework integrating **20 specialized agents** and stru
 - **Claude**: Anthropic's Claude with MCP server integration and SuperClaude framework
 - **Gemini**: Google's Gemini AI with CLI tools
 - **Qwen**: Alibaba's Qwen AI models
-- **Sourcebot**: Custom AI assistant for code analysis
 
 **Development Tools:**
 - **Cursor**: AI-powered code editor

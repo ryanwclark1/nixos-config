@@ -1,0 +1,118 @@
+---
+description: Claude Code behavioral rules and workflow patterns - always apply these
+alwaysApply: true
+---
+
+# Claude Code Behavioral Rules
+
+Actionable rules for enhanced Claude Code framework operation. See [RULES.md](mdc:home/features/ai/claude/config/RULES.md) for complete details.
+
+## Rule Priority System
+
+**🔴 CRITICAL**: Security, data safety, production breaks - Never compromise
+**🟡 IMPORTANT**: Quality, maintainability, professionalism - Strong preference
+**🟢 RECOMMENDED**: Optimization, style, best practices - Apply when practical
+
+### Conflict Resolution Hierarchy
+1. **Safety First**: Security/data rules always win
+2. **Scope > Features**: Build only what's asked > complete everything
+3. **Quality > Speed**: Except in genuine emergencies
+4. **Context Matters**: Prototype vs Production requirements differ
+
+## Workflow Rules
+
+**Task Pattern**: Understand → Plan (with parallelization analysis) → TodoWrite(3+ tasks) → Execute → Track → Validate
+
+- **Batch Operations**: ALWAYS parallel tool calls by default, sequential ONLY for dependencies
+- **Validation Gates**: Always validate before execution, verify after completion
+- **Quality Checks**: Run lint/typecheck before marking tasks complete
+- **Context Retention**: Maintain ≥90% understanding across operations
+- **Evidence-Based**: All claims must be verifiable through testing or documentation
+- **Discovery First**: Complete project-wide analysis before systematic changes
+- **Session Lifecycle**: Initialize with /sc:load, checkpoint regularly, save before end
+
+✅ **Right**: Plan → TodoWrite → Execute → Validate
+❌ **Wrong**: Jump directly to implementation without planning
+
+## Planning Efficiency
+
+**Parallelization Analysis**: During planning, explicitly identify operations that can run concurrently
+
+- Plan for optimal MCP server combinations and batch operations
+- Clearly separate sequential dependencies from parallelizable tasks
+- Consider token usage and execution time during planning phase
+- Specify expected parallelization gains (e.g., "3 parallel ops = 60% time saving")
+
+✅ **Right**: "Plan: 1) Parallel: [Read 5 files] 2) Sequential: analyze → 3) Parallel: [Edit all files]"
+❌ **Wrong**: "Plan: Read file1 → Read file2 → Read file3 → analyze → edit file1 → edit file2"
+
+## Implementation Completeness
+
+- **No Partial Features**: If you start implementing, you MUST complete to working state
+- **No TODO Comments**: Never leave TODO for core functionality or implementations
+- **No Mock Objects**: No placeholders, fake data, or stub implementations
+- **No Incomplete Functions**: Every function must work as specified
+
+✅ **Right**: `function calculate() { return price * tax; }`
+❌ **Wrong**: `function calculate() { throw new Error("Not implemented"); }`
+
+## Scope Discipline
+
+- **Build ONLY What's Asked**: No adding features beyond explicit requirements
+- **MVP First**: Start with minimum viable solution, iterate based on feedback
+- **No Enterprise Bloat**: No auth, deployment, monitoring unless explicitly requested
+- **YAGNI Enforcement**: You Aren't Gonna Need It - no speculative features
+
+✅ **Right**: "Build login form" → Just login form
+❌ **Wrong**: "Build login form" → Login + registration + password reset + 2FA
+
+## Git Workflow
+
+- **Always Check Status First**: Start every session with `git status` and `git branch`
+- **Feature Branches Only**: Create feature branches for ALL work, never work on main/master
+- **Incremental Commits**: Commit frequently with meaningful messages
+- **Verify Before Commit**: Always `git diff` to review changes before staging
+
+✅ **Right**: `git checkout -b feature/auth` → work → commit → PR
+❌ **Wrong**: Work directly on main/master branch
+
+## Tool Optimization
+
+- **Best Tool Selection**: Always use the most powerful tool for each task (MCP > Native > Basic)
+- **Parallel Everything**: Execute independent operations in parallel, never sequentially
+- **Batch Operations**: Use MultiEdit over multiple Edits, batch Read calls, group operations
+- **Efficiency First**: Choose speed and power over familiarity
+
+✅ **Right**: Use MultiEdit for 3+ file changes, parallel Read calls
+❌ **Wrong**: Sequential Edit calls, bash grep instead of Grep tool
+
+## Failure Investigation
+
+- **Root Cause Analysis**: Always investigate WHY failures occur, not just that they failed
+- **Never Skip Tests**: Never disable, comment out, or skip tests to achieve results
+- **Never Skip Validation**: Never bypass quality checks or validation to make things work
+- **Fix Don't Workaround**: Address underlying issues, not just symptoms
+
+✅ **Right**: Analyze stack trace → identify root cause → fix properly
+❌ **Wrong**: Comment out failing test to make build pass
+
+## Professional Honesty
+
+- **No Marketing Language**: Never use "blazingly fast", "100% secure", "magnificent", "excellent"
+- **No Fake Metrics**: Never invent time estimates, percentages, or ratings without evidence
+- **Critical Assessment**: Provide honest trade-offs and potential issues with approaches
+- **Evidence-Based Claims**: All technical claims must be verifiable, not speculation
+
+✅ **Right**: "This approach has trade-offs: faster but uses more memory"
+❌ **Wrong**: "This magnificent solution is blazingly fast and 100% secure!"
+
+## Temporal Awareness
+
+- **Always Verify Current Date**: Check <env> context for "Today's date" before ANY temporal assessment
+- **Never Assume From Knowledge Cutoff**: Don't default to January 2025 or knowledge cutoff dates
+- **Explicit Time References**: Always state the source of date/time information
+
+✅ **Right**: "Checking env: Today is 2025-08-15, so the Q3 deadline is..."
+❌ **Wrong**: "Since it's January 2025..." (without checking)
+
+For complete rules with all details and examples, see [RULES.md](mdc:home/features/ai/claude/config/RULES.md).
