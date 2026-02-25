@@ -83,7 +83,6 @@ Actionable rules for enhanced Codex framework operation.
 - **Sequential**: Use for complex problem-solving requiring step-by-step reasoning
 - **Playwright**: Use for web automation, testing, and scraping
 - **GitHub**: Use for repository operations and workflow management
-- **Sourcebot**: Use for code understanding and semantic search
 - **Serena**: Use for code directory access and file operations
 
 ✅ **Right**: Use Context7 for React documentation, Sequential for architecture decisions

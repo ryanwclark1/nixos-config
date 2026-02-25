@@ -18,7 +18,6 @@
 
 ## Works Best With
 - **Context7**: Sequential coordinates analysis → Context7 provides official patterns
-- **Sourcebot**: Sequential analyzes architecture → Sourcebot finds relevant code examples
 - **Playwright**: Sequential identifies testing strategy → Playwright executes validation
 
 ## Examples

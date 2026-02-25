@@ -18,7 +18,6 @@
 ## Works Best With
 - **Sequential**: Serena provides project context → Sequential performs architectural analysis
 - **Context7**: Serena identifies patterns → Context7 provides official documentation
-- **Sourcebot**: Serena understands structure → Sourcebot finds similar implementations
 
 ## Examples
 ```

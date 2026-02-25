@@ -62,7 +62,7 @@ in
     ./qwen
     ./codex
     ./opencode
-    # ./ollama
+    # ./ollama  # Only imported in woody.nix - not available on other hosts
   ];
   home.packages = with pkgs; [
     # mlflow-server  # Temporarily disabled due to missing fastapi/uvicorn dependencies

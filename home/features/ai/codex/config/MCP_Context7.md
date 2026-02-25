@@ -18,7 +18,6 @@
 
 ## Works Best With
 - **Sequential**: Context7 provides docs → Sequential analyzes implementation strategy
-- **Sourcebot**: Context7 supplies patterns → Sourcebot finds similar implementations in codebase
 
 ## Examples
 ```

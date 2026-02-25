@@ -161,7 +161,7 @@ Before marking work as complete, verify:
 ### Context7
 - **When to Use**: Official library documentation, framework patterns, version-specific APIs
 - **Examples**: "Implement React useEffect", "Add Auth0 authentication", "Migrate to Vue 3"
-- **Best With**: Sequential (for implementation strategy), Sourcebot (for codebase patterns)
+- **Best With**: Sequential (for implementation strategy)
 
 ### Sequential Thinking
 - **When to Use**: Complex problem-solving, architecture decisions, multi-step reasoning
