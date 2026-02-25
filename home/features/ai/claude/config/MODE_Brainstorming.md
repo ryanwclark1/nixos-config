@@ -1,6 +1,8 @@
 # Brainstorming Mode
 
-**Purpose**: Collaborative discovery mindset for interactive requirements exploration and creative problem solving
+> **Purpose**: Collaborative discovery mindset for interactive requirements exploration and creative problem solving
+> **Activation**: Auto-triggered by vague requests, or use `--brainstorm` / `--bs` flag
+> **Related**: See [FLAGS.md](mdc:home/features/ai/claude/config/FLAGS.md) for flag usage
 
 ## Activation Triggers
 - Vague project requests: "I want to build something...", "Thinking about creating..."
@@ -24,21 +26,51 @@
 - Better alignment between user vision and technical implementation
 - Smoother handoff to formal development workflows
 
-## Examples
-```
-Standard: "I want to build a web app"
-Brainstorming: "🤔 Discovery Questions:
-               - What problem does this solve for users?
-               - Who are your target users and their main workflows?
-               - What's your expected user volume and performance needs?
-               - Any existing systems to integrate with?
-               📝 Brief: [Generate structured requirements document]"
+## Integration
 
-Standard: "Maybe we could improve the authentication system"
-Brainstorming: "🔍 Let's explore this together:
-               - What specific auth challenges are users facing?
-               - Current vs desired user experience?
-               - Security requirements and compliance needs?
-               - Timeline and resource constraints?
-               ✅ Outcome: Clear improvement roadmap"
+### With Other Modes
+- **+ Task Management**: Convert brainstormed requirements into structured tasks
+- **+ Deep Research**: Research discovered requirements for feasibility
+- **+ Business Panel**: Analyze business viability of brainstormed ideas
+
+### With MCP Servers
+- **Context7**: Research similar solutions and patterns
+- **Sequential**: Structure complex brainstorming sessions
+- **Serena**: Save brainstormed insights for future sessions
+
+## Examples
+
+### Vague Request → Structured Requirements
 ```
+User: "I want to build a web app"
+Brainstorming Mode:
+🤔 Discovery Questions:
+- What problem does this solve for users?
+- Who are your target users and their main workflows?
+- What's your expected user volume and performance needs?
+- Any existing systems to integrate with?
+- What's your timeline and resource constraints?
+
+📝 Brief: [Generate structured requirements document]
+```
+
+### Exploration → Clear Roadmap
+```
+User: "Maybe we could improve the authentication system"
+Brainstorming Mode:
+🔍 Let's explore this together:
+- What specific auth challenges are users facing?
+- Current vs desired user experience?
+- Security requirements and compliance needs?
+- Timeline and resource constraints?
+
+✅ Outcome: Clear improvement roadmap with prioritized features
+```
+
+## Best Practices
+
+1. **Ask Open Questions**: Avoid yes/no questions, encourage detailed responses
+2. **Build on Answers**: Use responses to generate deeper questions
+3. **Document Insights**: Save key discoveries for later reference
+4. **Validate Assumptions**: Challenge assumptions through questioning
+5. **Synthesize**: Convert exploration into actionable requirements

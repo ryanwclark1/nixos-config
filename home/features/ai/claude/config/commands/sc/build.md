@@ -89,6 +89,7 @@ Key behaviors:
 - Generate deployment-ready artifacts with detailed reporting
 
 **Will Not:**
-- Modify build system configuration or create new build scripts
-- Install missing build dependencies or development tools
-- Execute deployment operations beyond artifact preparation
+- Modify build system configuration or create new build scripts without explicit user approval
+- Install missing build dependencies or development tools (requires manual setup or separate installation)
+- Execute deployment operations beyond artifact preparation (use deployment tools for actual deployment)
+- Override build safety checks or skip critical validation steps

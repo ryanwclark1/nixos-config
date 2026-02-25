@@ -3,7 +3,7 @@ name: workflow
 description: "Generate structured implementation workflows from PRDs and feature requirements"
 category: orchestration
 complexity: advanced
-mcp-servers: [sequential, context7, magic, playwright, morphllm, serena]
+mcp-servers: [sequential, context7, playwright, serena]
 personas: [architect, analyzer, frontend, backend, security, devops, project-manager]
 ---
 
@@ -14,6 +14,8 @@ personas: [architect, analyzer, frontend, backend, security, devops, project-man
 - Structured workflow generation for development projects
 - Multi-persona coordination for complex implementation strategies
 - Cross-session workflow management and dependency mapping
+
+**Note:** For requirements discovery and specification development, consider using `/sc:brainstorm` first to explore and refine requirements before generating workflows.
 
 ## Usage
 ```
@@ -94,4 +96,4 @@ Key behaviors:
 **Will Not:**
 - Execute actual implementation tasks beyond workflow planning and strategy
 - Override established development processes without proper analysis and validation
-- Generate workflows without comprehensive requirement analysis and dependency mapping 
+- Generate workflows without comprehensive requirement analysis and dependency mapping

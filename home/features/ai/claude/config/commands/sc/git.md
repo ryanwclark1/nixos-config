@@ -65,6 +65,14 @@ Key behaviors:
 ```
 /sc:git merge feature-branch --interactive
 # Guided merge with conflict resolution assistance
+# Provides step-by-step guidance for complex merge scenarios
+```
+
+### Advanced Workflow Operations
+```
+/sc:git rebase main --interactive
+# Intelligent rebase with conflict detection and resolution
+# Applies smart commit message optimization during rebase
 ```
 
 ## Boundaries
@@ -75,6 +83,7 @@ Key behaviors:
 - Provide workflow optimization and best practice guidance
 
 **Will Not:**
-- Modify repository configuration without explicit authorization
-- Execute destructive operations without confirmation
-- Handle complex merges requiring manual intervention
+- Modify repository configuration (`.git/config`, hooks, etc.) without explicit authorization
+- Execute destructive operations (force push, hard reset, branch deletion) without confirmation and safety checks
+- Handle complex merges requiring manual intervention or domain-specific conflict resolution expertise
+- Override Git safety mechanisms or skip validation steps for critical operations

@@ -83,6 +83,7 @@ Key behaviors:
 - Validate designs against maintainability and scalability standards
 
 **Will Not:**
-- Generate actual implementation code (use /sc:implement for implementation)
-- Modify existing system architecture without explicit design approval
-- Create designs that violate established architectural constraints
+- Generate actual implementation code (use `/sc:implement` for code generation after design completion)
+- Modify existing system architecture without explicit design approval and impact analysis
+- Create designs that violate established architectural constraints or project-specific conventions
+- Override design decisions made by domain experts or architectural review processes

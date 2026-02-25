@@ -3,7 +3,7 @@ name: implement
 description: "Feature and code implementation with intelligent persona activation and MCP integration"
 category: workflow
 complexity: standard
-mcp-servers: [context7, sequential, magic, playwright]
+mcp-servers: [context7, sequential, playwright]
 personas: [architect, frontend, backend, security, qa-specialist]
 ---
 
@@ -16,6 +16,8 @@ personas: [architect, frontend, backend, security, qa-specialist]
 - Code implementation needs with framework-specific requirements
 - Multi-domain development requiring coordinated expertise
 - Implementation projects requiring testing and validation integration
+
+**Note:** For design-first approaches, consider using `/sc:design` to create comprehensive specifications before implementation.
 
 ## Context Trigger Pattern
 ```

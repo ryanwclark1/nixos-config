@@ -3,7 +3,7 @@ name: brainstorm
 description: "Interactive requirements discovery through Socratic dialogue and systematic exploration"
 category: orchestration
 complexity: advanced
-mcp-servers: [sequential, context7, magic, playwright, morphllm, serena]
+mcp-servers: [sequential, context7, playwright, serena]
 personas: [architect, analyzer, frontend, backend, security, devops, project-manager]
 ---
 

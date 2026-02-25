@@ -2,7 +2,7 @@
 name: help
 description: "List all available /sc commands and their functionality"
 category: utility
-complexity: low
+complexity: basic
 mcp-servers: []
 personas: []
 ---
@@ -30,7 +30,6 @@ Here is a complete list of all available SuperClaude (`/sc`) commands.
 | `/sc:brainstorm` | Interactive requirements discovery through Socratic dialogue and systematic exploration |
 | `/sc:build` | Build, compile, and package projects with intelligent error handling and optimization |
 | `/sc:business-panel` | Multi-expert business analysis with adaptive interaction modes |
-| `/sc:cleanup` | Systematically clean up code, remove dead code, and optimize project structure |
 | `/sc:design` | Design system architecture, APIs, and component interfaces with comprehensive specifications |
 | `/sc:document` | Generate focused documentation for components, functions, APIs, and features |
 | `/sc:estimate` | Provide development estimates for tasks, features, or projects with intelligent analysis |
@@ -38,12 +37,11 @@ Here is a complete list of all available SuperClaude (`/sc`) commands.
 | `/sc:git` | Git operations with intelligent commit messages and workflow optimization |
 | `/sc:help` | List all available /sc commands and their functionality |
 | `/sc:implement` | Feature and code implementation with intelligent persona activation and MCP integration |
-| `/sc:improve` | Apply systematic improvements to code quality, performance, and maintainability |
+| `/sc:improve` | Apply systematic improvements to code quality, performance, maintainability, and cleanup |
 | `/sc:index` | Generate comprehensive project documentation and knowledge base with intelligent organization |
 | `/sc:load` | Session lifecycle management with Serena MCP integration for project context loading |
 | `/sc:reflect` | Task reflection and validation using Serena MCP analysis capabilities |
 | `/sc:save` | Session lifecycle management with Serena MCP integration for session context persistence |
-| `/sc:select-tool` | Intelligent MCP tool selection based on complexity scoring and operation analysis |
 | `/sc:spawn` | Meta-system task orchestration with intelligent breakdown and delegation |
 | `/sc:spec-panel` | Multi-expert specification review and improvement using renowned specification and software engineering experts |
 | `/sc:task` | Execute complex tasks with intelligent workflow management and delegation |

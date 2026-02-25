@@ -1,6 +1,8 @@
 # Token Efficiency Mode
 
-**Purpose**: Symbol-enhanced communication mindset for compressed clarity and efficient token usage
+> **Purpose**: Symbol-enhanced communication mindset for compressed clarity and efficient token usage
+> **Activation**: Auto-triggered when context >75% or use `--token-efficient` / `--uc` / `--ultracompressed` flag
+> **Related**: See [FLAGS.md](mdc:home/features/ai/claude/config/FLAGS.md) for flag usage
 
 ## Activation Triggers
 - Context usage >75% or resource constraints
@@ -56,20 +58,42 @@
 ### System & Architecture
 `cfg` config • `impl` implementation • `arch` architecture • `perf` performance • `ops` operations • `env` environment
 
-### Development Process  
+### Development Process
 `req` requirements • `deps` dependencies • `val` validation • `test` testing • `docs` documentation • `std` standards
 
 ### Quality & Analysis
 `qual` quality • `sec` security • `err` error • `rec` recovery • `sev` severity • `opt` optimization
 
 ## Examples
+
+### Before/After Comparison
 ```
 Standard: "The authentication system has a security vulnerability in the user validation function"
 Token Efficient: "auth.js:45 → 🛡️ sec risk in user val()"
+Savings: ~70% tokens, same information
+```
 
+```
 Standard: "Build process completed successfully, now running tests, then deploying"
 Token Efficient: "build ✅ » test 🔄 » deploy ⏳"
+Savings: ~60% tokens, clearer status visualization
+```
 
+```
 Standard: "Performance analysis shows the algorithm is slow because it's O(n²) complexity"
 Token Efficient: "⚡ perf analysis: slow ∵ O(n²) complexity"
+Savings: ~65% tokens, technical detail preserved
 ```
+
+## Integration
+
+### With Other Modes
+- **+ Task Management**: Compress task status updates
+- **+ Orchestration**: Reduce tool coordination verbosity
+- **+ Deep Research**: Compress research findings summaries
+
+### When NOT to Use
+- User requests detailed explanations
+- Learning/educational contexts
+- Complex reasoning requiring full context
+- First-time explanations of concepts

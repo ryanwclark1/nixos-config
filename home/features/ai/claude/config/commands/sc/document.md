@@ -15,6 +15,8 @@ personas: []
 - Code comment and inline documentation requirements
 - User guide and technical documentation creation requests
 
+**Note:** For comprehensive project documentation and knowledge base generation, consider using `/sc:index` to create project-wide documentation with intelligent organization.
+
 ## Usage
 ```
 /sc:document [target] [--type inline|external|api|guide] [--style brief|detailed]

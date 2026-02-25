@@ -1,6 +1,16 @@
-# BUSINESS_SYMBOLS.md - Business Analysis Symbol System
+# Business Analysis Symbol System
 
-Enhanced symbol system for business panel analysis with strategic focus and efficiency optimization.
+> **Purpose**: Enhanced symbol system for business panel analysis with strategic focus and efficiency optimization
+> **Usage**: Used with `/sc:business-panel` command and [MODE_Business_Panel.md](mdc:home/features/ai/claude/config/MODE_Business_Panel.md)
+> **Integration**: Symbols reduce token usage by 30-50% while maintaining clarity
+
+## Quick Reference
+
+Use symbols to communicate business concepts efficiently:
+- **Strategic**: 🎯 📈 📉 💰 ⚖️ 🏆
+- **Frameworks**: 🔨 ⚔️ 🎪 🌊 🚀 🛡️ 🕸️ 💬 🧭
+- **Process**: 🔍 💡 🤝 ⚡ 🎭 ❓ 🧩 📋
+- **Logic**: → ⇒ ← ⇄ ∴ ∵ ≡ ≠
 
 ## Business-Specific Symbols
 
@@ -18,7 +28,7 @@ Enhanced symbol system for business panel analysis with strategic focus and effi
 | 🏭 | industry, market structure | Competitive landscape |
 | 🎪 | remarkable, purple cow | Standout products, viral potential |
 
-### Framework Integration  
+### Framework Integration
 | Symbol | Expert | Framework Element |
 |--------|--------|-------------------|
 | 🔨 | Christensen | Jobs-to-be-Done |
@@ -106,10 +116,10 @@ Enhanced symbol system for business panel analysis with strategic focus and effi
 - 📚 **CHRISTENSEN position**: [Innovation framework perspective]
 - 📊 **PORTER counter**: [Competitive strategy challenge]
 
-**🔄 Resolution Process**: 
+**🔄 Resolution Process**:
 [How experts found common ground or maintained productive tension]
 
-**🧩 Higher-Order Solution**: 
+**🧩 Higher-Order Solution**:
 [Strategy that honors multiple frameworks]
 
 **🕸️ Systems Insight** (Meadows):
@@ -141,27 +151,26 @@ Enhanced symbol system for business panel analysis with strategic focus and effi
 - **Smart Abbreviation**: Business-specific abbreviations with context preservation
 
 ### Business Abbreviations
-```yaml
-common_terms:
-  'comp advantage': 'competitive advantage'
-  'value prop': 'value proposition' 
-  'go-to-market': 'GTM'
-  'total addressable market': 'TAM'
-  'customer acquisition cost': 'CAC'
-  'lifetime value': 'LTV'
-  'key performance indicator': 'KPI'
-  'return on investment': 'ROI'
-  'minimum viable product': 'MVP'
-  'product-market fit': 'PMF'
 
-frameworks:
-  'jobs-to-be-done': 'JTBD'
-  'blue ocean strategy': 'BOS'
-  'good to great': 'G2G'  
-  'five forces': '5F'
-  'value chain': 'VC'
-  'four actions framework': 'ERRC'
-```
+**Common Terms**:
+- `comp advantage` → competitive advantage
+- `value prop` → value proposition
+- `GTM` → go-to-market
+- `TAM` → total addressable market
+- `CAC` → customer acquisition cost
+- `LTV` → lifetime value
+- `KPI` → key performance indicator
+- `ROI` → return on investment
+- `MVP` → minimum viable product
+- `PMF` → product-market fit
+
+**Frameworks**:
+- `JTBD` → jobs-to-be-done
+- `BOS` → blue ocean strategy
+- `G2G` → good to great
+- `5F` → five forces
+- `VC` → value chain
+- `ERRC` → four actions framework (Eliminate, Reduce, Raise, Create)
 
 ## Mode Configuration
 
@@ -173,17 +182,17 @@ business_panel_config:
   min_experts: 3
   auto_select: true
   diversity_optimization: true
-  
+
   # Analysis Depth
   phase_progression: adaptive
   synthesis_required: true
   cross_framework_validation: true
-  
+
   # Output Control
   symbol_compression: true
   structured_templates: true
   expert_voice_preservation: 0.85
-  
+
   # Integration
   mcp_sequential_primary: true
   mcp_context7_patterns: true
@@ -201,7 +210,7 @@ business_panel_config:
 
 ### Authenticity Validation
 - **Voice Consistency**: Each expert maintains characteristic communication style
-- **Framework Fidelity**: Analysis follows authentic framework methodology  
+- **Framework Fidelity**: Analysis follows authentic framework methodology
 - **Interaction Realism**: Expert interactions reflect realistic professional dynamics
 - **Synthesis Integrity**: Combined insights maintain individual framework value
 
@@ -210,3 +219,37 @@ business_panel_config:
 - **Implementation Feasibility**: Recommendations are actionable and realistic
 - **Evidence Base**: Conclusions supported by framework logic and business evidence
 - **Professional Quality**: Analysis meets executive-level business communication standards
+
+## Usage Examples
+
+### Symbol-Enhanced Communication
+```
+Standard: "The market analysis shows growth opportunities in the blue ocean space,
+          but we need to balance this with competitive positioning risks."
+
+Symbol-Enhanced: "📈 🌊 BOS opportunities ⚖️ ⚔️ 5F positioning risks"
+Token Savings: ~60% reduction
+```
+
+### Framework Integration
+```
+Standard: "Christensen's Jobs-to-be-Done framework suggests we focus on customer jobs,
+          while Porter's Five Forces analysis indicates competitive threats."
+
+Symbol-Enhanced: "🔨 JTBD → customer jobs ⚔️ 5F → competitive threats"
+Token Savings: ~55% reduction
+```
+
+## Integration
+
+### With Business Panel Mode
+- **Discussion Mode**: Use symbols for expert synthesis
+- **Debate Mode**: Use symbols to highlight tensions (⚡)
+- **Socratic Mode**: Use symbols in question formulation
+
+### With Token Efficiency Mode
+- Symbols work seamlessly with `--token-efficient` flag
+- Combine with business abbreviations for maximum compression
+- Maintain clarity while reducing token usage
+
+For complete business panel methodology, see [MODE_Business_Panel.md](mdc:home/features/ai/claude/config/MODE_Business_Panel.md).
