@@ -92,8 +92,9 @@
   };
 
   nix = {
-    # Enable distributed builds (remote builders)
-    distributedBuilds = true;
+    # Keep build machine definitions, but default to local builds on laptop.
+    # The remote builder is not always reachable from this host.
+    distributedBuilds = false;
     buildMachines = [
       {
         hostName = "10.10.100.113";

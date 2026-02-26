@@ -5,9 +5,26 @@
   ...
 }:
 
+let
+  khalNoDocs = pkgs.khal.overridePythonAttrs (old: {
+    # khal docs currently fail under Sphinx 9 during doctree post-processing.
+    sphinxBuilders = [ ];
+    nativeBuildInputs = lib.filter (
+      pkg:
+      pkg != pkgs.python3Packages.sphinxHook
+      && pkg != pkgs.python3Packages.sphinx-rtd-theme
+      && pkg != pkgs.python3Packages.sphinxcontrib-newsfeed
+    ) old.nativeBuildInputs;
+    postInstall = (old.postInstall or "") + ''
+      # Keep expected multi-output derivation shape when docs are disabled.
+      mkdir -p "$doc/share/doc/khal"
+      mkdir -p "$man/share/man/man1"
+    '';
+  });
+in
 {
   home.packages = with pkgs; [
-    # khal  # Temporarily disabled due to build failure - Sphinx extension error
+    khalNoDocs
   ];
 
   accounts.calendar = {
