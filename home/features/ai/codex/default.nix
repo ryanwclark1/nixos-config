@@ -11,10 +11,8 @@ let
   configDir = ./config;
 in
 {
-  # Install codex package manually to avoid conflicts with manual config.toml management
-  # The programs.codex module automatically generates config.toml, which conflicts with
-  # our manual home.file entry below. We manage the config file manually for full control.
-  home.packages = [ pkgs.codex ];
+  # Keep Codex configuration managed here without forcing codex package builds
+  # during Home Manager activation.
 
 
   # Create config.toml template - will be processed by systemd service

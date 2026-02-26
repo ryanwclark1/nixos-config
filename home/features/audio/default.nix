@@ -6,7 +6,6 @@
 {
   imports = [
     ./mpris.nix
-    ./ncmp.nix
     ./playerctl.nix
     ./spotify.nix
   ];
