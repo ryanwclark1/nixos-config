@@ -21,6 +21,10 @@ in
   # This complements the system-level SSH config in hosts/common/global/security/openssh.nix
   # System config handles: knownHosts (public keys)
   # User config handles: connection behavior, ControlMaster, per-user preferences
+  #
+  # IMPORTANT: ~/.ssh/config is fully managed by Nix through this configuration.
+  # DO NOT manually edit ~/.ssh/config - it will be overwritten on rebuild.
+  # To add new hosts, add entries to the matchBlocks section below, then rebuild.
   programs.ssh = {
     enable = true;
     # Disable default config to avoid deprecation warning
@@ -66,7 +70,31 @@ in
         };
       };
 
+      # ============================================
       # Host configurations
+      # ============================================
+      # To add a new host:
+      # 1. Add a new entry in matchBlocks with the host alias as the key
+      # 2. Use commonHostConfig for standard settings, or define custom config
+      # 3. Rebuild with: home-manager switch
+      #
+      # Example for a new host:
+      #   "myhost" = commonHostConfig // {
+      #     hostname = "myhost.example.com";
+      #     port = 2222;  # Optional: custom port
+      #   };
+      #
+      # For hosts with different settings:
+      #   "customhost" = {
+      #     user = "differentuser";
+      #     hostname = "customhost.example.com";
+      #     identityFile = "~/.ssh/custom_key";
+      #     extraOptions = {
+      #       PreferredAuthentications = "publickey,password";
+      #     };
+      #   };
+      # ============================================
+
       "woody" = commonHostConfig // {
         hostname = "woody";
       };
@@ -75,11 +103,11 @@ in
         hostname = "frametop";
       };
 
-      # Direct IP connection
+      # Direct IP connections
       "10.10.100.56" = commonHostConfig // {
         hostname = "10.10.100.56";
       };
-            # Direct IP connection
+
       "155.138.220.196" = commonHostConfig // {
         hostname = "155.138.220.196";
       };
@@ -88,7 +116,28 @@ in
         hostname = "10.10.100.113";
       };
     };
+
+    # Additional SSH config that will be appended to the generated config
+    # Use this for any SSH options that aren't easily expressible in matchBlocks
+    # extraConfig = ''
+    #   # Custom SSH configuration here
+    # '';
   };
+
+  # Ensure ~/.ssh/config is fully managed by Nix
+  # This removes any manual ~/.ssh/config file and ensures Nix has full control
+  # If you have existing manual entries, migrate them to matchBlocks above before rebuilding
+  home.activation.removeManualSshConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    if [ -f "$HOME/.ssh/config" ] && ! [ -L "$HOME/.ssh/config" ]; then
+      # Check if the file is managed by home-manager (contains "Home Manager" comment)
+      if ! grep -q "Home Manager" "$HOME/.ssh/config" 2>/dev/null; then
+        echo "Warning: Found manual ~/.ssh/config file that is not managed by Nix."
+        echo "Backing it up to ~/.ssh/config.backup.$(date +%Y%m%d_%H%M%S)"
+        cp "$HOME/.ssh/config" "$HOME/.ssh/config.backup.$(date +%Y%m%d_%H%M%S)"
+        echo "Please migrate any needed entries to home/features/ssh/default.nix"
+      fi
+    fi
+  '';
 
   # Helper script to clean up stale SSH control sockets
   home.file."${config.home.homeDirectory}/.local/bin/ssh-cleanup" = {
