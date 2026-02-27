@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 export PATH="$HOME/.local/share/os/bin:$PATH"
 
 # Set to true when going directly to a submenu, so we can exit directly
@@ -33,11 +35,11 @@ menu() {
     fi
   fi
 
-  echo -e "$options" | os-launch-walker --dmenu --width 295 --minheight 1 --maxheight 630 -p "$prompt…" "${args[@]}" 2>/dev/null
+  echo -e "$options" | os-launch-walker --dmenu --width 295 --minheight 1 --maxheight 630 -p "$prompt…" "${args[@]}" 2>/dev/null || echo ""
 }
 
 terminal() {
-  xdg-terminal-exec --app-id=org.os.terminal "$@"
+  xdg-terminal-exec --app-id=org.os.terminal "$@" || true
 }
 
 present_terminal() {

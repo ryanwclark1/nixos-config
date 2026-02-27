@@ -91,13 +91,33 @@ done
 
 (( ${#dirs[@]} > 0 )) || dirs=("$HOME")
 
-mapfile -t repos < <(find "${dirs[@]}"  \
-  \( "${ignore_dirs[@]}" \
-    -fstype 'devfs' \
-    -o -fstype 'devtmpfs' \
-    -o -fstype 'proc' \
-  \) -prune -o -name '.git' -printf '%h\n' 2> /dev/null |
-  fzf --multi --cycle --inline-info +s -e ${force:+-f /})
+# Build find command - handle both GNU and BSD find
+if find --version &>/dev/null; then
+  # GNU find with -printf
+  mapfile -t repos < <(
+    find "${dirs[@]}" \
+      \( "${ignore_dirs[@]}" \
+        -fstype 'devfs' \
+        -o -fstype 'devtmpfs' \
+        -o -fstype 'proc' \
+      \) -prune -o -name '.git' -type d -printf '%h\n' 2>/dev/null |
+      sort -u |
+      fzf --multi --cycle --inline-info +s -e ${force:+-f /}
+  )
+else
+  # BSD find fallback
+  mapfile -t repos < <(
+    find "${dirs[@]}" \
+      \( "${ignore_dirs[@]}" \
+        -fstype 'devfs' \
+        -o -fstype 'devtmpfs' \
+        -o -fstype 'proc' \
+      \) -prune -o -name '.git' -type d -print 2>/dev/null |
+      sed 's|/\.git$||' |
+      sort -u |
+      fzf --multi --cycle --inline-info +s -e ${force:+-f /}
+  )
+fi
 
 (( ${#repos[@]} > 0 )) || exit
 
@@ -106,13 +126,15 @@ update() {
   dir="$1"
   name="${dir##*/}"
   (( quiet > 1 )) || color blue ":: updating $name"
-  if git -C "$dir" pull ${quiet:+-q}; then
+  if git -C "$dir" pull ${quiet:+-q} 2>&1; then
     (( quiet > 1 )) || color green ":: updated $name"
   else
     errs+=( "$name" )
+    (( quiet > 1 )) || err ":: failed to update $name"
   fi
 }
 
+local count=0
 for d in "${repos[@]}"; do
   (( count++ >= processes )) && wait -n
   update "$d" &

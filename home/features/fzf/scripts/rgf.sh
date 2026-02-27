@@ -45,12 +45,12 @@ has() {
 get_editor() {
     local editor
     editor="${EDITOR:-}"
-    
+
     if [[ -n "$editor" ]] && command -v "$editor" &>/dev/null; then
         echo "$editor"
         return 0
     fi
-    
+
     # Try common editors in order of preference
     for editor in nvim vim vi nano; do
         if command -v "$editor" &>/dev/null; then
@@ -58,7 +58,7 @@ get_editor() {
             return 0
         fi
     done
-    
+
     err "No suitable editor found"
     return 1
 }
@@ -66,11 +66,13 @@ get_editor() {
 # Get preview command
 get_preview_cmd() {
     if command -v bat &>/dev/null; then
-        echo "bat --color=always --style=numbers,changes --highlight-line {2} {1}"
+        echo "bat --color=always --style=numbers,changes --highlight-line {2} -- {1}"
+    elif command -v batcat &>/dev/null; then
+        echo "batcat --color=always --style=numbers,changes --highlight-line {2} -- {1}"
     elif command -v highlight &>/dev/null; then
-        echo "highlight -O ansi -l {1} 2>/dev/null | sed -n '{2}p' | head -1; highlight -O ansi -l {1} 2>/dev/null"
+        echo "highlight -O ansi --force -- {1} 2>/dev/null | sed -n \"{2}s/^/→ /p; {2}!p\" | head -50"
     else
-        echo "sed -n '{2}p' {1} | head -1; cat {1}"
+        echo "sed -n \"{2}p\" {1} 2>/dev/null | head -1; sed -n '1,50p' {1} 2>/dev/null || echo 'Preview not available'"
     fi
 }
 
@@ -112,7 +114,7 @@ main() {
     local search_pattern=""
     local rg_opts=()
     local fzf_opts=()
-    
+
     # Parse arguments
     while [[ $# -gt 0 ]]; do
         case $1 in
@@ -160,30 +162,30 @@ main() {
                 ;;
         esac
     done
-    
+
     # Check dependencies
     if ! has -v rg fzf; then
         err "This script requires ripgrep (rg) and fzf to be installed"
         exit 1
     fi
-    
+
     # Get editor
     local editor
     if ! editor=$(get_editor); then
         exit 1
     fi
-    
+
     # Get preview command
     local preview_cmd
     preview_cmd=$(get_preview_cmd)
-    
+
     # Prompt for search pattern if not provided
     if [[ -z "$search_pattern" ]]; then
         printf "${BLUE}Enter search pattern: ${RESET}"
         read -r search_pattern
         [[ -z "$search_pattern" ]] && exit 0
     fi
-    
+
     # Build ripgrep command
     local rg_cmd=(
         rg
@@ -192,16 +194,16 @@ main() {
         --no-heading
         --smart-case
         "${rg_opts[@]}"
-        "$search_pattern"
+        -- "$search_pattern"
     )
-    
+
     # Additional patterns from remaining args
     [[ $# -gt 0 ]] && rg_cmd+=("$@")
-    
+
     info "Searching for: $search_pattern"
-    
-    # Execute search with FZF
-    "${rg_cmd[@]}" 2>/dev/null |
+
+    # Execute search with FZF - handle empty results gracefully
+    "${rg_cmd[@]}" 2>/dev/null | head -10000 |
         fzf --ansi \
             --color "hl:-1:underline,hl+:-1:underline:reverse" \
             --delimiter : \
@@ -210,7 +212,7 @@ main() {
             --header "Search: $search_pattern | <Enter> open | <Ctrl-O> editor | <Ctrl-Y> copy | ? help" \
             --bind "enter:become($editor {1} +{2})" \
             --bind "ctrl-o:execute($editor {1} +{2})" \
-            --bind "ctrl-y:execute-silent(echo {1}:{2} | wl-copy || echo {1}:{2} | xclip -selection clipboard 2>/dev/null || echo {1}:{2} | pbcopy 2>/dev/null)" \
+            --bind "ctrl-y:execute-silent(printf '%s:%s\n' {1} {2} | wl-copy 2>/dev/null || printf '%s:%s\n' {1} {2} | xclip -selection clipboard 2>/dev/null || printf '%s:%s\n' {1} {2} | pbcopy 2>/dev/null || true)" \
             --bind "ctrl-l:toggle-preview" \
             --bind "ctrl-/:change-preview-window(right,60%,border-left|down,60%,border-top|hidden|)" \
             --bind '?:preview:echo -e "KEYBINDINGS:\n\n<Enter> - Open file at line in editor\n<Ctrl-O> - Open file in editor\n<Ctrl-Y> - Copy file:line to clipboard\n<Ctrl-L> - Toggle preview\n<Ctrl-/> - Change preview window\n? - Show this help"' \

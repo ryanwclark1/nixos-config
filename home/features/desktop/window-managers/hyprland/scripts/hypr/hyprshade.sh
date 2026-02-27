@@ -7,50 +7,117 @@
 #        |___/|_|
 #
 
-if [[ "$1" == "rofi" ]]; then
+set -euo pipefail
 
-    # Open rofi to select the Hyprshade filter for toggle
-    options="$(hyprshade ls)\noff"
+# Configuration
+SETTINGS_DIR="$HOME/.config/hypr/scripts/settings"
+SETTINGS_FILE="$SETTINGS_DIR/hyprshade.sh"
+ROFI_CONFIG="$HOME/.config/rofi/config-hyprshade.rasi"
+DEFAULT_FILTER="blue-light-filter-50"
 
-    # Open rofi
-    choice=$(echo -e "$options" | rofi -dmenu -replace -config ~/.config/rofi/config-hyprshade.rasi -i -no-show-icons -l 4 -width 30 -p "Hyprshade")
-    if [ ! -z $choice ]; then
-        echo "hyprshade_filter=\"$choice\"" >~/.config/hypr/scripts/settings/hyprshade.sh
-        if [ "$choice" == "off" ]; then
-            hyprshade off
-            notify-send "Hyprshade deactivated"
-            echo ":: hyprshade turned off"
-        else
-            notify-send "Changing Hyprshade to $choice" "Toggle shader with SUPER+SHIFT+S"
-        fi
+# Check required commands
+if ! command -v hyprshade >/dev/null 2>&1; then
+    echo "Error: hyprshade not found" >&2
+    exit 1
+fi
+
+# Notification helper
+notify() {
+    if command -v notify-send >/dev/null 2>&1; then
+        notify-send "$@"
+    fi
+}
+
+# Ensure settings directory exists
+mkdir -p "$SETTINGS_DIR"
+
+# Rofi selection mode
+rofi_mode() {
+    if ! command -v rofi >/dev/null 2>&1; then
+        echo "Error: rofi not found" >&2
+        exit 1
     fi
 
-else
+    # Get available filters
+    local options
+    options=$(hyprshade ls 2>/dev/null || echo "")
+    if [[ -z "$options" ]]; then
+        echo "Error: No hyprshade filters available" >&2
+        exit 1
+    fi
+    options="${options}\noff"
 
-    # Toggle Hyprshade based on the selected filter
-    hyprshade_filter="blue-light-filter-50"
+    # Open rofi
+    local rofi_args=(-dmenu -replace -i -no-show-icons -l 4 -width 30 -p "Hyprshade")
+    if [[ -f "$ROFI_CONFIG" ]]; then
+        rofi_args+=(-config "$ROFI_CONFIG")
+    fi
 
-    # Check if hyprshade.sh settings file exists and load
-    if [ -f ~/.config/hypr/scripts/settings/hyprshade.sh ]; then
-        source ~/.config/hypr/scripts/settings/hyprshade.sh
+    local choice
+    choice=$(echo -e "$options" | rofi "${rofi_args[@]}" 2>/dev/null || echo "")
+
+    if [[ -n "$choice" ]]; then
+        # Save selection
+        echo "hyprshade_filter=\"$choice\"" > "$SETTINGS_FILE"
+
+        if [[ "$choice" == "off" ]]; then
+            hyprshade off 2>/dev/null || true
+            notify "Hyprshade deactivated"
+            echo ":: hyprshade turned off"
+        else
+            notify "Changing Hyprshade to $choice" "Toggle shader with SUPER+SHIFT+S"
+        fi
+    fi
+}
+
+# Toggle mode
+toggle_mode() {
+    local hyprshade_filter="$DEFAULT_FILTER"
+
+    # Load saved filter if exists
+    if [[ -f "$SETTINGS_FILE" ]]; then
+        # Source the settings file safely
+        # shellcheck source=/dev/null
+        source "$SETTINGS_FILE"
     fi
 
     # Toggle Hyprshade
-    if [ "$hyprshade_filter" != "off" ]; then
-        if [ -z $(hyprshade current) ]; then
+    if [[ "$hyprshade_filter" != "off" ]]; then
+        local current
+        current=$(hyprshade current 2>/dev/null || echo "")
+
+        if [[ -z "$current" ]]; then
             echo ":: hyprshade is not running"
-            hyprshade on $hyprshade_filter
-            notify-send "Hyprshade activated" "with $(hyprshade current)"
-            echo ":: hyprshade started with $(hyprshade current)"
+            if hyprshade on "$hyprshade_filter" >/dev/null 2>&1; then
+                current=$(hyprshade current 2>/dev/null || echo "")
+                notify "Hyprshade activated" "with $current"
+                echo ":: hyprshade started with $current"
+            else
+                echo "Error: Failed to start hyprshade" >&2
+                exit 1
+            fi
         else
-            notify-send "Hyprshade deactivated"
-            echo ":: Current hyprshade $(hyprshade current)"
+            notify "Hyprshade deactivated"
+            echo ":: Current hyprshade $current"
             echo ":: Switching hyprshade off"
-            hyprshade off
+            hyprshade off 2>/dev/null || true
         fi
     else
-        hyprshade off
+        hyprshade off 2>/dev/null || true
         echo ":: hyprshade turned off"
     fi
+}
 
-fi
+# Main logic
+case "${1:-}" in
+    "rofi")
+        rofi_mode
+        ;;
+    "")
+        toggle_mode
+        ;;
+    *)
+        echo "Usage: $0 [rofi]" >&2
+        exit 1
+        ;;
+esac

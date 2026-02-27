@@ -1,6 +1,6 @@
 {
   imports = [
-    # ./mako
+    ./mako
     ./swaync
   ];
 }

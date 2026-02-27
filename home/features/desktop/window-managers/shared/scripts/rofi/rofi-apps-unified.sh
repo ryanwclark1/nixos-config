@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 # Unified Application Launcher
 # Replaces both apps.sh and appasroot.sh with a cleaner, more flexible approach
+
+# Get script directory for relative paths
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Configuration
 ROFI_THEME_TYPE="${ROFI_APP_THEME_TYPE:-type-3}"
@@ -92,13 +96,12 @@ else
         APP_SETTINGS="󰒓"
     fi
 
-    # Commands for user applications
-    CMD_TERMINAL="kitty"
-    CMD_FILEMANAGER="nautilus"
-    CMD_EDITOR="code"
-    CMD_BROWSER="google-chrome"
-    CMD_MUSIC="kitty -e ncmpcpp"
-    CMD_SETTINGS="$HOME/.config/hypr/scripts/rofi/settings-menu.sh"
+    # Commands for user applications - use script-relative path for settings
+    SETTINGS_SCRIPT="$SCRIPT_DIR/settings-menu.sh"
+    # Fallback to common locations if script not found in same directory
+    if [[ ! -f "$SETTINGS_SCRIPT" ]]; then
+        SETTINGS_SCRIPT="$HOME/.config/hypr/scripts/rofi/settings-menu.sh"
+    fi
 
     OPTIONS="$APP_TERMINAL\n$APP_FILEMANAGER\n$APP_EDITOR\n$APP_BROWSER\n$APP_MUSIC\n$APP_SETTINGS"
 fi
@@ -121,33 +124,55 @@ CHOICE=$(echo -e "$OPTIONS" | rofi_cmd)
 # Exit if nothing selected
 [[ -z "$CHOICE" ]] && exit 0
 
-# Execute based on choice
+# Execute based on choice - execute commands directly without eval
 case "$CHOICE" in
     "$APP_TERMINAL")
-        eval "$CMD_TERMINAL" &
+        if [[ "$MODE" == "root" ]]; then
+            pkexec env PATH="$PATH" WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-}" \
+                XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-}" kitty &
+        else
+            kitty &
+        fi
         ;;
     "$APP_FILEMANAGER")
-        eval "$CMD_FILEMANAGER" &
+        if [[ "$MODE" == "root" ]]; then
+            pkexec env PATH="$PATH" WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-}" \
+                XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-}" nautilus &
+        else
+            nautilus &
+        fi
         ;;
     "$APP_EDITOR")
-        eval "$CMD_EDITOR" &
+        if [[ "$MODE" == "root" ]]; then
+            pkexec env PATH="$PATH" WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-}" \
+                XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-}" kitty -e nvim &
+        else
+            code &
+        fi
         ;;
     "$APP_BROWSER")
-        eval "$CMD_BROWSER" &
+        google-chrome &
         ;;
     "$APP_SYSTEMCTL")
-        eval "$CMD_SYSTEMCTL" &
+        pkexec env PATH="$PATH" WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-}" \
+            XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-}" kitty -e systemctl &
         ;;
     "$APP_MUSIC")
-        eval "$CMD_MUSIC" &
+        kitty -e ncmpcpp &
         ;;
     "$APP_LOGS")
-        eval "$CMD_LOGS" &
+        pkexec env PATH="$PATH" WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-}" \
+            XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-}" kitty -e journalctl -f &
         ;;
     "$APP_SETTINGS")
-        eval "$CMD_SETTINGS" &
+        if [[ -f "$SETTINGS_SCRIPT" ]] && [[ -x "$SETTINGS_SCRIPT" ]]; then
+            "$SETTINGS_SCRIPT" &
+        else
+            notify-send "Error" "Settings menu script not found: $SETTINGS_SCRIPT" 2>/dev/null || true
+            exit 1
+        fi
         ;;
     "$APP_DISKS")
-        eval "$CMD_DISKS" &
+        pkexec gparted &
         ;;
 esac

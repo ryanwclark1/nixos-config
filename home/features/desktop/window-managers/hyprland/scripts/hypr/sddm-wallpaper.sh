@@ -6,54 +6,139 @@
 #  \___/| .__/ \__,_|\__,_|\__\___| |___/\__,_|\__,_|_| |_| |_|
 #       |_|
 #
+
+set -euo pipefail
+
+# Configuration
+CACHE_FILE="$HOME/.config/hypr/scripts/cache/current_wallpaper"
+SDDM_THEME_NAME="sequoia"
+SDDM_ASSET_FOLDER="/usr/share/sddm/themes/$SDDM_THEME_NAME/backgrounds"
+SDDM_THEME_TPL="/usr/share/ml4w-hyprland/sddm/theme.conf"
+CUSTOM_THEME_TPL="$HOME/.config/hypr/scripts/settings/sddm/theme.conf"
+SDDM_CONF_SOURCE="/usr/share/ml4w-hyprland/sddm/sddm.conf"
+SDDM_CONF_DEST="/etc/sddm.conf.d/sddm.conf"
+
+# Check required commands
+if ! command -v sudo >/dev/null 2>&1; then
+    echo "Error: sudo not found" >&2
+    exit 1
+fi
+
+# Check if running as root (not recommended, but handle it)
+if [[ $EUID -eq 0 ]]; then
+    SUDO_CMD=""
+else
+    SUDO_CMD="sudo"
+fi
+
+# Helper functions
+log() {
+    echo ":: $1"
+}
+
+error() {
+    echo "Error: $1" >&2
+    exit 1
+}
+
+# Check if gum is available (optional)
+if command -v gum >/dev/null 2>&1; then
+    USE_GUM=true
+else
+    USE_GUM=false
+fi
+
+# Main execution
 sleep 1
 clear
-cache_file="$HOME/.config/hypr/scripts/cache/current_wallpaper"
-current_wallpaper=$(cat "$cache_file")
+
+# Display header
+if command -v figlet >/dev/null 2>&1; then
+    echo -e "${GREEN:-}"
+    figlet -f smslant "SDDM Wallpaper" 2>/dev/null || echo "SDDM Wallpaper"
+    echo -e "${NONE:-}"
+else
+    echo "=== SDDM Wallpaper ==="
+fi
+
+# Check cache file
+if [[ ! -f "$CACHE_FILE" ]]; then
+    error "Cache file not found: $CACHE_FILE"
+fi
+
+# Read current wallpaper
+current_wallpaper=$(cat "$CACHE_FILE")
+if [[ -z "$current_wallpaper" ]]; then
+    error "Cache file is empty"
+fi
+
+# Get extension
 extension="${current_wallpaper##*.}"
 
-echo -e "${GREEN}"
-figlet -f smslant "SDDM Wallpaper"
-echo -e "${NONE}"
-
-sddm_theme_name="sequoia"
-sddm_asset_folder="/usr/share/sddm/themes/$sddm_theme_name/backgrounds"
-
-sddm_theme_tpl="/usr/share/ml4w-hyprland/sddm/theme.conf"
-if [ -f $HOME/.config/hypr/scripts/settings/sddm/theme.conf ]; then
-    sddm_theme_tpl="$HOME/.config/hypr/scripts/settings/sddm/theme.conf"
-    echo ":: Using custum theme.conf"
+# Check if wallpaper file exists
+if [[ ! -f "$current_wallpaper" ]]; then
+    if [[ "$USE_GUM" == true ]]; then
+        gum spin --spinner dot --title "File $current_wallpaper does not exist" -- sleep 3
+    else
+        error "Wallpaper file does not exist: $current_wallpaper"
+    fi
+    exit 1
 fi
 
-if [ ! -f $current_wallpaper ]; then
-    gum spin --spinner dot --title "File $current_wallpaper does not exist" -- sleep 3
-    exit
+log "Set the current wallpaper $current_wallpaper as SDDM wallpaper."
+echo
+
+# Use custom theme template if available
+if [[ -f "$CUSTOM_THEME_TPL" ]]; then
+    SDDM_THEME_TPL="$CUSTOM_THEME_TPL"
+    log "Using custom theme.conf"
 fi
 
-echo ":: Set the current wallpaper $current_wallpaper as SDDM wallpaper."
-echo
-
-if [ ! -d /etc/sddm.conf.d/ ]; then
-    sudo mkdir /etc/sddm.conf.d
-    echo ":: Folder /etc/sddm.conf.d created."
+# Create SDDM config directory
+if [[ ! -d /etc/sddm.conf.d/ ]]; then
+    $SUDO_CMD mkdir -p /etc/sddm.conf.d
+    log "Folder /etc/sddm.conf.d created."
 fi
 
-sudo cp /usr/share/ml4w-hyprland/sddm/sddm.conf /etc/sddm.conf.d/
-echo ":: File /etc/sddm.conf.d/sddm.conf updated."
+# Copy SDDM config
+if [[ -f "$SDDM_CONF_SOURCE" ]]; then
+    $SUDO_CMD cp "$SDDM_CONF_SOURCE" "$SDDM_CONF_DEST"
+    log "File $SDDM_CONF_DEST updated."
+else
+    error "SDDM config source not found: $SDDM_CONF_SOURCE"
+fi
 
-sudo cp $current_wallpaper $sddm_asset_folder/current_wallpaper.$extension
-echo ":: Current wallpaper copied into $sddm_asset_folder"
+# Ensure asset folder exists
+$SUDO_CMD mkdir -p "$SDDM_ASSET_FOLDER"
 
-sudo cp $sddm_theme_tpl /usr/share/sddm/themes/$sddm_theme_name/
-sudo sed -i 's/CURRENTWALLPAPER/'"current_wallpaper.$extension"'/' /usr/share/sddm/themes/$sddm_theme_name/theme.conf
-echo ":: File theme.conf updated in /usr/share/sddm/themes/$sddm_theme_name/"
-echo
+# Copy wallpaper to asset folder
+$SUDO_CMD cp "$current_wallpaper" "$SDDM_ASSET_FOLDER/current_wallpaper.$extension"
+log "Current wallpaper copied into $SDDM_ASSET_FOLDER"
 
-echo ":: You can preview your updated SDDM Login screen. (Close it with SUPER+Q)"
-echo
-if gum confirm "Do you want to preview the result?"; then
-    sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/sequoia
+# Copy and update theme config
+if [[ -f "$SDDM_THEME_TPL" ]]; then
+    $SUDO_CMD cp "$SDDM_THEME_TPL" "/usr/share/sddm/themes/$SDDM_THEME_NAME/"
+    $SUDO_CMD sed -i "s/CURRENTWALLPAPER/current_wallpaper.$extension/" "/usr/share/sddm/themes/$SDDM_THEME_NAME/theme.conf"
+    log "File theme.conf updated in /usr/share/sddm/themes/$SDDM_THEME_NAME/"
+else
+    error "Theme template not found: $SDDM_THEME_TPL"
 fi
 
 echo
-gum spin --spinner dot --title "Please logout to see the result." -- sleep 3
+log "You can preview your updated SDDM Login screen. (Close it with SUPER+Q)"
+echo
+
+# Preview option
+if [[ "$USE_GUM" == true ]]; then
+    if gum confirm "Do you want to preview the result?"; then
+        if command -v sddm-greeter-qt6 >/dev/null 2>&1; then
+            sddm-greeter-qt6 --test-mode --theme "/usr/share/sddm/themes/$SDDM_THEME_NAME" || true
+        else
+            log "sddm-greeter-qt6 not found, skipping preview"
+        fi
+    fi
+    echo
+    gum spin --spinner dot --title "Please logout to see the result." -- sleep 3
+else
+    log "Please logout to see the result."
+fi

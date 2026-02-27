@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -eu
 
 # System menu using rofi - alternative to walker-based system menu
 
@@ -11,14 +12,14 @@ menu() {
   local prompt="$1"
   local options="$2"
   local extra_opts="$3"
-  
+
   echo -e "$options" | rofi -dmenu -p "$prompt" $ROFI_OPTS $extra_opts
 }
 
 # Screenshot menu
 show_capture_menu() {
   selection=$(menu "📷 Capture" "📷 Screenshot\n🎬 Screenrecord\n🎨 Color Picker")
-  
+
   case "$selection" in
   *Screenshot*) show_screenshot_menu ;;
   *Screenrecord*) show_screenrecord_menu ;;
@@ -30,7 +31,7 @@ show_capture_menu() {
 # Screenshot submenu
 show_screenshot_menu() {
   selection=$(menu "📷 Screenshot" "📷 Region\n🖼️ Window\n🖥️ Display\n📁 Open Folder")
-  
+
   case "$selection" in
   *Region*) screenshot-enhanced region ;;
   *Window*) screenshot-enhanced window ;;
@@ -40,10 +41,10 @@ show_screenshot_menu() {
   esac
 }
 
-# Screen recording submenu  
+# Screen recording submenu
 show_screenrecord_menu() {
   selection=$(menu "🎬 Screenrecord" "🎬 Region\n🖥️ Fullscreen\n⏹️ Stop Recording")
-  
+
   case "$selection" in
   *Region*) screenrecord region ;;
   *Fullscreen*) screenrecord fullscreen ;;
@@ -55,7 +56,7 @@ show_screenrecord_menu() {
 # Audio menu
 show_audio_menu() {
   selection=$(menu "🔊 Audio" "🔊 Switch Output\n🔇 Toggle Mute\n🔉 Volume Down\n🔊 Volume Up\n🎚️ Mixer")
-  
+
   case "$selection" in
   *Switch*) audio-switch ;;
   *Mute*) audio-volume-mute ;;
@@ -69,7 +70,7 @@ show_audio_menu() {
 # Network menu
 show_network_menu() {
   selection=$(menu "📶 Network" "📶 WiFi Manager\n🔵 Bluetooth\n🌐 Network Settings")
-  
+
   case "$selection" in
   *WiFi*) kitty -e nmtui ;;
   *Bluetooth*) blueberry ;;
@@ -81,7 +82,7 @@ show_network_menu() {
 # System settings menu
 show_settings_menu() {
   selection=$(menu "⚙️ Settings" "🔊 Audio\n📶 Network\n🔵 Bluetooth\n⚡ Power\n🖥️ Displays\n⌨️ Keybindings\n🎨 Appearance")
-  
+
   case "$selection" in
   *Audio*) show_audio_menu ;;
   *Network*) show_network_menu ;;
@@ -97,31 +98,31 @@ show_settings_menu() {
 # Power menu with confirmation
 show_power_menu() {
   selection=$(menu "⚡ Power" "🔒 Lock Screen\n💤 Suspend\n🔄 Restart\n⏻ Shutdown\n🏠 Log Out")
-  
+
   case "$selection" in
   *Lock*) hyprlock ;;
-  *Suspend*) 
+  *Suspend*)
     if confirm_action "💤 Suspend" "Suspend system?"; then
       systemctl suspend
     else
       show_power_menu
     fi
     ;;
-  *Restart*) 
+  *Restart*)
     if confirm_action "🔄 Restart" "Restart system?"; then
       systemctl reboot
     else
       show_power_menu
     fi
     ;;
-  *Shutdown*) 
+  *Shutdown*)
     if confirm_action "⏻ Shutdown" "Shutdown system?"; then
       systemctl poweroff
     else
       show_power_menu
     fi
     ;;
-  *Log*) 
+  *Log*)
     if confirm_action "🏠 Log Out" "Log out of session?"; then
       hyprctl dispatch exit
     else
@@ -136,7 +137,7 @@ show_power_menu() {
 confirm_action() {
   local title="$1"
   local message="$2"
-  
+
   selection=$(menu "$title" "✅ Yes\n❌ No" "-theme android_notification")
   [[ "$selection" == *"Yes"* ]]
 }
@@ -148,27 +149,27 @@ show_toggle_menu() {
   wifi_status="🔴 Disabled"
   waybar_status="🔴 Hidden"
   nightlight_status="🔴 Disabled"
-  
+
   if ! rfkill list bluetooth | grep -q "Soft blocked: yes"; then
     bluetooth_status="🟢 Enabled"
   fi
-  
+
   if ! rfkill list wifi | grep -q "Soft blocked: yes"; then
     wifi_status="🟢 Enabled"
   fi
-  
+
   if pgrep -x waybar >/dev/null; then
     waybar_status="🟢 Visible"
   fi
-  
+
   if pgrep -x hyprsunset >/dev/null; then
     nightlight_status="🟢 Active"
   fi
-  
+
   selection=$(menu "🔀 Toggle" "🔵 Bluetooth ($bluetooth_status)\n📶 WiFi ($wifi_status)\n📊 Waybar ($waybar_status)\n🌙 Night Light ($nightlight_status)")
-  
+
   case "$selection" in
-  *Bluetooth*) 
+  *Bluetooth*)
     if rfkill list bluetooth | grep -q "Soft blocked: yes"; then
       rfkill unblock bluetooth && notify-send "🔵 Bluetooth" "Enabled" -t 2000
     else
@@ -187,7 +188,7 @@ show_toggle_menu() {
   *Waybar*)
     if pgrep -x waybar >/dev/null; then
       pkill waybar && notify-send "📊 Waybar" "Hidden" -t 2000
-    else  
+    else
       waybar & notify-send "📊 Waybar" "Shown" -t 2000
     fi
     show_toggle_menu
@@ -207,7 +208,7 @@ show_toggle_menu() {
 # Quick utilities menu
 show_utilities_menu() {
   selection=$(menu "🛠️ Utilities" "📁 File Manager\n💻 Terminal\n📊 System Monitor\n🧮 Calculator\n📝 Text Editor\n🎨 Color Picker\n📋 Clipboard History")
-  
+
   case "$selection" in
   *File*) nautilus ;;
   *Terminal*) kitty ;;
@@ -223,10 +224,10 @@ show_utilities_menu() {
 # Window management menu
 show_windows_menu() {
   selection=$(menu "🪟 Windows" "🔍 Window Info\n❌ Close All Windows\n📐 Resize Mode\n🎯 Focus Mode\n🔄 Workspace Switch")
-  
+
   case "$selection" in
   *Info*) window-info | rofi -dmenu -p "Window Info" $ROFI_OPTS ;;
-  *Close*) 
+  *Close*)
     if confirm_action "❌ Close All" "Close all windows?"; then
       close-all-windows
     else
@@ -235,7 +236,7 @@ show_windows_menu() {
     ;;
   *Resize*) notify-send "🪟 Resize Mode" "Use SUPER + mouse to resize windows" -t 3000 ;;
   *Focus*) notify-send "🪟 Focus Mode" "Use Alt+Tab to cycle through windows" -t 3000 ;;
-  *Workspace*) 
+  *Workspace*)
     workspace=$(menu "🔄 Switch Workspace" "1\n2\n3\n4\n5\n6\n7\n8\n9")
     [[ -n "$workspace" ]] && workspace-switch "$workspace"
     ;;
@@ -246,11 +247,11 @@ show_windows_menu() {
 # Main menu
 show_main_menu() {
   selection=$(menu "🚀 System Menu" "🚀 Apps\n📷 Capture\n⚙️ Settings\n🔀 Toggle\n🛠️ Utilities\n🪟 Windows\n⚡ Power")
-  
+
   case "$selection" in
   *Apps*) rofi -show drun -theme $ROFI_THEME -show-icons ;;
   *Capture*) show_capture_menu ;;
-  *Settings*) show_settings_menu ;;  
+  *Settings*) show_settings_menu ;;
   *Toggle*) show_toggle_menu ;;
   *Utilities*) show_utilities_menu ;;
   *Windows*) show_windows_menu ;;

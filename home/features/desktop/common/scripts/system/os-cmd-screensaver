@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 screensaver_in_focus() {
-  hyprctl activewindow -j | jq -e '.class == "org.os.screensaver"' >/dev/null 2>&1
+  hyprctl activewindow -j 2>/dev/null | jq -e '.class == "org.os.screensaver"' >/dev/null 2>&1
 }
 
 exit_screensaver() {
-  hyprctl keyword cursor:invisible false
-  pkill -x tte 2>/dev/null
-  pkill -f org.os.screensaver 2>/dev/null
+  hyprctl keyword cursor:invisible false || true
+  pkill -x tte 2>/dev/null || true
+  pkill -f org.os.screensaver 2>/dev/null || true
   exit 0
 }
 

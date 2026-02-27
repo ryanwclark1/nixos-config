@@ -120,6 +120,11 @@ if [[ -v FV_SEARCH && -n "$FV_SEARCH" ]]; then
   search_cmd="$FV_SEARCH"
   # Normalize ripgrep to rg for option handling
   [[ "$search_cmd" == "ripgrep" ]] && search_cmd="rg"
+  # Validate the specified tool exists
+  if ! command -v "$search_cmd" &>/dev/null; then
+    err "Specified search tool not found: $FV_SEARCH"
+    die
+  fi
 else
   # Check for ripgrep (rg) first, then ag, ack, grep
   # Also check for 'ripgrep' in case rg symlink doesn't exist
@@ -198,21 +203,34 @@ main() {
   local choices preview
   preview=$(get_preview_command)
 
-  choices=$($search_cmd "${search_opts[@]}" 2> /dev/null |
+  # Limit results to prevent overwhelming fzf
+  choices=$($search_cmd "${search_opts[@]}" 2>/dev/null | head -10000 |
     fzf --ansi --multi \
-        --preview="[[ \$(file -ib {}) == text/* ]] && $preview {} || echo 'Binary file'" \
-        --preview-window=right:60%) || return 1
+        --preview="[[ \$(file -ib {} 2>/dev/null) == text/* ]] && $preview {} 2>/dev/null || echo 'Binary file or preview unavailable'" \
+        --preview-window=right:60% \
+        --height=80%) || return 1
 
-  # Handle results
-  [[ "$search_str" != '' && "$search_cmd" == 'ag' ]] && choices=$(cut -d: -f1 <<< "$choices")
+  # Handle results - ag outputs file:line:match format
+  if [[ -n "$search_str" && "$search_cmd" == 'ag' ]]; then
+    choices=$(echo "$choices" | cut -d: -f1)
+  fi
 
+  # Convert to array, handling empty results
   mapfile -t choices <<< "$choices"
   [[ ${#choices[@]} -eq 0 ]] && return 1
 
+  # Filter out empty entries
+  local -a valid_choices=()
+  for choice in "${choices[@]}"; do
+    [[ -n "$choice" ]] && valid_choices+=("$choice")
+  done
+
+  [[ ${#valid_choices[@]} -eq 0 ]] && return 1
+
   if [[ -n "$dtach" ]]; then
-    ( "$cmd" "${cmdopts[@]}" "${choices[@]}" &> /dev/null & )
+    ( "$cmd" "${cmdopts[@]}" "${valid_choices[@]}" &> /dev/null & )
   else
-    "$cmd" "${cmdopts[@]}" "${choices[@]}"
+    "$cmd" "${cmdopts[@]}" "${valid_choices[@]}"
   fi
 }
 

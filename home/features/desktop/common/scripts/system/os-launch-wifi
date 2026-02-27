@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
 
-rfkill unblock wifi
+set -euo pipefail
+
+rfkill unblock wifi || true
 os-launch-or-focus-tui impala

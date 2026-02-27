@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 # Settings Menu for Hyprland
 # Provides access to various system settings applications
@@ -6,7 +7,7 @@
 # Icons for different settings categories
 AUDIO_ICON="󰕾"      # Audio/Volume settings
 BLUETOOTH_ICON="󰂯"  # Bluetooth settings
-NETWORK_ICON="󰖩"    # Network settings  
+NETWORK_ICON="󰖩"    # Network settings
 DISPLAY_ICON="󰍹"    # Display settings
 THEME_ICON="󰃟"      # Theme/Appearance settings
 SYSTEM_ICON="󰒓"     # System settings
@@ -24,6 +25,12 @@ options=(
     "$POWER_ICON  Power Management"
     "$PRIVACY_ICON  Privacy Settings"
 )
+
+# Check dependencies
+if ! command -v rofi >/dev/null 2>&1; then
+    notify-send "Error" "rofi not found" 2>/dev/null || echo "Error: rofi not found" >&2
+    exit 1
+fi
 
 # Show rofi menu
 choice=$(printf '%s\n' "${options[@]}" | rofi -dmenu -i -p "Settings" -theme-str 'listview { lines: 8; }')

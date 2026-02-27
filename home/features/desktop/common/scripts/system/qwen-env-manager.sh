@@ -5,8 +5,25 @@
 
 set -euo pipefail
 
-GLOBAL_ENV_FILE="$HOME/.qwen/.env"
-TEMPLATE_FILE="$HOME/.config/qwen/project-env-template"
+# Configuration
+GLOBAL_ENV_FILE="${QWEN_GLOBAL_ENV_FILE:-$HOME/.qwen/.env}"
+TEMPLATE_FILE="${QWEN_TEMPLATE_FILE:-$HOME/.config/qwen/project-env-template}"
+
+# Check dependencies
+check_dependencies() {
+    local missing=()
+
+    if ! command -v jq >/dev/null 2>&1; then
+        missing+=("jq")
+    fi
+
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        echo "Error: Missing required dependencies: ${missing[*]}" >&2
+        echo "Please install the missing packages and try again." >&2
+        return 1
+    fi
+    return 0
+}
 
 usage() {
     cat << EOF
@@ -43,7 +60,7 @@ EOF
 find_env_file() {
     local start_dir="${1:-$(pwd)}"
     local current_dir="$start_dir"
-    
+
     # Search upward from current directory
     while [[ "$current_dir" != "/" ]]; do
         # Check .qwen/.env first
@@ -51,27 +68,27 @@ find_env_file() {
             echo "$current_dir/.qwen/.env"
             return 0
         fi
-        
-        # Check .env second  
+
+        # Check .env second
         if [[ -f "$current_dir/.env" ]]; then
             echo "$current_dir/.env"
             return 0
         fi
-        
+
         current_dir=$(dirname "$current_dir")
     done
-    
+
     # Fallback to home directory
     if [[ -f "$HOME/.qwen/.env" ]]; then
         echo "$HOME/.qwen/.env"
         return 0
     fi
-    
+
     if [[ -f "$HOME/.env" ]]; then
-        echo "$HOME/.env" 
+        echo "$HOME/.env"
         return 0
     fi
-    
+
     echo "No .env file found"
     return 1
 }
@@ -80,12 +97,12 @@ find_env_file() {
 init_project_env() {
     local target_dir="${1:-$(pwd)}"
     local env_file="$target_dir/.qwen/.env"
-    
+
     echo "Initializing Qwen Code environment in: $target_dir"
-    
+
     # Create .qwen directory
     mkdir -p "$target_dir/.qwen"
-    
+
     if [[ -f "$env_file" ]]; then
         echo "Warning: $env_file already exists"
         read -p "Overwrite? (y/N): " -n 1 -r
@@ -95,7 +112,7 @@ init_project_env() {
             return 1
         fi
     fi
-    
+
     # Copy template if available, otherwise create basic file
     if [[ -f "$TEMPLATE_FILE" ]]; then
         cp "$TEMPLATE_FILE" "$env_file"
@@ -119,7 +136,7 @@ TEMPERATURE=0.05
 EOF
         echo "Created basic $env_file"
     fi
-    
+
     echo "Edit the file to customize settings for this project"
 }
 
@@ -139,23 +156,23 @@ show_global_env() {
 check_env_file() {
     local start_dir="${1:-$(pwd)}"
     local env_file
-    
+
     echo "Checking environment file resolution from: $start_dir"
     echo "Search order (Qwen Code behavior):"
-    
+
     local current_dir="$start_dir"
     local search_paths=()
-    
+
     # Build search path list
     while [[ "$current_dir" != "/" ]]; do
         search_paths+=("$current_dir/.qwen/.env")
         search_paths+=("$current_dir/.env")
         current_dir=$(dirname "$current_dir")
     done
-    
+
     search_paths+=("$HOME/.qwen/.env")
     search_paths+=("$HOME/.env")
-    
+
     # Show search order and find first match
     local found_file=""
     for i in "${!search_paths[@]}"; do
@@ -171,7 +188,7 @@ check_env_file() {
             echo "$((i+1)). $path ✗ (not found)"
         fi
     done
-    
+
     if [[ -n "$found_file" ]]; then
         echo ""
         echo "Qwen Code would use: $found_file"
@@ -185,32 +202,47 @@ check_env_file() {
 
 # Test Ollama connection
 test_ollama_connection() {
+    # Check dependencies
+    if ! check_dependencies; then
+        return 1
+    fi
+
+    if ! command -v curl >/dev/null 2>&1; then
+        echo "Error: curl not found. Please install curl." >&2
+        return 1
+    fi
+
     local env_file
     env_file=$(find_env_file) || {
         echo "No .env file found, testing with defaults"
     }
-    
+
     if [[ -n "$env_file" && "$env_file" != "No .env file found" ]]; then
         echo "Loading environment from: $env_file"
         set -a
-        source "$env_file"
+        # shellcheck source=/dev/null
+        source "$env_file" 2>/dev/null || {
+            echo "Warning: Failed to load environment file" >&2
+        }
         set +a
     fi
-    
+
     local base_url="${OPENAI_BASE_URL:-http://localhost:11434/v1}"
     local model="${MODEL:-hf.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL}"
-    
+
     echo "Testing Ollama connection..."
     echo "Base URL: $base_url"
     echo "Model: $model"
     echo ""
-    
+
     # Test basic connection
     if curl -sf "${base_url%/v1}/api/tags" >/dev/null 2>&1; then
         echo "✓ Ollama is running and accessible"
-        
+
         # Test if model is available
-        if curl -sf "${base_url%/v1}/api/tags" | grep -q "$(echo "$model" | cut -d: -f1)"; then
+        local model_base
+        model_base=$(echo "$model" | cut -d: -f1)
+        if curl -sf "${base_url%/v1}/api/tags" | jq -r '.models[].name' 2>/dev/null | grep -q "^${model_base}"; then
             echo "✓ Model '$model' is available"
         else
             echo "✗ Model '$model' not found in Ollama"
@@ -220,25 +252,36 @@ test_ollama_connection() {
     else
         echo "✗ Ollama is not accessible at ${base_url%/v1}"
         echo "Make sure Ollama is running: ollama serve"
+        return 1
     fi
 }
 
 # Show Ollama and model status
 show_status() {
+    # Check dependencies
+    if ! check_dependencies; then
+        return 1
+    fi
+
+    if ! command -v curl >/dev/null 2>&1; then
+        echo "Error: curl not found. Please install curl." >&2
+        return 1
+    fi
+
     echo "Ollama and Qwen Code Status"
     echo "==========================="
-    
+
     # Check if Ollama is running
-    if pgrep -f "ollama serve" >/dev/null; then
+    if pgrep -f "ollama serve" >/dev/null 2>&1; then
         echo "✓ Ollama service is running"
     else
         echo "✗ Ollama service not detected"
     fi
-    
+
     # Check Ollama API
     if curl -sf http://localhost:11434/api/tags >/dev/null 2>&1; then
         echo "✓ Ollama API accessible at http://localhost:11434"
-        
+
         echo ""
         echo "Available models:"
         curl -sf http://localhost:11434/api/tags | jq -r '.models[] | "  \(.name) (\(.size/1024/1024/1024 | floor)GB)"' 2>/dev/null || {
@@ -247,7 +290,7 @@ show_status() {
     else
         echo "✗ Ollama API not accessible"
     fi
-    
+
     echo ""
     check_env_file
 }
@@ -255,7 +298,7 @@ show_status() {
 # Main function
 main() {
     local command="${1:-}"
-    
+
     case "$command" in
         "init")
             shift

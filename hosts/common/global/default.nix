@@ -22,7 +22,8 @@
 
   # Global settings
   home-manager.useUserPackages = true;
-  home-manager.backupFileExtension = "bak";
+  # Use timestamped backups to avoid conflicts with existing backup files
+  home-manager.backupCommand = "cp -f $src $src.backup.$(date +%Y%m%d_%H%M%S)";
   home-manager.extraSpecialArgs = { inherit inputs outputs; };
 
   nixpkgs = {

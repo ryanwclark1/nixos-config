@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 CONFIG_PATHS="$HOME/.config/VSCodium,$HOME/.config/Code,$HOME/.config/Code - OSS"
 SORT_OPTION="time"
@@ -31,6 +32,25 @@ contract_tilde() {
     echo "$1" | sed "s|^$HOME|~|"
 }
 
+# Portable function to get file modification time
+get_file_mtime() {
+    local file="$1"
+    # Try GNU stat first (Linux)
+    if stat -c %Y "$file" 2>/dev/null; then
+        return 0
+    fi
+    # Try BSD stat (macOS/FreeBSD)
+    if stat -f %m "$file" 2>/dev/null; then
+        return 0
+    fi
+    # Fallback: use find (most portable)
+    if find "$file" -printf '%T@' 2>/dev/null | head -1; then
+        return 0
+    fi
+    # Last resort: return 0
+    echo 0
+}
+
 # Function to parse storage.json and extract workspace paths
 get_workspaces_from_storage() {
     local config_dir="$1"
@@ -42,13 +62,21 @@ get_workspaces_from_storage() {
     fi
 
     # Extract workspace paths from storage.json using jq
+    if ! command -v jq >/dev/null 2>&1; then
+        return 1
+    fi
+
     jq -r '.openedPathsList.workspaces3[]' "$storage_file" 2>/dev/null | while read -r j; do
         if [[ "$j" == file://* ]]; then
             local folder="${j:7}"
+            # Validate folder exists
+            if [[ ! -d "$folder" ]]; then
+                continue
+            fi
             local basename
             basename=$(basename "$folder")
             [[ "$FULLPATH" == "false" ]] && folder=$(contract_tilde "$folder")
-            echo "$folder|$basename|$(stat -c %Y "$folder" 2>/dev/null || echo 0)"
+            echo "$folder|$basename|$(get_file_mtime "$folder")"
         fi
     done
 }
@@ -59,6 +87,10 @@ get_workspaces_from_user_workspace() {
     local workspace_dirs
     workspace_dirs=$(find "$(expand_tilde "$config_dir")/User/workspaceStorage" -mindepth 1 -maxdepth 1 -type d 2>/dev/null)
 
+    if ! command -v jq >/dev/null 2>&1; then
+        return 1
+    fi
+
     for dir in $workspace_dirs; do
         local ws_file="$dir/workspace.json"
         if [[ -f "$ws_file" ]]; then
@@ -66,10 +98,14 @@ get_workspaces_from_user_workspace() {
             folder=$(jq -r '.folder' "$ws_file" 2>/dev/null)
             if [[ "$folder" == file://* ]]; then
                 folder="${folder:7}"
+                # Validate folder exists
+                if [[ ! -d "$folder" ]]; then
+                    continue
+                fi
                 local basename
                 basename=$(basename "$folder")
                 local time
-                time=$(stat -c %Y "$dir/state.vscdb" 2>/dev/null || echo 0)
+                time=$(get_file_mtime "$dir/state.vscdb")
                 [[ "$FULLPATH" == "false" ]] && folder=$(contract_tilde "$folder")
                 echo "$folder|$basename|$time"
             fi
@@ -102,6 +138,20 @@ run_rofi() {
     [[ -z "$selected" ]] && exit 0
 
     selected=$(expand_tilde "$selected")
+
+    # Validate workspace path exists before opening
+    if [[ ! -d "$selected" ]]; then
+        notify-send "Error" "Workspace not found: $selected" 2>/dev/null || \
+            echo "Error: Workspace not found: $selected" >&2
+        exit 1
+    fi
+
+    if ! command -v "$CODE_CMD" >/dev/null 2>&1; then
+        notify-send "Error" "Code editor not found: $CODE_CMD" 2>/dev/null || \
+            echo "Error: Code editor not found: $CODE_CMD" >&2
+        exit 1
+    fi
+
     $CODE_CMD "$selected" &
 }
 

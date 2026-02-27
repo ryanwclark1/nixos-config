@@ -246,11 +246,17 @@ main() {
     # Extract network information - fields are tab-separated
     local bssid ssid
     if [[ "$saved_only" == true ]]; then
-        ssid=$(echo "$network_line" | cut -d$'\t' -f1)
+        # Saved connections: name,type,autoconnect,state
+        IFS=$'\t' read -r ssid _ _ _ <<< "$network_line"
     else
-        # Extract fields from tab-separated line: bssid,signal,bars,freq,security,ssid
-        bssid=$(echo "$network_line" | cut -d$'\t' -f1)
-        ssid=$(echo "$network_line" | cut -d$'\t' -f6)
+        # WiFi networks: bssid,signal,bars,freq,security,ssid
+        IFS=$'\t' read -r bssid _ _ _ _ ssid <<< "$network_line"
+    fi
+
+    # Validate we got the required information
+    if [[ -z "$ssid" ]]; then
+        err "Failed to parse network information"
+        exit 1
     fi
 
     case "$key" in
@@ -301,11 +307,15 @@ main() {
                 fi
             else
                 info "Connecting to: $ssid"
-                if nmcli -a device wifi connect "$bssid" 2>/dev/null || nmcli -a device wifi connect "$ssid"; then
+                # Try BSSID first if available, then fall back to SSID
+                if [[ -n "$bssid" ]] && nmcli -a device wifi connect "$bssid" 2>/dev/null; then
+                    success "Successfully connected to: $ssid"
+                elif nmcli -a device wifi connect "$ssid" 2>/dev/null; then
                     success "Successfully connected to: $ssid"
                 else
                     err "Failed to connect to: $ssid"
                     warn "Check password or network availability"
+                    warn "The network may require manual configuration"
                 fi
             fi
             ;;

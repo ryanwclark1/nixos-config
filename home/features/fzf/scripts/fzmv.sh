@@ -36,11 +36,12 @@ fzf() {
 }
 
 pick_files() {
-  local files fzpick
-  find . -maxdepth 1 2> /dev/null |
+  local f
+  find . -maxdepth 1 -mindepth 1 2>/dev/null |
     sort -h |
-    sed '1d; s|^\./||' |
-    while read -r f; do
+    sed 's|^\./||' |
+    while IFS= read -r f; do
+      [[ -z "$f" ]] && continue
       if [[ -d "$f" ]]; then
         printf '%s/\n' "$f"
       elif [[ -L "$f" ]]; then
@@ -49,36 +50,39 @@ pick_files() {
         printf '%s\n' "$f"
       fi
     done |
-    fzf --multi --header='move these files'  || return 1
+    fzf --multi --header='move these files' || return 1
 }
 
 pick_destination() {
   local cwd browse_dir browse_info query dirs
-  cwd=$(pwd)
-  
+  cwd=$(pwd) || die "Failed to get current directory"
+
   # Use XDG cache directory for history
   local cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/fzmv"
-  mkdir -p "$cache_dir"
+  mkdir -p "$cache_dir" || die "Failed to create cache directory"
   local history_file="$cache_dir/history"
-  
+
   while [[ "$browse_dir" != "$cwd" ]]; do
     mapfile -t browse_info < <(
-    { echo '..'; find . -maxdepth 1 -type d 2> /dev/null; } |
-      sed 's|^./||' |
-      sort -h |
-      fzf --print-query \
-      --history="$history_file" \
-      --header="${errors:-move files here}")
-    query=${browse_info[0]}
-    browse_dir=${browse_info[1]}
+      { echo '..'; find . -maxdepth 1 -mindepth 1 -type d 2>/dev/null; } |
+        sed 's|^./||' |
+        sort -h |
+        fzf --print-query \
+        --history="$history_file" \
+        --header="${errors:-move files here}" || return 1
+    )
+    [[ ${#browse_info[@]} -eq 0 ]] && return 1
+
+    query=${browse_info[0]:-}
+    browse_dir=${browse_info[1]:-}
     files=( "${browse_info[@]:2}" )
     [[ -d "$query" ]] && browse_dir="$query"
     [[ ! -d "$browse_dir" ]] && return 1
-    if [[ "$browse_dir" == '.' && $(realpath "$browse_dir") != "$cwd" ]]; then
-      realpath "$browse_dir"
+    if [[ "$browse_dir" == '.' && $(realpath "$browse_dir" 2>/dev/null) != "$cwd" ]]; then
+      realpath "$browse_dir" 2>/dev/null || echo "$browse_dir"
       break
     else
-      cd "$browse_dir" || die
+      cd "$browse_dir" || die "Failed to change directory to: $browse_dir"
       continue
     fi
   done
@@ -94,5 +98,19 @@ done
 
 mapfile -t files < <(pick_files)
 (( ${#files[@]} > 0 )) || exit 1
+
 destination=$(pick_destination) || exit 1
-${dryrun:+echo} mv ${verbose:+-v} -t "$destination" "${files[@]}"
+[[ -z "$destination" ]] && die "No destination selected"
+
+# Validate destination exists and is writable
+if [[ ! -d "$destination" ]]; then
+  err "Destination is not a directory: $destination"
+  exit 1
+fi
+
+if [[ ! -w "$destination" ]]; then
+  err "Destination is not writable: $destination"
+  exit 1
+fi
+
+${dryrun:+echo} mv ${verbose:+-v} -t "$destination" "${files[@]}" || die "Failed to move files"

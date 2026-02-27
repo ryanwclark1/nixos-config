@@ -79,44 +79,72 @@ notify_with_actions() {
     local message="$2"
     local screenshot_path="$3"
 
-    if command -v notify-send >/dev/null; then
-        local result
-        result=$(notify-send \
-            -a "Screenshot" \
-            -i "image-x-generic-symbolic" \
-            -h "string:image-path:$screenshot_path" \
-            -A "file=Show in Files" \
-            -A "view=View" \
-            -A "edit=Edit" \
-            -A "copy=Copy Path" \
-            "$title" \
-            "$message" 2>/dev/null || echo "")
-
-        case "$result" in
-            "file")
-                log "Opening file manager"
-                xdg-open "$(dirname "$screenshot_path")" 2>/dev/null &
-                ;;
-            "view")
-                log "Opening image viewer"
-                xdg-open "$screenshot_path" 2>/dev/null &
-                ;;
-            "edit")
-                edit_screenshot "$screenshot_path"
-                ;;
-            "copy")
-                if command -v wl-copy >/dev/null; then
-                    echo "$screenshot_path" | wl-copy
-                    notify "Path Copied" "Screenshot path copied to clipboard"
-                fi
-                ;;
-        esac
+    if [[ ! -f "$screenshot_path" ]]; then
+        log "Warning: Screenshot file does not exist for notification: $screenshot_path"
+        notify "$title" "$message"
+        return 0
     fi
+
+    if ! command -v notify-send >/dev/null 2>&1; then
+        notify "$title" "$message"
+        return 0
+    fi
+
+    local result
+    result=$(notify-send \
+        -a "Screenshot" \
+        -i "image-x-generic-symbolic" \
+        -h "string:image-path:$screenshot_path" \
+        -A "file=Show in Files" \
+        -A "view=View" \
+        -A "edit=Edit" \
+        -A "copy=Copy Path" \
+        "$title" \
+        "$message" 2>/dev/null || echo "")
+
+    case "$result" in
+        "file")
+            log "Opening file manager"
+            if command -v xdg-open >/dev/null 2>&1; then
+                xdg-open "$(dirname "$screenshot_path")" >/dev/null 2>&1 &
+            else
+                log "Warning: xdg-open not available"
+            fi
+            ;;
+        "view")
+            log "Opening image viewer"
+            if command -v xdg-open >/dev/null 2>&1; then
+                xdg-open "$screenshot_path" >/dev/null 2>&1 &
+            else
+                log "Warning: xdg-open not available"
+            fi
+            ;;
+        "edit")
+            edit_screenshot "$screenshot_path"
+            ;;
+        "copy")
+            if command -v wl-copy >/dev/null 2>&1; then
+                if echo "$screenshot_path" | wl-copy 2>/dev/null; then
+                    notify "Path Copied" "Screenshot path copied to clipboard"
+                else
+                    log "Warning: Failed to copy path to clipboard"
+                fi
+            else
+                log "Warning: wl-copy not available"
+            fi
+            ;;
+    esac
 }
 
 # Edit screenshot with available editor
 edit_screenshot() {
     local screenshot_path="$1"
+
+    if [[ ! -f "$screenshot_path" ]]; then
+        log "Error: Screenshot file does not exist: $screenshot_path"
+        notify "Error" "Screenshot file not found"
+        return 1
+    fi
 
     # Try different image editors
     local editors=(
@@ -130,17 +158,26 @@ edit_screenshot() {
 
     for editor in "${editors[@]}"; do
         local editor_cmd="${editor%% *}"  # Get first word
-        if command -v "$editor_cmd" >/dev/null; then
+        if command -v "$editor_cmd" >/dev/null 2>&1; then
             log "Opening screenshot in $editor_cmd"
             notify "Edit Screenshot" "Opening in $editor_cmd"
-            $editor "$screenshot_path" &
-            return 0
+            if $editor "$screenshot_path" >/dev/null 2>&1 & then
+                return 0
+            else
+                log "Warning: Failed to start $editor_cmd"
+            fi
         fi
     done
 
     # Fallback to any image viewer/editor
     log "No image editor found, opening with default application"
-    xdg-open "$screenshot_path" &
+    if command -v xdg-open >/dev/null 2>&1; then
+        xdg-open "$screenshot_path" >/dev/null 2>&1 &
+    else
+        log "Error: xdg-open not available"
+        notify "Error" "No image editor or xdg-open found"
+        return 1
+    fi
 }
 
 # Generate screenshot filename
@@ -149,18 +186,31 @@ generate_filename() {
     local format="${2:-$DEFAULT_FORMAT}"
     local timestamp
 
+    # Validate prefix (sanitize)
+    prefix=$(echo "$prefix" | tr -cd '[:alnum:]-_' | head -c 50)
+    [[ -z "$prefix" ]] && prefix="screenshot"
+
     # Create screenshots directory if it doesn't exist
-    mkdir -p "$SCREENSHOTS_DIR"
-
-    # Generate timestamp
-    timestamp=$(date '+%Y-%m-%d_%H-%M-%S')
-
-    # Add milliseconds for uniqueness if available
-    if command -v date >/dev/null && date --help 2>&1 | grep -q '%3N'; then
-        timestamp="${timestamp}-$(date '+%3N')"
+    if ! mkdir -p "$SCREENSHOTS_DIR" 2>/dev/null; then
+        log "Error: Failed to create screenshots directory: $SCREENSHOTS_DIR"
+        return 1
     fi
 
-    echo "$SCREENSHOTS_DIR/${prefix}_${timestamp}.${format}"
+    # Generate timestamp
+    if ! timestamp=$(date '+%Y-%m-%d_%H-%M-%S' 2>/dev/null); then
+        log "Error: Failed to generate timestamp"
+        return 1
+    fi
+
+    # Add milliseconds for uniqueness if available
+    if command -v date >/dev/null 2>&1 && date --help 2>&1 | grep -q '%3N' 2>/dev/null; then
+        local milliseconds
+        milliseconds=$(date '+%3N' 2>/dev/null || echo "")
+        [[ -n "$milliseconds" ]] && timestamp="${timestamp}-${milliseconds}"
+    fi
+
+    local filename="$SCREENSHOTS_DIR/${prefix}_${timestamp}.${format}"
+    echo "$filename"
 }
 
 # Take screenshot using grimblast
@@ -225,20 +275,36 @@ screenshot_with_grimblast() {
 
 # Get rectangles for smart mode (windows and outputs on active workspace)
 get_rectangles() {
-    if ! command -v hyprctl >/dev/null || ! command -v jq >/dev/null; then
+    if ! command -v hyprctl >/dev/null 2>&1 || ! command -v jq >/dev/null 2>&1; then
+        log "Warning: hyprctl or jq not available for smart mode"
         return 1
     fi
 
-    local active_workspace
-    active_workspace=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true) | .activeWorkspace.id')
+    local active_workspace monitors_json clients_json
+    monitors_json=$(hyprctl monitors -j 2>/dev/null || echo "")
+    clients_json=$(hyprctl clients -j 2>/dev/null || echo "")
+
+    if [[ -z "$monitors_json" ]]; then
+        log "Warning: Could not get monitor information"
+        return 1
+    fi
+
+    active_workspace=$(echo "$monitors_json" | jq -r '.[] | select(.focused == true) | .activeWorkspace.id // empty' 2>/dev/null | head -n1)
+
+    if [[ -z "$active_workspace" ]] || [[ "$active_workspace" == "null" ]]; then
+        log "Warning: Could not determine active workspace"
+        return 1
+    fi
 
     # Output monitors on active workspace
-    hyprctl monitors -j | jq -r --arg ws "$active_workspace" \
-        '.[] | select(.activeWorkspace.id == ($ws | tonumber)) | "\(.x),\(.y) \((.width / .scale) | floor)x\((.height / .scale) | floor)"'
+    echo "$monitors_json" | jq -r --arg ws "$active_workspace" \
+        '.[] | select(.activeWorkspace.id == ($ws | tonumber)) | "\(.x),\(.y) \((.width / .scale) | floor)x\((.height / .scale) | floor)"' 2>/dev/null || true
 
     # Output windows on active workspace
-    hyprctl clients -j | jq -r --arg ws "$active_workspace" \
-        '.[] | select(.workspace.id == ($ws | tonumber)) | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"'
+    if [[ -n "$clients_json" ]]; then
+        echo "$clients_json" | jq -r --arg ws "$active_workspace" \
+            '.[] | select(.workspace.id == ($ws | tonumber)) | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' 2>/dev/null || true
+    fi
 }
 
 # Take screenshot using grim+slurp
@@ -260,8 +326,12 @@ screenshot_with_grim() {
     case "$mode" in
         "screen"|"fullscreen")
             # Full screen - get focused monitor
-            if command -v hyprctl >/dev/null && command -v jq >/dev/null; then
-                geometry=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true) | "\(.x),\(.y) \((.width / .scale) | floor)x\((.height / .scale) | floor)"')
+            if command -v hyprctl >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+                local monitors_json
+                monitors_json=$(hyprctl monitors -j 2>/dev/null || echo "")
+                if [[ -n "$monitors_json" ]]; then
+                    geometry=$(echo "$monitors_json" | jq -r '.[] | select(.focused == true) | "\(.x),\(.y) \((.width / .scale) | floor)x\((.height / .scale) | floor)"' 2>/dev/null | head -n1 || echo "")
+                fi
             fi
             # Fallback to full screen if hyprctl not available
             [[ -z "$geometry" ]] && geometry=""
@@ -296,10 +366,18 @@ screenshot_with_grim() {
             ;;
         "window")
             # Active window (requires compositor support)
-            if command -v hyprctl >/dev/null && command -v jq >/dev/null; then
-                geometry=$(hyprctl activewindow -j | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' 2>/dev/null)
-            elif command -v swaymsg >/dev/null && command -v jq >/dev/null; then
-                geometry=$(swaymsg -t get_tree | jq -r '.. | select(.focused?) | "\(.rect.x),\(.rect.y) \(.rect.width)x\(.rect.height)"' 2>/dev/null)
+            if command -v hyprctl >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+                local window_json
+                window_json=$(hyprctl activewindow -j 2>/dev/null || echo "")
+                if [[ -n "$window_json" ]]; then
+                    geometry=$(echo "$window_json" | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' 2>/dev/null || echo "")
+                fi
+            elif command -v swaymsg >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+                local tree_json
+                tree_json=$(swaymsg -t get_tree 2>/dev/null || echo "")
+                if [[ -n "$tree_json" ]]; then
+                    geometry=$(echo "$tree_json" | jq -r '.. | select(.focused?) | "\(.rect.x),\(.rect.y) \(.rect.width)x\(.rect.height)"' 2>/dev/null | head -n1 || echo "")
+                fi
             fi
 
             if [[ -z "$geometry" ]]; then
@@ -460,8 +538,12 @@ take_screenshot() {
     if [[ $result -eq 0 ]]; then
         if [[ -f "$output_file" ]]; then
             local file_size
-            file_size=$(du -h "$output_file" | cut -f1)
-            log "Screenshot saved: $output_file ($file_size)"
+            if file_size=$(du -h "$output_file" 2>/dev/null | cut -f1); then
+                log "Screenshot saved: $output_file ($file_size)"
+            else
+                log "Screenshot saved: $output_file"
+                file_size="unknown"
+            fi
 
             # Show notification with actions (unless using satty, which has its own notifications)
             if [[ "$use_satty" != "true" ]]; then
@@ -475,10 +557,14 @@ take_screenshot() {
             # Satty may have copied to clipboard without saving
             log "Screenshot processed by satty"
             return 0
+        elif [[ "$clipboard_only" == "true" ]]; then
+            # Clipboard-only mode succeeded
+            log "Screenshot copied to clipboard"
+            return 0
         fi
     fi
 
-    log "Screenshot failed"
+    log "Screenshot failed (exit code: $result)"
     notify "Screenshot Error" "Failed to capture screenshot"
     return 1
 }
@@ -621,8 +707,25 @@ main() {
             output_file="/tmp/screenshot-$$.${format}"
         else
             output_file=$(generate_filename "screenshot" "$format")
+            if [[ -z "$output_file" ]]; then
+                log "Error: Failed to generate output filename"
+                notify "Error" "Failed to generate output filename"
+                exit 1
+            fi
         fi
     fi
+
+    # Validate format
+    case "$format" in
+        png|jpg|jpeg|webp)
+            # Valid format
+            ;;
+        *)
+            log "Warning: Unknown format '$format', using PNG"
+            format="png"
+            output_file="${output_file%.*}.png"
+            ;;
+    esac
 
     # Disable notifications if requested
     if [[ "$show_notifications" == "false" ]]; then

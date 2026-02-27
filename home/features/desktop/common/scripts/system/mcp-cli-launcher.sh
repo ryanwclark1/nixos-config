@@ -10,30 +10,55 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MCP_CONFIG_FILE="${HOME}/.config/open-webui/mcp-servers.json"
 MCP_PROCESSED_CONFIG="/tmp/mcp-servers-processed.json"
 
+# Check dependencies
+check_dependencies() {
+    local missing=()
+
+    if ! command -v jq >/dev/null 2>&1; then
+        missing+=("jq")
+    fi
+
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        echo "Error: Missing required dependencies: ${missing[*]}" >&2
+        exit 1
+    fi
+}
+
 # Check if MCP config exists
-if [ ! -f "$MCP_CONFIG_FILE" ]; then
-    echo "Error: MCP configuration not found at $MCP_CONFIG_FILE"
-    exit 1
-fi
+check_mcp_config() {
+    if [[ ! -f "$MCP_CONFIG_FILE" ]]; then
+        echo "Error: MCP configuration not found at $MCP_CONFIG_FILE" >&2
+        echo "Please create the configuration file or set MCP_CONFIG_FILE environment variable" >&2
+        exit 1
+    fi
+}
 
 # Process MCP config to resolve variables
 process_mcp_config() {
     local input_file="$1"
     local output_file="$2"
-    
+
+    if [[ ! -f "$input_file" ]]; then
+        echo "Error: Input file not found: $input_file" >&2
+        return 1
+    fi
+
     # Read the JSON and replace template variables
     local processed_json
-    processed_json=$(cat "$input_file")
-    
+    processed_json=$(cat "$input_file" 2>/dev/null) || {
+        echo "Error: Failed to read configuration file" >&2
+        return 1
+    }
+
     # Replace {{HOME}} with actual home directory
     processed_json=$(echo "$processed_json" | sed "s|{{HOME}}|${HOME}|g")
-    
+
     # Process SOPS secrets
     while IFS= read -r line; do
         if [[ $line =~ \{\{SOPS:([^}]+)\}\} ]]; then
             local secret_key="${BASH_REMATCH[1]}"
             local secret_value=""
-            
+
             # Try to read from various SOPS locations
             local sops_paths=(
                 "/run/secrets/${secret_key}"
@@ -41,24 +66,33 @@ process_mcp_config() {
                 "/var/lib/sops-nix/secrets/${secret_key}"
                 "/var/lib/sops-nix/secrets/${secret_key/\//-}"
             )
-            
+
             for path in "${sops_paths[@]}"; do
                 if [ -f "$path" ] && [ -r "$path" ]; then
                     secret_value=$(cat "$path" 2>/dev/null || echo "")
                     break
                 fi
             done
-            
+
             if [ -z "$secret_value" ]; then
                 echo "Warning: Could not read SOPS secret '$secret_key'" >&2
                 secret_value="MISSING_SECRET_${secret_key}"
             fi
-            
+
             processed_json=$(echo "$processed_json" | sed "s|{{SOPS:${secret_key}}}|${secret_value}|g")
         fi
     done < <(echo "$processed_json" | grep -o '{{SOPS:[^}]*}}' || true)
-    
-    echo "$processed_json" > "$output_file"
+
+    echo "$processed_json" > "$output_file" || {
+        echo "Error: Failed to write processed configuration" >&2
+        return 1
+    }
+
+    # Validate JSON
+    if ! jq . "$output_file" >/dev/null 2>&1; then
+        echo "Error: Processed configuration is not valid JSON" >&2
+        return 1
+    fi
 }
 
 # Get available MCP servers
@@ -66,37 +100,37 @@ get_mcp_servers() {
     if [ ! -f "$MCP_PROCESSED_CONFIG" ]; then
         process_mcp_config "$MCP_CONFIG_FILE" "$MCP_PROCESSED_CONFIG"
     fi
-    
+
     jq -r 'keys[]' "$MCP_PROCESSED_CONFIG" 2>/dev/null || echo ""
 }
 
 # Launch MCP server
 launch_mcp_server() {
     local server_name="$1"
-    
+
     if [ ! -f "$MCP_PROCESSED_CONFIG" ]; then
         process_mcp_config "$MCP_CONFIG_FILE" "$MCP_PROCESSED_CONFIG"
     fi
-    
+
     local server_config
     server_config=$(jq ".\"$server_name\"" "$MCP_PROCESSED_CONFIG" 2>/dev/null)
-    
+
     if [ "$server_config" = "null" ] || [ -z "$server_config" ]; then
         echo "Error: MCP server '$server_name' not found" >&2
         return 1
     fi
-    
+
     local command args env_vars
     command=$(echo "$server_config" | jq -r '.command')
     args=$(echo "$server_config" | jq -r '.args[]?' | tr '\n' ' ')
-    
+
     # Set environment variables if specified
     if echo "$server_config" | jq -e '.env' > /dev/null 2>&1; then
         while IFS= read -r line; do
             export "$line"
         done < <(echo "$server_config" | jq -r '.env | to_entries[] | "\(.key)=\(.value)"')
     fi
-    
+
     # Launch the server
     exec $command $args
 }
@@ -216,14 +250,20 @@ EOF
 # Main function
 main() {
     local command="${1:-}"
-    
-    if [ $# -eq 0 ]; then
+
+    if [[ $# -eq 0 ]]; then
         usage
         exit 0
     fi
-    
+
+    # Check dependencies and config for all commands except help
+    if [[ "$command" != "help" && "$command" != "-h" && "$command" != "--help" ]]; then
+        check_dependencies
+        check_mcp_config
+    fi
+
     shift
-    
+
     case "$command" in
         "server")
             if [ $# -eq 0 ]; then

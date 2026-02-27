@@ -117,22 +117,25 @@ subcmd_ps() {
 
   if ! docker ps &>/dev/null; then
     err "Cannot connect to Docker daemon. Is Docker running?"
+    err "Try: sudo systemctl start docker"
     return 1
   fi
 
   local header="${GREEN}<Enter>${NC} opens shell, ${YELLOW}<Ctrl-R>${NC} restart, ${RED}<Ctrl-D>${NC} stop, ${BLUE}<Ctrl-L>${NC} logs toggle, ${GREEN}<Ctrl-I>${NC} inspect, ${YELLOW}?${NC} help"
 
+  local reload_cmd='docker ps --format "table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}\t{{.Ports}}" 2>/dev/null || echo "Error: Cannot connect to Docker daemon"'
+
   fzf \
-    --bind='start:reload:docker ps --format "table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}\t{{.Ports}}"' \
-    --bind='enter:execute:docker exec -it {1} sh || docker exec -it {1} bash' \
-    --bind='ctrl-d:execute-silent(docker stop {1})+reload:docker ps --format "table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}\t{{.Ports}}"' \
-    --bind='ctrl-r:execute-silent(docker restart {1})+reload:docker ps --format "table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}\t{{.Ports}}"' \
-    --bind='ctrl-k:execute-silent(docker kill {1})+reload:docker ps --format "table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}\t{{.Ports}}"' \
-    --bind='ctrl-i:execute:docker inspect {1} | less' \
+    --bind="start:reload:$reload_cmd" \
+    --bind='enter:execute:docker exec -it {1} sh 2>/dev/null || docker exec -it {1} bash 2>/dev/null || echo "Failed to open shell"' \
+    --bind="ctrl-d:execute-silent(docker stop {1} 2>/dev/null && echo 'Stopped {1}')+reload:$reload_cmd" \
+    --bind="ctrl-r:execute-silent(docker restart {1} 2>/dev/null && echo 'Restarted {1}')+reload:$reload_cmd" \
+    --bind="ctrl-k:execute-silent(docker kill {1} 2>/dev/null && echo 'Killed {1}')+reload:$reload_cmd" \
+    --bind='ctrl-i:execute:docker inspect {1} 2>/dev/null | less || echo "Failed to inspect container"' \
     --bind='ctrl-l:toggle-preview' \
     --bind='?:preview:echo -e "KEYBINDINGS:\n\n<Enter> - Open shell in container\n<Ctrl-D> - Stop container\n<Ctrl-R> - Restart container\n<Ctrl-K> - Kill container\n<Ctrl-I> - Inspect container\n<Ctrl-L> - Toggle logs view\n? - Show this help"' \
     --bind='escape:cancel' \
-    --preview='docker logs --tail 100 -f {1} 2>&1' \
+    --preview='docker logs --tail 100 {1} 2>&1 || echo "No logs available"' \
     --header="$header" \
     --reverse \
     --height=100% \
@@ -163,12 +166,12 @@ subcmd_logs() {
   [[ -z "${container:-}" ]] && return 0
 
   # Then view logs with options
-  docker logs --tail 100 "$container" |
+  docker logs --tail 100 "$container" 2>&1 |
     fzf \
-      --bind="enter:execute:docker logs -f $container | less +F" \
-      --bind="ctrl-a:execute:docker logs $container | less" \
-      --bind="ctrl-t:execute:read -p 'How many lines to tail? ' n && docker logs --tail \$n $container | less" \
-      --bind="ctrl-s:execute:read -p 'Search term: ' s && docker logs $container | grep -i \"\$s\" | less" \
+      --bind="enter:execute:docker logs -f $container 2>&1 | less +F || echo 'Failed to follow logs'" \
+      --bind="ctrl-a:execute:docker logs $container 2>&1 | less || echo 'Failed to load logs'" \
+      --bind="ctrl-t:execute:read -p 'How many lines to tail? ' n && docker logs --tail \$n $container 2>&1 | less || echo 'Failed to load logs'" \
+      --bind="ctrl-s:execute:read -p 'Search term: ' s && docker logs $container 2>&1 | grep -i \"\$s\" | less || echo 'No matches found'" \
       --header="$header" \
       --reverse \
       --height=100% \

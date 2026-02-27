@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-os-state clear re*-required
-os-hyprland-window-close-all
+set -euo pipefail
+
+os-state clear re*-required || true
+os-hyprland-window-close-all || true
 sleep 1 # Allow apps like Chrome to shutdown correctly
 systemctl poweroff --no-wall

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -eu
 
 # System Menu for Hyprland using rofi
 # Comprehensive menu system with nested submenus

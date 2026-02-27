@@ -57,7 +57,7 @@ check_deps() {
         err "On NixOS, ensure bluetooth is enabled in your configuration"
         exit 1
     fi
-    
+
     # Check if bluetooth service is running
     if ! systemctl is-active --quiet bluetooth; then
         err "Bluetooth service is not running"
@@ -68,28 +68,37 @@ check_deps() {
 
 # Get paired devices
 get_paired_devices() {
-    bluetoothctl devices Paired | while read -r _ address name; do
+    local address name status device_class info_output
+    while IFS= read -r line; do
+        # Parse bluetoothctl output: Device XX:XX:XX:XX:XX:XX DeviceName
+        address=$(echo "$line" | awk '{print $2}')
+        name=$(echo "$line" | cut -d' ' -f3-)
+
+        # Skip if address is empty
+        [[ -z "$address" ]] && continue
+
         # Get connection status
-        if bluetoothctl info "$address" | grep -q "Connected: yes"; then
+        info_output=$(bluetoothctl info "$address" 2>/dev/null)
+        if echo "$info_output" | grep -q "Connected: yes"; then
             status="${GREEN}✔ Connected${RESET}"
         else
             status="${RED}✗ Disconnected${RESET}"
         fi
-        
+
         # Get device type/class
-        device_class=$(bluetoothctl info "$address" | grep "Class:" | cut -d' ' -f2- || echo "Unknown")
-        
+        device_class=$(echo "$info_output" | grep "Class:" | cut -d' ' -f2- || echo "Unknown")
+
         printf "%s\t%s\t%s\t%s\n" "$address" "$name" "$status" "$device_class"
-    done
+    done < <(bluetoothctl devices Paired 2>/dev/null || true)
 }
 
 # Toggle device connection
 toggle_connection() {
     local address="$1"
     local name="$2"
-    
+
     info "Processing $name ($address)..."
-    
+
     if bluetoothctl info "$address" | grep -q "Connected: yes"; then
         info "Disconnecting $name..."
         if bluetoothctl disconnect "$address" &>/dev/null; then
@@ -112,24 +121,32 @@ toggle_connection() {
 scan_devices() {
     info "Scanning for devices (30 seconds)..."
     bluetoothctl --timeout 30 scan on >/dev/null 2>&1 &
-    scan_pid=$!
-    
-    # Show discovered devices
+    local scan_pid=$!
+
+    # Show discovered devices after a brief delay
     sleep 2
-    bluetoothctl devices | grep -v "Paired" | while read -r _ address name; do
-        printf "%s\t%s\t${YELLOW}Available${RESET}\t%s\n" "$address" "$name" "Discovered"
-    done
-    
-    wait $scan_pid 2>/dev/null || true
+    local address name
+    while IFS= read -r line; do
+        # Skip paired devices
+        [[ "$line" =~ "Paired" ]] && continue
+
+        # Parse device line
+        address=$(echo "$line" | awk '{print $2}')
+        name=$(echo "$line" | cut -d' ' -f3-)
+
+        [[ -n "$address" ]] && printf "%s\t%s\t${YELLOW}Available${RESET}\t%s\n" "$address" "$name" "Discovered"
+    done < <(bluetoothctl devices 2>/dev/null || true)
+
+    wait "$scan_pid" 2>/dev/null || true
 }
 
 # Pair with new device
 pair_device() {
     local address="$1"
     local name="$2"
-    
+
     info "Pairing with $name ($address)..."
-    
+
     if bluetoothctl pair "$address" && bluetoothctl trust "$address"; then
         success "Successfully paired with $name"
         if bluetoothctl connect "$address"; then
@@ -144,12 +161,12 @@ pair_device() {
 # Main interactive function
 main() {
     check_deps
-    
+
     while true; do
         # Create menu header
         local header="${BLUE}Bluetooth Device Manager${RESET}
 ${GREEN}<Enter>${RESET} toggle connection | ${YELLOW}<Ctrl-S>${RESET} scan | ${RED}<Ctrl-Q>${RESET} quit | ${CYAN}?${RESET} help"
-        
+
         # Get current devices and show menu
         local selection
         selection=$(
@@ -165,13 +182,13 @@ ${GREEN}<Enter>${RESET} toggle connection | ${YELLOW}<Ctrl-S>${RESET} scan | ${R
                 --preview='bluetoothctl info {1} 2>/dev/null || echo "No device info available"' \
                 --preview-window=right:60%:wrap
         ) || break
-        
+
         local key="${selection%%$'\n'*}"
         local device_line="${selection#*$'\n'}"
-        
+
         # Skip header line
         [[ "$device_line" =~ ^Action ]] && continue
-        
+
         case "$key" in
             ctrl-q)
                 info "Goodbye!"
@@ -184,18 +201,18 @@ ${GREEN}<Enter>${RESET} toggle connection | ${YELLOW}<Ctrl-S>${RESET} scan | ${R
                 ;;
             ctrl-p)
                 if [[ -n "$device_line" ]]; then
-                    read -r address name _ <<< "$device_line"
-                    pair_device "$address" "$name"
+                    IFS=$'\t' read -r address name _ _ <<< "$device_line"
+                    [[ -n "$address" ]] && pair_device "$address" "$name"
                 fi
                 ;;
             "")
                 if [[ -n "$device_line" ]]; then
-                    read -r address name _ <<< "$device_line"
-                    toggle_connection "$address" "$name"
+                    IFS=$'\t' read -r address name _ _ <<< "$device_line"
+                    [[ -n "$address" ]] && toggle_connection "$address" "$name"
                 fi
                 ;;
         esac
-        
+
         # Pause to show result
         sleep 1
     done
@@ -214,7 +231,7 @@ OPTIONS:
 
 KEYBINDINGS:
     <Enter>       Toggle device connection
-    <Ctrl-S>      Scan for new devices  
+    <Ctrl-S>      Scan for new devices
     <Ctrl-P>      Pair with selected device
     <Ctrl-Q>      Quit application
     ?             Show help in preview
