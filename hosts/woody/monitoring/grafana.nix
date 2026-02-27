@@ -158,6 +158,9 @@
       security = {
         adminUser = "admin";
         adminPassword = "admin"; # Change this in production!
+        # Secret key for signing session cookies and other cryptographic operations
+        # Generated with: openssl rand -base64 32
+        secret_key = "rmvGxeNJzaL6P/ZW55gplaSEkKdmujbr1Hspo0/Um6U=";
       };
 
       # Database settings (using SQLite for simplicity)
