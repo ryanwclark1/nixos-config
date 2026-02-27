@@ -30,33 +30,33 @@
   };
   chatgpt = {
     pname = "chatgpt";
-    version = "0.5.76";
+    version = "0.5.78";
     src = fetchurl {
-      url = "https://openai.gallery.vsassets.io/_apis/public/gallery/publisher/openai/extension/chatgpt/0.5.76/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "chatgpt-0.5.76.zip";
-      sha256 = "sha256-f9der+dngQmdTYHWcExVC/md4XTEckSYbRKWKf72C1g=";
+      url = "https://openai.gallery.vsassets.io/_apis/public/gallery/publisher/openai/extension/chatgpt/0.5.78/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "chatgpt-0.5.78.zip";
+      sha256 = "sha256-94mYuNm6IgIB2jOuyGcqnmUb1gbqO83TlkgvCoPx3Kw=";
     };
     publisher = "openai";
     name = "chatgpt";
   };
   claude-code = {
     pname = "claude-code";
-    version = "2.1.51";
+    version = "2.1.61";
     src = fetchurl {
-      url = "https://anthropic.gallery.vsassets.io/_apis/public/gallery/publisher/anthropic/extension/claude-code/2.1.51/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "claude-code-2.1.51.zip";
-      sha256 = "sha256-0dIXlOMqO68cShPrsxHhooIylvckQA9R2OUFKfDSfPI=";
+      url = "https://anthropic.gallery.vsassets.io/_apis/public/gallery/publisher/anthropic/extension/claude-code/2.1.61/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "claude-code-2.1.61.zip";
+      sha256 = "sha256-9/k1hnMpDl6dTlG67e37JuNo7mKtXAsLQpX2E0fbFuM=";
     };
     publisher = "anthropic";
     name = "claude-code";
   };
   explorer = {
     pname = "explorer";
-    version = "1.44.0";
+    version = "1.44.1";
     src = fetchurl {
-      url = "https://vitest.gallery.vsassets.io/_apis/public/gallery/publisher/vitest/extension/explorer/1.44.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "explorer-1.44.0.zip";
-      sha256 = "sha256-z8JQEWSSLw+EDEfJWrHYy7vT2kAdsFybFcVkl5w5WfM=";
+      url = "https://vitest.gallery.vsassets.io/_apis/public/gallery/publisher/vitest/extension/explorer/1.44.1/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "explorer-1.44.1.zip";
+      sha256 = "sha256-Ac6v4QwWpmZ8unjW3AnbPGe+JBQTUz2+v7X2/BRckcw=";
     };
     publisher = "vitest";
     name = "explorer";
@@ -184,11 +184,11 @@
   };
   ty = {
     pname = "ty";
-    version = "2026.16.0";
+    version = "2026.18.0";
     src = fetchurl {
-      url = "https://astral-sh.gallery.vsassets.io/_apis/public/gallery/publisher/astral-sh/extension/ty/2026.16.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
-      name = "ty-2026.16.0.zip";
-      sha256 = "sha256-5UmE+v9q48RYEQzcgXgDHyyXwdCYC79yC9mLBOMEAmM=";
+      url = "https://astral-sh.gallery.vsassets.io/_apis/public/gallery/publisher/astral-sh/extension/ty/2026.18.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
+      name = "ty-2026.18.0.zip";
+      sha256 = "sha256-cGTtEuXOqCbUd0eJtTYz6tjesHfRFHOrowHoXCegtoU=";
     };
     publisher = "astral-sh";
     name = "ty";

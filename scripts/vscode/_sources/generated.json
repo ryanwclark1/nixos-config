@@ -46,12 +46,12 @@
         },
         "pinned": false,
         "src": {
-            "name": "chatgpt-0.5.76.zip",
-            "sha256": "sha256-f9der+dngQmdTYHWcExVC/md4XTEckSYbRKWKf72C1g=",
+            "name": "chatgpt-0.5.78.zip",
+            "sha256": "sha256-94mYuNm6IgIB2jOuyGcqnmUb1gbqO83TlkgvCoPx3Kw=",
             "type": "url",
-            "url": "https://openai.gallery.vsassets.io/_apis/public/gallery/publisher/openai/extension/chatgpt/0.5.76/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://openai.gallery.vsassets.io/_apis/public/gallery/publisher/openai/extension/chatgpt/0.5.78/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "0.5.76"
+        "version": "0.5.78"
     },
     "claude-code": {
         "cargoLock": null,
@@ -64,12 +64,12 @@
         },
         "pinned": false,
         "src": {
-            "name": "claude-code-2.1.51.zip",
-            "sha256": "sha256-0dIXlOMqO68cShPrsxHhooIylvckQA9R2OUFKfDSfPI=",
+            "name": "claude-code-2.1.61.zip",
+            "sha256": "sha256-9/k1hnMpDl6dTlG67e37JuNo7mKtXAsLQpX2E0fbFuM=",
             "type": "url",
-            "url": "https://anthropic.gallery.vsassets.io/_apis/public/gallery/publisher/anthropic/extension/claude-code/2.1.51/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://anthropic.gallery.vsassets.io/_apis/public/gallery/publisher/anthropic/extension/claude-code/2.1.61/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "2.1.51"
+        "version": "2.1.61"
     },
     "explorer": {
         "cargoLock": null,
@@ -82,12 +82,12 @@
         },
         "pinned": false,
         "src": {
-            "name": "explorer-1.44.0.zip",
-            "sha256": "sha256-z8JQEWSSLw+EDEfJWrHYy7vT2kAdsFybFcVkl5w5WfM=",
+            "name": "explorer-1.44.1.zip",
+            "sha256": "sha256-Ac6v4QwWpmZ8unjW3AnbPGe+JBQTUz2+v7X2/BRckcw=",
             "type": "url",
-            "url": "https://vitest.gallery.vsassets.io/_apis/public/gallery/publisher/vitest/extension/explorer/1.44.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://vitest.gallery.vsassets.io/_apis/public/gallery/publisher/vitest/extension/explorer/1.44.1/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "1.44.0"
+        "version": "1.44.1"
     },
     "gemini-cli-vscode-ide-companion": {
         "cargoLock": null,
@@ -301,12 +301,12 @@
         },
         "pinned": false,
         "src": {
-            "name": "ty-2026.16.0.zip",
-            "sha256": "sha256-5UmE+v9q48RYEQzcgXgDHyyXwdCYC79yC9mLBOMEAmM=",
+            "name": "ty-2026.18.0.zip",
+            "sha256": "sha256-cGTtEuXOqCbUd0eJtTYz6tjesHfRFHOrowHoXCegtoU=",
             "type": "url",
-            "url": "https://astral-sh.gallery.vsassets.io/_apis/public/gallery/publisher/astral-sh/extension/ty/2026.16.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+            "url": "https://astral-sh.gallery.vsassets.io/_apis/public/gallery/publisher/astral-sh/extension/ty/2026.18.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
         },
-        "version": "2026.16.0"
+        "version": "2026.18.0"
     },
     "vscode-containers": {
         "cargoLock": null,

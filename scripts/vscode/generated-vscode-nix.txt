@@ -13,20 +13,20 @@
 {
   name = "chatgpt";
   publisher = "openai";
-  sha256 = "sha256-f9der+dngQmdTYHWcExVC/md4XTEckSYbRKWKf72C1g=";
-  version = "0.5.76";
+  sha256 = "sha256-94mYuNm6IgIB2jOuyGcqnmUb1gbqO83TlkgvCoPx3Kw=";
+  version = "0.5.78";
 }
 {
   name = "claude-code";
   publisher = "anthropic";
-  sha256 = "sha256-0dIXlOMqO68cShPrsxHhooIylvckQA9R2OUFKfDSfPI=";
-  version = "2.1.51";
+  sha256 = "sha256-9/k1hnMpDl6dTlG67e37JuNo7mKtXAsLQpX2E0fbFuM=";
+  version = "2.1.61";
 }
 {
   name = "explorer";
   publisher = "vitest";
-  sha256 = "sha256-z8JQEWSSLw+EDEfJWrHYy7vT2kAdsFybFcVkl5w5WfM=";
-  version = "1.44.0";
+  sha256 = "sha256-Ac6v4QwWpmZ8unjW3AnbPGe+JBQTUz2+v7X2/BRckcw=";
+  version = "1.44.1";
 }
 {
   name = "gemini-cli-vscode-ide-companion";
@@ -91,8 +91,8 @@
 {
   name = "ty";
   publisher = "astral-sh";
-  sha256 = "sha256-5UmE+v9q48RYEQzcgXgDHyyXwdCYC79yC9mLBOMEAmM=";
-  version = "2026.16.0";
+  sha256 = "sha256-cGTtEuXOqCbUd0eJtTYz6tjesHfRFHOrowHoXCegtoU=";
+  version = "2026.18.0";
 }
 {
   name = "vscode-containers";
