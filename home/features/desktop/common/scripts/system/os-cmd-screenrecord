@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
-[[ -f ~/.config/user-dirs.dirs ]] && source ~/.config/user-dirs.dirs
-OUTPUT_DIR="${OS_SCREENRECORD_DIR:-${XDG_VIDEOS_DIR:-$HOME/Videos}}"
+set -euo pipefail
+
+[[ -f "$HOME/.config/user-dirs.dirs" ]] && source "$HOME/.config/user-dirs.dirs"
+readonly OUTPUT_DIR="${OS_SCREENRECORD_DIR:-${XDG_VIDEOS_DIR:-$HOME/Videos}}"
 
 if [[ ! -d "$OUTPUT_DIR" ]]; then
   notify-send "Screen recording directory does not exist: $OUTPUT_DIR" -u critical -t 3000
@@ -18,7 +20,12 @@ for arg in "$@"; do
     --with-desktop-audio) DESKTOP_AUDIO="true" ;;
     --with-microphone-audio) MICROPHONE_AUDIO="true" ;;
     --with-webcam) WEBCAM="true" ;;
-    --stop-recording) STOP_RECORDING="true"
+    --stop-recording) STOP_RECORDING="true" ;;
+    *)
+      echo "Unknown option: $arg" >&2
+      echo "Usage: $0 [--with-desktop-audio] [--with-microphone-audio] [--with-webcam] [--stop-recording]" >&2
+      exit 1
+      ;;
   esac
 done
 
@@ -29,25 +36,38 @@ cleanup_webcam() {
 start_webcam_overlay() {
   cleanup_webcam
 
+  if [[ ! -c /dev/video0 ]]; then
+    notify-send "Warning" "Webcam device /dev/video0 not found" -t 2000
+    return 1
+  fi
+
   # Get monitor scale
-  local scale=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true) | .scale')
+  local scale
+  scale=$(hyprctl monitors -j 2>/dev/null | jq -r '.[] | select(.focused == true) | .scale' | head -1 || echo "1.0")
 
   # Target width (base 360px, scaled to monitor)
-  local target_width=$(awk "BEGIN {printf \"%.0f\", 360 * $scale}")
+  local target_width
+  target_width=$(awk "BEGIN {printf \"%.0f\", 360 * $scale}")
 
   # Try preferred 16:9 resolutions in order, use first available
   local preferred_resolutions=("640x360" "1280x720" "1920x1080")
   local video_size_arg=""
-  local available_formats=$(v4l2-ctl --list-formats-ext -d /dev/video0 2>/dev/null)
+  local available_formats
+  available_formats=$(v4l2-ctl --list-formats-ext -d /dev/video0 2>/dev/null || echo "")
 
   for resolution in "${preferred_resolutions[@]}"; do
     if echo "$available_formats" | grep -q "$resolution"; then
-      video_size_arg="-video_size $resolution"
+      video_size_arg=(-video_size "$resolution")
       break
     fi
   done
 
-  ffplay -f v4l2 $video_size_arg -framerate 30 /dev/video0 \
+  if ! command -v ffplay &>/dev/null; then
+    notify-send "Error" "ffplay not found" -u critical
+    return 1
+  fi
+
+  ffplay -f v4l2 "${video_size_arg[@]}" -framerate 30 /dev/video0 \
     -vf "scale=${target_width}:-1" \
     -window_title "WebcamOverlay" \
     -noborder \
@@ -62,7 +82,9 @@ start_screenrecording() {
   local audio_devices=""
   local audio_args=""
 
-  [[ "$DESKTOP_AUDIO" == "true" ]] && audio_devices+="default_output"
+  if [[ "$DESKTOP_AUDIO" == "true" ]]; then
+    audio_devices+="default_output"
+  fi
 
   if [[ "$MICROPHONE_AUDIO" == "true" ]]; then
     # Merge audio tracks into one - separate tracks only play one at a time in most players
@@ -70,9 +92,16 @@ start_screenrecording() {
     audio_devices+="default_input"
   fi
 
-  [[ -n "$audio_devices" ]] && audio_args+="-a $audio_devices"
+  if [[ -n "$audio_devices" ]]; then
+    audio_args=(-a "$audio_devices")
+  fi
 
-  gpu-screen-recorder -w portal -f 60 -fallback-cpu-encoding yes -o "$filename" $audio_args -ac aac &
+  if ! command -v gpu-screen-recorder &>/dev/null; then
+    notify-send "Error" "gpu-screen-recorder not found" -u critical
+    exit 1
+  fi
+
+  gpu-screen-recorder -w portal -f 60 -fallback-cpu-encoding yes -o "$filename" "${audio_args[@]}" -ac aac &
   toggle_screenrecording_indicator
 }
 

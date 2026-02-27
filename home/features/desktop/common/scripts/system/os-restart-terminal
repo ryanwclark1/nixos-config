@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 
-if [[ -f ~/.config/alacritty/alacritty.toml ]]; then
-  touch ~/.config/alacritty/alacritty.toml
+set -euo pipefail
+
+if [[ -f "$HOME/.config/alacritty/alacritty.toml" ]]; then
+  touch "$HOME/.config/alacritty/alacritty.toml"
 fi
 
-if pgrep -x kitty; then
-  killall -SIGUSR1 kitty
+if pgrep -x kitty >/dev/null; then
+  killall -SIGUSR1 kitty || true
 fi
 
-if pgrep -x ghostty; then
-  killall -SIGUSR2 ghostty
+if pgrep -x ghostty >/dev/null; then
+  killall -SIGUSR2 ghostty || true
 fi

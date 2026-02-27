@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 
-fc-list :spacing=100 -f "%{family[0]}\n" | grep -v -i -E 'emoji|signwriting|os' | sort -u
+set -euo pipefail
+
+fc-list :spacing=100 -f "%{family[0]}\n" 2>/dev/null | grep -v -i -E 'emoji|signwriting|os' | sort -u || echo ""

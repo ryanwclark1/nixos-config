@@ -1,30 +1,32 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 # Default temperature values
-ON_TEMP=4000
-OFF_TEMP=6000
+readonly ON_TEMP=4000
+readonly OFF_TEMP=6000
 
 # Ensure hyprsunset is running
-if ! pgrep -x hyprsunset; then
+if ! pgrep -x hyprsunset >/dev/null; then
   setsid uwsm-app -- hyprsunset &
   sleep 1 # Give it time to register
 fi
 
 # Query the current temperature
-CURRENT_TEMP=$(hyprctl hyprsunset temperature 2>/dev/null | grep -oE '[0-9]+')
+CURRENT_TEMP=$(hyprctl hyprsunset temperature 2>/dev/null | grep -oE '[0-9]+' || echo "$OFF_TEMP")
 
 restart_nightlighted_waybar() {
-  if grep -q "custom/nightlight" ~/.config/waybar/config.jsonc; then
+  if [[ -f ~/.config/waybar/config.jsonc ]] && grep -q "custom/nightlight" ~/.config/waybar/config.jsonc; then
     os-restart-waybar # restart waybar in case user has waybar module for hyprsunset
   fi
 }
 
 if [[ "$CURRENT_TEMP" == "$OFF_TEMP" ]]; then
-  hyprctl hyprsunset temperature $ON_TEMP
+  hyprctl hyprsunset temperature "$ON_TEMP"
   notify-send "  Nightlight screen temperature"
   restart_nightlighted_waybar
 else
-  hyprctl hyprsunset temperature $OFF_TEMP
+  hyprctl hyprsunset temperature "$OFF_TEMP"
   notify-send "   Daylight screen temperature"
   restart_nightlighted_waybar
 fi

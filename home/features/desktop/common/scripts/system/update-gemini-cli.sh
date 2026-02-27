@@ -5,8 +5,36 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_REMATCH[0]}")" && pwd)"
-GEMINI_OVERRIDE_FILE="$HOME/nixos-config/home/features/ai/gemini-cli-override.nix"
+# Configuration
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+GEMINI_OVERRIDE_FILE="${GEMINI_OVERRIDE_FILE:-$HOME/nixos-config/home/features/ai/gemini-cli-override.nix}"
+GEMINI_REPO="google-gemini/gemini-cli"
+
+# Check dependencies
+check_dependencies() {
+    local missing=()
+
+    if ! command -v curl >/dev/null 2>&1; then
+        missing+=("curl")
+    fi
+
+    if ! command -v jq >/dev/null 2>&1; then
+        missing+=("jq")
+    fi
+
+    if ! command -v nix-prefetch-url >/dev/null 2>&1; then
+        missing+=("nix-prefetch-url")
+    fi
+
+    if ! command -v nix-prefetch-git >/dev/null 2>&1; then
+        missing+=("nix-prefetch-git")
+    fi
+
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        echo "Error: Missing required dependencies: ${missing[*]}" >&2
+        exit 1
+    fi
+}
 
 usage() {
     cat << EOF
@@ -30,16 +58,22 @@ EOF
 
 # Get latest release version from GitHub
 get_latest_version() {
-    curl -sf https://api.github.com/repos/google-gemini/gemini-cli/releases/latest | \
-        jq -r '.tag_name' | sed 's/^v//'
+    local release_info
+    release_info=$(curl -sf "https://api.github.com/repos/${GEMINI_REPO}/releases/latest" 2>/dev/null) || {
+        echo "Error: Unable to fetch latest release from GitHub API" >&2
+        echo "Please check your internet connection and try again" >&2
+        return 1
+    }
+
+    echo "$release_info" | jq -r '.tag_name' | sed 's/^v//'
 }
 
 # Calculate hash for version
 calculate_version_hash() {
     local version="$1"
     echo "Calculating hash for version $version..."
-    
-    local url="https://github.com/google-gemini/gemini-cli/archive/v${version}.tar.gz"
+
+    local url="https://github.com/${GEMINI_REPO}/archive/v${version}.tar.gz"
     nix-prefetch-url --unpack "$url" 2>/dev/null
 }
 
@@ -47,8 +81,11 @@ calculate_version_hash() {
 calculate_commit_hash() {
     local commit="$1"
     echo "Calculating hash for commit $commit..."
-    
-    nix-prefetch-git --url https://github.com/google-gemini/gemini-cli.git --rev "$commit" --quiet | jq -r '.sha256'
+
+    nix-prefetch-git --url "https://github.com/${GEMINI_REPO}.git" --rev "$commit" --quiet 2>/dev/null | jq -r '.sha256' || {
+        echo "Error: Failed to calculate hash for commit $commit" >&2
+        return 1
+    }
 }
 
 # Update the override file
@@ -56,17 +93,17 @@ update_override_file() {
     local version="$1"
     local hash="$2"
     local is_commit="${3:-false}"
-    
+
     if [[ ! -f "$GEMINI_OVERRIDE_FILE" ]]; then
         echo "Error: Override file not found at $GEMINI_OVERRIDE_FILE" >&2
         exit 1
     fi
-    
+
     echo "Updating override file..."
-    
+
     # Create backup
     cp "$GEMINI_OVERRIDE_FILE" "${GEMINI_OVERRIDE_FILE}.backup"
-    
+
     if [[ "$is_commit" == "true" ]]; then
         # Update for git commit
         sed -i "s/version = \".*\";/version = \"${version}-unstable-$(date +%Y-%m-%d)\";/" "$GEMINI_OVERRIDE_FILE"
@@ -76,10 +113,10 @@ update_override_file() {
         sed -i "s/version = \".*\";/version = \"${version}\";/" "$GEMINI_OVERRIDE_FILE"
         sed -i "s/rev = \".*\";/tag = \"v${version}\";/" "$GEMINI_OVERRIDE_FILE"
     fi
-    
+
     # Update hash
     sed -i "s/hash = \"sha256-.*\";/hash = \"${hash}\";/" "$GEMINI_OVERRIDE_FILE"
-    
+
     echo "Updated $GEMINI_OVERRIDE_FILE"
     echo "Backup saved as ${GEMINI_OVERRIDE_FILE}.backup"
 }
@@ -113,18 +150,23 @@ show_current() {
 # Main function
 main() {
     local target="${1:-}"
-    
+
+    # Check dependencies for all commands except help
+    if [[ "$target" != "help" && "$target" != "-h" && "$target" != "--help" && -n "$target" ]]; then
+        check_dependencies
+    fi
+
     case "$target" in
         "latest")
             echo "Getting latest release..."
             local latest_version
             latest_version=$(get_latest_version)
             echo "Latest version: $latest_version"
-            
+
             local hash
             hash=$(calculate_version_hash "$latest_version")
             update_override_file "$latest_version" "$hash"
-            
+
             if test_build; then
                 echo "Successfully updated to gemini-cli $latest_version"
             fi
@@ -142,7 +184,7 @@ main() {
                 local hash
                 hash=$(calculate_version_hash "$target")
                 update_override_file "$target" "$hash"
-                
+
                 if test_build; then
                     echo "Successfully updated to gemini-cli $target"
                 fi
@@ -152,7 +194,7 @@ main() {
                 local hash
                 hash=$(calculate_commit_hash "$target")
                 update_override_file "$target" "$hash" "true"
-                
+
                 echo "Updated to commit $target"
                 echo "Note: You may need to manually update npmDepsHash if build fails"
             else

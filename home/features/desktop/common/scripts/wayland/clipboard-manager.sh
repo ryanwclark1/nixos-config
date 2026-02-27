@@ -21,13 +21,13 @@ CLIPHIST_DB="${XDG_CACHE_HOME:-$HOME/.cache}/cliphist/db"
 # Dependency check function
 check_dependencies() {
     local missing_deps=()
-    
+
     # Core dependencies
     command -v cliphist >/dev/null || missing_deps+=("cliphist")
     command -v rofi >/dev/null || missing_deps+=("rofi")
     command -v wl-copy >/dev/null || missing_deps+=("wl-copy (wl-clipboard)")
     command -v wl-paste >/dev/null || missing_deps+=("wl-paste (wl-clipboard)")
-    
+
     if [[ ${#missing_deps[@]} -gt 0 ]]; then
         echo "Error: Missing required dependencies:" >&2
         printf "  - %s\n" "${missing_deps[@]}" >&2
@@ -57,14 +57,14 @@ notify() {
 get_rofi_theme() {
     local theme_name="${1:-$DEFAULT_THEME}"
     local theme_path="$CONFIG_DIR/$theme_name.rasi"
-    
+
     # Check for specific cliphist theme
     local cliphist_theme="$CONFIG_DIR/cliphist.rasi"
     if [[ -f "$cliphist_theme" ]]; then
         echo "$cliphist_theme"
         return
     fi
-    
+
     # Check if specified theme exists
     if [[ -f "$theme_path" ]]; then
         echo "$theme_path"
@@ -81,7 +81,7 @@ run_rofi() {
     local additional_args=("${@:3}")
     local theme_path
     theme_path=$(get_rofi_theme)
-    
+
     local rofi_args=(
         -dmenu
         -p "$prompt"
@@ -89,24 +89,31 @@ run_rofi() {
         -format "s"  # Return selection
         -display-columns "1"
     )
-    
+
     # Add message if provided
     [[ -n "$message" ]] && rofi_args+=(-mesg "$message")
-    
+
     # Add theme if available
     [[ -n "$theme_path" ]] && rofi_args+=(-theme "$theme_path")
-    
+
     # Add any additional arguments
     rofi_args+=("${additional_args[@]}")
-    
+
     rofi "${rofi_args[@]}"
 }
 
 # Get clipboard history count
 get_history_count() {
-    if [[ -f "$CLIPHIST_DB" ]]; then
-        cliphist list | wc -l
+    if [[ ! -f "$CLIPHIST_DB" ]]; then
+        echo "0"
+        return 0
+    fi
+
+    local count
+    if count=$(cliphist list 2>/dev/null | wc -l); then
+        echo "$count"
     else
+        log "Warning: Failed to get clipboard history count"
         echo "0"
     fi
 }
@@ -115,36 +122,45 @@ get_history_count() {
 show_clipboard_history() {
     local history_count
     history_count=$(get_history_count)
-    
+
     if [[ $history_count -eq 0 ]]; then
         notify "Clipboard" "No clipboard history available"
         log "No clipboard history available"
         return 1
     fi
-    
+
     log "Showing clipboard history ($history_count items)"
-    
+
     # Get clipboard history and show in rofi
     local selected_item
     selected_item=$(cliphist list | run_rofi "Clipboard History" "Select item to copy ($history_count items)" -replace)
-    
-    if [[ -n "$selected_item" ]]; then
-        # Decode and copy selected item to clipboard
-        if echo "$selected_item" | cliphist decode | wl-copy; then
-            # Get first line of selection for notification (truncated)
-            local preview
-            preview=$(echo "$selected_item" | cliphist decode | head -n1 | cut -c1-50)
-            [[ ${#preview} -gt 45 ]] && preview="${preview:0:45}..."
-            
-            notify "Clipboard" "Copied: $preview"
-            log "Copied item to clipboard: $preview"
-        else
-            notify "Error" "Failed to copy item to clipboard"
-            log "Failed to copy item to clipboard"
-            return 1
-        fi
-    else
+
+    if [[ -z "$selected_item" ]]; then
         log "No item selected"
+        return 0
+    fi
+
+    # Decode and copy selected item to clipboard
+    local decoded_content
+    if ! decoded_content=$(echo "$selected_item" | cliphist decode 2>/dev/null); then
+        notify "Error" "Failed to decode clipboard item"
+        log "Error: Failed to decode clipboard item"
+        return 1
+    fi
+
+    if echo "$decoded_content" | wl-copy 2>/dev/null; then
+        # Get first line of selection for notification (truncated)
+        local preview
+        preview=$(echo "$decoded_content" | head -n1 | cut -c1-50)
+        [[ ${#preview} -gt 45 ]] && preview="${preview:0:45}..."
+
+        notify "Clipboard" "Copied: $preview"
+        log "Copied item to clipboard: $preview"
+        return 0
+    else
+        notify "Error" "Failed to copy item to clipboard"
+        log "Error: Failed to copy item to clipboard"
+        return 1
     fi
 }
 
@@ -152,43 +168,52 @@ show_clipboard_history() {
 delete_clipboard_entries() {
     local history_count
     history_count=$(get_history_count)
-    
+
     if [[ $history_count -eq 0 ]]; then
         notify "Clipboard" "No clipboard history to delete"
         log "No clipboard history available for deletion"
         return 1
     fi
-    
+
     log "Showing clipboard deletion interface ($history_count items)"
-    
+
     # Show delete interface with confirmation
     local selected_item
     selected_item=$(cliphist list | run_rofi "Delete Clipboard Item" "Select item to delete ($history_count items)" -replace)
-    
-    if [[ -n "$selected_item" ]]; then
-        # Get preview for confirmation
-        local preview
-        preview=$(echo "$selected_item" | cliphist decode | head -n1 | cut -c1-30)
-        [[ ${#preview} -gt 25 ]] && preview="${preview:0:25}..."
-        
-        # Confirm deletion
-        local confirm
-        confirm=$(echo -e "Delete\nCancel" | run_rofi "Confirm Deletion" "Delete: $preview?")
-        
-        if [[ "$confirm" == "Delete" ]]; then
-            if echo "$selected_item" | cliphist delete; then
-                notify "Clipboard" "Deleted: $preview"
-                log "Deleted clipboard item: $preview"
-            else
-                notify "Error" "Failed to delete clipboard item"
-                log "Failed to delete clipboard item"
-                return 1
-            fi
-        else
-            log "Deletion cancelled"
-        fi
-    else
+
+    if [[ -z "$selected_item" ]]; then
         log "No item selected for deletion"
+        return 0
+    fi
+
+    # Get preview for confirmation
+    local decoded_content preview
+    if ! decoded_content=$(echo "$selected_item" | cliphist decode 2>/dev/null); then
+        notify "Error" "Failed to decode clipboard item"
+        log "Error: Failed to decode clipboard item for preview"
+        return 1
+    fi
+
+    preview=$(echo "$decoded_content" | head -n1 | cut -c1-30)
+    [[ ${#preview} -gt 25 ]] && preview="${preview:0:25}..."
+
+    # Confirm deletion
+    local confirm
+    confirm=$(echo -e "Delete\nCancel" | run_rofi "Confirm Deletion" "Delete: $preview?")
+
+    if [[ "$confirm" != "Delete" ]]; then
+        log "Deletion cancelled"
+        return 0
+    fi
+
+    if echo "$selected_item" | cliphist delete 2>/dev/null; then
+        notify "Clipboard" "Deleted: $preview"
+        log "Deleted clipboard item: $preview"
+        return 0
+    else
+        notify "Error" "Failed to delete clipboard item"
+        log "Error: Failed to delete clipboard item"
+        return 1
     fi
 }
 
@@ -196,19 +221,19 @@ delete_clipboard_entries() {
 clear_clipboard_history() {
     local history_count
     history_count=$(get_history_count)
-    
+
     if [[ $history_count -eq 0 ]]; then
         notify "Clipboard" "No clipboard history to clear"
         log "No clipboard history to clear"
         return 0
     fi
-    
+
     log "Confirming clipboard history clear ($history_count items)"
-    
+
     # Confirm clearing all history
     local confirm
     confirm=$(echo -e "Clear All\nCancel" | run_rofi "Clear Clipboard History" "Clear all $history_count clipboard entries?")
-    
+
     if [[ "$confirm" == "Clear All" ]]; then
         if cliphist wipe; then
             notify "Clipboard" "Cleared all clipboard history ($history_count items)"
@@ -227,26 +252,30 @@ clear_clipboard_history() {
 show_clipboard_stats() {
     local history_count db_size="0"
     history_count=$(get_history_count)
-    
+
     if [[ -f "$CLIPHIST_DB" ]]; then
         db_size=$(du -h "$CLIPHIST_DB" 2>/dev/null | cut -f1 || echo "0")
     fi
-    
+
     cat << EOF
 Clipboard Manager Statistics:
   History entries: $history_count
   Database size: $db_size
   Database location: $CLIPHIST_DB
-  
+
 Recent entries (last 5):
 EOF
 
     if [[ $history_count -gt 0 ]]; then
-        cliphist list | head -n5 | while read -r line; do
-            local preview
-            preview=$(echo "$line" | cliphist decode | head -n1 | cut -c1-60)
-            [[ ${#preview} -gt 55 ]] && preview="${preview:0:55}..."
-            echo "  - $preview"
+        cliphist list 2>/dev/null | head -n5 | while IFS= read -r line || [[ -n "$line" ]]; do
+            local decoded_content preview
+            if decoded_content=$(echo "$line" | cliphist decode 2>/dev/null); then
+                preview=$(echo "$decoded_content" | head -n1 | cut -c1-60)
+                [[ ${#preview} -gt 55 ]] && preview="${preview:0:55}..."
+                echo "  - $preview"
+            else
+                echo "  - (failed to decode)"
+            fi
         done
     else
         echo "  (no entries)"
@@ -260,21 +289,29 @@ start_clipboard_daemon() {
         echo "Clipboard daemon is already running" >&2
         return 0
     fi
-    
+
     log "Starting clipboard history daemon"
     notify "Clipboard" "Starting clipboard history monitoring"
-    
+
     # Start clipboard monitoring in background
-    wl-paste --watch cliphist store &
+    if ! wl-paste --watch cliphist store >/dev/null 2>&1 & then
+        log "Error: Failed to start clipboard daemon process"
+        notify "Error" "Failed to start clipboard daemon"
+        return 1
+    fi
+
     local pid=$!
-    
+
     # Wait a moment to see if it started successfully
     sleep 0.5
     if kill -0 "$pid" 2>/dev/null; then
         log "Clipboard daemon started (PID: $pid)"
+        notify "Clipboard" "Clipboard history monitoring started"
         echo "Clipboard history daemon started successfully"
+        return 0
     else
-        log "Failed to start clipboard daemon"
+        log "Error: Clipboard daemon process died immediately"
+        notify "Error" "Clipboard daemon failed to start"
         echo "Failed to start clipboard daemon" >&2
         return 1
     fi
@@ -283,18 +320,27 @@ start_clipboard_daemon() {
 # Stop clipboard monitoring daemon
 stop_clipboard_daemon() {
     log "Stopping clipboard history daemon"
-    
+
     local pids
-    pids=$(pgrep -f "wl-paste.*cliphist" || true)
-    
-    if [[ -n "$pids" ]]; then
-        # Kill all clipboard monitoring processes
-        echo "$pids" | xargs kill
-        notify "Clipboard" "Stopped clipboard history monitoring"
-        log "Stopped clipboard daemon"
-        echo "Clipboard history daemon stopped"
-    else
+    pids=$(pgrep -f "wl-paste.*cliphist" 2>/dev/null || true)
+
+    if [[ -z "$pids" ]]; then
+        log "No clipboard daemon found running"
         echo "No clipboard daemon found running" >&2
+        return 0
+    fi
+
+    # Kill all clipboard monitoring processes
+    if echo "$pids" | xargs kill 2>/dev/null; then
+        sleep 0.2  # Give processes time to terminate
+        notify "Clipboard" "Stopped clipboard history monitoring"
+        log "Stopped clipboard daemon (PIDs: $pids)"
+        echo "Clipboard history daemon stopped"
+        return 0
+    else
+        log "Error: Failed to stop clipboard daemon"
+        notify "Error" "Failed to stop clipboard daemon"
+        return 1
     fi
 }
 
@@ -332,7 +378,7 @@ Examples:
 
 Dependencies:
     - cliphist
-    - rofi  
+    - rofi
     - wl-clipboard (wl-copy, wl-paste)
 EOF
 }
@@ -340,13 +386,13 @@ EOF
 # Main function
 main() {
     local command="${1:-show}"
-    
+
     # Handle help first (no dependency check needed)
     if [[ "$command" == "help" || "$command" == "-h" || "$command" == "--help" ]]; then
         usage
         exit 0
     fi
-    
+
     # Handle daemon commands (partial dependency check)
     if [[ "$command" == "daemon" ]]; then
         local daemon_action="${2:-}"
@@ -368,10 +414,10 @@ main() {
         esac
         exit 0
     fi
-    
+
     # Check all dependencies for other commands
     check_dependencies
-    
+
     case "$command" in
         "show"|"")
             show_clipboard_history

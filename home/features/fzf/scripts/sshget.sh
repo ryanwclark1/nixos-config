@@ -40,15 +40,20 @@ has() {
 has -v fzf rsync || die
 
 cleanup() {
-  [[ -e "$fifo" ]] && rm "$fifo"
+  [[ -e "$fifo" ]] && rm -f "$fifo" 2>/dev/null || true
+  # Kill any background jobs
+  jobs -p | xargs -r kill 2>/dev/null || true
 }
-trap cleanup SIGHUP SIGINT SIGTERM
+trap cleanup EXIT SIGHUP SIGINT SIGTERM
 
 # Remove existing FIFO if it exists
 [[ -e "$fifo" ]] && rm -f "$fifo"
 
 # Create new FIFO
-mkfifo "$fifo"
+if ! mkfifo "$fifo" 2>/dev/null; then
+  err "Failed to create FIFO: $fifo"
+  die
+fi
 
 if (( $# < 1 )); then
   usage
@@ -63,16 +68,25 @@ for a; do
 done
 
 for s in "${!domains[@]}"; do
-  ssh "${domains[$s]}" "find \"${paths[$s]}\" -type f" | sed -r "s|^|${domains[$s]}:|" >> "$fifo" &
+  (
+    if ssh "${domains[$s]}" "find \"${paths[$s]}\" -type f" 2>/dev/null | sed -r "s|^|${domains[$s]}:|"; then
+      : # Success
+    else
+      err "Failed to list files on ${domains[$s]}:${paths[$s]}" >&2
+    fi
+  ) >> "$fifo" &
 done
 
 # Wait for all background jobs to finish before reading from FIFO
-wait
+wait 2>/dev/null || true
 
-mapfile -t files < <(fzf -e --inline-info +s --multi --cycle --bind='Ctrl-A:toggle-all,`:jump' < "$fifo")
+mapfile -t files < <(fzf -e --inline-info +s --multi --cycle --bind='Ctrl-A:toggle-all,`:jump' < "$fifo" || true)
 
-if (( ${#files[@]} )); then
-  rsync --protect-args -auvzP -e ssh "${files[@]}" .
+if (( ${#files[@]} > 0 )); then
+  if rsync --protect-args -auvzP -e ssh "${files[@]}" . 2>&1; then
+    : # Success - cleanup will be handled by trap
+  else
+    err "Some files failed to transfer"
+    exit 1
+  fi
 fi
-
-cleanup

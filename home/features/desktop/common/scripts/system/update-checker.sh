@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+
+set -euo pipefail
+
 # Function to display help message
 show_help() {
   echo "Usage: $0 [options]"

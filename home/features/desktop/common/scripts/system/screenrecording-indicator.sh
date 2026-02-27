@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 # Screen recording indicator for Waybar
 # Returns JSON output indicating if screen recording is active
 

@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
+set -eu
 
 ## MPD Control Menu
+
+# Check dependencies
+if ! command -v rofi >/dev/null 2>&1; then
+    echo "Error: rofi not found" >&2
+    exit 1
+fi
+
+if ! command -v mpc >/dev/null 2>&1; then
+    echo "Error: mpc (MPD client) not found" >&2
+    exit 1
+fi
 
 # Check MPD status
 status="$(mpc status 2>/dev/null)"

@@ -5,7 +5,35 @@
 
 set -euo pipefail
 
-GEMINI_OVERRIDE_FILE="$HOME/nixos-config/home/features/ai/gemini-cli-override.nix"
+# Configuration
+GEMINI_OVERRIDE_FILE="${GEMINI_OVERRIDE_FILE:-$HOME/nixos-config/home/features/ai/gemini-cli-override.nix}"
+GEMINI_REPO="google-gemini/gemini-cli"
+
+# Check dependencies
+check_dependencies() {
+    local missing=()
+
+    if ! command -v curl >/dev/null 2>&1; then
+        missing+=("curl")
+    fi
+
+    if ! command -v jq >/dev/null 2>&1; then
+        missing+=("jq")
+    fi
+
+    if ! command -v nix-prefetch-url >/dev/null 2>&1; then
+        missing+=("nix-prefetch-url")
+    fi
+
+    if ! command -v nix >/dev/null 2>&1; then
+        missing+=("nix")
+    fi
+
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        echo "Error: Missing required dependencies: ${missing[*]}" >&2
+        exit 1
+    fi
+}
 
 usage() {
     cat << EOF
@@ -38,12 +66,12 @@ get_current_config() {
         echo "No override file found at $GEMINI_OVERRIDE_FILE"
         return 1
     fi
-    
+
     local version hash npm_hash
     version=$(grep 'version = ' "$GEMINI_OVERRIDE_FILE" | sed 's/.*version = "\(.*\)";.*/\1/' || echo "unknown")
     hash=$(grep 'hash = ' "$GEMINI_OVERRIDE_FILE" | sed 's/.*hash = "\(.*\)";.*/\1/' || echo "unknown")
     npm_hash=$(grep 'npmDepsHash = ' "$GEMINI_OVERRIDE_FILE" | sed 's/.*npmDepsHash = "\(.*\)";.*/\1/' || echo "unknown")
-    
+
     echo "Current Configuration:"
     echo "  Version: $version"
     echo "  Source Hash: $hash"
@@ -54,21 +82,22 @@ get_current_config() {
 # Get latest release from GitHub API
 get_latest_release() {
     local release_info
-    release_info=$(curl -sf https://api.github.com/repos/google-gemini/gemini-cli/releases/latest 2>/dev/null) || {
+    release_info=$(curl -sf "https://api.github.com/repos/${GEMINI_REPO}/releases/latest" 2>/dev/null) || {
         echo "Error: Unable to fetch latest release from GitHub API" >&2
+        echo "Please check your internet connection and try again" >&2
         return 1
     }
-    
+
     local version tag_name published_at
     tag_name=$(echo "$release_info" | jq -r '.tag_name')
     version=$(echo "$tag_name" | sed 's/^v//')
     published_at=$(echo "$release_info" | jq -r '.published_at' | cut -d'T' -f1)
-    
+
     echo "Latest Release:"
     echo "  Version: $version"
-    echo "  Tag: $tag_name"  
+    echo "  Tag: $tag_name"
     echo "  Published: $published_at"
-    
+
     # Calculate hash for latest version
     echo ""
     echo "Calculating hash for latest version..."
@@ -80,14 +109,14 @@ get_latest_release() {
 # Get hash for specific version
 get_version_hash() {
     local version="$1"
-    
+
     if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
         echo "Error: Invalid version format. Use semantic versioning (e.g., 0.3.0)" >&2
         return 1
     fi
-    
-    local url="https://github.com/google-gemini/gemini-cli/archive/v${version}.tar.gz"
-    
+
+    local url="https://github.com/${GEMINI_REPO}/archive/v${version}.tar.gz"
+
     # Use nix-prefetch-url to get the hash and convert to SRI format
     local raw_hash sri_hash
     raw_hash=$(nix-prefetch-url --unpack "$url" 2>/dev/null) || {
@@ -95,29 +124,29 @@ get_version_hash() {
         echo "URL: $url" >&2
         return 1
     }
-    
+
     # Convert to SRI format
     sri_hash=$(nix hash convert --hash-algo sha256 --to-sri "$raw_hash" 2>/dev/null) || {
         echo "Error: Failed to convert hash to SRI format" >&2
         return 1
     }
-    
+
     echo "$sri_hash"
 }
 
 # Check specific version (show hash and info)
 check_version() {
     local version="$1"
-    
+
     echo "Checking version $version..."
     echo ""
-    
+
     # Try to get release info for this version
     local release_info
-    release_info=$(curl -sf "https://api.github.com/repos/google-gemini/gemini-cli/releases/tags/v${version}" 2>/dev/null) || {
+    release_info=$(curl -sf "https://api.github.com/repos/${GEMINI_REPO}/releases/tags/v${version}" 2>/dev/null) || {
         echo "Warning: Could not fetch release info for v$version (might not exist)" >&2
     }
-    
+
     if [[ -n "${release_info:-}" ]]; then
         local published_at name
         published_at=$(echo "$release_info" | jq -r '.published_at' | cut -d'T' -f1)
@@ -127,11 +156,11 @@ check_version() {
         echo "  Published: $published_at"
         echo ""
     fi
-    
+
     echo "Calculating hash..."
     local hash
     hash=$(get_version_hash "$version")
-    
+
     echo "Version $version:"
     echo "  Source Hash: $hash"
     echo ""
@@ -144,13 +173,14 @@ check_version() {
 list_releases() {
     echo "Recent Releases:"
     echo "================"
-    
+
     local releases
-    releases=$(curl -sf https://api.github.com/repos/google-gemini/gemini-cli/releases 2>/dev/null) || {
+    releases=$(curl -sf "https://api.github.com/repos/${GEMINI_REPO}/releases" 2>/dev/null) || {
         echo "Error: Unable to fetch releases from GitHub API" >&2
+        echo "Please check your internet connection and try again" >&2
         return 1
     }
-    
+
     echo "$releases" | jq -r '.[] | select(.prerelease == false) | "\(.tag_name) - \(.published_at[:10]) - \(.name)"' | head -10
 }
 
@@ -159,7 +189,7 @@ compare_versions() {
     echo "Version Comparison:"
     echo "==================="
     echo ""
-    
+
     # Get current
     if [[ -f "$GEMINI_OVERRIDE_FILE" ]]; then
         local current_version
@@ -168,16 +198,16 @@ compare_versions() {
     else
         echo "Current: No override (using nixpkgs default)"
     fi
-    
+
     # Get latest
     local latest_info latest_version
-    latest_info=$(curl -sf https://api.github.com/repos/google-gemini/gemini-cli/releases/latest 2>/dev/null) || {
+    latest_info=$(curl -sf "https://api.github.com/repos/${GEMINI_REPO}/releases/latest" 2>/dev/null) || {
         echo "Latest: Unable to fetch" >&2
         return 1
     }
     latest_version=$(echo "$latest_info" | jq -r '.tag_name' | sed 's/^v//')
     echo "Latest:  $latest_version"
-    
+
     echo ""
     if [[ "$current_version" == "$latest_version" ]]; then
         echo "✅ You're using the latest version!"
@@ -189,20 +219,20 @@ compare_versions() {
 # Update override file
 update_override() {
     local new_version="$1"
-    
+
     echo "Updating to version $new_version..."
-    
+
     # Validate version format
     if [[ ! "$new_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
         echo "Error: Invalid version format. Use semantic versioning (e.g., 0.3.0)" >&2
         return 1
     fi
-    
+
     # Calculate hash
     echo "Calculating hash for version $new_version..."
     local hash
     hash=$(get_version_hash "$new_version") || return 1
-    
+
     # Check if override file exists
     if [[ ! -f "$GEMINI_OVERRIDE_FILE" ]]; then
         echo "Creating new override file at $GEMINI_OVERRIDE_FILE"
@@ -219,18 +249,18 @@ update_override() {
   home.packages = with pkgs; [
     (gemini-cli.overrideAttrs (oldAttrs: rec {
       version = "$new_version";
-      
+
       src = pkgs.fetchFromGitHub {
         owner = "google-gemini";
         repo = "gemini-cli";
         tag = "v\${version}";
         hash = "$hash";
       };
-      
+
       # Note: Update npmDepsHash if build fails
       # Run: nix-build '<nixpkgs>' -A gemini-cli
       # npmDepsHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
-      
+
       # Remove patches if they're no longer needed in newer version
       patches = [];
     }))
@@ -241,12 +271,12 @@ EOF
         # Update existing file
         echo "Updating existing override file..."
         cp "$GEMINI_OVERRIDE_FILE" "${GEMINI_OVERRIDE_FILE}.backup"
-        
+
         sed -i "s/version = \".*\";/version = \"$new_version\";/" "$GEMINI_OVERRIDE_FILE"
         sed -i "s/hash = \"sha256-.*\";/hash = \"$hash\";/" "$GEMINI_OVERRIDE_FILE"
         sed -i "s/# Use: gemini-cli-version check .*/# Use: gemini-cli-version check $new_version/" "$GEMINI_OVERRIDE_FILE"
     fi
-    
+
     echo ""
     echo "✅ Updated to version $new_version"
     echo "   Hash: $hash"
@@ -261,7 +291,12 @@ EOF
 # Main function
 main() {
     local command="${1:-}"
-    
+
+    # Check dependencies for all commands except help
+    if [[ "$command" != "help" && "$command" != "-h" && "$command" != "--help" && -n "$command" ]]; then
+        check_dependencies
+    fi
+
     case "$command" in
         "current")
             get_current_config

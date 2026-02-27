@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 # A script to display Hyprland keybindings defined in your configuration
 # using walker for an interactive search menu.
 
@@ -211,18 +213,20 @@ prioritize_entries() {
   cut -f2-
 }
 
-monitor_height=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true) | .height')
+monitor_height=$(hyprctl monitors -j 2>/dev/null | jq -r '.[] | select(.focused == true) | .height' | head -1 || echo "1080")
 menu_height=$((monitor_height * 40 / 100))
 
-build_keymap_cache
+if ! build_keymap_cache; then
+  echo "Warning: Failed to build keymap cache, continuing with limited functionality" >&2
+fi
 
 {
-  dynamic_bindings
+  dynamic_bindings || true
   static_bindings
 } |
   sort -u |
   parse_keycodes |
   parse_bindings |
   prioritize_entries |
-  walker --dmenu -p 'Keybindings' --width 800 --height "$menu_height"
+  walker --dmenu -p 'Keybindings' --width 800 --height "$menu_height" || true
 

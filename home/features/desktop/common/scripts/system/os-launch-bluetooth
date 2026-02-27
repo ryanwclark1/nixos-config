@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
 
-rfkill unblock bluetooth
+set -euo pipefail
+
+rfkill unblock bluetooth || true
 exec os-launch-or-focus-tui bluetui

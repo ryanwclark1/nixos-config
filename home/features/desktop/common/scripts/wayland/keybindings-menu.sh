@@ -3,14 +3,41 @@
 # A script to display Hyprland keybindings defined in your configuration
 # using walker for an interactive search menu.
 
+set -euo pipefail
+
+# Script configuration
+readonly SCRIPT_NAME="$(basename "$0")"
+
+# Logging function
+log() {
+    echo "[$SCRIPT_NAME] $1" >&2
+}
+
+# Check dependencies
+check_dependencies() {
+    local missing_deps=()
+
+    command -v hyprctl >/dev/null 2>&1 || missing_deps+=("hyprctl")
+    command -v jq >/dev/null 2>&1 || missing_deps+=("jq")
+    command -v walker >/dev/null 2>&1 || missing_deps+=("walker")
+    command -v xkbcli >/dev/null 2>&1 || missing_deps+=("xkbcli")
+
+    if [[ ${#missing_deps[@]} -gt 0 ]]; then
+        log "Error: Missing required dependencies: ${missing_deps[*]}"
+        echo "Error: Missing required dependencies:" >&2
+        printf "  - %s\n" "${missing_deps[@]}" >&2
+        exit 1
+    fi
+}
+
 declare -A KEYCODE_SYM_MAP
 
 build_keymap_cache() {
   local keymap
-  keymap="$(xkbcli compile-keymap)" || {
-    echo "Failed to compile keymap" >&2
+  if ! keymap="$(xkbcli compile-keymap 2>/dev/null)"; then
+    log "Warning: Failed to compile keymap, continuing without keycode mapping"
     return 1
-  }
+  fi
 
   while IFS=, read -r code sym; do
     [[ -z "$code" || -z "$sym" ]] && continue
@@ -38,7 +65,12 @@ build_keymap_cache() {
 }
 
 lookup_keycode_cached() {
-  printf '%s\n' "${KEYCODE_SYM_MAP[$1]}"
+  local code="$1"
+  if [[ -n "${KEYCODE_SYM_MAP[$code]:-}" ]]; then
+    printf '%s\n' "${KEYCODE_SYM_MAP[$code]}"
+  else
+    printf 'code:%s\n' "$code"
+  fi
 }
 
 parse_keycodes() {
@@ -202,16 +234,55 @@ prioritize_entries() {
   cut -f2-
 }
 
-monitor_height=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true) | .height')
-menu_height=$((monitor_height * 40 / 100))
+# Get monitor height for menu sizing
+get_menu_height() {
+  local monitor_height
+  if ! monitor_height=$(hyprctl monitors -j 2>/dev/null | jq -r '.[] | select(.focused == true) | .height' 2>/dev/null | head -n1); then
+    log "Warning: Could not get monitor height, using default"
+    echo "600"
+    return 0
+  fi
 
-build_keymap_cache
+  if ! [[ "$monitor_height" =~ ^[0-9]+$ ]]; then
+    log "Warning: Invalid monitor height, using default"
+    echo "600"
+    return 0
+  fi
 
-{
-  dynamic_bindings
-} |
-  sort -u |
-  parse_keycodes |
-  parse_bindings |
-  prioritize_entries |
-  walker --dmenu -p 'Keybindings' --width 800 --height "$menu_height"
+  local menu_height=$((monitor_height * 40 / 100))
+  # Ensure minimum height
+  if [[ $menu_height -lt 300 ]]; then
+    menu_height=300
+  fi
+
+  echo "$menu_height"
+}
+
+# Main execution
+main() {
+  check_dependencies
+
+  # Build keymap cache (non-fatal if it fails)
+  if ! build_keymap_cache; then
+    log "Warning: Keymap cache build failed, keycodes may not be mapped"
+  fi
+
+  local menu_height
+  menu_height=$(get_menu_height)
+
+  log "Displaying keybindings menu (height: ${menu_height}px)"
+
+  {
+    dynamic_bindings
+  } |
+    sort -u |
+    parse_keycodes |
+    parse_bindings |
+    prioritize_entries |
+    walker --dmenu -p 'Keybindings' --width 800 --height "$menu_height" || {
+      log "Error: Failed to display keybindings menu"
+      exit 1
+    }
+}
+
+main "$@"

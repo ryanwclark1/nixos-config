@@ -1,5 +1,5 @@
-
 #!/usr/bin/env bash
+set -eu
 
 ## Applets : Quick Links
 
@@ -9,8 +9,20 @@ type="$HOME/.config/rofi/applets/type-3"
 style='style-3.rasi'
 theme="$type/$style"
 
+# Check dependencies
+if ! command -v rofi >/dev/null 2>&1; then
+    echo "Error: rofi not found" >&2
+    exit 1
+fi
+
+if ! command -v xdg-open >/dev/null 2>&1; then
+    echo "Error: xdg-open not found" >&2
+    exit 1
+fi
+
 # Theme Elements
 prompt='Quick Links'
+BROWSER="${BROWSER:-firefox}"
 mesg="Using '$BROWSER' as web browser"
 
 if [[ ( "$theme" == *'type-1'* ) || ( "$theme" == *'type-3'* ) || ( "$theme" == *'type-5'* ) ]]; then
@@ -28,7 +40,11 @@ else
 fi
 
 # Options
-layout=`cat $theme | grep 'USE_ICON' | cut -d'=' -f2`
+if [[ -f "$theme" ]]; then
+    layout=$(grep 'USE_ICON' "$theme" 2>/dev/null | cut -d'=' -f2 | tr -d ' "'"'" || echo "YES")
+else
+    layout="YES"
+fi
 if [[ "$layout" == 'NO' ]]; then
 	option_1="  Google"
 	option_2="  Gmail"
@@ -64,18 +80,23 @@ run_rofi() {
 
 # Execute Command
 run_cmd() {
-	if [[ "$1" == '--opt1' ]]; then
-		xdg-open 'https://www.google.com/'
-	elif [[ "$1" == '--opt2' ]]; then
-		xdg-open 'https://mail.google.com/'
-	elif [[ "$1" == '--opt3' ]]; then
-		xdg-open 'https://www.youtube.com/'
-	elif [[ "$1" == '--opt4' ]]; then
-		xdg-open 'https://www.github.com/'
-	elif [[ "$1" == '--opt5' ]]; then
-		xdg-open 'https://www.reddit.com/'
-	elif [[ "$1" == '--opt6' ]]; then
-		xdg-open 'https://www.twitter.com/'
+	local url=""
+	case "$1" in
+		'--opt1') url='https://www.google.com/' ;;
+		'--opt2') url='https://mail.google.com/' ;;
+		'--opt3') url='https://www.youtube.com/' ;;
+		'--opt4') url='https://www.github.com/' ;;
+		'--opt5') url='https://www.reddit.com/' ;;
+		'--opt6') url='https://www.twitter.com/' ;;
+		*) return 1 ;;
+	esac
+
+	if [[ -n "$url" ]]; then
+		if ! xdg-open "$url" 2>/dev/null; then
+			notify-send "Error" "Failed to open: $url" 2>/dev/null || \
+				echo "Error: Failed to open: $url" >&2
+			return 1
+		fi
 	fi
 }
 

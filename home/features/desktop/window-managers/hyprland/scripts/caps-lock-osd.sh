@@ -3,37 +3,86 @@
 # SwayOSD Caps Lock indicator with proper state detection
 # This script detects the actual caps lock state and shows appropriate OSD
 
-if ! command -v swayosd-client >/dev/null; then
-    exit 0  # SwayOSD not available
-fi
+set -euo pipefail
 
-# Method 1: Check via xset (if available)
-if command -v xset >/dev/null; then
-    if xset q | grep -q "Caps Lock:.*off"; then
-        # Caps lock is OFF, show it's being turned ON
-        swayosd-client --caps-lock
-    else
-        # Caps lock is ON, show it's being turned OFF  
-        swayosd-client --caps-lock
-    fi
+# Check if SwayOSD is available
+if ! command -v swayosd-client >/dev/null 2>&1; then
+    # Silently exit if SwayOSD is not available
     exit 0
 fi
 
-# Method 2: Check via /sys/class/leds (Linux specific)
-CAPS_LED_PATH="/sys/class/leds"
-CAPS_LED_FILE=$(find "$CAPS_LED_PATH" -name "*capslock*" -o -name "*caps*" 2>/dev/null | head -n1)
-
-if [[ -n "$CAPS_LED_FILE" && -r "$CAPS_LED_FILE/brightness" ]]; then
-    # Read LED brightness (1 = on, 0 = off)
-    if [[ "$(cat "$CAPS_LED_FILE/brightness" 2>/dev/null)" == "1" ]]; then
-        # Caps lock LED is on, show OSD
-        swayosd-client --caps-lock
-    else
-        # Caps lock LED is off, show OSD
-        swayosd-client --caps-lock
+# Get caps lock state
+get_caps_state() {
+    # Method 1: Check via xset (most reliable on X11/Wayland)
+    if command -v xset >/dev/null 2>&1; then
+        if xset q 2>/dev/null | grep -q "Caps Lock:.*on"; then
+            echo "on"
+            return 0
+        else
+            echo "off"
+            return 0
+        fi
     fi
-    exit 0
-fi
 
-# Method 3: Fallback - just show the OSD (SwayOSD will figure it out)
-swayosd-client --caps-lock
+    # Method 2: Check via /sys/class/leds (Linux specific)
+    local caps_led_path="/sys/class/leds"
+    local caps_led_file
+    caps_led_file=$(find "$caps_led_path" -name "*capslock*" -o -name "*caps*" 2>/dev/null | head -n1 || echo "")
+
+    if [[ -n "$caps_led_file" && -r "$caps_led_file/brightness" ]]; then
+        local brightness
+        brightness=$(cat "$caps_led_file/brightness" 2>/dev/null || echo "0")
+        if [[ "$brightness" == "1" ]]; then
+            echo "on"
+            return 0
+        else
+            echo "off"
+            return 0
+        fi
+    fi
+
+    # Method 3: Try to read from keyboard device (fallback)
+    # This is less reliable but may work in some cases
+    if command -v setleds >/dev/null 2>&1; then
+        if setleds -L +caps 2>/dev/null | grep -q "on"; then
+            echo "on"
+            return 0
+        else
+            echo "off"
+            return 0
+        fi
+    fi
+
+    # If we can't determine state, return unknown
+    echo "unknown"
+    return 1
+}
+
+# Show OSD notification
+show_osd() {
+    # SwayOSD will handle the state toggle internally
+    # We just need to trigger it
+    if swayosd-client --caps-lock &>/dev/null; then
+        return 0
+    else
+        # If SwayOSD fails, try to show a notification as fallback
+        if command -v notify-send >/dev/null 2>&1; then
+            local state
+            state=$(get_caps_state || echo "toggled")
+            notify-send -t 1000 -u low "Caps Lock" "Caps Lock: $state" 2>/dev/null || true
+        fi
+        return 1
+    fi
+}
+
+# Main function
+main() {
+    # Get current state (for logging/debugging, but SwayOSD handles the toggle)
+    local current_state
+    current_state=$(get_caps_state || echo "unknown")
+
+    # Show OSD (SwayOSD will toggle the state internally)
+    show_osd
+}
+
+main "$@"

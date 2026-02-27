@@ -1,11 +1,19 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 # Returns the battery percentage remaining as an integer.
 
-upower -i $(upower -e | grep BAT) \
-| awk -F: '/percentage/ {
+BATTERY_DEVICE=$(upower -e 2>/dev/null | grep BAT | head -1 || echo "")
+
+if [[ -z "$BATTERY_DEVICE" ]]; then
+  echo ""
+  exit 0
+fi
+
+upower -i "$BATTERY_DEVICE" 2>/dev/null | awk -F: '/percentage/ {
     gsub(/[%[:space:]]/, "", $2);
     val=$2;
     printf("%d\n", (val+0.5))
     exit
-  }'
+  }' || echo ""
