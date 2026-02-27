@@ -127,17 +127,17 @@ in
   # Ensure ~/.ssh/config is fully managed by Nix
   # This removes any manual ~/.ssh/config file and ensures Nix has full control
   # If you have existing manual entries, migrate them to matchBlocks above before rebuilding
-  home.activation.removeManualSshConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    if [ -f "$HOME/.ssh/config" ] && ! [ -L "$HOME/.ssh/config" ]; then
-      # Check if the file is managed by home-manager (contains "Home Manager" comment)
-      if ! grep -q "Home Manager" "$HOME/.ssh/config" 2>/dev/null; then
-        echo "Warning: Found manual ~/.ssh/config file that is not managed by Nix."
-        echo "Backing it up to ~/.ssh/config.backup.$(date +%Y%m%d_%H%M%S)"
-        cp "$HOME/.ssh/config" "$HOME/.ssh/config.backup.$(date +%Y%m%d_%H%M%S)"
-        echo "Please migrate any needed entries to home/features/ssh/default.nix"
-      fi
-    fi
-  '';
+  # home.activation.removeManualSshConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+  #   if [ -f "$HOME/.ssh/config" ] && ! [ -L "$HOME/.ssh/config" ]; then
+  #     # Check if the file is managed by home-manager (contains "Home Manager" comment)
+  #     if ! grep -q "Home Manager" "$HOME/.ssh/config" 2>/dev/null; then
+  #       echo "Warning: Found manual ~/.ssh/config file that is not managed by Nix."
+  #       echo "Backing it up to ~/.ssh/config.backup.$(date +%Y%m%d_%H%M%S)"
+  #       cp "$HOME/.ssh/config" "$HOME/.ssh/config.backup.$(date +%Y%m%d_%H%M%S)"
+  #       echo "Please migrate any needed entries to home/features/ssh/default.nix"
+  #     fi
+  #   fi
+  # '';
 
   # Helper script to clean up stale SSH control sockets
   home.file."${config.home.homeDirectory}/.local/bin/ssh-cleanup" = {
