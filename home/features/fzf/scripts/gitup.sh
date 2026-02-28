@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 
-declare -A colors
-colors[red]=$(tput setaf 1)
-colors[green]=$(tput setaf 2)
-colors[blue]=$(tput setaf 4)
-colors[reset]=$(tput sgr0)
+set -o pipefail
+
+# -------- Catppuccin Frappé Colors --------
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[0;33m'
+readonly BLUE='\033[0;34m'
+readonly RESET='\033[0m'
+
 declare processes=4
 declare quiet
 declare force
@@ -12,6 +16,7 @@ declare -a dirs
 declare -a ignore_dir
 declare -a ignore_dirs
 declare -a errs
+declare -a success_repos
 
 usage() {
   LESS=-FEXR less <<'HELP'
@@ -33,39 +38,47 @@ if unspecified, dir defaults to $HOME
 HELP
 }
 
-color() {
-  local c
-  c="$1"
-  shift
-  printf '%s' "${colors[$c]}"
-  printf '%s\n' "$@"
-  printf '%s' "${colors[reset]}"
+err() {
+  printf "${RED}[ERROR]${RESET} %s\n" "$*" >&2
 }
 
-err() {
-  color red "$@" >&2
+info() {
+  printf "${BLUE}[INFO]${RESET} %s\n" "$*"
+}
+
+warn() {
+  printf "${YELLOW}[WARNING]${RESET} %s\n" "$*"
+}
+
+success() {
+  printf "${GREEN}[SUCCESS]${RESET} %s\n" "$*"
 }
 
 die() {
-  [[ -n "$1" ]] && err "$1"
+  [[ $# -gt 0 ]] && err "$*"
   exit 1
 }
 
 has() {
-  local verbose
-  if [[ $1 = '-v' ]]; then
-    verbose=1
+  local verbose=false
+  if [[ ${1:-} == '-v' ]]; then
+    verbose=true
     shift
   fi
-  for c; do c="${c%% *}"
-    if ! command -v "$c" &> /dev/null; then
-      (( "$verbose" > 0 )) && err "$c not found"
+  for cmd in "$@"; do
+    if ! command -v "${cmd%% *}" &>/dev/null; then
+      [[ "$verbose" == true ]] && err "$cmd not found"
       return 1
     fi
   done
+  return 0
 }
 
-has -v fzf git || die
+if ! has -v fzf git; then
+  err "fzf and git are required"
+  err "Install: nix-env -iA nixos.fzf nixos.git"
+  exit 1
+fi
 
 while getopts ':hqp:i:F' x; do o="$OPTARG"
   case "$x" in
@@ -92,14 +105,29 @@ done
 (( ${#dirs[@]} > 0 )) || dirs=("$HOME")
 
 # Build find command - handle both GNU and BSD find
+# Add common exclusions to prevent hanging on large directories
+common_excludes=(
+  -path '*/node_modules' -o
+  -path '*/.cache' -o
+  -path '*/.npm' -o
+  -path '*/.local/share/Trash' -o
+  -path '*/Library/Caches' -o
+  -path '*/__pycache__' -o
+  -path '*/.venv' -o
+)
+
 if find --version &>/dev/null; then
   # GNU find with -printf
   mapfile -t repos < <(
     find "${dirs[@]}" \
+      -maxdepth 10 \
       \( "${ignore_dirs[@]}" \
+        "${common_excludes[@]}" \
         -fstype 'devfs' \
         -o -fstype 'devtmpfs' \
         -o -fstype 'proc' \
+        -o -fstype 'sysfs' \
+        -o -fstype 'tmpfs' \
       \) -prune -o -name '.git' -type d -printf '%h\n' 2>/dev/null |
       sort -u |
       fzf --multi --cycle --inline-info +s -e ${force:+-f /}
@@ -108,10 +136,14 @@ else
   # BSD find fallback
   mapfile -t repos < <(
     find "${dirs[@]}" \
+      -maxdepth 10 \
       \( "${ignore_dirs[@]}" \
+        "${common_excludes[@]}" \
         -fstype 'devfs' \
         -o -fstype 'devtmpfs' \
         -o -fstype 'proc' \
+        -o -fstype 'sysfs' \
+        -o -fstype 'tmpfs' \
       \) -prune -o -name '.git' -type d -print 2>/dev/null |
       sed 's|/\.git$||' |
       sort -u |
@@ -122,27 +154,73 @@ fi
 (( ${#repos[@]} > 0 )) || exit
 
 update() {
-  local name dir
+  local name dir output exit_code
   dir="$1"
   name="${dir##*/}"
-  (( quiet > 1 )) || color blue ":: updating $name"
-  if git -C "$dir" pull ${quiet:+-q} 2>&1; then
-    (( quiet > 1 )) || color green ":: updated $name"
+
+  # Validate it's actually a git repo
+  if ! git -C "$dir" rev-parse --git-dir &>/dev/null; then
+    errs+=( "$name (not a git repo)" )
+    (( quiet > 1 )) || err ":: $name is not a valid git repository"
+    return 1
+  fi
+
+  (( quiet > 1 )) || info "Updating $name..."
+
+  # Capture output for better error reporting
+  if output=$(git -C "$dir" pull ${quiet:+-q} 2>&1); then
+    exit_code=$?
+    # Check if there were actual changes
+    if echo "$output" | grep -qE "(Already up to date|Fast-forward|Updating)"; then
+      success_repos+=( "$name" )
+      (( quiet > 1 )) || success "Updated $name"
+    else
+      success_repos+=( "$name" )
+      (( quiet > 1 )) || success "Updated $name"
+    fi
+    return $exit_code
   else
+    exit_code=$?
     errs+=( "$name" )
-    (( quiet > 1 )) || err ":: failed to update $name"
+    (( quiet > 1 )) || err "Failed to update $name"
+    if (( quiet == 0 )); then
+      echo "$output" | head -3 | while IFS= read -r line; do
+        [[ -n "$line" ]] && warn "  $line"
+      done
+    fi
+    return $exit_code
   fi
 }
 
-local count=0
+# Update repos in parallel with better progress tracking
+count=0
+total=${#repos[@]}
+(( quiet > 1 )) || info "Updating $total repository/repositories with $processes parallel processes..."
+
 for d in "${repos[@]}"; do
   (( count++ >= processes )) && wait -n
   update "$d" &
 done
+
+# Wait for all background jobs
 wait
 
-if (( "${#errs[@]}" > 0 )); then
-  color red 'The following packages failed to update:'
-  color red "  ${errs[*]}"
+# Summary
+local success_count=${#success_repos[@]}
+local error_count=${#errs[@]}
+
+if (( error_count > 0 )); then
+  echo
+  err "The following repositories failed to update:"
+  for repo in "${errs[@]}"; do
+    err "  - $repo"
+  done
 fi
-color green "updated ${#repos[@]} repos"
+
+if (( success_count > 0 )); then
+  success "Successfully updated $success_count repository/repositories"
+fi
+
+if (( error_count == 0 && success_count > 0 )); then
+  success "All repositories updated successfully!"
+fi

@@ -50,17 +50,23 @@ bat_cmd() {
 
 term_dim() {
   # Echo "COLUMNSxLINES" best-effort (prefer FZF-provided, fall back to stty)
-  local dim
+  local dim tty_lines
   dim="${FZF_PREVIEW_COLUMNS:-}x${FZF_PREVIEW_LINES:-}"
+
   if [[ $dim == x ]]; then
     # Try TTY (fzf preview runs attached to a TTY)
-    dim=$(stty size < /dev/tty 2>/dev/null | awk '{print $2 "x" $1}')
-    [[ -z "$dim" ]] && dim="80x24"
+    if tty_lines=$(stty size < /dev/tty 2>/dev/null); then
+      dim=$(echo "$tty_lines" | awk '{print $2 "x" $1}')
+    fi
+    [[ -z "$dim" || "$dim" == "x" ]] && dim="80x24"
   else
-    # Workaround: if preview hits bottom row and not Kitty, trim 1 line for Sixel
-    if [[ -z ${KITTY_WINDOW_ID:-} ]] \
-       && (( ${FZF_PREVIEW_TOP:-0} + ${FZF_PREVIEW_LINES:-0} == $(stty size < /dev/tty 2>/dev/null | awk '{print $1}') )); then
-      dim="${FZF_PREVIEW_COLUMNS}x$((FZF_PREVIEW_LINES-1))"
+    # Workaround: if preview hits bottom row and not Kitty/Ghostty, trim 1 line for Sixel
+    if [[ -z ${KITTY_WINDOW_ID:-} && -z ${GHOSTTY_RESOURCES_DIR:-} ]]; then
+      if tty_lines=$(stty size < /dev/tty 2>/dev/null | awk '{print $1}'); then
+        if (( ${FZF_PREVIEW_TOP:-0} + ${FZF_PREVIEW_LINES:-0} == tty_lines )); then
+          dim="${FZF_PREVIEW_COLUMNS}x$((FZF_PREVIEW_LINES-1))"
+        fi
+      fi
     fi
   fi
   echo "$dim"
@@ -78,10 +84,12 @@ full_mime_desc() {
 show_tree() {
   local path=$1
   if have eza; then
-    eza --tree --level=2 --color=always -- "$path" | head -200
+    eza --tree --level=2 --color=always -- "$path" 2>/dev/null | head -200 || true
+  elif have tree; then
+    tree -L 2 -- "$path" 2>/dev/null || true
   else
-    # Try colorized ls; if it fails, try tree (not always installed)
-    ls -la --color=always -- "$path" 2>/dev/null || tree -L 2 -- "$path" 2>/dev/null
+    # Fallback to ls
+    ls -la --color=always -- "$path" 2>/dev/null || ls -la -- "$path" 2>/dev/null || true
   fi
 }
 
@@ -113,32 +121,36 @@ show_binary() {
 
 show_image() {
   local path=$1
-  local dim; dim=$(term_dim)
+  local dim width height
+  dim=$(term_dim)
 
   # 1) Kitty/Ghostty icat via kitten
   if { [[ -n ${KITTY_WINDOW_ID:-} ]] || [[ -n ${GHOSTTY_RESOURCES_DIR:-} ]]; } && have kitten; then
     # Use memory transfer for speed; scrub trailing reset line (fzf scroll quirk)
-    kitten icat --clear --transfer-mode=memory --unicode-placeholder --stdin=no --place="$dim@0x0" -- "$path" \
-      | sed '$d' | sed $'$s/$/\e[m/'
-    return
+    if kitten icat --clear --transfer-mode=memory --unicode-placeholder --stdin=no --place="$dim@0x0" -- "$path" 2>/dev/null | sed '$d' | sed $'$s/$/\e[m/'; then
+      return
+    fi
   fi
 
-  # 2) chafa (Sixel/ANSI graphics)
+  # 2) chafa (Sixel/ANSI graphics) - works in many terminals
   if have chafa; then
-    chafa -s "$dim" -- "$path"
-    echo  # ensure newline so multiple images don’t stack weirdly
-    return
+    if chafa -s "$dim" -- "$path" 2>/dev/null; then
+      echo  # ensure newline so multiple images don't stack weirdly
+      return
+    fi
   fi
 
   # 3) iTerm2 imgcat
-  if have imgcat; then
-    local width="${dim%%x*}" height="${dim##*x}"
-    imgcat -W "$width" -H "$height" -- "$path"
-    return
+  if have imgcat && [[ -n ${ITERM_SESSION_ID:-} ]]; then
+    width="${dim%%x*}"
+    height="${dim##*x}"
+    if imgcat -W "$width" -H "$height" -- "$path" 2>/dev/null; then
+      return
+    fi
   fi
 
   # 4) Fallback: just describe the file
-  full_mime_desc "$path"
+  full_mime_desc "$path" || echo "Image file: $(basename "$path")"
 }
 
 is_text_mime() {

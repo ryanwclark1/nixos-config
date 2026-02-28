@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 
-
 # shellcheck disable=SC2039
 [[ $0 = - ]] && return
+
+# -------- Catppuccin Frappé Colors --------
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[0;33m'
+readonly BLUE='\033[0;34m'
+readonly RESET='\033[0m'
 
 __fzf_git_color() {
   if [[ -n $NO_COLOR ]]; then
@@ -17,6 +23,12 @@ __fzf_git_color() {
 __fzf_git_cat() {
   if [[ -n $FZF_GIT_CAT ]]; then
     echo "$FZF_GIT_CAT"
+    return
+  fi
+
+  # Prefer fzf-preview if available, then bat/batcat, then cat
+  if command -v fzf-preview > /dev/null; then
+    echo "fzf-preview"
     return
   fi
 
@@ -136,10 +148,22 @@ _fzf_git_fzf() {
 }
 
 _fzf_git_check() {
-  git rev-parse HEAD > /dev/null 2>&1 && return
+  if ! git rev-parse HEAD > /dev/null 2>&1; then
+    if [[ -n $TMUX ]]; then
+      tmux display-message "Not in a git repository"
+    else
+      echo "${RED}Error:${RESET} Not in a git repository" >&2
+    fi
+    return 1
+  fi
 
-  [[ -n $TMUX ]] && tmux display-message "Not in a git repository"
-  return 1
+  # Check if git is available
+  if ! command -v git &>/dev/null; then
+    echo "${RED}Error:${RESET} git is not installed" >&2
+    return 1
+  fi
+
+  return 0
 }
 
 __fzf_git=${BASH_SOURCE[0]:-${(%):-%x}}

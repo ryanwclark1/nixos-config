@@ -1,35 +1,57 @@
 #!/usr/bin/env bash
 
-declare -r esc=$'\033'
-declare -r c_reset="${esc}[0m"
-declare -r c_red="${esc}[31m"
+set -euo pipefail
+
+# -------- Catppuccin Frappé Colors --------
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[0;33m'
+readonly BLUE='\033[0;34m'
+readonly RESET='\033[0m'
+
 declare dryrun verbose
 
-set -e
-
 err() {
-  printf "${c_red}%s${c_reset}\n" "$*" >&2
+  printf "${RED}[ERROR]${RESET} %s\n" "$*" >&2
+}
+
+info() {
+  printf "${BLUE}[INFO]${RESET} %s\n" "$*"
+}
+
+warn() {
+  printf "${YELLOW}[WARNING]${RESET} %s\n" "$*"
+}
+
+success() {
+  printf "${GREEN}[SUCCESS]${RESET} %s\n" "$*"
 }
 
 die() {
+  [[ $# -gt 0 ]] && err "$*"
   exit 1
 }
 
 has() {
-  local verbose=0
-  if [[ $1 == '-v' ]]; then
-    verbose=1
+  local verbose=false
+  if [[ ${1:-} == '-v' ]]; then
+    verbose=true
     shift
   fi
-  for c; do c="${c%% *}"
-    if ! command -v "$c" &> /dev/null; then
-      (( verbose > 0 )) && err "$c not found"
+  for cmd in "$@"; do
+    if ! command -v "${cmd%% *}" &>/dev/null; then
+      [[ "$verbose" == true ]] && err "$cmd not found"
       return 1
     fi
   done
+  return 0
 }
 
-has -v fzf || die
+if ! has -v fzf; then
+  err "fzf is required but not found"
+  err "Install fzf: nix-env -iA nixos.fzf"
+  exit 1
+fi
 
 fzf() {
   command fzf --cycle "$@"
@@ -97,10 +119,20 @@ while (( $# > 0 )); do
 done
 
 mapfile -t files < <(pick_files)
-(( ${#files[@]} > 0 )) || exit 1
+if (( ${#files[@]} == 0 )); then
+  info "No files selected"
+  exit 0
+fi
 
-destination=$(pick_destination) || exit 1
-[[ -z "$destination" ]] && die "No destination selected"
+destination=$(pick_destination) || {
+  err "No destination selected"
+  exit 1
+}
+
+if [[ -z "$destination" ]]; then
+  err "No destination selected"
+  exit 1
+fi
 
 # Validate destination exists and is writable
 if [[ ! -d "$destination" ]]; then
@@ -110,7 +142,44 @@ fi
 
 if [[ ! -w "$destination" ]]; then
   err "Destination is not writable: $destination"
+  warn "You may need to run with sudo or change permissions"
   exit 1
 fi
 
-${dryrun:+echo} mv ${verbose:+-v} -t "$destination" "${files[@]}" || die "Failed to move files"
+# Validate all source files exist
+local missing_files=()
+for file in "${files[@]}"; do
+  if [[ ! -e "$file" ]]; then
+    missing_files+=( "$file" )
+  fi
+done
+
+if (( ${#missing_files[@]} > 0 )); then
+  err "Some selected files do not exist:"
+  for file in "${missing_files[@]}"; do
+    err "  - $file"
+  done
+  exit 1
+fi
+
+# Show what will be moved
+if [[ -n "${dryrun:-}" ]]; then
+  info "DRY RUN - Would move the following files:"
+  for file in "${files[@]}"; do
+    info "  $file -> $destination/"
+  done
+else
+  info "Moving ${#files[@]} file(s) to $destination"
+fi
+
+# Perform the move
+if ${dryrun:+echo} mv ${verbose:+-v} -t "$destination" "${files[@]}" 2>&1; then
+  if [[ -z "${dryrun:-}" ]]; then
+    success "Successfully moved ${#files[@]} file(s) to $destination"
+  fi
+else
+  local exit_code=$?
+  err "Failed to move files"
+  warn "Some files may have been moved. Check destination: $destination"
+  exit $exit_code
+fi

@@ -189,8 +189,13 @@ main() {
     # Force rescan if requested
     if [[ "$force_rescan" == true ]]; then
         info "Scanning for networks..."
-        nmcli device wifi rescan
-        sleep 3
+        if nmcli device wifi rescan 2>/dev/null; then
+            sleep 3
+            success "Scan complete"
+        else
+            err "Failed to rescan networks"
+            warn "Check WiFi device status: nmcli device status"
+        fi
     fi
 
     # Create header
@@ -210,10 +215,10 @@ main() {
         )
     else
         nmcli_cmd=(nmcli -t -f 'bssid,signal,bars,freq,security,ssid' device wifi)
-        preview_cmd='echo -e "BSSID: {1}\nSignal: {2}%\nBars: {3}\nFrequency: {4} MHz\nSecurity: {5}\nSSID: {6}"'
+        preview_cmd='echo -e "BSSID: {1}\nSignal: {2}%\nBars: {3}\nFrequency: {4} MHz\nSecurity: {5}\nSSID: {6}\n\nDevice: $(nmcli -t -f device device status | grep wifi | head -1)\nWiFi Status: $(nmcli radio wifi)"'
         reload_cmd='nmcli device wifi rescan; sleep 2; nmcli -t -f "bssid,signal,bars,freq,security,ssid" device wifi'
         fzf_opts=(
-            --with-nth=2..
+            --with-nth=6,2,3,4,5
         )
     fi
 
@@ -222,6 +227,7 @@ main() {
     selected=$(
         "${nmcli_cmd[@]}" 2>/dev/null |
         fzf --ansi \
+            -i \
             --header="$header" \
             --header-lines=1 \
             --delimiter='\t' \
@@ -300,22 +306,62 @@ main() {
             # Connect to network
             if [[ "$saved_only" == true ]]; then
                 info "Activating connection: $ssid"
-                if nmcli connection up "$ssid"; then
-                    success "Successfully activated connection: $ssid"
+                if nmcli connection up "$ssid" 2>/dev/null; then
+                    sleep 2
+                    # Verify connection
+                    if nmcli -t -f active,ssid device wifi list | grep -q "^yes:$ssid"; then
+                        success "Successfully activated connection: $ssid"
+                    else
+                        warn "Connection activated but may not be active yet"
+                    fi
                 else
                     err "Failed to activate connection: $ssid"
+                    warn "Check if the connection profile exists: nmcli connection show"
                 fi
             else
                 info "Connecting to: $ssid"
+                local connect_success=false
+                local max_retries=2
+                local retry_count=0
+
                 # Try BSSID first if available, then fall back to SSID
-                if [[ -n "$bssid" ]] && nmcli -a device wifi connect "$bssid" 2>/dev/null; then
-                    success "Successfully connected to: $ssid"
-                elif nmcli -a device wifi connect "$ssid" 2>/dev/null; then
-                    success "Successfully connected to: $ssid"
-                else
-                    err "Failed to connect to: $ssid"
-                    warn "Check password or network availability"
+                while (( retry_count < max_retries && connect_success == false )); do
+                    if [[ -n "$bssid" ]]; then
+                        if nmcli -a device wifi connect "$bssid" 2>/dev/null; then
+                            connect_success=true
+                        fi
+                    fi
+
+                    if [[ "$connect_success" == false ]]; then
+                        if nmcli -a device wifi connect "$ssid" 2>/dev/null; then
+                            connect_success=true
+                        fi
+                    fi
+
+                    if [[ "$connect_success" == true ]]; then
+                        sleep 3
+                        # Verify connection
+                        local connection_status
+                        connection_status=$(nmcli -t -f active,ssid device wifi list 2>/dev/null | grep "^yes:" | head -1 | cut -d: -f2)
+                        if [[ "$connection_status" == "$ssid" ]]; then
+                            success "Successfully connected to: $ssid"
+                        else
+                            warn "Connection initiated but verification pending"
+                        fi
+                        break
+                    fi
+
+                    ((retry_count++))
+                    if (( retry_count < max_retries )); then
+                        sleep 1
+                    fi
+                done
+
+                if [[ "$connect_success" == false ]]; then
+                    err "Failed to connect to: $ssid after $max_retries attempts"
+                    warn "Check password, network availability, or device status"
                     warn "The network may require manual configuration"
+                    warn "Try: nmcli device wifi connect \"$ssid\" password <password>"
                 fi
             fi
             ;;
