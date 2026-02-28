@@ -5,11 +5,10 @@
 
 {
   home.packages = with pkgs; [
-    nodejs_22
+    nodePackages.nodejs
+    pnpm
     yarn
-    # npm is included with nodejs_22
-    # nodePackages may cause conflicts
-    # deno
+    biome
   ];
   programs = {
     bun = {
