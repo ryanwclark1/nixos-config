@@ -39,24 +39,39 @@ in
     installBatSyntax = true;
     clearDefaultKeybinds = false;
     settings = {
+      # Theme
       theme = "theme";
+
+      # Font
       font-family = "JetBrainsMono Nerd Font";
       font-style = "Regular";
       font-size = 12;
+
+      # Window
       window-theme = "ghostty";
       window-padding-x = 4;
       window-padding-y = 4;
       confirm-close-surface = false;
       resize-overlay = "never";
       gtk-toolbar-style = "flat";
+      gtk-titlebar = false;
+
+      # Cursor
       cursor-style = "block";
       cursor-style-blink = false;
+
+      # Shell integration
       shell-integration-features = "no-cursor,ssh-env";
-      auto-update = "off";
+
+      # Background
       background-opacity = 0.7;
       background-blur = true;
+
+      # Behavior
       copy-on-select = true;
-      gtk-titlebar = false;
+      auto-update = "off";
+
+      # Keybindings
       keybind = [
         "shift+insert=paste_from_clipboard"
         "control+insert=copy_to_clipboard"

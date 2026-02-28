@@ -6,6 +6,13 @@ shopt -s extglob
 
 export SHELL=bash
 
+# -------- Catppuccin Frappé Colors --------
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[0;33m'
+readonly BLUE='\033[0;34m'
+readonly RESET='\033[0m'
+
 PROG=$(basename "$0")
 SYSZ_VERSION=1.4.3
 SYSZ_HISTORY=${SYSZ_HISTORY:-${XDG_CACHE_HOME:-$HOME/.cache}/sysz/history}
@@ -90,7 +97,10 @@ EOF
 
 _sysz_run() {
   [[ $VERBOSE = true ]] && echo '>' "$@" >&2
-  eval "$@" || return $?
+  if ! eval "$@"; then
+    echo "${RED}Error executing: $*${RESET}" >&2
+    return $?
+  fi
 }
 
 _sysz_systemctl() {
@@ -235,8 +245,15 @@ _sysz_list_units() {
 
 # check fzf version
 MIN_FZF=0.27.1
+if ! command -v fzf &>/dev/null; then
+  echo "${RED}ERROR:${RESET} fzf is not installed" >&2
+  echo "Install fzf: nix-env -iA nixos.fzf" >&2
+  exit 1
+fi
+
 if [[ "$(printf '%s\n' "$MIN_FZF" "$(fzf --version | cut -d' ' -f1)" | sort -V | head -n1)" != "$MIN_FZF" ]]; then
-  echo "ERROR: fzf >= $MIN_FZF required" >&2
+  echo "${RED}ERROR:${RESET} fzf >= $MIN_FZF required" >&2
+  echo "Current version: $(fzf --version | cut -d' ' -f1)" >&2
   echo "https://github.com/junegunn/fzf#upgrading-fzf" >&2
   exit 1
 fi
@@ -287,8 +304,9 @@ done
 
 for STATE in "${STATES[@]}"; do
   STATE="${STATE##*=}"
-  if [[ -n $STATE ]] && ! systemctl --state=help | grep -q "^${STATE}$"; then
-    echo "ERROR: Invalid state: $STATE" >&2
+  if [[ -n $STATE ]] && ! systemctl --state=help 2>/dev/null | grep -q "^${STATE}$"; then
+    echo "${RED}ERROR:${RESET} Invalid state: $STATE" >&2
+    echo "Run 'systemctl --state=help' to see valid states" >&2
     exit 1
   fi
 done

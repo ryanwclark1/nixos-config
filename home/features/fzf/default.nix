@@ -37,7 +37,6 @@ in
     (pkgs.writeScriptBin "fztop" (builtins.readFile ./scripts/fztop.sh))
     (pkgs.writeScriptBin "gitup" (builtins.readFile ./scripts/gitup.sh))
     (pkgs.writeScriptBin "igr" (builtins.readFile ./scripts/igr.sh))
-    (pkgs.writeScriptBin "rgf" (builtins.readFile ./scripts/rgf.sh))
     (pkgs.writeScriptBin "sshget" (builtins.readFile ./scripts/sshget.sh))
     (pkgs.writeScriptBin "sysz" (builtins.readFile ./scripts/sysz.sh))
     (pkgs.writeScriptBin "wifiz" (builtins.readFile ./scripts/wifiz.sh))
@@ -95,7 +94,7 @@ in
       "--ansi"
       "--tabstop=2"
       "--preview-window=right,60%,border-rounded"
-      "--preview=fzf-preview"
+      "--preview=fzf-preview {}"
       "--multi"
       "--cycle"
       "--marker=▶"
@@ -152,7 +151,7 @@ in
 
     changeDirWidgetCommand = "fd --type d";
     changeDirWidgetOptions = [
-      "--preview=fzf-preview"
+      "--preview=fzf-preview {}"
 
       # Navigation bindings consistent with other widgets
       "--bind=ctrl-j:down"

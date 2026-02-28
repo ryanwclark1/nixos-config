@@ -1,7 +1,55 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
+# -------- Catppuccin Frappé Colors --------
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[0;33m'
+readonly BLUE='\033[0;34m'
+readonly MAGENTA='\033[0;35m'
+readonly CYAN='\033[0;36m'
+readonly RESET='\033[0m'
+
+# -------- Helper Functions --------
+err() {
+  printf "${RED}[ERROR]${RESET} %s\n" "$*" >&2
+}
+
+info() {
+  printf "${BLUE}[INFO]${RESET} %s\n" "$*"
+}
+
+warn() {
+  printf "${YELLOW}[WARNING]${RESET} %s\n" "$*"
+}
+
+success() {
+  printf "${GREEN}[SUCCESS]${RESET} %s\n" "$*"
+}
+
+die() {
+  [[ $# -gt 0 ]] && err "$*"
+  exit 1
+}
+
+has() {
+  local verbose=false
+  if [[ ${1:-} == '-v' ]]; then
+    verbose=true
+    shift
+  fi
+  for cmd in "$@"; do
+    if ! command -v "${cmd%% *}" &>/dev/null; then
+      [[ "$verbose" == true ]] && err "$cmd not found"
+      return 1
+    fi
+  done
+  return 0
+}
+
 usage() {
-  LESS=-FEXR less <<'HELP'
+  cat << 'HELP'
 fv [OPTIONS] [SEARCH]
 Fuzzy file filtering and command executing
 
@@ -18,45 +66,6 @@ Environment:
   FV_CMD       Override the editor
   FV_SEARCH    Override the search tool (rg/ag/ack/grep)
 HELP
-}
-
-# -------- Colors --------
-declare -A colors
-colors[red]=$(tput setaf 1)$(tput bold)
-colors[green]=$(tput setaf 2)$(tput bold)
-colors[blue]=$(tput setaf 4)$(tput bold)
-colors[reset]=$(tput sgr0)
-
-color() {
-  local c="$1"
-  shift
-  printf '%s%s%s\n' "${colors[$c]}" "$*" "${colors[reset]}"
-}
-
-err() {
-  color red "$@" >&2
-}
-
-die() {
-  [[ -n "$1" ]] && err "$1"
-  exit 1
-}
-
-# -------- Helpers --------
-has() {
-  local o verbose=0 c
-  local OPTIND=1        # <<< reset OPTIND for getopts in this function
-  while getopts 'v' o; do
-    case "$o" in v) verbose=1 ;; esac
-  done
-  shift "$((OPTIND-1))"
-  for c; do
-    if ! command -v "${c%% *}" &> /dev/null; then
-      (( verbose > 0 )) && err "$c not found"
-      return 1
-    fi
-  done
-  return 0
 }
 
 select_from() {
@@ -79,9 +88,14 @@ select_from() {
 }
 
 get_preview_command() {
-  select_from 'bat --color=always --style=header' \
-              'highlight -q --force -O ansi' \
-              'cat'
+  # Prefer fzf-preview if available, then bat, highlight, or cat
+  if command -v fzf-preview &>/dev/null; then
+    echo 'fzf-preview'
+  else
+    select_from 'bat --color=always --style=header' \
+                'highlight -q --force -O ansi' \
+                'cat'
+  fi
 }
 
 # -------- Vars --------
@@ -105,7 +119,11 @@ done
 shift "$((OPTIND-1))"
 
 # -------- Prechecks --------
-has -v 'fzf' || die "fzf is required but not found"
+if ! has -v fzf; then
+  err "fzf is required but not found"
+  err "Install fzf: nix-env -iA nixos.fzf"
+  exit 1
+fi
 
 # Editor
 if [[ -v FV_CMD ]]; then
@@ -137,10 +155,15 @@ else
     search_cmd=$(select_from 'ag' 'ack' 'grep')
   fi
 fi
-[[ -z "$search_cmd" ]] && die "No search tool found (install rg/ag/ack/grep)"
+if [[ -z "$search_cmd" ]]; then
+  err "No search tool found (install rg/ag/ack/grep)"
+  err "Recommended: nix-env -iA nixos.ripgrep"
+  exit 1
+fi
+
 if [[ "$search_cmd" == "grep" ]]; then
-  err "Warning: grep is slow. Consider installing rg or ag."
-  sleep .75
+  warn "grep is slow. Consider installing rg or ag for better performance."
+  sleep 0.5
 fi
 
 # Input
@@ -200,15 +223,23 @@ esac
 
 # -------- Main Execution --------
 main() {
-  local choices preview
+  local choices preview preview_cmd
   preview=$(get_preview_command)
+
+  # Build preview command
+  if [[ "$preview" == "fzf-preview" ]]; then
+    preview_cmd='fzf-preview {}'
+  else
+    preview_cmd="[[ \$(file -ib {} 2>/dev/null) == text/* ]] && $preview {} 2>/dev/null || echo 'Binary file or preview unavailable'"
+  fi
 
   # Limit results to prevent overwhelming fzf
   choices=$($search_cmd "${search_opts[@]}" 2>/dev/null | head -10000 |
     fzf --ansi --multi \
-        --preview="[[ \$(file -ib {} 2>/dev/null) == text/* ]] && $preview {} 2>/dev/null || echo 'Binary file or preview unavailable'" \
-        --preview-window=right:60% \
-        --height=80%) || return 1
+        --preview="$preview_cmd" \
+        --preview-window=right:60%,border-left \
+        --height=80% \
+        --border=rounded) || return 1
 
   # Handle results - ag outputs file:line:match format
   if [[ -n "$search_str" && "$search_cmd" == 'ag' ]]; then

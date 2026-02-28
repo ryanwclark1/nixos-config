@@ -54,8 +54,23 @@ has() {
 
 # Check dependencies
 check_deps() {
-  if ! has fzf docker; then
-    err "This script requires fzf and docker to be installed"
+  if ! has -v fzf; then
+    err "fzf is required but not found"
+    err "Install fzf: nix-env -iA nixos.fzf"
+    exit 1
+  fi
+
+  if ! has -v docker; then
+    err "docker is required but not found"
+    err "Install docker: nix-env -iA nixos.docker"
+    exit 1
+  fi
+
+  # Check if Docker daemon is running
+  if ! docker info &>/dev/null; then
+    err "Cannot connect to Docker daemon"
+    err "Is Docker running? Try: sudo systemctl start docker"
+    err "Or check: docker info"
     exit 1
   fi
 }
@@ -116,8 +131,8 @@ subcmd_ps() {
   local header_lines=1
 
   if ! docker ps &>/dev/null; then
-    err "Cannot connect to Docker daemon. Is Docker running?"
-    err "Try: sudo systemctl start docker"
+    err "Cannot connect to Docker daemon"
+    err "Is Docker running? Try: sudo systemctl start docker"
     return 1
   fi
 
@@ -127,21 +142,22 @@ subcmd_ps() {
 
   fzf \
     --bind="start:reload:$reload_cmd" \
-    --bind='enter:execute:docker exec -it {1} sh 2>/dev/null || docker exec -it {1} bash 2>/dev/null || echo "Failed to open shell"' \
-    --bind="ctrl-d:execute-silent(docker stop {1} 2>/dev/null && echo 'Stopped {1}')+reload:$reload_cmd" \
-    --bind="ctrl-r:execute-silent(docker restart {1} 2>/dev/null && echo 'Restarted {1}')+reload:$reload_cmd" \
-    --bind="ctrl-k:execute-silent(docker kill {1} 2>/dev/null && echo 'Killed {1}')+reload:$reload_cmd" \
-    --bind='ctrl-i:execute:docker inspect {1} 2>/dev/null | less || echo "Failed to inspect container"' \
+    --bind='enter:execute:(docker exec -it {1} sh 2>/dev/null || docker exec -it {1} bash 2>/dev/null || docker exec -it {1} /bin/sh 2>/dev/null || echo "Failed to open shell - container may not have sh/bash")' \
+    --bind="ctrl-d:execute-silent(if docker stop {1} 2>/dev/null; then echo 'Stopped {1}'; else echo 'Failed to stop {1}'; fi)+reload:$reload_cmd" \
+    --bind="ctrl-r:execute-silent(if docker restart {1} 2>/dev/null; then echo 'Restarted {1}'; else echo 'Failed to restart {1}'; fi)+reload:$reload_cmd" \
+    --bind="ctrl-k:execute-silent(if docker kill {1} 2>/dev/null; then echo 'Killed {1}'; else echo 'Failed to kill {1}'; fi)+reload:$reload_cmd" \
+    --bind='ctrl-i:execute:(docker inspect {1} 2>/dev/null | less || echo "Failed to inspect container - check container ID")' \
     --bind='ctrl-l:toggle-preview' \
     --bind='?:preview:echo -e "KEYBINDINGS:\n\n<Enter> - Open shell in container\n<Ctrl-D> - Stop container\n<Ctrl-R> - Restart container\n<Ctrl-K> - Kill container\n<Ctrl-I> - Inspect container\n<Ctrl-L> - Toggle logs view\n? - Show this help"' \
     --bind='escape:cancel' \
-    --preview='docker logs --tail 100 {1} 2>&1 || echo "No logs available"' \
+    --preview='docker logs --tail 100 {1} 2>&1 || echo "No logs available or container not found"' \
     --header="$header" \
     --reverse \
     --height=100% \
     --header-lines="$header_lines" \
     --preview-window=down:60%:wrap \
-    --ansi
+    --ansi \
+    +m
 }
 
 # Log viewing command
@@ -149,7 +165,8 @@ subcmd_logs() {
   local header_lines=1
 
   if ! docker ps -a &>/dev/null; then
-    err "Cannot connect to Docker daemon. Is Docker running?"
+    err "Cannot connect to Docker daemon"
+    err "Is Docker running? Try: sudo systemctl start docker"
     return 1
   fi
 
@@ -159,19 +176,25 @@ subcmd_logs() {
   local container
   container=$(
     docker ps -a --format "{{.ID}}\t{{.Names}}\t{{.Status}}" |
-      fzf --header="Select container to view logs" --height=50% --reverse |
+      fzf --header="Select container to view logs" --height=50% --reverse --no-preview |
       awk '{print $1}'
   )
 
   [[ -z "${container:-}" ]] && return 0
 
+  # Validate container exists
+  if ! docker ps -a --format "{{.ID}}" | grep -q "^${container}$"; then
+    err "Container $container not found"
+    return 1
+  fi
+
   # Then view logs with options
   docker logs --tail 100 "$container" 2>&1 |
     fzf \
-      --bind="enter:execute:docker logs -f $container 2>&1 | less +F || echo 'Failed to follow logs'" \
-      --bind="ctrl-a:execute:docker logs $container 2>&1 | less || echo 'Failed to load logs'" \
-      --bind="ctrl-t:execute:read -p 'How many lines to tail? ' n && docker logs --tail \$n $container 2>&1 | less || echo 'Failed to load logs'" \
-      --bind="ctrl-s:execute:read -p 'Search term: ' s && docker logs $container 2>&1 | grep -i \"\$s\" | less || echo 'No matches found'" \
+      --bind="enter:execute:(docker logs -f $container 2>&1 | less +F || echo 'Failed to follow logs - container may have stopped')" \
+      --bind="ctrl-a:execute:(docker logs $container 2>&1 | less || echo 'Failed to load logs')" \
+      --bind="ctrl-t:execute:read -p 'How many lines to tail? ' n && (docker logs --tail \$n $container 2>&1 | less || echo 'Failed to load logs')" \
+      --bind="ctrl-s:execute:read -p 'Search term: ' s && (docker logs $container 2>&1 | grep -i \"\$s\" | less || echo 'No matches found')" \
       --header="$header" \
       --reverse \
       --height=100% \
@@ -183,18 +206,21 @@ subcmd_images() {
   local header_lines=1
 
   if ! docker images &>/dev/null; then
-    err "Cannot connect to Docker daemon. Is Docker running?"
+    err "Cannot connect to Docker daemon"
+    err "Is Docker running? Try: sudo systemctl start docker"
     return 1
   fi
 
   local header="${GREEN}<Enter>${NC} inspect, ${RED}<Ctrl-D>${NC} delete, ${YELLOW}<Ctrl-R>${NC} run, ${BLUE}<Ctrl-H>${NC} history"
 
+  local reload_cmd='docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.ID}}\t{{.Size}}\t{{.CreatedSince}}" 2>/dev/null || echo "Error: Cannot connect to Docker daemon"'
+
   fzf \
-    --bind='start:reload:docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.ID}}\t{{.Size}}\t{{.CreatedSince}}"' \
-    --bind='enter:execute:docker inspect {3} | less' \
-    --bind='ctrl-d:execute-silent(docker rmi {3})+reload:docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.ID}}\t{{.Size}}\t{{.CreatedSince}}"' \
-    --bind='ctrl-r:execute:read -p "Run command (e.g., -it --rm): " opts && docker run $opts {1}:{2}' \
-    --bind='ctrl-h:execute:docker history {3} | less' \
+    --bind="start:reload:$reload_cmd" \
+    --bind='enter:execute:(docker inspect {3} 2>/dev/null | less || echo "Failed to inspect image - check image ID")' \
+    --bind='ctrl-d:execute-silent(if docker rmi {3} 2>/dev/null; then echo "Deleted {1}:{2}"; else echo "Failed to delete {1}:{2} - may be in use"; fi)+reload:'"$reload_cmd" \
+    --bind='ctrl-r:execute:read -p "Run command (e.g., -it --rm): " opts && (docker run $opts {1}:{2} 2>&1 || echo "Failed to run image")' \
+    --bind='ctrl-h:execute:(docker history {3} 2>/dev/null | less || echo "Failed to show history")' \
     --bind='?:preview:echo -e "KEYBINDINGS:\n\n<Enter> - Inspect image\n<Ctrl-D> - Delete image\n<Ctrl-R> - Run image\n<Ctrl-H> - Show history\n? - Show this help"' \
     --header="$header" \
     --reverse \
@@ -264,7 +290,7 @@ subcmd_exec() {
   local container
   container=$(
     docker ps --format "{{.ID}}\t{{.Names}}\t{{.Image}}" |
-      fzf --header="Select container to execute command in" --height=50% --reverse |
+      fzf --header="Select container to execute command in" --height=50% --reverse --no-preview |
       awk '{print $1}'
   )
 
@@ -301,7 +327,7 @@ subcmd_compose() {
   else
     compose_file=$(
       printf "%s\n" "${compose_files[@]}" |
-        fzf --header="Select Docker Compose file" --height=50% --reverse
+        fzf --header="Select Docker Compose file" --height=50% --reverse --no-preview
     )
   fi
 
@@ -311,7 +337,7 @@ subcmd_compose() {
   local action
   action=$(
     echo -e "up\ndown\nps\nlogs\nrestart\npull\nbuild" |
-      fzf --header="Select Docker Compose action" --height=50% --reverse
+      fzf --header="Select Docker Compose action" --height=50% --reverse --no-preview
   )
   [[ -z "${action:-}" ]] && return 0
 
@@ -329,7 +355,7 @@ subcmd_compose() {
     logs)
       local service
       service=$(docker compose -f "$compose_file" ps --services |
-        fzf --header="Select service to view logs" --height=50% --reverse)
+        fzf --header="Select service to view logs" --height=50% --reverse --no-preview)
       [[ -z "${service:-}" ]] && return 0
       docker compose -f "$compose_file" logs -f "$service"
       ;;

@@ -96,48 +96,102 @@ get_paired_devices() {
 toggle_connection() {
     local address="$1"
     local name="$2"
+    local max_retries=3
+    local retry_count=0
 
     info "Processing $name ($address)..."
 
-    if bluetoothctl info "$address" | grep -q "Connected: yes"; then
+    # Check if device is already connected
+    local is_connected=false
+    if bluetoothctl info "$address" 2>/dev/null | grep -q "Connected: yes"; then
+        is_connected=true
+    fi
+
+    if [[ "$is_connected" == true ]]; then
         info "Disconnecting $name..."
-        if bluetoothctl disconnect "$address" &>/dev/null; then
-            success "Disconnected $name"
-        else
-            err "Failed to disconnect $name"
-        fi
+        while (( retry_count < max_retries )); do
+            if bluetoothctl disconnect "$address" 2>/dev/null; then
+                sleep 1
+                if ! bluetoothctl info "$address" 2>/dev/null | grep -q "Connected: yes"; then
+                    success "Disconnected $name"
+                    return 0
+                fi
+            fi
+            ((retry_count++))
+            sleep 0.5
+        done
+        err "Failed to disconnect $name after $max_retries attempts"
+        return 1
     else
         info "Connecting to $name..."
-        if bluetoothctl connect "$address" &>/dev/null; then
-            success "Connected to $name"
-        else
-            err "Failed to connect to $name"
-            warn "Device might need to be in pairing mode"
+        # Ensure device is trusted before connecting
+        if ! bluetoothctl info "$address" 2>/dev/null | grep -q "Trusted: yes"; then
+            info "Trusting device..."
+            bluetoothctl trust "$address" 2>/dev/null || true
         fi
+
+        while (( retry_count < max_retries )); do
+            if bluetoothctl connect "$address" 2>/dev/null; then
+                sleep 2
+                if bluetoothctl info "$address" 2>/dev/null | grep -q "Connected: yes"; then
+                    success "Connected to $name"
+                    return 0
+                fi
+            fi
+            ((retry_count++))
+            sleep 1
+        done
+        err "Failed to connect to $name after $max_retries attempts"
+        warn "Device might need to be in pairing mode or powered on"
+        return 1
     fi
 }
 
 # Scan for new devices
 scan_devices() {
     info "Scanning for devices (30 seconds)..."
-    bluetoothctl --timeout 30 scan on >/dev/null 2>&1 &
+
+    # Ensure bluetooth is powered on
+    if ! bluetoothctl show | grep -q "Powered: yes"; then
+        warn "Bluetooth is powered off. Powering on..."
+        if ! bluetoothctl power on; then
+            err "Failed to power on Bluetooth"
+            return 1
+        fi
+        sleep 1
+    fi
+
+    # Start scanning in background
+    if ! bluetoothctl --timeout 30 scan on >/dev/null 2>&1 & then
+        err "Failed to start device scan"
+        return 1
+    fi
     local scan_pid=$!
 
     # Show discovered devices after a brief delay
-    sleep 2
-    local address name
+    sleep 3
+    local address name discovered_count=0
     while IFS= read -r line; do
-        # Skip paired devices
+        # Skip empty lines and paired devices
+        [[ -z "$line" ]] && continue
         [[ "$line" =~ "Paired" ]] && continue
 
-        # Parse device line
-        address=$(echo "$line" | awk '{print $2}')
-        name=$(echo "$line" | cut -d' ' -f3-)
-
-        [[ -n "$address" ]] && printf "%s\t%s\t${YELLOW}Available${RESET}\t%s\n" "$address" "$name" "Discovered"
+        # Parse device line: Device XX:XX:XX:XX:XX:XX DeviceName
+        if [[ "$line" =~ ^Device\ ([0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2})\ (.+)$ ]]; then
+            address="${BASH_REMATCH[1]}"
+            name="${BASH_REMATCH[2]}"
+            [[ -n "$address" ]] && printf "%s\t%s\t${YELLOW}Available${RESET}\t%s\n" "$address" "$name" "Discovered"
+            ((discovered_count++))
+        fi
     done < <(bluetoothctl devices 2>/dev/null || true)
 
     wait "$scan_pid" 2>/dev/null || true
+
+    if (( discovered_count > 0 )); then
+        success "Found $discovered_count new device(s)"
+    else
+        warn "No new devices found. Make sure devices are in pairing mode."
+    fi
 }
 
 # Pair with new device
@@ -146,15 +200,34 @@ pair_device() {
     local name="$2"
 
     info "Pairing with $name ($address)..."
+    warn "Make sure the device is in pairing mode"
 
-    if bluetoothctl pair "$address" && bluetoothctl trust "$address"; then
-        success "Successfully paired with $name"
-        if bluetoothctl connect "$address"; then
-            success "Connected to $name"
+    # Try to pair
+    if bluetoothctl pair "$address" 2>/dev/null; then
+        sleep 1
+        # Trust the device
+        if bluetoothctl trust "$address" 2>/dev/null; then
+            success "Successfully paired and trusted $name"
+            sleep 1
+            # Try to connect
+            if bluetoothctl connect "$address" 2>/dev/null; then
+                sleep 2
+                if bluetoothctl info "$address" 2>/dev/null | grep -q "Connected: yes"; then
+                    success "Connected to $name"
+                else
+                    warn "Paired but not connected. Try connecting manually."
+                fi
+            else
+                info "Paired successfully. Connection may require manual attempt."
+            fi
+        else
+            err "Paired but failed to trust $name"
+            return 1
         fi
     else
         err "Failed to pair with $name"
-        warn "Make sure the device is in pairing mode"
+        warn "Make sure the device is in pairing mode and Bluetooth is powered on"
+        return 1
     fi
 }
 
@@ -171,7 +244,7 @@ ${GREEN}<Enter>${RESET} toggle connection | ${YELLOW}<Ctrl-S>${RESET} scan | ${R
         local selection
         selection=$(
             {
-                echo -e "Action\tDevice\tStatus\tType"
+                echo -e "Address\tDevice\tStatus\tType"
                 get_paired_devices
             } | fzf --ansi \
                 --header="$header" \
@@ -179,7 +252,7 @@ ${GREEN}<Enter>${RESET} toggle connection | ${YELLOW}<Ctrl-S>${RESET} scan | ${R
                 --with-nth=2,3,4 \
                 --expect=ctrl-s,ctrl-q,ctrl-p \
                 --bind='?:preview:echo -e "KEYBINDINGS:\n\n<Enter> - Toggle device connection\n<Ctrl-S> - Scan for new devices\n<Ctrl-P> - Pair with device\n<Ctrl-Q> - Quit\n? - Show this help"' \
-                --preview='bluetoothctl info {1} 2>/dev/null || echo "No device info available"' \
+                --preview='if [[ {1} =~ ^[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}$ ]]; then bluetoothctl info {1} 2>/dev/null || echo "No device info available"; else echo "Select a device to view details"; fi' \
                 --preview-window=right:60%:wrap
         ) || break
 
@@ -187,7 +260,7 @@ ${GREEN}<Enter>${RESET} toggle connection | ${YELLOW}<Ctrl-S>${RESET} scan | ${R
         local device_line="${selection#*$'\n'}"
 
         # Skip header line
-        [[ "$device_line" =~ ^Action ]] && continue
+        [[ "$device_line" =~ ^Address ]] && continue
 
         case "$key" in
             ctrl-q)

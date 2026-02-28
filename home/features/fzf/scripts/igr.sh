@@ -23,6 +23,7 @@ declare -a GENERIC_OPTS=()  # generic flags the user requested
 err()  { printf "${RED}[ERROR]${RESET} %s\n" "$*" >&2; }
 info() { printf "${BLUE}[INFO]${RESET} %s\n" "$*"; }
 warn() { printf "${YELLOW}[WARNING]${RESET} %s\n" "$*"; }
+success() { printf "${GREEN}[SUCCESS]${RESET} %s\n" "$*"; }
 
 has() {
   local verbose=false
@@ -69,6 +70,7 @@ init_editor_cmd() {
   local picked
   picked=$(select_from nvim vim vi nano) || {
     err "No suitable editor found"
+    err "Install an editor: nix-env -iA nixos.neovim"
     return 1
   }
   EDITOR_CMD="$picked"
@@ -217,7 +219,11 @@ main() {
     esac
   done
 
-  has -v fzf || { err "fzf is required"; exit 1; }
+  if ! has -v fzf; then
+    err "fzf is required but not found"
+    err "Install fzf: nix-env -iA nixos.fzf"
+    exit 1
+  fi
   init_search_base
   init_preview_cmd
   init_editor_cmd
@@ -246,7 +252,7 @@ main() {
     # Editor open
     --bind="$enter_bind"
     # Extras
-    --bind="ctrl-o:execute(sh -c 'xdg-open \"$1\" 2>/dev/null || (command -v open >/dev/null 2>&1 && open \"$1\" 2>/dev/null) || true' _ \"{1}\")"
+    --bind="ctrl-o:execute(sh -c 'xdg-open \"\$1\" 2>/dev/null || (command -v open >/dev/null 2>&1 && open \"\$1\" 2>/dev/null) || true' _ \"{1}\")"
     --bind="ctrl-y:execute-silent(echo {1}:{2} | wl-copy 2>/dev/null || echo {1}:{2} | xclip -selection clipboard 2>/dev/null || echo {1}:{2} | pbcopy 2>/dev/null)"
     --bind='?:preview:echo -e "KEYS:\n\nEnter - Open in editor at line/col\nCtrl-O - Open in default app\nCtrl-Y - Copy file:line\nCtrl-L - Toggle preview\nCtrl-R - Reload\nEsc - Quit\n\nSearch Tool: '"${SEARCH_TOOL}"'"'
     --bind="ctrl-l:toggle-preview"
@@ -255,12 +261,14 @@ main() {
 
   # Execute FZF
   "${fzf_cmd[@]}" || {
-    case $? in
-      1) warn "No matches found" ;;
-      2) err "fzf error occurred" ;;
-      130) info "Cancelled" ;;
-      *) err "Unknown error" ;;
+    local exit_code=$?
+    case $exit_code in
+      1) warn "No matches found or search cancelled" ;;
+      2) err "fzf error occurred - check fzf installation" ;;
+      130) info "Operation cancelled by user" ;;
+      *) err "Unknown error (exit code: $exit_code)" ;;
     esac
+    return $exit_code
   }
 }
 
