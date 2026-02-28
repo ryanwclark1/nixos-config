@@ -52,9 +52,11 @@
         # AMD Vulkan drivers
         # amdvlk
         # driversi686Linux.amdvlk
-        # ROCm packages for compute
+        # ROCm packages for compute acceleration
         rocmPackages.clr
         rocmPackages.clr.icd
+        rocmPackages.rocminfo # For ROCm device detection
+        rocmPackages.rocm-smi # For monitoring and verification
         # Video acceleration
         libva
         libvdpau-va-gl
@@ -85,6 +87,14 @@
     VK_ICD_FILENAMES = "/run/opengl-driver/share/vulkan/icd.d/radeon_icd.x86_64.json";
     # Mesa configuration for better compatibility
     MESA_LOADER_DRIVER_OVERRIDE = "radeonsi";
+    # ROCm environment variables for compute acceleration
+    # Ensure ROCm is detected and used instead of CUDA
+    # HSA_OVERRIDE_GFX_VERSION may be needed for some GPUs - uncomment and adjust if ROCm isn't detected
+    # Common values: "10.3.0" (RDNA/RDNA2), "11.0.0" (RDNA3), "9.0.0" (Vega)
+    # Check your GPU architecture with: rocminfo | grep -i "marketing"
+    # ROCM_PATH = "${pkgs.rocmPackages.clr}";
+    # Disable CUDA to prevent fallback to CUDA (which causes the max_blocks_per_sm error)
+    CUDA_VISIBLE_DEVICES = "";
   };
 
   # Desktop-specific packages
@@ -92,7 +102,13 @@
     amdgpu_top
     radeontop
     rocmPackages.rocm-smi
+    rocmPackages.rocminfo # For verifying ROCm installation
     corectrl
     gamemode
   ];
+
+  # Ensure render group has access to GPU devices for ROCm
+  # This is critical for Ollama (running via home-manager as administrator) to access the GPU
+  # The render group provides access to /dev/dri/renderD* devices needed for compute
+  users.groups.render.members = [ "administrator" ];
 }

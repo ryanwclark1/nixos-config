@@ -5,7 +5,7 @@
 
 # Git Operations - Read-only commands (safe)
 prefix_rule(
-    pattern = ["git", ["status", "diff", "log", "show", "branch", "tag", "remote"]],
+    pattern = ["git", ["status", "diff", "log", "show", "branch", "tag", "remote", "blame", "grep", "describe"]],
     decision = "allow",
     justification = "Read-only git commands are safe",
     match = [
@@ -15,19 +15,81 @@ prefix_rule(
         "git show HEAD",
         "git branch -a",
         "git remote -v",
+        "git blame file.txt",
+        "git grep pattern",
     ],
 )
 
 # Git Operations - Network operations (require approval)
 prefix_rule(
-    pattern = ["git", ["push", "pull", "fetch", "clone"]],
+    pattern = ["git", ["pull", "fetch", "clone"]],
     decision = "prompt",
-    justification = "Network operations require approval to prevent accidental pushes",
+    justification = "Network operations require approval",
     match = [
-        "git push origin main",
         "git pull origin main",
         "git fetch --all",
         "git clone https://github.com/user/repo.git",
+    ],
+)
+
+# Git Operations - Force push (blocked)
+prefix_rule(
+    pattern = ["git", "push", "--force"],
+    decision = "forbidden",
+    justification = "Force push is destructive and can overwrite remote history. Never allow force push.",
+    match = [
+        "git push --force",
+        "git push --force origin main",
+        "git push -f",
+        "git push origin main --force",
+    ],
+)
+
+# Git Operations - Regular push (require approval)
+prefix_rule(
+    pattern = ["git", "push"],
+    decision = "prompt",
+    justification = "Pushing commits requires approval to prevent accidental pushes",
+    match = [
+        "git push origin main",
+        "git push",
+    ],
+)
+
+# Git Operations - Write operations (require approval)
+prefix_rule(
+    pattern = ["git", ["add", "commit", "stash", "merge", "tag"]],
+    decision = "prompt",
+    justification = "Git write operations require approval",
+    match = [
+        "git add file.txt",
+        "git commit -m 'message'",
+        "git stash",
+        "git merge branch",
+        "git tag v1.0",
+    ],
+)
+
+# Git Operations - Highly destructive operations (blocked)
+prefix_rule(
+    pattern = ["git", "reset", "--hard"],
+    decision = "forbidden",
+    justification = "Hard reset is destructive and permanently loses uncommitted changes. Never allow hard reset.",
+    match = [
+        "git reset --hard HEAD~1",
+        "git reset --hard origin/main",
+        "git reset --hard",
+    ],
+)
+
+# Git Operations - Clean untracked files (blocked)
+prefix_rule(
+    pattern = ["git", "clean", "-fd"],
+    decision = "forbidden",
+    justification = "git clean -fd permanently removes untracked files. Too dangerous to allow.",
+    match = [
+        "git clean -fd",
+        "git clean -f -d",
     ],
 )
 
@@ -37,7 +99,8 @@ prefix_rule(
     decision = "prompt",
     justification = "History-modifying operations require approval",
     match = [
-        "git reset --hard HEAD~1",
+        "git reset --soft HEAD~1",
+        "git reset --mixed HEAD~1",
         "git rebase main",
         "git cherry-pick abc123",
         "git revert HEAD",
@@ -77,9 +140,32 @@ prefix_rule(
     match = [
         "rm -rf /tmp/test",
         "rm -rf node_modules",
+        "rm -rf /",
     ],
     not_match = [
         "rm -f file.txt",  # Single file removal is different
+    ],
+)
+
+# File system operations - Dangerous patterns (blocked)
+prefix_rule(
+    pattern = ["chmod", "777"],
+    decision = "forbidden",
+    justification = "Overly permissive file permissions are a security risk",
+    match = [
+        "chmod 777 file",
+        "chmod -R 777 directory",
+    ],
+)
+
+# File system operations - Format operations (blocked)
+prefix_rule(
+    pattern = ["mkfs", "format", "dd", "of="],
+    decision = "forbidden",
+    justification = "Disk formatting operations are destructive and must be done manually",
+    match = [
+        "mkfs.ext4 /dev/sda1",
+        "dd if=/dev/zero of=/dev/sda",
     ],
 )
 
@@ -109,7 +195,7 @@ prefix_rule(
 
 # Docker operations - Write operations (require approval)
 prefix_rule(
-    pattern = ["docker", ["run", "build", "push", "pull", "rm", "stop", "start"]],
+    pattern = ["docker", ["run", "build", "push", "pull", "rm", "stop", "start", "compose"]],
     decision = "prompt",
     justification = "Docker operations that modify state require approval",
     match = [
@@ -117,6 +203,55 @@ prefix_rule(
         "docker build -t tag .",
         "docker push image",
         "docker rm container",
+        "docker compose up",
+    ],
+)
+
+# Kubernetes operations - Read operations (safe)
+prefix_rule(
+    pattern = ["kubectl", ["get", "describe", "logs", "top", "version"]],
+    decision = "allow",
+    justification = "Read-only Kubernetes operations are safe",
+    match = [
+        "kubectl get pods",
+        "kubectl describe pod name",
+        "kubectl logs pod",
+    ],
+)
+
+# Kubernetes operations - Write operations (require approval)
+prefix_rule(
+    pattern = ["kubectl", ["apply", "delete", "create", "patch", "scale"]],
+    decision = "prompt",
+    justification = "Kubernetes write operations require approval",
+    match = [
+        "kubectl apply -f file.yaml",
+        "kubectl delete pod name",
+        "kubectl create deployment",
+    ],
+)
+
+# Terraform operations (require approval)
+prefix_rule(
+    pattern = ["terraform", ["apply", "destroy", "plan"]],
+    decision = "prompt",
+    justification = "Infrastructure changes require approval",
+    match = [
+        "terraform apply",
+        "terraform destroy",
+        "terraform plan",
+    ],
+)
+
+# SOPS operations (require approval)
+prefix_rule(
+    pattern = ["sops"],
+    decision = "prompt",
+    justification = "Secret management operations require approval",
+    match = [
+        "sops -e file.yaml",
+        "sops -d file.encrypted",
+        "sops updatekeys file.yaml",
     ],
 )
 
@@ -162,6 +297,30 @@ prefix_rule(
     ],
 )
 
+# Cargo operations (require approval)
+prefix_rule(
+    pattern = ["cargo", ["install", "update", "publish"]],
+    decision = "prompt",
+    justification = "Rust package operations require approval",
+    match = [
+        "cargo install tool",
+        "cargo update",
+        "cargo publish",
+    ],
+)
+
+# Go operations (require approval)
+prefix_rule(
+    pattern = ["go", ["install", "get", "mod"]],
+    decision = "prompt",
+    justification = "Go package operations require approval",
+    match = [
+        "go install package@latest",
+        "go get package",
+        "go mod tidy",
+    ],
+)
+
 # Nix operations - Read operations (safe)
 prefix_rule(
     pattern = ["nix", ["eval", "search", "show", "path-info"]],
@@ -186,6 +345,30 @@ prefix_rule(
     ],
 )
 
+# Nix Flake operations (require approval)
+prefix_rule(
+    pattern = ["nix", "flake"],
+    decision = "prompt",
+    justification = "Flake operations modify the development environment",
+    match = [
+        "nix flake update",
+        "nix flake lock",
+        "nix flake check",
+    ],
+)
+
+# Home Manager operations (blocked)
+prefix_rule(
+    pattern = ["home-manager"],
+    decision = "prompt",
+    justification = "Home Manager rebuilds must be done manually with explicit approval",
+    match = [
+        "home-manager switch",
+        "home-manager switch --flake",
+        "home-manager build",
+    ],
+)
+
 # NixOS system operations (blocked)
 prefix_rule(
     pattern = ["nixos-rebuild"],
@@ -194,6 +377,18 @@ prefix_rule(
     match = [
         "nixos-rebuild switch",
         "nixos-rebuild boot",
+        "nixos-rebuild test",
+    ],
+)
+
+# Nix store operations (require approval)
+prefix_rule(
+    pattern = ["nix", ["store", "gc", "optimise"]],
+    decision = "prompt",
+    justification = "Store operations can free disk space but require approval",
+    match = [
+        "nix store gc",
+        "nix store optimise",
     ],
 )
 
