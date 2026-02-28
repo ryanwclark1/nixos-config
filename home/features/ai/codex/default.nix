@@ -11,9 +11,13 @@ let
   configDir = ./config;
 in
 {
+  # Install the codex package
+  home.packages = with pkgs; [
+    codex
+  ];
+
   # Keep Codex configuration managed here without forcing codex package builds
   # during Home Manager activation.
-
 
   # Create config.toml template - will be processed by systemd service
   # The actual config.toml with secrets will be generated at runtime
@@ -250,17 +254,8 @@ in
     source = "${configDir}/prompts/test.md";
   };
 
-  # Create .env file with secrets from SOPS
-  # This file is generated at runtime by the systemd service
-  home.file."${codexHome}/.env" = {
-    force = true;
-    text = ''
-      # MCP Server Environment Variables
-      # This file is generated at runtime by the generate-codex-env service
-      CONTEXT7_TOKEN=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets.context7-token.path})
-      GITHUB_PERSONAL_ACCESS_TOKEN=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets.github-pat.path})
-    '';
-  };
+  # Note: .env file is generated at runtime by the generate-codex-env systemd service
+  # No static file definition needed - the service creates it with actual SOPS secret values
 
   # Create a systemd user service to generate .env file after SOPS secrets are available
   systemd.user.services.generate-codex-env = {
