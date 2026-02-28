@@ -18,7 +18,7 @@
     ./hardware-configuration.nix
     ./services
     ./performance.nix
-    ./monitoring
+    # ./monitoring
 
     # Common configurations
     ../common/global
