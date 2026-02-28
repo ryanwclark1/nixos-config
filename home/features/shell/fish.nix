@@ -340,6 +340,10 @@ in
       end
 
       # Initialize tools
+      if command -v atuin >/dev/null
+        atuin init fish | source
+      end
+
       if command -v starship >/dev/null
         starship init fish | source
       end

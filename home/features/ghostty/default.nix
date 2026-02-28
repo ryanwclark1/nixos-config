@@ -70,6 +70,8 @@ in
       # Behavior
       copy-on-select = true;
       auto-update = "off";
+      # Slow down mouse scrolling for finer control
+      mouse-scroll-multiplier = 0.95;
 
       # Keybindings
       keybind = [
@@ -79,6 +81,8 @@ in
     };
     themes = {
       theme = {
+        # Background is commented out to allow transparency/blur effects
+        # Uncomment if you want a solid background:
         # background = "${base00}";
         foreground = "${base05}";
         cursor-color = "${base06}";
