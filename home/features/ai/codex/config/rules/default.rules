@@ -180,6 +180,176 @@ prefix_rule(
     ],
 )
 
+# bd - Directory navigation (safe)
+prefix_rule(
+    pattern = ["bd"],
+    decision = "allow",
+    justification = "bd is a read-only directory navigation tool that safely navigates to parent directories",
+    match = [
+        "bd src",
+        "bd config",
+        "bd home",
+        "bd project",
+    ],
+)
+
+# Read-only file operations (safe)
+prefix_rule(
+    pattern = ["ls", "cat", "head", "tail", "grep", "file", "stat", "tree", "pwd", "which", "type"],
+    decision = "allow",
+    justification = "Read-only file inspection commands are safe",
+    match = [
+        "ls -la",
+        "cat file.txt",
+        "head -n 20 file.txt",
+        "tail -f log.txt",
+        "grep pattern file",
+        "file document.pdf",
+        "stat file.txt",
+        "tree -L 3",
+        "pwd",
+        "which command",
+        "type command",
+    ],
+)
+
+# Modern CLI replacements - Read operations (safe)
+prefix_rule(
+    pattern = ["rg", "fd", "bat", "eza", "procs", "dust", "duf", "delta"],
+    decision = "allow",
+    justification = "Modern read-only CLI tool replacements are safe",
+    match = [
+        "rg pattern",
+        "fd filename",
+        "bat file.txt",
+        "eza -la",
+        "procs",
+        "dust",
+        "duf",
+        "git diff | delta",
+    ],
+)
+
+# Directory navigation tools (safe)
+prefix_rule(
+    pattern = ["zoxide", "cd"],
+    decision = "allow",
+    justification = "Directory navigation tools are read-only and safe",
+    match = [
+        "zoxide query project",
+        "z project",
+        "cd /path/to/dir",
+    ],
+)
+
+# System information commands (safe)
+prefix_rule(
+    pattern = ["uname", "whoami", "date", "uptime", "env", "echo"],
+    decision = "allow",
+    justification = "System information commands are read-only and safe",
+    match = [
+        "uname -a",
+        "whoami",
+        "date",
+        "uptime",
+        "env",
+        "echo $VAR",
+    ],
+)
+
+# Text processing - Read operations (safe)
+prefix_rule(
+    pattern = ["jq"],
+    decision = "allow",
+    justification = "JSON processing read operations are safe",
+    match = [
+        "jq . file.json",
+        "jq '.key' file.json",
+    ],
+)
+
+prefix_rule(
+    pattern = ["awk"],
+    decision = "allow",
+    justification = "AWK read operations are safe",
+    match = [
+        "awk '{print $1}' file.txt",
+        "awk '/pattern/ {print}' file.txt",
+    ],
+)
+
+# sed - Read operations (safe), write operations require approval
+prefix_rule(
+    pattern = ["sed", "-n"],
+    decision = "allow",
+    justification = "sed read operations (with -n flag) are safe",
+    match = [
+        "sed -n '1,10p' file.txt",
+        "sed -n '/pattern/p' file.txt",
+    ],
+)
+
+prefix_rule(
+    pattern = ["sed", "-i"],
+    decision = "prompt",
+    justification = "sed in-place editing modifies files and requires approval",
+    match = [
+        "sed -i 's/old/new/g' file.txt",
+        "sed -i.bak 's/old/new/' file.txt",
+    ],
+)
+
+# Make - Build operations (require approval)
+prefix_rule(
+    pattern = ["make"],
+    decision = "prompt",
+    justification = "Build operations require approval",
+    match = [
+        "make",
+        "make build",
+        "make install",
+        "make clean",
+    ],
+)
+
+# Additional package managers (require approval)
+prefix_rule(
+    pattern = ["yarn", "pnpm", "bun"],
+    decision = "prompt",
+    justification = "Package installation/modification requires approval",
+    match = [
+        "yarn install",
+        "yarn add package",
+        "pnpm install",
+        "pnpm add package",
+        "bun install",
+        "bun add package",
+    ],
+)
+
+# Process management - Dangerous operations (blocked)
+prefix_rule(
+    pattern = ["kill", "-9"],
+    decision = "forbidden",
+    justification = "Process termination is dangerous and must be done manually",
+    match = [
+        "kill -9 1234",
+        "killall -9 process",
+    ],
+)
+
+# Helm - Kubernetes package manager (require approval)
+prefix_rule(
+    pattern = ["helm"],
+    decision = "prompt",
+    justification = "Kubernetes package operations require approval",
+    match = [
+        "helm install release chart",
+        "helm upgrade release chart",
+        "helm uninstall release",
+    ],
+)
+
 # Docker operations - Read operations (safe)
 prefix_rule(
     pattern = ["docker", ["ps", "images", "logs", "inspect", "exec"]],
@@ -255,14 +425,16 @@ prefix_rule(
     ],
 )
 
-# Network operations - Curl/wget (require approval for non-local)
+# Network operations - Curl (allowed)
 prefix_rule(
     pattern = ["curl"],
-    decision = "prompt",
-    justification = "Network requests require approval to prevent data exfiltration",
+    decision = "allow",
+    justification = "curl is a common development tool for API testing and data fetching",
     match = [
         "curl https://api.example.com/data",
         "curl -X POST https://api.example.com/endpoint",
+        "curl -O https://example.com/file",
+        "curl -L https://example.com/redirect",
     ],
 )
 
@@ -330,6 +502,20 @@ prefix_rule(
         "nix eval nixpkgs#hello",
         "nix search nixpkgs python",
         "nix show-derivation path",
+    ],
+)
+
+# nix-shell - Development environment (safe)
+prefix_rule(
+    pattern = ["nix-shell"],
+    decision = "allow",
+    justification = "nix-shell is a safe development environment tool that sets up a shell with dependencies",
+    match = [
+        "nix-shell",
+        "nix-shell default.nix",
+        "nix-shell shell.nix",
+        "nix-shell -p python3",
+        "nix-shell --run 'command'",
     ],
 )
 

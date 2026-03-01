@@ -48,7 +48,7 @@
       libva-vdpau-driver
     ];
 
-    extraPackages32 = [];
+    extraPackages32 = [ ];
   };
 
   # IMPORTANT:
