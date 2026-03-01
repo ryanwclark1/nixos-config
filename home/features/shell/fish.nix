@@ -6,30 +6,32 @@
 }:
 let
   # Catppuccin Frappe color palette
-  base00 = "303446"; # base
-  base01 = "292c3c"; # mantle
-  base02 = "414559"; # surface0
-  base03 = "51576d"; # surface1
-  base04 = "626880"; # surface2
-  base05 = "c6d0f5"; # text
-  base06 = "f2d5cf"; # rosewater
-  base07 = "babbf1"; # lavender
-  base08 = "e78284"; # red
-  base09 = "ef9f76"; # peach
-  base0A = "e5c890"; # yellow
-  base0B = "a6d189"; # green
-  base0C = "81c8be"; # teal
-  base0D = "8caaee"; # blue
-  base0E = "ca9ee6"; # mauve
-  base0F = "eebebe"; # flamingo
-  base10 = "292c3c"; # mantle - darker background
-  base11 = "232634"; # crust - darkest background
-  base12 = "ea999c"; # maroon - bright red
-  base13 = "f2d5cf"; # rosewater - bright yellow
-  base14 = "a6d189"; # green - bright green
-  base15 = "99d1db"; # sky - bright cyan
-  base16 = "85c1dc"; # sapphire - bright blue
-  base17 = "f4b8e4"; # pink - bright purple
+  colors = {
+    base00 = "303446"; # base
+    base01 = "292c3c"; # mantle
+    base02 = "414559"; # surface0
+    base03 = "51576d"; # surface1
+    base04 = "626880"; # surface2
+    base05 = "c6d0f5"; # text
+    base06 = "f2d5cf"; # rosewater
+    base07 = "babbf1"; # lavender
+    base08 = "e78284"; # red
+    base09 = "ef9f76"; # peach
+    base0A = "e5c890"; # yellow
+    base0B = "a6d189"; # green
+    base0C = "81c8be"; # teal
+    base0D = "8caaee"; # blue
+    base0E = "ca9ee6"; # mauve
+    base0F = "eebebe"; # flamingo
+    base10 = "292c3c"; # mantle - darker background
+    base11 = "232634"; # crust - darkest background
+    base12 = "ea999c"; # maroon - bright red
+    base13 = "f2d5cf"; # rosewater - bright yellow
+    base14 = "a6d189"; # green - bright green
+    base15 = "99d1db"; # sky - bright cyan
+    base16 = "85c1dc"; # sapphire - bright blue
+    base17 = "f4b8e4"; # pink - bright purple
+  };
 in
 
 {
@@ -38,46 +40,46 @@ in
     text = ''
       # name: 'Catppuccin Frappe Enhanced'
       # url: 'https://github.com/catppuccin/fish'
-      # preferred_background: ${base00}
+      # preferred_background: ${colors.base00}
 
       # Basic syntax highlighting
-      fish_color_normal ${base05}
-      fish_color_command ${base0D}
-      fish_color_param ${base0F}
-      fish_color_keyword ${base08}
-      fish_color_quote ${base0B}
-      fish_color_redirection ${base17}
-      fish_color_end ${base09}
+      fish_color_normal ${colors.base05}
+      fish_color_command ${colors.base0D}
+      fish_color_param ${colors.base0F}
+      fish_color_keyword ${colors.base08}
+      fish_color_quote ${colors.base0B}
+      fish_color_redirection ${colors.base17}
+      fish_color_end ${colors.base09}
       fish_color_comment 838ba7
-      fish_color_error ${base08}
+      fish_color_error ${colors.base08}
       fish_color_gray 737994
 
       # Selection and search
-      fish_color_selection --background=${base02}
-      fish_color_search_match --background=${base02}
+      fish_color_selection --background=${colors.base02}
+      fish_color_search_match --background=${colors.base02}
 
       # Advanced syntax
-      fish_color_option ${base0B}
-      fish_color_operator ${base17}
-      fish_color_escape ${base12}
+      fish_color_option ${colors.base0B}
+      fish_color_operator ${colors.base17}
+      fish_color_escape ${colors.base12}
       fish_color_autosuggestion 737994
-      fish_color_cancel ${base08}
+      fish_color_cancel ${colors.base08}
 
       # Prompt colors
-      fish_color_cwd ${base0A}
-      fish_color_user ${base0C}
-      fish_color_host ${base0D}
-      fish_color_host_remote ${base0B}
-      fish_color_status ${base08}
+      fish_color_cwd ${colors.base0A}
+      fish_color_user ${colors.base0C}
+      fish_color_host ${colors.base0D}
+      fish_color_host_remote ${colors.base0B}
+      fish_color_status ${colors.base08}
 
       # Pager colors
       fish_pager_color_progress 737994
-      fish_pager_color_prefix ${base17}
-      fish_pager_color_completion ${base05}
+      fish_pager_color_prefix ${colors.base17}
+      fish_pager_color_completion ${colors.base05}
       fish_pager_color_description 737994
-      fish_pager_color_selected_background --background=${base02}
-      fish_pager_color_selected_prefix ${base17}
-      fish_pager_color_selected_completion ${base05}
+      fish_pager_color_selected_background --background=${colors.base02}
+      fish_pager_color_selected_prefix ${colors.base17}
+      fish_pager_color_selected_completion ${colors.base05}
       fish_pager_color_selected_description 737994
     '';
   };
@@ -88,17 +90,16 @@ in
     preferAbbrs = true;
     generateCompletions = true;
 
-    # Fish-specific shell aliases
+    # Fish-specific shell aliases (common aliases are in common.nix)
     shellAliases = {
       clear = "printf '\\033[2J\\033[3J\\033[1;1H'";
       reload = "exec fish";
       fishconfig = "$EDITOR ~/.config/fish/config.fish";
       fishfunc = "$EDITOR ~/.config/fish/functions/";
       history = "history | head -20";
-
     };
 
-    # Shell abbreviations
+    # Shell abbreviations (fish-specific feature)
     shellAbbrs = {
       # Git commands
       gcmsg = "git commit -m";
@@ -113,22 +114,6 @@ in
       gcm = "git checkout main";
       gpu = "git pull";
       gp = "git push";
-
-      # Docker shortcuts
-      dps = "docker ps";
-      dpsa = "docker ps -a";
-      dimg = "docker images";
-      drm = "docker rm";
-      drmi = "docker rmi";
-      dexec = "docker exec -it";
-
-      # Kubernetes shortcuts
-      k = "kubectl";
-      kx = "kubectx";
-      kns = "kubens";
-      kgp = "kubectl get pods";
-      kgs = "kubectl get services";
-      kgd = "kubectl get deployments";
     };
 
     # Plugins
@@ -155,7 +140,7 @@ in
       }
     ];
 
-    # Functions
+    # Fish-specific functions (common functions are in common.nix)
     functions = {
       # Wrapper for cd to handle paths starting with '-'
       cd = ''
@@ -173,117 +158,8 @@ in
         mkdir -p $argv[1] && cd $argv[1]
       '';
 
-      up = ''
-        for i in (seq 1 $argv[1])
-          cd ..
-        end
-      '';
-
       gclone = ''
         git clone $argv[1] && cd (basename $argv[1] .git)
-      '';
-
-      extract = ''
-        if test -f $argv[1]
-          switch $argv[1]
-            case "*.tar.bz2"
-              tar xjf $argv[1]
-            case "*.tar.gz"
-              tar xzf $argv[1]
-            case "*.bz2"
-              bunzip2 $argv[1]
-            case "*.rar"
-              unrar e $argv[1]
-            case "*.gz"
-              gunzip $argv[1]
-            case "*.tar"
-              tar xf $argv[1]
-            case "*.tbz2"
-              tar xjf $argv[1]
-            case "*.tgz"
-              tar xzf $argv[1]
-            case "*.zip"
-              unzip $argv[1]
-            case "*.Z"
-              uncompress $argv[1]
-            case "*.7z"
-              7z x $argv[1]
-            case '*'
-              echo "'$argv[1]' cannot be extracted"
-          end
-        else
-          echo "'$argv[1]' is not a valid file"
-        end
-      '';
-
-      docker-exec = ''
-        set -l container $argv[1]
-        set -e argv[1]
-        if test -t 0 && test -t 1
-          docker exec -it $container $argv
-        else
-          docker exec $container $argv
-        end
-      '';
-
-      docker-bash = ''
-        set -l container $argv[1]
-        set -e argv[1]
-        if test -t 0 && test -t 1
-          docker exec -it $container bash $argv
-        else
-          docker exec $container bash $argv
-        end
-      '';
-
-      docker-sh = ''
-        set -l container $argv[1]
-        set -e argv[1]
-        if test -t 0 && test -t 1
-          docker exec -it $container sh $argv
-        else
-          docker exec $container sh $argv
-        end
-      '';
-
-      backup = ''
-        cp -r $argv[1] "$argv[1].bak."(date +%Y%m%d_%H%M%S)
-      '';
-
-      weather = ''
-        curl -s "wttr.in/$argv[1]"
-      '';
-
-      cheat = ''
-        curl -s "cheat.sh/$argv[1]"
-      '';
-
-      find = ''
-        fd $argv
-      '';
-
-      grep = ''
-        rg $argv
-      '';
-
-      ps = ''
-        procs $argv
-      '';
-
-      du = ''
-        dust $argv
-      '';
-
-      df = ''
-        duf $argv
-      '';
-
-      ports = ''
-        ss -tulanp
-      '';
-
-      jqless = ''
-        jq -C | bat --pager 'less RF' --style=numbers --color=always
       '';
 
       mkdir = ''
@@ -324,19 +200,6 @@ in
           case visual
             echo -n "(V) "
         end
-      end
-
-      # Custom prompt (overridden by starship if available)
-      function fish_prompt
-        set -l git_branch (git branch --show-current 2>/dev/null)
-        set -l git_status (git status --porcelain 2>/dev/null)
-
-        if test -n "$git_branch"
-          set -l git_color (test -n "$git_status" && echo "red" || echo "green")
-          echo -n (set_color $git_color)"[$git_branch]"
-        end
-
-        echo -n (set_color blue)(prompt_pwd)(set_color normal)" > "
       end
 
       # Initialize tools
