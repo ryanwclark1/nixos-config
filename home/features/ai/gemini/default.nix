@@ -193,7 +193,6 @@ in
     source = ./config/commands/sg/troubleshoot.toml;
   };
 
-
   # Manually manage settings.json to avoid backup conflicts
   # Using home.file instead of programs.gemini-cli to have full control
   home.file."${geminiHome}/settings.json" = {
