@@ -392,6 +392,27 @@ discovery.relabel "filtered_docker_containers" {
     source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
   }
 
+  // Drop RabbitMQ AMQP port (5672) — binary protocol rejects HTTP scrapes
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service", "__meta_docker_port_private"]
+    regex         = "rabbitmq;(4369|5671|5672|25672)"
+    action        = "drop"
+  }
+
+  // Drop RabbitMQ management ports — metrics are served on 15692, not 15672
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service", "__meta_docker_port_private"]
+    regex         = "rabbitmq;(15671|15672|15691)"
+    action        = "drop"
+  }
+
+  // Drop PostgreSQL port — binary protocol, not HTTP
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service", "__meta_docker_port_private"]
+    regex         = "postgres;5432"
+    action        = "drop"
+  }
+
   rule {
     source_labels = ["__meta_docker_container_name"]
     target_label = "container_name"

@@ -42,6 +42,9 @@
   ripgrep,
   asar,
   bash,
+  # Playwright browsers for browser automation support
+  # This ensures browsers are available in the FHS environment
+  playwright-browsers ? null,
 }:
 
 let
@@ -79,17 +82,28 @@ in
 
   sourceRoot = if hostPlatform.isDarwin then "Antigravity.app" else "Antigravity";
 
-  # When running inside an FHS environment, try linking Google Chrome or Chromium
-  # to the hardcoded Playwright search path: /opt/google/chrome/chrome
+  # When running inside an FHS environment, ensure browsers are available for Playwright
+  # This coordinates with home-manager playwright settings (PLAYWRIGHT_BROWSERS_PATH)
+  # by making playwright.browsers available in the FHS environment PATH
   customizeFHSEnv =
     args:
     buildFHSEnv (
       args
       // {
+        # Add playwright.browsers to targetPkgs so browsers are available in FHS PATH
+        # This ensures Playwright can find browsers even if PLAYWRIGHT_BROWSERS_PATH
+        # isn't passed through the FHS environment
+        targetPkgs = pkgs:
+          (args.targetPkgs pkgs)
+          ++ lib.optional (playwright-browsers != null) playwright-browsers;
+        # Create /opt/google/chrome directory for symlink fallback
         extraBuildCommands = (args.extraBuildCommands or "") + ''
           mkdir -p "$out/opt/google/chrome"
         '';
+        # Use tmpfs for /opt/google/chrome so symlinks work
         extraBwrapArgs = (args.extraBwrapArgs or [ ]) ++ [ "--tmpfs /opt/google/chrome" ];
+        # Wrapper script that tries to find browsers in PATH and symlink to Playwright's expected location
+        # This works with both system browsers and playwright.browsers (if added to targetPkgs)
         runScript = writeShellScript "antigravity-wrapper" ''
           for candidate in google-chrome-stable google-chrome chromium-browser chromium; do
             if target=$(command -v "$candidate"); then

@@ -48,6 +48,7 @@
     ./features/neovim
     ./features/networking-utils
     ./features/not-found
+    ./features/playwright
     ./features/productivity
     ./features/qutebrowser
     ./features/readline
