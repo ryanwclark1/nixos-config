@@ -37,16 +37,31 @@ fi
 
 echo "Updating to version $latestVersion..."
 
-# Prefetch GitHub source (using tarball URL)
+# Prefetch GitHub source using nix-prefetch-github (matches fetchFromGitHub behavior)
 echo "Prefetching GitHub source..."
-GITHUB_TARBALL_URL="https://github.com/google-gemini/gemini-cli/archive/refs/tags/v${latestVersion}.tar.gz"
-echo "  URL: $GITHUB_TARBALL_URL"
+echo "  Owner: google-gemini"
+echo "  Repo: gemini-cli"
+echo "  Tag: v${latestVersion}"
 
-SOURCE_PATH=$(nix-prefetch-url "$GITHUB_TARBALL_URL" --name "gemini-cli-${latestVersion}.tar.gz" 2>&1 | tail -1)
-SOURCE_HASH=$(nix-hash --to-sri --type sha256 "$SOURCE_PATH")
+# Use nix-prefetch-github with JSON output for reliable parsing
+# This matches fetchFromGitHub's hash calculation exactly
+PREFETCH_JSON=$(nix-prefetch-github google-gemini gemini-cli --tag "v${latestVersion}" --json 2>/dev/null)
+PREFETCH_EXIT=$?
 
-if [[ -z "$SOURCE_HASH" ]]; then
-  echo "Error: Failed to get source hash" >&2
+if [[ $PREFETCH_EXIT -ne 0 ]]; then
+  echo "Error: Failed to prefetch GitHub source (exit code: $PREFETCH_EXIT)" >&2
+  # Try again without suppressing stderr to show the actual error
+  nix-prefetch-github google-gemini gemini-cli --tag "v${latestVersion}" --json >&2
+  exit 1
+fi
+
+# Extract hash from JSON output
+SOURCE_HASH=$(echo "$PREFETCH_JSON" | jq -r '.hash' 2>/dev/null)
+
+if [[ -z "$SOURCE_HASH" ]] || [[ "$SOURCE_HASH" == "null" ]]; then
+  echo "Error: Failed to extract hash from nix-prefetch-github JSON output" >&2
+  echo "Output was:" >&2
+  echo "$PREFETCH_JSON" >&2
   exit 1
 fi
 
@@ -61,8 +76,18 @@ sed -i "s/version = \"$currentVersion\"/version = \"$latestVersion\"/" "$package
 # Update source hash
 sed -i "s|hash = \"sha256-[^\"]*\"|hash = \"$SOURCE_HASH\"|" "$packageFile"
 
-# Update rev (fetchFromGitHub uses rev, not tag)
-sed -i "s|rev = \"v\${finalAttrs.version}\"|rev = \"v${latestVersion}\"|" "$packageFile"
+# Update tag/rev in fetchFromGitHub
+# Check if using tag format (preferred) or rev format
+if grep -q "tag = \"v\${finalAttrs.version}\"" "$packageFile"; then
+  # Using tag format - no need to update, it uses the version variable
+  echo "  Using tag format (auto-updates with version)"
+elif grep -q "tag = \"v" "$packageFile"; then
+  # Using hardcoded tag - update it
+  sed -i "s|tag = \"v[^\"]*\"|tag = \"v${latestVersion}\"|" "$packageFile"
+elif grep -q "rev = \"v" "$packageFile"; then
+  # Using rev format - update it
+  sed -i "s|rev = \"v[^\"]*\"|rev = \"v${latestVersion}\"|" "$packageFile"
+fi
 
 echo "✅ Updated version and source hash"
 echo ""

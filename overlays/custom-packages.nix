@@ -36,13 +36,23 @@ final: prev: {
 
   # Override antigravity with our custom version
   # Same workaround as code-cursor: exclude meta from auto-filling
+  # Add playwright.browsers to FHS environment for browser automation support
   antigravity =
     let
       pkgsWithoutMeta = builtins.removeAttrs final [ "meta" ];
       callPackageWithoutMeta = final.lib.callPackageWith pkgsWithoutMeta;
+      # Safely get playwright.browsers if available
+      playwrightBrowsers =
+        if final ? playwright && final.playwright ? browsers
+        then final.playwright.browsers
+        else null;
     in
     callPackageWithoutMeta (import ../pkgs/antigravity) {
       callPackage = callPackageWithoutMeta;
+      # Add playwright.browsers to FHS environment so browsers are available for Playwright
+      # This coordinates with home-manager playwright settings
+      # Falls back to null if playwright.browsers is not available
+      playwright-browsers = playwrightBrowsers;
     };
 
   # Override kiro with our custom version
