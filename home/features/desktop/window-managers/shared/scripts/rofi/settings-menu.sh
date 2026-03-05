@@ -70,7 +70,7 @@ case "$choice" in
         ;;
     "$SYSTEM_ICON  System Information")
         # Show system information in terminal
-        kitty -e sh -c 'neofetch && echo "Press any key to exit..." && read -n 1' &
+        kitty -e sh -c 'fastfetch && echo "Press any key to exit..." && read -n 1' &
         ;;
     "$POWER_ICON  Power Management")
         # Try different power management tools
