@@ -143,7 +143,7 @@
     onefetch
 
     # System info
-    neofetch
+    fastfetch
 
     # File management
     fzf
