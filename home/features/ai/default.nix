@@ -54,27 +54,15 @@ let
 in
 {
   imports = [
-    ./aichat
     ./claude
-    ./crush
-    ./gemini
-    ./goose
-    ./qwen
     ./codex
+    ./gemini
     ./opencode
-    # ./ollama  # Only imported in woody.nix - not available on other hosts
   ];
   home.packages = with pkgs; [
-    # mlflow-server  # Temporarily disabled due to missing fastapi/uvicorn dependencies
-    playwright-mcp
-    # Playwright browsers - provides bundled Chromium, Firefox, and WebKit
-    # This is the most reliable way to ensure Playwright works in NixOS
+    playwright
     playwright.browsers
-    github-mcp-server
     amp-cli
-    # aider-chat-full  # Temporarily disabled due to mercantile package build failure
-
-    # Docker for running MCP servers
     docker
     docker-compose
 

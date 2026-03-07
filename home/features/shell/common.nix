@@ -124,35 +124,16 @@
 
   # Common packages for shell utilities
   home.packages = with pkgs; [
-    # Modern CLI replacements
-    ripgrep
+
     fd
     eza
     bat
     procs
-    btop
-    dust
-    duf
     delta
     hyperfine
     bottom
 
-    # Git tools
-    gitui
     lazygit
-    onefetch
-
-    # System info
-    fastfetch
-
-    # File management
-    fzf
-    zoxide
-    direnv
-
-    # Archive tools
-    unzip
-    p7zip
 
     # Network tools
     curl
@@ -193,74 +174,38 @@
         fi
       }
 
-      # Docker helper functions for non-interactive environments
-      docker-exec() {
-        local container="$1"
-        shift
-        if [ -t 0 ] && [ -t 1 ]; then
-          docker exec -it "$container" "$@"
-        else
-          docker exec "$container" "$@"
-        fi
-      }
-
-      docker-bash() {
-        local container="$1"
-        shift
-        if [ -t 0 ] && [ -t 1 ]; then
-          docker exec -it "$container" bash "$@"
-        else
-          docker exec "$container" bash "$@"
-        fi
-      }
-
-      docker-sh() {
-        local container="$1"
-        shift
-        if [ -t 0 ] && [ -t 1 ]; then
-          docker exec -it "$container" sh "$@"
-        else
-          docker exec "$container" sh "$@"
-        fi
-      }
-
-      # Quick backup function
-      backup() {
-        cp -r "$1" "$1.bak.$(date +%Y%m%d_%H%M%S)"
-      }
 
       # Weather function with better error handling
       weather() {
         local location="''${1:-}"
-        if command -v curl >/dev/null 2>&1; then
-          curl -s "wttr.in/$location" || echo "Failed to fetch weather data"
+
+        if ! command -v curl >/dev/null 2>&1; then
+          echo "Error: curl not available for weather lookup" >&2
+          return 1
+        fi
+
+        # Build URL - wttr.in handles spaces and special chars in location names
+        local url="wttr.in"
+        if [ -n "$location" ]; then
+          url="wttr.in/$location"
+        fi
+
+        # Fetch weather data with timeout and proper error handling
+        if curl -s --max-time 10 "$url"; then
+          return 0
         else
-          echo "curl not available for weather lookup"
+          local exit_code=$?
+          if [ $exit_code -eq 28 ]; then
+            echo "Error: Request timed out" >&2
+          elif [ $exit_code -eq 6 ]; then
+            echo "Error: Could not resolve host (check internet connection)" >&2
+          else
+            echo "Error: Failed to fetch weather data" >&2
+          fi
+          return $exit_code
         fi
       }
 
-      # Cheat sheet function with better error handling
-      cheat() {
-        local topic="''${1:-}"
-        if command -v curl >/dev/null 2>&1; then
-          curl -s "cheat.sh/$topic" || echo "Failed to fetch cheat sheet"
-        else
-          echo "curl not available for cheat sheet lookup"
-        fi
-      }
-
-      # Enhanced directory navigation
-      up() {
-        local levels="''${1:-1}"
-        for ((i=1; i<=levels; i++)); do
-          cd ..
-        done
-      }
-
-      # Quick file operations
-      mkdir-cd() {
-        mkdir -p "$1" && cd "$1"
-      }
 
       # Enhanced git functions
       git-branch-name() {

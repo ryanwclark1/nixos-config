@@ -15,10 +15,6 @@
       ];
     };
     settings = {
-      aliases = {
-        co = "pr checkout";
-        pv = "pr view";
-      };
       git_protocal = "https";
     };
     extensions = with pkgs; [
