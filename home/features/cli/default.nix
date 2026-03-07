@@ -20,11 +20,7 @@
     gum # shell scripts - cross-platform
     mprocs # multiple commands in parallel - cross-platform
     ncdu # TUI disk usage - cross-platform
-    so  # Stackoverflow search - cross-platform
-    tokei # code statistics - cross-platform
-    vhs # A tool for generating terminal GIFs with code - cross-platform
     viu # Terminal image viewer with native support for iTerm and Kitty - cross-platform
-    vultr-cli # vultr cli - cross-platform
     yq-go # jq for yaml, command-line YAML processor - cross-platform
   ] ++ (if pkgs.stdenv.hostPlatform.isLinux then [
     # Linux-specific CLI utilities

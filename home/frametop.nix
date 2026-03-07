@@ -13,7 +13,7 @@
     ./features/atuin
     ./features/audio
     ./features/bat
-    ./features/battery-monitor
+    ./features/battery/battery-monitor.nix
     ./features/bluetooth
     ./features/btop
     ./features/cava
