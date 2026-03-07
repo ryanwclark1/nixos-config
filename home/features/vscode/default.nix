@@ -196,8 +196,8 @@ in
 
   programs.vscode = {
     enable = true;
-    package = pkgs.vscode;
-    mutableExtensionsDir = false;
+    package = pkgs.vscode-fhs;
+    mutableExtensionsDir = true;
     profiles = {
       default = {
         enableExtensionUpdateCheck = lib.mkForce false;
@@ -263,16 +263,6 @@ in
           ])
           ++ (pkgs.vscode-utils.extensionsFromVscodeMarketplace marketplaceExtensions);
         userSettings = {
-          # NOTE: Many project-specific settings have been moved to workspace/folder settings.
-          # These include:
-          # - Language-specific formatters ([python], [typescript], etc.)
-          # - File associations and exclude patterns
-          # - Extension-specific settings (Python, Go, Ruff, Tailwind, YAML, etc.)
-          # - Editor tab size and rulers (project-specific)
-          #
-          # To configure these per-project, create .vscode/settings.json in your project root.
-          # Example: https://code.visualstudio.com/docs/getstarted/settings#_settings-file-locations
-
           "accessibility.dimUnfocused.enabled" = true;
           "breadcrumbs.enabled" = true;
           "diffEditor.codeLens" = true;
@@ -356,22 +346,6 @@ in
           "workbench.startupEditor" = "none"; # Skip welcome page for faster startup
           "workbench.editor.limit.enabled" = true; # Limit open editors for performance
           "workbench.editor.limit.value" = 20; # Max 20 open editors
-
-          # "remote.defaultExtensionsIfInstalledLocally" = [
-          #   "GitHub.copilot"
-          #   "GitHub.copilot-chat"
-          #   "GitHub.vscode-pull-request-github"
-          # ];
-
-          #############################
-          #    Extension Settings     #
-          #############################
-
-          ##### Autodoc Strings #####
-          # "autoDocstring.docstringFormat" = "google";
-          # "autoDocstring.generateDocstringOnEnter" = true;
-          # "autoDocstring.guessTypes" = true;
-          # "autoDocstring.startOnNewLine" = true;
 
           "emmet.showSuggestionsAsSnippets" = true;
           "emmet.includeLanguages" = {
@@ -528,42 +502,6 @@ in
           "git.confirmSync" = false;
           "git.enableSmartCommit" = true;
 
-          ##### Github #####
-          # "github.codespaces.defaultExtensions" = [
-          #   "GitHub.codespaces"
-          #   "GitHub.vscode-pull-request-github"
-          #   "Github.copilot-chat"
-          #   "Github.copilot"
-          # ];
-
-          ##### Kubernetes #####
-          # "vs-kubernetes" = {
-          #   "vs-kubernetes.crd-code-completion" = "enabled";
-          # };
-          # "vscode-kubernetes.log-viewer.autorun" = true;
-          # "vscode-kubernetes.log-viewer.destination" = "Terminal";
-          # "vscode-kubernetes.log-viewer.follow" = true;
-          # "vscode-kubernetes.log-viewer.timestamp" = true;
-
-          ##### CSS #####
-          # "[css]"."editor.defaultFormatter" = "esbenp.prettier-vscode";
-
-          ##### Tailwind CSS #####
-          # Tailwind CSS settings are project-specific - move to workspace settings
-          # "tailwindCSS.includeLanguages" = { ... };
-          # "tailwindCSS.codeActions" = true;
-          # etc.
-
-          ##### Templ #####
-          # Templ settings are project-specific - move to workspace settings
-          # "templ.pprof" = true;
-          # "templ.goplsRPCTrace" = true;
-
-          ##### YAML #####
-          # YAML settings are project-specific - move to workspace settings
-          # "yaml.completion" = true;
-          # "yaml.format.*" = { ... };
-          # etc.
         };
       };
     };
