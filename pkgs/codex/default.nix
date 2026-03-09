@@ -85,8 +85,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   postFixup = ''
     wrapProgram $out/bin/codex \
       --prefix PATH : ${lib.makeBinPath [ ripgrep ]} \
-      --set DISABLE_AUTOUPDATER 1 \
-      --run 'export CODEX_EXECUTABLE_PATH="$HOME/.local/bin/codex"'
+      --set DISABLE_AUTOUPDATER 1
   '';
 
   doInstallCheck = true;
