@@ -21,12 +21,15 @@
     username = lib.mkDefault "administrator";
     homeDirectory = lib.mkDefault "/home/${config.home.username}";
     stateVersion = lib.mkDefault "24.11";
-    # sessionPath moved to shell/common.nix
+
     sessionVariables = {
       FLAKE = lib.mkDefault "${config.home.homeDirectory}/nixos-config";
-      # EDITOR, VISUAL, and MANPAGER moved to shell/common.nix
+      EDITOR = lib.mkDefault "nvim";
+      VISUAL = lib.mkDefault "nvim";
+      PAGER = lib.mkDefault "less";
+      MANPAGER = lib.mkDefault "sh -c 'col -bx | bat -l man -p'";
+      BAT_THEME = lib.mkDefault "theme";
     };
-    # shellAliases moved to shell/common.nix
 
 
     # persistence = {};

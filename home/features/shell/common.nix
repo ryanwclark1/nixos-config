@@ -17,42 +17,19 @@
 
     # Common session variables for all shells
     sessionVariables = {
-      # Editor settings
-      EDITOR = lib.mkDefault "nvim";
-      VISUAL = lib.mkDefault "nvim";
-
       # Pager settings
-      PAGER = lib.mkDefault "less";
       LESS = lib.mkDefault "-R";
       LESSOPEN = lib.mkDefault "|${pkgs.bat-extras.batpipe}/bin/batpipe %s";
       BATPIPE = lib.mkDefault "color";
-      MANPAGER = lib.mkDefault "sh -c 'col -bx | bat -l man -p'";
       MANROFFOPT = lib.mkDefault "-c";
       MANWIDTH = lib.mkDefault "80";
       MANOPT = lib.mkDefault "--no-hyphenation --no-justification";
 
-      # Colored man pages
-      LESS_TERMCAP_mb = lib.mkDefault "$(printf '\e[1;32m')";
-      LESS_TERMCAP_md = lib.mkDefault "$(printf '\e[1;32m')";
-      LESS_TERMCAP_me = lib.mkDefault "$(printf '\e[0m')";
-      LESS_TERMCAP_se = lib.mkDefault "$(printf '\e[0m')";
-      LESS_TERMCAP_so = lib.mkDefault "$(printf '\e[01;33m')";
-      LESS_TERMCAP_ue = lib.mkDefault "$(printf '\e[0m')";
-      LESS_TERMCAP_us = lib.mkDefault "$(printf '\e[1;4;31m')";
-
       # Terminal capabilities
       COLORTERM = lib.mkDefault "truecolor";
 
-      # Theme settings
-      BAT_THEME = lib.mkDefault "theme";
-
       # Development
       CDPATH = lib.mkDefault ".:$HOME:$HOME/Code:$HOME/nixos-config";
-
-      # Shell experience
-      SHELL_SESSION_ID = lib.mkDefault "$(date +%s)";
-      HISTSIZE = lib.mkDefault "100000";
-      SAVEHIST = lib.mkDefault "100000";
     };
 
     # Common shell aliases for all shells
