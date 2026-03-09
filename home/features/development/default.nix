@@ -30,6 +30,8 @@
     protolint
     # System debugging (moved from desktop/common)
     d-spy # D-Bus debugger
-  ];
+  ] ++ (with pkgs.python313Packages; [
+    pyyaml
+  ]);
 
 }

@@ -8,6 +8,7 @@
 {
   home.packages = with pkgs; [
     glib
+    pango
     gcc
     meson
     ninja

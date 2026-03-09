@@ -5,7 +5,7 @@
 
 {
   home.packages = with pkgs; [
-    nodePackages.nodejs
+    fnm
     pnpm
     yarn
     biome
