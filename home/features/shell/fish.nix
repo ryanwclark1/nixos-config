@@ -179,6 +179,8 @@ in
       # Key bindings
       bind \ee edit_command_buffer
       bind \e\[C forward-char
+      bind \er _atuin_search
+      bind -M insert \er _atuin_search
       bind \e\[A history-search-backward
       bind \e\[B history-search-forward
       bind \cf accept-autosuggestion
@@ -203,10 +205,6 @@ in
       end
 
       # Initialize tools
-      if command -v atuin >/dev/null
-        atuin init fish | source
-      end
-
       if command -v starship >/dev/null
         starship init fish | source
       end

@@ -191,11 +191,7 @@
         }
       ])
 
-      if (which starship | complete).exit_code == 0 {
-        if ("~/.cache/starship/init.nu" | path exists) {
-          use ~/.cache/starship/init.nu
-        }
-      }
+      # Starship integration is provided by programs.starship.enableNushellIntegration.
     '';
 
     extraEnv = ''
