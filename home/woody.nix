@@ -27,7 +27,7 @@
     ./features/discord
     ./features/docker
     ./features/docs
-    ./features/dotfiles
+    # ./features/dotfiles
     ./features/eza
     ./features/fastfetch
     ./features/fd
