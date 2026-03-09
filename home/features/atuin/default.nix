@@ -10,6 +10,10 @@
   programs.atuin = {
     enable = true;
     package = pkgs.atuin;
+    flags = [
+      "--disable-up-arrow"
+      "--disable-ctrl-r"
+    ];
     settings = {
       auto_sync = true;
       sync_frequency = "1m";
