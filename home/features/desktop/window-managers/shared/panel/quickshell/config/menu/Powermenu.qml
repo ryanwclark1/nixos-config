@@ -39,9 +39,9 @@ PanelWindow {
 
     // Power Menu Content
     ColumnLayout {
+      id: contentCol
       anchors.centerIn: parent
-      spacing: 40
-      
+      spacing: 40      
       scale: root.isVisible ? 1.0 : 0.9
       Behavior on scale { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
       opacity: root.isVisible ? 1.0 : 0.0

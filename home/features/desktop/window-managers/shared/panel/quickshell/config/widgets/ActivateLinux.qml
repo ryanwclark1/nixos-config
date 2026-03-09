@@ -14,6 +14,7 @@ PanelWindow {
   implicitHeight: 80
   color: "transparent"
   exclusionMode: ExclusionMode.Ignore
+  mask: Region {}
 
   Column {
     anchors.fill: parent

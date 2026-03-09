@@ -68,8 +68,7 @@ Scope {
     color: "transparent"
     implicitHeight: Config.barHeight
 
-    mask: Region {
-    }
+    mask: Region {}
 
     Panel {
       id: panel

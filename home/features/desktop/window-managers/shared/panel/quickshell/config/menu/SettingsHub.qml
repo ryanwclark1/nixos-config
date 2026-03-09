@@ -44,6 +44,7 @@ PanelWindow {
 
   // Main Container
   Rectangle {
+    id: mainContainer
     width: 700; height: 500
     anchors.centerIn: parent
     color: Colors.bgGlass

@@ -18,6 +18,8 @@ PanelWindow {
   margins.bottom: 12
   color: "transparent"
 
+  mask: Region {}
+
   WlrLayershell.layer: WlrLayer.Bottom
   WlrLayershell.namespace: "quickshell"
   
