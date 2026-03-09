@@ -19,11 +19,13 @@ mkdir -p "$SCREENSHOTS_DIR" || {
 
 # Get script directory to find screenshot.sh
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SCREENSHOT_SCRIPT="${SCRIPT_DIR}/../wayland/screenshot.sh"
 
-# Fallback to common location if not found
+# Prefer installed location
+SCREENSHOT_SCRIPT="${HOME}/.local/bin/scripts/wayland/screenshot.sh"
+
+# Fallback to script-relative path if needed
 if [[ ! -f "$SCREENSHOT_SCRIPT" ]]; then
-  SCREENSHOT_SCRIPT="${HOME}/.local/bin/scripts/wayland/screenshot.sh"
+  SCREENSHOT_SCRIPT="${SCRIPT_DIR}/../wayland/screenshot.sh"
 fi
 
 # If still not found, try to find it in PATH
