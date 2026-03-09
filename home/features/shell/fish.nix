@@ -215,6 +215,11 @@ in
         direnv hook fish | source
       end
 
+      # Initialize fnm (Fast Node Manager)
+      if command -v fnm >/dev/null
+        fnm env --use-on-cd --shell fish | source
+      end
+
       # Completion settings
       set -gx FISH_COMPLETE_DIR_EXPAND 1
       set -gx FISH_COMPLETE_DIR_EXPAND_STRATEGY "descend"
