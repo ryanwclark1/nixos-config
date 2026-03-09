@@ -99,5 +99,5 @@
   users.groups.render.members = [ "administrator" ];
 
   # Optional but commonly needed:
-  # users.groups.video.members = [ "administrator" ];
+  users.groups.video.members = [ "administrator" ];
 }
