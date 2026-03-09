@@ -29,8 +29,19 @@ Scope {
     function closeAll() {
       root.notifCenterVisible = false;
       root.controlCenterVisible = false;
+      root.powerMenuVisible = false;
+    }
+
+    function togglePowermenu() {
+      root.powerMenuVisible = !root.powerMenuVisible;
+    }
+
+    function reloadConfig() {
+      Config.load();
     }
   }
+
+  property bool powerMenuVisible: false
 
   NotificationManager {
     id: notifManager
@@ -44,11 +55,16 @@ Scope {
     id: toplevel
     anchors {
       top: true
-      left: true
-      right: true
+      left: Config.barFloating
+      right: Config.barFloating
+    }
+    margins {
+      top: Config.barFloating ? Config.barMargin : 0
+      left: Config.barFloating ? Config.barMargin : 0
+      right: Config.barFloating ? Config.barMargin : 0
     }
 
-    implicitHeight: panel.implicitHeight
+    implicitHeight: Config.barHeight
 
     Panel {
       id: panel
@@ -97,6 +113,10 @@ Scope {
     id: activateLinux
   }
 
+  Corners {
+    id: corners
+  }
+
   Notifications {
     id: popups
     manager: notifManager
@@ -111,6 +131,11 @@ Scope {
   ControlCenter {
     id: controls
     showContent: root.controlCenterVisible
+  }
+
+  Powermenu {
+    id: powermenu
+    isVisible: root.powerMenuVisible
   }
 
   Launcher {

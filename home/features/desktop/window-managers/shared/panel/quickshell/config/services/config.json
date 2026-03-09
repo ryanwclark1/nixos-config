@@ -1,0 +1,16 @@
+{
+  "bar": {
+    "height": 30,
+    "floating": true,
+    "margin": 12,
+    "opacity": 0.85
+  },
+  "glass": {
+    "blur": true,
+    "opacity": 0.65
+  },
+  "notifications": {
+    "width": 350,
+    "popupTimer": 5000
+  }
+}

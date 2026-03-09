@@ -75,6 +75,20 @@ Scope {
 						
 						model: Hyprland.toplevels
 						
+						focus: true
+						currentIndex: 0
+						
+						Keys.onEscapePressed: root.isVisible = false
+						Keys.onReturnPressed: {
+							if (currentIndex >= 0 && currentIndex < count) {
+								let addr = Hyprland.toplevels[currentIndex].address;
+								if (addr) {
+									root.isVisible = false;
+									Quickshell.execDetached(["hyprctl", "dispatch", "focuswindow", "address:" + addr]);
+								}
+							}
+						}
+						
 						// Filter out special workspaces or quickshell itself if needed
 						// We'll show all normal windows for now
 						
@@ -83,11 +97,13 @@ Scope {
 							height: 220
 							color: "#33ffffff"
 							radius: 12
-							border.color: hoverArea.containsMouse ? "#ffffff" : "#44ffffff"
-							border.width: hoverArea.containsMouse ? 2 : 1
 							
-							// Animation on hover
-							scale: hoverArea.containsMouse ? 1.05 : 1.0
+							property bool isSelected: grid.currentIndex === index
+							border.color: isSelected ? "#4caf50" : (hoverArea.containsMouse ? "#ffffff" : "#44ffffff")
+							border.width: isSelected || hoverArea.containsMouse ? 3 : 1
+							
+							// Animation on hover or selection
+							scale: isSelected || hoverArea.containsMouse ? 1.05 : 1.0
 							Behavior on scale { NumberAnimation { duration: 150 } }
 
 							ColumnLayout {
@@ -138,6 +154,7 @@ Scope {
 								anchors.fill: parent
 								hoverEnabled: true
 								onClicked: {
+									grid.currentIndex = index;
 									root.isVisible = false;
 									Quickshell.execDetached(["hyprctl", "dispatch", "focuswindow", "address:" + modelData.address]);
 								}
@@ -150,17 +167,16 @@ Scope {
 						anchors.bottom: parent.bottom
 						anchors.horizontalCenter: parent.horizontalCenter
 						anchors.margins: 40
-						text: "Click outside to cancel"
+						text: "Use Arrow Keys + Enter to select, or click outside/Escape to cancel"
 						color: "#88ffffff"
 						font.pointSize: 12
 					}
 				}
 				
-				// Handle Escape key to close
+				// Global Escape handler fallback if grid loses focus
 				Item {
 					anchors.fill: parent
-					focus: true
-					Keys.onEscapePressed: root.isVisible = false
+					focus: false
 				}
 			}
 		}
