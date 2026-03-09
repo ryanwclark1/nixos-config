@@ -6,11 +6,6 @@
 }:
 
 let
-  hyprlandStateScript = pkgs.writeShellScript "quickshell-hyprland-state" ''
-    PATH="${pkgs.hyprland}/bin:${pkgs.jq}/bin:${pkgs.coreutils}/bin:$PATH"
-    ${builtins.readFile ./scripts/hyprland-state.sh}
-  '';
-
   appsScript = pkgs.writeShellScriptBin "qs-apps" ''
     PATH="${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.findutils}/bin:${pkgs.gnugrep}/bin:$PATH"
     ${builtins.readFile ./scripts/apps.sh}
@@ -55,6 +50,26 @@ let
     PATH="${pkgs.sqlite}/bin:${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.findutils}/bin:$PATH"
     ${builtins.readFile ./scripts/bookmarks.sh}
   '';
+
+  updatorScript = pkgs.writeShellScriptBin "qs-updator" ''
+    PATH="${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.perl}/bin:$PATH"
+    ${builtins.readFile ./scripts/updator.sh}
+  '';
+
+  cavaScript = pkgs.writeShellScriptBin "qs-cava" ''
+    PATH="${pkgs.cava}/bin:${pkgs.gnused}/bin:${pkgs.coreutils}/bin:$PATH"
+    ${builtins.readFile ./scripts/cava.sh}
+  '';
+
+  inhibitorScript = pkgs.writeScriptBin "qs-inhibitor" ''
+    #!${pkgs.python3.withPackages (ps: [ ps.pywayland ])}/bin/python
+    ${builtins.readFile ./scripts/inhibitor.py}
+  '';
+
+  networkScript = pkgs.writeShellScriptBin "qs-network" ''
+    PATH="${pkgs.networkmanager}/bin:${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:$PATH"
+    ${builtins.readFile ./scripts/network.sh}
+  '';
   in
   {
   options.features.quickshell = {
@@ -76,6 +91,10 @@ let
       keybindsScript
       aiScript
       bookmarksScript
+      updatorScript
+      cavaScript
+      inhibitorScript
+      networkScript
     ];    home.file.".config/quickshell" = {
       source = ./config;
       recursive = true;
@@ -106,34 +125,6 @@ let
 
       Install = {
         WantedBy = [ "graphical-session.target" ];
-      };
-    };
-
-    systemd.user.services.quickshell-hyprland-state = {
-      Unit = {
-        Description = "Quickshell Hyprland state snapshot";
-        After = [ "graphical-session.target" ];
-        Wants = [ "graphical-session.target" ];
-      };
-
-      Service = {
-        Type = "oneshot";
-        ExecStart = hyprlandStateScript;
-      };
-    };
-
-    systemd.user.timers.quickshell-hyprland-state = {
-      Unit = {
-        Description = "Quickshell Hyprland state snapshot timer";
-      };
-
-      Timer = {
-        OnBootSec = "1s";
-        OnUnitActiveSec = "1s";
-      };
-
-      Install = {
-        WantedBy = [ "timers.target" ];
       };
     };
   };

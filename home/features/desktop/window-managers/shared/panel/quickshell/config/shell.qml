@@ -2,6 +2,7 @@ import Quickshell // PanelWindow
 import QtQuick
 import Quickshell.Io
 import Quickshell.Wayland
+import Quickshell.Hyprland
 import "bar"
 import "launcher"
 import "menu"
@@ -48,128 +49,153 @@ Scope {
     id: notifManager
   }
 
-  HyprlandState {
-    id: hyprState
-  }
+  Repeater {
+    model: Quickshell.screens
 
-  PanelWindow {
-    id: toplevel
-    anchors {
-      top: true
-      left: Config.barFloating
-      right: Config.barFloating
-    }
-    margins {
-      top: Config.barFloating ? Config.barMargin : 0
-      left: Config.barFloating ? Config.barMargin : 0
-      right: Config.barFloating ? Config.barMargin : 0
-    }
-
-    color: "transparent"
-    implicitHeight: Config.barHeight
-
-    WlrLayershell.layer: WlrLayer.Top
-    WlrLayershell.namespace: "quickshell"
-
-    Panel {
-      id: panel
-      anchors.fill: parent
-      manager: notifManager
-      onNotifClicked: {
-        root.controlCenterVisible = false;
-        root.notifCenterVisible = !root.notifCenterVisible;
+    delegate: PanelWindow {
+      id: toplevel
+      screen: modelData
+      anchors {
+        top: true
+        left: Config.barFloating
+        right: Config.barFloating
       }
-      onControlClicked: {
-        root.notifCenterVisible = false;
-        root.controlCenterVisible = !root.controlCenterVisible;
+      margins {
+        top: Config.barFloating ? Config.barMargin : 0
+        left: Config.barFloating ? Config.barMargin : 0
+        right: Config.barFloating ? Config.barMargin : 0
       }
-    }
 
-    BluetoothMenu {
-      id: btMenu
-      anchor.window: toplevel
-      anchor.rect.x: toplevel.width - width - 12
-      anchor.rect.y: toplevel.height + 8
-      visible: panel.btMenuVisible
+      color: "transparent"
+      implicitHeight: Config.barHeight
+
+      WlrLayershell.layer: WlrLayer.Top
+      WlrLayershell.namespace: "quickshell"
+      WlrLayershell.blur: Config.blurEnabled
+
+      Panel {
+        id: panel
+        anchors.fill: parent
+        manager: notifManager
+        onNotifClicked: {
+          root.controlCenterVisible = false;
+          root.notifCenterVisible = !root.notifCenterVisible;
+        }
+        onControlClicked: {
+          root.notifCenterVisible = false;
+          root.controlCenterVisible = !root.controlCenterVisible;
+        }
+      }
+
+      BluetoothMenu {
+        id: btMenu
+        anchor.window: toplevel
+        anchor.rect.x: toplevel.width - width - 12
+        anchor.rect.y: toplevel.height + 8
+        visible: panel.btMenuVisible
+      }
     }
   }
 
   Osd {
     id: osd
+    screen: Quickshell.cursorScreen
   }
 
   MediaOsd {
     id: mediaOsd
+    screen: Quickshell.cursorScreen
   }
 
   WorkspaceOsd {
     id: workspaceOsd
+    screen: Quickshell.cursorScreen
   }
 
   Overview {
     id: overview
+    screen: Quickshell.cursorScreen
   }
 
   Dock {
     id: dock
+    screen: Quickshell.cursorScreen
   }
 
   Notifications {
     id: popups
     manager: notifManager
+    screen: Quickshell.cursorScreen
   }
 
   NotificationCenter {
     id: center
     manager: notifManager
     showContent: root.notifCenterVisible
+    screen: root.notifCenterVisible ? Quickshell.cursorScreen : screen
   }
 
   ControlCenter {
     id: controls
     showContent: root.controlCenterVisible
+    screen: root.controlCenterVisible ? Quickshell.cursorScreen : screen
   }
 
   Powermenu {
     id: powermenu
     isVisible: root.powerMenuVisible
+    screen: root.powerMenuVisible ? Quickshell.cursorScreen : screen
   }
 
   Launcher {
     id: launcher
-    hyprState: hyprState
+    screen: opacity > 0 ? Quickshell.cursorScreen : screen
   }
 
   SettingsHub {
     id: settingsHub
+    screen: Quickshell.cursorScreen
   }
 
-  NativeLock {
-    id: lockscreen
+  Repeater {
+    model: Quickshell.screens
+    delegate: NativeLock {
+      id: lockscreen
+      screen: modelData
+    }
   }
 
-  // PanelWindow {
-  //   id: desktopBackground
-  //   anchors {
-  //     top: true
-  //     left: true
-  //     right: true
-  //     bottom: true
-  //   }
-  //   color: "transparent"
-  //   exclusiveZone: -1
-  //   WlrLayershell.layer: WlrLayer.Background
-  //   mask: Region {}
+  Repeater {
+    model: Quickshell.screens
+    
+    delegate: PanelWindow {
+      id: desktopBackground
+      screen: modelData
+      anchors {
+        top: true
+        left: true
+        right: true
+        bottom: true
+      }
+      color: "transparent"
+      exclusiveZone: -1
+      WlrLayershell.layer: WlrLayer.Background
+      mask: Region {}
 
-  //   DesktopWidgets {
-  //     anchors.left: parent.left
-  //     anchors.top: parent.top
-  //     anchors.leftMargin: 80
-  //     anchors.topMargin: 120
-  //   }
-  // }
+      DesktopWidgets {
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.leftMargin: 80
+        anchors.topMargin: 120
+      }
+    }
+  }
 
-  // Corners {
-  //   id: screenCorners
-  // }
+  Repeater {
+    model: Quickshell.screens
+    delegate: Corners {
+      id: screenCorners
+      screen: modelData
+    }
+  }
 }

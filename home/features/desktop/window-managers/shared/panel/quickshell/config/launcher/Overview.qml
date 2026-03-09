@@ -46,6 +46,7 @@ Scope {
 				color: "transparent"
 				WlrLayershell.layer: WlrLayer.Overlay
 				WlrLayershell.namespace: "quickshell"
+				WlrLayershell.blur: Config.blurEnabled
 				WlrLayershell.keyboardFocus: root.isVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 				
 				exclusiveZone: -1

@@ -5,7 +5,7 @@ KEYBIND_DIR="$HOME/nixos-config/home/features/desktop/window-managers/hyprland/c
 
 if [ ! -d "$KEYBIND_DIR" ]; then
     # Fallback to absolute path if needed
-    KEYBIND_DIR="/home/administrator/nixos-config/home/features/desktop/window-managers/hyprland/conf/keybindings"
+    KEYBIND_DIR="$HOME/.config/hypr/conf/keybindings"
 fi
 
 # Use jq to build the final JSON array

@@ -1,8 +1,9 @@
 import QtQuick
 import Quickshell.Io
+import "../services"
 
 Row {
-  spacing: 12
+  spacing: 8
   anchors.verticalCenter: parent.verticalCenter
 
   // Updates properties
@@ -11,7 +12,7 @@ Row {
 
   Process {
     id: updatorProc
-    command: ["/home/administrator/nixos-config/home/features/desktop/window-managers/shared/panel/quickshell/scripts/updator.sh"]
+    command: ["qs-updator"]
     running: true
     stdout: StdioCollector {
       onStreamFinished: {
@@ -31,18 +32,28 @@ Row {
     onTriggered: updatorProc.running = true
   }
 
-  // Updates
-  Row {
-    spacing: 4
+  // Updates Pill
+  Rectangle {
+    width: updatesRow.width + 16
+    height: 24
+    radius: height / 2
+    color: Colors.bgWidget
+    anchors.verticalCenter: parent.verticalCenter
     visible: updatesCount !== "0" && updatesCount !== ""
-    Text { text: updatesIcon; color: "#e6e6e6"; font.pixelSize: 14; font.family: "JetBrainsMono Nerd Font"; anchors.verticalCenter: parent.verticalCenter }
-    Text { text: updatesCount; color: "#e6e6e6"; font.pixelSize: 12; anchors.verticalCenter: parent.verticalCenter }
+
+    Row {
+      id: updatesRow
+      spacing: 6
+      anchors.centerIn: parent
+      Text { text: updatesIcon; color: Colors.accent; font.pixelSize: 14; font.family: "JetBrainsMono Nerd Font"; anchors.verticalCenter: parent.verticalCenter }
+      Text { text: updatesCount; color: Colors.fgMain; font.pixelSize: 12; anchors.verticalCenter: parent.verticalCenter }
+    }
   }
 
   // Cava
   Process {
     id: cavaProc
-    command: ["/home/administrator/nixos-config/home/features/desktop/window-managers/shared/panel/quickshell/scripts/cava.sh"]
+    command: ["qs-cava"]
     running: true
     stdout: SplitParser {
       onRead: function(data) {
@@ -53,7 +64,21 @@ Row {
     }
   }
 
-  Text { id: cavaText; text: "▁▂▃▄▅▆▇█"; color: "#e6e6e6"; font.pixelSize: 12; anchors.verticalCenter: parent.verticalCenter }
+  Rectangle {
+    width: cavaText.width + 16
+    height: 24
+    radius: height / 2
+    color: "transparent"
+    anchors.verticalCenter: parent.verticalCenter
+
+    Text {
+      id: cavaText
+      text: "▁▂▃▄▅▆▇█"
+      color: Colors.primary
+      font.pixelSize: 12
+      anchors.centerIn: parent
+    }
+  }
 
   // Idle Inhibitor properties
   property bool inhibitorActive: false
@@ -76,18 +101,20 @@ Row {
     onTriggered: inhibitorCheck.running = true
   }
 
-  // Idle Inhibitor
+  // Idle Inhibitor Pill
   Rectangle {
-    width: 20
-    height: 20
-    color: "transparent"
-    radius: 4
+    width: 28
+    height: 24
+    color: inhibitorActive ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.2) : Colors.bgWidget
+    radius: height / 2
     anchors.verticalCenter: parent.verticalCenter
+    border.color: inhibitorActive ? Colors.primary : "transparent"
+    border.width: 1
 
     Text {
       anchors.centerIn: parent
       text: "󰒲"
-      color: inhibitorActive ? "#4caf50" : "#e6e6e6"
+      color: inhibitorActive ? Colors.primary : Colors.fgMain
       font.pixelSize: 14
       font.family: "JetBrainsMono Nerd Font"
     }
@@ -96,11 +123,13 @@ Row {
       anchors.fill: parent
       cursorShape: Qt.PointingHandCursor
       onClicked: {
-        var p = Qt.createQmlObject('import Quickshell.Io; Process { running: true; command: ["/home/administrator/nixos-config/home/features/desktop/window-managers/shared/panel/quickshell/scripts/inhibitor.py"] }', parent);
+        var p = Qt.createQmlObject('import Quickshell.Io; Process { running: true; command: ["qs-inhibitor"] }', parent);
         p.startDetached();
         // Force check update slightly later
         inhibitorCheckTimer.restart()
       }
+      onEntered: parent.color = Qt.rgba(255, 255, 255, 0.15)
+      onExited: parent.color = inhibitorActive ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.2) : Colors.bgWidget
     }
 
     Timer {

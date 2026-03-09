@@ -47,6 +47,12 @@ QtObject {
     }
   }
 
+  property FileView configWatcher: FileView {
+    path: root.configPath
+    watchChanges: true
+    onTextChanged: root.load()
+  }
+
   function save() {
     var data = {
       "bar": {

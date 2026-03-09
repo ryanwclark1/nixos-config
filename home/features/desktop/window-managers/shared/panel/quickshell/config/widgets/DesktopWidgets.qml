@@ -66,19 +66,11 @@ Item {
           spacing: 8
           Text { text: ""; color: Colors.primary; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 20 }
           Text { 
-            id: cpuVal
-            text: "0%"
+            text: SystemStatus.cpuUsage
             color: Colors.text
             font.pixelSize: 18
             font.weight: Font.Bold
           }
-        }
-        
-        Process {
-          id: cpuProc
-          command: ["sh", "-c", "top -bn1 | awk '/Cpu\\(s\\):/ {printf \"%d\", 100 - $8}'"]
-          running: true
-          stdout: StdioCollector { onStreamFinished: cpuVal.text = this.text.trim() + "%" }
         }
       }
 
@@ -90,28 +82,43 @@ Item {
           spacing: 8
           Text { text: ""; color: Colors.secondary; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 20 }
           Text { 
-            id: ramVal
-            text: "0GB"
+            text: SystemStatus.ramUsage
             color: Colors.text
             font.pixelSize: 18
             font.weight: Font.Bold
           }
         }
-        
-        Process {
-          id: ramProc
-          command: ["sh", "-c", "free -h | awk '/^Mem:/ {print $3}' | sed 's/Gi/GB/'"]
-          running: true
-          stdout: StdioCollector { onStreamFinished: ramVal.text = this.text.trim() }
-        }
       }
     }
 
-    Timer {
-      interval: 5000
-      running: true
-      repeat: true
-      onTriggered: { cpuProc.running = true; ramProc.running = true; }
+    Item { Layout.preferredHeight: 40 }
+
+    // Quick Note Widget
+    ColumnLayout {
+      spacing: 12
+      Layout.fillWidth: true
+      
+      Text { text: "QUICK NOTE"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold; font.letterSpacing: 1 }
+      
+      Rectangle {
+        Layout.preferredWidth: 350; Layout.preferredHeight: 180; color: Qt.rgba(1, 1, 1, 0.03); radius: Colors.radiusMedium; border.color: noteInput.activeFocus ? Colors.primary : Colors.border; border.width: 1
+        
+        TextArea {
+          id: noteInput; anchors.fill: parent; anchors.margins: 15; color: Colors.text; font.pixelSize: 14; font.family: "JetBrainsMono Nerd Font"; wrapMode: TextEdit.Wrap; placeholderText: "Type a note..."
+          
+          property string notePath: Quickshell.env("HOME") + "/.cache/quickshell_note.txt"
+          
+          Component.onCompleted: {
+            var file = Quickshell.openFile(notePath, File.ReadOnly);
+            if (file) { text = file.readAll(); file.close(); }
+          }
+          
+          onTextChanged: {
+            var file = Quickshell.openFile(notePath, File.WriteOnly | File.Truncate);
+            if (file) { file.write(text); file.close(); }
+          }
+        }
+      }
     }
 
     Item { Layout.fillHeight: true }

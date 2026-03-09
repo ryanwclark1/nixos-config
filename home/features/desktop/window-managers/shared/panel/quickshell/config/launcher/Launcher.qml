@@ -25,8 +25,8 @@ PanelWindow {
   WlrLayershell.layer: WlrLayer.Overlay
   WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
   WlrLayershell.namespace: "quickshell"
+  WlrLayershell.blur: Config.blurEnabled
 
-  property var hyprState: null
   property string searchText: ""
   property var allItems: []
   property var filteredItems: []
@@ -224,7 +224,7 @@ PanelWindow {
        filterItems();
        return;
     }
-    var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["fd", "--base-directory", "/home/administrator", "--max-results", "100", "' + searchQuery.replace(/"/g, '\\"') + '"] }', launcherRoot);
+    var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["fd", "--base-directory", "' + Quickshell.env("HOME") + '", "--max-results", "100", "' + searchQuery.replace(/"/g, '\\"') + '"] }', launcherRoot);
     proc.finished.connect(function() {
       var raw = proc.stdout.readAll();
       if (raw) {
@@ -235,7 +235,7 @@ PanelWindow {
             var path = lines[i];
             var parts = path.split("/");
             var filename = parts[parts.length - 1] || path;
-            items.push({ name: filename, title: path, fullPath: "/home/administrator/" + path });
+            items.push({ name: filename, title: path, fullPath: Quickshell.env("HOME") + "/" + path });
           }
         }
         if (items.length === 0) items = [{ name: "No files found", isHint: true, icon: "󰈔", fullPath: "" }];
@@ -335,10 +335,8 @@ PanelWindow {
   }
 
   function loadWindows() {
-    if (hyprState) {
-      allItems = hyprState.clients;
-      filterItems();
-    }
+    allItems = Hyprland.toplevels;
+    filterItems();
   }
   
   property var appFrequency: ({})
@@ -681,11 +679,12 @@ PanelWindow {
       }
       Rectangle { width: 1; Layout.fillHeight: true; color: Colors.border; visible: mode !== "media" && mode !== "system" && mode !== "nixos" }
       Rectangle {
-        width: 250; Layout.fillHeight: true; color: "transparent"; visible: mode !== "media" && mode !== "system" && mode !== "nixos"
+        width: mode === "ai" ? 400 : 250; Layout.fillHeight: true; color: "transparent"; visible: mode !== "media" && mode !== "system" && mode !== "nixos"
+        Behavior on width { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
         ColumnLayout {
           anchors.fill: parent; anchors.margins: 20; spacing: 15
           property var currentItem: launcherRoot.filteredItems.length > 0 && launcherRoot.selectedIndex >= 0 && launcherRoot.selectedIndex < launcherRoot.filteredItems.length ? launcherRoot.filteredItems[launcherRoot.selectedIndex] : null
-          onCurrentItemChanged: { if (mode === "files" && currentItem && currentItem.fullPath) { if (!currentItem.fullPath.match(/\.(jpg|jpeg|png|webp|gif|pdf|zip|tar|gz|mp4|mkv|mp3|flac|wav)$/i)) { filePreviewProc.command = ["head", "-n", "15", currentItem.fullPath]; filePreviewProc.running = true; } else previewTextContent.text = "Binary or media file."; } else previewTextContent.text = ""; }
+          onCurrentItemChanged: { if (mode === "files" && currentItem && currentItem.fullPath) { if (!currentItem.fullPath.match(/\.(jpg|jpeg|png|webp|gif|pdf|zip|tar|gz|mp4|mkv|mp3|flac|wav)$/i)) { filePreviewProc.command = ["head", "-n", "15", currentItem.fullPath]; filePreviewProc.running = true; } else previewTextContent.text = "Binary or media file."; } else if (mode !== "ai") previewTextContent.text = ""; }
           Process { id: filePreviewProc; command: ["echo", ""]; running: false; stdout: StdioCollector { onStreamFinished: { if (mode === "files") previewTextContent.text = this.text; } } }
           Rectangle {
             width: mode === "wallpapers" || (mode === "files" && parent.currentItem && parent.currentItem.fullPath && parent.currentItem.fullPath.match(/\.(jpg|jpeg|png|webp)$/i)) ? 210 : 128; height: mode === "wallpapers" || (mode === "files" && parent.currentItem && parent.currentItem.fullPath && parent.currentItem.fullPath.match(/\.(jpg|jpeg|png|webp)$/i)) ? 140 : 128; radius: Colors.radiusMedium; color: Colors.surface; Layout.alignment: Qt.AlignHCenter
@@ -695,7 +694,16 @@ PanelWindow {
           Text { text: parent.currentItem ? (mode === "drun" ? parent.currentItem.name : (mode === "window" ? parent.currentItem.title : (mode === "emoji" ? parent.currentItem.title : (mode === "clip" ? "Clipboard Item" : (mode === "wallpapers" ? "Wallpaper Preview" : (mode === "files" ? parent.currentItem.name : (mode === "ai" ? parent.currentItem.name : (mode === "bookmarks" ? parent.currentItem.name : parent.currentItem.name)))))))) : ""; color: Colors.text; font.pixelSize: 18; font.weight: Font.Bold; Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter; wrapMode: Text.Wrap; maximumLineCount: 3; elide: Text.ElideRight }
           Text { id: subTextItem; text: parent.currentItem ? (mode === "drun" ? parent.currentItem.exec : (mode === "window" ? parent.currentItem.class : (mode === "clip" ? parent.currentItem.name : (mode === "wallpapers" ? parent.currentItem.name : (mode === "files" ? parent.currentItem.title : (mode === "ai" ? parent.currentItem.title : (mode === "bookmarks" ? parent.currentItem.exec : ""))))))) : ""; color: Colors.textSecondary; font.pixelSize: 12; Layout.fillWidth: true; horizontalAlignment: (mode === "clip" || mode === "files" || mode === "bookmarks" || mode === "ai") ? Text.AlignLeft : Text.AlignHCenter; wrapMode: Text.Wrap; maximumLineCount: mode === "clip" ? 10 : 2; elide: Text.ElideRight; visible: text !== "" && mode !== "emoji" }
           Rectangle { Layout.fillWidth: true; height: 1; color: Colors.border; Layout.topMargin: 10; Layout.bottomMargin: 10 }
-          Text { id: previewTextContent; color: Colors.textSecondary; font.pixelSize: 10; font.family: "JetBrainsMono Nerd Font"; Layout.fillWidth: true; Layout.fillHeight: true; wrapMode: Text.Wrap; elide: Text.ElideRight; clip: true; visible: (mode === "files" || mode === "ai") && text !== ""; text: (mode === "ai" && parent.currentItem) ? (parent.currentItem.body || "") : "" }
+          
+          Flickable {
+            Layout.fillWidth: true; Layout.fillHeight: true; clip: true; contentHeight: previewTextContent.implicitHeight; visible: (mode === "files" || mode === "ai") && previewTextContent.text !== ""
+            Text { 
+              id: previewTextContent
+              width: parent.width; color: Colors.textSecondary; font.pixelSize: mode === "ai" ? 13 : 10; font.family: "JetBrainsMono Nerd Font"; wrapMode: Text.Wrap; 
+              text: (mode === "ai" && parent.parent.currentItem) ? (parent.parent.currentItem.body || "") : "" 
+            }
+          }
+          
           Text { text: mode === "drun" ? "Press Enter to launch" : (mode === "window" ? "Press Enter to focus" : (mode === "emoji" || mode === "clip" ? "Press Enter to copy" : (mode === "wallpapers" ? "Press Enter to apply" : (mode === "files" ? "Press Enter to open" : (mode === "ai" ? (parent.currentItem && parent.currentItem.body ? "Press Enter to copy" : "Press Enter to ask AI") : (mode === "bookmarks" ? "Press Enter to open" : "Press Enter to run")))))); color: Colors.textDisabled; font.pixelSize: 12; Layout.alignment: Qt.AlignHCenter }
           Item { Layout.fillHeight: true; visible: mode !== "files" && mode !== "ai" }
         }

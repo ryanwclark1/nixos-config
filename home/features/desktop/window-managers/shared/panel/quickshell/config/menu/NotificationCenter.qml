@@ -27,6 +27,7 @@ PanelWindow {
   WlrLayershell.layer: WlrLayer.Top
   WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
   WlrLayershell.namespace: "quickshell"
+  WlrLayershell.blur: Config.blurEnabled
 
   property var manager: null
   property bool showContent: false

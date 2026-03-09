@@ -10,7 +10,7 @@ Row {
 
   Process {
     id: networkProc
-    command: ["/home/administrator/nixos-config/home/features/desktop/window-managers/shared/panel/quickshell/scripts/network.sh"]
+    command: ["qs-network"]
     running: true
     stdout: StdioCollector {
       onStreamFinished: {

@@ -14,6 +14,6 @@ Item {
   MouseArea {
     anchors.fill: parent
     cursorShape: Qt.PointingHandCursor
-    onClicked: console.log("Toggle dashboard") // Map to dashboard later
+    onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Launcher", "openDrun"])
   }
 }

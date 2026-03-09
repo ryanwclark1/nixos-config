@@ -28,11 +28,14 @@ PanelWindow {
   WlrLayershell.layer: WlrLayer.Top
   WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
   WlrLayershell.namespace: "quickshell"
+  WlrLayershell.blur: Config.blurEnabled
   
   property bool showContent: false
   visible: showContent || sidebarContent.x < 350
 
-  onShowContentChanged: { if (showContent) scrollCol.focus = true; }
+  onShowContentChanged: { if (showContent) sidebarContent.forceActiveFocus(); }
+
+  Keys.onEscapePressed: root.showContent = false
 
   // State
   property real brightnessValue: 0.7
@@ -40,21 +43,6 @@ PanelWindow {
   property var vpns: []
   property string tailscaleStatus: "Offline"
   property string selectedSSID: ""
-  property string cpuTemp: "--"
-  property string gpuTemp: "--"
-
-  Process {
-    id: getStats
-    command: ["sh", "-c", "sensors | grep -E 'Tctl|edge' | awk '{print $2}' | sed 's/+//;s/°C//' || true"]
-    running: root.showContent
-    stdout: StdioCollector {
-      onStreamFinished: {
-        var lines = (this.text || "").trim().split("\n");
-        if (lines[0]) root.cpuTemp = Math.round(parseFloat(lines[0])) + "°C";
-        if (lines[1]) root.gpuTemp = Math.round(parseFloat(lines[1])) + "°C";
-      }
-    }
-  }
 
   Process {
     id: getWifi
@@ -132,20 +120,133 @@ PanelWindow {
       UpdateWidget {}
       MediaWidget {}
 
+      // Quick Toggles (Night Light, DND)
+      RowLayout {
+        Layout.fillWidth: true; spacing: 12
+        Rectangle {
+          Layout.fillWidth: true; height: 50; color: root.nightLightActive ? Colors.primary : Colors.highlightLight; radius: 10
+          property bool nightLightActive: false // We'll update this with a Process later
+          RowLayout {
+            anchors.centerIn: parent; spacing: 8
+            Text { text: "󰖔"; color: parent.parent.nightLightActive ? Colors.background : Colors.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 16 }
+            Text { text: "Night Light"; color: parent.parent.nightLightActive ? Colors.background : Colors.text; font.pixelSize: 12; font.weight: Font.Medium }
+          }
+          MouseArea { anchors.fill: parent; onClicked: { Quickshell.execDetached(["os-toggle-nightlight"]); parent.nightLightActive = !parent.nightLightActive; } }
+          
+          Process {
+            id: checkNightLight
+            command: ["sh", "-c", "hyprctl hyprsunset temperature 2>/dev/null | grep -v '6000' >/dev/null && echo 'on' || echo 'off'"]
+            running: root.showContent
+            stdout: StdioCollector {
+              onStreamFinished: {
+                if (this.text.trim() === "on") parent.nightLightActive = true;
+                else parent.nightLightActive = false;
+              }
+            }
+          }
+        }
+        Rectangle {
+          Layout.fillWidth: true; height: 50; color: root.manager && root.manager.dndEnabled ? Colors.primary : Colors.highlightLight; radius: 10
+          RowLayout {
+            anchors.centerIn: parent; spacing: 8
+            Text { text: "󰂛"; color: root.manager && root.manager.dndEnabled ? Colors.background : Colors.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 16 }
+            Text { text: "DND"; color: root.manager && root.manager.dndEnabled ? Colors.background : Colors.text; font.pixelSize: 12; font.weight: Font.Medium }
+          }
+          MouseArea { anchors.fill: parent; onClicked: { if (root.manager) root.manager.dndEnabled = !root.manager.dndEnabled; } }
+        }
+      }
+
+      // Brightness & Volume Sliders
+      ColumnLayout {
+        Layout.fillWidth: true; spacing: 15
+        
+        // Brightness Slider
+        ColumnLayout {
+          Layout.fillWidth: true; spacing: 6
+          RowLayout {
+            Layout.fillWidth: true
+            Text { text: "󰃠  BRIGHTNESS"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
+            Item { Layout.fillWidth: true }
+            Text { text: Math.round(SystemStatus.brightness * 100) + "%"; color: Colors.textSecondary; font.pixelSize: 10 }
+          }
+          Rectangle {
+            Layout.fillWidth: true; height: 24; color: Colors.highlightLight; radius: 12
+            Rectangle {
+              height: parent.height; width: Math.max(24, parent.width * SystemStatus.brightness); radius: 12
+              color: Colors.primary
+              Text { anchors.centerIn: parent; text: "󰃠"; color: Colors.background; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12; visible: SystemStatus.brightness > 0.1 }
+            }
+            MouseArea {
+              anchors.fill: parent; 
+              onPressed: (mouse) => { SystemStatus.setBrightness(Math.max(0.01, Math.min(1.0, mouse.x / width))); }
+              onPositionChanged: (mouse) => { if (pressed) SystemStatus.setBrightness(Math.max(0.01, Math.min(1.0, mouse.x / width))); }
+            }
+          }
+        }
+
+        // Output Volume Slider
+        ColumnLayout {
+          Layout.fillWidth: true; spacing: 6
+          RowLayout {
+            Layout.fillWidth: true
+            Text { text: "󰓃  OUTPUT VOLUME"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
+            Item { Layout.fillWidth: true }
+            Text { text: Pipewire.defaultAudioSink ? Math.round(Pipewire.defaultAudioSink.audio.volume * 100) + "%" : "0%"; color: Colors.textSecondary; font.pixelSize: 10 }
+          }
+          Rectangle {
+            Layout.fillWidth: true; height: 24; color: Colors.highlightLight; radius: 12
+            Rectangle {
+              height: parent.height; width: Pipewire.defaultAudioSink ? Math.max(24, parent.width * Pipewire.defaultAudioSink.audio.volume) : 0; radius: 12
+              color: Colors.primary
+              Text { anchors.centerIn: parent; text: "󰓃"; color: Colors.background; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12; visible: Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio.volume > 0.1 }
+            }
+            MouseArea {
+              anchors.fill: parent; 
+              onPressed: (mouse) => { if (Pipewire.defaultAudioSink) Pipewire.defaultAudioSink.audio.volume = Math.max(0, Math.min(1, mouse.x / width)); }
+              onPositionChanged: (mouse) => { if (pressed && Pipewire.defaultAudioSink) Pipewire.defaultAudioSink.audio.volume = Math.max(0, Math.min(1, mouse.x / width)); }
+            }
+          }
+        }
+
+        // Input Volume Slider (Microphone)
+        ColumnLayout {
+          Layout.fillWidth: true; spacing: 6; visible: Pipewire.defaultAudioSource !== null
+          RowLayout {
+            Layout.fillWidth: true
+            Text { text: "󰍬  INPUT VOLUME"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
+            Item { Layout.fillWidth: true }
+            Text { text: Pipewire.defaultAudioSource ? Math.round(Pipewire.defaultAudioSource.audio.volume * 100) + "%" : "0%"; color: Colors.textSecondary; font.pixelSize: 10 }
+          }
+          Rectangle {
+            Layout.fillWidth: true; height: 24; color: Colors.highlightLight; radius: 12
+            Rectangle {
+              height: parent.height; width: Pipewire.defaultAudioSource ? Math.max(24, parent.width * Pipewire.defaultAudioSource.audio.volume) : 0; radius: 12
+              color: Colors.accent || Colors.primary
+              Text { anchors.centerIn: parent; text: "󰍬"; color: Colors.background; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12; visible: Pipewire.defaultAudioSource && Pipewire.defaultAudioSource.audio.volume > 0.1 }
+            }
+            MouseArea {
+              anchors.fill: parent; 
+              onPressed: (mouse) => { if (Pipewire.defaultAudioSource) Pipewire.defaultAudioSource.audio.volume = Math.max(0, Math.min(1, mouse.x / width)); }
+              onPositionChanged: (mouse) => { if (pressed && Pipewire.defaultAudioSource) Pipewire.defaultAudioSource.audio.volume = Math.max(0, Math.min(1, mouse.x / width)); }
+            }
+          }
+        }
+      }
+
       RowLayout {
         Layout.fillWidth: true; spacing: 12
         Rectangle {
           Layout.fillWidth: true; height: 60; color: Colors.highlightLight; radius: 10
           Column { anchors.centerIn: parent; spacing: 2
             Text { text: "CPU TEMP"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold; anchors.horizontalCenter: parent }
-            Text { text: root.cpuTemp; color: Colors.text; font.pixelSize: 14; font.weight: Font.Bold; anchors.horizontalCenter: parent }
+            Text { text: SystemStatus.cpuTemp; color: Colors.text; font.pixelSize: 14; font.weight: Font.Bold; anchors.horizontalCenter: parent }
           }
         }
         Rectangle {
           Layout.fillWidth: true; height: 60; color: Colors.highlightLight; radius: 10
           Column { anchors.centerIn: parent; spacing: 2
             Text { text: "GPU TEMP"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold; anchors.horizontalCenter: parent }
-            Text { text: root.gpuTemp; color: Colors.text; font.pixelSize: 14; font.weight: Font.Bold; anchors.horizontalCenter: parent }
+            Text { text: SystemStatus.gpuTemp; color: Colors.text; font.pixelSize: 14; font.weight: Font.Bold; anchors.horizontalCenter: parent }
           }
         }
       }

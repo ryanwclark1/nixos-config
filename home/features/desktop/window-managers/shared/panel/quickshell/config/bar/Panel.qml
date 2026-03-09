@@ -24,9 +24,8 @@ Item {
 
   Rectangle {
     anchors.fill: parent
-    color: root.background
-    opacity: Config.barOpacity
-    radius: Config.barFloating ? 12 : 0
+    color: Colors.bgGlass
+    radius: Config.barFloating ? Colors.radiusMedium : 0
     border.color: Config.barFloating ? Colors.border : "transparent"
     border.width: Config.barFloating ? 1 : 0
   }
@@ -64,51 +63,61 @@ Item {
     // System Control Trigger (WiFi, Battery, Audio)
     MouseArea {
       height: 24
-      width: statusRow.width + 10
+      width: statusRow.width + 16
       hoverEnabled: true
       onClicked: root.controlClicked()
-      onEntered: statusBg.color = Colors.surface
-      onExited: statusBg.color = "transparent"
+      onEntered: statusBg.color = Qt.rgba(255, 255, 255, 0.15)
+      onExited: statusBg.color = Colors.bgWidget
 
       Rectangle {
         id: statusBg
         anchors.fill: parent
-        color: "transparent"
-        radius: 4
+        color: Colors.bgWidget
+        radius: height / 2
       }
 
       Row {
         id: statusRow
         anchors.centerIn: parent
-        spacing: 12
+        spacing: 8
         NetworkWidget {}
         BatteryWidget {}
         AudioWidget {}
       }
     }
 
-    Text {
-      color: root.foreground
-      font.pixelSize: 12
-      text: Qt.formatDateTime(
-        clock.date,
-        root.use24hClock ? "HH:mm" : "h:mm ap"
-      )
+    Rectangle {
+      width: clockText.width + 16
+      height: 24
+      radius: height / 2
+      color: Colors.bgWidget
       anchors.verticalCenter: parent.verticalCenter
+
+      Text {
+        id: clockText
+        anchors.centerIn: parent
+        color: Colors.fgMain
+        font.pixelSize: 12
+        font.weight: Font.Medium
+        text: Qt.formatDateTime(
+          clock.date,
+          root.use24hClock ? "HH:mm" : "h:mm ap"
+        )
+      }
     }
 
     TrayWidget {}
 
     Rectangle {
-      width: 24
-      height: 20
-      color: "transparent"
-      radius: 4
+      width: 28
+      height: 24
+      color: Colors.bgWidget
+      radius: height / 2
       anchors.verticalCenter: parent.verticalCenter
 
       Text {
         anchors.centerIn: parent
-        color: root.foreground
+        color: Colors.fgMain
         font.pixelSize: 14
         font.family: "JetBrainsMono Nerd Font"
         text: root.manager && root.manager.dndEnabled ? "󰂛" : "󰂚"
@@ -116,14 +125,14 @@ Item {
       
       // Unread badge
       Rectangle {
-        width: 6
-        height: 6
-        radius: 3
+        width: 8
+        height: 8
+        radius: 4
         color: Colors.error
         anchors.top: parent.top
         anchors.right: parent.right
-        anchors.topMargin: 2
-        anchors.rightMargin: 2
+        anchors.topMargin: 0
+        anchors.rightMargin: 0
         visible: root.manager && root.manager.notifications && root.manager.notifications.count > 0 && !(root.manager && root.manager.dndEnabled)
       }
 
@@ -131,8 +140,8 @@ Item {
         anchors.fill: parent
         hoverEnabled: true
         onClicked: root.notifClicked()
-        onEntered: parent.color = Colors.surface
-        onExited: parent.color = "transparent"
+        onEntered: parent.color = Qt.rgba(255, 255, 255, 0.15)
+        onExited: parent.color = Colors.bgWidget
       }
     }
   }

@@ -1,8 +1,9 @@
 import QtQuick
 import Quickshell.Io
+import "../services"
 
 Row {
-  spacing: 12
+  spacing: 8
   anchors.verticalCenter: parent.verticalCenter
 
   Process {
@@ -37,41 +38,61 @@ Row {
     }
   }
 
-  // CPU
-  Row {
-    spacing: 4
-    Text {
-      text: ""
-      color: "#e6e6e6"
-      font.pixelSize: 14
-      font.family: "JetBrainsMono Nerd Font"
-      anchors.verticalCenter: parent.verticalCenter
-    }
-    Text {
-      id: cpuText
-      text: "CPU"
-      color: "#e6e6e6"
-      font.pixelSize: 12
-      anchors.verticalCenter: parent.verticalCenter
+  // CPU Pill
+  Rectangle {
+    width: cpuRow.width + 16
+    height: 24
+    radius: height / 2
+    color: Colors.bgWidget
+    anchors.verticalCenter: parent.verticalCenter
+
+    Row {
+      id: cpuRow
+      spacing: 6
+      anchors.centerIn: parent
+      Text {
+        text: ""
+        color: Colors.primary
+        font.pixelSize: 14
+        font.family: "JetBrainsMono Nerd Font"
+        anchors.verticalCenter: parent.verticalCenter
+      }
+      Text {
+        id: cpuText
+        text: "CPU"
+        color: Colors.fgMain
+        font.pixelSize: 12
+        anchors.verticalCenter: parent.verticalCenter
+      }
     }
   }
 
-  // Memory
-  Row {
-    spacing: 4
-    Text {
-      text: ""
-      color: "#e6e6e6"
-      font.pixelSize: 14
-      font.family: "JetBrainsMono Nerd Font"
-      anchors.verticalCenter: parent.verticalCenter
-    }
-    Text {
-      id: ramText
-      text: "RAM"
-      color: "#e6e6e6"
-      font.pixelSize: 12
-      anchors.verticalCenter: parent.verticalCenter
+  // Memory Pill
+  Rectangle {
+    width: ramRow.width + 16
+    height: 24
+    radius: height / 2
+    color: Colors.bgWidget
+    anchors.verticalCenter: parent.verticalCenter
+
+    Row {
+      id: ramRow
+      spacing: 6
+      anchors.centerIn: parent
+      Text {
+        text: ""
+        color: Colors.accent
+        font.pixelSize: 14
+        font.family: "JetBrainsMono Nerd Font"
+        anchors.verticalCenter: parent.verticalCenter
+      }
+      Text {
+        id: ramText
+        text: "RAM"
+        color: Colors.fgMain
+        font.pixelSize: 12
+        anchors.verticalCenter: parent.verticalCenter
+      }
     }
   }
 }

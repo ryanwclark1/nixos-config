@@ -20,6 +20,8 @@ PanelWindow {
 
   WlrLayershell.layer: WlrLayer.Overlay
   WlrLayershell.keyboardFocus: root.isVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+  WlrLayershell.namespace: "quickshell"
+  WlrLayershell.blur: Config.blurEnabled
   
   Item {
     anchors.fill: parent

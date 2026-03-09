@@ -24,6 +24,7 @@ PanelWindow {
   WlrLayershell.layer: WlrLayer.Overlay
   WlrLayershell.keyboardFocus: root.isLocked ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
   WlrLayershell.namespace: "quickshell-lock"
+  WlrLayershell.blur: Config.blurEnabled
 
   Item {
     anchors.fill: parent
