@@ -10,11 +10,11 @@
 set -euo pipefail
 
 # Configuration
-CACHE_FILE="$HOME/.config/hypr/scripts/cache/current_wallpaper"
+CACHE_FILE="$HOME/.config/desktop/window-managers/hyprland/scripts/cache/current_wallpaper"
 SDDM_THEME_NAME="sequoia"
 SDDM_ASSET_FOLDER="/usr/share/sddm/themes/$SDDM_THEME_NAME/backgrounds"
 SDDM_THEME_TPL="/usr/share/ml4w-hyprland/sddm/theme.conf"
-CUSTOM_THEME_TPL="$HOME/.config/hypr/scripts/settings/sddm/theme.conf"
+CUSTOM_THEME_TPL="$HOME/.config/desktop/window-managers/hyprland/scripts/settings/sddm/theme.conf"
 SDDM_CONF_SOURCE="/usr/share/ml4w-hyprland/sddm/sddm.conf"
 SDDM_CONF_DEST="/etc/sddm.conf.d/sddm.conf"
 

@@ -9,7 +9,7 @@
 set -euo pipefail
 
 # Configuration
-GAMEMODE_FLAG="$HOME/.config/hypr/scripts/settings/gamemode-enabled"
+GAMEMODE_FLAG="$HOME/.config/desktop/window-managers/hyprland/scripts/settings/gamemode-enabled"
 
 # Check required commands
 if ! command -v hyprctl >/dev/null 2>&1; then

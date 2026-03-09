@@ -94,7 +94,7 @@ toggle_rofi() {
 # Clear wallpaper cache
 clear_wallpaper_cache() {
     local cache_dir="$HOME/.cache/hyprland-wallpapers"
-    local old_cache_dir="$HOME/.config/hypr/scripts/cache/wallpaper-generated"
+    local old_cache_dir="$HOME/.config/desktop/window-managers/hyprland/scripts/cache/wallpaper-generated"
     
     local cleared=false
     

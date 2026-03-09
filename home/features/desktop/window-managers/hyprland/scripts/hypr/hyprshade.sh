@@ -10,7 +10,7 @@
 set -euo pipefail
 
 # Configuration
-SETTINGS_DIR="$HOME/.config/hypr/scripts/settings"
+SETTINGS_DIR="$HOME/.config/desktop/window-managers/hyprland/scripts/settings"
 SETTINGS_FILE="$SETTINGS_DIR/hyprshade.sh"
 ROFI_CONFIG="$HOME/.config/rofi/config-hyprshade.rasi"
 DEFAULT_FILTER="blue-light-filter-50"
