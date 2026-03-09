@@ -28,7 +28,7 @@ let
   base17 = "f4b8e4"; # pink - bright purple
 in
 {
-  home.file.".config/ghostty/themes/theme.conf" = {
+  xdg.configFile."ghostty/themes/theme" = {
     text = ''
       palette = 0=#${base03}
       palette = 1=#${base08}
