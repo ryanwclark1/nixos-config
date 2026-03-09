@@ -60,7 +60,7 @@ These computers are managed by this Nix flake ❄️
     - `desktop/`: Desktop environments and window managers (Hyprland, GNOME, etc.)
       - Omarchy-inspired utilities and keybindings
       - Modern Wayland compositor configurations
-    - `development/`: Development tools and languages (Rust, Go, Python, etc.)
+    - `development/`: Development tools and languages (Rust, Go, Python with uv, JavaScript/Node.js, Lua, SQL, build tools)
     - `shell/`: Shell configurations (Bash, Fish, Zsh, etc.)
     - `media/`: Media applications and tools
     - `productivity/`: Productivity applications
@@ -196,11 +196,14 @@ Here is the directory structure I'm using.
 │   │   │   ├── environments/      # GNOME, XFCE configurations
 │   │   │   └── common/            # Shared desktop components
 │   │   │       └── scripts/       # System, Wayland, and Rofi utilities
-│   │   ├── development/           # Development tools
-│   │   │   ├── rust.nix          # Rust toolchain
-│   │   │   ├── go.nix            # Go toolchain
-│   │   │   ├── python.nix        # Python toolchain
-│   │   │   └── js.nix            # JavaScript/Node.js
+│       │   ├── development/           # Development tools
+    │   │   │   ├── rust.nix          # Rust toolchain
+    │   │   │   ├── go.nix            # Go toolchain
+    │   │   │   ├── uv.nix            # uv (modern Python package manager)
+    │   │   │   ├── js.nix            # JavaScript/Node.js
+    │   │   │   ├── lua.nix           # Lua toolchain
+    │   │   │   ├── sql.nix           # SQL tools
+    │   │   │   └── build.nix         # Build tools (protobuf, gRPC, etc.)
 │   │   ├── shell/                # Shell configurations
 │   │   │   ├── bash.nix
 │   │   │   ├── fish.nix
@@ -248,6 +251,32 @@ The NixOS and Home Manager configurations are in the `hosts` and `home` director
 The `pkgs` directory contains my custom packages with package overlays in the `overlays` directory.
 The `secrets.yaml` contains secrets managed by [sops-nix].
 The `default.nix` files in the root of each directory are the entry points.
+
+### Development Tools 🛠️
+
+Comprehensive development environment with support for multiple languages and tools:
+
+**Languages & Runtimes:**
+- **Rust**: Full Rust toolchain with cargo
+- **Go**: Go programming language and toolchain
+- **Python**: Python development with **uv** (modern, fast Python package manager)
+  - uv provides faster dependency resolution and virtual environment management
+  - Python preference set to "managed" for automatic version handling
+- **JavaScript/Node.js**: Node.js with npm and Git integration
+- **Lua**: Lua programming language and toolchain
+- **SQL**: SQL development tools and utilities
+
+**Build & Protocol Tools:**
+- **gRPC**: grpcurl, evans, and grpc tools for gRPC development
+- **Protobuf**: Protocol buffer compiler and protolint
+- **JSONnet**: JSONnet templating language and jsonnet-bundler
+- **pipx**: Python package installer for isolated environments
+
+**System Debugging:**
+- **d-spy**: D-Bus debugger for system introspection
+- **pyyaml**: Python YAML library for configuration management
+
+All development tools are modularly configured and can be enabled per-host as needed.
 
 ### The Shell 🐚
 
@@ -453,6 +482,8 @@ Things I should do or improve:
 - [ ] Improve development environment consistency across hosts
 - [ ] Add more AI model integrations
 - [ ] Enhance MCP server configurations
+- [ ] Expand SQL development tooling
+- [ ] Add additional build system integrations
 
 ### Desktop
 - [ ] Improve Niri configuration and stability
