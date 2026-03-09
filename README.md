@@ -52,11 +52,12 @@ These computers are managed by this Nix flake ❄️
 
 ## Structure
 
-- `home/`: Home Manager configurations accessible via `home-manager --flake`
+- `home/`: Home Manager configurations accessible via `home-manager switch --flake .#user@host`
   - `features/`: Modular feature configurations organized by category
     - `ai/`: AI tools and assistants with **SuperClaude Framework**
       - Claude with 20 specialized agents and MCP server integration
-      - Gemini, Qwen, Cursor, Windsurf, and more
+      - Framework docs live in `home/features/ai/claude/config/`
+      - Claude, Codex, Gemini, Ollama, OpenCode, and more
     - `desktop/`: Desktop environments and window managers (Hyprland, GNOME, etc.)
       - Omarchy-inspired utilities and keybindings
       - Modern Wayland compositor configurations
@@ -79,14 +80,21 @@ These computers are managed by this Nix flake ❄️
     - Monitoring setups (woody has comprehensive Grafana/Prometheus/Loki stack)
 - `overlays/`: Package patches and version overrides
 - `pkgs/`: Custom packages and applications
-  - `code-cursor/`: Cursor IDE package
-  - `kiro/`: Kiro terminal package
-  - `multiviewer/`: Multiviewer package
-  - `windsurf/`: Windsurf IDE package
+  - `antigravity/`: Antigravity IDE
+  - `claude-code/`: Claude Code CLI
+  - `code-cursor/`: Cursor IDE
+  - `codex/`: OpenAI Codex CLI
+  - `colors/`: Color assets/tools
+  - `cursor-cli/`: Cursor CLI
+  - `gemini-cli/`: Gemini CLI
+  - `github-mcp-server/`: GitHub MCP server
+  - `kiro/`: Kiro IDE
+  - `multiviewer/`: Multiviewer
+  - `vscode-generic/`: VS Code generic builder
 - `templates/`: Project templates for different languages (C, Node.js, Rust)
 - `scripts/`: Update scripts for custom packages
-- `secrets/`: Encrypted secrets managed by [sops-nix]
-- `docs/`: Documentation and configuration guides
+- `secrets/`: Encrypted secrets in `secrets/secrets.yaml` managed by [sops-nix]
+- `docs/`: Documentation and configuration guides (see `docs/secrets.md`, `docs/home-manager.md`)
 - `omarchy/`: Omarchy-inspired configuration and utilities
 - [flake.nix]: Entrypoint for hosts and home configurations
 - [Makefile]: Commands for managing Nix, secrets, and system operations
@@ -117,9 +125,9 @@ If you already have nix 2.4+, git, and have already enabled `flakes` and
 nix develop
 ```
 
-`nixos-rebuild --flake .` To build system configurations
+`nixos-rebuild --flake .#<hostname>` To build system configurations
 
-`home-manager --flake .` To build user configurations
+`home-manager switch --flake .#<user>@<host>` To build user configurations (see `docs/home-manager.md`)
 
 `nix build` (or shell or run) To build and use packages
 
@@ -174,83 +182,7 @@ The console .iso image is also periodically built and published via [GitHub [Act
 
 Nix is configured with [flake support](https://zero-to-nix.com/concepts/flakes) and the [unified CLI](https://zero-to-nix.com/concepts/nix#unified-cli) enabled.
 
-### Structure
-
-Here is the directory structure I'm using.
-
-```
-.
-├── home/
-│   ├── features/
-│   │   ├── ai/                    # AI tools and assistants
-│   │   │   ├── claude/            # Claude configurations with SuperClaude Framework
-│   │   │   │   ├── config/        # Framework documentation and agents
-│   │   │   │   │   ├── PLANNING.md, TASK.md, KNOWLEDGE.md, CONTRIBUTING.md
-│   │   │   │   │   ├── agents/    # 20 specialized AI agents
-│   │   │   │   │   └── MCP servers, modes, and configurations
-│   │   │   ├── gemini/            # Gemini configurations
-│   │   │   ├── qwen/              # Qwen configurations
-│   │   │   ├── cursor/            # Cursor IDE
-│   │   ├── desktop/               # Desktop environments
-│   │   │   ├── window-managers/   # Hyprland, Niri configurations
-│   │   │   ├── environments/      # GNOME, XFCE configurations
-│   │   │   └── common/            # Shared desktop components
-│   │   │       └── scripts/       # System, Wayland, and Rofi utilities
-│       │   ├── development/           # Development tools
-    │   │   │   ├── rust.nix          # Rust toolchain
-    │   │   │   ├── go.nix            # Go toolchain
-    │   │   │   ├── uv.nix            # uv (modern Python package manager)
-    │   │   │   ├── js.nix            # JavaScript/Node.js
-    │   │   │   ├── lua.nix           # Lua toolchain
-    │   │   │   ├── sql.nix           # SQL tools
-    │   │   │   └── build.nix         # Build tools (protobuf, gRPC, etc.)
-│   │   ├── shell/                # Shell configurations
-│   │   │   ├── bash.nix
-│   │   │   ├── fish.nix
-│   │   │   └── zsh.nix
-│   │   ├── media/                # Media applications
-│   │   ├── productivity/         # Productivity tools
-│   │   ├── games/                # Gaming applications
-│   │   └── [many more features]
-│   ├── global/                   # Global Home Manager settings
-│   └── $HOST_NAME.nix           # Host-specific configurations
-├── hosts/
-│   ├── common/
-│   │   ├── global/               # Core system configurations
-│   │   ├── optional/             # Opt-in configurations
-│   │   │   ├── desktop/          # Desktop environments
-│   │   │   ├── services/         # System services
-│   │   │   └── tools/            # System tools
-│   │   └── users/                # User configurations
-│   ├── frametop/                 # Framework laptop config
-│   │   ├── services/             # Laptop-specific services
-│   │   └── monitoring/           # Monitoring setup
-│   ├── woody/                    # Desktop config
-│   │   ├── services/             # Desktop-specific services
-│   │   └── monitoring/            # Comprehensive monitoring stack
-│   └── mini/                     # macOS config
-├── overlays/                     # Package patches and overrides
-├── pkgs/                         # Custom packages
-│   ├── code-cursor/              # Cursor IDE
-│   ├── kiro/                     # Kiro terminal
-│   ├── multiviewer/              # Multiviewer
-│   └── windsurf/                 # Windsurf IDE
-├── templates/                    # Project templates
-│   ├── c/                        # C project template
-│   ├── node/                     # Node.js template
-│   └── rust/                     # Rust template
-├── scripts/                      # Update scripts
-├── secrets/                       # Encrypted secrets
-├── docs/                         # Documentation
-├── omarchy/                      # Omarchy-inspired configuration
-├── flake.nix                     # Main flake configuration
-└── Makefile                      # Management commands
-```
-
-The NixOS and Home Manager configurations are in the `hosts` and `home` directories respectively
-The `pkgs` directory contains my custom packages with package overlays in the `overlays` directory.
-The `secrets.yaml` contains secrets managed by [sops-nix].
-The `default.nix` files in the root of each directory are the entry points.
+See the Structure section above for the directory layout and key entry points.
 
 ### Development Tools 🛠️
 
@@ -304,10 +236,9 @@ This configuration includes comprehensive AI tooling with the **SuperClaude Fram
 An elite AI development framework integrating **20 specialized agents** and structured knowledge management:
 
 **Core Documentation:**
-- **PLANNING.md**: Architecture principles, design decisions, and absolute rules for NixOS configuration
-- **TASK.md**: Task management system with priorities, backlog, and completion tracking
-- **KNOWLEDGE.md**: Accumulated insights, best practices, and NixOS/Nix troubleshooting
-- **CONTRIBUTING.md**: Comprehensive contribution guidelines covering git workflow, commit standards, and code style
+- **`home/features/ai/claude/config/PLANNING.md`**: Architecture principles, design decisions, and absolute rules for NixOS configuration
+- **`home/features/ai/claude/config/TASK.md`**: Task management system with priorities, backlog, and completion tracking
+- **`home/features/ai/claude/config/KNOWLEDGE.md`**: Accumulated insights, best practices, and NixOS/Nix troubleshooting
 
 **Specialized Agents (20):**
 - **nix-systems-specialist**: Elite Nix ecosystem expert for NixOS, Home Manager, and flakes
@@ -324,7 +255,6 @@ An elite AI development framework integrating **20 specialized agents** and stru
 - **refactoring-expert**: Code refactoring and technical debt management
 - **docs-architect**: Technical documentation, docs-as-code, and modern documentation workflows
 - **requirements-analyst**: Requirements gathering and analysis
-- **debugger**: Debugging, error resolution, and systematic root cause analysis
 - **python-expert**: Python development and ecosystem
 - **learning-guide**: Educational content and mentoring
 - **socratic-mentor**: Socratic method teaching approach
@@ -333,12 +263,12 @@ An elite AI development framework integrating **20 specialized agents** and stru
 
 **AI Assistants:**
 - **Claude**: Anthropic's Claude with MCP server integration and SuperClaude framework
+- **Codex**: OpenAI Codex CLI
 - **Gemini**: Google's Gemini AI with CLI tools
 - **Qwen**: Alibaba's Qwen AI models
 
 **Development Tools:**
 - **Cursor**: AI-powered code editor
-- **Windsurf**: Alternative AI code editor
 - **Open WebUI**: Web interface for local AI models
 - **Ollama**: Local AI model management
 
