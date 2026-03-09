@@ -7,10 +7,13 @@ This directory contains scripts organized by scope and compatibility level, foll
 ```
 ~/.local/bin/scripts/
 ├── system/              # System-level scripts (DE/WM independent)
-├── wayland/             # Wayland compositor scripts  
-└── rofi/                # Rofi menu scripts (WM independent)
+└── wayland/             # Wayland compositor scripts (shared)
 
-~/.config/hypr/scripts/  # Hyprland-specific scripts
+~/.config/desktop/window-managers/shared/scripts/
+├── rofi/                # Rofi menu scripts (shared across WMs)
+└── wayland/             # Wayland scripts (shared sources)
+
+~/.config/desktop/window-managers/hyprland/scripts/  # Hyprland-specific scripts
 ├── hypr/                # Hyprland compositor specific
 └── system/              # System integration for Hyprland
 ```
@@ -36,26 +39,20 @@ Wayland compositor compatible utilities:
 
 - **`screenshot.sh`** - Advanced screenshot tool (grimblast/grim+slurp)
 - **`clipboard-manager.sh`** - Clipboard history management (cliphist)
-- **`keybindings-menu.sh`** - Interactive keybindings reference with walker (Hyprland)
-- **`workspace-toggle-gaps.sh`** - Toggle workspace gaps on/off (Hyprland)
-- **`toggle-nightlight.sh`** - Toggle hyprsunset nightlight mode
-- **`toggle-idle.sh`** - Toggle hypridle idle management on/off
-- **`toggle-transparency.sh`** - Toggle window opacity/transparency (Hyprland)
-- **`window-pop.sh`** - Pop window out (float and pin across workspaces) (Hyprland)
 
 **Dependencies**: Wayland compositor, wayland-specific tools
 **Usage**: Works with any Wayland compositor (Hyprland, Sway, etc.)
-**Note**: Some scripts are Hyprland-specific (keybindings-menu, workspace-toggle-gaps)
 
-### Rofi Scripts (`~/.local/bin/scripts/rofi/`)
+### Rofi Scripts (`~/.config/desktop/window-managers/shared/scripts/rofi/`)
 Rofi-based menu interfaces:
 
-- **`web-search.sh`** - Web search engine launcher
+- **`rofi-web-search.sh`** - Web search engine launcher
+  (see the directory for additional rofi menus)
 
 **Dependencies**: rofi, xdg-utils
 **Usage**: Compatible with any window manager that supports rofi
 
-### Hyprland-Specific Scripts (`~/.config/hypr/scripts/`)
+### Hyprland-Specific Scripts (`~/.config/desktop/window-managers/hyprland/scripts/`)
 Hyprland compositor specific functionality:
 
 - **`hypr/`** - Scripts using `hyprctl` commands
@@ -70,8 +67,8 @@ Defined in `~/.config/hypr/conf/variables.conf`:
 # Common script paths (organized by scope)
 $SYSTEM_SCRIPTS = ~/.local/bin/scripts/system
 $WAYLAND_SCRIPTS = ~/.local/bin/scripts/wayland  
-$ROFI_SCRIPTS = ~/.local/bin/scripts/rofi
-$HYPR_SCRIPTS = ~/.config/hypr/scripts
+$ROFI_SCRIPTS = ~/.config/desktop/window-managers/shared/scripts/rofi
+$HYPR_SCRIPTS = ~/.config/desktop/window-managers/hyprland/scripts
 ```
 
 ### Keybinding Examples
@@ -83,10 +80,10 @@ bind = $mainMod, Escape, exec, $SYSTEM_SCRIPTS/power.sh
 bind = , Print, exec, $WAYLAND_SCRIPTS/screenshot.sh area
 
 # Rofi web search
-bind = $mainMod, W, exec, $ROFI_SCRIPTS/web-search.sh
+bind = $mainMod, W, exec, $ROFI_SCRIPTS/rofi-web-search.sh
 
 # Hyprland-specific functionality
-bind = $mainMod, F1, exec, $HYPR_SCRIPTS/hyprland-keybindings.sh
+bind = $mainMod, F1, exec, $HYPR_SCRIPTS/hypr/hyprland-keybindings.sh
 ```
 
 ## Script Features
@@ -115,12 +112,11 @@ All reorganized scripts include:
 Scripts have been moved from the old flat structure:
 ```bash
 # Old paths
-~/.config/hypr/scripts/system/volume.sh
 ~/.config/hypr/scripts/rofi/web-search.sh
 
 # New paths  
 ~/.local/bin/scripts/system/volume.sh
-~/.local/bin/scripts/rofi/web-search.sh
+~/.config/desktop/window-managers/shared/scripts/rofi/rofi-web-search.sh
 ```
 
 ### Configuration Updates

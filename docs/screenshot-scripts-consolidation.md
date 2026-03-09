@@ -8,7 +8,7 @@ This document describes the consolidation of screenshot scripts across the NixOS
 
 ### Unified Script: `screenshot.sh`
 
-**Location:** `home/features/desktop/common/scripts/wayland/screenshot.sh`
+**Location:** `home/features/desktop/window-managers/shared/scripts/wayland/screenshot.sh`
 
 This is the main, comprehensive screenshot script that provides all screenshot functionality:
 
@@ -150,4 +150,3 @@ After consolidation, verify:
 - Consider deprecating `screenshot-enhanced` in favor of unified script if Hyprland support improves
 - Consider adding X11 support to unified script for broader compatibility
 - Consider adding OCR functionality (currently only in keybindings)
-
