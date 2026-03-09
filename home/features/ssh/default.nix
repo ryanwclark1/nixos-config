@@ -11,9 +11,9 @@ let
     user = "administrator";
     identityFile = "~/.ssh/ssh_host_ed25519_key";
     identitiesOnly = true;
-      extraOptions = {
-        PreferredAuthentications = "publickey";
-      };
+    extraOptions = {
+      PreferredAuthentications = "publickey";
+    };
   };
 in
 {
@@ -25,11 +25,16 @@ in
   # IMPORTANT: ~/.ssh/config is fully managed by Nix through this configuration.
   # DO NOT manually edit ~/.ssh/config - it will be overwritten on rebuild.
   # To add new hosts, add entries to the matchBlocks section below, then rebuild.
+  #
+  # IDE TOOLS (VSCode, Cursor, etc.):
+  # These tools can write to ~/.ssh/config.local, which is automatically included.
+  # The main ~/.ssh/config remains managed by Nix, while IDE tools can add their
+  # own entries to config.local without conflicts.
   programs.ssh = {
     enable = true;
     # Disable default config to avoid deprecation warning
     # We explicitly set the defaults we want in matchBlocks."*"
-    enableDefaultConfig = false;
+    # enableDefaultConfig = false;
 
     matchBlocks = {
       # Default settings for all hosts (replaces enableDefaultConfig defaults)
@@ -112,17 +117,34 @@ in
         hostname = "155.138.220.196";
       };
 
-      "10.10.100.113" = commonHostConfig // {
-        hostname = "10.10.100.113";
+      "10.10.100.129" = commonHostConfig // {
+        hostname = "10.10.100.129";
       };
     };
 
     # Additional SSH config that will be appended to the generated config
     # Use this for any SSH options that aren't easily expressible in matchBlocks
-    # extraConfig = ''
-    #   # Custom SSH configuration here
-    # '';
+    extraConfig = ''
+      # Include IDE-managed config (VSCode, Cursor, etc. can write here)
+      # SSH will silently ignore this if the file doesn't exist
+      Include ~/.ssh/config.local
+    '';
   };
+
+  # Ensure ~/.ssh/config.local exists for IDE tools (VSCode, Cursor, etc.)
+  # This file is writable by IDE tools and is automatically included in the SSH config
+  # The file is created with proper permissions if it doesn't exist
+  home.activation.ensureSshConfigLocal = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    SSH_CONFIG_LOCAL="${config.home.homeDirectory}/.ssh/config.local"
+    if [ ! -f "$SSH_CONFIG_LOCAL" ]; then
+      touch "$SSH_CONFIG_LOCAL"
+      chmod 600 "$SSH_CONFIG_LOCAL"
+      echo "# IDE-managed SSH configuration" > "$SSH_CONFIG_LOCAL"
+      echo "# This file is automatically included by ~/.ssh/config" >> "$SSH_CONFIG_LOCAL"
+      echo "# VSCode, Cursor, and other IDE tools can safely write to this file" >> "$SSH_CONFIG_LOCAL"
+      echo "# without conflicts with the Nix-managed main config" >> "$SSH_CONFIG_LOCAL"
+    fi
+  '';
 
   # Ensure ~/.ssh/config is fully managed by Nix
   # This removes any manual ~/.ssh/config file and ensures Nix has full control
