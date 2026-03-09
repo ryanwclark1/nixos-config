@@ -37,7 +37,7 @@
       #   # BACKGROUND
       #   background = {
       #     # monitor =
-      #     path = "$HOME/.config/hypr/scripts/cache/blurred_wallpaper.png";
+      #     path = "$HOME/.config/desktop/window-managers/hyprland/scripts/cache/blurred_wallpaper.png";
       #     # color = "rgb(48,52,70)";
       #     # blur_passes = 1; # 0 disables blurring
       #     # blur_size = 7;

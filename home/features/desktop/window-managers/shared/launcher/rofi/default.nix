@@ -107,7 +107,7 @@ in
   };
 
   home.file = {
-    # Power menu scripts are now accessible via ~/.config/hypr/scripts/rofi/powermenu-unified.sh
+    # Rofi scripts are available under ~/.config/desktop/window-managers/shared/scripts/rofi
   };
 
   programs.rofi = {

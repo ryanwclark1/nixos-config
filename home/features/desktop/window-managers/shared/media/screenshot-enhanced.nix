@@ -10,7 +10,7 @@
   #
   # NOTE: This module provides Hyprland-specific screenshot tools using hyprshot.
   # For general Wayland screenshot functionality, see:
-  # - home/features/desktop/common/scripts/wayland/screenshot.sh (unified script)
+  # - home/features/desktop/window-managers/shared/scripts/wayland/screenshot.sh (unified script)
   # - home/features/desktop/common/scripts/system/os-cmd-screenshot (wrapper)
   #
   # This module is kept separate because:

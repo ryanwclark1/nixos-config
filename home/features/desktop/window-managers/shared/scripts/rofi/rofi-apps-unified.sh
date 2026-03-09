@@ -98,9 +98,9 @@ else
 
     # Commands for user applications - use script-relative path for settings
     SETTINGS_SCRIPT="$SCRIPT_DIR/settings-menu.sh"
-    # Fallback to common locations if script not found in same directory
+    # Fallback to shared scripts if script not found in same directory
     if [[ ! -f "$SETTINGS_SCRIPT" ]]; then
-        SETTINGS_SCRIPT="$HOME/.config/hypr/scripts/rofi/settings-menu.sh"
+        SETTINGS_SCRIPT="$HOME/.config/desktop/window-managers/shared/scripts/rofi/settings-menu.sh"
     fi
 
     OPTIONS="$APP_TERMINAL\n$APP_FILEMANAGER\n$APP_EDITOR\n$APP_BROWSER\n$APP_MUSIC\n$APP_SETTINGS"

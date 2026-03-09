@@ -62,7 +62,7 @@ show_settings_menu() {
   *Bluetooth*) blueberry ;;
   *Power*) show_power_menu ;;
   *Displays*) wdisplays ;;
-  *Keybindings*) $HYPR_SCRIPTS/hyprland-keybindings.sh ;;
+  *Keybindings*) $HYPR_SCRIPTS/hypr/hyprland-keybindings.sh ;;
   *) show_main_menu ;;
   esac
 }

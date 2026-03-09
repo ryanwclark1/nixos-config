@@ -59,8 +59,8 @@
       "persistent-workspaces": {
         "*": 5
       },
-      "on-scroll-up": "~/.config/hypr/scripts/hypr/workspace-switcher.sh next",
-      "on-scroll-down": "~/.config/hypr/scripts/hypr/workspace-switcher.sh prev",
+      "on-scroll-up": "~/.config/desktop/window-managers/hyprland/scripts/hypr/workspace-switcher.sh next",
+      "on-scroll-down": "~/.config/desktop/window-managers/hyprland/scripts/hypr/workspace-switcher.sh prev",
       "sort-by-number": true
     },
 
@@ -211,7 +211,7 @@
       },
       "on-click": "kitty --class=Wiremix -e wiremix",
       "on-click-right": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
-      "on-click-middle": "~/.config/hypr/scripts/rofi/settings-menu.sh"
+      "on-click-middle": "~/.config/desktop/window-managers/shared/scripts/rofi/settings-menu.sh"
     },
 
     "cpu": {
@@ -272,14 +272,14 @@
 
     "custom/settings": {
       "format": "󰒓 ",
-      "on-click": "~/.config/hypr/scripts/rofi/settings-menu.sh",
+      "on-click": "~/.config/desktop/window-managers/shared/scripts/rofi/settings-menu.sh",
       "tooltip": "Settings",
       "class": "action-button"
     },
 
     "custom/wallpaper": {
       "format": "󰸉 ",
-      "on-click": "sh -c 'cd ~/.config/hypr/scripts/hypr && ./wallpaper-manager.sh random'",
+      "on-click": "sh -c 'cd ~/.config/desktop/window-managers/hyprland/scripts/hypr && ./wallpaper-manager.sh random'",
       "on-click-right": "waypaper",
       "tooltip": "Wallpaper • Left: Random • Right: Waypaper",
       "class": "action-button"

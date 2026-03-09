@@ -300,8 +300,8 @@ show_settings_menu() {
       fi
       ;;
     *Keybindings*)
-      if [[ -n "$HYPR_SCRIPTS" ]] && [[ -f "$HYPR_SCRIPTS/hyprland-keybindings.sh" ]]; then
-        "$HYPR_SCRIPTS/hyprland-keybindings.sh"
+      if [[ -n "$HYPR_SCRIPTS" ]] && [[ -f "$HYPR_SCRIPTS/hypr/hyprland-keybindings.sh" ]]; then
+        "$HYPR_SCRIPTS/hypr/hyprland-keybindings.sh"
       else
         notify-send "Keybindings" "Keybindings script not found"
       fi

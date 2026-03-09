@@ -89,7 +89,7 @@ show_settings_menu() {
   *Bluetooth*) blueberry ;;
   *Power*) show_power_menu ;;
   *Displays*) wdisplays ;;
-  *Keybindings*) $HYPR_SCRIPTS/hyprland-keybindings.sh ;;
+  *Keybindings*) $HYPR_SCRIPTS/hypr/hyprland-keybindings.sh ;;
   *Appearance*) gnome-control-center appearance 2>/dev/null || notify-send "Settings" "Appearance settings not available" ;;
   *) [[ -n "$selection" ]] && show_main_menu ;;
   esac

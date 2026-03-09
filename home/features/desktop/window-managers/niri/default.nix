@@ -141,27 +141,27 @@
           "Mod+N".action.spawn = "nautilus";
           "Mod+Alt+L".action.spawn = "hyprlock";
 
-          # Screenshot (using same script as Hyprland and built-in actions)
-          "Print".action.spawn = "~/.config/hypr/scripts/rofi/screenshot-menu.sh";
-          "Mod+S".action.spawn = "~/.config/hypr/scripts/rofi/screenshot-menu.sh";
+          # Screenshot (using shared Wayland script)
+          "Print".action.spawn = "~/.local/bin/scripts/wayland/screenshot.sh area";
+          "Mod+S".action.spawn = "~/.local/bin/scripts/wayland/screenshot.sh area";
           "Mod+Print".action.screenshot-screen = { };
           "Alt+Print".action.screenshot-window = { };
 
           # Power menu
-          "Mod+Escape".action.spawn = "~/.config/hypr/scripts/rofi/powermenu-unified.sh";
+          "Mod+Escape".action.spawn = "~/.config/desktop/window-managers/shared/scripts/rofi/rofi-power.sh";
 
           # Clipboard history
           "Mod+V".action.spawn = "cliphist list | rofi -dmenu | cliphist decode | wl-copy";
 
           # Web search
-          "Mod+Shift+W".action.spawn = "web-search";
+          "Mod+Shift+W".action.spawn = "~/.config/desktop/window-managers/shared/scripts/rofi/rofi-web-search.sh";
         };
       };
     };
   };
 
   # Niri-specific packages would go here
-  # Note: Basic Wayland tools (wl-clipboard, grim, slurp) are provided by common/wayland/
+  # Note: Basic Wayland tools (wl-clipboard, grim, slurp) are provided by window-managers/shared/
   # Note: wlroots tools (wlr-randr) are provided by window-managers/shared/utils.nix
   home.packages = with pkgs; [
     # Currently no Niri-specific packages needed

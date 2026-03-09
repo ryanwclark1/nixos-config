@@ -27,6 +27,14 @@
       executable = true;
     };
 
+    # Wayland scripts (shared across Wayland window managers)
+    ".local/bin/scripts/wayland" = {
+      force = true;
+      source = ./scripts/wayland;
+      recursive = true;
+      executable = true;
+    };
+
     ".config/desktop/window-managers/shared/scripts" = {
       source = ./scripts;
       recursive = true;

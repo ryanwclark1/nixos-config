@@ -36,7 +36,7 @@ case "$CHOICE" in
 
 ```bash
 # Instead of:
-CMD_SETTINGS="$HOME/.config/hypr/scripts/rofi/settings-menu.sh"
+CMD_SETTINGS="$HOME/.config/desktop/window-managers/shared/scripts/rofi/settings-menu.sh"
 
 # Use:
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
