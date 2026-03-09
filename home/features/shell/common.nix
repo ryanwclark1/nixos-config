@@ -75,30 +75,9 @@
       # Editor shortcuts
       vim = "nvim";
       vi = "nvim";
-      e = "$EDITOR";
       o = "xdg-open";
 
       wifi = "nmtui";
-
-      # Docker
-      d = "docker";
-      dc = "docker compose";
-      dps = "docker ps";
-      dpsa = "docker ps -a";
-      dimg = "docker images";
-      drm = "docker rm";
-      drmi = "docker rmi";
-
-      # Kubernetes
-      k = "kubectl";
-      kx = "kubectx";
-      kns = "kubens";
-      kgp = "kubectl get pods";
-      kgs = "kubectl get services";
-      kgd = "kubectl get deployments";
-      kgn = "kubectl get nodes";
-      kctx = "kubectx";
-      kustomize-build = "kustomize build";
 
       # Network
       ip = "ip --color=auto";
@@ -110,11 +89,7 @@
       help = "man";
       mk = "mkdir -p";
       path = "echo $PATH | tr ':' '\\n'";
-      tf = "terraform";
       jqless = "jq -C | bat --pager 'less RF' --style=numbers --color=always";
-
-      # Configuration
-      nixconf = "$EDITOR ~/nixos-config/flake.nix";
 
       # Kitty specific
       cik = lib.mkIf config.programs.kitty.enable "clone-in-kitty --type os-window";
