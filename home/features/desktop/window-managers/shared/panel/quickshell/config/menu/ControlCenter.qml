@@ -24,13 +24,14 @@ PanelWindow {
   
   implicitWidth: 350
   color: "transparent"
-  mask: Region {}
+  mask: Region {
+  }
   WlrLayershell.layer: WlrLayer.Top
   WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
   WlrLayershell.namespace: "quickshell"
   
   property bool showContent: false
-  visible: true
+  visible: showContent || sidebarContent.x < 350
 
   // Grab focus when sidebar is shown
   onShowContentChanged: {

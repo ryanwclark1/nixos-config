@@ -65,7 +65,11 @@ Scope {
       right: Config.barFloating ? Config.barMargin : 0
     }
 
+    color: "transparent"
     implicitHeight: Config.barHeight
+
+    mask: Region {
+    }
 
     Panel {
       id: panel
@@ -150,6 +154,8 @@ Scope {
     }
     color: "transparent"
     exclusiveZone: -1
+    WlrLayershell.layer: WlrLayer.Background
+    mask: Region {}
 
     DesktopWidgets {
       anchors.left: parent.left

@@ -18,6 +18,7 @@ PanelWindow {
   implicitWidth: 350
   implicitHeight: col.implicitHeight
   color: "transparent"
+  mask: Region {}
 
   property var manager: null
 

@@ -27,7 +27,8 @@ Item {
     color: root.background
     opacity: Config.barOpacity
     radius: Config.barFloating ? 12 : 0
-    
+    border.color: Config.barFloating ? Colors.border : "transparent"
+    border.width: Config.barFloating ? 1 : 0
   }
 
   // LEFT MODULES

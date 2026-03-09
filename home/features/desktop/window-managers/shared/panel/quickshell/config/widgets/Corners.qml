@@ -55,8 +55,7 @@ Scope {
                     
                     // The corner effect: we draw an inverted curve
                     Shape {
-            width: screen ? screen.width : 0
-            height: screen ? screen.height : 0
+                        anchors.fill: parent
                         // Smooth antialiasing
                         layer.enabled: true
                         layer.samples: 4

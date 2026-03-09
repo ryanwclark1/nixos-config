@@ -53,9 +53,9 @@ Row {
       PopupWindow {
         id: previewWindow
         visible: root.hoveredWorkspace === modelData && !modelData.active
-        parentWindow: toplevel
-        relativeX: wsButton.mapToItem(null, 0, 0).x - 150 + (wsButton.width / 2)
-        relativeY: Config.barHeight + Config.barMargin + 8
+        anchor.window: toplevel
+        anchor.rect.x: wsButton.mapToItem(null, 0, 0).x - 150 + (wsButton.width / 2)
+        anchor.rect.y: Config.barHeight + Config.barMargin + 8
         width: 300; height: 180; color: "transparent"
 
         Rectangle {
