@@ -88,7 +88,13 @@ Rectangle {
     ColumnLayout {
       Layout.fillWidth: true
       RowLayout {
-        Text { text: "DOWNLOAD"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
+        Text { 
+          text: "DOWNLOAD"
+          color: Colors.textDisabled
+          font.pixelSize: 8
+          font.weight: Font.Bold
+          font.capitalization: Font.AllUppercase
+        }
         Item { Layout.fillWidth: true }
         Text { text: root.currentDown; color: Colors.primary; font.pixelSize: 9; font.weight: Font.Bold }
       }
@@ -109,7 +115,13 @@ Rectangle {
     ColumnLayout {
       Layout.fillWidth: true
       RowLayout {
-        Text { text: "UPLOAD"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
+        Text { 
+          text: "UPLOAD"
+          color: Colors.textDisabled
+          font.pixelSize: 8
+          font.weight: Font.Bold
+          font.capitalization: Font.AllUppercase
+        }
         Item { Layout.fillWidth: true }
         Text { text: root.currentUp; color: Colors.accent; font.pixelSize: 9; font.weight: Font.Bold }
       }

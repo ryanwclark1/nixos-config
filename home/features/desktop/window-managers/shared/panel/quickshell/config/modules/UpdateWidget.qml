@@ -49,17 +49,38 @@ Rectangle {
     ColumnLayout {
       Layout.fillWidth: true
       spacing: 2
-      Text { text: "System Updates"; color: Colors.fgMain; font.pixelSize: 16; font.weight: Font.Bold }
+      Text { 
+        text: "System Updates"
+        color: Colors.fgMain
+        font.pixelSize: 14
+        font.weight: Font.Bold
+        elide: Text.ElideRight
+        Layout.fillWidth: true
+      }
       
       RowLayout {
         spacing: 10
-        Text { text: " NixOS: " + root.nixUpdates; color: Colors.fgSecondary; font.pixelSize: 11; font.family: Colors.fontMono }
-        Text { text: "󰏘 Flatpak: " + root.flatpakUpdates; color: Colors.fgSecondary; font.pixelSize: 11; font.family: Colors.fontMono }
+        Text { 
+          text: " NixOS: " + root.nixUpdates
+          color: Colors.fgSecondary
+          font.pixelSize: 10
+          font.family: Colors.fontMono
+          elide: Text.ElideRight
+          Layout.fillWidth: true
+        }
+        Text { 
+          text: "󰏘 Flatpak: " + root.flatpakUpdates
+          color: Colors.fgSecondary
+          font.pixelSize: 10
+          font.family: Colors.fontMono
+          elide: Text.ElideRight
+          Layout.fillWidth: true
+        }
       }
     }
 
     Rectangle {
-      width: 80; height: 32; radius: 6; color: root.isChecking ? Colors.highlightLight : Colors.primary
+      width: 80; height: 32; radius: 6; color: root.isChecking ? Colors.surface : Colors.primary
       Text { 
         anchors.centerIn: parent
         text: root.isChecking ? "..." : "Refresh"

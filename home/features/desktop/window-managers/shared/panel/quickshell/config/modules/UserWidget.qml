@@ -61,17 +61,22 @@ Rectangle {
     }
 
     ColumnLayout {
+      Layout.fillWidth: true
       spacing: 2
       Text {
         text: "Welcome back, " + root.username
         color: Colors.fgMain
-        font.pixelSize: 16
+        font.pixelSize: 15
         font.weight: Font.Bold
+        Layout.fillWidth: true
+        elide: Text.ElideRight
       }
       Text {
         text: "System Uptime: " + root.uptime
         color: Colors.fgSecondary
-        font.pixelSize: 11
+        font.pixelSize: 10
+        Layout.fillWidth: true
+        elide: Text.ElideRight
       }
     }
   }

@@ -36,7 +36,13 @@ Rectangle {
     anchors.margins: 15
     spacing: 10
 
-    Text { text: "DISK USAGE"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
+    Text { 
+      text: "DISK USAGE"
+      color: Colors.textDisabled
+      font.pixelSize: 8
+      font.weight: Font.Bold
+      font.capitalization: Font.AllUppercase
+    }
 
     RowLayout {
       Layout.fillWidth: true
@@ -48,8 +54,14 @@ Rectangle {
           Layout.fillWidth: true
           spacing: 4
           RowLayout {
-            Text { text: modelData.mount === "/" ? "󰋊 Root" : "󰋊 Home"; color: Colors.fgMain; font.pixelSize: 11; font.weight: Font.Medium }
-            Item { Layout.fillWidth: true }
+            Text { 
+              text: modelData.mount === "/" ? "󰋊 Root" : "󰋊 Home"
+              color: Colors.fgMain
+              font.pixelSize: 11
+              font.weight: Font.Medium
+              Layout.fillWidth: true
+              elide: Text.ElideRight
+            }
             Text { text: modelData.used + " / " + modelData.total; color: Colors.fgSecondary; font.pixelSize: 10 }
           }
           Rectangle {

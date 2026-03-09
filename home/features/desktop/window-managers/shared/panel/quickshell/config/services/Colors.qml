@@ -20,6 +20,10 @@ QtObject {
   property color textDisabled: "#666666"
   
   // --- DERIVED PROPERTIES (Auto-updating) ---
+  readonly property color fgMain: text
+  readonly property color fgSecondary: textSecondary
+  readonly property color fgDim: textDisabled
+
   readonly property color border: Qt.rgba(textDisabled.r, textDisabled.g, textDisabled.b, 0.2)
   readonly property color highlight: Qt.rgba(primary.r, primary.g, primary.b, 0.2)
   readonly property color highlightLight: Qt.rgba(primary.r, primary.g, primary.b, 0.1)
@@ -27,6 +31,7 @@ QtObject {
   // --- GLASSMORPHISM ---
   readonly property real bgOpacity: 0.65
   readonly property color bgGlass: Qt.rgba(background.r, background.g, background.b, bgOpacity)
+  readonly property color bgWidget: Qt.rgba(255, 255, 255, 0.05)
   
   // --- DIMENSIONS ---
   readonly property real radiusLarge: 16

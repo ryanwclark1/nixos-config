@@ -2,14 +2,15 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
+import "../services"
 
 Rectangle {
   id: root
   Layout.fillWidth: true
   Layout.preferredHeight: 120
-  color: "#0dffffff"
-  radius: 12
-  border.color: "#33ffffff"
+  color: Colors.bgWidget
+  radius: Colors.radiusMedium
+  border.color: Colors.border
   clip: true
 
   property var cpuHistory: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -71,7 +72,13 @@ Rectangle {
 
     ColumnLayout {
       Layout.fillWidth: true
-      Text { text: "CPU LOAD"; color: "#666666"; font.pixelSize: 10; font.weight: Font.Bold }
+      Text { 
+        text: "CPU LOAD"
+        color: Colors.textDisabled
+        font.pixelSize: 8
+        font.weight: Font.Bold
+        font.capitalization: Font.AllUppercase
+      }
       Canvas {
         id: cpuCanvas
         Layout.fillWidth: true
@@ -79,7 +86,7 @@ Rectangle {
         onPaint: {
           var ctx = getContext("2d");
           ctx.reset();
-          ctx.strokeStyle = "#4caf50";
+          ctx.strokeStyle = Colors.primary;
           ctx.lineWidth = 2;
           ctx.beginPath();
           var w = width / (root.cpuHistory.length - 1);
@@ -96,7 +103,13 @@ Rectangle {
 
     ColumnLayout {
       Layout.fillWidth: true
-      Text { text: "MEMORY"; color: "#666666"; font.pixelSize: 10; font.weight: Font.Bold }
+      Text { 
+        text: "MEMORY"
+        color: Colors.textDisabled
+        font.pixelSize: 8
+        font.weight: Font.Bold
+        font.capitalization: Font.AllUppercase
+      }
       Canvas {
         id: memCanvas
         Layout.fillWidth: true
@@ -104,7 +117,7 @@ Rectangle {
         onPaint: {
           var ctx = getContext("2d");
           ctx.reset();
-          ctx.strokeStyle = "#2196f3";
+          ctx.strokeStyle = Colors.accent;
           ctx.lineWidth = 2;
           ctx.beginPath();
           var w = width / (root.memHistory.length - 1);

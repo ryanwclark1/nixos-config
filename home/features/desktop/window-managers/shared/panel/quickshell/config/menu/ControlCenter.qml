@@ -163,7 +163,13 @@ PanelWindow {
           
           Column {
             width: parent.width; spacing: 8
-            Text { text: "WI-FI NETWORKS"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
+            Text { 
+              text: "WI-FI NETWORKS"
+              color: Colors.textDisabled
+              font.pixelSize: 8
+              font.weight: Font.Bold
+              font.capitalization: Font.AllUppercase
+            }
             Repeater {
               model: root.wifiNetworks
               delegate: Column {
@@ -192,7 +198,13 @@ PanelWindow {
           Column {
             width: parent.width; spacing: 8
             visible: root.vpns.length > 0 || root.tailscaleStatus !== "Stopped"
-            Text { text: "VPN & OVERLAYS"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
+            Text { 
+              text: "VPN & OVERLAYS"
+              color: Colors.textDisabled
+              font.pixelSize: 8
+              font.weight: Font.Bold
+              font.capitalization: Font.AllUppercase
+            }
             Rectangle {
               width: parent.width; height: 40; color: Colors.highlightLight; radius: 8; visible: root.tailscaleStatus !== "Stopped"
               RowLayout {
@@ -221,7 +233,13 @@ PanelWindow {
           Column {
             width: parent.width; spacing: 8
             visible: Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled
-            Text { text: "BLUETOOTH DEVICES"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
+            Text { 
+              text: "BLUETOOTH DEVICES"
+              color: Colors.textDisabled
+              font.pixelSize: 8
+              font.weight: Font.Bold
+              font.capitalization: Font.AllUppercase
+            }
             Repeater {
               model: Bluetooth.defaultAdapter ? Bluetooth.defaultAdapter.devices : null
               delegate: Rectangle {
@@ -239,7 +257,13 @@ PanelWindow {
 
           Column {
             width: parent.width; spacing: 8
-            Text { text: "AUDIO OUTPUTS"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
+            Text { 
+              text: "AUDIO OUTPUTS"
+              color: Colors.textDisabled
+              font.pixelSize: 8
+              font.weight: Font.Bold
+              font.capitalization: Font.AllUppercase
+            }
             Repeater {
               model: Pipewire.objects
               delegate: Rectangle {
@@ -259,7 +283,13 @@ PanelWindow {
 
           Column {
             width: parent.width; spacing: 8
-            Text { text: "APPLICATION VOLUME"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
+            Text { 
+              text: "APPLICATION VOLUME"
+              color: Colors.textDisabled
+              font.pixelSize: 8
+              font.weight: Font.Bold
+              font.capitalization: Font.AllUppercase
+            }
             Repeater {
               model: Pipewire.objects
               delegate: Rectangle {
@@ -293,9 +323,9 @@ PanelWindow {
             { icon: "󰌾", cmd: "hyprlock" }
           ]
           delegate: Rectangle {
-            Layout.fillWidth: true; height: 40; color: Colors.highlightLight; radius: 8
-            Text { anchors.centerIn: parent; text: modelData.icon; color: Colors.error; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18 }
-            MouseArea { anchors.fill: parent; hoverEnabled: true; onEntered: parent.color = Colors.surface; onExited: parent.color = Colors.highlightLight; onClicked: Quickshell.execDetached(modelData.cmd.split(" ")) }
+            Layout.fillWidth: true; height: 40; color: Colors.surface; radius: 8
+            Text { anchors.centerIn: parent; text: modelData.icon; color: Colors.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18 }
+            MouseArea { anchors.fill: parent; hoverEnabled: true; onEntered: parent.color = Colors.highlightLight; onExited: parent.color = Colors.surface; onClicked: Quickshell.execDetached(modelData.cmd.split(" ")) }
           }
         }
       }

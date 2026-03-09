@@ -20,7 +20,13 @@ Rectangle {
     anchors.margins: 15
     spacing: 10
 
-    Text { text: "SCRATCHPAD WINDOWS"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
+    Text { 
+      text: "SCRATCHPAD WINDOWS"
+      color: Colors.textDisabled
+      font.pixelSize: 8
+      font.weight: Font.Bold
+      font.capitalization: Font.AllUppercase
+    }
 
     ColumnLayout {
       Layout.fillWidth: true

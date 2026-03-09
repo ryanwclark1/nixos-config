@@ -41,16 +41,21 @@ PanelWindow {
     anchors.fill: parent; onClicked: settingsRoot.close()
     Rectangle { anchors.fill: parent; color: "#000000"; opacity: 0.5 }
   }
+// Main Container
+Rectangle {
+  id: mainContainer
+  width: 700; height: 500
+  anchors.centerIn: parent
+  color: Colors.bgGlass
+  border.color: Colors.border; border.width: 1; radius: Colors.radiusLarge
+  clip: true
 
-  // Main Container
-  Rectangle {
-    id: mainContainer
-    width: 700; height: 500
-    anchors.centerIn: parent
-    color: Colors.bgGlass
-    border.color: Colors.border; border.width: 1; radius: Colors.radiusLarge
-    clip: true
+  opacity: settingsRoot.isOpen ? 1.0 : 0.0
+  scale: settingsRoot.isOpen ? 1.0 : 0.9
+  Behavior on opacity { NumberAnimation { duration: 200 } }
+  Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }
 
+  WlLayerSurface {
     MouseArea { anchors.fill: parent }
 
     RowLayout {

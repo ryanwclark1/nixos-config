@@ -25,19 +25,32 @@ Row {
       clip: true
 
       IconImage {
+        id: taskIcon
         anchors.centerIn: parent
         implicitWidth: 20
         implicitHeight: 20
-        // Try to find icon by class name, fallback to generic
-        source: Quickshell.iconPath((modelData.class || "").toLowerCase()) || Quickshell.iconPath("application-x-executable") || ""
         
+        // Use a function to safely check for the icon path
+        property string iconPath: {
+            var cls = (modelData.class || "").toLowerCase();
+            var path = Quickshell.iconPath(cls);
+            if (!path) path = Quickshell.iconPath("application-x-executable");
+            return path || "";
+        }
+        
+        source: iconPath
+        
+        // When source is empty or status is not ready, hide the IconImage 
+        // to prevent pink checkerboards in some Quickshell versions.
+        visible: status === IconImage.Ready && source != ""
+
         // Fallback to initial if icon not found
         Text {
           anchors.centerIn: parent
           text: modelData.class ? modelData.class.charAt(0).toUpperCase() : "?"
           color: Colors.fgMain
           font.pixelSize: 14
-          visible: parent.status !== IconImage.Ready
+          visible: !taskIcon.visible
         }
       }
 

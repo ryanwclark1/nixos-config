@@ -68,7 +68,8 @@ Scope {
     color: "transparent"
     implicitHeight: Config.barHeight
 
-    mask: Region {}
+    WlrLayershell.layer: WlrLayer.Top
+    WlrLayershell.namespace: "quickshell"
 
     Panel {
       id: panel
