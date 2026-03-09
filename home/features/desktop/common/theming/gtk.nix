@@ -8,12 +8,7 @@
 # rec
 {
   # Environment variables for GTK rendering compatibility
-  home.sessionVariables = {
-    # Force software rendering for problematic graphics setups
-    GSK_RENDERER = lib.mkDefault "cairo";
-    # Disable problematic graphics APIs
-    GDK_DISABLE = "gles-api,vulkan";
-  };
+  home.sessionVariables = { };
 
   gtk = {
     enable = lib.mkDefault true;
@@ -42,6 +37,8 @@
     };
     gtk3 = {
       bookmarks = [
+        "file:///home/administrator/Code"
+        "file:///home/administrator/Downloads"
         "file:///mnt/share"
         "file:///mnt/conf"
         "file:///mnt/sync"
