@@ -34,7 +34,7 @@ in
     enable = true;
     # Disable default config to avoid deprecation warning
     # We explicitly set the defaults we want in matchBlocks."*"
-    # enableDefaultConfig = false;
+    enableDefaultConfig = false;
 
     matchBlocks = {
       # Default settings for all hosts (replaces enableDefaultConfig defaults)
