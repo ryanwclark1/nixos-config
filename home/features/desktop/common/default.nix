@@ -10,6 +10,7 @@
     # ./wallpapers.nix
     ./xdg
     ./wayland
+    ./quickshell.nix
   ];
 
   # Core desktop dependencies - other packages moved to appropriate feature directories
@@ -45,30 +46,6 @@
       PATH="${pkgs.procps}/bin:${pkgs.coreutils}/bin:$PATH"
     '' + builtins.readFile ./scripts/system/screenrecording-indicator.sh))
 
-    # Wayland utility scripts (Hyprland-compatible)
-    (writeShellScriptBin "keybindings-menu" (''
-      PATH="${pkgs.hyprland}/bin:${pkgs.jq}/bin:${pkgs.libxkbcommon}/bin:${pkgs.walker}/bin:${pkgs.gawk}/bin:${pkgs.gnused}/bin:${pkgs.coreutils}/bin:$PATH"
-    '' + builtins.readFile ./scripts/wayland/keybindings-menu.sh))
-
-    (writeShellScriptBin "workspace-toggle-gaps" (''
-      PATH="${pkgs.hyprland}/bin:${pkgs.jq}/bin:${pkgs.libnotify}/bin:$PATH"
-    '' + builtins.readFile ./scripts/wayland/workspace-toggle-gaps.sh))
-
-    (writeShellScriptBin "toggle-nightlight" (''
-      PATH="${pkgs.hyprland}/bin:${pkgs.procps}/bin:${pkgs.gnugrep}/bin:${pkgs.libnotify}/bin:${pkgs.coreutils}/bin:$PATH"
-    '' + builtins.readFile ./scripts/wayland/toggle-nightlight.sh))
-
-    (writeShellScriptBin "toggle-idle" (''
-      PATH="${pkgs.procps}/bin:${pkgs.libnotify}/bin:$PATH"
-    '' + builtins.readFile ./scripts/wayland/toggle-idle.sh))
-
-    (writeShellScriptBin "toggle-transparency" (''
-      PATH="${pkgs.hyprland}/bin:${pkgs.jq}/bin:${pkgs.libnotify}/bin:$PATH"
-    '' + builtins.readFile ./scripts/wayland/toggle-transparency.sh))
-
-    (writeShellScriptBin "window-pop" (''
-      PATH="${pkgs.hyprland}/bin:${pkgs.jq}/bin:${pkgs.libnotify}/bin:$PATH"
-    '' + builtins.readFile ./scripts/wayland/window-pop.sh))
   ];
 
   # Desktop common scripts - available to all desktop environments/window managers
@@ -81,12 +58,5 @@
       executable = true;
     };
 
-    # Wayland-specific scripts (for all Wayland compositors)
-    ".local/bin/scripts/wayland" = {
-      force = true;
-      source = ./scripts/wayland;
-      recursive = true;
-      executable = true;
-    };
   };
 }
