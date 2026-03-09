@@ -1,31 +1,38 @@
 # home/vivid.nix
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 let
-  # Base24 palette mapping
-  base00 = "303446"; # Default Background
-  base01 = "292c3c"; # Lighter Background (Used for status bars, line number and folding marks)
-  base02 = "414559"; # Selection Background
-  base03 = "51576d"; # Comments, Invisibles, Line Highlighting
-  base04 = "626880"; # Dark Foreground (Used for status bars)
-  base05 = "c6d0f5"; # Default Foreground, Caret, Delimiters, Operators
-  base06 = "f2d5cf"; # Light Foreground (Not often used)
-  base07 = "babbf1"; # Light Background (Not often used)
-  base08 = "e78284"; # Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted
-  base09 = "ef9f76"; # Integers, Boolean, Constants, XML Attributes, Markup Link Url
-  base0A = "e5c890"; # Classes, Markup Bold, Search Text Background
-  base0B = "a6d189"; # Strings, Inherited Class, Markup Code, Diff Inserted
-  base0C = "81c8be"; # Support, Regular Expressions, Escape Characters, Markup Quotes
-  base0D = "8caaee"; # Functions, Methods, Attribute IDs, Headings
-  base0E = "ca9ee6"; # Keywords, Storage, Selector, Markup Italic, Diff Changed
-  base0F = "eebebe"; # Deprecated, Opening/Closing Embedded Language Tags
-  base10 = "292c3c"; # Darker Background
-  base11 = "232634"; # Darkest Background
-  base12 = "ea999c"; # Bright Red
-  base13 = "f2d5cf"; # Bright Orange
-  base14 = "a6d189"; # Bright Yellow
-  base15 = "99d1db"; # Bright Green
-  base16 = "85c1dc"; # Bright Cyan
-  base17 = "f4b8e4"; # Bright Blue
+  colors = import ../../theme/colors.nix;
+  inherit (colors)
+    base00
+    base01
+    base02
+    base03
+    base04
+    base05
+    base06
+    base07
+    base08
+    base09
+    base0A
+    base0B
+    base0C
+    base0D
+    base0E
+    base0F
+    base10
+    base11
+    base12
+    base13
+    base14
+    base15
+    base16
+    base17
+    ;
 
   # Write the vivid theme YAML following the correct schema
   themeYml = pkgs.writeText "theme.yml" ''
@@ -160,13 +167,12 @@ in
     enableBashIntegration = lib.mkIf config.programs.bash.enable true;
     enableFishIntegration = lib.mkIf config.programs.fish.enable true;
     enableZshIntegration = lib.mkIf config.programs.zsh.enable true;
-    themes.theme = themeYml;
-    colorMode = "24-bit";          # or "8-bit" for limited color support
-    activeTheme = "theme";  # Use our base24 theme
+    themes.theme = builtins.toPath themeYml;
+    colorMode = "24-bit"; # or "8-bit" for limited color support
+    activeTheme = "theme"; # Use our base24 theme
 
     # Home-Manager expects an attrset of absolute paths.
     # We feed our generated base24 theme file here.
-
 
     # If you maintain a theme filetype DB, you can also add it like:
     # filetypes = pkgs.fetchurl { url = ".../filetypes.yml"; hash = "sha256-..."; };
