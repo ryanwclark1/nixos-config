@@ -1,8 +1,11 @@
 import QtQuick
+import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
+import Quickshell.Hyprland
+import Quickshell.Wayland._Screencopy
 import Quickshell.Wayland
-import "../launcher"
+import "../services"
 
 PanelWindow {
   id: dockWindow
@@ -10,12 +13,11 @@ PanelWindow {
     bottom: true
   }
   
-  // Center it by not anchoring left or right
   implicitWidth: dockContainer.implicitWidth + 24
-  implicitHeight: 70
+  implicitHeight: 80
   margins.bottom: 12
-  
   color: "transparent"
+
   WlrLayershell.layer: WlrLayer.Bottom
   WlrLayershell.namespace: "quickshell"
   
@@ -24,9 +26,9 @@ PanelWindow {
     anchors.centerIn: parent
     width: row.implicitWidth + 40
     height: 56
-    color: "#a6101014"
+    color: Colors.bgGlass
     radius: 18
-    border.color: "#33ffffff"
+    border.color: Colors.border
     border.width: 1
 
     Row {
@@ -34,66 +36,95 @@ PanelWindow {
       anchors.centerIn: parent
       spacing: 12
 
-      // 1. Launcher
-      DockIcon {
-        iconText: "󱗼"
-        command: ["quickshell", "ipc", "call", "Launcher", "open"]
-      }
-      
-      // 2. Terminal
-      DockIcon {
-        iconText: ""
-        command: ["kitty"]
-      }
-
-      // 3. File Manager
-      DockIcon {
-        iconText: "󰉋"
-        command: ["nemo"]
-      }
-
-      // 4. Firefox
-      DockIcon {
-        iconText: "󰈹"
-        command: ["librewolf"]
-      }
-
-      // 5. Discord
-      DockIcon {
-        iconText: ""
-        command: ["vesktop"]
-      }
-
-      // 6. Spotify
-      DockIcon {
-        iconText: "󰓇"
-        command: ["spotify-launcher"]
-      }
+      DockIcon { iconText: "󱗼"; appClass: "launcher"; command: ["quickshell", "ipc", "call", "Launcher", "open"] }
+      DockIcon { iconText: ""; appClass: "kitty"; command: ["kitty"] }
+      DockIcon { iconText: "󰉋"; appClass: "nemo"; command: ["nemo"] }
+      DockIcon { iconText: "󰈹"; appClass: "librewolf"; command: ["librewolf"] }
+      DockIcon { iconText: ""; appClass: "vesktop"; command: ["vesktop"] }
+      DockIcon { iconText: "󰓇"; appClass: "spotify"; command: ["spotify-launcher"] }
     }
   }
 
   component DockIcon: Item {
     property string iconText: "?"
+    property string appClass: ""
     property var command: []
     
     width: 40
     height: 40
 
+    // Check if app is running
+    property var runningWindow: {
+       for (var i = 0; i < Hyprland.toplevels.count; i++) {
+          var win = Hyprland.toplevels.get(i);
+          if (win.class.toLowerCase().includes(appClass.toLowerCase())) return win;
+       }
+       return null;
+    }
+
     Rectangle {
+      id: iconBg
       anchors.fill: parent
       radius: 10
-      color: mouseArea.containsMouse ? "#33ffffff" : "transparent"
+      color: mouseArea.containsMouse ? Colors.highlight : "transparent"
       scale: mouseArea.containsMouse ? 1.2 : 1.0
-      
       Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutBack } }
-      Behavior on color { ColorAnimation { duration: 150 } }
       
       Text {
         anchors.centerIn: parent
         text: iconText
-        color: "#ffffff"
+        color: Colors.fgMain
         font.pixelSize: 24
-        font.family: "JetBrainsMono Nerd Font"
+        font.family: Colors.fontMono
+      }
+
+      // Running Indicator Dot
+      Rectangle {
+        anchors.bottom: parent.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottomMargin: -6
+        width: runningWindow ? 4 : 0
+        height: 4
+        radius: 2
+        color: runningWindow && runningWindow.focused ? Colors.primary : Colors.fgSecondary
+        Behavior on width { NumberAnimation { duration: 200 } }
+      }
+    }
+
+    // Hover Preview Popup
+    PopupWindow {
+      id: hoverPreview
+      visible: mouseArea.containsMouse && runningWindow !== null
+      
+      anchor.window: dockWindow
+      anchor.rect.x: iconBg.mapToItem(null, 0, 0).x - 100 + (iconBg.width / 2)
+      anchor.rect.y: -160 // Above the dock
+      
+      width: 200; height: 140
+      color: "transparent"
+
+      Rectangle {
+        anchors.fill: parent
+        color: Colors.bgGlass
+        border.color: Colors.primary
+        border.width: 1
+        radius: 12
+        clip: true
+
+        ColumnLayout {
+          anchors.fill: parent; anchors.margins: 4; spacing: 4
+          Rectangle {
+            Layout.fillWidth: true; Layout.fillHeight: true; color: "#111111"; radius: 8; clip: true
+            ScreencopyView {
+              anchors.fill: parent
+              captureSource: runningWindow ? runningWindow.wayland : null
+              live: true
+            }
+          }
+          Text {
+            text: runningWindow ? runningWindow.title : ""; color: Colors.fgMain; font.pixelSize: 8; elide: Text.ElideRight; Layout.alignment: Qt.AlignHCenter; Layout.maximumWidth: 180
+          }
+        }
       }
     }
 
@@ -101,13 +132,15 @@ PanelWindow {
       id: mouseArea
       anchors.fill: parent
       hoverEnabled: true
-      cursorShape: Qt.PointingHandCursor
       onClicked: {
-        if (command[0] === "quickshell") {
-           Quickshell.execDetached(command);
+        if (runningWindow) {
+           runningWindow.focus();
         } else {
-           var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: true; command: ' + JSON.stringify(command) + ' }', dockWindow);
-           proc.startDetached();
+           if (command[0] === "quickshell") Quickshell.execDetached(command);
+           else {
+              var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: true; command: ' + JSON.stringify(command) + ' }', dockWindow);
+              proc.startDetached();
+           }
         }
       }
     }

@@ -9,28 +9,34 @@ case "$MODE" in
     SUBMODE="${1:-drun}"
     case "$SUBMODE" in
       "drun")
-        quickshell --ipc-eval "launcher.openDrun()"
+        quickshell ipc call Launcher openDrun
         ;;
       "window")
-        quickshell --ipc-eval "launcher.openWindow()"
+        quickshell ipc call Launcher openWindow
         ;;
       "run")
-        quickshell --ipc-eval "launcher.openRun()"
+        quickshell ipc call Launcher openRun
         ;;
       "emoji")
-        quickshell --ipc-eval "launcher.openEmoji()"
+        quickshell ipc call Launcher openEmoji
         ;;
       "calc")
-        quickshell --ipc-eval "launcher.openCalc()"
+        quickshell ipc call Launcher openCalc
         ;;
       "clip")
-        quickshell --ipc-eval "launcher.openClip()"
+        quickshell ipc call Launcher openClip
         ;;
       "web")
-        quickshell --ipc-eval "launcher.openWeb()"
+        quickshell ipc call Launcher openWeb
         ;;
       "system")
-        quickshell --ipc-eval "launcher.openSystem()"
+        quickshell ipc call Launcher openSystem
+        ;;
+      "nixos")
+        quickshell ipc call Launcher openNixos
+        ;;
+      "files")
+        quickshell ipc call Launcher openFiles
         ;;
       *)
         echo "Unknown mode: $SUBMODE"
@@ -45,16 +51,15 @@ case "$MODE" in
       items+=("$line")
     done
     
-    # Convert to JSON array
-    json_items=$(printf '%s\n' "${items[@]}" | jq -R . | jq -s .)
-    json_payload=$(printf '%s' "$json_items" | jq -Rs .)
+    # Convert to JSON array string
+    json_items=$(printf '%s\n' "${items[@]}" | jq -R . | jq -s -c .)
     
     # Setup FIFO
     fifo_path="/tmp/qs-dmenu-result"
     [ -p "$fifo_path" ] || mkfifo "$fifo_path"
     
     # Send to Quickshell
-    quickshell --ipc-eval "launcher.openDmenu($json_payload)"
+    quickshell ipc call Launcher openDmenu "$json_items"
     
     # Wait for result and output to stdout
     cat "$fifo_path"
@@ -62,6 +67,6 @@ case "$MODE" in
     ;;
   *)
     # Default to drun if no arguments
-    quickshell --ipc-eval "launcher.openDrun()"
+    quickshell ipc call Launcher openDrun
     ;;
 esac

@@ -1,6 +1,7 @@
 import Quickshell // PanelWindow
 import QtQuick
 import Quickshell.Io
+import Quickshell.Wayland
 import "bar"
 import "launcher"
 import "menu"
@@ -109,14 +110,6 @@ Scope {
     id: dock
   }
 
-  ActivateLinux {
-    id: activateLinux
-  }
-
-  Corners {
-    id: corners
-  }
-
   Notifications {
     id: popups
     manager: notifManager
@@ -141,5 +134,32 @@ Scope {
   Launcher {
     id: launcher
     hyprState: hyprState
+  }
+
+  SettingsHub {
+    id: settingsHub
+  }
+
+  PanelWindow {
+    id: desktopBackground
+    anchors {
+      top: true
+      left: true
+      right: true
+      bottom: true
+    }
+    color: "transparent"
+    exclusiveZone: -1
+
+    DesktopWidgets {
+      anchors.left: parent.left
+      anchors.top: parent.top
+      anchors.leftMargin: 80
+      anchors.topMargin: 120
+    }
+  }
+
+  Corners {
+    id: screenCorners
   }
 }

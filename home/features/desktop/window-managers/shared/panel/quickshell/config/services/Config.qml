@@ -47,8 +47,31 @@ QtObject {
     }
   }
 
+  function save() {
+    var data = {
+      "bar": {
+        "height": barHeight,
+        "floating": barFloating,
+        "margin": barMargin,
+        "opacity": barOpacity
+      },
+      "glass": {
+        "blur": blurEnabled,
+        "opacity": glassOpacity
+      },
+      "notifications": {
+        "width": notifWidth,
+        "popupTimer": popupTimer
+      }
+    };
+    
+    var file = Quickshell.openFile(configPath, File.WriteOnly | File.Truncate);
+    if (file) {
+      file.write(JSON.stringify(data, null, 2));
+      file.close();
+    }
+  }
+
   // Watch for changes
-  // Note: Quickshell doesn't have a direct file watcher in QML yet, 
-  // but we can trigger a reload via IPC or a Timer for "live" effect.
   Component.onCompleted: load()
 }

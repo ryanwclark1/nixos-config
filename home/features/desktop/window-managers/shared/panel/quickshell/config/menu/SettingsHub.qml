@@ -3,7 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
-import "."
+import "../services"
 
 PanelWindow {
   id: settingsRoot
@@ -23,46 +23,11 @@ PanelWindow {
   WlrLayershell.namespace: "quickshell"
 
   property bool isOpen: false
+  property string activeTab: "system" // system, appearance
 
-  // State properties
-  property bool animState: true
-  property bool idleState: true
-  property bool nightLightState: false
-  property bool floatState: false
-
-  function toggle() {
-    if (isOpen) {
-      close();
-    } else {
-      open();
-    }
-  }
-
-  function open() {
-    isOpen = true;
-    checkStates();
-  }
-  
-  function close() {
-    isOpen = false;
-  }
-
-  function checkStates() {
-    // Check Animations (Cache file absence means animations are enabled)
-    var animProc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["bash", "-c", "[ ! -f ~/.cache/toggle_animation ] && echo true || echo false"] }', settingsRoot);
-    animProc.finished.connect(function() { settingsRoot.animState = animProc.stdout.readAll().trim() === "true"; });
-    animProc.running = true;
-
-    // Check Night Light
-    var nightProc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["bash", "-c", "pgrep -x hyprsunset >/dev/null && echo true || echo false"] }', settingsRoot);
-    nightProc.finished.connect(function() { settingsRoot.nightLightState = nightProc.stdout.readAll().trim() === "true"; });
-    nightProc.running = true;
-
-    // Check Idle
-    var idleProc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["bash", "-c", "pgrep -x hypridle >/dev/null && echo true || echo false"] }', settingsRoot);
-    idleProc.finished.connect(function() { settingsRoot.idleState = idleProc.stdout.readAll().trim() === "true"; });
-    idleProc.running = true;
-  }
+  function open() { isOpen = true; }
+  function close() { isOpen = false; }
+  function toggle() { isOpen ? close() : open(); }
 
   IpcHandler {
     target: "SettingsHub"
@@ -71,357 +36,143 @@ PanelWindow {
     function close() { settingsRoot.close(); }
   }
 
-  // Backdrop to catch clicks and close
+  // Backdrop
   MouseArea {
-    anchors.fill: parent
-    onClicked: settingsRoot.close()
-    
-    Rectangle {
-      anchors.fill: parent
-      color: "#000000"
-      opacity: 0.5
-    }
+    anchors.fill: parent; onClicked: settingsRoot.close()
+    Rectangle { anchors.fill: parent; color: "#000000"; opacity: 0.5 }
   }
 
   // Main Container
   Rectangle {
-    width: 500
-    height: 380
+    width: 700; height: 500
     anchors.centerIn: parent
-    color: Colors.background
-    opacity: 0.95
-    border.color: Colors.border
-    border.width: 1
-    radius: Colors.radiusLarge
+    color: Colors.bgGlass
+    border.color: Colors.border; border.width: 1; radius: Colors.radiusLarge
+    clip: true
 
-    // Prevent clicks from reaching the backdrop
     MouseArea { anchors.fill: parent }
 
-    ColumnLayout {
-      anchors.fill: parent
-      anchors.margins: 20
-      spacing: 20
+    RowLayout {
+      anchors.fill: parent; spacing: 0
 
-      // Header
-      RowLayout {
-        Layout.fillWidth: true
-        Text {
-          text: "Settings Hub"
-          color: Colors.text
-          font.pixelSize: 22
-          font.weight: Font.Bold
-        }
-        Item { Layout.fillWidth: true }
-        
-        Rectangle {
-          width: 30
-          height: 30
-          radius: 15
-          color: closeHover.containsMouse ? Colors.surface : "transparent"
-          Text {
-            anchors.centerIn: parent
-            text: "󰅖"
-            color: Colors.textSecondary
-            font.family: "JetBrainsMono Nerd Font"
-            font.pixelSize: 18
-          }
-          MouseArea {
-            id: closeHover
-            anchors.fill: parent
-            hoverEnabled: true
-            onClicked: settingsRoot.close()
-          }
-        }
-      }
-
+      // Sidebar Tabs
       Rectangle {
-        Layout.fillWidth: true
-        height: 1
-        color: Colors.border
-      }
-
-      // Settings Grid
-      GridLayout {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        columns: 2
-        columnSpacing: 15
-        rowSpacing: 15
-
-        // Animations Toggle
-        Rectangle {
-          Layout.fillWidth: true
-          Layout.preferredHeight: 70
-          color: Colors.highlightLight
-          radius: Colors.radiusMedium
-          border.color: animHover.containsMouse ? Colors.primary : "transparent"
-          border.width: 1
-
-          RowLayout {
-            anchors.fill: parent
-            anchors.margins: 15
-            spacing: 15
-
-            Text {
-              text: "󰢹"
-              color: settingsRoot.animState ? Colors.primary : Colors.textDisabled
-              font.family: "JetBrainsMono Nerd Font"
-              font.pixelSize: 24
-            }
-
-            ColumnLayout {
-              spacing: 2
-              Text { text: "Animations"; color: Colors.text; font.pixelSize: 14; font.weight: Font.DemiBold }
-              Text { text: settingsRoot.animState ? "Enabled" : "Disabled"; color: Colors.textSecondary; font.pixelSize: 11 }
-            }
-            Item { Layout.fillWidth: true }
-            
-            Rectangle {
-              width: 40
-              height: 20
-              radius: 10
-              color: settingsRoot.animState ? Colors.primary : Colors.surface
-              Rectangle {
-                width: 16
-                height: 16
-                radius: 8
-                color: "white"
-                anchors.verticalCenter: parent.verticalCenter
-                x: settingsRoot.animState ? parent.width - width - 2 : 2
-                Behavior on x { NumberAnimation { duration: 150 } }
-              }
-            }
-          }
-
-          MouseArea {
-            id: animHover
-            anchors.fill: parent
-            hoverEnabled: true
-            onClicked: {
-              settingsRoot.animState = !settingsRoot.animState;
-              Quickshell.execDetached(["toggle-animations.sh"]);
-            }
-          }
-        }
-
-        // Night Light Toggle
-        Rectangle {
-          Layout.fillWidth: true
-          Layout.preferredHeight: 70
-          color: Colors.highlightLight
-          radius: Colors.radiusMedium
-          border.color: nightHover.containsMouse ? Colors.accent : "transparent"
-          border.width: 1
-
-          RowLayout {
-            anchors.fill: parent
-            anchors.margins: 15
-            spacing: 15
-
-            Text {
-              text: "󰖔"
-              color: settingsRoot.nightLightState ? Colors.accent : Colors.textDisabled
-              font.family: "JetBrainsMono Nerd Font"
-              font.pixelSize: 24
-            }
-
-            ColumnLayout {
-              spacing: 2
-              Text { text: "Night Light"; color: Colors.text; font.pixelSize: 14; font.weight: Font.DemiBold }
-              Text { text: settingsRoot.nightLightState ? "Active" : "Inactive"; color: Colors.textSecondary; font.pixelSize: 11 }
-            }
-            Item { Layout.fillWidth: true }
-            
-            Rectangle {
-              width: 40
-              height: 20
-              radius: 10
-              color: settingsRoot.nightLightState ? Colors.accent : Colors.surface
-              Rectangle {
-                width: 16
-                height: 16
-                radius: 8
-                color: "white"
-                anchors.verticalCenter: parent.verticalCenter
-                x: settingsRoot.nightLightState ? parent.width - width - 2 : 2
-                Behavior on x { NumberAnimation { duration: 150 } }
-              }
-            }
-          }
-
-          MouseArea {
-            id: nightHover
-            anchors.fill: parent
-            hoverEnabled: true
-            onClicked: {
-              settingsRoot.nightLightState = !settingsRoot.nightLightState;
-              Quickshell.execDetached(["bash", "-c", "pgrep -x hyprsunset >/dev/null && pkill hyprsunset || hyprsunset &"]);
-            }
-          }
-        }
-
-        // Idle Toggle
-        Rectangle {
-          Layout.fillWidth: true
-          Layout.preferredHeight: 70
-          color: Colors.highlightLight
-          radius: Colors.radiusMedium
-          border.color: idleHover.containsMouse ? Colors.secondary : "transparent"
-          border.width: 1
-
-          RowLayout {
-            anchors.fill: parent
-            anchors.margins: 15
-            spacing: 15
-
-            Text {
-              text: "󰒲"
-              color: settingsRoot.idleState ? Colors.secondary : Colors.textDisabled
-              font.family: "JetBrainsMono Nerd Font"
-              font.pixelSize: 24
-            }
-
-            ColumnLayout {
-              spacing: 2
-              Text { text: "Auto Idle / Lock"; color: Colors.text; font.pixelSize: 14; font.weight: Font.DemiBold }
-              Text { text: settingsRoot.idleState ? "Enabled" : "Disabled"; color: Colors.textSecondary; font.pixelSize: 11 }
-            }
-            Item { Layout.fillWidth: true }
-            
-            Rectangle {
-              width: 40
-              height: 20
-              radius: 10
-              color: settingsRoot.idleState ? Colors.secondary : Colors.surface
-              Rectangle {
-                width: 16
-                height: 16
-                radius: 8
-                color: "white"
-                anchors.verticalCenter: parent.verticalCenter
-                x: settingsRoot.idleState ? parent.width - width - 2 : 2
-                Behavior on x { NumberAnimation { duration: 150 } }
-              }
-            }
-          }
-
-          MouseArea {
-            id: idleHover
-            anchors.fill: parent
-            hoverEnabled: true
-            onClicked: {
-              settingsRoot.idleState = !settingsRoot.idleState;
-              Quickshell.execDetached(["toggle-idle.sh"]);
-            }
-          }
-        }
-
-        // All Float Toggle
-        Rectangle {
-          Layout.fillWidth: true
-          Layout.preferredHeight: 70
-          color: Colors.highlightLight
-          radius: Colors.radiusMedium
-          border.color: floatHover.containsMouse ? Colors.error : "transparent"
-          border.width: 1
-
-          RowLayout {
-            anchors.fill: parent
-            anchors.margins: 15
-            spacing: 15
-
-            Text {
-              text: "󱂬"
-              color: Colors.error
-              font.family: "JetBrainsMono Nerd Font"
-              font.pixelSize: 24
-            }
-
-            ColumnLayout {
-              spacing: 2
-              Text { text: "Toggle Float"; color: Colors.text; font.pixelSize: 14; font.weight: Font.DemiBold }
-              Text { text: "All Windows"; color: Colors.textSecondary; font.pixelSize: 11 }
-            }
-            Item { Layout.fillWidth: true }
-          }
-
-          MouseArea {
-            id: floatHover
-            anchors.fill: parent
-            hoverEnabled: true
-            onClicked: {
-              Quickshell.execDetached(["toggle-all-float.sh"]);
-              settingsRoot.close();
-            }
+        width: 180; Layout.fillHeight: true; color: "#1affffff"
+        ColumnLayout {
+          anchors.fill: parent; anchors.margins: 20; spacing: 10
+          Text { text: "SETTINGS"; color: Colors.textDisabled; font.pixelSize: 10; font.bold: true; Layout.bottomMargin: 10 }
+          
+          TabBtn { label: "System"; icon: "󰒓"; tabId: "system" }
+          TabBtn { label: "Appearance"; icon: "󰸉"; tabId: "appearance" }
+          
+          Item { Layout.fillHeight: true }
+          
+          Rectangle {
+            Layout.fillWidth: true; height: 40; radius: 8; color: Colors.error
+            Text { anchors.centerIn: parent; text: "Save & Close"; color: "white"; font.weight: Font.Bold; font.pixelSize: 12 }
+            MouseArea { anchors.fill: parent; onClicked: { Config.save(); settingsRoot.close(); } }
           }
         }
       }
 
-      // One-Shot Action Buttons (Reload, Transparency)
-      RowLayout {
-        Layout.fillWidth: true
-        spacing: 15
+      // Content Area
+      ColumnLayout {
+        Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: 24; spacing: 20
 
-        Rectangle {
-          Layout.fillWidth: true
-          height: 45
-          color: transHover.containsMouse ? Colors.surface : Colors.highlightLight
-          radius: Colors.radiusSmall
+        Text {
+          text: activeTab === "system" ? "System Controls" : "UI Appearance"
+          color: Colors.fgMain; font.pixelSize: 24; font.weight: Font.Bold
+        }
 
+        // --- SYSTEM TAB ---
+        GridLayout {
+          visible: activeTab === "system"
+          columns: 2; columnSpacing: 15; rowSpacing: 15; Layout.fillWidth: true
+          
+          ToggleCard { label: "Animations"; icon: "󰢹"; property: "animState" }
+          ToggleCard { label: "Auto Idle"; icon: "󰒲"; property: "idleState" }
+          ToggleCard { label: "Night Light"; icon: "󰖔"; property: "nightLightState" }
+          ToggleCard { label: "Blur Effects"; icon: "󰃠"; property: "blurEnabled"; isConfig: true }
+        }
+
+        // --- APPEARANCE TAB ---
+        ColumnLayout {
+          visible: activeTab === "appearance"
+          spacing: 20; Layout.fillWidth: true
+
+          ConfigSlider { label: "Bar Height"; min: 20; max: 60; value: Config.barHeight; onMoved: (v) => Config.barHeight = v }
+          ConfigSlider { label: "Bar Margin"; min: 0; max: 40; value: Config.barMargin; onMoved: (v) => Config.barMargin = v }
+          ConfigSlider { label: "Glass Opacity"; min: 0.1; max: 1.0; value: Config.glassOpacity; step: 0.05; onMoved: (v) => Config.glassOpacity = v }
+          
           RowLayout {
-            anchors.centerIn: parent
-            spacing: 8
-            Text { text: "󰂵"; color: Colors.text; font.family: "JetBrainsMono Nerd Font" }
-            Text { text: "Toggle Active Window Transparency"; color: Colors.text; font.pixelSize: 12; font.weight: Font.Medium }
-          }
-
-          MouseArea {
-            id: transHover
-            anchors.fill: parent
-            hoverEnabled: true
-            onClicked: {
-              Quickshell.execDetached(["toggle-transparency.sh"]);
-              settingsRoot.close();
-            }
+            spacing: 20
+            Text { text: "Floating Bar"; color: Colors.fgMain; font.pixelSize: 14; Layout.fillWidth: true }
+            Switch { checked: Config.barFloating; onToggled: Config.barFloating = !Config.barFloating }
           }
         }
+
+        Item { Layout.fillHeight: true }
       }
+    }
+  }
 
-      RowLayout {
-        Layout.fillWidth: true
-        spacing: 15
+  // --- COMPONENT HELPERS ---
+  component TabBtn: Rectangle {
+    property string label; property string icon; property string tabId
+    Layout.fillWidth: true; height: 40; radius: 8
+    color: activeTab === tabId ? Colors.highlight : "transparent"
+    RowLayout {
+      anchors.fill: parent; anchors.leftMargin: 12; spacing: 12
+      Text { text: icon; color: activeTab === tabId ? Colors.primary : Colors.fgSecondary; font.family: Colors.fontMono; font.pixelSize: 16 }
+      Text { text: label; color: activeTab === tabId ? Colors.fgMain : Colors.fgSecondary; font.pixelSize: 13 }
+    }
+    MouseArea { anchors.fill: parent; onClicked: activeTab = tabId }
+  }
 
-        Rectangle {
-          Layout.fillWidth: true
-          height: 45
-          color: reloadHover.containsMouse ? Colors.error : Colors.surface
-          radius: Colors.radiusSmall
-
-          RowLayout {
-            anchors.centerIn: parent
-            spacing: 8
-            Text { text: "󰑐"; color: Colors.text; font.family: "JetBrainsMono Nerd Font" }
-            Text { text: "Reload Hyprland Config"; color: Colors.text; font.pixelSize: 12; font.weight: Font.Bold }
-          }
-
-          MouseArea {
-            id: reloadHover
-            anchors.fill: parent
-            hoverEnabled: true
-            onClicked: {
-              Quickshell.execDetached(["hyprctl", "reload"]);
-              settingsRoot.close();
-            }
-          }
+  component ConfigSlider: ColumnLayout {
+    property string label; property real min; property real max; property real value; property real step: 1; signal moved(real v)
+    spacing: 8; Layout.fillWidth: true
+    RowLayout {
+      Text { text: label; color: Colors.fgMain; font.pixelSize: 13 }
+      Item { Layout.fillWidth: true }
+      Text { text: Math.round(value * (step < 1 ? 100 : 1)) + (step < 1 ? "%" : "px"); color: Colors.fgSecondary; font.pixelSize: 11 }
+    }
+    Rectangle {
+      Layout.fillWidth: true; height: 6; color: Colors.surface; radius: 3
+      Rectangle {
+        width: parent.width * ((value - min) / (max - min)); height: parent.height; color: Colors.primary; radius: 3
+      }
+      MouseArea {
+        anchors.fill: parent
+        onPressed: (mouse) => {
+          var raw = min + (mouse.x / width) * (max - min);
+          moved(step < 1 ? Math.round(raw/step)*step : Math.round(raw));
         }
       }
     }
   }
 
-  // Close on Escape
-  Item {
-    anchors.fill: parent
-    focus: true
-    Keys.onEscapePressed: settingsRoot.close()
+  component Switch: Rectangle {
+    property bool checked; signal toggled()
+    width: 40; height: 20; radius: 10; color: checked ? Colors.primary : Colors.surface
+    Rectangle {
+      width: 16; height: 16; radius: 8; color: "white"; anchors.verticalCenter: parent.verticalCenter
+      x: checked ? parent.width - width - 2 : 2
+      Behavior on x { NumberAnimation { duration: 150 } }
+    }
+    MouseArea { anchors.fill: parent; onClicked: toggled() }
+  }
+
+  component ToggleCard: Rectangle {
+    property string label; property string icon; property string property; property bool isConfig: false
+    Layout.fillWidth: true; height: 60; color: "#1affffff"; radius: 10
+    property bool active: isConfig ? Config[property] : false // Simplified for demo
+    
+    RowLayout {
+      anchors.fill: parent; anchors.margins: 15
+      Text { text: icon; color: active ? Colors.primary : Colors.fgDim; font.family: Colors.fontMono; font.pixelSize: 20 }
+      Text { text: label; color: Colors.fgMain; font.pixelSize: 13; Layout.fillWidth: true }
+      Switch { checked: active; onToggled: { if(isConfig) Config[property] = !Config[property]; } }
+    }
   }
 }

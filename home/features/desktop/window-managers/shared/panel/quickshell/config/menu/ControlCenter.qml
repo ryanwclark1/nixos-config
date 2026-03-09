@@ -45,10 +45,8 @@ PanelWindow {
   property var vpns: []
   property string tailscaleStatus: "Offline"
   
-  // New Health State
-  property string cpuTemp: "--"
-  property string gpuTemp: "--"
-  property real batteryHealth: 1.0
+  property string selectedSSID: ""
+  property string wifiPassword: ""
 
   Process {
     id: getStats
@@ -155,12 +153,11 @@ PanelWindow {
       anchors.fill: parent
       anchors.margins: 24
       spacing: 20
-
       RowLayout {
         Layout.fillWidth: true
         Text {
           text: "Control Center"
-          color: Colors.text
+          color: "#ffffff"
           font.pixelSize: 22
           font.weight: Font.DemiBold
           font.letterSpacing: -0.5
@@ -192,6 +189,10 @@ PanelWindow {
           }
         }
       }
+
+      UserWidget {}
+      
+      UpdateWidget {}
 
       MediaWidget {}
 
@@ -245,12 +246,12 @@ PanelWindow {
             Text { text: "󰕾"; color: Colors.primary; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18 }
             Text { text: "Volume"; color: Colors.text; font.pixelSize: 13; font.weight: Font.Medium }
             Item { Layout.fillWidth: true }
-            Text { text: Math.round((Pipewire.defaultAudioSink?.audio.volume ?? 0) * 100) + "%"; color: Colors.textSecondary; font.pixelSize: 12 }
+            Text { text: Math.round(((Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio) ? Pipewire.defaultAudioSink.audio.volume : 0) * 100) + "%"; color: Colors.textSecondary; font.pixelSize: 12 }
           }
           Rectangle {
             Layout.fillWidth: true; height: 14; color: Colors.highlightLight; radius: 7
             Rectangle {
-              width: parent.width * (Pipewire.defaultAudioSink?.audio.volume ?? 0)
+              width: parent.width * ((Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio) ? Pipewire.defaultAudioSink.audio.volume : 0)
               height: parent.height; color: Colors.primary; radius: 7
             }
             MouseArea {
@@ -291,6 +292,8 @@ PanelWindow {
 
       SystemGraphs {}
 
+      NetworkGraphs {}
+
       // --- EXPANDABLE SECTIONS ---
       Flickable {
         Layout.fillWidth: true; Layout.fillHeight: true; contentHeight: scrollCol.height; clip: true
@@ -305,17 +308,50 @@ PanelWindow {
             Text { text: "WI-FI NETWORKS"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
             Repeater {
               model: root.wifiNetworks
-              delegate: Rectangle {
-                width: parent.width; height: 35; color: Colors.highlightLight; radius: 6
-                RowLayout {
-                  anchors.fill: parent; anchors.margins: 10
-                  Text { text: "󰖩"; color: Colors.textSecondary; font.family: "JetBrainsMono Nerd Font" }
-                  Text { text: modelData.ssid; color: Colors.text; font.pixelSize: 12; Layout.fillWidth: true; elide: Text.ElideRight }
-                  Text { text: modelData.bars; color: Colors.textDisabled; font.family: "JetBrainsMono Nerd Font" }
+              delegate: Column {
+                width: parent.width
+                spacing: 4
+
+                Rectangle {
+                  width: parent.width; height: 35; color: Colors.highlightLight; radius: 6
+                  RowLayout {
+                    anchors.fill: parent; anchors.margins: 10
+                    Text { text: "󰖩"; color: Colors.textSecondary; font.family: "JetBrainsMono Nerd Font" }
+                    Text { text: modelData.ssid; color: Colors.text; font.pixelSize: 12; Layout.fillWidth: true; elide: Text.ElideRight }
+                    Text { text: modelData.bars; color: Colors.textDisabled; font.family: "JetBrainsMono Nerd Font" }
+                  }
+                  MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                      if (root.selectedSSID === modelData.ssid) root.selectedSSID = "";
+                      else root.selectedSSID = modelData.ssid;
+                    }
+                  }
                 }
-                MouseArea {
-                  anchors.fill: parent
-                  onClicked: Quickshell.execDetached(["nmcli", "dev", "wifi", "connect", modelData.ssid])
+
+                // Password Input Area
+                Rectangle {
+                  width: parent.width; height: 40; color: "#1affffff"; radius: 6
+                  visible: root.selectedSSID === modelData.ssid
+                  border.color: pwInput.activeFocus ? Colors.primary : "transparent"
+                  border.width: 1
+
+                  TextInput {
+                    id: pwInput
+                    anchors.fill: parent; anchors.margins: 10; verticalAlignment: Text.AlignVCenter
+                    color: Colors.text; font.pixelSize: 12; echoMode: TextInput.Password
+                    focus: parent.visible
+
+                    Keys.onReturnPressed: {
+                      Quickshell.execDetached(["nmcli", "dev", "wifi", "connect", modelData.ssid, "password", text]);
+                      root.selectedSSID = "";
+                    }
+                  }
+                  Text {
+                    anchors.fill: parent; anchors.leftMargin: 10; verticalAlignment: Text.AlignVCenter
+                    text: "Enter Password..."; color: Colors.textDisabled; font.pixelSize: 11
+                    visible: !pwInput.text && !pwInput.activeFocus
+                  }
                 }
               }
             }

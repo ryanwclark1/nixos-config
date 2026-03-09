@@ -35,12 +35,17 @@ let
     PATH="${pkgs.cliphist}/bin:${pkgs.jq}/bin:${pkgs.coreutils}/bin:$PATH"
     ${builtins.readFile ./scripts/cliphist.sh}
   '';
-in
-{
+
+  wallpaperScript = pkgs.writeShellScriptBin "qs-wallpapers" ''
+    PATH="${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.findutils}/bin:$PATH"
+    ${builtins.readFile ./scripts/wallpapers.sh}
+  '';
+  in
+  {
   options.features.quickshell = {
     enable = lib.mkOption {
       type = lib.types.bool;
-      default = true;
+      default = false;
       description = "Enable the Quickshell panel.";
     };
   };
@@ -52,6 +57,7 @@ in
       runScript
       emojiScript
       clipScript
+      wallpaperScript
     ];
 
     home.file.".config/quickshell" = {

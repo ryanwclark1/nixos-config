@@ -4,6 +4,8 @@
 }:
 
 {
+  features.quickshell.enable = true;
+
   imports = [
     ./global
 

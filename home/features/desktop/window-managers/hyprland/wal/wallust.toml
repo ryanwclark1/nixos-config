@@ -123,6 +123,7 @@ colors-waybar = { src = "colors-waybar.css", dst = "~/.cache/wal/colors-waybar.c
 colors-wlogout = { src = "colors-wlogout.css", dst = "~/.cache/wal/colors-wlogout.css" }
 colors-xresources = { src = "colors.Xresources", dst = "~/.cache/wal/colors.Xresources" }
 colors-yml = { src = "colors.yml", dst = "~/.cache/wal/colors.yml" }
+quickshell-colors = { src = "Colors.qml", dst = "~/.cache/wal/Colors.qml" }
 
 # REMINDER Variables and methods that can be used with templating:
 #  wallpaper:  The full path to the current wallpaper, colorscheme file or the name of the theme in use.

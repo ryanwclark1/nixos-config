@@ -28,14 +28,6 @@ Item {
     opacity: Config.barOpacity
     radius: Config.barFloating ? 12 : 0
     
-    WlLayerSurface {
-      anchors.fill: parent
-      layer: WlLayerSurface.Top
-      blur: Config.blurEnabled
-      mask: Region {
-        rects: [ Qt.rect(0, 0, parent.width, parent.height) ]
-      }
-    }
   }
 
   // LEFT MODULES

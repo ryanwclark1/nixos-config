@@ -50,25 +50,29 @@ Row {
       }
 
       // Previews still work the same
-      PanelWindow {
+      PopupWindow {
         id: previewWindow
         visible: root.hoveredWorkspace === modelData && !modelData.active
-        anchor.window: toplevel 
-        anchor.rect.x: wsButton.mapToItem(null, 0, 0).x - 150 + (wsButton.width / 2)
-        anchor.rect.y: Config.barHeight + Config.barMargin + 8
+        parentWindow: toplevel
+        relativeX: wsButton.mapToItem(null, 0, 0).x - 150 + (wsButton.width / 2)
+        relativeY: Config.barHeight + Config.barMargin + 8
         width: 300; height: 180; color: "transparent"
-        opacity: visible ? 1.0 : 0.0; scale: visible ? 1.0 : 0.8
-        Behavior on opacity { NumberAnimation { duration: 150 } }
-        Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutBack } }
 
         Rectangle {
           anchors.fill: parent; color: Colors.bgGlass; border.color: modelData.hasFullscreen ? Colors.accent : Colors.primary; border.width: 2; radius: 12; clip: true
-          WlLayerSurface { anchors.fill: parent; layer: WlLayerSurface.Overlay; blur: true }
+
+          opacity: previewWindow.visible ? 1.0 : 0.0; scale: previewWindow.visible ? 1.0 : 0.8
+          Behavior on opacity { NumberAnimation { duration: 150 } }
+          Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutBack } }
+
           ColumnLayout {
-            anchors.fill: parent; anchors.margins: 4; spacing: 4
             Rectangle {
               Layout.fillWidth: true; Layout.fillHeight: true; color: "#111111"; radius: 8; clip: true
-              ScreencopyView { anchors.fill: parent; captureSource: modelData.monitor.wayland; live: true }
+              ScreencopyView {
+                anchors.fill: parent
+                captureSource: (modelData.monitor && modelData.monitor.wayland) ? modelData.monitor.wayland : null
+                live: true
+              }
               Rectangle { anchors.fill: parent; color: "#44000000" }
             }
             Text {

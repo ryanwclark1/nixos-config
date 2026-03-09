@@ -2,10 +2,11 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
-import Quickshell.Hyprland._Ipc
+import Quickshell.Hyprland
 import Quickshell.Wayland._Screencopy
 import Quickshell.Widgets
 import Quickshell.Wayland
+import "../services" // Import Colors
 
 Scope {
 	id: root
@@ -25,9 +26,6 @@ Scope {
 		}
 	}
 
-	// Hotkey to dismiss when clicking outside or pressing Escape
-	// If HyprlandFocusGrab works, we can grab focus, but we'll start with a simple overlay.
-	
 	Repeater {
 		model: Quickshell.screens
 
@@ -49,12 +47,11 @@ Scope {
 				WlrLayershell.namespace: "quickshell"
 				WlrLayershell.keyboardFocus: root.isVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 				
-				// Take up the whole screen to capture clicks outside
 				exclusiveZone: -1
 
 				Rectangle {
 					anchors.fill: parent
-					color: "#a6101014"
+					color: Colors.bgGlass
 					
 					opacity: root.isVisible ? 1.0 : 0.0
 					Behavior on opacity { NumberAnimation { duration: 200; easing.type: Easing.InOutQuad } }
@@ -64,120 +61,205 @@ Scope {
 						onClicked: root.isVisible = false
 					}
 
-					GridView {
-						id: grid
-						anchors.centerIn: parent
-						width: Math.min(parent.width * 0.8, cellWidth * 3)
-						height: Math.min(parent.height * 0.8, cellHeight * Math.ceil(count / 3))
-						
-						cellWidth: 320
-						cellHeight: 240
-						
-						model: Hyprland.toplevels
-						
-						focus: true
-						currentIndex: 0
-						
-						Keys.onEscapePressed: root.isVisible = false
-						Keys.onReturnPressed: {
-							if (currentIndex >= 0 && currentIndex < count) {
-								let addr = Hyprland.toplevels[currentIndex].address;
-								if (addr) {
-									root.isVisible = false;
-									Quickshell.execDetached(["hyprctl", "dispatch", "focuswindow", "address:" + addr]);
-								}
-							}
-						}
-						
-						// Filter out special workspaces or quickshell itself if needed
-						// We'll show all normal windows for now
-						
-						delegate: Rectangle {
-							width: 300
-							height: 220
-							color: "#33ffffff"
-							radius: 12
-							
-							property bool isSelected: grid.currentIndex === index
-							border.color: isSelected ? "#4caf50" : (hoverArea.containsMouse ? "#ffffff" : "#44ffffff")
-							border.width: isSelected || hoverArea.containsMouse ? 3 : 1
-							
-							// Animation on hover or selection
-							scale: isSelected || hoverArea.containsMouse ? 1.05 : 1.0
-							Behavior on scale { NumberAnimation { duration: 150 } }
-
-							ColumnLayout {
-								anchors.fill: parent
-								anchors.margins: 10
-								spacing: 10
-
-								Rectangle {
-									Layout.fillWidth: true
-									Layout.fillHeight: true
-									color: "transparent"
-									clip: true
-									radius: 8
-									
-									ScreencopyView {
-										anchors.fill: parent
-										captureSource: modelData.wayland
-										live: true
-									}
-								}
-
-								RowLayout {
-									Layout.fillWidth: true
-									spacing: 8
-									
-									Image {
-										// We could load an icon based on class name, but title is fine for now
-										source: "" 
-										Layout.preferredWidth: 24
-										Layout.preferredHeight: 24
-										visible: false
-									}
-									
-									Text {
-										text: modelData.title
-										color: "white"
-										font.pointSize: 10
-										font.bold: true
-										elide: Text.ElideRight
-										Layout.fillWidth: true
-										horizontalAlignment: Text.AlignHCenter
-									}
-								}
-							}
-
-							MouseArea {
-								id: hoverArea
-								anchors.fill: parent
-								hoverEnabled: true
-								onClicked: {
-									grid.currentIndex = index;
-									root.isVisible = false;
-									Quickshell.execDetached(["hyprctl", "dispatch", "focuswindow", "address:" + modelData.address]);
-								}
-							}
-						}
-					}
-					
-					// Instruction text
-					Text {
-						anchors.bottom: parent.bottom
-						anchors.horizontalCenter: parent.horizontalCenter
+					ColumnLayout {
+						anchors.fill: parent
 						anchors.margins: 40
-						text: "Use Arrow Keys + Enter to select, or click outside/Escape to cancel"
-						color: "#88ffffff"
-						font.pointSize: 12
+						spacing: 20
+
+						Text {
+							text: "Workspace Overview"
+							color: Colors.text
+							font.pixelSize: 32
+							font.weight: Font.Bold
+							Layout.alignment: Qt.AlignHCenter
+						}
+
+						ListView {
+							id: workspaceList
+							Layout.fillWidth: true
+							Layout.fillHeight: true
+							model: Hyprland.workspaces
+							orientation: ListView.Horizontal
+							spacing: 20
+							clip: true
+							
+							delegate: Rectangle {
+								id: workspaceRect
+								property var workspaceData: modelData
+								
+								width: 360
+								height: workspaceList.height
+								color: Colors.surface
+								radius: Colors.radiusLarge
+								border.color: workspaceData.active ? Colors.primary : Colors.border
+								border.width: workspaceData.active ? 2 : 1
+								
+								DropArea {
+									anchors.fill: parent
+									onDropped: (drop) => {
+										if (drop.source && drop.source.windowAddress) {
+											Quickshell.execDetached(["hyprctl", "dispatch", "movetoworkspace", workspaceData.id + ",address:" + drop.source.windowAddress]);
+										}
+									}
+								}
+
+								ColumnLayout {
+									anchors.fill: parent
+									anchors.margins: 15
+									spacing: 10
+
+									TextInput {
+										id: wsTitle
+										text: "Workspace " + workspaceData.name
+										color: workspaceData.active ? Colors.primary : Colors.text
+										font.pixelSize: 18
+										font.weight: Font.Bold
+										Layout.alignment: Qt.AlignHCenter
+										selectByMouse: true
+										
+										onEditingFinished: {
+											var newName = text.replace("Workspace ", "").trim();
+											if (newName !== workspaceData.name && newName !== "") {
+												Quickshell.execDetached(["hyprctl", "dispatch", "renameworkspace", workspaceData.id + " " + newName]);
+											}
+											focus = false;
+										}
+									}
+
+									Flickable {
+										Layout.fillWidth: true
+										Layout.fillHeight: true
+										clip: true
+										boundsBehavior: Flickable.StopAtBounds
+										flickableDirection: Flickable.VerticalFlick
+										contentWidth: flow.implicitWidth
+										contentHeight: flow.implicitHeight
+
+										Flow {
+											id: flow
+											width: parent.width
+											spacing: 10
+											
+											Repeater {
+												model: Hyprland.toplevels
+												
+												delegate: Rectangle {
+													id: windowCard
+													visible: modelData.workspace && modelData.workspace.id === workspaceRect.workspaceData.id
+													width: visible ? 155 : 0
+													height: visible ? 120 : 0
+													color: Colors.highlightLight
+													radius: Colors.radiusSmall
+													border.color: hoverArea.containsMouse ? Colors.text : Colors.border
+													border.width: 1
+													clip: true
+													
+													property string windowAddress: modelData.address
+
+													Drag.active: dragArea.drag.active
+													Drag.source: windowCard
+													Drag.hotSpot.x: width / 2
+													Drag.hotSpot.y: height / 2
+													
+													ColumnLayout {
+														anchors.fill: parent
+														anchors.margins: 5
+														spacing: 5
+														
+														Rectangle {
+															Layout.fillWidth: true
+															Layout.fillHeight: true
+															color: "#111111"
+															radius: 4
+															clip: true
+															
+															ScreencopyView {
+																anchors.fill: parent
+																captureSource: modelData.wayland
+																live: true
+															}
+															
+															// Close Button
+															Rectangle {
+																width: 24; height: 24; radius: 12
+																color: Colors.error
+																opacity: hoverArea.containsMouse ? 0.9 : 0.0
+																anchors.top: parent.top; anchors.right: parent.right
+																anchors.margins: 4
+																Behavior on opacity { NumberAnimation { duration: 150 } }
+																
+																Text {
+																	anchors.centerIn: parent
+																	text: "󰅖"
+																	color: "white"
+																	font.family: "JetBrainsMono Nerd Font"
+																	font.pixelSize: 14
+																}
+																
+																MouseArea {
+																	anchors.fill: parent
+																	hoverEnabled: true
+																	onClicked: {
+																		Quickshell.execDetached(["hyprctl", "dispatch", "closewindow", "address:" + modelData.address]);
+																	}
+																}
+															}
+														}
+														
+														Text {
+															text: modelData.title
+															color: Colors.text
+															font.pixelSize: 10
+															elide: Text.ElideRight
+															Layout.fillWidth: true
+															horizontalAlignment: Text.AlignHCenter
+														}
+													}
+													
+													MouseArea {
+														id: hoverArea
+														anchors.fill: parent
+														hoverEnabled: true
+														onClicked: {
+															root.isVisible = false;
+															Quickshell.execDetached(["hyprctl", "dispatch", "focuswindow", "address:" + modelData.address]);
+														}
+													}
+													
+													MouseArea {
+														id: dragArea
+														anchors.fill: parent
+														drag.target: windowCard
+														drag.axis: Drag.XAndYAxis
+														onReleased: windowCard.Drag.drop()
+														
+														// Pass clicks through to hoverArea
+														onClicked: hoverArea.clicked(mouse)
+													}
+													
+													// Reset position after drag
+													onXChanged: if (!dragArea.drag.active) x = 0
+													onYChanged: if (!dragArea.drag.active) y = 0
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+						
+						Text {
+							text: "Drag windows to move them between workspaces. Press Escape to close."
+							color: Colors.textSecondary
+							font.pixelSize: 14
+							Layout.alignment: Qt.AlignHCenter
+						}
 					}
 				}
 				
-				// Global Escape handler fallback if grid loses focus
-				Item {
-					anchors.fill: parent
-					focus: false
-				}
+				Keys.onEscapePressed: root.isVisible = false
+				Component.onCompleted: forceActiveFocus()
+				onVisibleChanged: if(visible) forceActiveFocus()
 			}
 		}
 	}

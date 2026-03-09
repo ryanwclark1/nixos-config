@@ -1,74 +1,92 @@
 import QtQuick
+import QtQuick.Shapes
 import Quickshell
 import Quickshell.Wayland
-import "../services"
 
-PanelWindow {
-  id: root
-  
-  anchors.fill: parent
-  color: "transparent"
-  
-  WlrLayershell.layer: WlrLayer.Overlay
-  WlrLayershell.namespace: "quickshell-corners"
-  exclusiveZone: -1
-  
-  // Create four corners
-  Repeater {
-    model: [
-      { top: true, left: true, rotation: 0 },
-      { top: true, right: true, rotation: 90 },
-      { bottom: true, left: true, rotation: 270 },
-      { bottom: true, right: true, rotation: 180 }
-    ]
+Scope {
+    id: root
     
-    delegate: Item {
-      width: 24; height: 24
-      anchors.top: modelData.top ? parent.top : undefined
-      anchors.bottom: modelData.bottom ? parent.bottom : undefined
-      anchors.left: modelData.left ? parent.left : undefined
-      anchors.right: modelData.right ? parent.right : undefined
-      
-      // The corner effect: a square with a circle cut out
-      Rectangle {
-        anchors.fill: parent
-        color: "#000000" // Standard black for screen corners
+    // Configurable radius
+    property int cornerRadius: 18
+
+    Repeater {
+        model: Quickshell.screens
         
-        // This is the "cutout" part
-        Rectangle {
-          width: 48; height: 48 // 2x the corner size
-          radius: 24
-          color: "transparent"
-          border.color: "transparent"
-          
-          anchors.top: modelData.top ? parent.top : undefined
-          anchors.bottom: modelData.bottom ? parent.bottom : undefined
-          anchors.left: modelData.left ? parent.left : undefined
-          anchors.right: modelData.right ? parent.right : undefined
-          
-          // Use a ShaderEffect or simple radius trick to create the inverted corner
-          // Simplified: Black square, then transparent circle on top
-          // The parent has clip: true or we use a mask.
+        delegate: PanelWindow {
+            screen: modelData
+            
+            anchors {
+                top: true
+                bottom: true
+                left: true
+                right: true
+            }
+            color: "transparent"
+            
+            WlrLayershell.layer: WlrLayer.Overlay
+            WlrLayershell.namespace: "quickshell-corners"
+            exclusiveZone: -1
+            
+            // Allow clicks to pass through the corners to windows underneath
+            mask: Region {
+                // Empty region means this window intercepts zero mouse events
+            }
+
+            // Create four corners
+            Repeater {
+                model: [
+                    { top: true, left: true, rotation: 0 },
+                    { top: true, left: false, rotation: 90 },
+                    { top: false, left: false, rotation: 180 },
+                    { top: false, left: true, rotation: 270 }
+                ]
+                
+                delegate: Item {
+                    width: root.cornerRadius
+                    height: root.cornerRadius
+                    
+                    anchors.top: modelData.top ? parent.top : undefined
+                    anchors.bottom: !modelData.top ? parent.bottom : undefined
+                    anchors.left: modelData.left ? parent.left : undefined
+                    anchors.right: !modelData.left ? parent.right : undefined
+                    
+                    transformOrigin: Item.Center
+                    rotation: modelData.rotation
+                    
+                    // The corner effect: we draw an inverted curve
+                    Shape {
+            width: screen ? screen.width : 0
+            height: screen ? screen.height : 0
+                        // Smooth antialiasing
+                        layer.enabled: true
+                        layer.samples: 4
+                        
+                        ShapePath {
+                            fillColor: "black" // Matches monitor bezel
+                            strokeWidth: 0
+                            
+                            // Start at top-left
+                            startX: 0
+                            startY: 0
+                            
+                            // Draw top line to top-right
+                            PathLine { x: root.cornerRadius; y: 0 }
+                            
+                            // Draw curve down to bottom-left
+                            PathArc {
+                                x: 0
+                                y: root.cornerRadius
+                                radiusX: root.cornerRadius
+                                radiusY: root.cornerRadius
+                                useLargeArc: false
+                            }
+                            
+                            // Draw left line back to top-left
+                            PathLine { x: 0; y: 0 }
+                        }
+                    }
+                }
+            }
         }
-        
-        // Clean implementation of inverted radius:
-        // We actually want to render the gap between the screen edge and the desktop
-        Canvas {
-          anchors.fill: parent
-          onPaint: {
-            var ctx = getContext("2d");
-            ctx.reset();
-            ctx.fillStyle = "black";
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(24, 0);
-            ctx.arcTo(0, 0, 0, 24, 24);
-            ctx.closePath();
-            ctx.fill();
-          }
-          rotation: modelData.rotation
-        }
-      }
     }
-  }
 }
