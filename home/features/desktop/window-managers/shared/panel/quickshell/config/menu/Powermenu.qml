@@ -16,6 +16,7 @@ PanelWindow {
   color: "transparent"
   
   property bool isVisible: false
+  visible: isVisible
 
   WlrLayershell.layer: WlrLayer.Overlay
   WlrLayershell.keyboardFocus: root.isVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None

@@ -38,6 +38,9 @@ case "$MODE" in
       "files")
         quickshell ipc call Launcher openFiles
         ;;
+      "keybinds")
+        quickshell ipc call Launcher openKeybinds
+        ;;
       *)
         echo "Unknown mode: $SUBMODE"
         exit 1

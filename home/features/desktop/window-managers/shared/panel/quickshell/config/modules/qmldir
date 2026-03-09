@@ -1,8 +1,10 @@
 ActionButton 1.0 ActionButton.qml
 Calendar 1.0 Calendar.qml
 DiskWidget 1.0 DiskWidget.qml
+GPUWidget 1.0 GPUWidget.qml
 MediaWidget 1.0 MediaWidget.qml
 NetworkGraphs 1.0 NetworkGraphs.qml
+ScratchpadWidget 1.0 ScratchpadWidget.qml
 SystemGraphs 1.0 SystemGraphs.qml
 SystemMonitor 1.0 SystemMonitor.qml
 UpdateWidget 1.0 UpdateWidget.qml

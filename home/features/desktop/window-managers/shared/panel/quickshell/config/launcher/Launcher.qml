@@ -98,13 +98,30 @@ PanelWindow {
       loadNixos()
     } else if (mode === "wallpapers") {
       loadWallpapers()
+    } else if (mode === "keybinds") {
+      loadKeybinds()
     }
-  }
-  
-  function close() {
-    windowOpacity = 0
+    }
+
+    function close() {
+    opacity = 0
     if (showingConfirm) confirmTitle = "";
-  }
+    }
+
+    function loadKeybinds() {
+    var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["qs-keybinds"] }', launcherRoot);
+    proc.finished.connect(function() {
+      try {
+        var raw = proc.stdout.readAll();
+        if (raw) {
+          allItems = JSON.parse(raw);
+          filterItems();
+        }
+      } catch (e) { console.error("Failed to parse keybinds JSON: " + e); }
+    });
+    proc.running = true;
+    }
+
 
   function askConfirm(title, callback) {
     confirmTitle = title;
@@ -361,7 +378,7 @@ PanelWindow {
           scoredItems.push(item);
         }
       }
-      if (mode !== "web" && mode !== "system" && mode !== "nixos" && mode !== "wallpapers") {
+      if (mode !== "web" && mode !== "system" && mode !== "nixos" && mode !== "wallpapers" && mode !== "keybinds") {
           scoredItems.sort(function(a, b) { return b._score - a._score; });
       }
       filteredItems = scoredItems;
@@ -414,6 +431,11 @@ PanelWindow {
         // Trigger wallust
         Quickshell.execDetached(["wallust", "run", item.path]);
         close();
+      } else if (mode === "keybinds") {
+        if (item.disp) {
+          Quickshell.execDetached(["hyprctl", "dispatch", item.disp, item.args]);
+        }
+        close();
       }
     }
   }
@@ -431,6 +453,7 @@ PanelWindow {
     function openNixos() { launcherRoot.open("nixos"); }
     function openMedia() { launcherRoot.open("media"); }
     function openWallpapers() { launcherRoot.open("wallpapers"); }
+    function openKeybinds() { launcherRoot.open("keybinds"); }
     function openFiles() { launcherRoot.open("files"); }
     function openDmenu(itemsJson: string) {
       var items = [];
@@ -494,6 +517,7 @@ PanelWindow {
                { id: "calc", icon: "󰪚", label: "Calculator" },
                { id: "media", icon: "󰝚", label: "Media" },
                { id: "wallpapers", icon: "󰸉", label: "Wallpapers" },
+               { id: "keybinds", icon: "󰌌", label: "Keybinds" },
                { id: "nixos", icon: "", label: "NixOS" },
                { id: "system", icon: "⚙️", label: "System" }
              ]
@@ -568,14 +592,14 @@ PanelWindow {
                   fillMode: Image.PreserveAspectCrop; visible: source != "" && status === Image.Ready
                 }
                 Text {
-                  anchors.centerIn: parent; text: mode === "window" ? "󱗼" : (mode === "run" ? "" : (mode === "web" ? modelData.icon : (mode === "emoji" ? modelData.name : (mode === "nixos" || mode === "system" ? modelData.icon : "󰀻"))))
-                  color: Colors.textSecondary; font.family: (mode === "emoji" || mode === "system" || mode === "nixos") ? "Noto Color Emoji" : "JetBrainsMono Nerd Font"; font.pixelSize: (mode === "emoji" || mode === "system" || mode === "nixos") ? 22 : 18; visible: !iconImage.visible
+                  anchors.centerIn: parent; text: mode === "window" ? "󱗼" : (mode === "run" ? "" : (mode === "web" ? modelData.icon : (mode === "emoji" ? modelData.name : (mode === "keybinds" ? "󰌌" : (mode === "nixos" || mode === "system" ? modelData.icon : "󰀻")))))
+                  color: Colors.textSecondary; font.family: (mode === "emoji" || mode === "system" || mode === "nixos" || mode === "keybinds") ? "Noto Color Emoji" : "JetBrainsMono Nerd Font"; font.pixelSize: (mode === "emoji" || mode === "system" || mode === "nixos" || mode === "keybinds") ? 22 : 18; visible: !iconImage.visible
                 }
               }
               ColumnLayout {
                 spacing: 2
                 Text { 
-                  text: mode === "drun" ? modelData.name : (mode === "run" ? modelData.name : (mode === "emoji" ? modelData.title : (mode === "calc" ? modelData.title : (mode === "clip" ? modelData.name : (mode === "web" ? modelData.title : (mode === "nixos" ? modelData.name : (mode === "wallpapers" ? modelData.name : (modelData.title || modelData.name))))))))
+                  text: mode === "drun" ? modelData.name : (mode === "run" ? modelData.name : (mode === "emoji" ? modelData.title : (mode === "calc" ? modelData.title : (mode === "clip" ? modelData.name : (mode === "web" ? modelData.title : (mode === "nixos" ? modelData.name : (mode === "wallpapers" ? modelData.name : (mode === "keybinds" ? modelData.name : (modelData.title || modelData.name)))))))))
                   color: Colors.text
                   font.pixelSize: mode === "calc" ? 18 : 14
                   font.weight: index === launcherRoot.selectedIndex ? Font.Bold : Font.Normal
@@ -583,7 +607,7 @@ PanelWindow {
                   Layout.fillWidth: true 
                 }
                 Text { 
-                  text: mode === "drun" ? modelData.exec : (mode === "run" ? "" : (mode === "wallpapers" ? modelData.path : (modelData.class || "")))
+                  text: mode === "drun" ? modelData.exec : (mode === "run" ? "" : (mode === "wallpapers" ? modelData.path : (mode === "keybinds" ? modelData.desc : (modelData.class || ""))))
                   color: Colors.textSecondary
                   font.pixelSize: 11
                   elide: Text.ElideRight

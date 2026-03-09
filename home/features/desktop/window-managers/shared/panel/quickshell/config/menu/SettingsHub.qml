@@ -65,6 +65,7 @@ PanelWindow {
           
           TabBtn { label: "System"; icon: "󰒓"; tabId: "system" }
           TabBtn { label: "Appearance"; icon: "󰸉"; tabId: "appearance" }
+          TabBtn { label: "Hyprland"; icon: "󱗼"; tabId: "layout" }
           
           Item { Layout.fillHeight: true }
           
@@ -81,7 +82,7 @@ PanelWindow {
         Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: 24; spacing: 20
 
         Text {
-          text: activeTab === "system" ? "System Controls" : "UI Appearance"
+          text: activeTab === "system" ? "System Controls" : (activeTab === "appearance" ? "UI Appearance" : "Hyprland Layout")
           color: Colors.fgMain; font.pixelSize: 24; font.weight: Font.Bold
         }
 
@@ -109,6 +110,39 @@ PanelWindow {
             spacing: 20
             Text { text: "Floating Bar"; color: Colors.fgMain; font.pixelSize: 14; Layout.fillWidth: true }
             Switch { checked: Config.barFloating; onToggled: Config.barFloating = !Config.barFloating }
+          }
+        }
+
+        // --- HYPRLAND TAB ---
+        ColumnLayout {
+          visible: activeTab === "layout"
+          spacing: 20; Layout.fillWidth: true
+
+          RowLayout {
+            spacing: 20
+            Text { text: "Master Layout"; color: Colors.fgMain; font.pixelSize: 14; Layout.fillWidth: true }
+            Switch { 
+              checked: false
+              onToggled: Quickshell.execDetached(["hyprctl", "dispatch", "layoutmsg", "toggle"])
+            }
+          }
+
+          ConfigSlider { 
+            label: "Outer Gaps"
+            min: 0; max: 50; value: 10
+            onMoved: (v) => Quickshell.execDetached(["hyprctl", "keyword", "general:gaps_out", v.toString()])
+          }
+
+          ConfigSlider { 
+            label: "Inner Gaps"
+            min: 0; max: 30; value: 5
+            onMoved: (v) => Quickshell.execDetached(["hyprctl", "keyword", "general:gaps_in", v.toString()])
+          }
+
+          ConfigSlider { 
+            label: "Active Opacity"
+            min: 0.5; max: 1.0; value: 1.0; step: 0.05
+            onMoved: (v) => Quickshell.execDetached(["hyprctl", "keyword", "decoration:active_opacity", v.toString()])
           }
         }
 

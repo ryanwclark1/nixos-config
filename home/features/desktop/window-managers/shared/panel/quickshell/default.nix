@@ -40,6 +40,11 @@ let
     PATH="${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.findutils}/bin:$PATH"
     ${builtins.readFile ./scripts/wallpapers.sh}
   '';
+
+  keybindsScript = pkgs.writeShellScriptBin "qs-keybinds" ''
+    PATH="${pkgs.jq}/bin:${pkgs.gnugrep}/bin:${pkgs.coreutils}/bin:$PATH"
+    ${builtins.readFile ./scripts/keybinds.sh}
+  '';
   in
   {
   options.features.quickshell = {
@@ -58,8 +63,8 @@ let
       emojiScript
       clipScript
       wallpaperScript
+      keybindsScript
     ];
-
     home.file.".config/quickshell" = {
       source = ./config;
       recursive = true;

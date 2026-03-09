@@ -143,28 +143,32 @@ Scope {
     id: settingsHub
   }
 
-  PanelWindow {
-    id: desktopBackground
-    anchors {
-      top: true
-      left: true
-      right: true
-      bottom: true
-    }
-    color: "transparent"
-    exclusiveZone: -1
-    WlrLayershell.layer: WlrLayer.Background
-    mask: Region {}
-
-    DesktopWidgets {
-      anchors.left: parent.left
-      anchors.top: parent.top
-      anchors.leftMargin: 80
-      anchors.topMargin: 120
-    }
+  NativeLock {
+    id: lockscreen
   }
 
-  Corners {
-    id: screenCorners
-  }
+  // PanelWindow {
+  //   id: desktopBackground
+  //   anchors {
+  //     top: true
+  //     left: true
+  //     right: true
+  //     bottom: true
+  //   }
+  //   color: "transparent"
+  //   exclusiveZone: -1
+  //   WlrLayershell.layer: WlrLayer.Background
+  //   mask: Region {}
+
+  //   DesktopWidgets {
+  //     anchors.left: parent.left
+  //     anchors.top: parent.top
+  //     anchors.leftMargin: 80
+  //     anchors.topMargin: 120
+  //   }
+  // }
+
+  // Corners {
+  //   id: screenCorners
+  // }
 }

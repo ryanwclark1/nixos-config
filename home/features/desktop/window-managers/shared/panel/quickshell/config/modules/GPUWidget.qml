@@ -16,24 +16,32 @@ Rectangle {
   property string vramUsage: "0 / 0 MB"
   property real vramPercent: 0.0
 
+  Timer {
+    interval: 2000
+    running: true
+    repeat: true
+    onTriggered: fetchGPU.running = true
+  }
+
   Process {
     id: fetchGPU
     // Specifically for AMD (typical in NixOS/Hyprland setups)
     command: ["sh", "-c", "cat /sys/class/drm/card0/device/gpu_busy_percent 2>/dev/null || echo 0"]
-    running: true
-    repeat: true
-    interval: 2000
     stdout: StdioCollector {
       onStreamFinished: root.gpuUsage = this.text.trim() + "%"
     }
   }
 
+  Timer {
+    interval: 5000
+    running: true
+    repeat: true
+    onTriggered: fetchVRAM.running = true
+  }
+
   Process {
     id: fetchVRAM
     command: ["sh", "-c", "cat /sys/class/drm/card0/device/mem_info_vram_used /sys/class/drm/card0/device/mem_info_vram_total 2>/dev/null | awk '{print $1}'"]
-    running: true
-    repeat: true
-    interval: 5000
     stdout: StdioCollector {
       onStreamFinished: {
         var lines = this.text.trim().split("\n");
