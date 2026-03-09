@@ -201,12 +201,11 @@ show_setup_power_menu() {
 }
 
 show_setup_config_menu() {
-  case $(menu "Setup" "  Hyprland\n  Hypridle\n  Hyprlock\n  Hyprsunset\n  Swayosd\n󰌧  Walker\n󰍜  Waybar\n󰞅  XCompose") in
+  case $(menu "Setup" "  Hyprland\n  Hypridle\n  Hyprlock\n  Hyprsunset\n󰌧  Walker\n󰍜  Waybar\n󰞅  XCompose") in
   *Hyprland*) open_in_editor ~/.config/hypr/hyprland.conf ;;
   *Hypridle*) open_in_editor ~/.config/hypr/hypridle.conf && os-restart-hypridle ;;
   *Hyprlock*) open_in_editor ~/.config/hypr/hyprlock.conf ;;
   *Hyprsunset*) open_in_editor ~/.config/hypr/hyprsunset.conf && os-restart-hyprsunset ;;
-  *Swayosd*) open_in_editor ~/.config/swayosd/config.toml && os-restart-swayosd ;;
   *Walker*) open_in_editor ~/.config/walker/config.toml && os-restart-walker ;;
   *Waybar*) open_in_editor ~/.config/waybar/config.jsonc && os-restart-waybar ;;
   *XCompose*) open_in_editor ~/.XCompose && os-restart-xcompose ;;
@@ -404,10 +403,9 @@ show_update_channel_menu() {
   esac
 }
 show_update_process_menu() {
-  case $(menu "Restart" "  Hypridle\n  Hyprsunset\n  Swayosd\n󰌧  Walker\n󰍜  Waybar") in
+  case $(menu "Restart" "  Hypridle\n  Hyprsunset\n󰌧  Walker\n󰍜  Waybar") in
   *Hypridle*) os-restart-hypridle ;;
   *Hyprsunset*) os-restart-hyprsunset ;;
-  *Swayosd*) os-restart-swayosd ;;
   *Walker*) os-restart-walker ;;
   *Waybar*) os-restart-waybar ;;
   *) show_update_menu ;;
@@ -415,13 +413,12 @@ show_update_process_menu() {
 }
 
 show_update_config_menu() {
-  case $(menu "Use default config" "  Hyprland\n  Hypridle\n  Hyprlock\n  Hyprsunset\n󱣴  Plymouth\n  Swayosd\n󰌧  Walker\n󰍜  Waybar") in
+  case $(menu "Use default config" "  Hyprland\n  Hypridle\n  Hyprlock\n  Hyprsunset\n󱣴  Plymouth\n󰌧  Walker\n󰍜  Waybar") in
   *Hyprland*) present_terminal os-refresh-hyprland ;;
   *Hypridle*) present_terminal os-refresh-hypridle ;;
   *Hyprlock*) present_terminal os-refresh-hyprlock ;;
   *Hyprsunset*) present_terminal os-refresh-hyprsunset ;;
   *Plymouth*) present_terminal os-refresh-plymouth ;;
-  *Swayosd*) present_terminal os-refresh-swayosd ;;
   *Walker*) present_terminal os-refresh-walker ;;
   *Waybar*) present_terminal os-refresh-waybar ;;
   *) show_update_menu ;;

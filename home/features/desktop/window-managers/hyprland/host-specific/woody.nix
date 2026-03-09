@@ -40,9 +40,4 @@
   # Host-specific configuration is automatically loaded via host-specific.conf
   # No need for wayland.windowManager.hyprland.settings when using system-level Hyprland
 
-  # SwayOSD configuration for woody (Desktop)
-  # services.swayosd = {
-  #   enable = true;
-  #   display = "DP-1";  # Desktop monitor via DisplayPort
-  # };
 }

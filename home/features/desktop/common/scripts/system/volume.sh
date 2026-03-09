@@ -6,7 +6,7 @@
 # -----------------------------------------------------
 #
 # This script provides volume control using wpctl by default
-# SwayOSD is used for display notifications when available
+# Quickshell handles display notifications when available
 # Compatible with any window manager that supports rofi
 # Uses PipeWire/WirePlumber for audio management
 # -----------------------------------------------------
@@ -46,15 +46,6 @@ notify_volume() {
 
     if command -v notify-send >/dev/null; then
         notify-send "$icon $title" "$message" -t 1000
-    fi
-
-    # Also send to SwayOSD if available for consistent display
-    if command -v swayosd-client >/dev/null; then
-        case "$icon" in
-            "󰝝") swayosd-client --output-volume raise --max-volume 100 >/dev/null 2>&1 || true ;;
-            "󰝞") swayosd-client --output-volume lower --max-volume 100 >/dev/null 2>&1 || true ;;
-            "󰝟") swayosd-client --output-volume mute-toggle >/dev/null 2>&1 || true ;;
-        esac
     fi
 }
 
@@ -366,7 +357,6 @@ Dependencies:
     - wpctl (wireplumber)
     - notify-send (optional, for notifications)
     - rofi (optional, for GUI mode)
-    - swayosd-client (optional, for display notifications)
 EOF
 }
 

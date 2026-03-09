@@ -1,15 +1,9 @@
 #!/usr/bin/env bash
 
-# SwayOSD Caps Lock indicator with proper state detection
+# Caps Lock indicator with proper state detection
 # This script detects the actual caps lock state and shows appropriate OSD
 
 set -euo pipefail
-
-# Check if SwayOSD is available
-if ! command -v swayosd-client >/dev/null 2>&1; then
-    # Silently exit if SwayOSD is not available
-    exit 0
-fi
 
 # Get caps lock state
 get_caps_state() {
@@ -60,28 +54,26 @@ get_caps_state() {
 
 # Show OSD notification
 show_osd() {
-    # SwayOSD will handle the state toggle internally
-    # We just need to trigger it
-    if swayosd-client --caps-lock &>/dev/null; then
-        return 0
-    else
-        # If SwayOSD fails, try to show a notification as fallback
-        if command -v notify-send >/dev/null 2>&1; then
-            local state
-            state=$(get_caps_state || echo "toggled")
-            notify-send -t 1000 -u low "Caps Lock" "Caps Lock: $state" 2>/dev/null || true
+    local state
+    state=$(get_caps_state || echo "unknown")
+
+    # Try quickshell IPC
+    if command -v quickshell >/dev/null 2>&1; then
+        if quickshell ipc call Osd showCapslock "$state" >/dev/null 2>&1; then
+            return 0
         fi
-        return 1
     fi
+
+    # Fallback to notify-send
+    if command -v notify-send >/dev/null 2>&1; then
+        notify-send -t 1000 -u low "Caps Lock" "Caps Lock: $state" 2>/dev/null || true
+    fi
+    return 1
 }
 
 # Main function
 main() {
-    # Get current state (for logging/debugging, but SwayOSD handles the toggle)
-    local current_state
-    current_state=$(get_caps_state || echo "unknown")
-
-    # Show OSD (SwayOSD will toggle the state internally)
+    # Show OSD (Quickshell will handle the state internally)
     show_osd
 }
 

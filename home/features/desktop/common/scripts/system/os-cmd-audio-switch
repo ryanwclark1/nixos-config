@@ -13,9 +13,7 @@ sinks=$(pactl -f json list sinks 2>/dev/null | jq '[.[] | select((.ports | lengt
 sinks_count=$(echo "$sinks" | jq '. | length' || echo "0")
 
 if [[ "$sinks_count" -eq 0 ]] || [[ "$sinks_count" == "null" ]]; then
-  swayosd-client \
-    --monitor "$focused_monitor" \
-    --custom-message "No audio devices found" || true
+  notify-send -t 2000 -u normal "Audio" "No audio devices found" || true
   exit 1
 fi
 
@@ -68,7 +66,4 @@ if [[ "$next_sink_name" != "$current_sink_name" ]]; then
   }
 fi
 
-swayosd-client \
-  --monitor "$focused_monitor" \
-  --custom-message "$next_sink_description" \
-  --custom-icon "$next_sink_volume_icon" || true
+notify-send -t 2000 -u normal "Audio Output" "$next_sink_description" || true

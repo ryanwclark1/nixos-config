@@ -43,9 +43,4 @@
   # Host-specific configuration is automatically loaded via host-specific.conf
   # No need for wayland.windowManager.hyprland.settings when using system-level Hyprland
 
-  # SwayOSD configuration for frametop (Framework laptop)
-  # services.swayosd = {
-  #   enable = true;
-  #   display = "eDP-1";  # Framework laptop internal display
-  # };
 }
