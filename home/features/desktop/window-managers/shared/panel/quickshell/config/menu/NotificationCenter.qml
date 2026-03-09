@@ -2,9 +2,11 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.Notifications
+import Quickshell.Services.Mpris
 import Quickshell.Wayland
 import "../modules"
 import "../notifications"
+import "../services"
 
 PanelWindow {
   id: root
@@ -75,12 +77,12 @@ PanelWindow {
           width: 80; height: 28
           Rectangle {
             anchors.fill: parent
-            color: root.manager && root.manager.dndEnabled ? "#e57373" : "#1affffff"
+            color: root.manager && root.manager.dndEnabled ? Colors.error : Colors.highlight
             radius: 6
             Text {
               anchors.centerIn: parent
               text: root.manager && root.manager.dndEnabled ? "󰂛 DND" : "󰂚 DND"
-              color: "#ffffff"; font.pixelSize: 11; font.weight: Font.Medium; font.family: "JetBrainsMono Nerd Font"
+              color: Colors.text; font.pixelSize: 11; font.weight: Font.Medium; font.family: "JetBrainsMono Nerd Font"
             }
           }
           onClicked: if (root.manager) root.manager.dndEnabled = !root.manager.dndEnabled
@@ -90,8 +92,8 @@ PanelWindow {
         MouseArea {
           width: 70; height: 28
           Rectangle {
-            anchors.fill: parent; color: "#1affffff"; radius: 6
-            Text { anchors.centerIn: parent; text: "Clear All"; color: "#aaaaaa"; font.pixelSize: 11; font.weight: Font.Medium }
+            anchors.fill: parent; color: Colors.highlight; radius: 6
+            Text { anchors.centerIn: parent; text: "Clear All"; color: Colors.textSecondary; font.pixelSize: 11; font.weight: Font.Medium }
           }
           onClicked: if (root.manager) { for (var i = 0; i < root.manager.notifications.count; i++) root.manager.notifications.get(i).dismiss(); }
         }
@@ -132,12 +134,9 @@ PanelWindow {
         property var collapsedGroups: ({})
 
         function toggleGroup(name) {
-          var groups = collapsedGroups;
+          var groups = JSON.parse(JSON.stringify(collapsedGroups));
           groups[name] = !groups[name];
           collapsedGroups = groups;
-          // Force refresh visible items
-          notifList.model = null;
-          notifList.model = root.manager.notifications;
         }
 
         section.property: "appName"
@@ -197,7 +196,7 @@ PanelWindow {
           
           visible: matchesSearch && !isCollapsed
           width: notifList.width
-          height: visible ? colItem.height + (isReplying ? 50 : 20) : 0
+          height: visible ? colItem.implicitHeight + 24 + (isReplying ? 50 : 0) : 0
           color: Colors.surface
           opacity: isCollapsed ? 0 : 1
           radius: 12
@@ -229,7 +228,7 @@ PanelWindow {
 
           Column {
             id: colItem
-            width: parent.width - 24; anchors.centerIn: parent; spacing: 10
+            width: parent.width - 24; anchors.top: parent.top; anchors.topMargin: 12; anchors.horizontalCenter: parent.horizontalCenter; spacing: 10
 
             RowLayout {
               width: parent.width; spacing: 12
@@ -262,14 +261,22 @@ PanelWindow {
               RowLayout {
                 anchors.fill: parent; anchors.margins: 8; spacing: 15
                 Item { Layout.fillWidth: true }
-                MouseArea { width: 24; height: 24; Text { anchors.centerIn: parent; text: "󰒮"; color: Colors.text; font.family: "JetBrainsMono Nerd Font" } onClicked: mprisPlayer.previous() }
+                MouseArea { 
+                  width: 24; height: 24
+                  Text { anchors.centerIn: parent; text: "󰒮"; color: Colors.text; font.family: "JetBrainsMono Nerd Font" } 
+                  onClicked: mprisPlayer.previous() 
+                }
                 MouseArea { 
                   width: 32; height: 32
                   Rectangle { anchors.fill: parent; radius: 16; color: Colors.primary }
                   Text { anchors.centerIn: parent; text: mprisPlayer && mprisPlayer.playbackState === Mpris.Playing ? "󰏤" : "󰐊"; color: Colors.background; font.family: "JetBrainsMono Nerd Font" }
                   onClicked: mprisPlayer.playPause()
                 }
-                MouseArea { width: 24; height: 24; Text { anchors.centerIn: parent; text: "󰒭"; color: Colors.text; font.family: "JetBrainsMono Nerd Font" } onClicked: mprisPlayer.next() }
+                MouseArea { 
+                  width: 24; height: 24
+                  Text { anchors.centerIn: parent; text: "󰒭"; color: Colors.text; font.family: "JetBrainsMono Nerd Font" } 
+                  onClicked: mprisPlayer.next() 
+                }
                 Item { Layout.fillWidth: true }
               }
             }

@@ -1,12 +1,12 @@
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Controls
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Bluetooth
 import Quickshell.Services.Pipewire
 import Quickshell.Services.Mpris
+import "components" // Implicitly includes Colors singleton
 import "../services"
 
 PanelWindow {
@@ -20,7 +20,7 @@ PanelWindow {
   }
   
   color: "transparent"
-  visible: windowOpacity > 0
+  visible: opacity > 0
 
   WlrLayershell.layer: WlrLayer.Overlay
   WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
@@ -31,28 +31,21 @@ PanelWindow {
   property var allItems: []
   property var filteredItems: []
   property int selectedIndex: 0
-  property string mode: "drun" // drun, window, dmenu, run, emoji, calc, clip, web, system, nixos, media, wallpapers
-
+  property string mode: "drun" // drun, window, dmenu, run, emoji, calc, clip, web, system, nixos, media, wallpapers, files, bookmarks, ai
+  
   // Confirmation state
   property string confirmTitle: ""
   property var confirmCallback: null
   readonly property bool showingConfirm: confirmTitle !== ""
 
-  property real windowOpacity: 0
-  property real scaleValue: 0.95
+  Item {
+    anchors.fill: parent
+    opacity: 0
+    Behavior on opacity { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
 
-  Behavior on windowOpacity { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
+    property real scaleValue: 0.95
 
-  // Spring animation for opening
-  onWindowOpacityChanged: {
-    if (windowOpacity > 0) {
-        scaleValueAnimation.to = 1.0;
-        scaleValueAnimation.start();
-    } else {
-        scaleValue = 0.95;
-    }
-  }
-  SpringAnimation {
+    SpringAnimation {
     id: scaleValueAnimation
     target: launcherRoot
     property: "scaleValue"
@@ -69,9 +62,9 @@ PanelWindow {
         searchText = ""
         if (searchInput) searchInput.text = ""
     }
-    selectedIndex = 0;
-    windowOpacity = 1;
-    if (searchInput) searchInput.forceActiveFocus();
+    selectedIndex = 0
+    opacity = 1
+    if (searchInput) searchInput.forceActiveFocus()
     
     if (mode === "drun") {
       loadApps()
@@ -83,8 +76,6 @@ PanelWindow {
       loadEmojis()
     } else if (mode === "clip") {
       loadClip()
-    } else if (mode === "files") {
-      loadFiles()
     } else if (mode === "calc") {
       allItems = []
       filterItems()
@@ -99,73 +90,21 @@ PanelWindow {
       loadNixos()
     } else if (mode === "wallpapers") {
       loadWallpapers()
-    } else if (mode === "keybinds") {
-      loadKeybinds()
+    } else if (mode === "files") {
+      loadFiles()
     } else if (mode === "bookmarks") {
       loadBookmarks()
     } else if (mode === "ai") {
       loadAi()
+    } else if (mode === "keybinds") {
+      loadKeybinds()
     }
-    }
-
-    function close() {
+  }
+  
+  function close() {
     opacity = 0
     if (showingConfirm) confirmTitle = "";
-    }
-
-    function loadBookmarks() {
-    var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["qs-bookmarks"] }', launcherRoot);
-    proc.finished.connect(function() {
-      try {
-        var raw = proc.stdout.readAll();
-        if (raw) {
-          allItems = JSON.parse(raw);
-          filterItems();
-        }
-      } catch (e) { console.error("Failed to parse bookmarks JSON: " + e); }
-    });
-    proc.running = true;
-    }
-
-    function loadAi() {
-    var query = searchText.startsWith("!") ? searchText.substring(1).trim() : searchText;
-    if (query.length < 3) {
-       allItems = [{ name: "Type your prompt...", isHint: true, icon: "󰚩" }];
-       filterItems();
-       return;
-    }
-
-    // We update the results list to show "Thinking..."
-    allItems = [{ name: "Thinking...", isHint: true, icon: "󰚩" }];
-    filterItems();
-
-    var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["qs-ai", "' + query.replace(/"/g, '\\"') + '"] }', launcherRoot);
-    proc.finished.connect(function() {
-      var raw = proc.stdout.readAll().trim();
-      if (raw) {
-        allItems = [{ name: "AI Response", title: "Click to copy response", body: raw, icon: "󰚩" }];
-        filterItems();
-      } else {
-        allItems = [{ name: "AI error or no response", isHint: true, icon: "󰚩" }];
-        filterItems();
-      }
-    });
-    proc.running = true;
-    }
-    function loadKeybinds() {
-    var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["qs-keybinds"] }', launcherRoot);
-    proc.finished.connect(function() {
-      try {
-        var raw = proc.stdout.readAll();
-        if (raw) {
-          allItems = JSON.parse(raw);
-          filterItems();
-        }
-      } catch (e) { console.error("Failed to parse keybinds JSON: " + e); }
-    });
-    proc.running = true;
-    }
-
+  }
 
   function askConfirm(title, callback) {
     confirmTitle = title;
@@ -250,6 +189,34 @@ PanelWindow {
     proc.running = true;
   }
 
+  function loadWallpapers() {
+    var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["qs-wallpapers"] }', launcherRoot);
+    proc.finished.connect(function() {
+      try {
+        var raw = proc.stdout.readAll();
+        if (raw) {
+          allItems = JSON.parse(raw);
+          filterItems();
+        }
+      } catch (e) { console.error("Failed to parse wallpapers JSON: " + e); }
+    });
+    proc.running = true;
+  }
+
+  function loadKeybinds() {
+    var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["qs-keybinds"] }', launcherRoot);
+    proc.finished.connect(function() {
+      try {
+        var raw = proc.stdout.readAll();
+        if (raw) {
+          allItems = JSON.parse(raw);
+          filterItems();
+        }
+      } catch (e) { console.error("Failed to parse keybinds JSON: " + e); }
+    });
+    proc.running = true;
+  }
+
   function loadFiles() {
     var searchQuery = searchText.startsWith("/") ? searchText.substring(1).trim() : searchText;
     if (searchQuery.length < 2) {
@@ -279,8 +246,8 @@ PanelWindow {
     proc.running = true;
   }
 
-  function loadWallpapers() {
-    var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["qs-wallpapers"] }', launcherRoot);
+  function loadBookmarks() {
+    var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["qs-bookmarks"] }', launcherRoot);
     proc.finished.connect(function() {
       try {
         var raw = proc.stdout.readAll();
@@ -288,7 +255,32 @@ PanelWindow {
           allItems = JSON.parse(raw);
           filterItems();
         }
-      } catch (e) { console.error("Failed to parse wallpapers JSON: " + e); }
+      } catch (e) { console.error("Failed to parse bookmarks JSON: " + e); }
+    });
+    proc.running = true;
+  }
+
+  function loadAi() {
+    var query = searchText.startsWith("!") ? searchText.substring(1).trim() : searchText;
+    if (query.length < 3) {
+       allItems = [{ name: "Type your prompt...", isHint: true, icon: "󰚩" }];
+       filterItems();
+       return;
+    }
+    
+    allItems = [{ name: "Thinking...", isHint: true, icon: "󰚩" }];
+    filterItems();
+
+    var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["qs-ai", "' + query.replace(/"/g, '\\"') + '"] }', launcherRoot);
+    proc.finished.connect(function() {
+      var raw = proc.stdout.readAll().trim();
+      if (raw) {
+        allItems = [{ name: "AI Response", title: "Click to copy response", body: raw, icon: "󰚩" }];
+        filterItems();
+      } else {
+        allItems = [{ name: "AI error or no response", isHint: true, icon: "󰚩" }];
+        filterItems();
+      }
     });
     proc.running = true;
   }
@@ -306,23 +298,16 @@ PanelWindow {
 
   function loadSystem() {
       allItems = [
-        // Power
         { category: "Power", name: "Shutdown", icon: "⏻", action: () => askConfirm("Shutdown system?", () => Quickshell.execDetached(["systemctl", "poweroff"])) },
         { category: "Power", name: "Reboot", icon: "🔄", action: () => askConfirm("Reboot system?", () => Quickshell.execDetached(["systemctl", "reboot"])) },
         { category: "Power", name: "Suspend", icon: "💤", action: () => Quickshell.execDetached(["systemctl", "suspend"]) },
         { category: "Power", name: "Lock Screen", icon: "🔒", action: () => Quickshell.execDetached(["hyprlock"]) },
         { category: "Power", name: "Log Out", icon: "🏠", action: () => askConfirm("Log out of session?", () => Quickshell.execDetached(["hyprctl", "dispatch", "exit"])) },
-        
-        // Capture
         { category: "Capture", name: "Screenshot (Area)", icon: "📷", action: () => Quickshell.execDetached(["screenshot-enhanced", "region"]) },
         { category: "Capture", name: "Screenshot (Display)", icon: "🖥️", action: () => Quickshell.execDetached(["screenshot-enhanced", "output"]) },
         { category: "Capture", name: "Color Picker", icon: "🎨", action: () => Quickshell.execDetached(["hyprpicker", "-a"]) },
-        
-        // Toggles
         { category: "Toggles", name: "Toggle Bluetooth", icon: "󰂯", action: () => { if(Bluetooth.defaultAdapter) Bluetooth.defaultAdapter.enabled = !Bluetooth.defaultAdapter.enabled; } },
         { category: "Toggles", name: "Toggle Night Light", icon: "🌙", action: () => { Quickshell.execDetached(["bash", "-c", "pgrep hyprsunset && pkill hyprsunset || hyprsunset &"]); } },
-        
-        // Utilities
         { category: "Utilities", name: "System Monitor (btop)", icon: "📊", action: () => Quickshell.execDetached(["kitty", "-e", "btop"]) },
         { category: "Utilities", name: "Audio Settings", icon: "🔊", action: () => Quickshell.execDetached(["kitty", "-e", "wiremix"]) }
       ]
@@ -346,7 +331,6 @@ PanelWindow {
       }
     });
     proc.running = true;
-    
     filterItems();
   }
 
@@ -363,19 +347,14 @@ PanelWindow {
   function loadFrequency() {
     var file = Quickshell.openFile(freqPath, File.ReadOnly);
     if (file) {
-      try {
-        appFrequency = JSON.parse(file.readAll());
-      } catch(e) {}
+      try { appFrequency = JSON.parse(file.readAll()); } catch(e) {}
       file.close();
     }
   }
 
   function saveFrequency() {
     var file = Quickshell.openFile(freqPath, File.WriteOnly | File.Truncate);
-    if (file) {
-      file.write(JSON.stringify(appFrequency));
-      file.close();
-    }
+    if (file) { file.write(JSON.stringify(appFrequency)); file.close(); }
   }
 
   function trackLaunch(exec) {
@@ -386,32 +365,30 @@ PanelWindow {
 
   function highlightMatch(fullText, query) {
     if (!query || !fullText) return fullText;
-    var idx = fullText.toLowerCase().indexOf(query.toLowerCase());
+    var cleanQuery = query.startsWith("!") || query.startsWith("/") || query.startsWith("@") || query.startsWith("?") || query.startsWith(">") || query.startsWith(":") || query.startsWith("=") ? query.substring(1).trim() : query;
+    if (!cleanQuery) return fullText;
+    var idx = fullText.toLowerCase().indexOf(cleanQuery.toLowerCase());
     if (idx === -1) return fullText;
-    return fullText.substring(0, idx) + "<b>" + fullText.substring(idx, idx + query.length) + "</b>" + fullText.substring(idx + query.length);
+    return fullText.substring(0, idx) + "<b>" + fullText.substring(idx, idx + cleanQuery.length) + "</b>" + fullText.substring(idx + cleanQuery.length);
   }
 
   function fuzzyMatch(str, pattern) {
     if (!pattern) return 100;
     if (!str) return 0;
     var s = str.toLowerCase();
-    var p = pattern.toLowerCase();
+    var p = (pattern.startsWith("!") || pattern.startsWith("/") || pattern.startsWith("@") || pattern.startsWith("?") || pattern.startsWith(">") || pattern.startsWith(":") || pattern.startsWith("=")) ? pattern.substring(1).trim() : pattern;
+    p = p.toLowerCase();
+    if (!p) return 100;
     if (s.startsWith(p)) return 100 + (p.length / s.length);
     if (s.includes(p)) return 50 + (p.length / s.length);
-    
-    var pIdx = 0;
-    var sIdx = 0;
-    while (sIdx < s.length && pIdx < p.length) {
-      if (s[sIdx] === p[pIdx]) { pIdx++; }
-      sIdx++;
-    }
+    var pIdx = 0; var sIdx = 0;
+    while (sIdx < s.length && pIdx < p.length) { if (s[sIdx] === p[pIdx]) { pIdx++; } sIdx++; }
     if (pIdx === p.length) return 10 + (p.length / s.length);
     return 0;
   }
 
   function filterItems() {
     var actualSearch = searchText;
-    
     if (mode === "calc") {
       actualSearch = searchText.startsWith("=") ? searchText.substring(1).trim() : searchText;
       try {
@@ -431,15 +408,17 @@ PanelWindow {
     if (mode === "run" && searchText.startsWith(">")) actualSearch = searchText.substring(1).trim();
     if (mode === "emoji" && searchText.startsWith(":")) actualSearch = searchText.substring(1).trim();
     if (mode === "web" && searchText.startsWith("?")) actualSearch = searchText.substring(1).trim();
+    if (mode === "ai" && searchText.startsWith("!")) actualSearch = searchText.substring(1).trim();
+    if (mode === "files" && searchText.startsWith("/")) actualSearch = searchText.substring(1).trim();
+    if (mode === "bookmarks" && searchText.startsWith("@")) actualSearch = searchText.substring(1).trim();
 
-    if (actualSearch === "") {
+    if (actualSearch === "" && mode !== "files" && mode !== "ai") {
       filteredItems = allItems;
     } else {
       var searchLower = actualSearch.toLowerCase();
       var scoredItems = [];
       for (var i = 0; i < allItems.length; i++) {
         var item = allItems[i];
-        
         if (mode === "web") {
             var webItem = Object.assign({}, item);
             webItem.title = "Search " + item.name + " for '" + actualSearch + "'";
@@ -447,19 +426,17 @@ PanelWindow {
             scoredItems.push(webItem);
             continue;
         }
-
         var name = (item.name || item.title || "");
         var exec = (item.exec || item.class || "");
-        var bestScore = Math.max(fuzzyMatch(name, searchLower), fuzzyMatch(exec, searchLower));
-        if (bestScore > 0) {
+        var bestScore = Math.max(fuzzyMatch(name, actualSearch), fuzzyMatch(exec, actualSearch));
+        if (bestScore > 0 || (actualSearch === "" && (mode === "files" || mode === "ai"))) {
           item._score = bestScore;
           scoredItems.push(item);
         }
       }
-      if (mode !== "web" && mode !== "system" && mode !== "nixos" && mode !== "wallpapers" && mode !== "keybinds" && mode !== "bookmarks" && mode !== "ai") {
+      if (mode !== "web" && mode !== "system" && mode !== "nixos" && mode !== "wallpapers" && mode !== "keybinds" && mode !== "bookmarks" && mode !== "ai" && mode !== "files") {
           scoredItems.sort(function(a, b) { 
             if (b._score !== a._score) return b._score - a._score;
-            // Frequency boost for equal scores
             if (mode === "drun") {
               var freqA = appFrequency[a.exec] || 0;
               var freqB = appFrequency[b.exec] || 0;
@@ -521,13 +498,10 @@ PanelWindow {
         if (!showingConfirm) close();
       } else if (mode === "wallpapers") {
         Quickshell.execDetached(["swww", "img", item.path, "--transition-type", "grow", "--transition-pos", "0.5,0.5", "--transition-duration", "1.5"]);
-        // Trigger wallust
         Quickshell.execDetached(["wallust", "run", item.path]);
         close();
       } else if (mode === "keybinds") {
-        if (item.disp) {
-          Quickshell.execDetached(["hyprctl", "dispatch", item.disp, item.args]);
-        }
+        if (item.disp) Quickshell.execDetached(["hyprctl", "dispatch", item.disp, item.args]);
         close();
       }
     }
@@ -551,55 +525,31 @@ PanelWindow {
     function openAi() { launcherRoot.open("ai"); }
     function openFiles() { launcherRoot.open("files"); }
     function openDmenu(itemsJson: string) {
-      var items = [];
-      try { items = JSON.parse(itemsJson); } catch (err) {}
+      var items = []; try { items = JSON.parse(itemsJson); } catch (err) {}
       launcherRoot.mode = "dmenu";
       launcherRoot.allItems = items.map(function(it) { return { name: it, title: it }; });
       launcherRoot.open("dmenu");
     }
   }
 
-  // Backdrop
   MouseArea {
     anchors.fill: parent
     onClicked: launcherRoot.close()
-    Rectangle { anchors.fill: parent; color: "#000000"; opacity: launcherRoot.windowOpacity * 0.5 }
+    Rectangle { anchors.fill: parent; color: "#000000"; opacity: children[0].opacity * 0.5 }
   }
 
   Rectangle {
     id: mainBox
-    width: 900
-    height: 520
-    anchors.centerIn: parent
-    color: Colors.background
-    opacity: launcherRoot.windowOpacity * 0.95
-    border.color: Colors.border
-    border.width: 1
-    radius: Colors.radiusLarge
-    scale: launcherRoot.scaleValue
-
+    width: 900; height: 520; anchors.centerIn: parent; color: Colors.background; opacity: 0.95; border.color: Colors.border; border.width: 1; radius: Colors.radiusLarge; scale: launcherRoot.scaleValue
     MouseArea { anchors.fill: parent }
-
     RowLayout {
-      anchors.fill: parent
-      spacing: 0
-
-      // Sidebar
+      anchors.fill: parent; spacing: 0
       Rectangle {
-        width: 160
-        Layout.fillHeight: true
-        color: Qt.darker(Colors.background, 1.2)
-        radius: Colors.radiusLarge
-        
-        Rectangle {
-            anchors.right: parent.right; anchors.top: parent.top; anchors.bottom: parent.bottom
-            width: 12; color: parent.color
-        }
-
+        width: 160; Layout.fillHeight: true; color: Qt.darker(Colors.background, 1.2); radius: Colors.radiusLarge
+        Rectangle { anchors.right: parent.right; anchors.top: parent.top; anchors.bottom: parent.bottom; width: 12; color: parent.color }
         ColumnLayout {
           anchors.fill: parent; anchors.margins: 10; spacing: 6
           Text { text: "LAUNCHER"; color: Colors.textDisabled; font.pixelSize: 11; font.bold: true; Layout.margins: 5; Layout.topMargin: 10 }
-
           Repeater {
              model: [
                { id: "drun", icon: "󰀻", label: "Apps" },
@@ -619,12 +569,12 @@ PanelWindow {
                { id: "system", icon: "⚙️", label: "System" }
              ]
              delegate: Rectangle {
-                Layout.fillWidth: true; height: 38; radius: Colors.radiusSmall
+                Layout.fillWidth: true; height: 32; radius: Colors.radiusSmall
                 color: launcherRoot.mode === modelData.id ? Colors.highlight : (sidebarMouse.containsMouse ? Colors.highlightLight : "transparent")
                 RowLayout {
                   anchors.fill: parent; anchors.leftMargin: 12; spacing: 12
-                  Text { text: modelData.icon; color: launcherRoot.mode === modelData.id ? Colors.primary : Colors.textSecondary; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 16 }
-                  Text { text: modelData.label; color: launcherRoot.mode === modelData.id ? Colors.text : Colors.textSecondary; font.pixelSize: 13 }
+                  Text { text: modelData.icon; color: launcherRoot.mode === modelData.id ? Colors.primary : Colors.textSecondary; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 14 }
+                  Text { text: modelData.label; color: launcherRoot.mode === modelData.id ? Colors.text : Colors.textSecondary; font.pixelSize: 11 }
                 }
                 MouseArea { id: sidebarMouse; anchors.fill: parent; hoverEnabled: true; onClicked: launcherRoot.open(modelData.id, launcherRoot.searchText !== "") }
              }
@@ -632,22 +582,16 @@ PanelWindow {
           Item { Layout.fillHeight: true }
         }
       }
-
       Rectangle { width: 1; Layout.fillHeight: true; color: Colors.border }
-
       ColumnLayout {
         Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: 15; spacing: 15
-
-        // Search Bar
         Rectangle {
-          Layout.fillWidth: true; height: 50; color: Colors.surface; radius: Colors.radiusSmall
-          border.color: searchInput.activeFocus ? Colors.primary : Colors.border; border.width: 1
+          Layout.fillWidth: true; height: 50; color: Colors.surface; radius: Colors.radiusSmall; border.color: searchInput.activeFocus ? Colors.primary : Colors.border; border.width: 1
           RowLayout {
             anchors.fill: parent; anchors.leftMargin: 15; anchors.rightMargin: 15; spacing: 12
             Text { text: ""; color: Colors.textSecondary; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18 }
             TextInput {
-              id: searchInput
-              Layout.fillWidth: true; color: Colors.text; font.pixelSize: 16; clip: true; text: launcherRoot.searchText; enabled: !launcherRoot.showingConfirm
+              id: searchInput; Layout.fillWidth: true; color: Colors.text; font.pixelSize: 16; clip: true; text: launcherRoot.searchText; enabled: !launcherRoot.showingConfirm
               onTextChanged: {
                 var txt = text;
                 if (txt.startsWith("=") && launcherRoot.mode !== "calc") launcherRoot.open("calc", true);
@@ -656,6 +600,7 @@ PanelWindow {
                 else if (txt.startsWith("?") && launcherRoot.mode !== "web") launcherRoot.open("web", true);
                 else if (txt.startsWith("!") && launcherRoot.mode !== "ai") launcherRoot.open("ai", true);
                 else if (txt.startsWith("@") && launcherRoot.mode !== "bookmarks") launcherRoot.open("bookmarks", true);
+                else if (txt.startsWith("/") && launcherRoot.mode !== "files") launcherRoot.open("files", true);
                 if (launcherRoot.searchText !== text) { launcherRoot.searchText = text; launcherRoot.filterItems(); }
               }
               Keys.onPressed: (event) => {
@@ -663,11 +608,9 @@ PanelWindow {
                   if (launcherRoot.mode === "dmenu") { var fifoPath = "/tmp/qs-dmenu-result"; Quickshell.execDetached(["bash", "-c", "echo '' > " + fifoPath]); }
                   launcherRoot.close();
                 } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) { 
-                    if (launcherRoot.mode === "ai" && !launcherRoot.filteredItems[0].body) {
-                        launcherRoot.loadAi();
-                    } else {
-                        launcherRoot.executeSelection(); 
-                    }
+                    if (launcherRoot.mode === "ai" && launcherRoot.filteredItems.length > 0 && !launcherRoot.filteredItems[0].body) launcherRoot.loadAi();
+                    else if (launcherRoot.mode === "files" && launcherRoot.searchText.length > 1 && (!launcherRoot.allItems[0] || launcherRoot.allItems[0].isHint)) launcherRoot.loadFiles();
+                    else launcherRoot.executeSelection(); 
                 }
                 else if (event.key === Qt.Key_Up || (event.key === Qt.Key_K && (event.modifiers & Qt.ControlModifier))) { launcherRoot.selectedIndex = Math.max(0, launcherRoot.selectedIndex - 1); event.accepted = true; }
                 else if (event.key === Qt.Key_Down || (event.key === Qt.Key_J && (event.modifiers & Qt.ControlModifier))) { launcherRoot.selectedIndex = Math.min(launcherRoot.filteredItems.length - 1, launcherRoot.selectedIndex + 1); event.accepted = true; }
@@ -675,80 +618,31 @@ PanelWindow {
             }
           }
         }
-
-        // Results List
         ListView {
-          id: resultsList
-          visible: mode !== "media"
-          Layout.fillWidth: true; Layout.fillHeight: true; model: launcherRoot.filteredItems; clip: true; spacing: 5; currentIndex: launcherRoot.selectedIndex; enabled: !launcherRoot.showingConfirm
+          id: resultsList; visible: mode !== "media"; Layout.fillWidth: true; Layout.fillHeight: true; model: launcherRoot.filteredItems; clip: true; spacing: 5; currentIndex: launcherRoot.selectedIndex; enabled: !launcherRoot.showingConfirm
           onCurrentIndexChanged: positionViewAtIndex(currentIndex, ListView.Contain)
-          section.property: "category"
-          section.delegate: Text { text: section; color: Colors.primary; font.pixelSize: 11; font.bold: true; Layout.margins: 5; height: 25; verticalAlignment: Text.AlignBottom }
-
+          section.property: "category"; section.delegate: Text { text: section; color: Colors.primary; font.pixelSize: 11; font.bold: true; Layout.margins: 5; height: 25; verticalAlignment: Text.AlignBottom }
           delegate: Rectangle {
             width: resultsList.width; height: mode === "clip" ? 60 : (mode === "wallpapers" ? 80 : 50); color: index === launcherRoot.selectedIndex ? Colors.highlight : (itemMouseArea.containsMouse ? Colors.highlightLight : "transparent"); radius: Colors.radiusSmall
             RowLayout {
               anchors.fill: parent; anchors.leftMargin: 12; anchors.rightMargin: 12; spacing: 12
               Rectangle {
                 width: mode === "wallpapers" ? 100 : 32; height: mode === "wallpapers" ? 60 : 32; radius: 6; color: Colors.surface; visible: mode !== "dmenu" && mode !== "clip" && mode !== "calc"
-                Image {
-                  id: iconImage; anchors.fill: parent; anchors.margins: mode === "wallpapers" ? 0 : 4
-                  source: modelData.path ? "file://" + modelData.path : (modelData.icon && modelData.icon.startsWith("/") ? "file://" + modelData.icon : "")
-                  fillMode: Image.PreserveAspectCrop; visible: source != "" && status === Image.Ready
-                }
-                Text {
-                  anchors.centerIn: parent; text: mode === "window" ? "󱗼" : (mode === "run" ? "" : (mode === "web" ? modelData.icon : (mode === "emoji" ? modelData.name : (mode === "keybinds" ? "󰌌" : (mode === "nixos" || mode === "system" ? modelData.icon : "󰀻")))))
-                  color: Colors.textSecondary; font.family: (mode === "emoji" || mode === "system" || mode === "nixos" || mode === "keybinds") ? "Noto Color Emoji" : "JetBrainsMono Nerd Font"; font.pixelSize: (mode === "emoji" || mode === "system" || mode === "nixos" || mode === "keybinds") ? 22 : 18; visible: !iconImage.visible
-                }
+                Image { id: iconImage; anchors.fill: parent; anchors.margins: mode === "wallpapers" ? 0 : 4; source: modelData.path ? "file://" + modelData.path : (modelData.icon && modelData.icon.startsWith("/") ? "file://" + modelData.icon : (mode === "files" && modelData.fullPath && modelData.fullPath.match(/\.(jpg|jpeg|png|webp)$/i) ? "file://" + modelData.fullPath : "")); fillMode: Image.PreserveAspectCrop; visible: source != "" && status === Image.Ready }
+                Text { anchors.centerIn: parent; text: mode === "window" ? "󱗼" : (mode === "run" ? "" : (mode === "web" ? modelData.icon : (mode === "emoji" ? modelData.name : (mode === "keybinds" ? "󰌌" : (mode === "ai" ? "󰚩" : (mode === "bookmarks" ? "󰖟" : (mode === "files" ? "󰈔" : "󰀻"))))))) ; color: Colors.textSecondary; font.family: (mode === "emoji" || mode === "system" || mode === "nixos" || mode === "ai" || mode === "bookmarks" || mode === "keybinds") ? "Noto Color Emoji" : "JetBrainsMono Nerd Font"; font.pixelSize: (mode === "emoji" || mode === "system" || mode === "nixos" || mode === "ai" || mode === "bookmarks") ? 22 : 18; visible: !iconImage.visible }
               }
               ColumnLayout {
                 spacing: 2
-                Text { 
-                  text: {
-                    var base = mode === "drun" ? modelData.name : (mode === "run" ? modelData.name : (mode === "emoji" ? modelData.title : (mode === "calc" ? modelData.title : (mode === "clip" ? modelData.name : (mode === "web" ? modelData.title : (mode === "nixos" ? modelData.name : (mode === "wallpapers" ? modelData.name : (mode === "keybinds" ? modelData.name : (mode === "files" ? modelData.name : (modelData.title || modelData.name))))))))));
-                    return highlightMatch(base, searchText);
-                  }
-                  color: Colors.text
-                  textFormat: Text.StyledText
-                  font.pixelSize: mode === "calc" ? 18 : 14
-                  font.weight: index === launcherRoot.selectedIndex ? Font.Bold : Font.Normal
-                  elide: Text.ElideRight
-                  Layout.fillWidth: true 
-                }
-                Text { 
-                  text: {
-                    var base = mode === "drun" ? modelData.exec : (mode === "run" ? "" : (mode === "wallpapers" ? modelData.path : (mode === "keybinds" ? modelData.desc : (mode === "files" ? modelData.title : (modelData.class || "")))));
-                    return highlightMatch(base, searchText);
-                  }
-                  color: Colors.textSecondary
-                  textFormat: Text.StyledText
-                  font.pixelSize: 11
-                  elide: Text.ElideRight
-                  Layout.fillWidth: true
-                  visible: text !== "" && mode !== "calc" && mode !== "emoji" && mode !== "web" && mode !== "system" 
-                }
+                Text { text: highlightMatch(mode === "drun" ? modelData.name : (mode === "run" ? modelData.name : (mode === "emoji" ? modelData.title : (mode === "calc" ? modelData.title : (mode === "clip" ? modelData.name : (mode === "web" ? modelData.title : (mode === "nixos" ? modelData.name : (mode === "wallpapers" ? modelData.name : (mode === "keybinds" ? modelData.name : (mode === "files" ? modelData.name : (mode === "ai" ? modelData.name : (mode === "bookmarks" ? modelData.name : (modelData.title || modelData.name)))))))))))) , searchText); color: Colors.text; textFormat: Text.StyledText; font.pixelSize: mode === "calc" ? 18 : 14; font.weight: index === launcherRoot.selectedIndex ? Font.Bold : Font.Normal; elide: Text.ElideRight; Layout.fillWidth: true }
+                Text { text: highlightMatch(mode === "drun" ? modelData.exec : (mode === "run" ? "" : (mode === "wallpapers" ? modelData.path : (mode === "keybinds" ? modelData.desc : (mode === "files" ? modelData.title : (mode === "bookmarks" ? modelData.exec : (mode === "ai" ? modelData.title : (modelData.class || ""))))))), searchText); color: Colors.textSecondary; textFormat: Text.StyledText; font.pixelSize: 11; elide: Text.ElideRight; Layout.fillWidth: true; visible: text !== "" && mode !== "calc" && mode !== "emoji" && mode !== "web" && mode !== "system" }
               }
             }
             MouseArea { id: itemMouseArea; anchors.fill: parent; hoverEnabled: true; onClicked: { launcherRoot.selectedIndex = index; launcherRoot.executeSelection(); } }
           }
         }
-
-        // Media View
         Flickable {
-          id: mediaDashboard
-          visible: mode === "media"
-          Layout.fillWidth: true
-          Layout.fillHeight: true
-          clip: true
-          boundsBehavior: Flickable.StopAtBounds
-          flickableDirection: Flickable.VerticalFlick
-          contentWidth: mediaColumn.implicitWidth
-          contentHeight: mediaColumn.implicitHeight
-
-          ColumnLayout {
-            id: mediaColumn
-            width: parent.width
-            spacing: 20
+          id: mediaDashboard; visible: mode === "media"; Layout.fillWidth: true; Layout.fillHeight: true; clip: true; boundsBehavior: Flickable.StopAtBounds; flickableDirection: Flickable.VerticalFlick; contentWidth: mediaColumn.implicitWidth; contentHeight: mediaColumn.implicitHeight
+          ColumnLayout { id: mediaColumn; width: parent.width; spacing: 20
             Repeater {
               model: Mpris.players
               delegate: Rectangle {
@@ -773,61 +667,9 @@ PanelWindow {
                     RowLayout { 
                       spacing: 30
                       Layout.alignment: Qt.AlignHCenter
-                      Rectangle {
-                        width: 40
-                        height: 40
-                        radius: 20
-                        color: prevHover.containsMouse ? Colors.surface : "transparent"
-                        Text {
-                          text: "󰒮"
-                          color: Colors.text
-                          font.family: "JetBrainsMono Nerd Font"
-                          font.pixelSize: 24
-                          anchors.centerIn: parent
-                        }
-                        MouseArea {
-                          id: prevHover
-                          anchors.fill: parent
-                          hoverEnabled: true
-                          onClicked: modelData.previous()
-                        }
-                      }
-                      Rectangle {
-                        width: 50
-                        height: 50
-                        radius: 25
-                        color: Colors.primary
-                        Text {
-                          text: modelData.playbackState === Mpris.Playing ? "󰏤" : "󰐊"
-                          color: Colors.background
-                          font.family: "JetBrainsMono Nerd Font"
-                          font.pixelSize: 28
-                          anchors.centerIn: parent
-                        }
-                        MouseArea {
-                          anchors.fill: parent
-                          onClicked: modelData.playPause()
-                        }
-                      }
-                      Rectangle {
-                        width: 40
-                        height: 40
-                        radius: 20
-                        color: nextHover.containsMouse ? Colors.surface : "transparent"
-                        Text {
-                          text: "󰒭"
-                          color: Colors.text
-                          font.family: "JetBrainsMono Nerd Font"
-                          font.pixelSize: 24
-                          anchors.centerIn: parent
-                        }
-                        MouseArea {
-                          id: nextHover
-                          anchors.fill: parent
-                          hoverEnabled: true
-                          onClicked: modelData.next()
-                        }
-                      }
+                      Rectangle { width: 40; height: 40; radius: 20; color: prevHover.containsMouse ? Colors.surface : "transparent"; Text { text: "󰒮"; color: Colors.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 24; anchors.centerIn: parent } MouseArea { id: prevHover; anchors.fill: parent; hoverEnabled: true; onClicked: modelData.previous() } }
+                      Rectangle { width: 50; height: 50; radius: 25; color: Colors.primary; Text { text: modelData.playbackState === Mpris.Playing ? "󰏤" : "󰐊"; color: Colors.background; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 28; anchors.centerIn: parent } MouseArea { anchors.fill: parent; onClicked: modelData.playPause() } }
+                      Rectangle { width: 40; height: 40; radius: 20; color: nextHover.containsMouse ? Colors.surface : "transparent"; Text { text: "󰒭"; color: Colors.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 24; anchors.centerIn: parent } MouseArea { id: nextHover; anchors.fill: parent; hoverEnabled: true; onClicked: modelData.next() } }
                     }
                   }
                 }
@@ -837,210 +679,42 @@ PanelWindow {
           }
         }
       }
-
-      Rectangle { width: 1; Layout.fillHeight: true; color: Colors.border; visible: mode === "drun" || mode === "window" || mode === "run" || mode === "clip" || mode === "emoji" || mode === "wallpapers" }
-
-      // Preview Pane
+      Rectangle { width: 1; Layout.fillHeight: true; color: Colors.border; visible: mode !== "media" && mode !== "system" && mode !== "nixos" }
       Rectangle {
-        width: 250
-        Layout.fillHeight: true
-        color: "transparent"
-        visible: mode === "drun" || mode === "window" || mode === "run" || mode === "clip" || mode === "emoji" || mode === "wallpapers" || mode === "files"
+        width: 250; Layout.fillHeight: true; color: "transparent"; visible: mode !== "media" && mode !== "system" && mode !== "nixos"
         ColumnLayout {
-          anchors.fill: parent
-          anchors.margins: 20
-          spacing: 15
+          anchors.fill: parent; anchors.margins: 20; spacing: 15
           property var currentItem: launcherRoot.filteredItems.length > 0 && launcherRoot.selectedIndex >= 0 && launcherRoot.selectedIndex < launcherRoot.filteredItems.length ? launcherRoot.filteredItems[launcherRoot.selectedIndex] : null
-          
-          onCurrentItemChanged: {
-            if (mode === "files" && currentItem && currentItem.fullPath) {
-               if (!currentItem.fullPath.match(/\.(jpg|jpeg|png|webp|gif|pdf|zip|tar|gz|mp4|mkv|mp3|flac|wav)$/i)) {
-                   filePreviewProc.command = ["head", "-n", "15", currentItem.fullPath];
-                   filePreviewProc.running = true;
-               } else {
-                   previewTextContent.text = "Binary or media file.";
-               }
-            } else {
-               previewTextContent.text = "";
-            }
-          }
-
-          Process {
-            id: filePreviewProc
-            command: ["echo", ""]
-            running: false
-            stdout: StdioCollector {
-              onStreamFinished: {
-                if (mode === "files") {
-                  previewTextContent.text = this.text;
-                }
-              }
-            }
-          }
-
+          onCurrentItemChanged: { if (mode === "files" && currentItem && currentItem.fullPath) { if (!currentItem.fullPath.match(/\.(jpg|jpeg|png|webp|gif|pdf|zip|tar|gz|mp4|mkv|mp3|flac|wav)$/i)) { filePreviewProc.command = ["head", "-n", "15", currentItem.fullPath]; filePreviewProc.running = true; } else previewTextContent.text = "Binary or media file."; } else previewTextContent.text = ""; }
+          Process { id: filePreviewProc; command: ["echo", ""]; running: false; stdout: StdioCollector { onStreamFinished: { if (mode === "files") previewTextContent.text = this.text; } } }
           Rectangle {
-            width: mode === "wallpapers" || (mode === "files" && parent.currentItem && parent.currentItem.fullPath && parent.currentItem.fullPath.match(/\.(jpg|jpeg|png|webp)$/i)) ? 210 : 128
-            height: mode === "wallpapers" || (mode === "files" && parent.currentItem && parent.currentItem.fullPath && parent.currentItem.fullPath.match(/\.(jpg|jpeg|png|webp)$/i)) ? 140 : 128
-            radius: Colors.radiusMedium
-            color: Colors.surface
-            Layout.alignment: Qt.AlignHCenter
-            
-            Image {
-              id: previewIcon
-              anchors.fill: parent
-              anchors.margins: (mode === "wallpapers" || (mode === "files" && parent.parent.currentItem && parent.parent.currentItem.fullPath && parent.parent.currentItem.fullPath.match(/\.(jpg|jpeg|png|webp)$/i))) ? 0 : 10
-              source: parent.parent.currentItem ? (parent.parent.currentItem.path ? "file://" + parent.parent.currentItem.path : (parent.parent.currentItem.icon && parent.parent.currentItem.icon.startsWith("/") ? "file://" + parent.parent.currentItem.icon : (mode === "files" && parent.parent.currentItem.fullPath && parent.parent.currentItem.fullPath.match(/\.(jpg|jpeg|png|webp)$/i) ? "file://" + parent.parent.currentItem.fullPath : ""))) : ""
-              fillMode: Image.PreserveAspectFit
-              visible: source != "" && status === Image.Ready
-            }
-            Text {
-              anchors.centerIn: parent
-              text: mode === "window" ? "󱗼" : (mode === "run" ? "" : (mode === "emoji" ? (parent.parent.currentItem ? parent.parent.currentItem.name : "") : (mode === "clip" ? "󰅍" : (mode === "files" ? "󰈔" : "󰀻"))))
-              color: mode === "emoji" ? Colors.fgMain : Colors.textSecondary
-              font.family: mode === "emoji" ? "Noto Color Emoji" : "JetBrainsMono Nerd Font"
-              font.pixelSize: 64
-              visible: !previewIcon.visible
-            }
+            width: mode === "wallpapers" || (mode === "files" && parent.currentItem && parent.currentItem.fullPath && parent.currentItem.fullPath.match(/\.(jpg|jpeg|png|webp)$/i)) ? 210 : 128; height: mode === "wallpapers" || (mode === "files" && parent.currentItem && parent.currentItem.fullPath && parent.currentItem.fullPath.match(/\.(jpg|jpeg|png|webp)$/i)) ? 140 : 128; radius: Colors.radiusMedium; color: Colors.surface; Layout.alignment: Qt.AlignHCenter
+            Image { id: previewIcon; anchors.fill: parent; anchors.margins: (mode === "wallpapers" || (mode === "files" && parent.parent.currentItem && parent.parent.currentItem.fullPath && parent.parent.currentItem.fullPath.match(/\.(jpg|jpeg|png|webp)$/i))) ? 0 : 10; source: parent.parent.currentItem ? (parent.parent.currentItem.path ? "file://" + parent.parent.currentItem.path : (parent.parent.currentItem.icon && parent.parent.currentItem.icon.startsWith("/") ? "file://" + parent.parent.currentItem.icon : (mode === "files" && parent.parent.currentItem.fullPath && parent.parent.currentItem.fullPath.match(/\.(jpg|jpeg|png|webp)$/i) ? "file://" + parent.parent.currentItem.fullPath : ""))) : ""; fillMode: Image.PreserveAspectFit; visible: source != "" && status === Image.Ready }
+            Text { anchors.centerIn: parent; text: mode === "window" ? "󱗼" : (mode === "run" ? "" : (mode === "emoji" ? (parent.parent.currentItem ? parent.parent.currentItem.name : "") : (mode === "clip" ? "󰅍" : (mode === "files" ? "󰈔" : (mode === "ai" ? "󰚩" : (mode === "bookmarks" ? "󰖟" : "󰀻")))))); color: mode === "emoji" ? Colors.fgMain : Colors.textSecondary; font.family: (mode === "emoji" || mode === "ai" || mode === "bookmarks") ? "Noto Color Emoji" : "JetBrainsMono Nerd Font"; font.pixelSize: 64; visible: !previewIcon.visible }
           }
-          
-          Text {
-            text: parent.currentItem ? (mode === "drun" ? parent.currentItem.name : (mode === "window" ? parent.currentItem.title : (mode === "emoji" ? parent.currentItem.title : (mode === "clip" ? "Clipboard Item" : (mode === "wallpapers" ? "Wallpaper Preview" : (mode === "files" ? parent.currentItem.name : parent.currentItem.name)))))) : ""
-            color: Colors.text
-            font.pixelSize: 18
-            font.weight: Font.Bold
-            Layout.fillWidth: true
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.Wrap
-            maximumLineCount: 3
-            elide: Text.ElideRight 
-          }
-          
-          Text {
-            id: subText
-            text: parent.currentItem ? (mode === "drun" ? parent.currentItem.exec : (mode === "window" ? parent.currentItem.class : (mode === "clip" ? parent.currentItem.name : (mode === "wallpapers" ? parent.currentItem.name : (mode === "files" ? parent.currentItem.title : ""))))) : ""
-            color: Colors.textSecondary
-            font.pixelSize: 12
-            Layout.fillWidth: true
-            horizontalAlignment: (mode === "clip" || mode === "files") ? Text.AlignLeft : Text.AlignHCenter
-            wrapMode: Text.Wrap
-            maximumLineCount: mode === "clip" ? 10 : 2
-            elide: Text.ElideRight
-            visible: text !== "" && mode !== "emoji"
-          }
-          
-          Rectangle { 
-            Layout.fillWidth: true
-            height: 1
-            color: Colors.border
-            Layout.topMargin: 10
-            Layout.bottomMargin: 10 
-          }
-          
-          Text {
-            id: previewTextContent
-            color: Colors.textSecondary
-            font.pixelSize: 10
-            font.family: "JetBrainsMono Nerd Font"
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            wrapMode: Text.Wrap
-            elide: Text.ElideRight
-            clip: true
-            visible: mode === "files" && text !== ""
-          }
-
-          Text { 
-            text: mode === "drun" ? "Press Enter to launch" : (mode === "window" ? "Press Enter to focus" : (mode === "emoji" || mode === "clip" ? "Press Enter to copy" : (mode === "wallpapers" ? "Press Enter to apply" : (mode === "files" ? "Press Enter to open" : "Press Enter to run"))))
-            color: Colors.textDisabled
-            font.pixelSize: 12
-            Layout.alignment: Qt.AlignHCenter
-          }
-          
-          Item {
-            Layout.fillHeight: true
-            visible: mode !== "files"
-          }
+          Text { text: parent.currentItem ? (mode === "drun" ? parent.currentItem.name : (mode === "window" ? parent.currentItem.title : (mode === "emoji" ? parent.currentItem.title : (mode === "clip" ? "Clipboard Item" : (mode === "wallpapers" ? "Wallpaper Preview" : (mode === "files" ? parent.currentItem.name : (mode === "ai" ? parent.currentItem.name : (mode === "bookmarks" ? parent.currentItem.name : parent.currentItem.name)))))))) : ""; color: Colors.text; font.pixelSize: 18; font.weight: Font.Bold; Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter; wrapMode: Text.Wrap; maximumLineCount: 3; elide: Text.ElideRight }
+          Text { id: subTextItem; text: parent.currentItem ? (mode === "drun" ? parent.currentItem.exec : (mode === "window" ? parent.currentItem.class : (mode === "clip" ? parent.currentItem.name : (mode === "wallpapers" ? parent.currentItem.name : (mode === "files" ? parent.currentItem.title : (mode === "ai" ? parent.currentItem.title : (mode === "bookmarks" ? parent.currentItem.exec : ""))))))) : ""; color: Colors.textSecondary; font.pixelSize: 12; Layout.fillWidth: true; horizontalAlignment: (mode === "clip" || mode === "files" || mode === "bookmarks" || mode === "ai") ? Text.AlignLeft : Text.AlignHCenter; wrapMode: Text.Wrap; maximumLineCount: mode === "clip" ? 10 : 2; elide: Text.ElideRight; visible: text !== "" && mode !== "emoji" }
+          Rectangle { Layout.fillWidth: true; height: 1; color: Colors.border; Layout.topMargin: 10; Layout.bottomMargin: 10 }
+          Text { id: previewTextContent; color: Colors.textSecondary; font.pixelSize: 10; font.family: "JetBrainsMono Nerd Font"; Layout.fillWidth: true; Layout.fillHeight: true; wrapMode: Text.Wrap; elide: Text.ElideRight; clip: true; visible: (mode === "files" || mode === "ai") && text !== ""; text: (mode === "ai" && parent.currentItem) ? (parent.currentItem.body || "") : "" }
+          Text { text: mode === "drun" ? "Press Enter to launch" : (mode === "window" ? "Press Enter to focus" : (mode === "emoji" || mode === "clip" ? "Press Enter to copy" : (mode === "wallpapers" ? "Press Enter to apply" : (mode === "files" ? "Press Enter to open" : (mode === "ai" ? (parent.currentItem && parent.currentItem.body ? "Press Enter to copy" : "Press Enter to ask AI") : (mode === "bookmarks" ? "Press Enter to open" : "Press Enter to run")))))); color: Colors.textDisabled; font.pixelSize: 12; Layout.alignment: Qt.AlignHCenter }
+          Item { Layout.fillHeight: true; visible: mode !== "files" && mode !== "ai" }
         }
       }
     }
-
-    // Confirmation Overlay
     Rectangle {
-      id: confirmOverlay
-      anchors.fill: parent
-      visible: launcherRoot.showingConfirm
-      color: Qt.rgba(Colors.background.r, Colors.background.g, Colors.background.b, 0.95)
-      radius: Colors.radiusLarge
-
+      id: confirmOverlay; anchors.fill: parent; visible: launcherRoot.showingConfirm; color: Qt.rgba(Colors.background.r, Colors.background.g, Colors.background.b, 0.95); radius: Colors.radiusLarge
       ColumnLayout {
-        anchors.centerIn: parent
-        spacing: 30
-
-        Text {
-          text: launcherRoot.confirmTitle
-          color: Colors.text
-          font.pixelSize: 24
-          font.bold: true
-          Layout.alignment: Qt.AlignHCenter
+        anchors.centerIn: parent; spacing: 30
+        Text { text: launcherRoot.confirmTitle; color: Colors.text; font.pixelSize: 24; font.bold: true; Layout.alignment: Qt.AlignHCenter }
+        RowLayout { spacing: 20; Layout.alignment: Qt.AlignHCenter
+          Rectangle { width: 120; height: 45; color: Colors.error; radius: Colors.radiusSmall; Text { text: "Yes"; color: "white"; anchors.centerIn: parent; font.bold: true } MouseArea { anchors.fill: parent; onClicked: launcherRoot.doConfirm() } }
+          Rectangle { width: 120; height: 45; color: Colors.surface; radius: Colors.radiusSmall; Text { text: "No"; color: Colors.text; anchors.centerIn: parent; font.bold: true } MouseArea { anchors.fill: parent; onClicked: launcherRoot.cancelConfirm() } }
         }
-
-        RowLayout {
-          spacing: 20
-          Layout.alignment: Qt.AlignHCenter
-
-          Rectangle {
-            width: 120
-            height: 45
-            color: Colors.error
-            radius: Colors.radiusSmall
-            Text {
-              text: "Yes"
-              color: "white"
-              anchors.centerIn: parent
-              font.bold: true
-            }
-            MouseArea {
-              anchors.fill: parent
-              onClicked: launcherRoot.doConfirm()
-            }
-          }
-
-          Rectangle {
-            width: 120
-            height: 45
-            color: Colors.surface
-            radius: Colors.radiusSmall
-            Text {
-              text: "No"
-              color: Colors.text
-              anchors.centerIn: parent
-              font.bold: true
-            }
-            MouseArea {
-              anchors.fill: parent
-              onClicked: launcherRoot.cancelConfirm()
-            }
-          }
-        }
-
-        Text {
-          text: "Press Enter for Yes, Esc for No"
-          color: Colors.textSecondary
-          font.pixelSize: 12
-          Layout.alignment: Qt.AlignHCenter
-        }
+        Text { text: "Press Enter for Yes, Esc for No"; color: Colors.textSecondary; font.pixelSize: 12; Layout.alignment: Qt.AlignHCenter }
       }
-
-      Keys.onPressed: (event) => {
-        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-          launcherRoot.doConfirm();
-        } else if (event.key === Qt.Key_Escape) {
-          launcherRoot.cancelConfirm();
-        }
-        event.accepted = true;
-      }
-      Component.onCompleted: forceActiveFocus()
-      onVisibleChanged: if (visible) forceActiveFocus()
+      Keys.onPressed: (event) => { if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) launcherRoot.doConfirm(); else if (event.key === Qt.Key_Escape) launcherRoot.cancelConfirm(); event.accepted = true; }
+      Component.onCompleted: forceActiveFocus(); onVisibleChanged: if (visible) forceActiveFocus()
     }
   }
 }
+  }

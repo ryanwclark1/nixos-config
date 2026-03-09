@@ -35,6 +35,7 @@ Scope {
 			PanelWindow {
 				id: overviewWindow
 				screen: modelData
+				visible: root.isVisible
 
 				anchors {
 					top: true
@@ -50,10 +51,12 @@ Scope {
 				exclusiveZone: -1
 
 				Rectangle {
+					id: mainRect
 					anchors.fill: parent
 					color: Colors.bgGlass
 					
-					opacity: root.isVisible ? 1.0 : 0.0
+					opacity: 0.0
+					Component.onCompleted: opacity = 1.0
 					Behavior on opacity { NumberAnimation { duration: 200; easing.type: Easing.InOutQuad } }
 
 					MouseArea {

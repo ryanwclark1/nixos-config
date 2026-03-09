@@ -34,7 +34,7 @@ PanelWindow {
         id: notifDelegate
         visible: !modelData.dismissed && (!root.manager || !root.manager.dndEnabled || isUrgent)
         Layout.preferredWidth: 350
-        Layout.preferredHeight: visible ? colMain.height + 20 : 0
+        Layout.preferredHeight: visible ? colMain.implicitHeight + 20 : 0
         
         // Use Colors singleton
         color: isUrgent ? Qt.rgba(Colors.error.r, Colors.error.g, Colors.error.b, 0.8) : Colors.bgGlass
@@ -58,8 +58,8 @@ PanelWindow {
           id: colMain
           width: parent.width
           spacing: 10
-          anchors.top: parent.top
-          anchors.topMargin: 10
+          anchors.horizontalCenter: parent.horizontalCenter
+          anchors.verticalCenter: parent.verticalCenter
 
           Row {
             width: parent.width - 24

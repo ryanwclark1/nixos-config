@@ -41,6 +41,12 @@ case "$MODE" in
       "keybinds")
         quickshell ipc call Launcher openKeybinds
         ;;
+      "bookmarks")
+        quickshell ipc call Launcher openBookmarks
+        ;;
+      "ai")
+        quickshell ipc call Launcher openAi
+        ;;
       *)
         echo "Unknown mode: $SUBMODE"
         exit 1

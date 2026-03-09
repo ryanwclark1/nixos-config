@@ -24,6 +24,9 @@ QtObject {
   readonly property color fgSecondary: textSecondary
   readonly property color fgDim: textDisabled
 
+  readonly property string fontMain: "Inter"
+  readonly property string fontMono: "JetBrainsMono Nerd Font"
+
   readonly property color border: Qt.rgba(textDisabled.r, textDisabled.g, textDisabled.b, 0.2)
   readonly property color highlight: Qt.rgba(primary.r, primary.g, primary.b, 0.2)
   readonly property color highlightLight: Qt.rgba(primary.r, primary.g, primary.b, 0.1)
