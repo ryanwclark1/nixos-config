@@ -55,10 +55,9 @@ Rectangle {
   Behavior on opacity { NumberAnimation { duration: 200 } }
   Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }
 
-  WlLayerSurface {
-    MouseArea { anchors.fill: parent }
+  MouseArea { anchors.fill: parent }
 
-    RowLayout {
+  RowLayout {
       anchors.fill: parent; spacing: 0
 
       // Sidebar Tabs
@@ -214,5 +213,5 @@ Rectangle {
       Text { text: label; color: Colors.fgMain; font.pixelSize: 13; Layout.fillWidth: true }
       Switch { checked: active; onToggled: { if(isConfig) Config[property] = !Config[property]; } }
     }
-  }
+}
 }

@@ -62,6 +62,7 @@ PanelWindow {
   }
 
   function open(newMode, keepSearch) {
+    loadFrequency();
     if (showingConfirm) cancelConfirm();
     mode = newMode || "drun"
     if (!keepSearch) {
@@ -100,6 +101,10 @@ PanelWindow {
       loadWallpapers()
     } else if (mode === "keybinds") {
       loadKeybinds()
+    } else if (mode === "bookmarks") {
+      loadBookmarks()
+    } else if (mode === "ai") {
+      loadAi()
     }
     }
 
@@ -108,6 +113,45 @@ PanelWindow {
     if (showingConfirm) confirmTitle = "";
     }
 
+    function loadBookmarks() {
+    var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["qs-bookmarks"] }', launcherRoot);
+    proc.finished.connect(function() {
+      try {
+        var raw = proc.stdout.readAll();
+        if (raw) {
+          allItems = JSON.parse(raw);
+          filterItems();
+        }
+      } catch (e) { console.error("Failed to parse bookmarks JSON: " + e); }
+    });
+    proc.running = true;
+    }
+
+    function loadAi() {
+    var query = searchText.startsWith("!") ? searchText.substring(1).trim() : searchText;
+    if (query.length < 3) {
+       allItems = [{ name: "Type your prompt...", isHint: true, icon: "󰚩" }];
+       filterItems();
+       return;
+    }
+
+    // We update the results list to show "Thinking..."
+    allItems = [{ name: "Thinking...", isHint: true, icon: "󰚩" }];
+    filterItems();
+
+    var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["qs-ai", "' + query.replace(/"/g, '\\"') + '"] }', launcherRoot);
+    proc.finished.connect(function() {
+      var raw = proc.stdout.readAll().trim();
+      if (raw) {
+        allItems = [{ name: "AI Response", title: "Click to copy response", body: raw, icon: "󰚩" }];
+        filterItems();
+      } else {
+        allItems = [{ name: "AI error or no response", isHint: true, icon: "󰚩" }];
+        filterItems();
+      }
+    });
+    proc.running = true;
+    }
     function loadKeybinds() {
     var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["qs-keybinds"] }', launcherRoot);
     proc.finished.connect(function() {
@@ -313,6 +357,40 @@ PanelWindow {
     }
   }
   
+  property var appFrequency: ({})
+  readonly property string freqPath: Quickshell.statePath("app_frequency.json")
+
+  function loadFrequency() {
+    var file = Quickshell.openFile(freqPath, File.ReadOnly);
+    if (file) {
+      try {
+        appFrequency = JSON.parse(file.readAll());
+      } catch(e) {}
+      file.close();
+    }
+  }
+
+  function saveFrequency() {
+    var file = Quickshell.openFile(freqPath, File.WriteOnly | File.Truncate);
+    if (file) {
+      file.write(JSON.stringify(appFrequency));
+      file.close();
+    }
+  }
+
+  function trackLaunch(exec) {
+    if (!exec) return;
+    appFrequency[exec] = (appFrequency[exec] || 0) + 1;
+    saveFrequency();
+  }
+
+  function highlightMatch(fullText, query) {
+    if (!query || !fullText) return fullText;
+    var idx = fullText.toLowerCase().indexOf(query.toLowerCase());
+    if (idx === -1) return fullText;
+    return fullText.substring(0, idx) + "<b>" + fullText.substring(idx, idx + query.length) + "</b>" + fullText.substring(idx + query.length);
+  }
+
   function fuzzyMatch(str, pattern) {
     if (!pattern) return 100;
     if (!str) return 0;
@@ -378,8 +456,17 @@ PanelWindow {
           scoredItems.push(item);
         }
       }
-      if (mode !== "web" && mode !== "system" && mode !== "nixos" && mode !== "wallpapers" && mode !== "keybinds") {
-          scoredItems.sort(function(a, b) { return b._score - a._score; });
+      if (mode !== "web" && mode !== "system" && mode !== "nixos" && mode !== "wallpapers" && mode !== "keybinds" && mode !== "bookmarks" && mode !== "ai") {
+          scoredItems.sort(function(a, b) { 
+            if (b._score !== a._score) return b._score - a._score;
+            // Frequency boost for equal scores
+            if (mode === "drun") {
+              var freqA = appFrequency[a.exec] || 0;
+              var freqB = appFrequency[b.exec] || 0;
+              return freqB - freqA;
+            }
+            return 0;
+          });
       }
       filteredItems = scoredItems;
     }
@@ -390,6 +477,7 @@ PanelWindow {
     if (filteredItems.length > 0 && selectedIndex >= 0) {
       var item = filteredItems[selectedIndex];
       if (mode === "drun") {
+        trackLaunch(item.exec);
         if (item.terminal && (item.terminal === "true" || item.terminal === "True")) {
           Quickshell.execDetached(["kitty", "-e", "bash", "-c", item.exec]);
         } else {
@@ -415,9 +503,14 @@ PanelWindow {
       } else if (mode === "clip") {
         Quickshell.execDetached(["bash", "-c", "cliphist decode " + item.id + " | wl-copy"]);
         close();
-      } else if (mode === "web") {
-        Quickshell.execDetached(["xdg-open", item.exec + encodeURIComponent(item.query)]);
+      } else if (mode === "web" || mode === "bookmarks") {
+        Quickshell.execDetached(["xdg-open", item.exec + (item.query ? encodeURIComponent(item.query) : "")]);
         close();
+      } else if (mode === "ai") {
+        if (item.body) {
+          Quickshell.execDetached(["bash", "-c", "echo -n '" + item.body.replace(/'/g, "'\\''") + "' | wl-copy"]);
+          close();
+        }
       } else if (mode === "files") {
         if (!item.isHint && item.fullPath) {
           Quickshell.execDetached(["xdg-open", item.fullPath]);
@@ -454,6 +547,8 @@ PanelWindow {
     function openMedia() { launcherRoot.open("media"); }
     function openWallpapers() { launcherRoot.open("wallpapers"); }
     function openKeybinds() { launcherRoot.open("keybinds"); }
+    function openBookmarks() { launcherRoot.open("bookmarks"); }
+    function openAi() { launcherRoot.open("ai"); }
     function openFiles() { launcherRoot.open("files"); }
     function openDmenu(itemsJson: string) {
       var items = [];
@@ -511,6 +606,8 @@ PanelWindow {
                { id: "window", icon: "󱗼", label: "Windows" },
                { id: "run", icon: "", label: "Run" },
                { id: "files", icon: "󰈔", label: "Files" },
+               { id: "bookmarks", icon: "󰖟", label: "Bookmarks" },
+               { id: "ai", icon: "󰚩", label: "AI Assistant" },
                { id: "web", icon: "󰖟", label: "Web Search" },
                { id: "emoji", icon: "󰞅", label: "Emoji" },
                { id: "clip", icon: "󰅍", label: "Clipboard" },
@@ -557,13 +654,21 @@ PanelWindow {
                 else if (txt.startsWith(">") && launcherRoot.mode !== "run") launcherRoot.open("run", true);
                 else if (txt.startsWith(":") && launcherRoot.mode !== "emoji") launcherRoot.open("emoji", true);
                 else if (txt.startsWith("?") && launcherRoot.mode !== "web") launcherRoot.open("web", true);
+                else if (txt.startsWith("!") && launcherRoot.mode !== "ai") launcherRoot.open("ai", true);
+                else if (txt.startsWith("@") && launcherRoot.mode !== "bookmarks") launcherRoot.open("bookmarks", true);
                 if (launcherRoot.searchText !== text) { launcherRoot.searchText = text; launcherRoot.filterItems(); }
               }
               Keys.onPressed: (event) => {
                 if (event.key === Qt.Key_Escape) {
                   if (launcherRoot.mode === "dmenu") { var fifoPath = "/tmp/qs-dmenu-result"; Quickshell.execDetached(["bash", "-c", "echo '' > " + fifoPath]); }
                   launcherRoot.close();
-                } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) { launcherRoot.executeSelection(); }
+                } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) { 
+                    if (launcherRoot.mode === "ai" && !launcherRoot.filteredItems[0].body) {
+                        launcherRoot.loadAi();
+                    } else {
+                        launcherRoot.executeSelection(); 
+                    }
+                }
                 else if (event.key === Qt.Key_Up || (event.key === Qt.Key_K && (event.modifiers & Qt.ControlModifier))) { launcherRoot.selectedIndex = Math.max(0, launcherRoot.selectedIndex - 1); event.accepted = true; }
                 else if (event.key === Qt.Key_Down || (event.key === Qt.Key_J && (event.modifiers & Qt.ControlModifier))) { launcherRoot.selectedIndex = Math.min(launcherRoot.filteredItems.length - 1, launcherRoot.selectedIndex + 1); event.accepted = true; }
               }
@@ -599,16 +704,24 @@ PanelWindow {
               ColumnLayout {
                 spacing: 2
                 Text { 
-                  text: mode === "drun" ? modelData.name : (mode === "run" ? modelData.name : (mode === "emoji" ? modelData.title : (mode === "calc" ? modelData.title : (mode === "clip" ? modelData.name : (mode === "web" ? modelData.title : (mode === "nixos" ? modelData.name : (mode === "wallpapers" ? modelData.name : (mode === "keybinds" ? modelData.name : (modelData.title || modelData.name)))))))))
+                  text: {
+                    var base = mode === "drun" ? modelData.name : (mode === "run" ? modelData.name : (mode === "emoji" ? modelData.title : (mode === "calc" ? modelData.title : (mode === "clip" ? modelData.name : (mode === "web" ? modelData.title : (mode === "nixos" ? modelData.name : (mode === "wallpapers" ? modelData.name : (mode === "keybinds" ? modelData.name : (mode === "files" ? modelData.name : (modelData.title || modelData.name))))))))));
+                    return highlightMatch(base, searchText);
+                  }
                   color: Colors.text
+                  textFormat: Text.StyledText
                   font.pixelSize: mode === "calc" ? 18 : 14
                   font.weight: index === launcherRoot.selectedIndex ? Font.Bold : Font.Normal
                   elide: Text.ElideRight
                   Layout.fillWidth: true 
                 }
                 Text { 
-                  text: mode === "drun" ? modelData.exec : (mode === "run" ? "" : (mode === "wallpapers" ? modelData.path : (mode === "keybinds" ? modelData.desc : (modelData.class || ""))))
+                  text: {
+                    var base = mode === "drun" ? modelData.exec : (mode === "run" ? "" : (mode === "wallpapers" ? modelData.path : (mode === "keybinds" ? modelData.desc : (mode === "files" ? modelData.title : (modelData.class || "")))));
+                    return highlightMatch(base, searchText);
+                  }
                   color: Colors.textSecondary
+                  textFormat: Text.StyledText
                   font.pixelSize: 11
                   elide: Text.ElideRight
                   Layout.fillWidth: true

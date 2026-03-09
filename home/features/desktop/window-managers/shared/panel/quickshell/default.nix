@@ -45,6 +45,16 @@ let
     PATH="${pkgs.jq}/bin:${pkgs.gnugrep}/bin:${pkgs.coreutils}/bin:$PATH"
     ${builtins.readFile ./scripts/keybinds.sh}
   '';
+
+  aiScript = pkgs.writeShellScriptBin "qs-ai" ''
+    PATH="${pkgs.curl}/bin:${pkgs.jq}/bin:$PATH"
+    ${builtins.readFile ./scripts/ai-prompt.sh}
+  '';
+
+  bookmarksScript = pkgs.writeShellScriptBin "qs-bookmarks" ''
+    PATH="${pkgs.sqlite}/bin:${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.findutils}/bin:$PATH"
+    ${builtins.readFile ./scripts/bookmarks.sh}
+  '';
   in
   {
   options.features.quickshell = {
@@ -64,8 +74,9 @@ let
       clipScript
       wallpaperScript
       keybindsScript
-    ];
-    home.file.".config/quickshell" = {
+      aiScript
+      bookmarksScript
+    ];    home.file.".config/quickshell" = {
       source = ./config;
       recursive = true;
     };
