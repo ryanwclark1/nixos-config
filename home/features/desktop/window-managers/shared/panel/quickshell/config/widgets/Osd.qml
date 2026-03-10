@@ -5,6 +5,7 @@ import Quickshell.Services.Pipewire
 import Quickshell.Widgets
 import Quickshell.Io
 import Quickshell.Wayland
+import "../services"
 
 Scope {
 	id: root
@@ -58,7 +59,7 @@ Scope {
 		function showBrightness(percent: string) {
 			var val = parseFloat(percent);
 			if (isNaN(val)) val = 0;
-			root.brightnessValue = val / 100.0;
+			SystemStatus.brightness = val / 100.0;
 			root.osdType = "brightness";
 			root.shouldShowOsd = true;
 			hideTimer.restart();
@@ -68,7 +69,6 @@ Scope {
 	property bool shouldShowOsd: false
 	property string osdType: "volume"
 	property bool capslockState: false
-	property real brightnessValue: 0.0
 
 	Timer {
 		id: hideTimer
@@ -95,14 +95,17 @@ Scope {
 				implicitHeight: 50
 				color: "transparent"
 
-				mask: Region {}
+				mask: Region {
+					item: content
+				}
 
 
 				Rectangle {
+					id: content
 					anchors.fill: parent
 					radius: height / 2
-					color: "#a6101014"
-					border.color: "#33ffffff"
+					color: Colors.bgGlass
+					border.color: Colors.border
 					border.width: 1
 
 					// Fade animation
@@ -139,7 +142,7 @@ Scope {
 						Text {
 							visible: root.osdType === "capslock"
 							text: "Caps Lock " + (root.capslockState ? "On" : "Off")
-							color: "white"
+							color: Colors.text
 							font.pointSize: 14
 							font.bold: true
 							Layout.fillWidth: true
@@ -151,7 +154,7 @@ Scope {
 							Layout.fillWidth: true
 							implicitHeight: 8
 							radius: height / 2
-							color: "#40ffffff"
+							color: Colors.bgWidget
 							clip: true
 
 							Rectangle {
@@ -162,12 +165,12 @@ Scope {
 								}
 
 								implicitWidth: {
-									if (root.osdType === "brightness") return parent.width * root.brightnessValue;
+									if (root.osdType === "brightness") return parent.width * SystemStatus.brightness;
 									if (root.osdType === "mic") return parent.width * (Pipewire.defaultAudioSource?.audio.volume ?? 0);
 									return parent.width * (Pipewire.defaultAudioSink?.audio.volume ?? 0);
 								}
 								radius: parent.radius
-								color: "white"
+								color: Colors.text
 
 								Behavior on implicitWidth {
 									NumberAnimation {
@@ -176,15 +179,14 @@ Scope {
 									}
 								}
 							}
-							
+
 							MouseArea {
 								anchors.fill: parent
 								onPositionChanged: (mouse) => {
 									if (pressed) {
 										let val = Math.max(0, Math.min(1, mouse.x / width));
 										if (root.osdType === "brightness") {
-											Quickshell.execDetached(["brightnessctl", "set", Math.round(val * 100) + "%"]);
-											root.brightnessValue = val;
+											SystemStatus.setBrightness(val);
 										} else if (root.osdType === "mic") {
 											if (Pipewire.defaultAudioSource) Pipewire.defaultAudioSource.audio.volume = val;
 										} else {
@@ -196,8 +198,7 @@ Scope {
 								onClicked: (mouse) => {
 									let val = Math.max(0, Math.min(1, mouse.x / width));
 									if (root.osdType === "brightness") {
-										Quickshell.execDetached(["brightnessctl", "set", Math.round(val * 100) + "%"]);
-										root.brightnessValue = val;
+										SystemStatus.setBrightness(val);
 									} else if (root.osdType === "mic") {
 										if (Pipewire.defaultAudioSource) Pipewire.defaultAudioSource.audio.volume = val;
 									} else {
@@ -207,11 +208,11 @@ Scope {
 								}
 							}
 						}
-						
+
 						Text {
 							visible: root.osdType === "volume" || root.osdType === "brightness" || root.osdType === "mic"
 							text: {
-								if (root.osdType === "brightness") return Math.round(root.brightnessValue * 100) + "%";
+								if (root.osdType === "brightness") return Math.round(SystemStatus.brightness * 100) + "%";
 								if (root.osdType === "mic") {
 									if (Pipewire.defaultAudioSource?.audio.muted) return "Muted";
 									return Math.round((Pipewire.defaultAudioSource?.audio.volume ?? 0) * 100) + "%";
@@ -219,7 +220,7 @@ Scope {
 								if (Pipewire.defaultAudioSink?.audio.muted) return "Muted";
 								return Math.round((Pipewire.defaultAudioSink?.audio.volume ?? 0) * 100) + "%";
 							}
-							color: "white"
+							color: Colors.text
 							font.pointSize: 12
 							font.bold: true
 							Layout.preferredWidth: 45

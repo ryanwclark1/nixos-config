@@ -17,7 +17,7 @@ Rectangle {
   ColumnLayout {
     id: col
     anchors.fill: parent
-    anchors.margins: 15
+    anchors.margins: Colors.paddingMedium
     spacing: 10
 
     Text { 
@@ -43,10 +43,10 @@ Rectangle {
           color: Colors.highlightLight; radius: 6
           
           RowLayout {
-            anchors.fill: parent; anchors.margins: 10; spacing: 10
-            Text { text: "󱂬"; color: Colors.primary; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 14 }
+            anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: 10
+            Text { text: "󱂬"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 14 }
             Text { text: modelData.title || "Unknown Window"; color: Colors.text; font.pixelSize: 11; Layout.fillWidth: true; elide: Text.ElideRight }
-            Text { text: "󰁔"; color: Colors.textDisabled; font.family: "JetBrainsMono Nerd Font" }
+            Text { text: "󰁔"; color: Colors.textDisabled; font.family: Colors.fontMono }
           }
 
           MouseArea {

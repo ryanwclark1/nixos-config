@@ -1,9 +1,9 @@
 import QtQuick
 import Quickshell.Io
+import "../services"
 
 Row {
   spacing: 6
-  anchors.verticalCenter: parent.verticalCenter
 
   property string networkIcon: "󰤨"
   property string networkName: "Net"
@@ -32,16 +32,19 @@ Row {
 
   Text {
     text: networkIcon
-    color: "#e6e6e6"
-    font.pixelSize: 16
-    font.family: "JetBrainsMono Nerd Font"
+    color: Colors.primary
+    font.pixelSize: 15
+    font.family: Colors.fontMono
     anchors.verticalCenter: parent.verticalCenter
   }
 
   Text {
     text: networkName
-    color: "#e6e6e6"
-    font.pixelSize: 12
+    color: Colors.fgMain
+    font.pixelSize: 11
+    font.weight: Font.DemiBold
     anchors.verticalCenter: parent.verticalCenter
+    elide: Text.ElideRight
+    width: Math.min(contentWidth, 80)
   }
 }

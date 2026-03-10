@@ -4,13 +4,14 @@ import Quickshell
 import Quickshell.Services.Notifications
 import Quickshell.Services.Mpris
 import Quickshell.Wayland
+import Quickshell.Widgets
 import "../modules"
 import "../notifications"
 import "../services"
 
 PanelWindow {
   id: root
-  
+
   anchors {
     top: true
     right: true
@@ -19,15 +20,15 @@ PanelWindow {
   margins.top: 40
   margins.right: 12
   margins.bottom: 60
-  
+
   implicitWidth: 350
   color: "transparent"
   mask: Region {
+    item: sidebarContent
   }
   WlrLayershell.layer: WlrLayer.Top
   WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
   WlrLayershell.namespace: "quickshell"
-  WlrLayershell.blur: Config.blurEnabled
 
   property var manager: null
   property bool showContent: false
@@ -45,34 +46,34 @@ PanelWindow {
     id: sidebarContent
     width: 350
     height: parent.height
-    color: "#a6101014"
-    border.color: "#33ffffff"
+    color: Colors.bgGlass
+    border.color: Colors.border
     border.width: 1
     radius: 16
 
     x: root.showContent ? 0 : 360
     opacity: root.showContent ? 1.0 : 0.0
-    
+
     Behavior on x { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
     Behavior on opacity { NumberAnimation { duration: 250 } }
 
     ColumnLayout {
       anchors.fill: parent
-      anchors.margins: 24
+      anchors.margins: Colors.paddingLarge
       spacing: 20
 
       RowLayout {
         Layout.fillWidth: true
         Text {
           text: "Notifications"
-          color: "#ffffff"
+          color: Colors.text
           font.pixelSize: 22
           font.weight: Font.DemiBold
           font.letterSpacing: -0.5
         }
-        
+
         Item { Layout.fillWidth: true }
-        
+
         // DND Toggle
         MouseArea {
           width: 80; height: 28
@@ -83,12 +84,12 @@ PanelWindow {
             Text {
               anchors.centerIn: parent
               text: root.manager && root.manager.dndEnabled ? "󰂛 DND" : "󰂚 DND"
-              color: Colors.text; font.pixelSize: 11; font.weight: Font.Medium; font.family: "JetBrainsMono Nerd Font"
+              color: Colors.text; font.pixelSize: 11; font.weight: Font.Medium; font.family: Colors.fontMono
             }
           }
           onClicked: if (root.manager) root.manager.dndEnabled = !root.manager.dndEnabled
         }
-        
+
         // Clear all
         MouseArea {
           width: 70; height: 28
@@ -97,6 +98,17 @@ PanelWindow {
             Text { anchors.centerIn: parent; text: "Clear All"; color: Colors.textSecondary; font.pixelSize: 11; font.weight: Font.Medium }
           }
           onClicked: if (root.manager) { for (var i = 0; i < root.manager.notifications.count; i++) root.manager.notifications.get(i).dismiss(); }
+        }
+
+        // Close button
+        MouseArea {
+          width: 28; height: 28
+          Rectangle {
+            anchors.fill: parent; color: closeHover.containsMouse ? Colors.highlight : "transparent"; radius: 6
+            Text { anchors.centerIn: parent; text: "󰅖"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 14 }
+          }
+          id: closeHover; hoverEnabled: true
+          onClicked: root.showContent = false
         }
       }
 
@@ -108,18 +120,19 @@ PanelWindow {
 
       // Search Bar
       Rectangle {
-        Layout.fillWidth: true; height: 40; color: "#1affffff"; radius: 8
+        Layout.fillWidth: true; height: 40; color: Colors.highlightLight; radius: 8
         border.color: searchInput.activeFocus ? Colors.primary : "transparent"; border.width: 1
         RowLayout {
-          anchors.fill: parent; anchors.margins: 10; spacing: 10
-          Text { text: ""; color: Colors.textDisabled; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 14 }
+          anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: 10
+          Text { text: ""; color: Colors.textDisabled; font.family: Colors.fontMono; font.pixelSize: 14 }
           TextInput {
             id: searchInput; Layout.fillWidth: true; verticalAlignment: Text.AlignVCenter
             color: Colors.text; font.pixelSize: 12
             onTextChanged: root.searchQuery = text
           }
-          Text { 
-            anchors.fill: parent; anchors.leftMargin: 35; verticalAlignment: Text.AlignVCenter
+          Text {
+            Layout.alignment: Qt.AlignVCenter
+            Layout.leftMargin: 35
             text: "Search notifications..."; color: Colors.textDisabled; font.pixelSize: 12
             visible: !searchInput.text && !searchInput.activeFocus
           }
@@ -145,27 +158,27 @@ PanelWindow {
         section.delegate: Rectangle {
           width: notifList.width; height: 35; color: "transparent"
           property bool isCollapsed: notifList.collapsedGroups[section] || false
-          
+
           RowLayout {
             anchors.fill: parent; spacing: 10
-            
+
             MouseArea {
               width: 20; height: 20
-              Text { 
+              Text {
                 anchors.centerIn: parent; text: isCollapsed ? "󰅂" : "󰅀"; color: Colors.primary
-                font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 14 
+                font.family: Colors.fontMono; font.pixelSize: 14
               }
               onClicked: notifList.toggleGroup(section)
             }
 
-            Text { 
+            Text {
               text: section || "System"
               color: Colors.text; font.pixelSize: 11; font.weight: Font.Bold
               font.capitalization: Font.AllUppercase; font.letterSpacing: 1
             }
-            
+
             Rectangle { Layout.fillWidth: true; height: 1; color: Colors.border; opacity: 0.5 }
-            
+
             // App Count Badge
             Rectangle {
               width: 20; height: 16; radius: 10; color: Colors.highlight
@@ -194,7 +207,7 @@ PanelWindow {
         delegate: Rectangle {
           id: notifItem
           property bool isCollapsed: notifList.collapsedGroups[modelData.appName] || false
-          
+
           visible: matchesSearch && !isCollapsed
           width: notifList.width
           height: visible ? colItem.implicitHeight + 24 + (isReplying ? 50 : 0) : 0
@@ -204,7 +217,7 @@ PanelWindow {
           border.color: ListView.isCurrentItem && notifList.activeFocus ? Colors.primary : Colors.border
           border.width: 1
           clip: true
-          
+
           // Search filtering logic
           property bool matchesSearch: {
              if (root.searchQuery === "") return true;
@@ -213,9 +226,9 @@ PanelWindow {
                     (modelData.summary && modelData.summary.toLowerCase().includes(q)) ||
                     (modelData.body && modelData.body.toLowerCase().includes(q));
           }
-          
+
           property bool isReplying: false
-          
+
           // MPRIS Integration
           property var mprisPlayer: {
             if (!modelData.appName) return null;
@@ -237,7 +250,7 @@ PanelWindow {
                 Layout.preferredWidth: 32; Layout.preferredHeight: 32
                 source: modelData.appIcon ? (modelData.appIcon.startsWith("/") ? "file://" + modelData.appIcon : "image://icon/" + modelData.appIcon) : ""
                 visible: modelData.appIcon !== ""
-                Rectangle { anchors.fill: parent; color: "transparent"; visible: parent.status !== Image.Ready; Text { anchors.centerIn: parent; text: "󰂚"; color: Colors.text; font.pixelSize: 20; font.family: "JetBrainsMono Nerd Font" } }
+                Rectangle { anchors.fill: parent; color: "transparent"; visible: parent.status !== Image.Ready; Text { anchors.centerIn: parent; text: "󰂚"; color: Colors.text; font.pixelSize: 20; font.family: Colors.fontMono } }
               }
 
               ColumnLayout {
@@ -249,7 +262,7 @@ PanelWindow {
                     Layout.fillWidth: true; elide: Text.ElideRight
                   }
                   Text {
-                    text: Qt.formatDateTime(new Date(), "HH:mm"); color: Colors.textDisabled; font.pixelSize: 10
+                    text: modelData.time ? Qt.formatDateTime(modelData.time, "HH:mm") : ""; color: Colors.textDisabled; font.pixelSize: 10
                   }
                 }
                 Text { text: modelData.body; color: Colors.textSecondary; font.pixelSize: 11; Layout.fillWidth: true; wrapMode: Text.Wrap; visible: modelData.body !== "" }
@@ -262,21 +275,21 @@ PanelWindow {
               RowLayout {
                 anchors.fill: parent; anchors.margins: 8; spacing: 15
                 Item { Layout.fillWidth: true }
-                MouseArea { 
+                MouseArea {
                   width: 24; height: 24
-                  Text { anchors.centerIn: parent; text: "󰒮"; color: Colors.text; font.family: "JetBrainsMono Nerd Font" } 
-                  onClicked: mprisPlayer.previous() 
+                  Text { anchors.centerIn: parent; text: "󰒮"; color: Colors.text; font.family: Colors.fontMono }
+                  onClicked: mprisPlayer.previous()
                 }
-                MouseArea { 
+                MouseArea {
                   width: 32; height: 32
                   Rectangle { anchors.fill: parent; radius: 16; color: Colors.primary }
-                  Text { anchors.centerIn: parent; text: mprisPlayer && mprisPlayer.playbackState === Mpris.Playing ? "󰏤" : "󰐊"; color: Colors.background; font.family: "JetBrainsMono Nerd Font" }
+                  Text { anchors.centerIn: parent; text: mprisPlayer && mprisPlayer.playbackState === Mpris.Playing ? "󰏤" : "󰐊"; color: Colors.background; font.family: Colors.fontMono }
                   onClicked: mprisPlayer.playPause()
                 }
-                MouseArea { 
+                MouseArea {
                   width: 24; height: 24
-                  Text { anchors.centerIn: parent; text: "󰒭"; color: Colors.text; font.family: "JetBrainsMono Nerd Font" } 
-                  onClicked: mprisPlayer.next() 
+                  Text { anchors.centerIn: parent; text: "󰒭"; color: Colors.text; font.family: Colors.fontMono }
+                  onClicked: mprisPlayer.next()
                 }
                 Item { Layout.fillWidth: true }
               }
@@ -302,7 +315,7 @@ PanelWindow {
             // Actions
             RowLayout {
               width: parent.width; spacing: 8; visible: !isReplying
-              
+
               // Dynamic Actions from Notification
               Repeater {
                 model: modelData.actions
@@ -319,11 +332,11 @@ PanelWindow {
                   }
                 }
               }
-              
+
               // Archive Action
               Rectangle {
                 Layout.preferredWidth: 32; height: 28; color: Colors.highlightLight; radius: 6
-                Text { anchors.centerIn: parent; text: "󰅨"; color: Colors.textSecondary; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 14 }
+                Text { anchors.centerIn: parent; text: "󰅨"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 14 }
                 MouseArea {
                   anchors.fill: parent; hoverEnabled: true
                   onEntered: parent.color = Colors.highlight; onExited: parent.color = Colors.highlightLight
@@ -337,7 +350,7 @@ PanelWindow {
               // Dismiss Action
               Rectangle {
                 Layout.preferredWidth: 32; height: 28; color: Colors.highlightLight; radius: 6
-                Text { anchors.centerIn: parent; text: "󰅖"; color: Colors.error; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 14 }
+                Text { anchors.centerIn: parent; text: "󰅖"; color: Colors.error; font.family: Colors.fontMono; font.pixelSize: 14 }
                 MouseArea {
                   anchors.fill: parent; hoverEnabled: true
                   onEntered: parent.color = Colors.highlight; onExited: parent.color = Colors.highlightLight
@@ -353,14 +366,14 @@ PanelWindow {
       Column {
         width: parent.width; spacing: 8
         visible: root.manager && root.manager.archivedNotifications.length > 0
-        
+
         RowLayout {
           width: parent.width
-          Text { text: "ARCHIVE"; color: "#666666"; font.pixelSize: 10; font.weight: Font.Bold }
+          Text { text: "ARCHIVE"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
           Item { Layout.fillWidth: true }
           MouseArea {
             width: 40; height: 20
-            Text { anchors.centerIn: parent; text: "Clear"; color: "#666666"; font.pixelSize: 10 }
+            Text { anchors.centerIn: parent; text: "Clear"; color: Colors.textDisabled; font.pixelSize: 10 }
             onClicked: if (root.manager) root.manager.clearArchive()
           }
         }
@@ -368,16 +381,16 @@ PanelWindow {
         Repeater {
           model: root.manager ? root.manager.archivedNotifications : null
           delegate: Rectangle {
-            width: parent.width; height: 60; color: "#0dffffff"; radius: 8; opacity: 0.7
+            width: parent.width; height: 60; color: Colors.bgWidget; radius: 8; opacity: 0.7
             Row {
-              anchors.fill: parent; anchors.margins: 10; spacing: 10
+              anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: 10
               Rectangle { width: 32; height: 32; color: "transparent"
-                Text { anchors.centerIn: parent; text: "󰂚"; color: "#666666"; font.pixelSize: 20; font.family: "JetBrainsMono Nerd Font" }
+                Text { anchors.centerIn: parent; text: "󰂚"; color: Colors.textDisabled; font.pixelSize: 20; font.family: Colors.fontMono }
               }
               Column {
                 width: parent.width - 50; spacing: 2
-                Text { text: modelData.summary; color: "#aaaaaa"; font.pixelSize: 12; font.weight: Font.Bold; elide: Text.ElideRight; width: parent.width }
-                Text { text: modelData.body; color: "#888888"; font.pixelSize: 10; elide: Text.ElideRight; width: parent.width }
+                Text { text: modelData.summary; color: Colors.textSecondary; font.pixelSize: 12; font.weight: Font.Bold; elide: Text.ElideRight; width: parent.width }
+                Text { text: modelData.body; color: Colors.textDisabled; font.pixelSize: 10; elide: Text.ElideRight; width: parent.width }
               }
             }
           }

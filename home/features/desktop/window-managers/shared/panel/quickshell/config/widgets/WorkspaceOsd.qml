@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Hyprland._Ipc
 import Quickshell.Widgets
 import Quickshell.Wayland
+import "../services"
 
 Scope {
 	id: root
@@ -59,14 +60,17 @@ Scope {
 				implicitHeight: 200
 				color: "transparent"
 
-				mask: Region {}
+				mask: Region {
+					item: content
+				}
 
 
 				Rectangle {
+					id: content
 					anchors.fill: parent
 					radius: 20
-					color: "#99000000"
-					border.color: "#33ffffff"
+					color: Colors.withAlpha(Colors.background, 0.6)
+					border.color: Colors.border
 					border.width: 1
 					
 					opacity: root.shouldShowOsd ? 1.0 : 0.0
@@ -85,7 +89,7 @@ Scope {
 						Text {
 							Layout.alignment: Qt.AlignHCenter
 							text: root.workspaceName
-							color: "white"
+							color: Colors.text
 							font.pointSize: 24
 							font.bold: true
 						}

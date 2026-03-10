@@ -11,6 +11,11 @@ Item {
   implicitWidth: 800
   implicitHeight: 600
 
+  SystemClock {
+    id: desktopClock
+    precision: SystemClock.Minutes
+  }
+
   RowLayout {
     anchors.fill: parent
     spacing: 40
@@ -27,35 +32,19 @@ Item {
         spacing: -10
 
         Text {
-          id: timeText
-          text: Qt.formatDateTime(new Date(), "HH:mm")
+          text: Qt.formatDateTime(desktopClock.date, "HH:mm")
           color: Colors.primary
           font.pixelSize: 96
           font.weight: Font.Bold
           font.letterSpacing: -4
-          
-          Timer {
-            interval: 10000
-            running: true
-            repeat: true
-            onTriggered: timeText.text = Qt.formatDateTime(new Date(), "HH:mm")
-          }
         }
 
         Text {
-          id: dateText
-          text: Qt.formatDateTime(new Date(), "dddd, MMMM d")
+          text: Qt.formatDateTime(desktopClock.date, "dddd, MMMM d")
           color: Colors.text
           font.pixelSize: 24
           font.weight: Font.Medium
           Layout.leftMargin: 5
-          
-          Timer {
-            interval: 60000
-            running: true
-            repeat: true
-            onTriggered: dateText.text = Qt.formatDateTime(new Date(), "dddd, MMMM d")
-          }
         }
       }
 
@@ -79,7 +68,7 @@ Item {
           Text { text: "CPU USAGE"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold; font.letterSpacing: 1 }
           RowLayout {
             spacing: 8
-            Text { text: ""; color: Colors.primary; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 20 }
+            Text { text: ""; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 20 }
             Text { 
               text: SystemStatus.cpuUsage
               color: Colors.text
@@ -95,7 +84,7 @@ Item {
           Text { text: "MEMORY"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold; font.letterSpacing: 1 }
           RowLayout {
             spacing: 8
-            Text { text: ""; color: Colors.secondary; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 20 }
+            Text { text: ""; color: Colors.secondary; font.family: Colors.fontMono; font.pixelSize: 20 }
             Text { 
               text: SystemStatus.ramUsage
               color: Colors.text
@@ -119,20 +108,21 @@ Item {
           Layout.preferredWidth: 350; Layout.preferredHeight: 180; color: Qt.rgba(1, 1, 1, 0.03); radius: Colors.radiusMedium; border.color: noteInput.activeFocus ? Colors.primary : Colors.border; border.width: 1
           
           TextArea {
-            id: noteInput; anchors.fill: parent; anchors.margins: 15; color: Colors.text; font.pixelSize: 14; font.family: "JetBrainsMono Nerd Font"; wrapMode: TextEdit.Wrap; placeholderText: "Type a note..."
+            id: noteInput; anchors.fill: parent; anchors.margins: Colors.paddingMedium; color: Colors.text; font.pixelSize: 14; font.family: Colors.fontMono; wrapMode: TextEdit.Wrap; placeholderText: "Type a note..."
             
             property string notePath: Quickshell.env("HOME") + "/.cache/quickshell_note.txt"
-            
+
+            property FileView noteFile: FileView {
+              path: ""
+              onLoaded: noteInput.text = text()
+            }
+
             Component.onCompleted: {
-              var file = Quickshell.openFile(notePath, File.ReadOnly);
-              if (file) { text = file.readAll(); file.close(); }
+              Quickshell.execDetached(["sh", "-c", "mkdir -p $(dirname " + notePath + ") && touch " + notePath]);
+              noteFile.path = noteInput.notePath;
+              noteFile.reload();
             }
-            
-            onTextChanged: {
-              var file = Quickshell.openFile(notePath, File.WriteOnly | File.Truncate);
-              if (file) { file.write(text); file.close(); }
-            }
-          }
+            onTextChanged: noteFile.setText(text)          }
         }
       }
 

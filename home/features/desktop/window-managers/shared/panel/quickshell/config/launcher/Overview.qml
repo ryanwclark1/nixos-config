@@ -46,7 +46,6 @@ Scope {
 				color: "transparent"
 				WlrLayershell.layer: WlrLayer.Overlay
 				WlrLayershell.namespace: "quickshell"
-				WlrLayershell.blur: Config.blurEnabled
 				WlrLayershell.keyboardFocus: root.isVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 				
 				exclusiveZone: -1
@@ -109,7 +108,7 @@ Scope {
 
 								ColumnLayout {
 									anchors.fill: parent
-									anchors.margins: 15
+									anchors.margins: Colors.paddingMedium
 									spacing: 10
 
 									TextInput {
@@ -173,7 +172,7 @@ Scope {
 														Rectangle {
 															Layout.fillWidth: true
 															Layout.fillHeight: true
-															color: "#111111"
+															color: Colors.surface
 															radius: 4
 															clip: true
 															
@@ -196,7 +195,7 @@ Scope {
 																	anchors.centerIn: parent
 																	text: "󰅖"
 																	color: "white"
-																	font.family: "JetBrainsMono Nerd Font"
+																	font.family: Colors.fontMono
 																	font.pixelSize: 14
 																}
 																

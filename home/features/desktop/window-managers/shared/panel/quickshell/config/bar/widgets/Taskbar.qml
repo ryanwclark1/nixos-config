@@ -14,12 +14,18 @@ Row {
   property var pinnedApps: []
   readonly property string pinnedPath: Quickshell.statePath("pinned_apps.json")
 
+  property FileView pinnedFile: FileView {
+    path: ""
+    onLoaded: {
+      try { root.pinnedApps = JSON.parse(text); } catch(e) {}
+    }
+  }
+
   function loadPinned() {
-    var file = Quickshell.openFile(pinnedPath, File.ReadOnly);
-    if (file) {
-      try { pinnedApps = JSON.parse(file.readAll()); } catch(e) {}
-      file.close();
-    } else {
+    if (pinnedFile.path === "") pinnedFile.path = root.pinnedPath;
+    Quickshell.execDetached(["sh", "-c", "mkdir -p $(dirname " + pinnedPath + ") && touch " + pinnedPath]);
+    pinnedFile.reload();
+    if (pinnedApps.length === 0) {
       // Default pinned apps
       pinnedApps = [
         { name: "Browser", class: "google-chrome", exec: "google-chrome" },
@@ -32,8 +38,7 @@ Row {
   }
 
   function savePinned() {
-    var file = Quickshell.openFile(pinnedPath, File.WriteOnly | File.Truncate);
-    if (file) { file.write(JSON.stringify(pinnedApps)); file.close(); }
+    pinnedFile.setText(JSON.stringify(pinnedApps));
   }
 
   function togglePin(app) {
@@ -51,11 +56,11 @@ Row {
 
   // Combined model: Pinned Apps + Running Apps not in Pinned
   Repeater {
-    model: pinnedApps
+    model: root.pinnedApps
     delegate: TaskButton {
-      appClass: modelData.class
-      appExec: modelData.exec
-      appName: modelData.name
+      appClass: modelData.class || ""
+      appExec: modelData.exec || ""
+      appName: modelData.name || ""
       isPinned: true
     }
   }
@@ -72,15 +77,15 @@ Row {
       // Only show if not already pinned and on active workspace
       property bool alreadyPinned: {
         for (var i = 0; i < pinnedApps.length; i++) {
-          if (pinnedApps[i].class === modelData.class) return true;
+          if (pinnedApps[i].class === (modelData.objectName || "")) return true;
         }
         return false;
       }
       visible: !alreadyPinned && modelData.workspace && modelData.workspace.active
       width: visible ? 32 : 0
-      appClass: modelData.class
+      appClass: modelData.objectName || ""
       appAddress: modelData.address
-      isFocused: modelData.focused
+      isFocused: modelData.activated
       isPinned: false
     }
   }

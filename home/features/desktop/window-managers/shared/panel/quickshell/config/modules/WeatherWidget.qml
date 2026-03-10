@@ -8,9 +8,9 @@ Rectangle {
   id: root
   Layout.fillWidth: true
   Layout.preferredHeight: 80
-  color: Colors.bgWidget || "#0dffffff"
-  radius: Colors.radiusMedium || 12
-  border.color: Colors.border || "#33ffffff"
+  color: Colors.bgWidget
+  radius: Colors.radiusMedium
+  border.color: Colors.border
   clip: true
 
   property string weatherText: "Loading weather..."
@@ -43,7 +43,7 @@ Rectangle {
 
   RowLayout {
     anchors.fill: parent
-    anchors.margins: 15
+    anchors.margins: Colors.paddingMedium
     spacing: 15
 
     // Weather Icon Placeholder (could map condition to icons)
@@ -57,8 +57,8 @@ Rectangle {
         if (w.includes("storm")) return "󰖓";
         return "󰖐";
       }
-      color: Colors.accent || "#ffffff"
-      font.family: Colors.fontMono || "JetBrainsMono Nerd Font"
+      color: Colors.accent
+      font.family: Colors.fontMono
       font.pixelSize: 32
     }
 
@@ -66,13 +66,13 @@ Rectangle {
       spacing: 2
       Text {
         text: root.temp
-        color: Colors.fgMain || "#ffffff"
+        color: Colors.fgMain
         font.pixelSize: 18
         font.weight: Font.Bold
       }
       Text {
         text: (root.weatherText || "Unknown") + " in " + (root.location || "Local")
-        color: Colors.fgDim || "#cccccc"
+        color: Colors.fgDim
         font.pixelSize: 11
         elide: Text.ElideRight
         Layout.fillWidth: true

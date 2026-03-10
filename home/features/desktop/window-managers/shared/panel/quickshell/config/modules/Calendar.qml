@@ -1,20 +1,27 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
+import "../services"
 
 Rectangle {
   id: root
   Layout.fillWidth: true
   Layout.preferredHeight: 280
-  color: "#0dffffff"
+  color: Colors.bgWidget
   radius: 12
-  border.color: "#33ffffff"
+  border.color: Colors.border
 
-  property date today: new Date()
-  property date viewDate: new Date()
-  
+  SystemClock {
+    id: calendarClock
+    precision: SystemClock.Hours
+  }
+
+  property date today: calendarClock.date
+  property date viewDate: calendarClock.date
+
   ColumnLayout {
     anchors.fill: parent
-    anchors.margins: 15
+    anchors.margins: Colors.paddingMedium
     spacing: 10
 
     // Header: Month and Year
@@ -22,7 +29,7 @@ Rectangle {
       Layout.fillWidth: true
       Text {
         text: root.viewDate.toLocaleDateString(Qt.locale(), "MMMM yyyy")
-        color: "#e6e6e6"
+        color: Colors.fgMain
         font.pixelSize: 16
         font.weight: Font.Bold
       }
@@ -39,7 +46,7 @@ Rectangle {
         delegate: Text {
           Layout.fillWidth: true
           text: modelData
-          color: "#666666"
+          color: Colors.textDisabled
           font.pixelSize: 11
           font.weight: Font.Bold
           horizontalAlignment: Text.AlignHCenter
@@ -61,7 +68,7 @@ Rectangle {
           Layout.fillWidth: true
           Layout.preferredHeight: 30
           color: "transparent"
-          
+
           property int dayNumber: {
             var firstDay = new Date(root.viewDate.getFullYear(), root.viewDate.getMonth(), 1).getDay();
             var d = index - firstDay + 1;
@@ -69,18 +76,18 @@ Rectangle {
             return (d > 0 && d <= daysInMonth) ? d : -1;
           }
 
-          property bool isToday: dayNumber === root.today.getDate() && 
+          property bool isToday: dayNumber === root.today.getDate() &&
                                root.viewDate.getMonth() === root.today.getMonth() &&
                                root.viewDate.getFullYear() === root.today.getFullYear()
 
           radius: 15
-          border.color: isToday ? "#4caf50" : "transparent"
+          border.color: isToday ? Colors.primary : "transparent"
           border.width: 1
-          
+
           Text {
             anchors.centerIn: parent
             text: parent.dayNumber > 0 ? parent.dayNumber : ""
-            color: parent.isToday ? "#4caf50" : (parent.dayNumber > 0 ? "#e6e6e6" : "transparent")
+            color: parent.isToday ? Colors.primary : (parent.dayNumber > 0 ? Colors.fgMain : "transparent")
             font.pixelSize: 12
             font.weight: parent.isToday ? Font.Bold : Font.Normal
           }

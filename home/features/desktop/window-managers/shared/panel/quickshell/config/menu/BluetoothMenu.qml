@@ -1,6 +1,7 @@
 import Quickshell
 import Quickshell.Bluetooth
 import QtQuick
+import "../services"
 
 PopupWindow {
   id: root
@@ -9,8 +10,8 @@ PopupWindow {
 
   Rectangle {
     anchors.fill: parent
-    color: "#1e1f22"
-    border.color: "#333333"
+    color: Colors.surface
+    border.color: Colors.border
     border.width: 1
     radius: 6
 
@@ -24,7 +25,7 @@ PopupWindow {
 
       Text {
         text: "Bluetooth"
-        color: "#e6e6e6"
+        color: Colors.fgMain
         font.pixelSize: 16
         font.weight: Font.Bold
         anchors.verticalCenter: parent.verticalCenter
@@ -35,7 +36,7 @@ PopupWindow {
         width: 40
         height: 20
         radius: 10
-        color: (Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled) ? "#4caf50" : "#555555"
+        color: (Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled) ? Colors.primary : Colors.textDisabled
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
         anchors.rightMargin: 24
@@ -55,7 +56,7 @@ PopupWindow {
       id: divider
       width: parent.width - 24
       height: 1
-      color: "#333333"
+      color: Colors.border
       anchors.top: header.bottom
       anchors.horizontalCenter: parent.horizontalCenter
     }
@@ -70,18 +71,18 @@ PopupWindow {
       anchors.bottomMargin: 10
       clip: true
       spacing: 5
-      
+
       model: Bluetooth.devices
 
       delegate: Rectangle {
         width: deviceList.width
         height: 44
-        color: index % 2 == 0 ? "#2a2b2e" : "#1e1f22"
+        color: index % 2 == 0 ? Colors.highlight : Colors.surface
         radius: 4
 
         Text {
           text: modelData.name || modelData.address || "Unknown Device"
-          color: "#e6e6e6"
+          color: Colors.fgMain
           anchors.verticalCenter: parent.verticalCenter
           anchors.left: parent.left
           anchors.leftMargin: 10
@@ -93,14 +94,14 @@ PopupWindow {
           width: 70
           height: 26
           radius: 4
-          color: modelData.connected ? "#4caf50" : "#3b3c40"
+          color: modelData.connected ? Colors.primary : Colors.highlightLight
           anchors.verticalCenter: parent.verticalCenter
           anchors.right: parent.right
           anchors.rightMargin: 10
 
           Text {
             text: modelData.connected ? "Connected" : "Connect"
-            color: "white"
+            color: Colors.text
             font.pixelSize: 11
             anchors.centerIn: parent
           }

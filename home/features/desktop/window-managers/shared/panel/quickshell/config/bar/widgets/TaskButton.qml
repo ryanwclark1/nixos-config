@@ -61,7 +61,7 @@ Rectangle {
           var addr = isPinned ? runningInstance.address : appAddress;
           Quickshell.execDetached(["hyprctl", "dispatch", "focuswindow", "address:" + addr]);
         } else if (isPinned && appExec) {
-          Quickshell.execDetached(appExec.split(" "));
+          Quickshell.execDetached(["sh", "-c", appExec]);
         }
       } else if (mouse.button === Qt.RightButton) {
         root.togglePin({ class: appClass, title: appName });

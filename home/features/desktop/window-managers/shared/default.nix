@@ -2,7 +2,7 @@
   imports = [
     ./panel
     ./launcher
-    ./notifications
+    # ./notifications
     ./media
     ./session
     ./clipboard

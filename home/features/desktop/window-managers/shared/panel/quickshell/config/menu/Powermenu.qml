@@ -21,11 +21,14 @@ PanelWindow {
   WlrLayershell.layer: WlrLayer.Overlay
   WlrLayershell.keyboardFocus: root.isVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
   WlrLayershell.namespace: "quickshell"
-  WlrLayershell.blur: Config.blurEnabled
   
   Item {
     anchors.fill: parent
     visible: root.isVisible
+    focus: root.isVisible
+    onVisibleChanged: if (visible) forceActiveFocus()
+
+    Keys.onEscapePressed: root.isVisible = false
 
     // Backdrop to close
     MouseArea {
@@ -34,7 +37,7 @@ PanelWindow {
       
       Rectangle {
         anchors.fill: parent
-        color: "#000000"
+        color: Colors.background
         opacity: root.isVisible ? 0.4 : 0.0
         Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
       }
@@ -63,17 +66,17 @@ PanelWindow {
         
         Repeater {
           model: [
-            { icon: "󰐥", label: "Shutdown", color: Colors.error, cmd: "systemctl poweroff" },
-            { icon: "󰑐", label: "Reboot", color: Colors.accent, cmd: "systemctl reboot" },
-            { icon: "󰌾", label: "Lock", color: Colors.primary, cmd: "hyprlock" },
-            { icon: "󰗽", label: "Logout", color: Colors.fgSecondary, cmd: "hyprctl dispatch exit" }
+            { icon: "󰐥", label: "Shutdown", color: Colors.error, cmd: ["systemctl", "poweroff"] },
+            { icon: "󰑐", label: "Reboot", color: Colors.accent, cmd: ["systemctl", "reboot"] },
+            { icon: "󰌾", label: "Lock", color: Colors.primary, cmd: ["hyprlock"] },
+            { icon: "󰗽", label: "Logout", color: Colors.fgSecondary, cmd: ["hyprctl", "dispatch", "exit"] }
           ]
           
           delegate: Rectangle {
             id: btn
             width: 120; height: 120
             radius: 20
-            color: mouseArea.containsMouse ? "#33ffffff" : "#1affffff"
+            color: mouseArea.containsMouse ? Colors.highlight : Colors.highlightLight
             border.color: mouseArea.containsMouse ? modelData.color : Colors.border
             border.width: 2
             
@@ -104,7 +107,7 @@ PanelWindow {
               hoverEnabled: true
               onClicked: {
                 root.isVisible = false;
-                Quickshell.execDetached(modelData.cmd.split(" "));
+                Quickshell.execDetached(modelData.cmd);
               }
             }
           }
@@ -119,6 +122,4 @@ PanelWindow {
       }
     }
   }
-
-  Keys.onEscapePressed: root.isVisible = false
 }

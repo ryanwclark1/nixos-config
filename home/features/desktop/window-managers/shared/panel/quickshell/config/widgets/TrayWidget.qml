@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.SystemTray
 import Quickshell.Widgets
+import "../services"
 
 Row {
   id: root
@@ -17,8 +18,8 @@ Row {
       width: 24
       height: 24
       radius: 6
-      color: mouseArea.containsMouse ? "#1affffff" : "transparent"
-      
+      color: mouseArea.containsMouse ? Colors.highlightLight : "transparent"
+
       anchors.verticalCenter: parent.verticalCenter
 
       IconImage {
@@ -26,12 +27,12 @@ Row {
         implicitWidth: 18
         implicitHeight: 18
         source: modelData.icon || ""
-        
+
         // Fallback icon if none found
         Text {
           anchors.centerIn: parent
           text: "󰏘"
-          color: "#aaaaaa"
+          color: Colors.textSecondary
           font.pixelSize: 14
           visible: parent.status !== IconImage.Ready
         }
@@ -62,16 +63,16 @@ Row {
         id: tooltip
         visible: mouseArea.containsMouse && (modelData.tooltip || "") !== ""
         z: 100
-        
+
         // Position it below the bar (assuming bar is at top)
         parent: root.parent.parent // Go up to a stable coordinate space
         x: trayItem.mapToItem(parent, 0, 0).x - (width / 2) + (trayItem.width / 2)
-        y: 35 
+        y: 35
 
         width: tooltipText.implicitWidth + 16
         height: 24
-        color: "#cc101014"
-        border.color: "#33ffffff"
+        color: Colors.bgGlass
+        border.color: Colors.border
         border.width: 1
         radius: 6
 
@@ -79,7 +80,7 @@ Row {
           id: tooltipText
           anchors.centerIn: parent
           text: modelData.tooltip || ""
-          color: "#ffffff"
+          color: Colors.text
           font.pixelSize: 10
         }
       }

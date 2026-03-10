@@ -27,7 +27,7 @@ PanelWindow {
     anchors.fill: parent
     Rectangle {
       anchors.fill: parent
-      color: "#000000"
+      color: Colors.background
       opacity: root.visible ? 0.5 : 0.0
       Behavior on opacity { NumberAnimation { duration: 200 } }
     }
@@ -49,7 +49,7 @@ PanelWindow {
 
       ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 24
+        anchors.margins: Colors.paddingLarge
         spacing: 15
 
         RowLayout {
@@ -75,7 +75,7 @@ PanelWindow {
         Rectangle {
           Layout.fillWidth: true
           height: 45
-          color: "#1affffff"
+          color: Colors.highlightLight
           radius: 8
           border.color: pwInput.activeFocus ? Colors.primary : "transparent"
           border.width: 1
@@ -120,7 +120,7 @@ PanelWindow {
           // Authenticate
           Rectangle {
             Layout.fillWidth: true; height: 40; color: Colors.primary; radius: 8
-            Text { anchors.centerIn: parent; text: "Unlock"; color: "#ffffff"; font.weight: Font.Bold }
+            Text { anchors.centerIn: parent; text: "Unlock"; color: Colors.text; font.weight: Font.Bold }
             MouseArea { anchors.fill: parent; onClicked: modelData.authenticate(pwInput.text) }
           }
         }

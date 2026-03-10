@@ -2,7 +2,6 @@ import Quickshell // SystemClock
 import Quickshell.Bluetooth
 import Quickshell.Wayland
 import QtQuick
-import QtQml
 import "."
 import "widgets"
 import "../modules"
@@ -25,6 +24,7 @@ Item {
   Rectangle {
     anchors.fill: parent
     color: Colors.bgGlass
+    opacity: Config.barOpacity
     radius: Config.barFloating ? Colors.radiusMedium : 0
     border.color: Config.barFloating ? Colors.border : "transparent"
     border.width: Config.barFloating ? 1 : 0
@@ -37,15 +37,30 @@ Item {
     anchors.verticalCenter: parent.verticalCenter
     spacing: 12
 
-    Logo {}
-    Workspaces {}
+    Logo {
+      scale: logoMouse.containsMouse ? 1.1 : 1.0
+      Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+      MouseArea { id: logoMouse; anchors.fill: parent; hoverEnabled: true; onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Launcher", "toggle"]) }
+    }
+    Workspaces {
+      scale: wsMouse.containsMouse ? 1.02 : 1.0
+      Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+      MouseArea { id: wsMouse; anchors.fill: parent; hoverEnabled: true; propagateComposedEvents: true; onEntered: {} }
+    }
     Taskbar {}
-    SystemMonitor {}
+    SystemMonitor {
+      scale: smMouse.containsMouse ? 1.02 : 1.0
+      Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+      MouseArea { id: smMouse; anchors.fill: parent; hoverEnabled: true; onEntered: {} }
+    }
   }
 
   // CENTER MODULES
   CenterModules {
     anchors.centerIn: parent
+    scale: cmMouse.containsMouse ? 1.02 : 1.0
+    Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+    MouseArea { id: cmMouse; anchors.fill: parent; hoverEnabled: true; onEntered: {} }
   }
 
   SystemClock {
@@ -62,12 +77,16 @@ Item {
 
     // System Control Trigger (WiFi, Battery, Audio)
     MouseArea {
-      height: 24
+      id: controlTrigger
+      height: 28
       width: statusRow.width + 16
       hoverEnabled: true
       onClicked: root.controlClicked()
       onEntered: statusBg.color = Qt.rgba(255, 255, 255, 0.15)
       onExited: statusBg.color = Colors.bgWidget
+
+      scale: containsMouse ? 1.05 : 1.0
+      Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
 
       Rectangle {
         id: statusBg
@@ -79,7 +98,7 @@ Item {
       Row {
         id: statusRow
         anchors.centerIn: parent
-        spacing: 8
+        spacing: 10
         NetworkWidget {}
         BatteryWidget {}
         AudioWidget {}
@@ -88,38 +107,51 @@ Item {
 
     Rectangle {
       width: clockText.width + 16
-      height: 24
+      height: 28
       radius: height / 2
       color: Colors.bgWidget
       anchors.verticalCenter: parent.verticalCenter
+      
+      scale: clockMouse.containsMouse ? 1.05 : 1.0
+      Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
 
       Text {
         id: clockText
         anchors.centerIn: parent
         color: Colors.fgMain
-        font.pixelSize: 12
-        font.weight: Font.Medium
+        font.pixelSize: 14
+        font.weight: Font.Bold
         text: Qt.formatDateTime(
           clock.date,
           root.use24hClock ? "HH:mm" : "h:mm ap"
         )
+      }
+      
+      MouseArea {
+        id: clockMouse
+        anchors.fill: parent
+        hoverEnabled: true
+        onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Calendar", "toggle"])
       }
     }
 
     TrayWidget {}
 
     Rectangle {
-      width: 28
-      height: 24
+      width: 32
+      height: 28
       color: Colors.bgWidget
       radius: height / 2
       anchors.verticalCenter: parent.verticalCenter
+      
+      scale: notifMouse.containsMouse ? 1.1 : 1.0
+      Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
 
       Text {
         anchors.centerIn: parent
         color: Colors.fgMain
-        font.pixelSize: 14
-        font.family: "JetBrainsMono Nerd Font"
+        font.pixelSize: 16
+        font.family: Colors.fontMono
         text: root.manager && root.manager.dndEnabled ? "󰂛" : "󰂚"
       }
       
@@ -131,12 +163,11 @@ Item {
         color: Colors.error
         anchors.top: parent.top
         anchors.right: parent.right
-        anchors.topMargin: 0
-        anchors.rightMargin: 0
         visible: root.manager && root.manager.notifications && root.manager.notifications.count > 0 && !(root.manager && root.manager.dndEnabled)
       }
 
       MouseArea {
+        id: notifMouse
         anchors.fill: parent
         hoverEnabled: true
         onClicked: root.notifClicked()

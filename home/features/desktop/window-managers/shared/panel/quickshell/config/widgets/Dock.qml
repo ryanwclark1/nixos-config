@@ -5,6 +5,7 @@ import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Wayland._Screencopy
 import Quickshell.Wayland
+import Quickshell.Widgets
 import "../services"
 
 PanelWindow {
@@ -18,7 +19,9 @@ PanelWindow {
   margins.bottom: 12
   color: "transparent"
 
-  mask: Region {}
+  mask: Region {
+    item: dockContainer
+  }
 
   WlrLayershell.layer: WlrLayer.Bottom
   WlrLayershell.namespace: "quickshell"
@@ -102,7 +105,7 @@ PanelWindow {
       anchor.rect.x: iconBg.mapToItem(null, 0, 0).x - 100 + (iconBg.width / 2)
       anchor.rect.y: -160 // Above the dock
       
-      width: 200; height: 140
+      implicitWidth: 200; implicitHeight: 140
       color: "transparent"
 
       Rectangle {
@@ -116,7 +119,7 @@ PanelWindow {
         ColumnLayout {
           anchors.fill: parent; anchors.margins: 4; spacing: 4
           Rectangle {
-            Layout.fillWidth: true; Layout.fillHeight: true; color: "#111111"; radius: 8; clip: true
+            Layout.fillWidth: true; Layout.fillHeight: true; color: Colors.surface; radius: 8; clip: true
             ScreencopyView {
               anchors.fill: parent
               captureSource: runningWindow ? runningWindow.wayland : null

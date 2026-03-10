@@ -1,12 +1,12 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Bluetooth
 import Quickshell.Services.Pipewire
 import Quickshell.Services.Mpris
-import "components" // Implicitly includes Colors singleton
 import "../services"
 
 PanelWindow {
@@ -20,39 +20,28 @@ PanelWindow {
   }
   
   color: "transparent"
-  visible: opacity > 0
+  property real launcherOpacity: 0
+  visible: launcherOpacity > 0
 
   WlrLayershell.layer: WlrLayer.Overlay
   WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
   WlrLayershell.namespace: "quickshell"
-  WlrLayershell.blur: Config.blurEnabled
 
   property string searchText: ""
   property var allItems: []
   property var filteredItems: []
   property int selectedIndex: 0
-  property string mode: "drun" // drun, window, dmenu, run, emoji, calc, clip, web, system, nixos, media, wallpapers, files, bookmarks, ai
+  property string mode: "drun" // drun, window, dmenu, run, emoji, calc, clip, web, system, nixos, media, wallpapers, files, bookmarks, ai, keybinds
   
   // Confirmation state
   property string confirmTitle: ""
   property var confirmCallback: null
   readonly property bool showingConfirm: confirmTitle !== ""
 
-  Item {
-    anchors.fill: parent
-    opacity: 0
-    Behavior on opacity { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
+  Behavior on launcherOpacity { NumberAnimation { duration: 300; easing.type: Easing.OutQuint } }
 
-    property real scaleValue: 0.95
-
-    SpringAnimation {
-    id: scaleValueAnimation
-    target: launcherRoot
-    property: "scaleValue"
-    spring: 3
-    damping: 0.2
-    mass: 1.0
-  }
+  property real scaleValue: 0.95
+  Behavior on scaleValue { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
 
   function open(newMode, keepSearch) {
     loadFrequency();
@@ -63,47 +52,33 @@ PanelWindow {
         if (searchInput) searchInput.text = ""
     }
     selectedIndex = 0
-    opacity = 1
+    launcherRoot.launcherOpacity = 1
+    launcherRoot.scaleValue = 1.0
     if (searchInput) searchInput.forceActiveFocus()
     
-    if (mode === "drun") {
-      loadApps()
-    } else if (mode === "window") {
-      loadWindows()
-    } else if (mode === "run") {
-      loadRun()
-    } else if (mode === "emoji") {
-      loadEmojis()
-    } else if (mode === "clip") {
-      loadClip()
-    } else if (mode === "calc") {
-      allItems = []
-      filterItems()
-    } else if (mode === "web") {
-      loadWeb()
-    } else if (mode === "system") {
-      loadSystem()
-    } else if (mode === "media") {
-      allItems = []
-      filterItems()
-    } else if (mode === "nixos") {
-      loadNixos()
-    } else if (mode === "wallpapers") {
-      loadWallpapers()
-    } else if (mode === "files") {
-      loadFiles()
-    } else if (mode === "bookmarks") {
-      loadBookmarks()
-    } else if (mode === "ai") {
-      loadAi()
-    } else if (mode === "keybinds") {
-      loadKeybinds()
-    }
+    if (mode === "drun") loadApps()
+    else if (mode === "window") loadWindows()
+    else if (mode === "run") loadRun()
+    else if (mode === "emoji") loadEmojis()
+    else if (mode === "clip") loadClip()
+    else if (mode === "calc") { allItems = []; filterItems(); }
+    else if (mode === "web") loadWeb()
+    else if (mode === "system") loadSystem()
+    else if (mode === "media") { allItems = []; filterItems(); }
+    else if (mode === "nixos") loadNixos()
+    else if (mode === "wallpapers") loadWallpapers()
+    else if (mode === "files") loadFiles()
+    else if (mode === "bookmarks") loadBookmarks()
+    else if (mode === "ai") loadAi()
+    else if (mode === "keybinds") loadKeybinds()
+    else if (mode === "dmenu") filterItems()
   }
-  
+
   function close() {
-    opacity = 0
+    launcherRoot.launcherOpacity = 0
+    launcherRoot.scaleValue = 0.95
     if (showingConfirm) confirmTitle = "";
+    launcherRoot.WlrLayershell.keyboardFocus = WlrKeyboardFocus.None
   }
 
   function askConfirm(title, callback) {
@@ -123,168 +98,53 @@ PanelWindow {
     confirmCallback = null;
     close();
   }
-  
+
+  function runCommand(command, onOutput) {
+    var proc = Qt.createQmlObject(
+      'import Quickshell.Io; Process { running: false; stdout: StdioCollector {} }',
+      launcherRoot
+    );
+    proc.command = command;
+    proc.stdout.streamFinished.connect(function() {
+      if (onOutput) onOutput(proc.stdout.text || "");
+      proc.destroy();
+    });
+    proc.running = true;
+  }
+
+  // --- Search Logic (Simplified) ---
   function loadApps() {
-    var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["qs-apps"] }', launcherRoot);
-    proc.finished.connect(function() {
-      try {
-        var raw = proc.stdout.readAll();
-        if (raw) {
-          allItems = JSON.parse(raw);
-          filterItems();
-        }
-      } catch (e) { console.error("Failed to parse apps JSON: " + e); }
-    });
-    proc.running = true;
+    runCommand(["qs-apps"], function(raw) { try { if (raw) { allItems = JSON.parse(raw); filterItems(); } } catch (e) {} });
   }
-  
   function loadRun() {
-    var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["qs-run"] }', launcherRoot);
-    proc.finished.connect(function() {
-      try {
-        var raw = proc.stdout.readAll();
-        if (raw) {
-          allItems = JSON.parse(raw);
-          filterItems();
-        }
-      } catch (e) { console.error("Failed to parse run JSON: " + e); }
-    });
-    proc.running = true;
+    runCommand(["qs-run"], function(raw) { try { if (raw) { allItems = JSON.parse(raw); filterItems(); } } catch (e) {} });
   }
-
   function loadEmojis() {
-    var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["qs-emoji"] }', launcherRoot);
-    proc.finished.connect(function() {
-      var raw = proc.stdout.readAll();
-      if (raw) {
-        var lines = raw.split("\n");
-        var items = [];
-        for (var i = 0; i < lines.length; i++) {
-          if (lines[i].trim() !== "") {
-            var parts = lines[i].split(" ");
-            var emoji = parts[0];
-            var name = parts.slice(1).join(" ");
-            items.push({ name: emoji, title: name });
-          }
-        }
-        allItems = items;
-        filterItems();
-      }
-    });
-    proc.running = true;
+    runCommand(["qs-emoji"], function(raw) { if (raw) { var lines = raw.split("\n"); var items = []; for (var i = 0; i < lines.length; i++) { if (lines[i].trim() !== "") { var parts = lines[i].split(" "); items.push({ name: parts[0], title: parts.slice(1).join(" ") }); } } allItems = items; filterItems(); } });
   }
-
   function loadClip() {
-    var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["qs-clip"] }', launcherRoot);
-    proc.finished.connect(function() {
-      try {
-        var raw = proc.stdout.readAll();
-        if (raw) {
-          var data = JSON.parse(raw);
-          allItems = data.map(function(it) { return { id: it.id, name: it.content, title: it.content }; });
-          filterItems();
-        }
-      } catch (e) { console.error("Failed to parse clip JSON: " + e); }
-    });
-    proc.running = true;
+    runCommand(["qs-clip"], function(raw) { try { if (raw) { var data = JSON.parse(raw); allItems = data.map(function(it) { return { id: it.id, name: it.content, title: it.content }; }); filterItems(); } } catch (e) {} });
   }
-
   function loadWallpapers() {
-    var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["qs-wallpapers"] }', launcherRoot);
-    proc.finished.connect(function() {
-      try {
-        var raw = proc.stdout.readAll();
-        if (raw) {
-          allItems = JSON.parse(raw);
-          filterItems();
-        }
-      } catch (e) { console.error("Failed to parse wallpapers JSON: " + e); }
-    });
-    proc.running = true;
+    runCommand(["qs-wallpapers"], function(raw) { try { if (raw) { allItems = JSON.parse(raw); filterItems(); } } catch (e) {} });
   }
-
   function loadKeybinds() {
-    var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["qs-keybinds"] }', launcherRoot);
-    proc.finished.connect(function() {
-      try {
-        var raw = proc.stdout.readAll();
-        if (raw) {
-          allItems = JSON.parse(raw);
-          filterItems();
-        }
-      } catch (e) { console.error("Failed to parse keybinds JSON: " + e); }
-    });
-    proc.running = true;
+    runCommand(["qs-keybinds"], function(raw) { try { if (raw) { allItems = JSON.parse(raw); filterItems(); } } catch (e) {} });
   }
-
   function loadFiles() {
     var searchQuery = searchText.startsWith("/") ? searchText.substring(1).trim() : searchText;
-    if (searchQuery.length < 2) {
-       allItems = [{ name: "Type to search files...", isHint: true, icon: "󰈔", fullPath: "" }];
-       filterItems();
-       return;
-    }
-    var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["fd", "--base-directory", "' + Quickshell.env("HOME") + '", "--max-results", "100", "' + searchQuery.replace(/"/g, '\\"') + '"] }', launcherRoot);
-    proc.finished.connect(function() {
-      var raw = proc.stdout.readAll();
-      if (raw) {
-        var lines = raw.split("\n");
-        var items = [];
-        for (var i = 0; i < lines.length; i++) {
-          if (lines[i].trim() !== "") {
-            var path = lines[i];
-            var parts = path.split("/");
-            var filename = parts[parts.length - 1] || path;
-            items.push({ name: filename, title: path, fullPath: Quickshell.env("HOME") + "/" + path });
-          }
-        }
-        if (items.length === 0) items = [{ name: "No files found", isHint: true, icon: "󰈔", fullPath: "" }];
-        allItems = items;
-        filterItems();
-      }
-    });
-    proc.running = true;
+    if (searchQuery.length < 2) { allItems = [{ name: "Type to search files...", isHint: true, icon: "󰈔", fullPath: "" }]; filterItems(); return; }
+    runCommand(["fd", "--base-directory", Quickshell.env("HOME"), "--max-results", "100", searchQuery], function(raw) { if (raw) { var lines = raw.split("\n"); var items = []; for (var i = 0; i < lines.length; i++) { if (lines[i].trim() !== "") { var path = lines[i]; var parts = path.split("/"); items.push({ name: parts[parts.length - 1] || path, title: path, fullPath: Quickshell.env("HOME") + "/" + path }); } } if (items.length === 0) items = [{ name: "No files found", isHint: true, icon: "󰈔", fullPath: "" }]; allItems = items; filterItems(); } });
   }
-
   function loadBookmarks() {
-    var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["qs-bookmarks"] }', launcherRoot);
-    proc.finished.connect(function() {
-      try {
-        var raw = proc.stdout.readAll();
-        if (raw) {
-          allItems = JSON.parse(raw);
-          filterItems();
-        }
-      } catch (e) { console.error("Failed to parse bookmarks JSON: " + e); }
-    });
-    proc.running = true;
+    runCommand(["qs-bookmarks"], function(raw) { try { if (raw) { allItems = JSON.parse(raw); filterItems(); } } catch (e) {} });
   }
-
   function loadAi() {
     var query = searchText.startsWith("!") ? searchText.substring(1).trim() : searchText;
-    if (query.length < 3) {
-       allItems = [{ name: "Type your prompt...", isHint: true, icon: "󰚩" }];
-       filterItems();
-       return;
-    }
-    
-    allItems = [{ name: "Thinking...", isHint: true, icon: "󰚩" }];
-    filterItems();
-
-    var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["qs-ai", "' + query.replace(/"/g, '\\"') + '"] }', launcherRoot);
-    proc.finished.connect(function() {
-      var raw = proc.stdout.readAll().trim();
-      if (raw) {
-        allItems = [{ name: "AI Response", title: "Click to copy response", body: raw, icon: "󰚩" }];
-        filterItems();
-      } else {
-        allItems = [{ name: "AI error or no response", isHint: true, icon: "󰚩" }];
-        filterItems();
-      }
-    });
-    proc.running = true;
+    if (query.length < 3) { allItems = [{ name: "Type your prompt...", isHint: true, icon: "󰚩" }]; filterItems(); return; }
+    allItems = [{ name: "Thinking...", isHint: true, icon: "󰚩" }]; filterItems();
+    runCommand(["qs-ai", query], function(raw) { raw = raw.trim(); if (raw) { allItems = [{ name: "AI Response", title: "Click to copy response", body: raw, icon: "󰚩" }]; filterItems(); } else { allItems = [{ name: "AI error or no response", isHint: true, icon: "󰚩" }]; filterItems(); } });
   }
-  
   function loadWeb() {
       allItems = [
         { name: "Google", exec: "https://www.google.com/search?q=", icon: "󰊯", isWeb: true },
@@ -295,7 +155,6 @@ PanelWindow {
       ]
       filterItems()
   }
-
   function loadSystem() {
       allItems = [
         { category: "Power", name: "Shutdown", icon: "⏻", action: () => askConfirm("Shutdown system?", () => Quickshell.execDetached(["systemctl", "poweroff"])) },
@@ -307,13 +166,12 @@ PanelWindow {
         { category: "Capture", name: "Screenshot (Display)", icon: "🖥️", action: () => Quickshell.execDetached(["screenshot-enhanced", "output"]) },
         { category: "Capture", name: "Color Picker", icon: "🎨", action: () => Quickshell.execDetached(["hyprpicker", "-a"]) },
         { category: "Toggles", name: "Toggle Bluetooth", icon: "󰂯", action: () => { if(Bluetooth.defaultAdapter) Bluetooth.defaultAdapter.enabled = !Bluetooth.defaultAdapter.enabled; } },
-        { category: "Toggles", name: "Toggle Night Light", icon: "🌙", action: () => { Quickshell.execDetached(["bash", "-c", "pgrep hyprsunset && pkill hyprsunset || hyprsunset &"]); } },
+        { category: "Toggles", name: "Toggle Night Light", icon: "🌙", action: () => { Quickshell.execDetached(["os-toggle-nightlight"]); } },
         { category: "Utilities", name: "System Monitor (btop)", icon: "📊", action: () => Quickshell.execDetached(["kitty", "-e", "btop"]) },
         { category: "Utilities", name: "Audio Settings", icon: "🔊", action: () => Quickshell.execDetached(["kitty", "-e", "wiremix"]) }
       ]
       filterItems()
   }
-
   function loadNixos() {
     allItems = [
       { category: "System", name: "Rebuild Switch (flake)", icon: "󰒓", action: () => Quickshell.execDetached(["kitty", "-e", "sudo", "nixos-rebuild", "switch", "--flake", ".#"]) },
@@ -321,45 +179,28 @@ PanelWindow {
       { category: "System", name: "Collect Garbage", icon: "󰃢", action: () => Quickshell.execDetached(["kitty", "-e", "sudo", "nix-env", "--delete-generations", "old"]) },
       { category: "Information", name: "System Generations", icon: "󰋚", action: () => Quickshell.execDetached(["kitty", "-e", "sudo", "nix-env", "-p", "/nix/var/nix/profiles/system", "--list-generations"]) }
     ]
-    
-    var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: false; command: ["nixos-version"] }', launcherRoot);
-    proc.finished.connect(function() {
-      var ver = proc.stdout.readAll().trim();
-      if (ver && mode === "nixos") {
-        allItems.unshift({ category: "Information", name: "Current Version: " + ver, icon: "", action: null });
-        filterItems();
-      }
-    });
-    proc.running = true;
+    runCommand(["nixos-version"], function(raw) { var ver = raw.trim(); if (ver && mode === "nixos") { allItems.unshift({ category: "Information", name: "Current Version: " + ver, icon: "", action: null }); filterItems(); } });
     filterItems();
   }
-
-  function loadWindows() {
-    allItems = Hyprland.toplevels;
-    filterItems();
-  }
+  function loadWindows() { allItems = Hyprland.toplevels; filterItems(); }
   
   property var appFrequency: ({})
   readonly property string freqPath: Quickshell.statePath("app_frequency.json")
-
-  function loadFrequency() {
-    var file = Quickshell.openFile(freqPath, File.ReadOnly);
-    if (file) {
-      try { appFrequency = JSON.parse(file.readAll()); } catch(e) {}
-      file.close();
+  
+  property FileView freqFile: FileView {
+    path: ""
+    onLoaded: {
+      try { launcherRoot.appFrequency = JSON.parse(text); } catch(e) {}
     }
   }
 
-  function saveFrequency() {
-    var file = Quickshell.openFile(freqPath, File.WriteOnly | File.Truncate);
-    if (file) { file.write(JSON.stringify(appFrequency)); file.close(); }
+  function loadFrequency() {
+    if (freqFile.path === "") freqFile.path = launcherRoot.freqPath;
+    Quickshell.execDetached(["sh", "-c", "mkdir -p $(dirname " + freqPath + ") && touch " + freqPath]);
+    freqFile.reload();
   }
-
-  function trackLaunch(exec) {
-    if (!exec) return;
-    appFrequency[exec] = (appFrequency[exec] || 0) + 1;
-    saveFrequency();
-  }
+  function saveFrequency() { freqFile.setText(JSON.stringify(appFrequency)); }
+  function trackLaunch(exec) { if (!exec) return; appFrequency[exec] = (appFrequency[exec] || 0) + 1; saveFrequency(); }
 
   function highlightMatch(fullText, query) {
     if (!query || !fullText) return fullText;
@@ -371,16 +212,13 @@ PanelWindow {
   }
 
   function fuzzyMatch(str, pattern) {
-    if (!pattern) return 100;
-    if (!str) return 0;
+    if (!pattern) return 100; if (!str) return 0;
     var s = str.toLowerCase();
     var p = (pattern.startsWith("!") || pattern.startsWith("/") || pattern.startsWith("@") || pattern.startsWith("?") || pattern.startsWith(">") || pattern.startsWith(":") || pattern.startsWith("=")) ? pattern.substring(1).trim() : pattern;
-    p = p.toLowerCase();
-    if (!p) return 100;
+    p = p.toLowerCase(); if (!p) return 100;
     if (s.startsWith(p)) return 100 + (p.length / s.length);
     if (s.includes(p)) return 50 + (p.length / s.length);
-    var pIdx = 0; var sIdx = 0;
-    while (sIdx < s.length && pIdx < p.length) { if (s[sIdx] === p[pIdx]) { pIdx++; } sIdx++; }
+    var pIdx = 0; var sIdx = 0; while (sIdx < s.length && pIdx < p.length) { if (s[sIdx] === p[pIdx]) { pIdx++; } sIdx++; }
     if (pIdx === p.length) return 10 + (p.length / s.length);
     return 0;
   }
@@ -389,20 +227,9 @@ PanelWindow {
     var actualSearch = searchText;
     if (mode === "calc") {
       actualSearch = searchText.startsWith("=") ? searchText.substring(1).trim() : searchText;
-      try {
-        if (actualSearch !== "") {
-          var result = eval(actualSearch.replace(/[^-+/*() .0-9]/g, ''));
-          if (result !== undefined && !isNaN(result)) {
-            filteredItems = [{ name: result.toString(), title: "Result: " + result, isCalc: true }];
-            selectedIndex = 0;
-            return;
-          }
-        }
-      } catch (e) {}
-      filteredItems = [];
-      return;
+      try { if (actualSearch !== "") { var result = eval(actualSearch.replace(/[^-+/*() .0-9]/g, '')); if (result !== undefined && !isNaN(result)) { filteredItems = [{ name: result.toString(), title: "Result: " + result, isCalc: true }]; selectedIndex = 0; return; } } } catch (e) {}
+      filteredItems = []; return;
     }
-
     if (mode === "run" && searchText.startsWith(">")) actualSearch = searchText.substring(1).trim();
     if (mode === "emoji" && searchText.startsWith(":")) actualSearch = searchText.substring(1).trim();
     if (mode === "web" && searchText.startsWith("?")) actualSearch = searchText.substring(1).trim();
@@ -417,31 +244,14 @@ PanelWindow {
       var scoredItems = [];
       for (var i = 0; i < allItems.length; i++) {
         var item = allItems[i];
-        if (mode === "web") {
-            var webItem = Object.assign({}, item);
-            webItem.title = "Search " + item.name + " for '" + actualSearch + "'";
-            webItem.query = actualSearch;
-            scoredItems.push(webItem);
-            continue;
-        }
+        if (mode === "web") { var webItem = Object.assign({}, item); webItem.title = "Search " + item.name + " for '" + actualSearch + "'"; webItem.query = actualSearch; scoredItems.push(webItem); continue; }
         var name = (item.name || item.title || "");
         var exec = (item.exec || item.class || "");
         var bestScore = Math.max(fuzzyMatch(name, actualSearch), fuzzyMatch(exec, actualSearch));
-        if (bestScore > 0 || (actualSearch === "" && (mode === "files" || mode === "ai"))) {
-          item._score = bestScore;
-          scoredItems.push(item);
-        }
+        if (bestScore > 0 || (actualSearch === "" && (mode === "files" || mode === "ai"))) { item._score = bestScore; scoredItems.push(item); }
       }
       if (mode !== "web" && mode !== "system" && mode !== "nixos" && mode !== "wallpapers" && mode !== "keybinds" && mode !== "bookmarks" && mode !== "ai" && mode !== "files") {
-          scoredItems.sort(function(a, b) { 
-            if (b._score !== a._score) return b._score - a._score;
-            if (mode === "drun") {
-              var freqA = appFrequency[a.exec] || 0;
-              var freqB = appFrequency[b.exec] || 0;
-              return freqB - freqA;
-            }
-            return 0;
-          });
+          scoredItems.sort(function(a, b) { if (b._score !== a._score) return b._score - a._score; if (mode === "drun") { var freqA = appFrequency[a.exec] || 0; var freqB = appFrequency[b.exec] || 0; return freqB - freqA; } return 0; });
       }
       filteredItems = scoredItems;
     }
@@ -453,55 +263,20 @@ PanelWindow {
       var item = filteredItems[selectedIndex];
       if (mode === "drun") {
         trackLaunch(item.exec);
-        if (item.terminal && (item.terminal === "true" || item.terminal === "True")) {
-          Quickshell.execDetached(["kitty", "-e", "bash", "-c", item.exec]);
-        } else {
-          Quickshell.execDetached(item.exec.split(" "));
-        }
+        if (item.terminal && (item.terminal === "true" || item.terminal === "True")) Quickshell.execDetached(["kitty", "-e", "bash", "-c", item.exec]);
+        else Quickshell.execDetached(["sh", "-c", item.exec]);
         close();
-      } else if (mode === "run") {
-        Quickshell.execDetached(["bash", "-c", item.exec]);
-        close();
-      } else if (mode === "window") {
-        Quickshell.execDetached(["hyprctl", "dispatch", "focuswindow", "address:" + item.address]);
-        close();
-      } else if (mode === "dmenu") {
-        var fifoPath = "/tmp/qs-dmenu-result";
-        Quickshell.execDetached(["bash", "-c", "echo '" + item.name + "' > " + fifoPath]);
-        close();
-      } else if (mode === "emoji") {
-        Quickshell.execDetached(["bash", "-c", "echo -n '" + item.name + "' | wl-copy"]);
-        close();
-      } else if (mode === "calc") {
-        Quickshell.execDetached(["bash", "-c", "echo -n '" + item.name + "' | wl-copy"]);
-        close();
-      } else if (mode === "clip") {
-        Quickshell.execDetached(["bash", "-c", "cliphist decode " + item.id + " | wl-copy"]);
-        close();
-      } else if (mode === "web" || mode === "bookmarks") {
-        Quickshell.execDetached(["xdg-open", item.exec + (item.query ? encodeURIComponent(item.query) : "")]);
-        close();
-      } else if (mode === "ai") {
-        if (item.body) {
-          Quickshell.execDetached(["bash", "-c", "echo -n '" + item.body.replace(/'/g, "'\\''") + "' | wl-copy"]);
-          close();
-        }
-      } else if (mode === "files") {
-        if (!item.isHint && item.fullPath) {
-          Quickshell.execDetached(["xdg-open", item.fullPath]);
-          close();
-        }
-      } else if (mode === "system" || mode === "nixos") {
-        if (item.action) item.action();
-        if (!showingConfirm) close();
-      } else if (mode === "wallpapers") {
-        Quickshell.execDetached(["swww", "img", item.path, "--transition-type", "grow", "--transition-pos", "0.5,0.5", "--transition-duration", "1.5"]);
-        Quickshell.execDetached(["wallust", "run", item.path]);
-        close();
-      } else if (mode === "keybinds") {
-        if (item.disp) Quickshell.execDetached(["hyprctl", "dispatch", item.disp, item.args]);
-        close();
-      }
+      } else if (mode === "run") { Quickshell.execDetached(["bash", "-c", item.exec]); close(); }
+      else if (mode === "window") { Quickshell.execDetached(["hyprctl", "dispatch", "focuswindow", "address:" + item.address]); close(); }
+      else if (mode === "dmenu") { var fifoPath = "/tmp/qs-dmenu-result"; Quickshell.execDetached(["bash", "-c", "echo '" + item.name + "' > " + fifoPath]); close(); }
+      else if (mode === "emoji" || mode === "calc") { Quickshell.execDetached(["bash", "-c", "echo -n '" + item.name + "' | wl-copy"]); close(); }
+      else if (mode === "clip") { Quickshell.execDetached(["bash", "-c", "cliphist decode " + item.id + " | wl-copy"]); close(); }
+      else if (mode === "web" || mode === "bookmarks") { Quickshell.execDetached(["xdg-open", item.exec + (item.query ? encodeURIComponent(item.query) : "")]); close(); }
+      else if (mode === "ai") { if (item.body) { Quickshell.execDetached(["bash", "-c", "echo -n '" + item.body.replace(/'/g, "'\\''") + "' | wl-copy"]); close(); } }
+      else if (mode === "files") { if (!item.isHint && item.fullPath) { Quickshell.execDetached(["xdg-open", item.fullPath]); close(); } }
+      else if (mode === "system" || mode === "nixos") { if (item.action) item.action(); if (!showingConfirm) close(); }
+      else if (mode === "wallpapers") { Quickshell.execDetached(["swww", "img", item.path, "--transition-type", "grow", "--transition-pos", "0.5,0.5", "--transition-duration", "1.5"]); Quickshell.execDetached(["wallust", "run", item.path]); close(); }
+      else if (mode === "keybinds") { if (item.disp) Quickshell.execDetached(["hyprctl", "dispatch", item.disp, item.args]); close(); }
     }
   }
 
@@ -528,201 +303,160 @@ PanelWindow {
       launcherRoot.allItems = items.map(function(it) { return { name: it, title: it }; });
       launcherRoot.open("dmenu");
     }
+    function toggle() { if (launcherRoot.launcherOpacity > 0) launcherRoot.close(); else launcherRoot.open("drun"); }
   }
 
-  MouseArea {
-    anchors.fill: parent
-    onClicked: launcherRoot.close()
-    Rectangle { anchors.fill: parent; color: "#000000"; opacity: children[0].opacity * 0.5 }
-  }
-
+  // --- BACKGROUND ---
   Rectangle {
-    id: mainBox
-    width: 900; height: 520; anchors.centerIn: parent; color: Colors.background; opacity: 0.95; border.color: Colors.border; border.width: 1; radius: Colors.radiusLarge; scale: launcherRoot.scaleValue
-    MouseArea { anchors.fill: parent }
-    RowLayout {
-      anchors.fill: parent; spacing: 0
+    anchors.fill: parent
+    color: Qt.rgba(0,0,0,0.5)
+    opacity: launcherRoot.launcherOpacity
+    MouseArea { anchors.fill: parent; onClicked: launcherRoot.close() }
+  }
+
+  // --- HUD CONTAINER ---
+  Rectangle {
+    id: hudBox
+    width: 700; height: Math.min(650, 100 + (mode === "media" ? 400 : (filteredItems.length > 0 ? (Math.min(filteredItems.length, 8) * 60) + 20 : 0)))
+    anchors.centerIn: parent
+    color: Colors.bgGlass
+    radius: Colors.radiusLarge
+    border.color: Colors.border
+    border.width: 1
+    scale: launcherRoot.scaleValue
+    clip: true
+
+    Behavior on height { NumberAnimation { duration: 300; easing.type: Easing.OutQuint } }
+
+    ColumnLayout {
+      anchors.fill: parent; anchors.margins: Colors.paddingMedium; spacing: 15
+
+      // Search Bar Pill
       Rectangle {
-        width: 160; Layout.fillHeight: true; color: Qt.darker(Colors.background, 1.2); radius: Colors.radiusLarge
-        Rectangle { anchors.right: parent.right; anchors.top: parent.top; anchors.bottom: parent.bottom; width: 12; color: parent.color }
-        ColumnLayout {
-          anchors.fill: parent; anchors.margins: 10; spacing: 6
-          Text { text: "LAUNCHER"; color: Colors.textDisabled; font.pixelSize: 11; font.bold: true; Layout.margins: 5; Layout.topMargin: 10 }
-          Repeater {
-             model: [
-               { id: "drun", icon: "󰀻", label: "Apps" },
-               { id: "window", icon: "󱗼", label: "Windows" },
-               { id: "run", icon: "", label: "Run" },
-               { id: "files", icon: "󰈔", label: "Files" },
-               { id: "bookmarks", icon: "󰖟", label: "Bookmarks" },
-               { id: "ai", icon: "󰚩", label: "AI Assistant" },
-               { id: "web", icon: "󰖟", label: "Web Search" },
-               { id: "emoji", icon: "󰞅", label: "Emoji" },
-               { id: "clip", icon: "󰅍", label: "Clipboard" },
-               { id: "calc", icon: "󰪚", label: "Calculator" },
-               { id: "media", icon: "󰝚", label: "Media" },
-               { id: "wallpapers", icon: "󰸉", label: "Wallpapers" },
-               { id: "keybinds", icon: "󰌌", label: "Keybinds" },
-               { id: "nixos", icon: "", label: "NixOS" },
-               { id: "system", icon: "⚙️", label: "System" }
-             ]
-             delegate: Rectangle {
-                Layout.fillWidth: true; height: 32; radius: Colors.radiusSmall
-                color: launcherRoot.mode === modelData.id ? Colors.highlight : (sidebarMouse.containsMouse ? Colors.highlightLight : "transparent")
-                RowLayout {
-                  anchors.fill: parent; anchors.leftMargin: 12; spacing: 12
-                  Text { text: modelData.icon; color: launcherRoot.mode === modelData.id ? Colors.primary : Colors.textSecondary; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 14 }
-                  Text { text: modelData.label; color: launcherRoot.mode === modelData.id ? Colors.text : Colors.textSecondary; font.pixelSize: 11 }
-                }
-                MouseArea { id: sidebarMouse; anchors.fill: parent; hoverEnabled: true; onClicked: launcherRoot.open(modelData.id, launcherRoot.searchText !== "") }
-             }
-          }
-          Item { Layout.fillHeight: true }
-        }
-      }
-      Rectangle { width: 1; Layout.fillHeight: true; color: Colors.border }
-      ColumnLayout {
-        Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: 15; spacing: 15
-        Rectangle {
-          Layout.fillWidth: true; height: 50; color: Colors.surface; radius: Colors.radiusSmall; border.color: searchInput.activeFocus ? Colors.primary : Colors.border; border.width: 1
-          RowLayout {
-            anchors.fill: parent; anchors.leftMargin: 15; anchors.rightMargin: 15; spacing: 12
-            Text { text: ""; color: Colors.textSecondary; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18 }
-            TextInput {
-              id: searchInput; Layout.fillWidth: true; color: Colors.text; font.pixelSize: 16; clip: true; text: launcherRoot.searchText; enabled: !launcherRoot.showingConfirm
-              onTextChanged: {
-                var txt = text;
-                if (txt.startsWith("=") && launcherRoot.mode !== "calc") launcherRoot.open("calc", true);
-                else if (txt.startsWith(">") && launcherRoot.mode !== "run") launcherRoot.open("run", true);
-                else if (txt.startsWith(":") && launcherRoot.mode !== "emoji") launcherRoot.open("emoji", true);
-                else if (txt.startsWith("?") && launcherRoot.mode !== "web") launcherRoot.open("web", true);
-                else if (txt.startsWith("!") && launcherRoot.mode !== "ai") launcherRoot.open("ai", true);
-                else if (txt.startsWith("@") && launcherRoot.mode !== "bookmarks") launcherRoot.open("bookmarks", true);
-                else if (txt.startsWith("/") && launcherRoot.mode !== "files") launcherRoot.open("files", true);
-                if (launcherRoot.searchText !== text) { launcherRoot.searchText = text; launcherRoot.filterItems(); }
+        Layout.fillWidth: true; height: 55; color: Colors.bgWidget; radius: 27.5
+        border.color: searchInput.activeFocus ? Colors.primary : "transparent"
+        border.width: 1
+
+        RowLayout {
+          anchors.fill: parent; anchors.leftMargin: 20; anchors.rightMargin: 20; spacing: 15
+          Text { text: ""; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 20 }
+          TextInput {
+            id: searchInput; Layout.fillWidth: true; color: Colors.text; font.pixelSize: 18; clip: true; text: launcherRoot.searchText; enabled: !launcherRoot.showingConfirm
+            onTextChanged: {
+              var txt = text;
+              if (txt.startsWith("=") && launcherRoot.mode !== "calc") launcherRoot.open("calc", true);
+              else if (txt.startsWith(">") && launcherRoot.mode !== "run") launcherRoot.open("run", true);
+              else if (txt.startsWith(":") && launcherRoot.mode !== "emoji") launcherRoot.open("emoji", true);
+              else if (txt.startsWith("?") && launcherRoot.mode !== "web") launcherRoot.open("web", true);
+              else if (txt.startsWith("!") && launcherRoot.mode !== "ai") launcherRoot.open("ai", true);
+              else if (txt.startsWith("@") && launcherRoot.mode !== "bookmarks") launcherRoot.open("bookmarks", true);
+              else if (txt.startsWith("/") && launcherRoot.mode !== "files") launcherRoot.open("files", true);
+              if (launcherRoot.searchText !== text) { launcherRoot.searchText = text; launcherRoot.filterItems(); }
+            }
+            Keys.onPressed: (event) => {
+              if (event.key === Qt.Key_Escape) launcherRoot.close();
+              else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) { 
+                  if (launcherRoot.mode === "ai" && launcherRoot.filteredItems.length > 0 && !launcherRoot.filteredItems[0].body) launcherRoot.loadAi();
+                  else if (launcherRoot.mode === "files" && launcherRoot.searchText.length > 1 && (!launcherRoot.allItems[0] || launcherRoot.allItems[0].isHint)) launcherRoot.loadFiles();
+                  else launcherRoot.executeSelection(); 
               }
-              Keys.onPressed: (event) => {
-                if (event.key === Qt.Key_Escape) {
-                  if (launcherRoot.mode === "dmenu") { var fifoPath = "/tmp/qs-dmenu-result"; Quickshell.execDetached(["bash", "-c", "echo '' > " + fifoPath]); }
-                  launcherRoot.close();
-                } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) { 
-                    if (launcherRoot.mode === "ai" && launcherRoot.filteredItems.length > 0 && !launcherRoot.filteredItems[0].body) launcherRoot.loadAi();
-                    else if (launcherRoot.mode === "files" && launcherRoot.searchText.length > 1 && (!launcherRoot.allItems[0] || launcherRoot.allItems[0].isHint)) launcherRoot.loadFiles();
-                    else launcherRoot.executeSelection(); 
-                }
-                else if (event.key === Qt.Key_Up || (event.key === Qt.Key_K && (event.modifiers & Qt.ControlModifier))) { launcherRoot.selectedIndex = Math.max(0, launcherRoot.selectedIndex - 1); event.accepted = true; }
-                else if (event.key === Qt.Key_Down || (event.key === Qt.Key_J && (event.modifiers & Qt.ControlModifier))) { launcherRoot.selectedIndex = Math.min(launcherRoot.filteredItems.length - 1, launcherRoot.selectedIndex + 1); event.accepted = true; }
-              }
+              else if (event.key === Qt.Key_Up) { launcherRoot.selectedIndex = Math.max(0, launcherRoot.selectedIndex - 1); event.accepted = true; }
+              else if (event.key === Qt.Key_Down) { launcherRoot.selectedIndex = Math.min(launcherRoot.filteredItems.length - 1, launcherRoot.selectedIndex + 1); event.accepted = true; }
             }
           }
+          // Mode Indicator
+          Rectangle {
+            height: 24; width: modeText.implicitWidth + 20; radius: 12; color: Colors.highlight
+            Text { id: modeText; anchors.centerIn: parent; text: launcherRoot.mode.toUpperCase(); color: Colors.primary; font.pixelSize: 9; font.weight: Font.Bold }
+          }
         }
-        ListView {
-          id: resultsList; visible: mode !== "media"; Layout.fillWidth: true; Layout.fillHeight: true; model: launcherRoot.filteredItems; clip: true; spacing: 5; currentIndex: launcherRoot.selectedIndex; enabled: !launcherRoot.showingConfirm
-          onCurrentIndexChanged: positionViewAtIndex(currentIndex, ListView.Contain)
-          section.property: "category"; section.delegate: Text { text: section; color: Colors.primary; font.pixelSize: 11; font.bold: true; Layout.margins: 5; height: 25; verticalAlignment: Text.AlignBottom }
+      }
+
+      // Quick Modes Row
+      RowLayout {
+        Layout.fillWidth: true; spacing: 10
+        visible: launcherRoot.searchText === ""
+        Repeater {
+          model: [
+            { id: "drun", icon: "󰀻" }, { id: "window", icon: "󱗼" }, { id: "files", icon: "󰈔" }, { id: "ai", icon: "󰚩" }, { id: "clip", icon: "󰅍" }, { id: "media", icon: "󰝚" }, { id: "system", icon: "⚙️" }
+          ]
           delegate: Rectangle {
-            width: resultsList.width; height: mode === "clip" ? 60 : (mode === "wallpapers" ? 80 : 50); color: index === launcherRoot.selectedIndex ? Colors.highlight : (itemMouseArea.containsMouse ? Colors.highlightLight : "transparent"); radius: Colors.radiusSmall
+            width: 40; height: 40; radius: 20; color: launcherRoot.mode === modelData.id ? Colors.primary : Colors.bgWidget
+            Text { anchors.centerIn: parent; text: modelData.icon; color: launcherRoot.mode === modelData.id ? Colors.background : Colors.text; font.family: Colors.fontMono; font.pixelSize: 18 }
+            MouseArea { anchors.fill: parent; hoverEnabled: true; onClicked: launcherRoot.open(modelData.id) }
+          }
+        }
+      }
+
+      // Results Area
+      StackLayout {
+        Layout.fillWidth: true; Layout.fillHeight: true; currentIndex: mode === "media" ? 1 : 0
+        
+        ListView {
+          id: resultsList; model: launcherRoot.filteredItems; clip: true; spacing: 8; currentIndex: launcherRoot.selectedIndex; enabled: !launcherRoot.showingConfirm
+          section.property: "category"; section.delegate: Text { text: section; color: Colors.primary; font.pixelSize: 10; font.bold: true; height: 25; verticalAlignment: Text.AlignBottom }
+          delegate: Rectangle {
+            width: resultsList.width; height: 50; color: index === launcherRoot.selectedIndex ? Colors.highlight : "transparent"; radius: Colors.radiusSmall
             RowLayout {
-              anchors.fill: parent; anchors.leftMargin: 12; anchors.rightMargin: 12; spacing: 12
+              anchors.fill: parent; anchors.leftMargin: 12; anchors.rightMargin: 12; spacing: 15
               Rectangle {
-                width: mode === "wallpapers" ? 100 : 32; height: mode === "wallpapers" ? 60 : 32; radius: 6; color: Colors.surface; visible: mode !== "dmenu" && mode !== "clip" && mode !== "calc"
-                Image { id: iconImage; anchors.fill: parent; anchors.margins: mode === "wallpapers" ? 0 : 4; source: modelData.path ? "file://" + modelData.path : (modelData.icon && modelData.icon.startsWith("/") ? "file://" + modelData.icon : (mode === "files" && modelData.fullPath && modelData.fullPath.match(/\.(jpg|jpeg|png|webp)$/i) ? "file://" + modelData.fullPath : "")); fillMode: Image.PreserveAspectCrop; visible: source != "" && status === Image.Ready }
-                Text { anchors.centerIn: parent; text: mode === "window" ? "󱗼" : (mode === "run" ? "" : (mode === "web" ? modelData.icon : (mode === "emoji" ? modelData.name : (mode === "keybinds" ? "󰌌" : (mode === "ai" ? "󰚩" : (mode === "bookmarks" ? "󰖟" : (mode === "files" ? "󰈔" : "󰀻"))))))) ; color: Colors.textSecondary; font.family: (mode === "emoji" || mode === "system" || mode === "nixos" || mode === "ai" || mode === "bookmarks" || mode === "keybinds") ? "Noto Color Emoji" : "JetBrainsMono Nerd Font"; font.pixelSize: (mode === "emoji" || mode === "system" || mode === "nixos" || mode === "ai" || mode === "bookmarks") ? 22 : 18; visible: !iconImage.visible }
+                width: 32; height: 32; radius: 8; color: Colors.surface
+                Image { id: iconImage; anchors.fill: parent; anchors.margins: 4; source: modelData.icon && modelData.icon.startsWith("/") ? "file://" + modelData.icon : ""; fillMode: Image.PreserveAspectCrop; visible: source != "" && status === Image.Ready }
+                Text { anchors.centerIn: parent; text: modelData.icon || (mode === "window" ? "󱗼" : (mode === "run" ? "" : (mode === "files" ? "󰈔" : "󰀻"))); color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 18; visible: !iconImage.visible }
               }
               ColumnLayout {
-                spacing: 2
-                Text { text: highlightMatch(mode === "drun" ? modelData.name : (mode === "run" ? modelData.name : (mode === "emoji" ? modelData.title : (mode === "calc" ? modelData.title : (mode === "clip" ? modelData.name : (mode === "web" ? modelData.title : (mode === "nixos" ? modelData.name : (mode === "wallpapers" ? modelData.name : (mode === "keybinds" ? modelData.name : (mode === "files" ? modelData.name : (mode === "ai" ? modelData.name : (mode === "bookmarks" ? modelData.name : (modelData.title || modelData.name)))))))))))) , searchText); color: Colors.text; textFormat: Text.StyledText; font.pixelSize: mode === "calc" ? 18 : 14; font.weight: index === launcherRoot.selectedIndex ? Font.Bold : Font.Normal; elide: Text.ElideRight; Layout.fillWidth: true }
-                Text { text: highlightMatch(mode === "drun" ? modelData.exec : (mode === "run" ? "" : (mode === "wallpapers" ? modelData.path : (mode === "keybinds" ? modelData.desc : (mode === "files" ? modelData.title : (mode === "bookmarks" ? modelData.exec : (mode === "ai" ? modelData.title : (modelData.class || ""))))))), searchText); color: Colors.textSecondary; textFormat: Text.StyledText; font.pixelSize: 11; elide: Text.ElideRight; Layout.fillWidth: true; visible: text !== "" && mode !== "calc" && mode !== "emoji" && mode !== "web" && mode !== "system" }
+                spacing: 1
+                Text { text: highlightMatch(modelData.name || modelData.title || "", searchText); color: Colors.text; textFormat: Text.StyledText; font.pixelSize: 14; font.weight: index === launcherRoot.selectedIndex ? Font.Bold : Font.Normal; elide: Text.ElideRight; Layout.fillWidth: true }
+                Text { text: modelData.exec || modelData.class || ""; color: Colors.textSecondary; font.pixelSize: 10; elide: Text.ElideRight; Layout.fillWidth: true; visible: text !== "" }
               }
             }
-            MouseArea { id: itemMouseArea; anchors.fill: parent; hoverEnabled: true; onClicked: { launcherRoot.selectedIndex = index; launcherRoot.executeSelection(); } }
+            MouseArea { anchors.fill: parent; hoverEnabled: true; onClicked: { launcherRoot.selectedIndex = index; launcherRoot.executeSelection(); } }
           }
         }
-        Flickable {
-          id: mediaDashboard; visible: mode === "media"; Layout.fillWidth: true; Layout.fillHeight: true; clip: true; boundsBehavior: Flickable.StopAtBounds; flickableDirection: Flickable.VerticalFlick; contentWidth: mediaColumn.implicitWidth; contentHeight: mediaColumn.implicitHeight
-          ColumnLayout { id: mediaColumn; width: parent.width; spacing: 20
-            Repeater {
-              model: Mpris.players
-              delegate: Rectangle {
-                Layout.fillWidth: true; height: 180; color: Colors.highlightLight; radius: Colors.radiusLarge; border.color: Colors.border; border.width: 1; clip: true
-                RowLayout {
-                  anchors.fill: parent; anchors.margins: 20; spacing: 20
-                  Rectangle { width: 140; height: 140; radius: Colors.radiusMedium; color: Colors.surface; clip: true
-                    Image { anchors.fill: parent; source: modelData.trackArtUrl || ""; fillMode: Image.PreserveAspectCrop; visible: status === Image.Ready }
-                    Text { anchors.centerIn: parent; text: "󰝚"; color: Colors.textDisabled; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 64; visible: parent.children[0].status !== Image.Ready }
-                  }
-                  ColumnLayout {
-                    Layout.fillWidth: true; Layout.fillHeight: true; spacing: 5
-                    Text { text: modelData.identity || "Media Player"; color: Colors.primary; font.pixelSize: 12; font.weight: Font.Bold }
-                    Text { text: modelData.trackTitle || "Unknown Track"; color: Colors.text; font.pixelSize: 22; font.weight: Font.Bold; Layout.fillWidth: true; elide: Text.ElideRight }
-                    Text { text: modelData.trackArtist || "Unknown Artist"; color: Colors.textSecondary; font.pixelSize: 16; Layout.fillWidth: true; elide: Text.ElideRight }
-                    Item { Layout.fillHeight: true }
-                    Rectangle { Layout.fillWidth: true; height: 6; radius: 3; color: Colors.surface; visible: modelData.length > 0
-                      Rectangle { height: parent.height; width: modelData.length > 0 ? parent.width * (modelData.position / modelData.length) : 0; radius: 3; color: Colors.primary }
-                      MouseArea { anchors.fill: parent; onClicked: (mouse) => { if (modelData.length > 0) modelData.position = modelData.length * (mouse.x / width); } }
-                    }
-                    Item { Layout.preferredHeight: 5 }
-                    RowLayout { 
-                      spacing: 30
-                      Layout.alignment: Qt.AlignHCenter
-                      Rectangle { width: 40; height: 40; radius: 20; color: prevHover.containsMouse ? Colors.surface : "transparent"; Text { text: "󰒮"; color: Colors.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 24; anchors.centerIn: parent } MouseArea { id: prevHover; anchors.fill: parent; hoverEnabled: true; onClicked: modelData.previous() } }
-                      Rectangle { width: 50; height: 50; radius: 25; color: Colors.primary; Text { text: modelData.playbackState === Mpris.Playing ? "󰏤" : "󰐊"; color: Colors.background; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 28; anchors.centerIn: parent } MouseArea { anchors.fill: parent; onClicked: modelData.playPause() } }
-                      Rectangle { width: 40; height: 40; radius: 20; color: nextHover.containsMouse ? Colors.surface : "transparent"; Text { text: "󰒭"; color: Colors.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 24; anchors.centerIn: parent } MouseArea { id: nextHover; anchors.fill: parent; hoverEnabled: true; onClicked: modelData.next() } }
-                    }
-                  }
-                }
-              }
-            }
-            Text { visible: Mpris.players.length === 0; text: "No active media players found."; color: Colors.textDisabled; font.pixelSize: 18; Layout.alignment: Qt.AlignHCenter; Layout.topMargin: 40 }
-          }
-        }
-      }
-      Rectangle { width: 1; Layout.fillHeight: true; color: Colors.border; visible: mode !== "media" && mode !== "system" && mode !== "nixos" }
-      Rectangle {
-        width: mode === "ai" ? 400 : 250; Layout.fillHeight: true; color: "transparent"; visible: mode !== "media" && mode !== "system" && mode !== "nixos"
-        Behavior on width { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+
+        // Media View
         ColumnLayout {
-          anchors.fill: parent; anchors.margins: 20; spacing: 15
-          property var currentItem: launcherRoot.filteredItems.length > 0 && launcherRoot.selectedIndex >= 0 && launcherRoot.selectedIndex < launcherRoot.filteredItems.length ? launcherRoot.filteredItems[launcherRoot.selectedIndex] : null
-          onCurrentItemChanged: { if (mode === "files" && currentItem && currentItem.fullPath) { if (!currentItem.fullPath.match(/\.(jpg|jpeg|png|webp|gif|pdf|zip|tar|gz|mp4|mkv|mp3|flac|wav)$/i)) { filePreviewProc.command = ["head", "-n", "15", currentItem.fullPath]; filePreviewProc.running = true; } else previewTextContent.text = "Binary or media file."; } else if (mode !== "ai") previewTextContent.text = ""; }
-          Process { id: filePreviewProc; command: ["echo", ""]; running: false; stdout: StdioCollector { onStreamFinished: { if (mode === "files") previewTextContent.text = this.text; } } }
-          Rectangle {
-            width: mode === "wallpapers" || (mode === "files" && parent.currentItem && parent.currentItem.fullPath && parent.currentItem.fullPath.match(/\.(jpg|jpeg|png|webp)$/i)) ? 210 : 128; height: mode === "wallpapers" || (mode === "files" && parent.currentItem && parent.currentItem.fullPath && parent.currentItem.fullPath.match(/\.(jpg|jpeg|png|webp)$/i)) ? 140 : 128; radius: Colors.radiusMedium; color: Colors.surface; Layout.alignment: Qt.AlignHCenter
-            Image { id: previewIcon; anchors.fill: parent; anchors.margins: (mode === "wallpapers" || (mode === "files" && parent.parent.currentItem && parent.parent.currentItem.fullPath && parent.parent.currentItem.fullPath.match(/\.(jpg|jpeg|png|webp)$/i))) ? 0 : 10; source: parent.parent.currentItem ? (parent.parent.currentItem.path ? "file://" + parent.parent.currentItem.path : (parent.parent.currentItem.icon && parent.parent.currentItem.icon.startsWith("/") ? "file://" + parent.parent.currentItem.icon : (mode === "files" && parent.parent.currentItem.fullPath && parent.parent.currentItem.fullPath.match(/\.(jpg|jpeg|png|webp)$/i) ? "file://" + parent.parent.currentItem.fullPath : ""))) : ""; fillMode: Image.PreserveAspectFit; visible: source != "" && status === Image.Ready }
-            Text { anchors.centerIn: parent; text: mode === "window" ? "󱗼" : (mode === "run" ? "" : (mode === "emoji" ? (parent.parent.currentItem ? parent.parent.currentItem.name : "") : (mode === "clip" ? "󰅍" : (mode === "files" ? "󰈔" : (mode === "ai" ? "󰚩" : (mode === "bookmarks" ? "󰖟" : "󰀻")))))); color: mode === "emoji" ? Colors.fgMain : Colors.textSecondary; font.family: (mode === "emoji" || mode === "ai" || mode === "bookmarks") ? "Noto Color Emoji" : "JetBrainsMono Nerd Font"; font.pixelSize: 64; visible: !previewIcon.visible }
-          }
-          Text { text: parent.currentItem ? (mode === "drun" ? parent.currentItem.name : (mode === "window" ? parent.currentItem.title : (mode === "emoji" ? parent.currentItem.title : (mode === "clip" ? "Clipboard Item" : (mode === "wallpapers" ? "Wallpaper Preview" : (mode === "files" ? parent.currentItem.name : (mode === "ai" ? parent.currentItem.name : (mode === "bookmarks" ? parent.currentItem.name : parent.currentItem.name)))))))) : ""; color: Colors.text; font.pixelSize: 18; font.weight: Font.Bold; Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter; wrapMode: Text.Wrap; maximumLineCount: 3; elide: Text.ElideRight }
-          Text { id: subTextItem; text: parent.currentItem ? (mode === "drun" ? parent.currentItem.exec : (mode === "window" ? parent.currentItem.class : (mode === "clip" ? parent.currentItem.name : (mode === "wallpapers" ? parent.currentItem.name : (mode === "files" ? parent.currentItem.title : (mode === "ai" ? parent.currentItem.title : (mode === "bookmarks" ? parent.currentItem.exec : ""))))))) : ""; color: Colors.textSecondary; font.pixelSize: 12; Layout.fillWidth: true; horizontalAlignment: (mode === "clip" || mode === "files" || mode === "bookmarks" || mode === "ai") ? Text.AlignLeft : Text.AlignHCenter; wrapMode: Text.Wrap; maximumLineCount: mode === "clip" ? 10 : 2; elide: Text.ElideRight; visible: text !== "" && mode !== "emoji" }
-          Rectangle { Layout.fillWidth: true; height: 1; color: Colors.border; Layout.topMargin: 10; Layout.bottomMargin: 10 }
-          
-          Flickable {
-            Layout.fillWidth: true; Layout.fillHeight: true; clip: true; contentHeight: previewTextContent.implicitHeight; visible: (mode === "files" || mode === "ai") && previewTextContent.text !== ""
-            Text { 
-              id: previewTextContent
-              width: parent.width; color: Colors.textSecondary; font.pixelSize: mode === "ai" ? 13 : 10; font.family: "JetBrainsMono Nerd Font"; wrapMode: Text.Wrap; 
-              text: (mode === "ai" && parent.parent.currentItem) ? (parent.parent.currentItem.body || "") : "" 
+          spacing: 15
+          Repeater {
+            model: Mpris.players
+            delegate: Rectangle {
+                Layout.fillWidth: true; height: 120; color: Colors.bgWidget; radius: Colors.radiusMedium; border.color: Colors.border; border.width: 1
+                RowLayout {
+                    anchors.fill: parent; anchors.margins: Colors.paddingMedium; spacing: 15
+                    Rectangle { width: 90; height: 90; radius: 8; color: Colors.surface; clip: true
+                        Image { anchors.fill: parent; source: modelData.trackArtUrl || ""; fillMode: Image.PreserveAspectCrop }
+                    }
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        Text { text: modelData.trackTitle || "Unknown"; color: Colors.text; font.pixelSize: 16; font.weight: Font.Bold; elide: Text.ElideRight }
+                        Text { text: modelData.trackArtist || "Unknown"; color: Colors.textSecondary; font.pixelSize: 12 }
+                        Item { Layout.fillHeight: true }
+                        RowLayout {
+                            spacing: 15
+                            Text { text: "󰒮"; color: Colors.text; font.family: Colors.fontMono; font.pixelSize: 18; MouseArea { anchors.fill: parent; onClicked: modelData.previous() } }
+                            Text { text: modelData.playbackState === Mpris.Playing ? "󰏤" : "󰐊"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 24; MouseArea { anchors.fill: parent; onClicked: modelData.playPause() } }
+                            Text { text: "󰒭"; color: Colors.text; font.family: Colors.fontMono; font.pixelSize: 18; MouseArea { anchors.fill: parent; onClicked: modelData.next() } }
+                        }
+                    }
+                }
             }
           }
-          
-          Text { text: mode === "drun" ? "Press Enter to launch" : (mode === "window" ? "Press Enter to focus" : (mode === "emoji" || mode === "clip" ? "Press Enter to copy" : (mode === "wallpapers" ? "Press Enter to apply" : (mode === "files" ? "Press Enter to open" : (mode === "ai" ? (parent.currentItem && parent.currentItem.body ? "Press Enter to copy" : "Press Enter to ask AI") : (mode === "bookmarks" ? "Press Enter to open" : "Press Enter to run")))))); color: Colors.textDisabled; font.pixelSize: 12; Layout.alignment: Qt.AlignHCenter }
-          Item { Layout.fillHeight: true; visible: mode !== "files" && mode !== "ai" }
         }
       }
     }
+
+    // Confirmation Overlay
     Rectangle {
-      id: confirmOverlay; anchors.fill: parent; visible: launcherRoot.showingConfirm; color: Qt.rgba(Colors.background.r, Colors.background.g, Colors.background.b, 0.95); radius: Colors.radiusLarge
+      id: confirmOverlay; anchors.fill: parent; visible: launcherRoot.showingConfirm; color: Colors.withAlpha(Colors.background, 0.9); radius: Colors.radiusLarge
       ColumnLayout {
-        anchors.centerIn: parent; spacing: 30
-        Text { text: launcherRoot.confirmTitle; color: Colors.text; font.pixelSize: 24; font.bold: true; Layout.alignment: Qt.AlignHCenter }
-        RowLayout { spacing: 20; Layout.alignment: Qt.AlignHCenter
-          Rectangle { width: 120; height: 45; color: Colors.error; radius: Colors.radiusSmall; Text { text: "Yes"; color: "white"; anchors.centerIn: parent; font.bold: true } MouseArea { anchors.fill: parent; onClicked: launcherRoot.doConfirm() } }
-          Rectangle { width: 120; height: 45; color: Colors.surface; radius: Colors.radiusSmall; Text { text: "No"; color: Colors.text; anchors.centerIn: parent; font.bold: true } MouseArea { anchors.fill: parent; onClicked: launcherRoot.cancelConfirm() } }
+        anchors.centerIn: parent; spacing: 25
+        Text { text: launcherRoot.confirmTitle; color: Colors.text; font.pixelSize: 20; font.bold: true; Layout.alignment: Qt.AlignHCenter }
+        RowLayout { spacing: 15; Layout.alignment: Qt.AlignHCenter
+          Rectangle { width: 100; height: 40; color: Colors.error; radius: 20; Text { text: "Yes"; color: "white"; anchors.centerIn: parent; font.bold: true } MouseArea { anchors.fill: parent; onClicked: launcherRoot.doConfirm() } }
+          Rectangle { width: 100; height: 40; color: Colors.surface; radius: 20; Text { text: "No"; color: Colors.text; anchors.centerIn: parent; font.bold: true } MouseArea { anchors.fill: parent; onClicked: launcherRoot.cancelConfirm() } }
         }
-        Text { text: "Press Enter for Yes, Esc for No"; color: Colors.textSecondary; font.pixelSize: 12; Layout.alignment: Qt.AlignHCenter }
       }
       Keys.onPressed: (event) => { if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) launcherRoot.doConfirm(); else if (event.key === Qt.Key_Escape) launcherRoot.cancelConfirm(); event.accepted = true; }
-      Component.onCompleted: forceActiveFocus(); onVisibleChanged: if (visible) forceActiveFocus()
     }
   }
 }
-  }

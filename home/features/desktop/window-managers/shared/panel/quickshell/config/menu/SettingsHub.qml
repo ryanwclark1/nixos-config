@@ -24,8 +24,18 @@ PanelWindow {
 
   property bool isOpen: false
   property string activeTab: "system" // system, appearance, layout
+  property real layoutGapsOut: 10
+  property real layoutGapsIn: 5
+  property real layoutActiveOpacity: 1.0
 
-  function open() { isOpen = true; }
+  function refreshHyprlandSettings() {
+    hyprStateProc.running = true;
+  }
+
+  function open() {
+    isOpen = true;
+    refreshHyprlandSettings();
+  }
   function close() { isOpen = false; }
   function toggle() { isOpen ? close() : open(); }
 
@@ -36,20 +46,59 @@ PanelWindow {
     function close() { settingsRoot.close(); }
   }
 
+  Process {
+    id: hyprStateProc
+    command: [
+      "sh",
+      "-c",
+      "hyprctl getoption general:gaps_out -j 2>/dev/null; "
+      + "printf '\\n'; "
+      + "hyprctl getoption general:gaps_in -j 2>/dev/null; "
+      + "printf '\\n'; "
+      + "hyprctl getoption decoration:active_opacity -j 2>/dev/null"
+    ]
+    running: false
+    stdout: StdioCollector {
+      onStreamFinished: {
+        var lines = (this.text || "").trim().split("\n");
+        try {
+          if (lines[0]) {
+            var gapsOut = JSON.parse(lines[0]);
+            settingsRoot.layoutGapsOut = gapsOut.int !== undefined ? gapsOut.int : settingsRoot.layoutGapsOut;
+          }
+          if (lines[1]) {
+            var gapsIn = JSON.parse(lines[1]);
+            settingsRoot.layoutGapsIn = gapsIn.int !== undefined ? gapsIn.int : settingsRoot.layoutGapsIn;
+          }
+          if (lines[2]) {
+            var activeOpacity = JSON.parse(lines[2]);
+            settingsRoot.layoutActiveOpacity = activeOpacity.float !== undefined ? activeOpacity.float : settingsRoot.layoutActiveOpacity;
+          }
+        } catch (e) {
+          console.error("Failed to parse Hyprland settings: " + e);
+        }
+      }
+    }
+  }
+
   // Backdrop
   MouseArea {
     anchors.fill: parent; onClicked: settingsRoot.close()
-    Rectangle { anchors.fill: parent; color: "#000000"; opacity: 0.5 }
+    Rectangle { anchors.fill: parent; color: Colors.background; opacity: 0.5 }
   }
 
   // Main Container
   Rectangle {
-    id: mainContainer
+    id: mainBox
     width: 750; height: 550
     anchors.centerIn: parent
     color: Colors.bgGlass
     border.color: Colors.border; border.width: 1; radius: Colors.radiusLarge
     clip: true
+
+    focus: settingsRoot.isOpen
+    onVisibleChanged: if (visible) forceActiveFocus()
+    Keys.onEscapePressed: settingsRoot.isOpen = false
 
     opacity: settingsRoot.isOpen ? 1.0 : 0.0
     scale: settingsRoot.isOpen ? 1.0 : 0.95
@@ -66,7 +115,7 @@ PanelWindow {
         Layout.preferredWidth: 200; Layout.fillHeight: true; color: Qt.rgba(0, 0, 0, 0.1)
         
         ColumnLayout {
-          anchors.fill: parent; anchors.margins: 24; spacing: 8
+          anchors.fill: parent; anchors.margins: Colors.paddingLarge; spacing: 8
           
           Text { 
             text: "SETTINGS"
@@ -89,7 +138,7 @@ PanelWindow {
             
             RowLayout {
               anchors.centerIn: parent; spacing: 8
-              Text { text: "󰆓"; color: "white"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 14 }
+              Text { text: "󰆓"; color: "white"; font.family: Colors.fontMono; font.pixelSize: 14 }
               Text { text: "Save & Close"; color: "white"; font.weight: Font.Bold; font.pixelSize: 12 }
             }
             
@@ -107,19 +156,43 @@ PanelWindow {
         Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: 32; spacing: 24
 
         Text {
-          text: activeTab === "system" ? "System Controls" : (activeTab === "appearance" ? "UI Appearance" : "Hyprland Layout")
+          text: activeTab === "system" ? "Shell Behavior" : (activeTab === "appearance" ? "UI Appearance" : "Hyprland Layout")
           color: Colors.fgMain; font.pixelSize: 26; font.weight: Font.Bold; font.letterSpacing: -0.5
         }
 
         // --- SYSTEM TAB ---
-        GridLayout {
+        ColumnLayout {
           visible: activeTab === "system"
-          columns: 2; columnSpacing: 16; rowSpacing: 16; Layout.fillWidth: true
-          
-          ToggleCard { label: "Animations"; icon: "󰢹"; property: "animState" }
-          ToggleCard { label: "Auto Idle"; icon: "󰒲"; property: "idleState" }
-          ToggleCard { label: "Night Light"; icon: "󰖔"; property: "nightLightState" }
-          ToggleCard { label: "Blur Effects"; icon: "󰃠"; property: "blurEnabled"; isConfig: true }
+          spacing: 24
+          Layout.fillWidth: true
+
+          GridLayout {
+            columns: 2
+            columnSpacing: 16
+            rowSpacing: 16
+            Layout.fillWidth: true
+
+            ToggleCard { label: "Floating Bar"; icon: "󰖲"; configKey: "barFloating" }
+            ToggleCard { label: "Blur Effects"; icon: "󰃠"; configKey: "blurEnabled" }
+          }
+
+          ConfigSlider {
+            label: "Notification Width"
+            min: 280
+            max: 520
+            value: Config.notifWidth
+            onMoved: (v) => Config.notifWidth = v
+          }
+
+          ConfigSlider {
+            label: "Popup Duration"
+            min: 2000
+            max: 10000
+            step: 500
+            value: Config.popupTimer
+            unit: "ms"
+            onMoved: (v) => Config.popupTimer = v
+          }
         }
 
         // --- APPEARANCE TAB ---
@@ -129,6 +202,7 @@ PanelWindow {
 
           ConfigSlider { label: "Bar Height"; min: 20; max: 60; value: Config.barHeight; onMoved: (v) => Config.barHeight = v }
           ConfigSlider { label: "Bar Margin"; min: 0; max: 40; value: Config.barMargin; onMoved: (v) => Config.barMargin = v }
+          ConfigSlider { label: "Bar Opacity"; min: 0.3; max: 1.0; value: Config.barOpacity; step: 0.05; unit: "%"; onMoved: (v) => Config.barOpacity = v }
           ConfigSlider { label: "Glass Opacity"; min: 0.1; max: 1.0; value: Config.glassOpacity; step: 0.05; onMoved: (v) => Config.glassOpacity = v }
           
           RowLayout {
@@ -154,20 +228,29 @@ PanelWindow {
 
           ConfigSlider { 
             label: "Outer Gaps"
-            min: 0; max: 50; value: 10
-            onMoved: (v) => Quickshell.execDetached(["hyprctl", "keyword", "general:gaps_out", v.toString()])
+            min: 0; max: 50; value: settingsRoot.layoutGapsOut
+            onMoved: (v) => {
+              settingsRoot.layoutGapsOut = v;
+              Quickshell.execDetached(["hyprctl", "keyword", "general:gaps_out", v.toString()]);
+            }
           }
 
           ConfigSlider { 
             label: "Inner Gaps"
-            min: 0; max: 30; value: 5
-            onMoved: (v) => Quickshell.execDetached(["hyprctl", "keyword", "general:gaps_in", v.toString()])
+            min: 0; max: 30; value: settingsRoot.layoutGapsIn
+            onMoved: (v) => {
+              settingsRoot.layoutGapsIn = v;
+              Quickshell.execDetached(["hyprctl", "keyword", "general:gaps_in", v.toString()]);
+            }
           }
 
           ConfigSlider { 
             label: "Active Opacity"
-            min: 0.5; max: 1.0; value: 1.0; step: 0.05
-            onMoved: (v) => Quickshell.execDetached(["hyprctl", "keyword", "decoration:active_opacity", v.toString()])
+            min: 0.5; max: 1.0; value: settingsRoot.layoutActiveOpacity; step: 0.05
+            onMoved: (v) => {
+              settingsRoot.layoutActiveOpacity = v;
+              Quickshell.execDetached(["hyprctl", "keyword", "decoration:active_opacity", v.toString()]);
+            }
           }
         }
 
@@ -186,7 +269,7 @@ PanelWindow {
         Text { 
           text: icon
           color: activeTab === tabId ? Colors.primary : Colors.fgDim
-          font.family: "JetBrainsMono Nerd Font"
+          font.family: Colors.fontMono
           font.pixelSize: 18
         }
         Text { 
@@ -206,15 +289,21 @@ PanelWindow {
     }
 
     component ConfigSlider: ColumnLayout {
-      property string label; property real min; property real max; property real value; property real step: 1; signal moved(real v)
+      property string label
+      property real min
+      property real max
+      property real value
+      property real step: 1
+      property string unit: step < 1 ? "%" : "px"
+      signal moved(real v)
       spacing: 12; Layout.fillWidth: true
       
       RowLayout {
         Text { text: label; color: Colors.fgMain; font.pixelSize: 13; font.weight: Font.Medium }
         Item { Layout.fillWidth: true }
         Text { 
-          text: (step < 1 ? Math.round(value * 100) : Math.round(value)) + (step < 1 ? "%" : "px")
-          color: Colors.fgSecondary; font.pixelSize: 11; font.family: "JetBrainsMono Nerd Font" 
+          text: (step < 1 ? Math.round(value * 100) : Math.round(value)) + unit
+          color: Colors.fgSecondary; font.pixelSize: 11; font.family: Colors.fontMono 
         }
       }
       
@@ -225,10 +314,14 @@ PanelWindow {
         }
         MouseArea {
           anchors.fill: parent
-          onPressed: (mouse) => {
+          function updateValue(mouse) {
             var raw = min + (mouse.x / width) * (max - min);
-            var val = step < 1 ? Math.round(raw/step)*step : Math.round(raw);
+            var val = step < 1 ? Math.round(raw / step) * step : Math.round(raw / step) * step;
             moved(Math.max(min, Math.min(max, val)));
+          }
+          onPressed: (mouse) => updateValue(mouse)
+          onPositionChanged: (mouse) => {
+            if (pressed) updateValue(mouse);
           }
         }
       }
@@ -248,10 +341,12 @@ PanelWindow {
     }
 
     component ToggleCard: Rectangle {
-      property string label; property string icon; property string property; property bool isConfig: false
+      property string label
+      property string icon
+      property string configKey
       Layout.fillWidth: true; height: 64; color: Colors.bgWidget; radius: 12; border.color: Colors.border; border.width: 1
       
-      property bool active: isConfig ? Config[property] : false
+      property bool active: configKey ? Config[configKey] : false
       
       RowLayout {
         anchors.fill: parent; anchors.margins: 16; spacing: 16
@@ -262,7 +357,7 @@ PanelWindow {
             anchors.centerIn: parent
             text: icon
             color: active ? Colors.primary : Colors.fgDim
-            font.family: "JetBrainsMono Nerd Font"
+            font.family: Colors.fontMono
             font.pixelSize: 18
           }
         }
@@ -275,7 +370,7 @@ PanelWindow {
           Layout.fillWidth: true 
         }
         
-        Switch { checked: active; onToggled: { if(isConfig) Config[property] = !Config[property]; } }
+        Switch { checked: active; onToggled: { if (configKey) Config[configKey] = !Config[configKey]; } }
       }
     }
   }

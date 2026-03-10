@@ -1,13 +1,14 @@
 import Quickshell
 import QtQuick
+import "../../services"
 
 Row {
   id: root
 
   property var state: null
-  property color activeColor: "#3a3f44"
-  property color inactiveColor: "#2a2d31"
-  property color textColor: "#e6e6e6"
+  property color activeColor: Colors.highlight
+  property color inactiveColor: Colors.surface
+  property color textColor: Colors.fgMain
 
   spacing: 6
 

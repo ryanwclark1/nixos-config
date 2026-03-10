@@ -19,8 +19,6 @@ Rectangle {
     id: fetchProcs
     command: ["sh", "-c", "ps -eo comm,pcpu,pmem --sort=-pcpu | head -n 6 | tail -n 5 | awk '{print $1 \":\" $2 \":\" $3}'"]
     running: true
-    repeat: true
-    interval: 3000
     stdout: StdioCollector {
       onStreamFinished: {
         var lines = (this.text || "").trim().split("\n");
@@ -34,10 +32,17 @@ Rectangle {
     }
   }
 
+  Timer {
+    interval: 3000
+    running: true
+    repeat: true
+    onTriggered: fetchProcs.running = true
+  }
+
   ColumnLayout {
     id: col
     anchors.fill: parent
-    anchors.margins: 15
+    anchors.margins: Colors.paddingMedium
     spacing: 10
 
     Text { text: "TOP PROCESSES"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
@@ -54,8 +59,8 @@ Rectangle {
           width: parent.width; height: 35; color: Colors.highlightLight; radius: 6
           
           RowLayout {
-            anchors.fill: parent; anchors.margins: 10; spacing: 10
-            Text { text: "󰆍"; color: Colors.primary; font.family: "JetBrainsMono Nerd Font" }
+            anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: 10
+            Text { text: "󰆍"; color: Colors.primary; font.family: Colors.fontMono }
             Text { text: modelData.name; color: Colors.text; font.pixelSize: 11; font.weight: Font.Medium; Layout.fillWidth: true; elide: Text.ElideRight }
             Text { text: modelData.cpu + "% CPU"; color: Colors.textSecondary; font.pixelSize: 9; font.family: Colors.fontMono }
             

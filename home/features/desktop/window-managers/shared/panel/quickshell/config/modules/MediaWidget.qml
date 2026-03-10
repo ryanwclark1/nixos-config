@@ -47,7 +47,7 @@ Rectangle {
             anchors.centerIn: parent
             text: "󰝚"
             color: Colors.fgDim
-            font.family: "JetBrainsMono Nerd Font"
+            font.family: Colors.fontMono
             font.pixelSize: 32
             visible: parent.children[0].status !== Image.Ready
           }
@@ -111,7 +111,7 @@ Rectangle {
             // Previous
             MouseArea {
               width: 24; height: 24
-              Text { text: "󰒮"; color: Colors.fgMain; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18; anchors.centerIn: parent }
+              Text { text: "󰒮"; color: Colors.fgMain; font.family: Colors.fontMono; font.pixelSize: 18; anchors.centerIn: parent }
               onClicked: modelData.previous()
             }
 
@@ -125,7 +125,7 @@ Rectangle {
                 Text { 
                   text: modelData.playbackState === Mpris.Playing ? "󰏤" : "󰐊"
                   color: Colors.fgMain
-                  font.family: "JetBrainsMono Nerd Font"
+                  font.family: Colors.fontMono
                   font.pixelSize: 14
                   anchors.centerIn: parent
                 }
@@ -136,7 +136,7 @@ Rectangle {
             // Next
             MouseArea {
               width: 24; height: 24
-              Text { text: "󰒭"; color: Colors.fgMain; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18; anchors.centerIn: parent }
+              Text { text: "󰒭"; color: Colors.fgMain; font.family: Colors.fontMono; font.pixelSize: 18; anchors.centerIn: parent }
               onClicked: modelData.next()
             }
           }

@@ -57,7 +57,7 @@ Rectangle {
 
   ColumnLayout {
     anchors.fill: parent
-    anchors.margins: 15
+    anchors.margins: Colors.paddingMedium
     spacing: 10
 
     Text { 

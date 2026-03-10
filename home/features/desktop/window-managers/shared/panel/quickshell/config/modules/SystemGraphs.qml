@@ -1,7 +1,5 @@
 import QtQuick
 import QtQuick.Layouts
-import Quickshell
-import Quickshell.Io
 import "../services"
 
 Rectangle {
@@ -17,46 +15,20 @@ Rectangle {
   property var memHistory: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
   Timer {
-    interval: 1000
+    interval: 2000
     running: true
     repeat: true
-    onTriggered: updateStats()
-  }
-
-  Process {
-    id: cpuProc
-    command: ["sh", "-c", "top -bn1 | awk '/Cpu\\(s\\):/ {printf \"%d\", 100 - $8}'"]
-    stdout: StdioCollector {
-      onStreamFinished: {
-        var val = parseFloat(this.text.trim()) / 100;
-        if (isNaN(val)) return;
-        var hist = cpuHistory; hist.shift(); hist.push(val); cpuHistory = hist;
-        cpuCanvas.requestPaint();
-      }
+    onTriggered: {
+      var h = root.cpuHistory; h.shift(); h.push(SystemStatus.cpuPercent); root.cpuHistory = h;
+      cpuCanvas.requestPaint();
+      var m = root.memHistory; m.shift(); m.push(SystemStatus.ramPercent); root.memHistory = m;
+      memCanvas.requestPaint();
     }
-  }
-
-  Process {
-    id: memProc
-    command: ["sh", "-c", "free | awk '/^Mem:/ {print $3/$2}'"]
-    stdout: StdioCollector {
-      onStreamFinished: {
-        var val = parseFloat(this.text.trim());
-        if (isNaN(val)) return;
-        var hist = memHistory; hist.shift(); hist.push(val); memHistory = hist;
-        memCanvas.requestPaint();
-      }
-    }
-  }
-
-  function updateStats() {
-    if (!cpuProc.running) cpuProc.running = true;
-    if (!memProc.running) memProc.running = true;
   }
 
   RowLayout {
     anchors.fill: parent
-    anchors.margins: 15
+    anchors.margins: Colors.paddingMedium
     spacing: 20
 
     // CPU Graph
@@ -78,12 +50,12 @@ Rectangle {
           var ctx = getContext("2d");
           ctx.reset();
           var w = width / (root.cpuHistory.length - 1);
-          
+
           // Gradient fill
           var grad = ctx.createLinearGradient(0, 0, 0, height);
-          grad.addColorStop(0, Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.3));
-          grad.addColorStop(1, Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0));
-          
+          grad.addColorStop(0, Colors.withAlpha(Colors.primary, 0.3));
+          grad.addColorStop(1, Colors.withAlpha(Colors.primary, 0));
+
           ctx.beginPath();
           ctx.moveTo(0, height);
           for (var i = 0; i < root.cpuHistory.length; i++) {
@@ -127,11 +99,11 @@ Rectangle {
           var ctx = getContext("2d");
           ctx.reset();
           var w = width / (root.memHistory.length - 1);
-          
+
           var grad = ctx.createLinearGradient(0, 0, 0, height);
-          grad.addColorStop(0, Qt.rgba(Colors.accent.r, Colors.accent.g, Colors.accent.b, 0.3));
-          grad.addColorStop(1, Qt.rgba(Colors.accent.r, Colors.accent.g, Colors.accent.b, 0));
-          
+          grad.addColorStop(0, Colors.withAlpha(Colors.accent, 0.3));
+          grad.addColorStop(1, Colors.withAlpha(Colors.accent, 0));
+
           ctx.beginPath();
           ctx.moveTo(0, height);
           for (var i = 0; i < root.memHistory.length; i++) {

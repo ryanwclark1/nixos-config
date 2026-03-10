@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Wayland
 import Quickshell.Io
 import Quickshell.Services.Pam
+import Quickshell.Services.UPower
 import "../services"
 import "../modules"
 
@@ -21,10 +22,22 @@ PanelWindow {
   property bool isLocked: false
   visible: isLocked
 
+  SystemClock {
+    id: lockClock
+    precision: SystemClock.Minutes
+  }
+
   WlrLayershell.layer: WlrLayer.Overlay
   WlrLayershell.keyboardFocus: root.isLocked ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
   WlrLayershell.namespace: "quickshell-lock"
-  WlrLayershell.blur: Config.blurEnabled
+
+  onIsLockedChanged: {
+    if (isLocked) {
+      pwInput.forceActiveFocus();
+    } else {
+      pwInput.text = "";
+    }
+  }
 
   Item {
     anchors.fill: parent
@@ -53,43 +66,46 @@ PanelWindow {
 
     Rectangle {
       anchors.fill: parent
-      color: "#000000"
+      color: Colors.background
       opacity: 0.6
     }
-    // Top: Time & Date
-    ColumnLayout {
-      Layout.alignment: Qt.AlignHCenter
+
+    Column {
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.top: parent.top
+      anchors.topMargin: 120
       spacing: 5
+
       Text {
-        text: Qt.formatDateTime(new Date(), "HH:mm")
+        text: Qt.formatDateTime(lockClock.date, "HH:mm")
         color: Colors.fgMain; font.pixelSize: 120; font.weight: Font.Bold
+        horizontalAlignment: Text.AlignHCenter
       }
       Text {
-        text: Qt.formatDateTime(new Date(), "dddd, MMMM d")
-        color: Colors.fgSecondary; font.pixelSize: 24; Layout.alignment: Qt.AlignHCenter
+        text: Qt.formatDateTime(lockClock.date, "dddd, MMMM d")
+        color: Colors.fgSecondary; font.pixelSize: 24
+        horizontalAlignment: Text.AlignHCenter
       }
     }
 
-    Item { Layout.fillHeight: true }
-
     // Middle: Auth Area
-    ColumnLayout {
+    Column {
       id: authArea
-      Layout.alignment: Qt.AlignHCenter
+      anchors.centerIn: parent
       spacing: 20
-      
       width: 300
 
       Rectangle {
-        Layout.fillWidth: true; height: 50; color: "#1affffff"; radius: 12
+        width: parent.width; height: 50; color: Colors.highlightLight; radius: 12
         border.color: pwInput.activeFocus ? Colors.primary : Colors.border
         border.width: 1
 
         TextInput {
-          id: pwInput; anchors.fill: parent; anchors.margins: 15; verticalAlignment: Text.AlignVCenter
-          color: "white"; font.pixelSize: 18; echoMode: TextInput.Password; focus: root.isLocked
+          id: pwInput; anchors.fill: parent; anchors.margins: Colors.paddingMedium; verticalAlignment: Text.AlignVCenter
+          color: Colors.text; font.pixelSize: 18; echoMode: TextInput.Password; focus: root.isLocked
           
           Keys.onReturnPressed: pam.authenticate(text)
+          Keys.onEscapePressed: text = ""
         }
         
         Text {
@@ -100,23 +116,24 @@ PanelWindow {
 
       Text {
         text: "Type password and press Enter"
-        color: Colors.textDisabled; font.pixelSize: 11; Layout.alignment: Qt.AlignHCenter
+        color: Colors.textDisabled; font.pixelSize: 11
+        anchors.horizontalCenter: parent.horizontalCenter
       }
     }
 
     SequentialAnimation {
       id: shakeAnim
-      PropertyAnimation { target: authArea; property: "anchors.horizontalCenterOffset"; from: 0; to: 10; duration: 50 }
-      PropertyAnimation { target: authArea; property: "anchors.horizontalCenterOffset"; from: 10; to: -10; duration: 50 }
-      PropertyAnimation { target: authArea; property: "anchors.horizontalCenterOffset"; from: -10; to: 0; duration: 50 }
+      PropertyAnimation { target: authArea; property: "x"; from: authArea.x; to: authArea.x + 10; duration: 50 }
+      PropertyAnimation { target: authArea; property: "x"; from: authArea.x + 10; to: authArea.x - 10; duration: 50 }
+      PropertyAnimation { target: authArea; property: "x"; from: authArea.x - 10; to: authArea.x; duration: 50 }
     }
-
-    Item { Layout.fillHeight: true }
 
     // Bottom: Widgets
     RowLayout {
-      Layout.fillWidth: true
-      Layout.alignment: Qt.AlignBottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.bottom: parent.bottom
+      anchors.margins: 40
       spacing: 40
 
       // Integrated Media
@@ -128,7 +145,12 @@ PanelWindow {
       RowLayout {
         spacing: 20
         SystemMonitor {}
-        Text { text: "󰁹 85%"; color: Colors.fgSecondary; font.family: Colors.fontMono }
+        Text {
+          visible: UPower.displayDevice && UPower.displayDevice.isPresent
+          text: UPower.displayDevice ? "󰁹 " + Math.round(UPower.displayDevice.percentage * 100) + "%" : ""
+          color: Colors.fgSecondary
+          font.family: Colors.fontMono
+        }
       }
     }
   }

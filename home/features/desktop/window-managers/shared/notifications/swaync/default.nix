@@ -7,7 +7,7 @@
   imports = [ ./style.css.nix ];
 
   services.swaync = {
-    enable = true;
+    enable = false;
     settings = {
       ### Popup positioning (notifications)
       positionX = "right";

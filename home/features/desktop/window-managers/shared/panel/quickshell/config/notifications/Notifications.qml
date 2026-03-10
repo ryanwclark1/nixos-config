@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.Notifications
+import Quickshell.Widgets
 import Quickshell.Wayland
 import "../services"
 
@@ -15,16 +16,18 @@ PanelWindow {
   margins.top: 40
   margins.right: 12
 
-  implicitWidth: 350
+  implicitWidth: Config.notifWidth
   implicitHeight: col.implicitHeight
   color: "transparent"
-  mask: Region {}
+  mask: Region {
+    item: col
+  }
 
   property var manager: null
 
   ColumnLayout {
     id: col
-    width: 350
+    width: Config.notifWidth
     spacing: 10
     
     Repeater {
@@ -33,11 +36,11 @@ PanelWindow {
       delegate: Rectangle {
         id: notifDelegate
         visible: !modelData.dismissed && (!root.manager || !root.manager.dndEnabled || isUrgent)
-        Layout.preferredWidth: 350
+        Layout.preferredWidth: Config.notifWidth
         Layout.preferredHeight: visible ? colMain.implicitHeight + 20 : 0
         
         // Use Colors singleton
-        color: isUrgent ? Qt.rgba(Colors.error.r, Colors.error.g, Colors.error.b, 0.8) : Colors.bgGlass
+        color: isUrgent ? Colors.withAlpha(Colors.error, 0.8) : Colors.bgGlass
         border.color: isUrgent ? Colors.error : Colors.border
         border.width: isUrgent ? 2 : 1
         radius: Colors.radiusLarge
@@ -50,8 +53,8 @@ PanelWindow {
         SequentialAnimation on border.color {
           running: notifDelegate.isUrgent
           loops: Animation.Infinite
-          ColorAnimation { from: Colors.error; to: "#ff0000"; duration: 800 }
-          ColorAnimation { from: "#ff0000"; to: Colors.error; duration: 800 }
+          ColorAnimation { from: Colors.error; to: Qt.lighter(Colors.error, 1.4); duration: 800 }
+          ColorAnimation { from: Qt.lighter(Colors.error, 1.4); to: Colors.error; duration: 800 }
         }
 
         Column {
@@ -110,7 +113,7 @@ PanelWindow {
             width: parent.width - 24; height: 36; anchors.horizontalCenter: parent.horizontalCenter; color: Colors.highlightLight; radius: 8; visible: notifDelegate.isReplying
             border.color: replyInput.activeFocus ? Colors.primary : "transparent"; border.width: 1
             TextInput {
-              id: replyInput; anchors.fill: parent; anchors.margins: 10; verticalAlignment: Text.AlignVCenter; color: Colors.fgMain; font.pixelSize: 12
+              id: replyInput; anchors.fill: parent; anchors.margins: Colors.paddingSmall; verticalAlignment: Text.AlignVCenter; color: Colors.fgMain; font.pixelSize: 12
               Keys.onReturnPressed: { modelData.invoke(replyInput.text); notifDelegate.modelData.dismiss(); }
               Keys.onEscapePressed: notifDelegate.isReplying = false
             }
@@ -142,7 +145,7 @@ PanelWindow {
         
         Timer {
           id: dismissTimer
-          interval: 5000
+          interval: Config.popupTimer
           running: !notifDelegate.isReplying && !notifDelegate.modelData.dismissed && !notifDelegate.isUrgent
           onTriggered: modelData.dismiss()
         }

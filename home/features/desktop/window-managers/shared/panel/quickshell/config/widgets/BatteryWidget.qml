@@ -1,28 +1,30 @@
 import QtQuick
 import Quickshell.Services.UPower
+import "../modules"
+import "../services"
 
 Row {
   spacing: 6
-  anchors.verticalCenter: parent.verticalCenter
 
   property var device: UPower.displayDevice
   property bool hasBattery: device != null && device.isPresent
-  property bool showBattery: hasBattery && device.isLaptopBattery
+  property bool showBattery: hasBattery && (device.kind === UPower.DeviceKindDisplayDevice || device.kind === UPower.DeviceKindBattery)
 
   visible: showBattery
 
-  Text {
-    text: showBattery ? (device.state == 1 ? "󰂄" : "󰁹") : "󰂑"
-    color: showBattery && device.state == 1 ? "#4caf50" : (showBattery && device.percentage < 0.2 ? "#f44336" : "#e6e6e6")
-    font.pixelSize: 16
-    font.family: "JetBrainsMono Nerd Font"
-    anchors.verticalCenter: parent.verticalCenter
+  CircularGauge {
+    value: device ? device.percentage : 0
+    color: device && device.state === UPower.DeviceStateCharging ? Colors.primary : (device && device.percentage < 0.2 ? Colors.error : Colors.fgMain)
+    icon: device ? (device.state === UPower.DeviceStateCharging ? "󰂄" : (device.percentage > 0.9 ? "󰁹" : (device.percentage > 0.5 ? "󰁿" : (device.percentage > 0.2 ? "󰁽" : "󰂃")))) : "󰂑"
+    thickness: 3
+    width: 20; height: 20
   }
 
   Text {
     text: showBattery ? Math.round(device.percentage * 100) + "%" : "100%"
-    color: "#e6e6e6"
-    font.pixelSize: 12
+    color: Colors.fgMain
+    font.pixelSize: 11
+    font.weight: Font.DemiBold
     anchors.verticalCenter: parent.verticalCenter
   }
 }

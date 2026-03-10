@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Services.Mpris
 import Quickshell.Widgets
 import Quickshell.Wayland
+import "../services"
 
 Scope {
 	id: root
@@ -67,13 +68,16 @@ Scope {
 				WlrLayershell.layer: WlrLayer.Overlay
 				WlrLayershell.namespace: "quickshell"
 
-				mask: Region {}
+				mask: Region {
+					item: content
+				}
 
 				Rectangle {
+					id: content
 					anchors.fill: parent
 					radius: 12
-					color: "#a6101014"
-					border.color: "#33ffffff"
+					color: Colors.bgGlass
+					border.color: Colors.border
 					border.width: 1
 
 					opacity: root.shouldShowOsd ? 1.0 : 0.0
@@ -81,7 +85,7 @@ Scope {
 
 					RowLayout {
 						anchors.fill: parent
-						anchors.margins: 10
+						anchors.margins: Colors.paddingSmall
 						spacing: 12
 
 						Image {
@@ -94,7 +98,7 @@ Scope {
 							Rectangle {
 								anchors.fill: parent
 								color: "transparent"
-								border.color: "#33ffffff"
+								border.color: Colors.border
 								border.width: 1
 								radius: 6
 							}
@@ -106,7 +110,7 @@ Scope {
 
 							Text {
 								text: root.trackTitle !== "" ? root.trackTitle : "No Media"
-								color: "white"
+								color: Colors.text
 								font.pointSize: 12
 								font.bold: true
 								elide: Text.ElideRight
@@ -115,7 +119,7 @@ Scope {
 
 							Text {
 								text: root.trackArtist !== "" ? root.trackArtist : "Unknown Artist"
-								color: "#cccccc"
+								color: Colors.textSecondary
 								font.pointSize: 10
 								elide: Text.ElideRight
 								Layout.fillWidth: true

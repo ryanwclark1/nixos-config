@@ -43,7 +43,7 @@ Rectangle {
 
   RowLayout {
     anchors.fill: parent
-    anchors.margins: 15
+    anchors.margins: Colors.paddingMedium
     spacing: 15
 
     // User Avatar placeholder
@@ -54,7 +54,7 @@ Rectangle {
       Text {
         anchors.centerIn: parent
         text: root.username.charAt(0).toUpperCase()
-        color: "#ffffff"
+        color: Colors.text
         font.pixelSize: 24
         font.weight: Font.Bold
       }

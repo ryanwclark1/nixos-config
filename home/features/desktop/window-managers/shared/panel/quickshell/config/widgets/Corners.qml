@@ -25,6 +25,7 @@ Scope {
             
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.namespace: "quickshell-corners"
+            WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
             exclusiveZone: -1
             
             // Allow clicks to pass through the corners to windows underneath

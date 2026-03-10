@@ -67,21 +67,21 @@
               "waybar.service"
             ];
           }
-          {
-            command = [
-              "sh"
-              "-c"
-              "systemctl --user reset-failed swaync.service || true"
-            ];
-          }
-          {
-            command = [
-              "systemctl"
-              "--user"
-              "start"
-              "swaync.service"
-            ];
-          }
+          # {
+          #   command = [
+          #     "sh"
+          #     "-c"
+          #     "systemctl --user reset-failed swaync.service || true"
+          #   ];
+          # }
+          # {
+          #   command = [
+          #     "systemctl"
+          #     "--user"
+          #     "start"
+          #     "swaync.service"
+          #   ];
+          # }
         ];
 
         prefer-no-csd = true;

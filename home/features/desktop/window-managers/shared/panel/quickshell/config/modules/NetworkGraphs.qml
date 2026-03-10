@@ -82,7 +82,7 @@ Rectangle {
 
   RowLayout {
     anchors.fill: parent
-    anchors.margins: 15
+    anchors.margins: Colors.paddingMedium
     spacing: 20
 
     ColumnLayout {

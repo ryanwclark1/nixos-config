@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "."
 
 pragma Singleton
 
@@ -27,13 +28,13 @@ QtObject {
   readonly property string fontMain: "Inter"
   readonly property string fontMono: "JetBrainsMono Nerd Font"
 
-  readonly property color border: Qt.rgba(text.r, text.g, text.b, 0.15)
-  readonly property color highlight: Qt.rgba(primary.r, primary.g, primary.b, 0.25)
-  readonly property color highlightLight: Qt.rgba(primary.r, primary.g, primary.b, 0.15)
+  readonly property color border: withAlpha(text, 0.15)
+  readonly property color highlight: withAlpha(primary, 0.25)
+  readonly property color highlightLight: withAlpha(primary, 0.15)
   
   // --- GLASSMORPHISM ---
-  readonly property real bgOpacity: 0.70
-  readonly property color bgGlass: Qt.rgba(background.r, background.g, background.b, bgOpacity)
+  readonly property real bgOpacity: Config.glassOpacity
+  readonly property color bgGlass: withAlpha(background, bgOpacity)
   readonly property color bgWidget: Qt.rgba(255, 255, 255, 0.08)
   
   // --- DIMENSIONS ---
@@ -45,14 +46,12 @@ QtObject {
   readonly property int paddingMedium: 15
   readonly property int paddingSmall: 10
 
+  function withAlpha(c, a) { return Qt.rgba(c.r, c.g, c.b, a); }
+
   function reloadColors() {
-    let home = Quickshell.env("HOME");
-    let colorsPath = home + "/.cache/wal/colors.json";
-    
     try {
-      let file = Quickshell.openFile(colorsPath, File.ReadOnly);
-      if (!file) return;
-      let content = file.readAll();
+      let content = walWatcher.text();
+      if (!content) return;
       let data = JSON.parse(content);
       
       background = data.special.background;
@@ -66,11 +65,8 @@ QtObject {
       textSecondary = data.colors.color7;
       textDisabled = data.colors.color8;
       
-      file.close();
-      // console.log("Quickshell colors reloaded from", colorsPath);
     } catch (e) {
       // It's fine if the file doesn't exist yet, we'll use defaults
-      // console.log("Dynamic colors not yet available at", colorsPath);
     }
   }
 
@@ -78,6 +74,7 @@ QtObject {
     path: Quickshell.env("HOME") + "/.cache/wal/colors.json"
     watchChanges: true
     onTextChanged: colors.reloadColors()
+    onLoaded: colors.reloadColors()
   }
 
   Component.onCompleted: {
