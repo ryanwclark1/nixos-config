@@ -66,13 +66,13 @@ case "$MODE" in
     # Setup FIFO
     fifo_path="/tmp/qs-dmenu-result"
     [ -p "$fifo_path" ] || mkfifo "$fifo_path"
-    
+    trap 'rm -f "$fifo_path"' EXIT
+
     # Send to Quickshell
     quickshell ipc call Launcher openDmenu "$json_items"
-    
+
     # Wait for result and output to stdout
     cat "$fifo_path"
-    rm "$fifo_path"
     ;;
   *)
     # Default to drun if no arguments

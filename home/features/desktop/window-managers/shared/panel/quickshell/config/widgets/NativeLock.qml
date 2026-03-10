@@ -1,8 +1,8 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Wayland
 import Quickshell.Io
+import Quickshell.Wayland
 import Quickshell.Services.Pam
 import Quickshell.Services.UPower
 import "../services"
@@ -95,6 +95,9 @@ PanelWindow {
       spacing: 20
       width: 300
 
+      property real shakeOffset: 0
+      transform: Translate { x: authArea.shakeOffset }
+
       Rectangle {
         width: parent.width; height: 50; color: Colors.highlightLight; radius: 12
         border.color: pwInput.activeFocus ? Colors.primary : Colors.border
@@ -103,11 +106,11 @@ PanelWindow {
         TextInput {
           id: pwInput; anchors.fill: parent; anchors.margins: Colors.paddingMedium; verticalAlignment: Text.AlignVCenter
           color: Colors.text; font.pixelSize: 18; echoMode: TextInput.Password; focus: root.isLocked
-          
+
           Keys.onReturnPressed: pam.authenticate(text)
           Keys.onEscapePressed: text = ""
         }
-        
+
         Text {
           anchors.centerIn: parent; text: "Unlock..."; color: Colors.fgDim; font.pixelSize: 16
           visible: !pwInput.text && !pwInput.activeFocus
@@ -123,9 +126,9 @@ PanelWindow {
 
     SequentialAnimation {
       id: shakeAnim
-      PropertyAnimation { target: authArea; property: "x"; from: authArea.x; to: authArea.x + 10; duration: 50 }
-      PropertyAnimation { target: authArea; property: "x"; from: authArea.x + 10; to: authArea.x - 10; duration: 50 }
-      PropertyAnimation { target: authArea; property: "x"; from: authArea.x - 10; to: authArea.x; duration: 50 }
+      PropertyAnimation { target: authArea; property: "shakeOffset"; to: 10; duration: 50 }
+      PropertyAnimation { target: authArea; property: "shakeOffset"; to: -10; duration: 50 }
+      PropertyAnimation { target: authArea; property: "shakeOffset"; to: 0; duration: 50 }
     }
 
     // Bottom: Widgets

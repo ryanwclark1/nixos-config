@@ -47,6 +47,7 @@ QtObject {
   readonly property int paddingSmall: 10
 
   function withAlpha(c, a) { return Qt.rgba(c.r, c.g, c.b, a); }
+  function clamp01(value) { return Math.max(0, Math.min(1, value)); }
 
   function reloadColors() {
     try {
@@ -76,9 +77,4 @@ QtObject {
     onTextChanged: colors.reloadColors()
     onLoaded: colors.reloadColors()
   }
-
-  Component.onCompleted: {
-    reloadColors();
-  }
-
 }

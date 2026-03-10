@@ -23,6 +23,6 @@ Rectangle {
 
   MouseArea {
     anchors.fill: parent
-    onClicked: Quickshell.execDetached([ "hyprctl", "dispatch", "togglespecialworkspace" ])
+    onClicked: Quickshell.execDetached([ "hyprctl", "dispatch", "togglespecialworkspace", "scratchpad" ])
   }
 }

@@ -7,7 +7,6 @@ subdirs = ["bar", "launcher", "menu", "modules", "notifications", "services", "w
 components_mapping = {
     "CenterModules": "bar",
     "Logo": "bar",
-    "NotificationsIndicator": "bar",
     "Panel": "bar",
     "Taskbar": "bar",
     "WindowTitle": "bar",

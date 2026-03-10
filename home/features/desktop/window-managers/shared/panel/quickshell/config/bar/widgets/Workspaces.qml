@@ -1,9 +1,8 @@
 import QtQuick
-import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
-import Quickshell.Wayland
 import "../../services"
+import "../../widgets" as SharedWidgets
 
 Rectangle {
   id: root
@@ -14,6 +13,20 @@ Rectangle {
   anchors.verticalCenter: parent.verticalCenter
 
   property var hoveredWorkspace: null
+  property var anchorWindow: null
+
+  scale: rootMouse.containsMouse ? 1.03 : 1.0
+  Behavior on scale {
+    NumberAnimation {
+      duration: 180
+      easing.type: Easing.OutCubic
+    }
+  }
+  Behavior on color {
+    ColorAnimation {
+      duration: 160
+    }
+  }
 
   Row {
     id: wsRow
@@ -39,6 +52,7 @@ Rectangle {
         Behavior on color { ColorAnimation { duration: 200 } }
 
         MouseArea {
+          id: wsMouse
           anchors.fill: parent
           anchors.margins: -4 // Larger click area
           cursorShape: Qt.PointingHandCursor
@@ -52,7 +66,30 @@ Rectangle {
             }
           }
         }
+
+        SharedWidgets.BarTooltip {
+          anchorItem: wsButton
+          anchorWindow: root.anchorWindow
+          hovered: wsMouse.containsMouse
+          text: modelData.name ? "Workspace " + modelData.name : "Workspace " + modelData.id
+          yOffset: 10
+        }
       }
     }
+  }
+
+  MouseArea {
+    id: rootMouse
+    anchors.fill: parent
+    hoverEnabled: true
+    acceptedButtons: Qt.NoButton
+    propagateComposedEvents: true
+  }
+
+  SharedWidgets.BarTooltip {
+    anchorItem: root
+    anchorWindow: root.anchorWindow
+    hovered: rootMouse.containsMouse
+    text: "Workspaces"
   }
 }

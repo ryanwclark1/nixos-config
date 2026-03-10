@@ -4,7 +4,6 @@
   ...
 }:
 
-
 {
   imports = [
     inputs.sops-nix.homeManagerModules.sops
@@ -25,16 +24,16 @@
       generateKey = true;
     };
     secrets = {
-      administrator-password = {};
-      "private_keys/administrator" = {};
-      "accent-email/accent-email-address" = {};
-      "accent-email/accent-email-username" = {};
-      "accent-email/accent-email-name" = {};
-      "accent-email/accent-email-realname" = {};
-      "accent-email/accent-email-password" = {};
-      "accent-email/accent-email-flavor" = {};
-      context7-token = {};
-      github-pat = {};
+      administrator-password = { };
+      "private_keys/administrator" = { };
+      "accent-email/accent-email-address" = { };
+      "accent-email/accent-email-username" = { };
+      "accent-email/accent-email-name" = { };
+      "accent-email/accent-email-realname" = { };
+      "accent-email/accent-email-password" = { };
+      "accent-email/accent-email-flavor" = { };
+      context7-token = { };
+      github-pat = { };
       # Vultr API (commented out - not in secrets.yaml)
       # "vultr/api-key" = {};
     };

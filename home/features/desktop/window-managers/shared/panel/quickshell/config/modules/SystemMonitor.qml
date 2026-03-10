@@ -1,10 +1,12 @@
 import QtQuick
 import "../services"
+import "../widgets" as SharedWidgets
 
 Item {
   id: root
   implicitWidth: mainRow.width
   implicitHeight: mainRow.height
+  property var anchorWindow: null
 
   Row {
     id: mainRow
@@ -13,11 +15,16 @@ Item {
 
     // CPU Pill
     Rectangle {
+      id: cpuPill
       width: cpuRow.width + 16
       height: 28
       radius: height / 2
-      color: Colors.bgWidget
+      color: cpuMouse.containsMouse ? Colors.highlightLight : Colors.bgWidget
       anchors.verticalCenter: parent.verticalCenter
+      scale: cpuMouse.containsMouse ? 1.04 : 1.0
+
+      Behavior on color { ColorAnimation { duration: 160 } }
+      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
 
       Row {
         id: cpuRow
@@ -38,15 +45,33 @@ Item {
           anchors.verticalCenter: parent.verticalCenter
         }
       }
+
+      MouseArea {
+        id: cpuMouse
+        anchors.fill: parent
+        hoverEnabled: true
+      }
+
+      SharedWidgets.BarTooltip {
+        anchorItem: cpuPill
+        anchorWindow: root.anchorWindow
+        hovered: cpuMouse.containsMouse
+        text: "CPU " + SystemStatus.cpuUsage + " • " + SystemStatus.cpuTemp
+      }
     }
 
     // Memory Pill
     Rectangle {
+      id: ramPill
       width: ramRow.width + 16
       height: 28
       radius: height / 2
-      color: Colors.bgWidget
+      color: ramMouse.containsMouse ? Colors.highlightLight : Colors.bgWidget
       anchors.verticalCenter: parent.verticalCenter
+      scale: ramMouse.containsMouse ? 1.04 : 1.0
+
+      Behavior on color { ColorAnimation { duration: 160 } }
+      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
 
       Row {
         id: ramRow
@@ -66,6 +91,19 @@ Item {
           font.weight: Font.DemiBold
           anchors.verticalCenter: parent.verticalCenter
         }
+      }
+
+      MouseArea {
+        id: ramMouse
+        anchors.fill: parent
+        hoverEnabled: true
+      }
+
+      SharedWidgets.BarTooltip {
+        anchorItem: ramPill
+        anchorWindow: root.anchorWindow
+        hovered: ramMouse.containsMouse
+        text: "RAM " + SystemStatus.ramUsage + " • GPU " + SystemStatus.gpuUsage
       }
     }
   }

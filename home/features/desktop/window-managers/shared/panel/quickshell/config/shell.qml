@@ -1,3 +1,4 @@
+//@ pragma UseQApplication
 import Quickshell
 import QtQuick
 import Quickshell.Io
@@ -17,27 +18,35 @@ Scope {
   
   property bool notifCenterVisible: false
   property bool controlCenterVisible: false
+  property bool networkMenuVisible: false
+  property bool audioMenuVisible: false
   property bool powerMenuVisible: false
   readonly property var activeScreen: (Quickshell.screens && Quickshell.screens.length > 0) ? (Quickshell.cursorScreen || Quickshell.screens[0]) : null
 
-  function toggleNotifications() {
-    controlCenterVisible = false;
-    notifCenterVisible = !notifCenterVisible;
+  function togglePanel(panel) {
+    var panels = ["notifCenterVisible", "controlCenterVisible", "networkMenuVisible", "audioMenuVisible"];
+    for (var i = 0; i < panels.length; i++) {
+      root[panels[i]] = (panels[i] === panel) ? !root[panels[i]] : false;
+    }
   }
 
-  function toggleControls() {
-    notifCenterVisible = false;
-    controlCenterVisible = !controlCenterVisible;
-  }
+  function toggleNotifications() { togglePanel("notifCenterVisible"); }
+  function toggleControls() { togglePanel("controlCenterVisible"); }
+  function toggleNetworkMenu() { togglePanel("networkMenuVisible"); }
+  function toggleAudioMenu() { togglePanel("audioMenuVisible"); }
 
   IpcHandler {
     target: "Shell"
     function toggleNotifications() { root.toggleNotifications(); }
     function toggleControls() { root.toggleControls(); }
+    function toggleNetworkMenu() { root.toggleNetworkMenu(); }
+    function toggleAudioMenu() { root.toggleAudioMenu(); }
 
     function closeAll() {
       root.notifCenterVisible = false;
       root.controlCenterVisible = false;
+      root.networkMenuVisible = false;
+      root.audioMenuVisible = false;
       root.powerMenuVisible = false;
     }
 
@@ -73,13 +82,30 @@ Scope {
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "quickshell"
     WlrLayershell.exclusiveZone: Config.barHeight
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
     
     Panel {
       id: panel
       anchors.fill: parent
+      focus: true
       manager: notifManager
+      anchorWindow: toplevel
+      Keys.onPressed: (event) => {
+        if (event.modifiers & Qt.MetaModifier && event.key === Qt.Key_S) {
+          settingsHub.toggle();
+          event.accepted = true;
+        } else if (event.modifiers & Qt.MetaModifier && event.key === Qt.Key_C) {
+          root.toggleControls();
+          event.accepted = true;
+        } else if (event.modifiers & Qt.MetaModifier && event.key === Qt.Key_N) {
+          root.toggleNotifications();
+          event.accepted = true;
+        }
+      }
       onNotifClicked: root.toggleNotifications()
-      onControlClicked: root.toggleControls()
+      onNetworkClicked: root.toggleNetworkMenu()
+      onAudioClicked: root.toggleAudioMenu()
+      onCommandClicked: root.toggleControls()
     }
 
     BluetoothMenu {
@@ -89,6 +115,23 @@ Scope {
       anchor.rect.y: toplevel.height + 8
       visible: panel.btMenuVisible
     }
+
+    AudioMenu {
+      id: audioMenu
+      anchor.window: toplevel
+      anchor.rect.x: toplevel.width - width - 8
+      anchor.rect.y: panel.audioTriggerBottomY + 6
+      visible: root.audioMenuVisible
+    }
+
+    NetworkMenu {
+      id: networkMenu
+      anchor.window: toplevel
+      anchor.rect.x: toplevel.width - width - 8
+      anchor.rect.y: panel.networkTriggerBottomY + 6
+      visible: root.networkMenuVisible
+    }
+
   }
 
   Osd {

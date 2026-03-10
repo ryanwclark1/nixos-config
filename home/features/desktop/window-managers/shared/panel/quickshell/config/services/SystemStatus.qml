@@ -49,20 +49,20 @@ QtObject {
 
           var cpuVal = parseInt(lines[2]) || 0;
           root.cpuUsage = cpuVal + "%";
-          root.cpuPercent = Math.max(0, Math.min(1, cpuVal / 100));
+          root.cpuPercent = Colors.clamp01(cpuVal / 100);
 
           var gpuVal = parseInt(lines[3]) || 0;
           root.gpuUsage = gpuVal + "%";
-          root.gpuPercent = Math.max(0, Math.min(1, gpuVal / 100));
+          root.gpuPercent = Colors.clamp01(gpuVal / 100);
 
           root.ramUsage = lines[4] || "0GB";
 
           var ramVal = parseFloat(lines[5]) || 0;
-          root.ramPercent = Math.max(0, Math.min(1, ramVal));
+          root.ramPercent = Colors.clamp01(ramVal);
 
           var curr = parseFloat(lines[6]) || 0;
           var max = parseFloat(lines[7]) || 100;
-          root.brightness = max > 0 ? Math.max(0, Math.min(1, curr / max)) : 0;
+          root.brightness = max > 0 ? Colors.clamp01(curr / max) : 0;
         }
       }
     }

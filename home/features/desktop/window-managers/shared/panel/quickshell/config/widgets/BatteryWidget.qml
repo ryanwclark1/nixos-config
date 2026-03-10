@@ -4,11 +4,24 @@ import "../modules"
 import "../services"
 
 Row {
+  id: root
   spacing: 6
 
   property var device: UPower.displayDevice
   property bool hasBattery: device != null && device.isPresent
   property bool showBattery: hasBattery && (device.kind === UPower.DeviceKindDisplayDevice || device.kind === UPower.DeviceKindBattery)
+  readonly property string batteryStateText: {
+    if (!device) return "Unknown";
+    if (device.state === UPower.DeviceStateCharging) return "Charging";
+    if (device.state === UPower.DeviceStateFullyCharged) return "Fully charged";
+    if (device.state === UPower.DeviceStatePendingCharge) return "Pending charge";
+    if (device.state === UPower.DeviceStatePendingDischarge) return "Pending discharge";
+    return "Discharging";
+  }
+  readonly property string tooltipText: {
+    if (!showBattery || !device) return "No battery detected";
+    return Math.round(device.percentage * 100) + "% • " + batteryStateText;
+  }
 
   visible: showBattery
 
@@ -21,7 +34,7 @@ Row {
   }
 
   Text {
-    text: showBattery ? Math.round(device.percentage * 100) + "%" : "100%"
+    text: showBattery && device ? Math.round(device.percentage * 100) + "%" : "100%"
     color: Colors.fgMain
     font.pixelSize: 11
     font.weight: Font.DemiBold

@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Widgets
@@ -10,30 +9,32 @@ Row {
   id: root
   spacing: 8
   anchors.verticalCenter: parent.verticalCenter
+  property var anchorWindow: null
 
   property var pinnedApps: []
+  property var iconMap: ({})
   readonly property string pinnedPath: Quickshell.statePath("pinned_apps.json")
 
   property FileView pinnedFile: FileView {
-    path: ""
+    path: root.pinnedPath
+    printErrors: false
     onLoaded: {
-      try { root.pinnedApps = JSON.parse(text); } catch(e) {}
-    }
-  }
+      var raw = pinnedFile.text();
+      try {
+        root.pinnedApps = raw ? JSON.parse(raw) : [];
+      } catch(e) {
+        root.pinnedApps = [];
+      }
 
-  function loadPinned() {
-    if (pinnedFile.path === "") pinnedFile.path = root.pinnedPath;
-    Quickshell.execDetached(["sh", "-c", "mkdir -p $(dirname " + pinnedPath + ") && touch " + pinnedPath]);
-    pinnedFile.reload();
-    if (pinnedApps.length === 0) {
-      // Default pinned apps
-      pinnedApps = [
-        { name: "Browser", class: "google-chrome", exec: "google-chrome" },
-        { name: "Terminal", class: "kitty", exec: "kitty" },
-        { name: "Files", class: "nemo", exec: "nemo" },
-        { name: "Code", class: "cursor", exec: "cursor" }
-      ];
-      savePinned();
+      if (root.pinnedApps.length === 0) {
+        root.pinnedApps = [
+          { name: "Browser", class: "google-chrome", exec: "google-chrome" },
+          { name: "Terminal", class: "kitty", exec: "kitty" },
+          { name: "Files", class: "nemo", exec: "nemo" },
+          { name: "Code", class: "cursor", exec: "cursor" }
+        ];
+        root.savePinned();
+      }
     }
   }
 
@@ -52,7 +53,18 @@ Row {
     savePinned();
   }
 
-  Component.onCompleted: loadPinned()
+  Process {
+    id: iconResolverProc
+    command: ["qs-icon-resolver"]
+    running: true
+    stdout: StdioCollector {
+      onStreamFinished: {
+        try { root.iconMap = JSON.parse(this.text || "{}"); } catch(e) {}
+      }
+    }
+  }
+
+  Component.onCompleted: {} // Pinned apps loaded via FileView.onLoaded
 
   // Combined model: Pinned Apps + Running Apps not in Pinned
   Repeater {
@@ -62,6 +74,8 @@ Row {
       appExec: modelData.exec || ""
       appName: modelData.name || ""
       isPinned: true
+      iconMap: root.iconMap
+      anchorWindow: root.anchorWindow
     }
   }
 
@@ -87,6 +101,8 @@ Row {
       appAddress: modelData.address
       isFocused: modelData.activated
       isPinned: false
+      iconMap: root.iconMap
+      anchorWindow: root.anchorWindow
     }
   }
 }

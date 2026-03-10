@@ -1,5 +1,7 @@
 import QtQuick
+import Quickshell
 import Quickshell.Services.Pipewire
+import Quickshell.Io
 import "../modules"
 import "../services"
 
@@ -7,14 +9,45 @@ Row {
   id: root
   spacing: 6
 
-  property var sink: Pipewire.defaultAudioSink
-  property real volume: (sink && sink.audio && !isNaN(sink.audio.volume)) ? sink.audio.volume : 0
-  property bool muted: (sink && sink.audio) ? sink.audio.muted : false
+  property real volume: 0
+  property bool muted: false
+  readonly property string tooltipText: {
+    if (root.muted) return "Audio muted";
+    return "Output volume " + Math.round(root.volume * 100) + "%";
+  }
+
+  Process {
+    id: volumeProc
+    command: ["wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@"]
+    running: true
+    stdout: StdioCollector {
+      onStreamFinished: {
+        var text = (this.text || "").trim();
+        var match = text.match(/Volume:\s+([0-9.]+)(?:\s+\[MUTED\])?/);
+        if (!match) {
+          root.volume = 0;
+          root.muted = false;
+          return;
+        }
+
+        var parsed = parseFloat(match[1]);
+        root.volume = isNaN(parsed) ? 0 : Colors.clamp01(parsed);
+        root.muted = text.indexOf("[MUTED]") !== -1;
+      }
+    }
+  }
+
+  Timer {
+    interval: 1000
+    running: true
+    repeat: true
+    onTriggered: volumeProc.running = true
+  }
 
   CircularGauge {
-    value: muted ? 0 : root.volume
-    color: muted ? Colors.error : Colors.fgMain
-    icon: muted ? "󰝟" : (root.volume > 0.6 ? "󰕾" : (root.volume > 0.3 ? "󰖀" : "󰕿"))
+    value: root.muted ? 0 : root.volume
+    color: root.muted ? Colors.error : Colors.fgMain
+    icon: root.muted ? "󰝟" : (root.volume > 0.6 ? "󰕾" : (root.volume > 0.3 ? "󰖀" : "󰕿"))
     thickness: 3
     width: 22; height: 22
   }
@@ -22,7 +55,7 @@ Row {
   Text {
     id: volumeText
     text: {
-        if (muted) return "Muted";
+        if (root.muted) return "Muted";
         var v = root.volume;
         if (isNaN(v)) return "0%";
         return Math.round(v * 100) + "%";

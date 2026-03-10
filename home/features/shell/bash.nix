@@ -9,7 +9,10 @@
   # Enhanced bash configuration with modern tooling
   programs.bash = {
     enable = true;
-    enableCompletion = true;
+    # This bash build was compiled without programmable completion support
+    # (`shopt progcomp` and `complete` are unavailable), so Home Manager's
+    # generic bash-completion init fails on startup.
+    enableCompletion = false;
 
     bashrcExtra = ''
       export HISTSIZE=100000

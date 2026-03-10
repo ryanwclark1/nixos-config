@@ -119,6 +119,7 @@ Scope {
 										font.weight: Font.Bold
 										Layout.alignment: Qt.AlignHCenter
 										selectByMouse: true
+										onVisibleChanged: if (!visible && activeFocus) focus = false
 										
 										onEditingFinished: {
 											var newName = text.replace("Workspace ", "").trim();

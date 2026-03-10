@@ -11,6 +11,7 @@ Scope {
 	property bool shouldShowOsd: false
 	property string workspaceName: ""
 	property bool isSpecial: false
+	property bool initialized: false
 	
 	Timer {
 		id: hideTimer
@@ -30,10 +31,12 @@ Scope {
 				}
 				
 				// Don't show OSD on initial load
-				if (workspaceName !== "") {
-					root.shouldShowOsd = true;
-					hideTimer.restart();
+				if (!root.initialized) {
+					root.initialized = true;
+					return;
 				}
+				root.shouldShowOsd = true;
+				hideTimer.restart();
 			}
 		}
 	}

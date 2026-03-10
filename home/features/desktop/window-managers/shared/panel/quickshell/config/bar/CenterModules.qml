@@ -1,19 +1,23 @@
 import QtQuick
+import Quickshell
 import Quickshell.Io
-import "../widgets"
+import "../widgets" as SharedWidgets
 import "../services"
 
 Item {
   id: root
   implicitWidth: mainRow.width
   implicitHeight: mainRow.height
+  property var anchorWindow: null
 
   Row {
     id: mainRow
     spacing: 8
     anchors.verticalCenter: parent.verticalCenter
 
-    MediaBar {}
+    SharedWidgets.MediaBar {
+      anchorWindow: root.anchorWindow
+    }
 
     // Updates properties
     property string updatesIcon: "󰚰"
@@ -43,12 +47,17 @@ Item {
 
     // Updates Pill
     Rectangle {
+      id: updatesPill
       width: updatesRow.width + 16
       height: 28
       radius: height / 2
-      color: Colors.bgWidget
+      color: updatesMouse.containsMouse ? Colors.highlightLight : Colors.bgWidget
       anchors.verticalCenter: parent.verticalCenter
       visible: mainRow.updatesCount !== "0" && mainRow.updatesCount !== ""
+      scale: updatesMouse.containsMouse ? 1.04 : 1.0
+
+      Behavior on color { ColorAnimation { duration: 160 } }
+      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
 
       Row {
         id: updatesRow
@@ -56,6 +65,19 @@ Item {
         anchors.centerIn: parent
         Text { text: mainRow.updatesIcon; color: Colors.accent; font.pixelSize: 16; font.family: Colors.fontMono; anchors.verticalCenter: parent.verticalCenter }
         Text { text: mainRow.updatesCount; color: Colors.fgMain; font.pixelSize: 13; font.weight: Font.DemiBold; anchors.verticalCenter: parent.verticalCenter }
+      }
+
+      MouseArea {
+        id: updatesMouse
+        anchors.fill: parent
+        hoverEnabled: true
+      }
+
+      SharedWidgets.BarTooltip {
+        anchorItem: updatesPill
+        anchorWindow: root.anchorWindow
+        hovered: updatesMouse.containsMouse
+        text: "System updates"
       }
     }
 
@@ -74,12 +96,17 @@ Item {
     }
 
     Rectangle {
+      id: cavaPill
       width: Math.min(cavaText.width + 16, 100)
       height: 28
       radius: height / 2
-      color: "transparent"
+      color: cavaMouse.containsMouse ? Colors.highlightLight : "transparent"
       anchors.verticalCenter: parent.verticalCenter
       clip: true
+      scale: cavaMouse.containsMouse ? 1.04 : 1.0
+
+      Behavior on color { ColorAnimation { duration: 160 } }
+      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
 
       Text {
         id: cavaText
@@ -87,6 +114,19 @@ Item {
         color: Colors.primary
         font.pixelSize: 13
         anchors.centerIn: parent
+      }
+
+      MouseArea {
+        id: cavaMouse
+        anchors.fill: parent
+        hoverEnabled: true
+      }
+
+      SharedWidgets.BarTooltip {
+        anchorItem: cavaPill
+        anchorWindow: root.anchorWindow
+        hovered: cavaMouse.containsMouse
+        text: "Audio visualizer"
       }
     }
 
@@ -113,13 +153,18 @@ Item {
 
     // Idle Inhibitor Pill
     Rectangle {
+      id: inhibitorPill
       width: 32
       height: 28
-      color: mainRow.inhibitorActive ? Colors.withAlpha(Colors.primary, 0.2) : Colors.bgWidget
+      color: inhibitorMouse.containsMouse ? Colors.highlightLight : (mainRow.inhibitorActive ? Colors.withAlpha(Colors.primary, 0.2) : Colors.bgWidget)
       radius: height / 2
       anchors.verticalCenter: parent.verticalCenter
       border.color: mainRow.inhibitorActive ? Colors.primary : "transparent"
       border.width: 1
+      scale: inhibitorMouse.containsMouse ? 1.06 : 1.0
+
+      Behavior on color { ColorAnimation { duration: 160 } }
+      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
 
       Text {
         anchors.centerIn: parent
@@ -130,15 +175,22 @@ Item {
       }
 
       MouseArea {
+        id: inhibitorMouse
         anchors.fill: parent
+        hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         onClicked: {
           Quickshell.execDetached(["qs-inhibitor"]);
           // Force check update slightly later
           inhibitorCheckTimer.restart()
         }
-        onEntered: parent.color = Qt.rgba(1, 1, 1, 0.15)
-        onExited: parent.color = mainRow.inhibitorActive ? Colors.withAlpha(Colors.primary, 0.2) : Colors.bgWidget
+      }
+
+      SharedWidgets.BarTooltip {
+        anchorItem: inhibitorPill
+        anchorWindow: root.anchorWindow
+        hovered: inhibitorMouse.containsMouse
+        text: mainRow.inhibitorActive ? "Idle inhibitor enabled" : "Idle inhibitor"
       }
 
       Timer {

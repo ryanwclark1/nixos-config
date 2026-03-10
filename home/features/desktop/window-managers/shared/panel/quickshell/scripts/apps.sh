@@ -31,7 +31,7 @@ resolve_icon() {
   for dir in "${icon_dirs[@]}"; do
     if [ -d "$dir" ]; then
       # Look for svg, then png
-      match=$(find "$dir" -name "${icon_name}.svg" -o -name "${icon_name}.png" | head -n 1)
+      match=$(find "$dir" \( -name "${icon_name}.svg" -o -name "${icon_name}.png" \) -print | head -n 1)
       if [[ -n "$match" ]]; then
         icon_cache["$icon_name"]="$match"
         echo "$match"

@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 AUR_HELPER="paru"
 UPDATES_DIR="/tmp/updates"
@@ -53,7 +53,7 @@ generate_json_output() {
   total=$((ofc + aur + fpk))
 
   if (( total == 0 )); then
-    echo "{\"icon\": \"\", \"count\": \"\", \"tooltip\": \"\"}"
+    jq -n '{icon: "", count: "", tooltip: ""}'
     return
   fi
 
@@ -75,7 +75,8 @@ generate_json_output() {
   # Remove trailing \n at end if any
   tooltip="${tooltip%\\n}"
 
-  echo "{\"icon\": \"${ICON}\", \"count\": \"${total}\", \"tooltip\": \"$tooltip\"}"
+  jq -n --arg icon "$ICON" --arg count "$total" --arg tooltip "$tooltip" \
+    '{icon: $icon, count: $count, tooltip: $tooltip}'
 }
 
 check_and_write_updates

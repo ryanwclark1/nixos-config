@@ -9,9 +9,13 @@ if [[ -z "$PLACES_DB" ]]; then
     exit 0
 fi
 
-# Copy DB to /tmp to avoid lock issues
-TEMP_DB="/tmp/firefox_places_copy.sqlite"
-cp "$PLACES_DB" "$TEMP_DB"
+# Copy DB to a temp file to avoid lock issues
+TEMP_DB=$(mktemp --suffix=.sqlite)
+trap 'rm -f "$TEMP_DB"' EXIT
+if ! cp "$PLACES_DB" "$TEMP_DB"; then
+    echo "[]"
+    exit 0
+fi
 
 # Query the database
 # moz_bookmarks table contains the bookmarks, moz_places contains the URLs
@@ -33,4 +37,3 @@ LIMIT 500;
 done | jq -s '.')
 
 echo "$output"
-rm "$TEMP_DB"

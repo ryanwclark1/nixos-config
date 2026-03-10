@@ -4,8 +4,6 @@
   pkgs,
   ...
 }:
-
-
 {
   programs.atuin = {
     enable = true;
@@ -14,9 +12,9 @@
       "--disable-up-arrow"
       "--disable-ctrl-r"
     ];
+    forceOverwriteSettings = true;
     settings = {
-      auto_sync = true;
-      sync_frequency = "1m";
+      auto_sync = false;
       dialect = "us";
       enter_accept = false;
       exit_mode = "return-original";
@@ -78,7 +76,6 @@
         ];
       };
     };
-
     enableBashIntegration = lib.mkIf config.programs.bash.enable true;
     enableFishIntegration = lib.mkIf config.programs.fish.enable true;
     enableZshIntegration = lib.mkIf config.programs.zsh.enable true;

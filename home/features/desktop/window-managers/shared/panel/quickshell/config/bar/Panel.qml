@@ -1,23 +1,28 @@
 import Quickshell // SystemClock
-import Quickshell.Bluetooth
 import Quickshell.Wayland
 import QtQuick
 import "."
 import "widgets"
 import "../modules"
 import "../services"
-import "../widgets"
+import "../widgets" as SharedWidgets
 
 Item {
   id: root
 
-  property color background: Colors.background
-  property color foreground: Colors.text
-  property bool use24hClock: true
   property bool btMenuVisible: false
   property var manager: null
+  property var anchorWindow: null
+  readonly property real networkTriggerX: networkTrigger.mapToItem(root, 0, 0).x
+  readonly property real networkTriggerBottomY: networkTrigger.mapToItem(root, 0, networkTrigger.height).y
+  readonly property real networkTriggerWidth: networkTrigger.width
+  readonly property real audioTriggerX: audioTrigger.mapToItem(root, 0, 0).x
+  readonly property real audioTriggerBottomY: audioTrigger.mapToItem(root, 0, audioTrigger.height).y
+  readonly property real audioTriggerWidth: audioTrigger.width
   signal notifClicked()
-  signal controlClicked()
+  signal networkClicked()
+  signal audioClicked()
+  signal commandClicked()
 
   implicitHeight: Config.barHeight
 
@@ -38,29 +43,24 @@ Item {
     spacing: 12
 
     Logo {
-      scale: logoMouse.containsMouse ? 1.1 : 1.0
-      Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-      MouseArea { id: logoMouse; anchors.fill: parent; hoverEnabled: true; onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Launcher", "toggle"]) }
+      tooltipText: "Application launcher"
+      anchorWindow: root.anchorWindow
     }
     Workspaces {
-      scale: wsMouse.containsMouse ? 1.02 : 1.0
-      Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-      MouseArea { id: wsMouse; anchors.fill: parent; hoverEnabled: true; propagateComposedEvents: true; onEntered: {} }
+      anchorWindow: root.anchorWindow
     }
-    Taskbar {}
+    Taskbar {
+      anchorWindow: root.anchorWindow
+    }
     SystemMonitor {
-      scale: smMouse.containsMouse ? 1.02 : 1.0
-      Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-      MouseArea { id: smMouse; anchors.fill: parent; hoverEnabled: true; onEntered: {} }
+      anchorWindow: root.anchorWindow
     }
   }
 
   // CENTER MODULES
   CenterModules {
     anchors.centerIn: parent
-    scale: cmMouse.containsMouse ? 1.02 : 1.0
-    Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-    MouseArea { id: cmMouse; anchors.fill: parent; hoverEnabled: true; onEntered: {} }
+    anchorWindow: root.anchorWindow
   }
 
   SystemClock {
@@ -75,33 +75,117 @@ Item {
     anchors.verticalCenter: parent.verticalCenter
     spacing: 12
 
-    // System Control Trigger (WiFi, Battery, Audio)
     MouseArea {
-      id: controlTrigger
+      id: networkTrigger
       height: 28
-      width: statusRow.width + 16
+      width: networkRow.width + 16
       hoverEnabled: true
-      onClicked: root.controlClicked()
-      onEntered: statusBg.color = Qt.rgba(1, 1, 1, 0.15)
-      onExited: statusBg.color = Colors.bgWidget
+      onClicked: root.networkClicked()
 
       scale: containsMouse ? 1.05 : 1.0
       Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
 
       Rectangle {
-        id: statusBg
+        id: networkBg
         anchors.fill: parent
-        color: Colors.bgWidget
+        color: networkTrigger.containsMouse ? Colors.highlightLight : Colors.bgWidget
         radius: height / 2
+        Behavior on color { ColorAnimation { duration: 160 } }
       }
 
       Row {
-        id: statusRow
+        id: networkRow
         anchors.centerIn: parent
-        spacing: 10
-        NetworkWidget {}
-        BatteryWidget {}
-        AudioWidget {}
+        spacing: 8
+        SharedWidgets.NetworkWidget {
+          id: networkWidget
+        }
+      }
+
+      SharedWidgets.BarTooltip {
+        anchorItem: networkTrigger
+        anchorWindow: root.anchorWindow
+        hovered: networkTrigger.containsMouse
+        text: networkWidget.tooltipText
+      }
+    }
+
+    MouseArea {
+      id: audioTrigger
+      height: 28
+      width: audioRow.width + 16
+      hoverEnabled: true
+      onClicked: root.audioClicked()
+
+      scale: containsMouse ? 1.05 : 1.0
+      Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+
+      Rectangle {
+        id: audioBg
+        anchors.fill: parent
+        color: audioTrigger.containsMouse ? Colors.highlightLight : Colors.bgWidget
+        radius: height / 2
+        Behavior on color { ColorAnimation { duration: 160 } }
+      }
+
+      Row {
+        id: audioRow
+        anchors.centerIn: parent
+        spacing: 8
+        SharedWidgets.AudioWidget {
+          id: audioWidget
+        }
+      }
+
+      SharedWidgets.BarTooltip {
+        anchorItem: audioTrigger
+        anchorWindow: root.anchorWindow
+        hovered: audioTrigger.containsMouse
+        text: audioWidget.tooltipText
+      }
+    }
+
+    MouseArea {
+      id: commandTrigger
+      height: 28
+      width: commandRow.width + 16
+      hoverEnabled: true
+      onClicked: root.commandClicked()
+
+      scale: containsMouse ? 1.05 : 1.0
+      Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+
+      Rectangle {
+        id: commandBg
+        anchors.fill: parent
+        color: commandTrigger.containsMouse ? Colors.highlightLight : Colors.bgWidget
+        radius: height / 2
+        Behavior on color { ColorAnimation { duration: 160 } }
+      }
+
+      Row {
+        id: commandRow
+        anchors.centerIn: parent
+        spacing: 8
+
+        SharedWidgets.BatteryWidget {
+          id: batteryWidget
+        }
+
+        Text {
+          color: Colors.fgMain
+          font.pixelSize: 16
+          font.family: Colors.fontMono
+          text: "󰒓"
+          anchors.verticalCenter: parent.verticalCenter
+        }
+      }
+
+      SharedWidgets.BarTooltip {
+        anchorItem: commandTrigger
+        anchorWindow: root.anchorWindow
+        hovered: commandTrigger.containsMouse
+        text: batteryWidget.visible ? (batteryWidget.tooltipText + " • System controls") : "System controls"
       }
     }
 
@@ -109,11 +193,12 @@ Item {
       width: clockText.width + 16
       height: 28
       radius: height / 2
-      color: Colors.bgWidget
+      color: clockMouse.containsMouse ? Colors.highlightLight : Colors.bgWidget
       anchors.verticalCenter: parent.verticalCenter
       
       scale: clockMouse.containsMouse ? 1.05 : 1.0
       Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+      Behavior on color { ColorAnimation { duration: 160 } }
 
       Text {
         id: clockText
@@ -121,10 +206,7 @@ Item {
         color: Colors.fgMain
         font.pixelSize: 14
         font.weight: Font.Bold
-        text: Qt.formatDateTime(
-          clock.date,
-          root.use24hClock ? "HH:mm" : "h:mm ap"
-        )
+        text: Qt.formatDateTime(clock.date, "HH:mm")
       }
       
       MouseArea {
@@ -133,14 +215,23 @@ Item {
         hoverEnabled: true
         onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Calendar", "toggle"])
       }
+
+      SharedWidgets.BarTooltip {
+        anchorItem: parent
+        anchorWindow: root.anchorWindow
+        hovered: clockMouse.containsMouse
+        text: "Calendar"
+      }
     }
 
-    TrayWidget {}
+    SharedWidgets.TrayWidget {
+      anchorWindow: root.anchorWindow
+    }
 
     Rectangle {
       width: 32
       height: 28
-      color: Colors.bgWidget
+      color: notifMouse.containsMouse ? Colors.highlightLight : Colors.bgWidget
       radius: height / 2
       anchors.verticalCenter: parent.verticalCenter
       
@@ -171,8 +262,15 @@ Item {
         anchors.fill: parent
         hoverEnabled: true
         onClicked: root.notifClicked()
-        onEntered: parent.color = Qt.rgba(1, 1, 1, 0.15)
-        onExited: parent.color = Colors.bgWidget
+      }
+
+      Behavior on color { ColorAnimation { duration: 160 } }
+
+      SharedWidgets.BarTooltip {
+        anchorItem: parent
+        anchorWindow: root.anchorWindow
+        hovered: notifMouse.containsMouse
+        text: root.manager && root.manager.dndEnabled ? "Notifications paused" : "Notifications"
       }
     }
   }

@@ -39,6 +39,8 @@ PanelWindow {
   onShowContentChanged: {
     if (showContent) {
       notifList.focus = true;
+    } else if (searchInput && searchInput.activeFocus) {
+      searchInput.focus = false;
     }
   }
 
@@ -97,7 +99,7 @@ PanelWindow {
             anchors.fill: parent; color: Colors.highlight; radius: 6
             Text { anchors.centerIn: parent; text: "Clear All"; color: Colors.textSecondary; font.pixelSize: 11; font.weight: Font.Medium }
           }
-          onClicked: if (root.manager) { for (var i = 0; i < root.manager.notifications.count; i++) root.manager.notifications.get(i).dismiss(); }
+          onClicked: if (root.manager) { for (var i = root.manager.notifications.count - 1; i >= 0; i--) root.manager.notifications.get(i).dismiss(); }
         }
 
         // Close button
@@ -209,16 +211,23 @@ PanelWindow {
                 Text { anchors.centerIn: parent; text: "󰅖"; color: Colors.textDisabled; font.pixelSize: 14 }
               }
               id: clearHover; hoverEnabled: true
-              onClicked: if (root.manager) { for (var i = root.manager.notifications.count - 1; i >= 0; i--) { var n = root.manager.notifications.get(i); if (n.appName === section) n.dismiss(); } }
+              onClicked: {
+                if (!root.manager) return;
+                for (var i = root.manager.notifications.count - 1; i >= 0; i--) {
+                  var n = root.manager.notifications.get(i);
+                  if (n.appName === section) n.dismiss();
+                }
+              }
             }
           }
         }
 
         delegate: Rectangle {
           id: notifItem
+          property var notification: modelData
           property bool isCollapsed: notifList.collapsedGroups[modelData.appName] || false
 
-          visible: matchesSearch && !isCollapsed
+          visible: !notification.dismissed && matchesSearch && !isCollapsed
           width: notifList.width
           height: visible ? colItem.implicitHeight + 24 + (isReplying ? 50 : 0) : 0
           color: Colors.surface
@@ -258,7 +267,13 @@ PanelWindow {
               width: parent.width; spacing: 12
               Image {
                 Layout.preferredWidth: 32; Layout.preferredHeight: 32
-                source: modelData.appIcon ? (modelData.appIcon.startsWith("/") ? "file://" + modelData.appIcon : "image://icon/" + modelData.appIcon) : ""
+                source: {
+                  if (!modelData.appIcon) return "";
+                  if (modelData.appIcon.startsWith("/")) return "file://" + modelData.appIcon;
+                  var resolved = Quickshell.iconPath(modelData.appIcon);
+                  if (resolved) return resolved.startsWith("file://") ? resolved : "file://" + resolved;
+                  return "";
+                }
                 visible: modelData.appIcon !== ""
                 Rectangle { anchors.fill: parent; color: "transparent"; visible: parent.status !== Image.Ready; Text { anchors.centerIn: parent; text: "󰂚"; color: Colors.text; font.pixelSize: 20; font.family: Colors.fontMono } }
               }
@@ -268,14 +283,18 @@ PanelWindow {
                 RowLayout {
                   Layout.fillWidth: true
                   Text {
-                    text: modelData.summary; color: Colors.text; font.pixelSize: 13; font.weight: Font.Bold
+                    text: modelData.summary; color: Colors.text; font.pixelSize: 15; font.weight: Font.Bold
                     Layout.fillWidth: true; elide: Text.ElideRight
                   }
                   Text {
-                    text: modelData.time ? Qt.formatDateTime(modelData.time, "HH:mm") : ""; color: Colors.textDisabled; font.pixelSize: 10
+                    text: modelData.time ? Qt.formatDateTime(modelData.time, "HH:mm") : ""
+                    color: Colors.textDisabled; font.pixelSize: 11
                   }
                 }
-                Text { text: modelData.body; color: Colors.textSecondary; font.pixelSize: 11; Layout.fillWidth: true; wrapMode: Text.Wrap; visible: modelData.body !== "" }
+                Text {
+                  text: modelData.body; color: Colors.textSecondary; font.pixelSize: 13
+                  Layout.fillWidth: true; wrapMode: Text.Wrap; visible: modelData.body !== ""
+                }
               }
             }
 
@@ -313,11 +332,16 @@ PanelWindow {
 
             // Inline Reply Area
             Rectangle {
-              width: parent.width; height: 32; radius: 6; color: Colors.highlightLight; visible: isReplying
+              width: parent.width; height: 36; radius: 6; color: Colors.highlightLight; visible: isReplying
               TextInput {
-                id: replyInput; anchors.fill: parent; anchors.margins: 8; verticalAlignment: Text.AlignVCenter
-                color: Colors.text; font.pixelSize: 11; focus: isReplying
-                Keys.onReturnPressed: { modelData.invoke(text); notifItem.isReplying = false; modelData.dismiss(); }
+                id: replyInput; anchors.fill: parent; anchors.margins: 8
+                verticalAlignment: Text.AlignVCenter
+                color: Colors.text; font.pixelSize: 13; focus: isReplying
+                Keys.onReturnPressed: {
+                  notifItem.notification.invoke(text);
+                  notifItem.isReplying = false;
+                  notifItem.notification.dismiss();
+                }
                 Keys.onEscapePressed: notifItem.isReplying = false
               }
             }
@@ -328,16 +352,18 @@ PanelWindow {
 
               // Dynamic Actions from Notification
               Repeater {
-                model: modelData.actions
+                model: notifItem.notification ? notifItem.notification.actions : null
                 delegate: Rectangle {
                   Layout.fillWidth: true; height: 28; color: Colors.highlightLight; radius: 6
-                  Text { anchors.centerIn: parent; text: modelData.label; color: Colors.text; font.pixelSize: 10; font.weight: Font.Medium }
+                  Text { anchors.centerIn: parent; text: modelData && modelData.label ? modelData.label : ""; color: Colors.text; font.pixelSize: 12; font.weight: Font.Medium }
                   MouseArea {
                     anchors.fill: parent; hoverEnabled: true
-                    onEntered: parent.color = Colors.highlight; onExited: parent.color = Colors.highlightLight
+                    onEntered: parent.color = Colors.highlight
+                    onExited: parent.color = Colors.highlightLight
                     onClicked: {
-                      if (modelData.label.toLowerCase().includes("reply")) notifItem.isReplying = true;
-                      else { modelData.invoke(); modelData.dismiss(); }
+                      var label = modelData && modelData.label ? modelData.label.toLowerCase() : "";
+                      if (label.includes("reply")) notifItem.isReplying = true;
+                      else if (modelData) { modelData.invoke(); notifItem.notification.dismiss(); }
                     }
                   }
                 }
@@ -349,11 +375,9 @@ PanelWindow {
                 Text { anchors.centerIn: parent; text: "󰅨"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 14 }
                 MouseArea {
                   anchors.fill: parent; hoverEnabled: true
-                  onEntered: parent.color = Colors.highlight; onExited: parent.color = Colors.highlightLight
-                  onClicked: {
-                    // Logic to archive: dismiss it, but it's already in tracked archive
-                    modelData.dismiss();
-                  }
+                  onEntered: parent.color = Colors.highlight
+                  onExited: parent.color = Colors.highlightLight
+                  onClicked: notifItem.notification.dismiss()
                 }
               }
 
@@ -363,8 +387,9 @@ PanelWindow {
                 Text { anchors.centerIn: parent; text: "󰅖"; color: Colors.error; font.family: Colors.fontMono; font.pixelSize: 14 }
                 MouseArea {
                   anchors.fill: parent; hoverEnabled: true
-                  onEntered: parent.color = Colors.highlight; onExited: parent.color = Colors.highlightLight
-                  onClicked: modelData.dismiss()
+                  onEntered: parent.color = Colors.highlight
+                  onExited: parent.color = Colors.highlightLight
+                  onClicked: notifItem.notification.dismiss()
                 }
               }
             }

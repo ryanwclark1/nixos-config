@@ -17,6 +17,7 @@ Rectangle {
   
   property real lastRx: 0
   property real lastTx: 0
+  property string activeInterface: "offline"
   property string currentDown: "0 KB/s"
   property string currentUp: "0 KB/s"
 
@@ -29,22 +30,26 @@ Rectangle {
 
   Process {
     id: netProc
-    command: ["sh", "-c", "cat /proc/net/dev"]
+    command: [
+      "sh",
+      "-c",
+      "iface=$(ip route show default 2>/dev/null | awk 'NR==1 {print $5}'); "
+      + "if [ -z \"$iface\" ]; then iface=$(ip -o link show up 2>/dev/null | awk -F': ' '$2 != \"lo\" {print $2; exit}'); fi; "
+      + "if [ -n \"$iface\" ] && [ -r \"/sys/class/net/$iface/statistics/rx_bytes\" ] && [ -r \"/sys/class/net/$iface/statistics/tx_bytes\" ]; then "
+      + "printf '%s\\n%s\\n%s\\n' \"$iface\" \"$(cat /sys/class/net/$iface/statistics/rx_bytes)\" \"$(cat /sys/class/net/$iface/statistics/tx_bytes)\"; "
+      + "fi"
+    ]
     stdout: StdioCollector {
       onStreamFinished: {
-        var lines = (this.text || "").split("\n");
-        var rx = 0, tx = 0;
-        for (var i = 2; i < lines.length; i++) {
-          var line = lines[i].trim();
-          if (line === "" || line.startsWith("lo:")) continue;
-          var parts = line.split(/[:\\s]+/);
-          rx += parseInt(parts[1]);
-          tx += parseInt(parts[9]);
-        }
+        var lines = (this.text || "").trim().split("\n");
+        if (lines.length < 3) return;
+        root.activeInterface = lines[0] || "offline";
+        var rx = parseInt(lines[1]) || 0;
+        var tx = parseInt(lines[2]) || 0;
 
         if (root.lastRx > 0) {
-          var diffRx = rx - root.lastRx;
-          var diffTx = tx - root.lastTx;
+          var diffRx = Math.max(0, rx - root.lastRx);
+          var diffTx = Math.max(0, tx - root.lastTx);
 
           root.currentDown = formatSpeed(diffRx);
           root.currentUp = formatSpeed(diffTx);
@@ -68,6 +73,21 @@ Rectangle {
         root.lastTx = tx;
       }
     }
+  }
+
+  function paintGraph(canvas, data, strokeColor) {
+    var ctx = canvas.getContext("2d");
+    ctx.reset();
+    ctx.strokeStyle = strokeColor;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    var w = canvas.width / (data.length - 1);
+    for (var i = 0; i < data.length; i++) {
+      var x = i * w;
+      var y = canvas.height - (data[i] * canvas.height);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
   }
 
   function formatSpeed(bytes) {
@@ -96,19 +116,13 @@ Rectangle {
           font.capitalization: Font.AllUppercase
         }
         Item { Layout.fillWidth: true }
+        Text { text: root.activeInterface.toUpperCase(); color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
+        Text { text: "•"; color: Colors.textDisabled; font.pixelSize: 8; visible: root.activeInterface !== "" }
         Text { text: root.currentDown; color: Colors.primary; font.pixelSize: 9; font.weight: Font.Bold }
       }
       Canvas {
         id: downCanvas; Layout.fillWidth: true; Layout.fillHeight: true
-        onPaint: {
-          var ctx = getContext("2d"); ctx.reset(); ctx.strokeStyle = Colors.primary; ctx.lineWidth = 2; ctx.beginPath();
-          var w = width / (root.downHistory.length - 1);
-          for (var i = 0; i < root.downHistory.length; i++) {
-            var x = i * w; var y = height - (root.downHistory[i] * height);
-            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-          }
-          ctx.stroke();
-        }
+        onPaint: root.paintGraph(downCanvas, root.downHistory, Colors.primary)
       }
     }
 
@@ -123,19 +137,13 @@ Rectangle {
           font.capitalization: Font.AllUppercase
         }
         Item { Layout.fillWidth: true }
+        Text { text: root.activeInterface.toUpperCase(); color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
+        Text { text: "•"; color: Colors.textDisabled; font.pixelSize: 8; visible: root.activeInterface !== "" }
         Text { text: root.currentUp; color: Colors.accent; font.pixelSize: 9; font.weight: Font.Bold }
       }
       Canvas {
         id: upCanvas; Layout.fillWidth: true; Layout.fillHeight: true
-        onPaint: {
-          var ctx = getContext("2d"); ctx.reset(); ctx.strokeStyle = Colors.accent; ctx.lineWidth = 2; ctx.beginPath();
-          var w = width / (root.upHistory.length - 1);
-          for (var i = 0; i < root.upHistory.length; i++) {
-            var x = i * w; var y = height - (root.upHistory[i] * height);
-            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-          }
-          ctx.stroke();
-        }
+        onPaint: root.paintGraph(upCanvas, root.upHistory, Colors.accent)
       }
     }
   }

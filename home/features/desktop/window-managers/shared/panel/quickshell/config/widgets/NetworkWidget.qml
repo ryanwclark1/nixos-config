@@ -3,10 +3,19 @@ import Quickshell.Io
 import "../services"
 
 Row {
+  id: root
   spacing: 6
 
   property string networkIcon: "󰤨"
   property string networkName: "Net"
+  property string networkStatus: "disconnected"
+  readonly property string tooltipText: {
+    if (networkStatus === "wifi") return "Wi-Fi connected to " + networkName;
+    if (networkStatus === "ethernet") return "Ethernet connected";
+    if (networkStatus === "linked") return "Network link detected";
+    if (networkStatus === "disabled") return "Networking disabled";
+    return "No active network connection";
+  }
 
   Process {
     id: networkProc
@@ -18,6 +27,7 @@ Row {
           var parsed = JSON.parse(this.text.trim())
           if (parsed.icon) networkIcon = parsed.icon
           if (parsed.name) networkName = parsed.name
+          if (parsed.status) networkStatus = parsed.status
         } catch(e) {}
       }
     }

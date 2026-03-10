@@ -33,24 +33,26 @@
   # Enable kubectl completion for supported shells
   # Note: Using bashrcExtra instead of initExtra to ensure bash completion is loaded first
   programs.bash.bashrcExtra = lib.mkIf config.programs.bash.enable ''
-    # Kubectl completion (only if bash completion is available)
-    if command -v kubectl &> /dev/null && type complete &> /dev/null; then
-      # Filter out invalid shopt commands and source completion
-      source <(kubectl completion bash 2>/dev/null | grep -v "shopt.*progcomp" || true)
-      # Only set completion if the function exists
-      if type __start_kubectl &> /dev/null; then
-        complete -F __start_kubectl k 2>/dev/null || true
+    # Some bash builds in this repo's target environments do not support
+    # programmable completion (`shopt progcomp` / `complete`).
+    if shopt -q progcomp 2>/dev/null; then
+      # Kubectl completion
+      if command -v kubectl &> /dev/null; then
+        source <(kubectl completion bash 2>/dev/null | grep -v "shopt.*progcomp" || true)
+        if type __start_kubectl &> /dev/null; then
+          complete -F __start_kubectl k 2>/dev/null || true
+        fi
       fi
-    fi
 
-    # Minikube completion
-    if command -v minikube &> /dev/null && type complete &> /dev/null; then
-      source <(minikube completion bash 2>/dev/null | grep -v "shopt.*progcomp" || true)
-    fi
+      # Minikube completion
+      if command -v minikube &> /dev/null; then
+        source <(minikube completion bash 2>/dev/null | grep -v "shopt.*progcomp" || true)
+      fi
 
-    # Helm completion
-    if command -v helm &> /dev/null && type complete &> /dev/null; then
-      source <(helm completion bash 2>/dev/null | grep -v "shopt.*progcomp" || true)
+      # Helm completion
+      if command -v helm &> /dev/null; then
+        source <(helm completion bash 2>/dev/null | grep -v "shopt.*progcomp" || true)
+      fi
     fi
   '';
 

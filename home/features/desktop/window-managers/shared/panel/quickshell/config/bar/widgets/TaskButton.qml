@@ -1,8 +1,8 @@
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
-import Quickshell.Widgets
 import "../../services"
+import "../../widgets" as SharedWidgets
 
 Rectangle {
   id: taskItem
@@ -10,6 +10,7 @@ Rectangle {
   color: isFocused ? Colors.highlight : (mouseArea.containsMouse ? Colors.highlightLight : "transparent")
   border.color: isFocused ? Colors.primary : "transparent"; border.width: 1
   clip: true
+  scale: mouseArea.containsMouse ? 1.06 : 1.0
 
   property string appClass: ""
   property string appAddress: ""
@@ -17,6 +18,14 @@ Rectangle {
   property string appName: ""
   property bool isFocused: false
   property bool isPinned: false
+  property var anchorWindow: null
+  property var iconMap: ({})
+  readonly property var iconAliases: ({
+    "alacritty": ["utilities-terminal", "terminal", "org.gnome.Console"],
+    "org.alacritty.alacritty": ["utilities-terminal", "terminal", "org.gnome.Console"],
+    "org.gnome.nautilus": ["system-file-manager", "folder", "inode-directory"],
+    "nautilus": ["system-file-manager", "folder", "inode-directory"]
+  })
   
   // Find running instance if it's a pinned app
   property var runningInstance: {
@@ -30,6 +39,15 @@ Rectangle {
   
   readonly property bool isRunning: isPinned ? runningInstance !== null : true
   readonly property bool actualFocused: isPinned ? (runningInstance && runningInstance.focused) : isFocused
+  readonly property string tooltipText: {
+    if ((appName || "").trim().length > 0) return appName;
+    if ((appClass || "").trim().length > 0) return appClass;
+    if ((appExec || "").trim().length > 0) return appExec;
+    return isPinned ? "Pinned app" : "Running app";
+  }
+
+  Behavior on color { ColorAnimation { duration: 160 } }
+  Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
 
   // Running indicator dot
   Rectangle {
@@ -38,34 +56,54 @@ Rectangle {
     visible: isRunning
   }
 
-  IconImage {
+  Image {
     id: taskIcon
-    anchors.centerIn: parent; implicitWidth: 20; implicitHeight: 20
-    property string iconPath: {
-        var cls = (appClass || "").toLowerCase();
-        var path = Quickshell.iconPath(cls);
-        if (!path) path = Quickshell.iconPath("application-x-executable");
-        return path || "";
+    anchors.centerIn: parent; width: 20; height: 20
+    sourceSize.width: 64; sourceSize.height: 64
+    fillMode: Image.PreserveAspectFit
+    property string sourceUrl: {
+        if (!resolvedPath) return "";
+        if (resolvedPath.startsWith("/") || resolvedPath.startsWith("file://")) return resolvedPath.startsWith("file://") ? resolvedPath : "file://" + resolvedPath;
+        return resolvedPath;
     }
-    source: iconPath; visible: status === IconImage.Ready && source != ""
+    property string resolvedPath: {
+        var cls = (appClass || "").toLowerCase();
+        var execName = (appExec || "").toLowerCase();
+        if (cls === "nemo" || execName === "nemo") return "";
+        var aliases = iconAliases[cls] || iconAliases[execName] || [];
+        // Prefer stable alias icons before app-specific SVGs that may be broken.
+        for (var i = 0; i < aliases.length; ++i) {
+            var alias = aliases[i];
+            if (iconMap[alias]) return iconMap[alias];
+        }
+        // Try icon map from qs-icon-resolver (class, exec, various keys)
+        if (cls && iconMap[cls]) return iconMap[cls];
+        if (execName && iconMap[execName]) return iconMap[execName];
+        // Try Quickshell.iconPath as fallback
+        for (var j = 0; j < aliases.length; ++j) {
+            var p3 = Quickshell.iconPath(aliases[j]);
+            if (p3) return p3;
+        }
+        if (cls) { var p = Quickshell.iconPath(cls); if (p) return p; }
+        if (execName && execName !== cls) { var p2 = Quickshell.iconPath(execName); if (p2) return p2; }
+        return "";
+    }
+    source: sourceUrl
+    visible: status === Image.Ready && source != ""
   }
 
   Text {
     anchors.centerIn: parent
-    text: appName ? appName.charAt(0).toUpperCase() : (appClass ? appClass.charAt(0).toUpperCase() : "?")
+    text: "󰀻"
     color: Colors.fgMain
-    font.pixelSize: 14
-    visible: !taskIcon.visible || taskIcon.status !== IconImage.Ready
+    font.family: Colors.fontMono
+    font.pixelSize: 16
+    visible: !taskIcon.visible
   }
 
   MouseArea {
     id: mouseArea; anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true; acceptedButtons: Qt.LeftButton | Qt.RightButton
     
-    // Simple tooltip fallback using title property if supported by compositor, 
-    // or just console log for now to identify.
-    onEntered: {
-      // console.log("Hovered app:", appName, "class:", appClass);
-    }
     onClicked: (mouse) => {
       if (mouse.button === Qt.LeftButton) {
         if (isRunning) {
@@ -78,5 +116,12 @@ Rectangle {
         root.togglePin({ class: appClass, title: appName });
       }
     }
+  }
+
+  SharedWidgets.BarTooltip {
+    anchorItem: taskItem
+    anchorWindow: taskItem.anchorWindow
+    hovered: mouseArea.containsMouse
+    text: taskItem.tooltipText
   }
 }

@@ -38,7 +38,6 @@ Rectangle {
       delegate: RowLayout {
         Layout.fillWidth: true
         spacing: 15
-...
 
         // Album Art
         Rectangle {

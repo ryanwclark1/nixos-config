@@ -21,7 +21,20 @@ QtObject {
   property int notifWidth: 350
   property int popupTimer: 5000
 
-  // Internal Logic to Load
+  // --- LAUNCHER ---
+  property string launcherDefaultMode: "drun"
+  property bool launcherShowModeHints: true
+  property bool launcherShowHomeSections: true
+
+  // --- CONTROL CENTER ---
+  property int controlCenterWidth: 350
+  property bool controlCenterShowQuickLinks: true
+  property bool controlCenterShowMediaWidget: true
+
+  // --- OSD ---
+  property int osdDuration: 2000
+  property int osdSize: 180
+
   readonly property string configPath: Quickshell.statePath("config.json")
 
   function applyRuntimeSettings() {
@@ -36,25 +49,44 @@ QtObject {
   }
 
   function load() {
-    if (configFile.path === "") return;
     var raw = configFile.text();
     if (!raw) return;
 
     try {
       var data = JSON.parse(raw);
+
       if (data.bar) {
-        barHeight = data.bar.height || barHeight;
-        barFloating = data.bar.floating !== undefined ? data.bar.floating : barFloating;
-        barMargin = data.bar.margin !== undefined ? data.bar.margin : barMargin;
-        barOpacity = data.bar.opacity || barOpacity;
+        if (data.bar.height !== undefined) barHeight = data.bar.height;
+        if (data.bar.floating !== undefined) barFloating = data.bar.floating;
+        if (data.bar.margin !== undefined) barMargin = data.bar.margin;
+        if (data.bar.opacity !== undefined) barOpacity = data.bar.opacity;
       }
+
       if (data.glass) {
-        blurEnabled = data.glass.blur !== undefined ? data.glass.blur : blurEnabled;
-        glassOpacity = data.glass.opacity || glassOpacity;
+        if (data.glass.blur !== undefined) blurEnabled = data.glass.blur;
+        if (data.glass.opacity !== undefined) glassOpacity = data.glass.opacity;
       }
+
       if (data.notifications) {
-        notifWidth = data.notifications.width || notifWidth;
-        popupTimer = data.notifications.popupTimer || popupTimer;
+        if (data.notifications.width !== undefined) notifWidth = data.notifications.width;
+        if (data.notifications.popupTimer !== undefined) popupTimer = data.notifications.popupTimer;
+      }
+
+      if (data.launcher) {
+        if (data.launcher.defaultMode !== undefined) launcherDefaultMode = data.launcher.defaultMode;
+        if (data.launcher.showModeHints !== undefined) launcherShowModeHints = data.launcher.showModeHints;
+        if (data.launcher.showHomeSections !== undefined) launcherShowHomeSections = data.launcher.showHomeSections;
+      }
+
+      if (data.controlCenter) {
+        if (data.controlCenter.width !== undefined) controlCenterWidth = data.controlCenter.width;
+        if (data.controlCenter.showQuickLinks !== undefined) controlCenterShowQuickLinks = data.controlCenter.showQuickLinks;
+        if (data.controlCenter.showMediaWidget !== undefined) controlCenterShowMediaWidget = data.controlCenter.showMediaWidget;
+      }
+
+      if (data.osd) {
+        if (data.osd.duration !== undefined) osdDuration = data.osd.duration;
+        if (data.osd.size !== undefined) osdSize = data.osd.size;
       }
     } catch (e) {
       console.error("Failed to load config: " + e);
@@ -64,11 +96,10 @@ QtObject {
   }
 
   property FileView configFile: FileView {
-    path: ""
+    path: root.configPath
     blockLoading: true
-    watchChanges: true
+    printErrors: false
     onLoaded: root.load()
-    onFileChanged: reload()
     onLoadFailed: (error) => {
       if (error === 2) {
         root.save();
@@ -80,7 +111,6 @@ QtObject {
   }
 
   function save() {
-    if (configFile.path === "") configFile.path = root.configPath;
     var data = {
       "bar": {
         "height": barHeight,
@@ -95,16 +125,24 @@ QtObject {
       "notifications": {
         "width": notifWidth,
         "popupTimer": popupTimer
+      },
+      "launcher": {
+        "defaultMode": launcherDefaultMode,
+        "showModeHints": launcherShowModeHints,
+        "showHomeSections": launcherShowHomeSections
+      },
+      "controlCenter": {
+        "width": controlCenterWidth,
+        "showQuickLinks": controlCenterShowQuickLinks,
+        "showMediaWidget": controlCenterShowMediaWidget
+      },
+      "osd": {
+        "duration": osdDuration,
+        "size": osdSize
       }
     };
 
     configFile.setText(JSON.stringify(data, null, 2));
     applyRuntimeSettings();
-  }
-
-  Component.onCompleted: {
-    Quickshell.execDetached(["sh", "-c", "mkdir -p $(dirname " + configPath + ") && touch " + configPath]);
-    configFile.path = root.configPath;
-    configFile.reload();
   }
 }

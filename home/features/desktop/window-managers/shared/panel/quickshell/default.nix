@@ -70,6 +70,12 @@ let
     PATH="${pkgs.networkmanager}/bin:${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:$PATH"
     ${builtins.readFile ./scripts/network.sh}
   '';
+
+  iconResolverScript = pkgs.writeShellScriptBin "qs-icon-resolver" ''
+    PATH="${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.findutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:$PATH"
+    ${builtins.readFile ./scripts/icon-resolver.sh}
+  '';
+
   in
   {
   options.features.quickshell = {
@@ -95,7 +101,37 @@ let
       cavaScript
       inhibitorScript
       networkScript
-    ];    home.file.".config/quickshell" = {
+      iconResolverScript
+    ];
+
+    home.activation.disableLegacyNotificationDaemons = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+      if command -v systemctl >/dev/null 2>&1; then
+        systemctl --user stop swaync.service >/dev/null 2>&1 || true
+        systemctl --user disable swaync.service >/dev/null 2>&1 || true
+        systemctl --user reset-failed swaync.service >/dev/null 2>&1 || true
+        while IFS= read -r unit; do
+          [ -n "$unit" ] || continue
+          systemctl --user stop "$unit" >/dev/null 2>&1 || true
+        done <<EOF
+$(systemctl --user list-units --full --all --plain --no-legend 'dbus-*.service' 2>/dev/null | awk '/org\.freedesktop\.Notifications/ { print $1 }')
+EOF
+      fi
+
+      if command -v pkill >/dev/null 2>&1; then
+        pkill -x mako >/dev/null 2>&1 || true
+        pkill -f '/mako($| )' >/dev/null 2>&1 || true
+      fi
+
+      if command -v busctl >/dev/null 2>&1; then
+        busctl --user call org.freedesktop.DBus /org/freedesktop/DBus org.freedesktop.DBus ReloadConfig >/dev/null 2>&1 || true
+      fi
+    '';
+
+    home.activation.removeQuickshellNotificationService = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+      rm -f "${config.home.homeDirectory}/.local/share/dbus-1/services/org.freedesktop.Notifications.service"
+    '';
+
+    home.file.".config/quickshell" = {
       source = ./config;
       recursive = true;
     };
@@ -119,6 +155,9 @@ let
 
       Service = {
         ExecStart = "${pkgs.quickshell}/bin/quickshell";
+        Environment = [
+          "PATH=%h/.nix-profile/bin:/etc/profiles/per-user/%u/bin:/run/current-system/sw/bin:${pkgs.quickshell}/bin:${pkgs.pipewire}/bin:${pkgs.networkmanager}/bin:${pkgs.tailscale}/bin:${pkgs.hyprland}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.bash}/bin"
+        ];
         Restart = "on-failure";
         RestartSec = 2;
       };

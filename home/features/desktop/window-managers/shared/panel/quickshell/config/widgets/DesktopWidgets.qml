@@ -105,24 +105,38 @@ Item {
         Text { text: "QUICK NOTE"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold; font.letterSpacing: 1 }
         
         Rectangle {
-          Layout.preferredWidth: 350; Layout.preferredHeight: 180; color: Qt.rgba(1, 1, 1, 0.03); radius: Colors.radiusMedium; border.color: noteInput.activeFocus ? Colors.primary : Colors.border; border.width: 1
-          
+          Layout.preferredWidth: 350
+          Layout.preferredHeight: 180
+          color: Qt.rgba(1, 1, 1, 0.03)
+          radius: Colors.radiusMedium
+          border.color: noteInput.activeFocus ? Colors.primary : Colors.border
+          border.width: 1
+
           TextArea {
-            id: noteInput; anchors.fill: parent; anchors.margins: Colors.paddingMedium; color: Colors.text; font.pixelSize: 14; font.family: Colors.fontMono; wrapMode: TextEdit.Wrap; placeholderText: "Type a note..."
-            
+            id: noteInput
+            anchors.fill: parent
+            anchors.margins: Colors.paddingMedium
+            color: Colors.text
+            font.pixelSize: 14
+            font.family: Colors.fontMono
+            wrapMode: TextEdit.Wrap
+            placeholderText: "Type a note..."
+
             property string notePath: Quickshell.env("HOME") + "/.cache/quickshell_note.txt"
+            property bool syncingNote: false
 
             property FileView noteFile: FileView {
-              path: ""
-              onLoaded: noteInput.text = text
+              path: noteInput.notePath
+              printErrors: false
+              onLoaded: {
+                noteInput.syncingNote = true;
+                noteInput.text = this.text();
+                noteInput.syncingNote = false;
+              }
             }
 
-            Component.onCompleted: {
-              Quickshell.execDetached(["sh", "-c", "mkdir -p $(dirname " + notePath + ") && touch " + notePath]);
-              noteFile.path = noteInput.notePath;
-              noteFile.reload();
-            }
-            onTextChanged: noteFile.setText(text)          }
+            onTextChanged: if (!syncingNote) noteInput.noteFile.setText(text)
+          }
         }
       }
 

@@ -2,10 +2,9 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import Quickshell
-import Quickshell.Services.Pipewire
-import Quickshell.Services.UPower
-import Quickshell.Bluetooth
 import Quickshell.Io
+import Quickshell.Services.Pipewire
+import Quickshell.Bluetooth
 import Quickshell.Wayland
 import Quickshell.Widgets
 import "."
@@ -24,76 +23,58 @@ PanelWindow {
   margins.right: Config.barMargin
   margins.bottom: 60
   
-  implicitWidth: 350
+  implicitWidth: Config.controlCenterWidth
   color: "transparent"
   mask: Region {
     item: sidebarContent
   }
   WlrLayershell.layer: WlrLayer.Top
-  WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+  WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
   WlrLayershell.namespace: "quickshell"
   
   property var manager: null
   property bool showContent: false
   visible: showContent || sidebarContent.x < 350
+  property real outputVolume: {
+    var v = Pipewire.defaultAudioSink?.audio?.volume;
+    return (v !== undefined && !isNaN(v)) ? Colors.clamp01(v) : 0;
+  }
+  property real inputVolume: {
+    var v = Pipewire.defaultAudioSource?.audio?.volume;
+    return (v !== undefined && !isNaN(v)) ? Colors.clamp01(v) : 0;
+  }
+  property bool outputMuted: Pipewire.defaultAudioSink?.audio?.muted ?? false
+  property bool inputMuted: Pipewire.defaultAudioSource?.audio?.muted ?? false
 
-  onShowContentChanged: { if (showContent) sidebarContent.forceActiveFocus(); }
+  PwObjectTracker {
+    objects: [Pipewire.defaultAudioSink, Pipewire.defaultAudioSource]
+  }
 
-  // State
-  property var wifiNetworks: []
-  property var vpns: []
-  property string tailscaleStatus: "Offline"
-  property string selectedSSID: ""
-
-  Process {
-    id: getWifi
-    command: ["sh", "-c", "command -v nmcli >/dev/null 2>&1 && nmcli -t -f SSID,SIGNAL,BARS dev wifi || true"]
-    running: root.showContent
-    stdout: StdioCollector {
-      onStreamFinished: {
-        var lines = (this.text || "").trim().split("\n");
-        var nets = [];
-        for (var i = 0; i < Math.min(lines.length, 10); i++) {
-          if (lines[i]) {
-            var parts = lines[i].split(":");
-            if (parts[0]) nets.push({ssid: parts[0], signal: parts[1], bars: parts[2]});
-          }
-        }
-        root.wifiNetworks = nets;
-      }
+  function setAudioVolume(target, value) {
+    var clamped = Colors.clamp01(value);
+    if (clamped > 0) {
+      Quickshell.execDetached(["wpctl", "set-mute", target, "0"]);
+    }
+    Quickshell.execDetached(["wpctl", "set-volume", target, Math.round(clamped * 100) + "%"]);
+    if (target === "@DEFAULT_AUDIO_SINK@") {
+      root.outputVolume = clamped;
+      root.outputMuted = false;
+      Quickshell.execDetached(["quickshell", "ipc", "call", "Osd", "showVolume", Math.round(clamped * 100).toString(), "false"]);
+    } else if (target === "@DEFAULT_AUDIO_SOURCE@") {
+      root.inputVolume = clamped;
+      root.inputMuted = false;
+      Quickshell.execDetached(["quickshell", "ipc", "call", "Osd", "showMic", Math.round(clamped * 100).toString(), "false"]);
     }
   }
 
-  Process {
-    id: getVPNs
-    command: ["sh", "-c", "command -v nmcli >/dev/null 2>&1 && nmcli -t -f NAME,TYPE,STATE connection show --active | grep -E 'vpn|wireguard|tun' || true"]
-    running: root.showContent
-    stdout: StdioCollector {
-      onStreamFinished: {
-        var lines = (this.text || "").trim().split("\n");
-        var activeVpns = [];
-        for (var i = 0; i < lines.length; i++) {
-          if (lines[i]) {
-            var parts = lines[i].split(":");
-            activeVpns.push({name: parts[0], type: parts[1], state: parts[2]});
-          }
-        }
-        root.vpns = activeVpns;
-      }
-    }
-  }
-
-  Process {
-    id: getTailscale
-    command: ["sh", "-c", "command -v tailscale >/dev/null 2>&1 && tailscale status --active || echo 'Offline'"]
-    running: root.showContent
-    stdout: StdioCollector {
-      onStreamFinished: {
-        var output = (this.text || "").trim();
-        if (output.includes("Tailscale is stopped")) root.tailscaleStatus = "Stopped";
-        else if (output === "" || output === "Offline") root.tailscaleStatus = "Disconnected";
-        else root.tailscaleStatus = "Connected";
-      }
+  function toggleMute(target, muted) {
+    Quickshell.execDetached(["wpctl", "set-mute", target, muted ? "0" : "1"]);
+    if (target === "@DEFAULT_AUDIO_SINK@") {
+      root.outputMuted = !muted;
+      Quickshell.execDetached(["quickshell", "ipc", "call", "Osd", "showVolume", Math.round(root.outputVolume * 100).toString(), (!muted).toString()]);
+    } else if (target === "@DEFAULT_AUDIO_SOURCE@") {
+      root.inputMuted = !muted;
+      Quickshell.execDetached(["quickshell", "ipc", "call", "Osd", "showMic", Math.round(root.inputVolume * 100).toString(), (!muted).toString()]);
     }
   }
 
@@ -110,12 +91,15 @@ PanelWindow {
       anchors.fill: parent; anchors.margins: Colors.paddingLarge; spacing: 20      
       RowLayout {
         Layout.fillWidth: true
-        Text { text: "Control Center"; color: Colors.text; font.pixelSize: 22; font.weight: Font.DemiBold; font.letterSpacing: -0.5 }
+        Text { text: "Command Center"; color: Colors.text; font.pixelSize: 22; font.weight: Font.DemiBold; font.letterSpacing: -0.5 }
         Item { Layout.fillWidth: true }
         Rectangle {
           width: 32; height: 32; radius: 16; color: settingsHover.containsMouse ? Colors.surface : "transparent"
           Text { anchors.centerIn: parent; text: "󰒓"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 18 }
-          MouseArea { id: settingsHover; anchors.fill: parent; hoverEnabled: true; onClicked: { root.showContent = false; Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "toggle"]); } }
+          MouseArea {
+            id: settingsHover; anchors.fill: parent; hoverEnabled: true
+            onClicked: { root.showContent = false; Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "toggle"]); }
+          }
         }
         Rectangle {
           width: 32; height: 32; radius: 16; color: closeHover.containsMouse ? Colors.surface : "transparent"
@@ -132,6 +116,62 @@ PanelWindow {
         ColumnLayout {
           id: mainCol; width: parent.width; spacing: 20
 
+          RowLayout {
+            Layout.fillWidth: true
+            spacing: 10
+            visible: Config.controlCenterShowQuickLinks
+
+            Rectangle {
+              Layout.fillWidth: true
+              implicitHeight: 78
+              radius: Colors.radiusMedium
+              color: Colors.bgWidget
+              border.color: Colors.border
+              border.width: 1
+
+              RowLayout {
+                anchors.fill: parent
+                anchors.margins: 14
+                spacing: 12
+                Text { text: "󰕾"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 18 }
+                ColumnLayout {
+                  Layout.fillWidth: true
+                  spacing: 2
+                  Text { text: "Audio Controls"; color: Colors.fgMain; font.pixelSize: 13; font.weight: Font.DemiBold }
+                  Text { text: "Switch devices, volume, mute"; color: Colors.textSecondary; font.pixelSize: 11 }
+                }
+                Text { text: "󰄮"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 14 }
+              }
+
+              MouseArea { anchors.fill: parent; onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleAudioMenu"]) }
+            }
+
+            Rectangle {
+              Layout.fillWidth: true
+              implicitHeight: 78
+              radius: Colors.radiusMedium
+              color: Colors.bgWidget
+              border.color: Colors.border
+              border.width: 1
+
+              RowLayout {
+                anchors.fill: parent
+                anchors.margins: 14
+                spacing: 12
+                Text { text: "󰖩"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 18 }
+                ColumnLayout {
+                  Layout.fillWidth: true
+                  spacing: 2
+                  Text { text: "Network Controls"; color: Colors.fgMain; font.pixelSize: 13; font.weight: Font.DemiBold }
+                  Text { text: "Connections, VPNs, Tailscale"; color: Colors.textSecondary; font.pixelSize: 11 }
+                }
+                Text { text: "󰄮"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 14 }
+              }
+
+              MouseArea { anchors.fill: parent; onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleNetworkMenu"]) }
+            }
+          }
+
           UserWidget {
             opacity: root.showContent ? 1 : 0
             scale: root.showContent ? 1 : 0.95
@@ -145,10 +185,6 @@ PanelWindow {
             opacity: root.showContent ? 1 : 0
             Behavior on opacity { NumberAnimation { duration: 450; easing.type: Easing.OutCubic } }
 
-            QuickToggle {
-              icon: "󰖩"; label: "Wi-Fi"; active: root.wifiNetworks.length > 0
-              onClicked: Quickshell.execDetached(["nmcli", "radio", "wifi", active ? "off" : "on"])
-            }
             QuickToggle {
               icon: "󰂯"; label: "Bluetooth"; active: !!(Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled)
               onClicked: { if (Bluetooth.defaultAdapter) Bluetooth.defaultAdapter.enabled = !Bluetooth.defaultAdapter.enabled; }
@@ -168,6 +204,7 @@ PanelWindow {
           }
 
           MediaWidget {
+            visible: Config.controlCenterShowMediaWidget
             opacity: root.showContent ? 1 : 0
             Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
           }
@@ -177,7 +214,7 @@ PanelWindow {
             Layout.fillWidth: true; spacing: 15
             opacity: root.showContent ? 1 : 0
             Behavior on opacity { NumberAnimation { duration: 550; easing.type: Easing.OutCubic } }
-            
+
             ColumnLayout {
               Layout.fillWidth: true; spacing: 6
               RowLayout {
@@ -187,14 +224,22 @@ PanelWindow {
                 Text { text: Math.round(SystemStatus.brightness * 100) + "%"; color: Colors.textSecondary; font.pixelSize: 10 }
               }
               Rectangle {
+                id: brightnessTrack
                 Layout.fillWidth: true; height: 28; color: Colors.bgWidget; radius: 14; border.color: Colors.border; border.width: 1
+                Behavior on color { ColorAnimation { duration: 150 } }
+                Behavior on border.color { ColorAnimation { duration: 150 } }
                 Rectangle {
                   height: parent.height; width: Math.max(28, parent.width * SystemStatus.brightness); radius: 14
-                  color: Colors.primary
+                  color: brightnessHover.containsMouse ? Qt.darker(Colors.primary, 1.08) : Colors.primary
+                  Behavior on color { ColorAnimation { duration: 150 } }
                   Text { anchors.centerIn: parent; text: "󰃠"; color: Colors.background; font.family: Colors.fontMono; font.pixelSize: 12; visible: SystemStatus.brightness > 0.1 }
                 }
                 MouseArea {
+                  id: brightnessHover
                   anchors.fill: parent; 
+                  hoverEnabled: true
+                  onEntered: { brightnessTrack.color = Colors.surface; brightnessTrack.border.color = Colors.primary; }
+                  onExited: { brightnessTrack.color = Colors.bgWidget; brightnessTrack.border.color = Colors.border; }
                   onPressed: (mouse) => { SystemStatus.setBrightness(Math.max(0.01, Math.min(1.0, mouse.x / width))); }
                   onPositionChanged: (mouse) => { if (pressed) SystemStatus.setBrightness(Math.max(0.01, Math.min(1.0, mouse.x / width))); }
                 }
@@ -205,27 +250,84 @@ PanelWindow {
               Layout.fillWidth: true; spacing: 6
               RowLayout {
                 Layout.fillWidth: true
-                Text { text: "󰓃  OUTPUT VOLUME"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
+                Text { text: "󰕾  OUTPUT"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
                 Item { Layout.fillWidth: true }
-                Text { 
-                  text: (Pipewire.defaultAudioSink && !isNaN(Pipewire.defaultAudioSink.audio.volume)) ? Math.round(Pipewire.defaultAudioSink.audio.volume * 100) + "%" : "0%"
-                  color: Colors.textSecondary; font.pixelSize: 10 
-                }
+                Text { text: root.outputMuted ? "Muted" : Math.round(root.outputVolume * 100) + "%"; color: Colors.textSecondary; font.pixelSize: 10 }
               }
-              Rectangle {
-                Layout.fillWidth: true; height: 28; color: Colors.bgWidget; radius: 14; border.color: Colors.border; border.width: 1
+              RowLayout {
+                Layout.fillWidth: true
+                spacing: 10
                 Rectangle {
-                  height: parent.height; width: (Pipewire.defaultAudioSink && !isNaN(Pipewire.defaultAudioSink.audio.volume)) ? Math.max(28, parent.width * Pipewire.defaultAudioSink.audio.volume) : 0; radius: 14
-                  color: Colors.primary
-                  Text { anchors.centerIn: parent; text: "󰓃"; color: Colors.background; font.family: Colors.fontMono; font.pixelSize: 12; visible: Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio.volume > 0.1 }
+                  width: 32; height: 32; radius: 16
+                  color: outputMuteHover.containsMouse ? Colors.highlightLight : Colors.bgWidget
+                  border.color: Colors.border
+                  border.width: 1
+                  Text {
+                    anchors.centerIn: parent
+                    text: root.outputMuted ? "󰝟" : "󰕾"
+                    color: root.outputMuted ? Colors.error : Colors.text
+                    font.family: Colors.fontMono
+                    font.pixelSize: 15
+                  }
+                  MouseArea {
+                    id: outputMuteHover
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onClicked: root.toggleMute("@DEFAULT_AUDIO_SINK@", root.outputMuted)
+                  }
                 }
-                MouseArea {
-                  anchors.fill: parent; 
-                  onPressed: (mouse) => { if (Pipewire.defaultAudioSink) Pipewire.defaultAudioSink.audio.volume = Math.max(0, Math.min(1, mouse.x / width)); }
-                  onPositionChanged: (mouse) => { if (pressed && Pipewire.defaultAudioSink) Pipewire.defaultAudioSink.audio.volume = Math.max(0, Math.min(1, mouse.x / width)); }
+                Slider {
+                  id: outputSlider
+                  Layout.fillWidth: true
+                  from: 0
+                  to: 1
+                  value: root.outputMuted ? 0 : root.outputVolume
+                  onMoved: root.setAudioVolume("@DEFAULT_AUDIO_SINK@", value)
                 }
               }
             }
+
+            ColumnLayout {
+              Layout.fillWidth: true; spacing: 6
+              RowLayout {
+                Layout.fillWidth: true
+                Text { text: "󰍬  INPUT"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
+                Item { Layout.fillWidth: true }
+                Text { text: root.inputMuted ? "Muted" : Math.round(root.inputVolume * 100) + "%"; color: Colors.textSecondary; font.pixelSize: 10 }
+              }
+              RowLayout {
+                Layout.fillWidth: true
+                spacing: 10
+                Rectangle {
+                  width: 32; height: 32; radius: 16
+                  color: inputMuteHover.containsMouse ? Colors.highlightLight : Colors.bgWidget
+                  border.color: Colors.border
+                  border.width: 1
+                  Text {
+                    anchors.centerIn: parent
+                    text: root.inputMuted ? "󰍭" : "󰍬"
+                    color: root.inputMuted ? Colors.error : Colors.text
+                    font.family: Colors.fontMono
+                    font.pixelSize: 15
+                  }
+                  MouseArea {
+                    id: inputMuteHover
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onClicked: root.toggleMute("@DEFAULT_AUDIO_SOURCE@", root.inputMuted)
+                  }
+                }
+                Slider {
+                  id: inputSlider
+                  Layout.fillWidth: true
+                  from: 0
+                  to: 1
+                  value: root.inputMuted ? 0 : root.inputVolume
+                  onMoved: root.setAudioVolume("@DEFAULT_AUDIO_SOURCE@", value)
+                }
+              }
+            }
+
           }
 
           RowLayout {
@@ -256,65 +358,6 @@ PanelWindow {
           UpdateWidget { opacity: root.showContent ? 1 : 0; Behavior on opacity { NumberAnimation { duration: 750; easing.type: Easing.OutCubic } } }
           ScratchpadWidget {}
 
-          ColumnLayout {
-            width: parent.width; spacing: 15
-            
-            ColumnLayout {
-              width: parent.width; spacing: 8; visible: root.wifiNetworks.length > 0
-              Text { text: "WI-FI NETWORKS"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold; font.capitalization: Font.AllUppercase }
-              Repeater {
-                model: root.wifiNetworks
-                delegate: ColumnLayout {
-                  width: parent.width; spacing: 4
-                  Rectangle {
-                    Layout.fillWidth: true; height: 35; color: Colors.highlightLight; radius: 6
-                    RowLayout {
-                      anchors.fill: parent; anchors.margins: Colors.paddingSmall
-                      Text { text: "󰖩"; color: Colors.textSecondary; font.family: Colors.fontMono }
-                      Text { text: modelData.ssid; color: Colors.text; font.pixelSize: 12; Layout.fillWidth: true; elide: Text.ElideRight }
-                      Text { text: modelData.bars; color: Colors.textDisabled; font.family: Colors.fontMono }
-                    }
-                    MouseArea { anchors.fill: parent; onClicked: { if (root.selectedSSID === modelData.ssid) root.selectedSSID = ""; else root.selectedSSID = modelData.ssid; } }
-                  }
-                  Rectangle {
-                    Layout.fillWidth: true; height: 40; color: Colors.highlightLight; radius: 6; visible: root.selectedSSID === modelData.ssid
-                    TextInput {
-                      id: pwInput; anchors.fill: parent; anchors.margins: Colors.paddingSmall; verticalAlignment: Text.AlignVCenter; color: Colors.text; font.pixelSize: 12; echoMode: TextInput.Password; focus: parent.visible
-                      Keys.onReturnPressed: { Quickshell.execDetached(["nmcli", "dev", "wifi", "connect", modelData.ssid, "password", text]); root.selectedSSID = ""; }
-                    }
-                  }
-                }
-              }
-            }
-
-            ColumnLayout {
-              width: parent.width; spacing: 8; visible: root.vpns.length > 0 || root.tailscaleStatus !== "Stopped"
-              Text { text: "VPN & OVERLAYS"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
-              Rectangle {
-                Layout.fillWidth: true; height: 40; color: Colors.highlightLight; radius: 8; visible: root.tailscaleStatus !== "Stopped"
-                RowLayout {
-                  anchors.fill: parent; anchors.margins: 12
-                  Text { text: "󰖂"; color: root.tailscaleStatus === "Connected" ? Colors.primary : Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 16 }
-                  Text { text: "Tailscale"; color: Colors.text; font.pixelSize: 12; font.weight: Font.Medium; Layout.fillWidth: true }
-                  Rectangle { width: 8; height: 8; radius: 4; color: root.tailscaleStatus === "Connected" ? Colors.primary : Colors.textDisabled }
-                }
-                MouseArea { anchors.fill: parent; hoverEnabled: true; onClicked: { if (root.tailscaleStatus === "Connected") Quickshell.execDetached(["tailscale", "down"]); else Quickshell.execDetached(["tailscale", "up"]); } }
-              }
-              Repeater {
-                model: root.vpns
-                delegate: Rectangle {
-                  Layout.fillWidth: true; height: 40; color: Colors.highlightLight; radius: 8
-                  RowLayout {
-                    anchors.fill: parent; anchors.margins: 12
-                    Text { text: "󰖂"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 16 }
-                    Text { text: modelData.name; color: Colors.text; font.pixelSize: 12; font.weight: Font.Medium; Layout.fillWidth: true; elide: Text.ElideRight }
-                    Text { text: modelData.type; color: Colors.textDisabled; font.pixelSize: 10; font.capitalization: Font.AllUppercase }
-                  }
-                  MouseArea { anchors.fill: parent; hoverEnabled: true; onClicked: Quickshell.execDetached(["nmcli", "connection", "down", modelData.name]) }
-                }
-              }
-            }
-          }
         }
       }
 
@@ -325,7 +368,12 @@ PanelWindow {
           delegate: Rectangle {
             Layout.fillWidth: true; height: 40; color: Colors.surface; radius: 8
             Text { anchors.centerIn: parent; text: modelData.icon; color: Colors.text; font.family: Colors.fontMono; font.pixelSize: 18 }
-            MouseArea { anchors.fill: parent; hoverEnabled: true; onEntered: parent.color = Colors.highlightLight; onExited: parent.color = Colors.surface; onClicked: Quickshell.execDetached(modelData.cmd) }
+            MouseArea {
+              anchors.fill: parent; hoverEnabled: true
+              onEntered: parent.color = Colors.highlightLight
+              onExited: parent.color = Colors.surface
+              onClicked: Quickshell.execDetached(modelData.cmd)
+            }
           }
         }
       }

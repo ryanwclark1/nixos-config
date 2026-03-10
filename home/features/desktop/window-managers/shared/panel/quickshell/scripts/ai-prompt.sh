@@ -12,8 +12,8 @@ fi
 # We use the /v1/chat/completions endpoint for better compatibility
 curl -s http://localhost:11434/v1/chat/completions \
     -H "Content-Type: application/json" \
-    -d "{
-        \"model\": \"$MODEL\",
-        \"messages\": [{\"role\": \"user\", \"content\": \"$PROMPT\"}],
-        \"stream\": false
-    }" | jq -r '.choices[0].message.content'
+    -d "$(jq -n --arg model "$MODEL" --arg prompt "$PROMPT" '{
+        model: $model,
+        messages: [{role: "user", content: $prompt}],
+        stream: false
+    }')" | jq -r '.choices[0].message.content'

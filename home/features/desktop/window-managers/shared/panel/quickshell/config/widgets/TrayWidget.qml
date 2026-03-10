@@ -4,11 +4,13 @@ import Quickshell
 import Quickshell.Services.SystemTray
 import Quickshell.Widgets
 import "../services"
+import "." as LocalWidgets
 
 Row {
   id: root
   spacing: 8
   anchors.verticalCenter: parent.verticalCenter
+  property var anchorWindow: null
 
   Repeater {
     model: SystemTray.items
@@ -19,8 +21,11 @@ Row {
       height: 24
       radius: 6
       color: mouseArea.containsMouse ? Colors.highlightLight : "transparent"
+      scale: mouseArea.containsMouse ? 1.08 : 1.0
 
       anchors.verticalCenter: parent.verticalCenter
+      Behavior on color { ColorAnimation { duration: 160 } }
+      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
 
       IconImage {
         anchors.centerIn: parent
@@ -47,42 +52,25 @@ Row {
 
         onClicked: (mouse) => {
           if (mouse.button === Qt.RightButton || mouse.button === Qt.LeftButton) {
-            // Open the context menu at the item's position
-            if (modelData.menu) {
-              modelData.menu.open(trayItem);
+            if (modelData.hasMenu) {
+              var pos = trayItem.mapToItem(null, 0, trayItem.height);
+              modelData.display(root.Window.window, Math.round(pos.x), Math.round(pos.y));
             } else {
-              // Some items use activate() for left click
-              modelData.activate();
+              if (mouse.button === Qt.RightButton && modelData.secondaryActivate) {
+                modelData.secondaryActivate();
+              } else {
+                modelData.activate();
+              }
             }
           }
         }
       }
 
-      // Tooltip
-      Rectangle {
-        id: tooltip
-        visible: mouseArea.containsMouse && (modelData.tooltip || "") !== ""
-        z: 100
-
-        // Position it below the bar (assuming bar is at top)
-        parent: root.parent.parent // Go up to a stable coordinate space
-        x: trayItem.mapToItem(parent, 0, 0).x - (width / 2) + (trayItem.width / 2)
-        y: 35
-
-        width: tooltipText.implicitWidth + 16
-        height: 24
-        color: Colors.bgGlass
-        border.color: Colors.border
-        border.width: 1
-        radius: 6
-
-        Text {
-          id: tooltipText
-          anchors.centerIn: parent
-          text: modelData.tooltip || ""
-          color: Colors.text
-          font.pixelSize: 10
-        }
+      LocalWidgets.BarTooltip {
+        anchorItem: trayItem
+        anchorWindow: root.anchorWindow
+        hovered: mouseArea.containsMouse
+        text: modelData.tooltip || modelData.title || "Tray item"
       }
     }
   }
