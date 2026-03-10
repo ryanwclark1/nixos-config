@@ -280,8 +280,8 @@ PanelWindow {
         close();
       } else if (mode === "run") { if (item.exec) Quickshell.execDetached(["bash", "-c", item.exec]); close(); }
       else if (mode === "window") { Quickshell.execDetached(["hyprctl", "dispatch", "focuswindow", "address:" + item.address]); close(); }
-      else if (mode === "dmenu") { var fifoPath = "/tmp/qs-dmenu-result"; Quickshell.execDetached(["bash", "-c", "echo '" + item.name + "' > " + fifoPath]); close(); }
-      else if (mode === "emoji" || mode === "calc") { Quickshell.execDetached(["bash", "-c", "echo -n '" + item.name + "' | wl-copy"]); close(); }
+      else if (mode === "dmenu") { var fifoPath = "/tmp/qs-dmenu-result"; Quickshell.execDetached(["bash", "-c", "echo '" + item.name.replace(/'/g, "'\\''") + "' > " + fifoPath]); close(); }
+      else if (mode === "emoji" || mode === "calc") { Quickshell.execDetached(["bash", "-c", "echo -n '" + item.name.replace(/'/g, "'\\''") + "' | wl-copy"]); close(); }
       else if (mode === "clip") { Quickshell.execDetached(["bash", "-c", "cliphist decode " + item.id + " | wl-copy"]); close(); }
       else if (mode === "web" || mode === "bookmarks") { Quickshell.execDetached(["xdg-open", item.exec + (item.query ? encodeURIComponent(item.query) : "")]); close(); }
       else if (mode === "ai") { if (item.body) { Quickshell.execDetached(["bash", "-c", "echo -n '" + item.body.replace(/'/g, "'\\''") + "' | wl-copy"]); close(); } }

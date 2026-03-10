@@ -39,6 +39,14 @@ PanelWindow {
         Layout.preferredWidth: Config.notifWidth
         Layout.preferredHeight: visible ? colMain.implicitHeight + 20 : 0
         
+        // Entrance animation properties
+        property real entranceProgress: 0
+        x: (1.0 - entranceProgress) * 100
+        opacity: entranceProgress
+
+        Component.onCompleted: entranceAnim.start()
+        NumberAnimation { id: entranceAnim; target: notifDelegate; property: "entranceProgress"; from: 0; to: 1.0; duration: 500; easing.type: Easing.OutBack }
+
         // Use Colors singleton
         color: isUrgent ? Colors.withAlpha(Colors.error, 0.8) : Colors.bgGlass
         border.color: isUrgent ? Colors.error : Colors.border

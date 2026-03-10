@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Wayland._Screencopy
 import Quickshell.Wayland
@@ -141,11 +140,7 @@ PanelWindow {
         if (runningWindow) {
            runningWindow.focus();
         } else {
-           if (command[0] === "quickshell") Quickshell.execDetached(command);
-           else {
-              var proc = Qt.createQmlObject('import Quickshell.Io; Process { running: true; command: ' + JSON.stringify(command) + ' }', dockWindow);
-              proc.startDetached();
-           }
+           Quickshell.execDetached(command);
         }
       }
     }

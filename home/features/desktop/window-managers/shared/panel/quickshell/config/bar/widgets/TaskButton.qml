@@ -48,13 +48,24 @@ Rectangle {
         return path || "";
     }
     source: iconPath; visible: status === IconImage.Ready && source != ""
-    Text {
-      anchors.centerIn: parent; text: appClass ? appClass.charAt(0).toUpperCase() : "?"; color: Colors.fgMain; font.pixelSize: 14; visible: !taskIcon.visible
-    }
+  }
+
+  Text {
+    anchors.centerIn: parent
+    text: appName ? appName.charAt(0).toUpperCase() : (appClass ? appClass.charAt(0).toUpperCase() : "?")
+    color: Colors.fgMain
+    font.pixelSize: 14
+    visible: !taskIcon.visible || taskIcon.status !== IconImage.Ready
   }
 
   MouseArea {
     id: mouseArea; anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true; acceptedButtons: Qt.LeftButton | Qt.RightButton
+    
+    // Simple tooltip fallback using title property if supported by compositor, 
+    // or just console log for now to identify.
+    onEntered: {
+      // console.log("Hovered app:", appName, "class:", appClass);
+    }
     onClicked: (mouse) => {
       if (mouse.button === Qt.LeftButton) {
         if (isRunning) {

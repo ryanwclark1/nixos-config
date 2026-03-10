@@ -29,7 +29,11 @@ Rectangle {
     command: ["sh", "-c", "uptime -p | sed 's/up //;s/ hours/h/;s/ minutes/m/;s/ hour/h/;s/ minute/m/'"]
     running: true
     stdout: StdioCollector {
-      onStreamFinished: root.uptime = this.text.trim()
+      onStreamFinished: {
+        var raw = this.text.trim();
+        if (raw) root.uptime = raw;
+        else root.uptime = "just started";
+      }
     }
   }
 

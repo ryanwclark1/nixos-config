@@ -28,7 +28,7 @@ Rectangle {
     Rectangle {
       width: 36; height: 36
       radius: 18
-      color: active ? Qt.rgba(255, 255, 255, 0.2) : Colors.surface
+      color: active ? Qt.rgba(1, 1, 1, 0.2) : Colors.surface
       
       Text {
         anchors.centerIn: parent
@@ -51,7 +51,7 @@ Rectangle {
       }
       Text {
         text: active ? "On" : "Off"
-        color: active ? Qt.rgba(255, 255, 255, 0.7) : Colors.fgSecondary
+        color: active ? Qt.rgba(1, 1, 1, 0.7) : Colors.fgSecondary
         font.pixelSize: 10
       }
     }

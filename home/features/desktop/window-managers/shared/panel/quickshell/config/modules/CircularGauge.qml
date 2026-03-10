@@ -28,7 +28,7 @@ Item {
 
     ShapePath {
       fillColor: "transparent"
-      strokeColor: Qt.rgba(root.color.r, root.color.g, root.color.b, 0.2)
+      strokeColor: Colors.withAlpha(root.color, 0.2)
       strokeWidth: root.thickness
       capStyle: ShapePath.RoundCap
       PathAngleArc {

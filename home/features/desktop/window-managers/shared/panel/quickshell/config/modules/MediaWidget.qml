@@ -7,26 +7,38 @@ import "../services"
 Rectangle {
   id: root
   Layout.fillWidth: true
-  Layout.preferredHeight: mprisRepeater.count > 0 ? (mprisRepeater.count * 115 + (mprisRepeater.count - 1) * 10) : 0
-  visible: mprisRepeater.count > 0
+  Layout.preferredHeight: contentCol.implicitHeight + 24
+  visible: activePlayers.length > 0
   color: Colors.bgWidget
   radius: Colors.radiusMedium
   border.color: Colors.border
   clip: true
 
+  readonly property var activePlayers: {
+    var players = [];
+    for (var i = 0; i < Mpris.players.length; i++) {
+      var p = Mpris.players[i];
+      if (p.playbackState !== Mpris.Stopped) {
+        players.push(p);
+      }
+    }
+    return players;
+  }
+
   ColumnLayout {
+    id: contentCol
     anchors.fill: parent
     anchors.margins: 12
-    spacing: 10
+    spacing: 15
 
     Repeater {
       id: mprisRepeater
-      model: Mpris.players
-      
+      model: root.activePlayers
+
       delegate: RowLayout {
-        visible: modelData.playbackState !== Mpris.Stopped
         Layout.fillWidth: true
         spacing: 15
+...
 
         // Album Art
         Rectangle {

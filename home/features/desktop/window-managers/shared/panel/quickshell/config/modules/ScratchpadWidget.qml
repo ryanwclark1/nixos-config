@@ -29,25 +29,28 @@ Rectangle {
     }
 
     ColumnLayout {
+      id: contentCol
       Layout.fillWidth: true
       spacing: 6
 
       Repeater {
         id: scratchRepeater
         model: Hyprland.toplevels
-        
+
         delegate: Rectangle {
+          id: itemRect
           // Filter for windows in the 'special' workspace
-          visible: modelData.workspace && modelData.workspace.name.startsWith("special")
-          width: parent.width; height: visible ? 35 : 0
-          color: Colors.highlightLight; radius: 6
-          
+          readonly property bool isSpecial: modelData.workspace && (modelData.workspace.name === "special" || modelData.workspace.name.indexOf("special:") === 0)
+          visible: isSpecial
+          Layout.fillWidth: true; height: isSpecial ? 35 : 0; color: Colors.highlightLight; radius: 6
+
           RowLayout {
             anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: 10
             Text { text: "󱂬"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 14 }
-            Text { text: modelData.title || "Unknown Window"; color: Colors.text; font.pixelSize: 11; Layout.fillWidth: true; elide: Text.ElideRight }
+            Text { text: modelData.title || modelData.class || "Unknown Window"; color: Colors.text; font.pixelSize: 11; Layout.fillWidth: true; elide: Text.ElideRight }
             Text { text: "󰁔"; color: Colors.textDisabled; font.family: Colors.fontMono }
           }
+    ...
 
           MouseArea {
             anchors.fill: parent

@@ -74,11 +74,12 @@ Item {
     }
 
     Rectangle {
-      width: cavaText.width + 16
+      width: Math.min(cavaText.width + 16, 100)
       height: 28
       radius: height / 2
       color: "transparent"
       anchors.verticalCenter: parent.verticalCenter
+      clip: true
 
       Text {
         id: cavaText
@@ -132,12 +133,11 @@ Item {
         anchors.fill: parent
         cursorShape: Qt.PointingHandCursor
         onClicked: {
-          var p = Qt.createQmlObject('import Quickshell.Io; Process { running: true; command: ["qs-inhibitor"] }', parent);
-          p.startDetached();
+          Quickshell.execDetached(["qs-inhibitor"]);
           // Force check update slightly later
           inhibitorCheckTimer.restart()
         }
-        onEntered: parent.color = Qt.rgba(255, 255, 255, 0.15)
+        onEntered: parent.color = Qt.rgba(1, 1, 1, 0.15)
         onExited: parent.color = mainRow.inhibitorActive ? Colors.withAlpha(Colors.primary, 0.2) : Colors.bgWidget
       }
 

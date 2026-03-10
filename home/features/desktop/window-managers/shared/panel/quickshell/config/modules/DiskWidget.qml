@@ -16,7 +16,7 @@ Rectangle {
 
   Process {
     id: fetchDisk
-    command: ["sh", "-c", "df -h / /home | tail -n +2 | awk '{print $1 \":\" $5 \":\" $3 \":\" $2}'"]
+    command: ["sh", "-c", "df -h / /home 2>/dev/null | tail -n +2 | awk '{print $6 \":\" $5 \":\" $3 \":\" $2}' | sort -u"]
     running: true
     stdout: StdioCollector {
       onStreamFinished: {
@@ -55,7 +55,7 @@ Rectangle {
           spacing: 4
           RowLayout {
             Text { 
-              text: modelData.mount === "/" ? "󰋊 Root" : "󰋊 Home"
+              text: "󰋊 " + (modelData.mount === "/" ? "Root" : modelData.mount.replace("/home/", ""))
               color: Colors.fgMain
               font.pixelSize: 11
               font.weight: Font.Medium
@@ -67,7 +67,7 @@ Rectangle {
           Rectangle {
             Layout.fillWidth: true; height: 4; color: Colors.surface; radius: 2
             Rectangle {
-              width: parent.width * (parseInt(modelData.percent) / 100.0)
+              width: parent.width * (Math.min(100, parseInt(modelData.percent)) / 100.0)
               height: parent.height; color: Colors.secondary; radius: 2
             }
           }

@@ -5,7 +5,8 @@ import "../services"
 Rectangle {
   id: root
   height: 24
-  width: visible ? (mediaRow.width + 16) : 0
+  implicitWidth: visible ? (mediaRow.width + 16) : 0
+  width: implicitWidth
   radius: height / 2
   color: Colors.bgWidget
   clip: true
@@ -14,10 +15,14 @@ Rectangle {
   visible: player !== null && player.playbackState !== Mpris.Stopped
 
   Behavior on width { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+  Behavior on opacity { NumberAnimation { duration: 300 } }
+  opacity: visible ? 1.0 : 0.0
 
   Row {
     id: mediaRow
     anchors.centerIn: parent
+    anchors.leftMargin: 8
+    anchors.rightMargin: 8
     spacing: 8
 
     Text {
@@ -29,6 +34,7 @@ Rectangle {
     }
 
     Item {
+      id: marqueeContainer
       width: Math.min(marqueeText.contentWidth, 150)
       height: 20
       clip: true
@@ -36,7 +42,7 @@ Rectangle {
 
       Text {
         id: marqueeText
-        text: player ? (player.trackTitle + " - " + player.trackArtist) : ""
+        text: player ? (player.trackTitle + (player.trackArtist ? " - " + player.trackArtist : "")) : ""
         color: Colors.fgMain
         font.pixelSize: 11
         font.weight: Font.Medium

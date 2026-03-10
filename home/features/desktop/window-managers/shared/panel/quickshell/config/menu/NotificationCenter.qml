@@ -147,6 +147,16 @@ PanelWindow {
 
         property var collapsedGroups: ({})
 
+        add: Transition {
+          NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: 400; easing.type: Easing.OutCubic }
+          NumberAnimation { property: "scale"; from: 0.9; to: 1.0; duration: 400; easing.type: Easing.OutBack }
+        }
+
+        remove: Transition {
+          NumberAnimation { property: "opacity"; to: 0; duration: 300 }
+          NumberAnimation { property: "scale"; to: 0.9; duration: 300 }
+        }
+
         function toggleGroup(name) {
           var groups = JSON.parse(JSON.stringify(collapsedGroups));
           groups[name] = !groups[name];

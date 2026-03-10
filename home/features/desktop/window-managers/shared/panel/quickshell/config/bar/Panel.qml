@@ -82,7 +82,7 @@ Item {
       width: statusRow.width + 16
       hoverEnabled: true
       onClicked: root.controlClicked()
-      onEntered: statusBg.color = Qt.rgba(255, 255, 255, 0.15)
+      onEntered: statusBg.color = Qt.rgba(1, 1, 1, 0.15)
       onExited: statusBg.color = Colors.bgWidget
 
       scale: containsMouse ? 1.05 : 1.0
@@ -171,7 +171,7 @@ Item {
         anchors.fill: parent
         hoverEnabled: true
         onClicked: root.notifClicked()
-        onEntered: parent.color = Qt.rgba(255, 255, 255, 0.15)
+        onEntered: parent.color = Qt.rgba(1, 1, 1, 0.15)
         onExited: parent.color = Colors.bgWidget
       }
     }

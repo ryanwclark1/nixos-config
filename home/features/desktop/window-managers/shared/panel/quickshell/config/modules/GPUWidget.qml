@@ -12,25 +12,8 @@ Rectangle {
   border.color: Colors.border
   clip: true
 
-  property string gpuUsage: "0%"
   property string vramUsage: "0 / 0 MB"
   property real vramPercent: 0.0
-
-  Timer {
-    interval: 2000
-    running: true
-    repeat: true
-    onTriggered: fetchGPU.running = true
-  }
-
-  Process {
-    id: fetchGPU
-    // Specifically for AMD (typical in NixOS/Hyprland setups)
-    command: ["sh", "-c", "cat /sys/class/drm/card0/device/gpu_busy_percent 2>/dev/null || echo 0"]
-    stdout: StdioCollector {
-      onStreamFinished: root.gpuUsage = this.text.trim() + "%"
-    }
-  }
 
   Timer {
     interval: 5000
@@ -49,7 +32,7 @@ Rectangle {
           var used = parseInt(lines[0]) / 1024 / 1024;
           var total = parseInt(lines[1]) / 1024 / 1024;
           root.vramUsage = Math.round(used) + " / " + Math.round(total) + " MB";
-          root.vramPercent = used / total;
+          root.vramPercent = total > 0 ? (used / total) : 0;
         }
       }
     }
@@ -84,12 +67,12 @@ Rectangle {
             Layout.fillWidth: true
             elide: Text.ElideRight
           }
-          Text { text: root.gpuUsage; color: Colors.fgSecondary; font.pixelSize: 10 }
+          Text { text: SystemStatus.gpuUsage; color: Colors.fgSecondary; font.pixelSize: 10 }
         }
         Rectangle {
           Layout.fillWidth: true; height: 4; color: Colors.surface; radius: 2
           Rectangle {
-            width: parent.width * (parseInt(root.gpuUsage) / 100.0)
+            width: parent.width * SystemStatus.gpuPercent
             height: parent.height; color: Colors.accent; radius: 2
           }
         }

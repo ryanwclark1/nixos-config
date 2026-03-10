@@ -56,13 +56,13 @@ Rectangle {
         model: root.topApps
         
         delegate: Rectangle {
-          width: parent.width; height: 35; color: Colors.highlightLight; radius: 6
+          Layout.fillWidth: true; height: 35; color: Colors.highlightLight; radius: 6
           
           RowLayout {
             anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: 10
-            Text { text: "󰆍"; color: Colors.primary; font.family: Colors.fontMono }
+            Text { text: "󰆍"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 14 }
             Text { text: modelData.name; color: Colors.text; font.pixelSize: 11; font.weight: Font.Medium; Layout.fillWidth: true; elide: Text.ElideRight }
-            Text { text: modelData.cpu + "% CPU"; color: Colors.textSecondary; font.pixelSize: 9; font.family: Colors.fontMono }
+            Text { text: modelData.cpu + "%"; color: Colors.textSecondary; font.pixelSize: 9; font.family: Colors.fontMono }
             
             // Kill button
             Rectangle {

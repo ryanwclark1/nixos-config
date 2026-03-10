@@ -58,7 +58,7 @@ Rectangle {
 
     ColumnLayout {
       Layout.fillWidth: true
-      spacing: 2
+      spacing: 4
       Text {
         text: "System Updates"
         color: Colors.fgMain
@@ -69,23 +69,28 @@ Rectangle {
       }
 
       RowLayout {
-        spacing: 10
-        Text {
-          text: " NixOS: " + root.nixUpdates
-          color: Colors.fgSecondary
-          font.pixelSize: 10
-          font.family: Colors.fontMono
-          elide: Text.ElideRight
-          Layout.fillWidth: true
+        spacing: 12; Layout.fillWidth: true
+        RowLayout {
+          spacing: 4
+          Text { text: ""; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 12 }
+          Text {
+            text: root.nixUpdates
+            color: Colors.fgSecondary
+            font.pixelSize: 11
+            font.family: Colors.fontMono
+          }
         }
-        Text {
-          text: "󰏘 Flatpak: " + root.flatpakUpdates
-          color: Colors.fgSecondary
-          font.pixelSize: 10
-          font.family: Colors.fontMono
-          elide: Text.ElideRight
-          Layout.fillWidth: true
+        RowLayout {
+          spacing: 4
+          Text { text: "󰏘"; color: Colors.accent; font.family: Colors.fontMono; font.pixelSize: 12 }
+          Text {
+            text: root.flatpakUpdates
+            color: Colors.fgSecondary
+            font.pixelSize: 11
+            font.family: Colors.fontMono
+          }
         }
+        Item { Layout.fillWidth: true }
       }
     }
 

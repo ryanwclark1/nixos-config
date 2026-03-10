@@ -35,7 +35,7 @@ QtObject {
   // --- GLASSMORPHISM ---
   readonly property real bgOpacity: Config.glassOpacity
   readonly property color bgGlass: withAlpha(background, bgOpacity)
-  readonly property color bgWidget: Qt.rgba(255, 255, 255, 0.08)
+  readonly property color bgWidget: Qt.rgba(1, 1, 1, 0.08)
   
   // --- DIMENSIONS ---
   readonly property real radiusLarge: 20
