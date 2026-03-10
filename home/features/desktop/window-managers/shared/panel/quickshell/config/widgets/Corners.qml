@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Shapes
 import Quickshell
 import Quickshell.Wayland
+import "../services"
 
 Scope {
     id: root
@@ -62,7 +63,7 @@ Scope {
                         layer.samples: 4
                         
                         ShapePath {
-                            fillColor: "black" // Matches monitor bezel
+                            fillColor: Colors.background
                             strokeWidth: 0
                             
                             // Start at top-left

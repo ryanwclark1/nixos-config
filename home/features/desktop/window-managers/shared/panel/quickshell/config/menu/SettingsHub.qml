@@ -138,8 +138,8 @@ PanelWindow {
             
             RowLayout {
               anchors.centerIn: parent; spacing: 8
-              Text { text: "󰆓"; color: "white"; font.family: Colors.fontMono; font.pixelSize: 14 }
-              Text { text: "Save & Close"; color: "white"; font.weight: Font.Bold; font.pixelSize: 12 }
+              Text { text: "󰆓"; color: Colors.text; font.family: Colors.fontMono; font.pixelSize: 14 }
+              Text { text: "Save & Close"; color: Colors.text; font.weight: Font.Bold; font.pixelSize: 12 }
             }
             
             MouseArea { 

@@ -5,7 +5,6 @@ import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Bluetooth
-import Quickshell.Services.Pipewire
 import Quickshell.Services.Mpris
 import "../services"
 
@@ -99,17 +98,23 @@ PanelWindow {
     close();
   }
 
-  function runCommand(command, onOutput) {
-    var proc = Qt.createQmlObject(
-      'import Quickshell.Io; Process { running: false; stdout: StdioCollector {} }',
-      launcherRoot
-    );
-    proc.command = command;
-    proc.stdout.streamFinished.connect(function() {
-      if (onOutput) onOutput(proc.stdout.text || "");
-      proc.destroy();
-    });
-    proc.running = true;
+  property var onCommandOutput: null
+  
+  property Process commandProc: Process {
+    running: false
+    stdout: StdioCollector {
+      onStreamFinished: {
+        if (launcherRoot.onCommandOutput) {
+          launcherRoot.onCommandOutput(this.text || "");
+        }
+      }
+    }
+  }
+
+  function runCommand(command, callback) {
+    onCommandOutput = callback;
+    commandProc.command = command;
+    commandProc.running = true;
   }
 
   // --- Search Logic (Simplified) ---
@@ -182,7 +187,14 @@ PanelWindow {
     runCommand(["nixos-version"], function(raw) { var ver = raw.trim(); if (ver && mode === "nixos") { allItems.unshift({ category: "Information", name: "Current Version: " + ver, icon: "", action: null }); filterItems(); } });
     filterItems();
   }
-  function loadWindows() { allItems = Hyprland.toplevels; filterItems(); }
+  function loadWindows() { 
+    try {
+      allItems = Hyprland.toplevels; 
+    } catch(e) {
+      allItems = [];
+    }
+    filterItems(); 
+  }
   
   property var appFrequency: ({})
   readonly property string freqPath: Quickshell.statePath("app_frequency.json")
@@ -264,9 +276,9 @@ PanelWindow {
       if (mode === "drun") {
         trackLaunch(item.exec);
         if (item.terminal && (item.terminal === "true" || item.terminal === "True")) Quickshell.execDetached(["kitty", "-e", "bash", "-c", item.exec]);
-        else Quickshell.execDetached(["sh", "-c", item.exec]);
+        else if (item.exec) Quickshell.execDetached(item.exec.split(" "));
         close();
-      } else if (mode === "run") { Quickshell.execDetached(["bash", "-c", item.exec]); close(); }
+      } else if (mode === "run") { if (item.exec) Quickshell.execDetached(["bash", "-c", item.exec]); close(); }
       else if (mode === "window") { Quickshell.execDetached(["hyprctl", "dispatch", "focuswindow", "address:" + item.address]); close(); }
       else if (mode === "dmenu") { var fifoPath = "/tmp/qs-dmenu-result"; Quickshell.execDetached(["bash", "-c", "echo '" + item.name + "' > " + fifoPath]); close(); }
       else if (mode === "emoji" || mode === "calc") { Quickshell.execDetached(["bash", "-c", "echo -n '" + item.name + "' | wl-copy"]); close(); }
@@ -452,7 +464,7 @@ PanelWindow {
         anchors.centerIn: parent; spacing: 25
         Text { text: launcherRoot.confirmTitle; color: Colors.text; font.pixelSize: 20; font.bold: true; Layout.alignment: Qt.AlignHCenter }
         RowLayout { spacing: 15; Layout.alignment: Qt.AlignHCenter
-          Rectangle { width: 100; height: 40; color: Colors.error; radius: 20; Text { text: "Yes"; color: "white"; anchors.centerIn: parent; font.bold: true } MouseArea { anchors.fill: parent; onClicked: launcherRoot.doConfirm() } }
+          Rectangle { width: 100; height: 40; color: Colors.error; radius: 20; Text { text: "Yes"; color: Colors.text; anchors.centerIn: parent; font.bold: true } MouseArea { anchors.fill: parent; onClicked: launcherRoot.doConfirm() } }
           Rectangle { width: 100; height: 40; color: Colors.surface; radius: 20; Text { text: "No"; color: Colors.text; anchors.centerIn: parent; font.bold: true } MouseArea { anchors.fill: parent; onClicked: launcherRoot.cancelConfirm() } }
         }
       }

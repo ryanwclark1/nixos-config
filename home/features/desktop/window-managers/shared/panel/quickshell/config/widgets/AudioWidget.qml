@@ -20,7 +20,13 @@ Row {
   }
 
   Text {
-    text: muted ? "Muted" : Math.round(root.volume * 100) + "%"
+    id: volumeText
+    text: {
+        if (muted) return "Muted";
+        var v = root.volume;
+        if (isNaN(v)) return "0%";
+        return Math.round(v * 100) + "%";
+    }
     color: Colors.fgMain
     font.pixelSize: 13
     font.weight: Font.Bold

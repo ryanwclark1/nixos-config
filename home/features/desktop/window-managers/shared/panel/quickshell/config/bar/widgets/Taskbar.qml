@@ -77,13 +77,13 @@ Row {
       // Only show if not already pinned and on active workspace
       property bool alreadyPinned: {
         for (var i = 0; i < pinnedApps.length; i++) {
-          if (pinnedApps[i].class === (modelData.objectName || "")) return true;
+          if (pinnedApps[i].class === (modelData.class || "")) return true;
         }
         return false;
       }
       visible: !alreadyPinned && modelData.workspace && modelData.workspace.active
       width: visible ? 32 : 0
-      appClass: modelData.objectName || ""
+      appClass: modelData.class || ""
       appAddress: modelData.address
       isFocused: modelData.activated
       isPinned: false

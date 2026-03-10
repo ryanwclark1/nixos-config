@@ -194,7 +194,7 @@ Scope {
 																Text {
 																	anchors.centerIn: parent
 																	text: "󰅖"
-																	color: "white"
+																	color: Colors.text
 																	font.family: Colors.fontMono
 																	font.pixelSize: 14
 																}

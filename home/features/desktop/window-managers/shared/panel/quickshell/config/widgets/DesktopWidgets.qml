@@ -114,7 +114,7 @@ Item {
 
             property FileView noteFile: FileView {
               path: ""
-              onLoaded: noteInput.text = text()
+              onLoaded: noteInput.text = text
             }
 
             Component.onCompleted: {
