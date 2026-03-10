@@ -35,7 +35,7 @@ QtObject {
   property int osdDuration: 2000
   property int osdSize: 180
 
-  readonly property string configPath: Quickshell.statePath("config.json")
+  readonly property string configPath: Quickshell.env("HOME") + "/.local/state/quickshell/config.json"
 
   function applyRuntimeSettings() {
     if (Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE") !== "") {

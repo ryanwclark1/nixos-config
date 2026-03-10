@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 AUR_HELPER="paru"
-UPDATES_DIR="/tmp/updates"
+UPDATES_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/quickshell/updates"
 ICON="󰮯"
 INTERVAL_MINUTES=10
 

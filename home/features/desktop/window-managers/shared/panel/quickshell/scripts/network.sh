@@ -26,7 +26,7 @@ output_status_json() {
         if [[ "$dev_type" == "wifi" && "$dev_state" == "connected" ]]; then
             icon=""
             status="wifi"
-            ssid=$(nmcli -t -f ACTIVE,SSID dev wifi | awk -F: '$1 == "yes" {print $2; exit}')
+            ssid=$(nmcli -g NAME connection show --active 2>/dev/null | head -n 1)
             name="$ssid"
             jq -nc --arg icon "$icon" --arg status "$status" --arg name "$name" \
                 '{icon: $icon, status: $status, name: $name}'

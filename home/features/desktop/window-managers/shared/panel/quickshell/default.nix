@@ -106,20 +106,27 @@ let
 
     home.activation.disableLegacyNotificationDaemons = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
       if command -v systemctl >/dev/null 2>&1; then
-        systemctl --user stop swaync.service >/dev/null 2>&1 || true
-        systemctl --user disable swaync.service >/dev/null 2>&1 || true
-        systemctl --user reset-failed swaync.service >/dev/null 2>&1 || true
+        # Explicitly stop, disable and MASK these to prevent restarts
+        for svc in swaync.service mako.service dunst.service; do
+          systemctl --user stop "$svc" >/dev/null 2>&1 || true
+          systemctl --user disable "$svc" >/dev/null 2>&1 || true
+          systemctl --user mask "$svc" >/dev/null 2>&1 || true
+          systemctl --user reset-failed "$svc" >/dev/null 2>&1 || true
+        done
+        
+        # Kill any stray processes
+        pkill -x swaync >/dev/null 2>&1 || true
+        pkill -x mako >/dev/null 2>&1 || true
+        pkill -x dunst >/dev/null 2>&1 || true
+
+        # Clean up any other services claiming the notifications name
         while IFS= read -r unit; do
           [ -n "$unit" ] || continue
           systemctl --user stop "$unit" >/dev/null 2>&1 || true
+          systemctl --user mask "$unit" >/dev/null 2>&1 || true
         done <<EOF
 $(systemctl --user list-units --full --all --plain --no-legend 'dbus-*.service' 2>/dev/null | awk '/org\.freedesktop\.Notifications/ { print $1 }')
 EOF
-      fi
-
-      if command -v pkill >/dev/null 2>&1; then
-        pkill -x mako >/dev/null 2>&1 || true
-        pkill -f '/mako($| )' >/dev/null 2>&1 || true
       fi
 
       if command -v busctl >/dev/null 2>&1; then
@@ -127,8 +134,20 @@ EOF
       fi
     '';
 
-    home.activation.removeQuickshellNotificationService = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-      rm -f "${config.home.homeDirectory}/.local/share/dbus-1/services/org.freedesktop.Notifications.service"
+    home.activation.prepareQuickshellRestart = lib.hm.dag.entryBefore [ "reloadSystemd" ] ''
+      if command -v systemctl >/dev/null 2>&1; then
+        systemctl --user stop quickshell.service >/dev/null 2>&1 || true
+      fi
+
+      if command -v busctl >/dev/null 2>&1; then
+        for _ in $(seq 1 50); do
+          owner_line="$(busctl --user --list 2>/dev/null | awk '/org\.freedesktop\.Notifications/ { print $3; exit }')"
+          if [ -z "$owner_line" ] || [ "$owner_line" = "-" ]; then
+            break
+          fi
+          sleep 0.1
+        done
+      fi
     '';
 
     home.file.".config/quickshell" = {
@@ -144,6 +163,12 @@ EOF
       Type=Application
       NoDisplay=true
       Categories=System;
+    '';
+
+    home.file.".local/share/dbus-1/services/org.freedesktop.Notifications.service".text = ''
+      [D-BUS Service]
+      Name=org.freedesktop.Notifications
+      SystemdService=quickshell.service
     '';
 
     systemd.user.services.quickshell = {

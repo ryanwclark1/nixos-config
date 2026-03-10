@@ -18,7 +18,7 @@ Row {
       radius: 6
       height: 20
       width: Math.max(22, label.implicitWidth + 10)
-      color: modelData.id === root.state.activeWorkspace ? root.activeColor : root.inactiveColor
+      color: (root.state && modelData.id === root.state.activeWorkspace) ? root.activeColor : root.inactiveColor
 
       Text {
         id: label

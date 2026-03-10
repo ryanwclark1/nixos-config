@@ -9,6 +9,9 @@ Item {
   implicitWidth: mainRow.width
   implicitHeight: mainRow.height
   property var anchorWindow: null
+  
+  property string fullCavaData: ""
+  property bool cavaPopupVisible: false
 
   Row {
     id: mainRow
@@ -89,7 +92,8 @@ Item {
       stdout: SplitParser {
         onRead: function(data) {
           if (data) {
-            cavaText.text = data.toString().trim()
+            root.fullCavaData = data.toString().trim()
+            cavaText.text = root.fullCavaData.substring(0, 8)
           }
         }
       }
@@ -120,6 +124,8 @@ Item {
         id: cavaMouse
         anchors.fill: parent
         hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
+        onClicked: root.cavaPopupVisible = !root.cavaPopupVisible
       }
 
       SharedWidgets.BarTooltip {

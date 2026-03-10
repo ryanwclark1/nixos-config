@@ -37,13 +37,15 @@ PanelWindow {
   readonly property bool showingConfirm: confirmTitle !== ""
 
   property var recentItems: []
+  property var suggestionItems: []
   property var featuredActions: []
   property var appFrequency: ({})
+  property var launchHistory: []
   property var onCommandOutput: null
   property var modeCache: ({})
   property int openCount: 0
 
-  readonly property bool showLauncherHome: Config.launcherShowHomeSections && searchText === "" && mode !== "media"
+  readonly property bool showLauncherHome: Config.launcherShowHomeSections && searchText === "" && (mode === "drun" || mode === "system" || mode === "files")
   readonly property var modeOrder: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media"]
   readonly property var primaryModes: ["drun", "window", "files", "ai", "clip", "system", "media"]
   readonly property var modeMeta: ({
@@ -108,29 +110,82 @@ PanelWindow {
     if (mode === "files") return "Type at least two characters to search files";
     if (mode === "ai") return "Describe what you want and press Enter";
     if (mode === "clip") return "Clipboard history is empty";
+    if (mode === "window") return "No open windows found";
     return "No results";
   }
   readonly property string emptyStateSubtitle: {
     if (mode === "files") return "Search runs inside your home directory";
     if (mode === "ai") return "The response will be copied to your clipboard";
     if (mode === "clip") return "Copy something to populate clipboard history";
+    if (mode === "window") return "Open some applications to see them here";
     return "Try another query or switch modes";
   }
 
-  readonly property string freqPath: Quickshell.statePath("app_frequency.json")
+  readonly property string freqPath: Quickshell.env("HOME") + "/.local/state/quickshell/app_frequency.json"
+  readonly property string historyPath: Quickshell.env("HOME") + "/.local/state/quickshell/launcher_history.json"
 
   Behavior on launcherOpacity { NumberAnimation { duration: 300; easing.type: Easing.OutQuint } }
 
   property real scaleValue: 0.95
   Behavior on scaleValue { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
+  property bool seedFrequencyFile: false
+  property bool seedHistoryFile: false
 
   property FileView freqFile: FileView {
     path: launcherRoot.freqPath
+    blockLoading: true
     printErrors: false
     onLoaded: {
       try {
         launcherRoot.appFrequency = JSON.parse(freqFile.text());
       } catch (e) {}
+    }
+    onLoadFailed: (error) => {
+      if (error === 2) {
+        launcherRoot.seedFrequencyFile = true;
+        seedFrequencyTimer.restart();
+      }
+    }
+  }
+
+  property FileView historyFile: FileView {
+    path: launcherRoot.historyPath
+    blockLoading: true
+    printErrors: false
+    onLoaded: {
+      try {
+        launcherRoot.launchHistory = JSON.parse(historyFile.text());
+      } catch (e) {
+        launcherRoot.launchHistory = [];
+      }
+    }
+    onLoadFailed: (error) => {
+      if (error === 2) {
+        launcherRoot.seedHistoryFile = true;
+        seedHistoryTimer.restart();
+      }
+    }
+  }
+
+  Timer {
+    id: seedFrequencyTimer
+    interval: 0
+    repeat: false
+    onTriggered: {
+      if (!launcherRoot.seedFrequencyFile) return;
+      launcherRoot.seedFrequencyFile = false;
+      freqFile.setText("{}");
+    }
+  }
+
+  Timer {
+    id: seedHistoryTimer
+    interval: 0
+    repeat: false
+    onTriggered: {
+      if (!launcherRoot.seedHistoryFile) return;
+      launcherRoot.seedHistoryFile = false;
+      historyFile.setText("[]");
     }
   }
 
@@ -158,29 +213,84 @@ PanelWindow {
   }
 
   function saveFrequency() { freqFile.setText(JSON.stringify(appFrequency)); }
-  function trackLaunch(exec) {
-    if (!exec) return;
-    appFrequency[exec] = (appFrequency[exec] || 0) + 1;
+  function saveHistory() { historyFile.setText(JSON.stringify(launchHistory)); }
+
+  function rememberRecent(item) {
+    var key = item.exec || item.address || item.fullPath || item.name || item.title || "";
+    if (!key) return;
+    var next = [{
+      key: key,
+      name: item.name || item.label || item.title || key,
+      title: item.title || item.description || item.exec || "",
+      icon: item.icon || modeIcons[mode] || "󰀻",
+      exec: item.exec || "",
+      openMode: item.openMode || "",
+      timestamp: Date.now()
+    }];
+    for (var i = 0; i < launchHistory.length; ++i) {
+      if (launchHistory[i].key !== key) next.push(launchHistory[i]);
+      if (next.length >= 12) break;
+    }
+    launchHistory = next;
+    saveHistory();
+  }
+
+  function trackLaunch(item) {
+    var exec = item && item.exec ? item.exec : "";
+    if (exec) appFrequency[exec] = (appFrequency[exec] || 0) + 1;
     saveFrequency();
+    rememberRecent(item || {});
     buildLauncherHome();
   }
 
   function buildLauncherHome() {
     featuredActions = launcherShortcuts[mode] || [];
+    suggestionItems = [];
     if (mode === "drun") {
       var apps = modeCache["drun"] || [];
-      var scored = [];
-      for (var i = 0; i < apps.length; i++) {
-        var app = apps[i];
-        var count = appFrequency[app.exec] || 0;
-        if (count > 0) {
-          var copy = Object.assign({}, app);
-          copy._recent = count;
-          scored.push(copy);
+      var recent = [];
+      var seen = ({});
+      for (var i = 0; i < launchHistory.length; ++i) {
+        var launch = launchHistory[i];
+        for (var j = 0; j < apps.length; ++j) {
+          var app = apps[j];
+          if (app.exec === launch.exec && !seen[app.exec]) {
+            var matched = Object.assign({}, app);
+            matched._recent = launch.timestamp || 0;
+            recent.push(matched);
+            seen[app.exec] = true;
+            break;
+          }
         }
       }
-      scored.sort(function(a, b) { return b._recent - a._recent; });
-      recentItems = scored.slice(0, 6);
+      if (recent.length < 6) {
+        var scored = [];
+        for (var k = 0; k < apps.length; ++k) {
+          var ranked = apps[k];
+          var count = appFrequency[ranked.exec] || 0;
+          if (count > 0 && !seen[ranked.exec]) {
+            var copy = Object.assign({}, ranked);
+            copy._recent = count;
+            scored.push(copy);
+          }
+        }
+        scored.sort(function(a, b) { return b._recent - a._recent; });
+        recent = recent.concat(scored);
+      }
+      recentItems = recent.slice(0, 6);
+      var suggestions = [];
+      for (var m = 0; m < apps.length; ++m) {
+        var candidate = apps[m];
+        if (seen[candidate.exec]) continue;
+        var usage = appFrequency[candidate.exec] || 0;
+        if (usage > 0) {
+          var suggested = Object.assign({}, candidate);
+          suggested._usage = usage;
+          suggestions.push(suggested);
+        }
+      }
+      suggestions.sort(function(a, b) { return (b._usage || 0) - (a._usage || 0); });
+      suggestionItems = suggestions.slice(0, 4);
     } else if (mode === "system") {
       recentItems = [
         { name: "Open Audio Controls", title: "Open the audio popup", icon: "󰕾", ipcTarget: "Shell", ipcAction: "toggleAudioMenu" },
@@ -312,8 +422,10 @@ PanelWindow {
 
   function loadClip() {
     loadCached("clip", ["qs-clip"], function(raw) {
-      return JSON.parse(raw).map(function(it) {
-        return { id: it.id, name: it.content, title: it.content };
+      return JSON.parse(raw).filter(function(it) {
+        return it.content && it.content.indexOf("[[ binary data") === -1;
+      }).map(function(it) {
+        return { id: it.id, name: it.content, title: it.content, icon: "󰅍" };
       });
     });
   }
@@ -410,11 +522,23 @@ PanelWindow {
   function loadWindows() {
     var items = [];
     try {
-      for (var i = 0; i < Hyprland.toplevels.count; i++) {
-        var win = Hyprland.toplevels.get(i);
-        items.push({ name: win.title || win.class || "Window", title: win.class || "", icon: "󱗼", address: win.address, class: win.class });
+      if (Hyprland.toplevels) {
+        for (var i = 0; i < Hyprland.toplevels.count; i++) {
+          var win = Hyprland.toplevels.get(i);
+          if (win) {
+            items.push({ 
+              name: win.title || win.class || "Window", 
+              title: win.class || "", 
+              icon: "󱗼", 
+              address: win.address, 
+              class: win.class 
+            });
+          }
+        }
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error("Error loading windows: " + e);
+    }
     allItems = items;
     filterItems();
   }
@@ -444,6 +568,23 @@ PanelWindow {
     }
     if (pIdx === p.length) return 10 + (p.length / s.length);
     return 0;
+  }
+
+  function rankItem(item, query) {
+    var clean = stripModePrefix(query);
+    if (clean === "") return 1;
+    var name = item.name || "";
+    var title = item.title || "";
+    var exec = item.exec || item.class || "";
+    var body = item.body || "";
+    var bestScore = Math.max(
+      fuzzyMatch(name, clean),
+      fuzzyMatch(title, clean) * 0.92,
+      fuzzyMatch(exec, clean) * 0.88,
+      fuzzyMatch(body, clean) * 0.75
+    );
+    if (mode === "drun") bestScore += (appFrequency[item.exec] || 0) * 0.6;
+    return bestScore;
   }
 
   function filterItems() {
@@ -484,19 +625,28 @@ PanelWindow {
           scoredItems.push(webItem);
           continue;
         }
-        var name = item.name || item.title || "";
-        var exec = item.exec || item.class || "";
-        var bestScore = Math.max(fuzzyMatch(name, actualSearch), fuzzyMatch(exec, actualSearch));
+        var bestScore = rankItem(item, actualSearch);
         if (bestScore > 0 || (actualSearch === "" && (mode === "files" || mode === "ai"))) {
           item._score = bestScore;
           scoredItems.push(item);
         }
       }
-      if (mode !== "web" && mode !== "system" && mode !== "nixos" && mode !== "wallpapers" &&
-          mode !== "keybinds" && mode !== "bookmarks" && mode !== "ai" && mode !== "files") {
+      if (mode !== "web" && mode !== "ai" && mode !== "files") {
         scoredItems.sort(function(a, b) {
           if (b._score !== a._score) return b._score - a._score;
           if (mode === "drun") return (appFrequency[b.exec] || 0) - (appFrequency[a.exec] || 0);
+          return (a.name || "").localeCompare(b.name || "");
+        });
+      } else if (mode === "files") {
+        scoredItems.sort(function(a, b) {
+          if (b._score !== a._score) return b._score - a._score;
+          var aPath = a.fullPath || a.title || "";
+          var bPath = b.fullPath || b.title || "";
+          return aPath.localeCompare(bPath);
+        });
+      } else if (mode === "ai") {
+        scoredItems.sort(function(a, b) {
+          if (b._score !== a._score) return b._score - a._score;
           return 0;
         });
       }
@@ -527,14 +677,16 @@ PanelWindow {
     var item = filteredItems[selectedIndex];
 
     if (mode === "drun") {
-      trackLaunch(item.exec);
+      trackLaunch(item);
       if (item.terminal === "true" || item.terminal === "True") Quickshell.execDetached(["kitty", "-e", "bash", "-c", item.exec]);
       else if (item.exec) Quickshell.execDetached(item.exec.split(" "));
       close();
     } else if (mode === "run") {
+      rememberRecent({ name: item.name || item.exec, title: item.exec || "", icon: "󰆍", exec: item.exec || "" });
       if (item.exec) Quickshell.execDetached(["bash", "-c", item.exec]);
       close();
     } else if (mode === "window") {
+      rememberRecent({ name: item.name || item.title || "Window", title: item.title || item.class || "", icon: "󱗼", address: item.address || "", openMode: "window" });
       Quickshell.execDetached(["hyprctl", "dispatch", "focuswindow", "address:" + item.address]);
       close();
     } else if (mode === "dmenu") {
@@ -548,6 +700,7 @@ PanelWindow {
       Quickshell.execDetached(["bash", "-c", "cliphist decode " + item.id + " | wl-copy"]);
       close();
     } else if (mode === "web" || mode === "bookmarks") {
+      rememberRecent({ name: item.name || "Link", title: item.title || item.exec || "", icon: item.icon || "󰖟", exec: item.exec || "" });
       Quickshell.execDetached(["xdg-open", item.exec + (item.query ? encodeURIComponent(item.query) : "")]);
       close();
     } else if (mode === "ai") {
@@ -557,10 +710,12 @@ PanelWindow {
       }
     } else if (mode === "files") {
       if (!item.isHint && item.fullPath) {
+        rememberRecent({ name: item.name || item.fullPath, title: item.fullPath, icon: "󰈔", fullPath: item.fullPath });
         Quickshell.execDetached(["xdg-open", item.fullPath]);
         close();
       }
     } else if (mode === "system" || mode === "nixos") {
+      rememberRecent({ name: item.name || "Action", title: item.category || item.title || "", icon: item.icon || "󰒓", exec: item.exec || "" });
       if (item.ipcTarget && item.ipcAction) Quickshell.execDetached(["quickshell", "ipc", "call", item.ipcTarget, item.ipcAction]);
       else if (item.action) item.action();
       if (!showingConfirm) close();
@@ -772,7 +927,7 @@ PanelWindow {
         RowLayout {
           Layout.fillWidth: true
           spacing: 10
-          visible: Config.launcherShowModeHints
+          visible: Config.launcherShowModeHints && launcherRoot.showLauncherHome
           Text { Layout.fillWidth: true; text: launcherRoot.modeInfo(launcherRoot.mode).hint; color: Colors.textSecondary; font.pixelSize: 11; elide: Text.ElideRight }
           Text { text: "Balanced keyboard + mouse flow"; color: Colors.textDisabled; font.pixelSize: 10 }
         }
@@ -858,6 +1013,78 @@ PanelWindow {
                 }
 
                 MouseArea { id: recentHover; anchors.fill: parent; hoverEnabled: true; onClicked: launcherRoot.activateFeatured(modelData) }
+              }
+            }
+          }
+        }
+
+        Rectangle {
+          Layout.fillWidth: true
+          visible: launcherRoot.showLauncherHome && launcherRoot.mode === "drun" && launcherRoot.suggestionItems.length > 0
+          color: Colors.bgWidget
+          radius: Colors.radiusMedium
+          border.color: Colors.border
+          border.width: 1
+          implicitHeight: suggestionColumn.implicitHeight + 24
+
+          ColumnLayout {
+            id: suggestionColumn
+            anchors.fill: parent
+            anchors.margins: 14
+            spacing: 8
+            Text { text: "Suggested"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
+
+            Repeater {
+              model: launcherRoot.suggestionItems
+              delegate: Rectangle {
+                Layout.fillWidth: true
+                implicitHeight: 42
+                radius: Colors.radiusSmall
+                color: suggestionHover.containsMouse ? Colors.highlightLight : "transparent"
+
+                RowLayout {
+                  anchors.fill: parent
+                  anchors.margins: 8
+                  spacing: 10
+                  Text { text: modelData.icon || "󰀻"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 14 }
+                  ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 0
+                    Text { text: modelData.name || modelData.label; color: Colors.fgMain; font.pixelSize: 12; font.weight: Font.DemiBold; elide: Text.ElideRight }
+                    Text { text: (modelData.exec || modelData.title || "Frequently used"); color: Colors.textSecondary; font.pixelSize: 10; elide: Text.ElideRight }
+                  }
+                  Rectangle {
+                    radius: 11
+                    color: Colors.surface
+                    border.color: Colors.border
+                    border.width: 1
+                    implicitWidth: suggestionBadge.implicitWidth + 16
+                    implicitHeight: 22
+                    Text {
+                      id: suggestionBadge
+                      anchors.centerIn: parent
+                      text: (modelData._usage || 0) + "x"
+                      color: Colors.textSecondary
+                      font.pixelSize: 10
+                      font.weight: Font.Medium
+                    }
+                  }
+                }
+
+                MouseArea {
+                  id: suggestionHover
+                  anchors.fill: parent
+                  hoverEnabled: true
+                  onClicked: {
+                    launcherRoot.selectedIndex = 0;
+                    if (modelData.exec) {
+                      launcherRoot.trackLaunch(modelData);
+                      if (modelData.terminal === "true" || modelData.terminal === "True") Quickshell.execDetached(["kitty", "-e", "bash", "-c", modelData.exec]);
+                      else Quickshell.execDetached(modelData.exec.split(" "));
+                      launcherRoot.close();
+                    }
+                  }
+                }
               }
             }
           }

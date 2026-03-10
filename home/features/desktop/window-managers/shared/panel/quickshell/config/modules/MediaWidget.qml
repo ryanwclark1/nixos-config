@@ -48,6 +48,7 @@ Rectangle {
           clip: true
 
           Image {
+            id: albumArt
             anchors.fill: parent
             source: modelData.trackArtUrl || ""
             fillMode: Image.PreserveAspectCrop
@@ -60,7 +61,7 @@ Rectangle {
             color: Colors.fgDim
             font.family: Colors.fontMono
             font.pixelSize: 32
-            visible: parent.children[0].status !== Image.Ready
+            visible: albumArt.status !== Image.Ready
           }
         }
 

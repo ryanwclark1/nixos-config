@@ -73,6 +73,8 @@ QtObject {
 
   property FileView walWatcher: FileView {
     path: Quickshell.env("HOME") + "/.cache/wal/colors.json"
+    blockLoading: true
+    printErrors: false
     watchChanges: true
     onTextChanged: colors.reloadColors()
     onLoaded: colors.reloadColors()

@@ -127,6 +127,7 @@ Item {
 
             property FileView noteFile: FileView {
               path: noteInput.notePath
+              blockLoading: true
               printErrors: false
               onLoaded: {
                 noteInput.syncingNote = true;

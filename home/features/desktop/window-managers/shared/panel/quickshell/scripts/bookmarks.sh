@@ -19,15 +19,13 @@ fi
 
 # Query the database
 # moz_bookmarks table contains the bookmarks, moz_places contains the URLs
-output=$(sqlite3 "$TEMP_DB" "
-SELECT b.title, p.url 
-FROM moz_bookmarks b 
-JOIN moz_places p ON b.fk = p.id 
+output=$(sqlite3 -separator $'\t' "$TEMP_DB" "
+SELECT b.title, p.url
+FROM moz_bookmarks b
+JOIN moz_places p ON b.fk = p.id
 WHERE b.title IS NOT NULL AND p.url NOT LIKE 'place:%'
 LIMIT 500;
-" | while read -r line; do
-    title=$(echo "$line" | cut -d'|' -f1)
-    url=$(echo "$line" | cut -d'|' -f2)
+" | while IFS=$'\t' read -r title url; do
     
     if [[ -n "$title" && -n "$url" ]]; then
         title_esc=$(echo "$title" | jq -R .)

@@ -1,7 +1,6 @@
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
-import Quickshell.Widgets
 import Quickshell.Io
 import "../../services"
 
@@ -13,10 +12,12 @@ Row {
 
   property var pinnedApps: []
   property var iconMap: ({})
-  readonly property string pinnedPath: Quickshell.statePath("pinned_apps.json")
+  property bool seedPinnedApps: false
+  readonly property string pinnedPath: Quickshell.env("HOME") + "/.local/state/quickshell/pinned_apps.json"
 
   property FileView pinnedFile: FileView {
     path: root.pinnedPath
+    blockLoading: true
     printErrors: false
     onLoaded: {
       var raw = pinnedFile.text();
@@ -33,8 +34,32 @@ Row {
           { name: "Files", class: "nemo", exec: "nemo" },
           { name: "Code", class: "cursor", exec: "cursor" }
         ];
-        root.savePinned();
+        root.seedPinnedApps = true;
+        seedPinnedTimer.restart();
       }
+    }
+    onLoadFailed: (error) => {
+      if (error === 2) {
+        root.pinnedApps = [
+          { name: "Browser", class: "google-chrome", exec: "google-chrome" },
+          { name: "Terminal", class: "kitty", exec: "kitty" },
+          { name: "Files", class: "nemo", exec: "nemo" },
+          { name: "Code", class: "cursor", exec: "cursor" }
+        ];
+        root.seedPinnedApps = true;
+        seedPinnedTimer.restart();
+      }
+    }
+  }
+
+  Timer {
+    id: seedPinnedTimer
+    interval: 0
+    repeat: false
+    onTriggered: {
+      if (!root.seedPinnedApps) return;
+      root.seedPinnedApps = false;
+      root.savePinned();
     }
   }
 

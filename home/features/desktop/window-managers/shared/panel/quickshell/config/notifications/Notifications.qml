@@ -3,7 +3,6 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.Notifications
 import Quickshell.Widgets
-import Quickshell.Wayland
 import "../services"
 
 PanelWindow {
@@ -24,6 +23,23 @@ PanelWindow {
   }
 
   property var manager: null
+
+  function resolveNotificationIcon(iconName) {
+    if (!iconName) return "";
+    if (iconName.startsWith("/")) return "file://" + iconName;
+    var normalized = iconName.toLowerCase();
+    if (normalized === "alacritty" || normalized === "org.alacritty.alacritty") {
+      var terminalFallbacks = ["utilities-terminal", "terminal", "org.gnome.Console"];
+      for (var i = 0; i < terminalFallbacks.length; ++i) {
+        var fallbackResolved = Quickshell.iconPath(terminalFallbacks[i]);
+        if (fallbackResolved) return fallbackResolved.startsWith("file://") ? fallbackResolved : "file://" + fallbackResolved;
+      }
+      return "";
+    }
+    var resolved = Quickshell.iconPath(iconName);
+    if (resolved) return resolved.startsWith("file://") ? resolved : "file://" + resolved;
+    return "";
+  }
 
   ColumnLayout {
     id: col
@@ -90,13 +106,7 @@ PanelWindow {
 
             Image {
               width: 44; height: 44
-              source: {
-                if (!modelData.appIcon) return "";
-                if (modelData.appIcon.startsWith("/")) return "file://" + modelData.appIcon;
-                var resolved = Quickshell.iconPath(modelData.appIcon);
-                if (resolved) return resolved.startsWith("file://") ? resolved : "file://" + resolved;
-                return "";
-              }
+              source: root.resolveNotificationIcon(modelData.appIcon)
               fillMode: Image.PreserveAspectFit
               visible: modelData.appIcon !== ""
               

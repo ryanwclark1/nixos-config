@@ -41,10 +41,10 @@
   # };
 
   # Add mako package
-  home.packages = with pkgs; [
-    mako
-    libnotify # For notify-send testing
-  ];
+  # home.packages = with pkgs; [
+  #   mako
+  #   libnotify # For notify-send testing
+  # ];
 
   # Ship Omarchy core for Mako (shared defaults, theme adds colors)
   home.file.".local/share/omarchy/default/mako/core.ini" = {

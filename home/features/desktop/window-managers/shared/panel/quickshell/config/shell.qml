@@ -87,25 +87,27 @@ Scope {
     Panel {
       id: panel
       anchors.fill: parent
-      focus: true
       manager: notifManager
       anchorWindow: toplevel
-      Keys.onPressed: (event) => {
-        if (event.modifiers & Qt.MetaModifier && event.key === Qt.Key_S) {
-          settingsHub.toggle();
-          event.accepted = true;
-        } else if (event.modifiers & Qt.MetaModifier && event.key === Qt.Key_C) {
-          root.toggleControls();
-          event.accepted = true;
-        } else if (event.modifiers & Qt.MetaModifier && event.key === Qt.Key_N) {
-          root.toggleNotifications();
-          event.accepted = true;
-        }
-      }
       onNotifClicked: root.toggleNotifications()
       onNetworkClicked: root.toggleNetworkMenu()
       onAudioClicked: root.toggleAudioMenu()
       onCommandClicked: root.toggleControls()
+    }
+
+    Shortcut {
+      sequence: "Meta+S"
+      onActivated: settingsHub.toggle()
+    }
+
+    Shortcut {
+      sequence: "Meta+C"
+      onActivated: root.toggleControls()
+    }
+
+    Shortcut {
+      sequence: "Meta+N"
+      onActivated: root.toggleNotifications()
     }
 
     BluetoothMenu {

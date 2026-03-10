@@ -7,8 +7,8 @@ import "../services"
 
 PopupWindow {
   id: root
-  implicitWidth: 420
-  implicitHeight: 620
+  implicitWidth: 396
+  implicitHeight: 552
   readonly property color panelSurface: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.96)
   readonly property color cardSurface: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.82)
   readonly property color chipSurface: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.92)
@@ -40,6 +40,7 @@ PopupWindow {
   property string publicIpv4: ""
   property string totalReceived: ""
   property string totalSent: ""
+  property bool showAdvanced: false
 
   property bool wifiRadioEnabled: false
   property bool wifiDeviceAvailable: false
@@ -182,7 +183,10 @@ PopupWindow {
 
   onVisibleChanged: {
     if (visible) root.refreshData();
-    else root.selectedSSID = "";
+    else {
+      root.selectedSSID = "";
+      root.showAdvanced = false;
+    }
   }
 
   Process {
@@ -425,7 +429,9 @@ PopupWindow {
           width: 82
           height: 28
           radius: 14
-          color: root.wifiRadioEnabled ? Colors.withAlpha(Colors.primary, 0.18) : Colors.bgWidget
+          color: root.wifiRadioEnabled
+            ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.18)
+            : root.chipSurface
           border.color: root.wifiRadioEnabled ? Colors.primary : Colors.border
           border.width: 1
           Text {
@@ -493,12 +499,12 @@ PopupWindow {
             color: root.cardSurface
             border.color: root.activePrimaryName === "Offline" ? Colors.border : Colors.primary
             border.width: 1
-            implicitHeight: 108
+            implicitHeight: 96
 
             ColumnLayout {
               anchors.fill: parent
               anchors.margins: 14
-              spacing: 12
+              spacing: 10
 
               RowLayout {
                 Layout.fillWidth: true
@@ -535,11 +541,15 @@ PopupWindow {
                   width: 90
                   height: 30
                   radius: 15
-                  color: Colors.highlightLight
+                  color: root.activePrimaryName === "Offline"
+                    ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.16)
+                    : Qt.rgba(Colors.error.r, Colors.error.g, Colors.error.b, 0.16)
+                  border.color: root.activePrimaryName === "Offline" ? Colors.primary : Colors.error
+                  border.width: 1
                   Text {
                     anchors.centerIn: parent
                     text: root.activePrimaryName === "Offline" ? "Refresh" : "Disconnect"
-                    color: Colors.fgMain
+                    color: root.activePrimaryName === "Offline" ? Colors.primary : Colors.error
                     font.pixelSize: 11
                     font.weight: Font.Medium
                   }
@@ -598,8 +608,7 @@ PopupWindow {
           ColumnLayout {
             Layout.fillWidth: true
             spacing: 8
-
-            Text { text: "Connection Details"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
+            Text { text: "Overview"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
 
             GridLayout {
               Layout.fillWidth: true
@@ -610,17 +619,13 @@ PopupWindow {
               Repeater {
                 model: [
                   { label: "IPv4", value: root.detailValue(root.primaryIpv4, "Unavailable") },
-                  { label: "IPv6", value: root.detailValue(root.primaryIpv6, "Unavailable") },
                   { label: "Gateway", value: root.detailValue(root.primaryGateway, "Unavailable") },
-                  { label: "DNS", value: root.dnsSummary() },
-                  { label: "MAC", value: root.detailValue(root.primaryMac, "Unavailable") },
-                  { label: "Link Speed", value: root.detailValue(root.primaryLinkSpeed, "Unavailable") },
-                  { label: "Security", value: root.detailValue(root.primarySecurity, root.activePrimaryType === "wifi" ? "Unknown" : "N/A") },
-                  { label: "Channel / Band", value: root.primaryChannel !== "" ? (root.primaryChannel + (root.primaryBand !== "" ? " • " + root.primaryBand : "")) : "N/A" }
+                  { label: "Default Route", value: root.detailValue(root.routeDevice, "Unavailable") + (root.routeSource !== "" ? " • " + root.routeSource : "") },
+                  { label: "DNS", value: root.dnsSummary() }
                 ]
                 delegate: Rectangle {
                   Layout.fillWidth: true
-                  Layout.preferredHeight: 64
+                  Layout.preferredHeight: 60
                   radius: Colors.radiusMedium
                   color: root.cardSurface
                   border.color: Colors.border
@@ -650,7 +655,7 @@ PopupWindow {
             Layout.fillWidth: true
             spacing: 8
 
-            Text { text: "Internet & Routing"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
+            Text { text: "Internet"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
 
             GridLayout {
               Layout.fillWidth: true
@@ -661,13 +666,13 @@ PopupWindow {
               Repeater {
                 model: [
                   { label: "Connectivity", value: root.detailValue(root.connectivityStatus, "Unknown") },
-                  { label: "Default Route", value: root.detailValue(root.routeDevice, "Unavailable") + (root.routeSource !== "" ? " • " + root.routeSource : "") },
                   { label: "Public IPv4", value: root.detailValue(root.publicIpv4, "Unavailable") },
-                  { label: "Transfer Totals", value: "Down " + root.detailValue(root.totalReceived, "0 B") + "\nUp " + root.detailValue(root.totalSent, "0 B") }
+                  { label: "Downloaded", value: root.detailValue(root.totalReceived, "0 B") },
+                  { label: "Uploaded", value: root.detailValue(root.totalSent, "0 B") }
                 ]
                 delegate: Rectangle {
                   Layout.fillWidth: true
-                  Layout.preferredHeight: 68
+                  Layout.preferredHeight: 60
                   radius: Colors.radiusMedium
                   color: root.cardSurface
                   border.color: Colors.border
@@ -699,44 +704,6 @@ PopupWindow {
 
             Text { text: "Live Traffic"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
             NetworkGraphs { Layout.fillWidth: true }
-          }
-
-          ColumnLayout {
-            Layout.fillWidth: true
-            spacing: 8
-            visible: root.activeConnections.length > 0
-
-            Text { text: "Active Connections"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
-
-            Repeater {
-              model: root.activeConnections
-              delegate: Rectangle {
-                Layout.fillWidth: true
-                implicitHeight: 42
-                radius: Colors.radiusMedium
-                color: root.cardSurface
-                border.color: Colors.border
-                border.width: 1
-
-                RowLayout {
-                  anchors.fill: parent
-                  anchors.margins: 12
-                  spacing: 10
-                  Text {
-                    text: modelData.type === "802-3-ethernet" || modelData.type === "ethernet" ? "󰈀" : (modelData.type === "wifi" || modelData.type === "802-11-wireless" ? "󰖩" : "󰖂")
-                    color: Colors.primary
-                    font.family: Colors.fontMono
-                    font.pixelSize: 15
-                  }
-                  ColumnLayout {
-                    Layout.fillWidth: true
-                    spacing: 0
-                    Text { text: modelData.name; color: Colors.fgMain; font.pixelSize: 12; Layout.fillWidth: true; elide: Text.ElideRight }
-                    Text { text: (modelData.device || "") + (modelData.type ? " • " + modelData.type : ""); color: Colors.textSecondary; font.pixelSize: 10; Layout.fillWidth: true; elide: Text.ElideRight }
-                  }
-                }
-              }
-            }
           }
 
           ColumnLayout {
@@ -776,11 +743,21 @@ PopupWindow {
                 }
 
                 Rectangle {
-                  width: 70
+                  width: 72
                   height: 28
                   radius: 14
-                  color: Colors.highlightLight
-                  Text { anchors.centerIn: parent; text: root.tailscaleStatus === "Connected" ? "Down" : "Up"; color: Colors.fgMain; font.pixelSize: 11; font.weight: Font.Medium }
+                  color: root.tailscaleStatus === "Connected"
+                    ? Qt.rgba(Colors.error.r, Colors.error.g, Colors.error.b, 0.14)
+                    : Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.16)
+                  border.color: root.tailscaleStatus === "Connected" ? Colors.error : Colors.primary
+                  border.width: 1
+                  Text {
+                    anchors.centerIn: parent
+                    text: root.tailscaleStatus === "Connected" ? "Down" : "Up"
+                    color: root.tailscaleStatus === "Connected" ? Colors.error : Colors.primary
+                    font.pixelSize: 11
+                    font.weight: Font.Medium
+                  }
                 }
               }
 
@@ -800,7 +777,7 @@ PopupWindow {
                 Layout.fillWidth: true
                 implicitHeight: 42
                 radius: Colors.radiusMedium
-                color: Colors.bgWidget
+                color: root.cardSurface
                 border.color: Colors.border
                 border.width: 1
 
@@ -828,6 +805,138 @@ PopupWindow {
             }
           }
 
+          Rectangle {
+            Layout.fillWidth: true
+            implicitHeight: 40
+            radius: Colors.radiusMedium
+            color: detailsMouse.containsMouse ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.14) : root.cardSurface
+            border.color: detailsMouse.containsMouse ? Colors.primary : Colors.border
+            border.width: 1
+
+            RowLayout {
+              anchors.fill: parent
+              anchors.margins: 12
+              spacing: 8
+
+              Text {
+                text: root.showAdvanced ? "󰅂" : "󰅀"
+                color: detailsMouse.containsMouse ? Colors.primary : Colors.textSecondary
+                font.family: Colors.fontMono
+                font.pixelSize: 14
+              }
+
+              Text {
+                text: root.showAdvanced ? "Hide technical details" : "Show technical details"
+                color: detailsMouse.containsMouse ? Colors.primary : Colors.fgMain
+                font.pixelSize: 11
+                font.weight: Font.Medium
+              }
+
+              Item { Layout.fillWidth: true }
+
+              Text {
+                text: root.showAdvanced ? "Less" : "More"
+                color: Colors.textSecondary
+                font.pixelSize: 10
+              }
+            }
+
+            MouseArea {
+              id: detailsMouse
+              anchors.fill: parent
+              hoverEnabled: true
+              onClicked: root.showAdvanced = !root.showAdvanced
+            }
+          }
+
+          ColumnLayout {
+            Layout.fillWidth: true
+            spacing: 8
+            visible: root.showAdvanced
+
+            Text { text: "Technical Details"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
+
+            GridLayout {
+              Layout.fillWidth: true
+              columns: 2
+              columnSpacing: 10
+              rowSpacing: 10
+
+              Repeater {
+                model: [
+                  { label: "IPv6", value: root.detailValue(root.primaryIpv6, "Unavailable") },
+                  { label: "MAC", value: root.detailValue(root.primaryMac, "Unavailable") },
+                  { label: "Link Speed", value: root.detailValue(root.primaryLinkSpeed, "Unavailable") },
+                  { label: "Security", value: root.detailValue(root.primarySecurity, root.activePrimaryType === "wifi" ? "Unknown" : "N/A") },
+                  { label: "Channel / Band", value: root.primaryChannel !== "" ? (root.primaryChannel + (root.primaryBand !== "" ? " • " + root.primaryBand : "")) : "N/A" },
+                  { label: "Interface", value: root.detailValue(root.primaryDevice, "Unavailable") }
+                ]
+                delegate: Rectangle {
+                  Layout.fillWidth: true
+                  Layout.preferredHeight: 60
+                  radius: Colors.radiusMedium
+                  color: root.cardSurface
+                  border.color: Colors.border
+                  border.width: 1
+
+                  Column {
+                    anchors.fill: parent
+                    anchors.margins: 12
+                    spacing: 5
+                    Text { text: modelData.label; color: Colors.textDisabled; font.pixelSize: 9; font.weight: Font.Bold }
+                    Text {
+                      text: modelData.value
+                      color: Colors.fgMain
+                      font.pixelSize: 11
+                      width: parent.width
+                      wrapMode: Text.WrapAnywhere
+                      maximumLineCount: 2
+                      elide: Text.ElideRight
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          ColumnLayout {
+            Layout.fillWidth: true
+            spacing: 8
+            visible: root.showAdvanced && root.activeConnections.length > 0
+
+            Text { text: "Active Connections"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
+
+            Repeater {
+              model: root.activeConnections
+              delegate: Rectangle {
+                Layout.fillWidth: true
+                implicitHeight: 42
+                radius: Colors.radiusMedium
+                color: root.cardSurface
+                border.color: Colors.border
+                border.width: 1
+
+                RowLayout {
+                  anchors.fill: parent
+                  anchors.margins: 12
+                  spacing: 10
+                  Text {
+                    text: modelData.type === "802-3-ethernet" || modelData.type === "ethernet" ? "󰈀" : (modelData.type === "wifi" || modelData.type === "802-11-wireless" ? "󰖩" : "󰖂")
+                    color: Colors.primary
+                    font.family: Colors.fontMono
+                    font.pixelSize: 15
+                  }
+                  ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 0
+                    Text { text: modelData.name; color: Colors.fgMain; font.pixelSize: 12; Layout.fillWidth: true; elide: Text.ElideRight }
+                    Text { text: (modelData.device || "") + (modelData.type ? " • " + modelData.type : ""); color: Colors.textSecondary; font.pixelSize: 10; Layout.fillWidth: true; elide: Text.ElideRight }
+                  }
+                }
+              }
+            }
+          }
+
           ColumnLayout {
             Layout.fillWidth: true
             spacing: 8
@@ -849,7 +958,9 @@ PopupWindow {
                   Layout.fillWidth: true
                   implicitHeight: 46
                   radius: Colors.radiusMedium
-                  color: networkMouse.containsMouse ? Colors.highlightLight : (modelData.active ? Colors.highlight : Colors.bgWidget)
+                  color: networkMouse.containsMouse
+                    ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.12)
+                    : (modelData.active ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.16) : root.cardSurface)
                   border.color: modelData.active ? Colors.primary : Colors.border
                   border.width: 1
 
@@ -916,7 +1027,7 @@ PopupWindow {
                   visible: root.selectedSSID === modelData.ssid
                   implicitHeight: visible ? 48 : 0
                   radius: Colors.radiusMedium
-                  color: Colors.bgWidget
+                  color: root.cardSurface
                   border.color: Colors.border
                   border.width: 1
 
@@ -928,7 +1039,6 @@ PopupWindow {
                     color: Colors.fgMain
                     font.pixelSize: 12
                     echoMode: TextInput.Password
-                    placeholderText: "Enter Wi-Fi password and press Enter"
                     focus: parent.visible
                     onVisibleChanged: if (!visible && activeFocus) focus = false
                     onAccepted: {
@@ -938,6 +1048,17 @@ PopupWindow {
                       root.queueRefresh();
                     }
                   }
+
+                  Text {
+                    anchors.fill: parent
+                    anchors.leftMargin: 12
+                    anchors.rightMargin: 12
+                    verticalAlignment: Text.AlignVCenter
+                    text: "Enter Wi-Fi password and press Enter"
+                    color: Colors.textDisabled
+                    font.pixelSize: 11
+                    visible: passwordInput.text === "" && !passwordInput.activeFocus
+                  }
                 }
               }
             }
@@ -946,7 +1067,7 @@ PopupWindow {
               Layout.fillWidth: true
               visible: root.wifiNetworks.length === 0
               radius: Colors.radiusMedium
-              color: Colors.bgWidget
+              color: root.cardSurface
               border.color: Colors.border
               border.width: 1
               implicitHeight: 72

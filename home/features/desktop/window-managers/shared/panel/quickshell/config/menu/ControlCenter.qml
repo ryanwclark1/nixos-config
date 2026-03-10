@@ -35,20 +35,66 @@ PanelWindow {
   property var manager: null
   property bool showContent: false
   visible: showContent || sidebarContent.x < 350
-  property real outputVolume: {
-    var v = Pipewire.defaultAudioSink?.audio?.volume;
-    return (v !== undefined && !isNaN(v)) ? Colors.clamp01(v) : 0;
-  }
-  property real inputVolume: {
-    var v = Pipewire.defaultAudioSource?.audio?.volume;
-    return (v !== undefined && !isNaN(v)) ? Colors.clamp01(v) : 0;
-  }
-  property bool outputMuted: Pipewire.defaultAudioSink?.audio?.muted ?? false
-  property bool inputMuted: Pipewire.defaultAudioSource?.audio?.muted ?? false
+  property real displayOutputVolume: 0
+  property real displayInputVolume: 0
+  property bool displayOutputMuted: false
+  property bool displayInputMuted: false
 
-  PwObjectTracker {
-    objects: [Pipewire.defaultAudioSink, Pipewire.defaultAudioSource]
+  function refreshAudioState() {
+    outputVolumeProc.running = true;
+    inputVolumeProc.running = true;
   }
+
+  Process {
+    id: outputVolumeProc
+    command: ["wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@"]
+    running: false
+    stdout: StdioCollector {
+      onStreamFinished: {
+        var text = (this.text || "").trim();
+        var match = text.match(/Volume:\s+([0-9.]+)(?:\s+\[MUTED\])?/);
+        if (!match) {
+          root.displayOutputVolume = 0;
+          root.displayOutputMuted = false;
+          return;
+        }
+
+        var parsed = parseFloat(match[1]);
+        root.displayOutputVolume = isNaN(parsed) ? 0 : Colors.clamp01(parsed);
+        root.displayOutputMuted = text.indexOf("[MUTED]") !== -1;
+      }
+    }
+  }
+
+  Process {
+    id: inputVolumeProc
+    command: ["wpctl", "get-volume", "@DEFAULT_AUDIO_SOURCE@"]
+    running: false
+    stdout: StdioCollector {
+      onStreamFinished: {
+        var text = (this.text || "").trim();
+        var match = text.match(/Volume:\s+([0-9.]+)(?:\s+\[MUTED\])?/);
+        if (!match) {
+          root.displayInputVolume = 0;
+          root.displayInputMuted = false;
+          return;
+        }
+
+        var parsed = parseFloat(match[1]);
+        root.displayInputVolume = isNaN(parsed) ? 0 : Colors.clamp01(parsed);
+        root.displayInputMuted = text.indexOf("[MUTED]") !== -1;
+      }
+    }
+  }
+
+  Timer {
+    interval: 1000
+    running: root.visible
+    repeat: true
+    onTriggered: root.refreshAudioState()
+  }
+
+  onVisibleChanged: if (visible) root.refreshAudioState()
 
   function setAudioVolume(target, value) {
     var clamped = Colors.clamp01(value);
@@ -57,25 +103,27 @@ PanelWindow {
     }
     Quickshell.execDetached(["wpctl", "set-volume", target, Math.round(clamped * 100) + "%"]);
     if (target === "@DEFAULT_AUDIO_SINK@") {
-      root.outputVolume = clamped;
-      root.outputMuted = false;
+      root.displayOutputVolume = clamped;
+      root.displayOutputMuted = false;
       Quickshell.execDetached(["quickshell", "ipc", "call", "Osd", "showVolume", Math.round(clamped * 100).toString(), "false"]);
     } else if (target === "@DEFAULT_AUDIO_SOURCE@") {
-      root.inputVolume = clamped;
-      root.inputMuted = false;
+      root.displayInputVolume = clamped;
+      root.displayInputMuted = false;
       Quickshell.execDetached(["quickshell", "ipc", "call", "Osd", "showMic", Math.round(clamped * 100).toString(), "false"]);
     }
+    Qt.callLater(root.refreshAudioState);
   }
 
   function toggleMute(target, muted) {
     Quickshell.execDetached(["wpctl", "set-mute", target, muted ? "0" : "1"]);
     if (target === "@DEFAULT_AUDIO_SINK@") {
-      root.outputMuted = !muted;
-      Quickshell.execDetached(["quickshell", "ipc", "call", "Osd", "showVolume", Math.round(root.outputVolume * 100).toString(), (!muted).toString()]);
+      root.displayOutputMuted = !muted;
+      Quickshell.execDetached(["quickshell", "ipc", "call", "Osd", "showVolume", Math.round(root.displayOutputVolume * 100).toString(), (!muted).toString()]);
     } else if (target === "@DEFAULT_AUDIO_SOURCE@") {
-      root.inputMuted = !muted;
-      Quickshell.execDetached(["quickshell", "ipc", "call", "Osd", "showMic", Math.round(root.inputVolume * 100).toString(), (!muted).toString()]);
+      root.displayInputMuted = !muted;
+      Quickshell.execDetached(["quickshell", "ipc", "call", "Osd", "showMic", Math.round(root.displayInputVolume * 100).toString(), (!muted).toString()]);
     }
+    Qt.callLater(root.refreshAudioState);
   }
 
   Rectangle {
@@ -252,7 +300,7 @@ PanelWindow {
                 Layout.fillWidth: true
                 Text { text: "󰕾  OUTPUT"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
                 Item { Layout.fillWidth: true }
-                Text { text: root.outputMuted ? "Muted" : Math.round(root.outputVolume * 100) + "%"; color: Colors.textSecondary; font.pixelSize: 10 }
+                Text { text: root.displayOutputMuted ? "Muted" : Math.round(root.displayOutputVolume * 100) + "%"; color: Colors.textSecondary; font.pixelSize: 10 }
               }
               RowLayout {
                 Layout.fillWidth: true
@@ -264,8 +312,8 @@ PanelWindow {
                   border.width: 1
                   Text {
                     anchors.centerIn: parent
-                    text: root.outputMuted ? "󰝟" : "󰕾"
-                    color: root.outputMuted ? Colors.error : Colors.text
+                    text: root.displayOutputMuted ? "󰝟" : "󰕾"
+                    color: root.displayOutputMuted ? Colors.error : Colors.text
                     font.family: Colors.fontMono
                     font.pixelSize: 15
                   }
@@ -273,7 +321,7 @@ PanelWindow {
                     id: outputMuteHover
                     anchors.fill: parent
                     hoverEnabled: true
-                    onClicked: root.toggleMute("@DEFAULT_AUDIO_SINK@", root.outputMuted)
+                    onClicked: root.toggleMute("@DEFAULT_AUDIO_SINK@", root.displayOutputMuted)
                   }
                 }
                 Slider {
@@ -281,7 +329,7 @@ PanelWindow {
                   Layout.fillWidth: true
                   from: 0
                   to: 1
-                  value: root.outputMuted ? 0 : root.outputVolume
+                  value: root.displayOutputMuted ? 0 : root.displayOutputVolume
                   onMoved: root.setAudioVolume("@DEFAULT_AUDIO_SINK@", value)
                 }
               }
@@ -293,7 +341,7 @@ PanelWindow {
                 Layout.fillWidth: true
                 Text { text: "󰍬  INPUT"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
                 Item { Layout.fillWidth: true }
-                Text { text: root.inputMuted ? "Muted" : Math.round(root.inputVolume * 100) + "%"; color: Colors.textSecondary; font.pixelSize: 10 }
+                Text { text: root.displayInputMuted ? "Muted" : Math.round(root.displayInputVolume * 100) + "%"; color: Colors.textSecondary; font.pixelSize: 10 }
               }
               RowLayout {
                 Layout.fillWidth: true
@@ -305,8 +353,8 @@ PanelWindow {
                   border.width: 1
                   Text {
                     anchors.centerIn: parent
-                    text: root.inputMuted ? "󰍭" : "󰍬"
-                    color: root.inputMuted ? Colors.error : Colors.text
+                    text: root.displayInputMuted ? "󰍭" : "󰍬"
+                    color: root.displayInputMuted ? Colors.error : Colors.text
                     font.family: Colors.fontMono
                     font.pixelSize: 15
                   }
@@ -314,7 +362,7 @@ PanelWindow {
                     id: inputMuteHover
                     anchors.fill: parent
                     hoverEnabled: true
-                    onClicked: root.toggleMute("@DEFAULT_AUDIO_SOURCE@", root.inputMuted)
+                    onClicked: root.toggleMute("@DEFAULT_AUDIO_SOURCE@", root.displayInputMuted)
                   }
                 }
                 Slider {
@@ -322,7 +370,7 @@ PanelWindow {
                   Layout.fillWidth: true
                   from: 0
                   to: 1
-                  value: root.inputMuted ? 0 : root.inputVolume
+                  value: root.displayInputMuted ? 0 : root.displayInputVolume
                   onMoved: root.setAudioVolume("@DEFAULT_AUDIO_SOURCE@", value)
                 }
               }

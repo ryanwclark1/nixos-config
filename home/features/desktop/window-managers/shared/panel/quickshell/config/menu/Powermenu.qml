@@ -26,7 +26,6 @@ PanelWindow {
     anchors.fill: parent
     visible: root.isVisible
     focus: root.isVisible
-    onVisibleChanged: if (visible) forceActiveFocus()
 
     Keys.onEscapePressed: root.isVisible = false
 

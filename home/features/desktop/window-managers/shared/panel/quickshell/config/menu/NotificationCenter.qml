@@ -35,6 +35,23 @@ PanelWindow {
   property string searchQuery: ""
   visible: showContent || sidebarContent.x < 350
 
+  function resolveNotificationIcon(iconName) {
+    if (!iconName) return "";
+    if (iconName.startsWith("/")) return "file://" + iconName;
+    var normalized = iconName.toLowerCase();
+    if (normalized === "alacritty" || normalized === "org.alacritty.alacritty") {
+      var terminalFallbacks = ["utilities-terminal", "terminal", "org.gnome.Console"];
+      for (var i = 0; i < terminalFallbacks.length; ++i) {
+        var fallbackResolved = Quickshell.iconPath(terminalFallbacks[i]);
+        if (fallbackResolved) return fallbackResolved.startsWith("file://") ? fallbackResolved : "file://" + fallbackResolved;
+      }
+      return "";
+    }
+    var resolved = Quickshell.iconPath(iconName);
+    if (resolved) return resolved.startsWith("file://") ? resolved : "file://" + resolved;
+    return "";
+  }
+
   // Ensure focus is grabbed when shown
   onShowContentChanged: {
     if (showContent) {
@@ -267,13 +284,7 @@ PanelWindow {
               width: parent.width; spacing: 12
               Image {
                 Layout.preferredWidth: 32; Layout.preferredHeight: 32
-                source: {
-                  if (!modelData.appIcon) return "";
-                  if (modelData.appIcon.startsWith("/")) return "file://" + modelData.appIcon;
-                  var resolved = Quickshell.iconPath(modelData.appIcon);
-                  if (resolved) return resolved.startsWith("file://") ? resolved : "file://" + resolved;
-                  return "";
-                }
+                source: root.resolveNotificationIcon(modelData.appIcon)
                 visible: modelData.appIcon !== ""
                 Rectangle { anchors.fill: parent; color: "transparent"; visible: parent.status !== Image.Ready; Text { anchors.centerIn: parent; text: "󰂚"; color: Colors.text; font.pixelSize: 20; font.family: Colors.fontMono } }
               }
