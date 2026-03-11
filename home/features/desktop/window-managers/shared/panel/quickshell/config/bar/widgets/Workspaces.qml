@@ -12,7 +12,6 @@ Rectangle {
   color: Colors.bgWidget
   anchors.verticalCenter: parent.verticalCenter
 
-  property var hoveredWorkspace: null
   property var anchorWindow: null
 
   scale: rootMouse.containsMouse ? 1.03 : 1.0
@@ -36,29 +35,37 @@ Rectangle {
     Repeater {
       model: Hyprland.workspaces
 
-      Rectangle {
-        id: wsButton
-        
-        // Dynamic width for active workspace
-        width: modelData.active ? 20 : 8
-        height: 8
-        radius: 4
-        
-        color: modelData.active ? Colors.primary : (modelData.hasFullscreen ? Colors.accent : (modelData.urgent ? Colors.error : Colors.fgDim))
-        opacity: modelData.active ? 1.0 : 0.6
-        
-        // Smooth width transition
-        Behavior on width { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
-        Behavior on color { ColorAnimation { duration: 200 } }
+      Item {
+        id: wsContainer
+        width: wsButton.width
+        height: wsRow.height
+
+        Rectangle {
+          id: wsButton
+          anchors.centerIn: parent
+
+          // Dynamic width for active workspace
+          width: modelData.active ? 20 : 8
+          height: 8
+          radius: 4
+
+          color: modelData.active ? Colors.primary : (modelData.hasFullscreen ? Colors.accent : (modelData.urgent ? Colors.error : Colors.fgDim))
+          opacity: modelData.active ? 1.0 : 0.6
+
+          // Smooth width transition
+          Behavior on width { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
+          Behavior on color { ColorAnimation { duration: 200 } }
+        }
 
         MouseArea {
           id: wsMouse
-          anchors.fill: parent
-          anchors.margins: -4 // Larger click area
+          anchors.centerIn: parent
+          width: parent.width + 8
+          height: wsRow.height
           cursorShape: Qt.PointingHandCursor
           hoverEnabled: true
           acceptedButtons: Qt.LeftButton | Qt.MiddleButton
-          
+
           onClicked: (mouse) => {
             if (mouse.button === Qt.LeftButton) modelData.activate();
             else if (mouse.button === Qt.MiddleButton) {
@@ -68,10 +75,10 @@ Rectangle {
         }
 
         SharedWidgets.BarTooltip {
-          anchorItem: wsButton
+          anchorItem: wsContainer
           anchorWindow: root.anchorWindow
           hovered: wsMouse.containsMouse
-          text: modelData.name ? "Workspace " + modelData.name : "Workspace " + modelData.id
+          text: (modelData.name ? "Workspace " + modelData.name : "Workspace " + modelData.id) + (modelData.urgent ? " (urgent)" : "")
           yOffset: 10
         }
       }
@@ -86,10 +93,4 @@ Rectangle {
     propagateComposedEvents: true
   }
 
-  SharedWidgets.BarTooltip {
-    anchorItem: root
-    anchorWindow: root.anchorWindow
-    hovered: rootMouse.containsMouse
-    text: "Workspaces"
-  }
 }

@@ -8,7 +8,7 @@ Rectangle {
   id: root
   Layout.fillWidth: true
   Layout.preferredHeight: contentCol.implicitHeight + 24
-  visible: activePlayers.length > 0
+  visible: Config.controlCenterShowMediaWidget && activePlayers.length > 0
   color: Colors.bgWidget
   radius: Colors.radiusMedium
   border.color: Colors.border

@@ -23,33 +23,14 @@ let
   base0E = "ca9ee6"; # mauve
   base0F = "eebebe"; # flamingo
 
-
-in
-{
-  home.packages = [
-    pkgs.file
-    pkgs.wl-clipboard  # For clipboard integration in fzf
-    (pkgs.writeScriptBin "bluetoothz" (builtins.readFile ./scripts/bluetoothz.sh))
-    (pkgs.writeScriptBin "dkr" (builtins.readFile ./scripts/dkr.sh))
-    (pkgs.writeScriptBin "fv" (builtins.readFile ./scripts/fv.sh))
-    (pkgs.writeScriptBin "fzf-git" (builtins.readFile ./scripts/fzf-git.sh))
-    (pkgs.writeScriptBin "fzmv" (builtins.readFile ./scripts/fzmv.sh))
-    (pkgs.writeScriptBin "fztop" (builtins.readFile ./scripts/fztop.sh))
-    (pkgs.writeScriptBin "gitup" (builtins.readFile ./scripts/gitup.sh))
-    (pkgs.writeScriptBin "igr" (builtins.readFile ./scripts/igr.sh))
-    (pkgs.writeScriptBin "sshget" (builtins.readFile ./scripts/sshget.sh))
-    (pkgs.writeScriptBin "sysz" (builtins.readFile ./scripts/sysz.sh))
-    (pkgs.writeScriptBin "wifiz" (builtins.readFile ./scripts/wifiz.sh))
-    (pkgs.writeScriptBin "fzf-preview" (builtins.readFile ./scripts/fzf-preview.sh))
-  ];
-
-  # Copy these scripts to the user's home directory for dotfiles repo
-  home.file.".config/scripts" = {
-    force = true;
-    source = ./scripts;
-    recursive = true;
+  # Import fzf scripts module
+  fzfScripts = import ../desktop/common/scripts/fzf/default.nix {
+    inherit pkgs lib;
   };
 
+in
+fzfScripts
+// {
   # FZF module automatically sets FZF_DEFAULT_COMMAND, FZF_CTRL_T_COMMAND, and FZF_ALT_C_COMMAND
   # based on defaultCommand, fileWidgetCommand, and changeDirWidgetCommand respectively.
   # We only need to set additional options that aren't covered by the module.
@@ -66,10 +47,10 @@ in
 
     colors = {
       fg = "#${base05}";
-      bg = "-1";              # use terminal background
+      bg = "-1"; # use terminal background
       hl = "#${base0E}";
       "fg+" = "#${base05}";
-      "bg+" = "#${base02}";      # selected line background
+      "bg+" = "#${base02}"; # selected line background
       "hl+" = "#${base0D}";
       info = "#${base0C}";
       border = "#${base03}";
@@ -94,7 +75,7 @@ in
       "--ansi"
       "--tabstop=2"
       "--preview-window=right,60%,border-rounded"
-      "--preview=fzf-preview {}"
+      "--preview 'fzf-preview {}'"
       "--multi"
       "--cycle"
       "--marker=▶"
@@ -151,7 +132,7 @@ in
 
     changeDirWidgetCommand = "fd --type d";
     changeDirWidgetOptions = [
-      "--preview=fzf-preview {}"
+      "--preview 'fzf-preview {}'"
 
       # Navigation bindings consistent with other widgets
       "--bind=ctrl-j:down"

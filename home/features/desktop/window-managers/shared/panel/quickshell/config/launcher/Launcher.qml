@@ -488,8 +488,8 @@ PanelWindow {
       { category: "Power", name: "Reboot", icon: "󰑐", action: () => askConfirm("Reboot system?", () => Quickshell.execDetached(["systemctl", "reboot"])) },
       { category: "Power", name: "Lock Screen", icon: "󰌾", action: () => Quickshell.execDetached(["hyprlock"]) },
       { category: "Power", name: "Log Out", icon: "󰍃", action: () => askConfirm("Log out of session?", () => Quickshell.execDetached(["hyprctl", "dispatch", "exit"])) },
-      { category: "Capture", name: "Screenshot (Area)", icon: "󰹑", action: () => Quickshell.execDetached(["screenshot-enhanced", "region"]) },
-      { category: "Capture", name: "Screenshot (Display)", icon: "󰍹", action: () => Quickshell.execDetached(["screenshot-enhanced", "output"]) },
+      { category: "Capture", name: "Screenshot (Area)", icon: "󰹑", action: () => Quickshell.execDetached(["screenshot.sh", "area", "--satty"]) },
+      { category: "Capture", name: "Screenshot (Display)", icon: "󰍹", action: () => Quickshell.execDetached(["screenshot.sh", "screen", "--satty"]) },
       { category: "Capture", name: "Color Picker", icon: "󰏘", action: () => Quickshell.execDetached(["hyprpicker", "-a"]) },
       { category: "Toggles", name: "Toggle Bluetooth", icon: "󰂯", action: () => { if (Bluetooth.defaultAdapter) Bluetooth.defaultAdapter.enabled = !Bluetooth.defaultAdapter.enabled; } },
       { category: "Toggles", name: "Toggle Night Light", icon: "󰖔", action: () => Quickshell.execDetached(["os-toggle-nightlight"]) },
@@ -526,12 +526,12 @@ PanelWindow {
         for (var i = 0; i < Hyprland.toplevels.count; i++) {
           var win = Hyprland.toplevels.get(i);
           if (win) {
-            items.push({ 
-              name: win.title || win.class || "Window", 
-              title: win.class || "", 
-              icon: "󱗼", 
-              address: win.address, 
-              class: win.class 
+            items.push({
+              name: win.title || win.class || "Window",
+              title: win.class || "",
+              icon: "󱗼",
+              address: win.address,
+              class: win.class
             });
           }
         }
@@ -873,6 +873,7 @@ PanelWindow {
               clip: true
               text: launcherRoot.searchText
               enabled: !launcherRoot.showingConfirm
+              onVisibleChanged: if (!visible && activeFocus) focus = false
               onTextChanged: {
                 if (text.startsWith("=") && launcherRoot.mode !== "calc") launcherRoot.open("calc", true);
                 else if (text.startsWith(">") && launcherRoot.mode !== "run") launcherRoot.open("run", true);
@@ -912,7 +913,7 @@ PanelWindow {
               width: modeText.implicitWidth + 32
               radius: height / 2
               color: Colors.highlight
-              Text { 
+              Text {
                 id: modeText
                 anchors.centerIn: parent
                 text: launcherRoot.modeInfo(launcherRoot.mode).label
@@ -1129,7 +1130,7 @@ PanelWindow {
                       id: iconImage
                       anchors.fill: parent
                       anchors.margins: 4
-                      source: modelData.icon && modelData.icon.startsWith("/") ? "file://" + modelData.icon : ""
+                      source: Config.resolveIconSource(modelData.icon || "")
                       fillMode: Image.PreserveAspectCrop
                       visible: source !== "" && status === Image.Ready
                     }

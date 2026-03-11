@@ -1,5 +1,4 @@
 {
-  config,
   pkgs,
   ...
 }:
@@ -19,7 +18,7 @@
     enable = true;
     port = 11434;
     host = "0.0.0.0";
-    acceleration = "rocm"; # AMD GPU acceleration via ROCm
+    package = pkgs.ollama-rocm; # AMD GPU acceleration (replaces deprecated acceleration option)
     # Note: loadModels is not available in home-manager's ollama module
     # Models should be loaded manually via: ollama pull <model-name>
     # Or configured via NixOS module in hosts/common/optional/services/ollama.nix

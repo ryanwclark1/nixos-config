@@ -43,8 +43,8 @@
 
     "custom/launcher": {
       "format": "",
-      "on-click": "~/.local/bin/scripts/rofi/apps-unified.sh",
-      "on-click-right": "~/.local/bin/scripts/rofi/apps-unified.sh --root",
+      "on-click": "~/.local/bin/scripts/rofi/rofi-apps-unified.sh",
+      "on-click-right": "~/.local/bin/scripts/rofi/rofi-apps-unified.sh --root",
       "tooltip": "Applications • Left: User Apps • Right: Root Apps"
     },
 
@@ -211,7 +211,7 @@
       },
       "on-click": "kitty --class=Wiremix -e wiremix",
       "on-click-right": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
-      "on-click-middle": "~/.config/desktop/window-managers/shared/scripts/rofi/settings-menu.sh"
+      "on-click-middle": "~/.config/desktop/window-managers/shared/scripts/rofi/rofi-settings-menu.sh"
     },
 
     "cpu": {
@@ -272,14 +272,14 @@
 
     "custom/settings": {
       "format": "󰒓 ",
-      "on-click": "~/.config/desktop/window-managers/shared/scripts/rofi/settings-menu.sh",
+      "on-click": "~/.config/desktop/window-managers/shared/scripts/rofi/rofi-settings-menu.sh",
       "tooltip": "Settings",
       "class": "action-button"
     },
 
     "custom/wallpaper": {
       "format": "󰸉 ",
-      "on-click": "sh -c 'cd ~/.config/desktop/window-managers/hyprland/scripts/hypr && ./wallpaper-manager.sh random'",
+      "on-click": "$WAYLAND_SCRIPTS/wallpaper-manager.sh random",
       "on-click-right": "waypaper",
       "tooltip": "Wallpaper • Left: Random • Right: Waypaper",
       "class": "action-button"
@@ -344,7 +344,7 @@
 
     "custom/power": {
       "format": "⏻",
-      "on-click": "~/.local/bin/scripts/system/power.sh",
+      "on-click": "os-power",
       "tooltip": "Power Menu",
       "class": "action-button"
     }

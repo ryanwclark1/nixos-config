@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Io
 import "../widgets" as SharedWidgets
 import "../services"
+import "../menu"
 
 Item {
   id: root
@@ -207,5 +208,28 @@ Item {
         onTriggered: inhibitorCheck.running = true
       }
     }
+  }
+
+  CavaPopup {
+    id: cavaPopup
+    anchor.window: root.anchorWindow
+    anchor.rect.x: {
+      if (!cavaPill || !root.anchorWindow) return 0;
+      try {
+        return cavaPill.mapToItem(null, 0, 0).x + (cavaPill.width / 2) - (width / 2);
+      } catch (e) {
+        return 0;
+      }
+    }
+    anchor.rect.y: {
+      if (!cavaPill || !root.anchorWindow) return root.implicitHeight + 8;
+      try {
+        return cavaPill.mapToItem(null, 0, cavaPill.height).y + 8;
+      } catch (e) {
+        return root.implicitHeight + 8;
+      }
+    }
+    visible: root.cavaPopupVisible
+    cavaData: root.fullCavaData
   }
 }

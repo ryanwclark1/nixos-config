@@ -71,6 +71,16 @@ in
 
     # Beads - issue tracker for AI-supervised coding workflows
     beads
+
+    # MCP and AI CLI utility scripts
+    (writeShellScriptBin "mcp-cli" (builtins.readFile ./scripts/mcp-cli-launcher.sh))
+    (writeShellScriptBin "mcp-process-config" (
+      builtins.readFile ./scripts/mcp-process-config.sh
+    ))
+    (writeShellScriptBin "update-gemini-cli" (builtins.readFile ./scripts/update-gemini-cli.sh))
+    (writeShellScriptBin "gemini-cli-version" (
+      builtins.readFile ./scripts/gemini-cli-version.sh
+    ))
   ];
 
   # Environment variables for Playwright

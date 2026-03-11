@@ -13,12 +13,8 @@ Item {
   property bool btMenuVisible: false
   property var manager: null
   property var anchorWindow: null
-  readonly property real networkTriggerX: networkTrigger.mapToItem(root, 0, 0).x
   readonly property real networkTriggerBottomY: networkTrigger.mapToItem(root, 0, networkTrigger.height).y
-  readonly property real networkTriggerWidth: networkTrigger.width
-  readonly property real audioTriggerX: audioTrigger.mapToItem(root, 0, 0).x
   readonly property real audioTriggerBottomY: audioTrigger.mapToItem(root, 0, audioTrigger.height).y
-  readonly property real audioTriggerWidth: audioTrigger.width
   signal notifClicked()
   signal networkClicked()
   signal audioClicked()

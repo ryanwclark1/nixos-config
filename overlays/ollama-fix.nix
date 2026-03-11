@@ -25,7 +25,7 @@ let
   } else {};
 
   # Conditionally add ollama-rocm if it exists - CRITICAL for ROCm acceleration
-  # When acceleration = "rocm" is set in services.ollama, this package variant is used
+  # Used when services.ollama.package = pkgs.ollama-rocm is set
   rocmOverlay = if prev ? ollama-rocm then {
     ollama-rocm = disableOllamaTests prev.ollama-rocm;
   } else {};

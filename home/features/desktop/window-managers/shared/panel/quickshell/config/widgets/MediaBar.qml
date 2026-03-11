@@ -58,9 +58,9 @@ Rectangle {
         SequentialAnimation on x {
           running: marqueeText.contentWidth > 150
           loops: Animation.Infinite
-          NumberAnimation { from: 0; to: -marqueeText.contentWidth + 140; duration: 5000; easing.type: Easing.Linear }
+          NumberAnimation { from: 0; to: -(marqueeText.contentWidth - marqueeContainer.width + 10); duration: 5000; easing.type: Easing.Linear }
           PauseAnimation { duration: 1000 }
-          NumberAnimation { from: -marqueeText.contentWidth + 140; to: 0; duration: 5000; easing.type: Easing.Linear }
+          NumberAnimation { from: -(marqueeText.contentWidth - marqueeContainer.width + 10); to: 0; duration: 5000; easing.type: Easing.Linear }
           PauseAnimation { duration: 1000 }
         }
       }

@@ -137,7 +137,7 @@
         "tooltip-format-discharging": "{power:>1.0f}W↓ {capacity}%",
         "tooltip-format-charging": "{power:>1.0f}W↑ {capacity}%",
         "interval": 5,
-        "on-click": "~/.local/bin/scripts/system/os-menu power",
+        "on-click": "walker-system-menu power",
         "states": {
             "warning": 20,
             "critical": 10
@@ -167,13 +167,13 @@
     },
     "custom/launcher": {
         "format": "󱄅",
-        "on-click": "~/.local/bin/scripts/rofi/apps-unified.sh",
-        "on-click-right": "~/.local/bin/scripts/rofi/apps-unified.sh --root",
+        "on-click": "~/.local/bin/scripts/rofi/rofi-apps-unified.sh",
+        "on-click-right": "~/.local/bin/scripts/rofi/rofi-apps-unified.sh --root",
         "tooltip": "Applications • Left: User Apps • Right: Root Apps"
     },
     "custom/system-menu": {
         "format": "󰍜",
-        "on-click": "~/.local/bin/scripts/system/os-menu",
+        "on-click": "walker-system-menu",
         "on-click-right": "xdg-terminal-exec",
         "tooltip": "System Menu\n\nLeft: Open Menu\nRight: Open Terminal"
     },
@@ -246,7 +246,7 @@
     },
     "custom/update": {
         "format": "{}",
-        "exec": "~/.local/bin/scripts/system/update-checker.sh --flake $HOME/nixos-config --host $HOSTNAME",
+        "exec": "os-update-checker --flake $HOME/nixos-config --host $HOSTNAME",
         "on-click": "kitty -e bash -c 'cd $HOME/nixos-config && nixos-rebuild switch --flake .#$HOSTNAME && read -p \"Press Enter to close...\"'",
         "tooltip-format": "{}",
         "signal": 7,
@@ -255,8 +255,8 @@
         "format-alt": "{}"
     },
     "custom/screenrecording-indicator": {
-        "on-click": "~/.local/bin/scripts/system/os-cmd-screenrecord --stop-recording",
-        "exec": "screenrecording-indicator",
+        "on-click": "os-cmd-screenrecord --stop-recording",
+        "exec": "os-screenrecording-indicator",
         "signal": 8,
         "return-type": "json",
         "interval": 2

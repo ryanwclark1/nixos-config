@@ -1,0 +1,483 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+export PATH="$HOME/.local/share/os/bin:$PATH"
+
+# Set to true when going directly to a submenu, so we can exit directly
+BACK_TO_EXIT=false
+
+back_to() {
+  local parent_menu="$1"
+
+  if [[ "$BACK_TO_EXIT" == "true" ]]; then
+    exit 0
+  elif [[ -n "$parent_menu" ]]; then
+    "$parent_menu"
+  else
+    show_main_menu
+  fi
+}
+
+menu() {
+  local prompt="$1"
+  local options="$2"
+  local extra="$3"
+  local preselect="$4"
+
+  read -r -a args <<<"$extra"
+
+  if [[ -n "$preselect" ]]; then
+    local index
+    index=$(echo -e "$options" | grep -nxF "$preselect" | cut -d: -f1)
+    if [[ -n "$index" ]]; then
+      args+=("-c" "$index")
+    fi
+  fi
+
+  echo -e "$options" | os-launch-walker --dmenu --width 295 --minheight 1 --maxheight 630 -p "$prompt…" "${args[@]}" 2>/dev/null || echo ""
+}
+
+terminal() {
+  xdg-terminal-exec --app-id=org.os.terminal "$@" || true
+}
+
+present_terminal() {
+  os-launch-floating-terminal-with-presentation $1
+}
+
+open_in_editor() {
+  notify-send "Editing config file" "$1"
+  os-launch-editor "$1"
+}
+
+install() {
+  present_terminal "echo 'Installing $1...'; sudo pacman -S --noconfirm $2"
+}
+
+install_and_launch() {
+  present_terminal "echo 'Installing $1...'; sudo pacman -S --noconfirm $2 && setsid gtk-launch $3"
+}
+
+install_font() {
+  present_terminal "echo 'Installing $1...'; sudo pacman -S --noconfirm --needed $2 && sleep 2 && os-font-set '$3'"
+}
+
+install_terminal() {
+  present_terminal "os-install-terminal $1"
+}
+
+aur_install() {
+  present_terminal "echo 'Installing $1 from AUR...'; yay -S --noconfirm $2"
+}
+
+aur_install_and_launch() {
+  present_terminal "echo 'Installing $1 from AUR...'; yay -S --noconfirm $2 && setsid gtk-launch $3"
+}
+
+show_learn_menu() {
+  case $(menu "Learn" "  Keybindings\n  OS\n  Hyprland\n󰣇  Arch\n  Neovim\n󱆃  Bash") in
+  *Keybindings*) walker-keybindings-menu.sh ;;
+  *OS*) os-launch-webapp "https://learn.omacom.io/2/the-os-manual" ;;
+  *Hyprland*) os-launch-webapp "https://wiki.hypr.land/" ;;
+  *Arch*) os-launch-webapp "https://wiki.archlinux.org/title/Main_page" ;;
+  *Bash*) os-launch-webapp "https://devhints.io/bash" ;;
+  *Neovim*) os-launch-webapp "https://www.lazyvim.org/keymaps" ;;
+  *) show_main_menu ;;
+  esac
+}
+
+show_trigger_menu() {
+  case $(menu "Trigger" "  Capture\n  Share\n󰔎  Toggle") in
+  *Capture*) show_capture_menu ;;
+  *Share*) show_share_menu ;;
+  *Toggle*) show_toggle_menu ;;
+  *) show_main_menu ;;
+  esac
+}
+
+show_capture_menu() {
+  case $(menu "Capture" "  Screenshot\n  Screenrecord\n󰃉  Color") in
+  *Screenshot*) show_screenshot_menu ;;
+  *Screenrecord*) show_screenrecord_menu ;;
+  *Color*) pkill hyprpicker || hyprpicker -a ;;
+  *) show_trigger_menu ;;
+  esac
+}
+
+show_screenshot_menu() {
+  case $(menu "Screenshot" "  Snap with Editing\n  Straight to Clipboard") in
+  *Editing*) os-cmd-screenshot smart ;;
+  *Clipboard*) os-cmd-screenshot smart clipboard ;;
+  *) show_capture_menu ;;
+  esac
+}
+
+show_screenrecord_menu() {
+  os-cmd-screenrecord --stop-recording && exit 0
+
+  case $(menu "Screenrecord" "  With desktop audio\n  With desktop + microphone audio\n  With desktop + microphone audio + webcam") in
+  *"With desktop audio") os-cmd-screenrecord --with-desktop-audio ;;
+  *"With desktop + microphone audio") os-cmd-screenrecord --with-desktop-audio --with-microphone-audio ;;
+  *"With desktop + microphone audio + webcam") os-cmd-screenrecord --with-desktop-audio --with-microphone-audio --with-webcam ;;
+  *) back_to show_capture_menu ;;
+  esac
+}
+
+show_share_menu() {
+  case $(menu "Share" "  Clipboard\n  File \n  Folder") in
+  *Clipboard*) os-cmd-share clipboard ;;
+  *File*) terminal bash -c "os-cmd-share file" ;;
+  *Folder*) terminal bash -c "os-cmd-share folder" ;;
+  *) back_to show_trigger_menu ;;
+  esac
+}
+
+show_toggle_menu() {
+  case $(menu "Toggle" "󱄄  Screensaver\n󰔎  Nightlight\n󱫖  Idle Lock\n󰍜  Top Bar") in
+  *Screensaver*) os-toggle-screensaver ;;
+  *Nightlight*) os-toggle-nightlight ;;
+  *Idle*) os-toggle-idle ;;
+  *Bar*) os-toggle-waybar ;;
+  *) show_trigger_menu ;;
+  esac
+}
+
+show_style_menu() {
+  case $(menu "Style" "󰸌  Theme\n  Font\n  Background\n  Hyprland\n󱄄  Screensaver\n  About") in
+  *Theme*) show_theme_menu ;;
+  *Font*) show_font_menu ;;
+  *Background*) os-theme-bg-next ;;
+  *Hyprland*) open_in_editor ~/.config/hypr/looknfeel.conf ;;
+  *Screensaver*) open_in_editor ~/.config/os/branding/screensaver.txt ;;
+  *About*) open_in_editor ~/.config/os/branding/about.txt ;;
+  *) show_main_menu ;;
+  esac
+}
+
+show_theme_menu() {
+  os-launch-walker -m menus:osthemes --width 800 --minheight 400
+}
+
+show_font_menu() {
+  theme=$(menu "Font" "$(os-font-list)" "--width 350" "$(os-font-current)")
+  if [[ "$theme" == "CNCLD" || -z "$theme" ]]; then
+    back_to show_style_menu
+  else
+    os-font-set "$theme"
+  fi
+}
+
+show_setup_menu() {
+  local options="  Audio\n  Wifi\n󰂯  Bluetooth\n󱐋  Power Profile\n󰍹  Monitors"
+  [ -f ~/.config/hypr/bindings.conf ] && options="$options\n  Keybindings"
+  [ -f ~/.config/hypr/input.conf ] && options="$options\n  Input"
+  options="$options\n  Defaults\n󰱔  DNS\n  Security\n  Config"
+
+  case $(menu "Setup" "$options") in
+  *Audio*) os-launch-or-focus-tui wiremix ;;
+  *Wifi*) os-launch-wifi ;;
+  *Bluetooth*) os-launch-bluetooth ;;
+  *Power*) show_setup_power_menu ;;
+  *Monitors*) open_in_editor ~/.config/hypr/monitors.conf ;;
+  *Keybindings*) open_in_editor ~/.config/hypr/bindings.conf ;;
+  *Input*) open_in_editor ~/.config/hypr/input.conf ;;
+  *Defaults*) open_in_editor ~/.config/uwsm/default ;;
+  *DNS*) present_terminal os-setup-dns ;;
+  *Security*) show_setup_security_menu ;;
+  *Config*) show_setup_config_menu ;;
+  *) show_main_menu ;;
+  esac
+}
+
+show_setup_power_menu() {
+  profile=$(menu "Power Profile" "$(os-powerprofiles-list)" "" "$(powerprofilesctl get)")
+
+  if [[ "$profile" == "CNCLD" || -z "$profile" ]]; then
+    back_to show_setup_menu
+  else
+    powerprofilesctl set "$profile"
+  fi
+}
+
+show_setup_config_menu() {
+  case $(menu "Setup" "  Hyprland\n  Hypridle\n  Hyprlock\n  Hyprsunset\n󰌧  Walker\n󰍜  Waybar\n󰞅  XCompose") in
+  *Hyprland*) open_in_editor ~/.config/hypr/hyprland.conf ;;
+  *Hypridle*) open_in_editor ~/.config/hypr/hypridle.conf && os-restart-app hypridle ;;
+  *Hyprlock*) open_in_editor ~/.config/hypr/hyprlock.conf ;;
+  *Hyprsunset*) open_in_editor ~/.config/hypr/hyprsunset.conf && os-restart-app hyprsunset ;;
+  *Walker*) open_in_editor ~/.config/walker/config.toml && os-restart-walker ;;
+  *Waybar*) open_in_editor ~/.config/waybar/config.jsonc && os-restart-app waybar ;;
+  *XCompose*) open_in_editor ~/.XCompose && os-restart-app fcitx5 ;;
+  *) show_main_menu ;;
+  esac
+}
+
+show_setup_security_menu() {
+  case $(menu "Setup" "󰈷  Fingerprint\n  Fido2") in
+  *Fingerprint*) present_terminal os-setup-fingerprint ;;
+  *Fido2*) present_terminal os-setup-fido2 ;;
+  *) show_setup_menu ;;
+  esac
+}
+
+show_install_menu() {
+  case $(menu "Install" "󰣇  Package\n󰣇  AUR\n  Web App\n  TUI\n  Service\n  Style\n󰵮  Development\n  Editor\n  Terminal\n󱚤  AI\n󰍲  Windows\n  Gaming") in
+  *Package*) terminal os-pkg-install ;;
+  *AUR*) terminal os-pkg-aur-install ;;
+  *Web*) present_terminal os-webapp-install ;;
+  *TUI*) present_terminal os-tui-install ;;
+  *Service*) show_install_service_menu ;;
+  *Style*) show_install_style_menu ;;
+  *Development*) show_install_development_menu ;;
+  *Editor*) show_install_editor_menu ;;
+  *Terminal*) show_install_terminal_menu ;;
+  *AI*) show_install_ai_menu ;;
+  *Windows*) present_terminal "os-windows-vm install" ;;
+  *Gaming*) show_install_gaming_menu ;;
+  *) show_main_menu ;;
+  esac
+}
+
+show_install_service_menu() {
+  case $(menu "Install" "  Dropbox\n  Tailscale\n󰟵  Bitwarden\n  Chromium Account") in
+  *Dropbox*) present_terminal os-install-dropbox ;;
+  *Tailscale*) present_terminal os-install-tailscale ;;
+  *Bitwarden*) install_and_launch "Bitwarden" "bitwarden bitwarden-cli" "bitwarden" ;;
+  *Chromium*) present_terminal os-install-chromium-google-account ;;
+  *) show_install_menu ;;
+  esac
+}
+
+show_install_editor_menu() {
+  case $(menu "Install" "  VSCode\n  Cursor\n  Zed\n  Sublime Text\n  Helix\n  Emacs") in
+  *VSCode*) present_terminal os-install-vscode ;;
+  *Cursor*) install_and_launch "Cursor" "cursor-bin" "cursor" ;;
+  *Zed*) present_terminal "echo 'Installing Zed...'; sudo pacman -S zed && setsid gtk-launch dev.zed.Zed" ;;
+  *Sublime*) install_and_launch "Sublime Text" "sublime-text-4" "sublime_text" ;;
+  *Helix*) install "Helix" "helix" ;;
+  *Emacs*) install "Emacs" "emacs-wayland" && systemctl --user enable --now emacs.service ;;
+  *) show_install_menu ;;
+  esac
+}
+
+show_install_terminal_menu() {
+  case $(menu "Install" "  Alacritty\n  Ghostty\n  Kitty") in
+  *Alacritty*) install_terminal "alacritty" ;;
+  *Ghostty*) install_terminal "ghostty" ;;
+  *Kitty*) install_terminal "kitty" ;;
+  *) show_install_menu ;;
+  esac
+}
+
+show_install_ai_menu() {
+  ollama_pkg=$(
+    (command -v nvidia-smi &>/dev/null && echo ollama-cuda) ||
+      (command -v rocminfo &>/dev/null && echo ollama-rocm) ||
+      echo ollama
+  )
+
+  case $(menu "Install" "󱚤  Claude Code\n󱚤  Cursor CLI\n󱚤  Gemini\n󱚤  OpenAI Codex\n󱚤  LM Studio\n󱚤  Ollama\n󱚤  Crush\n󱚤  opencode") in
+  *Claude*) install "Claude Code" "claude-code" ;;
+  *Cursor*) install "Cursor CLI" "cursor-cli" ;;
+  *OpenAI*) install "OpenAI Codex" "openai-codex-bin" ;;
+  *Gemini*) install "Gemini" "gemini-cli" ;;
+  *Studio*) install "LM Studio" "lmstudio" ;;
+  *Ollama*) install "Ollama" $ollama_pkg ;;
+  *Crush*) install "Crush" "crush-bin" ;;
+  *opencode*) install "opencode" "opencode" ;;
+  *) show_install_menu ;;
+  esac
+}
+
+show_install_gaming_menu() {
+  case $(menu "Install" "  Steam\n  RetroArch [AUR]\n󰍳  Minecraft\n󰖺  Xbox Controller [AUR]") in
+  *Steam*) present_terminal os-install-steam ;;
+  *RetroArch*) aur_install_and_launch "RetroArch" "retroarch retroarch-assets libretro libretro-fbneo" "com.libretro.RetroArch.desktop" ;;
+  *Minecraft*) install_and_launch "Minecraft" "minecraft-launcher" "minecraft-launcher" ;;
+  *Xbox*) present_terminal os-install-xbox-controllers ;;
+  *) show_install_menu ;;
+  esac
+}
+
+show_install_style_menu() {
+  case $(menu "Install" "󰸌  Theme\n  Background\n  Font") in
+  *Theme*) present_terminal os-theme-install ;;
+  *Background*) nautilus ~/.config/os/current/theme/backgrounds ;;
+  *Font*) show_install_font_menu ;;
+  *) show_install_menu ;;
+  esac
+}
+
+show_install_font_menu() {
+  case $(menu "Install" "  Meslo LG Mono\n  Fira Code\n  Victor Code\n  Bistream Vera Mono\n  Iosevka" "--width 350") in
+  *Meslo*) install_font "Meslo LG Mono" "ttf-meslo-nerd" "MesloLGL Nerd Font" ;;
+  *Fira*) install_font "Fira Code" "ttf-firacode-nerd" "FiraCode Nerd Font" ;;
+  *Victor*) install_font "Victor Code" "ttf-victor-mono-nerd" "VictorMono Nerd Font" ;;
+  *Bistream*) install_font "Bistream Vera Code" "ttf-bitstream-vera-mono-nerd" "BitstromWera Nerd Font" ;;
+  *Iosevka*) install_font "Iosevka" "ttf-iosevka-nerd" "Iosevka Nerd Font Mono" ;;
+  *) show_install_menu ;;
+  esac
+}
+
+show_install_development_menu() {
+  case $(menu "Install" "󰫏  Ruby on Rails\n  Docker DB\n  JavaScript\n  Go\n  PHP\n  Python\n  Elixir\n  Zig\n  Rust\n  Java\n  .NET\n  OCaml\n  Clojure") in
+  *Rails*) present_terminal "os-install-dev-env ruby" ;;
+  *Docker*) present_terminal os-install-docker-dbs ;;
+  *JavaScript*) show_install_javascript_menu ;;
+  *Go*) present_terminal "os-install-dev-env go" ;;
+  *PHP*) show_install_php_menu ;;
+  *Python*) present_terminal "os-install-dev-env python" ;;
+  *Elixir*) show_install_elixir_menu ;;
+  *Zig*) present_terminal "os-install-dev-env zig" ;;
+  *Rust*) present_terminal "os-install-dev-env rust" ;;
+  *Java*) present_terminal "os-install-dev-env java" ;;
+  *NET*) present_terminal "os-install-dev-env dotnet" ;;
+  *OCaml*) present_terminal "os-install-dev-env ocaml" ;;
+  *Clojure*) present_terminal "os-install-dev-env clojure" ;;
+  *) show_install_menu ;;
+  esac
+}
+
+show_install_javascript_menu() {
+  case $(menu "Install" "  Node.js\n  Bun\n  Deno") in
+  *Node*) present_terminal "os-install-dev-env node" ;;
+  *Bun*) present_terminal "os-install-dev-env bun" ;;
+  *Deno*) present_terminal "os-install-dev-env deno" ;;
+  *) show_install_development_menu ;;
+  esac
+}
+
+show_install_php_menu() {
+  case $(menu "Install" "  PHP\n  Laravel\n  Symfony") in
+  *PHP*) present_terminal "os-install-dev-env php" ;;
+  *Laravel*) present_terminal "os-install-dev-env laravel" ;;
+  *Symfony*) present_terminal "os-install-dev-env symfony" ;;
+  *) show_install_development_menu ;;
+  esac
+}
+
+show_install_elixir_menu() {
+  case $(menu "Install" "  Elixir\n  Phoenix") in
+  *Elixir*) present_terminal "os-install-dev-env elixir" ;;
+  *Phoenix*) present_terminal "os-install-dev-env phoenix" ;;
+  *) show_install_development_menu ;;
+  esac
+}
+
+show_remove_menu() {
+  case $(menu "Remove" "󰣇  Package\n  Web App\n  TUI\n󰸌  Theme\n󰍲  Windows\n󰈷  Fingerprint\n  Fido2") in
+  *Package*) terminal os-pkg-remove ;;
+  *Web*) present_terminal os-webapp-remove ;;
+  *TUI*) present_terminal os-tui-remove ;;
+  *Theme*) present_terminal os-theme-remove ;;
+  *Windows*) present_terminal "os-windows-vm remove" ;;
+  *Fingerprint*) present_terminal "os-setup-fingerprint --remove" ;;
+  *Fido2*) present_terminal "os-setup-fido2 --remove" ;;
+  *) show_main_menu ;;
+  esac
+}
+
+show_update_menu() {
+  case $(menu "Update" " OS\n󰔫  Channel\n  Config\n󰸌  Extra Themes\n  Process\n󰇅  Hardware\n  Firmware\n  Password\n  Timezone\n  Time") in
+  *OS*) present_terminal os-update ;;
+  *Channel*) show_update_channel_menu ;;
+  *Config*) show_update_config_menu ;;
+  *Themes*) present_terminal os-theme-update ;;
+  *Process*) show_update_process_menu ;;
+  *Hardware*) show_update_hardware_menu ;;
+  *Firmware*) present_terminal os-update-firmware ;;
+  *Timezone*) present_terminal os-tz-select ;;
+  *Time*) present_terminal os-update-time ;;
+  *Password*) show_update_password_menu ;;
+  *) show_main_menu ;;
+  esac
+}
+
+show_update_channel_menu() {
+  case $(menu "Update channel" "🟢 Stable\n🟡 Update") in
+  *Stable*) present_terminal "os-channel-set stable" ;;
+  *Update*) present_terminal "os-channel-set update" ;;
+  *) show_update_menu ;;
+  esac
+}
+show_update_process_menu() {
+  case $(menu "Restart" "  Hypridle\n  Hyprsunset\n󰌧  Walker\n󰍜  Waybar") in
+  *Hypridle*) os-restart-app hypridle ;;
+  *Hyprsunset*) os-restart-app hyprsunset ;;
+  *Walker*) os-restart-walker ;;
+  *Waybar*) os-restart-app waybar ;;
+  *) show_update_menu ;;
+  esac
+}
+
+show_update_config_menu() {
+  case $(menu "Use default config" "  Hyprland\n  Hypridle\n  Hyprlock\n  Hyprsunset\n󱣴  Plymouth\n󰌧  Walker\n󰍜  Waybar") in
+  *Hyprland*) present_terminal os-refresh-hyprland ;;
+  *Hypridle*) present_terminal os-refresh-hypridle ;;
+  *Hyprlock*) present_terminal os-refresh-hyprlock ;;
+  *Hyprsunset*) present_terminal os-refresh-hyprsunset ;;
+  *Plymouth*) present_terminal os-refresh-plymouth ;;
+  *Walker*) present_terminal os-refresh-walker ;;
+  *Waybar*) present_terminal os-refresh-waybar ;;
+  *) show_update_menu ;;
+  esac
+}
+
+show_update_hardware_menu() {
+  case $(menu "Restart" "  Audio\n󱚾  Wi-Fi\n󰂯  Bluetooth") in
+  *Audio*) present_terminal os-restart-pipewire ;;
+  *Wi-Fi*) present_terminal os-restart-wifi ;;
+  *Bluetooth*) present_terminal os-restart-bluetooth ;;
+  *) show_update_menu ;;
+  esac
+}
+
+show_update_password_menu() {
+  case $(menu "Update Password" "  Drive Encryption\n  User") in
+  *Drive*) present_terminal os-drive-set-password ;;
+  *User*) present_terminal passwd ;;
+  *) show_update_menu ;;
+  esac
+}
+
+show_system_menu() {
+  case $(menu "System" "  Lock\n󱄄  Screensaver\n󰜉  Restart\n󰐥  Shutdown") in
+  *Lock*) os-lock-screen ;;
+  *Screensaver*) os-launch-screensaver force ;;
+  *Restart*) os-cmd-reboot ;;
+  *Shutdown*) os-cmd-shutdown ;;
+  *) back_to show_main_menu ;;
+  esac
+}
+
+show_main_menu() {
+  go_to_menu "$(menu "Go" "󰀻  Apps\n󰧑  Learn\n󱓞  Trigger\n  Style\n  Setup\n󰉉  Install\n󰭌  Remove\n  Update\n  About\n  System")"
+}
+
+go_to_menu() {
+  case "${1,,}" in
+  *apps*) walker -p "Launch…" ;;
+  *learn*) show_learn_menu ;;
+  *trigger*) show_trigger_menu ;;
+  *share*) show_share_menu ;;
+  *style*) show_style_menu ;;
+  *theme*) show_theme_menu ;;
+  *screenshot*) show_screenshot_menu ;;
+  *screenrecord*) show_screenrecord_menu ;;
+  *setup*) show_setup_menu ;;
+  *power*) show_setup_power_menu ;;
+  *install*) show_install_menu ;;
+  *remove*) show_remove_menu ;;
+  *update*) show_update_menu ;;
+  *about*) os-launch-about ;;
+  *system*) show_system_menu ;;
+  esac
+}
+
+if [[ -n "$1" ]]; then
+  BACK_TO_EXIT=true
+  go_to_menu "$1"
+else
+  show_main_menu
+fi

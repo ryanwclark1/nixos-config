@@ -4,7 +4,6 @@ import QtQuick
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Hyprland
-import Quickshell.Widgets
 import "bar"
 import "launcher"
 import "menu"
@@ -165,12 +164,14 @@ Scope {
     id: center
     manager: notifManager
     showContent: root.notifCenterVisible
+    onCloseRequested: root.notifCenterVisible = false
   }
 
   ControlCenter {
     id: controls
     manager: notifManager
     showContent: root.controlCenterVisible
+    onCloseRequested: root.controlCenterVisible = false
   }
 
   Powermenu {

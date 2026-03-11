@@ -14,6 +14,11 @@ Row {
   property var iconMap: ({})
   property bool seedPinnedApps: false
   readonly property string pinnedPath: Quickshell.env("HOME") + "/.local/state/quickshell/pinned_apps.json"
+  readonly property var defaultPinnedApps: [
+    { name: "Browser", class: "google-chrome", exec: "google-chrome" },
+    { name: "Terminal", class: "com.mitchellh.ghostty", exec: "ghostty" },
+    { name: "Code", class: "cursor", exec: "cursor" }
+  ]
 
   property FileView pinnedFile: FileView {
     path: root.pinnedPath
@@ -28,24 +33,14 @@ Row {
       }
 
       if (root.pinnedApps.length === 0) {
-        root.pinnedApps = [
-          { name: "Browser", class: "google-chrome", exec: "google-chrome" },
-          { name: "Terminal", class: "kitty", exec: "kitty" },
-          { name: "Files", class: "nemo", exec: "nemo" },
-          { name: "Code", class: "cursor", exec: "cursor" }
-        ];
+        root.pinnedApps = root.defaultPinnedApps.slice();
         root.seedPinnedApps = true;
         seedPinnedTimer.restart();
       }
     }
     onLoadFailed: (error) => {
       if (error === 2) {
-        root.pinnedApps = [
-          { name: "Browser", class: "google-chrome", exec: "google-chrome" },
-          { name: "Terminal", class: "kitty", exec: "kitty" },
-          { name: "Files", class: "nemo", exec: "nemo" },
-          { name: "Code", class: "cursor", exec: "cursor" }
-        ];
+        root.pinnedApps = root.defaultPinnedApps.slice();
         root.seedPinnedApps = true;
         seedPinnedTimer.restart();
       }
@@ -73,7 +68,7 @@ Row {
       if (pinnedApps[i].class === app.class) { found = i; break; }
     }
     if (found !== -1) pinnedApps.splice(found, 1);
-    else pinnedApps.push({ name: app.title || app.class, class: app.class, exec: app.class });
+    else pinnedApps.push({ name: app.title || app.class, class: app.class, exec: app.exec || app.class });
     pinnedApps = pinnedApps; // Trigger update
     savePinned();
   }
@@ -123,6 +118,8 @@ Row {
       visible: !alreadyPinned && modelData.workspace && modelData.workspace.active
       width: visible ? 32 : 0
       appClass: modelData.class || ""
+      appExec: modelData.class || ""
+      appName: modelData.title || ""
       appAddress: modelData.address
       isFocused: modelData.activated
       isPinned: false

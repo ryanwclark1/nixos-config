@@ -1,6 +1,4 @@
 Logo 1.0 Logo.qml
 Taskbar 1.0 Taskbar.qml
 TaskButton 1.0 TaskButton.qml
-WindowTitle 1.0 WindowTitle.qml
-WorkspaceStrip 1.0 WorkspaceStrip.qml
 Workspaces 1.0 Workspaces.qml

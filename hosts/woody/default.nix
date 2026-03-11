@@ -36,15 +36,16 @@
     ../common/optional/services/audio.nix
     ../common/optional/services/bluetooth.nix
     ../common/optional/services/chroma.nix
-    ../common/optional/services/docling.nix # Temporarily disabled due to build failures
+    ../common/optional/services/docling.nix
     ../common/optional/services/gnome-services.nix
     ../common/optional/services/nfs.nix
-    # ../common/optional/services/open-webui.nix  # Disabled - not using OpenWebUI anymore
-    # ../common/optional/services/openvscode-server.nix  # Disabled - using vscode-server instead
+    ../common/optional/services/ollama.nix
+    # ../common/optional/services/openvscode-server.nix
     ../common/optional/services/printing.nix
     ../common/optional/services/searx.nix
     ../common/optional/services/steam.nix
     ../common/optional/services/syncthing.nix
+    # ../common/optional/services/tailscale.nix
     ../common/optional/services/virtualisation.nix
     ../common/optional/services/webcam.nix
 
@@ -159,15 +160,6 @@
         enableGraphical = true;
       };
     };
-  };
-
-  # Sourcebot removed - no longer using it
-
-  # Firewall configuration for Ollama (managed via home-manager)
-  networking.firewall = {
-    allowedTCPPorts = [
-      11434 # Ollama API port
-    ];
   };
 
   system.stateVersion = "24.05";

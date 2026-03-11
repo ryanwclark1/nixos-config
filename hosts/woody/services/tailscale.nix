@@ -12,7 +12,7 @@
     package = pkgs.tailscale;
     # Automatically start Tailscale on boot
     # This ensures the service is enabled and started with the system
-    useRoutingFeatures = "server";
+    useRoutingFeatures = lib.mkDefault "server";
     openFirewall = true;
     port = 41641;
 
@@ -44,6 +44,23 @@
   networking.firewall = {
     allowedUDPPorts = [ 41641 ];
     trustedInterfaces = [ "tailscale0" ];
+  };
+  # Improve shutdown ordering to prevent timeout errors
+  systemd.services.tailscaled = {
+    after = [ "network-online.target" "systemd-resolved.service" ];
+    wants = [ "network-online.target" ];
+    before = [ "shutdown.target" ];
+    conflicts = [ "shutdown.target" ];
+    serviceConfig = {
+      TimeoutStopSec = "30s";
+      KillMode = "mixed";
+      KillSignal = "SIGTERM";
+      # Add retry logic for network connectivity
+      Restart = "on-failure";
+      RestartSec = "5s";
+      StartLimitBurst = 5;
+      StartLimitIntervalSec = 60;
+    };
   };
 
 }

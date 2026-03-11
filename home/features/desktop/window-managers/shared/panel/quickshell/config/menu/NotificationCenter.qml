@@ -17,11 +17,11 @@ PanelWindow {
     right: true
     bottom: true
   }
-  margins.top: 40
-  margins.right: 12
+  margins.top: Config.barHeight + Config.barMargin + 8
+  margins.right: Config.barMargin
   margins.bottom: 60
 
-  implicitWidth: 350
+  implicitWidth: Config.controlCenterWidth
   color: "transparent"
   mask: Region {
     item: sidebarContent
@@ -32,30 +32,14 @@ PanelWindow {
 
   property var manager: null
   property bool showContent: false
+  signal closeRequested()
   property string searchQuery: ""
-  visible: showContent || sidebarContent.x < 350
-
-  function resolveNotificationIcon(iconName) {
-    if (!iconName) return "";
-    if (iconName.startsWith("/")) return "file://" + iconName;
-    var normalized = iconName.toLowerCase();
-    if (normalized === "alacritty" || normalized === "org.alacritty.alacritty") {
-      var terminalFallbacks = ["utilities-terminal", "terminal", "org.gnome.Console"];
-      for (var i = 0; i < terminalFallbacks.length; ++i) {
-        var fallbackResolved = Quickshell.iconPath(terminalFallbacks[i]);
-        if (fallbackResolved) return fallbackResolved.startsWith("file://") ? fallbackResolved : "file://" + fallbackResolved;
-      }
-      return "";
-    }
-    var resolved = Quickshell.iconPath(iconName);
-    if (resolved) return resolved.startsWith("file://") ? resolved : "file://" + resolved;
-    return "";
-  }
+  visible: showContent || sidebarContent.x < Config.controlCenterWidth
 
   // Ensure focus is grabbed when shown
   onShowContentChanged: {
     if (showContent) {
-      notifList.focus = true;
+      searchInput.forceActiveFocus();
     } else if (searchInput && searchInput.activeFocus) {
       searchInput.focus = false;
     }
@@ -63,14 +47,14 @@ PanelWindow {
 
   Rectangle {
     id: sidebarContent
-    width: 350
+    width: Config.controlCenterWidth
     height: parent.height
     color: Colors.bgGlass
     border.color: Colors.border
     border.width: 1
-    radius: 16
+    radius: Colors.radiusLarge
 
-    x: root.showContent ? 0 : 360
+    x: root.showContent ? 0 : Config.controlCenterWidth + 10
     opacity: root.showContent ? 1.0 : 0.0
 
     Behavior on x { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
@@ -127,7 +111,7 @@ PanelWindow {
             Text { anchors.centerIn: parent; text: "󰅖"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 14 }
           }
           id: closeHover; hoverEnabled: true
-          onClicked: root.showContent = false
+          onClicked: root.closeRequested()
         }
       }
 
@@ -147,6 +131,7 @@ PanelWindow {
           TextInput {
             id: searchInput; Layout.fillWidth: true; verticalAlignment: Text.AlignVCenter
             color: Colors.text; font.pixelSize: 12
+            onVisibleChanged: if (!visible && activeFocus) focus = false
             onTextChanged: root.searchQuery = text
           }
           Text {
@@ -264,6 +249,10 @@ PanelWindow {
           }
 
           property bool isReplying: false
+          onIsReplyingChanged: {
+            if (isReplying) replyInput.forceActiveFocus();
+            else if (replyInput.activeFocus) replyInput.focus = false;
+          }
 
           // MPRIS Integration
           property var mprisPlayer: {
@@ -284,7 +273,7 @@ PanelWindow {
               width: parent.width; spacing: 12
               Image {
                 Layout.preferredWidth: 32; Layout.preferredHeight: 32
-                source: root.resolveNotificationIcon(modelData.appIcon)
+                source: Config.resolveIconSource(modelData.appIcon || "")
                 visible: modelData.appIcon !== ""
                 Rectangle { anchors.fill: parent; color: "transparent"; visible: parent.status !== Image.Ready; Text { anchors.centerIn: parent; text: "󰂚"; color: Colors.text; font.pixelSize: 20; font.family: Colors.fontMono } }
               }
@@ -347,7 +336,8 @@ PanelWindow {
               TextInput {
                 id: replyInput; anchors.fill: parent; anchors.margins: 8
                 verticalAlignment: Text.AlignVCenter
-                color: Colors.text; font.pixelSize: 13; focus: isReplying
+                color: Colors.text; font.pixelSize: 13
+                onVisibleChanged: if (!visible && activeFocus) focus = false
                 Keys.onReturnPressed: {
                   notifItem.notification.invoke(text);
                   notifItem.isReplying = false;
@@ -377,18 +367,6 @@ PanelWindow {
                       else if (modelData) { modelData.invoke(); notifItem.notification.dismiss(); }
                     }
                   }
-                }
-              }
-
-              // Archive Action
-              Rectangle {
-                Layout.preferredWidth: 32; height: 28; color: Colors.highlightLight; radius: 6
-                Text { anchors.centerIn: parent; text: "󰅨"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 14 }
-                MouseArea {
-                  anchors.fill: parent; hoverEnabled: true
-                  onEntered: parent.color = Colors.highlight
-                  onExited: parent.color = Colors.highlightLight
-                  onClicked: notifItem.notification.dismiss()
                 }
               }
 

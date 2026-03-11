@@ -87,7 +87,16 @@ let
   };
 
   config = lib.mkIf config.features.quickshell.enable {
-    home.packages = [
+    home.packages = with pkgs; [
+      # Quickshell core and Qt dependencies
+      quickshell
+      qt6.qtdeclarative # qmlls (QML language server)
+      qt6.qtsvg
+      qt6.qtimageformats
+      qt6.qtmultimedia
+      qt6.qt5compat
+
+      # Quickshell utility scripts
       appsScript
       qsRofiScript
       runScript
@@ -113,7 +122,7 @@ let
           systemctl --user mask "$svc" >/dev/null 2>&1 || true
           systemctl --user reset-failed "$svc" >/dev/null 2>&1 || true
         done
-        
+
         # Kill any stray processes
         pkill -x swaync >/dev/null 2>&1 || true
         pkill -x mako >/dev/null 2>&1 || true

@@ -10,7 +10,6 @@
     ./global
 
     ./features/ai
-    ./features/ai/ollama  # Ollama only available on woody (desktop with AMD GPU + ROCm)
     ./features/alacritty
     ./features/ansible
     ./features/antigravity
@@ -64,6 +63,7 @@
     ./features/tmux
     ./features/virtualisation
     ./features/vivid
+    ./features/voxtype
     ./features/vscode
     ./features/webapps
     ./features/wireless

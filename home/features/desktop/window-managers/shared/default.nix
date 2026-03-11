@@ -1,42 +1,39 @@
 {
+  pkgs,
+  ...
+}:
+
+{
   imports = [
-    ./panel
-    ./launcher
-    # ./notifications
-    ./media
-    ./session
     ./clipboard
-    ./scripts/system-menu.nix # System menu launcher (walker-based)
-    ./scripts/rofi/system-menu-rofi.nix # System menu launcher (rofi-based)
-    ./utils.nix
+    ./launcher
+    ./media
+    ./notifications
+    ./panel
+    ./launcher/scripts/rofi/system-menu-rofi.nix # System menu launcher (rofi-based)
+    ./launcher/scripts/walker/system-menu.nix # System menu launcher (walker-based)
+    ./session
+  ];
+
+  home.packages = with pkgs; [
+    # wlroots-based compositor tools (only for wlroots compositors like Hyprland, Sway, Niri)
+    wlr-randr # Display configuration for wlroots compositors (Hyprland, Sway, etc.)
+    swaybg # Wayland wallpaper daemon (fallback)
+    swww # Animated wallpaper daemon for wlroots compositors
   ];
 
   # Shared window manager scripts
   home.file = {
-    # TODO: Relocate
     # Rofi scripts (common across window managers)
     ".local/bin/scripts/rofi/rofi-apps-unified.sh" = {
       force = true;
-      source = ./scripts/rofi/rofi-apps-unified.sh;
-      executable = true;
-    };
-    # Symlink for backward compatibility
-    ".local/bin/scripts/rofi/apps-unified.sh" = {
-      force = true;
-      source = ./scripts/rofi/rofi-apps-unified.sh;
+      source = ./launcher/scripts/rofi/rofi-apps-unified.sh;
       executable = true;
     };
 
-    # Wayland scripts (shared across Wayland window managers)
-    ".local/bin/scripts/wayland" = {
-      force = true;
-      source = ./scripts/wayland;
-      recursive = true;
-      executable = true;
-    };
-
+    # Shared scripts directory (for reference/config access)
     ".config/desktop/window-managers/shared/scripts" = {
-      source = ./scripts;
+      source = ./launcher/scripts;
       recursive = true;
       executable = true;
     };

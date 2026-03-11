@@ -7,11 +7,11 @@ This directory contains scripts organized by scope and compatibility level, foll
 ```
 ~/.local/bin/scripts/
 ├── system/              # System-level scripts (DE/WM independent)
-└── wayland/             # Wayland compositor scripts (shared)
+├── utils/               # General-purpose utility scripts
+└── wayland/             # Wayland compositor scripts (shared across all Wayland compositors)
 
 ~/.config/desktop/window-managers/shared/scripts/
-├── rofi/                # Rofi menu scripts (shared across WMs)
-└── wayland/             # Wayland scripts (shared sources)
+└── rofi/                # Rofi menu scripts (shared across WMs)
 
 ~/.config/desktop/window-managers/hyprland/scripts/  # Hyprland-specific scripts
 ├── hypr/                # Hyprland compositor specific
@@ -23,30 +23,44 @@ This directory contains scripts organized by scope and compatibility level, foll
 ### System-Level Scripts (`~/.local/bin/scripts/system/`)
 Platform and window manager independent utilities:
 
-- **`volume.sh`** - Audio volume control with rofi interface
-- **`brightness.sh`** - Display brightness control with rofi interface
-- **`power.sh`** - Power management (lock/logout/suspend/reboot/shutdown)
-- **`battery.sh`** - Battery status and power management with rofi interface
-- **`figlet.sh`** - ASCII art text generator with clipboard support
-- **`show-battery.sh`** - Display battery status notification
-- **`show-time.sh`** - Display current time and date notification
+- **`os-volume.sh`** - Audio volume control with rofi interface
+- **`os-brightness.sh`** - Display brightness control with rofi interface
+- **`os-power.sh`** - Power management (lock/logout/suspend/reboot/shutdown)
+- **`os-battery-show.sh`** - Display battery status notification (uses shared battery library)
+- **`os-battery-lib.sh`** - Shared battery utility library with multiple detection methods (acpi, /sys, upower)
+- **`os-battery-remaining.sh`** - Returns battery percentage as integer (uses shared library)
+- **`os-battery-device.sh`** - Returns battery device identifier (uses shared library)
+- **`os-battery-state.sh`** - Returns battery state (Charging/Discharging/Full) (uses shared library)
+- **`os-battery-monitor.sh`** - Systemd timer script for low battery notifications (uses shared library)
+- **`os-time-show.sh`** - Display current time and date notification
 
 **Dependencies**: Core system utilities, optional rofi/notifications
 **Usage**: Works with any desktop environment or window manager
 
-### Wayland Scripts (`~/.local/bin/scripts/wayland/`)
-Wayland compositor compatible utilities:
+### Utility Scripts (`~/.local/bin/scripts/utils/`)
+General-purpose utility scripts:
 
-- **`screenshot.sh`** - Advanced screenshot tool (grimblast/grim+slurp)
+- **`figlet.sh`** - ASCII art text generator with clipboard support
+- **`wttr.sh`** - Weather information from wttr.in
+
+**Dependencies**: figlet (for figlet.sh), curl (for wttr.sh), clipboard tools (wl-clipboard/xclip/xsel)
+**Usage**: Works with any desktop environment or window manager
+
+### Wayland Scripts (`~/.local/bin/scripts/wayland/`)
+Wayland compositor compatible utilities (shared across all Wayland compositors):
+
+- **`screenshot.sh`** - Advanced screenshot tool (grim+slurp with compositor-specific enhancements)
 - **`clipboard-manager.sh`** - Clipboard history management (cliphist)
 
-**Dependencies**: Wayland compositor, wayland-specific tools
-**Usage**: Works with any Wayland compositor (Hyprland, Sway, etc.)
+**Dependencies**: Wayland compositor, wayland-specific tools (grim, slurp, wl-clipboard, cliphist)
+**Usage**: Works with any Wayland compositor (Hyprland, Sway, GNOME Wayland, Plasma Wayland, etc.)
+**Source Location**: `home/features/desktop/common/scripts/wayland/` (moved from window-managers/shared)
 
 ### Rofi Scripts (`~/.config/desktop/window-managers/shared/scripts/rofi/`)
 Rofi-based menu interfaces:
 
 - **`rofi-web-search.sh`** - Web search engine launcher
+- **`rofi-os-battery.sh`** - Battery status and power management with rofi interface (uses shared battery library)
   (see the directory for additional rofi menus)
 
 **Dependencies**: rofi, xdg-utils
@@ -66,7 +80,7 @@ Defined in `~/.config/hypr/conf/variables.conf`:
 ```bash
 # Common script paths (organized by scope)
 $SYSTEM_SCRIPTS = ~/.local/bin/scripts/system
-$WAYLAND_SCRIPTS = ~/.local/bin/scripts/wayland  
+$WAYLAND_SCRIPTS = ~/.local/bin/scripts/wayland
 $ROFI_SCRIPTS = ~/.config/desktop/window-managers/shared/scripts/rofi
 $HYPR_SCRIPTS = ~/.config/desktop/window-managers/hyprland/scripts
 ```
@@ -74,7 +88,7 @@ $HYPR_SCRIPTS = ~/.config/desktop/window-managers/hyprland/scripts
 ### Keybinding Examples
 ```bash
 # System-level power management
-bind = $mainMod, Escape, exec, $SYSTEM_SCRIPTS/power.sh
+bind = $mainMod, Escape, exec, $SYSTEM_SCRIPTS/os-power.sh
 
 # Wayland screenshot
 bind = , Print, exec, $WAYLAND_SCRIPTS/screenshot.sh area
@@ -114,8 +128,8 @@ Scripts have been moved from the old flat structure:
 # Old paths
 ~/.config/hypr/scripts/rofi/web-search.sh
 
-# New paths  
-~/.local/bin/scripts/system/volume.sh
+# New paths
+~/.local/bin/scripts/system/os-volume.sh
 ~/.config/desktop/window-managers/shared/scripts/rofi/rofi-web-search.sh
 ```
 
@@ -129,19 +143,19 @@ Scripts have been moved from the old flat structure:
 ### Direct Execution
 ```bash
 # System volume control
-~/.local/bin/scripts/system/volume.sh
+~/.local/bin/scripts/system/os-volume.sh
 
 # Screenshot with area selection
 ~/.local/bin/scripts/wayland/screenshot.sh area
 
 # Power menu
-~/.local/bin/scripts/system/power.sh
+~/.local/bin/scripts/system/os-power.sh
 ```
 
 ### Command Line Options
 All scripts support `--help` for usage information:
 ```bash
-~/.local/bin/scripts/system/volume.sh --help
+~/.local/bin/scripts/system/os-volume.sh --help
 ~/.local/bin/scripts/wayland/screenshot.sh --help
 ```
 
@@ -160,7 +174,7 @@ Scripts are designed to work with:
 ### Feature-Specific Dependencies
 - **Audio Control**: `wpctl` (PipeWire/WirePlumber)
 - **Brightness**: `light`, `brightnessctl`, or `xbacklight`
-- **Screenshots**: `grimblast` or `grim`+`slurp`  
+- **Screenshots**: `grimblast` or `grim`+`slurp`
 - **Clipboard**: `cliphist`, `wl-clipboard`
 - **Rofi Interfaces**: `rofi`
 - **Notifications**: `notify-send` (optional)

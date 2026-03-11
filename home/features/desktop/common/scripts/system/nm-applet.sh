@@ -40,17 +40,12 @@ start_applet() {
         return 0
     fi
 
-    if nm-applet --indicator &>/dev/null &; then
-        sleep 0.5  # Give it time to start
-        if is_running; then
-            echo "Started"
-            notify "Network Manager" "Applet started" "normal"
-            return 0
-        else
-            echo "Failed to start"
-            notify "Network Manager" "Failed to start applet" "critical"
-            return 1
-        fi
+    nm-applet --indicator &>/dev/null &
+    sleep 0.5  # Give it time to start
+    if is_running; then
+        echo "Started"
+        notify "Network Manager" "Applet started" "normal"
+        return 0
     else
         echo "Failed to start"
         notify "Network Manager" "Failed to start applet" "critical"

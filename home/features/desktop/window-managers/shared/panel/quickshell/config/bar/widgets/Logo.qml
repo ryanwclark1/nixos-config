@@ -24,9 +24,20 @@ Item {
   }
 
   Image {
+    id: logoImage
     anchors.centerIn: parent
     sourceSize: Qt.size(20, 20)
     source: Quickshell.iconPath("nix-snowflake") || ""
+    visible: status === Image.Ready
+  }
+
+  Text {
+    anchors.centerIn: parent
+    text: "󱄅"
+    color: Colors.primary
+    font.family: Colors.fontMono
+    font.pixelSize: 18
+    visible: !logoImage.visible
   }
 
   scale: mouseArea.containsMouse ? 1.06 : 1.0

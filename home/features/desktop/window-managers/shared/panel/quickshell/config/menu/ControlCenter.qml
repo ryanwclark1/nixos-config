@@ -3,7 +3,6 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import Quickshell
 import Quickshell.Io
-import Quickshell.Services.Pipewire
 import Quickshell.Bluetooth
 import Quickshell.Wayland
 import Quickshell.Widgets
@@ -13,7 +12,7 @@ import "../services"
 
 PanelWindow {
   id: root
-  
+
   anchors {
     top: true
     right: true
@@ -22,7 +21,7 @@ PanelWindow {
   margins.top: Config.barHeight + Config.barMargin + 8
   margins.right: Config.barMargin
   margins.bottom: 60
-  
+
   implicitWidth: Config.controlCenterWidth
   color: "transparent"
   mask: Region {
@@ -31,10 +30,11 @@ PanelWindow {
   WlrLayershell.layer: WlrLayer.Top
   WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
   WlrLayershell.namespace: "quickshell"
-  
+
   property var manager: null
   property bool showContent: false
-  visible: showContent || sidebarContent.x < 350
+  signal closeRequested()
+  visible: showContent || sidebarContent.x < Config.controlCenterWidth
   property real displayOutputVolume: 0
   property real displayInputVolume: 0
   property bool displayOutputMuted: false
@@ -128,15 +128,15 @@ PanelWindow {
 
   Rectangle {
     id: sidebarContent
-    width: 350; height: parent.height; color: Colors.bgGlass; border.color: Colors.border; border.width: 1; radius: Colors.radiusLarge
-    x: root.showContent ? 0 : 360; opacity: root.showContent ? 1.0 : 0.0
+    width: Config.controlCenterWidth; height: parent.height; color: Colors.bgGlass; border.color: Colors.border; border.width: 1; radius: Colors.radiusLarge
+    x: root.showContent ? 0 : Config.controlCenterWidth + 10; opacity: root.showContent ? 1.0 : 0.0
     Behavior on x { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
     Behavior on opacity { NumberAnimation { duration: 250 } }
 
-    Keys.onEscapePressed: root.showContent = false
+    Keys.onEscapePressed: root.closeRequested()
 
     ColumnLayout {
-      anchors.fill: parent; anchors.margins: Colors.paddingLarge; spacing: 20      
+      anchors.fill: parent; anchors.margins: Colors.paddingLarge; spacing: 20
       RowLayout {
         Layout.fillWidth: true
         Text { text: "Command Center"; color: Colors.text; font.pixelSize: 22; font.weight: Font.DemiBold; font.letterSpacing: -0.5 }
@@ -146,13 +146,13 @@ PanelWindow {
           Text { anchors.centerIn: parent; text: "󰒓"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 18 }
           MouseArea {
             id: settingsHover; anchors.fill: parent; hoverEnabled: true
-            onClicked: { root.showContent = false; Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "toggle"]); }
+            onClicked: { root.closeRequested(); Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "toggle"]); }
           }
         }
         Rectangle {
           width: 32; height: 32; radius: 16; color: closeHover.containsMouse ? Colors.surface : "transparent"
           Text { anchors.centerIn: parent; text: "󰅖"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 18 }
-          MouseArea { id: closeHover; anchors.fill: parent; hoverEnabled: true; onClicked: root.showContent = false }
+          MouseArea { id: closeHover; anchors.fill: parent; hoverEnabled: true; onClicked: root.closeRequested() }
         }
       }
 
@@ -164,59 +164,94 @@ PanelWindow {
         ColumnLayout {
           id: mainCol; width: parent.width; spacing: 20
 
-          RowLayout {
+          component QuickLinkCard: Rectangle {
+            property string icon
+            property string title
+            property string subtitle
+            property var clickCommand: []
+
             Layout.fillWidth: true
-            spacing: 10
-            visible: Config.controlCenterShowQuickLinks
+            implicitHeight: 68
+            radius: Colors.radiusMedium
+            color: quickLinkHover.containsMouse ? Colors.highlightLight : Colors.bgWidget
+            border.color: Colors.border
+            border.width: 1
 
-            Rectangle {
-              Layout.fillWidth: true
-              implicitHeight: 78
-              radius: Colors.radiusMedium
-              color: Colors.bgWidget
-              border.color: Colors.border
-              border.width: 1
+            RowLayout {
+              anchors.fill: parent
+              anchors.margins: 14
+              spacing: 12
 
-              RowLayout {
-                anchors.fill: parent
-                anchors.margins: 14
-                spacing: 12
-                Text { text: "󰕾"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 18 }
-                ColumnLayout {
-                  Layout.fillWidth: true
-                  spacing: 2
-                  Text { text: "Audio Controls"; color: Colors.fgMain; font.pixelSize: 13; font.weight: Font.DemiBold }
-                  Text { text: "Switch devices, volume, mute"; color: Colors.textSecondary; font.pixelSize: 11 }
+              Rectangle {
+                Layout.preferredWidth: 36
+                Layout.preferredHeight: 36
+                radius: 18
+                color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.12)
+
+                Text {
+                  anchors.centerIn: parent
+                  text: icon
+                  color: Colors.primary
+                  font.family: Colors.fontMono
+                  font.pixelSize: 16
                 }
-                Text { text: "󰄮"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 14 }
               }
 
-              MouseArea { anchors.fill: parent; onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleAudioMenu"]) }
+              ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 1
+
+                Text {
+                  text: title
+                  color: Colors.fgMain
+                  font.pixelSize: 12
+                  font.weight: Font.DemiBold
+                  Layout.fillWidth: true
+                  elide: Text.ElideRight
+                }
+
+                Text {
+                  text: subtitle
+                  color: Colors.textSecondary
+                  font.pixelSize: 10
+                  Layout.fillWidth: true
+                  elide: Text.ElideRight
+                }
+              }
+
+              Text {
+                text: "󰄮"
+                color: Colors.textSecondary
+                font.family: Colors.fontMono
+                font.pixelSize: 13
+              }
             }
 
-            Rectangle {
-              Layout.fillWidth: true
-              implicitHeight: 78
-              radius: Colors.radiusMedium
-              color: Colors.bgWidget
-              border.color: Colors.border
-              border.width: 1
+            MouseArea {
+              id: quickLinkHover
+              anchors.fill: parent
+              hoverEnabled: true
+              onClicked: Quickshell.execDetached(clickCommand)
+            }
+          }
 
-              RowLayout {
-                anchors.fill: parent
-                anchors.margins: 14
-                spacing: 12
-                Text { text: "󰖩"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 18 }
-                ColumnLayout {
-                  Layout.fillWidth: true
-                  spacing: 2
-                  Text { text: "Network Controls"; color: Colors.fgMain; font.pixelSize: 13; font.weight: Font.DemiBold }
-                  Text { text: "Connections, VPNs, Tailscale"; color: Colors.textSecondary; font.pixelSize: 11 }
-                }
-                Text { text: "󰄮"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 14 }
-              }
+          ColumnLayout {
+            Layout.fillWidth: true
+            spacing: 8
+            visible: Config.controlCenterShowQuickLinks
 
-              MouseArea { anchors.fill: parent; onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleNetworkMenu"]) }
+            QuickLinkCard {
+              icon: "󰕾"
+              title: "Audio Controls"
+              subtitle: "Devices, volume, and mute"
+              clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleAudioMenu"]
+            }
+
+            QuickLinkCard {
+              icon: "󰖩"
+              title: "Network Controls"
+              subtitle: "Wi-Fi, VPN, and Tailscale"
+              clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleNetworkMenu"]
             }
           }
 
@@ -243,16 +278,19 @@ PanelWindow {
             }
             QuickToggle {
               id: nightLightToggle; icon: "󰖔"; label: "Night Light"; active: false
-              onClicked: { Quickshell.execDetached(["os-toggle-nightlight"]); active = !active; }
+              onClicked: { Quickshell.execDetached(["os-toggle-nightlight"]); active = !active; nightLightVerify.restart(); }
               Process {
                 id: checkNightLight; command: ["sh", "-c", "hyprctl hyprsunset temperature 2>/dev/null | grep -v '6000' >/dev/null && echo 'on' || echo 'off'"]
                 running: root.showContent; stdout: StdioCollector { onStreamFinished: nightLightToggle.active = (this.text.trim() === "on") }
+              }
+              Timer {
+                id: nightLightVerify; interval: 500; repeat: false
+                onTriggered: checkNightLight.running = true
               }
             }
           }
 
           MediaWidget {
-            visible: Config.controlCenterShowMediaWidget
             opacity: root.showContent ? 1 : 0
             Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
           }
@@ -284,7 +322,7 @@ PanelWindow {
                 }
                 MouseArea {
                   id: brightnessHover
-                  anchors.fill: parent; 
+                  anchors.fill: parent;
                   hoverEnabled: true
                   onEntered: { brightnessTrack.color = Colors.surface; brightnessTrack.border.color = Colors.primary; }
                   onExited: { brightnessTrack.color = Colors.bgWidget; brightnessTrack.border.color = Colors.border; }
@@ -324,13 +362,26 @@ PanelWindow {
                     onClicked: root.toggleMute("@DEFAULT_AUDIO_SINK@", root.displayOutputMuted)
                   }
                 }
-                Slider {
-                  id: outputSlider
-                  Layout.fillWidth: true
-                  from: 0
-                  to: 1
-                  value: root.displayOutputMuted ? 0 : root.displayOutputVolume
-                  onMoved: root.setAudioVolume("@DEFAULT_AUDIO_SINK@", value)
+                Rectangle {
+                  id: outputTrack
+                  Layout.fillWidth: true; height: 28; color: Colors.bgWidget; radius: 14; border.color: Colors.border; border.width: 1
+                  Behavior on color { ColorAnimation { duration: 150 } }
+                  Behavior on border.color { ColorAnimation { duration: 150 } }
+                  Rectangle {
+                    height: parent.height; width: Math.max(28, parent.width * (root.displayOutputMuted ? 0 : root.displayOutputVolume)); radius: 14
+                    color: root.displayOutputMuted ? Colors.error : (outputSliderHover.containsMouse ? Qt.darker(Colors.primary, 1.08) : Colors.primary)
+                    Behavior on color { ColorAnimation { duration: 150 } }
+                    Text { anchors.centerIn: parent; text: root.displayOutputMuted ? "󰝟" : "󰕾"; color: Colors.background; font.family: Colors.fontMono; font.pixelSize: 12; visible: (root.displayOutputMuted || root.displayOutputVolume > 0.1) }
+                  }
+                  MouseArea {
+                    id: outputSliderHover
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onEntered: { outputTrack.color = Colors.surface; outputTrack.border.color = root.displayOutputMuted ? Colors.error : Colors.primary; }
+                    onExited: { outputTrack.color = Colors.bgWidget; outputTrack.border.color = Colors.border; }
+                    onPressed: (mouse) => { root.setAudioVolume("@DEFAULT_AUDIO_SINK@", Math.max(0, Math.min(1.0, mouse.x / width))); }
+                    onPositionChanged: (mouse) => { if (pressed) root.setAudioVolume("@DEFAULT_AUDIO_SINK@", Math.max(0, Math.min(1.0, mouse.x / width))); }
+                  }
                 }
               }
             }
@@ -365,13 +416,26 @@ PanelWindow {
                     onClicked: root.toggleMute("@DEFAULT_AUDIO_SOURCE@", root.displayInputMuted)
                   }
                 }
-                Slider {
-                  id: inputSlider
-                  Layout.fillWidth: true
-                  from: 0
-                  to: 1
-                  value: root.displayInputMuted ? 0 : root.displayInputVolume
-                  onMoved: root.setAudioVolume("@DEFAULT_AUDIO_SOURCE@", value)
+                Rectangle {
+                  id: inputTrack
+                  Layout.fillWidth: true; height: 28; color: Colors.bgWidget; radius: 14; border.color: Colors.border; border.width: 1
+                  Behavior on color { ColorAnimation { duration: 150 } }
+                  Behavior on border.color { ColorAnimation { duration: 150 } }
+                  Rectangle {
+                    height: parent.height; width: Math.max(28, parent.width * (root.displayInputMuted ? 0 : root.displayInputVolume)); radius: 14
+                    color: root.displayInputMuted ? Colors.error : (inputSliderHover.containsMouse ? Qt.darker(Colors.primary, 1.08) : Colors.primary)
+                    Behavior on color { ColorAnimation { duration: 150 } }
+                    Text { anchors.centerIn: parent; text: root.displayInputMuted ? "󰍭" : "󰍬"; color: Colors.background; font.family: Colors.fontMono; font.pixelSize: 12; visible: (root.displayInputMuted || root.displayInputVolume > 0.1) }
+                  }
+                  MouseArea {
+                    id: inputSliderHover
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onEntered: { inputTrack.color = Colors.surface; inputTrack.border.color = root.displayInputMuted ? Colors.error : Colors.primary; }
+                    onExited: { inputTrack.color = Colors.bgWidget; inputTrack.border.color = Colors.border; }
+                    onPressed: (mouse) => { root.setAudioVolume("@DEFAULT_AUDIO_SOURCE@", Math.max(0, Math.min(1.0, mouse.x / width))); }
+                    onPositionChanged: (mouse) => { if (pressed) root.setAudioVolume("@DEFAULT_AUDIO_SOURCE@", Math.max(0, Math.min(1.0, mouse.x / width))); }
+                  }
                 }
               }
             }
@@ -415,6 +479,7 @@ PanelWindow {
           model: [{ icon: "󰐥", cmd: ["systemctl", "poweroff"] }, { icon: "󰑐", cmd: ["systemctl", "reboot"] }, { icon: "󰌾", cmd: ["hyprlock"] }]
           delegate: Rectangle {
             Layout.fillWidth: true; height: 40; color: Colors.surface; radius: 8
+            Behavior on color { ColorAnimation { duration: 160 } }
             Text { anchors.centerIn: parent; text: modelData.icon; color: Colors.text; font.family: Colors.fontMono; font.pixelSize: 18 }
             MouseArea {
               anchors.fill: parent; hoverEnabled: true

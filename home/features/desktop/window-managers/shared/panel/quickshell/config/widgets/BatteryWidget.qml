@@ -34,7 +34,7 @@ Row {
   }
 
   Text {
-    text: showBattery && device ? Math.round(device.percentage * 100) + "%" : "100%"
+    text: showBattery && device ? Math.round(device.percentage * 100) + "%" : ""
     color: Colors.fgMain
     font.pixelSize: 11
     font.weight: Font.DemiBold

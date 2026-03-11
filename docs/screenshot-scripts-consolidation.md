@@ -8,11 +8,11 @@ This document describes the consolidation of screenshot scripts across the NixOS
 
 ### Unified Script: `screenshot.sh`
 
-**Location:** `home/features/desktop/window-managers/shared/scripts/wayland/screenshot.sh`
+**Location:** `home/features/desktop/common/scripts/wayland/screenshot.sh` (moved from `window-managers/shared/scripts/wayland/`)
 
 This is the main, comprehensive screenshot script that provides all screenshot functionality:
 
-- **Backends:** Supports both `grimblast` (preferred) and `grim+slurp` (fallback)
+- **Backends:** Uses `grim+slurp` (general Wayland, no longer depends on `grimblast`)
 - **Modes:**
   - `screen` / `fullscreen` - Capture entire screen
   - `area` / `region` - Interactive area selection
@@ -31,7 +31,7 @@ This is the main, comprehensive screenshot script that provides all screenshot f
 
 #### `os-cmd-screenshot`
 
-**Location:** `home/features/desktop/common/scripts/system/os-cmd-screenshot`
+**Location:** `home/features/desktop/common/scripts/system/os-cmd-screenshot.sh`
 
 Wrapper that maintains compatibility with the old `os-cmd-screenshot` interface:
 - Maps old modes (`region`, `windows`, `fullscreen`, `smart`) to new modes
@@ -44,17 +44,15 @@ Wrapper that maintains compatibility with the old `os-cmd-screenshot` interface:
 
 Identical to `os-cmd-screenshot` except uses `OMARCHY_SCREENSHOT_DIR` environment variable. This maintains backward compatibility for the omarchy configuration.
 
-### Hyprland-Specific: `screenshot-enhanced`
+### Deprecated: `screenshot-enhanced`
 
-**Location:** `home/features/desktop/window-managers/shared/media/screenshot-enhanced.nix`
+**Status:** ❌ **REMOVED** - All functionality has been migrated to `screenshot.sh`
 
-This Nix package provides Hyprland-specific screenshot tools using `hyprshot`:
-- Uses `hyprshot` which is Hyprland-specific
-- Provides simpler, more opinionated interface
-- Packaged as Nix binaries for convenience
-- Provides wrapper commands: `screenshot-region`, `screenshot-window`, `screenshot-output`
-
-**Note:** This is kept separate because it uses Hyprland-specific tools (`hyprshot`) and provides a different workflow. The unified `screenshot.sh` can work with Hyprland but uses general Wayland tools.
+The `screenshot-enhanced` package has been removed. All its functionality is now available in the unified `screenshot.sh` script:
+- `screenshot-enhanced region` → `screenshot.sh area --satty`
+- `screenshot-enhanced window` → `screenshot.sh window --satty`
+- `screenshot-enhanced output` → `screenshot.sh screen --satty`
+- `screenshots-folder` → `screenshot.sh --open-folder`
 
 ## Migration Guide
 
@@ -102,38 +100,32 @@ screenshot.sh area --wait 3 --format jpg
 - `SCREENSHOTS_DIR` - Output directory for unified script (default: `~/Pictures/Screenshots`)
 - `OS_SCREENSHOT_DIR` - Output directory for `os-cmd-screenshot` wrapper
 - `OMARCHY_SCREENSHOT_DIR` - Output directory for `omarchy-cmd-screenshot` wrapper
-- `SCREENSHOT_DIR` - Output directory for `screenshot-enhanced` (Hyprland-specific)
 
 ## Dependencies
 
 ### Unified Script (`screenshot.sh`)
-- `grimblast` (preferred) or `grim` + `slurp` (fallback)
+- `grim` + `slurp` (required)
 - `wl-copy` (for clipboard)
 - `notify-send` (for notifications)
-- Optional: `satty` (for editing), `wayfreeze` (for freeze mode), `jq` (for smart mode)
+- Optional: `hyprpicker` (for freeze mode in Hyprland), `wayfreeze` (fallback freeze), `satty` (for editing), `jq` (for smart mode)
 
 ### Wrapper Scripts
 - Same as unified script (they call it)
 
-### `screenshot-enhanced`
-- `hyprshot` (Hyprland-specific)
-- `satty` (for editing)
-- `slurp` (for area selection)
-
 ## File Locations
 
 ```
-home/features/desktop/common/scripts/
-├── wayland/
-│   └── screenshot.sh          # Unified script (MAIN)
-└── system/
-    └── os-cmd-screenshot       # Wrapper for backward compatibility
+home/features/desktop/common/
+└── scripts/
+    ├── wayland/
+    │   ├── screenshot.sh          # Unified script (MAIN)
+    │   └── clipboard-manager.sh   # Clipboard history manager
+    └── system/
+        └── os-cmd-screenshot       # Wrapper for backward compatibility
 
 omarchy/bin/
 └── omarchy-cmd-screenshot     # Wrapper for omarchy (backward compatibility)
 
-home/features/desktop/window-managers/shared/media/
-└── screenshot-enhanced.nix    # Hyprland-specific Nix package
 ```
 
 ## Testing
@@ -147,6 +139,6 @@ After consolidation, verify:
 
 ## Future Considerations
 
-- Consider deprecating `screenshot-enhanced` in favor of unified script if Hyprland support improves
+- ✅ **COMPLETED:** `screenshot-enhanced` has been removed and all functionality migrated to `screenshot.sh`
 - Consider adding X11 support to unified script for broader compatibility
 - Consider adding OCR functionality (currently only in keybindings)

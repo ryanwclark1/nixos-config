@@ -349,9 +349,9 @@ This configuration supports multiple desktop environments and window managers:
 This configuration includes utilities and features inspired by [Omarchy](https://omarchy.org), DHH's beautiful, modern & opinionated Linux distribution.
 
 **System Notification Utilities:**
-- **show-battery**: Display battery status, level, charging state, and time remaining with smart icons
+- **os-battery-show**: Display battery status, level, charging state, and time remaining with smart icons
   - Keybinding: `SUPER+CTRL+B`
-- **show-time**: Display current time, date, week number, and timezone information
+- **os-time-show**: Display current time, date, week number, and timezone information
   - Keybinding: `SUPER+CTRL+T`
 
 **Wayland Utilities:**

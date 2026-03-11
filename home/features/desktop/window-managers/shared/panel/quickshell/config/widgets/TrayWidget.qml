@@ -51,11 +51,13 @@ Row {
         cursorShape: Qt.PointingHandCursor
 
         onClicked: (mouse) => {
-          if (modelData.hasMenu) {
-            var pos = trayItem.mapToItem(null, 0, trayItem.height);
-            modelData.display(root.Window.window, Math.round(pos.x), Math.round(pos.y));
-          } else if (mouse.button === Qt.RightButton && modelData.secondaryActivate) {
-            modelData.secondaryActivate();
+          if (mouse.button === Qt.RightButton) {
+            if (modelData.hasMenu) {
+              var pos = trayItem.mapToItem(null, 0, trayItem.height);
+              modelData.display(root.Window.window, Math.round(pos.x), Math.round(pos.y));
+            } else if (modelData.secondaryActivate) {
+              modelData.secondaryActivate();
+            }
           } else {
             modelData.activate();
           }

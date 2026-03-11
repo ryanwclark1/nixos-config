@@ -116,6 +116,11 @@
       url = "github:steveyegge/beads";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Voxtype - push-to-talk voice-to-text for Linux
+    voxtype = {
+      url = "github:peteonrails/voxtype";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =

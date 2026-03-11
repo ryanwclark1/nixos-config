@@ -19,31 +19,31 @@
     layout = [
       {
         label = "lock";
-        action = "~/.local/bin/scripts/system/power.sh lock";
+        action = "os-power lock";
         text = "Lock";
         keybind = "l";
       }
       {
         label = "logout";
-        action = "~/.local/bin/scripts/system/power.sh logout";
+        action = "os-power logout";
         text = "Exit";
         keybind = "e";
       }
       {
         label = "suspend";
-        action = "~/.local/bin/scripts/system/power.sh suspend";
+        action = "os-power suspend";
         text = "Suspend";
         keybind = "u";
       }
       {
         label = "reboot";
-        action = "~/.local/bin/scripts/system/power.sh reboot";
+        action = "os-power reboot";
         text = "Reboot";
         keybind = "r";
       }
       {
         label = "shutdown";
-        action = "~/.local/bin/scripts/system/power.sh shutdown";
+        action = "os-power shutdown";
         text = "Shutdown";
         keybind = "s";
       }

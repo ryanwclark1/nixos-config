@@ -1,7 +1,7 @@
 import Quickshell
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Controls
+
 import Quickshell.Io
 import "../services"
 
@@ -282,7 +282,7 @@ PopupWindow {
           color: root.cardSurface
           border.color: Colors.border
           border.width: 1
-          implicitHeight: 86
+          implicitHeight: 96
 
           ColumnLayout {
             anchors.fill: parent
@@ -317,12 +317,26 @@ PopupWindow {
               }
             }
 
-            Slider {
-              Layout.fillWidth: true
-              from: 0
-              to: 1
-              value: root.outputMuted ? 0 : root.outputVolume
-              onMoved: root.setVolume("@DEFAULT_AUDIO_SINK@", value)
+            Rectangle {
+              id: audioOutputTrack
+              Layout.fillWidth: true; height: 28; color: Colors.bgWidget; radius: 14; border.color: Colors.border; border.width: 1
+              Behavior on color { ColorAnimation { duration: 150 } }
+              Behavior on border.color { ColorAnimation { duration: 150 } }
+              Rectangle {
+                height: parent.height; width: Math.max(28, parent.width * (root.outputMuted ? 0 : root.outputVolume)); radius: 14
+                color: root.outputMuted ? Colors.error : (audioOutputHover.containsMouse ? Qt.darker(Colors.primary, 1.08) : Colors.primary)
+                Behavior on color { ColorAnimation { duration: 150 } }
+                Text { anchors.centerIn: parent; text: root.outputMuted ? "󰝟" : "󰕾"; color: Colors.background; font.family: Colors.fontMono; font.pixelSize: 12; visible: (root.outputMuted || root.outputVolume > 0.1) }
+              }
+              MouseArea {
+                id: audioOutputHover
+                anchors.fill: parent
+                hoverEnabled: true
+                onEntered: { audioOutputTrack.color = Colors.surface; audioOutputTrack.border.color = root.outputMuted ? Colors.error : Colors.primary; }
+                onExited: { audioOutputTrack.color = Colors.bgWidget; audioOutputTrack.border.color = Colors.border; }
+                onPressed: (mouse) => { root.setVolume("@DEFAULT_AUDIO_SINK@", Math.max(0, Math.min(1.0, mouse.x / width))); }
+                onPositionChanged: (mouse) => { if (pressed) root.setVolume("@DEFAULT_AUDIO_SINK@", Math.max(0, Math.min(1.0, mouse.x / width))); }
+              }
             }
 
             RowLayout {
@@ -380,7 +394,7 @@ PopupWindow {
           color: root.cardSurface
           border.color: Colors.border
           border.width: 1
-          implicitHeight: 86
+          implicitHeight: 96
 
           ColumnLayout {
             anchors.fill: parent
@@ -415,12 +429,26 @@ PopupWindow {
               }
             }
 
-            Slider {
-              Layout.fillWidth: true
-              from: 0
-              to: 1
-              value: root.inputMuted ? 0 : root.inputVolume
-              onMoved: root.setVolume("@DEFAULT_AUDIO_SOURCE@", value)
+            Rectangle {
+              id: audioInputTrack
+              Layout.fillWidth: true; height: 28; color: Colors.bgWidget; radius: 14; border.color: Colors.border; border.width: 1
+              Behavior on color { ColorAnimation { duration: 150 } }
+              Behavior on border.color { ColorAnimation { duration: 150 } }
+              Rectangle {
+                height: parent.height; width: Math.max(28, parent.width * (root.inputMuted ? 0 : root.inputVolume)); radius: 14
+                color: root.inputMuted ? Colors.error : (audioInputHover.containsMouse ? Qt.darker(Colors.primary, 1.08) : Colors.primary)
+                Behavior on color { ColorAnimation { duration: 150 } }
+                Text { anchors.centerIn: parent; text: root.inputMuted ? "󰍭" : "󰍬"; color: Colors.background; font.family: Colors.fontMono; font.pixelSize: 12; visible: (root.inputMuted || root.inputVolume > 0.1) }
+              }
+              MouseArea {
+                id: audioInputHover
+                anchors.fill: parent
+                hoverEnabled: true
+                onEntered: { audioInputTrack.color = Colors.surface; audioInputTrack.border.color = root.inputMuted ? Colors.error : Colors.primary; }
+                onExited: { audioInputTrack.color = Colors.bgWidget; audioInputTrack.border.color = Colors.border; }
+                onPressed: (mouse) => { root.setVolume("@DEFAULT_AUDIO_SOURCE@", Math.max(0, Math.min(1.0, mouse.x / width))); }
+                onPositionChanged: (mouse) => { if (pressed) root.setVolume("@DEFAULT_AUDIO_SOURCE@", Math.max(0, Math.min(1.0, mouse.x / width))); }
+              }
             }
 
             RowLayout {

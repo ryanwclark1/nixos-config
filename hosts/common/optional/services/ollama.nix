@@ -1,5 +1,5 @@
 {
-
+  pkgs,
   ...
 }:
 
@@ -9,15 +9,23 @@
       11434 # ollama
     ];
   };
-  
+
   services.ollama = {
     enable = true;
     port = 11434;
     host = "0.0.0.0";
     user = "ollama";
     group = "ollama";
-    acceleration = "rocm";
+    package = pkgs.ollama-rocm; # AMD GPU acceleration (replaces deprecated acceleration option)
     openFirewall = true;
+    environmentVariables = {
+      # Force Ollama to use only the discrete GPU (device 0 = RX 7800 XT)
+      # Without this, ROCm may try to use the Ryzen 9950X iGPU (gfx1036)
+      # which doesn't support the HIP kernels compiled for gfx1101
+      HIP_VISIBLE_DEVICES = "0";
+      ROCR_VISIBLE_DEVICES = "0";
+      HSA_OVERRIDE_GFX_VERSION = "11.0.1"; # Match gfx1101 target
+    };
     loadModels = [
       "qwen3:30b-thinking" # PRIMARY: Latest gen + tools + thinking + 256K context (19GB)
       "deepseek-r1:70b"    # O3-level reasoning + tools + thinking (43GB, optimal for hardware)

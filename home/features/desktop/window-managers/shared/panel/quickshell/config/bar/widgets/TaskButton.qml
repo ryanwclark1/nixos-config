@@ -24,7 +24,9 @@ Rectangle {
     "alacritty": ["utilities-terminal", "terminal", "org.gnome.Console"],
     "org.alacritty.alacritty": ["utilities-terminal", "terminal", "org.gnome.Console"],
     "org.gnome.nautilus": ["system-file-manager", "folder", "inode-directory"],
-    "nautilus": ["system-file-manager", "folder", "inode-directory"]
+    "nautilus": ["system-file-manager", "folder", "inode-directory"],
+    "com.mitchellh.ghostty": ["com.mitchellh.ghostty"],
+    "ghostty": ["com.mitchellh.ghostty"]
   })
   
   // Find running instance if it's a pinned app
@@ -69,7 +71,6 @@ Rectangle {
     property string resolvedPath: {
         var cls = (appClass || "").toLowerCase();
         var execName = (appExec || "").toLowerCase();
-        if (cls === "nemo" || execName === "nemo") return "";
         var aliases = iconAliases[cls] || iconAliases[execName] || [];
         // Prefer stable alias icons before app-specific SVGs that may be broken.
         for (var i = 0; i < aliases.length; ++i) {
@@ -81,11 +82,11 @@ Rectangle {
         if (execName && iconMap[execName]) return iconMap[execName];
         // Try Quickshell.iconPath as fallback
         for (var j = 0; j < aliases.length; ++j) {
-            var p3 = Quickshell.iconPath(aliases[j]);
+            var p3 = Config.resolveIconPath(aliases[j]);
             if (p3) return p3;
         }
-        if (cls) { var p = Quickshell.iconPath(cls); if (p) return p; }
-        if (execName && execName !== cls) { var p2 = Quickshell.iconPath(execName); if (p2) return p2; }
+        if (cls) { var p = Config.resolveIconPath(cls); if (p) return p; }
+        if (execName && execName !== cls) { var p2 = Config.resolveIconPath(execName); if (p2) return p2; }
         return "";
     }
     source: sourceUrl
@@ -113,7 +114,7 @@ Rectangle {
           Quickshell.execDetached(["sh", "-c", appExec]);
         }
       } else if (mouse.button === Qt.RightButton) {
-        root.togglePin({ class: appClass, title: appName });
+        root.togglePin({ class: appClass, title: appName, exec: appExec });
       }
     }
   }

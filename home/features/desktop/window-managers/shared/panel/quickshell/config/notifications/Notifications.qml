@@ -24,23 +24,6 @@ PanelWindow {
 
   property var manager: null
 
-  function resolveNotificationIcon(iconName) {
-    if (!iconName) return "";
-    if (iconName.startsWith("/")) return "file://" + iconName;
-    var normalized = iconName.toLowerCase();
-    if (normalized === "alacritty" || normalized === "org.alacritty.alacritty") {
-      var terminalFallbacks = ["utilities-terminal", "terminal", "org.gnome.Console"];
-      for (var i = 0; i < terminalFallbacks.length; ++i) {
-        var fallbackResolved = Quickshell.iconPath(terminalFallbacks[i]);
-        if (fallbackResolved) return fallbackResolved.startsWith("file://") ? fallbackResolved : "file://" + fallbackResolved;
-      }
-      return "";
-    }
-    var resolved = Quickshell.iconPath(iconName);
-    if (resolved) return resolved.startsWith("file://") ? resolved : "file://" + resolved;
-    return "";
-  }
-
   ColumnLayout {
     id: col
     width: Config.notifWidth
@@ -84,6 +67,11 @@ PanelWindow {
         property bool isReplying: false
         property bool isUrgent: modelData.urgency === Notifications.Critical
 
+        onIsReplyingChanged: {
+          if (isReplying) replyInput.forceActiveFocus();
+          else if (replyInput.activeFocus) replyInput.focus = false;
+        }
+
         // Pulse animation for urgent notifications
         SequentialAnimation on border.color {
           running: notifDelegate.isUrgent
@@ -106,7 +94,7 @@ PanelWindow {
 
             Image {
               width: 44; height: 44
-              source: root.resolveNotificationIcon(modelData.appIcon)
+              source: Config.resolveIconSource(modelData.appIcon || "")
               fillMode: Image.PreserveAspectFit
               visible: modelData.appIcon !== ""
               

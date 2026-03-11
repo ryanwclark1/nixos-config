@@ -38,7 +38,8 @@
       cursor-style-blink = false;
 
       # Shell integration
-      shell-integration-features = "no-cursor,ssh-env";
+      # Removed ssh-env to prevent OSC 7 host warnings with remote hostnames
+      shell-integration-features = "no-cursor";
 
       # Background
       background-opacity = 0.7;

@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # icon-resolver.sh - Build a JSON map of WMClass/exec -> icon path from .desktop files
 # Used by the taskbar to resolve app icons without hardcoded aliases.
 
@@ -14,6 +13,7 @@ icon_dirs=(
   "$HOME/.nix-profile/share/icons"
   "$HOME/.local/share/icons"
   "/run/current-system/sw/share/icons"
+  "/run/current-system/sw/share/pixmaps"
   "/usr/share/icons"
   "/usr/share/pixmaps"
 )

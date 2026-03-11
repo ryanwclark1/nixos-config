@@ -123,7 +123,7 @@ Scope {
 			id: content
 			anchors.fill: parent
 			radius: 28
-			color: Qt.rgba(0.08, 0.08, 0.1, 0.96)
+			color: Colors.bgGlass
 			border.color: Colors.primary
 			border.width: 2
 

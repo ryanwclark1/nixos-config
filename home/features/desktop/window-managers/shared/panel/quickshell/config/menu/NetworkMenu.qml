@@ -627,25 +627,36 @@ PopupWindow {
                   Layout.fillWidth: true
                   Layout.preferredHeight: 60
                   radius: Colors.radiusMedium
-                  color: root.cardSurface
+                  color: overviewCardHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : root.cardSurface
                   border.color: Colors.border
                   border.width: 1
+                  clip: true
+                  Behavior on color { ColorAnimation { duration: 150 } }
+
+                  Rectangle {
+                    anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom
+                    width: 3; color: Colors.withAlpha(Colors.primary, 0.25)
+                  }
 
                   Column {
                     anchors.fill: parent
                     anchors.margins: 12
+                    anchors.leftMargin: 14
                     spacing: 5
-                    Text { text: modelData.label; color: Colors.textDisabled; font.pixelSize: 9; font.weight: Font.Bold }
+                    Text { text: modelData.label; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold; font.letterSpacing: 0.5 }
                     Text {
                       text: modelData.value
                       color: Colors.fgMain
                       font.pixelSize: 11
+                      font.weight: Font.Medium
                       width: parent.width
                       wrapMode: Text.WrapAnywhere
                       maximumLineCount: 2
                       elide: Text.ElideRight
                     }
                   }
+
+                  MouseArea { id: overviewCardHover; anchors.fill: parent; hoverEnabled: true }
                 }
               }
             }
@@ -674,25 +685,36 @@ PopupWindow {
                   Layout.fillWidth: true
                   Layout.preferredHeight: 60
                   radius: Colors.radiusMedium
-                  color: root.cardSurface
+                  color: internetCardHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : root.cardSurface
                   border.color: Colors.border
                   border.width: 1
+                  clip: true
+                  Behavior on color { ColorAnimation { duration: 150 } }
+
+                  Rectangle {
+                    anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom
+                    width: 3; color: Colors.withAlpha(Colors.primary, 0.25)
+                  }
 
                   Column {
                     anchors.fill: parent
                     anchors.margins: 12
+                    anchors.leftMargin: 14
                     spacing: 5
-                    Text { text: modelData.label; color: Colors.textDisabled; font.pixelSize: 9; font.weight: Font.Bold }
+                    Text { text: modelData.label; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold; font.letterSpacing: 0.5 }
                     Text {
                       text: modelData.value
                       color: Colors.fgMain
                       font.pixelSize: 11
+                      font.weight: Font.Medium
                       width: parent.width
                       wrapMode: Text.WrapAnywhere
                       maximumLineCount: 2
                       elide: Text.ElideRight
                     }
                   }
+
+                  MouseArea { id: internetCardHover; anchors.fill: parent; hoverEnabled: true }
                 }
               }
             }
@@ -875,25 +897,36 @@ PopupWindow {
                   Layout.fillWidth: true
                   Layout.preferredHeight: 60
                   radius: Colors.radiusMedium
-                  color: root.cardSurface
+                  color: techCardHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : root.cardSurface
                   border.color: Colors.border
                   border.width: 1
+                  clip: true
+                  Behavior on color { ColorAnimation { duration: 150 } }
+
+                  Rectangle {
+                    anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom
+                    width: 3; color: Colors.withAlpha(Colors.primary, 0.25)
+                  }
 
                   Column {
                     anchors.fill: parent
                     anchors.margins: 12
+                    anchors.leftMargin: 14
                     spacing: 5
-                    Text { text: modelData.label; color: Colors.textDisabled; font.pixelSize: 9; font.weight: Font.Bold }
+                    Text { text: modelData.label; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold; font.letterSpacing: 0.5 }
                     Text {
                       text: modelData.value
                       color: Colors.fgMain
                       font.pixelSize: 11
+                      font.weight: Font.Medium
                       width: parent.width
                       wrapMode: Text.WrapAnywhere
                       maximumLineCount: 2
                       elide: Text.ElideRight
                     }
                   }
+
+                  MouseArea { id: techCardHover; anchors.fill: parent; hoverEnabled: true }
                 }
               }
             }
@@ -1039,8 +1072,10 @@ PopupWindow {
                     color: Colors.fgMain
                     font.pixelSize: 12
                     echoMode: TextInput.Password
-                    focus: parent.visible
-                    onVisibleChanged: if (!visible && activeFocus) focus = false
+                    onVisibleChanged: {
+                      if (visible) forceActiveFocus();
+                      else if (activeFocus) focus = false;
+                    }
                     onAccepted: {
                       Quickshell.execDetached(["nmcli", "dev", "wifi", "connect", modelData.ssid, "password", text]);
                       root.selectedSSID = "";
