@@ -9,184 +9,348 @@ import "../modules"
 import "../services"
 
 Scope {
-	id: root
+  id: root
 
-	PwObjectTracker {
-		objects: [ Pipewire.defaultAudioSink, Pipewire.defaultAudioSource ]
-	}
+  PwObjectTracker {
+    objects: [ Pipewire.defaultAudioSink, Pipewire.defaultAudioSource ]
+  }
 
-	function showOsd(type) {
-		root.osdType = type;
-		root.shouldShowOsd = true;
-		hideTimer.restart();
-	}
+  // --- State ---
+  property bool shouldShowOsd: false
+  property string osdType: "volume"
+  property bool capslockState: false
+  property bool numlockState: false
+  property bool scrolllockState: false
+  property bool suppressPipewireOsd: true
+  property bool startupComplete: false
+  property real displaySinkVolume: 0
+  property bool displaySinkMuted: false
+  property real displaySourceVolume: 0
+  property bool displaySourceMuted: false
 
-	function showAudioOsd(percent, muted, volumeProp, mutedProp, type) {
-		var parsed = parseFloat(percent);
-		if (!isNaN(parsed)) root[volumeProp] = Colors.clamp01(parsed / 100.0);
-		if (muted === "true" || muted === "false") root[mutedProp] = (muted === "true");
-		showOsd(type);
-	}
+  // Pipewire reactive bindings
+  property real sinkVolume: {
+    var v = Pipewire.defaultAudioSink?.audio?.volume;
+    return (v !== undefined && !isNaN(v)) ? (Config.osdOverdrive ? Math.min(v, 1.5) : Colors.clamp01(v)) : 0;
+  }
+  property bool sinkMuted: Pipewire.defaultAudioSink?.audio?.muted ?? false
+  property real sourceVolume: {
+    var v = Pipewire.defaultAudioSource?.audio?.volume;
+    return (v !== undefined && !isNaN(v)) ? Colors.clamp01(v) : 0;
+  }
+  property bool sourceMuted: Pipewire.defaultAudioSource?.audio?.muted ?? false
 
-	IpcHandler {
-		target: "Osd"
+  // --- OSD helpers ---
+  readonly property real maxValue: {
+    if ((osdType === "volume" || osdType === "mic") && Config.osdOverdrive) return 1.5;
+    return 1.0;
+  }
 
-		function showVolume(percent: string, muted: string) {
-			root.showAudioOsd(percent, muted, "displaySinkVolume", "displaySinkMuted", "volume");
-		}
+  readonly property real currentValue: {
+    if (osdType === "brightness") return SystemStatus.brightness;
+    if (osdType === "mic") return displaySourceVolume;
+    if (osdType === "capslock") return capslockState ? 1.0 : 0.0;
+    if (osdType === "numlock") return numlockState ? 1.0 : 0.0;
+    if (osdType === "scrolllock") return scrolllockState ? 1.0 : 0.0;
+    return displaySinkVolume;
+  }
 
-		function showMic(percent: string, muted: string) {
-			root.showAudioOsd(percent, muted, "displaySourceVolume", "displaySourceMuted", "mic");
-		}
+  readonly property bool isLockKey: osdType === "capslock" || osdType === "numlock" || osdType === "scrolllock"
 
-		function showCapslock(state: string) {
-			root.capslockState = (state === "on");
-			root.showOsd("capslock");
-		}
+  readonly property color osdColor: {
+    if (osdType === "capslock") return capslockState ? Colors.primary : Colors.fgDim;
+    if (osdType === "numlock") return numlockState ? Colors.primary : Colors.fgDim;
+    if (osdType === "scrolllock") return scrolllockState ? Colors.primary : Colors.fgDim;
+    if (osdType === "mic" && displaySourceMuted) return Colors.error;
+    if (osdType === "volume" && displaySinkMuted) return Colors.error;
+    // Overdrive: red when above 100%
+    if (osdType === "volume" && Config.osdOverdrive && displaySinkVolume > 1.0) return Colors.error;
+    return Colors.primary;
+  }
 
-		function showBrightness(percent: string) {
-			var val = parseFloat(percent);
-			if (isNaN(val)) val = 0;
-			SystemStatus.brightness = val / 100.0;
-			root.showOsd("brightness");
-		}
-	}
+  readonly property string osdIcon: {
+    if (osdType === "capslock") return capslockState ? "󰬶" : "󰬵";
+    if (osdType === "numlock") return numlockState ? "󰎠" : "󰎡";
+    if (osdType === "scrolllock") return scrolllockState ? "󱅮" : "󱅯";
+    if (osdType === "brightness") return "󰃠";
+    if (osdType === "mic") return displaySourceMuted ? "󰍭" : "󰍬";
+    if (osdType === "volume") return displaySinkMuted ? "󰝟" : "󰕾";
+    return "";
+  }
 
-	property bool shouldShowOsd: false
-	property string osdType: "volume"
-	property bool capslockState: false
-	property bool suppressPipewireOsd: true
-	property var osdScreen: (Quickshell.cursorScreen || (Quickshell.screens && Quickshell.screens.length > 0 ? Quickshell.screens[0] : null))
-	property real displaySinkVolume: 0
-	property bool displaySinkMuted: false
-	property real displaySourceVolume: 0
-	property bool displaySourceMuted: false
-	property real sinkVolume: {
-		var v = Pipewire.defaultAudioSink?.audio?.volume;
-		return (v !== undefined && !isNaN(v)) ? Colors.clamp01(v) : 0;
-	}
-	property bool sinkMuted: Pipewire.defaultAudioSink?.audio?.muted ?? false
-	property real sourceVolume: {
-		var v = Pipewire.defaultAudioSource?.audio?.volume;
-		return (v !== undefined && !isNaN(v)) ? Colors.clamp01(v) : 0;
-	}
-	property bool sourceMuted: Pipewire.defaultAudioSource?.audio?.muted ?? false
+  readonly property string osdLabel: {
+    if (osdType === "capslock") return capslockState ? "CAPS ON" : "CAPS OFF";
+    if (osdType === "numlock") return numlockState ? "NUM ON" : "NUM OFF";
+    if (osdType === "scrolllock") return scrolllockState ? "SCROLL ON" : "SCROLL OFF";
+    if (osdType === "brightness") return Math.round(SystemStatus.brightness * 100) + "%";
+    if (osdType === "mic") return displaySourceMuted ? "MUTED" : Math.round(displaySourceVolume * 100) + "%";
+    if (osdType === "volume" && displaySinkMuted) return "MUTED";
+    return Math.round(displaySinkVolume * 100) + "%";
+  }
 
-	function onPipewireChanged(displayProp, value, type) {
-		root[displayProp] = value;
-		if (!root.suppressPipewireOsd) showOsd(type);
-	}
+  // --- Position helpers ---
+  readonly property string location: Config.osdPosition
+  readonly property bool posTop: location === "top" || location.indexOf("top") === 0
+  readonly property bool posBottom: location === "bottom" || location.indexOf("bottom") === 0
+  readonly property bool posLeft: location.indexOf("left") !== -1
+  readonly property bool posRight: location.indexOf("right") !== -1
+  readonly property bool posCenter: location === "center"
 
-	onSinkVolumeChanged: onPipewireChanged("displaySinkVolume", sinkVolume, "volume")
-	onSinkMutedChanged: onPipewireChanged("displaySinkMuted", sinkMuted, "volume")
-	onSourceVolumeChanged: onPipewireChanged("displaySourceVolume", sourceVolume, "mic")
-	onSourceMutedChanged: onPipewireChanged("displaySourceMuted", sourceMuted, "mic")
+  function showOsd(type) {
+    if (!startupComplete) return;
+    root.osdType = type;
+    root.shouldShowOsd = true;
+    hideTimer.restart();
+  }
 
-	Component.onCompleted: {
-		root.displaySinkVolume = root.sinkVolume;
-		root.displaySinkMuted = root.sinkMuted;
-		root.displaySourceVolume = root.sourceVolume;
-		root.displaySourceMuted = root.sourceMuted;
-		Qt.callLater(function() {
-			root.suppressPipewireOsd = false;
-		});
-	}
+  function showAudioOsd(percent, muted, volumeProp, mutedProp, type) {
+    var parsed = parseFloat(percent);
+    if (!isNaN(parsed)) {
+      var maxPct = (Config.osdOverdrive && (type === "volume")) ? 150 : 100;
+      root[volumeProp] = Math.min(parsed / 100.0, maxPct / 100.0);
+    }
+    if (muted === "true" || muted === "false") root[mutedProp] = (muted === "true");
+    showOsd(type);
+  }
 
-	Timer {
-		id: hideTimer
-		interval: Config.osdDuration
-		onTriggered: root.shouldShowOsd = false
-	}
+  IpcHandler {
+    target: "Osd"
 
-	PanelWindow {
-		id: osdWindow
-		screen: root.osdScreen
-		visible: root.shouldShowOsd
+    function showVolume(percent: string, muted: string) {
+      root.showAudioOsd(percent, muted, "displaySinkVolume", "displaySinkMuted", "volume");
+    }
 
-		anchors.top: true
-		anchors.left: true
-		margins.top: screen ? (screen.height / 2 - implicitHeight / 2) : 0
-		margins.left: screen ? (screen.width / 2 - implicitWidth / 2) : 0
-		exclusiveZone: 0
+    function showMic(percent: string, muted: string) {
+      root.showAudioOsd(percent, muted, "displaySourceVolume", "displaySourceMuted", "mic");
+    }
 
-		implicitWidth: Config.osdSize
-		implicitHeight: Config.osdSize
-		color: "transparent"
-		WlrLayershell.layer: WlrLayer.Overlay
-		WlrLayershell.namespace: "quickshell"
+    function showCapslock(state: string) {
+      root.capslockState = (state === "on");
+      root.showOsd("capslock");
+    }
 
-		mask: Region {
-			item: content
-		}
+    function showNumlock(state: string) {
+      root.numlockState = (state === "on");
+      root.showOsd("numlock");
+    }
 
-		Rectangle {
-			id: content
-			anchors.fill: parent
-			radius: 28
-			color: Colors.bgGlass
-			border.color: Colors.primary
-			border.width: 2
+    function showScrolllock(state: string) {
+      root.scrolllockState = (state === "on");
+      root.showOsd("scrolllock");
+    }
 
-			opacity: root.shouldShowOsd ? 1.0 : 0.0
-			scale: root.shouldShowOsd ? 1.0 : 0.9
+    function showBrightness(percent: string) {
+      var val = parseFloat(percent);
+      if (isNaN(val)) val = 0;
+      SystemStatus.brightness = val / 100.0;
+      root.showOsd("brightness");
+    }
+  }
 
-			Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
-			Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutBack } }
+  function onPipewireChanged(displayProp, value, type) {
+    root[displayProp] = value;
+    if (!root.suppressPipewireOsd) showOsd(type);
+  }
 
-			ColumnLayout {
-				anchors.fill: parent
-				anchors.margins: 18
-				spacing: 10
+  onSinkVolumeChanged: onPipewireChanged("displaySinkVolume", sinkVolume, "volume")
+  onSinkMutedChanged: onPipewireChanged("displaySinkMuted", sinkMuted, "volume")
+  onSourceVolumeChanged: onPipewireChanged("displaySourceVolume", sourceVolume, "mic")
+  onSourceMutedChanged: onPipewireChanged("displaySourceMuted", sourceMuted, "mic")
 
-				CircularGauge {
-					Layout.alignment: Qt.AlignHCenter
-					width: 78
-					height: 78
-					thickness: 6
-					value: {
-						if (root.osdType === "brightness") return SystemStatus.brightness;
-						if (root.osdType === "mic") return root.displaySourceVolume;
-						if (root.osdType === "capslock") return root.capslockState ? 1.0 : 0.0;
-						return root.displaySinkVolume;
-					}
-					color: {
-						if (root.osdType === "capslock") return root.capslockState ? Colors.primary : Colors.fgDim;
-						if (root.osdType === "mic" && root.displaySourceMuted) return Colors.error;
-						if (root.osdType === "volume" && root.displaySinkMuted) return Colors.error;
-						return Colors.primary;
-					}
-					icon: {
-						if (root.osdType === "capslock") return root.capslockState ? "󰬶" : "󰬵";
-						if (root.osdType === "brightness") return "󰃠";
-						if (root.osdType === "mic") return root.displaySourceMuted ? "󰍭" : "󰍬";
-						if (root.osdType === "volume") return root.displaySinkMuted ? "󰝟" : "󰕾";
-						return "";
-					}
-				}
+  Component.onCompleted: {
+    root.displaySinkVolume = root.sinkVolume;
+    root.displaySinkMuted = root.sinkMuted;
+    root.displaySourceVolume = root.sourceVolume;
+    root.displaySourceMuted = root.sourceMuted;
+  }
 
-				Text {
-					Layout.alignment: Qt.AlignHCenter
-					text: {
-						if (root.osdType === "capslock") return root.capslockState ? "ON" : "OFF";
-						if (root.osdType === "brightness") return Math.round(SystemStatus.brightness * 100) + "%";
-						if (root.osdType === "mic") return root.displaySourceMuted ? "MUTED" : Math.round(root.displaySourceVolume * 100) + "%";
-						return root.displaySinkMuted ? "MUTED" : Math.round(root.displaySinkVolume * 100) + "%";
-					}
-					color: "white"
-					font.pixelSize: 18
-					font.weight: Font.Black
-					font.family: Colors.fontMono
-				}
+  // Startup suppression: 2s gate to prevent spurious OSD on shell init
+  Timer {
+    id: startupTimer
+    interval: 2000
+    running: true
+    onTriggered: {
+      root.suppressPipewireOsd = false;
+      root.startupComplete = true;
+    }
+  }
 
-				Text {
-					Layout.alignment: Qt.AlignHCenter
-					text: root.osdType.toUpperCase()
-					color: Colors.primary
-					font.pixelSize: 10
-					font.weight: Font.Black
-					font.letterSpacing: 1.5
-				}
-			}
-		}
-	}
+  Timer {
+    id: hideTimer
+    interval: Config.osdDuration
+    onTriggered: root.shouldShowOsd = false
+  }
+
+  // Per-screen OSD windows
+  Variants {
+    model: Quickshell.screens
+
+    delegate: Component {
+      PanelWindow {
+        id: osdWindow
+        required property ShellScreen modelData
+        screen: modelData
+
+        // Only show on the screen where the cursor is
+        visible: root.shouldShowOsd && (modelData === Quickshell.cursorScreen)
+
+        // --- 9-position anchoring ---
+        anchors.top: root.posTop || root.posCenter
+        anchors.bottom: root.posBottom
+        anchors.left: root.posLeft || root.posCenter
+        anchors.right: root.posRight
+
+        // Bar-aware margins: offset OSD when bar is at same edge
+        margins.top: {
+          if (root.posCenter) return screen ? (screen.height / 2 - implicitHeight / 2) : 0;
+          if (!root.posTop) return 0;
+          return Config.barHeight + (Config.barFloating ? Config.barMargin : 0) + 8;
+        }
+        margins.bottom: root.posBottom ? 16 : 0
+        margins.left: {
+          if (root.posCenter) return screen ? (screen.width / 2 - implicitWidth / 2) : 0;
+          if (root.posLeft) return 16;
+          // Horizontal center for top/bottom
+          if (!root.posLeft && !root.posRight && (root.posTop || root.posBottom))
+            return screen ? (screen.width / 2 - implicitWidth / 2) : 0;
+          return 0;
+        }
+        margins.right: root.posRight ? 16 : 0
+
+        exclusiveZone: 0
+        color: "transparent"
+        WlrLayershell.layer: WlrLayer.Overlay
+        WlrLayershell.namespace: "quickshell-osd"
+
+        // Size depends on style
+        implicitWidth: Config.osdStyle === "pill" ? pillWidth : Config.osdSize
+        implicitHeight: Config.osdStyle === "pill" ? pillHeight : Config.osdSize
+
+        readonly property int pillWidth: 280
+        readonly property int pillHeight: 56
+
+        mask: Region {
+          item: content
+        }
+
+        Rectangle {
+          id: content
+          anchors.fill: parent
+          radius: Config.osdStyle === "pill" ? height / 2 : 28
+          color: Colors.bgGlass
+          border.color: root.osdColor
+          border.width: 2
+
+          opacity: root.shouldShowOsd ? 1.0 : 0.0
+          scale: root.shouldShowOsd ? 1.0 : 0.9
+
+          Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+          Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutBack } }
+
+          // Circular style (original)
+          Loader {
+            active: Config.osdStyle === "circular"
+            anchors.fill: parent
+            sourceComponent: ColumnLayout {
+              anchors.fill: parent
+              anchors.margins: 18
+              spacing: 10
+
+              CircularGauge {
+                Layout.alignment: Qt.AlignHCenter
+                width: 78
+                height: 78
+                thickness: 6
+                value: Math.min(root.currentValue / root.maxValue, 1.0)
+                color: root.osdColor
+                icon: root.osdIcon
+              }
+
+              Text {
+                Layout.alignment: Qt.AlignHCenter
+                text: root.osdLabel
+                color: Colors.text
+                font.pixelSize: 18
+                font.weight: Font.Black
+                font.family: Colors.fontMono
+              }
+
+              Text {
+                Layout.alignment: Qt.AlignHCenter
+                text: root.osdType.toUpperCase()
+                color: root.osdColor
+                font.pixelSize: 10
+                font.weight: Font.Black
+                font.letterSpacing: 1.5
+              }
+            }
+          }
+
+          // Pill style (horizontal progress bar)
+          Loader {
+            active: Config.osdStyle === "pill"
+            anchors.fill: parent
+            sourceComponent: RowLayout {
+              anchors.fill: parent
+              anchors.leftMargin: 16
+              anchors.rightMargin: 16
+              spacing: 12
+
+              Text {
+                text: root.osdIcon
+                color: root.osdColor
+                font.pixelSize: 20
+                font.family: Colors.fontMono
+              }
+
+              // Progress track
+              Item {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 6
+
+                Rectangle {
+                  anchors.fill: parent
+                  radius: 3
+                  color: Colors.withAlpha(root.osdColor, 0.2)
+                }
+
+                Rectangle {
+                  width: {
+                    if (root.isLockKey) return root.currentValue * parent.width;
+                    return parent.width * Math.min(1.0, root.currentValue / root.maxValue);
+                  }
+                  height: parent.height
+                  radius: 3
+                  color: root.osdColor
+
+                  Behavior on width { NumberAnimation { duration: 100; easing.type: Easing.OutCubic } }
+                }
+
+                // Overdrive marker at 100% when max > 1.0
+                Rectangle {
+                  visible: root.maxValue > 1.0 && !root.isLockKey
+                  x: parent.width * (1.0 / root.maxValue)
+                  y: -2
+                  width: 2
+                  height: parent.height + 4
+                  radius: 1
+                  color: Colors.withAlpha(Colors.text, 0.4)
+                }
+              }
+
+              Text {
+                text: root.osdLabel
+                color: Colors.text
+                font.pixelSize: 14
+                font.weight: Font.Bold
+                font.family: Colors.fontMono
+                Layout.minimumWidth: 70
+                horizontalAlignment: Text.AlignRight
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }

@@ -7,6 +7,7 @@ Item {
   implicitWidth: mainRow.width
   implicitHeight: mainRow.height
   property var anchorWindow: null
+  signal statsClicked()
 
   Component.onCompleted: SystemStatus.subscribe()
   Component.onDestruction: SystemStatus.unsubscribe()
@@ -53,6 +54,7 @@ Item {
         id: cpuMouse
         anchors.fill: parent
         hoverEnabled: true
+        onClicked: root.statsClicked()
       }
 
       SharedWidgets.BarTooltip {
@@ -100,6 +102,7 @@ Item {
         id: ramMouse
         anchors.fill: parent
         hoverEnabled: true
+        onClicked: root.statsClicked()
       }
 
       SharedWidgets.BarTooltip {

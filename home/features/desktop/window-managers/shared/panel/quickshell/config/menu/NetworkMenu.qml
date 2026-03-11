@@ -4,14 +4,12 @@ import QtQuick.Layouts
 import Quickshell.Io
 import "../modules"
 import "../services"
+import "../widgets" as SharedWidgets
 
 PopupWindow {
   id: root
   implicitWidth: 396
   implicitHeight: 552
-  readonly property color panelSurface: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.96)
-  readonly property color cardSurface: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.82)
-  readonly property color chipSurface: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.92)
 
   property var wifiNetworks: []
   property var vpns: []
@@ -395,7 +393,7 @@ PopupWindow {
 
   Rectangle {
     anchors.fill: parent
-    color: root.panelSurface
+    color: Colors.popupSurface
     border.color: Colors.border
     border.width: 1
     radius: Colors.radiusMedium
@@ -430,8 +428,8 @@ PopupWindow {
           height: 28
           radius: 14
           color: root.wifiRadioEnabled
-            ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.18)
-            : root.chipSurface
+            ? Colors.withAlpha(Colors.primary, 0.18)
+            : Colors.chipSurface
           border.color: root.wifiRadioEnabled ? Colors.primary : Colors.border
           border.width: 1
           Text {
@@ -460,19 +458,7 @@ PopupWindow {
           MouseArea { id: refreshHover; anchors.fill: parent; hoverEnabled: true; onClicked: root.refreshData() }
         }
 
-        Rectangle {
-          width: 30
-          height: 30
-          radius: 15
-          color: networkCloseHover.containsMouse ? Colors.highlightLight : "transparent"
-          Text { anchors.centerIn: parent; text: "󰅖"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 16 }
-          MouseArea {
-            id: networkCloseHover
-            anchors.fill: parent
-            hoverEnabled: true
-            onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleNetworkMenu"])
-          }
-        }
+        SharedWidgets.MenuCloseButton { toggleMethod: "toggleNetworkMenu" }
       }
 
       Rectangle {
@@ -496,7 +482,7 @@ PopupWindow {
           Rectangle {
             Layout.fillWidth: true
             radius: Colors.radiusMedium
-            color: root.cardSurface
+            color: Colors.cardSurface
             border.color: root.activePrimaryName === "Offline" ? Colors.border : Colors.primary
             border.width: 1
             implicitHeight: 96
@@ -542,8 +528,8 @@ PopupWindow {
                   height: 30
                   radius: 15
                   color: root.activePrimaryName === "Offline"
-                    ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.16)
-                    : Qt.rgba(Colors.error.r, Colors.error.g, Colors.error.b, 0.16)
+                    ? Colors.withAlpha(Colors.primary, 0.16)
+                    : Colors.withAlpha(Colors.error, 0.16)
                   border.color: root.activePrimaryName === "Offline" ? Colors.primary : Colors.error
                   border.width: 1
                   Text {
@@ -571,7 +557,7 @@ PopupWindow {
                 Rectangle {
                   visible: root.primaryDevice !== ""
                   radius: 12
-                  color: root.chipSurface
+                  color: Colors.chipSurface
                   border.color: Colors.border
                   border.width: 1
                   implicitWidth: deviceLabel.implicitWidth + 18
@@ -581,7 +567,7 @@ PopupWindow {
 
                 Rectangle {
                   radius: 12
-                  color: root.chipSurface
+                  color: Colors.chipSurface
                   border.color: Colors.border
                   border.width: 1
                   implicitWidth: reachabilityLabel.implicitWidth + 18
@@ -592,7 +578,7 @@ PopupWindow {
                 Rectangle {
                   visible: root.primarySignal !== ""
                   radius: 12
-                  color: root.chipSurface
+                  color: Colors.chipSurface
                   border.color: Colors.border
                   border.width: 1
                   implicitWidth: signalLabel.implicitWidth + 18
@@ -627,7 +613,7 @@ PopupWindow {
                   Layout.fillWidth: true
                   Layout.preferredHeight: 60
                   radius: Colors.radiusMedium
-                  color: overviewCardHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : root.cardSurface
+                  color: overviewCardHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : Colors.cardSurface
                   border.color: Colors.border
                   border.width: 1
                   clip: true
@@ -685,7 +671,7 @@ PopupWindow {
                   Layout.fillWidth: true
                   Layout.preferredHeight: 60
                   radius: Colors.radiusMedium
-                  color: internetCardHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : root.cardSurface
+                  color: internetCardHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : Colors.cardSurface
                   border.color: Colors.border
                   border.width: 1
                   clip: true
@@ -740,7 +726,7 @@ PopupWindow {
               visible: root.tailscaleStatus !== "Offline"
               implicitHeight: 54
               radius: Colors.radiusMedium
-              color: root.cardSurface
+              color: Colors.cardSurface
               border.color: Colors.border
               border.width: 1
 
@@ -769,8 +755,8 @@ PopupWindow {
                   height: 28
                   radius: 14
                   color: root.tailscaleStatus === "Connected"
-                    ? Qt.rgba(Colors.error.r, Colors.error.g, Colors.error.b, 0.14)
-                    : Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.16)
+                    ? Colors.withAlpha(Colors.error, 0.14)
+                    : Colors.withAlpha(Colors.primary, 0.16)
                   border.color: root.tailscaleStatus === "Connected" ? Colors.error : Colors.primary
                   border.width: 1
                   Text {
@@ -799,7 +785,7 @@ PopupWindow {
                 Layout.fillWidth: true
                 implicitHeight: 42
                 radius: Colors.radiusMedium
-                color: root.cardSurface
+                color: Colors.cardSurface
                 border.color: Colors.border
                 border.width: 1
 
@@ -831,7 +817,7 @@ PopupWindow {
             Layout.fillWidth: true
             implicitHeight: 40
             radius: Colors.radiusMedium
-            color: detailsMouse.containsMouse ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.14) : root.cardSurface
+            color: detailsMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.14) : Colors.cardSurface
             border.color: detailsMouse.containsMouse ? Colors.primary : Colors.border
             border.width: 1
 
@@ -897,7 +883,7 @@ PopupWindow {
                   Layout.fillWidth: true
                   Layout.preferredHeight: 60
                   radius: Colors.radiusMedium
-                  color: techCardHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : root.cardSurface
+                  color: techCardHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : Colors.cardSurface
                   border.color: Colors.border
                   border.width: 1
                   clip: true
@@ -945,7 +931,7 @@ PopupWindow {
                 Layout.fillWidth: true
                 implicitHeight: 42
                 radius: Colors.radiusMedium
-                color: root.cardSurface
+                color: Colors.cardSurface
                 border.color: Colors.border
                 border.width: 1
 
@@ -992,8 +978,8 @@ PopupWindow {
                   implicitHeight: 46
                   radius: Colors.radiusMedium
                   color: networkMouse.containsMouse
-                    ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.12)
-                    : (modelData.active ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.16) : root.cardSurface)
+                    ? Colors.withAlpha(Colors.primary, 0.12)
+                    : (modelData.active ? Colors.withAlpha(Colors.primary, 0.16) : Colors.cardSurface)
                   border.color: modelData.active ? Colors.primary : Colors.border
                   border.width: 1
 
@@ -1060,7 +1046,7 @@ PopupWindow {
                   visible: root.selectedSSID === modelData.ssid
                   implicitHeight: visible ? 48 : 0
                   radius: Colors.radiusMedium
-                  color: root.cardSurface
+                  color: Colors.cardSurface
                   border.color: Colors.border
                   border.width: 1
 
@@ -1102,7 +1088,7 @@ PopupWindow {
               Layout.fillWidth: true
               visible: root.wifiNetworks.length === 0
               radius: Colors.radiusMedium
-              color: root.cardSurface
+              color: Colors.cardSurface
               border.color: Colors.border
               border.width: 1
               implicitHeight: 72

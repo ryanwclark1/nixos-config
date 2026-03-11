@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell.Services.Mpris
 import "../modules"
 import "../services"
 import "." as LocalWidgets
@@ -12,10 +11,9 @@ Rectangle {
   radius: height / 2
   color: mediaMouse.containsMouse ? Colors.highlightLight : Colors.bgWidget
   clip: true
-  
-  property var player: Mpris.players.length > 0 ? Mpris.players[0] : null
+
   property var anchorWindow: null
-  visible: player !== null && player.playbackState !== Mpris.Stopped
+  visible: MediaService.currentPlayer !== null
 
   Behavior on width { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
   Behavior on opacity { NumberAnimation { duration: 300 } }
@@ -34,10 +32,10 @@ Rectangle {
     CircularGauge {
       width: 18; height: 18
       anchors.verticalCenter: parent.verticalCenter
-      value: player && player.length > 0 ? (player.position / player.length) : 0
+      value: MediaService.trackLength > 0 ? (MediaService.currentPosition / MediaService.trackLength) : 0
       thickness: 2
       color: Colors.primary
-      icon: player && player.playbackState === Mpris.Playing ? "󰏤" : "󰐊"
+      icon: MediaService.isPlaying ? "󰏤" : "󰐊"
     }
 
     Item {
@@ -49,7 +47,7 @@ Rectangle {
 
       Text {
         id: marqueeText
-        text: player ? (player.trackTitle + (player.trackArtist ? " - " + player.trackArtist : "")) : ""
+        text: MediaService.trackTitle + (MediaService.trackArtist ? " - " + MediaService.trackArtist : "")
         color: Colors.fgMain
         font.pixelSize: 11
         font.weight: Font.Medium
@@ -74,17 +72,18 @@ Rectangle {
     hoverEnabled: true
     onClicked: (mouse) => {
       if (mouse.button === Qt.LeftButton) {
-        if (player) player.playPause();
+        MediaService.playPause();
       } else if (mouse.button === Qt.MiddleButton) {
-        if (player) player.next();
+        MediaService.next();
       }
     }
-    onDoubleClicked: if (player) player.next()
-    
+    onDoubleClicked: MediaService.next()
+
     onWheel: (wheel) => {
-      if (player) {
-        if (wheel.angleDelta.y > 0) player.volume = Colors.clamp01(player.volume + 0.05);
-        else player.volume = Colors.clamp01(player.volume - 0.05);
+      if (MediaService.currentPlayer) {
+        var vol = MediaService.currentPlayer.volume || 0;
+        if (wheel.angleDelta.y > 0) MediaService.currentPlayer.volume = Colors.clamp01(vol + 0.05);
+        else MediaService.currentPlayer.volume = Colors.clamp01(vol - 0.05);
       }
     }
   }
@@ -93,6 +92,6 @@ Rectangle {
     anchorItem: root
     anchorWindow: root.anchorWindow
     hovered: mediaMouse.containsMouse
-    text: player ? (player.trackTitle || player.identity || "Media controls") : "Media controls"
+    text: MediaService.trackTitle || (MediaService.currentPlayer ? MediaService.currentPlayer.identity : "Media controls") || "Media controls"
   }
 }

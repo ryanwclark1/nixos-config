@@ -20,14 +20,6 @@ Rectangle {
   property bool isPinned: false
   property var anchorWindow: null
   property var iconMap: ({})
-  readonly property var iconAliases: ({
-    "alacritty": ["utilities-terminal", "terminal", "org.gnome.Console"],
-    "org.alacritty.alacritty": ["utilities-terminal", "terminal", "org.gnome.Console"],
-    "org.gnome.nautilus": ["system-file-manager", "folder", "inode-directory"],
-    "nautilus": ["system-file-manager", "folder", "inode-directory"],
-    "com.mitchellh.ghostty": ["com.mitchellh.ghostty"],
-    "ghostty": ["com.mitchellh.ghostty"]
-  })
   
   signal pinToggled(var app)
 
@@ -74,7 +66,7 @@ Rectangle {
     property string resolvedPath: {
         var cls = (appClass || "").toLowerCase();
         var execName = (appExec || "").toLowerCase();
-        var aliases = iconAliases[cls] || iconAliases[execName] || [];
+        var aliases = Config.iconAliases[cls] || Config.iconAliases[execName] || [];
         // Prefer stable alias icons before app-specific SVGs that may be broken.
         for (var i = 0; i < aliases.length; ++i) {
             var alias = aliases[i];

@@ -9,6 +9,7 @@ import Quickshell.Widgets
 import "."
 import "../modules"
 import "../services"
+import "../widgets" as SharedWidgets
 
 PanelWindow {
   id: root
@@ -28,102 +29,20 @@ PanelWindow {
     item: sidebarContent
   }
   WlrLayershell.layer: WlrLayer.Top
-  WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+  WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
   WlrLayershell.namespace: "quickshell"
 
   property var manager: null
   property bool showContent: false
   signal closeRequested()
   visible: showContent || sidebarContent.x < Config.controlCenterWidth
-  property real displayOutputVolume: 0
-  property real displayInputVolume: 0
-  property bool displayOutputMuted: false
-  property bool displayInputMuted: false
 
-  function refreshAudioState() {
-    outputVolumeProc.running = true;
-    inputVolumeProc.running = true;
-  }
+  Component.onCompleted: AudioService.subscribe()
+  Component.onDestruction: AudioService.unsubscribe()
 
-  Process {
-    id: outputVolumeProc
-    command: ["wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@"]
-    running: false
-    stdout: StdioCollector {
-      onStreamFinished: {
-        var text = (this.text || "").trim();
-        var match = text.match(/Volume:\s+([0-9.]+)(?:\s+\[MUTED\])?/);
-        if (!match) {
-          root.displayOutputVolume = 0;
-          root.displayOutputMuted = false;
-          return;
-        }
-
-        var parsed = parseFloat(match[1]);
-        root.displayOutputVolume = isNaN(parsed) ? 0 : Colors.clamp01(parsed);
-        root.displayOutputMuted = text.indexOf("[MUTED]") !== -1;
-      }
-    }
-  }
-
-  Process {
-    id: inputVolumeProc
-    command: ["wpctl", "get-volume", "@DEFAULT_AUDIO_SOURCE@"]
-    running: false
-    stdout: StdioCollector {
-      onStreamFinished: {
-        var text = (this.text || "").trim();
-        var match = text.match(/Volume:\s+([0-9.]+)(?:\s+\[MUTED\])?/);
-        if (!match) {
-          root.displayInputVolume = 0;
-          root.displayInputMuted = false;
-          return;
-        }
-
-        var parsed = parseFloat(match[1]);
-        root.displayInputVolume = isNaN(parsed) ? 0 : Colors.clamp01(parsed);
-        root.displayInputMuted = text.indexOf("[MUTED]") !== -1;
-      }
-    }
-  }
-
-  Timer {
-    interval: 3000
-    running: root.showContent
-    repeat: true
-    onTriggered: root.refreshAudioState()
-  }
-
-  onVisibleChanged: if (visible) root.refreshAudioState()
-
-  function setAudioVolume(target, value) {
-    var clamped = Colors.clamp01(value);
-    if (clamped > 0) {
-      Quickshell.execDetached(["wpctl", "set-mute", target, "0"]);
-    }
-    Quickshell.execDetached(["wpctl", "set-volume", target, Math.round(clamped * 100) + "%"]);
-    if (target === "@DEFAULT_AUDIO_SINK@") {
-      root.displayOutputVolume = clamped;
-      root.displayOutputMuted = false;
-      Quickshell.execDetached(["quickshell", "ipc", "call", "Osd", "showVolume", Math.round(clamped * 100).toString(), "false"]);
-    } else if (target === "@DEFAULT_AUDIO_SOURCE@") {
-      root.displayInputVolume = clamped;
-      root.displayInputMuted = false;
-      Quickshell.execDetached(["quickshell", "ipc", "call", "Osd", "showMic", Math.round(clamped * 100).toString(), "false"]);
-    }
-    Qt.callLater(root.refreshAudioState);
-  }
-
-  function toggleMute(target, muted) {
-    Quickshell.execDetached(["wpctl", "set-mute", target, muted ? "0" : "1"]);
-    if (target === "@DEFAULT_AUDIO_SINK@") {
-      root.displayOutputMuted = !muted;
-      Quickshell.execDetached(["quickshell", "ipc", "call", "Osd", "showVolume", Math.round(root.displayOutputVolume * 100).toString(), (!muted).toString()]);
-    } else if (target === "@DEFAULT_AUDIO_SOURCE@") {
-      root.displayInputMuted = !muted;
-      Quickshell.execDetached(["quickshell", "ipc", "call", "Osd", "showMic", Math.round(root.displayInputVolume * 100).toString(), (!muted).toString()]);
-    }
-    Qt.callLater(root.refreshAudioState);
+  onShowContentChanged: {
+    if (showContent) SystemStatus.subscribe();
+    else SystemStatus.unsubscribe();
   }
 
   Rectangle {
@@ -186,7 +105,7 @@ PanelWindow {
                 Layout.preferredWidth: 36
                 Layout.preferredHeight: 36
                 radius: 18
-                color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.12)
+                color: Colors.withAlpha(Colors.primary, 0.12)
 
                 Text {
                   anchors.centerIn: parent
@@ -279,13 +198,17 @@ PanelWindow {
             QuickToggle {
               id: nightLightToggle; icon: "󰖔"; label: "Night Light"; active: false
               onClicked: { Quickshell.execDetached(["os-toggle-nightlight"]); active = !active; nightLightVerify.restart(); }
-              Process {
-                id: checkNightLight; command: ["sh", "-c", "hyprctl hyprsunset temperature 2>/dev/null | grep -v '6000' >/dev/null && echo 'on' || echo 'off'"]
-                running: root.showContent; stdout: StdioCollector { onStreamFinished: nightLightToggle.active = (this.text.trim() === "on") }
+              SharedWidgets.CommandPoll {
+                id: nightLightPoll
+                interval: 5000
+                running: root.showContent
+                command: ["sh", "-c", "hyprctl hyprsunset temperature 2>/dev/null | grep -v '6000' >/dev/null && echo 'on' || echo 'off'"]
+                parse: function(out) { return String(out || "").trim(); }
+                onUpdated: nightLightToggle.active = (nightLightPoll.value === "on")
               }
               Timer {
                 id: nightLightVerify; interval: 500; repeat: false
-                onTriggered: checkNightLight.running = true
+                onTriggered: nightLightPoll.poll()
               }
             }
           }
@@ -309,26 +232,11 @@ PanelWindow {
                 Item { Layout.fillWidth: true }
                 Text { text: Math.round(SystemStatus.brightness * 100) + "%"; color: Colors.textSecondary; font.pixelSize: 10 }
               }
-              Rectangle {
-                id: brightnessTrack
-                Layout.fillWidth: true; height: 28; color: Colors.bgWidget; radius: 14; border.color: Colors.border; border.width: 1
-                Behavior on color { ColorAnimation { duration: 150 } }
-                Behavior on border.color { ColorAnimation { duration: 150 } }
-                Rectangle {
-                  height: parent.height; width: Math.max(28, parent.width * SystemStatus.brightness); radius: 14
-                  color: brightnessHover.containsMouse ? Qt.darker(Colors.primary, 1.08) : Colors.primary
-                  Behavior on color { ColorAnimation { duration: 150 } }
-                  Text { anchors.centerIn: parent; text: "󰃠"; color: Colors.background; font.family: Colors.fontMono; font.pixelSize: 12; visible: SystemStatus.brightness > 0.1 }
-                }
-                MouseArea {
-                  id: brightnessHover
-                  anchors.fill: parent;
-                  hoverEnabled: true
-                  onEntered: { brightnessTrack.color = Colors.surface; brightnessTrack.border.color = Colors.primary; }
-                  onExited: { brightnessTrack.color = Colors.bgWidget; brightnessTrack.border.color = Colors.border; }
-                  onPressed: (mouse) => { SystemStatus.setBrightness(Math.max(0.01, Math.min(1.0, mouse.x / width))); }
-                  onPositionChanged: (mouse) => { if (pressed) SystemStatus.setBrightness(Math.max(0.01, Math.min(1.0, mouse.x / width))); }
-                }
+              SharedWidgets.SliderTrack {
+                Layout.fillWidth: true
+                value: SystemStatus.brightness
+                icon: "󰃠"
+                onSliderMoved: (v) => SystemStatus.setBrightness(Math.max(0.01, v))
               }
             }
 
@@ -338,50 +246,24 @@ PanelWindow {
                 Layout.fillWidth: true
                 Text { text: "󰕾  OUTPUT"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
                 Item { Layout.fillWidth: true }
-                Text { text: root.displayOutputMuted ? "Muted" : Math.round(root.displayOutputVolume * 100) + "%"; color: Colors.textSecondary; font.pixelSize: 10 }
+                Text { text: AudioService.outputMuted ? "Muted" : Math.round(AudioService.outputVolume * 100) + "%"; color: Colors.textSecondary; font.pixelSize: 10 }
               }
               RowLayout {
                 Layout.fillWidth: true
                 spacing: 10
-                Rectangle {
-                  width: 32; height: 32; radius: 16
-                  color: outputMuteHover.containsMouse ? Colors.highlightLight : Colors.bgWidget
-                  border.color: Colors.border
-                  border.width: 1
-                  Text {
-                    anchors.centerIn: parent
-                    text: root.displayOutputMuted ? "󰝟" : "󰕾"
-                    color: root.displayOutputMuted ? Colors.error : Colors.text
-                    font.family: Colors.fontMono
-                    font.pixelSize: 15
-                  }
-                  MouseArea {
-                    id: outputMuteHover
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onClicked: root.toggleMute("@DEFAULT_AUDIO_SINK@", root.displayOutputMuted)
-                  }
+                SharedWidgets.MuteButton {
+                  target: "@DEFAULT_AUDIO_SINK@"
+                  muted: AudioService.outputMuted
+                  icon: "󰕾"; mutedIcon: "󰝟"
+                  size: 32; showBorder: true
                 }
-                Rectangle {
-                  id: outputTrack
-                  Layout.fillWidth: true; height: 28; color: Colors.bgWidget; radius: 14; border.color: Colors.border; border.width: 1
-                  Behavior on color { ColorAnimation { duration: 150 } }
-                  Behavior on border.color { ColorAnimation { duration: 150 } }
-                  Rectangle {
-                    height: parent.height; width: Math.max(28, parent.width * (root.displayOutputMuted ? 0 : root.displayOutputVolume)); radius: 14
-                    color: root.displayOutputMuted ? Colors.error : (outputSliderHover.containsMouse ? Qt.darker(Colors.primary, 1.08) : Colors.primary)
-                    Behavior on color { ColorAnimation { duration: 150 } }
-                    Text { anchors.centerIn: parent; text: root.displayOutputMuted ? "󰝟" : "󰕾"; color: Colors.background; font.family: Colors.fontMono; font.pixelSize: 12; visible: (root.displayOutputMuted || root.displayOutputVolume > 0.1) }
-                  }
-                  MouseArea {
-                    id: outputSliderHover
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onEntered: { outputTrack.color = Colors.surface; outputTrack.border.color = root.displayOutputMuted ? Colors.error : Colors.primary; }
-                    onExited: { outputTrack.color = Colors.bgWidget; outputTrack.border.color = Colors.border; }
-                    onPressed: (mouse) => { root.setAudioVolume("@DEFAULT_AUDIO_SINK@", Math.max(0, Math.min(1.0, mouse.x / width))); }
-                    onPositionChanged: (mouse) => { if (pressed) root.setAudioVolume("@DEFAULT_AUDIO_SINK@", Math.max(0, Math.min(1.0, mouse.x / width))); }
-                  }
+                SharedWidgets.SliderTrack {
+                  Layout.fillWidth: true
+                  value: AudioService.outputVolume
+                  muted: AudioService.outputMuted
+                  icon: "󰕾"
+                  mutedIcon: "󰝟"
+                  onSliderMoved: (v) => AudioService.setVolume("@DEFAULT_AUDIO_SINK@", v)
                 }
               }
             }
@@ -392,50 +274,24 @@ PanelWindow {
                 Layout.fillWidth: true
                 Text { text: "󰍬  INPUT"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
                 Item { Layout.fillWidth: true }
-                Text { text: root.displayInputMuted ? "Muted" : Math.round(root.displayInputVolume * 100) + "%"; color: Colors.textSecondary; font.pixelSize: 10 }
+                Text { text: AudioService.inputMuted ? "Muted" : Math.round(AudioService.inputVolume * 100) + "%"; color: Colors.textSecondary; font.pixelSize: 10 }
               }
               RowLayout {
                 Layout.fillWidth: true
                 spacing: 10
-                Rectangle {
-                  width: 32; height: 32; radius: 16
-                  color: inputMuteHover.containsMouse ? Colors.highlightLight : Colors.bgWidget
-                  border.color: Colors.border
-                  border.width: 1
-                  Text {
-                    anchors.centerIn: parent
-                    text: root.displayInputMuted ? "󰍭" : "󰍬"
-                    color: root.displayInputMuted ? Colors.error : Colors.text
-                    font.family: Colors.fontMono
-                    font.pixelSize: 15
-                  }
-                  MouseArea {
-                    id: inputMuteHover
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onClicked: root.toggleMute("@DEFAULT_AUDIO_SOURCE@", root.displayInputMuted)
-                  }
+                SharedWidgets.MuteButton {
+                  target: "@DEFAULT_AUDIO_SOURCE@"
+                  muted: AudioService.inputMuted
+                  icon: "󰍬"; mutedIcon: "󰍭"
+                  size: 32; showBorder: true
                 }
-                Rectangle {
-                  id: inputTrack
-                  Layout.fillWidth: true; height: 28; color: Colors.bgWidget; radius: 14; border.color: Colors.border; border.width: 1
-                  Behavior on color { ColorAnimation { duration: 150 } }
-                  Behavior on border.color { ColorAnimation { duration: 150 } }
-                  Rectangle {
-                    height: parent.height; width: Math.max(28, parent.width * (root.displayInputMuted ? 0 : root.displayInputVolume)); radius: 14
-                    color: root.displayInputMuted ? Colors.error : (inputSliderHover.containsMouse ? Qt.darker(Colors.primary, 1.08) : Colors.primary)
-                    Behavior on color { ColorAnimation { duration: 150 } }
-                    Text { anchors.centerIn: parent; text: root.displayInputMuted ? "󰍭" : "󰍬"; color: Colors.background; font.family: Colors.fontMono; font.pixelSize: 12; visible: (root.displayInputMuted || root.displayInputVolume > 0.1) }
-                  }
-                  MouseArea {
-                    id: inputSliderHover
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onEntered: { inputTrack.color = Colors.surface; inputTrack.border.color = root.displayInputMuted ? Colors.error : Colors.primary; }
-                    onExited: { inputTrack.color = Colors.bgWidget; inputTrack.border.color = Colors.border; }
-                    onPressed: (mouse) => { root.setAudioVolume("@DEFAULT_AUDIO_SOURCE@", Math.max(0, Math.min(1.0, mouse.x / width))); }
-                    onPositionChanged: (mouse) => { if (pressed) root.setAudioVolume("@DEFAULT_AUDIO_SOURCE@", Math.max(0, Math.min(1.0, mouse.x / width))); }
-                  }
+                SharedWidgets.SliderTrack {
+                  Layout.fillWidth: true
+                  value: AudioService.inputVolume
+                  muted: AudioService.inputMuted
+                  icon: "󰍬"
+                  mutedIcon: "󰍭"
+                  onSliderMoved: (v) => AudioService.setVolume("@DEFAULT_AUDIO_SOURCE@", v)
                 }
               }
             }
@@ -478,13 +334,14 @@ PanelWindow {
         Repeater {
           model: [{ icon: "󰐥", cmd: ["systemctl", "poweroff"] }, { icon: "󰑐", cmd: ["systemctl", "reboot"] }, { icon: "󰌾", cmd: ["hyprlock"] }]
           delegate: Rectangle {
-            Layout.fillWidth: true; height: 40; color: Colors.surface; radius: 8
+            Layout.fillWidth: true; height: 40
+            color: powerHover.containsMouse ? Colors.highlightLight : Colors.surface
+            radius: 8
             Behavior on color { ColorAnimation { duration: 160 } }
             Text { anchors.centerIn: parent; text: modelData.icon; color: Colors.text; font.family: Colors.fontMono; font.pixelSize: 18 }
             MouseArea {
+              id: powerHover
               anchors.fill: parent; hoverEnabled: true
-              onEntered: parent.color = Colors.highlightLight
-              onExited: parent.color = Colors.surface
               onClicked: Quickshell.execDetached(modelData.cmd)
             }
           }

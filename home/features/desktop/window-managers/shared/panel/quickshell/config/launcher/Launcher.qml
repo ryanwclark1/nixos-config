@@ -45,6 +45,13 @@ PanelWindow {
   property var modeCache: ({})
   property int openCount: 0
 
+  // ── Hover anti-flicker ─────────────────────────
+  property bool ignoreMouseHover: true
+  property bool mouseTrackingReady: false
+  property bool globalMouseInitialized: false
+  property real globalLastMouseX: 0
+  property real globalLastMouseY: 0
+
   readonly property bool showLauncherHome: Config.launcherShowHomeSections && searchText === "" && (mode === "drun" || mode === "system" || mode === "files")
   readonly property var modeOrder: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media"]
   readonly property var primaryModes: ["drun", "window", "files", "ai", "clip", "system", "media"]
@@ -304,10 +311,23 @@ PanelWindow {
     }
   }
 
+  Timer {
+    id: mouseTrackingDelayTimer
+    interval: 350
+    onTriggered: {
+      launcherRoot.mouseTrackingReady = true;
+      launcherRoot.globalMouseInitialized = false;
+    }
+  }
+
   function open(newMode, keepSearch) {
     if (showingConfirm) cancelConfirm();
     openCount++;
     if (openCount % 10 === 0) modeCache = {};
+    ignoreMouseHover = true;
+    mouseTrackingReady = false;
+    globalMouseInitialized = false;
+    mouseTrackingDelayTimer.restart();
     mode = newMode || "drun";
     buildLauncherHome();
     if (!keepSearch) {
@@ -341,6 +361,8 @@ PanelWindow {
     if (searchInput && searchInput.activeFocus) searchInput.focus = false;
     launcherOpacity = 0;
     scaleValue = 0.95;
+    ignoreMouseHover = true;
+    mouseTrackingDelayTimer.stop();
     if (showingConfirm) confirmTitle = "";
   }
 
@@ -774,6 +796,25 @@ PanelWindow {
     scale: launcherRoot.scaleValue
     clip: true
 
+    // Anti-flicker: track mouse movement after open to enable hover-select
+    HoverHandler {
+      id: hudHoverHandler
+      onPointChanged: {
+        if (!launcherRoot.mouseTrackingReady) return;
+        if (!launcherRoot.globalMouseInitialized) {
+          launcherRoot.globalLastMouseX = point.position.x;
+          launcherRoot.globalLastMouseY = point.position.y;
+          launcherRoot.globalMouseInitialized = true;
+          return;
+        }
+        var dx = point.position.x - launcherRoot.globalLastMouseX;
+        var dy = point.position.y - launcherRoot.globalLastMouseY;
+        if (Math.sqrt(dx * dx + dy * dy) >= 5) {
+          launcherRoot.ignoreMouseHover = false;
+        }
+      }
+    }
+
     RowLayout {
       anchors.fill: parent
       anchors.margins: Colors.paddingMedium
@@ -1174,7 +1215,12 @@ PanelWindow {
                   }
                 }
 
-                MouseArea { anchors.fill: parent; hoverEnabled: true; onClicked: { launcherRoot.selectedIndex = index; launcherRoot.executeSelection(); } }
+                MouseArea {
+                  anchors.fill: parent
+                  hoverEnabled: true
+                  onEntered: if (!launcherRoot.ignoreMouseHover) launcherRoot.selectedIndex = index
+                  onClicked: { launcherRoot.selectedIndex = index; launcherRoot.executeSelection(); }
+                }
               }
             }
 

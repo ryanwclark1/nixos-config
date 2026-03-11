@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell.Io
 import "../services"
+import "../widgets" as SharedWidgets
 
 Rectangle {
   id: root
@@ -14,21 +15,21 @@ Rectangle {
 
   property var drives: []
 
-  Process {
-    id: fetchDisk
+  SharedWidgets.CommandPoll {
+    id: diskPoll
+    interval: 30000
+    running: root.visible
     command: ["sh", "-c", "df -h / /home 2>/dev/null | tail -n +2 | awk '{print $6 \":\" $5 \":\" $3 \":\" $2}' | sort -u"]
-    running: true
-    stdout: StdioCollector {
-      onStreamFinished: {
-        var lines = (this.text || "").trim().split("\n");
-        var items = [];
-        for (var i = 0; i < lines.length; i++) {
-          var p = lines[i].split(":");
-          if (p.length >= 4) items.push({ mount: p[0], percent: p[1], used: p[2], total: p[3] });
-        }
-        root.drives = items;
+    parse: function(out) {
+      var lines = String(out || "").trim().split("\n");
+      var items = [];
+      for (var i = 0; i < lines.length; i++) {
+        var p = lines[i].split(":");
+        if (p.length >= 4) items.push({ mount: p[0], percent: p[1], used: p[2], total: p[3] });
       }
+      return items;
     }
+    onUpdated: root.drives = diskPoll.value || []
   }
 
   ColumnLayout {

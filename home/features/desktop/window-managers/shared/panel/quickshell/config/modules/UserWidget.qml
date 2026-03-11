@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell.Io
 import "../services"
+import "../widgets" as SharedWidgets
 
 Rectangle {
   id: root
@@ -24,25 +25,13 @@ Rectangle {
     }
   }
 
-  Process {
-    id: fetchUptime
-    command: ["sh", "-c", "uptime -p | sed 's/up //;s/ hours/h/;s/ minutes/m/;s/ hour/h/;s/ minute/m/'"]
-    running: true
-    stdout: StdioCollector {
-      onStreamFinished: {
-        var raw = this.text.trim();
-        if (raw) root.uptime = raw;
-        else root.uptime = "just started";
-      }
-    }
-  }
-
-  // Refresh uptime every minute
-  Timer {
+  SharedWidgets.CommandPoll {
+    id: uptimePoll
     interval: 60000
-    running: true
-    repeat: true
-    onTriggered: fetchUptime.running = true
+    running: root.visible
+    command: ["sh", "-c", "uptime -p | sed 's/up //;s/ hours/h/;s/ minutes/m/;s/ hour/h/;s/ minute/m/'"]
+    parse: function(out) { return String(out || "").trim() || "just started" }
+    onUpdated: root.uptime = uptimePoll.value
   }
 
   RowLayout {

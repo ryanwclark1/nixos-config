@@ -5,20 +5,19 @@ import Quickshell.Io
 import Quickshell.Services.UPower
 import "../services"
 import "../modules"
+import "../widgets" as SharedWidgets
 
 PopupWindow {
   id: root
   implicitWidth: 340
   implicitHeight: 380
-  readonly property color panelSurface: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.96)
-  readonly property color cardSurface: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.82)
 
   property var device: UPower.displayDevice
   property bool hasBattery: device != null && device.isPresent && (device.kind === UPower.DeviceKindDisplayDevice || device.kind === UPower.DeviceKindBattery)
   property string currentProfile: "balanced"
 
   function refreshProfile() {
-    profileCheck.running = true;
+    profilePoll.poll();
   }
 
   function setProfile(profile) {
@@ -65,30 +64,19 @@ PopupWindow {
     return mins + "m " + label;
   }
 
-  Process {
-    id: profileCheck
-    command: ["powerprofilesctl", "get"]
-    running: false
-    stdout: StdioCollector {
-      onStreamFinished: {
-        var profile = (this.text || "").trim();
-        if (profile) root.currentProfile = profile;
-      }
-    }
-  }
-
-  Timer {
+  SharedWidgets.CommandPoll {
+    id: profilePoll
     interval: 5000
     running: root.visible
-    repeat: true
-    onTriggered: root.refreshProfile()
+    command: ["powerprofilesctl", "get"]
+    onUpdated: { if (profilePoll.value) root.currentProfile = profilePoll.value; }
   }
 
   onVisibleChanged: if (visible) refreshProfile()
 
   Rectangle {
     anchors.fill: parent
-    color: root.panelSurface
+    color: Colors.popupSurface
     border.color: Colors.border
     border.width: 1
     radius: Colors.radiusMedium
@@ -109,23 +97,7 @@ PopupWindow {
           font.weight: Font.DemiBold
         }
         Item { Layout.fillWidth: true }
-        Rectangle {
-          width: 30; height: 30; radius: 15
-          color: battCloseHover.containsMouse ? Colors.highlightLight : "transparent"
-          Text {
-            anchors.centerIn: parent
-            text: "󰅖"
-            color: Colors.textSecondary
-            font.family: Colors.fontMono
-            font.pixelSize: 16
-          }
-          MouseArea {
-            id: battCloseHover
-            anchors.fill: parent
-            hoverEnabled: true
-            onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleBatteryMenu"])
-          }
-        }
+        SharedWidgets.MenuCloseButton { toggleMethod: "toggleBatteryMenu" }
       }
 
       Rectangle {
@@ -160,7 +132,7 @@ PopupWindow {
           Layout.fillWidth: true
           implicitHeight: 90
           radius: Colors.radiusMedium
-          color: root.cardSurface
+          color: Colors.cardSurface
           border.color: Colors.border
           border.width: 1
 
@@ -209,7 +181,7 @@ PopupWindow {
           Layout.fillWidth: true
           implicitHeight: detailsGrid.implicitHeight + 24
           radius: Colors.radiusMedium
-          color: root.cardSurface
+          color: Colors.cardSurface
           border.color: Colors.border
           border.width: 1
 
@@ -225,14 +197,14 @@ PopupWindow {
 
             Text { text: "Energy rate"; color: Colors.fgSecondary; font.pixelSize: 12 }
             Text {
-              text: root.device ? root.device.energyRate.toFixed(1) + " W" : "—"
+              text: root.device && root.device.energyRate ? root.device.energyRate.toFixed(1) + " W" : "—"
               color: Colors.fgMain; font.pixelSize: 12; font.weight: Font.Medium
               Layout.alignment: Qt.AlignRight
             }
 
             Text { text: "Capacity"; color: Colors.fgSecondary; font.pixelSize: 12 }
             Text {
-              text: root.device ? root.device.energyFull.toFixed(1) + " Wh" : "—"
+              text: root.device && root.device.energyFull ? root.device.energyFull.toFixed(1) + " Wh" : "—"
               color: Colors.fgMain; font.pixelSize: 12; font.weight: Font.Medium
               Layout.alignment: Qt.AlignRight
             }
@@ -278,7 +250,7 @@ PopupWindow {
               radius: Colors.radiusMedium
               property bool isActive: root.currentProfile === modelData.id
               property bool isHovered: profileMouse.containsMouse
-              color: isActive ? Colors.withAlpha(Colors.primary, 0.2) : (isHovered ? Colors.highlightLight : root.cardSurface)
+              color: isActive ? Colors.withAlpha(Colors.primary, 0.2) : (isHovered ? Colors.highlightLight : Colors.cardSurface)
               border.color: isActive ? Colors.primary : Colors.border
               border.width: 1
               Behavior on color { ColorAnimation { duration: 150 } }

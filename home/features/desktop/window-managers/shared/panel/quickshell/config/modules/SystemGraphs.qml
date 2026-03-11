@@ -14,6 +14,9 @@ Rectangle {
   property var cpuHistory: new Array(30).fill(0)
   property var memHistory: new Array(30).fill(0)
 
+  Component.onCompleted: SystemStatus.subscribe()
+  Component.onDestruction: SystemStatus.unsubscribe()
+
   function paintGraph(canvas, data, strokeColor) {
     var ctx = canvas.getContext("2d");
     ctx.reset();

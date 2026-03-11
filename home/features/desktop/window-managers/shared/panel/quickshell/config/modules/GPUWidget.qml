@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell.Io
 import "../services"
+import "../widgets" as SharedWidgets
 
 Rectangle {
   id: root
@@ -15,31 +16,31 @@ Rectangle {
   property string vramUsage: "0 / 0 MB"
   property real vramPercent: 0.0
 
-  Timer {
-    interval: 5000
-    running: true
-    repeat: true
-    onTriggered: fetchVRAM.running = true
-  }
+  Component.onCompleted: SystemStatus.subscribe()
+  Component.onDestruction: SystemStatus.unsubscribe()
 
-  Process {
-    id: fetchVRAM
+  SharedWidgets.CommandPoll {
+    id: vramPoll
+    interval: 5000
+    running: root.visible
     command: ["sh", "-c",
       "gpu_card=$(for c in /sys/class/drm/card[0-9]*/device/mem_info_vram_total; do "
       + "echo \"$(cat \"$c\" 2>/dev/null || echo 0) $(dirname \"$(dirname \"$c\")\")\" ; done 2>/dev/null "
       + "| sort -rn | head -1 | awk '{print $2}'); "
       + "[ -n \"$gpu_card\" ] && cat \"$gpu_card/device/mem_info_vram_used\" \"$gpu_card/device/mem_info_vram_total\" 2>/dev/null | awk '{print $1}'"
     ]
-    stdout: StdioCollector {
-      onStreamFinished: {
-        var lines = this.text.trim().split("\n");
-        if (lines.length >= 2) {
-          var used = parseInt(lines[0]) / 1024 / 1024;
-          var total = parseInt(lines[1]) / 1024 / 1024;
-          root.vramUsage = Math.round(used) + " / " + Math.round(total) + " MB";
-          root.vramPercent = total > 0 ? (used / total) : 0;
-        }
+    parse: function(out) {
+      var lines = String(out || "").trim().split("\n");
+      if (lines.length >= 2) {
+        var used = parseInt(lines[0]) / 1024 / 1024;
+        var total = parseInt(lines[1]) / 1024 / 1024;
+        return { usage: Math.round(used) + " / " + Math.round(total) + " MB", percent: total > 0 ? (used / total) : 0 };
       }
+      return { usage: root.vramUsage, percent: root.vramPercent };
+    }
+    onUpdated: {
+      root.vramUsage = vramPoll.value.usage;
+      root.vramPercent = vramPoll.value.percent;
     }
   }
 

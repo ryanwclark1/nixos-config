@@ -3,19 +3,18 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell.Io
 import "../services"
+import "../widgets" as SharedWidgets
 
 PopupWindow {
   id: root
   implicitWidth: 360
   implicitHeight: 480
-  readonly property color panelSurface: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.96)
-  readonly property color cardSurface: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.82)
 
   property var clipboardItems: []
   property string searchQuery: ""
 
   function refresh() {
-    if (!clipProcess.running) clipProcess.running = true;
+    clipPoll.poll();
   }
 
   readonly property var filteredItemsResult: {
@@ -29,34 +28,20 @@ PopupWindow {
     return result;
   }
 
-  Process {
-    id: clipProcess
-    command: ["qs-clip"]
-    running: false
-    stdout: StdioCollector {
-      onStreamFinished: {
-        try {
-          var parsed = JSON.parse(this.text || "[]");
-          root.clipboardItems = parsed;
-        } catch (e) {
-          root.clipboardItems = [];
-        }
-      }
-    }
-  }
-
-  Timer {
+  SharedWidgets.CommandPoll {
+    id: clipPoll
     interval: 5000
     running: root.visible
-    repeat: true
-    onTriggered: root.refresh()
+    command: ["qs-clip"]
+    parse: function(out) { try { return JSON.parse(out || "[]") } catch(e) { return [] } }
+    onUpdated: root.clipboardItems = clipPoll.value || []
   }
 
   onVisibleChanged: if (visible) refresh()
 
   Rectangle {
     anchors.fill: parent
-    color: root.panelSurface
+    color: Colors.popupSurface
     border.color: Colors.border
     border.width: 1
     radius: Colors.radiusMedium
@@ -97,23 +82,7 @@ PopupWindow {
             }
           }
         }
-        Rectangle {
-          width: 30; height: 30; radius: 15
-          color: closeHover.containsMouse ? Colors.highlightLight : "transparent"
-          Text {
-            anchors.centerIn: parent
-            text: "󰅖"
-            color: Colors.textSecondary
-            font.family: Colors.fontMono
-            font.pixelSize: 16
-          }
-          MouseArea {
-            id: closeHover
-            anchors.fill: parent
-            hoverEnabled: true
-            onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleClipboardMenu"])
-          }
-        }
+        SharedWidgets.MenuCloseButton { toggleMethod: "toggleClipboardMenu" }
       }
 
       // Search bar
@@ -184,7 +153,7 @@ PopupWindow {
               Layout.fillWidth: true
               implicitHeight: clipContent.implicitHeight + 20
               radius: Colors.radiusSmall
-              color: clipMouse.containsMouse ? Colors.highlightLight : root.cardSurface
+              color: clipMouse.containsMouse ? Colors.highlightLight : Colors.cardSurface
               border.color: Colors.border
               border.width: 1
               Behavior on color { ColorAnimation { duration: 150 } }
@@ -247,7 +216,7 @@ PopupWindow {
             visible: root.filteredItemsResult.length === 0
             implicitHeight: 60
             radius: Colors.radiusMedium
-            color: root.cardSurface
+            color: Colors.cardSurface
             border.color: Colors.border
             border.width: 1
             Text {

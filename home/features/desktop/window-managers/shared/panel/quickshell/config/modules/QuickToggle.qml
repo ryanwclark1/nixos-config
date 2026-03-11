@@ -13,7 +13,7 @@ Rectangle {
   Layout.fillWidth: true
   Layout.preferredHeight: 60
   radius: Colors.radiusMedium
-  color: active ? Colors.primary : Colors.bgWidget
+  color: active ? Colors.primary : (toggleMouse.containsMouse ? Colors.surface : Colors.bgWidget)
   border.color: active ? Colors.primary : Colors.border
   border.width: 1
 
@@ -28,8 +28,8 @@ Rectangle {
     Rectangle {
       width: 36; height: 36
       radius: 18
-      color: active ? Qt.rgba(1, 1, 1, 0.2) : Colors.surface
-      
+      color: active ? Colors.withAlpha(Colors.text, 0.2) : Colors.surface
+
       Text {
         anchors.centerIn: parent
         text: root.icon
@@ -51,17 +51,16 @@ Rectangle {
       }
       Text {
         text: active ? "On" : "Off"
-        color: active ? Qt.rgba(1, 1, 1, 0.7) : Colors.fgSecondary
+        color: active ? Colors.withAlpha(Colors.text, 0.7) : Colors.fgSecondary
         font.pixelSize: 10
       }
     }
   }
 
   MouseArea {
+    id: toggleMouse
     anchors.fill: parent
     hoverEnabled: true
-    onEntered: if (!active) root.color = Colors.surface
-    onExited: if (!active) root.color = Colors.bgWidget
     onClicked: root.clicked()
   }
 }

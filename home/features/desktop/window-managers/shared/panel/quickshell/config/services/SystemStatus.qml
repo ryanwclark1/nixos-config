@@ -1,6 +1,7 @@
 import Quickshell
 import QtQuick
 import Quickshell.Io
+import Quickshell.Services.Mpris
 
 pragma Singleton
 
@@ -92,4 +93,19 @@ QtObject {
   }
 
   Component.onCompleted: statsProc.running = true
+
+  // ── MPRIS players ────────────────────────────
+  readonly property var activeMprisPlayers: {
+    var players = [];
+    for (var i = 0; i < Mpris.players.length; i++) {
+      var p = Mpris.players[i];
+      if (p.playbackState !== Mpris.Stopped) players.push(p);
+    }
+    return players;
+  }
+  readonly property bool hasActivePlayer: activeMprisPlayers.length > 0
+
+  // Recording state is now in RecordingService singleton.
+  // This alias preserves backward compatibility for existing consumers.
+  readonly property bool isRecording: RecordingService.isRecording
 }

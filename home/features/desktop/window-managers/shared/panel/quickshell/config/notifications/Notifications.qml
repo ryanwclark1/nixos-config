@@ -28,23 +28,30 @@ PanelWindow {
     id: col
     width: Config.notifWidth
     spacing: 10
-    
+
     Repeater {
       model: root.manager ? root.manager.notifications : null
-      
+
       delegate: Rectangle {
         id: notifDelegate
         property var notification: modelData || null
         visible: notification && !notification.dismissed && (!root.manager || !root.manager.dndEnabled || isUrgent)
         Layout.preferredWidth: Config.notifWidth
         Layout.preferredHeight: visible ? colMain.implicitHeight + 20 : 0
-        
+
         // Entrance animation properties
         property real entranceProgress: 0
-        x: (1.0 - entranceProgress) * 100
+        x: (1.0 - entranceProgress) * 100 + swipeOffset
         opacity: entranceProgress
 
-        Component.onCompleted: entranceAnim.start()
+        // Staggered entry
+        Timer {
+          id: staggerTimer
+          interval: index * 100
+          running: true
+          onTriggered: entranceAnim.start()
+        }
+
         NumberAnimation { id: entranceAnim; target: notifDelegate; property: "entranceProgress"; from: 0; to: 1.0; duration: 500; easing.type: Easing.OutBack }
 
         // Use Colors singleton
@@ -54,18 +61,82 @@ PanelWindow {
         radius: Colors.radiusLarge
         clip: true
 
+        // ── Hover tracking ─────────────────────────
+        property bool isHovered: false
+        HoverHandler {
+          onHoveredChanged: notifDelegate.isHovered = hovered
+        }
+
+        // ── Dismiss progress bar ───────────────────
+        property real dismissProgress: 1.0
+
+        NumberAnimation {
+          id: dismissProgressAnim
+          target: notifDelegate
+          property: "dismissProgress"
+          from: 1.0
+          to: 0.0
+          duration: Config.popupTimer
+          running: dismissTimer.running
+          paused: notifDelegate.isHovered
+        }
+
+        // Progress bar at top
+        Rectangle {
+          width: parent.width * notifDelegate.dismissProgress
+          height: 3
+          color: notifDelegate.isUrgent ? Colors.error : Colors.primary
+          opacity: 0.7
+          anchors.top: parent.top
+          anchors.left: parent.left
+          z: 1
+        }
+
+        // ── Swipe to dismiss ───────────────────────
+        property real swipeOffset: 0
+        property bool isSwiping: false
+        property real _swipeStartX: 0
+
+        Behavior on swipeOffset {
+          enabled: !notifDelegate.isSwiping
+          NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+        }
+
         MouseArea {
           anchors.fill: parent
-          acceptedButtons: Qt.RightButton
+          acceptedButtons: Qt.LeftButton | Qt.RightButton
           onClicked: function(mouse) {
             if (mouse.button === Qt.RightButton && notifDelegate.notification) {
               notifDelegate.notification.dismiss();
             }
           }
+          onPressed: function(mouse) {
+            if (mouse.button === Qt.LeftButton) {
+              notifDelegate._swipeStartX = mouse.x;
+              notifDelegate.isSwiping = true;
+            }
+          }
+          onPositionChanged: function(mouse) {
+            if (notifDelegate.isSwiping) {
+              var delta = mouse.x - notifDelegate._swipeStartX;
+              notifDelegate.swipeOffset = Math.max(0, delta);
+            }
+          }
+          onReleased: function(mouse) {
+            if (notifDelegate.isSwiping) {
+              notifDelegate.isSwiping = false;
+              var threshold = Math.max(80, notifDelegate.width * 0.35);
+              if (notifDelegate.swipeOffset >= threshold) {
+                if (notifDelegate.notification) notifDelegate.notification.dismiss();
+              } else {
+                notifDelegate.swipeOffset = 0;
+              }
+            }
+          }
         }
 
         property bool isReplying: false
-        property bool isUrgent: modelData.urgency === Notifications.Critical
+        property bool isUrgent: !!(modelData && modelData.urgency === Notifications.Critical)
 
         onIsReplyingChanged: {
           if (isReplying) replyInput.forceActiveFocus();
@@ -97,7 +168,7 @@ PanelWindow {
               source: Config.resolveIconSource(modelData.appIcon || "")
               fillMode: Image.PreserveAspectFit
               visible: modelData.appIcon !== ""
-              
+
               Rectangle {
                 anchors.fill: parent; color: "transparent"; visible: parent.status !== Image.Ready
                 Text { anchors.centerIn: parent; text: "󰂚"; color: Colors.fgMain; font.pixelSize: 24; font.family: Colors.fontMono }
@@ -190,12 +261,13 @@ PanelWindow {
                     : 1;
                   return (parent.width - (actionCount - 1) * 8) / actionCount;
                 }
-                height: 34; color: Colors.highlightLight; radius: 6; border.color: Colors.border
+                height: 34; radius: 6; border.color: Colors.border
+                color: actionMouse.containsMouse ? Colors.surface : Colors.highlightLight
+                Behavior on color { ColorAnimation { duration: 120 } }
                 Text { anchors.centerIn: parent; text: modelData && modelData.label ? modelData.label : ""; color: Colors.fgMain; font.pixelSize: 13 }
                 MouseArea {
+                  id: actionMouse
                   anchors.fill: parent; hoverEnabled: true
-                  onEntered: parent.color = Colors.surface
-                  onExited: parent.color = Colors.highlightLight
                   onClicked: {
                     var label = modelData && modelData.label ? modelData.label.toLowerCase() : "";
                     if (label.includes("reply")) { notifDelegate.isReplying = true; replyInput.forceActiveFocus(); }
@@ -211,7 +283,8 @@ PanelWindow {
             height: 36
             anchors.horizontalCenter: parent.horizontalCenter
             radius: 8
-            color: Colors.highlightLight
+            color: dismissMouse.containsMouse ? Colors.surface : Colors.highlightLight
+            Behavior on color { ColorAnimation { duration: 120 } }
             visible: !notifDelegate.isReplying
 
             Text {
@@ -223,21 +296,21 @@ PanelWindow {
             }
 
             MouseArea {
+              id: dismissMouse
               anchors.fill: parent
               hoverEnabled: true
-              onEntered: parent.color = Colors.surface
-              onExited: parent.color = Colors.highlightLight
               onClicked: if (notifDelegate.notification) notifDelegate.notification.dismiss()
             }
           }
 
         }
-        
+
         Timer {
           id: dismissTimer
           interval: Config.popupTimer
           running: notifDelegate.notification && !notifDelegate.isReplying
                    && !notifDelegate.notification.dismissed && !notifDelegate.isUrgent
+                   && !notifDelegate.isHovered
           onTriggered: if (notifDelegate.notification) notifDelegate.notification.dismiss()
         }
       }

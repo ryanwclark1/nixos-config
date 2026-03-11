@@ -15,6 +15,7 @@ QtObject {
   property color secondary: "#99aab5"
   property color accent: "#f39c12"
   property color error: "#f04747"
+  property color warning: "#f1c40f"
   
   property color text: "#ffffff"
   property color textSecondary: "#b9bbbe"
@@ -36,6 +37,11 @@ QtObject {
   readonly property real bgOpacity: Config.glassOpacity
   readonly property color bgGlass: withAlpha(background, bgOpacity)
   readonly property color bgWidget: Qt.rgba(1, 1, 1, 0.08)
+
+  // --- POPUP SURFACES (shared across all menus) ---
+  readonly property color popupSurface: withAlpha(surface, 0.96)
+  readonly property color cardSurface: withAlpha(surface, 0.82)
+  readonly property color chipSurface: withAlpha(surface, 0.92)
   
   // --- DIMENSIONS ---
   readonly property real radiusLarge: 20
@@ -49,6 +55,18 @@ QtObject {
   function withAlpha(c, a) { return Qt.rgba(c.r, c.g, c.b, a); }
   function clamp01(value) { return Math.max(0, Math.min(1, value)); }
 
+  function weatherIcon(desc) {
+    var d = (desc || "").toLowerCase();
+    if (d.includes("sun") || d.includes("clear")) return "󰖙";
+    if (d.includes("partly")) return "󰖕";
+    if (d.includes("rain") || d.includes("drizzle")) return "󰖗";
+    if (d.includes("thunder")) return "󰖓";
+    if (d.includes("snow") || d.includes("sleet") || d.includes("blizzard")) return "󰼶";
+    if (d.includes("fog") || d.includes("mist") || d.includes("haze")) return "󰖑";
+    if (d.includes("cloud") || d.includes("overcast")) return "󰖐";
+    return "󰖐";
+  }
+
   function reloadColors() {
     try {
       let content = walWatcher.text();
@@ -61,7 +79,8 @@ QtObject {
       secondary = data.colors.color2;
       accent = data.colors.color5;
       error = data.colors.color1;
-      
+      warning = data.colors.color3;
+
       text = data.special.foreground;
       textSecondary = data.colors.color7;
       textDisabled = data.colors.color8;

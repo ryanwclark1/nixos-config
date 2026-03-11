@@ -1,7 +1,9 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import Quickshell.Io
 import "../services"
+import "../widgets" as SharedWidgets
 
 Rectangle {
   id: root
@@ -15,28 +17,21 @@ Rectangle {
 
   property var topApps: []
 
-  Process {
-    id: fetchProcs
-    command: ["sh", "-c", "ps -eo comm,pcpu,pmem --sort=-pcpu | head -n 6 | tail -n 5 | awk '{print $1 \":\" $2 \":\" $3}'"]
-    running: true
-    stdout: StdioCollector {
-      onStreamFinished: {
-        var lines = (this.text || "").trim().split("\n");
-        var items = [];
-        for (var i = 0; i < lines.length; i++) {
-          var p = lines[i].split(":");
-          if (p.length >= 3) items.push({ name: p[0], cpu: p[1], mem: p[2] });
-        }
-        root.topApps = items;
-      }
-    }
-  }
-
-  Timer {
+  SharedWidgets.CommandPoll {
+    id: procPoll
     interval: 3000
-    running: true
-    repeat: true
-    onTriggered: fetchProcs.running = true
+    running: root.visible
+    command: ["sh", "-c", "ps -eo comm,pcpu,pmem --sort=-pcpu | head -n 6 | tail -n 5 | awk '{print $1 \":\" $2 \":\" $3}'"]
+    parse: function(out) {
+      var lines = String(out || "").trim().split("\n");
+      var result = [];
+      for (var i = 0; i < lines.length; i++) {
+        var parts = lines[i].split(":");
+        if (parts.length >= 3) result.push({ name: parts[0], cpu: parts[1], mem: parts[2] });
+      }
+      return result;
+    }
+    onUpdated: root.topApps = procPoll.value || []
   }
 
   ColumnLayout {

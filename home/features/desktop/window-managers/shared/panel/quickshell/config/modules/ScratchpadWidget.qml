@@ -57,7 +57,9 @@ Rectangle {
 
         delegate: Rectangle {
           id: itemRect
-          Layout.fillWidth: true; height: 35; color: Colors.highlightLight; radius: 6
+          Layout.fillWidth: true; height: 35
+          color: scratchHover.containsMouse ? Colors.surface : Colors.highlightLight
+          radius: 6
 
           RowLayout {
             anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: 10
@@ -67,10 +69,9 @@ Rectangle {
           }
 
           MouseArea {
+            id: scratchHover
             anchors.fill: parent
             hoverEnabled: true
-            onEntered: parent.color = Colors.surface
-            onExited: parent.color = Colors.highlightLight
             onClicked: root.summonWindow(modelData.address)
           }
         }

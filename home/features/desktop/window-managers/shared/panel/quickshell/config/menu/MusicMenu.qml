@@ -3,37 +3,19 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell.Services.Mpris
 import "../services"
+import "../widgets" as SharedWidgets
 
 PopupWindow {
   id: root
   implicitWidth: 360
   implicitHeight: 400
-  readonly property color panelSurface: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.96)
-  readonly property color cardSurface: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.82)
 
-  property int currentPlayerIndex: 0
-
-  readonly property var activePlayers: {
-    var players = [];
-    for (var i = 0; i < Mpris.players.length; i++) {
-      var p = Mpris.players[i];
-      if (p.playbackState !== Mpris.Stopped) players.push(p);
-    }
-    return players;
-  }
-
-  readonly property var player: activePlayers.length > 0 ? activePlayers[Math.min(currentPlayerIndex, activePlayers.length - 1)] : null
-
-  function formatTime(seconds) {
-    if (!seconds || seconds < 0) return "0:00";
-    var min = Math.floor(seconds / 60);
-    var sec = Math.floor(seconds % 60);
-    return min + ":" + (sec < 10 ? "0" : "") + sec;
-  }
+  readonly property var activePlayers: MediaService.getAvailablePlayers()
+  readonly property var player: MediaService.currentPlayer
 
   Rectangle {
     anchors.fill: parent
-    color: root.panelSurface
+    color: Colors.popupSurface
     border.color: Colors.border
     border.width: 1
     radius: Colors.radiusMedium
@@ -67,7 +49,7 @@ PopupWindow {
           Text {
             id: playerSelectorText
             anchors.centerIn: parent
-            text: root.player ? root.player.identity : ""
+            text: root.player ? (root.player.identity || "") : ""
             color: Colors.textSecondary
             font.pixelSize: 11
           }
@@ -76,27 +58,14 @@ PopupWindow {
             id: playerSelectorHover
             anchors.fill: parent
             hoverEnabled: true
-            onClicked: root.currentPlayerIndex = (root.currentPlayerIndex + 1) % root.activePlayers.length
+            onClicked: {
+              var idx = (MediaService.selectedPlayerIndex + 1) % root.activePlayers.length;
+              MediaService.switchToPlayer(idx);
+            }
           }
         }
 
-        Rectangle {
-          width: 30; height: 30; radius: 15
-          color: musicCloseHover.containsMouse ? Colors.highlightLight : "transparent"
-          Text {
-            anchors.centerIn: parent
-            text: "󰅖"
-            color: Colors.textSecondary
-            font.family: Colors.fontMono
-            font.pixelSize: 16
-          }
-          MouseArea {
-            id: musicCloseHover
-            anchors.fill: parent
-            hoverEnabled: true
-            onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleMusicMenu"])
-          }
-        }
+        SharedWidgets.MenuCloseButton { toggleMethod: "toggleMusicMenu" }
       }
 
       Rectangle {
@@ -138,7 +107,7 @@ PopupWindow {
           Image {
             id: albumArt
             anchors.fill: parent
-            source: root.player ? (root.player.trackArtUrl || "") : ""
+            source: MediaService.trackArtUrl || ""
             fillMode: Image.PreserveAspectCrop
             visible: status === Image.Ready
           }
@@ -159,7 +128,7 @@ PopupWindow {
           spacing: 2
 
           Text {
-            text: root.player ? (root.player.trackTitle || "Unknown Track") : ""
+            text: MediaService.trackTitle || "Unknown Track"
             color: Colors.fgMain
             font.pixelSize: 16
             font.weight: Font.Bold
@@ -169,7 +138,7 @@ PopupWindow {
           }
 
           Text {
-            text: root.player ? (root.player.trackArtist || "Unknown Artist") : ""
+            text: MediaService.trackArtist || "Unknown Artist"
             color: Colors.fgSecondary
             font.pixelSize: 13
             Layout.fillWidth: true
@@ -182,7 +151,7 @@ PopupWindow {
         ColumnLayout {
           Layout.fillWidth: true
           spacing: 4
-          visible: root.player && root.player.length > 0
+          visible: MediaService.trackLength > 0
 
           Rectangle {
             id: seekTrack
@@ -195,7 +164,7 @@ PopupWindow {
 
             Rectangle {
               height: parent.height
-              width: root.player && root.player.length > 0 ? parent.width * (root.player.position / root.player.length) : 0
+              width: MediaService.trackLength > 0 ? parent.width * (MediaService.currentPosition / MediaService.trackLength) : 0
               radius: 3
               color: Colors.primary
               Behavior on width { NumberAnimation { duration: 200 } }
@@ -206,13 +175,13 @@ PopupWindow {
               anchors.fill: parent
               hoverEnabled: true
               onClicked: (mouse) => {
-                if (root.player && root.player.length > 0) {
-                  root.player.position = root.player.length * (mouse.x / width);
+                if (MediaService.trackLength > 0) {
+                  MediaService.seekByRatio(mouse.x / width);
                 }
               }
               onPositionChanged: (mouse) => {
-                if (pressed && root.player && root.player.length > 0) {
-                  root.player.position = root.player.length * (mouse.x / width);
+                if (pressed && MediaService.trackLength > 0) {
+                  MediaService.seekByRatio(mouse.x / width);
                 }
               }
             }
@@ -221,14 +190,14 @@ PopupWindow {
           RowLayout {
             Layout.fillWidth: true
             Text {
-              text: root.player ? root.formatTime(root.player.position) : "0:00"
+              text: MediaService.positionString
               color: Colors.textDisabled
               font.pixelSize: 10
               font.family: Colors.fontMono
             }
             Item { Layout.fillWidth: true }
             Text {
-              text: root.player ? root.formatTime(root.player.length) : "0:00"
+              text: MediaService.lengthString
               color: Colors.textDisabled
               font.pixelSize: 10
               font.family: Colors.fontMono
@@ -241,7 +210,7 @@ PopupWindow {
           Layout.alignment: Qt.AlignHCenter
           spacing: 24
 
-          // Shuffle (placeholder — MPRIS doesn't always support this)
+          // Shuffle
           MouseArea {
             width: 28; height: 28
             hoverEnabled: true
@@ -262,7 +231,7 @@ PopupWindow {
               color: parent.containsMouse ? Colors.highlightLight : "transparent"
             }
             Text { text: "󰒮"; color: Colors.fgMain; font.family: Colors.fontMono; font.pixelSize: 22; anchors.centerIn: parent }
-            onClicked: if (root.player) root.player.previous()
+            onClicked: MediaService.previous()
           }
 
           // Play/Pause
@@ -275,13 +244,13 @@ PopupWindow {
               Behavior on color { ColorAnimation { duration: 150 } }
             }
             Text {
-              text: root.player && root.player.playbackState === Mpris.Playing ? "󰏤" : "󰐊"
+              text: MediaService.isPlaying ? "󰏤" : "󰐊"
               color: Colors.background
               font.family: Colors.fontMono
               font.pixelSize: 22
               anchors.centerIn: parent
             }
-            onClicked: if (root.player) root.player.playPause()
+            onClicked: MediaService.playPause()
           }
 
           // Next
@@ -293,7 +262,7 @@ PopupWindow {
               color: parent.containsMouse ? Colors.highlightLight : "transparent"
             }
             Text { text: "󰒭"; color: Colors.fgMain; font.family: Colors.fontMono; font.pixelSize: 22; anchors.centerIn: parent }
-            onClicked: if (root.player) root.player.next()
+            onClicked: MediaService.next()
           }
 
           // Repeat
@@ -307,7 +276,6 @@ PopupWindow {
             Text { text: "󰑖"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 18; anchors.centerIn: parent }
             onClicked: {
               if (!root.player) return;
-              // Cycle: None -> Track -> Playlist -> None
               if (root.player.loopStatus === Mpris.None) root.player.loopStatus = Mpris.Track;
               else if (root.player.loopStatus === Mpris.Track) root.player.loopStatus = Mpris.Playlist;
               else root.player.loopStatus = Mpris.None;

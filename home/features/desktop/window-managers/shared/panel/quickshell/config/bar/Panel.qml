@@ -1,6 +1,6 @@
 import Quickshell // SystemClock
+import Quickshell.Bluetooth
 import Quickshell.Wayland
-import Quickshell.Services.Mpris
 import Quickshell.Io
 import QtQuick
 import "."
@@ -12,15 +12,20 @@ import "../widgets" as SharedWidgets
 Item {
   id: root
 
-  property bool btMenuVisible: false
+  Component.onCompleted: RecordingService.subscribe()
+  Component.onDestruction: RecordingService.unsubscribe()
+
   property var manager: null
   property var anchorWindow: null
   readonly property real networkTriggerBottomY: networkTrigger.mapToItem(root, 0, networkTrigger.height).y
+  readonly property real btTriggerBottomY: btTrigger.mapToItem(root, 0, btTrigger.height).y
   readonly property real audioTriggerBottomY: audioTrigger.mapToItem(root, 0, audioTrigger.height).y
   readonly property real musicTriggerBottomY: musicTrigger.visible ? musicTrigger.mapToItem(root, 0, musicTrigger.height).y : audioTriggerBottomY
   readonly property real recordingTriggerBottomY: recordingTrigger.visible ? recordingTrigger.mapToItem(root, 0, recordingTrigger.height).y : audioTriggerBottomY
   readonly property real batteryTriggerBottomY: batteryTrigger.visible ? batteryTrigger.mapToItem(root, 0, batteryTrigger.height).y : audioTriggerBottomY
   readonly property real clipboardTriggerBottomY: clipboardTrigger.mapToItem(root, 0, clipboardTrigger.height).y
+  readonly property real weatherTriggerBottomY: weatherTrigger.mapToItem(root, 0, weatherTrigger.height).y
+  readonly property real systemMonitorBottomY: systemMonitor.mapToItem(root, 0, systemMonitor.height).y
   signal notifClicked()
   signal networkClicked()
   signal audioClicked()
@@ -29,30 +34,9 @@ Item {
   signal recordingClicked()
   signal batteryClicked()
   signal clipboardClicked()
-
-  // Recording detection
-  property bool isRecording: false
-  Process {
-    id: recDetect
-    command: ["sh", "-c", "pgrep -x wl-screenrec || pgrep -x wf-recorder || pgrep -f '^gpu-screen-recorder'"]
-    running: false
-    stdout: StdioCollector {
-      onStreamFinished: root.isRecording = (this.text || "").trim().length > 0
-    }
-  }
-  Timer { interval: 2000; running: true; repeat: true; onTriggered: { if (!recDetect.running) recDetect.running = true; } }
-  Component.onCompleted: recDetect.running = true
-
-  // Active MPRIS players
-  readonly property var activeMprisPlayers: {
-    var players = [];
-    for (var i = 0; i < Mpris.players.length; i++) {
-      var p = Mpris.players[i];
-      if (p.playbackState !== Mpris.Stopped) players.push(p);
-    }
-    return players;
-  }
-  readonly property bool hasActivePlayer: activeMprisPlayers.length > 0
+  signal bluetoothClicked()
+  signal weatherClicked()
+  signal systemStatsClicked()
 
   implicitHeight: Config.barHeight
 
@@ -83,7 +67,9 @@ Item {
       anchorWindow: root.anchorWindow
     }
     SystemMonitor {
+      id: systemMonitor
       anchorWindow: root.anchorWindow
+      onStatsClicked: root.systemStatsClicked()
     }
   }
 
@@ -105,99 +91,100 @@ Item {
     anchors.verticalCenter: parent.verticalCenter
     spacing: 12
 
-    MouseArea {
-      id: networkTrigger
-      height: 28
-      width: networkRow.width + 16
-      hoverEnabled: true
-      onClicked: root.networkClicked()
-
-      scale: containsMouse ? 1.04 : 1.0
-      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
-
-      Rectangle {
-        id: networkBg
-        anchors.fill: parent
-        color: networkTrigger.containsMouse ? Colors.highlightLight : Colors.bgWidget
-        radius: height / 2
-        Behavior on color { ColorAnimation { duration: 160 } }
-      }
+    SharedWidgets.BarPill {
+      id: weatherTrigger
+      anchorWindow: root.anchorWindow
+      tooltipText: WeatherService.condition || "Weather"
+      onClicked: root.weatherClicked()
 
       Row {
-        id: networkRow
-        anchors.centerIn: parent
+        spacing: 6
+
+        Text {
+          text: Colors.weatherIcon(WeatherService.condition)
+          color: Colors.accent
+          font.family: Colors.fontMono
+          font.pixelSize: 14
+          anchors.verticalCenter: parent.verticalCenter
+        }
+
+        Text {
+          text: WeatherService.temp
+          color: Colors.fgMain
+          font.pixelSize: 11
+          font.weight: Font.Medium
+          anchors.verticalCenter: parent.verticalCenter
+        }
+      }
+    }
+
+    SharedWidgets.BarPill {
+      id: networkTrigger
+      anchorWindow: root.anchorWindow
+      tooltipText: networkWidget.tooltipText
+      onClicked: root.networkClicked()
+
+      Row {
         spacing: 8
         SharedWidgets.NetworkWidget {
           id: networkWidget
         }
       }
+    }
 
-      SharedWidgets.BarTooltip {
-        anchorItem: networkTrigger
-        anchorWindow: root.anchorWindow
-        hovered: networkTrigger.containsMouse
-        text: networkWidget.tooltipText
+    SharedWidgets.BarPill {
+      id: btTrigger
+      anchorWindow: root.anchorWindow
+      tooltipText: {
+        if (!Bluetooth.defaultAdapter || !Bluetooth.defaultAdapter.enabled) return "Bluetooth off";
+        var count = 0;
+        for (var i = 0; i < Bluetooth.devices.values.length; i++) {
+          if (Bluetooth.devices.values[i].connected) count++;
+        }
+        return count > 0 ? count + " device" + (count > 1 ? "s" : "") + " connected" : "Bluetooth";
+      }
+      onClicked: root.bluetoothClicked()
+
+      Row {
+        spacing: 6
+
+        Text {
+          text: (Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled) ? "󰂯" : "󰂲"
+          color: (Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled) ? Colors.primary : Colors.textDisabled
+          font.family: Colors.fontMono
+          font.pixelSize: 14
+          anchors.verticalCenter: parent.verticalCenter
+        }
       }
     }
 
-    MouseArea {
+    SharedWidgets.BarPill {
       id: audioTrigger
-      height: 28
-      width: audioRow.width + 16
-      hoverEnabled: true
+      anchorWindow: root.anchorWindow
+      tooltipText: audioWidget.tooltipText
       onClicked: root.audioClicked()
 
-      scale: containsMouse ? 1.04 : 1.0
-      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
-
-      Rectangle {
-        id: audioBg
-        anchors.fill: parent
-        color: audioTrigger.containsMouse ? Colors.highlightLight : Colors.bgWidget
-        radius: height / 2
-        Behavior on color { ColorAnimation { duration: 160 } }
-      }
-
       Row {
-        id: audioRow
-        anchors.centerIn: parent
         spacing: 8
         SharedWidgets.AudioWidget {
           id: audioWidget
         }
       }
-
-      SharedWidgets.BarTooltip {
-        anchorItem: audioTrigger
-        anchorWindow: root.anchorWindow
-        hovered: audioTrigger.containsMouse
-        text: audioWidget.tooltipText
-      }
     }
 
     // Music trigger — only visible when an MPRIS player is active
-    MouseArea {
+    SharedWidgets.BarPill {
       id: musicTrigger
-      height: 28
-      width: musicRow.width + 16
-      hoverEnabled: true
-      visible: root.hasActivePlayer
+      visible: SystemStatus.hasActivePlayer
+      anchorWindow: root.anchorWindow
+      tooltipText: SystemStatus.activeMprisPlayers.length > 0
+        ? (SystemStatus.activeMprisPlayers[0].trackTitle || "Music") + (SystemStatus.activeMprisPlayers[0].trackArtist ? " - " + SystemStatus.activeMprisPlayers[0].trackArtist : "")
+        : "Music controls"
       onClicked: root.musicClicked()
 
-      scale: containsMouse ? 1.04 : 1.0
-      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
       Behavior on width { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
 
-      Rectangle {
-        anchors.fill: parent
-        color: musicTrigger.containsMouse ? Colors.highlightLight : Colors.bgWidget
-        radius: height / 2
-        Behavior on color { ColorAnimation { duration: 160 } }
-      }
-
       Row {
-        id: musicRow
-        anchors.centerIn: parent
         spacing: 6
 
         Text {
@@ -216,7 +203,7 @@ Item {
 
           Text {
             id: musicTitleText
-            text: root.activeMprisPlayers.length > 0 ? (root.activeMprisPlayers[0].trackTitle || "") : ""
+            text: SystemStatus.activeMprisPlayers.length > 0 ? (SystemStatus.activeMprisPlayers[0].trackTitle || "") : ""
             color: Colors.fgMain
             font.pixelSize: 11
             font.weight: Font.Medium
@@ -224,39 +211,19 @@ Item {
           }
         }
       }
-
-      SharedWidgets.BarTooltip {
-        anchorItem: musicTrigger
-        anchorWindow: root.anchorWindow
-        hovered: musicTrigger.containsMouse
-        text: root.activeMprisPlayers.length > 0
-          ? (root.activeMprisPlayers[0].trackTitle || "Music") + (root.activeMprisPlayers[0].trackArtist ? " - " + root.activeMprisPlayers[0].trackArtist : "")
-          : "Music controls"
-      }
     }
 
     // Recording trigger — only visible when recording is in progress
-    MouseArea {
+    SharedWidgets.BarPill {
       id: recordingTrigger
-      height: 28
-      width: recRow.width + 16
-      hoverEnabled: true
-      visible: root.isRecording
+      visible: SystemStatus.isRecording
+      anchorWindow: root.anchorWindow
+      normalColor: Colors.withAlpha(Colors.error, 0.15)
+      hoverColor: Colors.withAlpha(Colors.error, 0.25)
+      tooltipText: "Screen recording in progress"
       onClicked: root.recordingClicked()
 
-      scale: containsMouse ? 1.04 : 1.0
-      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
-
-      Rectangle {
-        anchors.fill: parent
-        color: recordingTrigger.containsMouse ? Colors.withAlpha(Colors.error, 0.25) : Colors.withAlpha(Colors.error, 0.15)
-        radius: height / 2
-        Behavior on color { ColorAnimation { duration: 160 } }
-      }
-
       Row {
-        id: recRow
-        anchors.centerIn: parent
         spacing: 6
 
         Rectangle {
@@ -264,7 +231,7 @@ Item {
           color: Colors.error
           anchors.verticalCenter: parent.verticalCenter
           SequentialAnimation on opacity {
-            running: root.isRecording
+            running: SystemStatus.isRecording
             loops: Animation.Infinite
             NumberAnimation { from: 1.0; to: 0.3; duration: 600 }
             NumberAnimation { from: 0.3; to: 1.0; duration: 600 }
@@ -279,118 +246,50 @@ Item {
           anchors.verticalCenter: parent.verticalCenter
         }
       }
-
-      SharedWidgets.BarTooltip {
-        anchorItem: recordingTrigger
-        anchorWindow: root.anchorWindow
-        hovered: recordingTrigger.containsMouse
-        text: "Screen recording in progress"
-      }
     }
 
     // Battery trigger — only visible when battery is present
-    MouseArea {
+    SharedWidgets.BarPill {
       id: batteryTrigger
-      height: 28
-      width: batteryRow.width + 16
-      hoverEnabled: true
       visible: batteryWidget.showBattery
+      anchorWindow: root.anchorWindow
+      tooltipText: batteryWidget.tooltipText
       onClicked: root.batteryClicked()
 
-      scale: containsMouse ? 1.04 : 1.0
-      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
-
-      Rectangle {
-        anchors.fill: parent
-        color: batteryTrigger.containsMouse ? Colors.highlightLight : Colors.bgWidget
-        radius: height / 2
-        Behavior on color { ColorAnimation { duration: 160 } }
-      }
-
       Row {
-        id: batteryRow
-        anchors.centerIn: parent
         spacing: 4
-
         SharedWidgets.BatteryWidget {
           id: batteryWidget
         }
       }
-
-      SharedWidgets.BarTooltip {
-        anchorItem: batteryTrigger
-        anchorWindow: root.anchorWindow
-        hovered: batteryTrigger.containsMouse
-        text: batteryWidget.tooltipText
-      }
     }
 
     // Settings trigger — opens ControlCenter
-    MouseArea {
+    SharedWidgets.BarPill {
       id: settingsTrigger
-      width: 32
-      height: 28
-      hoverEnabled: true
+      anchorWindow: root.anchorWindow
+      tooltipText: "System controls"
       onClicked: root.commandClicked()
 
-      scale: containsMouse ? 1.04 : 1.0
-      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
-
-      Rectangle {
-        anchors.fill: parent
-        color: settingsTrigger.containsMouse ? Colors.highlightLight : Colors.bgWidget
-        radius: height / 2
-        Behavior on color { ColorAnimation { duration: 160 } }
-      }
-
       Text {
-        anchors.centerIn: parent
         color: Colors.fgMain
         font.pixelSize: 16
         font.family: Colors.fontMono
         text: "󰒓"
       }
-
-      SharedWidgets.BarTooltip {
-        anchorItem: settingsTrigger
-        anchorWindow: root.anchorWindow
-        hovered: settingsTrigger.containsMouse
-        text: "System controls"
-      }
     }
 
-    Rectangle {
-      width: clockText.width + 16
-      height: 28
-      radius: height / 2
-      color: clockMouse.containsMouse ? Colors.highlightLight : Colors.bgWidget
-      anchors.verticalCenter: parent.verticalCenter
-      
-      scale: clockMouse.containsMouse ? 1.04 : 1.0
-      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
-      Behavior on color { ColorAnimation { duration: 160 } }
+    SharedWidgets.BarPill {
+      anchorWindow: root.anchorWindow
+      tooltipText: "Calendar"
+      onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Calendar", "toggle"])
 
       Text {
         id: clockText
-        anchors.centerIn: parent
         color: Colors.fgMain
         font.pixelSize: 14
         font.weight: Font.Bold
         text: String(clock.hours).padStart(2, '0') + ":" + String(clock.minutes).padStart(2, '0')
-      }
-      
-      MouseArea {
-        id: clockMouse
-        anchors.fill: parent
-        hoverEnabled: true
-        onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Calendar", "toggle"])
-      }
-
-      SharedWidgets.BarTooltip {
-        anchorItem: parent
-        anchorWindow: root.anchorWindow
-        hovered: clockMouse.containsMouse
-        text: "Calendar"
       }
     }
 
@@ -398,37 +297,17 @@ Item {
       anchorWindow: root.anchorWindow
     }
 
-    // Clipboard trigger
-    MouseArea {
+    SharedWidgets.BarPill {
       id: clipboardTrigger
-      width: 32
-      height: 28
-      hoverEnabled: true
+      anchorWindow: root.anchorWindow
+      tooltipText: "Clipboard history"
       onClicked: root.clipboardClicked()
 
-      scale: containsMouse ? 1.04 : 1.0
-      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
-
-      Rectangle {
-        anchors.fill: parent
-        color: clipboardTrigger.containsMouse ? Colors.highlightLight : Colors.bgWidget
-        radius: height / 2
-        Behavior on color { ColorAnimation { duration: 160 } }
-      }
-
       Text {
-        anchors.centerIn: parent
         text: "󰅍"
         color: Colors.fgMain
         font.family: Colors.fontMono
         font.pixelSize: 16
-      }
-
-      SharedWidgets.BarTooltip {
-        anchorItem: clipboardTrigger
-        anchorWindow: root.anchorWindow
-        hovered: clipboardTrigger.containsMouse
-        text: "Clipboard history"
       }
     }
 

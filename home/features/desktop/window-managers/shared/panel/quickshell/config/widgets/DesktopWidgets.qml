@@ -1,160 +1,290 @@
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Controls
 import Quickshell
 import Quickshell.Io
 import "../services"
-import "../modules"
 
 Item {
   id: root
-  implicitWidth: 800
-  implicitHeight: 600
+  anchors.fill: parent
 
-  SystemClock {
-    id: desktopClock
-    precision: SystemClock.Minutes
+  property string screenName: parent ? (parent.screen ? parent.screen.name : "") : ""
+
+  visible: Config.desktopWidgetsEnabled || DesktopWidgetRegistry.editMode
+
+  // Get widgets for this screen from config
+  property var screenWidgets: DesktopWidgetRegistry.getWidgetsForScreen(screenName)
+  onScreenNameChanged: screenWidgets = DesktopWidgetRegistry.getWidgetsForScreen(screenName)
+
+  // Refresh when config changes
+  Connections {
+    target: Config
+    function onDesktopWidgetsMonitorWidgetsChanged() {
+      root.screenWidgets = DesktopWidgetRegistry.getWidgetsForScreen(root.screenName);
+    }
   }
 
-  RowLayout {
+  IpcHandler {
+    target: "DesktopWidgets"
+    function toggleEditMode() {
+      DesktopWidgetRegistry.editMode = !DesktopWidgetRegistry.editMode;
+    }
+  }
+
+  // Grid overlay (only in edit mode with grid snap)
+  Canvas {
     anchors.fill: parent
-    spacing: 40
-
-    // Left Column: Time, Weather, System Stats, Quick Note
-    ColumnLayout {
-      Layout.alignment: Qt.AlignTop | Qt.AlignLeft
-      spacing: 15
-      Layout.preferredWidth: 350
-
-      // Large Material You Clock
-      ColumnLayout {
-        Layout.alignment: Qt.AlignLeft
-        spacing: -10
-
-        Text {
-          text: Qt.formatDateTime(desktopClock.date, "HH:mm")
-          color: Colors.primary
-          font.pixelSize: 96
-          font.weight: Font.Bold
-          font.letterSpacing: -4
-        }
-
-        Text {
-          text: Qt.formatDateTime(desktopClock.date, "dddd, MMMM d")
-          color: Colors.text
-          font.pixelSize: 24
-          font.weight: Font.Medium
-          Layout.leftMargin: 5
-        }
+    visible: DesktopWidgetRegistry.editMode && Config.desktopWidgetsGridSnap
+    opacity: 0.08
+    onPaint: {
+      var ctx = getContext("2d");
+      ctx.clearRect(0, 0, width, height);
+      ctx.strokeStyle = Colors.text;
+      ctx.lineWidth = 1;
+      var gridSize = 20;
+      for (var x = 0; x < width; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
       }
-
-      Item { Layout.preferredHeight: 10 }
-
-      // Weather
-      WeatherWidget {
-        Layout.fillWidth: true
+      for (var y = 0; y < height; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
       }
+    }
+  }
 
-      Item { Layout.preferredHeight: 10 }
+  // Widget instances
+  Repeater {
+    model: root.screenWidgets
 
-      // System Stats Row
-      RowLayout {
-        spacing: 30
-        Layout.leftMargin: 5
+    delegate: DraggableDesktopWidget {
+      required property var modelData
+      required property int index
 
-        // CPU Stat
-        ColumnLayout {
-          spacing: 5
-          Text { text: "CPU USAGE"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold; font.letterSpacing: 1 }
-          RowLayout {
-            spacing: 8
-            Text { text: ""; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 20 }
-            Text { 
-              text: SystemStatus.cpuUsage
-              color: Colors.text
-              font.pixelSize: 18
-              font.weight: Font.Bold
-            }
-          }
-        }
+      widgetId: modelData.id || ""
+      widgetType: modelData.type || ""
+      screenName: root.screenName
+      x: modelData.x || 0
+      y: modelData.y || 0
+      widgetScale: modelData.scale || 1.0
 
-        // RAM Stat
-        ColumnLayout {
-          spacing: 5
-          Text { text: "MEMORY"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold; font.letterSpacing: 1 }
-          RowLayout {
-            spacing: 8
-            Text { text: ""; color: Colors.secondary; font.family: Colors.fontMono; font.pixelSize: 20 }
-            Text { 
-              text: SystemStatus.ramUsage
-              color: Colors.text
-              font.pixelSize: 18
-              font.weight: Font.Bold
-            }
+      // Load the appropriate widget component based on type
+      Loader {
+        active: true
+        sourceComponent: {
+          switch (widgetType) {
+            case "Clock": return clockComponent;
+            case "SystemStat": return systemStatComponent;
+            case "Weather": return weatherComponent;
+            default: return placeholderComponent;
           }
         }
       }
+    }
+  }
 
-      Item { Layout.preferredHeight: 20 }
+  // Edit mode controls panel
+  Rectangle {
+    visible: DesktopWidgetRegistry.editMode
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.bottomMargin: 100
+    width: editRow.implicitWidth + 40
+    height: 48
+    radius: 24
+    color: Colors.bgGlass
+    border.color: Colors.primary
+    border.width: 2
 
-      // Quick Note Widget
-      ColumnLayout {
-        spacing: 12
-        Layout.fillWidth: true
-        
-        Text { text: "QUICK NOTE"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold; font.letterSpacing: 1 }
-        
+    RowLayout {
+      id: editRow
+      anchors.centerIn: parent
+      spacing: 16
+
+      // Add Widget button with dropdown
+      Item {
+        Layout.preferredWidth: addRow.implicitWidth
+        Layout.preferredHeight: 32
+
+        RowLayout {
+          id: addRow
+          anchors.centerIn: parent
+          spacing: 6
+
+          Text {
+            text: "󰐕"
+            color: Colors.primary
+            font.family: Colors.fontMono
+            font.pixelSize: 16
+          }
+          Text {
+            text: "Add Widget"
+            color: Colors.text
+            font.pixelSize: 13
+            font.weight: Font.Medium
+          }
+        }
+
+        MouseArea {
+          anchors.fill: parent
+          cursorShape: Qt.PointingHandCursor
+          onClicked: addWidgetMenu.visible = !addWidgetMenu.visible
+        }
+
+        // Add widget dropdown
         Rectangle {
-          Layout.preferredWidth: 350
-          Layout.preferredHeight: 180
-          color: Qt.rgba(1, 1, 1, 0.03)
-          radius: Colors.radiusMedium
-          border.color: noteInput.activeFocus ? Colors.primary : Colors.border
+          id: addWidgetMenu
+          visible: false
+          anchors.bottom: parent.top
+          anchors.horizontalCenter: parent.horizontalCenter
+          anchors.bottomMargin: 12
+          width: 160
+          height: addMenuCol.implicitHeight + 16
+          radius: 10
+          color: Colors.bgGlass
+          border.color: Colors.border
           border.width: 1
 
-          TextArea {
-            id: noteInput
+          Column {
+            id: addMenuCol
             anchors.fill: parent
-            anchors.margins: Colors.paddingMedium
-            color: Colors.text
-            font.pixelSize: 14
-            font.family: Colors.fontMono
-            wrapMode: TextEdit.Wrap
-            placeholderText: "Type a note..."
+            anchors.margins: 8
+            spacing: 2
 
-            property string notePath: Quickshell.env("HOME") + "/.cache/quickshell_note.txt"
-            property bool syncingNote: false
+            Repeater {
+              model: DesktopWidgetRegistry.widgetCatalog
 
-            property FileView noteFile: FileView {
-              path: noteInput.notePath
-              blockLoading: true
-              printErrors: false
-              onLoaded: {
-                noteInput.syncingNote = true;
-                noteInput.text = this.text();
-                noteInput.syncingNote = false;
+              delegate: Rectangle {
+                required property var modelData
+                width: parent.width
+                height: 30
+                radius: 6
+                color: addItemMa.containsMouse ? Colors.highlight : "transparent"
+
+                RowLayout {
+                  anchors.fill: parent
+                  anchors.margins: 6
+                  spacing: 8
+
+                  Text {
+                    text: modelData.icon
+                    color: Colors.primary
+                    font.family: Colors.fontMono
+                    font.pixelSize: 14
+                  }
+                  Text {
+                    text: modelData.name
+                    color: Colors.text
+                    font.pixelSize: 12
+                    Layout.fillWidth: true
+                  }
+                }
+
+                MouseArea {
+                  id: addItemMa
+                  anchors.fill: parent
+                  hoverEnabled: true
+                  cursorShape: Qt.PointingHandCursor
+                  onClicked: {
+                    DesktopWidgetRegistry.addWidget(root.screenName, modelData.id);
+                    addWidgetMenu.visible = false;
+                  }
+                }
               }
             }
-
-            onTextChanged: if (!syncingNote) noteInput.noteFile.setText(text)
           }
         }
       }
 
-      Item { Layout.fillHeight: true }
-    }
+      // Separator
+      Rectangle { width: 1; height: 24; color: Colors.border }
 
-    // Right Column: Calendar
-    ColumnLayout {
-      Layout.alignment: Qt.AlignTop | Qt.AlignLeft
-      Layout.topMargin: 20
-      Layout.preferredWidth: 320
+      // Grid Snap toggle
+      Rectangle {
+        Layout.preferredWidth: snapRow.implicitWidth + 16
+        Layout.preferredHeight: 28
+        radius: 14
+        color: Config.desktopWidgetsGridSnap ? Colors.withAlpha(Colors.primary, 0.2) : "transparent"
+        border.color: Config.desktopWidgetsGridSnap ? Colors.primary : Colors.border
+        border.width: 1
 
-      Calendar {
-        Layout.fillWidth: true
+        RowLayout {
+          id: snapRow
+          anchors.centerIn: parent
+          spacing: 4
+          Text { text: "󰕰"; color: Colors.text; font.family: Colors.fontMono; font.pixelSize: 14 }
+          Text { text: "Grid"; color: Colors.text; font.pixelSize: 12 }
+        }
+
+        MouseArea {
+          anchors.fill: parent
+          cursorShape: Qt.PointingHandCursor
+          onClicked: Config.desktopWidgetsGridSnap = !Config.desktopWidgetsGridSnap
+        }
       }
 
-      Item { Layout.fillHeight: true }
+      // Separator
+      Rectangle { width: 1; height: 24; color: Colors.border }
+
+      // Exit Edit Mode
+      Rectangle {
+        Layout.preferredWidth: exitRow.implicitWidth + 16
+        Layout.preferredHeight: 28
+        radius: 14
+        color: Colors.withAlpha(Colors.error, 0.15)
+        border.color: Colors.error
+        border.width: 1
+
+        RowLayout {
+          id: exitRow
+          anchors.centerIn: parent
+          spacing: 4
+          Text { text: "󰅖"; color: Colors.error; font.family: Colors.fontMono; font.pixelSize: 14 }
+          Text { text: "Done"; color: Colors.error; font.pixelSize: 12 }
+        }
+
+        MouseArea {
+          anchors.fill: parent
+          cursorShape: Qt.PointingHandCursor
+          onClicked: DesktopWidgetRegistry.editMode = false
+        }
+      }
+    }
+  }
+
+  // Widget component definitions
+  Component {
+    id: clockComponent
+    DesktopClock {}
+  }
+
+  Component {
+    id: systemStatComponent
+    DesktopSystemStat {}
+  }
+
+  Component {
+    id: weatherComponent
+    DesktopWeather {}
+  }
+
+  Component {
+    id: placeholderComponent
+    Rectangle {
+      width: 120; height: 60
+      radius: 10
+      color: Colors.withAlpha(Colors.surface, 0.5)
+      border.color: Colors.border
+      Text {
+        anchors.centerIn: parent
+        text: "Unknown Widget"
+        color: Colors.fgDim
+        font.pixelSize: 12
+      }
     }
   }
 }

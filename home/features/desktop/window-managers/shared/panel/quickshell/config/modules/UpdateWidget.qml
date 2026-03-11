@@ -1,7 +1,9 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import Quickshell.Io
 import "../services"
+import "../widgets" as SharedWidgets
 
 Rectangle {
   id: root
@@ -20,20 +22,23 @@ Rectangle {
     ? Quickshell.env("XDG_CACHE_HOME") + "/quickshell/updates"
     : Quickshell.env("HOME") + "/.cache/quickshell/updates"
 
-  Process {
-    id: readCache
+  SharedWidgets.CommandPoll {
+    id: cachePoll
+    interval: 3600000
+    running: true
     command: ["sh", "-c",
       "nix=$(cat '" + root.cacheDir + "/nixos' 2>/dev/null || echo 0); "
       + "fpk=$(cat '" + root.cacheDir + "/flatpak' 2>/dev/null || echo 0); "
       + "printf '%s\\n%s\\n' \"$nix\" \"$fpk\""
     ]
-    stdout: StdioCollector {
-      onStreamFinished: {
-        var lines = (this.text || "").trim().split("\n");
-        root.nixUpdates = (lines[0] || "0").trim();
-        root.flatpakUpdates = (lines.length >= 2 ? lines[1] : "0").trim();
-        root.isChecking = false;
-      }
+    parse: function(out) {
+      var lines = (out || "").trim().split("\n");
+      return { nix: (lines[0] || "0").trim(), flatpak: (lines.length >= 2 ? lines[1] : "0").trim() };
+    }
+    onUpdated: {
+      root.nixUpdates = cachePoll.value.nix;
+      root.flatpakUpdates = cachePoll.value.flatpak;
+      root.isChecking = false;
     }
   }
 
@@ -41,8 +46,13 @@ Rectangle {
     id: refreshProc
     command: ["qs-updator"]
     stdout: StdioCollector {
+      onStreamFinished: cachePoll.poll()
+    }
+    stderr: StdioCollector {
       onStreamFinished: {
-        readCache.running = true;
+        if ((this.text || "").trim().length > 0)
+          console.warn("UpdateWidget: qs-updator error:", this.text.trim());
+        root.isChecking = false;
       }
     }
   }
@@ -51,8 +61,6 @@ Rectangle {
     isChecking = true;
     refreshProc.running = true;
   }
-
-  Component.onCompleted: readCache.running = true
 
   RowLayout {
     anchors.fill: parent

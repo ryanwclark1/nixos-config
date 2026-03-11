@@ -1,78 +1,20 @@
 import Quickshell
 import QtQuick
 import QtQuick.Layouts
-import Quickshell.Io
 import "../services"
+import "../widgets" as SharedWidgets
 
 PopupWindow {
   id: root
   implicitWidth: 300
   implicitHeight: 220
-  readonly property color panelSurface: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.96)
-  readonly property color cardSurface: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.82)
 
-  property bool isRecording: false
-  property real recordingStartTime: 0
-  property string elapsedText: "00:00"
-
-  function checkRecording() {
-    if (!recordingCheck.running) recordingCheck.running = true;
-  }
-
-  function startRecording(mode) {
-    Quickshell.execDetached(["screenrecord", mode]);
-    Qt.callLater(function() { checkRecording(); });
-  }
-
-  function stopRecording() {
-    Quickshell.execDetached(["screenrecord-stop"]);
-    root.isRecording = false;
-    root.elapsedText = "00:00";
-  }
-
-  function formatElapsed(ms) {
-    var totalSec = Math.floor(ms / 1000);
-    var min = Math.floor(totalSec / 60);
-    var sec = totalSec % 60;
-    return (min < 10 ? "0" : "") + min + ":" + (sec < 10 ? "0" : "") + sec;
-  }
-
-  Process {
-    id: recordingCheck
-    command: ["sh", "-c", "pgrep -x wl-screenrec || pgrep -x wf-recorder || pgrep -f '^gpu-screen-recorder'"]
-    running: false
-    stdout: StdioCollector {
-      onStreamFinished: {
-        var wasRecording = root.isRecording;
-        root.isRecording = (this.text || "").trim().length > 0;
-        if (root.isRecording && !wasRecording && root.recordingStartTime === 0) {
-          root.recordingStartTime = Date.now();
-        }
-        if (!root.isRecording) {
-          root.elapsedText = "00:00";
-          root.recordingStartTime = 0;
-        }
-      }
-    }
-  }
-
-  Timer {
-    interval: 1000
-    running: root.visible || root.isRecording
-    repeat: true
-    onTriggered: {
-      if (root.isRecording && root.recordingStartTime > 0) {
-        root.elapsedText = root.formatElapsed(Date.now() - root.recordingStartTime);
-      }
-      recordingCheck.running = true;
-    }
-  }
-
-  onVisibleChanged: if (visible) checkRecording()
+  Component.onCompleted: RecordingService.subscribe()
+  Component.onDestruction: RecordingService.unsubscribe()
 
   Rectangle {
     anchors.fill: parent
-    color: root.panelSurface
+    color: Colors.popupSurface
     border.color: Colors.border
     border.width: 1
     radius: Colors.radiusMedium
@@ -93,23 +35,7 @@ PopupWindow {
           font.weight: Font.DemiBold
         }
         Item { Layout.fillWidth: true }
-        Rectangle {
-          width: 30; height: 30; radius: 15
-          color: recCloseHover.containsMouse ? Colors.highlightLight : "transparent"
-          Text {
-            anchors.centerIn: parent
-            text: "󰅖"
-            color: Colors.textSecondary
-            font.family: Colors.fontMono
-            font.pixelSize: 16
-          }
-          MouseArea {
-            id: recCloseHover
-            anchors.fill: parent
-            hoverEnabled: true
-            onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleRecordingMenu"])
-          }
-        }
+        SharedWidgets.MenuCloseButton { toggleMethod: "toggleRecordingMenu" }
       }
 
       Rectangle {
@@ -123,8 +49,8 @@ PopupWindow {
         Layout.fillWidth: true
         implicitHeight: 50
         radius: Colors.radiusMedium
-        color: root.isRecording ? Colors.withAlpha(Colors.error, 0.15) : root.cardSurface
-        border.color: root.isRecording ? Colors.error : Colors.border
+        color: RecordingService.isRecording ? Colors.withAlpha(Colors.error, 0.15) : Colors.cardSurface
+        border.color: RecordingService.isRecording ? Colors.error : Colors.border
         border.width: 1
 
         RowLayout {
@@ -134,9 +60,9 @@ PopupWindow {
 
           Rectangle {
             width: 12; height: 12; radius: 6
-            color: root.isRecording ? Colors.error : Colors.textDisabled
+            color: RecordingService.isRecording ? Colors.error : Colors.textDisabled
             SequentialAnimation on opacity {
-              running: root.isRecording
+              running: RecordingService.isRecording
               loops: Animation.Infinite
               NumberAnimation { from: 1.0; to: 0.3; duration: 600 }
               NumberAnimation { from: 0.3; to: 1.0; duration: 600 }
@@ -144,8 +70,8 @@ PopupWindow {
           }
 
           Text {
-            text: root.isRecording ? "Recording" : "Idle"
-            color: root.isRecording ? Colors.error : Colors.fgMain
+            text: RecordingService.isRecording ? "Recording" : "Idle"
+            color: RecordingService.isRecording ? Colors.error : Colors.fgMain
             font.pixelSize: 14
             font.weight: Font.DemiBold
           }
@@ -153,8 +79,8 @@ PopupWindow {
           Item { Layout.fillWidth: true }
 
           Text {
-            text: root.elapsedText
-            color: root.isRecording ? Colors.error : Colors.textDisabled
+            text: RecordingService.elapsedText
+            color: RecordingService.isRecording ? Colors.error : Colors.textDisabled
             font.pixelSize: 16
             font.weight: Font.Bold
             font.family: Colors.fontMono
@@ -166,13 +92,13 @@ PopupWindow {
       RowLayout {
         Layout.fillWidth: true
         spacing: 10
-        visible: !root.isRecording
+        visible: !RecordingService.isRecording
 
         Rectangle {
           Layout.fillWidth: true
           implicitHeight: 44
           radius: Colors.radiusMedium
-          color: fullscreenHover.containsMouse ? Colors.highlightLight : root.cardSurface
+          color: fullscreenHover.containsMouse ? Colors.highlightLight : Colors.cardSurface
           border.color: fullscreenHover.containsMouse ? Colors.primary : Colors.border
           border.width: 1
           Behavior on color { ColorAnimation { duration: 150 } }
@@ -188,7 +114,7 @@ PopupWindow {
             id: fullscreenHover
             anchors.fill: parent
             hoverEnabled: true
-            onClicked: root.startRecording("fullscreen")
+            onClicked: RecordingService.startRecording("fullscreen")
           }
         }
 
@@ -196,7 +122,7 @@ PopupWindow {
           Layout.fillWidth: true
           implicitHeight: 44
           radius: Colors.radiusMedium
-          color: regionHover.containsMouse ? Colors.highlightLight : root.cardSurface
+          color: regionHover.containsMouse ? Colors.highlightLight : Colors.cardSurface
           border.color: regionHover.containsMouse ? Colors.primary : Colors.border
           border.width: 1
           Behavior on color { ColorAnimation { duration: 150 } }
@@ -212,7 +138,7 @@ PopupWindow {
             id: regionHover
             anchors.fill: parent
             hoverEnabled: true
-            onClicked: root.startRecording("region")
+            onClicked: RecordingService.startRecording("region")
           }
         }
       }
@@ -222,13 +148,13 @@ PopupWindow {
         Layout.fillWidth: true
         implicitHeight: 44
         radius: Colors.radiusMedium
-        visible: root.isRecording
+        visible: RecordingService.isRecording
         color: stopHover.containsMouse ? Qt.darker(Colors.error, 1.1) : Colors.error
 
         Text {
           anchors.centerIn: parent
           text: "󰓛  Stop Recording"
-          color: "#ffffff"
+          color: Colors.background
           font.pixelSize: 14
           font.weight: Font.DemiBold
           font.family: Colors.fontMono
@@ -238,7 +164,7 @@ PopupWindow {
           id: stopHover
           anchors.fill: parent
           hoverEnabled: true
-          onClicked: root.stopRecording()
+          onClicked: RecordingService.stopRecording()
         }
       }
 

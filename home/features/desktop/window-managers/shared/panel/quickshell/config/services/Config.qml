@@ -34,6 +34,35 @@ QtObject {
   // --- OSD ---
   property int osdDuration: 2000
   property int osdSize: 180
+  property string osdPosition: "top"
+  property string osdStyle: "circular"
+  property bool osdOverdrive: false
+
+  // --- DOCK ---
+  property bool dockEnabled: true
+  property bool dockAutoHide: false
+  property var dockPinnedApps: []
+  property string dockPosition: "bottom"
+  property bool dockGroupApps: true
+  property int dockIconSize: 36
+
+  // --- DESKTOP WIDGETS ---
+  property bool desktopWidgetsEnabled: false
+  property bool desktopWidgetsGridSnap: false
+  property var desktopWidgetsMonitorWidgets: []
+
+  // --- POWER MENU ---
+  property int powermenuCountdown: 3000
+
+  // --- LOCK SCREEN ---
+  property bool lockScreenCompact: false
+  property bool lockScreenMediaControls: true
+  property bool lockScreenWeather: true
+  property bool lockScreenSessionButtons: true
+  property int lockScreenCountdown: 5000
+
+  // --- INTERNAL ---
+  property bool _loading: false
 
   readonly property string configPath: Quickshell.env("HOME") + "/.local/state/quickshell/config.json"
   readonly property var iconAliases: ({
@@ -99,9 +128,57 @@ QtObject {
     }
   }
 
+  // Debounced save: batches rapid property changes into a single disk write
+  property Timer saveTimer: Timer {
+    interval: 500
+    onTriggered: root.save()
+  }
+
+  function scheduleSave() {
+    if (!_loading) saveTimer.restart();
+  }
+
+  // Wire all user-facing properties to scheduleSave
+  onBarHeightChanged: scheduleSave()
+  onBarFloatingChanged: scheduleSave()
+  onBarMarginChanged: scheduleSave()
+  onBarOpacityChanged: scheduleSave()
+  onBlurEnabledChanged: scheduleSave()
+  onGlassOpacityChanged: scheduleSave()
+  onNotifWidthChanged: scheduleSave()
+  onPopupTimerChanged: scheduleSave()
+  onLauncherDefaultModeChanged: scheduleSave()
+  onLauncherShowModeHintsChanged: scheduleSave()
+  onLauncherShowHomeSectionsChanged: scheduleSave()
+  onControlCenterWidthChanged: scheduleSave()
+  onControlCenterShowQuickLinksChanged: scheduleSave()
+  onControlCenterShowMediaWidgetChanged: scheduleSave()
+  onOsdDurationChanged: scheduleSave()
+  onOsdSizeChanged: scheduleSave()
+  onOsdPositionChanged: scheduleSave()
+  onOsdStyleChanged: scheduleSave()
+  onOsdOverdriveChanged: scheduleSave()
+  onDockEnabledChanged: scheduleSave()
+  onDockAutoHideChanged: scheduleSave()
+  onDockPinnedAppsChanged: scheduleSave()
+  onDockPositionChanged: scheduleSave()
+  onDockGroupAppsChanged: scheduleSave()
+  onDockIconSizeChanged: scheduleSave()
+  onDesktopWidgetsEnabledChanged: scheduleSave()
+  onDesktopWidgetsGridSnapChanged: scheduleSave()
+  onDesktopWidgetsMonitorWidgetsChanged: scheduleSave()
+  onPowermenuCountdownChanged: scheduleSave()
+  onLockScreenCompactChanged: scheduleSave()
+  onLockScreenMediaControlsChanged: scheduleSave()
+  onLockScreenWeatherChanged: scheduleSave()
+  onLockScreenSessionButtonsChanged: scheduleSave()
+  onLockScreenCountdownChanged: scheduleSave()
+
   function load() {
     var raw = configFile.text();
     if (!raw) return;
+
+    _loading = true;
 
     try {
       var data = JSON.parse(raw);
@@ -138,11 +215,42 @@ QtObject {
       if (data.osd) {
         if (data.osd.duration !== undefined) osdDuration = data.osd.duration;
         if (data.osd.size !== undefined) osdSize = data.osd.size;
+        if (data.osd.position !== undefined) osdPosition = data.osd.position;
+        if (data.osd.style !== undefined) osdStyle = data.osd.style;
+        if (data.osd.overdrive !== undefined) osdOverdrive = data.osd.overdrive;
+      }
+
+      if (data.dock) {
+        if (data.dock.enabled !== undefined) dockEnabled = data.dock.enabled;
+        if (data.dock.autoHide !== undefined) dockAutoHide = data.dock.autoHide;
+        if (data.dock.pinnedApps !== undefined) dockPinnedApps = data.dock.pinnedApps;
+        if (data.dock.position !== undefined) dockPosition = data.dock.position;
+        if (data.dock.groupApps !== undefined) dockGroupApps = data.dock.groupApps;
+        if (data.dock.iconSize !== undefined) dockIconSize = data.dock.iconSize;
+      }
+
+      if (data.desktopWidgets) {
+        if (data.desktopWidgets.enabled !== undefined) desktopWidgetsEnabled = data.desktopWidgets.enabled;
+        if (data.desktopWidgets.gridSnap !== undefined) desktopWidgetsGridSnap = data.desktopWidgets.gridSnap;
+        if (data.desktopWidgets.monitorWidgets !== undefined) desktopWidgetsMonitorWidgets = data.desktopWidgets.monitorWidgets;
+      }
+
+      if (data.powerMenu) {
+        if (data.powerMenu.countdown !== undefined) powermenuCountdown = data.powerMenu.countdown;
+      }
+
+      if (data.lockScreen) {
+        if (data.lockScreen.compact !== undefined) lockScreenCompact = data.lockScreen.compact;
+        if (data.lockScreen.mediaControls !== undefined) lockScreenMediaControls = data.lockScreen.mediaControls;
+        if (data.lockScreen.weather !== undefined) lockScreenWeather = data.lockScreen.weather;
+        if (data.lockScreen.sessionButtons !== undefined) lockScreenSessionButtons = data.lockScreen.sessionButtons;
+        if (data.lockScreen.countdown !== undefined) lockScreenCountdown = data.lockScreen.countdown;
       }
     } catch (e) {
       console.error("Failed to load config: " + e);
     }
 
+    _loading = false;
     applyRuntimeSettings();
   }
 
@@ -189,7 +297,33 @@ QtObject {
       },
       "osd": {
         "duration": osdDuration,
-        "size": osdSize
+        "size": osdSize,
+        "position": osdPosition,
+        "style": osdStyle,
+        "overdrive": osdOverdrive
+      },
+      "dock": {
+        "enabled": dockEnabled,
+        "autoHide": dockAutoHide,
+        "pinnedApps": dockPinnedApps,
+        "position": dockPosition,
+        "groupApps": dockGroupApps,
+        "iconSize": dockIconSize
+      },
+      "desktopWidgets": {
+        "enabled": desktopWidgetsEnabled,
+        "gridSnap": desktopWidgetsGridSnap,
+        "monitorWidgets": desktopWidgetsMonitorWidgets
+      },
+      "powerMenu": {
+        "countdown": powermenuCountdown
+      },
+      "lockScreen": {
+        "compact": lockScreenCompact,
+        "mediaControls": lockScreenMediaControls,
+        "weather": lockScreenWeather,
+        "sessionButtons": lockScreenSessionButtons,
+        "countdown": lockScreenCountdown
       }
     };
 

@@ -112,7 +112,7 @@ PanelWindow {
   Rectangle {
     id: mainBox
     width: 780
-    height: 620
+    height: 700
     anchors.centerIn: parent
     color: Colors.bgGlass
     border.color: Colors.border
@@ -157,6 +157,10 @@ PanelWindow {
           TabBtn { label: "System"; icon: "󰒓"; tabId: "system" }
           TabBtn { label: "Appearance"; icon: "󰸉"; tabId: "appearance" }
           TabBtn { label: "Hyprland"; icon: "󱗼"; tabId: "layout" }
+          TabBtn { label: "OSD"; icon: "󰍡"; tabId: "osd" }
+          TabBtn { label: "Dock"; icon: "󰍜"; tabId: "dock" }
+          TabBtn { label: "Widgets"; icon: "󰖲"; tabId: "widgets" }
+          TabBtn { label: "Lock Screen"; icon: "󰌾"; tabId: "lockscreen" }
 
           Item { Layout.fillHeight: true }
 
@@ -201,7 +205,14 @@ PanelWindow {
           spacing: 24
 
           Text {
-            text: activeTab === "system" ? "Shell Behavior" : (activeTab === "appearance" ? "UI Appearance" : "Hyprland Layout")
+            text: activeTab === "system" ? "Shell Behavior"
+                  : activeTab === "appearance" ? "UI Appearance"
+                  : activeTab === "layout" ? "Hyprland Layout"
+                  : activeTab === "osd" ? "On-Screen Display"
+                  : activeTab === "dock" ? "Dock"
+                  : activeTab === "widgets" ? "Desktop Widgets"
+                  : activeTab === "lockscreen" ? "Lock Screen"
+                  : "Settings"
             color: Colors.fgMain
             font.pixelSize: 26
             font.weight: Font.Bold
@@ -282,17 +293,6 @@ PanelWindow {
               onMoved: (v) => Config.controlCenterWidth = v
             }
 
-            SectionLabel { text: "Feedback" }
-
-            ConfigSlider {
-              label: "OSD Duration"
-              min: 1000
-              max: 5000
-              step: 250
-              value: Config.osdDuration
-              unit: "ms"
-              onMoved: (v) => Config.osdDuration = v
-            }
           }
 
           ColumnLayout {
@@ -313,15 +313,6 @@ PanelWindow {
               Switch { checked: Config.barFloating; onToggled: Config.barFloating = !Config.barFloating }
             }
 
-            SectionLabel { text: "OSD" }
-
-            ConfigSlider {
-              label: "OSD Size"
-              min: 140
-              max: 260
-              value: Config.osdSize
-              onMoved: (v) => Config.osdSize = v
-            }
           }
 
           ColumnLayout {
@@ -372,6 +363,183 @@ PanelWindow {
               }
             }
           }
+
+          // OSD tab
+          ColumnLayout {
+            visible: activeTab === "osd"
+            spacing: 20
+            Layout.fillWidth: true
+
+            SectionLabel { text: "POSITION" }
+
+            ModeSelector {
+              label: "Screen Position"
+              currentValue: Config.osdPosition
+              options: [
+                { value: "top_left", label: "Top Left" },
+                { value: "top", label: "Top" },
+                { value: "top_right", label: "Top Right" },
+                { value: "left", label: "Left" },
+                { value: "center", label: "Center" },
+                { value: "right", label: "Right" },
+                { value: "bottom_left", label: "Bottom Left" },
+                { value: "bottom", label: "Bottom" },
+                { value: "bottom_right", label: "Bottom Right" }
+              ]
+              onSelected: (v) => Config.osdPosition = v
+            }
+
+            SectionLabel { text: "STYLE" }
+
+            ModeSelector {
+              label: "Display Style"
+              currentValue: Config.osdStyle
+              options: [
+                { value: "circular", label: "Circular" },
+                { value: "pill", label: "Pill" }
+              ]
+              onSelected: (v) => Config.osdStyle = v
+            }
+
+            GridLayout {
+              columns: 2
+              columnSpacing: 16
+              rowSpacing: 16
+              Layout.fillWidth: true
+
+              ToggleCard { label: "Volume Overdrive"; icon: "󰝝"; configKey: "osdOverdrive" }
+            }
+
+            SectionLabel { text: "TIMING & SIZE" }
+
+            ConfigSlider {
+              label: "OSD Duration"
+              min: 1000
+              max: 5000
+              step: 250
+              value: Config.osdDuration
+              unit: "ms"
+              onMoved: (v) => Config.osdDuration = v
+            }
+
+            ConfigSlider {
+              label: "OSD Size"
+              min: 140
+              max: 260
+              value: Config.osdSize
+              onMoved: (v) => Config.osdSize = v
+            }
+          }
+
+          // Dock tab
+          ColumnLayout {
+            visible: activeTab === "dock"
+            spacing: 20
+            Layout.fillWidth: true
+
+            GridLayout {
+              columns: 2
+              columnSpacing: 16
+              rowSpacing: 16
+              Layout.fillWidth: true
+
+              ToggleCard { label: "Dock Enabled"; icon: "󰍜"; configKey: "dockEnabled" }
+              ToggleCard { label: "Auto Hide"; icon: "󰘊"; configKey: "dockAutoHide" }
+              ToggleCard { label: "Group Windows"; icon: "󰖲"; configKey: "dockGroupApps" }
+            }
+
+            SectionLabel { text: "POSITION" }
+
+            ModeSelector {
+              label: "Dock Position"
+              currentValue: Config.dockPosition
+              options: [
+                { value: "top", label: "Top" },
+                { value: "bottom", label: "Bottom" }
+              ]
+              onSelected: (v) => Config.dockPosition = v
+            }
+
+            ConfigSlider {
+              label: "Icon Size"
+              min: 24
+              max: 56
+              value: Config.dockIconSize
+              onMoved: (v) => Config.dockIconSize = v
+            }
+          }
+
+          // Widgets tab
+          ColumnLayout {
+            visible: activeTab === "widgets"
+            spacing: 20
+            Layout.fillWidth: true
+
+            GridLayout {
+              columns: 2
+              columnSpacing: 16
+              rowSpacing: 16
+              Layout.fillWidth: true
+
+              ToggleCard { label: "Desktop Widgets"; icon: "󰖲"; configKey: "desktopWidgetsEnabled" }
+              ToggleCard { label: "Grid Snap"; icon: "󰕰"; configKey: "desktopWidgetsGridSnap" }
+            }
+
+            Rectangle {
+              Layout.fillWidth: true
+              height: 42
+              radius: 10
+              color: editWidgetsHover.containsMouse ? Qt.darker(Colors.primary, 1.1) : Colors.surface
+              border.color: Colors.primary
+              border.width: 1
+
+              RowLayout {
+                anchors.centerIn: parent
+                spacing: 8
+                Text { text: "󰏫"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 14 }
+                Text { text: "Edit Widgets"; color: Colors.fgMain; font.weight: Font.Bold; font.pixelSize: 12 }
+              }
+
+              MouseArea {
+                id: editWidgetsHover
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: {
+                  DesktopWidgetRegistry.editMode = true;
+                  settingsRoot.close();
+                }
+              }
+            }
+          }
+
+          // Lock Screen tab
+          ColumnLayout {
+            visible: activeTab === "lockscreen"
+            spacing: 20
+            Layout.fillWidth: true
+
+            GridLayout {
+              columns: 2
+              columnSpacing: 16
+              rowSpacing: 16
+              Layout.fillWidth: true
+
+              ToggleCard { label: "Compact Mode"; icon: "󰘖"; configKey: "lockScreenCompact" }
+              ToggleCard { label: "Media Controls"; icon: "󰝚"; configKey: "lockScreenMediaControls" }
+              ToggleCard { label: "Weather"; icon: "󰖙"; configKey: "lockScreenWeather" }
+              ToggleCard { label: "Session Buttons"; icon: "󰐥"; configKey: "lockScreenSessionButtons" }
+            }
+
+            ConfigSlider {
+              label: "Lock Countdown"
+              min: 1000
+              max: 10000
+              step: 500
+              value: Config.lockScreenCountdown
+              unit: "ms"
+              onMoved: (v) => Config.lockScreenCountdown = v
+            }
+          }
         }
       }
     }
@@ -391,7 +559,7 @@ PanelWindow {
       Layout.fillWidth: true
       height: 44
       radius: 10
-      color: activeTab === tabId ? Colors.highlight : "transparent"
+      color: activeTab === tabId ? Colors.highlight : (tabMouse.containsMouse ? Colors.highlightLight : "transparent")
 
       RowLayout {
         anchors.fill: parent
@@ -412,10 +580,9 @@ PanelWindow {
       }
 
       MouseArea {
+        id: tabMouse
         anchors.fill: parent
         hoverEnabled: true
-        onEntered: if (activeTab !== tabId) parent.color = Colors.highlightLight
-        onExited: if (activeTab !== tabId) parent.color = "transparent"
         onClicked: activeTab = tabId
       }
     }
@@ -480,7 +647,7 @@ PanelWindow {
         width: 14
         height: 14
         radius: 7
-        color: "white"
+        color: Colors.text
         anchors.verticalCenter: parent.verticalCenter
         x: checked ? parent.width - width - 3 : 3
         Behavior on x { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }

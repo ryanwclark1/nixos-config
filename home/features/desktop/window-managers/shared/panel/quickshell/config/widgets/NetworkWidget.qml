@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell.Io
 import "../services"
+import "." as Widgets
 
 Row {
   id: root
@@ -48,36 +49,28 @@ Row {
     return parts.join(" • ");
   }
 
-  Process {
-    id: networkProc
+  Widgets.CommandPoll {
+    id: networkPoll
+    interval: 5000
+    running: root.visible
     command: ["qs-network"]
-    running: true
-    stdout: StdioCollector {
-      onStreamFinished: {
-        try {
-          var parsed = JSON.parse(this.text.trim())
-          if (parsed.icon) networkIcon = parsed.icon
-          if (parsed.name) networkName = parsed.name
-          if (parsed.status) networkStatus = parsed.status
-          networkType = parsed.type || ""
-          deviceName = parsed.device || ""
-          signalStrength = parsed.signal || ""
-          linkSpeed = parsed.linkSpeed || ""
-          connectivity = parsed.connectivity || "unknown"
-          security = parsed.security || ""
-          vpnCount = parsed.vpnCount || 0
-          tailscaleStatus = parsed.tailscaleStatus || "Offline"
-          secondaryText = parsed.secondaryText || ""
-        } catch(e) {}
-      }
+    parse: function(out) { try { return JSON.parse(String(out || "").trim()) } catch(e) { return null } }
+    onUpdated: {
+      var p = networkPoll.value;
+      if (!p) return;
+      if (p.icon) networkIcon = p.icon;
+      if (p.name) networkName = p.name;
+      if (p.status) networkStatus = p.status;
+      networkType = p.type || "";
+      deviceName = p.device || "";
+      signalStrength = p.signal || "";
+      linkSpeed = p.linkSpeed || "";
+      connectivity = p.connectivity || "unknown";
+      security = p.security || "";
+      vpnCount = p.vpnCount || 0;
+      tailscaleStatus = p.tailscaleStatus || "Offline";
+      secondaryText = p.secondaryText || "";
     }
-  }
-
-  Timer {
-    interval: 5000 // 5 seconds
-    running: true
-    repeat: true
-    onTriggered: networkProc.running = true
   }
 
   Text {
@@ -125,8 +118,8 @@ Row {
     Rectangle {
       visible: root.hasVpn
       radius: 8
-      color: Qt.rgba(Colors.accent.r, Colors.accent.g, Colors.accent.b, 0.14)
-      border.color: Qt.rgba(Colors.accent.r, Colors.accent.g, Colors.accent.b, 0.35)
+      color: Colors.withAlpha(Colors.accent, 0.14)
+      border.color: Colors.withAlpha(Colors.accent, 0.35)
       border.width: 1
       implicitHeight: 18
       implicitWidth: vpnLabel.implicitWidth + 10
@@ -145,8 +138,8 @@ Row {
     Rectangle {
       visible: root.tailscaleActive
       radius: 8
-      color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.14)
-      border.color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.35)
+      color: Colors.withAlpha(Colors.primary, 0.14)
+      border.color: Colors.withAlpha(Colors.primary, 0.35)
       border.width: 1
       implicitHeight: 18
       implicitWidth: tsLabel.implicitWidth + 10
