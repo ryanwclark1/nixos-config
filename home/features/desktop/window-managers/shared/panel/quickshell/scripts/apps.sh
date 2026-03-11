@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # apps.sh - List all installed applications from .desktop files with icon resolution
 
 dirs=(

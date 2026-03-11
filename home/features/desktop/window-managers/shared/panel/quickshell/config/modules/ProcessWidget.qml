@@ -70,7 +70,7 @@ Rectangle {
               Text { anchors.centerIn: parent; text: "󰅖"; color: killHover.containsMouse ? Colors.text : Colors.textDisabled; font.pixelSize: 10 }
               MouseArea {
                 id: killHover; anchors.fill: parent; hoverEnabled: true
-                onClicked: Quickshell.execDetached(["pkill", "-9", modelData.name])
+                onClicked: Quickshell.execDetached(["pkill", modelData.name])
               }
             }
           }

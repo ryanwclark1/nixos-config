@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 
 FLAKE_PATH="${FLAKE:-$HOME/nixos-config}"
 HOSTNAME="${HOSTNAME:-$(hostname)}"

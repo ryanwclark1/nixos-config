@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # emojis.sh - Provide a list of emojis for the launcher
 
 # A condensed list of common emojis (can be expanded)

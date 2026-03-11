@@ -19,6 +19,13 @@ QtObject {
 
   property int pollIntervalMs: 2000
 
+  // Subscriber-based polling: only runs when at least one consumer is active.
+  // Consumers should increment on visible and decrement on hidden.
+  property int subscriberCount: 0
+
+  function subscribe() { subscriberCount++; }
+  function unsubscribe() { subscriberCount = Math.max(0, subscriberCount - 1); }
+
   function formatTemp(rawValue) {
     var parsed = parseFloat(rawValue);
     return isNaN(parsed) ? "--" : Math.round(parsed) + "°C";
@@ -31,7 +38,10 @@ QtObject {
       "cpu_temp=$(sensors 2>/dev/null | awk '/Tctl:/ {gsub(/[+°C]/, \"\", $2); print $2; exit}'); "
       + "gpu_temp=$(sensors 2>/dev/null | awk '/edge:/ {gsub(/[+°C]/, \"\", $2); print $2; exit}'); "
       + "cpu_usage=$(top -bn1 | awk '/Cpu\\\\(s\\\\):/ {printf \"%d\", 100 - $8}'); "
-      + "gpu_usage=$(cat /sys/class/drm/card0/device/gpu_busy_percent 2>/dev/null || echo 0); "
+      + "gpu_card=$(for c in /sys/class/drm/card[0-9]*/device/mem_info_vram_total; do "
+      + "echo \"$(cat \"$c\" 2>/dev/null || echo 0) $(dirname \"$(dirname \"$c\")\")\" ; done 2>/dev/null "
+      + "| sort -rn | head -1 | awk '{print $2}'); "
+      + "gpu_usage=$(cat \"$gpu_card/device/gpu_busy_percent\" 2>/dev/null || echo 0); "
       + "ram_usage=$(free -h | awk '/^Mem:/ {print $3}' | sed 's/Gi/GB/;s/Mi/MB/'); "
       + "ram_pct=$(free | awk '/^Mem:/ {printf \"%.4f\", $3/$2}'); "
       + "brightness_curr=$(brightnessctl g 2>/dev/null || echo 0); "
@@ -76,7 +86,7 @@ QtObject {
 
   property Timer refreshTimer: Timer {
     interval: root.pollIntervalMs
-    running: true
+    running: root.subscriberCount > 0
     repeat: true
     onTriggered: statsProc.running = true
   }

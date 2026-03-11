@@ -88,8 +88,8 @@ PanelWindow {
   }
 
   Timer {
-    interval: 1000
-    running: root.visible
+    interval: 3000
+    running: root.showContent
     repeat: true
     onTriggered: root.refreshAudioState()
   }

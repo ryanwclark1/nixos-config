@@ -53,8 +53,15 @@ Row {
         onClicked: (mouse) => {
           if (mouse.button === Qt.RightButton) {
             if (modelData.hasMenu) {
-              var pos = trayItem.mapToItem(null, 0, trayItem.height);
-              modelData.display(root.Window.window, Math.round(pos.x), Math.round(pos.y));
+              try {
+                var win = root.Window.window;
+                if (win) {
+                  var pos = trayItem.mapToItem(null, 0, trayItem.height);
+                  modelData.display(win, Math.round(pos.x), Math.round(pos.y));
+                }
+              } catch (e) {
+                console.warn("TrayWidget: failed to display menu:", e);
+              }
             } else if (modelData.secondaryActivate) {
               modelData.secondaryActivate();
             }

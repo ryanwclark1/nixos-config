@@ -17,6 +17,8 @@ Rectangle {
   
   property real lastRx: 0
   property real lastTx: 0
+  property real maxDown: 1048576  // 1 MB/s floor
+  property real maxUp: 1048576    // 1 MB/s floor
   property string activeInterface: "offline"
   property string currentDown: "0 KB/s"
   property string currentUp: "0 KB/s"
@@ -54,15 +56,21 @@ Rectangle {
           root.currentDown = formatSpeed(diffRx);
           root.currentUp = formatSpeed(diffTx);
 
-          // Normalize for graph (cap at 10MB/s for scale)
+          // Adaptive scaling: grow instantly, decay slowly
+          if (diffRx > root.maxDown) root.maxDown = diffRx;
+          else root.maxDown = Math.max(1048576, root.maxDown * 0.995);
+
+          if (diffTx > root.maxUp) root.maxUp = diffTx;
+          else root.maxUp = Math.max(1048576, root.maxUp * 0.995);
+
           var dHist = root.downHistory;
           dHist.shift();
-          dHist.push(Math.min(1.0, diffRx / 10485760));
+          dHist.push(Math.min(1.0, diffRx / root.maxDown));
           root.downHistory = dHist;
 
           var uHist = root.upHistory;
           uHist.shift();
-          uHist.push(Math.min(1.0, diffTx / 10485760));
+          uHist.push(Math.min(1.0, diffTx / root.maxUp));
           root.upHistory = uHist;
 
           downCanvas.requestPaint();

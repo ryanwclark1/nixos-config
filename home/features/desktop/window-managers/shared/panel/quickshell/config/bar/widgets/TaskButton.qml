@@ -29,11 +29,14 @@ Rectangle {
     "ghostty": ["com.mitchellh.ghostty"]
   })
   
+  signal pinToggled(var app)
+
   // Find running instance if it's a pinned app
   property var runningInstance: {
     if (!isPinned) return null;
     for (var i = 0; i < Hyprland.toplevels.count; i++) {
       var t = Hyprland.toplevels.get(i);
+      if (!t) continue;
       if (t.class === appClass) return t;
     }
     return null;
@@ -114,7 +117,7 @@ Rectangle {
           Quickshell.execDetached(["sh", "-c", appExec]);
         }
       } else if (mouse.button === Qt.RightButton) {
-        root.togglePin({ class: appClass, title: appName, exec: appExec });
+        taskItem.pinToggled({ class: appClass, title: appName, exec: appExec });
       }
     }
   }

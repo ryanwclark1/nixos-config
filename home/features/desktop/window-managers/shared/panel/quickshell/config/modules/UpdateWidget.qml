@@ -16,34 +16,43 @@ Rectangle {
   property string flatpakUpdates: "0"
   property bool isChecking: false
 
+  readonly property string cacheDir: Quickshell.env("XDG_CACHE_HOME") !== ""
+    ? Quickshell.env("XDG_CACHE_HOME") + "/quickshell/updates"
+    : Quickshell.env("HOME") + "/.cache/quickshell/updates"
+
   Process {
-    id: nixProc
-    command: ["sh", "-c", "nix flake check --no-build 2>/dev/null && echo 'Ready' || echo '0'"]
+    id: readCache
+    command: ["sh", "-c",
+      "nix=$(cat '" + root.cacheDir + "/nixos' 2>/dev/null || echo 0); "
+      + "fpk=$(cat '" + root.cacheDir + "/flatpak' 2>/dev/null || echo 0); "
+      + "printf '%s\\n%s\\n' \"$nix\" \"$fpk\""
+    ]
     stdout: StdioCollector {
       onStreamFinished: {
-        root.nixUpdates = this.text.trim() || "0";
+        var lines = (this.text || "").trim().split("\n");
+        root.nixUpdates = (lines[0] || "0").trim();
+        root.flatpakUpdates = (lines.length >= 2 ? lines[1] : "0").trim();
+        root.isChecking = false;
       }
     }
   }
 
   Process {
-    id: fpProc
-    command: ["sh", "-c", "flatpak update --appstream >/dev/null 2>&1 && flatpak remote-ls --updates | wc -l"]
+    id: refreshProc
+    command: ["qs-updator"]
     stdout: StdioCollector {
       onStreamFinished: {
-        root.flatpakUpdates = this.text.trim() || "0";
-        root.isChecking = false;
+        readCache.running = true;
       }
     }
   }
 
   function checkUpdates() {
     isChecking = true;
-    nixProc.running = true;
-    fpProc.running = true;
+    refreshProc.running = true;
   }
 
-  Component.onCompleted: checkUpdates()
+  Component.onCompleted: readCache.running = true
 
   RowLayout {
     anchors.fill: parent
@@ -71,7 +80,7 @@ Rectangle {
         spacing: 12; Layout.fillWidth: true
         RowLayout {
           spacing: 4
-          Text { text: ""; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 12 }
+          Text { text: ""; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 12 }
           Text {
             text: root.nixUpdates
             color: Colors.fgSecondary

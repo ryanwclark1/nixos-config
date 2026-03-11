@@ -18,13 +18,25 @@ PopupWindow {
   property bool ready: false
 
   anchor.window: anchorWindow
-  anchor.rect.x: anchorItem ? anchorItem.mapToItem(null, 0, 0).x + (anchorItem.width - width) / 2 : 0
-  anchor.rect.y: anchorItem ? anchorItem.mapToItem(null, 0, 0).y + anchorItem.height + yOffset : 0
+  anchor.rect.x: {
+    if (!anchorItem) return 0;
+    try { return anchorItem.mapToItem(null, 0, 0).x + (anchorItem.width - implicitWidth) / 2; }
+    catch (e) { return 0; }
+  }
+  anchor.rect.y: {
+    if (!anchorItem) return 0;
+    try { return anchorItem.mapToItem(null, 0, 0).y + anchorItem.height + yOffset; }
+    catch (e) { return 0; }
+  }
 
-  width: tooltipBody.width
-  height: tooltipBody.height
+  implicitWidth: tooltipBody.width
+  implicitHeight: tooltipBody.height
   visible: ready && hasText && !!anchorItem
   color: "transparent"
+
+  // Empty input mask: all mouse events pass through the tooltip surface
+  // to the underlying widgets, preventing hover/click interception
+  mask: Region { width: 0; height: 0 }
 
   onHoveredChanged: {
     if (hovered && hasText) {
@@ -51,20 +63,6 @@ PopupWindow {
     interval: root.delay
     repeat: false
     onTriggered: root.ready = root.hovered && root.hasText
-  }
-
-  // Safety timer: ensures tooltip hides when hover ends,
-  // even if the popup surface interferes with MouseArea events
-  Timer {
-    id: hideTimer
-    interval: 150
-    running: root.visible
-    repeat: true
-    onTriggered: {
-      if (!root.hovered) {
-        root.ready = false;
-      }
-    }
   }
 
   Rectangle {

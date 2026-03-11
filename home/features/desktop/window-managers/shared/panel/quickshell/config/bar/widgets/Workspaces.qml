@@ -2,7 +2,6 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import "../../services"
-import "../../widgets" as SharedWidgets
 
 Rectangle {
   id: root
@@ -27,6 +26,15 @@ Rectangle {
     }
   }
 
+  // rootMouse must be declared before wsRow so it sits behind
+  // the workspace items in z-order and doesn't intercept events
+  MouseArea {
+    id: rootMouse
+    anchors.fill: parent
+    hoverEnabled: true
+    acceptedButtons: Qt.NoButton
+  }
+
   Row {
     id: wsRow
     spacing: 8
@@ -44,15 +52,15 @@ Rectangle {
           id: wsButton
           anchors.centerIn: parent
 
-          // Dynamic width for active workspace
-          width: modelData.active ? 20 : 8
+          // focused = on the currently focused monitor
+          // active = visible on any monitor (secondary highlight)
+          width: modelData.focused ? 20 : (modelData.active ? 14 : 8)
           height: 8
           radius: 4
 
-          color: modelData.active ? Colors.primary : (modelData.hasFullscreen ? Colors.accent : (modelData.urgent ? Colors.error : Colors.fgDim))
-          opacity: modelData.active ? 1.0 : 0.6
+          color: modelData.focused ? Colors.primary : (modelData.active ? Colors.accent : (modelData.urgent ? Colors.error : Colors.fgDim))
+          opacity: modelData.focused ? 1.0 : (modelData.active ? 0.8 : 0.6)
 
-          // Smooth width transition
           Behavior on width { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
           Behavior on color { ColorAnimation { duration: 200 } }
         }
@@ -73,24 +81,7 @@ Rectangle {
             }
           }
         }
-
-        SharedWidgets.BarTooltip {
-          anchorItem: wsContainer
-          anchorWindow: root.anchorWindow
-          hovered: wsMouse.containsMouse
-          text: (modelData.name ? "Workspace " + modelData.name : "Workspace " + modelData.id) + (modelData.urgent ? " (urgent)" : "")
-          yOffset: 10
-        }
       }
     }
   }
-
-  MouseArea {
-    id: rootMouse
-    anchors.fill: parent
-    hoverEnabled: true
-    acceptedButtons: Qt.NoButton
-    propagateComposedEvents: true
-  }
-
 }

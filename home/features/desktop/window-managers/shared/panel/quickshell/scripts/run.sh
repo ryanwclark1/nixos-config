@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # run.sh - List all executable commands in PATH
 
 IFS=':' read -ra DIRS <<< "$PATH"

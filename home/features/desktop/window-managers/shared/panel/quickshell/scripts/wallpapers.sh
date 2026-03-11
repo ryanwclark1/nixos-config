@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # wallpapers.sh - List all wallpapers in the wallpapers directory
 
 WALLPAPER_DIR="$HOME/Pictures/wallpapers"

@@ -1,5 +1,7 @@
 import Quickshell // SystemClock
 import Quickshell.Wayland
+import Quickshell.Services.Mpris
+import Quickshell.Io
 import QtQuick
 import "."
 import "widgets"
@@ -15,10 +17,42 @@ Item {
   property var anchorWindow: null
   readonly property real networkTriggerBottomY: networkTrigger.mapToItem(root, 0, networkTrigger.height).y
   readonly property real audioTriggerBottomY: audioTrigger.mapToItem(root, 0, audioTrigger.height).y
+  readonly property real musicTriggerBottomY: musicTrigger.visible ? musicTrigger.mapToItem(root, 0, musicTrigger.height).y : audioTriggerBottomY
+  readonly property real recordingTriggerBottomY: recordingTrigger.visible ? recordingTrigger.mapToItem(root, 0, recordingTrigger.height).y : audioTriggerBottomY
+  readonly property real batteryTriggerBottomY: batteryTrigger.visible ? batteryTrigger.mapToItem(root, 0, batteryTrigger.height).y : audioTriggerBottomY
+  readonly property real clipboardTriggerBottomY: clipboardTrigger.mapToItem(root, 0, clipboardTrigger.height).y
   signal notifClicked()
   signal networkClicked()
   signal audioClicked()
   signal commandClicked()
+  signal musicClicked()
+  signal recordingClicked()
+  signal batteryClicked()
+  signal clipboardClicked()
+
+  // Recording detection
+  property bool isRecording: false
+  Process {
+    id: recDetect
+    command: ["sh", "-c", "pgrep -x wl-screenrec || pgrep -x wf-recorder || pgrep -f '^gpu-screen-recorder'"]
+    running: false
+    stdout: StdioCollector {
+      onStreamFinished: root.isRecording = (this.text || "").trim().length > 0
+    }
+  }
+  Timer { interval: 2000; running: true; repeat: true; onTriggered: { if (!recDetect.running) recDetect.running = true; } }
+  Component.onCompleted: recDetect.running = true
+
+  // Active MPRIS players
+  readonly property var activeMprisPlayers: {
+    var players = [];
+    for (var i = 0; i < Mpris.players.length; i++) {
+      var p = Mpris.players[i];
+      if (p.playbackState !== Mpris.Stopped) players.push(p);
+    }
+    return players;
+  }
+  readonly property bool hasActivePlayer: activeMprisPlayers.length > 0
 
   implicitHeight: Config.barHeight
 
@@ -78,8 +112,8 @@ Item {
       hoverEnabled: true
       onClicked: root.networkClicked()
 
-      scale: containsMouse ? 1.05 : 1.0
-      Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+      scale: containsMouse ? 1.04 : 1.0
+      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
 
       Rectangle {
         id: networkBg
@@ -113,8 +147,8 @@ Item {
       hoverEnabled: true
       onClicked: root.audioClicked()
 
-      scale: containsMouse ? 1.05 : 1.0
-      Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+      scale: containsMouse ? 1.04 : 1.0
+      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
 
       Rectangle {
         id: audioBg
@@ -141,47 +175,187 @@ Item {
       }
     }
 
+    // Music trigger — only visible when an MPRIS player is active
     MouseArea {
-      id: commandTrigger
+      id: musicTrigger
       height: 28
-      width: commandRow.width + 16
+      width: musicRow.width + 16
       hoverEnabled: true
-      onClicked: root.commandClicked()
+      visible: root.hasActivePlayer
+      onClicked: root.musicClicked()
 
-      scale: containsMouse ? 1.05 : 1.0
-      Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+      scale: containsMouse ? 1.04 : 1.0
+      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+      Behavior on width { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
 
       Rectangle {
-        id: commandBg
         anchors.fill: parent
-        color: commandTrigger.containsMouse ? Colors.highlightLight : Colors.bgWidget
+        color: musicTrigger.containsMouse ? Colors.highlightLight : Colors.bgWidget
         radius: height / 2
         Behavior on color { ColorAnimation { duration: 160 } }
       }
 
       Row {
-        id: commandRow
+        id: musicRow
         anchors.centerIn: parent
-        spacing: 8
+        spacing: 6
 
-        SharedWidgets.BatteryWidget {
-          id: batteryWidget
+        Text {
+          text: "󰝚"
+          color: Colors.primary
+          font.family: Colors.fontMono
+          font.pixelSize: 14
+          anchors.verticalCenter: parent.verticalCenter
+        }
+
+        Item {
+          width: Math.min(musicTitleText.contentWidth, 100)
+          height: 20
+          clip: true
+          anchors.verticalCenter: parent.verticalCenter
+
+          Text {
+            id: musicTitleText
+            text: root.activeMprisPlayers.length > 0 ? (root.activeMprisPlayers[0].trackTitle || "") : ""
+            color: Colors.fgMain
+            font.pixelSize: 11
+            font.weight: Font.Medium
+            anchors.verticalCenter: parent.verticalCenter
+          }
+        }
+      }
+
+      SharedWidgets.BarTooltip {
+        anchorItem: musicTrigger
+        anchorWindow: root.anchorWindow
+        hovered: musicTrigger.containsMouse
+        text: root.activeMprisPlayers.length > 0
+          ? (root.activeMprisPlayers[0].trackTitle || "Music") + (root.activeMprisPlayers[0].trackArtist ? " - " + root.activeMprisPlayers[0].trackArtist : "")
+          : "Music controls"
+      }
+    }
+
+    // Recording trigger — only visible when recording is in progress
+    MouseArea {
+      id: recordingTrigger
+      height: 28
+      width: recRow.width + 16
+      hoverEnabled: true
+      visible: root.isRecording
+      onClicked: root.recordingClicked()
+
+      scale: containsMouse ? 1.04 : 1.0
+      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+
+      Rectangle {
+        anchors.fill: parent
+        color: recordingTrigger.containsMouse ? Colors.withAlpha(Colors.error, 0.25) : Colors.withAlpha(Colors.error, 0.15)
+        radius: height / 2
+        Behavior on color { ColorAnimation { duration: 160 } }
+      }
+
+      Row {
+        id: recRow
+        anchors.centerIn: parent
+        spacing: 6
+
+        Rectangle {
+          width: 8; height: 8; radius: 4
+          color: Colors.error
+          anchors.verticalCenter: parent.verticalCenter
+          SequentialAnimation on opacity {
+            running: root.isRecording
+            loops: Animation.Infinite
+            NumberAnimation { from: 1.0; to: 0.3; duration: 600 }
+            NumberAnimation { from: 0.3; to: 1.0; duration: 600 }
+          }
         }
 
         Text {
-          color: Colors.fgMain
-          font.pixelSize: 16
-          font.family: Colors.fontMono
-          text: "󰒓"
+          text: "REC"
+          color: Colors.error
+          font.pixelSize: 10
+          font.weight: Font.Bold
           anchors.verticalCenter: parent.verticalCenter
         }
       }
 
       SharedWidgets.BarTooltip {
-        anchorItem: commandTrigger
+        anchorItem: recordingTrigger
         anchorWindow: root.anchorWindow
-        hovered: commandTrigger.containsMouse
-        text: batteryWidget.visible ? (batteryWidget.tooltipText + " • System controls") : "System controls"
+        hovered: recordingTrigger.containsMouse
+        text: "Screen recording in progress"
+      }
+    }
+
+    // Battery trigger — only visible when battery is present
+    MouseArea {
+      id: batteryTrigger
+      height: 28
+      width: batteryRow.width + 16
+      hoverEnabled: true
+      visible: batteryWidget.showBattery
+      onClicked: root.batteryClicked()
+
+      scale: containsMouse ? 1.04 : 1.0
+      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+
+      Rectangle {
+        anchors.fill: parent
+        color: batteryTrigger.containsMouse ? Colors.highlightLight : Colors.bgWidget
+        radius: height / 2
+        Behavior on color { ColorAnimation { duration: 160 } }
+      }
+
+      Row {
+        id: batteryRow
+        anchors.centerIn: parent
+        spacing: 4
+
+        SharedWidgets.BatteryWidget {
+          id: batteryWidget
+        }
+      }
+
+      SharedWidgets.BarTooltip {
+        anchorItem: batteryTrigger
+        anchorWindow: root.anchorWindow
+        hovered: batteryTrigger.containsMouse
+        text: batteryWidget.tooltipText
+      }
+    }
+
+    // Settings trigger — opens ControlCenter
+    MouseArea {
+      id: settingsTrigger
+      width: 32
+      height: 28
+      hoverEnabled: true
+      onClicked: root.commandClicked()
+
+      scale: containsMouse ? 1.04 : 1.0
+      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+
+      Rectangle {
+        anchors.fill: parent
+        color: settingsTrigger.containsMouse ? Colors.highlightLight : Colors.bgWidget
+        radius: height / 2
+        Behavior on color { ColorAnimation { duration: 160 } }
+      }
+
+      Text {
+        anchors.centerIn: parent
+        color: Colors.fgMain
+        font.pixelSize: 16
+        font.family: Colors.fontMono
+        text: "󰒓"
+      }
+
+      SharedWidgets.BarTooltip {
+        anchorItem: settingsTrigger
+        anchorWindow: root.anchorWindow
+        hovered: settingsTrigger.containsMouse
+        text: "System controls"
       }
     }
 
@@ -192,8 +366,8 @@ Item {
       color: clockMouse.containsMouse ? Colors.highlightLight : Colors.bgWidget
       anchors.verticalCenter: parent.verticalCenter
       
-      scale: clockMouse.containsMouse ? 1.05 : 1.0
-      Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+      scale: clockMouse.containsMouse ? 1.04 : 1.0
+      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
       Behavior on color { ColorAnimation { duration: 160 } }
 
       Text {
@@ -202,7 +376,7 @@ Item {
         color: Colors.fgMain
         font.pixelSize: 14
         font.weight: Font.Bold
-        text: Qt.formatDateTime(clock.date, "HH:mm")
+        text: String(clock.hours).padStart(2, '0') + ":" + String(clock.minutes).padStart(2, '0')
       }
       
       MouseArea {
@@ -224,24 +398,63 @@ Item {
       anchorWindow: root.anchorWindow
     }
 
+    // Clipboard trigger
+    MouseArea {
+      id: clipboardTrigger
+      width: 32
+      height: 28
+      hoverEnabled: true
+      onClicked: root.clipboardClicked()
+
+      scale: containsMouse ? 1.04 : 1.0
+      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+
+      Rectangle {
+        anchors.fill: parent
+        color: clipboardTrigger.containsMouse ? Colors.highlightLight : Colors.bgWidget
+        radius: height / 2
+        Behavior on color { ColorAnimation { duration: 160 } }
+      }
+
+      Text {
+        anchors.centerIn: parent
+        text: "󰅍"
+        color: Colors.fgMain
+        font.family: Colors.fontMono
+        font.pixelSize: 16
+      }
+
+      SharedWidgets.BarTooltip {
+        anchorItem: clipboardTrigger
+        anchorWindow: root.anchorWindow
+        hovered: clipboardTrigger.containsMouse
+        text: "Clipboard history"
+      }
+    }
+
     Rectangle {
+      id: notifBg
       width: 32
       height: 28
       color: notifMouse.containsMouse ? Colors.highlightLight : Colors.bgWidget
       radius: height / 2
       anchors.verticalCenter: parent.verticalCenter
-      
-      scale: notifMouse.containsMouse ? 1.1 : 1.0
-      Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+
+      scale: notifMouse.containsMouse ? 1.06 : 1.0
+      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+      Behavior on color { ColorAnimation { duration: 160 } }
+
+      readonly property bool hasDnd: !!(root.manager && root.manager.dndEnabled)
+      readonly property bool hasUnread: !!(root.manager && root.manager.notifications && root.manager.notifications.count > 0)
 
       Text {
         anchors.centerIn: parent
         color: Colors.fgMain
         font.pixelSize: 16
         font.family: Colors.fontMono
-        text: root.manager && root.manager.dndEnabled ? "󰂛" : "󰂚"
+        text: notifBg.hasDnd ? "󰂛" : "󰂚"
       }
-      
+
       // Unread badge
       Rectangle {
         width: 8
@@ -250,7 +463,7 @@ Item {
         color: Colors.error
         anchors.top: parent.top
         anchors.right: parent.right
-        visible: root.manager && root.manager.notifications && root.manager.notifications.count > 0 && !(root.manager && root.manager.dndEnabled)
+        visible: notifBg.hasUnread && !notifBg.hasDnd
       }
 
       MouseArea {
@@ -259,8 +472,6 @@ Item {
         hoverEnabled: true
         onClicked: root.notifClicked()
       }
-
-      Behavior on color { ColorAnimation { duration: 160 } }
 
       SharedWidgets.BarTooltip {
         anchorItem: parent

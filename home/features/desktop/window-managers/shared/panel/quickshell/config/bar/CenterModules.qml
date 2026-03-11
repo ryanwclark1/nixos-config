@@ -37,14 +37,16 @@ Item {
             var parsed = JSON.parse(this.text.trim())
             if (parsed.icon) parent.updatesIcon = parsed.icon
             if (parsed.count !== undefined) parent.updatesCount = parsed.count.toString()
-          } catch(e) {}
+          } catch(e) {
+            console.warn("CenterModules: updator parse error:", e)
+          }
         }
       }
     }
 
     Timer {
       interval: 600000 // 10 minutes
-      running: true
+      running: root.visible
       repeat: true
       onTriggered: updatorProc.running = true
     }
@@ -100,6 +102,13 @@ Item {
       }
     }
 
+    Timer {
+      interval: 5000
+      running: root.visible
+      repeat: true
+      onTriggered: if (!cavaProc.running) cavaProc.running = true
+    }
+
     Rectangle {
       id: cavaPill
       width: Math.min(cavaText.width + 16, 100)
@@ -153,7 +162,7 @@ Item {
 
     Timer {
       interval: 2000
-      running: true
+      running: root.visible
       repeat: true
       onTriggered: inhibitorCheck.running = true
     }

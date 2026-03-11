@@ -24,7 +24,12 @@ Rectangle {
 
   Process {
     id: fetchVRAM
-    command: ["sh", "-c", "cat /sys/class/drm/card0/device/mem_info_vram_used /sys/class/drm/card0/device/mem_info_vram_total 2>/dev/null | awk '{print $1}'"]
+    command: ["sh", "-c",
+      "gpu_card=$(for c in /sys/class/drm/card[0-9]*/device/mem_info_vram_total; do "
+      + "echo \"$(cat \"$c\" 2>/dev/null || echo 0) $(dirname \"$(dirname \"$c\")\")\" ; done 2>/dev/null "
+      + "| sort -rn | head -1 | awk '{print $2}'); "
+      + "[ -n \"$gpu_card\" ] && cat \"$gpu_card/device/mem_info_vram_used\" \"$gpu_card/device/mem_info_vram_total\" 2>/dev/null | awk '{print $1}'"
+    ]
     stdout: StdioCollector {
       onStreamFinished: {
         var lines = this.text.trim().split("\n");

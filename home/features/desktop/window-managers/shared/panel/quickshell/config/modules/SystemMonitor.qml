@@ -8,6 +8,9 @@ Item {
   implicitHeight: mainRow.height
   property var anchorWindow: null
 
+  Component.onCompleted: SystemStatus.subscribe()
+  Component.onDestruction: SystemStatus.unsubscribe()
+
   Row {
     id: mainRow
     spacing: 8

@@ -40,5 +40,7 @@
     # Development tools
     git
     wget
+    nodejs_22
+    fnm
   ];
 }

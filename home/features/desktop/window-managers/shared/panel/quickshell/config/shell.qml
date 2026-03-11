@@ -20,12 +20,17 @@ Scope {
   property bool networkMenuVisible: false
   property bool audioMenuVisible: false
   property bool powerMenuVisible: false
+  property bool clipboardMenuVisible: false
+  property bool recordingMenuVisible: false
+  property bool musicMenuVisible: false
+  property bool batteryMenuVisible: false
   readonly property var activeScreen: (Quickshell.screens && Quickshell.screens.length > 0) ? (Quickshell.cursorScreen || Quickshell.screens[0]) : null
 
   function togglePanel(panel) {
-    var panels = ["notifCenterVisible", "controlCenterVisible", "networkMenuVisible", "audioMenuVisible"];
+    var panels = ["notifCenterVisible", "controlCenterVisible", "networkMenuVisible", "audioMenuVisible", "clipboardMenuVisible", "recordingMenuVisible", "musicMenuVisible", "batteryMenuVisible", "powerMenuVisible"];
+    var next = !root[panel];
     for (var i = 0; i < panels.length; i++) {
-      root[panels[i]] = (panels[i] === panel) ? !root[panels[i]] : false;
+      root[panels[i]] = (panels[i] === panel) ? next : false;
     }
   }
 
@@ -33,6 +38,10 @@ Scope {
   function toggleControls() { togglePanel("controlCenterVisible"); }
   function toggleNetworkMenu() { togglePanel("networkMenuVisible"); }
   function toggleAudioMenu() { togglePanel("audioMenuVisible"); }
+  function toggleClipboardMenu() { togglePanel("clipboardMenuVisible"); }
+  function toggleRecordingMenu() { togglePanel("recordingMenuVisible"); }
+  function toggleMusicMenu() { togglePanel("musicMenuVisible"); }
+  function toggleBatteryMenu() { togglePanel("batteryMenuVisible"); }
 
   IpcHandler {
     target: "Shell"
@@ -40,6 +49,10 @@ Scope {
     function toggleControls() { root.toggleControls(); }
     function toggleNetworkMenu() { root.toggleNetworkMenu(); }
     function toggleAudioMenu() { root.toggleAudioMenu(); }
+    function toggleClipboardMenu() { root.toggleClipboardMenu(); }
+    function toggleRecordingMenu() { root.toggleRecordingMenu(); }
+    function toggleMusicMenu() { root.toggleMusicMenu(); }
+    function toggleBatteryMenu() { root.toggleBatteryMenu(); }
 
     function closeAll() {
       root.notifCenterVisible = false;
@@ -47,6 +60,10 @@ Scope {
       root.networkMenuVisible = false;
       root.audioMenuVisible = false;
       root.powerMenuVisible = false;
+      root.clipboardMenuVisible = false;
+      root.recordingMenuVisible = false;
+      root.musicMenuVisible = false;
+      root.batteryMenuVisible = false;
     }
 
     function togglePowermenu() {
@@ -92,6 +109,10 @@ Scope {
       onNetworkClicked: root.toggleNetworkMenu()
       onAudioClicked: root.toggleAudioMenu()
       onCommandClicked: root.toggleControls()
+      onMusicClicked: root.toggleMusicMenu()
+      onRecordingClicked: root.toggleRecordingMenu()
+      onBatteryClicked: root.toggleBatteryMenu()
+      onClipboardClicked: root.toggleClipboardMenu()
     }
 
     Shortcut {
@@ -131,6 +152,38 @@ Scope {
       anchor.rect.x: toplevel.width - width - 8
       anchor.rect.y: panel.networkTriggerBottomY + 6
       visible: root.networkMenuVisible
+    }
+
+    ClipboardMenu {
+      id: clipboardMenu
+      anchor.window: toplevel
+      anchor.rect.x: toplevel.width - width - 8
+      anchor.rect.y: panel.clipboardTriggerBottomY + 6
+      visible: root.clipboardMenuVisible
+    }
+
+    RecordingMenu {
+      id: recordingMenu
+      anchor.window: toplevel
+      anchor.rect.x: toplevel.width - width - 8
+      anchor.rect.y: panel.recordingTriggerBottomY + 6
+      visible: root.recordingMenuVisible
+    }
+
+    MusicMenu {
+      id: musicMenu
+      anchor.window: toplevel
+      anchor.rect.x: toplevel.width - width - 8
+      anchor.rect.y: panel.musicTriggerBottomY + 6
+      visible: root.musicMenuVisible
+    }
+
+    BatteryMenu {
+      id: batteryMenu
+      anchor.window: toplevel
+      anchor.rect.x: toplevel.width - width - 8
+      anchor.rect.y: panel.batteryTriggerBottomY + 6
+      visible: root.batteryMenuVisible
     }
 
   }

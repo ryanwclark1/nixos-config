@@ -11,8 +11,8 @@ Rectangle {
   border.color: Colors.border
   clip: true
 
-  property var cpuHistory: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-  property var memHistory: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+  property var cpuHistory: new Array(30).fill(0)
+  property var memHistory: new Array(30).fill(0)
 
   function paintGraph(canvas, data, strokeColor) {
     var ctx = canvas.getContext("2d");
@@ -46,12 +46,14 @@ Rectangle {
 
   Timer {
     interval: 2000
-    running: true
+    running: root.visible
     repeat: true
     onTriggered: {
-      var h = root.cpuHistory; h.shift(); h.push(SystemStatus.cpuPercent); root.cpuHistory = h;
+      root.cpuHistory.shift(); root.cpuHistory.push(SystemStatus.cpuPercent);
+      root.cpuHistory = root.cpuHistory; // Trigger binding update
       cpuCanvas.requestPaint();
-      var m = root.memHistory; m.shift(); m.push(SystemStatus.ramPercent); root.memHistory = m;
+      root.memHistory.shift(); root.memHistory.push(SystemStatus.ramPercent);
+      root.memHistory = root.memHistory;
       memCanvas.requestPaint();
     }
   }

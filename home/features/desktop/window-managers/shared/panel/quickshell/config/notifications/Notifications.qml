@@ -12,8 +12,8 @@ PanelWindow {
     top: true
     right: true
   }
-  margins.top: 40
-  margins.right: 12
+  margins.top: Config.barHeight + Config.barMargin + 8
+  margins.right: Config.barMargin
 
   implicitWidth: Config.notifWidth
   implicitHeight: col.implicitHeight

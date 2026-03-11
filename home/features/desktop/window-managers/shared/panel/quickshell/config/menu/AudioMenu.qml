@@ -7,10 +7,11 @@ import "../services"
 
 PopupWindow {
   id: root
-  implicitWidth: 340
-  implicitHeight: 470
+  implicitWidth: 350
+  implicitHeight: 510
   readonly property color panelSurface: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.96)
   readonly property color cardSurface: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.82)
+  readonly property color chipSurface: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.92)
 
   property var sinks: []
   property var sources: []
@@ -141,6 +142,7 @@ PopupWindow {
     border.color: Colors.border
     border.width: 1
     radius: Colors.radiusMedium
+    clip: true
 
     ColumnLayout {
       anchors.fill: parent
@@ -206,367 +208,244 @@ PopupWindow {
         color: Colors.border
       }
 
-      ColumnLayout {
+      Flickable {
         Layout.fillWidth: true
-        spacing: 12
-
-        Rectangle {
-          Layout.fillWidth: true
-          radius: Colors.radiusMedium
-          color: root.cardSurface
-          border.color: root.outputMuted && root.inputMuted ? Colors.border : Colors.primary
-          border.width: 1
-          implicitHeight: 78
-
-          RowLayout {
-            anchors.fill: parent
-            anchors.margins: 14
-            spacing: 12
-
-            Text {
-              text: root.outputMuted ? "󰝟" : "󰕾"
-              color: root.outputMuted ? Colors.textDisabled : Colors.primary
-              font.family: Colors.fontMono
-              font.pixelSize: 22
-            }
-
-            ColumnLayout {
-              Layout.fillWidth: true
-              spacing: 2
-
-              Text {
-                text: root.outputLabel
-                color: Colors.fgMain
-                font.pixelSize: 13
-                font.weight: Font.DemiBold
-                Layout.fillWidth: true
-                elide: Text.ElideRight
-              }
-
-              Text {
-                text: "Output " + root.percentText(root.outputVolume, root.outputMuted) + " • Input " + root.percentText(root.inputVolume, root.inputMuted)
-                color: Colors.textSecondary
-                font.pixelSize: 11
-                Layout.fillWidth: true
-                elide: Text.ElideRight
-              }
-            }
-
-            Rectangle {
-              width: 64
-              height: 30
-              radius: 15
-              color: summaryRefreshHover.containsMouse ? Colors.highlight : Colors.highlightLight
-
-              Text {
-                anchors.centerIn: parent
-                text: "Refresh"
-                color: Colors.fgMain
-                font.pixelSize: 10
-                font.weight: Font.Medium
-              }
-
-              MouseArea {
-                id: summaryRefreshHover
-                anchors.fill: parent
-                hoverEnabled: true
-                onClicked: root.refreshDevices()
-              }
-            }
-          }
-        }
-
-        Rectangle {
-          Layout.fillWidth: true
-          radius: Colors.radiusMedium
-          color: root.cardSurface
-          border.color: Colors.border
-          border.width: 1
-          implicitHeight: 96
-
-          ColumnLayout {
-            anchors.fill: parent
-            anchors.margins: 12
-            spacing: 8
-
-            RowLayout {
-              Layout.fillWidth: true
-              Text { text: "󰕾  Output"; color: Colors.fgMain; font.pixelSize: 13; font.weight: Font.Medium }
-              Item { Layout.fillWidth: true }
-              Rectangle {
-                radius: 12
-                color: root.outputMuted ? Colors.withAlpha(Colors.error, 0.16) : Colors.highlightLight
-                implicitWidth: outputPercentLabel.implicitWidth + 16
-                implicitHeight: 24
-                Text {
-                  id: outputPercentLabel
-                  anchors.centerIn: parent
-                  text: root.percentText(root.outputVolume, root.outputMuted)
-                  color: root.outputMuted ? Colors.error : Colors.textSecondary
-                  font.pixelSize: 10
-                  font.weight: Font.Medium
-                }
-              }
-              Rectangle {
-                width: 28
-                height: 28
-                radius: 14
-                color: outputMuteHover.containsMouse ? Colors.highlightLight : "transparent"
-                Text { anchors.centerIn: parent; text: root.outputMuted ? "󰝟" : "󰕾"; color: root.outputMuted ? Colors.error : Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 14 }
-                MouseArea { id: outputMuteHover; anchors.fill: parent; hoverEnabled: true; onClicked: root.toggleMute("@DEFAULT_AUDIO_SINK@", root.outputMuted) }
-              }
-            }
-
-            Rectangle {
-              id: audioOutputTrack
-              Layout.fillWidth: true; height: 28; color: Colors.bgWidget; radius: 14; border.color: Colors.border; border.width: 1
-              Behavior on color { ColorAnimation { duration: 150 } }
-              Behavior on border.color { ColorAnimation { duration: 150 } }
-              Rectangle {
-                height: parent.height; width: Math.max(28, parent.width * (root.outputMuted ? 0 : root.outputVolume)); radius: 14
-                color: root.outputMuted ? Colors.error : (audioOutputHover.containsMouse ? Qt.darker(Colors.primary, 1.08) : Colors.primary)
-                Behavior on color { ColorAnimation { duration: 150 } }
-                Text { anchors.centerIn: parent; text: root.outputMuted ? "󰝟" : "󰕾"; color: Colors.background; font.family: Colors.fontMono; font.pixelSize: 12; visible: (root.outputMuted || root.outputVolume > 0.1) }
-              }
-              MouseArea {
-                id: audioOutputHover
-                anchors.fill: parent
-                hoverEnabled: true
-                onEntered: { audioOutputTrack.color = Colors.surface; audioOutputTrack.border.color = root.outputMuted ? Colors.error : Colors.primary; }
-                onExited: { audioOutputTrack.color = Colors.bgWidget; audioOutputTrack.border.color = Colors.border; }
-                onPressed: (mouse) => { root.setVolume("@DEFAULT_AUDIO_SINK@", Math.max(0, Math.min(1.0, mouse.x / width))); }
-                onPositionChanged: (mouse) => { if (pressed) root.setVolume("@DEFAULT_AUDIO_SINK@", Math.max(0, Math.min(1.0, mouse.x / width))); }
-              }
-            }
-
-            RowLayout {
-              Layout.fillWidth: true
-              spacing: 8
-
-              Repeater {
-                model: [
-                  { label: "25%", value: 0.25 },
-                  { label: "50%", value: 0.50 },
-                  { label: "75%", value: 0.75 }
-                ]
-                delegate: Rectangle {
-                  radius: 11
-                  color: quickOutputHover.containsMouse ? Colors.highlight : Colors.surface
-                  border.color: Colors.border
-                  border.width: 1
-                  implicitWidth: quickOutputLabel.implicitWidth + 18
-                  implicitHeight: 24
-
-                  Text {
-                    id: quickOutputLabel
-                    anchors.centerIn: parent
-                    text: modelData.label
-                    color: Colors.textSecondary
-                    font.pixelSize: 10
-                    font.weight: Font.Medium
-                  }
-
-                  MouseArea {
-                    id: quickOutputHover
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onClicked: root.setVolume("@DEFAULT_AUDIO_SINK@", modelData.value)
-                  }
-                }
-              }
-
-              Item { Layout.fillWidth: true }
-            }
-
-            Text {
-              text: root.outputLabel
-              color: Colors.textSecondary
-              font.pixelSize: 11
-              elide: Text.ElideRight
-              Layout.fillWidth: true
-            }
-          }
-        }
-
-        Rectangle {
-          Layout.fillWidth: true
-          radius: Colors.radiusMedium
-          color: root.cardSurface
-          border.color: Colors.border
-          border.width: 1
-          implicitHeight: 96
-
-          ColumnLayout {
-            anchors.fill: parent
-            anchors.margins: 12
-            spacing: 8
-
-            RowLayout {
-              Layout.fillWidth: true
-              Text { text: "󰍬  Input"; color: Colors.fgMain; font.pixelSize: 13; font.weight: Font.Medium }
-              Item { Layout.fillWidth: true }
-              Rectangle {
-                radius: 12
-                color: root.inputMuted ? Colors.withAlpha(Colors.error, 0.16) : Colors.highlightLight
-                implicitWidth: inputPercentLabel.implicitWidth + 16
-                implicitHeight: 24
-                Text {
-                  id: inputPercentLabel
-                  anchors.centerIn: parent
-                  text: root.percentText(root.inputVolume, root.inputMuted)
-                  color: root.inputMuted ? Colors.error : Colors.textSecondary
-                  font.pixelSize: 10
-                  font.weight: Font.Medium
-                }
-              }
-              Rectangle {
-                width: 28
-                height: 28
-                radius: 14
-                color: inputMuteHover.containsMouse ? Colors.highlightLight : "transparent"
-                Text { anchors.centerIn: parent; text: root.inputMuted ? "󰍭" : "󰍬"; color: root.inputMuted ? Colors.error : Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 14 }
-                MouseArea { id: inputMuteHover; anchors.fill: parent; hoverEnabled: true; onClicked: root.toggleMute("@DEFAULT_AUDIO_SOURCE@", root.inputMuted) }
-              }
-            }
-
-            Rectangle {
-              id: audioInputTrack
-              Layout.fillWidth: true; height: 28; color: Colors.bgWidget; radius: 14; border.color: Colors.border; border.width: 1
-              Behavior on color { ColorAnimation { duration: 150 } }
-              Behavior on border.color { ColorAnimation { duration: 150 } }
-              Rectangle {
-                height: parent.height; width: Math.max(28, parent.width * (root.inputMuted ? 0 : root.inputVolume)); radius: 14
-                color: root.inputMuted ? Colors.error : (audioInputHover.containsMouse ? Qt.darker(Colors.primary, 1.08) : Colors.primary)
-                Behavior on color { ColorAnimation { duration: 150 } }
-                Text { anchors.centerIn: parent; text: root.inputMuted ? "󰍭" : "󰍬"; color: Colors.background; font.family: Colors.fontMono; font.pixelSize: 12; visible: (root.inputMuted || root.inputVolume > 0.1) }
-              }
-              MouseArea {
-                id: audioInputHover
-                anchors.fill: parent
-                hoverEnabled: true
-                onEntered: { audioInputTrack.color = Colors.surface; audioInputTrack.border.color = root.inputMuted ? Colors.error : Colors.primary; }
-                onExited: { audioInputTrack.color = Colors.bgWidget; audioInputTrack.border.color = Colors.border; }
-                onPressed: (mouse) => { root.setVolume("@DEFAULT_AUDIO_SOURCE@", Math.max(0, Math.min(1.0, mouse.x / width))); }
-                onPositionChanged: (mouse) => { if (pressed) root.setVolume("@DEFAULT_AUDIO_SOURCE@", Math.max(0, Math.min(1.0, mouse.x / width))); }
-              }
-            }
-
-            RowLayout {
-              Layout.fillWidth: true
-              spacing: 8
-
-              Repeater {
-                model: [
-                  { label: "25%", value: 0.25 },
-                  { label: "50%", value: 0.50 },
-                  { label: "75%", value: 0.75 }
-                ]
-                delegate: Rectangle {
-                  radius: 11
-                  color: quickInputHover.containsMouse ? Colors.highlight : Colors.surface
-                  border.color: Colors.border
-                  border.width: 1
-                  implicitWidth: quickInputLabel.implicitWidth + 18
-                  implicitHeight: 24
-
-                  Text {
-                    id: quickInputLabel
-                    anchors.centerIn: parent
-                    text: modelData.label
-                    color: Colors.textSecondary
-                    font.pixelSize: 10
-                    font.weight: Font.Medium
-                  }
-
-                  MouseArea {
-                    id: quickInputHover
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onClicked: root.setVolume("@DEFAULT_AUDIO_SOURCE@", modelData.value)
-                  }
-                }
-              }
-
-              Item { Layout.fillWidth: true }
-            }
-
-            Text {
-              text: root.inputLabel
-              color: Colors.textSecondary
-              font.pixelSize: 11
-              elide: Text.ElideRight
-              Layout.fillWidth: true
-            }
-          }
-        }
+        Layout.fillHeight: true
+        contentHeight: contentColumn.implicitHeight
+        clip: true
+        boundsBehavior: Flickable.StopAtBounds
 
         ColumnLayout {
-          Layout.fillWidth: true
-          spacing: 8
+          id: contentColumn
+          width: parent.width
+          spacing: 14
 
-          Text { text: "Output Devices"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
-          Text { text: root.sinks.length === 0 ? "No output devices detected" : "Click a device to make it default"; color: Colors.textSecondary; font.pixelSize: 10 }
+          // ── OUTPUT section ──────────────────────────
+          Text {
+            text: "OUTPUT"
+            color: Colors.textDisabled
+            font.pixelSize: 10
+            font.weight: Font.Bold
+            font.letterSpacing: 0.5
+          }
+
+          Rectangle {
+            Layout.fillWidth: true
+            radius: Colors.radiusMedium
+            color: root.cardSurface
+            border.color: Colors.border
+            border.width: 1
+            implicitHeight: 64
+
+            ColumnLayout {
+              anchors.fill: parent
+              anchors.margins: 12
+              spacing: 6
+
+              RowLayout {
+                Layout.fillWidth: true
+                Text { text: "󰕾"; color: root.outputMuted ? Colors.error : Colors.primary; font.family: Colors.fontMono; font.pixelSize: 16 }
+                Text { text: "Output"; color: Colors.fgMain; font.pixelSize: 13; font.weight: Font.Medium }
+                Item { Layout.fillWidth: true }
+                Rectangle {
+                  radius: 12
+                  color: root.outputMuted ? Colors.withAlpha(Colors.error, 0.16) : Colors.highlightLight
+                  implicitWidth: outputPercentLabel.implicitWidth + 16
+                  implicitHeight: 24
+                  Text {
+                    id: outputPercentLabel
+                    anchors.centerIn: parent
+                    text: root.percentText(root.outputVolume, root.outputMuted)
+                    color: root.outputMuted ? Colors.error : Colors.textSecondary
+                    font.pixelSize: 10
+                    font.weight: Font.Medium
+                  }
+                }
+                Rectangle {
+                  width: 28
+                  height: 28
+                  radius: 14
+                  color: outputMuteHover.containsMouse ? Colors.highlightLight : "transparent"
+                  Text { anchors.centerIn: parent; text: root.outputMuted ? "󰝟" : "󰕾"; color: root.outputMuted ? Colors.error : Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 14 }
+                  MouseArea { id: outputMuteHover; anchors.fill: parent; hoverEnabled: true; onClicked: root.toggleMute("@DEFAULT_AUDIO_SINK@", root.outputMuted) }
+                }
+              }
+
+              Rectangle {
+                id: audioOutputTrack
+                Layout.fillWidth: true; height: 28; color: Colors.bgWidget; radius: 14; border.color: Colors.border; border.width: 1
+                Behavior on color { ColorAnimation { duration: 150 } }
+                Behavior on border.color { ColorAnimation { duration: 150 } }
+                Rectangle {
+                  height: parent.height; width: Math.max(28, parent.width * (root.outputMuted ? 0 : root.outputVolume)); radius: 14
+                  color: root.outputMuted ? Colors.error : (audioOutputHover.containsMouse ? Qt.darker(Colors.primary, 1.08) : Colors.primary)
+                  Behavior on color { ColorAnimation { duration: 150 } }
+                  Text { anchors.centerIn: parent; text: root.outputMuted ? "󰝟" : "󰕾"; color: Colors.background; font.family: Colors.fontMono; font.pixelSize: 12; visible: (root.outputMuted || root.outputVolume > 0.1) }
+                }
+                MouseArea {
+                  id: audioOutputHover
+                  anchors.fill: parent
+                  hoverEnabled: true
+                  onEntered: { audioOutputTrack.color = Colors.surface; audioOutputTrack.border.color = root.outputMuted ? Colors.error : Colors.primary; }
+                  onExited: { audioOutputTrack.color = Colors.bgWidget; audioOutputTrack.border.color = Colors.border; }
+                  onPressed: (mouse) => { root.setVolume("@DEFAULT_AUDIO_SINK@", Math.max(0, Math.min(1.0, mouse.x / width))); }
+                  onPositionChanged: (mouse) => { if (pressed) root.setVolume("@DEFAULT_AUDIO_SINK@", Math.max(0, Math.min(1.0, mouse.x / width))); }
+                }
+              }
+            }
+          }
+
           Repeater {
             model: root.sinks
             delegate: Rectangle {
+              id: sinkCard
               Layout.fillWidth: true
               implicitHeight: 46
               radius: Colors.radiusMedium
-              color: modelData.id === root.defaultSinkId ? Colors.highlight : root.cardSurface
-              border.color: modelData.id === root.defaultSinkId ? Colors.primary : Colors.border
+              property bool isDefault: modelData.id === root.defaultSinkId
+              property bool isHovered: sinkHover.containsMouse
+              color: isDefault ? Colors.withAlpha(Colors.primary, 0.16) : (isHovered ? Colors.withAlpha(Colors.primary, 0.12) : root.cardSurface)
+              border.color: isDefault ? Colors.primary : Colors.border
               border.width: 1
+              Behavior on color { ColorAnimation { duration: 150 } }
 
               RowLayout {
                 anchors.fill: parent
                 anchors.margins: 10
                 spacing: 10
-                Text { text: modelData.id === root.defaultSinkId ? "󰄬" : "󰕾"; color: modelData.id === root.defaultSinkId ? Colors.primary : Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 14 }
-                ColumnLayout {
-                  Layout.fillWidth: true
-                  spacing: 0
-                  Text { text: modelData.name; color: Colors.fgMain; font.pixelSize: 12; font.weight: modelData.id === root.defaultSinkId ? Font.DemiBold : Font.Normal; elide: Text.ElideRight; Layout.fillWidth: true }
-                  Text { text: (modelData.muted ? "Muted" : "Ready") + " • " + Math.round(modelData.volume * 100) + "%"; color: Colors.textSecondary; font.pixelSize: 10; elide: Text.ElideRight; Layout.fillWidth: true }
-                }
-                Text { text: modelData.id === root.defaultSinkId ? "Default" : "Select"; color: modelData.id === root.defaultSinkId ? Colors.primary : Colors.textSecondary; font.pixelSize: 10; font.weight: Font.Medium }
+                Text { text: sinkCard.isDefault ? "󰄬" : "󰕾"; color: sinkCard.isDefault ? Colors.primary : Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 14 }
+                Text { text: modelData.name; color: Colors.fgMain; font.pixelSize: 12; font.weight: sinkCard.isDefault ? Font.DemiBold : Font.Normal; elide: Text.ElideRight; Layout.fillWidth: true }
+                Text { text: Math.round(modelData.volume * 100) + "%"; color: Colors.textSecondary; font.pixelSize: 10 }
+                Text { text: sinkCard.isDefault ? "Default" : "Select"; color: sinkCard.isDefault ? Colors.primary : Colors.textSecondary; font.pixelSize: 10; font.weight: Font.Medium }
               }
 
-              MouseArea { anchors.fill: parent; onClicked: root.setDefaultDevice(modelData.id) }
+              MouseArea { id: sinkHover; anchors.fill: parent; hoverEnabled: true; onClicked: root.setDefaultDevice(modelData.id) }
             }
           }
-        }
 
-        ColumnLayout {
-          Layout.fillWidth: true
-          spacing: 8
+          Rectangle {
+            Layout.fillWidth: true
+            visible: root.sinks.length === 0
+            implicitHeight: 36
+            radius: Colors.radiusMedium
+            color: root.cardSurface
+            border.color: Colors.border
+            border.width: 1
+            Text { anchors.centerIn: parent; text: "No output devices detected"; color: Colors.textDisabled; font.pixelSize: 11 }
+          }
 
-          Text { text: "Input Devices"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
-          Text { text: root.sources.length === 0 ? "No input devices detected" : "Click a device to make it default"; color: Colors.textSecondary; font.pixelSize: 10 }
+          // ── INPUT section ──────────────────────────
+          Text {
+            text: "INPUT"
+            color: Colors.textDisabled
+            font.pixelSize: 10
+            font.weight: Font.Bold
+            font.letterSpacing: 0.5
+          }
+
+          Rectangle {
+            Layout.fillWidth: true
+            radius: Colors.radiusMedium
+            color: root.cardSurface
+            border.color: Colors.border
+            border.width: 1
+            implicitHeight: 64
+
+            ColumnLayout {
+              anchors.fill: parent
+              anchors.margins: 12
+              spacing: 6
+
+              RowLayout {
+                Layout.fillWidth: true
+                Text { text: "󰍬"; color: root.inputMuted ? Colors.error : Colors.primary; font.family: Colors.fontMono; font.pixelSize: 16 }
+                Text { text: "Input"; color: Colors.fgMain; font.pixelSize: 13; font.weight: Font.Medium }
+                Item { Layout.fillWidth: true }
+                Rectangle {
+                  radius: 12
+                  color: root.inputMuted ? Colors.withAlpha(Colors.error, 0.16) : Colors.highlightLight
+                  implicitWidth: inputPercentLabel.implicitWidth + 16
+                  implicitHeight: 24
+                  Text {
+                    id: inputPercentLabel
+                    anchors.centerIn: parent
+                    text: root.percentText(root.inputVolume, root.inputMuted)
+                    color: root.inputMuted ? Colors.error : Colors.textSecondary
+                    font.pixelSize: 10
+                    font.weight: Font.Medium
+                  }
+                }
+                Rectangle {
+                  width: 28
+                  height: 28
+                  radius: 14
+                  color: inputMuteHover.containsMouse ? Colors.highlightLight : "transparent"
+                  Text { anchors.centerIn: parent; text: root.inputMuted ? "󰍭" : "󰍬"; color: root.inputMuted ? Colors.error : Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 14 }
+                  MouseArea { id: inputMuteHover; anchors.fill: parent; hoverEnabled: true; onClicked: root.toggleMute("@DEFAULT_AUDIO_SOURCE@", root.inputMuted) }
+                }
+              }
+
+              Rectangle {
+                id: audioInputTrack
+                Layout.fillWidth: true; height: 28; color: Colors.bgWidget; radius: 14; border.color: Colors.border; border.width: 1
+                Behavior on color { ColorAnimation { duration: 150 } }
+                Behavior on border.color { ColorAnimation { duration: 150 } }
+                Rectangle {
+                  height: parent.height; width: Math.max(28, parent.width * (root.inputMuted ? 0 : root.inputVolume)); radius: 14
+                  color: root.inputMuted ? Colors.error : (audioInputHover.containsMouse ? Qt.darker(Colors.primary, 1.08) : Colors.primary)
+                  Behavior on color { ColorAnimation { duration: 150 } }
+                  Text { anchors.centerIn: parent; text: root.inputMuted ? "󰍭" : "󰍬"; color: Colors.background; font.family: Colors.fontMono; font.pixelSize: 12; visible: (root.inputMuted || root.inputVolume > 0.1) }
+                }
+                MouseArea {
+                  id: audioInputHover
+                  anchors.fill: parent
+                  hoverEnabled: true
+                  onEntered: { audioInputTrack.color = Colors.surface; audioInputTrack.border.color = root.inputMuted ? Colors.error : Colors.primary; }
+                  onExited: { audioInputTrack.color = Colors.bgWidget; audioInputTrack.border.color = Colors.border; }
+                  onPressed: (mouse) => { root.setVolume("@DEFAULT_AUDIO_SOURCE@", Math.max(0, Math.min(1.0, mouse.x / width))); }
+                  onPositionChanged: (mouse) => { if (pressed) root.setVolume("@DEFAULT_AUDIO_SOURCE@", Math.max(0, Math.min(1.0, mouse.x / width))); }
+                }
+              }
+            }
+          }
+
           Repeater {
             model: root.sources
             delegate: Rectangle {
+              id: sourceCard
               Layout.fillWidth: true
               implicitHeight: 46
               radius: Colors.radiusMedium
-              color: modelData.id === root.defaultSourceId ? Colors.highlight : root.cardSurface
-              border.color: modelData.id === root.defaultSourceId ? Colors.primary : Colors.border
+              property bool isDefault: modelData.id === root.defaultSourceId
+              property bool isHovered: sourceHover.containsMouse
+              color: isDefault ? Colors.withAlpha(Colors.primary, 0.16) : (isHovered ? Colors.withAlpha(Colors.primary, 0.12) : root.cardSurface)
+              border.color: isDefault ? Colors.primary : Colors.border
               border.width: 1
+              Behavior on color { ColorAnimation { duration: 150 } }
 
               RowLayout {
                 anchors.fill: parent
                 anchors.margins: 10
                 spacing: 10
-                Text { text: modelData.id === root.defaultSourceId ? "󰄬" : "󰍬"; color: modelData.id === root.defaultSourceId ? Colors.primary : Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 14 }
-                ColumnLayout {
-                  Layout.fillWidth: true
-                  spacing: 0
-                  Text { text: modelData.name; color: Colors.fgMain; font.pixelSize: 12; font.weight: modelData.id === root.defaultSourceId ? Font.DemiBold : Font.Normal; elide: Text.ElideRight; Layout.fillWidth: true }
-                  Text { text: (modelData.muted ? "Muted" : "Ready") + " • " + Math.round(modelData.volume * 100) + "%"; color: Colors.textSecondary; font.pixelSize: 10; elide: Text.ElideRight; Layout.fillWidth: true }
-                }
-                Text { text: modelData.id === root.defaultSourceId ? "Default" : "Select"; color: modelData.id === root.defaultSourceId ? Colors.primary : Colors.textSecondary; font.pixelSize: 10; font.weight: Font.Medium }
+                Text { text: sourceCard.isDefault ? "󰄬" : "󰍬"; color: sourceCard.isDefault ? Colors.primary : Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 14 }
+                Text { text: modelData.name; color: Colors.fgMain; font.pixelSize: 12; font.weight: sourceCard.isDefault ? Font.DemiBold : Font.Normal; elide: Text.ElideRight; Layout.fillWidth: true }
+                Text { text: Math.round(modelData.volume * 100) + "%"; color: Colors.textSecondary; font.pixelSize: 10 }
+                Text { text: sourceCard.isDefault ? "Default" : "Select"; color: sourceCard.isDefault ? Colors.primary : Colors.textSecondary; font.pixelSize: 10; font.weight: Font.Medium }
               }
 
-              MouseArea { anchors.fill: parent; onClicked: root.setDefaultDevice(modelData.id) }
+              MouseArea { id: sourceHover; anchors.fill: parent; hoverEnabled: true; onClicked: root.setDefaultDevice(modelData.id) }
             }
+          }
+
+          Rectangle {
+            Layout.fillWidth: true
+            visible: root.sources.length === 0
+            implicitHeight: 36
+            radius: Colors.radiusMedium
+            color: root.cardSurface
+            border.color: Colors.border
+            border.width: 1
+            Text { anchors.centerIn: parent; text: "No input devices detected"; color: Colors.textDisabled; font.pixelSize: 11 }
           }
         }
       }

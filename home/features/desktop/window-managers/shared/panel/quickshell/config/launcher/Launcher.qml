@@ -23,7 +23,7 @@ PanelWindow {
   visible: launcherOpacity > 0
 
   WlrLayershell.layer: WlrLayer.Overlay
-  WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+  WlrLayershell.keyboardFocus: launcherOpacity > 0 ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
   WlrLayershell.namespace: "quickshell"
 
   property string searchText: ""
@@ -342,7 +342,6 @@ PanelWindow {
     launcherOpacity = 0;
     scaleValue = 0.95;
     if (showingConfirm) confirmTitle = "";
-    WlrLayershell.keyboardFocus = WlrKeyboardFocus.None;
   }
 
   function cycleMode(step) {

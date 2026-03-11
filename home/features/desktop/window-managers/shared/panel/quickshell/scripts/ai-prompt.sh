@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # ai-prompt.sh - Query local Ollama for the launcher
 
 PROMPT="$1"

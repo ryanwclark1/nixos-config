@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 
 output_status_json() {
     local icon="󰖪"

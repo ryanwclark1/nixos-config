@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # qs-rofi.sh - Quickshell based Rofi/Dmenu replacement
 
 MODE="${1:-drun}"

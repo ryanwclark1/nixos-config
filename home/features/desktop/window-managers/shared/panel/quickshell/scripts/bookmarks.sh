@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # bookmarks.sh - Extract Firefox bookmarks for the launcher
 
 # Find the places.sqlite file (use the first one found)

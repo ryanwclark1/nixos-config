@@ -79,7 +79,7 @@ Row {
     running: true
     stdout: StdioCollector {
       onStreamFinished: {
-        try { root.iconMap = JSON.parse(this.text || "{}"); } catch(e) {}
+        try { root.iconMap = JSON.parse(this.text || "{}"); } catch(e) { console.warn("Taskbar: icon map parse error:", e) }
       }
     }
   }
@@ -96,6 +96,7 @@ Row {
       isPinned: true
       iconMap: root.iconMap
       anchorWindow: root.anchorWindow
+      onPinToggled: (app) => root.togglePin(app)
     }
   }
 
@@ -117,6 +118,7 @@ Row {
       }
       visible: !alreadyPinned && modelData.workspace && modelData.workspace.active
       width: visible ? 32 : 0
+      Behavior on width { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
       appClass: modelData.class || ""
       appExec: modelData.class || ""
       appName: modelData.title || ""
@@ -125,6 +127,7 @@ Row {
       isPinned: false
       iconMap: root.iconMap
       anchorWindow: root.anchorWindow
+      onPinToggled: (app) => root.togglePin(app)
     }
   }
 }

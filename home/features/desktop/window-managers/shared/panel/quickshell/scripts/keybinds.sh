@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # keybinds.sh - Parse Hyprland keybindings into JSON
 
 KEYBIND_DIR="$HOME/nixos-config/home/features/desktop/window-managers/hyprland/conf/keybindings"

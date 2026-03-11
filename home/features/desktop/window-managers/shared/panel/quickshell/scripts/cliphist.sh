@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # cliphist.sh - Provide clipboard history for the launcher
 
 # Fetch clipboard history using cliphist
