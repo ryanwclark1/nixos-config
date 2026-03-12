@@ -24,17 +24,17 @@ wan_ip_interpolation=(
 # Corresponding command implementations - use centralized or fallback paths
 if command -v get_forceline_path >/dev/null 2>&1; then
   wan_ip_commands=(
-    "#($(get_forceline_path "modules/wan_ip/scripts/wan_ip.sh"))"
-    "#($(get_forceline_path "modules/wan_ip/scripts/wan_ip.sh") status)"
-    "#($(get_forceline_path "modules/wan_ip/scripts/wan_ip_color.sh") fg)"
-    "#($(get_forceline_path "modules/wan_ip/scripts/wan_ip_color.sh") bg)"
+    "#($(get_forceline_path "modules/wan_ip/wan_ip_data.sh"))"
+    "#($(get_forceline_path "modules/wan_ip/wan_ip_data.sh") status)"
+    "#($(get_forceline_path "modules/wan_ip/wan_ip_color.sh") fg)"
+    "#($(get_forceline_path "modules/wan_ip/wan_ip_color.sh") bg)"
   )
 else
   wan_ip_commands=(
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/wan_ip.sh)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/wan_ip.sh status)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/wan_ip_color.sh fg)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/wan_ip_color.sh bg)"
+    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/wan_ip.sh)"
+    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/wan_ip.sh status)"
+    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/wan_ip_color.sh fg)"
+    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/wan_ip_color.sh bg)"
   )
 fi
 
@@ -59,9 +59,9 @@ update_tmux_option() {
 main() {
     # Make scripts executable
     if command -v get_forceline_path >/dev/null 2>&1; then
-        chmod +x "$(get_forceline_path "modules/wan_ip/scripts")"/*.sh
+        chmod +x "$(get_forceline_path "modules/wan_ip")"/*.sh
     else
-        chmod +x "${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/"*.sh
+        chmod +x "${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/"*.sh
     fi
     
     # Update status-left and status-right to support WAN IP interpolation

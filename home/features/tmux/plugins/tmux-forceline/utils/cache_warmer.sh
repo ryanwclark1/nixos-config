@@ -160,8 +160,8 @@ find_module_script() {
     # Try different possible locations
     local possible_paths=(
         "$forceline_dir/modules/$module/$module.sh"
-        "$forceline_dir/modules/$module/scripts/${module}.sh"
-        "$forceline_dir/modules/$module/scripts/${module}_*.sh"
+        "$forceline_dir/modules/$module/${module}.sh"
+        "$forceline_dir/modules/$module/${module}_*.sh"
     )
     
     for path_pattern in "${possible_paths[@]}"; do

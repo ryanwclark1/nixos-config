@@ -4,57 +4,28 @@
 
 set -euo pipefail
 
-# Global configuration
-readonly SCRIPT_VERSION="3.0"
-readonly CACHE_DURATION=5  # Optimized cache for memory monitoring
-readonly DEFAULT_TIMEOUT=2 # Memory info is fast to retrieve
-
-# Source centralized path management
+# Source shared utilities
 UTILS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/utils"
-if [[ -f "$UTILS_DIR/common.sh" ]]; then
-    source "$UTILS_DIR/common.sh"
-    HELPERS_PATH="$(get_forceline_path "modules/memory/scripts/helpers.sh")"
-    source "$HELPERS_PATH"
-else
-    # Fallback implementation if common.sh not available
-    CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    source "$CURRENT_DIR/scripts/helpers.sh"
-fi
-
-# Get forceline root directory using centralized system
-FORCELINE_DIR="$(get_forceline_dir)"
+source "$UTILS_DIR/source_helpers.sh"
 
 # Memory-specific interpolation array
 memory_interpolation=(
   "\#{memory_percentage}"
-  "\#{memory_icon}" 
+  "\#{memory_icon}"
   "\#{memory_bg_color}"
   "\#{memory_fg_color}"
 )
 
-# Memory-specific commands array - use centralized or fallback paths
-if command -v get_forceline_path >/dev/null 2>&1; then
-  memory_commands=(
-    "#($(get_forceline_path "modules/memory/scripts/memory_percentage.sh"))"
-    "#($(get_forceline_path "modules/memory/scripts/memory_icon.sh"))"
-    "#($(get_forceline_path "modules/memory/scripts/memory_bg_color.sh"))"
-    "#($(get_forceline_path "modules/memory/scripts/memory_fg_color.sh"))"
-  )
-else
-  memory_commands=(
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/memory_percentage.sh)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/memory_icon.sh)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/memory_bg_color.sh)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/memory_fg_color.sh)"
-  )
-fi
+# Memory command mapping using centralized paths
+THRESHOLD_SCRIPT="$(get_forceline_path "utils/threshold_color.sh")"
+PCT_SCRIPT="$(get_forceline_path "modules/memory/memory_percentage.sh")"
 
-# Set tmux option with validation
-set_tmux_option() {
-  local option="$1"
-  local value="$2"
-  tmux set-option -gq "$option" "$value"
-}
+memory_commands=(
+  "#($PCT_SCRIPT)"
+  "#($THRESHOLD_SCRIPT memory icon $PCT_SCRIPT)"
+  "#($THRESHOLD_SCRIPT memory bg $PCT_SCRIPT)"
+  "#($THRESHOLD_SCRIPT memory fg $PCT_SCRIPT)"
+)
 
 # Perform memory-specific interpolation
 do_interpolation() {
@@ -76,10 +47,9 @@ update_tmux_option() {
 
 # Main memory module function
 main() {
-  # Only update if memory monitoring is enabled
   local enabled
   enabled=$(get_tmux_option "@forceline_memory_enabled" "true")
-  
+
   if [[ "$enabled" == "true" ]]; then
     update_tmux_option "status-right"
     update_tmux_option "status-left"

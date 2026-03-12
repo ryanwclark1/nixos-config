@@ -5,6 +5,7 @@ import "../services"
 
 PopupWindow {
   id: root
+  color: "transparent"
   implicitWidth: 400
   implicitHeight: 120
 

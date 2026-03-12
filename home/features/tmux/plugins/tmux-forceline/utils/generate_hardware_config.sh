@@ -48,25 +48,25 @@ set -ogq @forceline_plugin_path "#{@forceline_dir}/plugins"
 set -ogq @forceline_user_plugin_path "~/.config/tmux/forceline/plugins"
 
 # Plugin loading state
-set -g @_fl_plugins_loaded ""
-set -g @_fl_plugins_failed ""
-set -g @_fl_hardware_detected "yes"
+set -g @_plugins_loaded ""
+set -g @_plugins_failed ""
+set -g @_hardware_detected "yes"
 
 EOF
 
 # Add hardware detection results as static values
 cat >> "$OUTPUT_FILE" << EOF
 # Hardware detection results (static)
-set -g @_fl_is_laptop "$IS_LAPTOP"
-set -g @_fl_os_type "$OS_TYPE"
-set -g @_fl_capabilities "$CAPABILITIES"
+set -g @_is_laptop "$IS_LAPTOP"
+set -g @_os_type "$OS_TYPE"
+set -g @_capabilities "$CAPABILITIES"
 
 EOF
 
 # Add core plugins (always loaded)
 cat >> "$OUTPUT_FILE" << 'EOF'
 # Core plugins (always loaded)
-set -g @_fl_core_plugins "hostname,datetime,cpu,memory,load,uptime"
+set -g @_core_plugins "hostname,datetime,cpu,memory,load,uptime"
 
 # Load essential plugins using centralized path
 source -qF "#{@forceline_dir}/plugins/core/hostname/hostname.conf"
@@ -83,14 +83,14 @@ if [[ "$IS_LAPTOP" == "true" ]]; then
     cat >> "$OUTPUT_FILE" << 'EOF'
 # Load battery plugin (laptop detected)
 source -qF "#{@forceline_dir}/plugins/core/battery/battery.conf"
-set -ag @_fl_loaded_plugins "battery,"
+set -ag @_loaded_plugins "battery,"
 
 EOF
     log_info "Including battery module for laptop"
 else
     cat >> "$OUTPUT_FILE" << 'EOF'
 # Battery plugin skipped (desktop detected)
-set -g @_fl_battery_skipped "yes"
+set -g @_battery_skipped "yes"
 
 EOF
     log_info "Skipping battery module for desktop"
@@ -116,14 +116,14 @@ source -qF "#{@forceline_dir}/plugins/extended/now_playing/now_playing.conf"
 source -qF "#{@forceline_dir}/plugins/extended/network/network.conf"
 
 # Build plugin list
-set -g @_fl_all_plugins "#{@_fl_core_plugins},vcs,directory,disk_usage,session,lan_ip,wan_ip,weather,now_playing,network"
+set -g @_all_plugins "#{@_core_plugins},vcs,directory,disk_usage,session,lan_ip,wan_ip,weather,now_playing,network"
 
 EOF
 
 # Add battery to plugin list if it's a laptop
 if [[ "$IS_LAPTOP" == "true" ]]; then
     cat >> "$OUTPUT_FILE" << 'EOF'
-set -ag @_fl_all_plugins ",battery"
+set -ag @_all_plugins ",battery"
 
 EOF
 fi
@@ -132,11 +132,11 @@ fi
 cat >> "$OUTPUT_FILE" << 'EOF'
 # Display loading summary
 %if "#{==:#{@forceline_debug_modules},yes}"
-  display-message "Hardware-aware loading: laptop=#{@_fl_is_laptop}, plugins=#{@_fl_all_plugins}"
+  display-message "Hardware-aware loading: laptop=#{@_is_laptop}, plugins=#{@_all_plugins}"
 %endif
 
 # Register loaded plugins for status bar configuration
-set -g @forceline_active_plugins "#{@_fl_all_plugins}"
+set -g @forceline_active_plugins "#{@_all_plugins}"
 EOF
 
 log_info "Generated hardware-aware config: $OUTPUT_FILE"

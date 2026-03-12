@@ -25,17 +25,17 @@ disk_usage_interpolation=(
 # Corresponding command implementations - use centralized or fallback paths
 if command -v get_forceline_path >/dev/null 2>&1; then
   disk_usage_commands=(
-    "#($(get_forceline_path "modules/disk_usage/scripts/disk_usage_simple.sh"))"
-    "#($(get_forceline_path "modules/disk_usage/scripts/disk_usage.sh") status)"
-    "#($(get_forceline_path "modules/disk_usage/scripts/disk_usage_simple.sh"))"
+    "#($(get_forceline_path "modules/disk_usage/disk_usage_simple.sh"))"
+    "#($(get_forceline_path "modules/disk_usage/disk_usage_data.sh") status)"
+    "#($(get_forceline_path "modules/disk_usage/disk_usage_simple.sh"))"
     "#(df -h / | awk 'NR==2 {print \$3}')"
     "#(df -h / | awk 'NR==2 {print \$4}')"
   )
 else
   disk_usage_commands=(
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/disk_usage_simple.sh)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/disk_usage.sh status)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/disk_usage_simple.sh)"
+    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/disk_usage_simple.sh)"
+    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/disk_usage.sh status)"
+    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/disk_usage_simple.sh)"
     "#(df -h / | awk 'NR==2 {print \$3}')"
     "#(df -h / | awk 'NR==2 {print \$4}')"
   )
@@ -62,9 +62,9 @@ update_tmux_option() {
 main() {
     # Make scripts executable
     if command -v get_forceline_path >/dev/null 2>&1; then
-        chmod +x "$(get_forceline_path "modules/disk_usage/scripts")"/*.sh
+        chmod +x "$(get_forceline_path "modules/disk_usage")"/*.sh
     else
-        chmod +x "${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/"*.sh
+        chmod +x "${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/"*.sh
     fi
     
     # Update status-left and status-right to support disk usage interpolation

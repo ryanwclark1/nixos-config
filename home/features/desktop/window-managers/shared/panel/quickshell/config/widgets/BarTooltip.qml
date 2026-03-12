@@ -18,15 +18,27 @@ PopupWindow {
   property bool ready: false
 
   anchor.window: anchorWindow
+  // Compute window-relative coordinates by walking the parent chain.
+  // Unlike mapToItem(), direct property access IS reactive — QML tracks
+  // each ancestor's x/y as binding dependencies and re-evaluates on change.
+  function _windowX(item) {
+    var x = 0;
+    for (var it = item; it; it = it.parent) x += it.x;
+    return x;
+  }
+  function _windowY(item) {
+    var y = 0;
+    for (var it = item; it; it = it.parent) y += it.y;
+    return y;
+  }
+
   anchor.rect.x: {
-    if (!anchorItem) return 0;
-    try { return anchorItem.mapToItem(null, 0, 0).x + (anchorItem.width - implicitWidth) / 2; }
-    catch (e) { return 0; }
+    if (!anchorItem || !anchorItem.width) return 0;
+    return _windowX(anchorItem) + (anchorItem.width - implicitWidth) / 2;
   }
   anchor.rect.y: {
-    if (!anchorItem) return 0;
-    try { return anchorItem.mapToItem(null, 0, 0).y + anchorItem.height + yOffset; }
-    catch (e) { return 0; }
+    if (!anchorItem || !anchorItem.height) return 0;
+    return _windowY(anchorItem) + anchorItem.height + yOffset;
   }
 
   implicitWidth: tooltipBody.width

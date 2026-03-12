@@ -26,21 +26,21 @@ vcs_interpolation=(
 # Corresponding command implementations - use centralized or fallback paths
 if command -v get_forceline_path >/dev/null 2>&1; then
   vcs_commands=(
-    "#($(get_forceline_path "modules/vcs/scripts/vcs_branch.sh"))"
-    "#($(get_forceline_path "modules/vcs/scripts/vcs_status.sh"))"
-    "#($(get_forceline_path "modules/vcs/scripts/vcs_status.sh") counts)"
-    "#($(get_forceline_path "modules/vcs/scripts/vcs_branch.sh") type)"
-    "#($(get_forceline_path "modules/vcs/scripts/vcs_color.sh") fg)"
-    "#($(get_forceline_path "modules/vcs/scripts/vcs_color.sh") bg)"
+    "#($(get_forceline_path "modules/vcs/vcs_branch.sh"))"
+    "#($(get_forceline_path "modules/vcs/vcs_status.sh"))"
+    "#($(get_forceline_path "modules/vcs/vcs_status.sh") counts)"
+    "#($(get_forceline_path "modules/vcs/vcs_branch.sh") type)"
+    "#($(get_forceline_path "modules/vcs/vcs_color.sh") fg)"
+    "#($(get_forceline_path "modules/vcs/vcs_color.sh") bg)"
   )
 else
   vcs_commands=(
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/vcs_branch.sh)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/vcs_status.sh)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/vcs_status.sh counts)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/vcs_branch.sh type)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/vcs_color.sh fg)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/vcs_color.sh bg)"
+    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/vcs_branch.sh)"
+    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/vcs_status.sh)"
+    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/vcs_status.sh counts)"
+    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/vcs_branch.sh type)"
+    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/vcs_color.sh fg)"
+    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/vcs_color.sh bg)"
   )
 fi
 
@@ -65,9 +65,9 @@ update_tmux_option() {
 main() {
     # Make scripts executable
     if command -v get_forceline_path >/dev/null 2>&1; then
-        chmod +x "$(get_forceline_path "modules/vcs/scripts")"/*.sh
+        chmod +x "$(get_forceline_path "modules/vcs")"/*.sh
     else
-        chmod +x "${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/"*.sh
+        chmod +x "${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/"*.sh
     fi
     
     # Update status-left and status-right to support VCS interpolation

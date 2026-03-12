@@ -6,6 +6,7 @@ import "../widgets" as SharedWidgets
 
 PopupWindow {
   id: root
+  color: "transparent"
 
   // ── Required customization ────────────────────
   property string title: ""

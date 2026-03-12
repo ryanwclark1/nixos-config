@@ -4,14 +4,9 @@
 
 set -euo pipefail
 
-# Source centralized path management
+# Source shared utilities
 UTILS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/utils"
-if [[ -f "$UTILS_DIR/common.sh" ]]; then
-    source "$UTILS_DIR/common.sh"
-else
-    # Fallback implementation if common.sh not available
-    CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-fi
+source "$UTILS_DIR/source_helpers.sh"
 
 # Battery interpolation variables that will be available in tmux
 battery_interpolation=(
@@ -22,24 +17,14 @@ battery_interpolation=(
     "\#{battery_status}"
 )
 
-# Corresponding command implementations - use centralized or fallback paths
-if command -v get_forceline_path >/dev/null 2>&1; then
-  battery_commands=(
-    "#($(get_forceline_path "modules/battery/scripts/battery_color.sh") bg)"
-    "#($(get_forceline_path "modules/battery/scripts/battery_color.sh") fg)"
-    "#($(get_forceline_path "modules/battery/scripts/battery_icon.sh"))"
-    "#($(get_forceline_path "modules/battery/scripts/battery_percentage.sh"))"
-    "#($(get_forceline_path "modules/battery/scripts/battery_status.sh"))"
-  )
-else
-  battery_commands=(
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/battery_color.sh bg)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/battery_color.sh fg)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/battery_icon.sh)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/battery_percentage.sh)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/battery_status.sh)"
-  )
-fi
+# Corresponding command implementations using centralized paths
+battery_commands=(
+  "#($(get_forceline_path "modules/battery/battery_color.sh") bg)"
+  "#($(get_forceline_path "modules/battery/battery_color.sh") fg)"
+  "#($(get_forceline_path "modules/battery/battery_icon.sh"))"
+  "#($(get_forceline_path "modules/battery/battery_percentage.sh"))"
+  "#($(get_forceline_path "modules/battery/battery_status.sh"))"
+)
 
 # Interpolate battery variables in a string
 do_interpolation() {
@@ -63,15 +48,12 @@ main() {
     # Update status-left and status-right to support battery interpolation
     update_tmux_option "status-right"
     update_tmux_option "status-left"
-    
+
     # Cache initial battery data for performance
-    if command -v get_forceline_script >/dev/null 2>&1; then
-        get_forceline_script "modules/battery/scripts/battery_percentage.sh" >/dev/null &
-        source "$(get_forceline_path "modules/battery/scripts/helpers.sh")" && battery_status >/dev/null &
-    else
-        "${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/battery_percentage.sh" >/dev/null &
-        source "${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/helpers.sh" && battery_status >/dev/null &
-    fi
+    local battery_helpers
+    battery_helpers="$(get_forceline_path "modules/battery/battery_helpers.sh")"
+    "$(get_forceline_path "modules/battery/battery_percentage.sh")" >/dev/null &
+    source "$battery_helpers" && battery_status >/dev/null &
 }
 
 main

@@ -5,20 +5,22 @@
 # Strict error handling
 set -euo pipefail
 
-# Global constants
-readonly FL_VERSION="3.0.0"
-readonly FL_CACHE_DIR="${HOME}/.cache/tmux-forceline"
-readonly FL_CONFIG_DIR="${HOME}/.config/tmux/forceline"
-readonly FL_DEBUG="${FL_DEBUG:-0}"
+# Global constants (guarded for tmux config reload)
+if [[ -z "${FL_VERSION:-}" ]]; then
+    readonly FL_VERSION="3.0.0"
+    readonly FL_CACHE_DIR="${HOME}/.cache/tmux-forceline"
+    readonly FL_CONFIG_DIR="${HOME}/.config/tmux/forceline"
+    readonly FL_DEBUG="${FL_DEBUG:-0}"
 
-# Color constants for consistent styling
-readonly FL_COLOR_RESET='\033[0m'
-readonly FL_COLOR_RED='\033[0;31m'
-readonly FL_COLOR_GREEN='\033[0;32m'
-readonly FL_COLOR_YELLOW='\033[0;33m'
-readonly FL_COLOR_BLUE='\033[0;34m'
-readonly FL_COLOR_PURPLE='\033[0;35m'
-readonly FL_COLOR_CYAN='\033[0;36m'
+    # Color constants for consistent styling
+    readonly FL_COLOR_RESET='\033[0m'
+    readonly FL_COLOR_RED='\033[0;31m'
+    readonly FL_COLOR_GREEN='\033[0;32m'
+    readonly FL_COLOR_YELLOW='\033[0;33m'
+    readonly FL_COLOR_BLUE='\033[0;34m'
+    readonly FL_COLOR_PURPLE='\033[0;35m'
+    readonly FL_COLOR_CYAN='\033[0;36m'
+fi
 
 # Ensure required directories exist
 init_directories() {

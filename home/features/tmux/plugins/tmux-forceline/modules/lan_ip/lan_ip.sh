@@ -23,15 +23,15 @@ lan_ip_interpolation=(
 # Corresponding command implementations - use centralized or fallback paths
 if command -v get_forceline_path >/dev/null 2>&1; then
   lan_ip_commands=(
-    "#($(get_forceline_path "modules/lan_ip/scripts/lan_ip.sh"))"
-    "#($(get_forceline_path "modules/lan_ip/scripts/lan_ip.sh") primary)"
-    "#($(get_forceline_path "modules/lan_ip/scripts/lan_ip.sh") all)"
+    "#($(get_forceline_path "modules/lan_ip/lan_ip_data.sh"))"
+    "#($(get_forceline_path "modules/lan_ip/lan_ip_data.sh") primary)"
+    "#($(get_forceline_path "modules/lan_ip/lan_ip_data.sh") all)"
   )
 else
   lan_ip_commands=(
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/lan_ip.sh)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/lan_ip.sh primary)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/lan_ip.sh all)"
+    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/lan_ip.sh)"
+    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/lan_ip.sh primary)"
+    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/lan_ip.sh all)"
   )
 fi
 
@@ -56,9 +56,9 @@ update_tmux_option() {
 main() {
     # Make scripts executable
     if command -v get_forceline_path >/dev/null 2>&1; then
-        chmod +x "$(get_forceline_path "modules/lan_ip/scripts")"/*.sh
+        chmod +x "$(get_forceline_path "modules/lan_ip")"/*.sh
     else
-        chmod +x "${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/"*.sh
+        chmod +x "${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/"*.sh
     fi
     
     # Update status-left and status-right to support LAN IP interpolation

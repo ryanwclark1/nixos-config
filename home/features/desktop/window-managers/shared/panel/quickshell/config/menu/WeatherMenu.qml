@@ -11,8 +11,9 @@ BasePopupMenu {
   title: "Weather"
   toggleMethod: "toggleWeatherMenu"
 
-  // Current conditions
-  property string currentTemp: "--"
+  // Current conditions — headline temp comes from WeatherService (same as bar)
+  // to avoid discrepancy between the two API formats.
+  readonly property string currentTemp: WeatherService.temp || "--"
   property string feelsLike: "--"
   property string humidity: "--"
   property string windSpeed: "--"
@@ -70,7 +71,7 @@ BasePopupMenu {
     }
     onUpdated: {
       var v = weatherPoll.value;
-      if (v.currentTemp) root.currentTemp = v.currentTemp;
+      // currentTemp is a readonly binding to WeatherService.temp — don't overwrite
       if (v.feelsLike) root.feelsLike = v.feelsLike;
       if (v.humidity) root.humidity = v.humidity;
       if (v.windSpeed) root.windSpeed = v.windSpeed;

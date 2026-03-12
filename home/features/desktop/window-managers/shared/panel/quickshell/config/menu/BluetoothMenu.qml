@@ -100,10 +100,9 @@ BasePopupMenu {
     }
   }
 
-  Connections {
-    target: Bluetooth.devices
-    function onCountChanged() { root.updateCounts(); }
-  }
+  // Reactive device count watcher (ObjectModel doesn't expose countChanged signal)
+  property int _btDeviceCount: (Bluetooth.devices && Bluetooth.devices.values) ? Bluetooth.devices.values.length : 0
+  on_BtDeviceCountChanged: root.updateCounts()
 
   headerExtras: [
     SharedWidgets.FilterChip {

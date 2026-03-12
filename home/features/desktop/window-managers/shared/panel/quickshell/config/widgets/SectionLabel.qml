@@ -9,7 +9,7 @@ import "../services"
 Text {
   property string label: ""
   text: label
-  color: Colors.textDisabled
+  color: Colors.textSecondary
   font.pixelSize: Colors.fontSizeXS
   font.weight: Font.Bold
   font.letterSpacing: 0.5

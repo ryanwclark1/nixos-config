@@ -43,32 +43,32 @@ Rectangle {
         // Filter out special workspaces (negative IDs)
         visible: modelData.id > 0
         width: visible ? wsPill.width : 0
-        height: visible ? wsRow.height : 0
+        height: visible ? 20 : 0
 
         Rectangle {
           id: wsPill
           anchors.centerIn: parent
 
-          width: modelData.focused ? 20 : 16
-          height: 16
+          width: modelData.focused ? 28 : Math.max(22, wsLabel.implicitWidth + 12)
+          height: 20
           radius: height / 2
 
           color: modelData.focused
             ? Colors.primary
             : (wsMouse.containsMouseFinal
-              ? Colors.withAlpha(Colors.primary, 0.3)
-              : Colors.withAlpha(Colors.fgDim, 0.15))
+              ? Colors.withAlpha(Colors.primary, 0.5)
+              : Qt.lighter(Colors.surface, 1.5))
 
           Behavior on width { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
           Behavior on color { ColorAnimation { duration: 160 } }
 
           Text {
+            id: wsLabel
             anchors.centerIn: parent
             text: modelData.name
-            color: modelData.focused ? Colors.bgMain : Colors.text
-            font.pixelSize: 9
+            color: modelData.focused ? Colors.background : Colors.text
+            font.pixelSize: Colors.fontSizeSmall
             font.weight: modelData.focused ? Font.Bold : Font.Medium
-            opacity: modelData.focused ? 1.0 : 0.7
 
             Behavior on opacity { NumberAnimation { duration: 160 } }
           }
@@ -78,7 +78,7 @@ Rectangle {
           id: wsMouse
           anchors.centerIn: parent
           width: wsPill.width + 4
-          height: wsRow.height
+          height: 20
           cursorShape: Qt.PointingHandCursor
           hoverEnabled: true
           acceptedButtons: Qt.LeftButton | Qt.MiddleButton

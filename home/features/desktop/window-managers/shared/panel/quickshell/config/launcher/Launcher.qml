@@ -267,20 +267,18 @@ PanelWindow {
     onTriggered: launcherRoot.loadWindows()
   }
 
-  Connections {
-    target: Hyprland.toplevels
-    function onCountChanged() {
-      if (launcherRoot.mode === "window" && launcherRoot.launcherOpacity > 0)
-        launcherRoot.loadWindows();
-    }
+  // Reactive watchers: ObjectModel doesn't expose countChanged as a signal,
+  // so we use property bindings that re-evaluate when the model count changes.
+  property int _toplevelCount: Hyprland.toplevels ? Hyprland.toplevels.count || 0 : 0
+  on_ToplevelCountChanged: {
+    if (launcherRoot.mode === "window" && launcherRoot.launcherOpacity > 0)
+      launcherRoot.loadWindows();
   }
 
-  Connections {
-    target: Mpris.players
-    function onCountChanged() {
-      if (launcherRoot.mode === "media" && launcherRoot.launcherOpacity > 0)
-        launcherRoot.refreshMediaPlayers();
-    }
+  property int _mprisCount: Mpris.players ? Mpris.players.length || 0 : 0
+  on_MprisCountChanged: {
+    if (launcherRoot.mode === "media" && launcherRoot.launcherOpacity > 0)
+      launcherRoot.refreshMediaPlayers();
   }
 
   function modeInfo(key) {

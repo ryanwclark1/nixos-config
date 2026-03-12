@@ -5,6 +5,7 @@ import Quickshell.Services.Pipewire
 import Quickshell.Widgets
 import Quickshell.Io
 import Quickshell.Wayland
+import Quickshell.Hyprland
 import "../modules"
 import "../services"
 
@@ -215,7 +216,10 @@ Scope {
         screen: modelData
 
         // Delayed unmap: stay mapped briefly after hide for fade-out
-        property bool _wantVisible: root.shouldShowOsd && (modelData === Quickshell.cursorScreen)
+        // Note: Quickshell.cursorScreen is unavailable in 0.2.x, so we
+        // compare screen names via Hyprland.focusedMonitor as a fallback.
+        readonly property string focusedName: Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : ""
+        property bool _wantVisible: root.shouldShowOsd && (focusedName === "" || modelData.name === focusedName)
         visible: _wantVisible || unmapDelay.running
         on_WantVisibleChanged: {
           if (!_wantVisible) unmapDelay.restart();

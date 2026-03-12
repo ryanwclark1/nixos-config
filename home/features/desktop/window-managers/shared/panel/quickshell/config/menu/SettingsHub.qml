@@ -217,7 +217,7 @@ PanelWindow {
   Rectangle {
     id: mainBox
     width: Math.min(parent.width - 40, 780)
-    height: Math.min(parent.height - 40, 700)
+    height: Math.min(parent.height - 40, 860)
     anchors.centerIn: parent
     color: Colors.bgGlass
     border.color: Colors.border
@@ -311,18 +311,20 @@ PanelWindow {
         }
       }
 
-      Flickable {
+      SharedWidgets.ScrollableContent {
         Layout.fillWidth: true
         Layout.fillHeight: true
-        clip: true
-        contentHeight: contentColumn.implicitHeight + 64
-        boundsBehavior: Flickable.StopAtBounds
+        columnSpacing: Colors.spacingXL
 
+        // Padding wrapper — ScrollableContent's inner ColumnLayout is full-width,
+        // so we nest the actual content column with margins.
         ColumnLayout {
           id: contentColumn
-          width: parent.width - 64
-          x: 32
-          y: 32
+          Layout.fillWidth: true
+          Layout.leftMargin: 32
+          Layout.rightMargin: 32
+          Layout.topMargin: 32
+          Layout.bottomMargin: 32
           spacing: Colors.spacingXL
 
           Text {
@@ -460,67 +462,19 @@ PanelWindow {
                 Layout.fillWidth: true
                 spacing: Colors.spacingS
 
-                // "All Monitors" pill
-                Rectangle {
-                  width: allPillLabel.implicitWidth + 24
-                  height: 34
-                  radius: height / 2
-                  color: settingsRoot.wallpaperSelectedMonitor === "__all__"
-                         ? Colors.highlight : Colors.bgWidget
-                  border.color: settingsRoot.wallpaperSelectedMonitor === "__all__"
-                                ? Colors.primary : Colors.border
-                  border.width: 1
-                  Behavior on color { ColorAnimation { duration: 150 } }
-                  Behavior on border.color { ColorAnimation { duration: 150 } }
-
-                  Text {
-                    id: allPillLabel
-                    anchors.centerIn: parent
-                    text: "All"
-                    color: settingsRoot.wallpaperSelectedMonitor === "__all__"
-                           ? Colors.primary : Colors.text
-                    font.pixelSize: Colors.fontSizeMedium
-                    font.weight: Font.DemiBold
-                  }
-
-                  MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: settingsRoot.wallpaperSelectedMonitor = "__all__"
-                  }
+                SharedWidgets.FilterChip {
+                  label: "All"
+                  selected: settingsRoot.wallpaperSelectedMonitor === "__all__"
+                  onClicked: settingsRoot.wallpaperSelectedMonitor = "__all__"
                 }
 
                 Repeater {
                   model: settingsRoot.wallpaperMonitorNames
-                  delegate: Rectangle {
+                  delegate: SharedWidgets.FilterChip {
                     required property string modelData
-                    width: monPillLabel.implicitWidth + 24
-                    height: 34
-                    radius: height / 2
-                    color: settingsRoot.wallpaperSelectedMonitor === modelData
-                           ? Colors.highlight : Colors.bgWidget
-                    border.color: settingsRoot.wallpaperSelectedMonitor === modelData
-                                  ? Colors.primary : Colors.border
-                    border.width: 1
-                    Behavior on color { ColorAnimation { duration: 150 } }
-                    Behavior on border.color { ColorAnimation { duration: 150 } }
-
-                    Text {
-                      id: monPillLabel
-                      anchors.centerIn: parent
-                      text: modelData
-                      color: settingsRoot.wallpaperSelectedMonitor === modelData
-                             ? Colors.primary : Colors.text
-                      font.pixelSize: Colors.fontSizeMedium
-                      font.weight: Font.DemiBold
-                      font.family: Colors.fontMono
-                    }
-
-                    MouseArea {
-                      anchors.fill: parent
-                      cursorShape: Qt.PointingHandCursor
-                      onClicked: settingsRoot.wallpaperSelectedMonitor = modelData
-                    }
+                    label: modelData
+                    selected: settingsRoot.wallpaperSelectedMonitor === modelData
+                    onClicked: settingsRoot.wallpaperSelectedMonitor = modelData
                   }
                 }
               }
@@ -530,6 +484,7 @@ PanelWindow {
             SectionLabel { text: "CURRENT WALLPAPER" }
 
             Rectangle {
+              id: previewContainer
               Layout.fillWidth: true
               height: 160
               radius: Colors.radiusMedium
@@ -546,28 +501,59 @@ PanelWindow {
                        || "";
               }
 
+              // Double-buffer crossfade: _previewFlip toggles which image is "front"
+              property bool _previewFlip: false
+
+              onPreviewPathChanged: {
+                if (!previewPath) return;
+                // Load new wallpaper into the *back* image
+                var src = "file://" + previewPath;
+                if (_previewFlip) {
+                  previewA.source = src;
+                } else {
+                  previewB.source = src;
+                }
+              }
+
               Image {
+                id: previewA
                 anchors.fill: parent
-                source: parent.previewPath ? ("file://" + parent.previewPath) : ""
                 fillMode: Image.PreserveAspectCrop
                 asynchronous: true
                 smooth: true
-                visible: status === Image.Ready
+                sourceSize: Qt.size(previewContainer.width * 2, previewContainer.height * 2)
+                opacity: previewContainer._previewFlip ? 0.0 : 1.0
+                Behavior on opacity { NumberAnimation { duration: 400; easing.type: Easing.InOutQuad } }
+                onStatusChanged: {
+                  // When back image finishes loading, flip it to front
+                  if (status === Image.Ready && previewContainer._previewFlip) {
+                    previewContainer._previewFlip = false;
+                  }
+                }
               }
 
-              // Placeholder when no wallpaper is set / image hasn't loaded yet
+              Image {
+                id: previewB
+                anchors.fill: parent
+                fillMode: Image.PreserveAspectCrop
+                asynchronous: true
+                smooth: true
+                sourceSize: Qt.size(previewContainer.width * 2, previewContainer.height * 2)
+                opacity: previewContainer._previewFlip ? 1.0 : 0.0
+                Behavior on opacity { NumberAnimation { duration: 400; easing.type: Easing.InOutQuad } }
+                onStatusChanged: {
+                  if (status === Image.Ready && !previewContainer._previewFlip) {
+                    previewContainer._previewFlip = true;
+                  }
+                }
+              }
+
+              // Placeholder only when *both* images have no valid content
               ColumnLayout {
                 anchors.centerIn: parent
-                spacing: 6
-                visible: parent.previewPath === "" || previewImg.status !== Image.Ready
-
-                // Hidden image just to track load status via alias
-                Image {
-                  id: previewImg
-                  source: parent.parent.previewPath ? ("file://" + parent.parent.previewPath) : ""
-                  visible: false
-                  asynchronous: true
-                }
+                spacing: Colors.spacingS
+                visible: previewContainer.previewPath === ""
+                         || (previewA.status !== Image.Ready && previewB.status !== Image.Ready)
 
                 Text {
                   text: "󰸉"
@@ -577,7 +563,7 @@ PanelWindow {
                   Layout.alignment: Qt.AlignHCenter
                 }
                 Text {
-                  text: parent.parent.previewPath !== "" ? "Loading preview…" : "No wallpaper set"
+                  text: previewContainer.previewPath !== "" ? "Loading preview…" : "No wallpaper set"
                   color: Colors.fgDim
                   font.pixelSize: Colors.fontSizeMedium
                   Layout.alignment: Qt.AlignHCenter
@@ -589,19 +575,19 @@ PanelWindow {
                 anchors {
                   bottom: parent.bottom
                   right: parent.right
-                  margins: 10
+                  margins: Colors.spacingM
                 }
-                visible: parent.previewPath !== ""
+                visible: previewContainer.previewPath !== ""
                 implicitWidth: previewName.implicitWidth + 16
                 height: 22
-                radius: 11
+                radius: Colors.radiusPill
                 color: Qt.rgba(0, 0, 0, 0.55)
 
                 Text {
                   id: previewName
                   anchors.centerIn: parent
                   text: {
-                    var p = parent.parent.previewPath;
+                    var p = previewContainer.previewPath;
                     if (!p) return "";
                     var parts = p.split("/");
                     return parts[parts.length - 1];
@@ -618,7 +604,7 @@ PanelWindow {
             // ---- Quick action buttons ---------------------------------
             RowLayout {
               Layout.fillWidth: true
-              spacing: 10
+              spacing: Colors.spacingM
 
               // Next Wallpaper
               Rectangle {
@@ -637,7 +623,7 @@ PanelWindow {
 
                 RowLayout {
                   anchors.centerIn: parent
-                  spacing: 7
+                  spacing: Colors.spacingS
                   Text { text: "󰒭"; color: Colors.fgSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
                   Text { text: "Next"; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium }
                 }
@@ -673,7 +659,7 @@ PanelWindow {
 
                 RowLayout {
                   anchors.centerIn: parent
-                  spacing: 7
+                  spacing: Colors.spacingS
                   Text { text: "󰒝"; color: Colors.fgSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
                   Text { text: "Random"; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium }
                 }
@@ -709,7 +695,7 @@ PanelWindow {
 
                 RowLayout {
                   anchors.centerIn: parent
-                  spacing: 7
+                  spacing: Colors.spacingS
                   Text { text: "󰝰"; color: Colors.fgSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
                   Text { text: "Open Folder"; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium }
                 }
@@ -743,7 +729,7 @@ PanelWindow {
 
                 RowLayout {
                   anchors.centerIn: parent
-                  spacing: 7
+                  spacing: Colors.spacingS
                   Text { text: "󰉋"; color: Colors.fgSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
                   Text { text: "Browse..."; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium }
                 }
@@ -844,23 +830,49 @@ PanelWindow {
                 }
               }
 
-              Rectangle {
+              Item {
                 Layout.fillWidth: true
-                height: 6
-                color: Colors.surface
-                radius: 3
+                height: 24
 
+                // Track
                 Rectangle {
-                  width: parent.width * (Config.wallpaperCycleInterval / 60)
-                  height: parent.height
-                  color: Config.wallpaperCycleInterval > 0 ? Colors.primary : Colors.border
+                  id: cycleTrack
+                  anchors.verticalCenter: parent.verticalCenter
+                  width: parent.width
+                  height: 6
+                  color: Colors.surface
                   radius: 3
-                  Behavior on width { NumberAnimation { duration: 100 } }
+
+                  // Fill
+                  Rectangle {
+                    width: parent.width * (Config.wallpaperCycleInterval / 60)
+                    height: parent.height
+                    color: Config.wallpaperCycleInterval > 0 ? Colors.primary : Colors.border
+                    radius: 3
+                    Behavior on width { NumberAnimation { duration: 100 } }
+                    Behavior on color { ColorAnimation { duration: 150 } }
+                  }
+                }
+
+                // Thumb handle
+                Rectangle {
+                  id: cycleThumb
+                  width: 14
+                  height: 14
+                  radius: 7
+                  color: Config.wallpaperCycleInterval > 0 ? Colors.primary : Colors.border
+                  border.color: Colors.bgWidget
+                  border.width: 2
+                  x: Math.max(0, Math.min(parent.width - width, parent.width * (Config.wallpaperCycleInterval / 60) - width / 2))
+                  anchors.verticalCenter: parent.verticalCenter
+                  Behavior on x { NumberAnimation { duration: 100 } }
                   Behavior on color { ColorAnimation { duration: 150 } }
                 }
 
                 MouseArea {
                   anchors.fill: parent
+                  anchors.topMargin: -4
+                  anchors.bottomMargin: -4
                   cursorShape: Qt.PointingHandCursor
                   function updateCycle(mouse) {
                     var raw = (mouse.x / width) * 60;
@@ -872,6 +884,14 @@ PanelWindow {
                   onPressed: (mouse) => updateCycle(mouse)
                   onPositionChanged: (mouse) => { if (pressed) updateCycle(mouse); }
                 }
+              }
+
+              // Endpoint labels
+              RowLayout {
+                Layout.fillWidth: true
+                Text { text: "Off"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS }
+                Item { Layout.fillWidth: true }
+                Text { text: "60 min"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS }
               }
             }
 
@@ -885,16 +905,14 @@ PanelWindow {
             // Rescan + empty-state row
             RowLayout {
               Layout.fillWidth: true
-              spacing: 10
+              spacing: Colors.spacingM
               visible: !WallpaperService.scanning
 
-              Text {
+              SharedWidgets.EmptyState {
                 visible: WallpaperService.availableWallpapers.length === 0
-                text: "No wallpapers found in search directories."
-                color: Colors.fgDim
-                font.pixelSize: Colors.fontSizeMedium
+                icon: "󰸉"
+                message: "No wallpapers found in search directories"
                 Layout.fillWidth: true
-                wrapMode: Text.WordWrap
               }
 
               Item { Layout.fillWidth: true; visible: WallpaperService.availableWallpapers.length > 0 }
@@ -916,7 +934,7 @@ PanelWindow {
                 RowLayout {
                   id: rescanRow
                   anchors.centerIn: parent
-                  spacing: 6
+                  spacing: Colors.spacingS
                   Text { text: "󰑐"; color: Colors.fgSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium }
                   Text { text: "Rescan"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
                 }
@@ -935,28 +953,19 @@ PanelWindow {
             }
 
             // Scanning spinner placeholder
-            Item {
+            ColumnLayout {
               visible: WallpaperService.scanning
               Layout.fillWidth: true
-              height: 40
+              spacing: Colors.spacingS
 
-              RowLayout {
-                anchors.centerIn: parent
-                spacing: Colors.spacingS
-                Text {
-                  text: "󰑐"
-                  color: Colors.fgDim
-                  font.family: Colors.fontMono
-                  font.pixelSize: Colors.fontSizeXL
-
-                  RotationAnimator on rotation {
-                    from: 0; to: 360
-                    duration: 1200
-                    loops: Animation.Infinite
-                    running: WallpaperService.scanning
-                  }
-                }
-                Text { text: "Scanning directories…"; color: Colors.fgDim; font.pixelSize: Colors.fontSizeMedium }
+              SharedWidgets.LoadingSpinner {
+                Layout.alignment: Qt.AlignHCenter
+              }
+              Text {
+                text: "Scanning directories…"
+                color: Colors.textDisabled
+                font.pixelSize: Colors.fontSizeMedium
+                Layout.alignment: Qt.AlignHCenter
               }
             }
 
@@ -971,6 +980,7 @@ PanelWindow {
                 model: WallpaperService.availableWallpapers
 
                 delegate: Item {
+                  id: thumbDelegate
                   required property var modelData
                   required property int index
 
@@ -985,6 +995,13 @@ PanelWindow {
 
                   width: 108
                   height: 80
+                  scale: 1.0
+
+                  SequentialAnimation {
+                    id: thumbPulse
+                    NumberAnimation { target: thumbDelegate; property: "scale"; to: 0.92; duration: 100; easing.type: Easing.InQuad }
+                    NumberAnimation { target: thumbDelegate; property: "scale"; to: 1.0; duration: 100; easing.type: Easing.OutQuad }
+                  }
 
                   Rectangle {
                     anchors.fill: parent
@@ -1004,6 +1021,7 @@ PanelWindow {
                       asynchronous: true
                       smooth: true
                       cache: false
+                      sourceSize: Qt.size(216, 160)
 
                       // Fade-in when ready
                       opacity: status === Image.Ready ? 1.0 : 0.0
@@ -1063,6 +1081,7 @@ PanelWindow {
                       hoverEnabled: true
                       cursorShape: Qt.PointingHandCursor
                       onClicked: {
+                        thumbPulse.restart();
                         var mon = settingsRoot.wallpaperSelectedMonitor === "__all__"
                                   ? "" : settingsRoot.wallpaperSelectedMonitor;
                         WallpaperService.setWallpaper(modelData.path, mon);
@@ -1085,7 +1104,7 @@ PanelWindow {
               ColumnLayout {
                 id: wpInfoLayout
                 anchors { left: parent.left; right: parent.right; top: parent.top; margins: Colors.spacingM }
-                spacing: 6
+                spacing: Colors.spacingS
 
                 RowLayout {
                   spacing: Colors.spacingS
@@ -1148,7 +1167,7 @@ PanelWindow {
 
               RowLayout {
                 anchors { fill: parent; leftMargin: 16; rightMargin: 16 }
-                spacing: 10
+                spacing: Colors.spacingM
                 Text { text: "󰍺"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL }
                 Text { text: "Configure Displays"; color: Colors.text; font.weight: Font.Bold; font.pixelSize: Colors.fontSizeMedium }
                 Item { Layout.fillWidth: true }
@@ -1430,7 +1449,7 @@ PanelWindow {
               RowLayout {
                 id: noteRow
                 anchors { left: parent.left; right: parent.right; top: parent.top; margins: Colors.spacingM }
-                spacing: 10
+                spacing: Colors.spacingM
 
                 Text {
                   text: "󰋗"
@@ -1574,7 +1593,7 @@ PanelWindow {
                 RowLayout {
                   id: kbRow
                   anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; leftMargin: Colors.spacingM; rightMargin: Colors.spacingM }
-                  spacing: 10
+                  spacing: Colors.spacingM
 
                   // Chord badge
                   Rectangle {
@@ -1712,7 +1731,7 @@ PanelWindow {
                 RowLayout {
                   id: scanRow
                   anchors.centerIn: parent
-                  spacing: 7
+                  spacing: Colors.spacingS
                   Text {
                     text: "󰑐"
                     color: Colors.fgSecondary
@@ -1745,7 +1764,7 @@ PanelWindow {
               visible: PluginService.plugins.length === 0
               Layout.fillWidth: true
               Layout.topMargin: 24
-              spacing: 10
+              spacing: Colors.spacingM
 
               Text {
                 text: "󰏗"
@@ -1911,7 +1930,7 @@ PanelWindow {
               ColumnLayout {
                 id: pluginInfoRow
                 anchors { left: parent.left; right: parent.right; top: parent.top; margins: Colors.spacingM }
-                spacing: 6
+                spacing: Colors.spacingS
 
                 RowLayout {
                   spacing: Colors.spacingS
@@ -1971,7 +1990,7 @@ PanelWindow {
               ColumnLayout {
                 id: shellCard
                 anchors { left: parent.left; right: parent.right; top: parent.top; margins: 20 }
-                spacing: 6
+                spacing: Colors.spacingS
 
                 RowLayout {
                   spacing: Colors.spacingM
@@ -2067,7 +2086,7 @@ PanelWindow {
 
               RowLayout {
                 anchors.centerIn: parent
-                spacing: 10
+                spacing: Colors.spacingM
                 Text { text: "󰜉"; color: Colors.text; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL }
                 Text { text: "Restart Shell"; color: Colors.text; font.weight: Font.Bold; font.pixelSize: Colors.fontSizeMedium }
               }
@@ -2205,19 +2224,43 @@ PanelWindow {
         }
       }
 
-      Rectangle {
+      Item {
         Layout.fillWidth: true
-        height: 6
-        color: Colors.surface
-        radius: 3
+        height: 24
+
+        // Track
         Rectangle {
-          width: parent.width * ((value - min) / (max - min))
-          height: parent.height
-          color: Colors.primary
+          anchors.verticalCenter: parent.verticalCenter
+          width: parent.width
+          height: 6
+          color: Colors.surface
           radius: 3
+          Rectangle {
+            width: parent.width * ((value - min) / (max - min))
+            height: parent.height
+            color: Colors.primary
+            radius: 3
+            Behavior on width { NumberAnimation { duration: 80 } }
+          }
         }
+
+        // Thumb handle
+        Rectangle {
+          width: 14
+          height: 14
+          radius: 7
+          color: Colors.primary
+          border.color: Colors.bgWidget
+          border.width: 2
+          x: Math.max(0, Math.min(parent.width - width, parent.width * ((value - min) / (max - min)) - width / 2))
+          anchors.verticalCenter: parent.verticalCenter
+          Behavior on x { NumberAnimation { duration: 80 } }
+        }
+
         MouseArea {
           anchors.fill: parent
+          anchors.topMargin: -4
+          anchors.bottomMargin: -4
           cursorShape: Qt.PointingHandCursor
           function updateValue(mouse) {
             var raw = min + (mouse.x / width) * (max - min);

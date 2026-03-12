@@ -6,26 +6,26 @@ source "${script_dir}/helpers.sh"
 
 tmux set -g @forceline_pane_status_enabled "yes"
 
-tmux source "${script_dir}/../forceline_options_tmux.conf"
-tmux source "${script_dir}/../forceline_tmux.conf"
+tmux source "${script_dir}/../options.conf"
+tmux source "${script_dir}/../config.conf"
 
 print_option pane-border-format
 
 # Switch the number position to the right
 tmux set -g @forceline_pane_number_position "right"
-tmux source "${script_dir}/../forceline_tmux.conf"
+tmux source "${script_dir}/../config.conf"
 print_option pane-border-format
 
 tmux set -g @forceline_pane_number_position "left" # reset
 
 # Fill option "all"
 tmux set -g @forceline_pane_default_fill "all"
-tmux source "${script_dir}/../forceline_tmux.conf"
+tmux source "${script_dir}/../config.conf"
 print_option pane-border-format
 
 tmux set -g @forceline_pane_default_fill "number" # reset
 
 # Fill option "none"
 tmux set -g @forceline_pane_default_fill "none"
-tmux source "${script_dir}/../forceline_tmux.conf"
+tmux source "${script_dir}/../config.conf"
 print_option pane-border-format

@@ -16,7 +16,7 @@ if [[ -f "$UTILS_DIR/common.sh" ]]; then
     source "$UTILS_DIR/common.sh"
     
     # Source helpers using centralized path management
-    HELPERS_PATH="$(get_forceline_path "modules/now_playing/scripts/now_playing_helpers.sh")"
+    HELPERS_PATH="$(get_forceline_path "modules/now_playing/now_playing_helpers.sh")"
     if [[ -f "$HELPERS_PATH" ]]; then
         source "$HELPERS_PATH"
     else
@@ -57,8 +57,8 @@ if [[ -f "$UTILS_DIR/common.sh" ]]; then
 else
     # Fallback implementation if common.sh not available
     CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    if [[ -f "$CURRENT_DIR/scripts/now_playing_helpers.sh" ]]; then
-        source "$CURRENT_DIR/scripts/now_playing_helpers.sh"
+    if [[ -f "$CURRENT_DIR/now_playing_helpers.sh" ]]; then
+        source "$CURRENT_DIR/now_playing_helpers.sh"
     else
         echo "Error: Helper script not found" >&2
         exit 1

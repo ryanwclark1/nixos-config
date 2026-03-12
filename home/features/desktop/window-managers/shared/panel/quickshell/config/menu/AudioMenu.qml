@@ -7,8 +7,8 @@ import "../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  implicitWidth: 350
-  implicitHeight: 510
+  implicitWidth: 380
+  implicitHeight: 560
   title: "Audio"
   toggleMethod: "toggleAudioMenu"
 
@@ -63,10 +63,13 @@ BasePopupMenu {
         color: Colors.cardSurface
         border.color: Colors.border
         border.width: 1
-        implicitHeight: 64
+        implicitHeight: outputCol.implicitHeight + 2 * Colors.spacingM
 
         ColumnLayout {
-          anchors.fill: parent
+          id: outputCol
+          anchors.left: parent.left
+          anchors.right: parent.right
+          anchors.top: parent.top
           anchors.margins: Colors.spacingM
           spacing: Colors.spacingS
 
@@ -127,7 +130,7 @@ BasePopupMenu {
             spacing: Colors.paddingSmall
             Text { text: sinkCard.isDefault ? "󰄬" : "󰕾"; color: sinkCard.isDefault ? Colors.primary : Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
             Text { text: modelData.name; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: sinkCard.isDefault ? Font.DemiBold : Font.Normal; elide: Text.ElideRight; Layout.fillWidth: true }
-            Text { text: Math.round(modelData.volume * 100) + "%"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS }
+            Text { text: Math.min(Math.round(modelData.volume * 100), 100) + "%"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS }
             Text { text: sinkCard.isDefault ? "Default" : "Select"; color: sinkCard.isDefault ? Colors.primary : Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Medium }
           }
 
@@ -153,10 +156,13 @@ BasePopupMenu {
         color: Colors.cardSurface
         border.color: Colors.border
         border.width: 1
-        implicitHeight: 64
+        implicitHeight: inputCol.implicitHeight + 2 * Colors.spacingM
 
         ColumnLayout {
-          anchors.fill: parent
+          id: inputCol
+          anchors.left: parent.left
+          anchors.right: parent.right
+          anchors.top: parent.top
           anchors.margins: Colors.spacingM
           spacing: Colors.spacingS
 
@@ -217,7 +223,7 @@ BasePopupMenu {
             spacing: Colors.paddingSmall
             Text { text: sourceCard.isDefault ? "󰄬" : "󰍬"; color: sourceCard.isDefault ? Colors.primary : Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
             Text { text: modelData.name; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: sourceCard.isDefault ? Font.DemiBold : Font.Normal; elide: Text.ElideRight; Layout.fillWidth: true }
-            Text { text: Math.round(modelData.volume * 100) + "%"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS }
+            Text { text: Math.min(Math.round(modelData.volume * 100), 100) + "%"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS }
             Text { text: sourceCard.isDefault ? "Default" : "Select"; color: sourceCard.isDefault ? Colors.primary : Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Medium }
           }
 

@@ -5,8 +5,8 @@ script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 source "${script_dir}/helpers.sh"
 
 # Tests that the default options are set correctly
-tmux source "${script_dir}/../forceline_options_tmux.conf"
-tmux source "${script_dir}/../forceline_tmux.conf"
+tmux source "${script_dir}/../options.conf"
+tmux source "${script_dir}/../config.conf"
 
 print_option @forceline_status_application | grep -q "@thm_" &&
   echo "@forceline_status_application did not expand all colors"

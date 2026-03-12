@@ -13,8 +13,8 @@ script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 # shellcheck disable=SC1091
 source "${script_dir}/helpers.sh"
 
-tmux source "${script_dir}/../forceline_options_tmux.conf"
-tmux source "${script_dir}/../forceline_tmux.conf"
+tmux source "${script_dir}/../options.conf"
+tmux source "${script_dir}/../config.conf"
 
 print_option window-status-format
 print_option window-status-current-format
@@ -22,8 +22,8 @@ print_option window-status-current-format
 # Test the rounded style
 reset
 tmux set -g @forceline_window_status_style "rounded"
-tmux source "${script_dir}/../forceline_options_tmux.conf"
-tmux source "${script_dir}/../forceline_tmux.conf"
+tmux source "${script_dir}/../options.conf"
+tmux source "${script_dir}/../config.conf"
 
 print_option window-status-format
 print_option window-status-current-format
@@ -31,8 +31,8 @@ print_option window-status-current-format
 # Test the basic style with the number on the right
 reset
 tmux set -g @forceline_window_number_position "right"
-tmux source "${script_dir}/../forceline_options_tmux.conf"
-tmux source "${script_dir}/../forceline_tmux.conf"
+tmux source "${script_dir}/../options.conf"
+tmux source "${script_dir}/../config.conf"
 
 print_option window-status-format
 print_option window-status-current-format

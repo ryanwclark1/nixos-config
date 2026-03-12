@@ -24,9 +24,9 @@ readonly CACHE_DURATION=5  # Short cache for responsive updates
 readonly DEFAULT_TIMEOUT=1 # Fast response time
 
 # Source centralized path management
-UTILS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../utils" && pwd)"
+UTILS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../utils" && pwd)"
 if [[ -f "$UTILS_DIR/common.sh" ]]; then
-    # shellcheck source=../../../utils/common.sh
+    # shellcheck source=../../utils/common.sh
     source "$UTILS_DIR/common.sh"
     
     # Enhanced tmux option getter with transient-specific validation

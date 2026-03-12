@@ -15,6 +15,26 @@ Item {
   property string updatesCount: "0"
   property bool inhibitorActive: false
 
+  // Map spectrum values to block chars for bar display and popup
+  readonly property var _blockChars: ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"]
+  function _valToBlock(v) {
+    var idx = Math.min(7, Math.floor(v * 8));
+    return _blockChars[Math.max(0, idx)];
+  }
+  readonly property string fullCavaData: {
+    var vals = (SpectrumService && SpectrumService.values) ? SpectrumService.values : [];
+    var s = "";
+    for (var i = 0; i < vals.length; i++) {
+      var ch = _valToBlock(vals[i]);
+      if (ch !== undefined) s += ch;
+    }
+    return s || "";
+  }
+  readonly property string cavaBarText: {
+    var full = root.fullCavaData || "";
+    return full.length >= 8 ? full.substring(0, 8) : (full.length > 0 ? full : "▁▂▃▄▅▆▇█");
+  }
+
   // Read cached update counts written by qs-updator (triggered by UpdateWidget)
   SharedWidgets.CommandPoll {
     id: updatePoll
@@ -59,23 +79,6 @@ Item {
 
     // Cava spectrum (via SpectrumService)
     Loader { active: root.visible; sourceComponent: SharedWidgets.Ref { service: SpectrumService } }
-
-    // Map spectrum values to block chars for bar display and popup
-    readonly property var _blockChars: ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"]
-    function _valToBlock(v) {
-      var idx = Math.min(7, Math.floor(v * 8));
-      return _blockChars[Math.max(0, idx)];
-    }
-    readonly property string fullCavaData: {
-      var vals = SpectrumService.values || [];
-      var s = "";
-      for (var i = 0; i < vals.length; i++) s += _valToBlock(vals[i]);
-      return s || "";
-    }
-    readonly property string cavaBarText: {
-      var full = fullCavaData || "";
-      return full.length >= 8 ? full.substring(0, 8) : (full || "▁▂▃▄▅▆▇█");
-    }
 
     SharedWidgets.BarPill {
       id: cavaPill

@@ -4,21 +4,9 @@
 
 set -euo pipefail
 
-# Source centralized path management
+# Source shared utilities
 UTILS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/utils"
-if [[ -f "$UTILS_DIR/common.sh" ]]; then
-    source "$UTILS_DIR/common.sh"
-    # shellcheck source=scripts/helpers.sh
-    HELPERS_PATH="$(get_forceline_path "modules/gpu/scripts/helpers.sh")"
-    source "$HELPERS_PATH"
-else
-    # Fallback implementation if common.sh not available
-    CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    source "$CURRENT_DIR/scripts/helpers.sh"
-fi
-
-# Get forceline root directory using centralized system
-FORCELINE_DIR="$(get_forceline_dir)"
+source "$UTILS_DIR/source_helpers.sh"
 
 # GPU-only interpolation array for focused monitoring
 gpu_interpolation=(
@@ -32,50 +20,30 @@ gpu_interpolation=(
   "\#{gpu_temp_fg_color}"
 )
 
-# GPU-only command mapping - use centralized or fallback paths
-if command -v get_forceline_path >/dev/null 2>&1; then
-  gpu_commands=(
-    "#($(get_forceline_path "modules/gpu/scripts/gpu_percentage.sh"))"
-    "#($(get_forceline_path "modules/gpu/scripts/gpu_icon.sh"))"
-    "#($(get_forceline_path "modules/gpu/scripts/gpu_bg_color.sh"))"
-    "#($(get_forceline_path "modules/gpu/scripts/gpu_fg_color.sh"))"
-    "#($(get_forceline_path "modules/gpu/scripts/gpu_temp.sh"))"
-    "#($(get_forceline_path "modules/gpu/scripts/gpu_temp_icon.sh"))"
-    "#($(get_forceline_path "modules/gpu/scripts/gpu_temp_bg_color.sh"))"
-    "#($(get_forceline_path "modules/gpu/scripts/gpu_temp_fg_color.sh"))"
-  )
-else
-  gpu_commands=(
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/gpu_percentage.sh)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/gpu_icon.sh)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/gpu_bg_color.sh)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/gpu_fg_color.sh)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/gpu_temp.sh)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/gpu_temp_icon.sh)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/gpu_temp_bg_color.sh)"
-    "#(${CURRENT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/scripts/gpu_temp_fg_color.sh)"
-  )
-fi
+# GPU command mapping using centralized paths
+THRESHOLD_SCRIPT="$(get_forceline_path "utils/threshold_color.sh")"
+PCT_SCRIPT="$(get_forceline_path "modules/gpu/gpu_percentage.sh")"
+TEMP_SCRIPT="$(get_forceline_path "modules/gpu/gpu_temp.sh")"
 
-# Set tmux option with error handling
-set_tmux_option() {
-  local option="$1"
-  local value="$2"
-  
-  if ! tmux set-option -gq "$option" "$value"; then
-    echo "Warning: Failed to set tmux option '$option'" >&2
-    return 1
-  fi
-}
+gpu_commands=(
+  "#($PCT_SCRIPT)"
+  "#($THRESHOLD_SCRIPT gpu icon $PCT_SCRIPT)"
+  "#($THRESHOLD_SCRIPT gpu bg $PCT_SCRIPT)"
+  "#($THRESHOLD_SCRIPT gpu fg $PCT_SCRIPT)"
+  "#($TEMP_SCRIPT)"
+  "#($THRESHOLD_SCRIPT gpu_temp icon $TEMP_SCRIPT)"
+  "#($THRESHOLD_SCRIPT gpu_temp bg $TEMP_SCRIPT)"
+  "#($THRESHOLD_SCRIPT gpu_temp fg $TEMP_SCRIPT)"
+)
 
 # Perform GPU-specific interpolation
 do_interpolation() {
   local all_interpolated="$1"
-  
+
   for ((i = 0; i < ${#gpu_commands[@]}; i++)); do
     all_interpolated=${all_interpolated//${gpu_interpolation[$i]}/${gpu_commands[$i]}}
   done
-  
+
   echo "$all_interpolated"
 }
 
@@ -83,7 +51,7 @@ do_interpolation() {
 update_tmux_option() {
   local option="$1"
   local option_value new_option_value
-  
+
   option_value=$(get_tmux_option "$option")
   new_option_value=$(do_interpolation "$option_value")
   set_tmux_option "$option" "$new_option_value"
