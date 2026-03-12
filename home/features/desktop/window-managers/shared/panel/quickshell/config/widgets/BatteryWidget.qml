@@ -27,7 +27,7 @@ Row {
 
   CircularGauge {
     value: device ? device.percentage : 0
-    color: device && device.state === UPower.DeviceStateCharging ? Colors.primary : (device && device.percentage < 0.2 ? Colors.error : Colors.fgMain)
+    color: device && device.state === UPower.DeviceStateCharging ? Colors.primary : (device && device.percentage < 0.2 ? Colors.error : Colors.text)
     icon: device ? (device.state === UPower.DeviceStateCharging ? "󰂄" : (device.percentage > 0.9 ? "󰁹" : (device.percentage > 0.5 ? "󰁿" : (device.percentage > 0.2 ? "󰁽" : "󰂃")))) : "󰂑"
     thickness: 3
     width: 20; height: 20
@@ -35,8 +35,8 @@ Row {
 
   Text {
     text: showBattery && device ? Math.round(device.percentage * 100) + "%" : ""
-    color: Colors.fgMain
-    font.pixelSize: 11
+    color: Colors.text
+    font.pixelSize: Colors.fontSizeSmall
     font.weight: Font.DemiBold
     anchors.verticalCenter: parent.verticalCenter
   }

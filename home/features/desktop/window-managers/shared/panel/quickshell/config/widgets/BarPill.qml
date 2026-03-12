@@ -15,18 +15,78 @@ MouseArea {
 
   height: 28
   width: contentContainer.childrenRect.width + horizontalPadding * 2
-  hoverEnabled: true
+  hoverEnabled: enabled
+  cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+  opacity: enabled ? 1.0 : 0.4
 
-  scale: containsMouse ? hoverScale : 1.0
-  Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+  // Multiplicative scale: hover lifts, press pushes back toward normal
+  scale: (containsMouse ? hoverScale : 1.0) * (pressed ? 0.94 : 1.0)
+  Behavior on scale { NumberAnimation { duration: 240; easing.type: Easing.OutBack; easing.overshoot: 1.1 } }
+
+  // Y-offset physics: hover lifts, press pushes down
+  property real _yOffset: pressed ? 1.5 : (containsMouse ? -0.5 : 0)
+  Behavior on _yOffset { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+  transform: Translate { y: root._yOffset }
+
+  property bool shimmerEnabled: true
 
   Rectangle {
     id: bg
     anchors.fill: parent
     color: root.containsMouse ? root.hoverColor : root.normalColor
     radius: height / 2
+    clip: true
     Behavior on color { ColorAnimation { duration: 160 } }
+
+    // Shimmer sweep on hover
+    Rectangle {
+      id: shimmer
+      width: 60
+      height: parent.height * 1.6
+      y: -parent.height * 0.3
+      rotation: 20
+      visible: root.shimmerEnabled
+      opacity: 0
+
+      gradient: Gradient {
+        orientation: Gradient.Horizontal
+        GradientStop { position: 0.0; color: "transparent" }
+        GradientStop { position: 0.5; color: Qt.rgba(1, 1, 1, 0.14) }
+        GradientStop { position: 1.0; color: "transparent" }
+      }
+
+      NumberAnimation {
+        id: shimmerAnim
+        target: shimmer
+        property: "x"
+        from: -60
+        to: root.width + 60
+        duration: 600
+        easing.type: Easing.InOutQuad
+      }
+
+      SequentialAnimation {
+        id: shimmerFade
+        NumberAnimation { target: shimmer; property: "opacity"; to: 1.0; duration: 80 }
+        PauseAnimation { duration: 440 }
+        NumberAnimation { target: shimmer; property: "opacity"; to: 0.0; duration: 80 }
+      }
+    }
+
+    ClickRipple {
+      id: ripple
+      color: Qt.rgba(1, 1, 1, 0.12)
+    }
   }
+
+  onContainsMouseChanged: {
+    if (containsMouse && shimmerEnabled) {
+      shimmerAnim.restart();
+      shimmerFade.restart();
+    }
+  }
+
+  onClicked: (mouse) => ripple.burst(mouse.x, mouse.y)
 
   Item {
     id: contentContainer

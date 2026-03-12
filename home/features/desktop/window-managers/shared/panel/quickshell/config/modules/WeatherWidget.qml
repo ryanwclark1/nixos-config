@@ -14,7 +14,7 @@ Rectangle {
   RowLayout {
     anchors.fill: parent
     anchors.margins: Colors.paddingMedium
-    spacing: 15
+    spacing: Colors.paddingMedium
 
     Text {
       text: Colors.weatherIcon(WeatherService.condition)
@@ -27,14 +27,14 @@ Rectangle {
       spacing: 2
       Text {
         text: WeatherService.temp
-        color: Colors.fgMain
-        font.pixelSize: 18
+        color: Colors.text
+        font.pixelSize: Colors.fontSizeXL
         font.weight: Font.Bold
       }
       Text {
         text: (WeatherService.condition || "Unknown") + " in " + (WeatherService.location || "Local")
         color: Colors.fgDim
-        font.pixelSize: 11
+        font.pixelSize: Colors.fontSizeSmall
         elide: Text.ElideRight
         Layout.fillWidth: true
       }

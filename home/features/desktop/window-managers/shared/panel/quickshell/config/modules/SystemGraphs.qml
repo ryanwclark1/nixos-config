@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../services"
+import "../widgets" as SharedWidgets
 
 Rectangle {
   id: root
@@ -8,19 +9,24 @@ Rectangle {
   Layout.preferredHeight: 140
   color: Colors.highlightLight
   radius: Colors.radiusMedium
-  border.color: Colors.border
+  border.color: sysCardHover.hovered ? Colors.primary : Colors.border
   clip: true
+  scale: sysCardHover.hovered ? 1.01 : 1.0
+  Behavior on scale { NumberAnimation { duration: 300; easing.type: Easing.OutQuint } }
+  Behavior on border.color { ColorAnimation { duration: 160 } }
+
+  HoverHandler { id: sysCardHover }
 
   property var cpuHistory: new Array(30).fill(0)
   property var memHistory: new Array(30).fill(0)
 
-  Component.onCompleted: SystemStatus.subscribe()
-  Component.onDestruction: SystemStatus.unsubscribe()
+  SharedWidgets.Ref { service: SystemStatus }
 
   function paintGraph(canvas, data, strokeColor) {
+    if (!data.length || canvas.width <= 0 || canvas.height <= 0) return;
     var ctx = canvas.getContext("2d");
     ctx.reset();
-    var w = canvas.width / (data.length - 1);
+    var w = data.length > 1 ? canvas.width / (data.length - 1) : canvas.width;
 
     var grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
     grad.addColorStop(0, Colors.withAlpha(strokeColor, 0.3));
@@ -52,11 +58,9 @@ Rectangle {
     running: root.visible
     repeat: true
     onTriggered: {
-      root.cpuHistory.shift(); root.cpuHistory.push(SystemStatus.cpuPercent);
-      root.cpuHistory = root.cpuHistory; // Trigger binding update
+      root.cpuHistory = root.cpuHistory.slice(1).concat(SystemStatus.cpuPercent);
       cpuCanvas.requestPaint();
-      root.memHistory.shift(); root.memHistory.push(SystemStatus.ramPercent);
-      root.memHistory = root.memHistory;
+      root.memHistory = root.memHistory.slice(1).concat(SystemStatus.ramPercent);
       memCanvas.requestPaint();
     }
   }
@@ -73,15 +77,17 @@ Rectangle {
       spacing: 5
       RowLayout {
         Layout.preferredHeight: 14
-        Text { text: "CPU"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold; font.letterSpacing: 1 }
+        Text { text: "CPU"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.letterSpacing: 1 }
         Item { Layout.fillWidth: true }
-        Text { text: Math.round(root.cpuHistory[root.cpuHistory.length-1] * 100) + "%"; color: Colors.primary; font.pixelSize: 10; font.weight: Font.Bold }
+        Text { text: Math.round(root.cpuHistory[root.cpuHistory.length-1] * 100) + "%"; color: Colors.primary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
       }
       Canvas {
         id: cpuCanvas
         Layout.fillWidth: true
         Layout.fillHeight: true
         antialiasing: true
+        renderTarget: Canvas.FramebufferObject
+        renderStrategy: Canvas.Threaded
         onPaint: root.paintGraph(cpuCanvas, root.cpuHistory, Colors.primary)
       }
     }
@@ -93,15 +99,17 @@ Rectangle {
       spacing: 5
       RowLayout {
         Layout.preferredHeight: 14
-        Text { text: "MEM"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold; font.letterSpacing: 1 }
+        Text { text: "MEM"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.letterSpacing: 1 }
         Item { Layout.fillWidth: true }
-        Text { text: Math.round(root.memHistory[root.memHistory.length-1] * 100) + "%"; color: Colors.accent; font.pixelSize: 10; font.weight: Font.Bold }
+        Text { text: Math.round(root.memHistory[root.memHistory.length-1] * 100) + "%"; color: Colors.accent; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
       }
       Canvas {
         id: memCanvas
         Layout.fillWidth: true
         Layout.fillHeight: true
         antialiasing: true
+        renderTarget: Canvas.FramebufferObject
+        renderStrategy: Canvas.Threaded
         onPaint: root.paintGraph(memCanvas, root.memHistory, Colors.accent)
       }
     }

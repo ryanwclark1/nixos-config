@@ -1,0 +1,40 @@
+import QtQuick
+import QtQuick.Layouts
+
+// ScrollableContent — reusable scrollable wrapper for popup menus.
+//
+// Replaces the boilerplate Item + Flickable + ColumnLayout + DankScrollbar
+// + OverscrollGlow pattern used across popup menus.
+//
+// Usage:
+//   ScrollableContent {
+//     Layout.fillWidth: true
+//     Layout.fillHeight: true
+//     // children go directly into the inner ColumnLayout
+//     Text { text: "Hello" }
+//   }
+
+Item {
+  id: root
+
+  property int columnSpacing: 10
+  default property alias content: contentColumn.data
+  readonly property alias flickable: flick
+
+  Flickable {
+    id: flick
+    anchors.fill: parent
+    contentHeight: contentColumn.implicitHeight
+    clip: true
+    boundsBehavior: Flickable.DragOverBounds
+
+    ColumnLayout {
+      id: contentColumn
+      width: parent.width
+      spacing: root.columnSpacing
+    }
+  }
+
+  DankScrollbar { flickable: flick }
+  OverscrollGlow { flickable: flick }
+}

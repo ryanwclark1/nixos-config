@@ -11,8 +11,13 @@ Rectangle {
   visible: Config.controlCenterShowMediaWidget && activePlayers.length > 0
   color: Colors.bgWidget
   radius: Colors.radiusMedium
-  border.color: Colors.border
+  border.color: cardHover.hovered ? Colors.primary : Colors.border
   clip: true
+  scale: cardHover.hovered ? 1.01 : 1.0
+  Behavior on scale { NumberAnimation { duration: 300; easing.type: Easing.OutQuint } }
+  Behavior on border.color { ColorAnimation { duration: 160 } }
+
+  HoverHandler { id: cardHover }
 
   readonly property var activePlayers: {
     var players = [];
@@ -28,8 +33,8 @@ Rectangle {
   ColumnLayout {
     id: contentCol
     anchors.fill: parent
-    anchors.margins: 12
-    spacing: 15
+    anchors.margins: Colors.spacingM
+    spacing: Colors.paddingMedium
 
     Repeater {
       id: mprisRepeater
@@ -37,13 +42,13 @@ Rectangle {
 
       delegate: RowLayout {
         Layout.fillWidth: true
-        spacing: 15
+        spacing: Colors.paddingMedium
 
         // Album Art
         Rectangle {
           Layout.preferredWidth: 70
           Layout.preferredHeight: 70
-          radius: 8
+          radius: Colors.radiusXS
           color: Colors.surface
           clip: true
 
@@ -51,6 +56,8 @@ Rectangle {
             id: albumArt
             anchors.fill: parent
             source: modelData.trackArtUrl || ""
+            sourceSize: Qt.size(140, 140)
+            asynchronous: true
             fillMode: Image.PreserveAspectCrop
             visible: status === Image.Ready
           }
@@ -72,8 +79,8 @@ Rectangle {
 
           Text {
             text: modelData.trackTitle || "Unknown Track"
-            color: Colors.fgMain
-            font.pixelSize: 13
+            color: Colors.text
+            font.pixelSize: Colors.fontSizeMedium
             font.weight: Font.Bold
             Layout.fillWidth: true
             elide: Text.ElideRight
@@ -82,7 +89,7 @@ Rectangle {
           Text {
             text: modelData.trackArtist || "Unknown Artist"
             color: Colors.fgSecondary
-            font.pixelSize: 11
+            font.pixelSize: Colors.fontSizeSmall
             Layout.fillWidth: true
             elide: Text.ElideRight
           }
@@ -91,20 +98,25 @@ Rectangle {
           Rectangle {
             Layout.fillWidth: true
             Layout.topMargin: 4
-            height: 4
-            radius: 2
+            height: mediaProgressHover.containsMouse ? 6 : 4
+            Behavior on height { NumberAnimation { duration: 100 } }
+            radius: height / 2
             color: Colors.highlightLight
             visible: modelData.length > 0
-            
+
             Rectangle {
               height: parent.height
               width: modelData.length > 0 ? parent.width * (modelData.position / modelData.length) : 0
-              radius: 2
+              radius: parent.radius
               color: Colors.primary
+              Behavior on width { NumberAnimation { duration: 200 } }
             }
-            
+
             MouseArea {
+              id: mediaProgressHover
               anchors.fill: parent
+              hoverEnabled: true
+              cursorShape: Qt.PointingHandCursor
               onClicked: (mouse) => {
                 if (modelData.length > 0) {
                   modelData.position = modelData.length * (mouse.x / width);
@@ -123,22 +135,24 @@ Rectangle {
             // Previous
             MouseArea {
               width: 24; height: 24
-              Text { text: "󰒮"; color: Colors.fgMain; font.family: Colors.fontMono; font.pixelSize: 18; anchors.centerIn: parent }
+              cursorShape: Qt.PointingHandCursor
+              Text { text: "󰒮"; color: Colors.text; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL; anchors.centerIn: parent }
               onClicked: modelData.previous()
             }
 
             // Play/Pause
             MouseArea {
               width: 32; height: 32
+              cursorShape: Qt.PointingHandCursor
               Rectangle {
                 anchors.fill: parent
-                radius: 16
+                radius: height / 2
                 color: Colors.surface
                 Text { 
                   text: modelData.playbackState === Mpris.Playing ? "󰏤" : "󰐊"
-                  color: Colors.fgMain
+                  color: Colors.text
                   font.family: Colors.fontMono
-                  font.pixelSize: 14
+                  font.pixelSize: Colors.fontSizeMedium
                   anchors.centerIn: parent
                 }
               }
@@ -148,7 +162,8 @@ Rectangle {
             // Next
             MouseArea {
               width: 24; height: 24
-              Text { text: "󰒭"; color: Colors.fgMain; font.family: Colors.fontMono; font.pixelSize: 18; anchors.centerIn: parent }
+              cursorShape: Qt.PointingHandCursor
+              Text { text: "󰒭"; color: Colors.text; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL; anchors.centerIn: parent }
               onClicked: modelData.next()
             }
           }

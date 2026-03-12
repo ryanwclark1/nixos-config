@@ -75,7 +75,7 @@ Item {
       text: "󰁌"
       color: Colors.background
       font.family: Colors.fontMono
-      font.pixelSize: 10
+      font.pixelSize: Colors.fontSizeXS
     }
 
     MouseArea {
@@ -111,7 +111,7 @@ Item {
     anchors.left: parent.left
     anchors.topMargin: 8
     width: 140; height: menuCol.implicitHeight + 16
-    radius: 10
+    radius: Colors.radiusSmall
     color: Colors.bgGlass
     border.color: Colors.border
     border.width: 1
@@ -181,7 +181,7 @@ Item {
         anchors.centerIn: parent
         text: parent.parent.text
         color: parent.parent.isDestructive ? Colors.error : Colors.text
-        font.pixelSize: 12
+        font.pixelSize: Colors.fontSizeSmall
       }
 
       MouseArea {

@@ -45,7 +45,7 @@ PopupWindow {
   Rectangle {
     id: menuBg
     anchors.fill: parent
-    anchors.margins: 4
+    anchors.margins: Colors.spacingXS
     radius: 12
     color: Colors.bgGlass
     border.color: Colors.border
@@ -54,7 +54,7 @@ PopupWindow {
     ColumnLayout {
       id: menuColumn
       anchors.fill: parent
-      anchors.margins: 8
+      anchors.margins: Colors.spacingS
       spacing: 2
 
       // Grouped windows list
@@ -212,27 +212,33 @@ PopupWindow {
 
     Rectangle {
       anchors.fill: parent
-      radius: 8
-      color: itemMouse.containsMouse ? Colors.highlight : "transparent"
+      radius: Colors.radiusXS
+      color: "transparent"
+
+      StateLayer {
+        id: itemStateLayer
+        hovered: itemMouse.containsMouse
+        pressed: itemMouse.pressed
+      }
 
       RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: 10
-        anchors.rightMargin: 10
-        spacing: 8
+        anchors.leftMargin: Colors.paddingSmall
+        anchors.rightMargin: Colors.paddingSmall
+        spacing: Colors.spacingS
 
         Text {
           text: menuItem.icon
-          color: menuItem.isDestructive ? Colors.error : Colors.fgMain
+          color: menuItem.isDestructive ? Colors.error : Colors.text
           font.family: Colors.fontMono
-          font.pixelSize: 14
+          font.pixelSize: Colors.fontSizeMedium
         }
 
         Text {
           Layout.fillWidth: true
           text: menuItem.text
           color: menuItem.isDestructive ? Colors.error : Colors.text
-          font.pixelSize: 13
+          font.pixelSize: Colors.fontSizeMedium
           elide: Text.ElideRight
         }
       }
@@ -242,7 +248,10 @@ PopupWindow {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        onClicked: menuItem.clicked()
+        onClicked: (mouse) => {
+          itemStateLayer.burst(mouse.x, mouse.y);
+          menuItem.clicked();
+        }
       }
     }
   }

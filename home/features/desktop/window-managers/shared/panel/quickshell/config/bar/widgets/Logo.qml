@@ -12,14 +12,16 @@ Item {
   property string tooltipText: "Applications"
 
   Rectangle {
+    id: logoBg
     anchors.fill: parent
-    radius: 10
-    color: mouseArea.containsMouse ? Colors.highlightLight : "transparent"
+    radius: Colors.radiusSmall
+    color: "transparent"
 
-    Behavior on color {
-      ColorAnimation {
-        duration: 160
-      }
+    SharedWidgets.StateLayer {
+      id: stateLayer
+      hovered: mouseArea.containsMouse
+      pressed: mouseArea.pressed
+      stateColor: Colors.primary
     }
   }
 
@@ -36,14 +38,14 @@ Item {
     text: "󱄅"
     color: Colors.primary
     font.family: Colors.fontMono
-    font.pixelSize: 18
+    font.pixelSize: Colors.fontSizeXL
     visible: !logoImage.visible
   }
 
   scale: mouseArea.containsMouse ? 1.06 : 1.0
   Behavior on scale {
     NumberAnimation {
-      duration: 180
+      duration: 160
       easing.type: Easing.OutCubic
     }
   }
@@ -53,7 +55,7 @@ Item {
     anchors.fill: parent
     hoverEnabled: true
     cursorShape: Qt.PointingHandCursor
-    onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Launcher", "openDrun"])
+    onClicked: (mouse) => { stateLayer.burst(mouse.x, mouse.y); Quickshell.execDetached(["quickshell", "ipc", "call", "Launcher", "openDrun"]); }
   }
 
   SharedWidgets.BarTooltip {

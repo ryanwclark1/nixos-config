@@ -11,13 +11,17 @@ Row {
     return "Output volume " + Math.round(AudioService.outputVolume * 100) + "%";
   }
 
-  Component.onCompleted: AudioService.subscribe()
-  Component.onDestruction: AudioService.unsubscribe()
+  Ref { service: AudioService }
 
   CircularGauge {
     value: AudioService.outputMuted ? 0 : AudioService.outputVolume
-    color: AudioService.outputMuted ? Colors.error : Colors.fgMain
-    icon: AudioService.outputMuted ? "󰝟" : (AudioService.outputVolume > 0.6 ? "󰕾" : (AudioService.outputVolume > 0.3 ? "󰖀" : "󰕿"))
+    color: AudioService.outputMuted ? Colors.error : Colors.text
+    icon: {
+      if (AudioService.outputMuted) return "󰝟";
+      if (AudioService.outputDeviceType === "bluetooth") return "󰂯";
+      if (AudioService.outputDeviceType === "headphone") return "󰋋";
+      return AudioService.outputVolume > 0.6 ? "󰕾" : (AudioService.outputVolume > 0.3 ? "󰖀" : "󰕿");
+    }
     thickness: 3
     width: 22; height: 22
   }
@@ -30,8 +34,8 @@ Row {
         if (isNaN(v)) return "0%";
         return Math.round(v * 100) + "%";
     }
-    color: Colors.fgMain
-    font.pixelSize: 13
+    color: Colors.text
+    font.pixelSize: Colors.fontSizeMedium
     font.weight: Font.Bold
     anchors.verticalCenter: parent.verticalCenter
   }

@@ -5,146 +5,61 @@ import "../modules"
 import "../services"
 import "../widgets" as SharedWidgets
 
-PopupWindow {
+BasePopupMenu {
   id: root
   implicitWidth: 380
   implicitHeight: 580
+  title: "System"
+  toggleMethod: "toggleSystemStatsMenu"
 
-  Component.onCompleted: SystemStatus.subscribe()
-  Component.onDestruction: SystemStatus.unsubscribe()
+  Loader { active: root.visible; sourceComponent: SharedWidgets.Ref { service: SystemStatus } }
 
+  // At-a-glance temp/usage card
   Rectangle {
-    anchors.fill: parent
-    color: Colors.popupSurface
+    Layout.fillWidth: true
+    implicitHeight: 52
+    radius: Colors.radiusMedium
+    color: Colors.cardSurface
     border.color: Colors.border
     border.width: 1
-    radius: Colors.radiusMedium
-    clip: true
 
-    ColumnLayout {
+    RowLayout {
       anchors.fill: parent
-      anchors.margins: Colors.paddingLarge
-      spacing: 14
+      anchors.margins: Colors.paddingSmall
+      spacing: Colors.spacingM
 
-      // Header
+      // CPU Temp
       RowLayout {
-        Layout.fillWidth: true
-        Text {
-          text: "System"
-          color: Colors.fgMain
-          font.pixelSize: 18
-          font.weight: Font.DemiBold
-        }
-        Item { Layout.fillWidth: true }
-        SharedWidgets.MenuCloseButton { toggleMethod: "toggleSystemStatsMenu" }
+        spacing: Colors.spacingXS
+        Text { text: ""; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium }
+        Text { text: SystemStatus.cpuTemp; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
       }
 
-      Rectangle {
-        Layout.fillWidth: true
-        height: 1
-        color: Colors.border
+      // GPU Temp
+      RowLayout {
+        spacing: Colors.spacingXS
+        Text { text: "󰢮"; color: Colors.accent; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium }
+        Text { text: SystemStatus.gpuTemp; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
       }
 
-      // At-a-glance temp/usage card
-      Rectangle {
-        Layout.fillWidth: true
-        implicitHeight: 52
-        radius: Colors.radiusMedium
-        color: Colors.cardSurface
-        border.color: Colors.border
-        border.width: 1
+      Item { Layout.fillWidth: true }
 
-        RowLayout {
-          anchors.fill: parent
-          anchors.margins: 10
-          spacing: 12
-
-          // CPU Temp
-          RowLayout {
-            spacing: 4
-            Text { text: ""; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 14 }
-            Text { text: SystemStatus.cpuTemp; color: Colors.fgMain; font.pixelSize: 12; font.weight: Font.Medium }
-          }
-
-          // GPU Temp
-          RowLayout {
-            spacing: 4
-            Text { text: "󰢮"; color: Colors.accent; font.family: Colors.fontMono; font.pixelSize: 14 }
-            Text { text: SystemStatus.gpuTemp; color: Colors.fgMain; font.pixelSize: 12; font.weight: Font.Medium }
-          }
-
-          Item { Layout.fillWidth: true }
-
-          // CPU% chip
-          Rectangle {
-            radius: 10
-            color: Colors.withAlpha(Colors.primary, 0.16)
-            implicitWidth: cpuChipText.implicitWidth + 12
-            implicitHeight: 22
-            Text {
-              id: cpuChipText
-              anchors.centerIn: parent
-              text: "CPU " + SystemStatus.cpuUsage
-              color: Colors.primary
-              font.pixelSize: 9
-              font.weight: Font.Bold
-            }
-          }
-
-          // RAM% chip
-          Rectangle {
-            radius: 10
-            color: Colors.withAlpha(Colors.accent, 0.16)
-            implicitWidth: ramChipText.implicitWidth + 12
-            implicitHeight: 22
-            Text {
-              id: ramChipText
-              anchors.centerIn: parent
-              text: "RAM " + SystemStatus.ramUsage
-              color: Colors.accent
-              font.pixelSize: 9
-              font.weight: Font.Bold
-            }
-          }
-
-          // GPU% chip
-          Rectangle {
-            radius: 10
-            color: Colors.withAlpha(Colors.secondary, 0.16)
-            implicitWidth: gpuChipText.implicitWidth + 12
-            implicitHeight: 22
-            Text {
-              id: gpuChipText
-              anchors.centerIn: parent
-              text: "GPU " + SystemStatus.gpuUsage
-              color: Colors.secondary
-              font.pixelSize: 9
-              font.weight: Font.Bold
-            }
-          }
-        }
-      }
-
-      // Scrollable module area
-      Flickable {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        contentHeight: modulesColumn.implicitHeight
-        clip: true
-        boundsBehavior: Flickable.StopAtBounds
-
-        ColumnLayout {
-          id: modulesColumn
-          width: parent.width
-          spacing: 10
-
-          SystemGraphs {}
-          GPUWidget {}
-          NetworkGraphs {}
-          DiskWidget {}
-          ProcessWidget {}
-        }
-      }
+      SharedWidgets.Chip { icon: ""; iconColor: Colors.primary; text: "CPU " + SystemStatus.cpuUsage; textColor: Colors.primary }
+      SharedWidgets.Chip { icon: "󰍛"; iconColor: Colors.accent; text: "RAM " + SystemStatus.ramUsage; textColor: Colors.accent }
+      SharedWidgets.Chip { icon: "󰢮"; iconColor: Colors.secondary; text: "GPU " + SystemStatus.gpuUsage; textColor: Colors.secondary }
     }
+  }
+
+  // Scrollable module area
+  SharedWidgets.ScrollableContent {
+    Layout.fillWidth: true
+    Layout.fillHeight: true
+    columnSpacing: Colors.paddingSmall
+
+    SystemGraphs {}
+    GPUWidget {}
+    NetworkGraphs {}
+    DiskWidget {}
+    ProcessWidget {}
   }
 }

@@ -12,8 +12,9 @@ import "../widgets" as SharedWidgets
 Item {
   id: root
 
-  Component.onCompleted: RecordingService.subscribe()
-  Component.onDestruction: RecordingService.unsubscribe()
+  SharedWidgets.Ref { service: RecordingService }
+  SharedWidgets.Ref { service: PrivacyService }
+  SharedWidgets.Ref { service: PrinterService }
 
   property var manager: null
   property var anchorWindow: null
@@ -22,21 +23,26 @@ Item {
   readonly property real audioTriggerBottomY: audioTrigger.mapToItem(root, 0, audioTrigger.height).y
   readonly property real musicTriggerBottomY: musicTrigger.visible ? musicTrigger.mapToItem(root, 0, musicTrigger.height).y : audioTriggerBottomY
   readonly property real recordingTriggerBottomY: recordingTrigger.visible ? recordingTrigger.mapToItem(root, 0, recordingTrigger.height).y : audioTriggerBottomY
+  readonly property real privacyTriggerBottomY: privacyTrigger.visible ? privacyTrigger.mapToItem(root, 0, privacyTrigger.height).y : audioTriggerBottomY
   readonly property real batteryTriggerBottomY: batteryTrigger.visible ? batteryTrigger.mapToItem(root, 0, batteryTrigger.height).y : audioTriggerBottomY
   readonly property real clipboardTriggerBottomY: clipboardTrigger.mapToItem(root, 0, clipboardTrigger.height).y
   readonly property real weatherTriggerBottomY: weatherTrigger.mapToItem(root, 0, weatherTrigger.height).y
   readonly property real systemMonitorBottomY: systemMonitor.mapToItem(root, 0, systemMonitor.height).y
+  readonly property real printerTriggerBottomY: printerTrigger.visible ? printerTrigger.mapToItem(root, 0, printerTrigger.height).y : audioTriggerBottomY
   signal notifClicked()
   signal networkClicked()
   signal audioClicked()
   signal commandClicked()
   signal musicClicked()
   signal recordingClicked()
+  signal privacyClicked()
   signal batteryClicked()
   signal clipboardClicked()
   signal bluetoothClicked()
   signal weatherClicked()
   signal systemStatsClicked()
+  signal notepadClicked()
+  signal printerClicked()
 
   implicitHeight: Config.barHeight
 
@@ -52,9 +58,9 @@ Item {
   // LEFT MODULES
   Row {
     anchors.left: parent.left
-    anchors.leftMargin: 12
+    anchors.leftMargin: Colors.spacingM
     anchors.verticalCenter: parent.verticalCenter
-    spacing: 12
+    spacing: Colors.spacingM
 
     Logo {
       tooltipText: "Application launcher"
@@ -87,9 +93,9 @@ Item {
   // RIGHT MODULES
   Row {
     anchors.right: parent.right
-    anchors.rightMargin: 12
+    anchors.rightMargin: Colors.spacingM
     anchors.verticalCenter: parent.verticalCenter
-    spacing: 12
+    spacing: Colors.spacingM
 
     SharedWidgets.BarPill {
       id: weatherTrigger
@@ -98,20 +104,20 @@ Item {
       onClicked: root.weatherClicked()
 
       Row {
-        spacing: 6
+        spacing: Colors.spacingS
 
         Text {
           text: Colors.weatherIcon(WeatherService.condition)
           color: Colors.accent
           font.family: Colors.fontMono
-          font.pixelSize: 14
+          font.pixelSize: Colors.fontSizeLarge
           anchors.verticalCenter: parent.verticalCenter
         }
 
         Text {
           text: WeatherService.temp
-          color: Colors.fgMain
-          font.pixelSize: 11
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeSmall
           font.weight: Font.Medium
           anchors.verticalCenter: parent.verticalCenter
         }
@@ -125,7 +131,7 @@ Item {
       onClicked: root.networkClicked()
 
       Row {
-        spacing: 8
+        spacing: Colors.spacingS
         SharedWidgets.NetworkWidget {
           id: networkWidget
         }
@@ -146,13 +152,13 @@ Item {
       onClicked: root.bluetoothClicked()
 
       Row {
-        spacing: 6
+        spacing: Colors.spacingS
 
         Text {
           text: (Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled) ? "󰂯" : "󰂲"
           color: (Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled) ? Colors.primary : Colors.textDisabled
           font.family: Colors.fontMono
-          font.pixelSize: 14
+          font.pixelSize: Colors.fontSizeLarge
           anchors.verticalCenter: parent.verticalCenter
         }
       }
@@ -165,7 +171,7 @@ Item {
       onClicked: root.audioClicked()
 
       Row {
-        spacing: 8
+        spacing: Colors.spacingS
         SharedWidgets.AudioWidget {
           id: audioWidget
         }
@@ -177,21 +183,24 @@ Item {
       id: musicTrigger
       visible: SystemStatus.hasActivePlayer
       anchorWindow: root.anchorWindow
-      tooltipText: SystemStatus.activeMprisPlayers.length > 0
-        ? (SystemStatus.activeMprisPlayers[0].trackTitle || "Music") + (SystemStatus.activeMprisPlayers[0].trackArtist ? " - " + SystemStatus.activeMprisPlayers[0].trackArtist : "")
-        : "Music controls"
+      tooltipText: {
+        var players = SystemStatus.activeMprisPlayers;
+        if (!players || players.length === 0) return "Music controls";
+        var p = players[0];
+        return (p.trackTitle || "Music") + (p.trackArtist ? " - " + p.trackArtist : "");
+      }
       onClicked: root.musicClicked()
 
       Behavior on width { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
 
       Row {
-        spacing: 6
+        spacing: Colors.spacingS
 
         Text {
           text: "󰝚"
           color: Colors.primary
           font.family: Colors.fontMono
-          font.pixelSize: 14
+          font.pixelSize: Colors.fontSizeLarge
           anchors.verticalCenter: parent.verticalCenter
         }
 
@@ -204,11 +213,49 @@ Item {
           Text {
             id: musicTitleText
             text: SystemStatus.activeMprisPlayers.length > 0 ? (SystemStatus.activeMprisPlayers[0].trackTitle || "") : ""
-            color: Colors.fgMain
-            font.pixelSize: 11
+            color: Colors.text
+            font.pixelSize: Colors.fontSizeSmall
             font.weight: Font.Medium
             anchors.verticalCenter: parent.verticalCenter
           }
+        }
+      }
+    }
+
+    // Privacy indicator — visible when mic, camera, or screenshare is active
+    SharedWidgets.BarPill {
+      id: privacyTrigger
+      visible: PrivacyService.anyActive
+      anchorWindow: root.anchorWindow
+      normalColor: Colors.withAlpha(Colors.warning, 0.15)
+      hoverColor: Colors.withAlpha(Colors.warning, 0.28)
+      tooltipText: PrivacyService.activeLabel || "Privacy"
+      onClicked: root.privacyClicked()
+
+      Behavior on width { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
+
+      Row {
+        spacing: Colors.spacingXS
+
+        // Animated dot indicator
+        Rectangle {
+          width: 7; height: 7; radius: 3.5
+          color: Colors.warning
+          anchors.verticalCenter: parent.verticalCenter
+          SequentialAnimation on opacity {
+            running: PrivacyService.anyActive
+            loops: Animation.Infinite
+            NumberAnimation { from: 1.0; to: 0.25; duration: 700; easing.type: Easing.InOutSine }
+            NumberAnimation { from: 0.25; to: 1.0; duration: 700; easing.type: Easing.InOutSine }
+          }
+        }
+
+        Text {
+          text: PrivacyService.activeIcon
+          color: Colors.warning
+          font.family: Colors.fontMono
+          font.pixelSize: Colors.fontSizeLarge
+          anchors.verticalCenter: parent.verticalCenter
         }
       }
     }
@@ -224,7 +271,7 @@ Item {
       onClicked: root.recordingClicked()
 
       Row {
-        spacing: 6
+        spacing: Colors.spacingS
 
         Rectangle {
           width: 8; height: 8; radius: 4
@@ -241,7 +288,7 @@ Item {
         Text {
           text: "REC"
           color: Colors.error
-          font.pixelSize: 10
+          font.pixelSize: Colors.fontSizeXS
           font.weight: Font.Bold
           anchors.verticalCenter: parent.verticalCenter
         }
@@ -257,10 +304,84 @@ Item {
       onClicked: root.batteryClicked()
 
       Row {
-        spacing: 4
+        spacing: Colors.spacingXS
         SharedWidgets.BatteryWidget {
           id: batteryWidget
         }
+      }
+    }
+
+    // Printer trigger — only visible when at least one printer is configured
+    SharedWidgets.BarPill {
+      id: printerTrigger
+      visible: PrinterService.hasPrinters
+      anchorWindow: root.anchorWindow
+      tooltipText: PrinterService.activeJobs > 0
+        ? PrinterService.activeJobs + " print job" + (PrinterService.activeJobs !== 1 ? "s" : "") + " active"
+        : (PrinterService.defaultPrinter ? PrinterService.defaultPrinter : "Printers")
+      onClicked: root.printerClicked()
+
+      Behavior on width { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
+
+      Row {
+        spacing: Colors.spacingXS
+
+        Text {
+          text: "󰐪"
+          color: PrinterService.activeJobs > 0 ? Colors.warning : Colors.text
+          font.family: Colors.fontMono
+          font.pixelSize: Colors.fontSizeLarge
+          anchors.verticalCenter: parent.verticalCenter
+          Behavior on color { ColorAnimation { duration: 200 } }
+        }
+
+        // Active jobs badge — only shown when jobs are in flight
+        Rectangle {
+          visible: PrinterService.activeJobs > 0
+          width: printerJobsBadge.contentWidth + 8
+          height: 16
+          radius: Colors.radiusXS
+          color: Colors.withAlpha(Colors.warning, 0.20)
+          anchors.verticalCenter: parent.verticalCenter
+
+          Text {
+            id: printerJobsBadge
+            anchors.centerIn: parent
+            text: PrinterService.activeJobs
+            color: Colors.warning
+            font.pixelSize: Colors.fontSizeXS
+            font.weight: Font.Bold
+          }
+        }
+      }
+    }
+
+    // Bar plugin extension point — renders enabled bar-widget plugins
+    Repeater {
+      model: PluginService.barPlugins
+      delegate: Loader {
+        required property var modelData
+        anchors.verticalCenter: parent ? parent.verticalCenter : undefined
+        source: modelData.path + modelData.mainFile
+        onStatusChanged: {
+          if (status === Loader.Error)
+            console.warn("PluginService: failed to load bar plugin " + modelData.id + " from " + source);
+        }
+      }
+    }
+
+    // Notepad trigger — opens slideout notepad
+    SharedWidgets.BarPill {
+      id: notepadTrigger
+      anchorWindow: root.anchorWindow
+      tooltipText: "Notepad"
+      onClicked: root.notepadClicked()
+
+      Text {
+        color: Colors.text
+        font.pixelSize: Colors.fontSizeLarge
+        font.family: Colors.fontMono
+        text: "󰠮"
       }
     }
 
@@ -272,8 +393,8 @@ Item {
       onClicked: root.commandClicked()
 
       Text {
-        color: Colors.fgMain
-        font.pixelSize: 16
+        color: Colors.text
+        font.pixelSize: Colors.fontSizeXL
         font.family: Colors.fontMono
         text: "󰒓"
       }
@@ -286,8 +407,8 @@ Item {
 
       Text {
         id: clockText
-        color: Colors.fgMain
-        font.pixelSize: 14
+        color: Colors.text
+        font.pixelSize: Colors.fontSizeLarge
         font.weight: Font.Bold
         text: String(clock.hours).padStart(2, '0') + ":" + String(clock.minutes).padStart(2, '0')
       }
@@ -305,9 +426,9 @@ Item {
 
       Text {
         text: "󰅍"
-        color: Colors.fgMain
+        color: Colors.text
         font.family: Colors.fontMono
-        font.pixelSize: 16
+        font.pixelSize: Colors.fontSizeXL
       }
     }
 
@@ -315,21 +436,26 @@ Item {
       id: notifBg
       width: 32
       height: 28
-      color: notifMouse.containsMouse ? Colors.highlightLight : Colors.bgWidget
+      color: Colors.bgWidget
       radius: height / 2
       anchors.verticalCenter: parent.verticalCenter
 
       scale: notifMouse.containsMouse ? 1.06 : 1.0
       Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
-      Behavior on color { ColorAnimation { duration: 160 } }
+
+      SharedWidgets.StateLayer {
+        id: notifStateLayer
+        hovered: notifMouse.containsMouse
+        pressed: notifMouse.pressed
+      }
 
       readonly property bool hasDnd: !!(root.manager && root.manager.dndEnabled)
       readonly property bool hasUnread: !!(root.manager && root.manager.notifications && root.manager.notifications.count > 0)
 
       Text {
         anchors.centerIn: parent
-        color: Colors.fgMain
-        font.pixelSize: 16
+        color: Colors.text
+        font.pixelSize: Colors.fontSizeXL
         font.family: Colors.fontMono
         text: notifBg.hasDnd ? "󰂛" : "󰂚"
       }
@@ -349,7 +475,11 @@ Item {
         id: notifMouse
         anchors.fill: parent
         hoverEnabled: true
-        onClicked: root.notifClicked()
+        cursorShape: Qt.PointingHandCursor
+        onClicked: (mouse) => {
+          notifStateLayer.burst(mouse.x, mouse.y);
+          root.notifClicked();
+        }
       }
 
       SharedWidgets.BarTooltip {

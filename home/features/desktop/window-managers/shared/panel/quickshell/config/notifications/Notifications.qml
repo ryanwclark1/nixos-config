@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Services.Notifications
 import Quickshell.Widgets
 import "../services"
+import "../widgets" as SharedWidgets
 
 PanelWindow {
   id: root
@@ -27,7 +28,7 @@ PanelWindow {
   ColumnLayout {
     id: col
     width: Config.notifWidth
-    spacing: 10
+    spacing: Colors.paddingSmall
 
     Repeater {
       model: root.manager ? root.manager.notifications : null
@@ -44,15 +45,32 @@ PanelWindow {
         x: (1.0 - entranceProgress) * 100 + swipeOffset
         opacity: entranceProgress
 
-        // Staggered entry
+        // Staggered entry (capped at 320ms for snappy feel)
         Timer {
           id: staggerTimer
-          interval: index * 100
+          interval: Math.min(index * 80, 320)
           running: true
           onTriggered: entranceAnim.start()
         }
 
         NumberAnimation { id: entranceAnim; target: notifDelegate; property: "entranceProgress"; from: 0; to: 1.0; duration: 500; easing.type: Easing.OutBack }
+
+        // Animated dismiss: slide right + fade, then actually dismiss
+        property bool isDismissing: false
+        function animatedDismiss() {
+          if (isDismissing || !notification) return;
+          isDismissing = true;
+          dismissAnim.start();
+        }
+
+        ParallelAnimation {
+          id: dismissAnim
+          NumberAnimation { target: notifDelegate; property: "opacity"; to: 0; duration: 200; easing.type: Easing.InCubic }
+          NumberAnimation { target: notifDelegate; property: "swipeOffset"; to: notifDelegate.width + 20; duration: 250; easing.type: Easing.OutCubic }
+          onFinished: {
+            if (notifDelegate.notification) notifDelegate.notification.dismiss();
+          }
+        }
 
         // Use Colors singleton
         color: isUrgent ? Colors.withAlpha(Colors.error, 0.8) : Colors.bgGlass
@@ -105,6 +123,7 @@ PanelWindow {
         MouseArea {
           anchors.fill: parent
           acceptedButtons: Qt.LeftButton | Qt.RightButton
+          cursorShape: Qt.PointingHandCursor
           onClicked: function(mouse) {
             if (mouse.button === Qt.RightButton && notifDelegate.notification) {
               notifDelegate.notification.dismiss();
@@ -127,7 +146,7 @@ PanelWindow {
               notifDelegate.isSwiping = false;
               var threshold = Math.max(80, notifDelegate.width * 0.35);
               if (notifDelegate.swipeOffset >= threshold) {
-                if (notifDelegate.notification) notifDelegate.notification.dismiss();
+                notifDelegate.animatedDismiss();
               } else {
                 notifDelegate.swipeOffset = 0;
               }
@@ -154,51 +173,64 @@ PanelWindow {
         Column {
           id: colMain
           width: parent.width
-          spacing: 10
+          spacing: Colors.paddingSmall
           anchors.horizontalCenter: parent.horizontalCenter
           anchors.verticalCenter: parent.verticalCenter
 
           Row {
             width: parent.width - 24
             anchors.horizontalCenter: parent.horizontalCenter
-            spacing: 12
+            spacing: Colors.spacingM
 
             Image {
               width: 44; height: 44
               source: Config.resolveIconSource(modelData.appIcon || "")
+              sourceSize: Qt.size(88, 88)
+              asynchronous: true
               fillMode: Image.PreserveAspectFit
               visible: modelData.appIcon !== ""
 
               Rectangle {
                 anchors.fill: parent; color: "transparent"; visible: parent.status !== Image.Ready
-                Text { anchors.centerIn: parent; text: "󰂚"; color: Colors.fgMain; font.pixelSize: 24; font.family: Colors.fontMono }
+                Text { anchors.centerIn: parent; text: "󰂚"; color: Colors.text; font.pixelSize: Colors.fontSizeHuge; font.family: Colors.fontMono }
               }
             }
 
             Column {
-              width: parent.width - 52; spacing: 4
-              Text { text: modelData.appName || "Notification"; color: Colors.textSecondary; font.pixelSize: 12; font.weight: Font.Bold; font.capitalization: Font.AllUppercase }
-              Text { text: modelData.summary; color: Colors.fgMain; font.pixelSize: 17; font.weight: Font.Bold; width: parent.width; wrapMode: Text.Wrap }
-              Text { text: modelData.body; color: Colors.textSecondary; font.pixelSize: 14; width: parent.width; wrapMode: Text.Wrap; visible: modelData.body !== "" }
+              width: parent.width - 52; spacing: Colors.spacingXS
+              Text { text: modelData.appName || "Notification"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Bold; font.capitalization: Font.AllUppercase }
+              Text { text: modelData.summary; color: Colors.text; font.pixelSize: Colors.fontSizeLarge; font.weight: Font.Bold; width: parent.width; wrapMode: Text.Wrap }
+              Text { text: modelData.body; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeMedium; width: parent.width; wrapMode: Text.Wrap; visible: modelData.body !== "" }
             }
 
-            MouseArea {
-              width: 32
-              height: 32
-              hoverEnabled: true
-              Rectangle {
-                anchors.fill: parent
-                radius: 16
-                color: parent.containsMouse ? Colors.highlightLight : "transparent"
+            Rectangle {
+              width: 32; height: 32; radius: height / 2
+              color: "transparent"
+
+              SharedWidgets.StateLayer {
+                id: dismissXStateLayer
+                hovered: dismissXHover.containsMouse
+                pressed: dismissXHover.pressed
               }
+
               Text {
                 anchors.centerIn: parent
                 text: "󰅖"
                 color: Colors.error
-                font.pixelSize: 18
+                font.pixelSize: Colors.fontSizeXL
                 font.family: Colors.fontMono
               }
-              onClicked: notifDelegate.notification.dismiss()
+
+              MouseArea {
+                id: dismissXHover
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: (mouse) => {
+                  dismissXStateLayer.burst(mouse.x, mouse.y);
+                  notifDelegate.animatedDismiss();
+                }
+              }
             }
           }
 
@@ -208,7 +240,7 @@ PanelWindow {
             height: 180
             anchors.horizontalCenter: parent.horizontalCenter
             visible: modelData.image !== ""
-            radius: 8
+            radius: Colors.radiusXS
             clip: true
             color: "transparent"
             border.color: Colors.border
@@ -217,13 +249,15 @@ PanelWindow {
             Image {
               anchors.fill: parent
               source: modelData.image || ""
+              sourceSize: Qt.size(600, 300)
+              asynchronous: true
               fillMode: Image.PreserveAspectCrop
             }
           }
 
           // Reply Input
           Rectangle {
-            width: parent.width - 24; height: 40; radius: 8
+            width: parent.width - 24; height: 40; radius: Colors.radiusXS
             anchors.horizontalCenter: parent.horizontalCenter
             color: Colors.highlightLight
             visible: notifDelegate.isReplying
@@ -233,7 +267,7 @@ PanelWindow {
               id: replyInput
               anchors.fill: parent; anchors.margins: Colors.paddingSmall
               verticalAlignment: Text.AlignVCenter
-              color: Colors.fgMain; font.pixelSize: 14
+              color: Colors.text; font.pixelSize: Colors.fontSizeMedium
               onVisibleChanged: if (!visible && activeFocus) focus = false
               Keys.onReturnPressed: { notifDelegate.notification.invoke(replyInput.text); notifDelegate.notification.dismiss(); }
               Keys.onEscapePressed: notifDelegate.isReplying = false
@@ -241,14 +275,14 @@ PanelWindow {
             Text {
               anchors.fill: parent; anchors.leftMargin: 10
               verticalAlignment: Text.AlignVCenter
-              text: "Type a reply..."; color: Colors.fgDim; font.pixelSize: 13
+              text: "Type a reply..."; color: Colors.fgDim; font.pixelSize: Colors.fontSizeMedium
               visible: !replyInput.text && !replyInput.activeFocus
             }
           }
 
           // Actions
           Row {
-            width: parent.width - 24; spacing: 8
+            width: parent.width - 24; spacing: Colors.spacingS
             anchors.horizontalCenter: parent.horizontalCenter
             visible: notifDelegate.notification && notifDelegate.notification.actions &&
                      notifDelegate.notification.actions.count > 0 && !notifDelegate.isReplying
@@ -262,13 +296,20 @@ PanelWindow {
                   return (parent.width - (actionCount - 1) * 8) / actionCount;
                 }
                 height: 34; radius: 6; border.color: Colors.border
-                color: actionMouse.containsMouse ? Colors.surface : Colors.highlightLight
-                Behavior on color { ColorAnimation { duration: 120 } }
-                Text { anchors.centerIn: parent; text: modelData && modelData.label ? modelData.label : ""; color: Colors.fgMain; font.pixelSize: 13 }
+                color: Colors.highlightLight
+
+                SharedWidgets.StateLayer {
+                  id: actionStateLayer
+                  hovered: actionMouse.containsMouse
+                  pressed: actionMouse.pressed
+                }
+
+                Text { anchors.centerIn: parent; text: modelData && modelData.label ? modelData.label : ""; color: Colors.text; font.pixelSize: Colors.fontSizeMedium }
                 MouseArea {
                   id: actionMouse
-                  anchors.fill: parent; hoverEnabled: true
-                  onClicked: {
+                  anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                  onClicked: (mouse) => {
+                    actionStateLayer.burst(mouse.x, mouse.y);
                     var label = modelData && modelData.label ? modelData.label.toLowerCase() : "";
                     if (label.includes("reply")) { notifDelegate.isReplying = true; replyInput.forceActiveFocus(); }
                     else if (modelData) { modelData.invoke(); notifDelegate.notification.dismiss(); }
@@ -282,16 +323,21 @@ PanelWindow {
             width: parent.width - 24
             height: 36
             anchors.horizontalCenter: parent.horizontalCenter
-            radius: 8
-            color: dismissMouse.containsMouse ? Colors.surface : Colors.highlightLight
-            Behavior on color { ColorAnimation { duration: 120 } }
+            radius: Colors.radiusXS
+            color: Colors.highlightLight
             visible: !notifDelegate.isReplying
+
+            SharedWidgets.StateLayer {
+              id: dismissStateLayer
+              hovered: dismissMouse.containsMouse
+              pressed: dismissMouse.pressed
+            }
 
             Text {
               anchors.centerIn: parent
               text: "Dismiss"
               color: Colors.error
-              font.pixelSize: 14
+              font.pixelSize: Colors.fontSizeMedium
               font.weight: Font.DemiBold
             }
 
@@ -299,7 +345,11 @@ PanelWindow {
               id: dismissMouse
               anchors.fill: parent
               hoverEnabled: true
-              onClicked: if (notifDelegate.notification) notifDelegate.notification.dismiss()
+              cursorShape: Qt.PointingHandCursor
+              onClicked: (mouse) => {
+                dismissStateLayer.burst(mouse.x, mouse.y);
+                notifDelegate.animatedDismiss();
+              }
             }
           }
 
@@ -311,7 +361,7 @@ PanelWindow {
           running: notifDelegate.notification && !notifDelegate.isReplying
                    && !notifDelegate.notification.dismissed && !notifDelegate.isUrgent
                    && !notifDelegate.isHovered
-          onTriggered: if (notifDelegate.notification) notifDelegate.notification.dismiss()
+          onTriggered: notifDelegate.animatedDismiss()
         }
       }
     }

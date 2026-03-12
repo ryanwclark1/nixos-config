@@ -9,6 +9,7 @@ PopupWindow {
   implicitHeight: 120
 
   property string cavaData: ""
+  signal closeRequested()
 
   Rectangle {
     anchors.fill: parent
@@ -17,6 +18,8 @@ PopupWindow {
     border.color: Colors.border
     border.width: 1
     clip: true
+    focus: true
+    Keys.onEscapePressed: root.closeRequested()
 
     // Top accent line
     Rectangle {
@@ -45,13 +48,13 @@ PopupWindow {
 
     ColumnLayout {
       anchors.fill: parent
-      anchors.margins: 15
-      spacing: 10
+      anchors.margins: Colors.paddingMedium
+      spacing: Colors.paddingSmall
 
       Text {
         text: "󰎆  AUDIO VISUALIZER"
         color: Colors.textSecondary
-        font.pixelSize: 10
+        font.pixelSize: Colors.fontSizeXS
         font.weight: Font.Bold
         font.letterSpacing: 1
         Layout.alignment: Qt.AlignHCenter

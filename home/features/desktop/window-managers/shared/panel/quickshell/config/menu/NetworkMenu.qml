@@ -6,10 +6,13 @@ import "../modules"
 import "../services"
 import "../widgets" as SharedWidgets
 
-PopupWindow {
+BasePopupMenu {
   id: root
   implicitWidth: 396
   implicitHeight: 552
+  title: "Networking"
+  subtitle: root.activePrimaryName === "Offline" ? "Network inspector" : root.activePrimaryName
+  toggleMethod: "toggleNetworkMenu"
 
   property var wifiNetworks: []
   property var vpns: []
@@ -86,16 +89,16 @@ PopupWindow {
   }
 
   function refreshStatus() {
-    getPrimaryDetails.running = true;
-    getActiveConnections.running = true;
-    getTailscale.running = true;
+    if (!getPrimaryDetails.running) getPrimaryDetails.running = true;
+    if (!getActiveConnections.running) getActiveConnections.running = true;
+    if (!getTailscale.running) getTailscale.running = true;
   }
 
   function refreshInventory() {
-    getRadioState.running = true;
-    getWifi.running = true;
-    getVPNs.running = true;
-    getInternetDetails.running = true;
+    if (!getRadioState.running) getRadioState.running = true;
+    if (!getWifi.running) getWifi.running = true;
+    if (!getVPNs.running) getVPNs.running = true;
+    if (!getInternetDetails.running) getInternetDetails.running = true;
   }
 
   function queueRefresh() {
@@ -116,7 +119,7 @@ PopupWindow {
   }
 
   function signalIcon(signal) {
-    var value = parseInt(signal || "0");
+    var value = parseInt(signal || "0", 10);
     if (value >= 80) return "󰤨";
     if (value >= 60) return "󰤥";
     if (value >= 40) return "󰤢";
@@ -125,7 +128,7 @@ PopupWindow {
   }
 
   function bandFromChannel(channel) {
-    var ch = parseInt(channel || "0");
+    var ch = parseInt(channel || "0", 10);
     if (!ch) return "";
     if (ch <= 14) return "2.4 GHz";
     if (ch <= 177) return "5 GHz";
@@ -143,12 +146,12 @@ PopupWindow {
   function sortWifiNetworks(networks) {
     return networks.sort(function(a, b) {
       if (!!a.active !== !!b.active) return a.active ? -1 : 1;
-      return (parseInt(b.signal || "0") || 0) - (parseInt(a.signal || "0") || 0);
+      return (parseInt(b.signal || "0", 10) || 0) - (parseInt(a.signal || "0", 10) || 0);
     });
   }
 
   function formatBytes(bytesValue) {
-    var bytes = parseInt(bytesValue || "0");
+    var bytes = parseInt(bytesValue || "0", 10);
     if (!bytes) return "0 B";
     if (bytes < 1024) return bytes + " B";
     if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
@@ -202,7 +205,7 @@ PopupWindow {
       onStreamFinished: {
         var data = root.parseKeyValue(this.text || "");
         root.wifiRadioEnabled = (data.WIFI_RADIO || "").toLowerCase() === "enabled";
-        root.wifiDeviceAvailable = parseInt(data.WIFI_DEVICE || "0") > 0;
+        root.wifiDeviceAvailable = parseInt(data.WIFI_DEVICE || "0", 10) > 0;
         root.isRefreshing = false;
       }
     }
@@ -391,729 +394,685 @@ PopupWindow {
     }
   }
 
-  Rectangle {
-    anchors.fill: parent
-    color: Colors.popupSurface
-    border.color: Colors.border
-    border.width: 1
-    radius: Colors.radiusMedium
-
-    ColumnLayout {
-      anchors.fill: parent
-      anchors.margins: Colors.paddingLarge
-      spacing: 14
-
-      RowLayout {
-        Layout.fillWidth: true
-
-        ColumnLayout {
-          spacing: 2
-          Text {
-            text: "Networking"
-            color: Colors.fgMain
-            font.pixelSize: 18
-            font.weight: Font.DemiBold
-          }
-          Text {
-            text: root.activePrimaryName === "Offline" ? "Network inspector" : root.activePrimaryName
-            color: Colors.textSecondary
-            font.pixelSize: 11
-          }
+  headerExtras: [
+    Rectangle {
+      width: 82; height: 28; radius: Colors.radiusMedium
+      color: root.wifiRadioEnabled ? Colors.withAlpha(Colors.primary, 0.18) : Colors.chipSurface
+      border.color: root.wifiRadioEnabled ? Colors.primary : Colors.border
+      border.width: 1
+      Text {
+        anchors.centerIn: parent
+        text: !root.wifiDeviceAvailable ? "No Wi-Fi" : (root.wifiRadioEnabled ? "Wi-Fi On" : "Wi-Fi Off")
+        color: root.wifiRadioEnabled ? Colors.primary : Colors.textSecondary
+        font.pixelSize: Colors.fontSizeSmall
+        font.weight: Font.Medium
+      }
+      MouseArea {
+        anchors.fill: parent
+        enabled: root.wifiDeviceAvailable
+        cursorShape: Qt.PointingHandCursor
+        onClicked: {
+          Quickshell.execDetached(["nmcli", "radio", "wifi", root.wifiRadioEnabled ? "off" : "on"]);
+          root.queueRefresh();
         }
+      }
+    },
+    Rectangle {
+      width: 30; height: 30; radius: height / 2
+      color: "transparent"
+      Text { anchors.centerIn: parent; text: root.isRefreshing ? "󰇚" : "󰑐"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
+      SharedWidgets.StateLayer { id: refreshStateLayer; anchors.fill: parent; radius: parent.radius; hovered: refreshHover.containsMouse; pressed: refreshHover.pressed }
+      MouseArea { id: refreshHover; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: (mouse) => { refreshStateLayer.burst(mouse.x, mouse.y); root.refreshData(); } }
+    }
+  ]
 
-        Item { Layout.fillWidth: true }
+  SharedWidgets.ScrollableContent {
+    Layout.fillWidth: true
+    Layout.fillHeight: true
+    columnSpacing: Colors.spacingM
 
         Rectangle {
-          width: 82
-          height: 28
-          radius: 14
-          color: root.wifiRadioEnabled
-            ? Colors.withAlpha(Colors.primary, 0.18)
-            : Colors.chipSurface
-          border.color: root.wifiRadioEnabled ? Colors.primary : Colors.border
+          Layout.fillWidth: true
+          radius: Colors.radiusMedium
+          color: Colors.cardSurface
+          border.color: root.activePrimaryName === "Offline" ? Colors.border : Colors.primary
           border.width: 1
-          Text {
-            anchors.centerIn: parent
-            text: !root.wifiDeviceAvailable ? "No Wi-Fi" : (root.wifiRadioEnabled ? "Wi-Fi On" : "Wi-Fi Off")
-            color: root.wifiRadioEnabled ? Colors.primary : Colors.textSecondary
-            font.pixelSize: 11
-            font.weight: Font.Medium
-          }
-          MouseArea {
+          implicitHeight: 96
+
+          ColumnLayout {
             anchors.fill: parent
-            enabled: root.wifiDeviceAvailable
-            onClicked: {
-              Quickshell.execDetached(["nmcli", "radio", "wifi", root.wifiRadioEnabled ? "off" : "on"]);
-              root.queueRefresh();
-            }
-          }
-        }
+            anchors.margins: Colors.spacingM
+            spacing: Colors.paddingSmall
 
-        Rectangle {
-          width: 30
-          height: 30
-          radius: 15
-          color: refreshHover.containsMouse ? Colors.highlightLight : "transparent"
-          Text { anchors.centerIn: parent; text: root.isRefreshing ? "󰇚" : "󰑐"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 15 }
-          MouseArea { id: refreshHover; anchors.fill: parent; hoverEnabled: true; onClicked: root.refreshData() }
-        }
+            RowLayout {
+              Layout.fillWidth: true
+              spacing: Colors.spacingM
 
-        SharedWidgets.MenuCloseButton { toggleMethod: "toggleNetworkMenu" }
-      }
+              Text {
+                text: root.networkIcon()
+                color: root.activePrimaryName === "Offline" ? Colors.textDisabled : Colors.primary
+                font.family: Colors.fontMono
+                font.pixelSize: Colors.fontSizeHuge
+              }
 
-      Rectangle {
-        Layout.fillWidth: true
-        height: 1
-        color: Colors.border
-      }
-
-      Flickable {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        contentHeight: contentColumn.implicitHeight
-        clip: true
-        boundsBehavior: Flickable.StopAtBounds
-
-        ColumnLayout {
-          id: contentColumn
-          width: parent.width
-          spacing: 14
-
-          Rectangle {
-            Layout.fillWidth: true
-            radius: Colors.radiusMedium
-            color: Colors.cardSurface
-            border.color: root.activePrimaryName === "Offline" ? Colors.border : Colors.primary
-            border.width: 1
-            implicitHeight: 96
-
-            ColumnLayout {
-              anchors.fill: parent
-              anchors.margins: 14
-              spacing: 10
-
-              RowLayout {
+              ColumnLayout {
                 Layout.fillWidth: true
-                spacing: 12
-
+                spacing: 2
                 Text {
-                  text: root.networkIcon()
-                  color: root.activePrimaryName === "Offline" ? Colors.textDisabled : Colors.primary
-                  font.family: Colors.fontMono
-                  font.pixelSize: 22
-                }
-
-                ColumnLayout {
+                  text: root.activePrimaryName
+                  color: Colors.text
+                  font.pixelSize: Colors.fontSizeLarge
+                  font.weight: Font.DemiBold
                   Layout.fillWidth: true
-                  spacing: 2
-                  Text {
-                    text: root.activePrimaryName
-                    color: Colors.fgMain
-                    font.pixelSize: 14
-                    font.weight: Font.DemiBold
-                    Layout.fillWidth: true
-                    elide: Text.ElideRight
-                  }
-                  Text {
-                    text: root.networkSubtitle()
-                    color: Colors.textSecondary
-                    font.pixelSize: 11
-                    Layout.fillWidth: true
-                    elide: Text.ElideRight
-                  }
+                  elide: Text.ElideRight
                 }
-
-                Rectangle {
-                  width: 90
-                  height: 30
-                  radius: 15
-                  color: root.activePrimaryName === "Offline"
-                    ? Colors.withAlpha(Colors.primary, 0.16)
-                    : Colors.withAlpha(Colors.error, 0.16)
-                  border.color: root.activePrimaryName === "Offline" ? Colors.primary : Colors.error
-                  border.width: 1
-                  Text {
-                    anchors.centerIn: parent
-                    text: root.activePrimaryName === "Offline" ? "Refresh" : "Disconnect"
-                    color: root.activePrimaryName === "Offline" ? Colors.primary : Colors.error
-                    font.pixelSize: 11
-                    font.weight: Font.Medium
-                  }
-                  MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                      if (root.activePrimaryName === "Offline") root.refreshData();
-                      else Quickshell.execDetached(["nmcli", "connection", "down", root.activePrimaryName]);
-                      root.queueRefresh();
-                    }
-                  }
-                }
-              }
-
-              RowLayout {
-                Layout.fillWidth: true
-                spacing: 8
-
-                Rectangle {
-                  visible: root.primaryDevice !== ""
-                  radius: 12
-                  color: Colors.chipSurface
-                  border.color: Colors.border
-                  border.width: 1
-                  implicitWidth: deviceLabel.implicitWidth + 18
-                  implicitHeight: 24
-                  Text { id: deviceLabel; anchors.centerIn: parent; text: root.primaryDevice; color: Colors.textSecondary; font.pixelSize: 10; font.weight: Font.Medium }
-                }
-
-                Rectangle {
-                  radius: 12
-                  color: Colors.chipSurface
-                  border.color: Colors.border
-                  border.width: 1
-                  implicitWidth: reachabilityLabel.implicitWidth + 18
-                  implicitHeight: 24
-                  Text { id: reachabilityLabel; anchors.centerIn: parent; text: root.connectivityStatus; color: Colors.textSecondary; font.pixelSize: 10; font.weight: Font.Medium }
-                }
-
-                Rectangle {
-                  visible: root.primarySignal !== ""
-                  radius: 12
-                  color: Colors.chipSurface
-                  border.color: Colors.border
-                  border.width: 1
-                  implicitWidth: signalLabel.implicitWidth + 18
-                  implicitHeight: 24
-                  Text { id: signalLabel; anchors.centerIn: parent; text: root.signalIcon(root.primarySignal) + " " + root.primarySignal + "%"; color: Colors.textSecondary; font.pixelSize: 10; font.weight: Font.Medium; font.family: Colors.fontMono }
-                }
-
-                Item { Layout.fillWidth: true }
-              }
-            }
-          }
-
-          ColumnLayout {
-            Layout.fillWidth: true
-            spacing: 8
-            Text { text: "Overview"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
-
-            GridLayout {
-              Layout.fillWidth: true
-              columns: 2
-              columnSpacing: 10
-              rowSpacing: 10
-
-              Repeater {
-                model: [
-                  { label: "IPv4", value: root.detailValue(root.primaryIpv4, "Unavailable") },
-                  { label: "Gateway", value: root.detailValue(root.primaryGateway, "Unavailable") },
-                  { label: "Default Route", value: root.detailValue(root.routeDevice, "Unavailable") + (root.routeSource !== "" ? " • " + root.routeSource : "") },
-                  { label: "DNS", value: root.dnsSummary() }
-                ]
-                delegate: Rectangle {
+                Text {
+                  text: root.networkSubtitle()
+                  color: Colors.textSecondary
+                  font.pixelSize: Colors.fontSizeSmall
                   Layout.fillWidth: true
-                  Layout.preferredHeight: 60
-                  radius: Colors.radiusMedium
-                  color: overviewCardHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : Colors.cardSurface
-                  border.color: Colors.border
-                  border.width: 1
-                  clip: true
-                  Behavior on color { ColorAnimation { duration: 150 } }
-
-                  Rectangle {
-                    anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom
-                    width: 3; color: Colors.withAlpha(Colors.primary, 0.25)
-                  }
-
-                  Column {
-                    anchors.fill: parent
-                    anchors.margins: 12
-                    anchors.leftMargin: 14
-                    spacing: 5
-                    Text { text: modelData.label; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold; font.letterSpacing: 0.5 }
-                    Text {
-                      text: modelData.value
-                      color: Colors.fgMain
-                      font.pixelSize: 11
-                      font.weight: Font.Medium
-                      width: parent.width
-                      wrapMode: Text.WrapAnywhere
-                      maximumLineCount: 2
-                      elide: Text.ElideRight
-                    }
-                  }
-
-                  MouseArea { id: overviewCardHover; anchors.fill: parent; hoverEnabled: true }
-                }
-              }
-            }
-          }
-
-          ColumnLayout {
-            Layout.fillWidth: true
-            spacing: 8
-
-            Text { text: "Internet"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
-
-            GridLayout {
-              Layout.fillWidth: true
-              columns: 2
-              columnSpacing: 10
-              rowSpacing: 10
-
-              Repeater {
-                model: [
-                  { label: "Connectivity", value: root.detailValue(root.connectivityStatus, "Unknown") },
-                  { label: "Public IPv4", value: root.detailValue(root.publicIpv4, "Unavailable") },
-                  { label: "Downloaded", value: root.detailValue(root.totalReceived, "0 B") },
-                  { label: "Uploaded", value: root.detailValue(root.totalSent, "0 B") }
-                ]
-                delegate: Rectangle {
-                  Layout.fillWidth: true
-                  Layout.preferredHeight: 60
-                  radius: Colors.radiusMedium
-                  color: internetCardHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : Colors.cardSurface
-                  border.color: Colors.border
-                  border.width: 1
-                  clip: true
-                  Behavior on color { ColorAnimation { duration: 150 } }
-
-                  Rectangle {
-                    anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom
-                    width: 3; color: Colors.withAlpha(Colors.primary, 0.25)
-                  }
-
-                  Column {
-                    anchors.fill: parent
-                    anchors.margins: 12
-                    anchors.leftMargin: 14
-                    spacing: 5
-                    Text { text: modelData.label; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold; font.letterSpacing: 0.5 }
-                    Text {
-                      text: modelData.value
-                      color: Colors.fgMain
-                      font.pixelSize: 11
-                      font.weight: Font.Medium
-                      width: parent.width
-                      wrapMode: Text.WrapAnywhere
-                      maximumLineCount: 2
-                      elide: Text.ElideRight
-                    }
-                  }
-
-                  MouseArea { id: internetCardHover; anchors.fill: parent; hoverEnabled: true }
-                }
-              }
-            }
-          }
-
-          ColumnLayout {
-            Layout.fillWidth: true
-            spacing: 8
-
-            Text { text: "Live Traffic"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
-            NetworkGraphs { Layout.fillWidth: true }
-          }
-
-          ColumnLayout {
-            Layout.fillWidth: true
-            spacing: 8
-            visible: root.vpns.length > 0 || root.tailscaleStatus !== "Offline"
-
-            Text { text: "VPN & Overlays"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
-
-            Rectangle {
-              Layout.fillWidth: true
-              visible: root.tailscaleStatus !== "Offline"
-              implicitHeight: 54
-              radius: Colors.radiusMedium
-              color: Colors.cardSurface
-              border.color: Colors.border
-              border.width: 1
-
-              RowLayout {
-                anchors.fill: parent
-                anchors.margins: 12
-                spacing: 10
-
-                Text { text: "󰖂"; color: root.tailscaleStatus === "Connected" ? Colors.primary : Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 16 }
-
-                ColumnLayout {
-                  Layout.fillWidth: true
-                  spacing: 0
-                  Text { text: "Tailscale"; color: Colors.fgMain; font.pixelSize: 12; font.weight: Font.DemiBold }
-                  Text {
-                    text: root.tailscaleIp !== "" ? (root.tailscaleStatus + " • " + root.tailscaleIp) : root.tailscaleStatus
-                    color: Colors.textSecondary
-                    font.pixelSize: 10
-                    Layout.fillWidth: true
-                    elide: Text.ElideRight
-                  }
-                }
-
-                Rectangle {
-                  width: 72
-                  height: 28
-                  radius: 14
-                  color: root.tailscaleStatus === "Connected"
-                    ? Colors.withAlpha(Colors.error, 0.14)
-                    : Colors.withAlpha(Colors.primary, 0.16)
-                  border.color: root.tailscaleStatus === "Connected" ? Colors.error : Colors.primary
-                  border.width: 1
-                  Text {
-                    anchors.centerIn: parent
-                    text: root.tailscaleStatus === "Connected" ? "Down" : "Up"
-                    color: root.tailscaleStatus === "Connected" ? Colors.error : Colors.primary
-                    font.pixelSize: 11
-                    font.weight: Font.Medium
-                  }
+                  elide: Text.ElideRight
                 }
               }
 
-              MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                  if (root.tailscaleStatus === "Connected") Quickshell.execDetached(["tailscale", "down"]);
-                  else Quickshell.execDetached(["tailscale", "up"]);
-                  root.queueRefresh();
-                }
-              }
-            }
-
-            Repeater {
-              model: root.vpns
-              delegate: Rectangle {
-                Layout.fillWidth: true
-                implicitHeight: 42
-                radius: Colors.radiusMedium
-                color: Colors.cardSurface
-                border.color: Colors.border
+              Rectangle {
+                width: 90
+                height: 30
+                radius: height / 2
+                color: root.activePrimaryName === "Offline"
+                  ? Colors.withAlpha(Colors.primary, 0.16)
+                  : Colors.withAlpha(Colors.error, 0.16)
+                border.color: root.activePrimaryName === "Offline" ? Colors.primary : Colors.error
                 border.width: 1
-
-                RowLayout {
-                  anchors.fill: parent
-                  anchors.margins: 12
-                  spacing: 10
-                  Text { text: "󰖂"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 15 }
-                  ColumnLayout {
-                    Layout.fillWidth: true
-                    spacing: 0
-                    Text { text: modelData.name; color: Colors.fgMain; font.pixelSize: 12; Layout.fillWidth: true; elide: Text.ElideRight }
-                    Text { text: modelData.type + (modelData.state ? " • " + modelData.state : ""); color: Colors.textSecondary; font.pixelSize: 10; Layout.fillWidth: true; elide: Text.ElideRight }
-                  }
+                Text {
+                  anchors.centerIn: parent
+                  text: root.activePrimaryName === "Offline" ? "Refresh" : "Disconnect"
+                  color: root.activePrimaryName === "Offline" ? Colors.primary : Colors.error
+                  font.pixelSize: Colors.fontSizeSmall
+                  font.weight: Font.Medium
                 }
-
                 MouseArea {
                   anchors.fill: parent
+                  cursorShape: Qt.PointingHandCursor
                   onClicked: {
-                    Quickshell.execDetached(["nmcli", "connection", "down", modelData.name]);
+                    if (root.activePrimaryName === "Offline") root.refreshData();
+                    else Quickshell.execDetached(["nmcli", "connection", "down", root.activePrimaryName]);
                     root.queueRefresh();
                   }
                 }
               }
             }
-          }
-
-          Rectangle {
-            Layout.fillWidth: true
-            implicitHeight: 40
-            radius: Colors.radiusMedium
-            color: detailsMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.14) : Colors.cardSurface
-            border.color: detailsMouse.containsMouse ? Colors.primary : Colors.border
-            border.width: 1
 
             RowLayout {
-              anchors.fill: parent
-              anchors.margins: 12
-              spacing: 8
+              Layout.fillWidth: true
+              spacing: Colors.spacingS
 
-              Text {
-                text: root.showAdvanced ? "󰅂" : "󰅀"
-                color: detailsMouse.containsMouse ? Colors.primary : Colors.textSecondary
-                font.family: Colors.fontMono
-                font.pixelSize: 14
+              Rectangle {
+                visible: root.primaryDevice !== ""
+                radius: 12
+                color: Colors.chipSurface
+                border.color: Colors.border
+                border.width: 1
+                implicitWidth: deviceLabel.implicitWidth + 18
+                implicitHeight: 24
+                Text { id: deviceLabel; anchors.centerIn: parent; text: root.primaryDevice; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Medium }
               }
 
-              Text {
-                text: root.showAdvanced ? "Hide technical details" : "Show technical details"
-                color: detailsMouse.containsMouse ? Colors.primary : Colors.fgMain
-                font.pixelSize: 11
-                font.weight: Font.Medium
+              Rectangle {
+                radius: 12
+                color: Colors.chipSurface
+                border.color: Colors.border
+                border.width: 1
+                implicitWidth: reachabilityLabel.implicitWidth + 18
+                implicitHeight: 24
+                Text { id: reachabilityLabel; anchors.centerIn: parent; text: root.connectivityStatus; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Medium }
+              }
+
+              Rectangle {
+                visible: root.primarySignal !== ""
+                radius: 12
+                color: Colors.chipSurface
+                border.color: Colors.border
+                border.width: 1
+                implicitWidth: signalLabel.implicitWidth + 18
+                implicitHeight: 24
+                Text { id: signalLabel; anchors.centerIn: parent; text: root.signalIcon(root.primarySignal) + " " + root.primarySignal + "%"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Medium; font.family: Colors.fontMono }
               }
 
               Item { Layout.fillWidth: true }
-
-              Text {
-                text: root.showAdvanced ? "Less" : "More"
-                color: Colors.textSecondary
-                font.pixelSize: 10
-              }
-            }
-
-            MouseArea {
-              id: detailsMouse
-              anchors.fill: parent
-              hoverEnabled: true
-              onClicked: root.showAdvanced = !root.showAdvanced
             }
           }
+        }
 
-          ColumnLayout {
+        ColumnLayout {
+          Layout.fillWidth: true
+          spacing: Colors.spacingS
+          SharedWidgets.SectionLabel { label: "Overview" }
+
+          GridLayout {
             Layout.fillWidth: true
-            spacing: 8
-            visible: root.showAdvanced
-
-            Text { text: "Technical Details"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
-
-            GridLayout {
-              Layout.fillWidth: true
-              columns: 2
-              columnSpacing: 10
-              rowSpacing: 10
-
-              Repeater {
-                model: [
-                  { label: "IPv6", value: root.detailValue(root.primaryIpv6, "Unavailable") },
-                  { label: "MAC", value: root.detailValue(root.primaryMac, "Unavailable") },
-                  { label: "Link Speed", value: root.detailValue(root.primaryLinkSpeed, "Unavailable") },
-                  { label: "Security", value: root.detailValue(root.primarySecurity, root.activePrimaryType === "wifi" ? "Unknown" : "N/A") },
-                  { label: "Channel / Band", value: root.primaryChannel !== "" ? (root.primaryChannel + (root.primaryBand !== "" ? " • " + root.primaryBand : "")) : "N/A" },
-                  { label: "Interface", value: root.detailValue(root.primaryDevice, "Unavailable") }
-                ]
-                delegate: Rectangle {
-                  Layout.fillWidth: true
-                  Layout.preferredHeight: 60
-                  radius: Colors.radiusMedium
-                  color: techCardHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : Colors.cardSurface
-                  border.color: Colors.border
-                  border.width: 1
-                  clip: true
-                  Behavior on color { ColorAnimation { duration: 150 } }
-
-                  Rectangle {
-                    anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom
-                    width: 3; color: Colors.withAlpha(Colors.primary, 0.25)
-                  }
-
-                  Column {
-                    anchors.fill: parent
-                    anchors.margins: 12
-                    anchors.leftMargin: 14
-                    spacing: 5
-                    Text { text: modelData.label; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold; font.letterSpacing: 0.5 }
-                    Text {
-                      text: modelData.value
-                      color: Colors.fgMain
-                      font.pixelSize: 11
-                      font.weight: Font.Medium
-                      width: parent.width
-                      wrapMode: Text.WrapAnywhere
-                      maximumLineCount: 2
-                      elide: Text.ElideRight
-                    }
-                  }
-
-                  MouseArea { id: techCardHover; anchors.fill: parent; hoverEnabled: true }
-                }
-              }
-            }
-          }
-
-          ColumnLayout {
-            Layout.fillWidth: true
-            spacing: 8
-            visible: root.showAdvanced && root.activeConnections.length > 0
-
-            Text { text: "Active Connections"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
+            columns: 2
+            columnSpacing: Colors.paddingSmall
+            rowSpacing: Colors.paddingSmall
 
             Repeater {
-              model: root.activeConnections
+              model: [
+                { label: "IPv4", value: root.detailValue(root.primaryIpv4, "Unavailable") },
+                { label: "Gateway", value: root.detailValue(root.primaryGateway, "Unavailable") },
+                { label: "Default Route", value: root.detailValue(root.routeDevice, "Unavailable") + (root.routeSource !== "" ? " • " + root.routeSource : "") },
+                { label: "DNS", value: root.dnsSummary() }
+              ]
               delegate: Rectangle {
                 Layout.fillWidth: true
-                implicitHeight: 42
+                Layout.preferredHeight: 60
                 radius: Colors.radiusMedium
                 color: Colors.cardSurface
                 border.color: Colors.border
                 border.width: 1
+                clip: true
 
-                RowLayout {
+                Rectangle {
+                  anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom
+                  width: 3; color: Colors.withAlpha(Colors.primary, 0.25)
+                }
+
+                Column {
                   anchors.fill: parent
-                  anchors.margins: 12
-                  spacing: 10
+                  anchors.margins: Colors.spacingM
+                  anchors.leftMargin: Colors.spacingM
+                  spacing: Colors.spacingXS
+                  SharedWidgets.SectionLabel { label: modelData.label }
                   Text {
-                    text: modelData.type === "802-3-ethernet" || modelData.type === "ethernet" ? "󰈀" : (modelData.type === "wifi" || modelData.type === "802-11-wireless" ? "󰖩" : "󰖂")
-                    color: Colors.primary
-                    font.family: Colors.fontMono
-                    font.pixelSize: 15
-                  }
-                  ColumnLayout {
-                    Layout.fillWidth: true
-                    spacing: 0
-                    Text { text: modelData.name; color: Colors.fgMain; font.pixelSize: 12; Layout.fillWidth: true; elide: Text.ElideRight }
-                    Text { text: (modelData.device || "") + (modelData.type ? " • " + modelData.type : ""); color: Colors.textSecondary; font.pixelSize: 10; Layout.fillWidth: true; elide: Text.ElideRight }
+                    text: modelData.value
+                    color: Colors.text
+                    font.pixelSize: Colors.fontSizeSmall
+                    font.weight: Font.Medium
+                    width: parent.width
+                    wrapMode: Text.WrapAnywhere
+                    maximumLineCount: 2
+                    elide: Text.ElideRight
                   }
                 }
+
+                SharedWidgets.StateLayer { anchors.fill: parent; radius: parent.radius; stateColor: Colors.primary; enableRipple: false; hovered: overviewCardHover.containsMouse }
+                MouseArea { id: overviewCardHover; anchors.fill: parent; hoverEnabled: true }
+              }
+            }
+          }
+        }
+
+        ColumnLayout {
+          Layout.fillWidth: true
+          spacing: Colors.spacingS
+
+          SharedWidgets.SectionLabel { label: "Internet" }
+
+          GridLayout {
+            Layout.fillWidth: true
+            columns: 2
+            columnSpacing: Colors.paddingSmall
+            rowSpacing: Colors.paddingSmall
+
+            Repeater {
+              model: [
+                { label: "Connectivity", value: root.detailValue(root.connectivityStatus, "Unknown") },
+                { label: "Public IPv4", value: root.detailValue(root.publicIpv4, "Unavailable") },
+                { label: "Downloaded", value: root.detailValue(root.totalReceived, "0 B") },
+                { label: "Uploaded", value: root.detailValue(root.totalSent, "0 B") }
+              ]
+              delegate: Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 60
+                radius: Colors.radiusMedium
+                color: Colors.cardSurface
+                border.color: Colors.border
+                border.width: 1
+                clip: true
+
+                Rectangle {
+                  anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom
+                  width: 3; color: Colors.withAlpha(Colors.primary, 0.25)
+                }
+
+                Column {
+                  anchors.fill: parent
+                  anchors.margins: Colors.spacingM
+                  anchors.leftMargin: Colors.spacingM
+                  spacing: Colors.spacingXS
+                  SharedWidgets.SectionLabel { label: modelData.label }
+                  Text {
+                    text: modelData.value
+                    color: Colors.text
+                    font.pixelSize: Colors.fontSizeSmall
+                    font.weight: Font.Medium
+                    width: parent.width
+                    wrapMode: Text.WrapAnywhere
+                    maximumLineCount: 2
+                    elide: Text.ElideRight
+                  }
+                }
+
+                SharedWidgets.StateLayer { anchors.fill: parent; radius: parent.radius; stateColor: Colors.primary; enableRipple: false; hovered: internetCardHover.containsMouse }
+                MouseArea { id: internetCardHover; anchors.fill: parent; hoverEnabled: true }
+              }
+            }
+          }
+        }
+
+        ColumnLayout {
+          Layout.fillWidth: true
+          spacing: Colors.spacingS
+
+          SharedWidgets.SectionLabel { label: "Live Traffic" }
+          NetworkGraphs { Layout.fillWidth: true }
+        }
+
+        ColumnLayout {
+          Layout.fillWidth: true
+          spacing: Colors.spacingS
+          visible: root.vpns.length > 0 || root.tailscaleStatus !== "Offline"
+
+          SharedWidgets.SectionLabel { label: "VPN & Overlays" }
+
+          Rectangle {
+            Layout.fillWidth: true
+            visible: root.tailscaleStatus !== "Offline"
+            implicitHeight: 54
+            radius: Colors.radiusMedium
+            color: Colors.cardSurface
+            border.color: Colors.border
+            border.width: 1
+
+            RowLayout {
+              anchors.fill: parent
+              anchors.margins: Colors.spacingM
+              spacing: Colors.paddingSmall
+
+              Text { text: "󰖂"; color: root.tailscaleStatus === "Connected" ? Colors.primary : Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL }
+
+              ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 0
+                Text { text: "Tailscale"; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.DemiBold }
+                Text {
+                  text: root.tailscaleIp !== "" ? (root.tailscaleStatus + " • " + root.tailscaleIp) : root.tailscaleStatus
+                  color: Colors.textSecondary
+                  font.pixelSize: Colors.fontSizeXS
+                  Layout.fillWidth: true
+                  elide: Text.ElideRight
+                }
+              }
+
+              Rectangle {
+                width: 72
+                height: 28
+                radius: Colors.radiusMedium
+                color: root.tailscaleStatus === "Connected"
+                  ? Colors.withAlpha(Colors.error, 0.14)
+                  : Colors.withAlpha(Colors.primary, 0.16)
+                border.color: root.tailscaleStatus === "Connected" ? Colors.error : Colors.primary
+                border.width: 1
+                Text {
+                  anchors.centerIn: parent
+                  text: root.tailscaleStatus === "Connected" ? "Down" : "Up"
+                  color: root.tailscaleStatus === "Connected" ? Colors.error : Colors.primary
+                  font.pixelSize: Colors.fontSizeSmall
+                  font.weight: Font.Medium
+                }
+              }
+            }
+
+            MouseArea {
+              anchors.fill: parent
+              cursorShape: Qt.PointingHandCursor
+              onClicked: {
+                if (root.tailscaleStatus === "Connected") Quickshell.execDetached(["tailscale", "down"]);
+                else Quickshell.execDetached(["tailscale", "up"]);
+                root.queueRefresh();
               }
             }
           }
 
-          ColumnLayout {
-            Layout.fillWidth: true
-            spacing: 8
-
-            Text { text: "Available Networks"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
-            Text {
-              text: root.wifiNetworks.length === 0 ? "No nearby networks right now" : "Select a network to connect or disconnect"
-              color: Colors.textSecondary
-              font.pixelSize: 10
-            }
-
-            Repeater {
-              model: root.wifiNetworks
-              delegate: ColumnLayout {
-                width: parent.width
-                spacing: 6
-
-                Rectangle {
-                  Layout.fillWidth: true
-                  implicitHeight: 46
-                  radius: Colors.radiusMedium
-                  color: networkMouse.containsMouse
-                    ? Colors.withAlpha(Colors.primary, 0.12)
-                    : (modelData.active ? Colors.withAlpha(Colors.primary, 0.16) : Colors.cardSurface)
-                  border.color: modelData.active ? Colors.primary : Colors.border
-                  border.width: 1
-
-                  RowLayout {
-                    anchors.fill: parent
-                    anchors.margins: 12
-                    spacing: 10
-
-                    Text {
-                      text: modelData.active ? "󰄬" : root.signalIcon(modelData.signal)
-                      color: modelData.active ? Colors.primary : Colors.textSecondary
-                      font.family: Colors.fontMono
-                      font.pixelSize: 15
-                    }
-
-                    ColumnLayout {
-                      Layout.fillWidth: true
-                      spacing: 0
-                      Text {
-                        text: modelData.ssid
-                        color: Colors.fgMain
-                        font.pixelSize: 12
-                        font.weight: modelData.active ? Font.DemiBold : Font.Normal
-                        Layout.fillWidth: true
-                        elide: Text.ElideRight
-                      }
-                      Text {
-                        text: (modelData.security || "open") + " • " + (modelData.signal || "0") + "%"
-                        color: Colors.textSecondary
-                        font.pixelSize: 10
-                        Layout.fillWidth: true
-                        elide: Text.ElideRight
-                      }
-                    }
-
-                    Text {
-                      text: modelData.active ? "Connected" : "Connect"
-                      color: modelData.active ? Colors.primary : Colors.textSecondary
-                      font.pixelSize: 11
-                      font.weight: Font.Medium
-                    }
-                  }
-
-                  MouseArea {
-                    id: networkMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onClicked: {
-                      if (modelData.active) {
-                        Quickshell.execDetached(["nmcli", "connection", "down", modelData.ssid]);
-                        root.queueRefresh();
-                      } else if ((modelData.security || "") === "" || modelData.security === "--") {
-                        Quickshell.execDetached(["nmcli", "dev", "wifi", "connect", modelData.ssid]);
-                        root.queueRefresh();
-                      } else {
-                        root.selectedSSID = root.selectedSSID === modelData.ssid ? "" : modelData.ssid;
-                      }
-                    }
-                  }
-                }
-
-                Rectangle {
-                  Layout.fillWidth: true
-                  visible: root.selectedSSID === modelData.ssid
-                  implicitHeight: visible ? 48 : 0
-                  radius: Colors.radiusMedium
-                  color: Colors.cardSurface
-                  border.color: Colors.border
-                  border.width: 1
-
-                  TextInput {
-                    id: passwordInput
-                    anchors.fill: parent
-                    anchors.margins: 12
-                    verticalAlignment: Text.AlignVCenter
-                    color: Colors.fgMain
-                    font.pixelSize: 12
-                    echoMode: TextInput.Password
-                    onVisibleChanged: {
-                      if (visible) forceActiveFocus();
-                      else if (activeFocus) focus = false;
-                    }
-                    onAccepted: {
-                      Quickshell.execDetached(["nmcli", "dev", "wifi", "connect", modelData.ssid, "password", text]);
-                      root.selectedSSID = "";
-                      text = "";
-                      root.queueRefresh();
-                    }
-                  }
-
-                  Text {
-                    anchors.fill: parent
-                    anchors.leftMargin: 12
-                    anchors.rightMargin: 12
-                    verticalAlignment: Text.AlignVCenter
-                    text: "Enter Wi-Fi password and press Enter"
-                    color: Colors.textDisabled
-                    font.pixelSize: 11
-                    visible: passwordInput.text === "" && !passwordInput.activeFocus
-                  }
-                }
-              }
-            }
-
-            Rectangle {
+          Repeater {
+            model: root.vpns
+            delegate: Rectangle {
               Layout.fillWidth: true
-              visible: root.wifiNetworks.length === 0
+              implicitHeight: 42
               radius: Colors.radiusMedium
               color: Colors.cardSurface
               border.color: Colors.border
               border.width: 1
-              implicitHeight: 72
 
-              Column {
-                anchors.centerIn: parent
-                spacing: 4
-                Text {
-                  text: root.wifiDeviceAvailable ? (root.wifiRadioEnabled ? "󰤮" : "󰖪") : "󰤭"
-                  color: Colors.textDisabled
-                  font.family: Colors.fontMono
-                  font.pixelSize: 18
-                  anchors.horizontalCenter: parent.horizontalCenter
+              RowLayout {
+                anchors.fill: parent
+                anchors.margins: Colors.spacingM
+                spacing: Colors.paddingSmall
+                Text { text: "󰖂"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
+                ColumnLayout {
+                  Layout.fillWidth: true
+                  spacing: 0
+                  Text { text: modelData.name; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; Layout.fillWidth: true; elide: Text.ElideRight }
+                  Text { text: modelData.type + (modelData.state ? " • " + modelData.state : ""); color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
                 }
-                Text {
-                  text: !root.wifiDeviceAvailable ? "No Wi-Fi device detected" : (root.wifiRadioEnabled ? "No Wi-Fi networks detected" : "Wi-Fi radio is turned off")
-                  color: Colors.textSecondary
-                  font.pixelSize: 11
-                  anchors.horizontalCenter: parent.horizontalCenter
+              }
+
+              MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                  Quickshell.execDetached(["nmcli", "connection", "down", modelData.name]);
+                  root.queueRefresh();
                 }
               }
             }
           }
         }
-      }
-    }
+
+        Rectangle {
+          Layout.fillWidth: true
+          implicitHeight: 40
+          radius: Colors.radiusMedium
+          color: Colors.cardSurface
+          border.color: detailsMouse.containsMouse ? Colors.primary : Colors.border
+          border.width: 1
+          Behavior on border.color { ColorAnimation { duration: 160 } }
+
+          RowLayout {
+            anchors.fill: parent
+            anchors.margins: Colors.spacingM
+            spacing: Colors.spacingS
+
+            Text {
+              text: root.showAdvanced ? "󰅂" : "󰅀"
+              color: detailsMouse.containsMouse ? Colors.primary : Colors.textSecondary
+              Behavior on color { ColorAnimation { duration: 160 } }
+              font.family: Colors.fontMono
+              font.pixelSize: Colors.fontSizeLarge
+            }
+
+            Text {
+              text: root.showAdvanced ? "Hide technical details" : "Show technical details"
+              color: detailsMouse.containsMouse ? Colors.primary : Colors.text
+              Behavior on color { ColorAnimation { duration: 160 } }
+              font.pixelSize: Colors.fontSizeSmall
+              font.weight: Font.Medium
+            }
+
+            Item { Layout.fillWidth: true }
+
+            Text {
+              text: root.showAdvanced ? "Less" : "More"
+              color: Colors.textSecondary
+              font.pixelSize: Colors.fontSizeXS
+            }
+          }
+
+          SharedWidgets.StateLayer { id: detailsStateLayer; anchors.fill: parent; radius: parent.radius; stateColor: Colors.primary; hovered: detailsMouse.containsMouse; pressed: detailsMouse.pressed }
+          MouseArea {
+            id: detailsMouse
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: (mouse) => { detailsStateLayer.burst(mouse.x, mouse.y); root.showAdvanced = !root.showAdvanced; }
+          }
+        }
+
+        ColumnLayout {
+          Layout.fillWidth: true
+          spacing: Colors.spacingS
+          visible: root.showAdvanced
+
+          SharedWidgets.SectionLabel { label: "Technical Details" }
+
+          GridLayout {
+            Layout.fillWidth: true
+            columns: 2
+            columnSpacing: Colors.paddingSmall
+            rowSpacing: Colors.paddingSmall
+
+            Repeater {
+              model: [
+                { label: "IPv6", value: root.detailValue(root.primaryIpv6, "Unavailable") },
+                { label: "MAC", value: root.detailValue(root.primaryMac, "Unavailable") },
+                { label: "Link Speed", value: root.detailValue(root.primaryLinkSpeed, "Unavailable") },
+                { label: "Security", value: root.detailValue(root.primarySecurity, root.activePrimaryType === "wifi" ? "Unknown" : "N/A") },
+                { label: "Channel / Band", value: root.primaryChannel !== "" ? (root.primaryChannel + (root.primaryBand !== "" ? " • " + root.primaryBand : "")) : "N/A" },
+                { label: "Interface", value: root.detailValue(root.primaryDevice, "Unavailable") }
+              ]
+              delegate: Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 60
+                radius: Colors.radiusMedium
+                color: Colors.cardSurface
+                border.color: Colors.border
+                border.width: 1
+                clip: true
+
+                Rectangle {
+                  anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom
+                  width: 3; color: Colors.withAlpha(Colors.primary, 0.25)
+                }
+
+                Column {
+                  anchors.fill: parent
+                  anchors.margins: Colors.spacingM
+                  anchors.leftMargin: Colors.spacingM
+                  spacing: Colors.spacingXS
+                  SharedWidgets.SectionLabel { label: modelData.label }
+                  Text {
+                    text: modelData.value
+                    color: Colors.text
+                    font.pixelSize: Colors.fontSizeSmall
+                    font.weight: Font.Medium
+                    width: parent.width
+                    wrapMode: Text.WrapAnywhere
+                    maximumLineCount: 2
+                    elide: Text.ElideRight
+                  }
+                }
+
+                SharedWidgets.StateLayer { anchors.fill: parent; radius: parent.radius; stateColor: Colors.primary; enableRipple: false; hovered: techCardHover.containsMouse }
+                MouseArea { id: techCardHover; anchors.fill: parent; hoverEnabled: true }
+              }
+            }
+          }
+        }
+
+        ColumnLayout {
+          Layout.fillWidth: true
+          spacing: Colors.spacingS
+          visible: root.showAdvanced && root.activeConnections.length > 0
+
+          SharedWidgets.SectionLabel { label: "Active Connections" }
+
+          Repeater {
+            model: root.activeConnections
+            delegate: Rectangle {
+              Layout.fillWidth: true
+              implicitHeight: 42
+              radius: Colors.radiusMedium
+              color: Colors.cardSurface
+              border.color: Colors.border
+              border.width: 1
+
+              RowLayout {
+                anchors.fill: parent
+                anchors.margins: Colors.spacingM
+                spacing: Colors.paddingSmall
+                Text {
+                  text: modelData.type === "802-3-ethernet" || modelData.type === "ethernet" ? "󰈀" : (modelData.type === "wifi" || modelData.type === "802-11-wireless" ? "󰖩" : "󰖂")
+                  color: Colors.primary
+                  font.family: Colors.fontMono
+                  font.pixelSize: Colors.fontSizeLarge
+                }
+                ColumnLayout {
+                  Layout.fillWidth: true
+                  spacing: 0
+                  Text { text: modelData.name; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; Layout.fillWidth: true; elide: Text.ElideRight }
+                  Text { text: (modelData.device || "") + (modelData.type ? " • " + modelData.type : ""); color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
+                }
+              }
+            }
+          }
+        }
+
+        ColumnLayout {
+          Layout.fillWidth: true
+          spacing: Colors.spacingS
+
+          SharedWidgets.SectionLabel { label: "Available Networks" }
+          Text {
+            text: root.wifiNetworks.length === 0 ? "No nearby networks right now" : "Select a network to connect or disconnect"
+            color: Colors.textSecondary
+            font.pixelSize: Colors.fontSizeXS
+          }
+
+          Repeater {
+            model: root.wifiNetworks
+            delegate: ColumnLayout {
+              width: parent.width
+              spacing: Colors.spacingS
+
+              Rectangle {
+                Layout.fillWidth: true
+                implicitHeight: 46
+                radius: Colors.radiusMedium
+                color: networkMouse.containsMouse
+                  ? Colors.withAlpha(Colors.primary, 0.12)
+                  : (modelData.active ? Colors.withAlpha(Colors.primary, 0.16) : Colors.cardSurface)
+                border.color: modelData.active ? Colors.primary : Colors.border
+                border.width: 1
+
+                RowLayout {
+                  anchors.fill: parent
+                  anchors.margins: Colors.spacingM
+                  spacing: Colors.paddingSmall
+
+                  Text {
+                    text: modelData.active ? "󰄬" : root.signalIcon(modelData.signal)
+                    color: modelData.active ? Colors.primary : Colors.textSecondary
+                    font.family: Colors.fontMono
+                    font.pixelSize: Colors.fontSizeLarge
+                  }
+
+                  ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 0
+                    Text {
+                      text: modelData.ssid
+                      color: Colors.text
+                      font.pixelSize: Colors.fontSizeMedium
+                      font.weight: modelData.active ? Font.DemiBold : Font.Normal
+                      Layout.fillWidth: true
+                      elide: Text.ElideRight
+                    }
+                    Text {
+                      text: (modelData.security || "open") + " • " + (modelData.signal || "0") + "%"
+                      color: Colors.textSecondary
+                      font.pixelSize: Colors.fontSizeXS
+                      Layout.fillWidth: true
+                      elide: Text.ElideRight
+                    }
+                  }
+
+                  Text {
+                    text: modelData.active ? "Connected" : "Connect"
+                    color: modelData.active ? Colors.primary : Colors.textSecondary
+                    font.pixelSize: Colors.fontSizeSmall
+                    font.weight: Font.Medium
+                  }
+                }
+
+                MouseArea {
+                  id: networkMouse
+                  anchors.fill: parent
+                  hoverEnabled: true
+                  cursorShape: Qt.PointingHandCursor
+                  onClicked: {
+                    if (modelData.active) {
+                      Quickshell.execDetached(["nmcli", "connection", "down", modelData.ssid]);
+                      root.queueRefresh();
+                    } else if ((modelData.security || "") === "" || modelData.security === "--") {
+                      Quickshell.execDetached(["nmcli", "dev", "wifi", "connect", modelData.ssid]);
+                      root.queueRefresh();
+                    } else {
+                      root.selectedSSID = root.selectedSSID === modelData.ssid ? "" : modelData.ssid;
+                    }
+                  }
+                }
+              }
+
+              Rectangle {
+                Layout.fillWidth: true
+                visible: root.selectedSSID === modelData.ssid
+                implicitHeight: visible ? 48 : 0
+                radius: Colors.radiusMedium
+                color: Colors.cardSurface
+                border.color: Colors.border
+                border.width: 1
+
+                TextInput {
+                  id: passwordInput
+                  anchors.fill: parent
+                  anchors.margins: Colors.spacingM
+                  verticalAlignment: Text.AlignVCenter
+                  color: Colors.text
+                  font.pixelSize: Colors.fontSizeMedium
+                  echoMode: TextInput.Password
+                  onVisibleChanged: {
+                    if (visible) forceActiveFocus();
+                    else if (activeFocus) focus = false;
+                  }
+                  onAccepted: {
+                    Quickshell.execDetached(["nmcli", "dev", "wifi", "connect", modelData.ssid, "password", text]);
+                    root.selectedSSID = "";
+                    text = "";
+                    root.queueRefresh();
+                  }
+                }
+
+                Text {
+                  anchors.fill: parent
+                  anchors.leftMargin: Colors.spacingM
+                  anchors.rightMargin: Colors.spacingM
+                  verticalAlignment: Text.AlignVCenter
+                  text: "Enter Wi-Fi password and press Enter"
+                  color: Colors.textDisabled
+                  font.pixelSize: Colors.fontSizeSmall
+                  visible: passwordInput.text === "" && !passwordInput.activeFocus
+                }
+              }
+            }
+          }
+
+          Rectangle {
+            Layout.fillWidth: true
+            visible: root.wifiNetworks.length === 0
+            radius: Colors.radiusMedium
+            color: Colors.cardSurface
+            border.color: Colors.border
+            border.width: 1
+            implicitHeight: 72
+
+            Column {
+              anchors.centerIn: parent
+              spacing: Colors.spacingXS
+              Text {
+                text: root.wifiDeviceAvailable ? (root.wifiRadioEnabled ? "󰤮" : "󰖪") : "󰤭"
+                color: Colors.textDisabled
+                font.family: Colors.fontMono
+                font.pixelSize: Colors.fontSizeXL
+                anchors.horizontalCenter: parent.horizontalCenter
+              }
+              Text {
+                text: !root.wifiDeviceAvailable ? "No Wi-Fi device detected" : (root.wifiRadioEnabled ? "No Wi-Fi networks detected" : "Wi-Fi radio is turned off")
+                color: Colors.textSecondary
+                font.pixelSize: Colors.fontSizeSmall
+                anchors.horizontalCenter: parent.horizontalCenter
+              }
+            }
+          }
+        }
+
   }
 }

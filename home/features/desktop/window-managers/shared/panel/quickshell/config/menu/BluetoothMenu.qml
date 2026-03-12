@@ -5,13 +5,38 @@ import QtQuick.Layouts
 import "../services"
 import "../widgets" as SharedWidgets
 
-PopupWindow {
+BasePopupMenu {
   id: root
   implicitWidth: 380
   implicitHeight: 520
+  title: "Bluetooth"
+  toggleMethod: "toggleBluetoothMenu"
 
   readonly property bool hasAdapter: !!Bluetooth.defaultAdapter
   readonly property bool btEnabled: hasAdapter && Bluetooth.defaultAdapter.enabled
+
+  // Optimistic UI: reflect the toggle immediately, lock out polling for 4s
+  property bool _optimisticBtEnabled: false
+  property bool _optimisticLocked: false
+  readonly property bool effectiveBtEnabled: _optimisticLocked ? _optimisticBtEnabled : btEnabled
+
+  Timer {
+    id: optimisticTimer
+    interval: 4000
+    onTriggered: root._optimisticLocked = false
+  }
+
+  function toggleBluetooth() {
+    if (!root.hasAdapter) return;
+    var next = !root.effectiveBtEnabled;
+    root._optimisticBtEnabled = next;
+    root._optimisticLocked = true;
+    optimisticTimer.restart();
+    Bluetooth.defaultAdapter.enabled = next;
+    if (!next) root.stopScan();
+    else root.startScan();
+  }
+
   property bool isScanning: false
   property int scanElapsed: 0
   property int connectedCount: 0
@@ -44,7 +69,7 @@ PopupWindow {
   }
 
   function startScan() {
-    if (!hasAdapter || !btEnabled) return;
+    if (!hasAdapter || !effectiveBtEnabled) return;
     Bluetooth.defaultAdapter.discovering = true;
     isScanning = true;
     scanElapsed = 0;
@@ -59,7 +84,7 @@ PopupWindow {
   }
 
   onVisibleChanged: {
-    if (visible && btEnabled) startScan();
+    if (visible && effectiveBtEnabled) startScan();
     else if (!visible) stopScan();
     if (visible) updateCounts();
   }
@@ -80,529 +105,429 @@ PopupWindow {
     function onCountChanged() { root.updateCounts(); }
   }
 
-  Rectangle {
-    anchors.fill: parent
-    color: Colors.popupSurface
-    border.color: Colors.border
-    border.width: 1
-    radius: Colors.radiusMedium
-    clip: true
+  headerExtras: [
+    SharedWidgets.FilterChip {
+      label: root.effectiveBtEnabled ? "On" : "Off"
+      selected: root.effectiveBtEnabled
+      onClicked: root.toggleBluetooth()
+    },
+    Rectangle {
+      width: 30; height: 30; radius: height / 2
+      color: "transparent"
 
-    ColumnLayout {
-      anchors.fill: parent
-      anchors.margins: Colors.paddingLarge
-      spacing: 14
+      Text {
+        id: scanIcon
+        anchors.centerIn: parent
+        text: "󰑐"
+        color: root.isScanning ? Colors.primary : Colors.textSecondary
+        font.family: Colors.fontMono
+        font.pixelSize: Colors.fontSizeXL
 
-      // ── HEADER ──────────────────────────
-      RowLayout {
+        RotationAnimator on rotation {
+          from: 0; to: 360
+          duration: 1200
+          running: root.isScanning
+          loops: Animation.Infinite
+        }
+      }
+
+      SharedWidgets.StateLayer { id: scanBtnStateLayer; hovered: scanBtnHover.containsMouse; pressed: scanBtnHover.pressed }
+
+      MouseArea {
+        id: scanBtnHover
+        anchors.fill: parent
+        hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
+        onClicked: (mouse) => { scanBtnStateLayer.burst(mouse.x, mouse.y); root.isScanning ? root.stopScan() : root.startScan(); }
+      }
+    }
+  ]
+
+  // ── CONTENT ──────────────────────────
+  SharedWidgets.ScrollableContent {
+    Layout.fillWidth: true
+    Layout.fillHeight: true
+    columnSpacing: Colors.paddingSmall
+
+      // ── EMPTY STATES ──────────────────
+      // No adapter
+      SharedWidgets.EmptyState {
         Layout.fillWidth: true
+        Layout.topMargin: 40
+        visible: !root.hasAdapter
+        icon: "󰂲"
+        iconSize: 48
+        message: "No Bluetooth adapter found"
+      }
+
+      // BT off
+      ColumnLayout {
+        Layout.fillWidth: true
+        visible: root.hasAdapter && !root.effectiveBtEnabled
+        spacing: Colors.spacingM
+        Layout.topMargin: 40
 
         Text {
-          text: "Bluetooth"
-          color: Colors.fgMain
-          font.pixelSize: 18
-          font.weight: Font.DemiBold
+          Layout.alignment: Qt.AlignHCenter
+          text: "󰂲"
+          color: Colors.textDisabled
+          font.family: Colors.fontMono
+          font.pixelSize: 48
         }
-
-        Item { Layout.fillWidth: true }
-
-        // On/Off chip
+        Text {
+          Layout.alignment: Qt.AlignHCenter
+          text: "Bluetooth is off"
+          color: Colors.textDisabled
+          font.pixelSize: Colors.fontSizeMedium
+        }
         Rectangle {
-          implicitWidth: btChipLabel.implicitWidth + 20
-          implicitHeight: 26
-          radius: 13
-          color: root.btEnabled ? Colors.withAlpha(Colors.primary, 0.16) : Colors.highlightLight
-          Behavior on color { ColorAnimation { duration: 150 } }
+          Layout.alignment: Qt.AlignHCenter
+          implicitWidth: turnOnLabel.implicitWidth + 24
+          implicitHeight: 32
+          radius: 16
+          color: Colors.withAlpha(Colors.primary, 0.16)
 
           Text {
-            id: btChipLabel
+            id: turnOnLabel
             anchors.centerIn: parent
-            text: root.btEnabled ? "On" : "Off"
-            color: root.btEnabled ? Colors.primary : Colors.textSecondary
-            font.pixelSize: 11
-            font.weight: Font.Medium
+            text: "Turn On"
+            color: Colors.primary
+            font.pixelSize: Colors.fontSizeMedium
+            font.weight: Font.DemiBold
           }
+
+          SharedWidgets.StateLayer { id: turnOnStateLayer; hovered: turnOnHover.containsMouse; pressed: turnOnHover.pressed; stateColor: Colors.primary }
 
           MouseArea {
-            anchors.fill: parent
-            cursorShape: Qt.PointingHandCursor
-            onClicked: {
-              if (root.hasAdapter) {
-                Bluetooth.defaultAdapter.enabled = !Bluetooth.defaultAdapter.enabled;
-                if (!Bluetooth.defaultAdapter.enabled) root.stopScan();
-                else root.startScan();
-              }
-            }
-          }
-        }
-
-        // Scan button
-        Rectangle {
-          width: 30; height: 30; radius: 15
-          color: scanBtnHover.containsMouse ? Colors.highlightLight : "transparent"
-
-          Text {
-            id: scanIcon
-            anchors.centerIn: parent
-            text: "󰑐"
-            color: root.isScanning ? Colors.primary : Colors.textSecondary
-            font.family: Colors.fontMono
-            font.pixelSize: 16
-
-            RotationAnimator on rotation {
-              from: 0; to: 360
-              duration: 1200
-              running: root.isScanning
-              loops: Animation.Infinite
-            }
-          }
-
-          MouseArea {
-            id: scanBtnHover
+            id: turnOnHover
             anchors.fill: parent
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
-            onClicked: root.isScanning ? root.stopScan() : root.startScan()
+            onClicked: (mouse) => { turnOnStateLayer.burst(mouse.x, mouse.y); root.toggleBluetooth(); }
           }
         }
-
-        SharedWidgets.MenuCloseButton { toggleMethod: "toggleBluetoothMenu" }
       }
 
-      Rectangle {
-        Layout.fillWidth: true
-        height: 1
-        color: Colors.border
-      }
+      // ── CONNECTED SECTION ──────────────
+      SharedWidgets.SectionLabel { label: "CONNECTED"; visible: root.connectedCount > 0 }
 
-      // ── CONTENT ──────────────────────────
-      Flickable {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        contentHeight: contentColumn.implicitHeight
-        clip: true
-        boundsBehavior: Flickable.StopAtBounds
+      Repeater {
+        model: Bluetooth.devices
+        delegate: Rectangle {
+          id: connCard
+          Layout.fillWidth: true
+          implicitHeight: visible ? 46 : 0
+          visible: modelData.connected
+          radius: Colors.radiusMedium
+          color: Colors.cardSurface
+          border.color: Colors.primary
+          border.width: 1
 
-        ColumnLayout {
-          id: contentColumn
-          width: parent.width
-          spacing: 10
-
-          // ── EMPTY STATES ──────────────────
-          // No adapter
-          ColumnLayout {
-            Layout.fillWidth: true
-            visible: !root.hasAdapter
-            spacing: 8
-            Layout.topMargin: 40
+          RowLayout {
+            anchors.fill: parent
+            anchors.margins: Colors.paddingSmall
+            spacing: Colors.paddingSmall
 
             Text {
-              Layout.alignment: Qt.AlignHCenter
-              text: "󰂲"
-              color: Colors.textDisabled
+              text: root.deviceIcon(modelData)
+              color: Colors.primary
               font.family: Colors.fontMono
-              font.pixelSize: 48
+              font.pixelSize: Colors.fontSizeXL
             }
-            Text {
-              Layout.alignment: Qt.AlignHCenter
-              text: "No Bluetooth adapter found"
-              color: Colors.textDisabled
-              font.pixelSize: 13
-            }
-          }
 
-          // BT off
-          ColumnLayout {
-            Layout.fillWidth: true
-            visible: root.hasAdapter && !root.btEnabled
-            spacing: 12
-            Layout.topMargin: 40
-
-            Text {
-              Layout.alignment: Qt.AlignHCenter
-              text: "󰂲"
-              color: Colors.textDisabled
-              font.family: Colors.fontMono
-              font.pixelSize: 48
-            }
-            Text {
-              Layout.alignment: Qt.AlignHCenter
-              text: "Bluetooth is off"
-              color: Colors.textDisabled
-              font.pixelSize: 13
-            }
-            Rectangle {
-              Layout.alignment: Qt.AlignHCenter
-              implicitWidth: turnOnLabel.implicitWidth + 24
-              implicitHeight: 32
-              radius: 16
-              color: turnOnHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.24) : Colors.withAlpha(Colors.primary, 0.16)
-              Behavior on color { ColorAnimation { duration: 150 } }
-
+            ColumnLayout {
+              Layout.fillWidth: true
+              spacing: 1
               Text {
-                id: turnOnLabel
-                anchors.centerIn: parent
-                text: "Turn On"
-                color: Colors.primary
-                font.pixelSize: 12
+                text: modelData.name || "Unknown Device"
+                color: Colors.text
+                font.pixelSize: Colors.fontSizeMedium
                 font.weight: Font.DemiBold
+                elide: Text.ElideRight
+                Layout.fillWidth: true
               }
+              Text {
+                text: modelData.address
+                color: Colors.textDisabled
+                font.pixelSize: Colors.fontSizeXS
+                visible: !!modelData.address
+              }
+            }
 
+            Rectangle {
+              radius: 12
+              color: Colors.withAlpha(Colors.primary, 0.16)
+              implicitWidth: connChipLabel.implicitWidth + 16
+              implicitHeight: 24
+              Text {
+                id: connChipLabel
+                anchors.centerIn: parent
+                text: "Connected"
+                color: Colors.primary
+                font.pixelSize: Colors.fontSizeXS
+                font.weight: Font.Medium
+              }
+            }
+
+            Rectangle {
+              width: 28; height: 28; radius: Colors.radiusMedium
+              color: "transparent"
+              Text {
+                anchors.centerIn: parent
+                text: "󰅖"
+                color: Colors.textSecondary
+                font.family: Colors.fontMono
+                font.pixelSize: Colors.fontSizeLarge
+              }
+              SharedWidgets.StateLayer { id: disconnStateLayer; hovered: disconnHover.containsMouse; pressed: disconnHover.pressed; stateColor: Colors.error }
               MouseArea {
-                id: turnOnHover
+                id: disconnHover
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                  if (root.hasAdapter) {
-                    Bluetooth.defaultAdapter.enabled = true;
-                    root.startScan();
-                  }
-                }
+                onClicked: (mouse) => { disconnStateLayer.burst(mouse.x, mouse.y); modelData.disconnect(); }
               }
             }
           }
 
-          // ── CONNECTED SECTION ──────────────
-          Text {
-            text: "CONNECTED"
-            color: Colors.textDisabled
-            font.pixelSize: 10
-            font.weight: Font.Bold
-            font.letterSpacing: 0.5
-            visible: root.connectedCount > 0
-          }
+          SharedWidgets.StateLayer { id: connStateLayer; hovered: connHover.containsMouse; pressed: connHover.pressed; stateColor: Colors.primary; enableRipple: false }
 
-          Repeater {
-            model: Bluetooth.devices
-            delegate: Rectangle {
-              id: connCard
-              Layout.fillWidth: true
-              implicitHeight: visible ? 46 : 0
-              visible: modelData.connected
-              radius: Colors.radiusMedium
-              property bool isHovered: connHover.containsMouse
-              color: isHovered ? Colors.withAlpha(Colors.primary, 0.12) : Colors.cardSurface
-              border.color: Colors.primary
-              border.width: 1
-              Behavior on color { ColorAnimation { duration: 150 } }
-
-              RowLayout {
-                anchors.fill: parent
-                anchors.margins: 10
-                spacing: 10
-
-                Text {
-                  text: root.deviceIcon(modelData)
-                  color: Colors.primary
-                  font.family: Colors.fontMono
-                  font.pixelSize: 16
-                }
-
-                ColumnLayout {
-                  Layout.fillWidth: true
-                  spacing: 1
-                  Text {
-                    text: modelData.name || "Unknown Device"
-                    color: Colors.fgMain
-                    font.pixelSize: 12
-                    font.weight: Font.DemiBold
-                    elide: Text.ElideRight
-                    Layout.fillWidth: true
-                  }
-                  Text {
-                    text: modelData.address
-                    color: Colors.textDisabled
-                    font.pixelSize: 9
-                    visible: !!modelData.address
-                  }
-                }
-
-                Rectangle {
-                  radius: 12
-                  color: Colors.withAlpha(Colors.primary, 0.16)
-                  implicitWidth: connChipLabel.implicitWidth + 16
-                  implicitHeight: 24
-                  Text {
-                    id: connChipLabel
-                    anchors.centerIn: parent
-                    text: "Connected"
-                    color: Colors.primary
-                    font.pixelSize: 10
-                    font.weight: Font.Medium
-                  }
-                }
-
-                Rectangle {
-                  width: 28; height: 28; radius: 14
-                  color: disconnHover.containsMouse ? Colors.withAlpha(Colors.error, 0.16) : "transparent"
-                  Text {
-                    anchors.centerIn: parent
-                    text: "󰅖"
-                    color: Colors.textSecondary
-                    font.family: Colors.fontMono
-                    font.pixelSize: 14
-                  }
-                  MouseArea {
-                    id: disconnHover
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: modelData.disconnect()
-                  }
-                }
-              }
-
-              MouseArea {
-                id: connHover
-                anchors.fill: parent
-                hoverEnabled: true
-                acceptedButtons: Qt.NoButton
-              }
-            }
-          }
-
-          // ── PAIRED SECTION ──────────────
-          Text {
-            text: "PAIRED"
-            color: Colors.textDisabled
-            font.pixelSize: 10
-            font.weight: Font.Bold
-            font.letterSpacing: 0.5
-            visible: root.pairedCount > 0
-          }
-
-          Repeater {
-            model: Bluetooth.devices
-            delegate: Rectangle {
-              id: pairedCard
-              Layout.fillWidth: true
-              implicitHeight: visible ? 46 : 0
-              visible: modelData.paired && !modelData.connected
-              radius: Colors.radiusMedium
-              property bool isHovered: pairedHover.containsMouse
-              color: isHovered ? Colors.withAlpha(Colors.primary, 0.12) : Colors.cardSurface
-              border.color: Colors.border
-              border.width: 1
-              Behavior on color { ColorAnimation { duration: 150 } }
-
-              RowLayout {
-                anchors.fill: parent
-                anchors.margins: 10
-                spacing: 10
-
-                Text {
-                  text: root.deviceIcon(modelData)
-                  color: Colors.textSecondary
-                  font.family: Colors.fontMono
-                  font.pixelSize: 16
-                }
-
-                ColumnLayout {
-                  Layout.fillWidth: true
-                  spacing: 1
-                  Text {
-                    text: modelData.name || "Unknown Device"
-                    color: Colors.fgMain
-                    font.pixelSize: 12
-                    font.weight: Font.Normal
-                    elide: Text.ElideRight
-                    Layout.fillWidth: true
-                  }
-                  Text {
-                    text: modelData.address
-                    color: Colors.textDisabled
-                    font.pixelSize: 9
-                    visible: !!modelData.address
-                  }
-                }
-
-                Rectangle {
-                  radius: 12
-                  color: pairedConnHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.24) : Colors.highlightLight
-                  implicitWidth: pairedChipLabel.implicitWidth + 16
-                  implicitHeight: 24
-                  Behavior on color { ColorAnimation { duration: 150 } }
-
-                  Text {
-                    id: pairedChipLabel
-                    anchors.centerIn: parent
-                    text: "Connect"
-                    color: Colors.textSecondary
-                    font.pixelSize: 10
-                    font.weight: Font.Medium
-                  }
-
-                  MouseArea {
-                    id: pairedConnHover
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: modelData.connect()
-                  }
-                }
-
-                Rectangle {
-                  width: 28; height: 28; radius: 14
-                  color: removeHover.containsMouse ? Colors.withAlpha(Colors.error, 0.16) : "transparent"
-                  Text {
-                    anchors.centerIn: parent
-                    text: "󰆴"
-                    color: Colors.textSecondary
-                    font.family: Colors.fontMono
-                    font.pixelSize: 14
-                  }
-                  MouseArea {
-                    id: removeHover
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: Quickshell.execDetached(["bluetoothctl", "remove", modelData.address])
-                  }
-                }
-              }
-
-              MouseArea {
-                id: pairedHover
-                anchors.fill: parent
-                hoverEnabled: true
-                acceptedButtons: Qt.NoButton
-              }
-            }
-          }
-
-          // ── AVAILABLE SECTION ──────────────
-          Text {
-            text: "AVAILABLE"
-            color: Colors.textDisabled
-            font.pixelSize: 10
-            font.weight: Font.Bold
-            font.letterSpacing: 0.5
-            visible: root.availableCount > 0 || root.isScanning
-          }
-
-          // Scanning placeholder
-          RowLayout {
-            Layout.fillWidth: true
-            visible: root.isScanning
-            spacing: 8
-            Layout.leftMargin: 4
-
-            Text {
-              text: "󰑐"
-              color: Colors.textDisabled
-              font.family: Colors.fontMono
-              font.pixelSize: 14
-
-              RotationAnimator on rotation {
-                from: 0; to: 360
-                duration: 1200
-                running: root.isScanning
-                loops: Animation.Infinite
-              }
-            }
-
-            Text {
-              text: "Scanning for devices..."
-              color: Colors.textDisabled
-              font.pixelSize: 11
-            }
-          }
-
-          Repeater {
-            model: Bluetooth.devices
-            delegate: Rectangle {
-              id: availCard
-              Layout.fillWidth: true
-              implicitHeight: visible ? 46 : 0
-              visible: !modelData.paired && !modelData.connected
-              radius: Colors.radiusMedium
-              property bool isHovered: availHover.containsMouse
-              color: isHovered ? Colors.withAlpha(Colors.primary, 0.12) : Colors.cardSurface
-              border.color: Colors.border
-              border.width: 1
-              Behavior on color { ColorAnimation { duration: 150 } }
-
-              RowLayout {
-                anchors.fill: parent
-                anchors.margins: 10
-                spacing: 10
-
-                Text {
-                  text: root.deviceIcon(modelData)
-                  color: Colors.textDisabled
-                  font.family: Colors.fontMono
-                  font.pixelSize: 16
-                }
-
-                ColumnLayout {
-                  Layout.fillWidth: true
-                  spacing: 1
-                  Text {
-                    text: modelData.name || "Unknown Device"
-                    color: Colors.fgMain
-                    font.pixelSize: 12
-                    elide: Text.ElideRight
-                    Layout.fillWidth: true
-                  }
-                  Text {
-                    text: modelData.address
-                    color: Colors.textDisabled
-                    font.pixelSize: 9
-                    visible: !!modelData.address
-                  }
-                }
-
-                Rectangle {
-                  radius: 12
-                  color: pairHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.24) : Colors.highlightLight
-                  implicitWidth: pairChipLabel.implicitWidth + 16
-                  implicitHeight: 24
-                  Behavior on color { ColorAnimation { duration: 150 } }
-
-                  Text {
-                    id: pairChipLabel
-                    anchors.centerIn: parent
-                    text: "Pair"
-                    color: Colors.textSecondary
-                    font.pixelSize: 10
-                    font.weight: Font.Medium
-                  }
-
-                  MouseArea {
-                    id: pairHover
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                      Quickshell.execDetached(["sh", "-c",
-                        "bluetoothctl trust " + modelData.address + " && bluetoothctl pair " + modelData.address
-                      ]);
-                    }
-                  }
-                }
-              }
-
-              MouseArea {
-                id: availHover
-                anchors.fill: parent
-                hoverEnabled: true
-                acceptedButtons: Qt.NoButton
-              }
-            }
-          }
-
-          // No devices found (BT on, not scanning, nothing found)
-          Text {
-            Layout.alignment: Qt.AlignHCenter
-            Layout.topMargin: 20
-            text: "No devices found"
-            color: Colors.textDisabled
-            font.pixelSize: 12
-            visible: root.btEnabled && !root.isScanning && root.connectedCount === 0 && root.pairedCount === 0 && root.availableCount === 0
+          MouseArea {
+            id: connHover
+            anchors.fill: parent
+            hoverEnabled: true
+            acceptedButtons: Qt.NoButton
           }
         }
       }
-    }
+
+      // ── PAIRED SECTION ──────────────
+      SharedWidgets.SectionLabel { label: "PAIRED"; visible: root.pairedCount > 0 }
+
+      Repeater {
+        model: Bluetooth.devices
+        delegate: Rectangle {
+          id: pairedCard
+          Layout.fillWidth: true
+          implicitHeight: visible ? 46 : 0
+          visible: modelData.paired && !modelData.connected
+          radius: Colors.radiusMedium
+          color: Colors.cardSurface
+          border.color: Colors.border
+          border.width: 1
+
+          RowLayout {
+            anchors.fill: parent
+            anchors.margins: Colors.paddingSmall
+            spacing: Colors.paddingSmall
+
+            Text {
+              text: root.deviceIcon(modelData)
+              color: Colors.textSecondary
+              font.family: Colors.fontMono
+              font.pixelSize: Colors.fontSizeXL
+            }
+
+            ColumnLayout {
+              Layout.fillWidth: true
+              spacing: 1
+              Text {
+                text: modelData.name || "Unknown Device"
+                color: Colors.text
+                font.pixelSize: Colors.fontSizeMedium
+                font.weight: Font.Normal
+                elide: Text.ElideRight
+                Layout.fillWidth: true
+              }
+              Text {
+                text: modelData.address
+                color: Colors.textDisabled
+                font.pixelSize: Colors.fontSizeXS
+                visible: !!modelData.address
+              }
+            }
+
+            Rectangle {
+              radius: 12
+              color: Colors.highlightLight
+              implicitWidth: pairedChipLabel.implicitWidth + 16
+              implicitHeight: 24
+
+              Text {
+                id: pairedChipLabel
+                anchors.centerIn: parent
+                text: "Connect"
+                color: Colors.textSecondary
+                font.pixelSize: Colors.fontSizeXS
+                font.weight: Font.Medium
+              }
+
+              SharedWidgets.StateLayer { id: pairedConnStateLayer; hovered: pairedConnHover.containsMouse; pressed: pairedConnHover.pressed; stateColor: Colors.primary }
+
+              MouseArea {
+                id: pairedConnHover
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: (mouse) => { pairedConnStateLayer.burst(mouse.x, mouse.y); modelData.connect(); }
+              }
+            }
+
+            Rectangle {
+              width: 28; height: 28; radius: Colors.radiusMedium
+              color: "transparent"
+              Text {
+                anchors.centerIn: parent
+                text: "󰆴"
+                color: Colors.textSecondary
+                font.family: Colors.fontMono
+                font.pixelSize: Colors.fontSizeLarge
+              }
+              SharedWidgets.StateLayer { id: removeStateLayer; hovered: removeHover.containsMouse; pressed: removeHover.pressed; stateColor: Colors.error }
+              MouseArea {
+                id: removeHover
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: (mouse) => { removeStateLayer.burst(mouse.x, mouse.y); Quickshell.execDetached(["bluetoothctl", "remove", modelData.address]); }
+              }
+            }
+          }
+
+          SharedWidgets.StateLayer { id: pairedStateLayer; hovered: pairedHover.containsMouse; pressed: pairedHover.pressed; stateColor: Colors.primary; enableRipple: false }
+
+          MouseArea {
+            id: pairedHover
+            anchors.fill: parent
+            hoverEnabled: true
+            acceptedButtons: Qt.NoButton
+          }
+        }
+      }
+
+      // ── AVAILABLE SECTION ──────────────
+      SharedWidgets.SectionLabel { label: "AVAILABLE"; visible: root.availableCount > 0 || root.isScanning }
+
+      // Scanning placeholder
+      RowLayout {
+        Layout.fillWidth: true
+        visible: root.isScanning
+        spacing: Colors.spacingS
+        Layout.leftMargin: 4
+
+        Text {
+          text: "󰑐"
+          color: Colors.textDisabled
+          font.family: Colors.fontMono
+          font.pixelSize: Colors.fontSizeLarge
+
+          RotationAnimator on rotation {
+            from: 0; to: 360
+            duration: 1200
+            running: root.isScanning
+            loops: Animation.Infinite
+          }
+        }
+
+        Text {
+          text: "Scanning for devices..."
+          color: Colors.textDisabled
+          font.pixelSize: Colors.fontSizeSmall
+        }
+      }
+
+      Repeater {
+        model: Bluetooth.devices
+        delegate: Rectangle {
+          id: availCard
+          Layout.fillWidth: true
+          implicitHeight: visible ? 46 : 0
+          visible: !modelData.paired && !modelData.connected
+          radius: Colors.radiusMedium
+          color: Colors.cardSurface
+          border.color: Colors.border
+          border.width: 1
+
+          RowLayout {
+            anchors.fill: parent
+            anchors.margins: Colors.paddingSmall
+            spacing: Colors.paddingSmall
+
+            Text {
+              text: root.deviceIcon(modelData)
+              color: Colors.textDisabled
+              font.family: Colors.fontMono
+              font.pixelSize: Colors.fontSizeXL
+            }
+
+            ColumnLayout {
+              Layout.fillWidth: true
+              spacing: 1
+              Text {
+                text: modelData.name || "Unknown Device"
+                color: Colors.text
+                font.pixelSize: Colors.fontSizeMedium
+                elide: Text.ElideRight
+                Layout.fillWidth: true
+              }
+              Text {
+                text: modelData.address
+                color: Colors.textDisabled
+                font.pixelSize: Colors.fontSizeXS
+                visible: !!modelData.address
+              }
+            }
+
+            Rectangle {
+              radius: 12
+              color: Colors.highlightLight
+              implicitWidth: pairChipLabel.implicitWidth + 16
+              implicitHeight: 24
+
+              Text {
+                id: pairChipLabel
+                anchors.centerIn: parent
+                text: "Pair"
+                color: Colors.textSecondary
+                font.pixelSize: Colors.fontSizeXS
+                font.weight: Font.Medium
+              }
+
+              SharedWidgets.StateLayer { id: pairStateLayer; hovered: pairHover.containsMouse; pressed: pairHover.pressed; stateColor: Colors.primary }
+
+              MouseArea {
+                id: pairHover
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: (mouse) => {
+                  pairStateLayer.burst(mouse.x, mouse.y);
+                  Quickshell.execDetached(["sh", "-c",
+                    "bluetoothctl trust " + modelData.address + " && bluetoothctl pair " + modelData.address
+                  ]);
+                }
+              }
+            }
+          }
+
+          SharedWidgets.StateLayer { id: availStateLayer; hovered: availHover.containsMouse; pressed: availHover.pressed; stateColor: Colors.primary; enableRipple: false }
+
+          MouseArea {
+            id: availHover
+            anchors.fill: parent
+            hoverEnabled: true
+            acceptedButtons: Qt.NoButton
+          }
+        }
+      }
+
+      // No devices found (BT on, not scanning, nothing found)
+      SharedWidgets.EmptyState {
+        Layout.fillWidth: true
+        Layout.topMargin: 20
+        visible: root.effectiveBtEnabled && !root.isScanning && root.connectedCount === 0 && root.pairedCount === 0 && root.availableCount === 0
+        icon: "󰂯"
+        message: "No devices found"
+      }
   }
 }

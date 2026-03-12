@@ -28,7 +28,7 @@ Item {
     Text {
       text: Qt.formatDateTime(clock.date, "dddd, MMMM d")
       color: Colors.text
-      font.pixelSize: 20
+      font.pixelSize: Colors.fontSizeXL
       font.weight: Font.Medium
       Layout.leftMargin: 4
     }

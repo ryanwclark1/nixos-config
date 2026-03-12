@@ -4,12 +4,14 @@ import Quickshell.Services.Mpris
 
 pragma Singleton
 
-QtObject {
+Item {
   id: root
 
   // ── Exposed state ──────────────────────────────
   property var currentPlayer: null
   property bool isPlaying: false
+  property real _lastPlayingTimestamp: 0
+  readonly property int gracePeriodMs: 60000
   property string trackTitle: ""
   property string trackArtist: ""
   property string trackArtUrl: ""
@@ -19,6 +21,73 @@ QtObject {
   property string lengthString: "0:00"
   property bool isSeeking: false
   property int selectedPlayerIndex: 0
+
+  // ── Album art accent color ─────────────────────
+  property color artAccentColor: Colors.primary
+
+  // Hidden image loader at 32×32 for fast pixel sampling
+  Image {
+    id: _artSampler
+    width: 32; height: 32
+    visible: false
+    source: root.trackArtUrl
+    cache: true
+    asynchronous: true
+    onStatusChanged: {
+      if (status === Image.Ready) {
+        _artCanvas.needsSample = true;
+        _artCanvas.requestPaint();
+      }
+    }
+  }
+
+  // Hidden canvas: draws the image, then samples a 6×6 grid to extract dominant color
+  Canvas {
+    id: _artCanvas
+    width: 32; height: 32
+    visible: false
+    property bool needsSample: false
+
+    onPaint: {
+      var ctx = getContext("2d");
+      ctx.drawImage(_artSampler, 0, 0, 32, 32);
+      if (needsSample) {
+        needsSample = false;
+        _sampleColors(ctx);
+      }
+    }
+  }
+
+  function _sampleColors(ctx) {
+    var data = ctx.getImageData(0, 0, 32, 32);
+    var r = 0, g = 0, b = 0, count = 0;
+    // 6×6 grid — sample every ~5 pixels, starting at offset 2
+    for (var y = 2; y < 32; y += 5) {
+      for (var x = 2; x < 32; x += 5) {
+        var idx = (y * 32 + x) * 4;
+        r += data.data[idx];
+        g += data.data[idx + 1];
+        b += data.data[idx + 2];
+        count++;
+      }
+    }
+    if (count === 0) return;
+    r = Math.round(r / count);
+    g = Math.round(g / count);
+    b = Math.round(b / count);
+    // Mix 55% toward white to lift dark album colors into usable accent tones
+    r = Math.round(r + (255 - r) * 0.55);
+    g = Math.round(g + (255 - g) * 0.55);
+    b = Math.round(b + (255 - b) * 0.55);
+    root.artAccentColor = Qt.rgba(r / 255, g / 255, b / 255, 1.0);
+  }
+
+  // Reset accent color when art is cleared
+  onTrackArtUrlChanged: {
+    if (!trackArtUrl) {
+      artAccentColor = Colors.primary;
+    }
+  }
 
   // ── Browser dedup + player list ────────────────
   readonly property var _browserIdentities: ["firefox", "chromium", "chrome", "brave"]
@@ -117,15 +186,26 @@ QtObject {
 
   function updateCurrentPlayer() {
     var p = _findActivePlayer();
-    currentPlayer = p;
+
     if (p) {
-      isPlaying = p.playbackState === Mpris.Playing;
+      currentPlayer = p;
+      var playing = p.playbackState === Mpris.Playing;
+      if (playing) _lastPlayingTimestamp = Date.now();
+      isPlaying = playing;
       trackTitle = p.trackTitle || "";
       trackArtist = p.trackArtist || "";
       trackArtUrl = p.trackArtUrl || "";
       trackLength = p.length || 0;
       lengthString = formatTime(trackLength);
     } else {
+      // Grace period: keep showing last player info for 60s after pause
+      var elapsed = Date.now() - _lastPlayingTimestamp;
+      if (_lastPlayingTimestamp > 0 && elapsed < gracePeriodMs && currentPlayer) {
+        // Keep stale data visible but mark as not playing
+        isPlaying = false;
+        return;
+      }
+      currentPlayer = null;
       isPlaying = false;
       trackTitle = "";
       trackArtist = "";
@@ -156,7 +236,7 @@ QtObject {
   // ── Auto-switch monitor ────────────────────────
   property Timer switchMonitor: Timer {
     interval: 2000
-    running: true
+    running: Mpris.players.length > 0
     repeat: true
     onTriggered: root.updateCurrentPlayer()
   }

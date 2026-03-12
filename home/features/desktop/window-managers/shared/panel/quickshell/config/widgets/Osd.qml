@@ -23,10 +23,16 @@ Scope {
   property bool scrolllockState: false
   property bool suppressPipewireOsd: true
   property bool startupComplete: false
+  signal osdShown()
   property real displaySinkVolume: 0
   property bool displaySinkMuted: false
   property real displaySourceVolume: 0
   property bool displaySourceMuted: false
+
+  Component.onDestruction: {
+    hideTimer.stop();
+    if (root.osdType === "brightness") SystemStatus.subscriberCount--;
+  }
 
   // Pipewire reactive bindings
   property real sinkVolume: {
@@ -57,6 +63,11 @@ Scope {
 
   readonly property bool isLockKey: osdType === "capslock" || osdType === "numlock" || osdType === "scrolllock"
 
+  // Color lerp helper for smooth gradients between two colors
+  function lerpColor(a, b, t) {
+    return Qt.rgba(a.r + (b.r - a.r) * t, a.g + (b.g - a.g) * t, a.b + (b.b - a.b) * t, 1.0);
+  }
+
   readonly property color osdColor: {
     if (osdType === "capslock") return capslockState ? Colors.primary : Colors.fgDim;
     if (osdType === "numlock") return numlockState ? Colors.primary : Colors.fgDim;
@@ -65,6 +76,11 @@ Scope {
     if (osdType === "volume" && displaySinkMuted) return Colors.error;
     // Overdrive: red when above 100%
     if (osdType === "volume" && Config.osdOverdrive && displaySinkVolume > 1.0) return Colors.error;
+    // Volume color interpolation: primary → accent when > 50%
+    if (osdType === "volume" && displaySinkVolume > 0.5) {
+      var t = Math.min(1.0, (displaySinkVolume - 0.5) * 2.0);
+      return lerpColor(Colors.primary, Colors.accent, t);
+    }
     return Colors.primary;
   }
 
@@ -98,9 +114,13 @@ Scope {
 
   function showOsd(type) {
     if (!startupComplete) return;
+    // Unsubscribe previous brightness subscription if switching OSD type
+    if (root.osdType === "brightness" && type !== "brightness") SystemStatus.subscriberCount--;
     root.osdType = type;
     root.shouldShowOsd = true;
+    if (type === "brightness") SystemStatus.subscriberCount++;
     hideTimer.restart();
+    root.osdShown();
   }
 
   function showAudioOsd(percent, muted, volumeProp, mutedProp, type) {
@@ -178,7 +198,10 @@ Scope {
   Timer {
     id: hideTimer
     interval: Config.osdDuration
-    onTriggered: root.shouldShowOsd = false
+    onTriggered: {
+      if (root.osdType === "brightness") SystemStatus.subscriberCount--;
+      root.shouldShowOsd = false;
+    }
   }
 
   // Per-screen OSD windows
@@ -191,8 +214,13 @@ Scope {
         required property ShellScreen modelData
         screen: modelData
 
-        // Only show on the screen where the cursor is
-        visible: root.shouldShowOsd && (modelData === Quickshell.cursorScreen)
+        // Delayed unmap: stay mapped briefly after hide for fade-out
+        property bool _wantVisible: root.shouldShowOsd && (modelData === Quickshell.cursorScreen)
+        visible: _wantVisible || unmapDelay.running
+        on_WantVisibleChanged: {
+          if (!_wantVisible) unmapDelay.restart();
+        }
+        Timer { id: unmapDelay; interval: 350 }
 
         // --- 9-position anchoring ---
         anchors.top: root.posTop || root.posCenter
@@ -244,8 +272,33 @@ Scope {
           opacity: root.shouldShowOsd ? 1.0 : 0.0
           scale: root.shouldShowOsd ? 1.0 : 0.9
 
-          Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
-          Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutBack } }
+          // Asymmetric enter/exit: fast-in, slow-out
+          Behavior on opacity {
+            NumberAnimation {
+              id: osdFadeAnim
+              duration: root.shouldShowOsd ? 160 : 320
+              easing.type: root.shouldShowOsd ? Easing.OutQuad : Easing.InCubic
+            }
+          }
+          Behavior on scale {
+            NumberAnimation {
+              id: osdScaleAnim
+              duration: root.shouldShowOsd ? 240 : 280
+              easing.type: root.shouldShowOsd ? Easing.OutCubic : Easing.InCubic
+            }
+          }
+
+          // Layer during animation for GPU-accelerated compositing
+          layer.enabled: osdFadeAnim.running || osdScaleAnim.running || unmapDelay.running
+
+          // Inner ambient glow that brightens with value
+          Rectangle {
+            anchors.fill: parent
+            anchors.margins: 1
+            radius: parent.radius - 1
+            color: Colors.withAlpha(root.osdColor, 0.06 + (root.currentValue / root.maxValue) * 0.08)
+            Behavior on color { ColorAnimation { duration: 160 } }
+          }
 
           // Circular style (original)
           Loader {
@@ -254,7 +307,7 @@ Scope {
             sourceComponent: ColumnLayout {
               anchors.fill: parent
               anchors.margins: 18
-              spacing: 10
+              spacing: Colors.paddingSmall
 
               CircularGauge {
                 Layout.alignment: Qt.AlignHCenter
@@ -270,7 +323,7 @@ Scope {
                 Layout.alignment: Qt.AlignHCenter
                 text: root.osdLabel
                 color: Colors.text
-                font.pixelSize: 18
+                font.pixelSize: Colors.fontSizeXL
                 font.weight: Font.Black
                 font.family: Colors.fontMono
               }
@@ -279,7 +332,7 @@ Scope {
                 Layout.alignment: Qt.AlignHCenter
                 text: root.osdType.toUpperCase()
                 color: root.osdColor
-                font.pixelSize: 10
+                font.pixelSize: Colors.fontSizeXS
                 font.weight: Font.Black
                 font.letterSpacing: 1.5
               }
@@ -294,24 +347,51 @@ Scope {
               anchors.fill: parent
               anchors.leftMargin: 16
               anchors.rightMargin: 16
-              spacing: 12
+              spacing: Colors.spacingM
 
               Text {
+                id: pillIconText
                 text: root.osdIcon
                 color: root.osdColor
-                font.pixelSize: 20
+                font.pixelSize: Colors.fontSizeXL
                 font.family: Colors.fontMono
+                scale: 1.0
+
+                SequentialAnimation {
+                  id: pillIconPulse
+                  NumberAnimation { target: pillIconText; property: "scale"; to: 1.22; duration: 80; easing.type: Easing.OutQuad }
+                  NumberAnimation { target: pillIconText; property: "scale"; to: 1.0; duration: 180; easing.type: Easing.OutElastic }
+                }
+
+                Connections {
+                  target: root
+                  function onOsdShown() { pillIconPulse.restart(); }
+                }
               }
 
-              // Progress track
+              // Progress track (draggable for volume/brightness)
               Item {
+                id: osdTrack
                 Layout.fillWidth: true
-                Layout.preferredHeight: 6
+                Layout.preferredHeight: osdTrackMouse.pressed ? 12 : 6
+                Behavior on Layout.preferredHeight { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
 
                 Rectangle {
                   anchors.fill: parent
-                  radius: 3
+                  radius: parent.height / 2
                   color: Colors.withAlpha(root.osdColor, 0.2)
+                }
+
+                // Tick marks at 25%, 50%, 75%
+                Repeater {
+                  model: root.isLockKey ? [] : [0.25, 0.50, 0.75]
+                  Rectangle {
+                    x: osdTrack.width * modelData - 1
+                    y: -1; width: 2; height: osdTrack.height + 2
+                    radius: 1
+                    color: Colors.withAlpha(Colors.text, 0.2)
+                    visible: (root.currentValue / root.maxValue) < modelData
+                  }
                 }
 
                 Rectangle {
@@ -320,7 +400,7 @@ Scope {
                     return parent.width * Math.min(1.0, root.currentValue / root.maxValue);
                   }
                   height: parent.height
-                  radius: 3
+                  radius: parent.height / 2
                   color: root.osdColor
 
                   Behavior on width { NumberAnimation { duration: 100; easing.type: Easing.OutCubic } }
@@ -336,12 +416,42 @@ Scope {
                   radius: 1
                   color: Colors.withAlpha(Colors.text, 0.4)
                 }
+
+                // Drag interaction for volume/brightness adjustment
+                MouseArea {
+                  id: osdTrackMouse
+                  anchors.fill: parent
+                  anchors.topMargin: -12
+                  anchors.bottomMargin: -12
+                  enabled: !root.isLockKey
+                  hoverEnabled: true
+                  cursorShape: root.isLockKey ? Qt.ArrowCursor : Qt.PointingHandCursor
+
+                  function applyValue(mouseX) {
+                    var ratio = Math.max(0, Math.min(1.0, mouseX / osdTrack.width));
+                    var value = ratio * root.maxValue;
+                    if (root.osdType === "volume") {
+                      var pct = Math.round(value * 100);
+                      Quickshell.execDetached(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", pct + "%"]);
+                    } else if (root.osdType === "mic") {
+                      var pct = Math.round(value * 100);
+                      Quickshell.execDetached(["wpctl", "set-volume", "@DEFAULT_AUDIO_SOURCE@", pct + "%"]);
+                    } else if (root.osdType === "brightness") {
+                      var pct = Math.round(value * 100);
+                      Quickshell.execDetached(["brightnessctl", "set", pct + "%"]);
+                    }
+                    hideTimer.restart();
+                  }
+
+                  onPressed: (mouse) => applyValue(mouse.x)
+                  onPositionChanged: (mouse) => { if (pressed) applyValue(mouse.x); }
+                }
               }
 
               Text {
                 text: root.osdLabel
                 color: Colors.text
-                font.pixelSize: 14
+                font.pixelSize: Colors.fontSizeMedium
                 font.weight: Font.Bold
                 font.family: Colors.fontMono
                 Layout.minimumWidth: 70

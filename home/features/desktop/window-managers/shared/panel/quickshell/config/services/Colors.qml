@@ -42,15 +42,41 @@ QtObject {
   readonly property color popupSurface: withAlpha(surface, 0.96)
   readonly property color cardSurface: withAlpha(surface, 0.82)
   readonly property color chipSurface: withAlpha(surface, 0.92)
-  
+  readonly property color surfaceContainerHigh: Qt.lighter(popupSurface, 1.12)
+
   // --- DIMENSIONS ---
   readonly property real radiusLarge: 20
   readonly property real radiusMedium: 14
   readonly property real radiusSmall: 10
-  
+  readonly property real radiusXS: 8
+  readonly property real radiusPill: 999
+
   readonly property int paddingLarge: 24
   readonly property int paddingMedium: 15
   readonly property int paddingSmall: 10
+
+  // --- SPACING TOKENS ---
+  readonly property int spacingXS: 4
+  readonly property int spacingS: 8
+  readonly property int spacingM: 12
+  readonly property int spacingL: 16
+  readonly property int spacingXL: 24
+
+  // --- ANIMATION DURATIONS ---
+  readonly property int durationFast: 160
+  readonly property int durationNormal: 250
+  readonly property int durationSlow: 350
+
+  // --- TYPOGRAPHY TOKENS ---
+  readonly property int fontSizeXS: 10
+  readonly property int fontSizeSmall: 12
+  readonly property int fontSizeMedium: 14
+  readonly property int fontSizeLarge: 16
+  readonly property int fontSizeXL: 20
+  readonly property int fontSizeHuge: 24
+  readonly property int fontWeightNormal: Font.Normal
+  readonly property int fontWeightMedium: Font.Medium
+  readonly property int fontWeightBold: Font.Bold
 
   function withAlpha(c, a) { return Qt.rgba(c.r, c.g, c.b, a); }
   function clamp01(value) { return Math.max(0, Math.min(1, value)); }

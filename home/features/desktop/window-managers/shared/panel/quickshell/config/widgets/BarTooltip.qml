@@ -69,7 +69,7 @@ PopupWindow {
     id: tooltipBody
     width: Math.min(textItem.implicitWidth + 20, root.maxWidth)
     height: textItem.implicitHeight + 14
-    radius: 8
+    radius: Colors.radiusXS
     color: Colors.bgGlass
     border.color: Colors.border
     border.width: 1
@@ -80,7 +80,7 @@ PopupWindow {
       width: Math.min(implicitWidth, root.maxWidth - 20)
       text: root.tooltipText
       color: Colors.text
-      font.pixelSize: 12
+      font.pixelSize: Colors.fontSizeSmall
       font.weight: Font.Medium
       horizontalAlignment: Text.AlignHCenter
       wrapMode: Text.NoWrap

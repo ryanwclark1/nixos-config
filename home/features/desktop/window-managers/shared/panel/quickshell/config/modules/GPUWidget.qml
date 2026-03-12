@@ -4,20 +4,14 @@ import Quickshell.Io
 import "../services"
 import "../widgets" as SharedWidgets
 
-Rectangle {
+SharedWidgets.CardBase {
   id: root
-  Layout.fillWidth: true
   Layout.preferredHeight: 90
-  color: Colors.bgWidget
-  radius: Colors.radiusMedium
-  border.color: Colors.border
-  clip: true
 
   property string vramUsage: "0 / 0 MB"
   property real vramPercent: 0.0
 
-  Component.onCompleted: SystemStatus.subscribe()
-  Component.onDestruction: SystemStatus.unsubscribe()
+  SharedWidgets.Ref { service: SystemStatus }
 
   SharedWidgets.CommandPoll {
     id: vramPoll
@@ -32,8 +26,8 @@ Rectangle {
     parse: function(out) {
       var lines = String(out || "").trim().split("\n");
       if (lines.length >= 2) {
-        var used = parseInt(lines[0]) / 1024 / 1024;
-        var total = parseInt(lines[1]) / 1024 / 1024;
+        var used = (parseInt(lines[0], 10) || 0) / 1024 / 1024;
+        var total = (parseInt(lines[1], 10) || 0) / 1024 / 1024;
         return { usage: Math.round(used) + " / " + Math.round(total) + " MB", percent: total > 0 ? (used / total) : 0 };
       }
       return { usage: root.vramUsage, percent: root.vramPercent };
@@ -45,11 +39,11 @@ Rectangle {
   }
 
   ColumnLayout {
-    anchors.fill: parent
-    anchors.margins: Colors.paddingMedium
-    spacing: 10
+    Layout.fillWidth: true
+    Layout.fillHeight: true
+    spacing: Colors.paddingSmall
 
-    Text { 
+    Text {
       text: "GPU STATS"
       color: Colors.textDisabled
       font.pixelSize: 8
@@ -63,17 +57,17 @@ Rectangle {
 
       // GPU Load
       ColumnLayout {
-        Layout.fillWidth: true; spacing: 4
+        Layout.fillWidth: true; spacing: Colors.spacingXS
         RowLayout {
           Text { 
             text: "󰢮 Load"
-            color: Colors.fgMain
-            font.pixelSize: 11
+            color: Colors.text
+            font.pixelSize: Colors.fontSizeSmall
             font.weight: Font.Medium
             Layout.fillWidth: true
             elide: Text.ElideRight
           }
-          Text { text: SystemStatus.gpuUsage; color: Colors.fgSecondary; font.pixelSize: 10 }
+          Text { text: SystemStatus.gpuUsage; color: Colors.fgSecondary; font.pixelSize: Colors.fontSizeXS }
         }
         Rectangle {
           Layout.fillWidth: true; height: 4; color: Colors.surface; radius: 2
@@ -86,17 +80,17 @@ Rectangle {
 
       // VRAM
       ColumnLayout {
-        Layout.fillWidth: true; spacing: 4
+        Layout.fillWidth: true; spacing: Colors.spacingXS
         RowLayout {
           Text { 
             text: "󰍛 VRAM"
-            color: Colors.fgMain
-            font.pixelSize: 11
+            color: Colors.text
+            font.pixelSize: Colors.fontSizeSmall
             font.weight: Font.Medium
             Layout.fillWidth: true
             elide: Text.ElideRight
           }
-          Text { text: root.vramUsage; color: Colors.fgSecondary; font.pixelSize: 10 }
+          Text { text: root.vramUsage; color: Colors.fgSecondary; font.pixelSize: Colors.fontSizeXS }
         }
         Rectangle {
           Layout.fillWidth: true; height: 4; color: Colors.surface; radius: 2

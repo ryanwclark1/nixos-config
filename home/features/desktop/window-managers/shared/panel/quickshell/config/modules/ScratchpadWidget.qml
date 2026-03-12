@@ -3,21 +3,18 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
 import "../services"
+import "../widgets" as SharedWidgets
 
-Rectangle {
+SharedWidgets.CardBase {
   id: root
-  Layout.fillWidth: true
   Layout.preferredHeight: root.scratchpadWindows.length > 0 ? col.implicitHeight + 30 : 0
   visible: root.scratchpadWindows.length > 0
-  color: Colors.bgWidget
-  radius: Colors.radiusMedium
-  border.color: Colors.border
-  clip: true
 
   readonly property var scratchpadWindows: {
     var windows = [];
     for (var i = 0; i < Hyprland.toplevels.count; i++) {
       var win = Hyprland.toplevels.get(i);
+      if (!win) continue;
       var workspaceName = (win.workspace && win.workspace.name) ? win.workspace.name : "";
       if (workspaceName === "special:scratchpad") {
         windows.push(win);
@@ -34,11 +31,11 @@ Rectangle {
 
   ColumnLayout {
     id: col
-    anchors.fill: parent
-    anchors.margins: Colors.paddingMedium
-    spacing: 10
+    Layout.fillWidth: true
+    Layout.fillHeight: true
+    spacing: Colors.paddingSmall
 
-    Text { 
+    Text {
       text: "SCRATCHPAD WINDOWS"
       color: Colors.textDisabled
       font.pixelSize: 8
@@ -58,21 +55,33 @@ Rectangle {
         delegate: Rectangle {
           id: itemRect
           Layout.fillWidth: true; height: 35
-          color: scratchHover.containsMouse ? Colors.surface : Colors.highlightLight
+          color: Colors.highlightLight
           radius: 6
 
           RowLayout {
-            anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: 10
-            Text { text: "󱂬"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 14 }
-            Text { text: modelData.title || modelData.class || "Unknown Window"; color: Colors.text; font.pixelSize: 11; Layout.fillWidth: true; elide: Text.ElideRight }
+            anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: Colors.paddingSmall
+            Text { text: "󱂬"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium }
+            Text { text: modelData.title || modelData.class || "Unknown Window"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; Layout.fillWidth: true; elide: Text.ElideRight }
             Text { text: "󰁔"; color: Colors.textDisabled; font.family: Colors.fontMono }
+          }
+
+          SharedWidgets.StateLayer {
+            id: scratchStateLayer
+            anchors.fill: parent
+            radius: parent.radius
+            hovered: scratchHover.containsMouse
+            pressed: scratchHover.pressed
           }
 
           MouseArea {
             id: scratchHover
             anchors.fill: parent
             hoverEnabled: true
-            onClicked: root.summonWindow(modelData.address)
+            cursorShape: Qt.PointingHandCursor
+            onClicked: (mouse) => {
+              scratchStateLayer.burst(mouse.x, mouse.y);
+              root.summonWindow(modelData.address);
+            }
           }
         }
       }

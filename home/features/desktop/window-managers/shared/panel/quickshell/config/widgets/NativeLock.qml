@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Wayland
 import "../services"
 
@@ -43,9 +44,6 @@ Scope {
       model: Quickshell.screens
 
       WlSessionLockSurface {
-        required property var modelData
-        screen: modelData
-
         LockPanel {
           anchors.fill: parent
           lockContext: lockContext

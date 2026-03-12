@@ -4,14 +4,9 @@ import Quickshell.Io
 import "../services"
 import "../widgets" as SharedWidgets
 
-Rectangle {
+SharedWidgets.CardBase {
   id: root
-  Layout.fillWidth: true
   Layout.preferredHeight: 90
-  color: Colors.bgWidget
-  radius: Colors.radiusMedium
-  border.color: Colors.border
-  clip: true
 
   property var drives: []
 
@@ -33,11 +28,11 @@ Rectangle {
   }
 
   ColumnLayout {
-    anchors.fill: parent
-    anchors.margins: Colors.paddingMedium
-    spacing: 10
+    Layout.fillWidth: true
+    Layout.fillHeight: true
+    spacing: Colors.paddingSmall
 
-    Text { 
+    Text {
       text: "DISK USAGE"
       color: Colors.textDisabled
       font.pixelSize: 8
@@ -53,22 +48,22 @@ Rectangle {
         model: root.drives
         delegate: ColumnLayout {
           Layout.fillWidth: true
-          spacing: 4
+          spacing: Colors.spacingXS
           RowLayout {
             Text { 
               text: "󰋊 " + (modelData.mount === "/" ? "Root" : modelData.mount.replace("/home/", ""))
-              color: Colors.fgMain
-              font.pixelSize: 11
+              color: Colors.text
+              font.pixelSize: Colors.fontSizeSmall
               font.weight: Font.Medium
               Layout.fillWidth: true
               elide: Text.ElideRight
             }
-            Text { text: modelData.used + " / " + modelData.total; color: Colors.fgSecondary; font.pixelSize: 10 }
+            Text { text: modelData.used + " / " + modelData.total; color: Colors.fgSecondary; font.pixelSize: Colors.fontSizeXS }
           }
           Rectangle {
             Layout.fillWidth: true; height: 4; color: Colors.surface; radius: 2
             Rectangle {
-              width: parent.width * (Math.min(100, parseInt(modelData.percent)) / 100.0)
+              width: parent.width * (Math.min(100, parseInt(modelData.percent, 10) || 0) / 100.0)
               height: parent.height; color: Colors.secondary; radius: 2
             }
           }

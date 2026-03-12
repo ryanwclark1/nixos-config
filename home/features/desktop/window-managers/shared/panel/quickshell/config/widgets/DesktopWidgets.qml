@@ -103,7 +103,7 @@ Item {
     RowLayout {
       id: editRow
       anchors.centerIn: parent
-      spacing: 16
+      spacing: Colors.spacingL
 
       // Add Widget button with dropdown
       Item {
@@ -119,12 +119,12 @@ Item {
             text: "󰐕"
             color: Colors.primary
             font.family: Colors.fontMono
-            font.pixelSize: 16
+            font.pixelSize: Colors.fontSizeLarge
           }
           Text {
             text: "Add Widget"
             color: Colors.text
-            font.pixelSize: 13
+            font.pixelSize: Colors.fontSizeMedium
             font.weight: Font.Medium
           }
         }
@@ -144,7 +144,7 @@ Item {
           anchors.bottomMargin: 12
           width: 160
           height: addMenuCol.implicitHeight + 16
-          radius: 10
+          radius: Colors.radiusSmall
           color: Colors.bgGlass
           border.color: Colors.border
           border.width: 1
@@ -152,7 +152,7 @@ Item {
           Column {
             id: addMenuCol
             anchors.fill: parent
-            anchors.margins: 8
+            anchors.margins: Colors.spacingS
             spacing: 2
 
             Repeater {
@@ -168,18 +168,18 @@ Item {
                 RowLayout {
                   anchors.fill: parent
                   anchors.margins: 6
-                  spacing: 8
+                  spacing: Colors.spacingS
 
                   Text {
                     text: modelData.icon
                     color: Colors.primary
                     font.family: Colors.fontMono
-                    font.pixelSize: 14
+                    font.pixelSize: Colors.fontSizeMedium
                   }
                   Text {
                     text: modelData.name
                     color: Colors.text
-                    font.pixelSize: 12
+                    font.pixelSize: Colors.fontSizeSmall
                     Layout.fillWidth: true
                   }
                 }
@@ -207,7 +207,7 @@ Item {
       Rectangle {
         Layout.preferredWidth: snapRow.implicitWidth + 16
         Layout.preferredHeight: 28
-        radius: 14
+        radius: Colors.radiusMedium
         color: Config.desktopWidgetsGridSnap ? Colors.withAlpha(Colors.primary, 0.2) : "transparent"
         border.color: Config.desktopWidgetsGridSnap ? Colors.primary : Colors.border
         border.width: 1
@@ -215,9 +215,9 @@ Item {
         RowLayout {
           id: snapRow
           anchors.centerIn: parent
-          spacing: 4
-          Text { text: "󰕰"; color: Colors.text; font.family: Colors.fontMono; font.pixelSize: 14 }
-          Text { text: "Grid"; color: Colors.text; font.pixelSize: 12 }
+          spacing: Colors.spacingXS
+          Text { text: "󰕰"; color: Colors.text; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium }
+          Text { text: "Grid"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall }
         }
 
         MouseArea {
@@ -234,7 +234,7 @@ Item {
       Rectangle {
         Layout.preferredWidth: exitRow.implicitWidth + 16
         Layout.preferredHeight: 28
-        radius: 14
+        radius: Colors.radiusMedium
         color: Colors.withAlpha(Colors.error, 0.15)
         border.color: Colors.error
         border.width: 1
@@ -242,9 +242,9 @@ Item {
         RowLayout {
           id: exitRow
           anchors.centerIn: parent
-          spacing: 4
-          Text { text: "󰅖"; color: Colors.error; font.family: Colors.fontMono; font.pixelSize: 14 }
-          Text { text: "Done"; color: Colors.error; font.pixelSize: 12 }
+          spacing: Colors.spacingXS
+          Text { text: "󰅖"; color: Colors.error; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium }
+          Text { text: "Done"; color: Colors.error; font.pixelSize: Colors.fontSizeSmall }
         }
 
         MouseArea {
@@ -276,14 +276,14 @@ Item {
     id: placeholderComponent
     Rectangle {
       width: 120; height: 60
-      radius: 10
+      radius: Colors.radiusSmall
       color: Colors.withAlpha(Colors.surface, 0.5)
       border.color: Colors.border
       Text {
         anchors.centerIn: parent
         text: "Unknown Widget"
         color: Colors.fgDim
-        font.pixelSize: 12
+        font.pixelSize: Colors.fontSizeSmall
       }
     }
   }

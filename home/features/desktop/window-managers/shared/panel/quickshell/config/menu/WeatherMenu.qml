@@ -4,10 +4,12 @@ import QtQuick.Layouts
 import "../services"
 import "../widgets" as SharedWidgets
 
-PopupWindow {
+BasePopupMenu {
   id: root
   implicitWidth: 380
   implicitHeight: 520
+  title: "Weather"
+  toggleMethod: "toggleWeatherMenu"
 
   // Current conditions
   property string currentTemp: "--"
@@ -25,7 +27,7 @@ PopupWindow {
   function dayName(dateStr) {
     var parts = dateStr.split("-");
     if (parts.length < 3) return dateStr;
-    var d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    var d = new Date(parseInt(parts[0], 10) || 2000, (parseInt(parts[1], 10) || 1) - 1, parseInt(parts[2], 10) || 1);
     var days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     var today = new Date();
     if (d.toDateString() === today.toDateString()) return "Today";
@@ -43,7 +45,8 @@ PopupWindow {
     parse: function(out) {
       try {
         var data = JSON.parse(out);
-        var cur = data.current_condition[0];
+        var cur = (data.current_condition && data.current_condition.length > 0) ? data.current_condition[0] : null;
+        if (!cur) return { condition: "No weather data" };
         var loc = (data.nearest_area && data.nearest_area[0] && data.nearest_area[0].areaName && data.nearest_area[0].areaName[0])
           ? data.nearest_area[0].areaName[0].value : "Local";
         var days = [];
@@ -79,201 +82,160 @@ PopupWindow {
     }
   }
 
+  // Current conditions card
   Rectangle {
-    anchors.fill: parent
-    color: Colors.popupSurface
+    Layout.fillWidth: true
+    implicitHeight: 110
+    radius: Colors.radiusMedium
+    color: Colors.cardSurface
     border.color: Colors.border
     border.width: 1
-    radius: Colors.radiusMedium
-    clip: true
 
-    ColumnLayout {
+    RowLayout {
       anchors.fill: parent
-      anchors.margins: Colors.paddingLarge
-      spacing: 14
+      anchors.margins: Colors.spacingM
+      spacing: Colors.spacingM
 
-      // Header
-      RowLayout {
+      // Big weather icon
+      Text {
+        text: Colors.weatherIcon(root.condition)
+        color: Colors.accent
+        font.family: Colors.fontMono
+        font.pixelSize: 48
+        Layout.alignment: Qt.AlignVCenter
+      }
+
+      // Temp + condition + location
+      ColumnLayout {
+        spacing: 2
         Layout.fillWidth: true
+        Layout.alignment: Qt.AlignVCenter
+
         Text {
-          text: "Weather"
-          color: Colors.fgMain
-          font.pixelSize: 18
-          font.weight: Font.DemiBold
+          text: root.currentTemp
+          color: Colors.text
+          font.pixelSize: 36
+          font.weight: Font.Bold
         }
-        Item { Layout.fillWidth: true }
-        SharedWidgets.MenuCloseButton { toggleMethod: "toggleWeatherMenu" }
+        Text {
+          text: root.condition
+          color: Colors.fgSecondary
+          font.pixelSize: Colors.fontSizeMedium
+          font.weight: Font.Medium
+        }
+        Text {
+          text: root.location
+          color: Colors.textDisabled
+          font.pixelSize: Colors.fontSizeXS
+        }
       }
 
-      Rectangle {
-        Layout.fillWidth: true
-        height: 1
-        color: Colors.border
-      }
-
-      // Current conditions card
-      Rectangle {
-        Layout.fillWidth: true
-        implicitHeight: 110
-        radius: Colors.radiusMedium
-        color: Colors.cardSurface
-        border.color: Colors.border
-        border.width: 1
+      // Details column
+      ColumnLayout {
+        spacing: Colors.spacingXS
+        Layout.alignment: Qt.AlignVCenter
 
         RowLayout {
-          anchors.fill: parent
-          anchors.margins: 14
-          spacing: 14
-
-          // Big weather icon
-          Text {
-            text: Colors.weatherIcon(root.condition)
-            color: Colors.accent
-            font.family: Colors.fontMono
-            font.pixelSize: 48
-            Layout.alignment: Qt.AlignVCenter
-          }
-
-          // Temp + condition + location
-          ColumnLayout {
-            spacing: 2
-            Layout.fillWidth: true
-            Layout.alignment: Qt.AlignVCenter
-
-            Text {
-              text: root.currentTemp
-              color: Colors.fgMain
-              font.pixelSize: 36
-              font.weight: Font.Bold
-            }
-            Text {
-              text: root.condition
-              color: Colors.fgSecondary
-              font.pixelSize: 12
-              font.weight: Font.Medium
-            }
-            Text {
-              text: root.location
-              color: Colors.textDisabled
-              font.pixelSize: 10
-            }
-          }
-
-          // Details column
-          ColumnLayout {
-            spacing: 4
-            Layout.alignment: Qt.AlignVCenter
-
-            RowLayout {
-              spacing: 4
-              Text { text: "Feels"; color: Colors.textDisabled; font.pixelSize: 9 }
-              Text { text: root.feelsLike; color: Colors.fgSecondary; font.pixelSize: 10; font.weight: Font.Medium }
-            }
-            RowLayout {
-              spacing: 4
-              Text { text: "Humidity"; color: Colors.textDisabled; font.pixelSize: 9 }
-              Text { text: root.humidity; color: Colors.fgSecondary; font.pixelSize: 10; font.weight: Font.Medium }
-            }
-            RowLayout {
-              spacing: 4
-              Text { text: "Wind"; color: Colors.textDisabled; font.pixelSize: 9 }
-              Text { text: root.windSpeed + " " + root.windDir; color: Colors.fgSecondary; font.pixelSize: 10; font.weight: Font.Medium }
-            }
-            RowLayout {
-              spacing: 4
-              Text { text: "Visibility"; color: Colors.textDisabled; font.pixelSize: 9 }
-              Text { text: root.visibility; color: Colors.fgSecondary; font.pixelSize: 10; font.weight: Font.Medium }
-            }
-          }
+          spacing: Colors.spacingXS
+          Text { text: "Feels"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS }
+          Text { text: root.feelsLike; color: Colors.fgSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Medium }
+        }
+        RowLayout {
+          spacing: Colors.spacingXS
+          Text { text: "Humidity"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS }
+          Text { text: root.humidity; color: Colors.fgSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Medium }
+        }
+        RowLayout {
+          spacing: Colors.spacingXS
+          Text { text: "Wind"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS }
+          Text { text: root.windSpeed + " " + root.windDir; color: Colors.fgSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Medium }
+        }
+        RowLayout {
+          spacing: Colors.spacingXS
+          Text { text: "Visibility"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS }
+          Text { text: root.visibility; color: Colors.fgSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Medium }
         }
       }
-
-      // Forecast section label
-      Text {
-        text: "3-DAY FORECAST"
-        color: Colors.textDisabled
-        font.pixelSize: 10
-        font.weight: Font.Bold
-        font.letterSpacing: 0.5
-      }
-
-      // Forecast days
-      Repeater {
-        model: root.forecast
-        delegate: Rectangle {
-          Layout.fillWidth: true
-          implicitHeight: 60
-          radius: Colors.radiusMedium
-          color: forecastHover.containsMouse ? Colors.highlightLight : Colors.cardSurface
-          border.color: Colors.border
-          border.width: 1
-
-          Behavior on color { ColorAnimation { duration: 150 } }
-
-          MouseArea {
-            id: forecastHover
-            anchors.fill: parent
-            hoverEnabled: true
-          }
-
-          RowLayout {
-            anchors.fill: parent
-            anchors.margins: 12
-            spacing: 12
-
-            // Day name
-            Text {
-              text: root.dayName(modelData.date)
-              color: Colors.fgMain
-              font.pixelSize: 13
-              font.weight: Font.DemiBold
-              Layout.preferredWidth: 70
-            }
-
-            // Condition icon
-            Text {
-              text: Colors.weatherIcon(modelData.condition)
-              color: Colors.accent
-              font.family: Colors.fontMono
-              font.pixelSize: 22
-            }
-
-            // Description
-            Text {
-              text: modelData.condition
-              color: Colors.fgSecondary
-              font.pixelSize: 11
-              elide: Text.ElideRight
-              Layout.fillWidth: true
-            }
-
-            // Min temp
-            Text {
-              text: modelData.minTemp + "°"
-              color: Colors.textDisabled
-              font.pixelSize: 12
-            }
-
-            // Max temp with up arrow
-            RowLayout {
-              spacing: 2
-              Text {
-                text: "↑"
-                color: Colors.primary
-                font.pixelSize: 11
-              }
-              Text {
-                text: modelData.maxTemp + "°"
-                color: Colors.fgMain
-                font.pixelSize: 12
-                font.weight: Font.DemiBold
-              }
-            }
-          }
-        }
-      }
-
-      Item { Layout.fillHeight: true }
     }
   }
+
+  // Forecast section label
+  SharedWidgets.SectionLabel { label: "3-DAY FORECAST" }
+
+  // Forecast days
+  Repeater {
+    model: root.forecast
+    delegate: Rectangle {
+      Layout.fillWidth: true
+      implicitHeight: 60
+      radius: Colors.radiusMedium
+      color: Colors.cardSurface
+      border.color: Colors.border
+      border.width: 1
+
+      SharedWidgets.StateLayer {
+        hovered: forecastHover.containsMouse
+        pressed: forecastHover.pressed
+        enableRipple: false
+      }
+
+      MouseArea {
+        id: forecastHover
+        anchors.fill: parent
+        hoverEnabled: true
+      }
+
+      RowLayout {
+        anchors.fill: parent
+        anchors.margins: Colors.spacingM
+        spacing: Colors.spacingM
+
+        Text {
+          text: root.dayName(modelData.date)
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeMedium
+          font.weight: Font.DemiBold
+          Layout.preferredWidth: 70
+        }
+
+        Text {
+          text: Colors.weatherIcon(modelData.condition)
+          color: Colors.accent
+          font.family: Colors.fontMono
+          font.pixelSize: Colors.fontSizeHuge
+        }
+
+        Text {
+          text: modelData.condition
+          color: Colors.fgSecondary
+          font.pixelSize: Colors.fontSizeSmall
+          elide: Text.ElideRight
+          Layout.fillWidth: true
+        }
+
+        Text {
+          text: modelData.minTemp + "°"
+          color: Colors.textDisabled
+          font.pixelSize: Colors.fontSizeMedium
+        }
+
+        RowLayout {
+          spacing: 2
+          Text {
+            text: "↑"
+            color: Colors.primary
+            font.pixelSize: Colors.fontSizeSmall
+          }
+          Text {
+            text: modelData.maxTemp + "°"
+            color: Colors.text
+            font.pixelSize: Colors.fontSizeMedium
+            font.weight: Font.DemiBold
+          }
+        }
+      }
+    }
+  }
+
+  Item { Layout.fillHeight: true }
 }

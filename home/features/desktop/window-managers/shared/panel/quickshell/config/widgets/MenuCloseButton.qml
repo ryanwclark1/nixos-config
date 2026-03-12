@@ -9,21 +9,28 @@ Rectangle {
 
   width: 30
   height: 30
-  radius: 15
-  color: closeHover.containsMouse ? Colors.highlightLight : "transparent"
+  radius: height / 2
+  color: "transparent"
 
   Text {
     anchors.centerIn: parent
     text: "󰅖"
     color: Colors.textSecondary
     font.family: Colors.fontMono
-    font.pixelSize: 16
+    font.pixelSize: Colors.fontSizeLarge
+  }
+
+  StateLayer {
+    id: stateLayer
+    hovered: closeHover.containsMouse
+    pressed: closeHover.pressed
   }
 
   MouseArea {
     id: closeHover
     anchors.fill: parent
     hoverEnabled: true
-    onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", root.toggleMethod])
+    cursorShape: Qt.PointingHandCursor
+    onClicked: (mouse) => { stateLayer.burst(mouse.x, mouse.y); Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", root.toggleMethod]); }
   }
 }

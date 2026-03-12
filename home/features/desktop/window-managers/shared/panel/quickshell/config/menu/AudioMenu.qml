@@ -5,10 +5,12 @@ import QtQuick.Layouts
 import "../services"
 import "../widgets" as SharedWidgets
 
-PopupWindow {
+BasePopupMenu {
   id: root
   implicitWidth: 350
   implicitHeight: 510
+  title: "Audio"
+  toggleMethod: "toggleAudioMenu"
 
   function percentText(value, muted) {
     return muted ? "Muted" : Math.round(value * 100) + "%";
@@ -16,267 +18,220 @@ PopupWindow {
 
   onVisibleChanged: if (visible) AudioService.refreshDevices()
 
-  Rectangle {
-    anchors.fill: parent
-    color: Colors.popupSurface
-    border.color: Colors.border
-    border.width: 1
-    radius: Colors.radiusMedium
-    clip: true
+  headerExtras: [
+    Rectangle {
+      width: 30
+      height: 30
+      radius: height / 2
+      color: "transparent"
 
-    ColumnLayout {
-      anchors.fill: parent
-      anchors.margins: Colors.paddingLarge
-      spacing: 14
-
-      RowLayout {
-        Layout.fillWidth: true
-        Text {
-          text: "Audio"
-          color: Colors.fgMain
-          font.pixelSize: 18
-          font.weight: Font.DemiBold
-        }
-        Item { Layout.fillWidth: true }
-        Rectangle {
-          width: 30
-          height: 30
-          radius: 15
-          color: audioSettingsHover.containsMouse ? Colors.highlightLight : "transparent"
-
-          Text {
-            anchors.centerIn: parent
-            text: "󰒓"
-            color: Colors.textSecondary
-            font.family: Colors.fontMono
-            font.pixelSize: 16
-          }
-
-          MouseArea {
-            id: audioSettingsHover
-            anchors.fill: parent
-            hoverEnabled: true
-            onClicked: Quickshell.execDetached(["pavucontrol"])
-          }
-        }
-        SharedWidgets.MenuCloseButton { toggleMethod: "toggleAudioMenu" }
+      Text {
+        anchors.centerIn: parent
+        text: "󰒓"
+        color: Colors.textSecondary
+        font.family: Colors.fontMono
+        font.pixelSize: Colors.fontSizeXL
       }
+
+      SharedWidgets.StateLayer {
+        id: stateLayer
+        hovered: audioSettingsHover.containsMouse
+        pressed: audioSettingsHover.pressed
+      }
+
+      MouseArea {
+        id: audioSettingsHover
+        anchors.fill: parent
+        hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
+        onClicked: (mouse) => { stateLayer.burst(mouse.x, mouse.y); Quickshell.execDetached(["pavucontrol"]); }
+      }
+    }
+  ]
+
+  SharedWidgets.ScrollableContent {
+    Layout.fillWidth: true
+    Layout.fillHeight: true
+    columnSpacing: Colors.spacingM
+
+      // ── OUTPUT section ──────────────────────────
+      SharedWidgets.SectionLabel { label: "OUTPUT" }
 
       Rectangle {
         Layout.fillWidth: true
-        height: 1
-        color: Colors.border
-      }
-
-      Flickable {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        contentHeight: contentColumn.implicitHeight
-        clip: true
-        boundsBehavior: Flickable.StopAtBounds
+        radius: Colors.radiusMedium
+        color: Colors.cardSurface
+        border.color: Colors.border
+        border.width: 1
+        implicitHeight: 64
 
         ColumnLayout {
-          id: contentColumn
-          width: parent.width
-          spacing: 14
+          anchors.fill: parent
+          anchors.margins: Colors.spacingM
+          spacing: Colors.spacingS
 
-          // ── OUTPUT section ──────────────────────────
-          Text {
-            text: "OUTPUT"
-            color: Colors.textDisabled
-            font.pixelSize: 10
-            font.weight: Font.Bold
-            font.letterSpacing: 0.5
-          }
-
-          Rectangle {
+          RowLayout {
             Layout.fillWidth: true
-            radius: Colors.radiusMedium
-            color: Colors.cardSurface
-            border.color: Colors.border
-            border.width: 1
-            implicitHeight: 64
-
-            ColumnLayout {
-              anchors.fill: parent
-              anchors.margins: 12
-              spacing: 6
-
-              RowLayout {
-                Layout.fillWidth: true
-                Text { text: "󰕾"; color: AudioService.outputMuted ? Colors.error : Colors.primary; font.family: Colors.fontMono; font.pixelSize: 16 }
-                Text { text: "Output"; color: Colors.fgMain; font.pixelSize: 13; font.weight: Font.Medium }
-                Item { Layout.fillWidth: true }
-                Rectangle {
-                  radius: 12
-                  color: AudioService.outputMuted ? Colors.withAlpha(Colors.error, 0.16) : Colors.highlightLight
-                  implicitWidth: outputPercentLabel.implicitWidth + 16
-                  implicitHeight: 24
-                  Text {
-                    id: outputPercentLabel
-                    anchors.centerIn: parent
-                    text: root.percentText(AudioService.outputVolume, AudioService.outputMuted)
-                    color: AudioService.outputMuted ? Colors.error : Colors.textSecondary
-                    font.pixelSize: 10
-                    font.weight: Font.Medium
-                  }
-                }
-                SharedWidgets.MuteButton {
-                  target: "@DEFAULT_AUDIO_SINK@"
-                  muted: AudioService.outputMuted
-                  icon: "󰕾"; mutedIcon: "󰝟"
-                }
+            Text { text: "󰕾"; color: AudioService.outputMuted ? Colors.error : Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL }
+            Text { text: "Output"; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium }
+            Item { Layout.fillWidth: true }
+            Rectangle {
+              radius: 12
+              color: AudioService.outputMuted ? Colors.withAlpha(Colors.error, 0.16) : Colors.highlightLight
+              implicitWidth: outputPercentLabel.implicitWidth + 16
+              implicitHeight: 24
+              Text {
+                id: outputPercentLabel
+                anchors.centerIn: parent
+                text: root.percentText(AudioService.outputVolume, AudioService.outputMuted)
+                color: AudioService.outputMuted ? Colors.error : Colors.textSecondary
+                font.pixelSize: Colors.fontSizeXS
+                font.weight: Font.Medium
               }
-
-              SharedWidgets.SliderTrack {
-                Layout.fillWidth: true
-                value: AudioService.outputVolume
-                muted: AudioService.outputMuted
-                icon: "󰕾"
-                mutedIcon: "󰝟"
-                onSliderMoved: (v) => AudioService.setVolume("@DEFAULT_AUDIO_SINK@", v)
-              }
+            }
+            SharedWidgets.MuteButton {
+              target: "@DEFAULT_AUDIO_SINK@"
+              muted: AudioService.outputMuted
+              icon: "󰕾"; mutedIcon: "󰝟"
             }
           }
 
-          Repeater {
-            model: AudioService.sinks
-            delegate: Rectangle {
-              id: sinkCard
-              Layout.fillWidth: true
-              implicitHeight: 46
-              radius: Colors.radiusMedium
-              property bool isDefault: modelData.id === AudioService.defaultSinkId
-              property bool isHovered: sinkHover.containsMouse
-              color: isDefault ? Colors.withAlpha(Colors.primary, 0.16) : (isHovered ? Colors.withAlpha(Colors.primary, 0.12) : Colors.cardSurface)
-              border.color: isDefault ? Colors.primary : Colors.border
-              border.width: 1
-              Behavior on color { ColorAnimation { duration: 150 } }
-
-              RowLayout {
-                anchors.fill: parent
-                anchors.margins: 10
-                spacing: 10
-                Text { text: sinkCard.isDefault ? "󰄬" : "󰕾"; color: sinkCard.isDefault ? Colors.primary : Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 14 }
-                Text { text: modelData.name; color: Colors.fgMain; font.pixelSize: 12; font.weight: sinkCard.isDefault ? Font.DemiBold : Font.Normal; elide: Text.ElideRight; Layout.fillWidth: true }
-                Text { text: Math.round(modelData.volume * 100) + "%"; color: Colors.textSecondary; font.pixelSize: 10 }
-                Text { text: sinkCard.isDefault ? "Default" : "Select"; color: sinkCard.isDefault ? Colors.primary : Colors.textSecondary; font.pixelSize: 10; font.weight: Font.Medium }
-              }
-
-              MouseArea { id: sinkHover; anchors.fill: parent; hoverEnabled: true; onClicked: AudioService.setDefaultDevice(modelData.id) }
-            }
-          }
-
-          Rectangle {
+          SharedWidgets.SliderTrack {
             Layout.fillWidth: true
-            visible: AudioService.sinks.length === 0
-            implicitHeight: 36
-            radius: Colors.radiusMedium
-            color: Colors.cardSurface
-            border.color: Colors.border
-            border.width: 1
-            Text { anchors.centerIn: parent; text: "No output devices detected"; color: Colors.textDisabled; font.pixelSize: 11 }
-          }
-
-          // ── INPUT section ──────────────────────────
-          Text {
-            text: "INPUT"
-            color: Colors.textDisabled
-            font.pixelSize: 10
-            font.weight: Font.Bold
-            font.letterSpacing: 0.5
-          }
-
-          Rectangle {
-            Layout.fillWidth: true
-            radius: Colors.radiusMedium
-            color: Colors.cardSurface
-            border.color: Colors.border
-            border.width: 1
-            implicitHeight: 64
-
-            ColumnLayout {
-              anchors.fill: parent
-              anchors.margins: 12
-              spacing: 6
-
-              RowLayout {
-                Layout.fillWidth: true
-                Text { text: "󰍬"; color: AudioService.inputMuted ? Colors.error : Colors.primary; font.family: Colors.fontMono; font.pixelSize: 16 }
-                Text { text: "Input"; color: Colors.fgMain; font.pixelSize: 13; font.weight: Font.Medium }
-                Item { Layout.fillWidth: true }
-                Rectangle {
-                  radius: 12
-                  color: AudioService.inputMuted ? Colors.withAlpha(Colors.error, 0.16) : Colors.highlightLight
-                  implicitWidth: inputPercentLabel.implicitWidth + 16
-                  implicitHeight: 24
-                  Text {
-                    id: inputPercentLabel
-                    anchors.centerIn: parent
-                    text: root.percentText(AudioService.inputVolume, AudioService.inputMuted)
-                    color: AudioService.inputMuted ? Colors.error : Colors.textSecondary
-                    font.pixelSize: 10
-                    font.weight: Font.Medium
-                  }
-                }
-                SharedWidgets.MuteButton {
-                  target: "@DEFAULT_AUDIO_SOURCE@"
-                  muted: AudioService.inputMuted
-                  icon: "󰍬"; mutedIcon: "󰍭"
-                }
-              }
-
-              SharedWidgets.SliderTrack {
-                Layout.fillWidth: true
-                value: AudioService.inputVolume
-                muted: AudioService.inputMuted
-                icon: "󰍬"
-                mutedIcon: "󰍭"
-                onSliderMoved: (v) => AudioService.setVolume("@DEFAULT_AUDIO_SOURCE@", v)
-              }
-            }
-          }
-
-          Repeater {
-            model: AudioService.sources
-            delegate: Rectangle {
-              id: sourceCard
-              Layout.fillWidth: true
-              implicitHeight: 46
-              radius: Colors.radiusMedium
-              property bool isDefault: modelData.id === AudioService.defaultSourceId
-              property bool isHovered: sourceHover.containsMouse
-              color: isDefault ? Colors.withAlpha(Colors.primary, 0.16) : (isHovered ? Colors.withAlpha(Colors.primary, 0.12) : Colors.cardSurface)
-              border.color: isDefault ? Colors.primary : Colors.border
-              border.width: 1
-              Behavior on color { ColorAnimation { duration: 150 } }
-
-              RowLayout {
-                anchors.fill: parent
-                anchors.margins: 10
-                spacing: 10
-                Text { text: sourceCard.isDefault ? "󰄬" : "󰍬"; color: sourceCard.isDefault ? Colors.primary : Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 14 }
-                Text { text: modelData.name; color: Colors.fgMain; font.pixelSize: 12; font.weight: sourceCard.isDefault ? Font.DemiBold : Font.Normal; elide: Text.ElideRight; Layout.fillWidth: true }
-                Text { text: Math.round(modelData.volume * 100) + "%"; color: Colors.textSecondary; font.pixelSize: 10 }
-                Text { text: sourceCard.isDefault ? "Default" : "Select"; color: sourceCard.isDefault ? Colors.primary : Colors.textSecondary; font.pixelSize: 10; font.weight: Font.Medium }
-              }
-
-              MouseArea { id: sourceHover; anchors.fill: parent; hoverEnabled: true; onClicked: AudioService.setDefaultDevice(modelData.id) }
-            }
-          }
-
-          Rectangle {
-            Layout.fillWidth: true
-            visible: AudioService.sources.length === 0
-            implicitHeight: 36
-            radius: Colors.radiusMedium
-            color: Colors.cardSurface
-            border.color: Colors.border
-            border.width: 1
-            Text { anchors.centerIn: parent; text: "No input devices detected"; color: Colors.textDisabled; font.pixelSize: 11 }
+            value: AudioService.outputVolume
+            muted: AudioService.outputMuted
+            icon: "󰕾"
+            mutedIcon: "󰝟"
+            onSliderMoved: (v) => AudioService.setVolume("@DEFAULT_AUDIO_SINK@", v)
           }
         }
       }
-    }
+
+      Repeater {
+        model: AudioService.sinks
+        delegate: Rectangle {
+          id: sinkCard
+          Layout.fillWidth: true
+          implicitHeight: 46
+          radius: Colors.radiusMedium
+          property bool isDefault: modelData.id === AudioService.defaultSinkId
+          property bool isHovered: sinkHover.containsMouse
+          color: isDefault ? Colors.withAlpha(Colors.primary, 0.16) : (isHovered ? Colors.withAlpha(Colors.primary, 0.12) : Colors.cardSurface)
+          border.color: isDefault ? Colors.primary : Colors.border
+          border.width: 1
+          Behavior on color { ColorAnimation { duration: 160 } }
+
+          RowLayout {
+            anchors.fill: parent
+            anchors.margins: Colors.paddingSmall
+            spacing: Colors.paddingSmall
+            Text { text: sinkCard.isDefault ? "󰄬" : "󰕾"; color: sinkCard.isDefault ? Colors.primary : Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
+            Text { text: modelData.name; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: sinkCard.isDefault ? Font.DemiBold : Font.Normal; elide: Text.ElideRight; Layout.fillWidth: true }
+            Text { text: Math.round(modelData.volume * 100) + "%"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS }
+            Text { text: sinkCard.isDefault ? "Default" : "Select"; color: sinkCard.isDefault ? Colors.primary : Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Medium }
+          }
+
+          MouseArea { id: sinkHover; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: AudioService.setDefaultDevice(modelData.id) }
+        }
+      }
+
+      SharedWidgets.EmptyState {
+        Layout.fillWidth: true
+        Layout.topMargin: 4
+        Layout.bottomMargin: 4
+        visible: AudioService.sinks.length === 0
+        icon: "󰕿"
+        message: "No output devices detected"
+      }
+
+      // ── INPUT section ──────────────────────────
+      SharedWidgets.SectionLabel { label: "INPUT" }
+
+      Rectangle {
+        Layout.fillWidth: true
+        radius: Colors.radiusMedium
+        color: Colors.cardSurface
+        border.color: Colors.border
+        border.width: 1
+        implicitHeight: 64
+
+        ColumnLayout {
+          anchors.fill: parent
+          anchors.margins: Colors.spacingM
+          spacing: Colors.spacingS
+
+          RowLayout {
+            Layout.fillWidth: true
+            Text { text: "󰍬"; color: AudioService.inputMuted ? Colors.error : Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL }
+            Text { text: "Input"; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium }
+            Item { Layout.fillWidth: true }
+            Rectangle {
+              radius: 12
+              color: AudioService.inputMuted ? Colors.withAlpha(Colors.error, 0.16) : Colors.highlightLight
+              implicitWidth: inputPercentLabel.implicitWidth + 16
+              implicitHeight: 24
+              Text {
+                id: inputPercentLabel
+                anchors.centerIn: parent
+                text: root.percentText(AudioService.inputVolume, AudioService.inputMuted)
+                color: AudioService.inputMuted ? Colors.error : Colors.textSecondary
+                font.pixelSize: Colors.fontSizeXS
+                font.weight: Font.Medium
+              }
+            }
+            SharedWidgets.MuteButton {
+              target: "@DEFAULT_AUDIO_SOURCE@"
+              muted: AudioService.inputMuted
+              icon: "󰍬"; mutedIcon: "󰍭"
+            }
+          }
+
+          SharedWidgets.SliderTrack {
+            Layout.fillWidth: true
+            value: AudioService.inputVolume
+            muted: AudioService.inputMuted
+            icon: "󰍬"
+            mutedIcon: "󰍭"
+            onSliderMoved: (v) => AudioService.setVolume("@DEFAULT_AUDIO_SOURCE@", v)
+          }
+        }
+      }
+
+      Repeater {
+        model: AudioService.sources
+        delegate: Rectangle {
+          id: sourceCard
+          Layout.fillWidth: true
+          implicitHeight: 46
+          radius: Colors.radiusMedium
+          property bool isDefault: modelData.id === AudioService.defaultSourceId
+          property bool isHovered: sourceHover.containsMouse
+          color: isDefault ? Colors.withAlpha(Colors.primary, 0.16) : (isHovered ? Colors.withAlpha(Colors.primary, 0.12) : Colors.cardSurface)
+          border.color: isDefault ? Colors.primary : Colors.border
+          border.width: 1
+          Behavior on color { ColorAnimation { duration: 160 } }
+
+          RowLayout {
+            anchors.fill: parent
+            anchors.margins: Colors.paddingSmall
+            spacing: Colors.paddingSmall
+            Text { text: sourceCard.isDefault ? "󰄬" : "󰍬"; color: sourceCard.isDefault ? Colors.primary : Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
+            Text { text: modelData.name; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: sourceCard.isDefault ? Font.DemiBold : Font.Normal; elide: Text.ElideRight; Layout.fillWidth: true }
+            Text { text: Math.round(modelData.volume * 100) + "%"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS }
+            Text { text: sourceCard.isDefault ? "Default" : "Select"; color: sourceCard.isDefault ? Colors.primary : Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Medium }
+          }
+
+          MouseArea { id: sourceHover; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: AudioService.setDefaultDevice(modelData.id) }
+        }
+      }
+
+      SharedWidgets.EmptyState {
+        Layout.fillWidth: true
+        Layout.topMargin: 4
+        Layout.bottomMargin: 4
+        visible: AudioService.sources.length === 0
+        icon: "󰍭"
+        message: "No input devices detected"
+      }
   }
 }

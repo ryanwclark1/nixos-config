@@ -16,13 +16,14 @@ Rectangle {
   Text {
     id: label
     anchors.centerIn: parent
-    color: Colors.fgMain
-    font.pixelSize: 10
+    color: Colors.text
+    font.pixelSize: Colors.fontSizeXS
     text: "Scratch"
   }
 
   MouseArea {
     anchors.fill: parent
+    cursorShape: Qt.PointingHandCursor
     onClicked: Quickshell.execDetached([ "hyprctl", "dispatch", "togglespecialworkspace", "scratchpad" ])
   }
 }

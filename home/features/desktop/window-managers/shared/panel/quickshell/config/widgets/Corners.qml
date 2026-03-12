@@ -10,10 +10,12 @@ Scope {
     // Configurable radius
     property int cornerRadius: 18
 
-    Repeater {
+    Variants {
         model: Quickshell.screens
-        
-        delegate: PanelWindow {
+
+        delegate: Component {
+        PanelWindow {
+            required property ShellScreen modelData
             screen: modelData
             
             anchors {
@@ -88,6 +90,7 @@ Scope {
                     }
                 }
             }
+        }
         }
     }
 }

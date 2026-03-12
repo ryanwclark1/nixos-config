@@ -6,7 +6,7 @@ import "../../services"
 
 Row {
   id: root
-  spacing: 8
+  spacing: Colors.spacingS
   anchors.verticalCenter: parent.verticalCenter
   property var anchorWindow: null
 

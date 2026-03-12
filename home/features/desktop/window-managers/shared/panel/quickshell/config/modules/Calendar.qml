@@ -22,13 +22,22 @@ Rectangle {
 
   // ── Navigation helpers ─────────────────────────
   function prevMonth() {
+    monthTransition.restart();
     if (calendarMonth === 0) { calendarMonth = 11; calendarYear--; }
     else calendarMonth--;
   }
 
   function nextMonth() {
+    monthTransition.restart();
     if (calendarMonth === 11) { calendarMonth = 0; calendarYear++; }
     else calendarMonth++;
+  }
+
+  // Month transition: brief opacity dip on the days grid
+  SequentialAnimation {
+    id: monthTransition
+    NumberAnimation { target: daysGrid; property: "opacity"; to: 0.3; duration: 60 }
+    NumberAnimation { target: daysGrid; property: "opacity"; to: 1.0; duration: 150; easing.type: Easing.OutCubic }
   }
 
   function goToday() {
@@ -82,10 +91,12 @@ Rectangle {
     return d.toLocaleDateString(Qt.locale(), "MMMM yyyy");
   }
 
+  readonly property bool isCurrentMonth: calendarMonth === today.getMonth() && calendarYear === today.getFullYear()
+
   ColumnLayout {
     anchors.fill: parent
     anchors.margins: Colors.paddingMedium
-    spacing: 8
+    spacing: Colors.spacingS
 
     // Header: Month and Year with navigation
     RowLayout {
@@ -94,17 +105,19 @@ Rectangle {
       MouseArea {
         width: 24; height: 24
         hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
         onClicked: root.prevMonth()
         Rectangle {
           anchors.fill: parent; radius: 12
           color: parent.containsMouse ? Colors.highlightLight : "transparent"
+          Behavior on color { ColorAnimation { duration: 160 } }
         }
         Text {
           anchors.centerIn: parent
           text: "󰍞"
-          color: Colors.fgMain
+          color: Colors.text
           font.family: Colors.fontMono
-          font.pixelSize: 14
+          font.pixelSize: Colors.fontSizeMedium
         }
       }
 
@@ -121,29 +134,60 @@ Rectangle {
           id: monthLabel
           anchors.centerIn: parent
           text: root.monthName
-          color: parent.containsMouse ? Colors.primary : Colors.fgMain
-          font.pixelSize: 15
+          color: parent.containsMouse ? Colors.primary : Colors.text
+          font.pixelSize: Colors.fontSizeLarge
           font.weight: Font.Bold
-          Behavior on color { ColorAnimation { duration: 150 } }
+          Behavior on color { ColorAnimation { duration: 160 } }
         }
       }
 
       Item { Layout.fillWidth: true }
 
+      // "Today" pill button (visible when not viewing current month)
+      MouseArea {
+        visible: !root.isCurrentMonth
+        width: todayLabel.implicitWidth + 16
+        height: 22
+        hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
+        onClicked: root.goToday()
+
+        Rectangle {
+          anchors.fill: parent
+          radius: 11
+          color: parent.containsMouse ? Colors.primary : Colors.highlightLight
+          border.color: Colors.primary
+          border.width: 1
+          Behavior on color { ColorAnimation { duration: 160 } }
+        }
+
+        Text {
+          id: todayLabel
+          anchors.centerIn: parent
+          text: "Today"
+          color: parent.containsMouse ? Colors.background : Colors.primary
+          font.pixelSize: Colors.fontSizeXS
+          font.weight: Font.Bold
+          Behavior on color { ColorAnimation { duration: 160 } }
+        }
+      }
+
       MouseArea {
         width: 24; height: 24
         hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
         onClicked: root.nextMonth()
         Rectangle {
           anchors.fill: parent; radius: 12
           color: parent.containsMouse ? Colors.highlightLight : "transparent"
+          Behavior on color { ColorAnimation { duration: 160 } }
         }
         Text {
           anchors.centerIn: parent
           text: "󰍟"
-          color: Colors.fgMain
+          color: Colors.text
           font.family: Colors.fontMono
-          font.pixelSize: 14
+          font.pixelSize: Colors.fontSizeMedium
         }
       }
     }
@@ -158,38 +202,51 @@ Rectangle {
           Layout.fillWidth: true
           text: modelData
           color: Colors.textDisabled
-          font.pixelSize: 11
+          font.pixelSize: Colors.fontSizeSmall
           font.weight: Font.Bold
           horizontalAlignment: Text.AlignHCenter
         }
       }
     }
 
-    // Days Grid
+    // Days Grid with month transition fade
     GridLayout {
+      id: daysGrid
       columns: 7
       Layout.fillWidth: true
       Layout.fillHeight: true
       rowSpacing: 2
       columnSpacing: 0
 
+      Behavior on opacity { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+
       Repeater {
         model: root.daysModel
         delegate: Rectangle {
           Layout.fillWidth: true
           Layout.preferredHeight: 28
-          color: modelData.isToday ? Colors.primary : "transparent"
-          radius: 14
+          color: modelData.isToday ? Colors.primary
+            : dayMouse.containsMouse && modelData.currentMonth ? Colors.highlightLight
+            : "transparent"
+          radius: Colors.radiusMedium
+          Behavior on color { ColorAnimation { duration: 160 } }
 
           Text {
             anchors.centerIn: parent
             text: modelData.day
             color: modelData.isToday ? Colors.background
-              : modelData.currentMonth ? Colors.fgMain
+              : modelData.currentMonth ? Colors.text
               : Colors.textDisabled
-            font.pixelSize: 12
+            font.pixelSize: Colors.fontSizeSmall
             font.weight: modelData.isToday ? Font.Bold : Font.Normal
             opacity: modelData.currentMonth ? 1.0 : 0.4
+          }
+
+          MouseArea {
+            id: dayMouse
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: modelData.currentMonth ? Qt.PointingHandCursor : Qt.ArrowCursor
           }
         }
       }

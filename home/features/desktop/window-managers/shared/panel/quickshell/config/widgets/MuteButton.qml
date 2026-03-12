@@ -12,7 +12,7 @@ Rectangle {
   property bool showBorder: false
 
   width: size; height: size; radius: size / 2
-  color: hover.containsMouse ? Colors.highlightLight : (showBorder ? Colors.bgWidget : "transparent")
+  color: showBorder ? Colors.bgWidget : "transparent"
   border.color: showBorder ? Colors.border : "transparent"
   border.width: showBorder ? 1 : 0
 
@@ -24,10 +24,20 @@ Rectangle {
     font.pixelSize: Math.round(root.size * 0.5)
   }
 
+  opacity: enabled ? 1.0 : 0.4
+
+  StateLayer {
+    id: stateLayer
+    hovered: hover.containsMouse
+    pressed: hover.pressed
+    disabled: !root.enabled
+  }
+
   MouseArea {
     id: hover
     anchors.fill: parent
-    hoverEnabled: true
-    onClicked: AudioService.toggleMute(root.target, root.muted)
+    hoverEnabled: root.enabled
+    cursorShape: root.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+    onClicked: (mouse) => { if (!root.enabled) return; stateLayer.burst(mouse.x, mouse.y); AudioService.toggleMute(root.target, root.muted); }
   }
 }

@@ -13,9 +13,8 @@ QtObject {
   property string elapsedText: "00:00"
 
   // ── Subscriber-based polling ─────────────────
+  // Use Ref { service: RecordingService } for automatic lifecycle management.
   property int subscriberCount: 0
-  function subscribe() { subscriberCount++; }
-  function unsubscribe() { subscriberCount = Math.max(0, subscriberCount - 1); }
 
   // ── Recording detection ──────────────────────
   property SharedWidgets.CommandPoll recDetectPoll: SharedWidgets.CommandPoll {

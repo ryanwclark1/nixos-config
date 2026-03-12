@@ -15,7 +15,7 @@ PanelWindow {
   }
 
   margins.top: Config.barHeight + Config.barMargin + 8
-  implicitHeight: 80
+  implicitHeight: toastLoader.item ? toastLoader.item.implicitHeight + 16 : 80
   color: "transparent"
 
   WlrLayershell.layer: WlrLayer.Top

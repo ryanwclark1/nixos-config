@@ -27,12 +27,18 @@ Scope {
   property bool weatherMenuVisible: false
   property bool systemStatsMenuVisible: false
   property bool bluetoothMenuVisible: false
+  property bool printerMenuVisible: false
+  property bool privacyMenuVisible: false
+  property bool notepadVisible: false
+  property bool colorPickerVisible: false
+  property bool displayConfigVisible: false
+  property bool fileBrowserVisible: false
 
   // Track which screen triggered the current menu (captured at toggle time)
   property var menuScreen: null
   readonly property var activeScreen: (Quickshell.screens && Quickshell.screens.length > 0) ? (Quickshell.cursorScreen || Quickshell.screens[0]) : null
 
-  readonly property var allPanels: ["notifCenterVisible", "controlCenterVisible", "networkMenuVisible", "audioMenuVisible", "bluetoothMenuVisible", "clipboardMenuVisible", "recordingMenuVisible", "musicMenuVisible", "batteryMenuVisible", "weatherMenuVisible", "systemStatsMenuVisible", "powerMenuVisible"]
+  readonly property var allPanels: ["notifCenterVisible", "controlCenterVisible", "networkMenuVisible", "audioMenuVisible", "bluetoothMenuVisible", "printerMenuVisible", "privacyMenuVisible", "clipboardMenuVisible", "recordingMenuVisible", "musicMenuVisible", "batteryMenuVisible", "weatherMenuVisible", "systemStatsMenuVisible", "powerMenuVisible", "notepadVisible", "colorPickerVisible", "displayConfigVisible", "fileBrowserVisible"]
 
   function togglePanel(panel) {
     var next = !root[panel];
@@ -54,6 +60,12 @@ Scope {
   function toggleWeatherMenu() { togglePanel("weatherMenuVisible"); }
   function toggleSystemStatsMenu() { togglePanel("systemStatsMenuVisible"); }
   function toggleBluetoothMenu() { togglePanel("bluetoothMenuVisible"); }
+  function togglePrinterMenu() { togglePanel("printerMenuVisible"); }
+  function togglePrivacyMenu() { togglePanel("privacyMenuVisible"); }
+  function toggleNotepad() { togglePanel("notepadVisible"); }
+  function toggleColorPicker() { togglePanel("colorPickerVisible"); }
+  function toggleDisplayConfig() { togglePanel("displayConfigVisible"); }
+  function toggleFileBrowser() { togglePanel("fileBrowserVisible"); }
 
   IpcHandler {
     target: "Shell"
@@ -62,12 +74,18 @@ Scope {
     function toggleNetworkMenu() { root.toggleNetworkMenu(); }
     function toggleAudioMenu() { root.toggleAudioMenu(); }
     function toggleBluetoothMenu() { root.toggleBluetoothMenu(); }
+    function togglePrinterMenu() { root.togglePrinterMenu(); }
+    function togglePrivacyMenu() { root.togglePrivacyMenu(); }
     function toggleClipboardMenu() { root.toggleClipboardMenu(); }
     function toggleRecordingMenu() { root.toggleRecordingMenu(); }
     function toggleMusicMenu() { root.toggleMusicMenu(); }
     function toggleBatteryMenu() { root.toggleBatteryMenu(); }
     function toggleWeatherMenu() { root.toggleWeatherMenu(); }
     function toggleSystemStatsMenu() { root.toggleSystemStatsMenu(); }
+    function toggleNotepad() { root.toggleNotepad(); }
+    function toggleColorPicker() { root.toggleColorPicker(); }
+    function toggleDisplayConfig() { root.toggleDisplayConfig(); }
+    function toggleFileBrowser() { root.toggleFileBrowser(); }
 
     function closeAll() {
       for (var i = 0; i < root.allPanels.length; i++) {
@@ -147,75 +165,93 @@ Scope {
           onCommandClicked: root.toggleControls()
           onMusicClicked: root.toggleMusicMenu()
           onRecordingClicked: root.toggleRecordingMenu()
+          onPrivacyClicked: root.togglePrivacyMenu()
           onBatteryClicked: root.toggleBatteryMenu()
           onClipboardClicked: root.toggleClipboardMenu()
           onBluetoothClicked: root.toggleBluetoothMenu()
+          onPrinterClicked: root.togglePrinterMenu()
           onWeatherClicked: root.toggleWeatherMenu()
           onSystemStatsClicked: root.toggleSystemStatsMenu()
+          onNotepadClicked: root.toggleNotepad()
         }
 
-        // PopupWindow menus — anchored to this screen's bar, only visible on the menu screen
+        // PopupWindow menus — anchored to this screen's bar.
+        // Each BasePopupMenu self-manages deferred unmapping via wantVisible.
         BluetoothMenu {
           anchor.window: barWindow
           anchor.rect.x: barWindow.width - width - 8
           anchor.rect.y: panel.btTriggerBottomY + 6
-          visible: root.bluetoothMenuVisible && barWindow.isMenuScreen
+          wantVisible: root.bluetoothMenuVisible && barWindow.isMenuScreen
         }
 
         AudioMenu {
           anchor.window: barWindow
           anchor.rect.x: barWindow.width - width - 8
           anchor.rect.y: panel.audioTriggerBottomY + 6
-          visible: root.audioMenuVisible && barWindow.isMenuScreen
+          wantVisible: root.audioMenuVisible && barWindow.isMenuScreen
         }
 
         NetworkMenu {
           anchor.window: barWindow
           anchor.rect.x: barWindow.width - width - 8
           anchor.rect.y: panel.networkTriggerBottomY + 6
-          visible: root.networkMenuVisible && barWindow.isMenuScreen
+          wantVisible: root.networkMenuVisible && barWindow.isMenuScreen
         }
 
         ClipboardMenu {
           anchor.window: barWindow
           anchor.rect.x: barWindow.width - width - 8
           anchor.rect.y: panel.clipboardTriggerBottomY + 6
-          visible: root.clipboardMenuVisible && barWindow.isMenuScreen
+          wantVisible: root.clipboardMenuVisible && barWindow.isMenuScreen
         }
 
         RecordingMenu {
           anchor.window: barWindow
           anchor.rect.x: barWindow.width - width - 8
           anchor.rect.y: panel.recordingTriggerBottomY + 6
-          visible: root.recordingMenuVisible && barWindow.isMenuScreen
+          wantVisible: root.recordingMenuVisible && barWindow.isMenuScreen
+        }
+
+        PrivacyMenu {
+          anchor.window: barWindow
+          anchor.rect.x: barWindow.width - width - 8
+          anchor.rect.y: panel.privacyTriggerBottomY + 6
+          wantVisible: root.privacyMenuVisible && barWindow.isMenuScreen
         }
 
         MusicMenu {
           anchor.window: barWindow
           anchor.rect.x: barWindow.width - width - 8
           anchor.rect.y: panel.musicTriggerBottomY + 6
-          visible: root.musicMenuVisible && barWindow.isMenuScreen
+          wantVisible: root.musicMenuVisible && barWindow.isMenuScreen
         }
 
         BatteryMenu {
           anchor.window: barWindow
           anchor.rect.x: barWindow.width - width - 8
           anchor.rect.y: panel.batteryTriggerBottomY + 6
-          visible: root.batteryMenuVisible && barWindow.isMenuScreen
+          wantVisible: root.batteryMenuVisible && barWindow.isMenuScreen
         }
 
         WeatherMenu {
           anchor.window: barWindow
           anchor.rect.x: barWindow.width - width - 8
           anchor.rect.y: panel.weatherTriggerBottomY + 6
-          visible: root.weatherMenuVisible && barWindow.isMenuScreen
+          wantVisible: root.weatherMenuVisible && barWindow.isMenuScreen
         }
 
         SystemStatsMenu {
           anchor.window: barWindow
           anchor.rect.x: 8
           anchor.rect.y: panel.systemMonitorBottomY + 6
-          visible: root.systemStatsMenuVisible && barWindow.isMenuScreen
+          wantVisible: root.systemStatsMenuVisible && barWindow.isMenuScreen
+        }
+
+        PrinterMenu {
+          anchor.window: barWindow
+          anchor.rect.x: barWindow.width - width - 8
+          anchor.rect.y: panel.printerTriggerBottomY + 6
+          wantVisible: root.printerMenuVisible && barWindow.isMenuScreen
         }
       }
     }
@@ -246,11 +282,14 @@ Scope {
     manager: notifManager
   }
 
-  NotificationCenter {
-    id: center
-    manager: notifManager
-    showContent: root.notifCenterVisible
-    onCloseRequested: root.notifCenterVisible = false
+  LazyLoader {
+    active: root.notifCenterVisible
+    NotificationCenter {
+      id: center
+      manager: notifManager
+      showContent: root.notifCenterVisible
+      onCloseRequested: root.notifCenterVisible = false
+    }
   }
 
   ControlCenter {
@@ -260,9 +299,58 @@ Scope {
     onCloseRequested: root.controlCenterVisible = false
   }
 
-  Powermenu {
-    id: powermenu
-    isVisible: root.powerMenuVisible
+  // --- File operation coordination ---
+  // Tracks what triggered the FileBrowser so we can route fileSelected back
+  property string _fileBrowserCaller: "" // "notepad-open", "notepad-save", "wallpaper"
+  property string _pendingNotepadContent: "" // content to save for notepad-save
+  property string _wallpaperMonitor: "" // monitor name for wallpaper browse
+
+  function _openFileBrowserForNotepad(mode) {
+    _fileBrowserCaller = mode === "save" ? "notepad-save" : "notepad-open";
+    root.fileBrowserVisible = true;
+    // FileBrowser is now inside LazyLoader — need to defer open() call
+    _fileBrowserOpenTimer.opMode = mode;
+    _fileBrowserOpenTimer.restart();
+  }
+
+  Timer {
+    id: _fileBrowserOpenTimer
+    interval: 50
+    property string opMode: "open"
+    onTriggered: {
+      if (fileBrowser) {
+        var home = Quickshell.env("HOME") || "/home";
+        if (opMode === "__wallpaper__") {
+          fileBrowser.open(home + "/Pictures", [{label: "Images", extensions: ["jpg","jpeg","png","webp","gif"]}], "open");
+        } else if (opMode === "open") {
+          fileBrowser.open(home, [{label: "Text Files", extensions: ["txt","md","json","qml","conf","log","nix","sh","toml","yaml","yml"]}], "open");
+        } else {
+          fileBrowser.open(home, [{label: "Text Files", extensions: ["txt","md"]}], "save");
+        }
+      }
+    }
+  }
+
+  LazyLoader {
+    active: root.notepadVisible
+    Notepad {
+      id: notepad
+      showContent: root.notepadVisible
+      onCloseRequested: root.notepadVisible = false
+      onOpenFileRequested: root._openFileBrowserForNotepad("open")
+      onSaveAsRequested: (content) => {
+        root._pendingNotepadContent = content;
+        root._openFileBrowserForNotepad("save");
+      }
+    }
+  }
+
+  LazyLoader {
+    active: root.powerMenuVisible
+    Powermenu {
+      id: powermenu
+      isVisible: root.powerMenuVisible
+    }
   }
 
   Launcher {
@@ -271,6 +359,64 @@ Scope {
 
   SettingsHub {
     id: settingsHub
+    onBrowseWallpaper: (monitorName) => {
+      root._fileBrowserCaller = "wallpaper";
+      root._wallpaperMonitor = monitorName;
+      root.fileBrowserVisible = true;
+      _fileBrowserOpenTimer.opMode = "__wallpaper__";
+      _fileBrowserOpenTimer.restart();
+    }
+  }
+
+  LazyLoader {
+    active: root.colorPickerVisible
+    ColorPicker {
+      id: colorPicker
+      isOpen: root.colorPickerVisible
+      onIsOpenChanged: if (!isOpen) root.colorPickerVisible = false
+    }
+  }
+
+  LazyLoader {
+    active: root.displayConfigVisible
+    DisplayConfig {
+      id: displayConfig
+      isOpen: root.displayConfigVisible
+      onIsOpenChanged: if (!isOpen) root.displayConfigVisible = false
+    }
+  }
+
+  LazyLoader {
+    active: root.fileBrowserVisible
+    FileBrowser {
+      id: fileBrowser
+      isOpen: root.fileBrowserVisible
+      onIsOpenChanged: if (!isOpen) root.fileBrowserVisible = false
+      onFileSelected: (filePath) => {
+        root.fileBrowserVisible = false;
+        if (root._fileBrowserCaller === "notepad-open") {
+          // Re-open notepad if it was closed, then load file
+          root.notepadVisible = true;
+          // Defer until notepad is created by LazyLoader
+          Qt.callLater(function() {
+            if (notepad) notepad.loadFile(filePath);
+          });
+        } else if (root._fileBrowserCaller === "notepad-save") {
+          root.notepadVisible = true;
+          Qt.callLater(function() {
+            if (notepad) notepad.saveToFile(filePath, root._pendingNotepadContent);
+          });
+        } else if (root._fileBrowserCaller === "wallpaper") {
+          Quickshell.execDetached(["sh", "-c",
+            "swww img '" + filePath.replace(/'/g, "'\\''") + "'" +
+            (root._wallpaperMonitor ? " --outputs '" + root._wallpaperMonitor + "'" : "") +
+            " --transition-type grow --transition-duration 1.5"
+          ]);
+        }
+        root._fileBrowserCaller = "";
+        root._pendingNotepadContent = "";
+      }
+    }
   }
 
   NativeLock {
@@ -321,5 +467,18 @@ Scope {
 
   Corners {
     id: screenCorners
+  }
+
+  // Per-screen decorative border
+  Variants {
+    model: Quickshell.screens
+
+    delegate: Component {
+      ScreenBorder {
+        required property ShellScreen modelData
+        screen: modelData
+        visible: Config.showScreenBorders
+      }
+    }
   }
 }

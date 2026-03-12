@@ -53,6 +53,13 @@
     fi
   '';
 
+  # Workaround for SIGILL (code 132) crash in Electron GPU process
+  # on Wayland + AMD GPU. Disables the GPU process sandbox where
+  # the illegal instruction occurs.
+  xdg.configFile."cursor-flags.conf".text = ''
+    --disable-gpu-sandbox
+  '';
+
   # Note: Remote SSH extension must be installed manually in Cursor
   # Extension ID: ms-vscode-remote.remote-ssh
   # Install via: Cursor > Extensions > Search "Remote - SSH"

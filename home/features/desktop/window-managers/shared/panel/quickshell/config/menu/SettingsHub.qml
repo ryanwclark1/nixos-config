@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import "../services"
+import "../widgets" as SharedWidgets
 
 PanelWindow {
   id: settingsRoot
@@ -25,9 +26,11 @@ PanelWindow {
 
   property bool isOpen: false
   property string activeTab: "system"
+  signal browseWallpaper(string monitorName)
   property real layoutGapsOut: 10
   property real layoutGapsIn: 5
   property real layoutActiveOpacity: 1.0
+  property bool layoutIsMaster: false
 
   readonly property var launcherModeOptions: [
     { value: "drun", label: "Apps" },
@@ -40,7 +43,47 @@ PanelWindow {
   ]
 
   function refreshHyprlandSettings() {
-    hyprStateProc.running = true;
+    if (!hyprStateProc.running) hyprStateProc.running = true;
+  }
+
+  // --- Wallpaper tab state ---
+  // Which monitor slot is selected in the picker; "" means "all monitors"
+  property string wallpaperSelectedMonitor: ""
+  // List of connected monitor names, populated lazily when the tab opens
+  property var wallpaperMonitorNames: []
+
+  onActiveTabChanged: {
+    if (activeTab === "keybinds" && !hyprBindsProc.running) hyprBindsProc.running = true;
+    if (activeTab === "about"    && !aboutInfoProc.running)  aboutInfoProc.running = true;
+    if (activeTab === "wallpaper") {
+      // Refresh monitor list and rescan wallpapers when tab becomes active
+      if (!wallpaperMonProc.running) wallpaperMonProc.running = true;
+      if (WallpaperService.availableWallpapers.length === 0) WallpaperService.scanWallpapers();
+    }
+  }
+
+  // Fetch connected monitor names via hyprctl
+  Process {
+    id: wallpaperMonProc
+    command: ["hyprctl", "monitors", "-j"]
+    running: false
+    stdout: StdioCollector {
+      onStreamFinished: {
+        try {
+          var mons = JSON.parse(this.text || "[]");
+          var names = [];
+          for (var i = 0; i < mons.length; i++) {
+            if (mons[i].name) names.push(mons[i].name);
+          }
+          settingsRoot.wallpaperMonitorNames = names;
+          // Default selection to first monitor
+          if (settingsRoot.wallpaperSelectedMonitor === "" && names.length > 0)
+            settingsRoot.wallpaperSelectedMonitor = names[0];
+        } catch (e) {
+          console.error("Failed to parse hyprctl monitors: " + e);
+        }
+      }
+    }
   }
 
   function open() {
@@ -72,7 +115,9 @@ PanelWindow {
       + "printf '\\n'; "
       + "hyprctl getoption general:gaps_in -j 2>/dev/null; "
       + "printf '\\n'; "
-      + "hyprctl getoption decoration:active_opacity -j 2>/dev/null"
+      + "hyprctl getoption decoration:active_opacity -j 2>/dev/null; "
+      + "printf '\\n'; "
+      + "hyprctl getoption general:layout -j 2>/dev/null"
     ]
     running: false
     stdout: StdioCollector {
@@ -91,11 +136,71 @@ PanelWindow {
             var activeOpacity = JSON.parse(lines[2]);
             settingsRoot.layoutActiveOpacity = activeOpacity.float !== undefined ? activeOpacity.float : settingsRoot.layoutActiveOpacity;
           }
+          if (lines[3]) {
+            var layout = JSON.parse(lines[3]);
+            settingsRoot.layoutIsMaster = (layout.str === "master");
+          }
         } catch (e) {
           console.error("Failed to parse Hyprland settings: " + e);
         }
       }
     }
+  }
+
+  // --- Keybinds tab state ---
+  property var keybindsList: []
+  property string keybindsFilter: ""
+
+  Process {
+    id: hyprBindsProc
+    command: ["hyprctl", "binds", "-j"]
+    running: false
+    stdout: StdioCollector {
+      onStreamFinished: {
+        try {
+          var raw = JSON.parse(this.text || "[]");
+          var result = [];
+          for (var i = 0; i < raw.length; i++) {
+            var b = raw[i];
+            var mods = (b.modmask !== undefined && b.modmask !== 0) ? b.modString || "" : "";
+            result.push({
+              mods: mods,
+              key: b.key || "",
+              dispatcher: b.dispatcher || "",
+              arg: b.arg || ""
+            });
+          }
+          settingsRoot.keybindsList = result;
+        } catch (e) {
+          console.error("Failed to parse hyprctl binds: " + e);
+        }
+      }
+    }
+  }
+
+  // --- About tab state ---
+  property string aboutKernel: ""
+  property string aboutHostname: ""
+  property string aboutUptime: ""
+
+  Process {
+    id: aboutInfoProc
+    command: ["sh", "-c", "uname -r; echo '---'; hostname; echo '---'; uptime -p"]
+    running: false
+    stdout: StdioCollector {
+      onStreamFinished: {
+        var parts = (this.text || "").split("---");
+        settingsRoot.aboutKernel   = parts[0] ? parts[0].trim() : "";
+        settingsRoot.aboutHostname = parts[1] ? parts[1].trim() : "";
+        settingsRoot.aboutUptime   = parts[2] ? parts[2].trim() : "";
+      }
+    }
+  }
+
+  Process {
+    id: restartShellProc
+    command: ["sh", "-c", "quickshell --restart || quickshell-restart || qs --restart || true"]
+    running: false
   }
 
   MouseArea {
@@ -111,8 +216,8 @@ PanelWindow {
 
   Rectangle {
     id: mainBox
-    width: 780
-    height: 700
+    width: Math.min(parent.width - 40, 780)
+    height: Math.min(parent.height - 40, 700)
     anchors.centerIn: parent
     color: Colors.bgGlass
     border.color: Colors.border
@@ -126,8 +231,9 @@ PanelWindow {
 
     opacity: settingsRoot.isOpen ? 1.0 : 0.0
     scale: settingsRoot.isOpen ? 1.0 : 0.95
-    Behavior on opacity { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
-    Behavior on scale { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
+    Behavior on opacity { NumberAnimation { id: shFadeAnim; duration: 250; easing.type: Easing.OutCubic } }
+    Behavior on scale { NumberAnimation { id: shScaleAnim; duration: 300; easing.type: Easing.OutBack } }
+    layer.enabled: shFadeAnim.running || shScaleAnim.running
 
     MouseArea { anchors.fill: parent }
 
@@ -143,12 +249,12 @@ PanelWindow {
         ColumnLayout {
           anchors.fill: parent
           anchors.margins: Colors.paddingLarge
-          spacing: 8
+          spacing: Colors.spacingS
 
           Text {
             text: "SETTINGS"
             color: Colors.textDisabled
-            font.pixelSize: 9
+            font.pixelSize: Colors.fontSizeXS
             font.weight: Font.Black
             font.letterSpacing: 1.5
             Layout.bottomMargin: 12
@@ -156,32 +262,47 @@ PanelWindow {
 
           TabBtn { label: "System"; icon: "󰒓"; tabId: "system" }
           TabBtn { label: "Appearance"; icon: "󰸉"; tabId: "appearance" }
+          TabBtn { label: "Wallpaper"; icon: "󰸉"; tabId: "wallpaper" }
           TabBtn { label: "Hyprland"; icon: "󱗼"; tabId: "layout" }
           TabBtn { label: "OSD"; icon: "󰍡"; tabId: "osd" }
           TabBtn { label: "Dock"; icon: "󰍜"; tabId: "dock" }
           TabBtn { label: "Widgets"; icon: "󰖲"; tabId: "widgets" }
           TabBtn { label: "Lock Screen"; icon: "󰌾"; tabId: "lockscreen" }
+          TabBtn { label: "Privacy"; icon: "󰒃"; tabId: "privacy" }
+          TabBtn { label: "Power"; icon: "󰌪"; tabId: "power" }
+          TabBtn { label: "Keybinds"; icon: "󰌌"; tabId: "keybinds" }
+          TabBtn { label: "Plugins"; icon: "󰏗"; tabId: "plugins" }
+          TabBtn { label: "About"; icon: "󰋗"; tabId: "about" }
 
           Item { Layout.fillHeight: true }
 
           Rectangle {
             Layout.fillWidth: true
             height: 42
-            radius: 10
-            color: saveHover.containsMouse ? Qt.darker(Colors.primary, 1.1) : Colors.primary
+            radius: Colors.radiusSmall
+            color: Colors.primary
+
+            SharedWidgets.StateLayer {
+              id: saveStateLayer
+              hovered: saveHover.containsMouse
+              pressed: saveHover.pressed
+              stateColor: Colors.primary
+            }
 
             RowLayout {
               anchors.centerIn: parent
-              spacing: 8
-              Text { text: "󰆓"; color: Colors.text; font.family: Colors.fontMono; font.pixelSize: 14 }
-              Text { text: "Save & Close"; color: Colors.text; font.weight: Font.Bold; font.pixelSize: 12 }
+              spacing: Colors.spacingS
+              Text { text: "󰆓"; color: Colors.text; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
+              Text { text: "Save & Close"; color: Colors.text; font.weight: Font.Bold; font.pixelSize: Colors.fontSizeMedium }
             }
 
             MouseArea {
               id: saveHover
               anchors.fill: parent
               hoverEnabled: true
-              onClicked: {
+              cursorShape: Qt.PointingHandCursor
+              onClicked: (mouse) => {
+                saveStateLayer.burst(mouse.x, mouse.y);
                 Config.save();
                 settingsRoot.close();
               }
@@ -202,34 +323,40 @@ PanelWindow {
           width: parent.width - 64
           x: 32
           y: 32
-          spacing: 24
+          spacing: Colors.spacingXL
 
           Text {
             text: activeTab === "system" ? "Shell Behavior"
                   : activeTab === "appearance" ? "UI Appearance"
+                  : activeTab === "wallpaper" ? "Wallpaper"
                   : activeTab === "layout" ? "Hyprland Layout"
                   : activeTab === "osd" ? "On-Screen Display"
                   : activeTab === "dock" ? "Dock"
                   : activeTab === "widgets" ? "Desktop Widgets"
                   : activeTab === "lockscreen" ? "Lock Screen"
+                  : activeTab === "privacy" ? "Privacy"
+                  : activeTab === "power" ? "Power & Sleep"
+                  : activeTab === "keybinds" ? "Keybindings"
+                  : activeTab === "plugins" ? "Plugins"
+                  : activeTab === "about" ? "About"
                   : "Settings"
-            color: Colors.fgMain
-            font.pixelSize: 26
+            color: Colors.text
+            font.pixelSize: Colors.fontSizeHuge
             font.weight: Font.Bold
             font.letterSpacing: -0.5
           }
 
           ColumnLayout {
             visible: activeTab === "system"
-            spacing: 20
+            spacing: Colors.spacingXL
             Layout.fillWidth: true
 
             SectionLabel { text: "Shell" }
 
             GridLayout {
               columns: 2
-              columnSpacing: 16
-              rowSpacing: 16
+              columnSpacing: Colors.spacingL
+              rowSpacing: Colors.spacingL
               Layout.fillWidth: true
 
               ToggleCard { label: "Floating Bar"; icon: "󰖲"; configKey: "barFloating" }
@@ -260,13 +387,13 @@ PanelWindow {
               label: "Default Mode"
               currentValue: Config.launcherDefaultMode
               options: settingsRoot.launcherModeOptions
-              onSelected: (modeValue) => Config.launcherDefaultMode = modeValue
+              onModeSelected: (modeValue) => Config.launcherDefaultMode = modeValue
             }
 
             GridLayout {
               columns: 2
-              columnSpacing: 16
-              rowSpacing: 16
+              columnSpacing: Colors.spacingL
+              rowSpacing: Colors.spacingL
               Layout.fillWidth: true
 
               ToggleCard { label: "Show Mode Hints"; icon: "󰌌"; configKey: "launcherShowModeHints" }
@@ -277,8 +404,8 @@ PanelWindow {
 
             GridLayout {
               columns: 2
-              columnSpacing: 16
-              rowSpacing: 16
+              columnSpacing: Colors.spacingL
+              rowSpacing: Colors.spacingL
               Layout.fillWidth: true
 
               ToggleCard { label: "Quick Links"; icon: "󰖩"; configKey: "controlCenterShowQuickLinks" }
@@ -297,7 +424,7 @@ PanelWindow {
 
           ColumnLayout {
             visible: activeTab === "appearance"
-            spacing: 20
+            spacing: Colors.spacingXL
             Layout.fillWidth: true
 
             SectionLabel { text: "Bar" }
@@ -308,24 +435,748 @@ PanelWindow {
             ConfigSlider { label: "Glass Opacity"; min: 0.1; max: 1.0; value: Config.glassOpacity; step: 0.05; onMoved: (v) => Config.glassOpacity = v }
 
             RowLayout {
-              spacing: 20
-              Text { text: "Floating Bar"; color: Colors.fgMain; font.pixelSize: 14; Layout.fillWidth: true }
-              Switch { checked: Config.barFloating; onToggled: Config.barFloating = !Config.barFloating }
+              spacing: Colors.spacingXL
+              Text { text: "Floating Bar"; color: Colors.text; font.pixelSize: Colors.fontSizeLarge; Layout.fillWidth: true }
+              SharedWidgets.DankToggle { checked: Config.barFloating; onToggled: Config.barFloating = !Config.barFloating }
             }
 
           }
 
+          // ---- Wallpaper tab -----------------------------------------------
           ColumnLayout {
-            visible: activeTab === "layout"
-            spacing: 24
+            visible: activeTab === "wallpaper"
+            spacing: Colors.spacingXL
             Layout.fillWidth: true
 
+            // ---- Monitor selector (shown only when >1 monitor) --------
+            ColumnLayout {
+              visible: settingsRoot.wallpaperMonitorNames.length > 1
+              spacing: Colors.spacingS
+              Layout.fillWidth: true
+
+              SectionLabel { text: "MONITOR" }
+
+              Flow {
+                Layout.fillWidth: true
+                spacing: Colors.spacingS
+
+                // "All Monitors" pill
+                Rectangle {
+                  width: allPillLabel.implicitWidth + 24
+                  height: 34
+                  radius: height / 2
+                  color: settingsRoot.wallpaperSelectedMonitor === "__all__"
+                         ? Colors.highlight : Colors.bgWidget
+                  border.color: settingsRoot.wallpaperSelectedMonitor === "__all__"
+                                ? Colors.primary : Colors.border
+                  border.width: 1
+                  Behavior on color { ColorAnimation { duration: 150 } }
+                  Behavior on border.color { ColorAnimation { duration: 150 } }
+
+                  Text {
+                    id: allPillLabel
+                    anchors.centerIn: parent
+                    text: "All"
+                    color: settingsRoot.wallpaperSelectedMonitor === "__all__"
+                           ? Colors.primary : Colors.text
+                    font.pixelSize: Colors.fontSizeMedium
+                    font.weight: Font.DemiBold
+                  }
+
+                  MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: settingsRoot.wallpaperSelectedMonitor = "__all__"
+                  }
+                }
+
+                Repeater {
+                  model: settingsRoot.wallpaperMonitorNames
+                  delegate: Rectangle {
+                    required property string modelData
+                    width: monPillLabel.implicitWidth + 24
+                    height: 34
+                    radius: height / 2
+                    color: settingsRoot.wallpaperSelectedMonitor === modelData
+                           ? Colors.highlight : Colors.bgWidget
+                    border.color: settingsRoot.wallpaperSelectedMonitor === modelData
+                                  ? Colors.primary : Colors.border
+                    border.width: 1
+                    Behavior on color { ColorAnimation { duration: 150 } }
+                    Behavior on border.color { ColorAnimation { duration: 150 } }
+
+                    Text {
+                      id: monPillLabel
+                      anchors.centerIn: parent
+                      text: modelData
+                      color: settingsRoot.wallpaperSelectedMonitor === modelData
+                             ? Colors.primary : Colors.text
+                      font.pixelSize: Colors.fontSizeMedium
+                      font.weight: Font.DemiBold
+                      font.family: Colors.fontMono
+                    }
+
+                    MouseArea {
+                      anchors.fill: parent
+                      cursorShape: Qt.PointingHandCursor
+                      onClicked: settingsRoot.wallpaperSelectedMonitor = modelData
+                    }
+                  }
+                }
+              }
+            }
+
+            // ---- Current wallpaper preview ----------------------------
+            SectionLabel { text: "CURRENT WALLPAPER" }
+
+            Rectangle {
+              Layout.fillWidth: true
+              height: 160
+              radius: Colors.radiusMedium
+              color: Colors.bgWidget
+              border.color: Colors.border
+              border.width: 1
+              clip: true
+
+              // Resolve what path to preview: use selected monitor key or __all__
+              readonly property string previewPath: {
+                var key = settingsRoot.wallpaperSelectedMonitor || "__all__";
+                return WallpaperService.wallpapers[key]
+                       || WallpaperService.wallpapers["__all__"]
+                       || "";
+              }
+
+              Image {
+                anchors.fill: parent
+                source: parent.previewPath ? ("file://" + parent.previewPath) : ""
+                fillMode: Image.PreserveAspectCrop
+                asynchronous: true
+                smooth: true
+                visible: status === Image.Ready
+              }
+
+              // Placeholder when no wallpaper is set / image hasn't loaded yet
+              ColumnLayout {
+                anchors.centerIn: parent
+                spacing: 6
+                visible: parent.previewPath === "" || previewImg.status !== Image.Ready
+
+                // Hidden image just to track load status via alias
+                Image {
+                  id: previewImg
+                  source: parent.parent.previewPath ? ("file://" + parent.parent.previewPath) : ""
+                  visible: false
+                  asynchronous: true
+                }
+
+                Text {
+                  text: "󰸉"
+                  color: Colors.fgDim
+                  font.family: Colors.fontMono
+                  font.pixelSize: Colors.fontSizeHuge
+                  Layout.alignment: Qt.AlignHCenter
+                }
+                Text {
+                  text: parent.parent.previewPath !== "" ? "Loading preview…" : "No wallpaper set"
+                  color: Colors.fgDim
+                  font.pixelSize: Colors.fontSizeMedium
+                  Layout.alignment: Qt.AlignHCenter
+                }
+              }
+
+              // Filename chip at the bottom-right
+              Rectangle {
+                anchors {
+                  bottom: parent.bottom
+                  right: parent.right
+                  margins: 10
+                }
+                visible: parent.previewPath !== ""
+                implicitWidth: previewName.implicitWidth + 16
+                height: 22
+                radius: 11
+                color: Qt.rgba(0, 0, 0, 0.55)
+
+                Text {
+                  id: previewName
+                  anchors.centerIn: parent
+                  text: {
+                    var p = parent.parent.previewPath;
+                    if (!p) return "";
+                    var parts = p.split("/");
+                    return parts[parts.length - 1];
+                  }
+                  color: "#ffffff"
+                  font.pixelSize: Colors.fontSizeXS
+                  font.family: Colors.fontMono
+                  elide: Text.ElideLeft
+                  maximumLineCount: 1
+                }
+              }
+            }
+
+            // ---- Quick action buttons ---------------------------------
             RowLayout {
-              spacing: 20
-              Text { text: "Master Layout"; color: Colors.fgMain; font.pixelSize: 14; Layout.fillWidth: true }
-              Switch {
-                checked: false
-                onToggled: Quickshell.execDetached(["hyprctl", "dispatch", "layoutmsg", "toggle"])
+              Layout.fillWidth: true
+              spacing: 10
+
+              // Next Wallpaper
+              Rectangle {
+                Layout.fillWidth: true
+                height: 40
+                radius: Colors.radiusSmall
+                color: Colors.bgWidget
+                border.color: Colors.border
+                border.width: 1
+
+                SharedWidgets.StateLayer {
+                  id: nextWpStateLayer
+                  hovered: nextWpHover.containsMouse
+                  pressed: nextWpHover.pressed
+                }
+
+                RowLayout {
+                  anchors.centerIn: parent
+                  spacing: 7
+                  Text { text: "󰒭"; color: Colors.fgSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
+                  Text { text: "Next"; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium }
+                }
+
+                MouseArea {
+                  id: nextWpHover
+                  anchors.fill: parent
+                  hoverEnabled: true
+                  cursorShape: Qt.PointingHandCursor
+                  onClicked: (mouse) => {
+                    nextWpStateLayer.burst(mouse.x, mouse.y);
+                    var mon = settingsRoot.wallpaperSelectedMonitor === "__all__"
+                              ? "" : settingsRoot.wallpaperSelectedMonitor;
+                    WallpaperService.nextWallpaper(mon);
+                  }
+                }
+              }
+
+              // Random Wallpaper
+              Rectangle {
+                Layout.fillWidth: true
+                height: 40
+                radius: Colors.radiusSmall
+                color: Colors.bgWidget
+                border.color: Colors.border
+                border.width: 1
+
+                SharedWidgets.StateLayer {
+                  id: randWpStateLayer
+                  hovered: randWpHover.containsMouse
+                  pressed: randWpHover.pressed
+                }
+
+                RowLayout {
+                  anchors.centerIn: parent
+                  spacing: 7
+                  Text { text: "󰒝"; color: Colors.fgSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
+                  Text { text: "Random"; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium }
+                }
+
+                MouseArea {
+                  id: randWpHover
+                  anchors.fill: parent
+                  hoverEnabled: true
+                  cursorShape: Qt.PointingHandCursor
+                  onClicked: (mouse) => {
+                    randWpStateLayer.burst(mouse.x, mouse.y);
+                    var mon = settingsRoot.wallpaperSelectedMonitor === "__all__"
+                              ? "" : settingsRoot.wallpaperSelectedMonitor;
+                    WallpaperService.randomWallpaper(mon);
+                  }
+                }
+              }
+
+              // Open Folder
+              Rectangle {
+                Layout.fillWidth: true
+                height: 40
+                radius: Colors.radiusSmall
+                color: Colors.bgWidget
+                border.color: Colors.border
+                border.width: 1
+
+                SharedWidgets.StateLayer {
+                  id: openFolderStateLayer
+                  hovered: openFolderHover.containsMouse
+                  pressed: openFolderHover.pressed
+                }
+
+                RowLayout {
+                  anchors.centerIn: parent
+                  spacing: 7
+                  Text { text: "󰝰"; color: Colors.fgSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
+                  Text { text: "Open Folder"; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium }
+                }
+
+                MouseArea {
+                  id: openFolderHover
+                  anchors.fill: parent
+                  hoverEnabled: true
+                  cursorShape: Qt.PointingHandCursor
+                  onClicked: (mouse) => {
+                    openFolderStateLayer.burst(mouse.x, mouse.y);
+                    WallpaperService.openWallpaperFolder();
+                  }
+                }
+              }
+
+              // Browse custom image
+              Rectangle {
+                Layout.fillWidth: true
+                height: 40
+                radius: Colors.radiusSmall
+                color: Colors.bgWidget
+                border.color: Colors.border
+                border.width: 1
+
+                SharedWidgets.StateLayer {
+                  id: browseWpStateLayer
+                  hovered: browseWpHover.containsMouse
+                  pressed: browseWpHover.pressed
+                }
+
+                RowLayout {
+                  anchors.centerIn: parent
+                  spacing: 7
+                  Text { text: "󰉋"; color: Colors.fgSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
+                  Text { text: "Browse..."; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium }
+                }
+
+                MouseArea {
+                  id: browseWpHover
+                  anchors.fill: parent
+                  hoverEnabled: true
+                  cursorShape: Qt.PointingHandCursor
+                  onClicked: (mouse) => {
+                    browseWpStateLayer.burst(mouse.x, mouse.y);
+                    var mon = settingsRoot.wallpaperSelectedMonitor === "__all__"
+                              ? "" : settingsRoot.wallpaperSelectedMonitor;
+                    settingsRoot.browseWallpaper(mon);
+                  }
+                }
+              }
+            }
+
+            // ---- Settings section -------------------------------------
+            SectionLabel { text: "SETTINGS" }
+
+            GridLayout {
+              columns: 2
+              columnSpacing: Colors.spacingL
+              rowSpacing: Colors.spacingL
+              Layout.fillWidth: true
+
+              // Pywal toggle card (custom — not a Config property but a direct bool)
+              Rectangle {
+                Layout.fillWidth: true
+                implicitHeight: 84
+                radius: Colors.radiusMedium
+                color: Colors.bgWidget
+                border.color: Config.wallpaperRunPywal ? Colors.primary : Colors.border
+                border.width: 1
+                Behavior on border.color { ColorAnimation { duration: 150 } }
+
+                SharedWidgets.StateLayer {
+                  id: pywalStateLayer
+                  hovered: pywalHover.containsMouse
+                  pressed: pywalHover.pressed
+                }
+
+                RowLayout {
+                  anchors { fill: parent; margins: Colors.spacingM }
+                  spacing: Colors.spacingM
+
+                  Text {
+                    text: "󰏘"
+                    color: Config.wallpaperRunPywal ? Colors.primary : Colors.textSecondary
+                    font.family: Colors.fontMono
+                    font.pixelSize: Colors.fontSizeHuge
+                    Behavior on color { ColorAnimation { duration: 150 } }
+                  }
+
+                  ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 3
+                    Text { text: "Run pywal on change"; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.DemiBold }
+                    Text { text: Config.wallpaperRunPywal ? "Enabled" : "Disabled"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall }
+                  }
+
+                  SharedWidgets.DankToggle {
+                    checked: Config.wallpaperRunPywal
+                    onToggled: Config.wallpaperRunPywal = !Config.wallpaperRunPywal
+                  }
+                }
+
+                MouseArea {
+                  id: pywalHover
+                  anchors.fill: parent
+                  hoverEnabled: true
+                  cursorShape: Qt.PointingHandCursor
+                  onClicked: (mouse) => {
+                    pywalStateLayer.burst(mouse.x, mouse.y);
+                    Config.wallpaperRunPywal = !Config.wallpaperRunPywal;
+                  }
+                }
+              }
+            }
+
+            // Auto-cycle interval slider (0 = disabled)
+            ColumnLayout {
+              spacing: Colors.spacingM
+              Layout.fillWidth: true
+
+              RowLayout {
+                Text { text: "Auto-Cycle Interval"; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium }
+                Item { Layout.fillWidth: true }
+                Text {
+                  text: Config.wallpaperCycleInterval === 0
+                        ? "Off"
+                        : Config.wallpaperCycleInterval + " min"
+                  color: Colors.fgSecondary
+                  font.pixelSize: Colors.fontSizeSmall
+                  font.family: Colors.fontMono
+                }
+              }
+
+              Rectangle {
+                Layout.fillWidth: true
+                height: 6
+                color: Colors.surface
+                radius: 3
+
+                Rectangle {
+                  width: parent.width * (Config.wallpaperCycleInterval / 60)
+                  height: parent.height
+                  color: Config.wallpaperCycleInterval > 0 ? Colors.primary : Colors.border
+                  radius: 3
+                  Behavior on width { NumberAnimation { duration: 100 } }
+                  Behavior on color { ColorAnimation { duration: 150 } }
+                }
+
+                MouseArea {
+                  anchors.fill: parent
+                  cursorShape: Qt.PointingHandCursor
+                  function updateCycle(mouse) {
+                    var raw = (mouse.x / width) * 60;
+                    // Snap: 0-2 → 0 (off), then 5-minute steps
+                    if (raw < 2) { Config.wallpaperCycleInterval = 0; return; }
+                    var snapped = Math.round(raw / 5) * 5;
+                    Config.wallpaperCycleInterval = Math.max(5, Math.min(60, snapped));
+                  }
+                  onPressed: (mouse) => updateCycle(mouse)
+                  onPositionChanged: (mouse) => { if (pressed) updateCycle(mouse); }
+                }
+              }
+            }
+
+            // ---- Wallpaper grid --------------------------------------
+            SectionLabel {
+              text: WallpaperService.scanning
+                    ? "SCANNING…"
+                    : ("WALLPAPERS  (" + WallpaperService.availableWallpapers.length + ")")
+            }
+
+            // Rescan + empty-state row
+            RowLayout {
+              Layout.fillWidth: true
+              spacing: 10
+              visible: !WallpaperService.scanning
+
+              Text {
+                visible: WallpaperService.availableWallpapers.length === 0
+                text: "No wallpapers found in search directories."
+                color: Colors.fgDim
+                font.pixelSize: Colors.fontSizeMedium
+                Layout.fillWidth: true
+                wrapMode: Text.WordWrap
+              }
+
+              Item { Layout.fillWidth: true; visible: WallpaperService.availableWallpapers.length > 0 }
+
+              Rectangle {
+                implicitWidth: rescanRow.implicitWidth + 20
+                height: 32
+                radius: Colors.radiusXS
+                color: Colors.bgWidget
+                border.color: Colors.border
+                border.width: 1
+
+                SharedWidgets.StateLayer {
+                  id: rescanStateLayer
+                  hovered: rescanHover.containsMouse
+                  pressed: rescanHover.pressed
+                }
+
+                RowLayout {
+                  id: rescanRow
+                  anchors.centerIn: parent
+                  spacing: 6
+                  Text { text: "󰑐"; color: Colors.fgSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium }
+                  Text { text: "Rescan"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
+                }
+
+                MouseArea {
+                  id: rescanHover
+                  anchors.fill: parent
+                  hoverEnabled: true
+                  cursorShape: Qt.PointingHandCursor
+                  onClicked: (mouse) => {
+                    rescanStateLayer.burst(mouse.x, mouse.y);
+                    WallpaperService.scanWallpapers();
+                  }
+                }
+              }
+            }
+
+            // Scanning spinner placeholder
+            Item {
+              visible: WallpaperService.scanning
+              Layout.fillWidth: true
+              height: 40
+
+              RowLayout {
+                anchors.centerIn: parent
+                spacing: Colors.spacingS
+                Text {
+                  text: "󰑐"
+                  color: Colors.fgDim
+                  font.family: Colors.fontMono
+                  font.pixelSize: Colors.fontSizeXL
+
+                  RotationAnimator on rotation {
+                    from: 0; to: 360
+                    duration: 1200
+                    loops: Animation.Infinite
+                    running: WallpaperService.scanning
+                  }
+                }
+                Text { text: "Scanning directories…"; color: Colors.fgDim; font.pixelSize: Colors.fontSizeMedium }
+              }
+            }
+
+            // Grid of thumbnail cards
+            // We use a Flow layout so thumbnails wrap naturally inside the panel width.
+            Flow {
+              visible: !WallpaperService.scanning && WallpaperService.availableWallpapers.length > 0
+              Layout.fillWidth: true
+              spacing: Colors.spacingS
+
+              Repeater {
+                model: WallpaperService.availableWallpapers
+
+                delegate: Item {
+                  required property var modelData
+                  required property int index
+
+                  // Resolve the active path for the selected monitor slot
+                  readonly property string activePath: {
+                    var key = settingsRoot.wallpaperSelectedMonitor || "__all__";
+                    return WallpaperService.wallpapers[key]
+                           || WallpaperService.wallpapers["__all__"]
+                           || "";
+                  }
+                  readonly property bool isActive: modelData.path === activePath
+
+                  width: 108
+                  height: 80
+
+                  Rectangle {
+                    anchors.fill: parent
+                    radius: Colors.radiusSmall
+                    color: isActive ? Colors.highlight : Colors.bgWidget
+                    border.color: isActive ? Colors.primary : Colors.border
+                    border.width: isActive ? 2 : 1
+                    clip: true
+
+                    Behavior on border.color { ColorAnimation { duration: 150 } }
+                    Behavior on color { ColorAnimation { duration: 150 } }
+
+                    Image {
+                      anchors.fill: parent
+                      source: "file://" + modelData.path
+                      fillMode: Image.PreserveAspectCrop
+                      asynchronous: true
+                      smooth: true
+                      cache: false
+
+                      // Fade-in when ready
+                      opacity: status === Image.Ready ? 1.0 : 0.0
+                      Behavior on opacity { NumberAnimation { duration: 200 } }
+                    }
+
+                    // Loading placeholder
+                    Text {
+                      anchors.centerIn: parent
+                      text: "󰸉"
+                      color: Colors.fgDim
+                      font.family: Colors.fontMono
+                      font.pixelSize: Colors.fontSizeHuge
+                      visible: parent.children[0].status !== Image.Ready
+                    }
+
+                    // Active badge
+                    Rectangle {
+                      anchors { top: parent.top; right: parent.right; margins: 5 }
+                      visible: isActive
+                      width: 18; height: 18; radius: height / 2
+                      color: Colors.primary
+
+                      Text {
+                        anchors.centerIn: parent
+                        text: "󰄬"
+                        color: Colors.text
+                        font.family: Colors.fontMono
+                        font.pixelSize: Colors.fontSizeXS
+                      }
+                    }
+
+                    // Hover overlay + filename tooltip
+                    Rectangle {
+                      anchors.fill: parent
+                      color: thumbMouse.containsMouse ? Qt.rgba(0, 0, 0, 0.35) : "transparent"
+                      Behavior on color { ColorAnimation { duration: 120 } }
+                    }
+
+                    Text {
+                      anchors {
+                        bottom: parent.bottom
+                        left: parent.left
+                        right: parent.right
+                        margins: 4
+                      }
+                      text: modelData.filename
+                      color: "#ffffff"
+                      font.pixelSize: Colors.fontSizeXS
+                      elide: Text.ElideLeft
+                      visible: thumbMouse.containsMouse
+                    }
+
+                    MouseArea {
+                      id: thumbMouse
+                      anchors.fill: parent
+                      hoverEnabled: true
+                      cursorShape: Qt.PointingHandCursor
+                      onClicked: {
+                        var mon = settingsRoot.wallpaperSelectedMonitor === "__all__"
+                                  ? "" : settingsRoot.wallpaperSelectedMonitor;
+                        WallpaperService.setWallpaper(modelData.path, mon);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
+            // Info callout
+            Rectangle {
+              Layout.fillWidth: true
+              implicitHeight: wpInfoLayout.implicitHeight + 24
+              radius: Colors.radiusMedium
+              color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.07)
+              border.color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.22)
+              border.width: 1
+
+              ColumnLayout {
+                id: wpInfoLayout
+                anchors { left: parent.left; right: parent.right; top: parent.top; margins: Colors.spacingM }
+                spacing: 6
+
+                RowLayout {
+                  spacing: Colors.spacingS
+                  Text {
+                    text: "󰋗"
+                    color: Colors.primary
+                    font.family: Colors.fontMono
+                    font.pixelSize: Colors.fontSizeLarge
+                    Layout.alignment: Qt.AlignTop
+                  }
+                  Text {
+                    text: "Wallpaper search directories"
+                    color: Colors.text
+                    font.pixelSize: Colors.fontSizeMedium
+                    font.weight: Font.DemiBold
+                  }
+                }
+
+                Repeater {
+                  model: WallpaperService.wallpaperSearchDirs
+                  delegate: Text {
+                    required property string modelData
+                    text: "  " + modelData
+                    color: Colors.fgSecondary
+                    font.pixelSize: Colors.fontSizeXS
+                    font.family: Colors.fontMono
+                    Layout.fillWidth: true
+                    elide: Text.ElideLeft
+                  }
+                }
+
+                Text {
+                  text: "Requires swww, hyprctl hyprpaper, or swaybg to apply wallpapers."
+                  color: Colors.fgDim
+                  font.pixelSize: Colors.fontSizeXS
+                  wrapMode: Text.WordWrap
+                  Layout.fillWidth: true
+                  Layout.topMargin: 4
+                }
+              }
+            }
+          }
+
+          ColumnLayout {
+            visible: activeTab === "layout"
+            spacing: Colors.spacingXL
+            Layout.fillWidth: true
+
+            // Configure Displays entry point
+            Rectangle {
+              Layout.fillWidth: true
+              height: 48
+              radius: Colors.radiusSmall
+              color: configDisplaysHover.containsMouse
+                     ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.18)
+                     : Colors.bgWidget
+              border.color: Colors.primary
+              border.width: 1
+              Behavior on color { ColorAnimation { duration: 160 } }
+
+              RowLayout {
+                anchors { fill: parent; leftMargin: 16; rightMargin: 16 }
+                spacing: 10
+                Text { text: "󰍺"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL }
+                Text { text: "Configure Displays"; color: Colors.text; font.weight: Font.Bold; font.pixelSize: Colors.fontSizeMedium }
+                Item { Layout.fillWidth: true }
+                Text { text: "Arrange, resize & scale monitors →"; color: Colors.fgDim; font.pixelSize: Colors.fontSizeSmall }
+              }
+
+              MouseArea {
+                id: configDisplaysHover
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                  settingsRoot.close();
+                  Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleDisplayConfig"]);
+                }
+              }
+            }
+
+            RowLayout {
+              spacing: Colors.spacingXL
+              Text { text: "Master Layout"; color: Colors.text; font.pixelSize: Colors.fontSizeLarge; Layout.fillWidth: true }
+              SharedWidgets.DankToggle {
+                checked: settingsRoot.layoutIsMaster
+                onToggled: {
+                  var newLayout = !checked ? "master" : "dwindle";
+                  Quickshell.execDetached(["hyprctl", "keyword", "general:layout", newLayout]);
+                  settingsRoot.layoutIsMaster = !checked;
+                }
               }
             }
 
@@ -367,7 +1218,7 @@ PanelWindow {
           // OSD tab
           ColumnLayout {
             visible: activeTab === "osd"
-            spacing: 20
+            spacing: Colors.spacingXL
             Layout.fillWidth: true
 
             SectionLabel { text: "POSITION" }
@@ -386,7 +1237,7 @@ PanelWindow {
                 { value: "bottom", label: "Bottom" },
                 { value: "bottom_right", label: "Bottom Right" }
               ]
-              onSelected: (v) => Config.osdPosition = v
+              onModeSelected: (v) => Config.osdPosition = v
             }
 
             SectionLabel { text: "STYLE" }
@@ -398,13 +1249,13 @@ PanelWindow {
                 { value: "circular", label: "Circular" },
                 { value: "pill", label: "Pill" }
               ]
-              onSelected: (v) => Config.osdStyle = v
+              onModeSelected: (v) => Config.osdStyle = v
             }
 
             GridLayout {
               columns: 2
-              columnSpacing: 16
-              rowSpacing: 16
+              columnSpacing: Colors.spacingL
+              rowSpacing: Colors.spacingL
               Layout.fillWidth: true
 
               ToggleCard { label: "Volume Overdrive"; icon: "󰝝"; configKey: "osdOverdrive" }
@@ -434,13 +1285,13 @@ PanelWindow {
           // Dock tab
           ColumnLayout {
             visible: activeTab === "dock"
-            spacing: 20
+            spacing: Colors.spacingXL
             Layout.fillWidth: true
 
             GridLayout {
               columns: 2
-              columnSpacing: 16
-              rowSpacing: 16
+              columnSpacing: Colors.spacingL
+              rowSpacing: Colors.spacingL
               Layout.fillWidth: true
 
               ToggleCard { label: "Dock Enabled"; icon: "󰍜"; configKey: "dockEnabled" }
@@ -457,7 +1308,7 @@ PanelWindow {
                 { value: "top", label: "Top" },
                 { value: "bottom", label: "Bottom" }
               ]
-              onSelected: (v) => Config.dockPosition = v
+              onModeSelected: (v) => Config.dockPosition = v
             }
 
             ConfigSlider {
@@ -472,13 +1323,13 @@ PanelWindow {
           // Widgets tab
           ColumnLayout {
             visible: activeTab === "widgets"
-            spacing: 20
+            spacing: Colors.spacingXL
             Layout.fillWidth: true
 
             GridLayout {
               columns: 2
-              columnSpacing: 16
-              rowSpacing: 16
+              columnSpacing: Colors.spacingL
+              rowSpacing: Colors.spacingL
               Layout.fillWidth: true
 
               ToggleCard { label: "Desktop Widgets"; icon: "󰖲"; configKey: "desktopWidgetsEnabled" }
@@ -488,23 +1339,32 @@ PanelWindow {
             Rectangle {
               Layout.fillWidth: true
               height: 42
-              radius: 10
-              color: editWidgetsHover.containsMouse ? Qt.darker(Colors.primary, 1.1) : Colors.surface
+              radius: Colors.radiusSmall
+              color: Colors.surface
               border.color: Colors.primary
               border.width: 1
 
+              SharedWidgets.StateLayer {
+                id: editWidgetsStateLayer
+                hovered: editWidgetsHover.containsMouse
+                pressed: editWidgetsHover.pressed
+                stateColor: Colors.primary
+              }
+
               RowLayout {
                 anchors.centerIn: parent
-                spacing: 8
-                Text { text: "󰏫"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 14 }
-                Text { text: "Edit Widgets"; color: Colors.fgMain; font.weight: Font.Bold; font.pixelSize: 12 }
+                spacing: Colors.spacingS
+                Text { text: "󰏫"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
+                Text { text: "Edit Widgets"; color: Colors.text; font.weight: Font.Bold; font.pixelSize: Colors.fontSizeMedium }
               }
 
               MouseArea {
                 id: editWidgetsHover
                 anchors.fill: parent
                 hoverEnabled: true
-                onClicked: {
+                cursorShape: Qt.PointingHandCursor
+                onClicked: (mouse) => {
+                  editWidgetsStateLayer.burst(mouse.x, mouse.y);
                   DesktopWidgetRegistry.editMode = true;
                   settingsRoot.close();
                 }
@@ -515,13 +1375,13 @@ PanelWindow {
           // Lock Screen tab
           ColumnLayout {
             visible: activeTab === "lockscreen"
-            spacing: 20
+            spacing: Colors.spacingXL
             Layout.fillWidth: true
 
             GridLayout {
               columns: 2
-              columnSpacing: 16
-              rowSpacing: 16
+              columnSpacing: Colors.spacingL
+              rowSpacing: Colors.spacingL
               Layout.fillWidth: true
 
               ToggleCard { label: "Compact Mode"; icon: "󰘖"; configKey: "lockScreenCompact" }
@@ -540,13 +1400,737 @@ PanelWindow {
               onMoved: (v) => Config.lockScreenCountdown = v
             }
           }
+
+          // Privacy tab
+          ColumnLayout {
+            visible: activeTab === "privacy"
+            spacing: Colors.spacingXL
+            Layout.fillWidth: true
+
+            SectionLabel { text: "INDICATORS" }
+
+            GridLayout {
+              columns: 2
+              columnSpacing: Colors.spacingL
+              rowSpacing: Colors.spacingL
+              Layout.fillWidth: true
+
+              ToggleCard { label: "Privacy Indicators"; icon: "󰒃"; configKey: "privacyIndicatorsEnabled" }
+              ToggleCard { label: "Camera Monitoring"; icon: "󰄀"; configKey: "privacyCameraMonitoring" }
+            }
+
+            Rectangle {
+              Layout.fillWidth: true
+              implicitHeight: noteRow.implicitHeight + 24
+              radius: Colors.radiusMedium
+              color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.08)
+              border.color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.25)
+              border.width: 1
+
+              RowLayout {
+                id: noteRow
+                anchors { left: parent.left; right: parent.right; top: parent.top; margins: Colors.spacingM }
+                spacing: 10
+
+                Text {
+                  text: "󰋗"
+                  color: Colors.primary
+                  font.family: Colors.fontMono
+                  font.pixelSize: Colors.fontSizeXL
+                  Layout.alignment: Qt.AlignTop
+                }
+
+                Text {
+                  text: "Privacy indicators appear in the bar when microphone, camera, or screen sharing is active."
+                  color: Colors.fgSecondary
+                  font.pixelSize: Colors.fontSizeMedium
+                  wrapMode: Text.WordWrap
+                  Layout.fillWidth: true
+                }
+              }
+            }
+          }
+
+          // Power tab
+          ColumnLayout {
+            visible: activeTab === "power"
+            spacing: Colors.spacingXL
+            Layout.fillWidth: true
+
+            SectionLabel { text: "POWER MENU" }
+
+            ConfigSlider {
+              label: "Powermenu Countdown"
+              min: 1000
+              max: 10000
+              step: 500
+              value: Config.powermenuCountdown
+              unit: "ms"
+              onMoved: (v) => Config.powermenuCountdown = v
+            }
+
+            SectionLabel { text: "DISPLAY" }
+
+            GridLayout {
+              columns: 2
+              columnSpacing: Colors.spacingL
+              rowSpacing: Colors.spacingL
+              Layout.fillWidth: true
+
+              ToggleCard { label: "Screen Borders"; icon: "󰩪"; configKey: "showScreenBorders" }
+              ToggleCard { label: "Idle Inhibitor"; icon: "󰈈"; configKey: "idleInhibitEnabled" }
+            }
+          }
+
+          // Keybinds tab
+          ColumnLayout {
+            visible: activeTab === "keybinds"
+            spacing: Colors.spacingL
+            Layout.fillWidth: true
+
+            // Search bar
+            Rectangle {
+              Layout.fillWidth: true
+              height: 40
+              radius: Colors.radiusSmall
+              color: Colors.bgWidget
+              border.color: keybindsSearch.activeFocus ? Colors.primary : Colors.border
+              border.width: 1
+              Behavior on border.color { ColorAnimation { duration: 150 } }
+
+              RowLayout {
+                anchors { fill: parent; leftMargin: 12; rightMargin: 12 }
+                spacing: Colors.spacingS
+
+                Text {
+                  text: "󰍉"
+                  color: Colors.fgDim
+                  font.family: Colors.fontMono
+                  font.pixelSize: Colors.fontSizeXL
+                }
+
+                TextInput {
+                  id: keybindsSearch
+                  Layout.fillWidth: true
+                  color: Colors.text
+                  font.pixelSize: Colors.fontSizeMedium
+                  onTextChanged: settingsRoot.keybindsFilter = text.toLowerCase()
+
+                  Text {
+                    anchors.fill: parent
+                    text: "Search keybindings..."
+                    color: Colors.fgDim
+                    font.pixelSize: parent.font.pixelSize
+                    visible: parent.text.length === 0
+                  }
+                }
+
+                Text {
+                  text: "󰅖"
+                  color: Colors.fgDim
+                  font.family: Colors.fontMono
+                  font.pixelSize: Colors.fontSizeLarge
+                  visible: keybindsSearch.text.length > 0
+
+                  MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: keybindsSearch.text = ""
+                  }
+                }
+              }
+            }
+
+            // Loading state
+            Text {
+              visible: keybindsList.length === 0
+              text: "Loading keybindings…"
+              color: Colors.fgDim
+              font.pixelSize: Colors.fontSizeMedium
+              Layout.alignment: Qt.AlignHCenter
+              Layout.topMargin: 20
+            }
+
+            // Keybind rows via Repeater
+            Repeater {
+              model: {
+                var filter = settingsRoot.keybindsFilter;
+                var list = settingsRoot.keybindsList;
+                if (!filter) return list;
+                return list.filter(function(b) {
+                  var haystack = (b.mods + " " + b.key + " " + b.dispatcher + " " + b.arg).toLowerCase();
+                  return haystack.indexOf(filter) !== -1;
+                });
+              }
+
+              delegate: Rectangle {
+                Layout.fillWidth: true
+                implicitHeight: kbRow.implicitHeight + 16
+                radius: Colors.radiusXS
+                color: Colors.bgWidget
+                border.color: Colors.border
+                border.width: 1
+
+                RowLayout {
+                  id: kbRow
+                  anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; leftMargin: Colors.spacingM; rightMargin: Colors.spacingM }
+                  spacing: 10
+
+                  // Chord badge
+                  Rectangle {
+                    implicitWidth: chordText.implicitWidth + 16
+                    height: 26
+                    radius: 6
+                    color: Colors.highlight
+                    border.color: Colors.primary
+                    border.width: 1
+
+                    Text {
+                      id: chordText
+                      anchors.centerIn: parent
+                      text: {
+                        var parts = [];
+                        if (modelData.mods) parts.push(modelData.mods);
+                        if (modelData.key)  parts.push(modelData.key);
+                        return parts.join(" + ");
+                      }
+                      color: Colors.primary
+                      font.family: Colors.fontMono
+                      font.pixelSize: Colors.fontSizeSmall
+                      font.weight: Font.DemiBold
+                    }
+                  }
+
+                  // Dispatcher + arg
+                  ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 2
+
+                    Text {
+                      text: modelData.dispatcher
+                      color: Colors.text
+                      font.pixelSize: Colors.fontSizeMedium
+                      font.weight: Font.DemiBold
+                      elide: Text.ElideRight
+                      Layout.fillWidth: true
+                    }
+
+                    Text {
+                      text: modelData.arg || "—"
+                      color: Colors.fgSecondary
+                      font.pixelSize: Colors.fontSizeSmall
+                      font.family: modelData.arg ? Colors.fontMono : ""
+                      elide: Text.ElideRight
+                      Layout.fillWidth: true
+                      visible: modelData.arg.length > 0 || true
+                    }
+                  }
+                }
+              }
+            }
+
+            // Refresh button
+            Rectangle {
+              Layout.fillWidth: true
+              height: 42
+              radius: Colors.radiusSmall
+              color: Colors.bgWidget
+              border.color: Colors.border
+              border.width: 1
+
+              SharedWidgets.StateLayer {
+                id: kbRefreshStateLayer
+                hovered: kbRefreshHover.containsMouse
+                pressed: kbRefreshHover.pressed
+              }
+
+              RowLayout {
+                anchors.centerIn: parent
+                spacing: Colors.spacingS
+                Text { text: "󰑐"; color: Colors.fgSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
+                Text { text: "Refresh"; color: Colors.text; font.pixelSize: Colors.fontSizeMedium }
+              }
+
+              MouseArea {
+                id: kbRefreshHover
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: (mouse) => {
+                  kbRefreshStateLayer.burst(mouse.x, mouse.y);
+                  settingsRoot.keybindsList = [];
+                  hyprBindsProc.running = true;
+                }
+              }
+            }
+          }
+
+          // Plugins tab
+          ColumnLayout {
+            visible: activeTab === "plugins"
+            spacing: Colors.spacingXL
+            Layout.fillWidth: true
+
+            // Header row: plugin count + scan button
+            RowLayout {
+              Layout.fillWidth: true
+              spacing: Colors.spacingM
+
+              ColumnLayout {
+                spacing: 2
+                Layout.fillWidth: true
+
+                Text {
+                  text: PluginService.plugins.length + " plugin" + (PluginService.plugins.length !== 1 ? "s" : "") + " found"
+                  color: Colors.text
+                  font.pixelSize: Colors.fontSizeMedium
+                  font.weight: Font.Medium
+                }
+
+                Text {
+                  text: PluginService.plugins.filter(function(p) { return p.enabled; }).length + " enabled"
+                  color: Colors.fgSecondary
+                  font.pixelSize: Colors.fontSizeSmall
+                }
+              }
+
+              // Scan / Refresh button
+              Rectangle {
+                implicitWidth: scanRow.implicitWidth + 24
+                height: 36
+                radius: Colors.radiusSmall
+                color: Colors.bgWidget
+                border.color: Colors.border
+                border.width: 1
+
+                SharedWidgets.StateLayer {
+                  id: scanStateLayer
+                  hovered: scanHover.containsMouse
+                  pressed: scanHover.pressed
+                }
+
+                RowLayout {
+                  id: scanRow
+                  anchors.centerIn: parent
+                  spacing: 7
+                  Text {
+                    text: "󰑐"
+                    color: Colors.fgSecondary
+                    font.family: Colors.fontMono
+                    font.pixelSize: Colors.fontSizeLarge
+                  }
+                  Text {
+                    text: "Scan"
+                    color: Colors.text
+                    font.pixelSize: Colors.fontSizeMedium
+                    font.weight: Font.Medium
+                  }
+                }
+
+                MouseArea {
+                  id: scanHover
+                  anchors.fill: parent
+                  hoverEnabled: true
+                  cursorShape: Qt.PointingHandCursor
+                  onClicked: (mouse) => {
+                    scanStateLayer.burst(mouse.x, mouse.y);
+                    PluginService.scanPlugins();
+                  }
+                }
+              }
+            }
+
+            // Empty state
+            ColumnLayout {
+              visible: PluginService.plugins.length === 0
+              Layout.fillWidth: true
+              Layout.topMargin: 24
+              spacing: 10
+
+              Text {
+                text: "󰏗"
+                color: Colors.textDisabled
+                font.family: Colors.fontMono
+                font.pixelSize: Colors.fontSizeHuge
+                Layout.alignment: Qt.AlignHCenter
+              }
+
+              Text {
+                text: "No plugins found"
+                color: Colors.textDisabled
+                font.pixelSize: Colors.fontSizeLarge
+                font.weight: Font.DemiBold
+                Layout.alignment: Qt.AlignHCenter
+              }
+
+              Text {
+                text: "Add a folder with manifest.json to get started"
+                color: Colors.fgDim
+                font.pixelSize: Colors.fontSizeSmall
+                Layout.alignment: Qt.AlignHCenter
+              }
+            }
+
+            // Plugin list
+            Repeater {
+              model: PluginService.plugins
+
+              delegate: Rectangle {
+                Layout.fillWidth: true
+                implicitHeight: pluginCardRow.implicitHeight + 28
+                radius: Colors.radiusMedium
+                color: Colors.bgWidget
+                border.color: modelData.enabled ? Colors.primary : Colors.border
+                border.width: 1
+
+                Behavior on border.color { ColorAnimation { duration: 180 } }
+
+                RowLayout {
+                  id: pluginCardRow
+                  anchors {
+                    left: parent.left
+                    right: parent.right
+                    top: parent.top
+                    margins: Colors.spacingM
+                  }
+                  spacing: Colors.spacingM
+
+                  // Plugin icon
+                  Rectangle {
+                    width: 38
+                    height: 38
+                    radius: Colors.radiusSmall
+                    color: modelData.enabled
+                      ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.12)
+                      : Colors.withAlpha(Colors.text, 0.06)
+                    Layout.alignment: Qt.AlignVCenter
+
+                    Text {
+                      anchors.centerIn: parent
+                      text: modelData.type === "bar-widget" ? "󰖯" : "󰖲"
+                      color: modelData.enabled ? Colors.primary : Colors.fgDim
+                      font.family: Colors.fontMono
+                      font.pixelSize: Colors.fontSizeXL
+                      Behavior on color { ColorAnimation { duration: 180 } }
+                    }
+                  }
+
+                  // Info column
+                  ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 3
+
+                    RowLayout {
+                      spacing: Colors.spacingS
+
+                      Text {
+                        text: modelData.name
+                        color: Colors.text
+                        font.pixelSize: Colors.fontSizeMedium
+                        font.weight: Font.DemiBold
+                        elide: Text.ElideRight
+                      }
+
+                      // Version chip
+                      Rectangle {
+                        implicitWidth: verLabel.implicitWidth + 10
+                        height: 18
+                        radius: height / 2
+                        color: Colors.withAlpha(Colors.text, 0.08)
+
+                        Text {
+                          id: verLabel
+                          anchors.centerIn: parent
+                          text: "v" + modelData.version
+                          color: Colors.fgSecondary
+                          font.pixelSize: Colors.fontSizeXS
+                          font.family: Colors.fontMono
+                        }
+                      }
+
+                      // Type badge
+                      Rectangle {
+                        implicitWidth: typeLabel.implicitWidth + 10
+                        height: 18
+                        radius: height / 2
+                        color: modelData.type === "bar-widget"
+                          ? Qt.rgba(Colors.accent.r, Colors.accent.g, Colors.accent.b, 0.14)
+                          : Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.14)
+
+                        Text {
+                          id: typeLabel
+                          anchors.centerIn: parent
+                          text: modelData.type === "bar-widget" ? "Bar" : "Desktop"
+                          color: modelData.type === "bar-widget" ? Colors.accent : Colors.primary
+                          font.pixelSize: Colors.fontSizeXS
+                          font.weight: Font.DemiBold
+                        }
+                      }
+                    }
+
+                    Text {
+                      visible: modelData.description.length > 0
+                      text: modelData.description
+                      color: Colors.fgSecondary
+                      font.pixelSize: Colors.fontSizeSmall
+                      elide: Text.ElideRight
+                      Layout.fillWidth: true
+                    }
+
+                    Text {
+                      text: "by " + modelData.author
+                      color: Colors.fgDim
+                      font.pixelSize: Colors.fontSizeXS
+                    }
+                  }
+
+                  // Enable/disable toggle
+                  SharedWidgets.DankToggle {
+                    checked: modelData.enabled
+                    Layout.alignment: Qt.AlignVCenter
+                    onToggled: {
+                      if (modelData.enabled)
+                        PluginService.disablePlugin(modelData.id);
+                      else
+                        PluginService.enablePlugin(modelData.id);
+                    }
+                  }
+                }
+              }
+            }
+
+            // Info callout
+            Rectangle {
+              Layout.fillWidth: true
+              implicitHeight: pluginInfoRow.implicitHeight + 28
+              radius: Colors.radiusMedium
+              color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.07)
+              border.color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.22)
+              border.width: 1
+
+              ColumnLayout {
+                id: pluginInfoRow
+                anchors { left: parent.left; right: parent.right; top: parent.top; margins: Colors.spacingM }
+                spacing: 6
+
+                RowLayout {
+                  spacing: Colors.spacingS
+
+                  Text {
+                    text: "󰋗"
+                    color: Colors.primary
+                    font.family: Colors.fontMono
+                    font.pixelSize: Colors.fontSizeLarge
+                    Layout.alignment: Qt.AlignTop
+                  }
+
+                  Text {
+                    text: "How to install plugins"
+                    color: Colors.text
+                    font.pixelSize: Colors.fontSizeMedium
+                    font.weight: Font.DemiBold
+                  }
+                }
+
+                Text {
+                  text: "Plugin directory:  ~/.config/quickshell/plugins/"
+                  color: Colors.fgSecondary
+                  font.pixelSize: Colors.fontSizeSmall
+                  font.family: Colors.fontMono
+                  Layout.fillWidth: true
+                  wrapMode: Text.WrapAnywhere
+                }
+
+                Text {
+                  text: "Each plugin is a folder containing a manifest.json and a QML file.\n"
+                      + "manifest.json fields:  id, name, description, author, version, type (\"bar-widget\" or \"desktop-widget\"), main"
+                  color: Colors.fgSecondary
+                  font.pixelSize: Colors.fontSizeSmall
+                  wrapMode: Text.WordWrap
+                  Layout.fillWidth: true
+                }
+              }
+            }
+          }
+
+          // About tab
+          ColumnLayout {
+            visible: activeTab === "about"
+            spacing: Colors.spacingXL
+            Layout.fillWidth: true
+
+            // Shell identity card
+            Rectangle {
+              Layout.fillWidth: true
+              implicitHeight: shellCard.implicitHeight + 32
+              radius: Colors.radiusLarge
+              color: Colors.bgWidget
+              border.color: Colors.border
+              border.width: 1
+
+              ColumnLayout {
+                id: shellCard
+                anchors { left: parent.left; right: parent.right; top: parent.top; margins: 20 }
+                spacing: 6
+
+                RowLayout {
+                  spacing: Colors.spacingM
+
+                  Text {
+                    text: "󱗼"
+                    color: Colors.primary
+                    font.family: Colors.fontMono
+                    font.pixelSize: Colors.fontSizeHuge
+                  }
+
+                  ColumnLayout {
+                    spacing: 2
+                    Text {
+                      text: "Quickshell"
+                      color: Colors.text
+                      font.pixelSize: Colors.fontSizeHuge
+                      font.weight: Font.Bold
+                    }
+                    Text {
+                      text: "QML Desktop Shell"
+                      color: Colors.fgSecondary
+                      font.pixelSize: Colors.fontSizeMedium
+                    }
+                  }
+                }
+              }
+            }
+
+            SectionLabel { text: "SYSTEM INFO" }
+
+            // Info rows
+            Repeater {
+              model: [
+                { icon: "󰍹", label: "Hostname", value: settingsRoot.aboutHostname || "…" },
+                { icon: "󰌢", label: "Kernel",   value: settingsRoot.aboutKernel   || "…" },
+                { icon: "󱑎", label: "Uptime",   value: settingsRoot.aboutUptime   || "…" }
+              ]
+
+              delegate: Rectangle {
+                Layout.fillWidth: true
+                height: 52
+                radius: Colors.radiusXS
+                color: Colors.bgWidget
+                border.color: Colors.border
+                border.width: 1
+
+                RowLayout {
+                  anchors { fill: parent; leftMargin: Colors.spacingM; rightMargin: Colors.spacingM }
+                  spacing: Colors.spacingM
+
+                  Text {
+                    text: modelData.icon
+                    color: Colors.primary
+                    font.family: Colors.fontMono
+                    font.pixelSize: Colors.fontSizeXL
+                  }
+
+                  Text {
+                    text: modelData.label
+                    color: Colors.fgSecondary
+                    font.pixelSize: Colors.fontSizeMedium
+                    Layout.preferredWidth: 80
+                  }
+
+                  Text {
+                    text: modelData.value
+                    color: Colors.text
+                    font.pixelSize: Colors.fontSizeMedium
+                    font.family: Colors.fontMono
+                    elide: Text.ElideRight
+                    Layout.fillWidth: true
+                  }
+                }
+              }
+            }
+
+            SectionLabel { text: "ACTIONS" }
+
+            // Restart Shell button
+            Rectangle {
+              Layout.fillWidth: true
+              height: 48
+              radius: Colors.radiusSmall
+              color: Colors.primary
+
+              SharedWidgets.StateLayer {
+                id: restartStateLayer
+                hovered: restartHover.containsMouse
+                pressed: restartHover.pressed
+                stateColor: Colors.primary
+              }
+
+              RowLayout {
+                anchors.centerIn: parent
+                spacing: 10
+                Text { text: "󰜉"; color: Colors.text; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL }
+                Text { text: "Restart Shell"; color: Colors.text; font.weight: Font.Bold; font.pixelSize: Colors.fontSizeMedium }
+              }
+
+              MouseArea {
+                id: restartHover
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: (mouse) => {
+                  restartStateLayer.burst(mouse.x, mouse.y);
+                  settingsRoot.close();
+                  restartShellProc.running = true;
+                }
+              }
+            }
+
+            SectionLabel { text: "CREDITS" }
+
+            Rectangle {
+              Layout.fillWidth: true
+              implicitHeight: creditsContent.implicitHeight + 24
+              radius: Colors.radiusMedium
+              color: Colors.bgWidget
+              border.color: Colors.border
+              border.width: 1
+
+              ColumnLayout {
+                id: creditsContent
+                anchors { left: parent.left; right: parent.right; top: parent.top; margins: 16 }
+                spacing: Colors.spacingS
+
+                Text {
+                  text: "Built with Quickshell"
+                  color: Colors.text
+                  font.pixelSize: Colors.fontSizeMedium
+                  font.weight: Font.DemiBold
+                }
+                Text {
+                  text: "Powered by Qt / QML"
+                  color: Colors.fgSecondary
+                  font.pixelSize: Colors.fontSizeMedium
+                }
+                Text {
+                  text: "Icons: Nerd Fonts"
+                  color: Colors.fgSecondary
+                  font.pixelSize: Colors.fontSizeMedium
+                }
+                Text {
+                  text: "Theming: pywal"
+                  color: Colors.fgSecondary
+                  font.pixelSize: Colors.fontSizeMedium
+                }
+              }
+            }
+          }
         }
       }
     }
 
     component SectionLabel: Text {
       color: Colors.textDisabled
-      font.pixelSize: 10
+      font.pixelSize: Colors.fontSizeXS
       font.weight: Font.Black
       font.letterSpacing: 1.2
       Layout.topMargin: 6
@@ -558,23 +2142,31 @@ PanelWindow {
       property string tabId
       Layout.fillWidth: true
       height: 44
-      radius: 10
-      color: activeTab === tabId ? Colors.highlight : (tabMouse.containsMouse ? Colors.highlightLight : "transparent")
+      radius: Colors.radiusSmall
+      color: activeTab === tabId ? Colors.highlight : "transparent"
+      Behavior on color { ColorAnimation { duration: 160 } }
+
+      SharedWidgets.StateLayer {
+        id: tabStateLayer
+        hovered: tabMouse.containsMouse
+        pressed: tabMouse.pressed
+        visible: activeTab !== tabId
+      }
 
       RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: 16
-        spacing: 14
+        anchors.leftMargin: Colors.spacingL
+        spacing: Colors.spacingM
         Text {
           text: icon
           color: activeTab === tabId ? Colors.primary : Colors.fgDim
           font.family: Colors.fontMono
-          font.pixelSize: 18
+          font.pixelSize: Colors.fontSizeXL
         }
         Text {
           text: label
-          color: activeTab === tabId ? Colors.fgMain : Colors.fgSecondary
-          font.pixelSize: 13
+          color: activeTab === tabId ? Colors.text : Colors.fgSecondary
+          font.pixelSize: Colors.fontSizeMedium
           font.weight: activeTab === tabId ? Font.DemiBold : Font.Normal
         }
       }
@@ -583,7 +2175,11 @@ PanelWindow {
         id: tabMouse
         anchors.fill: parent
         hoverEnabled: true
-        onClicked: activeTab = tabId
+        cursorShape: Qt.PointingHandCursor
+        onClicked: (mouse) => {
+          tabStateLayer.burst(mouse.x, mouse.y);
+          activeTab = tabId;
+        }
       }
     }
 
@@ -595,16 +2191,16 @@ PanelWindow {
       property real step: 1
       property string unit: step < 1 ? "%" : "px"
       signal moved(real v)
-      spacing: 12
+      spacing: Colors.spacingM
       Layout.fillWidth: true
 
       RowLayout {
-        Text { text: label; color: Colors.fgMain; font.pixelSize: 13; font.weight: Font.Medium }
+        Text { text: label; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium }
         Item { Layout.fillWidth: true }
         Text {
           text: (unit === "ms" ? Math.round(value) : (step < 1 ? Math.round(value * 100) : Math.round(value))) + unit
           color: Colors.fgSecondary
-          font.pixelSize: 11
+          font.pixelSize: Colors.fontSizeSmall
           font.family: Colors.fontMono
         }
       }
@@ -622,6 +2218,7 @@ PanelWindow {
         }
         MouseArea {
           anchors.fill: parent
+          cursorShape: Qt.PointingHandCursor
           function updateValue(mouse) {
             var raw = min + (mouse.x / width) * (max - min);
             var val = Math.round(raw / step) * step;
@@ -635,27 +2232,6 @@ PanelWindow {
       }
     }
 
-    component Switch: Rectangle {
-      property bool checked
-      signal toggled()
-      width: 40
-      height: 20
-      radius: 10
-      color: checked ? Colors.primary : Colors.surface
-
-      Rectangle {
-        width: 14
-        height: 14
-        radius: 7
-        color: Colors.text
-        anchors.verticalCenter: parent.verticalCenter
-        x: checked ? parent.width - width - 3 : 3
-        Behavior on x { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }
-      }
-
-      MouseArea { anchors.fill: parent; onClicked: toggled() }
-    }
-
     component ToggleCard: Rectangle {
       property string label
       property string icon
@@ -664,30 +2240,36 @@ PanelWindow {
       Layout.fillWidth: true
       implicitHeight: 84
       radius: Colors.radiusMedium
-      color: toggleHover.containsMouse ? Colors.highlightLight : Colors.bgWidget
+      color: Colors.bgWidget
       border.color: Config[configKey] ? Colors.primary : Colors.border
       border.width: 1
 
+      SharedWidgets.StateLayer {
+        id: toggleStateLayer
+        hovered: toggleHover.containsMouse
+        pressed: toggleHover.pressed
+      }
+
       RowLayout {
         anchors.fill: parent
-        anchors.margins: 14
-        spacing: 12
+        anchors.margins: Colors.spacingM
+        spacing: Colors.spacingM
 
         Text {
           text: icon
           color: Config[configKey] ? Colors.primary : Colors.textSecondary
           font.family: Colors.fontMono
-          font.pixelSize: 20
+          font.pixelSize: Colors.fontSizeHuge
         }
 
         ColumnLayout {
           Layout.fillWidth: true
           spacing: 3
-          Text { text: label; color: Colors.fgMain; font.pixelSize: 13; font.weight: Font.DemiBold }
-          Text { text: Config[configKey] ? "Enabled" : "Disabled"; color: Colors.textSecondary; font.pixelSize: 11 }
+          Text { text: label; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.DemiBold }
+          Text { text: Config[configKey] ? "Enabled" : "Disabled"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall }
         }
 
-        Switch {
+        SharedWidgets.DankToggle {
           checked: Config[configKey]
           onToggled: Config[configKey] = !Config[configKey]
         }
@@ -697,47 +2279,36 @@ PanelWindow {
         id: toggleHover
         anchors.fill: parent
         hoverEnabled: true
-        onClicked: Config[configKey] = !Config[configKey]
+        cursorShape: Qt.PointingHandCursor
+        onClicked: (mouse) => {
+          toggleStateLayer.burst(mouse.x, mouse.y);
+          Config[configKey] = !Config[configKey];
+        }
       }
     }
 
     component ModeSelector: ColumnLayout {
+      id: modeSelector
       property string label
       property string currentValue
       property var options: []
-      signal selected(string modeValue)
-      spacing: 12
+      signal modeSelected(string modeValue)
+      spacing: Colors.spacingM
       Layout.fillWidth: true
 
-      Text { text: label; color: Colors.fgMain; font.pixelSize: 13; font.weight: Font.Medium }
+      Text { text: label; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium }
 
       Flow {
         Layout.fillWidth: true
         width: parent.width
-        spacing: 10
+        spacing: Colors.paddingSmall
 
         Repeater {
           model: options
-          delegate: Rectangle {
-            width: 96
-            height: 38
-            radius: 19
-            color: currentValue === modelData.value ? Colors.highlight : Colors.bgWidget
-            border.color: currentValue === modelData.value ? Colors.primary : Colors.border
-            border.width: 1
-
-            Text {
-              anchors.centerIn: parent
-              text: modelData.label
-              color: currentValue === modelData.value ? Colors.primary : Colors.fgMain
-              font.pixelSize: 12
-              font.weight: Font.DemiBold
-            }
-
-            MouseArea {
-              anchors.fill: parent
-              onClicked: selected(modelData.value)
-            }
+          delegate: SharedWidgets.FilterChip {
+            label: modelData.label
+            selected: modeSelector.currentValue === modelData.value
+            onClicked: modeSelector.modeSelected(modelData.value)
           }
         }
       }

@@ -9,7 +9,7 @@ Text {
 
   width: maxWidth
   color: Colors.fgSecondary
-  font.pixelSize: 12
+  font.pixelSize: Colors.fontSizeSmall
   elide: Text.ElideRight
   text: root.state && root.state.windowTitle !== "" ? root.state.windowTitle : "Desktop"
 }

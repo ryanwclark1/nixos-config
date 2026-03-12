@@ -6,7 +6,7 @@ import "../../services"
 Rectangle {
   id: root
   height: 24
-  width: wsRow.width + 16
+  width: wsRow.width + 12
   radius: height / 2
   color: Colors.bgWidget
   anchors.verticalCenter: parent.verticalCenter
@@ -18,11 +18,6 @@ Rectangle {
     NumberAnimation {
       duration: 180
       easing.type: Easing.OutCubic
-    }
-  }
-  Behavior on color {
-    ColorAnimation {
-      duration: 160
     }
   }
 
@@ -37,7 +32,7 @@ Rectangle {
 
   Row {
     id: wsRow
-    spacing: 8
+    spacing: Colors.spacingXS
     anchors.centerIn: parent
 
     Repeater {
@@ -45,34 +40,51 @@ Rectangle {
 
       Item {
         id: wsContainer
-        width: wsButton.width
-        height: wsRow.height
+        // Filter out special workspaces (negative IDs)
+        visible: modelData.id > 0
+        width: visible ? wsPill.width : 0
+        height: visible ? wsRow.height : 0
 
         Rectangle {
-          id: wsButton
+          id: wsPill
           anchors.centerIn: parent
 
-          // focused = on the currently focused monitor
-          // active = visible on any monitor (secondary highlight)
-          width: modelData.focused ? 20 : (modelData.active ? 14 : 8)
-          height: 8
-          radius: 4
+          width: modelData.focused ? 20 : 16
+          height: 16
+          radius: height / 2
 
-          color: modelData.focused ? Colors.primary : (modelData.active ? Colors.accent : (modelData.urgent ? Colors.error : Colors.fgDim))
-          opacity: modelData.focused ? 1.0 : (modelData.active ? 0.8 : 0.6)
+          color: modelData.focused
+            ? Colors.primary
+            : (wsMouse.containsMouseFinal
+              ? Colors.withAlpha(Colors.primary, 0.3)
+              : Colors.withAlpha(Colors.fgDim, 0.15))
 
-          Behavior on width { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
-          Behavior on color { ColorAnimation { duration: 200 } }
+          Behavior on width { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+          Behavior on color { ColorAnimation { duration: 160 } }
+
+          Text {
+            anchors.centerIn: parent
+            text: modelData.name
+            color: modelData.focused ? Colors.bgMain : Colors.text
+            font.pixelSize: 9
+            font.weight: modelData.focused ? Font.Bold : Font.Medium
+            opacity: modelData.focused ? 1.0 : 0.7
+
+            Behavior on opacity { NumberAnimation { duration: 160 } }
+          }
         }
 
         MouseArea {
           id: wsMouse
           anchors.centerIn: parent
-          width: parent.width + 8
+          width: wsPill.width + 4
           height: wsRow.height
           cursorShape: Qt.PointingHandCursor
           hoverEnabled: true
           acceptedButtons: Qt.LeftButton | Qt.MiddleButton
+
+          // Expose hover state for the pill color binding
+          readonly property bool containsMouseFinal: containsMouse
 
           onClicked: (mouse) => {
             if (mouse.button === Qt.LeftButton) modelData.activate();

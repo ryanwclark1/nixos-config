@@ -21,7 +21,7 @@ PanelWindow {
   }
   margins.top: Config.barHeight + Config.barMargin + 8
   margins.right: Config.barMargin
-  margins.bottom: 60
+  margins.bottom: Config.barHeight + Config.barMargin + 8
 
   implicitWidth: Config.controlCenterWidth
   color: "transparent"
@@ -34,44 +34,59 @@ PanelWindow {
 
   property var manager: null
   property bool showContent: false
+  property var pendingPowerCmd: null
+  property int pendingPowerIndex: -1
   signal closeRequested()
+
+  Timer {
+    id: powerConfirmTimer
+    interval: 3000
+    onTriggered: { root.pendingPowerCmd = null; root.pendingPowerIndex = -1; }
+  }
   visible: showContent || sidebarContent.x < Config.controlCenterWidth
 
-  Component.onCompleted: AudioService.subscribe()
-  Component.onDestruction: AudioService.unsubscribe()
-
-  onShowContentChanged: {
-    if (showContent) SystemStatus.subscribe();
-    else SystemStatus.unsubscribe();
-  }
+  SharedWidgets.Ref { service: AudioService }
+  Loader { active: root.showContent; sourceComponent: SharedWidgets.Ref { service: SystemStatus } }
+  Loader { active: root.showContent; sourceComponent: SharedWidgets.Ref { service: RecordingService } }
 
   Rectangle {
     id: sidebarContent
     width: Config.controlCenterWidth; height: parent.height; color: Colors.bgGlass; border.color: Colors.border; border.width: 1; radius: Colors.radiusLarge
     x: root.showContent ? 0 : Config.controlCenterWidth + 10; opacity: root.showContent ? 1.0 : 0.0
-    Behavior on x { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
-    Behavior on opacity { NumberAnimation { duration: 250 } }
+    Behavior on x { NumberAnimation { id: ccSlideAnim; duration: 300; easing.type: Easing.OutCubic } }
+    Behavior on opacity { NumberAnimation { id: ccFadeAnim; duration: 250 } }
+    layer.enabled: ccSlideAnim.running || ccFadeAnim.running
 
     Keys.onEscapePressed: root.closeRequested()
 
     ColumnLayout {
-      anchors.fill: parent; anchors.margins: Colors.paddingLarge; spacing: 20
+      anchors.fill: parent; anchors.margins: Colors.paddingLarge; spacing: Colors.spacingXL
       RowLayout {
         Layout.fillWidth: true
-        Text { text: "Command Center"; color: Colors.text; font.pixelSize: 22; font.weight: Font.DemiBold; font.letterSpacing: -0.5 }
+        Text { text: "Command Center"; color: Colors.text; font.pixelSize: Colors.fontSizeHuge; font.weight: Font.DemiBold; font.letterSpacing: -0.5 }
         Item { Layout.fillWidth: true }
         Rectangle {
-          width: 32; height: 32; radius: 16; color: settingsHover.containsMouse ? Colors.surface : "transparent"
-          Text { anchors.centerIn: parent; text: "󰒓"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 18 }
+          width: 32; height: 32; radius: height / 2; color: "transparent"
+          Text { anchors.centerIn: parent; text: "󰒓"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL }
+          SharedWidgets.StateLayer {
+            id: settingsStateLayer
+            hovered: settingsHover.containsMouse
+            pressed: settingsHover.pressed
+          }
           MouseArea {
-            id: settingsHover; anchors.fill: parent; hoverEnabled: true
-            onClicked: { root.closeRequested(); Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "toggle"]); }
+            id: settingsHover; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+            onClicked: (mouse) => { settingsStateLayer.burst(mouse.x, mouse.y); root.closeRequested(); Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "toggle"]); }
           }
         }
         Rectangle {
-          width: 32; height: 32; radius: 16; color: closeHover.containsMouse ? Colors.surface : "transparent"
-          Text { anchors.centerIn: parent; text: "󰅖"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 18 }
-          MouseArea { id: closeHover; anchors.fill: parent; hoverEnabled: true; onClicked: root.closeRequested() }
+          width: 32; height: 32; radius: height / 2; color: "transparent"
+          Text { anchors.centerIn: parent; text: "󰅖"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL }
+          SharedWidgets.StateLayer {
+            id: closeStateLayer
+            hovered: closeHover.containsMouse
+            pressed: closeHover.pressed
+          }
+          MouseArea { id: closeHover; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: (mouse) => { closeStateLayer.burst(mouse.x, mouse.y); root.closeRequested(); } }
         }
       }
 
@@ -92,19 +107,19 @@ PanelWindow {
             Layout.fillWidth: true
             implicitHeight: 68
             radius: Colors.radiusMedium
-            color: quickLinkHover.containsMouse ? Colors.highlightLight : Colors.bgWidget
+            color: Colors.bgWidget
             border.color: Colors.border
             border.width: 1
 
             RowLayout {
               anchors.fill: parent
-              anchors.margins: 14
-              spacing: 12
+              anchors.margins: Colors.spacingM
+              spacing: Colors.spacingM
 
               Rectangle {
                 Layout.preferredWidth: 36
                 Layout.preferredHeight: 36
-                radius: 18
+                radius: height / 2
                 color: Colors.withAlpha(Colors.primary, 0.12)
 
                 Text {
@@ -112,7 +127,7 @@ PanelWindow {
                   text: icon
                   color: Colors.primary
                   font.family: Colors.fontMono
-                  font.pixelSize: 16
+                  font.pixelSize: Colors.fontSizeXL
                 }
               }
 
@@ -122,8 +137,8 @@ PanelWindow {
 
                 Text {
                   text: title
-                  color: Colors.fgMain
-                  font.pixelSize: 12
+                  color: Colors.text
+                  font.pixelSize: Colors.fontSizeMedium
                   font.weight: Font.DemiBold
                   Layout.fillWidth: true
                   elide: Text.ElideRight
@@ -132,7 +147,7 @@ PanelWindow {
                 Text {
                   text: subtitle
                   color: Colors.textSecondary
-                  font.pixelSize: 10
+                  font.pixelSize: Colors.fontSizeXS
                   Layout.fillWidth: true
                   elide: Text.ElideRight
                 }
@@ -142,21 +157,28 @@ PanelWindow {
                 text: "󰄮"
                 color: Colors.textSecondary
                 font.family: Colors.fontMono
-                font.pixelSize: 13
+                font.pixelSize: Colors.fontSizeMedium
               }
+            }
+
+            SharedWidgets.StateLayer {
+              id: stateLayer
+              hovered: quickLinkHover.containsMouse
+              pressed: quickLinkHover.pressed
             }
 
             MouseArea {
               id: quickLinkHover
               anchors.fill: parent
               hoverEnabled: true
-              onClicked: Quickshell.execDetached(clickCommand)
+              cursorShape: Qt.PointingHandCursor
+              onClicked: (mouse) => { stateLayer.burst(mouse.x, mouse.y); Quickshell.execDetached(clickCommand); }
             }
           }
 
           ColumnLayout {
             Layout.fillWidth: true
-            spacing: 8
+            spacing: Colors.spacingS
             visible: Config.controlCenterShowQuickLinks
 
             QuickLinkCard {
@@ -176,6 +198,7 @@ PanelWindow {
 
           UserWidget {
             opacity: root.showContent ? 1 : 0
+            visible: opacity > 0
             scale: root.showContent ? 1 : 0.95
             Behavior on opacity { NumberAnimation { duration: 400; easing.type: Easing.OutCubic } }
             Behavior on scale { NumberAnimation { duration: 400; easing.type: Easing.OutBack } }
@@ -185,6 +208,7 @@ PanelWindow {
           GridLayout {
             columns: 2; Layout.fillWidth: true; rowSpacing: 10; columnSpacing: 10
             opacity: root.showContent ? 1 : 0
+            visible: opacity > 0
             Behavior on opacity { NumberAnimation { duration: 450; easing.type: Easing.OutCubic } }
 
             QuickToggle {
@@ -211,6 +235,13 @@ PanelWindow {
                 onTriggered: nightLightPoll.poll()
               }
             }
+            QuickToggle {
+              icon: "󰑊"; label: "Recording"; active: RecordingService.isRecording
+              onClicked: {
+                if (RecordingService.isRecording) RecordingService.stopRecording();
+                else RecordingService.startRecording("fullscreen");
+              }
+            }
           }
 
           MediaWidget {
@@ -222,15 +253,16 @@ PanelWindow {
           ColumnLayout {
             Layout.fillWidth: true; spacing: 15
             opacity: root.showContent ? 1 : 0
+            visible: opacity > 0
             Behavior on opacity { NumberAnimation { duration: 550; easing.type: Easing.OutCubic } }
 
             ColumnLayout {
               Layout.fillWidth: true; spacing: 6
               RowLayout {
                 Layout.fillWidth: true
-                Text { text: "󰃠  BRIGHTNESS"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
+                Text { text: "󰃠  BRIGHTNESS"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
                 Item { Layout.fillWidth: true }
-                Text { text: Math.round(SystemStatus.brightness * 100) + "%"; color: Colors.textSecondary; font.pixelSize: 10 }
+                Text { text: Math.round(SystemStatus.brightness * 100) + "%"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS }
               }
               SharedWidgets.SliderTrack {
                 Layout.fillWidth: true
@@ -244,9 +276,9 @@ PanelWindow {
               Layout.fillWidth: true; spacing: 6
               RowLayout {
                 Layout.fillWidth: true
-                Text { text: "󰕾  OUTPUT"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
+                Text { text: "󰕾  OUTPUT"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
                 Item { Layout.fillWidth: true }
-                Text { text: AudioService.outputMuted ? "Muted" : Math.round(AudioService.outputVolume * 100) + "%"; color: Colors.textSecondary; font.pixelSize: 10 }
+                Text { text: AudioService.outputMuted ? "Muted" : Math.round(AudioService.outputVolume * 100) + "%"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS }
               }
               RowLayout {
                 Layout.fillWidth: true
@@ -272,9 +304,9 @@ PanelWindow {
               Layout.fillWidth: true; spacing: 6
               RowLayout {
                 Layout.fillWidth: true
-                Text { text: "󰍬  INPUT"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
+                Text { text: "󰍬  INPUT"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
                 Item { Layout.fillWidth: true }
-                Text { text: AudioService.inputMuted ? "Muted" : Math.round(AudioService.inputVolume * 100) + "%"; color: Colors.textSecondary; font.pixelSize: 10 }
+                Text { text: AudioService.inputMuted ? "Muted" : Math.round(AudioService.inputVolume * 100) + "%"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS }
               }
               RowLayout {
                 Layout.fillWidth: true
@@ -299,32 +331,33 @@ PanelWindow {
           }
 
           RowLayout {
-            Layout.fillWidth: true; spacing: 12
+            Layout.fillWidth: true; spacing: Colors.spacingM
             opacity: root.showContent ? 1 : 0
+            visible: opacity > 0
             Behavior on opacity { NumberAnimation { duration: 600; easing.type: Easing.OutCubic } }
             Rectangle {
-              Layout.fillWidth: true; height: 60; color: Colors.bgWidget; radius: 10; border.color: Colors.border; border.width: 1
+              Layout.fillWidth: true; height: 60; color: Colors.bgWidget; radius: Colors.radiusSmall; border.color: Colors.border; border.width: 1
               Column { anchors.centerIn: parent; spacing: 2
-                Text { text: "CPU TEMP"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
-                Text { text: SystemStatus.cpuTemp; color: Colors.primary; font.pixelSize: 14; font.weight: Font.Bold }
+                Text { text: "CPU TEMP"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
+                Text { text: SystemStatus.cpuTemp; color: Colors.primary; font.pixelSize: Colors.fontSizeLarge; font.weight: Font.Bold }
               }
             }
             Rectangle {
-              Layout.fillWidth: true; height: 60; color: Colors.bgWidget; radius: 10; border.color: Colors.border; border.width: 1
+              Layout.fillWidth: true; height: 60; color: Colors.bgWidget; radius: Colors.radiusSmall; border.color: Colors.border; border.width: 1
               Column { anchors.centerIn: parent; spacing: 2
-                Text { text: "GPU TEMP"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
-                Text { text: SystemStatus.gpuTemp; color: Colors.accent; font.pixelSize: 14; font.weight: Font.Bold }
+                Text { text: "GPU TEMP"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
+                Text { text: SystemStatus.gpuTemp; color: Colors.accent; font.pixelSize: Colors.fontSizeLarge; font.weight: Font.Bold }
               }
             }
           }
 
-          SystemGraphs { opacity: root.showContent ? 1 : 0; Behavior on opacity { NumberAnimation { duration: 650; easing.type: Easing.OutCubic } } }
-          ProcessWidget { opacity: root.showContent ? 1 : 0; Behavior on opacity { NumberAnimation { duration: 700; easing.type: Easing.OutCubic } } }
-          NetworkGraphs {}
-          DiskWidget {}
-          GPUWidget {}
-          UpdateWidget { opacity: root.showContent ? 1 : 0; Behavior on opacity { NumberAnimation { duration: 750; easing.type: Easing.OutCubic } } }
-          ScratchpadWidget {}
+          SystemGraphs { opacity: root.showContent ? 1 : 0; visible: opacity > 0; Behavior on opacity { NumberAnimation { duration: 650; easing.type: Easing.OutCubic } } }
+          ProcessWidget { opacity: root.showContent ? 1 : 0; visible: opacity > 0; Behavior on opacity { NumberAnimation { duration: 700; easing.type: Easing.OutCubic } } }
+          NetworkGraphs { opacity: root.showContent ? 1 : 0; visible: opacity > 0; Behavior on opacity { NumberAnimation { duration: 750; easing.type: Easing.OutCubic } } }
+          DiskWidget { opacity: root.showContent ? 1 : 0; visible: opacity > 0; Behavior on opacity { NumberAnimation { duration: 800; easing.type: Easing.OutCubic } } }
+          GPUWidget { opacity: root.showContent ? 1 : 0; visible: opacity > 0; Behavior on opacity { NumberAnimation { duration: 850; easing.type: Easing.OutCubic } } }
+          UpdateWidget { opacity: root.showContent ? 1 : 0; visible: opacity > 0; Behavior on opacity { NumberAnimation { duration: 900; easing.type: Easing.OutCubic } } }
+          ScratchpadWidget { opacity: root.showContent ? 1 : 0; visible: opacity > 0; Behavior on opacity { NumberAnimation { duration: 950; easing.type: Easing.OutCubic } } }
 
         }
       }
@@ -334,15 +367,49 @@ PanelWindow {
         Repeater {
           model: [{ icon: "󰐥", cmd: ["systemctl", "poweroff"] }, { icon: "󰑐", cmd: ["systemctl", "reboot"] }, { icon: "󰌾", cmd: ["hyprlock"] }]
           delegate: Rectangle {
+            required property var modelData
+            required property int index
             Layout.fillWidth: true; height: 40
-            color: powerHover.containsMouse ? Colors.highlightLight : Colors.surface
-            radius: 8
+            color: root.pendingPowerIndex === index ? Colors.error : Colors.surface
+            radius: Colors.radiusXS
             Behavior on color { ColorAnimation { duration: 160 } }
-            Text { anchors.centerIn: parent; text: modelData.icon; color: Colors.text; font.family: Colors.fontMono; font.pixelSize: 18 }
+
+            Text {
+              anchors.centerIn: parent
+              text: root.pendingPowerIndex === index ? "Confirm?" : modelData.icon
+              color: root.pendingPowerIndex === index ? Colors.background : Colors.text
+              font.family: root.pendingPowerIndex === index ? undefined : Colors.fontMono
+              font.pixelSize: root.pendingPowerIndex === index ? Colors.fontSizeSmall : Colors.fontSizeXL
+              font.weight: root.pendingPowerIndex === index ? Font.Bold : Font.Normal
+            }
+
+            SharedWidgets.StateLayer {
+              id: powerStateLayer
+              hovered: powerHover.containsMouse
+              pressed: powerHover.pressed
+            }
+
             MouseArea {
               id: powerHover
-              anchors.fill: parent; hoverEnabled: true
-              onClicked: Quickshell.execDetached(modelData.cmd)
+              anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+              onClicked: (mouse) => {
+                powerStateLayer.burst(mouse.x, mouse.y);
+                if (modelData.cmd[0] === "hyprlock") {
+                  // Lock doesn't need confirmation
+                  Quickshell.execDetached(modelData.cmd);
+                  return;
+                }
+                if (root.pendingPowerIndex === index) {
+                  Quickshell.execDetached(modelData.cmd);
+                  root.pendingPowerCmd = null;
+                  root.pendingPowerIndex = -1;
+                  powerConfirmTimer.stop();
+                } else {
+                  root.pendingPowerCmd = modelData.cmd;
+                  root.pendingPowerIndex = index;
+                  powerConfirmTimer.restart();
+                }
+              }
             }
           }
         }

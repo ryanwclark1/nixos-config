@@ -9,12 +9,11 @@ Item {
   property var anchorWindow: null
   signal statsClicked()
 
-  Component.onCompleted: SystemStatus.subscribe()
-  Component.onDestruction: SystemStatus.unsubscribe()
+  SharedWidgets.Ref { service: SystemStatus }
 
   Row {
     id: mainRow
-    spacing: 8
+    spacing: Colors.spacingS
     anchors.verticalCenter: parent.verticalCenter
 
     // CPU Pill
@@ -23,12 +22,11 @@ Item {
       width: cpuRow.width + 16
       height: 28
       radius: height / 2
-      color: cpuMouse.containsMouse ? Colors.highlightLight : Colors.bgWidget
+      color: Colors.bgWidget
       anchors.verticalCenter: parent.verticalCenter
       scale: cpuMouse.containsMouse ? 1.04 : 1.0
 
-      Behavior on color { ColorAnimation { duration: 160 } }
-      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+      Behavior on scale { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
 
       Row {
         id: cpuRow
@@ -37,24 +35,32 @@ Item {
         Text {
           text: ""
           color: Colors.primary
-          font.pixelSize: 16
+          font.pixelSize: Colors.fontSizeLarge
           font.family: Colors.fontMono
           anchors.verticalCenter: parent.verticalCenter
         }
         Text {
           text: "CPU " + SystemStatus.cpuUsage
-          color: Colors.fgMain
-          font.pixelSize: 13
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeMedium
           font.weight: Font.DemiBold
           anchors.verticalCenter: parent.verticalCenter
         }
+      }
+
+      SharedWidgets.StateLayer {
+        id: cpuStateLayer
+        hovered: cpuMouse.containsMouse
+        pressed: cpuMouse.pressed
+        stateColor: Colors.primary
       }
 
       MouseArea {
         id: cpuMouse
         anchors.fill: parent
         hoverEnabled: true
-        onClicked: root.statsClicked()
+        cursorShape: Qt.PointingHandCursor
+        onClicked: (mouse) => { cpuStateLayer.burst(mouse.x, mouse.y); root.statsClicked(); }
       }
 
       SharedWidgets.BarTooltip {
@@ -71,12 +77,11 @@ Item {
       width: ramRow.width + 16
       height: 28
       radius: height / 2
-      color: ramMouse.containsMouse ? Colors.highlightLight : Colors.bgWidget
+      color: Colors.bgWidget
       anchors.verticalCenter: parent.verticalCenter
       scale: ramMouse.containsMouse ? 1.04 : 1.0
 
-      Behavior on color { ColorAnimation { duration: 160 } }
-      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+      Behavior on scale { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
 
       Row {
         id: ramRow
@@ -85,24 +90,32 @@ Item {
         Text {
           text: ""
           color: Colors.accent
-          font.pixelSize: 16
+          font.pixelSize: Colors.fontSizeLarge
           font.family: Colors.fontMono
           anchors.verticalCenter: parent.verticalCenter
         }
         Text {
           text: "RAM " + SystemStatus.ramUsage
-          color: Colors.fgMain
-          font.pixelSize: 13
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeMedium
           font.weight: Font.DemiBold
           anchors.verticalCenter: parent.verticalCenter
         }
+      }
+
+      SharedWidgets.StateLayer {
+        id: ramStateLayer
+        hovered: ramMouse.containsMouse
+        pressed: ramMouse.pressed
+        stateColor: Colors.primary
       }
 
       MouseArea {
         id: ramMouse
         anchors.fill: parent
         hoverEnabled: true
-        onClicked: root.statsClicked()
+        cursorShape: Qt.PointingHandCursor
+        onClicked: (mouse) => { ramStateLayer.burst(mouse.x, mouse.y); root.statsClicked(); }
       }
 
       SharedWidgets.BarTooltip {

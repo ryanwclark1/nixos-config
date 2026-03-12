@@ -21,11 +21,8 @@ QtObject {
   property int pollIntervalMs: 2000
 
   // Subscriber-based polling: only runs when at least one consumer is active.
-  // Consumers should increment on visible and decrement on hidden.
+  // Use Ref { service: SystemStatus } for automatic lifecycle management.
   property int subscriberCount: 0
-
-  function subscribe() { subscriberCount++; }
-  function unsubscribe() { subscriberCount = Math.max(0, subscriberCount - 1); }
 
   function formatTemp(rawValue) {
     var parsed = parseFloat(rawValue);
@@ -58,11 +55,11 @@ QtObject {
           root.cpuTemp = root.formatTemp(lines[0]);
           root.gpuTemp = root.formatTemp(lines[1]);
 
-          var cpuVal = parseInt(lines[2]) || 0;
+          var cpuVal = parseInt(lines[2], 10) || 0;
           root.cpuUsage = cpuVal + "%";
           root.cpuPercent = Colors.clamp01(cpuVal / 100);
 
-          var gpuVal = parseInt(lines[3]) || 0;
+          var gpuVal = parseInt(lines[3], 10) || 0;
           root.gpuUsage = gpuVal + "%";
           root.gpuPercent = Colors.clamp01(gpuVal / 100);
 
@@ -89,10 +86,8 @@ QtObject {
     interval: root.pollIntervalMs
     running: root.subscriberCount > 0
     repeat: true
-    onTriggered: statsProc.running = true
+    onTriggered: { if (!statsProc.running) statsProc.running = true; }
   }
-
-  Component.onCompleted: statsProc.running = true
 
   // ── MPRIS players ────────────────────────────
   readonly property var activeMprisPlayers: {

@@ -51,6 +51,9 @@ QtObject {
   property bool desktopWidgetsGridSnap: false
   property var desktopWidgetsMonitorWidgets: []
 
+  // --- SCREEN BORDERS ---
+  property bool showScreenBorders: false
+
   // --- POWER MENU ---
   property int powermenuCountdown: 3000
 
@@ -60,6 +63,24 @@ QtObject {
   property bool lockScreenWeather: true
   property bool lockScreenSessionButtons: true
   property int lockScreenCountdown: 5000
+
+  // --- PRIVACY ---
+  property bool privacyIndicatorsEnabled: true
+  property bool privacyCameraMonitoring: true
+
+  // --- POWER ---
+  property bool idleInhibitEnabled: false
+
+  // --- COLOR PICKER ---
+  property var recentPickerColors: []
+
+  // --- WALLPAPER ---
+  property bool wallpaperRunPywal: false
+  property var wallpaperPaths: ({})      // monitorName → absolute image path
+  property int wallpaperCycleInterval: 0  // 0 = disabled, otherwise minutes between auto-cycle
+
+  // --- PLUGINS ---
+  property var disabledPlugins: []
 
   // --- INTERNAL ---
   property bool _loading: false
@@ -167,12 +188,21 @@ QtObject {
   onDesktopWidgetsEnabledChanged: scheduleSave()
   onDesktopWidgetsGridSnapChanged: scheduleSave()
   onDesktopWidgetsMonitorWidgetsChanged: scheduleSave()
+  onShowScreenBordersChanged: scheduleSave()
   onPowermenuCountdownChanged: scheduleSave()
   onLockScreenCompactChanged: scheduleSave()
   onLockScreenMediaControlsChanged: scheduleSave()
   onLockScreenWeatherChanged: scheduleSave()
   onLockScreenSessionButtonsChanged: scheduleSave()
   onLockScreenCountdownChanged: scheduleSave()
+  onPrivacyIndicatorsEnabledChanged: scheduleSave()
+  onPrivacyCameraMonitoringChanged: scheduleSave()
+  onIdleInhibitEnabledChanged: scheduleSave()
+  onRecentPickerColorsChanged: scheduleSave()
+  onDisabledPluginsChanged: scheduleSave()
+  onWallpaperRunPywalChanged: scheduleSave()
+  onWallpaperPathsChanged: scheduleSave()
+  onWallpaperCycleIntervalChanged: scheduleSave()
 
   function load() {
     var raw = configFile.text();
@@ -235,6 +265,10 @@ QtObject {
         if (data.desktopWidgets.monitorWidgets !== undefined) desktopWidgetsMonitorWidgets = data.desktopWidgets.monitorWidgets;
       }
 
+      if (data.screenBorders) {
+        if (data.screenBorders.show !== undefined) showScreenBorders = data.screenBorders.show;
+      }
+
       if (data.powerMenu) {
         if (data.powerMenu.countdown !== undefined) powermenuCountdown = data.powerMenu.countdown;
       }
@@ -245,6 +279,29 @@ QtObject {
         if (data.lockScreen.weather !== undefined) lockScreenWeather = data.lockScreen.weather;
         if (data.lockScreen.sessionButtons !== undefined) lockScreenSessionButtons = data.lockScreen.sessionButtons;
         if (data.lockScreen.countdown !== undefined) lockScreenCountdown = data.lockScreen.countdown;
+      }
+
+      if (data.privacy) {
+        if (data.privacy.indicatorsEnabled !== undefined) privacyIndicatorsEnabled = data.privacy.indicatorsEnabled;
+        if (data.privacy.cameraMonitoring !== undefined) privacyCameraMonitoring = data.privacy.cameraMonitoring;
+      }
+
+      if (data.power) {
+        if (data.power.idleInhibit !== undefined) idleInhibitEnabled = data.power.idleInhibit;
+      }
+
+      if (data.colorPicker) {
+        if (data.colorPicker.recentColors !== undefined) recentPickerColors = data.colorPicker.recentColors;
+      }
+
+      if (data.plugins) {
+        if (data.plugins.disabled !== undefined) disabledPlugins = data.plugins.disabled;
+      }
+
+      if (data.wallpaper) {
+        if (data.wallpaper.runPywal !== undefined) wallpaperRunPywal = data.wallpaper.runPywal;
+        if (data.wallpaper.paths !== undefined) wallpaperPaths = data.wallpaper.paths;
+        if (data.wallpaper.cycleInterval !== undefined) wallpaperCycleInterval = data.wallpaper.cycleInterval;
       }
     } catch (e) {
       console.error("Failed to load config: " + e);
@@ -315,6 +372,9 @@ QtObject {
         "gridSnap": desktopWidgetsGridSnap,
         "monitorWidgets": desktopWidgetsMonitorWidgets
       },
+      "screenBorders": {
+        "show": showScreenBorders
+      },
       "powerMenu": {
         "countdown": powermenuCountdown
       },
@@ -324,6 +384,24 @@ QtObject {
         "weather": lockScreenWeather,
         "sessionButtons": lockScreenSessionButtons,
         "countdown": lockScreenCountdown
+      },
+      "privacy": {
+        "indicatorsEnabled": privacyIndicatorsEnabled,
+        "cameraMonitoring": privacyCameraMonitoring
+      },
+      "power": {
+        "idleInhibit": idleInhibitEnabled
+      },
+      "colorPicker": {
+        "recentColors": recentPickerColors
+      },
+      "plugins": {
+        "disabled": disabledPlugins
+      },
+      "wallpaper": {
+        "runPywal": wallpaperRunPywal,
+        "paths": wallpaperPaths,
+        "cycleInterval": wallpaperCycleInterval
       }
     };
 

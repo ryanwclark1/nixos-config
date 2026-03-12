@@ -9,7 +9,7 @@ Item {
 
   RowLayout {
     id: row
-    spacing: 12
+    spacing: Colors.spacingM
 
     Text {
       text: Colors.weatherIcon(WeatherService.condition)
@@ -24,20 +24,20 @@ Item {
       Text {
         text: WeatherService.temp || "--"
         color: Colors.text
-        font.pixelSize: 22
+        font.pixelSize: Colors.fontSizeHuge
         font.weight: Font.Bold
       }
 
       Text {
         text: WeatherService.condition || "Unknown"
         color: Colors.fgSecondary
-        font.pixelSize: 12
+        font.pixelSize: Colors.fontSizeSmall
       }
 
       Text {
         text: WeatherService.location || ""
         color: Colors.textDisabled
-        font.pixelSize: 10
+        font.pixelSize: Colors.fontSizeXS
         visible: text !== ""
       }
     }

@@ -1,139 +1,150 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Services.Mpris
 import Quickshell.Widgets
 import Quickshell.Wayland
 import "../services"
 
 Scope {
-	id: root
-	property bool shouldShowOsd: false
-	
-	property string trackTitle: ""
-	property string trackArtist: ""
-	property string trackArtUrl: ""
-	property bool isPlaying: false
-	
-	Timer {
-		id: hideTimer
-		interval: 3000
-		onTriggered: root.shouldShowOsd = false
-	}
-	
-	Instantiator {
-		model: Mpris.players
-		delegate: Connections {
-			target: modelData
-			
-			function onTrackTitleChanged() {
-				if (modelData.isPlaying) {
-					root.trackTitle = modelData.trackTitle;
-					root.trackArtist = modelData.trackArtist;
-					root.trackArtUrl = modelData.trackArtUrl;
-					root.isPlaying = modelData.isPlaying;
-					root.shouldShowOsd = true;
-					hideTimer.restart();
-				}
-			}
-			
-			function onPlaybackStateChanged() {
-				root.trackTitle = modelData.trackTitle;
-				root.trackArtist = modelData.trackArtist;
-				root.trackArtUrl = modelData.trackArtUrl;
-				root.isPlaying = modelData.isPlaying;
-				root.shouldShowOsd = true;
-				hideTimer.restart();
-			}
-		}
-	}
+  id: root
+  property bool shouldShowOsd: false
+  property bool initialized: false
 
-	Repeater {
-		model: Quickshell.screens
+  Timer {
+    id: hideTimer
+    interval: 3000
+    onTriggered: root.shouldShowOsd = false
+  }
 
-		delegate: LazyLoader {
-			active: root.shouldShowOsd
+  // Startup suppression — don't show OSD for 2 seconds after shell starts
+  Timer {
+    id: startupGuard
+    interval: 2000
+    running: true
+    onTriggered: root.initialized = true
+  }
 
-			PanelWindow {
-				id: osdWindow
-				screen: modelData
+  // Watch MediaService for track changes (already deduped + browser-merged)
+  Connections {
+    target: MediaService
+    function onTrackTitleChanged() {
+      if (!root.initialized) return;
+      if (!MediaService.trackTitle) return;
+      root.shouldShowOsd = true;
+      hideTimer.restart();
+    }
+  }
 
-				anchors.top: true
-				margins.top: screen.height / 10
-				exclusiveZone: 0
+  Variants {
+    model: Quickshell.screens
 
-				implicitWidth: 350
-				implicitHeight: 80
-				color: "transparent"
-				WlrLayershell.layer: WlrLayer.Overlay
-				WlrLayershell.namespace: "quickshell"
+    delegate: Component {
+      PanelWindow {
+        id: osdWindow
+        required property ShellScreen modelData
+        screen: modelData
 
-				mask: Region {
-					item: content
-				}
+        // Deferred unmap: keep window mapped briefly after hide for fade-out
+        property bool _wantVisible: root.shouldShowOsd
+        visible: _wantVisible || unmapDelay.running
+        on_WantVisibleChanged: {
+          if (!_wantVisible) unmapDelay.restart();
+        }
+        Timer { id: unmapDelay; interval: 350 }
 
-				Rectangle {
-					id: content
-					anchors.fill: parent
-					radius: 12
-					color: Colors.bgGlass
-					border.color: Colors.border
-					border.width: 1
+        anchors.top: true
+        margins.top: screen.height / 10
+        exclusiveZone: 0
 
-					opacity: root.shouldShowOsd ? 1.0 : 0.0
-					Behavior on opacity { NumberAnimation { duration: 200; easing.type: Easing.InOutQuad } }
+        implicitWidth: 350
+        implicitHeight: 80
+        color: "transparent"
+        WlrLayershell.layer: WlrLayer.Overlay
+        WlrLayershell.namespace: "quickshell"
 
-					RowLayout {
-						anchors.fill: parent
-						anchors.margins: Colors.paddingSmall
-						spacing: 12
+        mask: Region { item: content }
 
-						Image {
-							Layout.preferredWidth: 60
-							Layout.preferredHeight: 60
-							source: root.trackArtUrl !== "" ? root.trackArtUrl : ""
-							fillMode: Image.PreserveAspectCrop
-							visible: root.trackArtUrl !== ""
-							
-							Rectangle {
-								anchors.fill: parent
-								color: "transparent"
-								border.color: Colors.border
-								border.width: 1
-								radius: 6
-							}
-						}
+        Rectangle {
+          id: content
+          anchors.fill: parent
+          radius: 12
+          color: Colors.bgGlass
+          border.color: Colors.border
+          border.width: 1
 
-						ColumnLayout {
-							Layout.fillWidth: true
-							spacing: 4
+          opacity: root.shouldShowOsd ? 1.0 : 0.0
+          scale: root.shouldShowOsd ? 1.0 : 0.92
 
-							Text {
-								text: root.trackTitle !== "" ? root.trackTitle : "No Media"
-								color: Colors.text
-								font.pointSize: 12
-								font.bold: true
-								elide: Text.ElideRight
-								Layout.fillWidth: true
-							}
+          Behavior on opacity {
+            NumberAnimation {
+              id: osdFadeAnim
+              duration: root.shouldShowOsd ? 160 : 280
+              easing.type: root.shouldShowOsd ? Easing.OutQuad : Easing.InCubic
+            }
+          }
+          Behavior on scale {
+            NumberAnimation {
+              id: osdScaleAnim
+              duration: root.shouldShowOsd ? 200 : 280
+              easing.type: root.shouldShowOsd ? Easing.OutCubic : Easing.InCubic
+            }
+          }
 
-							Text {
-								text: root.trackArtist !== "" ? root.trackArtist : "Unknown Artist"
-								color: Colors.textSecondary
-								font.pointSize: 10
-								elide: Text.ElideRight
-								Layout.fillWidth: true
-							}
-						}
-						
-						IconImage {
-							Layout.preferredWidth: 24
-							Layout.preferredHeight: 24
-							source: Quickshell.iconPath(root.isPlaying ? "media-playback-pause-symbolic" : "media-playback-start-symbolic") || ""
-						}
-					}
-				}
-			}
-		}
-	}
+          layer.enabled: osdFadeAnim.running || osdScaleAnim.running || unmapDelay.running
+
+          RowLayout {
+            anchors.fill: parent
+            anchors.margins: Colors.paddingSmall
+            spacing: Colors.spacingM
+
+            Image {
+              Layout.preferredWidth: 60
+              Layout.preferredHeight: 60
+              source: MediaService.trackArtUrl || ""
+              sourceSize: Qt.size(120, 120)
+              asynchronous: true
+              fillMode: Image.PreserveAspectCrop
+              visible: MediaService.trackArtUrl !== ""
+
+              Rectangle {
+                anchors.fill: parent
+                color: "transparent"
+                border.color: Colors.border
+                border.width: 1
+                radius: 6
+              }
+            }
+
+            ColumnLayout {
+              Layout.fillWidth: true
+              spacing: Colors.spacingXS
+
+              Text {
+                text: MediaService.trackTitle || "No Media"
+                color: Colors.text
+                font.pointSize: 12
+                font.bold: true
+                elide: Text.ElideRight
+                Layout.fillWidth: true
+              }
+
+              Text {
+                text: MediaService.trackArtist || "Unknown Artist"
+                color: Colors.textSecondary
+                font.pointSize: 10
+                elide: Text.ElideRight
+                Layout.fillWidth: true
+              }
+            }
+
+            IconImage {
+              Layout.preferredWidth: 24
+              Layout.preferredHeight: 24
+              source: Quickshell.iconPath(MediaService.isPlaying ? "media-playback-pause-symbolic" : "media-playback-start-symbolic") || ""
+            }
+          }
+        }
+      }
+    }
+  }
 }

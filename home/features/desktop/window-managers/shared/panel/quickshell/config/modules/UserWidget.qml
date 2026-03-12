@@ -37,7 +37,7 @@ Rectangle {
   RowLayout {
     anchors.fill: parent
     anchors.margins: Colors.paddingMedium
-    spacing: 15
+    spacing: Colors.paddingMedium
 
     // User Avatar placeholder
     Rectangle {
@@ -48,7 +48,7 @@ Rectangle {
         anchors.centerIn: parent
         text: root.username.charAt(0).toUpperCase()
         color: Colors.text
-        font.pixelSize: 24
+        font.pixelSize: Colors.fontSizeHuge
         font.weight: Font.Bold
       }
     }
@@ -58,8 +58,8 @@ Rectangle {
       spacing: 2
       Text {
         text: "Welcome back, " + root.username
-        color: Colors.fgMain
-        font.pixelSize: 15
+        color: Colors.text
+        font.pixelSize: Colors.fontSizeLarge
         font.weight: Font.Bold
         Layout.fillWidth: true
         elide: Text.ElideRight
@@ -67,7 +67,7 @@ Rectangle {
       Text {
         text: "System Uptime: " + root.uptime
         color: Colors.fgSecondary
-        font.pixelSize: 10
+        font.pixelSize: Colors.fontSizeXS
         Layout.fillWidth: true
         elide: Text.ElideRight
       }

@@ -13,6 +13,7 @@ Item {
   property var anchorWindow: null
   property int dragSourceIndex: -1
   property int dragTargetIndex: -1
+  readonly property alias background: dockBg
 
   implicitWidth: dockBg.width
   implicitHeight: dockBg.height
@@ -60,7 +61,7 @@ Item {
   Row {
     id: row
     anchors.centerIn: dockBg
-    spacing: 8
+    spacing: Colors.spacingS
 
     Repeater {
       model: root.dockApps
@@ -131,7 +132,7 @@ Item {
           width: Config.dockIconSize
           height: Config.dockIconSize
 
-          property bool dragging: dragArea.drag.active
+          property bool dragging: mouseArea.drag.active
 
           Drag.active: dragging
           Drag.source: iconContainer
@@ -163,10 +164,15 @@ Item {
 
           Rectangle {
             anchors.fill: parent
-            radius: 10
-            color: mouseArea.containsMouse ? Colors.highlight : "transparent"
+            radius: Colors.radiusSmall
+            color: "transparent"
             scale: mouseArea.containsMouse ? 1.15 : 1.0
             Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutBack } }
+
+            StateLayer {
+              hovered: mouseArea.containsMouse
+              pressed: mouseArea.pressed
+            }
 
             // Prefer image icon from desktop entry; fallback to Nerd Font
             Loader {
@@ -187,7 +193,7 @@ Item {
               anchors.centerIn: parent
               visible: appDelegate.iconSource === ""
               text: appDelegate.appName.charAt(0).toUpperCase()
-              color: Colors.fgMain
+              color: Colors.text
               font.pixelSize: Config.dockIconSize * 0.5
               font.weight: Font.Bold
               font.family: Colors.fontMono
@@ -198,6 +204,7 @@ Item {
             id: mouseArea
             anchors.fill: parent
             hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
             acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
             drag.target: appDelegate.isPinned ? iconContainer : undefined
             drag.axis: Drag.XAxis
@@ -223,7 +230,7 @@ Item {
                     }
                     if (!closed && appDelegate.toplevels.length > 0) appDelegate.toplevels[0].close();
                   } else {
-                    appDelegate.toplevels[0].close();
+                    if (appDelegate.toplevels.length > 0) appDelegate.toplevels[0].close();
                   }
                 }
                 return;
@@ -241,7 +248,7 @@ Item {
                   var next = (idx + 1) % appDelegate.toplevels.length;
                   appDelegate.toplevels[next].activate();
                 } else {
-                  appDelegate.toplevels[0].activate();
+                  if (appDelegate.toplevels.length > 0) appDelegate.toplevels[0].activate();
                 }
               } else {
                 Quickshell.execDetached(["gtk-launch", appDelegate.appId]);
@@ -288,7 +295,7 @@ Item {
                   return Colors.primary;
                 return Colors.fgSecondary;
               }
-              Behavior on color { ColorAnimation { duration: 150 } }
+              Behavior on color { ColorAnimation { duration: 160 } }
             }
           }
         }

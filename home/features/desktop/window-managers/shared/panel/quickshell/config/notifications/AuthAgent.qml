@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Services.Polkit
 import Quickshell.Wayland
 import "../services"
+import "../widgets" as SharedWidgets
 
 PanelWindow {
   id: root
@@ -50,15 +51,15 @@ PanelWindow {
       ColumnLayout {
         anchors.fill: parent
         anchors.margins: Colors.paddingLarge
-        spacing: 15
+        spacing: Colors.paddingMedium
 
         RowLayout {
-          spacing: 12
-          Text { text: "󰌾"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 24 }
+          spacing: Colors.spacingM
+          Text { text: "󰌾"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeHuge }
           Text {
             text: "Authentication Required"
-            color: Colors.fgMain
-            font.pixelSize: 18
+            color: Colors.text
+            font.pixelSize: Colors.fontSizeXL
             font.weight: Font.Bold
           }
         }
@@ -66,7 +67,7 @@ PanelWindow {
         Text {
           text: modelData.message
           color: Colors.fgSecondary
-          font.pixelSize: 12
+          font.pixelSize: Colors.fontSizeSmall
           wrapMode: Text.Wrap
           Layout.fillWidth: true
         }
@@ -76,17 +77,17 @@ PanelWindow {
           Layout.fillWidth: true
           height: 45
           color: Colors.highlightLight
-          radius: 8
+          radius: Colors.radiusXS
           border.color: pwInput.activeFocus ? Colors.primary : "transparent"
           border.width: 1
 
           TextInput {
             id: pwInput
             anchors.fill: parent
-            anchors.margins: 12
+            anchors.margins: Colors.spacingM
             verticalAlignment: Text.AlignVCenter
-            color: Colors.fgMain
-            font.pixelSize: 14
+            color: Colors.text
+            font.pixelSize: Colors.fontSizeMedium
             echoMode: TextInput.Password
             focus: true
             
@@ -97,31 +98,68 @@ PanelWindow {
           
           Text {
             anchors.fill: parent
-            anchors.leftMargin: 12
+            anchors.leftMargin: Colors.spacingM
             verticalAlignment: Text.AlignVCenter
             text: "Password..."
             color: Colors.fgDim
-            font.pixelSize: 14
+            font.pixelSize: Colors.fontSizeMedium
             visible: !pwInput.text && !pwInput.activeFocus
           }
         }
 
         RowLayout {
           Layout.fillWidth: true
-          spacing: 12
+          spacing: Colors.spacingM
           
           // Cancel
           Rectangle {
-            Layout.fillWidth: true; height: 40; color: Colors.highlightLight; radius: 8
+            Layout.fillWidth: true; height: 40; radius: Colors.radiusXS
+            color: Colors.highlightLight
+
+            SharedWidgets.StateLayer {
+              id: cancelStateLayer
+              hovered: cancelHover.containsMouse
+              pressed: cancelHover.pressed
+            }
+
             Text { anchors.centerIn: parent; text: "Cancel"; color: Colors.fgSecondary; font.weight: Font.Medium }
-            MouseArea { anchors.fill: parent; onClicked: modelData.cancel() }
+
+            MouseArea {
+              id: cancelHover
+              anchors.fill: parent
+              hoverEnabled: true
+              cursorShape: Qt.PointingHandCursor
+              onClicked: (mouse) => {
+                cancelStateLayer.burst(mouse.x, mouse.y);
+                modelData.cancel();
+              }
+            }
           }
 
           // Authenticate
           Rectangle {
-            Layout.fillWidth: true; height: 40; color: Colors.primary; radius: 8
+            Layout.fillWidth: true; height: 40; radius: Colors.radiusXS
+            color: Colors.primary
+
+            SharedWidgets.StateLayer {
+              id: authStateLayer
+              hovered: authHover.containsMouse
+              pressed: authHover.pressed
+              stateColor: Colors.primary
+            }
+
             Text { anchors.centerIn: parent; text: "Unlock"; color: Colors.text; font.weight: Font.Bold }
-            MouseArea { anchors.fill: parent; onClicked: modelData.authenticate(pwInput.text) }
+
+            MouseArea {
+              id: authHover
+              anchors.fill: parent
+              hoverEnabled: true
+              cursorShape: Qt.PointingHandCursor
+              onClicked: (mouse) => {
+                authStateLayer.burst(mouse.x, mouse.y);
+                modelData.authenticate(pwInput.text);
+              }
+            }
           }
         }
       }

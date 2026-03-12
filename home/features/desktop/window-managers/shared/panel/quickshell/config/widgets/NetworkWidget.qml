@@ -1,11 +1,11 @@
 import QtQuick
 import Quickshell.Io
 import "../services"
-import "." as Widgets
+
 
 Row {
   id: root
-  spacing: 8
+  spacing: Colors.spacingS
 
   property string networkIcon: "󰤮"
   property string networkName: "Offline"
@@ -49,7 +49,7 @@ Row {
     return parts.join(" • ");
   }
 
-  Widgets.CommandPoll {
+  CommandPoll {
     id: networkPoll
     interval: 5000
     running: root.visible
@@ -76,7 +76,7 @@ Row {
   Text {
     text: networkIcon
     color: Colors.primary
-    font.pixelSize: 16
+    font.pixelSize: Colors.fontSizeLarge
     font.family: Colors.fontMono
     anchors.verticalCenter: parent.verticalCenter
   }
@@ -87,8 +87,8 @@ Row {
 
     Text {
       text: networkName
-      color: Colors.fgMain
-      font.pixelSize: 12
+      color: Colors.text
+      font.pixelSize: Colors.fontSizeSmall
       font.weight: Font.DemiBold
       elide: Text.ElideRight
       width: Math.min(contentWidth, 120)
@@ -97,7 +97,7 @@ Row {
 
     Rectangle {
       visible: secondaryLabel.text.length > 0
-      radius: 8
+      radius: Colors.radiusXS
       color: Colors.highlightLight
       border.color: Colors.border
       border.width: 1
@@ -110,14 +110,14 @@ Row {
         anchors.centerIn: parent
         text: root.secondaryText
         color: Colors.fgSecondary
-        font.pixelSize: 10
+        font.pixelSize: Colors.fontSizeXS
         font.weight: Font.Medium
       }
     }
 
     Rectangle {
       visible: root.hasVpn
-      radius: 8
+      radius: Colors.radiusXS
       color: Colors.withAlpha(Colors.accent, 0.14)
       border.color: Colors.withAlpha(Colors.accent, 0.35)
       border.width: 1
@@ -130,14 +130,14 @@ Row {
         anchors.centerIn: parent
         text: root.vpnCount > 1 ? root.vpnCount + " VPN" : "VPN"
         color: Colors.accent
-        font.pixelSize: 10
+        font.pixelSize: Colors.fontSizeXS
         font.weight: Font.DemiBold
       }
     }
 
     Rectangle {
       visible: root.tailscaleActive
-      radius: 8
+      radius: Colors.radiusXS
       color: Colors.withAlpha(Colors.primary, 0.14)
       border.color: Colors.withAlpha(Colors.primary, 0.35)
       border.width: 1
@@ -150,7 +150,7 @@ Row {
         anchors.centerIn: parent
         text: "TS"
         color: Colors.primary
-        font.pixelSize: 10
+        font.pixelSize: Colors.fontSizeXS
         font.weight: Font.DemiBold
       }
     }

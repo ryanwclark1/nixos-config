@@ -38,7 +38,7 @@ Rectangle {
     id: col
     anchors.fill: parent
     anchors.margins: Colors.paddingMedium
-    spacing: 10
+    spacing: Colors.paddingSmall
 
     Text { text: "TOP PROCESSES"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
 
@@ -54,17 +54,18 @@ Rectangle {
           Layout.fillWidth: true; height: 35; color: Colors.highlightLight; radius: 6
           
           RowLayout {
-            anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: 10
-            Text { text: "󰆍"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 14 }
-            Text { text: modelData.name; color: Colors.text; font.pixelSize: 11; font.weight: Font.Medium; Layout.fillWidth: true; elide: Text.ElideRight }
+            anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: Colors.paddingSmall
+            Text { text: "󰆍"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium }
+            Text { text: modelData.name; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium; Layout.fillWidth: true; elide: Text.ElideRight }
             Text { text: modelData.cpu + "%"; color: Colors.textSecondary; font.pixelSize: 9; font.family: Colors.fontMono }
             
             // Kill button
             Rectangle {
               width: 20; height: 20; radius: 4; color: killHover.containsMouse ? Colors.error : "transparent"
-              Text { anchors.centerIn: parent; text: "󰅖"; color: killHover.containsMouse ? Colors.text : Colors.textDisabled; font.pixelSize: 10 }
+              Behavior on color { ColorAnimation { duration: 160 } }
+              Text { anchors.centerIn: parent; text: "󰅖"; color: killHover.containsMouse ? Colors.text : Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; Behavior on color { ColorAnimation { duration: 160 } } }
               MouseArea {
-                id: killHover; anchors.fill: parent; hoverEnabled: true
+                id: killHover; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                 onClicked: Quickshell.execDetached(["pkill", modelData.name])
               }
             }

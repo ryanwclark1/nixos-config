@@ -5,10 +5,13 @@ import Quickshell.Io
 import "../services"
 import "../widgets" as SharedWidgets
 
-PopupWindow {
+BasePopupMenu {
   id: root
   implicitWidth: 360
   implicitHeight: 480
+  title: "Clipboard"
+  toggleMethod: "toggleClipboardMenu"
+  contentSpacing: 12
 
   property var clipboardItems: []
   property string searchQuery: ""
@@ -22,7 +25,7 @@ PopupWindow {
     var q = searchQuery.toLowerCase();
     var result = [];
     for (var i = 0; i < clipboardItems.length; i++) {
-      if (clipboardItems[i].content.toLowerCase().indexOf(q) !== -1)
+      if (clipboardItems[i] && clipboardItems[i].content && clipboardItems[i].content.toLowerCase().indexOf(q) !== -1)
         result.push(clipboardItems[i]);
     }
     return result;
@@ -39,195 +42,180 @@ PopupWindow {
 
   onVisibleChanged: if (visible) refresh()
 
-  Rectangle {
-    anchors.fill: parent
-    color: Colors.popupSurface
-    border.color: Colors.border
-    border.width: 1
-    radius: Colors.radiusMedium
-    clip: true
-
-    ColumnLayout {
-      anchors.fill: parent
-      anchors.margins: Colors.paddingLarge
-      spacing: 12
-
-      // Header
-      RowLayout {
-        Layout.fillWidth: true
-        Text {
-          text: "Clipboard"
-          color: Colors.fgMain
-          font.pixelSize: 18
-          font.weight: Font.DemiBold
-        }
-        Item { Layout.fillWidth: true }
-        Rectangle {
-          width: 30; height: 30; radius: 15
-          color: clearAllHover.containsMouse ? Colors.withAlpha(Colors.error, 0.2) : "transparent"
-          Text {
-            anchors.centerIn: parent
-            text: "󰃢"
-            color: clearAllHover.containsMouse ? Colors.error : Colors.textSecondary
-            font.family: Colors.fontMono
-            font.pixelSize: 16
-          }
-          MouseArea {
-            id: clearAllHover
-            anchors.fill: parent
-            hoverEnabled: true
-            onClicked: {
-              Quickshell.execDetached(["sh", "-c", "cliphist wipe"]);
-              root.clipboardItems = [];
-            }
-          }
-        }
-        SharedWidgets.MenuCloseButton { toggleMethod: "toggleClipboardMenu" }
+  headerExtras: [
+    Rectangle {
+      width: 30; height: 30; radius: height / 2
+      color: "transparent"
+      Text {
+        anchors.centerIn: parent
+        text: "󰃢"
+        color: clearAllHover.containsMouse ? Colors.error : Colors.textSecondary
+        Behavior on color { ColorAnimation { duration: 160 } }
+        font.family: Colors.fontMono
+        font.pixelSize: Colors.fontSizeLarge
       }
-
-      // Search bar
-      Rectangle {
-        Layout.fillWidth: true
-        height: 36
-        radius: height / 2
-        color: Colors.bgWidget
-        border.color: searchInput.activeFocus ? Colors.primary : Colors.border
-        border.width: 1
-
-        RowLayout {
-          anchors.fill: parent
-          anchors.leftMargin: 12
-          anchors.rightMargin: 12
-          spacing: 8
-
-          Text {
-            text: "󰍉"
-            color: Colors.textDisabled
-            font.family: Colors.fontMono
-            font.pixelSize: 14
-          }
-
-          TextInput {
-            id: searchInput
-            Layout.fillWidth: true
-            color: Colors.fgMain
-            font.pixelSize: 13
-            clip: true
-            onTextChanged: root.searchQuery = text
-
-            Text {
-              anchors.fill: parent
-              text: "Search clipboard..."
-              color: Colors.textDisabled
-              font.pixelSize: 13
-              visible: !searchInput.text && !searchInput.activeFocus
-              verticalAlignment: Text.AlignVCenter
-            }
-          }
-        }
+      SharedWidgets.StateLayer {
+        id: clearAllStateLayer
+        hovered: clearAllHover.containsMouse
+        pressed: clearAllHover.pressed
+        stateColor: Colors.error
       }
-
-      Rectangle {
-        Layout.fillWidth: true
-        height: 1
-        color: Colors.border
-      }
-
-      // Clipboard items list
-      Flickable {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        contentHeight: itemsColumn.implicitHeight
-        clip: true
-        boundsBehavior: Flickable.StopAtBounds
-
-        ColumnLayout {
-          id: itemsColumn
-          width: parent.width
-          spacing: 6
-
-          Repeater {
-            model: root.filteredItemsResult
-            delegate: Rectangle {
-              id: clipCard
-              Layout.fillWidth: true
-              implicitHeight: clipContent.implicitHeight + 20
-              radius: Colors.radiusSmall
-              color: clipMouse.containsMouse ? Colors.highlightLight : Colors.cardSurface
-              border.color: Colors.border
-              border.width: 1
-              Behavior on color { ColorAnimation { duration: 150 } }
-
-              RowLayout {
-                id: clipContent
-                anchors.fill: parent
-                anchors.margins: 10
-                spacing: 8
-
-                Text {
-                  text: modelData.content || ""
-                  color: Colors.fgMain
-                  font.pixelSize: 12
-                  Layout.fillWidth: true
-                  maximumLineCount: 2
-                  elide: Text.ElideRight
-                  wrapMode: Text.WrapAnywhere
-                }
-
-                Rectangle {
-                  width: 24; height: 24; radius: 12
-                  color: deleteHover.containsMouse ? Colors.withAlpha(Colors.error, 0.2) : "transparent"
-                  Text {
-                    anchors.centerIn: parent
-                    text: "󰅖"
-                    color: deleteHover.containsMouse ? Colors.error : Colors.textDisabled
-                    font.family: Colors.fontMono
-                    font.pixelSize: 12
-                  }
-                  MouseArea {
-                    id: deleteHover
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onClicked: {
-                      Quickshell.execDetached(["sh", "-c", "cliphist list | grep -F -- \"$1\" | head -1 | cliphist delete", "--", modelData.content || ""]);
-                      root.refresh();
-                    }
-                  }
-                }
-              }
-
-              MouseArea {
-                id: clipMouse
-                anchors.fill: parent
-                anchors.rightMargin: 36
-                hoverEnabled: true
-                onClicked: {
-                  var safeId = parseInt(modelData.id, 10);
-                  if (!isNaN(safeId)) Quickshell.execDetached(["sh", "-c", "cliphist decode " + safeId + " | wl-copy"]);
-                  Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleClipboardMenu"]);
-                }
-              }
-            }
-          }
-
-          // Empty state
-          Rectangle {
-            Layout.fillWidth: true
-            visible: root.filteredItemsResult.length === 0
-            implicitHeight: 60
-            radius: Colors.radiusMedium
-            color: Colors.cardSurface
-            border.color: Colors.border
-            border.width: 1
-            Text {
-              anchors.centerIn: parent
-              text: root.searchQuery ? "No matching items" : "Clipboard is empty"
-              color: Colors.textDisabled
-              font.pixelSize: 12
-            }
-          }
+      MouseArea {
+        id: clearAllHover
+        anchors.fill: parent
+        hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
+        onClicked: (mouse) => {
+          clearAllStateLayer.burst(mouse.x, mouse.y);
+          Quickshell.execDetached(["sh", "-c", "cliphist wipe"]);
+          root.clipboardItems = [];
         }
       }
     }
+  ]
+
+  // Search bar
+  Rectangle {
+    Layout.fillWidth: true
+    height: 36
+    radius: height / 2
+    color: Colors.bgWidget
+    border.color: searchInput.activeFocus ? Colors.primary : Colors.border
+    border.width: 1
+
+    RowLayout {
+      anchors.fill: parent
+      anchors.leftMargin: Colors.spacingM
+      anchors.rightMargin: Colors.spacingM
+      spacing: Colors.spacingS
+
+      Text {
+        text: "󰍉"
+        color: Colors.textDisabled
+        font.family: Colors.fontMono
+        font.pixelSize: Colors.fontSizeMedium
+      }
+
+      TextInput {
+        id: searchInput
+        Layout.fillWidth: true
+        color: Colors.text
+        font.pixelSize: Colors.fontSizeMedium
+        clip: true
+        onTextChanged: root.searchQuery = text
+
+        Text {
+          anchors.fill: parent
+          text: "Search clipboard..."
+          color: Colors.textDisabled
+          font.pixelSize: Colors.fontSizeMedium
+          visible: !searchInput.text && !searchInput.activeFocus
+          verticalAlignment: Text.AlignVCenter
+        }
+      }
+    }
+  }
+
+  Rectangle {
+    Layout.fillWidth: true
+    height: 1
+    color: Colors.border
+  }
+
+  // Clipboard items list
+  SharedWidgets.ScrollableContent {
+    Layout.fillWidth: true
+    Layout.fillHeight: true
+    columnSpacing: Colors.spacingS
+
+      Repeater {
+        model: root.filteredItemsResult
+        delegate: Rectangle {
+          id: clipCard
+          Layout.fillWidth: true
+          implicitHeight: clipContent.implicitHeight + 20
+          radius: Colors.radiusSmall
+          color: Colors.cardSurface
+          border.color: Colors.border
+          border.width: 1
+
+          SharedWidgets.StateLayer {
+            id: clipStateLayer
+            hovered: clipMouse.containsMouse
+            pressed: clipMouse.pressed
+          }
+
+          RowLayout {
+            id: clipContent
+            anchors.fill: parent
+            anchors.margins: Colors.paddingSmall
+            spacing: Colors.spacingS
+
+            Text {
+              text: modelData.content || ""
+              color: Colors.text
+              font.pixelSize: Colors.fontSizeSmall
+              Layout.fillWidth: true
+              maximumLineCount: 2
+              elide: Text.ElideRight
+              wrapMode: Text.WrapAnywhere
+            }
+
+            Rectangle {
+              width: 24; height: 24; radius: 12
+              color: "transparent"
+              Text {
+                anchors.centerIn: parent
+                text: "󰅖"
+                color: deleteHover.containsMouse ? Colors.error : Colors.textDisabled
+                Behavior on color { ColorAnimation { duration: 160 } }
+                font.family: Colors.fontMono
+                font.pixelSize: Colors.fontSizeSmall
+              }
+              SharedWidgets.StateLayer {
+                id: deleteStateLayer
+                hovered: deleteHover.containsMouse
+                pressed: deleteHover.pressed
+                stateColor: Colors.error
+              }
+              MouseArea {
+                id: deleteHover
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: (mouse) => {
+                  deleteStateLayer.burst(mouse.x, mouse.y);
+                  Quickshell.execDetached(["sh", "-c", "cliphist list | grep -F -- \"$1\" | head -1 | cliphist delete", "--", modelData.content || ""]);
+                  root.refresh();
+                }
+              }
+            }
+          }
+
+          MouseArea {
+            id: clipMouse
+            anchors.fill: parent
+            anchors.rightMargin: 36
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: (mouse) => {
+              clipStateLayer.burst(mouse.x, mouse.y);
+              var safeId = parseInt(modelData.id, 10);
+              if (!isNaN(safeId)) Quickshell.execDetached(["sh", "-c", "cliphist decode " + safeId + " | wl-copy"]);
+              Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleClipboardMenu"]);
+            }
+          }
+        }
+      }
+
+      // Empty state
+      SharedWidgets.EmptyState {
+        Layout.fillWidth: true
+        Layout.topMargin: 8
+        Layout.bottomMargin: 8
+        visible: root.filteredItemsResult.length === 0
+        icon: root.searchQuery ? "󰍉" : "󰅗"
+        message: root.searchQuery ? "No matching items" : "Clipboard is empty"
+      }
   }
 }

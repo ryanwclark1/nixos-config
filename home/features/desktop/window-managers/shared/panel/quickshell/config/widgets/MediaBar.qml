@@ -1,7 +1,6 @@
 import QtQuick
 import "../modules"
 import "../services"
-import "." as LocalWidgets
 
 Rectangle {
   id: root
@@ -9,32 +8,65 @@ Rectangle {
   implicitWidth: visible ? (mediaRow.width + 16) : 0
   width: implicitWidth
   radius: height / 2
-  color: mediaMouse.containsMouse ? Colors.highlightLight : Colors.bgWidget
+  color: Colors.bgWidget
   clip: true
 
   property var anchorWindow: null
   visible: MediaService.currentPlayer !== null
 
+  // Rewind detection: flash prev icon when position jumps backward > 3s
+  property real _lastPosition: 0
+  property real _rewindFlashOpacity: 0
+
+  Connections {
+    target: MediaService
+    function onCurrentPositionChanged() {
+      if (root._lastPosition > 0 && MediaService.currentPosition < root._lastPosition - 3000) {
+        rewindFlash.restart();
+      }
+      root._lastPosition = MediaService.currentPosition;
+    }
+  }
+
+  SequentialAnimation {
+    id: rewindFlash
+    NumberAnimation { target: root; property: "_rewindFlashOpacity"; to: 1.0; duration: 100 }
+    NumberAnimation { target: root; property: "_rewindFlashOpacity"; to: 0.0; duration: 400; easing.type: Easing.OutCubic }
+  }
+
   Behavior on width { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
   Behavior on opacity { NumberAnimation { duration: 300 } }
-  Behavior on color { ColorAnimation { duration: 160 } }
-  Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+  Behavior on scale { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
   opacity: visible ? 1.0 : 0.0
   scale: mediaMouse.containsMouse ? 1.04 : 1.0
+
+  // Rewind flash indicator
+  Text {
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    anchors.leftMargin: 4
+    text: "󰒮"
+    color: Colors.primary
+    font.family: Colors.fontMono
+    font.pixelSize: Colors.fontSizeXS
+    opacity: root._rewindFlashOpacity
+    z: 2
+  }
 
   Row {
     id: mediaRow
     anchors.centerIn: parent
     anchors.leftMargin: 8
     anchors.rightMargin: 8
-    spacing: 8
+    spacing: Colors.spacingS
 
     CircularGauge {
       width: 18; height: 18
       anchors.verticalCenter: parent.verticalCenter
       value: MediaService.trackLength > 0 ? (MediaService.currentPosition / MediaService.trackLength) : 0
       thickness: 2
-      color: Colors.primary
+      color: MediaService.artAccentColor
+      Behavior on color { ColorAnimation { duration: 400 } }
       icon: MediaService.isPlaying ? "󰏤" : "󰐊"
     }
 
@@ -48,8 +80,8 @@ Rectangle {
       Text {
         id: marqueeText
         text: MediaService.trackTitle + (MediaService.trackArtist ? " - " + MediaService.trackArtist : "")
-        color: Colors.fgMain
-        font.pixelSize: 11
+        color: Colors.text
+        font.pixelSize: Colors.fontSizeSmall
         font.weight: Font.Medium
         anchors.verticalCenter: parent.verticalCenter
 
@@ -65,12 +97,21 @@ Rectangle {
     }
   }
 
+  StateLayer {
+    id: stateLayer
+    hovered: mediaMouse.containsMouse
+    pressed: mediaMouse.pressed
+    stateColor: Colors.primary
+  }
+
   MouseArea {
     id: mediaMouse
     anchors.fill: parent
     acceptedButtons: Qt.LeftButton | Qt.MiddleButton
     hoverEnabled: true
+    cursorShape: Qt.PointingHandCursor
     onClicked: (mouse) => {
+      stateLayer.burst(mouse.x, mouse.y);
       if (mouse.button === Qt.LeftButton) {
         MediaService.playPause();
       } else if (mouse.button === Qt.MiddleButton) {
@@ -80,15 +121,16 @@ Rectangle {
     onDoubleClicked: MediaService.next()
 
     onWheel: (wheel) => {
-      if (MediaService.currentPlayer) {
-        var vol = MediaService.currentPlayer.volume || 0;
-        if (wheel.angleDelta.y > 0) MediaService.currentPlayer.volume = Colors.clamp01(vol + 0.05);
-        else MediaService.currentPlayer.volume = Colors.clamp01(vol - 0.05);
+      var player = MediaService.currentPlayer;
+      if (player) {
+        var vol = player.volume || 0;
+        if (wheel.angleDelta.y > 0) player.volume = Colors.clamp01(vol + 0.05);
+        else player.volume = Colors.clamp01(vol - 0.05);
       }
     }
   }
 
-  LocalWidgets.BarTooltip {
+  BarTooltip {
     anchorItem: root
     anchorWindow: root.anchorWindow
     hovered: mediaMouse.containsMouse

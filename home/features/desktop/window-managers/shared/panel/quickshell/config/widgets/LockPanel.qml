@@ -89,7 +89,7 @@ Item {
       Text {
         Layout.alignment: Qt.AlignHCenter
         text: Qt.formatDateTime(lockClock.date, "HH:mm")
-        color: Colors.fgMain
+        color: Colors.text
         font.pixelSize: compact ? 80 : 120
         font.weight: Font.Bold
       }
@@ -107,7 +107,7 @@ Item {
     ColumnLayout {
       id: authArea
       Layout.alignment: Qt.AlignHCenter
-      spacing: 16
+      spacing: Colors.spacingL
       Layout.preferredWidth: 300
 
       property real shakeOffset: 0
@@ -124,14 +124,14 @@ Item {
 
         RowLayout {
           anchors.fill: parent
-          anchors.margins: 12
-          spacing: 10
+          anchors.margins: Colors.spacingM
+          spacing: Colors.paddingSmall
 
           Text {
             text: "󰌾"
             color: Colors.fgDim
             font.family: Colors.fontMono
-            font.pixelSize: 18
+            font.pixelSize: Colors.fontSizeXL
           }
 
           TextInput {
@@ -139,7 +139,7 @@ Item {
             Layout.fillWidth: true
             verticalAlignment: Text.AlignVCenter
             color: Colors.text
-            font.pixelSize: 18
+            font.pixelSize: Colors.fontSizeXL
             echoMode: TextInput.Password
             focus: true
 
@@ -161,8 +161,8 @@ Item {
 
           // Submit button
           Rectangle {
-            width: 28; height: 28; radius: 14
-            color: submitMa.containsMouse ? Colors.primary : Colors.withAlpha(Colors.primary, 0.6)
+            width: 28; height: 28; radius: Colors.radiusMedium
+            color: Colors.withAlpha(Colors.primary, 0.6)
             visible: pwInput.text.length > 0
 
             Text {
@@ -170,7 +170,14 @@ Item {
               text: "󰁔"
               color: Colors.background
               font.family: Colors.fontMono
-              font.pixelSize: 14
+              font.pixelSize: Colors.fontSizeMedium
+            }
+
+            StateLayer {
+              id: submitStateLayer
+              hovered: submitMa.containsMouse
+              pressed: submitMa.pressed
+              stateColor: Colors.primary
             }
 
             MouseArea {
@@ -178,7 +185,10 @@ Item {
               anchors.fill: parent
               hoverEnabled: true
               cursorShape: Qt.PointingHandCursor
-              onClicked: { if (lockContext) lockContext.tryUnlock(); }
+              onClicked: (mouse) => {
+                submitStateLayer.burst(mouse.x, mouse.y);
+                if (lockContext) lockContext.tryUnlock();
+              }
             }
           }
         }
@@ -188,7 +198,7 @@ Item {
           anchors.centerIn: parent
           text: "Unlock..."
           color: Colors.fgDim
-          font.pixelSize: 16
+          font.pixelSize: Colors.fontSizeLarge
           visible: !pwInput.text && !pwInput.activeFocus
         }
       }
@@ -198,7 +208,7 @@ Item {
         Layout.alignment: Qt.AlignHCenter
         text: lockContext ? lockContext.errorMessage : ""
         color: Colors.error
-        font.pixelSize: 12
+        font.pixelSize: Colors.fontSizeSmall
         font.weight: Font.Medium
         visible: lockContext ? lockContext.showError : false
       }
@@ -208,7 +218,7 @@ Item {
         Layout.alignment: Qt.AlignHCenter
         text: "Authenticating..."
         color: Colors.fgDim
-        font.pixelSize: 11
+        font.pixelSize: Colors.fontSizeSmall
         visible: lockContext ? lockContext.unlockInProgress : false
       }
 
@@ -226,26 +236,33 @@ Item {
         RowLayout {
           id: countdownRow
           anchors.centerIn: parent
-          spacing: 8
+          spacing: Colors.spacingS
 
           Text {
             text: root.pendingAction.charAt(0).toUpperCase() + root.pendingAction.slice(1) + " in " + Math.ceil(root.timeRemaining / 1000) + "s"
             color: Colors.error
-            font.pixelSize: 13
+            font.pixelSize: Colors.fontSizeMedium
             font.weight: Font.Medium
           }
 
           Rectangle {
-            width: 20; height: 20; radius: 10
-            color: cancelMa.containsMouse ? Colors.error : "transparent"
+            width: 20; height: 20; radius: Colors.radiusSmall
+            color: "transparent"
             border.color: Colors.error; border.width: 1
+
+            StateLayer {
+              id: cancelStateLayer
+              hovered: cancelMa.containsMouse
+              pressed: cancelMa.pressed
+              stateColor: Colors.error
+            }
 
             Text {
               anchors.centerIn: parent
               text: "󰅖"
               color: Colors.error
               font.family: Colors.fontMono
-              font.pixelSize: 10
+              font.pixelSize: Colors.fontSizeXS
             }
 
             MouseArea {
@@ -253,7 +270,10 @@ Item {
               anchors.fill: parent
               hoverEnabled: true
               cursorShape: Qt.PointingHandCursor
-              onClicked: root.cancelTimer()
+              onClicked: (mouse) => {
+                cancelStateLayer.burst(mouse.x, mouse.y);
+                root.cancelTimer();
+              }
             }
           }
         }
@@ -272,7 +292,52 @@ Item {
       Loader {
         active: Config.lockScreenMediaControls && !compact && SystemStatus.hasActivePlayer
         Layout.maximumWidth: 350
-        sourceComponent: MediaWidget {}
+        sourceComponent: Rectangle {
+          implicitWidth: 320
+          implicitHeight: 60
+          radius: 12
+          color: Colors.withAlpha(Colors.background, 0.4)
+          border.color: Colors.border
+          border.width: 1
+
+          RowLayout {
+            anchors.fill: parent
+            anchors.margins: Colors.paddingSmall
+            spacing: Colors.paddingSmall
+
+            ColumnLayout {
+              Layout.fillWidth: true
+              spacing: 2
+              Text {
+                text: MediaService.trackTitle || ""
+                color: Colors.text
+                font.pixelSize: Colors.fontSizeMedium
+                font.weight: Font.DemiBold
+                elide: Text.ElideRight
+                Layout.fillWidth: true
+              }
+              Text {
+                text: MediaService.trackArtist || ""
+                color: Colors.textSecondary
+                font.pixelSize: Colors.fontSizeSmall
+                elide: Text.ElideRight
+                Layout.fillWidth: true
+              }
+            }
+
+            Text {
+              text: MediaService.isPlaying ? "󰏤" : "󰐊"
+              color: Colors.text
+              font.family: Colors.fontMono
+              font.pixelSize: Colors.fontSizeHuge
+              MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: MediaService.playPause()
+              }
+            }
+          }
+        }
       }
 
       Item { Layout.fillWidth: true }
@@ -281,17 +346,17 @@ Item {
       Loader {
         active: Config.lockScreenWeather && !compact && WeatherService.temp !== ""
         sourceComponent: RowLayout {
-          spacing: 8
+          spacing: Colors.spacingS
           Text {
             text: Colors.weatherIcon(WeatherService.condition)
             color: Colors.fgSecondary
             font.family: Colors.fontMono
-            font.pixelSize: 20
+            font.pixelSize: Colors.fontSizeXL
           }
           Text {
             text: (WeatherService.temp || "") + " " + (WeatherService.condition || "")
             color: Colors.fgSecondary
-            font.pixelSize: 14
+            font.pixelSize: Colors.fontSizeMedium
           }
         }
       }
@@ -302,14 +367,14 @@ Item {
         text: UPower.displayDevice ? "󰁹 " + Math.round(UPower.displayDevice.percentage * 100) + "%" : ""
         color: Colors.fgSecondary
         font.family: Colors.fontMono
-        font.pixelSize: 14
+        font.pixelSize: Colors.fontSizeMedium
       }
 
       // Session buttons (optional)
       Loader {
         active: Config.lockScreenSessionButtons
         sourceComponent: RowLayout {
-          spacing: 8
+          spacing: Colors.spacingS
 
           SessionButton { icon: "󰍃"; label: "Logout"; action: "logout" }
           SessionButton { icon: "󰤄"; label: "Suspend"; action: "suspend" }
@@ -349,17 +414,25 @@ Item {
     property string label: ""
     property string action: ""
 
-    width: 36; height: 36; radius: 18
-    color: sessionMa.containsMouse ? Colors.withAlpha(Colors.text, 0.15) : Colors.withAlpha(Colors.text, 0.05)
+    width: 36; height: 36; radius: height / 2
+    color: Colors.withAlpha(Colors.text, 0.05)
     border.color: (root.timerActive && root.pendingAction === action) ? Colors.error : Colors.border
     border.width: 1
+    Behavior on border.color { ColorAnimation { duration: 160 } }
+
+    StateLayer {
+      id: sessionStateLayer
+      hovered: sessionMa.containsMouse
+      pressed: sessionMa.pressed
+    }
 
     Text {
       anchors.centerIn: parent
       text: parent.icon
       color: (root.timerActive && root.pendingAction === parent.action) ? Colors.error : Colors.fgSecondary
+      Behavior on color { ColorAnimation { duration: 160 } }
       font.family: Colors.fontMono
-      font.pixelSize: 16
+      font.pixelSize: Colors.fontSizeLarge
     }
 
     MouseArea {
@@ -367,13 +440,16 @@ Item {
       anchors.fill: parent
       hoverEnabled: true
       cursorShape: Qt.PointingHandCursor
-      onClicked: root.startTimer(parent.action)
+      onClicked: (mouse) => {
+        sessionStateLayer.burst(mouse.x, mouse.y);
+        root.startTimer(parent.action);
+      }
     }
 
     BarTooltip {
       text: parent.label
       anchorItem: parent
-      show: sessionMa.containsMouse
+      hovered: sessionMa.containsMouse
     }
   }
 }

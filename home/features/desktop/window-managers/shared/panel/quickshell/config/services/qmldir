@@ -3,8 +3,12 @@ singleton Colors 1.0 Colors.qml
 singleton Config 1.0 Config.qml
 singleton DesktopWidgetRegistry 1.0 DesktopWidgetRegistry.qml
 singleton MediaService 1.0 MediaService.qml
+singleton PluginService 1.0 PluginService.qml
+singleton PrinterService 1.0 PrinterService.qml
+singleton PrivacyService 1.0 PrivacyService.qml
 singleton RecordingService 1.0 RecordingService.qml
 singleton SpectrumService 1.0 SpectrumService.qml
 singleton SystemStatus 1.0 SystemStatus.qml
 singleton ToastService 1.0 ToastService.qml
+singleton WallpaperService 1.0 WallpaperService.qml
 singleton WeatherService 1.0 WeatherService.qml

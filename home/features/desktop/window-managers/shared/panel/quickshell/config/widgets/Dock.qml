@@ -161,20 +161,25 @@ Scope {
     dockApps = combined;
   }
 
+  // Debounced rebuild: coalesces rapid toplevel/config changes into a single update per frame
+  property bool _rebuildPending: false
+  function scheduleRebuild() {
+    if (_rebuildPending) return;
+    _rebuildPending = true;
+    Qt.callLater(() => { _rebuildPending = false; _entryCache = {}; updateDockApps(); });
+  }
+
   // Rebuild on toplevel changes
   Connections {
     target: (typeof ToplevelManager !== 'undefined' && ToplevelManager.toplevels) ? ToplevelManager.toplevels : null
-    function onValuesChanged() {
-      root._entryCache = {};
-      root.updateDockApps();
-    }
+    function onValuesChanged() { root.scheduleRebuild(); }
   }
 
   // Rebuild on pinned apps change
   Connections {
     target: Config
-    function onDockPinnedAppsChanged() { root.updateDockApps(); }
-    function onDockGroupAppsChanged() { root.updateDockApps(); }
+    function onDockPinnedAppsChanged() { root.scheduleRebuild(); }
+    function onDockGroupAppsChanged() { root.scheduleRebuild(); }
   }
 
   Component.onCompleted: Qt.callLater(updateDockApps)
@@ -269,7 +274,8 @@ Scope {
               radius: 2
               color: Colors.primary
               opacity: screenDelegate.hidden ? 0.6 : 0.0
-              Behavior on opacity { NumberAnimation { duration: 200 } }
+              visible: opacity > 0
+              Behavior on opacity { NumberAnimation { duration: 160 } }
             }
           }
         }
@@ -293,35 +299,41 @@ Scope {
             WlrLayershell.namespace: "quickshell-dock"
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
 
-            mask: Region { item: dockBg }
+            mask: Region { item: dockContent.background }
 
-            // Show/hide animations
-            opacity: screenDelegate.hidden ? 0 : 1
-            property real yOffset: screenDelegate.hidden ? (screenDelegate.isBottom ? 20 : -20) : 0
-            Behavior on opacity { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-            Behavior on yOffset { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-            transform: Translate { y: dockWindow.yOffset }
-
-            MouseArea {
+            // Show/hide: wrap content in Item so opacity + translate animate on an Item, not the window
+            Item {
+              id: dockAnimWrapper
               anchors.fill: parent
-              hoverEnabled: true
-              acceptedButtons: Qt.NoButton
-              onEntered: {
-                screenDelegate.dockHovered = true;
-                hideTimer.stop();
-              }
-              onExited: {
-                screenDelegate.dockHovered = false;
-                if (screenDelegate.autoHide && !screenDelegate.peekHovered) hideTimer.restart();
-              }
-            }
 
-            DockContent {
-              id: dockContent
-              anchors.centerIn: parent
-              dockApps: root.dockApps
-              dockRoot: root
-              anchorWindow: dockWindow
+              opacity: screenDelegate.hidden ? 0 : 1
+              visible: opacity > 0
+              property real yOffset: screenDelegate.hidden ? (screenDelegate.isBottom ? 20 : -20) : 0
+              Behavior on opacity { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+              Behavior on yOffset { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+              transform: Translate { y: dockAnimWrapper.yOffset }
+
+              MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                acceptedButtons: Qt.NoButton
+                onEntered: {
+                  screenDelegate.dockHovered = true;
+                  hideTimer.stop();
+                }
+                onExited: {
+                  screenDelegate.dockHovered = false;
+                  if (screenDelegate.autoHide && !screenDelegate.peekHovered) hideTimer.restart();
+                }
+              }
+
+              DockContent {
+                id: dockContent
+                anchors.centerIn: parent
+                dockApps: root.dockApps
+                dockRoot: root
+                anchorWindow: dockWindow
+              }
             }
           }
         }

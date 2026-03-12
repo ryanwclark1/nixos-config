@@ -23,19 +23,19 @@ PanelWindow {
   Column {
     id: content
     anchors.fill: parent
-    spacing: 4
+    spacing: Colors.spacingXS
 
     Text {
       text: "Activate Linux"
       color: Colors.withAlpha(Colors.text, 0.5)
-      font.pixelSize: 24
+      font.pixelSize: Colors.fontSizeHuge
       font.family: "Cantarell, sans-serif"
     }
 
     Text {
       text: "Go to Settings to activate Linux."
       color: Colors.withAlpha(Colors.text, 0.5)
-      font.pixelSize: 14
+      font.pixelSize: Colors.fontSizeMedium
       font.family: "Cantarell, sans-serif"
     }
   }

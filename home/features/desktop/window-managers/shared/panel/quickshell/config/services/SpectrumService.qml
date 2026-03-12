@@ -13,26 +13,10 @@ QtObject {
   readonly property int barsCount: 32
 
   // ── Subscriber pattern ─────────────────────────
-  property var _subscribers: ({})
-  property int _subscriberCount: 0
+  property int subscriberCount: 0
+  onSubscriberCountChanged: _onSubscribersChanged()
 
-  function registerComponent(id) {
-    if (!_subscribers[id]) {
-      _subscribers[id] = true;
-      _subscriberCount++;
-      _onSubscribersChanged();
-    }
-  }
-
-  function unregisterComponent(id) {
-    if (_subscribers[id]) {
-      delete _subscribers[id];
-      _subscriberCount = Math.max(0, _subscriberCount - 1);
-      _onSubscribersChanged();
-    }
-  }
-
-  property bool _shouldRun: _subscriberCount > 0
+  property bool _shouldRun: subscriberCount > 0
 
   function _onSubscribersChanged() {
     if (_shouldRun && !_cavaProc.running) {
@@ -126,7 +110,7 @@ QtObject {
     var allZero = true;
 
     for (var i = 0; i < barsCount && i < parts.length; i++) {
-      var v = parseInt(parts[i]) / 100.0;
+      var v = parseInt(parts[i], 10) / 100.0;
       if (isNaN(v)) v = 0;
       buf[i] = Math.max(0, Math.min(1, v));
       if (buf[i] > 0.01) allZero = false;

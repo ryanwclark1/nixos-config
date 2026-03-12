@@ -4,11 +4,11 @@ import Quickshell
 import Quickshell.Services.SystemTray
 import Quickshell.Widgets
 import "../services"
-import "." as LocalWidgets
+
 
 Row {
   id: root
-  spacing: 8
+  spacing: Colors.spacingS
   anchors.verticalCenter: parent.verticalCenter
   property var anchorWindow: null
 
@@ -20,12 +20,11 @@ Row {
       width: 24
       height: 24
       radius: 6
-      color: mouseArea.containsMouse ? Colors.highlightLight : "transparent"
+      color: "transparent"
       scale: mouseArea.containsMouse ? 1.08 : 1.0
 
       anchors.verticalCenter: parent.verticalCenter
-      Behavior on color { ColorAnimation { duration: 160 } }
-      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+      Behavior on scale { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
 
       IconImage {
         anchors.centerIn: parent
@@ -38,9 +37,16 @@ Row {
           anchors.centerIn: parent
           text: "󰏘"
           color: Colors.textSecondary
-          font.pixelSize: 14
+          font.pixelSize: Colors.fontSizeMedium
           visible: parent.status !== IconImage.Ready
         }
+      }
+
+      StateLayer {
+        id: stateLayer
+        hovered: mouseArea.containsMouse
+        pressed: mouseArea.pressed
+        stateColor: Colors.primary
       }
 
       MouseArea {
@@ -51,6 +57,7 @@ Row {
         cursorShape: Qt.PointingHandCursor
 
         onClicked: (mouse) => {
+          stateLayer.burst(mouse.x, mouse.y);
           if (mouse.button === Qt.RightButton) {
             if (modelData.hasMenu) {
               try {
@@ -71,7 +78,7 @@ Row {
         }
       }
 
-      LocalWidgets.BarTooltip {
+      BarTooltip {
         anchorItem: trayItem
         anchorWindow: root.anchorWindow
         hovered: mouseArea.containsMouse

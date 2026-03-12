@@ -5,14 +5,9 @@ import Quickshell.Io
 import "../services"
 import "../widgets" as SharedWidgets
 
-Rectangle {
+SharedWidgets.CardBase {
   id: root
-  Layout.fillWidth: true
   Layout.preferredHeight: 100
-  color: Colors.bgWidget
-  radius: Colors.radiusMedium
-  border.color: Colors.border
-  clip: true
 
   property string nixUpdates: "0"
   property string flatpakUpdates: "0"
@@ -58,51 +53,52 @@ Rectangle {
   }
 
   function checkUpdates() {
+    if (refreshProc.running) return;
     isChecking = true;
     refreshProc.running = true;
   }
 
   RowLayout {
-    anchors.fill: parent
-    anchors.margins: Colors.paddingMedium
-    spacing: 15
+    Layout.fillWidth: true
+    Layout.fillHeight: true
+    spacing: Colors.paddingMedium
 
     Rectangle {
       width: 50; height: 50; radius: 25; color: Colors.secondary
-      Text { anchors.centerIn: parent; text: "󰚰"; color: Colors.text; font.pixelSize: 24; font.family: Colors.fontMono }
+      Text { anchors.centerIn: parent; text: "󰚰"; color: Colors.text; font.pixelSize: Colors.fontSizeHuge; font.family: Colors.fontMono }
     }
 
     ColumnLayout {
       Layout.fillWidth: true
-      spacing: 4
+      spacing: Colors.spacingXS
       Text {
         text: "System Updates"
-        color: Colors.fgMain
-        font.pixelSize: 14
+        color: Colors.text
+        font.pixelSize: Colors.fontSizeMedium
         font.weight: Font.Bold
         elide: Text.ElideRight
         Layout.fillWidth: true
       }
 
       RowLayout {
-        spacing: 12; Layout.fillWidth: true
+        spacing: Colors.spacingM; Layout.fillWidth: true
         RowLayout {
-          spacing: 4
-          Text { text: ""; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 12 }
+          spacing: Colors.spacingXS
+          Text { text: ""; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeSmall }
           Text {
             text: root.nixUpdates
             color: Colors.fgSecondary
-            font.pixelSize: 11
+            font.pixelSize: Colors.fontSizeSmall
             font.family: Colors.fontMono
           }
         }
         RowLayout {
-          spacing: 4
-          Text { text: "󰏘"; color: Colors.accent; font.family: Colors.fontMono; font.pixelSize: 12 }
+          spacing: Colors.spacingXS
+          Text { text: "󰏘"; color: Colors.accent; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeSmall }
           Text {
             text: root.flatpakUpdates
             color: Colors.fgSecondary
-            font.pixelSize: 11
+            font.pixelSize: Colors.fontSizeSmall
             font.family: Colors.fontMono
           }
         }
@@ -111,16 +107,33 @@ Rectangle {
     }
 
     Rectangle {
-      width: 80; height: 32; radius: 6; color: root.isChecking ? Colors.surface : Colors.primary
+      width: 80; height: 32; radius: 6
+      color: root.isChecking ? Colors.surface : Colors.primary
+      Behavior on color { ColorAnimation { duration: 160 } }
       Text {
         anchors.centerIn: parent
         text: root.isChecking ? "..." : "Refresh"
-        color: Colors.text; font.pixelSize: 11; font.weight: Font.Bold
+        color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Bold
+      }
+      SharedWidgets.StateLayer {
+        id: refreshStateLayer
+        anchors.fill: parent
+        radius: parent.radius
+        stateColor: Colors.primary
+        visible: !root.isChecking
+        hovered: refreshHover.containsMouse
+        pressed: refreshHover.pressed
       }
       MouseArea {
+        id: refreshHover
         anchors.fill: parent
+        hoverEnabled: true
         enabled: !root.isChecking
-        onClicked: root.checkUpdates()
+        cursorShape: Qt.PointingHandCursor
+        onClicked: (mouse) => {
+          refreshStateLayer.burst(mouse.x, mouse.y);
+          root.checkUpdates();
+        }
       }
     }
   }

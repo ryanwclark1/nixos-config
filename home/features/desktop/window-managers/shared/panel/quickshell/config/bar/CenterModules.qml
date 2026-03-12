@@ -26,9 +26,9 @@ Item {
       + "total=$(( (nix > 0 ? nix : 0) + (flat > 0 ? flat : 0) )); "
       + "echo $total"
     ]
-    parse: function(out) { return parseInt(String(out || "").trim()) || 0 }
+    parse: function(out) { return parseInt(String(out || "").trim(), 10) || 0 }
     onUpdated: {
-      var count = updatePoll.value;
+      var count = updatePoll.value || 0;
       root.updatesCount = count > 0 ? count.toString() : "0";
       root.updatesIcon = count > 0 ? "󰮯" : "󰚰";
     }
@@ -36,7 +36,7 @@ Item {
 
   Row {
     id: mainRow
-    spacing: 8
+    spacing: Colors.spacingS
     anchors.verticalCenter: parent.verticalCenter
 
     SharedWidgets.MediaBar {
@@ -52,15 +52,13 @@ Item {
 
       Row {
         spacing: 6
-        Text { text: root.updatesIcon; color: Colors.accent; font.pixelSize: 16; font.family: Colors.fontMono; anchors.verticalCenter: parent.verticalCenter }
-        Text { text: root.updatesCount; color: Colors.fgMain; font.pixelSize: 13; font.weight: Font.DemiBold; anchors.verticalCenter: parent.verticalCenter }
+        Text { text: root.updatesIcon; color: Colors.accent; font.pixelSize: Colors.fontSizeXL; font.family: Colors.fontMono; anchors.verticalCenter: parent.verticalCenter }
+        Text { text: root.updatesCount; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.DemiBold; anchors.verticalCenter: parent.verticalCenter }
       }
     }
 
     // Cava spectrum (via SpectrumService)
-    Component.onCompleted: if (visible) SpectrumService.registerComponent("centermodules")
-    Component.onDestruction: SpectrumService.unregisterComponent("centermodules")
-    onVisibleChanged: visible ? SpectrumService.registerComponent("centermodules") : SpectrumService.unregisterComponent("centermodules")
+    Loader { active: root.visible; sourceComponent: SharedWidgets.Ref { service: SpectrumService } }
 
     // Map spectrum values to block chars for bar display and popup
     readonly property var _blockChars: ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"]
@@ -68,17 +66,15 @@ Item {
       var idx = Math.min(7, Math.floor(v * 8));
       return _blockChars[Math.max(0, idx)];
     }
-    readonly property string cavaBarText: {
-      var vals = SpectrumService.values;
-      var s = "";
-      for (var i = 0; i < 8 && i < vals.length; i++) s += _valToBlock(vals[i]);
-      return s || "▁▂▃▄▅▆▇█";
-    }
     readonly property string fullCavaData: {
-      var vals = SpectrumService.values;
+      var vals = SpectrumService.values || [];
       var s = "";
       for (var i = 0; i < vals.length; i++) s += _valToBlock(vals[i]);
-      return s;
+      return s || "";
+    }
+    readonly property string cavaBarText: {
+      var full = fullCavaData || "";
+      return full.length >= 8 ? full.substring(0, 8) : (full || "▁▂▃▄▅▆▇█");
     }
 
     SharedWidgets.BarPill {
@@ -94,7 +90,7 @@ Item {
         id: cavaText
         text: root.cavaBarText
         color: Colors.primary
-        font.pixelSize: 13
+        font.pixelSize: Colors.fontSizeMedium
       }
     }
 
@@ -112,7 +108,7 @@ Item {
       id: inhibitorPill
       width: 32
       height: 28
-      color: inhibitorMouse.containsMouse ? Colors.highlightLight : (root.inhibitorActive ? Colors.withAlpha(Colors.primary, 0.2) : Colors.bgWidget)
+      color: root.inhibitorActive ? Colors.withAlpha(Colors.primary, 0.2) : Colors.bgWidget
       radius: height / 2
       anchors.verticalCenter: parent.verticalCenter
       border.color: root.inhibitorActive ? Colors.primary : "transparent"
@@ -122,11 +118,17 @@ Item {
       Behavior on color { ColorAnimation { duration: 160 } }
       Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
 
+      SharedWidgets.StateLayer {
+        id: inhibitorStateLayer
+        hovered: inhibitorMouse.containsMouse
+        pressed: inhibitorMouse.pressed
+      }
+
       Text {
         anchors.centerIn: parent
         text: "󰒲"
-        color: root.inhibitorActive ? Colors.primary : Colors.fgMain
-        font.pixelSize: 16
+        color: root.inhibitorActive ? Colors.primary : Colors.text
+        font.pixelSize: Colors.fontSizeXL
         font.family: Colors.fontMono
       }
 
@@ -135,7 +137,8 @@ Item {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        onClicked: {
+        onClicked: (mouse) => {
+          inhibitorStateLayer.burst(mouse.x, mouse.y);
           Quickshell.execDetached(["qs-inhibitor"]);
           // Force check update slightly later
           inhibitorCheckTimer.restart()
@@ -180,5 +183,6 @@ Item {
     }
     visible: root.cavaPopupVisible
     cavaData: root.fullCavaData
+    onCloseRequested: root.cavaPopupVisible = false
   }
 }

@@ -7,6 +7,6 @@ Text {
   property var state: null
 
   color: Colors.fgSecondary
-  font.pixelSize: 11
+  font.pixelSize: Colors.fontSizeSmall
   text: root.state && root.state.keyboardLayout !== "" ? root.state.keyboardLayout : "Layout"
 }

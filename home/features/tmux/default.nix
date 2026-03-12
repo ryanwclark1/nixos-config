@@ -4,35 +4,35 @@
   pkgs,
   ...
 }:
-let
-  tmux-which-key =
-    pkgs.tmuxPlugins.mkTmuxPlugin
-    {
-      pluginName = "tmux-which-key";
-      version = "2025-05-15";
-      src = pkgs.fetchFromGitHub {
-        owner = "alexwforsythe";
-        repo = "tmux-which-key";
-        rev = "1f419775caf136a60aac8e3a269b51ad10b51eb6";
-        sha256 = "sha256-X7FunHrAexDgAlZfN+JOUJvXFZeyVj9yu6WRnxMEA8E=";
-      };
-      rtpFilePath = "plugin.sh.tmux";
-    };
+# let
+#   tmux-which-key =
+#     pkgs.tmuxPlugins.mkTmuxPlugin
+#     {
+#       pluginName = "tmux-which-key";
+#       version = "2025-05-15";
+#       src = pkgs.fetchFromGitHub {
+#         owner = "alexwforsythe";
+#         repo = "tmux-which-key";
+#         rev = "1f419775caf136a60aac8e3a269b51ad10b51eb6";
+#         sha256 = "sha256-X7FunHrAexDgAlZfN+JOUJvXFZeyVj9yu6WRnxMEA8E=";
+#       };
+#       rtpFilePath = "plugin.sh.tmux";
+#     };
 
-  tmux-menus =
-    pkgs.tmuxPlugins.mkTmuxPlugin
-    {
-      pluginName = "tmux-menus";
-      version = "v2.2.22";
-      src = pkgs.fetchFromGitHub {
-        owner = "jaclu";
-        repo = "tmux-menus";
-        tag = "v2.2.22";
-        sha256 = "sha256-N2RMatxmpcbziiCfz0B1j6TfOpmZ4Bkx2kTdOs8R2ug=";
-      };
-      rtpFilePath = "plugin.sh.tmux";
-    };
-in
+#   tmux-menus =
+#     pkgs.tmuxPlugins.mkTmuxPlugin
+#     {
+#       pluginName = "tmux-menus";
+#       version = "v2.2.22";
+#       src = pkgs.fetchFromGitHub {
+#         owner = "jaclu";
+#         repo = "tmux-menus";
+#         tag = "v2.2.22";
+#         sha256 = "sha256-N2RMatxmpcbziiCfz0B1j6TfOpmZ4Bkx2kTdOs8R2ug=";
+#       };
+#       rtpFilePath = "plugin.sh.tmux";
+#     };
+# in
 
 {
   home.shellAliases = {
@@ -100,6 +100,23 @@ in
       ###################################
       # Configure the forceline plugin
 
+      # Options must be set BEFORE sourcing the plugin
+      set -g @forceline_theme "catppuccin-frappe"
+      set -g @forceline_window_status_style "rounded"
+      set -g @forceline_window_flags "icon"
+      set -g @forceline_window_number_position "left"
+      set -g @forceline_status_connect_separator "yes"
+
+      # Load the forceline plugin (theme, modules, status rendering)
+      source-file ~/.config/tmux/plugins/tmux-forceline/forceline.tmux
+
+      # Status bar layout using forceline module segments
+      set -g status-position bottom
+      set -g status-justify centre
+      set -g status-left-length 100
+      set -g status-right-length 100
+      set -g status-left "#{E:@forceline_status_session}"
+      set -g status-right "#{E:@forceline_status_cpu}#{E:@forceline_status_memory}#{E:@forceline_status_datetime}"
 
       # Reload configuration with Prefix + r
       bind r source-file ~/.config/tmux/tmux.conf \; display-message "Config reloaded!"

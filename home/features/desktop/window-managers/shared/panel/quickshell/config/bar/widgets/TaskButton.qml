@@ -6,9 +6,9 @@ import "../../widgets" as SharedWidgets
 
 Rectangle {
   id: taskItem
-  width: 32; height: 32; radius: 8
-  color: isFocused ? Colors.highlight : (mouseArea.containsMouse ? Colors.highlightLight : "transparent")
-  border.color: isFocused ? Colors.primary : "transparent"; border.width: 1
+  width: 32; height: 32; radius: Colors.radiusXS
+  color: actualFocused ? Colors.highlight : "transparent"
+  border.color: actualFocused ? Colors.primary : "transparent"; border.width: 1
   clip: true
   scale: mouseArea.containsMouse ? 1.06 : 1.0
 
@@ -44,7 +44,7 @@ Rectangle {
   }
 
   Behavior on color { ColorAnimation { duration: 160 } }
-  Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+  Behavior on scale { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
 
   // Running indicator dot
   Rectangle {
@@ -91,16 +91,24 @@ Rectangle {
   Text {
     anchors.centerIn: parent
     text: "󰀻"
-    color: Colors.fgMain
+    color: Colors.text
     font.family: Colors.fontMono
-    font.pixelSize: 16
+    font.pixelSize: Colors.fontSizeLarge
     visible: !taskIcon.visible
+  }
+
+  SharedWidgets.StateLayer {
+    id: stateLayer
+    hovered: mouseArea.containsMouse
+    pressed: mouseArea.pressed
+    stateColor: Colors.primary
   }
 
   MouseArea {
     id: mouseArea; anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true; acceptedButtons: Qt.LeftButton | Qt.RightButton
-    
+
     onClicked: (mouse) => {
+      stateLayer.burst(mouse.x, mouse.y);
       if (mouse.button === Qt.LeftButton) {
         if (isRunning) {
           var addr = isPinned ? runningInstance.address : appAddress;

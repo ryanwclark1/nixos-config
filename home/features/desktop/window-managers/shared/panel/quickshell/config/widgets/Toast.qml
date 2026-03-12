@@ -114,26 +114,26 @@ Item {
       anchors.left: parent.left
       anchors.right: parent.right
       anchors.top: parent.top
-      anchors.margins: 12
+      anchors.margins: Colors.spacingM
       anchors.topMargin: 15
-      spacing: 4
+      spacing: Colors.spacingXS
 
       Row {
-        spacing: 10
+        spacing: Colors.paddingSmall
         width: parent.width
 
         Text {
           text: root.icon
           color: root.borderColor
           font.family: Colors.fontMono
-          font.pixelSize: 18
+          font.pixelSize: Colors.fontSizeXL
           anchors.verticalCenter: parent.verticalCenter
         }
 
         Text {
           text: root.title
-          color: Colors.fgMain
-          font.pixelSize: 14
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeMedium
           font.weight: Font.Bold
           width: parent.width - 32
           elide: Text.ElideRight
@@ -143,7 +143,7 @@ Item {
       Text {
         text: root.description
         color: Colors.textSecondary
-        font.pixelSize: 12
+        font.pixelSize: Colors.fontSizeSmall
         width: parent.width
         wrapMode: Text.Wrap
         visible: text !== ""

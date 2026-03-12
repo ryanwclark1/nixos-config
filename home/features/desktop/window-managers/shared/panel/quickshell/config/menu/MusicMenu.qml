@@ -5,327 +5,294 @@ import Quickshell.Services.Mpris
 import "../services"
 import "../widgets" as SharedWidgets
 
-PopupWindow {
+BasePopupMenu {
   id: root
   implicitWidth: 360
   implicitHeight: 400
+  title: "Music"
+  toggleMethod: "toggleMusicMenu"
+  surfaceTint: Colors.withAlpha(root.dominantColor, 0.05)
 
-  readonly property var activePlayers: MediaService.getAvailablePlayers()
+  readonly property var activePlayers: {
+    MediaService.currentPlayer; // force re-eval on player change
+    return MediaService.getAvailablePlayers();
+  }
   readonly property var player: MediaService.currentPlayer
+  // Bind dominant color directly to MediaService's extracted accent color
+  property color dominantColor: MediaService.artAccentColor
 
-  Rectangle {
-    anchors.fill: parent
-    color: Colors.popupSurface
-    border.color: Colors.border
-    border.width: 1
-    radius: Colors.radiusMedium
-    clip: true
+  // Sticky fallback art: keep previous art visible for 3s after track change
+  property string _fallbackArtUrl: ""
+  readonly property string effectiveArtUrl: MediaService.trackArtUrl || _fallbackArtUrl
 
+  onEffectiveArtUrlChanged: {
+    if (MediaService.trackArtUrl) {
+      _fallbackArtUrl = MediaService.trackArtUrl;
+      fallbackClearTimer.stop();
+    } else if (_fallbackArtUrl) {
+      fallbackClearTimer.restart();
+    }
+  }
+
+  Timer {
+    id: fallbackClearTimer
+    interval: 3000
+    onTriggered: root._fallbackArtUrl = ""
+  }
+
+  headerExtras: [
+    // Player selector (only if multiple players)
+    Rectangle {
+      visible: root.activePlayers.length > 1
+      width: playerSelectorText.implicitWidth + 24
+      height: 26
+      radius: 13
+      color: Colors.bgWidget
+
+      Text {
+        id: playerSelectorText
+        anchors.centerIn: parent
+        text: root.player ? (root.player.identity || "") : ""
+        color: Colors.textSecondary
+        font.pixelSize: Colors.fontSizeSmall
+      }
+
+      SharedWidgets.StateLayer {
+        id: stateLayer
+        hovered: playerSelectorHover.containsMouse
+        pressed: playerSelectorHover.pressed
+      }
+
+      MouseArea {
+        id: playerSelectorHover
+        anchors.fill: parent
+        hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
+        onClicked: (mouse) => {
+          stateLayer.burst(mouse.x, mouse.y);
+          var idx = (MediaService.selectedPlayerIndex + 1) % root.activePlayers.length;
+          MediaService.switchToPlayer(idx);
+        }
+      }
+    }
+  ]
+
+  // No player state
+  Item {
+    Layout.fillWidth: true
+    Layout.fillHeight: true
+    visible: !root.player
+
+    Text {
+      anchors.centerIn: parent
+      text: "No music playing"
+      color: Colors.textDisabled
+      font.pixelSize: Colors.fontSizeLarge
+    }
+  }
+
+  // Player content
+  ColumnLayout {
+    Layout.fillWidth: true
+    Layout.fillHeight: true
+    spacing: Colors.spacingL
+    visible: !!root.player
+
+    // Album art
+    Rectangle {
+      Layout.alignment: Qt.AlignHCenter
+      Layout.preferredWidth: 120
+      Layout.preferredHeight: 120
+      radius: Colors.radiusMedium
+      color: Colors.surface
+      clip: true
+
+      Image {
+        id: albumArt
+        anchors.fill: parent
+        source: root.effectiveArtUrl || ""
+        sourceSize: Qt.size(240, 240)
+        asynchronous: true
+        fillMode: Image.PreserveAspectCrop
+        visible: status === Image.Ready
+      }
+
+      Text {
+        anchors.centerIn: parent
+        text: "󰝚"
+        color: Colors.fgDim
+        font.family: Colors.fontMono
+        font.pixelSize: 48
+        visible: albumArt.status !== Image.Ready
+      }
+
+    }
+
+    // Track info
     ColumnLayout {
-      anchors.fill: parent
-      anchors.margins: Colors.paddingLarge
-      spacing: 14
+      Layout.fillWidth: true
+      spacing: 2
 
-      // Header
+      Text {
+        text: MediaService.trackTitle || "Unknown Track"
+        color: Colors.text
+        font.pixelSize: Colors.fontSizeXL
+        font.weight: Font.Bold
+        Layout.fillWidth: true
+        horizontalAlignment: Text.AlignHCenter
+        elide: Text.ElideRight
+      }
+
+      Text {
+        text: MediaService.trackArtist || "Unknown Artist"
+        color: Colors.fgSecondary
+        font.pixelSize: Colors.fontSizeMedium
+        Layout.fillWidth: true
+        horizontalAlignment: Text.AlignHCenter
+        elide: Text.ElideRight
+      }
+    }
+
+    // Seek bar
+    ColumnLayout {
+      Layout.fillWidth: true
+      spacing: Colors.spacingXS
+      visible: MediaService.trackLength > 0
+
+      Item {
+        Layout.fillWidth: true
+        height: 12
+
+        SharedWidgets.WavyProgress {
+          anchors.fill: parent
+          value: MediaService.trackLength > 0 ? MediaService.currentPosition / MediaService.trackLength : 0
+          active: MediaService.isPlaying
+          color: root.dominantColor
+          trackColor: Colors.withAlpha(root.dominantColor, 0.18)
+          amplitude: 2.5
+          frequency: 0.15
+          lineWidth: 2.5
+        }
+
+        MouseArea {
+          id: seekMouse
+          anchors.fill: parent
+          hoverEnabled: true
+          cursorShape: Qt.PointingHandCursor
+          onClicked: (mouse) => {
+            if (MediaService.trackLength > 0 && width > 0) {
+              MediaService.seekByRatio(Colors.clamp01(mouse.x / width));
+            }
+          }
+          onPositionChanged: (mouse) => {
+            if (pressed && MediaService.trackLength > 0 && width > 0) {
+              MediaService.seekByRatio(Colors.clamp01(mouse.x / width));
+            }
+          }
+        }
+      }
+
       RowLayout {
         Layout.fillWidth: true
         Text {
-          text: "Music"
-          color: Colors.fgMain
-          font.pixelSize: 18
-          font.weight: Font.DemiBold
+          text: MediaService.positionString
+          color: Colors.textDisabled
+          font.pixelSize: Colors.fontSizeXS
+          font.family: Colors.fontMono
         }
         Item { Layout.fillWidth: true }
-
-        // Player selector (only if multiple players)
-        Rectangle {
-          visible: root.activePlayers.length > 1
-          width: playerSelectorText.implicitWidth + 24
-          height: 26
-          radius: 13
-          color: playerSelectorHover.containsMouse ? Colors.highlightLight : Colors.bgWidget
-          Behavior on color { ColorAnimation { duration: 150 } }
-
-          Text {
-            id: playerSelectorText
-            anchors.centerIn: parent
-            text: root.player ? (root.player.identity || "") : ""
-            color: Colors.textSecondary
-            font.pixelSize: 11
-          }
-
-          MouseArea {
-            id: playerSelectorHover
-            anchors.fill: parent
-            hoverEnabled: true
-            onClicked: {
-              var idx = (MediaService.selectedPlayerIndex + 1) % root.activePlayers.length;
-              MediaService.switchToPlayer(idx);
-            }
-          }
+        Text {
+          text: MediaService.lengthString
+          color: Colors.textDisabled
+          font.pixelSize: Colors.fontSizeXS
+          font.family: Colors.fontMono
         }
+      }
+    }
 
-        SharedWidgets.MenuCloseButton { toggleMethod: "toggleMusicMenu" }
+    // Transport controls
+    RowLayout {
+      Layout.alignment: Qt.AlignHCenter
+      spacing: Colors.spacingXL
+
+      SharedWidgets.PulseButton {
+        icon: "󰒟"; size: 28; tint: Colors.textSecondary
+        onClicked: if (root.player) root.player.shuffle = !root.player.shuffle
+      }
+
+      SharedWidgets.PulseButton {
+        icon: "󰒮"; size: 36; tint: Colors.text
+        onClicked: MediaService.previous()
+      }
+
+      // Play/Pause (larger, filled style — tinted by album art accent)
+      SharedWidgets.PulseButton {
+        icon: MediaService.isPlaying ? "󰏤" : "󰐊"
+        size: 48; tint: Colors.background
+        color: root.dominantColor
+        Behavior on color { ColorAnimation { duration: 400 } }
+        onClicked: MediaService.playPause()
+      }
+
+      SharedWidgets.PulseButton {
+        icon: "󰒭"; size: 36; tint: Colors.text
+        onClicked: MediaService.next()
+      }
+
+      SharedWidgets.PulseButton {
+        icon: "󰑖"; size: 28; tint: Colors.textSecondary
+        onClicked: {
+          if (!root.player) return;
+          if (root.player.loopStatus === Mpris.None) root.player.loopStatus = Mpris.Track;
+          else if (root.player.loopStatus === Mpris.Track) root.player.loopStatus = Mpris.Playlist;
+          else root.player.loopStatus = Mpris.None;
+        }
+      }
+    }
+
+    // Volume
+    RowLayout {
+      Layout.fillWidth: true
+      spacing: 10
+
+      Text {
+        text: "󰕾"
+        color: Colors.textSecondary
+        font.family: Colors.fontMono
+        font.pixelSize: Colors.fontSizeLarge
       }
 
       Rectangle {
+        id: volTrack
         Layout.fillWidth: true
-        height: 1
-        color: Colors.border
-      }
+        height: 4
+        radius: 2
+        color: Colors.bgWidget
 
-      // No player state
-      Item {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        visible: !root.player
-
-        Text {
-          anchors.centerIn: parent
-          text: "No music playing"
-          color: Colors.textDisabled
-          font.pixelSize: 14
-        }
-      }
-
-      // Player content
-      ColumnLayout {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        spacing: 16
-        visible: !!root.player
-
-        // Album art
         Rectangle {
-          Layout.alignment: Qt.AlignHCenter
-          Layout.preferredWidth: 120
-          Layout.preferredHeight: 120
-          radius: Colors.radiusMedium
-          color: Colors.surface
-          clip: true
-
-          Image {
-            id: albumArt
-            anchors.fill: parent
-            source: MediaService.trackArtUrl || ""
-            fillMode: Image.PreserveAspectCrop
-            visible: status === Image.Ready
-          }
-
-          Text {
-            anchors.centerIn: parent
-            text: "󰝚"
-            color: Colors.fgDim
-            font.family: Colors.fontMono
-            font.pixelSize: 48
-            visible: albumArt.status !== Image.Ready
-          }
+          height: parent.height
+          width: root.player ? parent.width * Colors.clamp01(root.player.volume) : 0
+          radius: 2
+          color: root.dominantColor
+          Behavior on color { ColorAnimation { duration: 400 } }
         }
 
-        // Track info
-        ColumnLayout {
-          Layout.fillWidth: true
-          spacing: 2
-
-          Text {
-            text: MediaService.trackTitle || "Unknown Track"
-            color: Colors.fgMain
-            font.pixelSize: 16
-            font.weight: Font.Bold
-            Layout.fillWidth: true
-            horizontalAlignment: Text.AlignHCenter
-            elide: Text.ElideRight
-          }
-
-          Text {
-            text: MediaService.trackArtist || "Unknown Artist"
-            color: Colors.fgSecondary
-            font.pixelSize: 13
-            Layout.fillWidth: true
-            horizontalAlignment: Text.AlignHCenter
-            elide: Text.ElideRight
-          }
+        MouseArea {
+          anchors.fill: parent
+          cursorShape: Qt.PointingHandCursor
+          onPressed: (mouse) => { if (root.player) root.player.volume = Colors.clamp01(mouse.x / width); }
+          onPositionChanged: (mouse) => { if (pressed && root.player) root.player.volume = Colors.clamp01(mouse.x / width); }
         }
+      }
 
-        // Seek bar
-        ColumnLayout {
-          Layout.fillWidth: true
-          spacing: 4
-          visible: MediaService.trackLength > 0
-
-          Rectangle {
-            id: seekTrack
-            Layout.fillWidth: true
-            height: 6
-            radius: 3
-            color: Colors.bgWidget
-            border.color: seekMouse.containsMouse ? Colors.primary : Colors.border
-            border.width: 1
-
-            Rectangle {
-              height: parent.height
-              width: MediaService.trackLength > 0 ? parent.width * (MediaService.currentPosition / MediaService.trackLength) : 0
-              radius: 3
-              color: Colors.primary
-              Behavior on width { NumberAnimation { duration: 200 } }
-            }
-
-            MouseArea {
-              id: seekMouse
-              anchors.fill: parent
-              hoverEnabled: true
-              onClicked: (mouse) => {
-                if (MediaService.trackLength > 0) {
-                  MediaService.seekByRatio(mouse.x / width);
-                }
-              }
-              onPositionChanged: (mouse) => {
-                if (pressed && MediaService.trackLength > 0) {
-                  MediaService.seekByRatio(mouse.x / width);
-                }
-              }
-            }
-          }
-
-          RowLayout {
-            Layout.fillWidth: true
-            Text {
-              text: MediaService.positionString
-              color: Colors.textDisabled
-              font.pixelSize: 10
-              font.family: Colors.fontMono
-            }
-            Item { Layout.fillWidth: true }
-            Text {
-              text: MediaService.lengthString
-              color: Colors.textDisabled
-              font.pixelSize: 10
-              font.family: Colors.fontMono
-            }
-          }
-        }
-
-        // Transport controls
-        RowLayout {
-          Layout.alignment: Qt.AlignHCenter
-          spacing: 24
-
-          // Shuffle
-          MouseArea {
-            width: 28; height: 28
-            hoverEnabled: true
-            Rectangle {
-              anchors.fill: parent; radius: 14
-              color: parent.containsMouse ? Colors.highlightLight : "transparent"
-            }
-            Text { text: "󰒟"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 18; anchors.centerIn: parent }
-            onClicked: if (root.player) root.player.shuffle = !root.player.shuffle
-          }
-
-          // Previous
-          MouseArea {
-            width: 36; height: 36
-            hoverEnabled: true
-            Rectangle {
-              anchors.fill: parent; radius: 18
-              color: parent.containsMouse ? Colors.highlightLight : "transparent"
-            }
-            Text { text: "󰒮"; color: Colors.fgMain; font.family: Colors.fontMono; font.pixelSize: 22; anchors.centerIn: parent }
-            onClicked: MediaService.previous()
-          }
-
-          // Play/Pause
-          MouseArea {
-            width: 48; height: 48
-            hoverEnabled: true
-            Rectangle {
-              anchors.fill: parent; radius: 24
-              color: parent.containsMouse ? Qt.darker(Colors.primary, 1.1) : Colors.primary
-              Behavior on color { ColorAnimation { duration: 150 } }
-            }
-            Text {
-              text: MediaService.isPlaying ? "󰏤" : "󰐊"
-              color: Colors.background
-              font.family: Colors.fontMono
-              font.pixelSize: 22
-              anchors.centerIn: parent
-            }
-            onClicked: MediaService.playPause()
-          }
-
-          // Next
-          MouseArea {
-            width: 36; height: 36
-            hoverEnabled: true
-            Rectangle {
-              anchors.fill: parent; radius: 18
-              color: parent.containsMouse ? Colors.highlightLight : "transparent"
-            }
-            Text { text: "󰒭"; color: Colors.fgMain; font.family: Colors.fontMono; font.pixelSize: 22; anchors.centerIn: parent }
-            onClicked: MediaService.next()
-          }
-
-          // Repeat
-          MouseArea {
-            width: 28; height: 28
-            hoverEnabled: true
-            Rectangle {
-              anchors.fill: parent; radius: 14
-              color: parent.containsMouse ? Colors.highlightLight : "transparent"
-            }
-            Text { text: "󰑖"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 18; anchors.centerIn: parent }
-            onClicked: {
-              if (!root.player) return;
-              if (root.player.loopStatus === Mpris.None) root.player.loopStatus = Mpris.Track;
-              else if (root.player.loopStatus === Mpris.Track) root.player.loopStatus = Mpris.Playlist;
-              else root.player.loopStatus = Mpris.None;
-            }
-          }
-        }
-
-        // Volume
-        RowLayout {
-          Layout.fillWidth: true
-          spacing: 10
-
-          Text {
-            text: "󰕾"
-            color: Colors.textSecondary
-            font.family: Colors.fontMono
-            font.pixelSize: 14
-          }
-
-          Rectangle {
-            id: volTrack
-            Layout.fillWidth: true
-            height: 4
-            radius: 2
-            color: Colors.bgWidget
-
-            Rectangle {
-              height: parent.height
-              width: root.player ? parent.width * Colors.clamp01(root.player.volume) : 0
-              radius: 2
-              color: Colors.primary
-            }
-
-            MouseArea {
-              anchors.fill: parent
-              onPressed: (mouse) => { if (root.player) root.player.volume = Colors.clamp01(mouse.x / width); }
-              onPositionChanged: (mouse) => { if (pressed && root.player) root.player.volume = Colors.clamp01(mouse.x / width); }
-            }
-          }
-
-          Text {
-            text: root.player ? Math.round(Colors.clamp01(root.player.volume) * 100) + "%" : "0%"
-            color: Colors.textDisabled
-            font.pixelSize: 10
-            font.family: Colors.fontMono
-          }
-        }
-
-        Item { Layout.fillHeight: true }
+      Text {
+        text: root.player ? Math.round(Colors.clamp01(root.player.volume) * 100) + "%" : "0%"
+        color: Colors.textDisabled
+        font.pixelSize: Colors.fontSizeXS
+        font.family: Colors.fontMono
       }
     }
+
+    Item { Layout.fillHeight: true }
   }
 }

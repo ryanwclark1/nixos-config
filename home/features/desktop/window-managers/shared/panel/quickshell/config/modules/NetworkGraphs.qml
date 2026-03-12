@@ -9,8 +9,13 @@ Rectangle {
   Layout.preferredHeight: 120
   color: Colors.bgWidget
   radius: Colors.radiusMedium
-  border.color: Colors.border
+  border.color: netCardHover.hovered ? Colors.primary : Colors.border
   clip: true
+  scale: netCardHover.hovered ? 1.01 : 1.0
+  Behavior on scale { NumberAnimation { duration: 300; easing.type: Easing.OutQuint } }
+  Behavior on border.color { ColorAnimation { duration: 160 } }
+
+  HoverHandler { id: netCardHover }
 
   property var downHistory: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
   property var upHistory: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -46,8 +51,8 @@ Rectangle {
         var lines = (this.text || "").trim().split("\n");
         if (lines.length < 3) return;
         root.activeInterface = lines[0] || "offline";
-        var rx = parseInt(lines[1]) || 0;
-        var tx = parseInt(lines[2]) || 0;
+        var rx = parseInt(lines[1], 10) || 0;
+        var tx = parseInt(lines[2], 10) || 0;
 
         if (root.lastRx > 0) {
           var diffRx = Math.max(0, rx - root.lastRx);
@@ -84,12 +89,13 @@ Rectangle {
   }
 
   function paintGraph(canvas, data, strokeColor) {
+    if (!data.length || canvas.width <= 0 || canvas.height <= 0) return;
     var ctx = canvas.getContext("2d");
     ctx.reset();
     ctx.strokeStyle = strokeColor;
     ctx.lineWidth = 2;
     ctx.beginPath();
-    var w = canvas.width / (data.length - 1);
+    var w = data.length > 1 ? canvas.width / (data.length - 1) : canvas.width;
     for (var i = 0; i < data.length; i++) {
       var x = i * w;
       var y = canvas.height - (data[i] * canvas.height);
@@ -130,6 +136,8 @@ Rectangle {
       }
       Canvas {
         id: downCanvas; Layout.fillWidth: true; Layout.fillHeight: true
+        renderTarget: Canvas.FramebufferObject
+        renderStrategy: Canvas.Threaded
         onPaint: root.paintGraph(downCanvas, root.downHistory, Colors.primary)
       }
     }
@@ -151,6 +159,8 @@ Rectangle {
       }
       Canvas {
         id: upCanvas; Layout.fillWidth: true; Layout.fillHeight: true
+        renderTarget: Canvas.FramebufferObject
+        renderStrategy: Canvas.Threaded
         onPaint: root.paintGraph(upCanvas, root.upHistory, Colors.accent)
       }
     }

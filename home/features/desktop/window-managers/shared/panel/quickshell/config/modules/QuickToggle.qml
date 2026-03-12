@@ -1,10 +1,11 @@
 import QtQuick
 import QtQuick.Layouts
 import "../services"
+import "../widgets" as SharedWidgets
 
 Rectangle {
   id: root
-  
+
   property string icon: ""
   property string label: ""
   property bool active: false
@@ -13,29 +14,35 @@ Rectangle {
   Layout.fillWidth: true
   Layout.preferredHeight: 60
   radius: Colors.radiusMedium
-  color: active ? Colors.primary : (toggleMouse.containsMouse ? Colors.surface : Colors.bgWidget)
+  color: active ? Colors.primary : Colors.bgWidget
   border.color: active ? Colors.primary : Colors.border
   border.width: 1
 
-  Behavior on color { ColorAnimation { duration: 200 } }
-  Behavior on border.color { ColorAnimation { duration: 200 } }
+  opacity: enabled ? 1.0 : 0.4
+  scale: toggleMouse.pressed ? 0.95 : 1.0
+  Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutBack } }
+  Behavior on color { ColorAnimation { duration: 160 } }
+  Behavior on border.color { ColorAnimation { duration: 160 } }
 
   RowLayout {
     anchors.fill: parent
     anchors.margins: 12
-    spacing: 12
+    spacing: Colors.spacingM
 
     Rectangle {
+      id: iconCircle
       width: 36; height: 36
-      radius: 18
+      radius: height / 2
       color: active ? Colors.withAlpha(Colors.text, 0.2) : Colors.surface
+      scale: toggleMouse.containsMouse ? 1.1 : 1.0
+      Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }
 
       Text {
         anchors.centerIn: parent
         text: root.icon
         color: active ? Colors.text : Colors.primary
         font.family: Colors.fontMono
-        font.pixelSize: 18
+        font.pixelSize: Colors.fontSizeXL
       }
     }
 
@@ -44,23 +51,31 @@ Rectangle {
       spacing: 2
       Text {
         text: root.label
-        color: active ? Colors.text : Colors.fgMain
-        font.pixelSize: 12
+        color: active ? Colors.text : Colors.text
+        font.pixelSize: Colors.fontSizeMedium
         font.weight: Font.Bold
         elide: Text.ElideRight
       }
       Text {
         text: active ? "On" : "Off"
         color: active ? Colors.withAlpha(Colors.text, 0.7) : Colors.fgSecondary
-        font.pixelSize: 10
+        font.pixelSize: Colors.fontSizeXS
       }
     }
+  }
+
+  SharedWidgets.StateLayer {
+    id: stateLayer
+    hovered: toggleMouse.containsMouse
+    pressed: toggleMouse.pressed
+    disabled: !root.enabled
   }
 
   MouseArea {
     id: toggleMouse
     anchors.fill: parent
-    hoverEnabled: true
-    onClicked: root.clicked()
+    hoverEnabled: root.enabled
+    cursorShape: root.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+    onClicked: (mouse) => { if (!root.enabled) return; stateLayer.burst(mouse.x, mouse.y); root.clicked(); }
   }
 }

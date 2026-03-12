@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Io
 import Quickshell.Wayland
 import "../services"
 
@@ -16,7 +17,8 @@ PanelWindow {
   color: "transparent"
 
   property bool isVisible: false
-  visible: isVisible
+  visible: isVisible || _unmapDelay.running
+  Timer { id: _unmapDelay; interval: 350 }
 
   WlrLayershell.layer: WlrLayer.Overlay
   WlrLayershell.keyboardFocus: root.isVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
@@ -28,9 +30,39 @@ PanelWindow {
   property bool timerActive: false
   property int timeRemaining: 0
 
+  // ── Keyboard navigation ────────────────────────
+  property int currentIndex: -1
+
+  readonly property var actions: [
+    { key: "shutdown", icon: "󰐥", label: "Shutdown", color: Colors.error, danger: true, cmd: ["systemctl", "poweroff"] },
+    { key: "reboot", icon: "󰑐", label: "Reboot", color: Colors.accent, danger: true, cmd: ["systemctl", "reboot"] },
+    { key: "lock", icon: "󰌾", label: "Lock", color: Colors.primary, danger: false, cmd: ["hyprlock"] },
+    { key: "logout", icon: "󰗽", label: "Logout", color: Colors.fgSecondary, danger: false, cmd: ["hyprctl", "dispatch", "exit"] }
+  ]
+
+  // ── Uptime ─────────────────────────────────────
+  property string uptimeText: ""
+  Process {
+    id: uptimeProc
+    command: ["sh", "-c", "uptime -p | sed 's/^up //'"]
+    running: false
+    stdout: StdioCollector {
+      onStreamFinished: root.uptimeText = (this.text || "").trim()
+    }
+  }
+
+  onIsVisibleChanged: {
+    if (isVisible) {
+      uptimeProc.running = true;
+      currentIndex = -1;
+    } else {
+      _unmapDelay.restart();
+      cancelTimer();
+    }
+  }
+
   function startTimer(key, cmd) {
     if (timerActive && pendingAction === key) {
-      // Double-click confirm: execute immediately
       executeAction(cmd);
       return;
     }
@@ -67,9 +99,6 @@ PanelWindow {
     }
   }
 
-  // Reset countdown when menu closes
-  onIsVisibleChanged: if (!isVisible) cancelTimer()
-
   Item {
     anchors.fill: parent
     visible: root.isVisible
@@ -80,7 +109,26 @@ PanelWindow {
       else root.isVisible = false;
     }
 
-    // Backdrop to close
+    Keys.onPressed: (event) => {
+      if (event.key === Qt.Key_Left || event.key === Qt.Key_H) {
+        root.currentIndex = Math.max(0, root.currentIndex - 1);
+        event.accepted = true;
+      } else if (event.key === Qt.Key_Right || event.key === Qt.Key_L) {
+        root.currentIndex = Math.min(root.actions.length - 1, root.currentIndex + 1);
+        event.accepted = true;
+      } else if (event.key === Qt.Key_Tab) {
+        root.currentIndex = (root.currentIndex + 1) % root.actions.length;
+        event.accepted = true;
+      } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+        if (root.currentIndex >= 0 && root.currentIndex < root.actions.length) {
+          var action = root.actions[root.currentIndex];
+          root.startTimer(action.key, action.cmd);
+        }
+        event.accepted = true;
+      }
+    }
+
+    // Backdrop
     MouseArea {
       anchors.fill: parent
       onClicked: {
@@ -102,15 +150,26 @@ PanelWindow {
       anchors.centerIn: parent
       spacing: 40
       scale: root.isVisible ? 1.0 : 0.9
-      Behavior on scale { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
+      Behavior on scale { NumberAnimation { id: pmScaleAnim; duration: 300; easing.type: Easing.OutBack } }
       opacity: root.isVisible ? 1.0 : 0.0
-      Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+      Behavior on opacity { NumberAnimation { id: pmFadeAnim; duration: 300; easing.type: Easing.OutCubic } }
+      layer.enabled: pmScaleAnim.running || pmFadeAnim.running
 
       Text {
         text: "Power Menu"
-        color: Colors.fgMain
+        color: Colors.text
         font.pixelSize: 32
         font.weight: Font.Bold
+        Layout.alignment: Qt.AlignHCenter
+      }
+
+      // Uptime display
+      Text {
+        visible: root.uptimeText !== ""
+        text: "up " + root.uptimeText
+        color: Colors.textDisabled
+        font.pixelSize: Colors.fontSizeMedium
+        font.family: Colors.fontMono
         Layout.alignment: Qt.AlignHCenter
       }
 
@@ -118,42 +177,69 @@ PanelWindow {
         spacing: 20
 
         Repeater {
-          model: [
-            { key: "shutdown", icon: "󰐥", label: "Shutdown", color: Colors.error, cmd: ["systemctl", "poweroff"] },
-            { key: "reboot", icon: "󰑐", label: "Reboot", color: Colors.accent, cmd: ["systemctl", "reboot"] },
-            { key: "lock", icon: "󰌾", label: "Lock", color: Colors.primary, cmd: ["hyprlock"] },
-            { key: "logout", icon: "󰗽", label: "Logout", color: Colors.fgSecondary, cmd: ["hyprctl", "dispatch", "exit"] }
-          ]
+          model: root.actions
 
-          delegate: Rectangle {
-            id: btn
+          delegate: Item {
             width: 120; height: 120
-            radius: 20
 
             property bool isPending: root.timerActive && root.pendingAction === modelData.key
+            property bool isFocused: root.currentIndex === index
+            property color activeColor: modelData.danger ? Colors.error : Colors.primary
 
-            color: mouseArea.containsMouse ? Colors.highlight : Colors.highlightLight
-            border.color: isPending ? Colors.primary : (mouseArea.containsMouse ? modelData.color : Colors.border)
-            border.width: isPending ? 3 : 2
+            // Layer 1: Base (stable, never animated)
+            Rectangle {
+              id: baseLayer
+              anchors.fill: parent
+              radius: Colors.radiusLarge
+              color: Colors.highlightLight
+            }
 
-            Behavior on color { ColorAnimation { duration: 150 } }
-            Behavior on border.color { ColorAnimation { duration: 150 } }
+            // Layer 2: Hover overlay
+            Rectangle {
+              anchors.fill: parent
+              radius: Colors.radiusLarge
+              color: Colors.highlight
+              opacity: mouseArea.containsMouse || parent.isFocused ? 1.0 : 0.0
+              Behavior on opacity { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+            }
+
+            // Layer 3: Active/pending overlay
+            Rectangle {
+              anchors.fill: parent
+              radius: Colors.radiusLarge
+              color: parent.activeColor
+              opacity: parent.isPending ? 0.3 : 0.0
+              Behavior on opacity { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+            }
+
+            // Focus/pending border
+            Rectangle {
+              anchors.fill: parent
+              radius: Colors.radiusLarge
+              color: "transparent"
+              border.color: parent.isPending ? parent.activeColor
+                : parent.isFocused ? Colors.primary
+                : mouseArea.containsMouse ? modelData.color
+                : Colors.border
+              border.width: parent.isPending ? 3 : (parent.isFocused ? 2 : 2)
+              Behavior on border.color { ColorAnimation { duration: 160 } }
+            }
 
             ColumnLayout {
               anchors.centerIn: parent
               spacing: 10
               Text {
-                text: btn.isPending ? Math.ceil(root.timeRemaining / 1000).toString() : modelData.icon
-                color: btn.isPending ? Colors.primary : modelData.color
-                font.family: btn.isPending ? undefined : Colors.fontMono
-                font.pixelSize: btn.isPending ? 36 : 40
-                font.weight: btn.isPending ? Font.Bold : Font.Normal
+                text: isPending ? Math.ceil(root.timeRemaining / 1000).toString() : modelData.icon
+                color: isPending ? parent.parent.activeColor : modelData.color
+                font.family: isPending ? undefined : Colors.fontMono
+                font.pixelSize: isPending ? 36 : 40
+                font.weight: isPending ? Font.Bold : Font.Normal
                 Layout.alignment: Qt.AlignHCenter
               }
               Text {
                 text: modelData.label
-                color: Colors.fgMain
-                font.pixelSize: 12
+                color: Colors.text
+                font.pixelSize: Colors.fontSizeMedium
                 font.weight: Font.Medium
                 Layout.alignment: Qt.AlignHCenter
               }
@@ -163,7 +249,11 @@ PanelWindow {
               id: mouseArea
               anchors.fill: parent
               hoverEnabled: true
+              cursorShape: Qt.PointingHandCursor
               onClicked: root.startTimer(modelData.key, modelData.cmd)
+              onContainsMouseChanged: {
+                if (containsMouse) root.currentIndex = index;
+              }
             }
           }
         }
@@ -172,9 +262,9 @@ PanelWindow {
       Text {
         text: root.timerActive ? "Click again to confirm, ESC to cancel" : "Press ESC to cancel"
         color: root.timerActive ? Colors.primary : Colors.fgDim
-        font.pixelSize: 12
+        font.pixelSize: Colors.fontSizeMedium
         Layout.alignment: Qt.AlignHCenter
-        Behavior on color { ColorAnimation { duration: 200 } }
+        Behavior on color { ColorAnimation { duration: 160 } }
       }
     }
   }

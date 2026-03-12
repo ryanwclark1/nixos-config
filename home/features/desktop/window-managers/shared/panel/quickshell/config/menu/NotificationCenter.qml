@@ -8,6 +8,7 @@ import Quickshell.Widgets
 import "../modules"
 import "../notifications"
 import "../services"
+import "../widgets" as SharedWidgets
 
 PanelWindow {
   id: root
@@ -56,9 +57,11 @@ PanelWindow {
 
     x: root.showContent ? 0 : Config.controlCenterWidth + 10
     opacity: root.showContent ? 1.0 : 0.0
+    visible: opacity > 0
 
-    Behavior on x { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
-    Behavior on opacity { NumberAnimation { duration: 250 } }
+    Behavior on x { NumberAnimation { id: ncSlideAnim; duration: 300; easing.type: Easing.OutCubic } }
+    Behavior on opacity { NumberAnimation { id: ncFadeAnim; duration: 250 } }
+    layer.enabled: ncSlideAnim.running || ncFadeAnim.running
 
     ColumnLayout {
       anchors.fill: parent
@@ -70,7 +73,7 @@ PanelWindow {
         Text {
           text: "Notifications"
           color: Colors.text
-          font.pixelSize: 22
+          font.pixelSize: Colors.fontSizeHuge
           font.weight: Font.DemiBold
           font.letterSpacing: -0.5
         }
@@ -80,38 +83,72 @@ PanelWindow {
         // DND Toggle
         MouseArea {
           width: 80; height: 28
+          hoverEnabled: true
+          cursorShape: Qt.PointingHandCursor
           Rectangle {
             anchors.fill: parent
-            color: root.manager && root.manager.dndEnabled ? Colors.error : Colors.highlight
+            color: parent.containsMouse
+              ? (root.manager && root.manager.dndEnabled ? Qt.darker(Colors.error, 1.1) : Colors.highlightLight)
+              : (root.manager && root.manager.dndEnabled ? Colors.error : Colors.highlight)
             radius: 6
+            Behavior on color { ColorAnimation { duration: 160 } }
             Text {
               anchors.centerIn: parent
               text: root.manager && root.manager.dndEnabled ? "󰂛 DND" : "󰂚 DND"
-              color: Colors.text; font.pixelSize: 11; font.weight: Font.Medium; font.family: Colors.fontMono
+              color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium; font.family: Colors.fontMono
             }
           }
           onClicked: if (root.manager) root.manager.dndEnabled = !root.manager.dndEnabled
         }
 
         // Clear all
-        MouseArea {
-          width: 70; height: 28
-          Rectangle {
-            anchors.fill: parent; color: Colors.highlight; radius: 6
-            Text { anchors.centerIn: parent; text: "Clear All"; color: Colors.textSecondary; font.pixelSize: 11; font.weight: Font.Medium }
+        Rectangle {
+          width: 70; height: 28; radius: 6
+          color: Colors.highlight
+
+          SharedWidgets.StateLayer {
+            id: clearAllStateLayer
+            hovered: clearAllHover.containsMouse
+            pressed: clearAllHover.pressed
           }
-          onClicked: if (root.manager) { for (var i = root.manager.notifications.count - 1; i >= 0; i--) root.manager.notifications.get(i).dismiss(); }
+
+          Text { anchors.centerIn: parent; text: "Clear All"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
+
+          MouseArea {
+            id: clearAllHover
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: (mouse) => {
+              clearAllStateLayer.burst(mouse.x, mouse.y);
+              if (root.manager) { for (var i = root.manager.notifications.count - 1; i >= 0; i--) { var n = root.manager.notifications.get(i); if (n) n.dismiss(); } }
+            }
+          }
         }
 
         // Close button
-        MouseArea {
-          width: 28; height: 28
-          Rectangle {
-            anchors.fill: parent; color: closeHover.containsMouse ? Colors.highlight : "transparent"; radius: 6
-            Text { anchors.centerIn: parent; text: "󰅖"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: 14 }
+        Rectangle {
+          width: 28; height: 28; radius: 6
+          color: "transparent"
+
+          SharedWidgets.StateLayer {
+            id: closeStateLayer
+            hovered: closeHover.containsMouse
+            pressed: closeHover.pressed
           }
-          id: closeHover; hoverEnabled: true
-          onClicked: root.closeRequested()
+
+          Text { anchors.centerIn: parent; text: "󰅖"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
+
+          MouseArea {
+            id: closeHover
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: (mouse) => {
+              closeStateLayer.burst(mouse.x, mouse.y);
+              root.closeRequested();
+            }
+          }
         }
       }
 
@@ -123,31 +160,36 @@ PanelWindow {
 
       // Search Bar
       Rectangle {
-        Layout.fillWidth: true; height: 40; color: Colors.highlightLight; radius: 8
+        Layout.fillWidth: true; height: 40; color: Colors.highlightLight; radius: Colors.radiusXS
         border.color: searchInput.activeFocus ? Colors.primary : "transparent"; border.width: 1
         RowLayout {
           anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: 10
-          Text { text: ""; color: Colors.textDisabled; font.family: Colors.fontMono; font.pixelSize: 14 }
+          Text { text: ""; color: Colors.textDisabled; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
           TextInput {
             id: searchInput; Layout.fillWidth: true; verticalAlignment: Text.AlignVCenter
-            color: Colors.text; font.pixelSize: 12
+            color: Colors.text; font.pixelSize: Colors.fontSizeMedium
             onVisibleChanged: if (!visible && activeFocus) focus = false
             onTextChanged: root.searchQuery = text
           }
           Text {
             Layout.alignment: Qt.AlignVCenter
             Layout.leftMargin: 35
-            text: "Search notifications..."; color: Colors.textDisabled; font.pixelSize: 12
+            text: "Search notifications..."; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeMedium
             visible: !searchInput.text && !searchInput.activeFocus
           }
         }
       }
 
-      ListView {
-        id: notifList
-        Layout.fillWidth: true; Layout.fillHeight: true; spacing: 12; clip: true; focus: true
-        highlightFollowsCurrentItem: true; keyNavigationEnabled: true
-        model: root.manager ? root.manager.notifications : null
+      Item {
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+
+        ListView {
+          id: notifList
+          anchors.fill: parent
+          spacing: Colors.spacingM; clip: true; focus: true
+          highlightFollowsCurrentItem: true; keyNavigationEnabled: true
+          model: root.manager ? root.manager.notifications : null
 
         property var collapsedGroups: ({})
 
@@ -159,6 +201,10 @@ PanelWindow {
         remove: Transition {
           NumberAnimation { property: "opacity"; to: 0; duration: 300 }
           NumberAnimation { property: "scale"; to: 0.9; duration: 300 }
+        }
+
+        displaced: Transition {
+          NumberAnimation { properties: "x,y"; duration: 300; easing.type: Easing.OutCubic }
         }
 
         function toggleGroup(name) {
@@ -178,16 +224,18 @@ PanelWindow {
 
             MouseArea {
               width: 20; height: 20
+              hoverEnabled: true
+              cursorShape: Qt.PointingHandCursor
               Text {
                 anchors.centerIn: parent; text: isCollapsed ? "󰅂" : "󰅀"; color: Colors.primary
-                font.family: Colors.fontMono; font.pixelSize: 14
+                font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge
               }
               onClicked: notifList.toggleGroup(section)
             }
 
             Text {
               text: section || "System"
-              color: Colors.text; font.pixelSize: 11; font.weight: Font.Bold
+              color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Bold
               font.capitalization: Font.AllUppercase; font.letterSpacing: 1
             }
 
@@ -195,29 +243,42 @@ PanelWindow {
 
             // App Count Badge
             Rectangle {
-              width: 20; height: 16; radius: 10; color: Colors.highlight
-              Text { anchors.centerIn: parent; text: getCount(); color: Colors.primary; font.pixelSize: 9; font.weight: Font.Bold }
+              width: 20; height: 16; radius: Colors.radiusSmall; color: Colors.highlight
+              Text { anchors.centerIn: parent; text: getCount(); color: Colors.primary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
               function getCount() {
                 var count = 0;
                 for (var i = 0; i < root.manager.notifications.count; i++) {
-                  if (root.manager.notifications.get(i).appName === section) count++;
+                  var n = root.manager.notifications.get(i);
+                  if (n && n.appName === section) count++;
                 }
                 return count;
               }
             }
 
-            MouseArea {
-              width: 24; height: 24
-              Rectangle {
-                anchors.fill: parent; radius: 12; color: clearHover.containsMouse ? Colors.highlight : "transparent"
-                Text { anchors.centerIn: parent; text: "󰅖"; color: Colors.textDisabled; font.pixelSize: 14 }
+            Rectangle {
+              width: 24; height: 24; radius: 12
+              color: "transparent"
+
+              SharedWidgets.StateLayer {
+                id: clearStateLayer
+                hovered: clearHover.containsMouse
+                pressed: clearHover.pressed
               }
-              id: clearHover; hoverEnabled: true
-              onClicked: {
-                if (!root.manager) return;
-                for (var i = root.manager.notifications.count - 1; i >= 0; i--) {
-                  var n = root.manager.notifications.get(i);
-                  if (n.appName === section) n.dismiss();
+
+              Text { anchors.centerIn: parent; text: "󰅖"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeLarge }
+
+              MouseArea {
+                id: clearHover
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: (mouse) => {
+                  clearStateLayer.burst(mouse.x, mouse.y);
+                  if (!root.manager) return;
+                  for (var i = root.manager.notifications.count - 1; i >= 0; i--) {
+                    var n = root.manager.notifications.get(i);
+                    if (n && n.appName === section) n.dismiss();
+                  }
                 }
               }
             }
@@ -260,7 +321,7 @@ PanelWindow {
             var app = modelData.appName.toLowerCase();
             for (var i = 0; i < Mpris.players.length; i++) {
               var p = Mpris.players[i];
-              if (p.identity.toLowerCase().includes(app) || p.desktopEntry === app) return p;
+              if ((p.identity || "").toLowerCase().includes(app) || p.desktopEntry === app) return p;
             }
             return null;
           }
@@ -270,12 +331,14 @@ PanelWindow {
             width: parent.width - 24; anchors.top: parent.top; anchors.topMargin: 12; anchors.horizontalCenter: parent.horizontalCenter; spacing: 10
 
             RowLayout {
-              width: parent.width; spacing: 12
+              width: parent.width; spacing: Colors.spacingM
               Image {
                 Layout.preferredWidth: 32; Layout.preferredHeight: 32
                 source: Config.resolveIconSource(modelData.appIcon || "")
+                sourceSize: Qt.size(64, 64)
+                asynchronous: true
                 visible: modelData.appIcon !== ""
-                Rectangle { anchors.fill: parent; color: "transparent"; visible: parent.status !== Image.Ready; Text { anchors.centerIn: parent; text: "󰂚"; color: Colors.text; font.pixelSize: 20; font.family: Colors.fontMono } }
+                Rectangle { anchors.fill: parent; color: "transparent"; visible: parent.status !== Image.Ready; Text { anchors.centerIn: parent; text: "󰂚"; color: Colors.text; font.pixelSize: Colors.fontSizeHuge; font.family: Colors.fontMono } }
               }
 
               ColumnLayout {
@@ -283,16 +346,16 @@ PanelWindow {
                 RowLayout {
                   Layout.fillWidth: true
                   Text {
-                    text: modelData.summary; color: Colors.text; font.pixelSize: 15; font.weight: Font.Bold
+                    text: modelData.summary; color: Colors.text; font.pixelSize: Colors.fontSizeLarge; font.weight: Font.Bold
                     Layout.fillWidth: true; elide: Text.ElideRight
                   }
                   Text {
                     text: modelData.time ? Qt.formatDateTime(modelData.time, "HH:mm") : ""
-                    color: Colors.textDisabled; font.pixelSize: 11
+                    color: Colors.textDisabled; font.pixelSize: Colors.fontSizeSmall
                   }
                 }
                 Text {
-                  text: modelData.body; color: Colors.textSecondary; font.pixelSize: 13
+                  text: modelData.body; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeMedium
                   Layout.fillWidth: true; wrapMode: Text.Wrap; visible: modelData.body !== ""
                 }
               }
@@ -300,25 +363,25 @@ PanelWindow {
 
             // Media Controls (if applicable)
             Rectangle {
-              width: parent.width; height: 40; radius: 8; color: Colors.highlightLight; visible: mprisPlayer !== null
+              width: parent.width; height: 40; radius: Colors.radiusXS; color: Colors.highlightLight; visible: mprisPlayer !== null
               RowLayout {
-                anchors.fill: parent; anchors.margins: 8; spacing: 15
+                anchors.fill: parent; anchors.margins: Colors.spacingS; spacing: 15
                 Item { Layout.fillWidth: true }
                 MouseArea {
-                  width: 24; height: 24
+                  width: 24; height: 24; cursorShape: Qt.PointingHandCursor
                   Text { anchors.centerIn: parent; text: "󰒮"; color: Colors.text; font.family: Colors.fontMono }
-                  onClicked: mprisPlayer.previous()
+                  onClicked: { if (mprisPlayer) mprisPlayer.previous(); }
                 }
                 MouseArea {
-                  width: 32; height: 32
-                  Rectangle { anchors.fill: parent; radius: 16; color: Colors.primary }
+                  width: 32; height: 32; cursorShape: Qt.PointingHandCursor
+                  Rectangle { anchors.fill: parent; radius: height / 2; color: Colors.primary }
                   Text { anchors.centerIn: parent; text: mprisPlayer && mprisPlayer.playbackState === Mpris.Playing ? "󰏤" : "󰐊"; color: Colors.background; font.family: Colors.fontMono }
-                  onClicked: mprisPlayer.playPause()
+                  onClicked: { if (mprisPlayer) mprisPlayer.playPause(); }
                 }
                 MouseArea {
-                  width: 24; height: 24
+                  width: 24; height: 24; cursorShape: Qt.PointingHandCursor
                   Text { anchors.centerIn: parent; text: "󰒭"; color: Colors.text; font.family: Colors.fontMono }
-                  onClicked: mprisPlayer.next()
+                  onClicked: { if (mprisPlayer) mprisPlayer.next(); }
                 }
                 Item { Layout.fillWidth: true }
               }
@@ -326,17 +389,17 @@ PanelWindow {
 
             // Large Image Preview
             Rectangle {
-              width: parent.width; height: 150; visible: modelData.image !== ""; radius: 8; clip: true; color: "transparent"; border.color: Colors.border; border.width: 1
-              Image { anchors.fill: parent; source: modelData.image || ""; fillMode: Image.PreserveAspectCrop }
+              width: parent.width; height: 150; visible: modelData.image !== ""; radius: Colors.radiusXS; clip: true; color: "transparent"; border.color: Colors.border; border.width: 1
+              Image { anchors.fill: parent; source: modelData.image || ""; sourceSize: Qt.size(600, 300); asynchronous: true; fillMode: Image.PreserveAspectCrop }
             }
 
             // Inline Reply Area
             Rectangle {
               width: parent.width; height: 36; radius: 6; color: Colors.highlightLight; visible: isReplying
               TextInput {
-                id: replyInput; anchors.fill: parent; anchors.margins: 8
+                id: replyInput; anchors.fill: parent; anchors.margins: Colors.spacingS
                 verticalAlignment: Text.AlignVCenter
-                color: Colors.text; font.pixelSize: 13
+                color: Colors.text; font.pixelSize: Colors.fontSizeMedium
                 onVisibleChanged: if (!visible && activeFocus) focus = false
                 Keys.onReturnPressed: {
                   notifItem.notification.invoke(text);
@@ -349,19 +412,25 @@ PanelWindow {
 
             // Actions
             RowLayout {
-              width: parent.width; spacing: 8; visible: !isReplying
+              width: parent.width; spacing: Colors.spacingS; visible: !isReplying
 
               // Dynamic Actions from Notification
               Repeater {
                 model: notifItem.notification ? notifItem.notification.actions : null
                 delegate: Rectangle {
+                  id: actionRect
                   Layout.fillWidth: true; height: 28; color: Colors.highlightLight; radius: 6
-                  Text { anchors.centerIn: parent; text: modelData && modelData.label ? modelData.label : ""; color: Colors.text; font.pixelSize: 12; font.weight: Font.Medium }
+                  Text { anchors.centerIn: parent; text: modelData && modelData.label ? modelData.label : ""; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium }
+                  SharedWidgets.StateLayer {
+                    id: actionStateLayer
+                    hovered: actionMa.containsMouse
+                    pressed: actionMa.pressed
+                  }
                   MouseArea {
-                    anchors.fill: parent; hoverEnabled: true
-                    onEntered: parent.color = Colors.highlight
-                    onExited: parent.color = Colors.highlightLight
-                    onClicked: {
+                    id: actionMa
+                    anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                    onClicked: (mouse) => {
+                      actionStateLayer.burst(mouse.x, mouse.y);
                       var label = modelData && modelData.label ? modelData.label.toLowerCase() : "";
                       if (label.includes("reply")) notifItem.isReplying = true;
                       else if (modelData) { modelData.invoke(); notifItem.notification.dismiss(); }
@@ -373,31 +442,44 @@ PanelWindow {
               // Dismiss Action
               Rectangle {
                 Layout.preferredWidth: 32; height: 28; color: Colors.highlightLight; radius: 6
-                Text { anchors.centerIn: parent; text: "󰅖"; color: Colors.error; font.family: Colors.fontMono; font.pixelSize: 14 }
+                Text { anchors.centerIn: parent; text: "󰅖"; color: Colors.error; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
+                SharedWidgets.StateLayer {
+                  id: dismissStateLayer
+                  hovered: dismissMa.containsMouse
+                  pressed: dismissMa.pressed
+                }
                 MouseArea {
-                  anchors.fill: parent; hoverEnabled: true
-                  onEntered: parent.color = Colors.highlight
-                  onExited: parent.color = Colors.highlightLight
-                  onClicked: notifItem.notification.dismiss()
+                  id: dismissMa
+                  anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                  onClicked: (mouse) => {
+                    dismissStateLayer.burst(mouse.x, mouse.y);
+                    notifItem.notification.dismiss();
+                  }
                 }
               }
             }
           }
         }
+
+          SharedWidgets.DankScrollbar { flickable: notifList }
+          SharedWidgets.OverscrollGlow { flickable: notifList }
+        }
       }
 
       // Archive Section
       Column {
-        width: parent.width; spacing: 8
+        width: parent.width; spacing: Colors.spacingS
         visible: root.manager && root.manager.archivedNotifications.length > 0
 
         RowLayout {
           width: parent.width
-          Text { text: "ARCHIVE"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Bold }
+          Text { text: "ARCHIVE"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
           Item { Layout.fillWidth: true }
           MouseArea {
             width: 40; height: 20
-            Text { anchors.centerIn: parent; text: "Clear"; color: Colors.textDisabled; font.pixelSize: 10 }
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            Text { anchors.centerIn: parent; text: "Clear"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS }
             onClicked: if (root.manager) root.manager.clearArchive()
           }
         }
@@ -405,16 +487,16 @@ PanelWindow {
         Repeater {
           model: root.manager ? root.manager.archivedNotifications : null
           delegate: Rectangle {
-            width: parent.width; height: 60; color: Colors.bgWidget; radius: 8; opacity: 0.7
+            width: parent.width; height: 60; color: Colors.bgWidget; radius: Colors.radiusXS; opacity: 0.7
             Row {
               anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: 10
               Rectangle { width: 32; height: 32; color: "transparent"
-                Text { anchors.centerIn: parent; text: "󰂚"; color: Colors.textDisabled; font.pixelSize: 20; font.family: Colors.fontMono }
+                Text { anchors.centerIn: parent; text: "󰂚"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeHuge; font.family: Colors.fontMono }
               }
               Column {
                 width: parent.width - 50; spacing: 2
-                Text { text: modelData.summary; color: Colors.textSecondary; font.pixelSize: 12; font.weight: Font.Bold; elide: Text.ElideRight; width: parent.width }
-                Text { text: modelData.body; color: Colors.textDisabled; font.pixelSize: 10; elide: Text.ElideRight; width: parent.width }
+                Text { text: modelData.summary; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Bold; elide: Text.ElideRight; width: parent.width }
+                Text { text: modelData.body; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; elide: Text.ElideRight; width: parent.width }
               }
             }
           }
