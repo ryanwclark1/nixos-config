@@ -50,7 +50,7 @@ Item {
                     if (!root.settingsRoot)
                         return;
                     var isMaster = !root.settingsRoot.layoutIsMaster;
-                    Quickshell.execDetached(["hyprctl", "keyword", "general:layout", isMaster ? "master" : "dwindle"]);
+                    CompositorAdapter.setHyprKeyword("general:layout", isMaster ? "master" : "dwindle", "Set layout");
                     root.settingsRoot.layoutIsMaster = isMaster;
                 }
             }
@@ -64,7 +64,7 @@ Item {
                     if (!root.settingsRoot)
                         return;
                     root.settingsRoot.layoutGapsOut = v;
-                    Quickshell.execDetached(["hyprctl", "keyword", "general:gaps_out", v.toString()]);
+                    CompositorAdapter.setHyprKeyword("general:gaps_out", v.toString(), "Set outer gaps");
                 }
             }
 
@@ -77,7 +77,7 @@ Item {
                     if (!root.settingsRoot)
                         return;
                     root.settingsRoot.layoutGapsIn = v;
-                    Quickshell.execDetached(["hyprctl", "keyword", "general:gaps_in", v.toString()]);
+                    CompositorAdapter.setHyprKeyword("general:gaps_in", v.toString(), "Set inner gaps");
                 }
             }
 
@@ -91,7 +91,7 @@ Item {
                     if (!root.settingsRoot)
                         return;
                     root.settingsRoot.layoutActiveOpacity = v;
-                    Quickshell.execDetached(["hyprctl", "keyword", "decoration:active_opacity", v.toString()]);
+                    CompositorAdapter.setHyprKeyword("decoration:active_opacity", v.toString(), "Set active opacity");
                 }
             }
         }

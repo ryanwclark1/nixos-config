@@ -832,10 +832,19 @@ Item {
     Loader {
       property var widgetInstance: null
       readonly property var pluginMeta: BarWidgetRegistry.pluginByWidgetType(widgetInstance ? widgetInstance.widgetType : "")
-      source: pluginMeta ? pluginMeta.path + pluginMeta.mainFile : ""
+      source: pluginMeta ? pluginMeta.path + pluginMeta.entryFile : ""
       onStatusChanged: {
         if (status === Loader.Error && widgetInstance)
           console.warn("BarWidgetRegistry: failed to load plugin widget " + widgetInstance.widgetType + " from " + source);
+        if (status === Loader.Ready && item && pluginMeta) {
+          var api = PluginService.getPluginAPI(pluginMeta.id);
+          if (api && item.hasOwnProperty("pluginApi"))
+            item.pluginApi = api;
+          if (item.hasOwnProperty("pluginManifest"))
+            item.pluginManifest = pluginMeta;
+          if (item.hasOwnProperty("pluginService"))
+            item.pluginService = PluginService;
+        }
       }
     }
   }

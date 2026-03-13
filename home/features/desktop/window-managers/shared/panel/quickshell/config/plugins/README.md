@@ -1,10 +1,10 @@
-# Shared Panel Plugin Manifest v2
+# Shared Panel Plugin Manifest
 
 Plugins are loaded from:
 
 - `~/.config/quickshell/plugins/<plugin-id>/manifest.json`
 
-Use `manifest-v2.schema.json` as the reference contract for plugin manifests.
+Use `manifest.schema.json` as the reference contract for plugin manifests.
 
 ## Minimal launcher provider plugin
 

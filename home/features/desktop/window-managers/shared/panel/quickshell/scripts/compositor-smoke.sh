@@ -40,12 +40,20 @@ detect_compositor() {
   desktop="${XDG_CURRENT_DESKTOP:-}"
   session="${DESKTOP_SESSION:-}"
 
-  if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]] || [[ "${desktop}${session}" =~ [Hh]yprland ]]; then
+  if [[ "${desktop}${session}" =~ [Nn]iri ]]; then
+    printf 'niri\n'
+    return
+  fi
+  if [[ "${desktop}${session}" =~ [Hh]yprland ]]; then
     printf 'hyprland\n'
     return
   fi
-  if [[ -n "${NIRI_SOCKET:-}" ]] || [[ "${desktop}${session}" =~ [Nn]iri ]]; then
+  if [[ -n "${NIRI_SOCKET:-}" ]]; then
     printf 'niri\n'
+    return
+  fi
+  if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
+    printf 'hyprland\n'
     return
   fi
   printf 'unknown\n'
@@ -92,7 +100,7 @@ check_niri() {
     return
   fi
 
-  local raw active_name
+  local raw active_name active_idx
   raw="$(niri msg -j workspaces 2>/dev/null || true)"
 
   if printf '%s' "${raw}" | jq -e '.' >/dev/null 2>&1; then
@@ -107,6 +115,15 @@ check_niri() {
     pass "Niri active workspace extracted (${active_name})"
   else
     warn "Niri active workspace not found in workspaces payload"
+  fi
+
+  active_idx="$(printf '%s' "${raw}" | jq -r '(if type == "array" then . else (.workspaces // []) end)[] | select(.is_active == true or .active == true or .is_focused == true or .focused == true) | (.idx // .id // .index // empty)' | head -n1 || true)"
+  if [[ -n "${active_idx}" ]]; then
+    if niri msg action focus-workspace "${active_idx}" >/dev/null 2>&1; then
+      pass "Niri focus-workspace action accepted for active workspace (${active_idx})"
+    else
+      warn "Niri focus-workspace action failed for active workspace (${active_idx})"
+    fi
   fi
 }
 

@@ -7,8 +7,10 @@ import "../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  implicitWidth: 380
-  implicitHeight: 520
+  readonly property int availablePopupWidth: screen ? Math.max(340, screen.width - 40) : 380
+  readonly property bool compactMode: availablePopupWidth < 360
+  implicitWidth: Math.min(380, availablePopupWidth)
+  implicitHeight: compactMode ? 560 : 520
   title: "Bluetooth"
   toggleMethod: "toggleBluetoothMenu"
 
@@ -181,6 +183,7 @@ BasePopupMenu {
         }
         Rectangle {
           Layout.alignment: Qt.AlignHCenter
+          Layout.fillWidth: root.compactMode
           implicitWidth: turnOnLabel.implicitWidth + 24
           implicitHeight: 32
           radius: 16
@@ -215,7 +218,7 @@ BasePopupMenu {
         delegate: Rectangle {
           id: connCard
           Layout.fillWidth: true
-          implicitHeight: visible ? 46 : 0
+          implicitHeight: visible ? (root.compactMode ? 56 : 46) : 0
           visible: modelData.connected
           radius: Colors.radiusMedium
           color: Colors.cardSurface
@@ -258,6 +261,7 @@ BasePopupMenu {
               color: Colors.withAlpha(Colors.primary, 0.16)
               implicitWidth: connChipLabel.implicitWidth + 16
               implicitHeight: 24
+              visible: !root.compactMode
               Text {
                 id: connChipLabel
                 anchors.centerIn: parent
@@ -308,7 +312,7 @@ BasePopupMenu {
         delegate: Rectangle {
           id: pairedCard
           Layout.fillWidth: true
-          implicitHeight: visible ? 46 : 0
+          implicitHeight: visible ? (root.compactMode ? 56 : 46) : 0
           visible: modelData.paired && !modelData.connected
           radius: Colors.radiusMedium
           color: Colors.cardSurface
@@ -351,6 +355,7 @@ BasePopupMenu {
               color: Colors.highlightLight
               implicitWidth: pairedChipLabel.implicitWidth + 16
               implicitHeight: 24
+              visible: !root.compactMode
 
               Text {
                 id: pairedChipLabel
@@ -440,7 +445,7 @@ BasePopupMenu {
         delegate: Rectangle {
           id: availCard
           Layout.fillWidth: true
-          implicitHeight: visible ? 46 : 0
+          implicitHeight: visible ? (root.compactMode ? 56 : 46) : 0
           visible: !modelData.paired && !modelData.connected
           radius: Colors.radiusMedium
           color: Colors.cardSurface
@@ -482,6 +487,7 @@ BasePopupMenu {
               color: Colors.highlightLight
               implicitWidth: pairChipLabel.implicitWidth + 16
               implicitHeight: 24
+              visible: !root.compactMode
 
               Text {
                 id: pairChipLabel

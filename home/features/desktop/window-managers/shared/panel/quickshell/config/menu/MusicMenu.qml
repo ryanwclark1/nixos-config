@@ -7,8 +7,10 @@ import "../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  implicitWidth: 360
-  implicitHeight: 400
+  readonly property int availablePopupWidth: screen ? Math.max(320, screen.width - 40) : 360
+  readonly property bool compactMode: availablePopupWidth < 350
+  implicitWidth: Math.min(360, availablePopupWidth)
+  implicitHeight: compactMode ? 430 : 400
   title: "Music"
   toggleMethod: "toggleMusicMenu"
   surfaceTint: Colors.withAlpha(root.dominantColor, 0.05)
@@ -44,7 +46,7 @@ BasePopupMenu {
     // Player selector (only if multiple players)
     Rectangle {
       visible: root.activePlayers.length > 1
-      width: playerSelectorText.implicitWidth + 24
+      width: Math.min(playerSelectorText.implicitWidth + 24, root.compactMode ? 160 : 220)
       height: 26
       radius: 13
       color: Colors.bgWidget
@@ -101,8 +103,8 @@ BasePopupMenu {
     // Album art
     Rectangle {
       Layout.alignment: Qt.AlignHCenter
-      Layout.preferredWidth: 120
-      Layout.preferredHeight: 120
+      Layout.preferredWidth: root.compactMode ? 96 : 120
+      Layout.preferredHeight: root.compactMode ? 96 : 120
       radius: Colors.radiusMedium
       color: Colors.surface
       clip: true
@@ -136,7 +138,7 @@ BasePopupMenu {
       Text {
         text: MediaService.trackTitle || "Unknown Track"
         color: Colors.text
-        font.pixelSize: Colors.fontSizeXL
+        font.pixelSize: root.compactMode ? Colors.fontSizeLarge : Colors.fontSizeXL
         font.weight: Font.Bold
         Layout.fillWidth: true
         horizontalAlignment: Text.AlignHCenter
@@ -146,7 +148,7 @@ BasePopupMenu {
       Text {
         text: MediaService.trackArtist || "Unknown Artist"
         color: Colors.fgSecondary
-        font.pixelSize: Colors.fontSizeMedium
+        font.pixelSize: root.compactMode ? Colors.fontSizeSmall : Colors.fontSizeMedium
         Layout.fillWidth: true
         horizontalAlignment: Text.AlignHCenter
         elide: Text.ElideRight
@@ -213,34 +215,34 @@ BasePopupMenu {
     // Transport controls
     RowLayout {
       Layout.alignment: Qt.AlignHCenter
-      spacing: Colors.spacingXL
+      spacing: root.compactMode ? Colors.spacingL : Colors.spacingXL
 
       SharedWidgets.PulseButton {
-        icon: "󰒟"; size: 28; tint: Colors.textSecondary
+        icon: "󰒟"; size: root.compactMode ? 24 : 28; tint: Colors.textSecondary
         onClicked: if (root.player) root.player.shuffle = !root.player.shuffle
       }
 
       SharedWidgets.PulseButton {
-        icon: "󰒮"; size: 36; tint: Colors.text
+        icon: "󰒮"; size: root.compactMode ? 32 : 36; tint: Colors.text
         onClicked: MediaService.previous()
       }
 
       // Play/Pause (larger, filled style — tinted by album art accent)
       SharedWidgets.PulseButton {
         icon: MediaService.isPlaying ? "󰏤" : "󰐊"
-        size: 48; tint: Colors.background
+        size: root.compactMode ? 42 : 48; tint: Colors.background
         color: root.dominantColor
         Behavior on color { ColorAnimation { duration: 400 } }
         onClicked: MediaService.playPause()
       }
 
       SharedWidgets.PulseButton {
-        icon: "󰒭"; size: 36; tint: Colors.text
+        icon: "󰒭"; size: root.compactMode ? 32 : 36; tint: Colors.text
         onClicked: MediaService.next()
       }
 
       SharedWidgets.PulseButton {
-        icon: "󰑖"; size: 28; tint: Colors.textSecondary
+        icon: "󰑖"; size: root.compactMode ? 24 : 28; tint: Colors.textSecondary
         onClicked: {
           if (!root.player) return;
           if (root.player.loopStatus === Mpris.None) root.player.loopStatus = Mpris.Track;

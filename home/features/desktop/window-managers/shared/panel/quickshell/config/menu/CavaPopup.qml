@@ -6,8 +6,10 @@ import "../services"
 PopupWindow {
   id: root
   color: "transparent"
-  implicitWidth: 400
-  implicitHeight: 120
+  readonly property int availablePopupWidth: screen ? Math.max(280, screen.width - 40) : 400
+  readonly property bool compactMode: availablePopupWidth < 340
+  implicitWidth: Math.min(400, availablePopupWidth)
+  implicitHeight: compactMode ? 108 : 120
 
   property string cavaData: ""
   signal closeRequested()
@@ -71,7 +73,7 @@ PopupWindow {
           anchors.centerIn: parent
           text: root.cavaData
           color: Colors.withAlpha(Colors.primary, 0.3)
-          font.pixelSize: 36
+          font.pixelSize: root.compactMode ? 30 : 36
           font.letterSpacing: 2
           horizontalAlignment: Text.AlignHCenter
           width: parent.width
@@ -83,7 +85,7 @@ PopupWindow {
           anchors.centerIn: parent
           text: root.cavaData
           color: Colors.primary
-          font.pixelSize: 32
+          font.pixelSize: root.compactMode ? 28 : 32
           font.letterSpacing: 2
           horizontalAlignment: Text.AlignHCenter
           width: parent.width

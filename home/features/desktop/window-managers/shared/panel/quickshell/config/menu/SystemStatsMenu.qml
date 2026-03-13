@@ -7,8 +7,10 @@ import "../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  implicitWidth: 380
-  implicitHeight: 580
+  readonly property int availablePopupWidth: screen ? Math.max(320, screen.width - 40) : 380
+  readonly property bool compactMode: availablePopupWidth < 360
+  implicitWidth: Math.min(380, availablePopupWidth)
+  implicitHeight: compactMode ? 620 : 580
   title: "System"
   toggleMethod: "toggleSystemStatsMenu"
 
@@ -17,36 +19,46 @@ BasePopupMenu {
   // At-a-glance temp/usage card
   Rectangle {
     Layout.fillWidth: true
-    implicitHeight: 52
+    implicitHeight: atAGlanceColumn.implicitHeight + Colors.paddingSmall * 2
     radius: Colors.radiusMedium
     color: Colors.cardSurface
     border.color: Colors.border
     border.width: 1
 
-    RowLayout {
+    ColumnLayout {
+      id: atAGlanceColumn
       anchors.fill: parent
       anchors.margins: Colors.paddingSmall
-      spacing: Colors.spacingM
+      spacing: Colors.spacingS
 
-      // CPU Temp
       RowLayout {
-        spacing: Colors.spacingXS
-        Text { text: ""; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium }
-        Text { text: SystemStatus.cpuTemp; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
+        Layout.fillWidth: true
+        spacing: Colors.spacingM
+
+        RowLayout {
+          spacing: Colors.spacingXS
+          Text { text: ""; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium }
+          Text { text: SystemStatus.cpuTemp; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
+        }
+
+        RowLayout {
+          spacing: Colors.spacingXS
+          Text { text: "󰢮"; color: Colors.accent; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium }
+          Text { text: SystemStatus.gpuTemp; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
+        }
+
+        Item { Layout.fillWidth: true }
       }
 
-      // GPU Temp
-      RowLayout {
-        spacing: Colors.spacingXS
-        Text { text: "󰢮"; color: Colors.accent; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium }
-        Text { text: SystemStatus.gpuTemp; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
+      Flow {
+        Layout.fillWidth: true
+        width: parent.width
+        spacing: Colors.spacingS
+
+        SharedWidgets.Chip { icon: ""; iconColor: Colors.primary; text: "CPU " + SystemStatus.cpuUsage; textColor: Colors.primary }
+        SharedWidgets.Chip { icon: "󰍛"; iconColor: Colors.accent; text: "RAM " + SystemStatus.ramUsage; textColor: Colors.accent }
+        SharedWidgets.Chip { icon: "󰢮"; iconColor: Colors.secondary; text: "GPU " + SystemStatus.gpuUsage; textColor: Colors.secondary }
       }
-
-      Item { Layout.fillWidth: true }
-
-      SharedWidgets.Chip { icon: ""; iconColor: Colors.primary; text: "CPU " + SystemStatus.cpuUsage; textColor: Colors.primary }
-      SharedWidgets.Chip { icon: "󰍛"; iconColor: Colors.accent; text: "RAM " + SystemStatus.ramUsage; textColor: Colors.accent }
-      SharedWidgets.Chip { icon: "󰢮"; iconColor: Colors.secondary; text: "GPU " + SystemStatus.gpuUsage; textColor: Colors.secondary }
     }
   }
 

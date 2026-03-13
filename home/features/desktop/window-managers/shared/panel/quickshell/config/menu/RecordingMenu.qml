@@ -6,8 +6,10 @@ import "../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  implicitWidth: 300
-  implicitHeight: 220
+  readonly property int availablePopupWidth: screen ? Math.max(280, screen.width - 40) : 300
+  readonly property bool compactMode: availablePopupWidth < 295
+  implicitWidth: Math.min(300, availablePopupWidth)
+  implicitHeight: compactMode ? 270 : 220
   title: "Screen Recording"
   toggleMethod: "toggleRecordingMenu"
 
@@ -63,9 +65,11 @@ BasePopupMenu {
   }
 
   // Mode buttons (only when not recording)
-  RowLayout {
+  GridLayout {
     Layout.fillWidth: true
-    spacing: Colors.paddingSmall
+    columns: root.compactMode ? 1 : 2
+    columnSpacing: Colors.paddingSmall
+    rowSpacing: Colors.paddingSmall
     visible: !RecordingService.isRecording
 
     Rectangle {

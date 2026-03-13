@@ -39,7 +39,7 @@ QtObject {
   // Outputs three colon-separated integers: mic_count:cam_count:share_count
   //   mic:   active PipeWire source-outputs (non-monitor captures)
   //   cam:   processes holding a /dev/video* device open (via lsof)
-  //   share: xdg-desktop-portal-hyprland screencopy sessions via hyprctl
+  //   share: compositor-specific screen sharing probe from CompositorAdapter
   property SharedWidgets.CommandPoll privacyPoll: SharedWidgets.CommandPoll {
     interval: 2000
     running: root.subscriberCount > 0
@@ -50,12 +50,8 @@ QtObject {
       "mic=$(pactl list source-outputs 2>/dev/null | grep -c '^Source Output' || echo 0); "
       // Camera: lsof any /dev/video* device and count unique PIDs holding them.
       + "cam=$(lsof /dev/video* 2>/dev/null | awk 'NR>1 {print $2}' | sort -u | wc -l || echo 0); "
-      // Screenshare: count active hyprland screencopy clients reported by hyprctl.
-      // Falls back to 0 if hyprctl is unavailable or returns nothing.
-      + "share=$(hyprctl clients -j 2>/dev/null | jq '[.[] | select(.class | ascii_downcase | test(\"screencopy|xdg-desktop-portal\"))] | length' 2>/dev/null || echo 0); "
-      // Alternative share detection: pgrep for common screenshare helpers
-      + "share2=$(pgrep -c -f 'xdg-desktop-portal-hyprland\\|pipewire-screenshare\\|obs.*screen' 2>/dev/null || echo 0); "
-      + "if [ \"$share\" -gt 0 ] || [ \"$share2\" -gt 0 ]; then share_out=1; else share_out=0; fi; "
+      // Screenshare: compositor-specific probe (sets share_out=0/1).
+      + CompositorAdapter.screenshareProbeSnippet()
       + "echo \"$mic:$cam:$share_out\""
     ]
     parse: function(out) {

@@ -12,8 +12,11 @@ QtObject {
   readonly property bool hasHyprSig: (Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE") || "") !== ""
   readonly property bool hasNiriSocket: (Quickshell.env("NIRI_SOCKET") || "") !== ""
 
-  readonly property bool isHyprland: hasHyprSig || desktopEnv.indexOf("hyprland") !== -1 || sessionDesktop.indexOf("hyprland") !== -1
-  readonly property bool isNiri: hasNiriSocket || desktopEnv.indexOf("niri") !== -1 || sessionDesktop.indexOf("niri") !== -1
+  readonly property bool desktopSaysHyprland: desktopEnv.indexOf("hyprland") !== -1 || sessionDesktop.indexOf("hyprland") !== -1
+  readonly property bool desktopSaysNiri: desktopEnv.indexOf("niri") !== -1 || sessionDesktop.indexOf("niri") !== -1
+
+  readonly property bool isNiri: desktopSaysNiri || (hasNiriSocket && !desktopSaysHyprland)
+  readonly property bool isHyprland: desktopSaysHyprland || (hasHyprSig && !desktopSaysNiri)
   readonly property string compositor: isHyprland ? "hyprland" : (isNiri ? "niri" : "unknown")
 
   readonly property bool supportsWorkspaceListing: isHyprland || isNiri
@@ -106,6 +109,21 @@ QtObject {
     return ["sh", "-c", "hyprctl hyprsunset temperature 2>/dev/null | grep -v '6000' >/dev/null && echo 'on' || echo 'off'"];
   }
 
+  // Returns shell snippet setting share_out=0/1 for PrivacyService polling.
+  function screenshareProbeSnippet() {
+    if (isHyprland) {
+      return "share=$(hyprctl clients -j 2>/dev/null | jq '[.[] | select(.class | ascii_downcase | test(\"screencopy|xdg-desktop-portal\"))] | length' 2>/dev/null || echo 0); "
+        + "share2=$(pgrep -c -f 'xdg-desktop-portal-hyprland\\|pipewire-screenshare\\|obs.*screen' 2>/dev/null || echo 0); "
+        + "if [ \"$share\" -gt 0 ] || [ \"$share2\" -gt 0 ]; then share_out=1; else share_out=0; fi; ";
+    }
+    if (isNiri) {
+      return "share=$(pgrep -c -f 'xdg-desktop-portal\\|pipewire-screenshare\\|obs.*screen\\|grim\\|slurp' 2>/dev/null || echo 0); "
+        + "if [ \"$share\" -gt 0 ]; then share_out=1; else share_out=0; fi; ";
+    }
+    return "share=$(pgrep -c -f 'xdg-desktop-portal\\|pipewire-screenshare\\|obs.*screen' 2>/dev/null || echo 0); "
+      + "if [ \"$share\" -gt 0 ]; then share_out=1; else share_out=0; fi; ";
+  }
+
   function lockCommand() {
     return ["os-lock-screen"];
   }
@@ -140,6 +158,14 @@ QtObject {
     if (arg !== undefined && arg !== null && String(arg) !== "")
       args.push(String(arg));
     Quickshell.execDetached(args);
+  }
+
+  function setHyprKeyword(key, value, unsupportedName) {
+    if (!supportsHyprctlSettings) {
+      notifyUnsupported(unsupportedName || ("Set " + String(key || "")));
+      return;
+    }
+    Quickshell.execDetached(["hyprctl", "keyword", String(key || ""), String(value || "")]);
   }
 
   function moveWindowToWorkspace(address, workspaceId) {

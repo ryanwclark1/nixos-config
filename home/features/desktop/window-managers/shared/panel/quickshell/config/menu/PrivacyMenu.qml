@@ -6,8 +6,10 @@ import "../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  implicitWidth: 320
-  implicitHeight: 260
+  readonly property int availablePopupWidth: screen ? Math.max(300, screen.width - 40) : 320
+  readonly property bool compactMode: availablePopupWidth < 310
+  implicitWidth: Math.min(320, availablePopupWidth)
+  implicitHeight: compactMode ? 290 : 260
   title: "Privacy"
   toggleMethod: "togglePrivacyMenu"
 
@@ -49,12 +51,16 @@ BasePopupMenu {
           color: PrivacyService.anyActive ? Colors.warning : Colors.text
           font.pixelSize: Colors.fontSizeMedium
           font.weight: Font.DemiBold
+          wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap
+          Layout.fillWidth: true
         }
 
         Text {
           text: PrivacyService.anyActive ? PrivacyService.activeLabel : "Microphone, camera, and screen share are idle"
           color: Colors.fgSecondary
           font.pixelSize: Colors.fontSizeSmall
+          wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap
+          Layout.fillWidth: true
         }
       }
     }

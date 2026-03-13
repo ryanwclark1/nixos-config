@@ -3,6 +3,9 @@
 This document defines the canonical structure for the active panel at:
 `home/features/desktop/window-managers/shared/panel/quickshell`.
 
+Compositor-specific behavior notes and capability expectations are documented in
+`COMPOSITOR_COMPATIBILITY.md`.
+
 ## Mental Model
 
 - `Shell Orchestrator`: top-level surface state, IPC entrypoints, per-screen wiring.

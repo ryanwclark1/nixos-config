@@ -7,13 +7,7 @@ config_dir="${script_dir}/../config"
 # Files intentionally compositor-scoped today.
 allow_hyprctl=(
   "${config_dir}/launcher/Overview.qml"
-  "${config_dir}/menu/ControlCenter.qml"
-  "${config_dir}/menu/DisplayConfig.qml"
-  "${config_dir}/menu/SettingsHub.qml"
-  "${config_dir}/menu/settings/tabs/HyprlandTab.qml"
   "${config_dir}/services/CompositorAdapter.qml"
-  "${config_dir}/services/Config.qml"
-  "${config_dir}/services/PrivacyService.qml"
   "${config_dir}/services/WallpaperService.qml"
 )
 

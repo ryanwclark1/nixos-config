@@ -88,11 +88,40 @@ Item {
         Config.launcherWebAliases = next;
     }
 
+    function isLauncherModeSupported(modeKey) {
+        if (modeKey === "window" && !CompositorAdapter.supportsWindowListing)
+            return false;
+        if (modeKey === "keybinds" && !CompositorAdapter.supportsHotkeysListing)
+            return false;
+        return true;
+    }
+
+    function supportedLauncherModes() {
+        var out = [];
+        for (var i = 0; i < launcherModes.length; i++) {
+            var modeMeta = launcherModes[i];
+            if (isLauncherModeSupported(modeMeta.key))
+                out.push(modeMeta);
+        }
+        return out;
+    }
+
+    function supportedLauncherModeKeys() {
+        return supportedLauncherModes().map(function(modeMeta) { return modeMeta.key; });
+    }
+
+    function defaultModeOptions() {
+        return supportedLauncherModes().map(function(modeMeta) {
+            return { value: modeMeta.key, label: modeMeta.label };
+        });
+    }
+
     function setEnabledModes(nextModes) {
         var allowed = {};
         var i;
-        for (i = 0; i < launcherModes.length; i++)
-            allowed[launcherModes[i].key] = true;
+        var availableModes = supportedLauncherModeKeys();
+        for (i = 0; i < availableModes.length; i++)
+            allowed[availableModes[i]] = true;
 
         var next = [];
         var seen = {};
@@ -147,12 +176,12 @@ Item {
         if (preset === "minimal")
             presetModes = ["drun", "window", "files", "run", "system", "media"];
         else if (preset === "full")
-            presetModes = launcherModes.map(function(modeMeta) { return modeMeta.key; });
+            presetModes = supportedLauncherModeKeys();
         else
             presetModes = ["drun", "window", "files", "ai", "clip", "system", "media"];
 
         setEnabledModes(presetModes);
-        Config.launcherModeOrder = presetModes.slice();
+        Config.launcherModeOrder = Array.isArray(Config.launcherEnabledModes) ? Config.launcherEnabledModes.slice() : ["drun"];
     }
 
     function launcherModeMeta(modeKey) {
@@ -171,6 +200,8 @@ Item {
         var i;
         for (i = 0; i < order.length; i++) {
             var modeKey = String(order[i] || "");
+            if (!isLauncherModeSupported(modeKey))
+                continue;
             if (enabled.indexOf(modeKey) !== -1 && !seen[modeKey]) {
                 out.push(modeKey);
                 seen[modeKey] = true;
@@ -178,6 +209,8 @@ Item {
         }
         for (i = 0; i < enabled.length; i++) {
             var extra = String(enabled[i] || "");
+            if (!isLauncherModeSupported(extra))
+                continue;
             if (!seen[extra]) {
                 out.push(extra);
                 seen[extra] = true;
@@ -300,12 +333,24 @@ Item {
         Config.launcherRememberWebProvider = true;
         Config.launcherWebLastProviderKey = "duckduckgo";
         Config.launcherWebProviderOrder = webProviderDefaultOrder.slice();
-        Config.launcherEnabledModes = launcherDefaultModes.slice();
-        Config.launcherModeOrder = launcherDefaultModes.slice();
+        var supportedDefaults = launcherDefaultModes.filter(function(modeKey) { return isLauncherModeSupported(modeKey); });
+        if (supportedDefaults.length === 0)
+            supportedDefaults = ["drun"];
+        Config.launcherEnabledModes = supportedDefaults.slice();
+        Config.launcherModeOrder = supportedDefaults.slice();
         Config.launcherScoreNameWeight = 1.0;
         Config.launcherScoreTitleWeight = 0.92;
         Config.launcherScoreExecWeight = 0.88;
         Config.launcherScoreBodyWeight = 0.75;
+    }
+
+    Component.onCompleted: {
+        var currentModes = Array.isArray(Config.launcherEnabledModes) ? Config.launcherEnabledModes.slice() : launcherDefaultModes.slice();
+        setEnabledModes(currentModes);
+        if (!isLauncherModeSupported(Config.launcherDefaultMode)) {
+            var ordered = orderedEnabledModes();
+            Config.launcherDefaultMode = ordered.length > 0 ? ordered[0] : "drun";
+        }
     }
 
     SettingsTabPage {
@@ -359,68 +404,7 @@ Item {
             SettingsModeRow {
                 label: "Default Mode"
                 currentValue: Config.launcherDefaultMode
-                options: [
-                    {
-                        value: "drun",
-                        label: "Apps"
-                    },
-                    {
-                        value: "window",
-                        label: "Windows"
-                    },
-                    {
-                        value: "files",
-                        label: "Files"
-                    },
-                    {
-                        value: "ai",
-                        label: "AI"
-                    },
-                    {
-                        value: "clip",
-                        label: "Clipboard"
-                    },
-                    {
-                        value: "system",
-                        label: "System"
-                    },
-                    {
-                        value: "media",
-                        label: "Media"
-                    },
-                    {
-                        value: "run",
-                        label: "Run"
-                    },
-                    {
-                        value: "web",
-                        label: "Web"
-                    },
-                    {
-                        value: "emoji",
-                        label: "Emoji"
-                    },
-                    {
-                        value: "calc",
-                        label: "Calc"
-                    },
-                    {
-                        value: "bookmarks",
-                        label: "Bookmarks"
-                    },
-                    {
-                        value: "keybinds",
-                        label: "Keybinds"
-                    },
-                    {
-                        value: "nixos",
-                        label: "NixOS"
-                    },
-                    {
-                        value: "wallpapers",
-                        label: "Wallpapers"
-                    }
-                ]
+                options: root.defaultModeOptions()
                 onModeSelected: modeValue => Config.launcherDefaultMode = modeValue
             }
 
@@ -604,9 +588,10 @@ Item {
                         Text {
                             Layout.fillWidth: true
                             color: Colors.text
-                            elide: Text.ElideRight
                             font.pixelSize: Colors.fontSizeSmall
                             font.weight: Font.DemiBold
+                            wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap
+                            elide: root.compactMode ? Text.ElideNone : Text.ElideRight
                             text: {
                                 for (var i = 0; i < root.webProviders.length; ++i) {
                                     if (root.webProviders[i].key === modelData)
@@ -720,6 +705,14 @@ Item {
                 onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Launcher", "redetectFilesBackend"])
             }
 
+            SettingsActionButton {
+                Layout.fillWidth: true
+                label: "Launcher Diagnostic Reset"
+                iconName: "󰔟"
+                compact: true
+                onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Launcher", "diagnosticReset"])
+            }
+
             SettingsSliderRow {
                 label: "Recents History Limit"
                 min: 4
@@ -759,7 +752,7 @@ Item {
                 spacing: Colors.spacingS
 
                 Repeater {
-                    model: root.launcherModes
+                    model: root.supportedLauncherModes()
                     delegate: SharedWidgets.FilterChip {
                         required property var modelData
                         label: modelData.label
@@ -836,7 +829,8 @@ Item {
                             font.pixelSize: Colors.fontSizeSmall
                             font.weight: Font.DemiBold
                             Layout.fillWidth: true
-                            elide: Text.ElideRight
+                            wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap
+                            elide: root.compactMode ? Text.ElideNone : Text.ElideRight
                         }
 
                         Flow {

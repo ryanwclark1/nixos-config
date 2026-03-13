@@ -9,8 +9,11 @@ import "../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  implicitWidth: 340
-  implicitHeight: 380
+  readonly property int availablePopupWidth: screen ? Math.max(300, screen.width - 40) : 340
+  readonly property bool compactMode: availablePopupWidth < 330
+  readonly property int detailColumns: compactMode ? 1 : 2
+  implicitWidth: Math.min(340, availablePopupWidth)
+  implicitHeight: compactMode ? 430 : 380
   title: "Battery"
   toggleMethod: "toggleBatteryMenu"
 
@@ -100,7 +103,7 @@ BasePopupMenu {
     // Battery status card
     Rectangle {
       Layout.fillWidth: true
-      implicitHeight: 90
+      implicitHeight: root.compactMode ? 102 : 90
       radius: Colors.radiusMedium
       color: Colors.cardSurface
       border.color: Colors.border
@@ -108,8 +111,8 @@ BasePopupMenu {
 
       RowLayout {
         anchors.fill: parent
-        anchors.margins: Colors.spacingL
-        spacing: Colors.spacingL
+        anchors.margins: root.compactMode ? Colors.spacingM : Colors.spacingL
+        spacing: root.compactMode ? Colors.spacingM : Colors.spacingL
 
         CircularGauge {
           value: root.device ? root.device.percentage : 0
@@ -159,24 +162,24 @@ BasePopupMenu {
         id: detailsGrid
         anchors.fill: parent
         anchors.margins: Colors.spacingM
-        columns: 2
+        columns: root.detailColumns
         rowSpacing: Colors.spacingS
         columnSpacing: Colors.spacingM
 
-        SharedWidgets.SectionLabel { label: "POWER"; Layout.columnSpan: 2 }
+        SharedWidgets.SectionLabel { label: "POWER"; Layout.columnSpan: root.detailColumns }
 
         Text { text: "Energy rate"; color: Colors.fgSecondary; font.pixelSize: Colors.fontSizeMedium }
         Text {
           text: root.device && root.device.energyRate ? root.device.energyRate.toFixed(1) + " W" : "—"
           color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium
-          Layout.alignment: Qt.AlignRight
+          Layout.alignment: root.compactMode ? Qt.AlignLeft : Qt.AlignRight
         }
 
         Text { text: "Capacity"; color: Colors.fgSecondary; font.pixelSize: Colors.fontSizeMedium }
         Text {
           text: root.device && root.device.energyFull ? root.device.energyFull.toFixed(1) + " Wh" : "—"
           color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium
-          Layout.alignment: Qt.AlignRight
+          Layout.alignment: root.compactMode ? Qt.AlignLeft : Qt.AlignRight
         }
 
         Text { text: "Health"; color: Colors.fgSecondary; font.pixelSize: Colors.fontSizeMedium }
@@ -190,7 +193,7 @@ BasePopupMenu {
             return health > 0.8 ? Colors.primary : (health > 0.5 ? Colors.accent : Colors.error);
           }
           font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium
-          Layout.alignment: Qt.AlignRight
+          Layout.alignment: root.compactMode ? Qt.AlignLeft : Qt.AlignRight
         }
       }
     }

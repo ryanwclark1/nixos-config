@@ -7,8 +7,10 @@ import "../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  implicitWidth: 360
-  implicitHeight: 480
+  readonly property int availablePopupWidth: screen ? Math.max(320, screen.width - 40) : 360
+  readonly property bool compactMode: availablePopupWidth < 350
+  implicitWidth: Math.min(360, availablePopupWidth)
+  implicitHeight: compactMode ? 520 : 480
   title: "Clipboard"
   toggleMethod: "toggleClipboardMenu"
   contentSpacing: 12
@@ -77,7 +79,7 @@ BasePopupMenu {
   // Search bar
   Rectangle {
     Layout.fillWidth: true
-    height: 36
+    height: root.compactMode ? 34 : 36
     radius: height / 2
     color: Colors.bgWidget
     border.color: searchInput.activeFocus ? Colors.primary : Colors.border

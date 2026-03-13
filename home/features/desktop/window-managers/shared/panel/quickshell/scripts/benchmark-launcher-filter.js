@@ -13,6 +13,7 @@ function parseArg(name, fallback) {
 const itemCount = Math.max(1000, Math.floor(parseArg("items", 30000)));
 const runs = Math.max(1, Math.floor(parseArg("runs", 40)));
 const seed = Math.floor(parseArg("seed", 1337));
+const outputJson = process.argv.includes("--json");
 
 const modePrefixes = ["=", ">", ":", "?", "!", "@", "/"];
 const scoreWeights = {
@@ -200,6 +201,23 @@ const speedup = legacyMedian / Math.max(0.001, optimizedMedian);
 
 const lastLegacy = legacySamples[legacySamples.length - 1];
 const lastOptimized = optimizedSamples[optimizedSamples.length - 1];
+
+if (outputJson) {
+  console.log(JSON.stringify({
+    benchmark: "launcher-filter",
+    items: itemCount,
+    runs,
+    seed,
+    legacyMedianMs: legacyMedian,
+    optimizedMedianMs: optimizedMedian,
+    speedup,
+    legacyChecksum: lastLegacy.checksum,
+    optimizedChecksum: lastOptimized.checksum,
+    legacyMatched: lastLegacy.matched,
+    optimizedMatched: lastOptimized.matched
+  }));
+  process.exit(0);
+}
 
 console.log("Launcher Filter Benchmark");
 console.log(`items=${itemCount} runs=${runs} seed=${seed}`);

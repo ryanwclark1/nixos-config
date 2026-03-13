@@ -84,6 +84,7 @@ Item {
 
       // Load the appropriate widget component based on type
       Loader {
+        id: widgetLoader
         active: true
         source: DesktopWidgetRegistry.pluginSourceForWidgetType(widgetType)
         sourceComponent: {
@@ -94,6 +95,20 @@ Item {
             case "Weather": return weatherComponent;
             default: return placeholderComponent;
           }
+        }
+        onStatusChanged: {
+          if (status !== Loader.Ready || !item)
+            return;
+          var plugin = DesktopWidgetRegistry.pluginForWidgetType(widgetType);
+          if (!plugin)
+            return;
+          var api = PluginService.getPluginAPI(plugin.id);
+          if (api && item.hasOwnProperty("pluginApi"))
+            item.pluginApi = api;
+          if (item.hasOwnProperty("pluginManifest"))
+            item.pluginManifest = plugin;
+          if (item.hasOwnProperty("pluginService"))
+            item.pluginService = PluginService;
         }
       }
     }

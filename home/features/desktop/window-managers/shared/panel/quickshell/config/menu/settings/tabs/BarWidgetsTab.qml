@@ -16,6 +16,7 @@ Item {
     property string settingsSection: ""
     property string settingsInstanceId: ""
     property bool widgetSettingsOpen: false
+    property string pluginSettingsError: ""
     property string validationMessage: ""
     property string dragSection: ""
     property int dragSourceIndex: -1
@@ -25,6 +26,24 @@ Item {
     readonly property var editingWidget: (selectedBar && settingsSection && settingsInstanceId)
         ? Config.widgetInstance(selectedBar.id, settingsSection, settingsInstanceId)
         : null
+    readonly property string editingPluginId: {
+        var typeName = editingWidget ? String(editingWidget.widgetType || "") : "";
+        return typeName.indexOf("plugin:") === 0 ? typeName.slice(7) : "";
+    }
+    readonly property bool editingPluginHasSettings: editingPluginId !== "" && PluginService.pluginSupportsSettings(editingPluginId)
+    readonly property bool editingPluginCanWriteSettings: editingPluginId !== "" && PluginService.pluginCanWriteSettings(editingPluginId)
+
+    onWidgetSettingsOpenChanged: {
+        if (!widgetSettingsOpen) {
+            pluginSettingsError = "";
+            if (pluginSettingsLoader)
+                pluginSettingsLoader.source = "";
+        }
+    }
+    onEditingPluginIdChanged: {
+        if (widgetSettingsOpen)
+            Qt.callLater(loadPluginSettingsPane);
+    }
 
     function sectionWidgets(section) {
         if (!selectedBar || !selectedBar.sectionWidgets)
@@ -45,7 +64,9 @@ Item {
     function openWidgetSettings(section, instanceId) {
         settingsSection = section;
         settingsInstanceId = instanceId;
+        pluginSettingsError = "";
         widgetSettingsOpen = true;
+        Qt.callLater(loadPluginSettingsPane);
     }
 
     function addWidget(widgetType) {
@@ -70,6 +91,29 @@ Item {
         var settings = editingWidget.settings ? JSON.parse(JSON.stringify(editingWidget.settings)) : {};
         settings.size = value;
         Config.updateBarWidget(selectedBar.id, settingsSection, editingWidget.instanceId, { settings: settings });
+    }
+
+    function loadPluginSettingsPane() {
+        if (!pluginSettingsLoader)
+            return;
+        pluginSettingsLoader.source = "";
+        if (!widgetSettingsOpen || editingPluginId === "" || !editingPluginHasSettings)
+            return;
+        if (!editingPluginCanWriteSettings) {
+            pluginSettingsError = "This plugin does not have settings_write permission.";
+            return;
+        }
+        var src = PluginService.pluginSettingsSource(editingPluginId);
+        if (src === "") {
+            pluginSettingsError = "Plugin settings entry point is missing.";
+            return;
+        }
+        var api = PluginService.getPluginAPI(editingPluginId);
+        pluginSettingsLoader.setSource(src, {
+            pluginApi: api,
+            pluginManifest: PluginService.pluginById(editingPluginId),
+            pluginService: PluginService
+        });
     }
 
     SettingsTabPage {
@@ -181,8 +225,9 @@ Item {
                                                 color: Colors.text
                                                 font.pixelSize: Colors.fontSizeMedium
                                                 font.weight: Font.Medium
-                                                elide: Text.ElideRight
                                                 Layout.fillWidth: true
+                                                wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap
+                                                elide: root.compactMode ? Text.ElideNone : Text.ElideRight
                                             }
 
                                             Text {
@@ -456,9 +501,21 @@ Item {
                     }
 
                     SettingsInfoCallout {
-                        visible: !root.editingWidget || !BarWidgetRegistry.supportsSettings(root.editingWidget.widgetType)
+                        visible: !root.editingWidget || (!BarWidgetRegistry.supportsSettings(root.editingWidget.widgetType) && root.editingPluginId === "")
                         title: "No configurable options"
                         body: "This widget does not expose custom per-instance settings yet."
+                    }
+
+                    SettingsInfoCallout {
+                        visible: root.editingPluginId !== "" && root.editingPluginHasSettings && !root.editingPluginCanWriteSettings
+                        title: "Permission required"
+                        body: "This plugin is missing settings_write permission in its manifest."
+                    }
+
+                    SettingsInfoCallout {
+                        visible: root.pluginSettingsError !== ""
+                        title: "Plugin settings failed to load"
+                        body: root.pluginSettingsError
                     }
 
                     SettingsSliderRow {
@@ -470,6 +527,18 @@ Item {
                             ? root.editingWidget.settings.size
                             : 24
                         onMoved: value => root.updateSpacerSize(value)
+                    }
+
+                    Loader {
+                        id: pluginSettingsLoader
+                        Layout.fillWidth: true
+                        visible: root.editingPluginId !== "" && root.editingPluginHasSettings && root.editingPluginCanWriteSettings && status !== Loader.Error
+                        onStatusChanged: {
+                            if (status === Loader.Error)
+                                root.pluginSettingsError = errorString();
+                            else if (status === Loader.Ready)
+                                root.pluginSettingsError = "";
+                        }
                     }
                 }
             }

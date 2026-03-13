@@ -12,6 +12,7 @@ function parseArg(name, fallback) {
 const linesCount = Math.max(1000, Math.floor(parseArg("lines", 120000)));
 const runs = Math.max(1, Math.floor(parseArg("runs", 25)));
 const seed = Math.floor(parseArg("seed", 1337));
+const outputJson = process.argv.includes("--json");
 const homeDir = "/home/administrator";
 
 function makePrng(initialSeed) {
@@ -108,6 +109,23 @@ for (let i = 0; i < 5; i += 1) {
 const medLegacy = median(legacy);
 const medOptimized = median(optimized);
 const speedup = medLegacy / Math.max(0.001, medOptimized);
+
+if (outputJson) {
+  console.log(JSON.stringify({
+    benchmark: "launcher-files-shaping",
+    lines: linesCount,
+    runs,
+    seed,
+    legacyMedianMs: medLegacy,
+    optimizedMedianMs: medOptimized,
+    speedup,
+    legacyChecksum: lastLegacy ? lastLegacy.checksum : 0,
+    optimizedChecksum: lastOptimized ? lastOptimized.checksum : 0,
+    legacyTotal: lastLegacy ? lastLegacy.total : 0,
+    optimizedTotal: lastOptimized ? lastOptimized.total : 0
+  }));
+  process.exit(0);
+}
 
 console.log("Launcher Files Shaping Benchmark");
 console.log(`lines=${linesCount} runs=${runs} seed=${seed}`);

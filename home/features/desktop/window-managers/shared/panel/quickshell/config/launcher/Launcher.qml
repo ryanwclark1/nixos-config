@@ -63,6 +63,7 @@ PanelWindow {
   property var fileQueryCacheTime: ({})
   property string fileSearchBackend: ""
   property int fileSearchBackendResolvedAt: 0
+  property string transientNoticeText: ""
   readonly property int fileSearchBackendRefreshMs: 180000
   readonly property int fileSearchBackendMissRefreshMs: 20000
   property int _lastFilterTriggerMs: 0
@@ -515,6 +516,13 @@ PanelWindow {
     interval: 100
     repeat: false
     onTriggered: launcherRoot.loadWindows()
+  }
+
+  Timer {
+    id: transientNoticeTimer
+    interval: 2800
+    repeat: false
+    onTriggered: launcherRoot.transientNoticeText = ""
   }
 
   // Reactive watchers: ObjectModel doesn't expose countChanged as a signal,
@@ -1455,12 +1463,56 @@ PanelWindow {
     });
   }
 
-  function forceRedetectFileSearchBackend() {
+  function showTransientNotice(message, durationMs) {
+    transientNoticeText = String(message || "");
+    if (transientNoticeText === "") {
+      transientNoticeTimer.stop();
+      return;
+    }
+    transientNoticeTimer.interval = Math.max(1200, Math.round(durationMs || 2800));
+    transientNoticeTimer.restart();
+  }
+
+  function filesBackendStatusObject() {
+    var modeStats = modeMetric("files");
+    return ({
+      backend: filesBackendLabel,
+      backendRaw: String(fileSearchBackend || ""),
+      resolvedAt: fileSearchBackendResolvedAt,
+      resolveRuns: launcherMetrics.filesResolveRuns || 0,
+      resolveAvgMs: launcherMetrics.filesResolveAvgMs || 0,
+      resolveLastMs: launcherMetrics.filesResolveLastMs || 0,
+      filesFdLoads: launcherMetrics.filesFdLoads || 0,
+      filesFindLoads: launcherMetrics.filesFindLoads || 0,
+      filesFdAvgMs: launcherMetrics.filesFdAvgMs || 0,
+      filesFdLastMs: launcherMetrics.filesFdLastMs || 0,
+      filesFindAvgMs: launcherMetrics.filesFindAvgMs || 0,
+      filesFindLastMs: launcherMetrics.filesFindLastMs || 0,
+      fileCacheHits: modeStats.cacheHits || 0,
+      fileCacheMisses: modeStats.cacheMisses || 0,
+      fileCacheHitRateLabel: filesCacheStatsLabel
+    });
+  }
+
+  function forceRedetectFileSearchBackend(announce, callback) {
+    var shouldAnnounce = announce === true;
     fileSearchBackend = "";
     fileSearchBackendResolvedAt = 0;
     invalidateCommandAvailability("fd");
     invalidateCommandAvailability("find");
-    resolveFileSearchBackend(function(_) {});
+    resolveFileSearchBackend(function(backend) {
+      if (shouldAnnounce)
+        showTransientNotice("Files backend re-detected: " + backend, 2600);
+      if (callback)
+        callback(backend);
+    });
+  }
+
+  function diagnosticReset() {
+    clearLauncherMetrics();
+    clearCaches();
+    forceRedetectFileSearchBackend(true, function(_) {});
+    showTransientNotice("Launcher diagnostics reset", 2200);
   }
 
   function loadFiles() {
@@ -2099,7 +2151,9 @@ PanelWindow {
       launcherRoot.open("dmenu");
     }
     function clearMetrics() { launcherRoot.clearLauncherMetrics(); }
-    function redetectFilesBackend() { launcherRoot.forceRedetectFileSearchBackend(); }
+    function redetectFilesBackend() { launcherRoot.forceRedetectFileSearchBackend(true, function(_) {}); }
+    function diagnosticReset() { launcherRoot.diagnosticReset(); }
+    function filesBackendStatus() { return JSON.stringify(launcherRoot.filesBackendStatusObject()); }
     function toggle() { if (launcherRoot.launcherOpacity > 0) launcherRoot.close(); else launcherRoot.open(launcherRoot.effectiveDefaultMode()); }
   }
 
@@ -2481,6 +2535,29 @@ PanelWindow {
               font.pixelSize: Colors.fontSizeXS
               wrapMode: Text.WordWrap
             }
+          }
+        }
+
+        Rectangle {
+          Layout.fillWidth: true
+          visible: launcherRoot.transientNoticeText !== "" && !launcherRoot.tightMode
+          color: Colors.withAlpha(Colors.primary, 0.12)
+          radius: Colors.radiusMedium
+          border.color: Colors.withAlpha(Colors.primary, 0.5)
+          border.width: 1
+          implicitHeight: transientNoticeLabel.implicitHeight + (Colors.spacingS * 2)
+
+          Text {
+            id: transientNoticeLabel
+            anchors.fill: parent
+            anchors.margins: Colors.spacingS
+            text: launcherRoot.transientNoticeText
+            color: Colors.primary
+            font.pixelSize: Colors.fontSizeXS
+            font.weight: Font.DemiBold
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            wrapMode: Text.WordWrap
           }
         }
 

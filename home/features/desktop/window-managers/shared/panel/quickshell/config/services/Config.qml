@@ -206,12 +206,7 @@ QtObject {
 
   function applyRuntimeSettings() {
     if (CompositorAdapter.supportsHyprctlSettings) {
-      Quickshell.execDetached([
-        "hyprctl",
-        "keyword",
-        "decoration:blur:enabled",
-        blurEnabled ? "true" : "false"
-      ]);
+      CompositorAdapter.setHyprKeyword("decoration:blur:enabled", blurEnabled ? "true" : "false", "Set blur");
     }
   }
 

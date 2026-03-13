@@ -42,7 +42,7 @@ PanelWindow {
   signal browseWallpaper(string monitorName)
   signal pickWallpaperFolder()
 
-  // Hyprland layout state (needed at open() time, stays on root)
+  // Window-manager layout state (loaded from Hyprland options when supported).
   property real layoutGapsOut: 10
   property real layoutGapsIn: 5
   property real layoutActiveOpacity: 1.0
@@ -110,7 +110,7 @@ PanelWindow {
             settingsRoot.layoutIsMaster = (layout.str === "master");
           }
         } catch (e) {
-          console.error("Failed to parse Hyprland settings: " + e);
+          console.error("Failed to parse window-manager layout settings: " + e);
         }
       }
     }

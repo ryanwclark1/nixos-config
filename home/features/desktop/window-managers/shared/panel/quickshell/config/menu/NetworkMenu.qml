@@ -8,8 +8,11 @@ import "../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  implicitWidth: 396
-  implicitHeight: 552
+  readonly property int availablePopupWidth: screen ? Math.max(340, screen.width - 40) : 396
+  readonly property bool compactMode: availablePopupWidth < 420
+  readonly property int detailColumns: compactMode ? 1 : 2
+  implicitWidth: Math.min(396, availablePopupWidth)
+  implicitHeight: compactMode ? 620 : 552
   title: "Networking"
   subtitle: root.activePrimaryName === "Offline" ? "Network inspector" : root.activePrimaryName
   toggleMethod: "toggleNetworkMenu"
@@ -396,11 +399,14 @@ BasePopupMenu {
 
   headerExtras: [
     Rectangle {
-      width: 82; height: 28; radius: Colors.radiusMedium
+      implicitWidth: wifiStatusLabel.implicitWidth + 20
+      height: 28
+      radius: Colors.radiusMedium
       color: root.wifiRadioEnabled ? Colors.withAlpha(Colors.primary, 0.18) : Colors.chipSurface
       border.color: root.wifiRadioEnabled ? Colors.primary : Colors.border
       border.width: 1
       Text {
+        id: wifiStatusLabel
         anchors.centerIn: parent
         text: !root.wifiDeviceAvailable ? "No Wi-Fi" : (root.wifiRadioEnabled ? "Wi-Fi On" : "Wi-Fi Off")
         color: root.wifiRadioEnabled ? Colors.primary : Colors.textSecondary
@@ -437,7 +443,7 @@ BasePopupMenu {
           color: Colors.cardSurface
           border.color: root.activePrimaryName === "Offline" ? Colors.border : Colors.primary
           border.width: 1
-          implicitHeight: 96
+          implicitHeight: root.compactMode ? 126 : 96
 
           ColumnLayout {
             anchors.fill: parent
@@ -445,6 +451,7 @@ BasePopupMenu {
             spacing: Colors.paddingSmall
 
             RowLayout {
+              visible: !root.compactMode
               Layout.fillWidth: true
               spacing: Colors.spacingM
 
@@ -503,8 +510,74 @@ BasePopupMenu {
               }
             }
 
-            RowLayout {
+            ColumnLayout {
+              visible: root.compactMode
               Layout.fillWidth: true
+              spacing: Colors.spacingS
+
+              RowLayout {
+                Layout.fillWidth: true
+                spacing: Colors.spacingM
+
+                Text {
+                  text: root.networkIcon()
+                  color: root.activePrimaryName === "Offline" ? Colors.textDisabled : Colors.primary
+                  font.family: Colors.fontMono
+                  font.pixelSize: Colors.fontSizeHuge
+                }
+
+                ColumnLayout {
+                  Layout.fillWidth: true
+                  spacing: 2
+                  Text {
+                    text: root.activePrimaryName
+                    color: Colors.text
+                    font.pixelSize: Colors.fontSizeLarge
+                    font.weight: Font.DemiBold
+                    Layout.fillWidth: true
+                    elide: Text.ElideRight
+                  }
+                  Text {
+                    text: root.networkSubtitle()
+                    color: Colors.textSecondary
+                    font.pixelSize: Colors.fontSizeSmall
+                    Layout.fillWidth: true
+                    elide: Text.ElideRight
+                  }
+                }
+              }
+
+              Rectangle {
+                Layout.fillWidth: true
+                implicitHeight: 30
+                radius: height / 2
+                color: root.activePrimaryName === "Offline"
+                  ? Colors.withAlpha(Colors.primary, 0.16)
+                  : Colors.withAlpha(Colors.error, 0.16)
+                border.color: root.activePrimaryName === "Offline" ? Colors.primary : Colors.error
+                border.width: 1
+                Text {
+                  anchors.centerIn: parent
+                  text: root.activePrimaryName === "Offline" ? "Refresh" : "Disconnect"
+                  color: root.activePrimaryName === "Offline" ? Colors.primary : Colors.error
+                  font.pixelSize: Colors.fontSizeSmall
+                  font.weight: Font.Medium
+                }
+                MouseArea {
+                  anchors.fill: parent
+                  cursorShape: Qt.PointingHandCursor
+                  onClicked: {
+                    if (root.activePrimaryName === "Offline") root.refreshData();
+                    else Quickshell.execDetached(["nmcli", "connection", "down", root.activePrimaryName]);
+                    root.queueRefresh();
+                  }
+                }
+              }
+            }
+
+            Flow {
+              Layout.fillWidth: true
+              width: parent.width
               spacing: Colors.spacingS
 
               Rectangle {
@@ -539,7 +612,6 @@ BasePopupMenu {
                 Text { id: signalLabel; anchors.centerIn: parent; text: root.signalIcon(root.primarySignal) + " " + root.primarySignal + "%"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Medium; font.family: Colors.fontMono }
               }
 
-              Item { Layout.fillWidth: true }
             }
           }
         }
@@ -551,7 +623,7 @@ BasePopupMenu {
 
           GridLayout {
             Layout.fillWidth: true
-            columns: 2
+            columns: root.detailColumns
             columnSpacing: Colors.paddingSmall
             rowSpacing: Colors.paddingSmall
 
@@ -609,7 +681,7 @@ BasePopupMenu {
 
           GridLayout {
             Layout.fillWidth: true
-            columns: 2
+            columns: root.detailColumns
             columnSpacing: Colors.paddingSmall
             rowSpacing: Colors.paddingSmall
 
@@ -826,7 +898,7 @@ BasePopupMenu {
 
           GridLayout {
             Layout.fillWidth: true
-            columns: 2
+            columns: root.detailColumns
             columnSpacing: Colors.paddingSmall
             rowSpacing: Colors.paddingSmall
 

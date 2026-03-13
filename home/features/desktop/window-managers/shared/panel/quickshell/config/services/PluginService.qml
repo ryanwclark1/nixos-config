@@ -13,6 +13,7 @@ QtObject {
   property var plugins: []
   property var pluginIndex: ({})
   property var pluginErrors: ({})
+  property var pluginStatuses: ({})
 
   // Runtime state for active plugin components.
   property var daemonComponents: ({})
@@ -67,6 +68,33 @@ QtObject {
   signal pluginCatalogUpdated
   signal pluginRuntimeUpdated
 
+  function _setPluginStatus(pluginId, state, code, message) {
+    var id = String(pluginId || "");
+    if (id === "")
+      return;
+    var current = pluginStatuses[id] || ({});
+    var next = Object.assign({}, pluginStatuses);
+    next[id] = {
+      state: String(state || current.state || "unknown"),
+      code: String(code || current.code || ""),
+      message: String(message || current.message || "")
+    };
+    pluginStatuses = next;
+  }
+
+  function _removePluginStatus(pluginId) {
+    var id = String(pluginId || "");
+    if (id === "" || pluginStatuses[id] === undefined)
+      return;
+    var next = Object.assign({}, pluginStatuses);
+    delete next[id];
+    pluginStatuses = next;
+  }
+
+  function _errorEntry(code, message) {
+    return ({ code: String(code || ""), message: String(message || "") });
+  }
+
   function scanPlugins() {
     scanProc.running = true;
   }
@@ -77,6 +105,28 @@ QtObject {
 
   function getPluginAPI(pluginId) {
     return pluginApis[String(pluginId || "")] || null;
+  }
+
+  function pluginSupportsSettings(pluginId) {
+    var plugin = pluginById(pluginId);
+    return !!(plugin && plugin.entryPoints && String(plugin.entryPoints.settings || "") !== "");
+  }
+
+  function pluginSettingsSource(pluginId) {
+    var plugin = pluginById(pluginId);
+    if (!plugin || !plugin.entryPoints)
+      return "";
+    var rel = String(plugin.entryPoints.settings || "");
+    if (rel === "")
+      return "";
+    return "file://" + String(plugin.path || "") + rel;
+  }
+
+  function pluginCanWriteSettings(pluginId) {
+    var plugin = pluginById(pluginId);
+    if (!plugin)
+      return false;
+    return _hasPermission(plugin, "settings_write");
   }
 
   function enablePlugin(pluginId) {
@@ -243,6 +293,7 @@ QtObject {
     var component = Qt.createComponent("file://" + providerPath);
     if (component.status !== Component.Ready) {
       console.warn("PluginService: Failed to load launcher provider", plugin.id, component.errorString());
+      _setPluginStatus(plugin.id, "failed", "E_LAUNCHER_COMPONENT_LOAD", component.errorString());
       return;
     }
 
@@ -254,6 +305,7 @@ QtObject {
     });
     if (!instance) {
       console.warn("PluginService: Failed to instantiate launcher provider", plugin.id, component.errorString());
+      _setPluginStatus(plugin.id, "failed", "E_LAUNCHER_INSTANCE_CREATE", component.errorString());
       return;
     }
 
@@ -266,6 +318,7 @@ QtObject {
     launcherProviderComponents = components;
     launcherProviderInstances = instances;
     pluginApis = apis;
+    _setPluginStatus(plugin.id, "active", "", "");
   }
 
   function _destroyLauncherProvider(pluginId) {
@@ -285,6 +338,14 @@ QtObject {
     delete components[pid];
     launcherProviderInstances = instances;
     launcherProviderComponents = components;
+
+    var plugin = pluginById(pid);
+    if (!plugin)
+      _removePluginStatus(pid);
+    else if (plugin.enabled)
+      _setPluginStatus(pid, "enabled", "", "");
+    else
+      _setPluginStatus(pid, "disabled", "", "");
   }
 
   function _instantiateDaemon(plugin) {
@@ -295,6 +356,7 @@ QtObject {
     var component = Qt.createComponent("file://" + daemonPath);
     if (component.status !== Component.Ready) {
       console.warn("PluginService: Failed to load daemon", plugin.id, component.errorString());
+      _setPluginStatus(plugin.id, "failed", "E_DAEMON_COMPONENT_LOAD", component.errorString());
       return;
     }
 
@@ -306,6 +368,7 @@ QtObject {
     });
     if (!instance) {
       console.warn("PluginService: Failed to instantiate daemon", plugin.id, component.errorString());
+      _setPluginStatus(plugin.id, "failed", "E_DAEMON_INSTANCE_CREATE", component.errorString());
       return;
     }
 
@@ -318,11 +381,14 @@ QtObject {
     daemonComponents = components;
     daemonInstances = instances;
     pluginApis = apis;
+    _setPluginStatus(plugin.id, "active", "", "");
 
     try {
       if (instance.start)
         instance.start();
-    } catch (e) {}
+    } catch (e) {
+      _setPluginStatus(plugin.id, "failed", "E_DAEMON_START", String(e));
+    }
   }
 
   function _destroyDaemon(pluginId) {
@@ -342,9 +408,30 @@ QtObject {
     delete components[pid];
     daemonInstances = instances;
     daemonComponents = components;
+
+    var plugin = pluginById(pid);
+    if (!plugin)
+      _removePluginStatus(pid);
+    else if (plugin.enabled)
+      _setPluginStatus(pid, "enabled", "", "");
+    else
+      _setPluginStatus(pid, "disabled", "", "");
   }
 
   function _refreshRuntime() {
+    var nextApis = ({});
+    var enabledPlugins = plugins || [];
+    for (var p = 0; p < enabledPlugins.length; ++p) {
+      var ap = enabledPlugins[p];
+      if (ap && ap.enabled) {
+        nextApis[ap.id] = pluginApis[ap.id] || _buildPluginApi(ap);
+        _setPluginStatus(ap.id, "enabled", "", "");
+      } else if (ap) {
+        _setPluginStatus(ap.id, "disabled", "", "");
+      }
+    }
+    pluginApis = nextApis;
+
     // Unload anything no longer active.
     for (var activeDaemonId in daemonInstances) {
       var activeDaemon = pluginById(activeDaemonId);
@@ -498,6 +585,7 @@ QtObject {
       plugin.enabled = disabledList.indexOf(plugin.id) === -1;
       nextList.push(plugin);
       nextIndex[plugin.id] = plugin;
+      _setPluginStatus(plugin.id, plugin.enabled ? "enabled" : "disabled", "", "");
 
       var previous = pluginFingerprints[plugin.id];
       var currentFingerprint = _pluginRuntimeFingerprint(plugin);
@@ -516,6 +604,7 @@ QtObject {
         _destroyDaemon(existingId);
         _destroyLauncherProvider(existingId);
         delete nextFingerprints[existingId];
+        _removePluginStatus(existingId);
       }
     }
 
@@ -582,14 +671,20 @@ QtObject {
   function _normalizeLauncherItem(item, plugin) {
     if (!item || typeof item !== "object")
       return null;
+    var name = String(item.name || item.title || "").trim();
+    if (name === "")
+      return null;
+    var score = Number(item.score);
+    if (!isFinite(score))
+      score = 0;
     var normalized = {
       pluginId: plugin.id,
       pluginName: plugin.name,
-      name: String(item.name || item.title || "Untitled"),
+      name: name,
       title: String(item.title || ""),
       description: String(item.description || ""),
       icon: String(item.icon || "󰏗"),
-      score: Number(item.score || 0),
+      score: score,
       data: item.data !== undefined ? item.data : null,
       exec: item.exec !== undefined ? item.exec : "",
       action: item.action !== undefined ? item.action : null,
@@ -605,6 +700,8 @@ QtObject {
     var query = triggered.pluginId !== "" ? triggered.query : raw.trim();
     var providers = launcherPlugins;
     var out = [];
+    var dedupe = ({});
+    var maxItemsPerProvider = 60;
 
     for (var i = 0; i < providers.length; ++i) {
       var plugin = providers[i];
@@ -630,15 +727,31 @@ QtObject {
         if (!Array.isArray(response))
           continue;
 
-        for (var j = 0; j < response.length; ++j) {
+        _setPluginStatus(providerId, "active", "", "");
+
+        for (var j = 0; j < response.length && j < maxItemsPerProvider; ++j) {
           var normalized = _normalizeLauncherItem(response[j], plugin);
-          if (normalized)
+          if (normalized) {
+            var dedupeKey = providerId + "::" + normalized.name + "::" + String(normalized.exec || "");
+            if (dedupe[dedupeKey])
+              continue;
+            dedupe[dedupeKey] = true;
             out.push(normalized);
+          }
         }
       } catch (e) {
         console.warn("PluginService: launcher provider error", providerId, e);
+        _setPluginStatus(providerId, "degraded", "E_LAUNCHER_QUERY", String(e));
       }
     }
+
+    out.sort(function(a, b) {
+      var as = Number(a.score || 0);
+      var bs = Number(b.score || 0);
+      if (bs !== as)
+        return bs - as;
+      return String(a.name || "").localeCompare(String(b.name || ""));
+    });
 
     return out;
   }
@@ -658,6 +771,7 @@ QtObject {
         }) !== false;
       } catch (e) {
         console.warn("PluginService: launcher execute failed", item.pluginId, e);
+        _setPluginStatus(item.pluginId, "degraded", "E_LAUNCHER_EXECUTE", String(e));
         return false;
       }
     }
@@ -712,20 +826,20 @@ QtObject {
             var validation = root._validateManifest(manifest, pluginPath);
             if (!validation.ok) {
               var badId = manifest && manifest.id ? String(manifest.id) : "plugin-" + i;
-              errors[badId] = validation.error;
+              errors[badId] = root._errorEntry("E_MANIFEST_VALIDATION", validation.error);
               continue;
             }
 
             var normalized = validation.manifest;
             if (seen[normalized.id]) {
-              errors[normalized.id] = "duplicate plugin id";
+              errors[normalized.id] = root._errorEntry("E_DUPLICATE_PLUGIN_ID", "duplicate plugin id");
               continue;
             }
             seen[normalized.id] = true;
             normalized.fingerprint = String(payload.fingerprint || "");
             loaded.push(normalized);
           } catch (e) {
-            // Ignore malformed scan line.
+            errors["scan-line-" + i] = root._errorEntry("E_SCAN_LINE_PARSE", "malformed scan output");
           }
         }
 

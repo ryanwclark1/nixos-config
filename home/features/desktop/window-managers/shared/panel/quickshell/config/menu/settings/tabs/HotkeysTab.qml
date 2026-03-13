@@ -55,7 +55,7 @@ Item {
         SettingsCard {
             title: "Search"
             iconName: "󰍉"
-            description: "Filter active Hyprland binds by key, modifier, dispatcher, or arguments."
+            description: "Filter active compositor binds by key, modifier, dispatcher, or arguments."
 
             SettingsTextInputRow {
                 id: keybindsSearchField

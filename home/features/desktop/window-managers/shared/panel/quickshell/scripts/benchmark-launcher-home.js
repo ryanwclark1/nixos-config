@@ -13,6 +13,7 @@ const appsCount = Math.max(1000, Math.floor(parseArg("apps", 30000)));
 const historyCount = Math.max(50, Math.floor(parseArg("history", 500)));
 const runs = Math.max(1, Math.floor(parseArg("runs", 60)));
 const seed = Math.floor(parseArg("seed", 1337));
+const outputJson = process.argv.includes("--json");
 const recentLimit = 6;
 const suggestionsLimit = 4;
 
@@ -205,6 +206,24 @@ for (let i = 0; i < 5; i += 1) {
 const legacyMedian = median(legacyTimes);
 const optimizedMedian = median(optimizedTimes);
 const speedup = legacyMedian / Math.max(0.001, optimizedMedian);
+
+if (outputJson) {
+  console.log(JSON.stringify({
+    benchmark: "launcher-home",
+    apps: appsCount,
+    history: historyCount,
+    runs,
+    seed,
+    legacyMedianMs: legacyMedian,
+    optimizedMedianMs: optimizedMedian,
+    speedup,
+    legacyChecksum: lastLegacy ? lastLegacy.checksum : 0,
+    optimizedChecksum: lastOptimized ? lastOptimized.checksum : 0,
+    legacyCount: lastLegacy ? lastLegacy.count : 0,
+    optimizedCount: lastOptimized ? lastOptimized.count : 0
+  }));
+  process.exit(0);
+}
 
 console.log("Launcher Home Benchmark");
 console.log(`apps=${appsCount} history=${historyCount} runs=${runs} seed=${seed}`);

@@ -15,9 +15,19 @@ Item {
         var map = PluginService.pluginErrors || ({});
         var entries = [];
         for (var key in map) {
+            var raw = map[key];
+            var code = "";
+            var message = "";
+            if (raw && typeof raw === "object") {
+                code = String(raw.code || "");
+                message = String(raw.message || "");
+            } else {
+                message = String(raw || "");
+            }
             entries.push({
                 id: key,
-                error: String(map[key] || "")
+                code: code,
+                error: message
             });
         }
         entries.sort(function(a, b) { return String(a.id).localeCompare(String(b.id)); });
@@ -213,6 +223,38 @@ Item {
                                     font.weight: Font.DemiBold
                                 }
                             }
+
+                            Rectangle {
+                                implicitWidth: statusLabel.implicitWidth + 10
+                                height: 18
+                                radius: height / 2
+                                color: {
+                                    var status = PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] ? PluginService.pluginStatuses[modelData.id].state : "";
+                                    return status === "failed" || status === "degraded"
+                                        ? Qt.rgba(Colors.error.r, Colors.error.g, Colors.error.b, 0.16)
+                                        : status === "active"
+                                            ? Qt.rgba(Colors.success.r, Colors.success.g, Colors.success.b, 0.16)
+                                            : Qt.rgba(Colors.text.r, Colors.text.g, Colors.text.b, 0.08);
+                                }
+                                Text {
+                                    id: statusLabel
+                                    anchors.centerIn: parent
+                                    text: {
+                                        var status = PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] ? PluginService.pluginStatuses[modelData.id].state : "";
+                                        return status !== "" ? status : (modelData.enabled ? "enabled" : "disabled");
+                                    }
+                                    color: {
+                                        var status = PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] ? PluginService.pluginStatuses[modelData.id].state : "";
+                                        return status === "failed" || status === "degraded"
+                                            ? Colors.error
+                                            : status === "active"
+                                                ? Colors.success
+                                                : Colors.fgSecondary;
+                                    }
+                                    font.pixelSize: Colors.fontSizeXS
+                                    font.weight: Font.DemiBold
+                                }
+                            }
                         }
 
                         Text {
@@ -227,6 +269,16 @@ Item {
                             text: "by " + modelData.author
                             color: Colors.fgDim
                             font.pixelSize: Colors.fontSizeXS
+                        }
+
+                        Text {
+                            visible: PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] && String(PluginService.pluginStatuses[modelData.id].message || "") !== ""
+                            text: (PluginService.pluginStatuses[modelData.id].code ? ("[" + PluginService.pluginStatuses[modelData.id].code + "] ") : "")
+                                + String(PluginService.pluginStatuses[modelData.id].message || "")
+                            color: Colors.warning
+                            font.pixelSize: Colors.fontSizeXS
+                            Layout.fillWidth: true
+                            wrapMode: Text.WordWrap
                         }
                     }
 
@@ -272,7 +324,7 @@ Item {
                             id: issueText
                             anchors.fill: parent
                             anchors.margins: 7
-                            text: modelData.id + ": " + modelData.error
+                            text: modelData.id + ": " + (modelData.code !== "" ? ("[" + modelData.code + "] ") : "") + modelData.error
                             color: Colors.warning
                             font.pixelSize: Colors.fontSizeXS
                             wrapMode: Text.WordWrap
@@ -301,7 +353,7 @@ Item {
                 }
 
                 Text {
-                    text: "Manifest v2 fields: id, name, description, author, version, type, permissions, entryPoints { barWidget|desktopWidget|launcherProvider|daemon|settings }"
+                    text: "Manifest fields: id, name, description, author, version, type, permissions, entryPoints { barWidget|desktopWidget|launcherProvider|daemon|settings }"
                     color: Colors.fgSecondary
                     font.pixelSize: Colors.fontSizeSmall
                     wrapMode: Text.WordWrap
@@ -309,7 +361,7 @@ Item {
                 }
 
                 Text {
-                    text: "Reference schema: config/plugins/manifest-v2.schema.json"
+                    text: "Reference schema: config/plugins/manifest.schema.json"
                     color: Colors.fgDim
                     font.pixelSize: Colors.fontSizeXS
                     wrapMode: Text.WordWrap

@@ -44,9 +44,10 @@ QtObject {
         icon: "󰏗",
         section: "right",
         description: plugin.description || "Bar plugin widget.",
+        hasSettings: !!(plugin.entryPoints && plugin.entryPoints.settings),
         pluginId: plugin.id,
         path: plugin.path || "",
-        mainFile: (plugin.entryPoints && plugin.entryPoints.barWidget) ? plugin.entryPoints.barWidget : ""
+        entryFile: (plugin.entryPoints && plugin.entryPoints.barWidget) ? plugin.entryPoints.barWidget : ""
       });
     }
     return items;
@@ -75,9 +76,10 @@ QtObject {
             icon: "󰏗",
             section: "right",
             description: plugins[j].description || "Bar plugin widget.",
+            hasSettings: !!(plugins[j].entryPoints && plugins[j].entryPoints.settings),
             pluginId: pluginId,
             path: plugins[j].path || "",
-            mainFile: (plugins[j].entryPoints && plugins[j].entryPoints.barWidget) ? plugins[j].entryPoints.barWidget : ""
+            entryFile: (plugins[j].entryPoints && plugins[j].entryPoints.barWidget) ? plugins[j].entryPoints.barWidget : ""
           };
         }
       }
