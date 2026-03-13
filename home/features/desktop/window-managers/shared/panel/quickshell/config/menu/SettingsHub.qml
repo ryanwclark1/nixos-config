@@ -20,10 +20,11 @@ PanelWindow {
   visible: isOpen
 
   WlrLayershell.layer: WlrLayer.Overlay
-  WlrLayershell.keyboardFocus: isOpen ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+  WlrLayershell.keyboardFocus: (isOpen && !interactionBlocked) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
   WlrLayershell.namespace: "quickshell-settings"
 
   property bool isOpen: false
+  property bool interactionBlocked: false
   property string currentTabId: SettingsRegistry.defaultTabId
   readonly property int currentTabIndex: SettingsRegistry.indexForTabId(currentTabId)
   signal browseWallpaper(string monitorName)
@@ -112,6 +113,7 @@ PanelWindow {
 
   // Background overlay
   MouseArea {
+    enabled: !settingsRoot.interactionBlocked
     anchors.fill: parent
     onClicked: settingsRoot.close()
 
@@ -125,6 +127,7 @@ PanelWindow {
   // Main settings box
   Rectangle {
     id: mainBox
+    enabled: !settingsRoot.interactionBlocked
     width: Math.min(parent.width - 40, 780)
     height: Math.min(parent.height - 40, 860)
     anchors.centerIn: parent

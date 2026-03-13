@@ -30,8 +30,8 @@ PanelWindow {
     item: sidebarContent
   }
   WlrLayershell.layer: WlrLayer.Top
-  // Request keyboard only while visible to avoid retaining focus after close.
-  WlrLayershell.keyboardFocus: root.showContent ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
+  // Command center has no text inputs; keep keyboard with focused app (e.g. Ghostty).
+  WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
   WlrLayershell.namespace: "quickshell"
 
   property var manager: null

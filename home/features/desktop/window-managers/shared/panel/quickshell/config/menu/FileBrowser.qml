@@ -1278,11 +1278,12 @@ PanelWindow {
               // Bottom row: selected path + filter + action buttons
               RowLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingM
+                spacing: root._compactActions ? Colors.spacingS : Colors.spacingM
 
                 // Selected file or path display
                 Rectangle {
                   Layout.fillWidth: true
+                  Layout.minimumWidth: 0
                   height: 30
                   radius: Colors.radiusSmall
                   color: Colors.withAlpha(Colors.surface, 0.5)
@@ -1310,7 +1311,7 @@ PanelWindow {
 
                 // Filter selector (shown only when filters defined)
                 Rectangle {
-                  visible: root.fileFilters.length > 1
+                  visible: root.fileFilters.length > 1 && !root._compactActions
                   height: 30
                   width: filterText.implicitWidth + 28
                   radius: Colors.radiusSmall

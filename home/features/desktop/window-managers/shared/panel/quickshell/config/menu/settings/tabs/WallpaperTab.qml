@@ -14,6 +14,7 @@ Item {
     property var wallpaperMonitorNames: []
     property string wallpaperFolderInput: Config.wallpaperDefaultFolder
     property string wallpaperFolderError: ""
+    property var _unsupportedImagePaths: ({})
 
     function isWallpaperFolderPathValid(path) {
         var p = (path || "").trim();
@@ -29,6 +30,19 @@ Item {
         wallpaperFolderError = "";
         Config.wallpaperDefaultFolder = trimmed;
         WallpaperService.scanWallpapers();
+    }
+
+    function _imageSource(path) {
+        if (!path || _unsupportedImagePaths[path])
+            return "";
+        return "file://" + path;
+    }
+
+    function _markUnsupportedImage(path) {
+        if (!path || _unsupportedImagePaths[path])
+            return;
+        _unsupportedImagePaths[path] = true;
+        _unsupportedImagePaths = Object.assign({}, _unsupportedImagePaths);
     }
 
     Process {
@@ -130,18 +144,24 @@ Item {
             property bool _previewFlip: false
 
             onPreviewPathChanged: {
-                if (!previewPath)
+                if (!previewPath || root._unsupportedImagePaths[previewPath]) {
+                    previewA.source = "";
+                    previewB.source = "";
                     return;
-                var src = "file://" + previewPath;
+                }
+                var src = root._imageSource(previewPath);
                 if (_previewFlip) {
+                    previewA.previewPath = previewPath;
                     previewA.source = src;
                 } else {
+                    previewB.previewPath = previewPath;
                     previewB.source = src;
                 }
             }
 
             Image {
                 id: previewA
+                property string previewPath: ""
                 anchors.fill: parent
                 fillMode: Image.PreserveAspectCrop
                 asynchronous: true
@@ -157,12 +177,16 @@ Item {
                 onStatusChanged: {
                     if (status === Image.Ready && previewContainer._previewFlip) {
                         previewContainer._previewFlip = false;
+                    } else if (status === Image.Error && previewPath.length > 0) {
+                        root._markUnsupportedImage(previewPath);
+                        source = "";
                     }
                 }
             }
 
             Image {
                 id: previewB
+                property string previewPath: ""
                 anchors.fill: parent
                 fillMode: Image.PreserveAspectCrop
                 asynchronous: true
@@ -178,6 +202,9 @@ Item {
                 onStatusChanged: {
                     if (status === Image.Ready && !previewContainer._previewFlip) {
                         previewContainer._previewFlip = true;
+                    } else if (status === Image.Error && previewPath.length > 0) {
+                        root._markUnsupportedImage(previewPath);
+                        source = "";
                     }
                 }
             }
@@ -547,14 +574,19 @@ Item {
                         }
 
                         Image {
+                            id: thumbImage
                             anchors.fill: parent
-                            source: "file://" + modelData.path
+                            source: root._imageSource(modelData.path)
                             fillMode: Image.PreserveAspectCrop
                             asynchronous: true
                             smooth: true
                             cache: false
                             sourceSize: Qt.size(216, 160)
                             opacity: status === Image.Ready ? 1.0 : 0.0
+                            onStatusChanged: {
+                                if (status === Image.Error)
+                                    root._markUnsupportedImage(modelData.path);
+                            }
                             Behavior on opacity {
                                 NumberAnimation {
                                     duration: 200
@@ -568,7 +600,7 @@ Item {
                             color: Colors.fgDim
                             font.family: Colors.fontMono
                             font.pixelSize: Colors.fontSizeHuge
-                            visible: parent.children[0].status !== Image.Ready
+                            visible: thumbImage.status !== Image.Ready
                         }
 
                         Rectangle {

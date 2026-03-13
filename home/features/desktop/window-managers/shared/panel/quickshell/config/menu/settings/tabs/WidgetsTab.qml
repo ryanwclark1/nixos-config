@@ -4,35 +4,45 @@ import "../../../services"
 import ".."
 
 Item {
-  id: root
-  property var settingsRoot: null
-  property string tabId: ""
+    id: root
+    property var settingsRoot: null
+    property string tabId: ""
 
-  SettingsTabPage {
-    anchors.fill: parent
-    tabId: root.tabId
-    title: "Desktop Widgets"
-    iconName: "󰖲"
+    SettingsTabPage {
+        anchors.fill: parent
+        tabId: root.tabId
+        title: "Desktop Widgets"
+        iconName: "󰖲"
 
-    SettingsCard {
-      title: "Widgets"
-      iconName: "󰖲"
+        SettingsCard {
+            title: "Widgets"
+            iconName: "󰖲"
+            description: "Desktop widget visibility, snapping, and edit mode."
 
-      SettingsFieldGrid {
-        SettingsToggleRow { label: "Desktop Widgets"; icon: "󰖲"; configKey: "desktopWidgetsEnabled" }
-        SettingsToggleRow { label: "Grid Snap"; icon: "󰕰"; configKey: "desktopWidgetsGridSnap" }
-      }
+            SettingsFieldGrid {
+                SettingsToggleRow {
+                    label: "Desktop Widgets"
+                    icon: "󰖲"
+                    configKey: "desktopWidgetsEnabled"
+                }
+                SettingsToggleRow {
+                    label: "Grid Snap"
+                    icon: "󰕰"
+                    configKey: "desktopWidgetsGridSnap"
+                }
+            }
 
-      SettingsActionButton {
-        Layout.fillWidth: true
-        emphasized: true
-        iconName: "󰏫"
-        label: "Edit Widgets"
-        onClicked: {
-          DesktopWidgetRegistry.editMode = true;
-          if (root.settingsRoot) root.settingsRoot.close();
+            SettingsActionButton {
+                Layout.fillWidth: true
+                emphasized: true
+                iconName: "󰏫"
+                label: "Edit Widgets"
+                onClicked: {
+                    DesktopWidgetRegistry.editMode = true;
+                    if (root.settingsRoot)
+                        root.settingsRoot.close();
+                }
+            }
         }
-      }
     }
-  }
 }

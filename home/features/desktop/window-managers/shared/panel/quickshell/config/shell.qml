@@ -450,6 +450,7 @@ Scope {
   property bool _reopenSettingsHubAfterFileBrowser: false
 
   function _openFileBrowserForNotepad(mode) {
+    _reopenSettingsHubTimer.stop();
     _fileBrowserCaller = mode === "save" ? "notepad-save" : "notepad-open";
     root.openSurface("fileBrowser");
     // FileBrowser is now inside LazyLoader — need to defer open() call
@@ -474,6 +475,19 @@ Scope {
         } else {
           fileBrowser.open(home, [{label: "Text Files", extensions: ["txt","md"]}], "save");
         }
+      }
+    }
+  }
+
+  // Avoid reactivating SettingsHub in the same click cycle as modal close.
+  Timer {
+    id: _reopenSettingsHubTimer
+    interval: 130
+    repeat: false
+    onTriggered: {
+      if (root._reopenSettingsHubAfterFileBrowser && !root.fileBrowserVisible) {
+        settingsHub.open();
+        root._reopenSettingsHubAfterFileBrowser = false;
       }
     }
   }
@@ -506,7 +520,9 @@ Scope {
 
   SettingsHub {
     id: settingsHub
+    interactionBlocked: root.fileBrowserVisible
     onBrowseWallpaper: (monitorName) => {
+      _reopenSettingsHubTimer.stop();
       root._fileBrowserCaller = "wallpaper";
       root._wallpaperMonitor = monitorName;
       root._reopenSettingsHubAfterFileBrowser = settingsHub.isOpen;
@@ -516,6 +532,7 @@ Scope {
       _fileBrowserOpenTimer.restart();
     }
     onPickWallpaperFolder: {
+      _reopenSettingsHubTimer.stop();
       root._fileBrowserCaller = "wallpaper-folder";
       root._reopenSettingsHubAfterFileBrowser = settingsHub.isOpen;
       if (settingsHub.isOpen) settingsHub.close();
@@ -550,8 +567,7 @@ Scope {
       if (!isOpen) {
         root.closeSurface("fileBrowser");
         if (root._reopenSettingsHubAfterFileBrowser) {
-          settingsHub.open();
-          root._reopenSettingsHubAfterFileBrowser = false;
+          _reopenSettingsHubTimer.restart();
         }
       }
     }
