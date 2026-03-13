@@ -204,6 +204,8 @@ Item {
 
     function exportWallpaperSettings() {
         var payload = {
+            schemaVersion: 1,
+            exportedAt: (new Date()).toISOString(),
             defaultFolder: Config.wallpaperDefaultFolder,
             cycleInterval: Config.wallpaperCycleInterval,
             runPywal: Config.wallpaperRunPywal,
@@ -354,6 +356,10 @@ Item {
                 }
                 try {
                     var data = JSON.parse(raw);
+                    if (!data || typeof data !== "object" || Array.isArray(data)) {
+                        ToastService.showError("Import failed", "Clipboard JSON root must be an object.");
+                        return;
+                    }
                     var skipped = [];
 
                     if (data.defaultFolder !== undefined) {
