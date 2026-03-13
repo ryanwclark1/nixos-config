@@ -1,4 +1,5 @@
 import QtQuick
+import "../../services"
 
 pragma Singleton
 
@@ -23,7 +24,7 @@ QtObject {
     { id: "appearance",   legacyIndex: 1,  label: "Appearance",     icon: "󰏘", categoryId: "visuals",        order: 30, component: "AppearanceTab.qml",  searchTerms: ["appearance", "glass", "blur"], owner: { surface: "bar", service: "Config", configDomain: "appearance" } },
     { id: "theme",        legacyIndex: 2,  label: "Theme",          icon: "󰏘", categoryId: "visuals",        order: 10, component: "ThemeTab.qml",       searchTerms: ["theme", "colors"], owner: { surface: "", service: "ThemeService", configDomain: "theme" } },
     { id: "wallpaper",    legacyIndex: 3,  label: "Wallpaper",      icon: "󰸉", categoryId: "visuals",        order: 20, component: "WallpaperTab.qml",   searchTerms: ["wallpaper", "background", "pywal"], owner: { surface: "", service: "WallpaperService", configDomain: "wallpaper" } },
-    { id: "hyprland",     legacyIndex: 4,  label: "Hyprland",       icon: "󱗼", categoryId: "window-manager", order: 10, component: "HyprlandTab.qml",    searchTerms: ["hyprland", "gaps", "opacity", "layout"], owner: { surface: "", service: "SettingsHub", configDomain: "hyprland" } },
+    { id: "hyprland",     legacyIndex: 4,  label: "Hyprland",       icon: "󱗼", categoryId: "window-manager", order: 10, component: "HyprlandTab.qml",    compositor: "hyprland", searchTerms: ["hyprland", "gaps", "opacity", "layout"], owner: { surface: "", service: "SettingsHub", configDomain: "hyprland" } },
     { id: "osd",          legacyIndex: 5,  label: "OSD",            icon: "󰍡", categoryId: "interaction",    order: 10, component: "OsdTab.qml",         searchTerms: ["osd", "overlay", "volume"], owner: { surface: "osd", service: "Config", configDomain: "osd" } },
     { id: "bars",         legacyIndex: 6,  label: "Bars",           icon: "󰕮", categoryId: "surfaces",       order: 10, component: "BarTab.qml",         searchTerms: ["bar", "bars", "multi bar", "display assignment"], owner: { surface: "bar", service: "Config", configDomain: "bars" } },
     { id: "bar-widgets",  legacyIndex: 7,  label: "Bar Widgets",    icon: "󰖲", categoryId: "surfaces",       order: 20, component: "BarWidgetsTab.qml",  searchTerms: ["bar widgets", "widgets", "sections"], owner: { surface: "bar", service: "BarWidgetRegistry", configDomain: "barWidgets" } },
@@ -32,39 +33,62 @@ QtObject {
     { id: "lock-screen",  legacyIndex: 10, label: "Lock Screen",    icon: "󰌾", categoryId: "surfaces",       order: 50, component: "LockScreenTab.qml",  searchTerms: ["lock", "screen", "auth"], owner: { surface: "lockscreen", service: "Config", configDomain: "lockScreen" } },
     { id: "privacy",      legacyIndex: 11, label: "Privacy",        icon: "󰒃", categoryId: "power-privacy",  order: 10, component: "PrivacyTab.qml",     searchTerms: ["privacy", "camera", "mic"], owner: { surface: "privacyMenu", service: "PrivacyService", configDomain: "privacy" } },
     { id: "power",        legacyIndex: 12, label: "Power",          icon: "󰌪", categoryId: "power-privacy",  order: 20, component: "PowerTab.qml",       searchTerms: ["power", "battery"], owner: { surface: "powerMenu", service: "Config", configDomain: "power" } },
-    { id: "hotkeys",      legacyIndex: 13, label: "Keybinds",       icon: "󰌌", categoryId: "interaction",    order: 30, component: "HotkeysTab.qml",     searchTerms: ["keys", "shortcuts"], owner: { surface: "", service: "Config", configDomain: "hotkeys" } },
+    { id: "hotkeys",      legacyIndex: 13, label: "Keybinds",       icon: "󰌌", categoryId: "interaction",    order: 30, component: "HotkeysTab.qml",     compositor: "hyprland", searchTerms: ["keys", "shortcuts"], owner: { surface: "", service: "Config", configDomain: "hotkeys" } },
     { id: "plugins",      legacyIndex: 14, label: "Plugins",        icon: "󰏗", categoryId: "extensibility",  order: 10, component: "PluginsTab.qml",     searchTerms: ["plugins", "extensions"], owner: { surface: "", service: "PluginService", configDomain: "plugins" } },
     { id: "about",        legacyIndex: 15, label: "About",          icon: "󰋗", categoryId: "meta",           order: 10, component: "AboutTab.qml",       searchTerms: ["about", "version"], owner: { surface: "", service: "Config", configDomain: "about" } },
     { id: "time-weather", legacyIndex: 16, label: "Time & Weather", icon: "󰔛", categoryId: "interaction",    order: 20, component: "TimeWeatherTab.qml", searchTerms: ["time", "clock", "weather"], owner: { surface: "dateTimeMenu", service: "WeatherService", configDomain: "timeWeather" } }
   ]
 
+  function isTabSupported(tab) {
+    if (!tab) return false;
+    var needs = tab.compositor || "any";
+    if (needs === "any") return true;
+    if (needs === "hyprland") return CompositorAdapter.isHyprland;
+    if (needs === "niri") return CompositorAdapter.isNiri;
+    return true;
+  }
+
+  function supportedTabs() {
+    var out = [];
+    for (var i = 0; i < tabs.length; i++) {
+      if (isTabSupported(tabs[i])) out.push(tabs[i]);
+    }
+    return out;
+  }
+
   function sortedCategories() {
-    return categories.slice().sort(function(a, b) { return (a.order || 0) - (b.order || 0); });
+    return categories
+      .slice()
+      .sort(function(a, b) { return (a.order || 0) - (b.order || 0); })
+      .filter(function(category) { return tabsForCategory(category.id).length > 0; });
   }
 
   function tabsForCategory(categoryId) {
-    return tabs
+    return supportedTabs()
       .filter(function(tab) { return tab.categoryId === categoryId; })
       .sort(function(a, b) { return (a.order || 0) - (b.order || 0); });
   }
 
   function findTab(tabId) {
-    for (var i = 0; i < tabs.length; i++) {
-      if (tabs[i].id === tabId) return tabs[i];
+    var supported = supportedTabs();
+    for (var i = 0; i < supported.length; i++) {
+      if (supported[i].id === tabId) return supported[i];
     }
     return null;
   }
 
   function tabIdForIndex(index) {
-    for (var i = 0; i < tabs.length; i++) {
-      if (tabs[i].legacyIndex === index) return tabs[i].id;
+    var supported = supportedTabs();
+    for (var i = 0; i < supported.length; i++) {
+      if (supported[i].legacyIndex === index) return supported[i].id;
     }
     return "";
   }
 
   function indexForTabId(tabId) {
-    for (var i = 0; i < tabs.length; i++) {
-      if (tabs[i].id === tabId) return tabs[i].legacyIndex !== undefined ? tabs[i].legacyIndex : i;
+    var supported = supportedTabs();
+    for (var i = 0; i < supported.length; i++) {
+      if (supported[i].id === tabId) return supported[i].legacyIndex !== undefined ? supported[i].legacyIndex : i;
     }
     return 0;
   }
@@ -74,8 +98,9 @@ QtObject {
     if (!q) return [];
 
     var results = [];
-    for (var i = 0; i < tabs.length; i++) {
-      var t = tabs[i];
+    var supported = supportedTabs();
+    for (var i = 0; i < supported.length; i++) {
+      var t = supported[i];
       var haystack = (t.label + " " + (t.searchTerms || []).join(" ")).toLowerCase();
       if (haystack.indexOf(q) !== -1) results.push(t);
     }

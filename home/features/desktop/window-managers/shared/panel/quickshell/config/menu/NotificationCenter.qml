@@ -17,10 +17,11 @@ PanelWindow {
   property int panelWidth: Config.controlCenterWidth
   property int panelHeight: 640
   property real panelX: 0
-  property int reservedTop: Config.barHeight + Config.barMargin + 8
-  property int reservedRight: Config.barMargin
-  property int reservedBottom: 60
-  property int reservedLeft: Config.barMargin
+  readonly property var edgeMargins: Config.reservedEdgesForScreen(screen, "")
+  property int reservedTop: edgeMargins.top
+  property int reservedRight: edgeMargins.right
+  property int reservedBottom: edgeMargins.bottom
+  property int reservedLeft: edgeMargins.left
   anchors {
     top: surfaceEdge === "right" || surfaceEdge === "left" || surfaceEdge === "top"
     right: surfaceEdge === "right"

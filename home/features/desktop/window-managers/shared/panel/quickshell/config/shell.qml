@@ -3,7 +3,6 @@ import Quickshell
 import QtQuick
 import Quickshell.Io
 import Quickshell.Wayland
-import Quickshell.Hyprland
 import "bar"
 import "launcher"
 import "menu"
@@ -643,6 +642,7 @@ Scope {
     active: root.powerMenuVisible
     Powermenu {
       id: powermenu
+      screen: root.currentSurfaceScreen()
       isVisible: root.powerMenuVisible
     }
   }

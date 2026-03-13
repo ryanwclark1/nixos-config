@@ -1,5 +1,10 @@
 # keybinds.sh - Parse Hyprland keybindings into JSON
 
+if [[ -z "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]] && ! grep -qi "hyprland" <<<"${XDG_CURRENT_DESKTOP:-}${DESKTOP_SESSION:-}"; then
+    echo "[]"
+    exit 0
+fi
+
 KEYBIND_DIR="$HOME/nixos-config/home/features/desktop/window-managers/hyprland/conf/keybindings"
 
 if [ ! -d "$KEYBIND_DIR" ]; then

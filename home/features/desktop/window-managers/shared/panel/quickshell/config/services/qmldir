@@ -1,5 +1,6 @@
 singleton AudioService 1.0 AudioService.qml
 singleton Colors 1.0 Colors.qml
+singleton CompositorAdapter 1.0 CompositorAdapter.qml
 singleton Config 1.0 Config.qml
 singleton BarWidgetRegistry 1.0 BarWidgetRegistry.qml
 singleton DesktopWidgetRegistry 1.0 DesktopWidgetRegistry.qml

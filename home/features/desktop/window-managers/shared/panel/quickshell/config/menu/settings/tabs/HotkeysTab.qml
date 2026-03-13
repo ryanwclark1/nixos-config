@@ -14,7 +14,7 @@ Item {
 
     Process {
         id: hyprBindsProc
-        command: ["hyprctl", "binds", "-j"]
+        command: CompositorAdapter.isHyprland ? ["hyprctl", "binds", "-j"] : ["sh", "-c", "echo '[]'"]
         running: false
         stdout: StdioCollector {
             onStreamFinished: {

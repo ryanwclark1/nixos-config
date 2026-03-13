@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Hyprland
 import Quickshell.Io
 import "../../services"
 
@@ -13,6 +12,16 @@ Row {
   property var pinnedApps: []
   property var iconMap: ({})
   property bool seedPinnedApps: false
+  readonly property var allToplevels: (typeof ToplevelManager !== "undefined" && ToplevelManager.toplevels) ? (ToplevelManager.toplevels.values || []) : []
+  readonly property var runningToplevels: {
+    var out = [];
+    for (var i = 0; i < allToplevels.length; i++) {
+      var tl = allToplevels[i];
+      if (!tl) continue;
+      if (!tl.workspace || tl.workspace.active || tl.activated) out.push(tl);
+    }
+    return out;
+  }
   readonly property string pinnedPath: Quickshell.env("HOME") + "/.local/state/quickshell/pinned_apps.json"
   readonly property var defaultPinnedApps: [
     { name: "Browser", class: "google-chrome", exec: "google-chrome" },
@@ -112,29 +121,29 @@ Row {
 
   // Separator if needed
   Rectangle {
-    width: 1; height: 16; color: Colors.border; visible: Hyprland.toplevels.count > 0
+    width: 1; height: 16; color: Colors.border; visible: runningToplevels.length > 0
     anchors.verticalCenter: parent.verticalCenter
   }
 
   Repeater {
-    model: Hyprland.toplevels
+    model: runningToplevels
     delegate: TaskButton {
       // Only show if not already pinned and on active workspace
       property bool alreadyPinned: {
         for (var i = 0; i < pinnedApps.length; i++) {
-          if (pinnedApps[i].class === (modelData.class || "")) return true;
+          if (pinnedApps[i].class === (modelData.class || modelData.appId || "")) return true;
         }
         return false;
       }
-      visible: !alreadyPinned && modelData.workspace && modelData.workspace.active
+      visible: !alreadyPinned
       width: visible ? 32 : 0
       Behavior on width { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-      appClass: modelData.class || ""
-      appExec: modelData.class || ""
+      appClass: modelData.class || modelData.appId || ""
+      appExec: modelData.class || modelData.appId || ""
       appName: modelData.title || ""
-      appAddress: modelData.address
       isFocused: modelData.activated
       isPinned: false
+      toplevelRef: modelData
       iconMap: root.iconMap
       anchorWindow: root.anchorWindow
       onPinToggled: (app) => root.togglePin(app)

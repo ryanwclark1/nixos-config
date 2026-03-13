@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Hyprland
 import "../../services"
 import "../../widgets" as SharedWidgets
 
@@ -20,16 +19,20 @@ Rectangle {
   property bool isPinned: false
   property var anchorWindow: null
   property var iconMap: ({})
+  property var toplevelRef: null
   
   signal pinToggled(var app)
 
-  // Find running instance if it's a pinned app
+  readonly property var allToplevels: (typeof ToplevelManager !== "undefined" && ToplevelManager.toplevels) ? (ToplevelManager.toplevels.values || []) : []
+
+  // Find running instance if it's a pinned app.
   property var runningInstance: {
     if (!isPinned) return null;
-    for (var i = 0; i < Hyprland.toplevels.count; i++) {
-      var t = Hyprland.toplevels.get(i);
+    for (var i = 0; i < allToplevels.length; i++) {
+      var t = allToplevels[i];
       if (!t) continue;
-      if (t.class === appClass) return t;
+      var cls = (t.class || t.appId || "");
+      if (cls === appClass) return t;
     }
     return null;
   }
@@ -76,8 +79,8 @@ Rectangle {
       stateLayer.burst(mouse.x, mouse.y);
       if (mouse.button === Qt.LeftButton) {
         if (isRunning) {
-          var addr = isPinned ? runningInstance.address : appAddress;
-          Quickshell.execDetached(["hyprctl", "dispatch", "focuswindow", "address:" + addr]);
+          var target = isPinned ? runningInstance : toplevelRef;
+          if (target && target.activate) target.activate();
         } else if (isPinned && appExec) {
           Quickshell.execDetached(["sh", "-c", appExec]);
         }

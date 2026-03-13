@@ -55,12 +55,7 @@ Row {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        onClicked: Quickshell.execDetached([
-          "hyprctl",
-          "dispatch",
-          "workspace",
-          String(modelData.id)
-        ])
+        onClicked: CompositorAdapter.focusWorkspace(modelData.id)
       }
     }
   }

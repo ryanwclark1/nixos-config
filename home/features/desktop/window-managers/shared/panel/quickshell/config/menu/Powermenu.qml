@@ -8,6 +8,12 @@ import "../services"
 PanelWindow {
   id: root
 
+  property var screenRef: screen || Quickshell.cursorScreen || Config.primaryScreen()
+  screen: screenRef
+  readonly property var edgeMargins: Config.reservedEdgesForScreen(screenRef, "")
+  readonly property real usableWidth: screenRef ? Math.max(1, screenRef.width - edgeMargins.left - edgeMargins.right) : width
+  readonly property real usableHeight: screenRef ? Math.max(1, screenRef.height - edgeMargins.top - edgeMargins.bottom) : height
+
   anchors {
     top: true
     bottom: true
@@ -36,8 +42,8 @@ PanelWindow {
   readonly property var actions: [
     { key: "shutdown", icon: "󰐥", label: "Shutdown", color: Colors.error, danger: true, cmd: ["systemctl", "poweroff"] },
     { key: "reboot", icon: "󰑐", label: "Reboot", color: Colors.accent, danger: true, cmd: ["systemctl", "reboot"] },
-    { key: "lock", icon: "󰌾", label: "Lock", color: Colors.primary, danger: false, cmd: ["hyprlock"] },
-    { key: "logout", icon: "󰗽", label: "Logout", color: Colors.fgSecondary, danger: false, cmd: ["hyprctl", "dispatch", "exit"] }
+    { key: "lock", icon: "󰌾", label: "Lock", color: Colors.primary, danger: false, cmd: CompositorAdapter.lockCommand() },
+    { key: "logout", icon: "󰗽", label: "Logout", color: Colors.fgSecondary, danger: false, cmd: CompositorAdapter.logoutCommand() }
   ]
 
   // ── Uptime ─────────────────────────────────────
@@ -147,7 +153,10 @@ PanelWindow {
     // Power Menu Content
     ColumnLayout {
       id: contentCol
-      anchors.centerIn: parent
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.topMargin: root.edgeMargins.top + Math.max(20, (root.usableHeight - height) / 2)
+      anchors.leftMargin: root.edgeMargins.left + Math.max(20, (root.usableWidth - width) / 2)
       spacing: 40
       scale: root.isVisible ? 1.0 : 0.9
       Behavior on scale { NumberAnimation { id: pmScaleAnim; duration: 300; easing.type: Easing.OutBack } }

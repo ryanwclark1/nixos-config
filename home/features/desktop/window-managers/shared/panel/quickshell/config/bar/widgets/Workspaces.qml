@@ -1,99 +1,77 @@
 import QtQuick
 import Quickshell
-import Quickshell.Hyprland
+import Quickshell.Io
 import "../../services"
 
 Rectangle {
   id: root
   height: 24
-  width: wsRow.width + 12
   radius: height / 2
   color: Colors.bgWidget
   anchors.verticalCenter: parent.verticalCenter
 
   property var anchorWindow: null
+  property var state: ({ workspaces: [], activeWorkspace: -1 })
 
-  scale: rootMouse.containsMouse ? 1.03 : 1.0
-  Behavior on scale {
-    NumberAnimation {
-      duration: 180
-      easing.type: Easing.OutCubic
+  readonly property bool workspaceApiAvailable: CompositorAdapter.isHyprland || CompositorAdapter.isNiri
+  width: workspaceApiAvailable && state.workspaces.length > 0 ? (strip.implicitWidth + 12) : 0
+  visible: width > 0
+
+  function updateStateFromHypr(rawText) {
+    try {
+      var lines = (rawText || "").trim().split("\n");
+      if (lines.length < 2) return;
+      var workspacesRaw = JSON.parse(lines[0] || "[]");
+      var activeRaw = JSON.parse(lines[1] || "{}");
+
+      var workspaces = [];
+      for (var i = 0; i < workspacesRaw.length; i++) {
+        var ws = workspacesRaw[i];
+        if (!ws || ws.id <= 0) continue;
+        workspaces.push({
+          id: ws.id,
+          name: String(ws.name || ws.id),
+          urgent: !!ws.hasurgent
+        });
+      }
+      workspaces.sort(function(a, b) { return a.id - b.id; });
+
+      state = {
+        workspaces: workspaces,
+        activeWorkspace: activeRaw && activeRaw.id ? activeRaw.id : -1
+      };
+    } catch (e) {
+      state = ({ workspaces: [], activeWorkspace: -1 });
     }
   }
 
-  // rootMouse must be declared before wsRow so it sits behind
-  // the workspace items in z-order and doesn't intercept events
-  MouseArea {
-    id: rootMouse
-    anchors.fill: parent
-    hoverEnabled: true
-    acceptedButtons: Qt.NoButton
+  Timer {
+    id: pollTimer
+    interval: 1200
+    running: root.workspaceApiAvailable && CompositorAdapter.isHyprland
+    repeat: true
+    triggeredOnStart: true
+    onTriggered: workspaceProc.running = true
   }
 
-  Row {
-    id: wsRow
-    spacing: Colors.spacingXS
-    anchors.centerIn: parent
-
-    Repeater {
-      model: Hyprland.workspaces
-
-      Item {
-        id: wsContainer
-        // Filter out special workspaces (negative IDs)
-        visible: modelData.id > 0
-        width: visible ? wsPill.width : 0
-        height: visible ? 20 : 0
-
-        Rectangle {
-          id: wsPill
-          anchors.centerIn: parent
-
-          width: modelData.focused ? 28 : Math.max(22, wsLabel.implicitWidth + 12)
-          height: 20
-          radius: height / 2
-
-          color: modelData.focused
-            ? Colors.primary
-            : (wsMouse.containsMouseFinal
-              ? Colors.withAlpha(Colors.primary, 0.5)
-              : Qt.lighter(Colors.surface, 1.5))
-
-          Behavior on width { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-          Behavior on color { ColorAnimation { duration: 160 } }
-
-          Text {
-            id: wsLabel
-            anchors.centerIn: parent
-            text: modelData.name
-            color: modelData.focused ? Colors.background : Colors.text
-            font.pixelSize: Colors.fontSizeSmall
-            font.weight: modelData.focused ? Font.Bold : Font.Medium
-
-            Behavior on opacity { NumberAnimation { duration: 160 } }
-          }
-        }
-
-        MouseArea {
-          id: wsMouse
-          anchors.centerIn: parent
-          width: wsPill.width + 4
-          height: 20
-          cursorShape: Qt.PointingHandCursor
-          hoverEnabled: true
-          acceptedButtons: Qt.LeftButton | Qt.MiddleButton
-
-          // Expose hover state for the pill color binding
-          readonly property bool containsMouseFinal: containsMouse
-
-          onClicked: (mouse) => {
-            if (mouse.button === Qt.LeftButton) modelData.activate();
-            else if (mouse.button === Qt.MiddleButton) {
-              Quickshell.execDetached(["sh", "-c", "hyprctl clients -j | jq -r '.[] | select(.workspace.id == " + modelData.id + ") | .address' | xargs -I {} hyprctl dispatch closewindow address:{}"]);
-            }
-          }
-        }
+  Process {
+    id: workspaceProc
+    running: false
+    command: [
+      "sh",
+      "-c",
+      "hyprctl workspaces -j 2>/dev/null; printf '\\n'; hyprctl activeworkspace -j 2>/dev/null"
+    ]
+    stdout: StdioCollector {
+      onStreamFinished: {
+        root.updateStateFromHypr(this.text || "");
       }
     }
+  }
+
+  WorkspaceStrip {
+    id: strip
+    anchors.centerIn: parent
+    state: root.state
   }
 }

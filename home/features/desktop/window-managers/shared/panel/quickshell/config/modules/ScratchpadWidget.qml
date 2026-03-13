@@ -1,19 +1,20 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Hyprland
 import "../services"
 import "../widgets" as SharedWidgets
 
 SharedWidgets.CardBase {
   id: root
+  readonly property var allToplevels: (typeof ToplevelManager !== "undefined" && ToplevelManager.toplevels) ? (ToplevelManager.toplevels.values || []) : []
   Layout.preferredHeight: root.scratchpadWindows.length > 0 ? col.implicitHeight + 30 : 0
-  visible: root.scratchpadWindows.length > 0
+  visible: CompositorAdapter.isHyprland && root.scratchpadWindows.length > 0
 
   readonly property var scratchpadWindows: {
     var windows = [];
-    for (var i = 0; i < Hyprland.toplevels.count; i++) {
-      var win = Hyprland.toplevels.get(i);
+    if (!CompositorAdapter.isHyprland) return windows;
+    for (var i = 0; i < allToplevels.length; i++) {
+      var win = allToplevels[i];
       if (!win) continue;
       var workspaceName = (win.workspace && win.workspace.name) ? win.workspace.name : "";
       if (workspaceName === "special:scratchpad") {
@@ -24,7 +25,8 @@ SharedWidgets.CardBase {
   }
 
   function summonWindow(address) {
-    var targetWorkspace = Hyprland.focusedWorkspace ? Hyprland.focusedWorkspace.name : "1";
+    if (!CompositorAdapter.isHyprland) return;
+    var targetWorkspace = "1";
     Quickshell.execDetached(["hyprctl", "dispatch", "movetoworkspace", targetWorkspace + ",address:" + address]);
     Quickshell.execDetached(["hyprctl", "dispatch", "focuswindow", "address:" + address]);
   }

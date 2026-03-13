@@ -242,6 +242,8 @@ Item {
         Config.launcherSearchDebounceMs = 35;
         Config.launcherFileSearchDebounceMs = 140;
         Config.launcherWebEnterUsesPrimary = true;
+        Config.launcherRememberWebProvider = true;
+        Config.launcherWebLastProviderKey = "duckduckgo";
         Config.launcherWebProviderOrder = webProviderDefaultOrder.slice();
         Config.launcherEnabledModes = launcherDefaultModes.slice();
         Config.launcherModeOrder = launcherDefaultModes.slice();
@@ -402,6 +404,11 @@ Item {
                     label: "Web Enter Uses Primary"
                     icon: "󰖟"
                     configKey: "launcherWebEnterUsesPrimary"
+                }
+                SettingsToggleRow {
+                    label: "Remember Web Provider"
+                    icon: "󰖟"
+                    configKey: "launcherRememberWebProvider"
                 }
             }
 

@@ -57,6 +57,8 @@ QtObject {
   property int launcherSearchDebounceMs: 35
   property int launcherFileSearchDebounceMs: 140
   property bool launcherWebEnterUsesPrimary: true
+  property bool launcherRememberWebProvider: true
+  property string launcherWebLastProviderKey: "duckduckgo"
   property var launcherWebProviderOrder: ["duckduckgo", "google", "youtube", "nixos", "github"]
   property var launcherModeOrder: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
   property var launcherEnabledModes: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
@@ -190,7 +192,7 @@ QtObject {
   }
 
   function applyRuntimeSettings() {
-    if (Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE") !== "") {
+    if (CompositorAdapter.supportsHyprctlSettings) {
       Quickshell.execDetached([
         "hyprctl",
         "keyword",
@@ -314,6 +316,10 @@ QtObject {
     launcherFileSearchDebounceMs = _clampInt(launcher.fileSearchDebounceMs, 50, 1200, 140);
     launcherWebEnterUsesPrimary = _asBool(launcher.webEnterUsesPrimary, true);
     launcherWebProviderOrder = _normalizeWebProviderOrder(launcher.webProviderOrder, fallbackWebProviders);
+    launcherRememberWebProvider = _asBool(launcher.rememberWebProvider, true);
+    launcherWebLastProviderKey = String(launcher.webLastProviderKey || "duckduckgo");
+    if (launcherWebProviderOrder.indexOf(launcherWebLastProviderKey) === -1)
+      launcherWebLastProviderKey = launcherWebProviderOrder[0] || "duckduckgo";
 
     launcherScoreNameWeight = _clampReal(launcher.scoreNameWeight, 0.1, 4.0, 1.0);
     launcherScoreTitleWeight = _clampReal(launcher.scoreTitleWeight, 0.1, 4.0, 0.92);
@@ -972,6 +978,8 @@ QtObject {
   onLauncherSearchDebounceMsChanged: scheduleSave()
   onLauncherFileSearchDebounceMsChanged: scheduleSave()
   onLauncherWebEnterUsesPrimaryChanged: scheduleSave()
+  onLauncherRememberWebProviderChanged: scheduleSave()
+  onLauncherWebLastProviderKeyChanged: scheduleSave()
   onLauncherWebProviderOrderChanged: scheduleSave()
   onLauncherModeOrderChanged: scheduleSave()
   onLauncherEnabledModesChanged: scheduleSave()
@@ -1234,6 +1242,8 @@ QtObject {
         "searchDebounceMs": launcherSearchDebounceMs,
         "fileSearchDebounceMs": launcherFileSearchDebounceMs,
         "webEnterUsesPrimary": launcherWebEnterUsesPrimary,
+        "rememberWebProvider": launcherRememberWebProvider,
+        "webLastProviderKey": launcherWebLastProviderKey,
         "webProviderOrder": launcherWebProviderOrder,
         "modeOrder": launcherModeOrder,
         "enabledModes": launcherEnabledModes,

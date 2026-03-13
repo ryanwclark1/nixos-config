@@ -4,7 +4,6 @@ import QtQuick.Controls
 import Quickshell
 import Quickshell.Io
 import Quickshell.Bluetooth
-import Quickshell.Hyprland
 import Quickshell.Wayland
 import Quickshell.Widgets
 import "."
@@ -19,10 +18,11 @@ PanelWindow {
   property int panelWidth: Config.controlCenterWidth
   property int panelHeight: 640
   property real panelX: 0
-  property int reservedTop: Config.barHeight + Config.barMargin + 8
-  property int reservedRight: Config.barMargin
-  property int reservedBottom: Config.barHeight + Config.barMargin + 8
-  property int reservedLeft: Config.barMargin
+  readonly property var edgeMargins: Config.reservedEdgesForScreen(screen, "")
+  property int reservedTop: edgeMargins.top
+  property int reservedRight: edgeMargins.right
+  property int reservedBottom: edgeMargins.bottom
+  property int reservedLeft: edgeMargins.left
   anchors {
     top: surfaceEdge === "right" || surfaceEdge === "left" || surfaceEdge === "top"
     right: surfaceEdge === "right"
@@ -49,24 +49,22 @@ PanelWindow {
   property bool showContent: false
   property var pendingPowerCmd: null
   property int pendingPowerIndex: -1
-  property string previousFocusedAddress: ""
+  property var previousFocusedToplevel: null
   signal closeRequested()
 
-  function focusedWindowAddress() {
-    if (!Hyprland.toplevels) return "";
-    for (var i = 0; i < Hyprland.toplevels.count; i++) {
-      var win = Hyprland.toplevels.get(i);
-      if (win && win.focused && win.address) return win.address;
+  function focusedToplevel() {
+    if (typeof ToplevelManager !== "undefined" && ToplevelManager.activeToplevel) {
+      return ToplevelManager.activeToplevel;
     }
-    return "";
+    return null;
   }
 
   onShowContentChanged: {
     if (showContent) {
-      root.previousFocusedAddress = focusedWindowAddress();
+      root.previousFocusedToplevel = focusedToplevel();
     } else {
       if (sidebarContent.activeFocus) sidebarContent.focus = false;
-      if (root.previousFocusedAddress !== "") restoreFocusTimer.restart();
+      if (root.previousFocusedToplevel) restoreFocusTimer.restart();
     }
   }
 
@@ -75,9 +73,9 @@ PanelWindow {
     interval: 60
     repeat: false
     onTriggered: {
-      if (root.previousFocusedAddress === "") return;
-      Quickshell.execDetached(["hyprctl", "dispatch", "focuswindow", "address:" + root.previousFocusedAddress]);
-      root.previousFocusedAddress = "";
+      if (!root.previousFocusedToplevel) return;
+      if (root.previousFocusedToplevel.activate) root.previousFocusedToplevel.activate();
+      root.previousFocusedToplevel = null;
     }
   }
 
@@ -437,7 +435,11 @@ PanelWindow {
       RowLayout {
         Layout.fillWidth: true; spacing: 10
         Repeater {
-          model: [{ icon: "󰐥", cmd: ["systemctl", "poweroff"] }, { icon: "󰑐", cmd: ["systemctl", "reboot"] }, { icon: "󰌾", cmd: ["hyprlock"] }]
+          model: [
+            { icon: "󰐥", cmd: ["systemctl", "poweroff"], confirm: true },
+            { icon: "󰑐", cmd: ["systemctl", "reboot"], confirm: true },
+            { icon: "󰌾", cmd: CompositorAdapter.lockCommand(), confirm: false }
+          ]
           delegate: Rectangle {
             required property var modelData
             required property int index
@@ -466,7 +468,7 @@ PanelWindow {
               anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
               onClicked: (mouse) => {
                 powerStateLayer.burst(mouse.x, mouse.y);
-                if (modelData.cmd[0] === "hyprlock") {
+                if (!modelData.confirm) {
                   // Lock doesn't need confirmation
                   Quickshell.execDetached(modelData.cmd);
                   return;

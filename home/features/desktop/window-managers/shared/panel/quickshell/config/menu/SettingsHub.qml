@@ -42,12 +42,13 @@ PanelWindow {
   property bool layoutIsMaster: false
 
   function refreshHyprlandSettings() {
+    if (!CompositorAdapter.isHyprland) return;
     if (!hyprStateProc.running) hyprStateProc.running = true;
   }
 
   function open() {
     isOpen = true;
-    refreshHyprlandSettings();
+    if (CompositorAdapter.isHyprland) refreshHyprlandSettings();
   }
 
   function close() {

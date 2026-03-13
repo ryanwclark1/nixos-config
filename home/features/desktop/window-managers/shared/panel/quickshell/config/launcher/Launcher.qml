@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Bluetooth
@@ -44,6 +43,7 @@ PanelWindow {
   property var recentItems: []
   property var suggestionItems: []
   property var featuredActions: []
+  property string _sessionWebProviderKey: ""
   property var appFrequency: ({})
   property var launchHistory: []
   property var onCommandOutput: null
@@ -60,6 +60,7 @@ PanelWindow {
   property var _commandWaiters: ({})
   property var mediaPlayers: []
   property var preloadFailureState: ({})
+  readonly property var availableToplevels: (typeof ToplevelManager !== "undefined" && ToplevelManager.toplevels) ? (ToplevelManager.toplevels.values || []) : []
   property var launcherMetrics: ({
     opens: 0,
     cacheHits: 0,
@@ -266,6 +267,11 @@ PanelWindow {
       return itemProviderLabel(selectedItem);
     return "";
   }
+  readonly property string selectedWebProviderKey: {
+    if (mode !== "web" || !selectedItem)
+      return "";
+    return String(selectedItem.key || "");
+  }
 
   readonly property string freqPath: Quickshell.env("HOME") + "/.local/state/quickshell/app_frequency.json"
   readonly property string historyPath: Quickshell.env("HOME") + "/.local/state/quickshell/launcher_history.json"
@@ -430,7 +436,7 @@ PanelWindow {
 
   // Reactive watchers: ObjectModel doesn't expose countChanged as a signal,
   // so we use property bindings that re-evaluate when the model count changes.
-  property int _toplevelCount: Hyprland.toplevels ? Hyprland.toplevels.count || 0 : 0
+  property int _toplevelCount: availableToplevels.length
   on_ToplevelCountChanged: {
     if (launcherRoot.mode === "window" && launcherRoot.launcherOpacity > 0)
       launcherRoot.loadWindows();
@@ -440,6 +446,10 @@ PanelWindow {
   on_MprisCountChanged: {
     if (launcherRoot.mode === "media" && launcherRoot.launcherOpacity > 0)
       launcherRoot.refreshMediaPlayers();
+  }
+
+  onSelectedIndexChanged: {
+    launcherRoot.rememberCurrentWebProviderSelection();
   }
 
   function modeInfo(key) {
@@ -635,6 +645,40 @@ PanelWindow {
     if (list.length <= 1)
       return null;
     return list[1];
+  }
+
+  function preferredWebProviderKey() {
+    if (Config.launcherRememberWebProvider) {
+      var persisted = String(Config.launcherWebLastProviderKey || "");
+      if (persisted !== "")
+        return persisted;
+    }
+    return String(_sessionWebProviderKey || "");
+  }
+
+  function applyRememberedWebProviderSelection() {
+    if (mode !== "web" || filteredItems.length <= 0)
+      return;
+    var preferred = preferredWebProviderKey();
+    if (preferred === "")
+      return;
+    for (var i = 0; i < filteredItems.length; ++i) {
+      if (String(filteredItems[i].key || "") === preferred) {
+        selectedIndex = i;
+        return;
+      }
+    }
+  }
+
+  function rememberCurrentWebProviderSelection() {
+    if (mode !== "web" || !selectedItem)
+      return;
+    var key = String(selectedItem.key || "");
+    if (key === "")
+      return;
+    _sessionWebProviderKey = key;
+    if (Config.launcherRememberWebProvider && Config.launcherWebLastProviderKey !== key)
+      Config.launcherWebLastProviderKey = key;
   }
 
   function shellQuote(text) {
@@ -893,7 +937,7 @@ PanelWindow {
         { name: "Open Network Controls", title: "Open the network popup", icon: "󰖩", ipcTarget: "Shell", ipcAction: "toggleNetworkMenu" },
         { name: "Open Command Center", title: "Open the system hub", icon: "󰒓", ipcTarget: "Shell", ipcAction: "toggleControls" }
       ];
-    } else if (mode === "window" && Hyprland.toplevels && Hyprland.toplevels.count > 0) {
+    } else if (mode === "window" && availableToplevels.length > 0) {
       recentItems = [{ name: "Focus open windows", title: "Jump into current clients", icon: "󱗼", openMode: "window" }];
     } else {
       recentItems = [];
@@ -1215,14 +1259,15 @@ PanelWindow {
   function loadWeb() {
     allItems = configuredWebProviders();
     filterItems();
+    applyRememberedWebProviderSelection();
   }
 
   function loadSystem() {
     allItems = [
       { category: "Power", name: "Shutdown", icon: "󰐥", action: () => askConfirm("Shutdown system?", () => Quickshell.execDetached(["systemctl", "poweroff"])) },
       { category: "Power", name: "Reboot", icon: "󰑐", action: () => askConfirm("Reboot system?", () => Quickshell.execDetached(["systemctl", "reboot"])) },
-      { category: "Power", name: "Lock Screen", icon: "󰌾", action: () => Quickshell.execDetached(["hyprlock"]) },
-      { category: "Power", name: "Log Out", icon: "󰍃", action: () => askConfirm("Log out of session?", () => Quickshell.execDetached(["hyprctl", "dispatch", "exit"])) },
+      { category: "Power", name: "Lock Screen", icon: "󰌾", action: () => Quickshell.execDetached(CompositorAdapter.lockCommand()) },
+      { category: "Power", name: "Log Out", icon: "󰍃", action: () => askConfirm("Log out of session?", () => Quickshell.execDetached(CompositorAdapter.logoutCommand())) },
       { category: "Capture", name: "Screenshot (Area)", icon: "󰹑", action: () => Quickshell.execDetached(["screenshot.sh", "area", "--satty"]) },
       { category: "Capture", name: "Screenshot (Display)", icon: "󰍹", action: () => Quickshell.execDetached(["screenshot.sh", "screen", "--satty"]) },
       { category: "Capture", name: "Color Picker", icon: "󰏘", action: () => Quickshell.execDetached(["hyprpicker", "-a"]) },
@@ -1257,19 +1302,17 @@ PanelWindow {
   function loadWindows() {
     var items = [];
     try {
-      if (Hyprland.toplevels) {
-        for (var i = 0; i < Hyprland.toplevels.count; i++) {
-          var win = Hyprland.toplevels.get(i);
-          if (win) {
-            items.push({
-              name: win.title || win.class || "Window",
-              title: win.class || "",
-              icon: "󱗼",
-              address: win.address,
-              class: win.class
-            });
-          }
-        }
+      for (var i = 0; i < availableToplevels.length; i++) {
+        var win = availableToplevels[i];
+        if (!win) continue;
+        var cls = win.class || win.appId || "";
+        items.push({
+          name: win.title || cls || "Window",
+          title: cls || "",
+          icon: "󱗼",
+          class: cls,
+          toplevel: win
+        });
       }
     } catch (e) {
       console.error("Error loading windows: " + e);
@@ -1542,6 +1585,17 @@ PanelWindow {
     selectedIndex = next;
   }
 
+  function selectWebProviderByKey(providerKey) {
+    if (mode !== "web" || providerKey === "")
+      return;
+    for (var i = 0; i < filteredItems.length; ++i) {
+      if (String(filteredItems[i].key || "") === providerKey) {
+        selectedIndex = i;
+        return;
+      }
+    }
+  }
+
   function openSelectedWebHomepage() {
     if (mode !== "web" || filteredItems.length <= 0 || selectedIndex < 0 || selectedIndex >= filteredItems.length)
       return;
@@ -1605,8 +1659,8 @@ PanelWindow {
       if (item.exec) Quickshell.execDetached(["bash", "-c", item.exec]);
       close();
     } else if (mode === "window") {
-      rememberRecent({ name: item.name || item.title || "Window", title: item.title || item.class || "", icon: "󱗼", address: item.address || "", openMode: "window" });
-      Quickshell.execDetached(["hyprctl", "dispatch", "focuswindow", "address:" + item.address]);
+      rememberRecent({ name: item.name || item.title || "Window", title: item.title || item.class || "", icon: "󱗼", openMode: "window" });
+      if (item.toplevel && item.toplevel.activate) item.toplevel.activate();
       close();
     } else if (mode === "dmenu") {
       var fifoPath = "/tmp/qs-dmenu-result";
@@ -1647,7 +1701,7 @@ PanelWindow {
       Quickshell.execDetached(["wallust", "run", item.path]);
       close();
     } else if (mode === "keybinds") {
-      if (item.disp) Quickshell.execDetached(["hyprctl", "dispatch", item.disp, item.args || ""]);
+      if (item.disp && CompositorAdapter.isHyprland) Quickshell.execDetached(["hyprctl", "dispatch", item.disp, item.args || ""]);
       close();
     }
   }
@@ -1931,6 +1985,66 @@ PanelWindow {
             text: launcherRoot.legendPrimaryAction + " • " + launcherRoot.legendSecondaryAction + " • " + launcherRoot.legendTertiaryAction
             color: Colors.textDisabled
             font.pixelSize: Colors.fontSizeXS
+          }
+        }
+
+        Rectangle {
+          Layout.fillWidth: true
+          visible: launcherRoot.mode === "web" && launcherRoot.filteredItems.length > 0
+          color: Colors.bgWidget
+          radius: Colors.radiusMedium
+          border.color: Colors.border
+          border.width: 1
+          implicitHeight: 42
+
+          RowLayout {
+            anchors.fill: parent
+            anchors.leftMargin: Colors.spacingM
+            anchors.rightMargin: Colors.spacingM
+            spacing: Colors.spacingS
+
+            Text {
+              color: Colors.textDisabled
+              font.pixelSize: Colors.fontSizeXS
+              font.weight: Font.Bold
+              text: "PROVIDERS"
+            }
+
+            Repeater {
+              model: launcherRoot.configuredWebProviders()
+
+              delegate: Rectangle {
+                required property var modelData
+
+                readonly property bool selected: String(modelData.key || "") === launcherRoot.selectedWebProviderKey
+                color: selected ? Colors.withAlpha(Colors.primary, 0.18) : Colors.surface
+                radius: Colors.radiusPill
+                border.color: selected ? Colors.withAlpha(Colors.primary, 0.6) : Colors.border
+                border.width: 1
+                implicitHeight: 28
+                implicitWidth: providerChipText.implicitWidth + 24
+
+                Text {
+                  id: providerChipText
+                  anchors.centerIn: parent
+                  text: (modelData.icon || "󰖟") + " " + (modelData.name || "")
+                  color: parent.selected ? Colors.primary : Colors.textSecondary
+                  font.pixelSize: Colors.fontSizeXS
+                  font.weight: Font.DemiBold
+                }
+
+                MouseArea {
+                  anchors.fill: parent
+                  hoverEnabled: true
+                  cursorShape: Qt.PointingHandCursor
+                  onClicked: launcherRoot.selectWebProviderByKey(String(modelData.key || ""))
+                }
+              }
+            }
+
+            Item {
+              Layout.fillWidth: true
+            }
           }
         }
 
