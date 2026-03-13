@@ -44,6 +44,9 @@ check_and_write_updates() {
     : > "$UPDATES_DIR/flatpak_list"
   fi
   echo "$fpk" > "$UPDATES_DIR/flatpak"
+
+  # TODO: Extend update checks to additional distro/package managers.
+  # Candidate backends: apt, pacman, dnf, zypper, brew.
 }
 
 boldify_ascii() {

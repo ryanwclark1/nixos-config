@@ -16,7 +16,11 @@ QtObject {
   property color accent: "#f39c12"
   property color error: "#f04747"
   property color warning: "#f1c40f"
-  
+  property color success: "#a6d189"
+  property color info: "#81c8be"
+
+  property bool _isLight: false
+
   property color text: "#ffffff"
   property color textSecondary: "#b9bbbe"
   property color textDisabled: "#72767d"
@@ -36,7 +40,7 @@ QtObject {
   // --- GLASSMORPHISM ---
   readonly property real bgOpacity: Config.glassOpacity
   readonly property color bgGlass: withAlpha(background, bgOpacity)
-  readonly property color bgWidget: Qt.rgba(1, 1, 1, 0.08)
+  readonly property color bgWidget: _isLight ? Qt.rgba(0, 0, 0, 0.06) : Qt.rgba(1, 1, 1, 0.08)
 
   // --- POPUP SURFACES (shared across all menus) ---
   readonly property color popupSurface: withAlpha(surface, 0.96)
@@ -93,12 +97,38 @@ QtObject {
     return "󰖐";
   }
 
+  function applyBase24(palette, variant) {
+    if (!palette) return;
+    _isLight = (variant === "light");
+
+    background    = palette.base00 || background;
+    // Derive surface close to background — base01 is "lighter bg" in base16,
+    // but some themes set it far from base00.  Nudge base00 slightly instead.
+    var bg = Qt.color(palette.base00 || background);
+    surface = _isLight ? Qt.darker(bg, 1.06) : Qt.lighter(bg, 1.15);
+
+    textDisabled  = palette.base03 || textDisabled;
+    textSecondary = palette.base04 || textSecondary;
+    text          = palette.base05 || text;
+    error         = palette.base08 || error;
+    warning       = palette.base09 || warning;
+    success       = palette.base0B || success;
+    info          = palette.base0C || info;
+    primary       = palette.base0D || primary;
+    secondary     = palette.base0E || secondary;
+    accent        = palette.base0F || accent;
+  }
+
   function reloadColors() {
+    // Skip pywal if a base24 theme is active
+    if (Config.themeName) return;
+
     try {
       let content = walWatcher.text();
       if (!content) return;
       let data = JSON.parse(content);
-      
+
+      _isLight = false;
       background = data.special.background;
       surface = data.colors.color0;
       primary = data.colors.color4;
@@ -110,7 +140,7 @@ QtObject {
       text = data.special.foreground;
       textSecondary = data.colors.color7;
       textDisabled = data.colors.color8;
-      
+
     } catch (e) {
       // It's fine if the file doesn't exist yet, we'll use defaults
     }

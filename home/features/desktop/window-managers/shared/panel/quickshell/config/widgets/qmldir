@@ -1,4 +1,5 @@
 ActivateLinux 1.0 ActivateLinux.qml
+AppIcon 1.0 AppIcon.qml
 AudioWidget 1.0 AudioWidget.qml
 BarPill 1.0 BarPill.qml
 BarTooltip 1.0 BarTooltip.qml

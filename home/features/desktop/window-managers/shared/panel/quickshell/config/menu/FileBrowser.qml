@@ -21,15 +21,15 @@ PanelWindow {
   visible: isOpen
 
   WlrLayershell.layer: WlrLayer.Overlay
-  WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
-  WlrLayershell.namespace: "quickshell"
+  WlrLayershell.keyboardFocus: isOpen ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+  WlrLayershell.namespace: "quickshell-filebrowser"
 
   // ── Public API ─────────────────────────────────────────────────────────────
   property bool isOpen: false
 
   // "open" or "save"
   property string mode: "open"
-  property string title: mode === "open" ? "Open File" : "Save File"
+  property string title: mode === "open" ? "Open File" : (mode === "save" ? "Save File" : "Select Folder")
 
   // Current directory being browsed
   property string currentPath: Quickshell.env("HOME") || "/home"
@@ -45,6 +45,7 @@ PanelWindow {
 
   // Signals
   signal fileSelected(string filePath)
+  signal folderSelected(string folderPath)
   signal cancelled()
 
   // Open the browser, optionally set path / filters / mode
@@ -272,8 +273,14 @@ PanelWindow {
   // ── Modal card ─────────────────────────────────────────────────────────────
   Rectangle {
     id: mainBox
-    width: 780
-    height: 560
+    readonly property real modalMarginX: Math.max(16, parent.width * 0.03)
+    readonly property real modalMarginY: Math.max(16, parent.height * 0.03)
+    readonly property real modalMinWidth: 760
+    readonly property real modalMaxWidth: 1200
+    readonly property real modalMinHeight: 560
+    readonly property real modalMaxHeight: 820
+    width: Math.max(modalMinWidth, Math.min(parent.width - modalMarginX * 2, modalMaxWidth))
+    height: Math.max(modalMinHeight, Math.min(parent.height - modalMarginY * 2, modalMaxHeight))
     anchors.centerIn: parent
 
     color: Colors.popupSurface
@@ -905,6 +912,21 @@ PanelWindow {
                   anchors.leftMargin: Colors.paddingMedium
                   anchors.rightMargin: Colors.paddingMedium
                   spacing: Colors.spacingM
+                  readonly property real contentW: Math.max(1, width - anchors.leftMargin - anchors.rightMargin)
+                  readonly property int minCols: 3
+                  readonly property int maxCols: 8
+                  readonly property real minCellW: 120
+                  readonly property int colCount: Math.max(
+                    minCols,
+                    Math.min(
+                      maxCols,
+                      Math.floor((contentW + spacing) / (minCellW + spacing))
+                    )
+                  )
+                  readonly property real cellW: Math.max(
+                    minCellW,
+                    Math.floor((contentW - (colCount - 1) * spacing) / colCount)
+                  )
 
                   // Invisible repeater to feed the flow
                   Repeater {
@@ -915,14 +937,8 @@ PanelWindow {
                       required property var modelData
                       required property int index
 
-                      // Compute cell size: 5 per row with spacing
-                      readonly property real cellW: Math.floor(
-                        (gridFlow.width - gridFlow.anchors.leftMargin
-                          - gridFlow.anchors.rightMargin
-                          - 4 * gridFlow.spacing) / 5
-                      )
-                      width: cellW
-                      height: cellW + 28
+                      width: gridFlow.cellW
+                      height: gridFlow.cellW + 28
 
                       radius: Colors.radiusSmall
                       color: {
@@ -977,7 +993,7 @@ PanelWindow {
                             text: root.fileIcon(modelData)
                             color: modelData.isDir ? Colors.accent : Colors.textSecondary
                             font.family: Colors.fontMono
-                            font.pixelSize: cellW < 80 ? 28 : 36
+                            font.pixelSize: gridFlow.cellW < 80 ? 28 : 36
                           }
                         }
 
@@ -1003,14 +1019,23 @@ PanelWindow {
 
                         onClicked: {
                           if (modelData.isDir) {
-                            root._navigate(modelData.path);
+                            if (root.mode === "folder") {
+                              root.selectedFile = modelData.path;
+                              root.saveFileName = modelData.name;
+                            } else {
+                              root._navigate(modelData.path);
+                            }
                           } else {
-                            root.selectedFile = modelData.path;
-                            root.saveFileName = modelData.name;
+                            if (root.mode !== "folder") {
+                              root.selectedFile = modelData.path;
+                              root.saveFileName = modelData.name;
+                            }
                           }
                         }
                         onDoubleClicked: {
-                          if (!modelData.isDir) {
+                          if (modelData.isDir) {
+                            root._navigate(modelData.path);
+                          } else if (root.mode !== "folder") {
                             root.fileSelected(modelData.path);
                             root.close();
                           }
@@ -1021,7 +1046,6 @@ PanelWindow {
                 }
               }
 
-              SharedWidgets.DankScrollbar { flickable: gridFlick }
             }
 
             // List view
@@ -1142,14 +1166,23 @@ PanelWindow {
 
                       onClicked: {
                         if (modelData.isDir) {
-                          root._navigate(modelData.path);
+                          if (root.mode === "folder") {
+                            root.selectedFile = modelData.path;
+                            root.saveFileName = modelData.name;
+                          } else {
+                            root._navigate(modelData.path);
+                          }
                         } else {
-                          root.selectedFile = modelData.path;
-                          root.saveFileName = modelData.name;
+                          if (root.mode !== "folder") {
+                            root.selectedFile = modelData.path;
+                            root.saveFileName = modelData.name;
+                          }
                         }
                       }
                       onDoubleClicked: {
-                        if (!modelData.isDir) {
+                        if (modelData.isDir) {
+                          root._navigate(modelData.path);
+                        } else if (root.mode !== "folder") {
                           root.fileSelected(modelData.path);
                           root.close();
                         }
@@ -1159,8 +1192,10 @@ PanelWindow {
                 }
               }
 
-              SharedWidgets.DankScrollbar { flickable: listFlick }
             }
+
+            SharedWidgets.DankScrollbar { flickable: gridFlick }
+            SharedWidgets.DankScrollbar { flickable: listFlick }
           }
 
           // ── Footer ─────────────────────────────────────────────────────────────
@@ -1250,9 +1285,10 @@ PanelWindow {
                     verticalAlignment: Text.AlignVCenter
                     text: root.mode === "open"
                       ? (root.selectedFile.length > 0 ? root.selectedFile : root.currentPath)
-                      : (root.saveFileName.length > 0
+                      : (root.mode === "save" ? (root.saveFileName.length > 0
                           ? root.currentPath + "/" + root.saveFileName
                           : root.currentPath)
+                          : (root.selectedFile.length > 0 ? root.selectedFile : root.currentPath))
                     color: root.selectedFile.length > 0 || root.saveFileName.length > 0
                       ? Colors.text : Colors.textDisabled
                     font.pixelSize: Colors.fontSizeSmall
@@ -1343,7 +1379,7 @@ PanelWindow {
 
                   readonly property bool canConfirm: root.mode === "open"
                     ? root.selectedFile.length > 0
-                    : root.saveFileName.length > 0
+                    : (root.mode === "save" ? root.saveFileName.length > 0 : true)
 
                   color: canConfirm
                     ? (actionHover.containsMouse ? Colors.primary : Colors.withAlpha(Colors.primary, 0.75))
@@ -1355,7 +1391,7 @@ PanelWindow {
                   Text {
                     id: actionText
                     anchors.centerIn: parent
-                    text: root.mode === "open" ? "Open" : "Save"
+                    text: root.mode === "open" ? "Open" : (root.mode === "save" ? "Save" : "Select Folder")
                     color: actionBtn.canConfirm ? Colors.text : Colors.textDisabled
                     font.pixelSize: Colors.fontSizeMedium
                     font.weight: Colors.fontWeightMedium
@@ -1370,8 +1406,10 @@ PanelWindow {
                       if (!actionBtn.canConfirm) return;
                       if (root.mode === "open") {
                         root.fileSelected(root.selectedFile);
-                      } else {
+                      } else if (root.mode === "save") {
                         root.fileSelected(root.currentPath + "/" + root.saveFileName);
+                      } else {
+                        root.folderSelected(root.selectedFile.length > 0 ? root.selectedFile : root.currentPath);
                       }
                       root.close();
                     }

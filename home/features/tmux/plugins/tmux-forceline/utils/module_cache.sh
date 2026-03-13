@@ -6,7 +6,7 @@
 # Usage: get_module_cache_dir <module_name>
 get_module_cache_dir() {
   local module="${1:-generic}"
-  local cache_dir="${TMUX_TMPDIR:-${TMPDIR:-/tmp}}/tmux-forceline-${module}"
+  local cache_dir="${TMPDIR:-/tmp}/tmux-forceline-${module}"
   mkdir -p "$cache_dir" 2>/dev/null || {
     echo "/tmp"
     return 1
@@ -55,18 +55,19 @@ cached_eval() {
   fi
 
   cache_dir=$(get_module_cache_dir "$module") || {
-    eval "$*"
+    "$@"
     return
   }
 
-  command_hash=$(echo "$*" | cksum | cut -d' ' -f1)
+  command_hash=$(echo "$@" | cksum | cut -d' ' -f1)
   cache_file="$cache_dir/cmd_${command_hash}.cache"
 
   if is_cache_valid "$cache_file" "$ttl"; then
     cat "$cache_file" 2>/dev/null && return 0
   fi
 
-  eval "$*" | tee "$cache_file" 2>/dev/null || eval "$*"
+  local tmp="${cache_file}.$$"
+  "$@" | tee "$tmp" 2>/dev/null && mv "$tmp" "$cache_file" || "$@"
 }
 
 export -f get_module_cache_dir is_cache_valid cached_eval

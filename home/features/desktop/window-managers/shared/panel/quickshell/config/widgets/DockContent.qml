@@ -174,29 +174,12 @@ Item {
               pressed: mouseArea.pressed
             }
 
-            // Prefer image icon from desktop entry; fallback to Nerd Font
-            Loader {
+            AppIcon {
               anchors.centerIn: parent
-              active: appDelegate.iconSource !== ""
-              sourceComponent: Image {
-                width: Config.dockIconSize - 8
-                height: Config.dockIconSize - 8
-                source: appDelegate.iconSource
-                sourceSize: Qt.size(width * 2, height * 2)
-                fillMode: Image.PreserveAspectFit
-                smooth: true
-              }
-            }
-
-            // Fallback: first letter
-            Text {
-              anchors.centerIn: parent
-              visible: appDelegate.iconSource === ""
-              text: appDelegate.appName.charAt(0).toUpperCase()
-              color: Colors.text
-              font.pixelSize: Config.dockIconSize * 0.5
-              font.weight: Font.Bold
-              font.family: Colors.fontMono
+              iconName: appDelegate.iconSource
+              appName: appDelegate.appName || ""
+              iconSize: Config.dockIconSize - 8
+              fallbackIcon: "󰀻"
             }
           }
 

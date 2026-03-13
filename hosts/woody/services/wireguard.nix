@@ -49,13 +49,17 @@
             "172.22.3.0/24"
           ];
 
-          # Set this to the server IP and port.
-          endpoint = "$(cat ${config.sops.secrets.accent-wg-server.path})"; # ToDo: route to endpoint not automatically configured https://wiki.archlinux.org/index.php/WireGuard#Loop_routing https://discourse.nixos.org/t/solved-minimal-firewall-setup-for-wireguard-client/7577
-
           # Send keepalives every 25 seconds. Important to keep NAT tables alive.
           persistentKeepalive = 25;
         }
       ];
+
+      # `networking.wireguard` does not shell-expand endpoint strings, so keep
+      # endpoint material in a secret and apply it after the interface comes up.
+      postSetup = ''
+        endpoint="$(tr -d '\n' < ${config.sops.secrets.accent-wg-server.path})"
+        ${pkgs.wireguard-tools}/bin/wg set wg0 peer zgZzw342CCMDrIjW2/sFf7ixAYR881h6LOG8hVDoclw= endpoint "$endpoint"
+      '';
     };
   };
 

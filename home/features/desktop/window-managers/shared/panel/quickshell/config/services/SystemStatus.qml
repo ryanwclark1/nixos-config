@@ -17,6 +17,8 @@ QtObject {
   property real ramPercent: 0.0
   property real gpuPercent: 0.0
   property real brightness: 0.0
+  property bool brightnessAvailable: false
+  property string brightnessStatus: "brightnessctl not detected"
 
   property int pollIntervalMs: 2000
 
@@ -42,16 +44,22 @@ QtObject {
       + "gpu_usage=$(cat \"$gpu_card/device/gpu_busy_percent\" 2>/dev/null || echo 0); "
       + "ram_usage=$(free -h | awk '/^Mem:/ {print $3}' | sed 's/Gi/GB/;s/Mi/MB/'); "
       + "ram_pct=$(free | awk '/^Mem:/ {printf \"%.4f\", $3/$2}'); "
+      + "brightness_supported=0; brightness_reason='unavailable'; brightness_curr=0; brightness_max=100; "
+      + "if command -v brightnessctl >/dev/null 2>&1; then "
+      + "if brightnessctl -m 2>/dev/null | head -n1 | grep -q .; then "
+      + "brightness_supported=1; brightness_reason='ready'; "
       + "brightness_curr=$(brightnessctl g 2>/dev/null || echo 0); "
       + "brightness_max=$(brightnessctl m 2>/dev/null || echo 100); "
-      + "printf '%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n' "
-      + "\"$cpu_temp\" \"$gpu_temp\" \"$cpu_usage\" \"$gpu_usage\" \"$ram_usage\" \"$ram_pct\" \"$brightness_curr\" \"$brightness_max\""
+      + "else brightness_reason='no_devices'; fi; "
+      + "else brightness_reason='missing_brightnessctl'; fi; "
+      + "printf '%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n' "
+      + "\"$cpu_temp\" \"$gpu_temp\" \"$cpu_usage\" \"$gpu_usage\" \"$ram_usage\" \"$ram_pct\" \"$brightness_curr\" \"$brightness_max\" \"$brightness_supported\" \"$brightness_reason\""
     ]
     running: false
     stdout: StdioCollector {
       onStreamFinished: {
         var lines = (this.text || "").trim().split("\n");
-        if (lines.length >= 8) {
+        if (lines.length >= 10) {
           root.cpuTemp = root.formatTemp(lines[0]);
           root.gpuTemp = root.formatTemp(lines[1]);
 
@@ -71,6 +79,13 @@ QtObject {
           var curr = parseFloat(lines[6]) || 0;
           var max = parseFloat(lines[7]) || 100;
           root.brightness = max > 0 ? Colors.clamp01(curr / max) : 0;
+
+          root.brightnessAvailable = (parseInt(lines[8], 10) || 0) === 1;
+          var reason = (lines[9] || "unavailable").trim();
+          if (root.brightnessAvailable) root.brightnessStatus = "Brightness control ready";
+          else if (reason === "no_devices") root.brightnessStatus = "No brightness device detected";
+          else if (reason === "missing_brightnessctl") root.brightnessStatus = "brightnessctl is not installed";
+          else root.brightnessStatus = "Brightness control unavailable";
         }
       }
     }
@@ -78,6 +93,7 @@ QtObject {
 
 
   function setBrightness(value) {
+    if (!root.brightnessAvailable) return;
     root.brightness = value;
     Quickshell.execDetached(["brightnessctl", "s", Math.round(value * 100) + "%"]);
   }

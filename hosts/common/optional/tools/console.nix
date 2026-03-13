@@ -1,4 +1,5 @@
 {
+  lib,
   ...
 }:
 let
@@ -30,7 +31,9 @@ in
 {
   console = {
     enable = true;
-    colors = [
+    # console.colors is a list option; multiple definitions concatenate.
+    # Force exactly 16 entries so kernel `vt.default_*` params stay valid.
+    colors = lib.mkForce [
       base00
       base01
       base02

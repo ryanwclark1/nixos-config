@@ -1,0 +1,739 @@
+import QtQuick
+import QtQuick.Layouts
+import Quickshell.Io
+import "../../../services"
+import "../../../widgets" as SharedWidgets
+import ".."
+
+Item {
+  id: root
+  property var settingsRoot: null
+  property string tabId: ""
+
+  property string wallpaperSelectedMonitor: ""
+  property var wallpaperMonitorNames: []
+  property string wallpaperFolderInput: Config.wallpaperDefaultFolder
+  property string wallpaperFolderError: ""
+
+  function isWallpaperFolderPathValid(path) {
+    var p = (path || "").trim();
+    return p.length > 0 && (p.indexOf("/") === 0 || p === "~" || p.indexOf("~/") === 0);
+  }
+
+  function applyWallpaperFolder() {
+    var trimmed = (wallpaperFolderInput || "").trim();
+    if (!isWallpaperFolderPathValid(trimmed)) {
+      wallpaperFolderError = "Use an absolute path, ~, or ~/path.";
+      return;
+    }
+    wallpaperFolderError = "";
+    Config.wallpaperDefaultFolder = trimmed;
+    WallpaperService.scanWallpapers();
+  }
+
+  Process {
+    id: wallpaperMonProc
+    command: ["hyprctl", "monitors", "-j"]
+    running: false
+    stdout: StdioCollector {
+      onStreamFinished: {
+        try {
+          var mons = JSON.parse(this.text || "[]");
+          var names = [];
+          for (var i = 0; i < mons.length; i++) {
+            if (mons[i].name) names.push(mons[i].name);
+          }
+          root.wallpaperMonitorNames = names;
+          if (root.wallpaperSelectedMonitor === "" && names.length > 0)
+            root.wallpaperSelectedMonitor = names[0];
+        } catch (e) {
+          console.error("Failed to parse hyprctl monitors: " + e);
+        }
+      }
+    }
+  }
+
+  Component.onCompleted: {
+    if (!wallpaperMonProc.running) wallpaperMonProc.running = true;
+    if (WallpaperService.availableWallpapers.length === 0) WallpaperService.scanWallpapers();
+  }
+
+  Connections {
+    target: Config
+    function onWallpaperDefaultFolderChanged() {
+      root.wallpaperFolderInput = Config.wallpaperDefaultFolder;
+      root.wallpaperFolderError = "";
+    }
+  }
+
+  SettingsTabPage {
+    anchors.fill: parent
+    tabId: root.tabId
+    title: "Wallpaper"
+    iconName: "󰸉"
+
+      // Monitor selector (shown only when >1 monitor)
+      ColumnLayout {
+        visible: root.wallpaperMonitorNames.length > 1
+        spacing: Colors.spacingS
+        Layout.fillWidth: true
+
+        SettingsSectionLabel { text: "MONITOR" }
+
+        Flow {
+          Layout.fillWidth: true
+          spacing: Colors.spacingS
+
+          SharedWidgets.FilterChip {
+            label: "All"
+            selected: root.wallpaperSelectedMonitor === "__all__"
+            onClicked: root.wallpaperSelectedMonitor = "__all__"
+          }
+
+          Repeater {
+            model: root.wallpaperMonitorNames
+            delegate: SharedWidgets.FilterChip {
+              required property string modelData
+              label: modelData
+              selected: root.wallpaperSelectedMonitor === modelData
+              onClicked: root.wallpaperSelectedMonitor = modelData
+            }
+          }
+        }
+      }
+
+      // Current wallpaper preview
+      SettingsSectionLabel { text: "CURRENT WALLPAPER" }
+
+      Rectangle {
+        id: previewContainer
+        Layout.fillWidth: true
+        height: 160
+        radius: Colors.radiusMedium
+        color: Colors.bgWidget
+        border.color: Colors.border
+        border.width: 1
+        clip: true
+
+        readonly property string previewPath: {
+          var key = root.wallpaperSelectedMonitor || "__all__";
+          return WallpaperService.wallpapers[key]
+                 || WallpaperService.wallpapers["__all__"]
+                 || "";
+        }
+
+        property bool _previewFlip: false
+
+        onPreviewPathChanged: {
+          if (!previewPath) return;
+          var src = "file://" + previewPath;
+          if (_previewFlip) {
+            previewA.source = src;
+          } else {
+            previewB.source = src;
+          }
+        }
+
+        Image {
+          id: previewA
+          anchors.fill: parent
+          fillMode: Image.PreserveAspectCrop
+          asynchronous: true
+          smooth: true
+          sourceSize: Qt.size(previewContainer.width * 2, previewContainer.height * 2)
+          opacity: previewContainer._previewFlip ? 0.0 : 1.0
+          Behavior on opacity { NumberAnimation { duration: 400; easing.type: Easing.InOutQuad } }
+          onStatusChanged: {
+            if (status === Image.Ready && previewContainer._previewFlip) {
+              previewContainer._previewFlip = false;
+            }
+          }
+        }
+
+        Image {
+          id: previewB
+          anchors.fill: parent
+          fillMode: Image.PreserveAspectCrop
+          asynchronous: true
+          smooth: true
+          sourceSize: Qt.size(previewContainer.width * 2, previewContainer.height * 2)
+          opacity: previewContainer._previewFlip ? 1.0 : 0.0
+          Behavior on opacity { NumberAnimation { duration: 400; easing.type: Easing.InOutQuad } }
+          onStatusChanged: {
+            if (status === Image.Ready && !previewContainer._previewFlip) {
+              previewContainer._previewFlip = true;
+            }
+          }
+        }
+
+        ColumnLayout {
+          anchors.centerIn: parent
+          spacing: Colors.spacingS
+          visible: previewContainer.previewPath === ""
+                   || (previewA.status !== Image.Ready && previewB.status !== Image.Ready)
+
+          Text {
+            text: "󰸉"
+            color: Colors.fgDim
+            font.family: Colors.fontMono
+            font.pixelSize: Colors.fontSizeHuge
+            Layout.alignment: Qt.AlignHCenter
+          }
+          Text {
+            text: previewContainer.previewPath !== "" ? "Loading preview…" : "No wallpaper set"
+            color: Colors.fgDim
+            font.pixelSize: Colors.fontSizeMedium
+            Layout.alignment: Qt.AlignHCenter
+          }
+        }
+
+        Rectangle {
+          anchors { bottom: parent.bottom; right: parent.right; margins: Colors.spacingM }
+          visible: previewContainer.previewPath !== ""
+          implicitWidth: previewName.implicitWidth + 16
+          height: 22
+          radius: Colors.radiusPill
+          color: Qt.rgba(0, 0, 0, 0.55)
+
+          Text {
+            id: previewName
+            anchors.centerIn: parent
+            text: {
+              var p = previewContainer.previewPath;
+              if (!p) return "";
+              var parts = p.split("/");
+              return parts[parts.length - 1];
+            }
+            color: "#ffffff"
+            font.pixelSize: Colors.fontSizeXS
+            font.family: Colors.fontMono
+            elide: Text.ElideLeft
+            maximumLineCount: 1
+          }
+        }
+      }
+
+      // Quick action buttons
+      RowLayout {
+        Layout.fillWidth: true
+        spacing: Colors.spacingM
+
+        Repeater {
+          model: [
+            { icon: "󰒭", label: "Next",        action: "next" },
+            { icon: "󰒝", label: "Random",      action: "random" },
+            { icon: "󰝰", label: "Open Folder", action: "folder" },
+            { icon: "󰉋", label: "Browse...",    action: "browse" }
+          ]
+
+          delegate: Rectangle {
+            Layout.fillWidth: true
+            height: 40
+            radius: Colors.radiusSmall
+            color: Colors.bgWidget
+            border.color: Colors.border
+            border.width: 1
+
+            SharedWidgets.StateLayer {
+              id: wpBtnStateLayer
+              hovered: wpBtnHover.containsMouse
+              pressed: wpBtnHover.pressed
+            }
+
+            RowLayout {
+              anchors.centerIn: parent
+              spacing: Colors.spacingS
+              Text { text: modelData.icon; color: Colors.fgSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
+              Text { text: modelData.label; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium }
+            }
+
+            MouseArea {
+              id: wpBtnHover
+              anchors.fill: parent
+              hoverEnabled: true
+              cursorShape: Qt.PointingHandCursor
+              onClicked: (mouse) => {
+                wpBtnStateLayer.burst(mouse.x, mouse.y);
+                var mon = root.wallpaperSelectedMonitor === "__all__"
+                          ? "" : root.wallpaperSelectedMonitor;
+                if (modelData.action === "next") WallpaperService.nextWallpaper(mon);
+                else if (modelData.action === "random") WallpaperService.randomWallpaper(mon);
+                else if (modelData.action === "folder") WallpaperService.openWallpaperFolder();
+                else if (modelData.action === "browse" && root.settingsRoot) root.settingsRoot.browseWallpaper(mon);
+              }
+            }
+          }
+        }
+      }
+
+      // Settings
+      SettingsSectionLabel { text: "SETTINGS" }
+
+      ColumnLayout {
+        Layout.fillWidth: true
+        spacing: Colors.spacingS
+
+        Text {
+          text: "Default wallpaper folder"
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeMedium
+          font.weight: Font.Medium
+        }
+
+        RowLayout {
+          Layout.fillWidth: true
+          spacing: Colors.spacingS
+
+          Rectangle {
+            Layout.fillWidth: true
+            height: 34
+            radius: Colors.radiusSmall
+            color: Colors.withAlpha(Colors.surface, 0.7)
+            border.color: folderInput.activeFocus ? Colors.primary : Colors.border
+            border.width: 1
+
+            TextInput {
+              id: folderInput
+              anchors.fill: parent
+              anchors.leftMargin: Colors.spacingM
+              anchors.rightMargin: Colors.spacingM
+              verticalAlignment: Text.AlignVCenter
+              color: Colors.text
+              text: root.wallpaperFolderInput
+              clip: true
+              onTextChanged: root.wallpaperFolderInput = text
+              onAccepted: root.applyWallpaperFolder()
+            }
+          }
+
+          Rectangle {
+            height: 34
+            implicitWidth: applyFolderText.implicitWidth + 22
+            radius: Colors.radiusSmall
+            color: applyFolderHover.containsMouse ? Colors.primary : Colors.withAlpha(Colors.primary, 0.75)
+            border.color: Colors.primary
+            border.width: 1
+
+            Text {
+              id: applyFolderText
+              anchors.centerIn: parent
+              text: "Apply"
+              color: Colors.text
+              font.pixelSize: Colors.fontSizeSmall
+              font.weight: Font.Medium
+            }
+
+            MouseArea {
+              id: applyFolderHover
+              anchors.fill: parent
+              hoverEnabled: true
+              cursorShape: Qt.PointingHandCursor
+              onClicked: root.applyWallpaperFolder()
+            }
+          }
+
+          Rectangle {
+            height: 34
+            implicitWidth: pickFolderText.implicitWidth + 22
+            radius: Colors.radiusSmall
+            color: pickFolderHover.containsMouse ? Colors.withAlpha(Colors.text, 0.1) : Colors.bgWidget
+            border.color: Colors.border
+            border.width: 1
+
+            Text {
+              id: pickFolderText
+              anchors.centerIn: parent
+              text: "Pick Folder"
+              color: Colors.textSecondary
+              font.pixelSize: Colors.fontSizeSmall
+              font.weight: Font.Medium
+            }
+
+            MouseArea {
+              id: pickFolderHover
+              anchors.fill: parent
+              hoverEnabled: true
+              cursorShape: Qt.PointingHandCursor
+              onClicked: if (root.settingsRoot) root.settingsRoot.pickWallpaperFolder()
+            }
+          }
+        }
+
+        Text {
+          visible: root.wallpaperFolderError.length > 0
+          text: root.wallpaperFolderError
+          color: Colors.error
+          font.pixelSize: Colors.fontSizeXS
+        }
+      }
+
+      GridLayout {
+        columns: 2
+        columnSpacing: Colors.spacingL
+        rowSpacing: Colors.spacingL
+        Layout.fillWidth: true
+
+        Rectangle {
+          visible: !Config.themeName
+          Layout.fillWidth: true
+          implicitHeight: 84
+          radius: Colors.radiusMedium
+          color: Colors.bgWidget
+          border.color: Config.wallpaperRunPywal ? Colors.primary : Colors.border
+          border.width: 1
+          Behavior on border.color { ColorAnimation { duration: 150 } }
+
+          SharedWidgets.StateLayer {
+            id: pywalStateLayer
+            hovered: pywalHover.containsMouse
+            pressed: pywalHover.pressed
+          }
+
+          RowLayout {
+            anchors { fill: parent; margins: Colors.spacingM }
+            spacing: Colors.spacingM
+
+            Text {
+              text: "󰏘"
+              color: Config.wallpaperRunPywal ? Colors.primary : Colors.textSecondary
+              font.family: Colors.fontMono
+              font.pixelSize: Colors.fontSizeHuge
+              Behavior on color { ColorAnimation { duration: 150 } }
+            }
+
+            ColumnLayout {
+              Layout.fillWidth: true
+              spacing: 3
+              Text { text: "Run pywal on change"; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.DemiBold }
+              Text { text: Config.wallpaperRunPywal ? "Enabled" : "Disabled"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall }
+            }
+
+            SharedWidgets.DankToggle {
+              checked: Config.wallpaperRunPywal
+              onToggled: Config.wallpaperRunPywal = !Config.wallpaperRunPywal
+            }
+          }
+
+          MouseArea {
+            id: pywalHover
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: (mouse) => {
+              pywalStateLayer.burst(mouse.x, mouse.y);
+              Config.wallpaperRunPywal = !Config.wallpaperRunPywal;
+            }
+          }
+        }
+      }
+
+      // Auto-cycle interval slider
+      ColumnLayout {
+        spacing: Colors.spacingM
+        Layout.fillWidth: true
+
+        RowLayout {
+          Text { text: "Auto-Cycle Interval"; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium }
+          Item { Layout.fillWidth: true }
+          Text {
+            text: Config.wallpaperCycleInterval === 0
+                  ? "Off"
+                  : Config.wallpaperCycleInterval + " min"
+            color: Colors.fgSecondary
+            font.pixelSize: Colors.fontSizeSmall
+            font.family: Colors.fontMono
+          }
+        }
+
+        Item {
+          Layout.fillWidth: true
+          height: 24
+
+          Rectangle {
+            id: cycleTrack
+            anchors.verticalCenter: parent.verticalCenter
+            width: parent.width
+            height: 6
+            color: Colors.surface
+            radius: 3
+
+            Rectangle {
+              width: parent.width * (Config.wallpaperCycleInterval / 60)
+              height: parent.height
+              color: Config.wallpaperCycleInterval > 0 ? Colors.primary : Colors.border
+              radius: 3
+              Behavior on width { NumberAnimation { duration: 100 } }
+              Behavior on color { ColorAnimation { duration: 150 } }
+            }
+          }
+
+          Rectangle {
+            width: 14; height: 14; radius: 7
+            color: Config.wallpaperCycleInterval > 0 ? Colors.primary : Colors.border
+            border.color: Colors.bgWidget
+            border.width: 2
+            x: Math.max(0, Math.min(parent.width - width, parent.width * (Config.wallpaperCycleInterval / 60) - width / 2))
+            anchors.verticalCenter: parent.verticalCenter
+            Behavior on x { NumberAnimation { duration: 100 } }
+            Behavior on color { ColorAnimation { duration: 150 } }
+          }
+
+          MouseArea {
+            anchors.fill: parent
+            anchors.topMargin: -4
+            anchors.bottomMargin: -4
+            cursorShape: Qt.PointingHandCursor
+            function updateCycle(mouse) {
+              var raw = (mouse.x / width) * 60;
+              if (raw < 2) { Config.wallpaperCycleInterval = 0; return; }
+              var snapped = Math.round(raw / 5) * 5;
+              Config.wallpaperCycleInterval = Math.max(5, Math.min(60, snapped));
+            }
+            onPressed: (mouse) => updateCycle(mouse)
+            onPositionChanged: (mouse) => { if (pressed) updateCycle(mouse); }
+          }
+        }
+
+        RowLayout {
+          Layout.fillWidth: true
+          Text { text: "Off"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS }
+          Item { Layout.fillWidth: true }
+          Text { text: "60 min"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS }
+        }
+      }
+
+      // Wallpaper grid
+      SettingsSectionLabel {
+        text: WallpaperService.scanning
+              ? "SCANNING…"
+              : ("WALLPAPERS  (" + WallpaperService.availableWallpapers.length + ")")
+      }
+
+      RowLayout {
+        Layout.fillWidth: true
+        spacing: Colors.spacingM
+        visible: !WallpaperService.scanning
+
+        SharedWidgets.EmptyState {
+          visible: WallpaperService.availableWallpapers.length === 0
+          icon: "󰸉"
+          message: "No wallpapers found in search directories"
+          Layout.fillWidth: true
+        }
+
+        Item { Layout.fillWidth: true; visible: WallpaperService.availableWallpapers.length > 0 }
+
+        Rectangle {
+          implicitWidth: rescanRow.implicitWidth + 20
+          height: 32
+          radius: Colors.radiusXS
+          color: Colors.bgWidget
+          border.color: Colors.border
+          border.width: 1
+
+          SharedWidgets.StateLayer {
+            id: rescanStateLayer
+            hovered: rescanHover.containsMouse
+            pressed: rescanHover.pressed
+          }
+
+          RowLayout {
+            id: rescanRow
+            anchors.centerIn: parent
+            spacing: Colors.spacingS
+            Text { text: "󰑐"; color: Colors.fgSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium }
+            Text { text: "Rescan"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
+          }
+
+          MouseArea {
+            id: rescanHover
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: (mouse) => {
+              rescanStateLayer.burst(mouse.x, mouse.y);
+              WallpaperService.scanWallpapers();
+            }
+          }
+        }
+      }
+
+      ColumnLayout {
+        visible: WallpaperService.scanning
+        Layout.fillWidth: true
+        spacing: Colors.spacingS
+
+        SharedWidgets.LoadingSpinner { Layout.alignment: Qt.AlignHCenter }
+        Text {
+          text: "Scanning directories…"
+          color: Colors.textDisabled
+          font.pixelSize: Colors.fontSizeMedium
+          Layout.alignment: Qt.AlignHCenter
+        }
+      }
+
+      Flow {
+        visible: !WallpaperService.scanning && WallpaperService.availableWallpapers.length > 0
+        Layout.fillWidth: true
+        spacing: Colors.spacingS
+
+        Repeater {
+          model: WallpaperService.availableWallpapers
+
+          delegate: Item {
+            id: thumbDelegate
+            required property var modelData
+            required property int index
+
+            readonly property string activePath: {
+              var key = root.wallpaperSelectedMonitor || "__all__";
+              return WallpaperService.wallpapers[key]
+                     || WallpaperService.wallpapers["__all__"]
+                     || "";
+            }
+            readonly property bool isActive: modelData.path === activePath
+
+            width: 108; height: 80
+            scale: 1.0
+
+            SequentialAnimation {
+              id: thumbPulse
+              NumberAnimation { target: thumbDelegate; property: "scale"; to: 0.92; duration: 100; easing.type: Easing.InQuad }
+              NumberAnimation { target: thumbDelegate; property: "scale"; to: 1.0; duration: 100; easing.type: Easing.OutQuad }
+            }
+
+            Rectangle {
+              anchors.fill: parent
+              radius: Colors.radiusSmall
+              color: isActive ? Colors.highlight : Colors.bgWidget
+              border.color: isActive ? Colors.primary : Colors.border
+              border.width: isActive ? 2 : 1
+              clip: true
+
+              Behavior on border.color { ColorAnimation { duration: 150 } }
+              Behavior on color { ColorAnimation { duration: 150 } }
+
+              Image {
+                anchors.fill: parent
+                source: "file://" + modelData.path
+                fillMode: Image.PreserveAspectCrop
+                asynchronous: true
+                smooth: true
+                cache: false
+                sourceSize: Qt.size(216, 160)
+                opacity: status === Image.Ready ? 1.0 : 0.0
+                Behavior on opacity { NumberAnimation { duration: 200 } }
+              }
+
+              Text {
+                anchors.centerIn: parent
+                text: "󰸉"
+                color: Colors.fgDim
+                font.family: Colors.fontMono
+                font.pixelSize: Colors.fontSizeHuge
+                visible: parent.children[0].status !== Image.Ready
+              }
+
+              Rectangle {
+                anchors { top: parent.top; right: parent.right; margins: 5 }
+                visible: isActive
+                width: 18; height: 18; radius: height / 2
+                color: Colors.primary
+
+                Text {
+                  anchors.centerIn: parent
+                  text: "󰄬"
+                  color: Colors.text
+                  font.family: Colors.fontMono
+                  font.pixelSize: Colors.fontSizeXS
+                }
+              }
+
+              Rectangle {
+                anchors.fill: parent
+                color: thumbMouse.containsMouse ? Qt.rgba(0, 0, 0, 0.35) : "transparent"
+                Behavior on color { ColorAnimation { duration: 120 } }
+              }
+
+              Text {
+                anchors { bottom: parent.bottom; left: parent.left; right: parent.right; margins: 4 }
+                text: modelData.filename
+                color: "#ffffff"
+                font.pixelSize: Colors.fontSizeXS
+                elide: Text.ElideLeft
+                visible: thumbMouse.containsMouse
+              }
+
+              MouseArea {
+                id: thumbMouse
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                  thumbPulse.restart();
+                  var mon = root.wallpaperSelectedMonitor === "__all__"
+                            ? "" : root.wallpaperSelectedMonitor;
+                  WallpaperService.setWallpaper(modelData.path, mon);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Info callout
+      Rectangle {
+        Layout.fillWidth: true
+        implicitHeight: wpInfoLayout.implicitHeight + 24
+        radius: Colors.radiusMedium
+        color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.07)
+        border.color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.22)
+        border.width: 1
+
+        ColumnLayout {
+          id: wpInfoLayout
+          anchors { left: parent.left; right: parent.right; top: parent.top; margins: Colors.spacingM }
+          spacing: Colors.spacingS
+
+          RowLayout {
+            spacing: Colors.spacingS
+            Text {
+              text: "󰋗"
+              color: Colors.primary
+              font.family: Colors.fontMono
+              font.pixelSize: Colors.fontSizeLarge
+              Layout.alignment: Qt.AlignTop
+            }
+            Text {
+              text: "Wallpaper search directories"
+              color: Colors.text
+              font.pixelSize: Colors.fontSizeMedium
+              font.weight: Font.DemiBold
+            }
+          }
+
+          Repeater {
+            model: WallpaperService.wallpaperSearchDirs
+            delegate: Text {
+              required property string modelData
+              text: "  " + modelData
+              color: Colors.fgSecondary
+              font.pixelSize: Colors.fontSizeXS
+              font.family: Colors.fontMono
+              Layout.fillWidth: true
+              elide: Text.ElideLeft
+            }
+          }
+
+          Text {
+            text: "Requires swww, hyprctl hyprpaper, or swaybg to apply wallpapers."
+            color: Colors.fgDim
+            font.pixelSize: Colors.fontSizeXS
+            wrapMode: Text.WordWrap
+            Layout.fillWidth: true
+            Layout.topMargin: 4
+          }
+        }
+      }
+  }
+}

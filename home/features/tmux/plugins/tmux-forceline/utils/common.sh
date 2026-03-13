@@ -50,23 +50,16 @@ command_exists() {
 }
 
 # Safe command execution with fallback
+# Usage: safe_execute <fallback> <timeout> <command> [args...]
 safe_execute() {
-    local cmd="$1"
-    local fallback="${2:-N/A}"
-    local timeout="${3:-5}"
+    local fallback="${1:-N/A}"; shift
+    local timeout_val="${1:-5}"; shift
 
     if command_exists timeout; then
-        if timeout "$timeout" bash -c "$cmd" 2>/dev/null; then
-            return 0
-        fi
+        timeout "$timeout_val" "$@" 2>/dev/null || { echo "$fallback"; return 1; }
     else
-        if eval "$cmd" 2>/dev/null; then
-            return 0
-        fi
+        "$@" 2>/dev/null || { echo "$fallback"; return 1; }
     fi
-
-    echo "$fallback"
-    return 1
 }
 
 # Get tmux option with fallback
@@ -125,11 +118,10 @@ get_tmux_option() {
     # Return value or default
     if [[ -n "$value" ]]; then
         echo "$value"
-        return 0
     else
         echo "$default"
-        return 2  # Indicates default was used
     fi
+    return 0
 }
 
 # Get forceline root directory from centralized tmux option
@@ -312,28 +304,6 @@ unset_tmux_option() {
     esac
 }
 
-# Format percentage with consistent styling
-format_percentage() {
-    local value="$1"
-    local threshold_warn="${2:-80}"
-    local threshold_crit="${3:-90}"
-
-    # Remove % if present and ensure numeric
-    value="${value%\%}"
-
-    if [[ "$value" =~ ^[0-9]+$ ]]; then
-        if [[ "$value" -ge "$threshold_crit" ]]; then
-            echo "${value}%"  # Critical - no color prefix, let tmux handle it
-        elif [[ "$value" -ge "$threshold_warn" ]]; then
-            echo "${value}%"  # Warning
-        else
-            echo "${value}%"  # Normal
-        fi
-    else
-        echo "N/A"
-    fi
-}
-
 # Cache management functions
 cache_get() {
     local key="$1"
@@ -409,5 +379,5 @@ export -f log_debug log_info log_warn log_error
 export -f command_exists safe_execute
 export -f get_tmux_option get_tmux_option_simple set_tmux_option unset_tmux_option tmux_option_exists
 export -f get_forceline_dir get_forceline_modules_dir get_forceline_utils_dir get_forceline_themes_dir get_forceline_path get_current_script_dir
-export -f format_percentage sanitize_output format_duration
+export -f sanitize_output format_duration
 export -f cache_get cache_set check_connectivity

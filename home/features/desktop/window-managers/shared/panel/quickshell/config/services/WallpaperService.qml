@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "."
 
 pragma Singleton
 
@@ -28,18 +29,15 @@ QtObject {
   // True while a directory scan is in progress.
   property bool scanning: false
 
-  // Primary wallpaper directory shown in the UI (default: hypr backgrounds).
+  // Primary wallpaper directory shown in the UI (default: Pictures).
   // The service always scans *all* wallpaperSearchDirs; this is just the folder
   // opened by the "Open Folder" button.
-  property string wallpaperDir: Quickshell.env("HOME") + "/.config/hypr/backgrounds"
+  readonly property string wallpaperDir: normalizedWallpaperDir(Config.wallpaperDefaultFolder)
 
-  // Ordered list of directories to scan (first-found wins for the primary preview).
+  // Ordered list of directories to scan.
+  // User-selected default folder replaces the built-in list.
   readonly property var wallpaperSearchDirs: [
-    Quickshell.env("HOME") + "/.config/hypr/backgrounds",
-    Quickshell.env("HOME") + "/Pictures/Wallpapers",
-    Quickshell.env("HOME") + "/Pictures/wallpapers",
-    Quickshell.env("HOME") + "/Pictures",
-    "/usr/share/backgrounds"
+    wallpaperDir
   ]
 
   // ---- Public API ------------------------------------------------------------
@@ -52,13 +50,21 @@ QtObject {
     // path via single-quotes so spaces in $HOME are handled correctly.
     // Wrap individual finds in a subshell group, then sort -u the combined output.
     var findCmds = [];
+    var fallbackDir = (Quickshell.env("HOME") || "/home") + "/Pictures";
     for (var i = 0; i < wallpaperSearchDirs.length; i++) {
       var qd = "'" + wallpaperSearchDirs[i].replace(/'/g, "'\\''") + "'";
+      var qFallback = "'" + fallbackDir.replace(/'/g, "'\\''") + "'";
       findCmds.push(
-        "{ [ -d " + qd + " ] && "
-        + "find " + qd + " -maxdepth 2 -type f "
+        "{ d=" + qd + "; [ -d \"$d\" ] || d=" + qFallback + "; [ -d \"$d\" ] && "
+        + "find \"$d\" -maxdepth 2 -type f "
         + "\\( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' "
-        + "   -o -iname '*.webp' -o -iname '*.gif' \\) 2>/dev/null || true; }"
+        + "   -o -iname '*.webp' -o -iname '*.gif' -o -iname '*.bmp' -o -iname '*.tif' -o -iname '*.tiff' \\) "
+        + "2>/dev/null | while IFS= read -r f; do "
+        + "mt=$(file -Lb --mime-type \"$f\" 2>/dev/null || true); "
+        + "case \"$mt\" in "
+        + "image/jpeg|image/png|image/webp|image/gif|image/bmp|image/tiff) printf '%s\\n' \"$f\" ;; "
+        + "esac; "
+        + "done || true; }"
       );
     }
     var script = "{ " + findCmds.join("; ") + "; } | sort -u";
@@ -85,8 +91,8 @@ QtObject {
     var setter = _buildSetterScript(imagePath, monitorName || "");
     Quickshell.execDetached(["sh", "-c", setter]);
 
-    // Optionally regenerate pywal colour scheme
-    if (Config.wallpaperRunPywal) {
+    // Optionally regenerate pywal colour scheme (skip when a base24 theme is active)
+    if (Config.wallpaperRunPywal && !Config.themeName) {
       Quickshell.execDetached(["sh", "-c",
         "wal -i " + _shellQuote(imagePath) + " -n -q 2>/dev/null || true"
       ]);
@@ -142,6 +148,9 @@ QtObject {
       cycleTimer.interval = Math.max(1, Config.wallpaperCycleInterval) * 60 * 1000;
       cycleTimer.running = Config.wallpaperCycleInterval > 0;
     }
+    function onWallpaperDefaultFolderChanged() {
+      root.scanWallpapers();
+    }
   }
 
   // ---- Scan process ----------------------------------------------------------
@@ -186,6 +195,17 @@ QtObject {
       if (availableWallpapers[i].path === path) return i;
     }
     return -1;
+  }
+
+  function normalizedWallpaperDir(rawPath) {
+    var home = Quickshell.env("HOME") || "/home";
+    var fallback = home + "/Pictures";
+    var input = (rawPath || "").trim();
+    if (!input) return fallback;
+    if (input === "~") return home;
+    if (input.indexOf("~/") === 0) return home + input.slice(1);
+    if (input.indexOf("/") === 0) return input;
+    return fallback;
   }
 
   // Minimal single-quote escaping for POSIX shell: replace ' with '\''

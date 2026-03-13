@@ -21,6 +21,9 @@
     enableUserSlices = lib.mkDefault true;
   };
 
+  # Work around invalid pre-sleep/pre-shutdown oneshot units when powerDownCommands is empty.
+  powerManagement.powerDownCommands = lib.mkDefault ":";
+
   # Common hardware settings
   hardware = {
     enableAllFirmware = lib.mkDefault true;

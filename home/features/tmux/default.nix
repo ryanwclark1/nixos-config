@@ -102,10 +102,11 @@
 
       # Options must be set BEFORE sourcing the plugin
       set -g @forceline_theme "catppuccin-frappe"
-      set -g @forceline_window_status_style "rounded"
+      set -g @forceline_separator_style "powerline"
       set -g @forceline_window_flags "icon"
       set -g @forceline_window_number_position "left"
       set -g @forceline_status_connect_separator "yes"
+      set -g @forceline_status_background "none"
 
       # Load the forceline plugin (theme, modules, status rendering)
       source-file ~/.config/tmux/plugins/tmux-forceline/forceline.tmux
@@ -114,9 +115,9 @@
       set -g status-position bottom
       set -g status-justify centre
       set -g status-left-length 100
-      set -g status-right-length 100
+      set -g status-right-length 150
       set -g status-left "#{E:@forceline_status_session}"
-      set -g status-right "#{E:@forceline_status_cpu}#{E:@forceline_status_memory}#{E:@forceline_status_datetime}"
+      set -g status-right "#{E:@forceline_status_cpu}#{E:@forceline_status_gpu}#{E:@forceline_status_memory}#{E:@forceline_status_datetime}"
 
       # Reload configuration with Prefix + r
       bind r source-file ~/.config/tmux/tmux.conf \; display-message "Config reloaded!"

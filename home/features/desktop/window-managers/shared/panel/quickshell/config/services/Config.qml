@@ -21,6 +21,20 @@ QtObject {
   property int notifWidth: 350
   property int popupTimer: 5000
 
+  // --- TIME ---
+  property bool timeUse24Hour: true
+  property bool timeShowSeconds: false
+  property bool timeShowBarDate: true
+  property string timeBarDateStyle: "weekday_short" // weekday_short | month_day | weekday_month_day
+
+  // --- WEATHER ---
+  property string weatherUnits: "metric" // metric | imperial
+  property bool weatherAutoLocation: true
+  property string weatherCityQuery: ""
+  property string weatherLatitude: ""
+  property string weatherLongitude: ""
+  property string weatherLocationPriority: "latlon_city_auto"
+
   // --- LAUNCHER ---
   property string launcherDefaultMode: "drun"
   property bool launcherShowModeHints: true
@@ -78,6 +92,10 @@ QtObject {
   property bool wallpaperRunPywal: false
   property var wallpaperPaths: ({})      // monitorName → absolute image path
   property int wallpaperCycleInterval: 0  // 0 = disabled, otherwise minutes between auto-cycle
+  property string wallpaperDefaultFolder: (Quickshell.env("HOME") || "/home") + "/Pictures"
+
+  // --- THEME ---
+  property string themeName: ""  // base24 theme id; empty = pywal fallback
 
   // --- PLUGINS ---
   property var disabledPlugins: []
@@ -168,6 +186,16 @@ QtObject {
   onGlassOpacityChanged: scheduleSave()
   onNotifWidthChanged: scheduleSave()
   onPopupTimerChanged: scheduleSave()
+  onTimeUse24HourChanged: scheduleSave()
+  onTimeShowSecondsChanged: scheduleSave()
+  onTimeShowBarDateChanged: scheduleSave()
+  onTimeBarDateStyleChanged: scheduleSave()
+  onWeatherUnitsChanged: scheduleSave()
+  onWeatherAutoLocationChanged: scheduleSave()
+  onWeatherCityQueryChanged: scheduleSave()
+  onWeatherLatitudeChanged: scheduleSave()
+  onWeatherLongitudeChanged: scheduleSave()
+  onWeatherLocationPriorityChanged: scheduleSave()
   onLauncherDefaultModeChanged: scheduleSave()
   onLauncherShowModeHintsChanged: scheduleSave()
   onLauncherShowHomeSectionsChanged: scheduleSave()
@@ -199,10 +227,12 @@ QtObject {
   onPrivacyCameraMonitoringChanged: scheduleSave()
   onIdleInhibitEnabledChanged: scheduleSave()
   onRecentPickerColorsChanged: scheduleSave()
+  onThemeNameChanged: scheduleSave()
   onDisabledPluginsChanged: scheduleSave()
   onWallpaperRunPywalChanged: scheduleSave()
   onWallpaperPathsChanged: scheduleSave()
   onWallpaperCycleIntervalChanged: scheduleSave()
+  onWallpaperDefaultFolderChanged: scheduleSave()
 
   function load() {
     var raw = configFile.text();
@@ -228,6 +258,22 @@ QtObject {
       if (data.notifications) {
         if (data.notifications.width !== undefined) notifWidth = data.notifications.width;
         if (data.notifications.popupTimer !== undefined) popupTimer = data.notifications.popupTimer;
+      }
+
+      if (data.time) {
+        if (data.time.use24Hour !== undefined) timeUse24Hour = data.time.use24Hour;
+        if (data.time.showSeconds !== undefined) timeShowSeconds = data.time.showSeconds;
+        if (data.time.showBarDate !== undefined) timeShowBarDate = data.time.showBarDate;
+        if (data.time.barDateStyle !== undefined) timeBarDateStyle = data.time.barDateStyle;
+      }
+
+      if (data.weather) {
+        if (data.weather.units !== undefined) weatherUnits = data.weather.units;
+        if (data.weather.autoLocation !== undefined) weatherAutoLocation = data.weather.autoLocation;
+        if (data.weather.cityQuery !== undefined) weatherCityQuery = data.weather.cityQuery;
+        if (data.weather.latitude !== undefined) weatherLatitude = String(data.weather.latitude);
+        if (data.weather.longitude !== undefined) weatherLongitude = String(data.weather.longitude);
+        if (data.weather.locationPriority !== undefined) weatherLocationPriority = data.weather.locationPriority;
       }
 
       if (data.launcher) {
@@ -298,10 +344,15 @@ QtObject {
         if (data.plugins.disabled !== undefined) disabledPlugins = data.plugins.disabled;
       }
 
+      if (data.theme) {
+        if (data.theme.name !== undefined) themeName = data.theme.name;
+      }
+
       if (data.wallpaper) {
         if (data.wallpaper.runPywal !== undefined) wallpaperRunPywal = data.wallpaper.runPywal;
         if (data.wallpaper.paths !== undefined) wallpaperPaths = data.wallpaper.paths;
         if (data.wallpaper.cycleInterval !== undefined) wallpaperCycleInterval = data.wallpaper.cycleInterval;
+        if (data.wallpaper.defaultFolder !== undefined) wallpaperDefaultFolder = data.wallpaper.defaultFolder;
       }
     } catch (e) {
       console.error("Failed to load config: " + e);
@@ -341,6 +392,20 @@ QtObject {
       "notifications": {
         "width": notifWidth,
         "popupTimer": popupTimer
+      },
+      "time": {
+        "use24Hour": timeUse24Hour,
+        "showSeconds": timeShowSeconds,
+        "showBarDate": timeShowBarDate,
+        "barDateStyle": timeBarDateStyle
+      },
+      "weather": {
+        "units": weatherUnits,
+        "autoLocation": weatherAutoLocation,
+        "cityQuery": weatherCityQuery,
+        "latitude": weatherLatitude,
+        "longitude": weatherLongitude,
+        "locationPriority": weatherLocationPriority
       },
       "launcher": {
         "defaultMode": launcherDefaultMode,
@@ -398,10 +463,14 @@ QtObject {
       "plugins": {
         "disabled": disabledPlugins
       },
+      "theme": {
+        "name": themeName
+      },
       "wallpaper": {
         "runPywal": wallpaperRunPywal,
         "paths": wallpaperPaths,
-        "cycleInterval": wallpaperCycleInterval
+        "cycleInterval": wallpaperCycleInterval,
+        "defaultFolder": wallpaperDefaultFolder
       }
     };
 

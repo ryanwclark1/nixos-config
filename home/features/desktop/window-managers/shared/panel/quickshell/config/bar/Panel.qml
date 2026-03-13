@@ -29,6 +29,28 @@ Item {
   readonly property real weatherTriggerBottomY: weatherTrigger.mapToItem(root, 0, weatherTrigger.height).y
   readonly property real systemMonitorBottomY: systemMonitor.mapToItem(root, 0, systemMonitor.height).y
   readonly property real printerTriggerBottomY: printerTrigger.visible ? printerTrigger.mapToItem(root, 0, printerTrigger.height).y : audioTriggerBottomY
+
+  // X-center positions for icon-aligned popup placement
+  readonly property real networkTriggerCenterX: networkTrigger.mapToItem(root, networkTrigger.width / 2, 0).x
+  readonly property real btTriggerCenterX: btTrigger.mapToItem(root, btTrigger.width / 2, 0).x
+  readonly property real audioTriggerCenterX: audioTrigger.mapToItem(root, audioTrigger.width / 2, 0).x
+  readonly property real musicTriggerCenterX: musicTrigger.visible ? musicTrigger.mapToItem(root, musicTrigger.width / 2, 0).x : audioTriggerCenterX
+  readonly property real recordingTriggerCenterX: recordingTrigger.visible ? recordingTrigger.mapToItem(root, recordingTrigger.width / 2, 0).x : audioTriggerCenterX
+  readonly property real privacyTriggerCenterX: privacyTrigger.visible ? privacyTrigger.mapToItem(root, privacyTrigger.width / 2, 0).x : audioTriggerCenterX
+  readonly property real batteryTriggerCenterX: batteryTrigger.visible ? batteryTrigger.mapToItem(root, batteryTrigger.width / 2, 0).x : audioTriggerCenterX
+  readonly property real clipboardTriggerCenterX: clipboardTrigger.mapToItem(root, clipboardTrigger.width / 2, 0).x
+  readonly property real weatherTriggerCenterX: weatherTrigger.mapToItem(root, weatherTrigger.width / 2, 0).x
+  readonly property real systemMonitorCenterX: systemMonitor.mapToItem(root, systemMonitor.width / 2, 0).x
+  readonly property real printerTriggerCenterX: printerTrigger.visible ? printerTrigger.mapToItem(root, printerTrigger.width / 2, 0).x : audioTriggerCenterX
+  readonly property real cavaTriggerBottomY: centerModules.cavaPill.mapToItem(root, 0, centerModules.cavaPill.height).y
+  readonly property real cavaTriggerCenterX: centerModules.cavaPill.mapToItem(root, centerModules.cavaPill.width / 2, 0).x
+  // Date/time trigger geometry is computed from direct coordinates so popup anchoring
+  // stays correct as the center row content shifts.
+  readonly property real dateTimeTriggerBottomY: centerModules.y + centerModules.dateTimePill.y + centerModules.dateTimePill.height
+  readonly property real dateTimeTriggerCenterX: centerModules.x + centerModules.dateTimePill.x + (centerModules.dateTimePill.width / 2)
+  readonly property string fullCavaData: centerModules.fullCavaData
+  signal cavaClicked()
+  signal dateTimeClicked()
   signal notifClicked()
   signal networkClicked()
   signal audioClicked()
@@ -81,13 +103,11 @@ Item {
 
   // CENTER MODULES
   CenterModules {
+    id: centerModules
     anchors.centerIn: parent
     anchorWindow: root.anchorWindow
-  }
-
-  SystemClock {
-    id: clock
-    precision: SystemClock.Minutes
+    onCavaClicked: root.cavaClicked()
+    onDateTimeClicked: root.dateTimeClicked()
   }
 
   // RIGHT MODULES
@@ -400,20 +420,6 @@ Item {
       }
     }
 
-    SharedWidgets.BarPill {
-      anchorWindow: root.anchorWindow
-      tooltipText: "Calendar"
-      onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Calendar", "toggle"])
-
-      Text {
-        id: clockText
-        color: Colors.text
-        font.pixelSize: Colors.fontSizeLarge
-        font.weight: Font.Bold
-        text: String(clock.hours).padStart(2, '0') + ":" + String(clock.minutes).padStart(2, '0')
-      }
-    }
-
     SharedWidgets.TrayWidget {
       anchorWindow: root.anchorWindow
     }
@@ -432,61 +438,35 @@ Item {
       }
     }
 
-    Rectangle {
+    SharedWidgets.BarPill {
       id: notifBg
-      width: 32
-      height: 28
-      color: Colors.bgWidget
-      radius: height / 2
-      anchors.verticalCenter: parent.verticalCenter
-
-      scale: notifMouse.containsMouse ? 1.06 : 1.0
-      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
-
-      SharedWidgets.StateLayer {
-        id: notifStateLayer
-        hovered: notifMouse.containsMouse
-        pressed: notifMouse.pressed
-      }
+      anchorWindow: root.anchorWindow
+      tooltipText: root.manager && root.manager.dndEnabled ? "Notifications paused" : "Notifications"
+      onClicked: root.notifClicked()
 
       readonly property bool hasDnd: !!(root.manager && root.manager.dndEnabled)
       readonly property bool hasUnread: !!(root.manager && root.manager.notifications && root.manager.notifications.count > 0)
 
       Text {
-        anchors.centerIn: parent
         color: Colors.text
         font.pixelSize: Colors.fontSizeXL
         font.family: Colors.fontMono
         text: notifBg.hasDnd ? "󰂛" : "󰂚"
       }
 
-      // Unread badge
+      // Unread badge — reparented to BarPill root so anchors work correctly
       Rectangle {
+        parent: notifBg
         width: 8
         height: 8
         radius: 4
         color: Colors.error
         anchors.top: parent.top
         anchors.right: parent.right
+        anchors.topMargin: 2
+        anchors.rightMargin: 2
         visible: notifBg.hasUnread && !notifBg.hasDnd
-      }
-
-      MouseArea {
-        id: notifMouse
-        anchors.fill: parent
-        hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        onClicked: (mouse) => {
-          notifStateLayer.burst(mouse.x, mouse.y);
-          root.notifClicked();
-        }
-      }
-
-      SharedWidgets.BarTooltip {
-        anchorItem: parent
-        anchorWindow: root.anchorWindow
-        hovered: notifMouse.containsMouse
-        text: root.manager && root.manager.dndEnabled ? "Notifications paused" : "Notifications"
+        z: 10
       }
     }
   }

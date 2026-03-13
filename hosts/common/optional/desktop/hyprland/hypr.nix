@@ -6,13 +6,11 @@
 }:
 with lib;
 let
-  hyprPluginPkgs = inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system};
   hypr-plugin-dir = pkgs.symlinkJoin {
-    name = "hyrpland-plugins";
-    paths = with hyprPluginPkgs; [
-      # hyprexpo
-      #...plugins
-    ];
+    name = "hyprland-plugins";
+    # Keep empty by default: current hyprland-plugins/hyprexpo can break
+    # against fast-moving Hyprland commits.
+    paths = [ ];
   };
 in
 

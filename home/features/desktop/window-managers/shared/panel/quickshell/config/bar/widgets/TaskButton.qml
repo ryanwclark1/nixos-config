@@ -53,48 +53,13 @@ Rectangle {
     visible: isRunning
   }
 
-  Image {
-    id: taskIcon
-    anchors.centerIn: parent; width: 20; height: 20
-    sourceSize.width: 64; sourceSize.height: 64
-    fillMode: Image.PreserveAspectFit
-    property string sourceUrl: {
-        if (!resolvedPath) return "";
-        if (resolvedPath.startsWith("/") || resolvedPath.startsWith("file://")) return resolvedPath.startsWith("file://") ? resolvedPath : "file://" + resolvedPath;
-        return resolvedPath;
-    }
-    property string resolvedPath: {
-        var cls = (appClass || "").toLowerCase();
-        var execName = (appExec || "").toLowerCase();
-        var aliases = Config.iconAliases[cls] || Config.iconAliases[execName] || [];
-        // Prefer stable alias icons before app-specific SVGs that may be broken.
-        for (var i = 0; i < aliases.length; ++i) {
-            var alias = aliases[i];
-            if (iconMap[alias]) return iconMap[alias];
-        }
-        // Try icon map from qs-icon-resolver (class, exec, various keys)
-        if (cls && iconMap[cls]) return iconMap[cls];
-        if (execName && iconMap[execName]) return iconMap[execName];
-        // Try Quickshell.iconPath as fallback
-        for (var j = 0; j < aliases.length; ++j) {
-            var p3 = Config.resolveIconPath(aliases[j]);
-            if (p3) return p3;
-        }
-        if (cls) { var p = Config.resolveIconPath(cls); if (p) return p; }
-        if (execName && execName !== cls) { var p2 = Config.resolveIconPath(execName); if (p2) return p2; }
-        return "";
-    }
-    source: sourceUrl
-    visible: status === Image.Ready && source != ""
-  }
-
-  Text {
+  SharedWidgets.AppIcon {
     anchors.centerIn: parent
-    text: "󰀻"
-    color: Colors.text
-    font.family: Colors.fontMono
-    font.pixelSize: Colors.fontSizeLarge
-    visible: !taskIcon.visible
+    iconName: taskItem.appClass || taskItem.appExec || ""
+    appName: taskItem.appName || taskItem.appClass || ""
+    iconSize: 20
+    iconMap: taskItem.iconMap
+    fallbackIcon: "󰀻"
   }
 
   SharedWidgets.StateLayer {

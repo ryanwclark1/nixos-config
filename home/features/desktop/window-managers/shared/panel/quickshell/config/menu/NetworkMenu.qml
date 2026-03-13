@@ -737,7 +737,7 @@ BasePopupMenu {
             model: root.vpns
             delegate: Rectangle {
               Layout.fillWidth: true
-              implicitHeight: 42
+              implicitHeight: 54
               radius: Colors.radiusMedium
               color: Colors.cardSurface
               border.color: Colors.border

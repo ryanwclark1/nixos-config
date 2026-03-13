@@ -2,7 +2,6 @@ import QtQuick
 import Quickshell
 import "../widgets" as SharedWidgets
 import "../services"
-import "../menu"
 
 Item {
   id: root
@@ -10,7 +9,10 @@ Item {
   implicitHeight: mainRow.height
   property var anchorWindow: null
   
-  property bool cavaPopupVisible: false
+  signal cavaClicked()
+  signal dateTimeClicked()
+  property alias cavaPill: cavaPill
+  property alias dateTimePill: dateTimePill
   property string updatesIcon: "󰚰"
   property string updatesCount: "0"
   property bool inhibitorActive: false
@@ -59,6 +61,50 @@ Item {
     spacing: Colors.spacingS
     anchors.verticalCenter: parent.verticalCenter
 
+    SystemClock {
+      id: centerClock
+      precision: Config.timeShowSeconds ? SystemClock.Seconds : SystemClock.Minutes
+    }
+
+    SharedWidgets.BarPill {
+      id: dateTimePill
+      anchorWindow: root.anchorWindow
+      tooltipText: Qt.formatDateTime(centerClock.date, "dddd, MMMM d yyyy")
+      onClicked: root.dateTimeClicked()
+
+      Row {
+        spacing: Colors.spacingXS
+
+        Text {
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeMedium
+          font.weight: Font.Bold
+          text: Qt.formatDateTime(
+            centerClock.date,
+            Config.timeUse24Hour
+              ? (Config.timeShowSeconds ? "HH:mm:ss" : "HH:mm")
+              : (Config.timeShowSeconds ? "hh:mm:ss AP" : "hh:mm AP")
+          )
+          anchors.verticalCenter: parent.verticalCenter
+        }
+
+        Text {
+          visible: Config.timeShowBarDate
+          color: Colors.textSecondary
+          font.pixelSize: Colors.fontSizeSmall
+          font.weight: Font.Medium
+          text: {
+            if (Config.timeBarDateStyle === "month_day")
+              return Qt.formatDateTime(centerClock.date, "MMM d");
+            if (Config.timeBarDateStyle === "weekday_month_day")
+              return Qt.formatDateTime(centerClock.date, "ddd MMM d");
+            return Qt.formatDateTime(centerClock.date, "ddd d");
+          }
+          anchors.verticalCenter: parent.verticalCenter
+        }
+      }
+    }
+
     SharedWidgets.MediaBar {
       anchorWindow: root.anchorWindow
     }
@@ -87,7 +133,7 @@ Item {
       tooltipText: "Audio visualizer"
       cursorShape: Qt.PointingHandCursor
       clip: true
-      onClicked: root.cavaPopupVisible = !root.cavaPopupVisible
+      onClicked: root.cavaClicked()
 
       Text {
         id: cavaText
@@ -107,52 +153,22 @@ Item {
     }
 
     // Idle Inhibitor Pill
-    Rectangle {
-      id: inhibitorPill
-      width: 32
-      height: 28
-      color: root.inhibitorActive ? Colors.withAlpha(Colors.primary, 0.2) : Colors.bgWidget
-      radius: height / 2
+    SharedWidgets.BarPill {
+      anchorWindow: root.anchorWindow
+      normalColor: root.inhibitorActive ? Colors.withAlpha(Colors.primary, 0.2) : Colors.bgWidget
+      hoverColor: root.inhibitorActive ? Colors.withAlpha(Colors.primary, 0.35) : Colors.highlightLight
+      tooltipText: root.inhibitorActive ? "Idle inhibitor enabled" : "Idle inhibitor"
       anchors.verticalCenter: parent.verticalCenter
-      border.color: root.inhibitorActive ? Colors.primary : "transparent"
-      border.width: 1
-      scale: inhibitorMouse.containsMouse ? 1.06 : 1.0
-
-      Behavior on color { ColorAnimation { duration: 160 } }
-      Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
-
-      SharedWidgets.StateLayer {
-        id: inhibitorStateLayer
-        hovered: inhibitorMouse.containsMouse
-        pressed: inhibitorMouse.pressed
+      onClicked: {
+        Quickshell.execDetached(["qs-inhibitor"]);
+        inhibitorCheckTimer.restart();
       }
 
       Text {
-        anchors.centerIn: parent
         text: "󰒲"
         color: root.inhibitorActive ? Colors.primary : Colors.text
         font.pixelSize: Colors.fontSizeXL
         font.family: Colors.fontMono
-      }
-
-      MouseArea {
-        id: inhibitorMouse
-        anchors.fill: parent
-        hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        onClicked: (mouse) => {
-          inhibitorStateLayer.burst(mouse.x, mouse.y);
-          Quickshell.execDetached(["qs-inhibitor"]);
-          // Force check update slightly later
-          inhibitorCheckTimer.restart()
-        }
-      }
-
-      SharedWidgets.BarTooltip {
-        anchorItem: inhibitorPill
-        anchorWindow: root.anchorWindow
-        hovered: inhibitorMouse.containsMouse
-        text: root.inhibitorActive ? "Idle inhibitor enabled" : "Idle inhibitor"
       }
 
       Timer {
@@ -165,27 +181,4 @@ Item {
     }
   }
 
-  CavaPopup {
-    id: cavaPopup
-    anchor.window: root.anchorWindow
-    anchor.rect.x: {
-      if (!cavaPill || !root.anchorWindow) return 0;
-      try {
-        return cavaPill.mapToItem(null, 0, 0).x + (cavaPill.width / 2) - (width / 2);
-      } catch (e) {
-        return 0;
-      }
-    }
-    anchor.rect.y: {
-      if (!cavaPill || !root.anchorWindow) return root.implicitHeight + 8;
-      try {
-        return cavaPill.mapToItem(null, 0, cavaPill.height).y + 8;
-      } catch (e) {
-        return root.implicitHeight + 8;
-      }
-    }
-    visible: root.cavaPopupVisible
-    cavaData: root.fullCavaData
-    onCloseRequested: root.cavaPopupVisible = false
-  }
 }

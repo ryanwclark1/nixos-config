@@ -30,9 +30,10 @@
       # Intel GPU environment (default is fine for Intel)
       source = ~/.config/hypr/conf/environments/default.conf
 
-      # Framework laptop typically has HiDPI display
-      # Adjust if your model differs - scaling to 1.5 for better readability
-      monitor = eDP-1, 2256x1504@60, 0x0, 1.0
+      # Framework 13 panel (2256x1504 @ 60Hz, 3:2) with comfortable HiDPI scaling.
+      # Keep both eDP-1 and eDP-2 entries for connector-name variance across boots/kernels.
+      monitor = eDP-1, 2256x1504@60, 0x0, 1.25
+      monitor = eDP-2, 2256x1504@60, 0x0, 1.25
 
       # Laptop-specific keybindings
       # bind = , XF86Launch1, exec, ags -t launcher  # Framework key

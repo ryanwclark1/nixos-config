@@ -19,6 +19,9 @@ PopupWindow {
   property color surfaceTint: "transparent"
   property int contentSpacing: 14
 
+  // ── Close signal (avoids IPC round-trip) ────
+  signal closeRequested()
+
   // ── Deferred unmapping ────────────────────────
   // Parent binds wantVisible instead of visible/showContent.
   // The popup stays mapped during fade-out, then unmaps after the delay.
@@ -49,7 +52,7 @@ PopupWindow {
     clip: true
     focus: true
 
-    Keys.onEscapePressed: Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", root.toggleMethod])
+    Keys.onEscapePressed: root.closeRequested()
 
     opacity: root.showContent ? 1.0 : 0.0
     scale: root.showContent ? 1.0 : 0.95
@@ -99,7 +102,7 @@ PopupWindow {
           spacing: Colors.spacingS
         }
 
-        SharedWidgets.MenuCloseButton { toggleMethod: root.toggleMethod }
+        SharedWidgets.MenuCloseButton { onClicked: root.closeRequested() }
       }
 
       // ── Separator ───────────────────────────

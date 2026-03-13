@@ -7,47 +7,107 @@ import "../widgets" as SharedWidgets
 
 SharedWidgets.CardBase {
   id: root
-  Layout.preferredHeight: 100
+  Layout.preferredHeight: 132
 
   property string nixUpdates: "0"
   property string flatpakUpdates: "0"
   property bool isChecking: false
+  property bool lastRunFailed: false
+  property string statusText: "Status: idle"
+  property string statusDetail: "Press Refresh to check for updates."
+  property string lastCheckedText: "Never"
+  property string lastError: ""
+  property double checkStartedAtMs: 0
+
+  readonly property int totalUpdates: (parseInt(root.nixUpdates, 10) || 0) + (parseInt(root.flatpakUpdates, 10) || 0)
 
   readonly property string cacheDir: Quickshell.env("XDG_CACHE_HOME") !== ""
     ? Quickshell.env("XDG_CACHE_HOME") + "/quickshell/updates"
     : Quickshell.env("HOME") + "/.cache/quickshell/updates"
+
+  function sanitizeCount(raw) {
+    var parsed = parseInt(String(raw || "0").trim(), 10);
+    return isNaN(parsed) || parsed < 0 ? "0" : parsed.toString();
+  }
+
+  function formatDuration(ms) {
+    var seconds = Math.max(0, Math.round(ms / 100) / 10);
+    return seconds.toFixed(1) + "s";
+  }
 
   SharedWidgets.CommandPoll {
     id: cachePoll
     interval: 3600000
     running: true
     command: ["sh", "-c",
-      "nix=$(cat '" + root.cacheDir + "/nixos' 2>/dev/null || echo 0); "
-      + "fpk=$(cat '" + root.cacheDir + "/flatpak' 2>/dev/null || echo 0); "
+      "nix=$(cat '" + root.cacheDir + "/nixos' 2>/dev/null || echo __missing__); "
+      + "fpk=$(cat '" + root.cacheDir + "/flatpak' 2>/dev/null || echo __missing__); "
       + "printf '%s\\n%s\\n' \"$nix\" \"$fpk\""
     ]
     parse: function(out) {
       var lines = (out || "").trim().split("\n");
-      return { nix: (lines[0] || "0").trim(), flatpak: (lines.length >= 2 ? lines[1] : "0").trim() };
+      return {
+        nix: root.sanitizeCount(lines[0] || "0"),
+        flatpak: root.sanitizeCount(lines.length >= 2 ? lines[1] : "0"),
+        hasCache: (lines[0] || "") !== "__missing__" || (lines.length >= 2 && (lines[1] || "") !== "__missing__")
+      };
     }
     onUpdated: {
       root.nixUpdates = cachePoll.value.nix;
       root.flatpakUpdates = cachePoll.value.flatpak;
-      root.isChecking = false;
+      if (root.isChecking) return;
+      if (root.lastRunFailed) return;
+      if (!cachePoll.value.hasCache) {
+        root.statusText = "Status: cache not initialized";
+        root.statusDetail = "Run Refresh to generate update cache files.";
+      } else if (root.totalUpdates === 0) {
+        root.statusText = "Status: system is up to date";
+        root.statusDetail = "No pending updates in tracked managers.";
+      } else {
+        root.statusText = "Status: " + root.totalUpdates + " update(s) available";
+        root.statusDetail = "NixOS: " + root.nixUpdates + "  Flatpak: " + root.flatpakUpdates;
+      }
     }
   }
 
   Process {
     id: refreshProc
     command: ["qs-updator"]
+    onStarted: {
+      root.isChecking = true;
+      root.lastRunFailed = false;
+      root.lastError = "";
+      root.checkStartedAtMs = Date.now();
+      root.statusText = "Status: checking updates...";
+      root.statusDetail = "Running qs-updator";
+    }
+    onExited: (exitCode, exitStatus) => {
+      root.isChecking = false;
+      root.lastCheckedText = Qt.formatDateTime(new Date(), "yyyy-MM-dd HH:mm:ss");
+      if (exitCode === 0) {
+        root.lastRunFailed = false;
+        root.statusText = "Status: update check finished";
+        root.statusDetail = "Completed in " + root.formatDuration(Date.now() - root.checkStartedAtMs);
+        ToastService.showSuccess(
+          "Update check complete",
+          "Total available updates: " + root.totalUpdates
+        );
+        cachePoll.poll();
+      } else {
+        root.lastRunFailed = true;
+        root.statusText = "Status: update check failed";
+        var err = (root.lastError || "").trim();
+        root.statusDetail = err.length > 0 ? err : "qs-updator exited with code " + exitCode;
+        ToastService.showError("Update check failed", root.statusDetail);
+      }
+    }
     stdout: StdioCollector {
-      onStreamFinished: cachePoll.poll()
+      onStreamFinished: {}
     }
     stderr: StdioCollector {
       onStreamFinished: {
-        if ((this.text || "").trim().length > 0)
-          console.warn("UpdateWidget: qs-updator error:", this.text.trim());
-        root.isChecking = false;
+        root.lastError = (this.text || "").trim();
+        if (root.lastError.length > 0) console.warn("UpdateWidget: qs-updator error:", root.lastError);
       }
     }
   }
@@ -84,7 +144,7 @@ SharedWidgets.CardBase {
         spacing: Colors.spacingM; Layout.fillWidth: true
         RowLayout {
           spacing: Colors.spacingXS
-          Text { text: ""; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeSmall }
+          Text { text: "󱄅"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeSmall }
           Text {
             text: root.nixUpdates
             color: Colors.fgSecondary
@@ -104,6 +164,35 @@ SharedWidgets.CardBase {
         }
         Item { Layout.fillWidth: true }
       }
+
+      Text {
+        text: root.statusText
+        color: root.lastRunFailed ? Colors.error : (root.isChecking ? Colors.info : Colors.textSecondary)
+        font.pixelSize: Colors.fontSizeXS
+        Layout.fillWidth: true
+        elide: Text.ElideRight
+      }
+      Text {
+        text: root.statusDetail
+        color: Colors.textDisabled
+        font.pixelSize: Colors.fontSizeXS
+        Layout.fillWidth: true
+        elide: Text.ElideRight
+      }
+      Text {
+        text: "Last checked: " + root.lastCheckedText
+        color: Colors.textDisabled
+        font.pixelSize: Colors.fontSizeXS
+        Layout.fillWidth: true
+        elide: Text.ElideRight
+      }
+      Text {
+        text: "TODO: add support for apt, pacman, dnf, zypper, brew."
+        color: Colors.textDisabled
+        font.pixelSize: Colors.fontSizeXS
+        Layout.fillWidth: true
+        elide: Text.ElideRight
+      }
     }
 
     Rectangle {
@@ -112,7 +201,7 @@ SharedWidgets.CardBase {
       Behavior on color { ColorAnimation { duration: 160 } }
       Text {
         anchors.centerIn: parent
-        text: root.isChecking ? "..." : "Refresh"
+        text: root.isChecking ? "Checking" : "Refresh"
         color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Bold
       }
       SharedWidgets.StateLayer {

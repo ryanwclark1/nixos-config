@@ -5,8 +5,8 @@ import "../services"
 
 PanelWindow {
   id: root
-  required property ShellScreen modelData
-  screen: modelData
+  required property ShellScreen screenModel
+  screen: screenModel
 
   anchors {
     top: true

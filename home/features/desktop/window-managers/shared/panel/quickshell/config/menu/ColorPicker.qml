@@ -202,7 +202,7 @@ PanelWindow {
         }
 
         SharedWidgets.MenuCloseButton {
-          toggleMethod: "toggleColorPicker"
+          onClicked: root.close()
         }
       }
 

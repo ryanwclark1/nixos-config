@@ -43,6 +43,8 @@
     wants = [ "network-online.target" ];
     before = [ "shutdown.target" ];
     conflicts = [ "shutdown.target" ];
+    startLimitBurst = 5;
+    startLimitIntervalSec = 60;
     serviceConfig = {
       TimeoutStopSec = "30s";
       KillMode = "mixed";
@@ -50,8 +52,6 @@
       # Add retry logic for network connectivity
       Restart = "on-failure";
       RestartSec = "5s";
-      StartLimitBurst = 5;
-      StartLimitIntervalSec = 60;
     };
   };
 }

@@ -16,8 +16,7 @@ Row {
   readonly property string pinnedPath: Quickshell.env("HOME") + "/.local/state/quickshell/pinned_apps.json"
   readonly property var defaultPinnedApps: [
     { name: "Browser", class: "google-chrome", exec: "google-chrome" },
-    { name: "Terminal", class: "com.mitchellh.ghostty", exec: "ghostty" },
-    { name: "Code", class: "cursor", exec: "cursor" }
+    { name: "Terminal", class: "com.mitchellh.ghostty", exec: "ghostty" }
   ]
 
   property FileView pinnedFile: FileView {
@@ -30,6 +29,17 @@ Row {
         root.pinnedApps = raw ? JSON.parse(raw) : [];
       } catch(e) {
         root.pinnedApps = [];
+      }
+
+      // Temporary mitigation: do not launch Cursor from Quickshell taskbar.
+      var beforeCount = root.pinnedApps.length;
+      root.pinnedApps = root.pinnedApps.filter(function(app) {
+        var appClass = (app.class || "").toLowerCase();
+        var appExec = (app.exec || "").toLowerCase();
+        return appClass !== "cursor" && appExec !== "cursor";
+      });
+      if (root.pinnedApps.length !== beforeCount) {
+        root.savePinned();
       }
 
       if (root.pinnedApps.length === 0) {

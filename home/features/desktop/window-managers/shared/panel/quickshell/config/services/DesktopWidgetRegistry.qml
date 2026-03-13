@@ -9,12 +9,49 @@ QtObject {
 
   property bool editMode: false
 
-  // Available widget catalog
-  readonly property var widgetCatalog: [
+  // Built-in widget catalog
+  readonly property var builtInWidgetCatalog: [
     { id: "Clock", name: "Clock", icon: "󰥔" },
     { id: "SystemStat", name: "System Stats", icon: "" },
     { id: "Weather", name: "Weather", icon: "󰖐" }
   ]
+
+  // Unified desktop widget catalog (built-ins + enabled desktop plugins)
+  readonly property var widgetCatalog: {
+    var result = builtInWidgetCatalog.slice();
+    var plugins = PluginService.desktopPlugins || [];
+    for (var i = 0; i < plugins.length; i++) {
+      var p = plugins[i];
+      result.push({
+        id: "plugin:" + p.id,
+        name: p.name || p.id,
+        icon: "󰖲",
+        source: "plugin",
+        pluginId: p.id
+      });
+    }
+    return result;
+  }
+
+  function pluginForWidgetType(widgetType) {
+    if (!widgetType || widgetType.indexOf("plugin:") !== 0) return null;
+    var pluginId = widgetType.slice("plugin:".length);
+    var plugins = PluginService.desktopPlugins || [];
+    for (var i = 0; i < plugins.length; i++) {
+      if (plugins[i].id === pluginId) return plugins[i];
+    }
+    return null;
+  }
+
+  function pluginSourceForWidgetType(widgetType) {
+    var plugin = pluginForWidgetType(widgetType);
+    if (!plugin) return "";
+    return (plugin.path || "") + (plugin.mainFile || "");
+  }
+
+  function isBuiltInType(widgetType) {
+    return widgetType === "Clock" || widgetType === "SystemStat" || widgetType === "Weather";
+  }
 
   function getWidgetsForScreen(screenName) {
     var monitors = Config.desktopWidgetsMonitorWidgets || [];

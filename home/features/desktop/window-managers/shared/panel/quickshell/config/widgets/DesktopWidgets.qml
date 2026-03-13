@@ -75,7 +75,9 @@ Item {
       // Load the appropriate widget component based on type
       Loader {
         active: true
+        source: DesktopWidgetRegistry.pluginSourceForWidgetType(widgetType)
         sourceComponent: {
+          if (source !== "") return undefined;
           switch (widgetType) {
             case "Clock": return clockComponent;
             case "SystemStat": return systemStatComponent;

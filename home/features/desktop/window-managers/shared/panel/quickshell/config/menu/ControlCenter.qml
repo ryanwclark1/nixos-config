@@ -29,7 +29,8 @@ PanelWindow {
     item: sidebarContent
   }
   WlrLayershell.layer: WlrLayer.Top
-  WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+  // Request keyboard only while visible to avoid retaining focus after close.
+  WlrLayershell.keyboardFocus: root.showContent ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
   WlrLayershell.namespace: "quickshell"
 
   property var manager: null
@@ -37,6 +38,12 @@ PanelWindow {
   property var pendingPowerCmd: null
   property int pendingPowerIndex: -1
   signal closeRequested()
+
+  onShowContentChanged: {
+    if (!showContent && sidebarContent.activeFocus) {
+      sidebarContent.focus = false;
+    }
+  }
 
   Timer {
     id: powerConfirmTimer
@@ -262,13 +269,26 @@ PanelWindow {
                 Layout.fillWidth: true
                 Text { text: "󰃠  BRIGHTNESS"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
                 Item { Layout.fillWidth: true }
-                Text { text: Math.round(SystemStatus.brightness * 100) + "%"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS }
+                Text {
+                  text: SystemStatus.brightnessAvailable ? Math.round(SystemStatus.brightness * 100) + "%" : "Unavailable"
+                  color: SystemStatus.brightnessAvailable ? Colors.textSecondary : Colors.warning
+                  font.pixelSize: Colors.fontSizeXS
+                }
               }
               SharedWidgets.SliderTrack {
                 Layout.fillWidth: true
                 value: SystemStatus.brightness
                 icon: "󰃠"
+                enabled: SystemStatus.brightnessAvailable
+                opacity: enabled ? 1.0 : 0.4
                 onSliderMoved: (v) => SystemStatus.setBrightness(Math.max(0.01, v))
+              }
+              Text {
+                text: SystemStatus.brightnessStatus
+                color: SystemStatus.brightnessAvailable ? Colors.success : Colors.textDisabled
+                font.pixelSize: Colors.fontSizeXS
+                Layout.fillWidth: true
+                elide: Text.ElideRight
               }
             }
 

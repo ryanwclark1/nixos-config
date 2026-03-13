@@ -57,11 +57,9 @@
     historySubstringSearch = {
       enable = true;
       searchUpKey = [
-        "^[[A"
         "^P"
       ];
       searchDownKey = [
-        "^[[B"
         "^N"
       ];
     };

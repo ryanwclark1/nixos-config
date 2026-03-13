@@ -76,6 +76,16 @@ let
     ${builtins.readFile ./scripts/icon-resolver.sh}
   '';
 
+  # Build-time theme manifest: converts 177 base24 YAML themes into a single JSON file
+  themeManifest = pkgs.runCommand "quickshell-theme-manifest" {
+    nativeBuildInputs = [ pkgs.yq-go pkgs.jq ];
+  } ''
+    mkdir -p $out
+    bash ${./scripts/generate-theme-manifest.sh} \
+      ${../../../../../tmux/plugins/tmux-forceline/themes/yaml} \
+      $out/themes.json
+  '';
+
   in
   {
   options.features.quickshell = {
@@ -163,6 +173,8 @@ EOF
       source = ./config;
       recursive = true;
     };
+
+    home.file.".config/quickshell/themes.json".source = "${themeManifest}/themes.json";
 
     home.file.".local/share/applications/org.quickshell.desktop".text = ''
       [Desktop Entry]

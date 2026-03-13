@@ -1,11 +1,10 @@
 import QtQuick
-import Quickshell
 import "../services"
 
 Rectangle {
   id: root
 
-  property string toggleMethod
+  signal clicked()
 
   width: 30
   height: 30
@@ -31,6 +30,6 @@ Rectangle {
     anchors.fill: parent
     hoverEnabled: true
     cursorShape: Qt.PointingHandCursor
-    onClicked: (mouse) => { stateLayer.burst(mouse.x, mouse.y); Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", root.toggleMethod]); }
+    onClicked: (mouse) => { stateLayer.burst(mouse.x, mouse.y); root.clicked(); }
   }
 }

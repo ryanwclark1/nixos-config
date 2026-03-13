@@ -104,10 +104,11 @@ Scope {
             anchors.centerIn: parent
             spacing: 20
 
-            IconImage {
+            AppIcon {
               Layout.alignment: Qt.AlignHCenter
-              implicitSize: 64
-              source: Quickshell.iconPath(root.isSpecial ? "view-pin-symbolic" : "desktop-symbolic") || ""
+              iconSize: 64
+              iconName: root.isSpecial ? "view-pin-symbolic" : "desktop-symbolic"
+              fallbackIcon: root.isSpecial ? "S" : "W"
             }
 
             Text {

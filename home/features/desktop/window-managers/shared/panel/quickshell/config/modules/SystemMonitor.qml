@@ -17,21 +17,14 @@ Item {
     anchors.verticalCenter: parent.verticalCenter
 
     // CPU Pill
-    Rectangle {
-      id: cpuPill
-      width: cpuRow.width + 16
-      height: 28
-      radius: height / 2
-      color: Colors.bgWidget
+    SharedWidgets.BarPill {
+      anchorWindow: root.anchorWindow
+      tooltipText: "CPU " + SystemStatus.cpuUsage + " • " + SystemStatus.cpuTemp
       anchors.verticalCenter: parent.verticalCenter
-      scale: cpuMouse.containsMouse ? 1.04 : 1.0
-
-      Behavior on scale { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+      onClicked: root.statsClicked()
 
       Row {
-        id: cpuRow
         spacing: 6
-        anchors.centerIn: parent
         Text {
           text: ""
           color: Colors.primary
@@ -47,46 +40,17 @@ Item {
           anchors.verticalCenter: parent.verticalCenter
         }
       }
-
-      SharedWidgets.StateLayer {
-        id: cpuStateLayer
-        hovered: cpuMouse.containsMouse
-        pressed: cpuMouse.pressed
-        stateColor: Colors.primary
-      }
-
-      MouseArea {
-        id: cpuMouse
-        anchors.fill: parent
-        hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        onClicked: (mouse) => { cpuStateLayer.burst(mouse.x, mouse.y); root.statsClicked(); }
-      }
-
-      SharedWidgets.BarTooltip {
-        anchorItem: cpuPill
-        anchorWindow: root.anchorWindow
-        hovered: cpuMouse.containsMouse
-        text: "CPU " + SystemStatus.cpuUsage + " • " + SystemStatus.cpuTemp
-      }
     }
 
     // Memory Pill
-    Rectangle {
-      id: ramPill
-      width: ramRow.width + 16
-      height: 28
-      radius: height / 2
-      color: Colors.bgWidget
+    SharedWidgets.BarPill {
+      anchorWindow: root.anchorWindow
+      tooltipText: "RAM " + SystemStatus.ramUsage + " • GPU " + SystemStatus.gpuUsage
       anchors.verticalCenter: parent.verticalCenter
-      scale: ramMouse.containsMouse ? 1.04 : 1.0
-
-      Behavior on scale { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+      onClicked: root.statsClicked()
 
       Row {
-        id: ramRow
         spacing: 6
-        anchors.centerIn: parent
         Text {
           text: ""
           color: Colors.accent
@@ -101,28 +65,6 @@ Item {
           font.weight: Font.DemiBold
           anchors.verticalCenter: parent.verticalCenter
         }
-      }
-
-      SharedWidgets.StateLayer {
-        id: ramStateLayer
-        hovered: ramMouse.containsMouse
-        pressed: ramMouse.pressed
-        stateColor: Colors.primary
-      }
-
-      MouseArea {
-        id: ramMouse
-        anchors.fill: parent
-        hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        onClicked: (mouse) => { ramStateLayer.burst(mouse.x, mouse.y); root.statsClicked(); }
-      }
-
-      SharedWidgets.BarTooltip {
-        anchorItem: ramPill
-        anchorWindow: root.anchorWindow
-        hovered: ramMouse.containsMouse
-        text: "RAM " + SystemStatus.ramUsage + " • GPU " + SystemStatus.gpuUsage
       }
     }
   }

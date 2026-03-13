@@ -1,0 +1,10 @@
+SettingsCard 1.0 SettingsCard.qml
+SettingsContent 1.0 SettingsContent.qml
+SettingsFieldGrid 1.0 SettingsFieldGrid.qml
+SettingsModeRow 1.0 SettingsModeRow.qml
+singleton SettingsRegistry 1.0 SettingsRegistry.qml
+SettingsSectionLabel 1.0 SettingsSectionLabel.qml
+SettingsSidebar 1.0 SettingsSidebar.qml
+SettingsSliderRow 1.0 SettingsSliderRow.qml
+SettingsTabPage 1.0 SettingsTabPage.qml
+SettingsToggleRow 1.0 SettingsToggleRow.qml

@@ -2,10 +2,10 @@
 # Generic threshold-based color/icon resolver for tmux-forceline
 # Replaces 19+ individual *_bg_color.sh, *_fg_color.sh, *_icon.sh scripts
 #
-# Usage: threshold_color.sh <module> <type> <percentage_script>
+# Usage: threshold_color.sh <module> <type> <cmd...>
 #   module: cpu, gpu, memory, graphics_memory, cpu_temp, gpu_temp
 #   type: bg, fg, icon
-#   percentage_script: path to script that outputs the current percentage
+#   cmd: command (and optional args) that outputs the current percentage
 
 set -euo pipefail
 
@@ -15,9 +15,10 @@ source "$UTILS_DIR/common.sh"
 source "$UTILS_DIR/platform.sh"
 source "$UTILS_DIR/thresholds.sh"
 
-MODULE="${1:?Usage: threshold_color.sh <module> <type> [percentage_script]}"
-TYPE="${2:?Usage: threshold_color.sh <module> <type> [percentage_script]}"
-PCT_SCRIPT="${3:-}"
+MODULE="${1:?Usage: threshold_color.sh <module> <type> [cmd...]}"
+TYPE="${2:?Usage: threshold_color.sh <module> <type> [cmd...]}"
+shift 2
+PCT_CMD=("$@")
 
 # Default color/icon tables per module
 # Format: module_type_level
@@ -89,8 +90,8 @@ get_value() {
 main() {
   # Get current percentage
   local pct
-  if [[ -n "$PCT_SCRIPT" ]] && [[ -x "$PCT_SCRIPT" ]]; then
-    pct=$("$PCT_SCRIPT" | sed -e 's/%//' -e 's/[^0-9.]//g')
+  if [[ ${#PCT_CMD[@]} -gt 0 ]] && [[ -x "${PCT_CMD[0]}" ]]; then
+    pct=$("${PCT_CMD[@]}" | sed -e 's/%//' -e 's/[^0-9.]//g')
   else
     echo "${DEFAULTS[${MODULE}_${TYPE}_low]:-}"
     return

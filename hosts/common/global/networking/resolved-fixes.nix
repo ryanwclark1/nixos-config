@@ -12,12 +12,12 @@
     wantedBy = [ "multi-user.target" "network-online.target" ];
     # Ensure it starts early in boot
     after = [ "systemd-networkd.service" ];
+    startLimitBurst = 5;
+    startLimitIntervalSec = 30;
     serviceConfig = {
       # Add retry logic for robustness
       Restart = "on-failure";
       RestartSec = "2s";
-      StartLimitBurst = 5;
-      StartLimitIntervalSec = 30;
     };
   };
 
@@ -32,14 +32,14 @@
     after = [ "systemd-resolved.service" ];
     before = [ "network-online.target" ];
     wantedBy = [ "network-online.target" ];
+    startLimitBurst = 10;
+    startLimitIntervalSec = 30;
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
       ExecStart = "${config.systemd.package}/bin/systemctl is-active systemd-resolved.service";
       Restart = "on-failure";
       RestartSec = "1s";
-      StartLimitBurst = 10;
-      StartLimitIntervalSec = 30;
     };
   };
 }

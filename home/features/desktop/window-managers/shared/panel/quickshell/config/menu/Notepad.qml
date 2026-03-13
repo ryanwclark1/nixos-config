@@ -370,7 +370,7 @@ PanelWindow {
           }
           color: Colors.textDisabled
           font.pixelSize: Colors.fontSizeXS
-          anchors.verticalCenter: parent.verticalCenter
+          Layout.alignment: Qt.AlignVCenter
           Layout.rightMargin: 4
         }
 
@@ -529,7 +529,7 @@ PanelWindow {
                     text: modelData.title
                     color: isActive ? Colors.primary : Colors.textSecondary
                     font.pixelSize: Colors.fontSizeSmall
-                    font.weight: isActive ? Font.SemiBold : Font.Normal
+                    font.weight: isActive ? Font.DemiBold : Font.Normal
                     elide: Text.ElideRight
                     visible: !tabDelegate.isEditing
                   }
@@ -544,7 +544,7 @@ PanelWindow {
                     text: modelData.title
                     color: Colors.primary
                     font.pixelSize: Colors.fontSizeSmall
-                    font.weight: Font.SemiBold
+                    font.weight: Font.DemiBold
                     visible: tabDelegate.isEditing
                     selectByMouse: true
                     onVisibleChanged: if (visible) { selectAll(); forceActiveFocus(); }

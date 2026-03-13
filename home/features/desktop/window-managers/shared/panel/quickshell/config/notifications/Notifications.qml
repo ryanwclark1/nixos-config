@@ -96,7 +96,7 @@ PanelWindow {
           to: 0.0
           duration: Config.popupTimer
           running: dismissTimer.running
-          paused: notifDelegate.isHovered
+          paused: running && notifDelegate.isHovered
         }
 
         // Progress bar at top
@@ -182,18 +182,12 @@ PanelWindow {
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: Colors.spacingM
 
-            Image {
-              width: 44; height: 44
-              source: Config.resolveIconSource(modelData.appIcon || "")
-              sourceSize: Qt.size(88, 88)
-              asynchronous: true
-              fillMode: Image.PreserveAspectFit
-              visible: modelData.appIcon !== ""
-
-              Rectangle {
-                anchors.fill: parent; color: "transparent"; visible: parent.status !== Image.Ready
-                Text { anchors.centerIn: parent; text: "󰂚"; color: Colors.text; font.pixelSize: Colors.fontSizeHuge; font.family: Colors.fontMono }
-              }
+            SharedWidgets.AppIcon {
+              iconName: modelData.appIcon || ""
+              appName: modelData.appName || ""
+              iconSize: 44
+              fallbackIcon: "󰂚"
+              visible: (modelData.appIcon || "") !== ""
             }
 
             Column {

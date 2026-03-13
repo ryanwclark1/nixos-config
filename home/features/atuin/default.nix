@@ -9,7 +9,6 @@
     enable = true;
     package = pkgs.atuin;
     flags = [
-      "--disable-up-arrow"
       "--disable-ctrl-r"
     ];
     forceOverwriteSettings = true;

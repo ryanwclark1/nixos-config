@@ -30,20 +30,10 @@
       xfce.default = [ "gtk" ];
     };
 
-    # Install additional portal backends for complete functionality
+    # Keep portal backends minimal on Hyprland to avoid duplicate DBus providers.
     extraPortals = with pkgs; [
-      # Hyprland portal (primary for Wayland)
-      inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland
-
-      # GTK portal (fallback and X11 support)
+      # GTK portal fallback for apps that do not fully support Hyprland portal.
       xdg-desktop-portal-gtk
-
-      # KDE portal (for KDE applications)
-      kdePackages.xdg-desktop-portal-kde
-
-      # Additional portals for specific functionality
-      xdg-desktop-portal-gnome # GNOME applications
-      xdg-desktop-portal-wlr # WLRoots compatibility
     ];
   };
 

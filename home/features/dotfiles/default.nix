@@ -8,7 +8,17 @@ let
   dotrepoDir = "${config.home.homeDirectory}/Code/dotfiles";
   defaultFileList = [ "starship.toml" ];
   defaultDirList = [ "atuin" "bat" "eza" "fd" "k9s" "navi" "ripgrep" "ripgrep-all" "scripts" "tealdeer" "tmux" "yazi"];
-  updatedDots = pkgs.writeShellScriptBin "update-dots" ''
+  updatedDots = pkgs.writeShellApplication {
+    name = "update-dots";
+    runtimeInputs = with pkgs; [
+      coreutils
+      diffutils
+      findutils
+      git
+      gnused
+      rsync
+    ];
+    text = ''
     set -euxo pipefail
 
     # ensure we own everything under dotrepoDir
@@ -100,7 +110,8 @@ let
     else
       echo "→ No changes to commit."
     fi
-  '';
+    '';
+  };
 
   in
 {
@@ -108,41 +119,4 @@ let
     git
     updatedDots
   ];
-
-  systemd.user.services.update-dots = {
-    Unit = {
-      Description = "Copy and commit dot config files";
-      Wants = [ "network-online.target" ];
-      After = [ "network-online.target" ];
-    };
-
-    Service = {
-      Type = "oneshot";
-      ExecStart = "${config.home.homeDirectory}/.nix-profile/bin/update-dots";
-      WorkingDirectory = "${config.home.homeDirectory}/Code/dotfiles";
-      Environment      = "HOME=${config.home.homeDirectory}";
-      StandardOutput   = "journal";
-      StandardError    = "journal";
-    };
-
-    Install = {
-      WantedBy = [ "default.target" ];
-    };
-  };
-
-  systemd.user.timers.update-dots = {
-    Unit = {
-      Description = "Run Dot Files Sync every 6 hours";
-    };
-
-    Timer = {
-      OnBootSec = "5m";
-      OnUnitActiveSec = "6h";
-      Persistent = true;
-    };
-
-    Install = {
-      WantedBy = [ "timers.target" ];
-    };
-  };
 }

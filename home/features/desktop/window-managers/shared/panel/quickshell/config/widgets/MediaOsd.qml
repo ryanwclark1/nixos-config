@@ -137,10 +137,15 @@ Scope {
               }
             }
 
-            IconImage {
+            Text {
               Layout.preferredWidth: 24
               Layout.preferredHeight: 24
-              source: Quickshell.iconPath(MediaService.isPlaying ? "media-playback-pause-symbolic" : "media-playback-start-symbolic") || ""
+              horizontalAlignment: Text.AlignHCenter
+              verticalAlignment: Text.AlignVCenter
+              text: MediaService.isPlaying ? "󰏤" : "󰐊"
+              color: Colors.text
+              font.family: Colors.fontMono
+              font.pixelSize: 18
             }
           }
         }

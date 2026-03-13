@@ -1,0 +1,15 @@
+AboutTab 1.0 AboutTab.qml
+AppearanceTab 1.0 AppearanceTab.qml
+DockTab 1.0 DockTab.qml
+HyprlandTab 1.0 HyprlandTab.qml
+HotkeysTab 1.0 HotkeysTab.qml
+LockScreenTab 1.0 LockScreenTab.qml
+OsdTab 1.0 OsdTab.qml
+PluginsTab 1.0 PluginsTab.qml
+PowerTab 1.0 PowerTab.qml
+PrivacyTab 1.0 PrivacyTab.qml
+SystemTab 1.0 SystemTab.qml
+ThemeTab 1.0 ThemeTab.qml
+TimeWeatherTab 1.0 TimeWeatherTab.qml
+WallpaperTab 1.0 WallpaperTab.qml
+WidgetsTab 1.0 WidgetsTab.qml

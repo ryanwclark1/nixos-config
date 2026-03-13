@@ -6,6 +6,9 @@
 # This provides a centralized path reference for all modules and scripts
 set -gF @forceline_dir "#{d:current_file}"
 
+# Export as environment variable so #() subprocesses inherit it
+set-environment -gF FORCELINE_DIR "#{d:current_file}"
+
 # Load options first
 source -F "#{d:current_file}/options.conf"
 

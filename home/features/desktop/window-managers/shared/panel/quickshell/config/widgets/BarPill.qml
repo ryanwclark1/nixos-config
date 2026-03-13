@@ -91,6 +91,7 @@ MouseArea {
   Item {
     id: contentContainer
     anchors.centerIn: parent
+    anchors.verticalCenterOffset: -1
     width: childrenRect.width
     height: childrenRect.height
   }
