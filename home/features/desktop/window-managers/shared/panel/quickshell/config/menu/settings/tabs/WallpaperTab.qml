@@ -14,6 +14,13 @@ Item {
     property var wallpaperMonitorNames: []
     property string wallpaperFolderInput: Config.wallpaperDefaultFolder
     property string wallpaperFolderError: ""
+    property string solidColorInput: "#000000"
+    property string solidColorError: ""
+    property bool solidPickerOpen: false
+    property real pickerHue: 0
+    property real pickerSaturation: 0
+    property real pickerValue: 0
+    property real pickerAlpha: 100
     property var _unsupportedImagePaths: ({})
 
     function isWallpaperFolderPathValid(path) {
@@ -45,6 +52,107 @@ Item {
         _unsupportedImagePaths = Object.assign({}, _unsupportedImagePaths);
     }
 
+    function _normalizeSolidColor(value) {
+        var v = (value || "").trim();
+        if (v.indexOf("#") === 0)
+            v = v.slice(1);
+        v = v.toLowerCase();
+        if (/^[0-9a-f]{6}$/.test(v))
+            return v + "ff";
+        if (/^[0-9a-f]{8}$/.test(v))
+            return v;
+        return "";
+    }
+
+    function _hex2(v) {
+        var n = Math.max(0, Math.min(255, Math.round(v)));
+        var s = n.toString(16);
+        return s.length < 2 ? "0" + s : s;
+    }
+
+    function _hsvToRgb(h, s, v) {
+        var hh = ((h % 360) + 360) % 360;
+        var ss = Math.max(0, Math.min(1, s));
+        var vv = Math.max(0, Math.min(1, v));
+        var c = vv * ss;
+        var x = c * (1 - Math.abs((hh / 60) % 2 - 1));
+        var m = vv - c;
+        var rp = 0, gp = 0, bp = 0;
+        if (hh < 60) { rp = c; gp = x; bp = 0; }
+        else if (hh < 120) { rp = x; gp = c; bp = 0; }
+        else if (hh < 180) { rp = 0; gp = c; bp = x; }
+        else if (hh < 240) { rp = 0; gp = x; bp = c; }
+        else if (hh < 300) { rp = x; gp = 0; bp = c; }
+        else { rp = c; gp = 0; bp = x; }
+        return {
+            r: Math.round((rp + m) * 255),
+            g: Math.round((gp + m) * 255),
+            b: Math.round((bp + m) * 255)
+        };
+    }
+
+    function _rgbToHsv(r, g, b) {
+        var rr = Math.max(0, Math.min(255, r)) / 255;
+        var gg = Math.max(0, Math.min(255, g)) / 255;
+        var bb = Math.max(0, Math.min(255, b)) / 255;
+        var maxv = Math.max(rr, gg, bb);
+        var minv = Math.min(rr, gg, bb);
+        var d = maxv - minv;
+        var h = 0;
+        if (d !== 0) {
+            if (maxv === rr) h = 60 * (((gg - bb) / d) % 6);
+            else if (maxv === gg) h = 60 * (((bb - rr) / d) + 2);
+            else h = 60 * (((rr - gg) / d) + 4);
+        }
+        if (h < 0) h += 360;
+        var s = maxv === 0 ? 0 : d / maxv;
+        var v = maxv;
+        return { h: h, s: s, v: v };
+    }
+
+    function _pickerHex() {
+        var rgb = _hsvToRgb(pickerHue, pickerSaturation / 100, pickerValue / 100);
+        var a = Math.round(Math.max(0, Math.min(100, pickerAlpha)) * 2.55);
+        return _hex2(rgb.r) + _hex2(rgb.g) + _hex2(rgb.b) + _hex2(a);
+    }
+
+    function openSolidPicker() {
+        var normalized = _normalizeSolidColor(solidColorInput);
+        if (!normalized)
+            normalized = Config.wallpaperSolidColor || "000000ff";
+        var r = parseInt(normalized.slice(0, 2), 16);
+        var g = parseInt(normalized.slice(2, 4), 16);
+        var b = parseInt(normalized.slice(4, 6), 16);
+        var a = parseInt(normalized.slice(6, 8), 16);
+        var hsv = _rgbToHsv(r, g, b);
+        pickerHue = hsv.h;
+        pickerSaturation = hsv.s * 100;
+        pickerValue = hsv.v * 100;
+        pickerAlpha = a / 2.55;
+        solidPickerOpen = true;
+    }
+
+    function applyPickerColor() {
+        var hex = _pickerHex();
+        solidColorInput = "#" + hex.slice(0, 6);
+        solidColorError = "";
+        var mon = root.wallpaperSelectedMonitor === "__all__" ? "" : root.wallpaperSelectedMonitor;
+        WallpaperService.setSolidColor(hex, mon);
+        solidPickerOpen = false;
+    }
+
+    function applySolidColor() {
+        var normalized = _normalizeSolidColor(solidColorInput);
+        if (!normalized) {
+            solidColorError = "Use #RRGGBB or #RRGGBBAA.";
+            return;
+        }
+        solidColorError = "";
+        solidColorInput = "#" + normalized.slice(0, 6);
+        var mon = root.wallpaperSelectedMonitor === "__all__" ? "" : root.wallpaperSelectedMonitor;
+        WallpaperService.setSolidColor(normalized, mon);
+    }
+
     Process {
         id: wallpaperMonProc
         command: ["hyprctl", "monitors", "-j"]
@@ -73,6 +181,7 @@ Item {
             wallpaperMonProc.running = true;
         if (WallpaperService.availableWallpapers.length === 0)
             WallpaperService.scanWallpapers();
+        root.solidColorInput = "#" + (Config.wallpaperSolidColor || "000000ff").slice(0, 6);
     }
 
     Connections {
@@ -80,6 +189,10 @@ Item {
         function onWallpaperDefaultFolderChanged() {
             root.wallpaperFolderInput = Config.wallpaperDefaultFolder;
             root.wallpaperFolderError = "";
+        }
+        function onWallpaperSolidColorChanged() {
+            var hex = Config.wallpaperSolidColor || "000000ff";
+            root.solidColorInput = "#" + hex.slice(0, 6);
         }
     }
 
@@ -140,6 +253,8 @@ Item {
                 var key = root.wallpaperSelectedMonitor || "__all__";
                 return WallpaperService.wallpapers[key] || WallpaperService.wallpapers["__all__"] || "";
             }
+            readonly property bool solidPreview: WallpaperService.solidColorActive && previewPath === ""
+            readonly property string solidHex: WallpaperService.solidColorHex || "000000ff"
 
             property bool _previewFlip: false
 
@@ -212,7 +327,8 @@ Item {
             ColumnLayout {
                 anchors.centerIn: parent
                 spacing: Colors.spacingS
-                visible: previewContainer.previewPath === "" || (previewA.status !== Image.Ready && previewB.status !== Image.Ready)
+                visible: !previewContainer.solidPreview
+                    && (previewContainer.previewPath === "" || (previewA.status !== Image.Ready && previewB.status !== Image.Ready))
 
                 Text {
                     text: "󰸉"
@@ -230,12 +346,31 @@ Item {
             }
 
             Rectangle {
+                anchors.centerIn: parent
+                visible: previewContainer.solidPreview
+                width: 220
+                height: 96
+                radius: Colors.radiusMedium
+                color: "#" + previewContainer.solidHex.slice(0, 6)
+                border.color: Colors.border
+                border.width: 1
+
+                Text {
+                    anchors.centerIn: parent
+                    text: "Solid #" + previewContainer.solidHex.slice(0, 6).toUpperCase()
+                    color: Colors.text
+                    font.pixelSize: Colors.fontSizeMedium
+                    font.weight: Font.Medium
+                }
+            }
+
+            Rectangle {
                 anchors {
                     bottom: parent.bottom
                     right: parent.right
                     margins: Colors.spacingM
                 }
-                visible: previewContainer.previewPath !== ""
+                visible: previewContainer.previewPath !== "" || previewContainer.solidPreview
                 implicitWidth: previewName.implicitWidth + 16
                 height: 22
                 radius: Colors.radiusPill
@@ -246,6 +381,8 @@ Item {
                     anchors.centerIn: parent
                     text: {
                         var p = previewContainer.previewPath;
+                        if (previewContainer.solidPreview)
+                            return "Solid #" + previewContainer.solidHex.slice(0, 6).toUpperCase();
                         if (!p)
                             return "";
                         var parts = p.split("/");
@@ -278,14 +415,9 @@ Item {
                         action: "random"
                     },
                     {
-                        icon: "󰝰",
-                        label: "Open Folder",
-                        action: "folder"
-                    },
-                    {
                         icon: "󰝤",
-                        label: "Black",
-                        action: "black"
+                        label: "Solid",
+                        action: "solid"
                     },
                     {
                         icon: "󰉋",
@@ -304,10 +436,10 @@ Item {
                             WallpaperService.nextWallpaper(mon);
                         else if (modelData.action === "random")
                             WallpaperService.randomWallpaper(mon);
-                        else if (modelData.action === "folder")
-                            WallpaperService.openWallpaperFolder();
-                        else if (modelData.action === "black")
-                            WallpaperService.setSolidColor("000000ff", mon);
+                        else if (modelData.action === "solid") {
+                            var quickHex = root._normalizeSolidColor(root.solidColorInput);
+                            WallpaperService.setSolidColor(quickHex || "000000ff", mon);
+                        }
                         else if (modelData.action === "browse" && root.settingsRoot)
                             root.settingsRoot.browseWallpaper(mon);
                     }
@@ -349,12 +481,74 @@ Item {
                         root.settingsRoot.pickWallpaperFolder()
                 }
             }
+
+            SettingsTextInputRow {
+                Layout.fillWidth: true
+                label: "Solid color"
+                placeholderText: "#000000"
+                leadingIcon: "󰝤"
+                text: root.solidColorInput
+                errorText: root.solidColorError
+                onTextEdited: value => root.solidColorInput = value
+                onSubmitted: root.applySolidColor()
+
+                SettingsActionButton {
+                    label: "Apply Solid"
+                    compact: true
+                    emphasized: true
+                    onClicked: root.applySolidColor()
+                }
+
+                SettingsActionButton {
+                    label: "Pick"
+                    compact: true
+                    onClicked: root.openSolidPicker()
+                }
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: Colors.spacingS
+
+                Repeater {
+                    model: [
+                        "000000", "111827", "1f2937", "374151",
+                        "ef4444", "f59e0b", "22c55e", "3b82f6", "8b5cf6"
+                    ]
+
+                    delegate: Rectangle {
+                        required property string modelData
+                        width: 24
+                        height: 24
+                        radius: 6
+                        color: "#" + modelData
+                        border.color: Colors.border
+                        border.width: 1
+
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                root.solidColorInput = "#" + modelData;
+                                root.applySolidColor();
+                            }
+                        }
+                    }
+                }
+            }
         }
 
-        SettingsFieldGrid {
-            SettingsToggleRow {
-                visible: !Config.themeName
-                label: "Run pywal on change"
+            SettingsFieldGrid {
+                SettingsToggleRow {
+                    label: "Use solid color on startup"
+                    icon: "󰝤"
+                    configKey: "wallpaperUseSolidOnStartup"
+                }
+
+                SettingsToggleRow {
+                    visible: !Config.themeName
+                    label: "Run pywal on change"
                 icon: "󰏘"
                 configKey: "wallpaperRunPywal"
             }
@@ -687,6 +881,123 @@ Item {
                     font.family: Colors.fontMono
                     Layout.fillWidth: true
                     elide: Text.ElideLeft
+                }
+            }
+        }
+    }
+
+    Rectangle {
+        anchors.fill: parent
+        visible: root.solidPickerOpen
+        color: Qt.rgba(0, 0, 0, 0.45)
+        z: 2000
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: root.solidPickerOpen = false
+        }
+
+        Rectangle {
+            width: Math.min(parent.width - 60, 560)
+            color: Colors.bgGlass
+            border.color: Colors.border
+            border.width: 1
+            radius: Colors.radiusLarge
+            anchors.centerIn: parent
+
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.margins: Colors.spacingL
+                spacing: Colors.spacingM
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    Text {
+                        text: "Solid Color Picker"
+                        color: Colors.text
+                        font.pixelSize: Colors.fontSizeLarge
+                        font.weight: Font.DemiBold
+                    }
+                    Item { Layout.fillWidth: true }
+                    SettingsActionButton {
+                        label: "Close"
+                        compact: true
+                        onClicked: root.solidPickerOpen = false
+                    }
+                }
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    height: 52
+                    radius: Colors.radiusMedium
+                    color: "#" + root._pickerHex().slice(0, 6)
+                    border.color: Colors.border
+                    border.width: 1
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "#" + root._pickerHex().toUpperCase()
+                        color: Colors.text
+                        font.pixelSize: Colors.fontSizeMedium
+                        font.family: Colors.fontMono
+                        font.weight: Font.Medium
+                    }
+                }
+
+                SettingsSliderRow {
+                    label: "Hue"
+                    min: 0
+                    max: 360
+                    step: 1
+                    unit: ""
+                    value: root.pickerHue
+                    onMoved: v => root.pickerHue = v
+                }
+
+                SettingsSliderRow {
+                    label: "Saturation"
+                    min: 0
+                    max: 100
+                    step: 1
+                    unit: "%"
+                    value: root.pickerSaturation
+                    onMoved: v => root.pickerSaturation = v
+                }
+
+                SettingsSliderRow {
+                    label: "Brightness"
+                    min: 0
+                    max: 100
+                    step: 1
+                    unit: "%"
+                    value: root.pickerValue
+                    onMoved: v => root.pickerValue = v
+                }
+
+                SettingsSliderRow {
+                    label: "Alpha"
+                    min: 0
+                    max: 100
+                    step: 1
+                    unit: "%"
+                    value: root.pickerAlpha
+                    onMoved: v => root.pickerAlpha = v
+                }
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    Item { Layout.fillWidth: true }
+                    SettingsActionButton {
+                        label: "Cancel"
+                        compact: true
+                        onClicked: root.solidPickerOpen = false
+                    }
+                    SettingsActionButton {
+                        label: "Apply Color"
+                        compact: true
+                        emphasized: true
+                        onClicked: root.applyPickerColor()
+                    }
                 }
             }
         }

@@ -56,6 +56,14 @@ PanelWindow {
   property var _commandCheckProcs: ({})
   property var _commandWaiters: ({})
   property var mediaPlayers: []
+  property var preloadFailureState: ({})
+  property var launcherMetrics: ({
+    opens: 0,
+    cacheHits: 0,
+    cacheMisses: 0,
+    commandFailures: 0,
+    perMode: ({})
+  })
 
   function refreshMediaPlayers() { mediaPlayers = MediaService.getAvailablePlayers(); }
 
@@ -68,6 +76,7 @@ PanelWindow {
 
   readonly property bool showLauncherHome: Config.launcherShowHomeSections && searchText === "" && (mode === "drun" || mode === "system" || mode === "files")
   readonly property var allKnownModes: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
+  readonly property var transientModes: ["dmenu"]
   readonly property var defaultModeOrder: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
   readonly property var defaultPrimaryModes: ["drun", "window", "files", "ai", "clip", "system", "media"]
   property var modeOrder: computeModeOrder()
@@ -246,6 +255,7 @@ PanelWindow {
     Process {
       id: _preloadProc
       property string _modeKey: ""
+      property int _startedAt: 0
       running: false
       stdout: StdioCollector {
         onStreamFinished: {
@@ -354,7 +364,7 @@ PanelWindow {
   }
 
   function supportsMode(modeKey) {
-    return modeOrder.indexOf(modeKey) !== -1;
+    return modeOrder.indexOf(modeKey) !== -1 || transientModes.indexOf(modeKey) !== -1;
   }
 
   function effectiveDefaultMode() {
@@ -453,14 +463,15 @@ PanelWindow {
     var pending = deps.length;
     var failed = "";
     for (var i = 0; i < deps.length; ++i) {
-      var dep = deps[i];
-      checkCommandAvailable(dep, function(ok) {
+      (function(depName) {
+        checkCommandAvailable(depName, function(ok) {
         if (!ok && failed === "")
-          failed = dep;
+          failed = depName;
         pending--;
         if (pending === 0)
           onReady(failed === "", failed);
       });
+      })(deps[i]);
     }
   }
 
@@ -527,6 +538,89 @@ PanelWindow {
   function clearCaches() {
     modeCache = ({});
     modeCacheTime = ({});
+  }
+
+  function modeMetric(modeKey) {
+    var perMode = launcherMetrics.perMode || ({});
+    return perMode[modeKey] || ({
+      loads: 0,
+      cacheHits: 0,
+      cacheMisses: 0,
+      failures: 0,
+      lastLoadMs: 0,
+      avgLoadMs: 0
+    });
+  }
+
+  function clearLauncherMetrics() {
+    launcherMetrics = ({
+      opens: 0,
+      cacheHits: 0,
+      cacheMisses: 0,
+      commandFailures: 0,
+      perMode: ({})
+    });
+  }
+
+  function recordLoadMetric(modeKey, durationMs, cacheHit, success) {
+    var next = Object.assign({}, launcherMetrics);
+    if (!next.perMode)
+      next.perMode = ({});
+    var current = Object.assign({
+      loads: 0,
+      cacheHits: 0,
+      cacheMisses: 0,
+      failures: 0,
+      lastLoadMs: 0,
+      avgLoadMs: 0
+    }, next.perMode[modeKey] || ({}));
+
+    current.loads += 1;
+    if (cacheHit) {
+      current.cacheHits += 1;
+      next.cacheHits = (next.cacheHits || 0) + 1;
+    } else {
+      current.cacheMisses += 1;
+      next.cacheMisses = (next.cacheMisses || 0) + 1;
+    }
+    if (!success) {
+      current.failures += 1;
+      next.commandFailures = (next.commandFailures || 0) + 1;
+    }
+
+    var clampedDuration = Math.max(0, Math.round(durationMs || 0));
+    current.lastLoadMs = clampedDuration;
+    current.avgLoadMs = Math.round((((current.avgLoadMs || 0) * (current.loads - 1)) + clampedDuration) / current.loads);
+    next.perMode[modeKey] = current;
+    launcherMetrics = next;
+  }
+
+  function shouldBackoffPreload(modeKey) {
+    var state = preloadFailureState[modeKey];
+    if (!state)
+      return false;
+    var threshold = Math.max(1, Config.launcherPreloadFailureThreshold);
+    if ((state.failures || 0) < threshold)
+      return false;
+    var backoffMs = Math.max(10, Config.launcherPreloadFailureBackoffSec) * 1000;
+    return (Date.now() - (state.lastFailure || 0)) < backoffMs;
+  }
+
+  function markPreloadFailure(modeKey) {
+    var next = Object.assign({}, preloadFailureState);
+    var current = Object.assign({ failures: 0, lastFailure: 0 }, next[modeKey] || ({}));
+    current.failures += 1;
+    current.lastFailure = Date.now();
+    next[modeKey] = current;
+    preloadFailureState = next;
+  }
+
+  function markPreloadSuccess(modeKey) {
+    if (!preloadFailureState[modeKey])
+      return;
+    var next = Object.assign({}, preloadFailureState);
+    delete next[modeKey];
+    preloadFailureState = next;
   }
 
   function saveFrequency() { freqFile.setText(JSON.stringify(appFrequency)); }
@@ -633,6 +727,10 @@ PanelWindow {
   function open(newMode, keepSearch) {
     var startedAt = telemetryStart();
     if (showingConfirm) cancelConfirm();
+    var nextMetrics = Object.assign({}, launcherMetrics);
+    nextMetrics.opens = (nextMetrics.opens || 0) + 1;
+    if (!nextMetrics.perMode) nextMetrics.perMode = ({});
+    launcherMetrics = nextMetrics;
     openCount++;
     if (openCount % 10 === 0) clearCaches();
     ignoreMouseHover = true;
@@ -735,10 +833,12 @@ PanelWindow {
   }
 
   function loadCached(modeKey, command, parseFunc) {
+    var startedAt = Date.now();
     var cached = getCached(modeKey);
     if (cached) {
       allItems = cached;
       filterItems();
+      recordLoadMetric(modeKey, 0, true, true);
       return;
     }
     // If a preload is already running for this mode, wait for it
@@ -759,12 +859,14 @@ PanelWindow {
         if (!Array.isArray(items))
           items = [];
         setCached(modeKey, items);
+        recordLoadMetric(modeKey, Date.now() - startedAt, false, true);
         if (mode === modeKey) {
           allItems = items;
           filterItems();
           buildLauncherHome();
         }
       } catch (e) {
+        recordLoadMetric(modeKey, Date.now() - startedAt, false, false);
         if (mode === modeKey)
           setModeHint("Failed to load " + modeInfo(modeKey).label, "Check helper command output and logs.", "󰅚");
       }
@@ -816,7 +918,7 @@ PanelWindow {
     var keys = Object.keys(preloadModes);
     for (var i = 0; i < keys.length; i++) {
       var key = keys[i];
-      if (key !== mode && !getCached(key) && !_preloadProcs[key]) {
+      if (key !== mode && !shouldBackoffPreload(key) && !getCached(key) && !_preloadProcs[key]) {
         _spawnPreload(key);
       }
     }
@@ -825,6 +927,7 @@ PanelWindow {
   function _spawnPreload(key) {
     var proc = preloadProcComponent.createObject(launcherRoot);
     proc._modeKey = key;
+    proc._startedAt = Date.now();
     proc.command = preloadModes[key].command;
     _preloadProcs[key] = proc;
     proc.running = true;
@@ -832,8 +935,20 @@ PanelWindow {
 
   function _handlePreloadDone(proc, raw) {
     var key = proc._modeKey;
+    var tookMs = Math.max(0, Date.now() - (proc._startedAt || Date.now()));
+    var ok = false;
     if (raw && key && preloadModes[key]) {
-      try { setCached(key, preloadModes[key].parse(raw)); } catch (e) {}
+      try {
+        setCached(key, preloadModes[key].parse(raw));
+        ok = true;
+      } catch (e) {}
+    }
+    if (ok) {
+      markPreloadSuccess(key);
+      recordLoadMetric(key, tookMs, false, true);
+    } else {
+      markPreloadFailure(key);
+      recordLoadMetric(key, tookMs, false, false);
     }
     delete _preloadProcs[key];
     proc.destroy();
@@ -852,6 +967,7 @@ PanelWindow {
       return;
     }
     var token = beginRequest("files");
+    var startedAt = Date.now();
     var homeDir = Quickshell.env("HOME") || "/";
     var maxResults = Math.max(20, Config.launcherFileMaxResults);
     var script = "if command -v fd >/dev/null 2>&1; then "
@@ -872,6 +988,7 @@ PanelWindow {
       }
       allItems = items;
       filterItems();
+      recordLoadMetric("files", Date.now() - startedAt, false, true);
     });
   }
 
@@ -885,6 +1002,7 @@ PanelWindow {
     allItems = [{ name: "Thinking...", isHint: true, icon: "󰚩" }];
     filterItems();
     var token = beginRequest("ai");
+    var startedAt = Date.now();
     runCommand(["qs-ai", query], function(raw) {
       if (!isRequestCurrent("ai", token))
         return;
@@ -892,6 +1010,7 @@ PanelWindow {
       if (raw) allItems = [{ name: "AI Response", title: "Click to copy response", body: raw, icon: "󰚩" }];
       else allItems = [];
       filterItems();
+      recordLoadMetric("ai", Date.now() - startedAt, false, true);
     });
   }
 
@@ -1190,6 +1309,7 @@ PanelWindow {
       launcherRoot.allItems = items.map(function(it) { return { name: it, title: it }; });
       launcherRoot.open("dmenu");
     }
+    function clearMetrics() { launcherRoot.clearLauncherMetrics(); }
     function toggle() { if (launcherRoot.launcherOpacity > 0) launcherRoot.close(); else launcherRoot.open(launcherRoot.effectiveDefaultMode()); }
   }
 
@@ -1401,6 +1521,71 @@ PanelWindow {
           visible: Config.launcherShowModeHints && launcherRoot.showLauncherHome
           Text { Layout.fillWidth: true; text: launcherRoot.modeInfo(launcherRoot.mode).hint; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; elide: Text.ElideRight }
           Text { text: "Balanced keyboard + mouse flow"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS }
+        }
+
+        Rectangle {
+          Layout.fillWidth: true
+          visible: Config.launcherShowRuntimeMetrics
+          color: Colors.bgWidget
+          radius: Colors.radiusMedium
+          border.color: Colors.border
+          border.width: 1
+          implicitHeight: 74
+
+          RowLayout {
+            anchors.fill: parent
+            anchors.margins: Colors.spacingM
+            spacing: Colors.spacingM
+
+            ColumnLayout {
+              Layout.fillWidth: true
+              spacing: 2
+              Text { text: "Launcher Metrics"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.DemiBold }
+              Text {
+                text: "opens " + launcherRoot.launcherMetrics.opens
+                  + " • cache " + launcherRoot.launcherMetrics.cacheHits + "/" + launcherRoot.launcherMetrics.cacheMisses
+                  + " • failures " + launcherRoot.launcherMetrics.commandFailures
+                color: Colors.textSecondary
+                font.pixelSize: Colors.fontSizeXS
+                elide: Text.ElideRight
+              }
+              Text {
+                readonly property var modeStats: launcherRoot.modeMetric(launcherRoot.mode)
+                text: launcherRoot.modeInfo(launcherRoot.mode).label
+                  + ": avg " + modeStats.avgLoadMs + "ms"
+                  + " • last " + modeStats.lastLoadMs + "ms"
+                  + " • failures " + modeStats.failures
+                color: Colors.textSecondary
+                font.pixelSize: Colors.fontSizeXS
+                elide: Text.ElideRight
+              }
+            }
+
+            Rectangle {
+              radius: Colors.radiusPill
+              color: Colors.surface
+              border.color: Colors.border
+              border.width: 1
+              implicitHeight: 28
+              implicitWidth: metricResetText.implicitWidth + 18
+
+              Text {
+                id: metricResetText
+                anchors.centerIn: parent
+                text: "Reset"
+                color: Colors.text
+                font.pixelSize: Colors.fontSizeXS
+                font.weight: Font.DemiBold
+              }
+
+              MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: launcherRoot.clearLauncherMetrics()
+              }
+            }
+          }
         }
 
         Rectangle {

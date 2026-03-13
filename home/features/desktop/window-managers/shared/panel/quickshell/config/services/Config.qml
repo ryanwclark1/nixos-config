@@ -44,6 +44,9 @@ QtObject {
   property bool launcherEnablePreload: true
   property bool launcherKeepSearchOnModeSwitch: true
   property bool launcherEnableDebugTimings: false
+  property bool launcherShowRuntimeMetrics: false
+  property int launcherPreloadFailureThreshold: 3
+  property int launcherPreloadFailureBackoffSec: 120
   property int launcherMaxResults: 80
   property int launcherFileMinQueryLength: 2
   property int launcherFileMaxResults: 100
@@ -111,6 +114,8 @@ QtObject {
   property var wallpaperPaths: ({})
   property int wallpaperCycleInterval: 0
   property string wallpaperDefaultFolder: (Quickshell.env("HOME") || "/home") + "/Pictures"
+  property string wallpaperSolidColor: "000000ff"
+  property bool wallpaperUseSolidOnStartup: false
 
   // --- THEME ---
   property string themeName: ""
@@ -266,6 +271,9 @@ QtObject {
     launcherEnablePreload = _asBool(launcher.enablePreload, true);
     launcherKeepSearchOnModeSwitch = _asBool(launcher.keepSearchOnModeSwitch, true);
     launcherEnableDebugTimings = _asBool(launcher.enableDebugTimings, false);
+    launcherShowRuntimeMetrics = _asBool(launcher.showRuntimeMetrics, false);
+    launcherPreloadFailureThreshold = _clampInt(launcher.preloadFailureThreshold, 1, 10, 3);
+    launcherPreloadFailureBackoffSec = _clampInt(launcher.preloadFailureBackoffSec, 10, 900, 120);
 
     launcherMaxResults = _clampInt(launcher.maxResults, 20, 400, 80);
     launcherFileMinQueryLength = _clampInt(launcher.fileMinQueryLength, 1, 8, 2);
@@ -768,11 +776,24 @@ QtObject {
     return barConfig.position === dockPosition;
   }
 
-  function dockHasConflict() {
-    if (!dockEnabled) return false;
+  function dockConflictsOnScreen(screen, positionOverride) {
+    if (!dockEnabled || !screen) return false;
+    var edge = isValidEdge(positionOverride) ? positionOverride : dockPosition;
     var bars = barConfigs || [];
     for (var i = 0; i < bars.length; ++i) {
-      if (dockConflictsWithBar(bars[i])) return true;
+      var barConfig = bars[i];
+      if (!barConfig.enabled) continue;
+      if (barConfig.position !== edge) continue;
+      if (barEnabledOnScreen(barConfig, screen)) return true;
+    }
+    return false;
+  }
+
+  function dockHasConflict() {
+    if (!dockEnabled) return false;
+    var screens = allScreens();
+    for (var i = 0; i < screens.length; ++i) {
+      if (dockConflictsOnScreen(screens[i])) return true;
     }
     return false;
   }
@@ -810,7 +831,7 @@ QtObject {
       reserved[barConfig.position] += barThickness(barConfig) + floatingInset(barConfig) + popupGap;
     }
 
-    if (dockEnabled)
+    if (dockEnabled && !dockConflictsOnScreen(screen))
       reserved[dockPosition] += dockIconSize + 32;
 
     return reserved;
@@ -887,6 +908,9 @@ QtObject {
   onLauncherEnablePreloadChanged: scheduleSave()
   onLauncherKeepSearchOnModeSwitchChanged: scheduleSave()
   onLauncherEnableDebugTimingsChanged: scheduleSave()
+  onLauncherShowRuntimeMetricsChanged: scheduleSave()
+  onLauncherPreloadFailureThresholdChanged: scheduleSave()
+  onLauncherPreloadFailureBackoffSecChanged: scheduleSave()
   onLauncherMaxResultsChanged: scheduleSave()
   onLauncherFileMinQueryLengthChanged: scheduleSave()
   onLauncherFileMaxResultsChanged: scheduleSave()
@@ -934,6 +958,8 @@ QtObject {
   onWallpaperPathsChanged: scheduleSave()
   onWallpaperCycleIntervalChanged: scheduleSave()
   onWallpaperDefaultFolderChanged: scheduleSave()
+  onWallpaperSolidColorChanged: scheduleSave()
+  onWallpaperUseSolidOnStartupChanged: scheduleSave()
 
   function load() {
     var raw = configFile.text();
@@ -1063,6 +1089,8 @@ QtObject {
         if (data.wallpaper.paths !== undefined) wallpaperPaths = data.wallpaper.paths;
         if (data.wallpaper.cycleInterval !== undefined) wallpaperCycleInterval = data.wallpaper.cycleInterval;
         if (data.wallpaper.defaultFolder !== undefined) wallpaperDefaultFolder = data.wallpaper.defaultFolder;
+        if (data.wallpaper.solidColor !== undefined) wallpaperSolidColor = data.wallpaper.solidColor;
+        if (data.wallpaper.useSolidOnStartup !== undefined) wallpaperUseSolidOnStartup = data.wallpaper.useSolidOnStartup;
       }
     } catch (e) {
       console.error("Failed to load config: " + e);
@@ -1134,6 +1162,9 @@ QtObject {
         "enablePreload": launcherEnablePreload,
         "keepSearchOnModeSwitch": launcherKeepSearchOnModeSwitch,
         "enableDebugTimings": launcherEnableDebugTimings,
+        "showRuntimeMetrics": launcherShowRuntimeMetrics,
+        "preloadFailureThreshold": launcherPreloadFailureThreshold,
+        "preloadFailureBackoffSec": launcherPreloadFailureBackoffSec,
         "maxResults": launcherMaxResults,
         "fileMinQueryLength": launcherFileMinQueryLength,
         "fileMaxResults": launcherFileMaxResults,
@@ -1206,7 +1237,9 @@ QtObject {
         "runPywal": wallpaperRunPywal,
         "paths": wallpaperPaths,
         "cycleInterval": wallpaperCycleInterval,
-        "defaultFolder": wallpaperDefaultFolder
+        "defaultFolder": wallpaperDefaultFolder,
+        "solidColor": wallpaperSolidColor,
+        "useSolidOnStartup": wallpaperUseSolidOnStartup
       }
     };
 

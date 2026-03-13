@@ -28,6 +28,8 @@ QtObject {
 
   // True while a directory scan is in progress.
   property bool scanning: false
+  property bool solidColorActive: false
+  property string solidColorHex: "000000ff"
   property string _applyImagePath: ""
   property string _applyMonitorName: ""
   property string _applyStdout: ""
@@ -39,7 +41,7 @@ QtObject {
 
   // Primary wallpaper directory shown in the UI (default: Pictures).
   // The service always scans *all* wallpaperSearchDirs; this is just the folder
-  // opened by the "Open Folder" button.
+  // used by wallpaper selection workflows.
   readonly property string wallpaperDir: normalizedWallpaperDir(Config.wallpaperDefaultFolder)
 
   // Ordered list of directories to scan.
@@ -118,16 +120,13 @@ QtObject {
     setWallpaper(availableWallpapers[idx].path, monitorName);
   }
 
-  // Open the primary wallpaper directory in the default file manager.
-  function openWallpaperFolder() {
-    Quickshell.execDetached(["xdg-open", wallpaperDir]);
-  }
-
   // Apply a solid color background via swww.
-  function setSolidColor(colorHex, monitorName) {
+  function setSolidColor(colorHex, monitorName, persistSetting) {
     if (applyProc.running || colorApplyProc.running) return;
     _colorHex = (colorHex || "000000ff").replace(/^#/, "");
     _colorMonitorName = monitorName || "";
+    if (persistSetting === undefined || persistSetting)
+      Config.wallpaperSolidColor = _colorHex;
     _colorApplyStderr = "";
     colorApplyProc.command = ["sh", "-c", _buildSolidColorScript(_colorHex, _colorMonitorName)];
     colorApplyProc.running = true;
@@ -197,6 +196,7 @@ QtObject {
     onExited: (exitCode, exitStatus) => {
       var key = root._applyMonitorName || "__all__";
       if (exitCode === 0) {
+        root.solidColorActive = false;
         var updated = Object.assign({}, root.wallpapers);
         updated[key] = root._applyImagePath;
         root.wallpapers = updated;
@@ -252,6 +252,13 @@ QtObject {
         ToastService.showError("Solid color failed", "Could not apply solid color wallpaper.");
         return;
       }
+      var key = root._colorMonitorName || "__all__";
+      var updated = Object.assign({}, root.wallpapers);
+      delete updated[key];
+      root.wallpapers = updated;
+      Config.wallpaperPaths = Object.assign({}, root.wallpapers);
+      root.solidColorHex = root._colorHex;
+      root.solidColorActive = true;
       console.log("WallpaperService: applied solid color", root._colorHex, "monitor", root._colorMonitorName || "__all__");
       ToastService.showSuccess("Solid color applied", "#" + root._colorHex.slice(0, 6));
     }
@@ -269,6 +276,9 @@ QtObject {
     if (Config.wallpaperPaths && typeof Config.wallpaperPaths === "object") {
       wallpapers = Object.assign({}, Config.wallpaperPaths);
     }
+    solidColorHex = Config.wallpaperSolidColor || "000000ff";
+    if (Config.wallpaperUseSolidOnStartup)
+      setSolidColor(solidColorHex, "", false);
     scanWallpapers();
   }
 

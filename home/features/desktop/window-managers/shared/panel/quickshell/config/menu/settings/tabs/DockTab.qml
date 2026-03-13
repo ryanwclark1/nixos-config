@@ -19,7 +19,7 @@ Item {
             visible: root.validationMessage !== "" || Config.dockHasConflict()
             iconName: "󰀪"
             title: root.validationMessage !== "" ? "Dock conflict" : "Reserved edge in use"
-            body: root.validationMessage !== "" ? root.validationMessage : "An enabled bar already occupies the dock edge. Pick another dock position or move the conflicting bar."
+            body: root.validationMessage !== "" ? root.validationMessage : "An enabled bar already occupies the dock edge on at least one display. The dock will stay hidden only on those conflicting displays."
         }
 
         SettingsCard {

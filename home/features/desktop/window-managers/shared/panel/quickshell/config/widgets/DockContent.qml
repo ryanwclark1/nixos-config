@@ -51,8 +51,8 @@ Item {
   Rectangle {
     id: dockBg
     anchors.centerIn: parent
-    width: root.vertical ? 56 : dockLayout.implicitWidth + 40
-    height: root.vertical ? dockLayout.implicitHeight + 40 : 56
+    width: root.vertical ? 56 : ((dockLayoutLoader.item ? dockLayoutLoader.item.implicitWidth : 0) + 40)
+    height: root.vertical ? ((dockLayoutLoader.item ? dockLayoutLoader.item.implicitHeight : 0) + 40) : 56
     color: Colors.bgGlass
     radius: 18
     border.color: Colors.border
@@ -60,6 +60,7 @@ Item {
   }
 
   Loader {
+    id: dockLayoutLoader
     anchors.centerIn: dockBg
     sourceComponent: root.vertical ? verticalDockLayout : horizontalDockLayout
   }

@@ -190,7 +190,7 @@ Scope {
         readonly property bool isRight: dockPosition === "right"
         readonly property bool vertical: isLeft || isRight
         readonly property bool autoHide: Config.dockAutoHide
-        readonly property bool dockAllowed: Config.dockEnabled && !Config.dockHasConflict()
+        readonly property bool dockAllowed: Config.dockEnabled && !Config.dockConflictsOnScreen(screenDelegate.modelData)
         property bool hidden: autoHide
         property bool dockHovered: false
         property bool peekHovered: false
