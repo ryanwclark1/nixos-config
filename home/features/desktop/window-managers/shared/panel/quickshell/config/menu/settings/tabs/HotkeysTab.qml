@@ -113,7 +113,8 @@ Item {
                             spacing: Colors.spacingS
 
                             Rectangle {
-                                implicitWidth: chordText.implicitWidth + 16
+                                id: chordBadge
+                                implicitWidth: Math.min(parent.width, chordText.implicitWidth + 16)
                                 height: 26
                                 radius: 6
                                 color: Colors.highlight
@@ -131,10 +132,12 @@ Item {
                                             parts.push(modelData["key"]);
                                         return parts.join(" + ");
                                     }
+                                    width: Math.max(0, parent.width - 12)
                                     color: Colors.primary
                                     font.family: Colors.fontMono
                                     font.pixelSize: Colors.fontSizeSmall
                                     font.weight: Font.DemiBold
+                                    elide: Text.ElideRight
                                 }
                             }
 
@@ -143,7 +146,9 @@ Item {
                                 color: Colors.text
                                 font.pixelSize: Colors.fontSizeMedium
                                 font.weight: Font.DemiBold
-                                width: Math.max(0, parent.width - chordText.implicitWidth - Colors.spacingS - 16)
+                                width: (root.compactMode || chordBadge.width > parent.width * 0.45)
+                                    ? parent.width
+                                    : Math.max(0, parent.width - chordBadge.width - Colors.spacingS)
                                 elide: Text.ElideRight
                             }
                         }

@@ -99,13 +99,14 @@ Rectangle {
     Rectangle {
       visible: !root.compactMode
       Layout.fillWidth: true
-      height: 34
+      implicitHeight: searchBarRow.implicitHeight + Colors.spacingS * 2
       radius: Colors.radiusPill
       color: Colors.bgWidget
       border.color: searchInput.activeFocus ? Colors.primary : Colors.border
       border.width: 1
 
       RowLayout {
+        id: searchBarRow
         anchors.fill: parent
         anchors.leftMargin: Colors.spacingM
         anchors.rightMargin: Colors.spacingM
@@ -124,6 +125,7 @@ Rectangle {
           color: Colors.text
           font.pixelSize: Colors.fontSizeSmall
           clip: true
+          wrapMode: TextInput.Wrap
           onTextChanged: {
             if (text !== root.searchQuery)
               root.searchQueryEdited(text);

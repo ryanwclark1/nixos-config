@@ -27,8 +27,8 @@ SharedWidgets.CardBase {
   function summonWindow(address) {
     if (!CompositorAdapter.supportsScratchpad) return;
     var targetWorkspace = "1";
-    Quickshell.execDetached(["hyprctl", "dispatch", "movetoworkspace", targetWorkspace + ",address:" + address]);
-    Quickshell.execDetached(["hyprctl", "dispatch", "focuswindow", "address:" + address]);
+    CompositorAdapter.moveWindowToWorkspace(address, targetWorkspace);
+    CompositorAdapter.focusWindowAddress(address);
   }
 
   ColumnLayout {

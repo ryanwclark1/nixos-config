@@ -216,8 +216,7 @@ PopupWindow {
           icon: ""
           onClicked: {
             for (var i = 0; i < root.toplevels.length; i++) {
-              Quickshell.execDetached(["hyprctl", "dispatch", "movetoworkspace",
-                (index + 1) + ",address:" + root.toplevels[i].address]);
+              CompositorAdapter.moveWindowToWorkspace(root.toplevels[i].address, index + 1);
             }
             root.showWorkspaceList = false;
             root.close();

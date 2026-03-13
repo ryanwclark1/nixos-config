@@ -307,7 +307,9 @@ Item {
 
                     SettingsTextInputRow {
                         id: weatherLatInput
-                        width: root.compactMode ? parent.width : Math.max(220, (parent.width - Colors.spacingM) / 2)
+                        width: root.compactMode
+                            ? parent.width
+                            : Math.min(parent.width, Math.max(180, (parent.width - Colors.spacingM) / 2))
                         label: "Latitude"
                         placeholderText: "40.7128"
                         leadingIcon: "󰍐"
@@ -322,7 +324,9 @@ Item {
 
                     SettingsTextInputRow {
                         id: weatherLonInput
-                        width: root.compactMode ? parent.width : Math.max(220, (parent.width - Colors.spacingM) / 2)
+                        width: root.compactMode
+                            ? parent.width
+                            : Math.min(parent.width, Math.max(180, (parent.width - Colors.spacingM) / 2))
                         label: "Longitude"
                         placeholderText: "-74.0060"
                         leadingIcon: "󰍐"

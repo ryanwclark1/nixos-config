@@ -91,22 +91,30 @@ Item {
                     active: modelData.enabled
                     radius: Colors.radiusMedium
                     contentInset: Colors.spacingM
-                    rowSpacing: Colors.spacingM
-                    minimumHeight: 66
+                    rowSpacing: root.compactMode ? Colors.spacingS : Colors.spacingM
+                    minimumHeight: root.compactMode ? 60 : 66
 
                     Rectangle {
-                        width: 38
-                        height: 38
+                        width: root.compactMode ? 32 : 38
+                        height: root.compactMode ? 32 : 38
                         radius: Colors.radiusSmall
                         color: modelData.enabled ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.12) : Colors.withAlpha(Colors.text, 0.06)
-                        Layout.alignment: Qt.AlignVCenter
+                        Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
 
                         Text {
                             anchors.centerIn: parent
-                            text: modelData.type === "bar-widget" ? "󰖯" : "󰖲"
+                            text: modelData.type === "bar-widget"
+                                  ? "󰖯"
+                                  : modelData.type === "desktop-widget"
+                                    ? "󰖲"
+                                    : modelData.type === "launcher-provider"
+                                      ? "󰀻"
+                                      : modelData.type === "daemon"
+                                        ? "󰒓"
+                                        : "󰏗"
                             color: modelData.enabled ? Colors.primary : Colors.fgDim
                             font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeXL
+                            font.pixelSize: root.compactMode ? Colors.fontSizeLarge : Colors.fontSizeXL
                             Behavior on color {
                                 ColorAnimation {
                                     duration: 180
@@ -129,10 +137,16 @@ Item {
                                 color: Colors.text
                                 font.pixelSize: Colors.fontSizeMedium
                                 font.weight: Font.DemiBold
-                                width: root.compactMode ? parent.width : undefined
+                                width: parent.width
                                 elide: Text.ElideRight
                                 wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap
                             }
+                        }
+
+                        Flow {
+                            Layout.fillWidth: true
+                            width: parent.width
+                            spacing: Colors.spacingS
 
                             Rectangle {
                                 implicitWidth: verLabel.implicitWidth + 10
@@ -153,12 +167,28 @@ Item {
                                 implicitWidth: typeLabel.implicitWidth + 10
                                 height: 18
                                 radius: height / 2
-                                color: modelData.type === "bar-widget" ? Qt.rgba(Colors.accent.r, Colors.accent.g, Colors.accent.b, 0.14) : Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.14)
+                                color: modelData.type === "bar-widget"
+                                       ? Qt.rgba(Colors.accent.r, Colors.accent.g, Colors.accent.b, 0.14)
+                                       : modelData.type === "desktop-widget"
+                                         ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.14)
+                                         : Qt.rgba(Colors.warning.r, Colors.warning.g, Colors.warning.b, 0.14)
                                 Text {
                                     id: typeLabel
                                     anchors.centerIn: parent
-                                    text: modelData.type === "bar-widget" ? "Bar" : "Desktop"
-                                    color: modelData.type === "bar-widget" ? Colors.accent : Colors.primary
+                                    text: modelData.type === "bar-widget"
+                                          ? "Bar"
+                                          : modelData.type === "desktop-widget"
+                                            ? "Desktop"
+                                            : modelData.type === "launcher-provider"
+                                              ? "Launcher"
+                                              : modelData.type === "daemon"
+                                                ? "Daemon"
+                                                : "Multi"
+                                    color: modelData.type === "bar-widget"
+                                           ? Colors.accent
+                                           : modelData.type === "desktop-widget"
+                                             ? Colors.primary
+                                             : Colors.warning
                                     font.pixelSize: Colors.fontSizeXS
                                     font.weight: Font.DemiBold
                                 }
@@ -182,7 +212,7 @@ Item {
 
                     SharedWidgets.DankToggle {
                         checked: modelData.enabled
-                        Layout.alignment: Qt.AlignVCenter
+                        Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
                         onToggled: {
                             if (modelData.enabled)
                                 PluginService.disablePlugin(modelData.id);
@@ -205,7 +235,7 @@ Item {
                 body: "~/.config/quickshell/plugins/"
 
                 Text {
-                    text: "Each plugin is a folder containing a manifest.json and a QML file."
+                    text: "Each plugin is a folder containing a manifest.json and one or more QML entry points."
                     color: Colors.fgSecondary
                     font.pixelSize: Colors.fontSizeSmall
                     wrapMode: Text.WordWrap
@@ -213,7 +243,7 @@ Item {
                 }
 
                 Text {
-                    text: "manifest.json fields: id, name, description, author, version, type (\"bar-widget\" or \"desktop-widget\"), main"
+                    text: "Manifest v2 fields: id, name, description, author, version, type, permissions, entryPoints { barWidget|desktopWidget|launcherProvider|daemon|settings }"
                     color: Colors.fgSecondary
                     font.pixelSize: Colors.fontSizeSmall
                     wrapMode: Text.WordWrap

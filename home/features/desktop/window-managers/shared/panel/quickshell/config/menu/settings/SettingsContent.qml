@@ -43,13 +43,14 @@ Item {
       Layout.fillWidth: true
       Layout.margins: root.tightSpacing ? Colors.spacingM : Colors.spacingL
       Layout.bottomMargin: root.tightSpacing ? 0 : Colors.spacingS
-      implicitHeight: 44
+      implicitHeight: compactSearchRow.implicitHeight + Colors.spacingM
       radius: Colors.radiusPill
       color: Colors.bgWidget
       border.color: compactSearchInput.activeFocus ? Colors.primary : Colors.border
       border.width: 1
 
       RowLayout {
+        id: compactSearchRow
         anchors.fill: parent
         anchors.leftMargin: Colors.spacingM
         anchors.rightMargin: Colors.spacingM
@@ -68,6 +69,7 @@ Item {
           color: Colors.text
           font.pixelSize: Colors.fontSizeSmall
           clip: true
+          wrapMode: TextInput.Wrap
           onTextChanged: {
             if (text !== root.searchQuery)
               root.searchQueryEdited(text);

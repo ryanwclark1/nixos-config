@@ -24,9 +24,6 @@ Rectangle {
   MouseArea {
     anchors.fill: parent
     cursorShape: Qt.PointingHandCursor
-    onClicked: {
-      if (!CompositorAdapter.supportsScratchpad) return;
-      Quickshell.execDetached([ "hyprctl", "dispatch", "togglespecialworkspace", "scratchpad" ]);
-    }
+    onClicked: CompositorAdapter.toggleScratchpadWorkspace("scratchpad")
   }
 }

@@ -69,8 +69,8 @@ QtObject {
   property bool launcherRememberWebProvider: true
   property string launcherWebLastProviderKey: "duckduckgo"
   property var launcherWebProviderOrder: ["duckduckgo", "google", "youtube", "nixos", "github"]
-  property var launcherModeOrder: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
-  property var launcherEnabledModes: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
+  property var launcherModeOrder: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
+  property var launcherEnabledModes: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
   property real launcherScoreNameWeight: 1.0
   property real launcherScoreTitleWeight: 0.92
   property real launcherScoreExecWeight: 0.88
@@ -139,6 +139,10 @@ QtObject {
 
   // --- PLUGINS ---
   property var disabledPlugins: []
+  property var pluginLauncherTriggers: ({})
+  property var pluginLauncherNoTrigger: ({})
+  property var pluginSettings: ({})
+  property bool pluginHotReload: true
 
   // --- INTERNAL ---
   property bool _loading: false
@@ -252,6 +256,7 @@ QtObject {
       "emoji": true,
       "calc": true,
       "web": true,
+      "plugins": true,
       "run": true,
       "system": true,
       "keybinds": true,
@@ -342,7 +347,7 @@ QtObject {
 
   function normalizeLauncherConfig(data) {
     var launcher = data && data.launcher ? data.launcher : {};
-    var fallbackModes = ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"];
+    var fallbackModes = ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"];
     var fallbackWebProviders = ["duckduckgo", "google", "youtube", "nixos", "github"];
 
     launcherModeOrder = _normalizeModeList(launcher.modeOrder, fallbackModes);
@@ -1211,6 +1216,10 @@ QtObject {
 
       if (data.plugins) {
         if (data.plugins.disabled !== undefined) disabledPlugins = data.plugins.disabled;
+        if (data.plugins.launcherTriggers !== undefined) pluginLauncherTriggers = data.plugins.launcherTriggers;
+        if (data.plugins.launcherNoTrigger !== undefined) pluginLauncherNoTrigger = data.plugins.launcherNoTrigger;
+        if (data.plugins.settings !== undefined) pluginSettings = data.plugins.settings;
+        if (data.plugins.hotReload !== undefined) pluginHotReload = data.plugins.hotReload;
       }
 
       if (data.theme) {
@@ -1372,7 +1381,11 @@ QtObject {
         "recentColors": recentPickerColors
       },
       "plugins": {
-        "disabled": disabledPlugins
+        "disabled": disabledPlugins,
+        "launcherTriggers": pluginLauncherTriggers,
+        "launcherNoTrigger": pluginLauncherNoTrigger,
+        "settings": pluginSettings,
+        "hotReload": pluginHotReload
       },
       "theme": {
         "name": themeName

@@ -46,7 +46,8 @@ QtObject {
   function pluginSourceForWidgetType(widgetType) {
     var plugin = pluginForWidgetType(widgetType);
     if (!plugin) return "";
-    return (plugin.path || "") + (plugin.mainFile || "");
+    var desktopEntry = (plugin.entryPoints && plugin.entryPoints.desktopWidget) ? plugin.entryPoints.desktopWidget : "";
+    return (plugin.path || "") + desktopEntry;
   }
 
   function isBuiltInType(widgetType) {

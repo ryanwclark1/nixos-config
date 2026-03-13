@@ -44,7 +44,9 @@ QtObject {
         icon: "󰏗",
         section: "right",
         description: plugin.description || "Bar plugin widget.",
-        pluginId: plugin.id
+        pluginId: plugin.id,
+        path: plugin.path || "",
+        mainFile: (plugin.entryPoints && plugin.entryPoints.barWidget) ? plugin.entryPoints.barWidget : ""
       });
     }
     return items;
@@ -73,7 +75,9 @@ QtObject {
             icon: "󰏗",
             section: "right",
             description: plugins[j].description || "Bar plugin widget.",
-            pluginId: pluginId
+            pluginId: pluginId,
+            path: plugins[j].path || "",
+            mainFile: (plugins[j].entryPoints && plugins[j].entryPoints.barWidget) ? plugins[j].entryPoints.barWidget : ""
           };
         }
       }

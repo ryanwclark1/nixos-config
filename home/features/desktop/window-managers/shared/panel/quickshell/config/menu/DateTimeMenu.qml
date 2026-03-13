@@ -7,8 +7,10 @@ import "../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  implicitWidth: 560
-  implicitHeight: 560
+  readonly property int availablePopupWidth: screen ? Math.max(340, screen.width - 40) : 560
+  readonly property bool compactMode: availablePopupWidth < 520
+  implicitWidth: Math.min(560, availablePopupWidth)
+  implicitHeight: compactMode ? 620 : 560
   title: "Date & Time"
   subtitle: Qt.formatDateTime(clock.date, "dddd, MMMM d")
 
@@ -24,16 +26,18 @@ BasePopupMenu {
 
     Rectangle {
       Layout.fillWidth: true
-      implicitHeight: 122
+      implicitHeight: root.compactMode ? 188 : 122
       radius: Colors.radiusMedium
       color: Colors.cardSurface
       border.color: Colors.border
       border.width: 1
 
-      RowLayout {
+      GridLayout {
         anchors.fill: parent
         anchors.margins: Colors.spacingM
-        spacing: Colors.spacingM
+        columns: root.compactMode ? 1 : 2
+        columnSpacing: Colors.spacingM
+        rowSpacing: Colors.spacingM
 
         ColumnLayout {
           Layout.fillWidth: true
@@ -47,19 +51,22 @@ BasePopupMenu {
                 : (Config.timeShowSeconds ? "hh:mm:ss AP" : "hh:mm AP")
             )
             color: Colors.text
-            font.pixelSize: 56
+            font.pixelSize: root.compactMode ? 44 : 56
             font.weight: Font.Bold
           }
 
           Text {
             text: Qt.formatDateTime(clock.date, "dddd, MMMM d, yyyy")
             color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeLarge
+            font.pixelSize: root.compactMode ? Colors.fontSizeMedium : Colors.fontSizeLarge
+            wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap
+            Layout.fillWidth: true
           }
         }
 
         ColumnLayout {
-          Layout.preferredWidth: 152
+          Layout.fillWidth: root.compactMode
+          Layout.preferredWidth: root.compactMode ? -1 : 152
           spacing: Colors.spacingXS
 
           Rectangle {
@@ -111,53 +118,61 @@ BasePopupMenu {
 
     Rectangle {
       Layout.fillWidth: true
-      implicitHeight: 88
+      implicitHeight: root.compactMode ? 122 : 88
       radius: Colors.radiusMedium
       color: Colors.cardSurface
       border.color: Colors.border
       border.width: 1
 
-      RowLayout {
+      GridLayout {
         anchors.fill: parent
         anchors.margins: Colors.spacingM
-        spacing: Colors.spacingM
+        columns: root.compactMode ? 1 : 2
+        columnSpacing: Colors.spacingM
+        rowSpacing: Colors.spacingS
 
-        Text {
-          text: Colors.weatherIcon(WeatherService.condition)
-          color: Colors.accent
-          font.family: Colors.fontMono
-          font.pixelSize: 28
-        }
-
-        ColumnLayout {
+        RowLayout {
           Layout.fillWidth: true
-          spacing: 2
+          spacing: Colors.spacingM
 
           Text {
-            text: WeatherService.condition || "Loading weather"
-            color: Colors.text
-            font.pixelSize: Colors.fontSizeXL
-            font.weight: Font.DemiBold
-            elide: Text.ElideRight
-            Layout.fillWidth: true
+            text: Colors.weatherIcon(WeatherService.condition)
+            color: Colors.accent
+            font.family: Colors.fontMono
+            font.pixelSize: 28
           }
 
-          Text {
-            text: (WeatherService.location || "Local") + "  •  Feels like " + (WeatherService.feelsLike || "--") + "  •  Humidity " + (WeatherService.humidity || "--")
-            color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeMedium
-            elide: Text.ElideRight
+          ColumnLayout {
             Layout.fillWidth: true
+            spacing: 2
+
+            Text {
+              text: WeatherService.condition || "Loading weather"
+              color: Colors.text
+              font.pixelSize: Colors.fontSizeXL
+              font.weight: Font.DemiBold
+              elide: Text.ElideRight
+              Layout.fillWidth: true
+            }
+
+            Text {
+              text: (WeatherService.location || "Local") + "  •  Feels like " + (WeatherService.feelsLike || "--") + "  •  Humidity " + (WeatherService.humidity || "--")
+              color: Colors.textSecondary
+              font.pixelSize: Colors.fontSizeMedium
+              elide: Text.ElideRight
+              Layout.fillWidth: true
+            }
           }
         }
 
         Rectangle {
-          implicitWidth: 104
+          implicitWidth: weatherButtonLabel.implicitWidth + 24
           implicitHeight: 34
           radius: Colors.radiusSmall
           color: Colors.highlight
           border.color: Colors.border
           border.width: 1
+          Layout.alignment: root.compactMode ? Qt.AlignLeft : (Qt.AlignRight | Qt.AlignVCenter)
 
           SharedWidgets.StateLayer {
             id: fullWeatherState
@@ -166,6 +181,7 @@ BasePopupMenu {
           }
 
           Text {
+            id: weatherButtonLabel
             anchors.centerIn: parent
             text: "Weather"
             color: Colors.text

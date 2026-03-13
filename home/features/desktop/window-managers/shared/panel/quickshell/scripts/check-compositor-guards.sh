@@ -6,8 +6,6 @@ config_dir="${script_dir}/../config"
 
 # Files intentionally compositor-scoped today.
 allow_hyprctl=(
-  "${config_dir}/bar/widgets/Workspaces.qml"
-  "${config_dir}/launcher/Launcher.qml"
   "${config_dir}/launcher/Overview.qml"
   "${config_dir}/menu/ControlCenter.qml"
   "${config_dir}/menu/DisplayConfig.qml"
@@ -16,14 +14,10 @@ allow_hyprctl=(
   "${config_dir}/menu/settings/tabs/HotkeysTab.qml"
   "${config_dir}/menu/settings/tabs/HyprlandTab.qml"
   "${config_dir}/menu/settings/tabs/WallpaperTab.qml"
-  "${config_dir}/modules/ScratchpadWidget.qml"
   "${config_dir}/services/CompositorAdapter.qml"
   "${config_dir}/services/Config.qml"
   "${config_dir}/services/PrivacyService.qml"
   "${config_dir}/services/WallpaperService.qml"
-  "${config_dir}/widgets/DockMenu.qml"
-  "${config_dir}/widgets/ScratchpadIndicator.qml"
-  "${config_dir}/widgets/WorkspaceOsd.qml"
 )
 
 allow_hyprland_import=(
@@ -56,6 +50,12 @@ while IFS= read -r hit; do
   fi
 done < <(rg -n "hyprctl" "${config_dir}" --glob '*.qml' || true)
 
+for file in "${allow_hyprctl[@]}"; do
+  if ! rg -q "hyprctl" "$file"; then
+    violations+=("stale hyprctl allowlist entry (no hyprctl found): ${file}")
+  fi
+done
+
 while IFS= read -r hit; do
   [[ -z "${hit}" ]] && continue
   file="${hit%%:*}"
@@ -63,6 +63,12 @@ while IFS= read -r hit; do
     violations+=("Quickshell.Hyprland import outside allowlist: ${hit}")
   fi
 done < <(rg -n '^\s*import\s+Quickshell\.Hyprland\b' "${config_dir}" --glob '*.qml' || true)
+
+for file in "${allow_hyprland_import[@]}"; do
+  if ! rg -q '^\s*import\s+Quickshell\.Hyprland\b' "$file"; then
+    violations+=("stale Quickshell.Hyprland allowlist entry (import missing): ${file}")
+  fi
+done
 
 while IFS= read -r hit; do
   [[ -z "${hit}" ]] && continue

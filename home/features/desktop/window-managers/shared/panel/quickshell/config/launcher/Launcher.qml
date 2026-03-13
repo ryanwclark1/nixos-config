@@ -82,6 +82,10 @@ PanelWindow {
     avgFilterMs: 0,
     filesFdLoads: 0,
     filesFindLoads: 0,
+    filesFdLastMs: 0,
+    filesFindLastMs: 0,
+    filesFdAvgMs: 0,
+    filesFindAvgMs: 0,
     perMode: ({})
   })
 
@@ -95,9 +99,9 @@ PanelWindow {
   property real globalLastMouseY: 0
 
   readonly property bool showLauncherHome: Config.launcherShowHomeSections && searchText === "" && (mode === "drun" || mode === "system" || mode === "files")
-  readonly property var allKnownModes: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
+  readonly property var allKnownModes: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
   readonly property var transientModes: ["dmenu"]
-  readonly property var defaultModeOrder: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
+  readonly property var defaultModeOrder: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
   readonly property var defaultPrimaryModes: ["drun", "window", "files", "ai", "clip", "system", "media"]
   property var modeOrder: computeModeOrder()
   property var primaryModes: sanitizeModeList(Config.launcherEnabledModes, defaultPrimaryModes, allKnownModes).filter(function(modeKey) {
@@ -112,6 +116,7 @@ PanelWindow {
     "emoji": { label: "Emoji", hint: "Search with :", prefix: ":" },
     "calc": { label: "Calculator", hint: "Evaluate with =", prefix: "=" },
     "web": { label: "Web", hint: "Search with ?", prefix: "?" },
+    "plugins": { label: "Plugins", hint: "Search plugin providers", prefix: "" },
     "run": { label: "Run", hint: "Run commands with >", prefix: ">" },
     "system": { label: "System", hint: "Session and utility actions", prefix: "" },
     "keybinds": { label: "Keybinds", hint: "Inspect and trigger binds", prefix: "" },
@@ -129,6 +134,7 @@ PanelWindow {
     "emoji": "󰞅",
     "calc": "󰪚",
     "web": "󰖟",
+    "plugins": "󰏗",
     "run": "󰆍",
     "system": "󰒓",
     "keybinds": "󰌌",
@@ -300,6 +306,14 @@ PanelWindow {
     if (fileSearchBackend === "none")
       return "none";
     return "auto";
+  }
+  readonly property string filesCacheStatsLabel: {
+    var stats = modeMetric("files");
+    var hits = Math.max(0, Math.round(stats.cacheHits || 0));
+    var misses = Math.max(0, Math.round(stats.cacheMisses || 0));
+    var total = hits + misses;
+    var pct = total > 0 ? Math.round((hits * 100) / total) : 0;
+    return hits + "/" + misses + " (" + pct + "%)";
   }
   readonly property string webSelectedProviderLabel: activeProviderLabel !== "" ? activeProviderLabel : "Selected"
   readonly property string webPrimaryEnterHint: Config.launcherWebEnterUsesPrimary ? ("Enter: " + webPrimaryProviderLabel) : ("Enter: " + webSelectedProviderLabel)
@@ -595,6 +609,7 @@ PanelWindow {
     if (modeKey === "wallpapers") return ["qs-wallpapers"];
     if (modeKey === "ai") return ["qs-ai", "wl-copy"];
     if (modeKey === "files") return [];
+    if (modeKey === "plugins") return [];
     return [];
   }
 
@@ -914,16 +929,28 @@ PanelWindow {
       avgFilterMs: 0,
       filesFdLoads: 0,
       filesFindLoads: 0,
+      filesFdLastMs: 0,
+      filesFindLastMs: 0,
+      filesFdAvgMs: 0,
+      filesFindAvgMs: 0,
       perMode: ({})
     });
   }
 
-  function recordFilesBackendLoad(backend) {
+  function recordFilesBackendLoad(backend, durationMs) {
     var next = Object.assign({}, launcherMetrics);
-    if (backend === "fd")
-      next.filesFdLoads = (next.filesFdLoads || 0) + 1;
-    else if (backend === "find")
-      next.filesFindLoads = (next.filesFindLoads || 0) + 1;
+    var took = Math.max(0, Math.round(durationMs || 0));
+    if (backend === "fd") {
+      var fdLoads = (next.filesFdLoads || 0) + 1;
+      next.filesFdLoads = fdLoads;
+      next.filesFdLastMs = took;
+      next.filesFdAvgMs = Math.round((((next.filesFdAvgMs || 0) * (fdLoads - 1)) + took) / fdLoads);
+    } else if (backend === "find") {
+      var findLoads = (next.filesFindLoads || 0) + 1;
+      next.filesFindLoads = findLoads;
+      next.filesFindLastMs = took;
+      next.filesFindAvgMs = Math.round((((next.filesFindAvgMs || 0) * (findLoads - 1)) + took) / findLoads);
+    }
     launcherMetrics = next;
   }
 
@@ -1152,6 +1179,7 @@ PanelWindow {
       else if (mode === "clip") loadClip();
       else if (mode === "calc") { allItems = []; filterItems(); }
       else if (mode === "web") loadWeb();
+      else if (mode === "plugins") loadPlugins();
       else if (mode === "system") loadSystem();
       else if (mode === "media") { allItems = []; filterItems(); refreshMediaPlayers(); }
       else if (mode === "nixos") loadNixos();
@@ -1424,15 +1452,16 @@ PanelWindow {
         command = ["bash", "-lc", script];
       }
 
-      recordFilesBackendLoad(backend);
       runCommand(command, function(raw) {
         if (!isRequestCurrent("files", token))
           return;
+        var tookMs = Date.now() - startedAt;
+        recordFilesBackendLoad(backend, tookMs);
         var items = buildFileItemsFromRaw(raw, homeDir);
         allItems = items;
         setFileQueryCached(cacheKey, items);
         filterItems();
-        recordLoadMetric("files", Date.now() - startedAt, false, true);
+        recordLoadMetric("files", tookMs, false, true);
       });
     });
   }
@@ -1463,6 +1492,11 @@ PanelWindow {
     allItems = configuredWebProviders();
     filterItems();
     applyRememberedWebProviderSelection();
+  }
+
+  function loadPlugins() {
+    allItems = PluginService.queryLauncherItems(searchText, true);
+    filterItems();
   }
 
   function loadSystem() {
@@ -1587,6 +1621,13 @@ PanelWindow {
       return;
     }
 
+    if (mode === "plugins") {
+      filteredItems = allItems.slice(0, Config.launcherMaxResults);
+      selectedIndex = Math.min(selectedIndex, Math.max(0, filteredItems.length - 1));
+      recordFilterMetric(Date.now() - startedAt);
+      return;
+    }
+
     if (mode === "run" && searchText.startsWith(">")) actualSearch = searchText.substring(1).trim();
     if (mode === "emoji" && searchText.startsWith(":")) actualSearch = searchText.substring(1).trim();
     if (mode === "web") {
@@ -1670,6 +1711,10 @@ PanelWindow {
 
   function applySearchRefresh(isFileRefresh) {
     _lastFilterTriggerMs = Date.now();
+    if (mode === "plugins") {
+      loadPlugins();
+      return;
+    }
     if (isFileRefresh === true || mode === "files") {
       loadFiles();
       return;
@@ -1697,7 +1742,7 @@ PanelWindow {
     if (mode === "window") return "Focus";
     if (mode === "files" || mode === "web" || mode === "bookmarks" || mode === "wallpapers") return "Open";
     if (mode === "drun" || mode === "run") return "Run";
-    if (mode === "system" || mode === "nixos" || mode === "keybinds" || mode === "media") return "Action";
+    if (mode === "system" || mode === "nixos" || mode === "keybinds" || mode === "media" || mode === "plugins") return "Action";
     return "";
   }
 
@@ -1744,6 +1789,10 @@ PanelWindow {
     }
     if (mode === "bookmarks") {
       open("web", true);
+      return;
+    }
+    if (mode === "plugins") {
+      open("drun");
       return;
     }
     open("drun");
@@ -1967,8 +2016,12 @@ PanelWindow {
       close();
     } else if (mode === "keybinds") {
       if (item.disp && CompositorAdapter.supportsDispatcherActions)
-        Quickshell.execDetached(["hyprctl", "dispatch", item.disp, item.args || ""]);
+        CompositorAdapter.dispatchAction(item.disp, item.args || "", "Trigger keybind action");
       close();
+    } else if (mode === "plugins") {
+      var executed = PluginService.executeLauncherItem(item, searchText);
+      if (executed)
+        close();
     }
   }
 
@@ -1981,6 +2034,7 @@ PanelWindow {
     function openCalc() { launcherRoot.open("calc"); }
     function openClip() { launcherRoot.open("clip"); }
     function openWeb() { launcherRoot.open("web"); }
+    function openPlugins() { launcherRoot.open("plugins"); }
     function openSystem() { launcherRoot.open("system"); }
     function openNixos() { launcherRoot.open("nixos"); }
     function openMedia() { launcherRoot.open("media"); }
@@ -2167,6 +2221,7 @@ PanelWindow {
                 else if (text.startsWith("!") && launcherRoot.mode !== "ai") launcherRoot.open("ai", true);
                 else if (text.startsWith("@") && launcherRoot.mode !== "bookmarks") launcherRoot.open("bookmarks", true);
                 else if (text.startsWith("/") && launcherRoot.mode !== "files") launcherRoot.open("files", true);
+                else if (PluginService.shouldOpenPluginsModeForQuery(text) && launcherRoot.mode !== "plugins") launcherRoot.open("plugins", true);
                 if (launcherRoot.searchText !== text) {
                   launcherRoot.searchText = text;
                   launcherRoot.scheduleSearchRefresh(false);
@@ -2406,7 +2461,9 @@ PanelWindow {
                   + " / last " + (launcherRoot.launcherMetrics.lastFilterMs || 0) + "ms"
                   + (launcherRoot.mode === "files" ? (" • backend " + launcherRoot.filesBackendLabel
                     + " • fd/find " + (launcherRoot.launcherMetrics.filesFdLoads || 0) + "/"
-                    + (launcherRoot.launcherMetrics.filesFindLoads || 0)) : "")
+                    + (launcherRoot.launcherMetrics.filesFindLoads || 0)
+                    + " • fd " + (launcherRoot.launcherMetrics.filesFdAvgMs || 0) + "/" + (launcherRoot.launcherMetrics.filesFdLastMs || 0) + "ms"
+                    + " • find " + (launcherRoot.launcherMetrics.filesFindAvgMs || 0) + "/" + (launcherRoot.launcherMetrics.filesFindLastMs || 0) + "ms") : "")
                 color: Colors.textSecondary
                 font.pixelSize: Colors.fontSizeXS
                 elide: Text.ElideRight
@@ -2417,6 +2474,7 @@ PanelWindow {
                   + ": avg " + modeStats.avgLoadMs + "ms"
                   + " • last " + modeStats.lastLoadMs + "ms"
                   + " • failures " + modeStats.failures
+                  + (launcherRoot.mode === "files" ? (" • cache " + launcherRoot.filesCacheStatsLabel) : "")
                 color: Colors.textSecondary
                 font.pixelSize: Colors.fontSizeXS
                 elide: Text.ElideRight

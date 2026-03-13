@@ -96,6 +96,41 @@ QtObject {
     }
   }
 
+  function dispatchAction(action, arg, unsupportedName) {
+    if (!supportsDispatcherActions) {
+      notifyUnsupported(unsupportedName || ("Dispatch " + String(action || "")));
+      return;
+    }
+    var args = ["hyprctl", "dispatch", String(action || "")];
+    if (arg !== undefined && arg !== null && String(arg) !== "")
+      args.push(String(arg));
+    Quickshell.execDetached(args);
+  }
+
+  function moveWindowToWorkspace(address, workspaceId) {
+    if (!supportsWorkspaceMove) {
+      notifyUnsupported("Move window to workspace");
+      return;
+    }
+    dispatchAction("movetoworkspace", String(workspaceId) + ",address:" + String(address), "Move window to workspace");
+  }
+
+  function focusWindowAddress(address) {
+    if (!supportsDispatcherActions) {
+      notifyUnsupported("Focus window");
+      return;
+    }
+    dispatchAction("focuswindow", "address:" + String(address), "Focus window");
+  }
+
+  function toggleScratchpadWorkspace(name) {
+    if (!supportsScratchpad) {
+      notifyUnsupported("Toggle scratchpad");
+      return;
+    }
+    dispatchAction("togglespecialworkspace", String(name || "scratchpad"), "Toggle scratchpad");
+  }
+
   function closeWorkspaceWindows(id) {
     if (!supportsWorkspaceCloseWindows) {
       notifyUnsupported("Close workspace windows");

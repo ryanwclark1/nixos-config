@@ -571,10 +571,10 @@ Item {
                 model: root.orderedWebProviders()
 
                 delegate: SettingsListRow {
-                    minimumHeight: 44
+                    minimumHeight: root.compactMode ? 76 : 44
 
                     Rectangle {
-                        Layout.alignment: Qt.AlignVCenter
+                        Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
                         border.color: Colors.border
                         border.width: 1
                         color: Colors.surface
@@ -597,33 +597,44 @@ Item {
                         }
                     }
 
-                    Text {
+                    ColumnLayout {
                         Layout.fillWidth: true
-                        color: Colors.text
-                        elide: Text.ElideRight
-                        font.pixelSize: Colors.fontSizeSmall
-                        font.weight: Font.DemiBold
-                        text: {
-                            for (var i = 0; i < root.webProviders.length; ++i) {
-                                if (root.webProviders[i].key === modelData)
-                                    return root.webProviders[i].label;
+                        spacing: Colors.spacingXS
+
+                        Text {
+                            Layout.fillWidth: true
+                            color: Colors.text
+                            elide: Text.ElideRight
+                            font.pixelSize: Colors.fontSizeSmall
+                            font.weight: Font.DemiBold
+                            text: {
+                                for (var i = 0; i < root.webProviders.length; ++i) {
+                                    if (root.webProviders[i].key === modelData)
+                                        return root.webProviders[i].label;
+                                }
+                                return modelData;
                             }
-                            return modelData;
                         }
-                    }
 
-                    SettingsActionButton {
-                        compact: true
-                        enabled: index > 0
-                        label: "↑"
-                        onClicked: root.moveWebProvider(modelData, -1)
-                    }
+                        Flow {
+                            Layout.fillWidth: true
+                            width: parent.width
+                            spacing: Colors.spacingS
 
-                    SettingsActionButton {
-                        compact: true
-                        enabled: index < (root.orderedWebProviders().length - 1)
-                        label: "↓"
-                        onClicked: root.moveWebProvider(modelData, 1)
+                            SettingsActionButton {
+                                compact: true
+                                enabled: index > 0
+                                label: "↑"
+                                onClicked: root.moveWebProvider(modelData, -1)
+                            }
+
+                            SettingsActionButton {
+                                compact: true
+                                enabled: index < (root.orderedWebProviders().length - 1)
+                                label: "↓"
+                                onClicked: root.moveWebProvider(modelData, 1)
+                            }
+                        }
                     }
                 }
             }
@@ -787,7 +798,7 @@ Item {
             Repeater {
                 model: root.orderedEnabledModes()
                 delegate: SettingsListRow {
-                    minimumHeight: 46
+                    minimumHeight: root.compactMode ? 76 : 46
 
                     Rectangle {
                         implicitWidth: 24
@@ -807,27 +818,38 @@ Item {
                         }
                     }
 
-                    Text {
-                        text: root.launcherModeMeta(modelData).label
-                        color: Colors.text
-                        font.pixelSize: Colors.fontSizeSmall
-                        font.weight: Font.DemiBold
+                    ColumnLayout {
                         Layout.fillWidth: true
-                        elide: Text.ElideRight
-                    }
+                        spacing: Colors.spacingXS
 
-                    SettingsActionButton {
-                        label: "↑"
-                        compact: true
-                        enabled: index > 0
-                        onClicked: root.moveMode(modelData, -1)
-                    }
+                        Text {
+                            text: root.launcherModeMeta(modelData).label
+                            color: Colors.text
+                            font.pixelSize: Colors.fontSizeSmall
+                            font.weight: Font.DemiBold
+                            Layout.fillWidth: true
+                            elide: Text.ElideRight
+                        }
 
-                    SettingsActionButton {
-                        label: "↓"
-                        compact: true
-                        enabled: index < (root.orderedEnabledModes().length - 1)
-                        onClicked: root.moveMode(modelData, 1)
+                        Flow {
+                            Layout.fillWidth: true
+                            width: parent.width
+                            spacing: Colors.spacingS
+
+                            SettingsActionButton {
+                                label: "↑"
+                                compact: true
+                                enabled: index > 0
+                                onClicked: root.moveMode(modelData, -1)
+                            }
+
+                            SettingsActionButton {
+                                label: "↓"
+                                compact: true
+                                enabled: index < (root.orderedEnabledModes().length - 1)
+                                onClicked: root.moveMode(modelData, 1)
+                            }
+                        }
                     }
                 }
             }
