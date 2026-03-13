@@ -5,12 +5,15 @@ import "../services"
 
 PanelWindow {
   id: root
+  property var screenRef: Quickshell.cursorScreen || Config.primaryScreen()
+  screen: screenRef
+  readonly property var edgeMargins: Config.reservedEdgesForScreen(screenRef, "")
   anchors {
     bottom: true
     right: true
   }
-  margins.bottom: 60
-  margins.right: 60
+  margins.bottom: edgeMargins.bottom + 20
+  margins.right: edgeMargins.right + 20
 
   implicitWidth: 250
   implicitHeight: 80

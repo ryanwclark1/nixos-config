@@ -252,6 +252,13 @@ PanelWindow {
     return "Tab: Next Mode";
   }
   readonly property string legendTertiaryAction: mode === "web" && hasResults ? "Ctrl+Enter: Open Provider Home" : "Esc: Close"
+  readonly property string webPrimaryProviderLabel: {
+    var provider = primaryWebProvider();
+    return provider ? provider.name : "Primary";
+  }
+  readonly property string webSelectedProviderLabel: activeProviderLabel !== "" ? activeProviderLabel : "Selected"
+  readonly property string webPrimaryEnterHint: Config.launcherWebEnterUsesPrimary ? ("Enter: " + webPrimaryProviderLabel) : ("Enter: " + webSelectedProviderLabel)
+  readonly property string webSecondaryEnterHint: Config.launcherWebEnterUsesPrimary ? ("Shift+Enter: " + webSelectedProviderLabel) : ("Shift+Enter: " + emptySecondaryCta)
   readonly property string activeProviderLabel: {
     if (mode !== "web")
       return "";
@@ -1924,6 +1931,42 @@ PanelWindow {
             text: launcherRoot.legendPrimaryAction + " • " + launcherRoot.legendSecondaryAction + " • " + launcherRoot.legendTertiaryAction
             color: Colors.textDisabled
             font.pixelSize: Colors.fontSizeXS
+          }
+        }
+
+        Rectangle {
+          Layout.fillWidth: true
+          visible: Config.launcherShowModeHints && launcherRoot.mode === "web"
+          color: Colors.bgWidget
+          radius: Colors.radiusMedium
+          border.color: Colors.border
+          border.width: 1
+          implicitHeight: 34
+
+          RowLayout {
+            anchors.fill: parent
+            anchors.leftMargin: Colors.spacingM
+            anchors.rightMargin: Colors.spacingM
+            spacing: Colors.spacingS
+
+            Text {
+              text: "󰖟"
+              color: Colors.primary
+              font.family: Colors.fontMono
+              font.pixelSize: Colors.fontSizeSmall
+            }
+            Text {
+              Layout.fillWidth: true
+              text: launcherRoot.webPrimaryEnterHint + " • " + launcherRoot.webSecondaryEnterHint
+              color: Colors.textSecondary
+              font.pixelSize: Colors.fontSizeXS
+              elide: Text.ElideRight
+            }
+            Text {
+              text: "Ctrl+Enter: Home"
+              color: Colors.textDisabled
+              font.pixelSize: Colors.fontSizeXS
+            }
           }
         }
 
