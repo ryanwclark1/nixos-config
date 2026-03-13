@@ -61,6 +61,7 @@ PanelWindow {
   property var modeCacheTime: ({})
   property var fileQueryCache: ({})
   property var fileQueryCacheTime: ({})
+  property string fileSearchBackend: ""
   property int _lastFilterTriggerMs: 0
   property int openCount: 0
   property int _requestToken: 0
@@ -79,6 +80,8 @@ PanelWindow {
     filterRuns: 0,
     lastFilterMs: 0,
     avgFilterMs: 0,
+    filesFdLoads: 0,
+    filesFindLoads: 0,
     perMode: ({})
   })
 
@@ -288,6 +291,15 @@ PanelWindow {
     if (!Config.launcherWebNumberHotkeysEnabled)
       return "Ctrl+Enter: Home";
     return webHintCompact ? "Ctrl+Enter: Home • Ctrl/Alt+1..9" : "Ctrl+Enter: Home • Ctrl+1..9: Open • Alt+1..9: Select";
+  }
+  readonly property string filesBackendLabel: {
+    if (fileSearchBackend === "fd")
+      return "fd";
+    if (fileSearchBackend === "find")
+      return "find";
+    if (fileSearchBackend === "none")
+      return "none";
+    return "auto";
   }
   readonly property string webSelectedProviderLabel: activeProviderLabel !== "" ? activeProviderLabel : "Selected"
   readonly property string webPrimaryEnterHint: Config.launcherWebEnterUsesPrimary ? ("Enter: " + webPrimaryProviderLabel) : ("Enter: " + webSelectedProviderLabel)
@@ -582,7 +594,7 @@ PanelWindow {
     if (modeKey === "bookmarks") return ["qs-bookmarks"];
     if (modeKey === "wallpapers") return ["qs-wallpapers"];
     if (modeKey === "ai") return ["qs-ai", "wl-copy"];
-    if (modeKey === "files") return ["bash"];
+    if (modeKey === "files") return [];
     return [];
   }
 
@@ -900,8 +912,19 @@ PanelWindow {
       filterRuns: 0,
       lastFilterMs: 0,
       avgFilterMs: 0,
+      filesFdLoads: 0,
+      filesFindLoads: 0,
       perMode: ({})
     });
+  }
+
+  function recordFilesBackendLoad(backend) {
+    var next = Object.assign({}, launcherMetrics);
+    if (backend === "fd")
+      next.filesFdLoads = (next.filesFdLoads || 0) + 1;
+    else if (backend === "find")
+      next.filesFindLoads = (next.filesFindLoads || 0) + 1;
+    launcherMetrics = next;
   }
 
   function recordFilterMetric(durationMs) {
@@ -1014,46 +1037,55 @@ PanelWindow {
       var apps = getCached("drun") || [];
       var recent = [];
       var seen = ({});
-      for (var i = 0; i < launchHistory.length; ++i) {
-        var launch = launchHistory[i];
-        for (var j = 0; j < apps.length; ++j) {
-          var app = apps[j];
-          if (app.exec === launch.exec && !seen[app.exec]) {
-            var matched = Object.assign({}, app);
-            matched._recent = launch.timestamp || 0;
-            recent.push(matched);
-            seen[app.exec] = true;
-            break;
-          }
+      var appsByExec = ({});
+      var usageRanked = [];
+      for (var i = 0; i < apps.length; ++i) {
+        var app = apps[i];
+        var execKey = String(app.exec || "");
+        if (execKey !== "" && !appsByExec[execKey])
+          appsByExec[execKey] = app;
+        var usage = appFrequency[execKey] || 0;
+        if (usage > 0) {
+          var rankedByUsage = Object.assign({}, app);
+          rankedByUsage._usage = usage;
+          usageRanked.push(rankedByUsage);
         }
       }
-      if (recent.length < Config.launcherRecentAppsLimit) {
-        var scored = [];
-        for (var k = 0; k < apps.length; ++k) {
-          var ranked = apps[k];
-          var count = appFrequency[ranked.exec] || 0;
-          if (count > 0 && !seen[ranked.exec]) {
-            var copy = Object.assign({}, ranked);
-            copy._recent = count;
-            scored.push(copy);
-          }
+      for (var j = 0; j < launchHistory.length; ++j) {
+        var launch = launchHistory[j];
+        var launchExec = String(launch.exec || "");
+        var matchedApp = launchExec === "" ? null : appsByExec[launchExec];
+        if (matchedApp && !seen[launchExec]) {
+          var matched = Object.assign({}, matchedApp);
+          matched._recent = launch.timestamp || 0;
+          recent.push(matched);
+          seen[launchExec] = true;
         }
-        scored.sort(function(a, b) { return b._recent - a._recent; });
-        recent = recent.concat(scored);
+      }
+      usageRanked.sort(function(a, b) { return (b._usage || 0) - (a._usage || 0); });
+      if (recent.length < Config.launcherRecentAppsLimit) {
+        for (var k = 0; k < usageRanked.length; ++k) {
+          var fallback = usageRanked[k];
+          var fallbackExec = String(fallback.exec || "");
+          if (fallbackExec === "" || seen[fallbackExec])
+            continue;
+          var promoted = Object.assign({}, fallback);
+          promoted._recent = fallback._usage || 0;
+          recent.push(promoted);
+          seen[fallbackExec] = true;
+          if (recent.length >= Config.launcherRecentAppsLimit)
+            break;
+        }
       }
       recentItems = recent.slice(0, Config.launcherRecentAppsLimit);
       var suggestions = [];
-      for (var m = 0; m < apps.length; ++m) {
-        var candidate = apps[m];
-        if (seen[candidate.exec]) continue;
-        var usage = appFrequency[candidate.exec] || 0;
-        if (usage > 0) {
-          var suggested = Object.assign({}, candidate);
-          suggested._usage = usage;
-          suggestions.push(suggested);
-        }
+      for (var m = 0; m < usageRanked.length; ++m) {
+        var candidate = usageRanked[m];
+        var candidateExec = String(candidate.exec || "");
+        if (candidateExec === "" || seen[candidateExec])
+          continue;
+        suggestions.push(candidate);
       }
-      suggestions.sort(function(a, b) { return (b._usage || 0) - (a._usage || 0); });
       suggestionItems = suggestions.slice(0, Config.launcherSuggestionsLimit);
     } else if (mode === "system") {
       recentItems = [
@@ -1316,6 +1348,45 @@ PanelWindow {
     preloadWaitTimer.restart();
   }
 
+  function buildFileItemsFromRaw(raw, homeDir) {
+    var lines = raw ? raw.split("\n") : [];
+    var items = new Array(lines.length);
+    var count = 0;
+    for (var i = 0; i < lines.length; ++i) {
+      var path = String(lines[i] || "");
+      if (path === "")
+        continue;
+      var fullPath = path.charCodeAt(0) === 47 ? path : (homeDir + "/" + path);
+      var slash = fullPath.lastIndexOf("/");
+      var name = slash >= 0 ? fullPath.substring(slash + 1) : fullPath;
+      if (name === "")
+        name = path;
+      items[count] = { name: name, title: fullPath, fullPath: fullPath };
+      count += 1;
+    }
+    if (count < items.length)
+      items.length = count;
+    return items;
+  }
+
+  function resolveFileSearchBackend(callback) {
+    if (fileSearchBackend === "fd" || fileSearchBackend === "find" || fileSearchBackend === "none") {
+      callback(fileSearchBackend);
+      return;
+    }
+    checkCommandAvailable("fd", function(fdOk) {
+      if (fdOk) {
+        fileSearchBackend = "fd";
+        callback("fd");
+        return;
+      }
+      checkCommandAvailable("find", function(findOk) {
+        fileSearchBackend = findOk ? "find" : "none";
+        callback(fileSearchBackend);
+      });
+    });
+  }
+
   function loadFiles() {
     var searchQuery = searchText.startsWith("/") ? searchText.substring(1).trim() : searchText;
     if (searchQuery.length < Config.launcherFileMinQueryLength) {
@@ -1335,26 +1406,34 @@ PanelWindow {
     var startedAt = Date.now();
     var homeDir = Quickshell.env("HOME") || "/";
     var maxResults = Math.max(20, Config.launcherFileMaxResults);
-    var script = "if command -v fd >/dev/null 2>&1; then "
-      + "fd --base-directory " + shellQuote(homeDir) + " --max-results " + maxResults + " " + shellQuote(searchQuery) + "; "
-      + "else find " + shellQuote(homeDir) + " -mindepth 1 -maxdepth 6 -iname '*" + searchQuery.replace(/'/g, "'\\''") + "*' 2>/dev/null | head -n " + maxResults + "; fi";
-    runCommand(["bash", "-lc", script], function(raw) {
+    resolveFileSearchBackend(function(backend) {
       if (!isRequestCurrent("files", token))
         return;
-      var lines = raw ? raw.split("\n") : [];
-      var items = [];
-      for (var i = 0; i < lines.length; i++) {
-        if (lines[i].trim() !== "") {
-          var path = lines[i];
-          var parts = path.split("/");
-          var fullPath = path.startsWith("/") ? path : (homeDir + "/" + path);
-          items.push({ name: parts[parts.length - 1] || path, title: fullPath, fullPath: fullPath });
-        }
+      if (backend === "none") {
+        setModeHint("Dependency missing", "Install 'fd' or 'find' to use Files mode.", "󰋼");
+        recordLoadMetric("files", Date.now() - startedAt, false, false);
+        return;
       }
-      allItems = items;
-      setFileQueryCached(cacheKey, items);
-      filterItems();
-      recordLoadMetric("files", Date.now() - startedAt, false, true);
+
+      var command = [];
+      if (backend === "fd") {
+        command = ["fd", "--base-directory", homeDir, "--max-results", String(maxResults), searchQuery];
+      } else {
+        var script = "find " + shellQuote(homeDir) + " -mindepth 1 -maxdepth 6 -iname '*" + searchQuery.replace(/'/g, "'\\''")
+          + "*' 2>/dev/null | head -n " + maxResults;
+        command = ["bash", "-lc", script];
+      }
+
+      recordFilesBackendLoad(backend);
+      runCommand(command, function(raw) {
+        if (!isRequestCurrent("files", token))
+          return;
+        var items = buildFileItemsFromRaw(raw, homeDir);
+        allItems = items;
+        setFileQueryCached(cacheKey, items);
+        filterItems();
+        recordLoadMetric("files", Date.now() - startedAt, false, true);
+      });
     });
   }
 
@@ -2325,6 +2404,9 @@ PanelWindow {
                   + " • failures " + launcherRoot.launcherMetrics.commandFailures
                   + " • filter avg " + (launcherRoot.launcherMetrics.avgFilterMs || 0) + "ms"
                   + " / last " + (launcherRoot.launcherMetrics.lastFilterMs || 0) + "ms"
+                  + (launcherRoot.mode === "files" ? (" • backend " + launcherRoot.filesBackendLabel
+                    + " • fd/find " + (launcherRoot.launcherMetrics.filesFdLoads || 0) + "/"
+                    + (launcherRoot.launcherMetrics.filesFindLoads || 0)) : "")
                 color: Colors.textSecondary
                 font.pixelSize: Colors.fontSizeXS
                 elide: Text.ElideRight

@@ -114,7 +114,10 @@ Item {
 
                     Item {
                         id: themeCardWrapper
-                        width: Math.max(220, Math.floor((themeFlow.width - Colors.spacingXS * (root._themeColumns - 1)) / root._themeColumns))
+                        width: Math.max(
+                            Math.min(180, themeFlow.width),
+                            Math.floor((themeFlow.width - Colors.spacingXS * (root._themeColumns - 1)) / root._themeColumns)
+                        )
                         height: themeCardLayout.implicitHeight + Colors.spacingS * 2
 
                         property var _theme: modelData

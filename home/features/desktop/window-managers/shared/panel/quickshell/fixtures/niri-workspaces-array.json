@@ -1,0 +1,20 @@
+[
+  {
+    "idx": 1,
+    "name": "1",
+    "is_active": false,
+    "is_urgent": false
+  },
+  {
+    "idx": 2,
+    "name": "2:web",
+    "is_active": true,
+    "is_urgent": false
+  },
+  {
+    "idx": 3,
+    "name": "3:chat",
+    "is_active": false,
+    "is_urgent": true
+  }
+]

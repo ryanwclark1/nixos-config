@@ -151,11 +151,27 @@ Item {
         Rectangle {
           id: addWidgetMenu
           visible: false
-          anchors.bottom: parent.top
-          anchors.horizontalCenter: parent.horizontalCenter
-          anchors.bottomMargin: 12
+          property real menuInset: 8
           width: 160
           height: addMenuCol.implicitHeight + 16
+          x: {
+            var base = (parent.width - width) / 2;
+            if (!root) return base;
+            var parentPos = parent.mapToItem(root, 0, 0);
+            var minX = -parentPos.x + menuInset;
+            var maxX = root.width - parentPos.x - width - menuInset;
+            return Math.min(Math.max(base, minX), Math.max(minX, maxX));
+          }
+          y: {
+            if (!root) return -height - 12;
+            var parentPos = parent.mapToItem(root, 0, 0);
+            var above = -height - 12;
+            var below = parent.height + 12;
+            var minY = -parentPos.y + menuInset;
+            var maxY = root.height - parentPos.y - height - menuInset;
+            var target = parentPos.y + above >= menuInset ? above : below;
+            return Math.min(Math.max(target, minY), Math.max(minY, maxY));
+          }
           radius: Colors.radiusSmall
           color: Colors.bgGlass
           border.color: Colors.border

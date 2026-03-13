@@ -86,6 +86,16 @@ let
     ${builtins.readFile ./scripts/compositor-smoke.sh}
   '';
 
+  compositorFixtureScript = pkgs.writeShellScriptBin "qs-compositor-fixture-check" ''
+    PATH="${pkgs.jq}/bin:${pkgs.bash}/bin:${pkgs.coreutils}/bin:$PATH"
+    ${builtins.readFile ./scripts/check-compositor-fixtures.sh}
+  '';
+
+  compositorVerifyScript = pkgs.writeShellScriptBin "qs-compositor-verify" ''
+    PATH="${pkgs.ripgrep}/bin:${pkgs.bash}/bin:${pkgs.coreutils}/bin:${pkgs.jq}/bin:${pkgs.gnused}/bin:${pkgs.hyprland}/bin:${pkgs.niri}/bin:$PATH"
+    ${builtins.readFile ./scripts/compositor-verify.sh}
+  '';
+
   # Build-time theme manifest: converts 177 base24 YAML themes into a single JSON file
   themeManifest = pkgs.runCommand "quickshell-theme-manifest" {
     nativeBuildInputs = [ pkgs.yq-go pkgs.jq ];
@@ -133,6 +143,8 @@ let
       iconResolverScript
       compositorGuardScript
       compositorSmokeScript
+      compositorFixtureScript
+      compositorVerifyScript
     ];
 
     home.activation.disableLegacyNotificationDaemons = lib.hm.dag.entryAfter [ "linkGeneration" ] ''

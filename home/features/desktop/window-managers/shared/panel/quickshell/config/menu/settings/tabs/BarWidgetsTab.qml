@@ -19,6 +19,7 @@ Item {
     property string validationMessage: ""
     property string dragSection: ""
     property int dragSourceIndex: -1
+    readonly property int overlayInset: root.tightSpacing ? 20 : 40
 
     readonly property var selectedBar: Config.selectedBar()
     readonly property var editingWidget: (selectedBar && settingsSection && settingsInstanceId)
@@ -282,9 +283,12 @@ Item {
         }
 
         Rectangle {
-            width: Math.min(root.compactMode ? 560 : 640, parent.width - (root.tightSpacing ? 40 : 80))
-            height: Math.min(560, parent.height - (root.tightSpacing ? 40 : 80))
-            anchors.centerIn: parent
+            width: Math.min(root.compactMode ? 560 : 640, parent.width - root.overlayInset * 2)
+            height: Math.min(560, parent.height - root.overlayInset * 2)
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.topMargin: Math.max(root.overlayInset, (parent.height - height) / 2)
+            anchors.leftMargin: Math.max(root.overlayInset, (parent.width - width) / 2)
             radius: Colors.radiusLarge
             color: Colors.popupSurface
             border.color: Colors.border
@@ -399,58 +403,68 @@ Item {
         }
 
         Rectangle {
-            width: Math.min(460, parent.width - (root.tightSpacing ? 40 : 80))
-            implicitHeight: settingsColumn.implicitHeight + Colors.paddingLarge * 2
-            anchors.centerIn: parent
+            width: Math.min(460, parent.width - root.overlayInset * 2)
+            height: Math.min(settingsFlick.contentHeight, parent.height - root.overlayInset * 2)
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.topMargin: Math.max(root.overlayInset, (parent.height - height) / 2)
+            anchors.leftMargin: Math.max(root.overlayInset, (parent.width - width) / 2)
             radius: Colors.radiusLarge
             color: Colors.popupSurface
             border.color: Colors.border
             border.width: 1
 
-            ColumnLayout {
-                id: settingsColumn
+            Flickable {
+                id: settingsFlick
                 anchors.fill: parent
                 anchors.margins: Colors.paddingLarge
-                spacing: Colors.spacingM
+                clip: true
+                contentHeight: settingsColumn.implicitHeight
 
-                Flow {
-                    Layout.fillWidth: true
-                    width: parent.width
-                    spacing: Colors.spacingS
+                ColumnLayout {
+                    id: settingsColumn
+                    width: settingsFlick.width
+                    spacing: Colors.spacingM
 
-                    Text {
-                        width: root.compactMode ? parent.width : Math.max(0, parent.width - closeSettingsButton.implicitWidth - Colors.spacingS)
-                        text: root.editingWidget ? (BarWidgetRegistry.displayName(root.editingWidget.widgetType) + " Settings") : "Widget Settings"
-                        color: Colors.text
-                        font.pixelSize: Colors.fontSizeXL
-                        font.weight: Font.DemiBold
-                        wrapMode: Text.WordWrap
+                    Flow {
+                        Layout.fillWidth: true
+                        width: parent.width
+                        spacing: Colors.spacingS
+
+                        Text {
+                            width: root.compactMode ? parent.width : Math.max(0, parent.width - closeSettingsButton.implicitWidth - Colors.spacingS)
+                            text: root.editingWidget ? (BarWidgetRegistry.displayName(root.editingWidget.widgetType) + " Settings") : "Widget Settings"
+                            color: Colors.text
+                            font.pixelSize: Colors.fontSizeXL
+                            font.weight: Font.DemiBold
+                            wrapMode: Text.WordWrap
+                        }
+
+                        SettingsActionButton {
+                            id: closeSettingsButton
+                            compact: true
+                            iconName: "󰅖"
+                            label: "Close"
+                            onClicked: root.widgetSettingsOpen = false
+                        }
                     }
 
-                    SettingsActionButton {
-                        id: closeSettingsButton
-                        compact: true
-                        iconName: "󰅖"
-                        label: "Close"
-                        onClicked: root.widgetSettingsOpen = false
+                    SettingsInfoCallout {
+                        visible: !root.editingWidget || !BarWidgetRegistry.supportsSettings(root.editingWidget.widgetType)
+                        title: "No configurable options"
+                        body: "This widget does not expose custom per-instance settings yet."
                     }
-                }
 
-                SettingsInfoCallout {
-                    visible: !root.editingWidget || !BarWidgetRegistry.supportsSettings(root.editingWidget.widgetType)
-                    title: "No configurable options"
-                    body: "This widget does not expose custom per-instance settings yet."
-                }
-
-                SettingsSliderRow {
-                    visible: !!root.editingWidget && root.editingWidget.widgetType === "spacer"
-                    label: "Spacer Size"
-                    min: 8
-                    max: 80
-                    value: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.size !== undefined
-                        ? root.editingWidget.settings.size
-                        : 24
-                    onMoved: value => root.updateSpacerSize(value)
+                    SettingsSliderRow {
+                        visible: !!root.editingWidget && root.editingWidget.widgetType === "spacer"
+                        label: "Spacer Size"
+                        min: 8
+                        max: 80
+                        value: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.size !== undefined
+                            ? root.editingWidget.settings.size
+                            : 24
+                        onMoved: value => root.updateSpacerSize(value)
+                    }
                 }
             }
         }

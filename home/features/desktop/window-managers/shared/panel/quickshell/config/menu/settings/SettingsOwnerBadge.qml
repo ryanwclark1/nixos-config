@@ -2,12 +2,13 @@ import QtQuick
 import QtQuick.Layouts
 import "../../services"
 
-RowLayout {
+Flow {
     id: root
 
     property var owner: null
     spacing: Colors.spacingS
     visible: !!owner
+    width: parent ? parent.width : implicitWidth
 
     function ownerField(name, fallback) {
         if (!owner || owner[name] === undefined || owner[name] === null || owner[name] === "")

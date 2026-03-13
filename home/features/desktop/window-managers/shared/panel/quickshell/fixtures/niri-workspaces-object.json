@@ -1,0 +1,16 @@
+{
+  "workspaces": [
+    {
+      "id": 1,
+      "name": "1",
+      "focused": false,
+      "urgent": false
+    },
+    {
+      "id": 2,
+      "name": "2:code",
+      "focused": true,
+      "urgent": false
+    }
+  ]
+}
