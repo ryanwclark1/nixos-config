@@ -59,7 +59,7 @@ show_settings_menu() {
   case $(menu "Settings" "🔊 Audio\n📶 Network\n🔵 Bluetooth\n⚡ Power\n🖥️ Displays\n⌨️ Keybindings") in
   *Audio*) show_audio_menu ;;
   *Network*) kitty -e nmtui ;;
-  *Bluetooth*) blueberry ;;
+  *Bluetooth*) blueman-manager ;;
   *Power*) show_power_menu ;;
   *Displays*) wdisplays ;;
   *Keybindings*) $HYPR_SCRIPTS/hypr/hyprland-keybindings.sh ;;

@@ -27,7 +27,7 @@ Rectangle {
     Layout.fillWidth: true
     implicitHeight: toggleContent.implicitHeight + Colors.spacingM * 2
     radius: Colors.radiusMedium
-    color: Colors.bgWidget
+    color: Colors.modalFieldSurface
     border.color: root._active ? Colors.primary : Colors.border
     border.width: 1
 

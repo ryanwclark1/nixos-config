@@ -2611,6 +2611,11 @@ PanelWindow {
                       event.accepted = true;
                   }
                 }
+                else if (launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && launcherRoot.showLauncherHome && (event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_Tab) {
+                  var direction = (event.modifiers & Qt.ShiftModifier) ? -1 : 1;
+                  if (launcherRoot.cycleDrunCategoryFilter(direction))
+                    event.accepted = true;
+                }
                 else if (event.key === Qt.Key_Backtab || (event.key === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier))) {
                   launcherRoot.cycleMode(-1);
                   event.accepted = true;

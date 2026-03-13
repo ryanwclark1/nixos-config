@@ -38,6 +38,8 @@ Item {
             description: "Visual helpers and idle inhibition behavior."
 
             SettingsFieldGrid {
+                maximumColumns: root.compactMode ? 1 : 2
+
                 SettingsToggleRow {
                     label: "Screen Borders"
                     icon: "󰩪"

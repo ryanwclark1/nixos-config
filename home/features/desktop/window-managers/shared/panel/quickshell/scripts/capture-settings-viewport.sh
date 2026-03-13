@@ -11,14 +11,16 @@ tab_id="wallpaper"
 output_path=""
 delay_seconds="4"
 scroll_y="0"
+workspace_target="auto"
 temp_qml=""
 temp_full=""
 temp_crop=""
 harness_pid=""
+restore_workspace=""
 
 usage() {
   cat <<'EOF'
-Usage: capture-settings-viewport.sh [--width PX] [--height PX] [--tab TAB_ID] [--delay SECONDS] [--scroll-y PX] [--output PATH]
+Usage: capture-settings-viewport.sh [--width PX] [--height PX] [--tab TAB_ID] [--delay SECONDS] [--scroll-y PX] [--workspace current|auto|NAME] [--output PATH]
 
 Render the settings UI inside a temporary overlay harness at a simulated viewport size,
 capture a cropped screenshot, and save it to a file.
@@ -47,6 +49,10 @@ while [[ $# -gt 0 ]]; do
       scroll_y="${2:-}"
       shift 2
       ;;
+    --workspace)
+      workspace_target="${2:-}"
+      shift 2
+      ;;
     --output)
       output_path="${2:-}"
       shift 2
@@ -68,6 +74,41 @@ require_cmd() {
     printf 'Missing required command: %s\n' "$1" >&2
     exit 2
   fi
+}
+
+pick_capture_workspace() {
+  local used
+  for candidate in $(seq 9001 9099); do
+    used="$(hyprctl workspaces -j | jq --arg candidate "${candidate}" 'map(select((.name // "") == $candidate or ((.id | tostring) == $candidate))) | length')"
+    if [[ "${used}" == "0" ]]; then
+      printf '%s\n' "${candidate}"
+      return 0
+    fi
+  done
+  return 1
+}
+
+switch_to_capture_workspace() {
+  local requested="$1"
+  local target="${requested}"
+  if [[ "${requested}" == "current" ]]; then
+    return 0
+  fi
+
+  restore_workspace="$(hyprctl -j activeworkspace | jq -r '.name // (.id | tostring)')"
+  if [[ -z "${restore_workspace}" || "${restore_workspace}" == "null" ]]; then
+    printf 'Could not resolve active workspace before capture.\n' >&2
+    exit 1
+  fi
+
+  if [[ "${requested}" == "auto" ]]; then
+    target="$(pick_capture_workspace)" || {
+      printf 'Could not allocate a dedicated capture workspace.\n' >&2
+      exit 1
+    }
+  fi
+
+  hyprctl dispatch workspace "${target}" >/dev/null
 }
 
 main() {
@@ -100,7 +141,9 @@ main() {
   temp_full="$(mktemp /tmp/settings-viewport-full-XXXXXX.png)"
   temp_crop="$(mktemp /tmp/settings-viewport-crop-XXXXXX.png)"
 
-  trap '[[ -n "${harness_pid}" ]] && kill "${harness_pid}" >/dev/null 2>&1 || true; rm -f "${temp_qml}" "${temp_full}" "${temp_crop}"' EXIT
+  trap '[[ -n "${harness_pid}" ]] && kill "${harness_pid}" >/dev/null 2>&1 || true; [[ -n "${restore_workspace}" ]] && hyprctl dispatch workspace "${restore_workspace}" >/dev/null 2>&1 || true; rm -f "${temp_qml}" "${temp_full}" "${temp_crop}"' EXIT
+
+  switch_to_capture_workspace "${workspace_target}"
 
   cat >"${temp_qml}" <<EOF
 import QtQuick

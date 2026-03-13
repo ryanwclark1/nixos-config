@@ -414,7 +414,7 @@ Item {
 
             SettingsFieldGrid {
                 maximumColumns: root.compactMode ? 1 : 2
-                minimumColumnWidth: 520
+                minimumColumnWidth: 280
 
                 SettingsToggleRow {
                     label: "Show Mode Hints"
@@ -615,7 +615,7 @@ Item {
 
                         Flow {
                             Layout.fillWidth: true
-                            width: parent.width
+                            Layout.preferredWidth: parent.width
                             spacing: Colors.spacingS
 
                             SettingsActionButton {
@@ -847,7 +847,7 @@ Item {
 
                         Flow {
                             Layout.fillWidth: true
-                            width: parent.width
+                            Layout.preferredWidth: parent.width
                             spacing: Colors.spacingS
 
                             SettingsActionButton {

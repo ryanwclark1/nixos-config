@@ -88,6 +88,8 @@ Item {
             }
 
             SettingsFieldGrid {
+                maximumColumns: root.compactMode ? 1 : 2
+
                 SettingsToggleRow {
                     label: "Volume Overdrive"
                     icon: "󰝝"

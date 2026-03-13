@@ -27,7 +27,7 @@ ColumnLayout {
 
     Flow {
         Layout.fillWidth: true
-        width: parent.width
+        Layout.preferredWidth: parent.width
         spacing: Colors.spacingM
 
         Text {
@@ -44,7 +44,7 @@ ColumnLayout {
             implicitWidth: selectedText.implicitWidth + 14
             implicitHeight: 24
             radius: 12
-            color: Colors.bgWidget
+            color: Colors.modalFieldSurface
             border.color: Colors.border
             border.width: 1
 
@@ -69,7 +69,7 @@ ColumnLayout {
 
     Flow {
         Layout.fillWidth: true
-        width: parent.width
+        Layout.preferredWidth: parent.width
         spacing: Colors.spacingS
 
         Repeater {

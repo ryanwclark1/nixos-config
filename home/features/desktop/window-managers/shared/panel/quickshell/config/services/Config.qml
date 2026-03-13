@@ -402,7 +402,8 @@ QtObject {
         createWidgetInstance("logo"),
         createWidgetInstance("workspaces"),
         createWidgetInstance("taskbar"),
-        createWidgetInstance("systemMonitor")
+        createWidgetInstance("cpuStatus"),
+        createWidgetInstance("ramStatus")
       ],
       center: [
         createWidgetInstance("dateTime"),
@@ -522,11 +523,42 @@ QtObject {
       var section = sections[i];
       var items = source[section] || [];
       for (var j = 0; j < items.length; ++j) {
-        normalized[section].push(normalizeWidgetInstance(items[j]));
+        var normalizedItems = normalizeWidgetInstances(items[j]);
+        for (var k = 0; k < normalizedItems.length; ++k) {
+          normalized[section].push(normalizedItems[k]);
+        }
       }
     }
 
     return normalized;
+  }
+
+  function cloneWidgetSettings(item) {
+    return item && item.settings ? JSON.parse(JSON.stringify(item.settings)) : {};
+  }
+
+  function normalizeWidgetInstances(item) {
+    var widgetType = item && item.widgetType ? item.widgetType : (item && item.widgetId ? item.widgetId : "");
+    if ((typeof item === "string" && item === "systemMonitor") || widgetType === "systemMonitor") {
+      var enabled = item && item.enabled !== undefined ? !!item.enabled : true;
+      var settings = cloneWidgetSettings(item);
+      return [
+        {
+          instanceId: generateId("widget"),
+          widgetType: "cpuStatus",
+          enabled: enabled,
+          settings: JSON.parse(JSON.stringify(settings))
+        },
+        {
+          instanceId: generateId("widget"),
+          widgetType: "ramStatus",
+          enabled: enabled,
+          settings: JSON.parse(JSON.stringify(settings))
+        }
+      ];
+    }
+
+    return [normalizeWidgetInstance(item)];
   }
 
   function normalizeWidgetInstance(item) {
@@ -537,7 +569,7 @@ QtObject {
       instanceId: item && item.instanceId ? item.instanceId : generateId("widget"),
       widgetType: widgetType,
       enabled: item && item.enabled !== undefined ? !!item.enabled : true,
-      settings: item && item.settings ? JSON.parse(JSON.stringify(item.settings)) : {}
+      settings: cloneWidgetSettings(item)
     };
   }
 

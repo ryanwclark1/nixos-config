@@ -261,11 +261,11 @@
                   "stateSeverity": {
                     "type": "string",
                     "enum": [
-                      "ok",
-                      "warn",
                       "error",
                       "info",
-                      "muted"
+                      "muted",
+                      "ok",
+                      "warn"
                     ]
                   },
                   "code": {
@@ -292,8 +292,8 @@
                     "type": "string",
                     "enum": [
                       "error",
-                      "warn",
-                      "muted"
+                      "muted",
+                      "warn"
                     ]
                   },
                   "message": {

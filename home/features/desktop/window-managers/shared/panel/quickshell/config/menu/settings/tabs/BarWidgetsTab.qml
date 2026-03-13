@@ -93,6 +93,17 @@ Item {
         Config.updateBarWidget(selectedBar.id, settingsSection, editingWidget.instanceId, { settings: settings });
     }
 
+    function updateEditingWidgetSetting(key, value) {
+        if (!selectedBar || !editingWidget) return;
+        var settings = editingWidget.settings ? JSON.parse(JSON.stringify(editingWidget.settings)) : {};
+        settings[key] = value;
+        Config.updateBarWidget(selectedBar.id, settingsSection, editingWidget.instanceId, { settings: settings });
+    }
+
+    function isSystemStatWidget(widgetType) {
+        return widgetType === "cpuStatus" || widgetType === "ramStatus" || widgetType === "gpuStatus";
+    }
+
     function loadPluginSettingsPane() {
         if (!pluginSettingsLoader)
             return;
@@ -187,7 +198,7 @@ Item {
                                 id: card
                                 anchors.fill: parent
                                 radius: Colors.radiusSmall
-                                color: Colors.bgWidget
+                                color: Colors.modalFieldSurface
                                 border.color: Colors.border
                                 border.width: 1
                                 opacity: dragArea.drag.active ? 0.7 : 1.0
@@ -527,6 +538,22 @@ Item {
                             ? root.editingWidget.settings.size
                             : 24
                         onMoved: value => root.updateSpacerSize(value)
+                    }
+
+                    SettingsModeRow {
+                        visible: !!root.editingWidget && root.isSystemStatWidget(root.editingWidget.widgetType)
+                        label: "Display Mode"
+                        description: "Choose whether this stat adapts to the bar orientation or always stays full, compact, or icon-only."
+                        currentValue: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.displayMode
+                            ? root.editingWidget.settings.displayMode
+                            : "auto"
+                        options: [
+                            { value: "auto", label: "Auto" },
+                            { value: "full", label: "Full" },
+                            { value: "compact", label: "Compact" },
+                            { value: "icon", label: "Icon" }
+                        ]
+                        onModeSelected: value => root.updateEditingWidgetSetting("displayMode", value)
                     }
 
                     Loader {

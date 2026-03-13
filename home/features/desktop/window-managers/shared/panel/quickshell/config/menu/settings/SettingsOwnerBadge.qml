@@ -44,7 +44,7 @@ Flow {
             implicitHeight: 24
             implicitWidth: badgeText.implicitWidth + 16
             radius: Colors.radiusPill
-            color: Colors.bgWidget
+            color: Colors.modalFieldSurface
             border.color: Colors.border
             border.width: 1
 

@@ -126,7 +126,7 @@ Item {
                         Rectangle {
                             anchors.fill: parent
                             radius: Colors.radiusSmall
-                            color: Colors.bgWidget
+                            color: Colors.modalFieldSurface
                             border.color: themeCardWrapper._themeIsActive ? Colors.primary : Colors.border
                             border.width: themeCardWrapper._themeIsActive ? 2 : 1
                             Behavior on border.color {

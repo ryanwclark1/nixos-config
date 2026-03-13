@@ -7,12 +7,14 @@ surface_id="networkMenu"
 output_path=""
 delay_seconds="1.6"
 crop_mode="monitor"
+workspace_target="auto"
 temp_full=""
 temp_crop=""
+restore_workspace=""
 
 usage() {
   cat <<'EOF'
-Usage: capture-surface-viewport.sh [--id INSTANCE_ID] [--surface SURFACE_ID] [--delay SECONDS] [--crop monitor|usable] [--output PATH]
+Usage: capture-surface-viewport.sh [--id INSTANCE_ID] [--surface SURFACE_ID] [--delay SECONDS] [--crop monitor|usable] [--workspace current|auto|NAME] [--output PATH]
 
 Open a live QuickShell surface through Shell IPC, capture the focused monitor, and save a cropped screenshot.
 EOF
@@ -36,6 +38,10 @@ while [[ $# -gt 0 ]]; do
       crop_mode="${2:-}"
       shift 2
       ;;
+    --workspace)
+      workspace_target="${2:-}"
+      shift 2
+      ;;
     --output)
       output_path="${2:-}"
       shift 2
@@ -57,6 +63,41 @@ require_cmd() {
     printf 'Missing required command: %s\n' "$1" >&2
     exit 2
   fi
+}
+
+pick_capture_workspace() {
+  local used
+  for candidate in $(seq 9001 9099); do
+    used="$(hyprctl workspaces -j | jq --arg candidate "${candidate}" 'map(select((.name // "") == $candidate or ((.id | tostring) == $candidate))) | length')"
+    if [[ "${used}" == "0" ]]; then
+      printf '%s\n' "${candidate}"
+      return 0
+    fi
+  done
+  return 1
+}
+
+switch_to_capture_workspace() {
+  local requested="$1"
+  local target="${requested}"
+  if [[ "${requested}" == "current" ]]; then
+    return 0
+  fi
+
+  restore_workspace="$(hyprctl -j activeworkspace | jq -r '.name // (.id | tostring)')"
+  if [[ -z "${restore_workspace}" || "${restore_workspace}" == "null" ]]; then
+    printf 'Could not resolve active workspace before capture.\n' >&2
+    exit 1
+  fi
+
+  if [[ "${requested}" == "auto" ]]; then
+    target="$(pick_capture_workspace)" || {
+      printf 'Could not allocate a dedicated capture workspace.\n' >&2
+      exit 1
+    }
+  fi
+
+  hyprctl dispatch workspace "${target}" >/dev/null
 }
 
 discover_instances_from_pid() {
@@ -144,7 +185,9 @@ main() {
 
   temp_full="$(mktemp /tmp/surface-capture-full-XXXXXX.png)"
   temp_crop="$(mktemp /tmp/surface-capture-crop-XXXXXX.png)"
-  trap 'rm -f "${temp_full}" "${temp_crop}"; quickshell ipc --id "${instance_id}" call Shell closeAllSurfaces >/dev/null 2>&1 || true' EXIT
+  trap 'rm -f "${temp_full}" "${temp_crop}"; quickshell ipc --id "${instance_id}" call Shell closeAllSurfaces >/dev/null 2>&1 || true; [[ -n "${restore_workspace}" ]] && hyprctl dispatch workspace "${restore_workspace}" >/dev/null 2>&1 || true' EXIT
+
+  switch_to_capture_workspace "${workspace_target}"
 
   quickshell ipc --id "${instance_id}" show >/dev/null
   call_ipc Shell reloadConfig >/dev/null

@@ -37,6 +37,10 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
 
 ## Validation Tooling
 
+- Local runner:
+  - `scripts/plugin-local.sh quick` (fast local guardrails)
+  - `scripts/plugin-local.sh full` (complete local verification)
+  - `scripts/plugin-local.sh doctor [/path/to/plugins]`
 - Runtime state/error catalog:
   - `config/plugins/runtime-catalog.json`
 - Diagnostics contract schema:
@@ -52,6 +56,9 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
   - `scripts/check-plugin-runtime-guards.sh`
 - Plugin diagnostics contract gate:
   - `scripts/check-plugin-diagnostics-contracts.sh`
+- Plugin diagnostics schema sync:
+  - `scripts/sync-plugin-diagnostics-schema.sh --write`
+  - CI/guard check: `scripts/sync-plugin-diagnostics-schema.sh --check`
 - Plugin diagnostics schema gate (ajv):
   - `scripts/check-plugin-diagnostics-schema.sh`
   - requires `ajv` or `npx` (`nodejs`)

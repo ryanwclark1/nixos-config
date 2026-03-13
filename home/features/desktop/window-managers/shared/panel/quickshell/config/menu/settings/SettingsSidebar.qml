@@ -22,7 +22,7 @@ Rectangle {
   readonly property var compactEntries: buildCompactEntries()
 
   Layout.fillHeight: true
-  color: Qt.rgba(0, 0, 0, 0.1)
+  color: Colors.modalSidebarSurface
 
   property var expandedCategories: ({})
 
@@ -101,7 +101,7 @@ Rectangle {
       Layout.fillWidth: true
       implicitHeight: searchBarRow.implicitHeight + Colors.spacingS * 2
       radius: Colors.radiusPill
-      color: Colors.bgWidget
+      color: Colors.modalFieldSurface
       border.color: searchInput.activeFocus ? Colors.primary : Colors.border
       border.width: 1
 

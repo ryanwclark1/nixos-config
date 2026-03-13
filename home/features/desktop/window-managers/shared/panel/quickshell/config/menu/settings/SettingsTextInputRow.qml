@@ -38,7 +38,7 @@ ColumnLayout {
             Layout.fillWidth: true
             height: 38
             radius: Colors.radiusSmall
-            color: Colors.withAlpha(Colors.surface, 0.7)
+            color: Colors.modalFieldSurface
             border.color: input.activeFocus ? Colors.primary : Colors.border
             border.width: 1
 

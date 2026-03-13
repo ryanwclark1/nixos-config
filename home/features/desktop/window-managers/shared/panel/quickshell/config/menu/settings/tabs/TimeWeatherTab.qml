@@ -199,6 +199,8 @@ Item {
             description: "Clock format and bar date display options."
 
             SettingsFieldGrid {
+                maximumColumns: root.compactMode ? 1 : 2
+
                 SettingsToggleRow {
                     label: "24-Hour Clock"
                     icon: "󰅐"

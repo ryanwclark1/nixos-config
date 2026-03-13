@@ -124,8 +124,7 @@ PanelWindow {
 
     Rectangle {
       anchors.fill: parent
-      color: Colors.background
-      opacity: 0.5
+      color: Colors.withAlpha(Colors.background, 0.82)
     }
   }
 
@@ -139,7 +138,7 @@ PanelWindow {
     anchors.left: parent.left
     anchors.topMargin: settingsRoot.edgeMargins.top + Math.max(settingsRoot.gutterY, (settingsRoot.usableHeight - height) / 2)
     anchors.leftMargin: settingsRoot.edgeMargins.left + Math.max(settingsRoot.gutterX, (settingsRoot.usableWidth - width) / 2)
-    color: Colors.bgGlass
+    color: Colors.modalSurface
     border.color: Colors.border
     border.width: 1
     radius: Colors.radiusLarge

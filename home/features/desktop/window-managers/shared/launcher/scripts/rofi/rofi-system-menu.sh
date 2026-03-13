@@ -245,9 +245,7 @@ show_network_menu() {
       fi
       ;;
     *Bluetooth*)
-      if command -v blueberry >/dev/null; then
-        blueberry &
-      elif command -v blueman-manager >/dev/null; then
+      if command -v blueman-manager >/dev/null; then
         blueman-manager &
       else
         notify-send "Bluetooth" "No bluetooth manager available"
@@ -281,9 +279,7 @@ show_settings_menu() {
     *Audio*) show_audio_menu ;;
     *Network*) show_network_menu ;;
     *Bluetooth*)
-      if command -v blueberry >/dev/null; then
-        blueberry &
-      elif command -v blueman-manager >/dev/null; then
+      if command -v blueman-manager >/dev/null; then
         blueman-manager &
       else
         notify-send "Bluetooth" "No bluetooth manager available"

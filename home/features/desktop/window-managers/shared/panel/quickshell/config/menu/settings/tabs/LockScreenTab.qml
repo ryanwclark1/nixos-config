@@ -22,6 +22,8 @@ Item {
             description: "Lock screen modules and pre-lock countdown timing."
 
             SettingsFieldGrid {
+                maximumColumns: root.compactMode ? 1 : 2
+
                 SettingsToggleRow {
                     label: "Compact Mode"
                     icon: "󰘖"

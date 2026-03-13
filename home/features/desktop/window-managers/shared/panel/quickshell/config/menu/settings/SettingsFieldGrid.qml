@@ -16,6 +16,7 @@ Item {
     )
   )
   implicitHeight: grid.implicitHeight
+  implicitWidth: grid.implicitWidth
   Layout.fillWidth: true
 
   GridLayout {

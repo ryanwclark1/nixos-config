@@ -51,15 +51,25 @@ make_temp_home() {
   printf '%s\n' "$home"
 }
 
+make_temp_runtime() {
+  local runtime_dir
+  runtime_dir="$(mktemp -d)"
+  auto_cleanup+=("${runtime_dir}")
+  mkdir -p "${runtime_dir}/quickshell"
+  chmod 700 "${runtime_dir}"
+  printf '%s\n' "$runtime_dir"
+}
+
 run_qml_case() {
   local label="$1"
   local qml_path="$2"
   local home="$3"
+  local runtime_dir="$4"
   local log_file="${home}/$(basename "${qml_path}").log"
   local exit_code=0
 
   set +e
-  timeout 5s env HOME="${home}" quickshell -p "${qml_path}" --no-duplicate > "${log_file}" 2>&1
+  timeout 5s env HOME="${home}" XDG_RUNTIME_DIR="${runtime_dir}" QT_QPA_PLATFORM=offscreen quickshell -p "${qml_path}" --no-duplicate > "${log_file}" 2>&1
   exit_code=$?
   set -e
 
@@ -83,9 +93,11 @@ run_shell_case() {
   local label="$1"
   local payload="$2"
   local home
+  local runtime_dir
   home="$(make_temp_home)"
+  runtime_dir="$(make_temp_runtime)"
   write_config "${home}" "${payload}"
-  run_qml_case "shell matrix: ${label}" "${root_qml}" "${home}"
+  run_qml_case "shell matrix: ${label}" "${root_qml}" "${home}" "${runtime_dir}"
 }
 
 write_tab_harnesses() {
@@ -145,7 +157,7 @@ PanelWindow {
       widgetPickerOpen: true
       widgetSettingsOpen: true
       settingsSection: "left"
-      settingsInstanceId: "spacer-left-1"
+      settingsInstanceId: "cpu-left-1"
     }
   }
 }
@@ -153,8 +165,9 @@ QML
 }
 
 run_management_harnesses() {
-  local home harness_dir
+  local home harness_dir runtime_dir
   home="$(make_temp_home)"
+  runtime_dir="$(make_temp_runtime)"
   harness_dir="$(mktemp -d)"
   auto_cleanup+=("${harness_dir}")
 
@@ -175,6 +188,7 @@ run_management_harnesses() {
           "opacity": 0.85,
           "sectionWidgets": {
             "left": [
+              { "instanceId": "cpu-left-1", "widgetType": "cpuStatus", "enabled": true, "settings": { "displayMode": "compact" } },
               { "instanceId": "spacer-left-1", "widgetType": "spacer", "enabled": true, "settings": { "size": 48 } },
               { "instanceId": "logo-left-1", "widgetType": "logo", "enabled": true, "settings": {} }
             ],
@@ -202,8 +216,8 @@ run_management_harnesses() {
   }'
 
   write_tab_harnesses "${harness_dir}"
-  run_qml_case 'management harness: BarTab' "${harness_dir}/bar-tab-harness.qml" "${home}"
-  run_qml_case 'management harness: BarWidgetsTab' "${harness_dir}/bar-widgets-harness.qml" "${home}"
+  run_qml_case 'management harness: BarTab' "${harness_dir}/bar-tab-harness.qml" "${home}" "${runtime_dir}"
+  run_qml_case 'management harness: BarWidgetsTab' "${harness_dir}/bar-widgets-harness.qml" "${home}" "${runtime_dir}"
 }
 
 main() {

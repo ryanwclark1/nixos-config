@@ -51,7 +51,7 @@ ColumnLayout {
 
     Flow {
         Layout.fillWidth: true
-        width: parent.width
+        Layout.preferredWidth: parent.width
 
         Text {
             width: root.narrowLayout ? parent.width : Math.max(0, parent.width - sliderValuePill.implicitWidth - Colors.spacingM)
@@ -67,7 +67,7 @@ ColumnLayout {
             implicitHeight: 24
             implicitWidth: valueText.implicitWidth + 14
             radius: 12
-            color: Colors.bgWidget
+            color: Colors.modalFieldSurface
             border.color: Colors.border
             border.width: 1
 
@@ -117,7 +117,7 @@ ColumnLayout {
             height: width
             radius: width / 2
             color: Colors.primary
-            border.color: Colors.bgWidget
+            border.color: Colors.modalFieldSurface
             border.width: 2
             x: Math.max(0, Math.min(parent.width - width, parent.width * Math.max(0, Math.min(1, root._ratio)) - width / 2))
             anchors.verticalCenter: parent.verticalCenter
@@ -151,7 +151,7 @@ ColumnLayout {
 
     Flow {
         Layout.fillWidth: true
-        width: parent.width
+        Layout.preferredWidth: parent.width
         spacing: Colors.spacingS
 
         Text {

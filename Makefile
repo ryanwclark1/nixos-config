@@ -13,7 +13,7 @@ AGE_PUBLIC_KEY_FILE = $(AGE_DIR)/keys.txt
 RSA_BITS = 4096
 
 # Define the makefile targets and rules
-.PHONY: keygen rsa_key ed25519_key age_key get_age_public_key update-packages update-package-status
+.PHONY: keygen rsa_key ed25519_key age_key get_age_public_key update-packages update-package-status niri-vm-build niri-vm niri-vm-reset niri-vm-fresh niri-vm-ssh niri-vm-fresh-ssh
 
 keygen: rsa_key ed25519_key age_key get_age_public_key
 
@@ -231,3 +231,37 @@ update-packages:
 
 update-package-status:
 	@./scripts/update-packages.sh status
+
+
+.PHONY: quickshell-guard quickshell-fixtures quickshell-smoke quickshell-checks
+
+quickshell-guard:
+	bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/check-compositor-guards.sh
+	bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/check-compositor-fixtures.sh
+
+quickshell-fixtures:
+	bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/check-compositor-fixtures.sh
+
+quickshell-smoke:
+	bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/compositor-smoke.sh
+
+quickshell-checks:
+	bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/compositor-verify.sh
+
+niri-vm-build:
+	bash ./scripts/vm/launch-niri-test-vm.sh --build-only
+
+niri-vm:
+	bash ./scripts/vm/launch-niri-test-vm.sh
+
+niri-vm-reset:
+	bash ./scripts/vm/launch-niri-test-vm.sh --reset-disk
+
+niri-vm-fresh:
+	bash ./scripts/vm/launch-niri-test-vm.sh --reset-disk
+
+niri-vm-ssh:
+	bash ./scripts/vm/launch-niri-test-vm.sh --ssh-port 2222
+
+niri-vm-fresh-ssh:
+	bash ./scripts/vm/launch-niri-test-vm.sh --reset-disk --ssh-port 2222

@@ -31,6 +31,8 @@ Item {
             description: "Dock visibility and grouping behavior."
 
             SettingsFieldGrid {
+                maximumColumns: root.compactMode ? 1 : 2
+
                 SettingsToggleRow {
                     label: "Dock Enabled"
                     icon: "󰍜"

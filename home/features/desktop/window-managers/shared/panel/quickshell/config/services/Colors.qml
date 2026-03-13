@@ -47,6 +47,10 @@ QtObject {
   readonly property color cardSurface: withAlpha(surface, 0.82)
   readonly property color chipSurface: withAlpha(surface, 0.92)
   readonly property color surfaceContainerHigh: Qt.lighter(popupSurface, 1.12)
+  readonly property color modalSurface: solid(surface)
+  readonly property color modalSidebarSurface: _isLight ? Qt.darker(modalSurface, 1.06) : Qt.darker(modalSurface, 1.18)
+  readonly property color modalCardSurface: _isLight ? Qt.darker(modalSurface, 1.03) : Qt.lighter(modalSurface, 1.12)
+  readonly property color modalFieldSurface: _isLight ? Qt.darker(modalSurface, 1.02) : Qt.lighter(modalSurface, 1.08)
 
   // --- DIMENSIONS ---
   readonly property real radiusLarge: 20
@@ -83,6 +87,7 @@ QtObject {
   readonly property int fontWeightBold: Font.Bold
 
   function withAlpha(c, a) { return Qt.rgba(c.r, c.g, c.b, a); }
+  function solid(c) { return Qt.rgba(c.r, c.g, c.b, 1); }
   function clamp01(value) { return Math.max(0, Math.min(1, value)); }
 
   function weatherIcon(desc) {

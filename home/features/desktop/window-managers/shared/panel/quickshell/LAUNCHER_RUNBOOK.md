@@ -19,6 +19,11 @@ Use this guide for day-to-day launcher validation and incident triage.
 - CI-safe launcher smoke gate:
   - `scripts/check-launcher-smoke.sh --ci`
 
+Live launcher scripts auto-select a QuickShell instance in this order:
+1. launched from this repo’s `config/shell.qml` and exposing latest launcher IPC actions
+2. launched from this repo’s `config/shell.qml`
+3. any launcher-capable instance
+
 ## Benchmark Baselines
 
 - Baselines file:
@@ -80,7 +85,8 @@ Use `App Category Filters` in Launcher settings to enable/disable these chips an
 1. Run `scripts/check-launcher-smoke.sh`.
 2. If benchmark gate fails, inspect `scripts/launcher-benchmark-baselines.json` versus current host load.
 3. If IPC health fails, run `scripts/check-launcher-ipc-health.sh --id <instance-id>` and inspect the emitted JSON `errors` list.
-   - If `drunCategoryState` is missing in a live instance but static checks pass, restart/reload QuickShell for that session and rerun smoke.
+   - Live checks now attempt `Shell.reloadConfig` automatically before warning on missing `drunCategoryState`.
+   - If `drunCategoryState` is missing, or present but returns empty/non-JSON payload after reload while static checks pass, restart QuickShell for that session and rerun smoke.
 4. In a live session, open launcher runtime metrics and verify:
    - backend is expected (`fd` preferred),
    - resolve cost is low/stable,

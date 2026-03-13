@@ -15,7 +15,7 @@ Rectangle {
     Layout.fillWidth: true
     implicitHeight: dataContent.implicitHeight + Colors.spacingM * 2
     radius: Colors.radiusXS
-    color: Colors.bgWidget
+    color: Colors.modalFieldSurface
     border.color: Colors.border
     border.width: 1
 

@@ -15,8 +15,8 @@ printf '[INFO] Running plugin runtime guard checks...\n'
 printf '[INFO] Running plugin diagnostics contract checks...\n'
 "${script_dir}/check-plugin-diagnostics-contracts.sh"
 
-printf '[INFO] Running plugin diagnostics catalog sync checks...\n'
-"${script_dir}/check-plugin-diagnostics-catalog-sync.sh"
+printf '[INFO] Running plugin diagnostics schema sync checks...\n'
+"${script_dir}/sync-plugin-diagnostics-schema.sh" --check
 
 printf '[INFO] Running plugin diagnostics schema checks...\n'
 "${script_dir}/check-plugin-diagnostics-schema.sh"

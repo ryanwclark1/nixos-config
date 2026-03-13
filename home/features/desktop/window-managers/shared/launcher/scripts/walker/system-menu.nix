@@ -13,7 +13,7 @@
     # System menu script - maintained as external file: ./walker-system-menu.sh
     (writeShellScriptBin "walker-system-menu" (
       ''
-        PATH="${pkgs.walker}/bin:${pkgs.coreutils}/bin:${pkgs.libnotify}/bin:${pkgs.systemd}/bin:${pkgs.kitty}/bin:${pkgs.hyprpicker}/bin:${pkgs.wiremix}/bin:${pkgs.networkmanager}/bin:${pkgs.blueberry}/bin:${pkgs.hyprlock}/bin:${pkgs.hyprsunset}/bin:${pkgs.wdisplays}/bin:${pkgs.nautilus}/bin:${pkgs.btop}/bin:${pkgs.gnome-calculator}/bin:${pkgs.gnome-text-editor}/bin:$PATH"
+        PATH="${pkgs.walker}/bin:${pkgs.coreutils}/bin:${pkgs.libnotify}/bin:${pkgs.systemd}/bin:${pkgs.kitty}/bin:${pkgs.hyprpicker}/bin:${pkgs.wiremix}/bin:${pkgs.networkmanager}/bin:${pkgs.blueman}/bin:${pkgs.hyprlock}/bin:${pkgs.hyprsunset}/bin:${pkgs.wdisplays}/bin:${pkgs.nautilus}/bin:${pkgs.btop}/bin:${pkgs.gnome-calculator}/bin:${pkgs.gnome-text-editor}/bin:$PATH"
 
       ''
       + builtins.readFile (./. + "/walker-system-menu.sh")

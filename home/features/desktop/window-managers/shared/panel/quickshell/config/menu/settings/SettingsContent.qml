@@ -45,7 +45,7 @@ Item {
       Layout.bottomMargin: root.tightSpacing ? 0 : Colors.spacingS
       implicitHeight: compactSearchRow.implicitHeight + Colors.spacingM
       radius: Colors.radiusPill
-      color: Colors.bgWidget
+      color: Colors.modalFieldSurface
       border.color: compactSearchInput.activeFocus ? Colors.primary : Colors.border
       border.width: 1
 
@@ -157,7 +157,7 @@ Item {
               Layout.fillWidth: true
               implicitHeight: resultColumn.implicitHeight + Colors.spacingM * 2
               radius: Colors.radiusMedium
-              color: Colors.bgWidget
+              color: Colors.modalFieldSurface
               border.color: Colors.border
               border.width: 1
 

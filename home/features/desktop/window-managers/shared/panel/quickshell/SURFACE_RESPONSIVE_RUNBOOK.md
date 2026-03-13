@@ -13,7 +13,9 @@ Use this runbook after changes to popup menus, panel surfaces, or shared shell s
 - High-risk surface screenshot matrix:
   - `scripts/capture-surface-matrix.sh --crop monitor`
 - Combined settings + surface QA capture set:
-  - `scripts/capture-panel-matrix.sh --settings-preset portrait --surface-crop monitor`
+- `scripts/capture-panel-matrix.sh --settings-preset portrait --surface-crop monitor`
+  - uses a dedicated empty workspace by default
+  - pass `--workspace current` only when you explicitly want live-workspace captures
 - If more than one QuickShell instance is running:
   - `scripts/check-surface-responsive.sh --id <instance-id>`
   - `scripts/preview-surface-responsive.sh --id <instance-id>`

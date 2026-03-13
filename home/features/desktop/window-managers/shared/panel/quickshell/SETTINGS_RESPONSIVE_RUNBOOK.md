@@ -2,6 +2,10 @@
 
 Use this runbook after changes to the settings hub shell, shared settings primitives, or dense settings tabs.
 
+Reference:
+
+- historical closeout: `SETTINGS_RESPONSIVE_CLOSEOUT.md`
+
 ## Quick Commands
 
 - Static + runtime guardrails:

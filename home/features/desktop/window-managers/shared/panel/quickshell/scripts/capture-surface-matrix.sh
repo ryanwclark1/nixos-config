@@ -6,6 +6,7 @@ instance_id=""
 output_dir="/tmp/surface-matrix"
 delay_seconds="1.6"
 crop_mode="monitor"
+workspace_target="auto"
 surfaces=(
   "notifCenter"
   "controlCenter"
@@ -17,7 +18,7 @@ surfaces=(
 
 usage() {
   cat <<'EOF'
-Usage: capture-surface-matrix.sh [--output-dir DIR] [--delay SECONDS] [--crop monitor|usable]
+Usage: capture-surface-matrix.sh [--output-dir DIR] [--delay SECONDS] [--crop monitor|usable] [--workspace current|auto|NAME]
 
 Capture the high-risk popup/panel surfaces on the currently focused monitor.
 EOF
@@ -39,6 +40,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --crop)
       crop_mode="${2:-}"
+      shift 2
+      ;;
+    --workspace)
+      workspace_target="${2:-}"
       shift 2
       ;;
     -h|--help)
@@ -65,6 +70,7 @@ for surface in "${surfaces[@]}"; do
     --surface "${surface}" \
     --delay "${delay_seconds}" \
     --crop "${crop_mode}" \
+    --workspace "${workspace_target}" \
     --output "${output_dir}/${surface}-${crop_mode}.png"
 done
 

@@ -190,6 +190,52 @@
             inherit inputs outputs;
           };
         };
+        niriTestVm = lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            stylix.nixosModules.stylix
+            ./hosts/woody
+            (
+              { lib, ... }:
+              {
+                # VM build path for this host currently asserts if time sync is off.
+                services.timesyncd.enable = lib.mkForce true;
+                programs.ssh.knownHosts = lib.mkForce { };
+                # Make the test VM reliably accessible without depending on host sops state.
+                services.displayManager.autoLogin.enable = lib.mkForce true;
+                services.displayManager.autoLogin.user = lib.mkForce "administrator";
+                services.displayManager.defaultSession = lib.mkForce "niri";
+                services.getty.autologinUser = lib.mkForce null;
+                services.openssh.enable = lib.mkForce true;
+                services.openssh.settings.PasswordAuthentication = lib.mkForce true;
+                services.openssh.hostKeys = lib.mkForce [
+                  {
+                    path = "/etc/ssh/ssh_host_ed25519_key";
+                    type = "ed25519";
+                  }
+                ];
+                sops.age.sshKeyPaths = lib.mkForce [
+                  "/etc/ssh/ssh_host_ed25519_key"
+                ];
+                users.users.administrator = {
+                  hashedPasswordFile = lib.mkForce null;
+                  initialPassword = lib.mkForce "niri";
+                };
+
+                # Keep this profile focused on compositor/UI testing.
+                virtualisation.vmVariant = {
+                  virtualisation.graphics = true;
+                  virtualisation.cores = 4;
+                  virtualisation.memorySize = 8192;
+                  virtualisation.diskSize = 16384;
+                };
+              }
+            )
+          ];
+          specialArgs = {
+            inherit inputs outputs;
+          };
+        };
       };
       darwinConfigurations = {
         mini = nix-darwin.lib.darwinSystem {

@@ -169,7 +169,7 @@ The following packages were **incorrectly marked as missing** in the previous co
 | alacritty | ❌ | - | Terminal emulator |
 | 1password-beta | ❌ | - | Password manager |
 | 1password-cli | ❌ | - | 1Password CLI |
-| blueberry | ❌ | - | Bluetooth manager |
+| blueman | ✅ | - | Bluetooth manager |
 | gnome-calculator | ❌ | - | Calculator |
 | gnome-themes-extra | ❌ | - | GNOME themes |
 | gvfs-mtp | ❌ | - | MTP support |

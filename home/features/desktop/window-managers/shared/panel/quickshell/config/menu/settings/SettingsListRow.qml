@@ -15,7 +15,7 @@ Rectangle {
     Layout.fillWidth: true
     implicitHeight: Math.max(minimumHeight, contentRow.implicitHeight + contentInset * 2)
     radius: Colors.radiusXS
-    color: root.active ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, root.activeBackgroundAlpha) : Colors.bgWidget
+    color: root.active ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, root.activeBackgroundAlpha) : Colors.modalFieldSurface
     border.color: root.active ? Colors.primary : Colors.border
     border.width: 1
 

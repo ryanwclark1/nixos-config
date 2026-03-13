@@ -4,6 +4,7 @@ set -euo pipefail
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 ci_mode=0
 instance_id=""
+expected_config="$(realpath "${script_dir}/../config/shell.qml" 2>/dev/null || printf '%s' "${script_dir}/../config/shell.qml")"
 
 usage() {
   cat <<'EOF'
@@ -38,7 +39,8 @@ while [[ $# -gt 0 ]]; do
 done
 
 discover_launcher_instance() {
-  local runtime_root candidate show_output fallback_candidate=""
+  local runtime_root candidate show_output log_file launch_line
+  local fallback_candidate="" drun_candidate="" config_candidate="" preferred_candidate=""
   runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
   if [[ ! -d "${runtime_root}" ]]; then
     return 1
@@ -56,11 +58,34 @@ discover_launcher_instance() {
       fallback_candidate="${candidate}"
     fi
 
-    if printf '%s' "${show_output}" | rg -q "function drunCategoryState\\("; then
-      printf '%s\n' "${candidate}"
-      return 0
+    if printf '%s' "${show_output}" | rg -q "function drunCategoryState\\(" && [[ -z "${drun_candidate}" ]]; then
+      drun_candidate="${candidate}"
+    fi
+
+    log_file="${runtime_root}/${candidate}/log.log"
+    launch_line="$(sed -n '1,6p' "${log_file}" 2>/dev/null | rg -m1 "Launching config:" || true)"
+    if [[ -n "${launch_line}" ]] && printf '%s' "${launch_line}" | rg -q -F -- "${expected_config}"; then
+      if [[ -z "${config_candidate}" ]]; then
+        config_candidate="${candidate}"
+      fi
+      if printf '%s' "${show_output}" | rg -q "function drunCategoryState\\("; then
+        preferred_candidate="${candidate}"
+        break
+      fi
     fi
   done < <(find "${runtime_root}" -mindepth 1 -maxdepth 1 -type d -exec test -S '{}/ipc.sock' ';' -printf '%T@ %f\n' 2>/dev/null | sort -nr | awk '{print $2}')
+  if [[ -n "${preferred_candidate}" ]]; then
+    printf '%s\n' "${preferred_candidate}"
+    return 0
+  fi
+  if [[ -n "${config_candidate}" ]]; then
+    printf '%s\n' "${config_candidate}"
+    return 0
+  fi
+  if [[ -n "${drun_candidate}" ]]; then
+    printf '%s\n' "${drun_candidate}"
+    return 0
+  fi
   if [[ -n "${fallback_candidate}" ]]; then
     printf '%s\n' "${fallback_candidate}"
     return 0

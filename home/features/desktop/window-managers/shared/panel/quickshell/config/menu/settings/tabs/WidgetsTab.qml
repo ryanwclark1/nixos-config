@@ -22,6 +22,8 @@ Item {
             description: "Desktop widget visibility, snapping, and edit mode."
 
             SettingsFieldGrid {
+                maximumColumns: root.compactMode ? 1 : 2
+
                 SettingsToggleRow {
                     label: "Desktop Widgets"
                     icon: "󰖲"

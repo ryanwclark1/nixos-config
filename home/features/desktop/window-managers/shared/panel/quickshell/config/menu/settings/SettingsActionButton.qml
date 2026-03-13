@@ -17,7 +17,7 @@ Rectangle {
     implicitHeight: Math.max(compact ? 34 : 40, buttonRow.implicitHeight + (compact ? 12 : 14))
     implicitWidth: buttonRow.implicitWidth + (compact ? 18 : 24)
     radius: compact ? Colors.radiusSmall : Colors.radiusMedium
-    color: root.emphasized ? Colors.primary : Colors.bgWidget
+    color: root.emphasized ? Colors.primary : Colors.modalFieldSurface
     border.color: root.emphasized ? Colors.primary : Colors.border
     border.width: 1
     opacity: root.enabled ? 1.0 : 0.45

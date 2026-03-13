@@ -37,7 +37,7 @@ SharedWidgets.ScrollableContent {
 
             Flow {
                 Layout.fillWidth: true
-                width: parent.width
+                Layout.preferredWidth: parent.width
                 spacing: Colors.spacingS
 
                 Text {
@@ -49,7 +49,8 @@ SharedWidgets.ScrollableContent {
                 }
 
                 Text {
-                    width: root.iconName ? Math.max(0, parent.width - Colors.fontSizeXL - Colors.spacingS) : parent.width
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: root.iconName ? Math.max(0, parent.width - Colors.fontSizeXL - Colors.spacingS) : parent.width
                     text: root.title
                     color: Colors.text
                     font.pixelSize: Colors.fontSizeHuge
@@ -73,7 +74,7 @@ SharedWidgets.ScrollableContent {
                 Layout.fillWidth: true
                 spacing: Colors.spacingS
                 visible: !!root.ownerMeta
-                width: parent.width
+                Layout.preferredWidth: parent.width
 
                 function ownerField(name, fallback) {
                     if (!root.ownerMeta || root.ownerMeta[name] === undefined || root.ownerMeta[name] === null || root.ownerMeta[name] === "")
@@ -109,7 +110,7 @@ SharedWidgets.ScrollableContent {
                         implicitHeight: 24
                         implicitWidth: badgeText.implicitWidth + 16
                         radius: Colors.radiusPill
-                        color: Colors.bgWidget
+                        color: Colors.modalFieldSurface
                         border.color: Colors.border
                         border.width: 1
 

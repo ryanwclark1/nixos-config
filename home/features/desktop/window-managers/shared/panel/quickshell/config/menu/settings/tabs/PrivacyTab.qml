@@ -22,6 +22,8 @@ Item {
             description: "Show active privacy-sensitive device usage in the bar."
 
             SettingsFieldGrid {
+                maximumColumns: root.compactMode ? 1 : 2
+
                 SettingsToggleRow {
                     label: "Privacy Indicators"
                     icon: "󰒃"

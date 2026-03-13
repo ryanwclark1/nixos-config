@@ -47,6 +47,7 @@ require_literal "$launcher_qml" 'function selectDrunCategorySlot(slot) {' "launc
 require_literal "$launcher_qml" 'function drunCategoryStateObject() {' "launcher category state payload helper"
 require_literal "$launcher_qml" 'function drunCategoryState() { return JSON.stringify(launcherRoot.drunCategoryStateObject()); }' "launcher category state IPC method"
 require_literal "$launcher_qml" 'launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && (event.modifiers & Qt.AltModifier) && !(event.modifiers & Qt.ControlModifier)' "launcher category keyboard handler branch"
+require_literal "$launcher_qml" 'launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && launcherRoot.showLauncherHome && (event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_Tab' "launcher category ctrl+tab keyboard handler branch"
 require_literal "$launcher_qml" 'Alt+←/→ or Alt+1..9: categories • Enter: run • Esc: close' "launcher category keyboard hint"
 require_literal "$launcher_qml" 'launcherRoot.showLauncherHome && launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && launcherRoot.drunCategoryOptions.length > 1' "launcher category chip visibility guard"
 

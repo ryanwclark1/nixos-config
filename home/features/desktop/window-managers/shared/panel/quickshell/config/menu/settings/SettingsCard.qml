@@ -18,7 +18,7 @@ Rectangle {
     Layout.fillWidth: true
     implicitHeight: headerContainer.implicitHeight + (expanded ? contentColumn.implicitHeight + Colors.spacingL : 0)
     radius: Colors.radiusMedium
-    color: Colors.bgWidget
+    color: Colors.modalCardSurface
     border.color: Colors.border
     border.width: 1
     clip: true
@@ -52,7 +52,7 @@ Rectangle {
 
             Flow {
                 Layout.fillWidth: true
-                width: parent.width
+                Layout.preferredWidth: parent.width
                 spacing: Colors.spacingS
 
                 Text {

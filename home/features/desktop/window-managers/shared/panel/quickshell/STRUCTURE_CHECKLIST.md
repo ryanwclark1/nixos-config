@@ -24,6 +24,7 @@ Use this checklist before merging panel architecture changes.
 - [ ] `scripts/check-settings-responsive.sh` passes after changes to `SettingsHub`, shared settings components, or dense settings tabs.
 - [ ] `scripts/capture-settings-matrix.sh --preset portrait --scroll-y 900` is reviewed after responsive settings changes that affect long/scroll-heavy tabs.
 - [ ] `scripts/capture-settings-matrix.sh --preset laptop --scroll-y 700` is reviewed after responsive settings changes that affect long/scroll-heavy tabs.
+- [ ] `SETTINGS_RESPONSIVE_CLOSEOUT.md` is reviewed when a future settings change needs prior responsive context or known harness caveats.
 - [x] `node scripts/benchmark-launcher-filter.js --items=30000 --runs=40` is sampled for performance-sensitive launcher ranking changes.
 - [x] `node scripts/benchmark-launcher-home.js --apps=30000 --history=500 --runs=60` is sampled after changes to drun home/recent/suggestion composition.
 - [x] `node scripts/benchmark-launcher-files-shaping.js --lines=120000 --runs=25` is sampled after files-result parsing/path-shaping changes.
@@ -34,6 +35,7 @@ Use this checklist before merging panel architecture changes.
 - [ ] `scripts/check-plugin-doctor-smoke.sh` passes for deterministic doctor behavior (valid fixtures pass, invalid fixtures fail).
 - [ ] `scripts/check-plugin-runtime-guards.sh` passes for lifecycle/API/error-code runtime guardrails.
 - [ ] `scripts/check-plugin-diagnostics-contracts.sh` passes for plugin diagnostics payload/schema contract guardrails.
+- [ ] `scripts/sync-plugin-diagnostics-schema.sh --check` passes and `--write` is used when runtime catalog enum sets change.
 - [ ] `scripts/check-plugin-diagnostics-schema.sh` passes for JSON Schema (`ajv`) validation of diagnostics payload contracts.
 - [ ] `config/plugins/runtime-catalog.json` is updated when plugin lifecycle states or runtime error codes change.
 - [ ] `config/plugins/diagnostics.schema.json` is updated when diagnostics payload contracts change.

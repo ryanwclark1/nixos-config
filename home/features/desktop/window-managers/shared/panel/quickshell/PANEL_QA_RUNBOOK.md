@@ -55,8 +55,10 @@ This is for manual inspection, not pass/fail gating.
 1. Captures portrait settings screenshots for the high-risk tabs.
 2. Captures a deeper portrait settings pass by default to expose lower-scroll sections in dense tabs.
 3. Captures monitor or usable-area screenshots for the high-risk popup/panel surfaces.
-4. Writes a review artifact set under a single output directory.
-5. Generates an `index.html` gallery for quick inspection.
+4. Uses a dedicated empty workspace by default so the capture run does not reuse the current working workspace.
+5. Restores the original workspace after the run completes.
+6. Writes a review artifact set under a single output directory.
+7. Generates an `index.html` gallery for quick inspection.
 
 This is for review and bug triage, not runtime health.
 
@@ -65,6 +67,7 @@ This is for review and bug triage, not runtime health.
 1. Run `qs-panel-runtime-verify`.
 2. Run `qs-panel-preview` on the live session.
 3. Run `qs-panel-capture-matrix --settings-preset portrait --surface-crop monitor`.
+   Use `--workspace current` only if you intentionally want captures from the currently active workspace.
 4. Open the generated `index.html` gallery and record only concrete defects.
 5. Re-run the smallest relevant subset after each fix.
 

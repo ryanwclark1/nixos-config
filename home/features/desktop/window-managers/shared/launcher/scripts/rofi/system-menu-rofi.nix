@@ -12,7 +12,7 @@
     # Rofi-based system menu script - using external script file
     # Rofi system menu script - maintained as external file: ./rofi-system-menu.sh
     (writeShellScriptBin "system-menu-rofi" (''
-      PATH="${pkgs.rofi}/bin:${pkgs.coreutils}/bin:${pkgs.libnotify}/bin:${pkgs.systemd}/bin:${pkgs.kitty}/bin:${pkgs.hyprpicker}/bin:${pkgs.blueberry}/bin:${pkgs.hyprlock}/bin:${pkgs.hyprsunset}/bin:${pkgs.wdisplays}/bin:${pkgs.wiremix}/bin:${pkgs.nautilus}/bin:${pkgs.btop}/bin:${pkgs.gnome-calculator}/bin:${pkgs.gnome-text-editor}/bin:${pkgs.gnome-control-center}/bin:$PATH"
+      PATH="${pkgs.rofi}/bin:${pkgs.coreutils}/bin:${pkgs.libnotify}/bin:${pkgs.systemd}/bin:${pkgs.kitty}/bin:${pkgs.hyprpicker}/bin:${pkgs.blueman}/bin:${pkgs.hyprlock}/bin:${pkgs.hyprsunset}/bin:${pkgs.wdisplays}/bin:${pkgs.wiremix}/bin:${pkgs.nautilus}/bin:${pkgs.btop}/bin:${pkgs.gnome-calculator}/bin:${pkgs.gnome-text-editor}/bin:${pkgs.gnome-control-center}/bin:$PATH"
 
     '' + builtins.readFile (./. + "/rofi-system-menu.sh")))
 

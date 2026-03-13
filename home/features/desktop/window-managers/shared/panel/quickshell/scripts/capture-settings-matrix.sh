@@ -7,6 +7,7 @@ viewport_preset="portrait"
 output_dir="/tmp/settings-matrix"
 delay_seconds="4"
 scroll_y="0"
+workspace_target="auto"
 tabs=(
   "wallpaper"
   "bar-widgets"
@@ -20,7 +21,7 @@ tabs=(
 
 usage() {
   cat <<'EOF'
-Usage: capture-settings-matrix.sh [--preset portrait|laptop|wide] [--output-dir DIR] [--delay SECONDS] [--scroll-y PX]
+Usage: capture-settings-matrix.sh [--preset portrait|laptop|wide] [--output-dir DIR] [--delay SECONDS] [--scroll-y PX] [--workspace current|auto|NAME]
 
 Capture the high-risk settings tabs for a standard viewport preset.
 EOF
@@ -42,6 +43,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --scroll-y)
       scroll_y="${2:-}"
+      shift 2
+      ;;
+    --workspace)
+      workspace_target="${2:-}"
       shift 2
       ;;
     -h|--help)
@@ -83,6 +88,7 @@ for tab in "${tabs[@]}"; do
     --height "${height}" \
     --delay "${delay_seconds}" \
     --scroll-y "${scroll_y}" \
+    --workspace "${workspace_target}" \
     --tab "${tab}" \
     --output "${output_dir}/${viewport_preset}-${tab}.png"
 done
