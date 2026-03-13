@@ -7,12 +7,20 @@ Item {
     id: root
     property var settingsRoot: null
     property string tabId: ""
+    property string validationMessage: ""
 
     SettingsTabPage {
         anchors.fill: parent
         tabId: root.tabId
         title: "Dock"
         iconName: "󰍜"
+
+        SettingsInfoCallout {
+            visible: root.validationMessage !== "" || Config.dockHasConflict()
+            iconName: "󰀪"
+            title: root.validationMessage !== "" ? "Dock conflict" : "Reserved edge in use"
+            body: root.validationMessage !== "" ? root.validationMessage : "An enabled bar already occupies the dock edge. Pick another dock position or move the conflicting bar."
+        }
 
         SettingsCard {
             title: "Behavior"
@@ -41,22 +49,22 @@ Item {
         SettingsCard {
             title: "Layout"
             iconName: "󰕰"
-            description: "Dock position and icon sizing."
+            description: "Dock position and icon sizing. The dock cannot share an edge with any enabled bar."
 
             SettingsModeRow {
                 label: "Dock Position"
                 currentValue: Config.dockPosition
                 options: [
-                    {
-                        value: "top",
-                        label: "Top"
-                    },
-                    {
-                        value: "bottom",
-                        label: "Bottom"
-                    }
+                    { value: "top", label: "Top" },
+                    { value: "bottom", label: "Bottom" },
+                    { value: "left", label: "Left" },
+                    { value: "right", label: "Right" }
                 ]
-                onModeSelected: v => Config.dockPosition = v
+                onModeSelected: value => {
+                    root.validationMessage = "";
+                    if (!Config.setDockPosition(value))
+                        root.validationMessage = "The " + value + " edge is already occupied by an enabled bar.";
+                }
             }
 
             SettingsSliderRow {

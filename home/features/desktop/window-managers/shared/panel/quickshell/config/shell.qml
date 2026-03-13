@@ -17,6 +17,7 @@ Scope {
 
   // Canonical UI state: only one closable surface is active at a time.
   property string activeSurfaceId: ""
+  property var activeSurfaceContext: null
   readonly property var knownSurfaces: [
     "notifCenter", "controlCenter", "networkMenu", "audioMenu", "powerMenu",
     "clipboardMenu", "recordingMenu", "musicMenu", "batteryMenu", "weatherMenu",
@@ -71,6 +72,12 @@ Scope {
   property var menuScreen: null
   readonly property var activeScreen: (Quickshell.screens && Quickshell.screens.length > 0) ? (Quickshell.cursorScreen || Quickshell.screens[0]) : null
 
+  function currentSurfaceScreen() {
+    if (root.activeSurfaceContext && root.activeSurfaceContext.screen)
+      return root.activeSurfaceContext.screen;
+    return root.menuScreen || root.activeScreen || Config.primaryScreen();
+  }
+
   function normalizeSurfaceId(surfaceId) {
     if (!surfaceId) return "";
     if (knownSurfaces.indexOf(surfaceId) !== -1) return surfaceId;
@@ -82,33 +89,88 @@ Scope {
     return root.activeSurfaceId === surfaceId;
   }
 
-  function openSurface(surfaceId) {
+  function defaultSurfaceContext(surfaceId, preferredScreen) {
+    var screen = preferredScreen || root.activeScreen || Config.primaryScreen();
+    var barConfig = Config.surfaceAnchorBar(Config.selectedBarId, screen);
+    var position = barConfig ? barConfig.position : "top";
+    var thickness = Config.barThickness(barConfig);
+    var triggerRect = { x: 16, y: 16, width: 28, height: 28 };
+
+    if (screen) {
+      if (position === "top" || position === "bottom") {
+        triggerRect.x = Math.max(16, screen.width - 72);
+        triggerRect.y = 4;
+      } else {
+        triggerRect.x = 4;
+        triggerRect.y = Math.max(16, Math.round(screen.height * 0.25));
+      }
+      triggerRect.width = Math.max(28, thickness - 8);
+      triggerRect.height = 28;
+    }
+
+    return {
+      surfaceId: surfaceId,
+      barId: barConfig ? barConfig.id : "",
+      position: position,
+      screen: screen,
+      screenName: Config.screenName(screen),
+      triggerRect: triggerRect
+    };
+  }
+
+  function resolveSurfaceContext(surfaceId, context) {
+    var resolved = context || {};
+    if (!resolved.screen)
+      resolved.screen = root.activeScreen || Config.primaryScreen();
+    if (!resolved.screenName)
+      resolved.screenName = Config.screenName(resolved.screen);
+    if (!resolved.barId || !Config.barById(resolved.barId)) {
+      var fallback = defaultSurfaceContext(surfaceId, resolved.screen);
+      if (!resolved.barId) resolved.barId = fallback.barId;
+      if (!resolved.position) resolved.position = fallback.position;
+      if (!resolved.triggerRect) resolved.triggerRect = fallback.triggerRect;
+    }
+    if (!resolved.position) {
+      var barConfig = Config.barById(resolved.barId);
+      resolved.position = barConfig ? barConfig.position : "top";
+    }
+    if (!resolved.triggerRect)
+      resolved.triggerRect = defaultSurfaceContext(surfaceId, resolved.screen).triggerRect;
+    resolved.surfaceId = surfaceId;
+    return resolved;
+  }
+
+  function openSurface(surfaceId, context) {
     var resolved = normalizeSurfaceId(surfaceId);
     if (!resolved) return false;
+    var surfaceContext = resolveSurfaceContext(resolved, context);
     root.activeSurfaceId = resolved;
-    root.menuScreen = root.activeScreen;
+    root.activeSurfaceContext = surfaceContext;
+    root.menuScreen = surfaceContext.screen || root.activeScreen;
     return true;
   }
 
   function closeSurface(surfaceId) {
     if (root.activeSurfaceId !== surfaceId) return false;
     root.activeSurfaceId = "";
+    root.activeSurfaceContext = null;
     root.menuScreen = null;
     return true;
   }
 
   function closeAllSurfaces() {
     root.activeSurfaceId = "";
+    root.activeSurfaceContext = null;
     root.menuScreen = null;
   }
 
-  function toggleSurface(surfaceId) {
+  function toggleSurface(surfaceId, context) {
     var resolved = normalizeSurfaceId(surfaceId);
     if (!resolved) return false;
     if (root.activeSurfaceId === resolved) {
       closeAllSurfaces();
     } else {
-      openSurface(resolved);
+      openSurface(resolved, context);
     }
     return true;
   }
@@ -118,30 +180,76 @@ Scope {
     return toggleSurface(panel);
   }
 
-  function popupAnchorX(centerX, popupWidth, windowWidth) {
-    return Math.min(Math.max(8, centerX - popupWidth / 2), windowWidth - popupWidth - 8);
+  function popupAnchorX(context, popupWidth, screenWidth) {
+    var trigger = context && context.triggerRect ? context.triggerRect : { x: 16, y: 16, width: 28, height: 28 };
+    var position = context && context.position ? context.position : "top";
+    var x = trigger.x;
+
+    if (position === "top" || position === "bottom") {
+      var minX = 8;
+      var maxX = Math.max(minX, screenWidth - popupWidth - 8);
+      x = trigger.x + (trigger.width / 2) - (popupWidth / 2);
+      return Math.min(Math.max(minX, x), maxX);
+    } else if (position === "left")
+      x = trigger.x + trigger.width + Config.popupGap;
+    else
+      x = trigger.x - popupWidth - Config.popupGap;
+
+    return x;
   }
 
-  function popupAnchorY(bottomY, popupHeight, windowHeight) {
-    // Keep popups below the bar surface to avoid overlap with the panel.
-    var minY = Math.max(bottomY + 8, Config.barHeight + 8);
-    if (popupHeight === undefined || windowHeight === undefined || windowHeight <= 0)
-      return minY;
+  function popupAnchorY(context, popupHeight, screenHeight) {
+    var trigger = context && context.triggerRect ? context.triggerRect : { x: 16, y: 16, width: 28, height: 28 };
+    var position = context && context.position ? context.position : "top";
+    var y = trigger.y + trigger.height + Config.popupGap;
 
-    // If it would clip at the bottom, move upward as much as possible
-    // while still respecting the "never overlap bar" rule.
-    if (minY + popupHeight + 8 > windowHeight) {
-      var adjusted = windowHeight - popupHeight - 8;
-      return Math.max(Config.barHeight + 8, adjusted);
+    if (position === "bottom")
+      return trigger.y - popupHeight - Config.popupGap;
+    else if (position === "left" || position === "right") {
+      var minY = 8;
+      var maxY = Math.max(minY, screenHeight - popupHeight - 8);
+      y = trigger.y + (trigger.height / 2) - (popupHeight / 2);
+      return Math.min(Math.max(minY, y), maxY);
     }
 
-    return minY;
+    return y;
   }
 
-  function popupMaxHeight(windowHeight) {
-    if (windowHeight === undefined || windowHeight <= 0)
+  function popupMaxHeight(screenHeight) {
+    if (screenHeight === undefined || screenHeight <= 0)
       return 560;
-    return Math.max(320, windowHeight - (Config.barHeight + 16));
+    return Math.max(320, screenHeight - 32);
+  }
+
+  function surfacePanelLayout(context, preferredWidth) {
+    var resolvedContext = context || defaultSurfaceContext(root.activeSurfaceId, root.currentSurfaceScreen());
+    var screen = resolvedContext.screen || root.activeScreen || Config.primaryScreen();
+    var position = resolvedContext.position || "right";
+    var reserved = Config.reservedEdgesForScreen(screen, "");
+    var width = preferredWidth || Config.controlCenterWidth;
+    var height = screen ? Math.max(360, Math.min(screen.height - reserved.top - reserved.bottom, Math.round(screen.height * 0.78))) : 640;
+    var x = Config.overlayInset;
+
+    if (screen) {
+      if (position === "top" || position === "bottom") {
+        x = resolvedContext.triggerRect
+          ? resolvedContext.triggerRect.x + (resolvedContext.triggerRect.width / 2) - (width / 2)
+          : Math.round((screen.width - width) / 2);
+        x = Math.min(Math.max(reserved.left, x), Math.max(reserved.left, screen.width - reserved.right - width));
+      }
+    }
+
+    return {
+      edge: position,
+      screen: screen,
+      width: width,
+      height: height,
+      x: x,
+      top: reserved.top,
+      right: reserved.right,
+      bottom: reserved.bottom,
+      left: reserved.left
+    };
   }
 
   function toggleNotifications() { toggleSurface("notifCenter"); }
@@ -224,177 +332,171 @@ Scope {
     id: notifManager
   }
 
-  // Per-screen bar + popup menus
+  // Per-screen bars + popup menus
   Variants {
     model: Quickshell.screens
 
     delegate: Component {
-      PanelWindow {
-        id: barWindow
+      Item {
+        id: screenBars
         required property ShellScreen modelData
-        screen: modelData
+        property var bars: Config.barsForScreen(modelData)
 
-        // Helper: is this the screen where the user opened a menu?
-        readonly property bool isMenuScreen: root.menuScreen === modelData
+        Variants {
+          model: screenBars.bars
 
-        anchors {
-          top: true
-          left: Config.barFloating
-          right: Config.barFloating
-        }
-        margins {
-          top: Config.barFloating ? Config.barMargin : 0
-          left: Config.barFloating ? Config.barMargin : 0
-          right: Config.barFloating ? Config.barMargin : 0
-        }
+          delegate: Component {
+            PanelWindow {
+              id: barWindow
+              required property var modelData
+              readonly property var barConfig: modelData
+              readonly property bool vertical: Config.isVerticalBar(barConfig.position)
+              readonly property int marginValue: Config.floatingInset(barConfig)
+              readonly property int thicknessValue: Config.barThickness(barConfig)
+              readonly property bool isMenuBar: !!(root.activeSurfaceContext && root.activeSurfaceContext.barId === barConfig.id && root.menuScreen === screenBars.modelData)
+              readonly property var currentContext: isMenuBar ? root.activeSurfaceContext : null
+              screen: screenBars.modelData
 
-        color: "transparent"
-        implicitHeight: Config.barHeight
+              anchors {
+                top: barConfig.position === "top" || barConfig.position === "left" || barConfig.position === "right"
+                bottom: barConfig.position === "bottom" || barConfig.position === "left" || barConfig.position === "right"
+                left: barConfig.position === "left" || ((barConfig.position === "top" || barConfig.position === "bottom") && barConfig.floating)
+                right: barConfig.position === "right" || ((barConfig.position === "top" || barConfig.position === "bottom") && barConfig.floating)
+              }
+              margins {
+                top: (barConfig.position === "top" || (vertical && barConfig.floating)) ? marginValue : 0
+                bottom: (barConfig.position === "bottom" || (vertical && barConfig.floating)) ? marginValue : 0
+                left: (barConfig.position === "left" || (!vertical && barConfig.floating)) ? marginValue : 0
+                right: (barConfig.position === "right" || (!vertical && barConfig.floating)) ? marginValue : 0
+              }
 
-        WlrLayershell.layer: WlrLayer.Top
-        WlrLayershell.namespace: "quickshell"
-        WlrLayershell.exclusiveZone: Config.barHeight
-        // Bar has no text input; keeping it non-focusable avoids keyboard grabs.
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+              color: "transparent"
+              implicitWidth: vertical ? panel.implicitWidth : 0
+              implicitHeight: vertical ? 0 : panel.implicitHeight
 
-        Panel {
-          id: panel
-          anchors.fill: parent
-          manager: notifManager
-          anchorWindow: barWindow
-          onNotifClicked: root.toggleNotifications()
-          onNetworkClicked: root.toggleNetworkMenu()
-          onAudioClicked: root.toggleAudioMenu()
-          onCommandClicked: root.toggleControls()
-          onMusicClicked: root.toggleMusicMenu()
-          onRecordingClicked: root.toggleRecordingMenu()
-          onPrivacyClicked: root.togglePrivacyMenu()
-          onBatteryClicked: root.toggleBatteryMenu()
-          onClipboardClicked: root.toggleClipboardMenu()
-          onBluetoothClicked: root.toggleBluetoothMenu()
-          onPrinterClicked: root.togglePrinterMenu()
-          onWeatherClicked: root.toggleWeatherMenu()
-          onDateTimeClicked: root.toggleDateTimeMenu()
-          onSystemStatsClicked: root.toggleSystemStatsMenu()
-          onNotepadClicked: root.toggleNotepad()
-          onCavaClicked: root.toggleCavaPopup()
-        }
+              WlrLayershell.layer: WlrLayer.Top
+              WlrLayershell.namespace: "quickshell-bar-" + barConfig.id
+              WlrLayershell.exclusiveZone: vertical ? width + marginValue : height + marginValue
+              WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
-        // PopupWindow menus — anchored to this screen's bar.
-        // Each BasePopupMenu self-manages deferred unmapping via wantVisible.
-        BluetoothMenu {
-          anchor.window: barWindow
-          anchor.rect.x: root.popupAnchorX(panel.btTriggerCenterX, width, barWindow.width)
-          anchor.rect.y: root.popupAnchorY(panel.btTriggerBottomY)
-          wantVisible: root.bluetoothMenuVisible && barWindow.isMenuScreen
-          onCloseRequested: root.closeSurface("bluetoothMenu")
-        }
+              Panel {
+                id: panel
+                anchors.fill: parent
+                manager: notifManager
+                anchorWindow: barWindow
+                screenRef: screenBars.modelData
+                barConfig: barWindow.barConfig
+                onSurfaceRequested: (surfaceId, context) => root.toggleSurface(surfaceId, context)
+              }
 
-        AudioMenu {
-          anchor.window: barWindow
-          anchor.rect.x: root.popupAnchorX(panel.audioTriggerCenterX, width, barWindow.width)
-          anchor.rect.y: root.popupAnchorY(panel.audioTriggerBottomY)
-          wantVisible: root.audioMenuVisible && barWindow.isMenuScreen
-          onCloseRequested: root.closeSurface("audioMenu")
-        }
+              BluetoothMenu {
+                anchor.window: barWindow
+                anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
+                anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
+                wantVisible: root.bluetoothMenuVisible && barWindow.isMenuBar
+                onCloseRequested: root.closeSurface("bluetoothMenu")
+              }
 
-        NetworkMenu {
-          anchor.window: barWindow
-          anchor.rect.x: root.popupAnchorX(panel.networkTriggerCenterX, width, barWindow.width)
-          anchor.rect.y: root.popupAnchorY(panel.networkTriggerBottomY)
-          wantVisible: root.networkMenuVisible && barWindow.isMenuScreen
-          onCloseRequested: root.closeSurface("networkMenu")
-        }
+              AudioMenu {
+                anchor.window: barWindow
+                anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
+                anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
+                wantVisible: root.audioMenuVisible && barWindow.isMenuBar
+                onCloseRequested: root.closeSurface("audioMenu")
+              }
 
-        ClipboardMenu {
-          anchor.window: barWindow
-          anchor.rect.x: root.popupAnchorX(panel.clipboardTriggerCenterX, width, barWindow.width)
-          anchor.rect.y: root.popupAnchorY(panel.clipboardTriggerBottomY)
-          wantVisible: root.clipboardMenuVisible && barWindow.isMenuScreen
-          onCloseRequested: root.closeSurface("clipboardMenu")
-        }
+            NetworkMenu {
+              anchor.window: barWindow
+              anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
+              anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
+              wantVisible: root.networkMenuVisible && barWindow.isMenuBar
+              onCloseRequested: root.closeSurface("networkMenu")
+            }
 
-        RecordingMenu {
-          anchor.window: barWindow
-          anchor.rect.x: root.popupAnchorX(panel.recordingTriggerCenterX, width, barWindow.width)
-          anchor.rect.y: root.popupAnchorY(panel.recordingTriggerBottomY)
-          wantVisible: root.recordingMenuVisible && barWindow.isMenuScreen
-          onCloseRequested: root.closeSurface("recordingMenu")
-        }
+            ClipboardMenu {
+              anchor.window: barWindow
+              anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
+              anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
+              wantVisible: root.clipboardMenuVisible && barWindow.isMenuBar
+              onCloseRequested: root.closeSurface("clipboardMenu")
+            }
 
-        PrivacyMenu {
-          anchor.window: barWindow
-          anchor.rect.x: root.popupAnchorX(panel.privacyTriggerCenterX, width, barWindow.width)
-          anchor.rect.y: root.popupAnchorY(panel.privacyTriggerBottomY)
-          wantVisible: root.privacyMenuVisible && barWindow.isMenuScreen
-          onCloseRequested: root.closeSurface("privacyMenu")
-        }
+            RecordingMenu {
+              anchor.window: barWindow
+              anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
+              anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
+              wantVisible: root.recordingMenuVisible && barWindow.isMenuBar
+              onCloseRequested: root.closeSurface("recordingMenu")
+            }
 
-        MusicMenu {
-          anchor.window: barWindow
-          anchor.rect.x: root.popupAnchorX(panel.musicTriggerCenterX, width, barWindow.width)
-          anchor.rect.y: root.popupAnchorY(panel.musicTriggerBottomY)
-          wantVisible: root.musicMenuVisible && barWindow.isMenuScreen
-          onCloseRequested: root.closeSurface("musicMenu")
-        }
+            PrivacyMenu {
+              anchor.window: barWindow
+              anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
+              anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
+              wantVisible: root.privacyMenuVisible && barWindow.isMenuBar
+              onCloseRequested: root.closeSurface("privacyMenu")
+            }
 
-        BatteryMenu {
-          anchor.window: barWindow
-          anchor.rect.x: root.popupAnchorX(panel.batteryTriggerCenterX, width, barWindow.width)
-          anchor.rect.y: root.popupAnchorY(panel.batteryTriggerBottomY)
-          wantVisible: root.batteryMenuVisible && barWindow.isMenuScreen
-          onCloseRequested: root.closeSurface("batteryMenu")
-        }
+            MusicMenu {
+              anchor.window: barWindow
+              anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
+              anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
+              wantVisible: root.musicMenuVisible && barWindow.isMenuBar
+              onCloseRequested: root.closeSurface("musicMenu")
+            }
 
-        WeatherMenu {
-          anchor.window: barWindow
-          implicitHeight: Math.min(600, root.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
-          anchor.rect.x: root.popupAnchorX(panel.weatherTriggerCenterX, width, barWindow.width)
-          anchor.rect.y: root.popupAnchorY(
-            panel.weatherTriggerBottomY,
-            implicitHeight,
-            (barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height
-          )
-          wantVisible: root.weatherMenuVisible && barWindow.isMenuScreen
-          onCloseRequested: root.closeSurface("weatherMenu")
-        }
+            BatteryMenu {
+              anchor.window: barWindow
+              anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
+              anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
+              wantVisible: root.batteryMenuVisible && barWindow.isMenuBar
+              onCloseRequested: root.closeSurface("batteryMenu")
+            }
 
-        DateTimeMenu {
-          anchor.window: barWindow
-          implicitHeight: Math.min(560, root.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
-          anchor.rect.x: root.popupAnchorX(panel.dateTimeTriggerCenterX, width, barWindow.width)
-          anchor.rect.y: root.popupAnchorY(
-            panel.dateTimeTriggerBottomY,
-            implicitHeight,
-            (barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height
-          )
-          wantVisible: root.dateTimeMenuVisible && barWindow.isMenuScreen
-          onCloseRequested: root.closeSurface("dateTimeMenu")
-        }
+            WeatherMenu {
+              anchor.window: barWindow
+              implicitHeight: Math.min(600, root.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
+              anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
+              anchor.rect.y: root.popupAnchorY(barWindow.currentContext, implicitHeight, barWindow.screen ? barWindow.screen.height : barWindow.height)
+              wantVisible: root.weatherMenuVisible && barWindow.isMenuBar
+              onCloseRequested: root.closeSurface("weatherMenu")
+            }
 
-        SystemStatsMenu {
-          anchor.window: barWindow
-          anchor.rect.x: root.popupAnchorX(panel.systemMonitorCenterX, width, barWindow.width)
-          anchor.rect.y: root.popupAnchorY(panel.systemMonitorBottomY)
-          wantVisible: root.systemStatsMenuVisible && barWindow.isMenuScreen
-          onCloseRequested: root.closeSurface("systemStatsMenu")
-        }
+            DateTimeMenu {
+              anchor.window: barWindow
+              implicitHeight: Math.min(560, root.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
+              anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
+              anchor.rect.y: root.popupAnchorY(barWindow.currentContext, implicitHeight, barWindow.screen ? barWindow.screen.height : barWindow.height)
+              wantVisible: root.dateTimeMenuVisible && barWindow.isMenuBar
+              onCloseRequested: root.closeSurface("dateTimeMenu")
+            }
 
-        PrinterMenu {
-          anchor.window: barWindow
-          anchor.rect.x: root.popupAnchorX(panel.printerTriggerCenterX, width, barWindow.width)
-          anchor.rect.y: root.popupAnchorY(panel.printerTriggerBottomY)
-          wantVisible: root.printerMenuVisible && barWindow.isMenuScreen
-          onCloseRequested: root.closeSurface("printerMenu")
-        }
+            SystemStatsMenu {
+              anchor.window: barWindow
+              anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
+              anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
+              wantVisible: root.systemStatsMenuVisible && barWindow.isMenuBar
+              onCloseRequested: root.closeSurface("systemStatsMenu")
+            }
 
-        CavaPopup {
-          anchor.window: barWindow
-          anchor.rect.x: root.popupAnchorX(panel.cavaTriggerCenterX, width, barWindow.width)
-          anchor.rect.y: root.popupAnchorY(panel.cavaTriggerBottomY)
-          visible: root.cavaPopupVisible && barWindow.isMenuScreen
-          cavaData: panel.fullCavaData
-          onCloseRequested: root.closeSurface("cavaPopup")
+            PrinterMenu {
+              anchor.window: barWindow
+              anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
+              anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
+              wantVisible: root.printerMenuVisible && barWindow.isMenuBar
+              onCloseRequested: root.closeSurface("printerMenu")
+            }
+
+              CavaPopup {
+                anchor.window: barWindow
+                anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
+                anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
+                visible: root.cavaPopupVisible && barWindow.isMenuBar
+                cavaData: panel.fullCavaData
+                onCloseRequested: root.closeSurface("cavaPopup")
+              }
+            }
+          }
         }
       }
     }
@@ -429,16 +531,36 @@ Scope {
     active: root.notifCenterVisible
     NotificationCenter {
       id: center
+      readonly property var layoutState: root.surfacePanelLayout(root.activeSurfaceContext, Config.controlCenterWidth)
+      screen: layoutState.screen
       manager: notifManager
       showContent: root.notifCenterVisible
+      surfaceEdge: layoutState.edge
+      panelWidth: layoutState.width
+      panelHeight: layoutState.height
+      panelX: layoutState.x
+      reservedTop: layoutState.top
+      reservedRight: layoutState.right
+      reservedBottom: layoutState.bottom
+      reservedLeft: layoutState.left
       onCloseRequested: root.closeSurface("notifCenter")
     }
   }
 
   ControlCenter {
     id: controls
+    readonly property var layoutState: root.surfacePanelLayout(root.activeSurfaceContext, Config.controlCenterWidth)
+    screen: layoutState.screen
     manager: notifManager
     showContent: root.controlCenterVisible
+    surfaceEdge: layoutState.edge
+    panelWidth: layoutState.width
+    panelHeight: layoutState.height
+    panelX: layoutState.x
+    reservedTop: layoutState.top
+    reservedRight: layoutState.right
+    reservedBottom: layoutState.bottom
+    reservedLeft: layoutState.left
     onCloseRequested: root.closeSurface("controlCenter")
   }
 

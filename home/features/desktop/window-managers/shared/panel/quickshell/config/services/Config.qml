@@ -7,11 +7,13 @@ pragma Singleton
 QtObject {
   id: root
 
-  // --- BAR ---
+  // --- BAR (legacy compatibility + shell defaults) ---
   property int barHeight: 38
   property bool barFloating: true
   property int barMargin: 12
   property real barOpacity: 0.85
+  property var barConfigs: []
+  property string selectedBarId: ""
 
   // --- GLASS ---
   property bool blurEnabled: true
@@ -39,6 +41,22 @@ QtObject {
   property string launcherDefaultMode: "drun"
   property bool launcherShowModeHints: true
   property bool launcherShowHomeSections: true
+  property bool launcherEnablePreload: true
+  property bool launcherKeepSearchOnModeSwitch: true
+  property bool launcherEnableDebugTimings: false
+  property int launcherMaxResults: 80
+  property int launcherFileMinQueryLength: 2
+  property int launcherFileMaxResults: 100
+  property int launcherRecentsLimit: 12
+  property int launcherRecentAppsLimit: 6
+  property int launcherSuggestionsLimit: 4
+  property int launcherCacheTtlSec: 300
+  property var launcherModeOrder: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
+  property var launcherEnabledModes: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
+  property real launcherScoreNameWeight: 1.0
+  property real launcherScoreTitleWeight: 0.92
+  property real launcherScoreExecWeight: 0.88
+  property real launcherScoreBodyWeight: 0.75
 
   // --- CONTROL CENTER ---
   property int controlCenterWidth: 350
@@ -90,19 +108,23 @@ QtObject {
 
   // --- WALLPAPER ---
   property bool wallpaperRunPywal: false
-  property var wallpaperPaths: ({})      // monitorName → absolute image path
-  property int wallpaperCycleInterval: 0  // 0 = disabled, otherwise minutes between auto-cycle
+  property var wallpaperPaths: ({})
+  property int wallpaperCycleInterval: 0
   property string wallpaperDefaultFolder: (Quickshell.env("HOME") || "/home") + "/Pictures"
 
   // --- THEME ---
-  property string themeName: ""  // base24 theme id; empty = pywal fallback
+  property string themeName: ""
 
   // --- PLUGINS ---
   property var disabledPlugins: []
 
   // --- INTERNAL ---
   property bool _loading: false
+  property bool _syncingLegacyBarSettings: false
 
+  readonly property int maxBars: 4
+  readonly property int popupGap: 8
+  readonly property int overlayInset: 12
   readonly property string configPath: Quickshell.env("HOME") + "/.local/state/quickshell/config.json"
   readonly property var iconAliases: ({
     "alacritty": ["utilities-terminal", "terminal", "org.gnome.Console"],
@@ -167,7 +189,669 @@ QtObject {
     }
   }
 
-  // Debounced save: batches rapid property changes into a single disk write
+  function _toInt(value, fallback) {
+    var n = parseInt(value, 10);
+    return isNaN(n) ? fallback : n;
+  }
+
+  function _toReal(value, fallback) {
+    var n = Number(value);
+    return isNaN(n) ? fallback : n;
+  }
+
+  function _clampInt(value, min, max, fallback) {
+    var n = _toInt(value, fallback);
+    if (n < min) return min;
+    if (n > max) return max;
+    return n;
+  }
+
+  function _clampReal(value, min, max, fallback) {
+    var n = _toReal(value, fallback);
+    if (n < min) return min;
+    if (n > max) return max;
+    return n;
+  }
+
+  function _asBool(value, fallback) {
+    if (value === true || value === false) return value;
+    if (value === "true") return true;
+    if (value === "false") return false;
+    return fallback;
+  }
+
+  function _normalizeModeList(list, fallbackList) {
+    var allowed = {
+      "drun": true,
+      "window": true,
+      "files": true,
+      "ai": true,
+      "clip": true,
+      "emoji": true,
+      "calc": true,
+      "web": true,
+      "run": true,
+      "system": true,
+      "keybinds": true,
+      "media": true,
+      "nixos": true,
+      "wallpapers": true,
+      "bookmarks": true
+    };
+    var source = Array.isArray(list) ? list : fallbackList;
+    var out = [];
+    var seen = {};
+    for (var i = 0; i < source.length; ++i) {
+      var mode = String(source[i] || "");
+      if (!allowed[mode] || seen[mode]) continue;
+      out.push(mode);
+      seen[mode] = true;
+    }
+    if (out.length === 0) return fallbackList.slice();
+    return out;
+  }
+
+  function normalizeLauncherConfig(data) {
+    var launcher = data && data.launcher ? data.launcher : {};
+    var fallbackModes = ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"];
+
+    launcherModeOrder = _normalizeModeList(launcher.modeOrder, fallbackModes);
+    launcherEnabledModes = _normalizeModeList(launcher.enabledModes, fallbackModes);
+    launcherDefaultMode = launcherEnabledModes.indexOf(String(launcher.defaultMode || "")) !== -1 ? launcher.defaultMode : "drun";
+    if (launcherEnabledModes.indexOf(launcherDefaultMode) === -1)
+      launcherDefaultMode = launcherEnabledModes[0] || "drun";
+
+    launcherShowModeHints = _asBool(launcher.showModeHints, true);
+    launcherShowHomeSections = _asBool(launcher.showHomeSections, true);
+    launcherEnablePreload = _asBool(launcher.enablePreload, true);
+    launcherKeepSearchOnModeSwitch = _asBool(launcher.keepSearchOnModeSwitch, true);
+    launcherEnableDebugTimings = _asBool(launcher.enableDebugTimings, false);
+
+    launcherMaxResults = _clampInt(launcher.maxResults, 20, 400, 80);
+    launcherFileMinQueryLength = _clampInt(launcher.fileMinQueryLength, 1, 8, 2);
+    launcherFileMaxResults = _clampInt(launcher.fileMaxResults, 20, 500, 100);
+    launcherRecentsLimit = _clampInt(launcher.recentsLimit, 1, 40, 12);
+    launcherRecentAppsLimit = _clampInt(launcher.recentAppsLimit, 1, 20, 6);
+    launcherSuggestionsLimit = _clampInt(launcher.suggestionsLimit, 1, 20, 4);
+    launcherCacheTtlSec = _clampInt(launcher.cacheTtlSec, 10, 3600, 300);
+
+    launcherScoreNameWeight = _clampReal(launcher.scoreNameWeight, 0.1, 4.0, 1.0);
+    launcherScoreTitleWeight = _clampReal(launcher.scoreTitleWeight, 0.1, 4.0, 0.92);
+    launcherScoreExecWeight = _clampReal(launcher.scoreExecWeight, 0.1, 4.0, 0.88);
+    launcherScoreBodyWeight = _clampReal(launcher.scoreBodyWeight, 0.1, 4.0, 0.75);
+  }
+
+  function defaultBarSectionWidgets() {
+    return {
+      left: [
+        createWidgetInstance("logo"),
+        createWidgetInstance("workspaces"),
+        createWidgetInstance("taskbar"),
+        createWidgetInstance("systemMonitor")
+      ],
+      center: [
+        createWidgetInstance("dateTime"),
+        createWidgetInstance("mediaBar"),
+        createWidgetInstance("updates"),
+        createWidgetInstance("cava"),
+        createWidgetInstance("idleInhibitor")
+      ],
+      right: [
+        createWidgetInstance("weather"),
+        createWidgetInstance("network"),
+        createWidgetInstance("bluetooth"),
+        createWidgetInstance("audio"),
+        createWidgetInstance("music"),
+        createWidgetInstance("privacy"),
+        createWidgetInstance("recording"),
+        createWidgetInstance("battery"),
+        createWidgetInstance("printer"),
+        createWidgetInstance("notepad"),
+        createWidgetInstance("controlCenter"),
+        createWidgetInstance("tray"),
+        createWidgetInstance("clipboard"),
+        createWidgetInstance("notifications")
+      ]
+    };
+  }
+
+  function generateId(prefix) {
+    var stamp = Date.now().toString(36);
+    var suffix = Math.floor(Math.random() * 1679616).toString(36);
+    return prefix + "-" + stamp + "-" + suffix;
+  }
+
+  function createWidgetInstance(widgetType, initialSettings) {
+    var settingsCopy = initialSettings ? JSON.parse(JSON.stringify(initialSettings)) : {};
+    return {
+      instanceId: generateId("widget"),
+      widgetType: widgetType,
+      enabled: true,
+      settings: settingsCopy
+    };
+  }
+
+  function createBarConfig(name) {
+    var barIndex = (barConfigs || []).length + 1;
+    var preferredPositions = ["top", "bottom", "left", "right"];
+    var selectedPosition = "top";
+    for (var posIndex = 0; posIndex < preferredPositions.length; ++posIndex) {
+      var candidatePos = preferredPositions[posIndex];
+      var occupied = false;
+      for (var i = 0; i < (barConfigs || []).length; ++i) {
+        if (barConfigs[i].enabled && barConfigs[i].position === candidatePos) {
+          occupied = true;
+          break;
+        }
+      }
+      if (!occupied && dockEnabled && dockPosition === candidatePos)
+        occupied = true;
+      if (!occupied) {
+        selectedPosition = candidatePos;
+        break;
+      }
+    }
+    return {
+      id: generateId("bar"),
+      name: name || (barIndex === 1 ? "Main Bar" : ("Bar " + barIndex)),
+      enabled: true,
+      position: selectedPosition,
+      displayMode: "all",
+      displayTargets: [],
+      height: barHeight,
+      floating: barFloating,
+      margin: barMargin,
+      opacity: barOpacity,
+      sectionWidgets: defaultBarSectionWidgets()
+    };
+  }
+
+  function isValidEdge(position) {
+    return position === "top" || position === "bottom" || position === "left" || position === "right";
+  }
+
+  function isVerticalBar(positionOrBar) {
+    var position = (typeof positionOrBar === "string") ? positionOrBar : ((positionOrBar && positionOrBar.position) || "top");
+    return position === "left" || position === "right";
+  }
+
+  function barThickness(barConfig) {
+    return Math.max(24, parseInt(barConfig && barConfig.height !== undefined ? barConfig.height : barHeight, 10) || barHeight);
+  }
+
+  function floatingInset(barConfig) {
+    return !!(barConfig && barConfig.floating) ? Math.max(0, parseInt(barConfig.margin || 0, 10)) : 0;
+  }
+
+  function screenName(screen) {
+    if (!screen) return "";
+    if (screen.name !== undefined) return String(screen.name);
+    return String(screen);
+  }
+
+  function allScreens() {
+    return Quickshell.screens ? Quickshell.screens.values || Quickshell.screens : [];
+  }
+
+  function primaryScreen() {
+    var screens = allScreens();
+    return screens.length > 0 ? screens[0] : null;
+  }
+
+  function normalizeSectionWidgets(sectionWidgets) {
+    var source = sectionWidgets || {};
+    var normalized = { left: [], center: [], right: [] };
+    var sections = ["left", "center", "right"];
+
+    for (var i = 0; i < sections.length; ++i) {
+      var section = sections[i];
+      var items = source[section] || [];
+      for (var j = 0; j < items.length; ++j) {
+        normalized[section].push(normalizeWidgetInstance(items[j]));
+      }
+    }
+
+    return normalized;
+  }
+
+  function normalizeWidgetInstance(item) {
+    if (typeof item === "string") return createWidgetInstance(item);
+
+    var widgetType = item && item.widgetType ? item.widgetType : (item && item.widgetId ? item.widgetId : "spacer");
+    return {
+      instanceId: item && item.instanceId ? item.instanceId : generateId("widget"),
+      widgetType: widgetType,
+      enabled: item && item.enabled !== undefined ? !!item.enabled : true,
+      settings: item && item.settings ? JSON.parse(JSON.stringify(item.settings)) : {}
+    };
+  }
+
+  function normalizeBarConfig(bar, index) {
+    var normalized = {
+      id: bar && bar.id ? bar.id : generateId("bar"),
+      name: bar && bar.name ? bar.name : (index === 0 ? "Main Bar" : ("Bar " + (index + 1))),
+      enabled: bar && bar.enabled !== undefined ? !!bar.enabled : true,
+      position: isValidEdge(bar && bar.position) ? bar.position : "top",
+      displayMode: bar && (bar.displayMode === "primary" || bar.displayMode === "specific") ? bar.displayMode : "all",
+      displayTargets: bar && Array.isArray(bar.displayTargets) ? bar.displayTargets.slice() : [],
+      height: Math.max(24, parseInt(bar && bar.height !== undefined ? bar.height : barHeight, 10) || barHeight),
+      floating: bar && bar.floating !== undefined ? !!bar.floating : barFloating,
+      margin: Math.max(0, parseInt(bar && bar.margin !== undefined ? bar.margin : barMargin, 10) || barMargin),
+      opacity: Math.max(0.2, Math.min(1.0, Number(bar && bar.opacity !== undefined ? bar.opacity : barOpacity) || barOpacity)),
+      sectionWidgets: normalizeSectionWidgets(bar && bar.sectionWidgets ? bar.sectionWidgets : defaultBarSectionWidgets())
+    };
+
+    return normalized;
+  }
+
+  function migrateLegacyBars(data) {
+    var migrated = createBarConfig("Main Bar");
+
+    if (data && data.bar) {
+      if (data.bar.height !== undefined) migrated.height = Math.max(24, parseInt(data.bar.height, 10) || barHeight);
+      if (data.bar.floating !== undefined) migrated.floating = !!data.bar.floating;
+      if (data.bar.margin !== undefined) migrated.margin = Math.max(0, parseInt(data.bar.margin, 10) || barMargin);
+      if (data.bar.opacity !== undefined) migrated.opacity = Math.max(0.2, Math.min(1.0, Number(data.bar.opacity) || barOpacity));
+    }
+
+    return [migrated];
+  }
+
+  function normalizeBarConfigs(bars, data) {
+    var inputBars = Array.isArray(bars) ? bars : [];
+    if (inputBars.length === 0)
+      inputBars = migrateLegacyBars(data);
+
+    var normalized = [];
+    for (var i = 0; i < inputBars.length && normalized.length < maxBars; ++i) {
+      normalized.push(normalizeBarConfig(inputBars[i], normalized.length));
+    }
+
+    if (normalized.length === 0)
+      normalized.push(normalizeBarConfig(createBarConfig("Main Bar"), 0));
+
+    return normalized;
+  }
+
+  function ensureSelectedBar() {
+    if (!barConfigs || barConfigs.length === 0) {
+      selectedBarId = "";
+      return;
+    }
+
+    var i;
+    for (i = 0; i < barConfigs.length; ++i) {
+      if (barConfigs[i].id === selectedBarId) return;
+    }
+
+    selectedBarId = barConfigs[0].id;
+  }
+
+  function selectedBar() {
+    return barById(selectedBarId) || (barConfigs.length > 0 ? barConfigs[0] : null);
+  }
+
+  function barById(barId) {
+    var bars = barConfigs || [];
+    for (var i = 0; i < bars.length; ++i) {
+      if (bars[i].id === barId) return bars[i];
+    }
+    return null;
+  }
+
+  function barsForScreen(screen) {
+    var screensBars = [];
+    var bars = barConfigs || [];
+    for (var i = 0; i < bars.length; ++i) {
+      if (barEnabledOnScreen(bars[i], screen)) screensBars.push(bars[i]);
+    }
+    return screensBars;
+  }
+
+  function barEnabledOnScreen(barConfig, screen) {
+    if (!barConfig || !barConfig.enabled || !screen) return false;
+    var mode = barConfig.displayMode || "all";
+    if (mode === "all") return true;
+    if (mode === "primary") return primaryScreen() === screen;
+
+    var targets = barConfig.displayTargets || [];
+    var name = screenName(screen);
+    return targets.indexOf(name) !== -1;
+  }
+
+  function screensForBar(barConfig) {
+    var screens = allScreens();
+    var matches = [];
+    for (var i = 0; i < screens.length; ++i) {
+      if (barEnabledOnScreen(barConfig, screens[i])) matches.push(screens[i]);
+    }
+    return matches;
+  }
+
+  function barSectionWidgets(barConfig, section) {
+    if (!barConfig || !barConfig.sectionWidgets || !barConfig.sectionWidgets[section]) return [];
+    return barConfig.sectionWidgets[section];
+  }
+
+  function sectionLabel(section, position) {
+    if (!isVerticalBar(position)) {
+      if (section === "left") return "Left";
+      if (section === "center") return "Center";
+      return "Right";
+    }
+
+    if (section === "left") return "Top";
+    if (section === "center") return "Middle";
+    return "Bottom";
+  }
+
+  function cloneBar(barConfig) {
+    return JSON.parse(JSON.stringify(barConfig));
+  }
+
+  function replaceBarConfig(updatedBar) {
+    if (!updatedBar || !updatedBar.id) return false;
+    var next = [];
+    var replaced = false;
+    for (var i = 0; i < barConfigs.length; ++i) {
+      if (barConfigs[i].id === updatedBar.id) {
+        next.push(normalizeBarConfig(updatedBar, i));
+        replaced = true;
+      } else {
+        next.push(barConfigs[i]);
+      }
+    }
+    if (!replaced) return false;
+    barConfigs = next;
+    ensureSelectedBar();
+    syncLegacyBarSettingsFromPrimary();
+    return true;
+  }
+
+  function barConflictDetails(barConfig) {
+    if (!barConfig || !barConfig.enabled) return null;
+    var screens = screensForBar(barConfig);
+    for (var i = 0; i < screens.length; ++i) {
+      var conflictBar = screenBarConflict(barConfig.id, barConfig.position, screens[i]);
+      if (conflictBar) {
+        return {
+          type: "bar",
+          screenName: screenName(screens[i]),
+          barId: conflictBar.id,
+          barName: conflictBar.name || "Bar"
+        };
+      }
+    }
+    if (dockEnabled && barConfig.position === dockPosition) {
+      return {
+        type: "dock",
+        screenName: "all",
+        edge: dockPosition
+      };
+    }
+    return null;
+  }
+
+  function barConflictMessage(barConfig) {
+    var details = barConflictDetails(barConfig);
+    if (!details) return "";
+    if (details.type === "dock")
+      return "The dock already uses the " + dockPosition + " edge.";
+    return (details.barName || "Another bar") + " already uses the " + barConfig.position + " edge on " + details.screenName + ".";
+  }
+
+  function addBar() {
+    if ((barConfigs || []).length >= maxBars) return null;
+    var next = (barConfigs || []).slice();
+    var created = createBarConfig();
+    if (barConflictDetails(created)) return null;
+    next.push(normalizeBarConfig(created, next.length));
+    barConfigs = next;
+    selectedBarId = created.id;
+    syncLegacyBarSettingsFromPrimary();
+    return created.id;
+  }
+
+  function removeBar(barId) {
+    if ((barConfigs || []).length <= 1) return false;
+    var next = [];
+    for (var i = 0; i < barConfigs.length; ++i) {
+      if (barConfigs[i].id !== barId) next.push(barConfigs[i]);
+    }
+    if (next.length === barConfigs.length) return false;
+    barConfigs = next;
+    ensureSelectedBar();
+    syncLegacyBarSettingsFromPrimary();
+    return true;
+  }
+
+  function setSelectedBar(barId) {
+    if (!barById(barId)) return false;
+    selectedBarId = barId;
+    return true;
+  }
+
+  function updateBarConfig(barId, patch) {
+    var barConfig = barById(barId);
+    if (!barConfig) return false;
+
+    var updated = cloneBar(barConfig);
+    var keys = Object.keys(patch || {});
+    for (var i = 0; i < keys.length; ++i)
+      updated[keys[i]] = patch[keys[i]];
+
+    if (updated.displayMode !== "specific") updated.displayTargets = [];
+    updated = normalizeBarConfig(updated, 0);
+    if (barConflictDetails(updated)) return false;
+
+    return replaceBarConfig(updated);
+  }
+
+  function updateBarDisplayTargets(barId, targets) {
+    return updateBarConfig(barId, { displayTargets: Array.isArray(targets) ? targets.slice() : [] });
+  }
+
+  function updateBarSection(barId, section, widgets) {
+    var barConfig = barById(barId);
+    if (!barConfig || ["left", "center", "right"].indexOf(section) === -1) return false;
+
+    var updated = cloneBar(barConfig);
+    if (!updated.sectionWidgets) updated.sectionWidgets = { left: [], center: [], right: [] };
+
+    updated.sectionWidgets[section] = [];
+    var source = Array.isArray(widgets) ? widgets : [];
+    for (var i = 0; i < source.length; ++i)
+      updated.sectionWidgets[section].push(normalizeWidgetInstance(source[i]));
+
+    return replaceBarConfig(updated);
+  }
+
+  function addBarWidget(barId, section, widgetType, initialSettings) {
+    var barConfig = barById(barId);
+    if (!barConfig || ["left", "center", "right"].indexOf(section) === -1) return null;
+    var widgets = barSectionWidgets(barConfig, section).slice();
+    var created = createWidgetInstance(widgetType, initialSettings);
+    widgets.push(created);
+    if (!updateBarSection(barId, section, widgets)) return null;
+    return created.instanceId;
+  }
+
+  function removeBarWidget(barId, section, instanceId) {
+    var barConfig = barById(barId);
+    if (!barConfig) return false;
+    var widgets = barSectionWidgets(barConfig, section).slice();
+    var next = [];
+    for (var i = 0; i < widgets.length; ++i) {
+      if (widgets[i].instanceId !== instanceId) next.push(widgets[i]);
+    }
+    return updateBarSection(barId, section, next);
+  }
+
+  function updateBarWidget(barId, section, instanceId, patch) {
+    var barConfig = barById(barId);
+    if (!barConfig) return false;
+    var widgets = barSectionWidgets(barConfig, section).slice();
+    var updated = [];
+    var found = false;
+
+    for (var i = 0; i < widgets.length; ++i) {
+      var current = normalizeWidgetInstance(widgets[i]);
+      if (current.instanceId === instanceId) {
+        var merged = JSON.parse(JSON.stringify(current));
+        var keys = Object.keys(patch || {});
+        for (var j = 0; j < keys.length; ++j)
+          merged[keys[j]] = patch[keys[j]];
+        if (patch && patch.settings)
+          merged.settings = JSON.parse(JSON.stringify(patch.settings));
+        updated.push(normalizeWidgetInstance(merged));
+        found = true;
+      } else {
+        updated.push(current);
+      }
+    }
+
+    if (!found) return false;
+    return updateBarSection(barId, section, updated);
+  }
+
+  function moveBarWidget(barId, section, fromIndex, toIndex) {
+    var barConfig = barById(barId);
+    if (!barConfig) return false;
+    var widgets = barSectionWidgets(barConfig, section).slice();
+    if (fromIndex < 0 || fromIndex >= widgets.length || toIndex < 0 || toIndex >= widgets.length) return false;
+    if (fromIndex === toIndex) return true;
+
+    var item = widgets.splice(fromIndex, 1)[0];
+    widgets.splice(toIndex, 0, item);
+    return updateBarSection(barId, section, widgets);
+  }
+
+  function widgetInstance(barId, section, instanceId) {
+    var widgets = barSectionWidgets(barById(barId), section);
+    for (var i = 0; i < widgets.length; ++i) {
+      if (widgets[i].instanceId === instanceId) return widgets[i];
+    }
+    return null;
+  }
+
+  function surfaceAnchorBar(barId, screen) {
+    var barConfig = barById(barId);
+    if (barConfig && barEnabledOnScreen(barConfig, screen)) return barConfig;
+
+    var candidates = barsForScreen(screen);
+    if (candidates.length > 0) return candidates[0];
+    return selectedBar();
+  }
+
+  function screenBarConflict(barId, position, screen) {
+    var bars = barConfigs || [];
+    for (var i = 0; i < bars.length; ++i) {
+      var barConfig = bars[i];
+      if (!barConfig.enabled || barConfig.id === barId) continue;
+      if (barConfig.position !== position) continue;
+      if (barEnabledOnScreen(barConfig, screen)) return barConfig;
+    }
+    return null;
+  }
+
+  function barHasConflict(barConfig) {
+    if (!barConfig || !barConfig.enabled) return false;
+    var screens = screensForBar(barConfig);
+    for (var i = 0; i < screens.length; ++i) {
+      if (screenBarConflict(barConfig.id, barConfig.position, screens[i])) return true;
+    }
+    return false;
+  }
+
+  function dockConflictsWithBar(barConfig) {
+    if (!dockEnabled || !barConfig || !barConfig.enabled) return false;
+    return barConfig.position === dockPosition;
+  }
+
+  function dockHasConflict() {
+    if (!dockEnabled) return false;
+    var bars = barConfigs || [];
+    for (var i = 0; i < bars.length; ++i) {
+      if (dockConflictsWithBar(bars[i])) return true;
+    }
+    return false;
+  }
+
+  function canUseDockPosition(position) {
+    var bars = barConfigs || [];
+    for (var i = 0; i < bars.length; ++i) {
+      var barConfig = bars[i];
+      if (!barConfig.enabled) continue;
+      if (barConfig.position === position) return false;
+    }
+    return true;
+  }
+
+  function setDockPosition(position) {
+    if (!isValidEdge(position)) return false;
+    if (!canUseDockPosition(position)) return false;
+    dockPosition = position;
+    return true;
+  }
+
+  function reservedEdgesForScreen(screen, excludeBarId) {
+    var reserved = {
+      top: overlayInset,
+      right: overlayInset,
+      bottom: overlayInset,
+      left: overlayInset
+    };
+
+    var bars = barConfigs || [];
+    for (var i = 0; i < bars.length; ++i) {
+      var barConfig = bars[i];
+      if (!barConfig.enabled || barConfig.id === excludeBarId) continue;
+      if (!barEnabledOnScreen(barConfig, screen)) continue;
+      reserved[barConfig.position] += barThickness(barConfig) + floatingInset(barConfig) + popupGap;
+    }
+
+    if (dockEnabled)
+      reserved[dockPosition] += dockIconSize + 32;
+
+    return reserved;
+  }
+
+  function notificationMargins(screen) {
+    var reserved = reservedEdgesForScreen(screen, "");
+    return {
+      top: reserved.top,
+      right: reserved.right,
+      bottom: reserved.bottom,
+      left: reserved.left
+    };
+  }
+
+  function compatibleLegacyBar() {
+    return selectedBar() || (barConfigs.length > 0 ? barConfigs[0] : null);
+  }
+
+  function syncLegacyBarSettingsFromPrimary() {
+    var primaryBar = compatibleLegacyBar();
+    if (!primaryBar) return;
+
+    _syncingLegacyBarSettings = true;
+    barHeight = primaryBar.height;
+    barFloating = primaryBar.floating;
+    barMargin = primaryBar.margin;
+    barOpacity = primaryBar.opacity;
+    _syncingLegacyBarSettings = false;
+  }
+
+  function applyLegacyBarSetting(key, value) {
+    if (_syncingLegacyBarSettings) return;
+    var primaryBar = compatibleLegacyBar();
+    if (!primaryBar) return;
+
+    var patch = {};
+    patch[key] = value;
+    updateBarConfig(primaryBar.id, patch);
+  }
+
   property Timer saveTimer: Timer {
     interval: 500
     onTriggered: root.save()
@@ -177,11 +861,12 @@ QtObject {
     if (!_loading) saveTimer.restart();
   }
 
-  // Wire all user-facing properties to scheduleSave
-  onBarHeightChanged: scheduleSave()
-  onBarFloatingChanged: scheduleSave()
-  onBarMarginChanged: scheduleSave()
-  onBarOpacityChanged: scheduleSave()
+  onBarHeightChanged: { applyLegacyBarSetting("height", barHeight); scheduleSave(); }
+  onBarFloatingChanged: { applyLegacyBarSetting("floating", barFloating); scheduleSave(); }
+  onBarMarginChanged: { applyLegacyBarSetting("margin", barMargin); scheduleSave(); }
+  onBarOpacityChanged: { applyLegacyBarSetting("opacity", barOpacity); scheduleSave(); }
+  onBarConfigsChanged: { ensureSelectedBar(); syncLegacyBarSettingsFromPrimary(); scheduleSave(); }
+  onSelectedBarIdChanged: scheduleSave()
   onBlurEnabledChanged: scheduleSave()
   onGlassOpacityChanged: scheduleSave()
   onNotifWidthChanged: scheduleSave()
@@ -199,6 +884,22 @@ QtObject {
   onLauncherDefaultModeChanged: scheduleSave()
   onLauncherShowModeHintsChanged: scheduleSave()
   onLauncherShowHomeSectionsChanged: scheduleSave()
+  onLauncherEnablePreloadChanged: scheduleSave()
+  onLauncherKeepSearchOnModeSwitchChanged: scheduleSave()
+  onLauncherEnableDebugTimingsChanged: scheduleSave()
+  onLauncherMaxResultsChanged: scheduleSave()
+  onLauncherFileMinQueryLengthChanged: scheduleSave()
+  onLauncherFileMaxResultsChanged: scheduleSave()
+  onLauncherRecentsLimitChanged: scheduleSave()
+  onLauncherRecentAppsLimitChanged: scheduleSave()
+  onLauncherSuggestionsLimitChanged: scheduleSave()
+  onLauncherCacheTtlSecChanged: scheduleSave()
+  onLauncherModeOrderChanged: scheduleSave()
+  onLauncherEnabledModesChanged: scheduleSave()
+  onLauncherScoreNameWeightChanged: scheduleSave()
+  onLauncherScoreTitleWeightChanged: scheduleSave()
+  onLauncherScoreExecWeightChanged: scheduleSave()
+  onLauncherScoreBodyWeightChanged: scheduleSave()
   onControlCenterWidthChanged: scheduleSave()
   onControlCenterShowQuickLinksChanged: scheduleSave()
   onControlCenterShowMediaWidgetChanged: scheduleSave()
@@ -236,7 +937,12 @@ QtObject {
 
   function load() {
     var raw = configFile.text();
-    if (!raw) return;
+    if (!raw) {
+      barConfigs = normalizeBarConfigs([], {});
+      ensureSelectedBar();
+      syncLegacyBarSettingsFromPrimary();
+      return;
+    }
 
     _loading = true;
 
@@ -248,6 +954,13 @@ QtObject {
         if (data.bar.floating !== undefined) barFloating = data.bar.floating;
         if (data.bar.margin !== undefined) barMargin = data.bar.margin;
         if (data.bar.opacity !== undefined) barOpacity = data.bar.opacity;
+      }
+
+      if (data.bars) {
+        if (data.bars.configs !== undefined) barConfigs = normalizeBarConfigs(data.bars.configs, data);
+        if (data.bars.selectedBarId !== undefined) selectedBarId = data.bars.selectedBarId;
+      } else {
+        barConfigs = normalizeBarConfigs([], data);
       }
 
       if (data.glass) {
@@ -276,11 +989,8 @@ QtObject {
         if (data.weather.locationPriority !== undefined) weatherLocationPriority = data.weather.locationPriority;
       }
 
-      if (data.launcher) {
-        if (data.launcher.defaultMode !== undefined) launcherDefaultMode = data.launcher.defaultMode;
-        if (data.launcher.showModeHints !== undefined) launcherShowModeHints = data.launcher.showModeHints;
-        if (data.launcher.showHomeSections !== undefined) launcherShowHomeSections = data.launcher.showHomeSections;
-      }
+      if (data.launcher)
+        normalizeLauncherConfig(data);
 
       if (data.controlCenter) {
         if (data.controlCenter.width !== undefined) controlCenterWidth = data.controlCenter.width;
@@ -356,8 +1066,11 @@ QtObject {
       }
     } catch (e) {
       console.error("Failed to load config: " + e);
+      barConfigs = normalizeBarConfigs([], {});
     }
 
+    ensureSelectedBar();
+    syncLegacyBarSettingsFromPrimary();
     _loading = false;
     applyRuntimeSettings();
   }
@@ -369,6 +1082,9 @@ QtObject {
     onLoaded: root.load()
     onLoadFailed: (error) => {
       if (error === 2) {
+        root.barConfigs = root.normalizeBarConfigs([], {});
+        root.ensureSelectedBar();
+        root.syncLegacyBarSettingsFromPrimary();
         root.save();
         return;
       }
@@ -384,6 +1100,10 @@ QtObject {
         "floating": barFloating,
         "margin": barMargin,
         "opacity": barOpacity
+      },
+      "bars": {
+        "selectedBarId": selectedBarId,
+        "configs": barConfigs
       },
       "glass": {
         "blur": blurEnabled,
@@ -410,7 +1130,23 @@ QtObject {
       "launcher": {
         "defaultMode": launcherDefaultMode,
         "showModeHints": launcherShowModeHints,
-        "showHomeSections": launcherShowHomeSections
+        "showHomeSections": launcherShowHomeSections,
+        "enablePreload": launcherEnablePreload,
+        "keepSearchOnModeSwitch": launcherKeepSearchOnModeSwitch,
+        "enableDebugTimings": launcherEnableDebugTimings,
+        "maxResults": launcherMaxResults,
+        "fileMinQueryLength": launcherFileMinQueryLength,
+        "fileMaxResults": launcherFileMaxResults,
+        "recentsLimit": launcherRecentsLimit,
+        "recentAppsLimit": launcherRecentAppsLimit,
+        "suggestionsLimit": launcherSuggestionsLimit,
+        "cacheTtlSec": launcherCacheTtlSec,
+        "modeOrder": launcherModeOrder,
+        "enabledModes": launcherEnabledModes,
+        "scoreNameWeight": launcherScoreNameWeight,
+        "scoreTitleWeight": launcherScoreTitleWeight,
+        "scoreExecWeight": launcherScoreExecWeight,
+        "scoreBodyWeight": launcherScoreBodyWeight
       },
       "controlCenter": {
         "width": controlCenterWidth,

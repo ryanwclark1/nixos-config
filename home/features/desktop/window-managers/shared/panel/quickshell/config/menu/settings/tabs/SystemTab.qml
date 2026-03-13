@@ -87,6 +87,38 @@ Item {
                     {
                         value: "media",
                         label: "Media"
+                    },
+                    {
+                        value: "run",
+                        label: "Run"
+                    },
+                    {
+                        value: "web",
+                        label: "Web"
+                    },
+                    {
+                        value: "emoji",
+                        label: "Emoji"
+                    },
+                    {
+                        value: "calc",
+                        label: "Calc"
+                    },
+                    {
+                        value: "bookmarks",
+                        label: "Bookmarks"
+                    },
+                    {
+                        value: "keybinds",
+                        label: "Keybinds"
+                    },
+                    {
+                        value: "nixos",
+                        label: "NixOS"
+                    },
+                    {
+                        value: "wallpapers",
+                        label: "Wallpapers"
                     }
                 ]
                 onModeSelected: modeValue => Config.launcherDefaultMode = modeValue
@@ -103,6 +135,57 @@ Item {
                     icon: "󰆍"
                     configKey: "launcherShowHomeSections"
                 }
+                SettingsToggleRow {
+                    label: "Background Preload"
+                    icon: "󰔟"
+                    configKey: "launcherEnablePreload"
+                }
+                SettingsToggleRow {
+                    label: "Keep Query on Mode Switch"
+                    icon: "󰍉"
+                    configKey: "launcherKeepSearchOnModeSwitch"
+                }
+                SettingsToggleRow {
+                    label: "Debug Launcher Timings"
+                    icon: "󰔛"
+                    configKey: "launcherEnableDebugTimings"
+                }
+            }
+
+            SettingsSliderRow {
+                label: "Max Results"
+                min: 20
+                max: 200
+                step: 5
+                value: Config.launcherMaxResults
+                onMoved: v => Config.launcherMaxResults = v
+            }
+
+            SettingsSliderRow {
+                label: "File Query Min Length"
+                min: 1
+                max: 6
+                value: Config.launcherFileMinQueryLength
+                onMoved: v => Config.launcherFileMinQueryLength = v
+            }
+
+            SettingsSliderRow {
+                label: "File Search Max Results"
+                min: 20
+                max: 300
+                step: 10
+                value: Config.launcherFileMaxResults
+                onMoved: v => Config.launcherFileMaxResults = v
+            }
+
+            SettingsSliderRow {
+                label: "Cache TTL"
+                min: 30
+                max: 1800
+                step: 30
+                value: Config.launcherCacheTtlSec
+                unit: "s"
+                onMoved: v => Config.launcherCacheTtlSec = v
             }
         }
 

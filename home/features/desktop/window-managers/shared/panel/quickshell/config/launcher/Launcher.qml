@@ -48,7 +48,13 @@ PanelWindow {
   property var launchHistory: []
   property var onCommandOutput: null
   property var modeCache: ({})
+  property var modeCacheTime: ({})
   property int openCount: 0
+  property int _requestToken: 0
+  property var _activeRequests: ({})
+  property var commandAvailability: ({})
+  property var _commandCheckProcs: ({})
+  property var _commandWaiters: ({})
   property var mediaPlayers: []
 
   function refreshMediaPlayers() { mediaPlayers = MediaService.getAvailablePlayers(); }
@@ -61,8 +67,11 @@ PanelWindow {
   property real globalLastMouseY: 0
 
   readonly property bool showLauncherHome: Config.launcherShowHomeSections && searchText === "" && (mode === "drun" || mode === "system" || mode === "files")
-  readonly property var modeOrder: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media"]
-  readonly property var primaryModes: ["drun", "window", "files", "ai", "clip", "system", "media"]
+  readonly property var allKnownModes: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
+  readonly property var defaultModeOrder: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
+  readonly property var defaultPrimaryModes: ["drun", "window", "files", "ai", "clip", "system", "media"]
+  property var modeOrder: computeModeOrder()
+  property var primaryModes: sanitizeModeList(Config.launcherEnabledModes, defaultPrimaryModes, allKnownModes)
   readonly property var modeMeta: ({
     "drun": { label: "Apps", hint: "Launch applications", prefix: "" },
     "window": { label: "Windows", hint: "Jump to an open window", prefix: "" },
@@ -75,7 +84,10 @@ PanelWindow {
     "run": { label: "Run", hint: "Run commands with >", prefix: ">" },
     "system": { label: "System", hint: "Session and utility actions", prefix: "" },
     "keybinds": { label: "Keybinds", hint: "Inspect and trigger binds", prefix: "" },
-    "media": { label: "Media", hint: "Control active players", prefix: "" }
+    "media": { label: "Media", hint: "Control active players", prefix: "" },
+    "nixos": { label: "NixOS", hint: "Nix maintenance actions", prefix: "" },
+    "wallpapers": { label: "Wallpapers", hint: "Pick and apply wallpapers", prefix: "" },
+    "bookmarks": { label: "Bookmarks", hint: "Open bookmarked destinations", prefix: "@" }
   })
   readonly property var modeIcons: ({
     "drun": "󰀻",
@@ -89,7 +101,10 @@ PanelWindow {
     "run": "󰆍",
     "system": "󰒓",
     "keybinds": "󰌌",
-    "media": "󰝚"
+    "media": "󰝚",
+    "nixos": "",
+    "wallpapers": "󰸉",
+    "bookmarks": "󰃀"
   })
   readonly property var launcherShortcuts: ({
     "drun": [
@@ -122,7 +137,7 @@ PanelWindow {
   })
   readonly property string modePrefixes: "!/@?>=:"
   readonly property string emptyStateTitle: {
-    if (mode === "files") return "Type at least two characters to search files";
+    if (mode === "files") return "Type at least " + Config.launcherFileMinQueryLength + " characters to search files";
     if (mode === "ai") return "Describe what you want and press Enter";
     if (mode === "clip") return "Clipboard history is empty";
     if (mode === "window") return "No open windows found";
@@ -240,16 +255,31 @@ PanelWindow {
     }
   }
 
+  Component {
+    id: commandCheckProcComponent
+    Process {
+      id: _checkProc
+      property string _commandName: ""
+      running: false
+      stdout: StdioCollector {
+        onStreamFinished: {
+          launcherRoot._finalizeCommandCheck(_checkProc, (this.text || "").trim() === "1");
+        }
+      }
+    }
+  }
+
   Timer {
     id: preloadWaitTimer
     interval: 50
     repeat: true
     property string waitingFor: ""
     onTriggered: {
-      if (launcherRoot.modeCache[waitingFor]) {
+      var cached = launcherRoot.getCached(waitingFor);
+      if (cached) {
         running = false;
         if (launcherRoot.mode === waitingFor) {
-          launcherRoot.allItems = launcherRoot.modeCache[waitingFor];
+          launcherRoot.allItems = cached;
           launcherRoot.filterItems();
           launcherRoot.buildLauncherHome();
         }
@@ -285,10 +315,218 @@ PanelWindow {
     return launcherRoot.modeMeta[key] || { label: key.toUpperCase(), hint: "", prefix: "" };
   }
 
+  function sanitizeModeList(source, fallback, allowedList) {
+    var out = [];
+    var seen = ({});
+    var allowed = ({});
+    var i;
+    for (i = 0; i < allowedList.length; ++i)
+      allowed[allowedList[i]] = true;
+
+    var list = Array.isArray(source) && source.length > 0 ? source : fallback;
+    for (i = 0; i < list.length; ++i) {
+      var modeKey = String(list[i] || "");
+      if (!allowed[modeKey] || seen[modeKey]) continue;
+      out.push(modeKey);
+      seen[modeKey] = true;
+    }
+    if (out.length === 0)
+      return fallback.slice();
+    return out;
+  }
+
+  function computeModeOrder() {
+    var order = sanitizeModeList(Config.launcherModeOrder, defaultModeOrder, allKnownModes);
+    var enabled = sanitizeModeList(Config.launcherEnabledModes, defaultModeOrder, allKnownModes);
+    var enabledSet = ({});
+    var i;
+    for (i = 0; i < enabled.length; ++i)
+      enabledSet[enabled[i]] = true;
+    var filtered = [];
+    for (i = 0; i < order.length; ++i) {
+      var modeKey = order[i];
+      if (enabledSet[modeKey])
+        filtered.push(modeKey);
+    }
+    if (filtered.length === 0)
+      return ["drun"];
+    return filtered;
+  }
+
+  function supportsMode(modeKey) {
+    return modeOrder.indexOf(modeKey) !== -1;
+  }
+
+  function effectiveDefaultMode() {
+    if (supportsMode(Config.launcherDefaultMode))
+      return Config.launcherDefaultMode;
+    return modeOrder.length > 0 ? modeOrder[0] : "drun";
+  }
+
+  function setModeHint(title, subtitle, iconName) {
+    allItems = [{
+      name: title,
+      title: subtitle || "",
+      icon: iconName || (modeIcons[mode] || "󰋼"),
+      isHint: true
+    }];
+    filterItems();
+  }
+
+  function modeDependencies(modeKey) {
+    if (modeKey === "drun") return ["qs-apps"];
+    if (modeKey === "run") return ["qs-run"];
+    if (modeKey === "emoji") return ["qs-emoji"];
+    if (modeKey === "clip") return ["qs-clip", "cliphist", "wl-copy"];
+    if (modeKey === "keybinds") return ["qs-keybinds"];
+    if (modeKey === "bookmarks") return ["qs-bookmarks"];
+    if (modeKey === "wallpapers") return ["qs-wallpapers"];
+    if (modeKey === "ai") return ["qs-ai", "wl-copy"];
+    if (modeKey === "files") return ["bash"];
+    return [];
+  }
+
+  function missingDependencyMessage(modeKey, cmd) {
+    if (modeKey === "files")
+      return "Required command missing: " + cmd;
+    return "Install '" + cmd + "' to use " + modeInfo(modeKey).label + " mode.";
+  }
+
+  function checkCommandAvailable(cmd, callback) {
+    if (!cmd) {
+      callback(false);
+      return;
+    }
+    if (commandAvailability[cmd] !== undefined) {
+      callback(commandAvailability[cmd] === true);
+      return;
+    }
+    if (_commandCheckProcs[cmd]) {
+      var queued = _commandWaiters[cmd] || [];
+      queued.push(callback);
+      var queuedMap = Object.assign({}, _commandWaiters);
+      queuedMap[cmd] = queued;
+      _commandWaiters = queuedMap;
+      return;
+    }
+
+    var proc = commandCheckProcComponent.createObject(launcherRoot);
+    proc._commandName = cmd;
+    proc.command = ["bash", "-lc", "command -v " + shellQuote(cmd) + " >/dev/null 2>&1 && echo 1 || echo 0"];
+    var nextProcMap = Object.assign({}, _commandCheckProcs);
+    nextProcMap[cmd] = proc;
+    _commandCheckProcs = nextProcMap;
+
+    var waiters = Object.assign({}, _commandWaiters);
+    waiters[cmd] = [callback];
+    _commandWaiters = waiters;
+    proc.running = true;
+  }
+
+  function _finalizeCommandCheck(proc, ok) {
+    var cmd = proc._commandName;
+    var nextAvailability = Object.assign({}, commandAvailability);
+    nextAvailability[cmd] = ok;
+    commandAvailability = nextAvailability;
+    var next = Object.assign({}, _commandCheckProcs);
+    delete next[cmd];
+    _commandCheckProcs = next;
+    var waiters = _commandWaiters[cmd] || [];
+    var nextWaiters = Object.assign({}, _commandWaiters);
+    delete nextWaiters[cmd];
+    _commandWaiters = nextWaiters;
+    for (var i = 0; i < waiters.length; ++i) {
+      try {
+        waiters[i](ok);
+      } catch (e) {}
+    }
+    proc.destroy();
+  }
+
+  function ensureModeDependencies(modeKey, onReady) {
+    var deps = modeDependencies(modeKey);
+    if (!deps || deps.length === 0) {
+      onReady(true, "");
+      return;
+    }
+
+    var pending = deps.length;
+    var failed = "";
+    for (var i = 0; i < deps.length; ++i) {
+      var dep = deps[i];
+      checkCommandAvailable(dep, function(ok) {
+        if (!ok && failed === "")
+          failed = dep;
+        pending--;
+        if (pending === 0)
+          onReady(failed === "", failed);
+      });
+    }
+  }
+
   function stripModePrefix(text) {
     if (text.length > 0 && modePrefixes.indexOf(text[0]) !== -1)
       return text.substring(1).trim();
     return text;
+  }
+
+  function shellQuote(text) {
+    return "'" + String(text || "").replace(/'/g, "'\\''") + "'";
+  }
+
+  function telemetryStart() {
+    return Date.now();
+  }
+
+  function telemetryEnd(label, startedAt) {
+    if (!Config.launcherEnableDebugTimings)
+      return;
+    var took = Math.max(0, Date.now() - startedAt);
+    console.log("Launcher timing:", label, took + "ms");
+  }
+
+  function beginRequest(modeKey) {
+    _requestToken += 1;
+    var next = Object.assign({}, _activeRequests);
+    next[modeKey] = _requestToken;
+    _activeRequests = next;
+    return _requestToken;
+  }
+
+  function isRequestCurrent(modeKey, token) {
+    return _activeRequests[modeKey] === token;
+  }
+
+  function getCached(modeKey) {
+    var items = modeCache[modeKey];
+    if (!items)
+      return null;
+    var ttlMs = Math.max(1, Config.launcherCacheTtlSec) * 1000;
+    var last = modeCacheTime[modeKey] || 0;
+    if (Date.now() - last > ttlMs) {
+      var nextCache = Object.assign({}, modeCache);
+      var nextTimes = Object.assign({}, modeCacheTime);
+      delete nextCache[modeKey];
+      delete nextTimes[modeKey];
+      modeCache = nextCache;
+      modeCacheTime = nextTimes;
+      return null;
+    }
+    return items;
+  }
+
+  function setCached(modeKey, items) {
+    var nextCache = Object.assign({}, modeCache);
+    var nextTimes = Object.assign({}, modeCacheTime);
+    nextCache[modeKey] = items;
+    nextTimes[modeKey] = Date.now();
+    modeCache = nextCache;
+    modeCacheTime = nextTimes;
+  }
+
+  function clearCaches() {
+    modeCache = ({});
+    modeCacheTime = ({});
   }
 
   function saveFrequency() { freqFile.setText(JSON.stringify(appFrequency)); }
@@ -308,7 +546,7 @@ PanelWindow {
     }];
     for (var i = 0; i < launchHistory.length; ++i) {
       if (launchHistory[i].key !== key) next.push(launchHistory[i]);
-      if (next.length >= 12) break;
+      if (next.length >= Config.launcherRecentsLimit) break;
     }
     launchHistory = next;
     saveHistory();
@@ -326,7 +564,7 @@ PanelWindow {
     featuredActions = launcherShortcuts[mode] || [];
     suggestionItems = [];
     if (mode === "drun") {
-      var apps = modeCache["drun"] || [];
+      var apps = getCached("drun") || [];
       var recent = [];
       var seen = ({});
       for (var i = 0; i < launchHistory.length; ++i) {
@@ -342,7 +580,7 @@ PanelWindow {
           }
         }
       }
-      if (recent.length < 6) {
+      if (recent.length < Config.launcherRecentAppsLimit) {
         var scored = [];
         for (var k = 0; k < apps.length; ++k) {
           var ranked = apps[k];
@@ -356,7 +594,7 @@ PanelWindow {
         scored.sort(function(a, b) { return b._recent - a._recent; });
         recent = recent.concat(scored);
       }
-      recentItems = recent.slice(0, 6);
+      recentItems = recent.slice(0, Config.launcherRecentAppsLimit);
       var suggestions = [];
       for (var m = 0; m < apps.length; ++m) {
         var candidate = apps[m];
@@ -369,7 +607,7 @@ PanelWindow {
         }
       }
       suggestions.sort(function(a, b) { return (b._usage || 0) - (a._usage || 0); });
-      suggestionItems = suggestions.slice(0, 4);
+      suggestionItems = suggestions.slice(0, Config.launcherSuggestionsLimit);
     } else if (mode === "system") {
       recentItems = [
         { name: "Open Audio Controls", title: "Open the audio popup", icon: "󰕾", ipcTarget: "Shell", ipcAction: "toggleAudioMenu" },
@@ -393,16 +631,21 @@ PanelWindow {
   }
 
   function open(newMode, keepSearch) {
+    var startedAt = telemetryStart();
     if (showingConfirm) cancelConfirm();
     openCount++;
-    if (openCount % 10 === 0) modeCache = {};
+    if (openCount % 10 === 0) clearCaches();
     ignoreMouseHover = true;
     mouseTrackingReady = false;
     globalMouseInitialized = false;
     mouseTrackingDelayTimer.restart();
-    mode = newMode || "drun";
+    var requestedMode = newMode || effectiveDefaultMode();
+    if (!supportsMode(requestedMode))
+      requestedMode = effectiveDefaultMode();
+    mode = requestedMode;
     buildLauncherHome();
-    if (!keepSearch) {
+    var shouldKeepSearch = keepSearch === true && Config.launcherKeepSearchOnModeSwitch;
+    if (!shouldKeepSearch) {
       searchText = "";
       if (searchInput) searchInput.text = "";
     }
@@ -411,25 +654,35 @@ PanelWindow {
     scaleValue = 1.0;
     Qt.callLater(function() { if (searchInput) searchInput.forceActiveFocus(); });
 
-    if (mode === "drun") loadApps();
-    else if (mode === "window") { allItems = []; filterItems(); windowLoadTimer.restart(); }
-    else if (mode === "run") loadRun();
-    else if (mode === "emoji") loadEmojis();
-    else if (mode === "clip") loadClip();
-    else if (mode === "calc") { allItems = []; filterItems(); }
-    else if (mode === "web") loadWeb();
-    else if (mode === "system") loadSystem();
-    else if (mode === "media") { allItems = []; filterItems(); refreshMediaPlayers(); }
-    else if (mode === "nixos") loadNixos();
-    else if (mode === "wallpapers") loadWallpapers();
-    else if (mode === "files") loadFiles();
-    else if (mode === "bookmarks") loadBookmarks();
-    else if (mode === "ai") loadAi();
-    else if (mode === "keybinds") loadKeybinds();
-    else if (mode === "dmenu") filterItems();
+    ensureModeDependencies(mode, function(ok, missingCmd) {
+      if (!ok) {
+        setModeHint("Dependency missing", missingDependencyMessage(mode, missingCmd), "󰋼");
+        return;
+      }
+
+      if (mode === "drun") loadApps();
+      else if (mode === "window") { allItems = []; filterItems(); windowLoadTimer.restart(); }
+      else if (mode === "run") loadRun();
+      else if (mode === "emoji") loadEmojis();
+      else if (mode === "clip") loadClip();
+      else if (mode === "calc") { allItems = []; filterItems(); }
+      else if (mode === "web") loadWeb();
+      else if (mode === "system") loadSystem();
+      else if (mode === "media") { allItems = []; filterItems(); refreshMediaPlayers(); }
+      else if (mode === "nixos") loadNixos();
+      else if (mode === "wallpapers") loadWallpapers();
+      else if (mode === "files") loadFiles();
+      else if (mode === "bookmarks") loadBookmarks();
+      else if (mode === "ai") loadAi();
+      else if (mode === "keybinds") loadKeybinds();
+      else if (mode === "dmenu") filterItems();
+    });
 
     // Start background preload of other cacheable modes
-    preloadDelayTimer.restart();
+    if (Config.launcherEnablePreload)
+      preloadDelayTimer.restart();
+
+    telemetryEnd("open:" + mode, startedAt);
   }
 
   function close() {
@@ -482,8 +735,9 @@ PanelWindow {
   }
 
   function loadCached(modeKey, command, parseFunc) {
-    if (modeCache[modeKey]) {
-      allItems = modeCache[modeKey];
+    var cached = getCached(modeKey);
+    if (cached) {
+      allItems = cached;
       filterItems();
       return;
     }
@@ -496,18 +750,24 @@ PanelWindow {
     }
     allItems = [{ name: "Loading...", isHint: true, icon: "󰔟" }];
     filterItems();
+    var token = beginRequest(modeKey);
     runCommand(command, function(raw) {
+      if (!isRequestCurrent(modeKey, token))
+        return;
       try {
-        if (raw) {
-          var items = parseFunc(raw);
-          modeCache[modeKey] = items;
-          if (mode === modeKey) {
-            allItems = items;
-            filterItems();
-            buildLauncherHome();
-          }
+        var items = raw ? parseFunc(raw) : [];
+        if (!Array.isArray(items))
+          items = [];
+        setCached(modeKey, items);
+        if (mode === modeKey) {
+          allItems = items;
+          filterItems();
+          buildLauncherHome();
         }
-      } catch (e) {}
+      } catch (e) {
+        if (mode === modeKey)
+          setModeHint("Failed to load " + modeInfo(modeKey).label, "Check helper command output and logs.", "󰅚");
+      }
     });
   }
 
@@ -551,10 +811,12 @@ PanelWindow {
   })
 
   function startPreload() {
+    if (!Config.launcherEnablePreload)
+      return;
     var keys = Object.keys(preloadModes);
     for (var i = 0; i < keys.length; i++) {
       var key = keys[i];
-      if (key !== mode && !modeCache[key] && !_preloadProcs[key]) {
+      if (key !== mode && !getCached(key) && !_preloadProcs[key]) {
         _spawnPreload(key);
       }
     }
@@ -571,7 +833,7 @@ PanelWindow {
   function _handlePreloadDone(proc, raw) {
     var key = proc._modeKey;
     if (raw && key && preloadModes[key]) {
-      try { modeCache[key] = preloadModes[key].parse(raw); } catch (e) {}
+      try { setCached(key, preloadModes[key].parse(raw)); } catch (e) {}
     }
     delete _preloadProcs[key];
     proc.destroy();
@@ -584,25 +846,32 @@ PanelWindow {
 
   function loadFiles() {
     var searchQuery = searchText.startsWith("/") ? searchText.substring(1).trim() : searchText;
-    if (searchQuery.length < 2) {
+    if (searchQuery.length < Config.launcherFileMinQueryLength) {
       allItems = [];
       filterItems();
       return;
     }
-    runCommand(["fd", "--base-directory", Quickshell.env("HOME"), "--max-results", "100", searchQuery], function(raw) {
-      if (raw) {
-        var lines = raw.split("\n");
-        var items = [];
-        for (var i = 0; i < lines.length; i++) {
-          if (lines[i].trim() !== "") {
-            var path = lines[i];
-            var parts = path.split("/");
-            items.push({ name: parts[parts.length - 1] || path, title: path, fullPath: Quickshell.env("HOME") + "/" + path });
-          }
+    var token = beginRequest("files");
+    var homeDir = Quickshell.env("HOME") || "/";
+    var maxResults = Math.max(20, Config.launcherFileMaxResults);
+    var script = "if command -v fd >/dev/null 2>&1; then "
+      + "fd --base-directory " + shellQuote(homeDir) + " --max-results " + maxResults + " " + shellQuote(searchQuery) + "; "
+      + "else find " + shellQuote(homeDir) + " -mindepth 1 -maxdepth 6 -iname '*" + searchQuery.replace(/'/g, "'\\''") + "*' 2>/dev/null | head -n " + maxResults + "; fi";
+    runCommand(["bash", "-lc", script], function(raw) {
+      if (!isRequestCurrent("files", token))
+        return;
+      var lines = raw ? raw.split("\n") : [];
+      var items = [];
+      for (var i = 0; i < lines.length; i++) {
+        if (lines[i].trim() !== "") {
+          var path = lines[i];
+          var parts = path.split("/");
+          var fullPath = path.startsWith("/") ? path : (homeDir + "/" + path);
+          items.push({ name: parts[parts.length - 1] || path, title: fullPath, fullPath: fullPath });
         }
-        allItems = items;
-        filterItems();
       }
+      allItems = items;
+      filterItems();
     });
   }
 
@@ -615,7 +884,10 @@ PanelWindow {
     }
     allItems = [{ name: "Thinking...", isHint: true, icon: "󰚩" }];
     filterItems();
+    var token = beginRequest("ai");
     runCommand(["qs-ai", query], function(raw) {
+      if (!isRequestCurrent("ai", token))
+        return;
       raw = raw.trim();
       if (raw) allItems = [{ name: "AI Response", title: "Click to copy response", body: raw, icon: "󰚩" }];
       else allItems = [];
@@ -730,10 +1002,10 @@ PanelWindow {
     var exec = item.exec || item.class || "";
     var body = item.body || "";
     var bestScore = Math.max(
-      fuzzyMatch(name, clean),
-      fuzzyMatch(title, clean) * 0.92,
-      fuzzyMatch(exec, clean) * 0.88,
-      fuzzyMatch(body, clean) * 0.75
+      fuzzyMatch(name, clean) * Config.launcherScoreNameWeight,
+      fuzzyMatch(title, clean) * Config.launcherScoreTitleWeight,
+      fuzzyMatch(exec, clean) * Config.launcherScoreExecWeight,
+      fuzzyMatch(body, clean) * Config.launcherScoreBodyWeight
     );
     if (mode === "drun") bestScore += (appFrequency[item.exec] || 0) * 0.6;
     return bestScore;
@@ -802,13 +1074,23 @@ PanelWindow {
           return 0;
         });
       }
-      filteredItems = scoredItems;
+      filteredItems = scoredItems.slice(0, Config.launcherMaxResults);
     }
     selectedIndex = Math.min(selectedIndex, Math.max(0, filteredItems.length - 1));
   }
 
   function copyToClipboard(text) {
-    Quickshell.execDetached(["bash", "-c", "echo -n '" + text.replace(/'/g, "'\\''") + "' | wl-copy"]);
+    Quickshell.execDetached(["bash", "-lc", "printf %s " + shellQuote(text) + " | wl-copy"]);
+  }
+
+  function launchExecString(execString, runInTerminal) {
+    if (!execString || String(execString).trim() === "")
+      return;
+    if (runInTerminal) {
+      Quickshell.execDetached(["kitty", "-e", "bash", "-lc", String(execString)]);
+      return;
+    }
+    Quickshell.execDetached(["bash", "-lc", String(execString)]);
   }
 
   function activateFeatured(item) {
@@ -830,8 +1112,7 @@ PanelWindow {
 
     if (mode === "drun") {
       trackLaunch(item);
-      if (item.terminal === "true" || item.terminal === "True") Quickshell.execDetached(["kitty", "-e", "bash", "-c", item.exec]);
-      else if (item.exec) Quickshell.execDetached(item.exec.split(" "));
+      launchExecString(item.exec, item.terminal === "true" || item.terminal === "True");
       close();
     } else if (mode === "run") {
       rememberRecent({ name: item.name || item.exec, title: item.exec || "", icon: "󰆍", exec: item.exec || "" });
@@ -849,12 +1130,16 @@ PanelWindow {
       copyToClipboard(item.name);
       close();
     } else if (mode === "clip") {
-      Quickshell.execDetached(["bash", "-c", "cliphist decode " + item.id + " | wl-copy"]);
-      close();
+      if (item.id) {
+        Quickshell.execDetached(["bash", "-lc", "cliphist decode " + shellQuote(item.id) + " | wl-copy"]);
+        close();
+      }
     } else if (mode === "web" || mode === "bookmarks") {
       rememberRecent({ name: item.name || "Link", title: item.title || item.exec || "", icon: item.icon || "󰖟", exec: item.exec || "" });
-      Quickshell.execDetached(["xdg-open", item.exec + (item.query ? encodeURIComponent(item.query) : "")]);
-      close();
+      if (item.exec) {
+        Quickshell.execDetached(["xdg-open", item.exec + (item.query ? encodeURIComponent(item.query) : "")]);
+        close();
+      }
     } else if (mode === "ai") {
       if (item.body) {
         copyToClipboard(item.body);
@@ -876,7 +1161,7 @@ PanelWindow {
       Quickshell.execDetached(["wallust", "run", item.path]);
       close();
     } else if (mode === "keybinds") {
-      if (item.disp) Quickshell.execDetached(["hyprctl", "dispatch", item.disp, item.args]);
+      if (item.disp) Quickshell.execDetached(["hyprctl", "dispatch", item.disp, item.args || ""]);
       close();
     }
   }
@@ -905,7 +1190,7 @@ PanelWindow {
       launcherRoot.allItems = items.map(function(it) { return { name: it, title: it }; });
       launcherRoot.open("dmenu");
     }
-    function toggle() { if (launcherRoot.launcherOpacity > 0) launcherRoot.close(); else launcherRoot.open(Config.launcherDefaultMode || "drun"); }
+    function toggle() { if (launcherRoot.launcherOpacity > 0) launcherRoot.close(); else launcherRoot.open(launcherRoot.effectiveDefaultMode()); }
   }
 
   Rectangle {
@@ -1288,8 +1573,7 @@ PanelWindow {
                     launcherRoot.selectedIndex = 0;
                     if (modelData.exec) {
                       launcherRoot.trackLaunch(modelData);
-                      if (modelData.terminal === "true" || modelData.terminal === "True") Quickshell.execDetached(["kitty", "-e", "bash", "-c", modelData.exec]);
-                      else Quickshell.execDetached(modelData.exec.split(" "));
+                      launcherRoot.launchExecString(modelData.exec, modelData.terminal === "true" || modelData.terminal === "True");
                       launcherRoot.close();
                     }
                   }

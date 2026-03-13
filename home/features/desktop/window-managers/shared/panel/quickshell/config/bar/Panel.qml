@@ -15,113 +15,423 @@ Item {
   SharedWidgets.Ref { service: RecordingService }
   SharedWidgets.Ref { service: PrivacyService }
   SharedWidgets.Ref { service: PrinterService }
+  SharedWidgets.Ref { service: SpectrumService }
 
   property var manager: null
   property var anchorWindow: null
-  readonly property real networkTriggerBottomY: networkTrigger.mapToItem(root, 0, networkTrigger.height).y
-  readonly property real btTriggerBottomY: btTrigger.mapToItem(root, 0, btTrigger.height).y
-  readonly property real audioTriggerBottomY: audioTrigger.mapToItem(root, 0, audioTrigger.height).y
-  readonly property real musicTriggerBottomY: musicTrigger.visible ? musicTrigger.mapToItem(root, 0, musicTrigger.height).y : audioTriggerBottomY
-  readonly property real recordingTriggerBottomY: recordingTrigger.visible ? recordingTrigger.mapToItem(root, 0, recordingTrigger.height).y : audioTriggerBottomY
-  readonly property real privacyTriggerBottomY: privacyTrigger.visible ? privacyTrigger.mapToItem(root, 0, privacyTrigger.height).y : audioTriggerBottomY
-  readonly property real batteryTriggerBottomY: batteryTrigger.visible ? batteryTrigger.mapToItem(root, 0, batteryTrigger.height).y : audioTriggerBottomY
-  readonly property real clipboardTriggerBottomY: clipboardTrigger.mapToItem(root, 0, clipboardTrigger.height).y
-  readonly property real weatherTriggerBottomY: weatherTrigger.mapToItem(root, 0, weatherTrigger.height).y
-  readonly property real systemMonitorBottomY: systemMonitor.mapToItem(root, 0, systemMonitor.height).y
-  readonly property real printerTriggerBottomY: printerTrigger.visible ? printerTrigger.mapToItem(root, 0, printerTrigger.height).y : audioTriggerBottomY
+  property var screenRef: null
+  property var barConfig: null
 
-  // X-center positions for icon-aligned popup placement
-  readonly property real networkTriggerCenterX: networkTrigger.mapToItem(root, networkTrigger.width / 2, 0).x
-  readonly property real btTriggerCenterX: btTrigger.mapToItem(root, btTrigger.width / 2, 0).x
-  readonly property real audioTriggerCenterX: audioTrigger.mapToItem(root, audioTrigger.width / 2, 0).x
-  readonly property real musicTriggerCenterX: musicTrigger.visible ? musicTrigger.mapToItem(root, musicTrigger.width / 2, 0).x : audioTriggerCenterX
-  readonly property real recordingTriggerCenterX: recordingTrigger.visible ? recordingTrigger.mapToItem(root, recordingTrigger.width / 2, 0).x : audioTriggerCenterX
-  readonly property real privacyTriggerCenterX: privacyTrigger.visible ? privacyTrigger.mapToItem(root, privacyTrigger.width / 2, 0).x : audioTriggerCenterX
-  readonly property real batteryTriggerCenterX: batteryTrigger.visible ? batteryTrigger.mapToItem(root, batteryTrigger.width / 2, 0).x : audioTriggerCenterX
-  readonly property real clipboardTriggerCenterX: clipboardTrigger.mapToItem(root, clipboardTrigger.width / 2, 0).x
-  readonly property real weatherTriggerCenterX: weatherTrigger.mapToItem(root, weatherTrigger.width / 2, 0).x
-  readonly property real systemMonitorCenterX: systemMonitor.mapToItem(root, systemMonitor.width / 2, 0).x
-  readonly property real printerTriggerCenterX: printerTrigger.visible ? printerTrigger.mapToItem(root, printerTrigger.width / 2, 0).x : audioTriggerCenterX
-  readonly property real cavaTriggerBottomY: centerModules.cavaPill.mapToItem(root, 0, centerModules.cavaPill.height).y
-  readonly property real cavaTriggerCenterX: centerModules.cavaPill.mapToItem(root, centerModules.cavaPill.width / 2, 0).x
-  // Date/time trigger geometry is computed from direct coordinates so popup anchoring
-  // stays correct as the center row content shifts.
-  readonly property real dateTimeTriggerBottomY: centerModules.y + centerModules.dateTimePill.y + centerModules.dateTimePill.height
-  readonly property real dateTimeTriggerCenterX: centerModules.x + centerModules.dateTimePill.x + (centerModules.dateTimePill.width / 2)
-  readonly property string fullCavaData: centerModules.fullCavaData
-  signal cavaClicked()
-  signal dateTimeClicked()
-  signal notifClicked()
-  signal networkClicked()
-  signal audioClicked()
-  signal commandClicked()
-  signal musicClicked()
-  signal recordingClicked()
-  signal privacyClicked()
-  signal batteryClicked()
-  signal clipboardClicked()
-  signal bluetoothClicked()
-  signal weatherClicked()
-  signal systemStatsClicked()
-  signal notepadClicked()
-  signal printerClicked()
+  readonly property string position: (barConfig && barConfig.position) || "top"
+  readonly property bool vertical: Config.isVerticalBar(position)
+  readonly property int thickness: Config.barThickness(barConfig)
+  readonly property var sectionWidgets: (barConfig && barConfig.sectionWidgets) || ({ left: [], center: [], right: [] })
+  readonly property int outerPadding: Colors.spacingM
+  readonly property int sectionSpacing: Colors.spacingS
+  readonly property int runtimeSpacing: Colors.spacingM
+  readonly property real computedOpacity: (barConfig && barConfig.opacity !== undefined) ? barConfig.opacity : Config.barOpacity
+  readonly property bool floatingBar: barConfig && barConfig.floating !== undefined ? !!barConfig.floating : Config.barFloating
+  readonly property string fullCavaData: {
+    var vals = (SpectrumService && SpectrumService.values) ? SpectrumService.values : [];
+    var blocks = ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"];
+    var s = "";
+    for (var i = 0; i < vals.length; ++i) {
+      var idx = Math.min(7, Math.floor(vals[i] * 8));
+      s += blocks[Math.max(0, idx)];
+    }
+    return s;
+  }
 
-  implicitHeight: Config.barHeight
+  signal surfaceRequested(string surfaceId, var context)
+
+  implicitHeight: vertical ? 0 : thickness
+  implicitWidth: vertical ? Math.max(thickness, Math.max(leftSection.implicitWidth, Math.max(centerSection.implicitWidth, rightSection.implicitWidth)) + outerPadding * 2) : 0
+
+  function sectionLabel(section) {
+    return Config.sectionLabel(section, position);
+  }
+
+  function sectionItems(section) {
+    var items = sectionWidgets && sectionWidgets[section] ? sectionWidgets[section] : [];
+    return items;
+  }
+
+  function widgetSettings(widgetInstance) {
+    return widgetInstance && widgetInstance.settings ? widgetInstance.settings : {};
+  }
+
+  function requestSurface(surfaceId, item) {
+    if (!item) return;
+    var topLeft = item.mapToItem(root, 0, 0);
+    root.surfaceRequested(surfaceId, {
+      surfaceId: surfaceId,
+      barId: barConfig ? barConfig.id : "",
+      position: position,
+      screen: screenRef,
+      screenName: Config.screenName(screenRef),
+      triggerRect: {
+        x: topLeft.x,
+        y: topLeft.y,
+        width: item.width,
+        height: item.height
+      }
+    });
+  }
+
+  function componentForWidget(widgetType) {
+    if (widgetType === "logo") return logoComponent;
+    if (widgetType === "workspaces") return workspacesComponent;
+    if (widgetType === "taskbar") return taskbarComponent;
+    if (widgetType === "systemMonitor") return systemMonitorComponent;
+    if (widgetType === "dateTime") return dateTimeComponent;
+    if (widgetType === "mediaBar") return mediaBarComponent;
+    if (widgetType === "updates") return updatesComponent;
+    if (widgetType === "cava") return cavaComponent;
+    if (widgetType === "idleInhibitor") return idleInhibitorComponent;
+    if (widgetType === "weather") return weatherComponent;
+    if (widgetType === "network") return networkComponent;
+    if (widgetType === "bluetooth") return bluetoothComponent;
+    if (widgetType === "audio") return audioComponent;
+    if (widgetType === "music") return musicComponent;
+    if (widgetType === "privacy") return privacyComponent;
+    if (widgetType === "recording") return recordingComponent;
+    if (widgetType === "battery") return batteryComponent;
+    if (widgetType === "printer") return printerComponent;
+    if (widgetType === "notepad") return notepadComponent;
+    if (widgetType === "controlCenter") return controlCenterComponent;
+    if (widgetType === "tray") return trayComponent;
+    if (widgetType === "clipboard") return clipboardComponent;
+    if (widgetType === "notifications") return notificationsComponent;
+    if (widgetType === "spacer") return spacerComponent;
+    if (widgetType === "separator") return separatorComponent;
+    if (String(widgetType || "").indexOf("plugin:") === 0) return pluginComponent;
+    return unknownComponent;
+  }
 
   Rectangle {
     anchors.fill: parent
     color: Colors.bgGlass
-    opacity: Config.barOpacity
-    radius: Config.barFloating ? Colors.radiusMedium : 0
-    border.color: Config.barFloating ? Colors.border : "transparent"
-    border.width: Config.barFloating ? 1 : 0
+    opacity: computedOpacity
+    radius: floatingBar ? Colors.radiusMedium : 0
+    border.color: floatingBar ? Colors.border : "transparent"
+    border.width: floatingBar ? 1 : 0
   }
 
-  // LEFT MODULES
   Row {
+    id: leftSection
+    visible: !vertical
     anchors.left: parent.left
-    anchors.leftMargin: Colors.spacingM
+    anchors.leftMargin: outerPadding
     anchors.verticalCenter: parent.verticalCenter
-    spacing: Colors.spacingM
+    spacing: runtimeSpacing
+    Repeater {
+      model: root.sectionItems("left")
+      delegate: widgetLoaderDelegate
+    }
+  }
 
+  Row {
+    id: centerSection
+    visible: !vertical
+    anchors.centerIn: parent
+    spacing: runtimeSpacing
+    Repeater {
+      model: root.sectionItems("center")
+      delegate: widgetLoaderDelegate
+    }
+  }
+
+  Row {
+    id: rightSection
+    visible: !vertical
+    anchors.right: parent.right
+    anchors.rightMargin: outerPadding
+    anchors.verticalCenter: parent.verticalCenter
+    spacing: runtimeSpacing
+    Repeater {
+      model: root.sectionItems("right")
+      delegate: widgetLoaderDelegate
+    }
+  }
+
+  Column {
+    id: leftColumn
+    visible: vertical
+    anchors.top: parent.top
+    anchors.topMargin: outerPadding
+    anchors.horizontalCenter: parent.horizontalCenter
+    spacing: runtimeSpacing
+    Repeater {
+      model: root.sectionItems("left")
+      delegate: widgetLoaderDelegate
+    }
+  }
+
+  Column {
+    id: centerColumn
+    visible: vertical
+    anchors.centerIn: parent
+    spacing: runtimeSpacing
+    Repeater {
+      model: root.sectionItems("center")
+      delegate: widgetLoaderDelegate
+    }
+  }
+
+  Column {
+    id: rightColumn
+    visible: vertical
+    anchors.bottom: parent.bottom
+    anchors.bottomMargin: outerPadding
+    anchors.horizontalCenter: parent.horizontalCenter
+    spacing: runtimeSpacing
+    Repeater {
+      model: root.sectionItems("right")
+      delegate: widgetLoaderDelegate
+    }
+  }
+
+  Component {
+    id: widgetLoaderDelegate
+    Loader {
+      required property var modelData
+      property var widgetInstance: modelData
+      active: !!widgetInstance && widgetInstance.enabled !== false
+      sourceComponent: root.componentForWidget(widgetInstance ? widgetInstance.widgetType : "")
+      onLoaded: {
+        if (item && item.widgetInstance !== undefined)
+          item.widgetInstance = widgetInstance;
+      }
+    }
+  }
+
+  Component {
+    id: logoComponent
     Logo {
+      property var widgetInstance: null
       tooltipText: "Application launcher"
       anchorWindow: root.anchorWindow
     }
+  }
+
+  Component {
+    id: workspacesComponent
     Workspaces {
+      property var widgetInstance: null
       anchorWindow: root.anchorWindow
     }
+  }
+
+  Component {
+    id: taskbarComponent
     Taskbar {
+      property var widgetInstance: null
       anchorWindow: root.anchorWindow
     }
+  }
+
+  Component {
+    id: systemMonitorComponent
     SystemMonitor {
-      id: systemMonitor
+      property var widgetInstance: null
       anchorWindow: root.anchorWindow
-      onStatsClicked: root.systemStatsClicked()
+      onStatsClicked: root.requestSurface("systemStatsMenu", this)
     }
   }
 
-  // CENTER MODULES
-  CenterModules {
-    id: centerModules
-    anchors.centerIn: parent
-    anchorWindow: root.anchorWindow
-    onCavaClicked: root.cavaClicked()
-    onDateTimeClicked: root.dateTimeClicked()
+  Component {
+    id: dateTimeComponent
+    Item {
+      id: dateTimeRoot
+      property var widgetInstance: null
+      implicitWidth: dateTimePill.implicitWidth
+      implicitHeight: dateTimePill.implicitHeight
+
+      SystemClock {
+        id: centerClock
+        precision: Config.timeShowSeconds ? SystemClock.Seconds : SystemClock.Minutes
+      }
+
+      SharedWidgets.BarPill {
+        id: dateTimePill
+        anchors.centerIn: parent
+        anchorWindow: root.anchorWindow
+        tooltipText: Qt.formatDateTime(centerClock.date, "dddd, MMMM d yyyy")
+        onClicked: root.requestSurface("dateTimeMenu", this)
+
+        Row {
+          spacing: Colors.spacingXS
+
+          Text {
+            color: Colors.text
+            font.pixelSize: Colors.fontSizeMedium
+            font.weight: Font.Bold
+            text: Qt.formatDateTime(
+              centerClock.date,
+              Config.timeUse24Hour
+                ? (Config.timeShowSeconds ? "HH:mm:ss" : "HH:mm")
+                : (Config.timeShowSeconds ? "hh:mm:ss AP" : "hh:mm AP")
+            )
+            anchors.verticalCenter: parent.verticalCenter
+          }
+
+          Text {
+            visible: Config.timeShowBarDate
+            color: Colors.textSecondary
+            font.pixelSize: Colors.fontSizeSmall
+            font.weight: Font.Medium
+            text: {
+              if (Config.timeBarDateStyle === "month_day")
+                return Qt.formatDateTime(centerClock.date, "MMM d");
+              if (Config.timeBarDateStyle === "weekday_month_day")
+                return Qt.formatDateTime(centerClock.date, "ddd MMM d");
+              return Qt.formatDateTime(centerClock.date, "ddd d");
+            }
+            anchors.verticalCenter: parent.verticalCenter
+          }
+        }
+      }
+    }
   }
 
-  // RIGHT MODULES
-  Row {
-    anchors.right: parent.right
-    anchors.rightMargin: Colors.spacingM
-    anchors.verticalCenter: parent.verticalCenter
-    spacing: Colors.spacingM
+  Component {
+    id: mediaBarComponent
+    SharedWidgets.MediaBar {
+      property var widgetInstance: null
+      anchorWindow: root.anchorWindow
+    }
+  }
 
+  Component {
+    id: updatesComponent
+    Item {
+      id: updatesRoot
+      property var widgetInstance: null
+      property string updatesIcon: "󰚰"
+      property string updatesCount: "0"
+      implicitWidth: updatesPill.implicitWidth
+      implicitHeight: updatesPill.implicitHeight
+
+      SharedWidgets.CommandPoll {
+        id: updatePoll
+        interval: 600000
+        running: updatesRoot.visible
+        command: ["sh", "-c",
+          "nix=$(cat \"${XDG_CACHE_HOME:-$HOME/.cache}/quickshell/updates/nixos\" 2>/dev/null || echo 0); "
+          + "flat=$(cat \"${XDG_CACHE_HOME:-$HOME/.cache}/quickshell/updates/flatpak\" 2>/dev/null || echo 0); "
+          + "total=$(( (nix > 0 ? nix : 0) + (flat > 0 ? flat : 0) )); "
+          + "echo $total"
+        ]
+        parse: function(out) { return parseInt(String(out || "").trim(), 10) || 0 }
+        onUpdated: {
+          var count = updatePoll.value || 0;
+          updatesRoot.updatesCount = count > 0 ? count.toString() : "0";
+          updatesRoot.updatesIcon = count > 0 ? "󰮯" : "󰚰";
+        }
+      }
+
+      SharedWidgets.BarPill {
+        id: updatesPill
+        visible: updatesRoot.updatesCount !== "0" && updatesRoot.updatesCount !== ""
+        anchors.centerIn: parent
+        anchorWindow: root.anchorWindow
+        tooltipText: "System updates"
+
+        Row {
+          spacing: 6
+          Text { text: updatesRoot.updatesIcon; color: Colors.accent; font.pixelSize: Colors.fontSizeXL; font.family: Colors.fontMono; anchors.verticalCenter: parent.verticalCenter }
+          Text { text: updatesRoot.updatesCount; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.DemiBold; anchors.verticalCenter: parent.verticalCenter }
+        }
+      }
+    }
+  }
+
+  Component {
+    id: cavaComponent
+    Item {
+      id: cavaRoot
+      property var widgetInstance: null
+      readonly property string cavaBarText: {
+        var full = root.fullCavaData || "";
+        return full.length >= 8 ? full.substring(0, 8) : (full.length > 0 ? full : "▁▂▃▄▅▆▇█");
+      }
+      implicitWidth: cavaPill.implicitWidth
+      implicitHeight: cavaPill.implicitHeight
+
+      SharedWidgets.BarPill {
+        id: cavaPill
+        anchors.centerIn: parent
+        normalColor: "transparent"
+        anchorWindow: root.anchorWindow
+        tooltipText: "Audio visualizer"
+        cursorShape: Qt.PointingHandCursor
+        clip: true
+        onClicked: root.requestSurface("cavaPopup", this)
+
+        Text {
+          text: cavaRoot.cavaBarText
+          color: Colors.primary
+          font.pixelSize: Colors.fontSizeMedium
+        }
+      }
+    }
+  }
+
+  Component {
+    id: idleInhibitorComponent
+    Item {
+      id: inhibitorRoot
+      property var widgetInstance: null
+      property bool inhibitorActive: false
+      implicitWidth: inhibitorPill.implicitWidth
+      implicitHeight: inhibitorPill.implicitHeight
+
+      SharedWidgets.CommandPoll {
+        id: inhibitorPoll
+        interval: 2000
+        running: inhibitorRoot.visible
+        command: ["sh", "-c", "[ -f /tmp/wayland_idle_inhibitor.pid ] && echo true || echo false"]
+        parse: function(out) { return String(out || "").trim() === "true" }
+        onUpdated: inhibitorRoot.inhibitorActive = inhibitorPoll.value
+      }
+
+      SharedWidgets.BarPill {
+        id: inhibitorPill
+        anchors.centerIn: parent
+        anchorWindow: root.anchorWindow
+        normalColor: inhibitorRoot.inhibitorActive ? Colors.withAlpha(Colors.primary, 0.2) : Colors.bgWidget
+        hoverColor: inhibitorRoot.inhibitorActive ? Colors.withAlpha(Colors.primary, 0.35) : Colors.highlightLight
+        tooltipText: inhibitorRoot.inhibitorActive ? "Idle inhibitor enabled" : "Idle inhibitor"
+        onClicked: {
+          Quickshell.execDetached(["qs-inhibitor"]);
+          inhibitorCheckTimer.restart();
+        }
+
+        Text {
+          text: "󰒲"
+          color: inhibitorRoot.inhibitorActive ? Colors.primary : Colors.text
+          font.pixelSize: Colors.fontSizeXL
+          font.family: Colors.fontMono
+        }
+
+        Timer {
+          id: inhibitorCheckTimer
+          interval: 500
+          running: false
+          repeat: false
+          onTriggered: inhibitorPoll.poll()
+        }
+      }
+    }
+  }
+
+  Component {
+    id: weatherComponent
     SharedWidgets.BarPill {
-      id: weatherTrigger
+      property var widgetInstance: null
       anchorWindow: root.anchorWindow
       tooltipText: WeatherService.condition || "Weather"
-      onClicked: root.weatherClicked()
+      onClicked: root.requestSurface("weatherMenu", this)
 
       Row {
         spacing: Colors.spacingS
@@ -143,12 +453,15 @@ Item {
         }
       }
     }
+  }
 
+  Component {
+    id: networkComponent
     SharedWidgets.BarPill {
-      id: networkTrigger
+      property var widgetInstance: null
       anchorWindow: root.anchorWindow
       tooltipText: networkWidget.tooltipText
-      onClicked: root.networkClicked()
+      onClicked: root.requestSurface("networkMenu", this)
 
       Row {
         spacing: Colors.spacingS
@@ -157,9 +470,12 @@ Item {
         }
       }
     }
+  }
 
+  Component {
+    id: bluetoothComponent
     SharedWidgets.BarPill {
-      id: btTrigger
+      property var widgetInstance: null
       anchorWindow: root.anchorWindow
       tooltipText: {
         if (!Bluetooth.defaultAdapter || !Bluetooth.defaultAdapter.enabled) return "Bluetooth off";
@@ -169,7 +485,7 @@ Item {
         }
         return count > 0 ? count + " device" + (count > 1 ? "s" : "") + " connected" : "Bluetooth";
       }
-      onClicked: root.bluetoothClicked()
+      onClicked: root.requestSurface("bluetoothMenu", this)
 
       Row {
         spacing: Colors.spacingS
@@ -183,12 +499,15 @@ Item {
         }
       }
     }
+  }
 
+  Component {
+    id: audioComponent
     SharedWidgets.BarPill {
-      id: audioTrigger
+      property var widgetInstance: null
       anchorWindow: root.anchorWindow
       tooltipText: audioWidget.tooltipText
-      onClicked: root.audioClicked()
+      onClicked: root.requestSurface("audioMenu", this)
 
       Row {
         spacing: Colors.spacingS
@@ -197,10 +516,12 @@ Item {
         }
       }
     }
+  }
 
-    // Music trigger — only visible when an MPRIS player is active
+  Component {
+    id: musicComponent
     SharedWidgets.BarPill {
-      id: musicTrigger
+      property var widgetInstance: null
       visible: SystemStatus.hasActivePlayer
       anchorWindow: root.anchorWindow
       tooltipText: {
@@ -209,7 +530,7 @@ Item {
         var p = players[0];
         return (p.trackTitle || "Music") + (p.trackArtist ? " - " + p.trackArtist : "");
       }
-      onClicked: root.musicClicked()
+      onClicked: root.requestSurface("musicMenu", this)
 
       Behavior on width { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
 
@@ -241,23 +562,24 @@ Item {
         }
       }
     }
+  }
 
-    // Privacy indicator — visible when mic, camera, or screenshare is active
+  Component {
+    id: privacyComponent
     SharedWidgets.BarPill {
-      id: privacyTrigger
+      property var widgetInstance: null
       visible: PrivacyService.anyActive
       anchorWindow: root.anchorWindow
       normalColor: Colors.withAlpha(Colors.warning, 0.15)
       hoverColor: Colors.withAlpha(Colors.warning, 0.28)
       tooltipText: PrivacyService.activeLabel || "Privacy"
-      onClicked: root.privacyClicked()
+      onClicked: root.requestSurface("privacyMenu", this)
 
       Behavior on width { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
 
       Row {
         spacing: Colors.spacingXS
 
-        // Animated dot indicator
         Rectangle {
           width: 7; height: 7; radius: 3.5
           color: Colors.warning
@@ -279,16 +601,18 @@ Item {
         }
       }
     }
+  }
 
-    // Recording trigger — only visible when recording is in progress
+  Component {
+    id: recordingComponent
     SharedWidgets.BarPill {
-      id: recordingTrigger
+      property var widgetInstance: null
       visible: SystemStatus.isRecording
       anchorWindow: root.anchorWindow
       normalColor: Colors.withAlpha(Colors.error, 0.15)
       hoverColor: Colors.withAlpha(Colors.error, 0.25)
       tooltipText: "Screen recording in progress"
-      onClicked: root.recordingClicked()
+      onClicked: root.requestSurface("recordingMenu", this)
 
       Row {
         spacing: Colors.spacingS
@@ -314,14 +638,16 @@ Item {
         }
       }
     }
+  }
 
-    // Battery trigger — only visible when battery is present
+  Component {
+    id: batteryComponent
     SharedWidgets.BarPill {
-      id: batteryTrigger
+      property var widgetInstance: null
       visible: batteryWidget.showBattery
       anchorWindow: root.anchorWindow
       tooltipText: batteryWidget.tooltipText
-      onClicked: root.batteryClicked()
+      onClicked: root.requestSurface("batteryMenu", this)
 
       Row {
         spacing: Colors.spacingXS
@@ -330,16 +656,18 @@ Item {
         }
       }
     }
+  }
 
-    // Printer trigger — only visible when at least one printer is configured
+  Component {
+    id: printerComponent
     SharedWidgets.BarPill {
-      id: printerTrigger
+      property var widgetInstance: null
       visible: PrinterService.hasPrinters
       anchorWindow: root.anchorWindow
       tooltipText: PrinterService.activeJobs > 0
         ? PrinterService.activeJobs + " print job" + (PrinterService.activeJobs !== 1 ? "s" : "") + " active"
         : (PrinterService.defaultPrinter ? PrinterService.defaultPrinter : "Printers")
-      onClicked: root.printerClicked()
+      onClicked: root.requestSurface("printerMenu", this)
 
       Behavior on width { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
 
@@ -355,7 +683,6 @@ Item {
           Behavior on color { ColorAnimation { duration: 200 } }
         }
 
-        // Active jobs badge — only shown when jobs are in flight
         Rectangle {
           visible: PrinterService.activeJobs > 0
           width: printerJobsBadge.contentWidth + 8
@@ -375,27 +702,15 @@ Item {
         }
       }
     }
+  }
 
-    // Bar plugin extension point — renders enabled bar-widget plugins
-    Repeater {
-      model: PluginService.barPlugins
-      delegate: Loader {
-        required property var modelData
-        anchors.verticalCenter: parent ? parent.verticalCenter : undefined
-        source: modelData.path + modelData.mainFile
-        onStatusChanged: {
-          if (status === Loader.Error)
-            console.warn("PluginService: failed to load bar plugin " + modelData.id + " from " + source);
-        }
-      }
-    }
-
-    // Notepad trigger — opens slideout notepad
+  Component {
+    id: notepadComponent
     SharedWidgets.BarPill {
-      id: notepadTrigger
+      property var widgetInstance: null
       anchorWindow: root.anchorWindow
       tooltipText: "Notepad"
-      onClicked: root.notepadClicked()
+      onClicked: root.requestSurface("notepad", this)
 
       Text {
         color: Colors.text
@@ -404,13 +719,15 @@ Item {
         text: "󰠮"
       }
     }
+  }
 
-    // Settings trigger — opens ControlCenter
+  Component {
+    id: controlCenterComponent
     SharedWidgets.BarPill {
-      id: settingsTrigger
+      property var widgetInstance: null
       anchorWindow: root.anchorWindow
       tooltipText: "System controls"
-      onClicked: root.commandClicked()
+      onClicked: root.requestSurface("controlCenter", this)
 
       Text {
         color: Colors.text
@@ -419,16 +736,23 @@ Item {
         text: "󰒓"
       }
     }
+  }
 
+  Component {
+    id: trayComponent
     SharedWidgets.TrayWidget {
+      property var widgetInstance: null
       anchorWindow: root.anchorWindow
     }
+  }
 
+  Component {
+    id: clipboardComponent
     SharedWidgets.BarPill {
-      id: clipboardTrigger
+      property var widgetInstance: null
       anchorWindow: root.anchorWindow
       tooltipText: "Clipboard history"
-      onClicked: root.clipboardClicked()
+      onClicked: root.requestSurface("clipboardMenu", this)
 
       Text {
         text: "󰅍"
@@ -437,12 +761,16 @@ Item {
         font.pixelSize: Colors.fontSizeXL
       }
     }
+  }
 
+  Component {
+    id: notificationsComponent
     SharedWidgets.BarPill {
-      id: notifBg
+      id: notifPill
+      property var widgetInstance: null
       anchorWindow: root.anchorWindow
       tooltipText: root.manager && root.manager.dndEnabled ? "Notifications paused" : "Notifications"
-      onClicked: root.notifClicked()
+      onClicked: root.requestSurface("notifCenter", this)
 
       readonly property bool hasDnd: !!(root.manager && root.manager.dndEnabled)
       readonly property bool hasUnread: !!(root.manager && root.manager.notifications && root.manager.notifications.count > 0)
@@ -451,12 +779,11 @@ Item {
         color: Colors.text
         font.pixelSize: Colors.fontSizeXL
         font.family: Colors.fontMono
-        text: notifBg.hasDnd ? "󰂛" : "󰂚"
+        text: notifPill.hasDnd ? "󰂛" : "󰂚"
       }
 
-      // Unread badge — reparented to BarPill root so anchors work correctly
       Rectangle {
-        parent: notifBg
+        parent: notifPill
         width: 8
         height: 8
         radius: 4
@@ -465,8 +792,65 @@ Item {
         anchors.right: parent.right
         anchors.topMargin: 2
         anchors.rightMargin: 2
-        visible: notifBg.hasUnread && !notifBg.hasDnd
+        visible: notifPill.hasUnread && !notifPill.hasDnd
         z: 10
+      }
+    }
+  }
+
+  Component {
+    id: spacerComponent
+    Item {
+      property var widgetInstance: null
+      readonly property int spacerSize: {
+        var settings = root.widgetSettings(widgetInstance);
+        return Math.max(8, parseInt(settings.size !== undefined ? settings.size : 24, 10) || 24);
+      }
+      width: root.vertical ? 1 : spacerSize
+      height: root.vertical ? spacerSize : 1
+      implicitWidth: width
+      implicitHeight: height
+    }
+  }
+
+  Component {
+    id: separatorComponent
+    Rectangle {
+      property var widgetInstance: null
+      implicitWidth: root.vertical ? Math.max(24, root.thickness - 8) : 1
+      implicitHeight: root.vertical ? 1 : 20
+      width: implicitWidth
+      height: implicitHeight
+      radius: 1
+      color: Colors.border
+      opacity: 0.8
+    }
+  }
+
+  Component {
+    id: pluginComponent
+    Loader {
+      property var widgetInstance: null
+      readonly property var pluginMeta: BarWidgetRegistry.pluginByWidgetType(widgetInstance ? widgetInstance.widgetType : "")
+      source: pluginMeta ? pluginMeta.path + pluginMeta.mainFile : ""
+      onStatusChanged: {
+        if (status === Loader.Error && widgetInstance)
+          console.warn("BarWidgetRegistry: failed to load plugin widget " + widgetInstance.widgetType + " from " + source);
+      }
+    }
+  }
+
+  Component {
+    id: unknownComponent
+    SharedWidgets.BarPill {
+      property var widgetInstance: null
+      anchorWindow: root.anchorWindow
+      enabled: false
+      tooltipText: "Unknown widget: " + (widgetInstance ? widgetInstance.widgetType : "")
+      Text {
+        text: "?"
+        color: Colors.textDisabled
+        font.pixelSize: Colors.fontSizeMedium
       }
     }
   }

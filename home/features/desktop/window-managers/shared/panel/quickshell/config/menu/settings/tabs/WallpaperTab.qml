@@ -283,6 +283,11 @@ Item {
                         action: "folder"
                     },
                     {
+                        icon: "󰝤",
+                        label: "Black",
+                        action: "black"
+                    },
+                    {
                         icon: "󰉋",
                         label: "Browse...",
                         action: "browse"
@@ -301,6 +306,8 @@ Item {
                             WallpaperService.randomWallpaper(mon);
                         else if (modelData.action === "folder")
                             WallpaperService.openWallpaperFolder();
+                        else if (modelData.action === "black")
+                            WallpaperService.setSolidColor("000000ff", mon);
                         else if (modelData.action === "browse" && root.settingsRoot)
                             root.settingsRoot.browseWallpaper(mon);
                     }

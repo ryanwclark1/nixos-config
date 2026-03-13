@@ -28,6 +28,14 @@ QtObject {
 
   // True while a directory scan is in progress.
   property bool scanning: false
+  property string _applyImagePath: ""
+  property string _applyMonitorName: ""
+  property string _applyStdout: ""
+  property string _applyStderr: ""
+  property var _queuedApply: null
+  property string _colorHex: "000000ff"
+  property string _colorMonitorName: ""
+  property string _colorApplyStderr: ""
 
   // Primary wallpaper directory shown in the UI (default: Pictures).
   // The service always scans *all* wallpaperSearchDirs; this is just the folder
@@ -77,26 +85,21 @@ QtObject {
   // SECURITY: commands are assembled as arrays — no shell word-splitting on paths.
   function setWallpaper(imagePath, monitorName) {
     if (!imagePath) return;
-
-    // Update in-memory state
-    var updated = Object.assign({}, wallpapers);
-    var key = monitorName || "__all__";
-    updated[key] = imagePath;
-    wallpapers = updated;
-
-    // Persist through Config
-    Config.wallpaperPaths = Object.assign({}, wallpapers);
-
-    // Build the setter command
-    var setter = _buildSetterScript(imagePath, monitorName || "");
-    Quickshell.execDetached(["sh", "-c", setter]);
-
-    // Optionally regenerate pywal colour scheme (skip when a base24 theme is active)
-    if (Config.wallpaperRunPywal && !Config.themeName) {
-      Quickshell.execDetached(["sh", "-c",
-        "wal -i " + _shellQuote(imagePath) + " -n -q 2>/dev/null || true"
-      ]);
+    var request = { imagePath: imagePath, monitorName: monitorName || "" };
+    if (applyProc.running) {
+      _queuedApply = request;
+      return;
     }
+    _startApply(request);
+  }
+
+  function _startApply(request) {
+    _applyImagePath = request.imagePath;
+    _applyMonitorName = request.monitorName;
+    _applyStdout = "";
+    _applyStderr = "";
+    applyProc.command = ["sh", "-c", _buildSetterScript(_applyImagePath, _applyMonitorName)];
+    applyProc.running = true;
   }
 
   // Advance to the next available wallpaper for `monitorName` (wraps around).
@@ -118,6 +121,16 @@ QtObject {
   // Open the primary wallpaper directory in the default file manager.
   function openWallpaperFolder() {
     Quickshell.execDetached(["xdg-open", wallpaperDir]);
+  }
+
+  // Apply a solid color background via swww.
+  function setSolidColor(colorHex, monitorName) {
+    if (applyProc.running || colorApplyProc.running) return;
+    _colorHex = (colorHex || "000000ff").replace(/^#/, "");
+    _colorMonitorName = monitorName || "";
+    _colorApplyStderr = "";
+    colorApplyProc.command = ["sh", "-c", _buildSolidColorScript(_colorHex, _colorMonitorName)];
+    colorApplyProc.running = true;
   }
 
   // ---- Auto-cycling ----------------------------------------------------------
@@ -178,6 +191,77 @@ QtObject {
     }
   }
 
+  property Process applyProc: Process {
+    id: applyProc
+    running: false
+    onExited: (exitCode, exitStatus) => {
+      var key = root._applyMonitorName || "__all__";
+      if (exitCode === 0) {
+        var updated = Object.assign({}, root.wallpapers);
+        updated[key] = root._applyImagePath;
+        root.wallpapers = updated;
+        Config.wallpaperPaths = Object.assign({}, root.wallpapers);
+
+        if (Config.wallpaperRunPywal && !Config.themeName) {
+          Quickshell.execDetached(["sh", "-c",
+            "wal -i " + root._shellQuote(root._applyImagePath) + " -n -q 2>/dev/null || true"
+          ]);
+        }
+        var backendLine = "";
+        var outLines = (root._applyStdout || "").split("\n");
+        for (var i = 0; i < outLines.length; i++) {
+          if (outLines[i].indexOf("BACKEND:") === 0) {
+            backendLine = outLines[i].trim();
+            break;
+          }
+        }
+        console.log("WallpaperService: applied wallpaper via", backendLine || "unknown", "monitor", key, "path", root._applyImagePath);
+      } else {
+        var err = (root._applyStderr || "").trim();
+        if (!err.length) err = "All wallpaper backends failed";
+        console.warn("WallpaperService: failed to apply wallpaper", "monitor", key, "path", root._applyImagePath, "error", err);
+        ToastService.showError("Wallpaper apply failed", "Check quickshell logs for backend errors.");
+      }
+
+      if (root._queuedApply) {
+        var next = root._queuedApply;
+        root._queuedApply = null;
+        root._startApply(next);
+      }
+    }
+    stdout: StdioCollector {
+      onStreamFinished: {
+        root._applyStdout = this.text || "";
+      }
+    }
+    stderr: StdioCollector {
+      onStreamFinished: {
+        root._applyStderr = this.text || "";
+      }
+    }
+  }
+
+  property Process colorApplyProc: Process {
+    id: colorApplyProc
+    running: false
+    onExited: (exitCode, exitStatus) => {
+      if (exitCode !== 0) {
+        var err = (root._colorApplyStderr || "").trim();
+        if (!err.length) err = "Failed to apply solid color background";
+        console.warn("WallpaperService: solid color apply failed", "color", root._colorHex, "monitor", root._colorMonitorName || "__all__", "error", err);
+        ToastService.showError("Solid color failed", "Could not apply solid color wallpaper.");
+        return;
+      }
+      console.log("WallpaperService: applied solid color", root._colorHex, "monitor", root._colorMonitorName || "__all__");
+      ToastService.showSuccess("Solid color applied", "#" + root._colorHex.slice(0, 6));
+    }
+    stderr: StdioCollector {
+      onStreamFinished: {
+        root._colorApplyStderr = this.text || "";
+      }
+    }
+  }
+
   // ---- Startup ---------------------------------------------------------------
 
   Component.onCompleted: {
@@ -218,14 +302,37 @@ QtObject {
     var outputFlag = monitorName ? ("--outputs " + _shellQuote(monitorName) + " ") : "";
     var hyprTarget = monitorName ? (monitorName + ",") : ",";
 
-    return "if command -v swww >/dev/null 2>&1; then "
-         + "  swww img " + outputFlag + quoted
-         + "    --transition-type fade --transition-duration 2 2>/dev/null || "
-         + "  swww img " + outputFlag + quoted + " 2>/dev/null; "
-         + "elif command -v hyprctl >/dev/null 2>&1; then "
-         + "  hyprctl hyprpaper wallpaper " + _shellQuote(hyprTarget + imagePath) + " 2>/dev/null; "
-         + "elif command -v swaybg >/dev/null 2>&1; then "
-         + "  swaybg -i " + quoted + " -m fill & "
-         + "fi";
+    return "set -u; ok=0; "
+         + "if command -v swww >/dev/null 2>&1; then "
+         + "  if ! swww query >/dev/null 2>&1; then "
+         + "    swww-daemon >/dev/null 2>&1 & "
+         + "    tries=0; while ! swww query >/dev/null 2>&1 && [ \"$tries\" -lt 10 ]; do sleep 0.2; tries=$((tries + 1)); done; "
+         + "  fi; "
+         + "  if swww img " + outputFlag + quoted + " --transition-type fade --transition-duration 2; then "
+         + "    echo BACKEND:swww; ok=1; "
+         + "  fi; "
+         + "fi; "
+         + "if [ \"$ok\" -eq 0 ] && command -v hyprctl >/dev/null 2>&1; then "
+         + "  if hyprctl hyprpaper wallpaper " + _shellQuote(hyprTarget + imagePath) + "; then "
+         + "    echo BACKEND:hyprpaper; ok=1; "
+         + "  fi; "
+         + "fi; "
+         + "if [ \"$ok\" -eq 0 ] && command -v swaybg >/dev/null 2>&1; then "
+         + "  pkill swaybg >/dev/null 2>&1 || true; "
+         + "  swaybg -i " + quoted + " -m fill >/dev/null 2>&1 & "
+         + "  echo BACKEND:swaybg; ok=1; "
+         + "fi; "
+         + "[ \"$ok\" -eq 1 ]";
+  }
+
+  function _buildSolidColorScript(colorHex, monitorName) {
+    var outputFlag = monitorName ? ("--outputs " + _shellQuote(monitorName) + " ") : "";
+    return "set -u; "
+         + "command -v swww >/dev/null 2>&1 || { echo 'swww not installed' >&2; exit 1; }; "
+         + "if ! swww query >/dev/null 2>&1; then "
+         + "  swww-daemon >/dev/null 2>&1 & "
+         + "  tries=0; while ! swww query >/dev/null 2>&1 && [ \"$tries\" -lt 10 ]; do sleep 0.2; tries=$((tries + 1)); done; "
+         + "fi; "
+         + "swww clear " + outputFlag + _shellQuote(colorHex);
   }
 }

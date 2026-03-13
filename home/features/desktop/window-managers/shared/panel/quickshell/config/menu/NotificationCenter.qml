@@ -13,16 +13,27 @@ import "../widgets" as SharedWidgets
 PanelWindow {
   id: root
 
+  property string surfaceEdge: "right"
+  property int panelWidth: Config.controlCenterWidth
+  property int panelHeight: 640
+  property real panelX: 0
+  property int reservedTop: Config.barHeight + Config.barMargin + 8
+  property int reservedRight: Config.barMargin
+  property int reservedBottom: 60
+  property int reservedLeft: Config.barMargin
   anchors {
-    top: true
-    right: true
-    bottom: true
+    top: surfaceEdge === "right" || surfaceEdge === "left" || surfaceEdge === "top"
+    right: surfaceEdge === "right"
+    bottom: surfaceEdge === "right" || surfaceEdge === "left" || surfaceEdge === "bottom"
+    left: surfaceEdge === "left" || surfaceEdge === "top" || surfaceEdge === "bottom"
   }
-  margins.top: Config.barHeight + Config.barMargin + 8
-  margins.right: Config.barMargin
-  margins.bottom: 60
+  margins.top: surfaceEdge === "right" || surfaceEdge === "left" || surfaceEdge === "top" ? reservedTop : 0
+  margins.right: surfaceEdge === "right" ? reservedRight : 0
+  margins.bottom: surfaceEdge === "right" || surfaceEdge === "left" || surfaceEdge === "bottom" ? reservedBottom : 0
+  margins.left: surfaceEdge === "left" ? reservedLeft : ((surfaceEdge === "top" || surfaceEdge === "bottom") ? panelX : 0)
 
-  implicitWidth: Config.controlCenterWidth
+  implicitWidth: panelWidth
+  implicitHeight: surfaceEdge === "top" || surfaceEdge === "bottom" ? panelHeight : 0
   color: "transparent"
   mask: Region {
     item: sidebarContent
@@ -35,7 +46,12 @@ PanelWindow {
   property bool showContent: false
   signal closeRequested()
   property string searchQuery: ""
-  visible: showContent || sidebarContent.x < Config.controlCenterWidth
+  visible: {
+    if (surfaceEdge === "right") return showContent || sidebarContent.x < panelWidth;
+    if (surfaceEdge === "left") return showContent || sidebarContent.x > -panelWidth;
+    if (surfaceEdge === "top") return showContent || sidebarContent.y > -sidebarContent.height;
+    return showContent || sidebarContent.y < sidebarContent.height;
+  }
 
   // Ensure focus is grabbed when shown
   onShowContentChanged: {
@@ -48,18 +64,28 @@ PanelWindow {
 
   Rectangle {
     id: sidebarContent
-    width: Config.controlCenterWidth
-    height: parent.height
+    width: root.panelWidth
+    height: root.surfaceEdge === "top" || root.surfaceEdge === "bottom" ? root.panelHeight : parent.height
     color: Colors.bgGlass
     border.color: Colors.border
     border.width: 1
     radius: Colors.radiusLarge
 
-    x: root.showContent ? 0 : Config.controlCenterWidth + 10
+    x: {
+      if (root.surfaceEdge === "right") return root.showContent ? 0 : root.panelWidth + 10;
+      if (root.surfaceEdge === "left") return root.showContent ? 0 : -root.panelWidth - 10;
+      return 0;
+    }
+    y: {
+      if (root.surfaceEdge === "top") return root.showContent ? 0 : -height - 10;
+      if (root.surfaceEdge === "bottom") return root.showContent ? 0 : height + 10;
+      return 0;
+    }
     opacity: root.showContent ? 1.0 : 0.0
     visible: opacity > 0
 
     Behavior on x { NumberAnimation { id: ncSlideAnim; duration: 300; easing.type: Easing.OutCubic } }
+    Behavior on y { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
     Behavior on opacity { NumberAnimation { id: ncFadeAnim; duration: 250 } }
     layer.enabled: ncSlideAnim.running || ncFadeAnim.running
 

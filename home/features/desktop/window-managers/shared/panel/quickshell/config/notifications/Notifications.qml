@@ -9,12 +9,14 @@ import "../widgets" as SharedWidgets
 PanelWindow {
   id: root
 
+  readonly property var edgeMargins: Config.notificationMargins(screen)
+
   anchors {
     top: true
     right: true
   }
-  margins.top: Config.barHeight + Config.barMargin + 8
-  margins.right: Config.barMargin
+  margins.top: edgeMargins.top
+  margins.right: edgeMargins.right
 
   implicitWidth: Config.notifWidth
   implicitHeight: col.implicitHeight

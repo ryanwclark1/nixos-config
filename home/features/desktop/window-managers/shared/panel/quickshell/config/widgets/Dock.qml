@@ -8,9 +8,7 @@ import "../services"
 Scope {
   id: root
 
-  // App model: merged pinned + running toplevels
   property var dockApps: []
-  // Desktop entry ID cache for heuristic resolution
   property var _entryCache: ({})
 
   function normalizeAppId(id) {
@@ -107,7 +105,6 @@ Scope {
     var combined = [];
     var processedIds = {};
 
-    // First: pinned apps (in order)
     for (var i = 0; i < pinned.length; i++) {
       var pinnedId = pinned[i];
       var normPinned = normalizeAppId(pinnedId);
@@ -118,9 +115,8 @@ Scope {
         if (!tl || !tl.appId) continue;
         var normTl = normalizeAppId(tl.appId);
         var resolved = normalizeAppId(resolveDesktopEntryId(tl.appId));
-        if (normTl === normPinned || resolved === normPinned) {
+        if (normTl === normPinned || resolved === normPinned)
           matchingToplevels.push(tl);
-        }
       }
 
       combined.push({
@@ -132,7 +128,6 @@ Scope {
       processedIds[normPinned] = true;
     }
 
-    // Second: running but not pinned
     var grouped = {};
     for (var k = 0; k < toplevels.length; k++) {
       var tl2 = toplevels[k];
@@ -154,14 +149,12 @@ Scope {
     }
 
     var keys = Object.keys(grouped);
-    for (var m = 0; m < keys.length; m++) {
+    for (var m = 0; m < keys.length; m++)
       combined.push(grouped[keys[m]]);
-    }
 
     dockApps = combined;
   }
 
-  // Debounced rebuild: coalesces rapid toplevel/config changes into a single update per frame
   property bool _rebuildPending: false
   function scheduleRebuild() {
     if (_rebuildPending) return;
@@ -169,13 +162,11 @@ Scope {
     Qt.callLater(() => { _rebuildPending = false; _entryCache = {}; updateDockApps(); });
   }
 
-  // Rebuild on toplevel changes
   Connections {
     target: (typeof ToplevelManager !== 'undefined' && ToplevelManager.toplevels) ? ToplevelManager.toplevels : null
     function onValuesChanged() { root.scheduleRebuild(); }
   }
 
-  // Rebuild on pinned apps change
   Connections {
     target: Config
     function onDockPinnedAppsChanged() { root.scheduleRebuild(); }
@@ -184,7 +175,6 @@ Scope {
 
   Component.onCompleted: Qt.callLater(updateDockApps)
 
-  // Per-screen dock
   Variants {
     model: Quickshell.screens
 
@@ -193,8 +183,14 @@ Scope {
         id: screenDelegate
         required property ShellScreen modelData
 
-        readonly property bool isBottom: Config.dockPosition === "bottom"
+        readonly property string dockPosition: Config.dockPosition
+        readonly property bool isBottom: dockPosition === "bottom"
+        readonly property bool isTop: dockPosition === "top"
+        readonly property bool isLeft: dockPosition === "left"
+        readonly property bool isRight: dockPosition === "right"
+        readonly property bool vertical: isLeft || isRight
         readonly property bool autoHide: Config.dockAutoHide
+        readonly property bool dockAllowed: Config.dockEnabled && !Config.dockHasConflict()
         property bool hidden: autoHide
         property bool dockHovered: false
         property bool peekHovered: false
@@ -214,21 +210,21 @@ Scope {
           }
         }
 
-        // Window 1: Peek (1px invisible hover trap at dock edge)
         Loader {
-          active: Config.dockEnabled && screenDelegate.autoHide && screenDelegate.modelData
+          active: screenDelegate.dockAllowed && screenDelegate.autoHide && screenDelegate.modelData
           sourceComponent: PanelWindow {
             screen: screenDelegate.modelData
             anchors.bottom: screenDelegate.isBottom
-            anchors.top: !screenDelegate.isBottom
+            anchors.top: screenDelegate.isTop
+            anchors.left: screenDelegate.isLeft
+            anchors.right: screenDelegate.isRight
             focusable: false
             color: "transparent"
-            implicitWidth: 200
-            implicitHeight: 1
+            implicitWidth: screenDelegate.vertical ? 1 : 200
+            implicitHeight: screenDelegate.vertical ? 200 : 1
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.namespace: "quickshell-dock-peek"
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
-
             mask: Region {}
 
             MouseArea {
@@ -247,19 +243,22 @@ Scope {
           }
         }
 
-        // Window 2: Indicator bar (thin colored line when hidden)
         Loader {
-          active: Config.dockEnabled && screenDelegate.autoHide && screenDelegate.modelData
+          active: screenDelegate.dockAllowed && screenDelegate.autoHide && screenDelegate.modelData
           sourceComponent: PanelWindow {
             screen: screenDelegate.modelData
             anchors.bottom: screenDelegate.isBottom
-            anchors.top: !screenDelegate.isBottom
+            anchors.top: screenDelegate.isTop
+            anchors.left: screenDelegate.isLeft
+            anchors.right: screenDelegate.isRight
             margins.bottom: screenDelegate.isBottom ? 4 : 0
-            margins.top: !screenDelegate.isBottom ? 4 : 0
+            margins.top: screenDelegate.isTop ? 4 : 0
+            margins.left: screenDelegate.isLeft ? 4 : 0
+            margins.right: screenDelegate.isRight ? 4 : 0
             focusable: false
             color: "transparent"
-            implicitWidth: 60
-            implicitHeight: 3
+            implicitWidth: screenDelegate.vertical ? 3 : 60
+            implicitHeight: screenDelegate.vertical ? 60 : 3
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.namespace: "quickshell-dock-indicator"
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
@@ -269,8 +268,8 @@ Scope {
             Rectangle {
               id: indicatorRect
               anchors.centerIn: parent
-              width: parent.width
-              height: 3
+              width: screenDelegate.vertical ? 3 : parent.width
+              height: screenDelegate.vertical ? parent.height : 3
               radius: 2
               color: Colors.primary
               opacity: screenDelegate.hidden ? 0.6 : 0.0
@@ -280,20 +279,23 @@ Scope {
           }
         }
 
-        // Window 3: Main dock
         Loader {
-          active: Config.dockEnabled && screenDelegate.modelData && root.dockApps.length > 0
+          active: screenDelegate.dockAllowed && screenDelegate.modelData && root.dockApps.length > 0
           sourceComponent: PanelWindow {
             id: dockWindow
             screen: screenDelegate.modelData
             anchors.bottom: screenDelegate.isBottom
-            anchors.top: !screenDelegate.isBottom
+            anchors.top: screenDelegate.isTop
+            anchors.left: screenDelegate.isLeft
+            anchors.right: screenDelegate.isRight
             margins.bottom: screenDelegate.isBottom ? 12 : 0
-            margins.top: !screenDelegate.isBottom ? 12 : 0
+            margins.top: screenDelegate.isTop ? 12 : 0
+            margins.left: screenDelegate.isLeft ? 12 : 0
+            margins.right: screenDelegate.isRight ? 12 : 0
             focusable: false
             color: "transparent"
             implicitWidth: dockContent.implicitWidth + 24
-            implicitHeight: 80
+            implicitHeight: dockContent.implicitHeight + 24
 
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.namespace: "quickshell-dock"
@@ -301,17 +303,18 @@ Scope {
 
             mask: Region { item: dockContent.background }
 
-            // Show/hide: wrap content in Item so opacity + translate animate on an Item, not the window
             Item {
               id: dockAnimWrapper
               anchors.fill: parent
 
               opacity: screenDelegate.hidden ? 0 : 1
               visible: opacity > 0
-              property real yOffset: screenDelegate.hidden ? (screenDelegate.isBottom ? 20 : -20) : 0
+              property real xOffset: screenDelegate.hidden ? (screenDelegate.isLeft ? -20 : (screenDelegate.isRight ? 20 : 0)) : 0
+              property real yOffset: screenDelegate.hidden ? (screenDelegate.isBottom ? 20 : (screenDelegate.isTop ? -20 : 0)) : 0
               Behavior on opacity { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+              Behavior on xOffset { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
               Behavior on yOffset { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-              transform: Translate { y: dockAnimWrapper.yOffset }
+              transform: Translate { x: dockAnimWrapper.xOffset; y: dockAnimWrapper.yOffset }
 
               MouseArea {
                 anchors.fill: parent
@@ -333,6 +336,7 @@ Scope {
                 dockApps: root.dockApps
                 dockRoot: root
                 anchorWindow: dockWindow
+                vertical: screenDelegate.vertical
               }
             }
           }

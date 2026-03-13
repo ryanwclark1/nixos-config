@@ -15,33 +15,10 @@ Item {
         iconName: "󰏘"
 
         SettingsCard {
-            title: "Bar"
-            iconName: "󰏘"
-            description: "Top bar sizing, opacity, and floating mode."
+            title: "Glass Surface"
+            iconName: "󰖲"
+            description: "Shell-wide blur and translucency settings shared by bars and menus."
 
-            SettingsSliderRow {
-                label: "Bar Height"
-                min: 20
-                max: 60
-                value: Config.barHeight
-                onMoved: v => Config.barHeight = v
-            }
-            SettingsSliderRow {
-                label: "Bar Margin"
-                min: 0
-                max: 40
-                value: Config.barMargin
-                onMoved: v => Config.barMargin = v
-            }
-            SettingsSliderRow {
-                label: "Bar Opacity"
-                min: 0.3
-                max: 1.0
-                value: Config.barOpacity
-                step: 0.05
-                unit: "%"
-                onMoved: v => Config.barOpacity = v
-            }
             SettingsSliderRow {
                 label: "Glass Opacity"
                 min: 0.1
@@ -51,10 +28,14 @@ Item {
                 onMoved: v => Config.glassOpacity = v
             }
 
-            SettingsToggleRow {
-                label: "Floating Bar"
-                icon: "󰖲"
-                configKey: "barFloating"
+            SettingsModeRow {
+                label: "Blur"
+                currentValue: Config.blurEnabled ? "enabled" : "disabled"
+                options: [
+                    { value: "enabled", label: "Enabled" },
+                    { value: "disabled", label: "Disabled" }
+                ]
+                onModeSelected: value => Config.blurEnabled = value === "enabled"
             }
         }
     }
