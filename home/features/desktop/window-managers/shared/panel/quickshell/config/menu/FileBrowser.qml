@@ -82,6 +82,8 @@ PanelWindow {
   property string _sortBy: "name"  // "name" | "date" | "size" | "type"
   property bool _sortAsc: true
   property bool _viewGrid: true    // true = grid, false = list
+  readonly property bool _compactActions: mainBox.width < 940
+  readonly property bool _showListDetailColumns: mainBox.width >= 1020
 
   readonly property var _quickLocations: [
     { label: "Home",      icon: "󰋜", path: Quickshell.env("HOME") || "/home" },
@@ -781,7 +783,8 @@ PanelWindow {
 
               // Date column header
               Item {
-                Layout.preferredWidth: 100
+                visible: root._showListDetailColumns
+                Layout.preferredWidth: root._showListDetailColumns ? 100 : 0
                 height: parent.height
 
                 RowLayout {
@@ -812,7 +815,8 @@ PanelWindow {
 
               // Type column header
               Item {
-                Layout.preferredWidth: 60
+                visible: root._showListDetailColumns
+                Layout.preferredWidth: root._showListDetailColumns ? 60 : 0
                 height: parent.height
 
                 RowLayout {
@@ -1145,7 +1149,8 @@ PanelWindow {
 
                       // Date
                       Text {
-                        Layout.preferredWidth: 100
+                        visible: root._showListDetailColumns
+                        Layout.preferredWidth: root._showListDetailColumns ? 100 : 0
                         text: root.formatDate(modelData.mtime)
                         color: Colors.textSecondary
                         font.pixelSize: Colors.fontSizeSmall
@@ -1154,7 +1159,8 @@ PanelWindow {
 
                       // Extension / type
                       Text {
-                        Layout.preferredWidth: 60
+                        visible: root._showListDetailColumns
+                        Layout.preferredWidth: root._showListDetailColumns ? 60 : 0
                         text: modelData.isDir ? "folder" : (modelData.extension || "—")
                         color: Colors.textDisabled
                         font.pixelSize: Colors.fontSizeSmall
@@ -1380,7 +1386,7 @@ PanelWindow {
                 // Open/Save button
                 Rectangle {
                   id: actionBtn
-                  Layout.minimumWidth: root.mode === "folder" ? 128 : 96
+                  Layout.minimumWidth: root.mode === "folder" ? (root._compactActions ? 96 : 128) : 96
                   height: 30
                   width: Math.max(Layout.minimumWidth, actionText.implicitWidth + 24)
                   radius: Colors.radiusSmall
@@ -1399,7 +1405,7 @@ PanelWindow {
                   Text {
                     id: actionText
                     anchors.centerIn: parent
-                    text: root.mode === "open" ? "Open" : (root.mode === "save" ? "Save" : "Select Folder")
+                    text: root.mode === "open" ? "Open" : (root.mode === "save" ? "Save" : (root._compactActions ? "Select" : "Select Folder"))
                     color: actionBtn.canConfirm ? Colors.text : Colors.textDisabled
                     font.pixelSize: Colors.fontSizeMedium
                     font.weight: Colors.fontWeightMedium

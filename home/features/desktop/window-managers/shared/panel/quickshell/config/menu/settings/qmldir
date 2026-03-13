@@ -3,6 +3,7 @@ SettingsContent 1.0 SettingsContent.qml
 SettingsFieldGrid 1.0 SettingsFieldGrid.qml
 SettingsDataRow 1.0 SettingsDataRow.qml
 SettingsInfoCallout 1.0 SettingsInfoCallout.qml
+SettingsListRow 1.0 SettingsListRow.qml
 SettingsModeRow 1.0 SettingsModeRow.qml
 singleton SettingsRegistry 1.0 SettingsRegistry.qml
 SettingsSectionLabel 1.0 SettingsSectionLabel.qml

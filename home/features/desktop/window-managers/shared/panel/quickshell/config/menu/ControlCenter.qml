@@ -4,6 +4,7 @@ import QtQuick.Controls
 import Quickshell
 import Quickshell.Io
 import Quickshell.Bluetooth
+import Quickshell.Hyprland
 import Quickshell.Wayland
 import Quickshell.Widgets
 import "."
@@ -37,11 +38,35 @@ PanelWindow {
   property bool showContent: false
   property var pendingPowerCmd: null
   property int pendingPowerIndex: -1
+  property string previousFocusedAddress: ""
   signal closeRequested()
 
+  function focusedWindowAddress() {
+    if (!Hyprland.toplevels) return "";
+    for (var i = 0; i < Hyprland.toplevels.count; i++) {
+      var win = Hyprland.toplevels.get(i);
+      if (win && win.focused && win.address) return win.address;
+    }
+    return "";
+  }
+
   onShowContentChanged: {
-    if (!showContent && sidebarContent.activeFocus) {
-      sidebarContent.focus = false;
+    if (showContent) {
+      root.previousFocusedAddress = focusedWindowAddress();
+    } else {
+      if (sidebarContent.activeFocus) sidebarContent.focus = false;
+      if (root.previousFocusedAddress !== "") restoreFocusTimer.restart();
+    }
+  }
+
+  Timer {
+    id: restoreFocusTimer
+    interval: 60
+    repeat: false
+    onTriggered: {
+      if (root.previousFocusedAddress === "") return;
+      Quickshell.execDetached(["hyprctl", "dispatch", "focuswindow", "address:" + root.previousFocusedAddress]);
+      root.previousFocusedAddress = "";
     }
   }
 

@@ -7,7 +7,7 @@ import "../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  implicitWidth: 540
+  implicitWidth: 560
   implicitHeight: 560
   title: "Date & Time"
   subtitle: Qt.formatDateTime(clock.date, "dddd, MMMM d")
@@ -24,7 +24,7 @@ BasePopupMenu {
 
     Rectangle {
       Layout.fillWidth: true
-      implicitHeight: 116
+      implicitHeight: 122
       radius: Colors.radiusMedium
       color: Colors.cardSurface
       border.color: Colors.border
@@ -47,7 +47,7 @@ BasePopupMenu {
                 : (Config.timeShowSeconds ? "hh:mm:ss AP" : "hh:mm AP")
             )
             color: Colors.text
-            font.pixelSize: 54
+            font.pixelSize: 56
             font.weight: Font.Bold
           }
 
@@ -59,7 +59,7 @@ BasePopupMenu {
         }
 
         ColumnLayout {
-          Layout.preferredWidth: 140
+          Layout.preferredWidth: 152
           spacing: Colors.spacingXS
 
           Rectangle {
@@ -85,7 +85,7 @@ BasePopupMenu {
               Text {
                 text: WeatherService.temp || "--"
                 color: Colors.text
-                font.pixelSize: Colors.fontSizeXL
+                font.pixelSize: Colors.fontSizeHuge
                 font.weight: Font.Bold
               }
 
@@ -111,7 +111,7 @@ BasePopupMenu {
 
     Rectangle {
       Layout.fillWidth: true
-      implicitHeight: 80
+      implicitHeight: 88
       radius: Colors.radiusMedium
       color: Colors.cardSurface
       border.color: Colors.border
@@ -136,14 +136,14 @@ BasePopupMenu {
           Text {
             text: WeatherService.condition || "Loading weather"
             color: Colors.text
-            font.pixelSize: Colors.fontSizeHuge
-            font.weight: Font.Bold
+            font.pixelSize: Colors.fontSizeXL
+            font.weight: Font.DemiBold
             elide: Text.ElideRight
             Layout.fillWidth: true
           }
 
           Text {
-            text: "Feels like " + (WeatherService.feelsLike || "--") + "  •  Humidity " + (WeatherService.humidity || "--")
+            text: (WeatherService.location || "Local") + "  •  Feels like " + (WeatherService.feelsLike || "--") + "  •  Humidity " + (WeatherService.humidity || "--")
             color: Colors.textSecondary
             font.pixelSize: Colors.fontSizeMedium
             elide: Text.ElideRight

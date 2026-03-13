@@ -254,7 +254,8 @@ Scope {
         WlrLayershell.layer: WlrLayer.Top
         WlrLayershell.namespace: "quickshell"
         WlrLayershell.exclusiveZone: Config.barHeight
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+        // Bar has no text input; keeping it non-focusable avoids keyboard grabs.
+        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
         Panel {
           id: panel

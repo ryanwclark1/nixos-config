@@ -100,73 +100,56 @@ Item {
                     });
                 }
 
-                delegate: Rectangle {
-                    Layout.fillWidth: true
-                    implicitHeight: kbRow.implicitHeight + 16
-                    radius: Colors.radiusXS
-                    color: Colors.bgWidget
-                    border.color: Colors.border
-                    border.width: 1
+                delegate: SettingsListRow {
+                    minimumHeight: 52
 
-                    RowLayout {
-                        id: kbRow
-                        anchors {
-                            left: parent.left
-                            right: parent.right
-                            verticalCenter: parent.verticalCenter
-                            leftMargin: Colors.spacingM
-                            rightMargin: Colors.spacingM
-                        }
-                        spacing: Colors.spacingM
+                    Rectangle {
+                        implicitWidth: chordText.implicitWidth + 16
+                        height: 26
+                        radius: 6
+                        color: Colors.highlight
+                        border.color: Colors.primary
+                        border.width: 1
+                        Layout.alignment: Qt.AlignTop
 
-                        Rectangle {
-                            implicitWidth: chordText.implicitWidth + 16
-                            height: 26
-                            radius: 6
-                            color: Colors.highlight
-                            border.color: Colors.primary
-                            border.width: 1
-
-                            Text {
-                                id: chordText
-                                anchors.centerIn: parent
-                                text: {
-                                    var parts = [];
-                                    if (modelData.mods)
-                                        parts.push(modelData.mods);
-                                    if (modelData["key"])
-                                        parts.push(modelData["key"]);
-                                    return parts.join(" + ");
-                                }
-                                color: Colors.primary
-                                font.family: Colors.fontMono
-                                font.pixelSize: Colors.fontSizeSmall
-                                font.weight: Font.DemiBold
+                        Text {
+                            id: chordText
+                            anchors.centerIn: parent
+                            text: {
+                                var parts = [];
+                                if (modelData.mods)
+                                    parts.push(modelData.mods);
+                                if (modelData["key"])
+                                    parts.push(modelData["key"]);
+                                return parts.join(" + ");
                             }
+                            color: Colors.primary
+                            font.family: Colors.fontMono
+                            font.pixelSize: Colors.fontSizeSmall
+                            font.weight: Font.DemiBold
                         }
+                    }
 
-                        ColumnLayout {
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 2
+
+                        Text {
+                            text: modelData.dispatcher
+                            color: Colors.text
+                            font.pixelSize: Colors.fontSizeMedium
+                            font.weight: Font.DemiBold
+                            elide: Text.ElideRight
                             Layout.fillWidth: true
-                            spacing: 2
+                        }
 
-                            Text {
-                                text: modelData.dispatcher
-                                color: Colors.text
-                                font.pixelSize: Colors.fontSizeMedium
-                                font.weight: Font.DemiBold
-                                elide: Text.ElideRight
-                                Layout.fillWidth: true
-                            }
-
-                            Text {
-                                text: modelData.arg || "—"
-                                color: Colors.fgSecondary
-                                font.pixelSize: Colors.fontSizeSmall
-                                font.family: modelData.arg ? Colors.fontMono : ""
-                                elide: Text.ElideRight
-                                Layout.fillWidth: true
-                                visible: modelData.arg.length > 0 || true
-                            }
+                        Text {
+                            text: modelData.arg || "—"
+                            color: Colors.fgSecondary
+                            font.pixelSize: Colors.fontSizeSmall
+                            font.family: modelData.arg ? Colors.fontMono : ""
+                            elide: Text.ElideRight
+                            Layout.fillWidth: true
                         }
                     }
                 }

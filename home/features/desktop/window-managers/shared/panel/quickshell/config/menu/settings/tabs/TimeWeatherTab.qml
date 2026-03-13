@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import "../../../services"
 import ".."
 
@@ -7,12 +8,124 @@ Item {
   id: root
   property var settingsRoot: null
   property string tabId: ""
+  property bool latValid: {
+    var v = parseFloat(Config.weatherLatitude);
+    return !isNaN(v) && v >= -90 && v <= 90;
+  }
+  property bool lonValid: {
+    var v = parseFloat(Config.weatherLongitude);
+    return !isNaN(v) && v >= -180 && v <= 180;
+  }
+
+  function barDatePreview(now) {
+    if (!Config.timeShowBarDate) return "";
+    if (Config.timeBarDateStyle === "month_day")
+      return Qt.formatDateTime(now, "MMM d");
+    if (Config.timeBarDateStyle === "weekday_month_day")
+      return Qt.formatDateTime(now, "ddd MMM d");
+    return Qt.formatDateTime(now, "ddd");
+  }
+
+  function activeLocationSummary() {
+    var location = WeatherService.location || "";
+    if (location !== "")
+      return location;
+    if (Config.weatherCityQuery)
+      return Config.weatherCityQuery;
+    if (Config.weatherLatitude && Config.weatherLongitude)
+      return Config.weatherLatitude + ", " + Config.weatherLongitude;
+    return Config.weatherAutoLocation ? "Auto-detected" : "Not configured";
+  }
+
+  SystemClock {
+    id: previewClock
+    precision: Config.timeShowSeconds ? SystemClock.Seconds : SystemClock.Minutes
+  }
 
   SettingsTabPage {
     anchors.fill: parent
     tabId: root.tabId
     title: "Time & Weather"
     iconName: "󰔛"
+
+    SettingsCard {
+      title: "Preview"
+      iconName: "󰇙"
+      description: "Live preview for your top bar clock and the Date & Time menu weather strip."
+
+      Rectangle {
+        Layout.fillWidth: true
+        implicitHeight: 84
+        radius: Colors.radiusMedium
+        color: Colors.withAlpha(Colors.surface, 0.78)
+        border.color: Colors.border
+        border.width: 1
+
+        RowLayout {
+          anchors.fill: parent
+          anchors.margins: Colors.spacingM
+          spacing: Colors.spacingM
+
+          Rectangle {
+            implicitHeight: 34
+            implicitWidth: timePreview.implicitWidth + datePreview.implicitWidth + Colors.spacingM * 3
+            radius: Colors.radiusPill
+            color: Colors.withAlpha(Colors.primary, 0.2)
+            border.color: Colors.withAlpha(Colors.primary, 0.45)
+            border.width: 1
+
+            RowLayout {
+              anchors.fill: parent
+              anchors.leftMargin: Colors.spacingM
+              anchors.rightMargin: Colors.spacingM
+              spacing: Colors.spacingS
+
+              Text {
+                id: timePreview
+                text: Qt.formatDateTime(
+                  previewClock.date,
+                  Config.timeUse24Hour
+                    ? (Config.timeShowSeconds ? "HH:mm:ss" : "HH:mm")
+                    : (Config.timeShowSeconds ? "hh:mm:ss AP" : "hh:mm AP")
+                )
+                color: Colors.text
+                font.pixelSize: Colors.fontSizeLarge
+                font.weight: Font.Bold
+              }
+
+              Text {
+                id: datePreview
+                text: root.barDatePreview(previewClock.date)
+                visible: text !== ""
+                color: Colors.textSecondary
+                font.pixelSize: Colors.fontSizeMedium
+              }
+            }
+          }
+
+          Item { Layout.fillWidth: true }
+
+          ColumnLayout {
+            spacing: 2
+
+            Text {
+              text: (WeatherService.condition || "Weather") + "  " + (WeatherService.temp || "--")
+              color: Colors.text
+              font.pixelSize: Colors.fontSizeMedium
+              font.weight: Font.DemiBold
+            }
+
+            Text {
+              text: root.activeLocationSummary()
+              color: Colors.textSecondary
+              font.pixelSize: Colors.fontSizeSmall
+              elide: Text.ElideRight
+              Layout.preferredWidth: 180
+            }
+          }
+        }
+      }
+    }
 
     SettingsCard {
       title: "Time Format"
@@ -37,7 +150,7 @@ Item {
     }
 
     SettingsCard {
-      title: "Weather"
+      title: "Weather & Location"
       iconName: "󰖔"
 
       SettingsModeRow {
@@ -71,39 +184,15 @@ Item {
         Layout.fillWidth: true
         spacing: Colors.spacingM
 
-        ColumnLayout {
-          Layout.fillWidth: true
-          spacing: Colors.spacingXS
-
-          Text {
-            text: "City"
-            color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeSmall
-            font.weight: Font.Medium
-          }
-
-          Rectangle {
-            Layout.fillWidth: true
-            implicitHeight: 36
-            radius: Colors.radiusSmall
-            color: Colors.bgWidget
-            border.color: cityInput.activeFocus ? Colors.primary : Colors.border
-            border.width: 1
-
-            TextInput {
-              id: cityInput
-              anchors.fill: parent
-              anchors.leftMargin: Colors.spacingM
-              anchors.rightMargin: Colors.spacingM
-              verticalAlignment: Text.AlignVCenter
-              color: Colors.text
-              font.pixelSize: Colors.fontSizeSmall
-              text: Config.weatherCityQuery
-              onEditingFinished: {
-                if (Config.weatherCityQuery !== text)
-                  Config.weatherCityQuery = text;
-              }
-            }
+        SettingsTextInputRow {
+          label: "City"
+          placeholderText: "New York, NY"
+          leadingIcon: "󰍎"
+          text: Config.weatherCityQuery
+          onSubmitted: (value) => Config.weatherCityQuery = value.trim()
+          onTextEdited: (value) => {
+            if (Config.weatherCityQuery !== value)
+              Config.weatherCityQuery = value;
           }
         }
 
@@ -111,83 +200,41 @@ Item {
           Layout.fillWidth: true
           spacing: Colors.spacingM
 
-          ColumnLayout {
+          SettingsTextInputRow {
+            id: weatherLatInput
             Layout.fillWidth: true
-            spacing: Colors.spacingXS
-
-            Text {
-              text: "Latitude"
-              color: Colors.textSecondary
-              font.pixelSize: Colors.fontSizeSmall
-              font.weight: Font.Medium
-            }
-
-            Rectangle {
-              Layout.fillWidth: true
-              implicitHeight: 36
-              radius: Colors.radiusSmall
-              color: Colors.bgWidget
-              border.color: latitudeInput.activeFocus ? Colors.primary : Colors.border
-              border.width: 1
-
-              TextInput {
-                id: latitudeInput
-                anchors.fill: parent
-                anchors.leftMargin: Colors.spacingM
-                anchors.rightMargin: Colors.spacingM
-                verticalAlignment: Text.AlignVCenter
-                color: Colors.text
-                font.pixelSize: Colors.fontSizeSmall
-                text: Config.weatherLatitude
-                onEditingFinished: {
-                  if (Config.weatherLatitude !== text)
-                    Config.weatherLatitude = text;
-                }
-              }
+            label: "Latitude"
+            placeholderText: "40.7128"
+            leadingIcon: "󰍐"
+            text: Config.weatherLatitude
+            errorText: weatherLatInput.text.length > 0 && !root.latValid ? "Expected value between -90 and 90" : ""
+            onSubmitted: (value) => Config.weatherLatitude = value.trim()
+            onTextEdited: (value) => {
+              if (Config.weatherLatitude !== value)
+                Config.weatherLatitude = value;
             }
           }
 
-          ColumnLayout {
+          SettingsTextInputRow {
+            id: weatherLonInput
             Layout.fillWidth: true
-            spacing: Colors.spacingXS
-
-            Text {
-              text: "Longitude"
-              color: Colors.textSecondary
-              font.pixelSize: Colors.fontSizeSmall
-              font.weight: Font.Medium
-            }
-
-            Rectangle {
-              Layout.fillWidth: true
-              implicitHeight: 36
-              radius: Colors.radiusSmall
-              color: Colors.bgWidget
-              border.color: longitudeInput.activeFocus ? Colors.primary : Colors.border
-              border.width: 1
-
-              TextInput {
-                id: longitudeInput
-                anchors.fill: parent
-                anchors.leftMargin: Colors.spacingM
-                anchors.rightMargin: Colors.spacingM
-                verticalAlignment: Text.AlignVCenter
-                color: Colors.text
-                font.pixelSize: Colors.fontSizeSmall
-                text: Config.weatherLongitude
-                onEditingFinished: {
-                  if (Config.weatherLongitude !== text)
-                    Config.weatherLongitude = text;
-                }
-              }
+            label: "Longitude"
+            placeholderText: "-74.0060"
+            leadingIcon: "󰍐"
+            text: Config.weatherLongitude
+            errorText: weatherLonInput.text.length > 0 && !root.lonValid ? "Expected value between -180 and 180" : ""
+            onSubmitted: (value) => Config.weatherLongitude = value.trim()
+            onTextEdited: (value) => {
+              if (Config.weatherLongitude !== value)
+                Config.weatherLongitude = value;
             }
           }
         }
 
         Text {
-          text: "Priority and source settings apply to both the standalone Weather menu and the Date & Time dropdown."
+          text: "Active location: " + root.activeLocationSummary() + ". Source priority applies to both the standalone Weather menu and the Date & Time dropdown."
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeXS
+          font.pixelSize: Colors.fontSizeSmall
           wrapMode: Text.WordWrap
           Layout.fillWidth: true
         }

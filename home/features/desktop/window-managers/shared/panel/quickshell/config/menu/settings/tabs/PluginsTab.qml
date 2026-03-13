@@ -83,120 +83,104 @@ Item {
             Repeater {
                 model: PluginService.plugins
 
-                delegate: Rectangle {
-                    Layout.fillWidth: true
-                    implicitHeight: pluginCardRow.implicitHeight + 28
+                delegate: SettingsListRow {
+                    active: modelData.enabled
                     radius: Colors.radiusMedium
-                    color: Colors.bgWidget
-                    border.color: modelData.enabled ? Colors.primary : Colors.border
-                    border.width: 1
-                    Behavior on border.color {
-                        ColorAnimation {
-                            duration: 180
+                    contentInset: Colors.spacingM
+                    rowSpacing: Colors.spacingM
+                    minimumHeight: 66
+
+                    Rectangle {
+                        width: 38
+                        height: 38
+                        radius: Colors.radiusSmall
+                        color: modelData.enabled ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.12) : Colors.withAlpha(Colors.text, 0.06)
+                        Layout.alignment: Qt.AlignVCenter
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: modelData.type === "bar-widget" ? "󰖯" : "󰖲"
+                            color: modelData.enabled ? Colors.primary : Colors.fgDim
+                            font.family: Colors.fontMono
+                            font.pixelSize: Colors.fontSizeXL
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: 180
+                                }
+                            }
                         }
                     }
 
-                    RowLayout {
-                        id: pluginCardRow
-                        anchors {
-                            left: parent.left
-                            right: parent.right
-                            top: parent.top
-                            margins: Colors.spacingM
-                        }
-                        spacing: Colors.spacingM
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 3
 
-                        Rectangle {
-                            width: 38
-                            height: 38
-                            radius: Colors.radiusSmall
-                            color: modelData.enabled ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.12) : Colors.withAlpha(Colors.text, 0.06)
-                            Layout.alignment: Qt.AlignVCenter
+                        RowLayout {
+                            spacing: Colors.spacingS
 
                             Text {
-                                anchors.centerIn: parent
-                                text: modelData.type === "bar-widget" ? "󰖯" : "󰖲"
-                                color: modelData.enabled ? Colors.primary : Colors.fgDim
-                                font.family: Colors.fontMono
-                                font.pixelSize: Colors.fontSizeXL
-                                Behavior on color {
-                                    ColorAnimation {
-                                        duration: 180
-                                    }
-                                }
-                            }
-                        }
-
-                        ColumnLayout {
-                            Layout.fillWidth: true
-                            spacing: 3
-
-                            RowLayout {
-                                spacing: Colors.spacingS
-
-                                Text {
-                                    text: modelData.name
-                                    color: Colors.text
-                                    font.pixelSize: Colors.fontSizeMedium
-                                    font.weight: Font.DemiBold
-                                    elide: Text.ElideRight
-                                }
-
-                                Rectangle {
-                                    implicitWidth: verLabel.implicitWidth + 10
-                                    height: 18
-                                    radius: height / 2
-                                    color: Colors.withAlpha(Colors.text, 0.08)
-                                    Text {
-                                        id: verLabel
-                                        anchors.centerIn: parent
-                                        text: "v" + modelData.version
-                                        color: Colors.fgSecondary
-                                        font.pixelSize: Colors.fontSizeXS
-                                        font.family: Colors.fontMono
-                                    }
-                                }
-
-                                Rectangle {
-                                    implicitWidth: typeLabel.implicitWidth + 10
-                                    height: 18
-                                    radius: height / 2
-                                    color: modelData.type === "bar-widget" ? Qt.rgba(Colors.accent.r, Colors.accent.g, Colors.accent.b, 0.14) : Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.14)
-                                    Text {
-                                        id: typeLabel
-                                        anchors.centerIn: parent
-                                        text: modelData.type === "bar-widget" ? "Bar" : "Desktop"
-                                        color: modelData.type === "bar-widget" ? Colors.accent : Colors.primary
-                                        font.pixelSize: Colors.fontSizeXS
-                                        font.weight: Font.DemiBold
-                                    }
-                                }
-                            }
-
-                            Text {
-                                visible: modelData.description.length > 0
-                                text: modelData.description
-                                color: Colors.fgSecondary
-                                font.pixelSize: Colors.fontSizeSmall
-                                elide: Text.ElideRight
+                                text: modelData.name
+                                color: Colors.text
+                                font.pixelSize: Colors.fontSizeMedium
+                                font.weight: Font.DemiBold
                                 Layout.fillWidth: true
+                                elide: Text.ElideRight
                             }
-                            Text {
-                                text: "by " + modelData.author
-                                color: Colors.fgDim
-                                font.pixelSize: Colors.fontSizeXS
+
+                            Rectangle {
+                                implicitWidth: verLabel.implicitWidth + 10
+                                height: 18
+                                radius: height / 2
+                                color: Colors.withAlpha(Colors.text, 0.08)
+                                Text {
+                                    id: verLabel
+                                    anchors.centerIn: parent
+                                    text: "v" + modelData.version
+                                    color: Colors.fgSecondary
+                                    font.pixelSize: Colors.fontSizeXS
+                                    font.family: Colors.fontMono
+                                }
+                            }
+
+                            Rectangle {
+                                implicitWidth: typeLabel.implicitWidth + 10
+                                height: 18
+                                radius: height / 2
+                                color: modelData.type === "bar-widget" ? Qt.rgba(Colors.accent.r, Colors.accent.g, Colors.accent.b, 0.14) : Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.14)
+                                Text {
+                                    id: typeLabel
+                                    anchors.centerIn: parent
+                                    text: modelData.type === "bar-widget" ? "Bar" : "Desktop"
+                                    color: modelData.type === "bar-widget" ? Colors.accent : Colors.primary
+                                    font.pixelSize: Colors.fontSizeXS
+                                    font.weight: Font.DemiBold
+                                }
                             }
                         }
 
-                        SharedWidgets.DankToggle {
-                            checked: modelData.enabled
-                            Layout.alignment: Qt.AlignVCenter
-                            onToggled: {
-                                if (modelData.enabled)
-                                    PluginService.disablePlugin(modelData.id);
-                                else
-                                    PluginService.enablePlugin(modelData.id);
-                            }
+                        Text {
+                            visible: modelData.description.length > 0
+                            text: modelData.description
+                            color: Colors.fgSecondary
+                            font.pixelSize: Colors.fontSizeSmall
+                            elide: Text.ElideRight
+                            Layout.fillWidth: true
+                        }
+                        Text {
+                            text: "by " + modelData.author
+                            color: Colors.fgDim
+                            font.pixelSize: Colors.fontSizeXS
+                        }
+                    }
+
+                    SharedWidgets.DankToggle {
+                        checked: modelData.enabled
+                        Layout.alignment: Qt.AlignVCenter
+                        onToggled: {
+                            if (modelData.enabled)
+                                PluginService.disablePlugin(modelData.id);
+                            else
+                                PluginService.enablePlugin(modelData.id);
                         }
                     }
                 }
