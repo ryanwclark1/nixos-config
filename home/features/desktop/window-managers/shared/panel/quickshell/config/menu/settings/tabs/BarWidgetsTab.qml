@@ -345,7 +345,7 @@ Item {
                             model: BarWidgetRegistry.search(root.widgetSearchQuery, root.addSection)
                             delegate: SettingsListRow {
                                 required property var modelData
-                                minimumHeight: 64
+                                minimumHeight: root.compactMode ? 88 : 64
 
                                 Text {
                                     text: modelData.icon
@@ -364,7 +364,7 @@ Item {
                                         font.pixelSize: Colors.fontSizeMedium
                                         font.weight: Font.Medium
                                         Layout.fillWidth: true
-                                        elide: Text.ElideRight
+                                        wrapMode: Text.WordWrap
                                     }
 
                                     Text {
@@ -376,12 +376,18 @@ Item {
                                     }
                                 }
 
-                                SettingsActionButton {
-                                    compact: true
-                                    emphasized: true
-                                    iconName: "󰐕"
-                                    label: "Add"
-                                    onClicked: root.addWidget(modelData.widgetType)
+                                Flow {
+                                    Layout.fillWidth: true
+                                    width: parent.width
+                                    spacing: Colors.spacingS
+
+                                    SettingsActionButton {
+                                        compact: true
+                                        emphasized: true
+                                        iconName: "󰐕"
+                                        label: "Add"
+                                        onClicked: root.addWidget(modelData.widgetType)
+                                    }
                                 }
                             }
                         }

@@ -11,6 +11,19 @@ Item {
     property bool compactMode: false
     property bool tightSpacing: false
 
+    function pluginErrorEntries() {
+        var map = PluginService.pluginErrors || ({});
+        var entries = [];
+        for (var key in map) {
+            entries.push({
+                id: key,
+                error: String(map[key] || "")
+            });
+        }
+        entries.sort(function(a, b) { return String(a.id).localeCompare(String(b.id)); });
+        return entries;
+    }
+
     SettingsTabPage {
         anchors.fill: parent
         tabId: root.tabId
@@ -43,6 +56,13 @@ Item {
                             return p.enabled;
                         }).length + " enabled"
                         color: Colors.fgSecondary
+                        font.pixelSize: Colors.fontSizeSmall
+                    }
+
+                    Text {
+                        visible: Object.keys(PluginService.pluginErrors || ({ })).length > 0
+                        text: Object.keys(PluginService.pluginErrors || ({ })).length + " invalid plugin manifest" + (Object.keys(PluginService.pluginErrors || ({ })).length !== 1 ? "s" : "")
+                        color: Colors.warning
                         font.pixelSize: Colors.fontSizeSmall
                     }
                 }
@@ -92,7 +112,7 @@ Item {
                     radius: Colors.radiusMedium
                     contentInset: Colors.spacingM
                     rowSpacing: root.compactMode ? Colors.spacingS : Colors.spacingM
-                    minimumHeight: root.compactMode ? 60 : 66
+                    minimumHeight: root.compactMode ? 92 : 66
 
                     Rectangle {
                         width: root.compactMode ? 32 : 38
@@ -222,6 +242,44 @@ Item {
                     }
                 }
             }
+
+            ColumnLayout {
+                visible: root.pluginErrorEntries().length > 0
+                Layout.fillWidth: true
+                spacing: Colors.spacingS
+                Layout.topMargin: Colors.spacingM
+
+                Text {
+                    text: "Invalid plugin manifests"
+                    color: Colors.warning
+                    font.pixelSize: Colors.fontSizeSmall
+                    font.weight: Font.DemiBold
+                }
+
+                Repeater {
+                    model: root.pluginErrorEntries()
+
+                    delegate: Rectangle {
+                        required property var modelData
+                        Layout.fillWidth: true
+                        radius: Colors.radiusSmall
+                        color: Colors.withAlpha(Colors.warning, 0.10)
+                        border.color: Colors.withAlpha(Colors.warning, 0.35)
+                        border.width: 1
+                        implicitHeight: issueText.implicitHeight + 14
+
+                        Text {
+                            id: issueText
+                            anchors.fill: parent
+                            anchors.margins: 7
+                            text: modelData.id + ": " + modelData.error
+                            color: Colors.warning
+                            font.pixelSize: Colors.fontSizeXS
+                            wrapMode: Text.WordWrap
+                        }
+                    }
+                }
+            }
         }
 
         SettingsCard {
@@ -246,6 +304,14 @@ Item {
                     text: "Manifest v2 fields: id, name, description, author, version, type, permissions, entryPoints { barWidget|desktopWidget|launcherProvider|daemon|settings }"
                     color: Colors.fgSecondary
                     font.pixelSize: Colors.fontSizeSmall
+                    wrapMode: Text.WordWrap
+                    Layout.fillWidth: true
+                }
+
+                Text {
+                    text: "Reference schema: config/plugins/manifest-v2.schema.json"
+                    color: Colors.fgDim
+                    font.pixelSize: Colors.fontSizeXS
                     wrapMode: Text.WordWrap
                     Layout.fillWidth: true
                 }

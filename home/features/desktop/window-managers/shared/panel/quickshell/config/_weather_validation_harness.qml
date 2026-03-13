@@ -3,7 +3,7 @@ import QtQuick
 import "./menu"
 
 ShellRoot {
-  DateTimeMenu {
+  WeatherMenu {
     wantVisible: true
   }
 }

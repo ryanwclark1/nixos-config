@@ -64,8 +64,8 @@ QtObject {
     return result;
   }
 
-  signal pluginCatalogChanged
-  signal pluginRuntimeChanged
+  signal pluginCatalogUpdated
+  signal pluginRuntimeUpdated
 
   function scanPlugins() {
     scanProc.running = true;
@@ -371,7 +371,7 @@ QtObject {
         _instantiateLauncherProvider(launchers[j]);
     }
 
-    pluginRuntimeChanged();
+    pluginRuntimeUpdated();
   }
 
   function _typeValid(typeName) {
@@ -484,7 +484,7 @@ QtObject {
     plugins = updated;
     pluginIndex = index;
     _refreshRuntime();
-    pluginCatalogChanged();
+    pluginCatalogUpdated();
   }
 
   function _applyScannedPlugins(nextPlugins, nextErrors) {
@@ -525,7 +525,7 @@ QtObject {
     pluginFingerprints = nextFingerprints;
 
     _refreshRuntime();
-    pluginCatalogChanged();
+    pluginCatalogUpdated();
   }
 
   function launcherTriggerForPlugin(pluginId) {
@@ -758,11 +758,11 @@ QtObject {
   property Connections _configConn: Connections {
     target: Config
     function onDisabledPluginsChanged() { root._refreshEnabledStates(); }
-    function onPluginLauncherTriggersChanged() { root.pluginRuntimeChanged(); }
-    function onPluginLauncherNoTriggerChanged() { root.pluginRuntimeChanged(); }
+    function onPluginLauncherTriggersChanged() { root.pluginRuntimeUpdated(); }
+    function onPluginLauncherNoTriggerChanged() { root.pluginRuntimeUpdated(); }
   }
 
-  Timer {
+  property Timer hotReloadTimer: Timer {
     id: hotReloadTimer
     interval: 2200
     repeat: true

@@ -62,7 +62,7 @@ Item {
                     delegate: SettingsListRow {
                         required property var modelData
                         active: Config.selectedBarId === modelData.id
-                        minimumHeight: root.compactMode ? 88 : 64
+                        minimumHeight: root.compactMode ? 112 : 64
 
                         ColumnLayout {
                             Layout.fillWidth: true
@@ -106,42 +106,43 @@ Item {
                             }
                         }
 
-                        SettingsActionButton {
-                            compact: true
-                            iconName: "󰏫"
-                            label: "Select"
-                            emphasized: Config.selectedBarId === modelData.id
-                            onClicked: Config.setSelectedBar(modelData.id)
-                        }
+                        Flow {
+                            Layout.fillWidth: true
+                            width: parent.width
+                            spacing: Colors.spacingS
 
-                        SettingsActionButton {
-                            compact: true
-                            iconName: "󰅖"
-                            label: "Remove"
-                            enabled: Config.barConfigs.length > 1
-                            onClicked: {
-                                root.validationMessage = "";
-                                Config.removeBar(modelData.id);
+                            SettingsActionButton {
+                                compact: true
+                                iconName: "󰏫"
+                                label: "Select"
+                                emphasized: Config.selectedBarId === modelData.id
+                                onClicked: Config.setSelectedBar(modelData.id)
+                            }
+
+                            SettingsActionButton {
+                                compact: true
+                                iconName: "󰅖"
+                                label: "Remove"
+                                enabled: Config.barConfigs.length > 1
+                                onClicked: {
+                                    root.validationMessage = "";
+                                    Config.removeBar(modelData.id);
+                                }
                             }
                         }
                     }
                 }
 
-                RowLayout {
+                SettingsActionButton {
                     Layout.fillWidth: true
-                    spacing: Colors.spacingS
-
-                    SettingsActionButton {
-                        Layout.fillWidth: true
-                        emphasized: true
-                        iconName: "󰐕"
-                        label: "Add Bar"
-                        enabled: Config.barConfigs.length < Config.maxBars
-                        onClicked: {
-                            root.validationMessage = "";
-                            if (!Config.addBar())
-                                root.validationMessage = "No free edge is available for another enabled bar.";
-                        }
+                    emphasized: true
+                    iconName: "󰐕"
+                    label: "Add Bar"
+                    enabled: Config.barConfigs.length < Config.maxBars
+                    onClicked: {
+                        root.validationMessage = "";
+                        if (!Config.addBar())
+                            root.validationMessage = "No free edge is available for another enabled bar.";
                     }
                 }
             }

@@ -3,6 +3,7 @@ set -euo pipefail
 
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 launcher_qml="${script_dir}/../config/launcher/Launcher.qml"
+system_tab_qml="${script_dir}/../config/menu/settings/tabs/SystemTab.qml"
 
 violations=()
 
@@ -33,11 +34,24 @@ require_literal "$launcher_qml" 'filesFdLastMs: 0,' "files fd last latency metri
 require_literal "$launcher_qml" 'filesFindLastMs: 0,' "files find last latency metric field"
 require_literal "$launcher_qml" 'filesFdAvgMs: 0,' "files fd average latency metric field"
 require_literal "$launcher_qml" 'filesFindAvgMs: 0,' "files find average latency metric field"
+require_literal "$launcher_qml" 'filesResolveRuns: 0,' "files backend resolve run metric field"
+require_literal "$launcher_qml" 'filesResolveLastMs: 0,' "files backend resolve last latency metric field"
+require_literal "$launcher_qml" 'filesResolveAvgMs: 0,' "files backend resolve average latency metric field"
+require_literal "$launcher_qml" 'property int fileSearchBackendResolvedAt: 0' "files backend resolved timestamp cache field"
+require_literal "$launcher_qml" 'readonly property int fileSearchBackendRefreshMs: 180000' "files backend refresh interval field"
+require_literal "$launcher_qml" 'readonly property int fileSearchBackendMissRefreshMs: 20000' "files backend miss refresh interval field"
 require_literal "$launcher_qml" 'readonly property string filesCacheStatsLabel: {' "files cache stats label property"
 require_literal "$launcher_qml" 'function recordFilterMetric(durationMs) {' "filter metric recorder"
 require_literal "$launcher_qml" 'function recordFilesBackendLoad(backend, durationMs) {' "files backend metric recorder"
+require_literal "$launcher_qml" 'function recordFilesBackendResolveMetric(durationMs) {' "files backend resolve metric recorder"
+require_literal "$launcher_qml" 'function invalidateCommandAvailability(cmd) {' "command availability invalidation helper"
+require_literal "$launcher_qml" 'function forceRedetectFileSearchBackend() {' "manual files backend redetect helper"
+require_literal "$launcher_qml" 'function redetectFilesBackend() { launcherRoot.forceRedetectFileSearchBackend(); }' "files backend redetect IPC action"
 require_literal "$launcher_qml" 'recordFilterMetric(Date.now() - startedAt);' "filter metric recording call"
 require_literal "$launcher_qml" 'recordFilesBackendLoad(backend, tookMs);' "files backend metric recording call"
+require_literal "$launcher_qml" 'recordFilesBackendResolveMetric(Date.now() - startedAt);' "files backend resolve metric recording call"
+require_literal "$launcher_qml" 'invalidateCommandAvailability("fd");' "files backend fd cache invalidation call"
+require_literal "$launcher_qml" 'invalidateCommandAvailability("find");' "files backend find cache invalidation call"
 require_literal "$launcher_qml" 'function fuzzyMatchLower(s, p) {' "lowercased fuzzy matcher"
 require_literal "$launcher_qml" 'function rankItem(item, clean, cleanLower) {' "rank function with precomputed query"
 require_literal "$launcher_qml" 'var cleanLower = clean.toLowerCase();' "single query lowercase preparation"
@@ -47,7 +61,10 @@ require_literal "$launcher_qml" '+ " / last " + (launcherRoot.launcherMetrics.la
 require_literal "$launcher_qml" '+ " • fd/find " + (launcherRoot.launcherMetrics.filesFdLoads || 0) + "/"' "runtime metrics files backend counter display"
 require_literal "$launcher_qml" '+ " • fd " + (launcherRoot.launcherMetrics.filesFdAvgMs || 0) + "/" + (launcherRoot.launcherMetrics.filesFdLastMs || 0) + "ms"' "runtime metrics fd latency display"
 require_literal "$launcher_qml" '+ " • find " + (launcherRoot.launcherMetrics.filesFindAvgMs || 0) + "/" + (launcherRoot.launcherMetrics.filesFindLastMs || 0) + "ms"' "runtime metrics find latency display"
+require_literal "$launcher_qml" '+ " • resolve " + (launcherRoot.launcherMetrics.filesResolveAvgMs || 0) + "/" + (launcherRoot.launcherMetrics.filesResolveLastMs || 0) + "ms"' "runtime metrics resolve latency display"
 require_literal "$launcher_qml" '+ (launcherRoot.mode === "files" ? (" • cache " + launcherRoot.filesCacheStatsLabel) : "")' "runtime metrics files cache stats display"
+require_literal "$system_tab_qml" 'label: "Re-detect Files Backend"' "settings button label for files backend redetect"
+require_literal "$system_tab_qml" 'onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Launcher", "redetectFilesBackend"])' "settings redetect files backend action binding"
 forbid_literal "$launcher_qml" 'function fuzzyMatch(str, pattern) {' "legacy fuzzy matcher signature"
 
 if (( ${#violations[@]} > 0 )); then

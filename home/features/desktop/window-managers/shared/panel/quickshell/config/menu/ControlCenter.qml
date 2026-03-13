@@ -283,7 +283,7 @@ PanelWindow {
                 id: nightLightPoll
                 interval: 5000
                 running: root.showContent && CompositorAdapter.supportsHyprctlSettings
-                command: ["sh", "-c", "hyprctl hyprsunset temperature 2>/dev/null | grep -v '6000' >/dev/null && echo 'on' || echo 'off'"]
+                command: CompositorAdapter.nightLightStatusCommand()
                 parse: function(out) { return String(out || "").trim(); }
                 onUpdated: nightLightToggle.active = (nightLightPoll.value === "on")
               }

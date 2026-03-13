@@ -9,11 +9,8 @@ allow_hyprctl=(
   "${config_dir}/launcher/Overview.qml"
   "${config_dir}/menu/ControlCenter.qml"
   "${config_dir}/menu/DisplayConfig.qml"
-  "${config_dir}/menu/HyprActions.qml"
   "${config_dir}/menu/SettingsHub.qml"
-  "${config_dir}/menu/settings/tabs/HotkeysTab.qml"
   "${config_dir}/menu/settings/tabs/HyprlandTab.qml"
-  "${config_dir}/menu/settings/tabs/WallpaperTab.qml"
   "${config_dir}/services/CompositorAdapter.qml"
   "${config_dir}/services/Config.qml"
   "${config_dir}/services/PrivacyService.qml"
@@ -48,10 +45,10 @@ while IFS= read -r hit; do
   if ! contains_path "$file" "${allow_hyprctl[@]}"; then
     violations+=("hyprctl outside allowlist: ${hit}")
   fi
-done < <(rg -n "hyprctl" "${config_dir}" --glob '*.qml' || true)
+done < <(rg -n '\bhyprctl\b' "${config_dir}" --glob '*.qml' || true)
 
 for file in "${allow_hyprctl[@]}"; do
-  if ! rg -q "hyprctl" "$file"; then
+  if ! rg -q '\bhyprctl\b' "$file"; then
     violations+=("stale hyprctl allowlist entry (no hyprctl found): ${file}")
   fi
 done

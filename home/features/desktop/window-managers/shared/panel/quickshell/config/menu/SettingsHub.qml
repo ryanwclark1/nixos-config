@@ -87,17 +87,7 @@ PanelWindow {
 
   Process {
     id: hyprStateProc
-    command: [
-      "sh",
-      "-c",
-      "hyprctl getoption general:gaps_out -j 2>/dev/null; "
-      + "printf '\\n'; "
-      + "hyprctl getoption general:gaps_in -j 2>/dev/null; "
-      + "printf '\\n'; "
-      + "hyprctl getoption decoration:active_opacity -j 2>/dev/null; "
-      + "printf '\\n'; "
-      + "hyprctl getoption general:layout -j 2>/dev/null"
-    ]
+    command: CompositorAdapter.hyprlandSettingsSnapshotCommand()
     running: false
     stdout: StdioCollector {
       onStreamFinished: {

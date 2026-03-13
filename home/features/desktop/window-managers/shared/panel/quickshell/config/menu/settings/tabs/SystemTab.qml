@@ -712,6 +712,14 @@ Item {
                 onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Launcher", "clearMetrics"])
             }
 
+            SettingsActionButton {
+                Layout.fillWidth: true
+                label: "Re-detect Files Backend"
+                iconName: "󰑓"
+                compact: true
+                onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Launcher", "redetectFilesBackend"])
+            }
+
             SettingsSliderRow {
                 label: "Recents History Limit"
                 min: 4

@@ -108,7 +108,7 @@ PanelWindow {
 
   Process {
     id: monitorLoadProc
-    command: ["hyprctl", "monitors", "-j"]
+    command: CompositorAdapter.monitorListCommand()
     running: false
     stdout: StdioCollector {
       onStreamFinished: {
@@ -211,7 +211,7 @@ PanelWindow {
     for (var i = 0; i < monitors.length; i++) bk.push(_cloneMonitor(monitors[i]));
     backupMonitors = bk;
 
-    // Build and run hyprctl commands sequentially via a simple JS array queue
+    // Build and run monitor update commands sequentially via a simple JS array queue
     applyInProgress = true;
     _applyQueue = _buildApplyCmds(monitors);
     _runNextApplyCmd();
@@ -227,9 +227,9 @@ PanelWindow {
       var posStr  = m.x + "x" + m.y;
       var dimStr  = m.width + "x" + m.height + "@" + rateStr;
       var scaleStr = m.scale.toFixed(2);
-      // hyprctl keyword monitor NAME,WIDTHxHEIGHT@RATE,POSXxPOSY,SCALE
-      cmds.push(["hyprctl", "keyword", "monitor",
-                 m.name + "," + dimStr + "," + posStr + "," + scaleStr]);
+      cmds.push(CompositorAdapter.monitorKeywordCommand(
+        m.name + "," + dimStr + "," + posStr + "," + scaleStr
+      ));
     }
     return cmds;
   }

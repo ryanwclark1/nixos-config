@@ -16,7 +16,7 @@ Item {
 
     Process {
         id: hyprBindsProc
-        command: CompositorAdapter.supportsHotkeysListing ? ["hyprctl", "binds", "-j"] : ["sh", "-c", "echo '[]'"]
+        command: CompositorAdapter.hotkeysCommand()
         running: false
         stdout: StdioCollector {
             onStreamFinished: {
@@ -35,7 +35,7 @@ Item {
                     }
                     root.keybindsList = result;
                 } catch (e) {
-                    console.error("Failed to parse hyprctl binds: " + e);
+                    console.error("Failed to parse compositor binds: " + e);
                 }
             }
         }

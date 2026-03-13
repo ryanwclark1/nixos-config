@@ -451,7 +451,7 @@ Rectangle {
 
     Rectangle {
       Layout.fillWidth: true
-      height: 40
+      implicitHeight: saveButtonRow.implicitHeight + Colors.spacingS * 2
       radius: root.compactMode ? Colors.radiusMedium : Colors.radiusPill
       color: Colors.withAlpha(Colors.primary, 0.14)
       border.color: Colors.primary
@@ -465,6 +465,7 @@ Rectangle {
       }
 
       RowLayout {
+        id: saveButtonRow
         anchors.centerIn: parent
         spacing: Colors.spacingS
 

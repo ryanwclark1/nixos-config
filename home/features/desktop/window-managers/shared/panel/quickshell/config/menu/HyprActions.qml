@@ -8,16 +8,16 @@ Row {
 
   ActionButton {
     label: "Float"
-    command: [ "hyprctl", "dispatch", "togglefloating" ]
+    action: function() { CompositorAdapter.dispatchAction("togglefloating", "", "Toggle floating"); }
   }
 
   ActionButton {
     label: "Pseudo"
-    command: [ "hyprctl", "dispatch", "pseudo" ]
+    action: function() { CompositorAdapter.dispatchAction("pseudo", "", "Toggle pseudo mode"); }
   }
 
   ActionButton {
     label: "Full"
-    command: [ "hyprctl", "dispatch", "fullscreen", "toggle" ]
+    action: function() { CompositorAdapter.dispatchAction("fullscreen", "toggle", "Toggle fullscreen"); }
   }
 }

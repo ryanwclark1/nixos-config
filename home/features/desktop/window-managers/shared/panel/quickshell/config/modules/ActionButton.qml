@@ -8,6 +8,7 @@ Rectangle {
 
   property string label: ""
   property var command: []
+  property var action: null
 
   radius: 6
   height: 20
@@ -35,6 +36,11 @@ Rectangle {
     anchors.fill: parent
     hoverEnabled: root.enabled
     cursorShape: root.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-    onClicked: (mouse) => { if (!root.enabled) return; stateLayer.burst(mouse.x, mouse.y); Quickshell.execDetached(root.command); }
+    onClicked: (mouse) => {
+      if (!root.enabled) return;
+      stateLayer.burst(mouse.x, mouse.y);
+      if (root.action) root.action();
+      else if (root.command && root.command.length > 0) Quickshell.execDetached(root.command);
+    }
   }
 }

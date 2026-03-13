@@ -71,6 +71,41 @@ QtObject {
     return ["sh", "-c", "echo ''"];
   }
 
+  function hotkeysCommand() {
+    if (supportsHotkeysListing) return ["hyprctl", "binds", "-j"];
+    return ["sh", "-c", "echo '[]'"];
+  }
+
+  function monitorListCommand() {
+    if (supportsDisplayConfig) return ["hyprctl", "monitors", "-j"];
+    return ["sh", "-c", "echo '[]'"];
+  }
+
+  function monitorKeywordCommand(spec) {
+    if (!supportsDisplayConfig) return ["sh", "-c", "true"];
+    return ["hyprctl", "keyword", "monitor", String(spec || "")];
+  }
+
+  function hyprlandSettingsSnapshotCommand() {
+    if (!supportsHyprctlSettings) return ["sh", "-c", "printf '{}'"];
+    return [
+      "sh",
+      "-c",
+      "hyprctl getoption general:gaps_out -j 2>/dev/null; "
+      + "printf '\\n'; "
+      + "hyprctl getoption general:gaps_in -j 2>/dev/null; "
+      + "printf '\\n'; "
+      + "hyprctl getoption decoration:active_opacity -j 2>/dev/null; "
+      + "printf '\\n'; "
+      + "hyprctl getoption general:layout -j 2>/dev/null"
+    ];
+  }
+
+  function nightLightStatusCommand() {
+    if (!supportsHyprctlSettings) return ["sh", "-c", "echo 'off'"];
+    return ["sh", "-c", "hyprctl hyprsunset temperature 2>/dev/null | grep -v '6000' >/dev/null && echo 'on' || echo 'off'"];
+  }
+
   function lockCommand() {
     return ["os-lock-screen"];
   }

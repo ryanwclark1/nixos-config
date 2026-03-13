@@ -5,8 +5,10 @@ import "../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  implicitWidth: 500
-  implicitHeight: 600
+  readonly property int availablePopupWidth: screen ? Math.max(340, screen.width - 40) : 500
+  readonly property bool compactMode: availablePopupWidth < 460
+  implicitWidth: Math.min(500, availablePopupWidth)
+  implicitHeight: compactMode ? 660 : 600
   title: "Weather"
   subtitle: WeatherService.location || "Local"
   toggleMethod: "toggleWeatherMenu"
@@ -31,22 +33,24 @@ BasePopupMenu {
 
     Rectangle {
       Layout.fillWidth: true
-      implicitHeight: 132
+      implicitHeight: root.compactMode ? 182 : 132
       radius: Colors.radiusMedium
       color: Colors.cardSurface
       border.color: Colors.border
       border.width: 1
 
-      RowLayout {
+      GridLayout {
         anchors.fill: parent
         anchors.margins: Colors.spacingM
-        spacing: Colors.spacingM
+        columns: root.compactMode ? 1 : 3
+        columnSpacing: Colors.spacingM
+        rowSpacing: Colors.spacingM
 
         Text {
           text: Colors.weatherIcon(WeatherService.condition)
           color: Colors.accent
           font.family: Colors.fontMono
-          font.pixelSize: 46
+          font.pixelSize: root.compactMode ? 38 : 46
           Layout.alignment: Qt.AlignVCenter
         }
 
@@ -57,7 +61,7 @@ BasePopupMenu {
           Text {
             text: WeatherService.temp || "--"
             color: Colors.text
-            font.pixelSize: 38
+            font.pixelSize: root.compactMode ? 32 : 38
             font.weight: Font.Bold
           }
 
@@ -80,6 +84,7 @@ BasePopupMenu {
         }
 
         ColumnLayout {
+          Layout.fillWidth: root.compactMode
           spacing: 4
 
           RowLayout {
@@ -120,7 +125,7 @@ BasePopupMenu {
       model: WeatherService.forecast || []
       delegate: Rectangle {
         Layout.fillWidth: true
-        implicitHeight: 60
+        implicitHeight: root.compactMode ? 78 : 60
         radius: Colors.radiusMedium
         color: Colors.cardSurface
         border.color: Colors.border
@@ -138,17 +143,20 @@ BasePopupMenu {
           hoverEnabled: true
         }
 
-        RowLayout {
+        GridLayout {
           anchors.fill: parent
           anchors.margins: Colors.spacingM
-          spacing: Colors.spacingM
+          columns: root.compactMode ? 2 : 4
+          columnSpacing: Colors.spacingM
+          rowSpacing: root.compactMode ? Colors.spacingXS : 0
 
           Text {
             text: root.dayName(modelData.date)
             color: Colors.text
             font.pixelSize: Colors.fontSizeMedium
             font.weight: Font.DemiBold
-            Layout.preferredWidth: 76
+            Layout.preferredWidth: root.compactMode ? -1 : 76
+            Layout.fillWidth: root.compactMode
           }
 
           Text {
@@ -156,6 +164,7 @@ BasePopupMenu {
             color: Colors.accent
             font.family: Colors.fontMono
             font.pixelSize: 22
+            Layout.alignment: root.compactMode ? Qt.AlignRight : Qt.AlignLeft
           }
 
           Text {
@@ -164,18 +173,24 @@ BasePopupMenu {
             font.pixelSize: Colors.fontSizeSmall
             elide: Text.ElideRight
             Layout.fillWidth: true
-          }
-
-          Text {
-            text: modelData.minTemp + "°"
-            color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeMedium
+            Layout.columnSpan: root.compactMode ? 2 : 1
           }
 
           RowLayout {
             spacing: 2
+            Layout.columnSpan: root.compactMode ? 2 : 1
             Text {
-              text: "↑"
+              text: "Low " + modelData.minTemp + "°"
+              color: Colors.textDisabled
+              font.pixelSize: Colors.fontSizeMedium
+            }
+            Text {
+              text: "•"
+              color: Colors.border
+              font.pixelSize: Colors.fontSizeMedium
+            }
+            Text {
+              text: "High"
               color: Colors.primary
               font.pixelSize: Colors.fontSizeSmall
             }

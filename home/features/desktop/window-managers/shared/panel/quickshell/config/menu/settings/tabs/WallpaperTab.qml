@@ -284,7 +284,7 @@ Item {
 
     Process {
         id: wallpaperMonProc
-        command: CompositorAdapter.supportsDisplayConfig ? ["hyprctl", "monitors", "-j"] : ["sh", "-c", "echo '[]'"]
+        command: CompositorAdapter.monitorListCommand()
         running: false
         stdout: StdioCollector {
             onStreamFinished: {
@@ -301,7 +301,7 @@ Item {
                     if (names.length === 0)
                         root._loadFallbackMonitorNames();
                 } catch (e) {
-                    console.error("Failed to parse hyprctl monitors: " + e);
+                    console.error("Failed to parse monitor list: " + e);
                     root._loadFallbackMonitorNames();
                 }
             }
@@ -1259,7 +1259,7 @@ Item {
         SettingsInfoCallout {
             iconName: "󰋗"
             title: "Wallpaper search directories"
-            body: "Requires swww, hyprctl hyprpaper, or swaybg to apply wallpapers."
+            body: "Requires swww, hyprpaper, or swaybg to apply wallpapers."
 
             Repeater {
                 model: WallpaperService.wallpaperSearchDirs

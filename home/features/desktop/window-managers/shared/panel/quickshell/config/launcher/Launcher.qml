@@ -62,6 +62,9 @@ PanelWindow {
   property var fileQueryCache: ({})
   property var fileQueryCacheTime: ({})
   property string fileSearchBackend: ""
+  property int fileSearchBackendResolvedAt: 0
+  readonly property int fileSearchBackendRefreshMs: 180000
+  readonly property int fileSearchBackendMissRefreshMs: 20000
   property int _lastFilterTriggerMs: 0
   property int openCount: 0
   property int _requestToken: 0
@@ -86,6 +89,9 @@ PanelWindow {
     filesFindLastMs: 0,
     filesFdAvgMs: 0,
     filesFindAvgMs: 0,
+    filesResolveRuns: 0,
+    filesResolveLastMs: 0,
+    filesResolveAvgMs: 0,
     perMode: ({})
   })
 
@@ -879,6 +885,14 @@ PanelWindow {
     fileQueryCacheTime = ({});
   }
 
+  function invalidateCommandAvailability(cmd) {
+    if (commandAvailability[cmd] === undefined)
+      return;
+    var nextAvailability = Object.assign({}, commandAvailability);
+    delete nextAvailability[cmd];
+    commandAvailability = nextAvailability;
+  }
+
   function getFileQueryCached(queryKey) {
     var items = fileQueryCache[queryKey];
     if (!items)
@@ -933,6 +947,9 @@ PanelWindow {
       filesFindLastMs: 0,
       filesFdAvgMs: 0,
       filesFindAvgMs: 0,
+      filesResolveRuns: 0,
+      filesResolveLastMs: 0,
+      filesResolveAvgMs: 0,
       perMode: ({})
     });
   }
@@ -951,6 +968,16 @@ PanelWindow {
       next.filesFindLastMs = took;
       next.filesFindAvgMs = Math.round((((next.filesFindAvgMs || 0) * (findLoads - 1)) + took) / findLoads);
     }
+    launcherMetrics = next;
+  }
+
+  function recordFilesBackendResolveMetric(durationMs) {
+    var next = Object.assign({}, launcherMetrics);
+    var runs = (next.filesResolveRuns || 0) + 1;
+    var took = Math.max(0, Math.round(durationMs || 0));
+    next.filesResolveRuns = runs;
+    next.filesResolveLastMs = took;
+    next.filesResolveAvgMs = Math.round((((next.filesResolveAvgMs || 0) * (runs - 1)) + took) / runs);
     launcherMetrics = next;
   }
 
@@ -1399,20 +1426,41 @@ PanelWindow {
 
   function resolveFileSearchBackend(callback) {
     if (fileSearchBackend === "fd" || fileSearchBackend === "find" || fileSearchBackend === "none") {
-      callback(fileSearchBackend);
-      return;
+      var now = Date.now();
+      var maxAge = fileSearchBackend === "none" ? fileSearchBackendMissRefreshMs : fileSearchBackendRefreshMs;
+      if ((now - fileSearchBackendResolvedAt) <= Math.max(1000, maxAge)) {
+        callback(fileSearchBackend);
+        return;
+      }
+      fileSearchBackend = "";
+      fileSearchBackendResolvedAt = 0;
+      invalidateCommandAvailability("fd");
+      invalidateCommandAvailability("find");
     }
+    var startedAt = Date.now();
     checkCommandAvailable("fd", function(fdOk) {
       if (fdOk) {
         fileSearchBackend = "fd";
+        fileSearchBackendResolvedAt = Date.now();
+        recordFilesBackendResolveMetric(Date.now() - startedAt);
         callback("fd");
         return;
       }
       checkCommandAvailable("find", function(findOk) {
         fileSearchBackend = findOk ? "find" : "none";
+        fileSearchBackendResolvedAt = Date.now();
+        recordFilesBackendResolveMetric(Date.now() - startedAt);
         callback(fileSearchBackend);
       });
     });
+  }
+
+  function forceRedetectFileSearchBackend() {
+    fileSearchBackend = "";
+    fileSearchBackendResolvedAt = 0;
+    invalidateCommandAvailability("fd");
+    invalidateCommandAvailability("find");
+    resolveFileSearchBackend(function(_) {});
   }
 
   function loadFiles() {
@@ -2051,6 +2099,7 @@ PanelWindow {
       launcherRoot.open("dmenu");
     }
     function clearMetrics() { launcherRoot.clearLauncherMetrics(); }
+    function redetectFilesBackend() { launcherRoot.forceRedetectFileSearchBackend(); }
     function toggle() { if (launcherRoot.launcherOpacity > 0) launcherRoot.close(); else launcherRoot.open(launcherRoot.effectiveDefaultMode()); }
   }
 
@@ -2463,7 +2512,8 @@ PanelWindow {
                     + " • fd/find " + (launcherRoot.launcherMetrics.filesFdLoads || 0) + "/"
                     + (launcherRoot.launcherMetrics.filesFindLoads || 0)
                     + " • fd " + (launcherRoot.launcherMetrics.filesFdAvgMs || 0) + "/" + (launcherRoot.launcherMetrics.filesFdLastMs || 0) + "ms"
-                    + " • find " + (launcherRoot.launcherMetrics.filesFindAvgMs || 0) + "/" + (launcherRoot.launcherMetrics.filesFindLastMs || 0) + "ms") : "")
+                    + " • find " + (launcherRoot.launcherMetrics.filesFindAvgMs || 0) + "/" + (launcherRoot.launcherMetrics.filesFindLastMs || 0) + "ms"
+                    + " • resolve " + (launcherRoot.launcherMetrics.filesResolveAvgMs || 0) + "/" + (launcherRoot.launcherMetrics.filesResolveLastMs || 0) + "ms") : "")
                 color: Colors.textSecondary
                 font.pixelSize: Colors.fontSizeXS
                 elide: Text.ElideRight
