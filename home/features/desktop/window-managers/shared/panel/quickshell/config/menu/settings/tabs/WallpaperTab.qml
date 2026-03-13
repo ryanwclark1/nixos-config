@@ -290,38 +290,16 @@ Item {
             Layout.fillWidth: true
             spacing: Colors.spacingS
 
-            Text {
-                text: "Default wallpaper folder"
-                color: Colors.text
-                font.pixelSize: Colors.fontSizeMedium
-                font.weight: Font.Medium
-            }
-
-            RowLayout {
+            SettingsTextInputRow {
+                id: wallpaperFolderField
                 Layout.fillWidth: true
-                spacing: Colors.spacingS
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    height: 34
-                    radius: Colors.radiusSmall
-                    color: Colors.withAlpha(Colors.surface, 0.7)
-                    border.color: folderInput.activeFocus ? Colors.primary : Colors.border
-                    border.width: 1
-
-                    TextInput {
-                        id: folderInput
-                        anchors.fill: parent
-                        anchors.leftMargin: Colors.spacingM
-                        anchors.rightMargin: Colors.spacingM
-                        verticalAlignment: Text.AlignVCenter
-                        color: Colors.text
-                        text: root.wallpaperFolderInput
-                        clip: true
-                        onTextChanged: root.wallpaperFolderInput = text
-                        onAccepted: root.applyWallpaperFolder()
-                    }
-                }
+                label: "Default wallpaper folder"
+                placeholderText: "~/.config/wallpapers"
+                leadingIcon: "󰉋"
+                text: root.wallpaperFolderInput
+                errorText: root.wallpaperFolderError
+                onTextEdited: value => root.wallpaperFolderInput = value
+                onSubmitted: root.applyWallpaperFolder()
 
                 SettingsActionButton {
                     label: "Apply"
@@ -336,13 +314,6 @@ Item {
                     onClicked: if (root.settingsRoot)
                         root.settingsRoot.pickWallpaperFolder()
                 }
-            }
-
-            Text {
-                visible: root.wallpaperFolderError.length > 0
-                text: root.wallpaperFolderError
-                color: Colors.error
-                font.pixelSize: Colors.fontSizeXS
             }
         }
 
@@ -662,61 +633,21 @@ Item {
         }
 
         // Info callout
-        Rectangle {
-            Layout.fillWidth: true
-            implicitHeight: wpInfoLayout.implicitHeight + 24
-            radius: Colors.radiusMedium
-            color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.07)
-            border.color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.22)
-            border.width: 1
+        SettingsInfoCallout {
+            iconName: "󰋗"
+            title: "Wallpaper search directories"
+            body: "Requires swww, hyprctl hyprpaper, or swaybg to apply wallpapers."
 
-            ColumnLayout {
-                id: wpInfoLayout
-                anchors {
-                    left: parent.left
-                    right: parent.right
-                    top: parent.top
-                    margins: Colors.spacingM
-                }
-                spacing: Colors.spacingS
-
-                RowLayout {
-                    spacing: Colors.spacingS
-                    Text {
-                        text: "󰋗"
-                        color: Colors.primary
-                        font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeLarge
-                        Layout.alignment: Qt.AlignTop
-                    }
-                    Text {
-                        text: "Wallpaper search directories"
-                        color: Colors.text
-                        font.pixelSize: Colors.fontSizeMedium
-                        font.weight: Font.DemiBold
-                    }
-                }
-
-                Repeater {
-                    model: WallpaperService.wallpaperSearchDirs
-                    delegate: Text {
-                        required property string modelData
-                        text: "  " + modelData
-                        color: Colors.fgSecondary
-                        font.pixelSize: Colors.fontSizeXS
-                        font.family: Colors.fontMono
-                        Layout.fillWidth: true
-                        elide: Text.ElideLeft
-                    }
-                }
-
-                Text {
-                    text: "Requires swww, hyprctl hyprpaper, or swaybg to apply wallpapers."
-                    color: Colors.fgDim
+            Repeater {
+                model: WallpaperService.wallpaperSearchDirs
+                delegate: Text {
+                    required property string modelData
+                    text: "  " + modelData
+                    color: Colors.fgSecondary
                     font.pixelSize: Colors.fontSizeXS
-                    wrapMode: Text.WordWrap
+                    font.family: Colors.fontMono
                     Layout.fillWidth: true
-                    Layout.topMargin: 4
+                    elide: Text.ElideLeft
                 }
             }
         }

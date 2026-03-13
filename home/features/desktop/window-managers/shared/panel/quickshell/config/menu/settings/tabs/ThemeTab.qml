@@ -13,7 +13,7 @@ Item {
     property string _themeVariantFilter: ""
 
     function _refreshThemeResults() {
-        _themeResults = ThemeService.searchThemes(themeSearchInput ? themeSearchInput.text : "", _themeVariantFilter);
+        _themeResults = ThemeService.searchThemes(themeSearchField ? themeSearchField.text : "", _themeVariantFilter);
     }
 
     Timer {
@@ -37,47 +37,12 @@ Item {
                 Layout.fillWidth: true
                 spacing: Colors.spacingM
 
-                Rectangle {
+                SettingsTextInputRow {
+                    id: themeSearchField
                     Layout.fillWidth: true
-                    height: 38
-                    radius: Colors.radiusSmall
-                    color: Colors.bgWidget
-                    border.color: themeSearchInput.activeFocus ? Colors.primary : Colors.border
-                    border.width: 1
-
-                    RowLayout {
-                        anchors {
-                            fill: parent
-                            leftMargin: Colors.spacingM
-                            rightMargin: Colors.spacingM
-                        }
-                        spacing: Colors.spacingS
-
-                        Text {
-                            text: "󰍉"
-                            color: Colors.fgDim
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeLarge
-                        }
-
-                        TextInput {
-                            id: themeSearchInput
-                            Layout.fillWidth: true
-                            color: Colors.text
-                            font.pixelSize: Colors.fontSizeMedium
-                            clip: true
-                            property string placeholderText: "Search themes..."
-
-                            Text {
-                                text: parent.placeholderText
-                                color: Colors.fgDim
-                                font.pixelSize: parent.font.pixelSize
-                                visible: !parent.text && !parent.activeFocus
-                            }
-
-                            onTextChanged: _themeRefreshTimer.restart()
-                        }
-                    }
+                    placeholderText: "Search themes..."
+                    leadingIcon: "󰍉"
+                    onTextEdited: _themeRefreshTimer.restart()
                 }
 
                 SharedWidgets.FilterChip {

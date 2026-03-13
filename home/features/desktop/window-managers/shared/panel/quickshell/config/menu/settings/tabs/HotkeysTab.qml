@@ -55,64 +55,12 @@ Item {
             iconName: "󰍉"
             description: "Filter active Hyprland binds by key, modifier, dispatcher, or arguments."
 
-            Rectangle {
+            SettingsTextInputRow {
+                id: keybindsSearchField
                 Layout.fillWidth: true
-                height: 40
-                radius: Colors.radiusSmall
-                color: Colors.bgWidget
-                border.color: keybindsSearch.activeFocus ? Colors.primary : Colors.border
-                border.width: 1
-                Behavior on border.color {
-                    ColorAnimation {
-                        duration: 150
-                    }
-                }
-
-                RowLayout {
-                    anchors {
-                        fill: parent
-                        leftMargin: 12
-                        rightMargin: 12
-                    }
-                    spacing: Colors.spacingS
-
-                    Text {
-                        text: "󰍉"
-                        color: Colors.fgDim
-                        font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeXL
-                    }
-
-                    TextInput {
-                        id: keybindsSearch
-                        Layout.fillWidth: true
-                        color: Colors.text
-                        font.pixelSize: Colors.fontSizeMedium
-                        onTextChanged: root.keybindsFilter = text.toLowerCase()
-
-                        Text {
-                            anchors.fill: parent
-                            text: "Search keybindings..."
-                            color: Colors.fgDim
-                            font.pixelSize: parent.font.pixelSize
-                            visible: parent.text.length === 0
-                        }
-                    }
-
-                    Text {
-                        text: "󰅖"
-                        color: Colors.fgDim
-                        font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeLarge
-                        visible: keybindsSearch.text.length > 0
-
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: keybindsSearch.text = ""
-                        }
-                    }
-                }
+                placeholderText: "Search keybindings..."
+                leadingIcon: "󰍉"
+                onTextEdited: value => root.keybindsFilter = value.toLowerCase()
             }
 
             SettingsActionButton {

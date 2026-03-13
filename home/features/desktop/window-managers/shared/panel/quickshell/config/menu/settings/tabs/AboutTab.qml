@@ -80,43 +80,11 @@ Item {
                     }
                 ]
 
-                delegate: Rectangle {
-                    Layout.fillWidth: true
-                    height: 52
-                    radius: Colors.radiusXS
-                    color: Colors.bgWidget
-                    border.color: Colors.border
-                    border.width: 1
-
-                    RowLayout {
-                        anchors {
-                            fill: parent
-                            leftMargin: Colors.spacingM
-                            rightMargin: Colors.spacingM
-                        }
-                        spacing: Colors.spacingM
-
-                        Text {
-                            text: modelData.icon
-                            color: Colors.primary
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeXL
-                        }
-                        Text {
-                            text: modelData.label
-                            color: Colors.fgSecondary
-                            font.pixelSize: Colors.fontSizeMedium
-                            Layout.preferredWidth: 80
-                        }
-                        Text {
-                            text: modelData.value
-                            color: Colors.text
-                            font.pixelSize: Colors.fontSizeMedium
-                            font.family: Colors.fontMono
-                            elide: Text.ElideRight
-                            Layout.fillWidth: true
-                        }
-                    }
+                delegate: SettingsDataRow {
+                    iconName: modelData.icon
+                    label: modelData.label
+                    value: modelData.value
+                    monoValue: true
                 }
             }
         }

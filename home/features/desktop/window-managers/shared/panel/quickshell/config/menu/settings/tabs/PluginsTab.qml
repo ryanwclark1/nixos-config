@@ -208,21 +208,26 @@ Item {
             iconName: "󰋗"
             description: "Plugin format and discovery location."
 
-            Text {
-                text: "Plugin directory:  ~/.config/quickshell/plugins/"
-                color: Colors.fgSecondary
-                font.pixelSize: Colors.fontSizeSmall
-                font.family: Colors.fontMono
-                Layout.fillWidth: true
-                wrapMode: Text.WrapAnywhere
-            }
+            SettingsInfoCallout {
+                iconName: "󰏗"
+                title: "Plugin directory"
+                body: "~/.config/quickshell/plugins/"
 
-            Text {
-                text: "Each plugin is a folder containing a manifest.json and a QML file.\n" + "manifest.json fields:  id, name, description, author, version, type (\"bar-widget\" or \"desktop-widget\"), main"
-                color: Colors.fgSecondary
-                font.pixelSize: Colors.fontSizeSmall
-                wrapMode: Text.WordWrap
-                Layout.fillWidth: true
+                Text {
+                    text: "Each plugin is a folder containing a manifest.json and a QML file."
+                    color: Colors.fgSecondary
+                    font.pixelSize: Colors.fontSizeSmall
+                    wrapMode: Text.WordWrap
+                    Layout.fillWidth: true
+                }
+
+                Text {
+                    text: "manifest.json fields: id, name, description, author, version, type (\"bar-widget\" or \"desktop-widget\"), main"
+                    color: Colors.fgSecondary
+                    font.pixelSize: Colors.fontSizeSmall
+                    wrapMode: Text.WordWrap
+                    Layout.fillWidth: true
+                }
             }
         }
     }
