@@ -7,15 +7,24 @@ PopupWindow {
 
   property Item anchorItem: null
   property var anchorWindow: null
+  property string preferredEdge: ""
   property bool hovered: false
   property string text: ""
   property int delay: 250
-  property real yOffset: 8
+  property real gap: 8
   property real maxWidth: 280
 
   readonly property string tooltipText: String(text || "").trim()
   readonly property bool hasText: tooltipText.length > 0
   property bool ready: false
+  readonly property string anchorEdge: {
+    if (preferredEdge !== "") return preferredEdge;
+    if (anchorWindow && anchorWindow.tooltipEdge !== undefined && anchorWindow.tooltipEdge !== "")
+      return String(anchorWindow.tooltipEdge);
+    if (anchorWindow && anchorWindow.barConfig && anchorWindow.barConfig.position)
+      return String(anchorWindow.barConfig.position);
+    return "top";
+  }
 
   anchor.window: anchorWindow
   // Compute window-relative coordinates by walking the parent chain.
@@ -34,11 +43,19 @@ PopupWindow {
 
   anchor.rect.x: {
     if (!anchorItem || !anchorItem.width) return 0;
+    if (anchorEdge === "left")
+      return _windowX(anchorItem) + anchorItem.width + gap;
+    if (anchorEdge === "right")
+      return _windowX(anchorItem) - implicitWidth - gap;
     return _windowX(anchorItem) + (anchorItem.width - implicitWidth) / 2;
   }
   anchor.rect.y: {
     if (!anchorItem || !anchorItem.height) return 0;
-    return _windowY(anchorItem) + anchorItem.height + yOffset;
+    if (anchorEdge === "bottom")
+      return _windowY(anchorItem) - implicitHeight - gap;
+    if (anchorEdge === "left" || anchorEdge === "right")
+      return _windowY(anchorItem) + (anchorItem.height - implicitHeight) / 2;
+    return _windowY(anchorItem) + anchorItem.height + gap;
   }
 
   implicitWidth: tooltipBody.width

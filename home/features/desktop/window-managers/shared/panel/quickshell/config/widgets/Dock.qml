@@ -284,6 +284,7 @@ Scope {
           sourceComponent: PanelWindow {
             id: dockWindow
             screen: screenDelegate.modelData
+            property string tooltipEdge: screenDelegate.dockPosition
             anchors.bottom: screenDelegate.isBottom
             anchors.top: screenDelegate.isTop
             anchors.left: screenDelegate.isLeft

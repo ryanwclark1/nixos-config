@@ -27,6 +27,14 @@ Item {
         { key: "bookmarks", label: "Bookmarks", icon: "󰃀" }
     ]
     readonly property var launcherDefaultModes: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
+    readonly property var webProviders: [
+        { key: "duckduckgo", label: "DuckDuckGo", icon: "󰇥" },
+        { key: "google", label: "Google", icon: "󰊯" },
+        { key: "youtube", label: "YouTube", icon: "󰗃" },
+        { key: "nixos", label: "NixOS Packages", icon: "" },
+        { key: "github", label: "GitHub", icon: "󰊤" }
+    ]
+    readonly property var webProviderDefaultOrder: ["duckduckgo", "google", "youtube", "nixos", "github"]
 
     function setEnabledModes(nextModes) {
         var allowed = {};
@@ -140,6 +148,80 @@ Item {
         Config.launcherModeOrder = current.slice();
     }
 
+    function setWebProviderOrder(nextOrder) {
+        var allowed = {};
+        var i;
+        for (i = 0; i < webProviders.length; i++)
+            allowed[webProviders[i].key] = true;
+
+        var out = [];
+        var seen = {};
+        for (i = 0; i < nextOrder.length; i++) {
+            var key = String(nextOrder[i] || "");
+            if (!allowed[key] || seen[key])
+                continue;
+            out.push(key);
+            seen[key] = true;
+        }
+        if (out.length === 0)
+            out = webProviderDefaultOrder.slice();
+        Config.launcherWebProviderOrder = out;
+    }
+
+    function orderedWebProviders() {
+        var order = Array.isArray(Config.launcherWebProviderOrder) ? Config.launcherWebProviderOrder : [];
+        var out = [];
+        var seen = {};
+        var i;
+        for (i = 0; i < order.length; i++) {
+            var key = String(order[i] || "");
+            if (seen[key])
+                continue;
+            for (var j = 0; j < webProviders.length; j++) {
+                if (webProviders[j].key === key) {
+                    out.push(key);
+                    seen[key] = true;
+                    break;
+                }
+            }
+        }
+        for (i = 0; i < webProviderDefaultOrder.length; i++) {
+            var fallbackKey = webProviderDefaultOrder[i];
+            if (!seen[fallbackKey]) {
+                out.push(fallbackKey);
+                seen[fallbackKey] = true;
+            }
+        }
+        return out;
+    }
+
+    function toggleWebProvider(providerKey) {
+        var current = orderedWebProviders();
+        var idx = current.indexOf(providerKey);
+        if (idx >= 0) {
+            if (current.length <= 1)
+                return;
+            current.splice(idx, 1);
+        } else {
+            current.push(providerKey);
+        }
+        setWebProviderOrder(current);
+    }
+
+    function moveWebProvider(providerKey, delta) {
+        var current = orderedWebProviders();
+        var from = current.indexOf(providerKey);
+        if (from < 0)
+            return;
+        var to = Math.max(0, Math.min(current.length - 1, from + delta));
+        if (to === from)
+            return;
+        var moved = current[from];
+        current.splice(from, 1);
+        current.splice(to, 0, moved);
+        setWebProviderOrder(current);
+    }
+
     function resetLauncherDefaults() {
         Config.launcherDefaultMode = "drun";
         Config.launcherShowModeHints = true;
@@ -157,6 +239,9 @@ Item {
         Config.launcherRecentAppsLimit = 6;
         Config.launcherSuggestionsLimit = 4;
         Config.launcherCacheTtlSec = 300;
+        Config.launcherSearchDebounceMs = 35;
+        Config.launcherFileSearchDebounceMs = 140;
+        Config.launcherWebProviderOrder = webProviderDefaultOrder.slice();
         Config.launcherEnabledModes = launcherDefaultModes.slice();
         Config.launcherModeOrder = launcherDefaultModes.slice();
         Config.launcherScoreNameWeight = 1.0;
@@ -348,6 +433,107 @@ Item {
                 value: Config.launcherCacheTtlSec
                 unit: "s"
                 onMoved: v => Config.launcherCacheTtlSec = v
+            }
+
+            SettingsSliderRow {
+                label: "Search Debounce"
+                min: 0
+                max: 250
+                step: 5
+                value: Config.launcherSearchDebounceMs
+                unit: "ms"
+                onMoved: v => Config.launcherSearchDebounceMs = v
+            }
+
+            SettingsSliderRow {
+                label: "File Search Debounce"
+                min: 50
+                max: 1200
+                step: 10
+                value: Config.launcherFileSearchDebounceMs
+                unit: "ms"
+                onMoved: v => Config.launcherFileSearchDebounceMs = v
+            }
+
+            SettingsSectionLabel {
+                text: "WEB PROVIDERS"
+            }
+
+            Flow {
+                Layout.fillWidth: true
+                spacing: Colors.spacingS
+
+                Repeater {
+                    model: root.webProviders
+                    delegate: SharedWidgets.FilterChip {
+                        required property var modelData
+                        label: modelData.label
+                        icon: modelData.icon
+                        selected: root.orderedWebProviders().indexOf(modelData.key) !== -1
+                        onClicked: root.toggleWebProvider(modelData.key)
+                    }
+                }
+            }
+
+            Repeater {
+                model: root.orderedWebProviders()
+
+                delegate: SettingsListRow {
+                    minimumHeight: 44
+
+                    Rectangle {
+                        Layout.alignment: Qt.AlignVCenter
+                        border.color: Colors.border
+                        border.width: 1
+                        color: Colors.surface
+                        implicitHeight: 24
+                        implicitWidth: 24
+                        radius: 12
+
+                        Text {
+                            anchors.centerIn: parent
+                            color: Colors.primary
+                            font.family: Colors.fontMono
+                            font.pixelSize: Colors.fontSizeSmall
+                            text: {
+                                for (var i = 0; i < root.webProviders.length; ++i) {
+                                    if (root.webProviders[i].key === modelData)
+                                        return root.webProviders[i].icon;
+                                }
+                                return "󰖟";
+                            }
+                        }
+                    }
+
+                    Text {
+                        Layout.fillWidth: true
+                        color: Colors.text
+                        elide: Text.ElideRight
+                        font.pixelSize: Colors.fontSizeSmall
+                        font.weight: Font.DemiBold
+                        text: {
+                            for (var i = 0; i < root.webProviders.length; ++i) {
+                                if (root.webProviders[i].key === modelData)
+                                    return root.webProviders[i].label;
+                            }
+                            return modelData;
+                        }
+                    }
+
+                    SettingsActionButton {
+                        compact: true
+                        enabled: index > 0
+                        label: "↑"
+                        onClicked: root.moveWebProvider(modelData, -1)
+                    }
+
+                    SettingsActionButton {
+                        compact: true
+                        enabled: index < (root.orderedWebProviders().length - 1)
+                        label: "↓"
+                        onClicked: root.moveWebProvider(modelData, 1)
+                    }
+                }
             }
 
             SettingsSliderRow {

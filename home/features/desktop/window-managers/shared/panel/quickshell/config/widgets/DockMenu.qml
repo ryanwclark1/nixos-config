@@ -9,9 +9,17 @@ PopupWindow {
 
   property var anchorWindow: null
   anchor.window: anchorWindow
+  property Item anchorItem: null
+  property string preferredEdge: ""
   property var dockRoot: null
   property var appData: null
   property int appIndex: -1
+  readonly property string anchorEdge: {
+    if (preferredEdge !== "") return preferredEdge;
+    if (anchorWindow && anchorWindow.tooltipEdge !== undefined && anchorWindow.tooltipEdge !== "")
+      return String(anchorWindow.tooltipEdge);
+    return "bottom";
+  }
 
   visible: false
   implicitWidth: 200
@@ -26,6 +34,36 @@ PopupWindow {
   property bool showWorkspaceList: false
   readonly property var desktopActions: dockRoot ? dockRoot.getAppActions(appId) : []
 
+  function _windowX(item) {
+    var x = 0;
+    for (var it = item; it; it = it.parent) x += it.x;
+    return x;
+  }
+
+  function _windowY(item) {
+    var y = 0;
+    for (var it = item; it; it = it.parent) y += it.y;
+    return y;
+  }
+
+  anchor.rect.x: {
+    if (!anchorItem) return 0;
+    if (anchorEdge === "left")
+      return _windowX(anchorItem) + anchorItem.width + 8;
+    if (anchorEdge === "right")
+      return _windowX(anchorItem) - implicitWidth - 8;
+    return _windowX(anchorItem) + (anchorItem.width - implicitWidth) / 2;
+  }
+
+  anchor.rect.y: {
+    if (!anchorItem) return 0;
+    if (anchorEdge === "top")
+      return _windowY(anchorItem) + anchorItem.height + 8;
+    if (anchorEdge === "bottom")
+      return _windowY(anchorItem) - implicitHeight - 8;
+    return _windowY(anchorItem) + (anchorItem.height - implicitHeight) / 2;
+  }
+
   function open() {
     visible = true;
   }
@@ -34,6 +72,7 @@ PopupWindow {
     visible = false;
     showWorkspaceList = false;
     appData = null;
+    anchorItem = null;
   }
 
   // Close on click outside

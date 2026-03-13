@@ -225,6 +225,7 @@ Item {
             if (mouse.button === Qt.RightButton) {
               contextMenu.appData = appDelegate.modelData;
               contextMenu.appIndex = appDelegate.index;
+              contextMenu.anchorItem = appDelegate;
               contextMenu.open();
               return;
             }

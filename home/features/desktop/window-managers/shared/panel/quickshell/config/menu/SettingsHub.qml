@@ -8,6 +8,11 @@ import "settings"
 
 PanelWindow {
   id: settingsRoot
+  property var screenRef: Quickshell.cursorScreen || Config.primaryScreen()
+  screen: screenRef
+  readonly property var edgeMargins: Config.reservedEdgesForScreen(screenRef, "")
+  readonly property int usableWidth: Math.max(0, width - edgeMargins.left - edgeMargins.right)
+  readonly property int usableHeight: Math.max(0, height - edgeMargins.top - edgeMargins.bottom)
 
   anchors {
     top: true
@@ -128,9 +133,12 @@ PanelWindow {
   Rectangle {
     id: mainBox
     enabled: !settingsRoot.interactionBlocked
-    width: Math.min(parent.width - 40, 780)
-    height: Math.min(parent.height - 40, 860)
-    anchors.centerIn: parent
+    width: Math.min(Math.max(320, settingsRoot.usableWidth - 40), 780)
+    height: Math.min(Math.max(360, settingsRoot.usableHeight - 40), 860)
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.topMargin: settingsRoot.edgeMargins.top + Math.max(20, (settingsRoot.usableHeight - height) / 2)
+    anchors.leftMargin: settingsRoot.edgeMargins.left + Math.max(20, (settingsRoot.usableWidth - width) / 2)
     color: Colors.bgGlass
     border.color: Colors.border
     border.width: 1

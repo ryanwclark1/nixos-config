@@ -54,6 +54,9 @@ QtObject {
   property int launcherRecentAppsLimit: 6
   property int launcherSuggestionsLimit: 4
   property int launcherCacheTtlSec: 300
+  property int launcherSearchDebounceMs: 35
+  property int launcherFileSearchDebounceMs: 140
+  property var launcherWebProviderOrder: ["duckduckgo", "google", "youtube", "nixos", "github"]
   property var launcherModeOrder: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
   property var launcherEnabledModes: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
   property real launcherScoreNameWeight: 1.0
@@ -258,9 +261,31 @@ QtObject {
     return out;
   }
 
+  function _normalizeWebProviderOrder(list, fallbackList) {
+    var allowed = {
+      "duckduckgo": true,
+      "google": true,
+      "youtube": true,
+      "nixos": true,
+      "github": true
+    };
+    var source = Array.isArray(list) ? list : fallbackList;
+    var out = [];
+    var seen = {};
+    for (var i = 0; i < source.length; ++i) {
+      var provider = String(source[i] || "");
+      if (!allowed[provider] || seen[provider]) continue;
+      out.push(provider);
+      seen[provider] = true;
+    }
+    if (out.length === 0) return fallbackList.slice();
+    return out;
+  }
+
   function normalizeLauncherConfig(data) {
     var launcher = data && data.launcher ? data.launcher : {};
     var fallbackModes = ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"];
+    var fallbackWebProviders = ["duckduckgo", "google", "youtube", "nixos", "github"];
 
     launcherModeOrder = _normalizeModeList(launcher.modeOrder, fallbackModes);
     launcherEnabledModes = _normalizeModeList(launcher.enabledModes, fallbackModes);
@@ -284,6 +309,9 @@ QtObject {
     launcherRecentAppsLimit = _clampInt(launcher.recentAppsLimit, 1, 20, 6);
     launcherSuggestionsLimit = _clampInt(launcher.suggestionsLimit, 1, 20, 4);
     launcherCacheTtlSec = _clampInt(launcher.cacheTtlSec, 10, 3600, 300);
+    launcherSearchDebounceMs = _clampInt(launcher.searchDebounceMs, 0, 250, 35);
+    launcherFileSearchDebounceMs = _clampInt(launcher.fileSearchDebounceMs, 50, 1200, 140);
+    launcherWebProviderOrder = _normalizeWebProviderOrder(launcher.webProviderOrder, fallbackWebProviders);
 
     launcherScoreNameWeight = _clampReal(launcher.scoreNameWeight, 0.1, 4.0, 1.0);
     launcherScoreTitleWeight = _clampReal(launcher.scoreTitleWeight, 0.1, 4.0, 0.92);
@@ -939,6 +967,9 @@ QtObject {
   onLauncherRecentAppsLimitChanged: scheduleSave()
   onLauncherSuggestionsLimitChanged: scheduleSave()
   onLauncherCacheTtlSecChanged: scheduleSave()
+  onLauncherSearchDebounceMsChanged: scheduleSave()
+  onLauncherFileSearchDebounceMsChanged: scheduleSave()
+  onLauncherWebProviderOrderChanged: scheduleSave()
   onLauncherModeOrderChanged: scheduleSave()
   onLauncherEnabledModesChanged: scheduleSave()
   onLauncherScoreNameWeightChanged: scheduleSave()
@@ -1197,6 +1228,9 @@ QtObject {
         "recentAppsLimit": launcherRecentAppsLimit,
         "suggestionsLimit": launcherSuggestionsLimit,
         "cacheTtlSec": launcherCacheTtlSec,
+        "searchDebounceMs": launcherSearchDebounceMs,
+        "fileSearchDebounceMs": launcherFileSearchDebounceMs,
+        "webProviderOrder": launcherWebProviderOrder,
         "modeOrder": launcherModeOrder,
         "enabledModes": launcherEnabledModes,
         "scoreNameWeight": launcherScoreNameWeight,

@@ -9,6 +9,11 @@ import "../widgets" as SharedWidgets
 
 PanelWindow {
   id: displayRoot
+  property var screenRef: Quickshell.cursorScreen || Config.primaryScreen()
+  screen: screenRef
+  readonly property var edgeMargins: Config.reservedEdgesForScreen(screenRef, "")
+  readonly property int usableWidth: Math.max(0, width - edgeMargins.left - edgeMargins.right)
+  readonly property int usableHeight: Math.max(0, height - edgeMargins.top - edgeMargins.bottom)
 
   anchors {
     top: true
@@ -349,12 +354,6 @@ PanelWindow {
     monitorsChanged();
   }
 
-  // ── Keyboard dismiss ──────────────────────────────────────────────
-  Keys.onEscapePressed: {
-    if (countdownActive) { _revertConfig(); _cancelCountdown(); }
-    else close();
-  }
-
   // ── UI ────────────────────────────────────────────────────────────
   // Backdrop
   MouseArea {
@@ -373,9 +372,12 @@ PanelWindow {
   // Main dialog card
   Rectangle {
     id: mainCard
-    width: 740
-    height: 560
-    anchors.centerIn: parent
+    width: Math.min(Math.max(420, displayRoot.usableWidth - 40), 740)
+    height: Math.min(Math.max(420, displayRoot.usableHeight - 40), 560)
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.topMargin: displayRoot.edgeMargins.top + Math.max(20, (displayRoot.usableHeight - height) / 2)
+    anchors.leftMargin: displayRoot.edgeMargins.left + Math.max(20, (displayRoot.usableWidth - width) / 2)
     color: Colors.bgGlass
     border.color: Colors.border
     border.width: 1

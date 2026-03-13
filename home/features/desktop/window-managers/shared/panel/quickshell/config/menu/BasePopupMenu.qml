@@ -18,6 +18,7 @@ PopupWindow {
   property string subtitle: ""
   property color surfaceTint: "transparent"
   property int contentSpacing: 14
+  property string preferredEdge: "top"
 
   // ── Close signal (avoids IPC round-trip) ────
   signal closeRequested()
@@ -56,7 +57,12 @@ PopupWindow {
 
     opacity: root.showContent ? 1.0 : 0.0
     scale: root.showContent ? 1.0 : 0.95
-    transformOrigin: Item.Top
+    transformOrigin: {
+      if (root.preferredEdge === "bottom") return Item.Bottom;
+      if (root.preferredEdge === "left") return Item.Left;
+      if (root.preferredEdge === "right") return Item.Right;
+      return Item.Top;
+    }
     Behavior on opacity { NumberAnimation { id: _opacAnim; duration: 200; easing.type: Easing.OutCubic } }
     Behavior on scale { NumberAnimation { id: _scaleAnim; duration: 250; easing.type: Easing.OutBack; easing.overshoot: 1.2 } }
     layer.enabled: _opacAnim.running || _scaleAnim.running

@@ -183,36 +183,34 @@ Scope {
   function popupAnchorX(context, popupWidth, screenWidth) {
     var trigger = context && context.triggerRect ? context.triggerRect : { x: 16, y: 16, width: 28, height: 28 };
     var position = context && context.position ? context.position : "top";
+    var minX = Config.overlayInset;
+    var maxX = Math.max(minX, screenWidth - popupWidth - Config.overlayInset);
     var x = trigger.x;
 
     if (position === "top" || position === "bottom") {
-      var minX = 8;
-      var maxX = Math.max(minX, screenWidth - popupWidth - 8);
       x = trigger.x + (trigger.width / 2) - (popupWidth / 2);
-      return Math.min(Math.max(minX, x), maxX);
     } else if (position === "left")
       x = trigger.x + trigger.width + Config.popupGap;
     else
       x = trigger.x - popupWidth - Config.popupGap;
 
-    return x;
+    return Math.min(Math.max(minX, x), maxX);
   }
 
   function popupAnchorY(context, popupHeight, screenHeight) {
     var trigger = context && context.triggerRect ? context.triggerRect : { x: 16, y: 16, width: 28, height: 28 };
     var position = context && context.position ? context.position : "top";
+    var minY = Config.overlayInset;
+    var maxY = Math.max(minY, screenHeight - popupHeight - Config.overlayInset);
     var y = trigger.y + trigger.height + Config.popupGap;
 
     if (position === "bottom")
-      return trigger.y - popupHeight - Config.popupGap;
+      y = trigger.y - popupHeight - Config.popupGap;
     else if (position === "left" || position === "right") {
-      var minY = 8;
-      var maxY = Math.max(minY, screenHeight - popupHeight - 8);
       y = trigger.y + (trigger.height / 2) - (popupHeight / 2);
-      return Math.min(Math.max(minY, y), maxY);
     }
 
-    return y;
+    return Math.min(Math.max(minY, y), maxY);
   }
 
   function popupMaxHeight(screenHeight) {
@@ -391,6 +389,7 @@ Scope {
 
               BluetoothMenu {
                 anchor.window: barWindow
+                preferredEdge: barWindow.currentContext ? barWindow.currentContext.position : barWindow.barConfig.position
                 anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
                 anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
                 wantVisible: root.bluetoothMenuVisible && barWindow.isMenuBar
@@ -399,6 +398,7 @@ Scope {
 
               AudioMenu {
                 anchor.window: barWindow
+                preferredEdge: barWindow.currentContext ? barWindow.currentContext.position : barWindow.barConfig.position
                 anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
                 anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
                 wantVisible: root.audioMenuVisible && barWindow.isMenuBar
@@ -407,6 +407,7 @@ Scope {
 
             NetworkMenu {
               anchor.window: barWindow
+              preferredEdge: barWindow.currentContext ? barWindow.currentContext.position : barWindow.barConfig.position
               anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
               anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
               wantVisible: root.networkMenuVisible && barWindow.isMenuBar
@@ -415,6 +416,7 @@ Scope {
 
             ClipboardMenu {
               anchor.window: barWindow
+              preferredEdge: barWindow.currentContext ? barWindow.currentContext.position : barWindow.barConfig.position
               anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
               anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
               wantVisible: root.clipboardMenuVisible && barWindow.isMenuBar
@@ -423,6 +425,7 @@ Scope {
 
             RecordingMenu {
               anchor.window: barWindow
+              preferredEdge: barWindow.currentContext ? barWindow.currentContext.position : barWindow.barConfig.position
               anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
               anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
               wantVisible: root.recordingMenuVisible && barWindow.isMenuBar
@@ -431,6 +434,7 @@ Scope {
 
             PrivacyMenu {
               anchor.window: barWindow
+              preferredEdge: barWindow.currentContext ? barWindow.currentContext.position : barWindow.barConfig.position
               anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
               anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
               wantVisible: root.privacyMenuVisible && barWindow.isMenuBar
@@ -439,6 +443,7 @@ Scope {
 
             MusicMenu {
               anchor.window: barWindow
+              preferredEdge: barWindow.currentContext ? barWindow.currentContext.position : barWindow.barConfig.position
               anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
               anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
               wantVisible: root.musicMenuVisible && barWindow.isMenuBar
@@ -447,6 +452,7 @@ Scope {
 
             BatteryMenu {
               anchor.window: barWindow
+              preferredEdge: barWindow.currentContext ? barWindow.currentContext.position : barWindow.barConfig.position
               anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
               anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
               wantVisible: root.batteryMenuVisible && barWindow.isMenuBar
@@ -455,6 +461,7 @@ Scope {
 
             WeatherMenu {
               anchor.window: barWindow
+              preferredEdge: barWindow.currentContext ? barWindow.currentContext.position : barWindow.barConfig.position
               implicitHeight: Math.min(600, root.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
               anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
               anchor.rect.y: root.popupAnchorY(barWindow.currentContext, implicitHeight, barWindow.screen ? barWindow.screen.height : barWindow.height)
@@ -464,6 +471,7 @@ Scope {
 
             DateTimeMenu {
               anchor.window: barWindow
+              preferredEdge: barWindow.currentContext ? barWindow.currentContext.position : barWindow.barConfig.position
               implicitHeight: Math.min(560, root.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
               anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
               anchor.rect.y: root.popupAnchorY(barWindow.currentContext, implicitHeight, barWindow.screen ? barWindow.screen.height : barWindow.height)
@@ -473,6 +481,7 @@ Scope {
 
             SystemStatsMenu {
               anchor.window: barWindow
+              preferredEdge: barWindow.currentContext ? barWindow.currentContext.position : barWindow.barConfig.position
               anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
               anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
               wantVisible: root.systemStatsMenuVisible && barWindow.isMenuBar
@@ -481,6 +490,7 @@ Scope {
 
             PrinterMenu {
               anchor.window: barWindow
+              preferredEdge: barWindow.currentContext ? barWindow.currentContext.position : barWindow.barConfig.position
               anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
               anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
               wantVisible: root.printerMenuVisible && barWindow.isMenuBar

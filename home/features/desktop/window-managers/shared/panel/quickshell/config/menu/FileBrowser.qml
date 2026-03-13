@@ -9,6 +9,11 @@ import "../widgets" as SharedWidgets
 
 PanelWindow {
   id: root
+  property var screenRef: Quickshell.cursorScreen || Config.primaryScreen()
+  screen: screenRef
+  readonly property var edgeMargins: Config.reservedEdgesForScreen(screenRef, "")
+  readonly property int usableWidth: Math.max(0, width - edgeMargins.left - edgeMargins.right)
+  readonly property int usableHeight: Math.max(0, height - edgeMargins.top - edgeMargins.bottom)
 
   anchors {
     top: true
@@ -289,7 +294,10 @@ PanelWindow {
     height: modalAvailHeight < modalMinHeight
       ? modalAvailHeight
       : Math.min(modalAvailHeight, modalMaxHeight)
-    anchors.centerIn: parent
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.topMargin: root.edgeMargins.top + Math.max(20, (root.usableHeight - height) / 2)
+    anchors.leftMargin: root.edgeMargins.left + Math.max(20, (root.usableWidth - width) / 2)
 
     color: Colors.popupSurface
     border.color: Colors.border

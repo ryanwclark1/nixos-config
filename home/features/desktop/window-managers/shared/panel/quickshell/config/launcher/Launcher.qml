@@ -49,6 +49,9 @@ PanelWindow {
   property var onCommandOutput: null
   property var modeCache: ({})
   property var modeCacheTime: ({})
+  property var fileQueryCache: ({})
+  property var fileQueryCacheTime: ({})
+  property int _lastFilterTriggerMs: 0
   property int openCount: 0
   property int _requestToken: 0
   property var _activeRequests: ({})
@@ -115,6 +118,13 @@ PanelWindow {
     "wallpapers": "󰸉",
     "bookmarks": "󰃀"
   })
+  readonly property var webProviderCatalog: ({
+    "google": { key: "google", name: "Google", exec: "https://www.google.com/search?q=", home: "https://www.google.com/", icon: "󰊯", isWeb: true },
+    "duckduckgo": { key: "duckduckgo", name: "DuckDuckGo", exec: "https://duckduckgo.com/?q=", home: "https://duckduckgo.com/", icon: "󰇥", isWeb: true },
+    "youtube": { key: "youtube", name: "YouTube", exec: "https://www.youtube.com/results?search_query=", home: "https://www.youtube.com/", icon: "󰗃", isWeb: true },
+    "nixos": { key: "nixos", name: "NixOS Packages", exec: "https://search.nixos.org/packages?query=", home: "https://search.nixos.org/packages", icon: "", isWeb: true },
+    "github": { key: "github", name: "GitHub", exec: "https://github.com/search?q=", home: "https://github.com/", icon: "󰊤", isWeb: true }
+  })
   readonly property var launcherShortcuts: ({
     "drun": [
       { icon: "󰀻", label: "Applications", description: "Installed desktop apps" },
@@ -161,8 +171,10 @@ PanelWindow {
   }
   readonly property string emptyPrimaryCta: {
     var clean = stripModePrefix(searchText).trim();
+    var webPrimary = primaryWebProvider();
+    var webPrimaryName = webPrimary ? webPrimary.name : "Web";
     if (mode === "files") return "Open Home";
-    if (mode === "web") return clean !== "" ? "Search Web" : "Open DuckDuckGo";
+    if (mode === "web") return clean !== "" ? "Search " + webPrimaryName : "Open " + webPrimaryName;
     if (mode === "ai") return clean.length >= 3 ? "Ask AI" : "Switch to Apps";
     if (mode === "run") return clean !== "" ? "Run Command" : "Switch to Apps";
     if (mode === "window") return "Open Apps";
@@ -172,16 +184,20 @@ PanelWindow {
   }
   readonly property string emptySecondaryCta: {
     var clean = stripModePrefix(searchText).trim();
+    var webSecondary = secondaryWebProvider();
+    var webSecondaryName = webSecondary ? webSecondary.name : "Google";
     if (mode === "files") return "Open Folder";
-    if (mode === "web") return clean !== "" ? "Search Google" : "Open Google";
+    if (mode === "web") return clean !== "" ? "Search " + webSecondaryName : "Open " + webSecondaryName;
     if (mode === "system") return "Open Controls";
     if (mode === "run") return clean !== "" ? "Run In Terminal" : "Open Terminal";
     return searchText !== "" ? "Clear Query" : "";
   }
   readonly property string emptyPrimaryHint: {
     var clean = stripModePrefix(searchText).trim();
+    var webPrimary = primaryWebProvider();
+    var webPrimaryName = webPrimary ? webPrimary.name : "default provider";
     if (mode === "files") return "Open your home directory in the default file manager.";
-    if (mode === "web") return clean !== "" ? "Search DuckDuckGo using the current query." : "Open DuckDuckGo homepage.";
+    if (mode === "web") return clean !== "" ? "Search " + webPrimaryName + " using the current query." : "Open " + webPrimaryName + " homepage.";
     if (mode === "ai") return clean.length >= 3 ? "Send prompt to AI helper and show copyable result." : "Switch back to app launcher mode.";
     if (mode === "run") return clean !== "" ? "Execute command directly in shell." : "Switch back to app launcher mode.";
     if (mode === "system") return "Switch back to app launcher mode.";
@@ -198,8 +214,10 @@ PanelWindow {
   }
   readonly property string emptySecondaryHint: {
     var clean = stripModePrefix(searchText).trim();
+    var webSecondary = secondaryWebProvider();
+    var webSecondaryName = webSecondary ? webSecondary.name : "Google";
     if (mode === "files") return clean !== "" ? "Open folder target derived from query path." : "Open your home directory.";
-    if (mode === "web") return clean !== "" ? "Search Google using the current query." : "Open Google homepage.";
+    if (mode === "web") return clean !== "" ? "Search " + webSecondaryName + " using the current query." : "Open " + webSecondaryName + " homepage.";
     if (mode === "system") return "Open quickshell control center panel.";
     if (mode === "run") return clean !== "" ? "Run command inside terminal for interactive output." : "Open terminal app.";
     if (searchText !== "") return "Clear the current query text.";
@@ -325,6 +343,20 @@ PanelWindow {
     id: preloadDelayTimer
     interval: 100
     onTriggered: launcherRoot.startPreload()
+  }
+
+  Timer {
+    id: searchDebounceTimer
+    interval: Math.max(0, Config.launcherSearchDebounceMs)
+    repeat: false
+    onTriggered: launcherRoot.applySearchRefresh(false)
+  }
+
+  Timer {
+    id: fileSearchDebounceTimer
+    interval: Math.max(50, Config.launcherFileSearchDebounceMs)
+    repeat: false
+    onTriggered: launcherRoot.applySearchRefresh(true)
   }
 
   Component {
@@ -558,6 +590,41 @@ PanelWindow {
     return text;
   }
 
+  function configuredWebProviders() {
+    var fallback = ["duckduckgo", "google", "youtube", "nixos", "github"];
+    var order = Array.isArray(Config.launcherWebProviderOrder) ? Config.launcherWebProviderOrder : fallback;
+    var out = [];
+    var seen = ({});
+    for (var i = 0; i < order.length; ++i) {
+      var key = String(order[i] || "");
+      var provider = webProviderCatalog[key];
+      if (!provider || seen[key])
+        continue;
+      out.push(provider);
+      seen[key] = true;
+    }
+    if (out.length === 0) {
+      for (var j = 0; j < fallback.length; ++j) {
+        var fallbackProvider = webProviderCatalog[fallback[j]];
+        if (fallbackProvider)
+          out.push(fallbackProvider);
+      }
+    }
+    return out;
+  }
+
+  function primaryWebProvider() {
+    var list = configuredWebProviders();
+    return list.length > 0 ? list[0] : null;
+  }
+
+  function secondaryWebProvider() {
+    var list = configuredWebProviders();
+    if (list.length <= 1)
+      return null;
+    return list[1];
+  }
+
   function shellQuote(text) {
     return "'" + String(text || "").replace(/'/g, "'\\''") + "'";
   }
@@ -615,6 +682,35 @@ PanelWindow {
   function clearCaches() {
     modeCache = ({});
     modeCacheTime = ({});
+    fileQueryCache = ({});
+    fileQueryCacheTime = ({});
+  }
+
+  function getFileQueryCached(queryKey) {
+    var items = fileQueryCache[queryKey];
+    if (!items)
+      return null;
+    var ttlMs = Math.max(1, Config.launcherCacheTtlSec) * 1000;
+    var last = fileQueryCacheTime[queryKey] || 0;
+    if (Date.now() - last > ttlMs) {
+      var nextCache = Object.assign({}, fileQueryCache);
+      var nextTimes = Object.assign({}, fileQueryCacheTime);
+      delete nextCache[queryKey];
+      delete nextTimes[queryKey];
+      fileQueryCache = nextCache;
+      fileQueryCacheTime = nextTimes;
+      return null;
+    }
+    return items;
+  }
+
+  function setFileQueryCached(queryKey, items) {
+    var nextCache = Object.assign({}, fileQueryCache);
+    var nextTimes = Object.assign({}, fileQueryCacheTime);
+    nextCache[queryKey] = items;
+    nextTimes[queryKey] = Date.now();
+    fileQueryCache = nextCache;
+    fileQueryCacheTime = nextTimes;
   }
 
   function modeMetric(modeKey) {
@@ -811,6 +907,8 @@ PanelWindow {
     openCount++;
     if (openCount % 10 === 0) clearCaches();
     ignoreMouseHover = true;
+    searchDebounceTimer.stop();
+    fileSearchDebounceTimer.stop();
     mouseTrackingReady = false;
     globalMouseInitialized = false;
     mouseTrackingDelayTimer.restart();
@@ -866,6 +964,8 @@ PanelWindow {
     scaleValue = 0.95;
     ignoreMouseHover = true;
     mouseTrackingDelayTimer.stop();
+    searchDebounceTimer.stop();
+    fileSearchDebounceTimer.stop();
     preloadDelayTimer.stop();
     preloadWaitTimer.stop();
     var _keys = Object.keys(_preloadProcs);
@@ -1043,6 +1143,14 @@ PanelWindow {
       filterItems();
       return;
     }
+    var cacheKey = String(searchQuery).toLowerCase();
+    var cachedItems = getFileQueryCached(cacheKey);
+    if (cachedItems) {
+      allItems = cachedItems;
+      filterItems();
+      recordLoadMetric("files", 0, true, true);
+      return;
+    }
     var token = beginRequest("files");
     var startedAt = Date.now();
     var homeDir = Quickshell.env("HOME") || "/";
@@ -1064,6 +1172,7 @@ PanelWindow {
         }
       }
       allItems = items;
+      setFileQueryCached(cacheKey, items);
       filterItems();
       recordLoadMetric("files", Date.now() - startedAt, false, true);
     });
@@ -1092,13 +1201,7 @@ PanelWindow {
   }
 
   function loadWeb() {
-    allItems = [
-      { name: "Google", exec: "https://www.google.com/search?q=", home: "https://www.google.com/", icon: "󰊯", isWeb: true },
-      { name: "DuckDuckGo", exec: "https://duckduckgo.com/?q=", home: "https://duckduckgo.com/", icon: "󰇥", isWeb: true },
-      { name: "YouTube", exec: "https://www.youtube.com/results?search_query=", home: "https://www.youtube.com/", icon: "󰗃", isWeb: true },
-      { name: "NixOS Packages", exec: "https://search.nixos.org/packages?query=", home: "https://search.nixos.org/packages", icon: "", isWeb: true },
-      { name: "GitHub", exec: "https://github.com/search?q=", home: "https://github.com/", icon: "󰊤", isWeb: true }
-    ];
+    allItems = configuredWebProviders();
     filterItems();
   }
 
@@ -1275,6 +1378,37 @@ PanelWindow {
     selectedIndex = Math.min(selectedIndex, Math.max(0, filteredItems.length - 1));
   }
 
+  function scheduleSearchRefresh(forceNow) {
+    if (forceNow === true) {
+      applySearchRefresh(mode === "files");
+      return;
+    }
+    if (mode === "files") {
+      searchDebounceTimer.stop();
+      if (Config.launcherFileSearchDebounceMs <= 50) {
+        applySearchRefresh(true);
+      } else {
+        fileSearchDebounceTimer.restart();
+      }
+      return;
+    }
+    fileSearchDebounceTimer.stop();
+    if (Config.launcherSearchDebounceMs <= 0 || mode === "calc") {
+      applySearchRefresh(false);
+      return;
+    }
+    searchDebounceTimer.restart();
+  }
+
+  function applySearchRefresh(isFileRefresh) {
+    _lastFilterTriggerMs = Date.now();
+    if (isFileRefresh === true || mode === "files") {
+      loadFiles();
+      return;
+    }
+    filterItems();
+  }
+
   function copyToClipboard(text) {
     Quickshell.execDetached(["bash", "-lc", "printf %s " + shellQuote(text) + " | wl-copy"]);
   }
@@ -1320,9 +1454,12 @@ PanelWindow {
       return;
     }
     if (mode === "web") {
-      var url = "https://duckduckgo.com/";
-      if (clean !== "")
-        url += "?q=" + encodeURIComponent(clean);
+      var primary = primaryWebProvider();
+      var url = primary ? String(primary.home || "") : "";
+      if (url === "")
+        url = "https://duckduckgo.com/";
+      if (clean !== "" && primary && primary.exec)
+        url = String(primary.exec) + encodeURIComponent(clean);
       Quickshell.execDetached(["xdg-open", url]);
       close();
       return;
@@ -1357,10 +1494,13 @@ PanelWindow {
       return;
     }
     if (mode === "web") {
-      var google = "https://www.google.com/";
-      if (clean !== "")
-        google += "search?q=" + encodeURIComponent(clean);
-      Quickshell.execDetached(["xdg-open", google]);
+      var secondary = secondaryWebProvider();
+      var secondaryUrl = secondary ? String(secondary.home || "") : "";
+      if (secondaryUrl === "")
+        secondaryUrl = "https://www.google.com/";
+      if (clean !== "" && secondary && secondary.exec)
+        secondaryUrl = String(secondary.exec) + encodeURIComponent(clean);
+      Quickshell.execDetached(["xdg-open", secondaryUrl]);
       close();
       return;
     }
@@ -1668,7 +1808,7 @@ PanelWindow {
                 else if (text.startsWith("/") && launcherRoot.mode !== "files") launcherRoot.open("files", true);
                 if (launcherRoot.searchText !== text) {
                   launcherRoot.searchText = text;
-                  launcherRoot.filterItems();
+                  launcherRoot.scheduleSearchRefresh(false);
                 }
               }
               Keys.onPressed: (event) => {
@@ -1689,7 +1829,7 @@ PanelWindow {
                   if ((event.modifiers & Qt.ControlModifier) && launcherRoot.mode === "web" && launcherRoot.filteredItems.length > 0) launcherRoot.openSelectedWebHomepage();
                   else if ((event.modifiers & Qt.ShiftModifier) && launcherRoot.filteredItems.length === 0 && launcherRoot.emptySecondaryCta !== "") launcherRoot.executeEmptySecondary();
                   else if (launcherRoot.mode === "ai" && launcherRoot.filteredItems.length === 0) launcherRoot.loadAi();
-                  else if (launcherRoot.mode === "files" && launcherRoot.searchText.length > 1 && launcherRoot.filteredItems.length === 0) launcherRoot.loadFiles();
+                  else if (launcherRoot.mode === "files" && launcherRoot.stripModePrefix(launcherRoot.searchText).trim().length >= Config.launcherFileMinQueryLength && launcherRoot.filteredItems.length === 0) launcherRoot.loadFiles();
                   else if (launcherRoot.filteredItems.length === 0) launcherRoot.executeEmptyPrimary();
                   else launcherRoot.executeSelection();
                 } else if (event.key === Qt.Key_Up) {

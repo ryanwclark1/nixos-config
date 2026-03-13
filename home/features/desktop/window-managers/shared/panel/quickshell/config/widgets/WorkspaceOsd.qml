@@ -49,6 +49,9 @@ Scope {
         id: osdWindow
         required property ShellScreen modelData
         screen: modelData
+        readonly property var edgeMargins: Config.reservedEdgesForScreen(modelData, "")
+        readonly property int usableWidth: Math.max(0, screen.width - edgeMargins.left - edgeMargins.right)
+        readonly property int usableHeight: Math.max(0, screen.height - edgeMargins.top - edgeMargins.bottom)
 
         // Delayed unmap: stay mapped briefly after hide for fade-out
         property bool _wantVisible: root.shouldShowOsd && (Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name === modelData.name : true)
@@ -60,9 +63,9 @@ Scope {
 
         // PanelWindow anchoring doesn't support centerIn; place it manually instead.
         anchors.top: true
-        margins.top: screen.height / 2 - implicitHeight / 2
+        margins.top: edgeMargins.top + Math.max(0, (usableHeight - implicitHeight) / 2)
         anchors.left: true
-        margins.left: screen.width / 2 - implicitWidth / 2
+        margins.left: edgeMargins.left + Math.max(0, (usableWidth - implicitWidth) / 2)
 
         exclusiveZone: 0
 
