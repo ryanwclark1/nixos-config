@@ -27,7 +27,9 @@ Rectangle {
         }
         spacing: Colors.spacingS
 
-        RowLayout {
+        Flow {
+            Layout.fillWidth: true
+            width: parent.width
             spacing: Colors.spacingS
 
             Text {
@@ -40,12 +42,13 @@ Rectangle {
             }
 
             Text {
+                width: root.iconName !== "" ? Math.max(0, parent.width - Colors.fontSizeLarge - Colors.spacingS) : parent.width
                 visible: root.title !== ""
                 text: root.title
                 color: Colors.text
                 font.pixelSize: Colors.fontSizeMedium
                 font.weight: Font.DemiBold
-                Layout.fillWidth: true
+                wrapMode: Text.WordWrap
             }
         }
 

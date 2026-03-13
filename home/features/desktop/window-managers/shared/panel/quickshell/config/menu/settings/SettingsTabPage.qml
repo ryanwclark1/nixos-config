@@ -35,8 +35,9 @@ SharedWidgets.ScrollableContent {
             Layout.fillWidth: true
             spacing: Colors.spacingXS
 
-            RowLayout {
+            Flow {
                 Layout.fillWidth: true
+                width: parent.width
                 spacing: Colors.spacingS
 
                 Text {
@@ -48,12 +49,13 @@ SharedWidgets.ScrollableContent {
                 }
 
                 Text {
-                    Layout.fillWidth: true
+                    width: root.iconName ? Math.max(0, parent.width - Colors.fontSizeXL - Colors.spacingS) : parent.width
                     text: root.title
                     color: Colors.text
                     font.pixelSize: Colors.fontSizeHuge
                     font.weight: Font.Bold
                     font.letterSpacing: -0.5
+                    wrapMode: Text.WordWrap
                 }
             }
 

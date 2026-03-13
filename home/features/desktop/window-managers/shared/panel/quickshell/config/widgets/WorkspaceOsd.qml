@@ -38,7 +38,7 @@ Scope {
   Timer {
     id: pollTimer
     interval: 400
-    running: CompositorAdapter.isHyprland
+    running: CompositorAdapter.supportsWorkspaceOsd
     repeat: true
     triggeredOnStart: true
     onTriggered: workspaceProc.running = true
@@ -47,7 +47,7 @@ Scope {
   Process {
     id: workspaceProc
     running: false
-    command: ["sh", "-c", "hyprctl activeworkspace -j 2>/dev/null | jq -r '.name // empty'"]
+    command: CompositorAdapter.activeWorkspaceNameCommand()
     stdout: StdioCollector {
       onStreamFinished: {
         root.updateWorkspace((this.text || "").trim());
@@ -67,7 +67,7 @@ Scope {
         readonly property int usableWidth: Math.max(0, screen.width - edgeMargins.left - edgeMargins.right)
         readonly property int usableHeight: Math.max(0, screen.height - edgeMargins.top - edgeMargins.bottom)
 
-        property bool _wantVisible: CompositorAdapter.isHyprland && root.shouldShowOsd
+        property bool _wantVisible: CompositorAdapter.supportsWorkspaceOsd && root.shouldShowOsd
         visible: _wantVisible || unmapDelay.running
         on_WantVisibleChanged: {
           if (!_wantVisible) unmapDelay.restart();

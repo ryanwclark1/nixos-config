@@ -300,13 +300,14 @@ Item {
                     }
                 }
 
-                RowLayout {
+                Flow {
                     Layout.fillWidth: true
+                    width: parent.width
                     spacing: Colors.spacingM
 
                     SettingsTextInputRow {
                         id: weatherLatInput
-                        Layout.fillWidth: true
+                        width: root.compactMode ? parent.width : Math.max(220, (parent.width - Colors.spacingM) / 2)
                         label: "Latitude"
                         placeholderText: "40.7128"
                         leadingIcon: "󰍐"
@@ -321,7 +322,7 @@ Item {
 
                     SettingsTextInputRow {
                         id: weatherLonInput
-                        Layout.fillWidth: true
+                        width: root.compactMode ? parent.width : Math.max(220, (parent.width - Colors.spacingM) / 2)
                         label: "Longitude"
                         placeholderText: "-74.0060"
                         leadingIcon: "󰍐"

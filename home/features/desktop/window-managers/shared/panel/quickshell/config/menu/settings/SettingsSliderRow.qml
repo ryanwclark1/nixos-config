@@ -15,6 +15,7 @@ ColumnLayout {
 
     readonly property real _range: max - min
     readonly property real _ratio: _range > 0 ? (value - min) / _range : 0
+    readonly property bool narrowLayout: width < 420
 
     function _displayValue() {
         if (root.unit === "ms")
@@ -48,19 +49,21 @@ ColumnLayout {
     spacing: Colors.spacingS
     Layout.fillWidth: true
 
-    RowLayout {
+    Flow {
         Layout.fillWidth: true
+        width: parent.width
 
         Text {
+            width: root.narrowLayout ? parent.width : Math.max(0, parent.width - sliderValuePill.implicitWidth - Colors.spacingM)
             text: root.label
             color: Colors.text
             font.pixelSize: Colors.fontSizeMedium
             font.weight: Font.Medium
-            Layout.fillWidth: true
-            elide: Text.ElideRight
+            wrapMode: Text.WordWrap
         }
 
         Rectangle {
+            id: sliderValuePill
             implicitHeight: 24
             implicitWidth: valueText.implicitWidth + 14
             radius: 12
@@ -146,18 +149,17 @@ ColumnLayout {
         }
     }
 
-    RowLayout {
+    Flow {
         Layout.fillWidth: true
+        width: parent.width
+        spacing: Colors.spacingS
 
         Text {
+            width: root.narrowLayout ? parent.width : undefined
             text: root._displayBound(root.min) + root.unit
             color: Colors.textDisabled
             font.pixelSize: Colors.fontSizeXS
             font.family: Colors.fontMono
-        }
-
-        Item {
-            Layout.fillWidth: true
         }
 
         Text {

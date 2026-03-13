@@ -13,7 +13,7 @@ Rectangle {
   property var anchorWindow: null
   property var state: ({ workspaces: [], activeWorkspace: -1 })
 
-  readonly property bool workspaceApiAvailable: CompositorAdapter.isHyprland || CompositorAdapter.isNiri
+  readonly property bool workspaceApiAvailable: CompositorAdapter.supportsWorkspaceListing
   width: workspaceApiAvailable && state.workspaces.length > 0 ? (strip.implicitWidth + 12) : 0
   visible: width > 0
 
@@ -88,17 +88,7 @@ Rectangle {
   }
 
   function workspaceQueryCommand() {
-    if (CompositorAdapter.isHyprland) {
-      return [
-        "sh",
-        "-c",
-        "hyprctl workspaces -j 2>/dev/null; printf '\\n'; hyprctl activeworkspace -j 2>/dev/null"
-      ];
-    }
-    if (CompositorAdapter.isNiri) {
-      return ["niri", "msg", "-j", "workspaces"];
-    }
-    return ["sh", "-c", "echo '[]'"];
+    return CompositorAdapter.workspaceListCommand();
   }
 
   Timer {
@@ -119,9 +109,25 @@ Rectangle {
     command: root.workspaceQueryCommand()
     stdout: StdioCollector {
       onStreamFinished: {
-        if (CompositorAdapter.isHyprland) root.updateStateFromHypr(this.text || "");
-        else if (CompositorAdapter.isNiri) root.updateStateFromNiri(this.text || "");
-        else root.state = ({ workspaces: [], activeWorkspace: -1 });
+        var raw = String(this.text || "").trim();
+        if (raw === "") {
+          root.state = ({ workspaces: [], activeWorkspace: -1 });
+          return;
+        }
+
+        // Niri responses are valid JSON (array/object), while Hyprland polling
+        // emits two JSON documents separated by a newline.
+        try {
+          JSON.parse(raw);
+          root.updateStateFromNiri(raw);
+          return;
+        } catch (e) {}
+
+        if (raw.indexOf("\n") !== -1) {
+          root.updateStateFromHypr(raw);
+          return;
+        }
+        root.state = ({ workspaces: [], activeWorkspace: -1 });
       }
     }
   }

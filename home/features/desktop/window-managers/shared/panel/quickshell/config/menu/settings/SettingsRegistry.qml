@@ -42,10 +42,7 @@ QtObject {
   function isTabSupported(tab) {
     if (!tab) return false;
     var needs = tab.compositor || "any";
-    if (needs === "any") return true;
-    if (needs === "hyprland") return CompositorAdapter.isHyprland;
-    if (needs === "niri") return CompositorAdapter.isNiri;
-    return true;
+    return CompositorAdapter.matchesCompositorTag(needs);
   }
 
   function supportedTabs() {

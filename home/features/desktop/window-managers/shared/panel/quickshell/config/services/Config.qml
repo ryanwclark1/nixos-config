@@ -56,6 +56,7 @@ QtObject {
   property int launcherCacheTtlSec: 300
   property int launcherSearchDebounceMs: 35
   property int launcherFileSearchDebounceMs: 140
+  property string launcherTabBehavior: "contextual"
   property bool launcherWebEnterUsesPrimary: true
   property bool launcherWebNumberHotkeysEnabled: true
   property var launcherWebAliases: ({
@@ -368,6 +369,8 @@ QtObject {
     launcherCacheTtlSec = _clampInt(launcher.cacheTtlSec, 10, 3600, 300);
     launcherSearchDebounceMs = _clampInt(launcher.searchDebounceMs, 0, 250, 35);
     launcherFileSearchDebounceMs = _clampInt(launcher.fileSearchDebounceMs, 50, 1200, 140);
+    var tabBehavior = String(launcher.tabBehavior || "contextual");
+    launcherTabBehavior = ["contextual", "results", "mode"].indexOf(tabBehavior) !== -1 ? tabBehavior : "contextual";
     launcherWebEnterUsesPrimary = _asBool(launcher.webEnterUsesPrimary, true);
     launcherWebNumberHotkeysEnabled = _asBool(launcher.webNumberHotkeysEnabled, true);
     launcherWebAliases = _normalizeWebAliases(launcher.webAliases, {
@@ -1039,6 +1042,7 @@ QtObject {
   onLauncherCacheTtlSecChanged: scheduleSave()
   onLauncherSearchDebounceMsChanged: scheduleSave()
   onLauncherFileSearchDebounceMsChanged: scheduleSave()
+  onLauncherTabBehaviorChanged: scheduleSave()
   onLauncherWebEnterUsesPrimaryChanged: scheduleSave()
   onLauncherWebNumberHotkeysEnabledChanged: scheduleSave()
   onLauncherWebAliasesChanged: scheduleSave()
@@ -1305,6 +1309,7 @@ QtObject {
         "cacheTtlSec": launcherCacheTtlSec,
         "searchDebounceMs": launcherSearchDebounceMs,
         "fileSearchDebounceMs": launcherFileSearchDebounceMs,
+        "tabBehavior": launcherTabBehavior,
         "webEnterUsesPrimary": launcherWebEnterUsesPrimary,
         "webNumberHotkeysEnabled": launcherWebNumberHotkeysEnabled,
         "webAliases": launcherWebAliases,

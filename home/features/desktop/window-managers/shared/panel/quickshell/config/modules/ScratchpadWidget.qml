@@ -8,11 +8,11 @@ SharedWidgets.CardBase {
   id: root
   readonly property var allToplevels: (typeof ToplevelManager !== "undefined" && ToplevelManager.toplevels) ? (ToplevelManager.toplevels.values || []) : []
   Layout.preferredHeight: root.scratchpadWindows.length > 0 ? col.implicitHeight + 30 : 0
-  visible: CompositorAdapter.isHyprland && root.scratchpadWindows.length > 0
+  visible: CompositorAdapter.supportsScratchpad && root.scratchpadWindows.length > 0
 
   readonly property var scratchpadWindows: {
     var windows = [];
-    if (!CompositorAdapter.isHyprland) return windows;
+    if (!CompositorAdapter.supportsScratchpad) return windows;
     for (var i = 0; i < allToplevels.length; i++) {
       var win = allToplevels[i];
       if (!win) continue;
@@ -25,7 +25,7 @@ SharedWidgets.CardBase {
   }
 
   function summonWindow(address) {
-    if (!CompositorAdapter.isHyprland) return;
+    if (!CompositorAdapter.supportsScratchpad) return;
     var targetWorkspace = "1";
     Quickshell.execDetached(["hyprctl", "dispatch", "movetoworkspace", targetWorkspace + ",address:" + address]);
     Quickshell.execDetached(["hyprctl", "dispatch", "focuswindow", "address:" + address]);

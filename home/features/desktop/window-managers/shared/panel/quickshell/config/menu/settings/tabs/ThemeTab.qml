@@ -115,7 +115,7 @@ Item {
                     Item {
                         id: themeCardWrapper
                         width: Math.max(220, Math.floor((themeFlow.width - Colors.spacingXS * (root._themeColumns - 1)) / root._themeColumns))
-                        height: 48
+                        height: themeCardLayout.implicitHeight + Colors.spacingS * 2
 
                         property var _theme: modelData
                         property bool _themeIsActive: _theme.id === Config.themeName
@@ -144,41 +144,55 @@ Item {
                                 }
                             }
 
-                            RowLayout {
+                            ColumnLayout {
+                                id: themeCardLayout
                                 anchors {
                                     fill: parent
                                     leftMargin: Colors.spacingM
                                     rightMargin: Colors.spacingM
+                                    topMargin: Colors.spacingS
+                                    bottomMargin: Colors.spacingS
                                 }
-                                spacing: Colors.spacingS
+                                spacing: Colors.spacingXS
 
-                                Text {
-                                    text: "󰄬"
-                                    color: Colors.primary
-                                    font.family: Colors.fontMono
-                                    font.pixelSize: Colors.fontSizeLarge
-                                    visible: themeCardWrapper._themeIsActive
-                                }
-
-                                Text {
-                                    text: themeCardWrapper._theme.name
-                                    color: themeCardWrapper._themeIsActive ? Colors.primary : Colors.text
-                                    font.pixelSize: Colors.fontSizeMedium
-                                    font.weight: themeCardWrapper._themeIsActive ? Font.DemiBold : Font.Normal
-                                    elide: Text.ElideRight
+                                RowLayout {
                                     Layout.fillWidth: true
+                                    spacing: Colors.spacingS
+
+                                    Text {
+                                        text: "󰄬"
+                                        color: Colors.primary
+                                        font.family: Colors.fontMono
+                                        font.pixelSize: Colors.fontSizeLarge
+                                        visible: themeCardWrapper._themeIsActive
+                                    }
+
+                                    Text {
+                                        text: themeCardWrapper._theme.name
+                                        color: themeCardWrapper._themeIsActive ? Colors.primary : Colors.text
+                                        font.pixelSize: Colors.fontSizeMedium
+                                        font.weight: themeCardWrapper._themeIsActive ? Font.DemiBold : Font.Normal
+                                        elide: Text.ElideRight
+                                        Layout.fillWidth: true
+                                    }
                                 }
 
-                                Repeater {
-                                    model: [themeCardWrapper._theme.palette.base00, themeCardWrapper._theme.palette.base08, themeCardWrapper._theme.palette.base0B, themeCardWrapper._theme.palette.base0D, themeCardWrapper._theme.palette.base0E, themeCardWrapper._theme.palette.base05]
+                                Flow {
+                                    Layout.fillWidth: true
+                                    width: parent.width
+                                    spacing: Colors.spacingXS
 
-                                    delegate: Rectangle {
-                                        width: 14
-                                        height: 14
-                                        radius: 7
-                                        color: modelData
-                                        border.color: Colors.withAlpha(Colors.text, 0.15)
-                                        border.width: 1
+                                    Repeater {
+                                        model: [themeCardWrapper._theme.palette.base00, themeCardWrapper._theme.palette.base08, themeCardWrapper._theme.palette.base0B, themeCardWrapper._theme.palette.base0D, themeCardWrapper._theme.palette.base0E, themeCardWrapper._theme.palette.base05]
+
+                                        delegate: Rectangle {
+                                            width: 14
+                                            height: 14
+                                            radius: 7
+                                            color: modelData
+                                            border.color: Colors.withAlpha(Colors.text, 0.15)
+                                            border.width: 1
+                                        }
                                     }
                                 }
                             }

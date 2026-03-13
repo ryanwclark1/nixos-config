@@ -15,6 +15,7 @@ Rectangle {
     signal toggled
 
     readonly property bool _active: configKey ? Config[configKey] : root.checked
+    readonly property bool narrowLayout: width < 420
 
     function triggerToggle() {
         if (root.configKey)
@@ -24,7 +25,7 @@ Rectangle {
     }
 
     Layout.fillWidth: true
-    implicitHeight: 72
+    implicitHeight: toggleContent.implicitHeight + Colors.spacingM * 2
     radius: Colors.radiusMedium
     color: Colors.bgWidget
     border.color: root._active ? Colors.primary : Colors.border
@@ -48,32 +49,33 @@ Rectangle {
         stateColor: Colors.primary
     }
 
-    RowLayout {
+    ColumnLayout {
+        id: toggleContent
         anchors.fill: parent
         anchors.margins: Colors.spacingM
-        spacing: Colors.spacingM
+        spacing: Colors.spacingS
 
-        Rectangle {
-            width: 38
-            height: 38
-            radius: Colors.radiusSmall
-            color: root._active ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.14) : Colors.withAlpha(Colors.text, 0.06)
-            border.color: root._active ? Colors.withAlpha(Colors.primary, 0.6) : Colors.border
-            border.width: 1
-            Layout.alignment: Qt.AlignVCenter
-
-            Text {
-                anchors.centerIn: parent
-                text: root.icon
-                color: root._active ? Colors.primary : Colors.textSecondary
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeXL
-            }
-        }
-
-        ColumnLayout {
+        RowLayout {
             Layout.fillWidth: true
-            spacing: 2
+            spacing: Colors.spacingM
+
+            Rectangle {
+                width: 38
+                height: 38
+                radius: Colors.radiusSmall
+                color: root._active ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.14) : Colors.withAlpha(Colors.text, 0.06)
+                border.color: root._active ? Colors.withAlpha(Colors.primary, 0.6) : Colors.border
+                border.width: 1
+                Layout.alignment: Qt.AlignTop
+
+                Text {
+                    anchors.centerIn: parent
+                    text: root.icon
+                    color: root._active ? Colors.primary : Colors.textSecondary
+                    font.family: Colors.fontMono
+                    font.pixelSize: Colors.fontSizeXL
+                }
+            }
 
             Text {
                 text: root.label
@@ -81,27 +83,23 @@ Rectangle {
                 font.pixelSize: Colors.fontSizeMedium
                 font.weight: Font.DemiBold
                 Layout.fillWidth: true
-                elide: Text.ElideRight
+                wrapMode: Text.WordWrap
             }
 
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: Colors.spacingS
-
-                Text {
-                    text: root._active ? root.enabledText : root.disabledText
-                    color: root._active ? Colors.primary : Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeSmall
-                    Layout.fillWidth: true
-                    elide: Text.ElideRight
-                }
+            SharedWidgets.DankToggle {
+                checked: root._active
+                Layout.alignment: Qt.AlignTop
+                onToggled: root.triggerToggle()
             }
         }
 
-        SharedWidgets.DankToggle {
-            checked: root._active
-            Layout.alignment: Qt.AlignVCenter
-            onToggled: root.triggerToggle()
+        Text {
+            text: root._active ? root.enabledText : root.disabledText
+            color: root._active ? Colors.primary : Colors.textSecondary
+            font.pixelSize: Colors.fontSizeSmall
+            Layout.fillWidth: true
+            wrapMode: Text.WordWrap
+            leftPadding: root.narrowLayout ? 0 : 38 + Colors.spacingM
         }
     }
 

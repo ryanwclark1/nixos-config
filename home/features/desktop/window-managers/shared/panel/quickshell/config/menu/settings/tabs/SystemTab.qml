@@ -293,6 +293,7 @@ Item {
         Config.launcherCacheTtlSec = 300;
         Config.launcherSearchDebounceMs = 35;
         Config.launcherFileSearchDebounceMs = 140;
+        Config.launcherTabBehavior = "contextual";
         Config.launcherWebEnterUsesPrimary = true;
         Config.launcherWebNumberHotkeysEnabled = true;
         Config.launcherWebAliases = defaultWebAliasesCopy();
@@ -453,6 +454,25 @@ Item {
                     label: "Show Runtime Metrics"
                     icon: "󰓅"
                     configKey: "launcherShowRuntimeMetrics"
+                }
+                SettingsModeRow {
+                    label: "Tab Behavior"
+                    currentValue: Config.launcherTabBehavior
+                    options: [
+                        {
+                            value: "contextual",
+                            label: "Contextual"
+                        },
+                        {
+                            value: "results",
+                            label: "Results Only"
+                        },
+                        {
+                            value: "mode",
+                            label: "Mode Switch"
+                        }
+                    ]
+                    onModeSelected: modeValue => Config.launcherTabBehavior = modeValue
                 }
                 SettingsToggleRow {
                     label: "Web Enter Uses Primary"
@@ -622,13 +642,34 @@ Item {
                 model: root.orderedWebProviders()
 
                 delegate: SettingsTextInputRow {
+                    id: aliasRow
                     required property var modelData
+                    property bool syncingText: false
                     label: root.webProviderMeta(modelData).label + " Aliases"
                     leadingIcon: root.webProviderMeta(modelData).icon
                     placeholderText: "comma-separated aliases"
-                    text: root.webAliasString(modelData)
+                    function syncFromConfig() {
+                        var next = root.webAliasString(modelData);
+                        if (text === next)
+                            return;
+                        syncingText = true;
+                        text = next;
+                        syncingText = false;
+                    }
+                    Component.onCompleted: syncFromConfig()
                     onSubmitted: value => root.setWebAliasString(modelData, value)
-                    onTextEdited: value => root.setWebAliasString(modelData, value)
+                    onTextEdited: value => {
+                        if (!syncingText)
+                            root.setWebAliasString(modelData, value);
+                    }
+
+                    Connections {
+                        target: Config
+                        function onLauncherWebAliasesChanged() {
+                            if (!aliasRow.inputActiveFocus)
+                                aliasRow.syncFromConfig();
+                        }
+                    }
                 }
             }
 

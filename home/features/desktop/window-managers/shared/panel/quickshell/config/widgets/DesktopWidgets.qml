@@ -9,6 +9,12 @@ Item {
   anchors.fill: parent
 
   property string screenName: parent ? (parent.screen ? parent.screen.name : "") : ""
+  readonly property var screenRef: parent && parent.screen ? parent.screen : null
+  readonly property var edgeMargins: Config.reservedEdgesForScreen(screenRef, "")
+  readonly property real safeDragMinX: edgeMargins.left + 8 - x
+  readonly property real safeDragMinY: edgeMargins.top + 8 - y
+  readonly property real safeSpawnX: Math.max(100, edgeMargins.left + 24 - x)
+  readonly property real safeSpawnY: Math.max(100, edgeMargins.top + 24 - y)
 
   visible: Config.desktopWidgetsEnabled || DesktopWidgetRegistry.editMode
 
@@ -68,6 +74,8 @@ Item {
       widgetId: modelData.id || ""
       widgetType: modelData.type || ""
       screenName: root.screenName
+      minimumX: root.safeDragMinX
+      minimumY: root.safeDragMinY
       x: modelData.x || 0
       y: modelData.y || 0
       widgetScale: modelData.scale || 1.0
@@ -94,7 +102,7 @@ Item {
     visible: DesktopWidgetRegistry.editMode
     anchors.bottom: parent.bottom
     anchors.horizontalCenter: parent.horizontalCenter
-    anchors.bottomMargin: 100
+    anchors.bottomMargin: edgeMargins.bottom + 20
     width: editRow.implicitWidth + 40
     height: 48
     radius: 24
@@ -192,7 +200,7 @@ Item {
                   hoverEnabled: true
                   cursorShape: Qt.PointingHandCursor
                   onClicked: {
-                    DesktopWidgetRegistry.addWidget(root.screenName, modelData.id);
+                    DesktopWidgetRegistry.addWidgetAt(root.screenName, modelData.id, root.safeSpawnX, root.safeSpawnY);
                     addWidgetMenu.visible = false;
                   }
                 }

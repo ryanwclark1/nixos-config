@@ -11,6 +11,7 @@ ColumnLayout {
     property string currentValue
     property var options: []
     signal modeSelected(string modeValue)
+    readonly property bool narrowLayout: width < 420
 
     function _currentLabel() {
         for (var i = 0; i < root.options.length; i++) {
@@ -24,20 +25,22 @@ ColumnLayout {
     spacing: Colors.spacingS
     Layout.fillWidth: true
 
-    RowLayout {
+    Flow {
         Layout.fillWidth: true
+        width: parent.width
         spacing: Colors.spacingM
 
         Text {
+            width: root.narrowLayout ? parent.width : Math.max(0, parent.width - modePill.implicitWidth - Colors.spacingM)
             text: root.label
             color: Colors.text
             font.pixelSize: Colors.fontSizeMedium
             font.weight: Font.Medium
-            Layout.fillWidth: true
-            elide: Text.ElideRight
+            wrapMode: Text.WordWrap
         }
 
         Rectangle {
+            id: modePill
             implicitWidth: selectedText.implicitWidth + 14
             implicitHeight: 24
             radius: 12

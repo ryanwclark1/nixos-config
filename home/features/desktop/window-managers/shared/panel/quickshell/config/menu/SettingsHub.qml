@@ -49,7 +49,7 @@ PanelWindow {
   property bool layoutIsMaster: false
 
   function refreshHyprlandSettings() {
-    if (!CompositorAdapter.isHyprland) return;
+    if (!CompositorAdapter.supportsHyprctlSettings) return;
     if (!hyprStateProc.running) hyprStateProc.running = true;
   }
 
@@ -57,7 +57,7 @@ PanelWindow {
     if (!SettingsRegistry.findTab(currentTabId))
       currentTabId = SettingsRegistry.defaultTabId;
     isOpen = true;
-    if (CompositorAdapter.isHyprland) refreshHyprlandSettings();
+    if (CompositorAdapter.supportsHyprctlSettings) refreshHyprlandSettings();
   }
 
   function close() {

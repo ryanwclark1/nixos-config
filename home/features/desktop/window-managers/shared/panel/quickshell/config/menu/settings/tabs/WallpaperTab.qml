@@ -284,7 +284,7 @@ Item {
 
     Process {
         id: wallpaperMonProc
-        command: CompositorAdapter.isHyprland ? ["hyprctl", "monitors", "-j"] : ["sh", "-c", "echo '[]'"]
+        command: CompositorAdapter.supportsDisplayConfig ? ["hyprctl", "monitors", "-j"] : ["sh", "-c", "echo '[]'"]
         running: false
         stdout: StdioCollector {
             onStreamFinished: {
@@ -947,16 +947,20 @@ Item {
             spacing: Colors.spacingM
             Layout.fillWidth: true
 
-            RowLayout {
+            Flow {
+                Layout.fillWidth: true
+                width: parent.width
+                spacing: Colors.spacingS
+
                 Text {
+                    width: root.compactMode ? parent.width : undefined
                     text: "Auto-Cycle Interval"
                     color: Colors.text
                     font.pixelSize: Colors.fontSizeMedium
                     font.weight: Font.Medium
+                    wrapMode: Text.WordWrap
                 }
-                Item {
-                    Layout.fillWidth: true
-                }
+
                 Text {
                     text: Config.wallpaperCycleInterval === 0 ? "Off" : Config.wallpaperCycleInterval + " min"
                     color: Colors.fgSecondary
@@ -1038,16 +1042,18 @@ Item {
                 }
             }
 
-            RowLayout {
+            Flow {
                 Layout.fillWidth: true
+                width: parent.width
+                spacing: Colors.spacingS
+
                 Text {
+                    width: root.compactMode ? parent.width : undefined
                     text: "Off"
                     color: Colors.textDisabled
                     font.pixelSize: Colors.fontSizeXS
                 }
-                Item {
-                    Layout.fillWidth: true
-                }
+
                 Text {
                     text: "60 min"
                     color: Colors.textDisabled
@@ -1061,8 +1067,9 @@ Item {
             text: WallpaperService.scanning ? "SCANNING…" : ("WALLPAPERS  (" + WallpaperService.availableWallpapers.length + ")")
         }
 
-        RowLayout {
+        Flow {
             Layout.fillWidth: true
+            width: parent.width
             spacing: Colors.spacingM
             visible: !WallpaperService.scanning
 
@@ -1070,12 +1077,7 @@ Item {
                 visible: WallpaperService.availableWallpapers.length === 0
                 icon: "󰸉"
                 message: "No wallpapers found in search directories"
-                Layout.fillWidth: true
-            }
-
-            Item {
-                Layout.fillWidth: true
-                visible: WallpaperService.availableWallpapers.length > 0
+                width: parent.width
             }
 
             SettingsActionButton {
@@ -1286,7 +1288,7 @@ Item {
         }
 
         Rectangle {
-            width: Math.min(parent.width - 60, 560)
+            width: Math.min(parent.width - (root.tightSpacing ? 32 : 60), 560)
             color: Colors.bgGlass
             border.color: Colors.border
             border.width: 1
@@ -1298,16 +1300,22 @@ Item {
                 anchors.margins: Colors.spacingL
                 spacing: Colors.spacingM
 
-                RowLayout {
+                Flow {
                     Layout.fillWidth: true
+                    width: parent.width
+                    spacing: Colors.spacingS
+
                     Text {
+                        width: root.compactMode ? parent.width : Math.max(0, parent.width - solidPickerCloseButton.implicitWidth - Colors.spacingS)
                         text: "Solid Color Picker"
                         color: Colors.text
                         font.pixelSize: Colors.fontSizeLarge
                         font.weight: Font.DemiBold
+                        wrapMode: Text.WordWrap
                     }
-                    Item { Layout.fillWidth: true }
+
                     SettingsActionButton {
+                        id: solidPickerCloseButton
                         label: "Close"
                         compact: true
                         onClicked: root.solidPickerOpen = false
@@ -1372,14 +1380,17 @@ Item {
                     onMoved: v => root.pickerAlpha = v
                 }
 
-                RowLayout {
+                Flow {
                     Layout.fillWidth: true
-                    Item { Layout.fillWidth: true }
+                    width: parent.width
+                    spacing: Colors.spacingS
+
                     SettingsActionButton {
                         label: "Cancel"
                         compact: true
                         onClicked: root.solidPickerOpen = false
                     }
+
                     SettingsActionButton {
                         label: "Apply Color"
                         compact: true

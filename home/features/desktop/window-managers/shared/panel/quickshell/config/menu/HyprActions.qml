@@ -3,7 +3,7 @@ import "../modules"
 import "../services"
 
 Row {
-  visible: CompositorAdapter.isHyprland
+  visible: CompositorAdapter.supportsDispatcherActions
   spacing: 6
 
   ActionButton {

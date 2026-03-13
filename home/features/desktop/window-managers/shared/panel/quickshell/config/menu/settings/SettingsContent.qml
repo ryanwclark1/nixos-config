@@ -166,30 +166,30 @@ Item {
                 stateColor: Colors.primary
               }
 
-              RowLayout {
+              ColumnLayout {
                 id: resultColumn
                 anchors.fill: parent
                 anchors.margins: Colors.spacingM
-                spacing: Colors.spacingM
+                spacing: Colors.spacingS
 
-                Rectangle {
-                  Layout.preferredWidth: 36
-                  Layout.preferredHeight: 36
-                  radius: Colors.radiusSmall
-                  color: Colors.withAlpha(Colors.primary, 0.12)
-
-                  Text {
-                    anchors.centerIn: parent
-                    text: modelData.icon
-                    color: Colors.primary
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeLarge
-                  }
-                }
-
-                ColumnLayout {
+                RowLayout {
                   Layout.fillWidth: true
-                  spacing: 2
+                  spacing: Colors.spacingM
+
+                  Rectangle {
+                    Layout.preferredWidth: 36
+                    Layout.preferredHeight: 36
+                    radius: Colors.radiusSmall
+                    color: Colors.withAlpha(Colors.primary, 0.12)
+
+                    Text {
+                      anchors.centerIn: parent
+                      text: modelData.icon
+                      color: Colors.primary
+                      font.family: Colors.fontMono
+                      font.pixelSize: Colors.fontSizeLarge
+                    }
+                  }
 
                   Text {
                     text: modelData.label
@@ -199,21 +199,14 @@ Item {
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
                   }
-
-                  Text {
-                    text: String(modelData.categoryId || "settings").replace(/-/g, " ")
-                    color: Colors.fgSecondary
-                    font.pixelSize: Colors.fontSizeSmall
-                    Layout.fillWidth: true
-                    elide: Text.ElideRight
-                  }
                 }
 
                 Text {
-                  text: "󰄮"
-                  color: Colors.fgDim
-                  font.family: Colors.fontMono
-                  font.pixelSize: Colors.fontSizeMedium
+                  text: String(modelData.categoryId || "settings").replace(/-/g, " ")
+                  color: Colors.fgSecondary
+                  font.pixelSize: Colors.fontSizeSmall
+                  Layout.fillWidth: true
+                  wrapMode: Text.WordWrap
                 }
               }
 

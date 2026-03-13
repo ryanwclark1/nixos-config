@@ -33,7 +33,7 @@ PanelWindow {
   property bool isOpen: false
 
   function open() {
-    if (!CompositorAdapter.isHyprland) {
+    if (!CompositorAdapter.supportsDisplayConfig) {
       CompositorAdapter.notifyUnsupported("Display configuration");
       return;
     }

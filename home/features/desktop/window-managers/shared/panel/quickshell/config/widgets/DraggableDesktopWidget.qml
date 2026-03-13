@@ -8,6 +8,8 @@ Item {
   property string widgetType: ""
   property string screenName: ""
   property real widgetScale: 1.0
+  property real minimumX: -root.width * 0.75
+  property real minimumY: -root.height * 0.75
   default property alias content: contentContainer.children
 
   x: 0
@@ -42,8 +44,8 @@ Item {
     enabled: DesktopWidgetRegistry.editMode
     cursorShape: DesktopWidgetRegistry.editMode ? Qt.SizeAllCursor : Qt.ArrowCursor
     drag.target: root
-    drag.minimumX: -root.width * 0.75
-    drag.minimumY: -root.height * 0.75
+    drag.minimumX: root.minimumX
+    drag.minimumY: root.minimumY
 
     acceptedButtons: Qt.LeftButton | Qt.RightButton
 

@@ -258,7 +258,7 @@ Rectangle {
             delegate: Rectangle {
               required property var modelData
               Layout.fillWidth: true
-              height: 38
+              implicitHeight: resultRow.implicitHeight + Colors.spacingS * 2
               radius: Colors.radiusSmall
               color: root.currentTabId === modelData.id ? Colors.highlight : "transparent"
               Behavior on color { ColorAnimation { duration: 120 } }
@@ -271,8 +271,12 @@ Rectangle {
               }
 
               RowLayout {
+                id: resultRow
                 anchors.fill: parent
                 anchors.leftMargin: Colors.spacingL
+                anchors.rightMargin: Colors.spacingM
+                anchors.topMargin: Colors.spacingS
+                anchors.bottomMargin: Colors.spacingS
                 spacing: Colors.spacingM
 
                 Text {
@@ -287,6 +291,8 @@ Rectangle {
                   color: root.currentTabId === modelData.id ? Colors.text : Colors.fgSecondary
                   font.pixelSize: Colors.fontSizeMedium
                   font.weight: root.currentTabId === modelData.id ? Font.DemiBold : Font.Normal
+                  Layout.fillWidth: true
+                  wrapMode: Text.WordWrap
                 }
               }
 
@@ -316,7 +322,7 @@ Rectangle {
 
               Rectangle {
                 Layout.fillWidth: true
-                height: 36
+                implicitHeight: categoryRow.implicitHeight + Colors.spacingS * 2
                 radius: Colors.radiusSmall
                 color: "transparent"
 
@@ -327,9 +333,12 @@ Rectangle {
                 }
 
                 RowLayout {
+                  id: categoryRow
                   anchors.fill: parent
                   anchors.leftMargin: Colors.spacingM
                   anchors.rightMargin: Colors.spacingM
+                  anchors.topMargin: Colors.spacingS
+                  anchors.bottomMargin: Colors.spacingS
                   spacing: Colors.spacingS
 
                   Text {
@@ -352,6 +361,7 @@ Rectangle {
                     font.pixelSize: Colors.fontSizeSmall
                     font.weight: Font.DemiBold
                     Layout.fillWidth: true
+                    wrapMode: Text.WordWrap
                   }
                 }
 
@@ -378,7 +388,7 @@ Rectangle {
                   delegate: Rectangle {
                     required property var modelData
                     Layout.fillWidth: true
-                    height: 36
+                    implicitHeight: tabRow.implicitHeight + Colors.spacingS * 2
                     radius: Colors.radiusSmall
                     color: root.currentTabId === modelData.id ? Colors.highlight : "transparent"
                     Behavior on color { ColorAnimation { duration: 120 } }
@@ -391,9 +401,12 @@ Rectangle {
                     }
 
                     RowLayout {
+                      id: tabRow
                       anchors.fill: parent
                       anchors.leftMargin: Colors.spacingXL
                       anchors.rightMargin: Colors.spacingM
+                      anchors.topMargin: Colors.spacingS
+                      anchors.bottomMargin: Colors.spacingS
                       spacing: Colors.spacingM
 
                       Text {
@@ -409,6 +422,7 @@ Rectangle {
                         font.pixelSize: Colors.fontSizeSmall
                         font.weight: root.currentTabId === modelData.id ? Font.DemiBold : Font.Normal
                         Layout.fillWidth: true
+                        wrapMode: Text.WordWrap
                       }
                     }
 

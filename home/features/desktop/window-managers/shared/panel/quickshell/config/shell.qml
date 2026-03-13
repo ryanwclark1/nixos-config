@@ -525,7 +525,7 @@ Scope {
 
   Loader {
     id: overview
-    active: CompositorAdapter.isHyprland
+    active: CompositorAdapter.supportsOverview
     source: "launcher/Overview.qml"
   }
 

@@ -82,6 +82,10 @@ QtObject {
   }
 
   function addWidget(screenName, widgetType) {
+    return addWidgetAt(screenName, widgetType, 100, 100);
+  }
+
+  function addWidgetAt(screenName, widgetType, x, y) {
     var monitors = JSON.parse(JSON.stringify(Config.desktopWidgetsMonitorWidgets || []));
     var monitorIdx = -1;
     for (var i = 0; i < monitors.length; i++) {
@@ -96,8 +100,8 @@ QtObject {
     monitors[monitorIdx].widgets.push({
       id: id,
       type: widgetType,
-      x: 100,
-      y: 100,
+      x: Math.round(Number(x) || 100),
+      y: Math.round(Number(y) || 100),
       scale: 1.0
     });
 

@@ -10,34 +10,44 @@ Rectangle {
     property string value: ""
     property int labelWidth: 88
     property bool monoValue: true
+    readonly property bool narrowLayout: width < 420
 
     Layout.fillWidth: true
-    implicitHeight: 52
+    implicitHeight: dataContent.implicitHeight + Colors.spacingM * 2
     radius: Colors.radiusXS
     color: Colors.bgWidget
     border.color: Colors.border
     border.width: 1
 
-    RowLayout {
+    ColumnLayout {
+        id: dataContent
         anchors.fill: parent
         anchors.leftMargin: Colors.spacingM
         anchors.rightMargin: Colors.spacingM
+        anchors.topMargin: Colors.spacingM
+        anchors.bottomMargin: Colors.spacingM
         spacing: Colors.spacingM
 
-        Text {
-            visible: root.iconName !== ""
-            text: root.iconName
-            color: Colors.primary
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeXL
-        }
+        Flow {
+            Layout.fillWidth: true
+            width: parent.width
+            spacing: Colors.spacingM
 
-        Text {
-            text: root.label
-            color: Colors.fgSecondary
-            font.pixelSize: Colors.fontSizeMedium
-            Layout.preferredWidth: root.labelWidth
-            elide: Text.ElideRight
+            Text {
+                visible: root.iconName !== ""
+                text: root.iconName
+                color: Colors.primary
+                font.family: Colors.fontMono
+                font.pixelSize: Colors.fontSizeXL
+            }
+
+            Text {
+                width: root.narrowLayout ? parent.width : root.labelWidth
+                text: root.label
+                color: Colors.fgSecondary
+                font.pixelSize: Colors.fontSizeMedium
+                wrapMode: Text.WordWrap
+            }
         }
 
         Text {
@@ -45,8 +55,8 @@ Rectangle {
             color: Colors.text
             font.pixelSize: Colors.fontSizeMedium
             font.family: root.monoValue ? Colors.fontMono : ""
-            elide: Text.ElideRight
             Layout.fillWidth: true
+            wrapMode: Text.WrapAnywhere
         }
     }
 }

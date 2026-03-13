@@ -76,6 +76,9 @@ PanelWindow {
     cacheHits: 0,
     cacheMisses: 0,
     commandFailures: 0,
+    filterRuns: 0,
+    lastFilterMs: 0,
+    avgFilterMs: 0,
     perMode: ({})
   })
 
@@ -246,6 +249,17 @@ PanelWindow {
   }
   readonly property bool hasResults: filteredItems.length > 0
   readonly property var selectedItem: hasResults && selectedIndex >= 0 && selectedIndex < filteredItems.length ? filteredItems[selectedIndex] : null
+  readonly property string launcherTabBehavior: {
+    var value = String(Config.launcherTabBehavior || "contextual");
+    return ["contextual", "results", "mode"].indexOf(value) !== -1 ? value : "contextual";
+  }
+  readonly property string tabControlHintText: {
+    if (launcherTabBehavior === "mode")
+      return "Tab: next mode • Shift+Tab: prev mode";
+    if (launcherTabBehavior === "results")
+      return "Tab: next result • Shift+Tab: prev mode";
+    return hasResults ? "Tab: next result • Shift+Tab: prev mode" : "Tab: next mode • Shift+Tab: prev mode";
+  }
   readonly property string legendPrimaryAction: {
     if (showingConfirm) return "Enter: Confirm";
     if (!hasResults) return "Enter: " + emptyPrimaryCta;
@@ -261,10 +275,11 @@ PanelWindow {
   readonly property string legendSecondaryAction: {
     if (showingConfirm) return "Esc: Cancel";
     if (!hasResults && emptySecondaryCta !== "") return "Shift+Enter: " + emptySecondaryCta;
-    if (hasResults) return "Tab: Next Result";
-    return "Tab: Next Mode";
+    if (launcherTabBehavior === "mode") return "Tab: Next Mode";
+    if (launcherTabBehavior === "results") return "Tab: Next Result";
+    return hasResults ? "Tab: Next Result" : "Tab: Next Mode";
   }
-  readonly property string legendTertiaryAction: hasResults ? "Shift+Tab: Prev Mode" : "Esc: Close"
+  readonly property string legendTertiaryAction: showingConfirm ? "Esc: Cancel" : "Shift+Tab: Prev Mode"
   readonly property string webPrimaryProviderLabel: {
     var provider = primaryWebProvider();
     return provider ? provider.name : "Primary";
@@ -531,7 +546,9 @@ PanelWindow {
   }
 
   function isModeAllowedByCompositor(modeKey) {
-    if ((modeKey === "window" || modeKey === "keybinds") && !CompositorAdapter.isHyprland)
+    if (modeKey === "window" && !CompositorAdapter.supportsWindowListing)
+      return false;
+    if (modeKey === "keybinds" && !CompositorAdapter.supportsHotkeysListing)
       return false;
     return true;
   }
@@ -880,8 +897,22 @@ PanelWindow {
       cacheHits: 0,
       cacheMisses: 0,
       commandFailures: 0,
+      filterRuns: 0,
+      lastFilterMs: 0,
+      avgFilterMs: 0,
       perMode: ({})
     });
+  }
+
+  function recordFilterMetric(durationMs) {
+    var next = Object.assign({}, launcherMetrics);
+    var runs = Math.max(0, Math.round(next.filterRuns || 0)) + 1;
+    var last = Math.max(0, Math.round(durationMs || 0));
+    var avg = Math.round((((next.avgFilterMs || 0) * (runs - 1)) + last) / runs);
+    next.filterRuns = runs;
+    next.lastFilterMs = last;
+    next.avgFilterMs = avg;
+    launcherMetrics = next;
   }
 
   function recordLoadMetric(modeKey, durationMs, cacheHit, success) {
@@ -1423,11 +1454,9 @@ PanelWindow {
     return fullText.substring(0, idx) + "<b>" + fullText.substring(idx, idx + cleanQuery.length) + "</b>" + fullText.substring(idx + cleanQuery.length);
   }
 
-  function fuzzyMatch(str, pattern) {
-    if (!pattern) return 100;
-    if (!str) return 0;
-    var s = str.toLowerCase();
-    var p = stripModePrefix(pattern).toLowerCase();
+  function fuzzyMatchLower(s, p) {
+    if (!p) return 100;
+    if (!s) return 0;
     if (!p) return 100;
     if (s.startsWith(p)) return 100 + (p.length / s.length);
     if (s.indexOf(p) !== -1) return 50 + (p.length / s.length);
@@ -1441,24 +1470,24 @@ PanelWindow {
     return 0;
   }
 
-  function rankItem(item, query) {
-    var clean = stripModePrefix(query);
+  function rankItem(item, clean, cleanLower) {
     if (clean === "") return 1;
-    var name = item.name || "";
-    var title = item.title || "";
-    var exec = item.exec || item.class || "";
-    var body = item.body || "";
+    var name = item.name ? String(item.name).toLowerCase() : "";
+    var title = item.title ? String(item.title).toLowerCase() : "";
+    var exec = item.exec ? String(item.exec).toLowerCase() : (item.class ? String(item.class).toLowerCase() : "");
+    var body = item.body ? String(item.body).toLowerCase() : "";
     var bestScore = Math.max(
-      fuzzyMatch(name, clean) * Config.launcherScoreNameWeight,
-      fuzzyMatch(title, clean) * Config.launcherScoreTitleWeight,
-      fuzzyMatch(exec, clean) * Config.launcherScoreExecWeight,
-      fuzzyMatch(body, clean) * Config.launcherScoreBodyWeight
+      fuzzyMatchLower(name, cleanLower) * Config.launcherScoreNameWeight,
+      fuzzyMatchLower(title, cleanLower) * Config.launcherScoreTitleWeight,
+      fuzzyMatchLower(exec, cleanLower) * Config.launcherScoreExecWeight,
+      fuzzyMatchLower(body, cleanLower) * Config.launcherScoreBodyWeight
     );
     if (mode === "drun") bestScore += (appFrequency[item.exec] || 0) * 0.6;
     return bestScore;
   }
 
   function filterItems() {
+    var startedAt = Date.now();
     var actualSearch = searchText;
     var webContext = null;
     if (mode === "calc") {
@@ -1469,11 +1498,13 @@ PanelWindow {
           if (result !== undefined && !isNaN(result)) {
             filteredItems = [{ name: result.toString(), title: "Result: " + result, isCalc: true }];
             selectedIndex = 0;
+            recordFilterMetric(Date.now() - startedAt);
             return;
           }
         }
       } catch (e) {}
       filteredItems = [];
+      recordFilterMetric(Date.now() - startedAt);
       return;
     }
 
@@ -1487,7 +1518,10 @@ PanelWindow {
     if (mode === "files" && searchText.startsWith("/")) actualSearch = searchText.substring(1).trim();
     if (mode === "bookmarks" && searchText.startsWith("@")) actualSearch = searchText.substring(1).trim();
 
-    if (actualSearch === "" && mode !== "files" && mode !== "ai") {
+    var clean = String(actualSearch || "");
+    var cleanLower = clean.toLowerCase();
+
+    if (clean === "" && mode !== "files" && mode !== "ai") {
       filteredItems = allItems;
     } else {
       var scoredItems = [];
@@ -1495,13 +1529,13 @@ PanelWindow {
         var item = allItems[i];
         if (mode === "web") {
           var webItem = Object.assign({}, item);
-          webItem.title = "Search " + item.name + " for '" + actualSearch + "'";
-          webItem.query = actualSearch;
+          webItem.title = "Search " + item.name + " for '" + clean + "'";
+          webItem.query = clean;
           scoredItems.push(webItem);
           continue;
         }
-        var bestScore = rankItem(item, actualSearch);
-        if (bestScore > 0 || (actualSearch === "" && (mode === "files" || mode === "ai"))) {
+        var bestScore = rankItem(item, clean, cleanLower);
+        if (bestScore > 0 || (clean === "" && (mode === "files" || mode === "ai"))) {
           item._score = bestScore;
           scoredItems.push(item);
         }
@@ -1530,6 +1564,7 @@ PanelWindow {
     selectedIndex = Math.min(selectedIndex, Math.max(0, filteredItems.length - 1));
     if (mode === "web" && webContext && webContext.providerKey !== "")
       selectWebProviderByKey(webContext.providerKey);
+    recordFilterMetric(Date.now() - startedAt);
   }
 
   function scheduleSearchRefresh(forceNow) {
@@ -1852,7 +1887,8 @@ PanelWindow {
       Quickshell.execDetached(["wallust", "run", item.path]);
       close();
     } else if (mode === "keybinds") {
-      if (item.disp && CompositorAdapter.isHyprland) Quickshell.execDetached(["hyprctl", "dispatch", item.disp, item.args || ""]);
+      if (item.disp && CompositorAdapter.supportsDispatcherActions)
+        Quickshell.execDetached(["hyprctl", "dispatch", item.disp, item.args || ""]);
       close();
     }
   }
@@ -2009,7 +2045,7 @@ PanelWindow {
               anchors.margins: Colors.spacingM
               spacing: 2
               Text { text: "Controls"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
-              Text { text: "Tab: next result • Shift+Tab: prev mode"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall }
+              Text { text: launcherRoot.tabControlHintText; color: Colors.text; font.pixelSize: Colors.fontSizeSmall }
               Text { text: "Enter to run • Esc to close"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS }
             }
           }
@@ -2067,12 +2103,18 @@ PanelWindow {
                   var slot = launcherRoot.webProviderSlotFromKey(event.key);
                   if (slot > 0 && launcherRoot.selectWebProviderBySlot(slot)) event.accepted = true;
                 }
-                else if (event.key === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier)) {
+                else if (event.key === Qt.Key_Backtab || (event.key === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier))) {
                   launcherRoot.cycleMode(-1);
                   event.accepted = true;
                 } else if (event.key === Qt.Key_Tab) {
-                  if (launcherRoot.filteredItems.length > 0) launcherRoot.cycleSelection(1);
-                  else launcherRoot.cycleMode(1);
+                  if (launcherRoot.launcherTabBehavior === "mode")
+                    launcherRoot.cycleMode(1);
+                  else if (launcherRoot.launcherTabBehavior === "results")
+                    launcherRoot.cycleSelection(1);
+                  else if (launcherRoot.filteredItems.length > 0)
+                    launcherRoot.cycleSelection(1);
+                  else
+                    launcherRoot.cycleMode(1);
                   event.accepted = true;
                 } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                   if ((event.modifiers & Qt.ControlModifier) && launcherRoot.mode === "web" && launcherRoot.filteredItems.length > 0) launcherRoot.openSelectedWebHomepage();
@@ -2281,6 +2323,8 @@ PanelWindow {
                 text: "opens " + launcherRoot.launcherMetrics.opens
                   + " • cache " + launcherRoot.launcherMetrics.cacheHits + "/" + launcherRoot.launcherMetrics.cacheMisses
                   + " • failures " + launcherRoot.launcherMetrics.commandFailures
+                  + " • filter avg " + (launcherRoot.launcherMetrics.avgFilterMs || 0) + "ms"
+                  + " / last " + (launcherRoot.launcherMetrics.lastFilterMs || 0) + "ms"
                 color: Colors.textSecondary
                 font.pixelSize: Colors.fontSizeXS
                 elide: Text.ElideRight
@@ -2516,15 +2560,15 @@ PanelWindow {
               id: resultsList
               model: launcherRoot.filteredItems
               clip: true
-              spacing: Colors.spacingS
+              spacing: launcherRoot.compactMode ? Colors.spacingXS : Colors.spacingS
               currentIndex: launcherRoot.selectedIndex
               enabled: !launcherRoot.showingConfirm
               section.property: "category"
-              section.delegate: Text { text: section; color: Colors.primary; font.pixelSize: Colors.fontSizeXS; font.bold: true; height: 25; verticalAlignment: Text.AlignBottom }
+              section.delegate: Text { text: section; color: Colors.primary; font.pixelSize: Colors.fontSizeXS; font.bold: true; height: launcherRoot.compactMode ? 21 : 25; verticalAlignment: Text.AlignBottom }
 
               delegate: Rectangle {
                 width: resultsList.width
-                height: 58
+                height: launcherRoot.tightMode ? 48 : (launcherRoot.compactMode ? 52 : 58)
                 color: index === launcherRoot.selectedIndex ? Colors.highlight : "transparent"
                 radius: Colors.radiusSmall
                 border.color: index === launcherRoot.selectedIndex ? Colors.withAlpha(Colors.primary, 0.6) : "transparent"
@@ -2534,13 +2578,13 @@ PanelWindow {
 
                 RowLayout {
                   anchors.fill: parent
-                  anchors.leftMargin: Colors.spacingM
-                  anchors.rightMargin: Colors.spacingM
-                  spacing: Colors.paddingMedium
+                  anchors.leftMargin: launcherRoot.compactMode ? Colors.spacingS : Colors.spacingM
+                  anchors.rightMargin: launcherRoot.compactMode ? Colors.spacingS : Colors.spacingM
+                  spacing: launcherRoot.compactMode ? Colors.paddingSmall : Colors.paddingMedium
 
                   Rectangle {
-                    width: 34
-                    height: 34
+                    width: launcherRoot.compactMode ? 30 : 34
+                    height: launcherRoot.compactMode ? 30 : 34
                     radius: Colors.radiusXS
                     color: Colors.surface
                     Image {
@@ -2558,7 +2602,7 @@ PanelWindow {
                       text: modelData.icon || launcherRoot.modeIcons[launcherRoot.mode] || "󰀻"
                       color: Colors.primary
                       font.family: Colors.fontMono
-                      font.pixelSize: Colors.fontSizeXL
+                      font.pixelSize: launcherRoot.compactMode ? Colors.fontSizeLarge : Colors.fontSizeXL
                       visible: !iconImage.visible
                     }
                   }
@@ -2570,7 +2614,7 @@ PanelWindow {
                       text: highlightMatch(modelData.name || modelData.title || "", searchText)
                       color: Colors.text
                       textFormat: Text.StyledText
-                      font.pixelSize: Colors.fontSizeMedium
+                      font.pixelSize: launcherRoot.compactMode ? Colors.fontSizeSmall : Colors.fontSizeMedium
                       font.weight: index === launcherRoot.selectedIndex ? Font.Bold : Font.Normal
                       elide: Text.ElideRight
                       Layout.fillWidth: true
@@ -2624,8 +2668,8 @@ PanelWindow {
                       }
                     }
                     Rectangle {
-                      width: 28
-                      height: 28
+                      width: launcherRoot.compactMode ? 24 : 28
+                      height: launcherRoot.compactMode ? 24 : 28
                       radius: Colors.radiusMedium
                       color: index === launcherRoot.selectedIndex ? Colors.withAlpha(Colors.primary, 0.18) : "transparent"
                       Text { anchors.centerIn: parent; text: "󰄮"; color: index === launcherRoot.selectedIndex ? Colors.primary : Colors.textDisabled; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeSmall }
@@ -2752,12 +2796,12 @@ PanelWindow {
                         }
 
           ColumnLayout {
-            spacing: Colors.paddingMedium
+            spacing: launcherRoot.compactMode ? Colors.paddingSmall : Colors.paddingMedium
             Repeater {
               model: launcherRoot.mediaPlayers
               delegate: Rectangle {
                 Layout.fillWidth: true
-                height: 120
+                height: launcherRoot.tightMode ? 96 : (launcherRoot.compactMode ? 108 : 120)
                 color: Colors.bgWidget
                 radius: Colors.radiusMedium
                 border.color: Colors.border
@@ -2765,11 +2809,11 @@ PanelWindow {
 
                 RowLayout {
                   anchors.fill: parent
-                  anchors.margins: Colors.paddingMedium
-                  spacing: Colors.paddingMedium
+                  anchors.margins: launcherRoot.compactMode ? Colors.spacingM : Colors.paddingMedium
+                  spacing: launcherRoot.compactMode ? Colors.paddingSmall : Colors.paddingMedium
                   Rectangle {
-                    width: 90
-                    height: 90
+                    width: launcherRoot.compactMode ? 72 : 90
+                    height: launcherRoot.compactMode ? 72 : 90
                     radius: Colors.radiusXS
                     color: Colors.surface
                     clip: true
@@ -2777,15 +2821,15 @@ PanelWindow {
                   }
                   ColumnLayout {
                     Layout.fillWidth: true
-                    Text { text: modelData.trackTitle || "Unknown"; color: Colors.text; font.pixelSize: Colors.fontSizeLarge; font.weight: Font.Bold; elide: Text.ElideRight }
+                    Text { text: modelData.trackTitle || "Unknown"; color: Colors.text; font.pixelSize: launcherRoot.compactMode ? Colors.fontSizeMedium : Colors.fontSizeLarge; font.weight: Font.Bold; elide: Text.ElideRight }
                     Text { text: modelData.trackArtist || "Unknown"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall }
                     Item { Layout.fillHeight: true }
                     RowLayout {
-                      spacing: Colors.paddingMedium
+                      spacing: launcherRoot.compactMode ? Colors.paddingSmall : Colors.paddingMedium
                       Rectangle {
-                        width: 30; height: 30; radius: height / 2
+                        width: launcherRoot.compactMode ? 26 : 30; height: launcherRoot.compactMode ? 26 : 30; radius: height / 2
                         color: "transparent"
-                        Text { anchors.centerIn: parent; text: "󰒮"; color: Colors.text; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL }
+                        Text { anchors.centerIn: parent; text: "󰒮"; color: Colors.text; font.family: Colors.fontMono; font.pixelSize: launcherRoot.compactMode ? Colors.fontSizeLarge : Colors.fontSizeXL }
                         SharedWidgets.StateLayer { id: prevStateLayer; hovered: prevHover.containsMouse; pressed: prevHover.pressed }
                         MouseArea {
                           id: prevHover
@@ -2799,9 +2843,9 @@ PanelWindow {
                         }
                       }
                       Rectangle {
-                        width: 36; height: 36; radius: height / 2
+                        width: launcherRoot.compactMode ? 30 : 36; height: launcherRoot.compactMode ? 30 : 36; radius: height / 2
                         color: "transparent"
-                        Text { anchors.centerIn: parent; text: (modelData._controlTarget || modelData).playbackState === Mpris.Playing ? "󰏤" : "󰐊"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeHuge }
+                        Text { anchors.centerIn: parent; text: (modelData._controlTarget || modelData).playbackState === Mpris.Playing ? "󰏤" : "󰐊"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: launcherRoot.compactMode ? Colors.fontSizeXL : Colors.fontSizeHuge }
                         SharedWidgets.StateLayer { id: playStateLayer; hovered: playHover.containsMouse; pressed: playHover.pressed }
                         MouseArea {
                           id: playHover
@@ -2815,9 +2859,9 @@ PanelWindow {
                         }
                       }
                       Rectangle {
-                        width: 30; height: 30; radius: height / 2
+                        width: launcherRoot.compactMode ? 26 : 30; height: launcherRoot.compactMode ? 26 : 30; radius: height / 2
                         color: "transparent"
-                        Text { anchors.centerIn: parent; text: "󰒭"; color: Colors.text; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL }
+                        Text { anchors.centerIn: parent; text: "󰒭"; color: Colors.text; font.family: Colors.fontMono; font.pixelSize: launcherRoot.compactMode ? Colors.fontSizeLarge : Colors.fontSizeXL }
                         SharedWidgets.StateLayer { id: nextStateLayer; hovered: nextHover.containsMouse; pressed: nextHover.pressed }
                         MouseArea {
                           id: nextHover

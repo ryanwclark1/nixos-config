@@ -8,6 +8,8 @@ Item {
     id: root
     property var settingsRoot: null
     property string tabId: ""
+    property bool compactMode: false
+    property bool tightSpacing: false
 
     SettingsTabPage {
         anchors.fill: parent

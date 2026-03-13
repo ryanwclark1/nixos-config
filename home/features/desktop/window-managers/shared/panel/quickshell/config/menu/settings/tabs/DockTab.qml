@@ -7,6 +7,8 @@ Item {
     id: root
     property var settingsRoot: null
     property string tabId: ""
+    property bool compactMode: false
+    property bool tightSpacing: false
     property string validationMessage: ""
     readonly property string conflictMessage: Config.dockConflictMessage()
 

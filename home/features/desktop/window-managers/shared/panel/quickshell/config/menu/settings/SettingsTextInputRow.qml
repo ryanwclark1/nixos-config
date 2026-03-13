@@ -11,11 +11,13 @@ ColumnLayout {
     property string errorText: ""
     property bool showClearButton: true
     property alias text: input.text
+    property alias inputActiveFocus: input.activeFocus
 
     signal textEdited(string value)
     signal submitted(string value)
 
     default property alias actions: actionsRow.data
+    readonly property bool narrowLayout: width < 480
 
     spacing: Colors.spacingS
     Layout.fillWidth: true
@@ -28,7 +30,7 @@ ColumnLayout {
         font.weight: Font.Medium
     }
 
-    RowLayout {
+    ColumnLayout {
         Layout.fillWidth: true
         spacing: Colors.spacingS
 
@@ -96,8 +98,10 @@ ColumnLayout {
             }
         }
 
-        RowLayout {
+        Flow {
             id: actionsRow
+            Layout.fillWidth: true
+            width: parent.width
             spacing: Colors.spacingS
         }
     }
