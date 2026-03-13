@@ -11,6 +11,7 @@ Item {
     property string tabId: ""
     property string validationMessage: ""
     readonly property var selectedBar: Config.selectedBar()
+    readonly property string selectedBarDockMessage: root.selectedBar ? Config.barDockConflictMessage(root.selectedBar) : ""
 
     function candidateWith(patch) {
         if (!selectedBar) return null;
@@ -44,13 +45,6 @@ Item {
         title: "Bars"
         iconName: "󰕮"
         subtitle: "Manage independent bars, monitor assignment, and per-bar layout settings."
-
-        SettingsInfoCallout {
-            visible: root.validationMessage !== "" || Config.dockHasConflict()
-            iconName: "󰀪"
-            title: root.validationMessage !== "" ? "Conflict detected" : "Dock conflict"
-            body: root.validationMessage !== "" ? root.validationMessage : "The dock is currently using the same edge as an enabled bar. Move the dock or change the conflicting bar edge."
-        }
 
         SettingsCard {
             title: "Bar Configurations"
@@ -146,6 +140,13 @@ Item {
             iconName: "󰖲"
             description: root.selectedBar ? "Edit edge placement, displays, and bar styling." : "Select a bar to edit."
             visible: !!root.selectedBar
+
+            SettingsInfoCallout {
+                visible: !!root.selectedBar && root.selectedBarDockMessage !== ""
+                iconName: "󰀪"
+                title: "Dock overlap"
+                body: root.selectedBarDockMessage
+            }
 
             SettingsTextInputRow {
                 label: "Bar Name"

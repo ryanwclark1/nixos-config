@@ -116,6 +116,8 @@ QtObject {
   property string wallpaperDefaultFolder: (Quickshell.env("HOME") || "/home") + "/Pictures"
   property string wallpaperSolidColor: "000000ff"
   property bool wallpaperUseSolidOnStartup: false
+  property var wallpaperSolidColorsByMonitor: ({})
+  property var wallpaperRecentSolidColors: []
 
   // --- THEME ---
   property string themeName: ""
@@ -590,21 +592,12 @@ QtObject {
         };
       }
     }
-    if (dockEnabled && barConfig.position === dockPosition) {
-      return {
-        type: "dock",
-        screenName: "all",
-        edge: dockPosition
-      };
-    }
     return null;
   }
 
   function barConflictMessage(barConfig) {
     var details = barConflictDetails(barConfig);
     if (!details) return "";
-    if (details.type === "dock")
-      return "The dock already uses the " + dockPosition + " edge.";
     return (details.barName || "Another bar") + " already uses the " + barConfig.position + " edge on " + details.screenName + ".";
   }
 
@@ -776,6 +769,41 @@ QtObject {
     return barConfig.position === dockPosition;
   }
 
+  function dockConflictScreens(positionOverride) {
+    var screens = allScreens();
+    var matches = [];
+    for (var i = 0; i < screens.length; ++i) {
+      if (dockConflictsOnScreen(screens[i], positionOverride))
+        matches.push(screenName(screens[i]));
+    }
+    return matches;
+  }
+
+  function dockConflictMessage(positionOverride) {
+    var screens = dockConflictScreens(positionOverride);
+    if (screens.length === 0) return "";
+    var edge = isValidEdge(positionOverride) ? positionOverride : dockPosition;
+    return "The dock shares the " + edge + " edge with a bar on " + screens.join(", ") + ". It will stay hidden only on those displays.";
+  }
+
+  function barDockConflictScreens(barConfig) {
+    if (!dockEnabled || !barConfig || !barConfig.enabled) return [];
+    if (barConfig.position !== dockPosition) return [];
+    var screens = screensForBar(barConfig);
+    var matches = [];
+    for (var i = 0; i < screens.length; ++i) {
+      if (dockConflictsOnScreen(screens[i], barConfig.position))
+        matches.push(screenName(screens[i]));
+    }
+    return matches;
+  }
+
+  function barDockConflictMessage(barConfig) {
+    var screens = barDockConflictScreens(barConfig);
+    if (screens.length === 0) return "";
+    return "This bar shares the " + barConfig.position + " edge with the dock on " + screens.join(", ") + ". The dock will stay hidden on those displays.";
+  }
+
   function dockConflictsOnScreen(screen, positionOverride) {
     if (!dockEnabled || !screen) return false;
     var edge = isValidEdge(positionOverride) ? positionOverride : dockPosition;
@@ -799,18 +827,11 @@ QtObject {
   }
 
   function canUseDockPosition(position) {
-    var bars = barConfigs || [];
-    for (var i = 0; i < bars.length; ++i) {
-      var barConfig = bars[i];
-      if (!barConfig.enabled) continue;
-      if (barConfig.position === position) return false;
-    }
-    return true;
+    return isValidEdge(position);
   }
 
   function setDockPosition(position) {
     if (!isValidEdge(position)) return false;
-    if (!canUseDockPosition(position)) return false;
     dockPosition = position;
     return true;
   }
@@ -960,6 +981,8 @@ QtObject {
   onWallpaperDefaultFolderChanged: scheduleSave()
   onWallpaperSolidColorChanged: scheduleSave()
   onWallpaperUseSolidOnStartupChanged: scheduleSave()
+  onWallpaperSolidColorsByMonitorChanged: scheduleSave()
+  onWallpaperRecentSolidColorsChanged: scheduleSave()
 
   function load() {
     var raw = configFile.text();
@@ -1091,6 +1114,8 @@ QtObject {
         if (data.wallpaper.defaultFolder !== undefined) wallpaperDefaultFolder = data.wallpaper.defaultFolder;
         if (data.wallpaper.solidColor !== undefined) wallpaperSolidColor = data.wallpaper.solidColor;
         if (data.wallpaper.useSolidOnStartup !== undefined) wallpaperUseSolidOnStartup = data.wallpaper.useSolidOnStartup;
+        if (data.wallpaper.solidColorsByMonitor !== undefined) wallpaperSolidColorsByMonitor = data.wallpaper.solidColorsByMonitor;
+        if (data.wallpaper.recentSolidColors !== undefined) wallpaperRecentSolidColors = data.wallpaper.recentSolidColors;
       }
     } catch (e) {
       console.error("Failed to load config: " + e);
@@ -1239,7 +1264,9 @@ QtObject {
         "cycleInterval": wallpaperCycleInterval,
         "defaultFolder": wallpaperDefaultFolder,
         "solidColor": wallpaperSolidColor,
-        "useSolidOnStartup": wallpaperUseSolidOnStartup
+        "useSolidOnStartup": wallpaperUseSolidOnStartup,
+        "solidColorsByMonitor": wallpaperSolidColorsByMonitor,
+        "recentSolidColors": wallpaperRecentSolidColors
       }
     };
 

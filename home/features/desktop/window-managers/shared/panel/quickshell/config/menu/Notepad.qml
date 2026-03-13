@@ -10,14 +10,16 @@ import "../widgets" as SharedWidgets
 PanelWindow {
   id: root
 
+  readonly property var edgeMargins: Config.reservedEdgesForScreen(screen, "")
+
   anchors {
     top: true
     right: true
     bottom: true
   }
-  margins.top: Config.barHeight + Config.barMargin + 8
-  margins.right: Config.barMargin
-  margins.bottom: Config.barHeight + Config.barMargin + 8
+  margins.top: edgeMargins.top
+  margins.right: edgeMargins.right
+  margins.bottom: edgeMargins.bottom
 
   implicitWidth: notepadWidth
   color: "transparent"

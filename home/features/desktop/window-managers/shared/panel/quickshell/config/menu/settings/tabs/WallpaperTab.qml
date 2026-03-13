@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import Quickshell.Io
 import "../../../services"
 import "../../../widgets" as SharedWidgets
@@ -136,6 +137,7 @@ Item {
         var hex = _pickerHex();
         solidColorInput = "#" + hex.slice(0, 6);
         solidColorError = "";
+        _rememberRecentSolidColor(hex);
         var mon = root.wallpaperSelectedMonitor === "__all__" ? "" : root.wallpaperSelectedMonitor;
         WallpaperService.setSolidColor(hex, mon);
         solidPickerOpen = false;
@@ -149,8 +151,54 @@ Item {
         }
         solidColorError = "";
         solidColorInput = "#" + normalized.slice(0, 6);
+        _rememberRecentSolidColor(normalized);
         var mon = root.wallpaperSelectedMonitor === "__all__" ? "" : root.wallpaperSelectedMonitor;
         WallpaperService.setSolidColor(normalized, mon);
+    }
+
+    function _rememberRecentSolidColor(hex8) {
+        var normalized = _normalizeSolidColor(hex8);
+        if (!normalized)
+            return;
+        var list = (Config.wallpaperRecentSolidColors || []).slice();
+        var next = [normalized];
+        for (var i = 0; i < list.length; i++) {
+            if ((list[i] || "").toLowerCase() !== normalized)
+                next.push((list[i] || "").toLowerCase());
+        }
+        if (next.length > 12)
+            next = next.slice(0, 12);
+        Config.wallpaperRecentSolidColors = next;
+    }
+
+    function copySolidColor() {
+        var normalized = _normalizeSolidColor(solidColorInput);
+        if (!normalized) {
+            solidColorError = "Use #RRGGBB or #RRGGBBAA.";
+            return;
+        }
+        solidColorError = "";
+        var six = normalized.slice(0, 6);
+        if (solidCopyProc.running)
+            return;
+        solidCopyProc.command = [
+            "sh", "-c",
+            "if command -v wl-copy >/dev/null 2>&1; then "
+            + "printf '%s' " + JSON.stringify("#" + six) + " | wl-copy; "
+            + "elif command -v xclip >/dev/null 2>&1; then "
+            + "printf '%s' " + JSON.stringify("#" + six) + " | xclip -selection clipboard; "
+            + "else exit 127; fi"
+        ];
+        solidCopyProc.running = true;
+    }
+
+    function pasteSolidColor() {
+        if (!solidPasteProc.running)
+            solidPasteProc.running = true;
+    }
+
+    function clearRecentSolidColors() {
+        Config.wallpaperRecentSolidColors = [];
     }
 
     Process {
@@ -172,6 +220,41 @@ Item {
                 } catch (e) {
                     console.error("Failed to parse hyprctl monitors: " + e);
                 }
+            }
+        }
+    }
+
+    Process {
+        id: solidCopyProc
+        running: false
+        onExited: (exitCode, exitStatus) => {
+            if (exitCode === 0)
+                ToastService.showSuccess("Copied", "Solid color copied to clipboard.");
+            else
+                ToastService.showError("Copy failed", "No clipboard utility found (wl-copy/xclip).");
+        }
+    }
+
+    Process {
+        id: solidPasteProc
+        command: ["sh", "-c", "if command -v wl-paste >/dev/null 2>&1; then wl-paste --no-newline; elif command -v xclip >/dev/null 2>&1; then xclip -o -selection clipboard; else exit 127; fi"]
+        running: false
+        onExited: (exitCode, exitStatus) => {
+            if (exitCode === 127)
+                ToastService.showError("Paste failed", "No clipboard utility found (wl-paste/xclip).");
+        }
+        stdout: StdioCollector {
+            onStreamFinished: {
+                var pasted = (this.text || "").trim();
+                if (!pasted.length)
+                    return;
+                var normalized = root._normalizeSolidColor(pasted);
+                if (!normalized) {
+                    root.solidColorError = "Clipboard must contain #RRGGBB or #RRGGBBAA.";
+                    return;
+                }
+                root.solidColorError = "";
+                root.solidColorInput = "#" + normalized.slice(0, 6);
             }
         }
     }
@@ -253,8 +336,9 @@ Item {
                 var key = root.wallpaperSelectedMonitor || "__all__";
                 return WallpaperService.wallpapers[key] || WallpaperService.wallpapers["__all__"] || "";
             }
-            readonly property bool solidPreview: WallpaperService.solidColorActive && previewPath === ""
-            readonly property string solidHex: WallpaperService.solidColorHex || "000000ff"
+            readonly property string _previewMonitor: root.wallpaperSelectedMonitor === "__all__" ? "" : root.wallpaperSelectedMonitor
+            readonly property string solidHex: WallpaperService.solidColorForMonitor(_previewMonitor)
+            readonly property bool solidPreview: solidHex.length > 0
 
             property bool _previewFlip: false
 
@@ -438,6 +522,7 @@ Item {
                             WallpaperService.randomWallpaper(mon);
                         else if (modelData.action === "solid") {
                             var quickHex = root._normalizeSolidColor(root.solidColorInput);
+                            root._rememberRecentSolidColor(quickHex || "000000ff");
                             WallpaperService.setSolidColor(quickHex || "000000ff", mon);
                         }
                         else if (modelData.action === "browse" && root.settingsRoot)
@@ -504,6 +589,18 @@ Item {
                     compact: true
                     onClicked: root.openSolidPicker()
                 }
+
+                SettingsActionButton {
+                    label: "Copy"
+                    compact: true
+                    onClicked: root.copySolidColor()
+                }
+
+                SettingsActionButton {
+                    label: "Paste"
+                    compact: true
+                    onClicked: root.pasteSolidColor()
+                }
             }
 
             RowLayout {
@@ -537,18 +634,61 @@ Item {
                     }
                 }
             }
-        }
 
-            SettingsFieldGrid {
-                SettingsToggleRow {
-                    label: "Use solid color on startup"
-                    icon: "󰝤"
-                    configKey: "wallpaperUseSolidOnStartup"
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: Colors.spacingS
+                visible: (Config.wallpaperRecentSolidColors || []).length > 0
+
+                Text {
+                    text: "Recent:"
+                    color: Colors.textSecondary
+                    font.pixelSize: Colors.fontSizeSmall
+                    font.weight: Font.Medium
                 }
 
-                SettingsToggleRow {
-                    visible: !Config.themeName
-                    label: "Run pywal on change"
+                SettingsActionButton {
+                    label: "Clear"
+                    compact: true
+                    onClicked: root.clearRecentSolidColors()
+                }
+
+                Repeater {
+                    model: Config.wallpaperRecentSolidColors || []
+
+                    delegate: Rectangle {
+                        required property string modelData
+                        width: 20
+                        height: 20
+                        radius: 5
+                        color: "#" + modelData.slice(0, 6)
+                        border.color: Colors.border
+                        border.width: 1
+
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                root.solidColorInput = "#" + modelData.slice(0, 6);
+                                root.applySolidColor();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        SettingsFieldGrid {
+            SettingsToggleRow {
+                label: "Use solid color on startup"
+                icon: "󰝤"
+                configKey: "wallpaperUseSolidOnStartup"
+            }
+
+            SettingsToggleRow {
+                visible: !Config.themeName
+                label: "Run pywal on change"
                 icon: "󰏘"
                 configKey: "wallpaperRunPywal"
             }

@@ -618,6 +618,7 @@ Scope {
     active: root.notepadVisible
     Notepad {
       id: notepad
+      screen: root.currentSurfaceScreen()
       showContent: root.notepadVisible
       onCloseRequested: root.closeSurface("notepad")
       onOpenFileRequested: root._openFileBrowserForNotepad("open")

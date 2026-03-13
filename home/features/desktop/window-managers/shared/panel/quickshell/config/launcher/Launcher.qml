@@ -159,6 +159,83 @@ PanelWindow {
     if (mode === "window") return "Open some applications to see them here";
     return "Try another query or switch modes";
   }
+  readonly property string emptyPrimaryCta: {
+    var clean = stripModePrefix(searchText).trim();
+    if (mode === "files") return "Open Home";
+    if (mode === "web") return clean !== "" ? "Search Web" : "Open DuckDuckGo";
+    if (mode === "ai") return clean.length >= 3 ? "Ask AI" : "Switch to Apps";
+    if (mode === "run") return clean !== "" ? "Run Command" : "Switch to Apps";
+    if (mode === "window") return "Open Apps";
+    if (mode === "bookmarks") return "Switch to Web";
+    if (mode === "clip") return "Switch to Apps";
+    return "Switch to Apps";
+  }
+  readonly property string emptySecondaryCta: {
+    var clean = stripModePrefix(searchText).trim();
+    if (mode === "files") return "Open Folder";
+    if (mode === "web") return clean !== "" ? "Search Google" : "Open Google";
+    if (mode === "system") return "Open Controls";
+    if (mode === "run") return clean !== "" ? "Run In Terminal" : "Open Terminal";
+    return searchText !== "" ? "Clear Query" : "";
+  }
+  readonly property string emptyPrimaryHint: {
+    var clean = stripModePrefix(searchText).trim();
+    if (mode === "files") return "Open your home directory in the default file manager.";
+    if (mode === "web") return clean !== "" ? "Search DuckDuckGo using the current query." : "Open DuckDuckGo homepage.";
+    if (mode === "ai") return clean.length >= 3 ? "Send prompt to AI helper and show copyable result." : "Switch back to app launcher mode.";
+    if (mode === "run") return clean !== "" ? "Execute command directly in shell." : "Switch back to app launcher mode.";
+    if (mode === "system") return "Switch back to app launcher mode.";
+    if (mode === "bookmarks") return "Switch to web mode for broader search.";
+    return "Switch to app launcher mode.";
+  }
+  readonly property string emptyPrimaryHintIcon: {
+    if (mode === "files") return "󰉋";
+    if (mode === "web") return "󰖟";
+    if (mode === "ai") return "󰚩";
+    if (mode === "run") return "󰆍";
+    if (mode === "bookmarks") return "󰃀";
+    return "󰀻";
+  }
+  readonly property string emptySecondaryHint: {
+    var clean = stripModePrefix(searchText).trim();
+    if (mode === "files") return clean !== "" ? "Open folder target derived from query path." : "Open your home directory.";
+    if (mode === "web") return clean !== "" ? "Search Google using the current query." : "Open Google homepage.";
+    if (mode === "system") return "Open quickshell control center panel.";
+    if (mode === "run") return clean !== "" ? "Run command inside terminal for interactive output." : "Open terminal app.";
+    if (searchText !== "") return "Clear the current query text.";
+    return "";
+  }
+  readonly property string emptySecondaryHintIcon: {
+    if (mode === "files") return "󰉋";
+    if (mode === "web") return "󰇥";
+    if (mode === "system") return "󰒓";
+    if (mode === "run") return "󰆍";
+    if (searchText !== "") return "󰅖";
+    return "";
+  }
+  readonly property bool hasResults: filteredItems.length > 0
+  readonly property var selectedItem: hasResults && selectedIndex >= 0 && selectedIndex < filteredItems.length ? filteredItems[selectedIndex] : null
+  readonly property string legendPrimaryAction: {
+    if (showingConfirm) return "Enter: Confirm";
+    if (!hasResults) return "Enter: " + emptyPrimaryCta;
+    var action = itemActionLabel(selectedItem);
+    if (action === "") action = "Open";
+    return "Enter: " + action;
+  }
+  readonly property string legendSecondaryAction: {
+    if (showingConfirm) return "Esc: Cancel";
+    if (!hasResults && emptySecondaryCta !== "") return "Shift+Enter: " + emptySecondaryCta;
+    if (mode === "web" && hasResults) return "Tab: Next Provider";
+    return "Tab: Next Mode";
+  }
+  readonly property string legendTertiaryAction: mode === "web" && hasResults ? "Ctrl+Enter: Open Provider Home" : "Esc: Close"
+  readonly property string activeProviderLabel: {
+    if (mode !== "web")
+      return "";
+    if (selectedItem)
+      return itemProviderLabel(selectedItem);
+    return "";
+  }
 
   readonly property string freqPath: Quickshell.env("HOME") + "/.local/state/quickshell/app_frequency.json"
   readonly property string historyPath: Quickshell.env("HOME") + "/.local/state/quickshell/launcher_history.json"
@@ -1016,11 +1093,11 @@ PanelWindow {
 
   function loadWeb() {
     allItems = [
-      { name: "Google", exec: "https://www.google.com/search?q=", icon: "󰊯", isWeb: true },
-      { name: "DuckDuckGo", exec: "https://duckduckgo.com/?q=", icon: "󰇥", isWeb: true },
-      { name: "YouTube", exec: "https://www.youtube.com/results?search_query=", icon: "󰗃", isWeb: true },
-      { name: "NixOS Packages", exec: "https://search.nixos.org/packages?query=", icon: "", isWeb: true },
-      { name: "GitHub", exec: "https://github.com/search?q=", icon: "󰊤", isWeb: true }
+      { name: "Google", exec: "https://www.google.com/search?q=", home: "https://www.google.com/", icon: "󰊯", isWeb: true },
+      { name: "DuckDuckGo", exec: "https://duckduckgo.com/?q=", home: "https://duckduckgo.com/", icon: "󰇥", isWeb: true },
+      { name: "YouTube", exec: "https://www.youtube.com/results?search_query=", home: "https://www.youtube.com/", icon: "󰗃", isWeb: true },
+      { name: "NixOS Packages", exec: "https://search.nixos.org/packages?query=", home: "https://search.nixos.org/packages", icon: "", isWeb: true },
+      { name: "GitHub", exec: "https://github.com/search?q=", home: "https://github.com/", icon: "󰊤", isWeb: true }
     ];
     filterItems();
   }
@@ -1210,6 +1287,125 @@ PanelWindow {
       return;
     }
     Quickshell.execDetached(["bash", "-lc", String(execString)]);
+  }
+
+  function itemActionLabel(item) {
+    if (!item || item.isHint) return "";
+    if (mode === "clip" || mode === "emoji" || mode === "calc" || mode === "ai") return "Copy";
+    if (mode === "window") return "Focus";
+    if (mode === "files" || mode === "web" || mode === "bookmarks" || mode === "wallpapers") return "Open";
+    if (mode === "drun" || mode === "run") return "Run";
+    if (mode === "system" || mode === "nixos" || mode === "keybinds" || mode === "media") return "Action";
+    return "";
+  }
+
+  function itemProviderLabel(item) {
+    if (!item || item.isHint)
+      return "";
+    if (mode === "web")
+      return item.name || "";
+    if (mode === "bookmarks") {
+      var raw = String(item.exec || "");
+      var match = raw.match(/^https?:\/\/([^\/?#]+)/i);
+      return match && match.length > 1 ? match[1] : "";
+    }
+    return "";
+  }
+
+  function executeEmptyPrimary() {
+    var clean = stripModePrefix(searchText).trim();
+    if (mode === "files") {
+      Quickshell.execDetached(["xdg-open", Quickshell.env("HOME") || "/"]);
+      close();
+      return;
+    }
+    if (mode === "web") {
+      var url = "https://duckduckgo.com/";
+      if (clean !== "")
+        url += "?q=" + encodeURIComponent(clean);
+      Quickshell.execDetached(["xdg-open", url]);
+      close();
+      return;
+    }
+    if (mode === "ai" && clean.length >= 3) {
+      loadAi();
+      return;
+    }
+    if (mode === "run" && clean !== "") {
+      launchExecString(clean, false);
+      close();
+      return;
+    }
+    if (mode === "bookmarks") {
+      open("web", true);
+      return;
+    }
+    open("drun");
+  }
+
+  function executeEmptySecondary() {
+    var clean = stripModePrefix(searchText).trim();
+    if (mode === "files") {
+      var target = Quickshell.env("HOME") || "/";
+      if (clean.startsWith("~")) {
+        target = (Quickshell.env("HOME") || "/") + clean.substring(1);
+      } else if (clean.startsWith("/")) {
+        target = clean;
+      }
+      Quickshell.execDetached(["xdg-open", target]);
+      close();
+      return;
+    }
+    if (mode === "web") {
+      var google = "https://www.google.com/";
+      if (clean !== "")
+        google += "search?q=" + encodeURIComponent(clean);
+      Quickshell.execDetached(["xdg-open", google]);
+      close();
+      return;
+    }
+    if (mode === "system") {
+      Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleControls"]);
+      close();
+      return;
+    }
+    if (mode === "run") {
+      if (clean !== "") {
+        launchExecString(clean, true);
+      } else {
+        Quickshell.execDetached(["kitty"]);
+      }
+      close();
+      return;
+    }
+    searchText = "";
+    if (searchInput) searchInput.text = "";
+    filterItems();
+    if (searchInput) searchInput.forceActiveFocus();
+  }
+
+  function cycleSelection(step) {
+    if (filteredItems.length <= 0) return;
+    var next = (selectedIndex + step + filteredItems.length) % filteredItems.length;
+    selectedIndex = next;
+  }
+
+  function openSelectedWebHomepage() {
+    if (mode !== "web" || filteredItems.length <= 0 || selectedIndex < 0 || selectedIndex >= filteredItems.length)
+      return;
+    var item = filteredItems[selectedIndex];
+    var home = String(item.home || "");
+    if (home === "") {
+      var exec = String(item.exec || "");
+      var qIndex = exec.indexOf("?");
+      home = qIndex >= 0 ? exec.substring(0, qIndex) : exec;
+      if (home !== "" && home.charAt(home.length - 1) !== "/")
+        home += "/";
+    }
+    if (home !== "") {
+      Quickshell.execDetached(["xdg-open", home]);
+      close();
+    }
   }
 
   function activateFeatured(item) {
@@ -1477,15 +1673,24 @@ PanelWindow {
               }
               Keys.onPressed: (event) => {
                 if (event.key === Qt.Key_Escape) launcherRoot.close();
-                else if (event.key === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier)) {
+                else if (event.key === Qt.Key_Tab && launcherRoot.mode === "web" && (event.modifiers & Qt.ShiftModifier) && !(event.modifiers & Qt.ControlModifier)) {
+                  launcherRoot.cycleSelection(-1);
+                  event.accepted = true;
+                } else if (event.key === Qt.Key_Tab && launcherRoot.mode === "web" && !(event.modifiers & Qt.ShiftModifier) && !(event.modifiers & Qt.ControlModifier)) {
+                  launcherRoot.cycleSelection(1);
+                  event.accepted = true;
+                } else if (event.key === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier)) {
                   launcherRoot.cycleMode(-1);
                   event.accepted = true;
                 } else if (event.key === Qt.Key_Tab) {
                   launcherRoot.cycleMode(1);
                   event.accepted = true;
                 } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                  if (launcherRoot.mode === "ai" && launcherRoot.filteredItems.length === 0) launcherRoot.loadAi();
+                  if ((event.modifiers & Qt.ControlModifier) && launcherRoot.mode === "web" && launcherRoot.filteredItems.length > 0) launcherRoot.openSelectedWebHomepage();
+                  else if ((event.modifiers & Qt.ShiftModifier) && launcherRoot.filteredItems.length === 0 && launcherRoot.emptySecondaryCta !== "") launcherRoot.executeEmptySecondary();
+                  else if (launcherRoot.mode === "ai" && launcherRoot.filteredItems.length === 0) launcherRoot.loadAi();
                   else if (launcherRoot.mode === "files" && launcherRoot.searchText.length > 1 && launcherRoot.filteredItems.length === 0) launcherRoot.loadFiles();
+                  else if (launcherRoot.filteredItems.length === 0) launcherRoot.executeEmptyPrimary();
                   else launcherRoot.executeSelection();
                 } else if (event.key === Qt.Key_Up) {
                   launcherRoot.selectedIndex = Math.max(0, launcherRoot.selectedIndex - 1);
@@ -1493,6 +1698,36 @@ PanelWindow {
                 } else if (event.key === Qt.Key_Down) {
                   launcherRoot.selectedIndex = Math.min(launcherRoot.filteredItems.length - 1, launcherRoot.selectedIndex + 1);
                   event.accepted = true;
+                }
+              }
+            }
+            Rectangle {
+              visible: launcherRoot.mode === "web" && launcherRoot.activeProviderLabel !== ""
+              height: 28
+              width: Math.min(providerText.implicitWidth + 28, 210)
+              radius: height / 2
+              color: Colors.withAlpha(Colors.primary, 0.12)
+              border.color: Colors.withAlpha(Colors.primary, 0.5)
+              border.width: 1
+              RowLayout {
+                anchors.fill: parent
+                anchors.leftMargin: 10
+                anchors.rightMargin: 12
+                spacing: Colors.spacingXS
+                Text {
+                  text: "󰖟"
+                  color: Colors.primary
+                  font.family: Colors.fontMono
+                  font.pixelSize: Colors.fontSizeSmall
+                }
+                Text {
+                  id: providerText
+                  Layout.fillWidth: true
+                  text: launcherRoot.activeProviderLabel
+                  color: Colors.primary
+                  font.pixelSize: Colors.fontSizeXS
+                  font.weight: Font.DemiBold
+                  elide: Text.ElideRight
                 }
               }
             }
@@ -1518,9 +1753,13 @@ PanelWindow {
         RowLayout {
           Layout.fillWidth: true
           spacing: Colors.paddingSmall
-          visible: Config.launcherShowModeHints && launcherRoot.showLauncherHome
+          visible: Config.launcherShowModeHints
           Text { Layout.fillWidth: true; text: launcherRoot.modeInfo(launcherRoot.mode).hint; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; elide: Text.ElideRight }
-          Text { text: "Balanced keyboard + mouse flow"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS }
+          Text {
+            text: launcherRoot.legendPrimaryAction + " • " + launcherRoot.legendSecondaryAction + " • " + launcherRoot.legendTertiaryAction
+            color: Colors.textDisabled
+            font.pixelSize: Colors.fontSizeXS
+          }
         }
 
         Rectangle {
@@ -1791,6 +2030,10 @@ PanelWindow {
                 height: 58
                 color: index === launcherRoot.selectedIndex ? Colors.highlight : "transparent"
                 radius: Colors.radiusSmall
+                border.color: index === launcherRoot.selectedIndex ? Colors.withAlpha(Colors.primary, 0.6) : "transparent"
+                border.width: index === launcherRoot.selectedIndex ? 1 : 0
+                readonly property string actionLabel: launcherRoot.itemActionLabel(modelData)
+                readonly property string providerLabel: launcherRoot.itemProviderLabel(modelData)
 
                 RowLayout {
                   anchors.fill: parent
@@ -1845,12 +2088,51 @@ PanelWindow {
                     }
                   }
 
-                  Rectangle {
-                    width: 28
-                    height: 28
-                    radius: Colors.radiusMedium
-                    color: index === launcherRoot.selectedIndex ? Colors.withAlpha(Colors.primary, 0.18) : "transparent"
-                    Text { anchors.centerIn: parent; text: "󰄮"; color: index === launcherRoot.selectedIndex ? Colors.primary : Colors.textDisabled; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeSmall }
+                  RowLayout {
+                    spacing: Colors.spacingXS
+                    Rectangle {
+                      visible: providerLabel !== ""
+                      radius: Colors.radiusPill
+                      color: index === launcherRoot.selectedIndex ? Colors.withAlpha(Colors.primary, 0.22) : Colors.highlight
+                      border.color: Colors.withAlpha(Colors.primary, 0.45)
+                      border.width: 1
+                      implicitHeight: 22
+                      implicitWidth: providerBadgeText.implicitWidth + 12
+                      Text {
+                        id: providerBadgeText
+                        anchors.centerIn: parent
+                        text: providerLabel
+                        color: Colors.primary
+                        font.pixelSize: Colors.fontSizeXS
+                        font.weight: Font.DemiBold
+                        elide: Text.ElideRight
+                        width: Math.min(implicitWidth, 150)
+                      }
+                    }
+                    Rectangle {
+                      visible: actionLabel !== ""
+                      radius: Colors.radiusPill
+                      color: index === launcherRoot.selectedIndex ? Colors.withAlpha(Colors.primary, 0.18) : Colors.surface
+                      border.color: Colors.border
+                      border.width: 1
+                      implicitHeight: 22
+                      implicitWidth: actionBadgeText.implicitWidth + 12
+                      Text {
+                        id: actionBadgeText
+                        anchors.centerIn: parent
+                        text: actionLabel
+                        color: index === launcherRoot.selectedIndex ? Colors.primary : Colors.textSecondary
+                        font.pixelSize: Colors.fontSizeXS
+                        font.weight: Font.DemiBold
+                      }
+                    }
+                    Rectangle {
+                      width: 28
+                      height: 28
+                      radius: Colors.radiusMedium
+                      color: index === launcherRoot.selectedIndex ? Colors.withAlpha(Colors.primary, 0.18) : "transparent"
+                      Text { anchors.centerIn: parent; text: "󰄮"; color: index === launcherRoot.selectedIndex ? Colors.primary : Colors.textDisabled; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeSmall }
+                    }
                   }
                 }
 
@@ -1878,9 +2160,99 @@ PanelWindow {
                 Text { text: launcherRoot.modeIcons[launcherRoot.mode] || "󰈔"; color: Colors.textDisabled; font.family: Colors.fontMono; font.pixelSize: 26; Layout.alignment: Qt.AlignHCenter }
                 Text { text: launcherRoot.emptyStateTitle; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.DemiBold; Layout.alignment: Qt.AlignHCenter }
                 Text { text: launcherRoot.emptyStateSubtitle; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; Layout.alignment: Qt.AlignHCenter }
-              }
-            }
-          }
+                                RowLayout {
+                                  Layout.alignment: Qt.AlignHCenter
+                                  spacing: Colors.spacingS
+                  Rectangle {
+                    radius: Colors.radiusPill
+                    color: Colors.primary
+                    implicitHeight: 30
+                    implicitWidth: emptyPrimaryText.implicitWidth + 20
+                    Text {
+                      id: emptyPrimaryText
+                      anchors.centerIn: parent
+                      text: launcherRoot.emptyPrimaryCta
+                      color: Colors.text
+                      font.pixelSize: Colors.fontSizeXS
+                      font.weight: Font.DemiBold
+                    }
+                    MouseArea {
+                      anchors.fill: parent
+                      hoverEnabled: true
+                      cursorShape: Qt.PointingHandCursor
+                      onClicked: launcherRoot.executeEmptyPrimary()
+                    }
+                  }
+                  Rectangle {
+                    visible: launcherRoot.emptySecondaryCta !== ""
+                    radius: Colors.radiusPill
+                    color: Colors.surface
+                    border.color: Colors.border
+                    border.width: 1
+                    implicitHeight: 30
+                    implicitWidth: emptySecondaryText.implicitWidth + 20
+                    Text {
+                      id: emptySecondaryText
+                      anchors.centerIn: parent
+                      text: launcherRoot.emptySecondaryCta
+                      color: Colors.text
+                      font.pixelSize: Colors.fontSizeXS
+                      font.weight: Font.DemiBold
+                    }
+                    MouseArea {
+                      anchors.fill: parent
+                      hoverEnabled: true
+                      cursorShape: Qt.PointingHandCursor
+                      onClicked: launcherRoot.executeEmptySecondary()
+                                    }
+                                  }
+                                }
+                                RowLayout {
+                                  Layout.maximumWidth: Math.min(parent.width - 24, 460)
+                                  Layout.alignment: Qt.AlignHCenter
+                                  spacing: Colors.spacingXS
+                                  Text {
+                                    text: launcherRoot.emptyPrimaryHintIcon
+                                    color: Colors.textDisabled
+                                    font.family: Colors.fontMono
+                                    font.pixelSize: Colors.fontSizeSmall
+                                    visible: text !== ""
+                                    Layout.alignment: Qt.AlignTop
+                                  }
+                                  Text {
+                                    text: launcherRoot.emptyPrimaryHint
+                                    color: Colors.textDisabled
+                                    font.pixelSize: Colors.fontSizeXS
+                                    wrapMode: Text.WordWrap
+                                    horizontalAlignment: Text.AlignHCenter
+                                    Layout.fillWidth: true
+                                  }
+                                }
+                                RowLayout {
+                                  visible: launcherRoot.emptySecondaryHint !== ""
+                                  Layout.maximumWidth: Math.min(parent.width - 24, 460)
+                                  Layout.alignment: Qt.AlignHCenter
+                                  spacing: Colors.spacingXS
+                                  Text {
+                                    text: launcherRoot.emptySecondaryHintIcon
+                                    color: Colors.textDisabled
+                                    font.family: Colors.fontMono
+                                    font.pixelSize: Colors.fontSizeSmall
+                                    visible: text !== ""
+                                    Layout.alignment: Qt.AlignTop
+                                  }
+                                  Text {
+                                    text: launcherRoot.emptySecondaryHint
+                                    color: Colors.textDisabled
+                                    font.pixelSize: Colors.fontSizeXS
+                                    wrapMode: Text.WordWrap
+                                    horizontalAlignment: Text.AlignHCenter
+                                    Layout.fillWidth: true
+                                  }
+                                }
+                              }
+                            }
+                        }
 
           ColumnLayout {
             spacing: Colors.paddingMedium

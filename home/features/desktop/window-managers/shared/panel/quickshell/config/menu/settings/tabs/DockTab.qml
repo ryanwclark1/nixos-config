@@ -8,6 +8,7 @@ Item {
     property var settingsRoot: null
     property string tabId: ""
     property string validationMessage: ""
+    readonly property string conflictMessage: Config.dockConflictMessage()
 
     SettingsTabPage {
         anchors.fill: parent
@@ -16,10 +17,10 @@ Item {
         iconName: "󰍜"
 
         SettingsInfoCallout {
-            visible: root.validationMessage !== "" || Config.dockHasConflict()
+            visible: root.validationMessage !== "" || root.conflictMessage !== ""
             iconName: "󰀪"
-            title: root.validationMessage !== "" ? "Dock conflict" : "Reserved edge in use"
-            body: root.validationMessage !== "" ? root.validationMessage : "An enabled bar already occupies the dock edge on at least one display. The dock will stay hidden only on those conflicting displays."
+            title: root.validationMessage !== "" ? "Dock warning" : "Shared edge"
+            body: root.validationMessage !== "" ? root.validationMessage : root.conflictMessage
         }
 
         SettingsCard {
@@ -49,7 +50,7 @@ Item {
         SettingsCard {
             title: "Layout"
             iconName: "󰕰"
-            description: "Dock position and icon sizing. The dock cannot share an edge with any enabled bar."
+            description: "Dock position and icon sizing. If a bar uses the same edge on a display, the dock hides only on that display."
 
             SettingsModeRow {
                 label: "Dock Position"
@@ -63,7 +64,7 @@ Item {
                 onModeSelected: value => {
                     root.validationMessage = "";
                     if (!Config.setDockPosition(value))
-                        root.validationMessage = "The " + value + " edge is already occupied by an enabled bar.";
+                        root.validationMessage = "Invalid dock edge: " + value + ".";
                 }
             }
 

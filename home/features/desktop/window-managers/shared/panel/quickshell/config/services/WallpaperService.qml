@@ -30,6 +30,7 @@ QtObject {
   property bool scanning: false
   property bool solidColorActive: false
   property string solidColorHex: "000000ff"
+  property var solidColorsByMonitor: ({})
   property string _applyImagePath: ""
   property string _applyMonitorName: ""
   property string _applyStdout: ""
@@ -38,6 +39,8 @@ QtObject {
   property string _colorHex: "000000ff"
   property string _colorMonitorName: ""
   property string _colorApplyStderr: ""
+  property bool _colorNotify: true
+  property var _queuedSolidApplies: []
 
   // Primary wallpaper directory shown in the UI (default: Pictures).
   // The service always scans *all* wallpaperSearchDirs; this is just the folder
@@ -121,15 +124,40 @@ QtObject {
   }
 
   // Apply a solid color background via swww.
-  function setSolidColor(colorHex, monitorName, persistSetting) {
-    if (applyProc.running || colorApplyProc.running) return;
-    _colorHex = (colorHex || "000000ff").replace(/^#/, "");
-    _colorMonitorName = monitorName || "";
-    if (persistSetting === undefined || persistSetting)
+  function setSolidColor(colorHex, monitorName, persistSetting, notifyUser) {
+    var request = {
+      colorHex: (colorHex || "000000ff").replace(/^#/, ""),
+      monitorName: monitorName || "",
+      persistSetting: persistSetting === undefined ? true : !!persistSetting,
+      notifyUser: notifyUser === undefined ? true : !!notifyUser
+    };
+    if (applyProc.running || colorApplyProc.running) {
+      _queuedSolidApplies = _queuedSolidApplies.concat([request]);
+      return;
+    }
+    _startSolidApply(request);
+  }
+
+  function _startSolidApply(request) {
+    _colorHex = request.colorHex;
+    _colorMonitorName = request.monitorName;
+    _colorNotify = request.notifyUser;
+    if (request.persistSetting)
       Config.wallpaperSolidColor = _colorHex;
     _colorApplyStderr = "";
     colorApplyProc.command = ["sh", "-c", _buildSolidColorScript(_colorHex, _colorMonitorName)];
     colorApplyProc.running = true;
+  }
+
+  function solidColorForMonitor(monitorName) {
+    var key = monitorName || "__all__";
+    return solidColorsByMonitor[key] || solidColorsByMonitor["__all__"] || "";
+  }
+
+  function _persistSolidMap(mapObj) {
+    solidColorsByMonitor = mapObj;
+    Config.wallpaperSolidColorsByMonitor = Object.assign({}, mapObj);
+    solidColorActive = Object.keys(mapObj).length > 0;
   }
 
   // ---- Auto-cycling ----------------------------------------------------------
@@ -196,7 +224,15 @@ QtObject {
     onExited: (exitCode, exitStatus) => {
       var key = root._applyMonitorName || "__all__";
       if (exitCode === 0) {
-        root.solidColorActive = false;
+        var clearedSolid = Object.assign({}, root.solidColorsByMonitor);
+        if (key === "__all__") {
+          clearedSolid = {};
+        } else {
+          delete clearedSolid[key];
+        }
+        root._persistSolidMap(clearedSolid);
+        if (!root.solidColorActive)
+          root.solidColorHex = Config.wallpaperSolidColor || "000000ff";
         var updated = Object.assign({}, root.wallpapers);
         updated[key] = root._applyImagePath;
         root.wallpapers = updated;
@@ -249,7 +285,13 @@ QtObject {
         var err = (root._colorApplyStderr || "").trim();
         if (!err.length) err = "Failed to apply solid color background";
         console.warn("WallpaperService: solid color apply failed", "color", root._colorHex, "monitor", root._colorMonitorName || "__all__", "error", err);
-        ToastService.showError("Solid color failed", "Could not apply solid color wallpaper.");
+        if (root._colorNotify)
+          ToastService.showError("Solid color failed", "Could not apply solid color wallpaper.");
+        if (root._queuedSolidApplies.length > 0) {
+          var nextReqFail = root._queuedSolidApplies[0];
+          root._queuedSolidApplies = root._queuedSolidApplies.slice(1);
+          root._startSolidApply(nextReqFail);
+        }
         return;
       }
       var key = root._colorMonitorName || "__all__";
@@ -257,10 +299,21 @@ QtObject {
       delete updated[key];
       root.wallpapers = updated;
       Config.wallpaperPaths = Object.assign({}, root.wallpapers);
+      var solidMap = Object.assign({}, root.solidColorsByMonitor);
+      if (key === "__all__")
+        solidMap = { "__all__": root._colorHex };
+      else
+        solidMap[key] = root._colorHex;
+      root._persistSolidMap(solidMap);
       root.solidColorHex = root._colorHex;
-      root.solidColorActive = true;
       console.log("WallpaperService: applied solid color", root._colorHex, "monitor", root._colorMonitorName || "__all__");
-      ToastService.showSuccess("Solid color applied", "#" + root._colorHex.slice(0, 6));
+      if (root._colorNotify)
+        ToastService.showSuccess("Solid color applied", "#" + root._colorHex.slice(0, 6));
+      if (root._queuedSolidApplies.length > 0) {
+        var nextReq = root._queuedSolidApplies[0];
+        root._queuedSolidApplies = root._queuedSolidApplies.slice(1);
+        root._startSolidApply(nextReq);
+      }
     }
     stderr: StdioCollector {
       onStreamFinished: {
@@ -277,8 +330,23 @@ QtObject {
       wallpapers = Object.assign({}, Config.wallpaperPaths);
     }
     solidColorHex = Config.wallpaperSolidColor || "000000ff";
-    if (Config.wallpaperUseSolidOnStartup)
-      setSolidColor(solidColorHex, "", false);
+    if (Config.wallpaperSolidColorsByMonitor && typeof Config.wallpaperSolidColorsByMonitor === "object") {
+      solidColorsByMonitor = Object.assign({}, Config.wallpaperSolidColorsByMonitor);
+      solidColorActive = Object.keys(solidColorsByMonitor).length > 0;
+    }
+    if (Config.wallpaperUseSolidOnStartup) {
+      setSolidColor(solidColorHex, "", false, false);
+    } else if (solidColorActive) {
+      if (solidColorsByMonitor["__all__"]) {
+        setSolidColor(solidColorsByMonitor["__all__"], "", false, false);
+      } else {
+        var keys = Object.keys(solidColorsByMonitor);
+        for (var i = 0; i < keys.length; i++) {
+          var mon = keys[i];
+          setSolidColor(solidColorsByMonitor[mon], mon, false, false);
+        }
+      }
+    }
     scanWallpapers();
   }
 

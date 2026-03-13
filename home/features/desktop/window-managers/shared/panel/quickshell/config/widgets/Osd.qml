@@ -214,6 +214,7 @@ Scope {
         id: osdWindow
         required property ShellScreen modelData
         screen: modelData
+        readonly property var edgeMargins: Config.reservedEdgesForScreen(modelData, "")
 
         // Delayed unmap: stay mapped briefly after hide for fade-out
         // Note: Quickshell.cursorScreen is unavailable in 0.2.x, so we
@@ -234,20 +235,22 @@ Scope {
 
         // Bar-aware margins: offset OSD when bar is at same edge
         margins.top: {
-          if (root.posCenter) return screen ? (screen.height / 2 - implicitHeight / 2) : 0;
+          if (root.posCenter)
+            return screen ? Math.max(edgeMargins.top, edgeMargins.top + ((screen.height - edgeMargins.top - edgeMargins.bottom - implicitHeight) / 2)) : 0;
           if (!root.posTop) return 0;
-          return Config.barHeight + (Config.barFloating ? Config.barMargin : 0) + 8;
+          return edgeMargins.top;
         }
-        margins.bottom: root.posBottom ? 16 : 0
+        margins.bottom: root.posBottom ? edgeMargins.bottom : 0
         margins.left: {
-          if (root.posCenter) return screen ? (screen.width / 2 - implicitWidth / 2) : 0;
-          if (root.posLeft) return 16;
+          if (root.posCenter)
+            return screen ? Math.max(edgeMargins.left, edgeMargins.left + ((screen.width - edgeMargins.left - edgeMargins.right - implicitWidth) / 2)) : 0;
+          if (root.posLeft) return edgeMargins.left;
           // Horizontal center for top/bottom
           if (!root.posLeft && !root.posRight && (root.posTop || root.posBottom))
-            return screen ? (screen.width / 2 - implicitWidth / 2) : 0;
+            return screen ? Math.max(edgeMargins.left, edgeMargins.left + ((screen.width - edgeMargins.left - edgeMargins.right - implicitWidth) / 2)) : 0;
           return 0;
         }
-        margins.right: root.posRight ? 16 : 0
+        margins.right: root.posRight ? edgeMargins.right : 0
 
         exclusiveZone: 0
         color: "transparent"

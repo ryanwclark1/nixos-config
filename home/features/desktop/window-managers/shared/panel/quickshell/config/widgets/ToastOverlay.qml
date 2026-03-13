@@ -7,6 +7,7 @@ PanelWindow {
   id: root
   required property ShellScreen screenModel
   screen: screenModel
+  readonly property var edgeMargins: Config.reservedEdgesForScreen(screenModel, "")
 
   anchors {
     top: true
@@ -14,7 +15,9 @@ PanelWindow {
     right: true
   }
 
-  margins.top: Config.barHeight + Config.barMargin + 8
+  margins.top: edgeMargins.top
+  margins.left: edgeMargins.left
+  margins.right: edgeMargins.right
   implicitHeight: toastLoader.item ? toastLoader.item.implicitHeight + 16 : 80
   color: "transparent"
 
