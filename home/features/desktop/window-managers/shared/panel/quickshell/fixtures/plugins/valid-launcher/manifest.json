@@ -1,0 +1,16 @@
+{
+  "id": "fixture.valid.launcher",
+  "name": "Fixture Launcher",
+  "description": "Valid launcher plugin fixture",
+  "author": "fixtures",
+  "version": "1.0.0",
+  "type": "launcher-provider",
+  "permissions": [],
+  "launcher": {
+    "trigger": "!fx",
+    "noTrigger": true
+  },
+  "entryPoints": {
+    "launcherProvider": "LauncherProvider.qml"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "id": "fixture.invalid.missing",
+  "name": "Missing Required",
+  "author": "fixtures",
+  "version": "1.0.0",
+  "type": "bar-widget",
+  "permissions": ["settings_read"],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  }
+}

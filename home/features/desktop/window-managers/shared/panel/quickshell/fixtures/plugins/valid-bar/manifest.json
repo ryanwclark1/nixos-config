@@ -1,0 +1,13 @@
+{
+  "id": "fixture.valid.bar",
+  "name": "Fixture Bar",
+  "description": "Valid bar plugin fixture",
+  "author": "fixtures",
+  "version": "1.0.0",
+  "type": "bar-widget",
+  "permissions": ["settings_read", "settings_write"],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml",
+    "settings": "Settings.qml"
+  }
+}

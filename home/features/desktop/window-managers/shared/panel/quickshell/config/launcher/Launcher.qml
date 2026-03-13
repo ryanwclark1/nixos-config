@@ -53,6 +53,8 @@ PanelWindow {
   property var recentItems: []
   property var suggestionItems: []
   property var featuredActions: []
+  property string drunCategoryFilter: ""
+  property var drunCategoryOptions: [{ key: "", label: "All", count: 0, hotkey: "0" }]
   property string _sessionWebProviderKey: ""
   property var appFrequency: ({})
   property var launchHistory: []
@@ -106,6 +108,15 @@ PanelWindow {
   property real globalLastMouseY: 0
 
   readonly property bool showLauncherHome: Config.launcherShowHomeSections && searchText === "" && (mode === "drun" || mode === "system" || mode === "files")
+  readonly property bool drunCategoryFiltersEnabled: Config.launcherDrunCategoryFiltersEnabled
+  readonly property string drunCategoryFilterLabel: {
+    for (var i = 0; i < drunCategoryOptions.length; ++i) {
+      var option = drunCategoryOptions[i];
+      if (String(option.key || "") === drunCategoryFilter)
+        return String(option.label || "All");
+    }
+    return "All";
+  }
   readonly property var allKnownModes: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
   readonly property var transientModes: ["dmenu"]
   readonly property var defaultModeOrder: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
@@ -1064,6 +1075,110 @@ PanelWindow {
   function saveFrequency() { freqFile.setText(JSON.stringify(appFrequency)); }
   function saveHistory() { historyFile.setText(JSON.stringify(launchHistory)); }
 
+  function formatDrunCategoryLabel(categoryKey) {
+    var key = String(categoryKey || "");
+    if (key === "")
+      return "All";
+    return key.charAt(0).toUpperCase() + key.slice(1);
+  }
+
+  function itemMatchesDrunCategory(item, categoryKey) {
+    var key = String(categoryKey || "");
+    if (key === "")
+      return true;
+    ensureItemRankCache(item);
+    var tokens = item._categoryTokens || [];
+    for (var i = 0; i < tokens.length; ++i) {
+      if (tokens[i] === key)
+        return true;
+    }
+    return false;
+  }
+
+  function refreshDrunCategoryOptions(apps) {
+    if (!drunCategoryFiltersEnabled) {
+      drunCategoryFilter = "";
+      drunCategoryOptions = [{ key: "", label: "All", count: Array.isArray(apps) ? apps.length : 0, hotkey: "0" }];
+      return;
+    }
+    var source = Array.isArray(apps) ? apps : [];
+    var counts = ({});
+    var labels = ({});
+    for (var i = 0; i < source.length; ++i) {
+      var app = source[i];
+      ensureItemRankCache(app);
+      var key = String(app._primaryCategoryKey || "");
+      if (key === "")
+        continue;
+      counts[key] = (counts[key] || 0) + 1;
+      if (!labels[key])
+        labels[key] = formatDrunCategoryLabel(key);
+    }
+    var keys = Object.keys(counts);
+    keys.sort(function(a, b) {
+      if ((counts[b] || 0) !== (counts[a] || 0))
+        return (counts[b] || 0) - (counts[a] || 0);
+      return String(labels[a] || a).localeCompare(String(labels[b] || b));
+    });
+
+    var next = [{ key: "", label: "All", count: source.length, hotkey: "0" }];
+    var limit = Math.min(9, keys.length);
+    for (var j = 0; j < limit; ++j) {
+      var categoryKey = keys[j];
+      next.push({
+        key: categoryKey,
+        label: String(labels[categoryKey] || categoryKey),
+        count: counts[categoryKey] || 0,
+        hotkey: String(j + 1)
+      });
+    }
+    drunCategoryOptions = next;
+
+    var exists = false;
+    for (var k = 0; k < next.length; ++k) {
+      if (String(next[k].key || "") === drunCategoryFilter) {
+        exists = true;
+        break;
+      }
+    }
+    if (!exists)
+      drunCategoryFilter = "";
+  }
+
+  function setDrunCategoryFilter(categoryKey) {
+    if (!drunCategoryFiltersEnabled) {
+      categoryKey = "";
+    }
+    var next = String(categoryKey || "");
+    if (drunCategoryFilter === next)
+      return false;
+    drunCategoryFilter = next;
+    scheduleSearchRefresh(true);
+    return true;
+  }
+
+  function cycleDrunCategoryFilter(step) {
+    if (!drunCategoryFiltersEnabled || mode !== "drun" || drunCategoryOptions.length <= 1)
+      return false;
+    var currentIndex = 0;
+    for (var i = 0; i < drunCategoryOptions.length; ++i) {
+      if (String(drunCategoryOptions[i].key || "") === drunCategoryFilter) {
+        currentIndex = i;
+        break;
+      }
+    }
+    var nextIndex = (currentIndex + step + drunCategoryOptions.length) % drunCategoryOptions.length;
+    return setDrunCategoryFilter(String((drunCategoryOptions[nextIndex] || {}).key || ""));
+  }
+
+  function selectDrunCategorySlot(slot) {
+    if (!drunCategoryFiltersEnabled || mode !== "drun" || slot < 1)
+      return false;
+    if (slot >= drunCategoryOptions.length)
+      return false;
+    return setDrunCategoryFilter(String((drunCategoryOptions[slot] || {}).key || ""));
+  }
+
   function rememberRecent(item) {
     var key = item.exec || item.address || item.fullPath || item.name || item.title || "";
     if (!key) return;
@@ -1097,6 +1212,7 @@ PanelWindow {
     suggestionItems = [];
     if (mode === "drun") {
       var apps = getCached("drun") || [];
+      refreshDrunCategoryOptions(apps);
       var recent = [];
       var seen = ({});
       var appsByExec = ({});
@@ -1124,12 +1240,26 @@ PanelWindow {
           seen[launchExec] = true;
         }
       }
-      usageRanked.sort(function(a, b) { return (b._usage || 0) - (a._usage || 0); });
+      usageRanked.sort(function(a, b) {
+        if ((b._usage || 0) !== (a._usage || 0))
+          return (b._usage || 0) - (a._usage || 0);
+        return compareLauncherItemsAlpha(a, b);
+      });
+      recent.sort(function(a, b) {
+        if ((b._recent || 0) !== (a._recent || 0))
+          return (b._recent || 0) - (a._recent || 0);
+        return compareLauncherItemsAlpha(a, b);
+      });
+      if (drunCategoryFilter !== "") {
+        recent = recent.filter(function(item) {
+          return itemMatchesDrunCategory(item, drunCategoryFilter);
+        });
+      }
       if (recent.length < Config.launcherRecentAppsLimit) {
         for (var k = 0; k < usageRanked.length; ++k) {
           var fallback = usageRanked[k];
           var fallbackExec = String(fallback.exec || "");
-          if (fallbackExec === "" || seen[fallbackExec])
+          if (fallbackExec === "" || seen[fallbackExec] || !itemMatchesDrunCategory(fallback, drunCategoryFilter))
             continue;
           var promoted = Object.assign({}, fallback);
           promoted._recent = fallback._usage || 0;
@@ -1144,20 +1274,26 @@ PanelWindow {
       for (var m = 0; m < usageRanked.length; ++m) {
         var candidate = usageRanked[m];
         var candidateExec = String(candidate.exec || "");
-        if (candidateExec === "" || seen[candidateExec])
+        if (candidateExec === "" || seen[candidateExec] || !itemMatchesDrunCategory(candidate, drunCategoryFilter))
           continue;
         suggestions.push(candidate);
       }
       suggestionItems = suggestions.slice(0, Config.launcherSuggestionsLimit);
     } else if (mode === "system") {
+      drunCategoryFilter = "";
+      drunCategoryOptions = [{ key: "", label: "All", count: 0, hotkey: "0" }];
       recentItems = [
         { name: "Open Audio Controls", title: "Open the audio popup", icon: "󰕾", ipcTarget: "Shell", ipcAction: "toggleAudioMenu" },
         { name: "Open Network Controls", title: "Open the network popup", icon: "󰖩", ipcTarget: "Shell", ipcAction: "toggleNetworkMenu" },
         { name: "Open Command Center", title: "Open the system hub", icon: "󰒓", ipcTarget: "Shell", ipcAction: "toggleControls" }
       ];
     } else if (mode === "window" && availableToplevels.length > 0) {
+      drunCategoryFilter = "";
+      drunCategoryOptions = [{ key: "", label: "All", count: 0, hotkey: "0" }];
       recentItems = [{ name: "Focus open windows", title: "Jump into current clients", icon: "󱗼", openMode: "window" }];
     } else {
+      drunCategoryFilter = "";
+      drunCategoryOptions = [{ key: "", label: "All", count: 0, hotkey: "0" }];
       recentItems = [];
     }
   }
@@ -1475,22 +1611,95 @@ PanelWindow {
 
   function filesBackendStatusObject() {
     var modeStats = modeMetric("files");
+    var resolveRuns = launcherMetrics.filesResolveRuns || 0;
+    var resolveAvgMs = launcherMetrics.filesResolveAvgMs || 0;
+    var resolveLastMs = launcherMetrics.filesResolveLastMs || 0;
+    var filesFdLoads = launcherMetrics.filesFdLoads || 0;
+    var filesFindLoads = launcherMetrics.filesFindLoads || 0;
+    var filesFdAvgMs = launcherMetrics.filesFdAvgMs || 0;
+    var filesFdLastMs = launcherMetrics.filesFdLastMs || 0;
+    var filesFindAvgMs = launcherMetrics.filesFindAvgMs || 0;
+    var filesFindLastMs = launcherMetrics.filesFindLastMs || 0;
+    var fileCacheHits = modeStats.cacheHits || 0;
+    var fileCacheMisses = modeStats.cacheMisses || 0;
     return ({
       backend: filesBackendLabel,
       backendRaw: String(fileSearchBackend || ""),
       resolvedAt: fileSearchBackendResolvedAt,
-      resolveRuns: launcherMetrics.filesResolveRuns || 0,
-      resolveAvgMs: launcherMetrics.filesResolveAvgMs || 0,
-      resolveLastMs: launcherMetrics.filesResolveLastMs || 0,
-      filesFdLoads: launcherMetrics.filesFdLoads || 0,
-      filesFindLoads: launcherMetrics.filesFindLoads || 0,
-      filesFdAvgMs: launcherMetrics.filesFdAvgMs || 0,
-      filesFdLastMs: launcherMetrics.filesFdLastMs || 0,
-      filesFindAvgMs: launcherMetrics.filesFindAvgMs || 0,
-      filesFindLastMs: launcherMetrics.filesFindLastMs || 0,
-      fileCacheHits: modeStats.cacheHits || 0,
-      fileCacheMisses: modeStats.cacheMisses || 0,
+      metrics: ({
+        filesResolveRuns: resolveRuns,
+        filesResolveAvgMs: resolveAvgMs,
+        filesResolveLastMs: resolveLastMs,
+        filesFdLoads: filesFdLoads,
+        filesFindLoads: filesFindLoads,
+        filesFdAvgMs: filesFdAvgMs,
+        filesFdLastMs: filesFdLastMs,
+        filesFindAvgMs: filesFindAvgMs,
+        filesFindLastMs: filesFindLastMs
+      }),
+      cache: ({
+        hits: fileCacheHits,
+        misses: fileCacheMisses,
+        hitRateLabel: filesCacheStatsLabel
+      }),
+      // Backward-compatible flat fields for existing consumers.
+      resolveRuns: resolveRuns,
+      resolveAvgMs: resolveAvgMs,
+      resolveLastMs: resolveLastMs,
+      filesFdLoads: filesFdLoads,
+      filesFindLoads: filesFindLoads,
+      filesFdAvgMs: filesFdAvgMs,
+      filesFdLastMs: filesFdLastMs,
+      filesFindAvgMs: filesFindAvgMs,
+      filesFindLastMs: filesFindLastMs,
+      fileCacheHits: fileCacheHits,
+      fileCacheMisses: fileCacheMisses,
       fileCacheHitRateLabel: filesCacheStatsLabel
+    });
+  }
+
+  function drunCategoryStateObject() {
+    var options = Array.isArray(drunCategoryOptions) ? drunCategoryOptions : [];
+    var normalized = [];
+    var active = null;
+    for (var i = 0; i < options.length; ++i) {
+      var raw = options[i] || ({});
+      var key = String(raw.key || "");
+      var label = String(raw.label || formatDrunCategoryLabel(key));
+      var count = Math.max(0, Math.round(Number(raw.count || 0)));
+      var hotkey = String(raw.hotkey || "");
+      var selected = key === drunCategoryFilter;
+      var item = ({
+        key: key,
+        label: label,
+        count: count,
+        hotkey: hotkey,
+        selected: selected
+      });
+      if (selected && !active)
+        active = item;
+      normalized.push(item);
+    }
+
+    if (!active && normalized.length > 0) {
+      var fallback = normalized[0];
+      active = Object.assign({}, fallback, { selected: true });
+      normalized[0] = active;
+    }
+
+    var totalCount = normalized.length > 0 ? Math.max(0, Math.round(Number(normalized[0].count || 0))) : 0;
+    var activeCount = active ? Math.max(0, Math.round(Number(active.count || 0))) : totalCount;
+
+    return ({
+      enabled: drunCategoryFiltersEnabled === true,
+      mode: String(mode || ""),
+      showLauncherHome: showLauncherHome === true,
+      visible: showLauncherHome && drunCategoryFiltersEnabled && mode === "drun" && normalized.length > 1,
+      activeKey: active ? String(active.key || "") : "",
+      activeLabel: active ? String(active.label || "All") : "All",
+      activeCount: activeCount,
+      totalCount: totalCount,
+      options: normalized
     });
   }
 
@@ -1683,20 +1892,59 @@ PanelWindow {
     return 0;
   }
 
+  function ensureItemRankCache(item) {
+    if (!item || item._rankCacheReady)
+      return;
+    item._nameLower = item.name ? String(item.name).toLowerCase() : "";
+    item._titleLower = item.title ? String(item.title).toLowerCase() : "";
+    item._execLower = item.exec ? String(item.exec).toLowerCase() : (item.class ? String(item.class).toLowerCase() : "");
+    item._bodyLower = item.body ? String(item.body).toLowerCase() : "";
+    var category = item.category ? String(item.category).toLowerCase() : "";
+    var keywords = item.keywords ? String(item.keywords).toLowerCase() : "";
+    var tokens = [];
+    var rawTokens = category.split(/[\s;,/|]+/);
+    for (var i = 0; i < rawTokens.length; ++i) {
+      var token = String(rawTokens[i] || "").trim();
+      if (token === "")
+        continue;
+      if (tokens.indexOf(token) === -1)
+        tokens.push(token);
+    }
+    item._categoryTokens = tokens;
+    item._primaryCategoryKey = tokens.length > 0 ? tokens[0] : "";
+    item._categoryKeywordsLower = (category + " " + keywords).trim();
+    item._rankCacheReady = true;
+  }
+
   function rankItem(item, clean, cleanLower) {
     if (clean === "") return 1;
-    var name = item.name ? String(item.name).toLowerCase() : "";
-    var title = item.title ? String(item.title).toLowerCase() : "";
-    var exec = item.exec ? String(item.exec).toLowerCase() : (item.class ? String(item.class).toLowerCase() : "");
-    var body = item.body ? String(item.body).toLowerCase() : "";
+    ensureItemRankCache(item);
+    var categoryScore = mode === "drun" ? (fuzzyMatchLower(item._categoryKeywordsLower, cleanLower) * Config.launcherScoreCategoryWeight) : 0;
     var bestScore = Math.max(
-      fuzzyMatchLower(name, cleanLower) * Config.launcherScoreNameWeight,
-      fuzzyMatchLower(title, cleanLower) * Config.launcherScoreTitleWeight,
-      fuzzyMatchLower(exec, cleanLower) * Config.launcherScoreExecWeight,
-      fuzzyMatchLower(body, cleanLower) * Config.launcherScoreBodyWeight
+      fuzzyMatchLower(item._nameLower, cleanLower) * Config.launcherScoreNameWeight,
+      fuzzyMatchLower(item._titleLower, cleanLower) * Config.launcherScoreTitleWeight,
+      fuzzyMatchLower(item._execLower, cleanLower) * Config.launcherScoreExecWeight,
+      fuzzyMatchLower(item._bodyLower, cleanLower) * Config.launcherScoreBodyWeight,
+      categoryScore
     );
     if (mode === "drun") bestScore += (appFrequency[item.exec] || 0) * 0.6;
     return bestScore;
+  }
+
+  function compareLauncherItemsAlpha(a, b) {
+    var aName = String(a && a.name ? a.name : "");
+    var bName = String(b && b.name ? b.name : "");
+    var byName = aName.localeCompare(bName);
+    if (byName !== 0)
+      return byName;
+    var aExec = String(a && a.exec ? a.exec : "");
+    var bExec = String(b && b.exec ? b.exec : "");
+    var byExec = aExec.localeCompare(bExec);
+    if (byExec !== 0)
+      return byExec;
+    var aTitle = String(a && a.title ? a.title : "");
+    var bTitle = String(b && b.title ? b.title : "");
+    return aTitle.localeCompare(bTitle);
   }
 
   function filterItems() {
@@ -1756,6 +2004,8 @@ PanelWindow {
         }
         var bestScore = rankItem(item, clean, cleanLower);
         if (bestScore > 0 || (clean === "" && (mode === "files" || mode === "ai"))) {
+          if (mode === "drun" && drunCategoryFilter !== "" && !itemMatchesDrunCategory(item, drunCategoryFilter))
+            continue;
           item._score = bestScore;
           scoredItems.push(item);
         }
@@ -1763,8 +2013,12 @@ PanelWindow {
       if (mode !== "web" && mode !== "ai" && mode !== "files") {
         scoredItems.sort(function(a, b) {
           if (b._score !== a._score) return b._score - a._score;
-          if (mode === "drun") return (appFrequency[b.exec] || 0) - (appFrequency[a.exec] || 0);
-          return (a.name || "").localeCompare(b.name || "");
+          if (mode === "drun") {
+            var usageDelta = (appFrequency[b.exec] || 0) - (appFrequency[a.exec] || 0);
+            if (usageDelta !== 0)
+              return usageDelta;
+          }
+          return compareLauncherItemsAlpha(a, b);
         });
       } else if (mode === "files") {
         scoredItems.sort(function(a, b) {
@@ -2154,6 +2408,7 @@ PanelWindow {
     function redetectFilesBackend() { launcherRoot.forceRedetectFileSearchBackend(true, function(_) {}); }
     function diagnosticReset() { launcherRoot.diagnosticReset(); }
     function filesBackendStatus() { return JSON.stringify(launcherRoot.filesBackendStatusObject()); }
+    function drunCategoryState() { return JSON.stringify(launcherRoot.drunCategoryStateObject()); }
     function toggle() { if (launcherRoot.launcherOpacity > 0) launcherRoot.close(); else launcherRoot.open(launcherRoot.effectiveDefaultMode()); }
   }
 
@@ -2282,7 +2537,7 @@ PanelWindow {
               spacing: 2
               Text { text: "Controls"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
               Text { text: launcherRoot.tabControlHintText; color: Colors.text; font.pixelSize: Colors.fontSizeSmall }
-              Text { text: "Enter to run • Esc to close"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS }
+              Text { text: launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && launcherRoot.drunCategoryOptions.length > 1 ? "Alt+←/→ or Alt+1..9: categories • Enter: run • Esc: close" : "Enter to run • Esc to close"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; wrapMode: Text.WordWrap }
             }
           }
         }
@@ -2339,6 +2594,22 @@ PanelWindow {
                 else if (Config.launcherWebNumberHotkeysEnabled && launcherRoot.mode === "web" && (event.modifiers & Qt.AltModifier) && !(event.modifiers & Qt.ControlModifier)) {
                   var slot = launcherRoot.webProviderSlotFromKey(event.key);
                   if (slot > 0 && launcherRoot.selectWebProviderBySlot(slot)) event.accepted = true;
+                }
+                else if (launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && (event.modifiers & Qt.AltModifier) && !(event.modifiers & Qt.ControlModifier)) {
+                  if (event.key === Qt.Key_Left) {
+                    if (launcherRoot.cycleDrunCategoryFilter(-1))
+                      event.accepted = true;
+                  } else if (event.key === Qt.Key_Right) {
+                    if (launcherRoot.cycleDrunCategoryFilter(1))
+                      event.accepted = true;
+                  } else if (event.key === Qt.Key_0) {
+                    if (launcherRoot.setDrunCategoryFilter(""))
+                      event.accepted = true;
+                  } else {
+                    var categorySlot = launcherRoot.webProviderSlotFromKey(event.key);
+                    if (categorySlot > 0 && launcherRoot.selectDrunCategorySlot(categorySlot))
+                      event.accepted = true;
+                  }
                 }
                 else if (event.key === Qt.Key_Backtab || (event.key === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier))) {
                   launcherRoot.cycleMode(-1);
@@ -2682,6 +2953,46 @@ PanelWindow {
                       launcherRoot.activateFeatured(modelData);
                     }
                   }
+                }
+              }
+            }
+          }
+        }
+
+        Rectangle {
+          Layout.fillWidth: true
+          visible: launcherRoot.showLauncherHome && launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && launcherRoot.drunCategoryOptions.length > 1
+          color: Colors.bgWidget
+          radius: Colors.radiusMedium
+          border.color: Colors.border
+          border.width: 1
+          implicitHeight: categoryFilterFlow.implicitHeight + 30
+
+          ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: Colors.spacingM
+            spacing: Colors.spacingS
+            Text {
+              text: "Categories • " + launcherRoot.drunCategoryFilterLabel
+              color: Colors.textDisabled
+              font.pixelSize: Colors.fontSizeXS
+              font.weight: Font.Bold
+            }
+            Flow {
+              id: categoryFilterFlow
+              Layout.fillWidth: true
+              spacing: Colors.spacingS
+
+              Repeater {
+                model: launcherRoot.drunCategoryOptions
+                delegate: SharedWidgets.FilterChip {
+                  required property var modelData
+
+                  icon: modelData.hotkey === "0" ? "󰍉" : "󰌌"
+                  label: String(modelData.label || "All") + " (" + String(modelData.count || 0) + ")" + (String(modelData.hotkey || "") !== "" ? (" [" + String(modelData.hotkey || "") + "]") : "")
+                  selected: String(modelData.key || "") === launcherRoot.drunCategoryFilter
+
+                  onClicked: launcherRoot.setDrunCategoryFilter(String(modelData.key || ""))
                 }
               }
             }

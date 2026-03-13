@@ -57,7 +57,10 @@ PanelWindow {
   // Ensure focus is grabbed when shown
   onShowContentChanged: {
     if (showContent) {
-      searchInput.forceActiveFocus();
+      Qt.callLater(function() {
+        if (root.showContent && searchInput)
+          searchInput.forceActiveFocus();
+      });
     } else if (searchInput && searchInput.activeFocus) {
       searchInput.focus = false;
     }
@@ -89,6 +92,7 @@ PanelWindow {
     Behavior on y { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
     Behavior on opacity { NumberAnimation { id: ncFadeAnim; duration: 250 } }
     layer.enabled: ncSlideAnim.running || ncFadeAnim.running
+    Keys.onEscapePressed: root.closeRequested()
 
     ColumnLayout {
       anchors.fill: parent
@@ -196,6 +200,7 @@ PanelWindow {
             id: searchInput; Layout.fillWidth: true; verticalAlignment: Text.AlignVCenter
             color: Colors.text; font.pixelSize: Colors.fontSizeMedium
             onVisibleChanged: if (!visible && activeFocus) focus = false
+            Keys.onEscapePressed: root.closeRequested()
             onTextChanged: root.searchQuery = text
           }
           Text {
@@ -216,6 +221,7 @@ PanelWindow {
           anchors.fill: parent
           spacing: Colors.spacingM; clip: true; focus: true
           highlightFollowsCurrentItem: true; keyNavigationEnabled: true
+          Keys.onEscapePressed: root.closeRequested()
           model: root.manager ? root.manager.notifications : null
 
         property var collapsedGroups: ({})

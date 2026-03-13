@@ -19,6 +19,8 @@ PopupWindow {
   property color surfaceTint: "transparent"
   property int contentSpacing: 14
   property string preferredEdge: "top"
+  property bool focusOnOpen: false
+  property var initialFocusTarget: null
 
   // ── Close signal (avoids IPC round-trip) ────
   signal closeRequested()
@@ -32,6 +34,20 @@ PopupWindow {
 
   onWantVisibleChanged: {
     if (!wantVisible) _unmapDelay.restart();
+  }
+
+  onShowContentChanged: {
+    if (showContent && focusOnOpen) {
+      Qt.callLater(function() {
+        if (!root.showContent) return;
+        if (root.initialFocusTarget && root.initialFocusTarget.forceActiveFocus)
+          root.initialFocusTarget.forceActiveFocus();
+        else if (surface.forceActiveFocus)
+          surface.forceActiveFocus();
+      });
+    } else if (!showContent && root.initialFocusTarget && root.initialFocusTarget.activeFocus) {
+      root.initialFocusTarget.focus = false;
+    }
   }
 
   Timer {

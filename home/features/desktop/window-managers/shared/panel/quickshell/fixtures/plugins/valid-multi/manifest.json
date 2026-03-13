@@ -1,0 +1,13 @@
+{
+  "id": "fixture.valid.multi",
+  "name": "Fixture Multi",
+  "description": "Valid multi plugin fixture",
+  "author": "fixtures",
+  "version": "1.0.0",
+  "type": "multi",
+  "permissions": ["settings_read"],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml",
+    "launcherProvider": "LauncherProvider.qml"
+  }
+}

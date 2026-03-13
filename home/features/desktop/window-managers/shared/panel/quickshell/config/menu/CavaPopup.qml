@@ -12,7 +12,20 @@ PopupWindow {
   implicitHeight: compactMode ? 108 : 120
 
   property string cavaData: ""
+  property string preferredEdge: "top"
   signal closeRequested()
+  property bool wantVisible: false
+  property bool showContent: wantVisible
+  visible: wantVisible || unmapDelay.running
+
+  onWantVisibleChanged: {
+    if (!wantVisible) unmapDelay.restart();
+  }
+
+  Timer {
+    id: unmapDelay
+    interval: 300
+  }
 
   Rectangle {
     anchors.fill: parent
@@ -23,6 +36,17 @@ PopupWindow {
     clip: true
     focus: true
     Keys.onEscapePressed: root.closeRequested()
+    opacity: root.showContent ? 1.0 : 0.0
+    scale: root.showContent ? 1.0 : 0.96
+    transformOrigin: {
+      if (root.preferredEdge === "bottom") return Item.Bottom;
+      if (root.preferredEdge === "left") return Item.Left;
+      if (root.preferredEdge === "right") return Item.Right;
+      return Item.Top;
+    }
+    Behavior on opacity { NumberAnimation { id: cavaFadeAnim; duration: 180; easing.type: Easing.OutCubic } }
+    Behavior on scale { NumberAnimation { id: cavaScaleAnim; duration: 220; easing.type: Easing.OutBack; easing.overshoot: 1.15 } }
+    layer.enabled: cavaFadeAnim.running || cavaScaleAnim.running
 
     // Top accent line
     Rectangle {

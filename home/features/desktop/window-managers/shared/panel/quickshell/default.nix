@@ -96,6 +96,56 @@ let
     ${builtins.readFile ./scripts/compositor-verify.sh}
   '';
 
+  surfaceResponsiveScript = pkgs.writeShellScriptBin "qs-surface-responsive-check" ''
+    PATH="${pkgs.quickshell}/bin:${pkgs.findutils}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:${pkgs.procps}/bin:${pkgs.bash}/bin:$PATH"
+    ${builtins.readFile ./scripts/check-surface-responsive.sh}
+  '';
+
+  surfacePreviewScript = pkgs.writeShellScriptBin "qs-surface-preview" ''
+    PATH="${pkgs.quickshell}/bin:${pkgs.findutils}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:${pkgs.procps}/bin:${pkgs.bash}/bin:$PATH"
+    ${builtins.readFile ./scripts/preview-surface-responsive.sh}
+  '';
+
+  multibarSmokeScript = pkgs.writeShellScriptBin "qs-multibar-smoke-check" ''
+    PATH="${pkgs.quickshell}/bin:${pkgs.findutils}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:${pkgs.procps}/bin:${pkgs.bash}/bin:$PATH"
+    ${builtins.readFile ./scripts/check-multibar-smoke.sh}
+  '';
+
+  panelRuntimeScript = pkgs.writeShellScriptBin "qs-panel-runtime-verify" ''
+    PATH="${pkgs.quickshell}/bin:${pkgs.findutils}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:${pkgs.procps}/bin:${pkgs.bash}/bin:$PATH"
+    ${builtins.readFile ./scripts/check-panel-runtime.sh}
+  '';
+
+  panelPreviewScript = pkgs.writeShellScriptBin "qs-panel-preview" ''
+    PATH="${pkgs.quickshell}/bin:${pkgs.findutils}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:${pkgs.procps}/bin:${pkgs.bash}/bin:$PATH"
+    ${builtins.readFile ./scripts/preview-panel-qa.sh}
+  '';
+
+  settingsCaptureScript = pkgs.writeShellScriptBin "qs-settings-capture" ''
+    PATH="${pkgs.quickshell}/bin:${pkgs.hyprland}/bin:${pkgs.grim}/bin:${pkgs.imagemagick}/bin:${pkgs.jq}/bin:${pkgs.findutils}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:${pkgs.procps}/bin:${pkgs.git}/bin:${pkgs.bash}/bin:$PATH"
+    ${builtins.readFile ./scripts/capture-settings-viewport.sh}
+  '';
+
+  settingsMatrixCaptureScript = pkgs.writeShellScriptBin "qs-settings-capture-matrix" ''
+    PATH="${pkgs.quickshell}/bin:${pkgs.hyprland}/bin:${pkgs.grim}/bin:${pkgs.imagemagick}/bin:${pkgs.jq}/bin:${pkgs.findutils}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:${pkgs.procps}/bin:${pkgs.git}/bin:${pkgs.bash}/bin:$PATH"
+    ${builtins.readFile ./scripts/capture-settings-matrix.sh}
+  '';
+
+  surfaceCaptureScript = pkgs.writeShellScriptBin "qs-surface-capture" ''
+    PATH="${pkgs.quickshell}/bin:${pkgs.hyprland}/bin:${pkgs.grim}/bin:${pkgs.imagemagick}/bin:${pkgs.jq}/bin:${pkgs.findutils}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:${pkgs.procps}/bin:${pkgs.bash}/bin:$PATH"
+    ${builtins.readFile ./scripts/capture-surface-viewport.sh}
+  '';
+
+  surfaceMatrixCaptureScript = pkgs.writeShellScriptBin "qs-surface-capture-matrix" ''
+    PATH="${pkgs.quickshell}/bin:${pkgs.hyprland}/bin:${pkgs.grim}/bin:${pkgs.imagemagick}/bin:${pkgs.jq}/bin:${pkgs.findutils}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:${pkgs.procps}/bin:${pkgs.bash}/bin:$PATH"
+    ${builtins.readFile ./scripts/capture-surface-matrix.sh}
+  '';
+
+  panelMatrixCaptureScript = pkgs.writeShellScriptBin "qs-panel-capture-matrix" ''
+    PATH="${pkgs.quickshell}/bin:${pkgs.hyprland}/bin:${pkgs.grim}/bin:${pkgs.imagemagick}/bin:${pkgs.jq}/bin:${pkgs.findutils}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:${pkgs.procps}/bin:${pkgs.git}/bin:${pkgs.bash}/bin:$PATH"
+    ${builtins.readFile ./scripts/capture-panel-matrix.sh}
+  '';
+
   # Build-time theme manifest: converts 177 base24 YAML themes into a single JSON file
   themeManifest = pkgs.runCommand "quickshell-theme-manifest" {
     nativeBuildInputs = [ pkgs.yq-go pkgs.jq ];
@@ -145,6 +195,16 @@ let
       compositorSmokeScript
       compositorFixtureScript
       compositorVerifyScript
+      surfaceResponsiveScript
+      surfacePreviewScript
+      multibarSmokeScript
+      panelRuntimeScript
+      panelPreviewScript
+      settingsCaptureScript
+      settingsMatrixCaptureScript
+      surfaceCaptureScript
+      surfaceMatrixCaptureScript
+      panelMatrixCaptureScript
     ];
 
     home.activation.disableLegacyNotificationDaemons = lib.hm.dag.entryAfter [ "linkGeneration" ] ''

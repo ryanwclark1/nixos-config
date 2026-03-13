@@ -6,6 +6,8 @@ MouseArea {
 
   property string tooltipText: ""
   property var anchorWindow: null
+  property bool isActive: false
+  property color activeColor: Colors.withAlpha(Colors.primary, 0.28)
   property color normalColor: Colors.bgWidget
   property color hoverColor: Colors.highlightLight
   property real hoverScale: 1.04
@@ -33,9 +35,11 @@ MouseArea {
   Rectangle {
     id: bg
     anchors.fill: parent
-    color: root.containsMouse ? root.hoverColor : root.normalColor
+    color: root.isActive ? root.activeColor : (root.containsMouse ? root.hoverColor : root.normalColor)
     radius: height / 2
     clip: true
+    border.color: root.isActive ? Colors.primary : "transparent"
+    border.width: root.isActive ? 1 : 0
     Behavior on color { ColorAnimation { duration: 160 } }
 
     // Shimmer sweep on hover

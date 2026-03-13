@@ -1,0 +1,12 @@
+{
+  "id": "fixture.invalid.path",
+  "name": "Path Traversal",
+  "description": "Invalid entry point path",
+  "author": "fixtures",
+  "version": "1.0.0",
+  "type": "launcher-provider",
+  "permissions": [],
+  "entryPoints": {
+    "launcherProvider": "../escape.qml"
+  }
+}

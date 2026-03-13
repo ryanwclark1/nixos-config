@@ -14,6 +14,8 @@ BasePopupMenu {
   title: "Clipboard"
   toggleMethod: "toggleClipboardMenu"
   contentSpacing: 12
+  focusOnOpen: true
+  initialFocusTarget: searchInput
 
   property var clipboardItems: []
   property string searchQuery: ""
@@ -42,7 +44,10 @@ BasePopupMenu {
     onUpdated: root.clipboardItems = clipPoll.value || []
   }
 
-  onVisibleChanged: if (visible) refresh()
+  onVisibleChanged: {
+    if (visible) refresh();
+    else if (searchInput.activeFocus) searchInput.focus = false;
+  }
 
   headerExtras: [
     Rectangle {
@@ -104,6 +109,7 @@ BasePopupMenu {
         color: Colors.text
         font.pixelSize: Colors.fontSizeMedium
         clip: true
+        Keys.onEscapePressed: root.closeRequested()
         onTextChanged: root.searchQuery = text
 
         Text {

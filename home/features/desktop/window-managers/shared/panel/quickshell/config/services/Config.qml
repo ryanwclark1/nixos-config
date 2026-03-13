@@ -41,6 +41,7 @@ QtObject {
   property string launcherDefaultMode: "drun"
   property bool launcherShowModeHints: true
   property bool launcherShowHomeSections: true
+  property bool launcherDrunCategoryFiltersEnabled: true
   property bool launcherEnablePreload: true
   property bool launcherKeepSearchOnModeSwitch: true
   property bool launcherEnableDebugTimings: false
@@ -75,6 +76,7 @@ QtObject {
   property real launcherScoreTitleWeight: 0.92
   property real launcherScoreExecWeight: 0.88
   property real launcherScoreBodyWeight: 0.75
+  property real launcherScoreCategoryWeight: 0.7
 
   // --- CONTROL CENTER ---
   property int controlCenterWidth: 350
@@ -353,6 +355,7 @@ QtObject {
 
     launcherShowModeHints = _asBool(launcher.showModeHints, true);
     launcherShowHomeSections = _asBool(launcher.showHomeSections, true);
+    launcherDrunCategoryFiltersEnabled = _asBool(launcher.drunCategoryFiltersEnabled, true);
     launcherEnablePreload = _asBool(launcher.enablePreload, true);
     launcherKeepSearchOnModeSwitch = _asBool(launcher.keepSearchOnModeSwitch, true);
     launcherEnableDebugTimings = _asBool(launcher.enableDebugTimings, false);
@@ -390,6 +393,7 @@ QtObject {
     launcherScoreTitleWeight = _clampReal(launcher.scoreTitleWeight, 0.1, 4.0, 0.92);
     launcherScoreExecWeight = _clampReal(launcher.scoreExecWeight, 0.1, 4.0, 0.88);
     launcherScoreBodyWeight = _clampReal(launcher.scoreBodyWeight, 0.1, 4.0, 0.75);
+    launcherScoreCategoryWeight = _clampReal(launcher.scoreCategoryWeight, 0.1, 4.0, 0.7);
   }
 
   function defaultBarSectionWidgets() {
@@ -1027,6 +1031,7 @@ QtObject {
   onLauncherDefaultModeChanged: scheduleSave()
   onLauncherShowModeHintsChanged: scheduleSave()
   onLauncherShowHomeSectionsChanged: scheduleSave()
+  onLauncherDrunCategoryFiltersEnabledChanged: scheduleSave()
   onLauncherEnablePreloadChanged: scheduleSave()
   onLauncherKeepSearchOnModeSwitchChanged: scheduleSave()
   onLauncherEnableDebugTimingsChanged: scheduleSave()
@@ -1055,6 +1060,7 @@ QtObject {
   onLauncherScoreTitleWeightChanged: scheduleSave()
   onLauncherScoreExecWeightChanged: scheduleSave()
   onLauncherScoreBodyWeightChanged: scheduleSave()
+  onLauncherScoreCategoryWeightChanged: scheduleSave()
   onControlCenterWidthChanged: scheduleSave()
   onControlCenterShowQuickLinksChanged: scheduleSave()
   onControlCenterShowMediaWidgetChanged: scheduleSave()
@@ -1298,6 +1304,7 @@ QtObject {
         "defaultMode": launcherDefaultMode,
         "showModeHints": launcherShowModeHints,
         "showHomeSections": launcherShowHomeSections,
+        "drunCategoryFiltersEnabled": launcherDrunCategoryFiltersEnabled,
         "enablePreload": launcherEnablePreload,
         "keepSearchOnModeSwitch": launcherKeepSearchOnModeSwitch,
         "enableDebugTimings": launcherEnableDebugTimings,
@@ -1325,7 +1332,8 @@ QtObject {
         "scoreNameWeight": launcherScoreNameWeight,
         "scoreTitleWeight": launcherScoreTitleWeight,
         "scoreExecWeight": launcherScoreExecWeight,
-        "scoreBodyWeight": launcherScoreBodyWeight
+        "scoreBodyWeight": launcherScoreBodyWeight,
+        "scoreCategoryWeight": launcherScoreCategoryWeight
       },
       "controlCenter": {
         "width": controlCenterWidth,

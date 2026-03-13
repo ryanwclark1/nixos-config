@@ -6,10 +6,18 @@ Use this guide for day-to-day launcher validation and incident triage.
 
 - Guardrails only:
   - `scripts/check-launcher-guardrails.sh`
+- Tab/Shift+Tab behavior matrix:
+  - `scripts/check-launcher-tab-matrix.sh`
+- Responsive/runtime smoke for launcher surface:
+  - `scripts/check-launcher-responsive.sh`
+- Live launcher IPC health and status payload contract:
+  - `scripts/check-launcher-ipc-health.sh`
 - Benchmarks with thresholds and parity checks:
   - `scripts/check-launcher-benchmarks.sh`
 - Full launcher smoke gate:
   - `scripts/check-launcher-smoke.sh`
+- CI-safe launcher smoke gate:
+  - `scripts/check-launcher-smoke.sh --ci`
 
 ## Benchmark Baselines
 
@@ -19,9 +27,28 @@ Use this guide for day-to-day launcher validation and incident triage.
   - `max_optimized_ms`
   - `tolerance_pct`
 
+## Baseline Governance
+
+- Update baselines only after a deliberate launcher performance change.
+- Record benchmark evidence for all three scripts before and after updates:
+  - `benchmark-launcher-filter.js`
+  - `benchmark-launcher-home.js`
+  - `benchmark-launcher-files-shaping.js`
+- Do not relax `tolerance_pct` to hide regressions; prefer improving implementation first.
+- Keep baseline updates and performance-related code changes in the same reviewable change set.
+
 ## Runtime Metrics Interpretation
 
 Enable `Show Runtime Metrics` in Launcher settings.
+
+`Category/Keywords Weight` currently affects app ranking in `drun` mode only.
+
+In `drun` home, category quick-filter shortcuts are:
+- `Alt+Left/Alt+Right`: cycle categories
+- `Alt+1..9`: jump to category slot
+- `Alt+0`: reset to `All`
+
+Use `App Category Filters` in Launcher settings to enable/disable these chips and shortcuts.
 
 - Core line:
   - `opens`, `cache`, `failures`, `filter avg/last`
@@ -45,13 +72,17 @@ Enable `Show Runtime Metrics` in Launcher settings.
   - or `quickshell ipc call Launcher diagnosticReset`
 - Inspect files backend status payload:
   - `quickshell ipc call Launcher filesBackendStatus`
+- Inspect drun category-chip state payload (enabled/visible/active badge counts):
+  - `quickshell ipc call Launcher drunCategoryState`
 
 ## Incident Triage Sequence
 
 1. Run `scripts/check-launcher-smoke.sh`.
 2. If benchmark gate fails, inspect `scripts/launcher-benchmark-baselines.json` versus current host load.
-3. In a live session, open launcher runtime metrics and verify:
+3. If IPC health fails, run `scripts/check-launcher-ipc-health.sh --id <instance-id>` and inspect the emitted JSON `errors` list.
+   - If `drunCategoryState` is missing in a live instance but static checks pass, restart/reload QuickShell for that session and rerun smoke.
+4. In a live session, open launcher runtime metrics and verify:
    - backend is expected (`fd` preferred),
    - resolve cost is low/stable,
    - files cache hit rate is non-zero during repeated queries.
-4. Trigger `Re-detect Files Backend`; confirm backend/resolve metrics update.
+5. Trigger `Re-detect Files Backend`; confirm backend/resolve metrics update.

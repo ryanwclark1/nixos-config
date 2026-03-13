@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
+config_dir="${script_dir}/../config"
+launcher_qml="${config_dir}/launcher/Launcher.qml"
+config_qml="${config_dir}/services/Config.qml"
+system_tab_qml="${config_dir}/menu/settings/tabs/SystemTab.qml"
+apps_script="${script_dir}/apps.sh"
+
+violations=()
+
+require_literal() {
+  local file="$1"
+  local needle="$2"
+  local label="$3"
+  if ! rg -n -F -- "$needle" "$file" >/dev/null 2>&1; then
+    violations+=("${label} missing in ${file}")
+  fi
+}
+
+# Config/state wiring
+require_literal "$config_qml" 'property bool launcherDrunCategoryFiltersEnabled: true' "drun category filters config property"
+require_literal "$config_qml" 'launcherDrunCategoryFiltersEnabled = _asBool(launcher.drunCategoryFiltersEnabled, true);' "drun category filters config load"
+require_literal "$config_qml" 'onLauncherDrunCategoryFiltersEnabledChanged: scheduleSave()' "drun category filters autosave hook"
+require_literal "$config_qml" '"drunCategoryFiltersEnabled": launcherDrunCategoryFiltersEnabled,' "drun category filters config persistence"
+
+# Settings exposure
+require_literal "$system_tab_qml" 'label: "App Category Filters"' "settings category filter toggle label"
+require_literal "$system_tab_qml" 'configKey: "launcherDrunCategoryFiltersEnabled"' "settings category filter toggle binding"
+require_literal "$system_tab_qml" 'Config.launcherDrunCategoryFiltersEnabled = true;' "settings category filter reset default"
+
+# Desktop app metadata extraction
+require_literal "$apps_script" 'categories=$(grep -m1 "^Categories="' "apps script categories extraction"
+require_literal "$apps_script" 'keywords=$(grep -m1 "^Keywords="' "apps script keywords extraction"
+require_literal "$apps_script" 'categories_esc=$(echo "${categories:-}" | jq -R .)' "apps script category JSON escaping"
+require_literal "$apps_script" 'keywords_esc=$(echo "${keywords:-}" | jq -R .)' "apps script keywords JSON escaping"
+
+# Launcher behavior and UI guards
+require_literal "$launcher_qml" 'readonly property bool drunCategoryFiltersEnabled: Config.launcherDrunCategoryFiltersEnabled' "launcher category filters enabled binding"
+require_literal "$launcher_qml" 'property var drunCategoryOptions:' "launcher category option state"
+require_literal "$launcher_qml" 'function refreshDrunCategoryOptions(apps) {' "launcher category options refresh function"
+require_literal "$launcher_qml" 'if (!drunCategoryFiltersEnabled) {' "launcher category options disabled guard"
+require_literal "$launcher_qml" 'function setDrunCategoryFilter(categoryKey) {' "launcher category set function"
+require_literal "$launcher_qml" 'function cycleDrunCategoryFilter(step) {' "launcher category cycle function"
+require_literal "$launcher_qml" 'function selectDrunCategorySlot(slot) {' "launcher category slot selection function"
+require_literal "$launcher_qml" 'function drunCategoryStateObject() {' "launcher category state payload helper"
+require_literal "$launcher_qml" 'function drunCategoryState() { return JSON.stringify(launcherRoot.drunCategoryStateObject()); }' "launcher category state IPC method"
+require_literal "$launcher_qml" 'launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && (event.modifiers & Qt.AltModifier) && !(event.modifiers & Qt.ControlModifier)' "launcher category keyboard handler branch"
+require_literal "$launcher_qml" 'Alt+←/→ or Alt+1..9: categories • Enter: run • Esc: close' "launcher category keyboard hint"
+require_literal "$launcher_qml" 'launcherRoot.showLauncherHome && launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && launcherRoot.drunCategoryOptions.length > 1' "launcher category chip visibility guard"
+
+if (( ${#violations[@]} > 0 )); then
+  printf '%s\n' "Launcher category filters check failed:" >&2
+  printf '  - %s\n' "${violations[@]}" >&2
+  exit 1
+fi
+
+printf '%s\n' "Launcher category filters check passed."

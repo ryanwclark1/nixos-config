@@ -7,6 +7,7 @@ Item {
   implicitWidth: mainRow.width
   implicitHeight: mainRow.height
   property var anchorWindow: null
+  property bool isActive: false
   signal statsClicked()
 
   SharedWidgets.Ref { service: SystemStatus }
@@ -19,6 +20,7 @@ Item {
     // CPU Pill
     SharedWidgets.BarPill {
       anchorWindow: root.anchorWindow
+      isActive: root.isActive
       tooltipText: "CPU " + SystemStatus.cpuUsage + " • " + SystemStatus.cpuTemp
       anchors.verticalCenter: parent.verticalCenter
       onClicked: root.statsClicked()
@@ -45,6 +47,7 @@ Item {
     // Memory Pill
     SharedWidgets.BarPill {
       anchorWindow: root.anchorWindow
+      isActive: root.isActive
       tooltipText: "RAM " + SystemStatus.ramUsage + " • GPU " + SystemStatus.gpuUsage
       anchors.verticalCenter: parent.verticalCenter
       onClicked: root.statsClicked()

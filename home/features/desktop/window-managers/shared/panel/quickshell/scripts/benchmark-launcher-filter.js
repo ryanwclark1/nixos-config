@@ -20,7 +20,8 @@ const scoreWeights = {
   name: 1.0,
   title: 0.92,
   exec: 0.88,
-  body: 0.75
+  body: 0.75,
+  category: 0.7
 };
 
 function stripModePrefix(text) {
@@ -58,7 +59,9 @@ function makeItems(count, rand) {
       title: `${b} ${c} helper`,
       exec: `${a}-${b}`,
       class: `${a}.${b}.${c}`,
-      body: `${a} ${b} ${c} workflow tooling`
+      body: `${a} ${b} ${c} workflow tooling`,
+      category: `${a} ${b}`,
+      keywords: `${a};${b};${c};launcher;menu`
     });
   }
   return out;
@@ -100,26 +103,35 @@ function fuzzyMatchLower(s, p) {
 function rankLegacy(item, query) {
   const clean = stripModePrefix(query);
   if (clean === "") return 1;
+  const categoryKeywords = `${item.category || ""} ${item.keywords || ""}`.trim();
   const best = Math.max(
     fuzzyMatchLegacy(item.name || "", clean) * scoreWeights.name,
     fuzzyMatchLegacy(item.title || "", clean) * scoreWeights.title,
     fuzzyMatchLegacy(item.exec || item.class || "", clean) * scoreWeights.exec,
-    fuzzyMatchLegacy(item.body || "", clean) * scoreWeights.body
+    fuzzyMatchLegacy(item.body || "", clean) * scoreWeights.body,
+    fuzzyMatchLegacy(categoryKeywords, clean) * scoreWeights.category
   );
   return best;
 }
 
 function rankOptimized(item, clean, cleanLower) {
   if (clean === "") return 1;
-  const name = item.name ? String(item.name).toLowerCase() : "";
-  const title = item.title ? String(item.title).toLowerCase() : "";
-  const exec = item.exec ? String(item.exec).toLowerCase() : (item.class ? String(item.class).toLowerCase() : "");
-  const body = item.body ? String(item.body).toLowerCase() : "";
+  if (!item._rankCacheReady) {
+    item._nameLower = item.name ? String(item.name).toLowerCase() : "";
+    item._titleLower = item.title ? String(item.title).toLowerCase() : "";
+    item._execLower = item.exec ? String(item.exec).toLowerCase() : (item.class ? String(item.class).toLowerCase() : "");
+    item._bodyLower = item.body ? String(item.body).toLowerCase() : "";
+    const category = item.category ? String(item.category).toLowerCase() : "";
+    const keywords = item.keywords ? String(item.keywords).toLowerCase() : "";
+    item._categoryKeywordsLower = `${category} ${keywords}`.trim();
+    item._rankCacheReady = true;
+  }
   const best = Math.max(
-    fuzzyMatchLower(name, cleanLower) * scoreWeights.name,
-    fuzzyMatchLower(title, cleanLower) * scoreWeights.title,
-    fuzzyMatchLower(exec, cleanLower) * scoreWeights.exec,
-    fuzzyMatchLower(body, cleanLower) * scoreWeights.body
+    fuzzyMatchLower(item._nameLower, cleanLower) * scoreWeights.name,
+    fuzzyMatchLower(item._titleLower, cleanLower) * scoreWeights.title,
+    fuzzyMatchLower(item._execLower, cleanLower) * scoreWeights.exec,
+    fuzzyMatchLower(item._bodyLower, cleanLower) * scoreWeights.body,
+    fuzzyMatchLower(item._categoryKeywordsLower, cleanLower) * scoreWeights.category
   );
   return best;
 }

@@ -21,6 +21,7 @@ Item {
   property var anchorWindow: null
   property var screenRef: null
   property var barConfig: null
+  property string activeSurfaceId: ""
 
   readonly property string position: (barConfig && barConfig.position) || "top"
   readonly property bool vertical: Config.isVerticalBar(position)
@@ -76,6 +77,10 @@ Item {
         height: item.height
       }
     });
+  }
+
+  function isSurfaceActive(surfaceId) {
+    return root.activeSurfaceId === surfaceId;
   }
 
   function componentForWidget(widgetType) {
@@ -235,6 +240,7 @@ Item {
     SystemMonitor {
       property var widgetInstance: null
       anchorWindow: root.anchorWindow
+      isActive: root.isSurfaceActive("systemStatsMenu")
       onStatsClicked: root.requestSurface("systemStatsMenu", this)
     }
   }
@@ -255,6 +261,7 @@ Item {
       SharedWidgets.BarPill {
         id: dateTimePill
         anchors.centerIn: parent
+        isActive: root.isSurfaceActive("dateTimeMenu")
         anchorWindow: root.anchorWindow
         tooltipText: Qt.formatDateTime(centerClock.date, "dddd, MMMM d yyyy")
         onClicked: root.requestSurface("dateTimeMenu", this)
@@ -361,6 +368,7 @@ Item {
       SharedWidgets.BarPill {
         id: cavaPill
         anchors.centerIn: parent
+        isActive: root.isSurfaceActive("cavaPopup")
         normalColor: "transparent"
         anchorWindow: root.anchorWindow
         tooltipText: "Audio visualizer"
@@ -429,6 +437,7 @@ Item {
     id: weatherComponent
     SharedWidgets.BarPill {
       property var widgetInstance: null
+      isActive: root.isSurfaceActive("weatherMenu")
       anchorWindow: root.anchorWindow
       tooltipText: WeatherService.condition || "Weather"
       onClicked: root.requestSurface("weatherMenu", this)
@@ -459,6 +468,7 @@ Item {
     id: networkComponent
     SharedWidgets.BarPill {
       property var widgetInstance: null
+      isActive: root.isSurfaceActive("networkMenu")
       anchorWindow: root.anchorWindow
       tooltipText: networkWidget.tooltipText
       onClicked: root.requestSurface("networkMenu", this)
@@ -476,6 +486,7 @@ Item {
     id: bluetoothComponent
     SharedWidgets.BarPill {
       property var widgetInstance: null
+      isActive: root.isSurfaceActive("bluetoothMenu")
       anchorWindow: root.anchorWindow
       tooltipText: {
         if (!Bluetooth.defaultAdapter || !Bluetooth.defaultAdapter.enabled) return "Bluetooth off";
@@ -505,6 +516,7 @@ Item {
     id: audioComponent
     SharedWidgets.BarPill {
       property var widgetInstance: null
+      isActive: root.isSurfaceActive("audioMenu")
       anchorWindow: root.anchorWindow
       tooltipText: audioWidget.tooltipText
       onClicked: root.requestSurface("audioMenu", this)
@@ -523,6 +535,7 @@ Item {
     SharedWidgets.BarPill {
       property var widgetInstance: null
       visible: SystemStatus.hasActivePlayer
+      isActive: root.isSurfaceActive("musicMenu")
       anchorWindow: root.anchorWindow
       tooltipText: {
         var players = SystemStatus.activeMprisPlayers;
@@ -569,7 +582,9 @@ Item {
     SharedWidgets.BarPill {
       property var widgetInstance: null
       visible: PrivacyService.anyActive
+      isActive: root.isSurfaceActive("privacyMenu")
       anchorWindow: root.anchorWindow
+      activeColor: Colors.withAlpha(Colors.warning, 0.22)
       normalColor: Colors.withAlpha(Colors.warning, 0.15)
       hoverColor: Colors.withAlpha(Colors.warning, 0.28)
       tooltipText: PrivacyService.activeLabel || "Privacy"
@@ -608,7 +623,9 @@ Item {
     SharedWidgets.BarPill {
       property var widgetInstance: null
       visible: SystemStatus.isRecording
+      isActive: root.isSurfaceActive("recordingMenu")
       anchorWindow: root.anchorWindow
+      activeColor: Colors.withAlpha(Colors.error, 0.22)
       normalColor: Colors.withAlpha(Colors.error, 0.15)
       hoverColor: Colors.withAlpha(Colors.error, 0.25)
       tooltipText: "Screen recording in progress"
@@ -645,6 +662,7 @@ Item {
     SharedWidgets.BarPill {
       property var widgetInstance: null
       visible: batteryWidget.showBattery
+      isActive: root.isSurfaceActive("batteryMenu")
       anchorWindow: root.anchorWindow
       tooltipText: batteryWidget.tooltipText
       onClicked: root.requestSurface("batteryMenu", this)
@@ -663,6 +681,7 @@ Item {
     SharedWidgets.BarPill {
       property var widgetInstance: null
       visible: PrinterService.hasPrinters
+      isActive: root.isSurfaceActive("printerMenu")
       anchorWindow: root.anchorWindow
       tooltipText: PrinterService.activeJobs > 0
         ? PrinterService.activeJobs + " print job" + (PrinterService.activeJobs !== 1 ? "s" : "") + " active"
@@ -708,6 +727,7 @@ Item {
     id: notepadComponent
     SharedWidgets.BarPill {
       property var widgetInstance: null
+      isActive: root.isSurfaceActive("notepad")
       anchorWindow: root.anchorWindow
       tooltipText: "Notepad"
       onClicked: root.requestSurface("notepad", this)
@@ -725,6 +745,7 @@ Item {
     id: controlCenterComponent
     SharedWidgets.BarPill {
       property var widgetInstance: null
+      isActive: root.isSurfaceActive("controlCenter")
       anchorWindow: root.anchorWindow
       tooltipText: "System controls"
       onClicked: root.requestSurface("controlCenter", this)
@@ -750,6 +771,7 @@ Item {
     id: clipboardComponent
     SharedWidgets.BarPill {
       property var widgetInstance: null
+      isActive: root.isSurfaceActive("clipboardMenu")
       anchorWindow: root.anchorWindow
       tooltipText: "Clipboard history"
       onClicked: root.requestSurface("clipboardMenu", this)
@@ -768,6 +790,7 @@ Item {
     SharedWidgets.BarPill {
       id: notifPill
       property var widgetInstance: null
+      isActive: root.isSurfaceActive("notifCenter")
       anchorWindow: root.anchorWindow
       tooltipText: root.manager && root.manager.dndEnabled ? "Notifications paused" : "Notifications"
       onClicked: root.requestSurface("notifCenter", this)

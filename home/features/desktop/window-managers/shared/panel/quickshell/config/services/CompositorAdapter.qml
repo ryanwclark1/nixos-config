@@ -124,6 +124,19 @@ QtObject {
       + "if [ \"$share\" -gt 0 ]; then share_out=1; else share_out=0; fi; ";
   }
 
+  // Returns wallpaper backend fallback snippet that may set ok=1.
+  // `wallpaperArgQuoted` must be a shell-quoted argument (e.g. 'DP-1,/path/image.jpg').
+  function wallpaperCompositorFallbackSnippet(wallpaperArgQuoted) {
+    if (isHyprland) {
+      return "if [ \"$ok\" -eq 0 ] && command -v hyprctl >/dev/null 2>&1; then "
+        + "  if hyprctl hyprpaper wallpaper " + String(wallpaperArgQuoted || "''") + "; then "
+        + "    echo BACKEND:hyprpaper; ok=1; "
+        + "  fi; "
+        + "fi; ";
+    }
+    return "";
+  }
+
   function lockCommand() {
     return ["os-lock-screen"];
   }

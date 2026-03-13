@@ -1,0 +1,12 @@
+{
+  "id": "fixture.valid.daemon",
+  "name": "Fixture Daemon",
+  "description": "Valid daemon plugin fixture",
+  "author": "fixtures",
+  "version": "1.0.0",
+  "type": "daemon",
+  "permissions": ["state_read"],
+  "entryPoints": {
+    "daemon": "Daemon.qml"
+  }
+}

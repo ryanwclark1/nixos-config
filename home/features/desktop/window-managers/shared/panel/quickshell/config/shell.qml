@@ -17,34 +17,45 @@ Scope {
   // Canonical UI state: only one closable surface is active at a time.
   property string activeSurfaceId: ""
   property var activeSurfaceContext: null
-  readonly property var knownSurfaces: [
-    "notifCenter", "controlCenter", "networkMenu", "audioMenu", "powerMenu",
-    "clipboardMenu", "recordingMenu", "musicMenu", "batteryMenu", "weatherMenu",
-    "dateTimeMenu", "systemStatsMenu", "bluetoothMenu", "printerMenu", "privacyMenu",
-    "notepad", "colorPicker", "displayConfig", "fileBrowser", "cavaPopup"
-  ]
-  readonly property var legacyPanelToSurface: ({
-    "notifCenterVisible": "notifCenter",
-    "controlCenterVisible": "controlCenter",
-    "networkMenuVisible": "networkMenu",
-    "audioMenuVisible": "audioMenu",
-    "powerMenuVisible": "powerMenu",
-    "clipboardMenuVisible": "clipboardMenu",
-    "recordingMenuVisible": "recordingMenu",
-    "musicMenuVisible": "musicMenu",
-    "batteryMenuVisible": "batteryMenu",
-    "weatherMenuVisible": "weatherMenu",
-    "dateTimeMenuVisible": "dateTimeMenu",
-    "systemStatsMenuVisible": "systemStatsMenu",
-    "bluetoothMenuVisible": "bluetoothMenu",
-    "printerMenuVisible": "printerMenu",
-    "privacyMenuVisible": "privacyMenu",
-    "notepadVisible": "notepad",
-    "colorPickerVisible": "colorPicker",
-    "displayConfigVisible": "displayConfig",
-    "fileBrowserVisible": "fileBrowser",
-    "cavaPopupVisible": "cavaPopup"
+  readonly property var surfaceRegistry: ({
+    notifCenter: { kind: "panel", focusPolicy: "focus-on-open", legacyFlags: ["notifCenterVisible"] },
+    controlCenter: { kind: "panel", focusPolicy: "preserve-app-focus", legacyFlags: ["controlCenterVisible"] },
+    networkMenu: { kind: "popup", focusPolicy: "preserve-app-focus", legacyFlags: ["networkMenuVisible"] },
+    audioMenu: { kind: "popup", focusPolicy: "preserve-app-focus", legacyFlags: ["audioMenuVisible"] },
+    powerMenu: { kind: "panel", focusPolicy: "focus-on-open", legacyFlags: ["powerMenuVisible"] },
+    clipboardMenu: { kind: "popup", focusPolicy: "focus-on-open", legacyFlags: ["clipboardMenuVisible"] },
+    recordingMenu: { kind: "popup", focusPolicy: "preserve-app-focus", legacyFlags: ["recordingMenuVisible"] },
+    musicMenu: { kind: "popup", focusPolicy: "preserve-app-focus", legacyFlags: ["musicMenuVisible"] },
+    batteryMenu: { kind: "popup", focusPolicy: "preserve-app-focus", legacyFlags: ["batteryMenuVisible"] },
+    weatherMenu: { kind: "popup", focusPolicy: "preserve-app-focus", legacyFlags: ["weatherMenuVisible"] },
+    dateTimeMenu: { kind: "popup", focusPolicy: "preserve-app-focus", legacyFlags: ["dateTimeMenuVisible"] },
+    systemStatsMenu: { kind: "popup", focusPolicy: "preserve-app-focus", legacyFlags: ["systemStatsMenuVisible"] },
+    bluetoothMenu: { kind: "popup", focusPolicy: "preserve-app-focus", legacyFlags: ["bluetoothMenuVisible"] },
+    printerMenu: { kind: "popup", focusPolicy: "preserve-app-focus", legacyFlags: ["printerMenuVisible"] },
+    privacyMenu: { kind: "popup", focusPolicy: "preserve-app-focus", legacyFlags: ["privacyMenuVisible"] },
+    notepad: { kind: "panel", focusPolicy: "focus-on-open", legacyFlags: ["notepadVisible"] },
+    colorPicker: { kind: "panel", focusPolicy: "focus-on-open", legacyFlags: ["colorPickerVisible"] },
+    displayConfig: { kind: "panel", focusPolicy: "focus-on-open", legacyFlags: ["displayConfigVisible"] },
+    fileBrowser: { kind: "panel", focusPolicy: "focus-on-open", legacyFlags: ["fileBrowserVisible"] },
+    cavaPopup: { kind: "popup", focusPolicy: "preserve-app-focus", legacyFlags: ["cavaPopupVisible"] }
   })
+  readonly property var knownSurfaces: Object.keys(surfaceRegistry)
+  readonly property var legacyPanelToSurface: {
+    var mapping = {};
+    for (var surfaceId in root.surfaceRegistry) {
+      var meta = root.surfaceRegistry[surfaceId];
+      var flags = meta && meta.legacyFlags ? meta.legacyFlags : [];
+      for (var i = 0; i < flags.length; ++i)
+        mapping[flags[i]] = surfaceId;
+    }
+    return mapping;
+  }
+  property string closingSurfaceId: ""
+  property var closingSurfaceContext: null
+  property var closingMenuScreen: null
+  property string pendingSurfaceId: ""
+  property var pendingSurfaceContext: null
+  readonly property int popupSwitchDelay: 170
 
   readonly property bool notifCenterVisible: root.isSurfaceOpen("notifCenter")
   readonly property bool controlCenterVisible: root.isSurfaceOpen("controlCenter")
@@ -86,6 +97,43 @@ Scope {
 
   function isSurfaceOpen(surfaceId) {
     return root.activeSurfaceId === surfaceId;
+  }
+
+  function surfaceMeta(surfaceId) {
+    var resolved = normalizeSurfaceId(surfaceId);
+    return resolved ? root.surfaceRegistry[resolved] || null : null;
+  }
+
+  function surfaceKind(surfaceId) {
+    var meta = surfaceMeta(surfaceId);
+    return meta ? meta.kind : "";
+  }
+
+  function barOwnsSurface(context, screenRef, barId) {
+    return !!(context && context.barId === barId && context.screen === screenRef);
+  }
+
+  function surfaceContextFor(surfaceId, screenRef, barId) {
+    if (root.activeSurfaceId === surfaceId && root.barOwnsSurface(root.activeSurfaceContext, screenRef, barId))
+      return root.activeSurfaceContext;
+    if (root.closingSurfaceId === surfaceId && root.barOwnsSurface(root.closingSurfaceContext, screenRef, barId))
+      return root.closingSurfaceContext;
+    return null;
+  }
+
+  function isSurfacePresentedOnBar(surfaceId, screenRef, barId) {
+    return root.activeSurfaceId === surfaceId && root.barOwnsSurface(root.activeSurfaceContext, screenRef, barId);
+  }
+
+  function clearClosingSurface() {
+    root.closingSurfaceId = "";
+    root.closingSurfaceContext = null;
+    root.closingMenuScreen = null;
+  }
+
+  function clearPendingSurface() {
+    root.pendingSurfaceId = "";
+    root.pendingSurfaceContext = null;
   }
 
   function defaultSurfaceContext(surfaceId, preferredScreen) {
@@ -139,18 +187,59 @@ Scope {
     return resolved;
   }
 
+  function commitSurfaceOpen(surfaceId, surfaceContext) {
+    var resolvedContext = surfaceContext || resolveSurfaceContext(surfaceId, {});
+    root.clearClosingSurface();
+    root.activeSurfaceId = surfaceId;
+    root.activeSurfaceContext = resolvedContext;
+    root.menuScreen = resolvedContext.screen || root.activeScreen;
+  }
+
+  function beginPopupSwitch(surfaceId, surfaceContext) {
+    root.pendingSurfaceId = surfaceId;
+    root.pendingSurfaceContext = surfaceContext;
+    root.closingSurfaceId = root.activeSurfaceId;
+    root.closingSurfaceContext = root.activeSurfaceContext;
+    root.closingMenuScreen = root.menuScreen;
+    root.activeSurfaceId = "";
+    root.activeSurfaceContext = null;
+    root.menuScreen = null;
+    popupSwitchTimer.restart();
+  }
+
   function openSurface(surfaceId, context) {
     var resolved = normalizeSurfaceId(surfaceId);
     if (!resolved) return false;
     var surfaceContext = resolveSurfaceContext(resolved, context);
-    root.activeSurfaceId = resolved;
-    root.activeSurfaceContext = surfaceContext;
-    root.menuScreen = surfaceContext.screen || root.activeScreen;
+
+    if (root.pendingSurfaceId === resolved) {
+      root.pendingSurfaceContext = surfaceContext;
+      return true;
+    }
+
+    if (root.activeSurfaceId
+      && root.activeSurfaceId !== resolved
+      && root.surfaceKind(root.activeSurfaceId) === "popup"
+      && root.surfaceKind(resolved) === "popup") {
+      beginPopupSwitch(resolved, surfaceContext);
+      return true;
+    }
+
+    popupSwitchTimer.stop();
+    root.clearPendingSurface();
+    root.clearClosingSurface();
+    root.commitSurfaceOpen(resolved, surfaceContext);
     return true;
   }
 
   function closeSurface(surfaceId) {
-    if (root.activeSurfaceId !== surfaceId) return false;
+    var resolved = normalizeSurfaceId(surfaceId);
+    if (!resolved) return false;
+    if (root.pendingSurfaceId === resolved)
+      root.clearPendingSurface();
+    if (root.activeSurfaceId !== resolved) return false;
+    popupSwitchTimer.stop();
+    root.clearClosingSurface();
     root.activeSurfaceId = "";
     root.activeSurfaceContext = null;
     root.menuScreen = null;
@@ -158,6 +247,9 @@ Scope {
   }
 
   function closeAllSurfaces() {
+    popupSwitchTimer.stop();
+    root.clearPendingSurface();
+    root.clearClosingSurface();
     root.activeSurfaceId = "";
     root.activeSurfaceContext = null;
     root.menuScreen = null;
@@ -216,6 +308,22 @@ Scope {
     if (screenHeight === undefined || screenHeight <= 0)
       return 560;
     return Math.max(320, screenHeight - 32);
+  }
+
+  Timer {
+    id: popupSwitchTimer
+    interval: root.popupSwitchDelay
+    repeat: false
+    onTriggered: {
+      if (root.pendingSurfaceId) {
+        var nextSurfaceId = root.pendingSurfaceId;
+        var nextSurfaceContext = root.pendingSurfaceContext;
+        root.clearPendingSurface();
+        root.commitSurfaceOpen(nextSurfaceId, nextSurfaceContext);
+      } else {
+        root.clearClosingSurface();
+      }
+    }
   }
 
   function surfacePanelLayout(context, preferredWidth) {
@@ -350,9 +458,28 @@ Scope {
               readonly property bool vertical: Config.isVerticalBar(barConfig.position)
               readonly property int marginValue: Config.floatingInset(barConfig)
               readonly property int thicknessValue: Config.barThickness(barConfig)
-              readonly property bool isMenuBar: !!(root.activeSurfaceContext && root.activeSurfaceContext.barId === barConfig.id && root.menuScreen === screenBars.modelData)
-              readonly property var currentContext: isMenuBar ? root.activeSurfaceContext : null
               screen: screenBars.modelData
+
+              function surfaceContext(surfaceId) {
+                return root.surfaceContextFor(surfaceId, screenBars.modelData, barConfig.id);
+              }
+
+              function popupVisible(surfaceId) {
+                return root.isSurfacePresentedOnBar(surfaceId, screenBars.modelData, barConfig.id);
+              }
+
+              function popupPreferredEdge(surfaceId) {
+                var context = surfaceContext(surfaceId);
+                return context ? context.position : barConfig.position;
+              }
+
+              function popupAnchorXFor(surfaceId, popupWidth) {
+                return root.popupAnchorX(surfaceContext(surfaceId), popupWidth, screen ? screen.width : width);
+              }
+
+              function popupAnchorYFor(surfaceId, popupHeight) {
+                return root.popupAnchorY(surfaceContext(surfaceId), popupHeight, screen ? screen.height : height);
+              }
 
               anchors {
                 top: barConfig.position === "top" || barConfig.position === "left" || barConfig.position === "right"
@@ -383,124 +510,126 @@ Scope {
                 anchorWindow: barWindow
                 screenRef: screenBars.modelData
                 barConfig: barWindow.barConfig
+                activeSurfaceId: root.barOwnsSurface(root.activeSurfaceContext, screenBars.modelData, barWindow.barConfig.id) ? root.activeSurfaceId : ""
                 onSurfaceRequested: (surfaceId, context) => root.toggleSurface(surfaceId, context)
               }
 
               BluetoothMenu {
                 anchor.window: barWindow
-                preferredEdge: barWindow.currentContext ? barWindow.currentContext.position : barWindow.barConfig.position
-                anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
-                anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
-                wantVisible: root.bluetoothMenuVisible && barWindow.isMenuBar
+                preferredEdge: barWindow.popupPreferredEdge("bluetoothMenu")
+                anchor.rect.x: barWindow.popupAnchorXFor("bluetoothMenu", width)
+                anchor.rect.y: barWindow.popupAnchorYFor("bluetoothMenu", height)
+                wantVisible: barWindow.popupVisible("bluetoothMenu")
                 onCloseRequested: root.closeSurface("bluetoothMenu")
               }
 
               AudioMenu {
                 anchor.window: barWindow
-                preferredEdge: barWindow.currentContext ? barWindow.currentContext.position : barWindow.barConfig.position
-                anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
-                anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
-                wantVisible: root.audioMenuVisible && barWindow.isMenuBar
+                preferredEdge: barWindow.popupPreferredEdge("audioMenu")
+                anchor.rect.x: barWindow.popupAnchorXFor("audioMenu", width)
+                anchor.rect.y: barWindow.popupAnchorYFor("audioMenu", height)
+                wantVisible: barWindow.popupVisible("audioMenu")
                 onCloseRequested: root.closeSurface("audioMenu")
               }
 
             NetworkMenu {
               anchor.window: barWindow
-              preferredEdge: barWindow.currentContext ? barWindow.currentContext.position : barWindow.barConfig.position
-              anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
-              anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
-              wantVisible: root.networkMenuVisible && barWindow.isMenuBar
+              preferredEdge: barWindow.popupPreferredEdge("networkMenu")
+              anchor.rect.x: barWindow.popupAnchorXFor("networkMenu", width)
+              anchor.rect.y: barWindow.popupAnchorYFor("networkMenu", height)
+              wantVisible: barWindow.popupVisible("networkMenu")
               onCloseRequested: root.closeSurface("networkMenu")
             }
 
             ClipboardMenu {
               anchor.window: barWindow
-              preferredEdge: barWindow.currentContext ? barWindow.currentContext.position : barWindow.barConfig.position
-              anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
-              anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
-              wantVisible: root.clipboardMenuVisible && barWindow.isMenuBar
+              preferredEdge: barWindow.popupPreferredEdge("clipboardMenu")
+              anchor.rect.x: barWindow.popupAnchorXFor("clipboardMenu", width)
+              anchor.rect.y: barWindow.popupAnchorYFor("clipboardMenu", height)
+              wantVisible: barWindow.popupVisible("clipboardMenu")
               onCloseRequested: root.closeSurface("clipboardMenu")
             }
 
             RecordingMenu {
               anchor.window: barWindow
-              preferredEdge: barWindow.currentContext ? barWindow.currentContext.position : barWindow.barConfig.position
-              anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
-              anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
-              wantVisible: root.recordingMenuVisible && barWindow.isMenuBar
+              preferredEdge: barWindow.popupPreferredEdge("recordingMenu")
+              anchor.rect.x: barWindow.popupAnchorXFor("recordingMenu", width)
+              anchor.rect.y: barWindow.popupAnchorYFor("recordingMenu", height)
+              wantVisible: barWindow.popupVisible("recordingMenu")
               onCloseRequested: root.closeSurface("recordingMenu")
             }
 
             PrivacyMenu {
               anchor.window: barWindow
-              preferredEdge: barWindow.currentContext ? barWindow.currentContext.position : barWindow.barConfig.position
-              anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
-              anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
-              wantVisible: root.privacyMenuVisible && barWindow.isMenuBar
+              preferredEdge: barWindow.popupPreferredEdge("privacyMenu")
+              anchor.rect.x: barWindow.popupAnchorXFor("privacyMenu", width)
+              anchor.rect.y: barWindow.popupAnchorYFor("privacyMenu", height)
+              wantVisible: barWindow.popupVisible("privacyMenu")
               onCloseRequested: root.closeSurface("privacyMenu")
             }
 
             MusicMenu {
               anchor.window: barWindow
-              preferredEdge: barWindow.currentContext ? barWindow.currentContext.position : barWindow.barConfig.position
-              anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
-              anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
-              wantVisible: root.musicMenuVisible && barWindow.isMenuBar
+              preferredEdge: barWindow.popupPreferredEdge("musicMenu")
+              anchor.rect.x: barWindow.popupAnchorXFor("musicMenu", width)
+              anchor.rect.y: barWindow.popupAnchorYFor("musicMenu", height)
+              wantVisible: barWindow.popupVisible("musicMenu")
               onCloseRequested: root.closeSurface("musicMenu")
             }
 
             BatteryMenu {
               anchor.window: barWindow
-              preferredEdge: barWindow.currentContext ? barWindow.currentContext.position : barWindow.barConfig.position
-              anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
-              anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
-              wantVisible: root.batteryMenuVisible && barWindow.isMenuBar
+              preferredEdge: barWindow.popupPreferredEdge("batteryMenu")
+              anchor.rect.x: barWindow.popupAnchorXFor("batteryMenu", width)
+              anchor.rect.y: barWindow.popupAnchorYFor("batteryMenu", height)
+              wantVisible: barWindow.popupVisible("batteryMenu")
               onCloseRequested: root.closeSurface("batteryMenu")
             }
 
             WeatherMenu {
               anchor.window: barWindow
-              preferredEdge: barWindow.currentContext ? barWindow.currentContext.position : barWindow.barConfig.position
+              preferredEdge: barWindow.popupPreferredEdge("weatherMenu")
               implicitHeight: Math.min(600, root.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
-              anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
-              anchor.rect.y: root.popupAnchorY(barWindow.currentContext, implicitHeight, barWindow.screen ? barWindow.screen.height : barWindow.height)
-              wantVisible: root.weatherMenuVisible && barWindow.isMenuBar
+              anchor.rect.x: barWindow.popupAnchorXFor("weatherMenu", width)
+              anchor.rect.y: barWindow.popupAnchorYFor("weatherMenu", implicitHeight)
+              wantVisible: barWindow.popupVisible("weatherMenu")
               onCloseRequested: root.closeSurface("weatherMenu")
             }
 
             DateTimeMenu {
               anchor.window: barWindow
-              preferredEdge: barWindow.currentContext ? barWindow.currentContext.position : barWindow.barConfig.position
+              preferredEdge: barWindow.popupPreferredEdge("dateTimeMenu")
               implicitHeight: Math.min(560, root.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
-              anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
-              anchor.rect.y: root.popupAnchorY(barWindow.currentContext, implicitHeight, barWindow.screen ? barWindow.screen.height : barWindow.height)
-              wantVisible: root.dateTimeMenuVisible && barWindow.isMenuBar
+              anchor.rect.x: barWindow.popupAnchorXFor("dateTimeMenu", width)
+              anchor.rect.y: barWindow.popupAnchorYFor("dateTimeMenu", implicitHeight)
+              wantVisible: barWindow.popupVisible("dateTimeMenu")
               onCloseRequested: root.closeSurface("dateTimeMenu")
             }
 
             SystemStatsMenu {
               anchor.window: barWindow
-              preferredEdge: barWindow.currentContext ? barWindow.currentContext.position : barWindow.barConfig.position
-              anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
-              anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
-              wantVisible: root.systemStatsMenuVisible && barWindow.isMenuBar
+              preferredEdge: barWindow.popupPreferredEdge("systemStatsMenu")
+              anchor.rect.x: barWindow.popupAnchorXFor("systemStatsMenu", width)
+              anchor.rect.y: barWindow.popupAnchorYFor("systemStatsMenu", height)
+              wantVisible: barWindow.popupVisible("systemStatsMenu")
               onCloseRequested: root.closeSurface("systemStatsMenu")
             }
 
             PrinterMenu {
               anchor.window: barWindow
-              preferredEdge: barWindow.currentContext ? barWindow.currentContext.position : barWindow.barConfig.position
-              anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
-              anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
-              wantVisible: root.printerMenuVisible && barWindow.isMenuBar
+              preferredEdge: barWindow.popupPreferredEdge("printerMenu")
+              anchor.rect.x: barWindow.popupAnchorXFor("printerMenu", width)
+              anchor.rect.y: barWindow.popupAnchorYFor("printerMenu", height)
+              wantVisible: barWindow.popupVisible("printerMenu")
               onCloseRequested: root.closeSurface("printerMenu")
             }
 
               CavaPopup {
                 anchor.window: barWindow
-                anchor.rect.x: root.popupAnchorX(barWindow.currentContext, width, barWindow.screen ? barWindow.screen.width : barWindow.width)
-                anchor.rect.y: root.popupAnchorY(barWindow.currentContext, height, barWindow.screen ? barWindow.screen.height : barWindow.height)
-                visible: root.cavaPopupVisible && barWindow.isMenuBar
+                preferredEdge: barWindow.popupPreferredEdge("cavaPopup")
+                anchor.rect.x: barWindow.popupAnchorXFor("cavaPopup", width)
+                anchor.rect.y: barWindow.popupAnchorYFor("cavaPopup", height)
+                wantVisible: barWindow.popupVisible("cavaPopup")
                 cavaData: panel.fullCavaData
                 onCloseRequested: root.closeSurface("cavaPopup")
               }

@@ -6,8 +6,10 @@ import "../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  implicitWidth: 380
-  implicitHeight: 480
+  readonly property int availablePopupWidth: screen ? Math.max(320, screen.width - 40) : 380
+  readonly property bool compactMode: availablePopupWidth < 360
+  implicitWidth: Math.min(380, availablePopupWidth)
+  implicitHeight: compactMode ? 540 : 480
   title: "Printers"
   toggleMethod: "togglePrinterMenu"
   contentSpacing: 12
@@ -76,22 +78,24 @@ BasePopupMenu {
   Rectangle {
     visible: PrinterService.hasPrinters
     Layout.fillWidth: true
-    implicitHeight: statusRow.implicitHeight + 16
+    implicitHeight: statusGrid.implicitHeight + 16
     radius: Colors.radiusMedium
     color: Colors.cardSurface
     border.color: Colors.border
     border.width: 1
 
-    RowLayout {
-      id: statusRow
+    GridLayout {
+      id: statusGrid
       anchors {
-        left: parent.left; right: parent.right
-        verticalCenter: parent.verticalCenter
-        leftMargin: Colors.spacingM; rightMargin: Colors.spacingM
+        left: parent.left
+        right: parent.right
+        top: parent.top
+        margins: Colors.spacingM
       }
-      spacing: Colors.spacingM
+      columns: root.compactMode ? 1 : (PrinterService.activeJobs > 0 ? 3 : 2)
+      columnSpacing: Colors.spacingM
+      rowSpacing: Colors.spacingS
 
-      // Printer count
       ColumnLayout {
         spacing: 2
         Text {
@@ -99,24 +103,17 @@ BasePopupMenu {
           color: Colors.text
           font.pixelSize: Colors.fontSizeHuge
           font.weight: Font.Bold
-          Layout.alignment: Qt.AlignHCenter
+          Layout.alignment: root.compactMode ? Qt.AlignLeft : Qt.AlignHCenter
         }
         Text {
           text: "printer" + (PrinterService.printers.length !== 1 ? "s" : "")
           color: Colors.textDisabled
           font.pixelSize: Colors.fontSizeXS
           font.weight: Font.Medium
-          Layout.alignment: Qt.AlignHCenter
+          Layout.alignment: root.compactMode ? Qt.AlignLeft : Qt.AlignHCenter
         }
       }
 
-      // Divider
-      Rectangle {
-        width: 1; height: 28
-        color: Colors.border
-      }
-
-      // Default printer info
       ColumnLayout {
         Layout.fillWidth: true
         spacing: 2
@@ -136,14 +133,6 @@ BasePopupMenu {
         }
       }
 
-      // Divider
-      Rectangle {
-        width: 1; height: 28
-        color: Colors.border
-        visible: PrinterService.activeJobs > 0
-      }
-
-      // Active jobs detail
       ColumnLayout {
         visible: PrinterService.activeJobs > 0
         spacing: 2
@@ -152,14 +141,14 @@ BasePopupMenu {
           color: Colors.warning
           font.pixelSize: Colors.fontSizeHuge
           font.weight: Font.Bold
-          Layout.alignment: Qt.AlignHCenter
+          Layout.alignment: root.compactMode ? Qt.AlignLeft : Qt.AlignHCenter
         }
         Text {
           text: "active job" + (PrinterService.activeJobs !== 1 ? "s" : "")
           color: Colors.textDisabled
           font.pixelSize: Colors.fontSizeXS
           font.weight: Font.Medium
-          Layout.alignment: Qt.AlignHCenter
+          Layout.alignment: root.compactMode ? Qt.AlignLeft : Qt.AlignHCenter
         }
       }
     }
@@ -297,6 +286,8 @@ BasePopupMenu {
                        : printerCard.isPrinting ? Colors.withAlpha(Colors.warning, 0.16)
                        : Colors.withAlpha(Colors.success, 0.14)
 
+                  visible: !root.compactMode
+
                   Text {
                     id: statusChipLabel
                     anchors.centerIn: parent
@@ -313,8 +304,9 @@ BasePopupMenu {
               }
 
               // Action buttons row
-              RowLayout {
+              Flow {
                 Layout.fillWidth: true
+                width: parent.width
                 spacing: Colors.spacingS
 
                 // Set Default button (hidden when already default)
@@ -433,8 +425,6 @@ BasePopupMenu {
                     }
                   }
                 }
-
-                Item { Layout.fillWidth: true }
 
                 // Enable / Disable toggle
                 Rectangle {

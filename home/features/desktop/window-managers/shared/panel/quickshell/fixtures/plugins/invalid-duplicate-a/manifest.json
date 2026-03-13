@@ -1,0 +1,12 @@
+{
+  "id": "fixture.invalid.duplicate",
+  "name": "Duplicate A",
+  "description": "Duplicate id fixture A",
+  "author": "fixtures",
+  "version": "1.0.0",
+  "type": "bar-widget",
+  "permissions": [],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  }
+}

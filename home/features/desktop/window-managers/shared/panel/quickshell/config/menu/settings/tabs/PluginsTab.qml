@@ -1,5 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
+import Quickshell.Io
 import "../../../services"
 import "../../../widgets" as SharedWidgets
 import ".."
@@ -10,6 +12,38 @@ Item {
     property string tabId: ""
     property bool compactMode: false
     property bool tightSpacing: false
+    property string _pluginDiagnosticsExportText: ""
+    property string _pluginDiagnosticsSavePath: ""
+
+    function shellQuote(value) {
+        var text = String(value || "");
+        return "'" + text.replace(/'/g, "'\"'\"'") + "'";
+    }
+
+    function diagnosticsTimestamp() {
+        var now = new Date();
+        function pad(n) {
+            var value = String(n);
+            return value.length < 2 ? ("0" + value) : value;
+        }
+        return now.getUTCFullYear()
+            + pad(now.getUTCMonth() + 1)
+            + pad(now.getUTCDate())
+            + "T"
+            + pad(now.getUTCHours())
+            + pad(now.getUTCMinutes())
+            + pad(now.getUTCSeconds())
+            + "Z";
+    }
+
+    function diagnosticsOutputDir() {
+        var home = Quickshell.env("HOME") || "/home";
+        return home + "/.local/state/quickshell/plugin-diagnostics";
+    }
+
+    function pluginDiagnosticsOutputPath() {
+        return diagnosticsOutputDir() + "/plugin-diagnostics-" + diagnosticsTimestamp() + ".json";
+    }
 
     function pluginErrorEntries() {
         var map = PluginService.pluginErrors || ({});
@@ -34,6 +68,131 @@ Item {
         return entries;
     }
 
+    function pluginStatusSummary() {
+        var map = PluginService.pluginStatuses || ({});
+        var summary = {
+            active: 0,
+            enabled: 0,
+            degraded: 0,
+            failed: 0,
+            disabled: 0,
+            validated: 0,
+            discovered: 0,
+            unknown: 0
+        };
+        for (var key in map) {
+            var state = String(map[key] && map[key].state ? map[key].state : "unknown");
+            if (summary[state] === undefined)
+                summary.unknown += 1;
+            else
+                summary[state] += 1;
+        }
+        return summary;
+    }
+
+    function statusSeverity(state) {
+        return PluginRuntimeCatalog.stateSeverity(String(state || ""));
+    }
+
+    function statusDescription(state) {
+        return PluginRuntimeCatalog.stateDescription(String(state || ""));
+    }
+
+    function pluginDiagnosticsPayload() {
+        var plugins = (PluginService.plugins || []).slice();
+        plugins.sort(function(a, b) { return String(a.id || "").localeCompare(String(b.id || "")); });
+
+        var pluginRows = [];
+        for (var i = 0; i < plugins.length; i++) {
+            var plugin = plugins[i] || ({});
+            var pluginId = String(plugin.id || "");
+            var runtime = PluginService.pluginStatuses && pluginId !== "" ? PluginService.pluginStatuses[pluginId] : null;
+            var state = runtime && runtime.state ? String(runtime.state) : (plugin.enabled ? "enabled" : "disabled");
+            var code = runtime && runtime.code ? String(runtime.code) : "";
+            var message = runtime && runtime.message ? String(runtime.message) : "";
+            var updatedAt = runtime && runtime.updatedAt ? String(runtime.updatedAt) : "";
+            pluginRows.push({
+                id: pluginId,
+                name: String(plugin.name || ""),
+                version: String(plugin.version || ""),
+                type: String(plugin.type || ""),
+                enabled: !!plugin.enabled,
+                author: String(plugin.author || ""),
+                permissions: Array.isArray(plugin.permissions) ? plugin.permissions.slice() : [],
+                entryPoints: plugin.entryPoints && typeof plugin.entryPoints === "object" ? Object.assign({}, plugin.entryPoints) : ({}),
+                runtime: {
+                    state: state,
+                    stateLabel: PluginRuntimeCatalog.stateLabel(state),
+                    stateSeverity: root.statusSeverity(state),
+                    code: code,
+                    codeLabel: code !== "" ? PluginRuntimeCatalog.errorLabel(code) : "",
+                    codeSeverity: code !== "" ? PluginRuntimeCatalog.errorSeverity(code) : "muted",
+                    message: message,
+                    updatedAt: updatedAt
+                }
+            });
+        }
+
+        return {
+            schemaVersion: 1,
+            generatedAt: (new Date()).toISOString(),
+            summary: {
+                installed: (PluginService.plugins || []).length,
+                enabled: (PluginService.plugins || []).filter(function(p) { return !!(p && p.enabled); }).length,
+                invalidManifests: root.pluginErrorEntries().length,
+                statuses: root.pluginStatusSummary()
+            },
+            plugins: pluginRows,
+            manifestErrors: root.pluginErrorEntries()
+        };
+    }
+
+    function copyPluginDiagnostics() {
+        _pluginDiagnosticsExportText = JSON.stringify(root.pluginDiagnosticsPayload(), null, 2);
+        if (pluginDiagnosticsCopyProc.running)
+            return;
+        pluginDiagnosticsCopyProc.command = [
+            "sh", "-c",
+            "if command -v wl-copy >/dev/null 2>&1; then "
+            + "cat | wl-copy; "
+            + "elif command -v xclip >/dev/null 2>&1; then "
+            + "cat | xclip -selection clipboard; "
+            + "else exit 127; fi"
+        ];
+        pluginDiagnosticsCopyProc.running = true;
+    }
+
+    function savePluginDiagnostics() {
+        _pluginDiagnosticsExportText = JSON.stringify(root.pluginDiagnosticsPayload(), null, 2);
+        _pluginDiagnosticsSavePath = root.pluginDiagnosticsOutputPath();
+        if (pluginDiagnosticsSaveProc.running)
+            return;
+        pluginDiagnosticsSaveProc.command = [
+            "sh", "-c",
+            "mkdir -p " + shellQuote(root.diagnosticsOutputDir())
+            + " && cat > " + shellQuote(_pluginDiagnosticsSavePath)
+        ];
+        pluginDiagnosticsSaveProc.running = true;
+    }
+
+    function severityColor(severity) {
+        var sev = String(severity || "");
+        if (sev === "ok")
+            return Colors.success;
+        if (sev === "warn")
+            return Colors.warning;
+        if (sev === "error")
+            return Colors.error;
+        return Colors.fgSecondary;
+    }
+
+    function severityBgColor(severity) {
+        var base = severityColor(severity);
+        if (String(severity || "") === "muted")
+            return Qt.rgba(Colors.text.r, Colors.text.g, Colors.text.b, 0.08);
+        return Qt.rgba(base.r, base.g, base.b, 0.16);
+    }
+
     SettingsTabPage {
         anchors.fill: parent
         tabId: root.tabId
@@ -52,7 +211,13 @@ Item {
 
                 ColumnLayout {
                     spacing: 2
-                    width: root.compactMode ? parent.width : Math.max(0, parent.width - scanPluginsButton.implicitWidth - Colors.spacingM)
+                    width: root.compactMode
+                           ? parent.width
+                           : Math.max(0, parent.width
+                                      - scanPluginsButton.implicitWidth
+                                      - copyDiagnosticsButton.implicitWidth
+                                      - saveDiagnosticsButton.implicitWidth
+                                      - (Colors.spacingM * 3))
 
                     Text {
                         text: PluginService.plugins.length + " plugin" + (PluginService.plugins.length !== 1 ? "s" : "") + " found"
@@ -83,6 +248,88 @@ Item {
                     iconName: "󰑐"
                     compact: true
                     onClicked: PluginService.scanPlugins()
+                }
+
+                SettingsActionButton {
+                    id: copyDiagnosticsButton
+                    label: "Copy Diagnostics"
+                    iconName: "󰨓"
+                    compact: true
+                    onClicked: root.copyPluginDiagnostics()
+                }
+
+                SettingsActionButton {
+                    id: saveDiagnosticsButton
+                    label: "Save Diagnostics"
+                    iconName: "󰆓"
+                    compact: true
+                    onClicked: root.savePluginDiagnostics()
+                }
+            }
+
+            Flow {
+                Layout.fillWidth: true
+                width: parent.width
+                spacing: Colors.spacingS
+
+                Rectangle {
+                    implicitWidth: activeCount.implicitWidth + 12
+                    height: 20
+                    radius: 10
+                    color: Qt.rgba(Colors.success.r, Colors.success.g, Colors.success.b, 0.16)
+                    Text {
+                        id: activeCount
+                        anchors.centerIn: parent
+                        text: "active " + root.pluginStatusSummary().active
+                        color: Colors.success
+                        font.pixelSize: Colors.fontSizeXS
+                        font.weight: Font.DemiBold
+                    }
+                }
+
+                Rectangle {
+                    implicitWidth: degradedCount.implicitWidth + 12
+                    height: 20
+                    radius: 10
+                    color: Qt.rgba(Colors.warning.r, Colors.warning.g, Colors.warning.b, 0.16)
+                    Text {
+                        id: degradedCount
+                        anchors.centerIn: parent
+                        text: "degraded " + root.pluginStatusSummary().degraded
+                        color: Colors.warning
+                        font.pixelSize: Colors.fontSizeXS
+                        font.weight: Font.DemiBold
+                    }
+                }
+
+                Rectangle {
+                    implicitWidth: failedCount.implicitWidth + 12
+                    height: 20
+                    radius: 10
+                    color: Qt.rgba(Colors.error.r, Colors.error.g, Colors.error.b, 0.16)
+                    Text {
+                        id: failedCount
+                        anchors.centerIn: parent
+                        text: "failed " + root.pluginStatusSummary().failed
+                        color: Colors.error
+                        font.pixelSize: Colors.fontSizeXS
+                        font.weight: Font.DemiBold
+                    }
+                }
+
+                Rectangle {
+                    implicitWidth: disabledCount.implicitWidth + 12
+                    height: 20
+                    radius: 10
+                    color: Qt.rgba(Colors.text.r, Colors.text.g, Colors.text.b, 0.12)
+                    Text {
+                        id: disabledCount
+                        anchors.centerIn: parent
+                        text: "disabled " + root.pluginStatusSummary().disabled
+                        color: Colors.fgSecondary
+                        font.pixelSize: Colors.fontSizeXS
+                        font.weight: Font.DemiBold
+                    }
                 }
             }
 
@@ -230,26 +477,20 @@ Item {
                                 radius: height / 2
                                 color: {
                                     var status = PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] ? PluginService.pluginStatuses[modelData.id].state : "";
-                                    return status === "failed" || status === "degraded"
-                                        ? Qt.rgba(Colors.error.r, Colors.error.g, Colors.error.b, 0.16)
-                                        : status === "active"
-                                            ? Qt.rgba(Colors.success.r, Colors.success.g, Colors.success.b, 0.16)
-                                            : Qt.rgba(Colors.text.r, Colors.text.g, Colors.text.b, 0.08);
+                                    var severity = root.statusSeverity(status !== "" ? status : (modelData.enabled ? "enabled" : "disabled"));
+                                    return root.severityBgColor(severity);
                                 }
                                 Text {
                                     id: statusLabel
                                     anchors.centerIn: parent
                                     text: {
                                         var status = PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] ? PluginService.pluginStatuses[modelData.id].state : "";
-                                        return status !== "" ? status : (modelData.enabled ? "enabled" : "disabled");
+                                        return PluginRuntimeCatalog.stateLabel(status !== "" ? status : (modelData.enabled ? "enabled" : "disabled"));
                                     }
                                     color: {
                                         var status = PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] ? PluginService.pluginStatuses[modelData.id].state : "";
-                                        return status === "failed" || status === "degraded"
-                                            ? Colors.error
-                                            : status === "active"
-                                                ? Colors.success
-                                                : Colors.fgSecondary;
+                                        var severity = root.statusSeverity(status !== "" ? status : (modelData.enabled ? "enabled" : "disabled"));
+                                        return root.severityColor(severity);
                                     }
                                     font.pixelSize: Colors.fontSizeXS
                                     font.weight: Font.DemiBold
@@ -273,9 +514,42 @@ Item {
 
                         Text {
                             visible: PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] && String(PluginService.pluginStatuses[modelData.id].message || "") !== ""
-                            text: (PluginService.pluginStatuses[modelData.id].code ? ("[" + PluginService.pluginStatuses[modelData.id].code + "] ") : "")
+                            text: (PluginService.pluginStatuses[modelData.id].code ? ("[" + PluginRuntimeCatalog.errorLabel(PluginService.pluginStatuses[modelData.id].code) + "] ") : "")
                                 + String(PluginService.pluginStatuses[modelData.id].message || "")
                             color: Colors.warning
+                            font.pixelSize: Colors.fontSizeXS
+                            Layout.fillWidth: true
+                            wrapMode: Text.WordWrap
+                        }
+
+                        Text {
+                            visible: PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] && String(PluginService.pluginStatuses[modelData.id].code || "") !== "" && String(PluginRuntimeCatalog.errorDescription(PluginService.pluginStatuses[modelData.id].code) || "") !== ""
+                            text: PluginRuntimeCatalog.errorDescription(PluginService.pluginStatuses[modelData.id].code)
+                            color: Colors.fgDim
+                            font.pixelSize: Colors.fontSizeXS
+                            Layout.fillWidth: true
+                            wrapMode: Text.WordWrap
+                        }
+
+                        Text {
+                            visible: PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] && String(PluginService.pluginStatuses[modelData.id].updatedAt || "") !== ""
+                            text: "updated " + String(PluginService.pluginStatuses[modelData.id].updatedAt || "")
+                            color: Colors.fgDim
+                            font.pixelSize: Colors.fontSizeXS
+                            Layout.fillWidth: true
+                            wrapMode: Text.WordWrap
+                        }
+
+                        Text {
+                            visible: {
+                                var status = PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] ? PluginService.pluginStatuses[modelData.id].state : (modelData.enabled ? "enabled" : "disabled");
+                                return String(root.statusDescription(status) || "") !== "";
+                            }
+                            text: {
+                                var status = PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] ? PluginService.pluginStatuses[modelData.id].state : (modelData.enabled ? "enabled" : "disabled");
+                                return root.statusDescription(status);
+                            }
+                            color: Colors.fgDim
                             font.pixelSize: Colors.fontSizeXS
                             Layout.fillWidth: true
                             wrapMode: Text.WordWrap
@@ -368,6 +642,38 @@ Item {
                     Layout.fillWidth: true
                 }
             }
+        }
+    }
+
+    Process {
+        id: pluginDiagnosticsCopyProc
+        running: false
+        stdinEnabled: true
+        onStarted: {
+            pluginDiagnosticsCopyProc.write(_pluginDiagnosticsExportText);
+            pluginDiagnosticsCopyProc.closeStdin();
+        }
+        onExited: (exitCode, exitStatus) => {
+            if (exitCode === 0)
+                ToastService.showSuccess("Copied", "Plugin diagnostics copied to clipboard.");
+            else
+                ToastService.showError("Copy failed", "No clipboard utility found (wl-copy/xclip).");
+        }
+    }
+
+    Process {
+        id: pluginDiagnosticsSaveProc
+        running: false
+        stdinEnabled: true
+        onStarted: {
+            pluginDiagnosticsSaveProc.write(_pluginDiagnosticsExportText);
+            pluginDiagnosticsSaveProc.closeStdin();
+        }
+        onExited: (exitCode, exitStatus) => {
+            if (exitCode === 0)
+                ToastService.showSuccess("Saved", "Plugin diagnostics saved to " + _pluginDiagnosticsSavePath);
+            else
+                ToastService.showError("Save failed", "Unable to write plugin diagnostics.");
         }
     }
 }

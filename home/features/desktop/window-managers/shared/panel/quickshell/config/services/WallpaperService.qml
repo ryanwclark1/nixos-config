@@ -10,8 +10,8 @@ pragma Singleton
 // wallpapers as `availableWallpapers`.  Tracks the currently-active wallpaper for each
 // monitor in `wallpapers` (a monitorName → path map), persisted through Config.
 //
-// Wall-setter is tool-agnostic: tries swww first (most common on Hyprland) then falls
-// back to `hyprctl hyprpaper`.  Optionally runs pywal to regenerate the colour scheme.
+// Wall-setter is tool-agnostic: tries swww first, then compositor-specific fallback
+// provided by CompositorAdapter, then swaybg. Optionally runs pywal to regenerate colours.
 
 QtObject {
   id: root
@@ -408,6 +408,7 @@ QtObject {
     var quoted = _shellQuote(imagePath);
     var outputFlag = monitorName ? ("--outputs " + _shellQuote(monitorName) + " ") : "";
     var hyprTarget = monitorName ? (monitorName + ",") : ",";
+    var compositorWallpaperArg = _shellQuote(hyprTarget + imagePath);
 
     return "set -u; ok=0; "
          + "if command -v swww >/dev/null 2>&1; then "
@@ -419,11 +420,7 @@ QtObject {
          + "    echo BACKEND:swww; ok=1; "
          + "  fi; "
          + "fi; "
-         + "if [ \"$ok\" -eq 0 ] && command -v hyprctl >/dev/null 2>&1; then "
-         + "  if hyprctl hyprpaper wallpaper " + _shellQuote(hyprTarget + imagePath) + "; then "
-         + "    echo BACKEND:hyprpaper; ok=1; "
-         + "  fi; "
-         + "fi; "
+         + CompositorAdapter.wallpaperCompositorFallbackSnippet(compositorWallpaperArg)
          + "if [ \"$ok\" -eq 0 ] && command -v swaybg >/dev/null 2>&1; then "
          + "  pkill swaybg >/dev/null 2>&1 || true; "
          + "  swaybg -i " + quoted + " -m fill >/dev/null 2>&1 & "

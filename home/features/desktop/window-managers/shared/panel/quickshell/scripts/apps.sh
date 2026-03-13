@@ -52,6 +52,8 @@ done | while read -r file; do
   name=$(grep -m1 "^Name=" "$file" | cut -d'=' -f2)
   exec=$(grep -m1 "^Exec=" "$file" | cut -d'=' -f2 | sed 's/ %[fFuU]//g' | sed 's/"//g')
   icon_name=$(grep -m1 "^Icon=" "$file" | cut -d'=' -f2)
+  categories=$(grep -m1 "^Categories=" "$file" | cut -d'=' -f2 | tr ';' ' ')
+  keywords=$(grep -m1 "^Keywords=" "$file" | cut -d'=' -f2 | tr ';' ' ')
   no_display=$(grep -m1 "^NoDisplay=" "$file" | cut -d'=' -f2)
   terminal=$(grep -m1 "^Terminal=" "$file" | cut -d'=' -f2)
   
@@ -62,8 +64,10 @@ done | while read -r file; do
     name_esc=$(echo "$name" | jq -R .)
     exec_esc=$(echo "$exec" | jq -R .)
     icon_esc=$(echo "$icon_path" | jq -R .)
+    categories_esc=$(echo "${categories:-}" | jq -R .)
+    keywords_esc=$(echo "${keywords:-}" | jq -R .)
     term_esc=$(echo "${terminal:-false}" | jq -R .)
-    echo "{\"name\":$name_esc,\"exec\":$exec_esc,\"icon\":$icon_esc,\"terminal\":$term_esc}"
+    echo "{\"name\":$name_esc,\"exec\":$exec_esc,\"icon\":$icon_esc,\"category\":$categories_esc,\"keywords\":$keywords_esc,\"terminal\":$term_esc}"
   fi
 done | jq -s 'unique_by(.exec)')
 

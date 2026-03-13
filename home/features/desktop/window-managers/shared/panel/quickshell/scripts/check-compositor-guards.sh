@@ -8,7 +8,6 @@ config_dir="${script_dir}/../config"
 allow_hyprctl=(
   "${config_dir}/launcher/Overview.qml"
   "${config_dir}/services/CompositorAdapter.qml"
-  "${config_dir}/services/WallpaperService.qml"
 )
 
 allow_hyprland_import=(

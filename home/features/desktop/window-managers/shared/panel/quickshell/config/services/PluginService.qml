@@ -77,7 +77,8 @@ QtObject {
     next[id] = {
       state: String(state || current.state || "unknown"),
       code: String(code || current.code || ""),
-      message: String(message || current.message || "")
+      message: String(message || current.message || ""),
+      updatedAt: new Date().toISOString()
     };
     pluginStatuses = next;
   }
@@ -205,6 +206,51 @@ QtObject {
     return pluginsDir + "/" + pluginId + "/state.json";
   }
 
+  function _normalizeStateEnvelope(raw) {
+    if (raw && typeof raw === "object" && raw.payload !== undefined) {
+      return {
+        stateVersion: Number(raw.stateVersion || 1),
+        updatedAt: String(raw.updatedAt || ""),
+        payload: raw.payload && typeof raw.payload === "object" ? raw.payload : ({})
+      };
+    }
+    if (raw && typeof raw === "object") {
+      return {
+        stateVersion: 1,
+        updatedAt: "",
+        payload: raw
+      };
+    }
+    return {
+      stateVersion: 1,
+      updatedAt: "",
+      payload: ({})
+    };
+  }
+
+  function _readStateEnvelope(pathValue) {
+    var fv = root.stateReaderComponent.createObject(root, { path: pathValue });
+    var envelope = _normalizeStateEnvelope(({ }));
+    try {
+      var raw = fv.text();
+      if (raw && String(raw).trim() !== "")
+        envelope = _normalizeStateEnvelope(JSON.parse(raw));
+    } catch (e) {}
+    fv.destroy();
+    return envelope;
+  }
+
+  function _writeStateEnvelope(pathValue, envelope) {
+    var writer = root.stateWriterComponent.createObject(root, { path: pathValue });
+    writer.setText(JSON.stringify({
+      stateVersion: Number(envelope.stateVersion || 1),
+      updatedAt: String(envelope.updatedAt || new Date().toISOString()),
+      payload: envelope.payload && typeof envelope.payload === "object" ? envelope.payload : ({})
+    }, null, 2));
+    writer.destroy();
+    return true;
+  }
+
   function _buildPluginApi(plugin) {
     var pluginId = plugin.id;
     var stateFilePath = _statePath(pluginId);
@@ -246,24 +292,54 @@ QtObject {
       loadState: function() {
         if (!root._hasPermission(plugin, "state_read"))
           return ({ });
-        var fv = root.stateReaderComponent.createObject(root, { path: stateFilePath });
-        var parsed = ({ });
-        try {
-          var raw = fv.text();
-          if (raw && String(raw).trim() !== "")
-            parsed = JSON.parse(raw);
-        } catch (e) {}
-        fv.destroy();
-        return parsed;
+        return root._readStateEnvelope(stateFilePath).payload;
       },
       saveState: function(data) {
         if (!root._hasPermission(plugin, "state_write"))
           return root._rejectPermission(pluginId, "state_write", "saveState");
         root._ensurePluginStateDir(pluginId);
-        var writer = root.stateWriterComponent.createObject(root, { path: stateFilePath });
-        writer.setText(JSON.stringify(data || ({ }), null, 2));
-        writer.destroy();
-        return true;
+        return root._writeStateEnvelope(stateFilePath, {
+          stateVersion: Number(plugin.metadata && plugin.metadata.stateVersion || 1),
+          updatedAt: new Date().toISOString(),
+          payload: data && typeof data === "object" ? data : ({})
+        });
+      },
+      loadStateEnvelope: function() {
+        if (!root._hasPermission(plugin, "state_read"))
+          return root._normalizeStateEnvelope(({ }));
+        return root._readStateEnvelope(stateFilePath);
+      },
+      saveStateEnvelope: function(envelope) {
+        if (!root._hasPermission(plugin, "state_write"))
+          return root._rejectPermission(pluginId, "state_write", "saveStateEnvelope");
+        root._ensurePluginStateDir(pluginId);
+        return root._writeStateEnvelope(stateFilePath, root._normalizeStateEnvelope(envelope));
+      },
+      migrateState: function(targetVersion, migrateFn) {
+        if (!root._hasPermission(plugin, "state_read") || !root._hasPermission(plugin, "state_write"))
+          return root._rejectPermission(pluginId, "state_write", "migrateState");
+        if (typeof migrateFn !== "function")
+          return false;
+        var envelope = root._readStateEnvelope(stateFilePath);
+        var current = Number(envelope.stateVersion || 1);
+        var target = Number(targetVersion || current);
+        if (target <= current)
+          return true;
+
+        var payload = envelope.payload && typeof envelope.payload === "object" ? envelope.payload : ({});
+        for (var ver = current + 1; ver <= target; ++ver) {
+          var nextPayload = migrateFn(payload, ver, current);
+          if (!nextPayload || typeof nextPayload !== "object")
+            return false;
+          payload = nextPayload;
+        }
+
+        root._ensurePluginStateDir(pluginId);
+        return root._writeStateEnvelope(stateFilePath, {
+          stateVersion: target,
+          updatedAt: new Date().toISOString(),
+          payload: payload
+        });
       },
       runProcess: function(commandArray) {
         if (!root._hasPermission(plugin, "process"))
@@ -604,8 +680,19 @@ QtObject {
         _destroyDaemon(existingId);
         _destroyLauncherProvider(existingId);
         delete nextFingerprints[existingId];
-        _removePluginStatus(existingId);
       }
+    }
+
+    for (var errorId in nextErrors) {
+      var entry = nextErrors[errorId];
+      _setPluginStatus(errorId, "failed", String(entry && entry.code || "E_SCAN"), String(entry && entry.message || "scan failure"));
+    }
+
+    var statusKeys = Object.keys(pluginStatuses || ({ }));
+    for (var k = 0; k < statusKeys.length; ++k) {
+      var statusId = statusKeys[k];
+      if (!nextIndex[statusId] && !nextErrors[statusId])
+        _removePluginStatus(statusId);
     }
 
     plugins = nextList;
@@ -787,6 +874,7 @@ QtObject {
         return true;
       } catch (err) {
         console.warn("PluginService: launcher action failed", err);
+        _setPluginStatus(item.pluginId, "degraded", "E_LAUNCHER_ACTION", String(err));
       }
     }
 
@@ -823,16 +911,21 @@ QtObject {
             var payload = JSON.parse(lines[i]);
             var pluginPath = String(payload.path || "");
             var manifest = payload.manifest;
+            if (manifest && manifest.id)
+              root._setPluginStatus(String(manifest.id), "discovered", "", "");
             var validation = root._validateManifest(manifest, pluginPath);
             if (!validation.ok) {
               var badId = manifest && manifest.id ? String(manifest.id) : "plugin-" + i;
               errors[badId] = root._errorEntry("E_MANIFEST_VALIDATION", validation.error);
+              root._setPluginStatus(badId, "failed", "E_MANIFEST_VALIDATION", validation.error);
               continue;
             }
 
             var normalized = validation.manifest;
+            root._setPluginStatus(normalized.id, "validated", "", "");
             if (seen[normalized.id]) {
               errors[normalized.id] = root._errorEntry("E_DUPLICATE_PLUGIN_ID", "duplicate plugin id");
+              root._setPluginStatus(normalized.id, "failed", "E_DUPLICATE_PLUGIN_ID", "duplicate plugin id");
               continue;
             }
             seen[normalized.id] = true;
@@ -840,6 +933,7 @@ QtObject {
             loaded.push(normalized);
           } catch (e) {
             errors["scan-line-" + i] = root._errorEntry("E_SCAN_LINE_PARSE", "malformed scan output");
+            root._setPluginStatus("scan-line-" + i, "failed", "E_SCAN_LINE_PARSE", "malformed scan output");
           }
         }
 

@@ -75,17 +75,50 @@ require_cmd() {
   fi
 }
 
+discover_instances_from_pid() {
+  local pid
+  local resolved
+  local preferred=()
+  local fallback=()
+  local log_path
+  local first_line
+
+  while IFS= read -r pid; do
+    [[ -n "${pid}" ]] || continue
+    resolved="$(readlink -f "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid/${pid}" 2>/dev/null || true)"
+    if [[ -n "${resolved}" && -S "${resolved}/ipc.sock" ]]; then
+      log_path="${resolved}/log.log"
+      first_line="$(sed -n '1p' "${log_path}" 2>/dev/null || true)"
+      if [[ "${first_line}" == *'Launching config:'*'shell.qml"'* ]]; then
+        preferred+=("$(basename "${resolved}")")
+      else
+        fallback+=("$(basename "${resolved}")")
+      fi
+    fi
+  done < <(ps -eo pid=,comm=,args= | awk '$2 ~ /quickshell/ || $3 ~ /quickshell/ { print $1 }')
+
+  if (( ${#preferred[@]} > 0 )); then
+    printf '%s\n' "${preferred[@]}" | awk 'NF && !seen[$0]++'
+  else
+    printf '%s\n' "${fallback[@]}" | awk 'NF && !seen[$0]++'
+  fi
+}
+
 discover_instances() {
   local dirs=()
   local dir
 
-  if [[ ! -d "${runtime_root}" ]]; then
+  mapfile -t dirs < <(discover_instances_from_pid)
+  if (( ${#dirs[@]} > 0 )); then
+    printf '%s\n' "${dirs[@]}"
     return 0
   fi
 
-  while IFS= read -r dir; do
-    dirs+=("$(basename "${dir}")")
-  done < <(find "${runtime_root}" -mindepth 1 -maxdepth 1 -type d -exec test -S '{}/ipc.sock' ';' -print 2>/dev/null | sort)
+  if [[ -d "${runtime_root}" ]]; then
+    while IFS= read -r dir; do
+      dirs+=("$(basename "${dir}")")
+    done < <(find "${runtime_root}" -mindepth 1 -maxdepth 1 -type d -exec test -S '{}/ipc.sock' ';' -print 2>/dev/null | sort)
+  fi
 
   printf '%s\n' "${dirs[@]}"
 }

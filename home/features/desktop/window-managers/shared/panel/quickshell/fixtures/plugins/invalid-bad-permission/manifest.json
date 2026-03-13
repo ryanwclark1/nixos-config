@@ -1,0 +1,12 @@
+{
+  "id": "fixture.invalid.permission",
+  "name": "Bad Permission",
+  "description": "Invalid permission fixture",
+  "author": "fixtures",
+  "version": "1.0.0",
+  "type": "daemon",
+  "permissions": ["network"],
+  "entryPoints": {
+    "daemon": "Daemon.qml"
+  }
+}

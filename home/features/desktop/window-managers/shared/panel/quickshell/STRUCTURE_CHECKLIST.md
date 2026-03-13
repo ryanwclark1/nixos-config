@@ -11,15 +11,33 @@ Use this checklist before merging panel architecture changes.
 - [ ] `scripts/compositor-smoke.sh` (or `qs-compositor-smoke-check`) passes in the active compositor session.
 - [x] `scripts/check-launcher-keymap.sh` passes for launcher keyboard behavior guardrails (`Tab`, `Shift+Tab`, and persisted tab behavior settings).
 - [x] `scripts/check-launcher-web-aliases.sh` passes for launcher alias guardrails (normalization, settings wiring, and runtime alias resolution/hints).
+- [x] `scripts/check-launcher-category-filters.sh` passes for launcher drun category-filter guards (metadata extraction, config/settings wiring, keyboard shortcuts, and chip visibility).
 - [x] `scripts/check-launcher-performance.sh` passes for launcher filter/ranking performance guardrails and runtime telemetry fields.
 - [x] `scripts/check-launcher-guardrails.sh` passes (composite launcher guardrail runner).
+- [x] `scripts/check-launcher-tab-matrix.sh` passes for launcher `Tab`/`Shift+Tab` behavior matrix guarantees.
+- [x] `scripts/check-launcher-responsive.sh` passes for launcher compact/tight responsive guardrails and runtime warning scan.
+- [x] `scripts/check-launcher-ipc-health.sh` passes for launcher IPC action reachability and status payload contract.
 - [x] `scripts/check-launcher-benchmarks.sh` passes (threshold + parity gate for launcher benchmarks).
 - [x] `scripts/check-launcher-smoke.sh` passes (guardrails + benchmarks in one command).
+- [x] `.github/workflows/flake-checker.yml` runs launcher smoke checks in CI mode (`check-launcher-smoke.sh --ci`) for launcher-sensitive changes.
+- [ ] `scripts/check-settings-guardrails.sh` passes after changes to `SettingsHub`, shared settings components, or dense settings tabs.
 - [ ] `scripts/check-settings-responsive.sh` passes after changes to `SettingsHub`, shared settings components, or dense settings tabs.
+- [ ] `scripts/capture-settings-matrix.sh --preset portrait --scroll-y 900` is reviewed after responsive settings changes that affect long/scroll-heavy tabs.
+- [ ] `scripts/capture-settings-matrix.sh --preset laptop --scroll-y 700` is reviewed after responsive settings changes that affect long/scroll-heavy tabs.
 - [x] `node scripts/benchmark-launcher-filter.js --items=30000 --runs=40` is sampled for performance-sensitive launcher ranking changes.
 - [x] `node scripts/benchmark-launcher-home.js --apps=30000 --history=500 --runs=60` is sampled after changes to drun home/recent/suggestion composition.
 - [x] `node scripts/benchmark-launcher-files-shaping.js --lines=120000 --runs=25` is sampled after files-result parsing/path-shaping changes.
 - [ ] Manual settings QA is completed using `SETTINGS_RESPONSIVE_RUNBOOK.md` on wide, laptop, and narrow/portrait layouts when responsive settings surfaces change.
 - [ ] New desktop widgets are integrated via `DesktopWidgetRegistry` (built-in or plugin path), not hardcoded in multiple places.
-- [ ] Plugin behavior preserves manifest compatibility (`bar-widget` / `desktop-widget`).
+- [ ] `scripts/check-plugin-conformance.sh` passes for plugin manifest/lifecycle conformance fixtures.
+- [ ] `scripts/plugin-doctor.sh` passes for local plugin directory health checks.
+- [ ] `scripts/check-plugin-doctor-smoke.sh` passes for deterministic doctor behavior (valid fixtures pass, invalid fixtures fail).
+- [ ] `scripts/check-plugin-runtime-guards.sh` passes for lifecycle/API/error-code runtime guardrails.
+- [ ] `scripts/check-plugin-diagnostics-contracts.sh` passes for plugin diagnostics payload/schema contract guardrails.
+- [ ] `scripts/check-plugin-diagnostics-schema.sh` passes for JSON Schema (`ajv`) validation of diagnostics payload contracts.
+- [ ] `config/plugins/runtime-catalog.json` is updated when plugin lifecycle states or runtime error codes change.
+- [ ] `config/plugins/diagnostics.schema.json` is updated when diagnostics payload contracts change.
+- [ ] `PluginRuntimeCatalog` remains in sync with `config/plugins/runtime-catalog.json` consumers (plugin settings UI and guards).
+- [ ] `scripts/plugin-verify.sh` passes as the unified plugin verification gate.
+- [ ] Plugin behavior preserves canonical manifest compatibility (`bar-widget` / `desktop-widget` / `launcher-provider` / `daemon` / `multi`).
 - [ ] Existing IPC actions remain backward compatible.

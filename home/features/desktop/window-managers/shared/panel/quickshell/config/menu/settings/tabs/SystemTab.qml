@@ -311,6 +311,7 @@ Item {
         Config.launcherDefaultMode = "drun";
         Config.launcherShowModeHints = true;
         Config.launcherShowHomeSections = true;
+        Config.launcherDrunCategoryFiltersEnabled = true;
         Config.launcherEnablePreload = true;
         Config.launcherKeepSearchOnModeSwitch = true;
         Config.launcherEnableDebugTimings = false;
@@ -342,6 +343,7 @@ Item {
         Config.launcherScoreTitleWeight = 0.92;
         Config.launcherScoreExecWeight = 0.88;
         Config.launcherScoreBodyWeight = 0.75;
+        Config.launcherScoreCategoryWeight = 0.7;
     }
 
     Component.onCompleted: {
@@ -365,6 +367,8 @@ Item {
             description: "Core shell visuals and transient notification behavior."
 
             SettingsFieldGrid {
+                maximumColumns: root.compactMode ? 1 : 2
+
                 SettingsToggleRow {
                     label: "Floating Bar"
                     icon: "󰖲"
@@ -409,6 +413,9 @@ Item {
             }
 
             SettingsFieldGrid {
+                maximumColumns: root.compactMode ? 1 : 2
+                minimumColumnWidth: 520
+
                 SettingsToggleRow {
                     label: "Show Mode Hints"
                     icon: "󰌌"
@@ -418,6 +425,11 @@ Item {
                     label: "Show Home Sections"
                     icon: "󰆍"
                     configKey: "launcherShowHomeSections"
+                }
+                SettingsToggleRow {
+                    label: "App Category Filters"
+                    icon: "󰍉"
+                    configKey: "launcherDrunCategoryFiltersEnabled"
                 }
                 SettingsToggleRow {
                     label: "Background Preload"
@@ -900,6 +912,16 @@ Item {
                 onMoved: v => Config.launcherScoreBodyWeight = v
             }
 
+            SettingsSliderRow {
+                label: "Category/Keywords Weight"
+                min: 0.1
+                max: 2.0
+                step: 0.05
+                value: Config.launcherScoreCategoryWeight
+                unit: ""
+                onMoved: v => Config.launcherScoreCategoryWeight = v
+            }
+
             SettingsActionButton {
                 Layout.fillWidth: true
                 label: "Reset Launcher Defaults"
@@ -914,6 +936,8 @@ Item {
             description: "Visibility and width of control center modules."
 
             SettingsFieldGrid {
+                maximumColumns: root.compactMode ? 1 : 2
+
                 SettingsToggleRow {
                     label: "Quick Links"
                     icon: "󰖩"

@@ -34,6 +34,7 @@ The current capability switches are defined in `CompositorAdapter.qml`:
 - Launcher mode availability excludes unsupported compositor modes (`window`, `keybinds`) when not supported.
 - Hyprland-only settings tabs/actions are filtered through compositor tags or capability checks.
 - Privacy screenshare probing uses compositor-aware logic from `CompositorAdapter` (hyprctl-assisted on Hyprland, process-based fallback on Niri/other).
+- Wallpaper fallback backend selection is compositor-aware via `CompositorAdapter` (Hyprland hyprpaper fallback only when supported).
 
 ## Verification
 

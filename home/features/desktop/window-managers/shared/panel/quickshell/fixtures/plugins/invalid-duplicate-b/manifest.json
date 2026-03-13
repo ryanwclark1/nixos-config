@@ -1,0 +1,12 @@
+{
+  "id": "fixture.invalid.duplicate",
+  "name": "Duplicate B",
+  "description": "Duplicate id fixture B",
+  "author": "fixtures",
+  "version": "1.0.0",
+  "type": "desktop-widget",
+  "permissions": [],
+  "entryPoints": {
+    "desktopWidget": "DesktopWidget.qml"
+  }
+}

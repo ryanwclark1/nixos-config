@@ -1,0 +1,12 @@
+{
+  "id": "fixture.valid.desktop",
+  "name": "Fixture Desktop",
+  "description": "Valid desktop plugin fixture",
+  "author": "fixtures",
+  "version": "1.0.0",
+  "type": "desktop-widget",
+  "permissions": ["state_read", "state_write"],
+  "entryPoints": {
+    "desktopWidget": "DesktopWidget.qml"
+  }
+}

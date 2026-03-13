@@ -1,0 +1,336 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "title": "QuickShell Plugin Diagnostics Contracts",
+  "description": "Reference contracts for machine-readable plugin diagnostics payloads.",
+  "type": "object",
+  "required": [
+    "doctorJson",
+    "uiExportJson"
+  ],
+  "properties": {
+    "doctorJson": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "generatedAt",
+        "pluginsDir",
+        "summary",
+        "entries"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "generatedAt": {
+          "type": "string"
+        },
+        "pluginsDir": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "pass",
+            "fail",
+            "warn"
+          ],
+          "properties": {
+            "pass": {
+              "type": "number"
+            },
+            "fail": {
+              "type": "number"
+            },
+            "warn": {
+              "type": "number"
+            }
+          }
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status",
+              "name",
+              "code",
+              "message"
+            ],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PASS",
+                  "FAIL",
+                  "WARN"
+                ]
+              },
+              "name": {
+                "type": "string"
+              },
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "uiExportJson": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "generatedAt",
+        "summary",
+        "plugins",
+        "manifestErrors"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "generatedAt": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "installed",
+            "enabled",
+            "invalidManifests",
+            "statuses"
+          ],
+          "properties": {
+            "installed": {
+              "type": "number"
+            },
+            "enabled": {
+              "type": "number"
+            },
+            "invalidManifests": {
+              "type": "number"
+            },
+            "statuses": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "active",
+                "enabled",
+                "degraded",
+                "failed",
+                "disabled",
+                "validated",
+                "discovered",
+                "unknown"
+              ],
+              "properties": {
+                "active": {
+                  "type": "number"
+                },
+                "enabled": {
+                  "type": "number"
+                },
+                "degraded": {
+                  "type": "number"
+                },
+                "failed": {
+                  "type": "number"
+                },
+                "disabled": {
+                  "type": "number"
+                },
+                "validated": {
+                  "type": "number"
+                },
+                "discovered": {
+                  "type": "number"
+                },
+                "unknown": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        },
+        "plugins": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "name",
+              "version",
+              "type",
+              "enabled",
+              "author",
+              "permissions",
+              "entryPoints",
+              "runtime"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "version": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "bar-widget",
+                  "desktop-widget",
+                  "launcher-provider",
+                  "daemon",
+                  "multi"
+                ]
+              },
+              "enabled": {
+                "type": "boolean"
+              },
+              "author": {
+                "type": "string"
+              },
+              "permissions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "entryPoints": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "barWidget": {
+                    "type": "string"
+                  },
+                  "desktopWidget": {
+                    "type": "string"
+                  },
+                  "launcherProvider": {
+                    "type": "string"
+                  },
+                  "daemon": {
+                    "type": "string"
+                  },
+                  "settings": {
+                    "type": "string"
+                  }
+                }
+              },
+              "runtime": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "state",
+                  "stateLabel",
+                  "stateSeverity",
+                  "code",
+                  "codeLabel",
+                  "codeSeverity",
+                  "message",
+                  "updatedAt"
+                ],
+                "properties": {
+                  "state": {
+                    "type": "string",
+                    "enum": [
+                      "active",
+                      "degraded",
+                      "disabled",
+                      "discovered",
+                      "enabled",
+                      "failed",
+                      "validated"
+                    ]
+                  },
+                  "stateLabel": {
+                    "type": "string"
+                  },
+                  "stateSeverity": {
+                    "type": "string",
+                    "enum": [
+                      "ok",
+                      "warn",
+                      "error",
+                      "info",
+                      "muted"
+                    ]
+                  },
+                  "code": {
+                    "type": "string",
+                    "enum": [
+                      "",
+                      "E_DAEMON_COMPONENT_LOAD",
+                      "E_DAEMON_INSTANCE_CREATE",
+                      "E_DAEMON_START",
+                      "E_DUPLICATE_PLUGIN_ID",
+                      "E_LAUNCHER_ACTION",
+                      "E_LAUNCHER_COMPONENT_LOAD",
+                      "E_LAUNCHER_EXECUTE",
+                      "E_LAUNCHER_INSTANCE_CREATE",
+                      "E_LAUNCHER_QUERY",
+                      "E_MANIFEST_VALIDATION",
+                      "E_SCAN_LINE_PARSE"
+                    ]
+                  },
+                  "codeLabel": {
+                    "type": "string"
+                  },
+                  "codeSeverity": {
+                    "type": "string",
+                    "enum": [
+                      "error",
+                      "warn",
+                      "muted"
+                    ]
+                  },
+                  "message": {
+                    "type": "string"
+                  },
+                  "updatedAt": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "manifestErrors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "code",
+              "error"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "code": {
+                "type": "string"
+              },
+              "error": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
