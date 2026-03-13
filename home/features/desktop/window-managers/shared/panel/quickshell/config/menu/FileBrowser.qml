@@ -279,8 +279,14 @@ PanelWindow {
     readonly property real modalMaxWidth: 1200
     readonly property real modalMinHeight: 560
     readonly property real modalMaxHeight: 820
-    width: Math.max(modalMinWidth, Math.min(parent.width - modalMarginX * 2, modalMaxWidth))
-    height: Math.max(modalMinHeight, Math.min(parent.height - modalMarginY * 2, modalMaxHeight))
+    readonly property real modalAvailWidth: Math.max(320, parent.width - modalMarginX * 2)
+    readonly property real modalAvailHeight: Math.max(320, parent.height - modalMarginY * 2)
+    width: modalAvailWidth < modalMinWidth
+      ? modalAvailWidth
+      : Math.min(modalAvailWidth, modalMaxWidth)
+    height: modalAvailHeight < modalMinHeight
+      ? modalAvailHeight
+      : Math.min(modalAvailHeight, modalMaxHeight)
     anchors.centerIn: parent
 
     color: Colors.popupSurface
@@ -1344,8 +1350,9 @@ PanelWindow {
 
                 // Cancel button
                 Rectangle {
+                  Layout.minimumWidth: 96
                   height: 30
-                  width: cancelText.implicitWidth + 24
+                  width: Math.max(Layout.minimumWidth, cancelText.implicitWidth + 24)
                   radius: Colors.radiusSmall
                   color: cancelHover.containsMouse
                     ? Colors.withAlpha(Colors.text, 0.1) : Colors.withAlpha(Colors.surface, 0.6)
@@ -1373,8 +1380,9 @@ PanelWindow {
                 // Open/Save button
                 Rectangle {
                   id: actionBtn
+                  Layout.minimumWidth: root.mode === "folder" ? 128 : 96
                   height: 30
-                  width: actionText.implicitWidth + 24
+                  width: Math.max(Layout.minimumWidth, actionText.implicitWidth + 24)
                   radius: Colors.radiusSmall
 
                   readonly property bool canConfirm: root.mode === "open"

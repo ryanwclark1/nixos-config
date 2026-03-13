@@ -1,78 +1,145 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../services"
+import "../../widgets" as SharedWidgets
 
 Rectangle {
-  id: root
+    id: root
 
-  property string title
-  property string iconName: ""
-  property bool collapsible: false
-  property bool expanded: true
-  default property alias content: contentColumn.data
+    property string title
+    property string iconName: ""
+    property string description: ""
+    property bool collapsible: false
+    property bool expanded: true
+    default property alias content: contentColumn.data
 
-  Layout.fillWidth: true
-  implicitHeight: headerRow.height + headerRow.anchors.margins + (expanded ? contentColumn.implicitHeight + contentColumn.anchors.topMargin + Colors.spacingL : 0)
-  radius: Colors.radiusMedium
-  color: Colors.bgWidget
-  border.color: Colors.border
-  border.width: 1
-  clip: true
+    readonly property bool _showChevron: root.collapsible
 
-  Behavior on implicitHeight { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
+    Layout.fillWidth: true
+    implicitHeight: headerContainer.implicitHeight + (expanded ? contentColumn.implicitHeight + Colors.spacingL : 0)
+    radius: Colors.radiusMedium
+    color: Colors.bgWidget
+    border.color: Colors.border
+    border.width: 1
+    clip: true
 
-  RowLayout {
-    id: headerRow
-    anchors { left: parent.left; right: parent.right; top: parent.top }
-    anchors.margins: Colors.spacingL
-    height: 40
-    spacing: Colors.spacingM
-
-    Text {
-      visible: root.iconName !== ""
-      text: root.iconName
-      color: Colors.primary
-      font.family: Colors.fontMono
-      font.pixelSize: Colors.fontSizeXL
+    Behavior on implicitHeight {
+        NumberAnimation {
+            duration: Colors.durationNormal
+            easing.type: Easing.OutCubic
+        }
     }
 
-    Text {
-      text: root.title
-      color: Colors.text
-      font.pixelSize: Colors.fontSizeLarge
-      font.weight: Font.Medium
-      Layout.fillWidth: true
+    Rectangle {
+        id: headerContainer
+        anchors {
+            left: parent.left
+            right: parent.right
+            top: parent.top
+        }
+        implicitHeight: headerColumn.implicitHeight + Colors.spacingM * 2
+        color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.06)
+
+        ColumnLayout {
+            id: headerColumn
+            anchors {
+                left: parent.left
+                right: parent.right
+                top: parent.top
+                margins: Colors.spacingM
+            }
+            spacing: 2
+
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: Colors.spacingS
+
+                Text {
+                    visible: root.iconName !== ""
+                    text: root.iconName
+                    color: Colors.primary
+                    font.family: Colors.fontMono
+                    font.pixelSize: Colors.fontSizeLarge
+                }
+
+                Text {
+                    Layout.fillWidth: true
+                    text: root.title
+                    color: Colors.text
+                    font.pixelSize: Colors.fontSizeMedium
+                    font.weight: Font.DemiBold
+                    elide: Text.ElideRight
+                }
+
+                Rectangle {
+                    visible: root._showChevron
+                    implicitWidth: 24
+                    implicitHeight: 24
+                    radius: 12
+                    color: Colors.withAlpha(Colors.text, collapseHover.containsMouse ? 0.14 : 0.08)
+                    border.color: Colors.border
+                    border.width: 1
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: root.expanded ? "󰅃" : "󰅀"
+                        color: Colors.fgSecondary
+                        font.family: Colors.fontMono
+                        font.pixelSize: Colors.fontSizeSmall
+                    }
+                }
+            }
+
+            Text {
+                visible: root.description !== ""
+                text: root.description
+                color: Colors.fgSecondary
+                font.pixelSize: Colors.fontSizeSmall
+                Layout.fillWidth: true
+                wrapMode: Text.WordWrap
+            }
+        }
+
+        MouseArea {
+            id: collapseHover
+            anchors.fill: parent
+            enabled: root.collapsible
+            hoverEnabled: true
+            cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+            onClicked: root.expanded = !root.expanded
+        }
+
+        SharedWidgets.StateLayer {
+            hovered: collapseHover.containsMouse
+            pressed: collapseHover.pressed
+            disabled: !root.collapsible
+            stateColor: Colors.primary
+        }
     }
 
-    Text {
-      visible: root.collapsible
-      text: root.expanded ? "󰅃" : "󰅀"
-      color: Colors.fgDim
-      font.family: Colors.fontMono
-      font.pixelSize: Colors.fontSizeLarge
+    Rectangle {
+        anchors {
+            left: parent.left
+            right: parent.right
+            top: headerContainer.bottom
+        }
+        height: 1
+        color: Colors.withAlpha(Colors.border, 0.7)
+        visible: root.expanded
     }
 
-  }
-
-  MouseArea {
-    anchors.fill: headerRow
-    visible: root.collapsible
-    cursorShape: root.collapsible ? Qt.PointingHandCursor : Qt.ArrowCursor
-    onClicked: if (root.collapsible) root.expanded = !root.expanded
-  }
-
-  ColumnLayout {
-    id: contentColumn
-    anchors {
-      left: parent.left
-      right: parent.right
-      top: headerRow.bottom
-      leftMargin: Colors.spacingL
-      rightMargin: Colors.spacingL
-      topMargin: Colors.spacingM
-      bottomMargin: Colors.spacingL
+    ColumnLayout {
+        id: contentColumn
+        anchors {
+            left: parent.left
+            right: parent.right
+            top: headerContainer.bottom
+            leftMargin: Colors.spacingL
+            rightMargin: Colors.spacingL
+            topMargin: Colors.spacingM
+            bottomMargin: Colors.spacingL
+        }
+        spacing: Colors.spacingL
+        visible: root.expanded
     }
-    spacing: Colors.spacingL
-    visible: root.expanded
-  }
 }

@@ -138,6 +138,12 @@ Scope {
     return minY;
   }
 
+  function popupMaxHeight(windowHeight) {
+    if (windowHeight === undefined || windowHeight <= 0)
+      return 560;
+    return Math.max(320, windowHeight - (Config.barHeight + 16));
+  }
+
   function toggleNotifications() { toggleSurface("notifCenter"); }
   function toggleControls() { toggleSurface("controlCenter"); }
   function toggleNetworkMenu() { toggleSurface("networkMenu"); }
@@ -341,10 +347,11 @@ Scope {
 
         WeatherMenu {
           anchor.window: barWindow
+          implicitHeight: Math.min(600, root.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
           anchor.rect.x: root.popupAnchorX(panel.weatherTriggerCenterX, width, barWindow.width)
           anchor.rect.y: root.popupAnchorY(
             panel.weatherTriggerBottomY,
-            height,
+            implicitHeight,
             (barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height
           )
           wantVisible: root.weatherMenuVisible && barWindow.isMenuScreen
@@ -353,10 +360,11 @@ Scope {
 
         DateTimeMenu {
           anchor.window: barWindow
+          implicitHeight: Math.min(560, root.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
           anchor.rect.x: root.popupAnchorX(panel.dateTimeTriggerCenterX, width, barWindow.width)
           anchor.rect.y: root.popupAnchorY(
             panel.dateTimeTriggerBottomY,
-            height,
+            implicitHeight,
             (barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height
           )
           wantVisible: root.dateTimeMenuVisible && barWindow.isMenuScreen
