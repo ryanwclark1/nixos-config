@@ -33,6 +33,10 @@ PanelWindow {
   property bool isOpen: false
 
   function open() {
+    if (!CompositorAdapter.isHyprland) {
+      CompositorAdapter.notifyUnsupported("Display configuration");
+      return;
+    }
     isOpen = true;
     _loadMonitors();
   }

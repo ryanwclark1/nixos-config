@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Layouts
 import "../../services"
@@ -8,19 +10,44 @@ Rectangle {
   id: root
 
   property string currentTabId: SettingsRegistry.defaultTabId
+  property string searchQuery: ""
+  property bool compactMode: false
   signal tabSelected(string tabId)
   signal saveAndClose()
+  signal searchQueryEdited(string query)
 
-  Layout.preferredWidth: 240
+  readonly property bool isSearching: searchQuery.length > 0
+  readonly property var orderedCategories: SettingsRegistry.sortedCategories()
+  readonly property var searchResults: SettingsRegistry.searchTabs(searchQuery)
+  readonly property var compactEntries: buildCompactEntries()
+
   Layout.fillHeight: true
   color: Qt.rgba(0, 0, 0, 0.1)
 
-  property string searchQuery: ""
-  property bool isSearching: searchQuery.length > 0
   property var expandedCategories: ({})
 
-  readonly property var orderedCategories: SettingsRegistry.sortedCategories()
-  readonly property var searchResults: SettingsRegistry.searchTabs(searchQuery)
+  function buildCompactEntries() {
+    var out = [];
+    for (var i = 0; i < orderedCategories.length; i++) {
+      var category = orderedCategories[i];
+      out.push({
+        type: "separator",
+        key: "sep-" + category.id,
+        icon: category.icon
+      });
+      var tabs = SettingsRegistry.tabsForCategory(category.id);
+      for (var j = 0; j < tabs.length; j++) {
+        out.push({
+          type: "tab",
+          key: tabs[j].id,
+          id: tabs[j].id,
+          icon: tabs[j].icon,
+          label: tabs[j].label
+        });
+      }
+    }
+    return out;
+  }
 
   function initializeExpandedState() {
     var states = {};
@@ -56,10 +83,11 @@ Rectangle {
 
   ColumnLayout {
     anchors.fill: parent
-    anchors.margins: Colors.spacingL
+    anchors.margins: root.compactMode ? Colors.spacingS : Colors.spacingL
     spacing: Colors.spacingS
 
     Text {
+      visible: !root.compactMode
       text: "SETTINGS"
       color: Colors.textDisabled
       font.pixelSize: Colors.fontSizeXS
@@ -69,6 +97,7 @@ Rectangle {
     }
 
     Rectangle {
+      visible: !root.compactMode
       Layout.fillWidth: true
       height: 34
       radius: Colors.radiusPill
@@ -95,7 +124,10 @@ Rectangle {
           color: Colors.text
           font.pixelSize: Colors.fontSizeSmall
           clip: true
-          onTextChanged: root.searchQuery = text
+          onTextChanged: {
+            if (text !== root.searchQuery)
+              root.searchQueryEdited(text);
+          }
 
           Text {
             text: "Search..."
@@ -115,13 +147,16 @@ Rectangle {
           MouseArea {
             anchors.fill: parent
             cursorShape: Qt.PointingHandCursor
-            onClicked: searchInput.text = ""
+            onClicked: root.searchQueryEdited("")
           }
         }
       }
     }
 
-    Item { height: 4 }
+    Item {
+      visible: !root.compactMode
+      height: 4
+    }
 
     Item {
       Layout.fillWidth: true
@@ -130,12 +165,90 @@ Rectangle {
       Flickable {
         id: sidebarFlick
         anchors.fill: parent
-        contentHeight: sidebarColumn.implicitHeight
+        contentHeight: root.compactMode ? compactColumn.implicitHeight : sidebarColumn.implicitHeight
         clip: true
         boundsBehavior: Flickable.DragOverBounds
 
         ColumnLayout {
+          id: compactColumn
+          visible: root.compactMode
+          width: parent.width
+          spacing: Colors.spacingS
+
+          Repeater {
+            model: root.compactEntries
+
+            delegate: Item {
+              required property var modelData
+              width: parent.width
+              height: modelData.type === "separator" ? 22 : 44
+
+              Rectangle {
+                anchors.centerIn: parent
+                visible: modelData.type === "tab"
+                width: 40
+                height: 40
+                radius: Colors.radiusMedium
+                color: root.currentTabId === modelData.id ? Colors.highlight : "transparent"
+                border.color: root.currentTabId === modelData.id ? Colors.withAlpha(Colors.primary, 0.55) : "transparent"
+                border.width: 1
+
+                SharedWidgets.StateLayer {
+                  id: compactTabState
+                  anchors.fill: parent
+                  hovered: compactTabMouse.containsMouse
+                  pressed: compactTabMouse.pressed
+                  visible: modelData.type === "tab" && root.currentTabId !== modelData.id
+                }
+
+                Text {
+                  anchors.centerIn: parent
+                  text: modelData.icon
+                  color: root.currentTabId === modelData.id ? Colors.primary : Colors.fgSecondary
+                  font.family: Colors.fontMono
+                  font.pixelSize: Colors.fontSizeLarge
+                }
+
+                MouseArea {
+                  id: compactTabMouse
+                  anchors.fill: parent
+                  enabled: modelData.type === "tab"
+                  hoverEnabled: true
+                  cursorShape: Qt.PointingHandCursor
+                  onClicked: (mouse) => {
+                    compactTabState.burst(mouse.x, mouse.y);
+                    root.selectTab(modelData.id);
+                  }
+                }
+              }
+
+              Column {
+                anchors.centerIn: parent
+                spacing: 2
+                visible: modelData.type === "separator"
+
+                Text {
+                  anchors.horizontalCenter: parent.horizontalCenter
+                  text: modelData.icon
+                  color: Colors.withAlpha(Colors.fgDim, 0.85)
+                  font.family: Colors.fontMono
+                  font.pixelSize: Colors.fontSizeSmall
+                }
+
+                Rectangle {
+                  anchors.horizontalCenter: parent.horizontalCenter
+                  width: 22
+                  height: 1
+                  color: Colors.border
+                }
+              }
+            }
+          }
+        }
+
+        ColumnLayout {
           id: sidebarColumn
+          visible: !root.compactMode
           width: parent.width
           spacing: 2
 
@@ -168,6 +281,7 @@ Rectangle {
                   font.family: Colors.fontMono
                   font.pixelSize: Colors.fontSizeLarge
                 }
+
                 Text {
                   text: modelData.label
                   color: root.currentTabId === modelData.id ? Colors.text : Colors.fgSecondary
@@ -322,7 +436,7 @@ Rectangle {
     Rectangle {
       Layout.fillWidth: true
       height: 40
-      radius: Colors.radiusPill
+      radius: root.compactMode ? Colors.radiusMedium : Colors.radiusPill
       color: Colors.withAlpha(Colors.primary, 0.14)
       border.color: Colors.primary
       border.width: 1
@@ -346,6 +460,7 @@ Rectangle {
         }
 
         Text {
+          visible: !root.compactMode
           text: "Save & Close"
           color: Colors.text
           font.pixelSize: Colors.fontSizeSmall
@@ -364,5 +479,10 @@ Rectangle {
         }
       }
     }
+  }
+
+  onSearchQueryChanged: {
+    if (!root.compactMode && searchInput.text !== searchQuery)
+      searchInput.text = searchQuery;
   }
 }

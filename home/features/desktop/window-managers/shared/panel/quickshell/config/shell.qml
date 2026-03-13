@@ -523,8 +523,10 @@ Scope {
     id: workspaceOsd
   }
 
-  Overview {
+  Loader {
     id: overview
+    active: CompositorAdapter.isHyprland
+    source: "launcher/Overview.qml"
   }
 
   Dock {

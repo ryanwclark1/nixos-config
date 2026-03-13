@@ -11,7 +11,7 @@ Rectangle {
   height: 20
   width: Math.max(40, label.implicitWidth + 12)
   color: root.state && root.state.specialWorkspaceActive ? Colors.highlight : Colors.surface
-  visible: root.state && root.state.specialWorkspace !== ""
+  visible: CompositorAdapter.isHyprland && root.state && root.state.specialWorkspace !== ""
 
   Text {
     id: label
@@ -24,6 +24,9 @@ Rectangle {
   MouseArea {
     anchors.fill: parent
     cursorShape: Qt.PointingHandCursor
-    onClicked: Quickshell.execDetached([ "hyprctl", "dispatch", "togglespecialworkspace", "scratchpad" ])
+    onClicked: {
+      if (!CompositorAdapter.isHyprland) return;
+      Quickshell.execDetached([ "hyprctl", "dispatch", "togglespecialworkspace", "scratchpad" ]);
+    }
   }
 }

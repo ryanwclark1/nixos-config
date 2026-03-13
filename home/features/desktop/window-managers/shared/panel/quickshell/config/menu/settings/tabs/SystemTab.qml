@@ -9,6 +9,8 @@ Item {
     id: root
     property var settingsRoot: null
     property string tabId: ""
+    property bool compactMode: false
+    property bool tightSpacing: false
     readonly property var launcherModes: [
         { key: "drun", label: "Apps", icon: "󰀻" },
         { key: "window", label: "Windows", icon: "󱗼" },
@@ -35,6 +37,56 @@ Item {
         { key: "github", label: "GitHub", icon: "󰊤" }
     ]
     readonly property var webProviderDefaultOrder: ["duckduckgo", "google", "youtube", "nixos", "github"]
+    readonly property var webAliasDefaults: ({
+        "duckduckgo": ["d", "ddg"],
+        "google": ["g"],
+        "youtube": ["yt"],
+        "nixos": ["nix", "np"],
+        "github": ["gh"]
+    })
+
+    function defaultWebAliasesCopy() {
+        return JSON.parse(JSON.stringify(webAliasDefaults));
+    }
+
+    function webProviderMeta(providerKey) {
+        for (var i = 0; i < webProviders.length; ++i) {
+            if (webProviders[i].key === providerKey)
+                return webProviders[i];
+        }
+        return { key: providerKey, label: providerKey, icon: "󰖟" };
+    }
+
+    function parseAliasTokens(text, providerKey) {
+        var value = String(text || "").toLowerCase();
+        var raw = value.split(/[\s,]+/);
+        var out = [];
+        var seen = {};
+        for (var i = 0; i < raw.length; ++i) {
+            var token = String(raw[i] || "").trim();
+            if (token === "" || token === providerKey || seen[token])
+                continue;
+            if (!/^[a-z0-9][a-z0-9_-]{0,15}$/.test(token))
+                continue;
+            out.push(token);
+            seen[token] = true;
+        }
+        return out;
+    }
+
+    function webAliasString(providerKey) {
+        var aliases = (Config.launcherWebAliases && typeof Config.launcherWebAliases === "object") ? Config.launcherWebAliases : ({});
+        var list = aliases[providerKey];
+        if (!Array.isArray(list))
+            list = [];
+        return list.join(", ");
+    }
+
+    function setWebAliasString(providerKey, textValue) {
+        var next = Object.assign({}, (Config.launcherWebAliases && typeof Config.launcherWebAliases === "object") ? Config.launcherWebAliases : ({}));
+        next[providerKey] = parseAliasTokens(textValue, providerKey);
+        Config.launcherWebAliases = next;
+    }
 
     function setEnabledModes(nextModes) {
         var allowed = {};
@@ -242,6 +294,8 @@ Item {
         Config.launcherSearchDebounceMs = 35;
         Config.launcherFileSearchDebounceMs = 140;
         Config.launcherWebEnterUsesPrimary = true;
+        Config.launcherWebNumberHotkeysEnabled = true;
+        Config.launcherWebAliases = defaultWebAliasesCopy();
         Config.launcherRememberWebProvider = true;
         Config.launcherWebLastProviderKey = "duckduckgo";
         Config.launcherWebProviderOrder = webProviderDefaultOrder.slice();
@@ -406,6 +460,11 @@ Item {
                     configKey: "launcherWebEnterUsesPrimary"
                 }
                 SettingsToggleRow {
+                    label: "Web Number Hotkeys"
+                    icon: "󰌌"
+                    configKey: "launcherWebNumberHotkeysEnabled"
+                }
+                SettingsToggleRow {
                     label: "Remember Web Provider"
                     icon: "󰖟"
                     configKey: "launcherRememberWebProvider"
@@ -549,6 +608,30 @@ Item {
                 }
             }
 
+            SettingsSectionLabel {
+                text: "WEB ALIASES"
+            }
+
+            SettingsInfoCallout {
+                iconName: "󰛢"
+                title: "Alias format"
+                body: "Enter aliases separated by commas. Example: g, gg"
+            }
+
+            Repeater {
+                model: root.orderedWebProviders()
+
+                delegate: SettingsTextInputRow {
+                    required property var modelData
+                    label: root.webProviderMeta(modelData).label + " Aliases"
+                    leadingIcon: root.webProviderMeta(modelData).icon
+                    placeholderText: "comma-separated aliases"
+                    text: root.webAliasString(modelData)
+                    onSubmitted: value => root.setWebAliasString(modelData, value)
+                    onTextEdited: value => root.setWebAliasString(modelData, value)
+                }
+            }
+
             SettingsSliderRow {
                 label: "Preload Failure Threshold"
                 min: 1
@@ -627,26 +710,29 @@ Item {
                 }
             }
 
-            RowLayout {
+            Flow {
                 Layout.fillWidth: true
                 spacing: Colors.spacingS
 
                 SettingsActionButton {
-                    Layout.fillWidth: true
+                    width: root.compactMode ? implicitWidth : 0
+                    Layout.fillWidth: !root.compactMode
                     label: "Core Preset"
                     compact: true
                     onClicked: root.applyModePreset("core")
                 }
 
                 SettingsActionButton {
-                    Layout.fillWidth: true
+                    width: root.compactMode ? implicitWidth : 0
+                    Layout.fillWidth: !root.compactMode
                     label: "Minimal Preset"
                     compact: true
                     onClicked: root.applyModePreset("minimal")
                 }
 
                 SettingsActionButton {
-                    Layout.fillWidth: true
+                    width: root.compactMode ? implicitWidth : 0
+                    Layout.fillWidth: !root.compactMode
                     label: "Full Preset"
                     compact: true
                     onClicked: root.applyModePreset("full")

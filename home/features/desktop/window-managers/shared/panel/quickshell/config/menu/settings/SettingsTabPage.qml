@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Layouts
 import "../../widgets" as SharedWidgets
@@ -11,6 +13,8 @@ SharedWidgets.ScrollableContent {
     property string subtitle: ""
     property var iconName: ""
     property string tabId: ""
+    property bool compactMode: false
+    property bool tightSpacing: false
     readonly property var tabMeta: SettingsRegistry.findTab(tabId)
     readonly property var ownerMeta: tabMeta ? tabMeta.owner : null
     default property alias pageContent: contentColumn.data
@@ -21,10 +25,10 @@ SharedWidgets.ScrollableContent {
     ColumnLayout {
         id: contentColumn
         Layout.fillWidth: true
-        Layout.leftMargin: 32
-        Layout.rightMargin: 32
-        Layout.topMargin: 32
-        Layout.bottomMargin: 32
+        Layout.leftMargin: root.tightSpacing ? 20 : (root.compactMode ? 24 : 32)
+        Layout.rightMargin: root.tightSpacing ? 20 : (root.compactMode ? 24 : 32)
+        Layout.topMargin: root.tightSpacing ? 20 : (root.compactMode ? 24 : 32)
+        Layout.bottomMargin: root.tightSpacing ? 20 : (root.compactMode ? 24 : 32)
         spacing: Colors.spacingXL
 
         ColumnLayout {
@@ -62,11 +66,12 @@ SharedWidgets.ScrollableContent {
                 Layout.fillWidth: true
             }
 
-            RowLayout {
+            Flow {
                 id: ownerBadgeRow
                 Layout.fillWidth: true
                 spacing: Colors.spacingS
                 visible: !!root.ownerMeta
+                width: parent.width
 
                 function ownerField(name, fallback) {
                     if (!root.ownerMeta || root.ownerMeta[name] === undefined || root.ownerMeta[name] === null || root.ownerMeta[name] === "")

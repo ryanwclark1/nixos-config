@@ -9,6 +9,8 @@ Item {
     id: root
     property var settingsRoot: null
     property string tabId: ""
+    property bool compactMode: false
+    property bool tightSpacing: false
     property string validationMessage: ""
     readonly property var selectedBar: Config.selectedBar()
     readonly property string selectedBarDockMessage: root.selectedBar ? Config.barDockConflictMessage(root.selectedBar) : ""
@@ -60,37 +62,47 @@ Item {
                     delegate: SettingsListRow {
                         required property var modelData
                         active: Config.selectedBarId === modelData.id
-                        minimumHeight: 64
+                        minimumHeight: root.compactMode ? 88 : 64
 
-                        Text {
-                            text: modelData.name || "Bar"
-                            color: Colors.text
-                            font.pixelSize: Colors.fontSizeMedium
-                            font.weight: Font.DemiBold
+                        ColumnLayout {
                             Layout.fillWidth: true
-                            elide: Text.ElideRight
-                        }
-
-                        Text {
-                            text: (Config.sectionLabel("left", modelData.position) + "/" + Config.sectionLabel("center", modelData.position) + "/" + Config.sectionLabel("right", modelData.position))
-                            color: Colors.fgSecondary
-                            font.pixelSize: Colors.fontSizeXS
-                        }
-
-                        Rectangle {
-                            implicitWidth: metaText.implicitWidth + 16
-                            implicitHeight: 24
-                            radius: Colors.radiusPill
-                            color: Colors.withAlpha(Colors.primary, 0.08)
-                            border.color: Colors.border
-                            border.width: 1
+                            spacing: Colors.spacingXS
 
                             Text {
-                                id: metaText
-                                anchors.centerIn: parent
-                                text: (modelData.position || "top") + " • " + (modelData.displayMode || "all")
-                                color: Colors.fgSecondary
-                                font.pixelSize: Colors.fontSizeXS
+                                text: modelData.name || "Bar"
+                                color: Colors.text
+                                font.pixelSize: Colors.fontSizeMedium
+                                font.weight: Font.DemiBold
+                                Layout.fillWidth: true
+                                elide: Text.ElideRight
+                            }
+
+                            Flow {
+                                Layout.fillWidth: true
+                                spacing: Colors.spacingS
+
+                                Text {
+                                    text: (Config.sectionLabel("left", modelData.position) + "/" + Config.sectionLabel("center", modelData.position) + "/" + Config.sectionLabel("right", modelData.position))
+                                    color: Colors.fgSecondary
+                                    font.pixelSize: Colors.fontSizeXS
+                                }
+
+                                Rectangle {
+                                    implicitWidth: metaText.implicitWidth + 16
+                                    implicitHeight: 24
+                                    radius: Colors.radiusPill
+                                    color: Colors.withAlpha(Colors.primary, 0.08)
+                                    border.color: Colors.border
+                                    border.width: 1
+
+                                    Text {
+                                        id: metaText
+                                        anchors.centerIn: parent
+                                        text: (modelData.position || "top") + " • " + (modelData.displayMode || "all")
+                                        color: Colors.fgSecondary
+                                        font.pixelSize: Colors.fontSizeXS
+                                    }
+                                }
                             }
                         }
 

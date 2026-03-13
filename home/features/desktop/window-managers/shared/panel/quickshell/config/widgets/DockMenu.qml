@@ -194,7 +194,7 @@ PopupWindow {
 
       // Move to Workspace
       MenuItem {
-        visible: root.isRunning && !root.showWorkspaceList
+        visible: root.isRunning && !root.showWorkspaceList && CompositorAdapter.isHyprland
         text: "Move to Workspace  ›"
         icon: "󰍹"
         onClicked: root.showWorkspaceList = true
@@ -209,7 +209,7 @@ PopupWindow {
       }
 
       Repeater {
-        model: root.showWorkspaceList ? 10 : 0
+        model: root.showWorkspaceList && CompositorAdapter.isHyprland ? 10 : 0
         delegate: MenuItem {
           required property int index
           text: "Workspace " + (index + 1)

@@ -8,6 +8,8 @@ Item {
     id: root
     property var settingsRoot: null
     property string tabId: ""
+    property bool compactMode: false
+    property bool tightSpacing: false
 
     property var keybindsList: []
     property string keybindsFilter: ""
@@ -101,46 +103,49 @@ Item {
                 }
 
                 delegate: SettingsListRow {
-                    minimumHeight: 52
-
-                    Rectangle {
-                        implicitWidth: chordText.implicitWidth + 16
-                        height: 26
-                        radius: 6
-                        color: Colors.highlight
-                        border.color: Colors.primary
-                        border.width: 1
-                        Layout.alignment: Qt.AlignTop
-
-                        Text {
-                            id: chordText
-                            anchors.centerIn: parent
-                            text: {
-                                var parts = [];
-                                if (modelData.mods)
-                                    parts.push(modelData.mods);
-                                if (modelData["key"])
-                                    parts.push(modelData["key"]);
-                                return parts.join(" + ");
-                            }
-                            color: Colors.primary
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeSmall
-                            font.weight: Font.DemiBold
-                        }
-                    }
-
                     ColumnLayout {
                         Layout.fillWidth: true
-                        spacing: 2
+                        spacing: root.tightSpacing ? 4 : 6
 
-                        Text {
-                            text: modelData.dispatcher
-                            color: Colors.text
-                            font.pixelSize: Colors.fontSizeMedium
-                            font.weight: Font.DemiBold
-                            elide: Text.ElideRight
+                        Flow {
                             Layout.fillWidth: true
+                            width: parent.width
+                            spacing: Colors.spacingS
+
+                            Rectangle {
+                                implicitWidth: chordText.implicitWidth + 16
+                                height: 26
+                                radius: 6
+                                color: Colors.highlight
+                                border.color: Colors.primary
+                                border.width: 1
+
+                                Text {
+                                    id: chordText
+                                    anchors.centerIn: parent
+                                    text: {
+                                        var parts = [];
+                                        if (modelData.mods)
+                                            parts.push(modelData.mods);
+                                        if (modelData["key"])
+                                            parts.push(modelData["key"]);
+                                        return parts.join(" + ");
+                                    }
+                                    color: Colors.primary
+                                    font.family: Colors.fontMono
+                                    font.pixelSize: Colors.fontSizeSmall
+                                    font.weight: Font.DemiBold
+                                }
+                            }
+
+                            Text {
+                                text: modelData.dispatcher
+                                color: Colors.text
+                                font.pixelSize: Colors.fontSizeMedium
+                                font.weight: Font.DemiBold
+                                width: Math.max(0, parent.width - chordText.implicitWidth - Colors.spacingS - 16)
+                                elide: Text.ElideRight
+                            }
                         }
 
                         Text {
@@ -148,8 +153,8 @@ Item {
                             color: Colors.fgSecondary
                             font.pixelSize: Colors.fontSizeSmall
                             font.family: modelData.arg ? Colors.fontMono : ""
-                            elide: Text.ElideRight
                             Layout.fillWidth: true
+                            wrapMode: Text.WrapAnywhere
                         }
                     }
                 }

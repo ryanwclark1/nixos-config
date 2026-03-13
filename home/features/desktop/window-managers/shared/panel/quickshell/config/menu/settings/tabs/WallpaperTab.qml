@@ -10,6 +10,8 @@ Item {
     id: root
     property var settingsRoot: null
     property string tabId: ""
+    property bool compactMode: false
+    property bool tightSpacing: false
 
     property string wallpaperSelectedMonitor: ""
     property var wallpaperMonitorNames: []
@@ -265,9 +267,24 @@ Item {
         return out;
     }
 
+    function _loadFallbackMonitorNames() {
+        var names = [];
+        var screens = Quickshell.screens || [];
+        for (var i = 0; i < screens.length; i++) {
+            var s = screens[i];
+            var name = (s && s.name) ? String(s.name) : "";
+            if (!name.length)
+                name = "Monitor " + (i + 1);
+            names.push(name);
+        }
+        root.wallpaperMonitorNames = names;
+        if (root.wallpaperSelectedMonitor === "" && names.length > 0)
+            root.wallpaperSelectedMonitor = names[0];
+    }
+
     Process {
         id: wallpaperMonProc
-        command: ["hyprctl", "monitors", "-j"]
+        command: CompositorAdapter.isHyprland ? ["hyprctl", "monitors", "-j"] : ["sh", "-c", "echo '[]'"]
         running: false
         stdout: StdioCollector {
             onStreamFinished: {
@@ -281,8 +298,11 @@ Item {
                     root.wallpaperMonitorNames = names;
                     if (root.wallpaperSelectedMonitor === "" && names.length > 0)
                         root.wallpaperSelectedMonitor = names[0];
+                    if (names.length === 0)
+                        root._loadFallbackMonitorNames();
                 } catch (e) {
                     console.error("Failed to parse hyprctl monitors: " + e);
+                    root._loadFallbackMonitorNames();
                 }
             }
         }
@@ -470,7 +490,7 @@ Item {
             text: "CURRENT WALLPAPER"
         }
 
-        RowLayout {
+        Flow {
             Layout.fillWidth: true
             spacing: Colors.spacingS
 
@@ -629,7 +649,7 @@ Item {
             Rectangle {
                 anchors.centerIn: parent
                 visible: previewContainer.solidPreview
-                width: 220
+                width: Math.min(previewContainer.width - Colors.spacingM * 4, 220)
                 height: 96
                 radius: Colors.radiusMedium
                 color: "#" + previewContainer.solidHex.slice(0, 6)
@@ -652,7 +672,7 @@ Item {
                     margins: Colors.spacingM
                 }
                 visible: previewContainer.previewPath !== "" || previewContainer.solidPreview
-                implicitWidth: previewName.implicitWidth + 16
+                width: Math.min(previewContainer.width - Colors.spacingM * 2, previewName.implicitWidth + 16)
                 height: 22
                 radius: Colors.radiusPill
                 color: Qt.rgba(0, 0, 0, 0.55)
@@ -679,7 +699,7 @@ Item {
         }
 
         // Quick action buttons
-        RowLayout {
+        Flow {
             Layout.fillWidth: true
             spacing: Colors.spacingM
 
@@ -708,7 +728,8 @@ Item {
                 ]
 
                 delegate: SettingsActionButton {
-                    Layout.fillWidth: true
+                    width: root.compactMode ? implicitWidth : 0
+                    Layout.fillWidth: !root.compactMode
                     label: modelData.label
                     iconName: modelData.icon
                     onClicked: {
@@ -809,7 +830,7 @@ Item {
                 }
             }
 
-            RowLayout {
+            Flow {
                 Layout.fillWidth: true
                 spacing: Colors.spacingS
 
@@ -841,7 +862,7 @@ Item {
                 }
             }
 
-            RowLayout {
+            Flow {
                 Layout.fillWidth: true
                 spacing: Colors.spacingS
                 visible: (Config.wallpaperRecentSolidColors || []).length > 0
@@ -900,17 +921,21 @@ Item {
             }
         }
 
-        RowLayout {
+        Flow {
             Layout.fillWidth: true
             spacing: Colors.spacingS
 
             SettingsActionButton {
+                width: root.compactMode ? implicitWidth : 0
+                Layout.fillWidth: !root.compactMode
                 label: "Export Wallpaper JSON"
                 compact: true
                 onClicked: root.exportWallpaperSettings()
             }
 
             SettingsActionButton {
+                width: root.compactMode ? implicitWidth : 0
+                Layout.fillWidth: !root.compactMode
                 label: "Import Wallpaper JSON"
                 compact: true
                 onClicked: root.importWallpaperSettings()
@@ -1096,8 +1121,8 @@ Item {
                     }
                     readonly property bool isActive: modelData.path === activePath
 
-                    width: 108
-                    height: 80
+                    width: root.compactMode ? 92 : 108
+                    height: root.compactMode ? 72 : 80
                     scale: 1.0
 
                     SequentialAnimation {

@@ -8,9 +8,12 @@ Item {
     id: root
     property var settingsRoot: null
     property string tabId: ""
+    property bool compactMode: false
+    property bool tightSpacing: false
 
     property var _themeResults: []
     property string _themeVariantFilter: ""
+    readonly property int _themeColumns: (compactMode || themeFlow.width < 700) ? 1 : 2
 
     function _refreshThemeResults() {
         _themeResults = ThemeService.searchThemes(themeSearchField ? themeSearchField.text : "", _themeVariantFilter);
@@ -33,7 +36,7 @@ Item {
             title: "Theme Browser"
             description: "Search and apply a base24 theme, or fall back to pywal colors."
 
-            RowLayout {
+            ColumnLayout {
                 Layout.fillWidth: true
                 spacing: Colors.spacingM
 
@@ -45,41 +48,46 @@ Item {
                     onTextEdited: _themeRefreshTimer.restart()
                 }
 
-                SharedWidgets.FilterChip {
-                    label: "Dark"
-                    icon: "󰖔"
-                    selected: root._themeVariantFilter === "dark"
-                    onClicked: {
-                        root._themeVariantFilter = root._themeVariantFilter === "dark" ? "" : "dark";
-                        root._refreshThemeResults();
-                    }
-                }
+                Flow {
+                    Layout.fillWidth: true
+                    width: parent.width
+                    spacing: Colors.spacingS
 
-                SharedWidgets.FilterChip {
-                    label: "Light"
-                    icon: "󰖙"
-                    selected: root._themeVariantFilter === "light"
-                    onClicked: {
-                        root._themeVariantFilter = root._themeVariantFilter === "light" ? "" : "light";
-                        root._refreshThemeResults();
+                    SharedWidgets.FilterChip {
+                        label: "Dark"
+                        icon: "󰖔"
+                        selected: root._themeVariantFilter === "dark"
+                        onClicked: {
+                            root._themeVariantFilter = root._themeVariantFilter === "dark" ? "" : "dark";
+                            root._refreshThemeResults();
+                        }
+                    }
+
+                    SharedWidgets.FilterChip {
+                        label: "Light"
+                        icon: "󰖙"
+                        selected: root._themeVariantFilter === "light"
+                        onClicked: {
+                            root._themeVariantFilter = root._themeVariantFilter === "light" ? "" : "light";
+                            root._refreshThemeResults();
+                        }
                     }
                 }
             }
 
-            RowLayout {
+            Flow {
                 Layout.fillWidth: true
+                width: parent.width
                 spacing: Colors.spacingM
                 visible: Config.themeName !== ""
 
                 Text {
+                    width: root.compactMode ? parent.width : undefined
                     text: "Active: " + (ThemeService.activeTheme ? ThemeService.activeTheme.name : Config.themeName)
                     color: Colors.primary
                     font.pixelSize: Colors.fontSizeSmall
                     font.weight: Font.DemiBold
-                }
-
-                Item {
-                    Layout.fillWidth: true
+                    wrapMode: Text.WordWrap
                 }
 
                 SettingsActionButton {
@@ -106,7 +114,7 @@ Item {
 
                     Item {
                         id: themeCardWrapper
-                        width: (themeFlow.width - Colors.spacingXS) / 2
+                        width: Math.max(220, Math.floor((themeFlow.width - Colors.spacingXS * (root._themeColumns - 1)) / root._themeColumns))
                         height: 48
 
                         property var _theme: modelData

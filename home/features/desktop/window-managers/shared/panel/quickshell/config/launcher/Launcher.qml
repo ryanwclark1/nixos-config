@@ -11,6 +11,16 @@ import "../widgets" as SharedWidgets
 PanelWindow {
   id: launcherRoot
 
+  property var screenRef: screen || Quickshell.cursorScreen || Config.primaryScreen()
+  screen: screenRef
+  readonly property var edgeMargins: Config.reservedEdgesForScreen(screenRef, "")
+  readonly property int usableWidth: Math.max(0, width - edgeMargins.left - edgeMargins.right)
+  readonly property int usableHeight: Math.max(0, height - edgeMargins.top - edgeMargins.bottom)
+  readonly property bool compactMode: usableWidth < 900 || usableHeight < 640
+  readonly property bool sidebarCompact: usableWidth < 720
+  readonly property bool tightMode: usableWidth < 560 || usableHeight < 500
+  readonly property bool webHintCompact: usableWidth < 760 || usableHeight < 560
+
   anchors {
     top: true
     left: true
@@ -84,7 +94,9 @@ PanelWindow {
   readonly property var defaultModeOrder: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
   readonly property var defaultPrimaryModes: ["drun", "window", "files", "ai", "clip", "system", "media"]
   property var modeOrder: computeModeOrder()
-  property var primaryModes: sanitizeModeList(Config.launcherEnabledModes, defaultPrimaryModes, allKnownModes)
+  property var primaryModes: sanitizeModeList(Config.launcherEnabledModes, defaultPrimaryModes, allKnownModes).filter(function(modeKey) {
+    return launcherRoot.isModeAllowedByCompositor(modeKey);
+  })
   readonly property var modeMeta: ({
     "drun": { label: "Apps", hint: "Launch applications", prefix: "" },
     "window": { label: "Windows", hint: "Jump to an open window", prefix: "" },
@@ -249,17 +261,41 @@ PanelWindow {
   readonly property string legendSecondaryAction: {
     if (showingConfirm) return "Esc: Cancel";
     if (!hasResults && emptySecondaryCta !== "") return "Shift+Enter: " + emptySecondaryCta;
-    if (mode === "web" && hasResults) return "Tab: Next Provider";
+    if (hasResults) return "Tab: Next Result";
     return "Tab: Next Mode";
   }
-  readonly property string legendTertiaryAction: mode === "web" && hasResults ? "Ctrl+Enter: Open Provider Home" : "Esc: Close"
+  readonly property string legendTertiaryAction: hasResults ? "Shift+Tab: Prev Mode" : "Esc: Close"
   readonly property string webPrimaryProviderLabel: {
     var provider = primaryWebProvider();
     return provider ? provider.name : "Primary";
   }
+  readonly property string webHotkeyHint: {
+    if (!Config.launcherWebNumberHotkeysEnabled)
+      return "Ctrl+Enter: Home";
+    return webHintCompact ? "Ctrl+Enter: Home • Ctrl/Alt+1..9" : "Ctrl+Enter: Home • Ctrl+1..9: Open • Alt+1..9: Select";
+  }
   readonly property string webSelectedProviderLabel: activeProviderLabel !== "" ? activeProviderLabel : "Selected"
   readonly property string webPrimaryEnterHint: Config.launcherWebEnterUsesPrimary ? ("Enter: " + webPrimaryProviderLabel) : ("Enter: " + webSelectedProviderLabel)
   readonly property string webSecondaryEnterHint: Config.launcherWebEnterUsesPrimary ? ("Shift+Enter: " + webSelectedProviderLabel) : ("Shift+Enter: " + emptySecondaryCta)
+  readonly property string webAliasHint: {
+    var aliases = (Config.launcherWebAliases && typeof Config.launcherWebAliases === "object") ? Config.launcherWebAliases : ({});
+    var providers = configuredWebProviders();
+    var parts = [];
+    for (var i = 0; i < providers.length; ++i) {
+      var providerKey = String(providers[i].key || "");
+      if (providerKey === "")
+        continue;
+      var list = aliases[providerKey];
+      if (!Array.isArray(list) || list.length === 0)
+        continue;
+      var first = String(list[0] || "").trim();
+      if (first !== "")
+        parts.push("?" + first);
+    }
+    if (parts.length > 0)
+      return (webHintCompact ? "Aliases: " : "Alias: ") + parts.join(" ");
+    return webHintCompact ? "Aliases: provider key" : "Alias: provider key";
+  }
   readonly property string activeProviderLabel: {
     if (mode !== "web")
       return "";
@@ -486,12 +522,18 @@ PanelWindow {
     var filtered = [];
     for (i = 0; i < order.length; ++i) {
       var modeKey = order[i];
-      if (enabledSet[modeKey])
+      if (enabledSet[modeKey] && isModeAllowedByCompositor(modeKey))
         filtered.push(modeKey);
     }
     if (filtered.length === 0)
       return ["drun"];
     return filtered;
+  }
+
+  function isModeAllowedByCompositor(modeKey) {
+    if ((modeKey === "window" || modeKey === "keybinds") && !CompositorAdapter.isHyprland)
+      return false;
+    return true;
   }
 
   function supportsMode(modeKey) {
@@ -638,6 +680,57 @@ PanelWindow {
   function primaryWebProvider() {
     var list = configuredWebProviders();
     return list.length > 0 ? list[0] : null;
+  }
+
+  function configuredWebProviderByKey(providerKey) {
+    var key = String(providerKey || "");
+    if (key === "")
+      return null;
+    var list = configuredWebProviders();
+    for (var i = 0; i < list.length; ++i) {
+      if (String(list[i].key || "") === key)
+        return list[i];
+    }
+    return null;
+  }
+
+  function webAliasToProviderKey(token) {
+    var key = String(token || "").toLowerCase();
+    if (key === "")
+      return "";
+    if (webProviderCatalog[key])
+      return key;
+    var aliases = (Config.launcherWebAliases && typeof Config.launcherWebAliases === "object") ? Config.launcherWebAliases : ({});
+    var providers = configuredWebProviders();
+    for (var i = 0; i < providers.length; ++i) {
+      var providerKey = String(providers[i].key || "");
+      if (providerKey === "")
+        continue;
+      var list = aliases[providerKey];
+      if (!Array.isArray(list))
+        continue;
+      for (var j = 0; j < list.length; ++j) {
+        if (String(list[j] || "").toLowerCase() === key)
+          return providerKey;
+      }
+    }
+    return "";
+  }
+
+  function parseWebQuery(text) {
+    var clean = stripModePrefix(text || "").trim();
+    var result = ({ query: clean, providerKey: "" });
+    if (clean === "")
+      return result;
+    var parts = clean.split(/\s+/);
+    if (!parts || parts.length === 0)
+      return result;
+    var mapped = webAliasToProviderKey(parts[0]);
+    if (mapped === "")
+      return result;
+    result.providerKey = mapped;
+    result.query = parts.length > 1 ? clean.substring(parts[0].length).trim() : "";
+    return result;
   }
 
   function secondaryWebProvider() {
@@ -1367,6 +1460,7 @@ PanelWindow {
 
   function filterItems() {
     var actualSearch = searchText;
+    var webContext = null;
     if (mode === "calc") {
       actualSearch = searchText.startsWith("=") ? searchText.substring(1).trim() : searchText;
       try {
@@ -1385,7 +1479,10 @@ PanelWindow {
 
     if (mode === "run" && searchText.startsWith(">")) actualSearch = searchText.substring(1).trim();
     if (mode === "emoji" && searchText.startsWith(":")) actualSearch = searchText.substring(1).trim();
-    if (mode === "web" && searchText.startsWith("?")) actualSearch = searchText.substring(1).trim();
+    if (mode === "web") {
+      webContext = parseWebQuery(searchText);
+      actualSearch = webContext.query;
+    }
     if (mode === "ai" && searchText.startsWith("!")) actualSearch = searchText.substring(1).trim();
     if (mode === "files" && searchText.startsWith("/")) actualSearch = searchText.substring(1).trim();
     if (mode === "bookmarks" && searchText.startsWith("@")) actualSearch = searchText.substring(1).trim();
@@ -1431,6 +1528,8 @@ PanelWindow {
       filteredItems = scoredItems.slice(0, Config.launcherMaxResults);
     }
     selectedIndex = Math.min(selectedIndex, Math.max(0, filteredItems.length - 1));
+    if (mode === "web" && webContext && webContext.providerKey !== "")
+      selectWebProviderByKey(webContext.providerKey);
   }
 
   function scheduleSearchRefresh(forceNow) {
@@ -1509,12 +1608,13 @@ PanelWindow {
       return;
     }
     if (mode === "web") {
-      var primary = primaryWebProvider();
+      var webCtx = parseWebQuery(searchText);
+      var primary = configuredWebProviderByKey(webCtx.providerKey) || primaryWebProvider();
       var url = primary ? String(primary.home || "") : "";
       if (url === "")
         url = "https://duckduckgo.com/";
-      if (clean !== "" && primary && primary.exec)
-        url = String(primary.exec) + encodeURIComponent(clean);
+      if (webCtx.query !== "" && primary && primary.exec)
+        url = String(primary.exec) + encodeURIComponent(webCtx.query);
       Quickshell.execDetached(["xdg-open", url]);
       close();
       return;
@@ -1596,6 +1696,56 @@ PanelWindow {
     }
   }
 
+  function webProviderSlotFromKey(key) {
+    if (key === Qt.Key_1) return 1;
+    if (key === Qt.Key_2) return 2;
+    if (key === Qt.Key_3) return 3;
+    if (key === Qt.Key_4) return 4;
+    if (key === Qt.Key_5) return 5;
+    if (key === Qt.Key_6) return 6;
+    if (key === Qt.Key_7) return 7;
+    if (key === Qt.Key_8) return 8;
+    if (key === Qt.Key_9) return 9;
+    return 0;
+  }
+
+  function selectWebProviderBySlot(slot) {
+    if (mode !== "web" || slot < 1)
+      return false;
+    var providers = configuredWebProviders();
+    if (slot > providers.length)
+      return false;
+    var key = String((providers[slot - 1] || {}).key || "");
+    if (key === "")
+      return false;
+    selectWebProviderByKey(key);
+    return true;
+  }
+
+  function executeWebProviderBySlot(slot) {
+    if (mode !== "web" || slot < 1)
+      return false;
+    var providers = configuredWebProviders();
+    if (slot > providers.length)
+      return false;
+    var provider = providers[slot - 1];
+    if (!provider)
+      return false;
+    var webCtx = parseWebQuery(searchText);
+    var query = String(webCtx.query || "");
+    var target = "";
+    if (query !== "" && provider.exec)
+      target = String(provider.exec) + encodeURIComponent(query);
+    else
+      target = String(provider.home || provider.exec || "");
+    if (target === "")
+      return false;
+    rememberRecent({ name: provider.name || "Web", title: target, icon: provider.icon || "󰖟", exec: String(provider.exec || "") });
+    Quickshell.execDetached(["xdg-open", target]);
+    close();
+    return true;
+  }
+
   function openSelectedWebHomepage() {
     if (mode !== "web" || filteredItems.length <= 0 || selectedIndex < 0 || selectedIndex >= filteredItems.length)
       return;
@@ -1617,10 +1767,11 @@ PanelWindow {
   function executePrimaryWebSearch() {
     if (mode !== "web")
       return;
-    var provider = primaryWebProvider();
+    var webCtx = parseWebQuery(searchText);
+    var provider = configuredWebProviderByKey(webCtx.providerKey) || primaryWebProvider();
     if (!provider)
       return;
-    var clean = stripModePrefix(searchText).trim();
+    var clean = webCtx.query;
     var target = "";
     if (clean !== "" && provider.exec)
       target = String(provider.exec) + encodeURIComponent(clean);
@@ -1744,9 +1895,12 @@ PanelWindow {
 
   Rectangle {
     id: hudBox
-    width: 960
-    height: Math.min(760, parent.height - 100)
-    anchors.centerIn: parent
+    width: Math.min(960, Math.max(launcherRoot.sidebarCompact ? 360 : 420, launcherRoot.usableWidth - (launcherRoot.tightMode ? 24 : 40)))
+    height: Math.min(760, Math.max(320, launcherRoot.usableHeight - (launcherRoot.tightMode ? 24 : 40)))
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.topMargin: launcherRoot.edgeMargins.top + Math.max(20, (launcherRoot.usableHeight - height) / 2)
+    anchors.leftMargin: launcherRoot.edgeMargins.left + Math.max(20, (launcherRoot.usableWidth - width) / 2)
     color: Colors.bgGlass
     radius: Colors.radiusLarge
     border.color: Colors.border
@@ -1775,11 +1929,11 @@ PanelWindow {
 
     RowLayout {
       anchors.fill: parent
-      anchors.margins: Colors.paddingMedium
-      spacing: 18
+      anchors.margins: launcherRoot.tightMode ? Colors.spacingM : Colors.paddingMedium
+      spacing: launcherRoot.compactMode ? Colors.paddingSmall : 18
 
       Rectangle {
-        Layout.preferredWidth: 210
+        Layout.preferredWidth: launcherRoot.sidebarCompact ? 76 : Math.max(148, Math.min(210, Math.round(hudBox.width * (launcherRoot.compactMode ? 0.2 : 0.22))))
         Layout.fillHeight: true
         radius: Colors.radiusLarge
         color: Colors.withAlpha(Colors.surface, 0.45)
@@ -1788,17 +1942,17 @@ PanelWindow {
 
         ColumnLayout {
           anchors.fill: parent
-          anchors.margins: Colors.spacingM
-          spacing: Colors.paddingSmall
+          anchors.margins: launcherRoot.sidebarCompact ? Colors.spacingS : Colors.spacingM
+          spacing: launcherRoot.sidebarCompact ? Colors.spacingXS : Colors.paddingSmall
 
-          Text { text: "Launcher"; color: Colors.text; font.pixelSize: Colors.fontSizeXL; font.weight: Font.DemiBold }
-          Text { text: "Modes"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
+          Text { visible: !launcherRoot.sidebarCompact; text: "Launcher"; color: Colors.text; font.pixelSize: Colors.fontSizeXL; font.weight: Font.DemiBold }
+          Text { visible: !launcherRoot.sidebarCompact; text: "Modes"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
 
           Repeater {
             model: launcherRoot.primaryModes
             delegate: Rectangle {
               Layout.fillWidth: true
-              implicitHeight: 46
+              implicitHeight: launcherRoot.sidebarCompact ? 40 : 46
               radius: Colors.radiusMedium
               color: launcherRoot.mode === modelData ? Colors.highlight : Colors.bgWidget
               Behavior on color { ColorAnimation { duration: 160 } }
@@ -1807,10 +1961,17 @@ PanelWindow {
 
               RowLayout {
                 anchors.fill: parent
-                anchors.margins: Colors.paddingSmall
-                spacing: Colors.paddingSmall
-                Text { text: launcherRoot.modeIcons[modelData] || "•"; color: launcherRoot.mode === modelData ? Colors.primary : Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
+                anchors.margins: launcherRoot.sidebarCompact ? Colors.spacingXS : Colors.paddingSmall
+                spacing: launcherRoot.sidebarCompact ? Colors.spacingXS : Colors.paddingSmall
+                Text {
+                  text: launcherRoot.modeIcons[modelData] || "•"
+                  color: launcherRoot.mode === modelData ? Colors.primary : Colors.textSecondary
+                  font.family: Colors.fontMono
+                  font.pixelSize: launcherRoot.sidebarCompact ? Colors.fontSizeXL : Colors.fontSizeLarge
+                  Layout.alignment: Qt.AlignVCenter | (launcherRoot.sidebarCompact ? Qt.AlignHCenter : 0)
+                }
                 ColumnLayout {
+                  visible: !launcherRoot.sidebarCompact
                   Layout.fillWidth: true
                   spacing: 0
                   Text { text: launcherRoot.modeInfo(modelData).label; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.DemiBold }
@@ -1841,14 +2002,14 @@ PanelWindow {
             color: Colors.bgWidget
             border.color: Colors.border
             border.width: 1
-            visible: Config.launcherShowModeHints
+            visible: Config.launcherShowModeHints && !launcherRoot.sidebarCompact
 
             ColumnLayout {
               anchors.fill: parent
               anchors.margins: Colors.spacingM
               spacing: 2
               Text { text: "Controls"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
-              Text { text: "Tab to cycle modes"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall }
+              Text { text: "Tab: next result • Shift+Tab: prev mode"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall }
               Text { text: "Enter to run • Esc to close"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS }
             }
           }
@@ -1858,11 +2019,11 @@ PanelWindow {
       ColumnLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
-        spacing: Colors.paddingMedium
+        spacing: launcherRoot.compactMode ? Colors.paddingSmall : Colors.paddingMedium
 
         Rectangle {
           Layout.fillWidth: true
-          height: 55
+          height: launcherRoot.compactMode ? 50 : 55
           color: Colors.bgWidget
           radius: 27.5
           border.color: searchInput.activeFocus ? Colors.primary : "transparent"
@@ -1878,7 +2039,7 @@ PanelWindow {
               id: searchInput
               Layout.fillWidth: true
               color: Colors.text
-              font.pixelSize: Colors.fontSizeXL
+              font.pixelSize: launcherRoot.sidebarCompact ? Colors.fontSizeLarge : Colors.fontSizeXL
               clip: true
               text: launcherRoot.searchText
               enabled: !launcherRoot.showingConfirm
@@ -1898,17 +2059,20 @@ PanelWindow {
               }
               Keys.onPressed: (event) => {
                 if (event.key === Qt.Key_Escape) launcherRoot.close();
-                else if (event.key === Qt.Key_Tab && launcherRoot.mode === "web" && (event.modifiers & Qt.ShiftModifier) && !(event.modifiers & Qt.ControlModifier)) {
-                  launcherRoot.cycleSelection(-1);
-                  event.accepted = true;
-                } else if (event.key === Qt.Key_Tab && launcherRoot.mode === "web" && !(event.modifiers & Qt.ShiftModifier) && !(event.modifiers & Qt.ControlModifier)) {
-                  launcherRoot.cycleSelection(1);
-                  event.accepted = true;
-                } else if (event.key === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier)) {
+                else if (Config.launcherWebNumberHotkeysEnabled && launcherRoot.mode === "web" && (event.modifiers & Qt.ControlModifier) && !(event.modifiers & Qt.AltModifier) && !(event.modifiers & Qt.ShiftModifier)) {
+                  var openSlot = launcherRoot.webProviderSlotFromKey(event.key);
+                  if (openSlot > 0 && launcherRoot.executeWebProviderBySlot(openSlot)) event.accepted = true;
+                }
+                else if (Config.launcherWebNumberHotkeysEnabled && launcherRoot.mode === "web" && (event.modifiers & Qt.AltModifier) && !(event.modifiers & Qt.ControlModifier)) {
+                  var slot = launcherRoot.webProviderSlotFromKey(event.key);
+                  if (slot > 0 && launcherRoot.selectWebProviderBySlot(slot)) event.accepted = true;
+                }
+                else if (event.key === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier)) {
                   launcherRoot.cycleMode(-1);
                   event.accepted = true;
                 } else if (event.key === Qt.Key_Tab) {
-                  launcherRoot.cycleMode(1);
+                  if (launcherRoot.filteredItems.length > 0) launcherRoot.cycleSelection(1);
+                  else launcherRoot.cycleMode(1);
                   event.accepted = true;
                 } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                   if ((event.modifiers & Qt.ControlModifier) && launcherRoot.mode === "web" && launcherRoot.filteredItems.length > 0) launcherRoot.openSelectedWebHomepage();
@@ -1930,7 +2094,7 @@ PanelWindow {
             Rectangle {
               visible: launcherRoot.mode === "web" && launcherRoot.activeProviderLabel !== ""
               height: 28
-              width: Math.min(providerText.implicitWidth + 28, 210)
+              width: Math.min(providerText.implicitWidth + 28, launcherRoot.compactMode ? 160 : 210)
               radius: height / 2
               color: Colors.withAlpha(Colors.primary, 0.12)
               border.color: Colors.withAlpha(Colors.primary, 0.5)
@@ -1959,7 +2123,7 @@ PanelWindow {
             }
             Rectangle {
               height: 28
-              width: Math.min(modeText.implicitWidth + 32, 110)
+              width: Math.min(modeText.implicitWidth + 32, launcherRoot.compactMode ? 92 : 110)
               radius: height / 2
               color: Colors.highlight
               Text {
@@ -1979,7 +2143,7 @@ PanelWindow {
         RowLayout {
           Layout.fillWidth: true
           spacing: Colors.paddingSmall
-          visible: Config.launcherShowModeHints
+          visible: Config.launcherShowModeHints && !launcherRoot.tightMode
           Text { Layout.fillWidth: true; text: launcherRoot.modeInfo(launcherRoot.mode).hint; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; elide: Text.ElideRight }
           Text {
             text: launcherRoot.legendPrimaryAction + " • " + launcherRoot.legendSecondaryAction + " • " + launcherRoot.legendTertiaryAction
@@ -1995,13 +2159,13 @@ PanelWindow {
           radius: Colors.radiusMedium
           border.color: Colors.border
           border.width: 1
-          implicitHeight: 42
+          implicitHeight: providerFlowContainer.implicitHeight + (Colors.spacingM * 2)
 
-          RowLayout {
+          Column {
+            id: providerFlowContainer
             anchors.fill: parent
-            anchors.leftMargin: Colors.spacingM
-            anchors.rightMargin: Colors.spacingM
-            spacing: Colors.spacingS
+            anchors.margins: Colors.spacingM
+            spacing: Colors.spacingXS
 
             Text {
               color: Colors.textDisabled
@@ -2010,83 +2174,94 @@ PanelWindow {
               text: "PROVIDERS"
             }
 
-            Repeater {
-              model: launcherRoot.configuredWebProviders()
+            Flow {
+              width: parent.width
+              spacing: Colors.spacingS
 
-              delegate: Rectangle {
-                required property var modelData
+              Repeater {
+                model: launcherRoot.configuredWebProviders()
 
-                readonly property bool selected: String(modelData.key || "") === launcherRoot.selectedWebProviderKey
-                color: selected ? Colors.withAlpha(Colors.primary, 0.18) : Colors.surface
-                radius: Colors.radiusPill
-                border.color: selected ? Colors.withAlpha(Colors.primary, 0.6) : Colors.border
-                border.width: 1
-                implicitHeight: 28
-                implicitWidth: providerChipText.implicitWidth + 24
+                delegate: Rectangle {
+                  required property var modelData
 
-                Text {
-                  id: providerChipText
-                  anchors.centerIn: parent
-                  text: (modelData.icon || "󰖟") + " " + (modelData.name || "")
-                  color: parent.selected ? Colors.primary : Colors.textSecondary
-                  font.pixelSize: Colors.fontSizeXS
-                  font.weight: Font.DemiBold
-                }
+                  readonly property bool selected: String(modelData.key || "") === launcherRoot.selectedWebProviderKey
+                  color: selected ? Colors.withAlpha(Colors.primary, 0.18) : Colors.surface
+                  radius: Colors.radiusPill
+                  border.color: selected ? Colors.withAlpha(Colors.primary, 0.6) : Colors.border
+                  border.width: 1
+                  implicitHeight: 28
+                  implicitWidth: Math.min(providerChipText.implicitWidth + 24, providerFlowContainer.width)
 
-                MouseArea {
-                  anchors.fill: parent
-                  hoverEnabled: true
-                  cursorShape: Qt.PointingHandCursor
-                  onClicked: launcherRoot.selectWebProviderByKey(String(modelData.key || ""))
+                  Text {
+                    id: providerChipText
+                    anchors.centerIn: parent
+                    width: Math.min(implicitWidth, parent.width - 18)
+                    text: (modelData.icon || "󰖟") + " " + (modelData.name || "")
+                    color: parent.selected ? Colors.primary : Colors.textSecondary
+                    font.pixelSize: Colors.fontSizeXS
+                    font.weight: Font.DemiBold
+                    elide: Text.ElideRight
+                  }
+
+                  MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: launcherRoot.selectWebProviderByKey(String(modelData.key || ""))
+                  }
                 }
               }
-            }
-
-            Item {
-              Layout.fillWidth: true
             }
           }
         }
 
         Rectangle {
           Layout.fillWidth: true
-          visible: Config.launcherShowModeHints && launcherRoot.mode === "web"
+          visible: Config.launcherShowModeHints && launcherRoot.mode === "web" && !launcherRoot.tightMode
           color: Colors.bgWidget
           radius: Colors.radiusMedium
           border.color: Colors.border
           border.width: 1
-          implicitHeight: 34
+          implicitHeight: webHintColumn.implicitHeight + (Colors.spacingS * 2)
 
-          RowLayout {
+          Column {
+            id: webHintColumn
             anchors.fill: parent
-            anchors.leftMargin: Colors.spacingM
-            anchors.rightMargin: Colors.spacingM
-            spacing: Colors.spacingS
+            anchors.margins: Colors.spacingS
+            spacing: launcherRoot.webHintCompact ? 3 : Colors.spacingXS
+
+            Row {
+              width: parent.width
+              spacing: Colors.spacingS
+
+              Text {
+                text: "󰖟"
+                color: Colors.primary
+                font.family: Colors.fontMono
+                font.pixelSize: Colors.fontSizeSmall
+              }
+              Text {
+                width: parent.width - x
+                text: launcherRoot.webPrimaryEnterHint + " • " + launcherRoot.webSecondaryEnterHint + " • " + launcherRoot.webAliasHint
+                color: Colors.textSecondary
+                font.pixelSize: Colors.fontSizeXS
+                wrapMode: Text.WordWrap
+              }
+            }
 
             Text {
-              text: "󰖟"
-              color: Colors.primary
-              font.family: Colors.fontMono
-              font.pixelSize: Colors.fontSizeSmall
-            }
-            Text {
-              Layout.fillWidth: true
-              text: launcherRoot.webPrimaryEnterHint + " • " + launcherRoot.webSecondaryEnterHint
-              color: Colors.textSecondary
-              font.pixelSize: Colors.fontSizeXS
-              elide: Text.ElideRight
-            }
-            Text {
-              text: "Ctrl+Enter: Home"
+              width: parent.width
+              text: launcherRoot.webHotkeyHint
               color: Colors.textDisabled
               font.pixelSize: Colors.fontSizeXS
+              wrapMode: Text.WordWrap
             }
           }
         }
 
         Rectangle {
           Layout.fillWidth: true
-          visible: Config.launcherShowRuntimeMetrics
+          visible: Config.launcherShowRuntimeMetrics && !launcherRoot.tightMode
           color: Colors.bgWidget
           radius: Colors.radiusMedium
           border.color: Colors.border
@@ -2156,7 +2331,7 @@ PanelWindow {
           radius: Colors.radiusMedium
           border.color: Colors.border
           border.width: 1
-          implicitHeight: 130
+          implicitHeight: launcherRoot.compactMode ? 116 : 130
 
           ColumnLayout {
             anchors.fill: parent

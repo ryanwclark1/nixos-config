@@ -8,6 +8,8 @@ Item {
     id: root
     property var settingsRoot: null
     property string tabId: ""
+    property bool compactMode: false
+    property bool tightSpacing: false
     property string addSection: "left"
     property string widgetSearchQuery: ""
     property bool widgetPickerOpen: false
@@ -119,7 +121,7 @@ Item {
                         delegate: Item {
                             id: widgetRow
                             width: sectionColumn.width
-                            height: 58
+                            height: cardLayout.implicitHeight + Colors.spacingM * 2
                             required property var modelData
                             required property int index
                             readonly property string sectionKey: widgetSectionCard.sectionKey
@@ -145,66 +147,78 @@ Item {
                                 border.width: 1
                                 opacity: dragArea.drag.active ? 0.7 : 1.0
 
-                                RowLayout {
+                                ColumnLayout {
+                                    id: cardLayout
                                     anchors.fill: parent
                                     anchors.margins: Colors.spacingM
                                     spacing: Colors.spacingS
 
-                                    Text {
-                                        text: "󰆾"
-                                        color: Colors.fgDim
-                                        font.family: Colors.fontMono
-                                        font.pixelSize: Colors.fontSizeLarge
-                                    }
-
-                                    Text {
-                                        text: BarWidgetRegistry.displayIcon(widgetRow.modelData.widgetType)
-                                        color: Colors.primary
-                                        font.family: Colors.fontMono
-                                        font.pixelSize: Colors.fontSizeLarge
-                                    }
-
-                                    ColumnLayout {
+                                    RowLayout {
                                         Layout.fillWidth: true
-                                        spacing: 2
+                                        spacing: Colors.spacingS
 
                                         Text {
-                                            text: BarWidgetRegistry.displayName(widgetRow.modelData.widgetType)
-                                            color: Colors.text
-                                            font.pixelSize: Colors.fontSizeMedium
-                                            font.weight: Font.Medium
-                                            elide: Text.ElideRight
-                                            Layout.fillWidth: true
+                                            text: "󰆾"
+                                            color: Colors.fgDim
+                                            font.family: Colors.fontMono
+                                            font.pixelSize: Colors.fontSizeLarge
                                         }
 
                                         Text {
-                                            text: BarWidgetRegistry.description(widgetRow.modelData.widgetType)
-                                            color: Colors.fgSecondary
-                                            font.pixelSize: Colors.fontSizeXS
-                                            elide: Text.ElideRight
+                                            text: BarWidgetRegistry.displayIcon(widgetRow.modelData.widgetType)
+                                            color: Colors.primary
+                                            font.family: Colors.fontMono
+                                            font.pixelSize: Colors.fontSizeLarge
+                                        }
+
+                                        ColumnLayout {
                                             Layout.fillWidth: true
+                                            spacing: 2
+
+                                            Text {
+                                                text: BarWidgetRegistry.displayName(widgetRow.modelData.widgetType)
+                                                color: Colors.text
+                                                font.pixelSize: Colors.fontSizeMedium
+                                                font.weight: Font.Medium
+                                                elide: Text.ElideRight
+                                                Layout.fillWidth: true
+                                            }
+
+                                            Text {
+                                                text: BarWidgetRegistry.description(widgetRow.modelData.widgetType)
+                                                color: Colors.fgSecondary
+                                                font.pixelSize: Colors.fontSizeXS
+                                                Layout.fillWidth: true
+                                                wrapMode: Text.WordWrap
+                                            }
                                         }
                                     }
 
-                                    SharedWidgets.FilterChip {
-                                        label: widgetRow.modelData.enabled === false ? "Hidden" : "Visible"
-                                        selected: widgetRow.modelData.enabled !== false
-                                        onClicked: root.toggleWidgetEnabled(widgetRow.sectionKey, widgetRow.modelData)
-                                    }
+                                    Flow {
+                                        Layout.fillWidth: true
+                                        width: parent.width
+                                        spacing: Colors.spacingS
 
-                                    SettingsActionButton {
-                                        compact: true
-                                        iconName: "󰍜"
-                                        label: "Settings"
-                                        enabled: BarWidgetRegistry.supportsSettings(widgetRow.modelData.widgetType)
-                                        onClicked: root.openWidgetSettings(widgetRow.sectionKey, widgetRow.modelData.instanceId)
-                                    }
+                                        SharedWidgets.FilterChip {
+                                            label: widgetRow.modelData.enabled === false ? "Hidden" : "Visible"
+                                            selected: widgetRow.modelData.enabled !== false
+                                            onClicked: root.toggleWidgetEnabled(widgetRow.sectionKey, widgetRow.modelData)
+                                        }
 
-                                    SettingsActionButton {
-                                        compact: true
-                                        iconName: "󰅖"
-                                        label: "Remove"
-                                        onClicked: root.removeWidget(widgetRow.sectionKey, widgetRow.modelData.instanceId)
+                                        SettingsActionButton {
+                                            compact: true
+                                            iconName: "󰍜"
+                                            label: "Settings"
+                                            enabled: BarWidgetRegistry.supportsSettings(widgetRow.modelData.widgetType)
+                                            onClicked: root.openWidgetSettings(widgetRow.sectionKey, widgetRow.modelData.instanceId)
+                                        }
+
+                                        SettingsActionButton {
+                                            compact: true
+                                            iconName: "󰅖"
+                                            label: "Remove"
+                                            onClicked: root.removeWidget(widgetRow.sectionKey, widgetRow.modelData.instanceId)
+                                        }
                                     }
                                 }
                             }
@@ -268,8 +282,8 @@ Item {
         }
 
         Rectangle {
-            width: Math.min(640, parent.width - 80)
-            height: Math.min(560, parent.height - 80)
+            width: Math.min(root.compactMode ? 560 : 640, parent.width - (root.tightSpacing ? 40 : 80))
+            height: Math.min(560, parent.height - (root.tightSpacing ? 40 : 80))
             anchors.centerIn: parent
             radius: Colors.radiusLarge
             color: Colors.popupSurface
@@ -281,16 +295,22 @@ Item {
                 anchors.margins: Colors.paddingLarge
                 spacing: Colors.spacingM
 
-                RowLayout {
+                Flow {
                     Layout.fillWidth: true
+                    width: parent.width
+                    spacing: Colors.spacingS
+
                     Text {
+                        width: root.compactMode ? parent.width : Math.max(0, parent.width - closePickerButton.implicitWidth - Colors.spacingS)
                         text: "Add Widget to " + root.sectionLabel(root.addSection)
                         color: Colors.text
                         font.pixelSize: Colors.fontSizeXL
                         font.weight: Font.DemiBold
-                        Layout.fillWidth: true
+                        wrapMode: Text.WordWrap
                     }
+
                     SettingsActionButton {
+                        id: closePickerButton
                         compact: true
                         iconName: "󰅖"
                         label: "Close"
@@ -379,7 +399,7 @@ Item {
         }
 
         Rectangle {
-            width: Math.min(460, parent.width - 80)
+            width: Math.min(460, parent.width - (root.tightSpacing ? 40 : 80))
             implicitHeight: settingsColumn.implicitHeight + Colors.paddingLarge * 2
             anchors.centerIn: parent
             radius: Colors.radiusLarge
@@ -393,16 +413,22 @@ Item {
                 anchors.margins: Colors.paddingLarge
                 spacing: Colors.spacingM
 
-                RowLayout {
+                Flow {
                     Layout.fillWidth: true
+                    width: parent.width
+                    spacing: Colors.spacingS
+
                     Text {
+                        width: root.compactMode ? parent.width : Math.max(0, parent.width - closeSettingsButton.implicitWidth - Colors.spacingS)
                         text: root.editingWidget ? (BarWidgetRegistry.displayName(root.editingWidget.widgetType) + " Settings") : "Widget Settings"
                         color: Colors.text
                         font.pixelSize: Colors.fontSizeXL
                         font.weight: Font.DemiBold
-                        Layout.fillWidth: true
+                        wrapMode: Text.WordWrap
                     }
+
                     SettingsActionButton {
+                        id: closeSettingsButton
                         compact: true
                         iconName: "󰅖"
                         label: "Close"

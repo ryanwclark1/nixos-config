@@ -13,6 +13,13 @@ PanelWindow {
   readonly property var edgeMargins: Config.reservedEdgesForScreen(screenRef, "")
   readonly property int usableWidth: Math.max(0, width - edgeMargins.left - edgeMargins.right)
   readonly property int usableHeight: Math.max(0, height - edgeMargins.top - edgeMargins.bottom)
+  readonly property bool isPortrait: usableHeight > usableWidth
+  readonly property real gutterX: Math.min(56, Math.max(24, usableWidth * 0.04))
+  readonly property real gutterY: Math.min(48, Math.max(24, usableHeight * 0.04))
+  readonly property bool compactMode: isPortrait || usableWidth < 1024 || usableHeight < 760
+  readonly property bool tightSpacing: usableWidth < 720 || usableHeight < 640
+  readonly property int sidebarWidth: compactMode ? 72 : 256
+  property string searchQuery: ""
 
   anchors {
     top: true
@@ -47,6 +54,8 @@ PanelWindow {
   }
 
   function open() {
+    if (!SettingsRegistry.findTab(currentTabId))
+      currentTabId = SettingsRegistry.defaultTabId;
     isOpen = true;
     if (CompositorAdapter.isHyprland) refreshHyprlandSettings();
   }
@@ -134,12 +143,12 @@ PanelWindow {
   Rectangle {
     id: mainBox
     enabled: !settingsRoot.interactionBlocked
-    width: Math.min(Math.max(320, settingsRoot.usableWidth - 40), 780)
-    height: Math.min(Math.max(360, settingsRoot.usableHeight - 40), 860)
+    width: Math.min(Math.max(320, settingsRoot.usableWidth - settingsRoot.gutterX * 2), 960)
+    height: Math.min(Math.max(360, settingsRoot.usableHeight - settingsRoot.gutterY * 2), 920)
     anchors.top: parent.top
     anchors.left: parent.left
-    anchors.topMargin: settingsRoot.edgeMargins.top + Math.max(20, (settingsRoot.usableHeight - height) / 2)
-    anchors.leftMargin: settingsRoot.edgeMargins.left + Math.max(20, (settingsRoot.usableWidth - width) / 2)
+    anchors.topMargin: settingsRoot.edgeMargins.top + Math.max(settingsRoot.gutterY, (settingsRoot.usableHeight - height) / 2)
+    anchors.leftMargin: settingsRoot.edgeMargins.left + Math.max(settingsRoot.gutterX, (settingsRoot.usableWidth - width) / 2)
     color: Colors.bgGlass
     border.color: Colors.border
     border.width: 1
@@ -164,8 +173,12 @@ PanelWindow {
       spacing: 0
 
       SettingsSidebar {
+        Layout.preferredWidth: settingsRoot.sidebarWidth
         currentTabId: settingsRoot.currentTabId
+        searchQuery: settingsRoot.searchQuery
+        compactMode: settingsRoot.compactMode
         onTabSelected: (tabId) => settingsRoot.currentTabId = tabId
+        onSearchQueryEdited: (query) => settingsRoot.searchQuery = query
         onSaveAndClose: {
           Config.save();
           settingsRoot.close();
@@ -177,6 +190,11 @@ PanelWindow {
         Layout.fillHeight: true
         currentTabId: settingsRoot.currentTabId
         settingsRoot: settingsRoot
+        searchQuery: settingsRoot.searchQuery
+        compactMode: settingsRoot.compactMode
+        tightSpacing: settingsRoot.tightSpacing
+        onTabSelected: (tabId) => settingsRoot.currentTabId = tabId
+        onSearchQueryEdited: (query) => settingsRoot.searchQuery = query
       }
     }
   }

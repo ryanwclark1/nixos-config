@@ -8,6 +8,8 @@ Item {
     id: root
     property var settingsRoot: null
     property string tabId: ""
+    property bool compactMode: false
+    property bool tightSpacing: false
 
     SettingsTabPage {
         anchors.fill: parent
@@ -20,13 +22,14 @@ Item {
             iconName: "󰏗"
             description: "Discover and toggle installed bar and desktop widget plugins."
 
-            RowLayout {
+            Flow {
                 Layout.fillWidth: true
+                width: parent.width
                 spacing: Colors.spacingM
 
                 ColumnLayout {
                     spacing: 2
-                    Layout.fillWidth: true
+                    width: root.compactMode ? parent.width : Math.max(0, parent.width - scanPluginsButton.implicitWidth - Colors.spacingM)
 
                     Text {
                         text: PluginService.plugins.length + " plugin" + (PluginService.plugins.length !== 1 ? "s" : "") + " found"
@@ -45,6 +48,7 @@ Item {
                 }
 
                 SettingsActionButton {
+                    id: scanPluginsButton
                     label: "Scan"
                     iconName: "󰑐"
                     compact: true
@@ -115,7 +119,9 @@ Item {
                         Layout.fillWidth: true
                         spacing: 3
 
-                        RowLayout {
+                        Flow {
+                            Layout.fillWidth: true
+                            width: parent.width
                             spacing: Colors.spacingS
 
                             Text {
@@ -123,8 +129,9 @@ Item {
                                 color: Colors.text
                                 font.pixelSize: Colors.fontSizeMedium
                                 font.weight: Font.DemiBold
-                                Layout.fillWidth: true
+                                width: root.compactMode ? parent.width : undefined
                                 elide: Text.ElideRight
+                                wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap
                             }
 
                             Rectangle {
@@ -163,8 +170,8 @@ Item {
                             text: modelData.description
                             color: Colors.fgSecondary
                             font.pixelSize: Colors.fontSizeSmall
-                            elide: Text.ElideRight
                             Layout.fillWidth: true
+                            wrapMode: Text.WordWrap
                         }
                         Text {
                             text: "by " + modelData.author

@@ -1,7 +1,9 @@
 import QtQuick
 import "../modules"
+import "../services"
 
 Row {
+  visible: CompositorAdapter.isHyprland
   spacing: 6
 
   ActionButton {

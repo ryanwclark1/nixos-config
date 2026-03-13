@@ -57,6 +57,14 @@ QtObject {
   property int launcherSearchDebounceMs: 35
   property int launcherFileSearchDebounceMs: 140
   property bool launcherWebEnterUsesPrimary: true
+  property bool launcherWebNumberHotkeysEnabled: true
+  property var launcherWebAliases: ({
+    "duckduckgo": ["d", "ddg"],
+    "google": ["g"],
+    "youtube": ["yt"],
+    "nixos": ["nix", "np"],
+    "github": ["gh"]
+  })
   property bool launcherRememberWebProvider: true
   property string launcherWebLastProviderKey: "duckduckgo"
   property var launcherWebProviderOrder: ["duckduckgo", "google", "youtube", "nixos", "github"]
@@ -285,6 +293,52 @@ QtObject {
     return out;
   }
 
+  function _normalizeWebAliases(map, fallbackMap) {
+    var allowed = ["duckduckgo", "google", "youtube", "nixos", "github"];
+    var source = (map && typeof map === "object") ? map : {};
+    var out = ({});
+    var globalSeen = ({});
+    var i;
+
+    function addToken(token, seen, bucket, providerKey) {
+      var normalized = String(token || "").trim().toLowerCase();
+      if (normalized === "") return;
+      if (!/^[a-z0-9][a-z0-9_-]{0,15}$/.test(normalized)) return;
+      if (seen[normalized] || globalSeen[normalized]) return;
+      if (normalized === providerKey) return;
+      seen[normalized] = true;
+      globalSeen[normalized] = true;
+      bucket.push(normalized);
+    }
+
+    for (i = 0; i < allowed.length; ++i) {
+      var provider = allowed[i];
+      var raw = source[provider];
+      var defaults = Array.isArray(fallbackMap[provider]) ? fallbackMap[provider] : [];
+      var tokens = [];
+      var seen = ({});
+      var j;
+
+      if (Array.isArray(raw)) {
+        for (j = 0; j < raw.length; ++j)
+          addToken(raw[j], seen, tokens, provider);
+      } else if (typeof raw === "string") {
+        var parts = raw.split(/[\s,]+/);
+        for (j = 0; j < parts.length; ++j)
+          addToken(parts[j], seen, tokens, provider);
+      }
+
+      if (tokens.length === 0) {
+        for (j = 0; j < defaults.length; ++j)
+          addToken(defaults[j], seen, tokens, provider);
+      }
+
+      out[provider] = tokens;
+    }
+
+    return out;
+  }
+
   function normalizeLauncherConfig(data) {
     var launcher = data && data.launcher ? data.launcher : {};
     var fallbackModes = ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"];
@@ -315,6 +369,14 @@ QtObject {
     launcherSearchDebounceMs = _clampInt(launcher.searchDebounceMs, 0, 250, 35);
     launcherFileSearchDebounceMs = _clampInt(launcher.fileSearchDebounceMs, 50, 1200, 140);
     launcherWebEnterUsesPrimary = _asBool(launcher.webEnterUsesPrimary, true);
+    launcherWebNumberHotkeysEnabled = _asBool(launcher.webNumberHotkeysEnabled, true);
+    launcherWebAliases = _normalizeWebAliases(launcher.webAliases, {
+      "duckduckgo": ["d", "ddg"],
+      "google": ["g"],
+      "youtube": ["yt"],
+      "nixos": ["nix", "np"],
+      "github": ["gh"]
+    });
     launcherWebProviderOrder = _normalizeWebProviderOrder(launcher.webProviderOrder, fallbackWebProviders);
     launcherRememberWebProvider = _asBool(launcher.rememberWebProvider, true);
     launcherWebLastProviderKey = String(launcher.webLastProviderKey || "duckduckgo");
@@ -978,6 +1040,8 @@ QtObject {
   onLauncherSearchDebounceMsChanged: scheduleSave()
   onLauncherFileSearchDebounceMsChanged: scheduleSave()
   onLauncherWebEnterUsesPrimaryChanged: scheduleSave()
+  onLauncherWebNumberHotkeysEnabledChanged: scheduleSave()
+  onLauncherWebAliasesChanged: scheduleSave()
   onLauncherRememberWebProviderChanged: scheduleSave()
   onLauncherWebLastProviderKeyChanged: scheduleSave()
   onLauncherWebProviderOrderChanged: scheduleSave()
@@ -1242,6 +1306,8 @@ QtObject {
         "searchDebounceMs": launcherSearchDebounceMs,
         "fileSearchDebounceMs": launcherFileSearchDebounceMs,
         "webEnterUsesPrimary": launcherWebEnterUsesPrimary,
+        "webNumberHotkeysEnabled": launcherWebNumberHotkeysEnabled,
+        "webAliases": launcherWebAliases,
         "rememberWebProvider": launcherRememberWebProvider,
         "webLastProviderKey": launcherWebLastProviderKey,
         "webProviderOrder": launcherWebProviderOrder,

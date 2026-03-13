@@ -8,6 +8,8 @@ Item {
     id: root
     property var settingsRoot: null
     property string tabId: ""
+    property bool compactMode: false
+    property bool tightSpacing: false
     property bool latValid: {
         var v = parseFloat(Config.weatherLatitude);
         return !isNaN(v) && v >= -90 && v <= 90;
@@ -56,16 +58,18 @@ Item {
 
             Rectangle {
                 Layout.fillWidth: true
-                implicitHeight: 84
+                implicitHeight: root.compactMode ? compactPreview.implicitHeight + Colors.spacingM * 2 : 84
                 radius: Colors.radiusMedium
                 color: Colors.withAlpha(Colors.surface, 0.78)
                 border.color: Colors.border
                 border.width: 1
 
                 RowLayout {
+                    id: widePreview
                     anchors.fill: parent
                     anchors.margins: Colors.spacingM
                     spacing: Colors.spacingM
+                    visible: !root.compactMode
 
                     Rectangle {
                         implicitHeight: 34
@@ -104,6 +108,7 @@ Item {
                     }
 
                     ColumnLayout {
+                        Layout.fillWidth: true
                         spacing: 2
 
                         Text {
@@ -118,7 +123,70 @@ Item {
                             color: Colors.textSecondary
                             font.pixelSize: Colors.fontSizeSmall
                             elide: Text.ElideRight
-                            Layout.preferredWidth: 180
+                            Layout.fillWidth: true
+                        }
+                    }
+                }
+
+                ColumnLayout {
+                    id: compactPreview
+                    anchors.fill: parent
+                    anchors.margins: Colors.spacingM
+                    spacing: Colors.spacingS
+                    visible: root.compactMode
+
+                    Rectangle {
+                        Layout.alignment: Qt.AlignLeft
+                        implicitHeight: 34
+                        implicitWidth: timePreviewCompact.implicitWidth + datePreviewCompact.implicitWidth + Colors.spacingM * 3
+                        radius: Colors.radiusPill
+                        color: Colors.withAlpha(Colors.primary, 0.2)
+                        border.color: Colors.withAlpha(Colors.primary, 0.45)
+                        border.width: 1
+
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.leftMargin: Colors.spacingM
+                            anchors.rightMargin: Colors.spacingM
+                            spacing: Colors.spacingS
+
+                            Text {
+                                id: timePreviewCompact
+                                text: Qt.formatDateTime(previewClock.date, Config.timeUse24Hour ? (Config.timeShowSeconds ? "HH:mm:ss" : "HH:mm") : (Config.timeShowSeconds ? "hh:mm:ss AP" : "hh:mm AP"))
+                                color: Colors.text
+                                font.pixelSize: Colors.fontSizeLarge
+                                font.weight: Font.Bold
+                            }
+
+                            Text {
+                                id: datePreviewCompact
+                                text: root.barDatePreview(previewClock.date)
+                                visible: text !== ""
+                                color: Colors.textSecondary
+                                font.pixelSize: Colors.fontSizeMedium
+                            }
+                        }
+                    }
+
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 2
+
+                        Text {
+                            text: (WeatherService.condition || "Weather") + "  " + (WeatherService.temp || "--")
+                            color: Colors.text
+                            font.pixelSize: Colors.fontSizeMedium
+                            font.weight: Font.DemiBold
+                            Layout.fillWidth: true
+                            wrapMode: Text.WordWrap
+                        }
+
+                        Text {
+                            text: root.activeLocationSummary()
+                            color: Colors.textSecondary
+                            font.pixelSize: Colors.fontSizeSmall
+                            Layout.fillWidth: true
+                            wrapMode: Text.WordWrap
                         }
                     }
                 }
