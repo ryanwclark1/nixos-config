@@ -241,6 +241,7 @@ Item {
         Config.launcherCacheTtlSec = 300;
         Config.launcherSearchDebounceMs = 35;
         Config.launcherFileSearchDebounceMs = 140;
+        Config.launcherWebEnterUsesPrimary = true;
         Config.launcherWebProviderOrder = webProviderDefaultOrder.slice();
         Config.launcherEnabledModes = launcherDefaultModes.slice();
         Config.launcherModeOrder = launcherDefaultModes.slice();
@@ -396,6 +397,11 @@ Item {
                     label: "Show Runtime Metrics"
                     icon: "󰓅"
                     configKey: "launcherShowRuntimeMetrics"
+                }
+                SettingsToggleRow {
+                    label: "Web Enter Uses Primary"
+                    icon: "󰖟"
+                    configKey: "launcherWebEnterUsesPrimary"
                 }
             }
 

@@ -33,6 +33,7 @@ PopupWindow {
   readonly property bool isGrouped: toplevels.length > 1
   property bool showWorkspaceList: false
   readonly property var desktopActions: dockRoot ? dockRoot.getAppActions(appId) : []
+  readonly property real inset: 8
 
   function _windowX(item) {
     var x = 0;
@@ -48,20 +49,34 @@ PopupWindow {
 
   anchor.rect.x: {
     if (!anchorItem) return 0;
+    var x = 0;
     if (anchorEdge === "left")
-      return _windowX(anchorItem) + anchorItem.width + 8;
-    if (anchorEdge === "right")
-      return _windowX(anchorItem) - implicitWidth - 8;
-    return _windowX(anchorItem) + (anchorItem.width - implicitWidth) / 2;
+      x = _windowX(anchorItem) + anchorItem.width + 8;
+    else if (anchorEdge === "right")
+      x = _windowX(anchorItem) - implicitWidth - 8;
+    else
+      x = _windowX(anchorItem) + (anchorItem.width - implicitWidth) / 2;
+    if (anchorWindow && anchorWindow.width !== undefined) {
+      var maxX = Math.max(inset, anchorWindow.width - implicitWidth - inset);
+      x = Math.min(Math.max(inset, x), maxX);
+    }
+    return x;
   }
 
   anchor.rect.y: {
     if (!anchorItem) return 0;
+    var y = 0;
     if (anchorEdge === "top")
-      return _windowY(anchorItem) + anchorItem.height + 8;
-    if (anchorEdge === "bottom")
-      return _windowY(anchorItem) - implicitHeight - 8;
-    return _windowY(anchorItem) + (anchorItem.height - implicitHeight) / 2;
+      y = _windowY(anchorItem) + anchorItem.height + 8;
+    else if (anchorEdge === "bottom")
+      y = _windowY(anchorItem) - implicitHeight - 8;
+    else
+      y = _windowY(anchorItem) + (anchorItem.height - implicitHeight) / 2;
+    if (anchorWindow && anchorWindow.height !== undefined) {
+      var maxY = Math.max(inset, anchorWindow.height - implicitHeight - inset);
+      y = Math.min(Math.max(inset, y), maxY);
+    }
+    return y;
   }
 
   function open() {

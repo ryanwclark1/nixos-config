@@ -56,6 +56,7 @@ QtObject {
   property int launcherCacheTtlSec: 300
   property int launcherSearchDebounceMs: 35
   property int launcherFileSearchDebounceMs: 140
+  property bool launcherWebEnterUsesPrimary: true
   property var launcherWebProviderOrder: ["duckduckgo", "google", "youtube", "nixos", "github"]
   property var launcherModeOrder: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
   property var launcherEnabledModes: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
@@ -311,6 +312,7 @@ QtObject {
     launcherCacheTtlSec = _clampInt(launcher.cacheTtlSec, 10, 3600, 300);
     launcherSearchDebounceMs = _clampInt(launcher.searchDebounceMs, 0, 250, 35);
     launcherFileSearchDebounceMs = _clampInt(launcher.fileSearchDebounceMs, 50, 1200, 140);
+    launcherWebEnterUsesPrimary = _asBool(launcher.webEnterUsesPrimary, true);
     launcherWebProviderOrder = _normalizeWebProviderOrder(launcher.webProviderOrder, fallbackWebProviders);
 
     launcherScoreNameWeight = _clampReal(launcher.scoreNameWeight, 0.1, 4.0, 1.0);
@@ -969,6 +971,7 @@ QtObject {
   onLauncherCacheTtlSecChanged: scheduleSave()
   onLauncherSearchDebounceMsChanged: scheduleSave()
   onLauncherFileSearchDebounceMsChanged: scheduleSave()
+  onLauncherWebEnterUsesPrimaryChanged: scheduleSave()
   onLauncherWebProviderOrderChanged: scheduleSave()
   onLauncherModeOrderChanged: scheduleSave()
   onLauncherEnabledModesChanged: scheduleSave()
@@ -1230,6 +1233,7 @@ QtObject {
         "cacheTtlSec": launcherCacheTtlSec,
         "searchDebounceMs": launcherSearchDebounceMs,
         "fileSearchDebounceMs": launcherFileSearchDebounceMs,
+        "webEnterUsesPrimary": launcherWebEnterUsesPrimary,
         "webProviderOrder": launcherWebProviderOrder,
         "modeOrder": launcherModeOrder,
         "enabledModes": launcherEnabledModes,

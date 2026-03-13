@@ -236,6 +236,11 @@ PanelWindow {
   readonly property string legendPrimaryAction: {
     if (showingConfirm) return "Enter: Confirm";
     if (!hasResults) return "Enter: " + emptyPrimaryCta;
+    if (mode === "web" && Config.launcherWebEnterUsesPrimary) {
+      var primary = primaryWebProvider();
+      var label = primary ? primary.name : "Web";
+      return "Enter: Search " + label;
+    }
     var action = itemActionLabel(selectedItem);
     if (action === "") action = "Open";
     return "Enter: " + action;
@@ -1548,6 +1553,25 @@ PanelWindow {
     }
   }
 
+  function executePrimaryWebSearch() {
+    if (mode !== "web")
+      return;
+    var provider = primaryWebProvider();
+    if (!provider)
+      return;
+    var clean = stripModePrefix(searchText).trim();
+    var target = "";
+    if (clean !== "" && provider.exec)
+      target = String(provider.exec) + encodeURIComponent(clean);
+    else
+      target = String(provider.home || provider.exec || "");
+    if (target === "")
+      return;
+    rememberRecent({ name: provider.name || "Web", title: target, icon: provider.icon || "󰖟", exec: String(provider.exec || "") });
+    Quickshell.execDetached(["xdg-open", target]);
+    close();
+  }
+
   function activateFeatured(item) {
     if (item.openMode) {
       open(item.openMode);
@@ -1827,6 +1851,7 @@ PanelWindow {
                   event.accepted = true;
                 } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                   if ((event.modifiers & Qt.ControlModifier) && launcherRoot.mode === "web" && launcherRoot.filteredItems.length > 0) launcherRoot.openSelectedWebHomepage();
+                  else if (launcherRoot.mode === "web" && launcherRoot.filteredItems.length > 0 && !(event.modifiers & Qt.ShiftModifier) && Config.launcherWebEnterUsesPrimary) launcherRoot.executePrimaryWebSearch();
                   else if ((event.modifiers & Qt.ShiftModifier) && launcherRoot.filteredItems.length === 0 && launcherRoot.emptySecondaryCta !== "") launcherRoot.executeEmptySecondary();
                   else if (launcherRoot.mode === "ai" && launcherRoot.filteredItems.length === 0) launcherRoot.loadAi();
                   else if (launcherRoot.mode === "files" && launcherRoot.stripModePrefix(launcherRoot.searchText).trim().length >= Config.launcherFileMinQueryLength && launcherRoot.filteredItems.length === 0) launcherRoot.loadFiles();

@@ -17,6 +17,7 @@ PopupWindow {
   readonly property string tooltipText: String(text || "").trim()
   readonly property bool hasText: tooltipText.length > 0
   property bool ready: false
+  readonly property real inset: 8
   readonly property string anchorEdge: {
     if (preferredEdge !== "") return preferredEdge;
     if (anchorWindow && anchorWindow.tooltipEdge !== undefined && anchorWindow.tooltipEdge !== "")
@@ -43,19 +44,33 @@ PopupWindow {
 
   anchor.rect.x: {
     if (!anchorItem || !anchorItem.width) return 0;
+    var x = 0;
     if (anchorEdge === "left")
-      return _windowX(anchorItem) + anchorItem.width + gap;
-    if (anchorEdge === "right")
-      return _windowX(anchorItem) - implicitWidth - gap;
-    return _windowX(anchorItem) + (anchorItem.width - implicitWidth) / 2;
+      x = _windowX(anchorItem) + anchorItem.width + gap;
+    else if (anchorEdge === "right")
+      x = _windowX(anchorItem) - implicitWidth - gap;
+    else
+      x = _windowX(anchorItem) + (anchorItem.width - implicitWidth) / 2;
+    if (anchorWindow && anchorWindow.width !== undefined) {
+      var maxX = Math.max(inset, anchorWindow.width - implicitWidth - inset);
+      x = Math.min(Math.max(inset, x), maxX);
+    }
+    return x;
   }
   anchor.rect.y: {
     if (!anchorItem || !anchorItem.height) return 0;
+    var y = 0;
     if (anchorEdge === "bottom")
-      return _windowY(anchorItem) - implicitHeight - gap;
-    if (anchorEdge === "left" || anchorEdge === "right")
-      return _windowY(anchorItem) + (anchorItem.height - implicitHeight) / 2;
-    return _windowY(anchorItem) + anchorItem.height + gap;
+      y = _windowY(anchorItem) - implicitHeight - gap;
+    else if (anchorEdge === "left" || anchorEdge === "right")
+      y = _windowY(anchorItem) + (anchorItem.height - implicitHeight) / 2;
+    else
+      y = _windowY(anchorItem) + anchorItem.height + gap;
+    if (anchorWindow && anchorWindow.height !== undefined) {
+      var maxY = Math.max(inset, anchorWindow.height - implicitHeight - inset);
+      y = Math.min(Math.max(inset, y), maxY);
+    }
+    return y;
   }
 
   implicitWidth: tooltipBody.width
