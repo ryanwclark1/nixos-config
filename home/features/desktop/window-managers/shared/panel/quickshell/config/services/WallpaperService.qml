@@ -154,6 +154,35 @@ QtObject {
     return solidColorsByMonitor[key] || solidColorsByMonitor["__all__"] || "";
   }
 
+  function clearSolidForMonitor(monitorName, reapplyImage, notifyUser) {
+    if (applyProc.running || colorApplyProc.running) {
+      if (notifyUser !== false)
+        ToastService.showNotice("Wallpaper busy", "Please wait for current wallpaper operation.");
+      return;
+    }
+    var key = monitorName || "__all__";
+    var mapObj = Object.assign({}, solidColorsByMonitor);
+    delete mapObj[key];
+    _persistSolidMap(mapObj);
+    if (!solidColorActive)
+      solidColorHex = Config.wallpaperSolidColor || "000000ff";
+
+    if (!reapplyImage) {
+      if (notifyUser !== false)
+        ToastService.showSuccess("Solid disabled", "Using image mode for this target.");
+      return;
+    }
+
+    var imagePath = key === "__all__"
+      ? (wallpapers["__all__"] || "")
+      : (wallpapers[key] || wallpapers["__all__"] || "");
+    if (imagePath) {
+      setWallpaper(imagePath, monitorName || "");
+    } else if (notifyUser !== false) {
+      ToastService.showNotice("No image wallpaper", "No saved image was found for this target.");
+    }
+  }
+
   function _persistSolidMap(mapObj) {
     solidColorsByMonitor = mapObj;
     Config.wallpaperSolidColorsByMonitor = Object.assign({}, mapObj);

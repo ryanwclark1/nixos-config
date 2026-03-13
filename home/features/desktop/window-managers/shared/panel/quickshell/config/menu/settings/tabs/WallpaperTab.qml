@@ -22,6 +22,7 @@ Item {
     property real pickerSaturation: 0
     property real pickerValue: 0
     property real pickerAlpha: 100
+    property string _settingsExportText: ""
     property var _unsupportedImagePaths: ({})
 
     function isWallpaperFolderPathValid(path) {
@@ -201,6 +202,67 @@ Item {
         Config.wallpaperRecentSolidColors = [];
     }
 
+    function exportWallpaperSettings() {
+        var payload = {
+            defaultFolder: Config.wallpaperDefaultFolder,
+            cycleInterval: Config.wallpaperCycleInterval,
+            runPywal: Config.wallpaperRunPywal,
+            solidColor: Config.wallpaperSolidColor,
+            useSolidOnStartup: Config.wallpaperUseSolidOnStartup,
+            solidColorsByMonitor: Config.wallpaperSolidColorsByMonitor,
+            recentSolidColors: Config.wallpaperRecentSolidColors
+        };
+        _settingsExportText = JSON.stringify(payload, null, 2);
+        if (settingsExportProc.running)
+            return;
+        settingsExportProc.command = [
+            "sh", "-c",
+            "if command -v wl-copy >/dev/null 2>&1; then "
+            + "cat | wl-copy; "
+            + "elif command -v xclip >/dev/null 2>&1; then "
+            + "cat | xclip -selection clipboard; "
+            + "else exit 127; fi"
+        ];
+        settingsExportProc.running = true;
+    }
+
+    function importWallpaperSettings() {
+        if (!settingsImportProc.running)
+            settingsImportProc.running = true;
+    }
+
+    function _sanitizeSolidColorMap(value) {
+        var out = {};
+        if (!value || typeof value !== "object")
+            return out;
+        var keys = Object.keys(value);
+        for (var i = 0; i < keys.length; i++) {
+            var key = String(keys[i] || "");
+            if (!key.length)
+                continue;
+            var color = _normalizeSolidColor(value[key]);
+            if (!color)
+                continue;
+            out[key] = color;
+        }
+        return out;
+    }
+
+    function _sanitizeRecentSolidColors(value) {
+        var out = [];
+        if (!Array.isArray(value))
+            return out;
+        for (var i = 0; i < value.length; i++) {
+            var color = _normalizeSolidColor(value[i]);
+            if (!color || out.indexOf(color) >= 0)
+                continue;
+            out.push(color);
+            if (out.length >= 12)
+                break;
+        }
+        return out;
+    }
+
     Process {
         id: wallpaperMonProc
         command: ["hyprctl", "monitors", "-j"]
@@ -255,6 +317,86 @@ Item {
                 }
                 root.solidColorError = "";
                 root.solidColorInput = "#" + normalized.slice(0, 6);
+            }
+        }
+    }
+
+    Process {
+        id: settingsExportProc
+        running: false
+        stdinEnabled: true
+        onStarted: {
+            settingsExportProc.write(_settingsExportText);
+            settingsExportProc.closeStdin();
+        }
+        onExited: (exitCode, exitStatus) => {
+            if (exitCode === 0)
+                ToastService.showSuccess("Exported", "Wallpaper settings copied to clipboard.");
+            else
+                ToastService.showError("Export failed", "No clipboard utility found (wl-copy/xclip).");
+        }
+    }
+
+    Process {
+        id: settingsImportProc
+        command: ["sh", "-c", "if command -v wl-paste >/dev/null 2>&1; then wl-paste --no-newline; elif command -v xclip >/dev/null 2>&1; then xclip -o -selection clipboard; else exit 127; fi"]
+        running: false
+        onExited: (exitCode, exitStatus) => {
+            if (exitCode === 127)
+                ToastService.showError("Import failed", "No clipboard utility found (wl-paste/xclip).");
+        }
+        stdout: StdioCollector {
+            onStreamFinished: {
+                var raw = (this.text || "").trim();
+                if (!raw.length) {
+                    ToastService.showError("Import failed", "Clipboard is empty.");
+                    return;
+                }
+                try {
+                    var data = JSON.parse(raw);
+                    var skipped = [];
+
+                    if (data.defaultFolder !== undefined) {
+                        var folder = String(data.defaultFolder || "").trim();
+                        if (root.isWallpaperFolderPathValid(folder))
+                            Config.wallpaperDefaultFolder = folder;
+                        else
+                            skipped.push("defaultFolder");
+                    }
+                    if (data.cycleInterval !== undefined)
+                        Config.wallpaperCycleInterval = Math.max(0, parseInt(data.cycleInterval, 10) || 0);
+                    if (data.runPywal !== undefined)
+                        Config.wallpaperRunPywal = !!data.runPywal;
+                    if (data.solidColor !== undefined) {
+                        var solid = root._normalizeSolidColor(data.solidColor);
+                        if (solid)
+                            Config.wallpaperSolidColor = solid;
+                        else
+                            skipped.push("solidColor");
+                    }
+                    if (data.useSolidOnStartup !== undefined)
+                        Config.wallpaperUseSolidOnStartup = !!data.useSolidOnStartup;
+                    if (data.solidColorsByMonitor !== undefined) {
+                        var solidMap = root._sanitizeSolidColorMap(data.solidColorsByMonitor);
+                        Config.wallpaperSolidColorsByMonitor = Object.assign({}, solidMap);
+                    }
+                    if (data.recentSolidColors !== undefined) {
+                        var recents = root._sanitizeRecentSolidColors(data.recentSolidColors);
+                        Config.wallpaperRecentSolidColors = recents;
+                    }
+
+                    root.wallpaperFolderInput = Config.wallpaperDefaultFolder;
+                    root.solidColorInput = "#" + (Config.wallpaperSolidColor || "000000ff").slice(0, 6);
+                    WallpaperService.solidColorsByMonitor = Object.assign({}, Config.wallpaperSolidColorsByMonitor || {});
+                    WallpaperService.solidColorActive = Object.keys(WallpaperService.solidColorsByMonitor).length > 0;
+                    WallpaperService.scanWallpapers();
+                    if (skipped.length > 0)
+                        ToastService.showNotice("Imported with skips", "Ignored invalid fields: " + skipped.join(", "));
+                    else
+                        ToastService.showSuccess("Imported", "Wallpaper settings imported from clipboard.");
+                } catch (e) {
+                    ToastService.showError("Import failed", "Clipboard does not contain valid wallpaper JSON.");
+                }
             }
         }
     }
@@ -320,6 +462,55 @@ Item {
         // Current wallpaper preview
         SettingsSectionLabel {
             text: "CURRENT WALLPAPER"
+        }
+
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: Colors.spacingS
+
+            Rectangle {
+                radius: Colors.radiusPill
+                color: Colors.bgWidget
+                border.color: Colors.border
+                border.width: 1
+                implicitHeight: 24
+                implicitWidth: sourceText.implicitWidth + 16
+
+                Text {
+                    id: sourceText
+                    anchors.centerIn: parent
+                    text: {
+                        var mon = root.wallpaperSelectedMonitor === "__all__" ? "" : root.wallpaperSelectedMonitor;
+                        var solidHex = WallpaperService.solidColorForMonitor(mon);
+                        if (solidHex.length > 0) return "Source: Solid #" + solidHex.slice(0, 6).toUpperCase();
+                        var key = root.wallpaperSelectedMonitor || "__all__";
+                        var p = WallpaperService.wallpapers[key] || WallpaperService.wallpapers["__all__"] || "";
+                        if (p.length > 0) return "Source: Image";
+                        return "Source: None";
+                    }
+                    color: Colors.textSecondary
+                    font.pixelSize: Colors.fontSizeXS
+                    font.family: Colors.fontMono
+                }
+            }
+
+            Rectangle {
+                radius: Colors.radiusPill
+                color: Colors.bgWidget
+                border.color: Colors.border
+                border.width: 1
+                implicitHeight: 24
+                implicitWidth: targetText.implicitWidth + 16
+
+                Text {
+                    id: targetText
+                    anchors.centerIn: parent
+                    text: "Target: " + (root.wallpaperSelectedMonitor === "__all__" ? "All monitors" : root.wallpaperSelectedMonitor)
+                    color: Colors.textSecondary
+                    font.pixelSize: Colors.fontSizeXS
+                    font.family: Colors.fontMono
+                }
+            }
         }
 
         Rectangle {
@@ -591,6 +782,15 @@ Item {
                 }
 
                 SettingsActionButton {
+                    label: "Reset Solid"
+                    compact: true
+                    onClicked: {
+                        var mon = root.wallpaperSelectedMonitor === "__all__" ? "" : root.wallpaperSelectedMonitor;
+                        WallpaperService.clearSolidForMonitor(mon, true, true);
+                    }
+                }
+
+                SettingsActionButton {
                     label: "Copy"
                     compact: true
                     onClicked: root.copySolidColor()
@@ -691,6 +891,23 @@ Item {
                 label: "Run pywal on change"
                 icon: "󰏘"
                 configKey: "wallpaperRunPywal"
+            }
+        }
+
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: Colors.spacingS
+
+            SettingsActionButton {
+                label: "Export Wallpaper JSON"
+                compact: true
+                onClicked: root.exportWallpaperSettings()
+            }
+
+            SettingsActionButton {
+                label: "Import Wallpaper JSON"
+                compact: true
+                onClicked: root.importWallpaperSettings()
             }
         }
 
