@@ -14,7 +14,7 @@ Rectangle {
 
     signal clicked(var mouse)
 
-    implicitHeight: compact ? 34 : 40
+    implicitHeight: Math.max(compact ? 34 : 40, buttonRow.implicitHeight + (compact ? 12 : 14))
     implicitWidth: buttonRow.implicitWidth + (compact ? 18 : 24)
     radius: compact ? Colors.radiusSmall : Colors.radiusMedium
     color: root.emphasized ? Colors.primary : Colors.bgWidget
@@ -38,7 +38,11 @@ Rectangle {
 
     RowLayout {
         id: buttonRow
-        anchors.centerIn: parent
+        anchors.fill: parent
+        anchors.leftMargin: compact ? 9 : 12
+        anchors.rightMargin: compact ? 9 : 12
+        anchors.topMargin: compact ? 6 : 7
+        anchors.bottomMargin: compact ? 6 : 7
         spacing: Colors.spacingS
 
         Text {
@@ -47,13 +51,18 @@ Rectangle {
             color: root.emphasized ? Colors.text : Colors.fgSecondary
             font.family: Colors.fontMono
             font.pixelSize: compact ? Colors.fontSizeMedium : Colors.fontSizeLarge
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
         }
 
         Text {
+            Layout.fillWidth: true
             text: root.label
             color: root.emphasized ? Colors.text : Colors.text
             font.pixelSize: compact ? Colors.fontSizeSmall : Colors.fontSizeMedium
             font.weight: root.emphasized ? Font.Bold : Font.Medium
+            wrapMode: Text.WordWrap
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
         }
     }
 

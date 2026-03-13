@@ -10,6 +10,8 @@ Item {
   property real widgetScale: 1.0
   property real minimumX: -root.width * 0.75
   property real minimumY: -root.height * 0.75
+  property real maximumX: x
+  property real maximumY: y
   default property alias content: contentContainer.children
 
   x: 0
@@ -46,11 +48,16 @@ Item {
     drag.target: root
     drag.minimumX: root.minimumX
     drag.minimumY: root.minimumY
+    drag.maximumX: root.maximumX
+    drag.maximumY: root.maximumY
 
     acceptedButtons: Qt.LeftButton | Qt.RightButton
 
     onReleased: {
-      if (drag.active) savePosition();
+      if (drag.active) {
+        constrainPosition();
+        savePosition();
+      }
     }
 
     onClicked: function(mouse) {
@@ -101,7 +108,10 @@ Item {
         root.widgetScale = Math.max(0.5, Math.min(5.0, startScale + delta));
       }
 
-      onReleased: savePosition()
+      onReleased: {
+        constrainPosition();
+        savePosition();
+      }
     }
   }
 
@@ -109,10 +119,22 @@ Item {
   Rectangle {
     id: widgetContextMenu
     visible: false
-    anchors.top: parent.bottom
-    anchors.left: parent.left
-    anchors.topMargin: 8
+    property real menuInset: 8
     width: 140; height: menuCol.implicitHeight + 16
+    x: {
+      if (!root.parent) return 0;
+      var minX = -root.x + menuInset;
+      var maxX = root.parent.width - root.x - width - menuInset;
+      return Math.min(Math.max(0, minX), Math.max(minX, maxX));
+    }
+    y: {
+      if (!root.parent) return root.height + menuInset;
+      var below = root.height + menuInset;
+      var minY = -root.y + menuInset;
+      var maxY = root.parent.height - root.y - height - menuInset;
+      if (root.y + below + height <= root.parent.height - menuInset) return below;
+      return Math.max(minY, maxY);
+    }
     radius: Colors.radiusSmall
     color: Colors.bgGlass
     border.color: Colors.border
@@ -151,6 +173,13 @@ Item {
       y: Math.round(root.y),
       scale: Math.round(root.widgetScale * 100) / 100
     });
+  }
+
+  function constrainPosition() {
+    if (root.x < minimumX) root.x = minimumX;
+    if (root.y < minimumY) root.y = minimumY;
+    if (root.x > maximumX) root.x = maximumX;
+    if (root.y > maximumY) root.y = maximumY;
   }
 
   // Grid snap on position change

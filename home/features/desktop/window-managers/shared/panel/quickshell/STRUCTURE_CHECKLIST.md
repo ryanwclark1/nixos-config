@@ -12,6 +12,7 @@ Use this checklist before merging panel architecture changes.
 - [ ] `scripts/check-launcher-web-aliases.sh` passes for launcher alias guardrails (normalization, settings wiring, and runtime alias resolution/hints).
 - [ ] `scripts/check-launcher-performance.sh` passes for launcher filter/ranking performance guardrails and runtime telemetry fields.
 - [ ] `scripts/check-launcher-guardrails.sh` passes (composite launcher guardrail runner).
+- [ ] `node scripts/benchmark-launcher-filter.js --items=30000 --runs=40` is sampled for performance-sensitive launcher ranking changes.
 - [ ] New desktop widgets are integrated via `DesktopWidgetRegistry` (built-in or plugin path), not hardcoded in multiple places.
 - [ ] Plugin behavior preserves manifest compatibility (`bar-widget` / `desktop-widget`).
 - [ ] Existing IPC actions remain backward compatible.

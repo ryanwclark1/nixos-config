@@ -76,6 +76,8 @@ Item {
       screenName: root.screenName
       minimumX: root.safeDragMinX
       minimumY: root.safeDragMinY
+      maximumX: root.parent ? Math.max(root.safeDragMinX, root.parent.width - root.edgeMargins.right - 8 - root.x - width) : x
+      maximumY: root.parent ? Math.max(root.safeDragMinY, root.parent.height - root.edgeMargins.bottom - 8 - root.y - height) : y
       x: modelData.x || 0
       y: modelData.y || 0
       widgetScale: modelData.scale || 1.0

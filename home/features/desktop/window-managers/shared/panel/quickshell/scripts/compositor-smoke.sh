@@ -61,18 +61,21 @@ check_hyprland() {
     return
   fi
 
-  local raw first second
-  raw="$( (hyprctl workspaces -j 2>/dev/null; printf '\n'; hyprctl activeworkspace -j 2>/dev/null) || true )"
-  first="$(printf '%s' "${raw}" | sed -n '1p')"
-  second="$(printf '%s' "${raw}" | sed -n '2p')"
+  local ws_raw active_raw
+  ws_raw="$(hyprctl workspaces -j 2>/dev/null || true)"
+  active_raw="$(hyprctl activeworkspace -j 2>/dev/null || true)"
 
-  if printf '%s' "${first}" | jq -e '.' >/dev/null 2>&1; then
+  if [[ -z "${ws_raw}" ]]; then
+    fail "Hyprland workspaces command returned empty output"
+  elif printf '%s' "${ws_raw}" | jq -e '.' >/dev/null 2>&1; then
     pass "Hyprland workspaces JSON parses"
   else
     fail "Hyprland workspaces JSON parse failed"
   fi
 
-  if printf '%s' "${second}" | jq -e '.' >/dev/null 2>&1; then
+  if [[ -z "${active_raw}" ]]; then
+    fail "Hyprland active workspace command returned empty output"
+  elif printf '%s' "${active_raw}" | jq -e '.' >/dev/null 2>&1; then
     pass "Hyprland active workspace JSON parses"
   else
     fail "Hyprland active workspace JSON parse failed"
