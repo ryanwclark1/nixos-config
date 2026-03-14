@@ -101,7 +101,7 @@ PanelWindow {
           color: Colors.text
           font.pixelSize: Colors.fontSizeHuge
           font.weight: Font.DemiBold
-          font.letterSpacing: -0.5
+          font.letterSpacing: Colors.letterSpacingTight
         }
 
         Item { Layout.fillWidth: true }
@@ -222,8 +222,8 @@ PanelWindow {
         property var collapsedGroups: ({})
 
         add: Transition {
-          NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: 400; easing.type: Easing.OutCubic }
-          NumberAnimation { property: "scale"; from: 0.9; to: 1.0; duration: 400; easing.type: Easing.OutBack }
+          NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: Colors.durationEmphasis; easing.type: Easing.OutCubic }
+          NumberAnimation { property: "scale"; from: 0.9; to: 1.0; duration: Colors.durationEmphasis; easing.type: Easing.OutBack }
         }
 
         remove: Transition {
@@ -264,7 +264,7 @@ PanelWindow {
             Text {
               text: section || "System"
               color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Bold
-              font.capitalization: Font.AllUppercase; font.letterSpacing: 1
+              font.capitalization: Font.AllUppercase; font.letterSpacing: Colors.letterSpacingWide
             }
 
             Rectangle { Layout.fillWidth: true; height: 1; color: Colors.border; opacity: 0.5 }
@@ -529,7 +529,7 @@ PanelWindow {
                 Text { anchors.centerIn: parent; text: "󰂚"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeHuge; font.family: Colors.fontMono }
               }
               Column {
-                width: parent.width - 50; spacing: 2
+                width: parent.width - 50; spacing: Colors.spacingXXS
                 Text { text: modelData.summary; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Bold; elide: Text.ElideRight; width: parent.width }
                 Text { text: modelData.body; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; elide: Text.ElideRight; width: parent.width }
               }

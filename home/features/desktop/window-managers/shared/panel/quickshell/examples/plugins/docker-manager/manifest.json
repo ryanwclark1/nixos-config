@@ -1,0 +1,14 @@
+{
+  "id": "docker.manager",
+  "name": "Docker Manager",
+  "description": "Optional bar plugin for monitoring and managing Docker or Podman containers.",
+  "author": "nixos-config",
+  "version": "1.0.0",
+  "type": "multi",
+  "permissions": ["settings_read", "settings_write", "process"],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml",
+    "daemon": "Daemon.qml",
+    "settings": "Settings.qml"
+  }
+}

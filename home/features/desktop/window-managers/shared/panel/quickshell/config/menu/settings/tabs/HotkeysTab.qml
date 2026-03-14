@@ -41,9 +41,43 @@ Item {
         }
     }
 
+    // Niri: load from NiriBinds service (parsed from config.kdl)
+    function loadNiriBinds() {
+        var result = [];
+        var categories = NiriBinds.binds.children || [];
+        for (var i = 0; i < categories.length; i++) {
+            var cat = categories[i];
+            var catName = cat.name || "";
+            var groups = cat.children || [];
+            for (var g = 0; g < groups.length; g++) {
+                var binds = groups[g].keybinds || [];
+                for (var k = 0; k < binds.length; k++) {
+                    var b = binds[k];
+                    var modStr = (b.mods || []).join(" + ");
+                    result.push({
+                        mods: modStr,
+                        key: b["key"] || "",
+                        dispatcher: catName,
+                        arg: b.comment || ""
+                    });
+                }
+            }
+        }
+        root.keybindsList = result;
+    }
+
+    Connections {
+        target: NiriBinds
+        enabled: CompositorAdapter.isNiri
+        function onBindsChanged() { root.loadNiriBinds(); }
+    }
+
     Component.onCompleted: {
-        if (!hyprBindsProc.running)
+        if (CompositorAdapter.isNiri) {
+            loadNiriBinds();
+        } else if (!hyprBindsProc.running) {
             hyprBindsProc.running = true;
+        }
     }
 
     SettingsTabPage {
@@ -71,7 +105,8 @@ Item {
                 iconName: "󰑐"
                 onClicked: {
                     root.keybindsList = [];
-                    hyprBindsProc.running = true;
+                    if (CompositorAdapter.isNiri) NiriBinds.reload();
+                    else hyprBindsProc.running = true;
                 }
             }
         }
@@ -79,7 +114,7 @@ Item {
         SettingsCard {
             title: "Bindings"
             iconName: "󰌌"
-            description: "Current compositor keymap snapshot."
+            description: CompositorAdapter.isNiri ? "Niri keybindings from config.kdl." : "Current compositor keymap snapshot."
 
             Text {
                 visible: root.keybindsList.length === 0
@@ -87,7 +122,7 @@ Item {
                 color: Colors.fgDim
                 font.pixelSize: Colors.fontSizeMedium
                 Layout.alignment: Qt.AlignHCenter
-                Layout.topMargin: 20
+                Layout.topMargin: Colors.spacingLG
             }
 
             Repeater {

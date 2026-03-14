@@ -137,12 +137,12 @@ BasePopupMenu {
             text: Colors.weatherIcon(WeatherService.condition)
             color: Colors.accent
             font.family: Colors.fontMono
-            font.pixelSize: 28
+            font.pixelSize: Colors.fontSizeDisplay
           }
 
           ColumnLayout {
             Layout.fillWidth: true
-            spacing: 2
+            spacing: Colors.spacingXXS
 
             Text {
               text: WeatherService.condition || "Loading weather"

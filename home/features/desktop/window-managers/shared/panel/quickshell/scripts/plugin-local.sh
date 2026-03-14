@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 mode="${1:-quick}"
 reference_dir_name="reference-local-toolkit"
@@ -437,6 +437,18 @@ EOF
       printf '[INFO] Running plugin diagnostics schema checks...\n'
     fi
     "${script_dir}/check-plugin-diagnostics-schema.sh"
+    if (( quiet == 0 )); then
+      printf '[INFO] Running first-party ssh plugin local checks...\n'
+    fi
+    "${script_dir}/check-plugin-ssh-local.sh"
+    if (( quiet == 0 )); then
+      printf '[INFO] Running first-party ssh plugin contract checks...\n'
+    fi
+    "${script_dir}/check-plugin-ssh-contracts.sh"
+    if (( quiet == 0 )); then
+      printf '[INFO] Running first-party ssh plugin fixture checks...\n'
+    fi
+    "${script_dir}/check-plugin-ssh-fixtures.sh"
     ;;
   baseline-gates)
     quiet=0
@@ -447,6 +459,10 @@ EOF
       printf '[INFO] Running plugin conformance checks...\n'
     fi
     "${script_dir}/check-plugin-conformance.sh"
+    if (( quiet == 0 )); then
+      printf '[INFO] Running docker-manager plugin contract checks...\n'
+    fi
+    "${script_dir}/check-plugin-docker-manager-contracts.sh"
     if (( quiet == 0 )); then
       printf '[INFO] Running plugin doctor smoke checks...\n'
     fi

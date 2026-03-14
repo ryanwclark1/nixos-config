@@ -167,7 +167,7 @@ PanelWindow {
       Text {
         text: "Power Menu"
         color: Colors.text
-        font.pixelSize: 32
+        font.pixelSize: Colors.fontSizeIcon
         font.weight: Font.Bold
         Layout.alignment: Qt.AlignHCenter
       }

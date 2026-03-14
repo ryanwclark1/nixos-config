@@ -68,8 +68,8 @@ Flow {
         id: urgentAnim
         running: wsPill.isUrgent
         loops: Animation.Infinite
-        ColorAnimation { to: root.urgentColor; duration: 600; easing.type: Easing.InOutSine }
-        ColorAnimation { to: Colors.warning;   duration: 600; easing.type: Easing.InOutSine }
+        ColorAnimation { to: root.urgentColor; duration: Colors.durationPulse; easing.type: Easing.InOutSine }
+        ColorAnimation { to: Colors.warning;   duration: Colors.durationPulse; easing.type: Easing.InOutSine }
       }
 
       Text {

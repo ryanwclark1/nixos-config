@@ -6,6 +6,6 @@ Text {
   color: Colors.textDisabled
   font.pixelSize: Colors.fontSizeXS
   font.weight: Font.Black
-  font.letterSpacing: 1.2
+  font.letterSpacing: Colors.letterSpacingExtraWide
   Layout.topMargin: 6
 }

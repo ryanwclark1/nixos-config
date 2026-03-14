@@ -192,6 +192,7 @@ Item {
     if (widgetType === "controlCenter") return controlCenterComponent;
     if (widgetType === "tray") return trayComponent;
     if (widgetType === "clipboard") return clipboardComponent;
+    if (widgetType === "screenshot") return screenshotComponent;
     if (widgetType === "notifications") return notificationsComponent;
     if (widgetType === "spacer") return spacerComponent;
     if (widgetType === "separator") return separatorComponent;
@@ -234,12 +235,12 @@ Item {
     : 0
 
   Behavior on _slideOffset {
-    NumberAnimation { duration: 200; easing.type: Easing.InOutQuad }
+    NumberAnimation { duration: Colors.durationFast; easing.type: Easing.InOutQuad }
   }
 
   opacity: root._autoHidden ? 0 : 1
   Behavior on opacity {
-    NumberAnimation { duration: 200; easing.type: Easing.InOutQuad }
+    NumberAnimation { duration: Colors.durationFast; easing.type: Easing.InOutQuad }
   }
 
   transform: Translate { y: root._slideOffset }
@@ -871,8 +872,8 @@ Item {
           SequentialAnimation on opacity {
             running: SystemStatus.isRecording
             loops: Animation.Infinite
-            NumberAnimation { from: 1.0; to: 0.3; duration: 600 }
-            NumberAnimation { from: 0.3; to: 1.0; duration: 600 }
+            NumberAnimation { from: 1.0; to: 0.3; duration: Colors.durationPulse }
+            NumberAnimation { from: 0.3; to: 1.0; duration: Colors.durationPulse }
           }
         }
 
@@ -1011,6 +1012,24 @@ Item {
 
       Text {
         text: "󰅍"
+        color: Colors.text
+        font.family: Colors.fontMono
+        font.pixelSize: Colors.fontSizeXL
+      }
+    }
+  }
+
+  Component {
+    id: screenshotComponent
+    SharedWidgets.BarPill {
+      property var widgetInstance: null
+      isActive: root.isSurfaceActive("screenshotMenu")
+      anchorWindow: root.anchorWindow
+      tooltipText: "Screenshot"
+      onClicked: root.requestSurface("screenshotMenu", this)
+
+      Text {
+        text: "󰩭"
         color: Colors.text
         font.family: Colors.fontMono
         font.pixelSize: Colors.fontSizeXL

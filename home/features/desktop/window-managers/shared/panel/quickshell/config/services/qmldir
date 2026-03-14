@@ -32,3 +32,8 @@ singleton UsageTrackerService 1.0 UsageTrackerService.qml
 singleton PresetService 1.0 PresetService.qml
 singleton PowerService 1.0 PowerService.qml
 SurfaceService 1.0 SurfaceService.qml
+singleton NiriService 1.0 NiriService.qml
+NiriSocket 1.0 NiriSocket.qml
+singleton NiriBinds 1.0 NiriBinds.qml
+singleton GameModeService 1.0 GameModeService.qml
+singleton NetworkService 1.0 NetworkService.qml

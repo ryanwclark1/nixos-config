@@ -20,6 +20,13 @@ QtObject {
             title: "Network Controls",
             subtitle: "Wi-Fi, VPN, and Tailscale",
             clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleNetworkMenu"]
+        },
+        {
+            id: "screenshotControls",
+            icon: "󰩭",
+            title: "Screenshot",
+            subtitle: "Capture region, screen, or fullscreen",
+            clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleScreenshotMenu"]
         }
     ]
 
@@ -97,6 +104,8 @@ QtObject {
             return NightLightService.active;
         case "caffeine":
             return CaffeineService.inhibiting;
+        case "recording":
+            return RecordingService.isRecording;
         default:
             return false;
         }
@@ -117,6 +126,12 @@ QtObject {
             return;
         case "caffeine":
             CaffeineService.toggle();
+            return;
+        case "recording":
+            if (RecordingService.isRecording)
+                RecordingService.stopRecording();
+            else
+                RecordingService.startRecording("fullscreen");
             return;
         }
     }

@@ -2621,8 +2621,8 @@ PanelWindow {
 
           RowLayout {
             anchors.fill: parent
-            anchors.leftMargin: 20
-            anchors.rightMargin: 20
+            anchors.leftMargin: Colors.spacingLG
+            anchors.rightMargin: Colors.spacingLG
             spacing: Colors.paddingMedium
             Text { text: ""; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL }
             TextInput {
@@ -3118,7 +3118,7 @@ PanelWindow {
                   color: Colors.primary
                   opacity: highlighted ? 0.95 : (hovered ? 0.4 : 0.0)
                   Behavior on height { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
-                  Behavior on opacity { NumberAnimation { duration: 120 } }
+                  Behavior on opacity { NumberAnimation { duration: Colors.durationSnap } }
                 }
 
                 RowLayout {

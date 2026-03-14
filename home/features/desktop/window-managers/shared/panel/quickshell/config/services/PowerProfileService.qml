@@ -91,6 +91,28 @@ QtObject {
         }
     }
 
+    // ── Persistence ──────────────────────────────
+    // Remember the last user-set profile across shell restarts.
+    readonly property string _persistPath: Quickshell.env("HOME") + "/.local/state/quickshell/power-profile"
+
+    property FileView _persistFile: FileView {
+        path: root._persistPath
+        blockLoading: true
+        watchChanges: false
+
+        onLoaded: {
+            var saved = (text || "").trim();
+            if (saved && root.available && root.availableProfiles.indexOf(saved) !== -1) {
+                root.setProfile(saved);
+            }
+        }
+        onLoadFailed: {} // First run — no persisted profile yet
+    }
+
+    function _persistProfile(name) {
+        _persistFile.setText(name + "\n");
+    }
+
     // ── Actions ──────────────────────────────────
     function setProfile(name) {
         if (!root.available) return;
@@ -98,6 +120,7 @@ QtObject {
             Quickshell.execDetached(["powerprofilesctl", "set", name]);
         }
         root.currentProfile = name;
+        _persistProfile(name);
     }
 
     function refresh() {

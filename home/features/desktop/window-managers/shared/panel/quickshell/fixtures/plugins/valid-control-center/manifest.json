@@ -1,0 +1,13 @@
+{
+  "id": "fixture.valid.controlcenter",
+  "name": "Fixture Valid Control Center",
+  "description": "Valid control center plugin fixture",
+  "author": "Fixture Suite",
+  "version": "1.0.0",
+  "type": "control-center-widget",
+  "permissions": ["settings_read"],
+  "entryPoints": {
+    "controlCenterWidget": "ControlCenterWidget.qml",
+    "controlCenterDetail": "ControlCenterDetail.qml"
+  }
+}

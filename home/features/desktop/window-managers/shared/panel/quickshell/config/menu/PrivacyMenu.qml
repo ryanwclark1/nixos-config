@@ -36,7 +36,7 @@ BasePopupMenu {
         text: PrivacyService.anyActive ? PrivacyService.activeIcon : "󰒃"
         color: PrivacyService.anyActive ? Colors.warning : Colors.textDisabled
         font.family: Colors.fontMono
-        font.pixelSize: 28
+        font.pixelSize: Colors.fontSizeDisplay
         Layout.alignment: Qt.AlignVCenter
       }
 

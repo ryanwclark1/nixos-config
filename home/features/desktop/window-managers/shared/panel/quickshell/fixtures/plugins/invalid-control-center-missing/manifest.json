@@ -1,0 +1,10 @@
+{
+  "id": "fixture.invalid.controlcenter.missing",
+  "name": "Fixture Invalid Control Center Missing",
+  "description": "Invalid control center plugin fixture",
+  "author": "Fixture Suite",
+  "version": "1.0.0",
+  "type": "control-center-widget",
+  "permissions": [],
+  "entryPoints": {}
+}

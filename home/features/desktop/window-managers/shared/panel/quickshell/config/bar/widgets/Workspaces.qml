@@ -20,6 +20,46 @@ Rectangle {
   implicitHeight: height
   visible: vertical ? (height > 0) : (width > 0)
 
+  // ── Niri reactive path ──────────────────────────
+  // When NiriService is available, derive state directly from its event-driven
+  // properties instead of polling.  This gives instant workspace updates.
+  Connections {
+    target: NiriService
+    enabled: CompositorAdapter.isNiri && NiriService.available
+    function onWorkspacesUpdated() {
+      root._updateStateFromNiriService()
+    }
+  }
+
+  Component.onCompleted: {
+    if (CompositorAdapter.isNiri && NiriService.available)
+      _updateStateFromNiriService()
+  }
+
+  function _updateStateFromNiriService() {
+    var workspaces = [];
+    var activeId = -1;
+    var all = NiriService.allWorkspaces;
+
+    for (var i = 0; i < all.length; i++) {
+      var ws = all[i];
+      var intId = ws.idx !== undefined ? ws.idx : (ws.id !== undefined ? ws.id : i + 1);
+      if (ws.is_focused) activeId = intId;
+
+      workspaces.push({
+        id: intId,
+        name: String(ws.name || intId),
+        urgent: !!(ws.is_urgent || ws.urgent)
+      });
+    }
+
+    state = {
+      workspaces: workspaces,
+      activeWorkspace: activeId
+    };
+  }
+
+  // ── Hyprland polling path (unchanged) ───────────
   function updateStateFromHypr(rawText) {
     try {
       var lines = (rawText || "").trim().split("\n");
@@ -94,10 +134,11 @@ Rectangle {
     return CompositorAdapter.workspaceListCommand();
   }
 
+  // Only poll when NiriService is NOT available (Hyprland, or fallback)
   Timer {
     id: pollTimer
     interval: 1200
-    running: root.workspaceApiAvailable
+    running: root.workspaceApiAvailable && !NiriService.available
     repeat: true
     triggeredOnStart: true
     onTriggered: {
@@ -118,8 +159,6 @@ Rectangle {
           return;
         }
 
-        // Niri responses are valid JSON (array/object), while Hyprland polling
-        // emits two JSON documents separated by a newline.
         try {
           JSON.parse(raw);
           root.updateStateFromNiri(raw);

@@ -463,7 +463,7 @@ BasePopupMenu {
       // No devices found (BT on, not scanning, nothing found)
       SharedWidgets.EmptyState {
         Layout.fillWidth: true
-        Layout.topMargin: 20
+        Layout.topMargin: Colors.spacingLG
         visible: root.effectiveBtEnabled && !root.isScanning && root.connectedCount === 0 && root.pairedCount === 0 && root.availableCount === 0
         icon: "󰂯"
         message: "No devices found"

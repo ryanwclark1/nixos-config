@@ -69,7 +69,7 @@ Item {
 
     // Press squish
     scale: mouse.pressed ? 0.88 : 1.0
-    Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutBack } }
+    Behavior on scale { NumberAnimation { duration: Colors.durationSnap; easing.type: Easing.OutBack } }
 
     // ── Checkmark icon ────────────────────────────────────────────────────
     Text {

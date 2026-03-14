@@ -226,6 +226,53 @@ SharedWidgets.CardBase {
             message: root.trimmedSearch === "" ? "No processes matched the current filter." : "No processes matched the current search."
         }
 
+        Rectangle {
+            Layout.fillWidth: true
+            visible: !!root.selectedProcess && !root.detailsExpanded
+            radius: Colors.radiusSmall
+            color: Colors.bgWidget
+            border.color: Colors.border
+            border.width: 1
+            implicitHeight: collapsedProcessRow.implicitHeight + Colors.spacingS * 2
+
+            RowLayout {
+                id: collapsedProcessRow
+                anchors.fill: parent
+                anchors.margins: Colors.spacingS
+                spacing: Colors.spacingS
+
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 2
+
+                    Text {
+                        text: root.selectedProcess ? (String(root.selectedProcess.name || "process") + "  •  PID " + String(root.selectedProcess.pid || 0)) : ""
+                        color: Colors.text
+                        font.pixelSize: Colors.fontSizeSmall
+                        font.weight: Font.Medium
+                        Layout.fillWidth: true
+                        elide: Text.ElideRight
+                    }
+
+                    Text {
+                        text: "Details collapsed. Select the row again to reopen actions."
+                        color: Colors.fgDim
+                        font.pixelSize: Colors.fontSizeXS
+                        Layout.fillWidth: true
+                        wrapMode: Text.WordWrap
+                    }
+                }
+
+                SharedWidgets.IconButton {
+                    icon: "󰐕"
+                    size: 28
+                    iconSize: Colors.fontSizeSmall
+                    iconColor: Colors.primary
+                    onClicked: root.detailsExpanded = true
+                }
+            }
+        }
+
         ColumnLayout {
             Layout.fillWidth: true
             spacing: Colors.spacingXS
@@ -247,13 +294,13 @@ SharedWidgets.CardBase {
 
                     Behavior on color {
                         ColorAnimation {
-                            duration: 140
+                            duration: Colors.durationFast
                         }
                     }
 
                     Behavior on border.color {
                         ColorAnimation {
-                            duration: 140
+                            duration: Colors.durationFast
                         }
                     }
 
@@ -352,7 +399,7 @@ SharedWidgets.CardBase {
 
                     ColumnLayout {
                         Layout.fillWidth: true
-                        spacing: 2
+                        spacing: Colors.spacingXXS
 
                         Text {
                             text: root.selectedProcess ? (root.selectedProcess.name || "process") : ""

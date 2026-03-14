@@ -586,7 +586,7 @@ Item {
                 opacity: previewContainer._previewFlip ? 0.0 : 1.0
                 Behavior on opacity {
                     NumberAnimation {
-                        duration: 400
+                        duration: Colors.durationEmphasis
                         easing.type: Easing.InOutQuad
                     }
                 }
@@ -611,7 +611,7 @@ Item {
                 opacity: previewContainer._previewFlip ? 1.0 : 0.0
                 Behavior on opacity {
                     NumberAnimation {
-                        duration: 400
+                        duration: Colors.durationEmphasis
                         easing.type: Easing.InOutQuad
                     }
                 }
@@ -988,7 +988,7 @@ Item {
                         radius: 3
                         Behavior on width {
                             NumberAnimation {
-                                duration: 100
+                                duration: Colors.durationSnap
                             }
                         }
                         Behavior on color {
@@ -1010,7 +1010,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     Behavior on x {
                         NumberAnimation {
-                            duration: 100
+                            duration: Colors.durationSnap
                         }
                     }
                     Behavior on color {
@@ -1133,14 +1133,14 @@ Item {
                             target: thumbDelegate
                             property: "scale"
                             to: 0.92
-                            duration: 100
+                            duration: Colors.durationSnap
                             easing.type: Easing.InQuad
                         }
                         NumberAnimation {
                             target: thumbDelegate
                             property: "scale"
                             to: 1.0
-                            duration: 100
+                            duration: Colors.durationSnap
                             easing.type: Easing.OutQuad
                         }
                     }
@@ -1220,7 +1220,7 @@ Item {
                             color: thumbMouse.containsMouse ? Qt.rgba(0, 0, 0, 0.35) : "transparent"
                             Behavior on color {
                                 ColorAnimation {
-                                    duration: 120
+                                    duration: Colors.durationSnap
                                 }
                             }
                         }

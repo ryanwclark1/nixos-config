@@ -93,7 +93,7 @@ QtObject {
     property int controlCenterWidth: 350
     property bool controlCenterShowQuickLinks: true
     property bool controlCenterShowMediaWidget: true
-    property var controlCenterToggleOrder: ["bluetooth", "dnd", "nightLight", "recording"]
+    property var controlCenterToggleOrder: ["bluetooth", "dnd", "nightLight", "caffeine", "recording"]
     property var controlCenterHiddenToggles: []
     property var controlCenterPluginOrder: []
     property var controlCenterHiddenPlugins: []

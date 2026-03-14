@@ -109,7 +109,7 @@ BasePopupMenu {
           Text {
             text: root.device ? Math.round(root.device.percentage * 100) + "%" : "—"
             color: root.batteryColor
-            font.pixelSize: 32
+            font.pixelSize: Colors.fontSizeIcon
             font.weight: Font.Bold
           }
 

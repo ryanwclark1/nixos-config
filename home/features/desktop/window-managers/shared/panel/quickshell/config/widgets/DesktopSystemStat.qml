@@ -15,7 +15,7 @@ Item {
 
     ColumnLayout {
       spacing: Colors.spacingXS
-      Text { text: "CPU"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.letterSpacing: 1 }
+      Text { text: "CPU"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.letterSpacing: Colors.letterSpacingWide }
       RowLayout {
         spacing: Colors.spacingSM
         Text { text: ""; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL }
@@ -25,7 +25,7 @@ Item {
 
     ColumnLayout {
       spacing: Colors.spacingXS
-      Text { text: "RAM"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.letterSpacing: 1 }
+      Text { text: "RAM"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.letterSpacing: Colors.letterSpacingWide }
       RowLayout {
         spacing: Colors.spacingSM
         Text { text: ""; color: Colors.secondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL }
@@ -35,7 +35,7 @@ Item {
 
     ColumnLayout {
       spacing: Colors.spacingXS
-      Text { text: "TEMP"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.letterSpacing: 1 }
+      Text { text: "TEMP"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.letterSpacing: Colors.letterSpacingWide }
       RowLayout {
         spacing: Colors.spacingSM
         Text { text: "󰔏"; color: Colors.warning; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL }

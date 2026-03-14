@@ -30,6 +30,7 @@ QtObject {
     { widgetType: "controlCenter", label: "Control Center", icon: "󰒓", section: "right", description: "Command center trigger." },
     { widgetType: "tray", label: "System Tray", icon: "󰀻", section: "right", description: "Status notifier tray." },
     { widgetType: "clipboard", label: "Clipboard", icon: "󰅍", section: "right", description: "Clipboard history popup." },
+    { widgetType: "screenshot", label: "Screenshot", icon: "󰩭", section: "right", description: "Screenshot capture popup." },
     { widgetType: "notifications", label: "Notifications", icon: "󰂚", section: "right", description: "Notification center trigger." },
     { widgetType: "spacer", label: "Spacer", icon: "󰉺", section: "center", description: "Adjustable empty spacing.", hasSettings: true, defaultSettings: { size: 24 } },
     { widgetType: "separator", label: "Separator", icon: "󰇘", section: "center", description: "Thin divider between widgets." }

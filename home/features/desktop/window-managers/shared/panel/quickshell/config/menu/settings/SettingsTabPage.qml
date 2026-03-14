@@ -55,7 +55,7 @@ SharedWidgets.ScrollableContent {
                     color: Colors.text
                     font.pixelSize: Colors.fontSizeHuge
                     font.weight: Font.Bold
-                    font.letterSpacing: -0.5
+                    font.letterSpacing: Colors.letterSpacingTight
                     wrapMode: Text.WordWrap
                 }
             }

@@ -72,7 +72,7 @@ Scope {
               Text {
                 text: "Workspace Overview"
                 color: Colors.text
-                font.pixelSize: 32
+                font.pixelSize: Colors.fontSizeIcon
                 font.weight: Font.Bold
                 Layout.alignment: Qt.AlignHCenter
               }

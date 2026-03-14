@@ -36,8 +36,8 @@ BasePopupMenu {
         SequentialAnimation on opacity {
           running: RecordingService.isRecording
           loops: Animation.Infinite
-          NumberAnimation { from: 1.0; to: 0.3; duration: 600 }
-          NumberAnimation { from: 0.3; to: 1.0; duration: 600 }
+          NumberAnimation { from: 1.0; to: 0.3; duration: Colors.durationPulse }
+          NumberAnimation { from: 0.3; to: 1.0; duration: Colors.durationPulse }
         }
       }
 

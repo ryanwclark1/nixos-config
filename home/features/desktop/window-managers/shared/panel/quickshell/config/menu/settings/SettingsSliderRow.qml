@@ -140,7 +140,7 @@ Rectangle {
 
                     Behavior on width {
                         NumberAnimation {
-                            duration: 90
+                            duration: Colors.durationSnap
                         }
                     }
                 }
@@ -159,7 +159,7 @@ Rectangle {
 
                 Behavior on x {
                     NumberAnimation {
-                        duration: 90
+                        duration: Colors.durationSnap
                     }
                 }
             }

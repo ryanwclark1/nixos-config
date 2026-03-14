@@ -20,7 +20,7 @@ Rectangle {
       text: Colors.weatherIcon(WeatherService.condition)
       color: Colors.accent
       font.family: Colors.fontMono
-      font.pixelSize: 32
+      font.pixelSize: Colors.fontSizeIcon
     }
 
     ColumnLayout {

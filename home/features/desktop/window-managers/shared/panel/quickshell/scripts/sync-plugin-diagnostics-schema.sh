@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 runtime_catalog="${script_dir}/../config/plugins/runtime-catalog.json"
 diagnostics_schema="${script_dir}/../config/plugins/diagnostics.schema.json"
 

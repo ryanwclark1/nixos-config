@@ -21,13 +21,13 @@ Rectangle {
 
     Behavior on color {
         ColorAnimation {
-            duration: 180
+            duration: Colors.durationFast
         }
     }
 
     Behavior on border.color {
         ColorAnimation {
-            duration: 180
+            duration: Colors.durationFast
         }
     }
 

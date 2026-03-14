@@ -16,6 +16,19 @@ QtObject {
   property real cpuPercent: 0.0
   property real ramPercent: 0.0
   property real gpuPercent: 0.0
+
+  // History arrays — 60 samples (2 minutes at default 2s poll).
+  // Enables sparkline/graph visualizations in SystemStatsMenu.
+  readonly property int historyMaxSamples: 60
+  property var cpuHistory: []
+  property var ramHistory: []
+  property var gpuHistory: []
+
+  function _pushHistory(arr, value) {
+    var copy = arr.length >= historyMaxSamples ? arr.slice(1) : arr.slice();
+    copy.push(value);
+    return copy;
+  }
   // Brightness is delegated to BrightnessService (multi-monitor + DDC support).
   // This writable property preserves backward compat for Osd.qml which assigns directly.
   // We use Connections instead of a binding so the imperative OSD assignment doesn't
@@ -101,6 +114,11 @@ QtObject {
 
           var ramVal = parseFloat(lines[5]) || 0;
           root.ramPercent = Colors.clamp01(ramVal);
+
+          // Push to history arrays for graph widgets
+          root.cpuHistory = root._pushHistory(root.cpuHistory, root.cpuPercent);
+          root.ramHistory = root._pushHistory(root.ramHistory, root.ramPercent);
+          root.gpuHistory = root._pushHistory(root.gpuHistory, root.gpuPercent);
         }
       }
     }

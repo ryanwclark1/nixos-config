@@ -52,7 +52,7 @@ Rectangle {
 
   // Running indicator dot
   Rectangle {
-    width: 4; height: 4; radius: 2; color: taskItem.actualFocused ? Colors.primary : Colors.textDisabled
+    width: 4; height: 4; radius: Colors.radiusMicro; color: taskItem.actualFocused ? Colors.primary : Colors.textDisabled
     anchors.bottom: parent.bottom; anchors.bottomMargin: 2; anchors.horizontalCenter: parent.horizontalCenter
     visible: isRunning
   }

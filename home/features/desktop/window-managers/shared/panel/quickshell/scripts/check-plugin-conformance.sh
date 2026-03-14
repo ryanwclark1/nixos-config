@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 fixtures_dir="${script_dir}/../fixtures/plugins"
 
 if ! command -v jq >/dev/null 2>&1; then
@@ -65,7 +65,7 @@ validate_manifest() {
   fi
 
   case "$type_name" in
-    bar-widget|desktop-widget|launcher-provider|daemon|multi) ;;
+    bar-widget|desktop-widget|launcher-provider|control-center-widget|daemon|multi) ;;
     *) echo "E_MANIFEST_VALIDATION|invalid type: ${type_name}"; return ;;
   esac
 
@@ -88,15 +88,20 @@ validate_manifest() {
     esac
   done < <(jq -r '.permissions[]? | tostring' "$file")
 
-  local ep_bar ep_desktop ep_launcher ep_daemon ep_settings
+  local ep_bar ep_desktop ep_launcher ep_control_center ep_control_center_detail ep_daemon ep_settings
   ep_bar="$(jq -r '.entryPoints.barWidget // ""' "$file")"
   ep_desktop="$(jq -r '.entryPoints.desktopWidget // ""' "$file")"
   ep_launcher="$(jq -r '.entryPoints.launcherProvider // ""' "$file")"
+  ep_control_center="$(jq -r '.entryPoints.controlCenterWidget // ""' "$file")"
+  ep_control_center_detail="$(jq -r '.entryPoints.controlCenterDetail // ""' "$file")"
   ep_daemon="$(jq -r '.entryPoints.daemon // ""' "$file")"
   ep_settings="$(jq -r '.entryPoints.settings // ""' "$file")"
 
   if jq -e '.entryPoints | has("settings")' "$file" >/dev/null; then
     entry_valid "$ep_settings" || { echo "E_MANIFEST_VALIDATION|entryPoints.settings must be a .qml path"; return; }
+  fi
+  if jq -e '.entryPoints | has("controlCenterDetail")' "$file" >/dev/null; then
+    entry_valid "$ep_control_center_detail" || { echo "E_MANIFEST_VALIDATION|entryPoints.controlCenterDetail must be a .qml path"; return; }
   fi
 
   if [[ "$type_name" == "bar-widget" ]] && ! entry_valid "$ep_bar"; then
@@ -111,12 +116,16 @@ validate_manifest() {
     echo "E_MANIFEST_VALIDATION|launcher-provider type requires entryPoints.launcherProvider"
     return
   fi
+  if [[ "$type_name" == "control-center-widget" ]] && ! entry_valid "$ep_control_center"; then
+    echo "E_MANIFEST_VALIDATION|control-center-widget type requires entryPoints.controlCenterWidget"
+    return
+  fi
   if [[ "$type_name" == "daemon" ]] && ! entry_valid "$ep_daemon"; then
     echo "E_MANIFEST_VALIDATION|daemon type requires entryPoints.daemon"
     return
   fi
   if [[ "$type_name" == "multi" ]]; then
-    if ! entry_valid "$ep_bar" && ! entry_valid "$ep_desktop" && ! entry_valid "$ep_launcher" && ! entry_valid "$ep_daemon"; then
+    if ! entry_valid "$ep_bar" && ! entry_valid "$ep_desktop" && ! entry_valid "$ep_launcher" && ! entry_valid "$ep_control_center" && ! entry_valid "$ep_daemon"; then
       echo "E_MANIFEST_VALIDATION|multi type requires at least one runtime entry point"
       return
     fi

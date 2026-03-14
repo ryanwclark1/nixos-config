@@ -68,7 +68,7 @@ MouseArea {
         property: "x"
         from: -60
         to: root.width + 60
-        duration: 600
+        duration: Colors.durationPulse
         easing.type: Easing.InOutQuad
       }
 

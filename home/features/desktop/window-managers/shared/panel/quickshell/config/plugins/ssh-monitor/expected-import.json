@@ -1,0 +1,45 @@
+{
+  "aliases": [
+    {
+      "alias": "analytics",
+      "hostName": "analytics.example.com",
+      "user": "",
+      "port": 2200,
+      "sourcePath": "fixtures/includes/extra.conf",
+      "sourceLine": 1
+    },
+    {
+      "alias": "bastion-prod",
+      "hostName": "bastion.example.com",
+      "user": "deploy",
+      "port": 2222,
+      "sourcePath": "fixtures/root.conf",
+      "sourceLine": 1
+    },
+    {
+      "alias": "db-admin",
+      "hostName": "db.example.com",
+      "user": "postgres",
+      "port": 22,
+      "sourcePath": "fixtures/includes/ops.conf",
+      "sourceLine": 1
+    },
+    {
+      "alias": "team-jump",
+      "hostName": "jump.team.example.com",
+      "user": "",
+      "port": 22,
+      "sourcePath": "fixtures/includes/team.conf",
+      "sourceLine": 1
+    }
+  ],
+  "skippedPatterns": [
+    {
+      "alias": "web-*",
+      "sourcePath": "fixtures/includes/team.conf",
+      "sourceLine": 4
+    }
+  ],
+  "matchBlockCount": 1,
+  "errorCount": 0
+}

@@ -44,8 +44,8 @@ PopupWindow {
       if (root.preferredEdge === "right") return Item.Right;
       return Item.Top;
     }
-    Behavior on opacity { NumberAnimation { id: cavaFadeAnim; duration: 180; easing.type: Easing.OutCubic } }
-    Behavior on scale { NumberAnimation { id: cavaScaleAnim; duration: 220; easing.type: Easing.OutBack; easing.overshoot: 1.15 } }
+    Behavior on opacity { NumberAnimation { id: cavaFadeAnim; duration: Colors.durationFast; easing.type: Easing.OutCubic } }
+    Behavior on scale { NumberAnimation { id: cavaScaleAnim; duration: Colors.durationMedium; easing.type: Easing.OutBack; easing.overshoot: 1.15 } }
     layer.enabled: cavaFadeAnim.running || cavaScaleAnim.running
 
     // Top accent line
@@ -83,7 +83,7 @@ PopupWindow {
         color: Colors.textSecondary
         font.pixelSize: Colors.fontSizeXS
         font.weight: Font.Bold
-        font.letterSpacing: 1
+        font.letterSpacing: Colors.letterSpacingWide
         Layout.alignment: Qt.AlignHCenter
       }
 

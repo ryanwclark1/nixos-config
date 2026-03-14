@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 fixtures_dir="${script_dir}/../fixtures/plugins"
 doctor_script="${script_dir}/plugin-doctor.sh"
 plugins_tab="${script_dir}/../config/menu/settings/tabs/PluginsTab.qml"

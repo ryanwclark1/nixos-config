@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 reference_dir="${script_dir}/../examples/plugins/reference-local-toolkit"
 active_fixture="${reference_dir}/expected-diagnostics-active.json"
 degraded_fixture="${reference_dir}/expected-diagnostics-degraded.json"

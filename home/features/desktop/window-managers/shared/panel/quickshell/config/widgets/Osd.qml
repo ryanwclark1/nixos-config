@@ -337,7 +337,7 @@ Scope {
                 color: root.osdColor
                 font.pixelSize: Colors.fontSizeXS
                 font.weight: Font.Black
-                font.letterSpacing: 1.5
+                font.letterSpacing: Colors.letterSpacingExtraWide
               }
             }
           }
@@ -363,7 +363,7 @@ Scope {
                 SequentialAnimation {
                   id: pillIconPulse
                   NumberAnimation { target: pillIconText; property: "scale"; to: 1.22; duration: 80; easing.type: Easing.OutQuad }
-                  NumberAnimation { target: pillIconText; property: "scale"; to: 1.0; duration: 180; easing.type: Easing.OutElastic }
+                  NumberAnimation { target: pillIconText; property: "scale"; to: 1.0; duration: Colors.durationFast; easing.type: Easing.OutElastic }
                 }
 
                 Connections {
@@ -377,7 +377,7 @@ Scope {
                 id: osdTrack
                 Layout.fillWidth: true
                 Layout.preferredHeight: osdTrackMouse.pressed ? 12 : 6
-                Behavior on Layout.preferredHeight { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
+                Behavior on Layout.preferredHeight { NumberAnimation { duration: Colors.durationSnap; easing.type: Easing.OutCubic } }
 
                 Rectangle {
                   anchors.fill: parent
@@ -406,7 +406,7 @@ Scope {
                   radius: parent.height / 2
                   color: root.osdColor
 
-                  Behavior on width { NumberAnimation { duration: 100; easing.type: Easing.OutCubic } }
+                  Behavior on width { NumberAnimation { duration: Colors.durationSnap; easing.type: Easing.OutCubic } }
                 }
 
                 // Overdrive marker at 100% when max > 1.0

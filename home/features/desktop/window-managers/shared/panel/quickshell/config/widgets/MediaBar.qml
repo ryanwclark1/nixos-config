@@ -31,8 +31,8 @@ Rectangle {
 
   SequentialAnimation {
     id: rewindFlash
-    NumberAnimation { target: root; property: "_rewindFlashOpacity"; to: 1.0; duration: 100 }
-    NumberAnimation { target: root; property: "_rewindFlashOpacity"; to: 0.0; duration: 400; easing.type: Easing.OutCubic }
+    NumberAnimation { target: root; property: "_rewindFlashOpacity"; to: 1.0; duration: Colors.durationSnap }
+    NumberAnimation { target: root; property: "_rewindFlashOpacity"; to: 0.0; duration: Colors.durationEmphasis; easing.type: Easing.OutCubic }
   }
 
   Behavior on width { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutCubic } }
@@ -67,7 +67,7 @@ Rectangle {
       value: MediaService.trackLength > 0 ? (MediaService.currentPosition / MediaService.trackLength) : 0
       thickness: 2
       color: MediaService.artAccentColor
-      Behavior on color { ColorAnimation { duration: 400 } }
+      Behavior on color { ColorAnimation { duration: Colors.durationEmphasis } }
       icon: MediaService.isPlaying ? "󰏤" : "󰐊"
     }
 

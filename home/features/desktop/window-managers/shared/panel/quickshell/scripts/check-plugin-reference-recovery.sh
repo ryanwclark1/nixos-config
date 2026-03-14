@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 reference_dir="${script_dir}/../examples/plugins/reference-local-toolkit"
 recovery_fixture="${reference_dir}/expected-recovery-scenarios.json"
 launcher_provider="${reference_dir}/LauncherProvider.qml"
 settings_view="${reference_dir}/Settings.qml"
-plugin_service="${script_dir}/../config/services/PluginService.qml"
+plugin_runtime="${script_dir}/../config/services/PluginRuntime.qml"
 runtime_catalog="${script_dir}/../config/plugins/runtime-catalog.json"
 
 pass_count=0
@@ -38,7 +38,7 @@ if ! command -v jq >/dev/null 2>&1; then
   exit 1
 fi
 
-for required in "$recovery_fixture" "$launcher_provider" "$settings_view" "$plugin_service" "$runtime_catalog"; do
+for required in "$recovery_fixture" "$launcher_provider" "$settings_view" "$plugin_runtime" "$runtime_catalog"; do
   if [[ ! -f "$required" ]]; then
     echo "[FAIL] Missing reference recovery file: ${required}" >&2
     exit 1
@@ -88,9 +88,9 @@ require_pattern "$launcher_provider" 'Reference plugin query failure requested\.
 require_pattern "$launcher_provider" 'Reference plugin execute failure requested\.' "reference launcher provider exposes the execute failure message"
 require_pattern "$settings_view" '_cycleSetting\("failureMode", \["none", "query", "execute"\]' "reference settings view cycles through healthy and failure modes"
 require_pattern "$settings_view" 'removeSetting\("failureMode"\)' "reference settings reset restores the healthy failure mode"
-require_pattern "$plugin_service" '_setPluginStatus\(providerId, "active", "", ""\);' "plugin service restores launcher providers to active after successful queries"
-require_pattern "$plugin_service" '_setPluginStatus\(providerId, "degraded", "E_LAUNCHER_QUERY", String\(e\)\);' "plugin service marks query failures as degraded"
-require_pattern "$plugin_service" '_setPluginStatus\(item.pluginId, "degraded", "E_LAUNCHER_EXECUTE", String\(e\)\);' "plugin service marks execute failures as degraded"
+require_pattern "$plugin_runtime" '_setPluginStatus\(providerId, "active", "", ""\);' "plugin service restores launcher providers to active after successful queries"
+require_pattern "$plugin_runtime" '_setPluginStatus\(providerId, "degraded", "E_LAUNCHER_QUERY", String\(e\)\);' "plugin service marks query failures as degraded"
+require_pattern "$plugin_runtime" '_setPluginStatus\(item.pluginId, "degraded", "E_LAUNCHER_EXECUTE", String\(e\)\);' "plugin service marks execute failures as degraded"
 
 printf '[INFO] Plugin reference recovery summary: %d pass, %d fail\n' "$pass_count" "$fail_count"
 (( fail_count == 0 ))

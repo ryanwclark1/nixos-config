@@ -665,7 +665,7 @@ Item {
 
                                 ColumnLayout {
                                     Layout.fillWidth: true
-                                    spacing: 2
+                                    spacing: Colors.spacingXXS
 
                                     Text {
                                         text: modelData.label

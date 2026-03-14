@@ -121,7 +121,7 @@ Item {
 
       SequentialAnimation {
         id: bounceAnim
-        NumberAnimation { target: iconContainer; property: root.vertical ? "x" : "y"; to: 0; duration: 100; easing.type: Easing.OutQuad }
+        NumberAnimation { target: iconContainer; property: root.vertical ? "x" : "y"; to: 0; duration: Colors.durationSnap; easing.type: Easing.OutQuad }
         NumberAnimation { target: iconContainer; property: root.vertical ? "x" : "y"; to: 4; duration: Colors.durationNormal; easing.type: Easing.OutBounce }
       }
 
@@ -302,7 +302,7 @@ Item {
             model: Math.min(appDelegate.toplevels.length, 3)
             Rectangle {
               required property int index
-              width: 4; height: 4; radius: 2
+              width: 4; height: 4; radius: Colors.radiusMicro
               color: {
                 if (!appDelegate.isFocused) return Colors.fgSecondary;
                 var active = (typeof ToplevelManager !== 'undefined') ? ToplevelManager.activeToplevel : null;
@@ -324,7 +324,7 @@ Item {
             model: Math.min(appDelegate.toplevels.length, 3)
             Rectangle {
               required property int index
-              width: 4; height: 4; radius: 2
+              width: 4; height: 4; radius: Colors.radiusMicro
               color: {
                 if (!appDelegate.isFocused) return Colors.fgSecondary;
                 var active = (typeof ToplevelManager !== 'undefined') ? ToplevelManager.activeToplevel : null;
@@ -351,7 +351,7 @@ Item {
           anchors.centerIn: parent
           text: appDelegate.toplevels.length
           color: Colors.background
-          font.pixelSize: 8
+          font.pixelSize: Colors.fontSizeXXS
           font.weight: Font.Bold
         }
       }

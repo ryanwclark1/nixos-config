@@ -92,7 +92,7 @@ Rectangle {
       color: Colors.textDisabled
       font.pixelSize: Colors.fontSizeXS
       font.weight: Font.Black
-      font.letterSpacing: 1.5
+      font.letterSpacing: Colors.letterSpacingExtraWide
       Layout.bottomMargin: Colors.spacingXS
     }
 
@@ -252,7 +252,7 @@ Rectangle {
           id: sidebarColumn
           visible: !root.compactMode
           width: parent.width
-          spacing: 2
+          spacing: Colors.spacingXXS
 
           Repeater {
             model: root.isSearching ? root.searchResults : []
@@ -263,7 +263,7 @@ Rectangle {
               implicitHeight: resultRow.implicitHeight + Colors.spacingS * 2
               radius: Colors.radiusSmall
               color: root.currentTabId === modelData.id ? Colors.highlight : "transparent"
-              Behavior on color { ColorAnimation { duration: 120 } }
+              Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
 
               SharedWidgets.StateLayer {
                 id: resultState
@@ -393,7 +393,7 @@ Rectangle {
                     implicitHeight: tabRow.implicitHeight + Colors.spacingS * 2
                     radius: Colors.radiusSmall
                     color: root.currentTabId === modelData.id ? Colors.highlight : "transparent"
-                    Behavior on color { ColorAnimation { duration: 120 } }
+                    Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
 
                     SharedWidgets.StateLayer {
                       id: tabState

@@ -61,6 +61,7 @@ QtObject {
     readonly property real radiusSmall: scaledMetric(10, _radiusScale, 4)
     readonly property real radiusXS: scaledMetric(8, _radiusScale, 4)
     readonly property real radiusXXS: scaledMetric(6, _radiusScale, 2)
+    readonly property real radiusMicro: scaledMetric(2, _radiusScale, 1)
     readonly property real radiusPill: 999
 
     readonly property int paddingLarge: scaledMetric(24, _spacingScale, 12)
@@ -78,17 +79,30 @@ QtObject {
     readonly property int spacingXL: scaledMetric(24, _spacingScale, 12)
 
     // --- ANIMATION DURATIONS ---
+    readonly property int durationFlash: 60
+    readonly property int durationSnap: 100
+    readonly property int durationMedium: 220
     readonly property int durationFast: 160
     readonly property int durationNormal: 250
     readonly property int durationSlow: 350
+    readonly property int durationEmphasis: 400
+    readonly property int durationPulse: 600
+
+    // --- LETTER-SPACING TOKENS ---
+    readonly property real letterSpacingTight: -0.5
+    readonly property real letterSpacingWide: 1.0
+    readonly property real letterSpacingExtraWide: 1.2
 
     // --- TYPOGRAPHY TOKENS ---
+    readonly property int fontSizeXXS: scaledMetric(8, _fontScale, 7)
     readonly property int fontSizeXS: scaledMetric(10, _fontScale, 9)
     readonly property int fontSizeSmall: scaledMetric(12, _fontScale, 10)
     readonly property int fontSizeMedium: scaledMetric(14, _fontScale, 11)
     readonly property int fontSizeLarge: scaledMetric(16, _fontScale, 12)
     readonly property int fontSizeXL: scaledMetric(20, _fontScale, 14)
     readonly property int fontSizeHuge: scaledMetric(24, _fontScale, 16)
+    readonly property int fontSizeDisplay: scaledMetric(28, _fontScale, 20)
+    readonly property int fontSizeIcon: scaledMetric(32, _fontScale, 22)
     readonly property int fontWeightNormal: Font.Normal
     readonly property int fontWeightMedium: Font.Medium
     readonly property int fontWeightBold: Font.Bold
@@ -110,6 +124,43 @@ QtObject {
     }
     function scaledMetric(base, factor, minimum) {
         return Math.max(minimum || 1, Math.round(Number(base || 0) * factor));
+    }
+
+    // ── WCAG contrast utilities ───────────────────
+    // Relative luminance per WCAG 2.1 §1.4.3
+    function _srgbChannel(c) {
+        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    }
+    function luminance(c) {
+        return 0.2126 * _srgbChannel(c.r) + 0.7152 * _srgbChannel(c.g) + 0.0722 * _srgbChannel(c.b);
+    }
+    function contrastRatio(fg, bg) {
+        var l1 = luminance(fg);
+        var l2 = luminance(bg);
+        var lighter = Math.max(l1, l2);
+        var darker = Math.min(l1, l2);
+        return (lighter + 0.05) / (darker + 0.05);
+    }
+    // Returns true if the pair meets WCAG AA for normal text (4.5:1).
+    function meetsContrastAA(fg, bg) {
+        return contrastRatio(fg, bg) >= 4.5;
+    }
+    // Adjusts `fg` toward white or black until it meets minRatio against `bg`.
+    // Returns the adjusted color, or the original if already passing.
+    function ensureReadable(fg, bg, minRatio) {
+        if (minRatio === undefined) minRatio = 4.5;
+        if (contrastRatio(fg, bg) >= minRatio) return fg;
+
+        var bgLum = luminance(bg);
+        // Try lightening if bg is dark, darkening if bg is light
+        var target = bgLum > 0.5 ? Qt.darker(fg, 1.0) : Qt.lighter(fg, 1.0);
+        for (var i = 0; i < 20; i++) {
+            var step = 1.0 + (i + 1) * 0.1;
+            target = bgLum > 0.5 ? Qt.darker(fg, step) : Qt.lighter(fg, step);
+            if (contrastRatio(target, bg) >= minRatio) return target;
+        }
+        // Last resort: pure white or black
+        return bgLum > 0.5 ? Qt.color("#000000") : Qt.color("#ffffff");
     }
 
     function weatherIcon(desc) {

@@ -166,7 +166,7 @@ PanelWindow {
 
     opacity: root.isOpen ? 1.0 : 0.0
     scale:   root.isOpen ? 1.0 : 0.94
-    Behavior on opacity { NumberAnimation { id: cpFadeAnim;  duration: 220; easing.type: Easing.OutCubic } }
+    Behavior on opacity { NumberAnimation { id: cpFadeAnim;  duration: Colors.durationMedium; easing.type: Easing.OutCubic } }
     Behavior on scale   { NumberAnimation { id: cpScaleAnim; duration: 280; easing.type: Easing.OutBack  } }
     layer.enabled: cpFadeAnim.running || cpScaleAnim.running
 
@@ -182,9 +182,9 @@ PanelWindow {
         top: parent.top
         left: parent.left
         right: parent.right
-        topMargin: 20
-        leftMargin: 24
-        rightMargin: 24
+        topMargin: Colors.spacingLG
+        leftMargin: Colors.paddingLarge
+        rightMargin: Colors.paddingLarge
       }
       spacing: Colors.spacingL
 
@@ -205,7 +205,7 @@ PanelWindow {
           color: Colors.text
           font.pixelSize: Colors.fontSizeLarge
           font.weight: Font.Bold
-          font.letterSpacing: -0.3
+          font.letterSpacing: Colors.letterSpacingTight
           Layout.fillWidth: true
         }
 
@@ -647,7 +647,7 @@ PanelWindow {
           color: Colors.textDisabled
           font.pixelSize: Colors.fontSizeXS
           font.weight: Font.Black
-          font.letterSpacing: 1.4
+          font.letterSpacing: Colors.letterSpacingExtraWide
         }
 
         readonly property var presetColors: [
@@ -675,7 +675,7 @@ PanelWindow {
               border.width: 1
 
               scale: swatchMouse.containsMouse ? 1.15 : 1.0
-              Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutBack } }
+              Behavior on scale { NumberAnimation { duration: Colors.durationSnap; easing.type: Easing.OutBack } }
 
               MouseArea {
                 id: swatchMouse
@@ -700,7 +700,7 @@ PanelWindow {
           color: Colors.textDisabled
           font.pixelSize: Colors.fontSizeXS
           font.weight: Font.Black
-          font.letterSpacing: 1.4
+          font.letterSpacing: Colors.letterSpacingExtraWide
         }
 
         Row {
@@ -718,7 +718,7 @@ PanelWindow {
               border.width: 1
 
               scale: recentMouse.containsMouse ? 1.15 : 1.0
-              Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutBack } }
+              Behavior on scale { NumberAnimation { duration: Colors.durationSnap; easing.type: Easing.OutBack } }
 
               MouseArea {
                 id: recentMouse

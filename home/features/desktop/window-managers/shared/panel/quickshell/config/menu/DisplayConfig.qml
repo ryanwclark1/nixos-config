@@ -509,7 +509,7 @@ PanelWindow {
         radius: Colors.radiusLarge
 
         RowLayout {
-          anchors { fill: parent; leftMargin: 24; rightMargin: 16 }
+          anchors { fill: parent; leftMargin: Colors.paddingLarge; rightMargin: Colors.spacingL }
           spacing: Colors.spacingM
 
           Text {
@@ -650,7 +650,7 @@ PanelWindow {
 
                 // Monitor name
                 Text {
-                  anchors { horizontalCenter: parent.horizontalCenter; top: parent.top; topMargin: 8 }
+                  anchors { horizontalCenter: parent.horizontalCenter; top: parent.top; topMargin: Colors.spacingS }
                   text: monDelegate.modelData.name
                   color: monDelegate.isSelected ? Colors.primary : Colors.text
                   font.pixelSize: Math.max(9, Math.min(13, monDelegate.height * 0.12))
@@ -735,7 +735,7 @@ PanelWindow {
 
         ColumnLayout {
           id: settingsPane
-          anchors { left: parent.left; right: parent.right; top: parent.top; margins: 20 }
+          anchors { left: parent.left; right: parent.right; top: parent.top; margins: Colors.spacingLG }
           spacing: 14
 
           // Section label
@@ -749,7 +749,7 @@ PanelWindow {
             color: Colors.fgDim
             font.pixelSize: Colors.fontSizeXS
             font.weight: Font.Black
-            font.letterSpacing: 1.2
+            font.letterSpacing: Colors.letterSpacingExtraWide
             elide: Text.ElideRight
             Layout.fillWidth: true
           }
@@ -763,7 +763,7 @@ PanelWindow {
               spacing: Colors.spacingSM
               Layout.fillWidth: true
 
-              Text { text: "RESOLUTION"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black; font.letterSpacing: 1.2 }
+              Text { text: "RESOLUTION"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Colors.letterSpacingExtraWide }
 
               ScrollView {
                 Layout.fillWidth: true
@@ -829,7 +829,7 @@ PanelWindow {
               spacing: Colors.spacingSM
               Layout.preferredWidth: 180
 
-              Text { text: "REFRESH RATE"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black; font.letterSpacing: 1.2 }
+              Text { text: "REFRESH RATE"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Colors.letterSpacingExtraWide }
 
               ScrollView {
                 Layout.fillWidth: true
@@ -899,7 +899,7 @@ PanelWindow {
               spacing: Colors.spacingSM
               Layout.preferredWidth: 220
 
-              Text { text: "SCALE"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black; font.letterSpacing: 1.2 }
+              Text { text: "SCALE"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Colors.letterSpacingExtraWide }
 
               Flow {
                 Layout.fillWidth: true
@@ -952,7 +952,7 @@ PanelWindow {
               spacing: Colors.spacingSM
               Layout.preferredWidth: 110
 
-              Text { text: "POSITION"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black; font.letterSpacing: 1.2 }
+              Text { text: "POSITION"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Colors.letterSpacingExtraWide }
 
               Rectangle {
                 width: 100; height: 46
@@ -996,9 +996,9 @@ PanelWindow {
       // ── Profile buttons ─────────────────────────────────────────
       RowLayout {
         Layout.fillWidth: true
-        Layout.leftMargin: 20
-        Layout.rightMargin: 20
-        Layout.topMargin: 8
+        Layout.leftMargin: Colors.spacingLG
+        Layout.rightMargin: Colors.spacingLG
+        Layout.topMargin: Colors.spacingS
         spacing: Colors.spacingS
 
         Text {
@@ -1006,7 +1006,7 @@ PanelWindow {
           color: Colors.textDisabled
           font.pixelSize: Colors.fontSizeXS
           font.weight: Font.Black
-          font.letterSpacing: 1.2
+          font.letterSpacing: Colors.letterSpacingExtraWide
         }
 
         Item { Layout.fillWidth: true }
@@ -1070,7 +1070,7 @@ PanelWindow {
       // ── Action buttons ─────────────────────────────────────────
       RowLayout {
         Layout.fillWidth: true
-        Layout.margins: 20
+        Layout.margins: Colors.spacingLG
         spacing: Colors.spacingM
 
         // Reload button

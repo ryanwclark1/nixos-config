@@ -34,7 +34,7 @@ Rectangle {
   SequentialAnimation {
     id: pulseAnim
     NumberAnimation { target: pulse; property: "opacity"; from: 0.0; to: 1.0; duration: 70 }
-    NumberAnimation { target: pulse; property: "scale"; from: 0.6; to: 1.25; duration: 180; easing.type: Easing.OutCubic }
+    NumberAnimation { target: pulse; property: "scale"; from: 0.6; to: 1.25; duration: Colors.durationFast; easing.type: Easing.OutCubic }
     NumberAnimation { target: pulse; property: "opacity"; from: 1.0; to: 0.0; duration: Colors.durationFast }
     ScriptAction { script: { pulse.scale = 0.6 } }
   }
@@ -61,5 +61,5 @@ Rectangle {
 
   // Squish on press
   scale: mouse.pressed ? 0.90 : 1.0
-  Behavior on scale { NumberAnimation { duration: 110; easing.type: Easing.OutBack } }
+  Behavior on scale { NumberAnimation { duration: Colors.durationSnap; easing.type: Easing.OutBack } }
 }

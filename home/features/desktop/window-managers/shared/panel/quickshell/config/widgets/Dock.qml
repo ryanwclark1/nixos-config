@@ -269,7 +269,7 @@ Scope {
               anchors.centerIn: parent
               width: screenDelegate.vertical ? 3 : parent.width
               height: screenDelegate.vertical ? parent.height : 3
-              radius: 2
+              radius: Colors.radiusMicro
               color: Colors.primary
               opacity: screenDelegate.hidden ? 0.6 : 0.0
               visible: opacity > 0

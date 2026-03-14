@@ -139,7 +139,7 @@ Item {
                                 opacity: themeMouseArea.pressed ? 0.12 : themeMouseArea.containsMouse ? 0.06 : 0
                                 Behavior on opacity {
                                     NumberAnimation {
-                                        duration: 120
+                                        duration: Colors.durationSnap
                                     }
                                 }
                             }

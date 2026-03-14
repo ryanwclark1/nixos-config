@@ -513,6 +513,53 @@ SharedWidgets.CardBase {
 
         Rectangle {
             Layout.fillWidth: true
+            visible: !!root.selectedUnit && !root.detailsExpanded
+            radius: Colors.radiusSmall
+            color: Colors.bgWidget
+            border.color: Colors.border
+            border.width: 1
+            implicitHeight: collapsedUnitRow.implicitHeight + Colors.spacingS * 2
+
+            RowLayout {
+                id: collapsedUnitRow
+                anchors.fill: parent
+                anchors.margins: Colors.spacingS
+                spacing: Colors.spacingS
+
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 2
+
+                    Text {
+                        text: root.selectedUnit ? String(root.selectedUnit.name || "service") : ""
+                        color: Colors.text
+                        font.pixelSize: Colors.fontSizeSmall
+                        font.weight: Font.Medium
+                        Layout.fillWidth: true
+                        elide: Text.ElideRight
+                    }
+
+                    Text {
+                        text: root.selectedUnit ? ("Details collapsed. Select the row again to reopen " + (root.selectedUnitScope === "system" ? "system" : "user") + " unit actions.") : ""
+                        color: Colors.fgDim
+                        font.pixelSize: Colors.fontSizeXS
+                        Layout.fillWidth: true
+                        wrapMode: Text.WordWrap
+                    }
+                }
+
+                SharedWidgets.IconButton {
+                    icon: "󰐕"
+                    size: 28
+                    iconSize: Colors.fontSizeSmall
+                    iconColor: Colors.primary
+                    onClicked: root.detailsExpanded = true
+                }
+            }
+        }
+
+        Rectangle {
+            Layout.fillWidth: true
             visible: !!root.selectedUnit && root.detailsExpanded
             radius: Colors.radiusSmall
             color: Colors.bgWidget
@@ -528,7 +575,7 @@ SharedWidgets.CardBase {
 
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: 2
+                    spacing: Colors.spacingXXS
 
                     Text {
                         text: root.selectedUnit ? String(root.selectedUnit.name || "service") : ""

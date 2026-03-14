@@ -10,12 +10,12 @@ Rectangle {
   Layout.fillWidth: true
   height: 4
   color: Colors.surface
-  radius: 2
+  radius: Colors.radiusMicro
 
   Rectangle {
     width: parent.width * Math.max(0, Math.min(1, root.value))
     height: parent.height
     color: root.barColor
-    radius: 2
+    radius: Colors.radiusMicro
   }
 }

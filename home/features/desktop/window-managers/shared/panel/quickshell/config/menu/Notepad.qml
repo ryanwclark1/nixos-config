@@ -320,7 +320,7 @@ PanelWindow {
       anchors.leftMargin: -3
       anchors.verticalCenter: parent.verticalCenter
       opacity: dragArea.containsMouse || dragArea.pressed ? 1.0 : 0.4
-      Behavior on opacity { NumberAnimation { duration: 180 } }
+      Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
       Behavior on color { ColorAnimation { duration: Colors.durationFast } }
 
       MouseArea {
@@ -358,7 +358,7 @@ PanelWindow {
           color: Colors.text
           font.pixelSize: Colors.fontSizeXL
           font.weight: Font.DemiBold
-          font.letterSpacing: -0.3
+          font.letterSpacing: Colors.letterSpacingTight
         }
 
         Item { Layout.fillWidth: true }

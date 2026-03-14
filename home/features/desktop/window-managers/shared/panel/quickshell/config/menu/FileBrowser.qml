@@ -310,7 +310,7 @@ PanelWindow {
 
     opacity: root.isOpen ? 1.0 : 0.0
     scale:   root.isOpen ? 1.0 : 0.95
-    Behavior on opacity { NumberAnimation { id: fbFadeAnim;  duration: 220; easing.type: Easing.OutCubic } }
+    Behavior on opacity { NumberAnimation { id: fbFadeAnim;  duration: Colors.durationMedium; easing.type: Easing.OutCubic } }
     Behavior on scale   { NumberAnimation { id: fbScaleAnim; duration: 260; easing.type: Easing.OutBack  } }
     layer.enabled: fbFadeAnim.running || fbScaleAnim.running
 
@@ -350,7 +350,7 @@ PanelWindow {
             color: Colors.text
             font.pixelSize: Colors.fontSizeLarge
             font.weight: Colors.fontWeightBold
-            font.letterSpacing: -0.3
+            font.letterSpacing: Colors.letterSpacingTight
           }
 
           Item { Layout.fillWidth: true }
@@ -361,7 +361,7 @@ PanelWindow {
             color: root._viewGrid
               ? Colors.withAlpha(Colors.primary, 0.25)
               : "transparent"
-            Behavior on color { ColorAnimation { duration: 130 } }
+            Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
 
             Text {
               anchors.centerIn: parent
@@ -391,7 +391,7 @@ PanelWindow {
             color: !root._viewGrid
               ? Colors.withAlpha(Colors.primary, 0.25)
               : "transparent"
-            Behavior on color { ColorAnimation { duration: 130 } }
+            Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
 
             Text {
               anchors.centerIn: parent
@@ -477,7 +477,7 @@ PanelWindow {
               color: Colors.textDisabled
               font.pixelSize: Colors.fontSizeXS
               font.weight: Colors.fontWeightBold
-              font.letterSpacing: 1.0
+              font.letterSpacing: Colors.letterSpacingWide
             }
 
             Repeater {
@@ -496,7 +496,7 @@ PanelWindow {
                   if (locHover.containsMouse) return Colors.withAlpha(Colors.text, 0.07);
                   return "transparent";
                 }
-                Behavior on color { ColorAnimation { duration: 120 } }
+                Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
 
                 RowLayout {
                   anchors.fill: parent
@@ -648,7 +648,7 @@ PanelWindow {
                           if (crumbHover.containsMouse) return Colors.withAlpha(Colors.text, 0.08);
                           return "transparent";
                         }
-                        Behavior on color { ColorAnimation { duration: 100 } }
+                        Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
 
                         Text {
                           id: crumbText
@@ -875,7 +875,7 @@ PanelWindow {
                   text: "󰑐"
                   color: Colors.textDisabled
                   font.family: Colors.fontMono
-                  font.pixelSize: 28
+                  font.pixelSize: Colors.fontSizeDisplay
 
                   RotationAnimator on rotation {
                     running: root._loading
@@ -964,7 +964,7 @@ PanelWindow {
                         if (gridItemHover.containsMouse) return Colors.withAlpha(Colors.text, 0.08);
                         return "transparent";
                       }
-                      Behavior on color { ColorAnimation { duration: 110 } }
+                      Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
 
                       ColumnLayout {
                         anchors.fill: parent
@@ -1094,7 +1094,7 @@ PanelWindow {
                       if (listItemHover.containsMouse) return Colors.withAlpha(Colors.text, 0.06);
                       return index % 2 === 0 ? "transparent" : Colors.withAlpha(Colors.surface, 0.3);
                     }
-                    Behavior on color { ColorAnimation { duration: 100 } }
+                    Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
 
                     // bottom separator
                     Rectangle {
@@ -1246,7 +1246,7 @@ PanelWindow {
                 color: Colors.withAlpha(Colors.surface, 0.7)
                 border.color: saveField.activeFocus ? Colors.primary : Colors.border
                 border.width: 1
-                Behavior on border.color { ColorAnimation { duration: 120 } }
+                Behavior on border.color { ColorAnimation { duration: Colors.durationSnap } }
 
                 RowLayout {
                   anchors.fill: parent
@@ -1326,7 +1326,7 @@ PanelWindow {
                     ? Colors.withAlpha(Colors.text, 0.1) : Colors.withAlpha(Colors.surface, 0.6)
                   border.color: Colors.border
                   border.width: 1
-                  Behavior on color { ColorAnimation { duration: 120 } }
+                  Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
 
                   RowLayout {
                     anchors.fill: parent
@@ -1372,7 +1372,7 @@ PanelWindow {
                     ? Colors.withAlpha(Colors.text, 0.1) : Colors.withAlpha(Colors.surface, 0.6)
                   border.color: Colors.border
                   border.width: 1
-                  Behavior on color { ColorAnimation { duration: 120 } }
+                  Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
 
                   Text {
                     id: cancelText
@@ -1408,7 +1408,7 @@ PanelWindow {
                     : Colors.withAlpha(Colors.surface, 0.6)
                   border.color: canConfirm ? Colors.primary : Colors.border
                   border.width: 1
-                  Behavior on color { ColorAnimation { duration: 120 } }
+                  Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
 
                   Text {
                     id: actionText

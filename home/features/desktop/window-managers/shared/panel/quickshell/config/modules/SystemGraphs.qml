@@ -77,7 +77,7 @@ Rectangle {
       spacing: 5
       RowLayout {
         Layout.preferredHeight: 14
-        Text { text: "CPU"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.letterSpacing: 1 }
+        Text { text: "CPU"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.letterSpacing: Colors.letterSpacingWide }
         Item { Layout.fillWidth: true }
         Text { text: Math.round(root.cpuHistory[root.cpuHistory.length-1] * 100) + "%"; color: Colors.primary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
       }
@@ -99,7 +99,7 @@ Rectangle {
       spacing: 5
       RowLayout {
         Layout.preferredHeight: 14
-        Text { text: "MEM"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.letterSpacing: 1 }
+        Text { text: "MEM"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.letterSpacing: Colors.letterSpacingWide }
         Item { Layout.fillWidth: true }
         Text { text: Math.round(root.memHistory[root.memHistory.length-1] * 100) + "%"; color: Colors.accent; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
       }

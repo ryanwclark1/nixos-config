@@ -36,7 +36,7 @@ Rectangle {
   // Month transition: brief opacity dip on the days grid
   SequentialAnimation {
     id: monthTransition
-    NumberAnimation { target: daysGrid; property: "opacity"; to: 0.3; duration: 60 }
+    NumberAnimation { target: daysGrid; property: "opacity"; to: 0.3; duration: Colors.durationFlash }
     NumberAnimation { target: daysGrid; property: "opacity"; to: 1.0; duration: Colors.durationFast; easing.type: Easing.OutCubic }
   }
 

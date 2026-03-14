@@ -96,7 +96,7 @@ Item {
     // Smooth position updates while not dragging.
     Behavior on y {
       enabled: !thumbDrag.drag.active
-      NumberAnimation { duration: 60; easing.type: Easing.OutCubic }
+      NumberAnimation { duration: Colors.durationFlash; easing.type: Easing.OutCubic }
     }
 
     // ── Drag + hover MouseArea ─────────────────────────────────────────────

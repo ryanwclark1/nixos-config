@@ -489,7 +489,7 @@ Item {
                             font.pixelSize: root.compactMode ? Colors.fontSizeLarge : Colors.fontSizeXL
                             Behavior on color {
                                 ColorAnimation {
-                                    duration: 180
+                                    duration: Colors.durationFast
                                 }
                             }
                         }

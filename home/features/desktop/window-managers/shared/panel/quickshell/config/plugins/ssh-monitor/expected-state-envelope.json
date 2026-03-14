@@ -1,0 +1,15 @@
+{
+  "stateVersion": 1,
+  "updatedAt": "2026-03-14T00:00:00.000Z",
+  "payload": {
+    "lastConnectedId": "prod-bastion",
+    "lastConnectedLabel": "Prod Bastion",
+    "lastConnectedAt": "2026-03-14T00:00:00.000Z",
+    "recentIds": ["prod-bastion", "team-jump"],
+    "lastImportSummary": {
+      "imported": 4,
+      "skippedPatterns": 1,
+      "errors": 0
+    }
+  }
+}

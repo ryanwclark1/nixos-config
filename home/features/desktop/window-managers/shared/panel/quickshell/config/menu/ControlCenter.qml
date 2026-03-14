@@ -142,7 +142,7 @@ PanelWindow {
                     color: Colors.text
                     font.pixelSize: Colors.fontSizeHuge
                     font.weight: Font.DemiBold
-                    font.letterSpacing: -0.5
+                    font.letterSpacing: Colors.letterSpacingTight
                 }
                 Item {
                     Layout.fillWidth: true
@@ -205,13 +205,13 @@ PanelWindow {
                             layer.enabled: opacity > 0 && opacity < 1
                             Behavior on opacity {
                                 NumberAnimation {
-                                    duration: 400
+                                    duration: Colors.durationEmphasis
                                     easing.type: Easing.OutCubic
                                 }
                             }
                             Behavior on scale {
                                 NumberAnimation {
-                                    duration: 400
+                                    duration: Colors.durationEmphasis
                                     easing.type: Easing.OutBack
                                 }
                             }
@@ -221,8 +221,8 @@ PanelWindow {
                         GridLayout {
                             columns: 2
                             Layout.fillWidth: true
-                            rowSpacing: 10
-                            columnSpacing: 10
+                            rowSpacing: Colors.paddingSmall
+                            columnSpacing: Colors.paddingSmall
                             opacity: root.showContent ? 1 : 0
                             visible: opacity > 0
                             layer.enabled: opacity > 0 && opacity < 1
@@ -239,17 +239,8 @@ PanelWindow {
                                     required property var modelData
                                     icon: modelData.icon
                                     label: modelData.label
-                                    active: modelData.id === "recording" ? RecordingService.isRecording : ControlCenterRegistry.quickToggleActive(modelData.id, root.manager)
-                                    onClicked: {
-                                        if (modelData.id === "recording") {
-                                            if (RecordingService.isRecording)
-                                                RecordingService.stopRecording();
-                                            else
-                                                RecordingService.startRecording("fullscreen");
-                                        } else {
-                                            ControlCenterRegistry.toggleQuickToggle(modelData.id, root.manager);
-                                        }
-                                    }
+                                    active: ControlCenterRegistry.quickToggleActive(modelData.id, root.manager)
+                                    onClicked: ControlCenterRegistry.toggleQuickToggle(modelData.id, root.manager)
                                 }
                             }
                         }
@@ -469,7 +460,7 @@ PanelWindow {
                             layer.enabled: opacity > 0 && opacity < 1
                             Behavior on opacity {
                                 NumberAnimation {
-                                    duration: 600
+                                    duration: Colors.durationPulse
                                     easing.type: Easing.OutCubic
                                 }
                             }

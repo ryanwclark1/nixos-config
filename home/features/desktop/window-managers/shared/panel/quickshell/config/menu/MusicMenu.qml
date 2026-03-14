@@ -229,7 +229,7 @@ BasePopupMenu {
         icon: MediaService.isPlaying ? "󰏤" : "󰐊"
         size: root.compactMode ? 42 : 48; tint: Colors.background
         color: root.dominantColor
-        Behavior on color { ColorAnimation { duration: 400 } }
+        Behavior on color { ColorAnimation { duration: Colors.durationEmphasis } }
         onClicked: MediaService.playPause()
       }
 
@@ -265,15 +265,15 @@ BasePopupMenu {
         id: volTrack
         Layout.fillWidth: true
         height: 4
-        radius: 2
+        radius: Colors.radiusMicro
         color: Colors.bgWidget
 
         Rectangle {
           height: parent.height
           width: root.player ? parent.width * Colors.clamp01(root.player.volume) : 0
-          radius: 2
+          radius: Colors.radiusMicro
           color: root.dominantColor
-          Behavior on color { ColorAnimation { duration: 400 } }
+          Behavior on color { ColorAnimation { duration: Colors.durationEmphasis } }
         }
 
         MouseArea {

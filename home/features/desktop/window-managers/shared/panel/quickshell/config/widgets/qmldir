@@ -50,3 +50,5 @@ TrayWidget 1.0 TrayWidget.qml
 WavyProgress 1.0 WavyProgress.qml
 AppVolumeEntry 1.0 AppVolumeEntry.qml
 WorkspaceOsd 1.0 WorkspaceOsd.qml
+ContextMenu 1.0 ContextMenu.qml
+CollapsibleSection 1.0 CollapsibleSection.qml

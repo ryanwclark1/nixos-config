@@ -57,7 +57,7 @@ validate_one() {
   fi
 
   case "$type" in
-    bar-widget|desktop-widget|launcher-provider|daemon|multi) ;;
+    bar-widget|desktop-widget|launcher-provider|control-center-widget|daemon|multi) ;;
     *) echo "FAIL|$(basename "$dir")|E_MANIFEST_VALIDATION|invalid type: ${type}"; return ;;
   esac
 
@@ -78,15 +78,21 @@ validate_one() {
     esac
   done < <(jq -r '.permissions[]? | tostring' "$manifest")
 
-  local ep_bar ep_desktop ep_launcher ep_daemon ep_settings
+  local ep_bar ep_desktop ep_launcher ep_control_center ep_control_center_detail ep_daemon ep_settings
   ep_bar="$(jq -r '.entryPoints.barWidget // ""' "$manifest")"
   ep_desktop="$(jq -r '.entryPoints.desktopWidget // ""' "$manifest")"
   ep_launcher="$(jq -r '.entryPoints.launcherProvider // ""' "$manifest")"
+  ep_control_center="$(jq -r '.entryPoints.controlCenterWidget // ""' "$manifest")"
+  ep_control_center_detail="$(jq -r '.entryPoints.controlCenterDetail // ""' "$manifest")"
   ep_daemon="$(jq -r '.entryPoints.daemon // ""' "$manifest")"
   ep_settings="$(jq -r '.entryPoints.settings // ""' "$manifest")"
 
   if jq -e '.entryPoints | has("settings")' "$manifest" >/dev/null && ! entry_valid "$ep_settings"; then
     echo "FAIL|$(basename "$dir")|E_MANIFEST_VALIDATION|entryPoints.settings must be a .qml path"
+    return
+  fi
+  if jq -e '.entryPoints | has("controlCenterDetail")' "$manifest" >/dev/null && ! entry_valid "$ep_control_center_detail"; then
+    echo "FAIL|$(basename "$dir")|E_MANIFEST_VALIDATION|entryPoints.controlCenterDetail must be a .qml path"
     return
   fi
 
@@ -102,17 +108,21 @@ validate_one() {
     echo "FAIL|$(basename "$dir")|E_MANIFEST_VALIDATION|launcher-provider type requires entryPoints.launcherProvider"
     return
   fi
+  if [[ "$type" == "control-center-widget" ]] && ! entry_valid "$ep_control_center"; then
+    echo "FAIL|$(basename "$dir")|E_MANIFEST_VALIDATION|control-center-widget type requires entryPoints.controlCenterWidget"
+    return
+  fi
   if [[ "$type" == "daemon" ]] && ! entry_valid "$ep_daemon"; then
     echo "FAIL|$(basename "$dir")|E_MANIFEST_VALIDATION|daemon type requires entryPoints.daemon"
     return
   fi
-  if [[ "$type" == "multi" ]] && ! entry_valid "$ep_bar" && ! entry_valid "$ep_desktop" && ! entry_valid "$ep_launcher" && ! entry_valid "$ep_daemon"; then
+  if [[ "$type" == "multi" ]] && ! entry_valid "$ep_bar" && ! entry_valid "$ep_desktop" && ! entry_valid "$ep_launcher" && ! entry_valid "$ep_control_center" && ! entry_valid "$ep_daemon"; then
     echo "FAIL|$(basename "$dir")|E_MANIFEST_VALIDATION|multi type requires at least one runtime entry point"
     return
   fi
 
   local rel
-  for rel in "$ep_bar" "$ep_desktop" "$ep_launcher" "$ep_daemon" "$ep_settings"; do
+  for rel in "$ep_bar" "$ep_desktop" "$ep_launcher" "$ep_control_center" "$ep_control_center_detail" "$ep_daemon" "$ep_settings"; do
     [[ -n "$rel" ]] || continue
     if [[ ! -f "$dir/$rel" ]]; then
       echo "FAIL|$(basename "$dir")|E_ENTRYPOINT_MISSING|missing file: ${rel}"

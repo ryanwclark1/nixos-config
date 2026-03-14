@@ -67,7 +67,7 @@ Rectangle {
             text: "󰝚"
             color: Colors.fgDim
             font.family: Colors.fontMono
-            font.pixelSize: 32
+            font.pixelSize: Colors.fontSizeIcon
             visible: albumArt.status !== Image.Ready
           }
         }
@@ -99,7 +99,7 @@ Rectangle {
             Layout.fillWidth: true
             Layout.topMargin: Colors.spacingXS
             height: mediaProgressHover.containsMouse ? 6 : 4
-            Behavior on height { NumberAnimation { duration: 100 } }
+            Behavior on height { NumberAnimation { duration: Colors.durationSnap } }
             radius: height / 2
             color: Colors.highlightLight
             visible: modelData.length > 0
