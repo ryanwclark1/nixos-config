@@ -97,7 +97,7 @@ Rectangle {
           // Progress Bar
           Rectangle {
             Layout.fillWidth: true
-            Layout.topMargin: 4
+            Layout.topMargin: Colors.spacingXS
             height: mediaProgressHover.containsMouse ? 6 : 4
             Behavior on height { NumberAnimation { duration: 100 } }
             radius: height / 2

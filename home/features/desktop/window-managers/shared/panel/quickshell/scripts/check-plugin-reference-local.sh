@@ -36,6 +36,13 @@ else
   sed -n '1,120p' /tmp/plugin_reference_install.err >&2
 fi
 
+if "$local_runner" reference-status "$tmp_other_source" --check --quiet >/tmp/plugin_reference_status_absent.out 2>/tmp/plugin_reference_status_absent.err; then
+  pass "plugin-local reference-status --check stays green when the reference plugin is absent"
+else
+  fail "plugin-local reference-status --check should not fail when the reference plugin is merely absent"
+  sed -n '1,120p' /tmp/plugin_reference_status_absent.err >&2
+fi
+
 if [[ -L "$reference_path" && -f "$reference_path/manifest.json" ]]; then
   pass "reference plugin link points to a plugin manifest"
 else
@@ -51,6 +58,16 @@ fi
 
 mkdir -p "$other_target"
 ln -s "$other_target" "$non_symlink_target"
+if "$local_runner" reference-status "$tmp_non_symlink_dir" --check --quiet >/tmp/plugin_reference_status_wrong_symlink.out 2>/tmp/plugin_reference_status_wrong_symlink.err; then
+  fail "plugin-local reference-status --check should fail for a mismatched symlink target"
+else
+  if rg -q 'Reference status check failed' /tmp/plugin_reference_status_wrong_symlink.err; then
+    pass "plugin-local reference-status --check fails for a mismatched symlink target"
+  else
+    fail "plugin-local reference-status --check returned the wrong error for a mismatched symlink target"
+    sed -n '1,120p' /tmp/plugin_reference_status_wrong_symlink.err >&2
+  fi
+fi
 if "$local_runner" install-reference "$tmp_non_symlink_dir" >/tmp/plugin_reference_install_wrong_symlink.out 2>/tmp/plugin_reference_install_wrong_symlink.err; then
   fail "plugin-local install-reference should refuse replacing a symlink that points somewhere else"
 else
@@ -64,6 +81,16 @@ fi
 rm "$non_symlink_target"
 
 mkdir -p "$non_symlink_target"
+if "$local_runner" reference-status "$tmp_non_symlink_dir" --check --quiet >/tmp/plugin_reference_status_nonsymlink.out 2>/tmp/plugin_reference_status_nonsymlink.err; then
+  fail "plugin-local reference-status --check should fail for a non-symlink reference path"
+else
+  if rg -q 'Reference status check failed' /tmp/plugin_reference_status_nonsymlink.err; then
+    pass "plugin-local reference-status --check fails for a non-symlink reference path"
+  else
+    fail "plugin-local reference-status --check returned the wrong error for a non-symlink reference path"
+    sed -n '1,120p' /tmp/plugin_reference_status_nonsymlink.err >&2
+  fi
+fi
 if "$local_runner" install-reference "$tmp_non_symlink_dir" >/tmp/plugin_reference_install_existing_dir.out 2>/tmp/plugin_reference_install_existing_dir.err; then
   fail "plugin-local install-reference should refuse overwriting an existing non-symlink path"
 else
@@ -95,7 +122,37 @@ else
 fi
 
 mkdir -p "$invalid_reference_path"
-cat > "${invalid_reference_path}/manifest.json" <<'EOF'
+cp "$reference_path/manifest.json" "${invalid_reference_path}/manifest.json"
+if "$local_runner" smoke-reference "$tmp_invalid_reference_dir" >/tmp/plugin_reference_smoke_nonsymlink.out 2>/tmp/plugin_reference_smoke_nonsymlink.err; then
+  fail "plugin-local smoke-reference should fail when the reference plugin path is not the expected symlink"
+else
+  if rg -q 'Reference plugin path is not the expected symlink' /tmp/plugin_reference_smoke_nonsymlink.err; then
+    pass "plugin-local smoke-reference fails cleanly when the reference plugin path is not a symlink"
+  else
+    fail "plugin-local smoke-reference returned the wrong error for a non-symlink reference path"
+    sed -n '1,120p' /tmp/plugin_reference_smoke_nonsymlink.err >&2
+  fi
+fi
+rm -rf "$invalid_reference_path"
+
+mkdir -p "$other_target"
+cp "$reference_path/manifest.json" "${other_target}/manifest.json"
+ln -s "$other_target" "$invalid_reference_path"
+if "$local_runner" smoke-reference "$tmp_invalid_reference_dir" >/tmp/plugin_reference_smoke_wrong_target.out 2>/tmp/plugin_reference_smoke_wrong_target.err; then
+  fail "plugin-local smoke-reference should fail when the reference symlink points somewhere else"
+else
+  if rg -q 'Reference plugin symlink has unexpected target' /tmp/plugin_reference_smoke_wrong_target.err; then
+    pass "plugin-local smoke-reference fails cleanly when the reference symlink target is wrong"
+  else
+    fail "plugin-local smoke-reference returned the wrong error for a mismatched symlink target"
+    sed -n '1,120p' /tmp/plugin_reference_smoke_wrong_target.err >&2
+  fi
+fi
+rm -f "$invalid_reference_path"
+
+wrong_id_target="${tmp_invalid_reference_dir}/wrong-id-target"
+mkdir -p "$wrong_id_target"
+cat > "${wrong_id_target}/manifest.json" <<'EOF'
 {
   "id": "not.reference.local.toolkit",
   "name": "Wrong Reference",
@@ -108,6 +165,7 @@ cat > "${invalid_reference_path}/manifest.json" <<'EOF'
   }
 }
 EOF
+ln -s "$wrong_id_target" "$invalid_reference_path"
 if "$local_runner" smoke-reference "$tmp_invalid_reference_dir" >/tmp/plugin_reference_smoke_wrong_id.out 2>/tmp/plugin_reference_smoke_wrong_id.err; then
   fail "plugin-local smoke-reference should fail when the installed manifest id is not the reference plugin id"
 else
@@ -118,7 +176,7 @@ else
     sed -n '1,120p' /tmp/plugin_reference_smoke_wrong_id.err >&2
   fi
 fi
-rm -rf "$invalid_reference_path"
+rm -f "$invalid_reference_path"
 
 if "$local_runner" remove-reference "$tmp_plugins" >/tmp/plugin_reference_remove.out 2>/tmp/plugin_reference_remove.err; then
   pass "plugin-local remove-reference removes the linked reference plugin"
@@ -132,6 +190,33 @@ if [[ ! -e "$reference_path" ]]; then
 else
   fail "reference plugin path still exists after remove-reference"
 fi
+
+mkdir -p "$non_symlink_target"
+if "$local_runner" remove-reference "$tmp_non_symlink_dir" >/tmp/plugin_reference_remove_nonsymlink.out 2>/tmp/plugin_reference_remove_nonsymlink.err; then
+  fail "plugin-local remove-reference should refuse deleting a non-symlink reference path"
+else
+  if rg -q 'Refusing to remove non-symlink path' /tmp/plugin_reference_remove_nonsymlink.err; then
+    pass "plugin-local remove-reference refuses deleting a non-symlink reference path"
+  else
+    fail "plugin-local remove-reference returned the wrong error for a non-symlink reference path"
+    sed -n '1,120p' /tmp/plugin_reference_remove_nonsymlink.err >&2
+  fi
+fi
+rm -rf "$non_symlink_target"
+
+mkdir -p "$other_target"
+ln -s "$other_target" "$non_symlink_target"
+if "$local_runner" remove-reference "$tmp_non_symlink_dir" >/tmp/plugin_reference_remove_wrong_symlink.out 2>/tmp/plugin_reference_remove_wrong_symlink.err; then
+  fail "plugin-local remove-reference should refuse deleting a symlink that points somewhere else"
+else
+  if rg -q 'Refusing to remove symlink with different target' /tmp/plugin_reference_remove_wrong_symlink.err; then
+    pass "plugin-local remove-reference refuses deleting a symlink with a different target"
+  else
+    fail "plugin-local remove-reference returned the wrong error for a mismatched symlink target"
+    sed -n '1,120p' /tmp/plugin_reference_remove_wrong_symlink.err >&2
+  fi
+fi
+rm -f "$non_symlink_target"
 
 if "$local_runner" remove-reference "$tmp_plugins" >/tmp/plugin_reference_remove_missing.out 2>/tmp/plugin_reference_remove_missing.err; then
   pass "plugin-local remove-reference is safe when the reference plugin is already absent"

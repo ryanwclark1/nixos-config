@@ -158,6 +158,11 @@ case "$mode" in
       echo "[FAIL] Refusing to remove non-symlink path: ${destination}" >&2
       exit 1
     fi
+    current_target="$(readlink "$destination" || true)"
+    if [[ "$current_target" != "$reference_source_dir" ]]; then
+      echo "[FAIL] Refusing to remove symlink with different target: ${destination}" >&2
+      exit 1
+    fi
     rm "$destination"
     printf '[INFO] Removed reference plugin from %s\n' "$destination"
     ;;
@@ -174,6 +179,15 @@ case "$mode" in
     fi
     if ! jq -e --arg id "$reference_plugin_id" '.id == $id' "$manifest_path" >/dev/null 2>&1; then
       echo "[FAIL] Reference plugin manifest has unexpected id: ${manifest_path}" >&2
+      exit 1
+    fi
+    if [[ ! -L "$destination" ]]; then
+      echo "[FAIL] Reference plugin path is not the expected symlink: ${destination}" >&2
+      exit 1
+    fi
+    current_target="$(readlink "$destination" || true)"
+    if [[ "$current_target" != "$reference_source_dir" ]]; then
+      echo "[FAIL] Reference plugin symlink has unexpected target: ${destination}" >&2
       exit 1
     fi
     cp -RL "$destination" "${tmp_plugins}/${reference_dir_name}"
@@ -282,17 +296,21 @@ EOF
       health_failures=$((health_failures + 1))
     fi
     if [[ -L "$destination" ]]; then
-      install_health="$(health_label 1 "reference plugin installed as symlink")"
+      install_target="$(readlink "$destination" || true)"
+      if [[ "$install_target" == "$reference_source_dir" ]]; then
+        install_health="$(health_label 1 "reference plugin installed as expected symlink")"
+        install_state="installed (expected symlink)"
+      else
+        install_health="warning: reference plugin symlink target differs from repo-tracked source"
+        install_state="installed (foreign symlink target)"
+        health_failures=$((health_failures + 1))
+      fi
     elif [[ -e "$destination" ]]; then
       install_health="warning: reference plugin path is present but not a symlink"
+      install_state="present (non-symlink)"
+      health_failures=$((health_failures + 1))
     else
       install_health="info: reference plugin not installed"
-    fi
-    if [[ -L "$destination" ]]; then
-      install_state="installed (symlink)"
-    elif [[ -e "$destination" ]]; then
-      install_state="present (non-symlink)"
-    else
       install_state="not installed"
     fi
     if (( quiet == 0 )); then

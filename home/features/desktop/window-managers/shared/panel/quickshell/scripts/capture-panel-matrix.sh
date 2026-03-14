@@ -9,7 +9,7 @@ repo_shell_mode=0
 repo_shell_pid=""
 repo_shell_service_was_active=0
 settings_preset="portrait"
-surface_crop="monitor"
+surface_crop="surface"
 workspace_target="auto"
 output_dir="/tmp/panel-qa-matrix"
 settings_delay="2.5"
@@ -130,7 +130,7 @@ EOF
 
 usage() {
   cat <<'EOF'
-Usage: capture-panel-matrix.sh [--id INSTANCE_ID] [--repo-shell] [--output-dir DIR] [--settings-preset portrait|laptop|wide] [--surface-crop monitor|usable] [--workspace current|auto|NAME] [--settings-delay SECONDS] [--surface-delay SECONDS] [--settings-deep-scroll-y PX] [--skip-settings] [--skip-surfaces]
+Usage: capture-panel-matrix.sh [--id INSTANCE_ID] [--repo-shell] [--output-dir DIR] [--settings-preset portrait|laptop|wide] [--surface-crop surface|monitor|usable] [--workspace current|auto|NAME] [--settings-delay SECONDS] [--surface-delay SECONDS] [--settings-deep-scroll-y PX] [--skip-settings] [--skip-surfaces]
 
 Capture the shared panel QA artifact set:
   - high-risk settings tab screenshots

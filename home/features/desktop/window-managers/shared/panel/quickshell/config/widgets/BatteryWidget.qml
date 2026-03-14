@@ -6,6 +6,7 @@ import "../services"
 Row {
   id: root
   spacing: 6
+  property bool iconOnly: false
 
   property var device: UPower.displayDevice
   property bool hasBattery: device != null && device.isPresent
@@ -34,6 +35,7 @@ Row {
   }
 
   Text {
+    visible: !root.iconOnly
     text: showBattery && device ? Math.round(device.percentage * 100) + "%" : ""
     color: Colors.text
     font.pixelSize: Colors.fontSizeSmall

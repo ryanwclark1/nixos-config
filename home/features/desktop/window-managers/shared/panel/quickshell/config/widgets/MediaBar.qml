@@ -12,6 +12,7 @@ Rectangle {
   clip: true
 
   property var anchorWindow: null
+  property bool vertical: false
   visible: MediaService.currentPlayer !== null
 
   // Rewind detection: flash prev icon when position jumps backward > 3s
@@ -44,7 +45,7 @@ Rectangle {
   Text {
     anchors.verticalCenter: parent.verticalCenter
     anchors.left: parent.left
-    anchors.leftMargin: 4
+    anchors.leftMargin: Colors.spacingXS
     text: "󰒮"
     color: Colors.primary
     font.family: Colors.fontMono
@@ -56,8 +57,8 @@ Rectangle {
   Row {
     id: mediaRow
     anchors.centerIn: parent
-    anchors.leftMargin: 8
-    anchors.rightMargin: 8
+    anchors.leftMargin: Colors.spacingS
+    anchors.rightMargin: Colors.spacingS
     spacing: Colors.spacingS
 
     CircularGauge {
@@ -72,7 +73,8 @@ Rectangle {
 
     Item {
       id: marqueeContainer
-      width: Math.min(marqueeText.contentWidth, 150)
+      visible: !root.vertical
+      width: visible ? Math.min(marqueeText.contentWidth, 150) : 0
       height: 20
       clip: true
       anchors.verticalCenter: parent.verticalCenter

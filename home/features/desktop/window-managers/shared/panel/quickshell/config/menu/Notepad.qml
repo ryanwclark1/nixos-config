@@ -373,7 +373,7 @@ PanelWindow {
           color: Colors.textDisabled
           font.pixelSize: Colors.fontSizeXS
           Layout.alignment: Qt.AlignVCenter
-          Layout.rightMargin: 4
+          Layout.rightMargin: Colors.spacingXS
         }
 
         // Open file button
@@ -524,10 +524,10 @@ PanelWindow {
                   Text {
                     id: tabLabelText
                     anchors.left: parent.left
-                    anchors.leftMargin: 8
+                    anchors.leftMargin: Colors.spacingS
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: deleteTabBtn.left
-                    anchors.rightMargin: 4
+                    anchors.rightMargin: Colors.spacingXS
                     text: modelData.title
                     color: isActive ? Colors.primary : Colors.textSecondary
                     font.pixelSize: Colors.fontSizeSmall
@@ -540,7 +540,7 @@ PanelWindow {
                   TextInput {
                     id: tabEditInput
                     anchors.left: parent.left
-                    anchors.leftMargin: 8
+                    anchors.leftMargin: Colors.spacingS
                     anchors.verticalCenter: parent.verticalCenter
                     width: Math.max(60, contentWidth + 4)
                     text: modelData.title
@@ -703,7 +703,7 @@ PanelWindow {
               anchors.left: parent.left
               anchors.top: parent.top
               anchors.leftMargin: 14
-              anchors.topMargin: 12
+              anchors.topMargin: Colors.spacingM
               text: "Start typing..."
               color: Colors.textDisabled
               font.pixelSize: Colors.fontSizeMedium

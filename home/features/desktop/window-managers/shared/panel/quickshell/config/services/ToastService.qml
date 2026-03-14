@@ -1,5 +1,5 @@
-import Quickshell
 import QtQuick
+import Quickshell
 
 pragma Singleton
 

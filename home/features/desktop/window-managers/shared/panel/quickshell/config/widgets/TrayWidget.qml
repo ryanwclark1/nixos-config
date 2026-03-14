@@ -1,15 +1,15 @@
 import QtQuick
-import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.SystemTray
 import Quickshell.Widgets
 import "../services"
 
 
-Row {
+Flow {
   id: root
   spacing: Colors.spacingS
-  anchors.verticalCenter: parent.verticalCenter
+  property bool vertical: false
+  flow: vertical ? Flow.TopToBottom : Flow.LeftToRight
   property var anchorWindow: null
 
   Repeater {
@@ -23,7 +23,6 @@ Row {
       color: "transparent"
       scale: mouseArea.containsMouse ? 1.08 : 1.0
 
-      anchors.verticalCenter: parent.verticalCenter
       Behavior on scale { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
 
       IconImage {

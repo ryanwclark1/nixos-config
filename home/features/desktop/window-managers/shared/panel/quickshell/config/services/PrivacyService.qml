@@ -1,6 +1,6 @@
+import QtQuick
 import Quickshell
 import Quickshell.Io
-import QtQuick
 import "../widgets" as SharedWidgets
 
 pragma Singleton

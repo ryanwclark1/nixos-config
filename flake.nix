@@ -230,7 +230,6 @@
                   initialPassword = lib.mkForce "niri";
                 };
                 systemd.user.services.niri-flake-polkit.wantedBy = lib.mkForce [ ];
-                systemd.user.services.geoclue-agent.wantedBy = lib.mkForce [ ];
 
                 # Keep this profile focused on compositor/UI testing.
                 virtualisation.vmVariant = {

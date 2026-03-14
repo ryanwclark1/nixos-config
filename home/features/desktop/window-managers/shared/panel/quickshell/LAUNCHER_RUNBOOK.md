@@ -2,6 +2,8 @@
 
 Use this guide for day-to-day launcher validation and incident triage.
 
+For implementation planning beyond this runbook, see `NEXT_STEPS.md`.
+
 ## Quick Commands
 
 - Guardrails only:
@@ -19,6 +21,10 @@ Use this guide for day-to-day launcher validation and incident triage.
 - CI-safe launcher smoke gate:
   - `scripts/check-launcher-smoke.sh --ci`
   - If no live QuickShell launcher instance is reachable, smoke falls back to static launcher probes, skips live category/`Esc` diagnostics, and still runs benchmarks.
+- Launcher visual capture artifact:
+  - `scripts/capture-launcher-viewport.sh --mode drun --state home`
+- Launcher visual capture matrix:
+  - `scripts/capture-launcher-matrix.sh`
 
 Live launcher scripts auto-select a QuickShell instance in this order:
 1. launched from this repo’s `config/shell.qml` and exposing both `drunCategoryState` and `escapeActionState`
@@ -69,6 +75,32 @@ Result-list navigation shortcuts:
 Query shortcuts:
 - `Ctrl+L` / `Ctrl+U`: clear the current launcher query and keep focus in the search field
 - `Esc`: cancel confirm, otherwise reset the current query or active app-category filter before closing the launcher on the next press
+
+## Visual Capture
+
+Use the launcher capture script when you need a review artifact for the upgraded launcher UI.
+
+- drun home:
+  - `scripts/capture-launcher-viewport.sh --mode drun --state home`
+- drun query results:
+  - `scripts/capture-launcher-viewport.sh --mode drun --state query --query firefox`
+- drun category state:
+  - `scripts/capture-launcher-viewport.sh --mode drun --state category`
+- files empty state:
+  - `scripts/capture-launcher-viewport.sh --mode files --state empty`
+- system mode:
+  - `scripts/capture-launcher-viewport.sh --mode system --state home`
+
+Default output goes to `/tmp/launcher-<mode>-<state>.png`.
+
+Use the launcher matrix script when you want the core review set in one pass.
+
+- core launcher matrix:
+  - `scripts/capture-launcher-matrix.sh`
+- packaged helper:
+  - `qs-launcher-capture-matrix`
+
+The launcher matrix writes an `index.html` gallery beside the PNG artifacts for quick review.
 
 - Core line:
   - `opens`, `cache`, `failures`, `filter avg/last`

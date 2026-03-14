@@ -146,6 +146,16 @@ let
     ${builtins.readFile ./scripts/capture-surface-matrix.sh}
   '';
 
+  launcherCaptureScript = pkgs.writeShellScriptBin "qs-launcher-capture" ''
+    PATH="${pkgs.quickshell}/bin:${pkgs.hyprland}/bin:${pkgs.grim}/bin:${pkgs.imagemagick}/bin:${pkgs.jq}/bin:${pkgs.findutils}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:${pkgs.procps}/bin:${pkgs.nodejs}/bin:${pkgs.bash}/bin:$PATH"
+    ${builtins.readFile ./scripts/capture-launcher-viewport.sh}
+  '';
+
+  launcherMatrixCaptureScript = pkgs.writeShellScriptBin "qs-launcher-capture-matrix" ''
+    PATH="${pkgs.quickshell}/bin:${pkgs.hyprland}/bin:${pkgs.grim}/bin:${pkgs.imagemagick}/bin:${pkgs.jq}/bin:${pkgs.findutils}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:${pkgs.procps}/bin:${pkgs.nodejs}/bin:${pkgs.bash}/bin:$PATH"
+    ${builtins.readFile ./scripts/capture-launcher-matrix.sh}
+  '';
+
   panelMatrixCaptureScript = pkgs.writeShellScriptBin "qs-panel-capture-matrix" ''
     PATH="${pkgs.quickshell}/bin:${pkgs.hyprland}/bin:${pkgs.grim}/bin:${pkgs.imagemagick}/bin:${pkgs.jq}/bin:${pkgs.findutils}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:${pkgs.procps}/bin:${pkgs.git}/bin:${pkgs.bash}/bin:$PATH"
     ${builtins.readFile ./scripts/capture-panel-matrix.sh}
@@ -293,6 +303,8 @@ EOF
         ExecStart = "${pkgs.quickshell}/bin/quickshell";
         Environment = [
           "PATH=%h/.local/bin:%h/.nix-profile/bin:/etc/profiles/per-user/%u/bin:/run/current-system/sw/bin:${pkgs.quickshell}/bin:${pkgs.pipewire}/bin:${pkgs.networkmanager}/bin:${pkgs.tailscale}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.bash}/bin:${pkgs.procps}/bin:${pkgs.wl-clipboard}/bin:${pkgs.power-profiles-daemon}/bin"
+          "QT_QPA_PLATFORMTHEME=adwaita"
+          "QT_STYLE_OVERRIDE=adwaita-dark"
         ];
         Restart = "on-failure";
         RestartSec = 2;

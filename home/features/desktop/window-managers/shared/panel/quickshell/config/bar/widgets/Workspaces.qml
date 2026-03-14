@@ -5,17 +5,20 @@ import "../../services"
 
 Rectangle {
   id: root
-  height: 24
-  radius: height / 2
+  height: vertical ? (workspaceApiAvailable && state.workspaces.length > 0 ? (strip.implicitHeight + 12) : 0) : 24
+  radius: vertical ? 12 : height / 2
   color: Colors.bgWidget
-  anchors.verticalCenter: parent.verticalCenter
 
+  property bool vertical: false
   property var anchorWindow: null
   property var state: ({ workspaces: [], activeWorkspace: -1 })
 
   readonly property bool workspaceApiAvailable: CompositorAdapter.supportsWorkspaceListing
-  width: workspaceApiAvailable && state.workspaces.length > 0 ? (strip.implicitWidth + 12) : 0
-  visible: width > 0
+  width: vertical ? (workspaceApiAvailable && state.workspaces.length > 0 ? 28 : 0)
+       : (workspaceApiAvailable && state.workspaces.length > 0 ? (strip.implicitWidth + 12) : 0)
+  implicitWidth: width
+  implicitHeight: height
+  visible: vertical ? (height > 0) : (width > 0)
 
   function updateStateFromHypr(rawText) {
     try {
@@ -135,6 +138,7 @@ Rectangle {
   WorkspaceStrip {
     id: strip
     anchors.centerIn: parent
+    vertical: root.vertical
     state: root.state
   }
 }

@@ -7,6 +7,7 @@ Row {
   id: root
   spacing: Colors.spacingS
 
+  property bool iconOnly: false
   property string networkIcon: "󰤮"
   property string networkName: "Offline"
   property string networkStatus: "disconnected"
@@ -82,6 +83,7 @@ Row {
   }
 
   Row {
+    visible: !root.iconOnly
     anchors.verticalCenter: parent.verticalCenter
     spacing: 6
 

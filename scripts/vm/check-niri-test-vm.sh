@@ -53,25 +53,43 @@ fi
 
 echo "[INFO] SSH is ready; validating session"
 
-read -r expected_count unexpected_count desktop_name session_type <<<"$(
-  "${ssh_base[@]}" '
-    expected=$(pgrep -fc "niri --session|quickshell|kitty")
-    unexpected=$(pgrep -fc "waybar|voxtype|blueman-applet|nm-applet|syncthing|polkit-kde-authentication-agent-1|geoclue-agent")
-    desktop="$(loginctl show-session "$XDG_SESSION_ID" -p Desktop --value 2>/dev/null || true)"
-    type="$(loginctl show-session "$XDG_SESSION_ID" -p Type --value 2>/dev/null || true)"
-    printf "%s %s %s %s\n" "$expected" "$unexpected" "${desktop:-_}" "${type:-_}"
-  '
-)"
+for ((i = 1; i <= 30; i++)); do
+  if "${ssh_base[@]}" '
+    pgrep -fa "niri --session" >/dev/null &&
+    pgrep -fa "/quickshell" >/dev/null &&
+    pgrep -fa "kitty" >/dev/null
+  '; then
+    break
+  fi
+  sleep 2
+done
 
-if (( expected_count < 3 )); then
-  echo "[ERROR] Expected niri/quickshell/kitty to be running, saw count=${expected_count}" >&2
+if ! "${ssh_base[@]}" '
+  pgrep -fa "niri --session" >/dev/null &&
+  pgrep -fa "/quickshell" >/dev/null &&
+  pgrep -fa "kitty" >/dev/null
+'; then
+  echo "[ERROR] Expected niri/quickshell/kitty to be running" >&2
   "${ssh_base[@]}" 'pgrep -a "niri|quickshell|kitty|waybar|voxtype|blueman|nm-applet|syncthing|polkit|geoclue" || true' >&2
   exit 1
 fi
 
-if (( unexpected_count != 0 )); then
+if "${ssh_base[@]}" '
+  pgrep -x waybar >/dev/null ||
+  pgrep -x voxtype >/dev/null ||
+  pgrep -x blueman-applet >/dev/null ||
+  pgrep -x nm-applet >/dev/null ||
+  pgrep -x syncthing >/dev/null ||
+  systemctl --user --quiet is-active niri-flake-polkit.service ||
+  systemctl --user --quiet is-active geoclue-agent.service
+'; then
   echo "[ERROR] Unexpected applet/background processes are still running" >&2
-  "${ssh_base[@]}" 'pgrep -a "waybar|voxtype|blueman-applet|nm-applet|syncthing|polkit-kde-authentication-agent-1|geoclue-agent" || true' >&2
+  "${ssh_base[@]}" '
+    for proc in waybar voxtype blueman-applet nm-applet syncthing geoclue-agent; do
+      pgrep -a -x "$proc" || true
+    done
+    systemctl --user status --no-pager niri-flake-polkit.service geoclue-agent.service 2>/dev/null || true
+  ' >&2
   exit 1
 fi
 
@@ -90,11 +108,14 @@ echo "[INFO] Session summary:"
   journalctl --user --no-pager -n 20
 '
 
-if [[ "${desktop_name}" != "_" && "${desktop_name}" != "niri" ]]; then
+desktop_name="$("${ssh_base[@]}" 'loginctl show-session "$XDG_SESSION_ID" -p Desktop --value 2>/dev/null || true')"
+session_type="$("${ssh_base[@]}" 'loginctl show-session "$XDG_SESSION_ID" -p Type --value 2>/dev/null || true')"
+
+if [[ -n "${desktop_name}" && "${desktop_name}" != "niri" ]]; then
   echo "[WARN] Desktop session reports '${desktop_name}' instead of 'niri'" >&2
 fi
 
-if [[ "${session_type}" != "_" && "${session_type}" != "tty" && "${session_type}" != "wayland" ]]; then
+if [[ -n "${session_type}" && "${session_type}" != "tty" && "${session_type}" != "wayland" ]]; then
   echo "[WARN] Unexpected session type '${session_type}'" >&2
 fi
 

@@ -2869,11 +2869,69 @@ PanelWindow {
           Layout.fillWidth: true
           spacing: Colors.paddingSmall
           visible: Config.launcherShowModeHints && !launcherRoot.tightMode
-          Text { Layout.fillWidth: true; text: launcherRoot.modeInfo(launcherRoot.mode).hint; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; elide: Text.ElideRight }
           Text {
-            text: launcherRoot.legendPrimaryAction + " • " + launcherRoot.legendSecondaryAction + " • " + launcherRoot.legendTertiaryAction
-            color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeXS
+            Layout.fillWidth: true
+            text: launcherRoot.modeInfo(launcherRoot.mode).hint
+            color: Colors.textSecondary
+            font.pixelSize: Colors.fontSizeSmall
+            elide: Text.ElideRight
+          }
+          Row {
+            spacing: Colors.spacingXS
+
+            Rectangle {
+              radius: Colors.radiusPill
+              color: Colors.withAlpha(Colors.primary, 0.12)
+              border.color: Colors.withAlpha(Colors.primary, 0.3)
+              border.width: 1
+              implicitHeight: 24
+              implicitWidth: footerPrimaryText.implicitWidth + 14
+
+              Text {
+                id: footerPrimaryText
+                anchors.centerIn: parent
+                text: launcherRoot.legendPrimaryAction
+                color: Colors.primary
+                font.pixelSize: Colors.fontSizeXS
+                font.weight: Font.DemiBold
+              }
+            }
+
+            Rectangle {
+              radius: Colors.radiusPill
+              color: Colors.withAlpha(Colors.textSecondary, 0.08)
+              border.color: Colors.withAlpha(Colors.primary, 0.14)
+              border.width: 1
+              implicitHeight: 24
+              implicitWidth: footerSecondaryText.implicitWidth + 14
+
+              Text {
+                id: footerSecondaryText
+                anchors.centerIn: parent
+                text: launcherRoot.legendSecondaryAction
+                color: Colors.textSecondary
+                font.pixelSize: Colors.fontSizeXS
+                font.weight: Font.DemiBold
+              }
+            }
+
+            Rectangle {
+              radius: Colors.radiusPill
+              color: Colors.surface
+              border.color: Colors.withAlpha(Colors.primary, 0.12)
+              border.width: 1
+              implicitHeight: 24
+              implicitWidth: footerTertiaryText.implicitWidth + 14
+
+              Text {
+                id: footerTertiaryText
+                anchors.centerIn: parent
+                text: launcherRoot.legendTertiaryAction
+                color: Colors.textDisabled
+                font.pixelSize: Colors.fontSizeXS
+                font.weight: Font.DemiBold
+              }
+            }
           }
         }
 
@@ -3504,9 +3562,9 @@ PanelWindow {
                 Text { text: launcherRoot.modeIcons[launcherRoot.mode] || "󰈔"; color: Colors.textDisabled; font.family: Colors.fontMono; font.pixelSize: 26; Layout.alignment: Qt.AlignHCenter }
                 Text { text: launcherRoot.emptyStateTitle; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.DemiBold; Layout.alignment: Qt.AlignHCenter }
                 Text { text: launcherRoot.emptyStateSubtitle; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; Layout.alignment: Qt.AlignHCenter }
-                                RowLayout {
-                                  Layout.alignment: Qt.AlignHCenter
-                                  spacing: Colors.spacingS
+                RowLayout {
+                  Layout.alignment: Qt.AlignHCenter
+                  spacing: Colors.spacingS
                   Rectangle {
                     radius: Colors.radiusPill
                     color: Colors.primary
@@ -3548,55 +3606,55 @@ PanelWindow {
                       hoverEnabled: true
                       cursorShape: Qt.PointingHandCursor
                       onClicked: launcherRoot.executeEmptySecondary()
-                                    }
-                                  }
-                                }
-                                RowLayout {
-                                  Layout.maximumWidth: Math.min(parent.width - 24, 460)
-                                  Layout.alignment: Qt.AlignHCenter
-                                  spacing: Colors.spacingXS
-                                  Text {
-                                    text: launcherRoot.emptyPrimaryHintIcon
-                                    color: Colors.textDisabled
-                                    font.family: Colors.fontMono
-                                    font.pixelSize: Colors.fontSizeSmall
-                                    visible: text !== ""
-                                    Layout.alignment: Qt.AlignTop
-                                  }
-                                  Text {
-                                    text: launcherRoot.emptyPrimaryHint
-                                    color: Colors.textDisabled
-                                    font.pixelSize: Colors.fontSizeXS
-                                    wrapMode: Text.WordWrap
-                                    horizontalAlignment: Text.AlignHCenter
-                                    Layout.fillWidth: true
-                                  }
-                                }
-                                RowLayout {
-                                  visible: launcherRoot.emptySecondaryHint !== ""
-                                  Layout.maximumWidth: Math.min(parent.width - 24, 460)
-                                  Layout.alignment: Qt.AlignHCenter
-                                  spacing: Colors.spacingXS
-                                  Text {
-                                    text: launcherRoot.emptySecondaryHintIcon
-                                    color: Colors.textDisabled
-                                    font.family: Colors.fontMono
-                                    font.pixelSize: Colors.fontSizeSmall
-                                    visible: text !== ""
-                                    Layout.alignment: Qt.AlignTop
-                                  }
-                                  Text {
-                                    text: launcherRoot.emptySecondaryHint
-                                    color: Colors.textDisabled
-                                    font.pixelSize: Colors.fontSizeXS
-                                    wrapMode: Text.WordWrap
-                                    horizontalAlignment: Text.AlignHCenter
-                                    Layout.fillWidth: true
-                                  }
-                                }
-                              }
-                            }
-                        }
+                    }
+                  }
+                }
+                RowLayout {
+                  Layout.maximumWidth: Math.min(parent.width - 24, 460)
+                  Layout.alignment: Qt.AlignHCenter
+                  spacing: Colors.spacingXS
+                  Text {
+                    text: launcherRoot.emptyPrimaryHintIcon
+                    color: Colors.textDisabled
+                    font.family: Colors.fontMono
+                    font.pixelSize: Colors.fontSizeSmall
+                    visible: text !== ""
+                    Layout.alignment: Qt.AlignTop
+                  }
+                  Text {
+                    text: launcherRoot.emptyPrimaryHint
+                    color: Colors.textDisabled
+                    font.pixelSize: Colors.fontSizeXS
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignHCenter
+                    Layout.fillWidth: true
+                  }
+                }
+                RowLayout {
+                  visible: launcherRoot.emptySecondaryHint !== ""
+                  Layout.maximumWidth: Math.min(parent.width - 24, 460)
+                  Layout.alignment: Qt.AlignHCenter
+                  spacing: Colors.spacingXS
+                  Text {
+                    text: launcherRoot.emptySecondaryHintIcon
+                    color: Colors.textDisabled
+                    font.family: Colors.fontMono
+                    font.pixelSize: Colors.fontSizeSmall
+                    visible: text !== ""
+                    Layout.alignment: Qt.AlignTop
+                  }
+                  Text {
+                    text: launcherRoot.emptySecondaryHint
+                    color: Colors.textDisabled
+                    font.pixelSize: Colors.fontSizeXS
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignHCenter
+                    Layout.fillWidth: true
+                  }
+                }
+              }
+            }
+          }
 
           ColumnLayout {
             spacing: launcherRoot.compactMode ? Colors.paddingSmall : Colors.paddingMedium

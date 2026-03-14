@@ -49,31 +49,24 @@
     recursive = true;
   };
 
-  # home.file = {
-  #   ".config/tmux/plugins/tmux-which-key/config.yaml" = {
-  #     source = ./plugins/tmux-which-key/config.yaml;
-  #     executable = false;
-  #   };
-  # };
-
   programs.tmux = {
     enable = true;
     package = pkgs.tmux;
     plugins = with pkgs; [
       tmuxPlugins.continuum
       tmuxPlugins.yank
-      # pkgs.tmuxPlugins.tmux-resurrect
       tmuxPlugins.tmux-fzf
     ];
+
     aggressiveResize = true;
     baseIndex = 1;
     clock24 = true;
-    customPaneNavigationAndResize = true; # Override the hjkl and HJKL bindings for pane navigation and resizing in VI mode.
+    customPaneNavigationAndResize = true;
     disableConfirmationPrompt = false;
     escapeTime = 0;
     focusEvents = true;
     historyLimit = 50000;
-    keyMode = "vi"; # emacs key bindings in tmux command prompt (prefix + :) are better than vi keys, even for vim users
+    keyMode = "vi";
     mouse = true;
     newSession = false;
     prefix = null;
@@ -84,23 +77,17 @@
     shell = "${pkgs.zsh}/bin/zsh";
     shortcut = "b";
     terminal = "tmux-256color";
-    extraConfig =
-    ''
 
-      # emacs key bindings in tmux command prompt (prefix + :) are better than
-      set -g detach-on-destroy off     # don't exit from tmux when closing a session
-      set -g renumber-windows on       # renumber all windows when any window is closed
-      set -g set-clipboard on          # use system clipboard
-
-      # https://yazi-rs.github.io/docs/image-preview
+    extraConfig = ''
+      set -g detach-on-destroy off
+      set -g renumber-windows on
+      set -g set-clipboard on
       set -g allow-passthrough on
-      set -ga update-environment TERM
-      set -ga update-environment TERM_PROGRAM
 
       ###################################
       # Configure the forceline plugin
 
-      # Options must be set BEFORE sourcing the plugin
+      # Default / desktop settings
       set -g @forceline_theme "catppuccin-frappe"
       set -g @forceline_separator_style "powerline"
       set -g @forceline_window_flags "icon"
@@ -108,16 +95,26 @@
       set -g @forceline_status_connect_separator "yes"
       set -g @forceline_status_background "none"
 
-      # Load the forceline plugin (theme, modules, status rendering)
+      # Load the forceline plugin after setting options
       source-file ~/.config/tmux/plugins/tmux-forceline/forceline.tmux
 
-      # Status bar layout using forceline module segments
+      ###################################
+      # Status line behavior
+
       set -g status-position bottom
       set -g status-justify centre
-      set -g status-left-length 100
-      set -g status-right-length 150
-      set -g status-left "#{E:@forceline_status_session}"
-      set -g status-right "#{E:@forceline_status_cpu}#{E:@forceline_status_gpu}#{E:@forceline_status_memory}#{E:@forceline_status_datetime}"
+      set -g status-left-length 40
+      set -g status-right-length 100
+
+      # Mobile / Termius detection
+      # Uses the attached client, not inherited session env
+      set -g @is_mobile '#{||:#{m/ri:termius,#{client_termtype}},#{m/ri:termius,#{client_termname}}}'
+
+      # Mobile gets a simple ASCII-safe status line.
+      # Narrow desktop also falls back to a simplified layout.
+      # Wider desktop gets full forceline rendering.
+      set -g status-left '#{?#{E:@is_mobile},#[bold] #S ,#{?#{<:#{client_width},90},#[bold] #S ,#{E:@forceline_status_session}}}'
+      set -g status-right '#{?#{E:@is_mobile},#[dim]#{pane_current_command} | %H:%M,#{?#{<:#{client_width},90},%H:%M,#{E:@forceline_status_cpu}#{E:@forceline_status_gpu}#{E:@forceline_status_memory}#{E:@forceline_status_datetime}}}'
 
       # Reload configuration with Prefix + r
       bind r source-file ~/.config/tmux/tmux.conf \; display-message "Config reloaded!"

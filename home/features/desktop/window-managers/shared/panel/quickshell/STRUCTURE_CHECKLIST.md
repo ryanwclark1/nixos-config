@@ -33,7 +33,7 @@ Use this checklist before merging panel architecture changes.
 - [ ] `scripts/check-plugin-conformance.sh` passes for plugin manifest/lifecycle conformance fixtures.
 - [ ] `scripts/plugin-doctor.sh` passes for local plugin directory health checks.
 - [ ] `scripts/check-plugin-doctor-smoke.sh` passes for deterministic doctor behavior (valid fixtures pass, invalid fixtures fail).
-- [ ] `scripts/check-plugin-reference-local.sh` passes for the repo-tracked reference plugin install/smoke/remove workflow, including idempotent install/remove behavior, refusal to overwrite unsafe target paths, and strict smoke failures for absent/wrong reference manifests.
+- [ ] `scripts/check-plugin-reference-local.sh` passes for the repo-tracked reference plugin install/smoke/remove workflow, including idempotent install/remove behavior, refusal to overwrite or delete unsafe target paths (including foreign symlinks), and strict smoke failures for non-symlink, wrong-target, absent, or wrong-id reference manifests.
 - [ ] `scripts/check-plugin-reference-contracts.sh` passes so the repo-tracked reference plugin keeps its intended manifest, state, launcher, settings, and README workflow contract.
 - [ ] `scripts/check-plugin-reference-fixtures.sh` passes so the repo-tracked reference plugin keeps its intended persisted state-envelope and settings-key shapes.
 - [ ] `scripts/check-plugin-reference-recovery.sh` passes so the repo-tracked reference plugin keeps its intended healthy/query-failure/execute-failure/recovery behavior.
@@ -43,7 +43,7 @@ Use this checklist before merging panel architecture changes.
 - [ ] `scripts/plugin-local.sh reference-flow` stays aligned with the documented manual reference-plugin workflow.
 - [ ] `scripts/plugin-local.sh reference-export` stays aligned with the documented diagnostics export path and reference payload fixtures.
 - [ ] `scripts/plugin-local.sh reference-status` stays aligned with the documented local commands, fixtures, and diagnostics export workflow.
-- [ ] `scripts/plugin-local.sh reference-status --check` remains green when the local reference toolkit prerequisites are intact.
+- [ ] `scripts/plugin-local.sh reference-status --check` remains green when the local reference toolkit prerequisites are intact and fails on foreign-symlink/non-symlink reference-path drift.
 - [ ] `scripts/plugin-local.sh shared-gates` remains the shared runtime/diagnostics tail used by quick and full verification.
 - [ ] `scripts/plugin-local.sh baseline-gates` remains the shared conformance/doctor entry phase used by full verification.
 - [ ] `scripts/plugin-local.sh all-gates` remains the assembled full local verification pipeline reused by `plugin-verify.sh` and `plugin-local.sh full`.

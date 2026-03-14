@@ -1,15 +1,17 @@
-import Quickshell
 import QtQuick
+import Quickshell
 import "../../services"
 
-Row {
+Flow {
   id: root
 
   property var state: null
+  property bool vertical: false
   property color activeColor: Colors.highlight
   property color inactiveColor: Colors.surface
   property color textColor: Colors.text
 
+  flow: vertical ? Flow.TopToBottom : Flow.LeftToRight
   spacing: 6
 
   Repeater {

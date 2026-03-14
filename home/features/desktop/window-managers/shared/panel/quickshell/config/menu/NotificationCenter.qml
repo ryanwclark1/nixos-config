@@ -47,12 +47,7 @@ PanelWindow {
   property bool showContent: false
   signal closeRequested()
   property string searchQuery: ""
-  visible: {
-    if (surfaceEdge === "right") return showContent || sidebarContent.x < panelWidth;
-    if (surfaceEdge === "left") return showContent || sidebarContent.x > -panelWidth;
-    if (surfaceEdge === "top") return showContent || sidebarContent.y > -sidebarContent.height;
-    return showContent || sidebarContent.y < sidebarContent.height;
-  }
+  visible: showContent || ncSlideAnim.running || ncFadeAnim.running
 
   // Ensure focus is grabbed when shown
   onShowContentChanged: {

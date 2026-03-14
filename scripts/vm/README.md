@@ -2,6 +2,8 @@
 
 Use the local wrapper to build and launch the NixOS VM profile used for compositor testing.
 
+See also: [NEXT_STEPS.md](/home/administrator/nixos-config/scripts/vm/NEXT_STEPS.md)
+
 ## Quick start
 
 ```bash

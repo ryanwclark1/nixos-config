@@ -93,7 +93,7 @@ Rectangle {
       font.pixelSize: Colors.fontSizeXS
       font.weight: Font.Black
       font.letterSpacing: 1.5
-      Layout.bottomMargin: 4
+      Layout.bottomMargin: Colors.spacingXS
     }
 
     Rectangle {

@@ -111,7 +111,7 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
 - Use this snapshot when triaging plugin failures or sharing bug reports.
 - Run `scripts/plugin-local.sh reference-export` to print the expected save path, fixture files, and reference export fields in the terminal.
 - Run `scripts/plugin-local.sh reference-status` to print the full local reference-plugin command/fixture/diagnostics summary plus lightweight health status in one place.
-- Run `scripts/plugin-local.sh reference-status --check` to fail fast when the local reference source, fixtures, or guard scripts are missing.
+- Run `scripts/plugin-local.sh reference-status --check` to fail fast when the local reference source, fixtures, or guard scripts are missing, or when the installed reference path has drifted into a foreign symlink/non-symlink state.
 - Run `scripts/plugin-local.sh reference-status --check --quiet` when you want the preflight result without printing the full dashboard.
 - Run `scripts/plugin-local.sh reference-status --quiet` when you want a one-line local availability summary for the reference toolkit.
 - Run `scripts/plugin-local.sh reference-files` when you need only the canonical fixture and guard paths.
@@ -134,8 +134,8 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
 - Validate the installed reference plugin in isolation with `scripts/plugin-local.sh smoke-reference`.
 - Remove the linked reference plugin with `scripts/plugin-local.sh remove-reference`.
 - `install-reference` is intentionally conservative: it is idempotent for the correct symlink target, but refuses to overwrite a non-symlink path or replace a symlink that points somewhere else.
-- `smoke-reference` is intentionally strict: it fails when the reference plugin manifest is absent or when the installed manifest id does not match `reference.local.toolkit`.
-- `remove-reference` is safe to rerun when the reference plugin is already absent.
+- `smoke-reference` is intentionally strict: it validates the expected repo-tracked reference symlink and fails when the plugin path is not that symlink, when the symlink target is wrong, when the manifest is absent, or when the installed manifest id does not match `reference.local.toolkit`.
+- `remove-reference` is safe to rerun when the reference plugin is already absent, but refuses to delete a non-symlink path or a symlink that points somewhere other than the repo-tracked reference plugin.
 - Keep `scripts/check-plugin-reference-contracts.sh` green when changing the reference plugin so its intended manifest, state, launcher, and settings behaviors do not drift.
 - Keep `scripts/check-plugin-reference-fixtures.sh` green when changing reference-plugin persistence so expected state-envelope and settings-key shapes do not drift.
 - Keep `scripts/check-plugin-reference-recovery.sh` green when changing launcher failure handling so healthy, degraded, and recovery transitions remain aligned with `PluginService`.

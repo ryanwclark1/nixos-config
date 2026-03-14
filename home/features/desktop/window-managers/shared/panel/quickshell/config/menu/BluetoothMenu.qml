@@ -1,7 +1,7 @@
-import Quickshell
-import Quickshell.Bluetooth
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
+import Quickshell.Bluetooth
 import "../services"
 import "../widgets" as SharedWidgets
 
@@ -386,7 +386,7 @@ BasePopupMenu {
         Layout.fillWidth: true
         visible: root.isScanning
         spacing: Colors.spacingS
-        Layout.leftMargin: 4
+        Layout.leftMargin: Colors.spacingXS
 
         SharedWidgets.LoadingSpinner { size: Colors.fontSizeLarge; color: Colors.textDisabled }
 
@@ -445,7 +445,7 @@ BasePopupMenu {
               interactive: true
               visible: !root.compactMode
               onClicked: Quickshell.execDetached(["sh", "-c",
-                "bluetoothctl trust " + modelData.address + " && bluetoothctl pair " + modelData.address
+                "bluetoothctl trust '" + modelData.address + "' && bluetoothctl pair '" + modelData.address + "'"
               ])
             }
           }

@@ -8,6 +8,8 @@ declare -i pass_count=0
 declare -i fail_count=0
 declare -i warn_count=0
 declare -i skip_count=0
+run_shell_matrix=1
+run_management_harnesses_only=0
 
 auto_cleanup=()
 
@@ -249,46 +251,76 @@ main() {
   require_cmd grep
   require_cmd sed
 
-  run_shell_case 'top + left with right dock' '{
-    "dock": {"enabled": true, "position": "right"},
-    "bars": {
-      "configs": [
-        {"id":"bar-top","name":"Top","enabled":true,"position":"top","displayMode":"all"},
-        {"id":"bar-left","name":"Left","enabled":true,"position":"left","displayMode":"primary"}
-      ]
-    }
-  }'
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --skip-shell-matrix)
+        run_shell_matrix=0
+        shift
+        ;;
+      --management-only)
+        run_shell_matrix=0
+        run_management_harnesses_only=1
+        shift
+        ;;
+      -h|--help)
+        cat <<'EOF'
+Usage: check-multibar-smoke.sh [--skip-shell-matrix] [--management-only]
 
-  run_shell_case 'bottom + right with left dock' '{
-    "dock": {"enabled": true, "position": "left"},
-    "bars": {
-      "configs": [
-        {"id":"bar-bottom","name":"Bottom","enabled":true,"position":"bottom","displayMode":"all"},
-        {"id":"bar-right","name":"Right","enabled":true,"position":"right","displayMode":"primary"}
-      ]
-    }
-  }'
+Run synthetic multibar verification cases.
+  --skip-shell-matrix  Skip the full shell matrix and run only the management harnesses.
+  --management-only    Alias for --skip-shell-matrix.
+EOF
+        exit 0
+        ;;
+      *)
+        printf 'Unknown argument: %s\n' "$1" >&2
+        exit 2
+        ;;
+    esac
+  done
 
-  run_shell_case 'shared-edge left dock yield' '{
-    "dock": {"enabled": true, "position": "left"},
-    "bars": {
-      "configs": [
-        {"id":"bar-left","name":"Left","enabled":true,"position":"left","displayMode":"all"},
-        {"id":"bar-bottom","name":"Bottom","enabled":true,"position":"bottom","displayMode":"all"}
-      ]
-    }
-  }'
+  if (( run_shell_matrix == 1 )); then
+    run_shell_case 'top + left with right dock' '{
+      "dock": {"enabled": true, "position": "right"},
+      "bars": {
+        "configs": [
+          {"id":"bar-top","name":"Top","enabled":true,"position":"top","displayMode":"all"},
+          {"id":"bar-left","name":"Left","enabled":true,"position":"left","displayMode":"primary"}
+        ]
+      }
+    }'
 
-  run_shell_case 'top + bottom + left with right dock' '{
-    "dock": {"enabled": true, "position": "right"},
-    "bars": {
-      "configs": [
-        {"id":"bar-top","name":"Top","enabled":true,"position":"top","displayMode":"all"},
-        {"id":"bar-bottom","name":"Bottom","enabled":true,"position":"bottom","displayMode":"all"},
-        {"id":"bar-left","name":"Left","enabled":true,"position":"left","displayMode":"primary"}
-      ]
-    }
-  }'
+    run_shell_case 'bottom + right with left dock' '{
+      "dock": {"enabled": true, "position": "left"},
+      "bars": {
+        "configs": [
+          {"id":"bar-bottom","name":"Bottom","enabled":true,"position":"bottom","displayMode":"all"},
+          {"id":"bar-right","name":"Right","enabled":true,"position":"right","displayMode":"primary"}
+        ]
+      }
+    }'
+
+    run_shell_case 'shared-edge left dock yield' '{
+      "dock": {"enabled": true, "position": "left"},
+      "bars": {
+        "configs": [
+          {"id":"bar-left","name":"Left","enabled":true,"position":"left","displayMode":"all"},
+          {"id":"bar-bottom","name":"Bottom","enabled":true,"position":"bottom","displayMode":"all"}
+        ]
+      }
+    }'
+
+    run_shell_case 'top + bottom + left with right dock' '{
+      "dock": {"enabled": true, "position": "right"},
+      "bars": {
+        "configs": [
+          {"id":"bar-top","name":"Top","enabled":true,"position":"top","displayMode":"all"},
+          {"id":"bar-bottom","name":"Bottom","enabled":true,"position":"bottom","displayMode":"all"},
+          {"id":"bar-left","name":"Left","enabled":true,"position":"left","displayMode":"primary"}
+        ]
+      }
+    }'
+  fi
 
   run_management_harnesses
 

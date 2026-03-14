@@ -5,6 +5,7 @@ import "../services"
 Row {
   id: root
   spacing: 6
+  property bool iconOnly: false
 
   readonly property string tooltipText: {
     if (AudioService.outputMuted) return "Audio muted";
@@ -28,6 +29,7 @@ Row {
 
   Text {
     id: volumeText
+    visible: !root.iconOnly
     text: {
         if (AudioService.outputMuted) return "Muted";
         var v = AudioService.outputVolume;

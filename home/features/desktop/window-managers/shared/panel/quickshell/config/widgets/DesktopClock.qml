@@ -30,7 +30,7 @@ Item {
       color: Colors.text
       font.pixelSize: Colors.fontSizeXL
       font.weight: Font.Medium
-      Layout.leftMargin: 4
+      Layout.leftMargin: Colors.spacingXS
     }
   }
 }

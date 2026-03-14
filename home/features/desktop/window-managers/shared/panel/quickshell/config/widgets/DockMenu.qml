@@ -130,8 +130,8 @@ PopupWindow {
         visible: root.isGrouped && !root.showWorkspaceList
         Layout.fillWidth: true
         Layout.preferredHeight: 1
-        Layout.topMargin: 4
-        Layout.bottomMargin: 4
+        Layout.topMargin: Colors.spacingXS
+        Layout.bottomMargin: Colors.spacingXS
         color: Colors.border
       }
 
@@ -154,8 +154,8 @@ PopupWindow {
         visible: root.desktopActions.length > 0 && !root.showWorkspaceList
         Layout.fillWidth: true
         Layout.preferredHeight: 1
-        Layout.topMargin: 4
-        Layout.bottomMargin: 4
+        Layout.topMargin: Colors.spacingXS
+        Layout.bottomMargin: Colors.spacingXS
         color: Colors.border
       }
 
@@ -229,8 +229,8 @@ PopupWindow {
         visible: root.isRunning && !root.showWorkspaceList
         Layout.fillWidth: true
         Layout.preferredHeight: 1
-        Layout.topMargin: 4
-        Layout.bottomMargin: 4
+        Layout.topMargin: Colors.spacingXS
+        Layout.bottomMargin: Colors.spacingXS
         color: Colors.border
       }
 

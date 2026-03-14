@@ -11,7 +11,7 @@ PopupWindow {
   property bool hovered: false
   property string text: ""
   property int delay: 250
-  property real gap: 8
+  property real gap: 12
   property real maxWidth: 280
 
   readonly property string tooltipText: String(text || "").trim()
@@ -51,11 +51,11 @@ PopupWindow {
       x = _windowX(anchorItem) - implicitWidth - gap;
     else
       x = _windowX(anchorItem) + (anchorItem.width - implicitWidth) / 2;
-    if (anchorWindow && anchorWindow.width !== undefined) {
-      var maxX = Math.max(inset, anchorWindow.width - implicitWidth - inset);
-      x = Math.min(Math.max(inset, x), maxX);
-    }
-    return x;
+    
+    // Clamp to screen width if possible, otherwise bar window width.
+    var fullWidth = (anchorWindow && anchorWindow.screen) ? anchorWindow.screen.width : (anchorWindow ? anchorWindow.width : 1920);
+    var maxX = Math.max(inset, fullWidth - implicitWidth - inset);
+    return Math.min(Math.max(inset, x), maxX);
   }
   anchor.rect.y: {
     if (!anchorItem || !anchorItem.height) return 0;
@@ -66,10 +66,10 @@ PopupWindow {
       y = _windowY(anchorItem) + (anchorItem.height - implicitHeight) / 2;
     else
       y = _windowY(anchorItem) + anchorItem.height + gap;
-    if (anchorWindow && anchorWindow.height !== undefined) {
-      var maxY = Math.max(inset, anchorWindow.height - implicitHeight - inset);
-      y = Math.min(Math.max(inset, y), maxY);
-    }
+
+    // We don't clamp Y against the bar window height because tooltips usually 
+    // need to appear OUTSIDE the bar (e.g. below it). 
+    // Quickshell's PopupWindow will handle the actual screen placement.
     return y;
   }
 

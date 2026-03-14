@@ -1,6 +1,6 @@
-import Quickshell
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import Quickshell.Io
 import "../modules"
 import "../services"

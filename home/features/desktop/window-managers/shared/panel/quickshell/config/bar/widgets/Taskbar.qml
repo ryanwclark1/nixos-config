@@ -3,10 +3,11 @@ import Quickshell
 import Quickshell.Io
 import "../../services"
 
-Row {
+Flow {
   id: root
   spacing: Colors.spacingS
-  anchors.verticalCenter: parent.verticalCenter
+  property bool vertical: false
+  flow: vertical ? Flow.TopToBottom : Flow.LeftToRight
   property var anchorWindow: null
 
   property var pinnedApps: []
@@ -121,8 +122,10 @@ Row {
 
   // Separator if needed
   Rectangle {
-    width: 1; height: 16; color: Colors.border; visible: runningToplevels.length > 0
-    anchors.verticalCenter: parent.verticalCenter
+    width: root.vertical ? 16 : 1
+    height: root.vertical ? 1 : 16
+    color: Colors.border
+    visible: runningToplevels.length > 0
   }
 
   Repeater {

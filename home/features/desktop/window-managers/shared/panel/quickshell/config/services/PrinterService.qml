@@ -1,7 +1,7 @@
 pragma Singleton
+import QtQuick
 import Quickshell
 import Quickshell.Io
-import QtQuick
 import "../widgets" as SharedWidgets
 
 // PrinterService — subscriber-based CUPS printer monitoring singleton.

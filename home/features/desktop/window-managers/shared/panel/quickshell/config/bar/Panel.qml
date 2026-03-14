@@ -1,7 +1,7 @@
-import Quickshell // SystemClock
+import QtQuick
+import Quickshell
 import Quickshell.Bluetooth
 import Quickshell.Wayland
-import QtQuick
 import "."
 import "widgets"
 import "../modules"
@@ -46,7 +46,7 @@ Item {
   signal surfaceRequested(string surfaceId, var context)
 
   implicitHeight: vertical ? 0 : thickness
-  implicitWidth: vertical ? Math.max(thickness, Math.max(leftSection.implicitWidth, Math.max(centerSection.implicitWidth, rightSection.implicitWidth)) + outerPadding * 2) : 0
+  implicitWidth: vertical ? Math.max(thickness, Math.max(leftColumn.implicitWidth, Math.max(centerColumn.implicitWidth, rightColumn.implicitWidth)) + outerPadding * 2) : 0
 
   function sectionItems(section) {
     var items = sectionWidgets && sectionWidgets[section] ? sectionWidgets[section] : [];
@@ -296,6 +296,7 @@ Item {
     id: workspacesComponent
     Workspaces {
       property var widgetInstance: null
+      vertical: root.vertical
       anchorWindow: root.anchorWindow
     }
   }
@@ -304,6 +305,7 @@ Item {
     id: taskbarComponent
     Taskbar {
       property var widgetInstance: null
+      vertical: root.vertical
       anchorWindow: root.anchorWindow
     }
   }
@@ -387,7 +389,16 @@ Item {
         tooltipText: Qt.formatDateTime(centerClock.date, "dddd, MMMM d yyyy")
         onClicked: root.requestSurface("dateTimeMenu", this)
 
+        Text {
+          visible: root.vertical
+          text: "󰥔"
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeLarge
+          font.family: Colors.fontMono
+        }
+
         Row {
+          visible: !root.vertical
           spacing: Colors.spacingXS
 
           Text {
@@ -426,6 +437,7 @@ Item {
     id: mediaBarComponent
     SharedWidgets.MediaBar {
       property var widgetInstance: null
+      vertical: root.vertical
       anchorWindow: root.anchorWindow
     }
   }
@@ -468,7 +480,7 @@ Item {
         Row {
           spacing: 6
           Text { text: updatesRoot.updatesIcon; color: Colors.accent; font.pixelSize: Colors.fontSizeXL; font.family: Colors.fontMono; anchors.verticalCenter: parent.verticalCenter }
-          Text { text: updatesRoot.updatesCount; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.DemiBold; anchors.verticalCenter: parent.verticalCenter }
+          Text { visible: !root.vertical; text: updatesRoot.updatesCount; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.DemiBold; anchors.verticalCenter: parent.verticalCenter }
         }
       }
     }
@@ -483,6 +495,7 @@ Item {
         var full = root.fullCavaData || "";
         return full.length >= 8 ? full.substring(0, 8) : (full.length > 0 ? full : "▁▂▃▄▅▆▇█");
       }
+      visible: !root.vertical
       implicitWidth: cavaPill.implicitWidth
       implicitHeight: cavaPill.implicitHeight
 
@@ -575,6 +588,7 @@ Item {
         }
 
         Text {
+          visible: !root.vertical
           text: WeatherService.temp
           color: Colors.text
           font.pixelSize: Colors.fontSizeSmall
@@ -598,6 +612,7 @@ Item {
         spacing: Colors.spacingS
         SharedWidgets.NetworkWidget {
           id: networkWidget
+          iconOnly: root.vertical
         }
       }
     }
@@ -646,6 +661,7 @@ Item {
         spacing: Colors.spacingS
         SharedWidgets.AudioWidget {
           id: audioWidget
+          iconOnly: root.vertical
         }
       }
     }
@@ -680,7 +696,8 @@ Item {
         }
 
         Item {
-          width: Math.min(musicTitleText.contentWidth, 100)
+          visible: !root.vertical
+          width: visible ? Math.min(musicTitleText.contentWidth, 100) : 0
           height: 20
           clip: true
           anchors.verticalCenter: parent.verticalCenter
@@ -768,6 +785,7 @@ Item {
         }
 
         Text {
+          visible: !root.vertical
           text: "REC"
           color: Colors.error
           font.pixelSize: Colors.fontSizeXS
@@ -792,6 +810,7 @@ Item {
         spacing: Colors.spacingXS
         SharedWidgets.BatteryWidget {
           id: batteryWidget
+          iconOnly: root.vertical
         }
       }
     }
@@ -824,7 +843,7 @@ Item {
         }
 
         Rectangle {
-          visible: PrinterService.activeJobs > 0
+          visible: PrinterService.activeJobs > 0 && !root.vertical
           width: printerJobsBadge.contentWidth + 8
           height: 16
           radius: Colors.radiusXS
@@ -884,6 +903,7 @@ Item {
     id: trayComponent
     SharedWidgets.TrayWidget {
       property var widgetInstance: null
+      vertical: root.vertical
       anchorWindow: root.anchorWindow
     }
   }

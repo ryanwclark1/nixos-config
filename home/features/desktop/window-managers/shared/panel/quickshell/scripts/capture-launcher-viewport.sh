@@ -6,11 +6,14 @@ runtime_root="${runtime_base}/by-id"
 instance_id=""
 hyprland_instance=""
 hyprland_wayland_socket=""
-surface_id="networkMenu"
+mode="drun"
+state="home"
+query=""
+category_key=""
 output_path=""
-delay_seconds="1.6"
+delay_seconds="1.2"
 ipc_timeout_seconds="2"
-crop_mode="surface"
+crop_mode="usable"
 workspace_target="auto"
 workspace_settle_attempts="20"
 workspace_settle_interval="0.1"
@@ -21,10 +24,16 @@ capture_workspace=""
 
 usage() {
   cat <<'EOF'
-Usage: capture-surface-viewport.sh [--id INSTANCE_ID] [--surface SURFACE_ID] [--delay SECONDS] [--crop surface|monitor|usable] [--workspace current|auto|NAME] [--output PATH]
+Usage: capture-launcher-viewport.sh [--id INSTANCE_ID] [--mode drun|files|system|web] [--state home|query|empty|category] [--query TEXT] [--category KEY] [--delay SECONDS] [--crop monitor|usable] [--workspace current|auto|NAME] [--output PATH]
 
-Open a live QuickShell surface through Shell IPC, capture the focused monitor, and save a cropped screenshot.
-This produces a review artifact for manual inspection, not PASS/WARN/FAIL results.
+Open the launcher through IPC, optionally drive a state preset, capture the focused monitor,
+and save a review screenshot.
+
+Examples:
+  scripts/capture-launcher-viewport.sh --mode drun --state home
+  scripts/capture-launcher-viewport.sh --mode drun --state query --query firefox
+  scripts/capture-launcher-viewport.sh --mode files --state empty --query /unlikely-launcher-capture-probe
+  scripts/capture-launcher-viewport.sh --mode drun --state category --category Utility
 EOF
 }
 
@@ -34,8 +43,20 @@ while [[ $# -gt 0 ]]; do
       instance_id="${2:-}"
       shift 2
       ;;
-    --surface)
-      surface_id="${2:-}"
+    --mode)
+      mode="${2:-}"
+      shift 2
+      ;;
+    --state)
+      state="${2:-}"
+      shift 2
+      ;;
+    --query)
+      query="${2:-}"
+      shift 2
+      ;;
+    --category)
+      category_key="${2:-}"
       shift 2
       ;;
     --delay)
@@ -132,7 +153,8 @@ resolve_hyprland_instance() {
 
 pick_capture_workspace() {
   local used
-  for candidate in $(seq 9001 9099); do
+  local candidate
+  for candidate in $(seq 9101 9199); do
     used="$(hypr workspaces -j | jq --arg candidate "${candidate}" 'map(select((.name // "") == $candidate or ((.id | tostring) == $candidate))) | length')"
     if [[ "${used}" == "0" ]]; then
       printf '%s\n' "${candidate}"
@@ -193,58 +215,25 @@ reassert_capture_workspace() {
   wait_for_workspace "${capture_workspace}"
 }
 
-resolve_shell_pid() {
-  local pid_link
-  while IFS= read -r pid_link; do
-    [[ -n "${pid_link}" ]] || continue
-    basename "${pid_link}"
-    return 0
-  done < <(find "${runtime_base}/by-pid" -mindepth 1 -maxdepth 1 -type l \
-    -exec sh -c 'target="$(readlink -f "$1" 2>/dev/null || true)"; [[ "${target}" == *"/'"${instance_id}"'" ]] && printf "%s\n" "$1"' _ {} \; 2>/dev/null | sort)
-
-  return 1
-}
-
-discover_instances_from_pid() {
-  local pid
-  local resolved
-  local ids=()
-
-  while IFS= read -r pid; do
-    [[ -n "${pid}" ]] || continue
-    resolved="$(readlink -f "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid/${pid}" 2>/dev/null || true)"
-    if [[ -n "${resolved}" && -S "${resolved}/ipc.sock" ]]; then
-      ids+=("$(basename "${resolved}")")
-    fi
-  done < <(ps -eo pid=,comm=,args= | awk '$2 ~ /quickshell/ || $3 ~ /quickshell/ { print $1 }')
-
-  printf '%s\n' "${ids[@]}" | awk 'NF && !seen[$0]++'
-}
-
 discover_instances() {
-  local dirs=()
-  local dir
-
-  mapfile -t dirs < <(discover_instances_from_pid)
-  if (( ${#dirs[@]} > 0 )); then
-    printf '%s\n' "${dirs[@]}"
+  if [[ ! -d "${runtime_root}" ]]; then
     return 0
   fi
-
-  if [[ -d "${runtime_root}" ]]; then
-    while IFS= read -r dir; do
-      dirs+=("$(basename "${dir}")")
-    done < <(find "${runtime_root}" -mindepth 1 -maxdepth 1 -type d -exec test -S '{}/ipc.sock' ';' -print 2>/dev/null | sort)
-  fi
-
-  printf '%s\n' "${dirs[@]}"
+  find "${runtime_root}" -mindepth 1 -maxdepth 1 -type d -exec test -S '{}/ipc.sock' ';' -printf '%T@ %f\n' 2>/dev/null \
+    | sort -nr | awk '{print $2}'
 }
 
 discover_reachable_instance() {
   local candidate
+  local show_output
   while IFS= read -r candidate; do
     [[ -n "${candidate}" ]] || continue
-    if run_ipc quickshell ipc --id "${candidate}" call Shell closeAllSurfaces >/dev/null; then
+    show_output="$(quickshell ipc --id "${candidate}" show 2>/dev/null || true)"
+    [[ -n "${show_output}" ]] || continue
+    if ! printf '%s' "${show_output}" | rg -q "target Launcher"; then
+      continue
+    fi
+    if run_ipc quickshell ipc --id "${candidate}" call Launcher openDrun >/dev/null; then
       printf '%s\n' "${candidate}"
       return 0
     fi
@@ -259,12 +248,103 @@ call_ipc() {
   run_ipc quickshell ipc --id "${instance_id}" call "${target}" "$@"
 }
 
+apply_launcher_state() {
+  local mode_action=""
+
+  case "${mode}" in
+    drun) mode_action="openDrun" ;;
+    files) mode_action="openFiles" ;;
+    system) mode_action="openSystem" ;;
+    web) mode_action="openWeb" ;;
+    *)
+      printf 'Unsupported launcher mode: %s\n' "${mode}" >&2
+      exit 2
+      ;;
+  esac
+
+  case "${state}" in
+    home|query|empty|category) ;;
+    *)
+      printf 'Unsupported launcher state: %s\n' "${state}" >&2
+      exit 2
+      ;;
+  esac
+
+  call_ipc Launcher "${mode_action}" >/dev/null
+  sleep 0.15
+
+  if call_ipc Launcher diagnosticSetSearchText "" >/dev/null 2>&1; then
+    :
+  fi
+  if call_ipc Launcher diagnosticSetDrunCategoryFilter "" >/dev/null 2>&1; then
+    :
+  fi
+
+  case "${state}" in
+    home)
+      ;;
+    query)
+      if [[ -z "${query}" ]]; then
+        case "${mode}" in
+          drun) query="firefox" ;;
+          files) query="/nix" ;;
+          system) query="reboot" ;;
+          web) query="wayland" ;;
+        esac
+      fi
+      call_ipc Launcher diagnosticSetSearchText "${query}" >/dev/null
+      ;;
+    empty)
+      if [[ -z "${query}" ]]; then
+        case "${mode}" in
+          drun) query="__launcher_empty_probe__" ;;
+          files) query="/__launcher_empty_probe__" ;;
+          system) query="__launcher_empty_probe__" ;;
+          web) query="zxqv-empty-probe" ;;
+        esac
+      fi
+      call_ipc Launcher diagnosticSetSearchText "${query}" >/dev/null
+      ;;
+    category)
+      if [[ "${mode}" != "drun" ]]; then
+        printf 'Category state is only supported in drun mode.\n' >&2
+        exit 2
+      fi
+      if [[ -z "${category_key}" ]]; then
+        category_key="$(call_ipc Launcher drunCategoryState 2>/dev/null | node -e '
+const fs = require("node:fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+if (!raw) process.exit(0);
+let payload = JSON.parse(raw);
+if (typeof payload === "string") payload = JSON.parse(payload);
+const options = Array.isArray(payload.options) ? payload.options : [];
+const match = options.find((item) => item && String(item.key || "") !== "");
+if (match) process.stdout.write(String(match.key || ""));
+' 2>/dev/null || true)"
+      fi
+      if [[ -z "${category_key}" ]]; then
+        printf 'Could not resolve a non-All drun category for capture.\n' >&2
+        exit 1
+      fi
+      call_ipc Launcher diagnosticSetDrunCategoryFilter "${category_key}" >/dev/null
+      ;;
+  esac
+}
+
+cleanup_launcher() {
+  call_ipc Launcher diagnosticSetSearchText "" >/dev/null 2>&1 || true
+  call_ipc Launcher diagnosticSetDrunCategoryFilter "" >/dev/null 2>&1 || true
+  call_ipc Launcher invokeEscapeAction >/dev/null 2>&1 || call_ipc Launcher toggle >/dev/null 2>&1 || true
+}
+
 main() {
   require_cmd quickshell
   require_cmd hyprctl
   require_cmd jq
   require_cmd grim
   require_cmd magick
+  require_cmd node
+  require_cmd rg
   require_cmd mktemp
   require_cmd sleep
   resolve_hyprland_instance
@@ -275,50 +355,43 @@ main() {
   fi
 
   case "${crop_mode}" in
-    surface|monitor|usable) ;;
+    monitor|usable) ;;
     *)
       printf 'Unknown crop mode: %s\n' "${crop_mode}" >&2
       exit 2
       ;;
   esac
 
-  if [[ "${crop_mode}" == "surface" && "${workspace_target}" == "auto" ]]; then
-    workspace_target="current"
-  fi
-
   if [[ -z "${instance_id}" ]]; then
     instance_id="$(discover_reachable_instance || true)"
     if [[ -z "${instance_id}" ]]; then
-      printf 'No live QuickShell instances found under %s\n' "${runtime_root}" >&2
+      printf 'No live QuickShell launcher instances found under %s\n' "${runtime_root}" >&2
       exit 1
     fi
   fi
 
   if [[ -z "${output_path}" ]]; then
-    output_path="/tmp/${surface_id}-${crop_mode}.png"
+    output_path="/tmp/launcher-${mode}-${state}.png"
   fi
 
-  temp_full="$(mktemp /tmp/surface-capture-full-XXXXXX.png)"
-  temp_crop="$(mktemp /tmp/surface-capture-crop-XXXXXX.png)"
-  trap 'rm -f "${temp_full}" "${temp_crop}"; quickshell ipc --id "${instance_id}" call Shell closeAllSurfaces >/dev/null 2>&1 || true; [[ -n "${restore_workspace}" ]] && hypr dispatch workspace "${restore_workspace}" >/dev/null 2>&1 || true' EXIT
+  temp_full="$(mktemp /tmp/launcher-capture-full-XXXXXX.png)"
+  temp_crop="$(mktemp /tmp/launcher-capture-crop-XXXXXX.png)"
+  trap 'rm -f "${temp_full}" "${temp_crop}"; cleanup_launcher; [[ -n "${restore_workspace}" ]] && hypr dispatch workspace "${restore_workspace}" >/dev/null 2>&1 || true' EXIT
 
   switch_to_capture_workspace "${workspace_target}"
 
-  call_ipc Shell closeAllSurfaces >/dev/null || true
-  call_ipc Shell openSurface "${surface_id}" >/dev/null
-  if [[ "${crop_mode}" != "surface" ]]; then
-    reassert_capture_workspace
-  fi
+  cleanup_launcher
+  apply_launcher_state
+  reassert_capture_workspace
   sleep "${delay_seconds}"
 
-  local monitor_json monitor_name monitor_x monitor_y monitor_w monitor_h reserved_top reserved_left reserved_bottom reserved_right crop_x crop_y crop_w crop_h shell_pid layers_json crop_box
+  local monitor_json monitor_x monitor_y monitor_w monitor_h reserved_top reserved_left reserved_bottom reserved_right crop_x crop_y crop_w crop_h
   monitor_json="$(hypr monitors -j | jq 'map(select(.focused == true))[0]')"
   if [[ -z "${monitor_json}" || "${monitor_json}" == "null" ]]; then
     printf 'Could not resolve focused monitor from hyprctl.\n' >&2
     exit 1
   fi
 
-  monitor_name="$(printf '%s' "${monitor_json}" | jq -r '.name')"
   monitor_x="$(printf '%s' "${monitor_json}" | jq -r '.x')"
   monitor_y="$(printf '%s' "${monitor_json}" | jq -r '.y')"
   monitor_w="$(printf '%s' "${monitor_json}" | jq -r '.width')"
@@ -327,41 +400,6 @@ main() {
   reserved_left="$(printf '%s' "${monitor_json}" | jq -r '.reserved[1]')"
   reserved_bottom="$(printf '%s' "${monitor_json}" | jq -r '.reserved[2]')"
   reserved_right="$(printf '%s' "${monitor_json}" | jq -r '.reserved[3]')"
-
-  if [[ "${crop_mode}" == "surface" ]]; then
-    shell_pid="$(resolve_shell_pid || true)"
-    layers_json="$(hypr layers -j)"
-    if [[ -n "${shell_pid}" ]]; then
-      crop_box="$(printf '%s' "${layers_json}" | jq -r --arg monitor "${monitor_name}" --argjson shell_pid "${shell_pid}" '
-        .[$monitor].levels
-        | to_entries
-        | map(.value[])
-        | map(select(.namespace != "swww-daemon"))
-        | map(select((.namespace | startswith("quickshell-bar-")) | not))
-        | map(select(.namespace != "quickshell-toast" and .namespace != "quickshell-corners"))
-        | map(select(.pid == $shell_pid))
-        | map(select(.w > 8 and .h > 8))
-        | map(select(.w < 3800 or .h < 2100))
-        | if length == 0 then empty else
-            max_by(.w * .h)
-            | [
-                (.x - 8),
-                (.y - 8),
-                (.w + 16),
-                (.h + 16)
-              ] | @tsv
-          end
-      ')"
-    else
-      crop_box=""
-    fi
-
-    if [[ -z "${crop_box}" ]]; then
-      crop_mode="usable"
-    else
-      read -r crop_x crop_y crop_w crop_h <<< "${crop_box}"
-    fi
-  fi
 
   if [[ "${crop_mode}" == "usable" ]]; then
     crop_x=$((monitor_x + reserved_left))
@@ -379,7 +417,7 @@ main() {
   magick "${temp_full}" -crop "${crop_w}x${crop_h}+${crop_x}+${crop_y}" +repage "${temp_crop}"
   cp "${temp_crop}" "${output_path}"
 
-  printf '[INFO] Saved surface review artifact for %s (%s) -> %s\n' "${surface_id}" "${crop_mode}" "${output_path}"
+  printf '[INFO] Saved launcher review artifact for %s/%s (%s) -> %s\n' "${mode}" "${state}" "${crop_mode}" "${output_path}"
 }
 
 main "$@"

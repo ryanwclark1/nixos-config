@@ -6,7 +6,7 @@
 {
   qt = {
     enable = true;
-    platformTheme.name = "kde";
+    platformTheme.name = "adwaita";
     style = {
       name = "adwaita-dark";
       package = pkgs.adwaita-qt;

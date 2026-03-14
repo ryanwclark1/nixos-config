@@ -59,12 +59,7 @@ PanelWindow {
     interval: 3000
     onTriggered: root.pendingPowerIndex = -1
   }
-  visible: {
-    if (surfaceEdge === "right") return showContent || sidebarContent.x < panelWidth;
-    if (surfaceEdge === "left") return showContent || sidebarContent.x > -panelWidth;
-    if (surfaceEdge === "top") return showContent || sidebarContent.y > -sidebarContent.height;
-    return showContent || sidebarContent.y < sidebarContent.height;
-  }
+  visible: showContent || ccSlideAnim.running || ccFadeAnim.running
 
   SharedWidgets.Ref { service: AudioService }
   Loader { active: root.showContent; sourceComponent: SharedWidgets.Ref { service: SystemStatus } }
@@ -84,6 +79,7 @@ PanelWindow {
       return 0;
     }
     opacity: root.showContent ? 1.0 : 0.0
+    visible: opacity > 0
     Behavior on x { NumberAnimation { id: ccSlideAnim; duration: 300; easing.type: Easing.OutCubic } }
     Behavior on y { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
     Behavior on opacity { NumberAnimation { id: ccFadeAnim; duration: 250 } }

@@ -11,39 +11,123 @@ Item {
     property string tabId: ""
     property bool compactMode: false
     property bool tightSpacing: false
+    property string dragModeKey: ""
+    property int dragModeTargetIndex: -1
+    property string dragWebProviderKey: ""
+    property int dragWebProviderTargetIndex: -1
     readonly property var launcherModes: [
-        { key: "drun", label: "Apps", icon: "󰀻" },
-        { key: "window", label: "Windows", icon: "󱗼" },
-        { key: "files", label: "Files", icon: "󰈔" },
-        { key: "ai", label: "AI", icon: "󰚩" },
-        { key: "clip", label: "Clipboard", icon: "󰅍" },
-        { key: "emoji", label: "Emoji", icon: "󰞅" },
-        { key: "calc", label: "Calc", icon: "󰪚" },
-        { key: "web", label: "Web", icon: "󰖟" },
-        { key: "run", label: "Run", icon: "󰆍" },
-        { key: "system", label: "System", icon: "󰒓" },
-        { key: "keybinds", label: "Keybinds", icon: "󰌌" },
-        { key: "media", label: "Media", icon: "󰝚" },
-        { key: "nixos", label: "NixOS", icon: "" },
-        { key: "wallpapers", label: "Wallpapers", icon: "󰸉" },
-        { key: "bookmarks", label: "Bookmarks", icon: "󰃀" }
+        {
+            key: "drun",
+            label: "Apps",
+            icon: "󰀻"
+        },
+        {
+            key: "window",
+            label: "Windows",
+            icon: "󱗼"
+        },
+        {
+            key: "files",
+            label: "Files",
+            icon: "󰈔"
+        },
+        {
+            key: "ai",
+            label: "AI",
+            icon: "󰚩"
+        },
+        {
+            key: "clip",
+            label: "Clipboard",
+            icon: "󰅍"
+        },
+        {
+            key: "emoji",
+            label: "Emoji",
+            icon: "󰞅"
+        },
+        {
+            key: "calc",
+            label: "Calc",
+            icon: "󰪚"
+        },
+        {
+            key: "web",
+            label: "Web",
+            icon: "󰖟"
+        },
+        {
+            key: "run",
+            label: "Run",
+            icon: "󰆍"
+        },
+        {
+            key: "system",
+            label: "System",
+            icon: "󰒓"
+        },
+        {
+            key: "keybinds",
+            label: "Keybinds",
+            icon: "󰌌"
+        },
+        {
+            key: "media",
+            label: "Media",
+            icon: "󰝚"
+        },
+        {
+            key: "nixos",
+            label: "NixOS",
+            icon: ""
+        },
+        {
+            key: "wallpapers",
+            label: "Wallpapers",
+            icon: "󰸉"
+        },
+        {
+            key: "bookmarks",
+            label: "Bookmarks",
+            icon: "󰃀"
+        }
     ]
     readonly property var launcherDefaultModes: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
     readonly property var webProviders: [
-        { key: "duckduckgo", label: "DuckDuckGo", icon: "󰇥" },
-        { key: "google", label: "Google", icon: "󰊯" },
-        { key: "youtube", label: "YouTube", icon: "󰗃" },
-        { key: "nixos", label: "NixOS Packages", icon: "" },
-        { key: "github", label: "GitHub", icon: "󰊤" }
+        {
+            key: "duckduckgo",
+            label: "DuckDuckGo",
+            icon: "󰇥"
+        },
+        {
+            key: "google",
+            label: "Google",
+            icon: "󰊯"
+        },
+        {
+            key: "youtube",
+            label: "YouTube",
+            icon: "󰗃"
+        },
+        {
+            key: "nixos",
+            label: "NixOS Packages",
+            icon: ""
+        },
+        {
+            key: "github",
+            label: "GitHub",
+            icon: "󰊤"
+        }
     ]
     readonly property var webProviderDefaultOrder: ["duckduckgo", "google", "youtube", "nixos", "github"]
     readonly property var webAliasDefaults: ({
-        "duckduckgo": ["d", "ddg"],
-        "google": ["g"],
-        "youtube": ["yt"],
-        "nixos": ["nix", "np"],
-        "github": ["gh"]
-    })
+            "duckduckgo": ["d", "ddg"],
+            "google": ["g"],
+            "youtube": ["yt"],
+            "nixos": ["nix", "np"],
+            "github": ["gh"]
+        })
 
     function defaultWebAliasesCopy() {
         return JSON.parse(JSON.stringify(webAliasDefaults));
@@ -54,7 +138,11 @@ Item {
             if (webProviders[i].key === providerKey)
                 return webProviders[i];
         }
-        return { key: providerKey, label: providerKey, icon: "󰖟" };
+        return {
+            key: providerKey,
+            label: providerKey,
+            icon: "󰖟"
+        };
     }
 
     function parseAliasTokens(text, providerKey) {
@@ -107,12 +195,17 @@ Item {
     }
 
     function supportedLauncherModeKeys() {
-        return supportedLauncherModes().map(function(modeMeta) { return modeMeta.key; });
+        return supportedLauncherModes().map(function (modeMeta) {
+            return modeMeta.key;
+        });
     }
 
     function defaultModeOptions() {
-        return supportedLauncherModes().map(function(modeMeta) {
-            return { value: modeMeta.key, label: modeMeta.label };
+        return supportedLauncherModes().map(function (modeMeta) {
+            return {
+                value: modeMeta.key,
+                label: modeMeta.label
+            };
         });
     }
 
@@ -189,7 +282,11 @@ Item {
             if (launcherModes[i].key === modeKey)
                 return launcherModes[i];
         }
-        return { key: modeKey, label: modeKey, icon: "•" };
+        return {
+            key: modeKey,
+            label: modeKey,
+            icon: "•"
+        };
     }
 
     function orderedEnabledModes() {
@@ -231,6 +328,33 @@ Item {
         current.splice(from, 1);
         current.splice(to, 0, moved);
         Config.launcherModeOrder = current.slice();
+    }
+
+    function clearModeDragState() {
+        dragModeKey = "";
+        dragModeTargetIndex = -1;
+    }
+
+    function moveDraggedMode(targetIndex) {
+        var current = orderedEnabledModes();
+        var from = current.indexOf(dragModeKey);
+        if (from < 0)
+            return false;
+
+        var boundedTarget = Math.max(0, Math.min(current.length, targetIndex));
+        if (from < boundedTarget)
+            boundedTarget -= 1;
+        if (boundedTarget === from) {
+            clearModeDragState();
+            return false;
+        }
+
+        var moved = current[from];
+        current.splice(from, 1);
+        current.splice(boundedTarget, 0, moved);
+        Config.launcherModeOrder = current.slice();
+        clearModeDragState();
+        return true;
     }
 
     function setWebProviderOrder(nextOrder) {
@@ -307,6 +431,33 @@ Item {
         setWebProviderOrder(current);
     }
 
+    function clearWebProviderDragState() {
+        dragWebProviderKey = "";
+        dragWebProviderTargetIndex = -1;
+    }
+
+    function moveDraggedWebProvider(targetIndex) {
+        var current = orderedWebProviders();
+        var from = current.indexOf(dragWebProviderKey);
+        if (from < 0)
+            return false;
+
+        var boundedTarget = Math.max(0, Math.min(current.length, targetIndex));
+        if (from < boundedTarget)
+            boundedTarget -= 1;
+        if (boundedTarget === from) {
+            clearWebProviderDragState();
+            return false;
+        }
+
+        var moved = current[from];
+        current.splice(from, 1);
+        current.splice(boundedTarget, 0, moved);
+        setWebProviderOrder(current);
+        clearWebProviderDragState();
+        return true;
+    }
+
     function resetLauncherDefaults() {
         Config.launcherDefaultMode = "drun";
         Config.launcherShowModeHints = true;
@@ -334,7 +485,9 @@ Item {
         Config.launcherRememberWebProvider = true;
         Config.launcherWebLastProviderKey = "duckduckgo";
         Config.launcherWebProviderOrder = webProviderDefaultOrder.slice();
-        var supportedDefaults = launcherDefaultModes.filter(function(modeKey) { return isLauncherModeSupported(modeKey); });
+        var supportedDefaults = launcherDefaultModes.filter(function (modeKey) {
+            return isLauncherModeSupported(modeKey);
+        });
         if (supportedDefaults.length === 0)
             supportedDefaults = ["drun"];
         Config.launcherEnabledModes = supportedDefaults.slice();
@@ -575,74 +728,226 @@ Item {
 
             Repeater {
                 model: root.orderedWebProviders()
-
-                delegate: SettingsListRow {
-                    minimumHeight: root.compactMode ? 76 : 44
+                delegate: Item {
+                    id: webProviderRow
+                    width: parent ? parent.width : 0
+                    implicitHeight: webProviderCard.implicitHeight + (webDropBeforeIndicator.visible ? webDropBeforeIndicator.height + Colors.spacingXS : 0)
+                    height: implicitHeight
+                    required property int index
+                    required property var modelData
+                    readonly property bool dropBeforeActive: root.dragWebProviderKey !== "" && root.dragWebProviderTargetIndex === index
 
                     Rectangle {
-                        Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
-                        border.color: Colors.border
+                        id: webDropBeforeIndicator
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                            top: parent.top
+                        }
+                        visible: webProviderRow.dropBeforeActive
+                        height: 10
+                        radius: 5
+                        color: Colors.withAlpha(Colors.primary, 0.22)
+                        border.color: Colors.primary
                         border.width: 1
-                        color: Colors.surface
-                        implicitHeight: 24
-                        implicitWidth: 24
-                        radius: 12
+                    }
 
-                        Text {
-                            anchors.centerIn: parent
-                            color: Colors.primary
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeSmall
-                            text: {
-                                for (var i = 0; i < root.webProviders.length; ++i) {
-                                    if (root.webProviders[i].key === modelData)
-                                        return root.webProviders[i].icon;
+                    DropArea {
+                        anchors.fill: parent
+                        keys: ["web-provider"]
+                        onEntered: function (drag) {
+                            if (root.dragWebProviderKey === "")
+                                return;
+                            root.dragWebProviderTargetIndex = webProviderRow.index;
+                        }
+                        onExited: {
+                            if (root.dragWebProviderTargetIndex === webProviderRow.index)
+                                root.dragWebProviderTargetIndex = -1;
+                        }
+                        onDropped: function (drop) {
+                            root.moveDraggedWebProvider(webProviderRow.index);
+                        }
+                    }
+
+                    SettingsListRow {
+                        id: webProviderCard
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                            top: webDropBeforeIndicator.bottom
+                            topMargin: webDropBeforeIndicator.visible ? Colors.spacingXS : 0
+                        }
+                        minimumHeight: root.compactMode ? 76 : 44
+                        active: webDragHandle.drag.active
+                        opacity: webDragHandle.drag.active ? 0.74 : 1.0
+
+                        Rectangle {
+                            implicitWidth: 28
+                            implicitHeight: 28
+                            radius: Colors.radiusSmall
+                            color: webDragHandle.pressed ? Colors.withAlpha(Colors.primary, 0.18) : (webDragHandle.containsMouse ? Colors.withAlpha(Colors.text, 0.10) : "transparent")
+                            border.color: webDragHandle.containsMouse ? Colors.border : "transparent"
+                            border.width: webDragHandle.containsMouse ? 1 : 0
+                            Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: "󰆾"
+                                color: webDragHandle.pressed ? Colors.primary : Colors.fgSecondary
+                                font.family: Colors.fontMono
+                                font.pixelSize: Colors.fontSizeMedium
+                            }
+
+                            MouseArea {
+                                id: webDragHandle
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                acceptedButtons: Qt.LeftButton
+                                drag.target: webProviderCard
+                                drag.axis: Drag.YAxis
+                                cursorShape: drag.active ? Qt.ClosedHandCursor : Qt.OpenHandCursor
+                                onPressed: {
+                                    root.dragWebProviderKey = webProviderRow.modelData;
+                                    root.dragWebProviderTargetIndex = webProviderRow.index;
                                 }
-                                return "󰖟";
+                                onReleased: {
+                                    webProviderCard.x = 0;
+                                    webProviderCard.y = 0;
+                                    if (webDragProxy.Drag.active)
+                                        webDragProxy.Drag.drop();
+                                    else
+                                        root.clearWebProviderDragState();
+                                }
+                                drag.onActiveChanged: {
+                                    if (!drag.active) {
+                                        webProviderCard.x = 0;
+                                        webProviderCard.y = 0;
+                                    }
+                                }
+                            }
+                        }
+
+                        Rectangle {
+                            Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
+                            border.color: Colors.border
+                            border.width: 1
+                            color: Colors.surface
+                            implicitHeight: 24
+                            implicitWidth: 24
+                            radius: 12
+
+                            Text {
+                                anchors.centerIn: parent
+                                color: Colors.primary
+                                font.family: Colors.fontMono
+                                font.pixelSize: Colors.fontSizeSmall
+                                text: {
+                                    for (var i = 0; i < root.webProviders.length; ++i) {
+                                        if (root.webProviders[i].key === webProviderRow.modelData)
+                                            return root.webProviders[i].icon;
+                                    }
+                                    return "󰖟";
+                                }
+                            }
+                        }
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: Colors.spacingXS
+
+                            Text {
+                                Layout.fillWidth: true
+                                color: Colors.text
+                                font.pixelSize: Colors.fontSizeSmall
+                                font.weight: Font.DemiBold
+                                wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap
+                                elide: root.compactMode ? Text.ElideNone : Text.ElideRight
+                                text: {
+                                    for (var i = 0; i < root.webProviders.length; ++i) {
+                                        if (root.webProviders[i].key === webProviderRow.modelData)
+                                            return root.webProviders[i].label;
+                                    }
+                                    return webProviderRow.modelData;
+                                }
+                            }
+
+                            Text {
+                                text: "Drag to reorder, or use the arrow buttons."
+                                color: Colors.fgSecondary
+                                font.pixelSize: Colors.fontSizeXS
+                                Layout.fillWidth: true
+                                wrapMode: Text.WordWrap
+                            }
+
+                            Flow {
+                                Layout.fillWidth: true
+                                Layout.preferredWidth: parent.width
+                                spacing: Colors.spacingS
+
+                                SettingsActionButton {
+                                    compact: true
+                                    enabled: webProviderRow.index > 0
+                                    label: "↑"
+                                    onClicked: root.moveWebProvider(webProviderRow.modelData, -1)
+                                }
+
+                                SettingsActionButton {
+                                    compact: true
+                                    enabled: webProviderRow.index < (root.orderedWebProviders().length - 1)
+                                    label: "↓"
+                                    onClicked: root.moveWebProvider(webProviderRow.modelData, 1)
+                                }
                             }
                         }
                     }
 
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: Colors.spacingXS
-
-                        Text {
-                            Layout.fillWidth: true
-                            color: Colors.text
-                            font.pixelSize: Colors.fontSizeSmall
-                            font.weight: Font.DemiBold
-                            wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap
-                            elide: root.compactMode ? Text.ElideNone : Text.ElideRight
-                            text: {
-                                for (var i = 0; i < root.webProviders.length; ++i) {
-                                    if (root.webProviders[i].key === modelData)
-                                        return root.webProviders[i].label;
-                                }
-                                return modelData;
-                            }
-                        }
-
-                        Flow {
-                            Layout.fillWidth: true
-                            Layout.preferredWidth: parent.width
-                            spacing: Colors.spacingS
-
-                            SettingsActionButton {
-                                compact: true
-                                enabled: index > 0
-                                label: "↑"
-                                onClicked: root.moveWebProvider(modelData, -1)
-                            }
-
-                            SettingsActionButton {
-                                compact: true
-                                enabled: index < (root.orderedWebProviders().length - 1)
-                                label: "↓"
-                                onClicked: root.moveWebProvider(modelData, 1)
-                            }
-                        }
+                    Item {
+                        id: webDragProxy
+                        width: webProviderRow.width
+                        height: webProviderRow.height
+                        visible: false
+                        Drag.active: webDragHandle.drag.active
+                        Drag.source: webDragProxy
+                        Drag.hotSpot.x: width / 2
+                        Drag.hotSpot.y: height / 2
+                        Drag.keys: ["web-provider"]
                     }
+                }
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                height: 12
+                radius: 6
+                visible: root.dragWebProviderKey !== "" && root.dragWebProviderTargetIndex === root.orderedWebProviders().length
+                color: Colors.withAlpha(Colors.primary, 0.22)
+                border.color: Colors.primary
+                border.width: 1
+            }
+
+            DropArea {
+                Layout.fillWidth: true
+                height: root.orderedWebProviders().length > 0 ? 28 : 0
+                visible: root.orderedWebProviders().length > 0
+                keys: ["web-provider"]
+                onEntered: function (drag) {
+                    if (root.dragWebProviderKey === "")
+                        return;
+                    root.dragWebProviderTargetIndex = root.orderedWebProviders().length;
+                }
+                onExited: {
+                    if (root.dragWebProviderTargetIndex === root.orderedWebProviders().length)
+                        root.dragWebProviderTargetIndex = -1;
+                }
+                onDropped: function (drop) {
+                    root.moveDraggedWebProvider(root.orderedWebProviders().length);
+                }
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: root.dragWebProviderKey !== "" ? "Drop at end of provider order" : ""
+                    color: Colors.fgSecondary
+                    font.pixelSize: Colors.fontSizeXS
                 }
             }
 
@@ -825,61 +1130,214 @@ Item {
 
             Repeater {
                 model: root.orderedEnabledModes()
-                delegate: SettingsListRow {
-                    minimumHeight: root.compactMode ? 76 : 46
+                delegate: Item {
+                    id: modeRow
+                    width: parent ? parent.width : 0
+                    implicitHeight: modeCard.implicitHeight + (dropBeforeIndicator.visible ? dropBeforeIndicator.height + Colors.spacingXS : 0)
+                    height: implicitHeight
+                    required property int index
+                    required property var modelData
+                    readonly property bool dropBeforeActive: root.dragModeKey !== "" && root.dragModeTargetIndex === index
 
                     Rectangle {
-                        implicitWidth: 24
-                        implicitHeight: 24
-                        radius: 12
-                        color: Colors.surface
-                        border.color: Colors.border
+                        id: dropBeforeIndicator
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                            top: parent.top
+                        }
+                        visible: modeRow.dropBeforeActive
+                        height: 10
+                        radius: 5
+                        color: Colors.withAlpha(Colors.primary, 0.22)
+                        border.color: Colors.primary
                         border.width: 1
-                        Layout.alignment: Qt.AlignVCenter
+                    }
 
-                        Text {
-                            anchors.centerIn: parent
-                            text: root.launcherModeMeta(modelData).icon
-                            color: Colors.primary
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeSmall
+                    DropArea {
+                        anchors.fill: parent
+                        keys: ["launcher-mode"]
+                        onEntered: function (drag) {
+                            if (root.dragModeKey === "")
+                                return;
+                            root.dragModeTargetIndex = modeRow.index;
+                        }
+                        onExited: {
+                            if (root.dragModeTargetIndex === modeRow.index)
+                                root.dragModeTargetIndex = -1;
+                        }
+                        onDropped: function (drop) {
+                            root.moveDraggedMode(modeRow.index);
                         }
                     }
 
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: Colors.spacingXS
-
-                        Text {
-                            text: root.launcherModeMeta(modelData).label
-                            color: Colors.text
-                            font.pixelSize: Colors.fontSizeSmall
-                            font.weight: Font.DemiBold
-                            Layout.fillWidth: true
-                            wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap
-                            elide: root.compactMode ? Text.ElideNone : Text.ElideRight
+                    SettingsListRow {
+                        id: modeCard
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                            top: dropBeforeIndicator.bottom
+                            topMargin: dropBeforeIndicator.visible ? Colors.spacingXS : 0
                         }
+                        minimumHeight: root.compactMode ? 76 : 46
+                        active: dragHandle.drag.active
+                        opacity: dragHandle.drag.active ? 0.74 : 1.0
 
-                        Flow {
-                            Layout.fillWidth: true
-                            Layout.preferredWidth: parent.width
-                            spacing: Colors.spacingS
+                        Rectangle {
+                            implicitWidth: 28
+                            implicitHeight: 28
+                            radius: Colors.radiusSmall
+                            color: dragHandle.pressed ? Colors.withAlpha(Colors.primary, 0.18) : (dragHandle.containsMouse ? Colors.withAlpha(Colors.text, 0.10) : "transparent")
+                            border.color: dragHandle.containsMouse ? Colors.border : "transparent"
+                            border.width: dragHandle.containsMouse ? 1 : 0
+                            Layout.alignment: Qt.AlignTop
 
-                            SettingsActionButton {
-                                label: "↑"
-                                compact: true
-                                enabled: index > 0
-                                onClicked: root.moveMode(modelData, -1)
+                            Text {
+                                anchors.centerIn: parent
+                                text: "󰆾"
+                                color: dragHandle.pressed ? Colors.primary : Colors.fgSecondary
+                                font.family: Colors.fontMono
+                                font.pixelSize: Colors.fontSizeMedium
                             }
 
-                            SettingsActionButton {
-                                label: "↓"
-                                compact: true
-                                enabled: index < (root.orderedEnabledModes().length - 1)
-                                onClicked: root.moveMode(modelData, 1)
+                            MouseArea {
+                                id: dragHandle
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                acceptedButtons: Qt.LeftButton
+                                drag.target: modeCard
+                                drag.axis: Drag.YAxis
+                                cursorShape: drag.active ? Qt.ClosedHandCursor : Qt.OpenHandCursor
+                                onPressed: {
+                                    root.dragModeKey = modeRow.modelData;
+                                    root.dragModeTargetIndex = modeRow.index;
+                                }
+                                onReleased: {
+                                    modeCard.x = 0;
+                                    modeCard.y = 0;
+                                    if (dragProxy.Drag.active)
+                                        dragProxy.Drag.drop();
+                                    else
+                                        root.clearModeDragState();
+                                }
+                                drag.onActiveChanged: {
+                                    if (!drag.active) {
+                                        modeCard.x = 0;
+                                        modeCard.y = 0;
+                                    }
+                                }
+                            }
+                        }
+
+                        Rectangle {
+                            implicitWidth: 24
+                            implicitHeight: 24
+                            radius: 12
+                            color: Colors.surface
+                            border.color: Colors.border
+                            border.width: 1
+                            Layout.alignment: Qt.AlignVCenter
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: root.launcherModeMeta(modeRow.modelData).icon
+                                color: Colors.primary
+                                font.family: Colors.fontMono
+                                font.pixelSize: Colors.fontSizeSmall
+                            }
+                        }
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: Colors.spacingXS
+
+                            Text {
+                                text: root.launcherModeMeta(modeRow.modelData).label
+                                color: Colors.text
+                                font.pixelSize: Colors.fontSizeSmall
+                                font.weight: Font.DemiBold
+                                Layout.fillWidth: true
+                                wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap
+                                elide: root.compactMode ? Text.ElideNone : Text.ElideRight
+                            }
+
+                            Text {
+                                text: "Drag to reorder, or use the arrow buttons."
+                                color: Colors.fgSecondary
+                                font.pixelSize: Colors.fontSizeXS
+                                Layout.fillWidth: true
+                                wrapMode: Text.WordWrap
+                            }
+
+                            Flow {
+                                Layout.fillWidth: true
+                                Layout.preferredWidth: parent.width
+                                spacing: Colors.spacingS
+
+                                SettingsActionButton {
+                                    label: "↑"
+                                    compact: true
+                                    enabled: modeRow.index > 0
+                                    onClicked: root.moveMode(modeRow.modelData, -1)
+                                }
+
+                                SettingsActionButton {
+                                    label: "↓"
+                                    compact: true
+                                    enabled: modeRow.index < (root.orderedEnabledModes().length - 1)
+                                    onClicked: root.moveMode(modeRow.modelData, 1)
+                                }
                             }
                         }
                     }
+
+                    Item {
+                        id: dragProxy
+                        width: modeRow.width
+                        height: modeRow.height
+                        visible: false
+                        Drag.active: dragHandle.drag.active
+                        Drag.source: dragProxy
+                        Drag.hotSpot.x: width / 2
+                        Drag.hotSpot.y: height / 2
+                        Drag.keys: ["launcher-mode"]
+                    }
+                }
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                height: 12
+                radius: 6
+                visible: root.dragModeKey !== "" && root.dragModeTargetIndex === root.orderedEnabledModes().length
+                color: Colors.withAlpha(Colors.primary, 0.22)
+                border.color: Colors.primary
+                border.width: 1
+            }
+
+            DropArea {
+                Layout.fillWidth: true
+                height: root.orderedEnabledModes().length > 0 ? 28 : 0
+                visible: root.orderedEnabledModes().length > 0
+                keys: ["launcher-mode"]
+                onEntered: function (drag) {
+                    if (root.dragModeKey === "")
+                        return;
+                    root.dragModeTargetIndex = root.orderedEnabledModes().length;
+                }
+                onExited: {
+                    if (root.dragModeTargetIndex === root.orderedEnabledModes().length)
+                        root.dragModeTargetIndex = -1;
+                }
+                onDropped: function (drop) {
+                    root.moveDraggedMode(root.orderedEnabledModes().length);
+                }
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: root.dragModeKey !== "" ? "Drop at end of mode order" : ""
+                    color: Colors.fgSecondary
+                    font.pixelSize: Colors.fontSizeXS
                 }
             }
 
