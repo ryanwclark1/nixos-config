@@ -22,6 +22,7 @@ usage() {
 Usage: preview-settings-responsive.sh [--id INSTANCE_ID] [--delay SECONDS]
 
 Open SettingsHub and walk the high-risk tabs in sequence for manual visual QA.
+This is a live-session manual walkthrough, not a PASS/WARN/FAIL gate.
 EOF
 }
 

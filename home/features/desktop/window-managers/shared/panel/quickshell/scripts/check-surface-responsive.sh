@@ -91,11 +91,14 @@ run_ipc() {
   local attempt
 
   for attempt in 1 2 3 4 5; do
-    output="$("$@" 2>&1)" && return 0
+    output="$(timeout 5s "$@" 2>&1)"
     status=$?
     if [[ "${output}" == *"Not ready to accept queries yet."* ]]; then
       sleep 0.2
       continue
+    fi
+    if [[ ${status} -eq 0 ]]; then
+      return 0
     fi
     [[ -n "${output}" ]] && printf '%s\n' "${output}" >&2
     return "${status}"
@@ -188,6 +191,7 @@ call_ipc() {
 
 main() {
   require_cmd quickshell
+  require_cmd timeout
   require_cmd grep
   require_cmd tail
   require_cmd sed

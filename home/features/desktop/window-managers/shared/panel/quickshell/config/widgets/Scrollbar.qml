@@ -1,7 +1,7 @@
 import QtQuick
 import "../services"
 
-// DankScrollbar — a 6px capsule scrollbar that auto-hides after 1200ms.
+// Scrollbar — a 6px capsule scrollbar that auto-hides after 1200ms.
 // Bind `flickable` to the Flickable/ListView you want to control.
 //
 // Usage:
@@ -11,7 +11,7 @@ import "../services"
 //
 //     Flickable { id: myFlick; anchors.fill: parent; ... }
 //
-//     DankScrollbar { flickable: myFlick }
+//     Scrollbar { flickable: myFlick }
 //   }
 
 Item {

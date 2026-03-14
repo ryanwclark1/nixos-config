@@ -21,6 +21,7 @@ usage() {
 Usage: capture-surface-matrix.sh [--output-dir DIR] [--delay SECONDS] [--crop monitor|usable] [--workspace current|auto|NAME]
 
 Capture the high-risk popup/panel surfaces on the currently focused monitor.
+This produces review artifacts for manual inspection, not PASS/WARN/FAIL results.
 EOF
 }
 
@@ -74,4 +75,4 @@ for surface in "${surfaces[@]}"; do
     --output "${output_dir}/${surface}-${crop_mode}.png"
 done
 
-printf '[INFO] Captured surface matrix (%s) to %s\n' "${crop_mode}" "${output_dir}"
+printf '[INFO] Saved surface review artifacts for the %s matrix to %s\n' "${crop_mode}" "${output_dir}"

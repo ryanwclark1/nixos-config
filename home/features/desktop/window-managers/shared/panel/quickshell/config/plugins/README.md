@@ -40,6 +40,7 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
 - Local runner:
   - `scripts/plugin-local.sh quick` (fast local guardrails, starting with `reference-all`)
   - `scripts/plugin-local.sh full` (complete local verification)
+  - `scripts/plugin-local.sh full --quiet` (same full verification with compact phase output)
   - `scripts/plugin-local.sh doctor [/path/to/plugins]`
   - `scripts/plugin-local.sh install-reference [/path/to/plugins]`
   - `scripts/plugin-local.sh smoke-reference [/path/to/plugins]`
@@ -50,6 +51,9 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
   - `scripts/plugin-local.sh reference-files`
   - `scripts/plugin-local.sh reference-guards`
   - `scripts/plugin-local.sh reference-all`
+  - `scripts/plugin-local.sh shared-gates`
+  - `scripts/plugin-local.sh baseline-gates`
+  - `scripts/plugin-local.sh all-gates`
 - Repo-tracked reference plugin:
   - `examples/plugins/reference-local-toolkit`
 - Runtime state/error catalog:
@@ -59,6 +63,7 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
 - UI label/severity source: `PluginRuntimeCatalog` (`config/services/PluginRuntimeCatalog.qml`)
 - Unified gate:
   - `scripts/plugin-verify.sh`
+  - reuses `scripts/plugin-local.sh all-gates`
 - Fixture conformance gate:
   - `scripts/check-plugin-conformance.sh`
 - Plugin doctor smoke gate:
@@ -107,7 +112,12 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
 - Run `scripts/plugin-local.sh reference-guards` when you need only the runnable reference guard commands in order.
 - Run `scripts/plugin-local.sh reference-all` when you want to execute the full reference-only guard sequence without the rest of `plugin-verify.sh`.
 - Run `scripts/plugin-local.sh reference-all --quiet` when you want the reference-only guard sequence without stage headings.
-- `scripts/plugin-local.sh quick` reuses `reference-all` before the shared runtime and diagnostics gates, so the fast path and the reference-only path stay aligned.
+- Run `scripts/plugin-local.sh reference-all --quiet --silent-preflight` when you want the most compact successful reference-only run output.
+- Run `scripts/plugin-local.sh shared-gates` when you want only the shared runtime and diagnostics tail checks.
+- Run `scripts/plugin-local.sh baseline-gates` when you want only the conformance and doctor-smoke entry gates.
+- Run `scripts/plugin-local.sh all-gates` when you want the same assembled pipeline used by `plugin-verify.sh` and `plugin-local.sh full`.
+- Run `scripts/plugin-local.sh all-gates --quiet` when you want that assembled pipeline without the phase headings.
+- `scripts/plugin-local.sh quick` reuses `reference-all --quiet --silent-preflight` before the shared runtime and diagnostics gates, so the fast path and the reference-only path stay aligned without extra preflight noise.
 
 ## Reference Plugin Workflow
 

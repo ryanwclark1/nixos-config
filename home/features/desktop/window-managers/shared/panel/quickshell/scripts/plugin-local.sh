@@ -24,8 +24,17 @@ health_label() {
 }
 
 reference_guard_commands() {
+  local quiet_mode="${1:-0}"
+  local silent_preflight="${2:-0}"
+  local preflight_cmd="${script_dir}/plugin-local.sh reference-status --check --quiet"
+  if [[ "$quiet_mode" == "1" ]]; then
+    preflight_cmd="${preflight_cmd} --silent-pass"
+  fi
+  if [[ "$silent_preflight" == "1" ]]; then
+    preflight_cmd="${preflight_cmd} --silent-status"
+  fi
   cat <<EOF
-${script_dir}/plugin-local.sh reference-status --check --quiet
+${preflight_cmd}
 ${script_dir}/check-plugin-reference-local.sh
 ${script_dir}/check-plugin-reference-contracts.sh
 ${script_dir}/check-plugin-reference-fixtures.sh
@@ -64,11 +73,11 @@ reference_guard_label() {
 usage() {
   cat <<'EOF'
 Usage:
-  plugin-local.sh [quick|full|doctor|install-reference|remove-reference|smoke-reference|reference-flow|reference-export|reference-status|reference-files|reference-guards|reference-all] [plugins_dir|--check|--quiet]
+  plugin-local.sh [quick|full|doctor|install-reference|remove-reference|smoke-reference|reference-flow|reference-export|reference-status|reference-files|reference-guards|reference-all|shared-gates|baseline-gates|all-gates] [plugins_dir|--check|--quiet]
 
 Modes:
   quick              Run fast local plugin guardrails (default)
-  full               Run complete local plugin verification gate
+  full               Run complete local plugin verification gate (`--quiet` suppresses the top-level wrapper line)
   doctor             Run plugin doctor against optional plugins_dir
   install-reference  Link the repo-tracked reference plugin into plugins_dir
   remove-reference   Remove the linked reference plugin from plugins_dir
@@ -78,23 +87,27 @@ Modes:
   reference-status   Print a combined local reference-plugin status summary (`--check` fails on unhealthy prerequisites, `--quiet` suppresses the dashboard and prints one-line status)
   reference-files    Print canonical reference toolkit file and guard paths only
   reference-guards   Print runnable reference toolkit guard commands in order
-  reference-all      Run the full reference-toolkit guard sequence (`--quiet` suppresses stage headings)
+  reference-all      Run the full reference-toolkit guard sequence (`--quiet` suppresses stage headings, `--silent-preflight` suppresses successful preflight output)
+  shared-gates       Run the shared runtime and diagnostics plugin gates
+  baseline-gates     Run plugin conformance and doctor-smoke gates
+  all-gates          Run baseline, reference, and shared plugin gates (`--quiet` suppresses phase headings)
 EOF
 }
 
 case "$mode" in
   quick)
     printf '[INFO] Local quick plugin checks...\n'
-    "${script_dir}/plugin-local.sh" reference-all
-    "${script_dir}/check-plugin-runtime-guards.sh"
-    "${script_dir}/check-plugin-diagnostics-contracts.sh"
-    "${script_dir}/sync-plugin-diagnostics-schema.sh" --check
-    "${script_dir}/check-plugin-diagnostics-schema.sh"
+    "${script_dir}/plugin-local.sh" reference-all --quiet --silent-preflight
+    "${script_dir}/plugin-local.sh" shared-gates
     printf '[INFO] Local quick plugin checks passed.\n'
     ;;
   full)
-    printf '[INFO] Local full plugin checks...\n'
-    "${script_dir}/plugin-verify.sh"
+    if [[ "${2:-}" != "--quiet" ]]; then
+      printf '[INFO] Local full plugin checks...\n'
+      "${script_dir}/plugin-local.sh" all-gates
+    else
+      "${script_dir}/plugin-local.sh" all-gates --quiet
+    fi
     ;;
   doctor)
     target="${2:-${HOME}/.config/quickshell/plugins}"
@@ -209,29 +222,36 @@ Manual export actions:
 EOF
     ;;
   reference-status)
-    target="${2:-${HOME}/.config/quickshell/plugins}"
+    target="${HOME}/.config/quickshell/plugins"
     check_only=0
     quiet=0
-    if [[ "${2:-}" == "--check" ]]; then
-      target="${HOME}/.config/quickshell/plugins"
-      check_only=1
-      if [[ "${3:-}" == "--quiet" ]]; then
-        quiet=1
-      fi
-    elif [[ "${3:-}" == "--check" ]]; then
-      check_only=1
-      if [[ "${4:-}" == "--quiet" ]]; then
-        quiet=1
-      fi
-    elif [[ "${2:-}" == "--quiet" ]]; then
-      target="${HOME}/.config/quickshell/plugins"
-      quiet=1
-      if [[ "${3:-}" == "--check" ]]; then
-        check_only=1
-      fi
-    elif [[ "${3:-}" == "--quiet" ]]; then
-      quiet=1
+    silent_pass=0
+    silent_status=0
+    if [[ -n "${2:-}" && "${2:-}" != --* ]]; then
+      target="$2"
+      shift 2
+    else
+      shift 1
     fi
+    while (($# > 0)); do
+      case "$1" in
+        --check)
+          check_only=1
+          ;;
+        --quiet)
+          quiet=1
+          ;;
+        --silent-pass)
+          quiet=1
+          silent_pass=1
+          ;;
+        --silent-status)
+          quiet=1
+          silent_status=1
+          ;;
+      esac
+      shift
+    done
     destination="${target}/${reference_dir_name}"
     health_failures=0
     if [[ -d "$reference_source_dir" ]]; then
@@ -309,7 +329,7 @@ Diagnostics export:
   saved path: ${HOME}/.local/state/quickshell/plugin-diagnostics/
   UI actions: Settings -> Plugins -> Copy Diagnostics / Save Diagnostics
 EOF
-    else
+    elif (( silent_status == 0 )); then
       printf '[INFO] Reference status: %s | %s | %s | %s\n' \
         "$source_health" \
         "$fixture_health" \
@@ -318,7 +338,9 @@ EOF
     fi
     if (( check_only == 1 )); then
       if (( health_failures == 0 )); then
-        printf '[INFO] Reference status check passed.\n'
+        if (( silent_pass == 0 )); then
+          printf '[INFO] Reference status check passed.\n'
+        fi
       else
         printf '[FAIL] Reference status check failed: %d prerequisite issue(s).\n' "$health_failures" >&2
         exit 1
@@ -346,8 +368,14 @@ EOF
     ;;
   reference-all)
     quiet=0
+    silent_preflight=0
     if [[ "${2:-}" == "--quiet" ]]; then
       quiet=1
+      if [[ "${3:-}" == "--silent-preflight" ]]; then
+        silent_preflight=1
+      fi
+    elif [[ "${2:-}" == "--silent-preflight" ]]; then
+      silent_preflight=1
     fi
     while IFS= read -r guard_cmd; do
       [[ -n "$guard_cmd" ]] || continue
@@ -356,9 +384,45 @@ EOF
         printf '[INFO] Running %s...\n' "$(reference_guard_label "$guard_cmd")"
       fi
       "${guard_parts[@]}"
-    done < <(reference_guard_commands)
+    done < <(reference_guard_commands "$quiet" "$silent_preflight")
     if (( quiet == 0 )); then
       printf '[INFO] Reference plugin checks passed.\n'
+    fi
+    ;;
+  shared-gates)
+    printf '[INFO] Running plugin runtime guard checks...\n'
+    "${script_dir}/check-plugin-runtime-guards.sh"
+    printf '[INFO] Running plugin diagnostics contract checks...\n'
+    "${script_dir}/check-plugin-diagnostics-contracts.sh"
+    printf '[INFO] Running plugin diagnostics schema sync checks...\n'
+    "${script_dir}/sync-plugin-diagnostics-schema.sh" --check
+    printf '[INFO] Running plugin diagnostics schema checks...\n'
+    "${script_dir}/check-plugin-diagnostics-schema.sh"
+    ;;
+  baseline-gates)
+    printf '[INFO] Running plugin conformance checks...\n'
+    "${script_dir}/check-plugin-conformance.sh"
+    printf '[INFO] Running plugin doctor smoke checks...\n'
+    "${script_dir}/check-plugin-doctor-smoke.sh"
+    ;;
+  all-gates)
+    quiet=0
+    if [[ "${2:-}" == "--quiet" ]]; then
+      quiet=1
+    fi
+    if (( quiet == 0 )); then
+      printf '[INFO] Running baseline plugin gates...\n'
+    fi
+    "${script_dir}/plugin-local.sh" baseline-gates
+    if (( quiet == 0 )); then
+      printf '[INFO] Running plugin reference toolkit checks...\n'
+      "${script_dir}/plugin-local.sh" reference-all
+      printf '[INFO] Running shared plugin gates...\n'
+      "${script_dir}/plugin-local.sh" shared-gates
+      printf '[INFO] Plugin verification passed.\n'
+    else
+      "${script_dir}/plugin-local.sh" reference-all --quiet --silent-preflight
+      "${script_dir}/plugin-local.sh" shared-gates
     fi
     ;;
   -h|--help|help)

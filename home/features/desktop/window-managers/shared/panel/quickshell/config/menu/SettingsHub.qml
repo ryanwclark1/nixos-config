@@ -38,6 +38,7 @@ PanelWindow {
   property bool isOpen: false
   property bool interactionBlocked: false
   property string currentTabId: SettingsRegistry.defaultTabId
+  property string pendingTabId: ""
   readonly property int currentTabIndex: SettingsRegistry.indexForTabId(currentTabId)
   signal browseWallpaper(string monitorName)
   signal pickWallpaperFolder()
@@ -64,8 +65,35 @@ PanelWindow {
     isOpen = false;
   }
 
+  function setCaptureScrollY(scrollY) {
+    settingsContent.requestedScrollY = Math.max(0, Number(scrollY) || 0);
+  }
+
+  function captureOpenTab(tabId, scrollY) {
+    var tab = SettingsRegistry.findTab(tabId);
+    if (tab)
+      currentTabId = tab.id;
+    pendingTabId = "";
+    setCaptureScrollY(scrollY);
+    open();
+  }
+
   function toggle() {
     isOpen ? close() : open();
+  }
+
+  Timer {
+    id: deferredOpenTimer
+    interval: 1
+    repeat: false
+    onTriggered: {
+      if (settingsRoot.pendingTabId) {
+        var tab = SettingsRegistry.findTab(settingsRoot.pendingTabId);
+        if (tab) settingsRoot.currentTabId = tab.id;
+        settingsRoot.pendingTabId = "";
+      }
+      settingsRoot.open();
+    }
   }
 
   IpcHandler {
@@ -78,16 +106,19 @@ PanelWindow {
     }
     function openTab(tabId: string) {
       Qt.callLater(() => {
-        var tab = SettingsRegistry.findTab(tabId);
-        if (tab) settingsRoot.currentTabId = tab.id;
-        settingsRoot.open();
+        settingsRoot.pendingTabId = tabId;
+        settingsRoot.setCaptureScrollY(0);
+        deferredOpenTimer.restart();
       });
+    }
+    function openTabScrolled(tabId: string, scrollY: int) {
+      settingsRoot.captureOpenTab(tabId, scrollY);
     }
     function openIndex(index: int) {
       Qt.callLater(() => {
-        var tabId = SettingsRegistry.tabIdForIndex(index);
-        if (tabId) settingsRoot.currentTabId = tabId;
-        settingsRoot.open();
+        settingsRoot.pendingTabId = SettingsRegistry.tabIdForIndex(index) || "";
+        settingsRoot.setCaptureScrollY(0);
+        deferredOpenTimer.restart();
       });
     }
     function close() {
@@ -185,6 +216,7 @@ PanelWindow {
       }
 
       SettingsContent {
+        id: settingsContent
         Layout.fillWidth: true
         Layout.fillHeight: true
         currentTabId: settingsRoot.currentTabId

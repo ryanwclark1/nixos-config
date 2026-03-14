@@ -3,6 +3,7 @@ set -euo pipefail
 
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 
+instance_id=""
 viewport_preset="portrait"
 output_dir="/tmp/settings-matrix"
 delay_seconds="4"
@@ -24,11 +25,16 @@ usage() {
 Usage: capture-settings-matrix.sh [--preset portrait|laptop|wide] [--output-dir DIR] [--delay SECONDS] [--scroll-y PX] [--workspace current|auto|NAME]
 
 Capture the high-risk settings tabs for a standard viewport preset.
+This produces review artifacts for manual inspection, not PASS/WARN/FAIL results.
 EOF
 }
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --id)
+      instance_id="${2:-}"
+      shift 2
+      ;;
     --preset)
       viewport_preset="${2:-}"
       shift 2
@@ -82,8 +88,14 @@ esac
 
 mkdir -p "${output_dir}"
 
+viewport_args=()
+if [[ -n "${instance_id}" ]]; then
+  viewport_args+=(--id "${instance_id}")
+fi
+
 for tab in "${tabs[@]}"; do
   bash "${script_dir}/capture-settings-viewport.sh" \
+    "${viewport_args[@]}" \
     --width "${width}" \
     --height "${height}" \
     --delay "${delay_seconds}" \
@@ -93,4 +105,4 @@ for tab in "${tabs[@]}"; do
     --output "${output_dir}/${viewport_preset}-${tab}.png"
 done
 
-printf '[INFO] Captured %s matrix to %s\n' "${viewport_preset}" "${output_dir}"
+printf '[INFO] Saved settings review artifacts for the %s matrix to %s\n' "${viewport_preset}" "${output_dir}"

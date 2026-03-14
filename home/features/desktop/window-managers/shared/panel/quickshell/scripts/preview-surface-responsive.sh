@@ -31,6 +31,7 @@ usage() {
 Usage: preview-surface-responsive.sh [--id INSTANCE_ID] [--delay SECONDS]
 
 Open popup and panel surfaces in sequence for manual visual QA.
+This is a live-session manual walkthrough, not a PASS/WARN/FAIL gate.
 EOF
 }
 

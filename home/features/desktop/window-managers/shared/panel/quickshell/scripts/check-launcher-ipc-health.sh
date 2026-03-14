@@ -18,7 +18,7 @@ Usage: check-launcher-ipc-health.sh [--id INSTANCE_ID] [--ci]
 
 Runs a launcher IPC health probe:
   - validates Launcher IPC methods are discoverable,
-  - exercises clearMetrics/redetectFilesBackend/diagnosticReset/filesBackendStatus/drunCategoryState,
+  - exercises clearMetrics/redetectFilesBackend/diagnosticReset/filesBackendStatus/drunCategoryState/escapeActionState/diagnosticSetSearchText/diagnosticSetDrunCategoryFilter/invokeEscapeAction,
   - verifies files backend status payload contract literals in Launcher.qml.
 In --ci mode, only static contract checks are executed.
 EOF
@@ -55,7 +55,7 @@ require_cmd() {
 
 discover_reachable_instance() {
   local candidate show_output log_file launch_line
-  local fallback_candidate="" drun_candidate="" config_candidate="" preferred_candidate=""
+  local fallback_candidate="" drun_candidate="" escape_candidate="" config_candidate="" preferred_candidate=""
   if [[ ! -d "${runtime_root}" ]]; then
     return 1
   fi
@@ -77,13 +77,17 @@ discover_reachable_instance() {
       drun_candidate="${candidate}"
     fi
 
+    if printf '%s' "${show_output}" | rg -q "function escapeActionState\\(" && [[ -z "${escape_candidate}" ]]; then
+      escape_candidate="${candidate}"
+    fi
+
     log_file="${runtime_root}/${candidate}/log.log"
     launch_line="$(sed -n '1,6p' "${log_file}" 2>/dev/null | rg -m1 "Launching config:" || true)"
     if [[ -n "${launch_line}" ]] && printf '%s' "${launch_line}" | rg -q -F -- "${expected_config}"; then
       if [[ -z "${config_candidate}" ]]; then
         config_candidate="${candidate}"
       fi
-      if printf '%s' "${show_output}" | rg -q "function drunCategoryState\\("; then
+      if printf '%s' "${show_output}" | rg -q "function drunCategoryState\\(" && printf '%s' "${show_output}" | rg -q "function escapeActionState\\("; then
         preferred_candidate="${candidate}"
         break
       fi
@@ -100,6 +104,10 @@ discover_reachable_instance() {
   fi
   if [[ -n "${drun_candidate}" ]]; then
     printf '%s\n' "${drun_candidate}"
+    return 0
+  fi
+  if [[ -n "${escape_candidate}" ]]; then
+    printf '%s\n' "${escape_candidate}"
     return 0
   fi
   if [[ -n "${fallback_candidate}" ]]; then
@@ -161,7 +169,7 @@ main() {
   fi
 
   local action
-  for action in clearMetrics redetectFilesBackend diagnosticReset filesBackendStatus drunCategoryState; do
+  for action in clearMetrics redetectFilesBackend diagnosticReset filesBackendStatus drunCategoryState escapeActionState diagnosticSetSearchText diagnosticSetDrunCategoryFilter invokeEscapeAction; do
     checked_actions+=("${action}")
   done
 
@@ -170,7 +178,16 @@ main() {
   require_literal 'function diagnosticReset() { launcherRoot.diagnosticReset(); }' "Launcher.diagnosticReset IPC mapping"
   require_literal 'function filesBackendStatus() { return JSON.stringify(launcherRoot.filesBackendStatusObject()); }' "Launcher.filesBackendStatus IPC mapping"
   require_literal 'function drunCategoryState() { return JSON.stringify(launcherRoot.drunCategoryStateObject()); }' "Launcher.drunCategoryState IPC mapping"
+  require_literal 'function escapeActionState() { return JSON.stringify(launcherRoot.escapeActionStateObject()); }' "Launcher.escapeActionState IPC mapping"
+  require_literal 'function diagnosticSetSearchText(text: string) { return launcherRoot.diagnosticSetSearchText(text); }' "Launcher.diagnosticSetSearchText IPC mapping"
+  require_literal 'function diagnosticSetDrunCategoryFilter(categoryKey: string) { return launcherRoot.diagnosticSetDrunCategoryFilter(categoryKey); }' "Launcher.diagnosticSetDrunCategoryFilter IPC mapping"
+  require_literal 'function invokeEscapeAction() {' "Launcher.invokeEscapeAction IPC mapping"
   require_literal 'function drunCategoryStateObject() {' "drunCategoryState payload helper"
+  require_literal 'function escapeActionStateObject() {' "escapeActionState payload helper"
+  require_literal 'action = "resetQuery";' "escapeActionState resetQuery branch"
+  require_literal 'action = "resetCategory";' "escapeActionState resetCategory branch"
+  require_literal 'hasQuery: searchText !== "",' "escapeActionState hasQuery field"
+  require_literal 'hasCategoryFilter: drunCategoryFiltersEnabled && mode === "drun" && drunCategoryFilter !== "",' "escapeActionState hasCategoryFilter field"
   require_literal 'visible: showLauncherHome && drunCategoryFiltersEnabled && mode === "drun" && normalized.length > 1,' "drunCategoryState visible field"
   require_literal 'activeCount: activeCount,' "drunCategoryState activeCount field"
   require_literal 'totalCount: totalCount,' "drunCategoryState totalCount field"
@@ -217,7 +234,7 @@ main() {
 
   for action in "${checked_actions[@]}"; do
     if ! printf '%s' "${show_output}" | rg -q "function ${action}\\("; then
-      if [[ "${action}" == "drunCategoryState" ]]; then
+      if [[ "${action}" == "drunCategoryState" || "${action}" == "escapeActionState" || "${action}" == "diagnosticSetSearchText" || "${action}" == "diagnosticSetDrunCategoryFilter" || "${action}" == "invokeEscapeAction" ]]; then
         if quickshell ipc --id "${instance_id}" call Shell reloadConfig >/dev/null 2>&1; then
           sleep 1
         fi
@@ -230,14 +247,116 @@ main() {
         continue
       fi
     fi
-    if ! quickshell ipc --id "${instance_id}" call Launcher "${action}" >/dev/null 2>&1; then
-      if [[ "${action}" == "drunCategoryState" ]]; then
+    if [[ "${action}" == "diagnosticSetSearchText" ]]; then
+      if ! quickshell ipc --id "${instance_id}" call Launcher "${action}" "__launcher_ipc_probe__" >/dev/null 2>&1; then
+        printf '%s\n' "[WARN] Launcher IPC call failed for ${action} in live instance (restart QuickShell to pick up latest QML)" >&2
+        continue
+      fi
+    elif [[ "${action}" == "diagnosticSetDrunCategoryFilter" ]]; then
+      if ! quickshell ipc --id "${instance_id}" call Launcher "${action}" "" >/dev/null 2>&1; then
+        printf '%s\n' "[WARN] Launcher IPC call failed for ${action} in live instance (restart QuickShell to pick up latest QML)" >&2
+        continue
+      fi
+    elif ! quickshell ipc --id "${instance_id}" call Launcher "${action}" >/dev/null 2>&1; then
+      if [[ "${action}" == "drunCategoryState" || "${action}" == "escapeActionState" || "${action}" == "invokeEscapeAction" ]]; then
         printf '%s\n' "[WARN] Launcher IPC call failed for ${action} in live instance (restart QuickShell to pick up latest QML)" >&2
         continue
       fi
       errors+=("Launcher IPC call failed: ${action}")
     fi
   done
+
+  if launcher_action_available "escapeActionState" && launcher_action_available "diagnosticSetSearchText" && launcher_action_available "invokeEscapeAction"; then
+    local escape_state query_set query_invoke
+    if escape_state="$(quickshell ipc --id "${instance_id}" call Launcher escapeActionState 2>/dev/null)" && ! printf '%s' "${escape_state}" | node -e '
+const fs = require("node:fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+let payload = JSON.parse(raw);
+if (typeof payload === "string") payload = JSON.parse(payload);
+if (typeof payload !== "object" || !payload) process.exit(1);
+if (typeof payload.action !== "string") process.exit(1);
+if (typeof payload.mode !== "string") process.exit(1);
+if (typeof payload.showingConfirm !== "boolean") process.exit(1);
+if (typeof payload.hasQuery !== "boolean") process.exit(1);
+if (typeof payload.searchText !== "string") process.exit(1);
+if (typeof payload.hasCategoryFilter !== "boolean") process.exit(1);
+if (typeof payload.drunCategoryFilter !== "string") process.exit(1);
+' >/dev/null 2>&1; then
+      errors+=("Launcher.escapeActionState returned invalid payload")
+    fi
+
+    if query_set="$(quickshell ipc --id "${instance_id}" call Launcher diagnosticSetSearchText "__launcher_ipc_probe__" 2>/dev/null)" && ! printf '%s' "${query_set}" | node -e '
+const fs = require("node:fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+let payload = JSON.parse(raw);
+if (typeof payload === "string") payload = JSON.parse(payload);
+if (String(payload.action || "") !== "resetQuery") process.exit(1);
+if (payload.hasQuery !== true) process.exit(1);
+if (String(payload.searchText || "") !== "__launcher_ipc_probe__") process.exit(1);
+' >/dev/null 2>&1; then
+      errors+=("Launcher.diagnosticSetSearchText returned invalid payload")
+    fi
+
+    if query_invoke="$(quickshell ipc --id "${instance_id}" call Launcher invokeEscapeAction 2>/dev/null)" && ! printf '%s' "${query_invoke}" | node -e '
+const fs = require("node:fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+let payload = JSON.parse(raw);
+if (typeof payload === "string") payload = JSON.parse(payload);
+const state = payload && typeof payload.state === "object" ? payload.state : {};
+if (payload.handled !== true) process.exit(1);
+if (String(payload.action || "") !== "resetQuery") process.exit(1);
+if (state.hasQuery !== false) process.exit(1);
+if (String(state.searchText || "") !== "") process.exit(1);
+' >/dev/null 2>&1; then
+      errors+=("Launcher.invokeEscapeAction query reset contract invalid")
+    fi
+  fi
+
+  if launcher_action_available "drunCategoryState" && launcher_action_available "diagnosticSetDrunCategoryFilter" && launcher_action_available "invokeEscapeAction"; then
+    local category_state category_key category_set category_invoke
+    if quickshell ipc --id "${instance_id}" call Launcher openDrun >/dev/null 2>&1; then
+      category_state="$(quickshell ipc --id "${instance_id}" call Launcher drunCategoryState 2>/dev/null || true)"
+      category_key="$(printf '%s' "${category_state}" | node -e '
+const fs = require("node:fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+if (!raw) process.exit(0);
+let payload = JSON.parse(raw);
+if (typeof payload === "string") payload = JSON.parse(payload);
+if (payload.enabled !== true) process.exit(0);
+const options = Array.isArray(payload.options) ? payload.options : [];
+const match = options.find((item) => item && String(item.key || "") !== "");
+if (match) process.stdout.write(String(match.key || ""));
+' 2>/dev/null || true)"
+      if [[ -n "${category_key}" ]]; then
+        if category_set="$(quickshell ipc --id "${instance_id}" call Launcher diagnosticSetDrunCategoryFilter "${category_key}" 2>/dev/null)" && ! printf '%s' "${category_set}" | node -e '
+const fs = require("node:fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+let payload = JSON.parse(raw);
+if (typeof payload === "string") payload = JSON.parse(payload);
+const state = payload && typeof payload.state === "object" ? payload.state : {};
+if (typeof payload.changed !== "boolean") process.exit(1);
+if (state.hasCategoryFilter !== true) process.exit(1);
+if (String(state.action || "") !== "resetCategory") process.exit(1);
+' >/dev/null 2>&1; then
+          errors+=("Launcher.diagnosticSetDrunCategoryFilter returned invalid payload")
+        fi
+
+        if category_invoke="$(quickshell ipc --id "${instance_id}" call Launcher invokeEscapeAction 2>/dev/null)" && ! printf '%s' "${category_invoke}" | node -e '
+const fs = require("node:fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+let payload = JSON.parse(raw);
+if (typeof payload === "string") payload = JSON.parse(payload);
+const state = payload && typeof payload.state === "object" ? payload.state : {};
+if (payload.handled !== true) process.exit(1);
+if (String(payload.action || "") !== "resetCategory") process.exit(1);
+if (state.hasCategoryFilter !== false) process.exit(1);
+if (String(state.drunCategoryFilter || "") !== "") process.exit(1);
+' >/dev/null 2>&1; then
+          errors+=("Launcher.invokeEscapeAction category reset contract invalid")
+        fi
+      fi
+    fi
+  fi
 
   if (( ${#errors[@]} > 0 )); then
     emit_result 0

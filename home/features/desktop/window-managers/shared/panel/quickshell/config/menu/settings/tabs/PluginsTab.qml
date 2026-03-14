@@ -556,7 +556,7 @@ Item {
                         }
                     }
 
-                    SharedWidgets.DankToggle {
+                    SharedWidgets.ToggleSwitch {
                         checked: modelData.enabled
                         Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
                         onToggled: {

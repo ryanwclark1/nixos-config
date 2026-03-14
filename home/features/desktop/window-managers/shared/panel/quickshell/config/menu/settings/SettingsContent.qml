@@ -14,6 +14,7 @@ Item {
   property string searchQuery: ""
   property bool compactMode: false
   property bool tightSpacing: false
+  property int requestedScrollY: 0
   signal tabSelected(string tabId)
   signal searchQueryEdited(string query)
 
@@ -21,6 +22,31 @@ Item {
   readonly property var searchResults: SettingsRegistry.searchTabs(searchQuery)
   readonly property bool showCompactSearch: compactMode
   readonly property bool showCompactResults: compactMode && searchQuery.length > 0
+
+  function findScrollable(node) {
+    if (!node)
+      return null;
+    if (node.flickable !== undefined && node.flickable)
+      return node;
+    if (!node.children)
+      return null;
+    for (var i = 0; i < node.children.length; ++i) {
+      var match = findScrollable(node.children[i]);
+      if (match)
+        return match;
+    }
+    return null;
+  }
+
+  function applyRequestedScroll() {
+    var scrollable = findScrollable(tabLoader.item);
+    if (!scrollable || scrollable.flickable === undefined || !scrollable.flickable)
+      return false;
+    var flick = scrollable.flickable;
+    var maxY = Math.max(0, flick.contentHeight - flick.height);
+    flick.contentY = Math.max(0, Math.min(requestedScrollY, maxY));
+    return true;
+  }
 
   function applyLayoutProps(item) {
     if (!item) return;
@@ -32,6 +58,7 @@ Item {
       item.compactMode = root.compactMode;
     if (item.tightSpacing !== undefined)
       item.tightSpacing = root.tightSpacing;
+    Qt.callLater(root.applyRequestedScroll);
   }
 
   ColumnLayout {
@@ -248,6 +275,7 @@ Item {
   onCurrentTabIdChanged: root.applyLayoutProps(tabLoader.item)
   onCompactModeChanged: root.applyLayoutProps(tabLoader.item)
   onTightSpacingChanged: root.applyLayoutProps(tabLoader.item)
+  onRequestedScrollYChanged: Qt.callLater(root.applyRequestedScroll)
   onSearchQueryChanged: {
     if (compactSearchInput.text !== searchQuery)
       compactSearchInput.text = searchQuery;

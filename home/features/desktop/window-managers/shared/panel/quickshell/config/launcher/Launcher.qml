@@ -290,9 +290,10 @@ PanelWindow {
   readonly property string launcherControlHintText: {
     var resultHint = hasResults ? "↑/↓/Ctrl+P/N/PgUp/PgDn/Home/End: results • " : "";
     var clearHint = searchText !== "" ? "Ctrl+L/U: clear • " : "";
+    var escapeHint = (searchText !== "" || (drunCategoryFiltersEnabled && mode === "drun" && drunCategoryFilter !== "")) ? "Esc: reset/close" : "Esc: close";
     if (drunCategoryFiltersEnabled && mode === "drun" && drunCategoryOptions.length > 1)
-      return "Alt+←/→/PgUp/PgDn/Home/End/0/Backspace, Ctrl+Tab, or Alt+1..9: categories • " + resultHint + clearHint + "Enter: run • Esc: close";
-    return resultHint + clearHint + "Enter: run • Esc: close";
+      return "Alt+←/→/PgUp/PgDn/Home/End/0/Backspace, Ctrl+Tab, or Alt+1..9: categories • " + resultHint + clearHint + "Enter: run • " + escapeHint;
+    return resultHint + clearHint + "Enter: run • " + escapeHint;
   }
   readonly property string legendPrimaryAction: {
     if (showingConfirm) return "Enter: Confirm";
@@ -316,8 +317,8 @@ PanelWindow {
   readonly property string legendTertiaryAction: {
     if (showingConfirm)
       return "Esc: Cancel";
-    if (searchText !== "")
-      return "Ctrl+L/U: Clear";
+    if (searchText !== "" || (drunCategoryFiltersEnabled && mode === "drun" && drunCategoryFilter !== ""))
+      return "Esc: Reset";
     return "Shift+Tab: Prev Mode";
   }
   readonly property string webPrimaryProviderLabel: {
@@ -1723,6 +1724,43 @@ PanelWindow {
     });
   }
 
+  function escapeActionStateObject() {
+    var action = "close";
+    if (showingConfirm)
+      action = "cancelConfirm";
+    else if (searchText !== "")
+      action = "resetQuery";
+    else if (drunCategoryFiltersEnabled && mode === "drun" && drunCategoryFilter !== "")
+      action = "resetCategory";
+
+    return ({
+      action: action,
+      mode: String(mode || ""),
+      showingConfirm: showingConfirm === true,
+      hasQuery: searchText !== "",
+      searchText: String(searchText || ""),
+      hasCategoryFilter: drunCategoryFiltersEnabled && mode === "drun" && drunCategoryFilter !== "",
+      drunCategoryFilter: String(drunCategoryFilter || "")
+    });
+  }
+
+  function diagnosticSetSearchText(text) {
+    searchText = String(text || "");
+    if (searchInput)
+      searchInput.text = searchText;
+    scheduleSearchRefresh(false);
+    return JSON.stringify(escapeActionStateObject());
+  }
+
+  function diagnosticSetDrunCategoryFilter(categoryKey) {
+    var nextKey = String(categoryKey || "");
+    var changed = setDrunCategoryFilter(nextKey);
+    return JSON.stringify({
+      changed: changed === true,
+      state: escapeActionStateObject()
+    });
+  }
+
   function forceRedetectFileSearchBackend(announce, callback) {
     var shouldAnnounce = announce === true;
     fileSearchBackend = "";
@@ -2220,6 +2258,22 @@ PanelWindow {
     if (searchInput) searchInput.forceActiveFocus();
   }
 
+  function handleEscapeAction() {
+    if (showingConfirm) {
+      cancelConfirm();
+      return true;
+    }
+    if (searchText !== "") {
+      clearSearchQuery();
+      return true;
+    }
+    if (drunCategoryFiltersEnabled && mode === "drun" && drunCategoryFilter !== "") {
+      return setDrunCategoryFilter("");
+    }
+    close();
+    return true;
+  }
+
   function cycleSelection(step) {
     if (filteredItems.length <= 0) return;
     var next = (selectedIndex + step + filteredItems.length) % filteredItems.length;
@@ -2461,6 +2515,18 @@ PanelWindow {
     function diagnosticReset() { launcherRoot.diagnosticReset(); }
     function filesBackendStatus() { return JSON.stringify(launcherRoot.filesBackendStatusObject()); }
     function drunCategoryState() { return JSON.stringify(launcherRoot.drunCategoryStateObject()); }
+    function escapeActionState() { return JSON.stringify(launcherRoot.escapeActionStateObject()); }
+    function diagnosticSetSearchText(text: string) { return launcherRoot.diagnosticSetSearchText(text); }
+    function diagnosticSetDrunCategoryFilter(categoryKey: string) { return launcherRoot.diagnosticSetDrunCategoryFilter(categoryKey); }
+    function invokeEscapeAction() {
+      var action = launcherRoot.escapeActionStateObject().action;
+      var handled = launcherRoot.handleEscapeAction();
+      return JSON.stringify({
+        handled: handled === true,
+        action: action,
+        state: launcherRoot.escapeActionStateObject()
+      });
+    }
     function toggle() { if (launcherRoot.launcherOpacity > 0) launcherRoot.close(); else launcherRoot.open(launcherRoot.effectiveDefaultMode()); }
   }
 
@@ -2638,7 +2704,10 @@ PanelWindow {
                 }
               }
               Keys.onPressed: (event) => {
-                if (event.key === Qt.Key_Escape) launcherRoot.close();
+                if (event.key === Qt.Key_Escape) {
+                  if (launcherRoot.handleEscapeAction())
+                    event.accepted = true;
+                }
                 else if ((event.modifiers & Qt.ControlModifier) && !(event.modifiers & Qt.AltModifier) && (event.key === Qt.Key_L || event.key === Qt.Key_U)) {
                   launcherRoot.clearSearchQuery();
                   event.accepted = true;

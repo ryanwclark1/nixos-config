@@ -147,7 +147,7 @@ QtObject {
       textDisabled = data.colors.color8;
 
     } catch (e) {
-      // It's fine if the file doesn't exist yet, we'll use defaults
+      console.debug("Colors: pywal colors not loaded, using defaults");
     }
   }
 

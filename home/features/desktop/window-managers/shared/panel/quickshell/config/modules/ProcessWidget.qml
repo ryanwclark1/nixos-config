@@ -40,7 +40,7 @@ Rectangle {
     anchors.margins: Colors.paddingMedium
     spacing: Colors.paddingSmall
 
-    Text { text: "TOP PROCESSES"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
+    Text { text: "TOP PROCESSES"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
 
     ColumnLayout {
       Layout.fillWidth: true
@@ -57,7 +57,7 @@ Rectangle {
             anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: Colors.paddingSmall
             Text { text: "󰆍"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium }
             Text { text: modelData.name; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium; Layout.fillWidth: true; elide: Text.ElideRight }
-            Text { text: modelData.cpu + "%"; color: Colors.textSecondary; font.pixelSize: 9; font.family: Colors.fontMono }
+            Text { text: modelData.cpu + "%"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono }
             
             // Kill button
             Rectangle {

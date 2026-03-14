@@ -40,7 +40,7 @@ done
 
 discover_launcher_instance() {
   local runtime_root candidate show_output log_file launch_line
-  local fallback_candidate="" drun_candidate="" config_candidate="" preferred_candidate=""
+  local fallback_candidate="" drun_candidate="" escape_candidate="" config_candidate="" preferred_candidate=""
   runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
   if [[ ! -d "${runtime_root}" ]]; then
     return 1
@@ -62,13 +62,17 @@ discover_launcher_instance() {
       drun_candidate="${candidate}"
     fi
 
+    if printf '%s' "${show_output}" | rg -q "function escapeActionState\\(" && [[ -z "${escape_candidate}" ]]; then
+      escape_candidate="${candidate}"
+    fi
+
     log_file="${runtime_root}/${candidate}/log.log"
     launch_line="$(sed -n '1,6p' "${log_file}" 2>/dev/null | rg -m1 "Launching config:" || true)"
     if [[ -n "${launch_line}" ]] && printf '%s' "${launch_line}" | rg -q -F -- "${expected_config}"; then
       if [[ -z "${config_candidate}" ]]; then
         config_candidate="${candidate}"
       fi
-      if printf '%s' "${show_output}" | rg -q "function drunCategoryState\\("; then
+      if printf '%s' "${show_output}" | rg -q "function drunCategoryState\\(" && printf '%s' "${show_output}" | rg -q "function escapeActionState\\("; then
         preferred_candidate="${candidate}"
         break
       fi
@@ -84,6 +88,10 @@ discover_launcher_instance() {
   fi
   if [[ -n "${drun_candidate}" ]]; then
     printf '%s\n' "${drun_candidate}"
+    return 0
+  fi
+  if [[ -n "${escape_candidate}" ]]; then
+    printf '%s\n' "${escape_candidate}"
     return 0
   fi
   if [[ -n "${fallback_candidate}" ]]; then

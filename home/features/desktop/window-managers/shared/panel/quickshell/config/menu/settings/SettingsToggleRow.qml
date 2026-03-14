@@ -86,7 +86,7 @@ Rectangle {
                 wrapMode: Text.WordWrap
             }
 
-            SharedWidgets.DankToggle {
+            SharedWidgets.ToggleSwitch {
                 checked: root._active
                 Layout.alignment: Qt.AlignTop
                 onToggled: root.triggerToggle()

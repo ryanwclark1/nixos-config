@@ -8,28 +8,36 @@ Reference:
 
 ## Quick Commands
 
-- Headless config/migration contract check for Bar Widgets stat settings:
+- Automated gate: headless config/migration contract check for Bar Widgets stat settings:
   - `scripts/check-panel-config-contracts.sh`
-- Static + runtime guardrails:
+- Automated gate: static + runtime guardrails:
   - `scripts/check-settings-guardrails.sh`
-- Runtime smoke check against the live QuickShell instance:
+- Automated gate: runtime smoke check against the live QuickShell instance:
   - `scripts/check-settings-responsive.sh`
-- Manual tab preview for visual QA:
+- Manual walkthrough: tab preview for visual QA:
   - `scripts/preview-settings-responsive.sh`
-- Simulated viewport screenshot capture:
+- Review artifact capture: simulated viewport screenshot:
   - `scripts/capture-settings-viewport.sh --width 430 --height 932 --tab wallpaper`
-- Simulated lower-fold screenshot capture:
+- Review artifact capture: simulated lower-fold screenshot:
   - `scripts/capture-settings-viewport.sh --width 430 --height 932 --tab wallpaper --scroll-y 900`
-- Batch viewport matrix capture:
+- Review artifact capture: batch viewport matrix:
   - `scripts/capture-settings-matrix.sh --preset portrait`
-- Batch lower-fold viewport matrix capture:
+- Review artifact capture: batch lower-fold viewport matrix:
   - `scripts/capture-settings-matrix.sh --preset portrait --scroll-y 900 --output-dir /tmp/settings-matrix-portrait-lower`
 - If more than one QuickShell instance is running:
   - `scripts/check-settings-guardrails.sh --id <instance-id>`
   - `scripts/check-settings-responsive.sh --id <instance-id>`
   - `scripts/preview-settings-responsive.sh --id <instance-id>`
+  - `scripts/capture-settings-viewport.sh --id <instance-id> --width 430 --height 932 --tab wallpaper`
+  - `scripts/capture-settings-matrix.sh --id <instance-id> --preset portrait`
 - Static parse validation for touched QML:
   - `qmlformat -n config/menu/SettingsHub.qml config/menu/settings/*.qml config/menu/settings/tabs/*.qml`
+
+Command roles:
+
+- `check-settings-responsive.sh` is the live-session runtime gate.
+- `preview-settings-responsive.sh` is a manual walkthrough.
+- `capture-settings-viewport.sh` and `capture-settings-matrix.sh` produce review artifacts.
 
 ## What The Smoke Script Covers
 
@@ -74,6 +82,7 @@ Recommended usage:
 Use the viewport capture script when you need repeatable narrow or portrait screenshots from a wide desktop session.
 
 For Bar Widgets stat-setting changes, run `scripts/check-panel-config-contracts.sh` first so default/migration regressions are caught before live-session layout review.
+Recommended order: run the runtime gate first, then the manual preview walkthrough, then generate capture artifacts if you need repeatable screenshots for review or bug triage.
 
 Examples:
 
@@ -86,7 +95,7 @@ Examples:
 - compact lower-section check:
   - `scripts/capture-settings-viewport.sh --width 430 --height 932 --tab bar-widgets --scroll-y 900 --output /tmp/bar-widgets-portrait-lower.png`
 
-Use this for visual inspection only. It does not replace the live runtime smoke gate.
+Use this to generate review artifacts for manual visual inspection only. It does not emit `PASS`, `WARN`, `FAIL`, or `[SKIP]` results, and it does not replace the live runtime smoke gate.
 
 For a full preset sweep of the highest-risk tabs:
 

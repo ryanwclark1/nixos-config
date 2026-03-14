@@ -82,7 +82,7 @@ Rectangle {
         text: MediaService.trackTitle + (MediaService.trackArtist ? " - " + MediaService.trackArtist : "")
         color: Colors.text
         font.pixelSize: Colors.fontSizeSmall
-        font.weight: Font.Medium
+        font.weight: Font.DemiBold
         anchors.verticalCenter: parent.verticalCenter
 
         SequentialAnimation on x {

@@ -1214,8 +1214,8 @@ PanelWindow {
 
             }
 
-            SharedWidgets.DankScrollbar { flickable: gridFlick }
-            SharedWidgets.DankScrollbar { flickable: listFlick }
+            SharedWidgets.Scrollbar { flickable: gridFlick }
+            SharedWidgets.Scrollbar { flickable: listFlick }
           }
 
           // ── Footer ─────────────────────────────────────────────────────────────

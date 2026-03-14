@@ -35,8 +35,8 @@ Row {
         return Math.round(v * 100) + "%";
     }
     color: Colors.text
-    font.pixelSize: Colors.fontSizeMedium
-    font.weight: Font.Bold
+    font.pixelSize: Colors.fontSizeSmall
+    font.weight: Font.DemiBold
     anchors.verticalCenter: parent.verticalCenter
   }
 }

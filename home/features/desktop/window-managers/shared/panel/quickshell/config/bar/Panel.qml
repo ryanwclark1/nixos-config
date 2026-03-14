@@ -310,259 +310,49 @@ Item {
 
   Component {
     id: cpuStatusComponent
-    Item {
+    StatPill {
       property var widgetInstance: null
-      readonly property bool compact: root.isCompactStatWidget(widgetInstance)
-      readonly property bool iconOnly: root.isIconOnlyStatWidget(widgetInstance)
-      readonly property string valueText: root.statDisplayText("cpuStatus", widgetInstance)
-      readonly property string compactValueText: root.compactStatDisplayText("cpuStatus", widgetInstance)
-      implicitWidth: cpuPill.implicitWidth
-      implicitHeight: cpuPill.implicitHeight
-
-      SharedWidgets.Ref { service: SystemStatus }
-
-      SharedWidgets.BarPill {
-        id: cpuPill
-        anchors.centerIn: parent
-        anchorWindow: root.anchorWindow
-        isActive: root.isSurfaceActive("systemStatsMenu")
-        tooltipText: root.statTooltipText("cpuStatus", widgetInstance)
-        horizontalPadding: (compact || iconOnly) ? 5 : 8
-        onClicked: root.requestSurface("systemStatsMenu", this)
-
-        Loader {
-          active: true
-          sourceComponent: iconOnly ? cpuIconContent : (compact ? cpuCompactContent : cpuWideContent)
-        }
-      }
-
-      Component {
-        id: cpuIconContent
-        Text {
-          text: ""
-          color: Colors.primary
-          font.pixelSize: Colors.fontSizeMedium
-          font.family: Colors.fontMono
-        }
-      }
-
-      Component {
-        id: cpuCompactContent
-        Column {
-          spacing: 1
-
-          Text {
-            text: ""
-            color: Colors.primary
-            font.pixelSize: Colors.fontSizeMedium
-            font.family: Colors.fontMono
-            anchors.horizontalCenter: parent.horizontalCenter
-          }
-
-          Text {
-            text: compactValueText
-            color: Colors.text
-            font.pixelSize: Colors.fontSizeXS
-            font.weight: Font.DemiBold
-            anchors.horizontalCenter: parent.horizontalCenter
-          }
-        }
-      }
-
-      Component {
-        id: cpuWideContent
-        Row {
-          spacing: 6
-
-          Text {
-            text: ""
-            color: Colors.primary
-            font.pixelSize: Colors.fontSizeLarge
-            font.family: Colors.fontMono
-            anchors.verticalCenter: parent.verticalCenter
-          }
-
-          Text {
-            text: "CPU " + valueText
-            color: Colors.text
-            font.pixelSize: Colors.fontSizeMedium
-            font.weight: Font.DemiBold
-            anchors.verticalCenter: parent.verticalCenter
-          }
-        }
-      }
+      statKey: "cpuStatus"; icon: ""; iconColor: Colors.primary; label: "CPU"
+      anchorWindow: root.anchorWindow
+      compact: root.isCompactStatWidget(widgetInstance)
+      iconOnly: root.isIconOnlyStatWidget(widgetInstance)
+      valueText: root.statDisplayText("cpuStatus", widgetInstance)
+      compactValueText: root.compactStatDisplayText("cpuStatus", widgetInstance)
+      tooltipText: root.statTooltipText("cpuStatus", widgetInstance)
+      isActive: root.isSurfaceActive("systemStatsMenu")
+      onClicked: root.requestSurface("systemStatsMenu", this)
     }
   }
 
   Component {
     id: ramStatusComponent
-    Item {
+    StatPill {
       property var widgetInstance: null
-      readonly property bool compact: root.isCompactStatWidget(widgetInstance)
-      readonly property bool iconOnly: root.isIconOnlyStatWidget(widgetInstance)
-      readonly property string valueText: root.statDisplayText("ramStatus", widgetInstance)
-      readonly property string compactValueText: root.compactStatDisplayText("ramStatus", widgetInstance)
-      implicitWidth: ramPill.implicitWidth
-      implicitHeight: ramPill.implicitHeight
-
-      SharedWidgets.Ref { service: SystemStatus }
-
-      SharedWidgets.BarPill {
-        id: ramPill
-        anchors.centerIn: parent
-        anchorWindow: root.anchorWindow
-        isActive: root.isSurfaceActive("systemStatsMenu")
-        tooltipText: root.statTooltipText("ramStatus", widgetInstance)
-        horizontalPadding: (compact || iconOnly) ? 5 : 8
-        onClicked: root.requestSurface("systemStatsMenu", this)
-
-        Loader {
-          active: true
-          sourceComponent: iconOnly ? ramIconContent : (compact ? ramCompactContent : ramWideContent)
-        }
-      }
-
-      Component {
-        id: ramIconContent
-        Text {
-          text: ""
-          color: Colors.accent
-          font.pixelSize: Colors.fontSizeMedium
-          font.family: Colors.fontMono
-        }
-      }
-
-      Component {
-        id: ramCompactContent
-        Column {
-          spacing: 1
-
-          Text {
-            text: ""
-            color: Colors.accent
-            font.pixelSize: Colors.fontSizeMedium
-            font.family: Colors.fontMono
-            anchors.horizontalCenter: parent.horizontalCenter
-          }
-
-          Text {
-            text: compactValueText
-            color: Colors.text
-            font.pixelSize: Colors.fontSizeXS
-            font.weight: Font.DemiBold
-            anchors.horizontalCenter: parent.horizontalCenter
-          }
-        }
-      }
-
-      Component {
-        id: ramWideContent
-        Row {
-          spacing: 6
-
-          Text {
-            text: ""
-            color: Colors.accent
-            font.pixelSize: Colors.fontSizeLarge
-            font.family: Colors.fontMono
-            anchors.verticalCenter: parent.verticalCenter
-          }
-
-          Text {
-            text: "RAM " + valueText
-            color: Colors.text
-            font.pixelSize: Colors.fontSizeMedium
-            font.weight: Font.DemiBold
-            anchors.verticalCenter: parent.verticalCenter
-          }
-        }
-      }
+      statKey: "ramStatus"; icon: "󰍛"; iconColor: Colors.accent; label: "RAM"
+      anchorWindow: root.anchorWindow
+      compact: root.isCompactStatWidget(widgetInstance)
+      iconOnly: root.isIconOnlyStatWidget(widgetInstance)
+      valueText: root.statDisplayText("ramStatus", widgetInstance)
+      compactValueText: root.compactStatDisplayText("ramStatus", widgetInstance)
+      tooltipText: root.statTooltipText("ramStatus", widgetInstance)
+      isActive: root.isSurfaceActive("systemStatsMenu")
+      onClicked: root.requestSurface("systemStatsMenu", this)
     }
   }
 
   Component {
     id: gpuStatusComponent
-    Item {
+    StatPill {
       property var widgetInstance: null
-      readonly property bool compact: root.isCompactStatWidget(widgetInstance)
-      readonly property bool iconOnly: root.isIconOnlyStatWidget(widgetInstance)
-      readonly property string valueText: root.statDisplayText("gpuStatus", widgetInstance)
-      readonly property string compactValueText: root.compactStatDisplayText("gpuStatus", widgetInstance)
-      implicitWidth: gpuPill.implicitWidth
-      implicitHeight: gpuPill.implicitHeight
-
-      SharedWidgets.Ref { service: SystemStatus }
-
-      SharedWidgets.BarPill {
-        id: gpuPill
-        anchors.centerIn: parent
-        anchorWindow: root.anchorWindow
-        isActive: root.isSurfaceActive("systemStatsMenu")
-        tooltipText: root.statTooltipText("gpuStatus", widgetInstance)
-        horizontalPadding: (compact || iconOnly) ? 5 : 8
-        onClicked: root.requestSurface("systemStatsMenu", this)
-
-        Loader {
-          active: true
-          sourceComponent: iconOnly ? gpuIconContent : (compact ? gpuCompactContent : gpuWideContent)
-        }
-      }
-
-      Component {
-        id: gpuIconContent
-        Text {
-          text: "󰢮"
-          color: Colors.secondary
-          font.pixelSize: Colors.fontSizeMedium
-          font.family: Colors.fontMono
-        }
-      }
-
-      Component {
-        id: gpuCompactContent
-        Column {
-          spacing: 1
-
-          Text {
-            text: "󰢮"
-            color: Colors.secondary
-            font.pixelSize: Colors.fontSizeMedium
-            font.family: Colors.fontMono
-            anchors.horizontalCenter: parent.horizontalCenter
-          }
-
-          Text {
-            text: compactValueText
-            color: Colors.text
-            font.pixelSize: Colors.fontSizeXS
-            font.weight: Font.DemiBold
-            anchors.horizontalCenter: parent.horizontalCenter
-          }
-        }
-      }
-
-      Component {
-        id: gpuWideContent
-        Row {
-          spacing: 6
-
-          Text {
-            text: "󰢮"
-            color: Colors.secondary
-            font.pixelSize: Colors.fontSizeLarge
-            font.family: Colors.fontMono
-            anchors.verticalCenter: parent.verticalCenter
-          }
-
-          Text {
-            text: "GPU " + valueText
-            color: Colors.text
-            font.pixelSize: Colors.fontSizeMedium
-            font.weight: Font.DemiBold
-            anchors.verticalCenter: parent.verticalCenter
-          }
-        }
-      }
+      statKey: "gpuStatus"; icon: "󰢮"; iconColor: Colors.secondary; label: "GPU"
+      anchorWindow: root.anchorWindow
+      compact: root.isCompactStatWidget(widgetInstance)
+      iconOnly: root.isIconOnlyStatWidget(widgetInstance)
+      valueText: root.statDisplayText("gpuStatus", widgetInstance)
+      compactValueText: root.compactStatDisplayText("gpuStatus", widgetInstance)
+      tooltipText: root.statTooltipText("gpuStatus", widgetInstance)
+      isActive: root.isSurfaceActive("systemStatsMenu")
+      onClicked: root.requestSurface("systemStatsMenu", this)
     }
   }
 
@@ -678,7 +468,7 @@ Item {
         Row {
           spacing: 6
           Text { text: updatesRoot.updatesIcon; color: Colors.accent; font.pixelSize: Colors.fontSizeXL; font.family: Colors.fontMono; anchors.verticalCenter: parent.verticalCenter }
-          Text { text: updatesRoot.updatesCount; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.DemiBold; anchors.verticalCenter: parent.verticalCenter }
+          Text { text: updatesRoot.updatesCount; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.DemiBold; anchors.verticalCenter: parent.verticalCenter }
         }
       }
     }
@@ -788,7 +578,7 @@ Item {
           text: WeatherService.temp
           color: Colors.text
           font.pixelSize: Colors.fontSizeSmall
-          font.weight: Font.Medium
+          font.weight: Font.DemiBold
           anchors.verticalCenter: parent.verticalCenter
         }
       }
@@ -900,7 +690,7 @@ Item {
             text: SystemStatus.activeMprisPlayers.length > 0 ? (SystemStatus.activeMprisPlayers[0].trackTitle || "") : ""
             color: Colors.text
             font.pixelSize: Colors.fontSizeSmall
-            font.weight: Font.Medium
+            font.weight: Font.DemiBold
             anchors.verticalCenter: parent.verticalCenter
           }
         }

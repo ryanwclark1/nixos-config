@@ -81,7 +81,7 @@ require_cmd() {
 
 discover_reachable_instance() {
   local candidate show_output log_file launch_line
-  local fallback_candidate="" drun_candidate="" config_candidate="" preferred_candidate=""
+  local fallback_candidate="" drun_candidate="" escape_candidate="" config_candidate="" preferred_candidate=""
   if [[ ! -d "${runtime_root}" ]]; then
     return 1
   fi
@@ -103,13 +103,17 @@ discover_reachable_instance() {
       drun_candidate="${candidate}"
     fi
 
+    if printf '%s' "${show_output}" | rg -q "function escapeActionState\\(" && [[ -z "${escape_candidate}" ]]; then
+      escape_candidate="${candidate}"
+    fi
+
     log_file="${runtime_root}/${candidate}/log.log"
     launch_line="$(sed -n '1,6p' "${log_file}" 2>/dev/null | rg -m1 "Launching config:" || true)"
     if [[ -n "${launch_line}" ]] && printf '%s' "${launch_line}" | rg -q -F -- "${expected_config}"; then
       if [[ -z "${config_candidate}" ]]; then
         config_candidate="${candidate}"
       fi
-      if printf '%s' "${show_output}" | rg -q "function drunCategoryState\\("; then
+      if printf '%s' "${show_output}" | rg -q "function drunCategoryState\\(" && printf '%s' "${show_output}" | rg -q "function escapeActionState\\("; then
         preferred_candidate="${candidate}"
         break
       fi
@@ -126,6 +130,10 @@ discover_reachable_instance() {
   fi
   if [[ -n "${drun_candidate}" ]]; then
     printf '%s\n' "${drun_candidate}"
+    return 0
+  fi
+  if [[ -n "${escape_candidate}" ]]; then
+    printf '%s\n' "${escape_candidate}"
     return 0
   fi
   if [[ -n "${fallback_candidate}" ]]; then
@@ -161,6 +169,11 @@ static_checks() {
   require_literal "$launcher_qml" 'visible: launcherRoot.transientNoticeText !== "" && !launcherRoot.tightMode' "transient notice tight-mode guard"
   require_literal "$launcher_qml" 'visible: Config.launcherShowRuntimeMetrics && !launcherRoot.tightMode' "runtime metrics tight-mode guard"
   require_literal "$launcher_qml" 'function drunCategoryState() { return JSON.stringify(launcherRoot.drunCategoryStateObject()); }' "drun category IPC payload mapping"
+  require_literal "$launcher_qml" 'function escapeActionState() { return JSON.stringify(launcherRoot.escapeActionStateObject()); }' "escape action IPC payload mapping"
+  require_literal "$launcher_qml" 'function diagnosticSetSearchText(text: string) { return launcherRoot.diagnosticSetSearchText(text); }' "escape action query setter IPC mapping"
+  require_literal "$launcher_qml" 'function diagnosticSetDrunCategoryFilter(categoryKey: string) { return launcherRoot.diagnosticSetDrunCategoryFilter(categoryKey); }' "escape action category setter IPC mapping"
+  require_literal "$launcher_qml" 'function invokeEscapeAction() {' "escape action invoker IPC mapping"
+  require_literal "$launcher_qml" 'function escapeActionStateObject() {' "escape action payload helper"
   require_literal "$launcher_qml" 'visible: launcherRoot.showLauncherHome && launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && launcherRoot.drunCategoryOptions.length > 1' "drun category chip visibility guard"
   require_literal "$system_tab_qml" 'minimumHeight: root.compactMode ? 76 : 44' "settings compact row height"
   require_literal "$system_tab_qml" 'elide: root.compactMode ? Text.ElideNone : Text.ElideRight' "settings compact label wrapping"
@@ -282,6 +295,104 @@ if (errors.length > 0) {
     fi
   else
     fail "Launcher.drunCategoryState IPC call failed"
+  fi
+
+  if ! launcher_action_available "escapeActionState"; then
+    if call_ipc Shell reloadConfig >/dev/null 2>&1; then
+      sleep 1
+    fi
+  fi
+  if ! launcher_action_available "escapeActionState" || ! launcher_action_available "diagnosticSetSearchText" || ! launcher_action_available "diagnosticSetDrunCategoryFilter" || ! launcher_action_available "invokeEscapeAction"; then
+    warn "Launcher escape diagnostics not exposed by live instance after reload; restart QuickShell to validate Esc reset ordering"
+  else
+    local escape_state query_set query_invoke category_key category_set category_invoke
+    if escape_state="$(call_ipc Launcher escapeActionState 2>/dev/null)" && printf '%s' "${escape_state}" | node -e '
+const fs = require("node:fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+let payload = JSON.parse(raw);
+if (typeof payload === "string") payload = JSON.parse(payload);
+if (String(payload.action || "") !== "close") process.exit(1);
+' >/dev/null 2>&1; then
+      pass "Launcher.escapeActionState default close branch"
+    else
+      fail "Launcher.escapeActionState default close branch"
+    fi
+
+    if query_set="$(call_ipc Launcher diagnosticSetSearchText "__launcher_escape_probe__" 2>/dev/null)" && printf '%s' "${query_set}" | node -e '
+const fs = require("node:fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+let payload = JSON.parse(raw);
+if (typeof payload === "string") payload = JSON.parse(payload);
+if (String(payload.action || "") !== "resetQuery") process.exit(1);
+if (payload.hasQuery !== true) process.exit(1);
+if (String(payload.searchText || "") !== "__launcher_escape_probe__") process.exit(1);
+' >/dev/null 2>&1; then
+      pass "Launcher.escapeActionState query reset branch"
+    else
+      fail "Launcher.escapeActionState query reset branch"
+    fi
+
+    if query_invoke="$(call_ipc Launcher invokeEscapeAction 2>/dev/null)" && printf '%s' "${query_invoke}" | node -e '
+const fs = require("node:fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+let payload = JSON.parse(raw);
+if (typeof payload === "string") payload = JSON.parse(payload);
+const state = payload && typeof payload.state === "object" ? payload.state : {};
+if (payload.handled !== true) process.exit(1);
+if (String(payload.action || "") !== "resetQuery") process.exit(1);
+if (state.hasQuery !== false) process.exit(1);
+if (String(state.searchText || "") !== "") process.exit(1);
+' >/dev/null 2>&1; then
+      pass "Launcher.invokeEscapeAction clears query before close"
+    else
+      fail "Launcher.invokeEscapeAction clears query before close"
+    fi
+
+    category_key="$(printf '%s' "${category_state:-}" | node -e '
+const fs = require("node:fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+if (!raw) process.exit(0);
+let payload = JSON.parse(raw);
+if (typeof payload === "string") payload = JSON.parse(payload);
+if (payload.enabled !== true) process.exit(0);
+const options = Array.isArray(payload.options) ? payload.options : [];
+const match = options.find((item) => item && String(item.key || "") !== "");
+if (match) process.stdout.write(String(match.key || ""));
+' 2>/dev/null || true)"
+
+    if [[ -n "${category_key}" ]]; then
+      if category_set="$(call_ipc Launcher diagnosticSetDrunCategoryFilter "${category_key}" 2>/dev/null)" && printf '%s' "${category_set}" | node -e '
+const fs = require("node:fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+let payload = JSON.parse(raw);
+if (typeof payload === "string") payload = JSON.parse(payload);
+const state = payload && typeof payload.state === "object" ? payload.state : {};
+if (state.hasCategoryFilter !== true) process.exit(1);
+if (String(state.action || "") !== "resetCategory") process.exit(1);
+' >/dev/null 2>&1; then
+        pass "Launcher.escapeActionState category reset branch"
+      else
+        fail "Launcher.escapeActionState category reset branch"
+      fi
+
+      if category_invoke="$(call_ipc Launcher invokeEscapeAction 2>/dev/null)" && printf '%s' "${category_invoke}" | node -e '
+const fs = require("node:fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+let payload = JSON.parse(raw);
+if (typeof payload === "string") payload = JSON.parse(payload);
+const state = payload && typeof payload.state === "object" ? payload.state : {};
+if (payload.handled !== true) process.exit(1);
+if (String(payload.action || "") !== "resetCategory") process.exit(1);
+if (state.hasCategoryFilter !== false) process.exit(1);
+if (String(state.drunCategoryFilter || "") !== "") process.exit(1);
+' >/dev/null 2>&1; then
+        pass "Launcher.invokeEscapeAction clears category before close"
+      else
+        fail "Launcher.invokeEscapeAction clears category before close"
+      fi
+    else
+      warn "Launcher escape category probe skipped because no non-All drun category option was available"
+    fi
   fi
 
   sleep 1

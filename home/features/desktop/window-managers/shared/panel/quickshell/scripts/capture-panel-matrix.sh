@@ -3,7 +3,11 @@ set -euo pipefail
 
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
+config_root="$(CDPATH= cd -- "${script_dir}/../config" >/dev/null && pwd)"
 instance_id=""
+repo_shell_mode=0
+repo_shell_pid=""
+repo_shell_service_was_active=0
 settings_preset="portrait"
 surface_crop="monitor"
 workspace_target="auto"
@@ -126,11 +130,15 @@ EOF
 
 usage() {
   cat <<'EOF'
-Usage: capture-panel-matrix.sh [--output-dir DIR] [--settings-preset portrait|laptop|wide] [--surface-crop monitor|usable] [--workspace current|auto|NAME] [--settings-delay SECONDS] [--surface-delay SECONDS] [--settings-deep-scroll-y PX] [--skip-settings] [--skip-surfaces]
+Usage: capture-panel-matrix.sh [--id INSTANCE_ID] [--repo-shell] [--output-dir DIR] [--settings-preset portrait|laptop|wide] [--surface-crop monitor|usable] [--workspace current|auto|NAME] [--settings-delay SECONDS] [--surface-delay SECONDS] [--settings-deep-scroll-y PX] [--skip-settings] [--skip-surfaces]
 
 Capture the shared panel QA artifact set:
   - high-risk settings tab screenshots
   - high-risk popup/panel surface screenshots
+
+This produces review artifacts for manual inspection, not PASS/WARN/FAIL results.
+`--repo-shell` temporarily stops the managed quickshell.service, launches the repo checkout
+config as the live shell, captures against that instance, then restores the service.
 EOF
 }
 
@@ -139,6 +147,10 @@ while [[ $# -gt 0 ]]; do
     --id)
       instance_id="${2:-}"
       shift 2
+      ;;
+    --repo-shell)
+      repo_shell_mode=1
+      shift
       ;;
     --output-dir)
       output_dir="${2:-}"
@@ -233,10 +245,92 @@ discover_instance() {
   return 1
 }
 
+run_ipc() {
+  local output=""
+  local status=0
+  local attempt
+
+  for attempt in 1 2 3 4 5; do
+    output="$(timeout 5s "$@" 2>&1)" && return 0
+    status=$?
+    if [[ "${output}" == *"Not ready to accept queries yet."* ]]; then
+      sleep 0.2
+      continue
+    fi
+    [[ -n "${output}" ]] && printf '%s\n' "${output}" >&2
+    return "${status}"
+  done
+
+  [[ -n "${output}" ]] && printf '%s\n' "${output}" >&2
+  return "${status}"
+}
+
+instance_for_pid() {
+  local pid="$1"
+  local resolved=""
+
+  resolved="$(readlink -f "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid/${pid}" 2>/dev/null || true)"
+  if [[ -n "${resolved}" && -S "${resolved}/ipc.sock" ]]; then
+    basename "${resolved}"
+    return 0
+  fi
+
+  return 1
+}
+
+cleanup_repo_shell() {
+  if [[ -n "${repo_shell_pid}" ]]; then
+    kill "${repo_shell_pid}" >/dev/null 2>&1 || true
+    wait "${repo_shell_pid}" >/dev/null 2>&1 || true
+  fi
+
+  if (( repo_shell_service_was_active == 1 )); then
+    systemctl --user start quickshell.service >/dev/null 2>&1 || true
+  fi
+}
+
+start_repo_shell() {
+  local deadline=0
+  local candidate=""
+
+  if ! command -v systemctl >/dev/null 2>&1; then
+    printf 'systemctl is required for --repo-shell mode.\n' >&2
+    exit 1
+  fi
+
+  if systemctl --user is-active --quiet quickshell.service; then
+    repo_shell_service_was_active=1
+    systemctl --user stop quickshell.service >/dev/null 2>&1 || true
+    sleep 1
+  fi
+
+  quickshell -p "${config_root}/shell.qml" >/tmp/quickshell-repo-qa.log 2>&1 &
+  repo_shell_pid="$!"
+
+  deadline=$((SECONDS + 20))
+  while (( SECONDS < deadline )); do
+    candidate="$(instance_for_pid "${repo_shell_pid}" || true)"
+    if [[ -n "${candidate}" ]] && run_ipc quickshell ipc --id "${candidate}" call SettingsHub close >/dev/null; then
+      instance_id="${candidate}"
+      printf '[INFO] Repo shell instance ready: %s\n' "${instance_id}"
+      return 0
+    fi
+    sleep 0.5
+  done
+
+  printf 'Repo shell did not become IPC-ready in time. See /tmp/quickshell-repo-qa.log\n' >&2
+  exit 1
+}
+
 main() {
   if (( run_settings == 0 && run_surfaces == 0 )); then
     printf 'Nothing to capture. Remove at least one --skip-* flag.\n' >&2
     exit 2
+  fi
+
+  if (( repo_shell_mode == 1 )); then
+    trap cleanup_repo_shell EXIT
+    start_repo_shell
   fi
 
   if (( run_surfaces == 1 )) && [[ -z "${instance_id}" ]]; then
@@ -257,6 +351,7 @@ main() {
 
     printf '[INFO] Capturing settings matrix (%s)...\n' "${settings_preset}"
     bash "${script_dir}/capture-settings-matrix.sh" \
+      --id "${instance_id}" \
       --preset "${settings_preset}" \
       --delay "${settings_delay}" \
       --workspace "${workspace_target}" \
@@ -265,6 +360,7 @@ main() {
     if [[ -n "${deep_scroll_y}" ]]; then
       printf '[INFO] Capturing settings matrix (%s, scroll %s)...\n' "${settings_preset}" "${deep_scroll_y}"
       bash "${script_dir}/capture-settings-matrix.sh" \
+        --id "${instance_id}" \
         --preset "${settings_preset}" \
         --delay "${settings_delay}" \
         --scroll-y "${deep_scroll_y}" \
@@ -285,8 +381,8 @@ main() {
 
   write_gallery "${output_dir}/index.html"
 
-  printf '[INFO] Panel QA capture set written to %s\n' "${output_dir}"
-  printf '[INFO] Review gallery: %s/index.html\n' "${output_dir}"
+  printf '[INFO] Saved panel QA review artifacts to %s\n' "${output_dir}"
+  printf '[INFO] Saved review gallery to %s/index.html\n' "${output_dir}"
 }
 
 main "$@"

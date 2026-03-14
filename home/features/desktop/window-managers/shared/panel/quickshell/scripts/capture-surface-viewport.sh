@@ -22,6 +22,7 @@ usage() {
 Usage: capture-surface-viewport.sh [--id INSTANCE_ID] [--surface SURFACE_ID] [--delay SECONDS] [--crop monitor|usable] [--workspace current|auto|NAME] [--output PATH]
 
 Open a live QuickShell surface through Shell IPC, capture the focused monitor, and save a cropped screenshot.
+This produces a review artifact for manual inspection, not PASS/WARN/FAIL results.
 EOF
 }
 
@@ -72,6 +73,26 @@ require_cmd() {
     printf 'Missing required command: %s\n' "$1" >&2
     exit 2
   fi
+}
+
+run_ipc() {
+  local output=""
+  local status=0
+  local attempt
+
+  for attempt in 1 2 3 4 5; do
+    output="$(timeout "${ipc_timeout_seconds}s" "$@" 2>&1)" && return 0
+    status=$?
+    if [[ "${output}" == *"Not ready to accept queries yet."* ]]; then
+      sleep 0.2
+      continue
+    fi
+    [[ -n "${output}" ]] && printf '%s\n' "${output}" >&2
+    return "${status}"
+  done
+
+  [[ -n "${output}" ]] && printf '%s\n' "${output}" >&2
+  return "${status}"
 }
 
 hypr() {
@@ -201,7 +222,7 @@ discover_reachable_instance() {
   local candidate
   while IFS= read -r candidate; do
     [[ -n "${candidate}" ]] || continue
-    if timeout "${ipc_timeout_seconds}" quickshell ipc --id "${candidate}" show >/dev/null 2>&1; then
+    if run_ipc quickshell ipc --id "${candidate}" call Shell closeAllSurfaces >/dev/null; then
       printf '%s\n' "${candidate}"
       return 0
     fi
@@ -213,7 +234,7 @@ discover_reachable_instance() {
 call_ipc() {
   local target="$1"
   shift
-  quickshell ipc --id "${instance_id}" call "${target}" "$@"
+  run_ipc quickshell ipc --id "${instance_id}" call "${target}" "$@"
 }
 
 main() {
@@ -257,8 +278,6 @@ main() {
 
   switch_to_capture_workspace "${workspace_target}"
 
-  quickshell ipc --id "${instance_id}" show >/dev/null
-  call_ipc Shell reloadConfig >/dev/null
   call_ipc Shell closeAllSurfaces >/dev/null || true
   call_ipc Shell openSurface "${surface_id}" >/dev/null
   sleep "${delay_seconds}"
@@ -295,7 +314,7 @@ main() {
   magick "${temp_full}" -crop "${crop_w}x${crop_h}+${crop_x}+${crop_y}" +repage "${temp_crop}"
   cp "${temp_crop}" "${output_path}"
 
-  printf '[INFO] Captured %s (%s) -> %s\n' "${surface_id}" "${crop_mode}" "${output_path}"
+  printf '[INFO] Saved surface review artifact for %s (%s) -> %s\n' "${surface_id}" "${crop_mode}" "${output_path}"
 }
 
 main "$@"

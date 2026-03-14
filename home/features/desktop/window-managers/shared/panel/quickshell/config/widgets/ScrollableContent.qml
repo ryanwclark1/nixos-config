@@ -3,7 +3,7 @@ import QtQuick.Layouts
 
 // ScrollableContent — reusable scrollable wrapper for popup menus.
 //
-// Replaces the boilerplate Item + Flickable + ColumnLayout + DankScrollbar
+// Replaces the boilerplate Item + Flickable + ColumnLayout + Scrollbar
 // + OverscrollGlow pattern used across popup menus.
 //
 // Usage:
@@ -35,6 +35,6 @@ Item {
     }
   }
 
-  DankScrollbar { flickable: flick }
+  Scrollbar { flickable: flick }
   OverscrollGlow { flickable: flick }
 }

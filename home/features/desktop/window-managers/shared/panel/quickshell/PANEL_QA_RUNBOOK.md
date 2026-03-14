@@ -12,33 +12,45 @@ Related docs:
 
 Packaged command entrypoints:
 
-- config and migration contracts:
+- automated gate: config and migration contracts:
   - `qs-panel-config-contracts`
-- full runtime verification:
+- automated gate: full runtime verification:
   - `qs-panel-runtime-verify`
-- manual preview walkthrough:
+- manual walkthrough: preview sequence:
   - `qs-panel-preview`
-- full screenshot artifact set:
+- review artifact capture: full screenshot artifact set:
   - `qs-panel-capture-matrix`
 
 Focused commands:
 
-- settings runtime smoke:
+- automated gate: settings runtime smoke:
   - `qs-panel-runtime-verify --skip-surfaces --skip-multibar`
-- surface runtime smoke:
+- automated gate: surface runtime smoke:
   - `qs-panel-runtime-verify --skip-settings --skip-multibar`
-- synthetic multibar smoke:
+- automated gate: synthetic multibar smoke:
   - `qs-panel-runtime-verify --skip-settings --skip-surfaces`
-- settings-only preview:
+- manual walkthrough: settings-only preview:
   - `qs-panel-preview --skip-surfaces`
-- surfaces-only preview:
+- manual walkthrough: surfaces-only preview:
   - `qs-panel-preview --skip-settings`
-- settings screenshot matrix:
+- review artifact capture: settings screenshot matrix:
   - `qs-settings-capture-matrix --preset portrait`
-- surface screenshot matrix:
+- review artifact capture: surface screenshot matrix:
   - `qs-surface-capture-matrix --crop monitor`
 
 Script equivalents remain available under `scripts/` when you want to run them from the repo checkout directly.
+
+Command roles:
+
+- `qs-panel-config-contracts` and `qs-panel-runtime-verify` are automated gates.
+- `qs-panel-preview` is a live-session walkthrough.
+- `qs-panel-capture-matrix` produces review artifacts.
+
+If more than one QuickShell instance is running:
+
+- `qs-panel-runtime-verify --id <instance-id>`
+- `qs-panel-preview --id <instance-id>`
+- `qs-panel-capture-matrix --id <instance-id> --settings-preset portrait --surface-crop monitor`
 
 ## What Each Command Covers
 
@@ -70,6 +82,7 @@ This is the fastest no-session gate for stat-widget and config-migration changes
 3. Gives a tester a repeatable live-session sequence for visual QA.
 
 This is for manual inspection, not pass/fail gating.
+It does not emit `PASS`, `WARN`, `FAIL`, or `[SKIP]` results; use it to drive visual review after the automated checks.
 
 `qs-panel-capture-matrix`
 
@@ -83,12 +96,13 @@ This is for manual inspection, not pass/fail gating.
 8. Generates an `index.html` gallery for quick inspection.
 
 This is for review and bug triage, not runtime health.
+It does not emit `PASS`, `WARN`, `FAIL`, or `[SKIP]` results; use the generated artifacts for manual visual review.
 
 ## Recommended QA Sequence
 
-1. Run `qs-panel-runtime-verify`.
-2. Run `qs-panel-preview` on the live session.
-3. Run `qs-panel-capture-matrix --settings-preset portrait --surface-crop monitor`.
+1. Run the automated gate: `qs-panel-runtime-verify`.
+2. Run the manual walkthrough: `qs-panel-preview` on the live session.
+3. Generate review artifacts: `qs-panel-capture-matrix --settings-preset portrait --surface-crop monitor`.
    Use `--workspace current` only if you intentionally want captures from the currently active workspace.
 4. Open the generated `index.html` gallery and record only concrete defects.
 5. Re-run the smallest relevant subset after each fix.

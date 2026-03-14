@@ -1,5 +1,5 @@
 import QtQuick
-import "../services" as Services
+import "../services"
 
 Item {
   id: root
@@ -24,7 +24,7 @@ Item {
     // If iconMap provided, try alias lookup then direct lookup
     if (iconMap) {
       var lower = name.toLowerCase();
-      var aliases = Services.Config.iconAliases[lower] || [];
+      var aliases = Config.iconAliases[lower] || [];
       for (var i = 0; i < aliases.length; ++i) {
         if (iconMap[aliases[i]]) return "file://" + iconMap[aliases[i]];
       }
@@ -32,7 +32,7 @@ Item {
     }
 
     // Fall back to Config.resolveIconSource (aliases + Quickshell.iconPath)
-    return Services.Config.resolveIconSource(name);
+    return Config.resolveIconSource(name);
   }
 
   Image {
@@ -48,8 +48,8 @@ Item {
   Text {
     anchors.centerIn: parent
     text: root.fallbackIcon
-    color: Services.Colors.text
-    font.family: Services.Colors.fontMono
+    color: Colors.text
+    font.family: Colors.fontMono
     font.pixelSize: root.iconSize * 0.6
     visible: !iconImage.visible
   }

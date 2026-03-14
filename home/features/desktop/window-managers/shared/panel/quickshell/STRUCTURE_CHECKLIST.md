@@ -38,11 +38,14 @@ Use this checklist before merging panel architecture changes.
 - [ ] `scripts/check-plugin-reference-fixtures.sh` passes so the repo-tracked reference plugin keeps its intended persisted state-envelope and settings-key shapes.
 - [ ] `scripts/check-plugin-reference-recovery.sh` passes so the repo-tracked reference plugin keeps its intended healthy/query-failure/execute-failure/recovery behavior.
 - [ ] `scripts/check-plugin-reference-diagnostics.sh` passes so the repo-tracked reference plugin keeps its intended exported diagnostics payload examples.
-- [ ] `scripts/plugin-local.sh quick` remains a fast local sweep for reference-plugin drift plus runtime/diagnostics contract regressions, reusing `reference-all` before shared gates.
+- [ ] `scripts/plugin-local.sh quick` remains a fast local sweep for reference-plugin drift plus runtime/diagnostics contract regressions, reusing `reference-all --quiet --silent-preflight` before shared gates.
 - [ ] `scripts/plugin-local.sh reference-flow` stays aligned with the documented manual reference-plugin workflow.
 - [ ] `scripts/plugin-local.sh reference-export` stays aligned with the documented diagnostics export path and reference payload fixtures.
 - [ ] `scripts/plugin-local.sh reference-status` stays aligned with the documented local commands, fixtures, and diagnostics export workflow.
 - [ ] `scripts/plugin-local.sh reference-status --check` remains green when the local reference toolkit prerequisites are intact.
+- [ ] `scripts/plugin-local.sh shared-gates` remains the shared runtime/diagnostics tail used by quick and full verification.
+- [ ] `scripts/plugin-local.sh baseline-gates` remains the shared conformance/doctor entry phase used by full verification.
+- [ ] `scripts/plugin-local.sh all-gates` remains the assembled full local verification pipeline reused by `plugin-verify.sh` and `plugin-local.sh full`.
 - [ ] `scripts/check-plugin-runtime-guards.sh` passes for lifecycle/API/error-code runtime guardrails.
 - [ ] `scripts/check-plugin-diagnostics-contracts.sh` passes for plugin diagnostics payload/schema contract guardrails.
 - [ ] `scripts/sync-plugin-diagnostics-schema.sh --check` passes and `--write` is used when runtime catalog enum sets change.
@@ -51,6 +54,7 @@ Use this checklist before merging panel architecture changes.
 - [ ] `config/plugins/diagnostics.schema.json` is updated when diagnostics payload contracts change.
 - [ ] `PluginRuntimeCatalog` remains in sync with `config/plugins/runtime-catalog.json` consumers (plugin settings UI and guards).
 - [ ] `scripts/plugin-verify.sh` passes as the unified plugin verification gate.
+- [ ] `scripts/plugin-verify.sh` reuses `scripts/plugin-local.sh all-gates`, rather than duplicating the assembled verification phases.
 - [ ] The repo-tracked reference plugin still validates the intended local workflow (`install-reference`, `smoke-reference`, `remove-reference`).
 - [ ] Plugin behavior preserves canonical manifest compatibility (`bar-widget` / `desktop-widget` / `launcher-provider` / `daemon` / `multi`).
 - [ ] Existing IPC actions remain backward compatible.

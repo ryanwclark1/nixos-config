@@ -13,6 +13,7 @@ output_path=""
 delay_seconds="1.2"
 ipc_timeout_seconds="2"
 scroll_y="0"
+frame_mode="modal"
 workspace_target="auto"
 workspace_settle_attempts="20"
 workspace_settle_interval="0.1"
@@ -22,10 +23,11 @@ restore_workspace=""
 
 usage() {
   cat <<'EOF'
-Usage: capture-settings-viewport.sh [--id INSTANCE_ID] [--width PX] [--height PX] [--tab TAB_ID] [--delay SECONDS] [--scroll-y PX] [--workspace current|auto|NAME] [--output PATH]
+Usage: capture-settings-viewport.sh [--id INSTANCE_ID] [--width PX] [--height PX] [--tab TAB_ID] [--delay SECONDS] [--scroll-y PX] [--frame modal|viewport] [--workspace current|auto|NAME] [--output PATH]
 
 Open the live SettingsHub through QuickShell IPC, capture a centered viewport-sized
 screenshot from the focused monitor, and save it to a file.
+This produces a review artifact for manual inspection, not PASS/WARN/FAIL results.
 
 Note: scroll-y is currently ignored in live capture mode.
 EOF
@@ -61,6 +63,10 @@ while [[ $# -gt 0 ]]; do
       scroll_y="${2:-}"
       shift 2
       ;;
+    --frame)
+      frame_mode="${2:-}"
+      shift 2
+      ;;
     --workspace)
       workspace_target="${2:-}"
       shift 2
@@ -86,6 +92,26 @@ require_cmd() {
     printf 'Missing required command: %s\n' "$1" >&2
     exit 2
   fi
+}
+
+run_ipc() {
+  local output=""
+  local status=0
+  local attempt
+
+  for attempt in 1 2 3 4 5; do
+    output="$(timeout "${ipc_timeout_seconds}s" "$@" 2>&1)" && return 0
+    status=$?
+    if [[ "${output}" == *"Not ready to accept queries yet."* ]]; then
+      sleep 0.2
+      continue
+    fi
+    [[ -n "${output}" ]] && printf '%s\n' "${output}" >&2
+    return "${status}"
+  done
+
+  [[ -n "${output}" ]] && printf '%s\n' "${output}" >&2
+  return "${status}"
 }
 
 hypr() {
@@ -173,7 +199,7 @@ discover_reachable_instance() {
   local candidate
   while IFS= read -r candidate; do
     [[ -n "${candidate}" ]] || continue
-    if timeout "${ipc_timeout_seconds}s" quickshell ipc --id "${candidate}" show >/dev/null 2>&1; then
+    if run_ipc quickshell ipc --id "${candidate}" call SettingsHub close >/dev/null; then
       printf '%s\n' "${candidate}"
       return 0
     fi
@@ -240,7 +266,7 @@ switch_to_capture_workspace() {
 call_ipc() {
   local target="$1"
   shift
-  timeout "${ipc_timeout_seconds}s" quickshell ipc --id "${instance_id}" call "${target}" "$@"
+  run_ipc quickshell ipc --id "${instance_id}" call "${target}" "$@"
 }
 
 main() {
@@ -271,10 +297,13 @@ main() {
     printf 'scroll-y must be a non-negative integer.\n' >&2
     exit 2
   fi
-
-  if [[ -n "${scroll_y}" && "${scroll_y}" != "0" ]]; then
-    printf '[WARN] scroll-y is ignored in live SettingsHub capture mode.\n' >&2
-  fi
+  case "${frame_mode}" in
+    modal|viewport) ;;
+    *)
+      printf 'Frame must be modal or viewport.\n' >&2
+      exit 2
+      ;;
+  esac
 
   if [[ -z "${instance_id}" ]]; then
     instance_id="$(discover_reachable_instance || true)"
@@ -295,21 +324,14 @@ main() {
 
   switch_to_capture_workspace "${workspace_target}"
 
-  if ! timeout "${ipc_timeout_seconds}s" quickshell ipc --id "${instance_id}" show >/dev/null; then
-    printf 'Live QuickShell IPC is not responding for instance %s.\n' "${instance_id}" >&2
-    exit 1
-  fi
-  if ! call_ipc Shell reloadConfig >/dev/null; then
-    printf 'Shell.reloadConfig timed out for instance %s.\n' "${instance_id}" >&2
-    exit 1
-  fi
-  if ! call_ipc SettingsHub openTab "${tab_id}" >/dev/null; then
-    printf 'SettingsHub.openTab %s timed out for instance %s.\n' "${tab_id}" "${instance_id}" >&2
+  call_ipc SettingsHub close >/dev/null 2>&1 || true
+  if ! call_ipc SettingsHub openTabScrolled "${tab_id}" "${scroll_y}" >/dev/null; then
+    printf 'SettingsHub.openTabScrolled %s %s timed out for instance %s.\n' "${tab_id}" "${scroll_y}" "${instance_id}" >&2
     exit 1
   fi
   sleep "${delay_seconds}"
 
-  local monitor_json monitor_x monitor_y monitor_w monitor_h reserved_top reserved_left reserved_bottom reserved_right usable_w usable_h crop_x crop_y crop_w crop_h
+  local monitor_json monitor_x monitor_y monitor_w monitor_h reserved_top reserved_left reserved_bottom reserved_right usable_w usable_h crop_x crop_y crop_w crop_h gutter_x gutter_y modal_w modal_h
   monitor_json="$(hypr monitors -j | jq 'map(select(.focused == true))[0]')"
   if [[ -z "${monitor_json}" || "${monitor_json}" == "null" ]]; then
     printf 'Could not resolve focused monitor from hyprctl.\n' >&2
@@ -327,16 +349,38 @@ main() {
 
   usable_w=$((monitor_w - reserved_left - reserved_right))
   usable_h=$((monitor_h - reserved_top - reserved_bottom))
-  crop_w=$(( width < usable_w ? width : usable_w ))
-  crop_h=$(( height < usable_h ? height : usable_h ))
-  crop_x=$((monitor_x + reserved_left + (usable_w - crop_w) / 2))
-  crop_y=$((monitor_y + reserved_top + (usable_h - crop_h) / 2))
+  if [[ "${frame_mode}" == "modal" ]]; then
+    gutter_x=$(( usable_w * 4 / 100 ))
+    gutter_y=$(( usable_h * 4 / 100 ))
+    (( gutter_x < 24 )) && gutter_x=24
+    (( gutter_x > 56 )) && gutter_x=56
+    (( gutter_y < 24 )) && gutter_y=24
+    (( gutter_y > 48 )) && gutter_y=48
+
+    modal_w=$(( usable_w - gutter_x * 2 ))
+    (( modal_w < 320 )) && modal_w=320
+    (( modal_w > 960 )) && modal_w=960
+
+    modal_h=$(( usable_h - gutter_y * 2 ))
+    (( modal_h < 360 )) && modal_h=360
+    (( modal_h > 920 )) && modal_h=920
+
+    crop_w="${modal_w}"
+    crop_h="${modal_h}"
+    crop_x=$((monitor_x + reserved_left + (usable_w - crop_w) / 2))
+    crop_y=$((monitor_y + reserved_top + (usable_h - crop_h) / 2))
+  else
+    crop_w=$(( width < usable_w ? width : usable_w ))
+    crop_h=$(( height < usable_h ? height : usable_h ))
+    crop_x=$((monitor_x + reserved_left + (usable_w - crop_w) / 2))
+    crop_y=$((monitor_y + reserved_top + (usable_h - crop_h) / 2))
+  fi
 
   grim -t png "${temp_full}"
   magick "${temp_full}" -crop "${crop_w}x${crop_h}+${crop_x}+${crop_y}" +repage "${temp_crop}"
   cp "${temp_crop}" "${output_path}"
 
-  printf '[INFO] Captured %s at %sx%s -> %s\n' "${tab_id}" "${crop_w}" "${crop_h}" "${output_path}"
+  printf '[INFO] Saved settings review artifact for %s at %sx%s -> %s\n' "${tab_id}" "${crop_w}" "${crop_h}" "${output_path}"
 }
 
 main "$@"

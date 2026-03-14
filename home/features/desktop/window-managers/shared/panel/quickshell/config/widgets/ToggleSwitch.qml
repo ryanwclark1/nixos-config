@@ -3,7 +3,7 @@ import "../services"
 
 // Material-style toggle switch.
 // Usage:
-//   DankToggle {
+//   ToggleSwitch {
 //     checked: someModel.enabled
 //     onToggled: someModel.enabled = !someModel.enabled
 //   }
@@ -34,7 +34,7 @@ Item {
       id: trackStateLayer
       hovered: mouse.containsMouse
       pressed: mouse.pressed
-      stateColor: "#ffffff"
+      stateColor: Colors.background
     }
   }
 
@@ -48,7 +48,7 @@ Item {
     width: thumbSize
     height: thumbSize
     radius: thumbSize / 2
-    color: root.checked ? "#ffffff" : Colors.fgSecondary
+    color: root.checked ? Colors.background : Colors.fgSecondary
     anchors.verticalCenter: parent.verticalCenter
 
     // Horizontal spring: right edge at (44-2)=42 checked, left at 2 unchecked

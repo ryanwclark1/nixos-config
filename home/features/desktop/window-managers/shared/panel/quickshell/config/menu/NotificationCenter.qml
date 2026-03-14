@@ -494,7 +494,7 @@ PanelWindow {
           }
         }
 
-          SharedWidgets.DankScrollbar { flickable: notifList }
+          SharedWidgets.Scrollbar { flickable: notifList }
           SharedWidgets.OverscrollGlow { flickable: notifList }
         }
       }

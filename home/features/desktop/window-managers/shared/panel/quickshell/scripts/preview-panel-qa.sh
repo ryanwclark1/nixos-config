@@ -15,6 +15,8 @@ Usage: preview-panel-qa.sh [--id INSTANCE_ID] [--settings-delay SECONDS] [--surf
 Run the manual QA preview sequence:
   1. walk high-risk settings tabs
   2. walk popup/panel surfaces
+
+This is a live-session manual walkthrough, not a PASS/WARN/FAIL gate.
 EOF
 }
 
@@ -73,7 +75,7 @@ main() {
     "${script_dir}/preview-surface-responsive.sh" "${args[@]}" --delay "${surface_delay}"
   fi
 
-  printf '[INFO] Preview sequence complete. Continue manual viewport and multi-monitor QA.\n'
+  printf '[INFO] Preview sequence complete. This was a manual walkthrough, not a pass/fail gate; continue viewport and multi-monitor QA.\n'
 }
 
 main "$@"

@@ -207,6 +207,9 @@
                 services.displayManager.autoLogin.user = lib.mkForce "administrator";
                 services.displayManager.defaultSession = lib.mkForce "niri";
                 services.getty.autologinUser = lib.mkForce null;
+                services.syncthing.enable = lib.mkForce false;
+                services.blueman.enable = lib.mkForce false;
+                services.geoclue2.enable = lib.mkForce false;
                 services.openssh.enable = lib.mkForce true;
                 services.openssh.settings.PasswordAuthentication = lib.mkForce true;
                 services.openssh.hostKeys = lib.mkForce [
@@ -226,6 +229,8 @@
                   hashedPasswordFile = lib.mkForce null;
                   initialPassword = lib.mkForce "niri";
                 };
+                systemd.user.services.niri-flake-polkit.wantedBy = lib.mkForce [ ];
+                systemd.user.services.geoclue-agent.wantedBy = lib.mkForce [ ];
 
                 # Keep this profile focused on compositor/UI testing.
                 virtualisation.vmVariant = {

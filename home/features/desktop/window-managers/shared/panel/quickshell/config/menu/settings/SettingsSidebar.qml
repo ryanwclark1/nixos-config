@@ -446,7 +446,7 @@ Rectangle {
         }
       }
 
-      SharedWidgets.DankScrollbar { flickable: sidebarFlick }
+      SharedWidgets.Scrollbar { flickable: sidebarFlick }
     }
 
     Rectangle {

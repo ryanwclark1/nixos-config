@@ -18,8 +18,8 @@ DesktopSystemStat 1.0 DesktopSystemStat.qml
 DesktopWeather 1.0 DesktopWeather.qml
 DesktopWidgets 1.0 DesktopWidgets.qml
 DraggableDesktopWidget 1.0 DraggableDesktopWidget.qml
-DankScrollbar 1.0 DankScrollbar.qml
-DankToggle 1.0 DankToggle.qml
+Scrollbar 1.0 Scrollbar.qml
+ToggleSwitch 1.0 ToggleSwitch.qml
 Dock 1.0 Dock.qml
 DockContent 1.0 DockContent.qml
 DockMenu 1.0 DockMenu.qml

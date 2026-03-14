@@ -40,7 +40,7 @@ SharedWidgets.CardBase {
     Text {
       text: "SCRATCHPAD WINDOWS"
       color: Colors.textDisabled
-      font.pixelSize: 8
+      font.pixelSize: Colors.fontSizeXS
       font.weight: Font.Bold
       font.capitalization: Font.AllUppercase
     }

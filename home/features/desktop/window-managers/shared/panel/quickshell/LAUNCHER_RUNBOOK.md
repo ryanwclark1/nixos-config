@@ -21,9 +21,11 @@ Use this guide for day-to-day launcher validation and incident triage.
   - If no live QuickShell launcher instance is reachable, smoke falls back to static launcher probes and still runs benchmarks.
 
 Live launcher scripts auto-select a QuickShell instance in this order:
-1. launched from this repo’s `config/shell.qml` and exposing latest launcher IPC actions
+1. launched from this repo’s `config/shell.qml` and exposing both `drunCategoryState` and `escapeActionState`
 2. launched from this repo’s `config/shell.qml`
-3. any launcher-capable instance
+3. exposing `drunCategoryState`
+4. exposing `escapeActionState`
+5. any launcher-capable instance
 
 ## Benchmark Baselines
 
@@ -66,6 +68,7 @@ Result-list navigation shortcuts:
 
 Query shortcuts:
 - `Ctrl+L` / `Ctrl+U`: clear the current launcher query and keep focus in the search field
+- `Esc`: cancel confirm, otherwise reset the current query or active app-category filter before closing the launcher on the next press
 
 - Core line:
   - `opens`, `cache`, `failures`, `filter avg/last`
@@ -91,14 +94,16 @@ Query shortcuts:
   - `quickshell ipc call Launcher filesBackendStatus`
 - Inspect drun category-chip state payload (enabled/visible/active badge counts):
   - `quickshell ipc call Launcher drunCategoryState`
+- Inspect `Esc` action state payload (cancel/reset/close branch selection):
+  - `quickshell ipc call Launcher escapeActionState`
 
 ## Incident Triage Sequence
 
 1. Run `scripts/check-launcher-smoke.sh`.
 2. If benchmark gate fails, inspect `scripts/launcher-benchmark-baselines.json` versus current host load.
 3. If IPC health fails, run `scripts/check-launcher-ipc-health.sh --id <instance-id>` and inspect the emitted JSON `errors` list.
-   - Live checks now attempt `Shell.reloadConfig` automatically before warning on missing `drunCategoryState`.
-   - If `drunCategoryState` is missing, or present but returns empty/non-JSON payload after reload while static checks pass, restart QuickShell for that session and rerun smoke.
+   - Live checks now attempt `Shell.reloadConfig` automatically before warning on missing `drunCategoryState` or `escapeActionState` diagnostics.
+   - If `drunCategoryState` or `escapeActionState` is missing, or returns empty/non-JSON payload after reload while static checks pass, restart QuickShell for that session and rerun smoke.
 4. In a live session, open launcher runtime metrics and verify:
    - backend is expected (`fd` preferred),
    - resolve cost is low/stable,

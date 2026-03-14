@@ -16,7 +16,7 @@ import "../widgets" as SharedWidgets
 //   hasPrinters   — convenience bool
 //   activeJobs    — total active job count across all printers
 
-Singleton {
+QtObject {
   id: root
 
   // ── Public state ─────────────────────────────────────────────────────────
@@ -31,8 +31,7 @@ Singleton {
   // ── Polling ───────────────────────────────────────────────────────────────
   // Combines `lpstat -p -d` (printer list + default) and `lpstat -o | wc -l`
   // (active job count) in a single shell invocation to minimise process spawns.
-  SharedWidgets.CommandPoll {
-    id: poll
+  property var poll: SharedWidgets.CommandPoll {
     interval: 10000
     running: root.subscriberCount > 0
 
@@ -133,6 +132,6 @@ Singleton {
 
   // Force an immediate refresh (called when PrinterMenu opens)
   function refresh() {
-    poll.poll();
+    poller.poll();
   }
 }
