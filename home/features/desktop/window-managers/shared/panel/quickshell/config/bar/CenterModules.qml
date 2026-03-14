@@ -117,9 +117,9 @@ Item {
       tooltipText: "System updates"
 
       Row {
-        spacing: 6
+        spacing: Colors.spacingXS
         Text { text: root.updatesIcon; color: Colors.accent; font.pixelSize: Colors.fontSizeXL; font.family: Colors.fontMono; anchors.verticalCenter: parent.verticalCenter }
-        Text { text: root.updatesCount; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.DemiBold; anchors.verticalCenter: parent.verticalCenter }
+        Text { text: root.updatesCount; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.DemiBold; anchors.verticalCenter: parent.verticalCenter }
       }
     }
 
@@ -145,7 +145,7 @@ Item {
 
     SharedWidgets.CommandPoll {
       id: inhibitorPoll
-      interval: 2000
+      interval: 5000
       running: root.visible
       command: ["sh", "-c", "[ -f /tmp/wayland_idle_inhibitor.pid ] && echo true || echo false"]
       parse: function(out) { return String(out || "").trim() === "true" }

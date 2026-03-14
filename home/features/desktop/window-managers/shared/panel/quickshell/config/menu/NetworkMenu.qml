@@ -162,7 +162,7 @@ BasePopupMenu {
 
   Timer {
     id: statusTimer
-    interval: 2500
+    interval: 5000
     running: root.visible
     repeat: true
     onTriggered: root.refreshStatus()
@@ -577,7 +577,7 @@ BasePopupMenu {
 
               Rectangle {
                 visible: root.primaryDevice !== ""
-                radius: 12
+                radius: Colors.radiusPill
                 color: Colors.chipSurface
                 border.color: Colors.border
                 border.width: 1
@@ -587,7 +587,7 @@ BasePopupMenu {
               }
 
               Rectangle {
-                radius: 12
+                radius: Colors.radiusPill
                 color: Colors.chipSurface
                 border.color: Colors.border
                 border.width: 1
@@ -598,7 +598,7 @@ BasePopupMenu {
 
               Rectangle {
                 visible: root.primarySignal !== ""
-                radius: 12
+                radius: Colors.radiusPill
                 color: Colors.chipSurface
                 border.color: Colors.border
                 border.width: 1
@@ -842,7 +842,7 @@ BasePopupMenu {
           color: Colors.cardSurface
           border.color: detailsMouse.containsMouse ? Colors.primary : Colors.border
           border.width: 1
-          Behavior on border.color { ColorAnimation { duration: 160 } }
+          Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
 
           RowLayout {
             anchors.fill: parent
@@ -852,7 +852,7 @@ BasePopupMenu {
             Text {
               text: root.showAdvanced ? "󰅂" : "󰅀"
               color: detailsMouse.containsMouse ? Colors.primary : Colors.textSecondary
-              Behavior on color { ColorAnimation { duration: 160 } }
+              Behavior on color { ColorAnimation { duration: Colors.durationFast } }
               font.family: Colors.fontMono
               font.pixelSize: Colors.fontSizeLarge
             }
@@ -860,7 +860,7 @@ BasePopupMenu {
             Text {
               text: root.showAdvanced ? "Hide technical details" : "Show technical details"
               color: detailsMouse.containsMouse ? Colors.primary : Colors.text
-              Behavior on color { ColorAnimation { duration: 160 } }
+              Behavior on color { ColorAnimation { duration: Colors.durationFast } }
               font.pixelSize: Colors.fontSizeSmall
               font.weight: Font.Medium
             }

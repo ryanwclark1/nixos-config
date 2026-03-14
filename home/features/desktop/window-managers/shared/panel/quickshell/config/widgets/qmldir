@@ -1,5 +1,5 @@
-ActivateLinux 1.0 ActivateLinux.qml
 AppIcon 1.0 AppIcon.qml
+AudioDeviceSection 1.0 AudioDeviceSection.qml
 AudioWidget 1.0 AudioWidget.qml
 BarPill 1.0 BarPill.qml
 BarTooltip 1.0 BarTooltip.qml
@@ -23,7 +23,6 @@ ToggleSwitch 1.0 ToggleSwitch.qml
 Dock 1.0 Dock.qml
 DockContent 1.0 DockContent.qml
 DockMenu 1.0 DockMenu.qml
-KeyboardLayout 1.0 KeyboardLayout.qml
 LoadingSpinner 1.0 LoadingSpinner.qml
 LockContext 1.0 LockContext.qml
 LockPanel 1.0 LockPanel.qml
@@ -39,7 +38,6 @@ OverscrollGlow 1.0 OverscrollGlow.qml
 PrivacySourceRow 1.0 PrivacySourceRow.qml
 PulseButton 1.0 PulseButton.qml
 Ref 1.0 Ref.qml
-ScratchpadIndicator 1.0 ScratchpadIndicator.qml
 ScrollableContent 1.0 ScrollableContent.qml
 SectionLabel 1.0 SectionLabel.qml
 ScreenBorder 1.0 ScreenBorder.qml
@@ -49,6 +47,6 @@ StatusChip 1.0 StatusChip.qml
 Toast 1.0 Toast.qml
 ToastOverlay 1.0 ToastOverlay.qml
 TrayWidget 1.0 TrayWidget.qml
-WavyLine 1.0 WavyLine.qml
 WavyProgress 1.0 WavyProgress.qml
+AppVolumeEntry 1.0 AppVolumeEntry.qml
 WorkspaceOsd 1.0 WorkspaceOsd.qml

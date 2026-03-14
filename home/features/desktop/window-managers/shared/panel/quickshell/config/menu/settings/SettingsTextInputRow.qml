@@ -44,7 +44,7 @@ ColumnLayout {
 
             Behavior on border.color {
                 ColorAnimation {
-                    duration: 150
+                    duration: Colors.durationFast
                 }
             }
 

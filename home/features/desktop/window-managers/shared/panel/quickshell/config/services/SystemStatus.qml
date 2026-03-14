@@ -16,9 +16,15 @@ QtObject {
   property real cpuPercent: 0.0
   property real ramPercent: 0.0
   property real gpuPercent: 0.0
-  property real brightness: 0.0
-  property bool brightnessAvailable: false
-  property string brightnessStatus: "brightnessctl not detected"
+  // Brightness is delegated to BrightnessService (multi-monitor + DDC support).
+  // This writable property preserves backward compat for Osd.qml which assigns directly.
+  property real brightness: BrightnessService.primaryMonitor.brightness
+  readonly property bool brightnessAvailable: BrightnessService.primaryMonitor.available
+  readonly property string brightnessStatus: {
+      if (BrightnessService.monitors.length === 0) return "No brightness device detected";
+      if (BrightnessService.primaryMonitor.available) return "Brightness control ready";
+      return "Brightness control unavailable";
+  }
 
   property int pollIntervalMs: 2000
 
@@ -35,31 +41,42 @@ QtObject {
     command: [
       "sh",
       "-c",
-      "cpu_temp=$(sensors 2>/dev/null | awk '/Tctl:/ {gsub(/[+°C]/, \"\", $2); print $2; exit}'); "
-      + "gpu_temp=$(sensors 2>/dev/null | awk '/edge:/ {gsub(/[+°C]/, \"\", $2); print $2; exit}'); "
+      // CPU temp: try AMD Tctl → Intel Package id 0 → AMD Tdie → Intel Core 0
+      "cpu_temp=$( "
+      + "sensors 2>/dev/null | awk '"
+      + "/Tctl:/ {gsub(/[+°C]/, \"\", $2); print $2; found=1; exit} "
+      + "/Package id 0:/ {gsub(/[+°C]/, \"\", $4); print $4; found=1; exit} "
+      + "/Tdie:/ {gsub(/[+°C]/, \"\", $2); print $2; found=1; exit} "
+      + "/Core 0:/ {gsub(/[+°C]/, \"\", $3); print $3; found=1; exit} "
+      + "END {if (!found) print \"\"}'"
+      + "); "
+      // GPU temp: try AMD edge → nvidia-smi → AMD junction
+      + "gpu_temp=$( "
+      + "sensors 2>/dev/null | awk '/edge:/ {gsub(/[+°C]/, \"\", $2); print $2; found=1; exit} "
+      + "/junction:/ {gsub(/[+°C]/, \"\", $2); print $2; found=1; exit} "
+      + "END {if (!found) print \"\"}'"
+      + "); "
+      + "if [ -z \"$gpu_temp\" ] && command -v nvidia-smi >/dev/null 2>&1; then "
+      + "gpu_temp=$(nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits 2>/dev/null | head -1); fi; "
       + "cpu_usage=$(top -bn1 | awk '/Cpu\\\\(s\\\\):/ {printf \"%d\", 100 - $8}'); "
+      // GPU usage: try AMD sysfs → nvidia-smi
       + "gpu_card=$(for c in /sys/class/drm/card[0-9]*/device/mem_info_vram_total; do "
       + "echo \"$(cat \"$c\" 2>/dev/null || echo 0) $(dirname \"$(dirname \"$c\")\")\" ; done 2>/dev/null "
       + "| sort -rn | head -1 | awk '{print $2}'); "
-      + "gpu_usage=$(cat \"$gpu_card/device/gpu_busy_percent\" 2>/dev/null || echo 0); "
+      + "gpu_usage=$(cat \"$gpu_card/device/gpu_busy_percent\" 2>/dev/null || echo ''); "
+      + "if [ -z \"$gpu_usage\" ] && command -v nvidia-smi >/dev/null 2>&1; then "
+      + "gpu_usage=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits 2>/dev/null | head -1); fi; "
+      + "gpu_usage=${gpu_usage:-0}; "
       + "ram_usage=$(free -h | awk '/^Mem:/ {print $3}' | sed 's/Gi/GB/;s/Mi/MB/'); "
       + "ram_pct=$(free | awk '/^Mem:/ {printf \"%.4f\", $3/$2}'); "
-      + "brightness_supported=0; brightness_reason='unavailable'; brightness_curr=0; brightness_max=100; "
-      + "if command -v brightnessctl >/dev/null 2>&1; then "
-      + "if brightnessctl -m 2>/dev/null | head -n1 | grep -q .; then "
-      + "brightness_supported=1; brightness_reason='ready'; "
-      + "brightness_curr=$(brightnessctl g 2>/dev/null || echo 0); "
-      + "brightness_max=$(brightnessctl m 2>/dev/null || echo 100); "
-      + "else brightness_reason='no_devices'; fi; "
-      + "else brightness_reason='missing_brightnessctl'; fi; "
-      + "printf '%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n' "
-      + "\"$cpu_temp\" \"$gpu_temp\" \"$cpu_usage\" \"$gpu_usage\" \"$ram_usage\" \"$ram_pct\" \"$brightness_curr\" \"$brightness_max\" \"$brightness_supported\" \"$brightness_reason\""
+      + "printf '%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n' "
+      + "\"$cpu_temp\" \"$gpu_temp\" \"$cpu_usage\" \"$gpu_usage\" \"$ram_usage\" \"$ram_pct\""
     ]
     running: false
     stdout: StdioCollector {
       onStreamFinished: {
         var lines = (this.text || "").trim().split("\n");
-        if (lines.length >= 10) {
+        if (lines.length >= 6) {
           root.cpuTemp = root.formatTemp(lines[0]);
           root.gpuTemp = root.formatTemp(lines[1]);
 
@@ -75,17 +92,6 @@ QtObject {
 
           var ramVal = parseFloat(lines[5]) || 0;
           root.ramPercent = Colors.clamp01(ramVal);
-
-          var curr = parseFloat(lines[6]) || 0;
-          var max = parseFloat(lines[7]) || 100;
-          root.brightness = max > 0 ? Colors.clamp01(curr / max) : 0;
-
-          root.brightnessAvailable = (parseInt(lines[8], 10) || 0) === 1;
-          var reason = (lines[9] || "unavailable").trim();
-          if (root.brightnessAvailable) root.brightnessStatus = "Brightness control ready";
-          else if (reason === "no_devices") root.brightnessStatus = "No brightness device detected";
-          else if (reason === "missing_brightnessctl") root.brightnessStatus = "brightnessctl is not installed";
-          else root.brightnessStatus = "Brightness control unavailable";
         }
       }
     }
@@ -93,9 +99,7 @@ QtObject {
 
 
   function setBrightness(value) {
-    if (!root.brightnessAvailable) return;
-    root.brightness = value;
-    Quickshell.execDetached(["brightnessctl", "s", Math.round(value * 100) + "%"]);
+    BrightnessService.setBrightness(BrightnessService.primaryMonitor.name, value);
   }
 
   property Timer refreshTimer: Timer {

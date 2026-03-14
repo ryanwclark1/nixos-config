@@ -17,7 +17,7 @@ Rectangle {
   color: mouse.pressed ? Qt.rgba(tint.r, tint.g, tint.b, 0.22)
                        : (mouse.containsMouse ? Qt.rgba(tint.r, tint.g, tint.b, 0.14) : "transparent")
 
-  Behavior on color { ColorAnimation { duration: 140 } }
+  Behavior on color { ColorAnimation { duration: Colors.durationFast } }
 
   // Ripple pulse overlay
   Rectangle {
@@ -35,7 +35,7 @@ Rectangle {
     id: pulseAnim
     NumberAnimation { target: pulse; property: "opacity"; from: 0.0; to: 1.0; duration: 70 }
     NumberAnimation { target: pulse; property: "scale"; from: 0.6; to: 1.25; duration: 180; easing.type: Easing.OutCubic }
-    NumberAnimation { target: pulse; property: "opacity"; from: 1.0; to: 0.0; duration: 160 }
+    NumberAnimation { target: pulse; property: "opacity"; from: 1.0; to: 0.0; duration: Colors.durationFast }
     ScriptAction { script: { pulse.scale = 0.6 } }
   }
 

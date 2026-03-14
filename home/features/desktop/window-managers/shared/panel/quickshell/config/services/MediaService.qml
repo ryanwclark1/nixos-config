@@ -148,7 +148,7 @@ Item {
               canGoPrevious: sp.canGoPrevious,
               shuffle: sp.shuffle,
               loopStatus: sp.loopStatus,
-              _controlTarget: sp,
+              _playerRef: sp,
               _isVirtual: true
             });
             mergedGenericIndices[g] = true;
@@ -225,7 +225,7 @@ Item {
     onTriggered: {
       if (root.currentPlayer) {
         var pos = root.currentPlayer._isVirtual
-          ? (root.currentPlayer._controlTarget ? root.currentPlayer._controlTarget.position : 0)
+          ? (root.currentPlayer._playerRef ? root.currentPlayer._playerRef.position : 0)
           : root.currentPlayer.position;
         root.currentPosition = pos || 0;
         root.positionString = root.formatTime(root.currentPosition);
@@ -235,7 +235,7 @@ Item {
 
   // ── Auto-switch monitor ────────────────────────
   property Timer switchMonitor: Timer {
-    interval: 2000
+    interval: 5000
     running: Mpris.players.length > 0
     repeat: true
     onTriggered: root.updateCurrentPlayer()
@@ -255,7 +255,7 @@ Item {
   // ── Transport controls ─────────────────────────
   function _controlTarget() {
     if (!currentPlayer) return null;
-    return currentPlayer._isVirtual ? currentPlayer._controlTarget : currentPlayer;
+    return currentPlayer._isVirtual ? currentPlayer._playerRef : currentPlayer;
   }
 
   function playPause() {

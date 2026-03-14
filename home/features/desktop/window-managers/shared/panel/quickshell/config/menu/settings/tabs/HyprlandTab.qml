@@ -95,5 +95,81 @@ Item {
                 }
             }
         }
+
+        SettingsCard {
+            title: "Display Profiles"
+            iconName: "󰍺"
+            description: "Saved monitor configurations for quick switching."
+
+            SettingsToggleRow {
+                label: "Auto-Apply Profiles"
+                icon: "󰔠"
+                checked: Config.displayAutoProfile
+                onToggled: Config.displayAutoProfile = !Config.displayAutoProfile
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: Colors.spacingS
+                visible: Config.displayProfiles.length > 0
+
+                Repeater {
+                    model: Config.displayProfiles
+                    delegate: SettingsListRow {
+                        required property var modelData
+                        required property int index
+                        minimumHeight: 56
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: Colors.spacingXS
+
+                            Text {
+                                text: modelData.name || ("Profile " + (index + 1))
+                                color: Colors.text
+                                font.pixelSize: Colors.fontSizeMedium
+                                font.weight: Font.DemiBold
+                                Layout.fillWidth: true
+                                elide: Text.ElideRight
+                            }
+
+                            Text {
+                                text: {
+                                    var mons = modelData.monitors || [];
+                                    var names = [];
+                                    for (var i = 0; i < mons.length; i++)
+                                        names.push(mons[i].name);
+                                    return names.join(", ") || "No monitors";
+                                }
+                                color: Colors.fgSecondary
+                                font.pixelSize: Colors.fontSizeXS
+                                Layout.fillWidth: true
+                                elide: Text.ElideRight
+                            }
+                        }
+
+                        SettingsActionButton {
+                            compact: true
+                            iconName: "󰅖"
+                            label: "Delete"
+                            onClicked: {
+                                var profiles = Config.displayProfiles.slice();
+                                profiles.splice(index, 1);
+                                Config.displayProfiles = profiles;
+                            }
+                        }
+                    }
+                }
+            }
+
+            Text {
+                visible: Config.displayProfiles.length === 0
+                text: "No saved profiles. Use the Display Configuration dialog to save profiles."
+                color: Colors.fgDim
+                font.pixelSize: Colors.fontSizeSmall
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+            }
+        }
     }
 }

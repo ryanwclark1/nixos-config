@@ -8,6 +8,7 @@ NetworkGraphs 1.0 NetworkGraphs.qml
 ProcessWidget 1.0 ProcessWidget.qml
 QuickToggle 1.0 QuickToggle.qml
 ScratchpadWidget 1.0 ScratchpadWidget.qml
+ServiceUnitWidget 1.0 ServiceUnitWidget.qml
 SystemGraphs 1.0 SystemGraphs.qml
 SystemMonitor 1.0 SystemMonitor.qml
 UpdateWidget 1.0 UpdateWidget.qml

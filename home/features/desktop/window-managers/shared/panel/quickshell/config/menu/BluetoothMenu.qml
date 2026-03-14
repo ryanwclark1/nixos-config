@@ -91,11 +91,10 @@ BasePopupMenu {
 
   Timer {
     id: scanTimer
-    interval: 1000
+    interval: 2000
     repeat: true
     onTriggered: {
-      scanElapsed++;
-      updateCounts();
+      scanElapsed += 2;
       if (scanElapsed >= 30) stopScan();
     }
   }
@@ -171,7 +170,7 @@ BasePopupMenu {
           text: "󰂲"
           color: Colors.textDisabled
           font.family: Colors.fontMono
-          font.pixelSize: 48
+          font.pixelSize: Colors.fontSizeHuge * 2
         }
         Text {
           Layout.alignment: Qt.AlignHCenter
@@ -184,7 +183,7 @@ BasePopupMenu {
           Layout.fillWidth: root.compactMode
           implicitWidth: turnOnLabel.implicitWidth + 24
           implicitHeight: 32
-          radius: 16
+          radius: Colors.radiusPill
           color: Colors.withAlpha(Colors.primary, 0.16)
 
           Text {

@@ -12,11 +12,15 @@ PanelWindow {
   readonly property var edgeMargins: Config.notificationMargins(screen)
 
   anchors {
-    top: true
-    right: true
+    top: Config.notifPosition.indexOf("top") !== -1
+    bottom: Config.notifPosition.indexOf("bottom") !== -1
+    left: Config.notifPosition.indexOf("left") !== -1 || Config.notifPosition === "top" || Config.notifPosition === "bottom"
+    right: Config.notifPosition.indexOf("right") !== -1 || Config.notifPosition === "top" || Config.notifPosition === "bottom"
   }
   margins.top: edgeMargins.top
   margins.right: edgeMargins.right
+  margins.bottom: edgeMargins.bottom || edgeMargins.top
+  margins.left: edgeMargins.left || edgeMargins.right
 
   implicitWidth: Config.notifWidth
   implicitHeight: col.implicitHeight
@@ -38,7 +42,7 @@ PanelWindow {
       delegate: Rectangle {
         id: notifDelegate
         property var notification: modelData || null
-        visible: notification && !notification.dismissed && (!root.manager || !root.manager.dndEnabled || isUrgent)
+        visible: notification && !notification.dismissed && (!root.manager || !root.manager.dndEnabled || isUrgent) && !_isMuted
         Layout.preferredWidth: Config.notifWidth
         Layout.preferredHeight: visible ? colMain.implicitHeight + 20 : 0
 
@@ -59,6 +63,7 @@ PanelWindow {
 
         // Animated dismiss: slide right + fade, then actually dismiss
         property bool isDismissing: false
+        layer.enabled: entranceAnim.running || dismissAnim.running
         function animatedDismiss() {
           if (isDismissing || !notification) return;
           isDismissing = true;
@@ -67,8 +72,8 @@ PanelWindow {
 
         ParallelAnimation {
           id: dismissAnim
-          NumberAnimation { target: notifDelegate; property: "opacity"; to: 0; duration: 200; easing.type: Easing.InCubic }
-          NumberAnimation { target: notifDelegate; property: "swipeOffset"; to: notifDelegate.width + 20; duration: 250; easing.type: Easing.OutCubic }
+          NumberAnimation { target: notifDelegate; property: "opacity"; to: 0; duration: Colors.durationNormal; easing.type: Easing.InCubic }
+          NumberAnimation { target: notifDelegate; property: "swipeOffset"; to: notifDelegate.width + 20; duration: Colors.durationNormal; easing.type: Easing.OutCubic }
           onFinished: {
             if (notifDelegate.notification) notifDelegate.notification.dismiss();
           }
@@ -96,7 +101,7 @@ PanelWindow {
           property: "dismissProgress"
           from: 1.0
           to: 0.0
-          duration: Config.popupTimer
+          duration: notifDelegate._urgencyTimeout > 0 ? notifDelegate._urgencyTimeout : Config.popupTimer
           running: dismissTimer.running
           paused: running && notifDelegate.isHovered
         }
@@ -119,7 +124,7 @@ PanelWindow {
 
         Behavior on swipeOffset {
           enabled: !notifDelegate.isSwiping
-          NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+          NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic }
         }
 
         MouseArea {
@@ -207,7 +212,7 @@ PanelWindow {
               width: parent.width - 52; spacing: Colors.spacingXS
               Text { text: modelData.appName || "Notification"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Bold; font.capitalization: Font.AllUppercase }
               Text { text: modelData.summary; color: Colors.text; font.pixelSize: Colors.fontSizeLarge; font.weight: Font.Bold; width: parent.width; wrapMode: Text.Wrap }
-              Text { text: modelData.body; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeMedium; width: parent.width; wrapMode: Text.Wrap; visible: modelData.body !== "" }
+              Text { text: Config.notifPrivacyMode ? "Notification content hidden" : modelData.body; color: Colors.textSecondary; font.pixelSize: Config.notifCompact ? Colors.fontSizeSmall : Colors.fontSizeMedium; width: parent.width; wrapMode: Text.Wrap; visible: modelData.body !== ""; font.italic: Config.notifPrivacyMode }
             }
 
             Rectangle {
@@ -362,11 +367,28 @@ PanelWindow {
 
         }
 
+        // Urgency-aware timeout: use per-urgency config, fallback to popupTimer
+        readonly property int _urgencyTimeout: {
+          if (!notification) return Config.popupTimer;
+          // Check notification rules for app-specific timeout
+          var rules = Config.notifRules;
+          for (var i = 0; i < rules.length; i++) {
+            if (rules[i].appName && (notification.appName || "").toLowerCase() === rules[i].appName.toLowerCase()) {
+              if (rules[i].action === "mute") return 0;
+              if (rules[i].timeout !== undefined) return rules[i].timeout;
+            }
+          }
+          if (notification.urgency === Notifications.Critical) return Config.notifTimeoutCritical;
+          if (notification.urgency === Notifications.Low) return Config.notifTimeoutLow;
+          return Config.notifTimeoutNormal;
+        }
+        readonly property bool _isMuted: _urgencyTimeout < 0
+
         Timer {
           id: dismissTimer
-          interval: Config.popupTimer
+          interval: Math.max(1000, notifDelegate._urgencyTimeout)
           running: notifDelegate.notification && !notifDelegate.isReplying
-                   && !notifDelegate.notification.dismissed && !notifDelegate.isUrgent
+                   && !notifDelegate.notification.dismissed && notifDelegate._urgencyTimeout > 0
                    && !notifDelegate.isHovered
           onTriggered: notifDelegate.animatedDismiss()
         }

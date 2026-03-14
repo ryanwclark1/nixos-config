@@ -34,7 +34,7 @@ Item {
 
         SettingsCard {
             title: "Theme Browser"
-            description: "Search and apply a base24 theme, or fall back to pywal colors."
+            description: "Search and apply a color theme. Typography and shell styling live in Appearance."
 
             ColumnLayout {
                 Layout.fillWidth: true
@@ -91,7 +91,7 @@ Item {
                 }
 
                 SettingsActionButton {
-                    label: "Use pywal"
+                    label: "Clear Theme"
                     iconName: "󰅖"
                     compact: true
                     onClicked: ThemeService.clearTheme()
@@ -114,10 +114,7 @@ Item {
 
                     Item {
                         id: themeCardWrapper
-                        width: Math.max(
-                            Math.min(180, themeFlow.width),
-                            Math.floor((themeFlow.width - Colors.spacingXS * (root._themeColumns - 1)) / root._themeColumns)
-                        )
+                        width: Math.max(Math.min(180, themeFlow.width), Math.floor((themeFlow.width - Colors.spacingXS * (root._themeColumns - 1)) / root._themeColumns))
                         height: themeCardLayout.implicitHeight + Colors.spacingS * 2
 
                         property var _theme: modelData
@@ -131,7 +128,7 @@ Item {
                             border.width: themeCardWrapper._themeIsActive ? 2 : 1
                             Behavior on border.color {
                                 ColorAnimation {
-                                    duration: 150
+                                    duration: Colors.durationFast
                                 }
                             }
 
@@ -210,6 +207,112 @@ Item {
                         }
                     }
                 }
+            }
+        }
+
+        SettingsCard {
+            title: "Auto Schedule"
+            iconName: "󰔠"
+            description: "Automatically switch between dark and light themes on a schedule."
+
+            SettingsToggleRow {
+                label: "Enable Auto Schedule"
+                icon: "󰔠"
+                checked: Config.themeAutoScheduleEnabled
+                onToggled: Config.themeAutoScheduleEnabled = !Config.themeAutoScheduleEnabled
+            }
+
+            SettingsModeRow {
+                visible: Config.themeAutoScheduleEnabled
+                label: "Schedule Mode"
+                currentValue: Config.themeAutoScheduleMode
+                options: [
+                    { value: "time", label: "Fixed Time" },
+                    { value: "sunrise_sunset", label: "Sunrise/Sunset" }
+                ]
+                onModeSelected: v => Config.themeAutoScheduleMode = v
+            }
+
+            SettingsTextInputRow {
+                visible: Config.themeAutoScheduleEnabled
+                label: "Dark Theme"
+                leadingIcon: "󰖔"
+                text: Config.themeDarkName
+                placeholderText: "Theme ID for dark mode"
+                onSubmitted: v => Config.themeDarkName = v.trim()
+            }
+
+            SettingsTextInputRow {
+                visible: Config.themeAutoScheduleEnabled
+                label: "Light Theme"
+                leadingIcon: "󰖙"
+                text: Config.themeLightName
+                placeholderText: "Theme ID for light mode"
+                onSubmitted: v => Config.themeLightName = v.trim()
+            }
+        }
+
+        SettingsCard {
+            title: "Schedule Times"
+            iconName: "󰥔"
+            description: "Set when to switch to dark and light themes."
+            visible: Config.themeAutoScheduleEnabled && Config.themeAutoScheduleMode === "time"
+
+            SettingsSliderRow {
+                label: "Dark Mode Hour"
+                min: 0
+                max: 23
+                value: Config.themeDarkHour
+                onMoved: v => Config.themeDarkHour = v
+            }
+
+            SettingsSliderRow {
+                label: "Dark Mode Minute"
+                min: 0
+                max: 55
+                step: 5
+                value: Config.themeDarkMinute
+                onMoved: v => Config.themeDarkMinute = v
+            }
+
+            SettingsSliderRow {
+                label: "Light Mode Hour"
+                min: 0
+                max: 23
+                value: Config.themeLightHour
+                onMoved: v => Config.themeLightHour = v
+            }
+
+            SettingsSliderRow {
+                label: "Light Mode Minute"
+                min: 0
+                max: 55
+                step: 5
+                value: Config.themeLightMinute
+                onMoved: v => Config.themeLightMinute = v
+            }
+        }
+
+        SettingsCard {
+            title: "Location"
+            iconName: "󰍎"
+            description: "Coordinates for sunrise/sunset theme switching."
+            visible: Config.themeAutoScheduleEnabled && Config.themeAutoScheduleMode === "sunrise_sunset"
+
+            SettingsTextInputRow {
+                label: "Latitude"
+                leadingIcon: "󰍎"
+                text: Config.themeAutoLatitude
+                placeholderText: "e.g. 40.7128"
+                onSubmitted: v => Config.themeAutoLatitude = v.trim()
+            }
+
+            SettingsTextInputRow {
+                label: "Longitude"
+                leadingIcon: "󰍎"
+                text: Config.themeAutoLongitude
+                placeholderText: "e.g. -74.0060"
+                onSubmitted: v => Config.themeAutoLongitude = v.trim()
             }
         }
     }

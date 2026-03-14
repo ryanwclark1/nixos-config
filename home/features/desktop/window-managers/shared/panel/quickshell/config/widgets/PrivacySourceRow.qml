@@ -17,7 +17,7 @@ Rectangle {
     : Colors.cardSurface
   border.color: root.active ? Colors.withAlpha(Colors.warning, 0.3) : Colors.border
   border.width: 1
-  Behavior on color { ColorAnimation { duration: 200 } }
+  Behavior on color { ColorAnimation { duration: Colors.durationNormal } }
 
   RowLayout {
     anchors.fill: parent
@@ -43,7 +43,7 @@ Rectangle {
       width: 8; height: 8; radius: 4
       color: root.active ? Colors.warning : Colors.textDisabled
       opacity: root.active ? 1.0 : 0.3
-      Behavior on color { ColorAnimation { duration: 200 } }
+      Behavior on color { ColorAnimation { duration: Colors.durationNormal } }
 
       SequentialAnimation on opacity {
         running: root.active

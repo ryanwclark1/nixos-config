@@ -2,17 +2,33 @@ singleton AudioService 1.0 AudioService.qml
 singleton Colors 1.0 Colors.qml
 singleton CompositorAdapter 1.0 CompositorAdapter.qml
 singleton Config 1.0 Config.qml
+ConfigAutoSave 1.0 ConfigAutoSave.qml
 singleton BarWidgetRegistry 1.0 BarWidgetRegistry.qml
+singleton ControlCenterRegistry 1.0 ControlCenterRegistry.qml
 singleton DesktopWidgetRegistry 1.0 DesktopWidgetRegistry.qml
 singleton MediaService 1.0 MediaService.qml
 singleton PluginService 1.0 PluginService.qml
+PluginRuntime 1.0 PluginRuntime.qml
+ConfigBarManager 1.0 ConfigBarManager.qml
 singleton PluginRuntimeCatalog 1.0 PluginRuntimeCatalog.qml
 singleton PrinterService 1.0 PrinterService.qml
 singleton PrivacyService 1.0 PrivacyService.qml
+singleton ProcessService 1.0 ProcessService.qml
 singleton RecordingService 1.0 RecordingService.qml
 singleton SpectrumService 1.0 SpectrumService.qml
+singleton ServiceUnitService 1.0 ServiceUnitService.qml
 singleton SystemStatus 1.0 SystemStatus.qml
 singleton ThemeService 1.0 ThemeService.qml
 singleton ToastService 1.0 ToastService.qml
 singleton WallpaperService 1.0 WallpaperService.qml
 singleton WeatherService 1.0 WeatherService.qml
+singleton SuspendManager 1.0 SuspendManager.qml
+singleton BrightnessService 1.0 BrightnessService.qml
+singleton NightLightService 1.0 NightLightService.qml
+singleton CaffeineService 1.0 CaffeineService.qml
+singleton PowerProfileService 1.0 PowerProfileService.qml
+singleton ScreenshotService 1.0 ScreenshotService.qml
+singleton UsageTrackerService 1.0 UsageTrackerService.qml
+singleton PresetService 1.0 PresetService.qml
+singleton PowerService 1.0 PowerService.qml
+SurfaceService 1.0 SurfaceService.qml

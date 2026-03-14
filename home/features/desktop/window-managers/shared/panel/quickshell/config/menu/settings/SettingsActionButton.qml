@@ -24,7 +24,7 @@ Rectangle {
 
     Behavior on color {
         ColorAnimation {
-            duration: 150
+            duration: Colors.durationFast
         }
     }
 

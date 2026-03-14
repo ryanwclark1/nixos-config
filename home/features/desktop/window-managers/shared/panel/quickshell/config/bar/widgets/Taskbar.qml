@@ -140,7 +140,7 @@ Flow {
       }
       visible: !alreadyPinned
       width: visible ? 32 : 0
-      Behavior on width { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+      Behavior on width { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
       appClass: modelData.class || modelData.appId || ""
       appExec: modelData.class || modelData.appId || ""
       appName: modelData.title || ""

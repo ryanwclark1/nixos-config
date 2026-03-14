@@ -321,7 +321,7 @@ PanelWindow {
       anchors.verticalCenter: parent.verticalCenter
       opacity: dragArea.containsMouse || dragArea.pressed ? 1.0 : 0.4
       Behavior on opacity { NumberAnimation { duration: 180 } }
-      Behavior on color { ColorAnimation { duration: 160 } }
+      Behavior on color { ColorAnimation { duration: Colors.durationFast } }
 
       MouseArea {
         id: dragArea
@@ -500,7 +500,7 @@ PanelWindow {
                   width: isEditing ? tabEditInput.width + 16 : Math.min(tabLabelText.contentWidth + 36, 140)
                   height: 28
 
-                  Behavior on width { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+                  Behavior on width { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
 
                   Rectangle {
                     id: tabBg
@@ -511,7 +511,7 @@ PanelWindow {
                       : Colors.bgWidget
                     border.color: isActive ? Colors.primary : Colors.border
                     border.width: isActive ? 1.5 : 1
-                    Behavior on color { ColorAnimation { duration: 140 } }
+                    Behavior on color { ColorAnimation { duration: Colors.durationFast } }
 
                     SharedWidgets.StateLayer {
                       id: tabStateLayer
@@ -573,7 +573,7 @@ PanelWindow {
                     color: "transparent"
                     opacity: (tabMouse.containsMouse || tabDelegate.isActive) && root.tabs.length > 1 ? 1 : 0
                     visible: root.tabs.length > 1
-                    Behavior on opacity { NumberAnimation { duration: 140 } }
+                    Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
 
                     SharedWidgets.StateLayer {
                       id: deleteTabStateLayer
@@ -663,7 +663,7 @@ PanelWindow {
         border.color: notepadText.activeFocus ? Colors.primary : Colors.border
         border.width: notepadText.activeFocus ? 1.5 : 1
         radius: Colors.radiusMedium
-        Behavior on border.color { ColorAnimation { duration: 160 } }
+        Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
         clip: true
 
         Flickable {

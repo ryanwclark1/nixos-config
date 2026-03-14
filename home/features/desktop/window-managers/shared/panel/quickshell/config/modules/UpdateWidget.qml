@@ -198,7 +198,7 @@ SharedWidgets.CardBase {
     Rectangle {
       width: 80; height: 32; radius: 6
       color: root.isChecking ? Colors.surface : Colors.primary
-      Behavior on color { ColorAnimation { duration: 160 } }
+      Behavior on color { ColorAnimation { duration: Colors.durationFast } }
       Text {
         anchors.centerIn: parent
         text: root.isChecking ? "Checking" : "Refresh"

@@ -284,6 +284,98 @@ PanelWindow {
     }
   }
 
+  // ── Display Profiles ──────────────────────────────────────────────
+  function saveProfile(name) {
+    if (!name || monitors.length === 0) return;
+    var monData = [];
+    for (var i = 0; i < monitors.length; i++) {
+      var m = monitors[i];
+      monData.push({
+        name: m.name,
+        width: m.width,
+        height: m.height,
+        refreshRate: m.refreshRate,
+        scale: m.scale,
+        x: m.x,
+        y: m.y
+      });
+    }
+    var profiles = Config.displayProfiles.slice();
+    // Replace existing profile with same name
+    var found = false;
+    for (var j = 0; j < profiles.length; j++) {
+      if (profiles[j].name === name) {
+        profiles[j] = { name: name, monitors: monData };
+        found = true;
+        break;
+      }
+    }
+    if (!found)
+      profiles.push({ name: name, monitors: monData });
+    Config.displayProfiles = profiles;
+  }
+
+  function loadProfile(profile) {
+    if (!profile || !profile.monitors) return;
+    var mons = [];
+    for (var i = 0; i < profile.monitors.length; i++) {
+      var pm = profile.monitors[i];
+      mons.push({
+        id: i,
+        name: pm.name,
+        description: "",
+        width: pm.width,
+        height: pm.height,
+        refreshRate: pm.refreshRate,
+        x: pm.x,
+        y: pm.y,
+        scale: pm.scale,
+        availableModes: [pm.width + "x" + pm.height + "@" + pm.refreshRate.toFixed(2) + "Hz"],
+        dragX: 0,
+        dragY: 0
+      });
+    }
+    monitors = mons;
+    _computeScaleFactor();
+    _syncDragPositions();
+    if (mons.length > 0) selectedIndex = 0;
+  }
+
+  function deleteProfile(name) {
+    var profiles = Config.displayProfiles.slice();
+    for (var i = 0; i < profiles.length; i++) {
+      if (profiles[i].name === name) {
+        profiles.splice(i, 1);
+        Config.displayProfiles = profiles;
+        return;
+      }
+    }
+  }
+
+  // Auto-profile matching on monitor connect
+  function _matchProfile() {
+    if (!Config.displayAutoProfile || monitors.length === 0) return;
+    var connectedNames = [];
+    for (var i = 0; i < monitors.length; i++)
+      connectedNames.push(monitors[i].name);
+    connectedNames.sort();
+
+    var profiles = Config.displayProfiles;
+    for (var j = 0; j < profiles.length; j++) {
+      var profileNames = [];
+      for (var k = 0; k < profiles[j].monitors.length; k++)
+        profileNames.push(profiles[j].monitors[k].name);
+      profileNames.sort();
+
+      if (connectedNames.length === profileNames.length &&
+          connectedNames.join(",") === profileNames.join(",")) {
+        loadProfile(profiles[j]);
+        _applyConfig();
+        return;
+      }
+    }
+  }
+
   // ── 30-second confirmation countdown ─────────────────────────────
   property bool countdownActive: false
   property int  countdownSeconds: 30
@@ -369,7 +461,7 @@ PanelWindow {
       anchors.fill: parent
       color: Colors.background
       opacity: displayRoot.isOpen ? 0.55 : 0.0
-      Behavior on opacity { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
+      Behavior on opacity { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
     }
   }
 
@@ -397,8 +489,8 @@ PanelWindow {
 
     opacity: displayRoot.isOpen ? 1.0 : 0.0
     scale: displayRoot.isOpen ? 1.0 : 0.95
-    Behavior on opacity { NumberAnimation { id: dcFadeAnim; duration: 250; easing.type: Easing.OutCubic } }
-    Behavior on scale   { NumberAnimation { id: dcScaleAnim; duration: 300; easing.type: Easing.OutBack  } }
+    Behavior on opacity { NumberAnimation { id: dcFadeAnim; duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
+    Behavior on scale   { NumberAnimation { id: dcScaleAnim; duration: Colors.durationSlow; easing.type: Easing.OutBack  } }
     layer.enabled: dcFadeAnim.running || dcScaleAnim.running
 
     // Eat mouse events so backdrop click doesn't reach through
@@ -553,8 +645,8 @@ PanelWindow {
                 border.width: monDelegate.isSelected ? 2 : 1
                 radius: Colors.radiusSmall
 
-                Behavior on color        { ColorAnimation { duration: 150 } }
-                Behavior on border.color { ColorAnimation { duration: 150 } }
+                Behavior on color        { ColorAnimation { duration: Colors.durationFast } }
+                Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
 
                 // Monitor name
                 Text {
@@ -901,6 +993,80 @@ PanelWindow {
       // Separator
       Rectangle { Layout.fillWidth: true; height: 1; color: Colors.border }
 
+      // ── Profile buttons ─────────────────────────────────────────
+      RowLayout {
+        Layout.fillWidth: true
+        Layout.leftMargin: 20
+        Layout.rightMargin: 20
+        Layout.topMargin: 8
+        spacing: Colors.spacingS
+
+        Text {
+          text: "PROFILES"
+          color: Colors.textDisabled
+          font.pixelSize: Colors.fontSizeXS
+          font.weight: Font.Black
+          font.letterSpacing: 1.2
+        }
+
+        Item { Layout.fillWidth: true }
+
+        // Save Profile
+        Rectangle {
+          height: 30; width: saveProfileRow.implicitWidth + 20
+          radius: Colors.radiusXS
+          color: Colors.bgWidget
+          border.color: Colors.border; border.width: 1
+
+          RowLayout {
+            id: saveProfileRow
+            anchors.centerIn: parent
+            spacing: Colors.spacingXS
+            Text { text: "󰆓"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeSmall }
+            Text { text: "Save"; color: Colors.text; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Medium }
+          }
+
+          MouseArea {
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: {
+              var name = "Profile " + (Config.displayProfiles.length + 1);
+              displayRoot.saveProfile(name);
+            }
+          }
+        }
+
+        // Load Profile dropdown
+        Repeater {
+          model: Config.displayProfiles
+          delegate: Rectangle {
+            required property var modelData
+            required property int index
+            height: 30; width: loadLabel.implicitWidth + 20
+            radius: Colors.radiusXS
+            color: Colors.bgWidget
+            border.color: Colors.border; border.width: 1
+
+            Text {
+              id: loadLabel
+              anchors.centerIn: parent
+              text: modelData.name || ("Profile " + (index + 1))
+              color: Colors.text
+              font.pixelSize: Colors.fontSizeXS
+              font.weight: Font.Medium
+            }
+
+            MouseArea {
+              anchors.fill: parent
+              hoverEnabled: true
+              cursorShape: Qt.PointingHandCursor
+              onClicked: displayRoot.loadProfile(modelData)
+            }
+          }
+        }
+      }
+
       // ── Action buttons ─────────────────────────────────────────
       RowLayout {
         Layout.fillWidth: true
@@ -977,7 +1143,7 @@ PanelWindow {
           color: displayRoot.applyInProgress
                  ? Colors.withAlpha(Colors.primary, 0.4)
                  : Colors.primary
-          Behavior on color { ColorAnimation { duration: 160 } }
+          Behavior on color { ColorAnimation { duration: Colors.durationFast } }
 
           RowLayout {
             anchors.centerIn: parent
@@ -1035,7 +1201,7 @@ PanelWindow {
       radius: Colors.radiusLarge
 
       opacity: displayRoot.countdownActive ? 1.0 : 0.0
-      Behavior on opacity { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+      Behavior on opacity { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
 
       ColumnLayout {
         anchors.centerIn: parent
@@ -1081,7 +1247,7 @@ PanelWindow {
             color: displayRoot.countdownSeconds <= 5 ? Colors.error : Colors.text
             font.pixelSize: 36
             font.weight: Font.Bold
-            Behavior on color { ColorAnimation { duration: 300 } }
+            Behavior on color { ColorAnimation { duration: Colors.durationSlow } }
           }
         }
 

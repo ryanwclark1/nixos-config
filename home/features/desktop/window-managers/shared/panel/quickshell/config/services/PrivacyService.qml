@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import "../widgets" as SharedWidgets
 
 pragma Singleton
@@ -41,7 +40,7 @@ QtObject {
   //   cam:   processes holding a /dev/video* device open (via lsof)
   //   share: compositor-specific screen sharing probe from CompositorAdapter
   property SharedWidgets.CommandPoll privacyPoll: SharedWidgets.CommandPoll {
-    interval: 2000
+    interval: 3000
     running: root.subscriberCount > 0
     command: [
       "sh", "-c",

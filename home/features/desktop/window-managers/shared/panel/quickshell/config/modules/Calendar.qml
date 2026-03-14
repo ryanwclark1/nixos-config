@@ -37,7 +37,7 @@ Rectangle {
   SequentialAnimation {
     id: monthTransition
     NumberAnimation { target: daysGrid; property: "opacity"; to: 0.3; duration: 60 }
-    NumberAnimation { target: daysGrid; property: "opacity"; to: 1.0; duration: 150; easing.type: Easing.OutCubic }
+    NumberAnimation { target: daysGrid; property: "opacity"; to: 1.0; duration: Colors.durationFast; easing.type: Easing.OutCubic }
   }
 
   function goToday() {
@@ -110,7 +110,7 @@ Rectangle {
         Rectangle {
           anchors.fill: parent; radius: 12
           color: parent.containsMouse ? Colors.highlightLight : "transparent"
-          Behavior on color { ColorAnimation { duration: 160 } }
+          Behavior on color { ColorAnimation { duration: Colors.durationFast } }
         }
         Text {
           anchors.centerIn: parent
@@ -137,7 +137,7 @@ Rectangle {
           color: parent.containsMouse ? Colors.primary : Colors.text
           font.pixelSize: Colors.fontSizeLarge
           font.weight: Font.Bold
-          Behavior on color { ColorAnimation { duration: 160 } }
+          Behavior on color { ColorAnimation { duration: Colors.durationFast } }
         }
       }
 
@@ -158,7 +158,7 @@ Rectangle {
           color: parent.containsMouse ? Colors.primary : Colors.highlightLight
           border.color: Colors.primary
           border.width: 1
-          Behavior on color { ColorAnimation { duration: 160 } }
+          Behavior on color { ColorAnimation { duration: Colors.durationFast } }
         }
 
         Text {
@@ -168,7 +168,7 @@ Rectangle {
           color: parent.containsMouse ? Colors.background : Colors.primary
           font.pixelSize: Colors.fontSizeXS
           font.weight: Font.Bold
-          Behavior on color { ColorAnimation { duration: 160 } }
+          Behavior on color { ColorAnimation { duration: Colors.durationFast } }
         }
       }
 
@@ -180,7 +180,7 @@ Rectangle {
         Rectangle {
           anchors.fill: parent; radius: 12
           color: parent.containsMouse ? Colors.highlightLight : "transparent"
-          Behavior on color { ColorAnimation { duration: 160 } }
+          Behavior on color { ColorAnimation { duration: Colors.durationFast } }
         }
         Text {
           anchors.centerIn: parent
@@ -218,7 +218,7 @@ Rectangle {
       rowSpacing: 2
       columnSpacing: 0
 
-      Behavior on opacity { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+      Behavior on opacity { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
 
       Repeater {
         model: root.daysModel
@@ -229,7 +229,7 @@ Rectangle {
             : dayMouse.containsMouse && modelData.currentMonth ? Colors.highlightLight
             : "transparent"
           radius: Colors.radiusMedium
-          Behavior on color { ColorAnimation { duration: 160 } }
+          Behavior on color { ColorAnimation { duration: Colors.durationFast } }
 
           Text {
             anchors.centerIn: parent

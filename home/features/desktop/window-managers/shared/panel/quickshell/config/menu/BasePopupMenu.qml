@@ -87,8 +87,8 @@ PopupWindow {
       if (root.preferredEdge === "right") return Item.Right;
       return Item.Top;
     }
-    Behavior on opacity { NumberAnimation { id: _opacAnim; duration: 200; easing.type: Easing.OutCubic } }
-    Behavior on scale { NumberAnimation { id: _scaleAnim; duration: 250; easing.type: Easing.OutBack; easing.overshoot: 1.2 } }
+    Behavior on opacity { NumberAnimation { id: _opacAnim; duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
+    Behavior on scale { NumberAnimation { id: _scaleAnim; duration: Colors.durationNormal; easing.type: Easing.OutBack; easing.overshoot: 1.2 } }
     layer.enabled: _opacAnim.running || _scaleAnim.running
 
     // Optional surface tint (e.g. for MusicMenu accent color)

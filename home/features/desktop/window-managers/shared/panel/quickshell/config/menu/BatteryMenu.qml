@@ -16,20 +16,10 @@ BasePopupMenu {
 
   property var device: UPower.displayDevice
   property bool hasBattery: device != null && device.isPresent && (device.kind === UPower.DeviceKindDisplayDevice || device.kind === UPower.DeviceKindBattery)
-  property string currentProfile: "balanced"
-  property bool powerProfilesAvailable: false
 
-  function refreshProfile() {
-    powerProfilesCheck.poll();
-    if (root.powerProfilesAvailable)
-      profilePoll.poll();
-  }
+  SharedWidgets.Ref { service: PowerProfileService }
 
-  function setProfile(profile) {
-    if (!root.powerProfilesAvailable) return;
-    Quickshell.execDetached(["powerprofilesctl", "set", profile]);
-    root.currentProfile = profile;
-  }
+  onVisibleChanged: if (visible) PowerProfileService.refresh()
 
   readonly property string batteryStateText: {
     if (!device) return "Unknown";
@@ -69,25 +59,6 @@ BasePopupMenu {
     if (hours > 0) return hours + "h " + mins + "m " + label;
     return mins + "m " + label;
   }
-
-  SharedWidgets.CommandPoll {
-    id: powerProfilesCheck
-    interval: 30000
-    running: root.visible
-    command: ["sh", "-c", "command -v powerprofilesctl >/dev/null 2>&1 && echo true || echo false"]
-    parse: function(out) { return String(out || "").trim() === "true"; }
-    onUpdated: root.powerProfilesAvailable = !!powerProfilesCheck.value
-  }
-
-  SharedWidgets.CommandPoll {
-    id: profilePoll
-    interval: 5000
-    running: root.visible && root.powerProfilesAvailable
-    command: ["powerprofilesctl", "get"]
-    onUpdated: { if (profilePoll.value) root.currentProfile = profilePoll.value; }
-  }
-
-  onVisibleChanged: if (visible) refreshProfile()
 
   // No battery state
   Item {
@@ -209,13 +180,13 @@ BasePopupMenu {
 
     // Power profiles
     SharedWidgets.SectionLabel {
-      label: root.powerProfilesAvailable ? "POWER PROFILE" : "POWER PROFILE UNAVAILABLE"
+      label: PowerProfileService.available ? "POWER PROFILE" : "POWER PROFILE UNAVAILABLE"
     }
 
     RowLayout {
       Layout.fillWidth: true
       spacing: Colors.spacingS
-      visible: root.powerProfilesAvailable
+      visible: PowerProfileService.available
 
       Repeater {
         model: [
@@ -227,15 +198,15 @@ BasePopupMenu {
           Layout.fillWidth: true
           icon: modelData.icon
           label: modelData.label
-          selected: root.currentProfile === modelData.id
-          onClicked: root.setProfile(modelData.id)
+          selected: PowerProfileService.currentProfile === modelData.id
+          onClicked: PowerProfileService.setProfile(modelData.id)
         }
       }
     }
 
     Text {
       Layout.fillWidth: true
-      visible: !root.powerProfilesAvailable
+      visible: !PowerProfileService.available
       text: "powerprofilesctl is not available on this system."
       color: Colors.textDisabled
       font.pixelSize: Colors.fontSizeSmall

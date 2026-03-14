@@ -63,8 +63,8 @@ Item {
   // ── Hide animation ─────────────────────────────
   ParallelAnimation {
     id: hideAnim
-    NumberAnimation { target: root; property: "opacity"; to: 0; duration: 200; easing.type: Easing.InCubic }
-    NumberAnimation { target: root; property: "scale"; to: 0.9; duration: 200; easing.type: Easing.InCubic }
+    NumberAnimation { target: root; property: "opacity"; to: 0; duration: Colors.durationNormal; easing.type: Easing.InCubic }
+    NumberAnimation { target: root; property: "scale"; to: 0.9; duration: Colors.durationNormal; easing.type: Easing.InCubic }
     onFinished: { root.visible = false; root.hidden(); }
   }
 
@@ -176,6 +176,6 @@ Item {
 
   Behavior on _swipeOffset {
     enabled: !root._isSwiping
-    NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+    NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic }
   }
 }

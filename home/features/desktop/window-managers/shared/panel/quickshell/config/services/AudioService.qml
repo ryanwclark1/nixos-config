@@ -1,204 +1,247 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Services.Pipewire
 
 pragma Singleton
 
 QtObject {
-  id: root
+    id: root
 
-  // ── Output (sink) state ──────────────────────
-  property real outputVolume: 0
-  property bool outputMuted: false
-  property string outputLabel: "No output device"
-  property string outputDeviceType: "speaker" // "speaker" | "headphone" | "bluetooth"
-
-  // ── Input (source) state ─────────────────────
-  property real inputVolume: 0
-  property bool inputMuted: false
-  property string inputLabel: "No input device"
-
-  // ── Device lists (populated on demand) ───────
-  property var sinks: []
-  property var sources: []
-  property int defaultSinkId: -1
-  property int defaultSourceId: -1
-
-  // ── Subscriber-based polling ─────────────────
-  // Use Ref { service: AudioService } for automatic lifecycle management.
-  property int subscriberCount: 0
-
-  // ── Helpers ─────────────────────────────────
-  function _parseWpctlVolume(text) {
-    var t = (text || "").trim();
-    var match = t.match(/Volume:\s+([0-9.]+)(?:\s+\[MUTED\])?/);
-    if (!match) return null;
-    var parsed = parseFloat(match[1]);
-    return { volume: isNaN(parsed) ? 0 : Colors.clamp01(parsed), muted: t.indexOf("[MUTED]") !== -1 };
-  }
-
-  function _sendOsdIpc(isSink, percent, muted) {
-    var method = isSink ? "showVolume" : "showMic";
-    Quickshell.execDetached(["quickshell", "ipc", "call", "Osd", method, Math.round(percent).toString(), muted.toString()]);
-  }
-
-  // ── Lightweight volume poll (sink + source) ──
-  property Process outputVolumeProc: Process {
-    command: ["wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@"]
-    running: false
-    stdout: StdioCollector {
-      onStreamFinished: {
-        var r = root._parseWpctlVolume(this.text);
-        if (!r) { root.outputVolume = 0; root.outputMuted = false; return; }
-        root.outputVolume = r.volume;
-        root.outputMuted = r.muted;
-      }
+    // ── Output (sink) state ──────────────────────
+    readonly property real outputVolume: {
+        var v = Pipewire.defaultAudioSink?.audio?.volume;
+        return (v !== undefined && !isNaN(v)) ? Colors.clamp01(v) : 0;
     }
-  }
+    readonly property bool outputMuted: Pipewire.defaultAudioSink?.audio?.muted ?? false
+    readonly property string outputLabel: _sinkDescription()
+    readonly property string outputDeviceType: _detectDeviceType()
 
-  property Process inputVolumeProc: Process {
-    command: ["wpctl", "get-volume", "@DEFAULT_AUDIO_SOURCE@"]
-    running: false
-    stdout: StdioCollector {
-      onStreamFinished: {
-        var r = root._parseWpctlVolume(this.text);
-        if (!r) { root.inputVolume = 0; root.inputMuted = false; return; }
-        root.inputVolume = r.volume;
-        root.inputMuted = r.muted;
-      }
+    // ── Input (source) state ─────────────────────
+    readonly property real inputVolume: {
+        var v = Pipewire.defaultAudioSource?.audio?.volume;
+        return (v !== undefined && !isNaN(v)) ? Colors.clamp01(v) : 0;
     }
-  }
+    readonly property bool inputMuted: Pipewire.defaultAudioSource?.audio?.muted ?? false
+    readonly property string inputLabel: _sourceDescription()
 
-  // ── Default sink name poll (device type detection) ──
-  property Process defaultSinkProc: Process {
-    command: ["pactl", "get-default-sink"]
-    running: false
-    stdout: StdioCollector {
-      onStreamFinished: {
-        var name = (this.text || "").trim().toLowerCase();
-        if (name.indexOf("bluetooth") !== -1 || name.indexOf("bluez") !== -1 || name.indexOf("a2dp") !== -1) {
-          root.outputDeviceType = "bluetooth";
-        } else if (name.indexOf("headphone") !== -1 || name.indexOf("headset") !== -1) {
-          root.outputDeviceType = "headphone";
+    // ── Device lists (reactive from PipeWire) ────
+    readonly property var sinks: _buildDeviceList(true)
+    readonly property var sources: _buildDeviceList(false)
+
+    // ── Filtered device lists (pin/hide applied) ────
+    readonly property var filteredSinks: _filterDevices(sinks, Config.audioPinnedOutputs, Config.audioHiddenOutputs)
+    readonly property var filteredSources: _filterDevices(sources, Config.audioPinnedInputs, Config.audioHiddenInputs)
+    readonly property int defaultSinkId: Pipewire.defaultAudioSink?.id ?? -1
+    readonly property int defaultSourceId: Pipewire.defaultAudioSource?.id ?? -1
+
+    // ── Per-app audio streams ────────────────────
+    readonly property var outputAppNodes: _buildAppNodes(true)
+    readonly property var inputAppNodes: _buildAppNodes(false)
+
+    // ── Subscriber-based (kept for Ref.qml compat, now a no-op) ──
+    property int subscriberCount: 0
+
+    // ── PipeWire object tracking ─────────────────
+    property PwObjectTracker _defaultTracker: PwObjectTracker {
+        objects: [Pipewire.defaultAudioSink, Pipewire.defaultAudioSource]
+    }
+
+    property PwObjectTracker _nodeTracker: PwObjectTracker {
+        objects: _allAudioNodes()
+    }
+
+    // ── Helpers ──────────────────────────────────
+    function _sinkDescription() {
+        var sink = Pipewire.defaultAudioSink;
+        if (!sink) return "No output device";
+        return sink.description || sink.nickname || sink.name || "Unknown";
+    }
+
+    function _sourceDescription() {
+        var source = Pipewire.defaultAudioSource;
+        if (!source) return "No input device";
+        return source.description || source.nickname || source.name || "Unknown";
+    }
+
+    function _detectDeviceType() {
+        var sink = Pipewire.defaultAudioSink;
+        if (!sink) return "speaker";
+        var name = (sink.name || "").toLowerCase();
+        var desc = (sink.description || "").toLowerCase();
+        var combined = name + " " + desc;
+        if (combined.indexOf("bluetooth") !== -1 || combined.indexOf("bluez") !== -1 || combined.indexOf("a2dp") !== -1)
+            return "bluetooth";
+        if (combined.indexOf("headphone") !== -1 || combined.indexOf("headset") !== -1)
+            return "headphone";
+        return "speaker";
+    }
+
+    function _allAudioNodes() {
+        if (!Pipewire.ready) return [];
+        var nodes = Pipewire.nodes?.values ?? [];
+        var audio = [];
+        for (var i = 0; i < nodes.length; i++) {
+            if (nodes[i] && nodes[i].audio)
+                audio.push(nodes[i]);
+        }
+        return audio;
+    }
+
+    function _buildDeviceList(isSinkList) {
+        if (!Pipewire.ready) return [];
+        var nodes = Pipewire.nodes?.values ?? [];
+        var devices = [];
+        var defaultId = isSinkList ? (Pipewire.defaultAudioSink?.id ?? -1)
+                                   : (Pipewire.defaultAudioSource?.id ?? -1);
+
+        for (var i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            if (!node || !node.audio || node.isStream) continue;
+            if (isSinkList !== node.isSink) continue;
+
+            var vol = node.audio.volume;
+            devices.push({
+                id: node.id,
+                name: node.description || node.nickname || node.name || "Unknown",
+                volume: (vol !== undefined && !isNaN(vol)) ? vol : 0,
+                muted: node.audio.muted || false,
+                isDefault: node.id === defaultId
+            });
+        }
+        return devices;
+    }
+
+    function _filterDevices(devices, pinned, hidden) {
+        var hiddenSet = {};
+        for (var h = 0; h < (hidden || []).length; h++)
+            hiddenSet[(hidden[h] || "").toLowerCase()] = true;
+
+        var pinnedSet = {};
+        for (var p = 0; p < (pinned || []).length; p++)
+            pinnedSet[(pinned[p] || "").toLowerCase()] = true;
+
+        var visible = [];
+        for (var i = 0; i < devices.length; i++) {
+            var name = (devices[i].name || "").toLowerCase();
+            if (!hiddenSet[name])
+                visible.push(devices[i]);
+        }
+
+        // Sort: pinned first, then rest
+        visible.sort(function(a, b) {
+            var aPin = pinnedSet[(a.name || "").toLowerCase()] ? 0 : 1;
+            var bPin = pinnedSet[(b.name || "").toLowerCase()] ? 0 : 1;
+            return aPin - bPin;
+        });
+
+        return visible;
+    }
+
+    function _buildAppNodes(isOutput) {
+        if (!Pipewire.ready) return [];
+        var nodes = Pipewire.nodes?.values ?? [];
+        var apps = [];
+
+        for (var i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            if (!node || !node.audio || !node.isStream) continue;
+            // Output app streams are sources (isSink=false) feeding into sinks
+            // Input app streams are sinks (isSink=true) receiving from sources
+            if (isOutput === node.isSink) continue;
+
+            var vol = node.audio.volume;
+            var props = node.properties || {};
+            apps.push({
+                nodeRef: node,
+                id: node.id,
+                name: props["application.name"] || node.description || node.nickname || node.name || "Unknown",
+                iconName: props["application.icon-name"] || "",
+                volume: (vol !== undefined && !isNaN(vol)) ? vol : 0,
+                muted: node.audio.muted || false
+            });
+        }
+        return apps;
+    }
+
+    function _sendOsdIpc(isSink, percent, muted) {
+        var method = isSink ? "showVolume" : "showMic";
+        Quickshell.execDetached(["quickshell", "ipc", "call", "Osd", method, Math.round(percent).toString(), muted.toString()]);
+    }
+
+    // ── Volume protection ────────────────────────
+    function protectedSetVolume(node, targetVolume, currentVolume) {
+        if (!node || !node.audio) return;
+        var maxJump = Config.volumeProtectionEnabled ? Config.volumeProtectionMaxJump : 1.0;
+        var delta = targetVolume - currentVolume;
+        if (Math.abs(delta) > maxJump)
+            targetVolume = currentVolume + (delta > 0 ? maxJump : -maxJump);
+        var clamped = Colors.clamp01(targetVolume);
+        node.audio.volume = clamped;
+        if (clamped > 0 && node.audio.muted)
+            node.audio.muted = false;
+    }
+
+    // ── Actions (preserves existing API) ─────────
+    function setVolume(target, value) {
+        var clamped = Colors.clamp01(value);
+        var isSink = target === "@DEFAULT_AUDIO_SINK@";
+        var node = isSink ? Pipewire.defaultAudioSink : Pipewire.defaultAudioSource;
+
+        if (node && node.audio) {
+            var current = node.audio.volume || 0;
+            if (Config.volumeProtectionEnabled) {
+                protectedSetVolume(node, clamped, current);
+            } else {
+                node.audio.volume = clamped;
+                if (clamped > 0 && node.audio.muted)
+                    node.audio.muted = false;
+            }
         } else {
-          root.outputDeviceType = "speaker";
-        }
-      }
-    }
-  }
-
-  function refreshVolumes() {
-    if (!outputVolumeProc.running) outputVolumeProc.running = true;
-    if (!inputVolumeProc.running) inputVolumeProc.running = true;
-    if (!defaultSinkProc.running) defaultSinkProc.running = true;
-  }
-
-  property Timer volumeTimer: Timer {
-    interval: 1000
-    running: root.subscriberCount > 0
-    repeat: true
-    onTriggered: root.refreshVolumes()
-  }
-
-  // ── Full device scan (on demand) ─────────────
-  property Process deviceScanProc: Process {
-    command: ["sh", "-c", "wpctl status"]
-    running: false
-    stdout: StdioCollector {
-      onStreamFinished: {
-        var lines = (this.text || "").split("\n");
-        var section = "";
-        var parsedSinks = [];
-        var parsedSources = [];
-
-        root.defaultSinkId = -1;
-        root.defaultSourceId = -1;
-
-        for (var i = 0; i < lines.length; i++) {
-          var line = lines[i];
-          if (line.indexOf("\u251c\u2500 Sinks:") !== -1) { section = "sinks"; continue; }
-          if (line.indexOf("\u251c\u2500 Sources:") !== -1) { section = "sources"; continue; }
-          if (line.indexOf("\u251c\u2500 Filters:") !== -1 || line.indexOf("\u2514\u2500 Streams:") !== -1 || line.indexOf("Video") === 0 || line.indexOf("Settings") === 0) {
-            section = "";
-          }
-          if (section !== "sinks" && section !== "sources") continue;
-
-          // Strip Unicode box-drawing tree prefixes (│ ├ └ ─) and whitespace
-          var trimmed = line.replace(/^[\s\u2502\u251c\u2514\u2500]+/, "");
-          if (!trimmed) continue;
-          var isDefault = trimmed.indexOf("*") === 0;
-          if (isDefault) trimmed = trimmed.substring(1).trim();
-
-          var match = trimmed.match(/^(\d+)\.\s+(.*?)\s+\[vol:\s+([0-9.]+)\](\s+\[MUTED\])?$/);
-          if (!match) continue;
-
-          var item = {
-            id: parseInt(match[1], 10),
-            name: match[2],
-            volume: parseFloat(match[3]),
-            muted: !!match[4],
-            isDefault: isDefault
-          };
-
-          if (section === "sinks") {
-            parsedSinks.push(item);
-            if (item.isDefault) {
-              root.defaultSinkId = item.id;
-              root.outputVolume = item.volume;
-              root.outputMuted = item.muted;
-              root.outputLabel = item.name;
-            }
-          } else {
-            parsedSources.push(item);
-            if (item.isDefault) {
-              root.defaultSourceId = item.id;
-              root.inputVolume = item.volume;
-              root.inputMuted = item.muted;
-              root.inputLabel = item.name;
-            }
-          }
+            // Fallback to wpctl for edge cases
+            if (clamped > 0)
+                Quickshell.execDetached(["wpctl", "set-mute", target, "0"]);
+            Quickshell.execDetached(["wpctl", "set-volume", target, Math.round(clamped * 100) + "%"]);
         }
 
-        root.sinks = parsedSinks;
-        root.sources = parsedSources;
-      }
+        if (isSink || target === "@DEFAULT_AUDIO_SOURCE@")
+            root._sendOsdIpc(isSink, clamped * 100, false);
     }
-  }
 
-  function refreshDevices() {
-    if (!deviceScanProc.running) deviceScanProc.running = true;
-  }
-
-  // ── Actions ──────────────────────────────────
-  function setVolume(target, value) {
-    var clamped = Colors.clamp01(value);
-    if (clamped > 0) {
-      Quickshell.execDetached(["wpctl", "set-mute", target, "0"]);
+    function setAppVolume(nodeRef, value) {
+        if (!nodeRef || !nodeRef.audio) return;
+        var clamped = Colors.clamp01(value);
+        nodeRef.audio.volume = clamped;
+        if (clamped > 0 && nodeRef.audio.muted)
+            nodeRef.audio.muted = false;
     }
-    Quickshell.execDetached(["wpctl", "set-volume", target, Math.round(clamped * 100) + "%"]);
 
-    var isSink = target === "@DEFAULT_AUDIO_SINK@";
-    if (isSink) { root.outputVolume = clamped; root.outputMuted = false; }
-    else if (target === "@DEFAULT_AUDIO_SOURCE@") { root.inputVolume = clamped; root.inputMuted = false; }
-    if (isSink || target === "@DEFAULT_AUDIO_SOURCE@")
-      root._sendOsdIpc(isSink, clamped * 100, false);
-    Qt.callLater(root.refreshVolumes);
-  }
+    function toggleAppMute(nodeRef) {
+        if (!nodeRef || !nodeRef.audio) return;
+        nodeRef.audio.muted = !nodeRef.audio.muted;
+    }
 
-  function toggleMute(target, currentlyMuted) {
-    Quickshell.execDetached(["wpctl", "set-mute", target, currentlyMuted ? "0" : "1"]);
-    var isSink = target === "@DEFAULT_AUDIO_SINK@";
-    if (isSink) root.outputMuted = !currentlyMuted;
-    else if (target === "@DEFAULT_AUDIO_SOURCE@") root.inputMuted = !currentlyMuted;
-    var vol = isSink ? root.outputVolume : root.inputVolume;
-    if (isSink || target === "@DEFAULT_AUDIO_SOURCE@")
-      root._sendOsdIpc(isSink, vol * 100, !currentlyMuted);
-    Qt.callLater(root.refreshVolumes);
-  }
+    function toggleMute(target, currentlyMuted) {
+        var isSink = target === "@DEFAULT_AUDIO_SINK@";
+        var node = isSink ? Pipewire.defaultAudioSink : Pipewire.defaultAudioSource;
 
-  function setDefaultDevice(id) {
-    if (id < 0) return;
-    Quickshell.execDetached(["wpctl", "set-default", id.toString()]);
-    Qt.callLater(root.refreshDevices);
-  }
+        if (node && node.audio) {
+            node.audio.muted = !currentlyMuted;
+        } else {
+            Quickshell.execDetached(["wpctl", "set-mute", target, currentlyMuted ? "0" : "1"]);
+        }
+
+        var vol = isSink ? root.outputVolume : root.inputVolume;
+        if (isSink || target === "@DEFAULT_AUDIO_SOURCE@")
+            root._sendOsdIpc(isSink, vol * 100, !currentlyMuted);
+    }
+
+    function setDefaultDevice(id) {
+        if (id < 0) return;
+        Quickshell.execDetached(["wpctl", "set-default", id.toString()]);
+    }
+
+    // ── Backward compat (no-ops since PipeWire is reactive) ──
+    function refreshVolumes() { }
+    function refreshDevices() { }
 }

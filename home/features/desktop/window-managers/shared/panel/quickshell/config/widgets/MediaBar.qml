@@ -35,9 +35,9 @@ Rectangle {
     NumberAnimation { target: root; property: "_rewindFlashOpacity"; to: 0.0; duration: 400; easing.type: Easing.OutCubic }
   }
 
-  Behavior on width { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
-  Behavior on opacity { NumberAnimation { duration: 300 } }
-  Behavior on scale { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+  Behavior on width { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutCubic } }
+  Behavior on opacity { NumberAnimation { duration: Colors.durationSlow } }
+  Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
   opacity: visible ? 1.0 : 0.0
   scale: mediaMouse.containsMouse ? 1.04 : 1.0
 

@@ -400,10 +400,10 @@ PanelWindow {
   readonly property string freqPath: Quickshell.env("HOME") + "/.local/state/quickshell/app_frequency.json"
   readonly property string historyPath: Quickshell.env("HOME") + "/.local/state/quickshell/launcher_history.json"
 
-  Behavior on launcherOpacity { NumberAnimation { duration: 300; easing.type: Easing.OutQuint } }
+  Behavior on launcherOpacity { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutQuint } }
 
   property real scaleValue: 0.95
-  Behavior on scaleValue { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
+  Behavior on scaleValue { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutBack } }
   property bool seedFrequencyFile: false
   property bool seedHistoryFile: false
 
@@ -1237,7 +1237,10 @@ PanelWindow {
 
   function trackLaunch(item) {
     var exec = item && item.exec ? item.exec : "";
-    if (exec) appFrequency[exec] = (appFrequency[exec] || 0) + 1;
+    if (exec) {
+      appFrequency[exec] = (appFrequency[exec] || 0) + 1;
+      UsageTrackerService.recordUsage(exec);
+    }
     saveFrequency();
     rememberRecent(item || {});
     buildLauncherHome();
@@ -1258,10 +1261,10 @@ PanelWindow {
         var execKey = String(app.exec || "");
         if (execKey !== "" && !appsByExec[execKey])
           appsByExec[execKey] = app;
-        var usage = appFrequency[execKey] || 0;
-        if (usage > 0) {
+        var usageScore = UsageTrackerService.getUsageScore(execKey);
+        if (usageScore > 0) {
           var rankedByUsage = Object.assign({}, app);
-          rankedByUsage._usage = usage;
+          rankedByUsage._usage = usageScore;
           usageRanked.push(rankedByUsage);
         }
       }
@@ -2000,7 +2003,12 @@ PanelWindow {
       fuzzyMatchLower(item._bodyLower, cleanLower) * Config.launcherScoreBodyWeight,
       categoryScore
     );
-    if (mode === "drun") bestScore += (appFrequency[item.exec] || 0) * 0.6;
+    if (mode === "drun") {
+      // Blend raw frequency (legacy) with decay-weighted usage score
+      var rawFreq = (appFrequency[item.exec] || 0) * 0.3;
+      var decayScore = UsageTrackerService.getUsageScore(item.exec) * 1.5;
+      bestScore += Math.max(rawFreq, decayScore);
+    }
     return bestScore;
   }
 
@@ -2087,9 +2095,9 @@ PanelWindow {
         scoredItems.sort(function(a, b) {
           if (b._score !== a._score) return b._score - a._score;
           if (mode === "drun") {
-            var usageDelta = (appFrequency[b.exec] || 0) - (appFrequency[a.exec] || 0);
-            if (usageDelta !== 0)
-              return usageDelta;
+            var usageDelta = UsageTrackerService.getUsageScore(b.exec) - UsageTrackerService.getUsageScore(a.exec);
+            if (Math.abs(usageDelta) > 0.01)
+              return usageDelta > 0 ? 1 : -1;
           }
           return compareLauncherItemsAlpha(a, b);
         });
@@ -2549,7 +2557,7 @@ PanelWindow {
     anchors.fill: parent
     color: Qt.rgba(0, 0, 0, 0.5)
     opacity: launcherOpacity
-    Behavior on opacity { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+    Behavior on opacity { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
     MouseArea { anchors.fill: parent; onClicked: launcherRoot.close() }
   }
 
@@ -2592,88 +2600,10 @@ PanelWindow {
       anchors.margins: launcherRoot.tightMode ? Colors.spacingM : Colors.paddingMedium
       spacing: launcherRoot.compactMode ? Colors.paddingSmall : 18
 
-      Rectangle {
+      LauncherSidebar {
         Layout.preferredWidth: launcherRoot.sidebarCompact ? 76 : Math.max(148, Math.min(210, Math.round(hudBox.width * (launcherRoot.compactMode ? 0.2 : 0.22))))
         Layout.fillHeight: true
-        radius: Colors.radiusLarge
-        color: Colors.withAlpha(Colors.surface, 0.45)
-        border.color: Colors.border
-        border.width: 1
-
-        ColumnLayout {
-          anchors.fill: parent
-          anchors.margins: launcherRoot.sidebarCompact ? Colors.spacingS : Colors.spacingM
-          spacing: launcherRoot.sidebarCompact ? Colors.spacingXS : Colors.paddingSmall
-
-          Text { visible: !launcherRoot.sidebarCompact; text: "Launcher"; color: Colors.text; font.pixelSize: Colors.fontSizeXL; font.weight: Font.DemiBold }
-          Text { visible: !launcherRoot.sidebarCompact; text: "Modes"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
-
-          Repeater {
-            model: launcherRoot.primaryModes
-            delegate: Rectangle {
-              Layout.fillWidth: true
-              implicitHeight: launcherRoot.sidebarCompact ? 40 : 46
-              radius: Colors.radiusMedium
-              color: launcherRoot.mode === modelData ? Colors.highlight : Colors.bgWidget
-              Behavior on color { ColorAnimation { duration: 160 } }
-              border.color: launcherRoot.mode === modelData ? Colors.primary : "transparent"
-              border.width: 1
-
-              RowLayout {
-                anchors.fill: parent
-                anchors.margins: launcherRoot.sidebarCompact ? Colors.spacingXS : Colors.paddingSmall
-                spacing: launcherRoot.sidebarCompact ? Colors.spacingXS : Colors.paddingSmall
-                Text {
-                  text: launcherRoot.modeIcons[modelData] || "•"
-                  color: launcherRoot.mode === modelData ? Colors.primary : Colors.textSecondary
-                  font.family: Colors.fontMono
-                  font.pixelSize: launcherRoot.sidebarCompact ? Colors.fontSizeXL : Colors.fontSizeLarge
-                  Layout.alignment: Qt.AlignVCenter | (launcherRoot.sidebarCompact ? Qt.AlignHCenter : 0)
-                }
-                ColumnLayout {
-                  visible: !launcherRoot.sidebarCompact
-                  Layout.fillWidth: true
-                  spacing: 0
-                  Text { text: launcherRoot.modeInfo(modelData).label; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.DemiBold }
-                  Text { text: launcherRoot.modeInfo(modelData).hint; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; elide: Text.ElideRight; Layout.fillWidth: true }
-                }
-              }
-
-              SharedWidgets.StateLayer { id: modeStateLayer; hovered: modeHover.containsMouse; pressed: modeHover.pressed; visible: launcherRoot.mode !== modelData }
-              MouseArea {
-                id: modeHover
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: (mouse) => {
-                  modeStateLayer.burst(mouse.x, mouse.y);
-                  launcherRoot.open(modelData, true);
-                }
-              }
-            }
-          }
-
-          Item { Layout.fillHeight: true }
-
-          Rectangle {
-            Layout.fillWidth: true
-            implicitHeight: 74
-            radius: Colors.radiusMedium
-            color: Colors.bgWidget
-            border.color: Colors.border
-            border.width: 1
-            visible: Config.launcherShowModeHints && !launcherRoot.sidebarCompact
-
-            ColumnLayout {
-              anchors.fill: parent
-              anchors.margins: Colors.spacingM
-              spacing: 2
-              Text { text: "Controls"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
-              Text { text: launcherRoot.tabControlHintText; color: Colors.text; font.pixelSize: Colors.fontSizeSmall }
-              Text { text: launcherRoot.launcherControlHintText; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; wrapMode: Text.WordWrap }
-            }
-          }
-        }
+        launcher: launcherRoot
       }
 
       ColumnLayout {
@@ -3139,248 +3069,9 @@ PanelWindow {
           }
         }
 
-        Rectangle {
+        LauncherHome {
           Layout.fillWidth: true
-          visible: launcherRoot.showLauncherHome
-          color: Colors.bgWidget
-          radius: Colors.radiusMedium
-          border.color: Colors.border
-          border.width: 1
-          implicitHeight: launcherRoot.compactMode ? 116 : 130
-
-          ColumnLayout {
-            anchors.fill: parent
-            anchors.margins: Colors.spacingM
-            spacing: Colors.spacingM
-            Text { text: "Featured"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
-            RowLayout {
-              Layout.fillWidth: true
-              spacing: Colors.paddingSmall
-              Repeater {
-                model: launcherRoot.featuredActions
-                delegate: Rectangle {
-                  Layout.fillWidth: true
-                  implicitHeight: 74
-                  radius: Colors.radiusMedium
-                  readonly property bool hovered: featureHover.containsMouse
-                  color: hovered ? Colors.withAlpha(Colors.primary, 0.1) : Colors.surface
-                  border.color: hovered ? Colors.withAlpha(Colors.primary, 0.3) : Colors.border
-                  border.width: 1
-                  scale: hovered ? 1.015 : 1.0
-                  Behavior on color { ColorAnimation { duration: 150 } }
-                  Behavior on border.color { ColorAnimation { duration: 150 } }
-                  Behavior on scale { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
-
-                  ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: Colors.spacingM
-                    spacing: Colors.spacingXS
-                    Text { text: modelData.icon; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL }
-                    Text { text: modelData.label; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.DemiBold; elide: Text.ElideRight }
-                    Text { text: modelData.description; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; elide: Text.ElideRight }
-                  }
-
-                  SharedWidgets.StateLayer { id: featureStateLayer; hovered: featureHover.containsMouse; pressed: featureHover.pressed }
-                  MouseArea {
-                    id: featureHover
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: (mouse) => {
-                      featureStateLayer.burst(mouse.x, mouse.y);
-                      launcherRoot.activateFeatured(modelData);
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        Rectangle {
-          Layout.fillWidth: true
-          visible: launcherRoot.showLauncherHome && launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && launcherRoot.drunCategoryOptions.length > 1
-          color: Colors.bgWidget
-          radius: Colors.radiusMedium
-          border.color: Colors.border
-          border.width: 1
-          implicitHeight: categoryFilterFlow.implicitHeight + 30
-
-          ColumnLayout {
-            anchors.fill: parent
-            anchors.margins: Colors.spacingM
-            spacing: Colors.spacingS
-            Text {
-              text: "Categories • " + launcherRoot.drunCategoryFilterLabel
-              color: Colors.textDisabled
-              font.pixelSize: Colors.fontSizeXS
-              font.weight: Font.Bold
-            }
-            Text {
-              text: launcherRoot.drunCategoryFilterSummary
-              color: Colors.textSecondary
-              font.pixelSize: Colors.fontSizeXS
-            }
-            Flow {
-              id: categoryFilterFlow
-              Layout.fillWidth: true
-              spacing: Colors.spacingS
-
-              Repeater {
-                model: launcherRoot.drunCategoryOptions
-                delegate: SharedWidgets.FilterChip {
-                  required property var modelData
-
-                  icon: modelData.hotkey === "0" ? "󰍉" : "󰌌"
-                  label: String(modelData.label || "All") + " (" + String(modelData.count || 0) + ")" + (String(modelData.hotkey || "") !== "" ? (" [" + String(modelData.hotkey || "") + "]") : "")
-                  selected: String(modelData.key || "") === launcherRoot.drunCategoryFilter
-
-                  onClicked: launcherRoot.setDrunCategoryFilter(String(modelData.key || ""))
-                }
-              }
-            }
-          }
-        }
-
-        Rectangle {
-          Layout.fillWidth: true
-          visible: launcherRoot.showLauncherHome && launcherRoot.recentItems.length > 0
-          color: Colors.bgWidget
-          radius: Colors.radiusMedium
-          border.color: Colors.border
-          border.width: 1
-          implicitHeight: recentColumn.implicitHeight + 24
-
-          ColumnLayout {
-            id: recentColumn
-            anchors.fill: parent
-            anchors.margins: Colors.spacingM
-            spacing: Colors.spacingS
-            Text { text: "Recent"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
-
-            Repeater {
-              model: launcherRoot.recentItems
-              delegate: Rectangle {
-                Layout.fillWidth: true
-                implicitHeight: 40
-                radius: Colors.radiusSmall
-                readonly property bool hovered: recentHover.containsMouse
-                color: hovered ? Colors.withAlpha(Colors.primary, 0.08) : "transparent"
-                border.color: hovered ? Colors.withAlpha(Colors.primary, 0.28) : "transparent"
-                border.width: hovered ? 1 : 0
-                scale: hovered ? 1.01 : 1.0
-                Behavior on color { ColorAnimation { duration: 140 } }
-                Behavior on border.color { ColorAnimation { duration: 140 } }
-                Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
-
-                RowLayout {
-                  anchors.fill: parent
-                  anchors.margins: Colors.spacingS
-                  spacing: Colors.paddingSmall
-                  Text { text: modelData.icon || "󰀻"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium }
-                  ColumnLayout {
-                    Layout.fillWidth: true
-                    spacing: 0
-                    Text { text: modelData.name || modelData.label; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.DemiBold; elide: Text.ElideRight }
-                    Text { text: modelData.title || modelData.description || ""; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; elide: Text.ElideRight }
-                  }
-                }
-
-                SharedWidgets.StateLayer { id: recentStateLayer; hovered: recentHover.containsMouse; pressed: recentHover.pressed }
-                MouseArea {
-                  id: recentHover
-                  anchors.fill: parent
-                  hoverEnabled: true
-                  cursorShape: Qt.PointingHandCursor
-                  onClicked: (mouse) => {
-                    recentStateLayer.burst(mouse.x, mouse.y);
-                    launcherRoot.activateFeatured(modelData);
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        Rectangle {
-          Layout.fillWidth: true
-          visible: launcherRoot.showLauncherHome && launcherRoot.mode === "drun" && launcherRoot.suggestionItems.length > 0
-          color: Colors.bgWidget
-          radius: Colors.radiusMedium
-          border.color: Colors.border
-          border.width: 1
-          implicitHeight: suggestionColumn.implicitHeight + 24
-
-          ColumnLayout {
-            id: suggestionColumn
-            anchors.fill: parent
-            anchors.margins: Colors.spacingM
-            spacing: Colors.spacingS
-            Text { text: "Suggested"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
-
-            Repeater {
-              model: launcherRoot.suggestionItems
-              delegate: Rectangle {
-                Layout.fillWidth: true
-                implicitHeight: 42
-                radius: Colors.radiusSmall
-                readonly property bool hovered: suggestionHover.containsMouse
-                color: hovered ? Colors.withAlpha(Colors.primary, 0.08) : "transparent"
-                border.color: hovered ? Colors.withAlpha(Colors.primary, 0.28) : "transparent"
-                border.width: hovered ? 1 : 0
-                scale: hovered ? 1.01 : 1.0
-                Behavior on color { ColorAnimation { duration: 140 } }
-                Behavior on border.color { ColorAnimation { duration: 140 } }
-                Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
-
-                RowLayout {
-                  anchors.fill: parent
-                  anchors.margins: Colors.spacingS
-                  spacing: Colors.paddingSmall
-                  Text { text: modelData.icon || "󰀻"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium }
-                  ColumnLayout {
-                    Layout.fillWidth: true
-                    spacing: 0
-                    Text { text: modelData.name || modelData.label; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.DemiBold; elide: Text.ElideRight }
-                    Text { text: (modelData.exec || modelData.title || "Frequently used"); color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; elide: Text.ElideRight }
-                  }
-                  Rectangle {
-                    radius: 11
-                    color: Colors.surface
-                    border.color: Colors.border
-                    border.width: 1
-                    implicitWidth: suggestionBadge.implicitWidth + 16
-                    implicitHeight: 22
-                    Text {
-                      id: suggestionBadge
-                      anchors.centerIn: parent
-                      text: (modelData._usage || 0) + "x"
-                      color: Colors.textSecondary
-                      font.pixelSize: Colors.fontSizeXS
-                      font.weight: Font.Medium
-                    }
-                  }
-                }
-
-                SharedWidgets.StateLayer { id: suggestionStateLayer; hovered: suggestionHover.containsMouse; pressed: suggestionHover.pressed }
-                MouseArea {
-                  id: suggestionHover
-                  anchors.fill: parent
-                  hoverEnabled: true
-                  cursorShape: Qt.PointingHandCursor
-                  onClicked: (mouse) => {
-                    suggestionStateLayer.burst(mouse.x, mouse.y);
-                    launcherRoot.selectedIndex = 0;
-                    if (modelData.exec) {
-                      launcherRoot.trackLaunch(modelData);
-                      launcherRoot.launchExecString(modelData.exec, modelData.terminal === "true" || modelData.terminal === "True");
-                      launcherRoot.close();
-                    }
-                  }
-                }
-              }
-            }
-          }
+          launcher: launcherRoot
         }
 
         StackLayout {
@@ -3411,9 +3102,9 @@ PanelWindow {
                 border.color: highlighted ? Colors.withAlpha(Colors.primary, 0.58) : (hovered ? Colors.withAlpha(Colors.primary, 0.18) : "transparent")
                 border.width: highlighted || hovered ? 1 : 0
                 scale: highlighted ? 1.012 : (hovered ? 1.004 : 1.0)
-                Behavior on color { ColorAnimation { duration: 140 } }
-                Behavior on border.color { ColorAnimation { duration: 140 } }
-                Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+                Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+                Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+                Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
                 readonly property string actionLabel: launcherRoot.itemActionLabel(modelData)
                 readonly property string providerLabel: launcherRoot.itemProviderLabel(modelData)
 
@@ -3426,7 +3117,7 @@ PanelWindow {
                   radius: width / 2
                   color: Colors.primary
                   opacity: highlighted ? 0.95 : (hovered ? 0.4 : 0.0)
-                  Behavior on height { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+                  Behavior on height { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
                   Behavior on opacity { NumberAnimation { duration: 120 } }
                 }
 
@@ -3444,9 +3135,9 @@ PanelWindow {
                     border.color: highlighted ? Colors.withAlpha(Colors.primary, 0.3) : "transparent"
                     border.width: highlighted ? 1 : 0
                     scale: highlighted ? 1.04 : 1.0
-                    Behavior on color { ColorAnimation { duration: 140 } }
-                    Behavior on border.color { ColorAnimation { duration: 140 } }
-                    Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+                    Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+                    Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+                    Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
                     Image {
                       id: iconImage
                       anchors.fill: parent
@@ -3656,148 +3347,21 @@ PanelWindow {
             }
           }
 
-          ColumnLayout {
-            spacing: launcherRoot.compactMode ? Colors.paddingSmall : Colors.paddingMedium
-            Repeater {
-              model: launcherRoot.mediaPlayers
-              delegate: Rectangle {
-                Layout.fillWidth: true
-                height: launcherRoot.tightMode ? 96 : (launcherRoot.compactMode ? 108 : 120)
-                color: Colors.bgWidget
-                radius: Colors.radiusMedium
-                border.color: Colors.border
-                border.width: 1
-
-                RowLayout {
-                  anchors.fill: parent
-                  anchors.margins: launcherRoot.compactMode ? Colors.spacingM : Colors.paddingMedium
-                  spacing: launcherRoot.compactMode ? Colors.paddingSmall : Colors.paddingMedium
-                  Rectangle {
-                    width: launcherRoot.compactMode ? 72 : 90
-                    height: launcherRoot.compactMode ? 72 : 90
-                    radius: Colors.radiusXS
-                    color: Colors.surface
-                    clip: true
-                    Image { anchors.fill: parent; source: modelData.trackArtUrl || ""; sourceSize: Qt.size(128, 128); asynchronous: true; fillMode: Image.PreserveAspectCrop }
-                  }
-                  ColumnLayout {
-                    Layout.fillWidth: true
-                    Text { text: modelData.trackTitle || "Unknown"; color: Colors.text; font.pixelSize: launcherRoot.compactMode ? Colors.fontSizeMedium : Colors.fontSizeLarge; font.weight: Font.Bold; elide: Text.ElideRight }
-                    Text { text: modelData.trackArtist || "Unknown"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall }
-                    Item { Layout.fillHeight: true }
-                    RowLayout {
-                      spacing: launcherRoot.compactMode ? Colors.paddingSmall : Colors.paddingMedium
-                      Rectangle {
-                        width: launcherRoot.compactMode ? 26 : 30; height: launcherRoot.compactMode ? 26 : 30; radius: height / 2
-                        color: "transparent"
-                        Text { anchors.centerIn: parent; text: "󰒮"; color: Colors.text; font.family: Colors.fontMono; font.pixelSize: launcherRoot.compactMode ? Colors.fontSizeLarge : Colors.fontSizeXL }
-                        SharedWidgets.StateLayer { id: prevStateLayer; hovered: prevHover.containsMouse; pressed: prevHover.pressed }
-                        MouseArea {
-                          id: prevHover
-                          anchors.fill: parent
-                          hoverEnabled: true
-                          cursorShape: Qt.PointingHandCursor
-                          onClicked: (mouse) => {
-                            prevStateLayer.burst(mouse.x, mouse.y);
-                            (modelData._controlTarget || modelData).previous();
-                          }
-                        }
-                      }
-                      Rectangle {
-                        width: launcherRoot.compactMode ? 30 : 36; height: launcherRoot.compactMode ? 30 : 36; radius: height / 2
-                        color: "transparent"
-                        Text { anchors.centerIn: parent; text: (modelData._controlTarget || modelData).playbackState === Mpris.Playing ? "󰏤" : "󰐊"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: launcherRoot.compactMode ? Colors.fontSizeXL : Colors.fontSizeHuge }
-                        SharedWidgets.StateLayer { id: playStateLayer; hovered: playHover.containsMouse; pressed: playHover.pressed }
-                        MouseArea {
-                          id: playHover
-                          anchors.fill: parent
-                          hoverEnabled: true
-                          cursorShape: Qt.PointingHandCursor
-                          onClicked: (mouse) => {
-                            playStateLayer.burst(mouse.x, mouse.y);
-                            (modelData._controlTarget || modelData).playPause();
-                          }
-                        }
-                      }
-                      Rectangle {
-                        width: launcherRoot.compactMode ? 26 : 30; height: launcherRoot.compactMode ? 26 : 30; radius: height / 2
-                        color: "transparent"
-                        Text { anchors.centerIn: parent; text: "󰒭"; color: Colors.text; font.family: Colors.fontMono; font.pixelSize: launcherRoot.compactMode ? Colors.fontSizeLarge : Colors.fontSizeXL }
-                        SharedWidgets.StateLayer { id: nextStateLayer; hovered: nextHover.containsMouse; pressed: nextHover.pressed }
-                        MouseArea {
-                          id: nextHover
-                          anchors.fill: parent
-                          hoverEnabled: true
-                          cursorShape: Qt.PointingHandCursor
-                          onClicked: (mouse) => {
-                            nextStateLayer.burst(mouse.x, mouse.y);
-                            (modelData._controlTarget || modelData).next();
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
+          LauncherMediaView {
+            mediaPlayers: launcherRoot.mediaPlayers
+            compactMode: launcherRoot.compactMode
+            tightMode: launcherRoot.tightMode
           }
         }
       }
     }
 
-    Rectangle {
+    LauncherConfirmDialog {
       anchors.fill: parent
-      visible: launcherRoot.showingConfirm
-      color: Colors.withAlpha(Colors.background, 0.9)
-      radius: Colors.radiusLarge
-
-      ColumnLayout {
-        anchors.centerIn: parent
-        spacing: 25
-        Text { text: launcherRoot.confirmTitle; color: Colors.text; font.pixelSize: Colors.fontSizeXL; font.bold: true; Layout.alignment: Qt.AlignHCenter }
-        RowLayout {
-          spacing: Colors.paddingMedium
-          Layout.alignment: Qt.AlignHCenter
-          Rectangle {
-            width: 100; height: 40; radius: Colors.radiusLarge
-            color: Colors.error
-            Text { text: "Yes"; color: Colors.text; anchors.centerIn: parent; font.bold: true }
-            SharedWidgets.StateLayer { id: yesStateLayer; hovered: yesHover.containsMouse; pressed: yesHover.pressed; stateColor: Colors.error }
-            MouseArea {
-              id: yesHover
-              anchors.fill: parent
-              hoverEnabled: true
-              cursorShape: Qt.PointingHandCursor
-              onClicked: (mouse) => {
-                yesStateLayer.burst(mouse.x, mouse.y);
-                launcherRoot.doConfirm();
-              }
-            }
-          }
-          Rectangle {
-            width: 100; height: 40; radius: Colors.radiusLarge
-            color: Colors.surface
-            Text { text: "No"; color: Colors.text; anchors.centerIn: parent; font.bold: true }
-            SharedWidgets.StateLayer { id: noStateLayer; hovered: noHover.containsMouse; pressed: noHover.pressed }
-            MouseArea {
-              id: noHover
-              anchors.fill: parent
-              hoverEnabled: true
-              cursorShape: Qt.PointingHandCursor
-              onClicked: (mouse) => {
-                noStateLayer.burst(mouse.x, mouse.y);
-                launcherRoot.cancelConfirm();
-              }
-            }
-          }
-        }
-      }
-
-      Keys.onPressed: (event) => {
-        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) launcherRoot.doConfirm();
-        else if (event.key === Qt.Key_Escape) launcherRoot.cancelConfirm();
-        event.accepted = true;
-      }
+      showingConfirm: launcherRoot.showingConfirm
+      confirmTitle: launcherRoot.confirmTitle
+      onConfirmed: launcherRoot.doConfirm()
+      onCancelled: launcherRoot.cancelConfirm()
     }
   }
 }

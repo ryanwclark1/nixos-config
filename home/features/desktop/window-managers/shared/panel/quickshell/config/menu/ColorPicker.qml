@@ -471,7 +471,7 @@ PanelWindow {
           color: Colors.bgWidget
           border.color: hexInput.activeFocus ? Colors.primary : Colors.border
           border.width: 1
-          Behavior on border.color { ColorAnimation { duration: 150 } }
+          Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
 
           RowLayout {
             anchors { fill: parent; leftMargin: 12; rightMargin: 12 }

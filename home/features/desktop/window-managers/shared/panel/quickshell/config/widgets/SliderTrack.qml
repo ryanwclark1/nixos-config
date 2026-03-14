@@ -39,23 +39,23 @@ Rectangle {
   }
 
   height: sliderMouse.pressed ? 32 : 28
-  Behavior on height { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+  Behavior on height { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
 
   transform: Scale {
     origin.x: root.width / 2
     origin.y: root.height / 2
     xScale: sliderMouse.pressed ? 1.02 : 1.0
     yScale: sliderMouse.pressed ? 0.96 : 1.0
-    Behavior on xScale { NumberAnimation { duration: 200; easing.type: Easing.OutBack; easing.overshoot: 1.4 } }
-    Behavior on yScale { NumberAnimation { duration: 200; easing.type: Easing.OutBack; easing.overshoot: 1.4 } }
+    Behavior on xScale { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutBack; easing.overshoot: 1.4 } }
+    Behavior on yScale { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutBack; easing.overshoot: 1.4 } }
   }
   color: sliderMouse.containsMouse ? Colors.surface : Colors.bgWidget
   radius: height / 2
   border.color: sliderMouse.containsMouse ? (root.muted ? root.mutedColor : root.activeColor) : Colors.border
   border.width: 1
 
-  Behavior on color { ColorAnimation { duration: 160 } }
-  Behavior on border.color { ColorAnimation { duration: 160 } }
+  Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+  Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
 
   // Tick marks at 25%, 50%, 75%
   Repeater {
@@ -75,14 +75,14 @@ Rectangle {
     radius: parent.radius
     color: root.muted ? root.mutedColor : (sliderMouse.containsMouse ? Qt.darker(root.activeColor, 1.08) : root.activeColor)
     opacity: root.muted ? 1.0 : (0.3 + root.value * 0.7)
-    Behavior on color { ColorAnimation { duration: 160 } }
-    Behavior on opacity { NumberAnimation { duration: 160 } }
+    Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+    Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
 
     Text {
       anchors.centerIn: parent
       text: root.muted ? root.mutedIcon : root.icon
       color: root.value > 0.15 ? Colors.background : Colors.text
-      Behavior on color { ColorAnimation { duration: 160 } }
+      Behavior on color { ColorAnimation { duration: Colors.durationFast } }
       font.family: Colors.fontMono
       font.pixelSize: Colors.fontSizeSmall
       opacity: 1.0 / Math.max(0.3, parent.opacity)

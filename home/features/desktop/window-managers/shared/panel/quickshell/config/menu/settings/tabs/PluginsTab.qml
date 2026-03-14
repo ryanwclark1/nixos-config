@@ -14,6 +14,27 @@ Item {
     property bool tightSpacing: false
     property string _pluginDiagnosticsExportText: ""
     property string _pluginDiagnosticsSavePath: ""
+    property bool pluginPaneOpen: false
+    property string pluginPaneMode: ""
+    property string selectedPluginId: ""
+    property string pluginPaneError: ""
+
+    readonly property var selectedPlugin: PluginService.pluginById(selectedPluginId)
+    readonly property bool selectedPluginHasSettings: selectedPluginId !== "" && PluginService.pluginSupportsSettings(selectedPluginId)
+    readonly property bool selectedPluginCanWriteSettings: selectedPluginId !== "" && PluginService.pluginCanWriteSettings(selectedPluginId)
+    readonly property bool selectedPluginHasControlCenterDetail: selectedPluginId !== "" && PluginService.pluginSupportsControlCenterDetail(selectedPluginId)
+
+    onPluginPaneOpenChanged: {
+        if (!pluginPaneOpen) {
+            pluginPaneMode = "";
+            selectedPluginId = "";
+            pluginPaneError = "";
+            if (pluginPaneLoader)
+                pluginPaneLoader.source = "";
+            return;
+        }
+        Qt.callLater(loadPluginPane);
+    }
 
     function shellQuote(value) {
         var text = String(value || "");
@@ -26,14 +47,7 @@ Item {
             var value = String(n);
             return value.length < 2 ? ("0" + value) : value;
         }
-        return now.getUTCFullYear()
-            + pad(now.getUTCMonth() + 1)
-            + pad(now.getUTCDate())
-            + "T"
-            + pad(now.getUTCHours())
-            + pad(now.getUTCMinutes())
-            + pad(now.getUTCSeconds())
-            + "Z";
+        return now.getUTCFullYear() + pad(now.getUTCMonth() + 1) + pad(now.getUTCDate()) + "T" + pad(now.getUTCHours()) + pad(now.getUTCMinutes()) + pad(now.getUTCSeconds()) + "Z";
     }
 
     function diagnosticsOutputDir() {
@@ -64,7 +78,9 @@ Item {
                 error: message
             });
         }
-        entries.sort(function(a, b) { return String(a.id).localeCompare(String(b.id)); });
+        entries.sort(function (a, b) {
+            return String(a.id).localeCompare(String(b.id));
+        });
         return entries;
     }
 
@@ -100,7 +116,9 @@ Item {
 
     function pluginDiagnosticsPayload() {
         var plugins = (PluginService.plugins || []).slice();
-        plugins.sort(function(a, b) { return String(a.id || "").localeCompare(String(b.id || "")); });
+        plugins.sort(function (a, b) {
+            return String(a.id || "").localeCompare(String(b.id || ""));
+        });
 
         var pluginRows = [];
         for (var i = 0; i < plugins.length; i++) {
@@ -138,7 +156,9 @@ Item {
             generatedAt: (new Date()).toISOString(),
             summary: {
                 installed: (PluginService.plugins || []).length,
-                enabled: (PluginService.plugins || []).filter(function(p) { return !!(p && p.enabled); }).length,
+                enabled: (PluginService.plugins || []).filter(function (p) {
+                    return !!(p && p.enabled);
+                }).length,
                 invalidManifests: root.pluginErrorEntries().length,
                 statuses: root.pluginStatusSummary()
             },
@@ -151,14 +171,7 @@ Item {
         _pluginDiagnosticsExportText = JSON.stringify(root.pluginDiagnosticsPayload(), null, 2);
         if (pluginDiagnosticsCopyProc.running)
             return;
-        pluginDiagnosticsCopyProc.command = [
-            "sh", "-c",
-            "if command -v wl-copy >/dev/null 2>&1; then "
-            + "cat | wl-copy; "
-            + "elif command -v xclip >/dev/null 2>&1; then "
-            + "cat | xclip -selection clipboard; "
-            + "else exit 127; fi"
-        ];
+        pluginDiagnosticsCopyProc.command = ["sh", "-c", "if command -v wl-copy >/dev/null 2>&1; then " + "cat | wl-copy; " + "elif command -v xclip >/dev/null 2>&1; then " + "cat | xclip -selection clipboard; " + "else exit 127; fi"];
         pluginDiagnosticsCopyProc.running = true;
     }
 
@@ -167,11 +180,7 @@ Item {
         _pluginDiagnosticsSavePath = root.pluginDiagnosticsOutputPath();
         if (pluginDiagnosticsSaveProc.running)
             return;
-        pluginDiagnosticsSaveProc.command = [
-            "sh", "-c",
-            "mkdir -p " + shellQuote(root.diagnosticsOutputDir())
-            + " && cat > " + shellQuote(_pluginDiagnosticsSavePath)
-        ];
+        pluginDiagnosticsSaveProc.command = ["sh", "-c", "mkdir -p " + shellQuote(root.diagnosticsOutputDir()) + " && cat > " + shellQuote(_pluginDiagnosticsSavePath)];
         pluginDiagnosticsSaveProc.running = true;
     }
 
@@ -193,6 +202,106 @@ Item {
         return Qt.rgba(base.r, base.g, base.b, 0.16);
     }
 
+    function pluginTypeIcon(typeName) {
+        if (typeName === "bar-widget")
+            return "󰖯";
+        if (typeName === "desktop-widget")
+            return "󰖲";
+        if (typeName === "launcher-provider")
+            return "󰀻";
+        if (typeName === "control-center-widget")
+            return "󰕮";
+        if (typeName === "daemon")
+            return "󰒓";
+        return "󰏗";
+    }
+
+    function pluginTypeLabel(typeName) {
+        if (typeName === "bar-widget")
+            return "Bar";
+        if (typeName === "desktop-widget")
+            return "Desktop";
+        if (typeName === "launcher-provider")
+            return "Launcher";
+        if (typeName === "control-center-widget")
+            return "Control Center";
+        if (typeName === "daemon")
+            return "Daemon";
+        return "Multi";
+    }
+
+    function pluginTypeAccent(typeName) {
+        if (typeName === "bar-widget")
+            return Colors.accent;
+        if (typeName === "desktop-widget")
+            return Colors.primary;
+        if (typeName === "control-center-widget")
+            return Colors.success;
+        return Colors.warning;
+    }
+
+    function openPluginPane(pluginId, paneMode) {
+        selectedPluginId = String(pluginId || "");
+        pluginPaneMode = String(paneMode || "");
+        pluginPaneError = "";
+        pluginPaneOpen = true;
+        Qt.callLater(loadPluginPane);
+    }
+
+    function closePluginPane() {
+        pluginPaneOpen = false;
+    }
+
+    function pluginPaneTitle() {
+        if (!selectedPlugin)
+            return "Plugin";
+        if (pluginPaneMode === "settings")
+            return String(selectedPlugin.name || selectedPlugin.id) + " Settings";
+        if (pluginPaneMode === "detail")
+            return String(selectedPlugin.name || selectedPlugin.id) + " Detail";
+        return String(selectedPlugin.name || selectedPlugin.id);
+    }
+
+    function loadPluginPane() {
+        if (!pluginPaneLoader)
+            return;
+        pluginPaneLoader.source = "";
+        pluginPaneError = "";
+        if (!pluginPaneOpen || selectedPluginId === "" || !selectedPlugin)
+            return;
+
+        var src = "";
+        if (pluginPaneMode === "settings") {
+            if (!selectedPluginHasSettings) {
+                pluginPaneError = "This plugin does not expose a settings entry point.";
+                return;
+            }
+            if (!selectedPluginCanWriteSettings) {
+                pluginPaneError = "This plugin does not have settings_write permission.";
+                return;
+            }
+            src = PluginService.pluginSettingsSource(selectedPluginId);
+        } else if (pluginPaneMode === "detail") {
+            if (!selectedPluginHasControlCenterDetail) {
+                pluginPaneError = "This plugin does not expose a Control Center detail pane.";
+                return;
+            }
+            src = PluginService.pluginControlCenterDetailSource(selectedPluginId);
+        }
+
+        if (src === "") {
+            pluginPaneError = "Plugin entry point is missing.";
+            return;
+        }
+
+        var api = PluginService.getPluginAPI(selectedPluginId);
+        pluginPaneLoader.setSource(src, {
+            pluginApi: api,
+            pluginManifest: selectedPlugin,
+            pluginService: PluginService
+        });
+    }
+
     SettingsTabPage {
         anchors.fill: parent
         tabId: root.tabId
@@ -211,13 +320,7 @@ Item {
 
                 ColumnLayout {
                     spacing: 2
-                    width: root.compactMode
-                           ? parent.width
-                           : Math.max(0, parent.width
-                                      - scanPluginsButton.implicitWidth
-                                      - copyDiagnosticsButton.implicitWidth
-                                      - saveDiagnosticsButton.implicitWidth
-                                      - (Colors.spacingM * 3))
+                    width: root.compactMode ? parent.width : Math.max(0, parent.width - scanPluginsButton.implicitWidth - copyDiagnosticsButton.implicitWidth - saveDiagnosticsButton.implicitWidth - (Colors.spacingM * 3))
 
                     Text {
                         text: PluginService.plugins.length + " plugin" + (PluginService.plugins.length !== 1 ? "s" : "") + " found"
@@ -235,8 +338,8 @@ Item {
                     }
 
                     Text {
-                        visible: Object.keys(PluginService.pluginErrors || ({ })).length > 0
-                        text: Object.keys(PluginService.pluginErrors || ({ })).length + " invalid plugin manifest" + (Object.keys(PluginService.pluginErrors || ({ })).length !== 1 ? "s" : "")
+                        visible: Object.keys(PluginService.pluginErrors || ({})).length > 0
+                        text: Object.keys(PluginService.pluginErrors || ({})).length + " invalid plugin manifest" + (Object.keys(PluginService.pluginErrors || ({})).length !== 1 ? "s" : "")
                         color: Colors.warning
                         font.pixelSize: Colors.fontSizeSmall
                     }
@@ -380,15 +483,7 @@ Item {
 
                         Text {
                             anchors.centerIn: parent
-                            text: modelData.type === "bar-widget"
-                                  ? "󰖯"
-                                  : modelData.type === "desktop-widget"
-                                    ? "󰖲"
-                                    : modelData.type === "launcher-provider"
-                                      ? "󰀻"
-                                      : modelData.type === "daemon"
-                                        ? "󰒓"
-                                        : "󰏗"
+                            text: root.pluginTypeIcon(modelData.type)
                             color: modelData.enabled ? Colors.primary : Colors.fgDim
                             font.family: Colors.fontMono
                             font.pixelSize: root.compactMode ? Colors.fontSizeLarge : Colors.fontSizeXL
@@ -444,28 +539,12 @@ Item {
                                 implicitWidth: typeLabel.implicitWidth + 10
                                 height: 18
                                 radius: height / 2
-                                color: modelData.type === "bar-widget"
-                                       ? Qt.rgba(Colors.accent.r, Colors.accent.g, Colors.accent.b, 0.14)
-                                       : modelData.type === "desktop-widget"
-                                         ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.14)
-                                         : Qt.rgba(Colors.warning.r, Colors.warning.g, Colors.warning.b, 0.14)
+                                color: Qt.rgba(root.pluginTypeAccent(modelData.type).r, root.pluginTypeAccent(modelData.type).g, root.pluginTypeAccent(modelData.type).b, 0.14)
                                 Text {
                                     id: typeLabel
                                     anchors.centerIn: parent
-                                    text: modelData.type === "bar-widget"
-                                          ? "Bar"
-                                          : modelData.type === "desktop-widget"
-                                            ? "Desktop"
-                                            : modelData.type === "launcher-provider"
-                                              ? "Launcher"
-                                              : modelData.type === "daemon"
-                                                ? "Daemon"
-                                                : "Multi"
-                                    color: modelData.type === "bar-widget"
-                                           ? Colors.accent
-                                           : modelData.type === "desktop-widget"
-                                             ? Colors.primary
-                                             : Colors.warning
+                                    text: root.pluginTypeLabel(modelData.type)
+                                    color: root.pluginTypeAccent(modelData.type)
                                     font.pixelSize: Colors.fontSizeXS
                                     font.weight: Font.DemiBold
                                 }
@@ -512,10 +591,31 @@ Item {
                             font.pixelSize: Colors.fontSizeXS
                         }
 
+                        Flow {
+                            Layout.fillWidth: true
+                            width: parent.width
+                            spacing: Colors.spacingS
+
+                            SettingsActionButton {
+                                visible: PluginService.pluginSupportsControlCenterDetail(modelData.id)
+                                compact: true
+                                iconName: "󰍐"
+                                label: "Detail"
+                                onClicked: root.openPluginPane(modelData.id, "detail")
+                            }
+
+                            SettingsActionButton {
+                                visible: PluginService.pluginSupportsSettings(modelData.id)
+                                compact: true
+                                iconName: "󰒓"
+                                label: "Settings"
+                                onClicked: root.openPluginPane(modelData.id, "settings")
+                            }
+                        }
+
                         Text {
                             visible: PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] && String(PluginService.pluginStatuses[modelData.id].message || "") !== ""
-                            text: (PluginService.pluginStatuses[modelData.id].code ? ("[" + PluginRuntimeCatalog.errorLabel(PluginService.pluginStatuses[modelData.id].code) + "] ") : "")
-                                + String(PluginService.pluginStatuses[modelData.id].message || "")
+                            text: (PluginService.pluginStatuses[modelData.id].code ? ("[" + PluginRuntimeCatalog.errorLabel(PluginService.pluginStatuses[modelData.id].code) + "] ") : "") + String(PluginService.pluginStatuses[modelData.id].message || "")
                             color: Colors.warning
                             font.pixelSize: Colors.fontSizeXS
                             Layout.fillWidth: true
@@ -640,6 +740,103 @@ Item {
                     font.pixelSize: Colors.fontSizeXS
                     wrapMode: Text.WordWrap
                     Layout.fillWidth: true
+                }
+            }
+        }
+    }
+
+    Rectangle {
+        anchors.fill: parent
+        visible: root.pluginPaneOpen
+        color: Qt.rgba(0, 0, 0, 0.45)
+        z: 20
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: root.closePluginPane()
+        }
+
+        Rectangle {
+            width: Math.min(520, parent.width - 24)
+            height: Math.min(pluginPaneFlick.contentHeight + (Colors.paddingLarge * 2), parent.height - 24)
+            anchors.centerIn: parent
+            radius: Colors.radiusLarge
+            color: Colors.popupSurface
+            border.color: Colors.border
+            border.width: 1
+
+            Flickable {
+                id: pluginPaneFlick
+                anchors.fill: parent
+                anchors.margins: Colors.paddingLarge
+                clip: true
+                contentHeight: pluginPaneColumn.implicitHeight
+
+                ColumnLayout {
+                    id: pluginPaneColumn
+                    width: parent.width
+                    spacing: Colors.spacingM
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: Colors.spacingS
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: root.pluginPaneTitle()
+                            color: Colors.text
+                            font.pixelSize: Colors.fontSizeXL
+                            font.weight: Font.DemiBold
+                            wrapMode: Text.WordWrap
+                        }
+
+                        SettingsActionButton {
+                            compact: true
+                            iconName: "󰅖"
+                            label: "Close"
+                            onClicked: root.closePluginPane()
+                        }
+                    }
+
+                    SettingsInfoCallout {
+                        visible: !!root.selectedPlugin
+                        iconName: root.selectedPlugin ? root.pluginTypeIcon(root.selectedPlugin.type) : "󰏗"
+                        title: root.selectedPlugin ? String(root.selectedPlugin.name || root.selectedPlugin.id) : "Plugin"
+                        body: root.selectedPlugin ? String(root.selectedPlugin.description || "") : ""
+
+                        Text {
+                            visible: !!root.selectedPlugin
+                            text: root.selectedPlugin ? ("Type: " + root.pluginTypeLabel(root.selectedPlugin.type) + " • Author: " + String(root.selectedPlugin.author || "Unknown") + " • Version: " + String(root.selectedPlugin.version || "")) : ""
+                            color: Colors.fgSecondary
+                            font.pixelSize: Colors.fontSizeSmall
+                            wrapMode: Text.WordWrap
+                            Layout.fillWidth: true
+                        }
+                    }
+
+                    SettingsInfoCallout {
+                        visible: root.pluginPaneMode === "settings" && root.selectedPluginHasSettings && !root.selectedPluginCanWriteSettings
+                        title: "Permission required"
+                        body: "This plugin is missing settings_write permission in its manifest."
+                    }
+
+                    SettingsInfoCallout {
+                        visible: root.pluginPaneError !== ""
+                        title: "Plugin pane failed to load"
+                        body: root.pluginPaneError
+                    }
+
+                    Loader {
+                        id: pluginPaneLoader
+                        Layout.fillWidth: true
+                        visible: root.pluginPaneOpen && root.pluginPaneError === "" && status !== Loader.Error
+                        onStatusChanged: {
+                            if (status === Loader.Error)
+                                root.pluginPaneError = errorString();
+                            else if (status === Loader.Ready)
+                                root.pluginPaneError = "";
+                        }
+                    }
                 }
             }
         }

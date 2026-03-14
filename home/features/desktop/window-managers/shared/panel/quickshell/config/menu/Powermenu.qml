@@ -146,7 +146,7 @@ PanelWindow {
         anchors.fill: parent
         color: Colors.background
         opacity: root.isVisible ? 0.4 : 0.0
-        Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+        Behavior on opacity { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutCubic } }
       }
     }
 
@@ -159,9 +159,9 @@ PanelWindow {
       anchors.leftMargin: root.edgeMargins.left + Math.max(20, (root.usableWidth - width) / 2)
       spacing: 40
       scale: root.isVisible ? 1.0 : 0.9
-      Behavior on scale { NumberAnimation { id: pmScaleAnim; duration: 300; easing.type: Easing.OutBack } }
+      Behavior on scale { NumberAnimation { id: pmScaleAnim; duration: Colors.durationSlow; easing.type: Easing.OutBack } }
       opacity: root.isVisible ? 1.0 : 0.0
-      Behavior on opacity { NumberAnimation { id: pmFadeAnim; duration: 300; easing.type: Easing.OutCubic } }
+      Behavior on opacity { NumberAnimation { id: pmFadeAnim; duration: Colors.durationSlow; easing.type: Easing.OutCubic } }
       layer.enabled: pmScaleAnim.running || pmFadeAnim.running
 
       Text {
@@ -209,7 +209,7 @@ PanelWindow {
               radius: Colors.radiusLarge
               color: Colors.highlight
               opacity: mouseArea.containsMouse || parent.isFocused ? 1.0 : 0.0
-              Behavior on opacity { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+              Behavior on opacity { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
             }
 
             // Layer 3: Active/pending overlay
@@ -218,7 +218,7 @@ PanelWindow {
               radius: Colors.radiusLarge
               color: parent.activeColor
               opacity: parent.isPending ? 0.3 : 0.0
-              Behavior on opacity { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+              Behavior on opacity { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
             }
 
             // Focus/pending border
@@ -231,7 +231,7 @@ PanelWindow {
                 : mouseArea.containsMouse ? modelData.color
                 : Colors.border
               border.width: parent.isPending ? 3 : (parent.isFocused ? 2 : 2)
-              Behavior on border.color { ColorAnimation { duration: 160 } }
+              Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
             }
 
             ColumnLayout {
@@ -273,7 +273,7 @@ PanelWindow {
         color: root.timerActive ? Colors.primary : Colors.fgDim
         font.pixelSize: Colors.fontSizeMedium
         Layout.alignment: Qt.AlignHCenter
-        Behavior on color { ColorAnimation { duration: 160 } }
+        Behavior on color { ColorAnimation { duration: Colors.durationFast } }
       }
     }
   }

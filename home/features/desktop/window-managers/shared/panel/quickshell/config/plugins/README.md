@@ -29,8 +29,15 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
 
 ## Notes
 
-- `type` can be `bar-widget`, `desktop-widget`, `launcher-provider`, `daemon`, or `multi`.
+- `type` can be `bar-widget`, `desktop-widget`, `launcher-provider`, `control-center-widget`, `daemon`, or `multi`.
 - `entryPoints` values must be `.qml` paths and must not contain `..`.
+- Control Center plugins may provide `entryPoints.controlCenterWidget` and optional `entryPoints.controlCenterDetail`.
+- Control Center widgets are rendered inside the main Control Center surface and may declare any of these optional injected properties:
+  - `pluginApi`
+  - `pluginManifest`
+  - `pluginService`
+  - `controlCenterRoot`
+  - `manager`
 - Unknown/invalid manifests are rejected and surfaced in the Plugins settings tab.
 - Plugin runtime status is exposed through `PluginService.pluginStatuses` with state/error metadata.
 - Plugin state persistence uses a state envelope: `{ stateVersion, updatedAt, payload }`. Legacy plain object state files are auto-normalized.

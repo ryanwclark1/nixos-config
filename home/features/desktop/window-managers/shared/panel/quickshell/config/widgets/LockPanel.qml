@@ -418,7 +418,7 @@ Item {
     color: Colors.withAlpha(Colors.text, 0.05)
     border.color: (root.timerActive && root.pendingAction === action) ? Colors.error : Colors.border
     border.width: 1
-    Behavior on border.color { ColorAnimation { duration: 160 } }
+    Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
 
     StateLayer {
       id: sessionStateLayer
@@ -430,7 +430,7 @@ Item {
       anchors.centerIn: parent
       text: parent.icon
       color: (root.timerActive && root.pendingAction === parent.action) ? Colors.error : Colors.fgSecondary
-      Behavior on color { ColorAnimation { duration: 160 } }
+      Behavior on color { ColorAnimation { duration: Colors.durationFast } }
       font.family: Colors.fontMono
       font.pixelSize: Colors.fontSizeLarge
     }

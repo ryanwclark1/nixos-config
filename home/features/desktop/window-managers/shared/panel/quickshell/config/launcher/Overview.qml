@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Wayland._Screencopy
 import Quickshell.Wayland
@@ -58,7 +57,7 @@ Scope {
 
             opacity: 0.0
             Component.onCompleted: opacity = 1.0
-            Behavior on opacity { NumberAnimation { duration: 200; easing.type: Easing.InOutQuad } }
+            Behavior on opacity { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.InOutQuad } }
 
             MouseArea {
               anchors.fill: parent
@@ -157,7 +156,7 @@ Scope {
                             radius: Colors.radiusSmall
                             border.color: hoverArea.containsMouse ? Colors.text : Colors.border
                             border.width: 1
-                            Behavior on border.color { ColorAnimation { duration: 160 } }
+                            Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
                             clip: true
 
                             property string windowAddress: modelData.address
@@ -193,7 +192,7 @@ Scope {
                                   visible: opacity > 0
                                   anchors.top: parent.top; anchors.right: parent.right
                                   anchors.margins: Colors.spacingXS
-                                  Behavior on opacity { NumberAnimation { duration: 150 } }
+                                  Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
 
                                   Text {
                                     anchors.centerIn: parent

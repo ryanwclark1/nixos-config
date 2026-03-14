@@ -161,7 +161,7 @@ BasePopupMenu {
             text: Colors.weatherIcon(modelData.condition)
             color: Colors.accent
             font.family: Colors.fontMono
-            font.pixelSize: 22
+            font.pixelSize: Colors.fontSizeXL
             Layout.alignment: root.compactMode ? Qt.AlignRight : Qt.AlignLeft
           }
 

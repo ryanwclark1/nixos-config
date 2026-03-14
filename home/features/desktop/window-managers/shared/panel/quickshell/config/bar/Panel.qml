@@ -32,6 +32,17 @@ Item {
   readonly property int runtimeSpacing: Colors.spacingM
   readonly property real computedOpacity: (barConfig && barConfig.opacity !== undefined) ? barConfig.opacity : Config.barOpacity
   readonly property bool floatingBar: barConfig && barConfig.floating !== undefined ? !!barConfig.floating : Config.barFloating
+  readonly property bool autoHide: !!(barConfig && barConfig.autoHide)
+  readonly property int autoHideDelay: (barConfig && barConfig.autoHideDelay) || 300
+  readonly property bool noBackground: !!(barConfig && barConfig.noBackground)
+  readonly property bool maximizeDetect: !!(barConfig && barConfig.maximizeDetect)
+  readonly property string scrollBehavior: (barConfig && barConfig.scrollBehavior) || "none"
+  readonly property bool shadowEnabled: !!(barConfig && barConfig.shadowEnabled)
+  readonly property real shadowOpacity: (barConfig && barConfig.shadowOpacity !== undefined) ? barConfig.shadowOpacity : 0.3
+  readonly property real barFontScale: (barConfig && barConfig.fontScale !== undefined) ? barConfig.fontScale : 1.0
+  readonly property real barIconScale: (barConfig && barConfig.iconScale !== undefined) ? barConfig.iconScale : 1.0
+  property bool _autoHidden: false
+  property bool _hovered: false
   readonly property string fullCavaData: {
     var vals = (SpectrumService && SpectrumService.values) ? SpectrumService.values : [];
     var blocks = ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"];
@@ -186,13 +197,78 @@ Item {
     return unknownComponent;
   }
 
+  // ── Auto-hide logic ─────────────────────────
+  Timer {
+    id: autoHideTimer
+    interval: root.autoHideDelay
+    onTriggered: {
+      if (root.autoHide && !root._hovered)
+        root._autoHidden = true;
+    }
+  }
+
+  onAutoHideChanged: {
+    if (!autoHide) root._autoHidden = false;
+  }
+
+  on_HoveredChanged: {
+    if (_hovered) {
+      root._autoHidden = false;
+      autoHideTimer.stop();
+    } else if (root.autoHide) {
+      autoHideTimer.restart();
+    }
+  }
+
+  // Hover sensor for auto-hide (covers the full bar area)
+  HoverHandler {
+    id: barHoverHandler
+    onHoveredChanged: root._hovered = barHoverHandler.hovered
+  }
+
+  // ── Scroll behavior ───────────────────────────
+  WheelHandler {
+    enabled: root.scrollBehavior !== "none"
+    onWheel: event => {
+      var delta = event.angleDelta.y;
+      if (delta === 0) return;
+      if (root.scrollBehavior === "workspace") {
+        if (delta > 0)
+          CompositorAdapter.focusWorkspace("prev");
+        else
+          CompositorAdapter.focusWorkspace("next");
+      } else if (root.scrollBehavior === "volume") {
+        var step = delta > 0 ? 0.02 : -0.02;
+        AudioService.setVolume("@DEFAULT_AUDIO_SINK@", Math.max(0, Math.min(1, AudioService.outputVolume + step)));
+      }
+    }
+  }
+
+  // ── Shadow ────────────────────────────────────
+  Rectangle {
+    visible: root.shadowEnabled && !root._autoHidden
+    anchors.fill: parent
+    anchors.margins: -4
+    z: -1
+    radius: floatingBar ? Colors.radiusMedium + 4 : 0
+    color: "transparent"
+    border.color: "transparent"
+    Rectangle {
+      anchors.fill: parent
+      radius: parent.radius
+      color: Qt.rgba(0, 0, 0, root.shadowOpacity)
+      z: -1
+    }
+  }
+
+  // ── Background ────────────────────────────────
   Rectangle {
     anchors.fill: parent
-    color: Colors.bgGlass
-    opacity: computedOpacity
+    color: root.noBackground ? "transparent" : Colors.bgGlass
+    opacity: root.noBackground ? 0 : computedOpacity
     radius: floatingBar ? Colors.radiusMedium : 0
-    border.color: floatingBar ? Colors.border : "transparent"
-    border.width: floatingBar ? 1 : 0
+    border.color: (floatingBar && !root.noBackground) ? Colors.border : "transparent"
+    border.width: (floatingBar && !root.noBackground) ? 1 : 0
   }
 
   Row {
@@ -478,7 +554,7 @@ Item {
         tooltipText: "System updates"
 
         Row {
-          spacing: 6
+          spacing: Colors.spacingXS
           Text { text: updatesRoot.updatesIcon; color: Colors.accent; font.pixelSize: Colors.fontSizeXL; font.family: Colors.fontMono; anchors.verticalCenter: parent.verticalCenter }
           Text { visible: !root.vertical; text: updatesRoot.updatesCount; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.DemiBold; anchors.verticalCenter: parent.verticalCenter }
         }
@@ -530,7 +606,7 @@ Item {
 
       SharedWidgets.CommandPoll {
         id: inhibitorPoll
-        interval: 2000
+        interval: 5000
         running: inhibitorRoot.visible
         command: ["sh", "-c", "[ -f /tmp/wayland_idle_inhibitor.pid ] && echo true || echo false"]
         parse: function(out) { return String(out || "").trim() === "true" }
@@ -682,7 +758,7 @@ Item {
       }
       onClicked: root.requestSurface("musicMenu", this)
 
-      Behavior on width { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+      Behavior on width { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutCubic } }
 
       Row {
         spacing: Colors.spacingS
@@ -728,7 +804,7 @@ Item {
       tooltipText: PrivacyService.activeLabel || "Privacy"
       onClicked: root.requestSurface("privacyMenu", this)
 
-      Behavior on width { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
+      Behavior on width { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
 
       Row {
         spacing: Colors.spacingXS
@@ -828,7 +904,7 @@ Item {
         : (PrinterService.defaultPrinter ? PrinterService.defaultPrinter : "Printers")
       onClicked: root.requestSurface("printerMenu", this)
 
-      Behavior on width { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
+      Behavior on width { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
 
       Row {
         spacing: Colors.spacingXS
@@ -839,7 +915,7 @@ Item {
           font.family: Colors.fontMono
           font.pixelSize: Colors.fontSizeLarge
           anchors.verticalCenter: parent.verticalCenter
-          Behavior on color { ColorAnimation { duration: 200 } }
+          Behavior on color { ColorAnimation { duration: Colors.durationNormal } }
         }
 
         Rectangle {

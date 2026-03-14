@@ -33,10 +33,71 @@ Item {
                 label: "Blur"
                 currentValue: Config.blurEnabled ? "enabled" : "disabled"
                 options: [
-                    { value: "enabled", label: "Enabled" },
-                    { value: "disabled", label: "Disabled" }
+                    {
+                        value: "enabled",
+                        label: "Enabled"
+                    },
+                    {
+                        value: "disabled",
+                        label: "Disabled"
+                    }
                 ]
                 onModeSelected: value => Config.blurEnabled = value === "enabled"
+            }
+        }
+
+        SettingsCard {
+            title: "Typography"
+            iconName: "󰛖"
+            description: "Font families and sizing are appearance settings, independent from the active color theme."
+
+            SettingsTextInputRow {
+                label: "Primary Font Family"
+                placeholderText: "Inter"
+                leadingIcon: "󰛖"
+                text: Config.fontFamily
+                onTextEdited: value => Config.fontFamily = value
+            }
+
+            SettingsTextInputRow {
+                label: "Monospace Font Family"
+                placeholderText: "JetBrainsMono Nerd Font"
+                leadingIcon: "󰍛"
+                text: Config.monoFontFamily
+                onTextEdited: value => Config.monoFontFamily = value
+            }
+
+            SettingsSliderRow {
+                label: "Font Scale"
+                min: 0.85
+                max: 1.35
+                value: Config.fontScale
+                step: 0.05
+                onMoved: v => Config.fontScale = v
+            }
+        }
+
+        SettingsCard {
+            title: "Shape & Density"
+            iconName: "󰉵"
+            description: "Tune radius and spacing without changing the selected color theme."
+
+            SettingsSliderRow {
+                label: "Corner Radius Scale"
+                min: 0.8
+                max: 1.35
+                value: Config.radiusScale
+                step: 0.05
+                onMoved: v => Config.radiusScale = v
+            }
+
+            SettingsSliderRow {
+                label: "Spacing Scale"
+                min: 0.85
+                max: 1.35
+                value: Config.spacingScale
+                step: 0.05
+                onMoved: v => Config.spacingScale = v
             }
         }
     }

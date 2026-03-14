@@ -37,7 +37,7 @@ Rectangle {
         color: root._active ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.08) : "transparent"
         Behavior on color {
             ColorAnimation {
-                duration: 150
+                duration: Colors.durationFast
             }
         }
     }

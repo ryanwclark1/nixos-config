@@ -10,6 +10,7 @@ Rectangle {
   border.color: actualFocused ? Colors.primary : "transparent"; border.width: 1
   clip: true
   scale: mouseArea.containsMouse ? 1.06 : 1.0
+  layer.enabled: mouseArea.containsMouse
 
   property string appClass: ""
   property string appAddress: ""
@@ -46,8 +47,8 @@ Rectangle {
     return isPinned ? "Pinned app" : "Running app";
   }
 
-  Behavior on color { ColorAnimation { duration: 160 } }
-  Behavior on scale { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+  Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+  Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
 
   // Running indicator dot
   Rectangle {

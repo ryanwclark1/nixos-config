@@ -4,6 +4,9 @@ import "../services"
 MouseArea {
   id: root
 
+  // Promote to GPU texture only during hover/press animations
+  layer.enabled: containsMouse || pressed
+
   property string tooltipText: ""
   property var anchorWindow: null
   property bool isActive: false
@@ -27,7 +30,7 @@ MouseArea {
 
   // Y-offset physics: hover lifts, press pushes down
   property real _yOffset: pressed ? 1.5 : (containsMouse ? -0.5 : 0)
-  Behavior on _yOffset { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+  Behavior on _yOffset { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
   transform: Translate { y: root._yOffset }
 
   property bool shimmerEnabled: true
@@ -40,7 +43,7 @@ MouseArea {
     clip: true
     border.color: root.isActive ? Colors.primary : "transparent"
     border.width: root.isActive ? 1 : 0
-    Behavior on color { ColorAnimation { duration: 160 } }
+    Behavior on color { ColorAnimation { duration: Colors.durationFast } }
 
     // Shimmer sweep on hover
     Rectangle {

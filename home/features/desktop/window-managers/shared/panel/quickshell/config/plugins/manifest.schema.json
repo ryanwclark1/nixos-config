@@ -24,7 +24,7 @@
     "version": { "type": "string", "minLength": 1 },
     "type": {
       "type": "string",
-      "enum": ["bar-widget", "desktop-widget", "launcher-provider", "daemon", "multi"]
+      "enum": ["bar-widget", "desktop-widget", "launcher-provider", "control-center-widget", "daemon", "multi"]
     },
     "permissions": {
       "type": "array",
@@ -51,6 +51,8 @@
         "barWidget": { "type": "string", "pattern": "^(?!.*\\.\\.).*\\.qml$" },
         "desktopWidget": { "type": "string", "pattern": "^(?!.*\\.\\.).*\\.qml$" },
         "launcherProvider": { "type": "string", "pattern": "^(?!.*\\.\\.).*\\.qml$" },
+        "controlCenterWidget": { "type": "string", "pattern": "^(?!.*\\.\\.).*\\.qml$" },
+        "controlCenterDetail": { "type": "string", "pattern": "^(?!.*\\.\\.).*\\.qml$" },
         "daemon": { "type": "string", "pattern": "^(?!.*\\.\\.).*\\.qml$" },
         "settings": { "type": "string", "pattern": "^(?!.*\\.\\.).*\\.qml$" }
       },
@@ -71,6 +73,10 @@
       "then": { "properties": { "entryPoints": { "required": ["launcherProvider"] } } }
     },
     {
+      "if": { "properties": { "type": { "const": "control-center-widget" } } },
+      "then": { "properties": { "entryPoints": { "required": ["controlCenterWidget"] } } }
+    },
+    {
       "if": { "properties": { "type": { "const": "daemon" } } },
       "then": { "properties": { "entryPoints": { "required": ["daemon"] } } }
     },
@@ -81,6 +87,7 @@
           { "properties": { "entryPoints": { "required": ["barWidget"] } } },
           { "properties": { "entryPoints": { "required": ["desktopWidget"] } } },
           { "properties": { "entryPoints": { "required": ["launcherProvider"] } } },
+          { "properties": { "entryPoints": { "required": ["controlCenterWidget"] } } },
           { "properties": { "entryPoints": { "required": ["daemon"] } } }
         ]
       }

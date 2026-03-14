@@ -265,6 +265,84 @@ Item {
                 ]
                 onModeSelected: value => root.applyPatch({ floating: value === "floating" })
             }
+
+            SettingsToggleRow {
+                label: "Auto-Hide"
+                icon: "󰘊"
+                checked: root.selectedBar ? !!root.selectedBar.autoHide : false
+                onToggled: root.applyPatch({ autoHide: !(root.selectedBar && root.selectedBar.autoHide) })
+            }
+
+            SettingsSliderRow {
+                visible: root.selectedBar && root.selectedBar.autoHide
+                label: "Auto-Hide Delay"
+                min: 100
+                max: 2000
+                step: 100
+                unit: "ms"
+                value: root.selectedBar ? root.selectedBar.autoHideDelay : 300
+                onMoved: value => root.applyPatch({ autoHideDelay: value })
+            }
+
+            SettingsToggleRow {
+                label: "No Background"
+                icon: "󰖲"
+                checked: root.selectedBar ? !!root.selectedBar.noBackground : false
+                onToggled: root.applyPatch({ noBackground: !(root.selectedBar && root.selectedBar.noBackground) })
+            }
+
+            SettingsToggleRow {
+                label: "Hide on Fullscreen"
+                icon: "󰊓"
+                checked: root.selectedBar ? !!root.selectedBar.maximizeDetect : false
+                onToggled: root.applyPatch({ maximizeDetect: !(root.selectedBar && root.selectedBar.maximizeDetect) })
+            }
+
+            SettingsModeRow {
+                label: "Scroll Behavior"
+                currentValue: root.selectedBar ? root.selectedBar.scrollBehavior : "none"
+                options: [
+                    { value: "none", label: "None" },
+                    { value: "workspace", label: "Workspace" },
+                    { value: "volume", label: "Volume" }
+                ]
+                onModeSelected: value => root.applyPatch({ scrollBehavior: value })
+            }
+
+            SettingsToggleRow {
+                label: "Shadow"
+                icon: "󰘷"
+                checked: root.selectedBar ? !!root.selectedBar.shadowEnabled : false
+                onToggled: root.applyPatch({ shadowEnabled: !(root.selectedBar && root.selectedBar.shadowEnabled) })
+            }
+
+            SettingsSliderRow {
+                visible: root.selectedBar && root.selectedBar.shadowEnabled
+                label: "Shadow Opacity"
+                min: 0.1
+                max: 1.0
+                step: 0.05
+                value: root.selectedBar ? root.selectedBar.shadowOpacity : 0.3
+                onMoved: value => root.applyPatch({ shadowOpacity: value })
+            }
+
+            SettingsSliderRow {
+                label: "Font Scale"
+                min: 0.5
+                max: 2.0
+                step: 0.1
+                value: root.selectedBar ? root.selectedBar.fontScale : 1.0
+                onMoved: value => root.applyPatch({ fontScale: value })
+            }
+
+            SettingsSliderRow {
+                label: "Icon Scale"
+                min: 0.5
+                max: 2.0
+                step: 0.1
+                value: root.selectedBar ? root.selectedBar.iconScale : 1.0
+                onMoved: value => root.applyPatch({ iconScale: value })
+            }
         }
     }
 }

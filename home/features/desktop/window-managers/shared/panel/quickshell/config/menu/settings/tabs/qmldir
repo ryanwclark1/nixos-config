@@ -15,3 +15,8 @@ ThemeTab 1.0 ThemeTab.qml
 TimeWeatherTab 1.0 TimeWeatherTab.qml
 WallpaperTab 1.0 WallpaperTab.qml
 WidgetsTab 1.0 WidgetsTab.qml
+NotificationsTab 1.0 NotificationsTab.qml
+AudioTab 1.0 AudioTab.qml
+WorkspaceTab 1.0 WorkspaceTab.qml
+NightLightTab 1.0 NightLightTab.qml
+PresetsTab 1.0 PresetsTab.qml

@@ -27,8 +27,8 @@ Item {
     border.color: root.checked ? "transparent" : Colors.border
     border.width: root.checked ? 0 : 1
 
-    Behavior on color { ColorAnimation { duration: 160 } }
-    Behavior on border.color { ColorAnimation { duration: 160 } }
+    Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+    Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
 
     StateLayer {
       id: trackStateLayer
@@ -57,15 +57,15 @@ Item {
       : 2
 
     Behavior on x {
-      NumberAnimation { duration: 200; easing.type: Easing.OutBack; easing.overshoot: 1.4 }
+      NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutBack; easing.overshoot: 1.4 }
     }
     Behavior on width {
-      NumberAnimation { duration: 200; easing.type: Easing.OutBack }
+      NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutBack }
     }
     Behavior on height {
-      NumberAnimation { duration: 200; easing.type: Easing.OutBack }
+      NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutBack }
     }
-    Behavior on color { ColorAnimation { duration: 160 } }
+    Behavior on color { ColorAnimation { duration: Colors.durationFast } }
 
     // Press squish
     scale: mouse.pressed ? 0.88 : 1.0
@@ -79,7 +79,7 @@ Item {
       font.pixelSize: Colors.fontSizeXS
       color: Colors.primary
       opacity: root.checked ? 1.0 : 0.0
-      Behavior on opacity { NumberAnimation { duration: 160 } }
+      Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
     }
   }
 

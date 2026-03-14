@@ -122,7 +122,7 @@ Item {
       SequentialAnimation {
         id: bounceAnim
         NumberAnimation { target: iconContainer; property: root.vertical ? "x" : "y"; to: 0; duration: 100; easing.type: Easing.OutQuad }
-        NumberAnimation { target: iconContainer; property: root.vertical ? "x" : "y"; to: 4; duration: 200; easing.type: Easing.OutBounce }
+        NumberAnimation { target: iconContainer; property: root.vertical ? "x" : "y"; to: 4; duration: Colors.durationNormal; easing.type: Easing.OutBounce }
       }
 
       onToplevelsChanged: {
@@ -186,8 +186,8 @@ Item {
         transform: Translate {
           x: root.vertical ? 0 : iconContainer.shiftMain
           y: root.vertical ? iconContainer.shiftMain : 0
-          Behavior on x { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
-          Behavior on y { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+          Behavior on x { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
+          Behavior on y { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
         }
 
         Rectangle {
@@ -195,7 +195,7 @@ Item {
           radius: Colors.radiusSmall
           color: "transparent"
           scale: mouseArea.containsMouse ? 1.15 : 1.0
-          Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutBack } }
+          Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutBack } }
 
           StateLayer {
             hovered: mouseArea.containsMouse
@@ -310,7 +310,7 @@ Item {
                   return Colors.primary;
                 return Colors.fgSecondary;
               }
-              Behavior on color { ColorAnimation { duration: 160 } }
+              Behavior on color { ColorAnimation { duration: Colors.durationFast } }
             }
           }
         }
@@ -332,7 +332,7 @@ Item {
                   return Colors.primary;
                 return Colors.fgSecondary;
               }
-              Behavior on color { ColorAnimation { duration: 160 } }
+              Behavior on color { ColorAnimation { duration: Colors.durationFast } }
             }
           }
         }

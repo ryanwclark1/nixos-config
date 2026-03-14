@@ -83,9 +83,9 @@ PanelWindow {
     opacity: root.showContent ? 1.0 : 0.0
     visible: opacity > 0
 
-    Behavior on x { NumberAnimation { id: ncSlideAnim; duration: 300; easing.type: Easing.OutCubic } }
-    Behavior on y { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
-    Behavior on opacity { NumberAnimation { id: ncFadeAnim; duration: 250 } }
+    Behavior on x { NumberAnimation { id: ncSlideAnim; duration: Colors.durationSlow; easing.type: Easing.OutCubic } }
+    Behavior on y { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutCubic } }
+    Behavior on opacity { NumberAnimation { id: ncFadeAnim; duration: Colors.durationNormal } }
     layer.enabled: ncSlideAnim.running || ncFadeAnim.running
     Keys.onEscapePressed: root.closeRequested()
 
@@ -117,7 +117,7 @@ PanelWindow {
               ? (root.manager && root.manager.dndEnabled ? Qt.darker(Colors.error, 1.1) : Colors.highlightLight)
               : (root.manager && root.manager.dndEnabled ? Colors.error : Colors.highlight)
             radius: 6
-            Behavior on color { ColorAnimation { duration: 160 } }
+            Behavior on color { ColorAnimation { duration: Colors.durationFast } }
             Text {
               anchors.centerIn: parent
               text: root.manager && root.manager.dndEnabled ? "󰂛 DND" : "󰂚 DND"
@@ -227,12 +227,12 @@ PanelWindow {
         }
 
         remove: Transition {
-          NumberAnimation { property: "opacity"; to: 0; duration: 300 }
-          NumberAnimation { property: "scale"; to: 0.9; duration: 300 }
+          NumberAnimation { property: "opacity"; to: 0; duration: Colors.durationSlow }
+          NumberAnimation { property: "scale"; to: 0.9; duration: Colors.durationSlow }
         }
 
         displaced: Transition {
-          NumberAnimation { properties: "x,y"; duration: 300; easing.type: Easing.OutCubic }
+          NumberAnimation { properties: "x,y"; duration: Colors.durationSlow; easing.type: Easing.OutCubic }
         }
 
         function toggleGroup(name) {
@@ -272,15 +272,17 @@ PanelWindow {
             // App Count Badge
             Rectangle {
               width: 20; height: 16; radius: Colors.radiusSmall; color: Colors.highlight
-              Text { anchors.centerIn: parent; text: getCount(); color: Colors.primary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
-              function getCount() {
+              readonly property int sectionCount: {
                 var count = 0;
-                for (var i = 0; i < root.manager.notifications.count; i++) {
-                  var n = root.manager.notifications.get(i);
+                var notifs = root.manager ? root.manager.notifications : null;
+                if (!notifs) return 0;
+                for (var i = 0; i < notifs.count; i++) {
+                  var n = notifs.get(i);
                   if (n && n.appName === section) count++;
                 }
                 return count;
               }
+              Text { anchors.centerIn: parent; text: parent.sectionCount; color: Colors.primary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
             }
 
             Rectangle {
@@ -512,10 +514,15 @@ PanelWindow {
           }
         }
 
-        Repeater {
+        ListView {
+          width: parent.width
+          height: Math.min(contentHeight, 300)
+          clip: true
           model: root.manager ? root.manager.archivedNotifications : null
+          cacheBuffer: 120
+          spacing: Colors.spacingS
           delegate: Rectangle {
-            width: parent.width; height: 60; color: Colors.bgWidget; radius: Colors.radiusXS; opacity: 0.7
+            width: ListView.view.width; height: 60; color: Colors.bgWidget; radius: Colors.radiusXS; opacity: 0.7
             Row {
               anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: 10
               Rectangle { width: 32; height: 32; color: "transparent"

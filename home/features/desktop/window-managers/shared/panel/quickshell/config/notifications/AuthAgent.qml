@@ -35,7 +35,8 @@ PanelWindow {
       anchors.fill: parent
       color: Colors.background
       opacity: root.visible ? 0.5 : 0.0
-      Behavior on opacity { NumberAnimation { duration: 200 } }
+      layer.enabled: opacity > 0 && opacity < 0.5
+      Behavior on opacity { NumberAnimation { duration: Colors.durationNormal } }
     }
   }
 

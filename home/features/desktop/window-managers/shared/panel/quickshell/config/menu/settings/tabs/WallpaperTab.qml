@@ -993,7 +993,7 @@ Item {
                         }
                         Behavior on color {
                             ColorAnimation {
-                                duration: 150
+                                duration: Colors.durationFast
                             }
                         }
                     }
@@ -1015,7 +1015,7 @@ Item {
                     }
                     Behavior on color {
                         ColorAnimation {
-                            duration: 150
+                            duration: Colors.durationFast
                         }
                     }
                 }
@@ -1155,12 +1155,12 @@ Item {
 
                         Behavior on border.color {
                             ColorAnimation {
-                                duration: 150
+                                duration: Colors.durationFast
                             }
                         }
                         Behavior on color {
                             ColorAnimation {
-                                duration: 150
+                                duration: Colors.durationFast
                             }
                         }
 
@@ -1180,7 +1180,7 @@ Item {
                             }
                             Behavior on opacity {
                                 NumberAnimation {
-                                    duration: 200
+                                    duration: Colors.durationNormal
                                 }
                             }
                         }

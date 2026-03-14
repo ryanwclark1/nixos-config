@@ -32,8 +32,8 @@ Item {
     clip: true
 
     scale: cardHover.hovered ? root.hoverScale : 1.0
-    Behavior on scale { NumberAnimation { duration: 300; easing.type: Easing.OutQuint } }
-    Behavior on border.color { ColorAnimation { duration: 160 } }
+    Behavior on scale { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutQuint } }
+    Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
 
     HoverHandler { id: cardHover }
 

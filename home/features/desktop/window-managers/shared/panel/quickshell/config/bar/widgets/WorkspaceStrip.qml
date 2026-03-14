@@ -7,15 +7,47 @@ Flow {
 
   property var state: null
   property bool vertical: false
-  property color activeColor: Colors.highlight
+  property color activeColor: Config.workspaceActiveColor !== "" ? Config.workspaceActiveColor : Colors.highlight
   property color inactiveColor: Colors.surface
   property color textColor: Colors.text
+  readonly property color urgentColor: Config.workspaceUrgentColor !== "" ? Config.workspaceUrgentColor : Colors.error
+
+  // Pill size presets
+  readonly property int pillHeight: Config.workspacePillSize === "compact" ? 16 : (Config.workspacePillSize === "large" ? 28 : 20)
+  readonly property int pillMinWidth: Config.workspacePillSize === "compact" ? 18 : (Config.workspacePillSize === "large" ? 30 : 22)
+  readonly property int pillFontSize: Config.workspacePillSize === "compact" ? Colors.fontSizeXS : (Config.workspacePillSize === "large" ? Colors.fontSizeMedium : Colors.fontSizeSmall)
 
   flow: vertical ? Flow.TopToBottom : Flow.LeftToRight
   spacing: 6
 
+  // Scroll-to-switch workspace
+  WheelHandler {
+    enabled: Config.workspaceScrollEnabled
+    onWheel: event => {
+      var delta = Config.workspaceReverseScroll ? -event.angleDelta.y : event.angleDelta.y;
+      if (delta > 0)
+        CompositorAdapter.focusWorkspace("prev");
+      else if (delta < 0)
+        CompositorAdapter.focusWorkspace("next");
+    }
+  }
+
   Repeater {
-    model: root.state ? root.state.workspaces : []
+    model: {
+      var workspaces = root.state ? root.state.workspaces : [];
+      if (!Config.workspaceShowEmpty) {
+        var filtered = [];
+        for (var i = 0; i < workspaces.length; i++) {
+          var ws = workspaces[i];
+          var isActive = root.state && ws.id === root.state.activeWorkspace;
+          var hasWindows = ws.windows !== undefined ? ws.windows > 0 : true;
+          if (isActive || hasWindows || ws.urgent)
+            filtered.push(ws);
+        }
+        return filtered;
+      }
+      return workspaces;
+    }
     delegate: Rectangle {
       id: wsPill
 
@@ -23,34 +55,29 @@ Flow {
       readonly property bool isUrgent: !isActive && !!modelData.urgent
 
       radius: 6
-      height: 20
-      width: Math.max(22, label.implicitWidth + 10)
+      height: root.pillHeight
+      width: Math.max(root.pillMinWidth, label.implicitWidth + 10)
       color: isActive ? root.activeColor : root.inactiveColor
 
-      // Smooth color transition for normal active/inactive state changes.
-      // Disabled while the urgent animation is running so it doesn't fight the
-      // SequentialAnimation below.
       Behavior on color {
         enabled: !wsPill.isUrgent
-        ColorAnimation { duration: 160 }
+        ColorAnimation { duration: Colors.durationFast }
       }
 
-      // Urgent blink: cycle between Colors.error and Colors.warning while
-      // the workspace has an urgent window AND is not the focused workspace.
       SequentialAnimation on color {
         id: urgentAnim
         running: wsPill.isUrgent
         loops: Animation.Infinite
-        ColorAnimation { to: Colors.error;   duration: 600; easing.type: Easing.InOutSine }
-        ColorAnimation { to: Colors.warning; duration: 600; easing.type: Easing.InOutSine }
+        ColorAnimation { to: root.urgentColor; duration: 600; easing.type: Easing.InOutSine }
+        ColorAnimation { to: Colors.warning;   duration: 600; easing.type: Easing.InOutSine }
       }
 
       Text {
         id: label
         anchors.centerIn: parent
         color: root.textColor
-        font.pixelSize: Colors.fontSizeSmall
-        text: modelData.name
+        font.pixelSize: root.pillFontSize
+        text: Config.workspaceShowNames && modelData.name ? modelData.name : modelData.name
       }
 
       MouseArea {

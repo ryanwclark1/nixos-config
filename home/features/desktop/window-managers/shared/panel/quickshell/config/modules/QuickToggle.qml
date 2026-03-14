@@ -20,9 +20,9 @@ Rectangle {
 
   opacity: enabled ? 1.0 : 0.4
   scale: toggleMouse.pressed ? 0.95 : 1.0
-  Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutBack } }
-  Behavior on color { ColorAnimation { duration: 160 } }
-  Behavior on border.color { ColorAnimation { duration: 160 } }
+  Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutBack } }
+  Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+  Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
 
   RowLayout {
     anchors.fill: parent
@@ -35,7 +35,7 @@ Rectangle {
       radius: height / 2
       color: active ? Colors.withAlpha(Colors.text, 0.2) : Colors.surface
       scale: toggleMouse.containsMouse ? 1.1 : 1.0
-      Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }
+      Behavior on scale { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutBack } }
 
       Text {
         anchors.centerIn: parent

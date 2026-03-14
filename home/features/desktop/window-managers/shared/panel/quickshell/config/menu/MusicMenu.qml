@@ -121,7 +121,7 @@ BasePopupMenu {
         text: "󰝚"
         color: Colors.fgDim
         font.family: Colors.fontMono
-        font.pixelSize: 48
+        font.pixelSize: Colors.fontSizeHuge * 2
         visible: albumArt.status !== Image.Ready
       }
 

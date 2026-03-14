@@ -3,7 +3,6 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.Pipewire
 import Quickshell.Widgets
-import Quickshell.Io
 import Quickshell.Wayland
 import "../modules"
 import "../services"
@@ -280,7 +279,7 @@ Scope {
           Behavior on opacity {
             NumberAnimation {
               id: osdFadeAnim
-              duration: root.shouldShowOsd ? 160 : 320
+              duration: root.shouldShowOsd ? Colors.durationFast : Colors.durationFast * 2
               easing.type: root.shouldShowOsd ? Easing.OutQuad : Easing.InCubic
             }
           }
@@ -301,7 +300,7 @@ Scope {
             anchors.margins: 1
             radius: parent.radius - 1
             color: Colors.withAlpha(root.osdColor, 0.06 + (root.currentValue / root.maxValue) * 0.08)
-            Behavior on color { ColorAnimation { duration: 160 } }
+            Behavior on color { ColorAnimation { duration: Colors.durationFast } }
           }
 
           // Circular style (original)

@@ -273,7 +273,7 @@ Scope {
               color: Colors.primary
               opacity: screenDelegate.hidden ? 0.6 : 0.0
               visible: opacity > 0
-              Behavior on opacity { NumberAnimation { duration: 160 } }
+              Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
             }
           }
         }
@@ -311,9 +311,9 @@ Scope {
               visible: opacity > 0
               property real xOffset: screenDelegate.hidden ? (screenDelegate.isLeft ? -20 : (screenDelegate.isRight ? 20 : 0)) : 0
               property real yOffset: screenDelegate.hidden ? (screenDelegate.isBottom ? 20 : (screenDelegate.isTop ? -20 : 0)) : 0
-              Behavior on opacity { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-              Behavior on xOffset { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-              Behavior on yOffset { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+              Behavior on opacity { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
+              Behavior on xOffset { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
+              Behavior on yOffset { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
               transform: Translate { x: dockAnimWrapper.xOffset; y: dockAnimWrapper.yOffset }
 
               MouseArea {

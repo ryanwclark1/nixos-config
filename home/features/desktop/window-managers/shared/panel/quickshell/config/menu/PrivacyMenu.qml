@@ -23,8 +23,8 @@ BasePopupMenu {
       : Colors.cardSurface
     border.color: PrivacyService.anyActive ? Colors.withAlpha(Colors.warning, 0.4) : Colors.border
     border.width: 1
-    Behavior on color { ColorAnimation { duration: 200 } }
-    Behavior on border.color { ColorAnimation { duration: 200 } }
+    Behavior on color { ColorAnimation { duration: Colors.durationNormal } }
+    Behavior on border.color { ColorAnimation { duration: Colors.durationNormal } }
 
     RowLayout {
       id: summaryRow

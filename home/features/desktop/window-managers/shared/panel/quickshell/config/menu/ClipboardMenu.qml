@@ -151,7 +151,7 @@ BasePopupMenu {
                 anchors.centerIn: parent
                 text: "󰅖"
                 color: deleteHover.containsMouse ? Colors.error : Colors.textDisabled
-                Behavior on color { ColorAnimation { duration: 160 } }
+                Behavior on color { ColorAnimation { duration: Colors.durationFast } }
                 font.family: Colors.fontMono
                 font.pixelSize: Colors.fontSizeSmall
               }

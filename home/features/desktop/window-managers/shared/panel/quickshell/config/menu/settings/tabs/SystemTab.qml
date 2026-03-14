@@ -458,6 +458,47 @@ Item {
         return true;
     }
 
+    function orderedControlCenterToggles() {
+        return ControlCenterRegistry.orderedQuickToggleItems();
+    }
+
+    function orderedControlCenterPlugins() {
+        return PluginService.visibleControlCenterPlugins.slice();
+    }
+
+    function moveOrderedValue(configKey, value, delta) {
+        var current = [];
+        if (configKey === "controlCenterToggleOrder")
+            current = orderedControlCenterToggles().map(function (item) {
+                return item.id;
+            });
+        else if (configKey === "controlCenterPluginOrder")
+            current = orderedControlCenterPlugins().map(function (item) {
+                return item.id;
+            });
+
+        var from = current.indexOf(value);
+        if (from < 0)
+            return;
+        var to = Math.max(0, Math.min(current.length - 1, from + delta));
+        if (to === from)
+            return;
+
+        current.splice(from, 1);
+        current.splice(to, 0, value);
+        Config[configKey] = current.slice();
+    }
+
+    function toggleHiddenListValue(configKey, value) {
+        var next = Array.isArray(Config[configKey]) ? Config[configKey].slice() : [];
+        var idx = next.indexOf(value);
+        if (idx >= 0)
+            next.splice(idx, 1);
+        else
+            next.push(value);
+        Config[configKey] = next;
+    }
+
     function resetLauncherDefaults() {
         Config.launcherDefaultMode = "drun";
         Config.launcherShowModeHints = true;
@@ -1435,6 +1476,187 @@ Item {
                 max: 460
                 value: Config.controlCenterWidth
                 onMoved: v => Config.controlCenterWidth = v
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: Colors.spacingS
+
+                Text {
+                    text: "Quick Toggles"
+                    color: Colors.text
+                    font.pixelSize: Colors.fontSizeMedium
+                    font.weight: Font.DemiBold
+                }
+
+                Text {
+                    text: "Control toggle visibility and order in the Control Center grid."
+                    color: Colors.fgSecondary
+                    font.pixelSize: Colors.fontSizeXS
+                    Layout.fillWidth: true
+                    wrapMode: Text.WordWrap
+                }
+
+                Repeater {
+                    model: root.orderedControlCenterToggles()
+
+                    delegate: SettingsListRow {
+                        required property var modelData
+                        readonly property bool hidden: Array.isArray(Config.controlCenterHiddenToggles) && Config.controlCenterHiddenToggles.indexOf(modelData.id) !== -1
+                        readonly property int rowIndex: root.orderedControlCenterToggles().findIndex(function (item) {
+                            return item.id === modelData.id;
+                        })
+                        minimumHeight: root.compactMode ? 72 : 60
+                        active: !hidden
+
+                        Text {
+                            text: modelData.icon || "󰖲"
+                            color: hidden ? Colors.fgDim : Colors.primary
+                            font.family: Colors.fontMono
+                            font.pixelSize: Colors.fontSizeLarge
+                        }
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 2
+
+                            Text {
+                                text: modelData.label || modelData.id
+                                color: Colors.text
+                                font.pixelSize: Colors.fontSizeMedium
+                                font.weight: Font.Medium
+                                Layout.fillWidth: true
+                                elide: Text.ElideRight
+                            }
+
+                            Text {
+                                text: hidden ? "Hidden" : "Visible"
+                                color: hidden ? Colors.fgDim : Colors.success
+                                font.pixelSize: Colors.fontSizeXS
+                            }
+                        }
+
+                        RowLayout {
+                            spacing: Colors.spacingS
+
+                            SettingsActionButton {
+                                compact: true
+                                iconName: "󰁍"
+                                label: "Up"
+                                enabled: rowIndex > 0
+                                onClicked: root.moveOrderedValue("controlCenterToggleOrder", modelData.id, -1)
+                            }
+
+                            SettingsActionButton {
+                                compact: true
+                                iconName: "󰁔"
+                                label: "Down"
+                                enabled: rowIndex >= 0 && rowIndex < root.orderedControlCenterToggles().length - 1
+                                onClicked: root.moveOrderedValue("controlCenterToggleOrder", modelData.id, 1)
+                            }
+
+                            SharedWidgets.ToggleSwitch {
+                                checked: !hidden
+                                onToggled: root.toggleHiddenListValue("controlCenterHiddenToggles", modelData.id)
+                            }
+                        }
+                    }
+                }
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: Colors.spacingS
+                visible: PluginService.controlCenterPlugins.length > 0
+
+                Text {
+                    text: "Plugin Widgets"
+                    color: Colors.text
+                    font.pixelSize: Colors.fontSizeMedium
+                    font.weight: Font.DemiBold
+                }
+
+                Text {
+                    text: "Manage third-party widgets exposed inside the Control Center."
+                    color: Colors.fgSecondary
+                    font.pixelSize: Colors.fontSizeXS
+                    Layout.fillWidth: true
+                    wrapMode: Text.WordWrap
+                }
+
+                Repeater {
+                    model: root.orderedControlCenterPlugins()
+
+                    delegate: SettingsListRow {
+                        required property var modelData
+                        readonly property bool hidden: Array.isArray(Config.controlCenterHiddenPlugins) && Config.controlCenterHiddenPlugins.indexOf(modelData.id) !== -1
+                        readonly property int rowIndex: root.orderedControlCenterPlugins().findIndex(function (item) {
+                            return item.id === modelData.id;
+                        })
+                        minimumHeight: root.compactMode ? 80 : 64
+                        active: !hidden
+
+                        Rectangle {
+                            width: root.compactMode ? 30 : 34
+                            height: width
+                            radius: Colors.radiusSmall
+                            color: hidden ? Colors.withAlpha(Colors.text, 0.06) : Colors.withAlpha(Colors.primary, 0.12)
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: "󰏗"
+                                color: hidden ? Colors.fgDim : Colors.primary
+                                font.family: Colors.fontMono
+                                font.pixelSize: Colors.fontSizeMedium
+                            }
+                        }
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 2
+
+                            Text {
+                                text: modelData.name || modelData.id
+                                color: Colors.text
+                                font.pixelSize: Colors.fontSizeMedium
+                                font.weight: Font.Medium
+                                Layout.fillWidth: true
+                                elide: Text.ElideRight
+                            }
+
+                            Text {
+                                text: hidden ? "Hidden" : "Visible"
+                                color: hidden ? Colors.fgDim : Colors.success
+                                font.pixelSize: Colors.fontSizeXS
+                            }
+                        }
+
+                        RowLayout {
+                            spacing: Colors.spacingS
+
+                            SettingsActionButton {
+                                compact: true
+                                iconName: "󰁍"
+                                label: "Up"
+                                enabled: rowIndex > 0
+                                onClicked: root.moveOrderedValue("controlCenterPluginOrder", modelData.id, -1)
+                            }
+
+                            SettingsActionButton {
+                                compact: true
+                                iconName: "󰁔"
+                                label: "Down"
+                                enabled: rowIndex >= 0 && rowIndex < root.orderedControlCenterPlugins().length - 1
+                                onClicked: root.moveOrderedValue("controlCenterPluginOrder", modelData.id, 1)
+                            }
+
+                            SharedWidgets.ToggleSwitch {
+                                checked: !hidden
+                                onToggled: root.toggleHiddenListValue("controlCenterHiddenPlugins", modelData.id)
+                            }
+                        }
+                    }
+                }
             }
         }
     }

@@ -191,8 +191,8 @@ PanelWindow {
 
     opacity: settingsRoot.isOpen ? 1.0 : 0.0
     scale: settingsRoot.isOpen ? 1.0 : 0.95
-    Behavior on opacity { NumberAnimation { id: shFadeAnim; duration: 250; easing.type: Easing.OutCubic } }
-    Behavior on scale { NumberAnimation { id: shScaleAnim; duration: 300; easing.type: Easing.OutBack } }
+    Behavior on opacity { NumberAnimation { id: shFadeAnim; duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
+    Behavior on scale { NumberAnimation { id: shScaleAnim; duration: Colors.durationSlow; easing.type: Easing.OutBack } }
     layer.enabled: shFadeAnim.running || shScaleAnim.running
 
     // Prevent clicks from closing through the box

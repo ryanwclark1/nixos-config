@@ -43,9 +43,10 @@ Item {
   }
 
   scale: mouseArea.containsMouse ? 1.06 : 1.0
+  layer.enabled: mouseArea.containsMouse
   Behavior on scale {
     NumberAnimation {
-      duration: 160
+      duration: Colors.durationFast
       easing.type: Easing.OutCubic
     }
   }

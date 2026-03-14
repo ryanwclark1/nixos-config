@@ -35,7 +35,7 @@ Item {
 
   onWidthChanged: c.requestPaint()
   onHeightChanged: c.requestPaint()
-  onValueChanged: c.requestPaint()
+  onValueChanged: if (!root.active) c.requestPaint()  // Timer already drives repaints when active
   onColorChanged: c.requestPaint()
   onTrackColorChanged: c.requestPaint()
 

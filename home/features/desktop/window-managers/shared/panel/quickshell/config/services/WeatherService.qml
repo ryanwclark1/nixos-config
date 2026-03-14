@@ -173,13 +173,20 @@ QtObject {
     onTriggered: root.refresh()
   }
 
+  // Debounce config changes — avoids multiple curl requests when several
+  // weather settings change in rapid succession (e.g. SettingsHub batch updates).
+  property Timer _configDebounce: Timer {
+    interval: 500
+    onTriggered: root.refresh()
+  }
+
   property Connections configConnections: Connections {
     target: Config
-    function onWeatherUnitsChanged() { root.refresh(); }
-    function onWeatherAutoLocationChanged() { root.refresh(); }
-    function onWeatherCityQueryChanged() { root.refresh(); }
-    function onWeatherLatitudeChanged() { root.refresh(); }
-    function onWeatherLongitudeChanged() { root.refresh(); }
-    function onWeatherLocationPriorityChanged() { root.refresh(); }
+    function onWeatherUnitsChanged() { root._configDebounce.restart(); }
+    function onWeatherAutoLocationChanged() { root._configDebounce.restart(); }
+    function onWeatherCityQueryChanged() { root._configDebounce.restart(); }
+    function onWeatherLatitudeChanged() { root._configDebounce.restart(); }
+    function onWeatherLongitudeChanged() { root._configDebounce.restart(); }
+    function onWeatherLocationPriorityChanged() { root._configDebounce.restart(); }
   }
 }
