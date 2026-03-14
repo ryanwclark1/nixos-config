@@ -156,6 +156,9 @@ QtObject {
     property string nightLightLongitude: ""
 
     // --- POWER ---
+    property bool batteryAlertsEnabled: true
+    property int batteryWarningThreshold: 20
+    property int batteryCriticalThreshold: 10
     property bool idleInhibitEnabled: false
     property int powerAcMonitorTimeout: 0
     property int powerAcLockTimeout: 0
@@ -214,12 +217,30 @@ QtObject {
     property real radiusScale: 1.0
     property real spacingScale: 1.0
 
+    // --- AI ASSISTANT ---
+    property string aiProvider: "ollama"           // "ollama"|"anthropic"|"openai"|"gemini"|"custom"
+    property string aiModel: ""                    // empty = provider default
+    property string aiCustomEndpoint: ""           // for "custom" provider
+    property bool aiSystemContext: false            // include system info in prompt
+    property int aiMaxTokens: 4096
+    property real aiTemperature: 0.7
+    property string aiSystemPrompt: ""             // custom system prompt
+    property string aiAnthropicKey: ""             // fallback if ANTHROPIC_API_KEY env not set
+    property string aiOpenaiKey: ""                // fallback if OPENAI_API_KEY env not set
+    property string aiGeminiKey: ""                // fallback if GEMINI_API_KEY env not set
+    property int aiMaxConversations: 20
+    property int aiMaxMessages: 100                // per conversation
+
     // --- PLUGINS ---
     property var disabledPlugins: []
     property var pluginLauncherTriggers: ({})
     property var pluginLauncherNoTrigger: ({})
     property var pluginSettings: ({})
     property bool pluginHotReload: true
+
+    // --- HOOKS ---
+    property bool hooksEnabled: true
+    property var hookPaths: ({})
 
     // --- INTERNAL ---
     property bool _loading: false

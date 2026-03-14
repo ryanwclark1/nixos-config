@@ -59,23 +59,7 @@ Rectangle {
             Layout.fillWidth: true
             spacing: Colors.spacingM
 
-            Rectangle {
-                width: 38
-                height: 38
-                radius: Colors.radiusSmall
-                color: root._active ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.14) : Colors.withAlpha(Colors.text, 0.06)
-                border.color: root._active ? Colors.withAlpha(Colors.primary, 0.6) : Colors.border
-                border.width: 1
-                Layout.alignment: Qt.AlignTop
-
-                Text {
-                    anchors.centerIn: parent
-                    text: root.icon
-                    color: root._active ? Colors.primary : Colors.textSecondary
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeXL
-                }
-            }
+            SettingsIconBox { icon: root.icon; active: root._active }
 
             Text {
                 text: root.label

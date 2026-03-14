@@ -10,6 +10,8 @@ MouseArea {
   property string tooltipText: ""
   property var anchorWindow: null
   property bool isActive: false
+  property var contextActions: []
+  signal contextMenuRequested(var actions, var triggerRect)
   property color activeColor: Colors.withAlpha(Colors.primary, 0.28)
   property color normalColor: Colors.bgWidget
   property color hoverColor: Colors.highlightLight
@@ -20,6 +22,7 @@ MouseArea {
 
   height: 28
   width: contentContainer.childrenRect.width + horizontalPadding * 2
+  acceptedButtons: Qt.LeftButton | Qt.RightButton
   hoverEnabled: enabled
   cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
   opacity: enabled ? 1.0 : 0.4
@@ -93,7 +96,19 @@ MouseArea {
     }
   }
 
-  onClicked: (mouse) => ripple.burst(mouse.x, mouse.y)
+  onClicked: (mouse) => {
+    if (mouse.button === Qt.RightButton) {
+      if (contextActions.length > 0) {
+        var globalPos = mapToItem(null, 0, 0);
+        contextMenuRequested(contextActions, {
+          x: globalPos.x, y: globalPos.y,
+          width: root.width, height: root.height
+        });
+      }
+      return;
+    }
+    ripple.burst(mouse.x, mouse.y);
+  }
 
   Item {
     id: contentContainer

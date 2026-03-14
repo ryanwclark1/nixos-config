@@ -39,7 +39,13 @@ Rectangle {
   }
   
   readonly property bool isRunning: isPinned ? runningInstance !== null : true
-  readonly property bool actualFocused: isPinned ? (runningInstance && runningInstance.focused) : isFocused
+  readonly property bool niriFocused: {
+    if (!CompositorAdapter.isNiri || !NiriService.available) return false;
+    var aw = CompositorAdapter.niriActiveWindow;
+    if (!aw) return false;
+    return (aw.app_id || "").toLowerCase() === appClass.toLowerCase();
+  }
+  readonly property bool actualFocused: niriFocused || (isPinned ? (runningInstance && runningInstance.focused) : isFocused)
   readonly property string tooltipText: {
     if ((appName || "").trim().length > 0) return appName;
     if ((appClass || "").trim().length > 0) return appClass;
@@ -80,6 +86,11 @@ Rectangle {
       stateLayer.burst(mouse.x, mouse.y);
       if (mouse.button === Qt.LeftButton) {
         if (isRunning) {
+          // On Niri, prefer NiriService.focusWindow for instant IPC focus
+          if (CompositorAdapter.isNiri && NiriService.available) {
+            var niriWin = NiriService.findWindowByAppId(appClass);
+            if (niriWin) { CompositorAdapter.focusWindow(niriWin.id); return; }
+          }
           var target = isPinned ? runningInstance : toplevelRef;
           if (target && target.activate) target.activate();
         } else if (isPinned && appExec) {

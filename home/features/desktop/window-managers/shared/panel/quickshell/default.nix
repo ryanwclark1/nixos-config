@@ -46,6 +46,11 @@ let
     ${builtins.readFile ./scripts/ai-prompt.sh}
   '';
 
+  aiStreamScript = pkgs.writeShellScriptBin "qs-ai-stream" ''
+    PATH="${pkgs.curl}/bin:${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.gnused}/bin:$PATH"
+    ${builtins.readFile ./scripts/ai-stream.sh}
+  '';
+
   bookmarksScript = pkgs.writeShellScriptBin "qs-bookmarks" ''
     PATH="${pkgs.sqlite}/bin:${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.findutils}/bin:$PATH"
     ${builtins.readFile ./scripts/bookmarks.sh}
@@ -210,6 +215,7 @@ let
       wallpaperScript
       keybindsScript
       aiScript
+      aiStreamScript
       bookmarksScript
       updatorScript
       cavaScript

@@ -188,7 +188,7 @@ Item {
                                         delegate: Rectangle {
                                             width: 14
                                             height: 14
-                                            radius: 7
+                                            radius: width / 2
                                             color: modelData
                                             border.color: Colors.withAlpha(Colors.text, 0.15)
                                             border.width: 1

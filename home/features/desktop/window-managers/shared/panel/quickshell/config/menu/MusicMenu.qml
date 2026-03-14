@@ -46,7 +46,7 @@ BasePopupMenu {
       visible: root.activePlayers.length > 1
       width: Math.min(playerSelectorText.implicitWidth + 24, root.compactMode ? 160 : 220)
       height: 26
-      radius: 13
+      radius: height / 2
       color: Colors.bgWidget
 
       Text {

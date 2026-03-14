@@ -60,6 +60,14 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
   - `scripts/plugin-local.sh reference-guards`
   - `scripts/plugin-local.sh reference-all`
   - `scripts/plugin-local.sh reference-all --quiet`
+  - `scripts/plugin-local.sh install-docker-manager`
+  - `scripts/plugin-local.sh smoke-docker-manager`
+  - `scripts/plugin-local.sh remove-docker-manager`
+  - `scripts/plugin-local.sh docker-status`
+  - `scripts/plugin-local.sh docker-flow`
+  - `scripts/plugin-local.sh docker-files`
+  - `scripts/plugin-local.sh docker-guards`
+  - `scripts/plugin-local.sh docker-all`
   - `scripts/plugin-local.sh shared-gates`
   - `scripts/plugin-local.sh shared-gates --quiet`
   - `scripts/plugin-local.sh baseline-gates`
@@ -83,6 +91,12 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
   - `scripts/check-plugin-doctor-smoke.sh`
 - Plugin reference local gate:
   - `scripts/check-plugin-reference-local.sh`
+- Plugin docker-manager local gate:
+  - `scripts/check-plugin-docker-manager-local.sh`
+- Plugin docker-manager runtime smoke gate:
+  - `scripts/check-plugin-docker-manager-runtime-smoke.sh`
+- Plugin docker-manager contract gate:
+  - `scripts/check-plugin-docker-manager-contracts.sh`
 - Plugin reference contract gate:
   - `scripts/check-plugin-reference-contracts.sh`
 - Plugin reference fixture gate:
@@ -105,6 +119,16 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
   - `scripts/plugin-doctor.sh`
   - JSON output mode: `scripts/plugin-doctor.sh --json`
   - Optional custom path: `scripts/plugin-doctor.sh /path/to/plugins`
+- First-party SSH plugin gates:
+  - `scripts/check-plugin-ssh-local.sh`
+  - `scripts/check-plugin-ssh-runtime-smoke.sh`
+  - `scripts/check-plugin-ssh-contracts.sh`
+  - `scripts/check-plugin-ssh-fixtures.sh`
+  - `scripts/plugin-local.sh ssh-status`
+  - `scripts/plugin-local.sh ssh-status --check --quiet`
+  - `scripts/plugin-local.sh ssh-flow`
+  - `scripts/plugin-local.sh ssh-guards`
+  - `scripts/plugin-local.sh ssh-all`
 
 ## Operational Diagnostics
 
@@ -132,6 +156,7 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
 - Run `scripts/plugin-local.sh baseline-gates --quiet` when you want that entry phase without wrapper headings.
 - Run `scripts/plugin-local.sh all-gates` when you want the same assembled pipeline used by `plugin-verify.sh` and `plugin-local.sh full`.
 - Run `scripts/plugin-local.sh all-gates --quiet` when you want that assembled pipeline without the phase headings.
+- `scripts/plugin-local.sh all-gates` runs the Docker Manager guard sequence when `scripts/plugin-local.sh docker-status --check` succeeds, and otherwise skips that optional Docker-specific phase.
 - `scripts/plugin-local.sh quick` reuses `reference-all --quiet --silent-preflight` before the shared runtime and diagnostics gates, so the fast path and the reference-only path stay aligned without extra preflight noise.
 - Run `scripts/plugin-local.sh quick --quiet` when you want that same fast path without the top-level wrapper lines or shared-gate headings.
 
@@ -150,6 +175,39 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
 - `scripts/plugin-local.sh quick` is the fastest local way to catch reference-plugin and diagnostics/runtime contract drift together.
 - Open launcher mode with `!ref` after installation to exercise increment, reset, and summary actions.
 - Use the reference plugin settings page to toggle launcher failure modes (`query` or `execute`) and confirm degraded diagnostics in the Plugins tab.
+
+## First-Party SSH Plugin Workflow
+
+- Shipped plugin path: `config/plugins/ssh-monitor`
+- Launcher trigger: `!ssh`
+- Keep `scripts/check-plugin-ssh-local.sh` green when changing the shipped manifest or install shape.
+- Keep `scripts/check-plugin-ssh-runtime-smoke.sh` green when changing runtime loading, ssh-config import behavior, or launcher/settings interactions.
+- Keep `scripts/check-plugin-ssh-contracts.sh` green when changing the intended first-party manifest, launcher, settings, or command wiring contract.
+- Keep `scripts/check-plugin-ssh-fixtures.sh` green when changing parser behavior or persisted settings/state envelope shapes.
+- Run `scripts/plugin-local.sh ssh-status --check` for a fast preflight over the shipped plugin files, fixtures, and SSH-specific guard scripts.
+- Run `scripts/plugin-local.sh ssh-status --check --quiet` when you want the compact one-line SSH preflight status.
+- Run `scripts/plugin-local.sh ssh-flow` for the manual first-party SSH plugin validation sequence.
+- Run `scripts/plugin-local.sh ssh-guards` for the canonical SSH-only guard command list.
+- Run `scripts/plugin-local.sh ssh-all` for the SSH-only automated guard sequence.
+- Run `scripts/plugin-local.sh shared-gates --quiet` for the shared plugin tail that now includes the first-party SSH checks.
+- Run `scripts/plugin-verify.sh --quiet` for the full assembled plugin pipeline.
+- Open launcher mode with `!ssh` to exercise connect and copy actions against the shipped plugin.
+
+## Docker Manager Plugin Workflow
+
+- Repo-tracked plugin path: `examples/plugins/docker-manager`
+- Bar widget surface: `Docker Manager`
+- Keep `scripts/check-plugin-docker-manager-local.sh` green when changing install shape, manifest wiring, or local command flow.
+- Keep `scripts/check-plugin-docker-manager-runtime-smoke.sh` green when changing daemon refresh logic, settings reload behavior, or degraded-runtime handling.
+- Keep `scripts/check-plugin-docker-manager-contracts.sh` green when changing the intended multi-plugin manifest, popup wiring, or settings contract.
+- Run `scripts/plugin-local.sh docker-status --check` for a fast preflight over the shipped plugin files, required guard scripts, `quickshell`, and Docker availability.
+- Run `scripts/plugin-local.sh docker-flow` for the manual Docker Manager validation sequence.
+- Run `scripts/plugin-local.sh docker-all` for the Docker Manager-only automated guard sequence.
+- `scripts/plugin-local.sh all-gates` and `scripts/plugin-verify.sh` include the Docker Manager guard sequence automatically when Docker Manager prerequisites are available on the machine.
+- Install the repo-tracked plugin locally with `scripts/plugin-local.sh install-docker-manager`.
+- Validate that local install in isolation with `scripts/plugin-local.sh smoke-docker-manager`.
+- Remove the local symlink with `scripts/plugin-local.sh remove-docker-manager`.
+- Add `Docker Manager` from the bar widget picker to exercise the popup against the local Docker daemon.
 
 ## Reference Plugin Manual Flow
 

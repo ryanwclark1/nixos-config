@@ -53,6 +53,44 @@ Item {
         }
 
         SettingsCard {
+            title: "Battery Alerts"
+            iconName: "󱃍"
+            description: "Get notified when battery is running low."
+
+            SettingsToggleRow {
+                label: "Battery Alerts"
+                icon: "󱃍"
+                configKey: "batteryAlertsEnabled"
+            }
+
+            SettingsSliderRow {
+                label: "Warning Threshold"
+                min: 5
+                max: 50
+                value: Config.batteryWarningThreshold
+                unit: "%"
+                onMoved: v => {
+                    Config.batteryWarningThreshold = v;
+                    if (Config.batteryCriticalThreshold > v)
+                        Config.batteryCriticalThreshold = v;
+                }
+            }
+
+            SettingsSliderRow {
+                label: "Critical Threshold"
+                min: 5
+                max: 30
+                value: Config.batteryCriticalThreshold
+                unit: "%"
+                onMoved: v => {
+                    Config.batteryCriticalThreshold = v;
+                    if (Config.batteryWarningThreshold < v)
+                        Config.batteryWarningThreshold = v;
+                }
+            }
+        }
+
+        SettingsCard {
             title: "AC Power Profile"
             iconName: "󰚥"
             description: "Timeout settings when connected to AC power. Set to 0 to disable."

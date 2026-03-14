@@ -52,43 +52,11 @@ Item {
 
                 Repeater {
                     model: Config.audioPinnedOutputs
-                    delegate: Rectangle {
-                        required property string modelData
-                        required property int index
-                        implicitWidth: pinnedOutputRow.implicitWidth + 16
-                        implicitHeight: 28
-                        radius: Colors.radiusPill
-                        color: Colors.withAlpha(Colors.primary, 0.1)
-                        border.color: Colors.border
-                        border.width: 1
-
-                        Row {
-                            id: pinnedOutputRow
-                            anchors.centerIn: parent
-                            spacing: Colors.spacingXS
-
-                            Text {
-                                text: modelData
-                                color: Colors.text
-                                font.pixelSize: Colors.fontSizeSmall
-                            }
-
-                            Text {
-                                text: "󰅖"
-                                color: Colors.textSecondary
-                                font.family: Colors.fontMono
-                                font.pixelSize: Colors.fontSizeSmall
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                        var arr = Config.audioPinnedOutputs.slice();
-                                        arr.splice(index, 1);
-                                        Config.audioPinnedOutputs = arr;
-                                    }
-                                }
-                            }
+                    delegate: SettingsRemovableChip {
+                        onRemoved: {
+                            var arr = Config.audioPinnedOutputs.slice();
+                            arr.splice(index, 1);
+                            Config.audioPinnedOutputs = arr;
                         }
                     }
                 }
@@ -122,43 +90,11 @@ Item {
 
                 Repeater {
                     model: Config.audioPinnedInputs
-                    delegate: Rectangle {
-                        required property string modelData
-                        required property int index
-                        implicitWidth: pinnedInputRow.implicitWidth + 16
-                        implicitHeight: 28
-                        radius: Colors.radiusPill
-                        color: Colors.withAlpha(Colors.primary, 0.1)
-                        border.color: Colors.border
-                        border.width: 1
-
-                        Row {
-                            id: pinnedInputRow
-                            anchors.centerIn: parent
-                            spacing: Colors.spacingXS
-
-                            Text {
-                                text: modelData
-                                color: Colors.text
-                                font.pixelSize: Colors.fontSizeSmall
-                            }
-
-                            Text {
-                                text: "󰅖"
-                                color: Colors.textSecondary
-                                font.family: Colors.fontMono
-                                font.pixelSize: Colors.fontSizeSmall
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                        var arr = Config.audioPinnedInputs.slice();
-                                        arr.splice(index, 1);
-                                        Config.audioPinnedInputs = arr;
-                                    }
-                                }
-                            }
+                    delegate: SettingsRemovableChip {
+                        onRemoved: {
+                            var arr = Config.audioPinnedInputs.slice();
+                            arr.splice(index, 1);
+                            Config.audioPinnedInputs = arr;
                         }
                     }
                 }
@@ -192,43 +128,11 @@ Item {
 
                 Repeater {
                     model: Config.audioHiddenOutputs
-                    delegate: Rectangle {
-                        required property string modelData
-                        required property int index
-                        implicitWidth: hiddenOutputRow.implicitWidth + 16
-                        implicitHeight: 28
-                        radius: Colors.radiusPill
-                        color: Colors.withAlpha(Colors.primary, 0.1)
-                        border.color: Colors.border
-                        border.width: 1
-
-                        Row {
-                            id: hiddenOutputRow
-                            anchors.centerIn: parent
-                            spacing: Colors.spacingXS
-
-                            Text {
-                                text: modelData
-                                color: Colors.text
-                                font.pixelSize: Colors.fontSizeSmall
-                            }
-
-                            Text {
-                                text: "󰅖"
-                                color: Colors.textSecondary
-                                font.family: Colors.fontMono
-                                font.pixelSize: Colors.fontSizeSmall
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                        var arr = Config.audioHiddenOutputs.slice();
-                                        arr.splice(index, 1);
-                                        Config.audioHiddenOutputs = arr;
-                                    }
-                                }
-                            }
+                    delegate: SettingsRemovableChip {
+                        onRemoved: {
+                            var arr = Config.audioHiddenOutputs.slice();
+                            arr.splice(index, 1);
+                            Config.audioHiddenOutputs = arr;
                         }
                     }
                 }
@@ -262,43 +166,11 @@ Item {
 
                 Repeater {
                     model: Config.audioHiddenInputs
-                    delegate: Rectangle {
-                        required property string modelData
-                        required property int index
-                        implicitWidth: hiddenInputRow.implicitWidth + 16
-                        implicitHeight: 28
-                        radius: Colors.radiusPill
-                        color: Colors.withAlpha(Colors.primary, 0.1)
-                        border.color: Colors.border
-                        border.width: 1
-
-                        Row {
-                            id: hiddenInputRow
-                            anchors.centerIn: parent
-                            spacing: Colors.spacingXS
-
-                            Text {
-                                text: modelData
-                                color: Colors.text
-                                font.pixelSize: Colors.fontSizeSmall
-                            }
-
-                            Text {
-                                text: "󰅖"
-                                color: Colors.textSecondary
-                                font.family: Colors.fontMono
-                                font.pixelSize: Colors.fontSizeSmall
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                        var arr = Config.audioHiddenInputs.slice();
-                                        arr.splice(index, 1);
-                                        Config.audioHiddenInputs = arr;
-                                    }
-                                }
-                            }
+                    delegate: SettingsRemovableChip {
+                        onRemoved: {
+                            var arr = Config.audioHiddenInputs.slice();
+                            arr.splice(index, 1);
+                            Config.audioHiddenInputs = arr;
                         }
                     }
                 }

@@ -16,6 +16,12 @@ QtObject {
   property string condition: ""
   property string location: "Local"
   property var forecast: []
+  property string uvIndex: "--"
+  property string pressure: "--"
+  property string precipitation: "--"
+  property string sunrise: "--"
+  property string sunset: "--"
+  property var hourlyForecast: []
 
   readonly property string _unitMode: Config.weatherUnits === "imperial" ? "imperial" : "metric"
   readonly property string _tempSuffix: _unitMode === "imperial" ? "°F" : "°C"
@@ -95,6 +101,12 @@ QtObject {
       root.condition = "Location not configured";
       root.location = "Set city or coordinates";
       root.forecast = [];
+      root.hourlyForecast = [];
+      root.uvIndex = "--";
+      root.pressure = "--";
+      root.precipitation = "--";
+      root.sunrise = "--";
+      root.sunset = "--";
       return;
     }
 
@@ -141,8 +153,27 @@ QtObject {
           root.windDir = cur.winddir16Point || "";
           root.visibility = _visibilityValue(cur);
 
-          var days = [];
+          // Additional current condition data
+          root.uvIndex = cur.uvIndex || "--";
+          root.pressure = (_unitMode === "imperial"
+            ? (cur.pressureInches || "--") + " inHg"
+            : (cur.pressureMB || "--") + " hPa");
+          root.precipitation = (cur.precipMM || "0") + " mm";
+
           var weather = data.weather || [];
+
+          // Astronomy (sunrise/sunset) from first day
+          if (weather.length > 0 && weather[0].astronomy && weather[0].astronomy[0]) {
+            var astro = weather[0].astronomy[0];
+            root.sunrise = astro.sunrise || "--";
+            root.sunset = astro.sunset || "--";
+          } else {
+            root.sunrise = "--";
+            root.sunset = "--";
+          }
+
+          // Daily forecast
+          var days = [];
           for (var i = 0; i < Math.min(3, weather.length); i++) {
             var w = weather[i];
             var desc = (w.hourly && w.hourly[4] && w.hourly[4].weatherDesc && w.hourly[4].weatherDesc[0])
@@ -151,15 +182,46 @@ QtObject {
               date: w.date,
               maxTemp: _tempValue(w, "maxtemp"),
               minTemp: _tempValue(w, "mintemp"),
-              condition: desc
+              condition: desc,
+              chanceOfRain: (w.hourly && w.hourly[4]) ? (w.hourly[4].chanceofrain || "0") + "%" : "--",
+              sunrise: (w.astronomy && w.astronomy[0]) ? w.astronomy[0].sunrise : "",
+              sunset: (w.astronomy && w.astronomy[0]) ? w.astronomy[0].sunset : ""
             });
           }
           root.forecast = days;
+
+          // Hourly forecast: remaining hours today + tomorrow
+          var hourly = [];
+          var currentHour = new Date().getHours();
+          for (var d = 0; d < Math.min(2, weather.length); d++) {
+            var hours = weather[d].hourly || [];
+            for (var h = 0; h < hours.length; h++) {
+              var entry = hours[h];
+              var hourTime = parseInt(entry.time, 10) / 100;
+              if (d === 0 && hourTime < currentHour) continue;
+              var hdesc = (entry.weatherDesc && entry.weatherDesc[0])
+                ? entry.weatherDesc[0].value : "Unknown";
+              hourly.push({
+                time: String(Math.floor(hourTime)).padStart(2, '0') + ":00",
+                temp: _tempWithUnit(entry, "temp"),
+                condition: hdesc,
+                chanceOfRain: (entry.chanceofrain || "0") + "%",
+                windSpeed: _windValue(entry) + _windSuffix
+              });
+            }
+          }
+          root.hourlyForecast = hourly;
         } catch (e) {
           console.warn("WeatherService: parse error:", e);
           root.condition = "Error loading weather";
           root.location = "Local";
           root.forecast = [];
+          root.hourlyForecast = [];
+          root.uvIndex = "--";
+          root.pressure = "--";
+          root.precipitation = "--";
+          root.sunrise = "--";
+          root.sunset = "--";
         }
       }
     }

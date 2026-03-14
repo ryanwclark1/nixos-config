@@ -14,14 +14,53 @@ Flow {
   property var iconMap: ({})
   property bool seedPinnedApps: false
   readonly property var allToplevels: (typeof ToplevelManager !== "undefined" && ToplevelManager.toplevels) ? (ToplevelManager.toplevels.values || []) : []
+  readonly property bool niriEnriched: CompositorAdapter.isNiri && NiriService.available
   readonly property var runningToplevels: {
+    // Force re-evaluation when NiriService windows change
+    void root._niriWindowsVersion;
+
     var out = [];
     for (var i = 0; i < allToplevels.length; i++) {
       var tl = allToplevels[i];
       if (!tl) continue;
       if (!tl.workspace || tl.workspace.active || tl.activated) out.push(tl);
     }
+
+    // On Niri, sort unpinned toplevels by MRU order
+    if (root.niriEnriched && NiriService.mruWindowIds.length > 0) {
+      var mru = NiriService.mruWindowIds;
+      var niriWindows = NiriService.windows;
+
+      // Build app_id → MRU rank map from NiriService
+      var mruRank = {};
+      for (var m = 0; m < mru.length; m++) {
+        for (var w = 0; w < niriWindows.length; w++) {
+          if (niriWindows[w].id === mru[m]) {
+            var appId = (niriWindows[w].app_id || "").toLowerCase();
+            if (appId && mruRank[appId] === undefined)
+              mruRank[appId] = m;
+            break;
+          }
+        }
+      }
+
+      out.sort(function(a, b) {
+        var aClass = (a.class || a.appId || "").toLowerCase();
+        var bClass = (b.class || b.appId || "").toLowerCase();
+        var aRank = mruRank[aClass] !== undefined ? mruRank[aClass] : 9999;
+        var bRank = mruRank[bClass] !== undefined ? mruRank[bClass] : 9999;
+        return aRank - bRank;
+      });
+    }
     return out;
+  }
+
+  // Bump this to force runningToplevels re-evaluation on Niri window changes
+  property int _niriWindowsVersion: 0
+  Connections {
+    target: NiriService
+    enabled: root.niriEnriched
+    function onWindowsUpdated() { root._niriWindowsVersion++; }
   }
   readonly property string pinnedPath: Quickshell.env("HOME") + "/.local/state/quickshell/pinned_apps.json"
   readonly property var defaultPinnedApps: [
@@ -125,7 +164,17 @@ Flow {
     width: root.vertical ? 16 : 1
     height: root.vertical ? 1 : 16
     color: Colors.border
-    visible: runningToplevels.length > 0
+    visible: {
+      for (var i = 0; i < runningToplevels.length; i++) {
+        var cls = (runningToplevels[i].class || runningToplevels[i].appId || "");
+        var found = false;
+        for (var j = 0; j < pinnedApps.length; j++) {
+          if (pinnedApps[j].class === cls) { found = true; break; }
+        }
+        if (!found) return true;
+      }
+      return false;
+    }
   }
 
   Repeater {

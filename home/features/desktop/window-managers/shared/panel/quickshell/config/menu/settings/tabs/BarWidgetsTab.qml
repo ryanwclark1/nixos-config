@@ -319,7 +319,7 @@ Item {
                                 }
                                 visible: widgetRow.dropBeforeActive
                                 height: 10
-                                radius: 5
+                                radius: Colors.radiusXXS
                                 color: Colors.withAlpha(Colors.primary, 0.22)
                                 border.color: Colors.primary
                                 border.width: 1

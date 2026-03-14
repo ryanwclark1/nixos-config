@@ -45,6 +45,8 @@ QtObject {
     property var composeProjects: []
 
     property bool _refreshQueued: false
+    property int _refreshExitCode: 0
+    property int _refreshOutputOffset: 0
 
     function _stringSetting(key, fallback) {
         if (!pluginApi || !pluginApi.loadSetting)
@@ -228,6 +230,8 @@ QtObject {
         }
         _refreshQueued = false;
         busy = true;
+        _refreshExitCode = 0;
+        _refreshOutputOffset = String(refreshCollector.text || "").length;
         refreshProc.command = _refreshCommand();
         refreshProc.running = true;
         _emitRuntimeUpdated();
@@ -554,9 +558,15 @@ QtObject {
         running: false
         stdout: StdioCollector {
             id: refreshCollector
+            onStreamFinished: {
+                var fullText = String(text || "");
+                root._handleRefreshFinished(fullText.slice(root._refreshOutputOffset), root._refreshExitCode);
+            }
         }
         onExited: (exitCode, exitStatus) => {
-            root._handleRefreshFinished(refreshCollector.text, exitCode);
+            root._refreshExitCode = exitCode;
+            if (exitCode !== 0 && String(refreshCollector.text || "").slice(root._refreshOutputOffset) === "")
+                root._handleRefreshFinished("", exitCode);
         }
     }
 

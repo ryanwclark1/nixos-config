@@ -344,7 +344,7 @@ Item {
         anchors.right: parent.right
         anchors.topMargin: 2
         anchors.rightMargin: 2
-        width: 14; height: 14; radius: 7
+        width: 14; height: 14; radius: width / 2
         color: Colors.primary
 
         Text {

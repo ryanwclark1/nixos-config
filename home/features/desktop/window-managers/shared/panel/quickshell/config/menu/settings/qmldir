@@ -13,4 +13,6 @@ SettingsTabPage 1.0 SettingsTabPage.qml
 SettingsActionButton 1.0 SettingsActionButton.qml
 SettingsOwnerBadge 1.0 SettingsOwnerBadge.qml
 SettingsTextInputRow 1.0 SettingsTextInputRow.qml
+SettingsIconBox 1.0 SettingsIconBox.qml
+SettingsRemovableChip 1.0 SettingsRemovableChip.qml
 SettingsToggleRow 1.0 SettingsToggleRow.qml

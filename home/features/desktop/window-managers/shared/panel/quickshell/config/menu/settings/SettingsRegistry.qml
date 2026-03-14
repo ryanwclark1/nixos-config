@@ -41,7 +41,8 @@ QtObject {
     { id: "audio",          legacyIndex: 18, label: "Audio",         icon: "󰕾", categoryId: "interaction",    order: 50, component: "AudioTab.qml",          searchTerms: ["audio", "volume", "device", "pin", "hide"], owner: { surface: "audioMenu", service: "AudioService", configDomain: "audio" } },
     { id: "workspaces",     legacyIndex: 19, label: "Workspaces",    icon: "󰕮", categoryId: "window-manager", order: 20, component: "WorkspaceTab.qml",      searchTerms: ["workspaces", "workspace", "scroll", "pill"], owner: { surface: "", service: "Config", configDomain: "workspaces" } },
     { id: "night-light",    legacyIndex: 20, label: "Night Light",   icon: "󰖔", categoryId: "power-privacy",  order: 30, component: "NightLightTab.qml",     searchTerms: ["night", "light", "gamma", "blue", "temperature", "schedule"], owner: { surface: "", service: "NightLightService", configDomain: "nightLight" } },
-    { id: "presets",         legacyIndex: 21, label: "Presets",       icon: "󰆓", categoryId: "meta",           order: 20, component: "PresetsTab.qml",        searchTerms: ["presets", "save", "load", "snapshot", "backup"], owner: { surface: "", service: "PresetService", configDomain: "presets" } }
+    { id: "presets",         legacyIndex: 21, label: "Presets",       icon: "󰆓", categoryId: "meta",           order: 20, component: "PresetsTab.qml",        searchTerms: ["presets", "save", "load", "snapshot", "backup"], owner: { surface: "", service: "PresetService", configDomain: "presets" } },
+    { id: "hooks",           legacyIndex: 22, label: "Hooks",         icon: "󱁨", categoryId: "extensibility",  order: 20, component: "HooksTab.qml",          searchTerms: ["hooks", "scripts", "events", "automation"], owner: { surface: "", service: "HookService", configDomain: "hooks" } }
   ]
 
   function isTabSupported(tab) {

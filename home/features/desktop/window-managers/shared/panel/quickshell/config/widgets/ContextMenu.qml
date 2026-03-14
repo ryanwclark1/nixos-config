@@ -96,9 +96,7 @@ Rectangle {
         onClicked: root.close()
     }
 
-    ElevationShadow {
-        source: root
-    }
+    ElevationShadow {}
 
     ColumnLayout {
         id: contentColumn

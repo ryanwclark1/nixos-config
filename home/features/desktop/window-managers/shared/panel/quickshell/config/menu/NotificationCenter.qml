@@ -4,7 +4,6 @@ import Quickshell
 import Quickshell.Services.Notifications
 import Quickshell.Services.Mpris
 import Quickshell.Wayland
-import Quickshell.Widgets
 import "../modules"
 import "../notifications"
 import "../services"

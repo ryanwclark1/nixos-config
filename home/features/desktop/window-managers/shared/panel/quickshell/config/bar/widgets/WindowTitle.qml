@@ -4,12 +4,20 @@ import "../../services"
 Text {
   id: root
 
-  property var state: null
+  property var widgetInstance: null
   property int maxWidth: 360
 
-  width: maxWidth
+  readonly property string activeTitle: {
+    if (CompositorAdapter.isNiri && CompositorAdapter.niriActiveWindow)
+      return CompositorAdapter.niriActiveWindow.title || "";
+    return "";
+  }
+
+  width: Math.min(maxWidth, implicitWidth)
   color: Colors.fgSecondary
   font.pixelSize: Colors.fontSizeSmall
+  font.letterSpacing: Colors.letterSpacingTight
   elide: Text.ElideRight
-  text: root.state && root.state.windowTitle !== "" ? root.state.windowTitle : "Desktop"
+  text: activeTitle || "Desktop"
+  visible: CompositorAdapter.isNiri && activeTitle !== ""
 }

@@ -29,6 +29,9 @@ Rectangle {
     function onWorkspacesUpdated() {
       root._updateStateFromNiriService()
     }
+    function onWindowsUpdated() {
+      root._updateStateFromNiriService()
+    }
   }
 
   Component.onCompleted: {
@@ -41,6 +44,14 @@ Rectangle {
     var activeId = -1;
     var all = NiriService.allWorkspaces;
 
+    // Pre-compute window counts per workspace (O(windows) instead of O(ws × windows))
+    var windowCounts = {};
+    var allWindows = NiriService.windows;
+    for (var j = 0; j < allWindows.length; j++) {
+      var wsId = allWindows[j].workspace_id;
+      windowCounts[wsId] = (windowCounts[wsId] || 0) + 1;
+    }
+
     for (var i = 0; i < all.length; i++) {
       var ws = all[i];
       var intId = ws.idx !== undefined ? ws.idx : (ws.id !== undefined ? ws.id : i + 1);
@@ -49,7 +60,8 @@ Rectangle {
       workspaces.push({
         id: intId,
         name: String(ws.name || intId),
-        urgent: !!(ws.is_urgent || ws.urgent)
+        urgent: !!(ws.is_urgent || ws.urgent),
+        windows: windowCounts[ws.id] || 0
       });
     }
 
@@ -138,7 +150,7 @@ Rectangle {
   Timer {
     id: pollTimer
     interval: 1200
-    running: root.workspaceApiAvailable && !NiriService.available
+    running: root.workspaceApiAvailable && !CompositorAdapter.isNiri
     repeat: true
     triggeredOnStart: true
     onTriggered: {

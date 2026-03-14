@@ -221,6 +221,7 @@ Flickable {
         Repeater {
             model: pluginData.manualHosts
             delegate: SettingsListRow {
+                required property int index
                 required property var modelData
                 readonly property int rowIndex: index
 
@@ -259,27 +260,27 @@ Flickable {
                     SettingsActionButton {
                         label: "Edit"
                         compact: true
-                        onClicked: root.editHostAt(index)
+                        onClicked: root.editHostAt(rowIndex)
                     }
 
                     SettingsActionButton {
                         label: "Up"
                         compact: true
-                        enabled: index > 0
-                        onClicked: root.moveHost(index, -1)
+                        enabled: rowIndex > 0
+                        onClicked: root.moveHost(rowIndex, -1)
                     }
 
                     SettingsActionButton {
                         label: "Down"
                         compact: true
-                        enabled: index < pluginData.manualHosts.length - 1
-                        onClicked: root.moveHost(index, 1)
+                        enabled: rowIndex < pluginData.manualHosts.length - 1
+                        onClicked: root.moveHost(rowIndex, 1)
                     }
 
                     SettingsActionButton {
                         label: "Delete"
                         compact: true
-                        onClicked: root.removeHost(index)
+                        onClicked: root.removeHost(rowIndex)
                     }
                 }
             }

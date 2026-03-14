@@ -42,24 +42,7 @@ Rectangle {
             Layout.fillWidth: true
             spacing: Colors.spacingM
 
-            Rectangle {
-                visible: root.icon !== ""
-                width: 38
-                height: 38
-                radius: Colors.radiusSmall
-                color: Colors.withAlpha(Colors.text, 0.06)
-                border.color: Colors.border
-                border.width: 1
-                Layout.alignment: Qt.AlignTop
-
-                Text {
-                    anchors.centerIn: parent
-                    text: root.icon
-                    color: Colors.textSecondary
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeXL
-                }
-            }
+            SettingsIconBox { icon: root.icon }
 
             ColumnLayout {
                 Layout.fillWidth: true

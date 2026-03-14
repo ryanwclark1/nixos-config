@@ -887,7 +887,7 @@ Item {
                         required property string modelData
                         width: 20
                         height: 20
-                        radius: 5
+                        radius: Colors.radiusXXS
                         color: "#" + modelData.slice(0, 6)
                         border.color: Colors.border
                         border.width: 1
@@ -1002,7 +1002,7 @@ Item {
                 Rectangle {
                     width: 14
                     height: 14
-                    radius: 7
+                    radius: width / 2
                     color: Config.wallpaperCycleInterval > 0 ? Colors.primary : Colors.border
                     border.color: Colors.bgWidget
                     border.width: 2

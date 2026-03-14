@@ -48,8 +48,8 @@ Rectangle {
       SequentialAnimation on opacity {
         running: root.active
         loops: Animation.Infinite
-        NumberAnimation { from: 1.0; to: 0.3; duration: 700; easing.type: Easing.InOutSine }
-        NumberAnimation { from: 0.3; to: 1.0; duration: 700; easing.type: Easing.InOutSine }
+        NumberAnimation { from: 1.0; to: 0.3; duration: Colors.durationPulse; easing.type: Easing.InOutSine }
+        NumberAnimation { from: 0.3; to: 1.0; duration: Colors.durationPulse; easing.type: Easing.InOutSine }
       }
     }
 

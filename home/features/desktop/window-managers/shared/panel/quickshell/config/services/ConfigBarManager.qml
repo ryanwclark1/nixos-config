@@ -17,6 +17,7 @@ QtObject {
       left: [
         createWidgetInstance("logo"),
         createWidgetInstance("workspaces"),
+        createWidgetInstance("windowTitle"),
         createWidgetInstance("taskbar"),
         createWidgetInstance("cpuStatus"),
         createWidgetInstance("ramStatus")
@@ -42,6 +43,7 @@ QtObject {
         createWidgetInstance("controlCenter"),
         createWidgetInstance("tray"),
         createWidgetInstance("clipboard"),
+        createWidgetInstance("keyboardLayout"),
         createWidgetInstance("notifications")
       ]
     };

@@ -221,7 +221,7 @@ ColumnLayout {
               Text { text: (modelData.exec || modelData.title || "Frequently used"); color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; elide: Text.ElideRight }
             }
             Rectangle {
-              radius: 11
+              radius: height / 2
               color: Colors.surface
               border.color: Colors.border
               border.width: 1

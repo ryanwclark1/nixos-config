@@ -145,42 +145,10 @@ SharedWidgets.CardBase {
             }
         }
 
-        Rectangle {
-            Layout.fillWidth: true
-            height: 38
-            radius: Colors.radiusSmall
-            color: Colors.highlightLight
-            border.color: processSearchInput.activeFocus ? Colors.primary : "transparent"
-            border.width: 1
-
-            RowLayout {
-                anchors.fill: parent
-                anchors.margins: Colors.spacingS
-                spacing: Colors.spacingS
-
-                Text {
-                    text: "󰍉"
-                    color: Colors.textDisabled
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeMedium
-                }
-
-                TextInput {
-                    id: processSearchInput
-                    Layout.fillWidth: true
-                    color: Colors.text
-                    font.pixelSize: Colors.fontSizeSmall
-                    verticalAlignment: Text.AlignVCenter
-                    onTextChanged: root.searchQuery = text
-                }
-
-                Text {
-                    text: "Filter by PID, user, name, or command..."
-                    color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeSmall
-                    visible: !processSearchInput.text && !processSearchInput.activeFocus
-                }
-            }
+        SharedWidgets.SearchBar {
+            id: processSearchBar
+            placeholder: "Filter by PID, user, name, or command..."
+            onTextChanged: root.searchQuery = text
         }
 
         RowLayout {

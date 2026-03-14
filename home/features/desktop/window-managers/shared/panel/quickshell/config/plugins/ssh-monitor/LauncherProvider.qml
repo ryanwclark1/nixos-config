@@ -27,6 +27,7 @@ QtObject {
         instance.pluginApi = root.pluginApi;
         instance.pluginManifest = root.pluginManifest;
         instance.pluginService = root.pluginService;
+        instance.refresh();
         return instance;
     }
 

@@ -505,7 +505,7 @@ PanelWindow {
                   Rectangle {
                     id: tabBg
                     anchors.fill: parent
-                    radius: 7
+                    radius: Colors.radiusXXS
                     color: isActive
                       ? Colors.withAlpha(Colors.primary, 0.18)
                       : Colors.bgWidget
@@ -566,7 +566,7 @@ PanelWindow {
                   // Delete tab button (visible on hover when more than 1 tab)
                   Rectangle {
                     id: deleteTabBtn
-                    width: 14; height: 14; radius: 7
+                    width: 14; height: 14; radius: width / 2
                     anchors.right: parent.right
                     anchors.rightMargin: 5
                     anchors.verticalCenter: parent.verticalCenter

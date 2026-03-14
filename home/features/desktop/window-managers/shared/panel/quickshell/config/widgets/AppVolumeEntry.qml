@@ -67,6 +67,8 @@ RowLayout {
         icon: "󰕾"
         mutedIcon: "󰝟"
         size: 28
-        onClicked: AudioService.toggleAppMute(root.appNode.nodeRef)
+        action: function() {
+            AudioService.toggleAppMute(root.appNode.nodeRef);
+        }
     }
 }

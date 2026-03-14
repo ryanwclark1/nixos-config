@@ -28,6 +28,14 @@ Manual local install:
 3. Enable `Docker Manager`.
 4. Add `Docker Manager` from the bar widget picker.
 
+Repo-local helpers:
+
+- `scripts/plugin-local.sh install-docker-manager`
+- `scripts/plugin-local.sh smoke-docker-manager`
+- `scripts/plugin-local.sh docker-status --check`
+- `scripts/plugin-local.sh docker-all`
+- `scripts/plugin-local.sh remove-docker-manager`
+
 Suggested defaults:
 
 - runtime binary: `docker`

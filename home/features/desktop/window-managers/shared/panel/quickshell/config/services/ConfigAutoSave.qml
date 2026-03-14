@@ -275,6 +275,21 @@ QtObject {
         function onNightLightTemperatureChanged() {
             root.config.scheduleSave();
         }
+        function onBatteryAlertsEnabledChanged() {
+            root.config.scheduleSave();
+        }
+        function onBatteryWarningThresholdChanged() {
+            root.config.scheduleSave();
+        }
+        function onBatteryCriticalThresholdChanged() {
+            root.config.scheduleSave();
+        }
+        function onHooksEnabledChanged() {
+            root.config.scheduleSave();
+        }
+        function onHookPathsChanged() {
+            root.config.scheduleSave();
+        }
         function onIdleInhibitEnabledChanged() {
             root.config.scheduleSave();
         }

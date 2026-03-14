@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Wayland._Screencopy
 import Quickshell.Wayland

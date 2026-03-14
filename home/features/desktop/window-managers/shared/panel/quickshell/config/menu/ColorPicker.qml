@@ -275,7 +275,7 @@ PanelWindow {
               anchors.centerIn: parent
               width: 10
               height: 10
-              radius: 5
+              radius: width / 2
               color: root.currentColor
             }
           }
@@ -337,7 +337,7 @@ PanelWindow {
             y: (parent.height - height) / 2
             width: 14
             height: 14
-            radius: 7
+            radius: width / 2
             color: Qt.hsva(root.hue, 1.0, 1.0, 1.0)
             border.color: "white"
             border.width: 2

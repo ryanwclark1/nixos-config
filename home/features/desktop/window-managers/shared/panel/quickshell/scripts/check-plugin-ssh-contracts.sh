@@ -9,6 +9,7 @@ launcher_provider="${plugin_dir}/LauncherProvider.qml"
 settings_view="${plugin_dir}/Settings.qml"
 plugin_data="${plugin_dir}/SshPluginData.qml"
 parser_js="${plugin_dir}/SshConfigParser.js"
+plugin_readme="${plugin_dir}/README.md"
 
 pass_count=0
 fail_count=0
@@ -39,7 +40,7 @@ if ! command -v jq >/dev/null 2>&1; then
   exit 1
 fi
 
-for required in "$manifest" "$bar_widget" "$launcher_provider" "$settings_view" "$plugin_data" "$parser_js"; do
+for required in "$manifest" "$bar_widget" "$launcher_provider" "$settings_view" "$plugin_data" "$parser_js" "$plugin_readme"; do
   if [[ ! -f "$required" ]]; then
     echo "[FAIL] Missing ssh plugin file: ${required}" >&2
     exit 1
@@ -75,6 +76,11 @@ require_pattern "$plugin_data" 'manualById\[imported.id\]' "ssh plugin gives man
 require_pattern "$plugin_data" 'wl-copy' "ssh plugin exposes copy-to-clipboard action"
 require_pattern "$parser_js" 'parseFile' "ssh parser exports parseFile"
 require_pattern "$parser_js" 'includes:' "ssh parser keeps include handling in the parser contract"
+require_pattern "$plugin_readme" '!ssh' "ssh plugin README documents the launcher trigger"
+require_pattern "$plugin_readme" 'check-plugin-ssh-runtime-smoke\.sh' "ssh plugin README documents runtime smoke coverage"
+require_pattern "$plugin_readme" '~/.ssh/config' "ssh plugin README documents ssh-config import"
+require_pattern "$plugin_readme" 'plugin-local\.sh ssh-status --check --quiet' "ssh plugin README documents compact ssh status checks"
+require_pattern "$plugin_readme" 'plugin-local\.sh ssh-guards' "ssh plugin README documents the ssh guard command list"
 
 printf '[INFO] Plugin ssh contract summary: %d pass, %d fail\n' "$pass_count" "$fail_count"
 (( fail_count == 0 ))

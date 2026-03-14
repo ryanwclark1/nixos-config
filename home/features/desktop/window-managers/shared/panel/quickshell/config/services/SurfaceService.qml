@@ -111,6 +111,11 @@ QtObject {
                 kind: "popup",
                 focusPolicy: "preserve-app-focus",
                 legacyFlags: ["cavaPopupVisible"]
+            },
+            aiChat: {
+                kind: "panel",
+                focusPolicy: "focus-on-open",
+                legacyFlags: ["aiChatVisible"]
             }
         })
     readonly property var knownSurfaces: Object.keys(surfaceRegistry)
@@ -404,7 +409,7 @@ QtObject {
         };
     }
 
-    Timer {
+    property Timer popupSwitchTimer: Timer {
         id: popupSwitchTimer
         interval: root.popupSwitchDelay
         repeat: false

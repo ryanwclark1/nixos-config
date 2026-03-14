@@ -1,6 +1,7 @@
 AppIcon 1.0 AppIcon.qml
 AudioDeviceSection 1.0 AudioDeviceSection.qml
 AudioWidget 1.0 AudioWidget.qml
+BarContextPopup 1.0 BarContextPopup.qml
 BarPill 1.0 BarPill.qml
 BarTooltip 1.0 BarTooltip.qml
 BatteryWidget 1.0 BatteryWidget.qml
@@ -19,6 +20,7 @@ DesktopWeather 1.0 DesktopWeather.qml
 DesktopWidgets 1.0 DesktopWidgets.qml
 DraggableDesktopWidget 1.0 DraggableDesktopWidget.qml
 Scrollbar 1.0 Scrollbar.qml
+SearchBar 1.0 SearchBar.qml
 ToggleSwitch 1.0 ToggleSwitch.qml
 Dock 1.0 Dock.qml
 DockContent 1.0 DockContent.qml

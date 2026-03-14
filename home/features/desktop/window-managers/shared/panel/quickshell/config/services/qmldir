@@ -1,3 +1,4 @@
+singleton AiService 1.0 AiService.qml
 singleton AudioService 1.0 AudioService.qml
 singleton Colors 1.0 Colors.qml
 singleton CompositorAdapter 1.0 CompositorAdapter.qml
@@ -36,4 +37,5 @@ singleton NiriService 1.0 NiriService.qml
 NiriSocket 1.0 NiriSocket.qml
 singleton NiriBinds 1.0 NiriBinds.qml
 singleton GameModeService 1.0 GameModeService.qml
+singleton HookService 1.0 HookService.qml
 singleton NetworkService 1.0 NetworkService.qml

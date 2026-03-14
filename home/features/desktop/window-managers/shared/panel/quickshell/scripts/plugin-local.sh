@@ -12,6 +12,77 @@ reference_settings_fixture="${reference_source_dir}/expected-settings.json"
 reference_recovery_fixture="${reference_source_dir}/expected-recovery-scenarios.json"
 reference_diag_active_fixture="${reference_source_dir}/expected-diagnostics-active.json"
 reference_diag_degraded_fixture="${reference_source_dir}/expected-diagnostics-degraded.json"
+ssh_plugin_dir_name="ssh-monitor"
+ssh_plugin_id="quickshell.ssh.monitor"
+ssh_source_dir="$(cd "${script_dir}/../config/plugins/${ssh_plugin_dir_name}" 2>/dev/null && pwd || true)"
+ssh_manifest="${ssh_source_dir}/manifest.json"
+ssh_readme="${ssh_source_dir}/README.md"
+ssh_settings_fixture="${ssh_source_dir}/expected-settings.json"
+ssh_state_fixture="${ssh_source_dir}/expected-state-envelope.json"
+ssh_import_fixture="${ssh_source_dir}/expected-import.json"
+docker_plugin_dir_name="docker-manager"
+docker_plugin_id="docker.manager"
+docker_source_dir="$(cd "${script_dir}/../examples/plugins/${docker_plugin_dir_name}" 2>/dev/null && pwd || true)"
+docker_manifest="${docker_source_dir}/manifest.json"
+docker_readme="${docker_source_dir}/README.md"
+
+ssh_guard_commands() {
+  if [[ "${PLUGIN_LOCAL_SSH_SKIP_LOCAL:-0}" != "1" ]]; then
+    printf '%s\n' "${script_dir}/check-plugin-ssh-local.sh"
+  fi
+  cat <<EOF
+${script_dir}/check-plugin-ssh-runtime-smoke.sh
+${script_dir}/check-plugin-ssh-contracts.sh
+${script_dir}/check-plugin-ssh-fixtures.sh
+EOF
+}
+
+ssh_guard_label() {
+  local guard_cmd="$1"
+  case "$guard_cmd" in
+    *"check-plugin-ssh-local.sh")
+      printf '%s' 'first-party ssh local checks'
+      ;;
+    *"check-plugin-ssh-runtime-smoke.sh")
+      printf '%s' 'first-party ssh runtime smoke checks'
+      ;;
+    *"check-plugin-ssh-contracts.sh")
+      printf '%s' 'first-party ssh contract checks'
+      ;;
+    *"check-plugin-ssh-fixtures.sh")
+      printf '%s' 'first-party ssh fixture checks'
+      ;;
+    *)
+      printf '%s' 'first-party ssh guard'
+      ;;
+  esac
+}
+
+docker_guard_commands() {
+  cat <<EOF
+${script_dir}/check-plugin-docker-manager-local.sh
+${script_dir}/check-plugin-docker-manager-runtime-smoke.sh
+${script_dir}/check-plugin-docker-manager-contracts.sh
+EOF
+}
+
+docker_guard_label() {
+  local guard_cmd="$1"
+  case "$guard_cmd" in
+    *"check-plugin-docker-manager-local.sh")
+      printf '%s' 'docker-manager local checks'
+      ;;
+    *"check-plugin-docker-manager-runtime-smoke.sh")
+      printf '%s' 'docker-manager runtime smoke checks'
+      ;;
+    *"check-plugin-docker-manager-contracts.sh")
+      printf '%s' 'docker-manager contract checks'
+      ;;
+    *)
+      printf '%s' 'docker-manager guard'
+      ;;
+  esac
+}
 
 health_label() {
   local ok="$1"
@@ -73,7 +144,7 @@ reference_guard_label() {
 usage() {
   cat <<'EOF'
 Usage:
-  plugin-local.sh [quick|full|doctor|install-reference|remove-reference|smoke-reference|reference-flow|reference-export|reference-status|reference-files|reference-guards|reference-all|shared-gates|baseline-gates|all-gates] [plugins_dir|--check|--quiet]
+  plugin-local.sh [quick|full|doctor|install-reference|remove-reference|smoke-reference|reference-flow|reference-export|reference-status|reference-files|reference-guards|reference-all|install-docker-manager|remove-docker-manager|smoke-docker-manager|docker-flow|docker-status|docker-files|docker-guards|docker-all|ssh-flow|ssh-status|ssh-files|ssh-guards|ssh-all|shared-gates|baseline-gates|all-gates] [plugins_dir|--check|--quiet]
 
 Modes:
   quick              Run fast local plugin guardrails (default, `--quiet` suppresses wrapper headings)
@@ -88,6 +159,19 @@ Modes:
   reference-files    Print canonical reference toolkit file and guard paths only
   reference-guards   Print runnable reference toolkit guard commands in order
   reference-all      Run the full reference-toolkit guard sequence (`--quiet` suppresses stage headings, `--silent-preflight` suppresses successful preflight output)
+  install-docker-manager Link the repo-tracked docker-manager plugin into plugins_dir
+  remove-docker-manager  Remove the linked docker-manager plugin from plugins_dir
+  smoke-docker-manager   Validate the installed docker-manager plugin in isolation
+  docker-flow        Print the manual docker-manager validation sequence
+  docker-status      Print a combined docker-manager status summary (`--check` fails on unhealthy prerequisites, `--quiet` suppresses the dashboard and prints one-line status)
+  docker-files       Print canonical docker-manager file and guard paths only
+  docker-guards      Print runnable docker-manager guard commands in order
+  docker-all         Run the full docker-manager guard sequence (`--quiet` suppresses stage headings)
+  ssh-flow           Print the manual first-party SSH plugin validation sequence
+  ssh-status         Print a combined first-party SSH plugin status summary (`--check` fails on unhealthy prerequisites, `--quiet` suppresses the dashboard and prints one-line status)
+  ssh-files          Print canonical first-party SSH plugin file and guard paths only
+  ssh-guards         Print runnable first-party SSH plugin guard commands in order
+  ssh-all            Run the full first-party SSH plugin guard sequence (`--quiet` suppresses stage headings)
   shared-gates       Run the shared runtime and diagnostics plugin gates (`--quiet` suppresses wrapper headings)
   baseline-gates     Run plugin conformance and doctor-smoke gates (`--quiet` suppresses wrapper headings)
   all-gates          Run baseline, reference, and shared plugin gates (`--quiet` suppresses phase headings)
@@ -416,6 +500,374 @@ EOF
       printf '[INFO] Reference plugin checks passed.\n'
     fi
     ;;
+  install-docker-manager)
+    target="${2:-${HOME}/.config/quickshell/plugins}"
+    destination="${target}/${docker_plugin_dir_name}"
+    if [[ ! -d "$docker_source_dir" ]]; then
+      echo "[FAIL] Missing docker-manager plugin source: ${docker_source_dir}" >&2
+      exit 1
+    fi
+    mkdir -p "$target"
+    if [[ -e "$destination" && ! -L "$destination" ]]; then
+      echo "[FAIL] Refusing to overwrite non-symlink path: ${destination}" >&2
+      exit 1
+    fi
+    if [[ -L "$destination" ]]; then
+      current_target="$(readlink "$destination" || true)"
+      if [[ "$current_target" == "$docker_source_dir" ]]; then
+        printf '[INFO] Docker Manager plugin already linked at %s\n' "$destination"
+        exit 0
+      fi
+      echo "[FAIL] Refusing to replace symlink with different target: ${destination}" >&2
+      exit 1
+    fi
+    ln -s "$docker_source_dir" "$destination"
+    printf '[INFO] Installed docker-manager plugin at %s\n' "$destination"
+    ;;
+  remove-docker-manager)
+    target="${2:-${HOME}/.config/quickshell/plugins}"
+    destination="${target}/${docker_plugin_dir_name}"
+    if [[ ! -e "$destination" ]]; then
+      printf '[INFO] Docker Manager plugin is not installed at %s\n' "$destination"
+      exit 0
+    fi
+    if [[ ! -L "$destination" ]]; then
+      echo "[FAIL] Refusing to remove non-symlink path: ${destination}" >&2
+      exit 1
+    fi
+    current_target="$(readlink "$destination" || true)"
+    if [[ "$current_target" != "$docker_source_dir" ]]; then
+      echo "[FAIL] Refusing to remove symlink with different target: ${destination}" >&2
+      exit 1
+    fi
+    rm "$destination"
+    printf '[INFO] Removed docker-manager plugin from %s\n' "$destination"
+    ;;
+  smoke-docker-manager)
+    target="${2:-${HOME}/.config/quickshell/plugins}"
+    destination="${target}/${docker_plugin_dir_name}"
+    manifest_path="${destination}/manifest.json"
+    tmp_plugins="$(mktemp -d)"
+    tmp_json="$(mktemp)"
+    trap 'rm -rf "$tmp_plugins" "$tmp_json"' EXIT
+    if [[ ! -f "$manifest_path" ]]; then
+      echo "[FAIL] Docker Manager manifest not found: ${manifest_path}" >&2
+      exit 1
+    fi
+    if ! jq -e --arg id "$docker_plugin_id" '.id == $id' "$manifest_path" >/dev/null 2>&1; then
+      echo "[FAIL] Docker Manager manifest has unexpected id: ${manifest_path}" >&2
+      exit 1
+    fi
+    if [[ ! -L "$destination" ]]; then
+      echo "[FAIL] Docker Manager path is not the expected symlink: ${destination}" >&2
+      exit 1
+    fi
+    current_target="$(readlink "$destination" || true)"
+    if [[ "$current_target" != "$docker_source_dir" ]]; then
+      echo "[FAIL] Docker Manager symlink has unexpected target: ${destination}" >&2
+      exit 1
+    fi
+    cp -RL "$destination" "${tmp_plugins}/${docker_plugin_dir_name}"
+    "${script_dir}/plugin-doctor.sh" --json "$tmp_plugins" > "$tmp_json"
+    jq -e --arg name "$docker_plugin_dir_name" '
+      .summary.fail == 0
+      and .summary.pass == 1
+      and ([.entries[] | select(.status == "PASS" and .name == $name)] | length) == 1
+    ' "$tmp_json" >/dev/null 2>&1
+    printf '[INFO] Docker Manager smoke passed for %s\n' "$destination"
+    ;;
+  docker-flow)
+    cat <<'EOF'
+Docker Manager Manual Flow
+
+1. Run `scripts/plugin-local.sh install-docker-manager` and `scripts/plugin-local.sh smoke-docker-manager`.
+2. Run `scripts/plugin-local.sh docker-all` to validate the local repo copy, runtime smoke harness, and contract checks.
+3. Open Settings -> Plugins, confirm `Docker Manager` is present and enabled.
+4. Add `Docker Manager` from the bar widget picker and confirm the badge appears in the bar.
+5. Open the popup and confirm the running count and status text match `docker ps` on the machine.
+6. Toggle compose view and port visibility, then reopen the popup and confirm those settings persist.
+7. Change the runtime binary to an invalid command in plugin settings and confirm the plugin becomes degraded without crashing the bar.
+8. Restore the runtime binary to `docker` and confirm the plugin returns to active state.
+9. Finish with `scripts/plugin-local.sh remove-docker-manager` if you only needed a temporary local install.
+EOF
+    ;;
+  docker-status)
+    target="${HOME}/.config/quickshell/plugins"
+    check_only=0
+    quiet=0
+    if [[ -n "${2:-}" && "${2:-}" != --* ]]; then
+      target="$2"
+      shift 2
+    else
+      shift 1
+    fi
+    while (($# > 0)); do
+      case "$1" in
+        --check)
+          check_only=1
+          ;;
+        --quiet)
+          quiet=1
+          ;;
+      esac
+      shift
+    done
+    destination="${target}/${docker_plugin_dir_name}"
+    health_failures=0
+    if [[ -d "$docker_source_dir" && -f "$docker_manifest" && -f "$docker_readme" ]]; then
+      source_health="$(health_label 1 "docker-manager plugin source")"
+    else
+      source_health="$(health_label 0 "docker-manager plugin source")"
+      health_failures=$((health_failures + 1))
+    fi
+    if [[ -x "${script_dir}/check-plugin-docker-manager-local.sh" && -x "${script_dir}/check-plugin-docker-manager-runtime-smoke.sh" && -x "${script_dir}/check-plugin-docker-manager-contracts.sh" ]]; then
+      guard_health="$(health_label 1 "docker-manager guard scripts")"
+    else
+      guard_health="$(health_label 0 "docker-manager guard scripts")"
+      health_failures=$((health_failures + 1))
+    fi
+    if command -v quickshell >/dev/null 2>&1 && command -v docker >/dev/null 2>&1; then
+      runtime_health="$(health_label 1 "quickshell and docker commands")"
+    else
+      runtime_health="$(health_label 0 "quickshell and docker commands")"
+      health_failures=$((health_failures + 1))
+    fi
+    if docker info >/dev/null 2>&1; then
+      daemon_health="$(health_label 1 "docker daemon reachable")"
+    else
+      daemon_health="$(health_label 0 "docker daemon reachable")"
+      health_failures=$((health_failures + 1))
+    fi
+    if [[ -L "$destination" ]]; then
+      install_target="$(readlink "$destination" || true)"
+      if [[ "$install_target" == "$docker_source_dir" ]]; then
+        install_health="$(health_label 1 "docker-manager plugin installed as expected symlink")"
+        install_state="installed (expected symlink)"
+      else
+        install_health="warning: docker-manager plugin symlink target differs from repo-tracked source"
+        install_state="installed (foreign symlink target)"
+        health_failures=$((health_failures + 1))
+      fi
+    elif [[ -e "$destination" ]]; then
+      install_health="warning: docker-manager plugin path is present but not a symlink"
+      install_state="present (non-symlink)"
+      health_failures=$((health_failures + 1))
+    else
+      install_health="info: docker-manager plugin not installed"
+      install_state="not installed"
+    fi
+    if (( quiet == 0 )); then
+      cat <<EOF
+Docker Manager Local Status
+
+Install state:
+  ${install_state}
+  target path: ${destination}
+  source path: ${docker_source_dir}
+  plugin id: ${docker_plugin_id}
+
+Health summary:
+  ${source_health}
+  ${guard_health}
+  ${runtime_health}
+  ${daemon_health}
+  ${install_health}
+
+Local commands:
+  install:  scripts/plugin-local.sh install-docker-manager ${target}
+  smoke:    scripts/plugin-local.sh smoke-docker-manager ${target}
+  remove:   scripts/plugin-local.sh remove-docker-manager ${target}
+  status:   scripts/plugin-local.sh docker-status --check
+  flow:     scripts/plugin-local.sh docker-flow
+  all:      scripts/plugin-local.sh docker-all
+
+Plugin files:
+  manifest: ${docker_manifest}
+  readme:   ${docker_readme}
+
+Docker guards:
+  scripts/check-plugin-docker-manager-local.sh
+  scripts/check-plugin-docker-manager-runtime-smoke.sh
+  scripts/check-plugin-docker-manager-contracts.sh
+EOF
+    else
+      printf '[INFO] Docker Manager status: %s | %s | %s | %s | %s\n' \
+        "$source_health" \
+        "$guard_health" \
+        "$runtime_health" \
+        "$daemon_health" \
+        "$install_health"
+    fi
+    if (( check_only == 1 )); then
+      if (( health_failures == 0 )); then
+        printf '[INFO] Docker Manager status check passed.\n'
+      else
+        printf '[FAIL] Docker Manager status check failed: %d prerequisite issue(s).\n' "$health_failures" >&2
+        exit 1
+      fi
+    fi
+    ;;
+  docker-files)
+    cat <<EOF
+source_dir=${docker_source_dir}
+plugin_id=${docker_plugin_id}
+manifest=${docker_manifest}
+readme=${docker_readme}
+guard_local=${script_dir}/check-plugin-docker-manager-local.sh
+guard_runtime_smoke=${script_dir}/check-plugin-docker-manager-runtime-smoke.sh
+guard_contracts=${script_dir}/check-plugin-docker-manager-contracts.sh
+EOF
+    ;;
+  docker-guards)
+    docker_guard_commands
+    ;;
+  docker-all)
+    quiet=0
+    if [[ "${2:-}" == "--quiet" ]]; then
+      quiet=1
+    fi
+    while IFS= read -r guard_cmd; do
+      [[ -n "$guard_cmd" ]] || continue
+      read -r -a guard_parts <<< "$guard_cmd"
+      if (( quiet == 0 )); then
+        printf '[INFO] Running %s...\n' "$(docker_guard_label "$guard_cmd")"
+      fi
+      "${guard_parts[@]}"
+    done < <(docker_guard_commands)
+    if (( quiet == 0 )); then
+      printf '[INFO] Docker Manager plugin checks passed.\n'
+    fi
+    ;;
+  ssh-flow)
+    cat <<'EOF'
+First-Party SSH Plugin Manual Flow
+
+1. Run `scripts/check-plugin-ssh-local.sh` and `scripts/check-plugin-ssh-runtime-smoke.sh`.
+2. Open Settings -> Plugins, confirm `SSH Monitor` is present and enabled, then run `scripts/plugin-local.sh shared-gates`.
+3. Open the SSH plugin settings page, add a manual host, and confirm the bar summary updates.
+4. Enable ssh-config import and confirm exact aliases from `~/.ssh/config` appear while wildcard entries remain skipped.
+5. Open launcher mode with `!ssh`, run a connect action for a manual host, then run a copy action for an imported alias.
+6. Confirm the copied command matches the displayed command form and that recent-host state updates after launcher actions.
+7. Finish with `scripts/plugin-verify.sh --quiet`.
+EOF
+    ;;
+  ssh-status)
+    check_only=0
+    quiet=0
+    shift 1
+    while (($# > 0)); do
+      case "$1" in
+        --check)
+          check_only=1
+          ;;
+        --quiet)
+          quiet=1
+          ;;
+      esac
+      shift
+    done
+    health_failures=0
+    if [[ -d "$ssh_source_dir" && -f "$ssh_manifest" && -f "$ssh_readme" ]]; then
+      source_health="$(health_label 1 "first-party ssh plugin source")"
+    else
+      source_health="$(health_label 0 "first-party ssh plugin source")"
+      health_failures=$((health_failures + 1))
+    fi
+    if [[ -f "$ssh_settings_fixture" && -f "$ssh_state_fixture" && -f "$ssh_import_fixture" ]]; then
+      fixture_health="$(health_label 1 "ssh plugin fixtures")"
+    else
+      fixture_health="$(health_label 0 "ssh plugin fixtures")"
+      health_failures=$((health_failures + 1))
+    fi
+    if [[ -x "${script_dir}/check-plugin-ssh-local.sh" && -x "${script_dir}/check-plugin-ssh-runtime-smoke.sh" && -x "${script_dir}/check-plugin-ssh-contracts.sh" && -x "${script_dir}/check-plugin-ssh-fixtures.sh" ]]; then
+      guard_health="$(health_label 1 "ssh guard scripts")"
+    else
+      guard_health="$(health_label 0 "ssh guard scripts")"
+      health_failures=$((health_failures + 1))
+    fi
+    if (( quiet == 0 )); then
+      cat <<EOF
+First-Party SSH Plugin Status
+
+Plugin state:
+  shipped path: ${ssh_source_dir}
+  plugin id: ${ssh_plugin_id}
+  launcher trigger: !ssh
+
+Health summary:
+  ${source_health}
+  ${fixture_health}
+  ${guard_health}
+
+Local commands:
+  shared:   scripts/plugin-local.sh shared-gates
+  verify:   scripts/plugin-verify.sh --quiet
+  flow:     scripts/plugin-local.sh ssh-flow
+  status:   scripts/plugin-local.sh ssh-status --check
+
+Plugin files:
+  manifest: ${ssh_manifest}
+  readme:   ${ssh_readme}
+  settings: ${ssh_settings_fixture}
+  state:    ${ssh_state_fixture}
+  import:   ${ssh_import_fixture}
+
+SSH guards:
+  scripts/check-plugin-ssh-local.sh
+  scripts/check-plugin-ssh-runtime-smoke.sh
+  scripts/check-plugin-ssh-contracts.sh
+  scripts/check-plugin-ssh-fixtures.sh
+EOF
+    else
+      printf '[INFO] SSH status: %s | %s | %s\n' \
+        "$source_health" \
+        "$fixture_health" \
+        "$guard_health"
+    fi
+    if (( check_only == 1 )); then
+      if (( health_failures == 0 )); then
+        printf '[INFO] SSH status check passed.\n'
+      else
+        printf '[FAIL] SSH status check failed: %d prerequisite issue(s).\n' "$health_failures" >&2
+        exit 1
+      fi
+    fi
+    ;;
+  ssh-files)
+    cat <<EOF
+source_dir=${ssh_source_dir}
+plugin_id=${ssh_plugin_id}
+manifest=${ssh_manifest}
+readme=${ssh_readme}
+settings_fixture=${ssh_settings_fixture}
+state_fixture=${ssh_state_fixture}
+import_fixture=${ssh_import_fixture}
+guard_local=${script_dir}/check-plugin-ssh-local.sh
+guard_runtime_smoke=${script_dir}/check-plugin-ssh-runtime-smoke.sh
+guard_contracts=${script_dir}/check-plugin-ssh-contracts.sh
+guard_fixtures=${script_dir}/check-plugin-ssh-fixtures.sh
+EOF
+    ;;
+  ssh-guards)
+    ssh_guard_commands
+    ;;
+  ssh-all)
+    quiet=0
+    if [[ "${2:-}" == "--quiet" ]]; then
+      quiet=1
+    fi
+    while IFS= read -r guard_cmd; do
+      [[ -n "$guard_cmd" ]] || continue
+      read -r -a guard_parts <<< "$guard_cmd"
+      if (( quiet == 0 )); then
+        printf '[INFO] Running %s...\n' "$(ssh_guard_label "$guard_cmd")"
+      fi
+      "${guard_parts[@]}"
+    done < <(ssh_guard_commands)
+    if (( quiet == 0 )); then
+      printf '[INFO] First-party SSH plugin checks passed.\n'
+    fi
+    ;;
   shared-gates)
     quiet=0
     if [[ "${2:-}" == "--quiet" ]]; then
@@ -441,6 +893,10 @@ EOF
       printf '[INFO] Running first-party ssh plugin local checks...\n'
     fi
     "${script_dir}/check-plugin-ssh-local.sh"
+    if (( quiet == 0 )); then
+      printf '[INFO] Running first-party ssh plugin runtime smoke checks...\n'
+    fi
+    "${script_dir}/check-plugin-ssh-runtime-smoke.sh"
     if (( quiet == 0 )); then
       printf '[INFO] Running first-party ssh plugin contract checks...\n'
     fi
@@ -484,11 +940,20 @@ EOF
     if (( quiet == 0 )); then
       printf '[INFO] Running plugin reference toolkit checks...\n'
       "${script_dir}/plugin-local.sh" reference-all
+      if "${script_dir}/plugin-local.sh" docker-status --check >/dev/null 2>&1; then
+        printf '[INFO] Running docker-manager plugin checks...\n'
+        "${script_dir}/plugin-local.sh" docker-all
+      else
+        printf '[INFO] Skipping docker-manager plugin checks; run `scripts/plugin-local.sh docker-status` for details.\n'
+      fi
       printf '[INFO] Running shared plugin gates...\n'
       "${script_dir}/plugin-local.sh" shared-gates
       printf '[INFO] Plugin verification passed.\n'
     else
       "${script_dir}/plugin-local.sh" reference-all --quiet --silent-preflight
+      if "${script_dir}/plugin-local.sh" docker-status --check >/dev/null 2>&1; then
+        "${script_dir}/plugin-local.sh" docker-all --quiet
+      fi
       "${script_dir}/plugin-local.sh" shared-gates --quiet
     fi
     ;;

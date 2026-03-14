@@ -1,6 +1,7 @@
 //@ pragma UseQApplication
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Wayland
 import "bar"
 import "launcher"
@@ -59,6 +60,7 @@ Scope {
     readonly property bool fileBrowserVisible: root.isSurfaceOpen("fileBrowser")
     readonly property bool screenshotMenuVisible: root.isSurfaceOpen("screenshotMenu")
     readonly property bool cavaPopupVisible: root.isSurfaceOpen("cavaPopup")
+    readonly property bool aiChatVisible: root.isSurfaceOpen("aiChat")
 
     function currentSurfaceScreen() {
         return surfaceService.currentSurfaceScreen();
@@ -193,6 +195,9 @@ Scope {
     function toggleCavaPopup() {
         toggleSurface("cavaPopup");
     }
+    function toggleAiChat() {
+        toggleSurface("aiChat");
+    }
 
     IpcHandler {
         target: "Shell"
@@ -213,6 +218,10 @@ Scope {
         }
         function reloadConfig() {
             Config.load();
+        }
+        function showAltTab() {
+            if (altTabSwitcher.item && altTabSwitcher.item.show)
+                altTabSwitcher.item.show();
         }
 
         // Per-surface toggle methods — kept for backward compatibility with
@@ -280,6 +289,9 @@ Scope {
         function toggleCavaPopup() {
             root.toggleSurface("cavaPopup");
         }
+        function toggleAiChat() {
+            root.toggleSurface("aiChat");
+        }
     }
 
     // Global shortcuts (outside Variants to avoid duplicate registration)
@@ -298,9 +310,10 @@ Scope {
         onActivated: root.toggleNotifications()
     }
 
-    // Ensure ThemeService initializes early (loads manifest + applies saved theme)
+    // Ensure ThemeService and HookService initialize early
     Component.onCompleted: {
         void ThemeService.activeThemeId;
+        void HookService;
     }
 
     NotificationManager {
@@ -382,6 +395,7 @@ Scope {
                                 barConfig: barWindow.barConfig
                                 activeSurfaceId: root.barOwnsSurface(root.activeSurfaceContext, screenBars.modelData, barWindow.barConfig.id) ? root.activeSurfaceId : ""
                                 onSurfaceRequested: (surfaceId, context) => root.toggleSurface(surfaceId, context)
+                                onContextMenuRequested: (actions, rect) => barContextPopup.show(actions, rect, barWindow.barConfig.position, barWindow)
                             }
 
                             BluetoothMenu {
@@ -519,6 +533,25 @@ Scope {
         }
     }
 
+    BarContextPopup {
+        id: barContextPopup
+    }
+
+    Connections {
+        target: surfaceService
+        function onActiveSurfaceIdChanged() { barContextPopup.close(); }
+    }
+
+    // Show a toast when Niri reports a config load failure
+    Connections {
+        target: NiriService
+        enabled: CompositorAdapter.isNiri && NiriService.available
+        function onConfigLoadFinished(ok, error) {
+            if (!ok)
+                ToastService.showError("Niri config error", error || "Failed to load config");
+        }
+    }
+
     Osd {
         id: osd
     }
@@ -534,7 +567,13 @@ Scope {
     Loader {
         id: overview
         active: CompositorAdapter.supportsOverview
-        source: "launcher/Overview.qml"
+        source: CompositorAdapter.isNiri ? "launcher/OverviewNiri.qml" : "launcher/Overview.qml"
+    }
+
+    Loader {
+        id: altTabSwitcher
+        active: CompositorAdapter.isNiri && NiriService.available
+        source: "launcher/AltTabSwitcher.qml"
     }
 
     Dock {
@@ -660,6 +699,16 @@ Scope {
                 root._pendingNotepadContent = content;
                 root._openFileBrowserForNotepad("save");
             }
+        }
+    }
+
+    LazyLoader {
+        active: root.aiChatVisible
+        AiChat {
+            id: aiChat
+            screen: root.currentSurfaceScreen()
+            showContent: root.aiChatVisible
+            onCloseRequested: root.closeSurface("aiChat")
         }
     }
 

@@ -154,7 +154,7 @@ Rectangle {
 
         Rectangle {
           anchors.fill: parent
-          radius: 11
+          radius: height / 2
           color: parent.containsMouse ? Colors.primary : Colors.highlightLight
           border.color: Colors.primary
           border.width: 1

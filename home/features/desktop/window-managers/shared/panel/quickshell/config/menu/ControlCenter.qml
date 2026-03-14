@@ -1,9 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Bluetooth
 import Quickshell.Wayland
-import Quickshell.Widgets
 import "."
 import "../modules"
 import "../services"
@@ -531,7 +529,7 @@ PanelWindow {
                             layer.enabled: opacity > 0 && opacity < 1
                             Behavior on opacity {
                                 NumberAnimation {
-                                    duration: 700
+                                    duration: Colors.durationPulse
                                     easing.type: Easing.OutCubic
                                 }
                             }

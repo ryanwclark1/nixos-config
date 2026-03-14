@@ -57,6 +57,7 @@ Item {
   }
 
   signal surfaceRequested(string surfaceId, var context)
+  signal contextMenuRequested(var actions, var triggerRect)
 
   implicitHeight: vertical ? 0 : thickness
   implicitWidth: vertical ? Math.max(thickness, Math.max(leftColumn.implicitWidth, Math.max(centerColumn.implicitWidth, rightColumn.implicitWidth)) + outerPadding * 2) : 0
@@ -170,6 +171,8 @@ Item {
     if (widgetType === "logo") return logoComponent;
     if (widgetType === "workspaces") return workspacesComponent;
     if (widgetType === "taskbar") return taskbarComponent;
+    if (widgetType === "windowTitle") return windowTitleComponent;
+    if (widgetType === "keyboardLayout") return keyboardLayoutComponent;
     if (widgetType === "cpuStatus") return cpuStatusComponent;
     if (widgetType === "ramStatus") return ramStatusComponent;
     if (widgetType === "gpuStatus") return gpuStatusComponent;
@@ -404,6 +407,21 @@ Item {
   }
 
   Component {
+    id: windowTitleComponent
+    WindowTitle {
+      property var widgetInstance: null
+    }
+  }
+
+  Component {
+    id: keyboardLayoutComponent
+    KeyboardLayout {
+      property var widgetInstance: null
+      anchorWindow: root.anchorWindow
+    }
+  }
+
+  Component {
     id: cpuStatusComponent
     StatPill {
       property var widgetInstance: null
@@ -481,6 +499,11 @@ Item {
         anchorWindow: root.anchorWindow
         tooltipText: Qt.formatDateTime(centerClock.date, "dddd, MMMM d yyyy")
         onClicked: root.requestSurface("dateTimeMenu", this)
+        contextActions: [
+          { label: "Copy Time", icon: "󰅍", action: () => Quickshell.execDetached(["sh", "-c", "echo -n '" + Qt.formatDateTime(centerClock.date, "HH:mm:ss") + "' | wl-copy"]) },
+          { label: "Copy Date", icon: "󰃭", action: () => Quickshell.execDetached(["sh", "-c", "echo -n '" + Qt.formatDateTime(centerClock.date, "yyyy-MM-dd") + "' | wl-copy"]) }
+        ]
+        onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
         Text {
           visible: root.vertical
@@ -637,6 +660,10 @@ Item {
         normalColor: inhibitorRoot.inhibitorActive ? Colors.withAlpha(Colors.primary, 0.2) : Colors.bgWidget
         hoverColor: inhibitorRoot.inhibitorActive ? Colors.withAlpha(Colors.primary, 0.35) : Colors.highlightLight
         tooltipText: inhibitorRoot.inhibitorActive ? "Idle inhibitor enabled" : "Idle inhibitor"
+        contextActions: [
+          { label: inhibitorRoot.inhibitorActive ? "Disable Inhibitor" : "Enable Inhibitor", icon: "󰒲", action: () => { Quickshell.execDetached(["qs-inhibitor"]); inhibitorCheckTimer.restart(); } }
+        ]
+        onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
         onClicked: {
           Quickshell.execDetached(["qs-inhibitor"]);
           inhibitorCheckTimer.restart();
@@ -668,6 +695,11 @@ Item {
       anchorWindow: root.anchorWindow
       tooltipText: WeatherService.condition || "Weather"
       onClicked: root.requestSurface("weatherMenu", this)
+      contextActions: [
+        { label: "Refresh Now", icon: "󰑓", action: () => WeatherService.refresh() },
+        { label: "Open Weather Menu", icon: "󰖐", action: () => root.requestSurface("weatherMenu", this) }
+      ]
+      onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
       Row {
         spacing: Colors.spacingS
@@ -700,6 +732,10 @@ Item {
       anchorWindow: root.anchorWindow
       tooltipText: networkWidget.tooltipText
       onClicked: root.requestSurface("networkMenu", this)
+      contextActions: [
+        { label: "Open Network Menu", icon: "󰛳", action: () => root.requestSurface("networkMenu", this) }
+      ]
+      onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
       Row {
         spacing: Colors.spacingS
@@ -726,6 +762,12 @@ Item {
         return count > 0 ? count + " device" + (count > 1 ? "s" : "") + " connected" : "Bluetooth";
       }
       onClicked: root.requestSurface("bluetoothMenu", this)
+      contextActions: [
+        { label: (Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled) ? "Disable Bluetooth" : "Enable Bluetooth", icon: "󰂯", action: () => { if (Bluetooth.defaultAdapter) Bluetooth.defaultAdapter.enabled = !Bluetooth.defaultAdapter.enabled; } },
+        { separator: true },
+        { label: "Open Bluetooth Menu", icon: "󰂯", action: () => root.requestSurface("bluetoothMenu", this) }
+      ]
+      onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
       Row {
         spacing: Colors.spacingS
@@ -749,6 +791,12 @@ Item {
       anchorWindow: root.anchorWindow
       tooltipText: audioWidget.tooltipText
       onClicked: root.requestSurface("audioMenu", this)
+      contextActions: [
+        { label: AudioService.outputMuted ? "Unmute" : "Mute", icon: AudioService.outputMuted ? "󰖁" : "󰕾", action: () => AudioService.toggleMute("@DEFAULT_AUDIO_SINK@") },
+        { separator: true },
+        { label: "Open Audio Menu", icon: "󰕾", action: () => root.requestSurface("audioMenu", this) }
+      ]
+      onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
       Row {
         spacing: Colors.spacingS
@@ -774,6 +822,13 @@ Item {
         return (p.trackTitle || "Music") + (p.trackArtist ? " - " + p.trackArtist : "");
       }
       onClicked: root.requestSurface("musicMenu", this)
+      contextActions: [
+        { label: "Play / Pause", icon: "󰐊", action: () => { var p = SystemStatus.activeMprisPlayers; if (p && p.length > 0 && p[0].player) p[0].player.playPause(); } },
+        { label: "Next Track", icon: "󰒭", action: () => { var p = SystemStatus.activeMprisPlayers; if (p && p.length > 0 && p[0].player) p[0].player.next(); } },
+        { separator: true },
+        { label: "Open Music Menu", icon: "󰝚", action: () => root.requestSurface("musicMenu", this) }
+      ]
+      onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
       Behavior on width { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutCubic } }
 
@@ -820,6 +875,10 @@ Item {
       hoverColor: Colors.withAlpha(Colors.warning, 0.28)
       tooltipText: PrivacyService.activeLabel || "Privacy"
       onClicked: root.requestSurface("privacyMenu", this)
+      contextActions: [
+        { label: "Open Privacy Menu", icon: "󰒃", action: () => root.requestSurface("privacyMenu", this) }
+      ]
+      onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
       Behavior on width { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
 
@@ -833,8 +892,8 @@ Item {
           SequentialAnimation on opacity {
             running: PrivacyService.anyActive
             loops: Animation.Infinite
-            NumberAnimation { from: 1.0; to: 0.25; duration: 700; easing.type: Easing.InOutSine }
-            NumberAnimation { from: 0.25; to: 1.0; duration: 700; easing.type: Easing.InOutSine }
+            NumberAnimation { from: 1.0; to: 0.25; duration: Colors.durationPulse; easing.type: Easing.InOutSine }
+            NumberAnimation { from: 0.25; to: 1.0; duration: Colors.durationPulse; easing.type: Easing.InOutSine }
           }
         }
 
@@ -861,6 +920,10 @@ Item {
       hoverColor: Colors.withAlpha(Colors.error, 0.25)
       tooltipText: "Screen recording in progress"
       onClicked: root.requestSurface("recordingMenu", this)
+      contextActions: [
+        { label: "Stop Recording", icon: "󰙧", danger: true, action: () => RecordingService.stopRecording() }
+      ]
+      onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
       Row {
         spacing: Colors.spacingS
@@ -898,6 +961,14 @@ Item {
       anchorWindow: root.anchorWindow
       tooltipText: batteryWidget.tooltipText
       onClicked: root.requestSurface("batteryMenu", this)
+      contextActions: [
+        { label: "Power Saver", icon: "󰌪", action: () => PowerProfileService.setProfile("power-saver") },
+        { label: "Balanced", icon: "󰛲", action: () => PowerProfileService.setProfile("balanced") },
+        { label: "Performance", icon: "󱐋", action: () => PowerProfileService.setProfile("performance") },
+        { separator: true },
+        { label: "Open Battery Menu", icon: "󰁹", action: () => root.requestSurface("batteryMenu", this) }
+      ]
+      onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
       Row {
         spacing: Colors.spacingXS
@@ -920,6 +991,10 @@ Item {
         ? PrinterService.activeJobs + " print job" + (PrinterService.activeJobs !== 1 ? "s" : "") + " active"
         : (PrinterService.defaultPrinter ? PrinterService.defaultPrinter : "Printers")
       onClicked: root.requestSurface("printerMenu", this)
+      contextActions: [
+        { label: "Open Printer Menu", icon: "󰐪", action: () => root.requestSurface("printerMenu", this) }
+      ]
+      onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
       Behavior on width { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
 
@@ -964,6 +1039,10 @@ Item {
       anchorWindow: root.anchorWindow
       tooltipText: "Notepad"
       onClicked: root.requestSurface("notepad", this)
+      contextActions: [
+        { label: "Open Notepad", icon: "󰠮", action: () => root.requestSurface("notepad", this) }
+      ]
+      onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
       Text {
         color: Colors.text
@@ -982,6 +1061,10 @@ Item {
       anchorWindow: root.anchorWindow
       tooltipText: "System controls"
       onClicked: root.requestSurface("controlCenter", this)
+      contextActions: [
+        { label: "Open Settings", icon: "󰒓", action: () => root.requestSurface("controlCenter", this) }
+      ]
+      onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
       Text {
         color: Colors.text
@@ -1009,6 +1092,12 @@ Item {
       anchorWindow: root.anchorWindow
       tooltipText: "Clipboard history"
       onClicked: root.requestSurface("clipboardMenu", this)
+      contextActions: [
+        { label: "Clear History", icon: "󰎟", danger: true, action: () => Quickshell.execDetached(["sh", "-c", "cliphist wipe"]) },
+        { separator: true },
+        { label: "Open Clipboard", icon: "󰅍", action: () => root.requestSurface("clipboardMenu", this) }
+      ]
+      onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
       Text {
         text: "󰅍"
@@ -1027,6 +1116,10 @@ Item {
       anchorWindow: root.anchorWindow
       tooltipText: "Screenshot"
       onClicked: root.requestSurface("screenshotMenu", this)
+      contextActions: [
+        { label: "Open Screenshot Menu", icon: "󰩭", action: () => root.requestSurface("screenshotMenu", this) }
+      ]
+      onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
       Text {
         text: "󰩭"
@@ -1046,6 +1139,13 @@ Item {
       anchorWindow: root.anchorWindow
       tooltipText: root.manager && root.manager.dndEnabled ? "Notifications paused" : "Notifications"
       onClicked: root.requestSurface("notifCenter", this)
+      contextActions: [
+        { label: (root.manager && root.manager.dndEnabled) ? "Disable DND" : "Enable DND", icon: "󰂛", action: () => { if (root.manager) root.manager.dndEnabled = !root.manager.dndEnabled; } },
+        { label: "Clear All", icon: "󰎟", action: () => { if (root.manager && root.manager.notifications) root.manager.notifications.clear(); } },
+        { separator: true },
+        { label: "Open Notifications", icon: "󰂚", action: () => root.requestSurface("notifCenter", this) }
+      ]
+      onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
       readonly property bool hasDnd: !!(root.manager && root.manager.dndEnabled)
       readonly property bool hasUnread: !!(root.manager && root.manager.notifications && root.manager.notifications.count > 0)

@@ -10,6 +10,7 @@ Rectangle {
   property string mutedIcon: "󰝟"
   property int size: 28
   property bool showBorder: false
+  property var action: null
 
   width: size; height: size; radius: size / 2
   color: showBorder ? Colors.bgWidget : "transparent"
@@ -38,6 +39,11 @@ Rectangle {
     anchors.fill: parent
     hoverEnabled: root.enabled
     cursorShape: root.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-    onClicked: (mouse) => { if (!root.enabled) return; stateLayer.burst(mouse.x, mouse.y); AudioService.toggleMute(root.target, root.muted); }
+    onClicked: (mouse) => {
+      if (!root.enabled) return;
+      stateLayer.burst(mouse.x, mouse.y);
+      if (root.action) root.action();
+      else AudioService.toggleMute(root.target, root.muted);
+    }
   }
 }

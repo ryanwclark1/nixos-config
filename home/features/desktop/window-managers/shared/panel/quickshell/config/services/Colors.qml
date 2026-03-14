@@ -25,11 +25,9 @@ QtObject {
     property color textDisabled: "#72767d"
 
     // --- DERIVED PROPERTIES (Auto-updating) ---
-    readonly property color fgMain: text
     readonly property color fgSecondary: textSecondary
     readonly property color fgDim: textDisabled
 
-    readonly property string fontMain: Config.fontFamily || "Inter"
     readonly property string fontMono: Config.monoFontFamily || "JetBrainsMono Nerd Font"
     readonly property real _fontScale: clampScale(Config.fontScale, 1.0)
     readonly property real _radiusScale: clampScale(Config.radiusScale, 1.0)
@@ -48,7 +46,6 @@ QtObject {
     readonly property color popupSurface: withAlpha(surface, 0.96)
     readonly property color cardSurface: withAlpha(surface, 0.82)
     readonly property color chipSurface: withAlpha(surface, 0.92)
-    readonly property color surfaceContainerHigh: Qt.lighter(popupSurface, 1.12)
     readonly property color modalSurface: solid(surface)
     readonly property color modalSidebarSurface: _isLight ? Qt.darker(modalSurface, 1.06) : Qt.darker(modalSurface, 1.18)
     readonly property color modalCardSurface: _isLight ? Qt.darker(modalSurface, 1.03) : Qt.lighter(modalSurface, 1.12)
@@ -103,9 +100,6 @@ QtObject {
     readonly property int fontSizeHuge: scaledMetric(24, _fontScale, 16)
     readonly property int fontSizeDisplay: scaledMetric(28, _fontScale, 20)
     readonly property int fontSizeIcon: scaledMetric(32, _fontScale, 22)
-    readonly property int fontWeightNormal: Font.Normal
-    readonly property int fontWeightMedium: Font.Medium
-    readonly property int fontWeightBold: Font.Bold
 
     function withAlpha(c, a) {
         return Qt.rgba(c.r, c.g, c.b, a);

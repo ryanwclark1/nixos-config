@@ -80,6 +80,19 @@ Flow {
         text: Config.workspaceShowNames && modelData.name ? modelData.name : String(modelData.id)
       }
 
+      // Window count dot: shows when workspace has windows but isn't active
+      Rectangle {
+        width: 4
+        height: 4
+        radius: 2
+        color: root.activeColor
+        opacity: 0.7
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 2
+        visible: !wsPill.isActive && modelData.windows !== undefined && modelData.windows > 0
+      }
+
       MouseArea {
         anchors.fill: parent
         hoverEnabled: true

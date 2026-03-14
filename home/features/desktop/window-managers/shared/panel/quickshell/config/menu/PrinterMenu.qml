@@ -252,7 +252,7 @@ BasePopupMenu {
                 Rectangle {
                   implicitWidth: statusChipLabel.implicitWidth + 14
                   implicitHeight: 22
-                  radius: 11
+                  radius: height / 2
                   color: printerCard.isDisabled ? Colors.withAlpha(Colors.textDisabled, 0.12)
                        : printerCard.isPrinting ? Colors.withAlpha(Colors.warning, 0.16)
                        : Colors.withAlpha(Colors.success, 0.14)
@@ -285,7 +285,7 @@ BasePopupMenu {
                   visible: !printerCard.isDefault
                   implicitWidth: setDefaultLabel.implicitWidth + 16
                   implicitHeight: 26
-                  radius: 13
+                  radius: height / 2
                   color: Colors.highlightLight
 
                   Text {
@@ -324,7 +324,7 @@ BasePopupMenu {
                   visible: !printerCard.isDisabled
                   implicitWidth: testPageLabel.implicitWidth + 16
                   implicitHeight: 26
-                  radius: 13
+                  radius: height / 2
                   color: Colors.highlightLight
 
                   Text {
@@ -363,7 +363,7 @@ BasePopupMenu {
                   visible: PrinterService.activeJobs > 0 && !printerCard.isDisabled
                   implicitWidth: cancelJobsLabel.implicitWidth + 16
                   implicitHeight: 26
-                  radius: 13
+                  radius: height / 2
                   color: Colors.withAlpha(Colors.error, 0.10)
 
                   Text {
@@ -401,7 +401,7 @@ BasePopupMenu {
                 Rectangle {
                   implicitWidth: toggleLabel.implicitWidth + 16
                   implicitHeight: 26
-                  radius: 13
+                  radius: height / 2
                   color: Colors.withAlpha(printerCard.isDisabled ? Colors.success : Colors.warning, 0.10)
                   Behavior on color { ColorAnimation { duration: Colors.durationFast } }
 

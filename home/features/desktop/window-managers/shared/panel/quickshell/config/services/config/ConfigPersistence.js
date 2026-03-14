@@ -231,11 +231,51 @@ function applyData(config, data) {
             config.powerBatSuspendTimeout = data.power.batSuspendTimeout;
         if (data.power.batSuspendAction !== undefined)
             config.powerBatSuspendAction = data.power.batSuspendAction;
+        if (data.power.batteryAlertsEnabled !== undefined)
+            config.batteryAlertsEnabled = data.power.batteryAlertsEnabled;
+        if (data.power.batteryWarningThreshold !== undefined)
+            config.batteryWarningThreshold = data.power.batteryWarningThreshold;
+        if (data.power.batteryCriticalThreshold !== undefined)
+            config.batteryCriticalThreshold = data.power.batteryCriticalThreshold;
+    }
+
+    if (data.hooks) {
+        if (data.hooks.enabled !== undefined)
+            config.hooksEnabled = data.hooks.enabled;
+        if (data.hooks.paths !== undefined)
+            config.hookPaths = data.hooks.paths;
     }
 
     if (data.colorPicker) {
         if (data.colorPicker.recentColors !== undefined)
             config.recentPickerColors = data.colorPicker.recentColors;
+    }
+
+    if (data.ai) {
+        if (data.ai.provider !== undefined)
+            config.aiProvider = data.ai.provider;
+        if (data.ai.model !== undefined)
+            config.aiModel = data.ai.model;
+        if (data.ai.customEndpoint !== undefined)
+            config.aiCustomEndpoint = data.ai.customEndpoint;
+        if (data.ai.systemContext !== undefined)
+            config.aiSystemContext = data.ai.systemContext;
+        if (data.ai.maxTokens !== undefined)
+            config.aiMaxTokens = data.ai.maxTokens;
+        if (data.ai.temperature !== undefined)
+            config.aiTemperature = data.ai.temperature;
+        if (data.ai.systemPrompt !== undefined)
+            config.aiSystemPrompt = data.ai.systemPrompt;
+        if (data.ai.anthropicKey !== undefined)
+            config.aiAnthropicKey = data.ai.anthropicKey;
+        if (data.ai.openaiKey !== undefined)
+            config.aiOpenaiKey = data.ai.openaiKey;
+        if (data.ai.geminiKey !== undefined)
+            config.aiGeminiKey = data.ai.geminiKey;
+        if (data.ai.maxConversations !== undefined)
+            config.aiMaxConversations = data.ai.maxConversations;
+        if (data.ai.maxMessages !== undefined)
+            config.aiMaxMessages = data.ai.maxMessages;
     }
 
     if (data.plugins) {
@@ -491,10 +531,31 @@ function buildData(config) {
             "batMonitorTimeout": config.powerBatMonitorTimeout,
             "batLockTimeout": config.powerBatLockTimeout,
             "batSuspendTimeout": config.powerBatSuspendTimeout,
-            "batSuspendAction": config.powerBatSuspendAction
+            "batSuspendAction": config.powerBatSuspendAction,
+            "batteryAlertsEnabled": config.batteryAlertsEnabled,
+            "batteryWarningThreshold": config.batteryWarningThreshold,
+            "batteryCriticalThreshold": config.batteryCriticalThreshold
+        },
+        "hooks": {
+            "enabled": config.hooksEnabled,
+            "paths": config.hookPaths
         },
         "colorPicker": {
             "recentColors": config.recentPickerColors
+        },
+        "ai": {
+            "provider": config.aiProvider,
+            "model": config.aiModel,
+            "customEndpoint": config.aiCustomEndpoint,
+            "systemContext": config.aiSystemContext,
+            "maxTokens": config.aiMaxTokens,
+            "temperature": config.aiTemperature,
+            "systemPrompt": config.aiSystemPrompt,
+            "anthropicKey": config.aiAnthropicKey,
+            "openaiKey": config.aiOpenaiKey,
+            "geminiKey": config.aiGeminiKey,
+            "maxConversations": config.aiMaxConversations,
+            "maxMessages": config.aiMaxMessages
         },
         "plugins": {
             "disabled": config.disabledPlugins,

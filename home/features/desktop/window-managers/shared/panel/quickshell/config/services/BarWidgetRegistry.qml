@@ -8,6 +8,8 @@ QtObject {
   readonly property var builtins: [
     { widgetType: "logo", label: "App Launcher", icon: "󰀻", section: "left", description: "Application launcher trigger." },
     { widgetType: "workspaces", label: "Workspace Switcher", icon: "󰍺", section: "left", description: "Current workspaces and switching." },
+    { widgetType: "windowTitle", label: "Window Title", icon: "󰖯", section: "left", description: "Active window title." },
+    { widgetType: "keyboardLayout", label: "Keyboard Layout", icon: "󰌌", section: "right", description: "Current keyboard layout indicator." },
     { widgetType: "taskbar", label: "Running Apps", icon: "󰣆", section: "left", description: "Focused and running applications." },
     { widgetType: "cpuStatus", label: "CPU", icon: "", section: "left", description: "CPU usage with system stats popup.", hasSettings: true, defaultSettings: { displayMode: "auto", valueStyle: "percent" } },
     { widgetType: "ramStatus", label: "Memory", icon: "", section: "left", description: "Memory usage with system stats popup.", hasSettings: true, defaultSettings: { displayMode: "auto", valueStyle: "usage" } },
