@@ -280,7 +280,7 @@ QtObject {
             break;
           }
         }
-        console.log("WallpaperService: applied wallpaper via", backendLine || "unknown", "monitor", key, "path", root._applyImagePath);
+        console.debug("WallpaperService: applied wallpaper via", backendLine || "unknown", "monitor", key, "path", root._applyImagePath);
       } else {
         var err = (root._applyStderr || "").trim();
         if (!err.length) err = "All wallpaper backends failed";
@@ -335,7 +335,7 @@ QtObject {
         solidMap[key] = root._colorHex;
       root._persistSolidMap(solidMap);
       root.solidColorHex = root._colorHex;
-      console.log("WallpaperService: applied solid color", root._colorHex, "monitor", root._colorMonitorName || "__all__");
+      console.debug("WallpaperService: applied solid color", root._colorHex, "monitor", root._colorMonitorName || "__all__");
       if (root._colorNotify)
         ToastService.showSuccess("Solid color applied", "#" + root._colorHex.slice(0, 6));
       if (root._queuedSolidApplies.length > 0) {

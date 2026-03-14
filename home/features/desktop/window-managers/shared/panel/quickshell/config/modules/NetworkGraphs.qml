@@ -125,14 +125,14 @@ Rectangle {
         Text { 
           text: "DOWNLOAD"
           color: Colors.textDisabled
-          font.pixelSize: 8
+          font.pixelSize: Colors.fontSizeXS
           font.weight: Font.Bold
           font.capitalization: Font.AllUppercase
         }
         Item { Layout.fillWidth: true }
-        Text { text: root.activeInterface.toUpperCase(); color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
-        Text { text: "•"; color: Colors.textDisabled; font.pixelSize: 8; visible: root.activeInterface !== "" }
-        Text { text: root.currentDown; color: Colors.primary; font.pixelSize: 9; font.weight: Font.Bold }
+        Text { text: root.activeInterface.toUpperCase(); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
+        Text { text: "•"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; visible: root.activeInterface !== "" }
+        Text { text: root.currentDown; color: Colors.primary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
       }
       Canvas {
         id: downCanvas; Layout.fillWidth: true; Layout.fillHeight: true
@@ -148,14 +148,14 @@ Rectangle {
         Text { 
           text: "UPLOAD"
           color: Colors.textDisabled
-          font.pixelSize: 8
+          font.pixelSize: Colors.fontSizeXS
           font.weight: Font.Bold
           font.capitalization: Font.AllUppercase
         }
         Item { Layout.fillWidth: true }
-        Text { text: root.activeInterface.toUpperCase(); color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Bold }
-        Text { text: "•"; color: Colors.textDisabled; font.pixelSize: 8; visible: root.activeInterface !== "" }
-        Text { text: root.currentUp; color: Colors.accent; font.pixelSize: 9; font.weight: Font.Bold }
+        Text { text: root.activeInterface.toUpperCase(); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
+        Text { text: "•"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; visible: root.activeInterface !== "" }
+        Text { text: root.currentUp; color: Colors.accent; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
       }
       Canvas {
         id: upCanvas; Layout.fillWidth: true; Layout.fillHeight: true

@@ -50,9 +50,8 @@ Rectangle {
             }
             spacing: 2
 
-            Flow {
+            RowLayout {
                 Layout.fillWidth: true
-                Layout.preferredWidth: parent.width
                 spacing: Colors.spacingS
 
                 Text {
@@ -64,7 +63,7 @@ Rectangle {
                 }
 
                 Text {
-                    width: root._showChevron ? Math.max(0, parent.width - 24 - Colors.spacingS * 2 - (root.iconName !== "" ? Colors.fontSizeLarge : 0)) : parent.width
+                    Layout.fillWidth: true
                     text: root.title
                     color: Colors.text
                     font.pixelSize: Colors.fontSizeMedium

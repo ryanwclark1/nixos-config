@@ -30,6 +30,7 @@ LockPanel 1.0 LockPanel.qml
 MediaBar 1.0 MediaBar.qml
 MediaOsd 1.0 MediaOsd.qml
 MenuCloseButton 1.0 MenuCloseButton.qml
+MiniProgressBar 1.0 MiniProgressBar.qml
 MuteButton 1.0 MuteButton.qml
 NativeLock 1.0 NativeLock.qml
 NetworkWidget 1.0 NetworkWidget.qml

@@ -5,7 +5,7 @@ import Quickshell.Io
 pragma Singleton
 
 QtObject {
-  id: service
+  id: root
 
   property string temp: "--"
   property string feelsLike: "--"
@@ -86,15 +86,15 @@ QtObject {
   function refresh() {
     var url = _buildUrl();
     if (!url) {
-      service.temp = "--";
-      service.feelsLike = "--";
-      service.humidity = "--";
-      service.windSpeed = "--";
-      service.windDir = "";
-      service.visibility = "--";
-      service.condition = "Location not configured";
-      service.location = "Set city or coordinates";
-      service.forecast = [];
+      root.temp = "--";
+      root.feelsLike = "--";
+      root.humidity = "--";
+      root.windSpeed = "--";
+      root.windDir = "";
+      root.visibility = "--";
+      root.condition = "Location not configured";
+      root.location = "Set city or coordinates";
+      root.forecast = [];
       return;
     }
 
@@ -132,14 +132,14 @@ QtObject {
             loc = areaName || region || "Local";
           }
 
-          service.location = loc;
-          service.condition = (cur.weatherDesc && cur.weatherDesc[0]) ? cur.weatherDesc[0].value : "Unknown";
-          service.temp = _tempWithUnit(cur, "temp_");
-          service.feelsLike = _tempWithUnit(cur, "FeelsLike");
-          service.humidity = (cur.humidity || "--") + "%";
-          service.windSpeed = _windValue(cur) + _windSuffix;
-          service.windDir = cur.winddir16Point || "";
-          service.visibility = _visibilityValue(cur);
+          root.location = loc;
+          root.condition = (cur.weatherDesc && cur.weatherDesc[0]) ? cur.weatherDesc[0].value : "Unknown";
+          root.temp = _tempWithUnit(cur, "temp_");
+          root.feelsLike = _tempWithUnit(cur, "FeelsLike");
+          root.humidity = (cur.humidity || "--") + "%";
+          root.windSpeed = _windValue(cur) + _windSuffix;
+          root.windDir = cur.winddir16Point || "";
+          root.visibility = _visibilityValue(cur);
 
           var days = [];
           var weather = data.weather || [];
@@ -154,12 +154,12 @@ QtObject {
               condition: desc
             });
           }
-          service.forecast = days;
+          root.forecast = days;
         } catch (e) {
           console.warn("WeatherService: parse error:", e);
-          service.condition = "Error loading weather";
-          service.location = "Local";
-          service.forecast = [];
+          root.condition = "Error loading weather";
+          root.location = "Local";
+          root.forecast = [];
         }
       }
     }
@@ -167,19 +167,19 @@ QtObject {
 
   property Timer weatherTimer: Timer {
     interval: 1800000
-    running: service._ready
+    running: root._ready
     repeat: true
     triggeredOnStart: true
-    onTriggered: service.refresh()
+    onTriggered: root.refresh()
   }
 
   property Connections configConnections: Connections {
     target: Config
-    function onWeatherUnitsChanged() { service.refresh(); }
-    function onWeatherAutoLocationChanged() { service.refresh(); }
-    function onWeatherCityQueryChanged() { service.refresh(); }
-    function onWeatherLatitudeChanged() { service.refresh(); }
-    function onWeatherLongitudeChanged() { service.refresh(); }
-    function onWeatherLocationPriorityChanged() { service.refresh(); }
+    function onWeatherUnitsChanged() { root.refresh(); }
+    function onWeatherAutoLocationChanged() { root.refresh(); }
+    function onWeatherCityQueryChanged() { root.refresh(); }
+    function onWeatherLatitudeChanged() { root.refresh(); }
+    function onWeatherLongitudeChanged() { root.refresh(); }
+    function onWeatherLocationPriorityChanged() { root.refresh(); }
   }
 }

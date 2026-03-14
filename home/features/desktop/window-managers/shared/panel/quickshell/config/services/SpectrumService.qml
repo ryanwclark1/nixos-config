@@ -98,6 +98,7 @@ QtObject {
   }
 
   function _startCava() {
+    _crashCount = 0;
     _cavaProc.running = true;
   }
 

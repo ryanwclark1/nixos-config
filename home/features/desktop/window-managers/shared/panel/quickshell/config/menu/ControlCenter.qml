@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Controls
 import Quickshell
 import Quickshell.Io
 import Quickshell.Bluetooth
@@ -109,13 +108,16 @@ PanelWindow {
         }
       }
 
-      Flickable {
-        Layout.fillWidth: true; Layout.fillHeight: true; contentHeight: mainCol.height; clip: true
-        boundsBehavior: Flickable.StopAtBounds; flickableDirection: Flickable.VerticalFlick
-        ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
+      Item {
+        Layout.fillWidth: true; Layout.fillHeight: true
 
-        ColumnLayout {
-          id: mainCol; width: parent.width; spacing: 20
+        Flickable {
+          id: ccFlick
+          anchors.fill: parent; contentHeight: mainCol.height; clip: true
+          boundsBehavior: Flickable.DragOverBounds; flickableDirection: Flickable.VerticalFlick
+
+          ColumnLayout {
+            id: mainCol; width: parent.width; spacing: 20
 
           component QuickLinkCard: Rectangle {
             property string icon
@@ -392,6 +394,10 @@ PanelWindow {
           ScratchpadWidget { opacity: root.showContent ? 1 : 0; visible: opacity > 0; Behavior on opacity { NumberAnimation { duration: 950; easing.type: Easing.OutCubic } } }
 
         }
+        }
+
+        SharedWidgets.Scrollbar { flickable: ccFlick }
+        SharedWidgets.OverscrollGlow { flickable: ccFlick }
       }
 
       RowLayout {

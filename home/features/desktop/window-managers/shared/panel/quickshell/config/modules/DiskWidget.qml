@@ -35,7 +35,7 @@ SharedWidgets.CardBase {
     Text {
       text: "DISK USAGE"
       color: Colors.textDisabled
-      font.pixelSize: 8
+      font.pixelSize: Colors.fontSizeXS
       font.weight: Font.Bold
       font.capitalization: Font.AllUppercase
     }
@@ -60,12 +60,9 @@ SharedWidgets.CardBase {
             }
             Text { text: modelData.used + " / " + modelData.total; color: Colors.fgSecondary; font.pixelSize: Colors.fontSizeXS }
           }
-          Rectangle {
-            Layout.fillWidth: true; height: 4; color: Colors.surface; radius: 2
-            Rectangle {
-              width: parent.width * (Math.min(100, parseInt(modelData.percent, 10) || 0) / 100.0)
-              height: parent.height; color: Colors.secondary; radius: 2
-            }
+          SharedWidgets.MiniProgressBar {
+            value: Math.min(100, parseInt(modelData.percent, 10) || 0) / 100.0
+            barColor: Colors.secondary
           }
         }
       }

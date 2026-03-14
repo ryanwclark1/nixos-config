@@ -2,14 +2,18 @@
 set -euo pipefail
 
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
+config_root="$(CDPATH= cd -- "${script_dir}/../config" >/dev/null && pwd)"
 instance_id=""
+repo_shell_mode=0
+repo_shell_pid=""
+repo_shell_service_was_active=0
 run_settings=1
 run_surfaces=1
 run_multibar=1
 
 usage() {
   cat <<'EOF'
-Usage: check-panel-runtime.sh [--id INSTANCE_ID] [--skip-settings] [--skip-surfaces] [--skip-multibar]
+Usage: check-panel-runtime.sh [--id INSTANCE_ID] [--repo-shell] [--skip-settings] [--skip-surfaces] [--skip-multibar]
 
 Run the shared panel runtime verification stack:
   1. panel config contract checks
@@ -28,6 +32,10 @@ while [[ $# -gt 0 ]]; do
     --id)
       instance_id="${2:-}"
       shift 2
+      ;;
+    --repo-shell)
+      repo_shell_mode=1
+      shift
       ;;
     --skip-settings)
       run_settings=0
@@ -64,8 +72,88 @@ run_step() {
   fi
 }
 
+run_ipc() {
+  local output=""
+  local status=0
+  local attempt
+
+  for attempt in 1 2 3 4 5; do
+    output="$(timeout 5s "$@" 2>&1)" && return 0
+    status=$?
+    if [[ "${output}" == *"Not ready to accept queries yet."* ]]; then
+      sleep 0.2
+      continue
+    fi
+    [[ -n "${output}" ]] && printf '%s\n' "${output}" >&2
+    return "${status}"
+  done
+
+  [[ -n "${output}" ]] && printf '%s\n' "${output}" >&2
+  return "${status}"
+}
+
+instance_for_pid() {
+  local pid="$1"
+  local resolved=""
+
+  resolved="$(readlink -f "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid/${pid}" 2>/dev/null || true)"
+  if [[ -n "${resolved}" && -S "${resolved}/ipc.sock" ]]; then
+    basename "${resolved}"
+    return 0
+  fi
+  return 1
+}
+
+cleanup_repo_shell() {
+  if [[ -n "${repo_shell_pid}" ]]; then
+    kill "${repo_shell_pid}" >/dev/null 2>&1 || true
+    wait "${repo_shell_pid}" >/dev/null 2>&1 || true
+  fi
+  if (( repo_shell_service_was_active == 1 )); then
+    systemctl --user start quickshell.service >/dev/null 2>&1 || true
+  fi
+}
+
+start_repo_shell() {
+  local deadline candidate
+
+  if ! command -v systemctl >/dev/null 2>&1; then
+    printf 'systemctl is required for --repo-shell mode.\n' >&2
+    exit 1
+  fi
+
+  if systemctl --user is-active --quiet quickshell.service; then
+    repo_shell_service_was_active=1
+    systemctl --user stop quickshell.service >/dev/null 2>&1 || true
+    sleep 1
+  fi
+
+  quickshell -p "${config_root}/shell.qml" >/tmp/quickshell-repo-qa.log 2>&1 &
+  repo_shell_pid="$!"
+
+  deadline=$((SECONDS + 20))
+  while (( SECONDS < deadline )); do
+    candidate="$(instance_for_pid "${repo_shell_pid}" || true)"
+    if [[ -n "${candidate}" ]] && run_ipc quickshell ipc --id "${candidate}" show >/dev/null; then
+      instance_id="${candidate}"
+      printf '[INFO] Repo shell instance ready: %s\n' "${instance_id}"
+      return 0
+    fi
+    sleep 0.5
+  done
+
+  printf 'Repo shell did not become IPC-ready in time. See /tmp/quickshell-repo-qa.log\n' >&2
+  exit 1
+}
+
 main() {
   local args=()
+
+  if (( repo_shell_mode == 1 )); then
+    trap cleanup_repo_shell EXIT
+    start_repo_shell
+  fi
+
   if [[ -n "${instance_id}" ]]; then
     args+=(--id "${instance_id}")
   fi

@@ -15,8 +15,8 @@ Use this checklist before merging panel architecture changes.
 - [x] `scripts/check-launcher-performance.sh` passes for launcher filter/ranking performance guardrails and runtime telemetry fields.
 - [x] `scripts/check-launcher-guardrails.sh` passes (composite launcher guardrail runner).
 - [x] `scripts/check-launcher-tab-matrix.sh` passes for launcher `Tab`/`Shift+Tab` behavior matrix guarantees and `Ctrl+Tab` drun category cycling guardrails.
-- [x] `scripts/check-launcher-responsive.sh` passes for launcher compact/tight responsive guardrails and runtime warning scan.
-- [x] `scripts/check-launcher-ipc-health.sh` passes for launcher IPC action reachability and status payload contract.
+- [x] `scripts/check-launcher-responsive.sh` passes for launcher compact/tight responsive guardrails, live `Esc` reset-before-close diagnostics, and runtime warning scan.
+- [x] `scripts/check-launcher-ipc-health.sh` passes for launcher IPC action reachability plus category/escape diagnostic payload contracts.
 - [x] `scripts/check-launcher-benchmarks.sh` passes (threshold + parity gate for launcher benchmarks).
 - [x] `scripts/check-launcher-smoke.sh` passes (guardrails + benchmarks in one command).
 - [x] `.github/workflows/flake-checker.yml` runs launcher smoke checks in CI mode (`check-launcher-smoke.sh --ci`) for launcher-sensitive changes.

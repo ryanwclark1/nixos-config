@@ -46,7 +46,7 @@ SharedWidgets.CardBase {
     Text {
       text: "GPU STATS"
       color: Colors.textDisabled
-      font.pixelSize: 8
+      font.pixelSize: Colors.fontSizeXS
       font.weight: Font.Bold
       font.capitalization: Font.AllUppercase
     }
@@ -69,13 +69,7 @@ SharedWidgets.CardBase {
           }
           Text { text: SystemStatus.gpuUsage; color: Colors.fgSecondary; font.pixelSize: Colors.fontSizeXS }
         }
-        Rectangle {
-          Layout.fillWidth: true; height: 4; color: Colors.surface; radius: 2
-          Rectangle {
-            width: parent.width * SystemStatus.gpuPercent
-            height: parent.height; color: Colors.accent; radius: 2
-          }
-        }
+        SharedWidgets.MiniProgressBar { value: SystemStatus.gpuPercent; barColor: Colors.accent }
       }
 
       // VRAM
@@ -92,13 +86,7 @@ SharedWidgets.CardBase {
           }
           Text { text: root.vramUsage; color: Colors.fgSecondary; font.pixelSize: Colors.fontSizeXS }
         }
-        Rectangle {
-          Layout.fillWidth: true; height: 4; color: Colors.surface; radius: 2
-          Rectangle {
-            width: parent.width * root.vramPercent
-            height: parent.height; color: Colors.primary; radius: 2
-          }
-        }
+        SharedWidgets.MiniProgressBar { value: root.vramPercent; barColor: Colors.primary }
       }
     }
   }

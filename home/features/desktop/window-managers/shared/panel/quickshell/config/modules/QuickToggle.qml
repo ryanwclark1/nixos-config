@@ -51,7 +51,7 @@ Rectangle {
       spacing: 2
       Text {
         text: root.label
-        color: active ? Colors.text : Colors.text
+        color: Colors.text
         font.pixelSize: Colors.fontSizeMedium
         font.weight: Font.Bold
         elide: Text.ElideRight

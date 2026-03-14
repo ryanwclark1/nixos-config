@@ -31,7 +31,7 @@ QtObject {
   // ── Polling ───────────────────────────────────────────────────────────────
   // Combines `lpstat -p -d` (printer list + default) and `lpstat -o | wc -l`
   // (active job count) in a single shell invocation to minimise process spawns.
-  property var poll: SharedWidgets.CommandPoll {
+  property SharedWidgets.CommandPoll printerPoll: SharedWidgets.CommandPoll {
     interval: 10000
     running: root.subscriberCount > 0
 
@@ -95,15 +95,16 @@ QtObject {
   function printTestPage(printerName) {
     Quickshell.execDetached([
       "sh", "-c",
-      "lp -d " + printerName + " /usr/share/cups/data/testprint.ps 2>/dev/null"
-      + " || lp -d " + printerName + " /usr/share/cups/testfiles/testprint.ps 2>/dev/null"
+      "lp -d \"$1\" /usr/share/cups/data/testprint.ps 2>/dev/null"
+      + " || lp -d \"$1\" /usr/share/cups/testfiles/testprint.ps 2>/dev/null",
+      "sh", printerName
     ]);
   }
 
   function cancelAllJobs(printerName) {
     Quickshell.execDetached(["cancel", "-a", printerName]);
     // Optimistically decrement active jobs count
-    root.activeJobs = Math.max(0, root.activeJobs - 1);
+    root.activeJobs = 0;
   }
 
   function enablePrinter(printerName) {
@@ -132,6 +133,6 @@ QtObject {
 
   // Force an immediate refresh (called when PrinterMenu opens)
   function refresh() {
-    poller.poll();
+    printerPoll.poll();
   }
 }

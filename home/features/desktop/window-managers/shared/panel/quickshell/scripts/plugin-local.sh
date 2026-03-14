@@ -88,8 +88,8 @@ Modes:
   reference-files    Print canonical reference toolkit file and guard paths only
   reference-guards   Print runnable reference toolkit guard commands in order
   reference-all      Run the full reference-toolkit guard sequence (`--quiet` suppresses stage headings, `--silent-preflight` suppresses successful preflight output)
-  shared-gates       Run the shared runtime and diagnostics plugin gates
-  baseline-gates     Run plugin conformance and doctor-smoke gates
+  shared-gates       Run the shared runtime and diagnostics plugin gates (`--quiet` suppresses wrapper headings)
+  baseline-gates     Run plugin conformance and doctor-smoke gates (`--quiet` suppresses wrapper headings)
   all-gates          Run baseline, reference, and shared plugin gates (`--quiet` suppresses phase headings)
 EOF
 }
@@ -390,19 +390,39 @@ EOF
     fi
     ;;
   shared-gates)
-    printf '[INFO] Running plugin runtime guard checks...\n'
+    quiet=0
+    if [[ "${2:-}" == "--quiet" ]]; then
+      quiet=1
+    fi
+    if (( quiet == 0 )); then
+      printf '[INFO] Running plugin runtime guard checks...\n'
+    fi
     "${script_dir}/check-plugin-runtime-guards.sh"
-    printf '[INFO] Running plugin diagnostics contract checks...\n'
+    if (( quiet == 0 )); then
+      printf '[INFO] Running plugin diagnostics contract checks...\n'
+    fi
     "${script_dir}/check-plugin-diagnostics-contracts.sh"
-    printf '[INFO] Running plugin diagnostics schema sync checks...\n'
+    if (( quiet == 0 )); then
+      printf '[INFO] Running plugin diagnostics schema sync checks...\n'
+    fi
     "${script_dir}/sync-plugin-diagnostics-schema.sh" --check
-    printf '[INFO] Running plugin diagnostics schema checks...\n'
+    if (( quiet == 0 )); then
+      printf '[INFO] Running plugin diagnostics schema checks...\n'
+    fi
     "${script_dir}/check-plugin-diagnostics-schema.sh"
     ;;
   baseline-gates)
-    printf '[INFO] Running plugin conformance checks...\n'
+    quiet=0
+    if [[ "${2:-}" == "--quiet" ]]; then
+      quiet=1
+    fi
+    if (( quiet == 0 )); then
+      printf '[INFO] Running plugin conformance checks...\n'
+    fi
     "${script_dir}/check-plugin-conformance.sh"
-    printf '[INFO] Running plugin doctor smoke checks...\n'
+    if (( quiet == 0 )); then
+      printf '[INFO] Running plugin doctor smoke checks...\n'
+    fi
     "${script_dir}/check-plugin-doctor-smoke.sh"
     ;;
   all-gates)
@@ -413,7 +433,11 @@ EOF
     if (( quiet == 0 )); then
       printf '[INFO] Running baseline plugin gates...\n'
     fi
-    "${script_dir}/plugin-local.sh" baseline-gates
+    if (( quiet == 0 )); then
+      "${script_dir}/plugin-local.sh" baseline-gates
+    else
+      "${script_dir}/plugin-local.sh" baseline-gates --quiet
+    fi
     if (( quiet == 0 )); then
       printf '[INFO] Running plugin reference toolkit checks...\n'
       "${script_dir}/plugin-local.sh" reference-all
@@ -422,7 +446,7 @@ EOF
       printf '[INFO] Plugin verification passed.\n'
     else
       "${script_dir}/plugin-local.sh" reference-all --quiet --silent-preflight
-      "${script_dir}/plugin-local.sh" shared-gates
+      "${script_dir}/plugin-local.sh" shared-gates --quiet
     fi
     ;;
   -h|--help|help)

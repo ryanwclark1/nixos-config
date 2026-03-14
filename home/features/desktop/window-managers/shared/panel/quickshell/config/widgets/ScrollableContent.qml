@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import "../services"
 
 // ScrollableContent — reusable scrollable wrapper for popup menus.
 //
@@ -17,7 +18,7 @@ import QtQuick.Layouts
 Item {
   id: root
 
-  property int columnSpacing: 10
+  property int columnSpacing: Colors.spacingM
   default property alias content: contentColumn.data
   readonly property alias flickable: flick
 
