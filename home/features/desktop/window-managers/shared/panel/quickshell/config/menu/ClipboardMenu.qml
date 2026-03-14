@@ -145,7 +145,7 @@ BasePopupMenu {
             }
 
             Rectangle {
-              width: 24; height: 24; radius: 12
+              width: 24; height: 24; radius: Colors.radiusCard
               color: "transparent"
               Text {
                 anchors.centerIn: parent

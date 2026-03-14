@@ -56,9 +56,11 @@ QtObject {
 
     // --- DIMENSIONS ---
     readonly property real radiusLarge: scaledMetric(20, _radiusScale, 8)
+    readonly property real radiusCard: scaledMetric(12, _radiusScale, 4)
     readonly property real radiusMedium: scaledMetric(14, _radiusScale, 6)
     readonly property real radiusSmall: scaledMetric(10, _radiusScale, 4)
     readonly property real radiusXS: scaledMetric(8, _radiusScale, 4)
+    readonly property real radiusXXS: scaledMetric(6, _radiusScale, 2)
     readonly property real radiusPill: 999
 
     readonly property int paddingLarge: scaledMetric(24, _spacingScale, 12)
@@ -66,10 +68,13 @@ QtObject {
     readonly property int paddingSmall: scaledMetric(10, _spacingScale, 6)
 
     // --- SPACING TOKENS ---
+    readonly property int spacingXXS: scaledMetric(2, _spacingScale, 1)
     readonly property int spacingXS: scaledMetric(4, _spacingScale, 2)
+    readonly property int spacingSM: scaledMetric(6, _spacingScale, 3)
     readonly property int spacingS: scaledMetric(8, _spacingScale, 4)
     readonly property int spacingM: scaledMetric(12, _spacingScale, 6)
     readonly property int spacingL: scaledMetric(16, _spacingScale, 8)
+    readonly property int spacingLG: scaledMetric(20, _spacingScale, 10)
     readonly property int spacingXL: scaledMetric(24, _spacingScale, 12)
 
     // --- ANIMATION DURATIONS ---

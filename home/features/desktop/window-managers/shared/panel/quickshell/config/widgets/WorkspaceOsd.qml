@@ -115,7 +115,7 @@ Scope {
 
           ColumnLayout {
             anchors.centerIn: parent
-            spacing: 20
+            spacing: Colors.spacingLG
 
             AppIcon {
               Layout.alignment: Qt.AlignHCenter

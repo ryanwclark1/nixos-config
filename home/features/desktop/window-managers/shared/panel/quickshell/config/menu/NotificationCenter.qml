@@ -92,7 +92,7 @@ PanelWindow {
     ColumnLayout {
       anchors.fill: parent
       anchors.margins: Colors.paddingLarge
-      spacing: 20
+      spacing: Colors.spacingLG
 
       RowLayout {
         Layout.fillWidth: true
@@ -116,7 +116,7 @@ PanelWindow {
             color: parent.containsMouse
               ? (root.manager && root.manager.dndEnabled ? Qt.darker(Colors.error, 1.1) : Colors.highlightLight)
               : (root.manager && root.manager.dndEnabled ? Colors.error : Colors.highlight)
-            radius: 6
+            radius: Colors.radiusXXS
             Behavior on color { ColorAnimation { duration: Colors.durationFast } }
             Text {
               anchors.centerIn: parent
@@ -129,7 +129,7 @@ PanelWindow {
 
         // Clear all
         Rectangle {
-          width: 70; height: 28; radius: 6
+          width: 70; height: 28; radius: Colors.radiusXXS
           color: Colors.highlight
 
           SharedWidgets.StateLayer {
@@ -154,7 +154,7 @@ PanelWindow {
 
         // Close button
         Rectangle {
-          width: 28; height: 28; radius: 6
+          width: 28; height: 28; radius: Colors.radiusXXS
           color: "transparent"
 
           SharedWidgets.StateLayer {
@@ -286,7 +286,7 @@ PanelWindow {
             }
 
             Rectangle {
-              width: 24; height: 24; radius: 12
+              width: 24; height: 24; radius: Colors.radiusCard
               color: "transparent"
 
               SharedWidgets.StateLayer {
@@ -325,7 +325,7 @@ PanelWindow {
           height: visible ? colItem.implicitHeight + 24 + (isReplying ? 50 : 0) : 0
           color: Colors.surface
           opacity: isCollapsed ? 0 : 1
-          radius: 12
+          radius: Colors.radiusCard
           border.color: ListView.isCurrentItem && notifList.activeFocus ? Colors.primary : Colors.border
           border.width: 1
           clip: true
@@ -372,7 +372,7 @@ PanelWindow {
               }
 
               ColumnLayout {
-                Layout.fillWidth: true; spacing: 2
+                Layout.fillWidth: true; spacing: Colors.spacingXXS
                 RowLayout {
                   Layout.fillWidth: true
                   Text {
@@ -425,7 +425,7 @@ PanelWindow {
 
             // Inline Reply Area
             Rectangle {
-              width: parent.width; height: 36; radius: 6; color: Colors.highlightLight; visible: isReplying
+              width: parent.width; height: 36; radius: Colors.radiusXXS; color: Colors.highlightLight; visible: isReplying
               TextInput {
                 id: replyInput; anchors.fill: parent; anchors.margins: Colors.spacingS
                 verticalAlignment: Text.AlignVCenter
@@ -449,7 +449,7 @@ PanelWindow {
                 model: notifItem.notification ? notifItem.notification.actions : null
                 delegate: Rectangle {
                   id: actionRect
-                  Layout.fillWidth: true; height: 28; color: Colors.highlightLight; radius: 6
+                  Layout.fillWidth: true; height: 28; color: Colors.highlightLight; radius: Colors.radiusXXS
                   Text { anchors.centerIn: parent; text: modelData && modelData.label ? modelData.label : ""; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium }
                   SharedWidgets.StateLayer {
                     id: actionStateLayer
@@ -471,7 +471,7 @@ PanelWindow {
 
               // Dismiss Action
               Rectangle {
-                Layout.preferredWidth: 32; height: 28; color: Colors.highlightLight; radius: 6
+                Layout.preferredWidth: 32; height: 28; color: Colors.highlightLight; radius: Colors.radiusXXS
                 Text { anchors.centerIn: parent; text: "󰅖"; color: Colors.error; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
                 SharedWidgets.StateLayer {
                   id: dismissStateLayer

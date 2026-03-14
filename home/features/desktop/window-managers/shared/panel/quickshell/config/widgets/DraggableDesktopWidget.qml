@@ -145,7 +145,7 @@ Item {
       id: menuCol
       anchors.fill: parent
       anchors.margins: Colors.spacingS
-      spacing: 2
+      spacing: Colors.spacingXXS
 
       ContextMenuItem {
         text: "Reset Size"
@@ -205,7 +205,7 @@ Item {
 
     Rectangle {
       anchors.fill: parent
-      radius: 6
+      radius: Colors.radiusXXS
       color: itemMa.containsMouse ? Colors.highlight : "transparent"
 
       Text {

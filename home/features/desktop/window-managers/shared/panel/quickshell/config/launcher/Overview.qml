@@ -67,7 +67,7 @@ Scope {
             ColumnLayout {
               anchors.fill: parent
               anchors.margins: 40
-              spacing: 20
+              spacing: Colors.spacingLG
 
               Text {
                 text: "Workspace Overview"
@@ -83,7 +83,7 @@ Scope {
                 Layout.fillHeight: true
                 model: Hyprland.workspaces
                 orientation: ListView.Horizontal
-                spacing: 20
+                spacing: Colors.spacingLG
                 clip: true
 
                 delegate: Rectangle {
@@ -186,7 +186,7 @@ Scope {
 
                                 // Close Button
                                 Rectangle {
-                                  width: 24; height: 24; radius: 12
+                                  width: 24; height: 24; radius: Colors.radiusCard
                                   color: Colors.error
                                   opacity: hoverArea.containsMouse ? 0.9 : 0.0
                                   visible: opacity > 0

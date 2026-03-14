@@ -183,7 +183,7 @@ PanelWindow {
       }
 
       RowLayout {
-        spacing: 20
+        spacing: Colors.spacingLG
 
         Repeater {
           model: root.actions

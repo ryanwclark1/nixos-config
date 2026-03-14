@@ -4,7 +4,7 @@ import "../services"
 
 Row {
   visible: CompositorAdapter.supportsDispatcherActions
-  spacing: 6
+  spacing: Colors.spacingSM
 
   ActionButton {
     label: "Float"

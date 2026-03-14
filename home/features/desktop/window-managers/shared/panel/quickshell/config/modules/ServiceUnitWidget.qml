@@ -11,8 +11,10 @@ SharedWidgets.CardBase {
     property bool showSystemUnits: false
     property int defaultLimit: 5
     property int searchLimit: 10
+    property bool compactMode: false
     property string selectedUnitScope: "user"
     property string selectedUnitName: ""
+    property bool detailsExpanded: true
     readonly property var visibleUserUnits: filterUnits(ServiceUnitService.userUnits)
     readonly property var visibleSystemUnits: filterUnits(ServiceUnitService.systemUnits)
     readonly property bool systemAvailable: ServiceUnitService.systemStatus === "ready"
@@ -97,8 +99,22 @@ SharedWidgets.CardBase {
     }
 
     function selectUnit(scope, unitName) {
-        selectedUnitScope = String(scope || "user");
-        selectedUnitName = String(unitName || "");
+        var safeScope = String(scope || "user");
+        var safeName = String(unitName || "");
+        if (safeName === "") {
+            selectedUnitName = "";
+            detailsExpanded = false;
+            return;
+        }
+
+        if (selectedUnitScope === safeScope && selectedUnitName === safeName) {
+            detailsExpanded = !detailsExpanded;
+            return;
+        }
+
+        selectedUnitScope = safeScope;
+        selectedUnitName = safeName;
+        detailsExpanded = !compactMode;
     }
 
     function syncSelection() {
@@ -122,6 +138,7 @@ SharedWidgets.CardBase {
             return;
         }
         selectedUnitName = "";
+        detailsExpanded = false;
     }
 
     onVisibleUserUnitsChanged: syncSelection()
@@ -221,7 +238,7 @@ SharedWidgets.CardBase {
 
         Text {
             Layout.fillWidth: true
-            text: ServiceUnitService.userStatus === "ready" ? ("User units  •  " + String(root.visibleUserUnits.length)) : (ServiceUnitService.userMessage || "User services unavailable")
+            text: ServiceUnitService.userStatus === "ready" ? ("User units  •  showing " + String(root.visibleUserUnits.length)) : (ServiceUnitService.userMessage || "User services unavailable")
             color: Colors.fgDim
             font.pixelSize: Colors.fontSizeXS
         }
@@ -256,7 +273,7 @@ SharedWidgets.CardBase {
 
                             ColumnLayout {
                                 Layout.fillWidth: true
-                                spacing: 2
+                                spacing: Colors.spacingXXS
 
                                 Text {
                                     text: modelData.name || "service"
@@ -496,7 +513,7 @@ SharedWidgets.CardBase {
 
         Rectangle {
             Layout.fillWidth: true
-            visible: !!root.selectedUnit
+            visible: !!root.selectedUnit && root.detailsExpanded
             radius: Colors.radiusSmall
             color: Colors.bgWidget
             border.color: Colors.border

@@ -48,7 +48,7 @@ SharedWidgets.CardBase {
     ColumnLayout {
       id: contentCol
       Layout.fillWidth: true
-      spacing: 6
+      spacing: Colors.spacingSM
 
       Repeater {
         id: scratchRepeater
@@ -58,7 +58,7 @@ SharedWidgets.CardBase {
           id: itemRect
           Layout.fillWidth: true; height: 35
           color: Colors.highlightLight
-          radius: 6
+          radius: Colors.radiusXXS
 
           RowLayout {
             anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: Colors.paddingSmall

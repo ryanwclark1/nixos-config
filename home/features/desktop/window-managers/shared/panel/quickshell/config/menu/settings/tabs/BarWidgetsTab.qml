@@ -386,7 +386,7 @@ Item {
 
                                         ColumnLayout {
                                             Layout.fillWidth: true
-                                            spacing: 2
+                                            spacing: Colors.spacingXXS
 
                                             Text {
                                                 text: BarWidgetRegistry.displayName(widgetRow.widgetInstance.widgetType)
@@ -528,7 +528,7 @@ Item {
                     Rectangle {
                         width: parent.width
                         height: 12
-                        radius: 6
+                        radius: Colors.radiusXXS
                         visible: root.sectionWidgets(sectionKey).length > 0
                             && root.dragSourceIndex >= 0
                             && root.dragTargetSection === sectionKey

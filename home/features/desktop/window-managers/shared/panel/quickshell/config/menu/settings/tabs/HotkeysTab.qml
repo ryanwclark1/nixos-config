@@ -116,7 +116,7 @@ Item {
                                 id: chordBadge
                                 implicitWidth: Math.min(parent.width, chordText.implicitWidth + 16)
                                 height: 26
-                                radius: 6
+                                radius: Colors.radiusXXS
                                 color: Colors.highlight
                                 border.color: Colors.primary
                                 border.width: 1

@@ -467,7 +467,7 @@ PanelWindow {
           ColumnLayout {
             anchors.fill: parent
             anchors.margins: Colors.spacingS
-            spacing: 2
+            spacing: Colors.spacingXXS
 
             // Section label
             Text {
@@ -626,7 +626,7 @@ PanelWindow {
                     delegate: Row {
                       required property var modelData
                       required property int index
-                      spacing: 2
+                      spacing: Colors.spacingXXS
 
                       Text {
                         text: "›"

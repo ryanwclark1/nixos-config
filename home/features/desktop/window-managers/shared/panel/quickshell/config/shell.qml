@@ -370,7 +370,7 @@ Scope {
 
                             WlrLayershell.layer: WlrLayer.Top
                             WlrLayershell.namespace: "quickshell-bar-" + barConfig.id
-                            WlrLayershell.exclusiveZone: vertical ? width + marginValue : height + marginValue
+                            WlrLayershell.exclusiveZone: panel.isAutoHidden ? 0 : (vertical ? width + marginValue : height + marginValue)
                             WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
                             Panel {

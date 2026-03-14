@@ -24,7 +24,7 @@ Rectangle {
     }
 
     ColumnLayout {
-      spacing: 2
+      spacing: Colors.spacingXXS
       Text {
         text: WeatherService.temp
         color: Colors.text

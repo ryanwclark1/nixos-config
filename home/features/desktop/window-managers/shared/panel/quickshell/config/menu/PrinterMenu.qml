@@ -26,7 +26,7 @@ BasePopupMenu {
       visible: PrinterService.activeJobs > 0
       implicitWidth: jobsChipLabel.implicitWidth + 18
       implicitHeight: 24
-      radius: 12
+      radius: Colors.radiusCard
       color: Colors.withAlpha(Colors.warning, 0.16)
 
       Text {
@@ -68,7 +68,7 @@ BasePopupMenu {
       rowSpacing: Colors.spacingS
 
       ColumnLayout {
-        spacing: 2
+        spacing: Colors.spacingXXS
         Text {
           text: PrinterService.printers.length
           color: Colors.text
@@ -87,7 +87,7 @@ BasePopupMenu {
 
       ColumnLayout {
         Layout.fillWidth: true
-        spacing: 2
+        spacing: Colors.spacingXXS
         Text {
           text: "Default"
           color: Colors.textDisabled
@@ -106,7 +106,7 @@ BasePopupMenu {
 
       ColumnLayout {
         visible: PrinterService.activeJobs > 0
-        spacing: 2
+        spacing: Colors.spacingXXS
         Text {
           text: PrinterService.activeJobs
           color: Colors.warning
@@ -203,7 +203,7 @@ BasePopupMenu {
 
                 ColumnLayout {
                   Layout.fillWidth: true
-                  spacing: 2
+                  spacing: Colors.spacingXXS
 
                   // Printer name + default badge
                   RowLayout {

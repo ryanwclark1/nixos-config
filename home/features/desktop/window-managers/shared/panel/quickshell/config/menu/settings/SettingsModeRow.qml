@@ -63,7 +63,7 @@ Rectangle {
 
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: 2
+                spacing: Colors.spacingXXS
 
                 Text {
                     text: root.label
@@ -88,7 +88,7 @@ Rectangle {
                 id: modePill
                 implicitWidth: selectedText.implicitWidth + 14
                 implicitHeight: 24
-                radius: 12
+                radius: Colors.radiusCard
                 color: Colors.surface
                 border.color: Colors.border
                 border.width: 1

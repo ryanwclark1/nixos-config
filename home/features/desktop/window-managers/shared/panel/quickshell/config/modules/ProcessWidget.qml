@@ -11,6 +11,8 @@ SharedWidgets.CardBase {
     property int maxItems: 6
     property int searchLimit: 12
     property int selectedPid: 0
+    property bool compactMode: false
+    property bool detailsExpanded: true
 
     readonly property string trimmedSearch: String(searchQuery || "").trim().toLowerCase()
     readonly property var visibleProcesses: computeVisibleProcesses()
@@ -63,14 +65,34 @@ SharedWidgets.CardBase {
         return null;
     }
 
-    function syncSelection() {
-        if (visibleProcesses.length === 0) {
+    function selectProcess(pid) {
+        var safePid = parseInt(pid, 10) || 0;
+        if (safePid <= 0) {
             selectedPid = 0;
+            detailsExpanded = false;
             return;
         }
 
-        if (!findVisibleProcessByPid(selectedPid))
+        if (selectedPid === safePid) {
+            detailsExpanded = !detailsExpanded;
+            return;
+        }
+
+        selectedPid = safePid;
+        detailsExpanded = !compactMode;
+    }
+
+    function syncSelection() {
+        if (visibleProcesses.length === 0) {
+            selectedPid = 0;
+            detailsExpanded = false;
+            return;
+        }
+
+        if (!findVisibleProcessByPid(selectedPid)) {
             selectedPid = visibleProcesses[0].pid || 0;
+            detailsExpanded = !compactMode;
+        }
     }
 
     onVisibleProcessesChanged: syncSelection()
@@ -192,7 +214,7 @@ SharedWidgets.CardBase {
 
         Text {
             Layout.fillWidth: true
-            text: ProcessService.busy ? "Refreshing process snapshot..." : (root.trimmedSearch === "" ? (ProcessService.sortBy === "cpu" ? "Showing hottest CPU processes." : "Showing heaviest memory processes.") : ("Showing " + String(root.visibleProcesses.length) + " matches for \"" + root.searchQuery + "\"."))
+            text: ProcessService.busy ? "Refreshing process snapshot..." : (root.trimmedSearch === "" ? ("Showing " + String(root.visibleProcesses.length) + " hottest processes by " + (ProcessService.sortBy === "cpu" ? "CPU." : "RAM.")) : ("Showing " + String(root.visibleProcesses.length) + " matches for \"" + root.searchQuery + "\"."))
             color: Colors.fgDim
             font.pixelSize: Colors.fontSizeXS
         }
@@ -250,7 +272,7 @@ SharedWidgets.CardBase {
 
                         ColumnLayout {
                             Layout.fillWidth: true
-                            spacing: 2
+                            spacing: Colors.spacingXXS
 
                             Text {
                                 text: modelData.name || "process"
@@ -270,7 +292,7 @@ SharedWidgets.CardBase {
                         }
 
                         ColumnLayout {
-                            spacing: 2
+                            spacing: Colors.spacingXXS
                             Layout.alignment: Qt.AlignVCenter
 
                             Text {
@@ -300,7 +322,7 @@ SharedWidgets.CardBase {
                             size: 28
                             iconSize: Colors.fontSizeSmall
                             iconColor: selected ? Colors.primary : Colors.textSecondary
-                            onClicked: root.selectedPid = modelData.pid || 0
+                            onClicked: root.selectProcess(modelData.pid)
                         }
                     }
 
@@ -308,14 +330,14 @@ SharedWidgets.CardBase {
                         anchors.fill: parent
                         acceptedButtons: Qt.LeftButton
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: root.selectedPid = modelData.pid || 0
+                        onClicked: root.selectProcess(modelData.pid)
                     }
                 }
             }
 
             Rectangle {
                 Layout.fillWidth: true
-                visible: !!root.selectedProcess
+                visible: !!root.selectedProcess && root.detailsExpanded
                 implicitHeight: detailColumn.implicitHeight + Colors.spacingM * 2
                 radius: Colors.radiusSmall
                 color: Colors.bgWidget

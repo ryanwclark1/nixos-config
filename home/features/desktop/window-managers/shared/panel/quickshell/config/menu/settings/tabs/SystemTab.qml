@@ -875,7 +875,7 @@ Item {
                             color: Colors.surface
                             implicitHeight: 24
                             implicitWidth: 24
-                            radius: 12
+                            radius: Colors.radiusCard
 
                             Text {
                                 anchors.centerIn: parent
@@ -959,7 +959,7 @@ Item {
             Rectangle {
                 Layout.fillWidth: true
                 height: 12
-                radius: 6
+                radius: Colors.radiusXXS
                 visible: root.dragWebProviderKey !== "" && root.dragWebProviderTargetIndex === root.orderedWebProviders().length
                 color: Colors.withAlpha(Colors.primary, 0.22)
                 border.color: Colors.primary
@@ -1273,7 +1273,7 @@ Item {
                         Rectangle {
                             implicitWidth: 24
                             implicitHeight: 24
-                            radius: 12
+                            radius: Colors.radiusCard
                             color: Colors.surface
                             border.color: Colors.border
                             border.width: 1
@@ -1349,7 +1349,7 @@ Item {
             Rectangle {
                 Layout.fillWidth: true
                 height: 12
-                radius: 6
+                radius: Colors.radiusXXS
                 visible: root.dragModeKey !== "" && root.dragModeTargetIndex === root.orderedEnabledModes().length
                 color: Colors.withAlpha(Colors.primary, 0.22)
                 border.color: Colors.primary
@@ -1518,7 +1518,7 @@ Item {
 
                         ColumnLayout {
                             Layout.fillWidth: true
-                            spacing: 2
+                            spacing: Colors.spacingXXS
 
                             Text {
                                 text: modelData.label || modelData.id
@@ -1613,7 +1613,7 @@ Item {
 
                         ColumnLayout {
                             Layout.fillWidth: true
-                            spacing: 2
+                            spacing: Colors.spacingXXS
 
                             Text {
                                 text: modelData.name || modelData.id

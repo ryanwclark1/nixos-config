@@ -426,7 +426,7 @@ PanelWindow {
             y: (parent.height - height) / 2
             width: 12
             height: 12
-            radius: 6
+            radius: Colors.radiusXXS
             color: root.currentColor
             border.color: "white"
             border.width: 2
@@ -475,7 +475,7 @@ PanelWindow {
 
           RowLayout {
             anchors { fill: parent; leftMargin: Colors.spacingM; rightMargin: Colors.spacingM }
-            spacing: 6
+            spacing: Colors.spacingSM
 
             Text {
               text: "#"
@@ -661,7 +661,7 @@ PanelWindow {
 
         Flow {
           Layout.fillWidth: true
-          spacing: 6
+          spacing: Colors.spacingSM
 
           Repeater {
             model: parent.parent.presetColors
@@ -669,7 +669,7 @@ PanelWindow {
             delegate: Rectangle {
               width: 28
               height: 28
-              radius: 6
+              radius: Colors.radiusXXS
               color: modelData
               border.color: Colors.border
               border.width: 1
@@ -704,7 +704,7 @@ PanelWindow {
         }
 
         Row {
-          spacing: 6
+          spacing: Colors.spacingSM
 
           Repeater {
             model: Config.recentPickerColors
@@ -712,7 +712,7 @@ PanelWindow {
             delegate: Rectangle {
               width: 28
               height: 28
-              radius: 6
+              radius: Colors.radiusXXS
               color: modelData
               border.color: Colors.border
               border.width: 1

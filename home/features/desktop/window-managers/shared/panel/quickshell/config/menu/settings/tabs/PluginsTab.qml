@@ -319,7 +319,7 @@ Item {
                 spacing: Colors.spacingM
 
                 ColumnLayout {
-                    spacing: 2
+                    spacing: Colors.spacingXXS
                     width: root.compactMode ? parent.width : Math.max(0, parent.width - scanPluginsButton.implicitWidth - copyDiagnosticsButton.implicitWidth - saveDiagnosticsButton.implicitWidth - (Colors.spacingM * 3))
 
                     Text {

@@ -80,7 +80,7 @@ Rectangle {
       ColumnLayout {
         anchors.fill: parent
         anchors.margins: Colors.spacingM
-        spacing: 2
+        spacing: Colors.spacingXXS
         Text { text: "Controls"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
         Text { text: root.launcher.tabControlHintText; color: Colors.text; font.pixelSize: Colors.fontSizeSmall }
         Text { text: root.launcher.launcherControlHintText; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; wrapMode: Text.WordWrap }

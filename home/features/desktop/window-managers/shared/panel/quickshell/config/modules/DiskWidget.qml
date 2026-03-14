@@ -41,7 +41,7 @@ SharedWidgets.CardBase {
 
     RowLayout {
       Layout.fillWidth: true
-      spacing: 20
+      spacing: Colors.spacingLG
       
       Repeater {
         model: root.drives

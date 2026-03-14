@@ -11,6 +11,7 @@ BasePopupMenu {
     compactThreshold: 360
     implicitHeight: compactMode ? 620 : 580
     title: "System"
+    subtitle: compactMode ? "Actions first" : "Processes, services, and live telemetry"
     toggleMethod: "toggleSystemStatsMenu"
 
     Loader {
@@ -121,11 +122,24 @@ BasePopupMenu {
         Layout.fillHeight: true
         columnSpacing: Colors.paddingSmall
 
+        SharedWidgets.SectionLabel {
+            label: "ACTIONS"
+        }
+
+        ProcessWidget {
+            compactMode: root.compactMode
+        }
+        ServiceUnitWidget {
+            compactMode: root.compactMode
+        }
+
+        SharedWidgets.SectionLabel {
+            label: "TELEMETRY"
+        }
+
         SystemGraphs {}
-        GPUWidget {}
-        NetworkGraphs {}
         DiskWidget {}
-        ProcessWidget {}
-        ServiceUnitWidget {}
+        NetworkGraphs {}
+        GPUWidget {}
     }
 }

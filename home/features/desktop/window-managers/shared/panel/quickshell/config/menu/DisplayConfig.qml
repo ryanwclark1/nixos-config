@@ -760,7 +760,7 @@ PanelWindow {
 
             // Resolution selector
             ColumnLayout {
-              spacing: 6
+              spacing: Colors.spacingSM
               Layout.fillWidth: true
 
               Text { text: "RESOLUTION"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black; font.letterSpacing: 1.2 }
@@ -778,7 +778,7 @@ PanelWindow {
                          : []
                   clip: true
                   orientation: ListView.Horizontal
-                  spacing: 6
+                  spacing: Colors.spacingSM
 
                   property string currentRes: displayRoot.selectedIndex >= 0 && displayRoot.monitors.length > 0
                                               ? displayRoot._currentResolution(displayRoot.monitors[displayRoot.selectedIndex])
@@ -826,7 +826,7 @@ PanelWindow {
 
             // Refresh rate selector
             ColumnLayout {
-              spacing: 6
+              spacing: Colors.spacingSM
               Layout.preferredWidth: 180
 
               Text { text: "REFRESH RATE"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black; font.letterSpacing: 1.2 }
@@ -846,7 +846,7 @@ PanelWindow {
                   }
                   clip: true
                   orientation: ListView.Horizontal
-                  spacing: 6
+                  spacing: Colors.spacingSM
 
                   property string currentRate: displayRoot.selectedIndex >= 0 && displayRoot.monitors.length > 0
                                                ? displayRoot.monitors[displayRoot.selectedIndex].refreshRate.toFixed(2)
@@ -896,14 +896,14 @@ PanelWindow {
 
             // Scale selector
             ColumnLayout {
-              spacing: 6
+              spacing: Colors.spacingSM
               Layout.preferredWidth: 220
 
               Text { text: "SCALE"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black; font.letterSpacing: 1.2 }
 
               Flow {
                 Layout.fillWidth: true
-                spacing: 6
+                spacing: Colors.spacingSM
 
                 Repeater {
                   model: ["1.00", "1.25", "1.50", "1.75", "2.00"]
@@ -949,7 +949,7 @@ PanelWindow {
 
             // Position readout
             ColumnLayout {
-              spacing: 6
+              spacing: Colors.spacingSM
               Layout.preferredWidth: 110
 
               Text { text: "POSITION"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black; font.letterSpacing: 1.2 }
@@ -963,7 +963,7 @@ PanelWindow {
 
                 ColumnLayout {
                   anchors.centerIn: parent
-                  spacing: 2
+                  spacing: Colors.spacingXXS
 
                   Text {
                     text: displayRoot.selectedIndex >= 0 && displayRoot.monitors.length > 0

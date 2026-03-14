@@ -52,7 +52,7 @@ SharedWidgets.CardBase {
 
     RowLayout {
       Layout.fillWidth: true
-      spacing: 20
+      spacing: Colors.spacingLG
 
       // GPU Load
       ColumnLayout {

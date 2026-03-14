@@ -109,7 +109,7 @@ Item {
 
                     ColumnLayout {
                         Layout.fillWidth: true
-                        spacing: 2
+                        spacing: Colors.spacingXXS
 
                         Text {
                             text: (WeatherService.condition || "Weather") + "  " + (WeatherService.temp || "--")
@@ -170,7 +170,7 @@ Item {
 
                     ColumnLayout {
                         Layout.fillWidth: true
-                        spacing: 2
+                        spacing: Colors.spacingXXS
 
                         Text {
                             text: (WeatherService.condition || "Weather") + "  " + (WeatherService.temp || "--")

@@ -26,7 +26,7 @@ Item {
       onClicked: root.statsClicked()
 
       Row {
-        spacing: 6
+        spacing: Colors.spacingSM
         Text {
           text: ""
           color: Colors.primary
@@ -53,7 +53,7 @@ Item {
       onClicked: root.statsClicked()
 
       Row {
-        spacing: 6
+        spacing: Colors.spacingSM
         Text {
           text: ""
           color: Colors.accent

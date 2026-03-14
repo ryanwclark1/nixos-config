@@ -196,7 +196,7 @@ SharedWidgets.CardBase {
     }
 
     Rectangle {
-      width: 80; height: 32; radius: 6
+      width: 80; height: 32; radius: Colors.radiusXXS
       color: root.isChecking ? Colors.surface : Colors.primary
       Behavior on color { ColorAnimation { duration: Colors.durationFast } }
       Text {

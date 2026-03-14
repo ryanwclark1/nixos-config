@@ -19,7 +19,7 @@ Flow {
       id: trayItem
       width: 24
       height: 24
-      radius: 6
+      radius: Colors.radiusXXS
       color: "transparent"
       scale: mouseArea.containsMouse ? 1.08 : 1.0
 

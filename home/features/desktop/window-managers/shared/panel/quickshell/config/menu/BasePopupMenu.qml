@@ -109,7 +109,7 @@ PopupWindow {
         Layout.fillWidth: true
 
         ColumnLayout {
-          spacing: 2
+          spacing: Colors.spacingXXS
           Text {
             text: root.title
             color: Colors.text

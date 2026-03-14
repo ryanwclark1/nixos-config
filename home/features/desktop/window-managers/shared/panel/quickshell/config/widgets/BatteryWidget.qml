@@ -5,7 +5,7 @@ import "../services"
 
 Row {
   id: root
-  spacing: 6
+  spacing: Colors.spacingSM
   property bool iconOnly: false
 
   property var device: UPower.displayDevice

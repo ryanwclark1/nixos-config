@@ -100,7 +100,7 @@ PopupWindow {
     id: menuBg
     anchors.fill: parent
     anchors.margins: Colors.spacingXS
-    radius: 12
+    radius: Colors.radiusCard
     color: Colors.bgGlass
     border.color: Colors.border
     border.width: 1
@@ -109,7 +109,7 @@ PopupWindow {
       id: menuColumn
       anchors.fill: parent
       anchors.margins: Colors.spacingS
-      spacing: 2
+      spacing: Colors.spacingXXS
 
       // Grouped windows list
       Repeater {

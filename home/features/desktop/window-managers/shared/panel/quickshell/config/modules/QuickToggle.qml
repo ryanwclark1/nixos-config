@@ -48,7 +48,7 @@ Rectangle {
 
     Column {
       Layout.fillWidth: true
-      spacing: 2
+      spacing: Colors.spacingXXS
       Text {
         text: root.label
         color: Colors.text

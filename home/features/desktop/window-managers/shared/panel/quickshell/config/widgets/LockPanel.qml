@@ -118,7 +118,7 @@ Item {
         Layout.fillWidth: true
         Layout.preferredHeight: 50
         color: Colors.highlightLight
-        radius: 12
+        radius: Colors.radiusCard
         border.color: pwInput.activeFocus ? Colors.primary : Colors.border
         border.width: 1
 
@@ -286,7 +286,7 @@ Item {
     RowLayout {
       Layout.fillWidth: true
       Layout.margins: compact ? 20 : 40
-      spacing: 20
+      spacing: Colors.spacingLG
 
       // Media controls (optional)
       Loader {
@@ -295,7 +295,7 @@ Item {
         sourceComponent: Rectangle {
           implicitWidth: 320
           implicitHeight: 60
-          radius: 12
+          radius: Colors.radiusCard
           color: Colors.withAlpha(Colors.background, 0.4)
           border.color: Colors.border
           border.width: 1
@@ -307,7 +307,7 @@ Item {
 
             ColumnLayout {
               Layout.fillWidth: true
-              spacing: 2
+              spacing: Colors.spacingXXS
               Text {
                 text: MediaService.trackTitle || ""
                 color: Colors.text

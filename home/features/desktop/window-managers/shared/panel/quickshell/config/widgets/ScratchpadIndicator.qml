@@ -7,7 +7,7 @@ Rectangle {
 
   property var state: null
 
-  radius: 6
+  radius: Colors.radiusXXS
   height: 20
   width: Math.max(40, label.implicitWidth + 12)
   color: root.state && root.state.specialWorkspaceActive ? Colors.highlight : Colors.surface

@@ -3011,7 +3011,7 @@ PanelWindow {
 
             ColumnLayout {
               Layout.fillWidth: true
-              spacing: 2
+              spacing: Colors.spacingXXS
               Text { text: "Launcher Metrics"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.DemiBold }
               Text {
                 text: "opens " + launcherRoot.launcherMetrics.opens

@@ -8,7 +8,7 @@ Rectangle {
   Layout.fillWidth: true
   Layout.preferredHeight: 280
   color: Colors.bgWidget
-  radius: 12
+  radius: Colors.radiusCard
   border.color: Colors.border
 
   SystemClock {
@@ -108,7 +108,7 @@ Rectangle {
         cursorShape: Qt.PointingHandCursor
         onClicked: root.prevMonth()
         Rectangle {
-          anchors.fill: parent; radius: 12
+          anchors.fill: parent; radius: Colors.radiusCard
           color: parent.containsMouse ? Colors.highlightLight : "transparent"
           Behavior on color { ColorAnimation { duration: Colors.durationFast } }
         }
@@ -178,7 +178,7 @@ Rectangle {
         cursorShape: Qt.PointingHandCursor
         onClicked: root.nextMonth()
         Rectangle {
-          anchors.fill: parent; radius: 12
+          anchors.fill: parent; radius: Colors.radiusCard
           color: parent.containsMouse ? Colors.highlightLight : "transparent"
           Behavior on color { ColorAnimation { duration: Colors.durationFast } }
         }

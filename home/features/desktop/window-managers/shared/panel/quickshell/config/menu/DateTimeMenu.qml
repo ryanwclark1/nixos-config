@@ -78,7 +78,7 @@ BasePopupMenu {
             ColumnLayout {
               anchors.fill: parent
               anchors.margins: Colors.spacingS
-              spacing: 2
+              spacing: Colors.spacingXXS
 
               Text {
                 text: Colors.weatherIcon(WeatherService.condition)

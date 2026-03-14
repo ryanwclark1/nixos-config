@@ -30,7 +30,7 @@ BasePopupMenu {
       spacing: Colors.paddingSmall
 
       Rectangle {
-        width: 12; height: 12; radius: 6
+        width: 12; height: 12; radius: Colors.radiusXXS
         color: RecordingService.isRecording ? Colors.error : Colors.textDisabled
         Behavior on color { ColorAnimation { duration: Colors.durationFast } }
         SequentialAnimation on opacity {
@@ -81,7 +81,7 @@ BasePopupMenu {
 
       ColumnLayout {
         anchors.centerIn: parent
-        spacing: 2
+        spacing: Colors.spacingXXS
         Text { text: "󰍹"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL; Layout.alignment: Qt.AlignHCenter }
         Text { text: "Fullscreen"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; Layout.alignment: Qt.AlignHCenter }
       }
@@ -112,7 +112,7 @@ BasePopupMenu {
 
       ColumnLayout {
         anchors.centerIn: parent
-        spacing: 2
+        spacing: Colors.spacingXXS
         Text { text: "󰩬"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL; Layout.alignment: Qt.AlignHCenter }
         Text { text: "Region"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; Layout.alignment: Qt.AlignHCenter }
       }

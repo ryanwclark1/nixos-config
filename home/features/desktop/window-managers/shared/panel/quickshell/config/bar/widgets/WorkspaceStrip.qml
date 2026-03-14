@@ -18,7 +18,7 @@ Flow {
   readonly property int pillFontSize: Config.workspacePillSize === "compact" ? Colors.fontSizeXS : (Config.workspacePillSize === "large" ? Colors.fontSizeMedium : Colors.fontSizeSmall)
 
   flow: vertical ? Flow.TopToBottom : Flow.LeftToRight
-  spacing: 6
+  spacing: Colors.spacingSM
 
   // Scroll-to-switch workspace
   WheelHandler {
@@ -26,9 +26,9 @@ Flow {
     onWheel: event => {
       var delta = Config.workspaceReverseScroll ? -event.angleDelta.y : event.angleDelta.y;
       if (delta > 0)
-        CompositorAdapter.focusWorkspace("prev");
+        CompositorAdapter.focusWorkspace("e-1");
       else if (delta < 0)
-        CompositorAdapter.focusWorkspace("next");
+        CompositorAdapter.focusWorkspace("e+1");
     }
   }
 
@@ -54,7 +54,7 @@ Flow {
       readonly property bool isActive: root.state && modelData.id === root.state.activeWorkspace
       readonly property bool isUrgent: !isActive && !!modelData.urgent
 
-      radius: 6
+      radius: Colors.radiusXXS
       height: root.pillHeight
       width: Math.max(root.pillMinWidth, label.implicitWidth + 10)
       color: isActive ? root.activeColor : root.inactiveColor
@@ -77,7 +77,7 @@ Flow {
         anchors.centerIn: parent
         color: root.textColor
         font.pixelSize: root.pillFontSize
-        text: Config.workspaceShowNames && modelData.name ? modelData.name : modelData.name
+        text: Config.workspaceShowNames && modelData.name ? modelData.name : String(modelData.id)
       }
 
       MouseArea {

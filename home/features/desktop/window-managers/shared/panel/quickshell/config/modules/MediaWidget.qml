@@ -75,7 +75,7 @@ Rectangle {
         // Track Info & Controls
         ColumnLayout {
           Layout.fillWidth: true
-          spacing: 2
+          spacing: Colors.spacingXXS
 
           Text {
             text: modelData.trackTitle || "Unknown Track"
@@ -129,7 +129,7 @@ Rectangle {
 
           // Playback Controls
           RowLayout {
-            spacing: 20
+            spacing: Colors.spacingLG
             Layout.alignment: Qt.AlignHCenter
             
             // Previous

@@ -19,7 +19,7 @@ Item {
     }
 
     ColumnLayout {
-      spacing: 2
+      spacing: Colors.spacingXXS
 
       Text {
         text: WeatherService.temp || "--"

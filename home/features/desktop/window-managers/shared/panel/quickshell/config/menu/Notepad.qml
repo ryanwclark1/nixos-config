@@ -464,7 +464,7 @@ PanelWindow {
       // ---- Tab bar ----
       RowLayout {
         Layout.fillWidth: true
-        spacing: 6
+        spacing: Colors.spacingSM
 
         // Scrollable tab strip
         Item {

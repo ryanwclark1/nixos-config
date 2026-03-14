@@ -104,7 +104,7 @@ BasePopupMenu {
 
         ColumnLayout {
           Layout.fillWidth: true
-          spacing: 2
+          spacing: Colors.spacingXXS
 
           Text {
             text: root.device ? Math.round(root.device.percentage * 100) + "%" : "—"

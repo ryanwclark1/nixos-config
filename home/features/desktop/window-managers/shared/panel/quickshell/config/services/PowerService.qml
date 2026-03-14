@@ -101,18 +101,26 @@ QtObject {
             lines.push("");
         }
 
-        var content = lines.join("\n");
+        _pendingHypridleContent = lines.join("\n") + "\n";
+        if (_writeProc.running) return; // debounce will re-trigger
         _writeProc.command = ["sh", "-c",
-            "mkdir -p ~/.config/hypr && " +
-            "cat > ~/.config/hypr/hypridle-quickshell.conf << 'QSEOF'\n" + content + "\nQSEOF"
+            "mkdir -p ~/.config/hypr && cat > ~/.config/hypr/hypridle-quickshell.conf"
         ];
         _writeProc.running = true;
     }
 
+    property string _pendingHypridleContent: ""
+
     property Process _writeProc: Process {
         running: false
-        stdout: StdioCollector {
-            onStreamFinished: {
+        stdinEnabled: true
+        onStarted: {
+            _writeProc.write(root._pendingHypridleContent);
+            _writeProc.closeStdin();
+        }
+        onExited: (exitCode, exitStatus) => {
+            root._pendingHypridleContent = "";
+            if (exitCode === 0) {
                 // Signal hypridle to reload if running
                 Quickshell.execDetached(["pkill", "-USR1", "hypridle"]);
             }

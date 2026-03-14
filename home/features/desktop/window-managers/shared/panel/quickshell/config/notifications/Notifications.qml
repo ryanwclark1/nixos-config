@@ -307,7 +307,7 @@ PanelWindow {
                     : 1;
                   return (parent.width - (actionCount - 1) * 8) / actionCount;
                 }
-                height: 34; radius: 6; border.color: Colors.border
+                height: 34; radius: Colors.radiusXXS; border.color: Colors.border
                 color: Colors.highlightLight
 
                 SharedWidgets.StateLayer {

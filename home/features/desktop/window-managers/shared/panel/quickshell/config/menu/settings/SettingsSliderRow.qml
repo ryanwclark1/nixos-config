@@ -98,7 +98,7 @@ Rectangle {
                 id: sliderValuePill
                 implicitHeight: 24
                 implicitWidth: valueText.implicitWidth + 14
-                radius: 12
+                radius: Colors.radiusCard
                 color: Colors.surface
                 border.color: Colors.border
                 border.width: 1

@@ -226,7 +226,7 @@ Rectangle {
 
               Column {
                 anchors.centerIn: parent
-                spacing: 2
+                spacing: Colors.spacingXXS
                 visible: modelData.type === "separator"
 
                 Text {
@@ -382,7 +382,7 @@ Rectangle {
               ColumnLayout {
                 Layout.fillWidth: true
                 visible: expanded
-                spacing: 2
+                spacing: Colors.spacingXXS
 
                 Repeater {
                   model: expanded ? categoryTabs : []

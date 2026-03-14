@@ -42,7 +42,7 @@ BasePopupMenu {
 
       ColumnLayout {
         Layout.fillWidth: true
-        spacing: 2
+        spacing: Colors.spacingXXS
 
         Text {
           text: PrivacyService.anyActive ? "Active access detected" : "No active access"

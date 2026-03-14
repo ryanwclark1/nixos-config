@@ -54,7 +54,7 @@ BasePopupMenu {
 
         ColumnLayout {
           Layout.fillWidth: true
-          spacing: 2
+          spacing: Colors.spacingXXS
 
           Text {
             text: WeatherService.temp || "--"
@@ -175,7 +175,7 @@ BasePopupMenu {
           }
 
           RowLayout {
-            spacing: 2
+            spacing: Colors.spacingXXS
             Layout.columnSpan: root.compactMode ? 2 : 1
             Text {
               text: "Low " + modelData.minTemp + "°"

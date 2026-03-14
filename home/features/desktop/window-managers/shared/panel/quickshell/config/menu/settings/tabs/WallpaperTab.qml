@@ -844,7 +844,7 @@ Item {
                         required property string modelData
                         width: 24
                         height: 24
-                        radius: 6
+                        radius: Colors.radiusXXS
                         color: "#" + modelData
                         border.color: Colors.border
                         border.width: 1

@@ -132,7 +132,7 @@ Item {
                 RowLayout {
                     id: addRow
                     anchors.centerIn: parent
-                    spacing: 6
+                    spacing: Colors.spacingSM
 
                     Text {
                         text: "󰐕"
@@ -190,7 +190,7 @@ Item {
                         id: addMenuCol
                         anchors.fill: parent
                         anchors.margins: Colors.spacingS
-                        spacing: 2
+                        spacing: Colors.spacingXXS
 
                         Repeater {
                             model: DesktopWidgetRegistry.widgetCatalog
@@ -199,7 +199,7 @@ Item {
                                 required property var modelData
                                 width: parent.width
                                 height: 30
-                                radius: 6
+                                radius: Colors.radiusXXS
                                 color: addItemMa.containsMouse ? Colors.highlight : "transparent"
 
                                 RowLayout {

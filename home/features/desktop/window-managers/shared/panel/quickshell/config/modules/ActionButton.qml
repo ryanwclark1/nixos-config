@@ -10,7 +10,7 @@ Rectangle {
   property var command: []
   property var action: null
 
-  radius: 6
+  radius: Colors.radiusXXS
   height: 20
   width: Math.max(28, textLabel.implicitWidth + 12)
   color: Colors.surface

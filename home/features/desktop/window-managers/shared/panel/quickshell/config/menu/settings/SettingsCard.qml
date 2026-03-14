@@ -48,7 +48,7 @@ Rectangle {
                 top: parent.top
                 margins: Colors.spacingM
             }
-            spacing: 2
+            spacing: Colors.spacingXXS
 
             RowLayout {
                 Layout.fillWidth: true
@@ -75,7 +75,7 @@ Rectangle {
                     visible: root._showChevron
                     implicitWidth: 24
                     implicitHeight: 24
-                    radius: 12
+                    radius: Colors.radiusCard
                     color: Colors.withAlpha(Colors.text, collapseHover.containsMouse ? 0.14 : 0.08)
                     border.color: Colors.border
                     border.width: 1

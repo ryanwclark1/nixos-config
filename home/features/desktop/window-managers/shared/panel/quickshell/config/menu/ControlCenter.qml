@@ -179,7 +179,7 @@ PanelWindow {
                     ColumnLayout {
                         id: mainCol
                         width: parent.width
-                        spacing: 20
+                        spacing: Colors.spacingLG
 
                         ColumnLayout {
                             Layout.fillWidth: true
@@ -330,14 +330,14 @@ PanelWindow {
 
                             ColumnLayout {
                                 Layout.fillWidth: true
-                                spacing: 6
+                                spacing: Colors.spacingSM
 
                                 Repeater {
                                     model: BrightnessService.monitors
                                     delegate: ColumnLayout {
                                         required property var modelData
                                         Layout.fillWidth: true
-                                        spacing: 6
+                                        spacing: Colors.spacingSM
                                         RowLayout {
                                             Layout.fillWidth: true
                                             Text {
@@ -378,7 +378,7 @@ PanelWindow {
 
                             ColumnLayout {
                                 Layout.fillWidth: true
-                                spacing: 6
+                                spacing: Colors.spacingSM
                                 RowLayout {
                                     Layout.fillWidth: true
                                     Text {
@@ -420,7 +420,7 @@ PanelWindow {
 
                             ColumnLayout {
                                 Layout.fillWidth: true
-                                spacing: 6
+                                spacing: Colors.spacingSM
                                 RowLayout {
                                     Layout.fillWidth: true
                                     Text {
@@ -482,7 +482,7 @@ PanelWindow {
                                 border.width: 1
                                 Column {
                                     anchors.centerIn: parent
-                                    spacing: 2
+                                    spacing: Colors.spacingXXS
                                     Text {
                                         text: "CPU TEMP"
                                         color: Colors.textDisabled
@@ -506,7 +506,7 @@ PanelWindow {
                                 border.width: 1
                                 Column {
                                     anchors.centerIn: parent
-                                    spacing: 2
+                                    spacing: Colors.spacingXXS
                                     Text {
                                         text: "GPU TEMP"
                                         color: Colors.textDisabled

@@ -72,7 +72,7 @@ Scope {
         Rectangle {
           id: content
           anchors.fill: parent
-          radius: 12
+          radius: Colors.radiusCard
           color: Colors.bgGlass
           border.color: Colors.border
           border.width: 1
@@ -116,7 +116,7 @@ Scope {
                 color: "transparent"
                 border.color: Colors.border
                 border.width: 1
-                radius: 6
+                radius: Colors.radiusXXS
               }
             }
 

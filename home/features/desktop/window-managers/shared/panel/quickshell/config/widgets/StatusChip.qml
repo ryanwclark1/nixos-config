@@ -10,7 +10,7 @@ Rectangle {
 
   signal clicked()
 
-  radius: 12
+  radius: Colors.radiusCard
   color: Colors.withAlpha(root.chipColor, 0.16)
   implicitWidth: chipLabel.implicitWidth + 16
   implicitHeight: 24

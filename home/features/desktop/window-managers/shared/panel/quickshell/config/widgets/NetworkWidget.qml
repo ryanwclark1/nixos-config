@@ -84,7 +84,7 @@ Row {
   Row {
     visible: !root.iconOnly
     anchors.verticalCenter: parent.verticalCenter
-    spacing: 6
+    spacing: Colors.spacingSM
 
     Text {
       text: networkName
