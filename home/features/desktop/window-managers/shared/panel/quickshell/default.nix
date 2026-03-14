@@ -61,6 +61,16 @@ let
     ${builtins.readFile ./scripts/cava.sh}
   '';
 
+  sleepMonitorScript = pkgs.writeShellScriptBin "qs-sleep-monitor" ''
+    PATH="${pkgs.dbus}/bin:${pkgs.gawk}/bin:${pkgs.coreutils}/bin:$PATH"
+    ${builtins.readFile ./scripts/sleep-monitor.sh}
+  '';
+
+  screenshotScript = pkgs.writeShellScriptBin "qs-screenshot" ''
+    PATH="${pkgs.grim}/bin:${pkgs.slurp}/bin:${pkgs.wl-clipboard}/bin:${pkgs.coreutils}/bin:${pkgs.jq}/bin:$PATH"
+    ${builtins.readFile ./scripts/screenshot.sh}
+  '';
+
   inhibitorScript = pkgs.writeScriptBin "qs-inhibitor" ''
     #!${pkgs.python3.withPackages (ps: [ ps.pywayland ])}/bin/python
     ${builtins.readFile ./scripts/inhibitor.py}
@@ -203,6 +213,8 @@ let
       bookmarksScript
       updatorScript
       cavaScript
+      sleepMonitorScript
+      screenshotScript
       inhibitorScript
       networkScript
       iconResolverScript
@@ -302,7 +314,7 @@ EOF
       Service = {
         ExecStart = "${pkgs.quickshell}/bin/quickshell";
         Environment = [
-          "PATH=%h/.local/bin:%h/.nix-profile/bin:/etc/profiles/per-user/%u/bin:/run/current-system/sw/bin:${pkgs.quickshell}/bin:${pkgs.pipewire}/bin:${pkgs.networkmanager}/bin:${pkgs.tailscale}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.bash}/bin:${pkgs.procps}/bin:${pkgs.wl-clipboard}/bin:${pkgs.power-profiles-daemon}/bin"
+          "PATH=%h/.local/bin:%h/.nix-profile/bin:/etc/profiles/per-user/%u/bin:/run/current-system/sw/bin:${pkgs.quickshell}/bin:${pkgs.pipewire}/bin:${pkgs.networkmanager}/bin:${pkgs.tailscale}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.bash}/bin:${pkgs.procps}/bin:${pkgs.wl-clipboard}/bin:${pkgs.power-profiles-daemon}/bin:${pkgs.ddcutil}/bin:${pkgs.grim}/bin:${pkgs.slurp}/bin:${pkgs.dbus}/bin"
           "QT_QPA_PLATFORMTHEME=adwaita"
           "QT_STYLE_OVERRIDE=adwaita-dark"
         ];
