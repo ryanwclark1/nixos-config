@@ -1,7 +1,6 @@
 import Quickshell // SystemClock
 import Quickshell.Bluetooth
 import Quickshell.Wayland
-import Quickshell.Io
 import QtQuick
 import "."
 import "widgets"
@@ -16,6 +15,7 @@ Item {
   SharedWidgets.Ref { service: PrivacyService }
   SharedWidgets.Ref { service: PrinterService }
   SharedWidgets.Ref { service: SpectrumService }
+  SharedWidgets.Ref { service: SystemStatus }
 
   property var manager: null
   property var anchorWindow: null

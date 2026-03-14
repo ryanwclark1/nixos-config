@@ -7,7 +7,7 @@ set -euo pipefail
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   # Linux - use notify-send
   if command -v notify-send >/dev/null 2>&1; then
-    notify-send -i "dialog-information" \
+    notify-send \
       "Claude Code" \
       "Claude Code needs your attention" \
       2>/dev/null || true

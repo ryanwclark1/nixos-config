@@ -6,8 +6,12 @@ Use this runbook after changes to popup menus, panel surfaces, or shared shell s
 
 - Runtime popup/panel smoke check against the live QuickShell instance:
   - `scripts/check-surface-responsive.sh`
+- Runtime popup/panel smoke check against the repo shell:
+  - `scripts/check-panel-runtime.sh --repo-shell --skip-settings --skip-multibar`
 - Manual popup/panel preview walk:
   - `scripts/preview-surface-responsive.sh`
+- Manual popup/panel preview against the repo shell:
+  - `scripts/preview-panel-qa.sh --repo-shell --skip-settings`
 - Focused surface screenshot capture:
   - `scripts/capture-surface-viewport.sh --surface networkMenu`
 - High-risk surface screenshot matrix:
@@ -16,9 +20,14 @@ Use this runbook after changes to popup menus, panel surfaces, or shared shell s
 - `scripts/capture-panel-matrix.sh --settings-preset portrait --surface-crop monitor`
   - uses a dedicated empty workspace by default
   - pass `--workspace current` only when you explicitly want live-workspace captures
+- Combined settings + surface QA capture set against the repo shell:
+  - `scripts/capture-panel-matrix.sh --repo-shell --settings-preset portrait --surface-crop monitor`
 - If more than one QuickShell instance is running:
   - `scripts/check-surface-responsive.sh --id <instance-id>`
   - `scripts/preview-surface-responsive.sh --id <instance-id>`
+- If the managed `quickshell.service` is stale, broken, or not yet rebuilt from the repo:
+  - prefer `--repo-shell` on the panel-level wrappers instead of guessing an instance id
+  - this temporarily stops the managed service, launches the repo checkout as the live shell, runs QA, then attempts to restore the service
 - Synthetic multi-bar shell matrix and management harnesses:
   - `scripts/check-multibar-smoke.sh`
 
@@ -55,6 +64,7 @@ Covered surfaces:
 - `cavaPopup`
 
 This is a runtime creation-path guardrail, not a replacement for visual QA.
+If the installed shell does not reflect the repo checkout yet, use `scripts/check-panel-runtime.sh --repo-shell --skip-settings --skip-multibar` instead.
 
 ## What The Preview Script Covers
 
@@ -71,6 +81,8 @@ Recommended usage:
   - `scripts/preview-surface-responsive.sh`
 - slower walkthrough:
   - `scripts/preview-surface-responsive.sh --delay 3`
+- repo-shell walkthrough:
+  - `scripts/preview-panel-qa.sh --repo-shell --skip-settings`
 
 ## Screenshot Capture
 
@@ -100,6 +112,8 @@ For a combined artifact set:
   - `scripts/capture-panel-matrix.sh --skip-surfaces`
 - surfaces only:
   - `scripts/capture-panel-matrix.sh --skip-settings --surface-crop usable`
+- repo-shell combined capture:
+  - `scripts/capture-panel-matrix.sh --repo-shell --settings-preset portrait --surface-crop monitor`
 
 This is for visual inspection only. It complements, but does not replace, the live smoke checks.
 

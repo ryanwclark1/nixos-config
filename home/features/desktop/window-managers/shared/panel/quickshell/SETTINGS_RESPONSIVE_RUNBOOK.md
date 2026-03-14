@@ -14,14 +14,20 @@ Reference:
   - `scripts/check-settings-guardrails.sh`
 - Automated gate: runtime smoke check against the live QuickShell instance:
   - `scripts/check-settings-responsive.sh`
+- Automated gate: runtime smoke check against the repo shell:
+  - `scripts/check-panel-runtime.sh --repo-shell --skip-surfaces --skip-multibar`
 - Manual walkthrough: tab preview for visual QA:
   - `scripts/preview-settings-responsive.sh`
+- Manual walkthrough against the repo shell:
+  - `scripts/preview-panel-qa.sh --repo-shell --skip-surfaces`
 - Review artifact capture: simulated viewport screenshot:
   - `scripts/capture-settings-viewport.sh --width 430 --height 932 --tab wallpaper`
 - Review artifact capture: simulated lower-fold screenshot:
   - `scripts/capture-settings-viewport.sh --width 430 --height 932 --tab wallpaper --scroll-y 900`
 - Review artifact capture: batch viewport matrix:
   - `scripts/capture-settings-matrix.sh --preset portrait`
+- Review artifact capture against the repo shell:
+  - `scripts/capture-panel-matrix.sh --repo-shell --skip-surfaces --settings-preset portrait`
 - Review artifact capture: batch lower-fold viewport matrix:
   - `scripts/capture-settings-matrix.sh --preset portrait --scroll-y 900 --output-dir /tmp/settings-matrix-portrait-lower`
 - If more than one QuickShell instance is running:
@@ -30,6 +36,9 @@ Reference:
   - `scripts/preview-settings-responsive.sh --id <instance-id>`
   - `scripts/capture-settings-viewport.sh --id <instance-id> --width 430 --height 932 --tab wallpaper`
   - `scripts/capture-settings-matrix.sh --id <instance-id> --preset portrait`
+- If the managed `quickshell.service` is stale, broken, or not yet rebuilt from the repo:
+  - prefer `--repo-shell` on the panel-level wrappers instead of guessing an instance id
+  - this temporarily stops the managed service, launches the repo checkout as the live shell, runs QA, then attempts to restore the service
 - Static parse validation for touched QML:
   - `qmlformat -n config/menu/SettingsHub.qml config/menu/settings/*.qml config/menu/settings/tabs/*.qml`
 
@@ -58,6 +67,7 @@ The smoke script:
 5. Scans new QuickShell runtime log output for warnings/errors.
 
 This is a runtime guardrail, not a replacement for visual QA.
+If the installed shell does not reflect the repo checkout yet, use `scripts/check-panel-runtime.sh --repo-shell --skip-surfaces --skip-multibar` instead.
 
 Unlike the headless multibar smoke in the panel QA flow, this live-session check uses only `PASS`, `WARN`, and `FAIL` outcomes. It does not emit `[SKIP]` results.
 
@@ -76,13 +86,18 @@ Recommended usage:
   - `scripts/preview-settings-responsive.sh`
 - slower walkthrough:
   - `scripts/preview-settings-responsive.sh --delay 4`
+- repo-shell walkthrough:
+  - `scripts/preview-panel-qa.sh --repo-shell --skip-surfaces`
 
 ## Simulated Compact QA
 
 Use the viewport capture script when you need repeatable narrow or portrait screenshots from a wide desktop session.
+If the installed shell is stale or unhealthy, prefer the repo-shell artifact path:
+- `scripts/capture-panel-matrix.sh --repo-shell --skip-surfaces --settings-preset portrait`
 
 For Bar Widgets stat-setting changes, run `scripts/check-panel-config-contracts.sh` first so default/migration regressions are caught before live-session layout review.
 Recommended order: run the runtime gate first, then the manual preview walkthrough, then generate capture artifacts if you need repeatable screenshots for review or bug triage.
+If you are validating repo-only changes before a Home Manager rebuild, use the repo-shell variants of those steps instead.
 
 Examples:
 

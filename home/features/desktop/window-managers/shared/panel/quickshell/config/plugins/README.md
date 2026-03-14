@@ -39,6 +39,7 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
 
 - Local runner:
   - `scripts/plugin-local.sh quick` (fast local guardrails, starting with `reference-all`)
+  - `scripts/plugin-local.sh quick --quiet` (same fast local guardrails with compact output)
   - `scripts/plugin-local.sh full` (complete local verification)
   - `scripts/plugin-local.sh full --quiet` (same full verification with compact phase output)
   - `scripts/plugin-local.sh doctor [/path/to/plugins]`
@@ -125,12 +126,16 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
 - Run `scripts/plugin-local.sh all-gates` when you want the same assembled pipeline used by `plugin-verify.sh` and `plugin-local.sh full`.
 - Run `scripts/plugin-local.sh all-gates --quiet` when you want that assembled pipeline without the phase headings.
 - `scripts/plugin-local.sh quick` reuses `reference-all --quiet --silent-preflight` before the shared runtime and diagnostics gates, so the fast path and the reference-only path stay aligned without extra preflight noise.
+- Run `scripts/plugin-local.sh quick --quiet` when you want that same fast path without the top-level wrapper lines or shared-gate headings.
 
 ## Reference Plugin Workflow
 
 - Install the repo-tracked reference plugin into a local plugin directory with `scripts/plugin-local.sh install-reference`.
 - Validate the installed reference plugin in isolation with `scripts/plugin-local.sh smoke-reference`.
 - Remove the linked reference plugin with `scripts/plugin-local.sh remove-reference`.
+- `install-reference` is intentionally conservative: it is idempotent for the correct symlink target, but refuses to overwrite a non-symlink path or replace a symlink that points somewhere else.
+- `smoke-reference` is intentionally strict: it fails when the reference plugin manifest is absent or when the installed manifest id does not match `reference.local.toolkit`.
+- `remove-reference` is safe to rerun when the reference plugin is already absent.
 - Keep `scripts/check-plugin-reference-contracts.sh` green when changing the reference plugin so its intended manifest, state, launcher, and settings behaviors do not drift.
 - Keep `scripts/check-plugin-reference-fixtures.sh` green when changing reference-plugin persistence so expected state-envelope and settings-key shapes do not drift.
 - Keep `scripts/check-plugin-reference-recovery.sh` green when changing launcher failure handling so healthy, degraded, and recovery transitions remain aligned with `PluginService`.

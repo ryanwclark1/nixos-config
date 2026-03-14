@@ -220,6 +220,7 @@ Item {
 
             SettingsModeRow {
                 label: "Bar Date Style"
+                icon: "󰃭"
                 currentValue: Config.timeBarDateStyle
                 options: [
                     {
@@ -246,6 +247,7 @@ Item {
 
             SettingsModeRow {
                 label: "Units"
+                icon: "󰔄"
                 currentValue: Config.weatherUnits
                 options: [
                     {
@@ -262,6 +264,7 @@ Item {
 
             SettingsModeRow {
                 label: "Location Priority"
+                icon: "󰍎"
                 currentValue: Config.weatherLocationPriority
                 options: [
                     {

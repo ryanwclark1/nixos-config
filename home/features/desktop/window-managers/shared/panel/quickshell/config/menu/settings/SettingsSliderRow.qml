@@ -2,15 +2,16 @@ import QtQuick
 import QtQuick.Layouts
 import "../../services"
 
-ColumnLayout {
+Rectangle {
     id: root
 
     property string label
+    property string icon: ""
     property real min
     property real max
     property real value
     property real step: 1
-    property string unit: step < 1 ? "%" : "px"
+    property string unit: ""
     signal moved(real v)
 
     readonly property real _range: max - min
@@ -46,127 +47,157 @@ ColumnLayout {
         root.moved(Math.max(root.min, Math.min(root.max, stepped)));
     }
 
-    spacing: Colors.spacingS
     Layout.fillWidth: true
+    implicitHeight: mainLayout.implicitHeight + Colors.spacingM * 2
+    radius: Colors.radiusMedium
+    color: Colors.modalFieldSurface
+    border.color: Colors.border
+    border.width: 1
 
-    Flow {
-        Layout.fillWidth: true
-        Layout.preferredWidth: parent.width
+    ColumnLayout {
+        id: mainLayout
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.margins: Colors.spacingM
+        spacing: Colors.spacingS
 
-        Text {
-            width: root.narrowLayout ? parent.width : Math.max(0, parent.width - sliderValuePill.implicitWidth - Colors.spacingM)
-            text: root.label
-            color: Colors.text
-            font.pixelSize: Colors.fontSizeMedium
-            font.weight: Font.Medium
-            wrapMode: Text.WordWrap
-        }
-
-        Rectangle {
-            id: sliderValuePill
-            implicitHeight: 24
-            implicitWidth: valueText.implicitWidth + 14
-            radius: 12
-            color: Colors.modalFieldSurface
-            border.color: Colors.border
-            border.width: 1
-
-            Text {
-                id: valueText
-                anchors.centerIn: parent
-                text: root._displayValue() + root.unit
-                color: Colors.fgSecondary
-                font.pixelSize: Colors.fontSizeSmall
-                font.family: Colors.fontMono
-            }
-        }
-    }
-
-    Item {
-        Layout.fillWidth: true
-        height: 28
-
-        Rectangle {
-            id: track
-            anchors {
-                left: parent.left
-                right: parent.right
-                verticalCenter: parent.verticalCenter
-            }
-            height: 8
-            radius: 4
-            color: Colors.surface
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: Colors.spacingM
 
             Rectangle {
-                width: track.width * Math.max(0, Math.min(1, root._ratio))
-                height: parent.height
-                radius: parent.radius
-                color: Colors.primary
+                visible: root.icon !== ""
+                width: 38
+                height: 38
+                radius: Colors.radiusSmall
+                color: Colors.withAlpha(Colors.text, 0.06)
+                border.color: Colors.border
+                border.width: 1
+                Layout.alignment: Qt.AlignTop
 
-                Behavior on width {
+                Text {
+                    anchors.centerIn: parent
+                    text: root.icon
+                    color: Colors.textSecondary
+                    font.family: Colors.fontMono
+                    font.pixelSize: Colors.fontSizeXL
+                }
+            }
+
+            Text {
+                text: root.label
+                color: Colors.text
+                font.pixelSize: Colors.fontSizeMedium
+                font.weight: Font.DemiBold
+                Layout.fillWidth: true
+                wrapMode: Text.WordWrap
+            }
+
+            Rectangle {
+                id: sliderValuePill
+                implicitHeight: 24
+                implicitWidth: valueText.implicitWidth + 14
+                radius: 12
+                color: Colors.surface
+                border.color: Colors.border
+                border.width: 1
+                Layout.alignment: Qt.AlignTop
+
+                Text {
+                    id: valueText
+                    anchors.centerIn: parent
+                    text: root._displayValue() + root.unit
+                    color: Colors.primary
+                    font.pixelSize: Colors.fontSizeSmall
+                    font.family: Colors.fontMono
+                    font.weight: Font.DemiBold
+                }
+            }
+        }
+
+        Item {
+            Layout.fillWidth: true
+            Layout.leftMargin: (root.icon !== "" && !root.narrowLayout) ? 38 + Colors.spacingM : 0
+            height: 28
+
+            Rectangle {
+                id: track
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    verticalCenter: parent.verticalCenter
+                }
+                height: 8
+                radius: 4
+                color: Colors.surface
+
+                Rectangle {
+                    width: track.width * Math.max(0, Math.min(1, root._ratio))
+                    height: parent.height
+                    radius: parent.radius
+                    color: Colors.primary
+
+                    Behavior on width {
+                        NumberAnimation {
+                            duration: 90
+                        }
+                    }
+                }
+            }
+
+            Rectangle {
+                id: thumb
+                width: sliderMouse.pressed ? 16 : 14
+                height: width
+                radius: width / 2
+                color: Colors.primary
+                border.color: Colors.modalFieldSurface
+                border.width: 2
+                x: Math.max(0, Math.min(parent.width - width, parent.width * Math.max(0, Math.min(1, root._ratio)) - width / 2))
+                anchors.verticalCenter: parent.verticalCenter
+
+                Behavior on x {
                     NumberAnimation {
                         duration: 90
                     }
                 }
             }
-        }
 
-        Rectangle {
-            id: thumb
-            width: sliderMouse.pressed ? 16 : 14
-            height: width
-            radius: width / 2
-            color: Colors.primary
-            border.color: Colors.modalFieldSurface
-            border.width: 2
-            x: Math.max(0, Math.min(parent.width - width, parent.width * Math.max(0, Math.min(1, root._ratio)) - width / 2))
-            anchors.verticalCenter: parent.verticalCenter
-
-            Behavior on x {
-                NumberAnimation {
-                    duration: 90
-                }
-            }
-            Behavior on width {
-                NumberAnimation {
-                    duration: 100
+            MouseArea {
+                id: sliderMouse
+                anchors.fill: parent
+                anchors.topMargin: -4
+                anchors.bottomMargin: -4
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onPressed: mouse => root._updateFromMouse(mouse.x, width)
+                onPositionChanged: mouse => {
+                    if (pressed)
+                        root._updateFromMouse(mouse.x, width);
                 }
             }
         }
 
-        MouseArea {
-            id: sliderMouse
-            anchors.fill: parent
-            anchors.topMargin: -4
-            anchors.bottomMargin: -4
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onPressed: mouse => root._updateFromMouse(mouse.x, width)
-            onPositionChanged: mouse => {
-                if (pressed)
-                    root._updateFromMouse(mouse.x, width);
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.leftMargin: (root.icon !== "" && !root.narrowLayout) ? 38 + Colors.spacingM : 0
+
+            Text {
+                text: root._displayBound(root.min) + root.unit
+                color: Colors.textDisabled
+                font.pixelSize: Colors.fontSizeXS
+                font.family: Colors.fontMono
             }
-        }
-    }
 
-    Flow {
-        Layout.fillWidth: true
-        Layout.preferredWidth: parent.width
-        spacing: Colors.spacingS
+            Item { Layout.fillWidth: true }
 
-        Text {
-            width: root.narrowLayout ? parent.width : undefined
-            text: root._displayBound(root.min) + root.unit
-            color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeXS
-            font.family: Colors.fontMono
-        }
-
-        Text {
-            text: root._displayBound(root.max) + root.unit
-            color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeXS
-            font.family: Colors.fontMono
+            Text {
+                text: root._displayBound(root.max) + root.unit
+                color: Colors.textDisabled
+                font.pixelSize: Colors.fontSizeXS
+                font.family: Colors.fontMono
+            }
         }
     }
 }

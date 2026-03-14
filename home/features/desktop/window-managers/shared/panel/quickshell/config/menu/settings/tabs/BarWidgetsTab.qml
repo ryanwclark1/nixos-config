@@ -20,6 +20,9 @@ Item {
     property string validationMessage: ""
     property string dragSection: ""
     property int dragSourceIndex: -1
+    property string dragTargetSection: ""
+    property int dragTargetIndex: -1
+    property var currentSectionWidgets: ({ left: [], center: [], right: [] })
     readonly property int overlayInset: root.tightSpacing ? 20 : 40
 
     readonly property var selectedBar: Config.selectedBar()
@@ -44,11 +47,28 @@ Item {
         if (widgetSettingsOpen)
             Qt.callLater(loadPluginSettingsPane);
     }
+    onSelectedBarChanged: refreshSectionWidgets()
+
+    Connections {
+        target: Config
+        function onBarConfigsChanged() { root.refreshSectionWidgets(); }
+        function onSelectedBarIdChanged() { root.refreshSectionWidgets(); }
+    }
 
     function sectionWidgets(section) {
-        if (!selectedBar || !selectedBar.sectionWidgets)
-            return [];
-        return selectedBar.sectionWidgets[section] || [];
+        return currentSectionWidgets[section] || [];
+    }
+
+    function refreshSectionWidgets() {
+        if (!selectedBar) {
+            currentSectionWidgets = { left: [], center: [], right: [] };
+            return;
+        }
+        currentSectionWidgets = {
+            left: Config.barSectionWidgets(selectedBar, "left").slice(),
+            center: Config.barSectionWidgets(selectedBar, "center").slice(),
+            right: Config.barSectionWidgets(selectedBar, "right").slice()
+        };
     }
 
     function sectionLabel(section) {
@@ -79,6 +99,23 @@ Item {
     function removeWidget(section, instanceId) {
         if (!selectedBar) return;
         Config.removeBarWidget(selectedBar.id, section, instanceId);
+    }
+
+    function clearDragState() {
+        dragSection = "";
+        dragSourceIndex = -1;
+        dragTargetSection = "";
+        dragTargetIndex = -1;
+    }
+
+    function moveDraggedWidget(targetSection, targetIndex) {
+        if (!selectedBar || dragSection === "" || dragSourceIndex < 0)
+            return false;
+        if (targetSection === "" || targetIndex < 0)
+            return false;
+        var ok = Config.moveBarWidget(selectedBar.id, dragSection, dragSourceIndex, targetIndex, targetSection);
+        clearDragState();
+        return ok;
     }
 
     function toggleWidgetEnabled(section, widgetInstance) {
@@ -192,44 +229,141 @@ Item {
 
                 Column {
                     id: sectionColumn
-                    width: parent.width
+                    width: widgetSectionCard.width - Colors.spacingL * 2
                     spacing: Colors.spacingS
 
+                    Text {
+                        width: parent.width
+                        text: root.sectionWidgets(sectionKey).length > 0
+                            ? "Current widgets: " + root.sectionWidgets(sectionKey).length
+                            : "Current widgets: none"
+                        color: Colors.fgSecondary
+                        font.pixelSize: Colors.fontSizeXS
+                        font.weight: Font.Medium
+                        wrapMode: Text.WordWrap
+                    }
+
+                    Rectangle {
+                        width: parent.width
+                        visible: root.sectionWidgets(sectionKey).length === 0
+                        radius: Colors.radiusSmall
+                        color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.06)
+                        border.color: root.dragTargetSection === sectionKey && root.dragTargetIndex === 0
+                            ? Colors.primary
+                            : Colors.border
+                        border.width: root.dragTargetSection === sectionKey && root.dragTargetIndex === 0 ? 2 : 1
+                        implicitHeight: emptyDropColumn.implicitHeight + Colors.spacingM * 2
+
+                        DropArea {
+                            anchors.fill: parent
+                            keys: ["bar-widget"]
+                            onEntered: function(drag) {
+                                if (root.dragSourceIndex < 0)
+                                    return;
+                                root.dragTargetSection = sectionKey;
+                                root.dragTargetIndex = 0;
+                            }
+                            onExited: {
+                                if (root.dragTargetSection === sectionKey && root.dragTargetIndex === 0) {
+                                    root.dragTargetSection = "";
+                                    root.dragTargetIndex = -1;
+                                }
+                            }
+                            onDropped: function(drop) {
+                                root.moveDraggedWidget(sectionKey, 0);
+                            }
+                        }
+
+                        Column {
+                            id: emptyDropColumn
+                            anchors.fill: parent
+                            anchors.margins: Colors.spacingM
+                            spacing: Colors.spacingXS
+
+                            Text {
+                                text: root.dragSourceIndex >= 0 ? "Drop widget here" : "No widgets in this section yet"
+                                color: Colors.text
+                                font.pixelSize: Colors.fontSizeSmall
+                                font.weight: Font.Medium
+                            }
+
+                            Text {
+                                text: root.dragSourceIndex >= 0
+                                    ? "Release to move the dragged widget into " + root.sectionLabel(sectionKey).toLowerCase() + "."
+                                    : "Add one below, or drag a widget here from another section."
+                                color: Colors.fgSecondary
+                                font.pixelSize: Colors.fontSizeXS
+                                wrapMode: Text.WordWrap
+                            }
+                        }
+                    }
+
                     Repeater {
-                        model: root.sectionWidgets(sectionKey)
+                        model: root.sectionWidgets(sectionKey).length
                         delegate: Item {
                             id: widgetRow
                             width: sectionColumn.width
-                            height: cardLayout.implicitHeight + Colors.spacingM * 2
-                            required property var modelData
+                            implicitHeight: cardLayout.implicitHeight + Colors.spacingM * 2
+                            height: implicitHeight
                             required property int index
                             readonly property string sectionKey: widgetSectionCard.sectionKey
+                            readonly property var widgetInstance: root.sectionWidgets(sectionKey)[index]
+                            readonly property bool dropBeforeActive: root.dragTargetSection === widgetRow.sectionKey
+                                && root.dragTargetIndex === widgetRow.index
+
+                            Rectangle {
+                                anchors {
+                                    left: parent.left
+                                    right: parent.right
+                                    top: parent.top
+                                }
+                                visible: widgetRow.dropBeforeActive
+                                height: 10
+                                radius: 5
+                                color: Colors.withAlpha(Colors.primary, 0.22)
+                                border.color: Colors.primary
+                                border.width: 1
+                                z: 3
+                            }
 
                             DropArea {
                                 anchors.fill: parent
-                                keys: ["bar-widget-" + widgetRow.sectionKey]
-                                onDropped: function(drop) {
-                                    if (!root.selectedBar || root.dragSection !== widgetRow.sectionKey)
+                                keys: ["bar-widget"]
+                                onEntered: function(drag) {
+                                    if (root.dragSourceIndex < 0)
                                         return;
-                                    Config.moveBarWidget(root.selectedBar.id, root.dragSection, root.dragSourceIndex, widgetRow.index);
-                                    root.dragSection = "";
-                                    root.dragSourceIndex = -1;
+                                    root.dragTargetSection = widgetRow.sectionKey;
+                                    root.dragTargetIndex = widgetRow.index;
+                                }
+                                onExited: {
+                                    if (root.dragTargetSection === widgetRow.sectionKey && root.dragTargetIndex === widgetRow.index) {
+                                        root.dragTargetSection = "";
+                                        root.dragTargetIndex = -1;
+                                    }
+                                }
+                                onDropped: function(drop) {
+                                    root.moveDraggedWidget(widgetRow.sectionKey, widgetRow.index);
                                 }
                             }
 
                             Rectangle {
                                 id: card
                                 anchors.fill: parent
+                                implicitHeight: cardLayout.implicitHeight + Colors.spacingM * 2
                                 radius: Colors.radiusSmall
                                 color: Colors.modalFieldSurface
                                 border.color: Colors.border
                                 border.width: 1
-                                opacity: dragArea.drag.active ? 0.7 : 1.0
+                                opacity: dragHandle.drag.active ? 0.7 : 1.0
 
                                 ColumnLayout {
                                     id: cardLayout
-                                    anchors.fill: parent
-                                    anchors.margins: Colors.spacingM
+                                    anchors {
+                                        left: parent.left
+                                        right: parent.right
+                                        top: parent.top
+                                        margins: Colors.spacingM
+                                    }
                                     spacing: Colors.spacingS
 
                                     RowLayout {
@@ -244,7 +378,7 @@ Item {
                                         }
 
                                         Text {
-                                            text: BarWidgetRegistry.displayIcon(widgetRow.modelData.widgetType)
+                                            text: BarWidgetRegistry.displayIcon(widgetRow.widgetInstance.widgetType)
                                             color: Colors.primary
                                             font.family: Colors.fontMono
                                             font.pixelSize: Colors.fontSizeLarge
@@ -255,7 +389,7 @@ Item {
                                             spacing: 2
 
                                             Text {
-                                                text: BarWidgetRegistry.displayName(widgetRow.modelData.widgetType)
+                                                text: BarWidgetRegistry.displayName(widgetRow.widgetInstance.widgetType)
                                                 color: Colors.text
                                                 font.pixelSize: Colors.fontSizeMedium
                                                 font.weight: Font.Medium
@@ -265,7 +399,7 @@ Item {
                                             }
 
                                             Text {
-                                                text: BarWidgetRegistry.description(widgetRow.modelData.widgetType)
+                                                text: BarWidgetRegistry.description(widgetRow.widgetInstance.widgetType)
                                                 color: Colors.fgSecondary
                                                 font.pixelSize: Colors.fontSizeXS
                                                 Layout.fillWidth: true
@@ -280,21 +414,21 @@ Item {
                                         spacing: Colors.spacingS
 
                                         SharedWidgets.FilterChip {
-                                            label: widgetRow.modelData.enabled === false ? "Hidden" : "Visible"
-                                            selected: widgetRow.modelData.enabled !== false
-                                            onClicked: root.toggleWidgetEnabled(widgetRow.sectionKey, widgetRow.modelData)
+                                            label: widgetRow.widgetInstance.enabled === false ? "Hidden" : "Visible"
+                                            selected: widgetRow.widgetInstance.enabled !== false
+                                            onClicked: root.toggleWidgetEnabled(widgetRow.sectionKey, widgetRow.widgetInstance)
                                         }
 
                                         SharedWidgets.FilterChip {
-                                            visible: root.isSystemStatWidget(widgetRow.modelData.widgetType)
-                                            label: "Mode: " + root.statDisplayModeLabel(widgetRow.modelData)
+                                            visible: root.isSystemStatWidget(widgetRow.widgetInstance.widgetType)
+                                            label: "Mode: " + root.statDisplayModeLabel(widgetRow.widgetInstance)
                                             selected: false
                                             enabled: false
                                         }
 
                                         SharedWidgets.FilterChip {
-                                            visible: root.isSystemStatWidget(widgetRow.modelData.widgetType)
-                                            label: "Value: " + root.statValueStyleLabel(widgetRow.modelData)
+                                            visible: root.isSystemStatWidget(widgetRow.widgetInstance.widgetType)
+                                            label: "Value: " + root.statValueStyleLabel(widgetRow.widgetInstance)
                                             selected: false
                                             enabled: false
                                         }
@@ -303,15 +437,15 @@ Item {
                                             compact: true
                                             iconName: "󰍜"
                                             label: "Settings"
-                                            enabled: BarWidgetRegistry.supportsSettings(widgetRow.modelData.widgetType)
-                                            onClicked: root.openWidgetSettings(widgetRow.sectionKey, widgetRow.modelData.instanceId)
+                                            enabled: BarWidgetRegistry.supportsSettings(widgetRow.widgetInstance.widgetType)
+                                            onClicked: root.openWidgetSettings(widgetRow.sectionKey, widgetRow.widgetInstance.instanceId)
                                         }
 
                                         SettingsActionButton {
                                             compact: true
                                             iconName: "󰅖"
                                             label: "Remove"
-                                            onClicked: root.removeWidget(widgetRow.sectionKey, widgetRow.modelData.instanceId)
+                                            onClicked: root.removeWidget(widgetRow.sectionKey, widgetRow.widgetInstance.instanceId)
                                         }
                                     }
                                 }
@@ -322,39 +456,121 @@ Item {
                                 width: widgetRow.width
                                 height: widgetRow.height
                                 visible: false
-                                Drag.active: dragArea.drag.active
+                                Drag.active: dragHandle.drag.active
                                 Drag.source: dragProxy
                                 Drag.hotSpot.x: width / 2
                                 Drag.hotSpot.y: height / 2
-                                Drag.keys: ["bar-widget-" + widgetRow.sectionKey]
+                                Drag.keys: ["bar-widget"]
                             }
 
                             MouseArea {
-                                id: dragArea
-                                anchors.fill: parent
+                                id: dragHandle
+                                width: 44
+                                height: 44
+                                anchors {
+                                    top: parent.top
+                                    right: parent.right
+                                    topMargin: Colors.spacingS
+                                }
                                 hoverEnabled: true
                                 acceptedButtons: Qt.LeftButton
                                 drag.target: card
                                 drag.axis: Drag.YAxis
+                                cursorShape: Qt.OpenHandCursor
                                 onPressed: {
                                     root.dragSection = widgetRow.sectionKey;
                                     root.dragSourceIndex = widgetRow.index;
+                                    root.dragTargetSection = widgetRow.sectionKey;
+                                    root.dragTargetIndex = widgetRow.index;
                                 }
                                 onReleased: {
                                     card.x = 0;
                                     card.y = 0;
                                     if (dragProxy.Drag.active)
                                         dragProxy.Drag.drop();
-                                    root.dragSection = "";
-                                    root.dragSourceIndex = -1;
+                                    else
+                                        root.clearDragState();
+                                }
+                                drag.onActiveChanged: {
+                                    if (!drag.active) {
+                                        card.x = 0;
+                                        card.y = 0;
+                                    }
+                                }
+
+                                Rectangle {
+                                    anchors {
+                                        right: parent.right
+                                        rightMargin: Colors.spacingS
+                                        verticalCenter: parent.verticalCenter
+                                    }
+                                    width: 28
+                                    height: 28
+                                    radius: Colors.radiusMedium
+                                    color: dragHandle.pressed
+                                        ? Colors.withAlpha(Colors.primary, 0.18)
+                                        : (dragHandle.containsMouse ? Colors.withAlpha(Colors.text, 0.10) : "transparent")
+                                    border.color: dragHandle.containsMouse ? Colors.border : "transparent"
+                                    border.width: dragHandle.containsMouse ? 1 : 0
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "󰒓"
+                                        color: dragHandle.pressed ? Colors.primary : Colors.fgSecondary
+                                        font.family: Colors.fontMono
+                                        font.pixelSize: Colors.fontSizeMedium
+                                    }
                                 }
                             }
+                        }
+                    }
+
+                    Rectangle {
+                        width: parent.width
+                        height: 12
+                        radius: 6
+                        visible: root.sectionWidgets(sectionKey).length > 0
+                            && root.dragSourceIndex >= 0
+                            && root.dragTargetSection === sectionKey
+                            && root.dragTargetIndex === root.sectionWidgets(sectionKey).length
+                        color: Colors.withAlpha(Colors.primary, 0.22)
+                        border.color: Colors.primary
+                        border.width: 1
+                    }
+
+                    DropArea {
+                        width: parent.width
+                        height: root.sectionWidgets(sectionKey).length > 0 ? 28 : 0
+                        visible: root.sectionWidgets(sectionKey).length > 0
+                        keys: ["bar-widget"]
+                        onEntered: function(drag) {
+                            if (root.dragSourceIndex < 0)
+                                return;
+                            root.dragTargetSection = sectionKey;
+                            root.dragTargetIndex = root.sectionWidgets(sectionKey).length;
+                        }
+                        onExited: {
+                            if (root.dragTargetSection === sectionKey
+                                    && root.dragTargetIndex === root.sectionWidgets(sectionKey).length) {
+                                root.dragTargetSection = "";
+                                root.dragTargetIndex = -1;
+                            }
+                        }
+                        onDropped: function(drop) {
+                            root.moveDraggedWidget(sectionKey, root.sectionWidgets(sectionKey).length);
+                        }
+
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: root.dragSourceIndex >= 0 ? "Drop at end of " + root.sectionLabel(sectionKey).toLowerCase() : ""
+                            color: Colors.fgSecondary
+                            font.pixelSize: Colors.fontSizeXS
                         }
                     }
                 }
 
                 SettingsActionButton {
-                    Layout.fillWidth: true
+                    width: sectionColumn.width
                     emphasized: true
                     iconName: "󰐕"
                     label: "Add Widget"

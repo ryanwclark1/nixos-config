@@ -158,6 +158,17 @@ PanelWindow {
 
         property bool isReplying: false
         property bool isUrgent: !!(modelData && modelData.urgency === Notifications.Critical)
+        readonly property string previewImageSource: {
+          var source = String((modelData && modelData.image) || "");
+          if (source === "")
+            return "";
+          if (source.startsWith("/") || source.startsWith("file://")
+              || source.startsWith("data:") || source.startsWith("image://")
+              || source.startsWith("http://") || source.startsWith("https://")) {
+            return source;
+          }
+          return "";
+        }
 
         onIsReplyingChanged: {
           if (isReplying) replyInput.forceActiveFocus();
@@ -235,7 +246,7 @@ PanelWindow {
             width: parent.width - 24
             height: 180
             anchors.horizontalCenter: parent.horizontalCenter
-            visible: modelData.image !== ""
+            visible: notifDelegate.previewImageSource !== ""
             radius: Colors.radiusXS
             clip: true
             color: "transparent"
@@ -244,7 +255,7 @@ PanelWindow {
 
             Image {
               anchors.fill: parent
-              source: modelData.image || ""
+              source: notifDelegate.previewImageSource
               sourceSize: Qt.size(600, 300)
               asynchronous: true
               fillMode: Image.PreserveAspectCrop

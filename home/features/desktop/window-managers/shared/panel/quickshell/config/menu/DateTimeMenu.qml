@@ -39,7 +39,7 @@ BasePopupMenu {
 
         ColumnLayout {
           Layout.fillWidth: true
-          spacing: 4
+          spacing: Colors.spacingXS
 
           Text {
             text: Qt.formatDateTime(

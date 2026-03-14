@@ -870,16 +870,34 @@ QtObject {
     return updateBarSection(barId, section, updated);
   }
 
-  function moveBarWidget(barId, section, fromIndex, toIndex) {
+  function moveBarWidget(barId, section, fromIndex, toIndex, targetSection) {
     var barConfig = barById(barId);
     if (!barConfig) return false;
-    var widgets = barSectionWidgets(barConfig, section).slice();
-    if (fromIndex < 0 || fromIndex >= widgets.length || toIndex < 0 || toIndex >= widgets.length) return false;
-    if (fromIndex === toIndex) return true;
+    var destinationSection = targetSection || section;
+    if (["left", "center", "right"].indexOf(section) === -1 || ["left", "center", "right"].indexOf(destinationSection) === -1)
+      return false;
 
-    var item = widgets.splice(fromIndex, 1)[0];
-    widgets.splice(toIndex, 0, item);
-    return updateBarSection(barId, section, widgets);
+    var sourceWidgets = barSectionWidgets(barConfig, section).slice();
+    if (fromIndex < 0 || fromIndex >= sourceWidgets.length) return false;
+
+    if (section === destinationSection) {
+      if (toIndex < 0 || toIndex >= sourceWidgets.length) return false;
+      if (fromIndex === toIndex) return true;
+
+      var sameSectionItem = sourceWidgets.splice(fromIndex, 1)[0];
+      sourceWidgets.splice(toIndex, 0, sameSectionItem);
+      return updateBarSection(barId, section, sourceWidgets);
+    }
+
+    var targetWidgets = barSectionWidgets(barConfig, destinationSection).slice();
+    if (toIndex < 0 || toIndex > targetWidgets.length) return false;
+
+    var movedItem = sourceWidgets.splice(fromIndex, 1)[0];
+    targetWidgets.splice(toIndex, 0, movedItem);
+
+    var updatedConfig = updateBarSection(barId, section, sourceWidgets);
+    if (!updatedConfig) return false;
+    return updateBarSection(barId, destinationSection, targetWidgets);
   }
 
   function widgetInstance(barId, section, instanceId) {

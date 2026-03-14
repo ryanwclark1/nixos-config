@@ -13,7 +13,7 @@ AGE_PUBLIC_KEY_FILE = $(AGE_DIR)/keys.txt
 RSA_BITS = 4096
 
 # Define the makefile targets and rules
-.PHONY: keygen rsa_key ed25519_key age_key get_age_public_key update-packages update-package-status niri-vm-build niri-vm niri-vm-reset niri-vm-fresh niri-vm-ssh niri-vm-fresh-ssh
+.PHONY: keygen rsa_key ed25519_key age_key get_age_public_key update-packages update-package-status niri-vm-build niri-vm niri-vm-reset niri-vm-fresh niri-vm-ssh niri-vm-fresh-ssh niri-vm-smoke
 
 keygen: rsa_key ed25519_key age_key get_age_public_key
 
@@ -265,3 +265,6 @@ niri-vm-ssh:
 
 niri-vm-fresh-ssh:
 	bash ./scripts/vm/launch-niri-test-vm.sh --reset-disk --ssh-port 2222
+
+niri-vm-smoke:
+	bash ./scripts/vm/check-niri-test-vm.sh

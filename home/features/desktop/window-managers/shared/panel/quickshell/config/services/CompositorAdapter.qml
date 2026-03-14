@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Io
 
 pragma Singleton
 
@@ -25,7 +24,6 @@ QtObject {
   readonly property bool supportsWindowListing: isHyprland
   readonly property bool supportsWorkspaceRename: isHyprland
   readonly property bool supportsWorkspaceMove: isHyprland
-  readonly property bool supportsWorkspaceCloseWindows: isHyprland
   readonly property bool supportsScratchpad: isHyprland
   readonly property bool supportsDisplayConfig: isHyprland
   readonly property bool supportsOverview: isHyprland
@@ -205,16 +203,4 @@ QtObject {
     dispatchAction("togglespecialworkspace", String(name || "scratchpad"), "Toggle scratchpad");
   }
 
-  function closeWorkspaceWindows(id) {
-    if (!supportsWorkspaceCloseWindows) {
-      notifyUnsupported("Close workspace windows");
-      return;
-    }
-
-    Quickshell.execDetached([
-      "sh",
-      "-c",
-      "hyprctl clients -j | jq -r '.[] | select(.workspace.id == " + String(id) + ") | .address' | xargs -I {} hyprctl dispatch closewindow address:{}"
-    ]);
-  }
 }

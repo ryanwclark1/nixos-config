@@ -349,8 +349,8 @@ Scope {
             anchors.fill: parent
             sourceComponent: RowLayout {
               anchors.fill: parent
-              anchors.leftMargin: 16
-              anchors.rightMargin: 16
+              anchors.leftMargin: Colors.spacingL
+              anchors.rightMargin: Colors.spacingL
               spacing: Colors.spacingM
 
               Text {

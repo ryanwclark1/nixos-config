@@ -12,6 +12,8 @@ BasePopupMenu {
   title: "Audio"
   toggleMethod: "toggleAudioMenu"
 
+  SharedWidgets.Ref { service: AudioService }
+
   function percentText(value, muted) {
     return muted ? "Muted" : Math.round(value * 100) + "%";
   }
@@ -131,8 +133,8 @@ BasePopupMenu {
 
       SharedWidgets.EmptyState {
         Layout.fillWidth: true
-        Layout.topMargin: 4
-        Layout.bottomMargin: 4
+        Layout.topMargin: Colors.spacingXS
+        Layout.bottomMargin: Colors.spacingXS
         visible: AudioService.sinks.length === 0
         icon: "󰕿"
         message: "No output devices detected"
@@ -238,8 +240,8 @@ BasePopupMenu {
 
       SharedWidgets.EmptyState {
         Layout.fillWidth: true
-        Layout.topMargin: 4
-        Layout.bottomMargin: 4
+        Layout.topMargin: Colors.spacingXS
+        Layout.bottomMargin: Colors.spacingXS
         visible: AudioService.sources.length === 0
         icon: "󰍭"
         message: "No input devices detected"

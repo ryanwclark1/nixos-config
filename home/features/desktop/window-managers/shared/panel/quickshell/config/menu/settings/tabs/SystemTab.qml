@@ -383,6 +383,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Notification Width"
+                icon: "󰂚"
                 min: 280
                 max: 520
                 value: Config.notifWidth
@@ -391,6 +392,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Popup Duration"
+                icon: "󰔛"
                 min: 2000
                 max: 10000
                 step: 500
@@ -407,6 +409,7 @@ Item {
 
             SettingsModeRow {
                 label: "Default Mode"
+                icon: "󰍉"
                 currentValue: Config.launcherDefaultMode
                 options: root.defaultModeOptions()
                 onModeSelected: modeValue => Config.launcherDefaultMode = modeValue
@@ -453,6 +456,7 @@ Item {
                 }
                 SettingsModeRow {
                     label: "Tab Behavior"
+                    icon: "󰌌"
                     currentValue: Config.launcherTabBehavior
                     options: [
                         {
@@ -489,6 +493,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Max Results"
+                icon: "󰍉"
                 min: 20
                 max: 200
                 step: 5
@@ -498,6 +503,7 @@ Item {
 
             SettingsSliderRow {
                 label: "File Query Min Length"
+                icon: "󰈔"
                 min: 1
                 max: 6
                 value: Config.launcherFileMinQueryLength
@@ -506,6 +512,7 @@ Item {
 
             SettingsSliderRow {
                 label: "File Search Max Results"
+                icon: "󰈔"
                 min: 20
                 max: 300
                 step: 10
@@ -515,6 +522,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Cache TTL"
+                icon: "󰔟"
                 min: 30
                 max: 1800
                 step: 30
@@ -525,6 +533,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Search Debounce"
+                icon: "󰔛"
                 min: 0
                 max: 250
                 step: 5
@@ -535,6 +544,7 @@ Item {
 
             SettingsSliderRow {
                 label: "File Search Debounce"
+                icon: "󰔛"
                 min: 50
                 max: 1200
                 step: 10
@@ -683,6 +693,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Preload Failure Threshold"
+                icon: "󰔟"
                 min: 1
                 max: 10
                 step: 1
@@ -693,6 +704,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Preload Backoff"
+                icon: "󰔛"
                 min: 10
                 max: 900
                 step: 10
@@ -727,6 +739,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Recents History Limit"
+                icon: "󰑓"
                 min: 4
                 max: 40
                 step: 1
@@ -737,6 +750,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Recent Apps on Home"
+                icon: "󰍉"
                 min: 1
                 max: 20
                 step: 1
@@ -747,6 +761,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Suggestions on Home"
+                icon: "󰍉"
                 min: 1
                 max: 20
                 step: 1
@@ -874,6 +889,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Name Weight"
+                icon: "󰌌"
                 min: 0.1
                 max: 2.0
                 step: 0.05
@@ -884,6 +900,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Title Weight"
+                icon: "󰍉"
                 min: 0.1
                 max: 2.0
                 step: 0.05
@@ -894,6 +911,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Exec/Class Weight"
+                icon: "󰆍"
                 min: 0.1
                 max: 2.0
                 step: 0.05
@@ -904,6 +922,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Body Weight"
+                icon: "󰈔"
                 min: 0.1
                 max: 2.0
                 step: 0.05
@@ -914,6 +933,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Category/Keywords Weight"
+                icon: "󰀻"
                 min: 0.1
                 max: 2.0
                 step: 0.05
@@ -952,6 +972,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Control Center Width"
+                icon: "󰖲"
                 min: 320
                 max: 460
                 value: Config.controlCenterWidth

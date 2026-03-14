@@ -117,6 +117,21 @@ PanelWindow {
     }
     return "All";
   }
+  readonly property string drunCategoryFilterSummary: {
+    var options = Array.isArray(drunCategoryOptions) ? drunCategoryOptions : [];
+    var totalCount = options.length > 0 ? Math.max(0, Math.round(Number((options[0] || {}).count || 0))) : 0;
+    var activeCount = totalCount;
+    for (var i = 0; i < options.length; ++i) {
+      var option = options[i] || ({});
+      if (String(option.key || "") === drunCategoryFilter) {
+        activeCount = Math.max(0, Math.round(Number(option.count || 0)));
+        break;
+      }
+    }
+    if (drunCategoryFilter === "")
+      return activeCount + " apps ready";
+    return activeCount + " of " + totalCount + " apps";
+  }
   readonly property var allKnownModes: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
   readonly property var transientModes: ["dmenu"]
   readonly property var defaultModeOrder: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
@@ -869,7 +884,7 @@ PanelWindow {
     if (!Config.launcherEnableDebugTimings)
       return;
     var took = Math.max(0, Date.now() - startedAt);
-    console.log("Launcher timing:", label, took + "ms");
+    console.debug("Launcher timing:", label, took + "ms");
   }
 
   function beginRequest(modeKey) {
@@ -2438,7 +2453,7 @@ PanelWindow {
       close();
     } else if (mode === "dmenu") {
       var fifoPath = "/tmp/qs-dmenu-result";
-      Quickshell.execDetached(["bash", "-c", "echo '" + item.name.replace(/'/g, "'\\''") + "' > " + fifoPath]);
+      Quickshell.execDetached(["bash", "-c", "echo " + shellQuote(item.name) + " > " + shellQuote(fifoPath)]);
       close();
     } else if (mode === "emoji" || mode === "calc") {
       copyToClipboard(item.name);
@@ -3089,9 +3104,14 @@ PanelWindow {
                   Layout.fillWidth: true
                   implicitHeight: 74
                   radius: Colors.radiusMedium
-                  color: Colors.surface
-                  border.color: Colors.border
+                  readonly property bool hovered: featureHover.containsMouse
+                  color: hovered ? Colors.withAlpha(Colors.primary, 0.1) : Colors.surface
+                  border.color: hovered ? Colors.withAlpha(Colors.primary, 0.3) : Colors.border
                   border.width: 1
+                  scale: hovered ? 1.015 : 1.0
+                  Behavior on color { ColorAnimation { duration: 150 } }
+                  Behavior on border.color { ColorAnimation { duration: 150 } }
+                  Behavior on scale { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
 
                   ColumnLayout {
                     anchors.fill: parent
@@ -3138,6 +3158,11 @@ PanelWindow {
               font.pixelSize: Colors.fontSizeXS
               font.weight: Font.Bold
             }
+            Text {
+              text: launcherRoot.drunCategoryFilterSummary
+              color: Colors.textSecondary
+              font.pixelSize: Colors.fontSizeXS
+            }
             Flow {
               id: categoryFilterFlow
               Layout.fillWidth: true
@@ -3181,7 +3206,14 @@ PanelWindow {
                 Layout.fillWidth: true
                 implicitHeight: 40
                 radius: Colors.radiusSmall
-                color: "transparent"
+                readonly property bool hovered: recentHover.containsMouse
+                color: hovered ? Colors.withAlpha(Colors.primary, 0.08) : "transparent"
+                border.color: hovered ? Colors.withAlpha(Colors.primary, 0.28) : "transparent"
+                border.width: hovered ? 1 : 0
+                scale: hovered ? 1.01 : 1.0
+                Behavior on color { ColorAnimation { duration: 140 } }
+                Behavior on border.color { ColorAnimation { duration: 140 } }
+                Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
 
                 RowLayout {
                   anchors.fill: parent
@@ -3234,7 +3266,14 @@ PanelWindow {
                 Layout.fillWidth: true
                 implicitHeight: 42
                 radius: Colors.radiusSmall
-                color: "transparent"
+                readonly property bool hovered: suggestionHover.containsMouse
+                color: hovered ? Colors.withAlpha(Colors.primary, 0.08) : "transparent"
+                border.color: hovered ? Colors.withAlpha(Colors.primary, 0.28) : "transparent"
+                border.width: hovered ? 1 : 0
+                scale: hovered ? 1.01 : 1.0
+                Behavior on color { ColorAnimation { duration: 140 } }
+                Behavior on border.color { ColorAnimation { duration: 140 } }
+                Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
 
                 RowLayout {
                   anchors.fill: parent
@@ -3307,16 +3346,35 @@ PanelWindow {
               delegate: Rectangle {
                 width: resultsList.width
                 height: launcherRoot.tightMode ? 48 : (launcherRoot.compactMode ? 52 : 58)
-                color: index === launcherRoot.selectedIndex ? Colors.highlight : "transparent"
+                readonly property bool highlighted: index === launcherRoot.selectedIndex
+                readonly property bool hovered: resultHover.containsMouse && !launcherRoot.ignoreMouseHover
+                color: highlighted ? Colors.withAlpha(Colors.primary, 0.12) : (hovered ? Colors.withAlpha(Colors.primary, 0.05) : "transparent")
                 radius: Colors.radiusSmall
-                border.color: index === launcherRoot.selectedIndex ? Colors.withAlpha(Colors.primary, 0.6) : "transparent"
-                border.width: index === launcherRoot.selectedIndex ? 1 : 0
+                border.color: highlighted ? Colors.withAlpha(Colors.primary, 0.58) : (hovered ? Colors.withAlpha(Colors.primary, 0.18) : "transparent")
+                border.width: highlighted || hovered ? 1 : 0
+                scale: highlighted ? 1.012 : (hovered ? 1.004 : 1.0)
+                Behavior on color { ColorAnimation { duration: 140 } }
+                Behavior on border.color { ColorAnimation { duration: 140 } }
+                Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
                 readonly property string actionLabel: launcherRoot.itemActionLabel(modelData)
                 readonly property string providerLabel: launcherRoot.itemProviderLabel(modelData)
 
+                Rectangle {
+                  anchors.left: parent.left
+                  anchors.leftMargin: launcherRoot.compactMode ? 4 : 6
+                  anchors.verticalCenter: parent.verticalCenter
+                  width: 3
+                  height: highlighted ? Math.max(22, parent.height - (launcherRoot.compactMode ? 18 : 16)) : (hovered ? 18 : 0)
+                  radius: width / 2
+                  color: Colors.primary
+                  opacity: highlighted ? 0.95 : (hovered ? 0.4 : 0.0)
+                  Behavior on height { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+                  Behavior on opacity { NumberAnimation { duration: 120 } }
+                }
+
                 RowLayout {
                   anchors.fill: parent
-                  anchors.leftMargin: launcherRoot.compactMode ? Colors.spacingS : Colors.spacingM
+                  anchors.leftMargin: launcherRoot.compactMode ? (Colors.spacingS + 4) : (Colors.spacingM + 4)
                   anchors.rightMargin: launcherRoot.compactMode ? Colors.spacingS : Colors.spacingM
                   spacing: launcherRoot.compactMode ? Colors.paddingSmall : Colors.paddingMedium
 
@@ -3324,7 +3382,13 @@ PanelWindow {
                     width: launcherRoot.compactMode ? 30 : 34
                     height: launcherRoot.compactMode ? 30 : 34
                     radius: Colors.radiusXS
-                    color: Colors.surface
+                    color: highlighted ? Colors.withAlpha(Colors.primary, 0.14) : (hovered ? Colors.withAlpha(Colors.primary, 0.08) : Colors.surface)
+                    border.color: highlighted ? Colors.withAlpha(Colors.primary, 0.3) : "transparent"
+                    border.width: highlighted ? 1 : 0
+                    scale: highlighted ? 1.04 : 1.0
+                    Behavior on color { ColorAnimation { duration: 140 } }
+                    Behavior on border.color { ColorAnimation { duration: 140 } }
+                    Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
                     Image {
                       id: iconImage
                       anchors.fill: parent
@@ -3350,16 +3414,16 @@ PanelWindow {
                     Layout.fillWidth: true
                     Text {
                       text: highlightMatch(modelData.name || modelData.title || "", searchText)
-                      color: Colors.text
+                      color: highlighted ? Colors.primary : Colors.text
                       textFormat: Text.StyledText
                       font.pixelSize: launcherRoot.compactMode ? Colors.fontSizeSmall : Colors.fontSizeMedium
-                      font.weight: index === launcherRoot.selectedIndex ? Font.Bold : Font.Normal
+                      font.weight: highlighted ? Font.Bold : Font.Normal
                       elide: Text.ElideRight
                       Layout.fillWidth: true
                     }
                     Text {
                       text: modelData.exec || modelData.class || modelData.title || ""
-                      color: Colors.textSecondary
+                      color: highlighted ? Colors.withAlpha(Colors.primary, 0.82) : Colors.textSecondary
                       font.pixelSize: Colors.fontSizeXS
                       elide: Text.ElideRight
                       Layout.fillWidth: true
@@ -3415,10 +3479,11 @@ PanelWindow {
                   }
                 }
 
-                MouseArea {
-                  anchors.fill: parent
-                  hoverEnabled: true
-                  cursorShape: Qt.PointingHandCursor
+                  MouseArea {
+                    id: resultHover
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
                   onEntered: if (!launcherRoot.ignoreMouseHover) launcherRoot.selectedIndex = index
                   onClicked: { launcherRoot.selectedIndex = index; launcherRoot.executeSelection(); }
                 }

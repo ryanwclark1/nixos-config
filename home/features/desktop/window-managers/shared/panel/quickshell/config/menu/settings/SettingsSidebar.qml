@@ -447,6 +447,7 @@ Rectangle {
       }
 
       SharedWidgets.Scrollbar { flickable: sidebarFlick }
+      SharedWidgets.OverscrollGlow { flickable: sidebarFlick }
     }
 
     Rectangle {

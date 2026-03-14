@@ -18,7 +18,7 @@ Use this guide for day-to-day launcher validation and incident triage.
   - `scripts/check-launcher-smoke.sh`
 - CI-safe launcher smoke gate:
   - `scripts/check-launcher-smoke.sh --ci`
-  - If no live QuickShell launcher instance is reachable, smoke falls back to static launcher probes and still runs benchmarks.
+  - If no live QuickShell launcher instance is reachable, smoke falls back to static launcher probes, skips live category/`Esc` diagnostics, and still runs benchmarks.
 
 Live launcher scripts auto-select a QuickShell instance in this order:
 1. launched from this repo’s `config/shell.qml` and exposing both `drunCategoryState` and `escapeActionState`

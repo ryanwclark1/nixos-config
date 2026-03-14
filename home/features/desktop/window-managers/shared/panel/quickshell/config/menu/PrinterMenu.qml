@@ -10,7 +10,7 @@ BasePopupMenu {
   implicitHeight: compactMode ? 540 : 480
   title: "Printers"
   toggleMethod: "togglePrinterMenu"
-  contentSpacing: 12
+  contentSpacing: Colors.spacingM
 
   // Subscribe to PrinterService while this menu is alive
   SharedWidgets.Ref { service: PrinterService }

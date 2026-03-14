@@ -76,7 +76,7 @@ Usage:
   plugin-local.sh [quick|full|doctor|install-reference|remove-reference|smoke-reference|reference-flow|reference-export|reference-status|reference-files|reference-guards|reference-all|shared-gates|baseline-gates|all-gates] [plugins_dir|--check|--quiet]
 
 Modes:
-  quick              Run fast local plugin guardrails (default)
+  quick              Run fast local plugin guardrails (default, `--quiet` suppresses wrapper headings)
   full               Run complete local plugin verification gate (`--quiet` suppresses the top-level wrapper line)
   doctor             Run plugin doctor against optional plugins_dir
   install-reference  Link the repo-tracked reference plugin into plugins_dir
@@ -96,10 +96,19 @@ EOF
 
 case "$mode" in
   quick)
-    printf '[INFO] Local quick plugin checks...\n'
-    "${script_dir}/plugin-local.sh" reference-all --quiet --silent-preflight
-    "${script_dir}/plugin-local.sh" shared-gates
-    printf '[INFO] Local quick plugin checks passed.\n'
+    quiet=0
+    if [[ "${2:-}" == "--quiet" ]]; then
+      quiet=1
+    fi
+    if (( quiet == 0 )); then
+      printf '[INFO] Local quick plugin checks...\n'
+      "${script_dir}/plugin-local.sh" reference-all --quiet --silent-preflight
+      "${script_dir}/plugin-local.sh" shared-gates
+      printf '[INFO] Local quick plugin checks passed.\n'
+    else
+      "${script_dir}/plugin-local.sh" reference-all --quiet --silent-preflight
+      "${script_dir}/plugin-local.sh" shared-gates --quiet
+    fi
     ;;
   full)
     if [[ "${2:-}" != "--quiet" ]]; then

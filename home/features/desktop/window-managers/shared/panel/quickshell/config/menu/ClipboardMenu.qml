@@ -1,7 +1,6 @@
 import Quickshell
 import QtQuick
 import QtQuick.Layouts
-import Quickshell.Io
 import "../services"
 import "../widgets" as SharedWidgets
 
@@ -11,7 +10,7 @@ BasePopupMenu {
   implicitHeight: compactMode ? 520 : 480
   title: "Clipboard"
   toggleMethod: "toggleClipboardMenu"
-  contentSpacing: 12
+  contentSpacing: Colors.spacingM
   focusOnOpen: true
   initialFocusTarget: searchInput
 
@@ -195,8 +194,8 @@ BasePopupMenu {
       // Empty state
       SharedWidgets.EmptyState {
         Layout.fillWidth: true
-        Layout.topMargin: 8
-        Layout.bottomMargin: 8
+        Layout.topMargin: Colors.spacingS
+        Layout.bottomMargin: Colors.spacingS
         visible: root.filteredItemsResult.length === 0
         icon: root.searchQuery ? "󰍉" : "󰅗"
         message: root.searchQuery ? "No matching items" : "Clipboard is empty"

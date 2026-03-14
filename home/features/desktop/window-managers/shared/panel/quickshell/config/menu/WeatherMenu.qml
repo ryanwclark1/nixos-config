@@ -83,7 +83,7 @@ BasePopupMenu {
 
         ColumnLayout {
           Layout.fillWidth: root.compactMode
-          spacing: 4
+          spacing: Colors.spacingXS
 
           RowLayout {
             spacing: Colors.spacingXS

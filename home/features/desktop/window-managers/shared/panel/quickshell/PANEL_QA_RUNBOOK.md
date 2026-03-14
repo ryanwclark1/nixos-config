@@ -38,6 +38,15 @@ Focused commands:
 - review artifact capture: surface screenshot matrix:
   - `qs-surface-capture-matrix --crop monitor`
 
+Repo-checkout workflow:
+
+- automated gate against the repo shell:
+  - `qs-panel-runtime-verify --repo-shell`
+- manual walkthrough against the repo shell:
+  - `qs-panel-preview --repo-shell`
+- review artifact capture against the repo shell:
+  - `qs-panel-capture-matrix --repo-shell --settings-preset portrait --surface-crop monitor`
+
 Script equivalents remain available under `scripts/` when you want to run them from the repo checkout directly.
 
 Command roles:
@@ -52,6 +61,12 @@ If more than one QuickShell instance is running:
 - `qs-panel-preview --id <instance-id>`
 - `qs-panel-capture-matrix --id <instance-id> --settings-preset portrait --surface-crop monitor`
 
+If the managed `quickshell.service` is stale, broken, or intentionally stopped:
+
+- prefer the `--repo-shell` path instead of guessing a live instance id
+- this temporarily stops `quickshell.service`, launches the repo checkout as the live shell, runs the requested QA flow, then attempts to restore the service afterward
+- use this path when validating repo-only changes before a Home Manager rebuild has been applied
+
 ## What Each Command Covers
 
 `qs-panel-runtime-verify`
@@ -62,6 +77,7 @@ If more than one QuickShell instance is running:
 4. Runs the synthetic multibar shell matrix and bar-management harnesses.
 
 This is the required runtime gate after panel changes.
+`--repo-shell` makes this gate self-contained by launching the repo checkout as the live shell first.
 
 The synthetic multibar phase uses temporary QML harnesses that mirror the real panel config tree so `BarTab` and `BarWidgetsTab` resolve the same sibling imports they use in the shipped settings UI.
 The live settings and surface phases use `PASS`, `WARN`, and `FAIL` outcomes only; the `[SKIP]` classification is specific to the headless multibar phase.
@@ -83,6 +99,7 @@ This is the fastest no-session gate for stat-widget and config-migration changes
 
 This is for manual inspection, not pass/fail gating.
 It does not emit `PASS`, `WARN`, `FAIL`, or `[SKIP]` results; use it to drive visual review after the automated checks.
+`--repo-shell` is the preferred option when you need to preview repo-only changes that are not yet active in the managed shell.
 
 `qs-panel-capture-matrix`
 
@@ -97,6 +114,7 @@ It does not emit `PASS`, `WARN`, `FAIL`, or `[SKIP]` results; use it to drive vi
 
 This is for review and bug triage, not runtime health.
 It does not emit `PASS`, `WARN`, `FAIL`, or `[SKIP]` results; use the generated artifacts for manual visual review.
+`--repo-shell` is the preferred option when the installed shell does not match the repo checkout or the managed service is unhealthy.
 
 ## Recommended QA Sequence
 
@@ -106,6 +124,12 @@ It does not emit `PASS`, `WARN`, `FAIL`, or `[SKIP]` results; use the generated 
    Use `--workspace current` only if you intentionally want captures from the currently active workspace.
 4. Open the generated `index.html` gallery and record only concrete defects.
 5. Re-run the smallest relevant subset after each fix.
+
+If the managed shell does not reflect the repo checkout yet:
+
+1. Run `qs-panel-runtime-verify --repo-shell`.
+2. Run `qs-panel-preview --repo-shell`.
+3. Run `qs-panel-capture-matrix --repo-shell --settings-preset portrait --surface-crop monitor`.
 
 ## Manual QA Matrix
 

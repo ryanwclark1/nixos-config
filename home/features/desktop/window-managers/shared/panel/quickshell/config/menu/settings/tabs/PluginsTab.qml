@@ -275,7 +275,7 @@ Item {
                 Rectangle {
                     implicitWidth: activeCount.implicitWidth + 12
                     height: 20
-                    radius: 10
+                    radius: Colors.radiusSmall
                     color: Qt.rgba(Colors.success.r, Colors.success.g, Colors.success.b, 0.16)
                     Text {
                         id: activeCount
@@ -290,7 +290,7 @@ Item {
                 Rectangle {
                     implicitWidth: degradedCount.implicitWidth + 12
                     height: 20
-                    radius: 10
+                    radius: Colors.radiusSmall
                     color: Qt.rgba(Colors.warning.r, Colors.warning.g, Colors.warning.b, 0.16)
                     Text {
                         id: degradedCount
@@ -305,7 +305,7 @@ Item {
                 Rectangle {
                     implicitWidth: failedCount.implicitWidth + 12
                     height: 20
-                    radius: 10
+                    radius: Colors.radiusSmall
                     color: Qt.rgba(Colors.error.r, Colors.error.g, Colors.error.b, 0.16)
                     Text {
                         id: failedCount
@@ -320,7 +320,7 @@ Item {
                 Rectangle {
                     implicitWidth: disabledCount.implicitWidth + 12
                     height: 20
-                    radius: 10
+                    radius: Colors.radiusSmall
                     color: Qt.rgba(Colors.text.r, Colors.text.g, Colors.text.b, 0.12)
                     Text {
                         id: disabledCount
@@ -336,7 +336,7 @@ Item {
             ColumnLayout {
                 visible: PluginService.plugins.length === 0
                 Layout.fillWidth: true
-                Layout.topMargin: 24
+                Layout.topMargin: Colors.spacingXL
                 spacing: Colors.spacingM
 
                 Text {
