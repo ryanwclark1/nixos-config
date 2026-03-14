@@ -569,7 +569,7 @@ PanelWindow {
 
         // Grid background
         Rectangle {
-          anchors { fill: parent; margins: 8 }
+          anchors { fill: parent; margins: Colors.spacingS }
           color: Qt.rgba(0, 0, 0, 0.18)
           radius: Colors.radiusMedium
           border.color: Colors.border

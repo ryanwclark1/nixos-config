@@ -968,7 +968,7 @@ PanelWindow {
 
                       ColumnLayout {
                         anchors.fill: parent
-                        anchors.margins: 4
+                        anchors.margins: Colors.spacingXS
                         spacing: Colors.spacingXS
 
                         // Icon area
@@ -979,7 +979,7 @@ PanelWindow {
                           // Image thumbnail (images only)
                           Image {
                             anchors.fill: parent
-                            anchors.margins: 4
+                            anchors.margins: Colors.spacingXS
                             visible: modelData.isImage
                             source: modelData.isImage ? ("file://" + modelData.path) : ""
                             fillMode: Image.PreserveAspectCrop

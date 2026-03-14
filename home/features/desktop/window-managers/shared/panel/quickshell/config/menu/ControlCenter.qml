@@ -317,7 +317,7 @@ PanelWindow {
                         // Sliders
                         ColumnLayout {
                             Layout.fillWidth: true
-                            spacing: 15
+                            spacing: Colors.paddingMedium
                             opacity: root.showContent ? 1 : 0
                             visible: opacity > 0
                             layer.enabled: opacity > 0 && opacity < 1
@@ -398,7 +398,7 @@ PanelWindow {
                                 }
                                 RowLayout {
                                     Layout.fillWidth: true
-                                    spacing: 10
+                                    spacing: Colors.paddingSmall
                                     SharedWidgets.MuteButton {
                                         target: "@DEFAULT_AUDIO_SINK@"
                                         muted: AudioService.outputMuted
@@ -440,7 +440,7 @@ PanelWindow {
                                 }
                                 RowLayout {
                                     Layout.fillWidth: true
-                                    spacing: 10
+                                    spacing: Colors.paddingSmall
                                     SharedWidgets.MuteButton {
                                         target: "@DEFAULT_AUDIO_SOURCE@"
                                         muted: AudioService.inputMuted
@@ -613,7 +613,7 @@ PanelWindow {
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: 10
+                spacing: Colors.paddingSmall
                 Repeater {
                     model: [
                         {

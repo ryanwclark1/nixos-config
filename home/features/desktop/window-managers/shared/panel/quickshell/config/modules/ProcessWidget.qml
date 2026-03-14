@@ -328,30 +328,31 @@ SharedWidgets.CardBase {
                     anchors.margins: Colors.spacingM
                     spacing: Colors.spacingS
 
-                    RowLayout {
+                    ColumnLayout {
                         Layout.fillWidth: true
-                        spacing: Colors.spacingS
+                        spacing: 2
 
-                        ColumnLayout {
+                        Text {
+                            text: root.selectedProcess ? (root.selectedProcess.name || "process") : ""
+                            color: Colors.text
+                            font.pixelSize: Colors.fontSizeSmall
+                            font.weight: Font.DemiBold
                             Layout.fillWidth: true
-                            spacing: 2
-
-                            Text {
-                                text: root.selectedProcess ? (root.selectedProcess.name || "process") : ""
-                                color: Colors.text
-                                font.pixelSize: Colors.fontSizeSmall
-                                font.weight: Font.DemiBold
-                                Layout.fillWidth: true
-                                elide: Text.ElideRight
-                            }
-
-                            Text {
-                                text: root.selectedProcess ? ("PID " + String(root.selectedProcess.pid || 0) + "  •  " + String(root.selectedProcess.user || "user")) : ""
-                                color: Colors.fgDim
-                                font.pixelSize: Colors.fontSizeXS
-                                font.family: Colors.fontMono
-                            }
+                            elide: Text.ElideRight
                         }
+
+                        Text {
+                            text: root.selectedProcess ? ("PID " + String(root.selectedProcess.pid || 0) + "  •  " + String(root.selectedProcess.user || "user")) : ""
+                            color: Colors.fgDim
+                            font.pixelSize: Colors.fontSizeXS
+                            font.family: Colors.fontMono
+                        }
+                    }
+
+                    Flow {
+                        Layout.fillWidth: true
+                        width: parent.width
+                        spacing: Colors.spacingS
 
                         SharedWidgets.FilterChip {
                             label: "TERM"
@@ -425,8 +426,9 @@ SharedWidgets.CardBase {
                         font.weight: Font.Bold
                     }
 
-                    RowLayout {
+                    Flow {
                         Layout.fillWidth: true
+                        width: parent.width
                         spacing: Colors.spacingS
 
                         SharedWidgets.FilterChip {
@@ -462,8 +464,9 @@ SharedWidgets.CardBase {
                         }
                     }
 
-                    RowLayout {
+                    Flow {
                         Layout.fillWidth: true
+                        width: parent.width
                         spacing: Colors.spacingS
 
                         SharedWidgets.FilterChip {

@@ -191,7 +191,7 @@ PanelWindow {
       // ── Header ──────────────────────────────────────────────────────────
       RowLayout {
         Layout.fillWidth: true
-        spacing: 10
+        spacing: Colors.paddingSmall
 
         Text {
           text: "󰈊"
@@ -474,7 +474,7 @@ PanelWindow {
           Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
 
           RowLayout {
-            anchors { fill: parent; leftMargin: 12; rightMargin: 12 }
+            anchors { fill: parent; leftMargin: Colors.spacingM; rightMargin: Colors.spacingM }
             spacing: 6
 
             Text {

@@ -1230,7 +1230,7 @@ Item {
                                 bottom: parent.bottom
                                 left: parent.left
                                 right: parent.right
-                                margins: 4
+                                margins: Colors.spacingXS
                             }
                             text: modelData.filename
                             color: "#ffffff"

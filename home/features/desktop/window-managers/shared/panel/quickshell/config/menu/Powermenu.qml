@@ -236,7 +236,7 @@ PanelWindow {
 
             ColumnLayout {
               anchors.centerIn: parent
-              spacing: 10
+              spacing: Colors.paddingSmall
               Text {
                 text: isPending ? Math.ceil(root.timeRemaining / 1000).toString() : modelData.icon
                 color: isPending ? parent.parent.activeColor : modelData.color

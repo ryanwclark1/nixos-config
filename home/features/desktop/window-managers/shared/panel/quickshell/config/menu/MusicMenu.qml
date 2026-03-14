@@ -252,7 +252,7 @@ BasePopupMenu {
     // Volume
     RowLayout {
       Layout.fillWidth: true
-      spacing: 10
+      spacing: Colors.paddingSmall
 
       Text {
         text: "󰕾"

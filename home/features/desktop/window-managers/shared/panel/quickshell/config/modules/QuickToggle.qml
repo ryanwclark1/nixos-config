@@ -26,7 +26,7 @@ Rectangle {
 
   RowLayout {
     anchors.fill: parent
-    anchors.margins: 12
+    anchors.margins: Colors.spacingM
     spacing: Colors.spacingM
 
     Rectangle {

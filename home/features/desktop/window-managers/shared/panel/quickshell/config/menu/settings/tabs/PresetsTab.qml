@@ -13,12 +13,12 @@ Item {
 
     property string _presetName: ""
     property string _presetDesc: ""
-    property int _pendingDeleteIndex: -1
+    property string _pendingDeleteName: ""
 
     Timer {
         id: deleteConfirmTimer
         interval: 3000
-        onTriggered: root._pendingDeleteIndex = -1
+        onTriggered: root._pendingDeleteName = ""
     }
 
     SettingsTabPage {
@@ -140,16 +140,16 @@ Item {
                             }
 
                             SettingsActionButton {
-                                label: root._pendingDeleteIndex === index ? "Confirm?" : "Delete"
-                                iconName: root._pendingDeleteIndex === index ? "󰀦" : "󰆴"
+                                label: root._pendingDeleteName === modelData.name ? "Confirm?" : "Delete"
+                                iconName: root._pendingDeleteName === modelData.name ? "󰀦" : "󰆴"
                                 compact: true
                                 onClicked: {
-                                    if (root._pendingDeleteIndex === index) {
+                                    if (root._pendingDeleteName === modelData.name) {
                                         PresetService.deletePreset(modelData.name);
-                                        root._pendingDeleteIndex = -1;
+                                        root._pendingDeleteName = "";
                                         deleteConfirmTimer.stop();
                                     } else {
-                                        root._pendingDeleteIndex = index;
+                                        root._pendingDeleteName = modelData.name;
                                         deleteConfirmTimer.restart();
                                     }
                                 }

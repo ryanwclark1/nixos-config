@@ -115,7 +115,7 @@ Item {
       anchors.right: parent.right
       anchors.top: parent.top
       anchors.margins: Colors.spacingM
-      anchors.topMargin: 15
+      anchors.topMargin: Colors.paddingMedium
       spacing: Colors.spacingXS
 
       Row {

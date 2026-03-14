@@ -162,7 +162,7 @@ PanelWindow {
         }
 
         property bool isReplying: false
-        property bool isUrgent: !!(modelData && modelData.urgency === Notifications.Critical)
+        property bool isUrgent: !!(modelData && modelData.urgency === NotificationUrgency.Critical)
         readonly property string previewImageSource: {
           var source = String((modelData && modelData.image) || "");
           if (source === "")
@@ -285,7 +285,7 @@ PanelWindow {
               Keys.onEscapePressed: notifDelegate.isReplying = false
             }
             Text {
-              anchors.fill: parent; anchors.leftMargin: 10
+              anchors.fill: parent; anchors.leftMargin: Colors.paddingSmall
               verticalAlignment: Text.AlignVCenter
               text: "Type a reply..."; color: Colors.fgDim; font.pixelSize: Colors.fontSizeMedium
               visible: !replyInput.text && !replyInput.activeFocus
@@ -374,12 +374,12 @@ PanelWindow {
           var rules = Config.notifRules;
           for (var i = 0; i < rules.length; i++) {
             if (rules[i].appName && (notification.appName || "").toLowerCase() === rules[i].appName.toLowerCase()) {
-              if (rules[i].action === "mute") return 0;
+              if (rules[i].action === "mute") return -1;
               if (rules[i].timeout !== undefined) return rules[i].timeout;
             }
           }
-          if (notification.urgency === Notifications.Critical) return Config.notifTimeoutCritical;
-          if (notification.urgency === Notifications.Low) return Config.notifTimeoutLow;
+          if (notification.urgency === NotificationUrgency.Critical) return Config.notifTimeoutCritical;
+          if (notification.urgency === NotificationUrgency.Low) return Config.notifTimeoutLow;
           return Config.notifTimeoutNormal;
         }
         readonly property bool _isMuted: _urgencyTimeout < 0

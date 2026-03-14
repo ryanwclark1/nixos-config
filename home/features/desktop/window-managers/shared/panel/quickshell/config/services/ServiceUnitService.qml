@@ -25,6 +25,8 @@ QtObject {
     property string _actionSuccessMessage: ""
     property string _actionFailureMessage: ""
     property var _actionCommand: []
+    property bool _actionNeedsStdin: false
+    property string _actionStdin: ""
 
     function _unitsCommand(scope) {
         var prefix = scope === "system" ? "systemctl" : "systemctl --user";
@@ -118,8 +120,32 @@ QtObject {
         _actionTitle = "Service updated";
         _actionSuccessMessage = String(unitName) + " " + String(actionName) + " completed.";
         _actionFailureMessage = "Unable to " + String(actionName) + " " + String(unitName) + ".";
+        _actionNeedsStdin = false;
+        _actionStdin = "";
         _actionCommand = command;
         _setPending(_actionScope, _actionUnitName, actionName);
+        actionProc.command = _actionCommand;
+        actionProc.running = true;
+        return true;
+    }
+
+    function _runClipboardAction(scope, unitName, text, successMessage) {
+        if (!unitName)
+            return false;
+        if (actionProc.running) {
+            ToastService.showNotice("Action pending", "Wait for the current service action to finish.");
+            return false;
+        }
+
+        _actionScope = String(scope || "user");
+        _actionUnitName = String(unitName);
+        _actionTitle = "Copied";
+        _actionSuccessMessage = String(successMessage || "Copied to clipboard.");
+        _actionFailureMessage = "No clipboard utility found (wl-copy/xclip).";
+        _actionNeedsStdin = true;
+        _actionStdin = String(text || "");
+        _actionCommand = ["sh", "-c", "if command -v wl-copy >/dev/null 2>&1; then cat | wl-copy; elif command -v xclip >/dev/null 2>&1; then cat | xclip -selection clipboard; else exit 1; fi"];
+        _setPending(_actionScope, _actionUnitName, "copy");
         actionProc.command = _actionCommand;
         actionProc.running = true;
         return true;
@@ -135,6 +161,32 @@ QtObject {
 
     function restartUnit(scope, unitName) {
         return _runUnitAction(scope, unitName, "restart");
+    }
+
+    function reloadUnit(scope, unitName) {
+        return _runUnitAction(scope, unitName, "reload");
+    }
+
+    function copyUnitName(scope, unitName) {
+        return _runClipboardAction(scope, unitName, String(unitName || ""), "Unit name copied to clipboard.");
+    }
+
+    function openUnitLogsInTerminal(scope, unitName) {
+        if (!unitName)
+            return false;
+
+        var prefix = scope === "system" ? "journalctl -u " : "journalctl --user -u ";
+        Quickshell.execDetached(["kitty", "-e", "bash", "-lc", prefix + String(unitName) + " -n 120 --no-pager; echo; read -n 1 -s -r -p \"Press any key to close\""]);
+        return true;
+    }
+
+    function openUnitStatusInTerminal(scope, unitName) {
+        if (!unitName)
+            return false;
+
+        var prefix = scope === "system" ? "systemctl status " : "systemctl --user status ";
+        Quickshell.execDetached(["kitty", "-e", "bash", "-lc", prefix + String(unitName) + " --no-pager; echo; read -n 1 -s -r -p \"Press any key to close\""]);
+        return true;
     }
 
     property SharedWidgets.CommandPoll userPoll: SharedWidgets.CommandPoll {
@@ -173,6 +225,13 @@ QtObject {
         id: actionProc
         command: root._actionCommand
         running: false
+        stdinEnabled: true
+        onStarted: {
+            if (root._actionNeedsStdin) {
+                actionProc.write(root._actionStdin);
+                actionProc.closeStdin();
+            }
+        }
         onExited: (exitCode, exitStatus) => {
             root._setPending(root._actionScope, root._actionUnitName, "");
             if (exitCode === 0)

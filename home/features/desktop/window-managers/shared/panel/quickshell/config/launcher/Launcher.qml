@@ -2756,8 +2756,8 @@ PanelWindow {
               border.width: 1
               RowLayout {
                 anchors.fill: parent
-                anchors.leftMargin: 10
-                anchors.rightMargin: 12
+                anchors.leftMargin: Colors.paddingSmall
+                anchors.rightMargin: Colors.spacingM
                 spacing: Colors.spacingXS
                 Text {
                   text: "󰖟"

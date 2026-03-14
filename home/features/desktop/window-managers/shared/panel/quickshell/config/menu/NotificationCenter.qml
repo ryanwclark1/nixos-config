@@ -189,7 +189,7 @@ PanelWindow {
         Layout.fillWidth: true; height: 40; color: Colors.highlightLight; radius: Colors.radiusXS
         border.color: searchInput.activeFocus ? Colors.primary : "transparent"; border.width: 1
         RowLayout {
-          anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: 10
+          anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: Colors.paddingSmall
           Text { text: ""; color: Colors.textDisabled; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
           TextInput {
             id: searchInput; Layout.fillWidth: true; verticalAlignment: Text.AlignVCenter
@@ -248,7 +248,7 @@ PanelWindow {
           property bool isCollapsed: notifList.collapsedGroups[section] || false
 
           RowLayout {
-            anchors.fill: parent; spacing: 10
+            anchors.fill: parent; spacing: Colors.paddingSmall
 
             MouseArea {
               width: 20; height: 20
@@ -358,7 +358,7 @@ PanelWindow {
 
           Column {
             id: colItem
-            width: parent.width - 24; anchors.top: parent.top; anchors.topMargin: 12; anchors.horizontalCenter: parent.horizontalCenter; spacing: 10
+            width: parent.width - 24; anchors.top: parent.top; anchors.topMargin: Colors.spacingM; anchors.horizontalCenter: parent.horizontalCenter; spacing: Colors.paddingSmall
 
             RowLayout {
               width: parent.width; spacing: Colors.spacingM
@@ -395,7 +395,7 @@ PanelWindow {
             Rectangle {
               width: parent.width; height: 40; radius: Colors.radiusXS; color: Colors.highlightLight; visible: mprisPlayer !== null
               RowLayout {
-                anchors.fill: parent; anchors.margins: Colors.spacingS; spacing: 15
+                anchors.fill: parent; anchors.margins: Colors.spacingS; spacing: Colors.paddingMedium
                 Item { Layout.fillWidth: true }
                 MouseArea {
                   width: 24; height: 24; cursorShape: Qt.PointingHandCursor
@@ -524,7 +524,7 @@ PanelWindow {
           delegate: Rectangle {
             width: ListView.view.width; height: 60; color: Colors.bgWidget; radius: Colors.radiusXS; opacity: 0.7
             Row {
-              anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: 10
+              anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: Colors.paddingSmall
               Rectangle { width: 32; height: 32; color: "transparent"
                 Text { anchors.centerIn: parent; text: "󰂚"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeHuge; font.family: Colors.fontMono }
               }

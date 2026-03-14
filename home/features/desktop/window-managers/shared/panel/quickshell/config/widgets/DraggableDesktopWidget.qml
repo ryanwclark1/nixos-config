@@ -144,7 +144,7 @@ Item {
     Column {
       id: menuCol
       anchors.fill: parent
-      anchors.margins: 8
+      anchors.margins: Colors.spacingS
       spacing: 2
 
       ContextMenuItem {
