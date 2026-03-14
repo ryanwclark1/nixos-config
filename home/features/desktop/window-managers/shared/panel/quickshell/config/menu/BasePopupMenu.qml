@@ -22,6 +22,14 @@ PopupWindow {
   property bool focusOnOpen: false
   property var initialFocusTarget: null
 
+  // ── Responsive width ──────────────────────────
+  property int popupMinWidth: 320
+  property int popupMaxWidth: 380
+  property int compactThreshold: 350
+  readonly property int availablePopupWidth: screen ? Math.max(popupMinWidth, screen.width - 40) : popupMaxWidth
+  readonly property bool compactMode: availablePopupWidth < compactThreshold
+  implicitWidth: Math.min(popupMaxWidth, availablePopupWidth)
+
   // ── Close signal (avoids IPC round-trip) ────
   signal closeRequested()
 

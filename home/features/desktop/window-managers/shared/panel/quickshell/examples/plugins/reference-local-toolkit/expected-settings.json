@@ -1,0 +1,6 @@
+{
+  "label": "Pulse",
+  "showUpdated": true,
+  "failureMode": "execute",
+  "lastSummaryQuery": "!ref summary"
+}

@@ -6,9 +6,7 @@ import "../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  readonly property int availablePopupWidth: screen ? Math.max(320, screen.width - 40) : 380
-  readonly property bool compactMode: availablePopupWidth < 360
-  implicitWidth: Math.min(380, availablePopupWidth)
+  popupMaxWidth: 380; compactThreshold: 360
   implicitHeight: compactMode ? 540 : 480
   title: "Printers"
   toggleMethod: "togglePrinterMenu"
@@ -41,36 +39,9 @@ BasePopupMenu {
       }
     },
     // Refresh button
-    Rectangle {
-      width: 30; height: 30; radius: height / 2
-      color: "transparent"
-
-      Text {
-        anchors.centerIn: parent
-        text: "󰑐"
-        color: Colors.textSecondary
-        font.family: Colors.fontMono
-        font.pixelSize: Colors.fontSizeLarge
-      }
-
-      SharedWidgets.StateLayer {
-        id: refreshState
-        anchors.fill: parent
-        radius: parent.radius
-        hovered: refreshHover.containsMouse
-        pressed: refreshHover.pressed
-      }
-
-      MouseArea {
-        id: refreshHover
-        anchors.fill: parent
-        hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        onClicked: (mouse) => {
-          refreshState.burst(mouse.x, mouse.y);
-          PrinterService.refresh();
-        }
-      }
+    SharedWidgets.IconButton {
+      icon: "󰑐"
+      onClicked: PrinterService.refresh()
     }
   ]
 

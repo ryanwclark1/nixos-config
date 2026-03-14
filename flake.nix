@@ -200,6 +200,7 @@
               {
                 # VM build path for this host currently asserts if time sync is off.
                 services.timesyncd.enable = lib.mkForce true;
+                networking.hostName = lib.mkForce "niriTestVm";
                 programs.ssh.knownHosts = lib.mkForce { };
                 # Make the test VM reliably accessible without depending on host sops state.
                 services.displayManager.autoLogin.enable = lib.mkForce true;
@@ -216,6 +217,10 @@
                 ];
                 sops.age.sshKeyPaths = lib.mkForce [
                   "/etc/ssh/ssh_host_ed25519_key"
+                ];
+                systemd.tmpfiles.rules = [
+                  "d /home/administrator/.ssh 0700 administrator users - -"
+                  "Z /home/administrator/.ssh 0700 administrator users - -"
                 ];
                 users.users.administrator = {
                   hashedPasswordFile = lib.mkForce null;

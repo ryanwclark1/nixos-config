@@ -48,10 +48,6 @@ Item {
   implicitHeight: vertical ? 0 : thickness
   implicitWidth: vertical ? Math.max(thickness, Math.max(leftSection.implicitWidth, Math.max(centerSection.implicitWidth, rightSection.implicitWidth)) + outerPadding * 2) : 0
 
-  function sectionLabel(section) {
-    return Config.sectionLabel(section, position);
-  }
-
   function sectionItems(section) {
     var items = sectionWidgets && sectionWidgets[section] ? sectionWidgets[section] : [];
     return items;
@@ -85,6 +81,59 @@ Item {
 
   function compactPercentText(value) {
     return Math.round(Math.max(0, Math.min(1, Number(value) || 0)) * 100) + "%";
+  }
+
+  function widgetValueStyle(widgetInstance, widgetType) {
+    var settings = widgetSettings(widgetInstance);
+    var fallback = widgetType === "ramStatus" ? "usage" : "percent";
+    var style = String(settings.valueStyle || fallback);
+    if (widgetType === "ramStatus")
+      return ["usage", "percent"].indexOf(style) !== -1 ? style : fallback;
+    return ["percent", "usage", "usageTemp"].indexOf(style) !== -1 ? style : fallback;
+  }
+
+  function statDisplayText(widgetType, widgetInstance) {
+    var style = widgetValueStyle(widgetInstance, widgetType);
+    if (widgetType === "cpuStatus") {
+      if (style === "usageTemp") return SystemStatus.cpuUsage + " • " + SystemStatus.cpuTemp;
+      return SystemStatus.cpuUsage;
+    }
+    if (widgetType === "ramStatus") {
+      if (style === "percent") return compactPercentText(SystemStatus.ramPercent);
+      return SystemStatus.ramUsage;
+    }
+    if (widgetType === "gpuStatus") {
+      if (style === "usageTemp") return SystemStatus.gpuUsage + " • " + SystemStatus.gpuTemp;
+      return SystemStatus.gpuUsage;
+    }
+    return "";
+  }
+
+  function compactStatDisplayText(widgetType, widgetInstance) {
+    var style = widgetValueStyle(widgetInstance, widgetType);
+    if (style === "percent")
+      return statDisplayText(widgetType, widgetInstance);
+
+    if (widgetType === "ramStatus") {
+      var ramUsage = statDisplayText(widgetType, widgetInstance);
+      return ramUsage.length <= 5 ? ramUsage : compactPercentText(SystemStatus.ramPercent);
+    }
+
+    if (style === "usageTemp")
+      return widgetType === "cpuStatus" ? SystemStatus.cpuUsage : SystemStatus.gpuUsage;
+
+    var usage = statDisplayText(widgetType, widgetInstance);
+    return usage.length <= 5 ? usage : (widgetType === "cpuStatus" ? SystemStatus.cpuUsage : SystemStatus.gpuUsage);
+  }
+
+  function statTooltipText(widgetType, widgetInstance) {
+    if (widgetType === "cpuStatus")
+      return "CPU " + statDisplayText(widgetType, widgetInstance);
+    if (widgetType === "ramStatus")
+      return "RAM " + statDisplayText(widgetType, widgetInstance) + " • " + compactPercentText(SystemStatus.ramPercent);
+    if (widgetType === "gpuStatus")
+      return "GPU " + statDisplayText(widgetType, widgetInstance);
+    return "";
   }
 
   function widgetDisplayMode(widgetInstance) {
@@ -265,6 +314,8 @@ Item {
       property var widgetInstance: null
       readonly property bool compact: root.isCompactStatWidget(widgetInstance)
       readonly property bool iconOnly: root.isIconOnlyStatWidget(widgetInstance)
+      readonly property string valueText: root.statDisplayText("cpuStatus", widgetInstance)
+      readonly property string compactValueText: root.compactStatDisplayText("cpuStatus", widgetInstance)
       implicitWidth: cpuPill.implicitWidth
       implicitHeight: cpuPill.implicitHeight
 
@@ -275,7 +326,7 @@ Item {
         anchors.centerIn: parent
         anchorWindow: root.anchorWindow
         isActive: root.isSurfaceActive("systemStatsMenu")
-        tooltipText: "CPU " + SystemStatus.cpuUsage + " • " + SystemStatus.cpuTemp
+        tooltipText: root.statTooltipText("cpuStatus", widgetInstance)
         horizontalPadding: (compact || iconOnly) ? 5 : 8
         onClicked: root.requestSurface("systemStatsMenu", this)
 
@@ -309,7 +360,7 @@ Item {
           }
 
           Text {
-            text: root.compactPercentText(SystemStatus.cpuPercent)
+            text: compactValueText
             color: Colors.text
             font.pixelSize: Colors.fontSizeXS
             font.weight: Font.DemiBold
@@ -332,7 +383,7 @@ Item {
           }
 
           Text {
-            text: "CPU " + SystemStatus.cpuUsage
+            text: "CPU " + valueText
             color: Colors.text
             font.pixelSize: Colors.fontSizeMedium
             font.weight: Font.DemiBold
@@ -349,6 +400,8 @@ Item {
       property var widgetInstance: null
       readonly property bool compact: root.isCompactStatWidget(widgetInstance)
       readonly property bool iconOnly: root.isIconOnlyStatWidget(widgetInstance)
+      readonly property string valueText: root.statDisplayText("ramStatus", widgetInstance)
+      readonly property string compactValueText: root.compactStatDisplayText("ramStatus", widgetInstance)
       implicitWidth: ramPill.implicitWidth
       implicitHeight: ramPill.implicitHeight
 
@@ -359,7 +412,7 @@ Item {
         anchors.centerIn: parent
         anchorWindow: root.anchorWindow
         isActive: root.isSurfaceActive("systemStatsMenu")
-        tooltipText: "RAM " + SystemStatus.ramUsage
+        tooltipText: root.statTooltipText("ramStatus", widgetInstance)
         horizontalPadding: (compact || iconOnly) ? 5 : 8
         onClicked: root.requestSurface("systemStatsMenu", this)
 
@@ -393,7 +446,7 @@ Item {
           }
 
           Text {
-            text: root.compactPercentText(SystemStatus.ramPercent)
+            text: compactValueText
             color: Colors.text
             font.pixelSize: Colors.fontSizeXS
             font.weight: Font.DemiBold
@@ -416,7 +469,7 @@ Item {
           }
 
           Text {
-            text: "RAM " + SystemStatus.ramUsage
+            text: "RAM " + valueText
             color: Colors.text
             font.pixelSize: Colors.fontSizeMedium
             font.weight: Font.DemiBold
@@ -433,6 +486,8 @@ Item {
       property var widgetInstance: null
       readonly property bool compact: root.isCompactStatWidget(widgetInstance)
       readonly property bool iconOnly: root.isIconOnlyStatWidget(widgetInstance)
+      readonly property string valueText: root.statDisplayText("gpuStatus", widgetInstance)
+      readonly property string compactValueText: root.compactStatDisplayText("gpuStatus", widgetInstance)
       implicitWidth: gpuPill.implicitWidth
       implicitHeight: gpuPill.implicitHeight
 
@@ -443,7 +498,7 @@ Item {
         anchors.centerIn: parent
         anchorWindow: root.anchorWindow
         isActive: root.isSurfaceActive("systemStatsMenu")
-        tooltipText: "GPU " + SystemStatus.gpuUsage + " • " + SystemStatus.gpuTemp
+        tooltipText: root.statTooltipText("gpuStatus", widgetInstance)
         horizontalPadding: (compact || iconOnly) ? 5 : 8
         onClicked: root.requestSurface("systemStatsMenu", this)
 
@@ -477,7 +532,7 @@ Item {
           }
 
           Text {
-            text: root.compactPercentText(SystemStatus.gpuPercent)
+            text: compactValueText
             color: Colors.text
             font.pixelSize: Colors.fontSizeXS
             font.weight: Font.DemiBold
@@ -500,7 +555,7 @@ Item {
           }
 
           Text {
-            text: "GPU " + SystemStatus.gpuUsage
+            text: "GPU " + valueText
             color: Colors.text
             font.pixelSize: Colors.fontSizeMedium
             font.weight: Font.DemiBold

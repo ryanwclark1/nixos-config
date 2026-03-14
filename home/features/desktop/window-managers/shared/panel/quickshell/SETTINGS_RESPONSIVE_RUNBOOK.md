@@ -8,6 +8,8 @@ Reference:
 
 ## Quick Commands
 
+- Headless config/migration contract check for Bar Widgets stat settings:
+  - `scripts/check-panel-config-contracts.sh`
 - Static + runtime guardrails:
   - `scripts/check-settings-guardrails.sh`
 - Runtime smoke check against the live QuickShell instance:
@@ -49,6 +51,8 @@ The smoke script:
 
 This is a runtime guardrail, not a replacement for visual QA.
 
+Unlike the headless multibar smoke in the panel QA flow, this live-session check uses only `PASS`, `WARN`, and `FAIL` outcomes. It does not emit `[SKIP]` results.
+
 ## What The Preview Script Covers
 
 The preview script:
@@ -68,6 +72,8 @@ Recommended usage:
 ## Simulated Compact QA
 
 Use the viewport capture script when you need repeatable narrow or portrait screenshots from a wide desktop session.
+
+For Bar Widgets stat-setting changes, run `scripts/check-panel-config-contracts.sh` first so default/migration regressions are caught before live-session layout review.
 
 Examples:
 
@@ -132,14 +138,23 @@ Look for:
 - oversized vertical spacing after wrapping,
 - dialogs or pickers exceeding the viewport,
 - search result alignment issues.
+- in `Bar Widgets`, verify CPU / Memory / GPU rows show both `Mode` and `Value` summary chips.
+- in `Bar Widgets`, open CPU / Memory / GPU settings and verify `Display Mode` and `Value Style` controls wrap cleanly in portrait/narrow layouts.
+- in `Bar Widgets`, verify compact and auto modes remain readable when long values are selected and that compact mode shortens long values instead of widening the layout.
 
 ## Harness Notes
 
 - The viewport capture harness is valid for layout inspection, but it does not perfectly reproduce every runtime data source.
+- The synthetic `Bar Widgets` smoke harness now mirrors the real settings subtree so sibling QML types resolve the same way they do in the shipped settings UI.
+- In headless/offscreen runs, that harness should now either load normally or stop on the expected `No PanelWindow backend loaded` condition rather than failing on malformed temporary import paths.
 - `Theme` is the known exception:
   - in the real running `SettingsHub`, the theme list populates normally,
   - in the harness, the tab can report `0 themes`,
   - treat that as a harness-data limitation, not a confirmed layout regression.
+- `Bar Widgets` stat-widget settings are now partially protected by the headless-safe config contract check:
+  - `scripts/check-panel-config-contracts.sh`
+  - use that for default/migration coverage,
+  - use live preview/capture for final layout validation.
 - For `Theme`, use the live shell preview path for final validation:
   - `scripts/preview-settings-responsive.sh`
   - or open `SettingsHub` directly in the running shell and inspect the tab there.
@@ -161,3 +176,4 @@ Record remaining issues in this format:
 - Dialogs and pickers remain inside the visible viewport.
 - Search navigation works in wide and compact modes.
 - Placement remains screen-safe relative to reserved edges.
+- CPU / Memory / GPU widget settings remain readable and configurable in compact layouts.

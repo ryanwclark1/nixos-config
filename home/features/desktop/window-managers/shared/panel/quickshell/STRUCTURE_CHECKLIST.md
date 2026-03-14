@@ -14,7 +14,7 @@ Use this checklist before merging panel architecture changes.
 - [x] `scripts/check-launcher-category-filters.sh` passes for launcher drun category-filter guards (metadata extraction, config/settings wiring, keyboard shortcuts, and chip visibility).
 - [x] `scripts/check-launcher-performance.sh` passes for launcher filter/ranking performance guardrails and runtime telemetry fields.
 - [x] `scripts/check-launcher-guardrails.sh` passes (composite launcher guardrail runner).
-- [x] `scripts/check-launcher-tab-matrix.sh` passes for launcher `Tab`/`Shift+Tab` behavior matrix guarantees.
+- [x] `scripts/check-launcher-tab-matrix.sh` passes for launcher `Tab`/`Shift+Tab` behavior matrix guarantees and `Ctrl+Tab` drun category cycling guardrails.
 - [x] `scripts/check-launcher-responsive.sh` passes for launcher compact/tight responsive guardrails and runtime warning scan.
 - [x] `scripts/check-launcher-ipc-health.sh` passes for launcher IPC action reachability and status payload contract.
 - [x] `scripts/check-launcher-benchmarks.sh` passes (threshold + parity gate for launcher benchmarks).
@@ -33,13 +33,24 @@ Use this checklist before merging panel architecture changes.
 - [ ] `scripts/check-plugin-conformance.sh` passes for plugin manifest/lifecycle conformance fixtures.
 - [ ] `scripts/plugin-doctor.sh` passes for local plugin directory health checks.
 - [ ] `scripts/check-plugin-doctor-smoke.sh` passes for deterministic doctor behavior (valid fixtures pass, invalid fixtures fail).
+- [ ] `scripts/check-plugin-reference-local.sh` passes for the repo-tracked reference plugin install/smoke/remove workflow.
+- [ ] `scripts/check-plugin-reference-contracts.sh` passes so the repo-tracked reference plugin keeps its intended manifest, state, launcher, settings, and README workflow contract.
+- [ ] `scripts/check-plugin-reference-fixtures.sh` passes so the repo-tracked reference plugin keeps its intended persisted state-envelope and settings-key shapes.
+- [ ] `scripts/check-plugin-reference-recovery.sh` passes so the repo-tracked reference plugin keeps its intended healthy/query-failure/execute-failure/recovery behavior.
+- [ ] `scripts/check-plugin-reference-diagnostics.sh` passes so the repo-tracked reference plugin keeps its intended exported diagnostics payload examples.
+- [ ] `scripts/plugin-local.sh quick` remains a fast local sweep for reference-plugin drift plus runtime/diagnostics contract regressions, reusing `reference-all` before shared gates.
+- [ ] `scripts/plugin-local.sh reference-flow` stays aligned with the documented manual reference-plugin workflow.
+- [ ] `scripts/plugin-local.sh reference-export` stays aligned with the documented diagnostics export path and reference payload fixtures.
+- [ ] `scripts/plugin-local.sh reference-status` stays aligned with the documented local commands, fixtures, and diagnostics export workflow.
+- [ ] `scripts/plugin-local.sh reference-status --check` remains green when the local reference toolkit prerequisites are intact.
 - [ ] `scripts/check-plugin-runtime-guards.sh` passes for lifecycle/API/error-code runtime guardrails.
 - [ ] `scripts/check-plugin-diagnostics-contracts.sh` passes for plugin diagnostics payload/schema contract guardrails.
 - [ ] `scripts/sync-plugin-diagnostics-schema.sh --check` passes and `--write` is used when runtime catalog enum sets change.
-- [ ] `scripts/check-plugin-diagnostics-schema.sh` passes for JSON Schema (`ajv`) validation of diagnostics payload contracts.
+- [ ] `scripts/check-plugin-diagnostics-schema.sh` passes for local JSON Schema validation of diagnostics payload contracts.
 - [ ] `config/plugins/runtime-catalog.json` is updated when plugin lifecycle states or runtime error codes change.
 - [ ] `config/plugins/diagnostics.schema.json` is updated when diagnostics payload contracts change.
 - [ ] `PluginRuntimeCatalog` remains in sync with `config/plugins/runtime-catalog.json` consumers (plugin settings UI and guards).
 - [ ] `scripts/plugin-verify.sh` passes as the unified plugin verification gate.
+- [ ] The repo-tracked reference plugin still validates the intended local workflow (`install-reference`, `smoke-reference`, `remove-reference`).
 - [ ] Plugin behavior preserves canonical manifest compatibility (`bar-widget` / `desktop-widget` / `launcher-provider` / `daemon` / `multi`).
 - [ ] Existing IPC actions remain backward compatible.

@@ -7,9 +7,7 @@ import "../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  readonly property int availablePopupWidth: screen ? Math.max(340, screen.width - 40) : 380
-  readonly property bool compactMode: availablePopupWidth < 360
-  implicitWidth: Math.min(380, availablePopupWidth)
+  popupMinWidth: 340; popupMaxWidth: 380; compactThreshold: 360
   implicitHeight: compactMode ? 560 : 520
   title: "Bluetooth"
   toggleMethod: "toggleBluetoothMenu"
@@ -256,20 +254,10 @@ BasePopupMenu {
               }
             }
 
-            Rectangle {
-              radius: 12
-              color: Colors.withAlpha(Colors.primary, 0.16)
-              implicitWidth: connChipLabel.implicitWidth + 16
-              implicitHeight: 24
+            SharedWidgets.StatusChip {
+              text: "Connected"
+              chipColor: Colors.primary
               visible: !root.compactMode
-              Text {
-                id: connChipLabel
-                anchors.centerIn: parent
-                text: "Connected"
-                color: Colors.primary
-                font.pixelSize: Colors.fontSizeXS
-                font.weight: Font.Medium
-              }
             }
 
             Rectangle {
@@ -350,31 +338,12 @@ BasePopupMenu {
               }
             }
 
-            Rectangle {
-              radius: 12
-              color: Colors.highlightLight
-              implicitWidth: pairedChipLabel.implicitWidth + 16
-              implicitHeight: 24
+            SharedWidgets.StatusChip {
+              text: "Connect"
+              chipColor: Colors.textSecondary
+              interactive: true
               visible: !root.compactMode
-
-              Text {
-                id: pairedChipLabel
-                anchors.centerIn: parent
-                text: "Connect"
-                color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXS
-                font.weight: Font.Medium
-              }
-
-              SharedWidgets.StateLayer { id: pairedConnStateLayer; hovered: pairedConnHover.containsMouse; pressed: pairedConnHover.pressed; stateColor: Colors.primary }
-
-              MouseArea {
-                id: pairedConnHover
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: (mouse) => { pairedConnStateLayer.burst(mouse.x, mouse.y); modelData.connect(); }
-              }
+              onClicked: modelData.connect()
             }
 
             Rectangle {
@@ -419,19 +388,7 @@ BasePopupMenu {
         spacing: Colors.spacingS
         Layout.leftMargin: 4
 
-        Text {
-          text: "󰑐"
-          color: Colors.textDisabled
-          font.family: Colors.fontMono
-          font.pixelSize: Colors.fontSizeLarge
-
-          RotationAnimator on rotation {
-            from: 0; to: 360
-            duration: 1200
-            running: root.isScanning
-            loops: Animation.Infinite
-          }
-        }
+        SharedWidgets.LoadingSpinner { size: Colors.fontSizeLarge; color: Colors.textDisabled }
 
         Text {
           text: "Scanning for devices..."
@@ -482,36 +439,14 @@ BasePopupMenu {
               }
             }
 
-            Rectangle {
-              radius: 12
-              color: Colors.highlightLight
-              implicitWidth: pairChipLabel.implicitWidth + 16
-              implicitHeight: 24
+            SharedWidgets.StatusChip {
+              text: "Pair"
+              chipColor: Colors.textSecondary
+              interactive: true
               visible: !root.compactMode
-
-              Text {
-                id: pairChipLabel
-                anchors.centerIn: parent
-                text: "Pair"
-                color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXS
-                font.weight: Font.Medium
-              }
-
-              SharedWidgets.StateLayer { id: pairStateLayer; hovered: pairHover.containsMouse; pressed: pairHover.pressed; stateColor: Colors.primary }
-
-              MouseArea {
-                id: pairHover
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: (mouse) => {
-                  pairStateLayer.burst(mouse.x, mouse.y);
-                  Quickshell.execDetached(["sh", "-c",
-                    "bluetoothctl trust " + modelData.address + " && bluetoothctl pair " + modelData.address
-                  ]);
-                }
-              }
+              onClicked: Quickshell.execDetached(["sh", "-c",
+                "bluetoothctl trust " + modelData.address + " && bluetoothctl pair " + modelData.address
+              ])
             }
           }
 

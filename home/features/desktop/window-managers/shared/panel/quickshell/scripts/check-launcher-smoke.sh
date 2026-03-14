@@ -102,8 +102,9 @@ if (( ci_mode == 0 )); then
     "${script_dir}/check-launcher-responsive.sh" --id "${instance_id}"
     "${script_dir}/check-launcher-ipc-health.sh" --id "${instance_id}"
   else
-    "${script_dir}/check-launcher-responsive.sh"
-    "${script_dir}/check-launcher-ipc-health.sh"
+    printf '%s\n' "[WARN] No reachable launcher instance found; falling back to static launcher probes." >&2
+    "${script_dir}/check-launcher-responsive.sh" --ci
+    "${script_dir}/check-launcher-ipc-health.sh" --ci
   fi
 else
   "${script_dir}/check-launcher-responsive.sh" --ci

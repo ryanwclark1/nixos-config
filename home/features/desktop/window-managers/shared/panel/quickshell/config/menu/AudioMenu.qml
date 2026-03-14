@@ -7,9 +7,7 @@ import "../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  readonly property int availablePopupWidth: screen ? Math.max(340, screen.width - 40) : 380
-  readonly property bool compactMode: availablePopupWidth < 360
-  implicitWidth: Math.min(380, availablePopupWidth)
+  popupMinWidth: 340; popupMaxWidth: 380; compactThreshold: 360
   implicitHeight: compactMode ? 620 : 560
   title: "Audio"
   toggleMethod: "toggleAudioMenu"
@@ -21,33 +19,10 @@ BasePopupMenu {
   onVisibleChanged: if (visible) AudioService.refreshDevices()
 
   headerExtras: [
-    Rectangle {
-      width: 30
-      height: 30
-      radius: height / 2
-      color: "transparent"
-
-      Text {
-        anchors.centerIn: parent
-        text: "󰒓"
-        color: Colors.textSecondary
-        font.family: Colors.fontMono
-        font.pixelSize: Colors.fontSizeXL
-      }
-
-      SharedWidgets.StateLayer {
-        id: stateLayer
-        hovered: audioSettingsHover.containsMouse
-        pressed: audioSettingsHover.pressed
-      }
-
-      MouseArea {
-        id: audioSettingsHover
-        anchors.fill: parent
-        hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        onClicked: (mouse) => { stateLayer.burst(mouse.x, mouse.y); Quickshell.execDetached(["pavucontrol"]); }
-      }
+    SharedWidgets.IconButton {
+      icon: "󰒓"
+      iconSize: Colors.fontSizeXL
+      onClicked: Quickshell.execDetached(["pavucontrol"])
     }
   ]
 
@@ -81,19 +56,9 @@ BasePopupMenu {
             Text { text: "󰕾"; color: AudioService.outputMuted ? Colors.error : Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL }
             Text { text: "Output"; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium }
             Item { Layout.fillWidth: true }
-            Rectangle {
-              radius: 12
-              color: AudioService.outputMuted ? Colors.withAlpha(Colors.error, 0.16) : Colors.highlightLight
-              implicitWidth: outputPercentLabel.implicitWidth + 16
-              implicitHeight: 24
-              Text {
-                id: outputPercentLabel
-                anchors.centerIn: parent
-                text: root.percentText(AudioService.outputVolume, AudioService.outputMuted)
-                color: AudioService.outputMuted ? Colors.error : Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXS
-                font.weight: Font.Medium
-              }
+            SharedWidgets.StatusChip {
+              text: root.percentText(AudioService.outputVolume, AudioService.outputMuted)
+              chipColor: AudioService.outputMuted ? Colors.error : Colors.textSecondary
             }
             SharedWidgets.MuteButton {
               target: "@DEFAULT_AUDIO_SINK@"
@@ -119,19 +84,9 @@ BasePopupMenu {
               }
             }
 
-            Rectangle {
-              radius: 12
-              color: AudioService.outputMuted ? Colors.withAlpha(Colors.error, 0.16) : Colors.highlightLight
-              implicitWidth: outputPercentLabelCompact.implicitWidth + 16
-              implicitHeight: 24
-              Text {
-                id: outputPercentLabelCompact
-                anchors.centerIn: parent
-                text: root.percentText(AudioService.outputVolume, AudioService.outputMuted)
-                color: AudioService.outputMuted ? Colors.error : Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXS
-                font.weight: Font.Medium
-              }
+            SharedWidgets.StatusChip {
+              text: root.percentText(AudioService.outputVolume, AudioService.outputMuted)
+              chipColor: AudioService.outputMuted ? Colors.error : Colors.textSecondary
             }
           }
 
@@ -208,19 +163,9 @@ BasePopupMenu {
             Text { text: "󰍬"; color: AudioService.inputMuted ? Colors.error : Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL }
             Text { text: "Input"; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium }
             Item { Layout.fillWidth: true }
-            Rectangle {
-              radius: 12
-              color: AudioService.inputMuted ? Colors.withAlpha(Colors.error, 0.16) : Colors.highlightLight
-              implicitWidth: inputPercentLabel.implicitWidth + 16
-              implicitHeight: 24
-              Text {
-                id: inputPercentLabel
-                anchors.centerIn: parent
-                text: root.percentText(AudioService.inputVolume, AudioService.inputMuted)
-                color: AudioService.inputMuted ? Colors.error : Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXS
-                font.weight: Font.Medium
-              }
+            SharedWidgets.StatusChip {
+              text: root.percentText(AudioService.inputVolume, AudioService.inputMuted)
+              chipColor: AudioService.inputMuted ? Colors.error : Colors.textSecondary
             }
             SharedWidgets.MuteButton {
               target: "@DEFAULT_AUDIO_SOURCE@"
@@ -246,19 +191,9 @@ BasePopupMenu {
               }
             }
 
-            Rectangle {
-              radius: 12
-              color: AudioService.inputMuted ? Colors.withAlpha(Colors.error, 0.16) : Colors.highlightLight
-              implicitWidth: inputPercentLabelCompact.implicitWidth + 16
-              implicitHeight: 24
-              Text {
-                id: inputPercentLabelCompact
-                anchors.centerIn: parent
-                text: root.percentText(AudioService.inputVolume, AudioService.inputMuted)
-                color: AudioService.inputMuted ? Colors.error : Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXS
-                font.weight: Font.Medium
-              }
+            SharedWidgets.StatusChip {
+              text: root.percentText(AudioService.inputVolume, AudioService.inputMuted)
+              chipColor: AudioService.inputMuted ? Colors.error : Colors.textSecondary
             }
           }
 

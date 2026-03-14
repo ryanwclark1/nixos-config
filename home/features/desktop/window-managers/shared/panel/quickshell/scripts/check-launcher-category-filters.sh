@@ -46,9 +46,13 @@ require_literal "$launcher_qml" 'function cycleDrunCategoryFilter(step) {' "laun
 require_literal "$launcher_qml" 'function selectDrunCategorySlot(slot) {' "launcher category slot selection function"
 require_literal "$launcher_qml" 'function drunCategoryStateObject() {' "launcher category state payload helper"
 require_literal "$launcher_qml" 'function drunCategoryState() { return JSON.stringify(launcherRoot.drunCategoryStateObject()); }' "launcher category state IPC method"
+require_literal "$launcher_qml" 'readonly property string launcherControlHintText: {' "launcher control hint property"
 require_literal "$launcher_qml" 'launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && (event.modifiers & Qt.AltModifier) && !(event.modifiers & Qt.ControlModifier)' "launcher category keyboard handler branch"
 require_literal "$launcher_qml" 'launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && launcherRoot.showLauncherHome && (event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_Tab' "launcher category ctrl+tab keyboard handler branch"
-require_literal "$launcher_qml" 'Alt+←/→ or Alt+1..9: categories • Enter: run • Esc: close' "launcher category keyboard hint"
+require_literal "$launcher_qml" 'var clearHint = searchText !== "" ? "Ctrl+L/U: clear • " : "";' "launcher category clear hint"
+require_literal "$launcher_qml" 'return "Alt+←/→/PgUp/PgDn/Home/End/0/Backspace, Ctrl+Tab, or Alt+1..9: categories • " + resultHint + clearHint + "Enter: run • Esc: close";' "launcher category keyboard hint"
+require_literal "$launcher_qml" 'function jumpDrunCategoryBoundary(toEnd) {' "launcher category boundary helper"
+require_literal "$launcher_qml" 'else if (event.key === Qt.Key_0 || event.key === Qt.Key_Backspace) {' "launcher category clear branch"
 require_literal "$launcher_qml" 'launcherRoot.showLauncherHome && launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && launcherRoot.drunCategoryOptions.length > 1' "launcher category chip visibility guard"
 
 if (( ${#violations[@]} > 0 )); then

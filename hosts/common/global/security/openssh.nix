@@ -7,6 +7,7 @@
 }:
 let
   hosts = lib.attrNames outputs.nixosConfigurations;
+  hostsDir = toString ../../..;
   user = "administrator";
   homeDirectory = "/home/${user}";
   domain = config.networking.domain;
@@ -51,24 +52,34 @@ in
 
   programs.ssh = {
     # Each hosts public key
-    knownHosts = lib.genAttrs hosts (hostname: {
-      publicKeyFile = ../../../${hostname}/ssh_host_ed25519_key.pub;
-      extraHostNames =
-        [
-          "${hostname}.${domain}"
-        ]
-        ++
-          # Alias for localhost if it's the same host
-          (lib.optional (hostname == config.networking.hostName) "localhost")
-        ++ (lib.optionals (hostname == "woody") [
-          "${domain}"
-          "local.${domain}"
-        ])
-        ++ (lib.optionals (hostname == "frametop") [
-          "${domain}"
-          "local.${domain}"
-        ]);
-    });
+    knownHosts = lib.foldl' (acc: hostname:
+      let
+        keyPath = "${hostsDir}/${hostname}/ssh_host_ed25519_key.pub";
+      in
+      if builtins.pathExists keyPath then
+        acc // {
+          ${hostname} = {
+            publicKey = builtins.readFile keyPath;
+            extraHostNames =
+              [
+                "${hostname}.${domain}"
+              ]
+              ++
+                # Alias for localhost if it's the same host
+                (lib.optional (hostname == config.networking.hostName) "localhost")
+              ++ (lib.optionals (hostname == "woody") [
+                "${domain}"
+                "local.${domain}"
+              ])
+              ++ (lib.optionals (hostname == "frametop") [
+                "${domain}"
+                "local.${domain}"
+              ]);
+          };
+        }
+      else
+        acc
+    ) { } hosts;
   };
 
   # Passwordless sudo when SSH'ing with keys

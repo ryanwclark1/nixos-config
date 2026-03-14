@@ -3,11 +3,16 @@ set -euo pipefail
 
 runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
 instance_id=""
+hyprland_instance=""
+hyprland_wayland_socket=""
 surface_id="networkMenu"
 output_path=""
 delay_seconds="1.6"
+ipc_timeout_seconds="2"
 crop_mode="monitor"
 workspace_target="auto"
+workspace_settle_attempts="20"
+workspace_settle_interval="0.1"
 temp_full=""
 temp_crop=""
 restore_workspace=""
@@ -32,6 +37,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --delay)
       delay_seconds="${2:-}"
+      shift 2
+      ;;
+    --ipc-timeout)
+      ipc_timeout_seconds="${2:-}"
       shift 2
       ;;
     --crop)
@@ -65,16 +74,68 @@ require_cmd() {
   fi
 }
 
+hypr() {
+  if [[ -n "${hyprland_instance}" ]]; then
+    env HYPRLAND_INSTANCE_SIGNATURE="${hyprland_instance}" WAYLAND_DISPLAY="${hyprland_wayland_socket}" \
+      hyprctl -i "${hyprland_instance}" "$@"
+  else
+    hyprctl "$@"
+  fi
+}
+
+resolve_hyprland_instance() {
+  local candidate
+  local wl_socket
+
+  if hyprctl -j activeworkspace >/dev/null 2>&1; then
+    hyprland_instance=""
+    hyprland_wayland_socket=""
+    return 0
+  fi
+
+  while IFS=$'\t' read -r candidate wl_socket; do
+    [[ -n "${candidate}" ]] || continue
+    if env HYPRLAND_INSTANCE_SIGNATURE="${candidate}" WAYLAND_DISPLAY="${wl_socket}" \
+      hyprctl -i "${candidate}" -j activeworkspace >/dev/null 2>&1; then
+      hyprland_instance="${candidate}"
+      hyprland_wayland_socket="${wl_socket}"
+      return 0
+    fi
+  done < <(hyprctl instances -j | jq -r '.[] | [.instance // "", .wl_socket // ""] | @tsv')
+
+  printf 'Could not resolve a reachable Hyprland instance.\n' >&2
+  exit 1
+}
+
 pick_capture_workspace() {
   local used
   for candidate in $(seq 9001 9099); do
-    used="$(hyprctl workspaces -j | jq --arg candidate "${candidate}" 'map(select((.name // "") == $candidate or ((.id | tostring) == $candidate))) | length')"
+    used="$(hypr workspaces -j | jq --arg candidate "${candidate}" 'map(select((.name // "") == $candidate or ((.id | tostring) == $candidate))) | length')"
     if [[ "${used}" == "0" ]]; then
       printf '%s\n' "${candidate}"
       return 0
     fi
   done
   return 1
+}
+
+wait_for_workspace() {
+  local target="$1"
+  local current_name
+  local current_id
+  local attempt
+
+  for attempt in $(seq 1 "${workspace_settle_attempts}"); do
+    current_name="$(hypr activeworkspace -j | jq -r '.name // empty')"
+    current_id="$(hypr activeworkspace -j | jq -r '(.id | tostring) // empty')"
+    if [[ "${current_name}" == "${target}" || "${current_id}" == "${target}" ]]; then
+      return 0
+    fi
+    sleep "${workspace_settle_interval}"
+  done
+
+  printf 'Workspace %s did not become active in time.\n' "${target}" >&2
+  exit 1
 }
 
 switch_to_capture_workspace() {
@@ -84,7 +145,7 @@ switch_to_capture_workspace() {
     return 0
   fi
 
-  restore_workspace="$(hyprctl -j activeworkspace | jq -r '.name // (.id | tostring)')"
+  restore_workspace="$(hypr activeworkspace -j | jq -r '.name // (.id | tostring)')"
   if [[ -z "${restore_workspace}" || "${restore_workspace}" == "null" ]]; then
     printf 'Could not resolve active workspace before capture.\n' >&2
     exit 1
@@ -97,7 +158,8 @@ switch_to_capture_workspace() {
     }
   fi
 
-  hyprctl dispatch workspace "${target}" >/dev/null
+  hypr dispatch workspace "${target}" >/dev/null
+  wait_for_workspace "${target}"
 }
 
 discover_instances_from_pid() {
@@ -135,6 +197,19 @@ discover_instances() {
   printf '%s\n' "${dirs[@]}"
 }
 
+discover_reachable_instance() {
+  local candidate
+  while IFS= read -r candidate; do
+    [[ -n "${candidate}" ]] || continue
+    if timeout "${ipc_timeout_seconds}" quickshell ipc --id "${candidate}" show >/dev/null 2>&1; then
+      printf '%s\n' "${candidate}"
+      return 0
+    fi
+  done < <(discover_instances)
+
+  return 1
+}
+
 call_ipc() {
   local target="$1"
   shift
@@ -149,6 +224,7 @@ main() {
   require_cmd magick
   require_cmd mktemp
   require_cmd sleep
+  resolve_hyprland_instance
 
   if ! [[ "${delay_seconds}" =~ ^[0-9]+([.][0-9]+)?$ ]]; then
     printf 'Delay must be numeric.\n' >&2
@@ -164,19 +240,11 @@ main() {
   esac
 
   if [[ -z "${instance_id}" ]]; then
-    mapfile -t live_instances < <(discover_instances)
-
-    if (( ${#live_instances[@]} == 0 )); then
+    instance_id="$(discover_reachable_instance || true)"
+    if [[ -z "${instance_id}" ]]; then
       printf 'No live QuickShell instances found under %s\n' "${runtime_root}" >&2
       exit 1
-    elif (( ${#live_instances[@]} > 1 )); then
-      printf 'Multiple QuickShell instances found:\n' >&2
-      printf '  %s\n' "${live_instances[@]}" >&2
-      printf 'Re-run with --id INSTANCE_ID\n' >&2
-      exit 1
     fi
-
-    instance_id="${live_instances[0]}"
   fi
 
   if [[ -z "${output_path}" ]]; then
@@ -185,7 +253,7 @@ main() {
 
   temp_full="$(mktemp /tmp/surface-capture-full-XXXXXX.png)"
   temp_crop="$(mktemp /tmp/surface-capture-crop-XXXXXX.png)"
-  trap 'rm -f "${temp_full}" "${temp_crop}"; quickshell ipc --id "${instance_id}" call Shell closeAllSurfaces >/dev/null 2>&1 || true; [[ -n "${restore_workspace}" ]] && hyprctl dispatch workspace "${restore_workspace}" >/dev/null 2>&1 || true' EXIT
+  trap 'rm -f "${temp_full}" "${temp_crop}"; quickshell ipc --id "${instance_id}" call Shell closeAllSurfaces >/dev/null 2>&1 || true; [[ -n "${restore_workspace}" ]] && hypr dispatch workspace "${restore_workspace}" >/dev/null 2>&1 || true' EXIT
 
   switch_to_capture_workspace "${workspace_target}"
 
@@ -196,7 +264,7 @@ main() {
   sleep "${delay_seconds}"
 
   local monitor_json monitor_x monitor_y monitor_w monitor_h reserved_top reserved_left reserved_bottom reserved_right crop_x crop_y crop_w crop_h
-  monitor_json="$(hyprctl monitors -j | jq 'map(select(.focused == true))[0]')"
+  monitor_json="$(hypr monitors -j | jq 'map(select(.focused == true))[0]')"
   if [[ -z "${monitor_json}" || "${monitor_json}" == "null" ]]; then
     printf 'Could not resolve focused monitor from hyprctl.\n' >&2
     exit 1

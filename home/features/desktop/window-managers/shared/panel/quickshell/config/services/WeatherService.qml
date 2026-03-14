@@ -156,6 +156,7 @@ QtObject {
           }
           service.forecast = days;
         } catch (e) {
+          console.warn("WeatherService: parse error:", e);
           service.condition = "Error loading weather";
           service.location = "Local";
           service.forecast = [];

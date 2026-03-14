@@ -5,9 +5,7 @@ import "../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  readonly property int availablePopupWidth: screen ? Math.max(340, screen.width - 40) : 500
-  readonly property bool compactMode: availablePopupWidth < 460
-  implicitWidth: Math.min(500, availablePopupWidth)
+  popupMinWidth: 340; popupMaxWidth: 500; compactThreshold: 460
   implicitHeight: compactMode ? 660 : 600
   title: "Weather"
   subtitle: WeatherService.location || "Local"

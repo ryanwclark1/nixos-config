@@ -8,10 +8,8 @@ import "../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  readonly property int availablePopupWidth: screen ? Math.max(340, screen.width - 40) : 396
-  readonly property bool compactMode: availablePopupWidth < 420
+  popupMinWidth: 340; popupMaxWidth: 396; compactThreshold: 420
   readonly property int detailColumns: compactMode ? 1 : 2
-  implicitWidth: Math.min(396, availablePopupWidth)
   implicitHeight: compactMode ? 620 : 552
   title: "Networking"
   subtitle: root.activePrimaryName === "Offline" ? "Network inspector" : root.activePrimaryName
@@ -423,12 +421,9 @@ BasePopupMenu {
         }
       }
     },
-    Rectangle {
-      width: 30; height: 30; radius: height / 2
-      color: "transparent"
-      Text { anchors.centerIn: parent; text: root.isRefreshing ? "󰇚" : "󰑐"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
-      SharedWidgets.StateLayer { id: refreshStateLayer; anchors.fill: parent; radius: parent.radius; hovered: refreshHover.containsMouse; pressed: refreshHover.pressed }
-      MouseArea { id: refreshHover; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: (mouse) => { refreshStateLayer.burst(mouse.x, mouse.y); root.refreshData(); } }
+    SharedWidgets.IconButton {
+      icon: root.isRefreshing ? "󰇚" : "󰑐"
+      onClicked: root.refreshData()
     }
   ]
 

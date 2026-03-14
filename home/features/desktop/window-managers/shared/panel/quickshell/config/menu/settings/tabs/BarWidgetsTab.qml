@@ -104,6 +104,29 @@ Item {
         return widgetType === "cpuStatus" || widgetType === "ramStatus" || widgetType === "gpuStatus";
     }
 
+    function statDisplayModeLabel(widgetInstance) {
+        var settings = widgetInstance && widgetInstance.settings ? widgetInstance.settings : {};
+        var mode = String(settings.displayMode || "auto");
+        if (mode === "full")
+            return "Full";
+        if (mode === "compact")
+            return "Compact";
+        if (mode === "icon")
+            return "Icon";
+        return "Auto";
+    }
+
+    function statValueStyleLabel(widgetInstance) {
+        var widgetType = widgetInstance ? String(widgetInstance.widgetType || "") : "";
+        var settings = widgetInstance && widgetInstance.settings ? widgetInstance.settings : {};
+        var style = String(settings.valueStyle || (widgetType === "ramStatus" ? "usage" : "percent"));
+        if (style === "usageTemp")
+            return "Usage + Temp";
+        if (style === "usage")
+            return "Usage";
+        return "Percent";
+    }
+
     function loadPluginSettingsPane() {
         if (!pluginSettingsLoader)
             return;
@@ -260,6 +283,20 @@ Item {
                                             label: widgetRow.modelData.enabled === false ? "Hidden" : "Visible"
                                             selected: widgetRow.modelData.enabled !== false
                                             onClicked: root.toggleWidgetEnabled(widgetRow.sectionKey, widgetRow.modelData)
+                                        }
+
+                                        SharedWidgets.FilterChip {
+                                            visible: root.isSystemStatWidget(widgetRow.modelData.widgetType)
+                                            label: "Mode: " + root.statDisplayModeLabel(widgetRow.modelData)
+                                            selected: false
+                                            enabled: false
+                                        }
+
+                                        SharedWidgets.FilterChip {
+                                            visible: root.isSystemStatWidget(widgetRow.modelData.widgetType)
+                                            label: "Value: " + root.statValueStyleLabel(widgetRow.modelData)
+                                            selected: false
+                                            enabled: false
                                         }
 
                                         SettingsActionButton {
@@ -543,7 +580,7 @@ Item {
                     SettingsModeRow {
                         visible: !!root.editingWidget && root.isSystemStatWidget(root.editingWidget.widgetType)
                         label: "Display Mode"
-                        description: "Choose whether this stat adapts to the bar orientation or always stays full, compact, or icon-only."
+                        description: "Choose whether this stat adapts to bar orientation or always stays full, compact, or icon-only. Compact mode may shorten long values automatically to keep vertical bars narrow."
                         currentValue: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.displayMode
                             ? root.editingWidget.settings.displayMode
                             : "auto"
@@ -554,6 +591,28 @@ Item {
                             { value: "icon", label: "Icon" }
                         ]
                         onModeSelected: value => root.updateEditingWidgetSetting("displayMode", value)
+                    }
+
+                    SettingsModeRow {
+                        visible: !!root.editingWidget && root.isSystemStatWidget(root.editingWidget.widgetType)
+                        label: "Value Style"
+                        description: root.editingWidget && root.editingWidget.widgetType === "ramStatus"
+                            ? "Choose whether memory shows percent used or the current used-memory value. Compact mode can still fall back to percent when the usage text is too long."
+                            : "Choose whether this stat shows percent only, usage text, or usage with temperature. Compact mode can shorten long values automatically."
+                        currentValue: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.valueStyle
+                            ? root.editingWidget.settings.valueStyle
+                            : (root.editingWidget && root.editingWidget.widgetType === "ramStatus" ? "usage" : "percent")
+                        options: root.editingWidget && root.editingWidget.widgetType === "ramStatus"
+                            ? [
+                                { value: "usage", label: "Usage" },
+                                { value: "percent", label: "Percent" }
+                              ]
+                            : [
+                                { value: "percent", label: "Percent" },
+                                { value: "usage", label: "Usage" },
+                                { value: "usageTemp", label: "Usage + Temp" }
+                              ]
+                        onModeSelected: value => root.updateEditingWidgetSetting("valueStyle", value)
                     }
 
                     Loader {

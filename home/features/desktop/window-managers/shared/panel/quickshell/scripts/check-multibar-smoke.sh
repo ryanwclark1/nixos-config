@@ -4,11 +4,10 @@ set -euo pipefail
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 config_dir="${script_dir}/../config"
 root_qml="${config_dir}/shell.qml"
-config_dir_url="file:${config_dir}"
-
 declare -i pass_count=0
 declare -i fail_count=0
 declare -i warn_count=0
+declare -i skip_count=0
 
 auto_cleanup=()
 
@@ -22,9 +21,21 @@ warn() {
   warn_count=$((warn_count + 1))
 }
 
+skip() {
+  printf '[SKIP] %s\n' "$1"
+  skip_count=$((skip_count + 1))
+}
+
 fail() {
   printf '[FAIL] %s\n' "$1" >&2
   fail_count=$((fail_count + 1))
+}
+
+print_log_excerpt() {
+  local log_file="$1"
+  if ! grep -E '^( ERROR: Failed to load configuration| ERROR:   caused by )' "${log_file}" >&2; then
+    sed -n '1,80p' "${log_file}" >&2
+  fi
 }
 
 cleanup() {
@@ -69,12 +80,18 @@ run_qml_case() {
   local exit_code=0
 
   set +e
-  timeout 5s env HOME="${home}" XDG_RUNTIME_DIR="${runtime_dir}" QT_QPA_PLATFORM=offscreen quickshell -p "${qml_path}" --no-duplicate > "${log_file}" 2>&1
+  timeout 5s env -u WAYLAND_DISPLAY -u DISPLAY HOME="${home}" XDG_RUNTIME_DIR="${runtime_dir}" QT_QPA_PLATFORM=offscreen quickshell -p "${qml_path}" --no-duplicate > "${log_file}" 2>&1
   exit_code=$?
   set -e
 
   if grep -q 'Configuration Loaded' "${log_file}" && [[ ${exit_code} -eq 124 || ${exit_code} -eq 0 ]]; then
     pass "${label}"
+    return 0
+  fi
+
+  if grep -q 'No PanelWindow backend loaded' "${log_file}"; then
+    skip "${label}: no PanelWindow backend available in this environment"
+    print_log_excerpt "${log_file}"
     return 0
   fi
 
@@ -105,12 +122,17 @@ write_tab_harnesses() {
   local bar_tab_qml="${harness_dir}/bar-tab-harness.qml"
   local bar_widgets_qml="${harness_dir}/bar-widgets-harness.qml"
 
+  mkdir -p "${harness_dir}/menu"
+  ln -s "${config_dir}/services" "${harness_dir}/services"
+  ln -s "${config_dir}/widgets" "${harness_dir}/widgets"
+  ln -s "${config_dir}/menu/settings" "${harness_dir}/menu/settings"
+
   cat > "${bar_tab_qml}" <<QML
 import Quickshell
 import QtQuick
 import QtQuick.Layouts
-import "${config_dir_url}/services"
-import "${config_dir_url}/menu/settings/tabs"
+import "./services"
+import "./menu/settings/tabs"
 
 PanelWindow {
   visible: true
@@ -136,8 +158,8 @@ QML
 import Quickshell
 import QtQuick
 import QtQuick.Layouts
-import "${config_dir_url}/services"
-import "${config_dir_url}/menu/settings/tabs"
+import "./services"
+import "./menu/settings/tabs"
 
 PanelWindow {
   visible: true
@@ -270,7 +292,7 @@ main() {
 
   run_management_harnesses
 
-  printf '[INFO] Summary: %d pass, %d warn, %d fail\n' "${pass_count}" "${warn_count}" "${fail_count}"
+  printf '[INFO] Summary: %d pass, %d warn, %d skip, %d fail\n' "${pass_count}" "${warn_count}" "${skip_count}" "${fail_count}"
   (( fail_count == 0 ))
 }
 

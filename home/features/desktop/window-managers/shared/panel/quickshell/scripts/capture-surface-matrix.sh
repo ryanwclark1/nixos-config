@@ -65,7 +65,7 @@ if [[ -n "${instance_id}" ]]; then
 fi
 
 for surface in "${surfaces[@]}"; do
-  "${script_dir}/capture-surface-viewport.sh" \
+  bash "${script_dir}/capture-surface-viewport.sh" \
     "${surface_args[@]}" \
     --surface "${surface}" \
     --delay "${delay_seconds}" \

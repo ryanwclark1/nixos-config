@@ -1,0 +1,21 @@
+{
+  "id": "reference.local.toolkit",
+  "name": "Reference Local Toolkit",
+  "description": "Local-only reference plugin for bar widgets, launcher actions, settings, and state handling.",
+  "author": "nixos-config",
+  "version": "1.0.0",
+  "type": "multi",
+  "permissions": ["settings_read", "settings_write", "state_read", "state_write"],
+  "metadata": {
+    "stateVersion": 2
+  },
+  "launcher": {
+    "trigger": "!ref",
+    "noTrigger": true
+  },
+  "entryPoints": {
+    "barWidget": "BarWidget.qml",
+    "launcherProvider": "LauncherProvider.qml",
+    "settings": "Settings.qml"
+  }
+}

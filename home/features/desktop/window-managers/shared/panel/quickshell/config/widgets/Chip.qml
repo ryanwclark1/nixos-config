@@ -34,7 +34,7 @@ Rectangle {
     Text {
       text: root.text
       color: root.textColor
-      font.pixelSize: 9
+      font.pixelSize: Colors.fontSizeXS
       font.weight: Font.Bold
     }
   }

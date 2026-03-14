@@ -40,6 +40,8 @@ Smoke-check the live QuickShell surface stack by:
   5. scanning new runtime log output for warnings/errors.
 
 This validates runtime creation and close paths, not visual placement quality.
+This is a live-session check and reports PASS/WARN/FAIL outcomes only; it does not use
+the headless multibar [SKIP] classification.
 EOF
 }
 
@@ -83,6 +85,26 @@ require_cmd() {
   fi
 }
 
+run_ipc() {
+  local output=""
+  local status=0
+  local attempt
+
+  for attempt in 1 2 3 4 5; do
+    output="$("$@" 2>&1)" && return 0
+    status=$?
+    if [[ "${output}" == *"Not ready to accept queries yet."* ]]; then
+      sleep 0.2
+      continue
+    fi
+    [[ -n "${output}" ]] && printf '%s\n' "${output}" >&2
+    return "${status}"
+  done
+
+  [[ -n "${output}" ]] && printf '%s\n' "${output}" >&2
+  return "${status}"
+}
+
 discover_instances_from_pid() {
   local pid
   local resolved
@@ -118,10 +140,50 @@ discover_instances() {
   printf '%s\n' "${dirs[@]}"
 }
 
+discover_reachable_instance() {
+  local candidate
+  while IFS= read -r candidate; do
+    [[ -n "${candidate}" ]] || continue
+    if run_ipc quickshell ipc --id "${candidate}" show >/dev/null; then
+      printf '%s\n' "${candidate}"
+      return 0
+    fi
+  done < <(discover_instances)
+
+  return 1
+}
+
+resolve_instance_dir() {
+  local requested_id="$1"
+  local direct_dir="${runtime_root}/${requested_id}"
+  local resolved_dir=""
+
+  if [[ -S "${direct_dir}/ipc.sock" ]]; then
+    printf '%s\n' "${direct_dir}"
+    return 0
+  fi
+
+  resolved_dir="$(
+    rg -l --fixed-strings "Shell ID: \"${requested_id}\"" "${runtime_root}"/*/log.log 2>/dev/null \
+      | xargs -r stat -c '%Y %n' 2>/dev/null \
+      | sort -nr \
+      | head -n1 \
+      | cut -d' ' -f2- \
+      | xargs -r dirname
+  )"
+
+  if [[ -n "${resolved_dir}" && -S "${resolved_dir}/ipc.sock" ]]; then
+    printf '%s\n' "${resolved_dir}"
+    return 0
+  fi
+
+  return 1
+}
+
 call_ipc() {
   local target="$1"
   shift
-  quickshell ipc --id "${instance_id}" call "${target}" "$@"
+  run_ipc quickshell ipc --id "${instance_id}" call "${target}" "$@"
 }
 
 main() {
@@ -132,38 +194,33 @@ main() {
   require_cmd sleep
 
   if [[ -z "${instance_id}" ]]; then
-    mapfile -t live_instances < <(discover_instances)
-
-    if (( ${#live_instances[@]} == 0 )); then
+    instance_id="$(discover_reachable_instance || true)"
+    if [[ -z "${instance_id}" ]]; then
       printf 'No live QuickShell instances found under %s\n' "${runtime_root}" >&2
       exit 1
-    elif (( ${#live_instances[@]} > 1 )); then
-      printf 'Multiple QuickShell instances found:\n' >&2
-      printf '  %s\n' "${live_instances[@]}" >&2
-      printf 'Re-run with --id INSTANCE_ID\n' >&2
-      exit 1
     fi
-
-    instance_id="${live_instances[0]}"
   fi
 
-  local instance_dir="${runtime_root}/${instance_id}"
+  local instance_dir=""
   local log_file="${instance_dir}/log.log"
   local start_bytes=0
   local delta_file
   delta_file="$(mktemp)"
   trap "rm -f '${delta_file}'" EXIT
 
-  if [[ ! -S "${instance_dir}/ipc.sock" ]]; then
-    printf 'Instance %s does not expose ipc.sock at %s\n' "${instance_id}" "${instance_dir}/ipc.sock" >&2
+  instance_dir="$(resolve_instance_dir "${instance_id}" || true)"
+  if [[ -z "${instance_dir}" || ! -S "${instance_dir}/ipc.sock" ]]; then
+    printf 'Unable to resolve a live runtime directory for instance %s under %s\n' "${instance_id}" "${runtime_root}" >&2
     exit 1
   fi
+  instance_id="$(basename "${instance_dir}")"
+  log_file="${instance_dir}/log.log"
 
   if [[ -f "${log_file}" ]]; then
     start_bytes="$(wc -c < "${log_file}")"
   fi
 
-  if quickshell ipc --id "${instance_id}" show >/dev/null; then
+  if run_ipc quickshell ipc --id "${instance_id}" show >/dev/null; then
     pass "IPC reachable for instance ${instance_id}"
   else
     fail "IPC unreachable for instance ${instance_id}"

@@ -33,8 +33,8 @@ Compositor-specific behavior notes and capability expectations are documented in
 - Bar plugins: `PluginService.barPlugins` rendered by the bar.
 - Desktop plugins: `PluginService.desktopPlugins` merged into `DesktopWidgetRegistry.widgetCatalog`.
 - Plugin manifest contract:
-  - required: `id`, `name`, `type`, `main`
-  - supported `type`: `bar-widget`, `desktop-widget`
+  - required: `id`, `name`, `description`, `author`, `version`, `type`, `permissions`, `entryPoints`
+  - supported `type`: `bar-widget`, `desktop-widget`, `launcher-provider`, `daemon`, `multi`
 
 ## Invariants
 

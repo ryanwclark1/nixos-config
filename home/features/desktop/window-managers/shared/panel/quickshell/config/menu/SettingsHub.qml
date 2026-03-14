@@ -70,19 +70,29 @@ PanelWindow {
 
   IpcHandler {
     target: "SettingsHub"
-    function toggle() { settingsRoot.toggle(); }
-    function open() { settingsRoot.open(); }
+    function toggle() {
+      Qt.callLater(() => settingsRoot.toggle());
+    }
+    function open() {
+      Qt.callLater(() => settingsRoot.open());
+    }
     function openTab(tabId: string) {
-      var tab = SettingsRegistry.findTab(tabId);
-      if (tab) settingsRoot.currentTabId = tab.id;
-      settingsRoot.open();
+      Qt.callLater(() => {
+        var tab = SettingsRegistry.findTab(tabId);
+        if (tab) settingsRoot.currentTabId = tab.id;
+        settingsRoot.open();
+      });
     }
     function openIndex(index: int) {
-      var tabId = SettingsRegistry.tabIdForIndex(index);
-      if (tabId) settingsRoot.currentTabId = tabId;
-      settingsRoot.open();
+      Qt.callLater(() => {
+        var tabId = SettingsRegistry.tabIdForIndex(index);
+        if (tabId) settingsRoot.currentTabId = tabId;
+        settingsRoot.open();
+      });
     }
-    function close() { settingsRoot.close(); }
+    function close() {
+      Qt.callLater(() => settingsRoot.close());
+    }
   }
 
   Process {

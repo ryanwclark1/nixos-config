@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-01-01T00:00:00Z",
+  "summary": {
+    "installed": 1,
+    "enabled": 1,
+    "invalidManifests": 0,
+    "statuses": {
+      "active": 0,
+      "enabled": 0,
+      "degraded": 1,
+      "failed": 0,
+      "disabled": 0,
+      "validated": 0,
+      "discovered": 0,
+      "unknown": 0
+    }
+  },
+  "plugins": [
+    {
+      "id": "reference.local.toolkit",
+      "name": "Reference Local Toolkit",
+      "version": "1.0.0",
+      "type": "multi",
+      "enabled": true,
+      "author": "nixos-config",
+      "permissions": ["settings_read", "settings_write", "state_read", "state_write"],
+      "entryPoints": {
+        "barWidget": "BarWidget.qml",
+        "launcherProvider": "LauncherProvider.qml",
+        "settings": "Settings.qml"
+      },
+      "runtime": {
+        "state": "degraded",
+        "stateLabel": "Degraded",
+        "stateSeverity": "warn",
+        "code": "E_LAUNCHER_QUERY",
+        "codeLabel": "Launcher Query Failed",
+        "codeSeverity": "warn",
+        "message": "Reference plugin query failure requested.",
+        "updatedAt": "2026-01-01T00:00:00Z"
+      }
+    }
+  ],
+  "manifestErrors": []
+}

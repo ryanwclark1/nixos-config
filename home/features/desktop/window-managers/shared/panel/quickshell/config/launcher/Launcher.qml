@@ -287,6 +287,13 @@ PanelWindow {
       return "Tab: next result • Shift+Tab: prev mode";
     return hasResults ? "Tab: next result • Shift+Tab: prev mode" : "Tab: next mode • Shift+Tab: prev mode";
   }
+  readonly property string launcherControlHintText: {
+    var resultHint = hasResults ? "↑/↓/Ctrl+P/N/PgUp/PgDn/Home/End: results • " : "";
+    var clearHint = searchText !== "" ? "Ctrl+L/U: clear • " : "";
+    if (drunCategoryFiltersEnabled && mode === "drun" && drunCategoryOptions.length > 1)
+      return "Alt+←/→/PgUp/PgDn/Home/End/0/Backspace, Ctrl+Tab, or Alt+1..9: categories • " + resultHint + clearHint + "Enter: run • Esc: close";
+    return resultHint + clearHint + "Enter: run • Esc: close";
+  }
   readonly property string legendPrimaryAction: {
     if (showingConfirm) return "Enter: Confirm";
     if (!hasResults) return "Enter: " + emptyPrimaryCta;
@@ -306,7 +313,13 @@ PanelWindow {
     if (launcherTabBehavior === "results") return "Tab: Next Result";
     return hasResults ? "Tab: Next Result" : "Tab: Next Mode";
   }
-  readonly property string legendTertiaryAction: showingConfirm ? "Esc: Cancel" : "Shift+Tab: Prev Mode"
+  readonly property string legendTertiaryAction: {
+    if (showingConfirm)
+      return "Esc: Cancel";
+    if (searchText !== "")
+      return "Ctrl+L/U: Clear";
+    return "Shift+Tab: Prev Mode";
+  }
   readonly property string webPrimaryProviderLabel: {
     var provider = primaryWebProvider();
     return provider ? provider.name : "Primary";
@@ -1169,6 +1182,13 @@ PanelWindow {
     }
     var nextIndex = (currentIndex + step + drunCategoryOptions.length) % drunCategoryOptions.length;
     return setDrunCategoryFilter(String((drunCategoryOptions[nextIndex] || {}).key || ""));
+  }
+
+  function jumpDrunCategoryBoundary(toEnd) {
+    if (!drunCategoryFiltersEnabled || mode !== "drun" || drunCategoryOptions.length <= 1)
+      return false;
+    var targetIndex = toEnd ? (drunCategoryOptions.length - 1) : 0;
+    return setDrunCategoryFilter(String((drunCategoryOptions[targetIndex] || {}).key || ""));
   }
 
   function selectDrunCategorySlot(slot) {
@@ -2190,6 +2210,10 @@ PanelWindow {
       close();
       return;
     }
+    clearSearchQuery();
+  }
+
+  function clearSearchQuery() {
     searchText = "";
     if (searchInput) searchInput.text = "";
     filterItems();
@@ -2200,6 +2224,34 @@ PanelWindow {
     if (filteredItems.length <= 0) return;
     var next = (selectedIndex + step + filteredItems.length) % filteredItems.length;
     selectedIndex = next;
+  }
+
+  function moveSelectionRelative(step) {
+    if (filteredItems.length <= 0)
+      return false;
+    var next = Math.max(0, Math.min(filteredItems.length - 1, selectedIndex + step));
+    if (next === selectedIndex)
+      return false;
+    selectedIndex = next;
+    return true;
+  }
+
+  function jumpSelectionBoundary(toEnd) {
+    if (filteredItems.length <= 0)
+      return false;
+    selectedIndex = toEnd ? (filteredItems.length - 1) : 0;
+    return true;
+  }
+
+  function pageSelection(step) {
+    if (filteredItems.length <= 0)
+      return false;
+    var pageSize = Math.max(5, Math.min(12, Math.round(hudBox.height / 72)));
+    var next = Math.max(0, Math.min(filteredItems.length - 1, selectedIndex + (step * pageSize)));
+    if (next === selectedIndex)
+      return false;
+    selectedIndex = next;
+    return true;
   }
 
   function selectWebProviderByKey(providerKey) {
@@ -2537,7 +2589,7 @@ PanelWindow {
               spacing: 2
               Text { text: "Controls"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
               Text { text: launcherRoot.tabControlHintText; color: Colors.text; font.pixelSize: Colors.fontSizeSmall }
-              Text { text: launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && launcherRoot.drunCategoryOptions.length > 1 ? "Alt+←/→ or Alt+1..9: categories • Enter: run • Esc: close" : "Enter to run • Esc to close"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; wrapMode: Text.WordWrap }
+              Text { text: launcherRoot.launcherControlHintText; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; wrapMode: Text.WordWrap }
             }
           }
         }
@@ -2587,6 +2639,10 @@ PanelWindow {
               }
               Keys.onPressed: (event) => {
                 if (event.key === Qt.Key_Escape) launcherRoot.close();
+                else if ((event.modifiers & Qt.ControlModifier) && !(event.modifiers & Qt.AltModifier) && (event.key === Qt.Key_L || event.key === Qt.Key_U)) {
+                  launcherRoot.clearSearchQuery();
+                  event.accepted = true;
+                }
                 else if (Config.launcherWebNumberHotkeysEnabled && launcherRoot.mode === "web" && (event.modifiers & Qt.ControlModifier) && !(event.modifiers & Qt.AltModifier) && !(event.modifiers & Qt.ShiftModifier)) {
                   var openSlot = launcherRoot.webProviderSlotFromKey(event.key);
                   if (openSlot > 0 && launcherRoot.executeWebProviderBySlot(openSlot)) event.accepted = true;
@@ -2602,7 +2658,19 @@ PanelWindow {
                   } else if (event.key === Qt.Key_Right) {
                     if (launcherRoot.cycleDrunCategoryFilter(1))
                       event.accepted = true;
-                  } else if (event.key === Qt.Key_0) {
+                  } else if (event.key === Qt.Key_PageUp) {
+                    if (launcherRoot.cycleDrunCategoryFilter(-1))
+                      event.accepted = true;
+                  } else if (event.key === Qt.Key_PageDown) {
+                    if (launcherRoot.cycleDrunCategoryFilter(1))
+                      event.accepted = true;
+                  } else if (event.key === Qt.Key_Home) {
+                    if (launcherRoot.jumpDrunCategoryBoundary(false))
+                      event.accepted = true;
+                  } else if (event.key === Qt.Key_End) {
+                    if (launcherRoot.jumpDrunCategoryBoundary(true))
+                      event.accepted = true;
+                  } else if (event.key === Qt.Key_0 || event.key === Qt.Key_Backspace) {
                     if (launcherRoot.setDrunCategoryFilter(""))
                       event.accepted = true;
                   } else {
@@ -2637,12 +2705,30 @@ PanelWindow {
                   else if (launcherRoot.mode === "files" && launcherRoot.stripModePrefix(launcherRoot.searchText).trim().length >= Config.launcherFileMinQueryLength && launcherRoot.filteredItems.length === 0) launcherRoot.loadFiles();
                   else if (launcherRoot.filteredItems.length === 0) launcherRoot.executeEmptyPrimary();
                   else launcherRoot.executeSelection();
+                } else if ((event.modifiers & Qt.ControlModifier) && !(event.modifiers & Qt.AltModifier) && event.key === Qt.Key_P) {
+                  if (launcherRoot.moveSelectionRelative(-1))
+                    event.accepted = true;
+                } else if ((event.modifiers & Qt.ControlModifier) && !(event.modifiers & Qt.AltModifier) && event.key === Qt.Key_N) {
+                  if (launcherRoot.moveSelectionRelative(1))
+                    event.accepted = true;
                 } else if (event.key === Qt.Key_Up) {
-                  launcherRoot.selectedIndex = Math.max(0, launcherRoot.selectedIndex - 1);
-                  event.accepted = true;
+                  if (launcherRoot.moveSelectionRelative(-1))
+                    event.accepted = true;
                 } else if (event.key === Qt.Key_Down) {
-                  launcherRoot.selectedIndex = Math.min(launcherRoot.filteredItems.length - 1, launcherRoot.selectedIndex + 1);
-                  event.accepted = true;
+                  if (launcherRoot.moveSelectionRelative(1))
+                    event.accepted = true;
+                } else if (event.key === Qt.Key_PageUp) {
+                  if (launcherRoot.pageSelection(-1))
+                    event.accepted = true;
+                } else if (event.key === Qt.Key_PageDown) {
+                  if (launcherRoot.pageSelection(1))
+                    event.accepted = true;
+                } else if (event.key === Qt.Key_Home) {
+                  if (launcherRoot.jumpSelectionBoundary(false))
+                    event.accepted = true;
+                } else if (event.key === Qt.Key_End) {
+                  if (launcherRoot.jumpSelectionBoundary(true))
+                    event.accepted = true;
                 }
               }
             }

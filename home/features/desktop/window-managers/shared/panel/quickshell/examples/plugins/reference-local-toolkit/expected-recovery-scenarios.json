@@ -1,0 +1,34 @@
+[
+  {
+    "name": "healthy-query",
+    "failureMode": "none",
+    "operation": "query",
+    "expectedState": "active",
+    "expectedCode": "",
+    "expectedMessage": ""
+  },
+  {
+    "name": "query-failure",
+    "failureMode": "query",
+    "operation": "query",
+    "expectedState": "degraded",
+    "expectedCode": "E_LAUNCHER_QUERY",
+    "expectedMessage": "Reference plugin query failure requested."
+  },
+  {
+    "name": "execute-failure",
+    "failureMode": "execute",
+    "operation": "execute",
+    "expectedState": "degraded",
+    "expectedCode": "E_LAUNCHER_EXECUTE",
+    "expectedMessage": "Reference plugin execute failure requested."
+  },
+  {
+    "name": "recovered-query",
+    "failureMode": "none",
+    "operation": "query",
+    "expectedState": "active",
+    "expectedCode": "",
+    "expectedMessage": ""
+  }
+]

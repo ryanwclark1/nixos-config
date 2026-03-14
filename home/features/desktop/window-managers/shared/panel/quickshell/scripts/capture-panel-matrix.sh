@@ -256,7 +256,7 @@ main() {
     fi
 
     printf '[INFO] Capturing settings matrix (%s)...\n' "${settings_preset}"
-    "${script_dir}/capture-settings-matrix.sh" \
+    bash "${script_dir}/capture-settings-matrix.sh" \
       --preset "${settings_preset}" \
       --delay "${settings_delay}" \
       --workspace "${workspace_target}" \
@@ -264,7 +264,7 @@ main() {
 
     if [[ -n "${deep_scroll_y}" ]]; then
       printf '[INFO] Capturing settings matrix (%s, scroll %s)...\n' "${settings_preset}" "${deep_scroll_y}"
-      "${script_dir}/capture-settings-matrix.sh" \
+      bash "${script_dir}/capture-settings-matrix.sh" \
         --preset "${settings_preset}" \
         --delay "${settings_delay}" \
         --scroll-y "${deep_scroll_y}" \
@@ -275,7 +275,7 @@ main() {
 
   if (( run_surfaces == 1 )); then
     printf '[INFO] Capturing surface matrix (%s)...\n' "${surface_crop}"
-    "${script_dir}/capture-surface-matrix.sh" \
+    bash "${script_dir}/capture-surface-matrix.sh" \
       --id "${instance_id}" \
       --crop "${surface_crop}" \
       --delay "${surface_delay}" \

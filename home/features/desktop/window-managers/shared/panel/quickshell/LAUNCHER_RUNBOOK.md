@@ -18,6 +18,7 @@ Use this guide for day-to-day launcher validation and incident triage.
   - `scripts/check-launcher-smoke.sh`
 - CI-safe launcher smoke gate:
   - `scripts/check-launcher-smoke.sh --ci`
+  - If no live QuickShell launcher instance is reachable, smoke falls back to static launcher probes and still runs benchmarks.
 
 Live launcher scripts auto-select a QuickShell instance in this order:
 1. launched from this repo’s `config/shell.qml` and exposing latest launcher IPC actions
@@ -49,11 +50,22 @@ Enable `Show Runtime Metrics` in Launcher settings.
 `Category/Keywords Weight` currently affects app ranking in `drun` mode only.
 
 In `drun` home, category quick-filter shortcuts are:
-- `Alt+Left/Alt+Right`: cycle categories
+- `Alt+Left/Alt+Right` or `Alt+PageUp/Alt+PageDown`: cycle categories
+- `Alt+Home` / `Alt+End`: jump to the first/last category
+- `Ctrl+Tab` / `Ctrl+Shift+Tab`: cycle next/previous category without changing launcher mode
 - `Alt+1..9`: jump to category slot
-- `Alt+0`: reset to `All`
+- `Alt+0` / `Alt+Backspace`: reset to `All`
 
 Use `App Category Filters` in Launcher settings to enable/disable these chips and shortcuts.
+
+Result-list navigation shortcuts:
+- `Up` / `Down`: move one result
+- `Ctrl+P` / `Ctrl+N`: move to previous/next result
+- `PageUp` / `PageDown`: jump by a visible page of results
+- `Home` / `End`: jump to first/last result
+
+Query shortcuts:
+- `Ctrl+L` / `Ctrl+U`: clear the current launcher query and keep focus in the search field
 
 - Core line:
   - `opens`, `cache`, `failures`, `filter avg/last`

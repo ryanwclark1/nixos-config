@@ -13,6 +13,7 @@ DesktopClock 1.0 DesktopClock.qml
 ElevationShadow 1.0 ElevationShadow.qml
 EmptyState 1.0 EmptyState.qml
 FilterChip 1.0 FilterChip.qml
+IconButton 1.0 IconButton.qml
 DesktopSystemStat 1.0 DesktopSystemStat.qml
 DesktopWeather 1.0 DesktopWeather.qml
 DesktopWidgets 1.0 DesktopWidgets.qml
@@ -34,6 +35,7 @@ NativeLock 1.0 NativeLock.qml
 NetworkWidget 1.0 NetworkWidget.qml
 Osd 1.0 Osd.qml
 OverscrollGlow 1.0 OverscrollGlow.qml
+PrivacySourceRow 1.0 PrivacySourceRow.qml
 PulseButton 1.0 PulseButton.qml
 Ref 1.0 Ref.qml
 ScratchpadIndicator 1.0 ScratchpadIndicator.qml
@@ -42,6 +44,7 @@ SectionLabel 1.0 SectionLabel.qml
 ScreenBorder 1.0 ScreenBorder.qml
 SliderTrack 1.0 SliderTrack.qml
 StateLayer 1.0 StateLayer.qml
+StatusChip 1.0 StatusChip.qml
 Toast 1.0 Toast.qml
 ToastOverlay 1.0 ToastOverlay.qml
 TrayWidget 1.0 TrayWidget.qml

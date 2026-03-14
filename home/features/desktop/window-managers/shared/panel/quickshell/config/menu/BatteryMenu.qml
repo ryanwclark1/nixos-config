@@ -9,10 +9,8 @@ import "../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  readonly property int availablePopupWidth: screen ? Math.max(300, screen.width - 40) : 340
-  readonly property bool compactMode: availablePopupWidth < 330
+  popupMinWidth: 300; popupMaxWidth: 340; compactThreshold: 330
   readonly property int detailColumns: compactMode ? 1 : 2
-  implicitWidth: Math.min(340, availablePopupWidth)
   implicitHeight: compactMode ? 430 : 380
   title: "Battery"
   toggleMethod: "toggleBatteryMenu"
@@ -20,12 +18,16 @@ BasePopupMenu {
   property var device: UPower.displayDevice
   property bool hasBattery: device != null && device.isPresent && (device.kind === UPower.DeviceKindDisplayDevice || device.kind === UPower.DeviceKindBattery)
   property string currentProfile: "balanced"
+  property bool powerProfilesAvailable: false
 
   function refreshProfile() {
-    profilePoll.poll();
+    powerProfilesCheck.poll();
+    if (root.powerProfilesAvailable)
+      profilePoll.poll();
   }
 
   function setProfile(profile) {
+    if (!root.powerProfilesAvailable) return;
     Quickshell.execDetached(["powerprofilesctl", "set", profile]);
     root.currentProfile = profile;
   }
@@ -70,9 +72,18 @@ BasePopupMenu {
   }
 
   SharedWidgets.CommandPoll {
+    id: powerProfilesCheck
+    interval: 30000
+    running: root.visible
+    command: ["sh", "-c", "command -v powerprofilesctl >/dev/null 2>&1 && echo true || echo false"]
+    parse: function(out) { return String(out || "").trim() === "true"; }
+    onUpdated: root.powerProfilesAvailable = !!powerProfilesCheck.value
+  }
+
+  SharedWidgets.CommandPoll {
     id: profilePoll
     interval: 5000
-    running: root.visible
+    running: root.visible && root.powerProfilesAvailable
     command: ["powerprofilesctl", "get"]
     onUpdated: { if (profilePoll.value) root.currentProfile = profilePoll.value; }
   }
@@ -85,11 +96,10 @@ BasePopupMenu {
     Layout.fillHeight: true
     visible: !root.hasBattery
 
-    Text {
+    SharedWidgets.EmptyState {
       anchors.centerIn: parent
-      text: "No battery detected"
-      color: Colors.textDisabled
-      font.pixelSize: Colors.fontSizeLarge
+      icon: "󰂑"
+      message: "No battery detected"
     }
   }
 
@@ -199,11 +209,14 @@ BasePopupMenu {
     }
 
     // Power profiles
-    SharedWidgets.SectionLabel { label: "POWER PROFILE" }
+    SharedWidgets.SectionLabel {
+      label: root.powerProfilesAvailable ? "POWER PROFILE" : "POWER PROFILE UNAVAILABLE"
+    }
 
     RowLayout {
       Layout.fillWidth: true
       spacing: Colors.spacingS
+      visible: root.powerProfilesAvailable
 
       Repeater {
         model: [
@@ -219,6 +232,15 @@ BasePopupMenu {
           onClicked: root.setProfile(modelData.id)
         }
       }
+    }
+
+    Text {
+      Layout.fillWidth: true
+      visible: !root.powerProfilesAvailable
+      text: "powerprofilesctl is not available on this system."
+      color: Colors.textDisabled
+      font.pixelSize: Colors.fontSizeSmall
+      wrapMode: Text.WordWrap
     }
 
     Item { Layout.fillHeight: true }

@@ -9,6 +9,21 @@ printf '[INFO] Running plugin conformance checks...\n'
 printf '[INFO] Running plugin doctor smoke checks...\n'
 "${script_dir}/check-plugin-doctor-smoke.sh"
 
+printf '[INFO] Running plugin reference local checks...\n'
+"${script_dir}/check-plugin-reference-local.sh"
+
+printf '[INFO] Running plugin reference contract checks...\n'
+"${script_dir}/check-plugin-reference-contracts.sh"
+
+printf '[INFO] Running plugin reference fixture checks...\n'
+"${script_dir}/check-plugin-reference-fixtures.sh"
+
+printf '[INFO] Running plugin reference recovery checks...\n'
+"${script_dir}/check-plugin-reference-recovery.sh"
+
+printf '[INFO] Running plugin reference diagnostics checks...\n'
+"${script_dir}/check-plugin-reference-diagnostics.sh"
+
 printf '[INFO] Running plugin runtime guard checks...\n'
 "${script_dir}/check-plugin-runtime-guards.sh"
 

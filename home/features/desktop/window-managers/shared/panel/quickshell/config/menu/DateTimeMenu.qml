@@ -7,9 +7,7 @@ import "../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  readonly property int availablePopupWidth: screen ? Math.max(340, screen.width - 40) : 560
-  readonly property bool compactMode: availablePopupWidth < 520
-  implicitWidth: Math.min(560, availablePopupWidth)
+  popupMinWidth: 340; popupMaxWidth: 560; compactThreshold: 520
   implicitHeight: compactMode ? 620 : 560
   title: "Date & Time"
   subtitle: Qt.formatDateTime(clock.date, "dddd, MMMM d")

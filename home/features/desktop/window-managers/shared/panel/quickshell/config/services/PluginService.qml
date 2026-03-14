@@ -235,7 +235,9 @@ QtObject {
       var raw = fv.text();
       if (raw && String(raw).trim() !== "")
         envelope = _normalizeStateEnvelope(JSON.parse(raw));
-    } catch (e) {}
+    } catch (e) {
+      console.warn("PluginService: state parse error:", e);
+    }
     fv.destroy();
     return envelope;
   }
@@ -404,7 +406,9 @@ QtObject {
       try {
         if (launcherProviderInstances[pid].shutdown)
           launcherProviderInstances[pid].shutdown();
-      } catch (e) {}
+      } catch (e) {
+        console.warn("PluginService: shutdown error:", pid, e);
+      }
       launcherProviderInstances[pid].destroy();
     }
 
@@ -474,7 +478,9 @@ QtObject {
       try {
         if (daemonInstances[pid].stop)
           daemonInstances[pid].stop();
-      } catch (e) {}
+      } catch (e) {
+        console.warn("PluginService: daemon stop error:", pid, e);
+      }
       daemonInstances[pid].destroy();
     }
 

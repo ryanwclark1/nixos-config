@@ -47,42 +47,19 @@ PanelWindow {
 
   property var manager: null
   property bool showContent: false
-  property var pendingPowerCmd: null
   property int pendingPowerIndex: -1
-  property var previousFocusedToplevel: null
   signal closeRequested()
 
-  function focusedToplevel() {
-    if (typeof ToplevelManager !== "undefined" && ToplevelManager.activeToplevel) {
-      return ToplevelManager.activeToplevel;
-    }
-    return null;
-  }
-
   onShowContentChanged: {
-    if (showContent) {
-      root.previousFocusedToplevel = focusedToplevel();
-    } else {
+    if (!showContent) {
       if (sidebarContent.activeFocus) sidebarContent.focus = false;
-      if (root.previousFocusedToplevel) restoreFocusTimer.restart();
-    }
-  }
-
-  Timer {
-    id: restoreFocusTimer
-    interval: 60
-    repeat: false
-    onTriggered: {
-      if (!root.previousFocusedToplevel) return;
-      if (root.previousFocusedToplevel.activate) root.previousFocusedToplevel.activate();
-      root.previousFocusedToplevel = null;
     }
   }
 
   Timer {
     id: powerConfirmTimer
     interval: 3000
-    onTriggered: { root.pendingPowerCmd = null; root.pendingPowerIndex = -1; }
+    onTriggered: root.pendingPowerIndex = -1
   }
   visible: {
     if (surfaceEdge === "right") return showContent || sidebarContent.x < panelWidth;
@@ -122,28 +99,13 @@ PanelWindow {
         Layout.fillWidth: true
         Text { text: "Command Center"; color: Colors.text; font.pixelSize: Colors.fontSizeHuge; font.weight: Font.DemiBold; font.letterSpacing: -0.5 }
         Item { Layout.fillWidth: true }
-        Rectangle {
-          width: 32; height: 32; radius: height / 2; color: "transparent"
-          Text { anchors.centerIn: parent; text: "󰒓"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL }
-          SharedWidgets.StateLayer {
-            id: settingsStateLayer
-            hovered: settingsHover.containsMouse
-            pressed: settingsHover.pressed
-          }
-          MouseArea {
-            id: settingsHover; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-            onClicked: (mouse) => { settingsStateLayer.burst(mouse.x, mouse.y); root.closeRequested(); Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "toggle"]); }
-          }
+        SharedWidgets.IconButton {
+          icon: "󰒓"; size: 32; iconSize: Colors.fontSizeXL
+          onClicked: { root.closeRequested(); Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "toggle"]); }
         }
-        Rectangle {
-          width: 32; height: 32; radius: height / 2; color: "transparent"
-          Text { anchors.centerIn: parent; text: "󰅖"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL }
-          SharedWidgets.StateLayer {
-            id: closeStateLayer
-            hovered: closeHover.containsMouse
-            pressed: closeHover.pressed
-          }
-          MouseArea { id: closeHover; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: (mouse) => { closeStateLayer.burst(mouse.x, mouse.y); root.closeRequested(); } }
+        SharedWidgets.IconButton {
+          icon: "󰅖"; size: 32; iconSize: Colors.fontSizeXL
+          onClicked: root.closeRequested()
         }
       }
 
@@ -475,11 +437,9 @@ PanelWindow {
                 }
                 if (root.pendingPowerIndex === index) {
                   Quickshell.execDetached(modelData.cmd);
-                  root.pendingPowerCmd = null;
                   root.pendingPowerIndex = -1;
                   powerConfirmTimer.stop();
                 } else {
-                  root.pendingPowerCmd = modelData.cmd;
                   root.pendingPowerIndex = index;
                   powerConfirmTimer.restart();
                 }

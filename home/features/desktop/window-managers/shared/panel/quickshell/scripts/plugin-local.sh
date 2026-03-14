@@ -4,22 +4,88 @@ set -euo pipefail
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 mode="${1:-quick}"
+reference_dir_name="reference-local-toolkit"
+reference_plugin_id="reference.local.toolkit"
+reference_source_dir="$(cd "${script_dir}/../examples/plugins/${reference_dir_name}" 2>/dev/null && pwd || true)"
+reference_state_fixture="${reference_source_dir}/expected-state-envelope.json"
+reference_settings_fixture="${reference_source_dir}/expected-settings.json"
+reference_recovery_fixture="${reference_source_dir}/expected-recovery-scenarios.json"
+reference_diag_active_fixture="${reference_source_dir}/expected-diagnostics-active.json"
+reference_diag_degraded_fixture="${reference_source_dir}/expected-diagnostics-degraded.json"
+
+health_label() {
+  local ok="$1"
+  local label="$2"
+  if [[ "$ok" == "1" ]]; then
+    printf 'ok: %s' "$label"
+  else
+    printf 'missing: %s' "$label"
+  fi
+}
+
+reference_guard_commands() {
+  cat <<EOF
+${script_dir}/plugin-local.sh reference-status --check --quiet
+${script_dir}/check-plugin-reference-local.sh
+${script_dir}/check-plugin-reference-contracts.sh
+${script_dir}/check-plugin-reference-fixtures.sh
+${script_dir}/check-plugin-reference-recovery.sh
+${script_dir}/check-plugin-reference-diagnostics.sh
+EOF
+}
+
+reference_guard_label() {
+  local guard_cmd="$1"
+  case "$guard_cmd" in
+    *"reference-status --check --quiet")
+      printf '%s' 'reference plugin preflight'
+      ;;
+    *"check-plugin-reference-local.sh")
+      printf '%s' 'reference plugin install/smoke/remove checks'
+      ;;
+    *"check-plugin-reference-contracts.sh")
+      printf '%s' 'reference plugin contract checks'
+      ;;
+    *"check-plugin-reference-fixtures.sh")
+      printf '%s' 'reference plugin fixture checks'
+      ;;
+    *"check-plugin-reference-recovery.sh")
+      printf '%s' 'reference plugin recovery checks'
+      ;;
+    *"check-plugin-reference-diagnostics.sh")
+      printf '%s' 'reference plugin diagnostics checks'
+      ;;
+    *)
+      printf '%s' 'reference plugin guard'
+      ;;
+  esac
+}
 
 usage() {
   cat <<'EOF'
 Usage:
-  plugin-local.sh [quick|full|doctor] [plugins_dir]
+  plugin-local.sh [quick|full|doctor|install-reference|remove-reference|smoke-reference|reference-flow|reference-export|reference-status|reference-files|reference-guards|reference-all] [plugins_dir|--check|--quiet]
 
 Modes:
-  quick   Run fast local plugin guardrails (default)
-  full    Run complete local plugin verification gate
-  doctor  Run plugin doctor against optional plugins_dir
+  quick              Run fast local plugin guardrails (default)
+  full               Run complete local plugin verification gate
+  doctor             Run plugin doctor against optional plugins_dir
+  install-reference  Link the repo-tracked reference plugin into plugins_dir
+  remove-reference   Remove the linked reference plugin from plugins_dir
+  smoke-reference    Validate the installed reference plugin in isolation
+  reference-flow     Print the manual reference-plugin validation sequence
+  reference-export   Print the reference diagnostics export paths and fixtures
+  reference-status   Print a combined local reference-plugin status summary (`--check` fails on unhealthy prerequisites, `--quiet` suppresses the dashboard and prints one-line status)
+  reference-files    Print canonical reference toolkit file and guard paths only
+  reference-guards   Print runnable reference toolkit guard commands in order
+  reference-all      Run the full reference-toolkit guard sequence (`--quiet` suppresses stage headings)
 EOF
 }
 
 case "$mode" in
   quick)
     printf '[INFO] Local quick plugin checks...\n'
+    "${script_dir}/plugin-local.sh" reference-all
     "${script_dir}/check-plugin-runtime-guards.sh"
     "${script_dir}/check-plugin-diagnostics-contracts.sh"
     "${script_dir}/sync-plugin-diagnostics-schema.sh" --check
@@ -34,6 +100,266 @@ case "$mode" in
     target="${2:-${HOME}/.config/quickshell/plugins}"
     printf '[INFO] Running plugin doctor for %s...\n' "$target"
     "${script_dir}/plugin-doctor.sh" "$target"
+    ;;
+  install-reference)
+    target="${2:-${HOME}/.config/quickshell/plugins}"
+    destination="${target}/${reference_dir_name}"
+    if [[ ! -d "$reference_source_dir" ]]; then
+      echo "[FAIL] Missing reference plugin source: ${reference_source_dir}" >&2
+      exit 1
+    fi
+    mkdir -p "$target"
+    if [[ -e "$destination" && ! -L "$destination" ]]; then
+      echo "[FAIL] Refusing to overwrite non-symlink path: ${destination}" >&2
+      exit 1
+    fi
+    if [[ -L "$destination" ]]; then
+      current_target="$(readlink "$destination" || true)"
+      if [[ "$current_target" == "$reference_source_dir" ]]; then
+        printf '[INFO] Reference plugin already linked at %s\n' "$destination"
+        exit 0
+      fi
+      echo "[FAIL] Refusing to replace symlink with different target: ${destination}" >&2
+      exit 1
+    fi
+    ln -s "$reference_source_dir" "$destination"
+    printf '[INFO] Installed reference plugin at %s\n' "$destination"
+    ;;
+  remove-reference)
+    target="${2:-${HOME}/.config/quickshell/plugins}"
+    destination="${target}/${reference_dir_name}"
+    if [[ ! -e "$destination" ]]; then
+      printf '[INFO] Reference plugin is not installed at %s\n' "$destination"
+      exit 0
+    fi
+    if [[ ! -L "$destination" ]]; then
+      echo "[FAIL] Refusing to remove non-symlink path: ${destination}" >&2
+      exit 1
+    fi
+    rm "$destination"
+    printf '[INFO] Removed reference plugin from %s\n' "$destination"
+    ;;
+  smoke-reference)
+    target="${2:-${HOME}/.config/quickshell/plugins}"
+    destination="${target}/${reference_dir_name}"
+    manifest_path="${destination}/manifest.json"
+    tmp_plugins="$(mktemp -d)"
+    tmp_json="$(mktemp)"
+    trap 'rm -rf "$tmp_plugins" "$tmp_json"' EXIT
+    if [[ ! -f "$manifest_path" ]]; then
+      echo "[FAIL] Reference plugin manifest not found: ${manifest_path}" >&2
+      exit 1
+    fi
+    if ! jq -e --arg id "$reference_plugin_id" '.id == $id' "$manifest_path" >/dev/null 2>&1; then
+      echo "[FAIL] Reference plugin manifest has unexpected id: ${manifest_path}" >&2
+      exit 1
+    fi
+    cp -RL "$destination" "${tmp_plugins}/${reference_dir_name}"
+    "${script_dir}/plugin-doctor.sh" --json "$tmp_plugins" > "$tmp_json"
+    jq -e --arg name "$reference_dir_name" '
+      .summary.fail == 0
+      and .summary.pass == 1
+      and ([.entries[] | select(.status == "PASS" and .name == $name)] | length) == 1
+    ' "$tmp_json" >/dev/null 2>&1
+    printf '[INFO] Reference plugin smoke passed for %s\n' "$destination"
+    ;;
+  reference-flow)
+    cat <<'EOF'
+Reference Plugin Manual Flow
+
+1. Run `scripts/plugin-local.sh install-reference` and `scripts/plugin-local.sh smoke-reference`.
+2. Open Settings -> Plugins, confirm `Reference Local Toolkit` is present and enabled, then run `scripts/plugin-local.sh quick`.
+3. Open launcher mode and query `!ref`, then run the `Increment`, `Reset`, and `Summary` actions.
+4. Open the reference plugin settings page, cycle `Label`, toggle `Show Updated Marker`, and confirm the bar widget reflects the changes.
+5. Set `Failure Mode` to `query`, re-run `!ref`, and confirm the plugin becomes `Degraded` with `E_LAUNCHER_QUERY`.
+6. Use `Copy Diagnostics` and `Save Diagnostics`, then verify the exported payload shows `reference.local.toolkit` with degraded runtime metadata.
+7. Set `Failure Mode` back to `none`, re-run `!ref`, and confirm the plugin returns to `Active`.
+8. Repeat with `Failure Mode` set to `execute`, trigger an item, and confirm `E_LAUNCHER_EXECUTE`, then recover back to `none`.
+9. Finish with `scripts/plugin-local.sh full` and `scripts/plugin-local.sh remove-reference`.
+EOF
+    ;;
+  reference-export)
+    cat <<EOF
+Reference Plugin Diagnostics Export
+
+Saved diagnostics directory:
+  ${HOME}/.local/state/quickshell/plugin-diagnostics/
+
+Reference fixtures:
+  active export: ${reference_source_dir}/expected-diagnostics-active.json
+  degraded export: ${reference_source_dir}/expected-diagnostics-degraded.json
+
+Expected reference plugin id:
+  ${reference_plugin_id}
+
+Exported payload fields:
+  schemaVersion
+  generatedAt
+  summary.installed
+  summary.enabled
+  summary.invalidManifests
+  summary.statuses.{active,enabled,degraded,failed,disabled,validated,discovered,unknown}
+  plugins[].{id,name,version,type,enabled,author,permissions,entryPoints,runtime}
+  plugins[].runtime.{state,stateLabel,stateSeverity,code,codeLabel,codeSeverity,message,updatedAt}
+  manifestErrors[]
+
+Manual export actions:
+  Settings -> Plugins -> Copy Diagnostics
+  Settings -> Plugins -> Save Diagnostics
+EOF
+    ;;
+  reference-status)
+    target="${2:-${HOME}/.config/quickshell/plugins}"
+    check_only=0
+    quiet=0
+    if [[ "${2:-}" == "--check" ]]; then
+      target="${HOME}/.config/quickshell/plugins"
+      check_only=1
+      if [[ "${3:-}" == "--quiet" ]]; then
+        quiet=1
+      fi
+    elif [[ "${3:-}" == "--check" ]]; then
+      check_only=1
+      if [[ "${4:-}" == "--quiet" ]]; then
+        quiet=1
+      fi
+    elif [[ "${2:-}" == "--quiet" ]]; then
+      target="${HOME}/.config/quickshell/plugins"
+      quiet=1
+      if [[ "${3:-}" == "--check" ]]; then
+        check_only=1
+      fi
+    elif [[ "${3:-}" == "--quiet" ]]; then
+      quiet=1
+    fi
+    destination="${target}/${reference_dir_name}"
+    health_failures=0
+    if [[ -d "$reference_source_dir" ]]; then
+      source_health="$(health_label 1 "reference plugin source")"
+    else
+      source_health="$(health_label 0 "reference plugin source")"
+      health_failures=$((health_failures + 1))
+    fi
+    if [[ -f "$reference_state_fixture" && -f "$reference_settings_fixture" && -f "$reference_recovery_fixture" && -f "$reference_diag_active_fixture" && -f "$reference_diag_degraded_fixture" ]]; then
+      fixture_health="$(health_label 1 "reference fixtures")"
+    else
+      fixture_health="$(health_label 0 "reference fixtures")"
+      health_failures=$((health_failures + 1))
+    fi
+    if [[ -x "${script_dir}/check-plugin-reference-local.sh" && -x "${script_dir}/check-plugin-reference-contracts.sh" && -x "${script_dir}/check-plugin-reference-fixtures.sh" && -x "${script_dir}/check-plugin-reference-recovery.sh" && -x "${script_dir}/check-plugin-reference-diagnostics.sh" ]]; then
+      guard_health="$(health_label 1 "reference guard scripts")"
+    else
+      guard_health="$(health_label 0 "reference guard scripts")"
+      health_failures=$((health_failures + 1))
+    fi
+    if [[ -L "$destination" ]]; then
+      install_health="$(health_label 1 "reference plugin installed as symlink")"
+    elif [[ -e "$destination" ]]; then
+      install_health="warning: reference plugin path is present but not a symlink"
+    else
+      install_health="info: reference plugin not installed"
+    fi
+    if [[ -L "$destination" ]]; then
+      install_state="installed (symlink)"
+    elif [[ -e "$destination" ]]; then
+      install_state="present (non-symlink)"
+    else
+      install_state="not installed"
+    fi
+    if (( quiet == 0 )); then
+      cat <<EOF
+Reference Plugin Local Status
+
+Install state:
+  ${install_state}
+  target path: ${destination}
+  source path: ${reference_source_dir}
+  plugin id: ${reference_plugin_id}
+
+Health summary:
+  ${source_health}
+  ${fixture_health}
+  ${guard_health}
+  ${install_health}
+
+Local commands:
+  install:  scripts/plugin-local.sh install-reference ${target}
+  smoke:    scripts/plugin-local.sh smoke-reference ${target}
+  remove:   scripts/plugin-local.sh remove-reference ${target}
+  quick:    scripts/plugin-local.sh quick
+  full:     scripts/plugin-local.sh full
+  flow:     scripts/plugin-local.sh reference-flow
+  export:   scripts/plugin-local.sh reference-export
+
+Reference fixtures:
+  state:      ${reference_state_fixture}
+  settings:   ${reference_settings_fixture}
+  recovery:   ${reference_recovery_fixture}
+  diag-active:${reference_diag_active_fixture}
+  diag-degr.: ${reference_diag_degraded_fixture}
+
+Reference guards:
+  scripts/check-plugin-reference-local.sh
+  scripts/check-plugin-reference-contracts.sh
+  scripts/check-plugin-reference-fixtures.sh
+  scripts/check-plugin-reference-recovery.sh
+  scripts/check-plugin-reference-diagnostics.sh
+
+Diagnostics export:
+  saved path: ${HOME}/.local/state/quickshell/plugin-diagnostics/
+  UI actions: Settings -> Plugins -> Copy Diagnostics / Save Diagnostics
+EOF
+    else
+      printf '[INFO] Reference status: %s | %s | %s | %s\n' \
+        "$source_health" \
+        "$fixture_health" \
+        "$guard_health" \
+        "$install_health"
+    fi
+    if (( check_only == 1 )); then
+      if (( health_failures == 0 )); then
+        printf '[INFO] Reference status check passed.\n'
+      else
+        printf '[FAIL] Reference status check failed: %d prerequisite issue(s).\n' "$health_failures" >&2
+        exit 1
+      fi
+    fi
+    ;;
+  reference-files)
+    cat <<EOF
+source_dir=${reference_source_dir}
+plugin_id=${reference_plugin_id}
+state_fixture=${reference_state_fixture}
+settings_fixture=${reference_settings_fixture}
+recovery_fixture=${reference_recovery_fixture}
+diagnostics_active_fixture=${reference_diag_active_fixture}
+diagnostics_degraded_fixture=${reference_diag_degraded_fixture}
+guard_local=${script_dir}/check-plugin-reference-local.sh
+guard_contracts=${script_dir}/check-plugin-reference-contracts.sh
+guard_fixtures=${script_dir}/check-plugin-reference-fixtures.sh
+guard_recovery=${script_dir}/check-plugin-reference-recovery.sh
+guard_diagnostics=${script_dir}/check-plugin-reference-diagnostics.sh
+EOF
+    ;;
+  reference-guards)
+    reference_guard_commands
+    ;;
+  reference-all)
+    quiet=0
+    if [[ "${2:-}" == "--quiet" ]]; then
+      quiet=1
+    fi
+    while IFS= read -r guard_cmd; do
+      [[ -n "$guard_cmd" ]] || continue
+      read -r -a guard_parts <<< "$guard_cmd"
+      if (( quiet == 0 )); then
+        printf '[INFO] Running %s...\n' "$(reference_guard_label "$guard_cmd")"
+      fi
+      "${guard_parts[@]}"
+    done < <(reference_guard_commands)
+    if (( quiet == 0 )); then
+      printf '[INFO] Reference plugin checks passed.\n'
+    fi
     ;;
   -h|--help|help)
     usage

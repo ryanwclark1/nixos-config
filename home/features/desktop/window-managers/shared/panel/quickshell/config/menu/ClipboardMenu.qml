@@ -7,9 +7,7 @@ import "../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  readonly property int availablePopupWidth: screen ? Math.max(320, screen.width - 40) : 360
-  readonly property bool compactMode: availablePopupWidth < 350
-  implicitWidth: Math.min(360, availablePopupWidth)
+  popupMaxWidth: 360; compactThreshold: 350
   implicitHeight: compactMode ? 520 : 480
   title: "Clipboard"
   toggleMethod: "toggleClipboardMenu"
@@ -50,33 +48,11 @@ BasePopupMenu {
   }
 
   headerExtras: [
-    Rectangle {
-      width: 30; height: 30; radius: height / 2
-      color: "transparent"
-      Text {
-        anchors.centerIn: parent
-        text: "󰃢"
-        color: clearAllHover.containsMouse ? Colors.error : Colors.textSecondary
-        Behavior on color { ColorAnimation { duration: 160 } }
-        font.family: Colors.fontMono
-        font.pixelSize: Colors.fontSizeLarge
-      }
-      SharedWidgets.StateLayer {
-        id: clearAllStateLayer
-        hovered: clearAllHover.containsMouse
-        pressed: clearAllHover.pressed
-        stateColor: Colors.error
-      }
-      MouseArea {
-        id: clearAllHover
-        anchors.fill: parent
-        hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        onClicked: (mouse) => {
-          clearAllStateLayer.burst(mouse.x, mouse.y);
-          Quickshell.execDetached(["sh", "-c", "cliphist wipe"]);
-          root.clipboardItems = [];
-        }
+    SharedWidgets.IconButton {
+      icon: "󰃢"
+      onClicked: {
+        Quickshell.execDetached(["sh", "-c", "cliphist wipe"]);
+        root.clipboardItems = [];
       }
     }
   ]

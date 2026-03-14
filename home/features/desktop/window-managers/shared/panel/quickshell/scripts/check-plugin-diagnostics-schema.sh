@@ -5,6 +5,7 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 fixtures_dir="${script_dir}/../fixtures/plugins"
 doctor_script="${script_dir}/plugin-doctor.sh"
 schema_file="${script_dir}/../config/plugins/diagnostics.schema.json"
+schema_validator="${script_dir}/validate-json-schema.js"
 
 pass_count=0
 fail_count=0
@@ -19,21 +20,13 @@ fail() {
   fail_count=$((fail_count + 1))
 }
 
-run_ajv() {
-  if command -v ajv >/dev/null 2>&1; then
-    ajv "$@"
-    return
-  fi
-  if command -v npx >/dev/null 2>&1; then
-    npx --yes ajv-cli "$@"
-    return
-  fi
-  echo "[FAIL] ajv is required (install ajv-cli or provide npx)." >&2
-  return 1
-}
-
 if ! command -v jq >/dev/null 2>&1; then
   echo '[FAIL] jq is required for diagnostics schema checks' >&2
+  exit 1
+fi
+
+if ! command -v node >/dev/null 2>&1; then
+  echo '[FAIL] node is required for diagnostics schema checks' >&2
   exit 1
 fi
 
@@ -44,6 +37,11 @@ fi
 
 if [[ ! -f "$schema_file" ]]; then
   echo "[FAIL] Missing diagnostics schema file: ${schema_file}" >&2
+  exit 1
+fi
+
+if [[ ! -f "$schema_validator" ]]; then
+  echo "[FAIL] Missing schema validator script: ${schema_validator}" >&2
   exit 1
 fi
 
@@ -119,31 +117,31 @@ jq -n '{
 jq 'del(.manifestErrors)' "$ui_json" >"$ui_invalid_json"
 jq '.plugins[0].entryPoints.unknown = "Nope.qml"' "$ui_json" >"$ui_plugin_bad_entrypoint_json"
 
-if run_ajv validate --spec=draft2019 -s "$doctor_schema" -d "$doctor_json" >/dev/null 2>&1; then
+if node "$schema_validator" "$doctor_schema" "$doctor_json" >/dev/null 2>&1; then
   pass "doctor diagnostics payload validates against schema"
 else
   fail "doctor diagnostics payload failed schema validation"
 fi
 
-if run_ajv validate --spec=draft2019 -s "$doctor_schema" -d "$doctor_invalid_json" >/dev/null 2>&1; then
+if node "$schema_validator" "$doctor_schema" "$doctor_invalid_json" >/dev/null 2>&1; then
   fail "invalid doctor diagnostics sample should fail schema validation"
 else
   pass "invalid doctor diagnostics sample is rejected by schema"
 fi
 
-if run_ajv validate --spec=draft2019 -s "$ui_schema" -d "$ui_json" >/dev/null 2>&1; then
+if node "$schema_validator" "$ui_schema" "$ui_json" >/dev/null 2>&1; then
   pass "ui diagnostics payload sample validates against schema"
 else
   fail "ui diagnostics payload sample failed schema validation"
 fi
 
-if run_ajv validate --spec=draft2019 -s "$ui_schema" -d "$ui_invalid_json" >/dev/null 2>&1; then
+if node "$schema_validator" "$ui_schema" "$ui_invalid_json" >/dev/null 2>&1; then
   fail "invalid ui diagnostics sample should fail schema validation"
 else
   pass "invalid ui diagnostics sample is rejected by schema"
 fi
 
-if run_ajv validate --spec=draft2019 -s "$ui_schema" -d "$ui_plugin_bad_entrypoint_json" >/dev/null 2>&1; then
+if node "$schema_validator" "$ui_schema" "$ui_plugin_bad_entrypoint_json" >/dev/null 2>&1; then
   fail "ui diagnostics sample with unknown entryPoints key should fail schema validation"
 else
   pass "ui diagnostics sample rejects unknown entryPoints keys"

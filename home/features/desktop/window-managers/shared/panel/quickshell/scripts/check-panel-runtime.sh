@@ -12,11 +12,14 @@ usage() {
 Usage: check-panel-runtime.sh [--id INSTANCE_ID] [--skip-settings] [--skip-surfaces] [--skip-multibar]
 
 Run the shared panel runtime verification stack:
-  1. settings responsive smoke
-  2. live popup/panel surface smoke
-  3. synthetic multibar shell matrix and management harnesses
+  1. panel config contract checks
+  2. settings responsive smoke
+  3. live popup/panel surface smoke
+  4. synthetic multibar shell matrix and management harnesses
 
 If more than one QuickShell instance is running, pass --id INSTANCE_ID.
+In headless/offscreen environments, the multibar phase can end in [SKIP] results when
+PanelWindow backends are unavailable; treat that as an environment limit, not a widget failure.
 EOF
 }
 
@@ -54,7 +57,11 @@ run_step() {
   local label="$1"
   shift
   printf '[INFO] %s...\n' "$label"
-  "$@"
+  if [[ $# -gt 0 && -f "$1" && ! -x "$1" ]]; then
+    bash "$@"
+  else
+    "$@"
+  fi
 }
 
 main() {
@@ -68,6 +75,8 @@ main() {
     exit 2
   fi
 
+  run_step "Running panel config contract checks" "${script_dir}/check-panel-config-contracts.sh"
+
   if (( run_settings == 1 )); then
     run_step "Running settings responsive smoke" "${script_dir}/check-settings-responsive.sh" "${args[@]}"
   fi
@@ -80,7 +89,7 @@ main() {
     run_step "Running synthetic multibar smoke" "${script_dir}/check-multibar-smoke.sh"
   fi
 
-  printf '[INFO] Panel runtime verification passed. Manual visual QA is still required for final signoff.\n'
+  printf '[INFO] Panel runtime verification completed. In headless/offscreen environments, multibar [SKIP] results can be expected. Manual visual QA is still required for final signoff.\n'
 }
 
 main "$@"

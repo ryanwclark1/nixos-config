@@ -133,6 +133,15 @@ if [[ "${build_only}" -eq 1 ]]; then
   exit 0
 fi
 
+qemu_opts="${QEMU_OPTS:-}"
+# Niri needs a DRM-capable virtio GPU in QEMU; the default VGA device leaves it
+# with no real outputs and only placeholder screens.
+default_qemu_opts="-vga none -device virtio-vga-gl -display gtk,gl=on"
+if [[ -z "${qemu_opts}" ]]; then
+  qemu_opts="${default_qemu_opts}"
+  echo "[INFO] Using default QEMU graphics options for compositor testing: ${qemu_opts}"
+fi
+
 qemu_net_opts="${QEMU_NET_OPTS:-}"
 if [[ -n "${ssh_port}" ]]; then
   ssh_forward="hostfwd=tcp::${ssh_port}-:22"
@@ -145,4 +154,4 @@ if [[ -n "${ssh_port}" ]]; then
 fi
 
 echo "[INFO] Launching VM..."
-exec env NIX_DISK_IMAGE="${disk_image}" QEMU_NET_OPTS="${qemu_net_opts}" "${runner}" "${runner_args[@]}"
+exec env NIX_DISK_IMAGE="${disk_image}" QEMU_OPTS="${qemu_opts}" QEMU_NET_OPTS="${qemu_net_opts}" "${runner}" "${runner_args[@]}"

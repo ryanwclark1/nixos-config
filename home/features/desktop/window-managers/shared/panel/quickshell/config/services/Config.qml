@@ -438,7 +438,15 @@ QtObject {
   }
 
   function createWidgetInstance(widgetType, initialSettings) {
-    var settingsCopy = initialSettings ? JSON.parse(JSON.stringify(initialSettings)) : {};
+    var defaults = {};
+    if (BarWidgetRegistry && BarWidgetRegistry.defaultSettings)
+      defaults = BarWidgetRegistry.defaultSettings(widgetType);
+    var settingsCopy = JSON.parse(JSON.stringify(defaults));
+    if (initialSettings) {
+      var provided = JSON.parse(JSON.stringify(initialSettings));
+      for (var key in provided)
+        settingsCopy[key] = provided[key];
+    }
     return {
       instanceId: generateId("widget"),
       widgetType: widgetType,
@@ -537,23 +545,33 @@ QtObject {
     return item && item.settings ? JSON.parse(JSON.stringify(item.settings)) : {};
   }
 
+  function normalizedWidgetSettings(widgetType, item) {
+    var defaults = {};
+    if (BarWidgetRegistry && BarWidgetRegistry.defaultSettings)
+      defaults = BarWidgetRegistry.defaultSettings(widgetType);
+    var merged = JSON.parse(JSON.stringify(defaults));
+    var current = cloneWidgetSettings(item);
+    for (var key in current)
+      merged[key] = current[key];
+    return merged;
+  }
+
   function normalizeWidgetInstances(item) {
     var widgetType = item && item.widgetType ? item.widgetType : (item && item.widgetId ? item.widgetId : "");
     if ((typeof item === "string" && item === "systemMonitor") || widgetType === "systemMonitor") {
       var enabled = item && item.enabled !== undefined ? !!item.enabled : true;
-      var settings = cloneWidgetSettings(item);
       return [
         {
           instanceId: generateId("widget"),
           widgetType: "cpuStatus",
           enabled: enabled,
-          settings: JSON.parse(JSON.stringify(settings))
+          settings: normalizedWidgetSettings("cpuStatus", item)
         },
         {
           instanceId: generateId("widget"),
           widgetType: "ramStatus",
           enabled: enabled,
-          settings: JSON.parse(JSON.stringify(settings))
+          settings: normalizedWidgetSettings("ramStatus", item)
         }
       ];
     }
@@ -569,7 +587,7 @@ QtObject {
       instanceId: item && item.instanceId ? item.instanceId : generateId("widget"),
       widgetType: widgetType,
       enabled: item && item.enabled !== undefined ? !!item.enabled : true,
-      settings: cloneWidgetSettings(item)
+      settings: normalizedWidgetSettings(widgetType, item)
     };
   }
 

@@ -17,6 +17,8 @@ The `niriTestVm` profile is configured for test access:
 - fallback login password is `niri`
 - OpenSSH is enabled, with password auth enabled for debugging
 - VM host SSH keys live under `/etc/ssh` so Home Manager can manage `~/.ssh`
+- VM uses a dedicated stripped-down Home Manager profile in [home/niriTestVm.nix](/home/administrator/nixos-config/home/niriTestVm.nix)
+- That profile auto-launches `kitty` for visible session feedback and avoids the heavier `woody` desktop extras
 
 ## Disk behavior
 
@@ -61,6 +63,9 @@ Password: `niri`
 ## Useful launch variants
 
 ```bash
+# default launch already uses a virtio GL GPU and gtk display for Niri testing
+make niri-vm
+
 # pass args directly to run-*-vm
 bash scripts/vm/launch-niri-test-vm.sh -- -display gtk,gl=on
 

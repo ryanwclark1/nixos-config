@@ -111,8 +111,13 @@ let
     ${builtins.readFile ./scripts/check-multibar-smoke.sh}
   '';
 
+  panelConfigContractsScript = pkgs.writeShellScriptBin "qs-panel-config-contracts" ''
+    PATH="${pkgs.quickshell}/bin:${pkgs.jq}/bin:${pkgs.findutils}/bin:${pkgs.coreutils}/bin:${pkgs.gnused}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:${pkgs.procps}/bin:${pkgs.bash}/bin:$PATH"
+    ${builtins.readFile ./scripts/check-panel-config-contracts.sh}
+  '';
+
   panelRuntimeScript = pkgs.writeShellScriptBin "qs-panel-runtime-verify" ''
-    PATH="${pkgs.quickshell}/bin:${pkgs.findutils}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:${pkgs.procps}/bin:${pkgs.bash}/bin:$PATH"
+    PATH="${pkgs.quickshell}/bin:${pkgs.jq}/bin:${pkgs.findutils}/bin:${pkgs.coreutils}/bin:${pkgs.gnused}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:${pkgs.procps}/bin:${pkgs.bash}/bin:$PATH"
     ${builtins.readFile ./scripts/check-panel-runtime.sh}
   '';
 
@@ -198,6 +203,7 @@ let
       surfaceResponsiveScript
       surfacePreviewScript
       multibarSmokeScript
+      panelConfigContractsScript
       panelRuntimeScript
       panelPreviewScript
       settingsCaptureScript

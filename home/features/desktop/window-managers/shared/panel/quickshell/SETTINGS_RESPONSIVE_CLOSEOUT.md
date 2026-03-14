@@ -27,6 +27,7 @@ This closeout records the responsive settings-hub work completed across:
   - `Hotkeys`
   - `Time & Weather`
 - Added runtime guardrail scripts and viewport capture scripts for regression checking.
+- Hardened capture tooling so viewport/surface runs choose reachable QuickShell and Hyprland sessions and wait for workspace activation before capturing.
 
 ## QA Evidence
 

@@ -83,7 +83,7 @@ esac
 mkdir -p "${output_dir}"
 
 for tab in "${tabs[@]}"; do
-  "${script_dir}/capture-settings-viewport.sh" \
+  bash "${script_dir}/capture-settings-viewport.sh" \
     --width "${width}" \
     --height "${height}" \
     --delay "${delay_seconds}" \

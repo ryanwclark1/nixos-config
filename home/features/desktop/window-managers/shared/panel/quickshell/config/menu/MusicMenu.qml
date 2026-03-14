@@ -7,9 +7,7 @@ import "../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  readonly property int availablePopupWidth: screen ? Math.max(320, screen.width - 40) : 360
-  readonly property bool compactMode: availablePopupWidth < 350
-  implicitWidth: Math.min(360, availablePopupWidth)
+  popupMaxWidth: 360; compactThreshold: 350
   implicitHeight: compactMode ? 430 : 400
   title: "Music"
   toggleMethod: "toggleMusicMenu"
@@ -85,11 +83,10 @@ BasePopupMenu {
     Layout.fillHeight: true
     visible: !root.player
 
-    Text {
+    SharedWidgets.EmptyState {
       anchors.centerIn: parent
-      text: "No music playing"
-      color: Colors.textDisabled
-      font.pixelSize: Colors.fontSizeLarge
+      icon: "󰝚"
+      message: "No music playing"
     }
   }
 

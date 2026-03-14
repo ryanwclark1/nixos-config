@@ -6,9 +6,7 @@ import "../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  readonly property int availablePopupWidth: screen ? Math.max(280, screen.width - 40) : 300
-  readonly property bool compactMode: availablePopupWidth < 295
-  implicitWidth: Math.min(300, availablePopupWidth)
+  popupMinWidth: 280; popupMaxWidth: 300; compactThreshold: 295
   implicitHeight: compactMode ? 270 : 220
   title: "Screen Recording"
   toggleMethod: "toggleRecordingMenu"

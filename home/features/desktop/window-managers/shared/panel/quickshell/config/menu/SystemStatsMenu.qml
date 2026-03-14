@@ -7,9 +7,7 @@ import "../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  readonly property int availablePopupWidth: screen ? Math.max(320, screen.width - 40) : 380
-  readonly property bool compactMode: availablePopupWidth < 360
-  implicitWidth: Math.min(380, availablePopupWidth)
+  popupMaxWidth: 380; compactThreshold: 360
   implicitHeight: compactMode ? 620 : 580
   title: "System"
   toggleMethod: "toggleSystemStatsMenu"

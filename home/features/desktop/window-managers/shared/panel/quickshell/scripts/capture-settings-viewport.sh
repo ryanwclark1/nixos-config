@@ -1,34 +1,42 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
-repo_root="$(git -C "${script_dir}" rev-parse --show-toplevel)"
-config_root="${repo_root}/home/features/desktop/window-managers/shared/panel/quickshell/config"
+runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
 
 width=900
 height=700
 tab_id="wallpaper"
+instance_id=""
+hyprland_instance=""
+hyprland_wayland_socket=""
 output_path=""
-delay_seconds="4"
+delay_seconds="1.2"
+ipc_timeout_seconds="2"
 scroll_y="0"
 workspace_target="auto"
-temp_qml=""
+workspace_settle_attempts="20"
+workspace_settle_interval="0.1"
 temp_full=""
 temp_crop=""
-harness_pid=""
 restore_workspace=""
 
 usage() {
   cat <<'EOF'
-Usage: capture-settings-viewport.sh [--width PX] [--height PX] [--tab TAB_ID] [--delay SECONDS] [--scroll-y PX] [--workspace current|auto|NAME] [--output PATH]
+Usage: capture-settings-viewport.sh [--id INSTANCE_ID] [--width PX] [--height PX] [--tab TAB_ID] [--delay SECONDS] [--scroll-y PX] [--workspace current|auto|NAME] [--output PATH]
 
-Render the settings UI inside a temporary overlay harness at a simulated viewport size,
-capture a cropped screenshot, and save it to a file.
+Open the live SettingsHub through QuickShell IPC, capture a centered viewport-sized
+screenshot from the focused monitor, and save it to a file.
+
+Note: scroll-y is currently ignored in live capture mode.
 EOF
 }
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --id)
+      instance_id="${2:-}"
+      shift 2
+      ;;
     --width)
       width="${2:-}"
       shift 2
@@ -43,6 +51,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --delay)
       delay_seconds="${2:-}"
+      shift 2
+      ;;
+    --ipc-timeout)
+      ipc_timeout_seconds="${2:-}"
       shift 2
       ;;
     --scroll-y)
@@ -76,16 +88,129 @@ require_cmd() {
   fi
 }
 
+hypr() {
+  if [[ -n "${hyprland_instance}" ]]; then
+    env HYPRLAND_INSTANCE_SIGNATURE="${hyprland_instance}" WAYLAND_DISPLAY="${hyprland_wayland_socket}" \
+      hyprctl -i "${hyprland_instance}" "$@"
+  else
+    hyprctl "$@"
+  fi
+}
+
+resolve_hyprland_instance() {
+  local candidate
+  local wl_socket
+
+  if hyprctl -j activeworkspace >/dev/null 2>&1; then
+    hyprland_instance=""
+    hyprland_wayland_socket=""
+    return 0
+  fi
+
+  while IFS=$'\t' read -r candidate wl_socket; do
+    [[ -n "${candidate}" ]] || continue
+    if env HYPRLAND_INSTANCE_SIGNATURE="${candidate}" WAYLAND_DISPLAY="${wl_socket}" \
+      hyprctl -i "${candidate}" -j activeworkspace >/dev/null 2>&1; then
+      hyprland_instance="${candidate}"
+      hyprland_wayland_socket="${wl_socket}"
+      return 0
+    fi
+  done < <(hyprctl instances -j | jq -r '.[] | [.instance // "", .wl_socket // ""] | @tsv')
+
+  printf 'Could not resolve a reachable Hyprland instance.\n' >&2
+  exit 1
+}
+
+discover_instances_from_pid() {
+  local pid
+  local resolved
+  local preferred=()
+  local fallback=()
+  local log_path
+  local first_line
+
+  while IFS= read -r pid; do
+    [[ -n "${pid}" ]] || continue
+    resolved="$(readlink -f "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid/${pid}" 2>/dev/null || true)"
+    if [[ -n "${resolved}" && -S "${resolved}/ipc.sock" ]]; then
+      log_path="${resolved}/log.log"
+      first_line="$(sed -n '1p' "${log_path}" 2>/dev/null || true)"
+      if [[ "${first_line}" == *'Launching config:'*'shell.qml"'* ]]; then
+        preferred+=("$(basename "${resolved}")")
+      else
+        fallback+=("$(basename "${resolved}")")
+      fi
+    fi
+  done < <(ps -eo pid=,comm=,args= | awk '$2 ~ /quickshell/ || $3 ~ /quickshell/ { print $1 }')
+
+  if (( ${#preferred[@]} > 0 )); then
+    printf '%s\n' "${preferred[@]}" | awk 'NF && !seen[$0]++'
+  else
+    printf '%s\n' "${fallback[@]}" | awk 'NF && !seen[$0]++'
+  fi
+}
+
+discover_instances() {
+  local dirs=()
+  local dir
+
+  mapfile -t dirs < <(discover_instances_from_pid)
+  if (( ${#dirs[@]} > 0 )); then
+    printf '%s\n' "${dirs[@]}"
+    return 0
+  fi
+
+  if [[ -d "${runtime_root}" ]]; then
+    while IFS= read -r dir; do
+      dirs+=("$(basename "${dir}")")
+    done < <(find "${runtime_root}" -mindepth 1 -maxdepth 1 -type d -exec test -S '{}/ipc.sock' ';' -print 2>/dev/null | sort)
+  fi
+
+  printf '%s\n' "${dirs[@]}"
+}
+
+discover_reachable_instance() {
+  local candidate
+  while IFS= read -r candidate; do
+    [[ -n "${candidate}" ]] || continue
+    if timeout "${ipc_timeout_seconds}s" quickshell ipc --id "${candidate}" show >/dev/null 2>&1; then
+      printf '%s\n' "${candidate}"
+      return 0
+    fi
+  done < <(discover_instances)
+
+  return 1
+}
+
 pick_capture_workspace() {
   local used
   for candidate in $(seq 9001 9099); do
-    used="$(hyprctl workspaces -j | jq --arg candidate "${candidate}" 'map(select((.name // "") == $candidate or ((.id | tostring) == $candidate))) | length')"
+    used="$(hypr workspaces -j | jq --arg candidate "${candidate}" 'map(select((.name // "") == $candidate or ((.id | tostring) == $candidate))) | length')"
     if [[ "${used}" == "0" ]]; then
       printf '%s\n' "${candidate}"
       return 0
     fi
   done
   return 1
+}
+
+wait_for_workspace() {
+  local target="$1"
+  local current_name
+  local current_id
+  local attempt
+
+  for attempt in $(seq 1 "${workspace_settle_attempts}"); do
+    current_name="$(hypr activeworkspace -j | jq -r '.name // empty')"
+    current_id="$(hypr activeworkspace -j | jq -r '(.id | tostring) // empty')"
+    if [[ "${current_name}" == "${target}" || "${current_id}" == "${target}" ]]; then
+      return 0
+    fi
+    sleep "${workspace_settle_interval}"
+  done
+
+  printf 'Workspace %s did not become active in time.\n' "${target}" >&2
+  exit 1
 }
 
 switch_to_capture_workspace() {
@@ -95,7 +220,7 @@ switch_to_capture_workspace() {
     return 0
   fi
 
-  restore_workspace="$(hyprctl -j activeworkspace | jq -r '.name // (.id | tostring)')"
+  restore_workspace="$(hypr activeworkspace -j | jq -r '.name // (.id | tostring)')"
   if [[ -z "${restore_workspace}" || "${restore_workspace}" == "null" ]]; then
     printf 'Could not resolve active workspace before capture.\n' >&2
     exit 1
@@ -108,7 +233,14 @@ switch_to_capture_workspace() {
     }
   fi
 
-  hyprctl dispatch workspace "${target}" >/dev/null
+  hypr dispatch workspace "${target}" >/dev/null
+  wait_for_workspace "${target}"
+}
+
+call_ipc() {
+  local target="$1"
+  shift
+  timeout "${ipc_timeout_seconds}s" quickshell ipc --id "${instance_id}" call "${target}" "$@"
 }
 
 main() {
@@ -118,7 +250,10 @@ main() {
   require_cmd grim
   require_cmd magick
   require_cmd mktemp
-  require_cmd git
+  require_cmd sed
+  require_cmd find
+  require_cmd ps
+  resolve_hyprland_instance
 
   if ! [[ "${width}" =~ ^[0-9]+$ ]] || ! [[ "${height}" =~ ^[0-9]+$ ]]; then
     printf 'Width and height must be integers.\n' >&2
@@ -128,168 +263,59 @@ main() {
     printf 'Delay must be numeric.\n' >&2
     exit 2
   fi
+  if ! [[ "${ipc_timeout_seconds}" =~ ^[0-9]+([.][0-9]+)?$ ]]; then
+    printf 'IPC timeout must be numeric.\n' >&2
+    exit 2
+  fi
   if ! [[ "${scroll_y}" =~ ^[0-9]+$ ]]; then
     printf 'scroll-y must be a non-negative integer.\n' >&2
     exit 2
+  fi
+
+  if [[ -n "${scroll_y}" && "${scroll_y}" != "0" ]]; then
+    printf '[WARN] scroll-y is ignored in live SettingsHub capture mode.\n' >&2
+  fi
+
+  if [[ -z "${instance_id}" ]]; then
+    instance_id="$(discover_reachable_instance || true)"
+    if [[ -z "${instance_id}" ]]; then
+      printf 'No live QuickShell instances found under %s\n' "${runtime_root}" >&2
+      exit 1
+    fi
   fi
 
   if [[ -z "${output_path}" ]]; then
     output_path="/tmp/settings-${tab_id}-${width}x${height}.png"
   fi
 
-  temp_qml="$(mktemp /tmp/settings-viewport-harness-XXXXXX.qml)"
   temp_full="$(mktemp /tmp/settings-viewport-full-XXXXXX.png)"
   temp_crop="$(mktemp /tmp/settings-viewport-crop-XXXXXX.png)"
 
-  trap '[[ -n "${harness_pid}" ]] && kill "${harness_pid}" >/dev/null 2>&1 || true; [[ -n "${restore_workspace}" ]] && hyprctl dispatch workspace "${restore_workspace}" >/dev/null 2>&1 || true; rm -f "${temp_qml}" "${temp_full}" "${temp_crop}"' EXIT
+  trap 'call_ipc SettingsHub close >/dev/null 2>&1 || true; [[ -n "${restore_workspace}" ]] && hypr dispatch workspace "${restore_workspace}" >/dev/null 2>&1 || true; rm -f "${temp_full}" "${temp_crop}"' EXIT
 
   switch_to_capture_workspace "${workspace_target}"
 
-  cat >"${temp_qml}" <<EOF
-import QtQuick
-import QtQuick.Layouts
-import Quickshell
-import Quickshell.Wayland
-import "file:${config_root}/services"
-import "file:${config_root}/menu/settings"
-
-PanelWindow {
-  id: root
-  screen: Quickshell.screens[0]
-  color: "transparent"
-  visible: true
-  WlrLayershell.layer: WlrLayer.Overlay
-  WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-  WlrLayershell.namespace: "settings-viewport-harness"
-
-  anchors {
-    top: true
-    left: true
-    right: true
-    bottom: true
-  }
-
-  property int previewWidth: ${width}
-  property int previewHeight: ${height}
-  property int requestedScrollY: ${scroll_y}
-  property int scrollApplyAttemptsRemaining: 12
-  property string initialTabId: "${tab_id}"
-  property string currentTabId: SettingsRegistry.defaultTabId
-  property string searchQuery: ""
-  readonly property bool compactMode: previewHeight > previewWidth || previewWidth < 1024 || previewHeight < 760
-  readonly property bool tightSpacing: previewWidth < 720 || previewHeight < 640
-  readonly property int sidebarWidth: compactMode ? 72 : 256
-  property QtObject settingsRoot: QtObject {
-    property real layoutGapsOut: 10
-    property real layoutGapsIn: 5
-    property real layoutActiveOpacity: 1.0
-    property bool layoutIsMaster: false
-    signal browseWallpaper(string monitorName)
-    signal pickWallpaperFolder()
-    function close() {}
-  }
-
-  Rectangle {
-    anchors.fill: parent
-    color: Colors.withAlpha(Colors.background, 0.72)
-  }
-
-  Component.onCompleted: {
-    if (SettingsRegistry.findTab(initialTabId))
-      currentTabId = initialTabId;
-  }
-
-  function applyScroll(node) {
-    if (!node)
-      return;
-    if (node.contentY !== undefined && node.contentHeight !== undefined && node.height !== undefined) {
-      var maxY = Math.max(0, node.contentHeight - node.height);
-      node.contentY = Math.min(requestedScrollY, maxY);
-    }
-    var kids = [];
-    if (node.children)
-      kids = kids.concat(node.children);
-    if (node.contentItem)
-      kids.push(node.contentItem);
-    if (node.flickable)
-      kids.push(node.flickable);
-    if (node.item)
-      kids.push(node.item);
-    for (var i = 0; i < kids.length; i++)
-      applyScroll(kids[i]);
-  }
-
-  Timer {
-    interval: 0
-    running: true
-    repeat: false
-    onTriggered: {
-      if (SettingsRegistry.findTab(root.initialTabId))
-        root.currentTabId = root.initialTabId;
-      applyScroll(root);
-    }
-  }
-
-  Timer {
-    interval: 150
-    running: true
-    repeat: true
-    onTriggered: {
-      if (SettingsRegistry.findTab(root.initialTabId))
-        root.currentTabId = root.initialTabId;
-      applyScroll(root);
-      root.scrollApplyAttemptsRemaining -= 1;
-      if (root.scrollApplyAttemptsRemaining <= 0)
-        stop();
-    }
-  }
-
-  Rectangle {
-    width: root.previewWidth
-    height: root.previewHeight
-    anchors.centerIn: parent
-    color: Colors.bgGlass
-    border.color: Colors.border
-    border.width: 1
-    radius: Colors.radiusLarge
-    clip: true
-
-    RowLayout {
-      anchors.fill: parent
-      spacing: 0
-
-      SettingsSidebar {
-        Layout.preferredWidth: root.sidebarWidth
-        compactMode: root.compactMode
-        currentTabId: root.currentTabId
-        searchQuery: root.searchQuery
-        onTabSelected: tabId => root.currentTabId = tabId
-        onSearchQueryEdited: query => root.searchQuery = query
-        onSaveAndClose: Config.save()
-      }
-
-      SettingsContent {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        compactMode: root.compactMode
-        currentTabId: root.currentTabId
-        searchQuery: root.searchQuery
-        settingsRoot: root.settingsRoot
-        tightSpacing: root.tightSpacing
-        onTabSelected: tabId => root.currentTabId = tabId
-        onSearchQueryEdited: query => root.searchQuery = query
-      }
-    }
-  }
-}
-EOF
-
-  quickshell --path "${temp_qml}" >/tmp/settings-viewport-harness.log 2>&1 &
-  harness_pid=$!
+  if ! timeout "${ipc_timeout_seconds}s" quickshell ipc --id "${instance_id}" show >/dev/null; then
+    printf 'Live QuickShell IPC is not responding for instance %s.\n' "${instance_id}" >&2
+    exit 1
+  fi
+  if ! call_ipc Shell reloadConfig >/dev/null; then
+    printf 'Shell.reloadConfig timed out for instance %s.\n' "${instance_id}" >&2
+    exit 1
+  fi
+  if ! call_ipc SettingsHub openTab "${tab_id}" >/dev/null; then
+    printf 'SettingsHub.openTab %s timed out for instance %s.\n' "${tab_id}" "${instance_id}" >&2
+    exit 1
+  fi
   sleep "${delay_seconds}"
 
-  local monitor_json monitor_x monitor_y monitor_w monitor_h reserved_top reserved_right reserved_bottom reserved_left usable_w usable_h crop_x crop_y
-  monitor_json="$(hyprctl monitors -j | jq 'map(select(.focused == true))[0]')"
+  local monitor_json monitor_x monitor_y monitor_w monitor_h reserved_top reserved_left reserved_bottom reserved_right usable_w usable_h crop_x crop_y crop_w crop_h
+  monitor_json="$(hypr monitors -j | jq 'map(select(.focused == true))[0]')"
+  if [[ -z "${monitor_json}" || "${monitor_json}" == "null" ]]; then
+    printf 'Could not resolve focused monitor from hyprctl.\n' >&2
+    exit 1
+  fi
+
   monitor_x="$(printf '%s' "${monitor_json}" | jq -r '.x')"
   monitor_y="$(printf '%s' "${monitor_json}" | jq -r '.y')"
   monitor_w="$(printf '%s' "${monitor_json}" | jq -r '.width')"
@@ -301,15 +327,16 @@ EOF
 
   usable_w=$((monitor_w - reserved_left - reserved_right))
   usable_h=$((monitor_h - reserved_top - reserved_bottom))
-
-  crop_x=$((monitor_x + reserved_left + (usable_w - width) / 2))
-  crop_y=$((monitor_y + reserved_top + (usable_h - height) / 2))
+  crop_w=$(( width < usable_w ? width : usable_w ))
+  crop_h=$(( height < usable_h ? height : usable_h ))
+  crop_x=$((monitor_x + reserved_left + (usable_w - crop_w) / 2))
+  crop_y=$((monitor_y + reserved_top + (usable_h - crop_h) / 2))
 
   grim -t png "${temp_full}"
-  magick "${temp_full}" -crop "${width}x${height}+${crop_x}+${crop_y}" +repage "${temp_crop}"
+  magick "${temp_full}" -crop "${crop_w}x${crop_h}+${crop_x}+${crop_y}" +repage "${temp_crop}"
   cp "${temp_crop}" "${output_path}"
 
-  printf '[INFO] Captured %s at %sx%s -> %s\n' "${tab_id}" "${width}" "${height}" "${output_path}"
+  printf '[INFO] Captured %s at %sx%s -> %s\n' "${tab_id}" "${crop_w}" "${crop_h}" "${output_path}"
 }
 
 main "$@"
