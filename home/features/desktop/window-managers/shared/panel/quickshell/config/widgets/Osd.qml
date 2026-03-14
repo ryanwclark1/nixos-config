@@ -28,10 +28,12 @@ Scope {
   property bool displaySinkMuted: false
   property real displaySourceVolume: 0
   property bool displaySourceMuted: false
+  property real displayKbdBrightness: 0
 
   Component.onDestruction: {
     hideTimer.stop();
     if (root.osdType === "brightness") SystemStatus.subscriberCount--;
+    if (root.osdType === "kbdbrightness") BrightnessService.subscriberCount--;
   }
 
   // Pipewire reactive bindings
@@ -54,6 +56,7 @@ Scope {
 
   readonly property real currentValue: {
     if (osdType === "brightness") return SystemStatus.brightness;
+    if (osdType === "kbdbrightness") return displayKbdBrightness;
     if (osdType === "mic") return displaySourceVolume;
     if (osdType === "capslock") return capslockState ? 1.0 : 0.0;
     if (osdType === "numlock") return numlockState ? 1.0 : 0.0;
@@ -69,9 +72,9 @@ Scope {
   }
 
   readonly property color osdColor: {
-    if (osdType === "capslock") return capslockState ? Colors.primary : Colors.fgDim;
-    if (osdType === "numlock") return numlockState ? Colors.primary : Colors.fgDim;
-    if (osdType === "scrolllock") return scrolllockState ? Colors.primary : Colors.fgDim;
+    if (osdType === "capslock") return capslockState ? Colors.primary : Colors.textDisabled;
+    if (osdType === "numlock") return numlockState ? Colors.primary : Colors.textDisabled;
+    if (osdType === "scrolllock") return scrolllockState ? Colors.primary : Colors.textDisabled;
     if (osdType === "mic" && displaySourceMuted) return Colors.error;
     if (osdType === "volume" && displaySinkMuted) return Colors.error;
     // Overdrive: red when above 100%
@@ -89,6 +92,7 @@ Scope {
     if (osdType === "numlock") return numlockState ? "󰎠" : "󰎡";
     if (osdType === "scrolllock") return scrolllockState ? "󱅮" : "󱅯";
     if (osdType === "brightness") return "󰃠";
+    if (osdType === "kbdbrightness") return "󰌌";
     if (osdType === "mic") return displaySourceMuted ? "󰍭" : "󰍬";
     if (osdType === "volume") return displaySinkMuted ? "󰝟" : "󰕾";
     return "";
@@ -99,6 +103,7 @@ Scope {
     if (osdType === "numlock") return numlockState ? "NUM ON" : "NUM OFF";
     if (osdType === "scrolllock") return scrolllockState ? "SCROLL ON" : "SCROLL OFF";
     if (osdType === "brightness") return Math.round(SystemStatus.brightness * 100) + "%";
+    if (osdType === "kbdbrightness") return Math.round(displayKbdBrightness * 100) + "%";
     if (osdType === "mic") return displaySourceMuted ? "MUTED" : Math.round(displaySourceVolume * 100) + "%";
     if (osdType === "volume" && displaySinkMuted) return "MUTED";
     return Math.round(displaySinkVolume * 100) + "%";
@@ -116,9 +121,11 @@ Scope {
     if (!startupComplete) return;
     // Unsubscribe previous brightness subscription if switching OSD type
     if (root.osdType === "brightness" && type !== "brightness") SystemStatus.subscriberCount--;
+    if (root.osdType === "kbdbrightness" && type !== "kbdbrightness") BrightnessService.subscriberCount--;
     root.osdType = type;
     root.shouldShowOsd = true;
     if (type === "brightness") SystemStatus.subscriberCount++;
+    if (type === "kbdbrightness") BrightnessService.subscriberCount++;
     hideTimer.restart();
     root.osdShown();
   }
@@ -165,6 +172,13 @@ Scope {
       SystemStatus.brightness = val / 100.0;
       root.showOsd("brightness");
     }
+
+    function showKbdBrightness(percent: string) {
+      var val = parseFloat(percent);
+      if (isNaN(val)) val = 0;
+      root.displayKbdBrightness = val / 100.0;
+      root.showOsd("kbdbrightness");
+    }
   }
 
   function onPipewireChanged(displayProp, value, type) {
@@ -200,6 +214,7 @@ Scope {
     interval: Config.osdDuration
     onTriggered: {
       if (root.osdType === "brightness") SystemStatus.subscriberCount--;
+      if (root.osdType === "kbdbrightness") BrightnessService.subscriberCount--;
       root.shouldShowOsd = false;
     }
   }
@@ -334,7 +349,7 @@ Scope {
 
               Text {
                 Layout.alignment: Qt.AlignHCenter
-                text: root.osdType.toUpperCase()
+                text: root.osdType === "kbdbrightness" ? "KBD BRIGHTNESS" : root.osdType.toUpperCase()
                 color: root.osdColor
                 font.pixelSize: Colors.fontSizeXS
                 font.weight: Font.Black
@@ -443,6 +458,8 @@ Scope {
                     } else if (root.osdType === "brightness") {
                       var pct = Math.round(value * 100);
                       Quickshell.execDetached(["brightnessctl", "set", pct + "%"]);
+                    } else if (root.osdType === "kbdbrightness") {
+                      BrightnessService.setKbdBrightness(value);
                     }
                     hideTimer.restart();
                   }

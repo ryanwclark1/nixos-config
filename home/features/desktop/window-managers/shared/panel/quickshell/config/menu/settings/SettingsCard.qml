@@ -83,7 +83,7 @@ Rectangle {
                     Text {
                         anchors.centerIn: parent
                         text: root.expanded ? "󰅃" : "󰅀"
-                        color: Colors.fgSecondary
+                        color: Colors.textSecondary
                         font.family: Colors.fontMono
                         font.pixelSize: Colors.fontSizeSmall
                     }
@@ -93,7 +93,7 @@ Rectangle {
             Text {
                 visible: root.description !== ""
                 text: root.description
-                color: Colors.fgSecondary
+                color: Colors.textSecondary
                 font.pixelSize: Colors.fontSizeSmall
                 Layout.fillWidth: true
                 wrapMode: Text.WordWrap

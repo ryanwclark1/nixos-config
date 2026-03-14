@@ -20,8 +20,8 @@ PopupWindow {
 
     color: "transparent"
     visible: false
-    width: menuWidth + 2
-    height: menuPadding * 2 + contentColumn.implicitHeight + 2
+    implicitWidth: menuWidth + 2
+    implicitHeight: menuPadding * 2 + contentColumn.implicitHeight + 2
 
     function show(actions, triggerRect, position, anchorWin) {
         if (!actions || actions.length === 0) return;
@@ -174,7 +174,7 @@ PopupWindow {
                                 visible: !!modelData.icon
                                 text: modelData.icon || ""
                                 color: modelData.danger ? Colors.error
-                                    : (modelData.disabled ? Colors.textDisabled : Colors.fgSecondary)
+                                    : (modelData.disabled ? Colors.textDisabled : Colors.textSecondary)
                                 font.family: Colors.fontMono
                                 font.pixelSize: Colors.fontSizeMedium
                             }

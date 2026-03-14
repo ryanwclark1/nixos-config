@@ -98,6 +98,7 @@ QtObject {
     property FileView _persistFile: FileView {
         path: root._persistPath
         blockLoading: true
+        printErrors: false
         watchChanges: false
 
         onLoaded: {

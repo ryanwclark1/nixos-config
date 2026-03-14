@@ -125,7 +125,7 @@ Flickable {
 
         Text {
             text: "First-party SSH launcher plugin with manual hosts plus ~/.ssh/config import."
-            color: Colors.fgSecondary
+            color: Colors.textSecondary
             wrapMode: Text.WordWrap
             Layout.fillWidth: true
         }
@@ -248,7 +248,7 @@ Flickable {
 
                     Text {
                         text: (modelData.user ? (modelData.user + "@") : "") + modelData.host + (Number(modelData.port || 22) !== 22 ? (":" + modelData.port) : "")
-                        color: Colors.fgSecondary
+                        color: Colors.textSecondary
                         font.pixelSize: Colors.fontSizeSmall
                     }
                 }
@@ -397,7 +397,7 @@ Flickable {
 
                     Text {
                         text: modelData.sourcePath + ":" + modelData.sourceLine
-                        color: Colors.fgSecondary
+                        color: Colors.textSecondary
                         font.pixelSize: Colors.fontSizeSmall
                     }
                 }

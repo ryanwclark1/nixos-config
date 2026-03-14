@@ -31,16 +31,17 @@ Flow {
       var mru = NiriService.mruWindowIds;
       var niriWindows = NiriService.windows;
 
-      // Build app_id → MRU rank map from NiriService
+      // Build id → window map, then app_id → MRU rank
+      var windowMap = {};
+      for (var w = 0; w < niriWindows.length; w++)
+        windowMap[niriWindows[w].id] = niriWindows[w];
       var mruRank = {};
       for (var m = 0; m < mru.length; m++) {
-        for (var w = 0; w < niriWindows.length; w++) {
-          if (niriWindows[w].id === mru[m]) {
-            var appId = (niriWindows[w].app_id || "").toLowerCase();
-            if (appId && mruRank[appId] === undefined)
-              mruRank[appId] = m;
-            break;
-          }
+        var nw = windowMap[mru[m]];
+        if (nw) {
+          var appId = (nw.app_id || "").toLowerCase();
+          if (appId && mruRank[appId] === undefined)
+            mruRank[appId] = m;
         }
       }
 

@@ -122,10 +122,12 @@ QtObject {
             return;
         var current = pluginStatuses[id] || ({});
         var next = Object.assign({}, pluginStatuses);
+        var hasCode = arguments.length >= 3;
+        var hasMessage = arguments.length >= 4;
         next[id] = {
             state: String(state || current.state || "unknown"),
-            code: String(code || current.code || ""),
-            message: String(message || current.message || ""),
+            code: hasCode ? String(code ?? "") : String(current.code || ""),
+            message: hasMessage ? String(message ?? "") : String(current.message || ""),
             updatedAt: new Date().toISOString()
         };
         pluginStatuses = next;

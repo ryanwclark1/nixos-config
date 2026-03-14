@@ -287,7 +287,7 @@ PanelWindow {
             Text {
               anchors.fill: parent; anchors.leftMargin: Colors.paddingSmall
               verticalAlignment: Text.AlignVCenter
-              text: "Type a reply..."; color: Colors.fgDim; font.pixelSize: Colors.fontSizeMedium
+              text: "Type a reply..."; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeMedium
               visible: !replyInput.text && !replyInput.activeFocus
             }
           }

@@ -32,7 +32,21 @@ Item {
             SettingsListRow {
                 label: "Open Hooks Directory"
                 icon: "󰉋"
-                onClicked: Quickshell.execDetached(["xdg-open", HookService.hookDir])
+
+                Text {
+                    Layout.fillWidth: true
+                    text: "Open ~/.config/quickshell/hooks in the default file manager."
+                    color: Colors.textSecondary
+                    font.pixelSize: Colors.fontSizeSmall
+                    wrapMode: Text.WordWrap
+                }
+
+                SettingsActionButton {
+                    label: "Open"
+                    iconName: "󰉋"
+                    compact: true
+                    onClicked: Quickshell.execDetached(["xdg-open", HookService.hookDir])
+                }
             }
         }
 
@@ -85,7 +99,7 @@ Item {
 
                             Text {
                                 text: "󰆓"
-                                color: Colors.fgSecondary
+                                color: Colors.textSecondary
                                 font.family: Colors.fontMono
                                 font.pixelSize: Colors.fontSizeLarge
 
@@ -176,7 +190,7 @@ Item {
         stdinEnabled: true
         onStarted: {
             write(root._pendingTemplateContent);
-            closeStdin();
+            stdinEnabled = false;
         }
         onExited: (exitCode, exitStatus) => {
             if (exitCode === 0)

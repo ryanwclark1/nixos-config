@@ -34,6 +34,7 @@ Repo-local helpers:
 - `scripts/plugin-local.sh smoke-docker-manager`
 - `scripts/plugin-local.sh docker-status --check`
 - `scripts/plugin-local.sh docker-all`
+- `scripts/check-plugin-docker-manager-diagnostics.sh`
 - `scripts/plugin-local.sh remove-docker-manager`
 
 Suggested defaults:

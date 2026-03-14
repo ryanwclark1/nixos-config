@@ -633,14 +633,14 @@ Item {
 
                 Text {
                     text: "󰸉"
-                    color: Colors.fgDim
+                    color: Colors.textDisabled
                     font.family: Colors.fontMono
                     font.pixelSize: Colors.fontSizeHuge
                     Layout.alignment: Qt.AlignHCenter
                 }
                 Text {
                     text: previewContainer.previewPath !== "" ? "Loading preview…" : "No wallpaper set"
-                    color: Colors.fgDim
+                    color: Colors.textDisabled
                     font.pixelSize: Colors.fontSizeMedium
                     Layout.alignment: Qt.AlignHCenter
                 }
@@ -963,7 +963,7 @@ Item {
 
                 Text {
                     text: Config.wallpaperCycleInterval === 0 ? "Off" : Config.wallpaperCycleInterval + " min"
-                    color: Colors.fgSecondary
+                    color: Colors.textSecondary
                     font.pixelSize: Colors.fontSizeSmall
                     font.family: Colors.fontMono
                 }
@@ -1188,7 +1188,7 @@ Item {
                         Text {
                             anchors.centerIn: parent
                             text: "󰸉"
-                            color: Colors.fgDim
+                            color: Colors.textDisabled
                             font.family: Colors.fontMono
                             font.pixelSize: Colors.fontSizeHuge
                             visible: thumbImage.status !== Image.Ready
@@ -1266,7 +1266,7 @@ Item {
                 delegate: Text {
                     required property string modelData
                     text: "  " + modelData
-                    color: Colors.fgSecondary
+                    color: Colors.textSecondary
                     font.pixelSize: Colors.fontSizeXS
                     font.family: Colors.fontMono
                     Layout.fillWidth: true

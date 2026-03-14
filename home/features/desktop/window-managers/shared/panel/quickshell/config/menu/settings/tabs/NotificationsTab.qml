@@ -149,7 +149,7 @@ Item {
                 Text {
                     visible: Config.notifTimeoutLow <= 0
                     text: "Never auto-dismiss"
-                    color: Colors.fgSecondary
+                    color: Colors.textSecondary
                     font.pixelSize: Colors.fontSizeXS
                     leftPadding: Colors.spacingM
                 }
@@ -172,7 +172,7 @@ Item {
                 Text {
                     visible: Config.notifTimeoutNormal <= 0
                     text: "Never auto-dismiss"
-                    color: Colors.fgSecondary
+                    color: Colors.textSecondary
                     font.pixelSize: Colors.fontSizeXS
                     leftPadding: Colors.spacingM
                 }
@@ -195,7 +195,7 @@ Item {
                 Text {
                     visible: Config.notifTimeoutCritical <= 0
                     text: "Never auto-dismiss — requires manual action"
-                    color: Colors.fgSecondary
+                    color: Colors.textSecondary
                     font.pixelSize: Colors.fontSizeXS
                     leftPadding: Colors.spacingM
                 }
@@ -275,7 +275,7 @@ Item {
 
                 Text {
                     text: "Add a rule below to override behaviour per application."
-                    color: Colors.fgDim
+                    color: Colors.textDisabled
                     font.pixelSize: Colors.fontSizeSmall
                     wrapMode: Text.WordWrap
                     horizontalAlignment: Text.AlignHCenter
@@ -308,7 +308,7 @@ Item {
                         Text {
                             anchors.centerIn: parent
                             text: modelData.action === "mute" ? "󰂛" : "󰔛"
-                            color: Colors.fgSecondary
+                            color: Colors.textSecondary
                             font.family: Colors.fontMono
                             font.pixelSize: Colors.fontSizeLarge
                         }

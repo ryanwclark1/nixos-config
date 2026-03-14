@@ -141,7 +141,7 @@ Item {
                                         names.push(mons[i].name);
                                     return names.join(", ") || "No monitors";
                                 }
-                                color: Colors.fgSecondary
+                                color: Colors.textSecondary
                                 font.pixelSize: Colors.fontSizeXS
                                 Layout.fillWidth: true
                                 elide: Text.ElideRight
@@ -165,7 +165,7 @@ Item {
             Text {
                 visible: Config.displayProfiles.length === 0
                 text: "No saved profiles. Use the Display Configuration dialog to save profiles."
-                color: Colors.fgDim
+                color: Colors.textDisabled
                 font.pixelSize: Colors.fontSizeSmall
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true

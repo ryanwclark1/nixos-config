@@ -22,7 +22,7 @@ ColumnLayout {
       anchors.fill: parent
       anchors.margins: Colors.spacingM
       spacing: Colors.spacingM
-      Text { text: "Featured"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
+      SharedWidgets.SectionLabel { label: "FEATURED" }
       RowLayout {
         Layout.fillWidth: true
         spacing: Colors.paddingSmall
@@ -82,12 +82,7 @@ ColumnLayout {
       anchors.fill: parent
       anchors.margins: Colors.spacingM
       spacing: Colors.spacingS
-      Text {
-        text: "Categories • " + root.launcher.drunCategoryFilterLabel
-        color: Colors.textDisabled
-        font.pixelSize: Colors.fontSizeXS
-        font.weight: Font.Bold
-      }
+      SharedWidgets.SectionLabel { label: "CATEGORIES • " + root.launcher.drunCategoryFilterLabel }
       Text {
         text: root.launcher.drunCategoryFilterSummary
         color: Colors.textSecondary
@@ -129,7 +124,7 @@ ColumnLayout {
       anchors.fill: parent
       anchors.margins: Colors.spacingM
       spacing: Colors.spacingS
-      Text { text: "Recent"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
+      SharedWidgets.SectionLabel { label: "RECENT" }
 
       Repeater {
         model: root.launcher.recentItems
@@ -191,7 +186,7 @@ ColumnLayout {
       anchors.fill: parent
       anchors.margins: Colors.spacingM
       spacing: Colors.spacingS
-      Text { text: "Suggested"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
+      SharedWidgets.SectionLabel { label: "SUGGESTED" }
 
       Repeater {
         model: root.launcher.suggestionItems

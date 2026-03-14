@@ -48,6 +48,21 @@ QtObject {
       }
   }
 
+  // Keyboard backlight brightness, synced from BrightnessService
+  property real kbdBrightness: 0.0
+  readonly property bool kbdBrightnessAvailable: BrightnessService.kbdAvailable
+
+  property Connections _kbdBrightnessSyncConn: Connections {
+      target: BrightnessService
+      function onKbdDeviceChanged() {
+          root.kbdBrightness = BrightnessService.kbdDevice.brightness;
+      }
+  }
+
+  function setKbdBrightness(value) {
+    BrightnessService.setKbdBrightness(value);
+  }
+
   property int pollIntervalMs: 2000
 
   // Subscriber-based polling: only runs when at least one consumer is active.

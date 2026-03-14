@@ -237,7 +237,7 @@ Item {
                         text: root.sectionWidgets(sectionKey).length > 0
                             ? "Current widgets: " + root.sectionWidgets(sectionKey).length
                             : "Current widgets: none"
-                        color: Colors.fgSecondary
+                        color: Colors.textSecondary
                         font.pixelSize: Colors.fontSizeXS
                         font.weight: Font.Medium
                         wrapMode: Text.WordWrap
@@ -291,7 +291,7 @@ Item {
                                 text: root.dragSourceIndex >= 0
                                     ? "Release to move the dragged widget into " + root.sectionLabel(sectionKey).toLowerCase() + "."
                                     : "Add one below, or drag a widget here from another section."
-                                color: Colors.fgSecondary
+                                color: Colors.textSecondary
                                 font.pixelSize: Colors.fontSizeXS
                                 wrapMode: Text.WordWrap
                             }
@@ -372,7 +372,7 @@ Item {
 
                                         Text {
                                             text: "󰆾"
-                                            color: Colors.fgDim
+                                            color: Colors.textDisabled
                                             font.family: Colors.fontMono
                                             font.pixelSize: Colors.fontSizeLarge
                                         }
@@ -400,7 +400,7 @@ Item {
 
                                             Text {
                                                 text: BarWidgetRegistry.description(widgetRow.widgetInstance.widgetType)
-                                                color: Colors.fgSecondary
+                                                color: Colors.textSecondary
                                                 font.pixelSize: Colors.fontSizeXS
                                                 Layout.fillWidth: true
                                                 wrapMode: Text.WordWrap
@@ -516,7 +516,7 @@ Item {
                                     Text {
                                         anchors.centerIn: parent
                                         text: "󰒓"
-                                        color: dragHandle.pressed ? Colors.primary : Colors.fgSecondary
+                                        color: dragHandle.pressed ? Colors.primary : Colors.textSecondary
                                         font.family: Colors.fontMono
                                         font.pixelSize: Colors.fontSizeMedium
                                     }
@@ -563,7 +563,7 @@ Item {
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
                             text: root.dragSourceIndex >= 0 ? "Drop at end of " + root.sectionLabel(sectionKey).toLowerCase() : ""
-                            color: Colors.fgSecondary
+                            color: Colors.textSecondary
                             font.pixelSize: Colors.fontSizeXS
                         }
                     }
@@ -678,7 +678,7 @@ Item {
 
                                     Text {
                                         text: modelData.description || ""
-                                        color: Colors.fgSecondary
+                                        color: Colors.textSecondary
                                         font.pixelSize: Colors.fontSizeXS
                                         Layout.fillWidth: true
                                         wrapMode: Text.WordWrap

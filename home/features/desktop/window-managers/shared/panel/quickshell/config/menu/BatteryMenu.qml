@@ -115,7 +115,7 @@ BasePopupMenu {
 
           Text {
             text: root.batteryStateText
-            color: Colors.fgSecondary
+            color: Colors.textSecondary
             font.pixelSize: Colors.fontSizeMedium
           }
 
@@ -148,21 +148,21 @@ BasePopupMenu {
 
         SharedWidgets.SectionLabel { label: "POWER"; Layout.columnSpan: root.detailColumns }
 
-        Text { text: "Energy rate"; color: Colors.fgSecondary; font.pixelSize: Colors.fontSizeMedium }
+        Text { text: "Energy rate"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeMedium }
         Text {
           text: root.device && root.device.energyRate ? root.device.energyRate.toFixed(1) + " W" : "—"
           color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium
           Layout.alignment: root.compactMode ? Qt.AlignLeft : Qt.AlignRight
         }
 
-        Text { text: "Capacity"; color: Colors.fgSecondary; font.pixelSize: Colors.fontSizeMedium }
+        Text { text: "Capacity"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeMedium }
         Text {
           text: root.device && root.device.energyFull ? root.device.energyFull.toFixed(1) + " Wh" : "—"
           color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium
           Layout.alignment: root.compactMode ? Qt.AlignLeft : Qt.AlignRight
         }
 
-        Text { text: "Health"; color: Colors.fgSecondary; font.pixelSize: Colors.fontSizeMedium }
+        Text { text: "Health"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeMedium }
         Text {
           text: root.device && root.device.energyFullDesign > 0
             ? Math.round((root.device.energyFull / root.device.energyFullDesign) * 100) + "%"

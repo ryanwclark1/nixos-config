@@ -142,7 +142,7 @@ Rectangle {
                             visible: !!modelData.icon
                             text: modelData.icon || ""
                             color: modelData.danger ? Colors.error
-                                : (modelData.disabled ? Colors.textDisabled : Colors.fgSecondary)
+                                : (modelData.disabled ? Colors.textDisabled : Colors.textSecondary)
                             font.family: Colors.fontMono
                             font.pixelSize: Colors.fontSizeMedium
                         }
@@ -159,7 +159,7 @@ Rectangle {
                         Text {
                             visible: !!modelData.shortcut
                             text: modelData.shortcut || ""
-                            color: Colors.fgDim
+                            color: Colors.textDisabled
                             font.pixelSize: Colors.fontSizeXS
                             font.family: Colors.fontMono
                         }

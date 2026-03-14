@@ -183,7 +183,7 @@ SharedWidgets.CardBase {
         Text {
             Layout.fillWidth: true
             text: ProcessService.busy ? "Refreshing process snapshot..." : (root.trimmedSearch === "" ? ("Showing " + String(root.visibleProcesses.length) + " hottest processes by " + (ProcessService.sortBy === "cpu" ? "CPU." : "RAM.")) : ("Showing " + String(root.visibleProcesses.length) + " matches for \"" + root.searchQuery + "\"."))
-            color: Colors.fgDim
+            color: Colors.textDisabled
             font.pixelSize: Colors.fontSizeXS
         }
 
@@ -224,7 +224,7 @@ SharedWidgets.CardBase {
 
                     Text {
                         text: "Details collapsed. Select the row again to reopen actions."
-                        color: Colors.fgDim
+                        color: Colors.textDisabled
                         font.pixelSize: Colors.fontSizeXS
                         Layout.fillWidth: true
                         wrapMode: Text.WordWrap
@@ -300,7 +300,7 @@ SharedWidgets.CardBase {
 
                             Text {
                                 text: String(modelData.user || "user") + "  •  PID " + String(modelData.pid || 0)
-                                color: Colors.fgDim
+                                color: Colors.textDisabled
                                 font.pixelSize: Colors.fontSizeXS
                                 font.family: Colors.fontMono
                             }
@@ -312,21 +312,21 @@ SharedWidgets.CardBase {
 
                             Text {
                                 text: "CPU " + Number(modelData.cpu || 0).toFixed(1) + "%"
-                                color: ProcessService.sortBy === "cpu" ? Colors.primary : Colors.fgSecondary
+                                color: ProcessService.sortBy === "cpu" ? Colors.primary : Colors.textSecondary
                                 font.pixelSize: Colors.fontSizeXS
                                 font.family: Colors.fontMono
                             }
 
                             Text {
                                 text: "RAM " + Number(modelData.mem || 0).toFixed(1) + "%"
-                                color: ProcessService.sortBy === "mem" ? Colors.accent : Colors.fgSecondary
+                                color: ProcessService.sortBy === "mem" ? Colors.accent : Colors.textSecondary
                                 font.pixelSize: Colors.fontSizeXS
                                 font.family: Colors.fontMono
                             }
 
                             Text {
                                 text: String(modelData.elapsed || "--:--")
-                                color: Colors.fgSecondary
+                                color: Colors.textSecondary
                                 font.pixelSize: Colors.fontSizeXS
                                 font.family: Colors.fontMono
                             }
@@ -380,7 +380,7 @@ SharedWidgets.CardBase {
 
                         Text {
                             text: root.selectedProcess ? ("PID " + String(root.selectedProcess.pid || 0) + "  •  " + String(root.selectedProcess.user || "user")) : ""
-                            color: Colors.fgDim
+                            color: Colors.textDisabled
                             font.pixelSize: Colors.fontSizeXS
                             font.family: Colors.fontMono
                         }

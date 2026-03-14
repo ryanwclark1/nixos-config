@@ -53,7 +53,7 @@ Item {
 
             Text {
                 text: "QML Desktop Shell"
-                color: Colors.fgSecondary
+                color: Colors.textSecondary
                 font.pixelSize: Colors.fontSizeMedium
             }
         }
@@ -122,17 +122,17 @@ Item {
             }
             Text {
                 text: "Powered by Qt / QML"
-                color: Colors.fgSecondary
+                color: Colors.textSecondary
                 font.pixelSize: Colors.fontSizeMedium
             }
             Text {
                 text: "Icons: Nerd Fonts"
-                color: Colors.fgSecondary
+                color: Colors.textSecondary
                 font.pixelSize: Colors.fontSizeMedium
             }
             Text {
                 text: Config.themeName ? "Theme: " + Config.themeName : "Theming: pywal"
-                color: Colors.fgSecondary
+                color: Colors.textSecondary
                 font.pixelSize: Colors.fontSizeMedium
             }
         }

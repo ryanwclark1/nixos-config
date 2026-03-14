@@ -85,7 +85,7 @@ Item {
 
         Text {
           text: "󰍉"
-          color: Colors.fgDim
+          color: Colors.textDisabled
           font.family: Colors.fontMono
           font.pixelSize: Colors.fontSizeMedium
         }
@@ -104,7 +104,7 @@ Item {
 
           Text {
             text: "Search settings"
-            color: Colors.fgDim
+            color: Colors.textDisabled
             font.pixelSize: parent.font.pixelSize
             visible: !parent.text && !parent.activeFocus
           }
@@ -112,7 +112,7 @@ Item {
 
         Text {
           text: "󰅖"
-          color: Colors.fgDim
+          color: Colors.textDisabled
           font.family: Colors.fontMono
           font.pixelSize: Colors.fontSizeSmall
           visible: compactSearchInput.text.length > 0
@@ -169,7 +169,7 @@ Item {
               text: root.searchResults.length > 0
                 ? root.searchResults.length + " matching settings"
                 : "No matching settings"
-              color: Colors.fgSecondary
+              color: Colors.textSecondary
               font.pixelSize: Colors.fontSizeSmall
               Layout.fillWidth: true
               wrapMode: Text.WordWrap
@@ -232,7 +232,7 @@ Item {
 
                 Text {
                   text: String(modelData.categoryId || "settings").replace(/-/g, " ")
-                  color: Colors.fgSecondary
+                  color: Colors.textSecondary
                   font.pixelSize: Colors.fontSizeSmall
                   Layout.fillWidth: true
                   wrapMode: Text.WordWrap
@@ -265,7 +265,7 @@ Item {
       Text {
         anchors.centerIn: parent
         text: "Unknown settings tab"
-        color: Colors.fgDim
+        color: Colors.textDisabled
         font.pixelSize: Colors.fontSizeMedium
       }
     }

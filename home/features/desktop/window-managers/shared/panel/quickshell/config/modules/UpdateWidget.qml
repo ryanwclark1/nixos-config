@@ -147,7 +147,7 @@ SharedWidgets.CardBase {
           Text { text: "󱄅"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeSmall }
           Text {
             text: root.nixUpdates
-            color: Colors.fgSecondary
+            color: Colors.textSecondary
             font.pixelSize: Colors.fontSizeSmall
             font.family: Colors.fontMono
           }
@@ -157,7 +157,7 @@ SharedWidgets.CardBase {
           Text { text: "󰏘"; color: Colors.accent; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeSmall }
           Text {
             text: root.flatpakUpdates
-            color: Colors.fgSecondary
+            color: Colors.textSecondary
             font.pixelSize: Colors.fontSizeSmall
             font.family: Colors.fontMono
           }

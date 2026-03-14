@@ -64,7 +64,7 @@ Rectangle {
       x: root.width * modelData - 1
       y: 0; width: 2; height: root.height
       radius: 1
-      color: Colors.withAlpha(Colors.fgDim, 0.3)
+      color: Colors.withAlpha(Colors.textDisabled, 0.3)
       visible: !root.muted && root.value < modelData
     }
   }

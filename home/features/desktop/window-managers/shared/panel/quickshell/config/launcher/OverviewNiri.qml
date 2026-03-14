@@ -112,7 +112,7 @@ Scope {
 
                   Text {
                     text: ""
-                    color: Colors.fgSecondary
+                    color: Colors.textSecondary
                     font.pixelSize: Colors.fontSizeLarge
                     font.family: Colors.fontMono
                     anchors.verticalCenter: parent.verticalCenter
@@ -165,7 +165,18 @@ Scope {
                     delegate: Rectangle {
                       id: wsColumn
                       readonly property var ws: modelData
+                      readonly property int wsIndex: index
                       readonly property bool isFocused: ws.is_focused
+
+                      // Staggered entry animation
+                      opacity: 0
+                      transform: Translate { id: wsSlide; y: 20; Behavior on y { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } } }
+                      Behavior on opacity { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
+
+                      Timer {
+                        running: true; interval: wsColumn.wsIndex * 60
+                        onTriggered: { wsColumn.opacity = 1; wsSlide.y = 0; }
+                      }
                       readonly property var wsWindows: {
                         var all = root.workspaceWindows[ws.id] || [];
                         if (root.searchQuery === "") return all;
@@ -199,7 +210,7 @@ Scope {
                         // Window count
                         Text {
                           text: wsColumn.wsWindows.length + " window" + (wsColumn.wsWindows.length !== 1 ? "s" : "")
-                          color: Colors.fgSecondary
+                          color: Colors.textSecondary
                           font.pixelSize: Colors.fontSizeXS
                           Layout.alignment: Qt.AlignHCenter
                         }
@@ -276,7 +287,7 @@ Scope {
                                     Text {
                                       width: parent.width
                                       text: modelData.app_id || ""
-                                      color: Colors.fgSecondary
+                                      color: Colors.textSecondary
                                       font.pixelSize: Colors.fontSizeXS
                                       elide: Text.ElideRight
                                     }
@@ -290,7 +301,7 @@ Scope {
                                   anchors.top: parent.top
                                   anchors.margins: Colors.spacingS
                                   text: "󰅙"
-                                  color: closeMouse.containsMouse ? Colors.error : Colors.fgSecondary
+                                  color: closeMouse.containsMouse ? Colors.error : Colors.textSecondary
                                   font.pixelSize: Colors.fontSizeLarge
                                   font.family: Colors.fontMono
                                   visible: cardMouse.containsMouse

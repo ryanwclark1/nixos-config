@@ -115,7 +115,9 @@ MouseArea {
     anchors.centerIn: parent
     anchors.verticalCenterOffset: -1
     width: childrenRect.width
-    height: childrenRect.height
+    // Keep a stable container height so children can anchor vertically
+    // without creating a childrenRect -> parent.height binding cycle.
+    height: root.height
   }
 
   BarTooltip {

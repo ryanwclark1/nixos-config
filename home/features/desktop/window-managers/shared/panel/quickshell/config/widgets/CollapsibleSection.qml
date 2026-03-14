@@ -47,7 +47,7 @@ ColumnLayout {
 
             Text {
                 text: root.expanded ? "󰅀" : "󰅂"
-                color: Colors.fgDim
+                color: Colors.textDisabled
                 font.family: Colors.fontMono
                 font.pixelSize: Colors.fontSizeSmall
 
@@ -63,7 +63,7 @@ ColumnLayout {
             Text {
                 visible: !!root.icon
                 text: root.icon
-                color: Colors.fgSecondary
+                color: Colors.textSecondary
                 font.family: Colors.fontMono
                 font.pixelSize: Colors.fontSizeMedium
             }
@@ -71,7 +71,7 @@ ColumnLayout {
             Text {
                 id: headerText
                 text: root.title
-                color: Colors.fgSecondary
+                color: Colors.textSecondary
                 font.pixelSize: Colors.fontSizeSmall
                 font.weight: Font.DemiBold
                 Layout.fillWidth: true

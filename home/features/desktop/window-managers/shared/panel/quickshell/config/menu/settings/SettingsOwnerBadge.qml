@@ -51,7 +51,7 @@ Flow {
                 id: badgeText
                 anchors.centerIn: parent
                 text: root.ownerChip(modelData.label, root.ownerField(modelData.key, modelData.fallback))
-                color: Colors.fgSecondary
+                color: Colors.textSecondary
                 font.pixelSize: Colors.fontSizeXS
             }
         }

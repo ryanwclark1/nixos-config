@@ -349,7 +349,7 @@ PanelWindow {
             text: root.title
             color: Colors.text
             font.pixelSize: Colors.fontSizeLarge
-            font.weight: Colors.fontWeightBold
+            font.weight: Font.Bold
             font.letterSpacing: Colors.letterSpacingTight
           }
 
@@ -476,7 +476,7 @@ PanelWindow {
               text: "QUICK ACCESS"
               color: Colors.textDisabled
               font.pixelSize: Colors.fontSizeXS
-              font.weight: Colors.fontWeightBold
+              font.weight: Font.Bold
               font.letterSpacing: Colors.letterSpacingWide
             }
 
@@ -738,7 +738,7 @@ PanelWindow {
                     text: "Name"
                     color: root._sortBy === "name" ? Colors.primary : Colors.textSecondary
                     font.pixelSize: Colors.fontSizeSmall
-                    font.weight: Colors.fontWeightMedium
+                    font.weight: Font.Medium
                   }
                   Text {
                     text: root._sortBy === "name" ? (root._sortAsc ? "↑" : "↓") : ""
@@ -769,7 +769,7 @@ PanelWindow {
                     text: "Size"
                     color: root._sortBy === "size" ? Colors.primary : Colors.textSecondary
                     font.pixelSize: Colors.fontSizeSmall
-                    font.weight: Colors.fontWeightMedium
+                    font.weight: Font.Medium
                   }
                   Text {
                     text: root._sortBy === "size" ? (root._sortAsc ? "↑" : "↓") : ""
@@ -801,7 +801,7 @@ PanelWindow {
                     text: "Modified"
                     color: root._sortBy === "date" ? Colors.primary : Colors.textSecondary
                     font.pixelSize: Colors.fontSizeSmall
-                    font.weight: Colors.fontWeightMedium
+                    font.weight: Font.Medium
                   }
                   Text {
                     text: root._sortBy === "date" ? (root._sortAsc ? "↑" : "↓") : ""
@@ -833,7 +833,7 @@ PanelWindow {
                     text: "Type"
                     color: root._sortBy === "type" ? Colors.primary : Colors.textSecondary
                     font.pixelSize: Colors.fontSizeSmall
-                    font.weight: Colors.fontWeightMedium
+                    font.weight: Font.Medium
                   }
                   Text {
                     text: root._sortBy === "type" ? (root._sortAsc ? "↑" : "↓") : ""
@@ -1416,7 +1416,7 @@ PanelWindow {
                     text: root.mode === "open" ? "Open" : (root.mode === "save" ? "Save" : (root._compactActions ? "Select" : "Select Folder"))
                     color: actionBtn.canConfirm ? Colors.text : Colors.textDisabled
                     font.pixelSize: Colors.fontSizeMedium
-                    font.weight: Colors.fontWeightMedium
+                    font.weight: Font.Medium
                   }
 
                   MouseArea {

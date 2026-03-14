@@ -83,7 +83,7 @@ Item {
 
                                 Text {
                                     text: (Config.sectionLabel("left", modelData.position) + "/" + Config.sectionLabel("center", modelData.position) + "/" + Config.sectionLabel("right", modelData.position))
-                                    color: Colors.fgSecondary
+                                    color: Colors.textSecondary
                                     font.pixelSize: Colors.fontSizeXS
                                 }
 
@@ -99,7 +99,7 @@ Item {
                                         id: metaText
                                         anchors.centerIn: parent
                                         text: (modelData.position || "top") + " • " + (modelData.displayMode || "all")
-                                        color: Colors.fgSecondary
+                                        color: Colors.textSecondary
                                         font.pixelSize: Colors.fontSizeXS
                                     }
                                 }

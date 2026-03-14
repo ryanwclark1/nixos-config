@@ -96,7 +96,7 @@ Item {
       Text {
         Layout.alignment: Qt.AlignHCenter
         text: Qt.formatDateTime(lockClock.date, "dddd, MMMM d")
-        color: Colors.fgSecondary
+        color: Colors.textSecondary
         font.pixelSize: compact ? 18 : 24
       }
     }
@@ -129,7 +129,7 @@ Item {
 
           Text {
             text: "󰌾"
-            color: Colors.fgDim
+            color: Colors.textDisabled
             font.family: Colors.fontMono
             font.pixelSize: Colors.fontSizeXL
           }
@@ -197,7 +197,7 @@ Item {
         Text {
           anchors.centerIn: parent
           text: "Unlock..."
-          color: Colors.fgDim
+          color: Colors.textDisabled
           font.pixelSize: Colors.fontSizeLarge
           visible: !pwInput.text && !pwInput.activeFocus
         }
@@ -217,7 +217,7 @@ Item {
       Text {
         Layout.alignment: Qt.AlignHCenter
         text: "Authenticating..."
-        color: Colors.fgDim
+        color: Colors.textDisabled
         font.pixelSize: Colors.fontSizeSmall
         visible: lockContext ? lockContext.unlockInProgress : false
       }
@@ -349,13 +349,13 @@ Item {
           spacing: Colors.spacingS
           Text {
             text: Colors.weatherIcon(WeatherService.condition)
-            color: Colors.fgSecondary
+            color: Colors.textSecondary
             font.family: Colors.fontMono
             font.pixelSize: Colors.fontSizeXL
           }
           Text {
             text: (WeatherService.temp || "") + " " + (WeatherService.condition || "")
-            color: Colors.fgSecondary
+            color: Colors.textSecondary
             font.pixelSize: Colors.fontSizeMedium
           }
         }
@@ -365,7 +365,7 @@ Item {
       Text {
         visible: UPower.displayDevice && UPower.displayDevice.isPresent
         text: UPower.displayDevice ? "󰁹 " + Math.round(UPower.displayDevice.percentage * 100) + "%" : ""
-        color: Colors.fgSecondary
+        color: Colors.textSecondary
         font.family: Colors.fontMono
         font.pixelSize: Colors.fontSizeMedium
       }
@@ -429,7 +429,7 @@ Item {
     Text {
       anchors.centerIn: parent
       text: parent.icon
-      color: (root.timerActive && root.pendingAction === parent.action) ? Colors.error : Colors.fgSecondary
+      color: (root.timerActive && root.pendingAction === parent.action) ? Colors.error : Colors.textSecondary
       Behavior on color { ColorAnimation { duration: Colors.durationFast } }
       font.family: Colors.fontMono
       font.pixelSize: Colors.fontSizeLarge

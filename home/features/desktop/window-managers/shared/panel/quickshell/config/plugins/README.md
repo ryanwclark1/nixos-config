@@ -97,6 +97,8 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
   - `scripts/check-plugin-docker-manager-runtime-smoke.sh`
 - Plugin docker-manager contract gate:
   - `scripts/check-plugin-docker-manager-contracts.sh`
+- Plugin docker-manager diagnostics gate:
+  - `scripts/check-plugin-docker-manager-diagnostics.sh`
 - Plugin reference contract gate:
   - `scripts/check-plugin-reference-contracts.sh`
 - Plugin reference fixture gate:
@@ -203,6 +205,7 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
 - Run `scripts/plugin-local.sh docker-status --check` for a fast preflight over the shipped plugin files, required guard scripts, `quickshell`, and Docker availability.
 - Run `scripts/plugin-local.sh docker-flow` for the manual Docker Manager validation sequence.
 - Run `scripts/plugin-local.sh docker-all` for the Docker Manager-only automated guard sequence.
+- Run `scripts/check-plugin-docker-manager-diagnostics.sh` when changing expected diagnostics exports or plugin runtime messaging.
 - `scripts/plugin-local.sh all-gates` and `scripts/plugin-verify.sh` include the Docker Manager guard sequence automatically when Docker Manager prerequisites are available on the machine.
 - Install the repo-tracked plugin locally with `scripts/plugin-local.sh install-docker-manager`.
 - Validate that local install in isolation with `scripts/plugin-local.sh smoke-docker-manager`.

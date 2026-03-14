@@ -40,7 +40,14 @@ QtObject {
         var scriptPath = _resolveHookPath(hookName);
         if (!scriptPath) return;
 
-        var args = [scriptPath, hookName];
+        var args = [
+            "sh",
+            "-c",
+            'script="$1"; shift; [ -x "$script" ] || exit 0; exec "$script" "$@"',
+            "sh",
+            scriptPath,
+            hookName
+        ];
         if (hookValue !== undefined && hookValue !== null && hookValue !== "")
             args.push(String(hookValue));
 

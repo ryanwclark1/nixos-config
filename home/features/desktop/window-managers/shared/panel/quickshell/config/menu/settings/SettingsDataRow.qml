@@ -44,7 +44,7 @@ Rectangle {
             Text {
                 width: root.narrowLayout ? parent.width : root.labelWidth
                 text: root.label
-                color: Colors.fgSecondary
+                color: Colors.textSecondary
                 font.pixelSize: Colors.fontSizeMedium
                 wrapMode: Text.WordWrap
             }

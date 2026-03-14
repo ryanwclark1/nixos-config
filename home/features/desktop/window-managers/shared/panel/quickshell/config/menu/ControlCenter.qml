@@ -363,6 +363,35 @@ PanelWindow {
                                     font.pixelSize: Colors.fontSizeXS
                                     Layout.fillWidth: true
                                 }
+
+                                // Keyboard backlight slider
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    spacing: Colors.spacingSM
+                                    visible: BrightnessService.kbdAvailable
+
+                                    RowLayout {
+                                        Layout.fillWidth: true
+                                        Text {
+                                            text: "󰌌  KEYBOARD"
+                                            color: Colors.textDisabled
+                                            font.pixelSize: Colors.fontSizeXS
+                                            font.weight: Font.Bold
+                                        }
+                                        Item { Layout.fillWidth: true }
+                                        Text {
+                                            text: Math.round(BrightnessService.kbdDevice.brightness * 100) + "%"
+                                            color: Colors.textSecondary
+                                            font.pixelSize: Colors.fontSizeXS
+                                        }
+                                    }
+                                    SharedWidgets.SliderTrack {
+                                        Layout.fillWidth: true
+                                        value: BrightnessService.kbdDevice.brightness
+                                        icon: "󰌌"
+                                        onSliderMoved: v => BrightnessService.setKbdBrightness(v)
+                                    }
+                                }
                             }
 
                             ColumnLayout {

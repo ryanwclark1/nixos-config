@@ -273,6 +273,7 @@ main() {
       and (.healthy.statusMessage | contains("Docker is available"))
       and .degraded.runtimeAvailable == false
       and .degraded.pluginState == "degraded"
+      and .degraded.pluginCode == "E_DOCKER_RUNTIME_UNAVAILABLE"
       and (
         (.degraded.statusMessage | contains("Runtime binary not found"))
         or (.degraded.statusMessage | contains("Runtime unavailable."))

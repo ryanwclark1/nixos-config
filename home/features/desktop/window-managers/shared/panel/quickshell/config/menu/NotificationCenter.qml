@@ -152,28 +152,10 @@ PanelWindow {
         }
 
         // Close button
-        Rectangle {
-          width: 28; height: 28; radius: Colors.radiusXXS
-          color: "transparent"
-
-          SharedWidgets.StateLayer {
-            id: closeStateLayer
-            hovered: closeHover.containsMouse
-            pressed: closeHover.pressed
-          }
-
-          Text { anchors.centerIn: parent; text: "󰅖"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
-
-          MouseArea {
-            id: closeHover
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: (mouse) => {
-              closeStateLayer.burst(mouse.x, mouse.y);
-              root.closeRequested();
-            }
-          }
+        SharedWidgets.IconButton {
+          size: 28; radius: Colors.radiusXXS
+          icon: "󰅖"
+          onClicked: root.closeRequested()
         }
       }
 
@@ -284,30 +266,14 @@ PanelWindow {
               Text { anchors.centerIn: parent; text: parent.sectionCount; color: Colors.primary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
             }
 
-            Rectangle {
-              width: 24; height: 24; radius: Colors.radiusCard
-              color: "transparent"
-
-              SharedWidgets.StateLayer {
-                id: clearStateLayer
-                hovered: clearHover.containsMouse
-                pressed: clearHover.pressed
-              }
-
-              Text { anchors.centerIn: parent; text: "󰅖"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeLarge }
-
-              MouseArea {
-                id: clearHover
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: (mouse) => {
-                  clearStateLayer.burst(mouse.x, mouse.y);
-                  if (!root.manager) return;
-                  for (var i = root.manager.notifications.count - 1; i >= 0; i--) {
-                    var n = root.manager.notifications.get(i);
-                    if (n && n.appName === section) n.dismiss();
-                  }
+            SharedWidgets.IconButton {
+              size: 24; radius: Colors.radiusCard
+              icon: "󰅖"; iconColor: Colors.textDisabled
+              onClicked: {
+                if (!root.manager) return;
+                for (var i = root.manager.notifications.count - 1; i >= 0; i--) {
+                  var n = root.manager.notifications.get(i);
+                  if (n && n.appName === section) n.dismiss();
                 }
               }
             }
@@ -396,20 +362,18 @@ PanelWindow {
               RowLayout {
                 anchors.fill: parent; anchors.margins: Colors.spacingS; spacing: Colors.paddingMedium
                 Item { Layout.fillWidth: true }
-                MouseArea {
-                  width: 24; height: 24; cursorShape: Qt.PointingHandCursor
-                  Text { anchors.centerIn: parent; text: "󰒮"; color: Colors.text; font.family: Colors.fontMono }
+                SharedWidgets.IconButton {
+                  size: 24; icon: "󰒮"; iconColor: Colors.text
                   onClicked: { if (mprisPlayer) mprisPlayer.previous(); }
                 }
-                MouseArea {
-                  width: 32; height: 32; cursorShape: Qt.PointingHandCursor
-                  Rectangle { anchors.fill: parent; radius: height / 2; color: Colors.primary }
-                  Text { anchors.centerIn: parent; text: mprisPlayer && mprisPlayer.playbackState === Mpris.Playing ? "󰏤" : "󰐊"; color: Colors.background; font.family: Colors.fontMono }
+                SharedWidgets.IconButton {
+                  size: 32; color: Colors.primary
+                  icon: mprisPlayer && mprisPlayer.playbackState === Mpris.Playing ? "󰏤" : "󰐊"
+                  iconColor: Colors.background
                   onClicked: { if (mprisPlayer) mprisPlayer.playPause(); }
                 }
-                MouseArea {
-                  width: 24; height: 24; cursorShape: Qt.PointingHandCursor
-                  Text { anchors.centerIn: parent; text: "󰒭"; color: Colors.text; font.family: Colors.fontMono }
+                SharedWidgets.IconButton {
+                  size: 24; icon: "󰒭"; iconColor: Colors.text
                   onClicked: { if (mprisPlayer) mprisPlayer.next(); }
                 }
                 Item { Layout.fillWidth: true }

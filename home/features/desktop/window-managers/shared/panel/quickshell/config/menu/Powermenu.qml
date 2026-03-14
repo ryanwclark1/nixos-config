@@ -43,7 +43,7 @@ PanelWindow {
     { key: "shutdown", icon: "󰐥", label: "Shutdown", color: Colors.error, danger: true, cmd: ["systemctl", "poweroff"] },
     { key: "reboot", icon: "󰑐", label: "Reboot", color: Colors.accent, danger: true, cmd: ["systemctl", "reboot"] },
     { key: "lock", icon: "󰌾", label: "Lock", color: Colors.primary, danger: false, cmd: CompositorAdapter.lockCommand() },
-    { key: "logout", icon: "󰗽", label: "Logout", color: Colors.fgSecondary, danger: false, cmd: CompositorAdapter.logoutCommand() }
+    { key: "logout", icon: "󰗽", label: "Logout", color: Colors.textSecondary, danger: false, cmd: CompositorAdapter.logoutCommand() }
   ]
 
   // ── Uptime ─────────────────────────────────────
@@ -270,7 +270,7 @@ PanelWindow {
 
       Text {
         text: root.timerActive ? "Click again to confirm, ESC to cancel" : "Press ESC to cancel"
-        color: root.timerActive ? Colors.primary : Colors.fgDim
+        color: root.timerActive ? Colors.primary : Colors.textDisabled
         font.pixelSize: Colors.fontSizeMedium
         Layout.alignment: Qt.AlignHCenter
         Behavior on color { ColorAnimation { duration: Colors.durationFast } }

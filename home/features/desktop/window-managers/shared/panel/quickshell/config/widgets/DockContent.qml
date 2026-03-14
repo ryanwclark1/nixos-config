@@ -304,11 +304,11 @@ Item {
               required property int index
               width: 4; height: 4; radius: Colors.radiusMicro
               color: {
-                if (!appDelegate.isFocused) return Colors.fgSecondary;
+                if (!appDelegate.isFocused) return Colors.textSecondary;
                 var active = (typeof ToplevelManager !== 'undefined') ? ToplevelManager.activeToplevel : null;
                 if (active && index < appDelegate.toplevels.length && appDelegate.toplevels[index] === active)
                   return Colors.primary;
-                return Colors.fgSecondary;
+                return Colors.textSecondary;
               }
               Behavior on color { ColorAnimation { duration: Colors.durationFast } }
             }
@@ -326,11 +326,11 @@ Item {
               required property int index
               width: 4; height: 4; radius: Colors.radiusMicro
               color: {
-                if (!appDelegate.isFocused) return Colors.fgSecondary;
+                if (!appDelegate.isFocused) return Colors.textSecondary;
                 var active = (typeof ToplevelManager !== 'undefined') ? ToplevelManager.activeToplevel : null;
                 if (active && index < appDelegate.toplevels.length && appDelegate.toplevels[index] === active)
                   return Colors.primary;
-                return Colors.fgSecondary;
+                return Colors.textSecondary;
               }
               Behavior on color { ColorAnimation { duration: Colors.durationFast } }
             }

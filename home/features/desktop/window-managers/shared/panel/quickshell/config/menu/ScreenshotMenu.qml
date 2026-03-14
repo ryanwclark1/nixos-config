@@ -57,7 +57,7 @@ BasePopupMenu {
 
                         Text {
                             text: modelData.desc
-                            color: Colors.fgSecondary
+                            color: Colors.textSecondary
                             font.pixelSize: Colors.fontSizeXS
                         }
                     }
@@ -105,7 +105,7 @@ BasePopupMenu {
 
         Text {
             text: "Last capture"
-            color: Colors.fgSecondary
+            color: Colors.textSecondary
             font.pixelSize: Colors.fontSizeSmall
             Layout.fillWidth: true
         }

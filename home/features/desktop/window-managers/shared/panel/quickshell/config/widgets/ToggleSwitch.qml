@@ -48,7 +48,7 @@ Item {
     width: thumbSize
     height: thumbSize
     radius: thumbSize / 2
-    color: root.checked ? Colors.background : Colors.fgSecondary
+    color: root.checked ? Colors.background : Colors.textSecondary
     anchors.verticalCenter: parent.verticalCenter
 
     // Horizontal spring: right edge at (44-2)=42 checked, left at 2 unchecked

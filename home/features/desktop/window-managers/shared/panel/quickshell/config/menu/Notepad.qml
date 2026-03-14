@@ -377,87 +377,24 @@ PanelWindow {
         }
 
         // Open file button
-        Rectangle {
-          width: 28; height: 28; radius: Colors.radiusXS
-          color: "transparent"
-          Text {
-            anchors.centerIn: parent
-            text: "󰏗"
-            color: Colors.textSecondary
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeLarge
-          }
-          SharedWidgets.StateLayer {
-            id: openStateLayer
-            hovered: openHover.containsMouse
-            pressed: openHover.pressed
-          }
-          MouseArea {
-            id: openHover
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: (mouse) => {
-              openStateLayer.burst(mouse.x, mouse.y);
-              root.openFileRequested();
-            }
-          }
+        SharedWidgets.IconButton {
+          size: 28; radius: Colors.radiusXS
+          icon: "󰏗"
+          onClicked: root.openFileRequested()
         }
 
         // Save As button
-        Rectangle {
-          width: 28; height: 28; radius: Colors.radiusXS
-          color: "transparent"
-          Text {
-            anchors.centerIn: parent
-            text: "󰆓"
-            color: Colors.textSecondary
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeLarge
-          }
-          SharedWidgets.StateLayer {
-            id: saveStateLayer
-            hovered: saveHover.containsMouse
-            pressed: saveHover.pressed
-          }
-          MouseArea {
-            id: saveHover
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: (mouse) => {
-              saveStateLayer.burst(mouse.x, mouse.y);
-              root.saveAsRequested(root.activeContent);
-            }
-          }
+        SharedWidgets.IconButton {
+          size: 28; radius: Colors.radiusXS
+          icon: "󰆓"
+          onClicked: root.saveAsRequested(root.activeContent)
         }
 
         // Close button
-        Rectangle {
-          width: 28; height: 28; radius: Colors.radiusMedium
-          color: "transparent"
-          Text {
-            anchors.centerIn: parent
-            text: "󰅖"
-            color: Colors.textSecondary
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeLarge
-          }
-          SharedWidgets.StateLayer {
-            id: closeStateLayer
-            hovered: closeHover.containsMouse
-            pressed: closeHover.pressed
-          }
-          MouseArea {
-            id: closeHover
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: (mouse) => {
-              closeStateLayer.burst(mouse.x, mouse.y);
-              root.closeRequested();
-            }
-          }
+        SharedWidgets.IconButton {
+          size: 28; radius: Colors.radiusMedium
+          icon: "󰅖"
+          onClicked: root.closeRequested()
         }
       }
 

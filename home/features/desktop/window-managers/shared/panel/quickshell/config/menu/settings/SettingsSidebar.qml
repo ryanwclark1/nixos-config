@@ -114,7 +114,7 @@ Rectangle {
 
         Text {
           text: "󰍉"
-          color: Colors.fgDim
+          color: Colors.textDisabled
           font.family: Colors.fontMono
           font.pixelSize: Colors.fontSizeMedium
         }
@@ -133,7 +133,7 @@ Rectangle {
 
           Text {
             text: "Search..."
-            color: Colors.fgDim
+            color: Colors.textDisabled
             font.pixelSize: parent.font.pixelSize
             visible: !parent.text && !parent.activeFocus
           }
@@ -141,7 +141,7 @@ Rectangle {
 
         Text {
           text: "󰅖"
-          color: Colors.fgDim
+          color: Colors.textDisabled
           font.family: Colors.fontMono
           font.pixelSize: Colors.fontSizeSmall
           visible: searchInput.text.length > 0
@@ -206,7 +206,7 @@ Rectangle {
                 Text {
                   anchors.centerIn: parent
                   text: modelData.icon
-                  color: root.currentTabId === modelData.id ? Colors.primary : Colors.fgSecondary
+                  color: root.currentTabId === modelData.id ? Colors.primary : Colors.textSecondary
                   font.family: Colors.fontMono
                   font.pixelSize: Colors.fontSizeLarge
                 }
@@ -232,7 +232,7 @@ Rectangle {
                 Text {
                   anchors.horizontalCenter: parent.horizontalCenter
                   text: modelData.icon
-                  color: Colors.withAlpha(Colors.fgDim, 0.85)
+                  color: Colors.withAlpha(Colors.textDisabled, 0.85)
                   font.family: Colors.fontMono
                   font.pixelSize: Colors.fontSizeSmall
                 }
@@ -283,14 +283,14 @@ Rectangle {
 
                 Text {
                   text: modelData.icon
-                  color: root.currentTabId === modelData.id ? Colors.primary : Colors.fgDim
+                  color: root.currentTabId === modelData.id ? Colors.primary : Colors.textDisabled
                   font.family: Colors.fontMono
                   font.pixelSize: Colors.fontSizeLarge
                 }
 
                 Text {
                   text: modelData.label
-                  color: root.currentTabId === modelData.id ? Colors.text : Colors.fgSecondary
+                  color: root.currentTabId === modelData.id ? Colors.text : Colors.textSecondary
                   font.pixelSize: Colors.fontSizeMedium
                   font.weight: root.currentTabId === modelData.id ? Font.DemiBold : Font.Normal
                   Layout.fillWidth: true
@@ -345,21 +345,21 @@ Rectangle {
 
                   Text {
                     text: expanded ? "󰅀" : "󰅂"
-                    color: Colors.fgDim
+                    color: Colors.textDisabled
                     font.family: Colors.fontMono
                     font.pixelSize: Colors.fontSizeSmall
                   }
 
                   Text {
                     text: modelData.icon
-                    color: Colors.fgSecondary
+                    color: Colors.textSecondary
                     font.family: Colors.fontMono
                     font.pixelSize: Colors.fontSizeLarge
                   }
 
                   Text {
                     text: modelData.label
-                    color: Colors.fgSecondary
+                    color: Colors.textSecondary
                     font.pixelSize: Colors.fontSizeSmall
                     font.weight: Font.DemiBold
                     Layout.fillWidth: true
@@ -413,14 +413,14 @@ Rectangle {
 
                       Text {
                         text: modelData.icon
-                        color: root.currentTabId === modelData.id ? Colors.primary : Colors.fgDim
+                        color: root.currentTabId === modelData.id ? Colors.primary : Colors.textDisabled
                         font.family: Colors.fontMono
                         font.pixelSize: Colors.fontSizeMedium
                       }
 
                       Text {
                         text: modelData.label
-                        color: root.currentTabId === modelData.id ? Colors.text : Colors.fgSecondary
+                        color: root.currentTabId === modelData.id ? Colors.text : Colors.textSecondary
                         font.pixelSize: Colors.fontSizeSmall
                         font.weight: root.currentTabId === modelData.id ? Font.DemiBold : Font.Normal
                         Layout.fillWidth: true

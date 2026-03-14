@@ -48,7 +48,7 @@ Rectangle {
         Text {
             visible: root.iconName !== ""
             text: root.iconName
-            color: root.emphasized ? Colors.text : Colors.fgSecondary
+            color: root.emphasized ? Colors.text : Colors.textSecondary
             font.family: Colors.fontMono
             font.pixelSize: compact ? Colors.fontSizeMedium : Colors.fontSizeLarge
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter

@@ -834,7 +834,7 @@ Item {
                             Text {
                                 anchors.centerIn: parent
                                 text: "󰆾"
-                                color: webDragHandle.pressed ? Colors.primary : Colors.fgSecondary
+                                color: webDragHandle.pressed ? Colors.primary : Colors.textSecondary
                                 font.family: Colors.fontMono
                                 font.pixelSize: Colors.fontSizeMedium
                             }
@@ -914,7 +914,7 @@ Item {
 
                             Text {
                                 text: "Drag to reorder, or use the arrow buttons."
-                                color: Colors.fgSecondary
+                                color: Colors.textSecondary
                                 font.pixelSize: Colors.fontSizeXS
                                 Layout.fillWidth: true
                                 wrapMode: Text.WordWrap
@@ -987,7 +987,7 @@ Item {
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     text: root.dragWebProviderKey !== "" ? "Drop at end of provider order" : ""
-                    color: Colors.fgSecondary
+                    color: Colors.textSecondary
                     font.pixelSize: Colors.fontSizeXS
                 }
             }
@@ -1236,7 +1236,7 @@ Item {
                             Text {
                                 anchors.centerIn: parent
                                 text: "󰆾"
-                                color: dragHandle.pressed ? Colors.primary : Colors.fgSecondary
+                                color: dragHandle.pressed ? Colors.primary : Colors.textSecondary
                                 font.family: Colors.fontMono
                                 font.pixelSize: Colors.fontSizeMedium
                             }
@@ -1304,7 +1304,7 @@ Item {
 
                             Text {
                                 text: "Drag to reorder, or use the arrow buttons."
-                                color: Colors.fgSecondary
+                                color: Colors.textSecondary
                                 font.pixelSize: Colors.fontSizeXS
                                 Layout.fillWidth: true
                                 wrapMode: Text.WordWrap
@@ -1377,7 +1377,7 @@ Item {
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     text: root.dragModeKey !== "" ? "Drop at end of mode order" : ""
-                    color: Colors.fgSecondary
+                    color: Colors.textSecondary
                     font.pixelSize: Colors.fontSizeXS
                 }
             }
@@ -1491,7 +1491,7 @@ Item {
 
                 Text {
                     text: "Control toggle visibility and order in the Control Center grid."
-                    color: Colors.fgSecondary
+                    color: Colors.textSecondary
                     font.pixelSize: Colors.fontSizeXS
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
@@ -1511,7 +1511,7 @@ Item {
 
                         Text {
                             text: modelData.icon || "󰖲"
-                            color: hidden ? Colors.fgDim : Colors.primary
+                            color: hidden ? Colors.textDisabled : Colors.primary
                             font.family: Colors.fontMono
                             font.pixelSize: Colors.fontSizeLarge
                         }
@@ -1531,7 +1531,7 @@ Item {
 
                             Text {
                                 text: hidden ? "Hidden" : "Visible"
-                                color: hidden ? Colors.fgDim : Colors.success
+                                color: hidden ? Colors.textDisabled : Colors.success
                                 font.pixelSize: Colors.fontSizeXS
                             }
                         }
@@ -1578,7 +1578,7 @@ Item {
 
                 Text {
                     text: "Manage third-party widgets exposed inside the Control Center."
-                    color: Colors.fgSecondary
+                    color: Colors.textSecondary
                     font.pixelSize: Colors.fontSizeXS
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
@@ -1605,7 +1605,7 @@ Item {
                             Text {
                                 anchors.centerIn: parent
                                 text: "󰏗"
-                                color: hidden ? Colors.fgDim : Colors.primary
+                                color: hidden ? Colors.textDisabled : Colors.primary
                                 font.family: Colors.fontMono
                                 font.pixelSize: Colors.fontSizeMedium
                             }
@@ -1626,7 +1626,7 @@ Item {
 
                             Text {
                                 text: hidden ? "Hidden" : "Visible"
-                                color: hidden ? Colors.fgDim : Colors.success
+                                color: hidden ? Colors.textDisabled : Colors.success
                                 font.pixelSize: Colors.fontSizeXS
                             }
                         }

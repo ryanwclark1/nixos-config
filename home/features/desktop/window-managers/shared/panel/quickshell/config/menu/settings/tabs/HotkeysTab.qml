@@ -119,7 +119,7 @@ Item {
             Text {
                 visible: root.keybindsList.length === 0
                 text: "Loading keybindings…"
-                color: Colors.fgDim
+                color: Colors.textDisabled
                 font.pixelSize: Colors.fontSizeMedium
                 Layout.alignment: Qt.AlignHCenter
                 Layout.topMargin: Colors.spacingLG
@@ -190,7 +190,7 @@ Item {
 
                         Text {
                             text: modelData.arg || "—"
-                            color: Colors.fgSecondary
+                            color: Colors.textSecondary
                             font.pixelSize: Colors.fontSizeSmall
                             font.family: modelData.arg ? Colors.fontMono : ""
                             Layout.fillWidth: true

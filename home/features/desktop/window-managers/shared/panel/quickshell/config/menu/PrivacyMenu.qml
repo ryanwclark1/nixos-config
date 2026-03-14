@@ -55,7 +55,7 @@ BasePopupMenu {
 
         Text {
           text: PrivacyService.anyActive ? PrivacyService.activeLabel : "Microphone, camera, and screen share are idle"
-          color: Colors.fgSecondary
+          color: Colors.textSecondary
           font.pixelSize: Colors.fontSizeSmall
           wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap
           Layout.fillWidth: true

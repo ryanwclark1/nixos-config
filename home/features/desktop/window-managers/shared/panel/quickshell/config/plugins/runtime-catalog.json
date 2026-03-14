@@ -94,6 +94,21 @@
       "label": "Daemon Start Failed",
       "description": "Daemon instance was created but failed during start().",
       "severity": "error"
+    },
+    "E_DOCKER_RUNTIME_UNAVAILABLE": {
+      "label": "Docker Runtime Unavailable",
+      "description": "Docker Manager could not reach the configured container runtime or inspect its containers.",
+      "severity": "warn"
+    },
+    "E_DOCKER_SNAPSHOT_PARSE": {
+      "label": "Docker Snapshot Parse Failed",
+      "description": "Docker Manager received runtime output that could not be parsed into a container snapshot.",
+      "severity": "warn"
+    },
+    "E_DOCKER_ACTION_FAILED": {
+      "label": "Docker Action Failed",
+      "description": "Docker Manager failed while executing a container or compose action.",
+      "severity": "warn"
     }
   }
 }

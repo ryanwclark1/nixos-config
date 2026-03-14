@@ -16,19 +16,25 @@ Scope {
     if (!CompositorAdapter.isNiri || !NiriService.available) return [];
     var mru = NiriService.mruWindowIds;
     var allWindows = NiriService.windows;
+    // Build id → window map for O(1) lookups
+    var windowMap = {};
+    for (var j = 0; j < allWindows.length; j++)
+      windowMap[allWindows[j].id] = allWindows[j];
     var result = [];
     for (var i = 0; i < mru.length; i++) {
-      for (var j = 0; j < allWindows.length; j++) {
-        if (allWindows[j].id === mru[i]) {
-          result.push(allWindows[j]);
-          break;
-        }
-      }
+      var win = windowMap[mru[i]];
+      if (win) result.push(win);
     }
     return result;
   }
 
   property int selectedIndex: 0
+
+  // Clamp selectedIndex when window list shrinks (e.g. window closed while switcher open)
+  onWindowListChanged: {
+    if (selectedIndex >= windowList.length)
+      selectedIndex = Math.max(0, windowList.length - 1);
+  }
 
   function show() {
     if (windowList.length < 2) return;
@@ -181,7 +187,7 @@ Scope {
                         anchors.horizontalCenter: parent.horizontalCenter
                         width: card.width - Colors.spacingM * 2
                         text: modelData.app_id || "Unknown"
-                        color: card.isSelected ? Colors.text : Colors.fgSecondary
+                        color: card.isSelected ? Colors.text : Colors.textSecondary
                         font.pixelSize: Colors.fontSizeXS
                         font.family: Colors.fontMono
                         horizontalAlignment: Text.AlignHCenter
@@ -208,7 +214,7 @@ Scope {
                           var ws = NiriService.workspaces ? NiriService.workspaces[modelData.workspace_id] : null;
                           return ws ? String(ws.name || ws.idx || modelData.workspace_id) : String(modelData.workspace_id);
                         }
-                        color: Colors.fgSecondary
+                        color: Colors.textSecondary
                         font.pixelSize: Colors.fontSizeXXS
                       }
                     }

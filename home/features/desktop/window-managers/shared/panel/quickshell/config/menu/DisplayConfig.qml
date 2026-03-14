@@ -534,7 +534,7 @@ PanelWindow {
             Text {
               anchors.centerIn: parent
               text: "󰅖"
-              color: Colors.fgSecondary
+              color: Colors.textSecondary
               font.family: Colors.fontMono
               font.pixelSize: Colors.fontSizeLarge
             }
@@ -581,7 +581,7 @@ PanelWindow {
             onPaint: {
               var ctx = getContext("2d");
               ctx.clearRect(0, 0, width, height);
-              ctx.fillStyle = Qt.rgba(Colors.fgDim.r, Colors.fgDim.g, Colors.fgDim.b, 0.18);
+              ctx.fillStyle = Qt.rgba(Colors.textDisabled.r, Colors.textDisabled.g, Colors.textDisabled.b, 0.18);
               var step = 24;
               for (var gx = step; gx < width; gx += step) {
                 for (var gy = step; gy < height; gy += step) {
@@ -598,7 +598,7 @@ PanelWindow {
             visible: displayRoot.loading
             anchors.centerIn: parent
             text: "Loading monitors…"
-            color: Colors.fgDim
+            color: Colors.textDisabled
             font.pixelSize: Colors.fontSizeMedium
           }
 
@@ -607,7 +607,7 @@ PanelWindow {
             visible: !displayRoot.loading && displayRoot.monitors.length === 0
             anchors.centerIn: parent
             text: "No monitors detected"
-            color: Colors.fgDim
+            color: Colors.textDisabled
             font.pixelSize: Colors.fontSizeMedium
           }
 
@@ -666,7 +666,7 @@ PanelWindow {
                   text: monDelegate.modelData.width + "×" + monDelegate.modelData.height
                         + "\n" + monDelegate.modelData.refreshRate.toFixed(0) + "Hz"
                         + "  @" + monDelegate.modelData.scale.toFixed(2) + "×"
-                  color: Colors.fgSecondary
+                  color: Colors.textSecondary
                   font.pixelSize: Math.max(8, Math.min(11, monDelegate.height * 0.10))
                   font.family: Colors.fontMono
                   horizontalAlignment: Text.AlignHCenter
@@ -677,7 +677,7 @@ PanelWindow {
                 Text {
                   anchors { bottom: parent.bottom; right: parent.right; margins: 5 }
                   text: "󰆾"
-                  color: Colors.withAlpha(Colors.fgDim, 0.6)
+                  color: Colors.withAlpha(Colors.textDisabled, 0.6)
                   font.family: Colors.fontMono
                   font.pixelSize: Colors.fontSizeXS
                   visible: monDelegate.height > 40
@@ -746,7 +746,7 @@ PanelWindow {
                         ? "  —  " + displayRoot.monitors[displayRoot.selectedIndex].description
                         : ""))
                   : ""
-            color: Colors.fgDim
+            color: Colors.textDisabled
             font.pixelSize: Colors.fontSizeXS
             font.weight: Font.Black
             font.letterSpacing: Colors.letterSpacingExtraWide
@@ -1085,7 +1085,7 @@ PanelWindow {
           RowLayout {
             anchors.centerIn: parent
             spacing: Colors.spacingS
-            Text { text: "󰑐"; color: Colors.fgSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium }
+            Text { text: "󰑐"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium }
             Text { text: "Reload"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
           }
 
@@ -1117,7 +1117,7 @@ PanelWindow {
           RowLayout {
             anchors.centerIn: parent
             spacing: Colors.spacingS
-            Text { text: "󰅖"; color: Colors.fgSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium }
+            Text { text: "󰅖"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium }
             Text { text: "Close"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
           }
 
@@ -1261,7 +1261,7 @@ PanelWindow {
 
         Text {
           text: "Reverting in " + displayRoot.countdownSeconds + " seconds…"
-          color: Colors.fgSecondary
+          color: Colors.textSecondary
           font.pixelSize: Colors.fontSizeSmall
           Layout.alignment: Qt.AlignHCenter
         }

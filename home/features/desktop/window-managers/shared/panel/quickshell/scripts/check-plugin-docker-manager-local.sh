@@ -47,9 +47,11 @@ tmp_flow_out="$(mktemp)"
 tmp_flow_err="$(mktemp)"
 tmp_guards_out="$(mktemp)"
 tmp_guards_err="$(mktemp)"
+tmp_all_out="$(mktemp)"
+tmp_all_err="$(mktemp)"
 tmp_help_out="$(mktemp)"
 tmp_help_err="$(mktemp)"
-trap 'rm -rf "$tmp_plugins" "$tmp_json" "$tmp_status_out" "$tmp_status_err" "$tmp_status_quiet_out" "$tmp_status_quiet_err" "$tmp_files_out" "$tmp_files_err" "$tmp_flow_out" "$tmp_flow_err" "$tmp_guards_out" "$tmp_guards_err" "$tmp_help_out" "$tmp_help_err"' EXIT
+trap 'rm -rf "$tmp_plugins" "$tmp_json" "$tmp_status_out" "$tmp_status_err" "$tmp_status_quiet_out" "$tmp_status_quiet_err" "$tmp_files_out" "$tmp_files_err" "$tmp_flow_out" "$tmp_flow_err" "$tmp_guards_out" "$tmp_guards_err" "$tmp_all_out" "$tmp_all_err" "$tmp_help_out" "$tmp_help_err"' EXIT
 
 cp -R "$plugin_dir" "${tmp_plugins}/docker-manager"
 
@@ -131,7 +133,8 @@ fi
 if "$local_runner" docker-guards >"$tmp_guards_out" 2>"$tmp_guards_err"; then
   if rg -q 'check-plugin-docker-manager-local\.sh' "$tmp_guards_out" \
     && rg -q 'check-plugin-docker-manager-runtime-smoke\.sh' "$tmp_guards_out" \
-    && rg -q 'check-plugin-docker-manager-contracts\.sh' "$tmp_guards_out"; then
+    && rg -q 'check-plugin-docker-manager-contracts\.sh' "$tmp_guards_out" \
+    && rg -q 'check-plugin-docker-manager-diagnostics\.sh' "$tmp_guards_out"; then
     pass "plugin-local docker-guards prints the assembled docker-manager guard sequence"
   else
     fail "plugin-local docker-guards output drifted from the expected docker-manager guard sequence"
@@ -140,6 +143,21 @@ if "$local_runner" docker-guards >"$tmp_guards_out" 2>"$tmp_guards_err"; then
 else
   fail "plugin-local docker-guards should succeed"
   sed -n '1,120p' "$tmp_guards_err" >&2
+fi
+
+if env PLUGIN_LOCAL_DOCKER_SKIP_LOCAL=1 "$local_runner" docker-all --quiet >"$tmp_all_out" 2>"$tmp_all_err"; then
+  if ! rg -q 'Plugin docker local summary:' "$tmp_all_out" \
+    && rg -q 'Plugin docker runtime smoke summary: 2 pass, 0 fail' "$tmp_all_out" \
+    && rg -q 'Docker-manager plugin contract summary: 28 pass, 0 fail' "$tmp_all_out" \
+    && rg -q 'Plugin docker diagnostics summary:' "$tmp_all_out"; then
+    pass "plugin-local docker-all --quiet runs the assembled docker-manager guard sequence when local recursion is disabled"
+  else
+    fail "plugin-local docker-all --quiet output drifted from the expected docker-manager aggregate guard sequence"
+    sed -n '1,160p' "$tmp_all_out" >&2
+  fi
+else
+  fail "plugin-local docker-all --quiet should succeed when local recursion is disabled"
+  sed -n '1,160p' "$tmp_all_err" >&2
 fi
 
 if "$local_runner" --help >"$tmp_help_out" 2>"$tmp_help_err"; then

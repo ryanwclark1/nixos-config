@@ -25,9 +25,6 @@ QtObject {
     property color textDisabled: "#72767d"
 
     // --- DERIVED PROPERTIES (Auto-updating) ---
-    readonly property color fgSecondary: textSecondary
-    readonly property color fgDim: textDisabled
-
     readonly property string fontMono: Config.monoFontFamily || "JetBrainsMono Nerd Font"
     readonly property real _fontScale: clampScale(Config.fontScale, 1.0)
     readonly property real _radiusScale: clampScale(Config.radiusScale, 1.0)

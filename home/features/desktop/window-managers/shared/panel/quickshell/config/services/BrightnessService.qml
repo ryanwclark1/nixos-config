@@ -19,6 +19,17 @@ QtObject {
             available: false
         })
 
+    // ── Keyboard backlight ─────────────────────────
+    property var kbdDevice: _emptyKbdDevice
+    readonly property bool kbdAvailable: kbdDevice.available
+
+    readonly property var _emptyKbdDevice: ({
+            name: "none",
+            brightness: 0,
+            maxSteps: 0,
+            available: false
+        })
+
     // ── Subscriber-based polling ─────────────────
     property int subscriberCount: 0
 
@@ -48,7 +59,9 @@ QtObject {
             // Line 1: internal brightness (brightnessctl)
             "int_avail=0; int_curr=0; int_max=100; int_name='eDP-1'; " + "if command -v brightnessctl >/dev/null 2>&1; then " + "if brightnessctl -m 2>/dev/null | head -n1 | grep -q .; then " + "int_avail=1; int_curr=$(brightnessctl g 2>/dev/null || echo 0); " + "int_max=$(brightnessctl m 2>/dev/null || echo 100); fi; fi; " + "printf 'INT|%s|%s|%s|%s\\n' \"$int_avail\" \"$int_name\" \"$int_curr\" \"$int_max\"; " +
             // Line 2+: DDC external monitors
-            "if command -v ddcutil >/dev/null 2>&1; then " + "ddcutil detect --brief 2>/dev/null | awk '" + "/^Display [0-9]/ { bus=\"\"; name=\"\" } " + "/I2C bus:/ { gsub(/.*\\/dev\\/i2c-/, \"\"); bus=$0 } " + "/Monitor:/ { $1=\"\"; name=$0; gsub(/^[ \\t]+/, \"\", name) } " + "bus && name { printf \"DDC|%s|%s\\n\", bus, name; bus=\"\"; name=\"\" }'" + "; for bus in $(ddcutil detect --brief 2>/dev/null | awk '/I2C bus:/ {gsub(/.*i2c-/,\"\"); print}'); do " + "val=$(ddcutil getvcp 10 --bus \"$bus\" --brief 2>/dev/null | awk '{print $4, $5}'); " + "printf 'DDCVAL|%s|%s\\n' \"$bus\" \"$val\"; done; fi"]
+            "if command -v ddcutil >/dev/null 2>&1; then " + "ddcutil detect --brief 2>/dev/null | awk '" + "/^Display [0-9]/ { bus=\"\"; name=\"\" } " + "/I2C bus:/ { gsub(/.*\\/dev\\/i2c-/, \"\"); bus=$0 } " + "/Monitor:/ { $1=\"\"; name=$0; gsub(/^[ \\t]+/, \"\", name) } " + "bus && name { printf \"DDC|%s|%s\\n\", bus, name; bus=\"\"; name=\"\" }'" + "; for bus in $(ddcutil detect --brief 2>/dev/null | awk '/I2C bus:/ {gsub(/.*i2c-/,\"\"); print}'); do " + "val=$(ddcutil getvcp 10 --bus \"$bus\" --brief 2>/dev/null | awk '{print $4, $5}'); " + "printf 'DDCVAL|%s|%s\\n' \"$bus\" \"$val\"; done; fi; " +
+            // Keyboard backlight
+            "for d in /sys/class/leds/*kbd_backlight*; do " + "if [ -e \"$d\" ]; then " + "dname=$(basename \"$d\"); " + "curr=$(brightnessctl -d \"$dname\" get 2>/dev/null || echo 0); " + "kmax=$(brightnessctl -d \"$dname\" max 2>/dev/null || echo 0); " + "printf 'KBD|%s|%s|%s\\n' \"$dname\" \"$curr\" \"$kmax\"; " + "break; fi; done"]
         stdout: StdioCollector {
             onStreamFinished: root._parseDetection(this.text || "")
         }
@@ -94,6 +107,17 @@ QtObject {
                     curr: parseFloat(vals[0]) || 0,
                     max: parseFloat(vals[1]) || 100
                 };
+            } else if (parts[0] === "KBD") {
+                var kbdCurr = parseFloat(parts[2]) || 0;
+                var kbdMax = parseFloat(parts[3]) || 0;
+                if (kbdMax > 0) {
+                    root.kbdDevice = {
+                        name: parts[1] || "kbd_backlight",
+                        brightness: Colors.clamp01(kbdCurr / kbdMax),
+                        maxSteps: kbdMax,
+                        available: true
+                    };
+                }
             }
         }
 
@@ -155,13 +179,41 @@ QtObject {
         monitors = updated;
     }
 
+    // ── Set keyboard brightness ───────────────────
+    function setKbdBrightness(value) {
+        if (!kbdDevice.available) return;
+        var clamped = Colors.clamp01(value);
+        var step = Math.round(clamped * kbdDevice.maxSteps);
+        Quickshell.execDetached(["brightnessctl", "-d", kbdDevice.name, "set", step.toString()]);
+        kbdDevice = {
+            name: kbdDevice.name,
+            brightness: clamped,
+            maxSteps: kbdDevice.maxSteps,
+            available: true
+        };
+    }
+
     // ── Polling for brightness changes (internal only) ──
     property Process _internalPollProc: Process {
         running: false
-        command: ["sh", "-c", "curr=$(brightnessctl g 2>/dev/null || echo 0); " + "max=$(brightnessctl m 2>/dev/null || echo 100); " + "echo \"$curr $max\""]
+        command: ["sh", "-c",
+            "curr=$(brightnessctl g 2>/dev/null || echo 0); " +
+            "max=$(brightnessctl m 2>/dev/null || echo 100); " +
+            "echo \"$curr $max\"; " +
+            // Keyboard backlight poll
+            "kbd_curr=0; kbd_max=0; kbd_name=''; " +
+            "for d in /sys/class/leds/*kbd_backlight*; do " +
+            "if [ -e \"$d\" ]; then " +
+            "kbd_name=$(basename \"$d\"); " +
+            "kbd_curr=$(brightnessctl -d \"$kbd_name\" get 2>/dev/null || echo 0); " +
+            "kbd_max=$(brightnessctl -d \"$kbd_name\" max 2>/dev/null || echo 0); " +
+            "break; fi; done; " +
+            "printf '%s %s %s\\n' \"$kbd_curr\" \"$kbd_max\" \"$kbd_name\""]
         stdout: StdioCollector {
             onStreamFinished: {
-                var parts = (this.text || "").trim().split(/\s+/);
+                var lines = (this.text || "").trim().split("\n");
+                // Line 1: display brightness
+                var parts = (lines[0] || "").trim().split(/\s+/);
                 var curr = parseFloat(parts[0]) || 0;
                 var max = parseFloat(parts[1]) || 100;
                 var brightness = max > 0 ? Colors.clamp01(curr / max) : 0;
@@ -183,6 +235,21 @@ QtObject {
                 }
                 if (updated.length > 0)
                     root.monitors = updated;
+
+                // Line 2: keyboard backlight
+                if (lines.length >= 2 && root.kbdDevice.available) {
+                    var kp = (lines[1] || "").trim().split(/\s+/);
+                    var kCurr = parseFloat(kp[0]) || 0;
+                    var kMax = parseFloat(kp[1]) || 0;
+                    if (kMax > 0) {
+                        root.kbdDevice = {
+                            name: kp[2] || root.kbdDevice.name,
+                            brightness: Colors.clamp01(kCurr / kMax),
+                            maxSteps: kMax,
+                            available: true
+                        };
+                    }
+                }
             }
         }
     }

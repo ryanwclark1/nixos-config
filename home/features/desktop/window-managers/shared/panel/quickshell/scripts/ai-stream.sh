@@ -47,6 +47,7 @@ case "$PROVIDER" in
         curl -s --no-buffer -X POST "$URL" \
             -H "Content-Type: application/json" \
             -d "$BODY" 2>/dev/null | while IFS= read -r line; do
+            line="${line%$'\r'}"
             [[ -z "$line" ]] && continue
 
             # Ollama NDJSON: each line is a JSON object with .message.content
@@ -100,6 +101,7 @@ case "$PROVIDER" in
             -H "x-api-key: $API_KEY" \
             -H "anthropic-version: 2023-06-01" \
             -d "$BODY" 2>/dev/null | while IFS= read -r line; do
+            line="${line%$'\r'}"
             # SSE format: lines starting with "data: "
             if [[ "$line" == data:* ]]; then
                 data="${line#data: }"
@@ -153,6 +155,7 @@ case "$PROVIDER" in
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $API_KEY" \
             -d "$BODY" 2>/dev/null | while IFS= read -r line; do
+            line="${line%$'\r'}"
             if [[ "$line" == data:* ]]; then
                 data="${line#data: }"
                 [[ "$data" == "[DONE]" ]] && break
@@ -200,6 +203,7 @@ case "$PROVIDER" in
         curl -s --no-buffer -X POST "$URL" \
             -H "Content-Type: application/json" \
             -d "$BODY" 2>/dev/null | while IFS= read -r line; do
+            line="${line%$'\r'}"
             if [[ "$line" == data:* ]]; then
                 data="${line#data: }"
                 [[ -z "$data" ]] && continue

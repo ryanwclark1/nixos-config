@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-01-01T00:00:00Z",
+  "summary": {
+    "installed": 1,
+    "enabled": 1,
+    "invalidManifests": 0,
+    "statuses": {
+      "active": 1,
+      "enabled": 0,
+      "degraded": 0,
+      "failed": 0,
+      "disabled": 0,
+      "validated": 0,
+      "discovered": 0,
+      "unknown": 0
+    }
+  },
+  "plugins": [
+    {
+      "id": "docker.manager",
+      "name": "Docker Manager",
+      "version": "1.0.0",
+      "type": "multi",
+      "enabled": true,
+      "author": "nixos-config",
+      "permissions": [
+        "settings_read",
+        "settings_write",
+        "process"
+      ],
+      "entryPoints": {
+        "barWidget": "BarWidget.qml",
+        "daemon": "Daemon.qml",
+        "settings": "Settings.qml"
+      },
+      "runtime": {
+        "state": "active",
+        "stateLabel": "Active",
+        "stateSeverity": "ok",
+        "code": "",
+        "codeLabel": "",
+        "codeSeverity": "muted",
+        "message": "",
+        "updatedAt": "2026-01-01T00:00:00Z"
+      }
+    }
+  ],
+  "manifestErrors": []
+}

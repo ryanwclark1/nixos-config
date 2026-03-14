@@ -8,6 +8,7 @@ Rectangle {
   property int size: 30
   property int iconSize: Colors.fontSizeLarge
   property color iconColor: Colors.textSecondary
+  property color stateColor: Colors.text
 
   signal clicked(real x, real y)
 
@@ -28,6 +29,7 @@ Rectangle {
     id: stateLayer
     hovered: hoverArea.containsMouse
     pressed: hoverArea.pressed
+    stateColor: root.stateColor
   }
 
   MouseArea {

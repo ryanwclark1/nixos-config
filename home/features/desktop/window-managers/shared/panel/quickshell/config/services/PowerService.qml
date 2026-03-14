@@ -117,7 +117,7 @@ QtObject {
         stdinEnabled: true
         onStarted: {
             _writeProc.write(root._pendingHypridleContent);
-            _writeProc.closeStdin();
+            _writeProc.stdinEnabled = false;
         }
         onExited: (exitCode, exitStatus) => {
             root._pendingHypridleContent = "";

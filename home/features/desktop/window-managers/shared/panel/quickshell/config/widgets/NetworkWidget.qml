@@ -110,7 +110,7 @@ Row {
         id: secondaryLabel
         anchors.centerIn: parent
         text: root.secondaryText
-        color: Colors.fgSecondary
+        color: Colors.textSecondary
         font.pixelSize: Colors.fontSizeXS
         font.weight: Font.Medium
       }

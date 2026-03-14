@@ -66,7 +66,7 @@ SharedWidgets.CardBase {
             Layout.fillWidth: true
             elide: Text.ElideRight
           }
-          Text { text: SystemStatus.gpuUsage; color: Colors.fgSecondary; font.pixelSize: Colors.fontSizeXS }
+          Text { text: SystemStatus.gpuUsage; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS }
         }
         SharedWidgets.MiniProgressBar { value: SystemStatus.gpuPercent; barColor: Colors.accent }
       }
@@ -83,7 +83,7 @@ SharedWidgets.CardBase {
             Layout.fillWidth: true
             elide: Text.ElideRight
           }
-          Text { text: root.vramUsage; color: Colors.fgSecondary; font.pixelSize: Colors.fontSizeXS }
+          Text { text: root.vramUsage; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS }
         }
         SharedWidgets.MiniProgressBar { value: root.vramPercent; barColor: Colors.primary }
       }

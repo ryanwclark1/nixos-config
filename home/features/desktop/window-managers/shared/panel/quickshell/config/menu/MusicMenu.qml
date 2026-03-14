@@ -119,7 +119,7 @@ BasePopupMenu {
       Text {
         anchors.centerIn: parent
         text: "󰝚"
-        color: Colors.fgDim
+        color: Colors.textDisabled
         font.family: Colors.fontMono
         font.pixelSize: Colors.fontSizeHuge * 2
         visible: albumArt.status !== Image.Ready
@@ -144,7 +144,7 @@ BasePopupMenu {
 
       Text {
         text: MediaService.trackArtist || "Unknown Artist"
-        color: Colors.fgSecondary
+        color: Colors.textSecondary
         font.pixelSize: root.compactMode ? Colors.fontSizeSmall : Colors.fontSizeMedium
         Layout.fillWidth: true
         horizontalAlignment: Text.AlignHCenter

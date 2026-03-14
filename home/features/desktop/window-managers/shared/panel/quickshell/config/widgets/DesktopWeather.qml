@@ -30,7 +30,7 @@ Item {
 
       Text {
         text: WeatherService.condition || "Unknown"
-        color: Colors.fgSecondary
+        color: Colors.textSecondary
         font.pixelSize: Colors.fontSizeSmall
       }
 

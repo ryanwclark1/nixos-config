@@ -33,7 +33,7 @@ Rectangle {
       }
       Text {
         text: (WeatherService.condition || "Unknown") + " in " + (WeatherService.location || "Local")
-        color: Colors.fgDim
+        color: Colors.textDisabled
         font.pixelSize: Colors.fontSizeSmall
         elide: Text.ElideRight
         Layout.fillWidth: true

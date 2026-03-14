@@ -479,7 +479,7 @@ PanelWindow {
 
             Text {
               text: "#"
-              color: Colors.fgDim
+              color: Colors.textDisabled
               font.family: Colors.fontMono
               font.pixelSize: Colors.fontSizeMedium
             }
@@ -523,7 +523,7 @@ PanelWindow {
           Text {
             anchors.centerIn: parent
             text: clipCopied.running ? "󰄬" : "󰆏"
-            color: clipCopied.running ? Colors.primary : Colors.fgSecondary
+            color: clipCopied.running ? Colors.primary : Colors.textSecondary
             font.family: Colors.fontMono
             font.pixelSize: Colors.fontSizeLarge
           }
@@ -620,7 +620,7 @@ PanelWindow {
 
             Text {
               text: modelData.value
-              color: Colors.fgDim
+              color: Colors.textDisabled
               font.family: Colors.fontMono
               font.pixelSize: Colors.fontSizeXS
               Layout.preferredWidth: 28

@@ -59,10 +59,13 @@ ssh_guard_label() {
 }
 
 docker_guard_commands() {
+  if [[ "${PLUGIN_LOCAL_DOCKER_SKIP_LOCAL:-0}" != "1" ]]; then
+    printf '%s\n' "${script_dir}/check-plugin-docker-manager-local.sh"
+  fi
   cat <<EOF
-${script_dir}/check-plugin-docker-manager-local.sh
 ${script_dir}/check-plugin-docker-manager-runtime-smoke.sh
 ${script_dir}/check-plugin-docker-manager-contracts.sh
+${script_dir}/check-plugin-docker-manager-diagnostics.sh
 EOF
 }
 
@@ -77,6 +80,9 @@ docker_guard_label() {
       ;;
     *"check-plugin-docker-manager-contracts.sh")
       printf '%s' 'docker-manager contract checks'
+      ;;
+    *"check-plugin-docker-manager-diagnostics.sh")
+      printf '%s' 'docker-manager diagnostics checks'
       ;;
     *)
       printf '%s' 'docker-manager guard'
@@ -172,7 +178,7 @@ Modes:
   ssh-files          Print canonical first-party SSH plugin file and guard paths only
   ssh-guards         Print runnable first-party SSH plugin guard commands in order
   ssh-all            Run the full first-party SSH plugin guard sequence (`--quiet` suppresses stage headings)
-  shared-gates       Run the shared runtime and diagnostics plugin gates (`--quiet` suppresses wrapper headings)
+  shared-gates       Run the shared Quickshell startup, runtime, and diagnostics plugin gates (`--quiet` suppresses wrapper headings)
   baseline-gates     Run plugin conformance and doctor-smoke gates (`--quiet` suppresses wrapper headings)
   all-gates          Run baseline, reference, and shared plugin gates (`--quiet` suppresses phase headings)
 EOF
@@ -620,7 +626,7 @@ EOF
       source_health="$(health_label 0 "docker-manager plugin source")"
       health_failures=$((health_failures + 1))
     fi
-    if [[ -x "${script_dir}/check-plugin-docker-manager-local.sh" && -x "${script_dir}/check-plugin-docker-manager-runtime-smoke.sh" && -x "${script_dir}/check-plugin-docker-manager-contracts.sh" ]]; then
+    if [[ -x "${script_dir}/check-plugin-docker-manager-local.sh" && -x "${script_dir}/check-plugin-docker-manager-runtime-smoke.sh" && -x "${script_dir}/check-plugin-docker-manager-contracts.sh" && -x "${script_dir}/check-plugin-docker-manager-diagnostics.sh" ]]; then
       guard_health="$(health_label 1 "docker-manager guard scripts")"
     else
       guard_health="$(health_label 0 "docker-manager guard scripts")"
@@ -689,6 +695,7 @@ Docker guards:
   scripts/check-plugin-docker-manager-local.sh
   scripts/check-plugin-docker-manager-runtime-smoke.sh
   scripts/check-plugin-docker-manager-contracts.sh
+  scripts/check-plugin-docker-manager-diagnostics.sh
 EOF
     else
       printf '[INFO] Docker Manager status: %s | %s | %s | %s | %s\n' \
@@ -716,6 +723,7 @@ readme=${docker_readme}
 guard_local=${script_dir}/check-plugin-docker-manager-local.sh
 guard_runtime_smoke=${script_dir}/check-plugin-docker-manager-runtime-smoke.sh
 guard_contracts=${script_dir}/check-plugin-docker-manager-contracts.sh
+guard_diagnostics=${script_dir}/check-plugin-docker-manager-diagnostics.sh
 EOF
     ;;
   docker-guards)
@@ -873,6 +881,10 @@ EOF
     if [[ "${2:-}" == "--quiet" ]]; then
       quiet=1
     fi
+    if (( quiet == 0 )); then
+      printf '[INFO] Running Quickshell startup smoke checks...\n'
+    fi
+    "${script_dir}/check-quickshell-startup.sh"
     if (( quiet == 0 )); then
       printf '[INFO] Running plugin runtime guard checks...\n'
     fi

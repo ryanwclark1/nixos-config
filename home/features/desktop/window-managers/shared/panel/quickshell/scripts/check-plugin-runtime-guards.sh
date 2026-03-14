@@ -4,6 +4,7 @@ set -euo pipefail
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 plugin_service="${script_dir}/../config/services/PluginService.qml"
 plugin_runtime="${script_dir}/../config/services/PluginRuntime.qml"
+docker_daemon="${script_dir}/../examples/plugins/docker-manager/Daemon.qml"
 runtime_catalog="${script_dir}/../config/plugins/runtime-catalog.json"
 
 pass_count=0
@@ -42,6 +43,10 @@ if [[ ! -f "$plugin_runtime" ]]; then
   echo "[FAIL] Missing plugin runtime: $plugin_runtime" >&2
   exit 1
 fi
+if [[ ! -f "$docker_daemon" ]]; then
+  echo "[FAIL] Missing docker-manager daemon: $docker_daemon" >&2
+  exit 1
+fi
 
 require_pattern 'function _setPluginStatus\(' 'plugin status setter exists'
 require_pattern 'updatedAt:' 'plugin status transition timestamp is tracked'
@@ -65,7 +70,7 @@ require_pattern 'migrateState: function\(' 'plugin API exposes migrateState'
 
 # Canonical error code guardrails.
 while IFS= read -r code; do
-  if rg -q "$code" "$plugin_service" "$plugin_runtime"; then
+  if rg -q "$code" "$plugin_service" "$plugin_runtime" "$docker_daemon"; then
     pass "error code '${code}' is present"
   else
     fail "error code '${code}' is missing"

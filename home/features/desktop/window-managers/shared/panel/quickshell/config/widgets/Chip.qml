@@ -11,7 +11,7 @@ Rectangle {
 
   radius: Colors.radiusPill
   color: Colors.withAlpha(root.iconColor, 0.16)
-  border.color: Colors.withAlpha(Colors.fgDim, 0.06)
+  border.color: Colors.withAlpha(Colors.textDisabled, 0.06)
   border.width: 1
   implicitWidth: row.implicitWidth + 14
   implicitHeight: 22

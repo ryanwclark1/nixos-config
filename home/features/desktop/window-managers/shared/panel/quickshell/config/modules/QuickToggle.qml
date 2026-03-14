@@ -58,7 +58,7 @@ Rectangle {
       }
       Text {
         text: active ? "On" : "Off"
-        color: active ? Colors.withAlpha(Colors.text, 0.7) : Colors.fgSecondary
+        color: active ? Colors.withAlpha(Colors.text, 0.7) : Colors.textSecondary
         font.pixelSize: Colors.fontSizeXS
       }
     }

@@ -506,10 +506,10 @@ QtObject {
     property Process _modelProc: Process {
         id: modelProc
         running: false
-        onExited: (exitCode, exitStatus) => {
-            if (exitCode === 0) {
+        stdout: StdioCollector {
+            onStreamFinished: {
                 try {
-                    var data = JSON.parse(modelProc.stdout);
+                    var data = JSON.parse(this.text || "{}");
                     var models = data.models || [];
                     var names = [];
                     for (var i = 0; i < models.length; i++) {

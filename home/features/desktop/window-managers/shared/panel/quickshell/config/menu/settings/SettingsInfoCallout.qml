@@ -55,7 +55,7 @@ Rectangle {
         Text {
             visible: root.body !== ""
             text: root.body
-            color: Colors.fgSecondary
+            color: Colors.textSecondary
             font.pixelSize: Colors.fontSizeSmall
             wrapMode: Text.WordWrap
             Layout.fillWidth: true

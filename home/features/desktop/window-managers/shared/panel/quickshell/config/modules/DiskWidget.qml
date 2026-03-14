@@ -57,7 +57,7 @@ SharedWidgets.CardBase {
               Layout.fillWidth: true
               elide: Text.ElideRight
             }
-            Text { text: modelData.used + " / " + modelData.total; color: Colors.fgSecondary; font.pixelSize: Colors.fontSizeXS }
+            Text { text: modelData.used + " / " + modelData.total; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS }
           }
           SharedWidgets.MiniProgressBar {
             value: Math.min(100, parseInt(modelData.percent, 10) || 0) / 100.0

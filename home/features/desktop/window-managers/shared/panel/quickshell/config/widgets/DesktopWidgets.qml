@@ -331,7 +331,7 @@ Item {
             Text {
                 anchors.centerIn: parent
                 text: "Unknown Widget"
-                color: Colors.fgDim
+                color: Colors.textDisabled
                 font.pixelSize: Colors.fontSizeSmall
             }
         }

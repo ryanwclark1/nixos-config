@@ -207,7 +207,7 @@ SharedWidgets.CardBase {
         Text {
             Layout.fillWidth: true
             text: ServiceUnitService.userStatus === "ready" ? ("User units  •  showing " + String(root.visibleUserUnits.length)) : (ServiceUnitService.userMessage || "User services unavailable")
-            color: Colors.fgDim
+            color: Colors.textDisabled
             font.pixelSize: Colors.fontSizeXS
         }
 
@@ -509,7 +509,7 @@ SharedWidgets.CardBase {
 
                     Text {
                         text: root.selectedUnit ? ("Details collapsed. Select the row again to reopen " + (root.selectedUnitScope === "system" ? "system" : "user") + " unit actions.") : ""
-                        color: Colors.fgDim
+                        color: Colors.textDisabled
                         font.pixelSize: Colors.fontSizeXS
                         Layout.fillWidth: true
                         wrapMode: Text.WordWrap
@@ -556,7 +556,7 @@ SharedWidgets.CardBase {
 
                     Text {
                         text: root.selectedUnit ? ((root.selectedUnitScope === "system" ? "SYSTEM" : "USER") + "  •  " + String(root.selectedUnit.description || root.selectedUnit.sub || "service")) : ""
-                        color: Colors.fgDim
+                        color: Colors.textDisabled
                         font.pixelSize: Colors.fontSizeXS
                         Layout.fillWidth: true
                         elide: Text.ElideRight

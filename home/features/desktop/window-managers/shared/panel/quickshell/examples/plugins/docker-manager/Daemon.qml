@@ -123,7 +123,7 @@ QtObject {
 
     function _setRuntimeStatus(state, code, message) {
         if (pluginService && pluginService._setPluginStatus)
-            pluginService._setPluginStatus(pluginId, state, code || "", message || "");
+            pluginService._setPluginStatus(pluginId, state, String(code ?? ""), String(message ?? ""));
         _emitRuntimeUpdated();
     }
 
@@ -316,7 +316,7 @@ QtObject {
             _clearSnapshot();
             if (eventProc.running)
                 eventProc.running = false;
-            _setRuntimeStatus("degraded", "", statusMessage);
+            _setRuntimeStatus("degraded", "E_DOCKER_RUNTIME_UNAVAILABLE", statusMessage);
             return;
         }
 
@@ -396,7 +396,7 @@ QtObject {
             statusMessage = "Refresh failed.";
             lastError = statusMessage;
             _clearSnapshot();
-            _setRuntimeStatus("degraded", "", statusMessage);
+            _setRuntimeStatus("degraded", "E_DOCKER_RUNTIME_UNAVAILABLE", statusMessage);
         } else {
             try {
                 var payload = JSON.parse(String(stdoutText || "").trim() || "{}");
@@ -406,7 +406,7 @@ QtObject {
                 statusMessage = "Failed to parse runtime snapshot.";
                 lastError = String(e);
                 _clearSnapshot();
-                _setRuntimeStatus("degraded", "", statusMessage);
+                _setRuntimeStatus("degraded", "E_DOCKER_SNAPSHOT_PARSE", statusMessage);
             }
         }
 
@@ -602,6 +602,7 @@ QtObject {
             else {
                 root.lastError = root.actionFailureMessage;
                 root._setNotice("error", root.actionFailureMessage);
+                root._setRuntimeStatus("degraded", "E_DOCKER_ACTION_FAILED", root.actionFailureMessage);
             }
             root.scheduleRefresh(250);
         }

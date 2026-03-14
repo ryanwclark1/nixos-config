@@ -57,7 +57,7 @@ ColumnLayout {
                 Text {
                     visible: root.leadingIcon !== ""
                     text: root.leadingIcon
-                    color: Colors.fgDim
+                    color: Colors.textDisabled
                     font.family: Colors.fontMono
                     font.pixelSize: Colors.fontSizeLarge
                 }
@@ -76,7 +76,7 @@ ColumnLayout {
 
                     Text {
                         text: root.placeholderText
-                        color: Colors.fgDim
+                        color: Colors.textDisabled
                         font.pixelSize: parent.font.pixelSize
                         visible: parent.text.length === 0 && !parent.activeFocus
                     }
@@ -85,7 +85,7 @@ ColumnLayout {
                 Text {
                     visible: root.showClearButton && input.text.length > 0
                     text: "󰅖"
-                    color: Colors.fgDim
+                    color: Colors.textDisabled
                     font.family: Colors.fontMono
                     font.pixelSize: Colors.fontSizeLarge
 

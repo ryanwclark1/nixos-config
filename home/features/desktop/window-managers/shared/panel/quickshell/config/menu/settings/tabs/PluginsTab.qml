@@ -192,7 +192,7 @@ Item {
             return Colors.warning;
         if (sev === "error")
             return Colors.error;
-        return Colors.fgSecondary;
+        return Colors.textSecondary;
     }
 
     function severityBgColor(severity) {
@@ -333,7 +333,7 @@ Item {
                         text: PluginService.plugins.filter(function (p) {
                             return p.enabled;
                         }).length + " enabled"
-                        color: Colors.fgSecondary
+                        color: Colors.textSecondary
                         font.pixelSize: Colors.fontSizeSmall
                     }
 
@@ -429,7 +429,7 @@ Item {
                         id: disabledCount
                         anchors.centerIn: parent
                         text: "disabled " + root.pluginStatusSummary().disabled
-                        color: Colors.fgSecondary
+                        color: Colors.textSecondary
                         font.pixelSize: Colors.fontSizeXS
                         font.weight: Font.DemiBold
                     }
@@ -458,7 +458,7 @@ Item {
                 }
                 Text {
                     text: "Add a folder with manifest.json to get started"
-                    color: Colors.fgDim
+                    color: Colors.textDisabled
                     font.pixelSize: Colors.fontSizeSmall
                     Layout.alignment: Qt.AlignHCenter
                 }
@@ -484,7 +484,7 @@ Item {
                         Text {
                             anchors.centerIn: parent
                             text: root.pluginTypeIcon(modelData.type)
-                            color: modelData.enabled ? Colors.primary : Colors.fgDim
+                            color: modelData.enabled ? Colors.primary : Colors.textDisabled
                             font.family: Colors.fontMono
                             font.pixelSize: root.compactMode ? Colors.fontSizeLarge : Colors.fontSizeXL
                             Behavior on color {
@@ -529,7 +529,7 @@ Item {
                                     id: verLabel
                                     anchors.centerIn: parent
                                     text: "v" + modelData.version
-                                    color: Colors.fgSecondary
+                                    color: Colors.textSecondary
                                     font.pixelSize: Colors.fontSizeXS
                                     font.family: Colors.fontMono
                                 }
@@ -580,14 +580,14 @@ Item {
                         Text {
                             visible: modelData.description.length > 0
                             text: modelData.description
-                            color: Colors.fgSecondary
+                            color: Colors.textSecondary
                             font.pixelSize: Colors.fontSizeSmall
                             Layout.fillWidth: true
                             wrapMode: Text.WordWrap
                         }
                         Text {
                             text: "by " + modelData.author
-                            color: Colors.fgDim
+                            color: Colors.textDisabled
                             font.pixelSize: Colors.fontSizeXS
                         }
 
@@ -625,7 +625,7 @@ Item {
                         Text {
                             visible: PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] && String(PluginService.pluginStatuses[modelData.id].code || "") !== "" && String(PluginRuntimeCatalog.errorDescription(PluginService.pluginStatuses[modelData.id].code) || "") !== ""
                             text: PluginRuntimeCatalog.errorDescription(PluginService.pluginStatuses[modelData.id].code)
-                            color: Colors.fgDim
+                            color: Colors.textDisabled
                             font.pixelSize: Colors.fontSizeXS
                             Layout.fillWidth: true
                             wrapMode: Text.WordWrap
@@ -634,7 +634,7 @@ Item {
                         Text {
                             visible: PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] && String(PluginService.pluginStatuses[modelData.id].updatedAt || "") !== ""
                             text: "updated " + String(PluginService.pluginStatuses[modelData.id].updatedAt || "")
-                            color: Colors.fgDim
+                            color: Colors.textDisabled
                             font.pixelSize: Colors.fontSizeXS
                             Layout.fillWidth: true
                             wrapMode: Text.WordWrap
@@ -649,7 +649,7 @@ Item {
                                 var status = PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] ? PluginService.pluginStatuses[modelData.id].state : (modelData.enabled ? "enabled" : "disabled");
                                 return root.statusDescription(status);
                             }
-                            color: Colors.fgDim
+                            color: Colors.textDisabled
                             font.pixelSize: Colors.fontSizeXS
                             Layout.fillWidth: true
                             wrapMode: Text.WordWrap
@@ -720,7 +720,7 @@ Item {
 
                 Text {
                     text: "Each plugin is a folder containing a manifest.json and one or more QML entry points."
-                    color: Colors.fgSecondary
+                    color: Colors.textSecondary
                     font.pixelSize: Colors.fontSizeSmall
                     wrapMode: Text.WordWrap
                     Layout.fillWidth: true
@@ -728,7 +728,7 @@ Item {
 
                 Text {
                     text: "Manifest fields: id, name, description, author, version, type, permissions, entryPoints { barWidget|desktopWidget|launcherProvider|daemon|settings }"
-                    color: Colors.fgSecondary
+                    color: Colors.textSecondary
                     font.pixelSize: Colors.fontSizeSmall
                     wrapMode: Text.WordWrap
                     Layout.fillWidth: true
@@ -736,7 +736,7 @@ Item {
 
                 Text {
                     text: "Reference schema: config/plugins/manifest.schema.json"
-                    color: Colors.fgDim
+                    color: Colors.textDisabled
                     font.pixelSize: Colors.fontSizeXS
                     wrapMode: Text.WordWrap
                     Layout.fillWidth: true
@@ -807,7 +807,7 @@ Item {
                         Text {
                             visible: !!root.selectedPlugin
                             text: root.selectedPlugin ? ("Type: " + root.pluginTypeLabel(root.selectedPlugin.type) + " • Author: " + String(root.selectedPlugin.author || "Unknown") + " • Version: " + String(root.selectedPlugin.version || "")) : ""
-                            color: Colors.fgSecondary
+                            color: Colors.textSecondary
                             font.pixelSize: Colors.fontSizeSmall
                             wrapMode: Text.WordWrap
                             Layout.fillWidth: true
@@ -848,7 +848,7 @@ Item {
         stdinEnabled: true
         onStarted: {
             pluginDiagnosticsCopyProc.write(_pluginDiagnosticsExportText);
-            pluginDiagnosticsCopyProc.closeStdin();
+            pluginDiagnosticsCopyProc.stdinEnabled = false;
         }
         onExited: (exitCode, exitStatus) => {
             if (exitCode === 0)
@@ -864,7 +864,7 @@ Item {
         stdinEnabled: true
         onStarted: {
             pluginDiagnosticsSaveProc.write(_pluginDiagnosticsExportText);
-            pluginDiagnosticsSaveProc.closeStdin();
+            pluginDiagnosticsSaveProc.stdinEnabled = false;
         }
         onExited: (exitCode, exitStatus) => {
             if (exitCode === 0)

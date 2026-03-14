@@ -66,7 +66,7 @@ Rectangle {
       }
       Text {
         text: "System Uptime: " + root.uptime
-        color: Colors.fgSecondary
+        color: Colors.textSecondary
         font.pixelSize: Colors.fontSizeXS
         Layout.fillWidth: true
         elide: Text.ElideRight

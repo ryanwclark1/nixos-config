@@ -63,7 +63,7 @@ SharedWidgets.ScrollableContent {
             Text {
                 visible: !!root.subtitle
                 text: root.subtitle
-                color: Colors.fgSecondary
+                color: Colors.textSecondary
                 font.pixelSize: Colors.fontSizeSmall
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
@@ -118,7 +118,7 @@ SharedWidgets.ScrollableContent {
                             id: badgeText
                             anchors.centerIn: parent
                             text: ownerBadgeRow.ownerChip(modelData.label, ownerBadgeRow.ownerField(modelData.key, modelData.fallback))
-                            color: Colors.fgSecondary
+                            color: Colors.textSecondary
                             font.pixelSize: Colors.fontSizeXS
                         }
                     }

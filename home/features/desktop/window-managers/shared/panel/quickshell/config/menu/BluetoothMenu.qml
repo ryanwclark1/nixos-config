@@ -259,24 +259,10 @@ BasePopupMenu {
               visible: !root.compactMode
             }
 
-            Rectangle {
-              width: 28; height: 28; radius: Colors.radiusMedium
-              color: "transparent"
-              Text {
-                anchors.centerIn: parent
-                text: "󰅖"
-                color: Colors.textSecondary
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeLarge
-              }
-              SharedWidgets.StateLayer { id: disconnStateLayer; hovered: disconnHover.containsMouse; pressed: disconnHover.pressed; stateColor: Colors.error }
-              MouseArea {
-                id: disconnHover
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: (mouse) => { disconnStateLayer.burst(mouse.x, mouse.y); modelData.disconnect(); }
-              }
+            SharedWidgets.IconButton {
+              size: 28; radius: Colors.radiusMedium
+              icon: "󰅖"; stateColor: Colors.error
+              onClicked: modelData.disconnect()
             }
           }
 
@@ -345,24 +331,10 @@ BasePopupMenu {
               onClicked: modelData.connect()
             }
 
-            Rectangle {
-              width: 28; height: 28; radius: Colors.radiusMedium
-              color: "transparent"
-              Text {
-                anchors.centerIn: parent
-                text: "󰆴"
-                color: Colors.textSecondary
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeLarge
-              }
-              SharedWidgets.StateLayer { id: removeStateLayer; hovered: removeHover.containsMouse; pressed: removeHover.pressed; stateColor: Colors.error }
-              MouseArea {
-                id: removeHover
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: (mouse) => { removeStateLayer.burst(mouse.x, mouse.y); Quickshell.execDetached(["bluetoothctl", "remove", modelData.address]); }
-              }
+            SharedWidgets.IconButton {
+              size: 28; radius: Colors.radiusMedium
+              icon: "󰆴"; stateColor: Colors.error
+              onClicked: Quickshell.execDetached(["bluetoothctl", "remove", modelData.address])
             }
           }
 

@@ -100,7 +100,7 @@ Item {
 
             Text {
                 text: root._themeResults.length + " themes"
-                color: Colors.fgDim
+                color: Colors.textDisabled
                 font.pixelSize: Colors.fontSizeXS
             }
 

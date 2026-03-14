@@ -19,7 +19,7 @@ Rectangle {
     spacing: root.launcher.sidebarCompact ? Colors.spacingXS : Colors.paddingSmall
 
     Text { visible: !root.launcher.sidebarCompact; text: "Launcher"; color: Colors.text; font.pixelSize: Colors.fontSizeXL; font.weight: Font.DemiBold }
-    Text { visible: !root.launcher.sidebarCompact; text: "Modes"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
+    SharedWidgets.SectionLabel { visible: !root.launcher.sidebarCompact; label: "MODES" }
 
     Repeater {
       model: root.launcher.primaryModes
@@ -81,7 +81,7 @@ Rectangle {
         anchors.fill: parent
         anchors.margins: Colors.spacingM
         spacing: Colors.spacingXXS
-        Text { text: "Controls"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
+        SharedWidgets.SectionLabel { label: "CONTROLS" }
         Text { text: root.launcher.tabControlHintText; color: Colors.text; font.pixelSize: Colors.fontSizeSmall }
         Text { text: root.launcher.launcherControlHintText; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; wrapMode: Text.WordWrap }
       }

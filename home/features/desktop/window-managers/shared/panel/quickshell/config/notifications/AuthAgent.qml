@@ -75,7 +75,7 @@ PanelWindow {
 
         Text {
           text: modelData.message
-          color: Colors.fgSecondary
+          color: Colors.textSecondary
           font.pixelSize: Colors.fontSizeSmall
           wrapMode: Text.Wrap
           Layout.fillWidth: true
@@ -110,7 +110,7 @@ PanelWindow {
             anchors.leftMargin: Colors.spacingM
             verticalAlignment: Text.AlignVCenter
             text: "Password..."
-            color: Colors.fgDim
+            color: Colors.textDisabled
             font.pixelSize: Colors.fontSizeMedium
             visible: !pwInput.text && !pwInput.activeFocus
           }
@@ -131,7 +131,7 @@ PanelWindow {
               pressed: cancelHover.pressed
             }
 
-            Text { anchors.centerIn: parent; text: "Cancel"; color: Colors.fgSecondary; font.weight: Font.Medium }
+            Text { anchors.centerIn: parent; text: "Cancel"; color: Colors.textSecondary; font.weight: Font.Medium }
 
             MouseArea {
               id: cancelHover

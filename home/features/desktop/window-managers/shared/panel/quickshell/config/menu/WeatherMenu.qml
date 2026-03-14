@@ -66,7 +66,7 @@ BasePopupMenu {
 
           Text {
             text: WeatherService.condition || "Loading weather"
-            color: Colors.fgSecondary
+            color: Colors.textSecondary
             font.pixelSize: Colors.fontSizeLarge
             font.weight: Font.DemiBold
             elide: Text.ElideRight
@@ -89,13 +89,13 @@ BasePopupMenu {
           RowLayout {
             spacing: Colors.spacingXS
             Text { text: "Feels"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeSmall }
-            Text { text: WeatherService.feelsLike || "--"; color: Colors.fgSecondary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
+            Text { text: WeatherService.feelsLike || "--"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
           }
 
           RowLayout {
             spacing: Colors.spacingXS
             Text { text: "Humidity"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeSmall }
-            Text { text: WeatherService.humidity || "--"; color: Colors.fgSecondary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
+            Text { text: WeatherService.humidity || "--"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
           }
 
           RowLayout {
@@ -103,7 +103,7 @@ BasePopupMenu {
             Text { text: "Wind"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeSmall }
             Text {
               text: (WeatherService.windSpeed || "--") + (WeatherService.windDir ? (" " + WeatherService.windDir) : "")
-              color: Colors.fgSecondary
+              color: Colors.textSecondary
               font.pixelSize: Colors.fontSizeSmall
               font.weight: Font.Medium
             }
@@ -112,7 +112,7 @@ BasePopupMenu {
           RowLayout {
             spacing: Colors.spacingXS
             Text { text: "Visibility"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeSmall }
-            Text { text: WeatherService.visibility || "--"; color: Colors.fgSecondary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
+            Text { text: WeatherService.visibility || "--"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
           }
         }
       }
@@ -165,7 +165,7 @@ BasePopupMenu {
           RowLayout {
             spacing: Colors.spacingXS
             Text { text: "↑" + WeatherService.sunrise; color: Colors.accent; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
-            Text { text: "↓" + WeatherService.sunset; color: Colors.fgSecondary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
+            Text { text: "↓" + WeatherService.sunset; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
           }
         }
       }
@@ -294,7 +294,7 @@ BasePopupMenu {
 
           Text {
             text: modelData.condition
-            color: Colors.fgSecondary
+            color: Colors.textSecondary
             font.pixelSize: Colors.fontSizeSmall
             elide: Text.ElideRight
             Layout.fillWidth: true

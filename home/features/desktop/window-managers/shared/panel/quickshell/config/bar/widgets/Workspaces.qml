@@ -32,6 +32,9 @@ Rectangle {
     function onWindowsUpdated() {
       root._updateStateFromNiriService()
     }
+    function onWindowUrgentChanged() {
+      root._updateStateFromNiriService()
+    }
   }
 
   Component.onCompleted: {
