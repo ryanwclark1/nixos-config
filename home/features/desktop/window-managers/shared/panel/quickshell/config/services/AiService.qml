@@ -123,6 +123,13 @@ QtObject {
                 content: scriptMatch[2].trim()
             };
         }
+
+        // 3. Look for [RENAME_WORKSPACE: id | name]
+        var renameRegex = /\[RENAME_WORKSPACE:\s*([^|\]]+)\s*\|\s*([^\]]+)\]/g;
+        var renameMatch;
+        while ((renameMatch = renameRegex.exec(content)) !== null) {
+            WorkspaceIdentityService.renameWorkspace(renameMatch[1].trim(), renameMatch[2].trim());
+        }
     }
 
     // ── Session Persistence ─────────────────────
@@ -554,6 +561,7 @@ QtObject {
                 "For example: [COMMAND: Lock Screen | os-lock-screen]. " +
                 "You can also propose shell scripts to be installed to ~/.local/bin using: [SCRIPT: filename | script_content]. " +
                 "For example: [SCRIPT: prune-docker | #!/bin/bash\ndocker container prune -f]. " +
+                "To rename a workspace, use: [RENAME_WORKSPACE: workspace_id | new_name]. " +
                 "Only suggest commands or scripts when explicitly requested or highly relevant. " +
                 "The user must confirm the action before it is executed.";
         }

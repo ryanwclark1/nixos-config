@@ -41,3 +41,4 @@ singleton ToastService 1.0 ToastService.qml
 singleton UsageTrackerService 1.0 UsageTrackerService.qml
 singleton WallpaperService 1.0 WallpaperService.qml
 singleton WeatherService 1.0 WeatherService.qml
+singleton WorkspaceIdentityService 1.0 WorkspaceIdentityService.qml

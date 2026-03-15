@@ -12,12 +12,15 @@ For implementation planning beyond this runbook, see `NEXT_STEPS.md`.
   - `scripts/check-launcher-tab-matrix.sh`
 - Responsive/runtime smoke for launcher surface:
   - `scripts/check-launcher-responsive.sh`
+  - preferred repo-checkout path: `scripts/check-launcher-responsive.sh --repo-shell`
 - Live launcher IPC health and status payload contract:
   - `scripts/check-launcher-ipc-health.sh`
+  - preferred repo-checkout path: `scripts/check-launcher-ipc-health.sh --repo-shell`
 - Benchmarks with thresholds and parity checks:
   - `scripts/check-launcher-benchmarks.sh`
 - Full launcher smoke gate:
   - `scripts/check-launcher-smoke.sh`
+  - preferred repo-checkout path: `scripts/check-launcher-smoke.sh --repo-shell`
 - CI-safe launcher smoke gate:
   - `scripts/check-launcher-smoke.sh --ci`
   - If no live QuickShell launcher instance is reachable, smoke falls back to static launcher probes, skips live category/`Esc` diagnostics, and still runs benchmarks.
@@ -32,6 +35,21 @@ Live launcher scripts auto-select a QuickShell instance in this order:
 3. exposing `drunCategoryState`
 4. exposing `escapeActionState`
 5. any launcher-capable instance
+
+`--repo-shell` is now the preferred validation path when you need to test the repo checkout directly. It launches this tree’s `config/shell.qml`, keeps the probe bound to that PID, and avoids stale installed-session QML.
+
+## Current Verified Baseline
+
+- `scripts/check-launcher-responsive.sh --repo-shell`
+  - summary: `14 pass, 1 warn, 0 fail`
+  - the remaining warning is acceptable when no non-`All` drun category option is available in the fresh repo-shell instance
+- `scripts/check-launcher-ipc-health.sh --repo-shell`
+  - emits `{"ok":true,...,"errors":[]}`
+- `scripts/check-launcher-smoke.sh --repo-shell`
+  - passes end to end, including guardrails, live responsive/IPC probes, and benchmarks
+
+Recent runtime fix that materially changed this baseline:
+- `Launcher` IPC methods that return JSON diagnostics now declare `: string`, so `drunCategoryState`, `escapeActionState`, `diagnosticSetSearchText`, `diagnosticSetDrunCategoryFilter`, and `invokeEscapeAction` no longer get coerced to `void` by Qt.
 
 ## Benchmark Baselines
 
@@ -131,11 +149,11 @@ The launcher matrix writes an `index.html` gallery beside the PNG artifacts for 
 
 ## Incident Triage Sequence
 
-1. Run `scripts/check-launcher-smoke.sh`.
+1. Run `scripts/check-launcher-smoke.sh --repo-shell`.
 2. If benchmark gate fails, inspect `scripts/launcher-benchmark-baselines.json` versus current host load.
-3. If IPC health fails, run `scripts/check-launcher-ipc-health.sh --id <instance-id>` and inspect the emitted JSON `errors` list.
+3. If IPC health fails, run `scripts/check-launcher-ipc-health.sh --repo-shell` first, then `scripts/check-launcher-ipc-health.sh --id <instance-id>` if you need to compare against an installed session, and inspect the emitted JSON `errors` list.
    - Live checks now attempt `Shell.reloadConfig` automatically before warning on missing `drunCategoryState` or `escapeActionState` diagnostics.
-   - If `drunCategoryState` or `escapeActionState` is missing, or returns empty/non-JSON payload after reload while static checks pass, restart QuickShell for that session and rerun smoke.
+   - If `drunCategoryState` or `escapeActionState` is missing, or returns empty/non-JSON payload after reload while static checks pass, confirm the repo checkout still has typed `: string` launcher IPC diagnostics before treating it as a session-staleness problem.
 4. In a live session, open launcher runtime metrics and verify:
    - backend is expected (`fd` preferred),
    - resolve cost is low/stable,

@@ -105,7 +105,11 @@ Flow {
         color: wsPill.isActive ? Colors.background : root.textColor
         font.pixelSize: root.pillFontSize
         font.weight: wsPill.isActive ? Font.Bold : Font.Normal
-        text: Config.workspaceShowNames && modelData.name ? modelData.name : String(modelData.id)
+        text: {
+            var custom = WorkspaceIdentityService.getWorkspaceName(modelData.id);
+            if (custom) return custom;
+            return Config.workspaceShowNames && modelData.name ? modelData.name : String(modelData.id)
+        }
         z: 2
       }
 
@@ -142,8 +146,19 @@ Flow {
       MouseArea {
         anchors.fill: parent
         hoverEnabled: true
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
         cursorShape: Qt.PointingHandCursor
-        onClicked: CompositorAdapter.focusWorkspace(modelData.id)
+        onClicked: (mouse) => {
+            if (mouse.button === Qt.RightButton) {
+                // Inline rename logic using a simple input dialog or just a command
+                // For now, we'll use a prompt via IPC to the AI assistant to rename it
+                var current = WorkspaceIdentityService.getWorkspaceName(modelData.id);
+                AiService.sendMessage("Rename workspace " + modelData.id + " from '" + current + "' to: ");
+                root.requestSurface("aiChat");
+            } else {
+                CompositorAdapter.focusWorkspace(modelData.id)
+            }
+        }
       }
     }
   }

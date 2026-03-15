@@ -223,6 +223,36 @@ PanelWindow {
     scheduleSave();
   }
 
+  Connections {
+    target: WorkspaceIdentityService
+    function onWorkspaceDataChanged() {
+        if (!Config.notepadProjectSync) return;
+        var project = WorkspaceIdentityService.getActiveProject();
+        if (!project) return;
+        for (var i = 0; i < tabs.length; i++) {
+            if (tabs[i].title.toLowerCase() === project.toLowerCase()) {
+                activeTabId = tabs[i].id;
+                return;
+            }
+        }
+    }
+  }
+
+  Connections {
+    target: CompositorAdapter
+    function onActiveWorkspaceChanged() {
+        if (!Config.notepadProjectSync) return;
+        var project = WorkspaceIdentityService.getActiveProject();
+        if (!project) return;
+        for (var i = 0; i < tabs.length; i++) {
+            if (tabs[i].title.toLowerCase() === project.toLowerCase()) {
+                activeTabId = tabs[i].id;
+                return;
+            }
+        }
+    }
+  }
+
   function removeTab(tabId) {
     if (tabs.length <= 1) return; // Can't delete last tab
     var newTabs = [];
