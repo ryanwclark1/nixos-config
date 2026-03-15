@@ -1,8 +1,8 @@
 import QtQuick
 import QtQuick.Layouts
-import "../../services"
-import "../../modules"
-import "../../widgets" as SharedWidgets
+import "../services"
+import "../modules" as Modules
+import "../widgets" as SharedWidgets
 
 ColumnLayout {
     id: root
@@ -76,7 +76,10 @@ ColumnLayout {
                     
                     GridLayout {
                         id: wsGrid
-                        columns: 2; spacing: Colors.spacingM; width: parent.width
+                        columns: 2
+                        columnSpacing: Colors.spacingM
+                        rowSpacing: Colors.spacingM
+                        width: parent.width
                         
                         Repeater {
                             model: NiriService.allWorkspaces

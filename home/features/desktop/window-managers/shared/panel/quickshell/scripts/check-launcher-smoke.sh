@@ -4,11 +4,12 @@ set -euo pipefail
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 ci_mode=0
 instance_id=""
+repo_shell_mode=0
 expected_config="$(realpath "${script_dir}/../config/shell.qml" 2>/dev/null || printf '%s' "${script_dir}/../config/shell.qml")"
 
 usage() {
   cat <<'EOF'
-Usage: check-launcher-smoke.sh [--ci]
+Usage: check-launcher-smoke.sh [--id INSTANCE_ID] [--repo-shell] [--ci]
 
 Runs launcher validation gates.
   default: guardrails + responsive/runtime + ipc-health + benchmarks
@@ -21,6 +22,10 @@ while [[ $# -gt 0 ]]; do
     --id)
       instance_id="${2:-}"
       shift 2
+      ;;
+    --repo-shell)
+      repo_shell_mode=1
+      shift
       ;;
     --ci)
       ci_mode=1
@@ -103,10 +108,13 @@ discover_launcher_instance() {
 
 "${script_dir}/check-launcher-guardrails.sh"
 if (( ci_mode == 0 )); then
-  if [[ -z "${instance_id}" ]]; then
+  if (( repo_shell_mode == 0 )) && [[ -z "${instance_id}" ]]; then
     instance_id="$(discover_launcher_instance || true)"
   fi
-  if [[ -n "${instance_id}" ]]; then
+  if (( repo_shell_mode == 1 )); then
+    "${script_dir}/check-launcher-responsive.sh" --repo-shell
+    "${script_dir}/check-launcher-ipc-health.sh" --repo-shell
+  elif [[ -n "${instance_id}" ]]; then
     "${script_dir}/check-launcher-responsive.sh" --id "${instance_id}"
     "${script_dir}/check-launcher-ipc-health.sh" --id "${instance_id}"
   else

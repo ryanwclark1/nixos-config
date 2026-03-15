@@ -3,18 +3,23 @@ set -euo pipefail
 
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
+config_root="$(CDPATH= cd -- "${script_dir}/../config" >/dev/null && pwd)"
 launcher_qml="${script_dir}/../config/launcher/Launcher.qml"
 expected_config="$(realpath "${script_dir}/../config/shell.qml" 2>/dev/null || printf '%s' "${script_dir}/../config/shell.qml")"
 
 instance_id=""
 ci_mode=0
+repo_shell_mode=0
+repo_shell_pid=""
+repo_shell_service_was_active=0
+repo_shell_env=()
 checked_actions=()
 errors=()
 status_payload_valid=1
 
 usage() {
   cat <<'EOF'
-Usage: check-launcher-ipc-health.sh [--id INSTANCE_ID] [--ci]
+Usage: check-launcher-ipc-health.sh [--id INSTANCE_ID] [--repo-shell] [--ci]
 
 Runs a launcher IPC health probe:
   - validates Launcher IPC methods are discoverable,
@@ -29,6 +34,10 @@ while [[ $# -gt 0 ]]; do
     --id)
       instance_id="${2:-}"
       shift 2
+      ;;
+    --repo-shell)
+      repo_shell_mode=1
+      shift
       ;;
     --ci)
       ci_mode=1
@@ -51,6 +60,67 @@ require_cmd() {
     errors+=("missing command: $1")
     return 1
   fi
+}
+
+cleanup_repo_shell() {
+  if [[ -n "${repo_shell_pid}" ]]; then
+    kill "${repo_shell_pid}" >/dev/null 2>&1 || true
+    wait "${repo_shell_pid}" >/dev/null 2>&1 || true
+  fi
+  if (( repo_shell_service_was_active == 1 )); then
+    systemctl --user start quickshell.service >/dev/null 2>&1 || true
+  fi
+}
+
+populate_repo_shell_env() {
+  local line key value
+  repo_shell_env=()
+  for key in HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY NIRI_SOCKET XDG_CURRENT_DESKTOP DESKTOP_SESSION; do
+    value="${!key:-}"
+    [[ -n "${value}" ]] && repo_shell_env+=("${key}=${value}")
+  done
+  if (( ${#repo_shell_env[@]} > 0 )); then
+    return 0
+  fi
+  while IFS= read -r line; do
+    [[ "${line}" == *=* ]] || continue
+    key="${line%%=*}"
+    value="${line#*=}"
+    case "${key}" in
+      HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|XDG_CURRENT_DESKTOP|DESKTOP_SESSION)
+        [[ -n "${value}" ]] && repo_shell_env+=("${key}=${value}")
+        ;;
+    esac
+  done < <(systemctl --user show-environment 2>/dev/null || true)
+}
+
+start_repo_shell() {
+  local deadline runtime_dir
+  if ! command -v systemctl >/dev/null 2>&1; then
+    printf 'systemctl is required for --repo-shell mode.\n' >&2
+    exit 1
+  fi
+  if systemctl --user is-active --quiet quickshell.service; then
+    repo_shell_service_was_active=1
+    systemctl --user stop quickshell.service >/dev/null 2>&1 || true
+    sleep 1
+  fi
+  populate_repo_shell_env
+  env "${repo_shell_env[@]}" quickshell -p "${config_root}/shell.qml" >/tmp/quickshell-repo-launcher-ipc.log 2>&1 &
+  repo_shell_pid="$!"
+  deadline=$((SECONDS + 20))
+  while (( SECONDS < deadline )); do
+    if quickshell ipc --pid "${repo_shell_pid}" show >/dev/null 2>&1; then
+      sleep 1
+      runtime_dir="$(readlink -f "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid/${repo_shell_pid}" 2>/dev/null || true)"
+      instance_id="$(basename "${runtime_dir}")"
+      printf '[INFO] Repo shell instance ready: pid %s\n' "${repo_shell_pid}"
+      return 0
+    fi
+    sleep 0.5
+  done
+  printf 'Repo shell did not become IPC-ready in time. See /tmp/quickshell-repo-launcher-ipc.log\n' >&2
+  exit 1
 }
 
 discover_reachable_instance() {
@@ -136,10 +206,10 @@ ensure_live_instance() {
       instance_id="${discovered}"
       return 0
     fi
-    if (( attempt == 1 )); then
-      if command -v systemctl >/dev/null 2>&1; then
-        systemctl --user restart quickshell >/dev/null 2>&1 || true
-        sleep 2
+      if (( attempt == 1 && repo_shell_mode == 0 )); then
+        if command -v systemctl >/dev/null 2>&1; then
+          systemctl --user restart quickshell >/dev/null 2>&1 || true
+          sleep 2
       fi
     fi
   done
@@ -188,6 +258,11 @@ main() {
   require_cmd node || true
   if (( ci_mode == 0 )); then
     require_cmd quickshell || true
+  fi
+
+  if (( repo_shell_mode == 1 )); then
+    trap cleanup_repo_shell EXIT
+    start_repo_shell
   fi
 
   if (( ${#errors[@]} > 0 )); then
