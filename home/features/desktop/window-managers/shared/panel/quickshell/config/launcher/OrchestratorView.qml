@@ -68,7 +68,7 @@ ColumnLayout {
                 anchors.fill: parent; anchors.margins: Colors.paddingLarge
                 spacing: Colors.spacingM
                 
-                Text { text: "WORKSPACE FLEET"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Black; font.letterSpacing: 1.0 }
+                Text { text: "WORKSPACE FLEET"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Colors.letterSpacingWide }
                 
                 Flickable {
                     Layout.fillWidth: true; Layout.fillHeight: true
@@ -127,7 +127,7 @@ ColumnLayout {
                 ColumnLayout {
                     anchors.fill: parent; anchors.margins: Colors.paddingLarge
                     spacing: Colors.spacingL
-                    Text { text: "TELEMETRY HEATMAP"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Black; font.letterSpacing: 1.0 }
+                    Text { text: "TELEMETRY HEATMAP"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Colors.letterSpacingWide }
                     
                     SystemGraphs { Layout.fillWidth: true; Layout.preferredHeight: 160 }
                     GPUWidget { Layout.fillWidth: true }
@@ -146,7 +146,7 @@ ColumnLayout {
                 ColumnLayout {
                     anchors.fill: parent; anchors.margins: Colors.paddingLarge
                     spacing: Colors.spacingM
-                    Text { text: "ACTIVE MISSION"; color: Colors.accent; font.pixelSize: 10; font.weight: Font.Black; font.letterSpacing: 1.0 }
+                    Text { text: "ACTIVE MISSION"; color: Colors.accent; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Colors.letterSpacingWide }
                     
                     Rectangle {
                         Layout.fillWidth: true; Layout.fillHeight: true; radius: Colors.radiusXS

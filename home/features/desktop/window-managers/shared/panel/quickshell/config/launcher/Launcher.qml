@@ -157,7 +157,6 @@ PanelWindow {
     })
     readonly property var modeMeta: ModeData.modeMeta
     readonly property var modeIcons: ModeData.modeIcons
-    readonly property var webProviderCatalog: ModeData.webProviderCatalog
     readonly property var launcherShortcuts: ({
             "drun": [
                 {
@@ -215,7 +214,6 @@ PanelWindow {
                 }
             ]
         })
-    readonly property string modePrefixes: ModeData.modePrefixes
     readonly property string emptyStateTitle: {
         if (mode === "files")
             return "Type at least " + Config.launcherFileMinQueryLength + " characters to search files";

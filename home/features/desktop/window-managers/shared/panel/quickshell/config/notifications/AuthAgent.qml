@@ -54,7 +54,7 @@ PanelWindow {
       color: Colors.bgGlass
       border.color: Colors.primary
       border.width: 1
-      radius: 16
+      radius: Colors.radiusPill
       clip: true
 
       ColumnLayout {

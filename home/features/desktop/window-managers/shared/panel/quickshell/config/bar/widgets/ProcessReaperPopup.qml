@@ -25,18 +25,18 @@ Rectangle {
     ColumnLayout {
         id: contentCol
         anchors.fill: parent
-        anchors.margins: 12
+        anchors.margins: Colors.spacingM
         spacing: Colors.spacingM
 
         RowLayout {
             Layout.fillWidth: true
-            Text { text: "RESOURCE REAPER"; color: Colors.textDisabled; font.pixelSize: 10; font.weight: Font.Black; font.letterSpacing: 1.0; Layout.fillWidth: true }
+            Text { text: "RESOURCE REAPER"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Colors.letterSpacingWide; Layout.fillWidth: true }
             Text { text: ProcessService.sortBy.toUpperCase(); color: Colors.primary; font.pixelSize: 9; font.weight: Font.Bold }
         }
 
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: 4
+            spacing: Colors.spacingXS
 
             Repeater {
                 model: ProcessService.processes ? ProcessService.processes.slice(0, 5) : []
@@ -47,8 +47,8 @@ Rectangle {
                     color: Colors.withAlpha(Colors.surface, 0.3)
                     
                     RowLayout {
-                        anchors.fill: parent; anchors.margins: 8
-                        spacing: 8
+                        anchors.fill: parent; anchors.margins: Colors.spacingS
+                        spacing: Colors.spacingS
                         
                         ColumnLayout {
                             spacing: -2; Layout.fillWidth: true
@@ -58,7 +58,7 @@ Rectangle {
                         
                         Text { 
                             text: (ProcessService.sortBy === "cpu" ? modelData.cpu : modelData.mem) + "%"
-                            color: Colors.primary; font.pixelSize: 10; font.weight: Font.Bold 
+                            color: Colors.primary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold
                         }
                         
                         SharedWidgets.IconButton {

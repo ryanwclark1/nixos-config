@@ -615,7 +615,7 @@ PanelWindow {
                                 text: AiService.pendingScript ? AiService.pendingScript.content : ""
                                 color: Colors.textSecondary
                                 font.family: Colors.fontMono
-                                font.pixelSize: 10
+                                font.pixelSize: Colors.fontSizeXS
                                 wrapMode: Text.WrapAnywhere
                             }
                         }
