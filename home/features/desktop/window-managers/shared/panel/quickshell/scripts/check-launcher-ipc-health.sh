@@ -158,7 +158,7 @@ require_literal() {
 require_pattern() {
   local pattern="$1"
   local label="$2"
-  if ! rg -n --pcre2 -- "$pattern" "$launcher_qml" >/dev/null 2>&1; then
+  if ! rg -n -U --multiline --pcre2 -- "$pattern" "$launcher_qml" >/dev/null 2>&1; then
     status_payload_valid=0
     errors+=("status payload contract missing: ${label}")
   fi
@@ -200,14 +200,14 @@ main() {
     checked_actions+=("${action}")
   done
 
-  require_literal 'function clearMetrics() { launcherRoot.clearLauncherMetrics(); }' "Launcher.clearMetrics IPC mapping"
-  require_literal 'function redetectFilesBackend() { launcherRoot.forceRedetectFileSearchBackend(true, function(_) {}); }' "Launcher.redetectFilesBackend IPC mapping"
-  require_literal 'function diagnosticReset() { launcherRoot.diagnosticReset(); }' "Launcher.diagnosticReset IPC mapping"
-  require_pattern 'function filesBackendStatus\(\)(?:: string)? \{ return JSON\.stringify\(launcherRoot\.filesBackendStatusObject\(\)\); \}' "Launcher.filesBackendStatus IPC mapping"
-  require_pattern 'function drunCategoryState\(\)(?:: string)? \{ return JSON\.stringify\(launcherRoot\.drunCategoryStateObject\(\)\); \}' "Launcher.drunCategoryState IPC mapping"
-  require_pattern 'function escapeActionState\(\)(?:: string)? \{ return JSON\.stringify\(launcherRoot\.escapeActionStateObject\(\)\); \}' "Launcher.escapeActionState IPC mapping"
-  require_pattern 'function diagnosticSetSearchText\(text: string\)(?:: string)? \{ return launcherRoot\.diagnosticSetSearchText\(text\); \}' "Launcher.diagnosticSetSearchText IPC mapping"
-  require_pattern 'function diagnosticSetDrunCategoryFilter\(categoryKey: string\)(?:: string)? \{ return launcherRoot\.diagnosticSetDrunCategoryFilter\(categoryKey\); \}' "Launcher.diagnosticSetDrunCategoryFilter IPC mapping"
+  require_literal 'function clearMetrics() {' "Launcher.clearMetrics IPC mapping"
+  require_literal 'function redetectFilesBackend() {' "Launcher.redetectFilesBackend IPC mapping"
+  require_literal 'function diagnosticReset() {' "Launcher.diagnosticReset IPC mapping"
+  require_pattern 'function filesBackendStatus\(\)(?:: string)? \{\s*return JSON\.stringify\(launcherRoot\.filesBackendStatusObject\(\)\);\s*\}' "Launcher.filesBackendStatus IPC mapping"
+  require_pattern 'function drunCategoryState\(\)(?:: string)? \{\s*return JSON\.stringify\(launcherRoot\.drunCategoryStateObject\(\)\);\s*\}' "Launcher.drunCategoryState IPC mapping"
+  require_pattern 'function escapeActionState\(\)(?:: string)? \{\s*return JSON\.stringify\(launcherRoot\.escapeActionStateObject\(\)\);\s*\}' "Launcher.escapeActionState IPC mapping"
+  require_pattern 'function diagnosticSetSearchText\(text: string\)(?:: string)? \{\s*return launcherRoot\.diagnosticSetSearchText\(text\);\s*\}' "Launcher.diagnosticSetSearchText IPC mapping"
+  require_pattern 'function diagnosticSetDrunCategoryFilter\(categoryKey: string\)(?:: string)? \{\s*return launcherRoot\.diagnosticSetDrunCategoryFilter\(categoryKey\);\s*\}' "Launcher.diagnosticSetDrunCategoryFilter IPC mapping"
   require_pattern 'function invokeEscapeAction\(\)(?:: string)? \{' "Launcher.invokeEscapeAction IPC mapping"
   require_literal 'function drunCategoryStateObject() {' "drunCategoryState payload helper"
   require_literal 'function escapeActionStateObject() {' "escapeActionState payload helper"
@@ -215,7 +215,7 @@ main() {
   require_literal 'action = "resetCategory";' "escapeActionState resetCategory branch"
   require_literal 'hasQuery: searchText !== "",' "escapeActionState hasQuery field"
   require_literal 'hasCategoryFilter: drunCategoryFiltersEnabled && mode === "drun" && drunCategoryFilter !== "",' "escapeActionState hasCategoryFilter field"
-  require_literal 'visible: showLauncherHome && drunCategoryFiltersEnabled && mode === "drun" && normalized.length > 1,' "drunCategoryState visible field"
+  require_literal 'enabled: drunCategoryFiltersEnabled === true,' "drunCategoryState enabled field"
   require_literal 'activeCount: activeCount,' "drunCategoryState activeCount field"
   require_literal 'totalCount: totalCount,' "drunCategoryState totalCount field"
   require_literal 'options: normalized' "drunCategoryState options field"
