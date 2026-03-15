@@ -7,7 +7,6 @@ import "../services"
 Scope {
   id: root
 
-  property var dockApps: []
   property var _entryCache: ({})
 
   function normalizeAppId(id) {
@@ -92,87 +91,75 @@ Scope {
     if (idx >= 0) pinned.splice(idx, 1);
     else pinned.push(appId);
     Config.dockPinnedApps = pinned;
-    updateDockApps();
   }
 
-  function updateDockApps() {
-    var toplevels = [];
-    if (typeof ToplevelManager !== 'undefined' && ToplevelManager.toplevels) {
-      toplevels = ToplevelManager.toplevels.values || [];
-    }
-    var pinned = Config.dockPinnedApps || [];
-    var combined = [];
-    var processedIds = {};
+  ScriptModel {
+    id: dockModel
+    values: {
+      // These dependencies auto-trigger re-evaluation
+      var toplevels = (typeof ToplevelManager !== 'undefined' && ToplevelManager.toplevels)
+        ? (ToplevelManager.toplevels.values || []) : [];
+      var pinned = Config.dockPinnedApps || [];
+      var groupApps = Config.dockGroupApps;  // force dep
 
-    for (var i = 0; i < pinned.length; i++) {
-      var pinnedId = pinned[i];
-      var normPinned = normalizeAppId(pinnedId);
-      var matchingToplevels = [];
+      // Clear entry cache on each rebuild
+      root._entryCache = {};
 
-      for (var j = 0; j < toplevels.length; j++) {
-        var tl = toplevels[j];
-        if (!tl || !tl.appId) continue;
-        var normTl = normalizeAppId(tl.appId);
-        var resolved = normalizeAppId(resolveDesktopEntryId(tl.appId));
-        if (normTl === normPinned || resolved === normPinned)
-          matchingToplevels.push(tl);
+      var combined = [];
+      var processedIds = {};
+
+      for (var i = 0; i < pinned.length; i++) {
+        var pinnedId = pinned[i];
+        var normPinned = root.normalizeAppId(pinnedId);
+        var matchingToplevels = [];
+
+        for (var j = 0; j < toplevels.length; j++) {
+          var tl = toplevels[j];
+          if (!tl || !tl.appId) continue;
+          var normTl = root.normalizeAppId(tl.appId);
+          var resolved = root.normalizeAppId(root.resolveDesktopEntryId(tl.appId));
+          if (normTl === normPinned || resolved === normPinned)
+            matchingToplevels.push(tl);
+        }
+
+        combined.push({
+          appId: pinnedId,
+          pinned: true,
+          toplevels: matchingToplevels,
+          name: matchingToplevels.length > 0 ? matchingToplevels[0].title : root.getAppName(pinnedId)
+        });
+        processedIds[normPinned] = true;
       }
 
-      combined.push({
-        appId: pinnedId,
-        pinned: true,
-        toplevels: matchingToplevels,
-        name: matchingToplevels.length > 0 ? matchingToplevels[0].title : getAppName(pinnedId)
-      });
-      processedIds[normPinned] = true;
-    }
+      var grouped = {};
+      for (var k = 0; k < toplevels.length; k++) {
+        var tl2 = toplevels[k];
+        if (!tl2 || !tl2.appId) continue;
+        var norm2 = root.normalizeAppId(tl2.appId);
+        var resolved2 = root.normalizeAppId(root.resolveDesktopEntryId(tl2.appId));
+        if (processedIds[norm2] || processedIds[resolved2]) continue;
 
-    var grouped = {};
-    for (var k = 0; k < toplevels.length; k++) {
-      var tl2 = toplevels[k];
-      if (!tl2 || !tl2.appId) continue;
-      var norm2 = normalizeAppId(tl2.appId);
-      var resolved2 = normalizeAppId(resolveDesktopEntryId(tl2.appId));
-      if (processedIds[norm2] || processedIds[resolved2]) continue;
-
-      var groupKey = Config.dockGroupApps ? norm2 : (norm2 + "_" + k);
-      if (!grouped[groupKey]) {
-        grouped[groupKey] = {
-          appId: tl2.appId,
-          pinned: false,
-          toplevels: [],
-          name: tl2.title
-        };
+        var groupKey = groupApps ? norm2 : (norm2 + "_" + k);
+        if (!grouped[groupKey]) {
+          grouped[groupKey] = {
+            appId: tl2.appId,
+            pinned: false,
+            toplevels: [],
+            name: tl2.title
+          };
+        }
+        grouped[groupKey].toplevels.push(tl2);
       }
-      grouped[groupKey].toplevels.push(tl2);
+
+      var keys = Object.keys(grouped);
+      for (var m = 0; m < keys.length; m++)
+        combined.push(grouped[keys[m]]);
+
+      return combined;
     }
-
-    var keys = Object.keys(grouped);
-    for (var m = 0; m < keys.length; m++)
-      combined.push(grouped[keys[m]]);
-
-    dockApps = combined;
   }
 
-  property bool _rebuildPending: false
-  function scheduleRebuild() {
-    if (_rebuildPending) return;
-    _rebuildPending = true;
-    Qt.callLater(() => { _rebuildPending = false; _entryCache = {}; updateDockApps(); });
-  }
-
-  Connections {
-    target: (typeof ToplevelManager !== 'undefined' && ToplevelManager.toplevels) ? ToplevelManager.toplevels : null
-    function onValuesChanged() { root.scheduleRebuild(); }
-  }
-
-  Connections {
-    target: Config
-    function onDockPinnedAppsChanged() { root.scheduleRebuild(); }
-    function onDockGroupAppsChanged() { root.scheduleRebuild(); }
-  }
-
-  Component.onCompleted: Qt.callLater(updateDockApps)
+  readonly property alias dockApps: dockModel.values
 
   Variants {
     model: Quickshell.screens

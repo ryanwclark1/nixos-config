@@ -74,9 +74,21 @@ ColumnLayout {
                     anchors.fill: parent; anchors.margins: 8
                     Text { text: "󰡨"; color: Colors.primary; font.pixelSize: 16; font.family: Colors.fontMono }
                     Text { text: modelData.name; color: Colors.text; font.pixelSize: Colors.fontSizeXS; font.weight: Font.DemiBold; elide: Text.ElideRight; Layout.fillWidth: true }
-                    SharedWidgets.IconButton {
-                        icon: "󰆍"; size: 28; iconSize: 14; iconColor: Colors.textDisabled
-                        onClicked: Quickshell.execDetached(["ghostty", "-e", "docker", "exec", "-it", modelData.id, "sh"])
+                    
+                    Row {
+                        spacing: 2
+                        SharedWidgets.IconButton {
+                            icon: "󰆍"; size: 28; iconSize: 14; iconColor: Colors.textDisabled
+                            onClicked: Quickshell.execDetached(["ghostty", "-e", "docker", "exec", "-it", modelData.id, "sh"])
+                        }
+                        SharedWidgets.IconButton {
+                            icon: "󰋚"; size: 28; iconSize: 14; iconColor: Colors.textDisabled
+                            onClicked: {
+                                logOverlay.title = "Docker: " + modelData.name;
+                                logOverlay.command = ServiceUnitService.getLogStreamCommand("docker", modelData.id);
+                                logOverlay.visible = true;
+                            }
+                        }
                     }
                 }
             }
@@ -91,15 +103,41 @@ ColumnLayout {
                     anchors.fill: parent; anchors.margins: 8
                     Text { text: "󰣀"; color: Colors.accent; font.pixelSize: 16; font.family: Colors.fontMono }
                     Text { text: modelData; color: Colors.text; font.pixelSize: Colors.fontSizeXS; font.weight: Font.DemiBold; elide: Text.ElideRight; Layout.fillWidth: true }
-                    SharedWidgets.IconButton {
-                        icon: "󰆍"; size: 28; iconSize: 14; iconColor: Colors.textDisabled
-                        onClicked: {
-                            var host = modelData.split("@")[1] || modelData;
-                            Quickshell.execDetached(["ghostty", "-e", "ssh", host]);
+                    
+                    Row {
+                        spacing: 2
+                        SharedWidgets.IconButton {
+                            icon: "󰆍"; size: 28; iconSize: 14; iconColor: Colors.textDisabled
+                            onClicked: {
+                                var host = modelData.split("@")[1] || modelData;
+                                Quickshell.execDetached(["ghostty", "-e", "ssh", host]);
+                            }
+                        }
+                        SharedWidgets.IconButton {
+                            icon: "󰋚"; size: 28; iconSize: 14; iconColor: Colors.textDisabled
+                            onClicked: {
+                                logOverlay.title = "SSH: " + modelData;
+                                // For SSH, we might just tail secure or similar if we had perms, 
+                                // but here we'll just show systemd logs for sshd as a demo
+                                logOverlay.command = ServiceUnitService.getLogStreamCommand("system", "sshd");
+                                logOverlay.visible = true;
+                            }
                         }
                     }
                 }
             }
+        }
+    }
+
+    // Live Log Overlay
+    SharedWidgets.LiveLogOverlay {
+        id: logOverlay
+        Layout.fillWidth: true
+        Layout.preferredHeight: 300
+        visible: false
+        onCloseRequested: {
+            visible = false;
+            command = [];
         }
     }
 

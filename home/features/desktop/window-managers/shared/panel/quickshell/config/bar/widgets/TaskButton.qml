@@ -24,28 +24,14 @@ Rectangle {
   
   signal pinToggled(var app)
 
-  readonly property var allToplevels: (typeof ToplevelManager !== "undefined" && ToplevelManager.toplevels) ? (ToplevelManager.toplevels.values || []) : []
-
-  // Find running instance if it's a pinned app.
-  property var runningInstance: {
-    if (!isPinned) return null;
-    for (var i = 0; i < allToplevels.length; i++) {
-      var t = allToplevels[i];
-      if (!t) continue;
-      var cls = (t.class || t.appId || "");
-      if (cls === appClass) return t;
-    }
-    return null;
-  }
-  
-  readonly property bool isRunning: isPinned ? runningInstance !== null : true
+  readonly property bool isRunning: toplevelRef !== null
   readonly property bool niriFocused: {
     if (!CompositorAdapter.isNiri || !NiriService.available) return false;
     var aw = CompositorAdapter.niriActiveWindow;
     if (!aw) return false;
     return (aw.app_id || "").toLowerCase() === appClass.toLowerCase();
   }
-  readonly property bool actualFocused: niriFocused || (isPinned ? (runningInstance && runningInstance.focused) : isFocused)
+  readonly property bool actualFocused: niriFocused || isFocused
   readonly property string tooltipText: {
     if ((appName || "").trim().length > 0) return appName;
     if ((appClass || "").trim().length > 0) return appClass;
@@ -94,8 +80,7 @@ Rectangle {
             var niriWin = NiriService.findWindowByAppId(appClass);
             if (niriWin) { CompositorAdapter.focusWindow(niriWin.id); return; }
           }
-          var target = isPinned ? runningInstance : toplevelRef;
-          if (target && target.activate) target.activate();
+          if (toplevelRef && toplevelRef.activate) toplevelRef.activate();
         } else if (isPinned && appExec) {
           Quickshell.execDetached(["sh", "-c", appExec]);
         }

@@ -146,57 +146,102 @@ Flow {
 
   Component.onCompleted: {} // Pinned apps loaded via FileView.onLoaded
 
-  // Combined model: Pinned Apps + Running Apps not in Pinned
-  Repeater {
-    model: root.pinnedApps
-    delegate: TaskButton {
-      appClass: modelData.class || ""
-      appExec: modelData.exec || ""
-      appName: modelData.name || ""
-      isPinned: true
-      iconMap: root.iconMap
-      anchorWindow: root.anchorWindow
-      onPinToggled: (app) => root.togglePin(app)
+  // Unified model: pinned apps, optional separator sentinel, then unpinned running apps
+  ScriptModel {
+    id: taskModel
+    values: {
+      void root._niriWindowsVersion;  // force Niri reactivity
+      void root.pinnedApps;           // force pinned reactivity
+
+      var result = [];
+      var pinnedClasses = {};
+
+      // Phase 1: Pinned apps (always first)
+      for (var i = 0; i < root.pinnedApps.length; i++) {
+        var p = root.pinnedApps[i];
+        var cls = p.class || "";
+        pinnedClasses[cls] = true;
+
+        // Find matching running toplevel
+        var matchedTl = null;
+        var matchedFocused = false;
+        for (var t = 0; t < root.runningToplevels.length; t++) {
+          var tl = root.runningToplevels[t];
+          if ((tl.class || tl.appId || "") === cls) {
+            matchedTl = tl;
+            matchedFocused = !!tl.activated;
+            break;
+          }
+        }
+
+        result.push({
+          _key: "pinned_" + cls,
+          name: p.name || "",
+          class: cls,
+          exec: p.exec || "",
+          isPinned: true,
+          isSeparator: false,
+          toplevelRef: matchedTl,
+          isFocused: matchedFocused
+        });
+      }
+
+      // Phase 2: Unpinned running apps
+      var unpinned = [];
+      for (var r = 0; r < root.runningToplevels.length; r++) {
+        var rt = root.runningToplevels[r];
+        var rtCls = rt.class || rt.appId || "";
+        if (!pinnedClasses[rtCls]) {
+          unpinned.push({
+            _key: "running_" + rtCls,
+            name: rt.title || "",
+            class: rtCls,
+            exec: rtCls,
+            isPinned: false,
+            isSeparator: false,
+            toplevelRef: rt,
+            isFocused: !!rt.activated
+          });
+        }
+      }
+
+      // Separator sentinel (only if unpinned apps exist)
+      if (unpinned.length > 0) {
+        result.push({ _key: "__separator__", isSeparator: true });
+        result = result.concat(unpinned);
+      }
+
+      return result;
     }
   }
 
-  // Separator if needed
-  Rectangle {
-    width: root.vertical ? 16 : 1
-    height: root.vertical ? 1 : 16
-    color: Colors.border
-    visible: {
-      for (var i = 0; i < runningToplevels.length; i++) {
-        var cls = (runningToplevels[i].class || runningToplevels[i].appId || "");
-        var found = false;
-        for (var j = 0; j < pinnedApps.length; j++) {
-          if (pinnedApps[j].class === cls) { found = true; break; }
-        }
-        if (!found) return true;
-      }
-      return false;
+  Repeater {
+    model: taskModel
+    delegate: Loader {
+      required property var modelData
+      sourceComponent: modelData.isSeparator ? separatorComponent : taskButtonComponent
     }
   }
 
-  Repeater {
-    model: runningToplevels
-    delegate: TaskButton {
-      // Only show if not already pinned and on active workspace
-      property bool alreadyPinned: {
-        for (var i = 0; i < pinnedApps.length; i++) {
-          if (pinnedApps[i].class === (modelData.class || modelData.appId || "")) return true;
-        }
-        return false;
-      }
-      visible: !alreadyPinned
-      width: visible ? 32 : 0
-      Behavior on width { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
-      appClass: modelData.class || modelData.appId || ""
-      appExec: modelData.class || modelData.appId || ""
-      appName: modelData.title || ""
-      isFocused: modelData.activated
-      isPinned: false
-      toplevelRef: modelData
+  Component {
+    id: separatorComponent
+    Rectangle {
+      width: root.vertical ? 16 : 1
+      height: root.vertical ? 1 : 16
+      color: Colors.border
+    }
+  }
+
+  Component {
+    id: taskButtonComponent
+    TaskButton {
+      readonly property var itemData: parent ? parent.modelData : ({})
+      appClass: itemData.class || ""
+      appExec: itemData.exec || ""
+      appName: itemData.name || ""
+      isPinned: !!itemData.isPinned
+      isFocused: !!itemData.isFocused
+      toplevelRef: itemData.toplevelRef || null
       iconMap: root.iconMap
       anchorWindow: root.anchorWindow
       onPinToggled: (app) => root.togglePin(app)

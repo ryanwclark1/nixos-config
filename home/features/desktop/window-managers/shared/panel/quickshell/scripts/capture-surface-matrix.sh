@@ -8,12 +8,12 @@ delay_seconds="1.6"
 crop_mode="monitor"
 workspace_target="auto"
 surfaces=(
-  "notifCenter"
-  "controlCenter"
   "networkMenu"
   "audioMenu"
   "weatherMenu"
   "dateTimeMenu"
+  "notifCenter"
+  "controlCenter"
 )
 
 usage() {

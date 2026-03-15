@@ -205,38 +205,57 @@ if [[ -n "${settings_deep_scroll_y}" ]] && ! [[ "${settings_deep_scroll_y}" =~ ^
   exit 2
 fi
 
+pid_looks_like_quickshell() {
+  local pid
+  local exe=""
+  local comm=""
+  local cmdline=""
+
+  pid="${1:-}"
+  [[ -n "${pid}" ]] || return 1
+  kill -0 "${pid}" >/dev/null 2>&1 || return 1
+
+  exe="$(readlink -f "/proc/${pid}/exe" 2>/dev/null || true)"
+  comm="$(cat "/proc/${pid}/comm" 2>/dev/null || true)"
+  if [[ -r "/proc/${pid}/cmdline" ]]; then
+    cmdline="$(tr '\0' ' ' < "/proc/${pid}/cmdline" 2>/dev/null || true)"
+  fi
+
+  [[ "${exe}" == *quickshell* || "${comm}" == *quickshell* || "${cmdline}" == *quickshell* ]]
+}
+
+instance_for_pid() {
+  local pid="$1"
+  local resolved=""
+
+  pid_looks_like_quickshell "${pid}" || return 1
+
+  resolved="$(readlink -f "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid/${pid}" 2>/dev/null || true)"
+  if [[ -n "${resolved}" && -S "${resolved}/ipc.sock" ]]; then
+    basename "${resolved}"
+    return 0
+  fi
+
+  return 1
+}
+
 discover_instances_from_pid() {
   local pid
-  local resolved
-  local ids=()
 
   while IFS= read -r pid; do
     [[ -n "${pid}" ]] || continue
-    resolved="$(readlink -f "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid/${pid}" 2>/dev/null || true)"
-    if [[ -n "${resolved}" && -S "${resolved}/ipc.sock" ]]; then
-      ids+=("$(basename "${resolved}")")
-    fi
-  done < <(ps -eo pid=,comm=,args= | awk '$2 ~ /quickshell/ || $3 ~ /quickshell/ { print $1 }')
-
-  printf '%s\n' "${ids[@]}" | awk 'NF && !seen[$0]++'
+    instance_for_pid "${pid}" || continue
+  done < <(
+    {
+      find "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid" -mindepth 1 -maxdepth 1 -type l -printf '%f\n' 2>/dev/null || true
+      ps -eo pid=,comm= | awk '$2 ~ /quickshell|\\.quickshell-wra/ { print $1 }'
+    } | awk 'NF && !seen[$0]++'
+  )
 }
 
 discover_instance() {
   local ids=()
-  local dir
-
   mapfile -t ids < <(discover_instances_from_pid)
-  if (( ${#ids[@]} == 1 )); then
-    printf '%s\n' "${ids[0]}"
-    return 0
-  fi
-
-  if (( ${#ids[@]} == 0 )) && [[ -d "${runtime_root}" ]]; then
-    while IFS= read -r dir; do
-      ids+=("$(basename "${dir}")")
-    done < <(find "${runtime_root}" -mindepth 1 -maxdepth 1 -type d -exec test -S '{}/ipc.sock' ';' -print 2>/dev/null | sort)
-  fi
-
   if (( ${#ids[@]} == 1 )); then
     printf '%s\n' "${ids[0]}"
     return 0
@@ -263,19 +282,6 @@ run_ipc() {
 
   [[ -n "${output}" ]] && printf '%s\n' "${output}" >&2
   return "${status}"
-}
-
-instance_for_pid() {
-  local pid="$1"
-  local resolved=""
-
-  resolved="$(readlink -f "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid/${pid}" 2>/dev/null || true)"
-  if [[ -n "${resolved}" && -S "${resolved}/ipc.sock" ]]; then
-    basename "${resolved}"
-    return 0
-  fi
-
-  return 1
 }
 
 cleanup_repo_shell() {

@@ -4,6 +4,7 @@ import Quickshell.Bluetooth
 import Quickshell.Wayland
 import "."
 import "widgets"
+import "./widgets" as Widgets
 import "../modules"
 import "../services"
 import "../widgets" as SharedWidgets
@@ -412,7 +413,7 @@ Item {
 
   Component {
     id: logoComponent
-    Logo {
+    Widgets.Logo {
       property var widgetInstance: null
       tooltipText: "Application launcher"
       anchorWindow: root.anchorWindow
@@ -421,7 +422,7 @@ Item {
 
   Component {
     id: workspacesComponent
-    Workspaces {
+    Widgets.Workspaces {
       property var widgetInstance: null
       vertical: root.vertical
       anchorWindow: root.anchorWindow
@@ -430,7 +431,7 @@ Item {
 
   Component {
     id: taskbarComponent
-    Taskbar {
+    Widgets.Taskbar {
       property var widgetInstance: null
       vertical: root.vertical
       anchorWindow: root.anchorWindow
@@ -439,14 +440,14 @@ Item {
 
   Component {
     id: windowTitleComponent
-    WindowTitle {
+    Widgets.WindowTitle {
       property var widgetInstance: null
     }
   }
 
   Component {
     id: keyboardLayoutComponent
-    KeyboardLayout {
+    Widgets.KeyboardLayout {
       property var widgetInstance: null
       anchorWindow: root.anchorWindow
     }

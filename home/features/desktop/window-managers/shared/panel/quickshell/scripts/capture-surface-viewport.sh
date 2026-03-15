@@ -237,46 +237,87 @@ resolve_shell_pid() {
   return 1
 }
 
+pid_looks_like_quickshell() {
+  local pid
+  local exe=""
+  local comm=""
+  local cmdline=""
+
+  pid="${1:-}"
+  [[ -n "${pid}" ]] || return 1
+  kill -0 "${pid}" >/dev/null 2>&1 || return 1
+
+  exe="$(readlink -f "/proc/${pid}/exe" 2>/dev/null || true)"
+  comm="$(cat "/proc/${pid}/comm" 2>/dev/null || true)"
+  if [[ -r "/proc/${pid}/cmdline" ]]; then
+    cmdline="$(tr '\0' ' ' < "/proc/${pid}/cmdline" 2>/dev/null || true)"
+  fi
+
+  [[ "${exe}" == *quickshell* || "${comm}" == *quickshell* || "${cmdline}" == *quickshell* ]]
+}
+
+instance_id_from_pid() {
+  local pid
+  local resolved=""
+
+  pid="${1:-}"
+  [[ -n "${pid}" ]] || return 1
+  pid_looks_like_quickshell "${pid}" || return 1
+
+  resolved="$(readlink -f "${runtime_base}/by-pid/${pid}" 2>/dev/null || true)"
+  if [[ -n "${resolved}" && -S "${resolved}/ipc.sock" ]]; then
+    basename "${resolved}"
+    return 0
+  fi
+
+  return 1
+}
+
 discover_instances_from_pid() {
   local pid
-  local resolved
   local ids=()
 
   while IFS= read -r pid; do
     [[ -n "${pid}" ]] || continue
-    resolved="$(readlink -f "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid/${pid}" 2>/dev/null || true)"
-    if [[ -n "${resolved}" && -S "${resolved}/ipc.sock" ]]; then
-      ids+=("$(basename "${resolved}")")
-    fi
-  done < <(ps -eo pid=,comm=,args= | awk '$2 ~ /quickshell/ || $3 ~ /quickshell/ { print $1 }')
+    instance_id_from_pid "${pid}" || continue
+  done < <(
+    {
+      find "${runtime_base}/by-pid" -mindepth 1 -maxdepth 1 -type l -printf '%f\n' 2>/dev/null || true
+      ps -eo pid=,comm= | awk '$2 ~ /quickshell|\\.quickshell-wra/ { print $1 }'
+    } | awk 'NF && !seen[$0]++'
+  )
 
-  printf '%s\n' "${ids[@]}" | awk 'NF && !seen[$0]++'
+  return 0
+}
+
+instance_is_reachable() {
+  local candidate="$1"
+  local output=""
+  local status=0
+  local attempt
+
+  for attempt in 1 2 3 4 5; do
+    output="$(timeout "${ipc_timeout_seconds}s" quickshell ipc --id "${candidate}" call Shell closeAllSurfaces >/dev/null 2>&1)" && return 0
+    status=$?
+    if [[ "${output}" == *"Not ready to accept queries yet."* ]]; then
+      sleep 0.2
+      continue
+    fi
+    return "${status}"
+  done
+
+  return "${status}"
 }
 
 discover_instances() {
-  local dirs=()
-  local dir
-
-  mapfile -t dirs < <(discover_instances_from_pid)
-  if (( ${#dirs[@]} > 0 )); then
-    printf '%s\n' "${dirs[@]}"
-    return 0
-  fi
-
-  if [[ -d "${runtime_root}" ]]; then
-    while IFS= read -r dir; do
-      dirs+=("$(basename "${dir}")")
-    done < <(find "${runtime_root}" -mindepth 1 -maxdepth 1 -type d -exec test -S '{}/ipc.sock' ';' -print 2>/dev/null | sort)
-  fi
-
-  printf '%s\n' "${dirs[@]}"
+  discover_instances_from_pid
 }
 
 discover_reachable_instance() {
   local candidate
   while IFS= read -r candidate; do
     [[ -n "${candidate}" ]] || continue
-    if run_ipc quickshell ipc --id "${candidate}" call Shell closeAllSurfaces >/dev/null; then
+    if instance_is_reachable "${candidate}"; then
       printf '%s\n' "${candidate}"
       return 0
     fi
@@ -284,7 +325,7 @@ discover_reachable_instance() {
 
   while IFS= read -r candidate; do
     [[ -n "${candidate}" ]] || continue
-    if run_ipc quickshell ipc --id "${candidate}" call Shell closeAllSurfaces >/dev/null; then
+    if instance_is_reachable "${candidate}"; then
       printf '%s\n' "${candidate}"
       return 0
     fi
@@ -296,18 +337,13 @@ discover_reachable_instance() {
 discover_instances_from_monitor_layers() {
   local monitor_name=""
   local pid
-  local resolved=""
-  local ids=()
 
   monitor_name="$(hypr monitors -j | jq -r 'map(select(.focused == true))[0].name // empty')" || true
   [[ -n "${monitor_name}" ]] || return 0
 
   while IFS= read -r pid; do
     [[ -n "${pid}" ]] || continue
-    resolved="$(readlink -f "${runtime_base}/by-pid/${pid}" 2>/dev/null || true)"
-    if [[ -n "${resolved}" && -S "${resolved}/ipc.sock" ]]; then
-      ids+=("$(basename "${resolved}")")
-    fi
+    instance_id_from_pid "${pid}" || continue
   done < <(
     hypr layers -j | jq -r --arg monitor "${monitor_name}" '
       (.[$monitor].levels // {})
@@ -316,10 +352,11 @@ discover_instances_from_monitor_layers() {
       | map(select(((.namespace // "") | startswith("quickshell-bar-")) or (.namespace // "") == "quickshell-settings" or (.namespace // "") == "quickshell"))
       | map(.pid // empty)
       | .[]
-    ' 2>/dev/null | awk '!seen[$0]++' | sort -nr
+    ' 2>/dev/null \
+      | awk 'NF { count[$1]++ } END { for (pid in count) printf "%d %s\n", count[pid], pid }' \
+      | sort -k1,1nr -k2,2nr \
+      | awk '{ print $2 }'
   )
-
-  printf '%s\n' "${ids[@]}" | awk 'NF && !seen[$0]++'
 }
 
 call_ipc() {

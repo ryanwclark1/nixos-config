@@ -1034,6 +1034,9 @@ PanelWindow {
                         cursorShape: Qt.PointingHandCursor
                         acceptedButtons: Qt.LeftButton
 
+                        drag.target: modelData.isDir ? null : dragRect
+                        drag.axis: Drag.XAndYAxis
+
                         onClicked: {
                           if (modelData.isDir) {
                             if (root.mode === "folder") {
@@ -1056,6 +1059,26 @@ PanelWindow {
                             root.fileSelected(modelData.path);
                             root.close();
                           }
+                        }
+                      }
+
+                      // Hidden proxy for dragging
+                      Rectangle {
+                        id: dragRect
+                        visible: Drag.active
+                        width: 48; height: 48; radius: 8
+                        color: Colors.primary
+                        opacity: 0.8
+                        z: 999
+                        
+                        Drag.active: gridItemHover.drag.active
+                        Drag.source: ({ type: "file", path: modelData.path, name: modelData.name, isImage: modelData.isImage })
+                        Drag.hotSpot.x: 24; Drag.hotSpot.y: 24
+                        
+                        Text {
+                            anchors.centerIn: parent
+                            text: root.fileIcon(modelData)
+                            color: "white"; font.pixelSize: 24; font.family: Colors.fontMono
                         }
                       }
                     }
