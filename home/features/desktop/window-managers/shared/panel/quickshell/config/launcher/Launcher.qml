@@ -3253,74 +3253,12 @@ PanelWindow {
                     }
                 }
 
-                RowLayout {
-                    Layout.fillWidth: true
-                    spacing: Colors.paddingSmall
+                LauncherActionLegend {
                     visible: Config.launcherShowModeHints && !launcherRoot.tightMode
-                    Text {
-                        Layout.fillWidth: true
-                        text: launcherRoot.modeInfo(launcherRoot.mode).hint
-                        color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeSmall
-                        elide: Text.ElideRight
-                    }
-                    Row {
-                        spacing: Colors.spacingXS
-
-                        Rectangle {
-                            radius: Colors.radiusPill
-                            color: Colors.withAlpha(Colors.primary, 0.12)
-                            border.color: Colors.withAlpha(Colors.primary, 0.3)
-                            border.width: 1
-                            implicitHeight: 24
-                            implicitWidth: footerPrimaryText.implicitWidth + 14
-
-                            Text {
-                                id: footerPrimaryText
-                                anchors.centerIn: parent
-                                text: launcherRoot.legendPrimaryAction
-                                color: Colors.primary
-                                font.pixelSize: Colors.fontSizeXS
-                                font.weight: Font.DemiBold
-                            }
-                        }
-
-                        Rectangle {
-                            radius: Colors.radiusPill
-                            color: Colors.withAlpha(Colors.textSecondary, 0.08)
-                            border.color: Colors.withAlpha(Colors.primary, 0.14)
-                            border.width: 1
-                            implicitHeight: 24
-                            implicitWidth: footerSecondaryText.implicitWidth + 14
-
-                            Text {
-                                id: footerSecondaryText
-                                anchors.centerIn: parent
-                                text: launcherRoot.legendSecondaryAction
-                                color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeXS
-                                font.weight: Font.DemiBold
-                            }
-                        }
-
-                        Rectangle {
-                            radius: Colors.radiusPill
-                            color: Colors.surface
-                            border.color: Colors.withAlpha(Colors.primary, 0.12)
-                            border.width: 1
-                            implicitHeight: 24
-                            implicitWidth: footerTertiaryText.implicitWidth + 14
-
-                            Text {
-                                id: footerTertiaryText
-                                anchors.centerIn: parent
-                                text: launcherRoot.legendTertiaryAction
-                                color: Colors.textDisabled
-                                font.pixelSize: Colors.fontSizeXS
-                                font.weight: Font.DemiBold
-                            }
-                        }
-                    }
+                    hintText: launcherRoot.modeInfo(launcherRoot.mode).hint
+                    primaryAction: launcherRoot.legendPrimaryAction
+                    secondaryAction: launcherRoot.legendSecondaryAction
+                    tertiaryAction: launcherRoot.legendTertiaryAction
                 }
 
                 LauncherWebProviderBar {

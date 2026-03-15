@@ -90,7 +90,7 @@ QtObject {
     property real launcherScoreCategoryWeight: 0.7
 
     // --- CONTROL CENTER ---
-    property int controlCenterWidth: 350
+    property int controlCenterWidth: 400
     property bool controlCenterShowQuickLinks: true
     property bool controlCenterShowMediaWidget: true
     property var controlCenterToggleOrder: ["bluetooth", "dnd", "nightLight", "caffeine", "recording"]
@@ -222,6 +222,7 @@ QtObject {
     property string aiModel: ""                    // empty = provider default
     property string aiCustomEndpoint: ""           // for "custom" provider
     property bool aiSystemContext: false            // include system info in prompt
+    property bool notepadProjectSync: true          // auto-switch tabs based on workspace name
     property int aiMaxTokens: 4096
     property real aiTemperature: 0.7
     property string aiSystemPrompt: ""             // custom system prompt

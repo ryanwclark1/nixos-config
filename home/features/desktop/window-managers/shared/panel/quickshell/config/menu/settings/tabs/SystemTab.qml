@@ -1381,8 +1381,8 @@ Item {
             SettingsSliderRow {
                 label: "Control Center Width"
                 icon: "󰖲"
-                min: 320
-                max: 460
+                min: 360
+                max: 520
                 value: Config.controlCenterWidth
                 onMoved: v => Config.controlCenterWidth = v
             }
