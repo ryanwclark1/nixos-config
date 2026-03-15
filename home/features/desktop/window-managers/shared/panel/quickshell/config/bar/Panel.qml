@@ -1,7 +1,6 @@
 import QtQuick
 import Quickshell
 import Quickshell.Bluetooth
-import Quickshell.Wayland
 import "."
 import "widgets"
 import "./widgets" as Widgets

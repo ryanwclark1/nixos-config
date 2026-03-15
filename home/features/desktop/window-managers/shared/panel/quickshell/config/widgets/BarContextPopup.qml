@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Wayland
 import "../services"
 
 // Lightweight popup surface for bar pill right-click context menus.
