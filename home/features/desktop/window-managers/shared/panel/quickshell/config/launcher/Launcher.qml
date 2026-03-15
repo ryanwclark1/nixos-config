@@ -155,7 +155,6 @@ PanelWindow {
     property var primaryModes: sanitizeModeList(Config.launcherEnabledModes, defaultPrimaryModes, allKnownModes).filter(function (modeKey) {
         return launcherRoot.isModeAllowedByCompositor(modeKey);
     })
-    readonly property var modeMeta: ModeData.modeMeta
     readonly property var modeIcons: ModeData.modeIcons
     readonly property var launcherShortcuts: ({
             "drun": [
@@ -3117,7 +3116,7 @@ PanelWindow {
                     Layout.fillWidth: true
                     text: launcherRoot.searchText
                     accentColor: Colors.primary
-                    placeholder: launcherRoot.modeMeta[launcherRoot.mode] ? launcherRoot.modeMeta[launcherRoot.mode].hint : "Search..."
+                    placeholder: launcherRoot.modeInfo(launcherRoot.mode).hint || "Search..."
 
                     onTextChanged: {
                         if (text.startsWith("=") && launcherRoot.mode !== "calc")

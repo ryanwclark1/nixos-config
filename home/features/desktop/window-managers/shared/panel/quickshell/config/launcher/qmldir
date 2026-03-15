@@ -1,1 +1,11 @@
+AltTabSwitcher 1.0 AltTabSwitcher.qml
+LauncherConfirmDialog 1.0 LauncherConfirmDialog.qml
+LauncherHome 1.0 LauncherHome.qml
+LauncherMediaView 1.0 LauncherMediaView.qml
+Launcher 1.0 Launcher.qml
+LauncherResultDelegate 1.0 LauncherResultDelegate.qml
+LauncherSearchField 1.0 LauncherSearchField.qml
+LauncherSidebar 1.0 LauncherSidebar.qml
 OrchestratorView 1.0 OrchestratorView.qml
+OverviewNiri 1.0 OverviewNiri.qml
+Overview 1.0 Overview.qml
