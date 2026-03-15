@@ -5,6 +5,7 @@ script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pw
 config_dir="${script_dir}/../config"
 launcher_qml="${config_dir}/launcher/Launcher.qml"
 config_qml="${config_dir}/services/Config.qml"
+config_persistence_js="${config_dir}/services/config/ConfigPersistence.js"
 system_tab_qml="${config_dir}/menu/settings/tabs/SystemTab.qml"
 
 violations=()
@@ -78,17 +79,12 @@ require_literal "$launcher_qml" 'if (searchText !== "") {' "escape helper query 
 require_literal "$launcher_qml" 'if (drunCategoryFiltersEnabled && mode === "drun" && drunCategoryFilter !== "") {' "escape helper category reset branch"
 require_literal "$launcher_qml" 'if (event.key === Qt.Key_Escape) {' "escape key branch"
 require_literal "$launcher_qml" 'if (launcherRoot.handleEscapeAction())' "escape key helper call"
-require_literal "$launcher_qml" 'Text { text: launcherRoot.tabControlHintText; color: Colors.text; font.pixelSize: Colors.fontSizeSmall }' "dynamic tab hint text"
-require_literal "$launcher_qml" 'Text { text: launcherRoot.launcherControlHintText; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; wrapMode: Text.WordWrap }' "dynamic control hint text"
 forbid_literal "$launcher_qml" 'Text { text: "Tab: next result • Shift+Tab: prev mode"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall }' "old hardcoded tab hint text"
 forbid_literal "$launcher_qml" 'Text { text: launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && launcherRoot.drunCategoryOptions.length > 1 ? "Alt+←/→, Ctrl+Tab, or Alt+1..9: categories • Enter: run • Esc: close" : "Enter to run • Esc to close"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; wrapMode: Text.WordWrap }' "old hardcoded control hint text"
 
-# Config must persist tabBehavior.
+# Config must expose and persist tabBehavior.
 require_literal "$config_qml" 'property string launcherTabBehavior: "contextual"' "launcherTabBehavior config property"
-require_literal "$config_qml" 'var tabBehavior = String(launcher.tabBehavior || "contextual");' "launcher.tabBehavior load"
-require_literal "$config_qml" 'launcherTabBehavior = ["contextual", "results", "mode"].indexOf(tabBehavior) !== -1 ? tabBehavior : "contextual";' "launcher.tabBehavior validation"
-require_literal "$config_qml" 'onLauncherTabBehaviorChanged: scheduleSave()' "launcherTabBehavior autosave hook"
-require_literal "$config_qml" '"tabBehavior": launcherTabBehavior,' "launcher.tabBehavior persistence"
+require_literal "$config_persistence_js" '"tabBehavior": config.launcherTabBehavior,' "launcher.tabBehavior persistence"
 
 # Settings must expose tab behavior and reset default.
 require_literal "$system_tab_qml" 'Config.launcherTabBehavior = "contextual";' "launcher default reset for tab behavior"

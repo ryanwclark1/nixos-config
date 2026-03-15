@@ -55,8 +55,11 @@ require_literal "$launcher_qml" 'else if (event.key === Qt.Key_End) {' "End key 
 require_literal "$launcher_qml" 'if (launcherRoot.jumpSelectionBoundary(true))' "End key selection action"
 
 # Legend text must match behavior.
-require_literal "$launcher_qml" 'if (launcherTabBehavior === "mode") return "Tab: Next Mode";' "legend mode branch"
-require_literal "$launcher_qml" 'if (launcherTabBehavior === "results") return "Tab: Next Result";' "legend results branch"
+require_literal "$launcher_qml" 'readonly property string legendSecondaryAction: {' "legend secondary action property"
+require_literal "$launcher_qml" 'if (launcherTabBehavior === "mode")' "legend mode branch"
+require_literal "$launcher_qml" 'return "Tab: Next Mode";' "legend mode mapping"
+require_literal "$launcher_qml" 'if (launcherTabBehavior === "results")' "legend results branch"
+require_literal "$launcher_qml" 'return "Tab: Next Result";' "legend results mapping"
 require_literal "$launcher_qml" 'return hasResults ? "Tab: Next Result" : "Tab: Next Mode";' "legend contextual branch"
 require_literal "$launcher_qml" 'readonly property string legendTertiaryAction: {' "legend tertiary action property"
 require_literal "$launcher_qml" 'if (showingConfirm)' "legend tertiary confirm branch"

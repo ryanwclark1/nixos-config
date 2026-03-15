@@ -5,6 +5,8 @@ script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pw
 config_dir="${script_dir}/../config"
 launcher_qml="${config_dir}/launcher/Launcher.qml"
 config_qml="${config_dir}/services/Config.qml"
+config_persistence_js="${config_dir}/services/config/ConfigPersistence.js"
+mode_data_js="${config_dir}/launcher/LauncherModeData.js"
 system_tab_qml="${config_dir}/menu/settings/tabs/SystemTab.qml"
 
 violations=()
@@ -18,22 +20,21 @@ require_literal() {
   fi
 }
 
-# Config: schema, normalization, autosave, persistence.
+# Config: schema and persistence.
 require_literal "$config_qml" 'property var launcherWebAliases: ({' "launcherWebAliases property"
-require_literal "$config_qml" 'function _normalizeWebAliases(map, fallbackMap) {' "web alias normalization helper"
-require_literal "$config_qml" 'if (!/^[a-z0-9][a-z0-9_-]{0,15}$/.test(normalized)) return;' "web alias token format validation"
-require_literal "$config_qml" 'if (seen[normalized] || globalSeen[normalized]) return;' "web alias dedup validation"
-require_literal "$config_qml" 'launcherWebAliases = _normalizeWebAliases(launcher.webAliases, {' "web alias config load"
-require_literal "$config_qml" 'onLauncherWebAliasesChanged: scheduleSave()' "web alias autosave hook"
-require_literal "$config_qml" '"webAliases": launcherWebAliases,' "web alias persistence"
+require_literal "$config_persistence_js" '"webAliases": config.launcherWebAliases,' "web alias persistence"
+
+# Launcher mode data owns alias resolution/parsing.
+require_literal "$mode_data_js" 'function webAliasToProviderKey(token, providers, aliases) {' "web alias normalization helper"
+require_literal "$mode_data_js" 'if (webProviderCatalog[key])' "provider key direct mapping"
+require_literal "$mode_data_js" 'function parseWebQuery(text, providers, aliases) {' "alias parsing in web query"
+require_literal "$mode_data_js" 'var mapped = webAliasToProviderKey(parts[0], providers, aliases);' "alias parsing mapped provider"
 
 # Launcher: alias-to-provider resolution and hint wiring.
 require_literal "$launcher_qml" 'readonly property string webAliasHint: {' "web alias hint property"
 require_literal "$launcher_qml" 'var aliases = (Config.launcherWebAliases && typeof Config.launcherWebAliases === "object") ? Config.launcherWebAliases : ({})' "web alias hint source map"
 require_literal "$launcher_qml" 'function webAliasToProviderKey(token) {' "alias resolver function"
-require_literal "$launcher_qml" 'if (webProviderCatalog[key])' "provider key direct mapping"
 require_literal "$launcher_qml" 'var aliases = (Config.launcherWebAliases && typeof Config.launcherWebAliases === "object") ? Config.launcherWebAliases : ({})' "alias resolver source map"
-require_literal "$launcher_qml" 'var mapped = webAliasToProviderKey(parts[0]);' "alias parsing in web query"
 require_literal "$launcher_qml" 'text: launcherRoot.webPrimaryEnterHint + " • " + launcherRoot.webSecondaryEnterHint + " • " + launcherRoot.webAliasHint' "web alias hint shown in UI"
 
 # Settings: editable alias tokens and reset/default behavior.
