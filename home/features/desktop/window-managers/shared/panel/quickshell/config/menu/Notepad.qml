@@ -40,6 +40,8 @@ PanelWindow {
   property var tabs: [{ "id": 1, "title": "Notes", "content": "" }]
   property int activeTabId: 1
   property int nextTabId: 2
+  property string searchQuery: ""
+  property bool isSearching: false
 
   readonly property string savePath: (Quickshell.env("HOME") || "/home") + "/.local/state/quickshell/notepad.json"
   property bool _loading: false
@@ -398,6 +400,36 @@ PanelWindow {
 
         Item { Layout.fillWidth: true }
 
+        // Search bar
+        Rectangle {
+          visible: root.isSearching
+          width: 140; height: 28; radius: 14
+          color: Colors.withAlpha(Colors.surface, 0.6)
+          border.color: searchInput.activeFocus ? Colors.primary : Colors.border
+          border.width: 1
+          
+          TextInput {
+            id: searchInput
+            anchors.fill: parent; anchors.leftMargin: 10; anchors.rightMargin: 10
+            verticalAlignment: Text.AlignVCenter
+            color: Colors.text; font.pixelSize: Colors.fontSizeSmall
+            text: root.searchQuery
+            onTextChanged: root.searchQuery = text
+            onVisibleChanged: if (visible) forceActiveFocus()
+          }
+        }
+
+        // Search toggle
+        SharedWidgets.IconButton {
+          size: 28; radius: Colors.radiusXS
+          icon: "󰍉"
+          iconColor: root.isSearching ? Colors.primary : Colors.textDisabled
+          onClicked: {
+            root.isSearching = !root.isSearching;
+            if (!root.isSearching) root.searchQuery = "";
+          }
+        }
+
         // Word / char counts
         Text {
           text: {
@@ -468,6 +500,9 @@ PanelWindow {
                   required property int index
                   property bool isActive: modelData.id === root.activeTabId
                   property bool isEditing: false
+                  readonly property bool hasSearchMatch: root.searchQuery !== "" && 
+                    (modelData.title.toLowerCase().indexOf(root.searchQuery.toLowerCase()) !== -1 || 
+                     modelData.content.toLowerCase().indexOf(root.searchQuery.toLowerCase()) !== -1)
 
                   width: isEditing ? tabEditInput.width + 16 : Math.min(tabLabelText.contentWidth + 36, 140)
                   height: 28
@@ -480,10 +515,11 @@ PanelWindow {
                     radius: Colors.radiusXXS
                     color: isActive
                       ? Colors.withAlpha(Colors.primary, 0.18)
-                      : Colors.bgWidget
-                    border.color: isActive ? Colors.primary : Colors.border
-                    border.width: isActive ? 1.5 : 1
+                      : (hasSearchMatch ? Colors.withAlpha(Colors.accent, 0.12) : Colors.bgWidget)
+                    border.color: isActive ? Colors.primary : (hasSearchMatch ? Colors.accent : Colors.border)
+                    border.width: (isActive || hasSearchMatch) ? 1.5 : 1
                     Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+                    Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
 
                     SharedWidgets.StateLayer {
                       id: tabStateLayer

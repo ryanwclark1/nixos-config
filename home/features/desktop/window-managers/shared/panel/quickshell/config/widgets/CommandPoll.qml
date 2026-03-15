@@ -14,7 +14,7 @@ QtObject {
 
   signal updated()
 
-  function triggerPoll() {
+  property var triggerPoll: function() {
     if (!root.running || root.busy) return;
     if (!root.proc) return;
     if (!root.command || root.command.length === 0) return;
@@ -22,8 +22,8 @@ QtObject {
     root.proc.running = true;
   }
 
-  function poll() {
-    triggerPoll();
+  property var poll: function() {
+    root.triggerPoll();
   }
 
   property Process proc: Process {
@@ -51,6 +51,12 @@ QtObject {
     repeat: true
     running: root.running
     triggeredOnStart: true
-    onTriggered: root.triggerPoll()
+    onTriggered: {
+      if (!root.running || root.busy) return;
+      if (!root.proc) return;
+      if (!root.command || root.command.length === 0) return;
+      root.busy = true;
+      root.proc.running = true;
+    }
   }
 }

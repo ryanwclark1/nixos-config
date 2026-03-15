@@ -15,13 +15,13 @@ Use this runbook after changes to popup menus, panel surfaces, or shared shell s
 - Focused surface screenshot capture:
   - `scripts/capture-surface-viewport.sh --surface networkMenu`
 - High-risk surface screenshot matrix:
-  - `scripts/capture-surface-matrix.sh --crop monitor`
+  - `scripts/capture-surface-matrix.sh --crop surface`
 - Combined settings + surface QA capture set:
-- `scripts/capture-panel-matrix.sh --settings-preset portrait --surface-crop monitor`
+  - `scripts/capture-panel-matrix.sh --settings-preset portrait --surface-crop surface`
   - uses a dedicated empty workspace by default
   - pass `--workspace current` only when you explicitly want live-workspace captures
 - Combined settings + surface QA capture set against the repo shell:
-  - `scripts/capture-panel-matrix.sh --repo-shell --settings-preset portrait --surface-crop monitor`
+  - `scripts/capture-panel-matrix.sh --repo-shell --settings-preset portrait --surface-crop surface`
 - If more than one QuickShell instance is running:
   - `scripts/check-surface-responsive.sh --id <instance-id>`
   - `scripts/preview-surface-responsive.sh --id <instance-id>`
@@ -90,32 +90,45 @@ Use the capture scripts when you need repeatable screenshots from the live shell
 
 Examples:
 
-- full focused monitor capture for one surface:
-  - `scripts/capture-surface-viewport.sh --surface weatherMenu`
+- tight surface crop for one surface:
+  - `scripts/capture-surface-viewport.sh --surface weatherMenu --crop surface`
 - usable-area crop for one surface:
   - `scripts/capture-surface-viewport.sh --surface controlCenter --crop usable`
+- full focused monitor capture for one surface:
+  - `scripts/capture-surface-viewport.sh --surface weatherMenu`
 - write to a specific file:
   - `scripts/capture-surface-viewport.sh --surface networkMenu --output /tmp/network-menu.png`
 
 For a small high-risk batch:
 
-- full monitor crop:
-  - `scripts/capture-surface-matrix.sh --crop monitor`
+- tight surface crop:
+  - `scripts/capture-surface-matrix.sh --crop surface`
 - usable-area crop:
   - `scripts/capture-surface-matrix.sh --crop usable`
 
 For a combined artifact set:
 
-- portrait settings + monitor-cropped surfaces:
-  - `scripts/capture-panel-matrix.sh --settings-preset portrait --surface-crop monitor`
+- portrait settings + surface-cropped surfaces:
+  - `scripts/capture-panel-matrix.sh --settings-preset portrait --surface-crop surface`
 - settings only:
   - `scripts/capture-panel-matrix.sh --skip-surfaces`
 - surfaces only:
-  - `scripts/capture-panel-matrix.sh --skip-settings --surface-crop usable`
+  - `scripts/capture-panel-matrix.sh --skip-settings --surface-crop surface`
 - repo-shell combined capture:
-  - `scripts/capture-panel-matrix.sh --repo-shell --settings-preset portrait --surface-crop monitor`
+  - `scripts/capture-panel-matrix.sh --repo-shell --settings-preset portrait --surface-crop surface`
 
 This is for visual inspection only. It complements, but does not replace, the live smoke checks.
+
+Recent automated captures from the live shell produced:
+
+- `networkMenu`: `412x576`
+- `audioMenu`: `396x584`
+- `weatherMenu`: `516x624`
+- `dateTimeMenu`: `576x584`
+- `notifCenter`: `401x1701`
+- `controlCenter`: `401x1701`
+
+That means the capture path is now proving tight popup/panel crops reliably. The remaining work is manual review of placement and interaction across layouts.
 
 ## Manual Visual QA Matrix
 

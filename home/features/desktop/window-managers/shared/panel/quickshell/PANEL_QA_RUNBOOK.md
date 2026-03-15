@@ -36,7 +36,7 @@ Focused commands:
 - review artifact capture: settings screenshot matrix:
   - `qs-settings-capture-matrix --preset portrait`
 - review artifact capture: surface screenshot matrix:
-  - `qs-surface-capture-matrix --crop monitor`
+  - `qs-surface-capture-matrix --crop surface`
 
 Repo-checkout workflow:
 
@@ -45,7 +45,7 @@ Repo-checkout workflow:
 - manual walkthrough against the repo shell:
   - `qs-panel-preview --repo-shell`
 - review artifact capture against the repo shell:
-  - `qs-panel-capture-matrix --repo-shell --settings-preset portrait --surface-crop monitor`
+  - `qs-panel-capture-matrix --repo-shell --settings-preset portrait --surface-crop surface`
 
 Script equivalents remain available under `scripts/` when you want to run them from the repo checkout directly.
 
@@ -59,7 +59,7 @@ If more than one QuickShell instance is running:
 
 - `qs-panel-runtime-verify --id <instance-id>`
 - `qs-panel-preview --id <instance-id>`
-- `qs-panel-capture-matrix --id <instance-id> --settings-preset portrait --surface-crop monitor`
+- `qs-panel-capture-matrix --id <instance-id> --settings-preset portrait --surface-crop surface`
 
 If the managed `quickshell.service` is stale, broken, or intentionally stopped:
 
@@ -105,7 +105,7 @@ It does not emit `PASS`, `WARN`, `FAIL`, or `[SKIP]` results; use it to drive vi
 
 1. Captures portrait settings screenshots for the high-risk tabs.
 2. Captures a deeper portrait settings pass by default to expose lower-scroll sections in dense tabs.
-3. Captures monitor or usable-area screenshots for the high-risk popup/panel surfaces.
+3. Captures tight popup/panel surface crops for the high-risk popup/panel surfaces.
 4. Uses a dedicated empty workspace by default so the capture run does not reuse the current working workspace.
 5. Waits for the requested workspace to become active before capturing instead of relying on a fixed settle sleep.
 6. Restores the original workspace after the run completes.
@@ -120,7 +120,7 @@ It does not emit `PASS`, `WARN`, `FAIL`, or `[SKIP]` results; use the generated 
 
 1. Run the automated gate: `qs-panel-runtime-verify`.
 2. Run the manual walkthrough: `qs-panel-preview` on the live session.
-3. Generate review artifacts: `qs-panel-capture-matrix --settings-preset portrait --surface-crop monitor`.
+3. Generate review artifacts: `qs-panel-capture-matrix --settings-preset portrait --surface-crop surface`.
    Use `--workspace current` only if you intentionally want captures from the currently active workspace.
 4. Open the generated `index.html` gallery and record only concrete defects.
 5. Re-run the smallest relevant subset after each fix.
@@ -129,7 +129,7 @@ If the managed shell does not reflect the repo checkout yet:
 
 1. Run `qs-panel-runtime-verify --repo-shell`.
 2. Run `qs-panel-preview --repo-shell`.
-3. Run `qs-panel-capture-matrix --repo-shell --settings-preset portrait --surface-crop monitor`.
+3. Run `qs-panel-capture-matrix --repo-shell --settings-preset portrait --surface-crop surface`.
 
 ## Manual QA Matrix
 
@@ -162,6 +162,8 @@ Environment note:
 - Temporary bar-management harnesses should now fail only for real QML/runtime issues or the expected `No PanelWindow backend loaded` condition, not malformed local import paths.
 - A healthy headless run can therefore end with a summary like `0 pass, 0 warn, 6 skip, 0 fail`.
 - Use `qs-panel-config-contracts` for the no-session contract gate and reserve multibar smoke pass/fail expectations for real graphical sessions.
+- Current surface-capture automation prefers `--surface-crop surface`; recent matrix runs produced tight artifacts such as `networkMenu 412x576`, `audioMenu 396x584`, `weatherMenu 516x624`, `dateTimeMenu 576x584`, `notifCenter 401x1701`, and `controlCenter 401x1701`.
+- The remaining gap is manual visual QA of placement/interaction, not surface-instance discovery or screenshot cropping.
 
 ## Triage Format
 

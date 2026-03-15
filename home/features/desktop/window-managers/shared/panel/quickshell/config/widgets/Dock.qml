@@ -7,27 +7,9 @@ import "../services"
 Scope {
   id: root
 
-  property var _entryCache: ({})
-
   function normalizeAppId(id) {
     if (!id) return "";
     return id.toLowerCase().replace(/\.desktop$/, "");
-  }
-
-  function resolveDesktopEntryId(appId) {
-    if (!appId) return appId;
-    if (_entryCache.hasOwnProperty(appId)) return _entryCache[appId];
-    try {
-      if (typeof DesktopEntries !== 'undefined' && DesktopEntries.heuristicLookup) {
-        var entry = DesktopEntries.heuristicLookup(appId);
-        if (entry && entry.id) {
-          _entryCache[appId] = entry.id;
-          return entry.id;
-        }
-      }
-    } catch (e) {}
-    _entryCache[appId] = appId;
-    return appId;
   }
 
   function isAppPinned(appId) {
@@ -93,6 +75,23 @@ Scope {
     Config.dockPinnedApps = pinned;
   }
 
+  // Resolve desktop entry id with local cache (pure, no side effects)
+  function resolveDesktopEntryIdCached(appId, cache) {
+    if (!appId) return appId;
+    if (cache.hasOwnProperty(appId)) return cache[appId];
+    try {
+      if (typeof DesktopEntries !== 'undefined' && DesktopEntries.heuristicLookup) {
+        var entry = DesktopEntries.heuristicLookup(appId);
+        if (entry && entry.id) {
+          cache[appId] = entry.id;
+          return entry.id;
+        }
+      }
+    } catch (e) {}
+    cache[appId] = appId;
+    return appId;
+  }
+
   ScriptModel {
     id: dockModel
     values: {
@@ -102,8 +101,8 @@ Scope {
       var pinned = Config.dockPinnedApps || [];
       var groupApps = Config.dockGroupApps;  // force dep
 
-      // Clear entry cache on each rebuild
-      root._entryCache = {};
+      // Local cache — no property writes, no binding loop
+      var entryCache = {};
 
       var combined = [];
       var processedIds = {};
@@ -117,7 +116,7 @@ Scope {
           var tl = toplevels[j];
           if (!tl || !tl.appId) continue;
           var normTl = root.normalizeAppId(tl.appId);
-          var resolved = root.normalizeAppId(root.resolveDesktopEntryId(tl.appId));
+          var resolved = root.normalizeAppId(root.resolveDesktopEntryIdCached(tl.appId, entryCache));
           if (normTl === normPinned || resolved === normPinned)
             matchingToplevels.push(tl);
         }
@@ -136,7 +135,7 @@ Scope {
         var tl2 = toplevels[k];
         if (!tl2 || !tl2.appId) continue;
         var norm2 = root.normalizeAppId(tl2.appId);
-        var resolved2 = root.normalizeAppId(root.resolveDesktopEntryId(tl2.appId));
+        var resolved2 = root.normalizeAppId(root.resolveDesktopEntryIdCached(tl2.appId, entryCache));
         if (processedIds[norm2] || processedIds[resolved2]) continue;
 
         var groupKey = groupApps ? norm2 : (norm2 + "_" + k);

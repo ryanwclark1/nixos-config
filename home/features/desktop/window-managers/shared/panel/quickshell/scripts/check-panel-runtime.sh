@@ -84,6 +84,9 @@ run_ipc() {
       sleep 0.2
       continue
     fi
+    if [[ "${output}" == *"No instance found for pid "* ]]; then
+      return "${status}"
+    fi
     [[ -n "${output}" ]] && printf '%s\n' "${output}" >&2
     return "${status}"
   done

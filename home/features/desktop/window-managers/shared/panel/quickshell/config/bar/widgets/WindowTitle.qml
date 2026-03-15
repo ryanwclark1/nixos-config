@@ -87,4 +87,61 @@ RowLayout {
             Text { text: gitStatus.branchName; color: Colors.text; font.pixelSize: 10; font.weight: Font.Bold }
         }
     }
+
+    // ── Inline Media Context ───────────────────
+    Rectangle {
+        id: mediaContext
+        visible: !!MediaService.currentPlayer && MediaService.trackTitle !== ""
+        
+        implicitWidth: visible ? mediaRow.implicitWidth + 12 : 0
+        implicitHeight: 22
+        radius: 11
+        color: Colors.withAlpha(MediaService.artAccentColor, 0.15)
+        border.color: Colors.withAlpha(MediaService.artAccentColor, 0.3)
+        border.width: 1
+        
+        Behavior on color { ColorAnimation { duration: 400 } }
+        Behavior on border.color { ColorAnimation { duration: 400 } }
+
+        RowLayout {
+            id: mediaRow
+            anchors.centerIn: parent
+            spacing: 6
+            
+            Text {
+                text: MediaService.isPlaying ? "󰏤" : "󰐊"
+                color: MediaService.artAccentColor
+                font.family: Colors.fontMono
+                font.pixelSize: 12
+                
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: MediaService.playPause()
+                }
+            }
+            
+            Text {
+                text: MediaService.trackTitle
+                color: Colors.text
+                font.pixelSize: 9
+                font.weight: Font.Bold
+                elide: Text.ElideRight
+                Layout.maximumWidth: 120
+            }
+
+            Text {
+                text: "󰒭"
+                color: Colors.textDisabled
+                font.family: Colors.fontMono
+                font.pixelSize: 12
+                
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: MediaService.next()
+                }
+            }
+        }
+    }
 }

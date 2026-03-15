@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Io
 import "../services"
 import "../services/config/AiProviders.js" as Providers
 import "../services/config/AiMarkdown.js" as Markdown
@@ -39,6 +40,10 @@ PanelWindow {
     readonly property int panelMaxWidth: 600
     property bool includeWindowContext: false
     property bool includeVisualContext: false
+
+    property var attachedFiles: []
+    property string _pendingMsgText: ""
+    property int _fileReadIndex: 0
 
     signal closeRequested()
 
@@ -141,6 +146,21 @@ PanelWindow {
         layer.enabled: slideAnim.running || fadeAnim.running
 
         Keys.onEscapePressed: root.closeRequested()
+
+        DropArea {
+            anchors.fill: parent
+            keys: ["file"]
+            onDropped: (drop) => {
+                if (drop.hasUrls) {
+                    for (var i = 0; i < drop.urls.length; i++) {
+                        var url = drop.urls[i].toString();
+                        var path = url.replace("file://", "");
+                        var name = path.split("/").pop();
+                        root.attachedFiles = root.attachedFiles.concat([{ type: "file", name: name, path: path, content: "" }]);
+                    }
+                }
+            }
+        }
 
         // ----------------------------------------------------------
         //  Left-edge drag handle for resizing
@@ -932,6 +952,52 @@ PanelWindow {
                         }
                     }
 
+                    // Attached files flow
+                    Flow {
+                        Layout.fillWidth: true
+                        spacing: Colors.spacingS
+                        visible: root.attachedFiles.length > 0
+
+                        Repeater {
+                            model: root.attachedFiles
+                            delegate: Rectangle {
+                                width: fileText.width + removeButton.width + Colors.spacingM
+                                height: 24
+                                color: Colors.withAlpha(Colors.primary, 0.15)
+                                radius: Colors.radiusSmall
+                                border.color: Colors.withAlpha(Colors.primary, 0.3)
+                                border.width: 1
+
+                                RowLayout {
+                                    anchors.fill: parent
+                                    anchors.leftMargin: Colors.spacingS
+                                    anchors.rightMargin: Colors.spacingXS
+                                    spacing: Colors.spacingXS
+
+                                    Text {
+                                        id: fileText
+                                        text: modelData.name
+                                        color: Colors.text
+                                        font.pixelSize: Colors.fontSizeSmall
+                                        elide: Text.ElideRight
+                                        Layout.maximumWidth: 150
+                                    }
+
+                                    SharedWidgets.IconButton {
+                                        id: removeButton
+                                        icon: "window-close-symbolic"
+                                        size: 16
+                                        iconSize: 10
+                                        color: "transparent"
+                                        onClicked: {
+                                            root.attachedFiles = root.attachedFiles.filter((_, i) => i !== index);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     RowLayout {
                         Layout.fillWidth: true
                         spacing: Colors.spacingS
@@ -1004,6 +1070,7 @@ PanelWindow {
                                 target: ScreenshotService
                                 function onRegionCaptured(path) {
                                     root.includeVisualContext = true;
+                                    AiService.performOcr(path);
                                 }
                             }
                         }
@@ -1517,16 +1584,57 @@ PanelWindow {
     }
 
     // ── Helpers ──────────────────────────────────
+    Process {
+        id: fileReadProc
+        command: ["cat", root.attachedFiles[root._fileReadIndex] ? root.attachedFiles[root._fileReadIndex].path : ""]
+        onExited: (exitCode) => {
+            if (exitCode === 0) {
+                var files = root.attachedFiles.slice();
+                files[root._fileReadIndex].content = stdout.readAll();
+                root.attachedFiles = files;
+            }
+            root._fileReadIndex++;
+            root._readNextAttachedFile();
+        }
+    }
+
+    function _readNextAttachedFile() {
+        if (root._fileReadIndex < root.attachedFiles.length) {
+            fileReadProc.running = true;
+        } else {
+            // Finished reading all files, now send.
+            var contextString = "";
+            for (var i = 0; i < root.attachedFiles.length; i++) {
+                contextString += "\n\nFile: " + root.attachedFiles[i].name + "\nContent:\n" + root.attachedFiles[i].content;
+            }
+            var text = root._pendingMsgText + contextString;
+            var winCtx = root.includeWindowContext ? AiService.contextWindowTitle : "";
+            var visualCtx = root.includeVisualContext ? ScreenshotService.lastRegionPath : "";
+            AiService.sendMessage(text, winCtx, visualCtx);
+            root.attachedFiles = [];
+            root._pendingMsgText = "";
+            root.includeWindowContext = false;
+            root.includeVisualContext = false;
+        }
+    }
+
     function _sendCurrentMessage() {
         var text = inputField.text.trim();
-        if (text.length === 0) return;
+        if (text.length === 0 && root.attachedFiles.length === 0) return;
         if (AiService.isStreaming) return;
         inputField.text = "";
-        var winCtx = root.includeWindowContext ? AiService.contextWindowTitle : "";
-        var visualCtx = root.includeVisualContext ? ScreenshotService.lastRegionPath : "";
-        AiService.sendMessage(text, winCtx, visualCtx);
-        root.includeWindowContext = false;
-        root.includeVisualContext = false;
+
+        if (root.attachedFiles.length > 0) {
+            root._pendingMsgText = text;
+            root._fileReadIndex = 0;
+            root._readNextAttachedFile();
+        } else {
+            var winCtx = root.includeWindowContext ? AiService.contextWindowTitle : "";
+            var visualCtx = root.includeVisualContext ? (ScreenshotService.lastRegionPath || "") : "";
+            AiService.sendMessage(text, winCtx, visualCtx);
+            root.includeWindowContext = false;
+            root.includeVisualContext = false;
+        }
     }
 
     function _shellEscape(str) {

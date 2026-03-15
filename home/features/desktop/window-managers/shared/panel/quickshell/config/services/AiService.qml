@@ -528,6 +528,9 @@ QtObject {
         if (visualContext) {
             var visInfo = "Visual Context (latest cropped region): " + visualContext + 
                 "\n(Note: The assistant can reference this image if the multimodal backend supports it, otherwise it sees this path as a hint.)";
+            if (root.lastOcrText) {
+                visInfo += "\nExtracted Text from Region:\n```\n" + root.lastOcrText + "\n```";
+            }
             contextInfo = contextInfo ? contextInfo + "\n" + visInfo : visInfo;
         }
 
@@ -692,6 +695,29 @@ QtObject {
             hyprActiveProc.running = true;
         } else if (CompositorAdapter.isNiri) {
             contextWindowTitle = NiriService.activeWindow ? NiriService.activeWindow.title : "";
+        }
+    }
+
+    // ── OCR Helpers ─────────────────────────────
+    property string lastOcrText: ""
+    property bool isOcrBusy: false
+    
+    function performOcr(imagePath) {
+        if (!imagePath || isOcrBusy) return;
+        isOcrBusy = true;
+        lastOcrText = "";
+        ocrProc.command = ["sh", "-c", "tesseract '" + imagePath + "' stdout -l eng 2>/dev/null"];
+        ocrProc.running = true;
+    }
+
+    property Process _ocrProc: Process {
+        id: ocrProc
+        running: false
+        stdout: StdioCollector {
+            onStreamFinished: {
+                root.lastOcrText = this.text.trim();
+                root.isOcrBusy = false;
+            }
         }
     }
 
