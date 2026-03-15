@@ -40,7 +40,9 @@ cat > "${tmp_home}/.local/state/quickshell/config.json" <<'JSON'
             { "instanceId": "workspaces-1", "widgetType": "workspaces", "enabled": true, "settings": {} },
             { "instanceId": "window-title-1", "widgetType": "windowTitle", "enabled": true, "settings": {} }
           ],
-          "center": [],
+          "center": [
+            { "instanceId": "clock-1", "widgetType": "clock", "enabled": true, "settings": {} }
+          ],
           "right": []
         }
       }
@@ -58,16 +60,30 @@ QtObject {
   property int attempts: 0
 
   function leftOrder() {
+    return sectionOrder("left");
+  }
+
+  function centerOrder() {
+    return sectionOrder("center");
+  }
+
+  function rightOrder() {
+    return sectionOrder("right");
+  }
+
+  function sectionOrder(section) {
     var bar = Config.barById("bar-main");
-    var widgets = Config.barSectionWidgets(bar, "left");
+    var widgets = Config.barSectionWidgets(bar, section);
     var ids = [];
     for (var i = 0; i < widgets.length; ++i)
       ids.push(String(widgets[i].instanceId || ""));
-    return ids.join(",");
+    return ids.length > 0 ? ids.join(",") : "<empty>";
   }
 
   function runChecks() {
     console.log("INITIAL", leftOrder());
+    console.log("INITIAL_CENTER", centerOrder());
+    console.log("INITIAL_RIGHT", rightOrder());
 
     var movedToEnd = Config.moveBarWidget("bar-main", "left", 0, 3, "left");
     console.log("MOVE_END_OK", movedToEnd);
@@ -76,6 +92,21 @@ QtObject {
     var movedUp = Config.moveBarWidget("bar-main", "left", 2, 0, "left");
     console.log("MOVE_UP_OK", movedUp);
     console.log("MOVE_UP_ORDER", leftOrder());
+
+    var movedToCenter = Config.moveBarWidget("bar-main", "left", 1, 1, "center");
+    console.log("MOVE_CENTER_OK", movedToCenter);
+    console.log("MOVE_CENTER_LEFT", leftOrder());
+    console.log("MOVE_CENTER_CENTER", centerOrder());
+
+    var movedToEmptyRight = Config.moveBarWidget("bar-main", "left", 0, 0, "right");
+    console.log("MOVE_EMPTY_RIGHT_OK", movedToEmptyRight);
+    console.log("MOVE_EMPTY_RIGHT_LEFT", leftOrder());
+    console.log("MOVE_EMPTY_RIGHT_RIGHT", rightOrder());
+
+    var movedToCenterEnd = Config.moveBarWidget("bar-main", "right", 0, 2, "center");
+    console.log("MOVE_CENTER_END_OK", movedToCenterEnd);
+    console.log("MOVE_CENTER_END_CENTER", centerOrder());
+    console.log("MOVE_CENTER_END_RIGHT", rightOrder());
 
     Qt.quit();
   }
@@ -139,4 +170,49 @@ grep -q 'MOVE_UP_ORDER logo-1,workspaces-1,window-title-1' <<<"${output}" || {
   exit 1
 }
 
-printf '[PASS] moveBarWidget preserves expected same-section reorder semantics.\n'
+grep -q 'MOVE_CENTER_OK true' <<<"${output}" || {
+  printf '[FAIL] moveBarWidget rejected cross-section move into populated section.\n' >&2
+  exit 1
+}
+
+grep -q 'MOVE_CENTER_LEFT logo-1,window-title-1' <<<"${output}" || {
+  printf '[FAIL] moveBarWidget produced the wrong source order after populated cross-section move.\n' >&2
+  exit 1
+}
+
+grep -q 'MOVE_CENTER_CENTER clock-1,workspaces-1' <<<"${output}" || {
+  printf '[FAIL] moveBarWidget produced the wrong target order for populated cross-section move.\n' >&2
+  exit 1
+}
+
+grep -q 'MOVE_EMPTY_RIGHT_OK true' <<<"${output}" || {
+  printf '[FAIL] moveBarWidget rejected move into empty section.\n' >&2
+  exit 1
+}
+
+grep -q 'MOVE_EMPTY_RIGHT_LEFT window-title-1' <<<"${output}" || {
+  printf '[FAIL] moveBarWidget produced the wrong source order after empty-section move.\n' >&2
+  exit 1
+}
+
+grep -q 'MOVE_EMPTY_RIGHT_RIGHT logo-1' <<<"${output}" || {
+  printf '[FAIL] moveBarWidget produced the wrong target order for empty-section move.\n' >&2
+  exit 1
+}
+
+grep -q 'MOVE_CENTER_END_OK true' <<<"${output}" || {
+  printf '[FAIL] moveBarWidget rejected end-of-section cross-section move.\n' >&2
+  exit 1
+}
+
+grep -q 'MOVE_CENTER_END_CENTER clock-1,workspaces-1,logo-1' <<<"${output}" || {
+  printf '[FAIL] moveBarWidget produced the wrong order for end-of-section cross-section move.\n' >&2
+  exit 1
+}
+
+grep -q 'MOVE_CENTER_END_RIGHT <empty>' <<<"${output}" || {
+  printf '[FAIL] moveBarWidget did not empty the source section after end-of-section move.\n' >&2
+  exit 1
+}
+
+printf '[PASS] moveBarWidget preserves same-section and cross-section reorder semantics.\n'

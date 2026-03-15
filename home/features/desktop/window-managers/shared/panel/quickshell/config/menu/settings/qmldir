@@ -11,6 +11,7 @@ SettingsSidebar 1.0 SettingsSidebar.qml
 SettingsSliderRow 1.0 SettingsSliderRow.qml
 SettingsTabPage 1.0 SettingsTabPage.qml
 SettingsActionButton 1.0 SettingsActionButton.qml
+SettingsDragHandle 1.0 SettingsDragHandle.qml
 SettingsOwnerBadge 1.0 SettingsOwnerBadge.qml
 SettingsTextInputRow 1.0 SettingsTextInputRow.qml
 SettingsIconBox 1.0 SettingsIconBox.qml

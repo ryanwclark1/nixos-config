@@ -72,6 +72,15 @@ require_literal() {
   fi
 }
 
+require_pattern() {
+  local file="$1"
+  local pattern="$2"
+  local label="$3"
+  if ! rg -n -U --multiline --pcre2 -- "$pattern" "$file" >/dev/null 2>&1; then
+    violations+=("${label} missing in ${file}")
+  fi
+}
+
 require_cmd() {
   if ! command -v "$1" >/dev/null 2>&1; then
     printf 'Missing required command: %s\n' "$1" >&2
@@ -168,10 +177,10 @@ static_checks() {
   require_literal "$launcher_qml" 'height: launcherRoot.compactMode ? 50 : 55' "compact search bar height"
   require_literal "$launcher_qml" 'visible: launcherRoot.transientNoticeText !== "" && !launcherRoot.tightMode' "transient notice tight-mode guard"
   require_literal "$launcher_qml" 'visible: Config.launcherShowRuntimeMetrics && !launcherRoot.tightMode' "runtime metrics tight-mode guard"
-  require_literal "$launcher_qml" 'function drunCategoryState() { return JSON.stringify(launcherRoot.drunCategoryStateObject()); }' "drun category IPC payload mapping"
-  require_literal "$launcher_qml" 'function escapeActionState() { return JSON.stringify(launcherRoot.escapeActionStateObject()); }' "escape action IPC payload mapping"
-  require_literal "$launcher_qml" 'function diagnosticSetSearchText(text: string) { return launcherRoot.diagnosticSetSearchText(text); }' "escape action query setter IPC mapping"
-  require_literal "$launcher_qml" 'function diagnosticSetDrunCategoryFilter(categoryKey: string) { return launcherRoot.diagnosticSetDrunCategoryFilter(categoryKey); }' "escape action category setter IPC mapping"
+  require_pattern "$launcher_qml" 'function drunCategoryState\(\)\s*(?::\s*string)?\s*\{\s*return JSON\.stringify\(launcherRoot\.drunCategoryStateObject\(\)\);\s*\}' "drun category IPC payload mapping"
+  require_pattern "$launcher_qml" 'function escapeActionState\(\)\s*(?::\s*string)?\s*\{\s*return JSON\.stringify\(launcherRoot\.escapeActionStateObject\(\)\);\s*\}' "escape action IPC payload mapping"
+  require_pattern "$launcher_qml" 'function diagnosticSetSearchText\(text(?::\s*string)?\)\s*(?::\s*string)?\s*\{\s*return launcherRoot\.diagnosticSetSearchText\(text\);\s*\}' "escape action query setter IPC mapping"
+  require_pattern "$launcher_qml" 'function diagnosticSetDrunCategoryFilter\(categoryKey(?::\s*string)?\)\s*(?::\s*string)?\s*\{\s*return launcherRoot\.diagnosticSetDrunCategoryFilter\(categoryKey\);\s*\}' "escape action category setter IPC mapping"
   require_literal "$launcher_qml" 'function invokeEscapeAction() {' "escape action invoker IPC mapping"
   require_literal "$launcher_qml" 'function escapeActionStateObject() {' "escape action payload helper"
   require_literal "$launcher_qml" 'visible: launcherRoot.showLauncherHome && launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && launcherRoot.drunCategoryOptions.length > 1' "drun category chip visibility guard"

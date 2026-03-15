@@ -109,6 +109,12 @@ PanelWindow {
             service: BrightnessService
         }
     }
+    Loader {
+        active: root.showContent
+        sourceComponent: SharedWidgets.Ref {
+            service: ServiceUnitService
+        }
+    }
 
     Rectangle {
         id: sidebarContent
@@ -323,6 +329,75 @@ PanelWindow {
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(4) } NumberAnimation { duration: root.entranceDuration(4); easing.type: Easing.OutCubic } } }
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(4) } NumberAnimation { duration: root.entranceDuration(4); easing.type: Easing.OutBack } } }
+                        }
+
+                        // DevOps & Services
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: Colors.spacingM
+                            opacity: root.entranceOpacity(15)
+                            scale: root.entranceScale(15)
+                            transform: Translate { y: root.entranceY(15) }
+                            visible: opacity > 0
+                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(15) } NumberAnimation { duration: root.entranceDuration(15); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(15) } NumberAnimation { duration: root.entranceDuration(15); easing.type: Easing.OutBack } } }
+                            Behavior on transform { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(15) } NumberAnimation { duration: root.entranceDuration(15); easing.type: Easing.OutCubic } } }
+
+                            Text {
+                                text: "DEVOPS & SERVICES"
+                                color: Colors.textDisabled
+                                font.pixelSize: Colors.fontSizeXS
+                                font.weight: Font.Bold
+                                font.letterSpacing: 1.0
+                            }
+
+                            RowLayout {
+                                Layout.fillWidth: true
+                                spacing: Colors.spacingM
+
+                                // Docker Card
+                                Rectangle {
+                                    Layout.fillWidth: true
+                                    height: 60
+                                    radius: Colors.radiusMedium
+                                    color: Colors.withAlpha(Colors.surface, 0.3)
+                                    border.color: Colors.border
+                                    border.width: 1
+                                    
+                                    RowLayout {
+                                        anchors.fill: parent; anchors.margins: Colors.paddingSmall
+                                        spacing: Colors.spacingS
+                                        Text { text: "󰡨"; color: ServiceUnitService.dockerContainers.length > 0 ? Colors.primary : Colors.textDisabled; font.pixelSize: 24; font.family: Colors.fontMono }
+                                        ColumnLayout {
+                                            spacing: 0
+                                            Text { text: "DOCKER"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Black }
+                                            Text { text: ServiceUnitService.dockerContainers.length + " Active"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Bold }
+                                        }
+                                    }
+                                }
+
+                                // SSH Card
+                                Rectangle {
+                                    Layout.fillWidth: true
+                                    height: 60
+                                    radius: Colors.radiusMedium
+                                    color: Colors.withAlpha(Colors.surface, 0.3)
+                                    border.color: Colors.border
+                                    border.width: 1
+                                    
+                                    RowLayout {
+                                        anchors.fill: parent; anchors.margins: Colors.paddingSmall
+                                        spacing: Colors.spacingS
+                                        Text { text: "󰣀"; color: ServiceUnitService.sshActiveCount > 0 ? Colors.accent : Colors.textDisabled; font.pixelSize: 24; font.family: Colors.fontMono }
+                                        ColumnLayout {
+                                            spacing: 0
+                                            Text { text: "SSH"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Black }
+                                            Text { text: ServiceUnitService.sshActiveCount + " Active"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Bold }
+                                        }
+                                    }
+                                }
+                            }
                         }
 
                         // Sliders

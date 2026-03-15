@@ -13,6 +13,7 @@ Item {
 
     property var _themeResults: []
     property string _themeVariantFilter: ""
+    property var _previewTheme: null
     readonly property int _themeColumns: (compactMode || themeFlow.width < 700) ? 1 : 2
 
     function _refreshThemeResults() {
@@ -31,6 +32,196 @@ Item {
         anchors.fill: parent
         tabId: root.tabId
         title: "Color Theme"
+
+        // ── Live Preview Section ──────────────────────
+        SettingsCard {
+            title: "Live Preview"
+            iconName: "󰄄"
+            description: "Real-time preview of the selected or hovered theme."
+            visible: !root.compactMode && root._previewTheme !== null
+
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: Colors.spacingXL
+
+                // Mock Shell Element
+                Rectangle {
+                    Layout.preferredWidth: 240
+                    Layout.preferredHeight: 120
+                    radius: Colors.radiusMedium
+                    color: root._previewTheme ? root._previewTheme.palette.base00 : Colors.background
+                    border.color: root._previewTheme ? root._previewTheme.palette.base03 : Colors.border
+                    border.width: 1
+                    clip: true
+
+                    ColumnLayout {
+                        anchors.fill: parent
+                        anchors.margins: Colors.spacingM
+                        spacing: Colors.spacingS
+
+                        // Mock Bar
+                        Rectangle {
+                            Layout.fillWidth: true
+                            height: 24
+                            radius: 12
+                            color: root._previewTheme ? Colors.withAlpha(root._previewTheme.palette.base01, 0.8) : Colors.surface
+
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.leftMargin: 10
+                                anchors.rightMargin: 10
+                                Rectangle {
+                                    width: 12
+                                    height: 12
+                                    radius: 6
+                                    color: root._previewTheme ? root._previewTheme.palette.base0D : Colors.primary
+                                }
+                                Item {
+                                    Layout.fillWidth: true
+                                }
+                                Text {
+                                    text: "12:00"
+                                    color: root._previewTheme ? root._previewTheme.palette.base05 : Colors.text
+                                    font.pixelSize: 10
+                                    font.bold: true
+                                }
+                            }
+                        }
+
+                        // Mock Window
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            radius: 8
+                            color: root._previewTheme ? root._previewTheme.palette.base01 : Colors.surface
+                            border.color: root._previewTheme ? root._previewTheme.palette.base0D : Colors.primary
+                            border.width: 1
+
+                            ColumnLayout {
+                                anchors.fill: parent
+                                anchors.margins: 10
+                                spacing: 4
+                                Rectangle {
+                                    width: 60
+                                    height: 4
+                                    radius: 2
+                                    color: root._previewTheme ? root._previewTheme.palette.base05 : Colors.text
+                                    opacity: 0.6
+                                }
+                                Rectangle {
+                                    width: 100
+                                    height: 4
+                                    radius: 2
+                                    color: root._previewTheme ? root._previewTheme.palette.base05 : Colors.text
+                                    opacity: 0.3
+                                }
+                                Item {
+                                    Layout.fillHeight: true
+                                }
+                                Rectangle {
+                                    Layout.alignment: Qt.AlignRight
+                                    width: 30
+                                    height: 12
+                                    radius: 4
+                                    color: root._previewTheme ? root._previewTheme.palette.base0B : Colors.success
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Palette Grid
+                GridLayout {
+                    columns: 4
+                    columnSpacing: Colors.spacingS
+                    rowSpacing: Colors.spacingS
+
+                    Repeater {
+                        model: root._previewTheme ? [
+                            {
+                                c: root._previewTheme.palette.base00,
+                                l: "BG"
+                            },
+                            {
+                                c: root._previewTheme.palette.base01,
+                                l: "SRF"
+                            },
+                            {
+                                c: root._previewTheme.palette.base05,
+                                l: "TXT"
+                            },
+                            {
+                                c: root._previewTheme.palette.base0D,
+                                l: "PRI"
+                            },
+                            {
+                                c: root._previewTheme.palette.base08,
+                                l: "ERR"
+                            },
+                            {
+                                c: root._previewTheme.palette.base0A,
+                                l: "WRN"
+                            },
+                            {
+                                c: root._previewTheme.palette.base0B,
+                                l: "SUC"
+                            },
+                            {
+                                c: root._previewTheme.palette.base0E,
+                                l: "ACC"
+                            }
+                        ] : []
+
+                        Column {
+                            spacing: 2
+                            Rectangle {
+                                width: 36
+                                height: 36
+                                radius: 18
+                                color: modelData.c
+                                border.color: Colors.withAlpha(Colors.text, 0.1)
+                                border.width: 1
+                            }
+                            Text {
+                                width: 36
+                                text: modelData.l
+                                color: Colors.textDisabled
+                                font.pixelSize: 8
+                                font.weight: Font.Bold
+                                horizontalAlignment: Text.AlignHCenter
+                            }
+                        }
+                    }
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                }
+
+                ColumnLayout {
+                    visible: root._previewTheme !== null
+                    Text {
+                        text: root._previewTheme ? root._previewTheme.name : ""
+                        color: Colors.text
+                        font.pixelSize: Colors.fontSizeLarge
+                        font.weight: Font.Bold
+                    }
+                    Text {
+                        text: root._previewTheme ? root._previewTheme.author : ""
+                        color: Colors.textSecondary
+                        font.pixelSize: Colors.fontSizeSmall
+                    }
+                    Item {
+                        Layout.preferredHeight: Colors.spacingS
+                    }
+                    SettingsActionButton {
+                        label: "Apply Theme"
+                        iconName: "󰄬"
+                        onClicked: ThemeService.applyTheme(root._previewTheme.id)
+                    }
+                }
+            }
+        }
 
         SettingsCard {
             title: "Theme Browser"
@@ -202,6 +393,7 @@ Item {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
+                                onEntered: root._previewTheme = themeCardWrapper._theme
                                 onClicked: ThemeService.applyTheme(themeCardWrapper._theme.id)
                             }
                         }
@@ -227,8 +419,14 @@ Item {
                 label: "Schedule Mode"
                 currentValue: Config.themeAutoScheduleMode
                 options: [
-                    { value: "time", label: "Fixed Time" },
-                    { value: "sunrise_sunset", label: "Sunrise/Sunset" }
+                    {
+                        value: "time",
+                        label: "Fixed Time"
+                    },
+                    {
+                        value: "sunrise_sunset",
+                        label: "Sunrise/Sunset"
+                    }
                 ]
                 onModeSelected: v => Config.themeAutoScheduleMode = v
             }

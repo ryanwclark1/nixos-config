@@ -37,6 +37,51 @@ QtObject {
     property int lastCompletionTokens: 0
     readonly property int lastTotalTokens: lastPromptTokens + lastCompletionTokens
 
+    property var _statusConn: Connections {
+        target: SystemStatus
+        function onNewIncident(incident) {
+            if (root.isStreaming) return;
+            // Proactively ask the AI to explain and fix the incident
+            var prompt = "I've detected a system incident: **" + incident.signature + "**\n\n" +
+                "Summary: " + incident.summary + "\n" +
+                "Severity: " + incident.severity + "\n\n" +
+                "Please analyze this and suggest a fix using the [COMMAND: label | cmd args] format if possible.";
+            
+            root.sendMessage(prompt);
+            // Open the AI chat surface automatically for high severity
+            if (incident.severity === "error") {
+                Quickshell.execDetached(["quickshell", "ipc", "call", "SurfaceService", "openSurface", "aiChat"]);
+            }
+        }
+    }
+
+    // ── Command Execution ──────────────────────
+    property var pendingCommand: null // { label: string, cmd: [] }
+    
+    function executePendingCommand() {
+        if (!pendingCommand) return;
+        Quickshell.execDetached(pendingCommand.cmd);
+        _addSystemMessage("Executed: `" + pendingCommand.cmd.join(" ") + "`");
+        pendingCommand = null;
+    }
+
+    function cancelPendingCommand() {
+        pendingCommand = null;
+    }
+
+    function _extractCommands(content) {
+        // Look for [COMMAND: label | cmd arg1 arg2]
+        var regex = /\[COMMAND:\s*([^|\]]+)\s*\|\s*([^\]]+)\]/g;
+        var match;
+        while ((match = regex.exec(content)) !== null) {
+            var label = match[1].trim();
+            var cmdStr = match[2].trim();
+            var cmdParts = cmdStr.split(/\s+/);
+            root.pendingCommand = { label: label, cmd: cmdParts };
+            // For now, we only handle the last command found in a block
+        }
+    }
+
     // ── Persistence ─────────────────────────────
     readonly property string savePath: (Quickshell.env("HOME") || "/home") + "/.local/state/quickshell/ai-chat.json"
     property bool _loading: false
@@ -249,6 +294,7 @@ QtObject {
                 // Commit whatever we have
                 if (root.streamingContent.trim().length > 0) {
                     root._appendMessage("assistant", root.streamingContent);
+                    root._extractCommands(root.streamingContent);
                     root._autoTitle();
                 } else if (exitCode !== 0 && !root.lastError) {
                     root.lastError = "Process exited with code " + exitCode;
@@ -390,7 +436,7 @@ QtObject {
         return null;
     }
 
-    function sendMessage(text) {
+    function sendMessage(text, contextWindow) {
         if (!text || text.trim().length === 0) return;
         if (isStreaming) return;
 
@@ -421,11 +467,27 @@ QtObject {
 
         // System prompt
         var systemPrompt = Config.aiSystemPrompt;
+        if (!systemPrompt) {
+            systemPrompt = "You are a helpful Linux desktop assistant for Quickshell. " +
+                "You can suggest system actions by using the following format: [COMMAND: Label | command args]. " +
+                "For example: [COMMAND: Toggle Float | hyprctl dispatch togglefloating] or [COMMAND: Close Terminal | hyprctl dispatch closewindow class:ghostty]. " +
+                "Only suggest commands when explicitly requested or highly relevant. " +
+                "The user must confirm the command before it is executed.";
+        }
+        var contextInfo = "";
         if (Config.aiSystemContext) {
-            var contextInfo = "System: " + (Quickshell.env("HOSTNAME") || "unknown") +
+            contextInfo = "System: " + (Quickshell.env("HOSTNAME") || "unknown") +
                 " | CPU: " + SystemStatus.cpuUsage +
                 " | RAM: " + SystemStatus.ramUsage +
                 " | CPU temp: " + SystemStatus.cpuTemp;
+        }
+        
+        if (contextWindow) {
+            var winInfo = "Active Window: " + contextWindow;
+            contextInfo = contextInfo ? contextInfo + "\n" + winInfo : winInfo;
+        }
+
+        if (contextInfo) {
             systemPrompt = systemPrompt ? systemPrompt + "\n\n" + contextInfo : contextInfo;
         }
         if (systemPrompt) {

@@ -11,13 +11,71 @@ QtObject {
     property int pollIntervalMs: 5000
     property var userUnits: []
     property var systemUnits: []
+    property var dockerContainers: []
     property string userStatus: "loading"
     property string userMessage: "Loading user services..."
     property string systemStatus: "loading"
     property string systemMessage: "Loading system services..."
+    property string dockerStatus: "loading"
+    property string dockerMessage: "Loading containers..."
     property bool userBusy: userPoll.busy
     property bool systemBusy: systemPoll.busy
+    property bool dockerBusy: dockerPoll.busy
     property var pendingActions: ({})
+
+    function _dockerCommand() {
+        return ["sh", "-c", "if ! command -v docker >/dev/null 2>&1; then printf '__STATUS__\\tmissing\\tdocker is not installed\\n'; exit 0; fi; " + "if ! output=$(docker ps -a --format '{{.ID}}\\t{{.Names}}\\t{{.Status}}\\t{{.Image}}\\t{{.State}}' 2>/dev/null); then " + "printf '__STATUS__\\terror\\tUnable to query docker containers\\n'; exit 0; fi; " + "printf '__STATUS__\\tready\\t\\n'; " + "printf '%s\\n' \"$output\""];
+    }
+
+    function _parseDockerSnapshot(out) {
+        var text = String(out || "").trim();
+        if (text === "") return { status: "ready", message: "", containers: [] };
+        var lines = text.split("\n");
+        var first = String(lines[0] || "");
+        var status = "ready";
+        var message = "";
+        if (first.indexOf("__STATUS__\t") === 0) {
+            var meta = first.split("\t");
+            status = String(meta[1] || "ready");
+            message = String(meta[2] || "");
+            lines.shift();
+        }
+        var containers = [];
+        for (var i = 0; i < lines.length; i++) {
+            var parts = lines[i].split("\t");
+            if (parts.length < 5) continue;
+            containers.push({
+                id: parts[0], name: parts[1], status: parts[2], image: parts[3], state: parts[4]
+            });
+        }
+        return { status: status, message: message, containers: containers };
+    }
+
+    function runDockerAction(containerId, action) {
+        _actionScope = "docker";
+        _actionUnitName = containerId;
+        _actionTitle = "Container " + action;
+        _actionSuccessMessage = "Container " + containerId + " " + action + " successful.";
+        _actionFailureMessage = "Failed to " + action + " container " + containerId;
+        _actionCommand = ["docker", action, containerId];
+        _setPending(_actionScope, _actionUnitName, action);
+        actionProc.command = _actionCommand;
+        actionProc.running = true;
+    }
+
+    property SharedWidgets.CommandPoll dockerPoll: SharedWidgets.CommandPoll {
+        id: dockerPoll
+        interval: Math.max(3000, root.pollIntervalMs)
+        running: root.subscriberCount > 0
+        command: root._dockerCommand()
+        parse: function(out) { return root._parseDockerSnapshot(out); }
+        onUpdated: {
+            var snapshot = dockerPoll.value || {};
+            root.dockerStatus = snapshot.status;
+            root.dockerMessage = snapshot.message;
+            root.dockerContainers = snapshot.containers || [];
+        }
+    }
 
     property string _actionScope: "user"
     property string _actionUnitName: ""
@@ -78,9 +136,32 @@ QtObject {
         };
     }
 
+    property var sshSessions: []
+    property string sshStatus: "ready"
+    property string sshMessage: ""
+    property int sshActiveCount: sshSessions.length
+
+    property SharedWidgets.CommandPoll sshPoll: SharedWidgets.CommandPoll {
+        id: sshPoll
+        interval: 10000
+        running: root.subscriberCount > 0
+        command: ["sh", "-c", "who | grep 'pts/' | awk '{print $1 \"@\" $5}' | sed 's/[()]//g'"]
+        parse: function(out) {
+            var lines = String(out || "").trim().split("\n");
+            var result = [];
+            for (var i = 0; i < lines.length; i++) {
+                if (lines[i].trim()) result.push(lines[i].trim());
+            }
+            return result;
+        }
+        onUpdated: root.sshSessions = sshPoll.value || []
+    }
+
     function refresh() {
         userPoll.triggerPoll();
         systemPoll.triggerPoll();
+        dockerPoll.triggerPoll();
+        sshPoll.triggerPoll();
     }
 
     function pendingActionForUnit(scope, unitName) {

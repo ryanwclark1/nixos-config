@@ -36,19 +36,15 @@ PopupWindow {
 
   // ── Deferred unmapping ────────────────────────
   // Parent binds wantVisible instead of visible/showContent.
-  // The popup stays mapped during fade-out, then unmaps after the delay.
+  // The popup stays mapped while exit animations are running, then unmaps.
   property bool wantVisible: false
-  visible: wantVisible || _unmapDelay.running
+  visible: wantVisible || _opacAnim.running || _scaleAnim.running
   property bool showContent: wantVisible
 
   function allowLayer(width, height) {
     return width > 0 && height > 0
       && width <= maxLayerTextureSize
       && height <= maxLayerTextureSize;
-  }
-
-  onWantVisibleChanged: {
-    if (!wantVisible) _unmapDelay.restart();
   }
 
   onShowContentChanged: {
@@ -63,11 +59,6 @@ PopupWindow {
     } else if (!showContent && root.initialFocusTarget && root.initialFocusTarget.activeFocus) {
       root.initialFocusTarget.focus = false;
     }
-  }
-
-  Timer {
-    id: _unmapDelay
-    interval: 350
   }
 
   // ── Shadow ────────────────────────────────────

@@ -1,12 +1,102 @@
+pragma Singleton
+
 import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Mpris
 
-pragma Singleton
-
 QtObject {
   id: root
+
+  // ── Health Monitoring ──────────────────────────
+  property string overallStatus: "healthy" // healthy, warning, manual_review_required, failure
+  property var activeIncidents: []
+  signal newIncident(var incident)
+
+  property var pluginDiagnostics: ({})
+  property bool isHealthChecking: false
+  property date lastHealthCheckTime: new Date(0)
+
+  readonly property string healthCheckScript: "/home/administrator/nixos-config/home/features/desktop/window-managers/shared/panel/quickshell/scripts/health-check.sh"
+  readonly property string pluginDoctorScript: "/home/administrator/nixos-config/home/features/desktop/window-managers/shared/panel/quickshell/scripts/plugin-doctor.sh"
+  readonly property string incidentRoot: Quickshell.env("HOME") + "/.local/state/quickshell/incidents"
+
+  property Process _healthProc: Process {
+    command: [root.healthCheckScript]
+    running: false
+    stdout: StdioCollector {
+      onStreamFinished: {
+        try {
+          var data = JSON.parse(this.text);
+          root.overallStatus = data.status || "failure";
+          root._loadDetailedIncidents();
+        } catch (e) {
+          root.overallStatus = "failure";
+        }
+        root.isHealthChecking = false;
+        root.lastHealthCheckTime = new Date();
+      }
+    }
+  }
+
+  property Process _pluginProc: Process {
+    command: [root.pluginDoctorScript, "--json"]
+    running: false
+    stdout: StdioCollector {
+      onStreamFinished: {
+        try { root.pluginDiagnostics = JSON.parse(this.text); } catch (e) {}
+      }
+    }
+  }
+
+  function refreshHealth() {
+    if (isHealthChecking) return;
+    isHealthChecking = true;
+    _healthProc.running = true;
+    _pluginProc.running = true;
+  }
+
+  function applySafeFixes() {
+    var fixProc = Qt.createQmlObject('import Quickshell.Io; Process { command: ["' + root.healthCheckScript + '", "--apply-safe-fixes"] }', root);
+    fixProc.onExited.connect(function() {
+      root.refreshHealth();
+      fixProc.destroy();
+    });
+    fixProc.running = true;
+  }
+
+  function _loadDetailedIncidents() {
+    _incidentCollector.running = true;
+  }
+
+  property Process _incidentCollector: Process {
+    command: ["sh", "-c", "find '" + root.incidentRoot + "' -name 'incident.json' -exec cat {} + | jq -s ."]
+    running: false
+    stdout: StdioCollector {
+      onStreamFinished: {
+        try { 
+          var nextIncidents = JSON.parse(this.text || "[]");
+          // Check for genuinely new signatures to avoid notification spam
+          var currentSigs = root.activeIncidents.map(i => i.signature);
+          for (var i = 0; i < nextIncidents.length; i++) {
+            if (currentSigs.indexOf(nextIncidents[i].signature) === -1) {
+              root.newIncident(nextIncidents[i]);
+            }
+          }
+          root.activeIncidents = nextIncidents;
+        } catch (e) { 
+          root.activeIncidents = []; 
+        }
+      }
+    }
+  }
+
+  property Timer _healthTimer: Timer {
+    interval: 300000 // 5 minutes
+    running: false // disabled until health scripts are Nix-wrapped
+    repeat: true
+    onTriggered: root.refreshHealth()
+  }
 
   property string cpuTemp: "--"
   property string gpuTemp: "--"

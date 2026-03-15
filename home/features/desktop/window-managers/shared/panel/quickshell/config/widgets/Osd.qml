@@ -230,14 +230,10 @@ Scope {
         screen: modelData
         readonly property var edgeMargins: Config.reservedEdgesForScreen(modelData, "")
 
-        // Delayed unmap: stay mapped briefly after hide for fade-out.
+        // Delayed unmap: stay mapped while exit animations run.
         // Keep this compositor-agnostic; OSD is safe to render on all screens.
         property bool _wantVisible: root.shouldShowOsd
-        visible: _wantVisible || unmapDelay.running
-        on_WantVisibleChanged: {
-          if (!_wantVisible) unmapDelay.restart();
-        }
-        Timer { id: unmapDelay; interval: 350 }
+        visible: _wantVisible || osdFadeAnim.running || osdScaleAnim.running
 
         // --- 9-position anchoring ---
         anchors.top: root.posTop || root.posCenter
@@ -334,7 +330,7 @@ Scope {
           }
 
           // Layer during animation for GPU-accelerated compositing
-          layer.enabled: osdFadeAnim.running || osdScaleAnim.running || unmapDelay.running
+          layer.enabled: osdFadeAnim.running || osdScaleAnim.running
 
           // Inner ambient glow that brightens with value
           Rectangle {

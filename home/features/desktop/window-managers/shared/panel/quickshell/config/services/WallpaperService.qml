@@ -1,9 +1,9 @@
+pragma Singleton
+
 import QtQuick
 import Quickshell
 import Quickshell.Io
 import "."
-
-pragma Singleton
 
 // WallpaperService — per-monitor wallpaper management with swww/hyprpaper support.
 // Scans multiple well-known wallpaper directories and exposes the list of available

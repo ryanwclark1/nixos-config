@@ -243,15 +243,33 @@ Scope {
                     }
 
                     MouseArea {
+                      id: cardMouse
                       anchors.fill: parent
                       hoverEnabled: true
                       cursorShape: Qt.PointingHandCursor
+                      
+                      drag.target: card
+                      drag.axis: Drag.XAndYAxis
+                      
                       onClicked: {
                         root.selectedIndex = index;
                         root.confirm();
                       }
                       onEntered: root.selectedIndex = index
                     }
+
+                    Drag.active: cardMouse.drag.active
+                    Drag.source: ({ type: "window", windowId: modelData.id, windowAddress: modelData.address, appId: modelData.app_id })
+                    Drag.hotSpot.x: width / 2
+                    Drag.hotSpot.y: height / 2
+
+                    states: [
+                      State {
+                        when: cardMouse.drag.active
+                        ParentChange { target: card; parent: focusItem }
+                        PropertyChanges { target: card; opacity: 0.8; scale: 0.8 }
+                      }
+                    ]
                   }
                 }
               }

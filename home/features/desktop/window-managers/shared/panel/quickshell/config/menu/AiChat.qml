@@ -7,6 +7,7 @@ import "../services"
 import "../services/config/AiProviders.js" as Providers
 import "../services/config/AiMarkdown.js" as Markdown
 import "../widgets" as SharedWidgets
+import "settings"
 
 PanelWindow {
     id: root
@@ -36,8 +37,13 @@ PanelWindow {
     property int panelWidth: 420
     readonly property int panelMinWidth: 320
     readonly property int panelMaxWidth: 600
+    property bool includeWindowContext: false
 
     signal closeRequested()
+
+    onIncludeWindowContextChanged: {
+        if (includeWindowContext) AiService.refreshActiveWindowTitle();
+    }
 
     // Panel visibility: stay mapped during slide-out animation
     visible: showContent || slidePanel.x < panelWidth
@@ -465,6 +471,74 @@ PanelWindow {
                 }
             }
 
+            // ---- Command Confirmation ----
+            Rectangle {
+                Layout.fillWidth: true
+                implicitHeight: cmdCol.implicitHeight + 24
+                radius: Colors.radiusMedium
+                color: Colors.withAlpha(Colors.accent, 0.12)
+                border.color: Colors.accent
+                border.width: 1
+                visible: AiService.pendingCommand !== null
+                clip: true
+
+                opacity: visible ? 1.0 : 0.0
+                scale: visible ? 1.0 : 0.95
+                Behavior on opacity { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
+                Behavior on scale { NumberAnimation { duration: 350; easing.type: Easing.OutBack } }
+
+                ColumnLayout {
+                    id: cmdCol
+                    anchors.fill: parent; anchors.margins: Colors.spacingM
+                    spacing: Colors.spacingS
+
+                    RowLayout {
+                        spacing: Colors.spacingS
+                        Text { text: "󰒓"; color: Colors.accent; font.pixelSize: 20; font.family: Colors.fontMono }
+                        Text { 
+                            text: "Suggested System Action"
+                            color: Colors.text
+                            font.pixelSize: Colors.fontSizeSmall
+                            font.weight: Font.Bold
+                        }
+                    }
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        implicitHeight: cmdLabel.implicitHeight + 16
+                        radius: Colors.radiusSmall
+                        color: Colors.withAlpha(Colors.background, 0.4)
+                        Text {
+                            id: cmdLabel
+                            anchors.centerIn: parent
+                            text: AiService.pendingCommand ? AiService.pendingCommand.label : ""
+                            color: Colors.text
+                            font.pixelSize: Colors.fontSizeMedium
+                            font.weight: Font.Bold
+                        }
+                    }
+
+                    RowLayout {
+                        Layout.alignment: Qt.AlignRight
+                        spacing: Colors.spacingM
+                        
+                        SettingsActionButton {
+                            label: "Cancel"
+                            iconName: "󰅖"
+                            compact: true
+                            onClicked: AiService.cancelPendingCommand()
+                        }
+                        
+                        SettingsActionButton {
+                            label: "Execute"
+                            iconName: "󰐊"
+                            compact: true
+                            onClicked: AiService.executePendingCommand()
+                        }
+                    }
+                }
+            }
+
             // ---- Message list ----
             Rectangle {
                 Layout.fillWidth: true
@@ -859,6 +933,66 @@ PanelWindow {
                         Layout.fillWidth: true
                         spacing: Colors.spacingS
 
+                        // Window context toggle
+                        Rectangle {
+                            width: 24; height: 24; radius: Colors.radiusXXS
+                            color: root.includeWindowContext ? Colors.withAlpha(Colors.primary, 0.18) : "transparent"
+                            border.color: root.includeWindowContext ? Colors.primary : Colors.border
+                            border.width: 1
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: "󰖲"
+                                color: root.includeWindowContext ? Colors.primary : Colors.textDisabled
+                                font.family: Colors.fontMono
+                                font.pixelSize: Colors.fontSizeSmall
+                            }
+                            MouseArea {
+                                id: winCtxHover
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: root.includeWindowContext = !root.includeWindowContext
+                            }
+                            
+                            SharedWidgets.BarTooltip {
+                                text: "Attach Active Window Title"
+                                hovered: winCtxHover.containsMouse
+                                anchorItem: parent
+                            }
+                        }
+
+                        // Screenshot context
+                        Rectangle {
+                            width: 24; height: 24; radius: Colors.radiusXXS
+                            color: "transparent"
+                            border.color: Colors.border
+                            border.width: 1
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: "󰄀"
+                                color: Colors.textDisabled
+                                font.family: Colors.fontMono
+                                font.pixelSize: Colors.fontSizeSmall
+                            }
+                            MouseArea {
+                                id: screenCtxHover
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    ScreenshotService.captureRegion();
+                                }
+                            }
+                            
+                            SharedWidgets.BarTooltip {
+                                text: "Capture Region to Clipboard"
+                                hovered: screenCtxHover.containsMouse
+                                anchorItem: parent
+                            }
+                        }
+
                         // System context toggle
                         Rectangle {
                             width: 24; height: 24; radius: Colors.radiusXXS
@@ -879,6 +1013,12 @@ PanelWindow {
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: Config.aiSystemContext = !Config.aiSystemContext
+                            }
+                            
+                            SharedWidgets.BarTooltip {
+                                text: "Attach System Stats (CPU/RAM)"
+                                hovered: sysCtxHover.containsMouse
+                                anchorItem: parent
                             }
                         }
 
@@ -1132,15 +1272,17 @@ PanelWindow {
                 spacing: 2
 
                 Repeater {
-                    model: {
-                        var typed = inputField.text.toLowerCase();
-                        var cmds = AiService.slashCommands;
-                        var filtered = [];
-                        for (var i = 0; i < cmds.length; i++) {
-                            if (typed.length <= 1 || cmds[i].cmd.indexOf(typed) === 0)
-                                filtered.push(cmds[i]);
+                    model: ScriptModel {
+                        values: {
+                            var typed = inputField.text.toLowerCase();
+                            var cmds = AiService.slashCommands;
+                            var filtered = [];
+                            for (var i = 0; i < cmds.length; i++) {
+                                if (typed.length <= 1 || cmds[i].cmd.indexOf(typed) === 0)
+                                    filtered.push(cmds[i]);
+                            }
+                            return filtered;
                         }
-                        return filtered;
                     }
 
                     delegate: Rectangle {
@@ -1365,7 +1507,9 @@ PanelWindow {
         if (text.length === 0) return;
         if (AiService.isStreaming) return;
         inputField.text = "";
-        AiService.sendMessage(text);
+        var winCtx = root.includeWindowContext ? AiService.contextWindowTitle : "";
+        AiService.sendMessage(text, winCtx);
+        root.includeWindowContext = false;
     }
 
     function _shellEscape(str) {

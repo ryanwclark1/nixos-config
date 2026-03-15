@@ -1,8 +1,8 @@
+pragma Singleton
+
 import QtQuick
 import Quickshell
 import Quickshell.Services.Mpris
-
-pragma Singleton
 
 Item {
   id: root
@@ -23,70 +23,40 @@ Item {
   property int selectedPlayerIndex: 0
 
   // ── Album art accent color ─────────────────────
-  property color artAccentColor: Colors.primary
+  property color artAccentColor: {
+    if (!trackArtUrl || !_colorQuantizer.colors || _colorQuantizer.colors.length === 0)
+      return Colors.primary;
+    return _pickAccentColor(_colorQuantizer.colors);
+  }
 
-  // Hidden image loader at 32×32 for fast pixel sampling
-  Image {
-    id: _artSampler
-    width: 32; height: 32
-    visible: false
+  ColorQuantizer {
+    id: _colorQuantizer
     source: root.trackArtUrl
-    cache: true
-    asynchronous: true
-    onStatusChanged: {
-      if (status === Image.Ready) {
-        _artCanvas.needsSample = true;
-        _artCanvas.requestPaint();
-      }
-    }
+    depth: 3        // 2^3 = 8 palette colors
+    rescaleSize: 64 // fast, sufficient quality
   }
 
-  // Hidden canvas: draws the image, then samples a 6×6 grid to extract dominant color
-  Canvas {
-    id: _artCanvas
-    width: 32; height: 32
-    visible: false
-    property bool needsSample: false
-
-    onPaint: {
-      var ctx = getContext("2d");
-      ctx.drawImage(_artSampler, 0, 0, 32, 32);
-      if (needsSample) {
-        needsSample = false;
-        _sampleColors(ctx);
-      }
+  function _pickAccentColor(colors) {
+    var best = null;
+    var bestSat = -1;
+    for (var i = 0; i < colors.length; i++) {
+      var c = colors[i];
+      var max = Math.max(c.r, c.g, c.b);
+      var min = Math.min(c.r, c.g, c.b);
+      var lum = (max + min) / 2;
+      var sat = (max === min) ? 0
+        : (lum > 0.5 ? (max - min) / (2 - max - min) : (max - min) / (max + min));
+      if (lum < 0.1 || sat < 0.15) continue;
+      if (sat > bestSat) { bestSat = sat; best = c; }
     }
-  }
-
-  function _sampleColors(ctx) {
-    var data = ctx.getImageData(0, 0, 32, 32);
-    var r = 0, g = 0, b = 0, count = 0;
-    // 6×6 grid — sample every ~5 pixels, starting at offset 2
-    for (var y = 2; y < 32; y += 5) {
-      for (var x = 2; x < 32; x += 5) {
-        var idx = (y * 32 + x) * 4;
-        r += data.data[idx];
-        g += data.data[idx + 1];
-        b += data.data[idx + 2];
-        count++;
-      }
-    }
-    if (count === 0) return;
-    r = Math.round(r / count);
-    g = Math.round(g / count);
-    b = Math.round(b / count);
+    if (!best) best = colors[0];
     // Mix 55% toward white to lift dark album colors into usable accent tones
-    r = Math.round(r + (255 - r) * 0.55);
-    g = Math.round(g + (255 - g) * 0.55);
-    b = Math.round(b + (255 - b) * 0.55);
-    root.artAccentColor = Qt.rgba(r / 255, g / 255, b / 255, 1.0);
-  }
-
-  // Reset accent color when art is cleared
-  onTrackArtUrlChanged: {
-    if (!trackArtUrl) {
-      artAccentColor = Colors.primary;
-    }
+    return Qt.rgba(
+      best.r + (1.0 - best.r) * 0.55,
+      best.g + (1.0 - best.g) * 0.55,
+      best.b + (1.0 - best.b) * 0.55,
+      1.0
+    );
   }
 
   // ── Browser dedup + player list ────────────────

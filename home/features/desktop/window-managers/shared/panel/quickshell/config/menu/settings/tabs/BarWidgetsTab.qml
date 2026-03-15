@@ -23,7 +23,7 @@ Item {
     property string dragTargetSection: ""
     property int dragTargetIndex: -1
     readonly property int overlayInset: root.tightSpacing ? 20 : 40
-    readonly property bool dragReorderEnabled: false
+    readonly property bool dragReorderEnabled: true
 
     readonly property var selectedBar: {
         var bars = Config.barConfigs || [];
@@ -44,9 +44,7 @@ Item {
             right: (sections.right || []).slice()
         };
     }
-    readonly property var editingWidget: (selectedBar && settingsSection && settingsInstanceId)
-        ? Config.widgetInstance(selectedBar.id, settingsSection, settingsInstanceId)
-        : null
+    readonly property var editingWidget: (selectedBar && settingsSection && settingsInstanceId) ? Config.widgetInstance(selectedBar.id, settingsSection, settingsInstanceId) : null
     readonly property string editingPluginId: {
         var typeName = editingWidget ? String(editingWidget.widgetType || "") : "";
         return typeName.indexOf("plugin:") === 0 ? typeName.slice(7) : "";
@@ -88,14 +86,16 @@ Item {
     }
 
     function addWidget(widgetType) {
-        if (!selectedBar) return;
+        if (!selectedBar)
+            return;
         var settings = BarWidgetRegistry.defaultSettings(widgetType);
         Config.addBarWidget(selectedBar.id, addSection, widgetType, settings);
         widgetPickerOpen = false;
     }
 
     function removeWidget(section, instanceId) {
-        if (!selectedBar) return;
+        if (!selectedBar)
+            return;
         Config.removeBarWidget(selectedBar.id, section, instanceId);
     }
 
@@ -129,22 +129,31 @@ Item {
     }
 
     function toggleWidgetEnabled(section, widgetInstance) {
-        if (!selectedBar || !widgetInstance) return;
-        Config.updateBarWidget(selectedBar.id, section, widgetInstance.instanceId, { enabled: widgetInstance.enabled === false });
+        if (!selectedBar || !widgetInstance)
+            return;
+        Config.updateBarWidget(selectedBar.id, section, widgetInstance.instanceId, {
+            enabled: widgetInstance.enabled === false
+        });
     }
 
     function updateSpacerSize(value) {
-        if (!selectedBar || !editingWidget) return;
+        if (!selectedBar || !editingWidget)
+            return;
         var settings = editingWidget.settings ? JSON.parse(JSON.stringify(editingWidget.settings)) : {};
         settings.size = value;
-        Config.updateBarWidget(selectedBar.id, settingsSection, editingWidget.instanceId, { settings: settings });
+        Config.updateBarWidget(selectedBar.id, settingsSection, editingWidget.instanceId, {
+            settings: settings
+        });
     }
 
     function updateEditingWidgetSetting(key, value) {
-        if (!selectedBar || !editingWidget) return;
+        if (!selectedBar || !editingWidget)
+            return;
         var settings = editingWidget.settings ? JSON.parse(JSON.stringify(editingWidget.settings)) : {};
         settings[key] = value;
-        Config.updateBarWidget(selectedBar.id, settingsSection, editingWidget.instanceId, { settings: settings });
+        Config.updateBarWidget(selectedBar.id, settingsSection, editingWidget.instanceId, {
+            settings: settings
+        });
     }
 
     function isSystemStatWidget(widgetType) {
@@ -234,7 +243,7 @@ Item {
                 readonly property string sectionKey: modelData
                 title: root.sectionLabel(sectionKey) + " Section"
                 iconName: sectionKey === "left" ? "󰁍" : (sectionKey === "center" ? "󰇘" : "󰁔")
-                description: "Use the arrow buttons to reorder widgets inside this section, or add new widgets from the searchable picker."
+                description: "Drag to reorder widgets, or use the arrow buttons as a fallback."
                 visible: !!root.selectedBar
 
                 ColumnLayout {
@@ -244,9 +253,7 @@ Item {
 
                     Text {
                         Layout.fillWidth: true
-                        text: root.sectionWidgets(sectionKey).length > 0
-                            ? "Current widgets: " + root.sectionWidgets(sectionKey).length
-                            : "Current widgets: none"
+                        text: root.sectionWidgets(sectionKey).length > 0 ? "Current widgets: " + root.sectionWidgets(sectionKey).length : "Current widgets: none"
                         color: Colors.textSecondary
                         font.pixelSize: Colors.fontSizeXS
                         font.weight: Font.Medium
@@ -258,9 +265,7 @@ Item {
                         visible: root.sectionWidgets(sectionKey).length === 0
                         radius: Colors.radiusSmall
                         color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.06)
-                        border.color: root.dragReorderEnabled && root.dragTargetSection === sectionKey && root.dragTargetIndex === 0
-                            ? Colors.primary
-                            : Colors.border
+                        border.color: root.dragReorderEnabled && root.dragTargetSection === sectionKey && root.dragTargetIndex === 0 ? Colors.primary : Colors.border
                         border.width: root.dragReorderEnabled && root.dragTargetSection === sectionKey && root.dragTargetIndex === 0 ? 2 : 1
                         implicitHeight: emptyDropColumn.implicitHeight + Colors.spacingM * 2
 
@@ -268,7 +273,7 @@ Item {
                             anchors.fill: parent
                             enabled: root.dragReorderEnabled
                             keys: ["bar-widget"]
-                            onEntered: function(drag) {
+                            onEntered: function (drag) {
                                 if (root.dragSourceIndex < 0)
                                     return;
                                 root.dragTargetSection = sectionKey;
@@ -280,7 +285,7 @@ Item {
                                     root.dragTargetIndex = -1;
                                 }
                             }
-                            onDropped: function(drop) {
+                            onDropped: function (drop) {
                                 root.moveDraggedWidget(sectionKey, 0);
                             }
                         }
@@ -299,9 +304,7 @@ Item {
                             }
 
                             Text {
-                                text: (root.dragReorderEnabled && root.dragSourceIndex >= 0)
-                                    ? "Release to move the dragged widget into " + root.sectionLabel(sectionKey).toLowerCase() + "."
-                                    : "Add one below, then use the arrow buttons to place it."
+                                text: (root.dragReorderEnabled && root.dragSourceIndex >= 0) ? "Release to move the dragged widget into " + root.sectionLabel(sectionKey).toLowerCase() + "." : "Add one below, then drag it into place or use the arrow buttons."
                                 color: Colors.textSecondary
                                 font.pixelSize: Colors.fontSizeXS
                                 wrapMode: Text.WordWrap
@@ -320,8 +323,7 @@ Item {
                             required property int index
                             readonly property string sectionKey: widgetSectionCard.sectionKey
                             readonly property var widgetInstance: root.sectionWidgets(sectionKey)[index]
-                            readonly property bool dropBeforeActive: root.dragTargetSection === widgetRow.sectionKey
-                                && root.dragTargetIndex === widgetRow.index
+                            readonly property bool dropBeforeActive: root.dragTargetSection === widgetRow.sectionKey && root.dragTargetIndex === widgetRow.index
 
                             Rectangle {
                                 anchors {
@@ -342,7 +344,7 @@ Item {
                                 anchors.fill: parent
                                 enabled: root.dragReorderEnabled
                                 keys: ["bar-widget"]
-                                onEntered: function(drag) {
+                                onEntered: function (drag) {
                                     if (root.dragSourceIndex < 0)
                                         return;
                                     root.dragTargetSection = widgetRow.sectionKey;
@@ -354,7 +356,7 @@ Item {
                                         root.dragTargetIndex = -1;
                                     }
                                 }
-                                onDropped: function(drop) {
+                                onDropped: function (drop) {
                                     root.moveDraggedWidget(widgetRow.sectionKey, widgetRow.index);
                                 }
                             }
@@ -367,7 +369,15 @@ Item {
                                 color: Colors.modalFieldSurface
                                 border.color: Colors.border
                                 border.width: 1
-                                opacity: dragHandle.drag.active ? 0.7 : 1.0
+                                opacity: dragHandle.dragActive ? 0.7 : 1.0
+
+                                Behavior on y {
+                                    enabled: !dragHandle.dragActive
+
+                                    NumberAnimation {
+                                        duration: Colors.durationFast
+                                    }
+                                }
 
                                 ColumnLayout {
                                     id: cardLayout
@@ -420,9 +430,7 @@ Item {
                                             }
 
                                             Text {
-                                                text: root.dragReorderEnabled
-                                                    ? "Use the arrow buttons to reorder within this section. Drag/drop is still being refined."
-                                                    : "Use the arrow buttons to reorder within this section."
+                                                text: root.dragReorderEnabled ? "Drag to reorder within or across sections, or use the arrow buttons." : "Use the arrow buttons to reorder within this section."
                                                 color: Colors.textSecondary
                                                 font.pixelSize: Colors.fontSizeXS
                                                 Layout.fillWidth: true
@@ -493,71 +501,42 @@ Item {
                                 width: widgetRow.width
                                 height: widgetRow.height
                                 visible: false
-                                Drag.active: root.dragReorderEnabled && dragHandle.drag.active
+                                Drag.active: root.dragReorderEnabled && dragHandle.dragActive
                                 Drag.source: dragProxy
                                 Drag.hotSpot.x: width / 2
                                 Drag.hotSpot.y: height / 2
                                 Drag.keys: ["bar-widget"]
                             }
 
-                            MouseArea {
+                            SettingsDragHandle {
                                 id: dragHandle
-                                width: 44
-                                height: 44
                                 anchors {
                                     top: parent.top
                                     right: parent.right
                                     topMargin: Colors.spacingS
+                                    rightMargin: Colors.spacingS
                                 }
-                                hoverEnabled: true
                                 enabled: root.dragReorderEnabled
                                 visible: root.dragReorderEnabled
-                                acceptedButtons: Qt.LeftButton
-                                drag.target: root.dragReorderEnabled ? card : undefined
-                                drag.axis: Drag.YAxis
-                                cursorShape: drag.active ? Qt.ClosedHandCursor : Qt.OpenHandCursor
-                                onPressed: {
+                                dragTarget: root.dragReorderEnabled ? card : null
+                                onPressedChanged: {
                                     root.dragSection = widgetRow.sectionKey;
                                     root.dragSourceIndex = widgetRow.index;
                                     root.dragTargetSection = widgetRow.sectionKey;
                                     root.dragTargetIndex = widgetRow.index;
                                 }
-                                onReleased: {
+                                onReleased: function (wasDragging) {
                                     card.x = 0;
                                     card.y = 0;
-                                    if (dragProxy.Drag.active)
+                                    if (wasDragging && dragProxy.Drag.active)
                                         dragProxy.Drag.drop();
                                     else
                                         root.clearDragState();
                                 }
-                                drag.onActiveChanged: {
-                                    if (!drag.active) {
+                                onDragActiveChanged: {
+                                    if (!dragActive) {
                                         card.x = 0;
                                         card.y = 0;
-                                    }
-                                }
-
-                                Rectangle {
-                                    anchors {
-                                        right: parent.right
-                                        rightMargin: Colors.spacingS
-                                        verticalCenter: parent.verticalCenter
-                                    }
-                                    width: 28
-                                    height: 28
-                                    radius: Colors.radiusMedium
-                                    color: dragHandle.pressed
-                                        ? Colors.withAlpha(Colors.primary, 0.18)
-                                        : (dragHandle.containsMouse ? Colors.withAlpha(Colors.text, 0.10) : "transparent")
-                                    border.color: dragHandle.containsMouse ? Colors.border : "transparent"
-                                    border.width: dragHandle.containsMouse ? 1 : 0
-
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "󰒓"
-                                        color: dragHandle.pressed ? Colors.primary : Colors.textSecondary
-                                        font.family: Colors.fontMono
-                                        font.pixelSize: Colors.fontSizeMedium
                                     }
                                 }
                             }
@@ -568,11 +547,7 @@ Item {
                         Layout.fillWidth: true
                         height: 12
                         radius: Colors.radiusXXS
-                        visible: root.sectionWidgets(sectionKey).length > 0
-                            && root.dragReorderEnabled
-                            && root.dragSourceIndex >= 0
-                            && root.dragTargetSection === sectionKey
-                            && root.dragTargetIndex === root.sectionWidgets(sectionKey).length
+                        visible: root.sectionWidgets(sectionKey).length > 0 && root.dragReorderEnabled && root.dragSourceIndex >= 0 && root.dragTargetSection === sectionKey && root.dragTargetIndex === root.sectionWidgets(sectionKey).length
                         color: Colors.withAlpha(Colors.primary, 0.22)
                         border.color: Colors.primary
                         border.width: 1
@@ -584,20 +559,19 @@ Item {
                         visible: root.dragReorderEnabled && root.sectionWidgets(sectionKey).length > 0
                         enabled: root.dragReorderEnabled
                         keys: ["bar-widget"]
-                        onEntered: function(drag) {
+                        onEntered: function (drag) {
                             if (root.dragSourceIndex < 0)
                                 return;
                             root.dragTargetSection = sectionKey;
                             root.dragTargetIndex = root.sectionWidgets(sectionKey).length;
                         }
                         onExited: {
-                            if (root.dragTargetSection === sectionKey
-                                    && root.dragTargetIndex === root.sectionWidgets(sectionKey).length) {
+                            if (root.dragTargetSection === sectionKey && root.dragTargetIndex === root.sectionWidgets(sectionKey).length) {
                                 root.dragTargetSection = "";
                                 root.dragTargetIndex = -1;
                             }
                         }
-                        onDropped: function(drop) {
+                        onDropped: function (drop) {
                             root.moveDraggedWidget(sectionKey, root.sectionWidgets(sectionKey).length);
                         }
 
@@ -828,9 +802,7 @@ Item {
                         label: "Spacer Size"
                         min: 8
                         max: 80
-                        value: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.size !== undefined
-                            ? root.editingWidget.settings.size
-                            : 24
+                        value: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.size !== undefined ? root.editingWidget.settings.size : 24
                         onMoved: value => root.updateSpacerSize(value)
                     }
 
@@ -838,14 +810,24 @@ Item {
                         visible: !!root.editingWidget && root.isSystemStatWidget(root.editingWidget.widgetType)
                         label: "Display Mode"
                         description: "Choose whether this stat adapts to bar orientation or always stays full, compact, or icon-only. Compact mode may shorten long values automatically to keep vertical bars narrow."
-                        currentValue: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.displayMode
-                            ? root.editingWidget.settings.displayMode
-                            : "auto"
+                        currentValue: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.displayMode ? root.editingWidget.settings.displayMode : "auto"
                         options: [
-                            { value: "auto", label: "Auto" },
-                            { value: "full", label: "Full" },
-                            { value: "compact", label: "Compact" },
-                            { value: "icon", label: "Icon" }
+                            {
+                                value: "auto",
+                                label: "Auto"
+                            },
+                            {
+                                value: "full",
+                                label: "Full"
+                            },
+                            {
+                                value: "compact",
+                                label: "Compact"
+                            },
+                            {
+                                value: "icon",
+                                label: "Icon"
+                            }
                         ]
                         onModeSelected: value => root.updateEditingWidgetSetting("displayMode", value)
                     }
@@ -853,22 +835,31 @@ Item {
                     SettingsModeRow {
                         visible: !!root.editingWidget && root.isSystemStatWidget(root.editingWidget.widgetType)
                         label: "Value Style"
-                        description: root.editingWidget && root.editingWidget.widgetType === "ramStatus"
-                            ? "Choose whether memory shows percent used or the current used-memory value. Compact mode can still fall back to percent when the usage text is too long."
-                            : "Choose whether this stat shows percent only, usage text, or usage with temperature. Compact mode can shorten long values automatically."
-                        currentValue: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.valueStyle
-                            ? root.editingWidget.settings.valueStyle
-                            : (root.editingWidget && root.editingWidget.widgetType === "ramStatus" ? "usage" : "percent")
-                        options: root.editingWidget && root.editingWidget.widgetType === "ramStatus"
-                            ? [
-                                { value: "usage", label: "Usage" },
-                                { value: "percent", label: "Percent" }
-                              ]
-                            : [
-                                { value: "percent", label: "Percent" },
-                                { value: "usage", label: "Usage" },
-                                { value: "usageTemp", label: "Usage + Temp" }
-                              ]
+                        description: root.editingWidget && root.editingWidget.widgetType === "ramStatus" ? "Choose whether memory shows percent used or the current used-memory value. Compact mode can still fall back to percent when the usage text is too long." : "Choose whether this stat shows percent only, usage text, or usage with temperature. Compact mode can shorten long values automatically."
+                        currentValue: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.valueStyle ? root.editingWidget.settings.valueStyle : (root.editingWidget && root.editingWidget.widgetType === "ramStatus" ? "usage" : "percent")
+                        options: root.editingWidget && root.editingWidget.widgetType === "ramStatus" ? [
+                            {
+                                value: "usage",
+                                label: "Usage"
+                            },
+                            {
+                                value: "percent",
+                                label: "Percent"
+                            }
+                        ] : [
+                            {
+                                value: "percent",
+                                label: "Percent"
+                            },
+                            {
+                                value: "usage",
+                                label: "Usage"
+                            },
+                            {
+                                value: "usageTemp",
+                                label: "Usage + Temp"
+                            }
+                        ]
                         onModeSelected: value => root.updateEditingWidgetSetting("valueStyle", value)
                     }
 

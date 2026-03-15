@@ -1,8 +1,8 @@
+pragma Singleton
+
 import QtQuick
 import Quickshell
 import Quickshell.Io
-
-pragma Singleton
 
 QtObject {
   id: root

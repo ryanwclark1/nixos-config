@@ -1,8 +1,8 @@
+pragma Singleton
+
 import QtQuick
 import Quickshell
 import "../widgets" as SharedWidgets
-
-pragma Singleton
 
 QtObject {
   id: root

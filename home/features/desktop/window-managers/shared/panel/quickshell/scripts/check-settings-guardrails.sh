@@ -12,13 +12,33 @@ require_cmd() {
   fi
 }
 
+require_pattern() {
+  local file="$1"
+  local pattern="$2"
+  local label="$3"
+  if ! rg -q --multiline "${pattern}" "${file}"; then
+    printf '[FAIL] %s missing in %s\n' "${label}" "${file}" >&2
+    exit 1
+  fi
+}
+
 main() {
   require_cmd qmlformat
+  require_cmd rg
 
   qmlformat -n \
     "${config_root}/menu/SettingsHub.qml" \
     "${config_root}/menu/settings/"*.qml \
     "${config_root}/menu/settings/tabs/"*.qml >/dev/null
+
+  require_pattern "${config_root}/menu/settings/tabs/BarWidgetsTab.qml" 'dragReorderEnabled:\s*true' "bar widget drag enablement"
+  require_pattern "${config_root}/menu/settings/tabs/BarWidgetsTab.qml" 'SettingsDragHandle' "bar widget shared drag handle"
+  require_pattern "${config_root}/menu/settings/tabs/BarWidgetsTab.qml" 'label:\s*"↑"' "bar widget up-arrow fallback"
+  require_pattern "${config_root}/menu/settings/tabs/BarWidgetsTab.qml" 'label:\s*"↓"' "bar widget down-arrow fallback"
+  require_pattern "${config_root}/menu/settings/tabs/SystemTab.qml" 'SettingsDragHandle' "system tab shared drag handle"
+  require_pattern "${config_root}/menu/settings/tabs/SystemTab.qml" 'targetIndexFromMappedY' "system tab reorder math helper usage"
+  require_pattern "${config_root}/menu/settings/tabs/SystemTab.qml" 'label:\s*"↑"' "system tab up-arrow fallback"
+  require_pattern "${config_root}/menu/settings/tabs/SystemTab.qml" 'label:\s*"↓"' "system tab down-arrow fallback"
 
   "${script_dir}/check-settings-responsive.sh" "$@"
 

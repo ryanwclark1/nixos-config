@@ -32,8 +32,9 @@ Flow {
     }
   }
 
-  Repeater {
-    model: {
+  ScriptModel {
+    id: _wsModel
+    values: {
       var workspaces = root.state ? root.state.workspaces : [];
       if (!Config.workspaceShowEmpty) {
         var filtered = [];
@@ -46,14 +47,19 @@ Flow {
         }
         return filtered;
       }
-      return workspaces;
+      return [...workspaces];
     }
+  }
+
+  Repeater {
+    model: _wsModel
     delegate: Rectangle {
       id: wsPill
 
       readonly property bool isActive: root.state && modelData.id === root.state.activeWorkspace
       readonly property bool isUrgent: !isActive && !!modelData.urgent
       readonly property int windowCount: modelData.windows || 0
+      property bool dropHighlight: false
 
       radius: Colors.radiusXXS
       height: root.pillHeight
@@ -62,13 +68,27 @@ Flow {
         if (windowCount > 0) return base + Math.min(windowCount * 8, 40);
         return base;
       }
-      color: isActive ? root.activeColor : root.inactiveColor
+      color: dropHighlight ? Colors.accent : (isActive ? root.activeColor : root.inactiveColor)
 
       Behavior on width { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutBack } }
 
       Behavior on color {
         enabled: !wsPill.isUrgent
         ColorAnimation { duration: Colors.durationFast }
+      }
+
+      DropArea {
+        anchors.fill: parent
+        keys: ["window", "overview-window"]
+        onEntered: wsPill.dropHighlight = true
+        onExited: wsPill.dropHighlight = false
+        onDropped: (drop) => {
+          wsPill.dropHighlight = false;
+          if (drop.source && (drop.source.windowAddress || drop.source.windowId)) {
+            var addr = drop.source.windowAddress || drop.source.windowId;
+            CompositorAdapter.moveWindowToWorkspace(addr, modelData.id);
+          }
+        }
       }
 
       SequentialAnimation on color {
@@ -95,7 +115,7 @@ Flow {
         anchors.fill: parent
         anchors.margins: 2
         opacity: wsPill.isActive ? 0.4 : 0.6
-        visible: modelData.windowData && modelData.windowData.length > 0
+        visible: !!(modelData && modelData.windowData && modelData.windowData.length > 0)
         z: 1
 
         Repeater {

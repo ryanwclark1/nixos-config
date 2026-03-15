@@ -82,6 +82,9 @@ Rectangle {
   MouseArea {
     id: mouseArea; anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true; acceptedButtons: Qt.LeftButton | Qt.RightButton
 
+    drag.target: isPinned ? null : taskItem
+    drag.axis: Drag.XAndYAxis
+
     onClicked: (mouse) => {
       stateLayer.burst(mouse.x, mouse.y);
       if (mouse.button === Qt.LeftButton) {
@@ -101,6 +104,23 @@ Rectangle {
       }
     }
   }
+
+  Drag.active: mouseArea.drag.active
+  Drag.source: {
+    if (isPinned) return null;
+    var winId = toplevelRef ? (toplevelRef.id || toplevelRef.address || "") : "";
+    return ({ type: "window", windowId: winId, windowAddress: winId, appId: appClass });
+  }
+  Drag.hotSpot.x: width / 2
+  Drag.hotSpot.y: height / 2
+
+  states: [
+    State {
+      when: mouseArea.drag.active
+      ParentChange { target: taskItem; parent: anchorWindow.contentItem }
+      PropertyChanges { target: taskItem; opacity: 0.8; scale: 0.8 }
+    }
+  ]
 
   SharedWidgets.BarTooltip {
     anchorItem: taskItem

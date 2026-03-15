@@ -23,8 +23,7 @@ PanelWindow {
   color: "transparent"
 
   property bool isVisible: false
-  visible: isVisible || _unmapDelay.running
-  Timer { id: _unmapDelay; interval: 350 }
+  visible: isVisible || pmFadeAnim.running || pmScaleAnim.running
 
   WlrLayershell.layer: WlrLayer.Overlay
   WlrLayershell.keyboardFocus: root.isVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
@@ -57,7 +56,6 @@ PanelWindow {
       uptimeProc.running = true;
       currentIndex = -1;
     } else {
-      _unmapDelay.restart();
       cancelTimer();
     }
   }

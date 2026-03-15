@@ -47,13 +47,9 @@ Scope {
         readonly property int usableWidth: Math.max(0, screen.width - edgeMargins.left - edgeMargins.right)
         readonly property int usableHeight: Math.max(0, screen.height - edgeMargins.top - edgeMargins.bottom)
 
-        // Deferred unmap: keep window mapped briefly after hide for fade-out
+        // Deferred unmap: stay mapped while exit animations run
         property bool _wantVisible: root.shouldShowOsd
-        visible: _wantVisible || unmapDelay.running
-        on_WantVisibleChanged: {
-          if (!_wantVisible) unmapDelay.restart();
-        }
-        Timer { id: unmapDelay; interval: 350 }
+        visible: _wantVisible || osdFadeAnim.running || osdScaleAnim.running
 
         anchors.top: true
         anchors.left: true
@@ -121,7 +117,7 @@ Scope {
             }
           }
 
-          layer.enabled: osdFadeAnim.running || osdScaleAnim.running || unmapDelay.running
+          layer.enabled: osdFadeAnim.running || osdScaleAnim.running
 
           RowLayout {
             anchors.fill: parent

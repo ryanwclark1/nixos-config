@@ -67,11 +67,7 @@ Scope {
         readonly property int usableHeight: Math.max(0, screen.height - edgeMargins.top - edgeMargins.bottom)
 
         property bool _wantVisible: CompositorAdapter.supportsWorkspaceOsd && root.shouldShowOsd
-        visible: _wantVisible || unmapDelay.running
-        on_WantVisibleChanged: {
-          if (!_wantVisible) unmapDelay.restart();
-        }
-        Timer { id: unmapDelay; interval: 350 }
+        visible: _wantVisible || osdFadeAnim.running || osdScaleAnim.running
 
         anchors.top: true
         margins.top: edgeMargins.top + Math.max(0, (usableHeight - implicitHeight) / 2)
@@ -137,7 +133,7 @@ Scope {
             }
           }
 
-          layer.enabled: osdFadeAnim.running || osdScaleAnim.running || unmapDelay.running
+          layer.enabled: osdFadeAnim.running || osdScaleAnim.running
 
           ColumnLayout {
             anchors.centerIn: parent

@@ -16,16 +16,7 @@ PopupWindow {
   signal closeRequested()
   property bool wantVisible: false
   property bool showContent: wantVisible
-  visible: wantVisible || unmapDelay.running
-
-  onWantVisibleChanged: {
-    if (!wantVisible) unmapDelay.restart();
-  }
-
-  Timer {
-    id: unmapDelay
-    interval: 300
-  }
+  visible: wantVisible || cavaFadeAnim.running || cavaScaleAnim.running
 
   Rectangle {
     anchors.fill: parent
