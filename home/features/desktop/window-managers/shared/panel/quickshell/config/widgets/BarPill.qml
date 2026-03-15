@@ -15,6 +15,8 @@ MouseArea {
   property color activeColor: Colors.withAlpha(Colors.primary, 0.28)
   property color normalColor: Colors.bgWidget
   property color hoverColor: Colors.highlightLight
+  property color activeBorderColor: Colors.primary
+  property color normalBorderColor: Colors.border
   property real hoverScale: 1.04
   property real horizontalPadding: 8
 
@@ -46,7 +48,7 @@ MouseArea {
     color: root.isActive ? root.activeColor : (root.containsMouse ? root.hoverColor : root.normalColor)
     radius: height / 2
     clip: true
-    border.color: root.isActive ? Colors.primary : Colors.border
+    border.color: root.isActive ? root.activeBorderColor : root.normalBorderColor
     border.width: 1
     opacity: root.isActive ? 1.0 : (root.containsMouse ? 1.0 : 0.8)
     Behavior on color { ColorAnimation { duration: Colors.durationFast } }

@@ -25,6 +25,7 @@ ElevationShadow 1.0 ElevationShadow.qml
 EmptyState 1.0 EmptyState.qml
 FilterChip 1.0 FilterChip.qml
 IconButton 1.0 IconButton.qml
+InfoRow 1.0 InfoRow.qml
 InnerHighlight 1.0 InnerHighlight.qml
 LiveLogOverlay 1.0 LiveLogOverlay.qml
 LoadingSpinner 1.0 LoadingSpinner.qml

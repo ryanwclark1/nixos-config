@@ -184,6 +184,7 @@ Item {
 
   function componentForWidget(widgetType) {
     if (widgetType === "logo") return logoComponent;
+    if (widgetType === "criticalStatus") return criticalStatusComponent;
     if (widgetType === "workspaces") return workspacesComponent;
     if (widgetType === "taskbar") return taskbarComponent;
     if (widgetType === "windowTitle") return windowTitleComponent;
@@ -410,6 +411,34 @@ Item {
       property var widgetInstance: null
       tooltipText: "Application launcher"
       anchorWindow: root.anchorWindow
+    }
+  }
+
+  Component {
+    id: criticalStatusComponent
+    SharedWidgets.BarPill {
+      property var widgetInstance: null
+      visible: SystemStatus.isCritical
+      anchorWindow: root.anchorWindow
+      normalColor: Colors.withAlpha(Colors.error, 0.2)
+      hoverColor: Colors.withAlpha(Colors.error, 0.28)
+      activeColor: Colors.withAlpha(Colors.error, 0.28)
+      normalBorderColor: Colors.error
+      activeBorderColor: Colors.error
+      tooltipText: "CRITICAL: High load or temperature detected"
+      
+      Text {
+        anchors.centerIn: parent
+        text: "󰀪"
+        color: Colors.error
+        font.pixelSize: Colors.fontSizeLarge
+        font.family: Colors.fontMono
+        SequentialAnimation on opacity {
+          loops: Animation.Infinite
+          NumberAnimation { from: 1.0; to: 0.3; duration: 500 }
+          NumberAnimation { from: 0.3; to: 1.0; duration: 500 }
+        }
+      }
     }
   }
 

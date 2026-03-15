@@ -97,25 +97,21 @@ BasePopupMenu {
           Layout.fillWidth: root.compactMode
           spacing: Colors.spacingXS
 
-          RowLayout {
-            spacing: Colors.spacingXS
-            Text { text: "Feels"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeSmall }
-            Text { text: WeatherService.feelsLike || "--"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
+          SharedWidgets.InfoRow {
+            label: "Feels"
+            value: WeatherService.feelsLike || "--"
           }
-          RowLayout {
-            spacing: Colors.spacingXS
-            Text { text: "Humidity"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeSmall }
-            Text { text: WeatherService.humidity || "--"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
+          SharedWidgets.InfoRow {
+            label: "Humidity"
+            value: WeatherService.humidity || "--"
           }
-          RowLayout {
-            spacing: Colors.spacingXS
-            Text { text: "Wind"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeSmall }
-            Text { text: (WeatherService.windSpeed || "--") + (WeatherService.windDir ? (" " + WeatherService.windDir) : ""); color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
+          SharedWidgets.InfoRow {
+            label: "Wind"
+            value: (WeatherService.windSpeed || "--") + (WeatherService.windDir ? (" " + WeatherService.windDir) : "")
           }
-          RowLayout {
-            spacing: Colors.spacingXS
-            Text { text: "Visibility"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeSmall }
-            Text { text: WeatherService.visibility || "--"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
+          SharedWidgets.InfoRow {
+            label: "Visibility"
+            value: WeatherService.visibility || "--"
           }
         }
       }
