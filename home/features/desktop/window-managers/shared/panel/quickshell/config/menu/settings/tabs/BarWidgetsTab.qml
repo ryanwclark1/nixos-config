@@ -22,10 +22,28 @@ Item {
     property int dragSourceIndex: -1
     property string dragTargetSection: ""
     property int dragTargetIndex: -1
-    property var currentSectionWidgets: ({ left: [], center: [], right: [] })
     readonly property int overlayInset: root.tightSpacing ? 20 : 40
 
-    readonly property var selectedBar: Config.selectedBar()
+    readonly property var selectedBar: {
+        var bars = Config.barConfigs || [];
+        var selectedId = String(Config.selectedBarId || "");
+        var fallback = bars.length > 0 ? bars[0] : null;
+        for (var i = 0; i < bars.length; ++i) {
+            if (String(bars[i].id || "") === selectedId)
+                return bars[i];
+        }
+        return fallback;
+    }
+    readonly property var currentSectionWidgets: {
+        var bar = selectedBar;
+        var sections = (bar && bar.sectionWidgets) ? bar.sectionWidgets : {};
+        return {
+            left: (sections.left || []).slice(),
+            center: (sections.center || []).slice(),
+            right: (sections.right || []).slice()
+        };
+    }
+    readonly property bool configReady: !Config._loading && (Config.barConfigs || []).length > 0
     readonly property var editingWidget: (selectedBar && settingsSection && settingsInstanceId)
         ? Config.widgetInstance(selectedBar.id, settingsSection, settingsInstanceId)
         : null
@@ -35,11 +53,6 @@ Item {
     }
     readonly property bool editingPluginHasSettings: editingPluginId !== "" && PluginService.pluginSupportsSettings(editingPluginId)
     readonly property bool editingPluginCanWriteSettings: editingPluginId !== "" && PluginService.pluginCanWriteSettings(editingPluginId)
-
-    Component.onCompleted: {
-        refreshSectionWidgets();
-        Qt.callLater(refreshSectionWidgets);
-    }
 
     onWidgetSettingsOpenChanged: {
         if (!widgetSettingsOpen) {
@@ -52,28 +65,8 @@ Item {
         if (widgetSettingsOpen)
             Qt.callLater(loadPluginSettingsPane);
     }
-    onSelectedBarChanged: refreshSectionWidgets()
-
-    Connections {
-        target: Config
-        function onBarConfigsChanged() { root.refreshSectionWidgets(); }
-        function onSelectedBarIdChanged() { root.refreshSectionWidgets(); }
-    }
-
     function sectionWidgets(section) {
         return currentSectionWidgets[section] || [];
-    }
-
-    function refreshSectionWidgets() {
-        if (!selectedBar) {
-            currentSectionWidgets = { left: [], center: [], right: [] };
-            return;
-        }
-        currentSectionWidgets = {
-            left: Config.barSectionWidgets(selectedBar, "left").slice(),
-            center: Config.barSectionWidgets(selectedBar, "center").slice(),
-            right: Config.barSectionWidgets(selectedBar, "right").slice()
-        };
     }
 
     function sectionLabel(section) {
@@ -194,6 +187,7 @@ Item {
 
     SettingsTabPage {
         anchors.fill: parent
+        visible: root.configReady
         tabId: root.tabId
         title: "Bar Widgets"
         iconName: "󰖲"

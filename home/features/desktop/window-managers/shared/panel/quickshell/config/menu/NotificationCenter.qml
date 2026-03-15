@@ -44,9 +44,16 @@ PanelWindow {
 
   property var manager: null
   property bool showContent: false
+  readonly property int maxLayerTextureSize: 4096
   signal closeRequested()
   property string searchQuery: ""
   visible: showContent || ncSlideAnim.running || ncFadeAnim.running
+
+  function allowLayer(width, height) {
+    return width > 0 && height > 0
+      && width <= maxLayerTextureSize
+      && height <= maxLayerTextureSize;
+  }
 
   // Ensure focus is grabbed when shown
   onShowContentChanged: {
@@ -85,7 +92,7 @@ PanelWindow {
     Behavior on x { NumberAnimation { id: ncSlideAnim; duration: Colors.durationSlow; easing.type: Easing.OutCubic } }
     Behavior on y { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutCubic } }
     Behavior on opacity { NumberAnimation { id: ncFadeAnim; duration: Colors.durationNormal } }
-    layer.enabled: ncSlideAnim.running || ncFadeAnim.running
+    layer.enabled: (ncSlideAnim.running || ncFadeAnim.running) && root.allowLayer(width, height)
     Keys.onEscapePressed: root.closeRequested()
 
     ColumnLayout {

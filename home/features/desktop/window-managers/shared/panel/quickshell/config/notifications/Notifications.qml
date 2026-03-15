@@ -30,6 +30,13 @@ PanelWindow {
   }
 
   property var manager: null
+  readonly property int maxLayerTextureSize: 4096
+
+  function allowLayer(width, height) {
+    return width > 0 && height > 0
+      && width <= maxLayerTextureSize
+      && height <= maxLayerTextureSize;
+  }
 
   ColumnLayout {
     id: col
@@ -63,7 +70,7 @@ PanelWindow {
 
         // Animated dismiss: slide right + fade, then actually dismiss
         property bool isDismissing: false
-        layer.enabled: entranceAnim.running || dismissAnim.running
+        layer.enabled: (entranceAnim.running || dismissAnim.running) && root.allowLayer(width, height)
         function animatedDismiss() {
           if (isDismissing || !notification) return;
           isDismissing = true;

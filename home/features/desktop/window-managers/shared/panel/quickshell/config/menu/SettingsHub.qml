@@ -19,6 +19,7 @@ PanelWindow {
   readonly property bool compactMode: isPortrait || usableWidth < 1024 || usableHeight < 760
   readonly property bool tightSpacing: usableWidth < 720 || usableHeight < 640
   readonly property int sidebarWidth: compactMode ? 72 : 256
+  readonly property int maxLayerTextureSize: 4096
   property string searchQuery: ""
 
   anchors {
@@ -80,6 +81,12 @@ PanelWindow {
 
   function toggle() {
     isOpen ? close() : open();
+  }
+
+  function allowLayer(width, height) {
+    return width > 0 && height > 0
+      && width <= maxLayerTextureSize
+      && height <= maxLayerTextureSize;
   }
 
   Timer {
@@ -193,7 +200,7 @@ PanelWindow {
     scale: settingsRoot.isOpen ? 1.0 : 0.95
     Behavior on opacity { NumberAnimation { id: shFadeAnim; duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
     Behavior on scale { NumberAnimation { id: shScaleAnim; duration: Colors.durationSlow; easing.type: Easing.OutBack } }
-    layer.enabled: shFadeAnim.running || shScaleAnim.running
+    layer.enabled: (shFadeAnim.running || shScaleAnim.running) && settingsRoot.allowLayer(width, height)
 
     // Prevent clicks from closing through the box
     MouseArea { anchors.fill: parent }

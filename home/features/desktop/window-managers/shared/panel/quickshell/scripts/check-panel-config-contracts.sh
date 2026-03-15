@@ -162,12 +162,12 @@ main() {
 
   new_bar_json="$(printf '%s\n' "${new_bar_output}" | sed -n 's/^.*CONTRACT://p' | tail -n 1)"
   if [[ -n "${new_bar_json}" ]] \
-    && [[ "$(printf '%s' "${new_bar_json}" | jq -r '.left[3].widgetType')" == "cpuStatus" ]] \
-    && [[ "$(printf '%s' "${new_bar_json}" | jq -r '.left[3].settings.displayMode')" == "auto" ]] \
-    && [[ "$(printf '%s' "${new_bar_json}" | jq -r '.left[3].settings.valueStyle')" == "percent" ]] \
-    && [[ "$(printf '%s' "${new_bar_json}" | jq -r '.left[4].widgetType')" == "ramStatus" ]] \
+    && [[ "$(printf '%s' "${new_bar_json}" | jq -r '.left[4].widgetType')" == "cpuStatus" ]] \
     && [[ "$(printf '%s' "${new_bar_json}" | jq -r '.left[4].settings.displayMode')" == "auto" ]] \
-    && [[ "$(printf '%s' "${new_bar_json}" | jq -r '.left[4].settings.valueStyle')" == "usage" ]] \
+    && [[ "$(printf '%s' "${new_bar_json}" | jq -r '.left[4].settings.valueStyle')" == "percent" ]] \
+    && [[ "$(printf '%s' "${new_bar_json}" | jq -r '.left[5].widgetType')" == "ramStatus" ]] \
+    && [[ "$(printf '%s' "${new_bar_json}" | jq -r '.left[5].settings.displayMode')" == "auto" ]] \
+    && [[ "$(printf '%s' "${new_bar_json}" | jq -r '.left[5].settings.valueStyle')" == "usage" ]] \
     && ! printf '%s' "${new_bar_json}" | jq -e '.. | objects | select(.widgetType? == "systemMonitor")' >/dev/null; then
     pass "Default bar composition uses separated stat widgets"
   else

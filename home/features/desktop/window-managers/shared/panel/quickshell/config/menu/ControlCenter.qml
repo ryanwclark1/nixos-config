@@ -44,7 +44,14 @@ PanelWindow {
     property var manager: null
     property bool showContent: false
     property int pendingPowerIndex: -1
+    readonly property int maxLayerTextureSize: 4096
     signal closeRequested
+
+    function allowLayer(width, height) {
+        return width > 0 && height > 0
+            && width <= maxLayerTextureSize
+            && height <= maxLayerTextureSize;
+    }
 
     onShowContentChanged: {
         if (!showContent) {
@@ -125,7 +132,7 @@ PanelWindow {
                 duration: Colors.durationNormal
             }
         }
-        layer.enabled: ccSlideAnim.running || ccFadeAnim.running
+        layer.enabled: (ccSlideAnim.running || ccFadeAnim.running) && root.allowLayer(width, height)
 
         Keys.onEscapePressed: root.closeRequested()
 
@@ -200,7 +207,7 @@ PanelWindow {
                             opacity: root.showContent ? 1 : 0
                             visible: opacity > 0
                             scale: root.showContent ? 1 : 0.95
-                            layer.enabled: opacity > 0 && opacity < 1
+                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity {
                                 NumberAnimation {
                                     duration: Colors.durationEmphasis
@@ -223,7 +230,7 @@ PanelWindow {
                             columnSpacing: Colors.paddingSmall
                             opacity: root.showContent ? 1 : 0
                             visible: opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1
+                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity {
                                 NumberAnimation {
                                     duration: 450
@@ -248,7 +255,7 @@ PanelWindow {
                             spacing: Colors.spacingS
                             visible: PluginService.visibleControlCenterPlugins.length > 0
                             opacity: root.showContent ? 1 : 0
-                            layer.enabled: opacity > 0 && opacity < 1
+                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity {
                                 NumberAnimation {
                                     duration: 480
@@ -294,7 +301,7 @@ PanelWindow {
 
                         MediaWidget {
                             opacity: root.showContent ? 1 : 0
-                            layer.enabled: opacity > 0 && opacity < 1
+                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity {
                                 NumberAnimation {
                                     duration: 500
@@ -309,7 +316,7 @@ PanelWindow {
                             spacing: Colors.paddingMedium
                             opacity: root.showContent ? 1 : 0
                             visible: opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1
+                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity {
                                 NumberAnimation {
                                     duration: 550
@@ -484,7 +491,7 @@ PanelWindow {
                             spacing: Colors.spacingM
                             opacity: root.showContent ? 1 : 0
                             visible: opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1
+                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity {
                                 NumberAnimation {
                                     duration: Colors.durationPulse
@@ -544,7 +551,7 @@ PanelWindow {
                         SystemGraphs {
                             opacity: root.showContent ? 1 : 0
                             visible: opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1
+                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity {
                                 NumberAnimation {
                                     duration: 650
@@ -555,7 +562,7 @@ PanelWindow {
                         ProcessWidget {
                             opacity: root.showContent ? 1 : 0
                             visible: opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1
+                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity {
                                 NumberAnimation {
                                     duration: Colors.durationPulse
@@ -566,7 +573,7 @@ PanelWindow {
                         NetworkGraphs {
                             opacity: root.showContent ? 1 : 0
                             visible: opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1
+                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity {
                                 NumberAnimation {
                                     duration: 750
@@ -577,7 +584,7 @@ PanelWindow {
                         DiskWidget {
                             opacity: root.showContent ? 1 : 0
                             visible: opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1
+                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity {
                                 NumberAnimation {
                                     duration: 800
@@ -588,7 +595,7 @@ PanelWindow {
                         GPUWidget {
                             opacity: root.showContent ? 1 : 0
                             visible: opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1
+                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity {
                                 NumberAnimation {
                                     duration: 850
@@ -599,7 +606,7 @@ PanelWindow {
                         UpdateWidget {
                             opacity: root.showContent ? 1 : 0
                             visible: opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1
+                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity {
                                 NumberAnimation {
                                     duration: 900
@@ -610,7 +617,7 @@ PanelWindow {
                         ScratchpadWidget {
                             opacity: root.showContent ? 1 : 0
                             visible: opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1
+                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity {
                                 NumberAnimation {
                                     duration: 950

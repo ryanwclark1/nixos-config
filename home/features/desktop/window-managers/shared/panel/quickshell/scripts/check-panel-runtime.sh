@@ -92,18 +92,6 @@ run_ipc() {
   return "${status}"
 }
 
-instance_for_pid() {
-  local pid="$1"
-  local resolved=""
-
-  resolved="$(readlink -f "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid/${pid}" 2>/dev/null || true)"
-  if [[ -n "${resolved}" && -S "${resolved}/ipc.sock" ]]; then
-    basename "${resolved}"
-    return 0
-  fi
-  return 1
-}
-
 cleanup_repo_shell() {
   if [[ -n "${repo_shell_pid}" ]]; then
     kill "${repo_shell_pid}" >/dev/null 2>&1 || true
@@ -115,7 +103,7 @@ cleanup_repo_shell() {
 }
 
 start_repo_shell() {
-  local deadline candidate
+  local deadline
 
   if ! command -v systemctl >/dev/null 2>&1; then
     printf 'systemctl is required for --repo-shell mode.\n' >&2
@@ -133,10 +121,8 @@ start_repo_shell() {
 
   deadline=$((SECONDS + 20))
   while (( SECONDS < deadline )); do
-    candidate="$(instance_for_pid "${repo_shell_pid}" || true)"
-    if [[ -n "${candidate}" ]] && run_ipc quickshell ipc --id "${candidate}" show >/dev/null; then
-      instance_id="${candidate}"
-      printf '[INFO] Repo shell instance ready: %s\n' "${instance_id}"
+    if run_ipc quickshell ipc --pid "${repo_shell_pid}" show >/dev/null; then
+      printf '[INFO] Repo shell instance ready: pid %s\n' "${repo_shell_pid}"
       return 0
     fi
     sleep 0.5

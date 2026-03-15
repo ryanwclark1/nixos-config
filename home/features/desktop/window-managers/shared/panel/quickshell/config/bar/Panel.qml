@@ -30,13 +30,6 @@ Item {
   readonly property int outerPadding: Colors.spacingM
   readonly property int sectionSpacing: Colors.spacingS
   readonly property int runtimeSpacing: Colors.spacingM
-  readonly property real horizontalCenterMinX: outerPadding + leftSection.width + (leftSection.width > 0 ? runtimeSpacing : 0)
-  readonly property real horizontalCenterMaxX: width - outerPadding - rightSection.width - (rightSection.width > 0 ? runtimeSpacing : 0) - centerSection.width
-  readonly property real horizontalCenterGapX: {
-    var gapStart = root.horizontalCenterMinX;
-    var gapEnd = width - outerPadding - rightSection.width - (rightSection.width > 0 ? runtimeSpacing : 0);
-    return gapStart + ((gapEnd - gapStart) - centerSection.width) / 2;
-  }
   readonly property real computedOpacity: (barConfig && barConfig.opacity !== undefined) ? barConfig.opacity : Config.barOpacity
   readonly property bool floatingBar: barConfig && barConfig.floating !== undefined ? !!barConfig.floating : Config.barFloating
   readonly property bool autoHide: !!(barConfig && barConfig.autoHide)
@@ -315,15 +308,7 @@ Item {
   Row {
     id: centerSection
     visible: !vertical
-    anchors.verticalCenter: parent.verticalCenter
-    x: {
-      var target = root.horizontalCenterGapX;
-      var minX = root.horizontalCenterMinX;
-      var maxX = root.horizontalCenterMaxX;
-      if (minX > maxX)
-        return Math.max(outerPadding, Math.min((width - centerSection.width) / 2, width - outerPadding - centerSection.width));
-      return Math.max(minX, Math.min(target, maxX));
-    }
+    anchors.centerIn: parent
     spacing: runtimeSpacing
     Repeater {
       model: root.sectionItems("center")

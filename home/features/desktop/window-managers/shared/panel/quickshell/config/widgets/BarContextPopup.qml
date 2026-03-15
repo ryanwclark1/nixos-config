@@ -17,11 +17,18 @@ PopupWindow {
     readonly property int separatorHeight: 9
     readonly property int menuPadding: Colors.spacingXS
     readonly property int menuWidth: 200
+    readonly property int maxLayerTextureSize: 4096
 
     color: "transparent"
     visible: false
     implicitWidth: menuWidth + 2
     implicitHeight: menuPadding * 2 + contentColumn.implicitHeight + 2
+
+    function allowLayer(width, height) {
+        return width > 0 && height > 0
+            && width <= maxLayerTextureSize
+            && height <= maxLayerTextureSize;
+    }
 
     function show(actions, triggerRect, position, anchorWin) {
         if (!actions || actions.length === 0) return;
@@ -125,7 +132,7 @@ PopupWindow {
         Keys.onEnterPressed: root.executeItem(root.focusedIndex)
         Keys.onEscapePressed: root.close()
 
-        layer.enabled: root.visible
+        layer.enabled: root.visible && root.allowLayer(width, height)
         layer.smooth: true
 
         ElevationShadow {}

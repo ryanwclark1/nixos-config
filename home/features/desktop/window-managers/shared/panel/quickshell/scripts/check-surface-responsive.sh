@@ -331,7 +331,7 @@ main() {
       fail "New runtime warnings/errors detected"
       printf '%s\n' "${filtered}" >&2
     else
-      warn "New log output observed, but only known non-blocking warnings were present"
+      pass "Only known non-blocking runtime warnings were observed"
     fi
   else
     pass "No new runtime warnings/errors in QuickShell log"

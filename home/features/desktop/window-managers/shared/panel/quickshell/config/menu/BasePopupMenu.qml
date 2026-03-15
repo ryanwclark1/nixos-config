@@ -26,6 +26,7 @@ PopupWindow {
   property int popupMinWidth: 320
   property int popupMaxWidth: 380
   property int compactThreshold: 350
+  property int maxLayerTextureSize: 4096
   readonly property int availablePopupWidth: screen ? Math.max(popupMinWidth, screen.width - 40) : popupMaxWidth
   readonly property bool compactMode: availablePopupWidth < compactThreshold
   implicitWidth: Math.min(popupMaxWidth, availablePopupWidth)
@@ -39,6 +40,12 @@ PopupWindow {
   property bool wantVisible: false
   visible: wantVisible || _unmapDelay.running
   property bool showContent: wantVisible
+
+  function allowLayer(width, height) {
+    return width > 0 && height > 0
+      && width <= maxLayerTextureSize
+      && height <= maxLayerTextureSize;
+  }
 
   onWantVisibleChanged: {
     if (!wantVisible) _unmapDelay.restart();
@@ -89,7 +96,7 @@ PopupWindow {
     }
     Behavior on opacity { NumberAnimation { id: _opacAnim; duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
     Behavior on scale { NumberAnimation { id: _scaleAnim; duration: Colors.durationNormal; easing.type: Easing.OutBack; easing.overshoot: 1.2 } }
-    layer.enabled: _opacAnim.running || _scaleAnim.running
+    layer.enabled: (_opacAnim.running || _scaleAnim.running) && root.allowLayer(width, height)
 
     // Optional surface tint (e.g. for MusicMenu accent color)
     Rectangle {
