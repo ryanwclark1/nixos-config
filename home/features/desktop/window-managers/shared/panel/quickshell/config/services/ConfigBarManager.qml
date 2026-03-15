@@ -527,11 +527,18 @@ QtObject {
     if (fromIndex < 0 || fromIndex >= sourceWidgets.length) return false;
 
     if (section === destinationSection) {
-      if (toIndex < 0 || toIndex >= sourceWidgets.length) return false;
-      if (fromIndex === toIndex) return true;
+      if (toIndex < 0 || toIndex > sourceWidgets.length) return false;
 
+      var originalLength = sourceWidgets.length;
       var sameSectionItem = sourceWidgets.splice(fromIndex, 1)[0];
-      sourceWidgets.splice(toIndex, 0, sameSectionItem);
+      var insertionIndex = Math.min(toIndex, sourceWidgets.length);
+      if (fromIndex < toIndex && toIndex < originalLength)
+        insertionIndex -= 1;
+      if (insertionIndex < 0)
+        insertionIndex = 0;
+
+      if (fromIndex === insertionIndex) return true;
+      sourceWidgets.splice(insertionIndex, 0, sameSectionItem);
       return updateBarSection(barId, section, sourceWidgets);
     }
 

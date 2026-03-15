@@ -20,6 +20,7 @@ ssh_readme="${ssh_source_dir}/README.md"
 ssh_settings_fixture="${ssh_source_dir}/expected-settings.json"
 ssh_state_fixture="${ssh_source_dir}/expected-state-envelope.json"
 ssh_import_fixture="${ssh_source_dir}/expected-import.json"
+shell_config="${script_dir}/../config/shell.qml"
 docker_plugin_dir_name="docker-manager"
 docker_plugin_id="docker.manager"
 docker_source_dir="$(cd "${script_dir}/../examples/plugins/${docker_plugin_dir_name}" 2>/dev/null && pwd || true)"
@@ -90,6 +91,36 @@ docker_guard_label() {
   esac
 }
 
+quickshell_guard_commands() {
+  cat <<EOF
+${script_dir}/check-quickshell-startup.sh
+${script_dir}/check-settings-responsive.sh
+${script_dir}/check-surface-responsive.sh
+${script_dir}/check-panel-runtime.sh
+EOF
+}
+
+quickshell_guard_label() {
+  local guard_cmd="$1"
+  case "$guard_cmd" in
+    *"check-quickshell-startup.sh")
+      printf '%s' 'quickshell startup smoke'
+      ;;
+    *"check-settings-responsive.sh")
+      printf '%s' 'quickshell settings responsiveness smoke'
+      ;;
+    *"check-surface-responsive.sh")
+      printf '%s' 'quickshell surface responsiveness smoke'
+      ;;
+    *"check-panel-runtime.sh")
+      printf '%s' 'quickshell panel runtime aggregate (with multibar when supported)'
+      ;;
+    *)
+      printf '%s' 'quickshell runtime guard'
+      ;;
+  esac
+}
+
 health_label() {
   local ok="$1"
   local label="$2"
@@ -150,7 +181,7 @@ reference_guard_label() {
 usage() {
   cat <<'EOF'
 Usage:
-  plugin-local.sh [quick|full|doctor|install-reference|remove-reference|smoke-reference|reference-flow|reference-export|reference-status|reference-files|reference-guards|reference-all|install-docker-manager|remove-docker-manager|smoke-docker-manager|docker-flow|docker-status|docker-files|docker-guards|docker-all|ssh-flow|ssh-status|ssh-files|ssh-guards|ssh-all|shared-gates|baseline-gates|all-gates] [plugins_dir|--check|--quiet]
+  plugin-local.sh [quick|full|doctor|install-reference|remove-reference|smoke-reference|reference-flow|reference-export|reference-status|reference-files|reference-guards|reference-all|install-docker-manager|remove-docker-manager|smoke-docker-manager|docker-flow|docker-status|docker-files|docker-guards|docker-all|ssh-flow|ssh-status|ssh-files|ssh-guards|ssh-all|quickshell-flow|quickshell-status|quickshell-files|quickshell-guards|quickshell-all|live-gates|shared-gates|baseline-gates|all-gates] [plugins_dir|--check|--quiet]
 
 Modes:
   quick              Run fast local plugin guardrails (default, `--quiet` suppresses wrapper headings)
@@ -178,6 +209,12 @@ Modes:
   ssh-files          Print canonical first-party SSH plugin file and guard paths only
   ssh-guards         Print runnable first-party SSH plugin guard commands in order
   ssh-all            Run the full first-party SSH plugin guard sequence (`--quiet` suppresses stage headings)
+  quickshell-flow    Print the manual Quickshell runtime validation sequence
+  quickshell-status  Print a combined Quickshell runtime status summary (`--check` fails on missing prerequisites or inactive service, `--quiet` suppresses the dashboard and prints one-line status)
+  quickshell-files   Print canonical Quickshell shell/runtime script and guard paths only
+  quickshell-guards  Print runnable Quickshell runtime guard commands in order
+  quickshell-all     Run the full Quickshell runtime guard sequence (`--quiet` suppresses stage headings)
+  live-gates         Run shared plugin/runtime guards plus the live Quickshell runtime workflow (`--quiet` suppresses wrapper headings)
   shared-gates       Run the shared Quickshell startup, runtime, and diagnostics plugin gates (`--quiet` suppresses wrapper headings)
   baseline-gates     Run plugin conformance and doctor-smoke gates (`--quiet` suppresses wrapper headings)
   all-gates          Run baseline, reference, and shared plugin gates (`--quiet` suppresses phase headings)
@@ -874,6 +911,143 @@ EOF
     done < <(ssh_guard_commands)
     if (( quiet == 0 )); then
       printf '[INFO] First-party SSH plugin checks passed.\n'
+    fi
+    ;;
+  quickshell-flow)
+    cat <<EOF
+Quickshell Manual Flow
+
+1. Ensure the current Home Manager generation is active:
+   - home-manager switch --flake /home/administrator/nixos-config#administrator@woody
+2. Restart the live shell:
+   - systemctl --user restart quickshell
+3. Run the focused Quickshell runtime checks:
+   - scripts/check-quickshell-startup.sh
+   - scripts/check-settings-responsive.sh
+   - scripts/check-surface-responsive.sh
+   - scripts/check-panel-runtime.sh
+4. Run the assembled Quickshell workflow:
+   - scripts/plugin-local.sh quickshell-all
+EOF
+    ;;
+  quickshell-status)
+    check_only=0
+    quiet=0
+    shift 1
+    while (($# > 0)); do
+      case "$1" in
+        --check)
+          check_only=1
+          ;;
+        --quiet)
+          quiet=1
+          ;;
+      esac
+      shift
+    done
+    health_failures=0
+    if [[ -f "$shell_config" ]]; then
+      shell_health="$(health_label 1 "quickshell shell config")"
+    else
+      shell_health="$(health_label 0 "quickshell shell config")"
+      health_failures=$((health_failures + 1))
+    fi
+    if [[ -x "${script_dir}/check-quickshell-startup.sh" && -x "${script_dir}/check-settings-responsive.sh" && -x "${script_dir}/check-surface-responsive.sh" && -x "${script_dir}/check-panel-runtime.sh" ]]; then
+      guard_health="$(health_label 1 "quickshell runtime guard scripts")"
+    else
+      guard_health="$(health_label 0 "quickshell runtime guard scripts")"
+      health_failures=$((health_failures + 1))
+    fi
+    if command -v systemctl >/dev/null 2>&1 && systemctl --user is-active --quiet quickshell.service; then
+      service_health="$(health_label 1 "quickshell.service active")"
+    else
+      service_health="$(health_label 0 "quickshell.service active")"
+      health_failures=$((health_failures + 1))
+    fi
+    if (( quiet == 0 )); then
+      cat <<EOF
+Quickshell Runtime Status
+
+Shell state:
+  config: ${shell_config}
+  service: quickshell.service
+
+Health summary:
+  ${shell_health}
+  ${guard_health}
+  ${service_health}
+
+Local commands:
+  flow:    scripts/plugin-local.sh quickshell-flow
+  status:  scripts/plugin-local.sh quickshell-status --check
+  guards:  scripts/plugin-local.sh quickshell-guards
+  all:     scripts/plugin-local.sh quickshell-all
+
+Runtime files:
+  startup:  ${script_dir}/check-quickshell-startup.sh
+  settings: ${script_dir}/check-settings-responsive.sh
+  surfaces: ${script_dir}/check-surface-responsive.sh
+  panel:    ${script_dir}/check-panel-runtime.sh
+EOF
+    else
+      printf '[INFO] Quickshell status: %s | %s | %s\n' \
+        "$shell_health" \
+        "$guard_health" \
+        "$service_health"
+    fi
+    if (( check_only == 1 )); then
+      if (( health_failures == 0 )); then
+        printf '[INFO] Quickshell status check passed.\n'
+      else
+        printf '[FAIL] Quickshell status check failed: %d prerequisite issue(s).\n' "$health_failures" >&2
+        exit 1
+      fi
+    fi
+    ;;
+  quickshell-files)
+    cat <<EOF
+shell_config=${shell_config}
+guard_startup=${script_dir}/check-quickshell-startup.sh
+guard_settings=${script_dir}/check-settings-responsive.sh
+guard_surfaces=${script_dir}/check-surface-responsive.sh
+guard_panel_runtime=${script_dir}/check-panel-runtime.sh
+service_name=quickshell.service
+EOF
+    ;;
+  quickshell-guards)
+    quickshell_guard_commands
+    ;;
+  quickshell-all)
+    quiet=0
+    if [[ "${2:-}" == "--quiet" ]]; then
+      quiet=1
+    fi
+    while IFS= read -r guard_cmd; do
+      [[ -n "$guard_cmd" ]] || continue
+      read -r -a guard_parts <<< "$guard_cmd"
+      if (( quiet == 0 )); then
+        printf '[INFO] Running %s...\n' "$(quickshell_guard_label "$guard_cmd")"
+      fi
+      "${guard_parts[@]}"
+    done < <(quickshell_guard_commands)
+    if (( quiet == 0 )); then
+      printf '[INFO] Quickshell runtime checks passed.\n'
+    fi
+    ;;
+  live-gates)
+    quiet=0
+    if [[ "${2:-}" == "--quiet" ]]; then
+      quiet=1
+    fi
+    if (( quiet == 0 )); then
+      printf '[INFO] Running shared plugin/runtime gates...\n'
+      "${script_dir}/plugin-local.sh" shared-gates
+      printf '[INFO] Running live Quickshell runtime gates...\n'
+      "${script_dir}/plugin-local.sh" quickshell-all
+      printf '[INFO] Live Quickshell gates passed.\n'
+    else
+      "${script_dir}/plugin-local.sh" shared-gates --quiet
+      "${script_dir}/plugin-local.sh" quickshell-all --quiet
     fi
     ;;
   shared-gates)

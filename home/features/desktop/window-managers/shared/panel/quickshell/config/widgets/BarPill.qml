@@ -44,9 +44,24 @@ MouseArea {
     color: root.isActive ? root.activeColor : (root.containsMouse ? root.hoverColor : root.normalColor)
     radius: height / 2
     clip: true
-    border.color: root.isActive ? Colors.primary : "transparent"
-    border.width: root.isActive ? 1 : 0
+    border.color: root.isActive ? Colors.primary : Colors.border
+    border.width: 1
+    opacity: root.isActive ? 1.0 : (root.containsMouse ? 1.0 : 0.8)
     Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+    Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
+    Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+
+    // Double border effect for depth
+    Rectangle {
+      anchors.fill: parent
+      anchors.margins: 1
+      radius: parent.radius - 1
+      color: "transparent"
+      border.color: Colors.borderLight
+      border.width: 1
+      opacity: root.isActive ? 0.4 : (root.containsMouse ? 0.25 : 0.1)
+      Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
+    }
 
     // Shimmer sweep on hover
     Rectangle {

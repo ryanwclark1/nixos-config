@@ -22,6 +22,18 @@ ColumnLayout {
       anchors.fill: parent
       anchors.margins: Colors.spacingM
       spacing: Colors.spacingM
+
+      // Inner highlight
+      Rectangle {
+        anchors.fill: parent
+        anchors.margins: 1
+        radius: parent.radius - 1
+        color: "transparent"
+        border.color: Colors.borderLight
+        border.width: 1
+        opacity: 0.1
+      }
+
       SharedWidgets.SectionLabel { label: "FEATURED" }
       RowLayout {
         Layout.fillWidth: true
@@ -33,14 +45,26 @@ ColumnLayout {
             implicitHeight: 74
             radius: Colors.radiusMedium
             readonly property bool hovered: featureHover.containsMouse
-            color: hovered ? Colors.withAlpha(Colors.primary, 0.1) : Colors.surface
-            border.color: hovered ? Colors.withAlpha(Colors.primary, 0.3) : Colors.border
+            color: hovered ? Colors.withAlpha(Colors.primary, 0.12) : Colors.surface
+            border.color: hovered ? Colors.primary : Colors.border
             border.width: 1
-            scale: hovered ? 1.015 : 1.0
+            scale: hovered ? 1.02 : 1.0
             layer.enabled: hovered
             Behavior on color { ColorAnimation { duration: Colors.durationFast } }
             Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
             Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
+
+            // Depth border
+            Rectangle {
+              anchors.fill: parent
+              anchors.margins: 1
+              radius: parent.radius - 1
+              color: "transparent"
+              border.color: Colors.borderLight
+              border.width: 1
+              opacity: hovered ? 0.3 : 0.15
+              Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
+            }
 
             ColumnLayout {
               anchors.fill: parent

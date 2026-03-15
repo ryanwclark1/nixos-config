@@ -25,15 +25,40 @@ Item {
   Rectangle {
     id: card
     anchors.fill: parent
-    color: Colors.bgWidget
+    color: "transparent"
     radius: Colors.radiusMedium
-    border.color: cardHover.hovered ? Colors.primary : Colors.border
-    border.width: 1
     clip: true
 
     scale: cardHover.hovered ? root.hoverScale : 1.0
     Behavior on scale { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutQuint } }
-    Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+
+    Rectangle {
+      id: bg
+      anchors.fill: parent
+      radius: parent.radius
+      color: Colors.bgWidget
+      border.color: cardHover.hovered ? Colors.primary : Colors.border
+      border.width: 1
+      Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+
+      gradient: Gradient {
+        orientation: Gradient.Vertical
+        GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+        GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+      }
+    }
+
+    // Inner subtle highlight border
+    Rectangle {
+      anchors.fill: parent
+      anchors.margins: 1
+      radius: parent.radius - 1
+      color: "transparent"
+      border.color: Colors.borderLight
+      border.width: 1
+      opacity: cardHover.hovered ? 0.3 : 0.15
+      Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
+    }
 
     HoverHandler { id: cardHover }
 

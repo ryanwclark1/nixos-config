@@ -24,8 +24,8 @@ Item {
 
   signal clicked()
 
-  implicitWidth: pill.implicitWidth
-  implicitHeight: pill.implicitHeight
+  implicitWidth: pill.width
+  implicitHeight: pill.height
 
   SharedWidgets.Ref { service: SystemStatus }
 

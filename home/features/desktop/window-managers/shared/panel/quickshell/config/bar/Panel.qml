@@ -30,6 +30,12 @@ Item {
   readonly property int outerPadding: Colors.spacingM
   readonly property int sectionSpacing: Colors.spacingS
   readonly property int runtimeSpacing: Colors.spacingM
+  readonly property real centerTargetOffset: (leftSection.width - rightSection.width) / 2
+  readonly property real centerMinOffset: outerPadding + leftSection.width + (leftSection.width > 0 ? runtimeSpacing : 0) - width / 2 + centerSection.width / 2
+  readonly property real centerMaxOffset: width / 2 - outerPadding - rightSection.width - (rightSection.width > 0 ? runtimeSpacing : 0) - centerSection.width / 2
+  readonly property real centerClampedOffset: centerMinOffset > centerMaxOffset
+    ? 0
+    : Math.max(centerMinOffset, Math.min(centerTargetOffset, centerMaxOffset))
   readonly property real computedOpacity: (barConfig && barConfig.opacity !== undefined) ? barConfig.opacity : Config.barOpacity
   readonly property bool floatingBar: barConfig && barConfig.floating !== undefined ? !!barConfig.floating : Config.barFloating
   readonly property bool autoHide: !!(barConfig && barConfig.autoHide)
@@ -308,7 +314,9 @@ Item {
   Row {
     id: centerSection
     visible: !vertical
-    anchors.centerIn: parent
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.horizontalCenterOffset: root.centerClampedOffset
+    anchors.verticalCenter: parent.verticalCenter
     spacing: runtimeSpacing
     Repeater {
       model: root.sectionItems("center")
@@ -485,8 +493,8 @@ Item {
     Item {
       id: dateTimeRoot
       property var widgetInstance: null
-      implicitWidth: dateTimePill.implicitWidth
-      implicitHeight: dateTimePill.implicitHeight
+      implicitWidth: dateTimePill.width
+      implicitHeight: dateTimePill.height
 
       SystemClock {
         id: centerClock
@@ -566,8 +574,8 @@ Item {
       property var widgetInstance: null
       property string updatesIcon: "󰚰"
       property string updatesCount: "0"
-      implicitWidth: updatesPill.implicitWidth
-      implicitHeight: updatesPill.implicitHeight
+      implicitWidth: updatesPill.width
+      implicitHeight: updatesPill.height
 
       SharedWidgets.CommandPoll {
         id: updatePoll
@@ -613,8 +621,8 @@ Item {
         return full.length >= 8 ? full.substring(0, 8) : (full.length > 0 ? full : "▁▂▃▄▅▆▇█");
       }
       visible: !root.vertical
-      implicitWidth: cavaPill.implicitWidth
-      implicitHeight: cavaPill.implicitHeight
+      implicitWidth: cavaPill.width
+      implicitHeight: cavaPill.height
 
       SharedWidgets.BarPill {
         id: cavaPill
@@ -642,8 +650,8 @@ Item {
       id: inhibitorRoot
       property var widgetInstance: null
       property bool inhibitorActive: false
-      implicitWidth: inhibitorPill.implicitWidth
-      implicitHeight: inhibitorPill.implicitHeight
+      implicitWidth: inhibitorPill.width
+      implicitHeight: inhibitorPill.height
 
       SharedWidgets.CommandPoll {
         id: inhibitorPoll
@@ -793,7 +801,7 @@ Item {
       tooltipText: audioWidget.tooltipText
       onClicked: root.requestSurface("audioMenu", this)
       contextActions: [
-        { label: AudioService.outputMuted ? "Unmute" : "Mute", icon: AudioService.outputMuted ? "󰖁" : "󰕾", action: () => AudioService.toggleMute("@DEFAULT_AUDIO_SINK@") },
+        { label: AudioService.outputMuted ? "Unmute" : "Mute", icon: AudioService.outputMuted ? "󰖁" : "󰕾", action: () => AudioService.toggleMute("@DEFAULT_AUDIO_SINK@", AudioService.outputMuted) },
         { separator: true },
         { label: "Open Audio Menu", icon: "󰕾", action: () => root.requestSurface("audioMenu", this) }
       ]

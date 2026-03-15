@@ -74,7 +74,7 @@ QtObject {
       return [
         "sh",
         "-c",
-        "hyprctl workspaces -j 2>/dev/null; printf '\\n'; hyprctl activeworkspace -j 2>/dev/null"
+        "hyprctl workspaces -j 2>/dev/null | tr '\\n' ' '; printf '\\n'; hyprctl activeworkspace -j 2>/dev/null | tr '\\n' ' '"
       ];
     }
     if (isNiri) return ["niri", "msg", "-j", "workspaces"];
@@ -114,13 +114,13 @@ QtObject {
     return [
       "sh",
       "-c",
-      "hyprctl getoption general:gaps_out -j 2>/dev/null; "
+      "hyprctl getoption general:gaps_out -j 2>/dev/null | tr '\\n' ' '; "
       + "printf '\\n'; "
-      + "hyprctl getoption general:gaps_in -j 2>/dev/null; "
+      + "hyprctl getoption general:gaps_in -j 2>/dev/null | tr '\\n' ' '; "
       + "printf '\\n'; "
-      + "hyprctl getoption decoration:active_opacity -j 2>/dev/null; "
+      + "hyprctl getoption decoration:active_opacity -j 2>/dev/null | tr '\\n' ' '; "
       + "printf '\\n'; "
-      + "hyprctl getoption general:layout -j 2>/dev/null"
+      + "hyprctl getoption general:layout -j 2>/dev/null | tr '\\n' ' '"
     ];
   }
 

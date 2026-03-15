@@ -43,7 +43,6 @@ Item {
             right: (sections.right || []).slice()
         };
     }
-    readonly property bool configReady: !Config._loading && (Config.barConfigs || []).length > 0
     readonly property var editingWidget: (selectedBar && settingsSection && settingsInstanceId)
         ? Config.widgetInstance(selectedBar.id, settingsSection, settingsInstanceId)
         : null
@@ -97,6 +96,18 @@ Item {
     function removeWidget(section, instanceId) {
         if (!selectedBar) return;
         Config.removeBarWidget(selectedBar.id, section, instanceId);
+    }
+
+    function moveWidget(section, index, delta) {
+        if (!selectedBar)
+            return false;
+        var widgets = root.sectionWidgets(section);
+        var targetIndex = index + delta;
+        if (index < 0 || index >= widgets.length)
+            return false;
+        if (targetIndex < 0 || targetIndex >= widgets.length)
+            return false;
+        return Config.moveBarWidget(selectedBar.id, section, index, targetIndex, section);
     }
 
     function clearDragState() {
@@ -187,7 +198,6 @@ Item {
 
     SettingsTabPage {
         anchors.fill: parent
-        visible: root.configReady
         tabId: root.tabId
         title: "Bar Widgets"
         iconName: "󰖲"
@@ -223,16 +233,16 @@ Item {
                 readonly property string sectionKey: modelData
                 title: root.sectionLabel(sectionKey) + " Section"
                 iconName: sectionKey === "left" ? "󰁍" : (sectionKey === "center" ? "󰇘" : "󰁔")
-                description: "Drag widgets to reorder inside this section, or add new widgets from the searchable picker."
+                description: "Reorder widgets inside this section, or add new widgets from the searchable picker."
                 visible: !!root.selectedBar
 
-                Column {
+                ColumnLayout {
                     id: sectionColumn
-                    width: widgetSectionCard.width - Colors.spacingL * 2
+                    Layout.fillWidth: true
                     spacing: Colors.spacingS
 
                     Text {
-                        width: parent.width
+                        Layout.fillWidth: true
                         text: root.sectionWidgets(sectionKey).length > 0
                             ? "Current widgets: " + root.sectionWidgets(sectionKey).length
                             : "Current widgets: none"
@@ -243,7 +253,7 @@ Item {
                     }
 
                     Rectangle {
-                        width: parent.width
+                        Layout.fillWidth: true
                         visible: root.sectionWidgets(sectionKey).length === 0
                         radius: Colors.radiusSmall
                         color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.06)
@@ -301,6 +311,7 @@ Item {
                         model: root.sectionWidgets(sectionKey).length
                         delegate: Item {
                             id: widgetRow
+                            Layout.fillWidth: true
                             width: sectionColumn.width
                             implicitHeight: cardLayout.implicitHeight + Colors.spacingM * 2
                             height: implicitHeight
@@ -404,6 +415,14 @@ Item {
                                                 Layout.fillWidth: true
                                                 wrapMode: Text.WordWrap
                                             }
+
+                                            Text {
+                                                text: "Use the arrow buttons to reorder within this section."
+                                                color: Colors.textSecondary
+                                                font.pixelSize: Colors.fontSizeXS
+                                                Layout.fillWidth: true
+                                                wrapMode: Text.WordWrap
+                                            }
                                         }
                                     }
 
@@ -430,6 +449,20 @@ Item {
                                             label: "Value: " + root.statValueStyleLabel(widgetRow.widgetInstance)
                                             selected: false
                                             enabled: false
+                                        }
+
+                                        SettingsActionButton {
+                                            compact: true
+                                            label: "↑"
+                                            enabled: widgetRow.index > 0
+                                            onClicked: root.moveWidget(widgetRow.sectionKey, widgetRow.index, -1)
+                                        }
+
+                                        SettingsActionButton {
+                                            compact: true
+                                            label: "↓"
+                                            enabled: widgetRow.index < (root.sectionWidgets(widgetRow.sectionKey).length - 1)
+                                            onClicked: root.moveWidget(widgetRow.sectionKey, widgetRow.index, 1)
                                         }
 
                                         SettingsActionButton {
@@ -525,7 +558,7 @@ Item {
                     }
 
                     Rectangle {
-                        width: parent.width
+                        Layout.fillWidth: true
                         height: 12
                         radius: Colors.radiusXXS
                         visible: root.sectionWidgets(sectionKey).length > 0
@@ -538,7 +571,7 @@ Item {
                     }
 
                     DropArea {
-                        width: parent.width
+                        Layout.fillWidth: true
                         height: root.sectionWidgets(sectionKey).length > 0 ? 28 : 0
                         visible: root.sectionWidgets(sectionKey).length > 0
                         keys: ["bar-widget"]
@@ -569,7 +602,7 @@ Item {
                 }
 
                 SettingsActionButton {
-                    width: sectionColumn.width
+                    Layout.fillWidth: true
                     emphasized: true
                     iconName: "󰐕"
                     label: "Add Widget"

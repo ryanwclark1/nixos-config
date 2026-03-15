@@ -39,6 +39,19 @@ QtObject {
     readonly property color bgGlass: withAlpha(background, bgOpacity)
     readonly property color bgWidget: _isLight ? Qt.rgba(0, 0, 0, 0.06) : Qt.rgba(1, 1, 1, 0.08)
 
+    // --- GRADIENTS & DEPTH ---
+    readonly property color surfaceGradientStart: withAlpha(surface, 0.1)
+    readonly property color surfaceGradientEnd: withAlpha(surface, 0.02)
+    readonly property color borderLight: withAlpha(text, 0.12)
+    readonly property color borderDark: withAlpha("#000000", 0.25)
+    readonly property color glassBorder: withAlpha(text, 0.1)
+
+    // --- SHADOWS ---
+    readonly property color shadowColor: withAlpha("#000000", 0.35)
+    readonly property int shadowSizeLow: 4
+    readonly property int shadowSizeMedium: 8
+    readonly property int shadowSizeHigh: 16
+
     // --- POPUP SURFACES (shared across all menus) ---
     readonly property color popupSurface: withAlpha(surface, 0.96)
     readonly property color cardSurface: withAlpha(surface, 0.82)

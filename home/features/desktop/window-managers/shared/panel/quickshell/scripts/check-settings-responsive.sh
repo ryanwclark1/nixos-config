@@ -53,6 +53,9 @@ EOF
 
 instance_id=""
 instance_pid=""
+instance_dir=""
+log_file=""
+start_bytes=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -231,11 +234,68 @@ resolve_instance_dir() {
 call_ipc() {
   local target="$1"
   shift
-  if [[ -n "${instance_pid}" ]]; then
-    run_ipc quickshell ipc --pid "${instance_pid}" call "${target}" "$@"
-  else
-    run_ipc quickshell ipc --id "${instance_id}" call "${target}" "$@"
+  local attempt
+  for attempt in 1 2 3; do
+    if [[ -n "${instance_pid}" ]]; then
+      if run_ipc quickshell ipc --pid "${instance_pid}" call "${target}" "$@"; then
+        return 0
+      fi
+    else
+      if run_ipc quickshell ipc --id "${instance_id}" call "${target}" "$@"; then
+        return 0
+      fi
+    fi
+    if ! refresh_instance_binding; then
+      sleep 0.2
+      continue
+    fi
+    sleep 0.2
+  done
+  return 1
+}
+
+refresh_instance_binding() {
+  local refreshed_pid=""
+  local refreshed_id=""
+  local refreshed_dir=""
+  local refreshed_log=""
+
+  refreshed_pid="$(discover_reachable_pid || true)"
+  if [[ -n "${refreshed_pid}" ]]; then
+    refreshed_dir="$(readlink -f "${runtime_pid_root}/${refreshed_pid}" 2>/dev/null || true)"
+    if [[ -n "${refreshed_dir}" && -S "${refreshed_dir}/ipc.sock" ]]; then
+      refreshed_id="$(shell_id_for_runtime_dir "${refreshed_dir}" || basename "${refreshed_dir}")"
+      instance_pid="${refreshed_pid}"
+      instance_id="${refreshed_id}"
+      instance_dir="${refreshed_dir}"
+      refreshed_log="${instance_dir}/log.log"
+      log_file="${refreshed_log}"
+      if [[ -f "${log_file}" ]]; then
+        start_bytes="$(wc -c < "${log_file}")"
+      else
+        start_bytes=0
+      fi
+      return 0
+    fi
   fi
+
+  if [[ -n "${instance_id}" ]]; then
+    refreshed_dir="$(resolve_instance_dir "${instance_id}" || true)"
+    if [[ -n "${refreshed_dir}" && -S "${refreshed_dir}/ipc.sock" ]]; then
+      instance_pid=""
+      instance_dir="${refreshed_dir}"
+      refreshed_log="${instance_dir}/log.log"
+      log_file="${refreshed_log}"
+      if [[ -f "${log_file}" ]]; then
+        start_bytes="$(wc -c < "${log_file}")"
+      else
+        start_bytes=0
+      fi
+      return 0
+    fi
+  fi
+
+  return 1
 }
 
 main() {
@@ -253,9 +313,6 @@ main() {
     fi
   fi
 
-  local instance_dir=""
-  local log_file="${instance_dir}/log.log"
-  local start_bytes=0
   local delta_file
   delta_file="$(mktemp)"
   trap "rm -f '${delta_file}'" EXIT

@@ -85,6 +85,10 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
   - `scripts/plugin-verify.sh`
   - `scripts/plugin-verify.sh --quiet`
   - reuses `scripts/plugin-local.sh all-gates`
+- Quickshell-first live gate:
+  - `scripts/quickshell-verify.sh`
+  - `scripts/quickshell-verify.sh --quiet`
+  - reuses `scripts/plugin-local.sh live-gates`
 - Fixture conformance gate:
   - `scripts/check-plugin-conformance.sh`
 - Plugin doctor smoke gate:
@@ -131,6 +135,14 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
   - `scripts/plugin-local.sh ssh-flow`
   - `scripts/plugin-local.sh ssh-guards`
   - `scripts/plugin-local.sh ssh-all`
+  - `scripts/check-quickshell-local.sh`
+  - `scripts/plugin-local.sh quickshell-status`
+  - `scripts/plugin-local.sh quickshell-status --check --quiet`
+  - `scripts/plugin-local.sh quickshell-flow`
+  - `scripts/plugin-local.sh quickshell-guards`
+  - `scripts/plugin-local.sh quickshell-all`
+  - `scripts/plugin-local.sh live-gates`
+  - `scripts/plugin-local.sh live-gates --quiet`
 
 ## Operational Diagnostics
 
@@ -161,6 +173,17 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
 - `scripts/plugin-local.sh all-gates` runs the Docker Manager guard sequence when `scripts/plugin-local.sh docker-status --check` succeeds, and otherwise skips that optional Docker-specific phase.
 - `scripts/plugin-local.sh quick` reuses `reference-all --quiet --silent-preflight` before the shared runtime and diagnostics gates, so the fast path and the reference-only path stay aligned without extra preflight noise.
 - Run `scripts/plugin-local.sh quick --quiet` when you want that same fast path without the top-level wrapper lines or shared-gate headings.
+- Run `scripts/plugin-local.sh quickshell-status` when you want a one-screen health summary for the live Quickshell service and its runtime guard scripts.
+- Run `scripts/plugin-local.sh quickshell-status --check` to fail fast when the live Quickshell service is inactive or the Quickshell runtime guard scripts are missing.
+- Run `scripts/plugin-local.sh quickshell-status --check --quiet` when you want that preflight as a compact one-line status.
+- Run `scripts/plugin-local.sh quickshell-files` when you need only the canonical Quickshell shell and runtime guard paths.
+- Run `scripts/plugin-local.sh quickshell-guards` when you need the runnable Quickshell runtime guard commands in order.
+- Run `scripts/plugin-local.sh quickshell-all` when you want the assembled Quickshell runtime workflow in one command, including multibar when the environment supports a `PanelWindow` backend.
+- Run `scripts/plugin-local.sh live-gates` when you want the shared plugin/runtime guards and the live Quickshell session workflow in one command.
+- Run `scripts/plugin-local.sh live-gates --quiet` when you want that combined live gate without wrapper headings.
+- Run `scripts/quickshell-verify.sh` when you want the Quickshell-first top-level verifier without going through `plugin-local.sh`.
+- Run `scripts/quickshell-verify.sh --quiet` when you want that verifier in compact mode.
+- Run `scripts/check-quickshell-local.sh` when you want to guard the `plugin-local.sh` Quickshell workflow surface itself against drift.
 
 ## Reference Plugin Workflow
 

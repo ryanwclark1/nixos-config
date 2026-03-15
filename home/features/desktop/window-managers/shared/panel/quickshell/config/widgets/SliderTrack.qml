@@ -51,32 +51,58 @@ Rectangle {
   }
   color: sliderMouse.containsMouse ? Colors.surface : Colors.bgWidget
   radius: height / 2
-  border.color: sliderMouse.containsMouse ? (root.muted ? root.mutedColor : root.activeColor) : Colors.border
+  border.color: root.muted ? root.mutedColor : (sliderMouse.containsMouse ? root.activeColor : Colors.border)
   border.width: 1
 
   Behavior on color { ColorAnimation { duration: Colors.durationFast } }
   Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+
+  // Background inner shadow/depth
+  Rectangle {
+    anchors.fill: parent
+    anchors.margins: 1
+    radius: parent.radius - 1
+    color: "transparent"
+    border.color: Colors.borderDark
+    border.width: 1
+    opacity: 0.1
+  }
 
   // Tick marks at 25%, 50%, 75%
   Repeater {
     model: [0.25, 0.50, 0.75]
     Rectangle {
       x: root.width * modelData - 1
-      y: 0; width: 2; height: root.height
+      y: 2; width: 2; height: root.height - 4
       radius: 1
-      color: Colors.withAlpha(Colors.textDisabled, 0.3)
+      color: Colors.withAlpha(Colors.textDisabled, 0.2)
       visible: !root.muted && root.value < modelData
     }
   }
 
   Rectangle {
+    id: thumb
     height: parent.height
     width: Math.max(root.minThumbWidth, parent.width * (root.muted ? 0 : root.value))
     radius: parent.radius
-    color: root.muted ? root.mutedColor : (sliderMouse.containsMouse ? Qt.darker(root.activeColor, 1.08) : root.activeColor)
-    opacity: root.muted ? 1.0 : (0.3 + root.value * 0.7)
+    color: root.muted ? root.mutedColor : root.activeColor
     Behavior on color { ColorAnimation { duration: Colors.durationFast } }
-    Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
+
+    gradient: Gradient {
+      orientation: Gradient.Horizontal
+      GradientStop { position: 0.0; color: root.muted ? root.mutedColor : root.activeColor }
+      GradientStop { position: 1.0; color: root.muted ? Qt.lighter(root.mutedColor, 1.2) : Qt.lighter(root.activeColor, 1.15) }
+    }
+
+    // Inner highlight for the thumb
+    Rectangle {
+      anchors.fill: parent
+      anchors.margins: 1
+      radius: parent.radius - 1
+      color: "transparent"
+      border.color: Colors.withAlpha("#ffffff", 0.25)
+      border.width: 1
+    }
 
     Text {
       anchors.centerIn: parent
@@ -85,7 +111,6 @@ Rectangle {
       Behavior on color { ColorAnimation { duration: Colors.durationFast } }
       font.family: Colors.fontMono
       font.pixelSize: Colors.fontSizeSmall
-      opacity: 1.0 / Math.max(0.3, parent.opacity)
       visible: root.muted || root.value > root.minVisibleValue
     }
   }

@@ -13,21 +13,40 @@ Rectangle {
   border.color: Colors.border
   border.width: 1
 
+  // Depth highlight
+  Rectangle {
+    anchors.fill: parent
+    anchors.margins: 1
+    radius: parent.radius - 1
+    color: "transparent"
+    border.color: Colors.borderLight
+    border.width: 1
+    opacity: 0.2
+  }
+
   ColumnLayout {
     anchors.fill: parent
     anchors.margins: root.launcher.sidebarCompact ? Colors.spacingS : Colors.spacingM
     spacing: root.launcher.sidebarCompact ? Colors.spacingXS : Colors.paddingSmall
 
-    Text { visible: !root.launcher.sidebarCompact; text: "Launcher"; color: Colors.text; font.pixelSize: Colors.fontSizeXL; font.weight: Font.DemiBold }
+    RowLayout {
+      visible: !root.launcher.sidebarCompact
+      Layout.fillWidth: true
+      spacing: Colors.spacingS
+      Text { text: "󰍉"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXXL }
+      Text { text: "Launcher"; color: Colors.text; font.pixelSize: Colors.fontSizeXL; font.weight: Font.DemiBold }
+    }
+
+    Item { Layout.preferredHeight: Colors.spacingS; visible: !root.launcher.sidebarCompact }
     SharedWidgets.SectionLabel { visible: !root.launcher.sidebarCompact; label: "MODES" }
 
     Repeater {
       model: root.launcher.primaryModes
       delegate: Rectangle {
         Layout.fillWidth: true
-        implicitHeight: root.launcher.sidebarCompact ? 40 : 46
+        implicitHeight: root.launcher.sidebarCompact ? 40 : 52
         radius: Colors.radiusMedium
-        color: root.launcher.mode === modelData ? Colors.highlight : Colors.bgWidget
+        color: root.launcher.mode === modelData ? Colors.withAlpha(Colors.primary, 0.12) : "transparent"
         Behavior on color { ColorAnimation { duration: Colors.durationFast } }
         border.color: root.launcher.mode === modelData ? Colors.primary : "transparent"
         border.width: 1
@@ -47,8 +66,8 @@ Rectangle {
             visible: !root.launcher.sidebarCompact
             Layout.fillWidth: true
             spacing: 0
-            Text { text: root.launcher.modeInfo(modelData).label; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.DemiBold }
-            Text { text: root.launcher.modeInfo(modelData).hint; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; elide: Text.ElideRight; Layout.fillWidth: true }
+            Text { text: root.launcher.modeInfo(modelData).label; color: root.launcher.mode === modelData ? Colors.text : Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; font.weight: root.launcher.mode === modelData ? Font.Bold : Font.Normal }
+            Text { text: root.launcher.modeInfo(modelData).hint; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; elide: Text.ElideRight; Layout.fillWidth: true; visible: root.launcher.mode === modelData }
           }
         }
 

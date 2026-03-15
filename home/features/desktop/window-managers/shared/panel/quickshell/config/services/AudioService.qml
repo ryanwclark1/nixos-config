@@ -9,20 +9,14 @@ QtObject {
     id: root
 
     // ── Output (sink) state ──────────────────────
-    readonly property real outputVolume: {
-        var v = Pipewire.defaultAudioSink?.audio?.volume;
-        return (v !== undefined && !isNaN(v)) ? Colors.clamp01(v) : 0;
-    }
-    readonly property bool outputMuted: Pipewire.defaultAudioSink?.audio?.muted ?? false
+    property real outputVolume: 0
+    property bool outputMuted: false
     readonly property string outputLabel: _sinkDescription()
     readonly property string outputDeviceType: _detectDeviceType()
 
     // ── Input (source) state ─────────────────────
-    readonly property real inputVolume: {
-        var v = Pipewire.defaultAudioSource?.audio?.volume;
-        return (v !== undefined && !isNaN(v)) ? Colors.clamp01(v) : 0;
-    }
-    readonly property bool inputMuted: Pipewire.defaultAudioSource?.audio?.muted ?? false
+    property real inputVolume: 0
+    property bool inputMuted: false
     readonly property string inputLabel: _sourceDescription()
 
     // ── Device lists (reactive from PipeWire) ────
@@ -49,6 +43,53 @@ QtObject {
 
     property PwObjectTracker _nodeTracker: PwObjectTracker {
         objects: _allAudioNodes()
+    }
+
+    property Process outputVolumeProc: Process {
+        command: ["wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@"]
+        running: false
+        stdout: StdioCollector {
+            onStreamFinished: {
+                var result = root._parseWpctlVolume(this.text);
+                if (!result) {
+                    root.outputVolume = 0;
+                    root.outputMuted = false;
+                    return;
+                }
+                root.outputVolume = result.volume;
+                root.outputMuted = result.muted;
+            }
+        }
+    }
+
+    property Process inputVolumeProc: Process {
+        command: ["wpctl", "get-volume", "@DEFAULT_AUDIO_SOURCE@"]
+        running: false
+        stdout: StdioCollector {
+            onStreamFinished: {
+                var result = root._parseWpctlVolume(this.text);
+                if (!result) {
+                    root.inputVolume = 0;
+                    root.inputMuted = false;
+                    return;
+                }
+                root.inputVolume = result.volume;
+                root.inputMuted = result.muted;
+            }
+        }
+    }
+
+    property Timer volumeTimer: Timer {
+        interval: 1000
+        running: root.subscriberCount > 0
+        repeat: true
+        onTriggered: root.refreshVolumes()
+    }
+
+    property Timer postWriteRefreshTimer: Timer {
+        interval: 120
+        repeat: false
+        onTriggered: root.refreshVolumes()
     }
 
     // ── Helpers ──────────────────────────────────
@@ -88,6 +129,83 @@ QtObject {
         return audio;
     }
 
+    function _deviceDisplayName(node) {
+        return node.description || node.nickname || node.name || "Unknown";
+    }
+
+    function _parseWpctlVolume(text) {
+        var trimmed = String(text || "").trim();
+        var match = trimmed.match(/Volume:\s+([0-9.]+)(?:\s+\[MUTED\])?/);
+        if (!match)
+            return null;
+        var parsed = parseFloat(match[1]);
+        return {
+            volume: isNaN(parsed) ? 0 : Colors.clamp01(parsed),
+            muted: trimmed.indexOf("[MUTED]") !== -1
+        };
+    }
+
+    function _deviceMatchKeys(node, displayName) {
+        var keys = [];
+
+        function addKey(value) {
+            var key = String(value || "").trim().toLowerCase();
+            if (!key || keys.indexOf(key) !== -1)
+                return;
+            keys.push(key);
+        }
+
+        addKey(displayName);
+        addKey(node.description);
+        addKey(node.nickname);
+        addKey(node.name);
+        addKey(node.properties ? node.properties["node.name"] : "");
+        addKey(node.properties ? node.properties["object.path"] : "");
+        return keys;
+    }
+
+    function _configuredSet(values) {
+        var configured = {};
+        for (var i = 0; i < (values || []).length; i++) {
+            var key = String(values[i] || "").trim().toLowerCase();
+            if (key)
+                configured[key] = true;
+        }
+        return configured;
+    }
+
+    function _matchesConfiguredDevice(device, configured) {
+        var keys = device.matchKeys || [];
+        for (var i = 0; i < keys.length; i++) {
+            if (configured[keys[i]])
+                return true;
+        }
+        return false;
+    }
+
+    function _volumePercentText(value) {
+        return Math.round(Colors.clamp01(value) * 100) + "%";
+    }
+
+    function _currentTargetVolume(target) {
+        return target === "@DEFAULT_AUDIO_SINK@" ? root.outputVolume : root.inputVolume;
+    }
+
+    function _currentTargetMuted(target) {
+        return target === "@DEFAULT_AUDIO_SINK@" ? root.outputMuted : root.inputMuted;
+    }
+
+    function _execWpctl(args) {
+        Quickshell.execDetached(["wpctl"].concat(args));
+    }
+
+    function refreshVolumes() {
+        if (!root.outputVolumeProc.running)
+            root.outputVolumeProc.running = true;
+        if (!root.inputVolumeProc.running)
+            root.inputVolumeProc.running = true;
+    }
+
     function _buildDeviceList(isSinkList) {
         if (!Pipewire.ready) return [];
         var nodes = Pipewire.nodes?.values ?? [];
@@ -101,9 +219,12 @@ QtObject {
             if (isSinkList !== node.isSink) continue;
 
             var vol = node.audio.volume;
+            var displayName = _deviceDisplayName(node);
             devices.push({
                 id: node.id,
-                name: node.description || node.nickname || node.name || "Unknown",
+                name: displayName,
+                key: String(node.name || (node.properties ? node.properties["node.name"] : "") || displayName),
+                matchKeys: _deviceMatchKeys(node, displayName),
                 volume: (vol !== undefined && !isNaN(vol)) ? vol : 0,
                 muted: node.audio.muted || false,
                 isDefault: node.id === defaultId
@@ -113,25 +234,19 @@ QtObject {
     }
 
     function _filterDevices(devices, pinned, hidden) {
-        var hiddenSet = {};
-        for (var h = 0; h < (hidden || []).length; h++)
-            hiddenSet[(hidden[h] || "").toLowerCase()] = true;
-
-        var pinnedSet = {};
-        for (var p = 0; p < (pinned || []).length; p++)
-            pinnedSet[(pinned[p] || "").toLowerCase()] = true;
+        var hiddenSet = _configuredSet(hidden);
+        var pinnedSet = _configuredSet(pinned);
 
         var visible = [];
         for (var i = 0; i < devices.length; i++) {
-            var name = (devices[i].name || "").toLowerCase();
-            if (!hiddenSet[name])
+            if (!root._matchesConfiguredDevice(devices[i], hiddenSet))
                 visible.push(devices[i]);
         }
 
         // Sort: pinned first, then rest
         visible.sort(function(a, b) {
-            var aPin = pinnedSet[(a.name || "").toLowerCase()] ? 0 : 1;
-            var bPin = pinnedSet[(b.name || "").toLowerCase()] ? 0 : 1;
+            var aPin = root._matchesConfiguredDevice(a, pinnedSet) ? 0 : 1;
+            var bPin = root._matchesConfiguredDevice(b, pinnedSet) ? 0 : 1;
             return aPin - bPin;
         });
 
@@ -170,66 +285,69 @@ QtObject {
     }
 
     // ── Volume protection ────────────────────────
-    function protectedSetVolume(node, targetVolume, currentVolume) {
-        if (!node || !node.audio) return;
+    function protectedVolume(targetVolume, currentVolume) {
         var maxJump = Config.volumeProtectionEnabled ? Config.volumeProtectionMaxJump : 1.0;
         var delta = targetVolume - currentVolume;
         if (Math.abs(delta) > maxJump)
             targetVolume = currentVolume + (delta > 0 ? maxJump : -maxJump);
-        var clamped = Colors.clamp01(targetVolume);
-        node.audio.volume = clamped;
-        if (clamped > 0 && node.audio.muted)
-            node.audio.muted = false;
+        return Colors.clamp01(targetVolume);
     }
 
     // ── Actions (preserves existing API) ─────────
     function setVolume(target, value) {
-        var clamped = Colors.clamp01(value);
+        var current = root._currentTargetVolume(target);
+        var clamped = Config.volumeProtectionEnabled
+            ? root.protectedVolume(value, current)
+            : Colors.clamp01(value);
         var isSink = target === "@DEFAULT_AUDIO_SINK@";
-        var node = isSink ? Pipewire.defaultAudioSink : Pipewire.defaultAudioSource;
 
-        if (node && node.audio) {
-            var current = node.audio.volume || 0;
-            if (Config.volumeProtectionEnabled) {
-                protectedSetVolume(node, clamped, current);
-            } else {
-                node.audio.volume = clamped;
-                if (clamped > 0 && node.audio.muted)
-                    node.audio.muted = false;
-            }
-        } else {
-            // Fallback to wpctl for edge cases
+        if (isSink) {
+            root.outputVolume = clamped;
             if (clamped > 0)
-                Quickshell.execDetached(["wpctl", "set-mute", target, "0"]);
-            Quickshell.execDetached(["wpctl", "set-volume", target, Math.round(clamped * 100) + "%"]);
+                root.outputMuted = false;
+        } else {
+            root.inputVolume = clamped;
+            if (clamped > 0)
+                root.inputMuted = false;
         }
+
+        if (clamped > 0)
+            root._execWpctl(["set-mute", target, "0"]);
+        root._execWpctl(["set-volume", target, root._volumePercentText(clamped)]);
+        root.postWriteRefreshTimer.restart();
 
         if (isSink || target === "@DEFAULT_AUDIO_SOURCE@")
             root._sendOsdIpc(isSink, clamped * 100, false);
     }
 
     function setAppVolume(nodeRef, value) {
-        if (!nodeRef || !nodeRef.audio) return;
+        if (!nodeRef) return;
         var clamped = Colors.clamp01(value);
-        nodeRef.audio.volume = clamped;
-        if (clamped > 0 && nodeRef.audio.muted)
-            nodeRef.audio.muted = false;
+        var targetId = nodeRef.id !== undefined ? nodeRef.id.toString() : "";
+        if (!targetId) return;
+        if (clamped > 0)
+            root._execWpctl(["set-mute", targetId, "0"]);
+        root._execWpctl(["set-volume", targetId, root._volumePercentText(clamped)]);
     }
 
     function toggleAppMute(nodeRef) {
-        if (!nodeRef || !nodeRef.audio) return;
-        nodeRef.audio.muted = !nodeRef.audio.muted;
+        if (!nodeRef) return;
+        var targetId = nodeRef.id !== undefined ? nodeRef.id.toString() : "";
+        if (!targetId) return;
+        var currentMuted = nodeRef.audio ? !!nodeRef.audio.muted : false;
+        root._execWpctl(["set-mute", targetId, currentMuted ? "0" : "1"]);
     }
 
     function toggleMute(target, currentlyMuted) {
         var isSink = target === "@DEFAULT_AUDIO_SINK@";
-        var node = isSink ? Pipewire.defaultAudioSink : Pipewire.defaultAudioSource;
-
-        if (node && node.audio) {
-            node.audio.muted = !currentlyMuted;
-        } else {
-            Quickshell.execDetached(["wpctl", "set-mute", target, currentlyMuted ? "0" : "1"]);
-        }
+        if (currentlyMuted === undefined)
+            currentlyMuted = root._currentTargetMuted(target);
+        if (isSink)
+            root.outputMuted = !currentlyMuted;
+        else
+            root.inputMuted = !currentlyMuted;
+        root._execWpctl(["set-mute", target, currentlyMuted ? "0" : "1"]);
+        root.postWriteRefreshTimer.restart();
 
         var vol = isSink ? root.outputVolume : root.inputVolume;
         if (isSink || target === "@DEFAULT_AUDIO_SOURCE@")
@@ -238,10 +356,17 @@ QtObject {
 
     function setDefaultDevice(id) {
         if (id < 0) return;
-        Quickshell.execDetached(["wpctl", "set-default", id.toString()]);
+        root._execWpctl(["set-default", id.toString()]);
+        root.postWriteRefreshTimer.restart();
     }
 
     // ── Backward compat (no-ops since PipeWire is reactive) ──
-    function refreshVolumes() { }
     function refreshDevices() { }
+
+    onSubscriberCountChanged: {
+        if (subscriberCount > 0)
+            refreshVolumes();
+    }
+
+    Component.onCompleted: refreshVolumes()
 }
