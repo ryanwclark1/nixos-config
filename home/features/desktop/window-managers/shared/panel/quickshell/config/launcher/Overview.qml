@@ -93,10 +93,27 @@ Scope {
 
                   width: 360
                   height: workspaceList.height
-                  color: Colors.surface
+                  color: Colors.withAlpha(Colors.surface, 0.4)
                   radius: Colors.radiusLarge
                   border.color: workspaceData.active ? Colors.primary : Colors.border
                   border.width: workspaceData.active ? 2 : 1
+
+                  gradient: Gradient {
+                    orientation: Gradient.Vertical
+                    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+                    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+                  }
+
+                  // Inner highlight
+                  Rectangle {
+                    anchors.fill: parent
+                    anchors.margins: 1
+                    radius: parent.radius - 1
+                    color: "transparent"
+                    border.color: Colors.borderLight
+                    border.width: 1
+                    opacity: workspaceData.active ? 0.25 : 0.1
+                  }
 
                   DropArea {
                     anchors.fill: parent
@@ -153,12 +170,23 @@ Scope {
                             visible: modelData.workspace && modelData.workspace.id === workspaceRect.workspaceData.id
                             width: visible ? 155 : 0
                             height: visible ? 120 : 0
-                            color: Colors.highlightLight
+                            color: hoverArea.containsMouse ? Colors.withAlpha(Colors.primary, 0.12) : Colors.highlightLight
                             radius: Colors.radiusSmall
-                            border.color: hoverArea.containsMouse ? Colors.text : Colors.border
+                            border.color: hoverArea.containsMouse ? Colors.primary : Colors.border
                             border.width: 1
                             Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
                             clip: true
+
+                            // Inner highlight
+                            Rectangle {
+                              anchors.fill: parent
+                              anchors.margins: 1
+                              radius: parent.radius - 1
+                              color: "transparent"
+                              border.color: Colors.borderLight
+                              border.width: 1
+                              opacity: hoverArea.containsMouse ? 0.3 : 0.1
+                            }
 
                             property string windowAddress: modelData.address
 

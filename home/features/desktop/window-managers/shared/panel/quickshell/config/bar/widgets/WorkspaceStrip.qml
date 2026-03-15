@@ -53,11 +53,18 @@ Flow {
 
       readonly property bool isActive: root.state && modelData.id === root.state.activeWorkspace
       readonly property bool isUrgent: !isActive && !!modelData.urgent
+      readonly property int windowCount: modelData.windows || 0
 
       radius: Colors.radiusXXS
       height: root.pillHeight
-      width: Math.max(root.pillMinWidth, label.implicitWidth + 10)
+      width: {
+        var base = Math.max(root.pillMinWidth, label.implicitWidth + 12);
+        if (windowCount > 0) return base + Math.min(windowCount * 8, 40);
+        return base;
+      }
       color: isActive ? root.activeColor : root.inactiveColor
+
+      Behavior on width { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutBack } }
 
       Behavior on color {
         enabled: !wsPill.isUrgent
@@ -75,22 +82,41 @@ Flow {
       Text {
         id: label
         anchors.centerIn: parent
-        color: root.textColor
+        color: wsPill.isActive ? Colors.background : root.textColor
         font.pixelSize: root.pillFontSize
+        font.weight: wsPill.isActive ? Font.Bold : Font.Normal
         text: Config.workspaceShowNames && modelData.name ? modelData.name : String(modelData.id)
+        z: 2
       }
 
-      // Window count dot: shows when workspace has windows but isn't active
-      Rectangle {
-        width: 4
-        height: 4
-        radius: 2
-        color: root.activeColor
-        opacity: 0.7
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 2
-        visible: !wsPill.isActive && modelData.windows !== undefined && modelData.windows > 0
+      // Live Mini-Map: dynamic window outlines
+      Item {
+        id: miniMap
+        anchors.fill: parent
+        anchors.margins: 2
+        opacity: wsPill.isActive ? 0.4 : 0.6
+        visible: modelData.windowData && modelData.windowData.length > 0
+        z: 1
+
+        Repeater {
+          model: modelData.windowData || []
+          delegate: Rectangle {
+            // Find screen dimensions to normalize coordinates
+            readonly property real screenW: root.anchorWindow ? root.anchorWindow.width : 1920
+            readonly property real screenH: root.anchorWindow ? root.anchorWindow.height : 1080
+            
+            x: (modelData.x / screenW) * parent.width
+            y: (modelData.y / screenH) * parent.height
+            width: Math.max(2, (modelData.w / screenW) * parent.width)
+            height: Math.max(2, (modelData.h / screenH) * parent.height)
+            
+            radius: 1
+            color: wsPill.isActive ? Colors.background : (modelData.active ? Colors.primary : Colors.textSecondary)
+            opacity: modelData.active ? 0.8 : 0.4
+            border.color: wsPill.isActive ? Colors.background : Colors.border
+            border.width: modelData.active ? 1 : 0
+          }
+        }
       }
 
       MouseArea {

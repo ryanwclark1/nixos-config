@@ -18,7 +18,7 @@ BasePopupMenu {
   property string searchQuery: ""
 
   function refresh() {
-    clipPoll.poll();
+    clipPoll.triggerPoll();
   }
 
   // Fuzzy search: ranks by exact substring match first, then by
@@ -154,9 +154,21 @@ BasePopupMenu {
           Layout.fillWidth: true
           implicitHeight: clipContent.implicitHeight + 20
           radius: Colors.radiusSmall
-          color: Colors.cardSurface
-          border.color: Colors.border
+          color: clipMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.12) : Colors.withAlpha(Colors.surface, 0.35)
+          border.color: clipMouse.containsMouse ? Colors.primary : Colors.border
           border.width: 1
+          Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+
+          // Inner highlight
+          Rectangle {
+            anchors.fill: parent
+            anchors.margins: 1
+            radius: parent.radius - 1
+            color: "transparent"
+            border.color: Colors.borderLight
+            border.width: 1
+            opacity: clipMouse.containsMouse ? 0.25 : 0.1
+          }
 
           SharedWidgets.StateLayer {
             id: clipStateLayer

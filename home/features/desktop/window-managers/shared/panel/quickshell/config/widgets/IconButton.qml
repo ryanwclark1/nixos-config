@@ -8,6 +8,9 @@ Rectangle {
   property int size: 30
   property int iconSize: Colors.fontSizeLarge
   property color iconColor: Colors.textSecondary
+  property color normalColor: "transparent"
+  property color hoverColor: "transparent"
+  property color activeColor: hoverColor
   property color stateColor: Colors.text
 
   signal clicked(real x, real y)
@@ -15,7 +18,7 @@ Rectangle {
   width: size
   height: size
   radius: height / 2
-  color: "transparent"
+  color: hoverArea.pressed ? root.activeColor : (hoverArea.containsMouse ? root.hoverColor : root.normalColor)
 
   Text {
     anchors.centerIn: parent

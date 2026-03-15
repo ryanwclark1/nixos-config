@@ -59,7 +59,7 @@ QtObject {
     }
 
     function refresh() {
-        processPoll.poll();
+        processPoll.triggerPoll();
     }
 
     function processByPid(pid) {

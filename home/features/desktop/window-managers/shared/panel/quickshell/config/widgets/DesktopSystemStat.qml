@@ -9,9 +9,36 @@ Item {
 
   Ref { service: SystemStatus }
 
+  Rectangle {
+    id: bg
+    anchors.fill: parent
+    anchors.margins: -Colors.spacingM
+    radius: Colors.radiusLarge
+    color: Colors.withAlpha(Colors.surface, 0.2)
+    border.color: Colors.withAlpha(Colors.border, 0.4)
+    border.width: 1
+
+    gradient: Gradient {
+      orientation: Gradient.Vertical
+      GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+      GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+    }
+
+    // Inner highlight
+    Rectangle {
+      anchors.fill: parent
+      anchors.margins: 1
+      radius: parent.radius - 1
+      color: "transparent"
+      border.color: Colors.borderLight
+      border.width: 1
+      opacity: 0.1
+    }
+  }
+
   RowLayout {
     id: row
-    spacing: 30
+    spacing: 36
 
     ColumnLayout {
       spacing: Colors.spacingXS

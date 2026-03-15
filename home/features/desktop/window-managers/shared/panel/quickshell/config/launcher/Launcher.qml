@@ -187,17 +187,17 @@ PanelWindow {
     "drun": [
       { icon: "󰀻", label: "Applications", description: "Installed desktop apps" },
       { icon: "󱗼", label: "Windows", description: "Focus open clients", openMode: "window" },
-      { icon: "󰖩", label: "Networks", description: "Open network menu", ipcTarget: "Shell", ipcAction: "toggleNetworkMenu" },
-      { icon: "󰕾", label: "Audio", description: "Open audio menu", ipcTarget: "Shell", ipcAction: "toggleAudioMenu" }
+      shortcutAction("networkControls", "Networks"),
+      shortcutAction("audioControls", "Audio")
     ],
     "files": [
       { icon: "󰈔", label: "Home Search", description: "Search under your home directory" },
       { icon: "󰚩", label: "Ask AI", description: "Jump to AI mode", openMode: "ai" }
     ],
     "system": [
-      { icon: "󰒓", label: "Command Center", description: "Open system hub", ipcTarget: "Shell", ipcAction: "toggleControls" },
-      { icon: "󰕾", label: "Audio Controls", description: "Open audio menu", ipcTarget: "Shell", ipcAction: "toggleAudioMenu" },
-      { icon: "󰖩", label: "Network Controls", description: "Open network menu", ipcTarget: "Shell", ipcAction: "toggleNetworkMenu" }
+      shortcutAction("commandCenter", "Command Center"),
+      shortcutAction("audioControls", "Audio Controls"),
+      shortcutAction("networkControls", "Network Controls")
     ],
     "media": [
       { icon: "󰝚", label: "Media Players", description: "Control active players" }
@@ -402,8 +402,23 @@ PanelWindow {
 
   Behavior on launcherOpacity { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutQuint } }
 
-  property real scaleValue: 0.95
-  Behavior on scaleValue { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutBack } }
+  property real scaleValue: 1.0
+  Behavior on scaleValue {
+    SpringAnimation {
+      spring: 4.5
+      damping: 0.28
+      epsilon: 0.005
+    }
+  }
+
+  property real yOffset: 0
+  Behavior on yOffset {
+    SpringAnimation {
+      spring: 4.0
+      damping: 0.3
+      epsilon: 0.005
+    }
+  }
   property bool seedFrequencyFile: false
   property bool seedHistoryFile: false
 
@@ -1321,11 +1336,7 @@ PanelWindow {
     } else if (mode === "system") {
       drunCategoryFilter = "";
       drunCategoryOptions = [{ key: "", label: "All", count: 0, hotkey: "0" }];
-      recentItems = [
-        { name: "Open Audio Controls", title: "Open the audio popup", icon: "󰕾", ipcTarget: "Shell", ipcAction: "toggleAudioMenu" },
-        { name: "Open Network Controls", title: "Open the network popup", icon: "󰖩", ipcTarget: "Shell", ipcAction: "toggleNetworkMenu" },
-        { name: "Open Command Center", title: "Open the system hub", icon: "󰒓", ipcTarget: "Shell", ipcAction: "toggleControls" }
-      ];
+      recentItems = SystemActionRegistry.shellEntryActions;
     } else if (mode === "window" && availableToplevels.length > 0) {
       drunCategoryFilter = "";
       drunCategoryOptions = [{ key: "", label: "All", count: 0, hotkey: "0" }];
@@ -1411,7 +1422,8 @@ PanelWindow {
   function close() {
     if (searchInput && searchInput.activeFocus) searchInput.focus = false;
     launcherOpacity = 0;
-    scaleValue = 0.95;
+    scaleValue = 0.94;
+    yOffset = 15;
     ignoreMouseHover = true;
     mouseTrackingDelayTimer.stop();
     searchDebounceTimer.stop();
@@ -1437,6 +1449,38 @@ PanelWindow {
   function askConfirm(title, callback) {
     confirmTitle = title;
     confirmCallback = callback;
+  }
+
+  function shortcutAction(actionId, labelOverride) {
+    var action = SystemActionRegistry.actionById(actionId) || ({});
+    return {
+      icon: action.icon || "",
+      label: labelOverride || action.label || action.name || "",
+      description: action.title || action.subtitle || "",
+      ipcTarget: action.ipcTarget || "",
+      ipcAction: action.ipcAction || ""
+    };
+  }
+
+  function makeConfirmedSystemAction(title, command) {
+    return function() {
+      askConfirm(title, function() {
+        Quickshell.execDetached(command);
+      });
+    };
+  }
+
+  function makeDetachedSystemAction(command) {
+    return function() {
+      Quickshell.execDetached(command);
+    };
+  }
+
+  function runShellEntryAction(actionId) {
+    var action = SystemActionRegistry.actionById(actionId) || ({});
+    var command = Array.isArray(action.clickCommand) ? action.clickCommand : [];
+    if (command.length > 0)
+      Quickshell.execDetached(command);
   }
 
   function cancelConfirm() {
@@ -1885,22 +1929,50 @@ PanelWindow {
   }
 
   function loadSystem() {
-    allItems = [
-      { category: "Power", name: "Shutdown", icon: "󰐥", action: () => askConfirm("Shutdown system?", () => Quickshell.execDetached(["systemctl", "poweroff"])) },
-      { category: "Power", name: "Reboot", icon: "󰑐", action: () => askConfirm("Reboot system?", () => Quickshell.execDetached(["systemctl", "reboot"])) },
-      { category: "Power", name: "Lock Screen", icon: "󰌾", action: () => Quickshell.execDetached(CompositorAdapter.lockCommand()) },
-      { category: "Power", name: "Log Out", icon: "󰍃", action: () => askConfirm("Log out of session?", () => Quickshell.execDetached(CompositorAdapter.logoutCommand())) },
+    var items = [];
+    var powerActions = SystemActionRegistry.sessionActions;
+    var controlActions = SystemActionRegistry.shellEntryActions;
+    for (var i = 0; i < powerActions.length; ++i) {
+      var action = powerActions[i];
+      var item = {
+        category: action.category,
+        name: action.name,
+        title: action.title,
+        icon: action.icon
+      };
+      if (action.ipcTarget && action.ipcAction) {
+        item.ipcTarget = action.ipcTarget;
+        item.ipcAction = action.ipcAction;
+      } else if (action.danger) {
+        item.action = makeConfirmedSystemAction(action.title, action.cmd);
+      } else {
+        item.action = makeDetachedSystemAction(action.cmd);
+      }
+      items.push(item);
+    }
+    items = items.concat([
       { category: "Capture", name: "Screenshot (Area)", icon: "󰹑", action: () => Quickshell.execDetached(["screenshot.sh", "area", "--satty"]) },
       { category: "Capture", name: "Screenshot (Display)", icon: "󰍹", action: () => Quickshell.execDetached(["screenshot.sh", "screen", "--satty"]) },
       { category: "Capture", name: "Color Picker", icon: "󰏘", action: () => Quickshell.execDetached(["hyprpicker", "-a"]) },
       { category: "Toggles", name: "Toggle Bluetooth", icon: "󰂯", action: () => { if (Bluetooth.defaultAdapter) Bluetooth.defaultAdapter.enabled = !Bluetooth.defaultAdapter.enabled; } },
-      { category: "Toggles", name: "Toggle Night Light", icon: "󰖔", action: () => Quickshell.execDetached(["os-toggle-nightlight"]) },
-      { category: "Controls", name: "Open Audio Controls", icon: "󰕾", ipcTarget: "Shell", ipcAction: "toggleAudioMenu" },
-      { category: "Controls", name: "Open Network Controls", icon: "󰖩", ipcTarget: "Shell", ipcAction: "toggleNetworkMenu" },
-      { category: "Controls", name: "Open Command Center", icon: "󰒓", ipcTarget: "Shell", ipcAction: "toggleControls" },
+      { category: "Toggles", name: "Toggle Night Light", icon: "󰖔", action: () => Quickshell.execDetached(["os-toggle-nightlight"]) }
+    ]);
+    for (var j = 0; j < controlActions.length; ++j) {
+      var control = controlActions[j];
+      items.push({
+        category: control.category,
+        name: control.name,
+        title: control.title,
+        icon: control.icon,
+        ipcTarget: control.ipcTarget,
+        ipcAction: control.ipcAction
+      });
+    }
+    items = items.concat([
       { category: "Utilities", name: "System Monitor (btop)", icon: "󰄨", action: () => Quickshell.execDetached(["kitty", "-e", "btop"]) },
       { category: "Utilities", name: "Audio Settings", icon: "󰕾", action: () => Quickshell.execDetached(["kitty", "-e", "wiremix"]) }
-    ];
+    ]);
+    allItems = items;
     filterItems();
   }
 
@@ -2258,7 +2330,7 @@ PanelWindow {
       return;
     }
     if (mode === "system") {
-      Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleControls"]);
+      runShellEntryAction("commandCenter");
       close();
       return;
     }
@@ -2536,15 +2608,15 @@ PanelWindow {
     function clearMetrics() { launcherRoot.clearLauncherMetrics(); }
     function redetectFilesBackend() { launcherRoot.forceRedetectFileSearchBackend(true, function(_) {}); }
     function diagnosticReset() { launcherRoot.diagnosticReset(); }
-    function filesBackendStatus() { return JSON.stringify(launcherRoot.filesBackendStatusObject()); }
-    function drunCategoryState() { return JSON.stringify(launcherRoot.drunCategoryStateObject()); }
-    function escapeActionState() { return JSON.stringify(launcherRoot.escapeActionStateObject()); }
-    function diagnosticSetSearchText(text: string) { return launcherRoot.diagnosticSetSearchText(text); }
-    function diagnosticSetDrunCategoryFilter(categoryKey: string) { return launcherRoot.diagnosticSetDrunCategoryFilter(categoryKey); }
-    function invokeEscapeAction() {
-      var action = launcherRoot.escapeActionStateObject().action;
-      var handled = launcherRoot.handleEscapeAction();
-      return JSON.stringify({
+    function filesBackendStatus(): string { return JSON.stringify(launcherRoot.filesBackendStatusObject()); }
+    function drunCategoryState(): string { return JSON.stringify(launcherRoot.drunCategoryStateObject()); }
+    function escapeActionState(): string { return JSON.stringify(launcherRoot.escapeActionStateObject()); }
+    function diagnosticSetSearchText(text: string): string { return launcherRoot.diagnosticSetSearchText(text); }
+    function diagnosticSetDrunCategoryFilter(categoryKey: string): string { return launcherRoot.diagnosticSetDrunCategoryFilter(categoryKey); }
+    function invokeEscapeAction(): string {
+        var action = launcherRoot.escapeActionStateObject().action;
+        var handled = launcherRoot.handleEscapeAction();
+        return JSON.stringify({
         handled: handled === true,
         action: action,
         state: launcherRoot.escapeActionStateObject()
@@ -2574,6 +2646,7 @@ PanelWindow {
     border.color: Colors.border
     border.width: 1
     scale: launcherRoot.scaleValue
+    transform: Translate { y: launcherRoot.yOffset }
     clip: true
 
     // Anti-flicker: track mouse movement after open to enable hover-select

@@ -128,10 +128,37 @@ launcher_action_available() {
   printf '%s' "${show_output}" | rg -q "function ${action}\\("
 }
 
+ensure_live_instance() {
+  local attempt discovered
+  for attempt in 1 2; do
+    discovered="$(discover_reachable_instance || true)"
+    if [[ -n "${discovered}" ]]; then
+      instance_id="${discovered}"
+      return 0
+    fi
+    if (( attempt == 1 )); then
+      if command -v systemctl >/dev/null 2>&1; then
+        systemctl --user restart quickshell >/dev/null 2>&1 || true
+        sleep 2
+      fi
+    fi
+  done
+  return 1
+}
+
 require_literal() {
   local needle="$1"
   local label="$2"
   if ! rg -n -F -- "$needle" "$launcher_qml" >/dev/null 2>&1; then
+    status_payload_valid=0
+    errors+=("status payload contract missing: ${label}")
+  fi
+}
+
+require_pattern() {
+  local pattern="$1"
+  local label="$2"
+  if ! rg -n --pcre2 -- "$pattern" "$launcher_qml" >/dev/null 2>&1; then
     status_payload_valid=0
     errors+=("status payload contract missing: ${label}")
   fi
@@ -176,12 +203,12 @@ main() {
   require_literal 'function clearMetrics() { launcherRoot.clearLauncherMetrics(); }' "Launcher.clearMetrics IPC mapping"
   require_literal 'function redetectFilesBackend() { launcherRoot.forceRedetectFileSearchBackend(true, function(_) {}); }' "Launcher.redetectFilesBackend IPC mapping"
   require_literal 'function diagnosticReset() { launcherRoot.diagnosticReset(); }' "Launcher.diagnosticReset IPC mapping"
-  require_literal 'function filesBackendStatus() { return JSON.stringify(launcherRoot.filesBackendStatusObject()); }' "Launcher.filesBackendStatus IPC mapping"
-  require_literal 'function drunCategoryState() { return JSON.stringify(launcherRoot.drunCategoryStateObject()); }' "Launcher.drunCategoryState IPC mapping"
-  require_literal 'function escapeActionState() { return JSON.stringify(launcherRoot.escapeActionStateObject()); }' "Launcher.escapeActionState IPC mapping"
-  require_literal 'function diagnosticSetSearchText(text: string) { return launcherRoot.diagnosticSetSearchText(text); }' "Launcher.diagnosticSetSearchText IPC mapping"
-  require_literal 'function diagnosticSetDrunCategoryFilter(categoryKey: string) { return launcherRoot.diagnosticSetDrunCategoryFilter(categoryKey); }' "Launcher.diagnosticSetDrunCategoryFilter IPC mapping"
-  require_literal 'function invokeEscapeAction() {' "Launcher.invokeEscapeAction IPC mapping"
+  require_pattern 'function filesBackendStatus\(\)(?:: string)? \{ return JSON\.stringify\(launcherRoot\.filesBackendStatusObject\(\)\); \}' "Launcher.filesBackendStatus IPC mapping"
+  require_pattern 'function drunCategoryState\(\)(?:: string)? \{ return JSON\.stringify\(launcherRoot\.drunCategoryStateObject\(\)\); \}' "Launcher.drunCategoryState IPC mapping"
+  require_pattern 'function escapeActionState\(\)(?:: string)? \{ return JSON\.stringify\(launcherRoot\.escapeActionStateObject\(\)\); \}' "Launcher.escapeActionState IPC mapping"
+  require_pattern 'function diagnosticSetSearchText\(text: string\)(?:: string)? \{ return launcherRoot\.diagnosticSetSearchText\(text\); \}' "Launcher.diagnosticSetSearchText IPC mapping"
+  require_pattern 'function diagnosticSetDrunCategoryFilter\(categoryKey: string\)(?:: string)? \{ return launcherRoot\.diagnosticSetDrunCategoryFilter\(categoryKey\); \}' "Launcher.diagnosticSetDrunCategoryFilter IPC mapping"
+  require_pattern 'function invokeEscapeAction\(\)(?:: string)? \{' "Launcher.invokeEscapeAction IPC mapping"
   require_literal 'function drunCategoryStateObject() {' "drunCategoryState payload helper"
   require_literal 'function escapeActionStateObject() {' "escapeActionState payload helper"
   require_literal 'action = "resetQuery";' "escapeActionState resetQuery branch"
@@ -212,7 +239,7 @@ main() {
   fi
 
   if [[ -z "${instance_id}" ]]; then
-    instance_id="$(discover_reachable_instance || true)"
+    ensure_live_instance || true
   fi
 
   if [[ -z "${instance_id}" ]]; then
@@ -223,9 +250,13 @@ main() {
 
   local show_output
   if ! show_output="$(quickshell ipc --id "${instance_id}" show 2>&1)"; then
-    errors+=("failed to query IPC metadata for instance ${instance_id}: ${show_output}")
-    emit_result 0
-    exit 1
+    instance_id=""
+    ensure_live_instance || true
+    if [[ -z "${instance_id}" ]] || ! show_output="$(quickshell ipc --id "${instance_id}" show 2>&1)"; then
+      errors+=("failed to query IPC metadata for instance ${instance_id:-<none>}: ${show_output}")
+      emit_result 0
+      exit 1
+    fi
   fi
 
   if ! printf '%s' "${show_output}" | rg -q "target Launcher"; then

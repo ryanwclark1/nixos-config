@@ -258,9 +258,26 @@ Scope {
                       width: Math.max(280, Math.min(400, overviewWindow.width / Math.max(overviewWindow.screenWorkspaces.length, 1) - Colors.spacingXL))
                       height: parent.height
                       radius: Colors.radiusLarge
-                      color: Colors.surface
+                      color: Colors.withAlpha(Colors.surface, 0.4)
                       border.color: dropHighlight ? Colors.accent : (isFocused ? Colors.primary : Colors.border)
                       border.width: (dropHighlight || isFocused) ? 2 : 1
+
+                      gradient: Gradient {
+                        orientation: Gradient.Vertical
+                        GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+                        GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+                      }
+
+                      // Inner highlight
+                      Rectangle {
+                        anchors.fill: parent
+                        anchors.margins: 1
+                        radius: parent.radius - 1
+                        color: "transparent"
+                        border.color: Colors.borderLight
+                        border.width: 1
+                        opacity: isFocused ? 0.25 : 0.1
+                      }
 
                       DropArea {
                         anchors.fill: parent
@@ -324,9 +341,20 @@ Scope {
                                 radius: Colors.radiusSmall
                                 color: modelData.is_focused
                                        ? Colors.withAlpha(Colors.primary, 0.15)
-                                       : (cardMouse.containsMouse ? Colors.highlightLight : "transparent")
-                                border.color: modelData.is_focused ? Colors.primary : "transparent"
-                                border.width: modelData.is_focused ? 1 : 0
+                                       : (cardMouse.containsMouse ? Colors.highlightLight : Colors.withAlpha(Colors.surface, 0.25))
+                                border.color: modelData.is_focused ? Colors.primary : (cardMouse.containsMouse ? Colors.border : "transparent")
+                                border.width: 1
+
+                                // Inner highlight
+                                Rectangle {
+                                  anchors.fill: parent
+                                  anchors.margins: 1
+                                  radius: parent.radius - 1
+                                  color: "transparent"
+                                  border.color: Colors.borderLight
+                                  border.width: 1
+                                  opacity: modelData.is_focused ? 0.3 : 0.1
+                                }
 
                                 // Drag-and-drop support
                                 property int windowId: modelData.id

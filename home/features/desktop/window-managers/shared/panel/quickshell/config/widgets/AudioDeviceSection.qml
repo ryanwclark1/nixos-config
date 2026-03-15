@@ -31,10 +31,27 @@ ColumnLayout {
   Rectangle {
     Layout.fillWidth: true
     radius: Colors.radiusMedium
-    color: Colors.cardSurface
+    color: Colors.withAlpha(Colors.surface, 0.4)
     border.color: Colors.border
     border.width: 1
     implicitHeight: controlCol.implicitHeight + 2 * Colors.spacingM
+
+    gradient: Gradient {
+      orientation: Gradient.Vertical
+      GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+      GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+    }
+
+    // Inner highlight
+    Rectangle {
+      anchors.fill: parent
+      anchors.margins: 1
+      radius: parent.radius - 1
+      color: "transparent"
+      border.color: Colors.borderLight
+      border.width: 1
+      opacity: 0.1
+    }
 
     ColumnLayout {
       id: controlCol
@@ -107,10 +124,21 @@ ColumnLayout {
       radius: Colors.radiusMedium
       property bool isDefault: modelData.id === root.defaultDeviceId
       property bool isHovered: deviceHover.containsMouse
-      color: isDefault ? Colors.withAlpha(Colors.primary, 0.16) : (isHovered ? Colors.withAlpha(Colors.primary, 0.12) : Colors.cardSurface)
+      color: isDefault ? Colors.withAlpha(Colors.primary, 0.16) : (isHovered ? Colors.withAlpha(Colors.primary, 0.12) : Colors.withAlpha(Colors.surface, 0.35))
       border.color: isDefault ? Colors.primary : Colors.border
       border.width: 1
       Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+
+      // Inner highlight
+      Rectangle {
+        anchors.fill: parent
+        anchors.margins: 1
+        radius: parent.radius - 1
+        color: "transparent"
+        border.color: Colors.borderLight
+        border.width: 1
+        opacity: deviceCard.isDefault ? 0.3 : 0.15
+      }
 
       RowLayout {
         anchors.fill: parent

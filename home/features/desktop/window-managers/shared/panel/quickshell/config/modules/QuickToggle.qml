@@ -18,8 +18,25 @@ Rectangle {
   border.color: active ? Colors.primary : Colors.border
   border.width: 1
 
+  gradient: Gradient {
+    orientation: Gradient.Vertical
+    GradientStop { position: 0.0; color: active ? Colors.primary : Colors.bgWidget }
+    GradientStop { position: 1.0; color: active ? Qt.darker(Colors.primary, 1.1) : Colors.bgWidget }
+  }
+
+  // Inner subtle highlight border
+  Rectangle {
+    anchors.fill: parent
+    anchors.margins: 1
+    radius: parent.radius - 1
+    color: "transparent"
+    border.color: active ? Colors.withAlpha("#ffffff", 0.25) : Colors.borderLight
+    border.width: 1
+    opacity: active ? 0.4 : 0.15
+  }
+
   opacity: enabled ? 1.0 : 0.4
-  scale: toggleMouse.pressed ? 0.95 : 1.0
+  scale: toggleMouse.pressed ? 0.96 : 1.0
   Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutBack } }
   Behavior on color { ColorAnimation { duration: Colors.durationFast } }
   Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }

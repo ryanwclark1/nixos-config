@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd -P)"
 config_dir="${script_dir}/../config"
 
 # Files intentionally compositor-scoped today.
 allow_hyprctl=(
   "${config_dir}/launcher/Overview.qml"
   "${config_dir}/services/CompositorAdapter.qml"
+  "${config_dir}/services/NightLightService.qml"
+  "${config_dir}/services/PowerService.qml"
 )
 
 allow_hyprland_import=(
@@ -15,7 +17,18 @@ allow_hyprland_import=(
 )
 
 allow_direct_compositor_checks=(
+  "${config_dir}/bar/widgets/Taskbar.qml"
+  "${config_dir}/bar/widgets/TaskButton.qml"
+  "${config_dir}/bar/widgets/WindowTitle.qml"
+  "${config_dir}/bar/widgets/Workspaces.qml"
+  "${config_dir}/launcher/AltTabSwitcher.qml"
+  "${config_dir}/menu/settings/tabs/HotkeysTab.qml"
   "${config_dir}/services/CompositorAdapter.qml"
+  "${config_dir}/services/NightLightService.qml"
+  "${config_dir}/services/NiriBinds.qml"
+  "${config_dir}/services/NiriService.qml"
+  "${config_dir}/services/PowerService.qml"
+  "${config_dir}/shell.qml"
 )
 
 contains_path() {

@@ -176,7 +176,7 @@ Item {
         interval: 500
         running: false
         repeat: false
-        onTriggered: inhibitorPoll.poll()
+        onTriggered: inhibitorPoll.triggerPoll()
       }
     }
   }

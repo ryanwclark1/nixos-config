@@ -6,21 +6,10 @@ import Quickshell.Bluetooth
 QtObject {
     id: root
 
-    readonly property var quickLinkItems: [
-        {
-            id: "audioControls",
-            icon: "󰕾",
-            title: "Audio Controls",
-            subtitle: "Devices, volume, and mute",
-            clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleAudioMenu"]
-        },
-        {
-            id: "networkControls",
-            icon: "󰖩",
-            title: "Network Controls",
-            subtitle: "Wi-Fi, VPN, and Tailscale",
-            clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleNetworkMenu"]
-        },
+    readonly property var quickLinkItems: SystemActionRegistry.actionsByIds([
+        "audioControls",
+        "networkControls"
+    ]).concat([
         {
             id: "screenshotControls",
             icon: "󰩭",
@@ -28,7 +17,7 @@ QtObject {
             subtitle: "Capture region, screen, or fullscreen",
             clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleScreenshotMenu"]
         }
-    ]
+    ])
 
     readonly property var quickToggleItems: [
         {

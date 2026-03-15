@@ -34,9 +34,26 @@ BasePopupMenu {
       Layout.fillWidth: true
       implicitHeight: root.compactMode ? 182 : 132
       radius: Colors.radiusMedium
-      color: Colors.cardSurface
+      color: Colors.withAlpha(Colors.surface, 0.4)
       border.color: Colors.border
       border.width: 1
+
+      gradient: Gradient {
+        orientation: Gradient.Vertical
+        GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+        GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+      }
+
+      // Inner highlight
+      Rectangle {
+        anchors.fill: parent
+        anchors.margins: 1
+        radius: parent.radius - 1
+        color: "transparent"
+        border.color: Colors.borderLight
+        border.width: 1
+        opacity: 0.1
+      }
 
       GridLayout {
         anchors.fill: parent
@@ -123,9 +140,26 @@ BasePopupMenu {
       Layout.fillWidth: true
       implicitHeight: detailsGrid.implicitHeight + Colors.spacingM * 2
       radius: Colors.radiusMedium
-      color: Colors.cardSurface
+      color: Colors.withAlpha(Colors.surface, 0.4)
       border.color: Colors.border
       border.width: 1
+
+      gradient: Gradient {
+        orientation: Gradient.Vertical
+        GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+        GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+      }
+
+      // Inner highlight
+      Rectangle {
+        anchors.fill: parent
+        anchors.margins: 1
+        radius: parent.radius - 1
+        color: "transparent"
+        border.color: Colors.borderLight
+        border.width: 1
+        opacity: 0.1
+      }
 
       GridLayout {
         id: detailsGrid
@@ -196,10 +230,21 @@ BasePopupMenu {
           delegate: Rectangle {
             width: 62
             height: 72
-            radius: Colors.radiusXS
-            color: Colors.cardSurface
+            radius: Colors.radiusMedium
+            color: Colors.withAlpha(Colors.surface, 0.35)
             border.color: Colors.border
             border.width: 1
+
+            // Inner highlight
+            Rectangle {
+              anchors.fill: parent
+              anchors.margins: 1
+              radius: parent.radius - 1
+              color: "transparent"
+              border.color: Colors.borderLight
+              border.width: 1
+              opacity: 0.1
+            }
 
             ColumnLayout {
               anchors.fill: parent
@@ -252,9 +297,20 @@ BasePopupMenu {
         Layout.fillWidth: true
         implicitHeight: root.compactMode ? 78 : 60
         radius: Colors.radiusMedium
-        color: Colors.cardSurface
-        border.color: Colors.border
+        color: forecastHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : Colors.withAlpha(Colors.surface, 0.3)
+        border.color: forecastHover.containsMouse ? Colors.primary : Colors.border
         border.width: 1
+
+        // Inner highlight
+        Rectangle {
+          anchors.fill: parent
+          anchors.margins: 1
+          radius: parent.radius - 1
+          color: "transparent"
+          border.color: Colors.borderLight
+          border.width: 1
+          opacity: forecastHover.containsMouse ? 0.2 : 0.1
+        }
 
         SharedWidgets.StateLayer {
           hovered: forecastHover.containsMouse

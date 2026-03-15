@@ -7,6 +7,8 @@ Item {
   id: root
   width: 30
   height: 30
+  implicitWidth: width
+  implicitHeight: height
 
   property var anchorWindow: null
   property string tooltipText: "Applications"

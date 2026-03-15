@@ -6,10 +6,27 @@ Rectangle {
   id: root
   Layout.fillWidth: true
   Layout.preferredHeight: 80
-  color: Colors.bgWidget
+  color: Colors.withAlpha(Colors.surface, 0.4)
   radius: Colors.radiusMedium
   border.color: Colors.border
   clip: true
+
+  gradient: Gradient {
+    orientation: Gradient.Vertical
+    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+  }
+
+  // Inner highlight
+  Rectangle {
+    anchors.fill: parent
+    anchors.margins: 1
+    radius: parent.radius - 1
+    color: "transparent"
+    border.color: Colors.borderLight
+    border.width: 1
+    opacity: 0.1
+  }
 
   RowLayout {
     anchors.fill: parent

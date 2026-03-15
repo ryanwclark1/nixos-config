@@ -165,12 +165,35 @@ Scope {
                     width: 120
                     height: 100
                     radius: Colors.radiusCard
-                    color: isSelected ? Colors.withAlpha(Colors.primary, 0.25) : Colors.surface
+                    color: isSelected ? Colors.withAlpha(Colors.primary, 0.15) : Colors.withAlpha(Colors.surface, 0.45)
                     border.color: isSelected ? Colors.primary : Colors.border
                     border.width: isSelected ? 2 : 1
-                    scale: isSelected ? 1.08 : 1.0
-                    Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
+                    scale: isSelected ? 1.15 : 1.0
+                    Behavior on scale {
+                      SpringAnimation {
+                        spring: 5.0
+                        damping: 0.3
+                        epsilon: 0.005
+                      }
+                    }
                     Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+
+                    gradient: isSelected ? Gradient {
+                      orientation: Gradient.Vertical
+                      GradientStop { position: 0.0; color: Colors.withAlpha(Colors.primary, 0.1) }
+                      GradientStop { position: 1.0; color: "transparent" }
+                    } : null
+
+                    // Inner highlight
+                    Rectangle {
+                      anchors.fill: parent
+                      anchors.margins: 1
+                      radius: parent.radius - 1
+                      color: "transparent"
+                      border.color: Colors.borderLight
+                      border.width: 1
+                      opacity: isSelected ? 0.3 : 0.1
+                    }
 
                     Column {
                       anchors.centerIn: parent

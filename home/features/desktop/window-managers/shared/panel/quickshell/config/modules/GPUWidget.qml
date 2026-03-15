@@ -5,7 +5,7 @@ import "../widgets" as SharedWidgets
 
 SharedWidgets.CardBase {
   id: root
-  Layout.preferredHeight: 90
+  Layout.preferredHeight: 100
 
   property string vramUsage: "0 / 0 MB"
   property real vramPercent: 0.0
@@ -40,33 +40,33 @@ SharedWidgets.CardBase {
   ColumnLayout {
     Layout.fillWidth: true
     Layout.fillHeight: true
-    spacing: Colors.paddingSmall
+    spacing: Colors.spacingS
 
     Text {
-      text: "GPU STATS"
+      text: "GPU TELEMETRY"
       color: Colors.textDisabled
       font.pixelSize: Colors.fontSizeXS
-      font.weight: Font.Bold
+      font.weight: Font.Black
+      font.letterSpacing: 1.0
       font.capitalization: Font.AllUppercase
     }
 
     RowLayout {
       Layout.fillWidth: true
-      spacing: Colors.spacingLG
+      spacing: Colors.spacingXL
 
       // GPU Load
       ColumnLayout {
         Layout.fillWidth: true; spacing: Colors.spacingXS
         RowLayout {
           Text { 
-            text: "󰢮 Load"
-            color: Colors.text
-            font.pixelSize: Colors.fontSizeSmall
-            font.weight: Font.Medium
+            text: "󰢮  CORE LOAD"
+            color: Colors.textSecondary
+            font.pixelSize: Colors.fontSizeXXS
+            font.weight: Font.Bold
             Layout.fillWidth: true
-            elide: Text.ElideRight
           }
-          Text { text: SystemStatus.gpuUsage; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS }
+          Text { text: SystemStatus.gpuUsage; color: Colors.accent; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Bold; font.family: Colors.fontMono }
         }
         SharedWidgets.MiniProgressBar { value: SystemStatus.gpuPercent; barColor: Colors.accent }
       }
@@ -76,14 +76,13 @@ SharedWidgets.CardBase {
         Layout.fillWidth: true; spacing: Colors.spacingXS
         RowLayout {
           Text { 
-            text: "󰍛 VRAM"
-            color: Colors.text
-            font.pixelSize: Colors.fontSizeSmall
-            font.weight: Font.Medium
+            text: "󰍛  MEMORY"
+            color: Colors.textSecondary
+            font.pixelSize: Colors.fontSizeXXS
+            font.weight: Font.Bold
             Layout.fillWidth: true
-            elide: Text.ElideRight
           }
-          Text { text: root.vramUsage; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS }
+          Text { text: root.vramUsage; color: Colors.primary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Bold; font.family: Colors.fontMono }
         }
         SharedWidgets.MiniProgressBar { value: root.vramPercent; barColor: Colors.primary }
       }

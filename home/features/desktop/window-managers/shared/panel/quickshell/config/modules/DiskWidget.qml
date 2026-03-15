@@ -5,7 +5,7 @@ import "../widgets" as SharedWidgets
 
 SharedWidgets.CardBase {
   id: root
-  Layout.preferredHeight: 90
+  Layout.preferredHeight: 100
 
   property var drives: []
 
@@ -29,19 +29,20 @@ SharedWidgets.CardBase {
   ColumnLayout {
     Layout.fillWidth: true
     Layout.fillHeight: true
-    spacing: Colors.paddingSmall
+    spacing: Colors.spacingS
 
     Text {
-      text: "DISK USAGE"
+      text: "DISK TELEMETRY"
       color: Colors.textDisabled
       font.pixelSize: Colors.fontSizeXS
-      font.weight: Font.Bold
+      font.weight: Font.Black
+      font.letterSpacing: 1.0
       font.capitalization: Font.AllUppercase
     }
 
     RowLayout {
       Layout.fillWidth: true
-      spacing: Colors.spacingLG
+      spacing: Colors.spacingXL
       
       Repeater {
         model: root.drives
@@ -50,14 +51,14 @@ SharedWidgets.CardBase {
           spacing: Colors.spacingXS
           RowLayout {
             Text { 
-              text: "󰋊 " + (modelData.mount === "/" ? "Root" : modelData.mount.replace("/home/", ""))
-              color: Colors.text
-              font.pixelSize: Colors.fontSizeSmall
-              font.weight: Font.Medium
+              text: "󰋊 " + (modelData.mount === "/" ? "ROOT" : modelData.mount.replace("/home/", "").toUpperCase())
+              color: Colors.textSecondary
+              font.pixelSize: Colors.fontSizeXXS
+              font.weight: Font.Bold
               Layout.fillWidth: true
               elide: Text.ElideRight
             }
-            Text { text: modelData.used + " / " + modelData.total; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS }
+            Text { text: modelData.percent; color: Colors.secondary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Bold; font.family: Colors.fontMono }
           }
           SharedWidgets.MiniProgressBar {
             value: Math.min(100, parseInt(modelData.percent, 10) || 0) / 100.0

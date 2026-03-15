@@ -18,21 +18,21 @@ ColumnLayout {
     border.width: 1
     implicitHeight: root.launcher.compactMode ? 116 : 130
 
+    // Inner highlight lives on the card itself, not inside the layout flow.
+    Rectangle {
+      anchors.fill: parent
+      anchors.margins: 1
+      radius: parent.radius - 1
+      color: "transparent"
+      border.color: Colors.borderLight
+      border.width: 1
+      opacity: 0.1
+    }
+
     ColumnLayout {
       anchors.fill: parent
       anchors.margins: Colors.spacingM
       spacing: Colors.spacingM
-
-      // Inner highlight
-      Rectangle {
-        anchors.fill: parent
-        anchors.margins: 1
-        radius: parent.radius - 1
-        color: "transparent"
-        border.color: Colors.borderLight
-        border.width: 1
-        opacity: 0.1
-      }
 
       SharedWidgets.SectionLabel { label: "FEATURED" }
       RowLayout {

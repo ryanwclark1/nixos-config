@@ -284,10 +284,27 @@ PanelWindow {
     id: slidePanel
     width: root.notepadWidth
     height: parent.height
-    color: Colors.bgGlass
+    color: Colors.withAlpha(Colors.surface, 0.96)
     border.color: Colors.border
     border.width: 1
     radius: Colors.radiusLarge
+
+    gradient: Gradient {
+      orientation: Gradient.Vertical
+      GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+      GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+    }
+
+    // Inner highlight
+    Rectangle {
+      anchors.fill: parent
+      anchors.margins: 1
+      radius: parent.radius - 1
+      color: "transparent"
+      border.color: Colors.borderLight
+      border.width: 1
+      opacity: 0.15
+    }
 
     x: root.showContent ? 0 : root.notepadWidth + 10
     opacity: root.showContent ? 1.0 : 0.0
@@ -596,7 +613,7 @@ PanelWindow {
       Rectangle {
         Layout.fillWidth: true
         Layout.fillHeight: true
-        color: Colors.bgWidget
+        color: Colors.withAlpha(Colors.surface, 0.35)
         border.color: notepadText.activeFocus ? Colors.primary : Colors.border
         border.width: notepadText.activeFocus ? 1.5 : 1
         radius: Colors.radiusMedium

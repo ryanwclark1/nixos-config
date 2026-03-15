@@ -19,6 +19,7 @@ singleton RecordingService 1.0 RecordingService.qml
 singleton SpectrumService 1.0 SpectrumService.qml
 singleton ServiceUnitService 1.0 ServiceUnitService.qml
 singleton SystemStatus 1.0 SystemStatus.qml
+singleton SystemActionRegistry 1.0 SystemActionRegistry.qml
 singleton ThemeService 1.0 ThemeService.qml
 singleton ToastService 1.0 ToastService.qml
 singleton WallpaperService 1.0 WallpaperService.qml

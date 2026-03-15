@@ -65,10 +65,27 @@ BasePopupMenu {
         Rectangle {
           Layout.fillWidth: true
           radius: Colors.radiusMedium
-          color: Colors.cardSurface
+          color: Colors.withAlpha(Colors.surface, 0.4)
           border.color: NetworkService.activePrimaryName === "Offline" ? Colors.border : Colors.primary
           border.width: 1
           implicitHeight: root.compactMode ? 126 : 96
+
+          gradient: Gradient {
+            orientation: Gradient.Vertical
+            GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+            GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+          }
+
+          // Inner highlight
+          Rectangle {
+            anchors.fill: parent
+            anchors.margins: 1
+            radius: parent.radius - 1
+            color: "transparent"
+            border.color: Colors.borderLight
+            border.width: 1
+            opacity: 0.1
+          }
 
           ColumnLayout {
             anchors.fill: parent
@@ -261,10 +278,21 @@ BasePopupMenu {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 60
                 radius: Colors.radiusMedium
-                color: Colors.cardSurface
+                color: Colors.withAlpha(Colors.surface, 0.3)
                 border.color: Colors.border
                 border.width: 1
                 clip: true
+
+                // Inner highlight
+                Rectangle {
+                  anchors.fill: parent
+                  anchors.margins: 1
+                  radius: parent.radius - 1
+                  color: "transparent"
+                  border.color: Colors.borderLight
+                  border.width: 1
+                  opacity: 0.1
+                }
 
                 Rectangle {
                   anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom
@@ -319,10 +347,21 @@ BasePopupMenu {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 60
                 radius: Colors.radiusMedium
-                color: Colors.cardSurface
+                color: Colors.withAlpha(Colors.surface, 0.3)
                 border.color: Colors.border
                 border.width: 1
                 clip: true
+
+                // Inner highlight
+                Rectangle {
+                  anchors.fill: parent
+                  anchors.margins: 1
+                  radius: parent.radius - 1
+                  color: "transparent"
+                  border.color: Colors.borderLight
+                  border.width: 1
+                  opacity: 0.1
+                }
 
                 Rectangle {
                   anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom
@@ -534,10 +573,21 @@ BasePopupMenu {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 60
                 radius: Colors.radiusMedium
-                color: Colors.cardSurface
+                color: Colors.withAlpha(Colors.surface, 0.3)
                 border.color: Colors.border
                 border.width: 1
                 clip: true
+
+                // Inner highlight
+                Rectangle {
+                  anchors.fill: parent
+                  anchors.margins: 1
+                  radius: parent.radius - 1
+                  color: "transparent"
+                  border.color: Colors.borderLight
+                  border.width: 1
+                  opacity: 0.1
+                }
 
                 Rectangle {
                   anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom
@@ -630,9 +680,20 @@ BasePopupMenu {
                 radius: Colors.radiusMedium
                 color: networkMouse.containsMouse
                   ? Colors.withAlpha(Colors.primary, 0.12)
-                  : (modelData.active ? Colors.withAlpha(Colors.primary, 0.16) : Colors.cardSurface)
+                  : (modelData.active ? Colors.withAlpha(Colors.primary, 0.16) : Colors.withAlpha(Colors.surface, 0.3))
                 border.color: modelData.active ? Colors.primary : Colors.border
                 border.width: 1
+
+                // Inner highlight
+                Rectangle {
+                  anchors.fill: parent
+                  anchors.margins: 1
+                  radius: parent.radius - 1
+                  color: "transparent"
+                  border.color: Colors.borderLight
+                  border.width: 1
+                  opacity: modelData.active ? 0.25 : 0.1
+                }
 
                 RowLayout {
                   anchors.fill: parent

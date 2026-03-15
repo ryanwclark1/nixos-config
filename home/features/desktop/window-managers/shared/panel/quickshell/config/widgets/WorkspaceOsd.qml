@@ -89,25 +89,51 @@ Scope {
           id: content
           anchors.fill: parent
           radius: Colors.radiusLarge
-          color: Colors.withAlpha(Colors.background, 0.6)
+          color: Colors.withAlpha(Colors.surface, 0.85)
           border.color: Colors.border
           border.width: 1
 
+          gradient: Gradient {
+            orientation: Gradient.Vertical
+            GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+            GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+          }
+
+          // Inner highlight
+          Rectangle {
+            anchors.fill: parent
+            anchors.margins: 1
+            radius: parent.radius - 1
+            color: "transparent"
+            border.color: Colors.borderLight
+            border.width: 1
+            opacity: 0.15
+          }
+
           opacity: _wantVisible ? 1.0 : 0.0
-          scale: _wantVisible ? 1.0 : 0.9
+          scale: _wantVisible ? 1.0 : 0.92
+          transform: Translate { y: _wantVisible ? 0 : 10 }
 
           Behavior on opacity {
             NumberAnimation {
               id: osdFadeAnim
-              duration: _wantVisible ? 160 : 320
-              easing.type: _wantVisible ? Easing.OutQuad : Easing.InCubic
+              duration: _wantVisible ? 200 : 300
+              easing.type: Easing.OutCubic
             }
           }
           Behavior on scale {
-            NumberAnimation {
+            SpringAnimation {
               id: osdScaleAnim
-              duration: _wantVisible ? 240 : 280
-              easing.type: _wantVisible ? Easing.OutCubic : Easing.InCubic
+              spring: 4.5
+              damping: 0.3
+              epsilon: 0.005
+            }
+          }
+          Behavior on transform {
+            SpringAnimation {
+              spring: 4.0
+              damping: 0.35
+              epsilon: 0.005
             }
           }
 

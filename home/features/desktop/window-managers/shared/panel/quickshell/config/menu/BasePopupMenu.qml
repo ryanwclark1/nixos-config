@@ -77,34 +77,50 @@ PopupWindow {
   Rectangle {
     id: surface
     anchors.fill: parent
-    color: Colors.popupSurface
+    color: Colors.withAlpha(Colors.surface, 0.94)
     border.color: Colors.border
     border.width: 1
-    radius: Colors.radiusMedium
+    radius: Colors.radiusLarge
     clip: true
     focus: true
+
+    gradient: Gradient {
+      orientation: Gradient.Vertical
+      GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+      GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+    }
+
+    // Inner subtle highlight border
+    Rectangle {
+      anchors.fill: parent
+      anchors.margins: 1
+      radius: parent.radius - 1
+      color: "transparent"
+      border.color: Colors.borderLight
+      border.width: 1
+      opacity: 0.15
+    }
 
     Keys.onEscapePressed: root.closeRequested()
 
     opacity: root.showContent ? 1.0 : 0.0
-    scale: root.showContent ? 1.0 : 0.95
+    scale: root.showContent ? 1.0 : 0.96
+    transform: Translate {
+      y: root.showContent ? 0 : (root.preferredEdge === "top" ? -10 : 10)
+    }
+
     transformOrigin: {
       if (root.preferredEdge === "bottom") return Item.Bottom;
       if (root.preferredEdge === "left") return Item.Left;
       if (root.preferredEdge === "right") return Item.Right;
       return Item.Top;
     }
-    Behavior on opacity { NumberAnimation { id: _opacAnim; duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
-    Behavior on scale { NumberAnimation { id: _scaleAnim; duration: Colors.durationNormal; easing.type: Easing.OutBack; easing.overshoot: 1.2 } }
-    layer.enabled: (_opacAnim.running || _scaleAnim.running) && root.allowLayer(width, height)
 
-    // Optional surface tint (e.g. for MusicMenu accent color)
-    Rectangle {
-      anchors.fill: parent
-      radius: parent.radius
-      color: root.surfaceTint
-      visible: root.surfaceTint !== Qt.rgba(0,0,0,0) && root.surfaceTint.a > 0
-    }
+    Behavior on opacity { NumberAnimation { id: _opacAnim; duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
+    Behavior on scale { NumberAnimation { id: _scaleAnim; duration: Colors.durationNormal; easing.type: Easing.OutBack; easing.overshoot: 1.1 } }
+    Behavior on transform { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
+
+    layer.enabled: (_opacAnim.running || _scaleAnim.running) && root.allowLayer(width, height)
 
     ColumnLayout {
       anchors.fill: parent
@@ -114,24 +130,28 @@ PopupWindow {
       // ── Header row ──────────────────────────
       RowLayout {
         Layout.fillWidth: true
+        spacing: Colors.spacingM
 
         ColumnLayout {
-          spacing: Colors.spacingXXS
+          Layout.fillWidth: true
+          spacing: 0
           Text {
             text: root.title
             color: Colors.text
             font.pixelSize: Colors.fontSizeXL
-            font.weight: Font.DemiBold
+            font.weight: Font.Bold
+            Layout.fillWidth: true
+            elide: Text.ElideRight
           }
           Text {
             visible: root.subtitle !== ""
             text: root.subtitle
             color: Colors.textSecondary
             font.pixelSize: Colors.fontSizeSmall
+            Layout.fillWidth: true
+            elide: Text.ElideRight
           }
         }
-
-        Item { Layout.fillWidth: true }
 
         // Slot for extra header widgets (buttons, chips, etc.)
         Row {
@@ -139,7 +159,14 @@ PopupWindow {
           spacing: Colors.spacingS
         }
 
-        SharedWidgets.MenuCloseButton { onClicked: root.closeRequested() }
+        SharedWidgets.IconButton {
+          icon: "󰅖"
+          size: 32
+          iconSize: Colors.fontSizeXL
+          iconColor: Colors.textDisabled
+          stateColor: Colors.error
+          onClicked: root.closeRequested()
+        }
       }
 
       // ── Separator ───────────────────────────
@@ -147,6 +174,7 @@ PopupWindow {
         Layout.fillWidth: true
         height: 1
         color: Colors.border
+        opacity: 0.6
       }
 
       // ── Content slot (ColumnLayout for Layout.* props) ──

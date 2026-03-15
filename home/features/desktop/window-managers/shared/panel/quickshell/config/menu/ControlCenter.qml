@@ -214,9 +214,8 @@ PanelWindow {
                             opacity: root.entranceOpacity(0)
                             scale: root.entranceScale(0)
                             transform: Translate { y: root.entranceY(0) }
-                            Behavior on opacity { NumberAnimation { duration: root.entranceDuration(0); delay: root.entranceDelay(0); easing.type: Easing.OutCubic } }
-                            Behavior on scale { NumberAnimation { duration: root.entranceDuration(0); delay: root.entranceDelay(0); easing.type: Easing.OutBack } }
-                            Behavior on transform { NumberAnimation { duration: root.entranceDuration(0); delay: root.entranceDelay(0); easing.type: Easing.OutCubic } }
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(0) } NumberAnimation { duration: root.entranceDuration(0); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(0) } NumberAnimation { duration: root.entranceDuration(0); easing.type: Easing.OutBack } } }
 
                             Repeater {
                                 model: ControlCenterRegistry.quickLinkItems
@@ -236,9 +235,8 @@ PanelWindow {
                             transform: Translate { y: root.entranceY(1) }
                             visible: opacity > 0
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { NumberAnimation { duration: root.entranceDuration(1); delay: root.entranceDelay(1); easing.type: Easing.OutCubic } }
-                            Behavior on scale { NumberAnimation { duration: root.entranceDuration(1); delay: root.entranceDelay(1); easing.type: Easing.OutBack } }
-                            Behavior on transform { NumberAnimation { duration: root.entranceDuration(1); delay: root.entranceDelay(1); easing.type: Easing.OutCubic } }
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(1) } NumberAnimation { duration: root.entranceDuration(1); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(1) } NumberAnimation { duration: root.entranceDuration(1); easing.type: Easing.OutBack } } }
                         }
 
                         // Quick Toggles Grid
@@ -252,9 +250,8 @@ PanelWindow {
                             transform: Translate { y: root.entranceY(2) }
                             visible: opacity > 0
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { NumberAnimation { duration: root.entranceDuration(2); delay: root.entranceDelay(2); easing.type: Easing.OutCubic } }
-                            Behavior on scale { NumberAnimation { duration: root.entranceDuration(2); delay: root.entranceDelay(2); easing.type: Easing.OutBack } }
-                            Behavior on transform { NumberAnimation { duration: root.entranceDuration(2); delay: root.entranceDelay(2); easing.type: Easing.OutCubic } }
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(2) } NumberAnimation { duration: root.entranceDuration(2); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(2) } NumberAnimation { duration: root.entranceDuration(2); easing.type: Easing.OutBack } } }
 
                             Repeater {
                                 model: ControlCenterRegistry.visibleQuickToggleItems
@@ -262,8 +259,12 @@ PanelWindow {
                                     required property var modelData
                                     icon: modelData.icon
                                     label: modelData.label
-                                    active: ControlCenterRegistry.quickToggleActive(modelData.id, root.manager)
-                                    onClicked: ControlCenterRegistry.toggleQuickToggle(modelData.id, root.manager)
+                                    active: !!root.manager && ControlCenterRegistry.quickToggleActive(modelData.id, root.manager)
+                                    onClicked: {
+                                        if (!root.manager)
+                                            return;
+                                        ControlCenterRegistry.toggleQuickToggle(modelData.id, root.manager);
+                                    }
                                 }
                             }
                         }
@@ -276,9 +277,8 @@ PanelWindow {
                             scale: root.entranceScale(3)
                             transform: Translate { y: root.entranceY(3) }
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { NumberAnimation { duration: root.entranceDuration(3); delay: root.entranceDelay(3); easing.type: Easing.OutCubic } }
-                            Behavior on scale { NumberAnimation { duration: root.entranceDuration(3); delay: root.entranceDelay(3); easing.type: Easing.OutBack } }
-                            Behavior on transform { NumberAnimation { duration: root.entranceDuration(3); delay: root.entranceDelay(3); easing.type: Easing.OutCubic } }
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(3) } NumberAnimation { duration: root.entranceDuration(3); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(3) } NumberAnimation { duration: root.entranceDuration(3); easing.type: Easing.OutBack } } }
 
                             Text {
                                 text: "PLUGINS"
@@ -321,9 +321,8 @@ PanelWindow {
                             scale: root.entranceScale(4)
                             transform: Translate { y: root.entranceY(4) }
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { NumberAnimation { duration: root.entranceDuration(4); delay: root.entranceDelay(4); easing.type: Easing.OutCubic } }
-                            Behavior on scale { NumberAnimation { duration: root.entranceDuration(4); delay: root.entranceDelay(4); easing.type: Easing.OutBack } }
-                            Behavior on transform { NumberAnimation { duration: root.entranceDuration(4); delay: root.entranceDelay(4); easing.type: Easing.OutCubic } }
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(4) } NumberAnimation { duration: root.entranceDuration(4); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(4) } NumberAnimation { duration: root.entranceDuration(4); easing.type: Easing.OutBack } } }
                         }
 
                         // Sliders
@@ -335,9 +334,8 @@ PanelWindow {
                             transform: Translate { y: root.entranceY(5) }
                             visible: opacity > 0
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { NumberAnimation { duration: root.entranceDuration(5); delay: root.entranceDelay(5); easing.type: Easing.OutCubic } }
-                            Behavior on scale { NumberAnimation { duration: root.entranceDuration(5); delay: root.entranceDelay(5); easing.type: Easing.OutBack } }
-                            Behavior on transform { NumberAnimation { duration: root.entranceDuration(5); delay: root.entranceDelay(5); easing.type: Easing.OutCubic } }
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(5) } NumberAnimation { duration: root.entranceDuration(5); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(5) } NumberAnimation { duration: root.entranceDuration(5); easing.type: Easing.OutBack } } }
 
                             ColumnLayout {
                                 Layout.fillWidth: true
@@ -509,9 +507,8 @@ PanelWindow {
                             transform: Translate { y: root.entranceY(6) }
                             visible: opacity > 0
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { NumberAnimation { duration: root.entranceDuration(6); delay: root.entranceDelay(6); easing.type: Easing.OutCubic } }
-                            Behavior on scale { NumberAnimation { duration: root.entranceDuration(6); delay: root.entranceDelay(6); easing.type: Easing.OutBack } }
-                            Behavior on transform { NumberAnimation { duration: root.entranceDuration(6); delay: root.entranceDelay(6); easing.type: Easing.OutCubic } }
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(6) } NumberAnimation { duration: root.entranceDuration(6); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(6) } NumberAnimation { duration: root.entranceDuration(6); easing.type: Easing.OutBack } } }
                             Rectangle {
                                 Layout.fillWidth: true
                                 height: 60
@@ -568,9 +565,8 @@ PanelWindow {
                             transform: Translate { y: root.entranceY(7) }
                             visible: opacity > 0
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { NumberAnimation { duration: root.entranceDuration(7); delay: root.entranceDelay(7); easing.type: Easing.OutCubic } }
-                            Behavior on scale { NumberAnimation { duration: root.entranceDuration(7); delay: root.entranceDelay(7); easing.type: Easing.OutBack } }
-                            Behavior on transform { NumberAnimation { duration: root.entranceDuration(7); delay: root.entranceDelay(7); easing.type: Easing.OutCubic } }
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(7) } NumberAnimation { duration: root.entranceDuration(7); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(7) } NumberAnimation { duration: root.entranceDuration(7); easing.type: Easing.OutBack } } }
                         }
                         ProcessWidget {
                             opacity: root.entranceOpacity(8)
@@ -578,9 +574,8 @@ PanelWindow {
                             transform: Translate { y: root.entranceY(8) }
                             visible: opacity > 0
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { NumberAnimation { duration: root.entranceDuration(8); delay: root.entranceDelay(8); easing.type: Easing.OutCubic } }
-                            Behavior on scale { NumberAnimation { duration: root.entranceDuration(8); delay: root.entranceDelay(8); easing.type: Easing.OutBack } }
-                            Behavior on transform { NumberAnimation { duration: root.entranceDuration(8); delay: root.entranceDelay(8); easing.type: Easing.OutCubic } }
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(8) } NumberAnimation { duration: root.entranceDuration(8); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(8) } NumberAnimation { duration: root.entranceDuration(8); easing.type: Easing.OutBack } } }
                         }
                         NetworkGraphs {
                             opacity: root.entranceOpacity(9)
@@ -588,9 +583,8 @@ PanelWindow {
                             transform: Translate { y: root.entranceY(9) }
                             visible: opacity > 0
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { NumberAnimation { duration: root.entranceDuration(9); delay: root.entranceDelay(9); easing.type: Easing.OutCubic } }
-                            Behavior on scale { NumberAnimation { duration: root.entranceDuration(9); delay: root.entranceDelay(9); easing.type: Easing.OutBack } }
-                            Behavior on transform { NumberAnimation { duration: root.entranceDuration(9); delay: root.entranceDelay(9); easing.type: Easing.OutCubic } }
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(9) } NumberAnimation { duration: root.entranceDuration(9); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(9) } NumberAnimation { duration: root.entranceDuration(9); easing.type: Easing.OutBack } } }
                         }
                         DiskWidget {
                             opacity: root.entranceOpacity(10)
@@ -598,9 +592,8 @@ PanelWindow {
                             transform: Translate { y: root.entranceY(10) }
                             visible: opacity > 0
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { NumberAnimation { duration: root.entranceDuration(10); delay: root.entranceDelay(10); easing.type: Easing.OutCubic } }
-                            Behavior on scale { NumberAnimation { duration: root.entranceDuration(10); delay: root.entranceDelay(10); easing.type: Easing.OutBack } }
-                            Behavior on transform { NumberAnimation { duration: root.entranceDuration(10); delay: root.entranceDelay(10); easing.type: Easing.OutCubic } }
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(10) } NumberAnimation { duration: root.entranceDuration(10); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(10) } NumberAnimation { duration: root.entranceDuration(10); easing.type: Easing.OutBack } } }
                         }
                         GPUWidget {
                             opacity: root.entranceOpacity(11)
@@ -608,9 +601,8 @@ PanelWindow {
                             transform: Translate { y: root.entranceY(11) }
                             visible: opacity > 0
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { NumberAnimation { duration: root.entranceDuration(11); delay: root.entranceDelay(11); easing.type: Easing.OutCubic } }
-                            Behavior on scale { NumberAnimation { duration: root.entranceDuration(11); delay: root.entranceDelay(11); easing.type: Easing.OutBack } }
-                            Behavior on transform { NumberAnimation { duration: root.entranceDuration(11); delay: root.entranceDelay(11); easing.type: Easing.OutCubic } }
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(11) } NumberAnimation { duration: root.entranceDuration(11); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(11) } NumberAnimation { duration: root.entranceDuration(11); easing.type: Easing.OutBack } } }
                         }
                         UpdateWidget {
                             opacity: root.entranceOpacity(12)
@@ -618,9 +610,8 @@ PanelWindow {
                             transform: Translate { y: root.entranceY(12) }
                             visible: opacity > 0
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { NumberAnimation { duration: root.entranceDuration(12); delay: root.entranceDelay(12); easing.type: Easing.OutCubic } }
-                            Behavior on scale { NumberAnimation { duration: root.entranceDuration(12); delay: root.entranceDelay(12); easing.type: Easing.OutBack } }
-                            Behavior on transform { NumberAnimation { duration: root.entranceDuration(12); delay: root.entranceDelay(12); easing.type: Easing.OutCubic } }
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(12) } NumberAnimation { duration: root.entranceDuration(12); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(12) } NumberAnimation { duration: root.entranceDuration(12); easing.type: Easing.OutBack } } }
                         }
                         ScratchpadWidget {
                             opacity: root.entranceOpacity(13)
@@ -628,9 +619,8 @@ PanelWindow {
                             transform: Translate { y: root.entranceY(13) }
                             visible: opacity > 0
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { NumberAnimation { duration: root.entranceDuration(13); delay: root.entranceDelay(13); easing.type: Easing.OutCubic } }
-                            Behavior on scale { NumberAnimation { duration: root.entranceDuration(13); delay: root.entranceDelay(13); easing.type: Easing.OutBack } }
-                            Behavior on transform { NumberAnimation { duration: root.entranceDuration(13); delay: root.entranceDelay(13); easing.type: Easing.OutCubic } }
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(13) } NumberAnimation { duration: root.entranceDuration(13); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(13) } NumberAnimation { duration: root.entranceDuration(13); easing.type: Easing.OutBack } } }
                         }
                     }
                 }
@@ -649,33 +639,21 @@ PanelWindow {
                 opacity: root.entranceOpacity(14)
                 scale: root.entranceScale(14)
                 transform: Translate { y: root.entranceY(14) }
-                Behavior on opacity { NumberAnimation { duration: root.entranceDuration(14); delay: root.entranceDelay(14); easing.type: Easing.OutCubic } }
-                Behavior on scale { NumberAnimation { duration: root.entranceDuration(14); delay: root.entranceDelay(14); easing.type: Easing.OutBack } }
-                Behavior on transform { NumberAnimation { duration: root.entranceDuration(14); delay: root.entranceDelay(14); easing.type: Easing.OutCubic } }
+                Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(14) } NumberAnimation { duration: root.entranceDuration(14); easing.type: Easing.OutCubic } } }
+                Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(14) } NumberAnimation { duration: root.entranceDuration(14); easing.type: Easing.OutBack } } }
                 Repeater {
-                    model: [
-                        {
-                            icon: "󰐥",
-                            cmd: ["systemctl", "poweroff"],
-                            confirm: true
-                        },
-                        {
-                            icon: "󰑐",
-                            cmd: ["systemctl", "reboot"],
-                            confirm: true
-                        },
-                        {
-                            icon: "󰌾",
-                            cmd: CompositorAdapter.lockCommand(),
-                            confirm: false
-                        }
-                    ]
+                    model: SystemActionRegistry.actionsByIds([
+                        "shutdown",
+                        "reboot",
+                        "lock"
+                    ])
                     delegate: Rectangle {
                         required property var modelData
                         required property int index
+                        readonly property bool awaitingConfirm: !!root && root.pendingPowerIndex === index
                         Layout.fillWidth: true
                         height: 40
-                        color: root.pendingPowerIndex === index ? Colors.error : Colors.surface
+                        color: awaitingConfirm ? Colors.error : Colors.surface
                         radius: Colors.radiusXS
                         border.color: Colors.border
                         border.width: 1
@@ -698,11 +676,11 @@ PanelWindow {
 
                         Text {
                             anchors.centerIn: parent
-                            text: root.pendingPowerIndex === index ? "Confirm?" : modelData.icon
-                            color: root.pendingPowerIndex === index ? Colors.background : Colors.text
-                            font.family: root.pendingPowerIndex === index ? undefined : Colors.fontMono
-                            font.pixelSize: root.pendingPowerIndex === index ? Colors.fontSizeSmall : Colors.fontSizeXL
-                            font.weight: root.pendingPowerIndex === index ? Font.Bold : Font.Normal
+                            text: awaitingConfirm ? "Confirm?" : modelData.icon
+                            color: awaitingConfirm ? Colors.background : Colors.text
+                            font.family: awaitingConfirm ? undefined : Colors.fontMono
+                            font.pixelSize: awaitingConfirm ? Colors.fontSizeSmall : Colors.fontSizeXL
+                            font.weight: awaitingConfirm ? Font.Bold : Font.Normal
                         }
 
                         SharedWidgets.StateLayer {
@@ -718,12 +696,12 @@ PanelWindow {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: mouse => {
                                 powerStateLayer.burst(mouse.x, mouse.y);
-                                if (!modelData.confirm) {
+                                if (!modelData.danger) {
                                     // Lock doesn't need confirmation
                                     Quickshell.execDetached(modelData.cmd);
                                     return;
                                 }
-                                if (root.pendingPowerIndex === index) {
+                                if (awaitingConfirm) {
                                     Quickshell.execDetached(modelData.cmd);
                                     root.pendingPowerIndex = -1;
                                     powerConfirmTimer.stop();

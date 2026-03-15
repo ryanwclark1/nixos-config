@@ -23,6 +23,7 @@ Item {
     property string dragTargetSection: ""
     property int dragTargetIndex: -1
     readonly property int overlayInset: root.tightSpacing ? 20 : 40
+    readonly property bool dragReorderEnabled: false
 
     readonly property var selectedBar: {
         var bars = Config.barConfigs || [];
@@ -233,7 +234,7 @@ Item {
                 readonly property string sectionKey: modelData
                 title: root.sectionLabel(sectionKey) + " Section"
                 iconName: sectionKey === "left" ? "󰁍" : (sectionKey === "center" ? "󰇘" : "󰁔")
-                description: "Reorder widgets inside this section, or add new widgets from the searchable picker."
+                description: "Use the arrow buttons to reorder widgets inside this section, or add new widgets from the searchable picker."
                 visible: !!root.selectedBar
 
                 ColumnLayout {
@@ -257,14 +258,15 @@ Item {
                         visible: root.sectionWidgets(sectionKey).length === 0
                         radius: Colors.radiusSmall
                         color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.06)
-                        border.color: root.dragTargetSection === sectionKey && root.dragTargetIndex === 0
+                        border.color: root.dragReorderEnabled && root.dragTargetSection === sectionKey && root.dragTargetIndex === 0
                             ? Colors.primary
                             : Colors.border
-                        border.width: root.dragTargetSection === sectionKey && root.dragTargetIndex === 0 ? 2 : 1
+                        border.width: root.dragReorderEnabled && root.dragTargetSection === sectionKey && root.dragTargetIndex === 0 ? 2 : 1
                         implicitHeight: emptyDropColumn.implicitHeight + Colors.spacingM * 2
 
                         DropArea {
                             anchors.fill: parent
+                            enabled: root.dragReorderEnabled
                             keys: ["bar-widget"]
                             onEntered: function(drag) {
                                 if (root.dragSourceIndex < 0)
@@ -290,16 +292,16 @@ Item {
                             spacing: Colors.spacingXS
 
                             Text {
-                                text: root.dragSourceIndex >= 0 ? "Drop widget here" : "No widgets in this section yet"
+                                text: (root.dragReorderEnabled && root.dragSourceIndex >= 0) ? "Drop widget here" : "No widgets in this section yet"
                                 color: Colors.text
                                 font.pixelSize: Colors.fontSizeSmall
                                 font.weight: Font.Medium
                             }
 
                             Text {
-                                text: root.dragSourceIndex >= 0
+                                text: (root.dragReorderEnabled && root.dragSourceIndex >= 0)
                                     ? "Release to move the dragged widget into " + root.sectionLabel(sectionKey).toLowerCase() + "."
-                                    : "Add one below, or drag a widget here from another section."
+                                    : "Add one below, then use the arrow buttons to place it."
                                 color: Colors.textSecondary
                                 font.pixelSize: Colors.fontSizeXS
                                 wrapMode: Text.WordWrap
@@ -327,7 +329,7 @@ Item {
                                     right: parent.right
                                     top: parent.top
                                 }
-                                visible: widgetRow.dropBeforeActive
+                                visible: root.dragReorderEnabled && widgetRow.dropBeforeActive
                                 height: 10
                                 radius: Colors.radiusXXS
                                 color: Colors.withAlpha(Colors.primary, 0.22)
@@ -338,6 +340,7 @@ Item {
 
                             DropArea {
                                 anchors.fill: parent
+                                enabled: root.dragReorderEnabled
                                 keys: ["bar-widget"]
                                 onEntered: function(drag) {
                                     if (root.dragSourceIndex < 0)
@@ -417,7 +420,9 @@ Item {
                                             }
 
                                             Text {
-                                                text: "Use the arrow buttons to reorder within this section."
+                                                text: root.dragReorderEnabled
+                                                    ? "Use the arrow buttons to reorder within this section. Drag/drop is still being refined."
+                                                    : "Use the arrow buttons to reorder within this section."
                                                 color: Colors.textSecondary
                                                 font.pixelSize: Colors.fontSizeXS
                                                 Layout.fillWidth: true
@@ -488,7 +493,7 @@ Item {
                                 width: widgetRow.width
                                 height: widgetRow.height
                                 visible: false
-                                Drag.active: dragHandle.drag.active
+                                Drag.active: root.dragReorderEnabled && dragHandle.drag.active
                                 Drag.source: dragProxy
                                 Drag.hotSpot.x: width / 2
                                 Drag.hotSpot.y: height / 2
@@ -505,10 +510,12 @@ Item {
                                     topMargin: Colors.spacingS
                                 }
                                 hoverEnabled: true
+                                enabled: root.dragReorderEnabled
+                                visible: root.dragReorderEnabled
                                 acceptedButtons: Qt.LeftButton
-                                drag.target: card
+                                drag.target: root.dragReorderEnabled ? card : undefined
                                 drag.axis: Drag.YAxis
-                                cursorShape: Qt.OpenHandCursor
+                                cursorShape: drag.active ? Qt.ClosedHandCursor : Qt.OpenHandCursor
                                 onPressed: {
                                     root.dragSection = widgetRow.sectionKey;
                                     root.dragSourceIndex = widgetRow.index;
@@ -562,6 +569,7 @@ Item {
                         height: 12
                         radius: Colors.radiusXXS
                         visible: root.sectionWidgets(sectionKey).length > 0
+                            && root.dragReorderEnabled
                             && root.dragSourceIndex >= 0
                             && root.dragTargetSection === sectionKey
                             && root.dragTargetIndex === root.sectionWidgets(sectionKey).length
@@ -573,7 +581,8 @@ Item {
                     DropArea {
                         Layout.fillWidth: true
                         height: root.sectionWidgets(sectionKey).length > 0 ? 28 : 0
-                        visible: root.sectionWidgets(sectionKey).length > 0
+                        visible: root.dragReorderEnabled && root.sectionWidgets(sectionKey).length > 0
+                        enabled: root.dragReorderEnabled
                         keys: ["bar-widget"]
                         onEntered: function(drag) {
                             if (root.dragSourceIndex < 0)
@@ -594,7 +603,7 @@ Item {
 
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
-                            text: root.dragSourceIndex >= 0 ? "Drop at end of " + root.sectionLabel(sectionKey).toLowerCase() : ""
+                            text: root.dragReorderEnabled && root.dragSourceIndex >= 0 ? "Drop at end of " + root.sectionLabel(sectionKey).toLowerCase() : ""
                             color: Colors.textSecondary
                             font.pixelSize: Colors.fontSizeXS
                         }

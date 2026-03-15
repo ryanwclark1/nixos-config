@@ -15,9 +15,20 @@ Rectangle {
     Layout.fillWidth: true
     implicitHeight: Math.max(minimumHeight, contentRow.implicitHeight + contentInset * 2)
     radius: Colors.radiusXS
-    color: root.active ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, root.activeBackgroundAlpha) : Colors.modalFieldSurface
+    color: root.active ? Colors.withAlpha(Colors.primary, 0.12) : Colors.withAlpha(Colors.surface, 0.35)
     border.color: root.active ? Colors.primary : Colors.border
     border.width: 1
+
+    // Inner highlight
+    Rectangle {
+      anchors.fill: parent
+      anchors.margins: 1
+      radius: parent.radius - 1
+      color: "transparent"
+      border.color: Colors.borderLight
+      border.width: 1
+      opacity: root.active ? 0.3 : 0.1
+    }
 
     Behavior on color {
         ColorAnimation {

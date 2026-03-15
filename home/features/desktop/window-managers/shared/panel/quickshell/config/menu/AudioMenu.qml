@@ -67,10 +67,27 @@ BasePopupMenu {
       Rectangle {
         Layout.fillWidth: true
         radius: Colors.radiusMedium
-        color: Colors.cardSurface
+        color: Colors.withAlpha(Colors.surface, 0.4)
         border.color: Colors.border
         border.width: 1
         implicitHeight: appCol.implicitHeight + 2 * Colors.spacingM
+
+        gradient: Gradient {
+          orientation: Gradient.Vertical
+          GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+          GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+        }
+
+        // Inner highlight
+        Rectangle {
+          anchors.fill: parent
+          anchors.margins: 1
+          radius: parent.radius - 1
+          color: "transparent"
+          border.color: Colors.borderLight
+          border.width: 1
+          opacity: 0.1
+        }
 
         ColumnLayout {
           id: appCol

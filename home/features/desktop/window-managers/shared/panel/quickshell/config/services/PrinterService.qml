@@ -132,6 +132,6 @@ QtObject {
 
   // Force an immediate refresh (called when PrinterMenu opens)
   function refresh() {
-    printerPoll.poll();
+    printerPoll.triggerPoll();
   }
 }

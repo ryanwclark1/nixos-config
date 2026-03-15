@@ -22,7 +22,16 @@ Rectangle {
   readonly property var compactEntries: buildCompactEntries()
 
   Layout.fillHeight: true
-  color: Colors.modalSidebarSurface
+  color: Colors.withAlpha(Colors.surface, 0.25)
+
+  Rectangle {
+    anchors.right: parent.right
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    width: 1
+    color: Colors.border
+    opacity: 0.5
+  }
 
   property var expandedCategories: ({})
 

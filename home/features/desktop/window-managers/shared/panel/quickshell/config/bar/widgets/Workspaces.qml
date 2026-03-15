@@ -47,12 +47,24 @@ Rectangle {
     var activeId = -1;
     var all = NiriService.allWorkspaces;
 
-    // Pre-compute window counts per workspace (O(windows) instead of O(ws × windows))
-    var windowCounts = {};
+    // Pre-compute window metadata per workspace for mini-map
+    var wsWindows = {};
     var allWindows = NiriService.windows;
     for (var j = 0; j < allWindows.length; j++) {
-      var wsId = allWindows[j].workspace_id;
-      windowCounts[wsId] = (windowCounts[wsId] || 0) + 1;
+      var win = allWindows[j];
+      var wsId = win.workspace_id;
+      if (!wsWindows[wsId]) wsWindows[wsId] = [];
+      
+      // Basic bounding box data for mini-map (normalized 0-1)
+      if (win.width > 0 && win.height > 0) {
+        wsWindows[wsId].push({
+          x: win.x,
+          y: win.y,
+          w: win.width,
+          h: win.height,
+          active: !!win.is_focused
+        });
+      }
     }
 
     for (var i = 0; i < all.length; i++) {
@@ -64,7 +76,8 @@ Rectangle {
         id: intId,
         name: String(ws.name || intId),
         urgent: !!(ws.is_urgent || ws.urgent),
-        windows: windowCounts[ws.id] || 0
+        windows: (wsWindows[ws.id] || []).length,
+        windowData: wsWindows[ws.id] || []
       });
     }
 

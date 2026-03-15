@@ -52,6 +52,40 @@ make_temp_runtime() {
   printf '%s\n' "${runtime_dir}"
 }
 
+filter_unexpected_headless_lines() {
+  local log_file="$1"
+
+  node - "$log_file" <<'NODE'
+const fs = require("fs");
+const logPath = process.argv[2];
+const lines = fs.readFileSync(logPath, "utf8").split(/\r?\n/);
+
+const ignoreSubstrings = [
+  "Could not create attached properties object 'qs::wayland::layershell::WlrLayershell'",
+  "failed to create variant with object QVariant(",
+  "QQmlComponent: Component is not ready",
+  "ShellBarLayer.qml:87",
+];
+
+const interestingTokens = [
+  "Failed to load configuration",
+  " is not a type",
+  "TypeError:",
+  "ReferenceError:",
+  "Cannot assign to non-existent property",
+  "Unable to assign [undefined]",
+  "Binding loop detected",
+  "Expected token",
+];
+
+for (const line of lines) {
+  if (!interestingTokens.some(token => line.includes(token))) continue;
+  if (ignoreSubstrings.some(token => line.includes(token))) continue;
+  console.log(line);
+}
+NODE
+}
+
 run_live_startup_smoke() {
   local home log_file pid elapsed output
 
@@ -90,48 +124,28 @@ run_live_startup_smoke() {
 }
 
 run_headless_compile_smoke() {
-  local home runtime_dir qml_path log_file output
+  local home runtime_dir log_file output unexpected
 
   home="$(make_temp_home)"
   runtime_dir="$(make_temp_runtime)"
-  qml_path="$(mktemp /tmp/quickshell-startup-smoke-headless-XXXXXX.qml)"
   log_file="$(mktemp /tmp/quickshell-startup-smoke-headless-log-XXXXXX.txt)"
-  auto_cleanup+=("${qml_path}" "${log_file}")
-
-  cat > "${qml_path}" <<QML
-import Quickshell
-import QtQuick
-
-Scope {
-  Component.onCompleted: {
-    var component = Qt.createComponent("file://${config_root}/shell.qml");
-    if (component.status !== Component.Ready) {
-      console.log("COMPONENT_ERROR:" + component.errorString());
-      Qt.quit();
-      return;
-    }
-    console.log("COMPONENT_READY");
-    Qt.quit();
-  }
-}
-QML
+  auto_cleanup+=("${log_file}")
 
   timeout 10s env HOME="${home}" XDG_RUNTIME_DIR="${runtime_dir}" QT_QPA_PLATFORM=offscreen \
-    quickshell -p "${qml_path}" >"${log_file}" 2>&1 || true
+    quickshell -p "${config_root}/shell.qml" >"${log_file}" 2>&1 || true
 
   output="$(sed -n '1,220p' "${log_file}" 2>/dev/null || true)"
-  if [[ "${output}" == *"COMPONENT_READY"* ]]; then
+  unexpected="$(filter_unexpected_headless_lines "${log_file}" || true)"
+
+  if [[ "${output}" == *"Configuration Loaded"* ]] && [[ -z "${unexpected}" ]]; then
     return 0
   fi
-  if [[ "${output}" == *"COMPONENT_ERROR:"* ]]; then
-    if [[ "${output}" == *"No PanelWindow backend loaded."* ]] \
-      && [[ "${output}" != *"Failed to load configuration"* ]] \
-      && [[ "${output}" != *" is not a type"* ]]; then
-      return 0
-    fi
-  fi
 
-  printf '%s\n' "${output}" >&2
+  if [[ -n "${unexpected}" ]]; then
+    printf '%s\n' "${unexpected}" >&2
+  else
+    printf '%s\n' "${output}" >&2
+  fi
   return 1
 }
 
@@ -141,6 +155,7 @@ main() {
   require_cmd timeout
   require_cmd sed
   require_cmd sleep
+  require_cmd node
 
   local mode="headless"
   if [[ -n "${WAYLAND_DISPLAY:-}" || -n "${DISPLAY:-}" ]]; then

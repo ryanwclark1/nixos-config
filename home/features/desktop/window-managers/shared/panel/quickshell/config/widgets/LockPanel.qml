@@ -11,6 +11,10 @@ Item {
 
   property var lockContext: null
   property bool compact: Config.lockScreenCompact
+  readonly property var lockPowerButtons: SystemActionRegistry.actionsByIds([
+    "reboot",
+    "shutdown"
+  ])
 
   // Session action countdown
   property string pendingAction: ""
@@ -39,15 +43,15 @@ Item {
     countdownTimer.stop();
     switch (action) {
       case "logout":
-        Quickshell.execDetached(["loginctl", "terminate-session", "self"]); break;
+        Quickshell.execDetached(SystemActionRegistry.commandFor(action)); break;
       case "suspend":
         Quickshell.execDetached(["systemctl", "suspend"]); break;
       case "hibernate":
         Quickshell.execDetached(["systemctl", "hibernate"]); break;
       case "reboot":
-        Quickshell.execDetached(["systemctl", "reboot"]); break;
+        Quickshell.execDetached(SystemActionRegistry.commandFor(action)); break;
       case "shutdown":
-        Quickshell.execDetached(["systemctl", "poweroff"]); break;
+        Quickshell.execDetached(SystemActionRegistry.commandFor(action)); break;
     }
     cancelTimer();
   }
@@ -376,10 +380,22 @@ Item {
         sourceComponent: RowLayout {
           spacing: Colors.spacingS
 
-          SessionButton { icon: "󰍃"; label: "Logout"; action: "logout" }
+          SessionButton {
+            readonly property var actionMeta: SystemActionRegistry.actionById("logout") || ({})
+            icon: String(actionMeta.icon || "")
+            label: String(actionMeta.label || actionMeta.name || "")
+            action: "logout"
+          }
           SessionButton { icon: "󰤄"; label: "Suspend"; action: "suspend" }
-          SessionButton { icon: "󰜗"; label: "Reboot"; action: "reboot" }
-          SessionButton { icon: "󰐥"; label: "Shutdown"; action: "shutdown" }
+          Repeater {
+            model: root.lockPowerButtons
+            delegate: SessionButton {
+              required property var modelData
+              icon: String(modelData.icon || "")
+              label: String(modelData.label || modelData.name || "")
+              action: String(modelData.id || "")
+            }
+          }
         }
       }
     }

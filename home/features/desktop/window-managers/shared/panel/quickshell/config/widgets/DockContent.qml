@@ -52,10 +52,27 @@ Item {
     anchors.centerIn: parent
     width: root.vertical ? 56 : ((dockLayoutLoader.item ? dockLayoutLoader.item.implicitWidth : 0) + 40)
     height: root.vertical ? ((dockLayoutLoader.item ? dockLayoutLoader.item.implicitHeight : 0) + 40) : 56
-    color: Colors.bgGlass
-    radius: 18
+    color: Colors.withAlpha(Colors.surface, 0.85)
+    radius: 20
     border.color: Colors.border
     border.width: 1
+
+    gradient: Gradient {
+      orientation: root.vertical ? Gradient.Horizontal : Gradient.Vertical
+      GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+      GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+    }
+
+    // Inner highlight
+    Rectangle {
+      anchors.fill: parent
+      anchors.margins: 1
+      radius: parent.radius - 1
+      color: "transparent"
+      border.color: Colors.borderLight
+      border.width: 1
+      opacity: 0.15
+    }
   }
 
   Loader {

@@ -1,0 +1,78 @@
+[
+  {
+    "signature": "legacy-script-dir-resolution",
+    "severity": "warning",
+    "kind": "repo_pattern",
+    "safe_fix_id": "normalize-script-dir",
+    "description": "Known CDPATH-sensitive script_dir pattern still exists in quickshell verification scripts.",
+    "repro": "bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/compositor-verify.sh --ci"
+  },
+  {
+    "signature": "compositor-static-check-failed",
+    "severity": "error",
+    "kind": "command",
+    "safe_fix_id": "",
+    "description": "Quickshell compositor guard or fixture checks failed after bootstrap verification.",
+    "repro": "bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/compositor-verify.sh --ci"
+  },
+  {
+    "signature": "quickshell-service-inactive",
+    "severity": "error",
+    "kind": "service",
+    "safe_fix_id": "",
+    "description": "quickshell.service is not active in the user session.",
+    "repro": "systemctl --user status quickshell.service"
+  },
+  {
+    "signature": "quickshell-ipc-unreachable",
+    "severity": "error",
+    "kind": "runtime",
+    "safe_fix_id": "",
+    "description": "quickshell.service is active but no reachable IPC socket was found.",
+    "repro": "quickshell ipc list || find \"$XDG_RUNTIME_DIR/quickshell/by-id\" -mindepth 1 -maxdepth 1 -type d"
+  },
+  {
+    "signature": "quickshell-settings-probe-failed",
+    "severity": "error",
+    "kind": "probe",
+    "safe_fix_id": "",
+    "description": "The health loop could not open and close SettingsHub via quickshell IPC.",
+    "repro": "quickshell ipc --id <instance> call SettingsHub openTabScrolled wallpaper 0"
+  },
+  {
+    "signature": "quickshell-control-center-probe-failed",
+    "severity": "error",
+    "kind": "probe",
+    "safe_fix_id": "",
+    "description": "The health loop could not open and close the control center via quickshell IPC.",
+    "repro": "quickshell ipc --id <instance> call Shell openSurface controlCenter"
+  },
+  {
+    "signature": "quickshell-notification-center-probe-failed",
+    "severity": "error",
+    "kind": "probe",
+    "safe_fix_id": "",
+    "description": "The health loop could not open and close the notification center via quickshell IPC.",
+    "repro": "quickshell ipc --id <instance> call Shell openSurface notifCenter"
+  },
+  {
+    "signature": "quickshell-layer-texture-warning",
+    "severity": "error",
+    "kind": "journal",
+    "safe_fix_id": "",
+    "threshold": 3,
+    "pattern": "QSGRhiLayer: Unsupported size requested",
+    "description": "Repeated render-layer texture allocation warnings were found in the quickshell journal.",
+    "repro": "journalctl --user -u quickshell --since '15 minutes ago' --no-pager | rg 'QSGRhiLayer: Unsupported size requested'"
+  },
+  {
+    "signature": "quickshell-qml-runtime-error",
+    "severity": "error",
+    "kind": "journal",
+    "safe_fix_id": "",
+    "threshold": 1,
+    "pattern": "(ReferenceError|TypeError|Error loading|Failed to load|Cannot assign|QML .* Error)",
+    "description": "A QML/runtime error was found in the quickshell journal.",
+    "repro": "journalctl --user -u quickshell --since '15 minutes ago' --no-pager | rg 'ReferenceError|TypeError|Error loading|Failed to load|Cannot assign|QML .* Error'"
+  }
+]

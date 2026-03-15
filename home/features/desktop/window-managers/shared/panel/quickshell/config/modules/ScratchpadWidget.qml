@@ -57,8 +57,22 @@ SharedWidgets.CardBase {
         delegate: Rectangle {
           id: itemRect
           Layout.fillWidth: true; height: 35
-          color: Colors.highlightLight
+          color: scratchHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.12) : Colors.withAlpha(Colors.surface, 0.35)
+          border.color: Colors.border
+          border.width: 1
           radius: Colors.radiusXXS
+          Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+
+          // Inner highlight
+          Rectangle {
+            anchors.fill: parent
+            anchors.margins: 1
+            radius: parent.radius - 1
+            color: "transparent"
+            border.color: Colors.borderLight
+            border.width: 1
+            opacity: scratchHover.containsMouse ? 0.25 : 0.1
+          }
 
           RowLayout {
             anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: Colors.paddingSmall

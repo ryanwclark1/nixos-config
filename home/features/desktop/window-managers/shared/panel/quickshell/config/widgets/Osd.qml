@@ -284,26 +284,52 @@ Scope {
           id: content
           anchors.fill: parent
           radius: Config.osdStyle === "pill" ? height / 2 : 28
-          color: Colors.bgGlass
+          color: Colors.withAlpha(Colors.surface, 0.85)
           border.color: root.osdColor
           border.width: 2
 
+          gradient: Gradient {
+            orientation: Gradient.Vertical
+            GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+            GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+          }
+
+          // Inner highlight
+          Rectangle {
+            anchors.fill: parent
+            anchors.margins: 1
+            radius: parent.radius - 1
+            color: "transparent"
+            border.color: Colors.borderLight
+            border.width: 1
+            opacity: 0.15
+          }
+
           opacity: root.shouldShowOsd ? 1.0 : 0.0
-          scale: root.shouldShowOsd ? 1.0 : 0.9
+          scale: root.shouldShowOsd ? 1.0 : 0.92
+          transform: Translate { y: root.shouldShowOsd ? 0 : 10 }
 
           // Asymmetric enter/exit: fast-in, slow-out
           Behavior on opacity {
             NumberAnimation {
               id: osdFadeAnim
-              duration: root.shouldShowOsd ? Colors.durationFast : Colors.durationFast * 2
-              easing.type: root.shouldShowOsd ? Easing.OutQuad : Easing.InCubic
+              duration: root.shouldShowOsd ? 200 : 300
+              easing.type: Easing.OutCubic
             }
           }
           Behavior on scale {
-            NumberAnimation {
+            SpringAnimation {
               id: osdScaleAnim
-              duration: root.shouldShowOsd ? 240 : 280
-              easing.type: root.shouldShowOsd ? Easing.OutCubic : Easing.InCubic
+              spring: 4.5
+              damping: 0.3
+              epsilon: 0.005
+            }
+          }
+          Behavior on transform {
+            SpringAnimation {
+              spring: 4.0
+              damping: 0.35
+              epsilon: 0.005
             }
           }
 

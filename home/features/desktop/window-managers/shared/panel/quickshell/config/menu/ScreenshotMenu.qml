@@ -28,9 +28,20 @@ BasePopupMenu {
                 Layout.fillWidth: true
                 implicitHeight: 48
                 radius: Colors.radiusMedium
-                color: mouseArea.containsMouse ? Colors.withAlpha(Colors.primary, 0.12) : Colors.cardSurface
-                border.color: Colors.border
+                color: mouseArea.containsMouse ? Colors.withAlpha(Colors.primary, 0.12) : Colors.withAlpha(Colors.surface, 0.35)
+                border.color: mouseArea.containsMouse ? Colors.primary : Colors.border
                 border.width: 1
+
+                // Inner highlight
+                Rectangle {
+                    anchors.fill: parent
+                    anchors.margins: 1
+                    radius: parent.radius - 1
+                    color: "transparent"
+                    border.color: Colors.borderLight
+                    border.width: 1
+                    opacity: mouseArea.containsMouse ? 0.25 : 0.1
+                }
 
                 RowLayout {
                     anchors.fill: parent
@@ -92,8 +103,21 @@ BasePopupMenu {
             Layout.preferredWidth: 32
             Layout.preferredHeight: 32
             radius: Colors.radiusXS
-            color: Colors.cardSurface
+            color: Colors.withAlpha(Colors.surface, 0.5)
+            border.color: Colors.border
+            border.width: 1
             clip: true
+
+            // Inner highlight
+            Rectangle {
+                anchors.fill: parent
+                anchors.margins: 1
+                radius: parent.radius - 1
+                color: "transparent"
+                border.color: Colors.borderLight
+                border.width: 1
+                opacity: 0.1
+            }
 
             Image {
                 anchors.fill: parent

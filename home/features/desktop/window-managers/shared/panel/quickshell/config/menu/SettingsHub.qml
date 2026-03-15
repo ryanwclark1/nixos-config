@@ -186,11 +186,28 @@ PanelWindow {
     anchors.left: parent.left
     anchors.topMargin: settingsRoot.edgeMargins.top + Math.max(settingsRoot.gutterY, (settingsRoot.usableHeight - height) / 2)
     anchors.leftMargin: settingsRoot.edgeMargins.left + Math.max(settingsRoot.gutterX, (settingsRoot.usableWidth - width) / 2)
-    color: Colors.modalSurface
+    color: Colors.withAlpha(Colors.surface, 0.96)
     border.color: Colors.border
     border.width: 1
     radius: Colors.radiusLarge
     clip: true
+
+    gradient: Gradient {
+      orientation: Gradient.Vertical
+      GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+      GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+    }
+
+    // Inner highlight
+    Rectangle {
+      anchors.fill: parent
+      anchors.margins: 1
+      radius: parent.radius - 1
+      color: "transparent"
+      border.color: Colors.borderLight
+      border.width: 1
+      opacity: 0.15
+    }
 
     focus: settingsRoot.isOpen
     onVisibleChanged: if (visible) forceActiveFocus()

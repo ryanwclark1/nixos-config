@@ -79,8 +79,8 @@ QtObject {
     }
 
     function refresh() {
-        userPoll.poll();
-        systemPoll.poll();
+        userPoll.triggerPoll();
+        systemPoll.triggerPoll();
     }
 
     function pendingActionForUnit(scope, unitName) {

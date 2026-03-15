@@ -92,21 +92,37 @@ Item {
   Rectangle {
     id: bg
     anchors.fill: parent
-    color: Colors.bgGlass
+    color: Colors.withAlpha(Colors.surface, 0.85)
     border.color: root.borderColor
     border.width: 1
     radius: Colors.radiusMedium
     clip: true
 
-    // Progress bar at top
+    gradient: Gradient {
+      orientation: Gradient.Vertical
+      GradientStop { position: 0.0; color: type === "error" ? Colors.withAlpha(Colors.error, 0.1) : Colors.surfaceGradientStart }
+      GradientStop { position: 1.0; color: type === "error" ? Colors.withAlpha(Colors.error, 0.02) : Colors.surfaceGradientEnd }
+    }
+
+    // Inner highlight
+    Rectangle {
+      anchors.fill: parent
+      anchors.margins: 1
+      radius: parent.radius - 1
+      color: "transparent"
+      border.color: Colors.borderLight
+      border.width: 1
+      opacity: 0.15
+    }
+
+    // Progress bar at bottom
     Rectangle {
       width: parent.width * root.progress
       height: 3
       color: root.borderColor
-      opacity: 0.8
-      anchors.top: parent.top
+      opacity: 0.6
+      anchors.bottom: parent.bottom
       anchors.left: parent.left
-      radius: Colors.radiusMedium
     }
 
     Column {

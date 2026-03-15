@@ -111,17 +111,33 @@ PopupWindow {
 
   Rectangle {
     id: tooltipBody
-    width: Math.min(textItem.implicitWidth + 20, root.maxWidth)
-    height: textItem.implicitHeight + 14
-    radius: Colors.radiusXS
-    color: Colors.bgGlass
+    width: Math.min(textItem.implicitWidth + 24, root.maxWidth)
+    height: textItem.implicitHeight + 16
+    radius: Colors.radiusSmall
+    color: Colors.withAlpha(Colors.surface, 0.95)
     border.color: Colors.border
     border.width: 1
+
+    opacity: root.ready ? 1.0 : 0.0
+    scale: root.ready ? 1.0 : 0.92
+    Behavior on opacity { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
+    Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutBack } }
+
+    // Subtly lighter inner border
+    Rectangle {
+      anchors.fill: parent
+      anchors.margins: 1
+      radius: parent.radius - 1
+      color: "transparent"
+      border.color: Colors.borderLight
+      border.width: 1
+      opacity: 0.1
+    }
 
     Text {
       id: textItem
       anchors.centerIn: parent
-      width: Math.min(implicitWidth, root.maxWidth - 20)
+      width: Math.min(implicitWidth, root.maxWidth - 24)
       text: root.tooltipText
       color: Colors.text
       font.pixelSize: Colors.fontSizeSmall

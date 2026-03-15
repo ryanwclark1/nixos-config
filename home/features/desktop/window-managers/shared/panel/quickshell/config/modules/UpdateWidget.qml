@@ -92,7 +92,7 @@ SharedWidgets.CardBase {
           "Update check complete",
           "Total available updates: " + root.totalUpdates
         );
-        cachePoll.poll();
+        cachePoll.triggerPoll();
       } else {
         root.lastRunFailed = true;
         root.statusText = "Status: update check failed";
@@ -197,12 +197,22 @@ SharedWidgets.CardBase {
 
     Rectangle {
       width: 80; height: 32; radius: Colors.radiusXXS
-      color: root.isChecking ? Colors.surface : Colors.primary
+      color: root.isChecking ? Colors.withAlpha(Colors.surface, 0.4) : Colors.withAlpha(Colors.primary, 0.18)
+      border.color: root.isChecking ? Colors.border : Colors.primary
+      border.width: 1
       Behavior on color { ColorAnimation { duration: Colors.durationFast } }
-      Text {
-        anchors.centerIn: parent
-        text: root.isChecking ? "Checking" : "Refresh"
-        color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Bold
+      scale: refreshHover.pressed ? 0.96 : 1.0
+      Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutBack } }
+
+      // Inner highlight
+      Rectangle {
+        anchors.fill: parent
+        anchors.margins: 1
+        radius: parent.radius - 1
+        color: "transparent"
+        border.color: root.isChecking ? Colors.borderLight : Colors.withAlpha("#ffffff", 0.2)
+        border.width: 1
+        opacity: refreshHover.containsMouse ? 0.25 : 0.1
       }
       SharedWidgets.StateLayer {
         id: refreshStateLayer

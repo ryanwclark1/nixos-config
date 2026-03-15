@@ -6,6 +6,9 @@
 }:
 
 let
+  repoRoot = builtins.toString ../../../../../../..;
+  healthRules = pkgs.writeText "qs-health-rules.json" (builtins.readFile ./scripts/health-rules.json);
+
   appsScript = pkgs.writeShellScriptBin "qs-apps" ''
     PATH="${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.findutils}/bin:${pkgs.gnugrep}/bin:$PATH"
     ${builtins.readFile ./scripts/apps.sh}
@@ -109,6 +112,19 @@ let
   compositorVerifyScript = pkgs.writeShellScriptBin "qs-compositor-verify" ''
     PATH="${pkgs.ripgrep}/bin:${pkgs.bash}/bin:${pkgs.coreutils}/bin:${pkgs.jq}/bin:${pkgs.gnused}/bin:${pkgs.hyprland}/bin:${pkgs.niri}/bin:$PATH"
     ${builtins.readFile ./scripts/compositor-verify.sh}
+  '';
+
+  healthSafeFixScript = pkgs.writeShellScriptBin "qs-health-safe-fix" ''
+    export QS_REPO_ROOT=${lib.escapeShellArg repoRoot}
+    PATH="${pkgs.ripgrep}/bin:${pkgs.perl}/bin:${pkgs.coreutils}/bin:${pkgs.bash}/bin:$PATH"
+    ${builtins.readFile ./scripts/health-safe-fix.sh}
+  '';
+
+  healthCheckScript = pkgs.writeShellScriptBin "qs-health-check" ''
+    export QS_REPO_ROOT=${lib.escapeShellArg repoRoot}
+    export QS_HEALTH_RULES_FILE=${lib.escapeShellArg healthRules}
+    PATH="${pkgs.quickshell}/bin:${pkgs.jq}/bin:${pkgs.ripgrep}/bin:${pkgs.git}/bin:${pkgs.perl}/bin:${pkgs.findutils}/bin:${pkgs.coreutils}/bin:${pkgs.procps}/bin:${pkgs.systemd}/bin:${pkgs.bash}/bin:$PATH"
+    ${builtins.readFile ./scripts/health-check.sh}
   '';
 
   surfaceResponsiveScript = pkgs.writeShellScriptBin "qs-surface-responsive-check" ''
@@ -228,6 +244,8 @@ let
       compositorSmokeScript
       compositorFixtureScript
       compositorVerifyScript
+      healthSafeFixScript
+      healthCheckScript
       surfaceResponsiveScript
       surfacePreviewScript
       multibarSmokeScript
@@ -330,6 +348,39 @@ EOF
 
       Install = {
         WantedBy = [ "graphical-session.target" ];
+      };
+    };
+
+    systemd.user.services.quickshell-health = {
+      Unit = {
+        Description = "Quickshell health monitor";
+        After = [ "graphical-session.target" "quickshell.service" ];
+        Wants = [ "graphical-session.target" "quickshell.service" ];
+      };
+
+      Service = {
+        Type = "oneshot";
+        ExecStart = "${healthCheckScript}/bin/qs-health-check --apply-safe-fixes";
+        StandardOutput = "journal";
+        StandardError = "journal";
+      };
+    };
+
+    systemd.user.timers.quickshell-health = {
+      Unit = {
+        Description = "Quickshell health monitor timer";
+        Requires = [ "quickshell-health.service" ];
+      };
+
+      Timer = {
+        OnBootSec = "2min";
+        OnUnitActiveSec = "5min";
+        RandomizedDelaySec = "45sec";
+        Persistent = true;
+      };
+
+      Install = {
+        WantedBy = [ "timers.target" ];
       };
     };
   };

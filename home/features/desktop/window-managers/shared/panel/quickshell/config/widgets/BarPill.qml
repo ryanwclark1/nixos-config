@@ -22,6 +22,8 @@ MouseArea {
 
   height: 28
   width: contentContainer.childrenRect.width + horizontalPadding * 2
+  implicitWidth: width
+  implicitHeight: height
   acceptedButtons: Qt.LeftButton | Qt.RightButton
   hoverEnabled: enabled
   cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
@@ -127,12 +129,10 @@ MouseArea {
 
   Item {
     id: contentContainer
-    anchors.centerIn: parent
-    anchors.verticalCenterOffset: -1
+    x: (parent.width - width) / 2
+    y: (parent.height - height) / 2 - 1
     width: childrenRect.width
-    // Keep a stable container height so children can anchor vertically
-    // without creating a childrenRect -> parent.height binding cycle.
-    height: root.height
+    height: children.length > 0 ? children[0].height : 0
   }
 
   BarTooltip {

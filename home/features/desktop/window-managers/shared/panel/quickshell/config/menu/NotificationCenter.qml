@@ -492,7 +492,15 @@ PanelWindow {
           cacheBuffer: 120
           spacing: Colors.spacingS
           delegate: Rectangle {
-            width: ListView.view.width; height: 60; color: Colors.bgWidget; radius: Colors.radiusXS; opacity: 0.7
+            width: ListView.view.width; height: 60; color: Colors.withAlpha(Colors.surface, 0.25); radius: Colors.radiusSmall; opacity: 0.8
+            border.color: Colors.border; border.width: 1
+            
+            // Inner highlight
+            Rectangle {
+              anchors.fill: parent; anchors.margins: 1; radius: parent.radius - 1
+              color: "transparent"; border.color: Colors.borderLight; border.width: 1; opacity: 0.1
+            }
+
             Row {
               anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: Colors.paddingSmall
               Rectangle { width: 32; height: 32; color: "transparent"

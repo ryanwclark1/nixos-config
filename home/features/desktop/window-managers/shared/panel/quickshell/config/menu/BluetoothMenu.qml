@@ -218,9 +218,20 @@ BasePopupMenu {
           implicitHeight: visible ? (root.compactMode ? 56 : 46) : 0
           visible: modelData.connected
           radius: Colors.radiusMedium
-          color: Colors.cardSurface
-          border.color: Colors.primary
+          color: modelData.connected ? Colors.withAlpha(Colors.primary, 0.12) : (connHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : Colors.withAlpha(Colors.surface, 0.35))
+          border.color: modelData.connected ? Colors.primary : Colors.border
           border.width: 1
+
+          // Inner highlight
+          Rectangle {
+            anchors.fill: parent
+            anchors.margins: 1
+            radius: parent.radius - 1
+            color: "transparent"
+            border.color: Colors.borderLight
+            border.width: 1
+            opacity: modelData.connected ? 0.25 : 0.1
+          }
 
           RowLayout {
             anchors.fill: parent
@@ -288,9 +299,20 @@ BasePopupMenu {
           implicitHeight: visible ? (root.compactMode ? 56 : 46) : 0
           visible: modelData.paired && !modelData.connected
           radius: Colors.radiusMedium
-          color: Colors.cardSurface
+          color: pairedHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : Colors.withAlpha(Colors.surface, 0.35)
           border.color: Colors.border
           border.width: 1
+
+          // Inner highlight
+          Rectangle {
+            anchors.fill: parent
+            anchors.margins: 1
+            radius: parent.radius - 1
+            color: "transparent"
+            border.color: Colors.borderLight
+            border.width: 1
+            opacity: 0.1
+          }
 
           RowLayout {
             anchors.fill: parent
@@ -376,9 +398,20 @@ BasePopupMenu {
           implicitHeight: visible ? (root.compactMode ? 56 : 46) : 0
           visible: !modelData.paired && !modelData.connected
           radius: Colors.radiusMedium
-          color: Colors.cardSurface
+          color: availHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : Colors.withAlpha(Colors.surface, 0.35)
           border.color: Colors.border
           border.width: 1
+
+          // Inner highlight
+          Rectangle {
+            anchors.fill: parent
+            anchors.margins: 1
+            radius: parent.radius - 1
+            color: "transparent"
+            border.color: Colors.borderLight
+            border.width: 1
+            opacity: availHover.containsMouse ? 0.2 : 0.1
+          }
 
           RowLayout {
             anchors.fill: parent

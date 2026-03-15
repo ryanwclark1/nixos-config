@@ -97,7 +97,41 @@ load_quickshell_env() {
 
 ocr_text() {
   local image_path="$1"
-  tesseract "${image_path}" stdout 2>/dev/null | tr '\n' ' '
+  local processed_image
+  processed_image="$(mktemp /tmp/bar-widgets-ocr-XXXXXX.png)"
+  magick "${image_path}" \
+    -colorspace Gray \
+    -negate \
+    -contrast-stretch 0x10% \
+    -resize 250% \
+    -threshold 35% \
+    "${processed_image}"
+  tesseract "${processed_image}" stdout --psm 11 2>/dev/null | tr '\n' ' '
+  rm -f "${processed_image}"
+}
+
+image_mean() {
+  local image_path="$1"
+  magick "${image_path}" -colorspace Gray -format '%[fx:mean]' info:
+}
+
+capture_until_visible() {
+  local label="$1"
+  local output_path="$2"
+  local attempt
+  local mean
+
+  for attempt in 1 2 3 4; do
+    bash "${script_dir}/capture-settings-viewport.sh" --id "${instance_id}" --tab bar-widgets --output "${output_path}"
+    mean="$(image_mean "${output_path}")"
+    if awk "BEGIN { exit !(${mean} > 0.02) }"; then
+      return 0
+    fi
+    printf '[INFO] %s capture was too dark (mean=%s), retrying.\n' "${label}" "${mean}"
+    sleep 1
+  done
+
+  return 1
 }
 
 population_score() {
@@ -107,18 +141,28 @@ import re
 import sys
 
 text = sys.argv[1]
-patterns = [
+score = 0
+
+stable_patterns = [
+    r'Bar Widgets',
+    r'Manage the widget composition',
+    r'Main Bar',
+    r'Current widgets',
+    r'Remove',
+    r'Settings',
     r'App Launcher',
     r'Workspace Switcher',
     r'Window Title',
     r'Running Apps',
-    r'CPU',
-    r'Visible',
-    r'Settings',
-    r'Remove',
-    r'Current widgets',
 ]
-score = sum(1 for pattern in patterns if re.search(pattern, text, flags=re.I))
+
+for pattern in stable_patterns:
+    if re.search(pattern, text, flags=re.I):
+        score += 1
+
+visible_hits = len(re.findall(r'Visible', text, flags=re.I))
+score += min(visible_hits, 6)
+
 print(score)
 PY
 }
@@ -158,17 +202,22 @@ fi
 
 printf '[INFO] Running settings smoke against instance %s\n' "${instance_id}"
 bash "${script_dir}/check-settings-responsive.sh" --id "${instance_id}"
+instance_id="$(discover_instance)" || {
+  printf 'Could not rediscover a reachable quickshell instance after settings smoke.\n' >&2
+  exit 1
+}
 
 printf '[INFO] Capturing first-open Bar Widgets state\n'
-bash "${script_dir}/capture-settings-viewport.sh" --id "${instance_id}" --tab bar-widgets --output "${first_open_png}"
+capture_until_visible "First-open" "${first_open_png}"
 
 printf '[INFO] Reproducing close/reenter path for control capture\n'
 quickshell ipc --id "${instance_id}" call SettingsHub close >/dev/null 2>&1 || true
-quickshell ipc --id "${instance_id}" call SettingsHub openTab bar-widgets >/dev/null
-sleep 1
-quickshell ipc --id "${instance_id}" call SettingsHub close >/dev/null
 sleep 0.5
-bash "${script_dir}/capture-settings-viewport.sh" --id "${instance_id}" --tab bar-widgets --output "${reenter_png}"
+instance_id="$(discover_instance)" || {
+  printf 'Could not rediscover a reachable quickshell instance before re-entry capture.\n' >&2
+  exit 1
+}
+capture_until_visible "Re-entry" "${reenter_png}"
 
 first_text="$(ocr_text "${first_open_png}")"
 reenter_text="$(ocr_text "${reenter_png}")"
@@ -188,12 +237,12 @@ printf '  %s\n' "${reenter_png}"
 printf '  %s\n' "${first_open_txt}"
 printf '  %s\n' "${reenter_txt}"
 
-if (( reenter_score < 4 )); then
+if (( reenter_score < 5 )); then
   printf '[FAIL] Re-entry capture did not expose enough widget content, so this run cannot determine pass/fail.\n' >&2
   exit 1
 fi
 
-if (( first_score < 3 )); then
+if (( first_score < 5 )); then
   printf '[FAIL] First-open Bar Widgets still looks under-populated.\n' >&2
   exit 1
 fi

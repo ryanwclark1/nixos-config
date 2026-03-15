@@ -36,13 +36,35 @@ Rectangle {
     width: 180
     height: menuPadding * 2 + contentColumn.implicitHeight
     radius: Colors.radiusMedium
-    color: Colors.popupSurface
+    color: Colors.withAlpha(Colors.surface, 0.96)
     border.color: Colors.border
     border.width: 1
     visible: root.showMenu
     z: 9999
 
-    layer.enabled: showMenu
+    gradient: Gradient {
+      orientation: Gradient.Vertical
+      GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+      GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+    }
+
+    // Inner highlight
+    Rectangle {
+      anchors.fill: parent
+      anchors.margins: 1
+      radius: parent.radius - 1
+      color: "transparent"
+      border.color: Colors.borderLight
+      border.width: 1
+      opacity: 0.15
+    }
+
+    scale: showMenu ? 1.0 : 0.9
+    opacity: showMenu ? 1.0 : 0.0
+    Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutBack; easing.overshoot: 1.1 } }
+    Behavior on opacity { NumberAnimation { duration: Colors.durationSnap } }
+
+    layer.enabled: showMenu || opacity > 0
     layer.smooth: true
 
     function popup(mx, my) {
@@ -179,9 +201,7 @@ Rectangle {
         }
     }
 
-    Behavior on opacity { NumberAnimation { duration: Colors.durationSnap } }
-
     onShowMenuChanged: {
-        opacity = showMenu ? 1.0 : 0.0
+        if (showMenu) forceActiveFocus()
     }
 }

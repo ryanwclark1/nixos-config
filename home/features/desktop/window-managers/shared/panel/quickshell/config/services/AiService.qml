@@ -554,6 +554,41 @@ QtObject {
         return _resolveApiKey(provider || Config.aiProvider).length > 0;
     }
 
+    // ── Context Helpers ─────────────────────────
+    function getActiveWindowTitle() {
+        if (CompositorAdapter.isHyprland) {
+            // Hyprland doesn't have a singleton active window in our service yet, use a quick poll
+            return ""; // Placeholder, will implement via IPC if needed or skip
+        }
+        if (CompositorAdapter.isNiri) {
+            return NiriService.activeWindow ? NiriService.activeWindow.title : "";
+        }
+        return "";
+    }
+
+    property Process _hyprActiveProc: Process {
+        id: hyprActiveProc
+        command: ["hyprctl", "activewindow", "-j"]
+        running: false
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    var data = JSON.parse(this.text);
+                    root.contextWindowTitle = data.title || "";
+                } catch(e) {}
+            }
+        }
+    }
+
+    property string contextWindowTitle: ""
+    function refreshActiveWindowTitle() {
+        if (CompositorAdapter.isHyprland) {
+            hyprActiveProc.running = true;
+        } else if (CompositorAdapter.isNiri) {
+            contextWindowTitle = NiriService.activeWindow ? NiriService.activeWindow.title : "";
+        }
+    }
+
     // ── Auto-title ──────────────────────────────
     function _autoTitle() {
         var conv = activeConversation;

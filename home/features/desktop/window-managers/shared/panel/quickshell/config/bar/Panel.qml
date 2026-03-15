@@ -11,6 +11,12 @@ import "../widgets" as SharedWidgets
 Item {
   id: root
 
+  Gradient {
+    id: barGradient
+    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+  }
+
   SharedWidgets.Ref { service: RecordingService }
   SharedWidgets.Ref { service: PrivacyService }
   SharedWidgets.Ref { service: PrinterService }
@@ -294,8 +300,24 @@ Item {
     color: root.noBackground ? "transparent" : Colors.bgGlass
     opacity: root.noBackground ? 0 : computedOpacity
     radius: floatingBar ? Colors.radiusMedium : 0
+    clip: true
+
+    gradient: (floatingBar && !root.noBackground) ? barGradient : null
+
     border.color: (floatingBar && !root.noBackground) ? Colors.border : "transparent"
     border.width: (floatingBar && !root.noBackground) ? 1 : 0
+
+    // Inner subtle highlight border
+    Rectangle {
+      anchors.fill: parent
+      anchors.margins: 1
+      radius: parent.radius > 0 ? parent.radius - 1 : 0
+      color: "transparent"
+      border.color: Colors.borderLight
+      border.width: 1
+      opacity: 0.15
+      visible: floatingBar && !root.noBackground
+    }
   }
 
   Row {
@@ -690,7 +712,7 @@ Item {
           interval: 500
           running: false
           repeat: false
-          onTriggered: inhibitorPoll.poll()
+          onTriggered: inhibitorPoll.triggerPoll()
         }
       }
     }

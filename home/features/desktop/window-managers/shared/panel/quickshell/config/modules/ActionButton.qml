@@ -11,10 +11,27 @@ Rectangle {
   property var action: null
 
   radius: Colors.radiusXXS
-  height: 20
-  width: Math.max(28, textLabel.implicitWidth + 12)
-  color: Colors.surface
+  height: 22
+  width: Math.max(32, textLabel.implicitWidth + 16)
+  color: btnMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.15) : Colors.withAlpha(Colors.surface, 0.6)
+  border.color: btnMouse.containsMouse ? Colors.primary : Colors.border
+  border.width: 1
   opacity: enabled ? 1.0 : 0.4
+  scale: btnMouse.pressed ? 0.96 : 1.0
+  Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+  Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+  Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutBack } }
+
+  // Inner highlight
+  Rectangle {
+    anchors.fill: parent
+    anchors.margins: 1
+    radius: parent.radius - 1
+    color: "transparent"
+    border.color: Colors.borderLight
+    border.width: 1
+    opacity: btnMouse.containsMouse ? 0.25 : 0.1
+  }
 
   Text {
     id: textLabel

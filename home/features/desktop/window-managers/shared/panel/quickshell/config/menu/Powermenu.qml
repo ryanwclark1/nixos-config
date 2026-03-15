@@ -39,12 +39,7 @@ PanelWindow {
   // ── Keyboard navigation ────────────────────────
   property int currentIndex: -1
 
-  readonly property var actions: [
-    { key: "shutdown", icon: "󰐥", label: "Shutdown", color: Colors.error, danger: true, cmd: ["systemctl", "poweroff"] },
-    { key: "reboot", icon: "󰑐", label: "Reboot", color: Colors.accent, danger: true, cmd: ["systemctl", "reboot"] },
-    { key: "lock", icon: "󰌾", label: "Lock", color: Colors.primary, danger: false, cmd: CompositorAdapter.lockCommand() },
-    { key: "logout", icon: "󰗽", label: "Logout", color: Colors.textSecondary, danger: false, cmd: CompositorAdapter.logoutCommand() }
-  ]
+  readonly property var actions: SystemActionRegistry.sessionActions
 
   // ── Uptime ─────────────────────────────────────
   property string uptimeText: ""
@@ -145,7 +140,7 @@ PanelWindow {
       Rectangle {
         anchors.fill: parent
         color: Colors.background
-        opacity: root.isVisible ? 0.4 : 0.0
+        opacity: root.isVisible ? 0.75 : 0.0
         Behavior on opacity { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutCubic } }
       }
     }
@@ -153,104 +148,130 @@ PanelWindow {
     // Power Menu Content
     ColumnLayout {
       id: contentCol
-      anchors.top: parent.top
-      anchors.left: parent.left
-      anchors.topMargin: root.edgeMargins.top + Math.max(20, (root.usableHeight - height) / 2)
-      anchors.leftMargin: root.edgeMargins.left + Math.max(20, (root.usableWidth - width) / 2)
-      spacing: 40
-      scale: root.isVisible ? 1.0 : 0.9
-      Behavior on scale { NumberAnimation { id: pmScaleAnim; duration: Colors.durationSlow; easing.type: Easing.OutBack } }
+      anchors.centerIn: parent
+      spacing: 48
+      scale: root.isVisible ? 1.0 : 0.94
+      Behavior on scale { NumberAnimation { id: pmScaleAnim; duration: 500; easing.type: Easing.OutBack } }
       opacity: root.isVisible ? 1.0 : 0.0
-      Behavior on opacity { NumberAnimation { id: pmFadeAnim; duration: Colors.durationSlow; easing.type: Easing.OutCubic } }
+      Behavior on opacity { NumberAnimation { id: pmFadeAnim; duration: 400; easing.type: Easing.OutCubic } }
       layer.enabled: pmScaleAnim.running || pmFadeAnim.running
 
-      Text {
-        text: "Power Menu"
-        color: Colors.text
-        font.pixelSize: Colors.fontSizeIcon
-        font.weight: Font.Bold
+      ColumnLayout {
         Layout.alignment: Qt.AlignHCenter
-      }
+        spacing: 4
+        Text {
+          text: "Power Menu"
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeHuge
+          font.weight: Font.Bold
+          font.letterSpacing: -0.5
+          Layout.alignment: Qt.AlignHCenter
+        }
 
-      // Uptime display
-      Text {
-        visible: root.uptimeText !== ""
-        text: "up " + root.uptimeText
-        color: Colors.textDisabled
-        font.pixelSize: Colors.fontSizeMedium
-        font.family: Colors.fontMono
-        Layout.alignment: Qt.AlignHCenter
+        // Uptime display
+        Text {
+          visible: root.uptimeText !== ""
+          text: "system uptime: " + root.uptimeText
+          color: Colors.primary
+          opacity: 0.8
+          font.pixelSize: Colors.fontSizeSmall
+          font.weight: Font.Medium
+          Layout.alignment: Qt.AlignHCenter
+        }
       }
 
       RowLayout {
-        spacing: Colors.spacingLG
+        spacing: Colors.spacingXL
 
         Repeater {
           model: root.actions
 
           delegate: Item {
-            width: 120; height: 120
+            id: actionItem
+            width: 140; height: 140
 
-            property bool isPending: root.timerActive && root.pendingAction === modelData.key
+            property bool isPending: root.timerActive && root.pendingAction === modelData.id
             property bool isFocused: root.currentIndex === index
+            property color actionColor: {
+              switch (modelData.id) {
+              case "shutdown": return Colors.error;
+              case "reboot": return Colors.accent;
+              case "lock": return Colors.primary;
+              case "logout": return Colors.info;
+              case "suspend": return Colors.success;
+              default: return Colors.textSecondary;
+              }
+            }
             property color activeColor: modelData.danger ? Colors.error : Colors.primary
 
-            // Layer 1: Base (stable, never animated)
+            // Staggered entry
+            opacity: root.isVisible ? 1.0 : 0.0
+            scale: root.isVisible ? 1.0 : 0.8
+            transform: Translate { y: root.isVisible ? 0 : 20 }
+            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: index * 40 } NumberAnimation { duration: 400; easing.type: Easing.OutCubic } } }
+            Behavior on scale { SequentialAnimation { PauseAnimation { duration: index * 40 } NumberAnimation { duration: 500; easing.type: Easing.OutBack } } }
+            Behavior on transform { SequentialAnimation { PauseAnimation { duration: index * 40 } NumberAnimation { duration: 450; easing.type: Easing.OutCubic } } }
+
+            // Layer 1: Base
             Rectangle {
               id: baseLayer
               anchors.fill: parent
               radius: Colors.radiusLarge
-              color: Colors.highlightLight
-            }
-
-            // Layer 2: Hover overlay
-            Rectangle {
-              anchors.fill: parent
-              radius: Colors.radiusLarge
-              color: Colors.highlight
-              opacity: mouseArea.containsMouse || parent.isFocused ? 1.0 : 0.0
-              Behavior on opacity { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
-            }
-
-            // Layer 3: Active/pending overlay
-            Rectangle {
-              anchors.fill: parent
-              radius: Colors.radiusLarge
-              color: parent.activeColor
-              opacity: parent.isPending ? 0.3 : 0.0
-              Behavior on opacity { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
-            }
-
-            // Focus/pending border
-            Rectangle {
-              anchors.fill: parent
-              radius: Colors.radiusLarge
-              color: "transparent"
-              border.color: parent.isPending ? parent.activeColor
-                : parent.isFocused ? Colors.primary
-                : mouseArea.containsMouse ? modelData.color
-                : Colors.border
-              border.width: parent.isPending ? 3 : (parent.isFocused ? 2 : 2)
+              color: Colors.withAlpha(Colors.surface, 0.4)
+              border.color: actionItem.isFocused ? actionItem.actionColor : Colors.border
+              border.width: actionItem.isFocused ? 2 : 1
               Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+
+              gradient: Gradient {
+                orientation: Gradient.Vertical
+                GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+                GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+              }
+
+              // Inner highlight
+              Rectangle {
+                anchors.fill: parent
+                anchors.margins: 1
+                radius: parent.radius - 1
+                color: "transparent"
+                border.color: Colors.borderLight
+                border.width: 1
+                opacity: actionItem.isFocused ? 0.3 : 0.1
+              }
+            }
+
+            // Layer 2: Pending indicator (circular progress-like)
+            Rectangle {
+              anchors.fill: parent
+              radius: Colors.radiusLarge
+              color: actionItem.actionColor
+              opacity: actionItem.isPending ? 0.15 : 0.0
+              Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
             }
 
             ColumnLayout {
               anchors.centerIn: parent
-              spacing: Colors.paddingSmall
-              Text {
-                text: isPending ? Math.ceil(root.timeRemaining / 1000).toString() : modelData.icon
-                color: isPending ? parent.parent.activeColor : modelData.color
-                font.family: isPending ? undefined : Colors.fontMono
-                font.pixelSize: isPending ? 36 : 40
-                font.weight: isPending ? Font.Bold : Font.Normal
+              spacing: Colors.spacingM
+              Item {
+                width: 48; height: 48
                 Layout.alignment: Qt.AlignHCenter
+                Text {
+                  anchors.centerIn: parent
+                  text: isPending ? Math.ceil(root.timeRemaining / 1000).toString() : modelData.icon
+                  color: actionItem.isFocused ? Colors.text : actionItem.actionColor
+                  font.family: isPending ? undefined : Colors.fontMono
+                  font.pixelSize: isPending ? 32 : 44
+                  font.weight: isPending ? Font.Bold : Font.Normal
+                  Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+                }
               }
               Text {
                 text: modelData.label
-                color: Colors.text
-                font.pixelSize: Colors.fontSizeMedium
-                font.weight: Font.Medium
+                color: actionItem.isFocused ? Colors.text : Colors.textSecondary
+                font.pixelSize: Colors.fontSizeSmall
+                font.weight: actionItem.isFocused ? Font.Bold : Font.Medium
                 Layout.alignment: Qt.AlignHCenter
+                Behavior on color { ColorAnimation { duration: Colors.durationFast } }
               }
             }
 
@@ -259,21 +280,36 @@ PanelWindow {
               anchors.fill: parent
               hoverEnabled: true
               cursorShape: Qt.PointingHandCursor
-              onClicked: root.startTimer(modelData.key, modelData.cmd)
-              onContainsMouseChanged: {
-                if (containsMouse) root.currentIndex = index;
-              }
+              onClicked: root.startTimer(modelData.id, modelData.cmd)
+              onEntered: root.currentIndex = index
             }
           }
         }
       }
 
-      Text {
-        text: root.timerActive ? "Click again to confirm, ESC to cancel" : "Press ESC to cancel"
-        color: root.timerActive ? Colors.primary : Colors.textDisabled
-        font.pixelSize: Colors.fontSizeMedium
+      Rectangle {
         Layout.alignment: Qt.AlignHCenter
-        Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+        width: 300; height: 40; radius: 20
+        color: Colors.withAlpha(Colors.surface, 0.3)
+        visible: root.timerActive
+        border.color: Colors.border
+        border.width: 1
+
+        Text {
+          anchors.centerIn: parent
+          text: "Click again to confirm, ESC to cancel"
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeSmall
+          font.weight: Font.Medium
+        }
+      }
+
+      Text {
+        visible: !root.timerActive
+        text: "Press ESC to cancel"
+        color: Colors.textDisabled
+        font.pixelSize: Colors.fontSizeSmall
+        Layout.alignment: Qt.AlignHCenter
       }
     }
   }

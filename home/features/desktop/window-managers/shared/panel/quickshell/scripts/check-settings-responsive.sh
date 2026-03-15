@@ -235,7 +235,7 @@ call_ipc() {
   local target="$1"
   shift
   local attempt
-  for attempt in 1 2 3; do
+  for attempt in 1 2 3 4 5 6; do
     if [[ -n "${instance_pid}" ]]; then
       if run_ipc quickshell ipc --pid "${instance_pid}" call "${target}" "$@"; then
         return 0
@@ -246,7 +246,7 @@ call_ipc() {
       fi
     fi
     if ! refresh_instance_binding; then
-      sleep 0.2
+      sleep 0.4
       continue
     fi
     sleep 0.2
@@ -259,41 +259,48 @@ refresh_instance_binding() {
   local refreshed_id=""
   local refreshed_dir=""
   local refreshed_log=""
+  local attempt
 
-  refreshed_pid="$(discover_reachable_pid || true)"
-  if [[ -n "${refreshed_pid}" ]]; then
-    refreshed_dir="$(readlink -f "${runtime_pid_root}/${refreshed_pid}" 2>/dev/null || true)"
-    if [[ -n "${refreshed_dir}" && -S "${refreshed_dir}/ipc.sock" ]]; then
-      refreshed_id="$(shell_id_for_runtime_dir "${refreshed_dir}" || basename "${refreshed_dir}")"
-      instance_pid="${refreshed_pid}"
-      instance_id="${refreshed_id}"
-      instance_dir="${refreshed_dir}"
-      refreshed_log="${instance_dir}/log.log"
-      log_file="${refreshed_log}"
-      if [[ -f "${log_file}" ]]; then
-        start_bytes="$(wc -c < "${log_file}")"
-      else
-        start_bytes=0
+  for attempt in 1 2 3 4 5 6 7 8; do
+    refreshed_pid="$(discover_reachable_pid || true)"
+    if [[ -n "${refreshed_pid}" ]]; then
+      refreshed_dir="$(readlink -f "${runtime_pid_root}/${refreshed_pid}" 2>/dev/null || true)"
+      if [[ -n "${refreshed_dir}" && -S "${refreshed_dir}/ipc.sock" ]]; then
+        refreshed_id="$(shell_id_for_runtime_dir "${refreshed_dir}" || basename "${refreshed_dir}")"
+        instance_pid="${refreshed_pid}"
+        instance_id="${refreshed_id}"
+        instance_dir="${refreshed_dir}"
+        refreshed_log="${instance_dir}/log.log"
+        log_file="${refreshed_log}"
+        if [[ -f "${log_file}" ]]; then
+          start_bytes="$(wc -c < "${log_file}")"
+        else
+          start_bytes=0
+        fi
+        return 0
       fi
-      return 0
     fi
-  fi
 
-  if [[ -n "${instance_id}" ]]; then
-    refreshed_dir="$(resolve_instance_dir "${instance_id}" || true)"
-    if [[ -n "${refreshed_dir}" && -S "${refreshed_dir}/ipc.sock" ]]; then
-      instance_pid=""
-      instance_dir="${refreshed_dir}"
-      refreshed_log="${instance_dir}/log.log"
-      log_file="${refreshed_log}"
-      if [[ -f "${log_file}" ]]; then
-        start_bytes="$(wc -c < "${log_file}")"
-      else
-        start_bytes=0
+    refreshed_id="$(discover_reachable_instance || true)"
+    if [[ -n "${refreshed_id}" ]]; then
+      refreshed_dir="$(resolve_instance_dir "${refreshed_id}" || true)"
+      if [[ -n "${refreshed_dir}" && -S "${refreshed_dir}/ipc.sock" ]]; then
+        instance_pid=""
+        instance_id="${refreshed_id}"
+        instance_dir="${refreshed_dir}"
+        refreshed_log="${instance_dir}/log.log"
+        log_file="${refreshed_log}"
+        if [[ -f "${log_file}" ]]; then
+          start_bytes="$(wc -c < "${log_file}")"
+        else
+          start_bytes=0
+        fi
+        return 0
       fi
-      return 0
     fi
-  fi
+
+    sleep 0.4
+  done
 
   return 1
 }
@@ -338,6 +345,8 @@ main() {
   if [[ -n "${instance_pid}" ]]; then
     if run_ipc quickshell ipc --pid "${instance_pid}" show >/dev/null; then
       pass "IPC reachable for pid ${instance_pid}"
+    elif refresh_instance_binding && [[ -n "${instance_pid}" ]] && run_ipc quickshell ipc --pid "${instance_pid}" show >/dev/null; then
+      pass "IPC reachable for pid ${instance_pid}"
     else
       fail "IPC unreachable for pid ${instance_pid}"
       printf '[INFO] Summary: %d pass, %d warn, %d fail\n' "${pass_count}" "${warn_count}" "${fail_count}"
@@ -346,6 +355,22 @@ main() {
   else
     if run_ipc quickshell ipc --id "${instance_id}" show >/dev/null; then
       pass "IPC reachable for instance ${instance_id}"
+    elif refresh_instance_binding; then
+      if [[ -n "${instance_pid}" ]]; then
+        if run_ipc quickshell ipc --pid "${instance_pid}" show >/dev/null; then
+          pass "IPC reachable for pid ${instance_pid}"
+        else
+          fail "IPC unreachable for instance ${instance_id}"
+          printf '[INFO] Summary: %d pass, %d warn, %d fail\n' "${pass_count}" "${warn_count}" "${fail_count}"
+          exit 1
+        fi
+      elif run_ipc quickshell ipc --id "${instance_id}" show >/dev/null; then
+        pass "IPC reachable for instance ${instance_id}"
+      else
+        fail "IPC unreachable for instance ${instance_id}"
+        printf '[INFO] Summary: %d pass, %d warn, %d fail\n' "${pass_count}" "${warn_count}" "${fail_count}"
+        exit 1
+      fi
     else
       fail "IPC unreachable for instance ${instance_id}"
       printf '[INFO] Summary: %d pass, %d warn, %d fail\n' "${pass_count}" "${warn_count}" "${fail_count}"

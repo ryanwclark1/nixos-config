@@ -9,13 +9,30 @@ Rectangle {
   Layout.fillWidth: true
   Layout.preferredHeight: contentCol.implicitHeight + 24
   visible: Config.controlCenterShowMediaWidget && activePlayers.length > 0
-  color: Colors.bgWidget
+  color: Colors.withAlpha(Colors.surface, 0.4)
   radius: Colors.radiusMedium
   border.color: cardHover.hovered ? Colors.primary : Colors.border
   clip: true
   scale: cardHover.hovered ? 1.01 : 1.0
   Behavior on scale { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutQuint } }
   Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+
+  gradient: Gradient {
+    orientation: Gradient.Vertical
+    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+  }
+
+  // Inner highlight
+  Rectangle {
+    anchors.fill: parent
+    anchors.margins: 1
+    radius: parent.radius - 1
+    color: "transparent"
+    border.color: Colors.borderLight
+    border.width: 1
+    opacity: 0.1
+  }
 
   HoverHandler { id: cardHover }
 
@@ -134,26 +151,41 @@ Rectangle {
             
             // Previous
             MouseArea {
-              width: 24; height: 24
+              id: prevBtn
+              width: 32; height: 32
               cursorShape: Qt.PointingHandCursor
-              Text { text: "󰒮"; color: Colors.text; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL; anchors.centerIn: parent }
+              hoverEnabled: true
+              Text { 
+                text: "󰒮"
+                color: prevBtn.containsMouse ? Colors.primary : Colors.text
+                font.family: Colors.fontMono
+                font.pixelSize: Colors.fontSizeXL
+                anchors.centerIn: parent
+                Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+              }
               onClicked: modelData.previous()
             }
 
             // Play/Pause
             MouseArea {
-              width: 32; height: 32
+              id: playBtn
+              width: 40; height: 40
               cursorShape: Qt.PointingHandCursor
+              hoverEnabled: true
               Rectangle {
                 anchors.fill: parent
                 radius: height / 2
-                color: Colors.surface
+                color: playBtn.containsMouse ? Colors.primary : Colors.withAlpha(Colors.surface, 0.6)
+                border.color: playBtn.containsMouse ? Colors.primary : Colors.border
+                border.width: 1
+                Behavior on color { ColorAnimation { duration: Colors.durationFast } }
                 Text { 
                   text: modelData.playbackState === Mpris.Playing ? "󰏤" : "󰐊"
-                  color: Colors.text
+                  color: playBtn.containsMouse ? Colors.background : Colors.text
                   font.family: Colors.fontMono
-                  font.pixelSize: Colors.fontSizeMedium
+                  font.pixelSize: Colors.fontSizeLarge
                   anchors.centerIn: parent
+                  Behavior on color { ColorAnimation { duration: Colors.durationFast } }
                 }
               }
               onClicked: modelData.playPause()
@@ -161,9 +193,18 @@ Rectangle {
 
             // Next
             MouseArea {
-              width: 24; height: 24
+              id: nextBtn
+              width: 32; height: 32
               cursorShape: Qt.PointingHandCursor
-              Text { text: "󰒭"; color: Colors.text; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL; anchors.centerIn: parent }
+              hoverEnabled: true
+              Text { 
+                text: "󰒭"
+                color: nextBtn.containsMouse ? Colors.primary : Colors.text
+                font.family: Colors.fontMono
+                font.pixelSize: Colors.fontSizeXL
+                anchors.centerIn: parent
+                Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+              }
               onClicked: modelData.next()
             }
           }
