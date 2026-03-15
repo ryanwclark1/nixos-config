@@ -20,6 +20,15 @@ require_literal() {
   fi
 }
 
+require_pattern() {
+  local file="$1"
+  local pattern="$2"
+  local label="$3"
+  if ! rg -n -U --multiline --pcre2 -- "$pattern" "$file" >/dev/null 2>&1; then
+    violations+=("${label} missing in ${file}")
+  fi
+}
+
 # Config/state wiring
 require_literal "$config_qml" 'property bool launcherDrunCategoryFiltersEnabled: true' "drun category filters config property"
 require_literal "$config_persistence_js" '"drunCategoryFiltersEnabled": config.launcherDrunCategoryFiltersEnabled,' "drun category filters config persistence"
@@ -44,7 +53,7 @@ require_literal "$launcher_qml" 'function setDrunCategoryFilter(categoryKey) {' 
 require_literal "$launcher_qml" 'function cycleDrunCategoryFilter(step) {' "launcher category cycle function"
 require_literal "$launcher_qml" 'function selectDrunCategorySlot(slot) {' "launcher category slot selection function"
 require_literal "$launcher_qml" 'function drunCategoryStateObject() {' "launcher category state payload helper"
-require_literal "$launcher_qml" 'function drunCategoryState() {' "launcher category state IPC method"
+require_pattern "$launcher_qml" 'function drunCategoryState\(\)\s*(?::\s*string)?\s*\{' "launcher category state IPC method"
 require_literal "$launcher_qml" 'readonly property string launcherControlHintText: {' "launcher control hint property"
 require_literal "$launcher_qml" 'launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && (event.modifiers & Qt.AltModifier) && !(event.modifiers & Qt.ControlModifier)' "launcher category keyboard handler branch"
 require_literal "$launcher_qml" 'launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && launcherRoot.showLauncherHome && (event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_Tab' "launcher category ctrl+tab keyboard handler branch"

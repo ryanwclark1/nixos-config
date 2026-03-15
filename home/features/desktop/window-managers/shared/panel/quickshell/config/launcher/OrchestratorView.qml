@@ -132,9 +132,9 @@ ColumnLayout {
                     spacing: Colors.spacingL
                     Text { text: "TELEMETRY HEATMAP"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Colors.letterSpacingWide }
                     
-                    SystemGraphs { Layout.fillWidth: true; Layout.preferredHeight: 160 }
-                    GPUWidget { Layout.fillWidth: true }
-                    DiskWidget { Layout.fillWidth: true }
+                    Modules.SystemGraphs { Layout.fillWidth: true; Layout.preferredHeight: 160 }
+                    Modules.GPUWidget { Layout.fillWidth: true }
+                    Modules.DiskWidget { Layout.fillWidth: true }
                     
                     Item { Layout.fillHeight: true }
                 }

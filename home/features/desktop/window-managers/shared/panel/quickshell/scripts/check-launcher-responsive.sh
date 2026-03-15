@@ -227,7 +227,8 @@ discover_reachable_instance() {
 call_ipc() {
   local target="$1"
   local action="$2"
-  quickshell ipc --id "${instance_id}" call "${target}" "${action}"
+  shift 2
+  quickshell ipc --id "${instance_id}" call "${target}" "${action}" "$@"
 }
 
 launcher_action_available() {
@@ -252,7 +253,7 @@ static_checks() {
   require_pattern "$launcher_qml" 'function escapeActionState\(\)\s*(?::\s*string)?\s*\{\s*return JSON\.stringify\(launcherRoot\.escapeActionStateObject\(\)\);\s*\}' "escape action IPC payload mapping"
   require_pattern "$launcher_qml" 'function diagnosticSetSearchText\(text(?::\s*string)?\)\s*(?::\s*string)?\s*\{\s*return launcherRoot\.diagnosticSetSearchText\(text\);\s*\}' "escape action query setter IPC mapping"
   require_pattern "$launcher_qml" 'function diagnosticSetDrunCategoryFilter\(categoryKey(?::\s*string)?\)\s*(?::\s*string)?\s*\{\s*return launcherRoot\.diagnosticSetDrunCategoryFilter\(categoryKey\);\s*\}' "escape action category setter IPC mapping"
-  require_literal "$launcher_qml" 'function invokeEscapeAction() {' "escape action invoker IPC mapping"
+  require_pattern "$launcher_qml" 'function invokeEscapeAction\(\)\s*(?::\s*string)?\s*\{' "escape action invoker IPC mapping"
   require_literal "$launcher_qml" 'function escapeActionStateObject() {' "escape action payload helper"
   require_literal "$launcher_qml" 'visible: launcherRoot.showLauncherHome && launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && launcherRoot.drunCategoryOptions.length > 1' "drun category chip visibility guard"
   require_literal "$system_tab_qml" 'minimumHeight: root.compactMode ? 76 : 44' "settings compact row height"

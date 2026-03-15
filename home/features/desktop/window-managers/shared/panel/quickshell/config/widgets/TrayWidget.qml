@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Services.SystemTray
+import Quickshell.Widgets
 import "../services"
 
 
@@ -24,11 +25,12 @@ Flow {
 
       Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
 
-      IconImage {
+      Image {
         anchors.centerIn: parent
-        implicitWidth: 18
-        implicitHeight: 18
+        width: 18
+        height: 18
         source: modelData.icon || ""
+        asynchronous: true
 
         // Fallback icon if none found
         Text {
@@ -36,7 +38,7 @@ Flow {
           text: "󰏘"
           color: Colors.textSecondary
           font.pixelSize: Colors.fontSizeMedium
-          visible: parent.status !== IconImage.Ready
+          visible: parent.status !== Image.Ready
         }
       }
 

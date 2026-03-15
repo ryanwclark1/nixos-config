@@ -3012,19 +3012,19 @@ PanelWindow {
         function filesBackendStatus(): string {
             return JSON.stringify(launcherRoot.filesBackendStatusObject());
         }
-        function drunCategoryState() {
+        function drunCategoryState(): string {
             return JSON.stringify(launcherRoot.drunCategoryStateObject());
         }
-        function escapeActionState() {
+        function escapeActionState(): string {
             return JSON.stringify(launcherRoot.escapeActionStateObject());
         }
-        function diagnosticSetSearchText(text: string) {
+        function diagnosticSetSearchText(text: string): string {
             return launcherRoot.diagnosticSetSearchText(text);
         }
-        function diagnosticSetDrunCategoryFilter(categoryKey: string) {
+        function diagnosticSetDrunCategoryFilter(categoryKey: string): string {
             return launcherRoot.diagnosticSetDrunCategoryFilter(categoryKey);
         }
-        function invokeEscapeAction() {
+        function invokeEscapeAction(): string {
             var action = launcherRoot.escapeActionStateObject().action;
             var handled = launcherRoot.handleEscapeAction();
             return JSON.stringify({
