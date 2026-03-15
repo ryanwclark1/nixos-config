@@ -23,10 +23,7 @@ Rectangle {
     Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
 
     // Inner highlight
-    Rectangle {
-        anchors.fill: parent; anchors.margins: 1; radius: parent.radius - 1
-        color: "transparent"; border.color: Colors.borderLight; border.width: 1; opacity: 0.1
-    }
+    SharedWidgets.InnerHighlight { }
 
     RowLayout {
         anchors.fill: parent
@@ -37,7 +34,7 @@ Rectangle {
         Text {
             text: "󰍉"
             color: input.activeFocus ? accentColor : Colors.textDisabled
-            font.pixelSize: 20
+            font.pixelSize: Colors.fontSizeXL
             font.family: Colors.fontMono
             Behavior on color { ColorAnimation { duration: Colors.durationFast } }
         }

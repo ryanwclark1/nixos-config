@@ -1,11 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
-import Quickshell
-import Quickshell.Io
-import Quickshell.Wayland
 import "../../services"
 import "../../widgets" as SharedWidgets
-import "." as Widgets
 
 RowLayout {
     id: root
@@ -17,9 +13,8 @@ RowLayout {
     readonly property var activeWindow: {
         if (CompositorAdapter.isNiri && CompositorAdapter.niriActiveWindow)
             return CompositorAdapter.niriActiveWindow;
-        if (CompositorAdapter.isHyprland && typeof ToplevelManager !== "undefined") {
-            return ToplevelManager.activeToplevel;
-        }
+        if (CompositorAdapter.isHyprland && CompositorAdapter.hasToplevelManager)
+            return CompositorAdapter.activeToplevel;
         return null;
     }
 
@@ -30,16 +25,16 @@ RowLayout {
 
     // ── App Icon ───────────────────────────────
     Rectangle {
-        width: 22; height: 22; radius: 6
+        width: 22; height: 22; radius: Colors.radiusXXS
         color: Colors.withAlpha(Colors.surface, 0.4)
         border.color: Colors.border; border.width: 1
         
-        Image {
-            anchors.fill: parent; anchors.margins: 4
-            source: Config.resolveIconSource(root.activeAppId)
-            sourceSize: Qt.size(32, 32)
-            asynchronous: true
-            fillMode: Image.PreserveAspectFit
+        SharedWidgets.AppIcon {
+            anchors.centerIn: parent
+            iconName: root.activeAppId
+            appName: root.activeTitle
+            iconSize: 16
+            fallbackIcon: "󰣆"
         }
     }
 
@@ -53,39 +48,10 @@ RowLayout {
         text: root.activeTitle
     }
 
-    // ── Inline Git Status ──────────────────────
-    Rectangle {
-        id: gitStatus
-        property string branchName: ""
-        visible: !!branchName && (root.activeAppId.toLowerCase().includes("terminal") || root.activeAppId.toLowerCase().includes("ghostty") || root.activeAppId.toLowerCase().includes("kitty") || root.activeTitle.includes("~") || root.activeTitle.includes("/"))
-        
-        implicitWidth: visible ? gitRow.implicitWidth + 12 : 0
-        implicitHeight: 22
-        radius: 11
-        color: Colors.withAlpha(Colors.primary, 0.15)
-        border.color: Colors.withAlpha(Colors.primary, 0.3)
-        border.width: 1
-        
-        SharedWidgets.CommandPoll {
-            id: gitPoll
-            interval: 3000
-            running: gitStatus.visible
-            command: ["sh", "-c", "
-                path=$(echo '" + root.activeTitle + "' | grep -o '/[^ ]*' | head -1)
-                [ -z \"$path\" ] && path=$HOME
-                cd \"$path\" 2>/dev/null || cd $HOME
-                git rev-parse --abbrev-ref HEAD 2>/dev/null
-            "]
-            onUpdated: gitStatus.branchName = (gitPoll.value || "").trim()
-        }
-
-        RowLayout {
-            id: gitRow
-            anchors.centerIn: parent
-            spacing: 4
-            Text { text: "󰊢"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: 12 }
-            Text { text: gitStatus.branchName; color: Colors.text; font.pixelSize: 10; font.weight: Font.Bold }
-        }
+    // ── Git Status ─────────────────────────────
+    GitStatus {
+        windowTitle: root.activeTitle
+        appId: root.activeAppId
     }
 
     // ── Inline Media Context ───────────────────
@@ -93,26 +59,26 @@ RowLayout {
         id: mediaContext
         visible: !!MediaService.currentPlayer && MediaService.trackTitle !== ""
         
-        implicitWidth: visible ? mediaRow.implicitWidth + 12 : 0
+        implicitWidth: visible ? mediaRow.implicitWidth + Colors.spacingM : 0
         implicitHeight: 22
         radius: 11
         color: Colors.withAlpha(MediaService.artAccentColor, 0.15)
         border.color: Colors.withAlpha(MediaService.artAccentColor, 0.3)
         border.width: 1
         
-        Behavior on color { ColorAnimation { duration: 400 } }
-        Behavior on border.color { ColorAnimation { duration: 400 } }
+        Behavior on color { ColorAnimation { duration: Colors.durationEmphasis } }
+        Behavior on border.color { ColorAnimation { duration: Colors.durationEmphasis } }
 
         RowLayout {
             id: mediaRow
             anchors.centerIn: parent
-            spacing: 6
+            spacing: Colors.spacingSM
             
             Text {
                 text: MediaService.isPlaying ? "󰏤" : "󰐊"
                 color: MediaService.artAccentColor
                 font.family: Colors.fontMono
-                font.pixelSize: 12
+                font.pixelSize: Colors.fontSizeSmall
                 
                 MouseArea {
                     anchors.fill: parent
@@ -134,7 +100,7 @@ RowLayout {
                 text: "󰒭"
                 color: Colors.textDisabled
                 font.family: Colors.fontMono
-                font.pixelSize: 12
+                font.pixelSize: Colors.fontSizeSmall
                 
                 MouseArea {
                     anchors.fill: parent

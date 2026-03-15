@@ -40,7 +40,7 @@ Rectangle {
 
     // Blinking active indicator
     Rectangle {
-      width: 8; height: 8; radius: 4
+      width: 8; height: 8; radius: Colors.radiusXS
       color: root.active ? Colors.warning : Colors.textDisabled
       opacity: root.active ? 1.0 : 0.3
       Behavior on color { ColorAnimation { duration: Colors.durationNormal } }

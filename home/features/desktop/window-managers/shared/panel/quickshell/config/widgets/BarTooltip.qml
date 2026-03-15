@@ -124,15 +124,7 @@ PopupWindow {
     Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutBack } }
 
     // Subtly lighter inner border
-    Rectangle {
-      anchors.fill: parent
-      anchors.margins: 1
-      radius: parent.radius - 1
-      color: "transparent"
-      border.color: Colors.borderLight
-      border.width: 1
-      opacity: 0.1
-    }
+    InnerHighlight { }
 
     Text {
       id: textItem

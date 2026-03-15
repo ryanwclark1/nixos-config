@@ -55,8 +55,9 @@ QtObject {
         }
     }
 
-    // ── Command Execution ──────────────────────
+    // ── Command & Script Execution ──────────────
     property var pendingCommand: null // { label: string, cmd: [] }
+    property var pendingScript: null  // { name: string, content: string }
     
     function executePendingCommand() {
         if (!pendingCommand) return;
@@ -69,16 +70,58 @@ QtObject {
         pendingCommand = null;
     }
 
+    function installPendingScript() {
+        if (!pendingScript) return;
+        _runInstallScript(pendingScript.name, pendingScript.content);
+        pendingScript = null;
+    }
+
+    function cancelPendingScript() {
+        pendingScript = null;
+    }
+
+    function _runInstallScript(name, content) {
+        var binDir = (Quickshell.env("HOME") || "/home") + "/.local/bin";
+        var path = binDir + "/" + name;
+        
+        // Ensure binDir exists and write file
+        var cmd = ["sh", "-c", "mkdir -p '" + binDir + "' && cat > '" + path + "' && chmod +x '" + path + "'"];
+        var proc = Qt.createQmlObject('import Quickshell.Io; Process { command: ' + JSON.stringify(cmd) + '; stdinEnabled: true }', root);
+        proc.onStarted.connect(function() {
+            proc.write(content);
+            proc.stdinEnabled = false;
+        });
+        proc.onExited.connect(function(code) {
+            if (code === 0) {
+                _addSystemMessage("Successfully installed script to `" + path + "`.\nIt is now available in your PATH.");
+            } else {
+                _addSystemMessage("Failed to install script to `" + path + "`.");
+            }
+            proc.destroy();
+        });
+        proc.running = true;
+    }
+
     function _extractCommands(content) {
-        // Look for [COMMAND: label | cmd arg1 arg2]
-        var regex = /\[COMMAND:\s*([^|\]]+)\s*\|\s*([^\]]+)\]/g;
-        var match;
-        while ((match = regex.exec(content)) !== null) {
-            var label = match[1].trim();
-            var cmdStr = match[2].trim();
+        // 1. Look for [COMMAND: label | cmd arg1 arg2]
+        var cmdRegex = /\[COMMAND:\s*([^|\]]+)\s*\|\s*([^\]]+)\]/g;
+        var cmdMatch;
+        while ((cmdMatch = cmdRegex.exec(content)) !== null) {
+            var label = cmdMatch[1].trim();
+            var cmdStr = cmdMatch[2].trim();
             var cmdParts = cmdStr.split(/\s+/);
             root.pendingCommand = { label: label, cmd: cmdParts };
-            // For now, we only handle the last command found in a block
+        }
+
+        // 2. Look for [SCRIPT: name | content]
+        // Note: content can span multiple lines
+        var scriptRegex = /\[SCRIPT:\s*([^|\]]+)\s*\|([\s\S]*?)\]/g;
+        var scriptMatch;
+        while ((scriptMatch = scriptRegex.exec(content)) !== null) {
+            root.pendingScript = {
+                name: scriptMatch[1].trim(),
+                content: scriptMatch[2].trim()
+            };
         }
     }
 
@@ -508,9 +551,11 @@ QtObject {
         if (!systemPrompt) {
             systemPrompt = "You are a helpful Linux desktop assistant for Quickshell. " +
                 "You can suggest system actions by using the following format: [COMMAND: Label | command args]. " +
-                "For example: [COMMAND: Toggle Float | hyprctl dispatch togglefloating] or [COMMAND: Close Terminal | hyprctl dispatch closewindow class:ghostty]. " +
-                "Only suggest commands when explicitly requested or highly relevant. " +
-                "The user must confirm the command before it is executed.";
+                "For example: [COMMAND: Toggle Float | hyprctl dispatch togglefloating]. " +
+                "You can also propose shell scripts to be installed to ~/.local/bin using: [SCRIPT: filename | script_content]. " +
+                "For example: [SCRIPT: prune-docker | #!/bin/bash\ndocker container prune -f]. " +
+                "Only suggest commands or scripts when explicitly requested or highly relevant. " +
+                "The user must confirm the action before it is executed.";
         }
         var contextInfo = "";
         if (Config.aiSystemContext) {

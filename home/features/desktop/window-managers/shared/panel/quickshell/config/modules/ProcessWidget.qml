@@ -211,7 +211,7 @@ SharedWidgets.CardBase {
 
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: 2
+                    spacing: Colors.spacingXXS
 
                     Text {
                         text: root.selectedProcess ? (String(root.selectedProcess.name || "process") + "  •  PID " + String(root.selectedProcess.pid || 0)) : ""

@@ -42,23 +42,14 @@ Item {
       Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
 
       gradient: Gradient {
-        orientation: Gradient.Vertical
-        GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-        GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-      }
+    orientation: Gradient.Vertical
+    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+}
     }
 
     // Inner subtle highlight border
-    Rectangle {
-      anchors.fill: parent
-      anchors.margins: 1
-      radius: parent.radius - 1
-      color: "transparent"
-      border.color: Colors.borderLight
-      border.width: 1
-      opacity: cardHover.hovered ? 0.3 : 0.15
-      Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
-    }
+    InnerHighlight { highlightOpacity: 0.15; hoveredOpacity: 0.3; hovered: cardHover.hovered }
 
     HoverHandler { id: cardHover }
 

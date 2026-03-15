@@ -14,15 +14,7 @@ Rectangle {
   border.width: 1
 
   // Depth highlight
-  Rectangle {
-    anchors.fill: parent
-    anchors.margins: 1
-    radius: parent.radius - 1
-    color: "transparent"
-    border.color: Colors.borderLight
-    border.width: 1
-    opacity: 0.2
-  }
+  SharedWidgets.InnerHighlight { highlightOpacity: 0.2 }
 
   ColumnLayout {
     anchors.fill: parent

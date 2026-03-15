@@ -31,8 +31,8 @@ Item {
     color: root.statusColor
     opacity: (SystemStatus.overallStatus === "healthy") ? 0 : 0.3
     visible: opacity > 0
-    Behavior on color { ColorAnimation { duration: 400 } }
-    Behavior on opacity { NumberAnimation { duration: 400 } }
+    Behavior on color { ColorAnimation { duration: Colors.durationEmphasis } }
+    Behavior on opacity { NumberAnimation { duration: Colors.durationEmphasis } }
 
     SequentialAnimation on opacity {
         running: SystemStatus.overallStatus !== "healthy"

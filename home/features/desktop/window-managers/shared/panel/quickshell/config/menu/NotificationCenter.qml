@@ -497,10 +497,7 @@ PanelWindow {
             border.color: Colors.border; border.width: 1
             
             // Inner highlight
-            Rectangle {
-              anchors.fill: parent; anchors.margins: 1; radius: parent.radius - 1
-              color: "transparent"; border.color: Colors.borderLight; border.width: 1; opacity: 0.1
-            }
+            SharedWidgets.InnerHighlight { }
 
             Row {
               anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: Colors.paddingSmall

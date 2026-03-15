@@ -159,16 +159,7 @@ BasePopupMenu {
           border.width: 1
           Behavior on color { ColorAnimation { duration: Colors.durationFast } }
 
-          // Inner highlight
-          Rectangle {
-            anchors.fill: parent
-            anchors.margins: 1
-            radius: parent.radius - 1
-            color: "transparent"
-            border.color: Colors.borderLight
-            border.width: 1
-            opacity: clipMouse.containsMouse ? 0.25 : 0.1
-          }
+          SharedWidgets.InnerHighlight { hoveredOpacity: 0.25; hovered: clipMouse.containsMouse }
 
           SharedWidgets.StateLayer {
             id: clipStateLayer

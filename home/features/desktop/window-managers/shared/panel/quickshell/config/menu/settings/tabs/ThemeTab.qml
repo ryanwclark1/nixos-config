@@ -100,7 +100,7 @@ Item {
                             ColumnLayout {
                                 anchors.fill: parent
                                 anchors.margins: 10
-                                spacing: 4
+                                spacing: Colors.spacingXS
                                 Rectangle {
                                     width: 60
                                     height: 4
@@ -122,7 +122,7 @@ Item {
                                     Layout.alignment: Qt.AlignRight
                                     width: 30
                                     height: 12
-                                    radius: 4
+                                    radius: Colors.radiusXS
                                     color: root._previewTheme ? root._previewTheme.palette.base0B : Colors.success
                                 }
                             }
@@ -173,7 +173,7 @@ Item {
                         ] : []
 
                         Column {
-                            spacing: 2
+                            spacing: Colors.spacingXXS
                             Rectangle {
                                 width: 36
                                 height: 36
@@ -186,7 +186,7 @@ Item {
                                 width: 36
                                 text: modelData.l
                                 color: Colors.textDisabled
-                                font.pixelSize: 8
+                                font.pixelSize: Colors.fontSizeXXS
                                 font.weight: Font.Bold
                                 horizontalAlignment: Text.AlignHCenter
                             }

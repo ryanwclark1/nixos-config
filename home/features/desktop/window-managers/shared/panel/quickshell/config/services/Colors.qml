@@ -89,7 +89,6 @@ QtObject {
     readonly property int radiusPill: 999
 
     // --- ANIMATIONS ---
-    readonly property int durationInstant: 60
     readonly property int durationFlash: 80
     readonly property int durationSnap: 100
     readonly property int durationMedium: 220

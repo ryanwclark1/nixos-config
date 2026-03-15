@@ -113,21 +113,13 @@ PanelWindow {
         radius: Colors.radiusLarge
 
         gradient: Gradient {
-            orientation: Gradient.Vertical
-            GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-            GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-        }
+    orientation: Gradient.Vertical
+    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+}
 
         // Inner highlight
-        Rectangle {
-            anchors.fill: parent
-            anchors.margins: 1
-            radius: parent.radius - 1
-            color: "transparent"
-            border.color: Colors.borderLight
-            border.width: 1
-            opacity: 0.15
-        }
+        SharedWidgets.InnerHighlight { highlightOpacity: 0.15 }
 
         x: root.showContent ? 0 : root.panelWidth + 10
         opacity: root.showContent ? 1.0 : 0.0
@@ -515,7 +507,7 @@ PanelWindow {
 
                     RowLayout {
                         spacing: Colors.spacingS
-                        Text { text: "󰒓"; color: Colors.accent; font.pixelSize: 20; font.family: Colors.fontMono }
+                        Text { text: "󰒓"; color: Colors.accent; font.pixelSize: Colors.fontSizeXL; font.family: Colors.fontMono }
                         Text { 
                             text: "Suggested System Action"
                             color: Colors.text
@@ -555,6 +547,100 @@ PanelWindow {
                             iconName: "󰐊"
                             compact: true
                             onClicked: AiService.executePendingCommand()
+                        }
+                    }
+                }
+            }
+
+            // ---- Script Confirmation ----
+            Rectangle {
+                Layout.fillWidth: true
+                implicitHeight: scriptCol.implicitHeight + 24
+                radius: Colors.radiusMedium
+                color: Colors.withAlpha(Colors.success, 0.12)
+                border.color: Colors.success
+                border.width: 1
+                visible: AiService.pendingScript !== null
+                clip: true
+
+                opacity: visible ? 1.0 : 0.0
+                scale: visible ? 1.0 : 0.95
+                Behavior on opacity { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
+                Behavior on scale { NumberAnimation { duration: 350; easing.type: Easing.OutBack } }
+
+                ColumnLayout {
+                    id: scriptCol
+                    anchors.fill: parent; anchors.margins: Colors.spacingM
+                    spacing: Colors.spacingS
+
+                    RowLayout {
+                        spacing: Colors.spacingS
+                        Text { text: "󰆍"; color: Colors.success; font.pixelSize: 20; font.family: Colors.fontMono }
+                        Text { 
+                            text: "Install Shell Script"
+                            color: Colors.text
+                            font.pixelSize: Colors.fontSizeSmall
+                            font.weight: Font.Bold
+                        }
+                    }
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        implicitHeight: 32
+                        radius: Colors.radiusSmall
+                        color: Colors.withAlpha(Colors.background, 0.4)
+                        Text {
+                            anchors.centerIn: parent
+                            text: "filename: " + (AiService.pendingScript ? AiService.pendingScript.name : "")
+                            color: Colors.success
+                            font.pixelSize: 11
+                            font.weight: Font.Bold
+                            font.family: Colors.fontMono
+                        }
+                    }
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        implicitHeight: Math.min(200, scriptPreview.implicitHeight + 16)
+                        radius: Colors.radiusSmall
+                        color: Colors.withAlpha(Colors.background, 0.6)
+                        border.color: Colors.withAlpha(Colors.success, 0.2)
+                        border.width: 1
+                        clip: true
+
+                        Flickable {
+                            anchors.fill: parent; anchors.margins: 8
+                            contentHeight: scriptPreview.implicitHeight
+                            contentWidth: width
+                            flickableDirection: Flickable.VerticalFlick
+                            Text {
+                                id: scriptPreview
+                                width: parent.width
+                                text: AiService.pendingScript ? AiService.pendingScript.content : ""
+                                color: Colors.textSecondary
+                                font.family: Colors.fontMono
+                                font.pixelSize: 10
+                                wrapMode: Text.WrapAnywhere
+                            }
+                        }
+                    }
+
+                    RowLayout {
+                        Layout.alignment: Qt.AlignRight
+                        spacing: Colors.spacingM
+                        
+                        SettingsActionButton {
+                            label: "Discard"
+                            iconName: "󰅖"
+                            compact: true
+                            onClicked: AiService.cancelPendingScript()
+                        }
+                        
+                        SettingsActionButton {
+                            label: "Install to ~/.local/bin"
+                            iconName: "󰄬"
+                            compact: true
+                            onClicked: AiService.installPendingScript()
                         }
                     }
                 }
@@ -1351,7 +1437,7 @@ PanelWindow {
                 id: slashHintsCol
                 anchors.fill: parent
                 anchors.margins: Colors.spacingS
-                spacing: 2
+                spacing: Colors.spacingXXS
 
                 Repeater {
                     model: ScriptModel {

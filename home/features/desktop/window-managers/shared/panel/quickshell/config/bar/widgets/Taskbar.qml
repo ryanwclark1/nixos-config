@@ -13,11 +13,11 @@ Flow {
   property var pinnedApps: []
   property var iconMap: ({})
   property bool seedPinnedApps: false
-  readonly property var allToplevels: (typeof ToplevelManager !== "undefined" && ToplevelManager.toplevels) ? (ToplevelManager.toplevels.values || []) : []
+  readonly property var allToplevels: CompositorAdapter.toplevels
   readonly property bool niriEnriched: CompositorAdapter.isNiri && NiriService.available
   readonly property var runningToplevels: {
     // Force re-evaluation when NiriService windows change
-    void root._niriWindowsVersion;
+    var _niriVer = root._niriWindowsVersion;
 
     var out = [];
     for (var i = 0; i < allToplevels.length; i++) {
@@ -144,17 +144,23 @@ Flow {
     }
   }
 
-  Component.onCompleted: {} // Pinned apps loaded via FileView.onLoaded
-
   // Unified model: pinned apps, optional separator sentinel, then unpinned running apps
   ScriptModel {
     id: taskModel
     values: {
-      void root._niriWindowsVersion;  // force Niri reactivity
-      void root.pinnedApps;           // force pinned reactivity
+      var _niriVer = root._niriWindowsVersion;  // force Niri reactivity
+      var _pinned = root.pinnedApps;            // force pinned reactivity
 
       var result = [];
       var pinnedClasses = {};
+
+      // Pre-build class→toplevel map for O(1) pinned lookups
+      var tlByClass = {};
+      for (var t = 0; t < root.runningToplevels.length; t++) {
+        var tl = root.runningToplevels[t];
+        var tlCls = tl.class || tl.appId || "";
+        if (tlCls && !tlByClass[tlCls]) tlByClass[tlCls] = tl;
+      }
 
       // Phase 1: Pinned apps (always first)
       for (var i = 0; i < root.pinnedApps.length; i++) {
@@ -162,17 +168,9 @@ Flow {
         var cls = p.class || "";
         pinnedClasses[cls] = true;
 
-        // Find matching running toplevel
-        var matchedTl = null;
-        var matchedFocused = false;
-        for (var t = 0; t < root.runningToplevels.length; t++) {
-          var tl = root.runningToplevels[t];
-          if ((tl.class || tl.appId || "") === cls) {
-            matchedTl = tl;
-            matchedFocused = !!tl.activated;
-            break;
-          }
-        }
+        // O(1) lookup from pre-built map
+        var matchedTl = tlByClass[cls] || null;
+        var matchedFocused = matchedTl ? !!matchedTl.activated : false;
 
         result.push({
           _key: "pinned_" + cls,

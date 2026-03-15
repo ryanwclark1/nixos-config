@@ -23,6 +23,8 @@ Item {
   SharedWidgets.Ref { service: PrinterService }
   SharedWidgets.Ref { service: SpectrumService }
   SharedWidgets.Ref { service: SystemStatus }
+  SharedWidgets.Ref { service: MediaService }
+  SharedWidgets.Ref { service: WeatherService }
 
   property var manager: null
   property var anchorWindow: null
@@ -309,16 +311,7 @@ Item {
     border.width: (floatingBar && !root.noBackground) ? 1 : 0
 
     // Inner subtle highlight border
-    Rectangle {
-      anchors.fill: parent
-      anchors.margins: 1
-      radius: parent.radius > 0 ? parent.radius - 1 : 0
-      color: "transparent"
-      border.color: Colors.borderLight
-      border.width: 1
-      opacity: 0.15
-      visible: floatingBar && !root.noBackground
-    }
+    SharedWidgets.InnerHighlight { highlightOpacity: 0.15; visible: floatingBar && !root.noBackground }
   }
 
   Row {
@@ -413,7 +406,7 @@ Item {
 
   Component {
     id: logoComponent
-    Widgets.Logo {
+    Logo {
       property var widgetInstance: null
       tooltipText: "Application launcher"
       anchorWindow: root.anchorWindow
@@ -422,7 +415,7 @@ Item {
 
   Component {
     id: workspacesComponent
-    Widgets.Workspaces {
+    Workspaces {
       property var widgetInstance: null
       vertical: root.vertical
       anchorWindow: root.anchorWindow
@@ -431,7 +424,7 @@ Item {
 
   Component {
     id: taskbarComponent
-    Widgets.Taskbar {
+    Taskbar {
       property var widgetInstance: null
       vertical: root.vertical
       anchorWindow: root.anchorWindow
@@ -440,14 +433,14 @@ Item {
 
   Component {
     id: windowTitleComponent
-    Widgets.WindowTitle {
+    WindowTitle {
       property var widgetInstance: null
     }
   }
 
   Component {
     id: keyboardLayoutComponent
-    Widgets.KeyboardLayout {
+    KeyboardLayout {
       property var widgetInstance: null
       anchorWindow: root.anchorWindow
     }

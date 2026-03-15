@@ -8,6 +8,7 @@ QtObject {
 
   readonly property var builtins: [
     { widgetType: "logo", label: "App Launcher", icon: "󰀻", section: "left", description: "Application launcher trigger." },
+    { widgetType: "criticalStatus", label: "Critical Alerts", icon: "󰀪", section: "left", description: "High-priority system health alerts." },
     { widgetType: "workspaces", label: "Workspace Switcher", icon: "󰍺", section: "left", description: "Current workspaces and switching." },
     { widgetType: "windowTitle", label: "Active App Context", icon: "󰖯", section: "left", description: "Active window title and app-specific tools." },
     { widgetType: "keyboardLayout", label: "Keyboard Layout", icon: "󰌌", section: "right", description: "Current keyboard layout indicator." },
@@ -21,6 +22,26 @@ QtObject {
     { widgetType: "cava", label: "Visualizer", icon: "󰎈", section: "center", description: "Compact audio spectrum with popup." },
     { widgetType: "idleInhibitor", label: "Idle Inhibitor", icon: "󰒲", section: "center", description: "Toggle idle inhibit state." },
     { widgetType: "weather", label: "Weather", icon: "󰖙", section: "right", description: "Current weather and forecast popup." },
+    {
+      widgetType: "ssh",
+      label: "SSH",
+      icon: "󰣀",
+      section: "right",
+      description: "SSH hosts with manual entries and ~/.ssh/config import.",
+      hasSettings: true,
+      defaultSettings: {
+        manualHosts: [],
+        enableSshConfigImport: true,
+        displayMode: "count",
+        defaultAction: "connect",
+        state: {
+          lastConnectedId: "",
+          lastConnectedLabel: "",
+          lastConnectedAt: "",
+          recentIds: []
+        }
+      }
+    },
     { widgetType: "network", label: "Network", icon: "󰖩", section: "right", description: "Network state and controls popup." },
     { widgetType: "bluetooth", label: "Bluetooth", icon: "󰂯", section: "right", description: "Bluetooth status and controls popup." },
     { widgetType: "audio", label: "Audio", icon: "󰕾", section: "right", description: "Volume and device controls popup." },

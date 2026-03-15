@@ -37,6 +37,11 @@ QtObject {
   readonly property bool supportsHyprctlSettings: isHyprland
   readonly property bool supportsKeyboardLayouts: isNiri
 
+  // ── ToplevelManager abstraction ────────────
+  readonly property bool hasToplevelManager: typeof ToplevelManager !== "undefined"
+  readonly property var toplevels: hasToplevelManager ? (ToplevelManager.toplevels ? (ToplevelManager.toplevels.values || []) : []) : []
+  readonly property var activeToplevel: hasToplevelManager ? ToplevelManager.activeToplevel : null
+
   // ── Niri reactive state (delegated to NiriService) ──
   // These provide zero-latency access to Niri state without polling.
   readonly property var niriWorkspaces: isNiri ? NiriService.allWorkspaces : []

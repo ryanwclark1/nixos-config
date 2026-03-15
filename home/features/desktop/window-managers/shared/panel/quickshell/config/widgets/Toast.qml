@@ -105,15 +105,7 @@ Item {
     }
 
     // Inner highlight
-    Rectangle {
-      anchors.fill: parent
-      anchors.margins: 1
-      radius: parent.radius - 1
-      color: "transparent"
-      border.color: Colors.borderLight
-      border.width: 1
-      opacity: 0.15
-    }
+    InnerHighlight { highlightOpacity: 0.15 }
 
     // Progress bar at bottom
     Rectangle {

@@ -1,12 +1,54 @@
 .pragma library
 
+var REMOVED_PLUGIN_IDS = ["quickshell.ssh.monitor"];
+
+function _sanitizeDisabledPlugins(list) {
+    if (!Array.isArray(list))
+        return [];
+    return list.filter(function(id) {
+        return REMOVED_PLUGIN_IDS.indexOf(String(id || "")) === -1;
+    });
+}
+
+function _sanitizePluginMap(mapValue) {
+    var source = mapValue && typeof mapValue === "object" ? mapValue : {};
+    var next = {};
+    for (var key in source) {
+        if (REMOVED_PLUGIN_IDS.indexOf(String(key || "")) !== -1)
+            continue;
+        next[key] = source[key];
+    }
+    return next;
+}
+
 function initializeDefaults(config) {
     config.barConfigs = config.normalizeBarConfigs([], {});
     config.ensureSelectedBar();
     config.syncLegacyBarSettingsFromPrimary();
 }
 
+function _applyPluginData(config, pluginsData, options) {
+    if (!pluginsData)
+        return;
+    var preserveRemovedSettings = !!(options && options.preserveRemovedSettings);
+    if (pluginsData.disabled !== undefined)
+        config.disabledPlugins = _sanitizeDisabledPlugins(pluginsData.disabled);
+    if (pluginsData.launcherTriggers !== undefined)
+        config.pluginLauncherTriggers = _sanitizePluginMap(pluginsData.launcherTriggers);
+    if (pluginsData.launcherNoTrigger !== undefined)
+        config.pluginLauncherNoTrigger = _sanitizePluginMap(pluginsData.launcherNoTrigger);
+    if (pluginsData.settings !== undefined)
+        config.pluginSettings = preserveRemovedSettings
+            ? (pluginsData.settings && typeof pluginsData.settings === "object" ? pluginsData.settings : {})
+            : _sanitizePluginMap(pluginsData.settings);
+    if (pluginsData.hotReload !== undefined)
+        config.pluginHotReload = pluginsData.hotReload;
+}
+
 function applyData(config, data) {
+    // Load plugin settings early so migrated bar widgets can consume legacy plugin-backed state.
+    _applyPluginData(config, data.plugins, { preserveRemovedSettings: true });
+
     if (data.bar) {
         if (data.bar.height !== undefined)
             config.barHeight = data.bar.height;
@@ -278,19 +320,6 @@ function applyData(config, data) {
             config.aiMaxMessages = data.ai.maxMessages;
     }
 
-    if (data.plugins) {
-        if (data.plugins.disabled !== undefined)
-            config.disabledPlugins = data.plugins.disabled;
-        if (data.plugins.launcherTriggers !== undefined)
-            config.pluginLauncherTriggers = data.plugins.launcherTriggers;
-        if (data.plugins.launcherNoTrigger !== undefined)
-            config.pluginLauncherNoTrigger = data.plugins.launcherNoTrigger;
-        if (data.plugins.settings !== undefined)
-            config.pluginSettings = data.plugins.settings;
-        if (data.plugins.hotReload !== undefined)
-            config.pluginHotReload = data.plugins.hotReload;
-    }
-
     if (data.theme) {
         if (data.theme.name !== undefined)
             config.themeName = data.theme.name;
@@ -558,10 +587,10 @@ function buildData(config) {
             "maxMessages": config.aiMaxMessages
         },
         "plugins": {
-            "disabled": config.disabledPlugins,
-            "launcherTriggers": config.pluginLauncherTriggers,
-            "launcherNoTrigger": config.pluginLauncherNoTrigger,
-            "settings": config.pluginSettings,
+            "disabled": _sanitizeDisabledPlugins(config.disabledPlugins),
+            "launcherTriggers": _sanitizePluginMap(config.pluginLauncherTriggers),
+            "launcherNoTrigger": _sanitizePluginMap(config.pluginLauncherNoTrigger),
+            "settings": _sanitizePluginMap(config.pluginSettings),
             "hotReload": config.pluginHotReload
         },
         "theme": {

@@ -112,7 +112,7 @@ Rectangle {
                     verticalCenter: parent.verticalCenter
                 }
                 height: 8
-                radius: 4
+                radius: Colors.radiusXS
                 color: Colors.surface
 
                 Rectangle {

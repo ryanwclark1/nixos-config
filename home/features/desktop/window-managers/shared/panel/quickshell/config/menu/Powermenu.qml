@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import "../services"
+import "../widgets" as SharedWidgets
 
 PanelWindow {
   id: root
@@ -151,18 +152,18 @@ PanelWindow {
       scale: root.isVisible ? 1.0 : 0.94
       Behavior on scale { NumberAnimation { id: pmScaleAnim; duration: 500; easing.type: Easing.OutBack } }
       opacity: root.isVisible ? 1.0 : 0.0
-      Behavior on opacity { NumberAnimation { id: pmFadeAnim; duration: 400; easing.type: Easing.OutCubic } }
+      Behavior on opacity { NumberAnimation { id: pmFadeAnim; duration: Colors.durationEmphasis; easing.type: Easing.OutCubic } }
       layer.enabled: pmScaleAnim.running || pmFadeAnim.running
 
       ColumnLayout {
         Layout.alignment: Qt.AlignHCenter
-        spacing: 4
+        spacing: Colors.spacingXS
         Text {
           text: "Power Menu"
           color: Colors.text
           font.pixelSize: Colors.fontSizeHuge
           font.weight: Font.Bold
-          font.letterSpacing: -0.5
+          font.letterSpacing: Colors.letterSpacingTight
           Layout.alignment: Qt.AlignHCenter
         }
 
@@ -221,21 +222,12 @@ PanelWindow {
               Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
 
               gradient: Gradient {
-                orientation: Gradient.Vertical
-                GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-                GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-              }
+    orientation: Gradient.Vertical
+    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+}
 
-              // Inner highlight
-              Rectangle {
-                anchors.fill: parent
-                anchors.margins: 1
-                radius: parent.radius - 1
-                color: "transparent"
-                border.color: Colors.borderLight
-                border.width: 1
-                opacity: actionItem.isFocused ? 0.3 : 0.1
-              }
+              SharedWidgets.InnerHighlight { hoveredOpacity: 0.3; hovered: actionItem.isFocused }
             }
 
             // Layer 2: Pending indicator (circular progress-like)

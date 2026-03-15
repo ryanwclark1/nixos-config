@@ -7,6 +7,7 @@ instance_id=""
 repo_shell_mode=0
 repo_shell_pid=""
 repo_shell_service_was_active=0
+repo_shell_env=()
 run_settings=1
 run_surfaces=1
 run_multibar=1
@@ -105,6 +106,35 @@ cleanup_repo_shell() {
   fi
 }
 
+populate_repo_shell_env() {
+  local line=""
+  local key=""
+  local value=""
+
+  repo_shell_env=()
+  for key in HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY NIRI_SOCKET XDG_CURRENT_DESKTOP DESKTOP_SESSION; do
+    value="${!key:-}"
+    if [[ -n "${value}" ]]; then
+      repo_shell_env+=("${key}=${value}")
+    fi
+  done
+
+  if (( ${#repo_shell_env[@]} > 0 )); then
+    return 0
+  fi
+
+  while IFS= read -r line; do
+    [[ "${line}" == *=* ]] || continue
+    key="${line%%=*}"
+    value="${line#*=}"
+    case "${key}" in
+      HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|XDG_CURRENT_DESKTOP|DESKTOP_SESSION)
+        [[ -n "${value}" ]] && repo_shell_env+=("${key}=${value}")
+        ;;
+    esac
+  done < <(systemctl --user show-environment 2>/dev/null || true)
+}
+
 start_repo_shell() {
   local deadline
 
@@ -119,7 +149,8 @@ start_repo_shell() {
     sleep 1
   fi
 
-  quickshell -p "${config_root}/shell.qml" >/tmp/quickshell-repo-qa.log 2>&1 &
+  populate_repo_shell_env
+  env "${repo_shell_env[@]}" quickshell -p "${config_root}/shell.qml" >/tmp/quickshell-repo-qa.log 2>&1 &
   repo_shell_pid="$!"
 
   deadline=$((SECONDS + 20))

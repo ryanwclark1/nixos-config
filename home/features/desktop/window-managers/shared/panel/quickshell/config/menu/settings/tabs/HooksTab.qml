@@ -71,7 +71,7 @@ Item {
                             spacing: Colors.spacingS
 
                             Rectangle {
-                                width: 8; height: 8; radius: 4
+                                width: 8; height: 8; radius: Colors.radiusXS
                                 color: _hookHasScript(modelData.name) ? Colors.success : Colors.textDisabled
                             }
 

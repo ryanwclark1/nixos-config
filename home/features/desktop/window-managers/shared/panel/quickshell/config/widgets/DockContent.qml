@@ -53,7 +53,7 @@ Item {
     width: root.vertical ? 56 : ((dockLayoutLoader.item ? dockLayoutLoader.item.implicitWidth : 0) + 40)
     height: root.vertical ? ((dockLayoutLoader.item ? dockLayoutLoader.item.implicitHeight : 0) + 40) : 56
     color: Colors.withAlpha(Colors.surface, 0.85)
-    radius: 20
+    radius: Colors.radiusLarge
     border.color: Colors.border
     border.width: 1
 
@@ -64,15 +64,7 @@ Item {
     }
 
     // Inner highlight
-    Rectangle {
-      anchors.fill: parent
-      anchors.margins: 1
-      radius: parent.radius - 1
-      color: "transparent"
-      border.color: Colors.borderLight
-      border.width: 1
-      opacity: 0.15
-    }
+    InnerHighlight { highlightOpacity: 0.15 }
   }
 
   Loader {
@@ -125,8 +117,8 @@ Item {
       readonly property string appName: modelData.name || appId
       readonly property string iconSource: root.dockRoot ? root.dockRoot.getAppIcon(appId) : ""
       readonly property bool isFocused: {
-        if (!isRunning || typeof ToplevelManager === 'undefined') return false;
-        var active = ToplevelManager.activeToplevel;
+        if (!isRunning || !CompositorAdapter.hasToplevelManager) return false;
+        var active = CompositorAdapter.activeToplevel;
         if (!active) return false;
         for (var i = 0; i < toplevels.length; i++) {
           if (toplevels[i] === active) return true;
@@ -249,7 +241,7 @@ Item {
             if (mouse.button === Qt.MiddleButton) {
               if (appDelegate.isRunning) {
                 if (appDelegate.isGrouped) {
-                  var active = (typeof ToplevelManager !== 'undefined') ? ToplevelManager.activeToplevel : null;
+                  var active = CompositorAdapter.activeToplevel;
                   var closed = false;
                   for (var i = 0; i < appDelegate.toplevels.length; i++) {
                     if (appDelegate.toplevels[i] === active) {
@@ -266,7 +258,7 @@ Item {
 
             if (appDelegate.isRunning) {
               if (appDelegate.isGrouped) {
-                var activeTop = (typeof ToplevelManager !== 'undefined') ? ToplevelManager.activeToplevel : null;
+                var activeTop = CompositorAdapter.activeToplevel;
                 var idx = -1;
                 for (var j = 0; j < appDelegate.toplevels.length; j++) {
                   if (appDelegate.toplevels[j] === activeTop) { idx = j; break; }
@@ -283,7 +275,7 @@ Item {
 
           onWheel: function(wheel) {
             if (!appDelegate.isGrouped) return;
-            var active = (typeof ToplevelManager !== 'undefined') ? ToplevelManager.activeToplevel : null;
+            var active = CompositorAdapter.activeToplevel;
             var idx = -1;
             for (var i = 0; i < appDelegate.toplevels.length; i++) {
               if (appDelegate.toplevels[i] === active) { idx = i; break; }
@@ -322,7 +314,7 @@ Item {
               width: 4; height: 4; radius: Colors.radiusMicro
               color: {
                 if (!appDelegate.isFocused) return Colors.textSecondary;
-                var active = (typeof ToplevelManager !== 'undefined') ? ToplevelManager.activeToplevel : null;
+                var active = CompositorAdapter.activeToplevel;
                 if (active && index < appDelegate.toplevels.length && appDelegate.toplevels[index] === active)
                   return Colors.primary;
                 return Colors.textSecondary;
@@ -344,7 +336,7 @@ Item {
               width: 4; height: 4; radius: Colors.radiusMicro
               color: {
                 if (!appDelegate.isFocused) return Colors.textSecondary;
-                var active = (typeof ToplevelManager !== 'undefined') ? ToplevelManager.activeToplevel : null;
+                var active = CompositorAdapter.activeToplevel;
                 if (active && index < appDelegate.toplevels.length && appDelegate.toplevels[index] === active)
                   return Colors.primary;
                 return Colors.textSecondary;

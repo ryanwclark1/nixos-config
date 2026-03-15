@@ -137,9 +137,7 @@ fi
 if run_capture "$tmp_guards_out" "$tmp_guards_err" "$local_runner" quickshell-guards; then
   if assert_patterns "$tmp_guards_out" \
     'check-quickshell-startup\.sh' \
-    'check-settings-responsive\.sh' \
-    'check-surface-responsive\.sh' \
-    'check-panel-runtime\.sh$'; then
+    'check-panel-runtime\.sh --repo-shell'; then
     pass "plugin-local quickshell-guards prints the assembled Quickshell guard sequence"
   else
     fail "plugin-local quickshell-guards output drifted from the expected Quickshell guard sequence"

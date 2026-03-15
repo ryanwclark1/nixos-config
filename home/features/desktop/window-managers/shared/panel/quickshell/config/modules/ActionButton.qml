@@ -22,16 +22,7 @@ Rectangle {
   Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
   Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutBack } }
 
-  // Inner highlight
-  Rectangle {
-    anchors.fill: parent
-    anchors.margins: 1
-    radius: parent.radius - 1
-    color: "transparent"
-    border.color: Colors.borderLight
-    border.width: 1
-    opacity: btnMouse.containsMouse ? 0.25 : 0.1
-  }
+  SharedWidgets.InnerHighlight { hoveredOpacity: 0.25; hovered: btnMouse.containsMouse }
 
   Text {
     id: textLabel

@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../services"
+import "../widgets" as SharedWidgets
 
 Rectangle {
   id: root
@@ -11,22 +12,16 @@ Rectangle {
   border.color: Colors.border
   clip: true
 
+  SharedWidgets.Ref { service: WeatherService }
+
   gradient: Gradient {
     orientation: Gradient.Vertical
     GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
     GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-  }
+}
 
   // Inner highlight
-  Rectangle {
-    anchors.fill: parent
-    anchors.margins: 1
-    radius: parent.radius - 1
-    color: "transparent"
-    border.color: Colors.borderLight
-    border.width: 1
-    opacity: 0.1
-  }
+  SharedWidgets.InnerHighlight { }
 
   RowLayout {
     anchors.fill: parent

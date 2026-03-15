@@ -8,6 +8,8 @@ import "../modules"
 Item {
   id: root
   anchors.fill: parent
+  Ref { service: MediaService; active: Config.lockScreenMediaControls }
+  Ref { service: WeatherService; active: Config.lockScreenWeather }
 
   property var lockContext: null
   property bool compact: Config.lockScreenCompact

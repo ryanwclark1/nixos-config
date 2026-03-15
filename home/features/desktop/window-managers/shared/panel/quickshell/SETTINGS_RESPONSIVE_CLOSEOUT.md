@@ -28,6 +28,10 @@ This closeout records the responsive settings-hub work completed across:
   - `Time & Weather`
 - Added runtime guardrail scripts and viewport capture scripts for regression checking.
 - Hardened capture tooling so viewport/surface runs choose reachable QuickShell and Hyprland sessions and wait for workspace activation before capturing.
+- Fixed repo-shell/runtime regressions uncovered during verification:
+  - deferred settings tab open now guards persistence state initialization,
+  - `CommandPoll` no longer emits startup `triggerPoll` type errors,
+  - missing shared settings/bar support widgets were restored where refactors had left dangling references.
 
 ## QA Evidence
 
@@ -40,7 +44,7 @@ This closeout records the responsive settings-hub work completed across:
 Latest verification result:
 
 ```text
-[PASS] IPC reachable for instance m61e25jxubt
+[PASS] IPC reachable for pid 3701012
 [PASS] Shell.reloadConfig
 [PASS] SettingsHub.open
 [PASS] SettingsHub.openTab wallpaper
@@ -51,9 +55,8 @@ Latest verification result:
 [PASS] SettingsHub.openTab theme
 [PASS] SettingsHub.openTab hotkeys
 [PASS] SettingsHub.openTab time-weather
-[WARN] New log output observed, but only known non-blocking warnings were present
-[INFO] Summary: 11 pass, 1 warn, 0 fail
-Settings guardrails passed.
+[PASS] No new runtime warnings/errors in QuickShell log
+[INFO] Summary: 12 pass, 0 warn, 0 fail
 ```
 
 ### Simulated Viewport QA
@@ -99,6 +102,7 @@ This confirmed:
 - Portrait/laptop lower-fold capture workflow: complete
 - Live validation of remaining uncertain tabs: complete
 - Checklist/runbook integration: complete
+- Repo-shell settings runtime verification: complete
 
 ## Future Workflow
 

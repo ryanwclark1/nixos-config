@@ -222,16 +222,7 @@ BasePopupMenu {
           border.color: modelData.connected ? Colors.primary : Colors.border
           border.width: 1
 
-          // Inner highlight
-          Rectangle {
-            anchors.fill: parent
-            anchors.margins: 1
-            radius: parent.radius - 1
-            color: "transparent"
-            border.color: Colors.borderLight
-            border.width: 1
-            opacity: modelData.connected ? 0.25 : 0.1
-          }
+          SharedWidgets.InnerHighlight { hoveredOpacity: 0.25; hovered: modelData.connected }
 
           RowLayout {
             anchors.fill: parent
@@ -304,15 +295,7 @@ BasePopupMenu {
           border.width: 1
 
           // Inner highlight
-          Rectangle {
-            anchors.fill: parent
-            anchors.margins: 1
-            radius: parent.radius - 1
-            color: "transparent"
-            border.color: Colors.borderLight
-            border.width: 1
-            opacity: 0.1
-          }
+          SharedWidgets.InnerHighlight { }
 
           RowLayout {
             anchors.fill: parent
@@ -402,16 +385,7 @@ BasePopupMenu {
           border.color: Colors.border
           border.width: 1
 
-          // Inner highlight
-          Rectangle {
-            anchors.fill: parent
-            anchors.margins: 1
-            radius: parent.radius - 1
-            color: "transparent"
-            border.color: Colors.borderLight
-            border.width: 1
-            opacity: availHover.containsMouse ? 0.2 : 0.1
-          }
+          SharedWidgets.InnerHighlight { hoveredOpacity: 0.2; hovered: availHover.containsMouse }
 
           RowLayout {
             anchors.fill: parent

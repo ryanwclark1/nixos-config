@@ -43,21 +43,13 @@ BasePopupMenu {
         border.width: 1
 
         gradient: Gradient {
-            orientation: Gradient.Vertical
-            GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-            GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-        }
+    orientation: Gradient.Vertical
+    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+}
 
         // Inner highlight
-        Rectangle {
-            anchors.fill: parent
-            anchors.margins: 1
-            radius: parent.radius - 1
-            color: "transparent"
-            border.color: Colors.borderLight
-            border.width: 1
-            opacity: 0.1
-        }
+        SharedWidgets.InnerHighlight { }
 
         ColumnLayout {
             id: atAGlanceColumn

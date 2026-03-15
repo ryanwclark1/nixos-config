@@ -20,47 +20,37 @@ Scope {
     return false;
   }
 
-  function getAppName(appId) {
+  function _lookupEntry(appId) {
+    if (!appId) return null;
     try {
       if (typeof DesktopEntries !== 'undefined') {
-        var entry = DesktopEntries.heuristicLookup
+        return DesktopEntries.heuristicLookup
           ? DesktopEntries.heuristicLookup(appId)
           : (DesktopEntries.byId ? DesktopEntries.byId(appId) : null);
-        if (entry && entry.name) return entry.name;
       }
     } catch (e) {}
-    return appId || "";
+    return null;
+  }
+
+  function getAppName(appId) {
+    var entry = _lookupEntry(appId);
+    return (entry && entry.name) ? entry.name : (appId || "");
   }
 
   function getAppIcon(appId) {
-    try {
-      if (typeof DesktopEntries !== 'undefined') {
-        var entry = DesktopEntries.heuristicLookup
-          ? DesktopEntries.heuristicLookup(appId)
-          : (DesktopEntries.byId ? DesktopEntries.byId(appId) : null);
-        if (entry && entry.icon) return Config.resolveIconSource(entry.icon);
-      }
-    } catch (e) {}
-    return Config.resolveIconSource(appId);
+    var entry = _lookupEntry(appId);
+    return (entry && entry.icon) ? Config.resolveIconSource(entry.icon) : Config.resolveIconSource(appId);
   }
 
   function getAppActions(appId) {
-    try {
-      if (typeof DesktopEntries !== 'undefined') {
-        var entry = DesktopEntries.heuristicLookup
-          ? DesktopEntries.heuristicLookup(appId)
-          : (DesktopEntries.byId ? DesktopEntries.byId(appId) : null);
-        if (entry && entry.actions) {
-          var result = [];
-          for (var i = 0; i < entry.actions.length; i++) {
-            var a = entry.actions[i];
-            if (a && a.name) result.push({ name: a.name, action: a });
-          }
-          return result;
-        }
-      }
-    } catch (e) {}
-    return [];
+    var entry = _lookupEntry(appId);
+    if (!entry || !entry.actions) return [];
+    var result = [];
+    for (var i = 0; i < entry.actions.length; i++) {
+      var a = entry.actions[i];
+      if (a && a.name) result.push({ name: a.name, action: a });
+    }
+    return result;
   }
 
   function togglePin(appId) {
@@ -79,25 +69,17 @@ Scope {
   function resolveDesktopEntryIdCached(appId, cache) {
     if (!appId) return appId;
     if (cache.hasOwnProperty(appId)) return cache[appId];
-    try {
-      if (typeof DesktopEntries !== 'undefined' && DesktopEntries.heuristicLookup) {
-        var entry = DesktopEntries.heuristicLookup(appId);
-        if (entry && entry.id) {
-          cache[appId] = entry.id;
-          return entry.id;
-        }
-      }
-    } catch (e) {}
-    cache[appId] = appId;
-    return appId;
+    var entry = _lookupEntry(appId);
+    var resolved = (entry && entry.id) ? entry.id : appId;
+    cache[appId] = resolved;
+    return resolved;
   }
 
   ScriptModel {
     id: dockModel
     values: {
       // These dependencies auto-trigger re-evaluation
-      var toplevels = (typeof ToplevelManager !== 'undefined' && ToplevelManager.toplevels)
-        ? (ToplevelManager.toplevels.values || []) : [];
+      var toplevels = CompositorAdapter.toplevels;
       var pinned = Config.dockPinnedApps || [];
       var groupApps = Config.dockGroupApps;  // force dep
 

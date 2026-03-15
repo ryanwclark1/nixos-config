@@ -12,52 +12,12 @@ reference_settings_fixture="${reference_source_dir}/expected-settings.json"
 reference_recovery_fixture="${reference_source_dir}/expected-recovery-scenarios.json"
 reference_diag_active_fixture="${reference_source_dir}/expected-diagnostics-active.json"
 reference_diag_degraded_fixture="${reference_source_dir}/expected-diagnostics-degraded.json"
-ssh_plugin_dir_name="ssh-monitor"
-ssh_plugin_id="quickshell.ssh.monitor"
-ssh_source_dir="$(cd "${script_dir}/../config/plugins/${ssh_plugin_dir_name}" 2>/dev/null && pwd || true)"
-ssh_manifest="${ssh_source_dir}/manifest.json"
-ssh_readme="${ssh_source_dir}/README.md"
-ssh_settings_fixture="${ssh_source_dir}/expected-settings.json"
-ssh_state_fixture="${ssh_source_dir}/expected-state-envelope.json"
-ssh_import_fixture="${ssh_source_dir}/expected-import.json"
 shell_config="${script_dir}/../config/shell.qml"
 docker_plugin_dir_name="docker-manager"
 docker_plugin_id="docker.manager"
 docker_source_dir="$(cd "${script_dir}/../examples/plugins/${docker_plugin_dir_name}" 2>/dev/null && pwd || true)"
 docker_manifest="${docker_source_dir}/manifest.json"
 docker_readme="${docker_source_dir}/README.md"
-
-ssh_guard_commands() {
-  if [[ "${PLUGIN_LOCAL_SSH_SKIP_LOCAL:-0}" != "1" ]]; then
-    printf '%s\n' "${script_dir}/check-plugin-ssh-local.sh"
-  fi
-  cat <<EOF
-${script_dir}/check-plugin-ssh-runtime-smoke.sh
-${script_dir}/check-plugin-ssh-contracts.sh
-${script_dir}/check-plugin-ssh-fixtures.sh
-EOF
-}
-
-ssh_guard_label() {
-  local guard_cmd="$1"
-  case "$guard_cmd" in
-    *"check-plugin-ssh-local.sh")
-      printf '%s' 'first-party ssh local checks'
-      ;;
-    *"check-plugin-ssh-runtime-smoke.sh")
-      printf '%s' 'first-party ssh runtime smoke checks'
-      ;;
-    *"check-plugin-ssh-contracts.sh")
-      printf '%s' 'first-party ssh contract checks'
-      ;;
-    *"check-plugin-ssh-fixtures.sh")
-      printf '%s' 'first-party ssh fixture checks'
-      ;;
-    *)
-      printf '%s' 'first-party ssh guard'
-      ;;
-  esac
-}
 
 docker_guard_commands() {
   if [[ "${PLUGIN_LOCAL_DOCKER_SKIP_LOCAL:-0}" != "1" ]]; then
@@ -94,9 +54,7 @@ docker_guard_label() {
 quickshell_guard_commands() {
   cat <<EOF
 ${script_dir}/check-quickshell-startup.sh
-${script_dir}/check-settings-responsive.sh
-${script_dir}/check-surface-responsive.sh
-${script_dir}/check-panel-runtime.sh
+${script_dir}/check-panel-runtime.sh --repo-shell
 EOF
 }
 
@@ -106,14 +64,11 @@ quickshell_guard_label() {
     *"check-quickshell-startup.sh")
       printf '%s' 'quickshell startup smoke'
       ;;
-    *"check-settings-responsive.sh")
-      printf '%s' 'quickshell settings responsiveness smoke'
-      ;;
-    *"check-surface-responsive.sh")
-      printf '%s' 'quickshell surface responsiveness smoke'
+    *"check-panel-runtime.sh --repo-shell")
+      printf '%s' 'quickshell repo-shell runtime aggregate (settings, surfaces, and multibar when supported)'
       ;;
     *"check-panel-runtime.sh")
-      printf '%s' 'quickshell panel runtime aggregate (with multibar when supported)'
+      printf '%s' 'quickshell panel runtime aggregate'
       ;;
     *)
       printf '%s' 'quickshell runtime guard'
@@ -181,7 +136,7 @@ reference_guard_label() {
 usage() {
   cat <<'EOF'
 Usage:
-  plugin-local.sh [quick|full|doctor|install-reference|remove-reference|smoke-reference|reference-flow|reference-export|reference-status|reference-files|reference-guards|reference-all|install-docker-manager|remove-docker-manager|smoke-docker-manager|docker-flow|docker-status|docker-files|docker-guards|docker-all|ssh-flow|ssh-status|ssh-files|ssh-guards|ssh-all|quickshell-flow|quickshell-status|quickshell-files|quickshell-guards|quickshell-all|live-gates|shared-gates|baseline-gates|all-gates] [plugins_dir|--check|--quiet]
+  plugin-local.sh [quick|full|doctor|install-reference|remove-reference|smoke-reference|reference-flow|reference-export|reference-status|reference-files|reference-guards|reference-all|install-docker-manager|remove-docker-manager|smoke-docker-manager|docker-flow|docker-status|docker-files|docker-guards|docker-all|quickshell-flow|quickshell-status|quickshell-files|quickshell-guards|quickshell-all|live-gates|shared-gates|baseline-gates|all-gates] [plugins_dir|--check|--quiet]
 
 Modes:
   quick              Run fast local plugin guardrails (default, `--quiet` suppresses wrapper headings)
@@ -204,11 +159,6 @@ Modes:
   docker-files       Print canonical docker-manager file and guard paths only
   docker-guards      Print runnable docker-manager guard commands in order
   docker-all         Run the full docker-manager guard sequence (`--quiet` suppresses stage headings)
-  ssh-flow           Print the manual first-party SSH plugin validation sequence
-  ssh-status         Print a combined first-party SSH plugin status summary (`--check` fails on unhealthy prerequisites, `--quiet` suppresses the dashboard and prints one-line status)
-  ssh-files          Print canonical first-party SSH plugin file and guard paths only
-  ssh-guards         Print runnable first-party SSH plugin guard commands in order
-  ssh-all            Run the full first-party SSH plugin guard sequence (`--quiet` suppresses stage headings)
   quickshell-flow    Print the manual Quickshell runtime validation sequence
   quickshell-status  Print a combined Quickshell runtime status summary (`--check` fails on missing prerequisites or inactive service, `--quiet` suppresses the dashboard and prints one-line status)
   quickshell-files   Print canonical Quickshell shell/runtime script and guard paths only
@@ -783,150 +733,16 @@ EOF
       printf '[INFO] Docker Manager plugin checks passed.\n'
     fi
     ;;
-  ssh-flow)
-    cat <<'EOF'
-First-Party SSH Plugin Manual Flow
-
-1. Run `scripts/check-plugin-ssh-local.sh` and `scripts/check-plugin-ssh-runtime-smoke.sh`.
-2. Open Settings -> Plugins, confirm `SSH Monitor` is present and enabled, then run `scripts/plugin-local.sh shared-gates`.
-3. Open the SSH plugin settings page, add a manual host, and confirm the bar summary updates.
-4. Enable ssh-config import and confirm exact aliases from `~/.ssh/config` appear while wildcard entries remain skipped.
-5. Open launcher mode with `!ssh`, run a connect action for a manual host, then run a copy action for an imported alias.
-6. Confirm the copied command matches the displayed command form and that recent-host state updates after launcher actions.
-7. Finish with `scripts/plugin-verify.sh --quiet`.
-EOF
-    ;;
-  ssh-status)
-    check_only=0
-    quiet=0
-    shift 1
-    while (($# > 0)); do
-      case "$1" in
-        --check)
-          check_only=1
-          ;;
-        --quiet)
-          quiet=1
-          ;;
-      esac
-      shift
-    done
-    health_failures=0
-    if [[ -d "$ssh_source_dir" && -f "$ssh_manifest" && -f "$ssh_readme" ]]; then
-      source_health="$(health_label 1 "first-party ssh plugin source")"
-    else
-      source_health="$(health_label 0 "first-party ssh plugin source")"
-      health_failures=$((health_failures + 1))
-    fi
-    if [[ -f "$ssh_settings_fixture" && -f "$ssh_state_fixture" && -f "$ssh_import_fixture" ]]; then
-      fixture_health="$(health_label 1 "ssh plugin fixtures")"
-    else
-      fixture_health="$(health_label 0 "ssh plugin fixtures")"
-      health_failures=$((health_failures + 1))
-    fi
-    if [[ -x "${script_dir}/check-plugin-ssh-local.sh" && -x "${script_dir}/check-plugin-ssh-runtime-smoke.sh" && -x "${script_dir}/check-plugin-ssh-contracts.sh" && -x "${script_dir}/check-plugin-ssh-fixtures.sh" ]]; then
-      guard_health="$(health_label 1 "ssh guard scripts")"
-    else
-      guard_health="$(health_label 0 "ssh guard scripts")"
-      health_failures=$((health_failures + 1))
-    fi
-    if (( quiet == 0 )); then
-      cat <<EOF
-First-Party SSH Plugin Status
-
-Plugin state:
-  shipped path: ${ssh_source_dir}
-  plugin id: ${ssh_plugin_id}
-  launcher trigger: !ssh
-
-Health summary:
-  ${source_health}
-  ${fixture_health}
-  ${guard_health}
-
-Local commands:
-  shared:   scripts/plugin-local.sh shared-gates
-  verify:   scripts/plugin-verify.sh --quiet
-  flow:     scripts/plugin-local.sh ssh-flow
-  status:   scripts/plugin-local.sh ssh-status --check
-
-Plugin files:
-  manifest: ${ssh_manifest}
-  readme:   ${ssh_readme}
-  settings: ${ssh_settings_fixture}
-  state:    ${ssh_state_fixture}
-  import:   ${ssh_import_fixture}
-
-SSH guards:
-  scripts/check-plugin-ssh-local.sh
-  scripts/check-plugin-ssh-runtime-smoke.sh
-  scripts/check-plugin-ssh-contracts.sh
-  scripts/check-plugin-ssh-fixtures.sh
-EOF
-    else
-      printf '[INFO] SSH status: %s | %s | %s\n' \
-        "$source_health" \
-        "$fixture_health" \
-        "$guard_health"
-    fi
-    if (( check_only == 1 )); then
-      if (( health_failures == 0 )); then
-        printf '[INFO] SSH status check passed.\n'
-      else
-        printf '[FAIL] SSH status check failed: %d prerequisite issue(s).\n' "$health_failures" >&2
-        exit 1
-      fi
-    fi
-    ;;
-  ssh-files)
-    cat <<EOF
-source_dir=${ssh_source_dir}
-plugin_id=${ssh_plugin_id}
-manifest=${ssh_manifest}
-readme=${ssh_readme}
-settings_fixture=${ssh_settings_fixture}
-state_fixture=${ssh_state_fixture}
-import_fixture=${ssh_import_fixture}
-guard_local=${script_dir}/check-plugin-ssh-local.sh
-guard_runtime_smoke=${script_dir}/check-plugin-ssh-runtime-smoke.sh
-guard_contracts=${script_dir}/check-plugin-ssh-contracts.sh
-guard_fixtures=${script_dir}/check-plugin-ssh-fixtures.sh
-EOF
-    ;;
-  ssh-guards)
-    ssh_guard_commands
-    ;;
-  ssh-all)
-    quiet=0
-    if [[ "${2:-}" == "--quiet" ]]; then
-      quiet=1
-    fi
-    while IFS= read -r guard_cmd; do
-      [[ -n "$guard_cmd" ]] || continue
-      read -r -a guard_parts <<< "$guard_cmd"
-      if (( quiet == 0 )); then
-        printf '[INFO] Running %s...\n' "$(ssh_guard_label "$guard_cmd")"
-      fi
-      "${guard_parts[@]}"
-    done < <(ssh_guard_commands)
-    if (( quiet == 0 )); then
-      printf '[INFO] First-party SSH plugin checks passed.\n'
-    fi
-    ;;
   quickshell-flow)
     cat <<EOF
 Quickshell Manual Flow
 
 1. Ensure the current Home Manager generation is active:
    - home-manager switch --flake /home/administrator/nixos-config#administrator@woody
-2. Restart the live shell:
-   - systemctl --user restart quickshell
-3. Run the focused Quickshell runtime checks:
+2. Run the focused Quickshell runtime checks:
    - scripts/check-quickshell-startup.sh
-   - scripts/check-settings-responsive.sh
-   - scripts/check-surface-responsive.sh
-   - scripts/check-panel-runtime.sh
-4. Run the assembled Quickshell workflow:
+   - scripts/check-panel-runtime.sh --repo-shell
+3. Run the assembled Quickshell workflow:
    - scripts/plugin-local.sh quickshell-all
 EOF
     ;;
@@ -958,10 +774,14 @@ EOF
       guard_health="$(health_label 0 "quickshell runtime guard scripts")"
       health_failures=$((health_failures + 1))
     fi
-    if command -v systemctl >/dev/null 2>&1 && systemctl --user is-active --quiet quickshell.service; then
-      service_health="$(health_label 1 "quickshell.service active")"
+    if command -v systemctl >/dev/null 2>&1; then
+      if systemctl --user is-active --quiet quickshell.service; then
+        service_health="$(health_label 1 "quickshell.service active")"
+      else
+        service_health="$(health_label 1 "repo-shell runtime path available")"
+      fi
     else
-      service_health="$(health_label 0 "quickshell.service active")"
+      service_health="$(health_label 0 "repo-shell runtime path available")"
       health_failures=$((health_failures + 1))
     fi
     if (( quiet == 0 )); then
@@ -985,9 +805,7 @@ Local commands:
 
 Runtime files:
   startup:  ${script_dir}/check-quickshell-startup.sh
-  settings: ${script_dir}/check-settings-responsive.sh
-  surfaces: ${script_dir}/check-surface-responsive.sh
-  panel:    ${script_dir}/check-panel-runtime.sh
+  panel:    ${script_dir}/check-panel-runtime.sh --repo-shell
 EOF
     else
       printf '[INFO] Quickshell status: %s | %s | %s\n' \
@@ -1075,22 +893,6 @@ EOF
       printf '[INFO] Running plugin diagnostics schema checks...\n'
     fi
     "${script_dir}/check-plugin-diagnostics-schema.sh"
-    if (( quiet == 0 )); then
-      printf '[INFO] Running first-party ssh plugin local checks...\n'
-    fi
-    "${script_dir}/check-plugin-ssh-local.sh"
-    if (( quiet == 0 )); then
-      printf '[INFO] Running first-party ssh plugin runtime smoke checks...\n'
-    fi
-    "${script_dir}/check-plugin-ssh-runtime-smoke.sh"
-    if (( quiet == 0 )); then
-      printf '[INFO] Running first-party ssh plugin contract checks...\n'
-    fi
-    "${script_dir}/check-plugin-ssh-contracts.sh"
-    if (( quiet == 0 )); then
-      printf '[INFO] Running first-party ssh plugin fixture checks...\n'
-    fi
-    "${script_dir}/check-plugin-ssh-fixtures.sh"
     ;;
   baseline-gates)
     quiet=0

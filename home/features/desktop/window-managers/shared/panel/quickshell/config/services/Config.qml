@@ -447,6 +447,9 @@ QtObject {
     function updateBarWidget(barId, section, instanceId, patch) {
         return _barMgr.updateBarWidget(barId, section, instanceId, patch);
     }
+    function updateBarWidgetByInstance(instanceId, patch) {
+        return _barMgr.updateBarWidgetByInstance(instanceId, patch);
+    }
     function moveBarWidget(barId, section, fromIndex, toIndex, targetSection) {
         return _barMgr.moveBarWidget(barId, section, fromIndex, toIndex, targetSection);
     }

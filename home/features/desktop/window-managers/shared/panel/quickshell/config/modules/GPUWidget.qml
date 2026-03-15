@@ -47,7 +47,7 @@ SharedWidgets.CardBase {
       color: Colors.textDisabled
       font.pixelSize: Colors.fontSizeXS
       font.weight: Font.Black
-      font.letterSpacing: 1.0
+      font.letterSpacing: Colors.letterSpacingWide
       font.capitalization: Font.AllUppercase
     }
 

@@ -11,6 +11,8 @@ BasePopupMenu {
   subtitle: WeatherService.location || "Local"
   toggleMethod: "toggleWeatherMenu"
 
+  SharedWidgets.Ref { service: WeatherService }
+
   function dayName(dateStr) {
     var parts = String(dateStr || "").split("-");
     if (parts.length < 3) return dateStr;
@@ -39,21 +41,13 @@ BasePopupMenu {
       border.width: 1
 
       gradient: Gradient {
-        orientation: Gradient.Vertical
-        GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-        GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-      }
+    orientation: Gradient.Vertical
+    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+}
 
       // Inner highlight
-      Rectangle {
-        anchors.fill: parent
-        anchors.margins: 1
-        radius: parent.radius - 1
-        color: "transparent"
-        border.color: Colors.borderLight
-        border.width: 1
-        opacity: 0.1
-      }
+      SharedWidgets.InnerHighlight { }
 
       GridLayout {
         anchors.fill: parent
@@ -108,24 +102,16 @@ BasePopupMenu {
             Text { text: "Feels"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeSmall }
             Text { text: WeatherService.feelsLike || "--"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
           }
-
           RowLayout {
             spacing: Colors.spacingXS
             Text { text: "Humidity"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeSmall }
             Text { text: WeatherService.humidity || "--"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
           }
-
           RowLayout {
             spacing: Colors.spacingXS
             Text { text: "Wind"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeSmall }
-            Text {
-              text: (WeatherService.windSpeed || "--") + (WeatherService.windDir ? (" " + WeatherService.windDir) : "")
-              color: Colors.textSecondary
-              font.pixelSize: Colors.fontSizeSmall
-              font.weight: Font.Medium
-            }
+            Text { text: (WeatherService.windSpeed || "--") + (WeatherService.windDir ? (" " + WeatherService.windDir) : ""); color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
           }
-
           RowLayout {
             spacing: Colors.spacingXS
             Text { text: "Visibility"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeSmall }
@@ -145,21 +131,13 @@ BasePopupMenu {
       border.width: 1
 
       gradient: Gradient {
-        orientation: Gradient.Vertical
-        GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-        GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-      }
+    orientation: Gradient.Vertical
+    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+}
 
       // Inner highlight
-      Rectangle {
-        anchors.fill: parent
-        anchors.margins: 1
-        radius: parent.radius - 1
-        color: "transparent"
-        border.color: Colors.borderLight
-        border.width: 1
-        opacity: 0.1
-      }
+      SharedWidgets.InnerHighlight { }
 
       GridLayout {
         id: detailsGrid
@@ -236,15 +214,7 @@ BasePopupMenu {
             border.width: 1
 
             // Inner highlight
-            Rectangle {
-              anchors.fill: parent
-              anchors.margins: 1
-              radius: parent.radius - 1
-              color: "transparent"
-              border.color: Colors.borderLight
-              border.width: 1
-              opacity: 0.1
-            }
+            SharedWidgets.InnerHighlight { }
 
             ColumnLayout {
               anchors.fill: parent
@@ -301,16 +271,7 @@ BasePopupMenu {
         border.color: forecastHover.containsMouse ? Colors.primary : Colors.border
         border.width: 1
 
-        // Inner highlight
-        Rectangle {
-          anchors.fill: parent
-          anchors.margins: 1
-          radius: parent.radius - 1
-          color: "transparent"
-          border.color: Colors.borderLight
-          border.width: 1
-          opacity: forecastHover.containsMouse ? 0.2 : 0.1
-        }
+        SharedWidgets.InnerHighlight { hoveredOpacity: 0.2; hovered: forecastHover.containsMouse }
 
         SharedWidgets.StateLayer {
           hovered: forecastHover.containsMouse

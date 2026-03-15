@@ -85,7 +85,7 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
   - `scripts/plugin-verify.sh`
   - `scripts/plugin-verify.sh --quiet`
   - reuses `scripts/plugin-local.sh all-gates`
-- Quickshell-first live gate:
+- Quickshell-first runtime gate:
   - `scripts/quickshell-verify.sh`
   - `scripts/quickshell-verify.sh --quiet`
   - reuses `scripts/plugin-local.sh live-gates`
@@ -125,16 +125,7 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
   - `scripts/plugin-doctor.sh`
   - JSON output mode: `scripts/plugin-doctor.sh --json`
   - Optional custom path: `scripts/plugin-doctor.sh /path/to/plugins`
-- First-party SSH plugin gates:
-  - `scripts/check-plugin-ssh-local.sh`
-  - `scripts/check-plugin-ssh-runtime-smoke.sh`
-  - `scripts/check-plugin-ssh-contracts.sh`
-  - `scripts/check-plugin-ssh-fixtures.sh`
-  - `scripts/plugin-local.sh ssh-status`
-  - `scripts/plugin-local.sh ssh-status --check --quiet`
-  - `scripts/plugin-local.sh ssh-flow`
-  - `scripts/plugin-local.sh ssh-guards`
-  - `scripts/plugin-local.sh ssh-all`
+- Quickshell runtime gates:
   - `scripts/check-quickshell-local.sh`
   - `scripts/plugin-local.sh quickshell-status`
   - `scripts/plugin-local.sh quickshell-status --check --quiet`
@@ -173,17 +164,26 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
 - `scripts/plugin-local.sh all-gates` runs the Docker Manager guard sequence when `scripts/plugin-local.sh docker-status --check` succeeds, and otherwise skips that optional Docker-specific phase.
 - `scripts/plugin-local.sh quick` reuses `reference-all --quiet --silent-preflight` before the shared runtime and diagnostics gates, so the fast path and the reference-only path stay aligned without extra preflight noise.
 - Run `scripts/plugin-local.sh quick --quiet` when you want that same fast path without the top-level wrapper lines or shared-gate headings.
-- Run `scripts/plugin-local.sh quickshell-status` when you want a one-screen health summary for the live Quickshell service and its runtime guard scripts.
-- Run `scripts/plugin-local.sh quickshell-status --check` to fail fast when the live Quickshell service is inactive or the Quickshell runtime guard scripts are missing.
+- Run `scripts/plugin-local.sh quickshell-status` when you want a one-screen health summary for the Quickshell shell config, runtime guard scripts, and the current runtime path (`quickshell.service` when active, otherwise the repo-shell fallback path).
+- Run `scripts/plugin-local.sh quickshell-status --check` to fail fast when the Quickshell shell config or runtime guard scripts are missing, or when no repo-shell launch path is available.
 - Run `scripts/plugin-local.sh quickshell-status --check --quiet` when you want that preflight as a compact one-line status.
 - Run `scripts/plugin-local.sh quickshell-files` when you need only the canonical Quickshell shell and runtime guard paths.
 - Run `scripts/plugin-local.sh quickshell-guards` when you need the runnable Quickshell runtime guard commands in order.
-- Run `scripts/plugin-local.sh quickshell-all` when you want the assembled Quickshell runtime workflow in one command, including multibar when the environment supports a `PanelWindow` backend.
-- Run `scripts/plugin-local.sh live-gates` when you want the shared plugin/runtime guards and the live Quickshell session workflow in one command.
-- Run `scripts/plugin-local.sh live-gates --quiet` when you want that combined live gate without wrapper headings.
+- Run `scripts/plugin-local.sh quickshell-all` when you want the assembled Quickshell runtime workflow in one command; it runs startup smoke plus `check-panel-runtime.sh --repo-shell`, including multibar when the environment supports a `PanelWindow` backend.
+- Run `scripts/plugin-local.sh live-gates` when you want the shared plugin/runtime guards and the Quickshell repo-shell runtime workflow in one command.
+- Run `scripts/plugin-local.sh live-gates --quiet` when you want that combined repo-shell gate without wrapper headings.
 - Run `scripts/quickshell-verify.sh` when you want the Quickshell-first top-level verifier without going through `plugin-local.sh`.
 - Run `scripts/quickshell-verify.sh --quiet` when you want that verifier in compact mode.
 - Run `scripts/check-quickshell-local.sh` when you want to guard the `plugin-local.sh` Quickshell workflow surface itself against drift.
+- Current verified baseline for `scripts/quickshell-verify.sh --quiet` is:
+  - startup smoke: `1 pass, 0 fail`
+  - plugin runtime guard: `29 pass, 0 fail`
+  - plugin diagnostics contract: `14 pass, 0 fail`
+  - plugin diagnostics schema: `6 pass, 0 fail`
+  - panel config contracts: `4 pass, 0 fail`
+  - settings runtime smoke: `12 pass, 0 warn, 0 fail`
+  - surface runtime smoke: `41 pass, 0 warn, 0 fail`
+  - synthetic multibar smoke in this headless environment: `0 pass, 0 warn, 6 skip, 0 fail`
 
 ## Reference Plugin Workflow
 
@@ -200,23 +200,6 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
 - `scripts/plugin-local.sh quick` is the fastest local way to catch reference-plugin and diagnostics/runtime contract drift together.
 - Open launcher mode with `!ref` after installation to exercise increment, reset, and summary actions.
 - Use the reference plugin settings page to toggle launcher failure modes (`query` or `execute`) and confirm degraded diagnostics in the Plugins tab.
-
-## First-Party SSH Plugin Workflow
-
-- Shipped plugin path: `config/plugins/ssh-monitor`
-- Launcher trigger: `!ssh`
-- Keep `scripts/check-plugin-ssh-local.sh` green when changing the shipped manifest or install shape.
-- Keep `scripts/check-plugin-ssh-runtime-smoke.sh` green when changing runtime loading, ssh-config import behavior, or launcher/settings interactions.
-- Keep `scripts/check-plugin-ssh-contracts.sh` green when changing the intended first-party manifest, launcher, settings, or command wiring contract.
-- Keep `scripts/check-plugin-ssh-fixtures.sh` green when changing parser behavior or persisted settings/state envelope shapes.
-- Run `scripts/plugin-local.sh ssh-status --check` for a fast preflight over the shipped plugin files, fixtures, and SSH-specific guard scripts.
-- Run `scripts/plugin-local.sh ssh-status --check --quiet` when you want the compact one-line SSH preflight status.
-- Run `scripts/plugin-local.sh ssh-flow` for the manual first-party SSH plugin validation sequence.
-- Run `scripts/plugin-local.sh ssh-guards` for the canonical SSH-only guard command list.
-- Run `scripts/plugin-local.sh ssh-all` for the SSH-only automated guard sequence.
-- Run `scripts/plugin-local.sh shared-gates --quiet` for the shared plugin tail that now includes the first-party SSH checks.
-- Run `scripts/plugin-verify.sh --quiet` for the full assembled plugin pipeline.
-- Open launcher mode with `!ssh` to exercise connect and copy actions against the shipped plugin.
 
 ## Docker Manager Plugin Workflow
 

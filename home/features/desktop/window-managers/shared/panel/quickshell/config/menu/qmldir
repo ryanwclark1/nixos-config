@@ -11,7 +11,6 @@ DateTimeMenu 1.0 DateTimeMenu.qml
 DevOpsSection 1.0 DevOpsSection.qml
 DisplayConfig 1.0 DisplayConfig.qml
 FileBrowser 1.0 FileBrowser.qml
-HyprActions 1.0 HyprActions.qml
 MusicMenu 1.0 MusicMenu.qml
 NetworkMenu 1.0 NetworkMenu.qml
 Notepad 1.0 Notepad.qml

@@ -43,21 +43,13 @@ Rectangle {
     z: 9999
 
     gradient: Gradient {
-      orientation: Gradient.Vertical
-      GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-      GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+        orientation: Gradient.Vertical
+        GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+        GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
     }
 
     // Inner highlight
-    Rectangle {
-      anchors.fill: parent
-      anchors.margins: 1
-      radius: parent.radius - 1
-      color: "transparent"
-      border.color: Colors.borderLight
-      border.width: 1
-      opacity: 0.15
-    }
+    InnerHighlight { highlightOpacity: 0.15 }
 
     scale: showMenu ? 1.0 : 0.9
     opacity: showMenu ? 1.0 : 0.0

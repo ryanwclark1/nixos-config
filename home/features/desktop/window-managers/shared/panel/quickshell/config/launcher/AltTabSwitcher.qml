@@ -184,16 +184,7 @@ Scope {
                       GradientStop { position: 1.0; color: "transparent" }
                     } : null
 
-                    // Inner highlight
-                    Rectangle {
-                      anchors.fill: parent
-                      anchors.margins: 1
-                      radius: parent.radius - 1
-                      color: "transparent"
-                      border.color: Colors.borderLight
-                      border.width: 1
-                      opacity: isSelected ? 0.3 : 0.1
-                    }
+                    SharedWidgets.InnerHighlight { hoveredOpacity: 0.3; hovered: isSelected }
 
                     Column {
                       anchors.centerIn: parent

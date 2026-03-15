@@ -6,6 +6,7 @@ import Quickshell.Hyprland
 import Quickshell.Wayland._Screencopy
 import Quickshell.Wayland
 import "../services" // Import Colors
+import "../widgets" as SharedWidgets
 
 Scope {
   id: root
@@ -99,21 +100,12 @@ Scope {
                   border.width: workspaceData.active ? 2 : 1
 
                   gradient: Gradient {
-                    orientation: Gradient.Vertical
-                    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-                    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-                  }
+    orientation: Gradient.Vertical
+    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+}
 
-                  // Inner highlight
-                  Rectangle {
-                    anchors.fill: parent
-                    anchors.margins: 1
-                    radius: parent.radius - 1
-                    color: "transparent"
-                    border.color: Colors.borderLight
-                    border.width: 1
-                    opacity: workspaceData.active ? 0.25 : 0.1
-                  }
+                  SharedWidgets.InnerHighlight { hoveredOpacity: 0.25; hovered: workspaceData.active }
 
                   DropArea {
                     anchors.fill: parent
@@ -177,16 +169,7 @@ Scope {
                             Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
                             clip: true
 
-                            // Inner highlight
-                            Rectangle {
-                              anchors.fill: parent
-                              anchors.margins: 1
-                              radius: parent.radius - 1
-                              color: "transparent"
-                              border.color: Colors.borderLight
-                              border.width: 1
-                              opacity: hoverArea.containsMouse ? 0.3 : 0.1
-                            }
+                            SharedWidgets.InnerHighlight { hoveredOpacity: 0.3; hovered: hoverArea.containsMouse }
 
                             property string windowAddress: modelData.address
 
@@ -204,7 +187,7 @@ Scope {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 color: Colors.surface
-                                radius: 4
+                                radius: Colors.radiusXS
                                 clip: true
 
                                 ScreencopyView {

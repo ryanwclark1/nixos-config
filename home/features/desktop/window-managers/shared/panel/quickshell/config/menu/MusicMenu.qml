@@ -14,6 +14,8 @@ BasePopupMenu {
   toggleMethod: "toggleMusicMenu"
   surfaceTint: Colors.withAlpha(root.dominantColor, 0.05)
 
+  SharedWidgets.Ref { service: MediaService }
+
   readonly property var activePlayers: {
     MediaService.currentPlayer; // force re-eval on player change
     return MediaService.getAvailablePlayers();

@@ -7,6 +7,9 @@ import Quickshell.Services.Mpris
 Item {
   id: root
 
+  // ── Subscriber lifecycle ──────────────────────────
+  property int subscriberCount: 0
+
   // ── Exposed state ──────────────────────────────
   property var currentPlayer: null
   property bool isPlaying: false
@@ -190,7 +193,7 @@ Item {
   // ── Position tracking ──────────────────────────
   property Timer positionTimer: Timer {
     interval: 1000
-    running: root.isPlaying && !root.isSeeking && root.trackLength > 0
+    running: root.isPlaying && !root.isSeeking && root.trackLength > 0 && root.subscriberCount > 0
     repeat: true
     onTriggered: {
       if (root.currentPlayer) {
@@ -206,7 +209,7 @@ Item {
   // ── Auto-switch monitor ────────────────────────
   property Timer switchMonitor: Timer {
     interval: 5000
-    running: Mpris.players.length > 0
+    running: Mpris.players.length > 0 && root.subscriberCount > 0
     repeat: true
     onTriggered: root.updateCurrentPlayer()
   }

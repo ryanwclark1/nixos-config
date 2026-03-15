@@ -16,6 +16,7 @@ QtObject {
     return {
       left: [
         createWidgetInstance("logo"),
+        createWidgetInstance("criticalStatus"),
         createWidgetInstance("workspaces"),
         createWidgetInstance("windowTitle"),
         createWidgetInstance("taskbar"),
@@ -172,11 +173,29 @@ QtObject {
     return item && item.settings ? JSON.parse(JSON.stringify(item.settings)) : {};
   }
 
+  function canonicalWidgetType(widgetType) {
+    var typeName = String(widgetType || "");
+    if (typeName === "plugin:quickshell.ssh.monitor")
+      return "ssh";
+    return typeName;
+  }
+
+  function legacyWidgetSettings(widgetType) {
+    if (canonicalWidgetType(widgetType) !== "ssh")
+      return {};
+    var legacy = config.pluginSettings && config.pluginSettings["quickshell.ssh.monitor"];
+    return legacy && typeof legacy === "object" ? JSON.parse(JSON.stringify(legacy)) : {};
+  }
+
   function normalizedWidgetSettings(widgetType, item) {
+    var canonicalType = canonicalWidgetType(widgetType);
     var defaults = {};
     if (BarWidgetRegistry && BarWidgetRegistry.defaultSettings)
-      defaults = BarWidgetRegistry.defaultSettings(widgetType);
+      defaults = BarWidgetRegistry.defaultSettings(canonicalType);
     var merged = JSON.parse(JSON.stringify(defaults));
+    var legacy = legacyWidgetSettings(canonicalType);
+    for (var legacyKey in legacy)
+      merged[legacyKey] = legacy[legacyKey];
     var current = cloneWidgetSettings(item);
     for (var key in current)
       merged[key] = current[key];
@@ -210,11 +229,12 @@ QtObject {
     if (typeof item === "string") return createWidgetInstance(item);
 
     var widgetType = item && item.widgetType ? item.widgetType : (item && item.widgetId ? item.widgetId : "spacer");
+    var canonicalType = canonicalWidgetType(widgetType);
     return {
       instanceId: item && item.instanceId ? item.instanceId : generateId("widget"),
-      widgetType: widgetType,
+      widgetType: canonicalType,
       enabled: item && item.enabled !== undefined ? !!item.enabled : true,
-      settings: normalizedWidgetSettings(widgetType, item)
+      settings: normalizedWidgetSettings(canonicalType, item)
     };
   }
 
@@ -514,6 +534,28 @@ QtObject {
 
     if (!found) return false;
     return updateBarSection(barId, section, updated);
+  }
+
+  function updateBarWidgetByInstance(instanceId, patch) {
+    var targetId = String(instanceId || "");
+    if (targetId === "")
+      return false;
+
+    var bars = config.barConfigs || [];
+    var sections = ["left", "center", "right"];
+    for (var i = 0; i < bars.length; ++i) {
+      var barConfig = bars[i];
+      for (var j = 0; j < sections.length; ++j) {
+        var section = sections[j];
+        var widgets = barSectionWidgets(barConfig, section);
+        for (var k = 0; k < widgets.length; ++k) {
+          if (String(widgets[k].instanceId || "") === targetId)
+            return updateBarWidget(barConfig.id, section, targetId, patch);
+        }
+      }
+    }
+
+    return false;
   }
 
   function moveBarWidget(barId, section, fromIndex, toIndex, targetSection) {

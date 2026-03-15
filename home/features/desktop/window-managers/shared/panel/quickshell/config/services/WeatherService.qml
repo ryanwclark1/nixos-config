@@ -7,6 +7,9 @@ import Quickshell.Io
 QtObject {
   id: root
 
+  // ── Subscriber lifecycle ──────────────────────────
+  property int subscriberCount: 0
+
   property string temp: "--"
   property string feelsLike: "--"
   property string humidity: "--"
@@ -229,7 +232,7 @@ QtObject {
 
   property Timer weatherTimer: Timer {
     interval: 1800000
-    running: root._ready
+    running: root._ready && root.subscriberCount > 0
     repeat: true
     triggeredOnStart: true
     onTriggered: root.refresh()

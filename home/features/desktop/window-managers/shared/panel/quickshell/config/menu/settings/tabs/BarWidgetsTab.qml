@@ -863,6 +863,12 @@ Item {
                         onModeSelected: value => root.updateEditingWidgetSetting("valueStyle", value)
                     }
 
+                    SharedWidgets.SshWidgetSettings {
+                        Layout.fillWidth: true
+                        visible: !!root.editingWidget && root.editingWidget.widgetType === "ssh"
+                        widgetInstance: root.editingWidget
+                    }
+
                     Loader {
                         id: pluginSettingsLoader
                         Layout.fillWidth: true

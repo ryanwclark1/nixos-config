@@ -71,6 +71,16 @@ If the installed shell does not reflect the repo checkout yet, use `scripts/chec
 
 Unlike the headless multibar smoke in the panel QA flow, this live-session check uses only `PASS`, `WARN`, and `FAIL` outcomes. It does not emit `[SKIP]` results.
 
+Current verified repo-shell baseline:
+
+- `scripts/check-panel-runtime.sh --repo-shell --skip-surfaces --skip-multibar`
+- summary: `12 pass, 0 warn, 0 fail`
+- covered tabs: `wallpaper`, `bar-widgets`, `bars`, `system`, `plugins`, `theme`, `hotkeys`, `time-weather`
+- recent runtime fixes that made this clean again:
+  - deferred `SettingsHub` tab-open persistence now guards initialization,
+  - `CommandPoll` no longer emits startup `triggerPoll` type errors,
+  - missing shared support widgets/imports uncovered during repo-shell verification were restored.
+
 ## What The Preview Script Covers
 
 The preview script:

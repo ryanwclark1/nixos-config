@@ -57,6 +57,48 @@ BasePopupMenu {
     }
   ]
 
+  Component {
+    id: networkDetailCardComponent
+    Rectangle {
+      required property var modelData
+      Layout.fillWidth: true
+      Layout.preferredHeight: 60
+      radius: Colors.radiusMedium
+      color: Colors.withAlpha(Colors.surface, 0.3)
+      border.color: Colors.border
+      border.width: 1
+      clip: true
+
+      SharedWidgets.InnerHighlight { }
+
+      Rectangle {
+        anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom
+        width: 3; color: Colors.withAlpha(Colors.primary, 0.25)
+      }
+
+      Column {
+        anchors.fill: parent
+        anchors.margins: Colors.spacingM
+        anchors.leftMargin: Colors.spacingM
+        spacing: Colors.spacingXS
+        SharedWidgets.SectionLabel { label: modelData.label }
+        Text {
+          text: modelData.value
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeSmall
+          font.weight: Font.Medium
+          width: parent.width
+          wrapMode: Text.WrapAnywhere
+          maximumLineCount: 2
+          elide: Text.ElideRight
+        }
+      }
+
+      SharedWidgets.StateLayer { anchors.fill: parent; radius: parent.radius; stateColor: Colors.primary; enableRipple: false; hovered: detailHover.containsMouse }
+      MouseArea { id: detailHover; anchors.fill: parent; hoverEnabled: true }
+    }
+  }
+
   SharedWidgets.ScrollableContent {
     Layout.fillWidth: true
     Layout.fillHeight: true
@@ -71,21 +113,13 @@ BasePopupMenu {
           implicitHeight: root.compactMode ? 126 : 96
 
           gradient: Gradient {
-            orientation: Gradient.Vertical
-            GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-            GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-          }
+    orientation: Gradient.Vertical
+    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+}
 
           // Inner highlight
-          Rectangle {
-            anchors.fill: parent
-            anchors.margins: 1
-            radius: parent.radius - 1
-            color: "transparent"
-            border.color: Colors.borderLight
-            border.width: 1
-            opacity: 0.1
-          }
+          SharedWidgets.InnerHighlight { }
 
           ColumnLayout {
             anchors.fill: parent
@@ -274,52 +308,7 @@ BasePopupMenu {
                 { label: "Default Route", value: NetworkService.detailValue(NetworkService.routeDevice, "Unavailable") + (NetworkService.routeSource !== "" ? " \u2022 " + NetworkService.routeSource : "") },
                 { label: "DNS", value: NetworkService.dnsSummary() }
               ]
-              delegate: Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 60
-                radius: Colors.radiusMedium
-                color: Colors.withAlpha(Colors.surface, 0.3)
-                border.color: Colors.border
-                border.width: 1
-                clip: true
-
-                // Inner highlight
-                Rectangle {
-                  anchors.fill: parent
-                  anchors.margins: 1
-                  radius: parent.radius - 1
-                  color: "transparent"
-                  border.color: Colors.borderLight
-                  border.width: 1
-                  opacity: 0.1
-                }
-
-                Rectangle {
-                  anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom
-                  width: 3; color: Colors.withAlpha(Colors.primary, 0.25)
-                }
-
-                Column {
-                  anchors.fill: parent
-                  anchors.margins: Colors.spacingM
-                  anchors.leftMargin: Colors.spacingM
-                  spacing: Colors.spacingXS
-                  SharedWidgets.SectionLabel { label: modelData.label }
-                  Text {
-                    text: modelData.value
-                    color: Colors.text
-                    font.pixelSize: Colors.fontSizeSmall
-                    font.weight: Font.Medium
-                    width: parent.width
-                    wrapMode: Text.WrapAnywhere
-                    maximumLineCount: 2
-                    elide: Text.ElideRight
-                  }
-                }
-
-                SharedWidgets.StateLayer { anchors.fill: parent; radius: parent.radius; stateColor: Colors.primary; enableRipple: false; hovered: overviewCardHover.containsMouse }
-                MouseArea { id: overviewCardHover; anchors.fill: parent; hoverEnabled: true }
-              }
+              delegate: networkDetailCardComponent
             }
           }
         }
@@ -343,52 +332,7 @@ BasePopupMenu {
                 { label: "Downloaded", value: NetworkService.detailValue(NetworkService.totalReceived, "0 B") },
                 { label: "Uploaded", value: NetworkService.detailValue(NetworkService.totalSent, "0 B") }
               ]
-              delegate: Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 60
-                radius: Colors.radiusMedium
-                color: Colors.withAlpha(Colors.surface, 0.3)
-                border.color: Colors.border
-                border.width: 1
-                clip: true
-
-                // Inner highlight
-                Rectangle {
-                  anchors.fill: parent
-                  anchors.margins: 1
-                  radius: parent.radius - 1
-                  color: "transparent"
-                  border.color: Colors.borderLight
-                  border.width: 1
-                  opacity: 0.1
-                }
-
-                Rectangle {
-                  anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom
-                  width: 3; color: Colors.withAlpha(Colors.primary, 0.25)
-                }
-
-                Column {
-                  anchors.fill: parent
-                  anchors.margins: Colors.spacingM
-                  anchors.leftMargin: Colors.spacingM
-                  spacing: Colors.spacingXS
-                  SharedWidgets.SectionLabel { label: modelData.label }
-                  Text {
-                    text: modelData.value
-                    color: Colors.text
-                    font.pixelSize: Colors.fontSizeSmall
-                    font.weight: Font.Medium
-                    width: parent.width
-                    wrapMode: Text.WrapAnywhere
-                    maximumLineCount: 2
-                    elide: Text.ElideRight
-                  }
-                }
-
-                SharedWidgets.StateLayer { anchors.fill: parent; radius: parent.radius; stateColor: Colors.primary; enableRipple: false; hovered: internetCardHover.containsMouse }
-                MouseArea { id: internetCardHover; anchors.fill: parent; hoverEnabled: true }
-              }
+              delegate: networkDetailCardComponent
             }
           }
         }
@@ -569,52 +513,7 @@ BasePopupMenu {
                 { label: "Channel / Band", value: NetworkService.primaryChannel !== "" ? (NetworkService.primaryChannel + (NetworkService.primaryBand !== "" ? " \u2022 " + NetworkService.primaryBand : "")) : "N/A" },
                 { label: "Interface", value: NetworkService.detailValue(NetworkService.primaryDevice, "Unavailable") }
               ]
-              delegate: Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 60
-                radius: Colors.radiusMedium
-                color: Colors.withAlpha(Colors.surface, 0.3)
-                border.color: Colors.border
-                border.width: 1
-                clip: true
-
-                // Inner highlight
-                Rectangle {
-                  anchors.fill: parent
-                  anchors.margins: 1
-                  radius: parent.radius - 1
-                  color: "transparent"
-                  border.color: Colors.borderLight
-                  border.width: 1
-                  opacity: 0.1
-                }
-
-                Rectangle {
-                  anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom
-                  width: 3; color: Colors.withAlpha(Colors.primary, 0.25)
-                }
-
-                Column {
-                  anchors.fill: parent
-                  anchors.margins: Colors.spacingM
-                  anchors.leftMargin: Colors.spacingM
-                  spacing: Colors.spacingXS
-                  SharedWidgets.SectionLabel { label: modelData.label }
-                  Text {
-                    text: modelData.value
-                    color: Colors.text
-                    font.pixelSize: Colors.fontSizeSmall
-                    font.weight: Font.Medium
-                    width: parent.width
-                    wrapMode: Text.WrapAnywhere
-                    maximumLineCount: 2
-                    elide: Text.ElideRight
-                  }
-                }
-
-                SharedWidgets.StateLayer { anchors.fill: parent; radius: parent.radius; stateColor: Colors.primary; enableRipple: false; hovered: techCardHover.containsMouse }
-                MouseArea { id: techCardHover; anchors.fill: parent; hoverEnabled: true }
-              }
+              delegate: networkDetailCardComponent
             }
           }
         }
@@ -684,16 +583,7 @@ BasePopupMenu {
                 border.color: modelData.active ? Colors.primary : Colors.border
                 border.width: 1
 
-                // Inner highlight
-                Rectangle {
-                  anchors.fill: parent
-                  anchors.margins: 1
-                  radius: parent.radius - 1
-                  color: "transparent"
-                  border.color: Colors.borderLight
-                  border.width: 1
-                  opacity: modelData.active ? 0.25 : 0.1
-                }
+                SharedWidgets.InnerHighlight { hoveredOpacity: 0.25; hovered: modelData.active }
 
                 RowLayout {
                   anchors.fill: parent

@@ -98,6 +98,15 @@ QtObject {
     onTriggered: root.refreshHealth()
   }
 
+  readonly property real cpuTempNum: parseFloat(cpuTemp) || 0
+  readonly property real gpuTempNum: parseFloat(gpuTemp) || 0
+  readonly property real cpuUsageNum: parseFloat(cpuUsage) || 0
+  readonly property real ramUsageNum: parseFloat(ramUsage) || 0
+
+  readonly property bool hasHighLoad: cpuUsageNum > 85 || ramUsageNum > 90
+  readonly property bool hasHighTemp: cpuTempNum > 85 || gpuTempNum > 80
+  readonly property bool isCritical: hasHighLoad || hasHighTemp || overallStatus === "failure"
+
   property string cpuTemp: "--"
   property string gpuTemp: "--"
   property string cpuUsage: "0%"

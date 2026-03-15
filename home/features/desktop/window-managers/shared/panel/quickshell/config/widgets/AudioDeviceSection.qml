@@ -37,21 +37,13 @@ ColumnLayout {
     implicitHeight: controlCol.implicitHeight + 2 * Colors.spacingM
 
     gradient: Gradient {
-      orientation: Gradient.Vertical
-      GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-      GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-    }
+    orientation: Gradient.Vertical
+    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+}
 
     // Inner highlight
-    Rectangle {
-      anchors.fill: parent
-      anchors.margins: 1
-      radius: parent.radius - 1
-      color: "transparent"
-      border.color: Colors.borderLight
-      border.width: 1
-      opacity: 0.1
-    }
+    InnerHighlight { }
 
     ColumnLayout {
       id: controlCol
@@ -129,16 +121,7 @@ ColumnLayout {
       border.width: 1
       Behavior on color { ColorAnimation { duration: Colors.durationFast } }
 
-      // Inner highlight
-      Rectangle {
-        anchors.fill: parent
-        anchors.margins: 1
-        radius: parent.radius - 1
-        color: "transparent"
-        border.color: Colors.borderLight
-        border.width: 1
-        opacity: deviceCard.isDefault ? 0.3 : 0.15
-      }
+      InnerHighlight { highlightOpacity: 0.15; hoveredOpacity: 0.3; hovered: deviceCard.isDefault }
 
       RowLayout {
         anchors.fill: parent

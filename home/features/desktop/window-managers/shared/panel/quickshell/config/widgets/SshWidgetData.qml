@@ -1,19 +1,20 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "../services"
 import "SshConfigParser.js" as SshConfigParser
 
 QtObject {
     id: root
 
-    property var pluginApi: null
-    property var pluginManifest: null
-    property var pluginService: null
+    property var widgetInstance: null
 
-    property var manualHosts: []
-    property bool enableSshConfigImport: true
-    property string displayMode: "count"
-    property string defaultAction: "connect"
+    readonly property var rawSettings: widgetInstance && widgetInstance.settings ? widgetInstance.settings : ({})
+    readonly property var manualHosts: _normalizeManualHosts(rawSettings.manualHosts || [])
+    readonly property bool enableSshConfigImport: rawSettings.enableSshConfigImport !== false
+    readonly property string displayMode: String(rawSettings.displayMode || "count") === "recent" ? "recent" : "count"
+    readonly property string defaultAction: String(rawSettings.defaultAction || "connect") === "copy" ? "copy" : "connect"
+    readonly property var stateInfo: _normalizedState(rawSettings.state)
 
     property var importedHosts: []
     property var skippedPatternEntries: []
@@ -23,32 +24,17 @@ QtObject {
     property bool importBusy: false
     property string importRootPath: _expandHome("~/.ssh/config")
 
-    property var stateEnvelope: ({
-        stateVersion: 1,
-        updatedAt: "",
-        payload: {
-            lastConnectedId: "",
-            lastConnectedLabel: "",
-            lastConnectedAt: "",
-            recentIds: [],
-            lastImportSummary: {
-                imported: 0,
-                skippedPatterns: 0,
-                errors: 0
-            }
-        }
-    })
-
-    signal refreshed
-
     property var _pendingFiles: []
     property var _seenFiles: ({})
     property int _pendingIncludeExpansions: 0
+    property int _importGeneration: 0
     property var _importedAliasMap: ({})
     property var _skippedMap: ({})
     property var _errorList: []
 
-    onPluginApiChanged: refresh()
+    onWidgetInstanceChanged: refreshImport()
+    onManualHostsChanged: _recomputeMerged()
+    onEnableSshConfigImportChanged: refreshImport()
 
     function _expandHome(pathValue) {
         var text = String(pathValue || "");
@@ -62,16 +48,16 @@ QtObject {
         return "'" + value.replace(/'/g, "'\"'\"'") + "'";
     }
 
+    function _clone(value) {
+        return JSON.parse(JSON.stringify(value));
+    }
+
     function _normalizeId(text, fallbackValue) {
         var value = String(text || "").trim().toLowerCase();
         if (value === "")
             value = String(fallbackValue || "").trim().toLowerCase();
         value = value.replace(/[^a-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "");
         return value === "" ? "host-" + String(Date.now()) : value;
-    }
-
-    function _arrayClone(list) {
-        return JSON.parse(JSON.stringify(Array.isArray(list) ? list : []));
     }
 
     function _tagsFromValue(value) {
@@ -144,81 +130,37 @@ QtObject {
         return out;
     }
 
-    function _clonePayload() {
-        var payload = stateEnvelope && stateEnvelope.payload ? stateEnvelope.payload : ({});
+    function _normalizedState(raw) {
+        var input = raw && typeof raw === "object" ? raw : ({});
         return {
-            lastConnectedId: String(payload.lastConnectedId || ""),
-            lastConnectedLabel: String(payload.lastConnectedLabel || ""),
-            lastConnectedAt: String(payload.lastConnectedAt || ""),
-            recentIds: Array.isArray(payload.recentIds) ? payload.recentIds.slice() : [],
-            lastImportSummary: payload.lastImportSummary && typeof payload.lastImportSummary === "object" ? {
-                imported: Math.max(0, Number(payload.lastImportSummary.imported || 0)),
-                skippedPatterns: Math.max(0, Number(payload.lastImportSummary.skippedPatterns || 0)),
-                errors: Math.max(0, Number(payload.lastImportSummary.errors || 0))
-            } : { imported: 0, skippedPatterns: 0, errors: 0 }
+            lastConnectedId: String(input.lastConnectedId || ""),
+            lastConnectedLabel: String(input.lastConnectedLabel || ""),
+            lastConnectedAt: String(input.lastConnectedAt || ""),
+            recentIds: Array.isArray(input.recentIds) ? input.recentIds.slice() : []
         };
     }
 
-    function _payloadFromEnvelope(envelope) {
-        var payload = envelope && envelope.payload && typeof envelope.payload === "object" ? envelope.payload : ({});
+    function _settingsSnapshot() {
         return {
-            lastConnectedId: String(payload.lastConnectedId || ""),
-            lastConnectedLabel: String(payload.lastConnectedLabel || ""),
-            lastConnectedAt: String(payload.lastConnectedAt || ""),
-            recentIds: Array.isArray(payload.recentIds) ? payload.recentIds.slice() : [],
-            lastImportSummary: payload.lastImportSummary && typeof payload.lastImportSummary === "object" ? {
-                imported: Math.max(0, Number(payload.lastImportSummary.imported || 0)),
-                skippedPatterns: Math.max(0, Number(payload.lastImportSummary.skippedPatterns || 0)),
-                errors: Math.max(0, Number(payload.lastImportSummary.errors || 0))
-            } : { imported: 0, skippedPatterns: 0, errors: 0 }
+            manualHosts: _clone(rawSettings.manualHosts || []),
+            enableSshConfigImport: enableSshConfigImport,
+            displayMode: displayMode,
+            defaultAction: defaultAction,
+            state: _clone(stateInfo)
         };
     }
 
-    function loadSettings() {
-        if (!pluginApi)
-            return;
-        manualHosts = _normalizeManualHosts(pluginApi.loadSetting("manualHosts", []));
-        enableSshConfigImport = pluginApi.loadSetting("enableSshConfigImport", true) !== false;
-        var nextDisplay = String(pluginApi.loadSetting("displayMode", "count"));
-        displayMode = nextDisplay === "recent" ? "recent" : "count";
-        var nextAction = String(pluginApi.loadSetting("defaultAction", "connect"));
-        defaultAction = nextAction === "copy" ? "copy" : "connect";
-    }
-
-    function loadState() {
-        if (!pluginApi)
-            return;
-        var envelope = pluginApi.loadStateEnvelope ? pluginApi.loadStateEnvelope() : ({});
-        if (!envelope || typeof envelope !== "object")
-            envelope = ({});
-        if (!envelope.payload || typeof envelope.payload !== "object")
-            envelope.payload = ({});
-        stateEnvelope = {
-            stateVersion: Number(envelope.stateVersion || 1),
-            updatedAt: String(envelope.updatedAt || ""),
-            payload: _payloadFromEnvelope(envelope)
-        };
-    }
-
-    function refresh() {
-        if (!pluginApi)
-            return;
-        loadSettings();
-        loadState();
-        refreshImport();
-    }
-
-    function _notifyRefresh() {
-        if (pluginService && pluginService.pluginRuntimeUpdated)
-            pluginService.pluginRuntimeUpdated();
-        refreshed();
+    function _persistSettings(nextSettings) {
+        if (!widgetInstance || !widgetInstance.instanceId)
+            return false;
+        return Config.updateBarWidgetByInstance(widgetInstance.instanceId, {
+            settings: _clone(nextSettings)
+        });
     }
 
     function saveManualHosts(list) {
-        if (!pluginApi)
-            return false;
-        var normalized = _normalizeManualHosts(list);
-        var persistable = normalized.map(function(host) {
+        var next = _settingsSnapshot();
+        next.manualHosts = _normalizeManualHosts(list).map(function(host) {
             return {
                 id: host.id,
                 label: host.label,
@@ -231,75 +173,74 @@ QtObject {
                 icon: host.icon
             };
         });
-        pluginApi.saveSetting("manualHosts", persistable);
-        manualHosts = normalized;
-        _recomputeMerged();
-        _notifyRefresh();
-        return true;
+        return _persistSettings(next);
     }
 
     function setImportEnabled(enabled) {
-        if (!pluginApi)
-            return false;
-        pluginApi.saveSetting("enableSshConfigImport", enabled === true);
-        enableSshConfigImport = enabled === true;
-        refreshImport();
-        _notifyRefresh();
-        return true;
+        var next = _settingsSnapshot();
+        next.enableSshConfigImport = enabled === true;
+        return _persistSettings(next);
     }
 
     function setDisplayMode(modeValue) {
-        if (!pluginApi)
-            return false;
-        displayMode = String(modeValue || "") === "recent" ? "recent" : "count";
-        pluginApi.saveSetting("displayMode", displayMode);
-        _notifyRefresh();
-        return true;
+        var next = _settingsSnapshot();
+        next.displayMode = String(modeValue || "") === "recent" ? "recent" : "count";
+        return _persistSettings(next);
     }
 
     function setDefaultAction(modeValue) {
-        if (!pluginApi)
-            return false;
-        defaultAction = String(modeValue || "") === "copy" ? "copy" : "connect";
-        pluginApi.saveSetting("defaultAction", defaultAction);
-        _notifyRefresh();
-        return true;
+        var next = _settingsSnapshot();
+        next.defaultAction = String(modeValue || "") === "copy" ? "copy" : "connect";
+        return _persistSettings(next);
     }
 
     function resetStateOnly() {
-        if (!pluginApi)
-            return false;
-        pluginApi.saveStateEnvelope({
-            stateVersion: 1,
-            updatedAt: new Date().toISOString(),
-            payload: {
-                lastConnectedId: "",
-                lastConnectedLabel: "",
-                lastConnectedAt: "",
-                recentIds: [],
-                lastImportSummary: {
-                    imported: importedHosts.length,
-                    skippedPatterns: skippedPatternEntries.length,
-                    errors: importErrors.length
-                }
-            }
-        });
-        loadState();
-        _notifyRefresh();
-        return true;
+        var next = _settingsSnapshot();
+        next.state = {
+            lastConnectedId: "",
+            lastConnectedLabel: "",
+            lastConnectedAt: "",
+            recentIds: []
+        };
+        return _persistSettings(next);
     }
 
     function resetAll() {
-        if (!pluginApi)
-            return false;
-        pluginApi.saveSetting("manualHosts", []);
-        pluginApi.saveSetting("enableSshConfigImport", true);
-        pluginApi.saveSetting("displayMode", "count");
-        pluginApi.saveSetting("defaultAction", "connect");
-        loadSettings();
-        resetStateOnly();
-        refreshImport();
-        return true;
+        return _persistSettings({
+            manualHosts: [],
+            enableSshConfigImport: true,
+            displayMode: "count",
+            defaultAction: "connect",
+            state: {
+                lastConnectedId: "",
+                lastConnectedLabel: "",
+                lastConnectedAt: "",
+                recentIds: []
+            }
+        });
+    }
+
+    function refreshImport() {
+        _importGeneration += 1;
+        importedHosts = [];
+        skippedPatternEntries = [];
+        importErrors = [];
+        _importedAliasMap = ({});
+        _skippedMap = ({});
+        _errorList = [];
+        _pendingFiles = [];
+        _seenFiles = ({});
+        _pendingIncludeExpansions = 0;
+        importBusy = enableSshConfigImport;
+        importReady = !enableSshConfigImport;
+
+        if (!enableSshConfigImport) {
+            _recomputeMerged();
+            return;
+        }
+
+        _enqueueFile(importRootPath, "", 0);
+        _drainImportQueue();
     }
 
     function _recomputeMerged() {
@@ -319,9 +260,8 @@ QtObject {
         merged.sort(function(a, b) {
             var aRank = a.source === "manual" ? 0 : 1;
             var bRank = b.source === "manual" ? 0 : 1;
-            var sourceOrder = aRank - bRank;
-            if (sourceOrder !== 0)
-                return sourceOrder;
+            if (aRank !== bRank)
+                return aRank - bRank;
             return String(a.label || "").localeCompare(String(b.label || ""));
         });
         mergedHosts = merged;
@@ -373,30 +313,6 @@ QtObject {
         });
     }
 
-    function refreshImport() {
-        importedHosts = [];
-        skippedPatternEntries = [];
-        importErrors = [];
-        _importedAliasMap = ({});
-        _skippedMap = ({});
-        _errorList = [];
-        _pendingFiles = [];
-        _seenFiles = ({});
-        _pendingIncludeExpansions = 0;
-        importBusy = enableSshConfigImport;
-        importReady = !enableSshConfigImport;
-
-        if (!enableSshConfigImport) {
-            _recomputeMerged();
-            _writeImportSummaryState();
-            refreshed();
-            return;
-        }
-
-        _enqueueFile(importRootPath, "", 0);
-        _drainImportQueue();
-    }
-
     function _drainImportQueue() {
         while (_pendingFiles.length > 0) {
             var next = _pendingFiles.shift();
@@ -437,6 +353,7 @@ QtObject {
                     _pendingIncludeExpansions += 1;
                     var proc = includeExpandProcComponent.createObject(root, {
                         owner: root,
+                        importGeneration: _importGeneration,
                         includePattern: resolved,
                         includeSourcePath: next.path,
                         includeSourceLine: Math.max(0, Number(includeEntry.sourceLine || 0))
@@ -460,6 +377,11 @@ QtObject {
     }
 
     function _handleIncludeExpansion(proc, outputText) {
+        if (!proc || Number(proc.importGeneration || 0) !== _importGeneration) {
+            if (proc)
+                proc.destroy();
+            return;
+        }
         var lines = String(outputText || "").split("\n").map(function(entry) {
             return String(entry || "").trim();
         }).filter(function(entry) {
@@ -493,25 +415,6 @@ QtObject {
         importBusy = false;
         importReady = true;
         _recomputeMerged();
-        _writeImportSummaryState();
-        refreshed();
-    }
-
-    function _writeImportSummaryState() {
-        if (!pluginApi || !pluginApi.saveStateEnvelope)
-            return;
-        var payload = _clonePayload();
-        payload.lastImportSummary = {
-            imported: importedHosts.length,
-            skippedPatterns: skippedPatternEntries.length,
-            errors: importErrors.length
-        };
-        pluginApi.saveStateEnvelope({
-            stateVersion: 1,
-            updatedAt: new Date().toISOString(),
-            payload: payload
-        });
-        loadState();
     }
 
     function _buildManualCommand(host) {
@@ -539,134 +442,57 @@ QtObject {
     }
 
     function _rememberHost(host) {
-        if (!pluginApi || !pluginApi.saveStateEnvelope)
-            return;
-        var payload = _clonePayload();
-        payload.lastConnectedId = String(host.id || "");
-        payload.lastConnectedLabel = String(host.label || host.alias || host.host || "");
-        payload.lastConnectedAt = new Date().toISOString();
-        var recent = [payload.lastConnectedId];
-        var currentRecent = Array.isArray(payload.recentIds) ? payload.recentIds : [];
-        for (var i = 0; i < currentRecent.length && recent.length < 8; ++i) {
-            var item = String(currentRecent[i] || "");
+        var next = _settingsSnapshot();
+        var recent = [String(host.id || "")];
+        for (var i = 0; i < stateInfo.recentIds.length && recent.length < 8; ++i) {
+            var item = String(stateInfo.recentIds[i] || "");
             if (item !== "" && recent.indexOf(item) === -1)
                 recent.push(item);
         }
-        payload.recentIds = recent;
-        payload.lastImportSummary = {
-            imported: importedHosts.length,
-            skippedPatterns: skippedPatternEntries.length,
-            errors: importErrors.length
+        next.state = {
+            lastConnectedId: String(host.id || ""),
+            lastConnectedLabel: String(host.label || host.alias || host.host || ""),
+            lastConnectedAt: new Date().toISOString(),
+            recentIds: recent
         };
-        pluginApi.saveStateEnvelope({
-            stateVersion: 1,
-            updatedAt: new Date().toISOString(),
-            payload: payload
-        });
-        loadState();
+        _persistSettings(next);
     }
 
     function connectHost(host) {
-        if (!pluginApi || !host)
+        if (!host)
             return false;
         var terminalCommand = host.source === "imported"
             ? "exec ssh " + _shellQuote(String(host.alias || ""))
             : _buildManualCommand(host);
-        var ok = pluginApi.runProcess(["kitty", "-e", "bash", "-lc", terminalCommand]);
-        if (ok !== false) {
-            _rememberHost(host);
-            _notifyRefresh();
-        }
-        return ok !== false;
+        Quickshell.execDetached(["ghostty", "-e", "bash", "-lc", terminalCommand]);
+        _rememberHost(host);
+        return true;
     }
 
     function copyHostCommand(host) {
-        if (!pluginApi || !host)
+        if (!host)
             return false;
         var commandText = buildDisplayCommand(host);
         if (commandText === "")
             return false;
-        var ok = pluginApi.runProcess([
+        Quickshell.execDetached([
             "bash",
             "-lc",
             "printf '%s' " + _shellQuote(commandText) + " | wl-copy"
         ]);
-        if (ok !== false) {
-            _rememberHost(host);
-            _notifyRefresh();
-        }
-        return ok !== false;
+        _rememberHost(host);
+        return true;
     }
 
-    function openLauncher() {
-        if (!pluginApi)
-            return false;
-        return pluginApi.runProcess(["quickshell", "ipc", "call", "Launcher", "openPlugins"]) !== false;
-    }
-
-    function executeLauncherItem(item) {
-        if (!item || !item.data)
-            return false;
-        var host = item.data.host || null;
-        var action = String(item.data.action || defaultAction || "connect");
+    function executeDefault(host) {
+        var action = defaultAction;
         if (action === "copy")
             return copyHostCommand(host);
         return connectHost(host);
     }
 
-    function _scoreHost(host, query) {
-        var q = String(query || "").trim().toLowerCase();
-        if (q === "")
-            return 100;
-        var haystack = String(host.searchText || "");
-        if (haystack.indexOf(q) === -1)
-            return -1;
-        if (String(host.label || "").toLowerCase().indexOf(q) === 0)
-            return 120;
-        if (String(host.alias || "").toLowerCase().indexOf(q) === 0)
-            return 115;
-        return 80;
-    }
-
-    function launcherItems(query) {
-        var items = [];
-        for (var i = 0; i < mergedHosts.length; ++i) {
-            var host = mergedHosts[i];
-            var score = _scoreHost(host, query);
-            if (score < 0)
-                continue;
-            var description = host.source === "imported"
-                ? ("Alias from " + String(host.sourcePath || "~/.ssh/config"))
-                : ((String(host.user || "").trim() !== "" ? (host.user + "@") : "") + String(host.host || ""));
-            items.push({
-                name: String(host.label || host.alias || host.host || "SSH"),
-                title: String(host.label || host.alias || host.host || "SSH"),
-                description: description,
-                icon: String(host.icon || "󰣀"),
-                score: score,
-                data: {
-                    action: "connect",
-                    host: host
-                }
-            });
-            items.push({
-                name: "Copy " + String(host.label || host.alias || host.host || "SSH"),
-                title: "Copy " + String(host.label || host.alias || host.host || "SSH"),
-                description: "Copy `" + buildDisplayCommand(host) + "` to the clipboard.",
-                icon: "󰅍",
-                score: score - 10,
-                data: {
-                    action: "copy",
-                    host: host
-                }
-            });
-        }
-        return items;
-    }
-
     function recentHostLabel() {
-        var payload = _clonePayload();
-        return String(payload.lastConnectedLabel || "");
+        return String(stateInfo.lastConnectedLabel || "");
     }
 
     function summaryLabel() {
@@ -676,18 +502,56 @@ QtObject {
     }
 
     function summaryTooltip() {
-        var payload = _clonePayload();
         var lines = [
             "Manual hosts: " + String(manualHosts.length),
             "Imported aliases: " + String(importedHosts.length),
             "Skipped patterns: " + String(skippedPatternEntries.length)
         ];
-        if (payload.lastConnectedLabel)
-            lines.push("Last connected: " + payload.lastConnectedLabel + (payload.lastConnectedAt ? (" at " + payload.lastConnectedAt) : ""));
+        if (stateInfo.lastConnectedLabel)
+            lines.push("Last connected: " + stateInfo.lastConnectedLabel + (stateInfo.lastConnectedAt ? (" at " + stateInfo.lastConnectedAt) : ""));
         if (importErrors.length > 0)
             lines.push("Import errors: " + String(importErrors.length));
         return lines.join("\n");
     }
+
+    function contextActions(limit) {
+        var count = Math.max(1, Number(limit || 6));
+        var actions = [];
+        for (var i = 0; i < mergedHosts.length && i < count; ++i) {
+            var host = mergedHosts[i];
+            actions.push({
+                label: "Connect " + String(host.label || host.alias || host.host || "SSH"),
+                icon: "󰆍",
+                action: (function(selectedHost) {
+                    return function() {
+                        root.connectHost(selectedHost);
+                    };
+                })(host)
+            });
+            actions.push({
+                label: "Copy " + String(host.label || host.alias || host.host || "SSH"),
+                icon: "󰅍",
+                action: (function(selectedHost) {
+                    return function() {
+                        root.copyHostCommand(selectedHost);
+                    };
+                })(host)
+            });
+        }
+        if (enableSshConfigImport) {
+            actions.push({
+                label: importBusy ? "Refreshing import..." : "Refresh SSH config import",
+                icon: "󰑐",
+                enabled: !importBusy,
+                action: function() {
+                    root.refreshImport();
+                }
+            });
+        }
+        return actions;
+    }
+
+    Component.onCompleted: refreshImport()
 
     property Component fileReaderComponent: Component {
         FileView {
@@ -700,6 +564,7 @@ QtObject {
         Process {
             id: includeProc
             property var owner: null
+            property int importGeneration: 0
             property string includePattern: ""
             property string includeSourcePath: ""
             property int includeSourceLine: 0

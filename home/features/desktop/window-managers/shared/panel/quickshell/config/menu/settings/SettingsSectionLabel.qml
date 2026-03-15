@@ -7,5 +7,5 @@ Text {
   font.pixelSize: Colors.fontSizeXS
   font.weight: Font.Black
   font.letterSpacing: Colors.letterSpacingExtraWide
-  Layout.topMargin: 6
+  Layout.topMargin: Colors.spacingSM
 }

@@ -12,6 +12,8 @@ BasePopupMenu {
   title: "Date & Time"
   subtitle: Qt.formatDateTime(clock.date, "dddd, MMMM d")
 
+  SharedWidgets.Ref { service: WeatherService }
+
   SystemClock {
     id: clock
     precision: Config.timeShowSeconds ? SystemClock.Seconds : SystemClock.Minutes

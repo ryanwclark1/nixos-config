@@ -7,6 +7,8 @@ import Quickshell.Bluetooth
 import Quickshell.Services.Mpris
 import "../services"
 import "../widgets" as SharedWidgets
+import "LauncherModeData.js" as ModeData
+import "LauncherSearch.js" as Search
 
 PanelWindow {
     id: launcherRoot
@@ -88,7 +90,7 @@ PanelWindow {
     property var _commandWaiters: ({})
     property var mediaPlayers: []
     property var preloadFailureState: ({})
-    readonly property var availableToplevels: (typeof ToplevelManager !== "undefined" && ToplevelManager.toplevels) ? (ToplevelManager.toplevels.values || []) : []
+    readonly property var availableToplevels: CompositorAdapter.toplevels
     property var launcherMetrics: ({
             opens: 0,
             cacheHits: 0,
@@ -145,168 +147,17 @@ PanelWindow {
             return activeCount + " apps ready";
         return activeCount + " of " + totalCount + " apps";
     }
-    readonly property var allKnownModes: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks", "settings", "devops"]
-    readonly property var transientModes: ["dmenu"]
-    readonly property var defaultModeOrder: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks", "settings", "devops"]
-    readonly property var defaultPrimaryModes: ["drun", "window", "files", "ai", "clip", "system", "media", "settings", "devops"]
+    readonly property var allKnownModes: ModeData.allKnownModes
+    readonly property var transientModes: ModeData.transientModes
+    readonly property var defaultModeOrder: ModeData.defaultModeOrder
+    readonly property var defaultPrimaryModes: ModeData.defaultPrimaryModes
     property var modeOrder: computeModeOrder()
     property var primaryModes: sanitizeModeList(Config.launcherEnabledModes, defaultPrimaryModes, allKnownModes).filter(function (modeKey) {
         return launcherRoot.isModeAllowedByCompositor(modeKey);
     })
-    readonly property var modeMeta: ({
-            "drun": {
-                label: "Apps",
-                hint: "Launch applications",
-                prefix: ""
-            },
-            "window": {
-                label: "Windows",
-                hint: "Jump to an open window",
-                prefix: ""
-            },
-            "files": {
-                label: "Files",
-                hint: "Search home with /",
-                prefix: "/"
-            },
-            "ai": {
-                label: "AI",
-                hint: "Ask with !",
-                prefix: "!"
-            },
-            "clip": {
-                label: "Clipboard",
-                hint: "Recent clipboard history",
-                prefix: ""
-            },
-            "emoji": {
-                label: "Emoji",
-                hint: "Search with :",
-                prefix: ":"
-            },
-            "calc": {
-                label: "Calculator",
-                hint: "Evaluate with =",
-                prefix: "="
-            },
-            "web": {
-                label: "Web",
-                hint: "Search with ?",
-                prefix: "?"
-            },
-            "plugins": {
-                label: "Plugins",
-                hint: "Search plugin providers",
-                prefix: ""
-            },
-            "run": {
-                label: "Run",
-                hint: "Run commands with >",
-                prefix: ">"
-            },
-            "system": {
-                label: "System",
-                hint: "Session and utility actions",
-                prefix: ""
-            },
-            "keybinds": {
-                label: "Keybinds",
-                hint: "Inspect and trigger binds",
-                prefix: ""
-            },
-            "media": {
-                label: "Media",
-                hint: "Control active players",
-                prefix: ""
-            },
-            "nixos": {
-                label: "NixOS",
-                hint: "Nix maintenance actions",
-                prefix: ""
-            },
-            "wallpapers": {
-                label: "Wallpapers",
-                hint: "Pick and apply wallpapers",
-                prefix: ""
-            },
-            "bookmarks": {
-                label: "Bookmarks",
-                hint: "Open bookmarked destinations",
-                prefix: "@"
-            },
-            "settings": {
-                label: "Settings",
-                hint: "Jump to a settings tab with ,",
-                prefix: ","
-            },
-            "devops": {
-                label: "DevOps",
-                hint: "Control containers & services",
-                prefix: ""
-            }
-        })
-    readonly property var modeIcons: ({
-            "drun": "󰀻",
-            "window": "󱗼",
-            "files": "󰈔",
-            "ai": "󰚩",
-            "clip": "󰅍",
-            "emoji": "󰞅",
-            "calc": "󰪚",
-            "web": "󰖟",
-            "plugins": "󰏗",
-            "run": "󰆍",
-            "system": "󰒓",
-            "keybinds": "󰌌",
-            "media": "󰝚",
-            "nixos": "",
-            "wallpapers": "󰸉",
-            "bookmarks": "󰃭",
-            "settings": "󰒓",
-            "devops": "󰒍"
-            })
-    readonly property var webProviderCatalog: ({
-            "google": {
-                key: "google",
-                name: "Google",
-                exec: "https://www.google.com/search?q=",
-                home: "https://www.google.com/",
-                icon: "󰊯",
-                isWeb: true
-            },
-            "duckduckgo": {
-                key: "duckduckgo",
-                name: "DuckDuckGo",
-                exec: "https://duckduckgo.com/?q=",
-                home: "https://duckduckgo.com/",
-                icon: "󰇥",
-                isWeb: true
-            },
-            "youtube": {
-                key: "youtube",
-                name: "YouTube",
-                exec: "https://www.youtube.com/results?search_query=",
-                home: "https://www.youtube.com/",
-                icon: "󰗃",
-                isWeb: true
-            },
-            "nixos": {
-                key: "nixos",
-                name: "NixOS Packages",
-                exec: "https://search.nixos.org/packages?query=",
-                home: "https://search.nixos.org/packages",
-                icon: "",
-                isWeb: true
-            },
-            "github": {
-                key: "github",
-                name: "GitHub",
-                exec: "https://github.com/search?q=",
-                home: "https://github.com/",
-                icon: "󰊤",
-                isWeb: true
-            }
-        })
+    readonly property var modeMeta: ModeData.modeMeta
+    readonly property var modeIcons: ModeData.modeIcons
+    readonly property var webProviderCatalog: ModeData.webProviderCatalog
     readonly property var launcherShortcuts: ({
             "drun": [
                 {
@@ -364,7 +215,7 @@ PanelWindow {
                 }
             ]
         })
-    readonly property string modePrefixes: "!/@?>=:"
+    readonly property string modePrefixes: ModeData.modePrefixes
     readonly property string emptyStateTitle: {
         if (mode === "files")
             return "Type at least " + Config.launcherFileMinQueryLength + " characters to search files";
@@ -2548,62 +2399,15 @@ PanelWindow {
     }
 
     function highlightMatch(fullText, query) {
-        if (!query || !fullText)
-            return fullText;
-        var cleanQuery = stripModePrefix(query);
-        if (!cleanQuery)
-            return fullText;
-        var idx = fullText.toLowerCase().indexOf(cleanQuery.toLowerCase());
-        if (idx === -1)
-            return fullText;
-        return fullText.substring(0, idx) + "<b>" + fullText.substring(idx, idx + cleanQuery.length) + "</b>" + fullText.substring(idx + cleanQuery.length);
+        return Search.highlightMatch(fullText, query, stripModePrefix);
     }
 
     function fuzzyMatchLower(s, p) {
-        if (!p)
-            return 100;
-        if (!s)
-            return 0;
-        if (!p)
-            return 100;
-        if (s.startsWith(p))
-            return 100 + (p.length / s.length);
-        if (s.indexOf(p) !== -1)
-            return 50 + (p.length / s.length);
-        var pIdx = 0;
-        var sIdx = 0;
-        while (sIdx < s.length && pIdx < p.length) {
-            if (s[sIdx] === p[pIdx])
-                pIdx++;
-            sIdx++;
-        }
-        if (pIdx === p.length)
-            return 10 + (p.length / s.length);
-        return 0;
+        return Search.fuzzyMatchLower(s, p);
     }
 
     function ensureItemRankCache(item) {
-        if (!item || item._rankCacheReady)
-            return;
-        item._nameLower = item.name ? String(item.name).toLowerCase() : "";
-        item._titleLower = item.title ? String(item.title).toLowerCase() : "";
-        item._execLower = item.exec ? String(item.exec).toLowerCase() : (item.class ? String(item.class).toLowerCase() : "");
-        item._bodyLower = item.body ? String(item.body).toLowerCase() : "";
-        var category = item.category ? String(item.category).toLowerCase() : "";
-        var keywords = item.keywords ? String(item.keywords).toLowerCase() : "";
-        var tokens = [];
-        var rawTokens = category.split(/[\s;,/|]+/);
-        for (var i = 0; i < rawTokens.length; ++i) {
-            var token = String(rawTokens[i] || "").trim();
-            if (token === "")
-                continue;
-            if (tokens.indexOf(token) === -1)
-                tokens.push(token);
-        }
-        item._categoryTokens = tokens;
-        item._primaryCategoryKey = tokens.length > 0 ? tokens[0] : "";
-        item._categoryKeywordsLower = (category + " " + keywords).trim();
-        item._rankCacheReady = true;
+        Search.ensureItemRankCache(item);
     }
 
     function rankItem(item, clean, cleanLower) {
@@ -2622,19 +2426,7 @@ PanelWindow {
     }
 
     function compareLauncherItemsAlpha(a, b) {
-        var aName = String(a && a.name ? a.name : "");
-        var bName = String(b && b.name ? b.name : "");
-        var byName = aName.localeCompare(bName);
-        if (byName !== 0)
-            return byName;
-        var aExec = String(a && a.exec ? a.exec : "");
-        var bExec = String(b && b.exec ? b.exec : "");
-        var byExec = aExec.localeCompare(bExec);
-        if (byExec !== 0)
-            return byExec;
-        var aTitle = String(a && a.title ? a.title : "");
-        var bTitle = String(b && b.title ? b.title : "");
-        return aTitle.localeCompare(bTitle);
+        return Search.compareLauncherItemsAlpha(a, b);
     }
 
     function filterItems() {

@@ -263,21 +263,12 @@ Scope {
                       border.width: (dropHighlight || isFocused) ? 2 : 1
 
                       gradient: Gradient {
-                        orientation: Gradient.Vertical
-                        GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-                        GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-                      }
+    orientation: Gradient.Vertical
+    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
+    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
+}
 
-                      // Inner highlight
-                      Rectangle {
-                        anchors.fill: parent
-                        anchors.margins: 1
-                        radius: parent.radius - 1
-                        color: "transparent"
-                        border.color: Colors.borderLight
-                        border.width: 1
-                        opacity: isFocused ? 0.25 : 0.1
-                      }
+                      SharedWidgets.InnerHighlight { hoveredOpacity: 0.25; hovered: isFocused }
 
                       DropArea {
                         anchors.fill: parent
@@ -345,16 +336,7 @@ Scope {
                                 border.color: modelData.is_focused ? Colors.primary : (cardMouse.containsMouse ? Colors.border : "transparent")
                                 border.width: 1
 
-                                // Inner highlight
-                                Rectangle {
-                                  anchors.fill: parent
-                                  anchors.margins: 1
-                                  radius: parent.radius - 1
-                                  color: "transparent"
-                                  border.color: Colors.borderLight
-                                  border.width: 1
-                                  opacity: modelData.is_focused ? 0.3 : 0.1
-                                }
+                                SharedWidgets.InnerHighlight { hoveredOpacity: 0.3; hovered: modelData.is_focused }
 
                                 // Drag-and-drop support
                                 property int windowId: modelData.id
@@ -409,7 +391,7 @@ Scope {
                                   Column {
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: parent.width - 32 - Colors.spacingM * 2 - closeBtn.width
-                                    spacing: 2
+                                    spacing: Colors.spacingXXS
 
                                     Text {
                                       width: parent.width

@@ -32,16 +32,7 @@ BasePopupMenu {
                 border.color: mouseArea.containsMouse ? Colors.primary : Colors.border
                 border.width: 1
 
-                // Inner highlight
-                Rectangle {
-                    anchors.fill: parent
-                    anchors.margins: 1
-                    radius: parent.radius - 1
-                    color: "transparent"
-                    border.color: Colors.borderLight
-                    border.width: 1
-                    opacity: mouseArea.containsMouse ? 0.25 : 0.1
-                }
+                SharedWidgets.InnerHighlight { hoveredOpacity: 0.25; hovered: mouseArea.containsMouse }
 
                 RowLayout {
                     anchors.fill: parent
@@ -109,15 +100,7 @@ BasePopupMenu {
             clip: true
 
             // Inner highlight
-            Rectangle {
-                anchors.fill: parent
-                anchors.margins: 1
-                radius: parent.radius - 1
-                color: "transparent"
-                border.color: Colors.borderLight
-                border.width: 1
-                opacity: 0.1
-            }
+            SharedWidgets.InnerHighlight { }
 
             Image {
                 anchors.fill: parent

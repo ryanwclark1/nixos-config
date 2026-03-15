@@ -19,15 +19,7 @@ ColumnLayout {
     implicitHeight: root.launcher.compactMode ? 116 : 130
 
     // Inner highlight lives on the card itself, not inside the layout flow.
-    Rectangle {
-      anchors.fill: parent
-      anchors.margins: 1
-      radius: parent.radius - 1
-      color: "transparent"
-      border.color: Colors.borderLight
-      border.width: 1
-      opacity: 0.1
-    }
+    SharedWidgets.InnerHighlight { }
 
     ColumnLayout {
       anchors.fill: parent
@@ -55,16 +47,7 @@ ColumnLayout {
             Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
 
             // Depth border
-            Rectangle {
-              anchors.fill: parent
-              anchors.margins: 1
-              radius: parent.radius - 1
-              color: "transparent"
-              border.color: Colors.borderLight
-              border.width: 1
-              opacity: hovered ? 0.3 : 0.15
-              Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
-            }
+            SharedWidgets.InnerHighlight { highlightOpacity: 0.15; hoveredOpacity: 0.3; hovered: parent.hovered }
 
             ColumnLayout {
               anchors.fill: parent

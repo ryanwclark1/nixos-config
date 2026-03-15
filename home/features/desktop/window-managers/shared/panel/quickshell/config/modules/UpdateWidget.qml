@@ -187,7 +187,7 @@ SharedWidgets.CardBase {
         elide: Text.ElideRight
       }
       Text {
-        text: "TODO: add support for apt, pacman, dnf, zypper, brew."
+        text: "Only nix-based updates are currently supported."
         color: Colors.textDisabled
         font.pixelSize: Colors.fontSizeXS
         Layout.fillWidth: true

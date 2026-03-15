@@ -6,7 +6,7 @@ import "../widgets" as SharedWidgets
 
 SharedWidgets.CardBase {
   id: root
-  readonly property var allToplevels: (typeof ToplevelManager !== "undefined" && ToplevelManager.toplevels) ? (ToplevelManager.toplevels.values || []) : []
+  readonly property var allToplevels: CompositorAdapter.toplevels
   Layout.preferredHeight: root.scratchpadWindows.length > 0 ? col.implicitHeight + 30 : 0
   visible: CompositorAdapter.supportsScratchpad && root.scratchpadWindows.length > 0
 
@@ -63,16 +63,7 @@ SharedWidgets.CardBase {
           radius: Colors.radiusXXS
           Behavior on color { ColorAnimation { duration: Colors.durationFast } }
 
-          // Inner highlight
-          Rectangle {
-            anchors.fill: parent
-            anchors.margins: 1
-            radius: parent.radius - 1
-            color: "transparent"
-            border.color: Colors.borderLight
-            border.width: 1
-            opacity: scratchHover.containsMouse ? 0.25 : 0.1
-          }
+          SharedWidgets.InnerHighlight { hoveredOpacity: 0.25; hovered: scratchHover.containsMouse }
 
           RowLayout {
             anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: Colors.paddingSmall
