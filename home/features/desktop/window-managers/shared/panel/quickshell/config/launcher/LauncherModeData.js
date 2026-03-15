@@ -1,9 +1,9 @@
 .pragma library
 
-var allKnownModes = ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks", "settings", "devops"];
+var allKnownModes = ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks", "settings", "devops", "orchestrator"];
 var transientModes = ["dmenu"];
-var defaultModeOrder = ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks", "settings", "devops"];
-var defaultPrimaryModes = ["drun", "window", "files", "ai", "clip", "system", "media", "settings", "devops"];
+var defaultModeOrder = ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks", "settings", "devops", "orchestrator"];
+var defaultPrimaryModes = ["drun", "window", "files", "ai", "clip", "system", "media", "settings", "devops", "orchestrator"];
 var modePrefixes = "!/@?>=:";
 
 var modeMeta = {
@@ -24,7 +24,8 @@ var modeMeta = {
     "wallpapers": { label: "Wallpapers", hint: "Pick and apply wallpapers", prefix: "" },
     "bookmarks": { label: "Bookmarks", hint: "Open bookmarked destinations", prefix: "@" },
     "settings": { label: "Settings", hint: "Jump to a settings tab with ,", prefix: "," },
-    "devops": { label: "DevOps", hint: "Control containers & services", prefix: "" }
+    "devops": { label: "DevOps", hint: "Control containers & services", prefix: "" },
+    "orchestrator": { label: "Orchestrator", hint: "Full system dashboard", prefix: "" }
 };
 
 var modeIcons = {
@@ -32,7 +33,7 @@ var modeIcons = {
     "clip": "󰅍", "emoji": "󰞅", "calc": "󰪚", "web": "󰖟",
     "plugins": "󰏗", "run": "󰆍", "system": "󰒓", "keybinds": "󰌌",
     "media": "󰝚", "nixos": "", "wallpapers": "󰸉", "bookmarks": "󰃭",
-    "settings": "󰒓", "devops": "󰒍"
+    "settings": "󰒓", "devops": "󰒍", "orchestrator": "󰓅"
 };
 
 function modeInfo(key) {

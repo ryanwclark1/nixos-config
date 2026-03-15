@@ -1511,6 +1511,8 @@ PanelWindow {
                 loadSettings();
             else if (mode === "devops")
                 loadDevOps();
+            else if (mode === "orchestrator")
+                loadOrchestrator();
             else if (mode === "ai")
                 loadAi();
             else if (mode === "keybinds")
@@ -2187,6 +2189,11 @@ PanelWindow {
         }
 
         allItems = items;
+        filterItems();
+    }
+
+    function loadOrchestrator() {
+        allItems = [];
         filterItems();
     }
 
@@ -3517,6 +3524,11 @@ PanelWindow {
                 LauncherHome {
                     Layout.fillWidth: true
                     launcher: launcherRoot
+                    visible: launcherRoot.showLauncherHome && launcherRoot.mode !== "orchestrator"
+                }
+
+                OrchestratorView {
+                    visible: launcherRoot.mode === "orchestrator" && launcherRoot.searchText === ""
                 }
 
                 StackLayout {
