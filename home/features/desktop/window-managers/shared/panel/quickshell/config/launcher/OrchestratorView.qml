@@ -20,9 +20,9 @@ ColumnLayout {
             Text {
                 text: "SYSTEM ORCHESTRATOR"
                 color: Colors.primary
-                font.pixelSize: 32
+                font.pixelSize: Colors.fontSizeIcon
                 font.weight: Font.Black
-                font.letterSpacing: -1
+                font.letterSpacing: Colors.letterSpacingTight
             }
             Text {
                 text: "Unified Command & Control • v7.0"
@@ -35,7 +35,7 @@ ColumnLayout {
         Item { Layout.fillWidth: true }
         
         Rectangle {
-            width: 120; height: 32; radius: 16
+            width: 120; height: 32; radius: Colors.radiusPill
             color: Colors.withAlpha(SystemStatus.isCritical ? Colors.error : Colors.primary, 0.15)
             border.color: SystemStatus.isCritical ? Colors.error : Colors.primary
             border.width: 1
@@ -44,7 +44,7 @@ ColumnLayout {
                 anchors.centerIn: parent
                 text: SystemStatus.overallStatus.toUpperCase()
                 color: SystemStatus.isCritical ? Colors.error : Colors.text
-                font.pixelSize: 10; font.weight: Font.Black; font.letterSpacing: 1.0
+                font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Colors.letterSpacingWide
             }
         }
     }
@@ -86,23 +86,23 @@ ColumnLayout {
                                 border.color: modelData.is_focused ? Colors.primary : Colors.border; border.width: 1
                                 
                                 ColumnLayout {
-                                    anchors.fill: parent; anchors.margins: 12; spacing: 8
+                                    anchors.fill: parent; anchors.margins: Colors.spacingM; spacing: Colors.spacingS
                                     RowLayout {
-                                        Text { text: modelData.name || modelData.id; color: modelData.is_focused ? Colors.primary : Colors.text; font.pixelSize: 12; font.weight: Font.Bold }
+                                        Text { text: modelData.name || modelData.id; color: modelData.is_focused ? Colors.primary : Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Bold }
                                         Item { Layout.fillWidth: true }
                                         Text { text: modelData.windows + " windows"; color: Colors.textDisabled; font.pixelSize: 9 }
                                     }
                                     
                                     // Mini-map visualization placeholder
                                     Rectangle {
-                                        Layout.fillWidth: true; Layout.fillHeight: true; radius: 4
+                                        Layout.fillWidth: true; Layout.fillHeight: true; radius: Colors.radiusMicro
                                         color: Colors.withAlpha(Colors.background, 0.4)
                                         clip: true
                                         
                                         Text {
                                             anchors.centerIn: parent
                                             text: "󱗼"
-                                            color: Colors.textDisabled; opacity: 0.2; font.pixelSize: 32
+                                            color: Colors.textDisabled; opacity: 0.2; font.pixelSize: Colors.fontSizeIcon
                                         }
                                     }
                                 }
@@ -149,10 +149,10 @@ ColumnLayout {
                     Text { text: "ACTIVE MISSION"; color: Colors.accent; font.pixelSize: 10; font.weight: Font.Black; font.letterSpacing: 1.0 }
                     
                     Rectangle {
-                        Layout.fillWidth: true; Layout.fillHeight: true; radius: 8
+                        Layout.fillWidth: true; Layout.fillHeight: true; radius: Colors.radiusXS
                         color: Colors.withAlpha(Colors.background, 0.4)
                         Text {
-                            anchors.fill: parent; anchors.margins: 12
+                            anchors.fill: parent; anchors.margins: Colors.spacingM
                             text: AiService.isStreaming ? AiService.streamingContent : (AiService.activeMessages.length > 0 ? AiService.activeMessages[AiService.activeMessages.length-1].content : "Listening for commands...")
                             color: Colors.textSecondary; font.pixelSize: 11; wrapMode: Text.Wrap; elide: Text.ElideRight
                         }
