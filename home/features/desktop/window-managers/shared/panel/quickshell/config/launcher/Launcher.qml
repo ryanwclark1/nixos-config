@@ -3323,111 +3323,20 @@ PanelWindow {
                     }
                 }
 
-                Rectangle {
-                    Layout.fillWidth: true
+                LauncherWebProviderBar {
                     visible: launcherRoot.mode === "web" && launcherRoot.filteredItems.length > 0
-                    color: Colors.bgWidget
-                    radius: Colors.radiusMedium
-                    border.color: Colors.border
-                    border.width: 1
-                    implicitHeight: providerFlowContainer.implicitHeight + (Colors.spacingM * 2)
-
-                    Column {
-                        id: providerFlowContainer
-                        anchors.fill: parent
-                        anchors.margins: Colors.spacingM
-                        spacing: Colors.spacingXS
-
-                        Text {
-                            color: Colors.textDisabled
-                            font.pixelSize: Colors.fontSizeXS
-                            font.weight: Font.Bold
-                            text: "PROVIDERS"
-                        }
-
-                        Flow {
-                            width: parent.width
-                            spacing: Colors.spacingS
-
-                            Repeater {
-                                model: launcherRoot.configuredWebProviders()
-
-                                delegate: Rectangle {
-                                    required property var modelData
-
-                                    readonly property bool selected: String(modelData.key || "") === launcherRoot.selectedWebProviderKey
-                                    color: selected ? Colors.withAlpha(Colors.primary, 0.18) : Colors.surface
-                                    radius: Colors.radiusPill
-                                    border.color: selected ? Colors.withAlpha(Colors.primary, 0.6) : Colors.border
-                                    border.width: 1
-                                    implicitHeight: 28
-                                    implicitWidth: Math.min(providerChipText.implicitWidth + 24, providerFlowContainer.width)
-
-                                    Text {
-                                        id: providerChipText
-                                        anchors.centerIn: parent
-                                        width: Math.min(implicitWidth, parent.width - 18)
-                                        text: (modelData.icon || "󰖟") + " " + (modelData.name || "")
-                                        color: parent.selected ? Colors.primary : Colors.textSecondary
-                                        font.pixelSize: Colors.fontSizeXS
-                                        font.weight: Font.DemiBold
-                                        elide: Text.ElideRight
-                                    }
-
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: launcherRoot.selectWebProviderByKey(String(modelData.key || ""))
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    providers: launcherRoot.configuredWebProviders()
+                    selectedKey: launcherRoot.selectedWebProviderKey
+                    onProviderSelected: key => launcherRoot.selectWebProviderByKey(key)
                 }
 
-                Rectangle {
-                    Layout.fillWidth: true
+                LauncherWebHints {
                     visible: Config.launcherShowModeHints && launcherRoot.mode === "web" && !launcherRoot.tightMode
-                    color: Colors.bgWidget
-                    radius: Colors.radiusMedium
-                    border.color: Colors.border
-                    border.width: 1
-                    implicitHeight: webHintColumn.implicitHeight + (Colors.spacingS * 2)
-
-                    Column {
-                        id: webHintColumn
-                        anchors.fill: parent
-                        anchors.margins: Colors.spacingS
-                        spacing: launcherRoot.webHintCompact ? 3 : Colors.spacingXS
-
-                        Row {
-                            width: parent.width
-                            spacing: Colors.spacingS
-
-                            Text {
-                                text: "󰖟"
-                                color: Colors.primary
-                                font.family: Colors.fontMono
-                                font.pixelSize: Colors.fontSizeSmall
-                            }
-                            Text {
-                                width: parent.width - x
-                                text: launcherRoot.webPrimaryEnterHint + " • " + launcherRoot.webSecondaryEnterHint + " • " + launcherRoot.webAliasHint
-                                color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeXS
-                                wrapMode: Text.WordWrap
-                            }
-                        }
-
-                        Text {
-                            width: parent.width
-                            text: launcherRoot.webHotkeyHint
-                            color: Colors.textDisabled
-                            font.pixelSize: Colors.fontSizeXS
-                            wrapMode: Text.WordWrap
-                        }
-                    }
+                    primaryEnterHint: launcherRoot.webPrimaryEnterHint
+                    secondaryEnterHint: launcherRoot.webSecondaryEnterHint
+                    aliasHint: launcherRoot.webAliasHint
+                    hotkeyHint: launcherRoot.webHotkeyHint
+                    compact: launcherRoot.webHintCompact
                 }
 
                 Rectangle {
@@ -3566,128 +3475,18 @@ PanelWindow {
                             }
                         }
 
-                        Rectangle {
-                            color: Colors.bgWidget
-                            radius: Colors.radiusMedium
-                            border.color: Colors.border
-                            border.width: 1
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-
-                            ColumnLayout {
-                                anchors.centerIn: parent
-                                spacing: Colors.spacingS
-                                Text {
-                                    text: launcherRoot.modeIcons[launcherRoot.mode] || "󰈔"
-                                    color: Colors.textDisabled
-                                    font.family: Colors.fontMono
-                                    font.pixelSize: 26
-                                    Layout.alignment: Qt.AlignHCenter
-                                }
-                                Text {
-                                    text: launcherRoot.emptyStateTitle
-                                    color: Colors.text
-                                    font.pixelSize: Colors.fontSizeMedium
-                                    font.weight: Font.DemiBold
-                                    Layout.alignment: Qt.AlignHCenter
-                                }
-                                Text {
-                                    text: launcherRoot.emptyStateSubtitle
-                                    color: Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeSmall
-                                    Layout.alignment: Qt.AlignHCenter
-                                }
-                                RowLayout {
-                                    Layout.alignment: Qt.AlignHCenter
-                                    spacing: Colors.spacingS
-                                    Rectangle {
-                                        radius: Colors.radiusPill
-                                        color: Colors.primary
-                                        implicitHeight: 30
-                                        implicitWidth: emptyPrimaryText.implicitWidth + 20
-                                        Text {
-                                            id: emptyPrimaryText
-                                            anchors.centerIn: parent
-                                            text: launcherRoot.emptyPrimaryCta
-                                            color: Colors.text
-                                            font.pixelSize: Colors.fontSizeXS
-                                            font.weight: Font.DemiBold
-                                        }
-                                        MouseArea {
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: Qt.PointingHandCursor
-                                            onClicked: launcherRoot.executeEmptyPrimary()
-                                        }
-                                    }
-                                    Rectangle {
-                                        visible: launcherRoot.emptySecondaryCta !== ""
-                                        radius: Colors.radiusPill
-                                        color: Colors.surface
-                                        border.color: Colors.border
-                                        border.width: 1
-                                        implicitHeight: 30
-                                        implicitWidth: emptySecondaryText.implicitWidth + 20
-                                        Text {
-                                            id: emptySecondaryText
-                                            anchors.centerIn: parent
-                                            text: launcherRoot.emptySecondaryCta
-                                            color: Colors.text
-                                            font.pixelSize: Colors.fontSizeXS
-                                            font.weight: Font.DemiBold
-                                        }
-                                        MouseArea {
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: Qt.PointingHandCursor
-                                            onClicked: launcherRoot.executeEmptySecondary()
-                                        }
-                                    }
-                                }
-                                RowLayout {
-                                    Layout.maximumWidth: Math.min(parent.width - 24, 460)
-                                    Layout.alignment: Qt.AlignHCenter
-                                    spacing: Colors.spacingXS
-                                    Text {
-                                        text: launcherRoot.emptyPrimaryHintIcon
-                                        color: Colors.textDisabled
-                                        font.family: Colors.fontMono
-                                        font.pixelSize: Colors.fontSizeSmall
-                                        visible: text !== ""
-                                        Layout.alignment: Qt.AlignTop
-                                    }
-                                    Text {
-                                        text: launcherRoot.emptyPrimaryHint
-                                        color: Colors.textDisabled
-                                        font.pixelSize: Colors.fontSizeXS
-                                        wrapMode: Text.WordWrap
-                                        horizontalAlignment: Text.AlignHCenter
-                                        Layout.fillWidth: true
-                                    }
-                                }
-                                RowLayout {
-                                    visible: launcherRoot.emptySecondaryHint !== ""
-                                    Layout.maximumWidth: Math.min(parent.width - 24, 460)
-                                    Layout.alignment: Qt.AlignHCenter
-                                    spacing: Colors.spacingXS
-                                    Text {
-                                        text: launcherRoot.emptySecondaryHintIcon
-                                        color: Colors.textDisabled
-                                        font.family: Colors.fontMono
-                                        font.pixelSize: Colors.fontSizeSmall
-                                        visible: text !== ""
-                                        Layout.alignment: Qt.AlignTop
-                                    }
-                                    Text {
-                                        text: launcherRoot.emptySecondaryHint
-                                        color: Colors.textDisabled
-                                        font.pixelSize: Colors.fontSizeXS
-                                        wrapMode: Text.WordWrap
-                                        horizontalAlignment: Text.AlignHCenter
-                                        Layout.fillWidth: true
-                                    }
-                                }
-                            }
+                        LauncherEmptyState {
+                            icon: launcherRoot.modeIcons[launcherRoot.mode] || "󰈔"
+                            title: launcherRoot.emptyStateTitle
+                            subtitle: launcherRoot.emptyStateSubtitle
+                            primaryCta: launcherRoot.emptyPrimaryCta
+                            secondaryCta: launcherRoot.emptySecondaryCta
+                            primaryHint: launcherRoot.emptyPrimaryHint
+                            primaryHintIcon: launcherRoot.emptyPrimaryHintIcon
+                            secondaryHint: launcherRoot.emptySecondaryHint
+                            secondaryHintIcon: launcherRoot.emptySecondaryHintIcon
+                            onPrimaryClicked: launcherRoot.executeEmptyPrimary()
+                            onSecondaryClicked: launcherRoot.executeEmptySecondary()
                         }
                     }
 
