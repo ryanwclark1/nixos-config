@@ -390,7 +390,7 @@ main() {
     start_repo_shell
   fi
 
-  if [[ -z "${instance_id}" ]]; then
+  if [[ -z "${instance_id}" && -z "${instance_pid}" ]]; then
     instance_pid="$(discover_reachable_pid || true)"
     if [[ -z "${instance_pid}" ]]; then
       printf 'No live QuickShell instances found under %s\n' "${runtime_root}" >&2

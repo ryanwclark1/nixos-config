@@ -180,7 +180,6 @@ Item {
 
   function componentForWidget(widgetType) {
     if (widgetType === "logo") return logoComponent;
-    if (widgetType === "criticalStatus") return criticalStatusComponent;
     if (widgetType === "workspaces") return workspacesComponent;
     if (widgetType === "taskbar") return taskbarComponent;
     if (widgetType === "windowTitle") return windowTitleComponent;
@@ -411,7 +410,6 @@ Item {
   }
 
   Component {
-    id: criticalStatusComponent
     SharedWidgets.BarPill {
       property var widgetInstance: null
       visible: SystemStatus.isCritical

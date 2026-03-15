@@ -16,7 +16,6 @@ QtObject {
     return {
       left: [
         createWidgetInstance("logo"),
-        createWidgetInstance("criticalStatus"),
         createWidgetInstance("workspaces"),
         createWidgetInstance("windowTitle"),
         createWidgetInstance("taskbar"),

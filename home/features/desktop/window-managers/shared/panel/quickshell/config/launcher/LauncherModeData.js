@@ -83,6 +83,72 @@ function shellQuote(text) {
     return "'" + String(text || "").replace(/'/g, "'\\''") + "'";
 }
 
+function stripModePrefix(text) {
+    if (text.length > 0 && modePrefixes.indexOf(text[0]) !== -1)
+        return text.substring(1).trim();
+    return text;
+}
+
+function configuredWebProviders(orderArray) {
+    var fallback = ["duckduckgo", "google", "youtube", "nixos", "github"];
+    var order = Array.isArray(orderArray) && orderArray.length > 0 ? orderArray : fallback;
+    var out = [];
+    var seen = {};
+    for (var i = 0; i < order.length; ++i) {
+        var key = String(order[i] || "");
+        var provider = webProviderCatalog[key];
+        if (!provider || seen[key])
+            continue;
+        out.push(provider);
+        seen[key] = true;
+    }
+    if (out.length === 0) {
+        for (var j = 0; j < fallback.length; ++j) {
+            var fallbackProvider = webProviderCatalog[fallback[j]];
+            if (fallbackProvider)
+                out.push(fallbackProvider);
+        }
+    }
+    return out;
+}
+
+function webAliasToProviderKey(token, providers, aliases) {
+    var key = String(token || "").toLowerCase();
+    if (key === "")
+        return "";
+    if (webProviderCatalog[key])
+        return key;
+    for (var i = 0; i < providers.length; ++i) {
+        var providerKey = String(providers[i].key || "");
+        if (providerKey === "")
+            continue;
+        var list = aliases[providerKey];
+        if (!Array.isArray(list))
+            continue;
+        for (var j = 0; j < list.length; ++j) {
+            if (String(list[j] || "").toLowerCase() === key)
+                return providerKey;
+        }
+    }
+    return "";
+}
+
+function parseWebQuery(text, providers, aliases) {
+    var clean = stripModePrefix(text || "").trim();
+    var result = { query: clean, providerKey: "" };
+    if (clean === "")
+        return result;
+    var parts = clean.split(/\s+/);
+    if (!parts || parts.length === 0)
+        return result;
+    var mapped = webAliasToProviderKey(parts[0], providers, aliases);
+    if (mapped === "")
+        return result;
+    result.providerKey = mapped;
+    result.query = parts.length > 1 ? clean.substring(parts[0].length).trim() : "";
+    return result;
+}
+
 var webProviderCatalog = {
     "google": {
         key: "google", name: "Google",

@@ -8,7 +8,6 @@ QtObject {
 
   readonly property var builtins: [
     { widgetType: "logo", label: "App Launcher", icon: "󰀻", section: "left", description: "Application launcher trigger." },
-    { widgetType: "criticalStatus", label: "Critical Alerts", icon: "󰀪", section: "left", description: "High-priority system health alerts." },
     { widgetType: "workspaces", label: "Workspace Switcher", icon: "󰍺", section: "left", description: "Current workspaces and switching." },
     { widgetType: "windowTitle", label: "Active App Context", icon: "󰖯", section: "left", description: "Active window title and app-specific tools." },
     { widgetType: "keyboardLayout", label: "Keyboard Layout", icon: "󰌌", section: "right", description: "Current keyboard layout indicator." },

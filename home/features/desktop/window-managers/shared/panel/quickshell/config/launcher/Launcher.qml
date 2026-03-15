@@ -835,33 +835,10 @@ PanelWindow {
         }
     }
 
-    function stripModePrefix(text) {
-        if (text.length > 0 && modePrefixes.indexOf(text[0]) !== -1)
-            return text.substring(1).trim();
-        return text;
-    }
+    function stripModePrefix(text) { return ModeData.stripModePrefix(text); }
 
     function configuredWebProviders() {
-        var fallback = ["duckduckgo", "google", "youtube", "nixos", "github"];
-        var order = Array.isArray(Config.launcherWebProviderOrder) ? Config.launcherWebProviderOrder : fallback;
-        var out = [];
-        var seen = ({});
-        for (var i = 0; i < order.length; ++i) {
-            var key = String(order[i] || "");
-            var provider = webProviderCatalog[key];
-            if (!provider || seen[key])
-                continue;
-            out.push(provider);
-            seen[key] = true;
-        }
-        if (out.length === 0) {
-            for (var j = 0; j < fallback.length; ++j) {
-                var fallbackProvider = webProviderCatalog[fallback[j]];
-                if (fallbackProvider)
-                    out.push(fallbackProvider);
-            }
-        }
-        return out;
+        return ModeData.configuredWebProviders(Config.launcherWebProviderOrder);
     }
 
     function primaryWebProvider() {
@@ -882,45 +859,13 @@ PanelWindow {
     }
 
     function webAliasToProviderKey(token) {
-        var key = String(token || "").toLowerCase();
-        if (key === "")
-            return "";
-        if (webProviderCatalog[key])
-            return key;
         var aliases = (Config.launcherWebAliases && typeof Config.launcherWebAliases === "object") ? Config.launcherWebAliases : ({});
-        var providers = configuredWebProviders();
-        for (var i = 0; i < providers.length; ++i) {
-            var providerKey = String(providers[i].key || "");
-            if (providerKey === "")
-                continue;
-            var list = aliases[providerKey];
-            if (!Array.isArray(list))
-                continue;
-            for (var j = 0; j < list.length; ++j) {
-                if (String(list[j] || "").toLowerCase() === key)
-                    return providerKey;
-            }
-        }
-        return "";
+        return ModeData.webAliasToProviderKey(token, configuredWebProviders(), aliases);
     }
 
     function parseWebQuery(text) {
-        var clean = stripModePrefix(text || "").trim();
-        var result = ({
-                query: clean,
-                providerKey: ""
-            });
-        if (clean === "")
-            return result;
-        var parts = clean.split(/\s+/);
-        if (!parts || parts.length === 0)
-            return result;
-        var mapped = webAliasToProviderKey(parts[0]);
-        if (mapped === "")
-            return result;
-        result.providerKey = mapped;
-        result.query = parts.length > 1 ? clean.substring(parts[0].length).trim() : "";
-        return result;
+        var aliases = (Config.launcherWebAliases && typeof Config.launcherWebAliases === "object") ? Config.launcherWebAliases : ({});
+        return ModeData.parseWebQuery(text, configuredWebProviders(), aliases);
     }
 
     function secondaryWebProvider() {
@@ -964,9 +909,7 @@ PanelWindow {
             Config.launcherWebLastProviderKey = key;
     }
 
-    function shellQuote(text) {
-        return "'" + String(text || "").replace(/'/g, "'\\''") + "'";
-    }
+    function shellQuote(text) { return ModeData.shellQuote(text); }
 
     function telemetryStart() {
         return Date.now();
