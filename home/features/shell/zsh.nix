@@ -10,6 +10,12 @@
     enable = true;
     package = pkgs.zsh;
     dotDir = "${config.xdg.configHome}/zsh";
+    envExtra = ''
+      # Initialize fnm early so Node shims are on PATH before other shell hooks run.
+      if command -v fnm &> /dev/null; then
+        eval "$(fnm env --shell zsh)"
+      fi
+    '';
     enableCompletion = true;
     enableVteIntegration = true;
     autocd = true;
@@ -165,7 +171,7 @@
       # Enable vim mode
       bindkey -v
 
-      # Initialize fnm (Fast Node Manager)
+      # Enable fnm's directory-based auto-switching for interactive Zsh sessions.
       if command -v fnm &> /dev/null; then
         eval "$(fnm env --use-on-cd --shell zsh)"
       fi

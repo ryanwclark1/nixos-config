@@ -908,6 +908,8 @@ PanelWindow {
                         selectByMouse: true
                         selectedTextColor: Colors.background
                         selectionColor: Colors.primary
+                        text: AiService.currentInputText
+                        onTextChanged: AiService.currentInputText = text
 
                         // Placeholder
                         Text {

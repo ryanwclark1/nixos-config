@@ -21,26 +21,24 @@ Implemented:
 
 - drag-and-drop ordering for launcher modes
 - drag-and-drop ordering for web providers
-- explicit drag handles in both ordering lists
-- end-of-list drop targets for both ordering lists
+- shared settings drag handles in both ordering lists
+- mapped-position reorder math shared through `SettingsReorder.js`
+- end-of-list drop indicators for both ordering lists
 - existing arrow-button reorder controls preserved as fallback
 
 Validated:
 
 - `qmlformat -i home/features/desktop/window-managers/shared/panel/quickshell/config/menu/settings/tabs/SystemTab.qml`
 - `bash home/features/desktop/window-managers/shared/panel/quickshell/scripts/check-launcher-performance.sh`
-- `bash home/features/desktop/window-managers/shared/panel/quickshell/scripts/check-launcher-responsive.sh`
-  - static portion passed
-  - live portion still depends on a reachable QuickShell instance
-- live QuickShell IPC access succeeded against the active session
-- live runtime capture succeeded on current workspace:
-  - `/tmp/quickshell-system-tab-runtime.png`
+- `bash home/features/desktop/window-managers/shared/panel/quickshell/scripts/check-launcher-responsive.sh --ci`
+- `bash home/features/desktop/window-managers/shared/panel/quickshell/scripts/check-panel-runtime.sh --repo-shell --skip-surfaces --skip-multibar`
+  - includes passing `SettingsHub.openTab system`
 
 Known limitation:
 
-- `capture-settings-viewport.sh --workspace auto` failed once with:
-  - `Workspace 9001 did not become active in time.`
-- `--workspace current` worked and is the reliable fallback right now.
+- settings capture is blocked in the current shell environment because repo-shell capture failed with:
+  - `failed to create display`
+- `capture-settings-viewport.sh --workspace auto` still needs validation in a real graphical session.
 
 ## Remaining Gaps
 
@@ -124,12 +122,11 @@ If this area will keep changing, add stronger verification instead of relying on
 
 Best candidates:
 
-- harden `capture-settings-viewport.sh --workspace auto`
-- add a small helper focused on `System` tab capture
 - add a guardrail that checks `SystemTab.qml` still exposes:
   - drag handles
-  - drop targets
   - arrow-button fallback
+- harden `capture-settings-viewport.sh --workspace auto`
+- add a small helper focused on `System` tab capture when a graphical session is available
 
 ### 5. Consider refactoring the duplicated drag-sort pattern
 
@@ -154,15 +151,11 @@ bash home/features/desktop/window-managers/shared/panel/quickshell/scripts/check
 ```
 
 ```bash
-bash home/features/desktop/window-managers/shared/panel/quickshell/scripts/check-launcher-responsive.sh
+bash home/features/desktop/window-managers/shared/panel/quickshell/scripts/check-launcher-responsive.sh --ci
 ```
 
 ```bash
-quickshell ipc --id 0t7s1ecbvbt show
-```
-
-```bash
-bash home/features/desktop/window-managers/shared/panel/quickshell/scripts/capture-settings-viewport.sh --id 0t7s1ecbvbt --workspace current --tab system --output /tmp/quickshell-system-tab-runtime.png
+bash home/features/desktop/window-managers/shared/panel/quickshell/scripts/check-panel-runtime.sh --repo-shell --skip-surfaces --skip-multibar
 ```
 
 ## Open Questions

@@ -15,13 +15,15 @@ Managed shell status:
 Runtime status:
 
 - config contract checks pass
-- settings smoke passes
+- settings smoke passes, including repo-shell validation through:
+  - `scripts/check-panel-runtime.sh --repo-shell --skip-surfaces --skip-multibar`
 - live surface smoke passes
 - synthetic multibar smoke is still environment-sensitive and can `[SKIP]` in headless/offscreen runs when no `PanelWindow` backend is available
 
 UI status:
 
 - multi-bar config and per-bar widget management are implemented
+- shared settings drag/reorder primitives now back the active reorder surfaces
 - settings modal ghosting was addressed by moving settings surfaces onto opaque modal tokens
 - portrait settings captures are usable again
 - managed-shell capture gallery generation works
@@ -30,6 +32,8 @@ Known remaining defect:
 
 - surface screenshot capture is still not reliably isolating the intended popup bounds for all popup classes
 - settings capture is in better shape than surface capture
+- repo-shell settings capture is currently blocked in this shell environment with:
+  - `failed to create display`
 
 ## Immediate Priority
 

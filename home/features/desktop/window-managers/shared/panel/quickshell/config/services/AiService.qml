@@ -82,6 +82,44 @@ QtObject {
         }
     }
 
+    // ── Session Persistence ─────────────────────
+    property string currentInputText: ""
+    readonly property string sessionPath: (Quickshell.env("HOME") || "/home") + "/.local/state/quickshell/ai-chat-session.json"
+
+    function saveSession() {
+        if (_loading) return;
+        var data = {
+            activeConversationId: root.activeConversationId,
+            currentInputText: root.currentInputText
+        };
+        sessionFile.setText(JSON.stringify(data));
+    }
+
+    property FileView sessionFile: FileView {
+        path: root.sessionPath
+        onLoaded: {
+            try {
+                var data = JSON.parse(this.text);
+                root.activeConversationId = data.activeConversationId || "";
+                root.currentInputText = data.currentInputText || "";
+                if (root.activeConversationId) {
+                    for (var i = 0; i < root.conversations.length; i++) {
+                        if (root.conversations[i].id === root.activeConversationId) {
+                            // Found active conversation
+                            break;
+                        }
+                    }
+                }
+            } catch(e) {}
+        }
+    }
+
+    onActiveConversationIdChanged: {
+        saveSession();
+    }
+
+    onCurrentInputTextChanged: saveSession()
+
     // ── Persistence ─────────────────────────────
     readonly property string savePath: (Quickshell.env("HOME") || "/home") + "/.local/state/quickshell/ai-chat.json"
     property bool _loading: false

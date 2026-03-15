@@ -148,7 +148,7 @@ BasePopupMenu {
     columnSpacing: Colors.spacingS
 
       Repeater {
-        model: root.filteredItemsResult
+        model: ScriptModel { values: root.filteredItemsResult }
         delegate: Rectangle {
           id: clipCard
           Layout.fillWidth: true

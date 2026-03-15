@@ -41,6 +41,41 @@ PanelWindow {
   property int activeTabId: 1
   property int nextTabId: 2
 
+  readonly property string savePath: (Quickshell.env("HOME") || "/home") + "/.local/state/quickshell/notepad.json"
+  property bool _loading: false
+
+  function saveState() {
+    if (_loading) return;
+    var data = {
+      tabs: root.tabs,
+      activeTabId: root.activeTabId,
+      nextTabId: root.nextTabId,
+      notepadWidth: root.notepadWidth
+    };
+    _stateFile.setText(JSON.stringify(data));
+  }
+
+  property FileView _stateFile: FileView {
+    path: root.savePath
+    onLoaded: {
+      try {
+        var data = JSON.parse(this.text);
+        root._loading = true;
+        root.tabs = data.tabs || [{ "id": 1, "title": "Notes", "content": "" }];
+        root.activeTabId = data.activeTabId || 1;
+        root.nextTabId = data.nextTabId || 2;
+        root.notepadWidth = data.notepadWidth || 400;
+        root._loading = false;
+        // Trigger UI sync
+        notepadText.text = root.activeContent;
+      } catch(e) { root._loading = false; }
+    }
+  }
+
+  onTabsChanged: saveState()
+  onActiveTabIdChanged: saveState()
+  onNotepadWidthChanged: saveState()
+
   signal closeRequested()
   signal openFileRequested()
   signal saveAsRequested(string content)

@@ -3375,8 +3375,6 @@ PanelWindow {
                     accentColor: Colors.primary
                     placeholder: launcherRoot.modeMeta[launcherRoot.mode] ? launcherRoot.modeMeta[launcherRoot.mode].hint : "Search..."
 
-                    property alias searchInputComp.searchInput: searchInputComp.searchInputComp.searchInput
-
                     onTextChanged: {
                         if (text.startsWith("=") && launcherRoot.mode !== "calc")
                             launcherRoot.open("calc", true);
@@ -3403,8 +3401,11 @@ PanelWindow {
                     }
 
                     Connections {
-                        target: searchInputComp.searchInputComp.searchInput
-                        function onVisibleChanged() { if (!searchInputComp.searchInputComp.searchInput.visible && searchInputComp.searchInputComp.searchInput.activeFocus) searchInputComp.searchInputComp.searchInput.focus = false }
+                        target: searchInputComp.searchInput
+                        function onVisibleChanged() { 
+                            if (!searchInputComp.searchInput.visible && searchInputComp.searchInput.activeFocus) 
+                                searchInputComp.searchInput.focus = false 
+                        }
                     }
 
                     Keys.onPressed: event => {

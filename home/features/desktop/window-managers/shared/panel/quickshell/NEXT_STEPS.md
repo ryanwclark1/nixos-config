@@ -6,12 +6,18 @@ Use this document to drive the next work after the bar widget management, typogr
 
 - Bar widget value typography is normalized across the comparable bar widgets.
 - The `Bar Widgets` settings tab now shows the current widgets for the selected bar.
-- The `Bar Widgets` tab now has explicit drag handles and drop targets for:
+- The `Bar Widgets` tab now has active drag handles and drop targets for:
   - reordering within a section
   - moving to another section
   - dropping into an empty section
   - dropping at the end of a section
 - `Config.moveBarWidget(...)` now supports cross-section moves.
+- Shared settings drag/reorder primitives now exist for settings surfaces:
+  - `config/menu/settings/SettingsDragHandle.qml`
+  - `config/menu/settings/SettingsReorder.js`
+- The `System` tab launcher ordering rows now use the shared drag/reorder pattern for:
+  - launcher mode order
+  - web provider order
 - `PrinterService.qml` no longer breaks the config contract harness.
 - `quickshell.service` was restarted successfully on the current Home Manager generation and is healthy again.
 
@@ -19,22 +25,34 @@ Use this document to drive the next work after the bar widget management, typogr
 
 - Live installed-shell capture confirms populated widget management UI:
   - `/tmp/bar-widgets-installed-live.png`
-- Live settings smoke passed against the installed shell:
-  - `scripts/check-settings-responsive.sh --id <live-instance>`
+- Repo-shell panel runtime verification passed for config contracts plus settings smoke:
+  - `scripts/check-panel-runtime.sh --repo-shell --skip-surfaces --skip-multibar`
+- Live settings smoke passed against the repo shell:
+  - `scripts/check-settings-responsive.sh`
 - Config contract checks passed:
   - `scripts/check-panel-config-contracts.sh`
+- Bar widget reorder contract checks now cover same-section and cross-section moves:
+  - `scripts/check-bar-widget-reorder.sh`
+- Static settings guardrails now cover drag enablement, shared handles, and arrow-button fallback:
+  - `scripts/check-settings-guardrails.sh`
+- Static launcher responsive guardrails passed:
+  - `scripts/check-launcher-responsive.sh --ci`
 - The multibar QA script now supports running only the management harnesses:
   - `scripts/check-multibar-smoke.sh --management-only`
 
 ## What Is Still Not Fully Proven
 
 - An end-to-end drag gesture has not been mechanically exercised from automation yet.
-- The management harnesses now skip cleanly in this environment because offscreen QuickShell has no `PanelWindow` backend.
-- The full synthetic shell matrix remains separate from this bar-widget verification and can still be blocked by unrelated shell-level issues.
+- Manual drag/drop review is still pending for:
+  - `Bar Widgets`
+  - `System` tab launcher ordering
+- Screenshot-based settings capture is currently blocked in this shell environment:
+  - `capture-panel-matrix.sh --repo-shell --skip-surfaces ...` launched the repo shell, then failed with `failed to create display`
+- The management harnesses now skip cleanly in some environments because offscreen QuickShell has no `PanelWindow` backend.
 
 ## Immediate Next Work
 
-### 1. Manually prove drag and drop in the live installed shell
+### 1. Manually prove drag and drop in a real graphical session
 
 Do this first. It is the main remaining verification gap.
 
@@ -96,8 +114,8 @@ Preferred path:
 
 Practical options:
 
-- add a repo-shell or live-session helper that can programmatically mutate bar config order and then capture the `Bar Widgets` tab
-- add a dedicated verification helper for `Config.moveBarWidget(...)`
+- keep `scripts/check-bar-widget-reorder.sh` as the contract harness for `Config.moveBarWidget(...)`
+- if manual QA stays blocked, add a live-session helper that can programmatically mutate bar config order and then capture the `Bar Widgets` tab
 - if needed, add a temporary IPC bridge only for local QA, but do not keep unnecessary runtime surface area
 
 Success criteria:
@@ -141,6 +159,18 @@ bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/che
 ```
 
 ```bash
+bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/check-panel-runtime.sh --repo-shell --skip-surfaces --skip-multibar
+```
+
+```bash
+bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/check-bar-widget-reorder.sh
+```
+
+```bash
+bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/check-settings-guardrails.sh
+```
+
+```bash
 bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/check-multibar-smoke.sh --management-only
 ```
 
@@ -170,19 +200,19 @@ The `↑` / `↓` controls remain in place as fallback.
 ### Evidence Collected
 
 - Static launcher responsive guardrails passed:
-  - `scripts/check-launcher-responsive.sh`
+  - `scripts/check-launcher-responsive.sh --ci`
 - Launcher performance check passed:
   - `scripts/check-launcher-performance.sh`
-- Live QuickShell IPC was reachable for the active session.
-- A live `System` tab runtime capture succeeded on the current workspace:
-  - `/tmp/quickshell-system-tab-runtime.png`
+- Repo-shell settings smoke passed for the `System` tab as part of:
+  - `scripts/check-panel-runtime.sh --repo-shell --skip-surfaces --skip-multibar`
+- Shared settings drag/reorder primitives now back the launcher ordering rows.
 
 ### What Is Still Not Fully Proven
 
 - Drag-and-drop has not yet been reviewed across portrait, laptop, and wide settings layouts.
-- The current-workspace capture path works, but auto-workspace capture failed once with:
-  - `Workspace 9001 did not become active in time.`
-- There is not yet a guardrail that explicitly checks the ordering rows keep both drag affordances and arrow-button fallback.
+- Screenshot capture is blocked in this shell environment because the repo-shell capture path currently fails with:
+  - `failed to create display`
+- Auto-workspace capture reliability is still unproven in a real graphical session.
 
 ### Immediate Next Work
 

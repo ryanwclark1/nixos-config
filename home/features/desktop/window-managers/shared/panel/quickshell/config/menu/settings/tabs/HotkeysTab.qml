@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import Quickshell.Io
 import "../../../services"
 import ".."
@@ -126,15 +127,17 @@ Item {
             }
 
             Repeater {
-                model: {
-                    var filter = root.keybindsFilter;
-                    var list = root.keybindsList;
-                    if (!filter)
-                        return list;
-                    return list.filter(function (b) {
-                        var haystack = (b.mods + " " + b["key"] + " " + b.dispatcher + " " + b.arg).toLowerCase();
-                        return haystack.indexOf(filter) !== -1;
-                    });
+                model: ScriptModel {
+                    values: {
+                        var filter = root.keybindsFilter;
+                        var list = root.keybindsList;
+                        if (!filter)
+                            return [...list];
+                        return list.filter(function (b) {
+                            var haystack = (b.mods + " " + b["key"] + " " + b.dispatcher + " " + b.arg).toLowerCase();
+                            return haystack.indexOf(filter) !== -1;
+                        });
+                    }
                 }
 
                 delegate: SettingsListRow {
