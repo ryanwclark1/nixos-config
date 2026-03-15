@@ -88,7 +88,7 @@ PanelWindow {
     stdinEnabled: true
     onStarted: {
       fileWriteProc.write(root._pendingWriteContent);
-      fileWriteProc.closeStdin();
+      fileWriteProc.stdinEnabled = false;
     }
     onExited: (exitCode, exitStatus) => {
       if (exitCode === 0 && root._pendingWritePath) {

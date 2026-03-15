@@ -42,7 +42,8 @@ QtObject {
     { id: "workspaces",     legacyIndex: 19, label: "Workspaces",    icon: "󰕮", categoryId: "window-manager", order: 20, component: "WorkspaceTab.qml",      searchTerms: ["workspaces", "workspace", "scroll", "pill"], owner: { surface: "", service: "Config", configDomain: "workspaces" } },
     { id: "night-light",    legacyIndex: 20, label: "Night Light",   icon: "󰖔", categoryId: "power-privacy",  order: 30, component: "NightLightTab.qml",     searchTerms: ["night", "light", "gamma", "blue", "temperature", "schedule"], owner: { surface: "", service: "NightLightService", configDomain: "nightLight" } },
     { id: "presets",         legacyIndex: 21, label: "Presets",       icon: "󰆓", categoryId: "meta",           order: 20, component: "PresetsTab.qml",        searchTerms: ["presets", "save", "load", "snapshot", "backup"], owner: { surface: "", service: "PresetService", configDomain: "presets" } },
-    { id: "hooks",           legacyIndex: 22, label: "Hooks",         icon: "󱁨", categoryId: "extensibility",  order: 20, component: "HooksTab.qml",          searchTerms: ["hooks", "scripts", "events", "automation"], owner: { surface: "", service: "HookService", configDomain: "hooks" } }
+    { id: "hooks",           legacyIndex: 22, label: "Hooks",         icon: "󱁨", categoryId: "extensibility",  order: 20, component: "HooksTab.qml",          searchTerms: ["hooks", "scripts", "events", "automation"], owner: { surface: "", service: "HookService", configDomain: "hooks" } },
+    { id: "ai",              legacyIndex: 23, label: "AI Assistant",  icon: "󰚩", categoryId: "extensibility",  order: 30, component: "AiTab.qml",             searchTerms: ["ai", "chat", "assistant", "ollama", "anthropic", "openai", "gemini", "llm"], owner: { surface: "aiChat", service: "AiService", configDomain: "ai" } }
   ]
 
   function isTabSupported(tab) {

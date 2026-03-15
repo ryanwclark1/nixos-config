@@ -31,7 +31,6 @@ Item {
 
             SettingsListRow {
                 label: "Open Hooks Directory"
-                icon: "󰉋"
 
                 Text {
                     Layout.fillWidth: true

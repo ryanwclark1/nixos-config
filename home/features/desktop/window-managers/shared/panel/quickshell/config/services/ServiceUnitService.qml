@@ -229,7 +229,7 @@ QtObject {
         onStarted: {
             if (root._actionNeedsStdin) {
                 actionProc.write(root._actionStdin);
-                actionProc.closeStdin();
+                actionProc.stdinEnabled = false;
             }
         }
         onExited: (exitCode, exitStatus) => {

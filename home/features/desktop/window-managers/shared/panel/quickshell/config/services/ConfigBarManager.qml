@@ -39,6 +39,7 @@ QtObject {
         createWidgetInstance("recording"),
         createWidgetInstance("battery"),
         createWidgetInstance("printer"),
+        createWidgetInstance("aiChat"),
         createWidgetInstance("notepad"),
         createWidgetInstance("controlCenter"),
         createWidgetInstance("tray"),

@@ -579,7 +579,7 @@ QtObject {
         stdinEnabled: true
         onStarted: {
             tempWriteProc.write(root._pendingTempContent);
-            tempWriteProc.closeStdin();
+            tempWriteProc.stdinEnabled = false;
         }
         onExited: (exitCode, exitStatus) => {
             // Launch the stream process now that the temp file is ready

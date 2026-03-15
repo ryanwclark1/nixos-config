@@ -30,6 +30,13 @@ Item {
   readonly property int outerPadding: Colors.spacingM
   readonly property int sectionSpacing: Colors.spacingS
   readonly property int runtimeSpacing: Colors.spacingM
+  readonly property real horizontalCenterMinX: outerPadding + leftSection.width + (leftSection.width > 0 ? runtimeSpacing : 0)
+  readonly property real horizontalCenterMaxX: width - outerPadding - rightSection.width - (rightSection.width > 0 ? runtimeSpacing : 0) - centerSection.width
+  readonly property real horizontalCenterGapX: {
+    var gapStart = root.horizontalCenterMinX;
+    var gapEnd = width - outerPadding - rightSection.width - (rightSection.width > 0 ? runtimeSpacing : 0);
+    return gapStart + ((gapEnd - gapStart) - centerSection.width) / 2;
+  }
   readonly property real computedOpacity: (barConfig && barConfig.opacity !== undefined) ? barConfig.opacity : Config.barOpacity
   readonly property bool floatingBar: barConfig && barConfig.floating !== undefined ? !!barConfig.floating : Config.barFloating
   readonly property bool autoHide: !!(barConfig && barConfig.autoHide)
@@ -191,6 +198,7 @@ Item {
     if (widgetType === "recording") return recordingComponent;
     if (widgetType === "battery") return batteryComponent;
     if (widgetType === "printer") return printerComponent;
+    if (widgetType === "aiChat") return aiChatPillComponent;
     if (widgetType === "notepad") return notepadComponent;
     if (widgetType === "controlCenter") return controlCenterComponent;
     if (widgetType === "tray") return trayComponent;
@@ -307,7 +315,15 @@ Item {
   Row {
     id: centerSection
     visible: !vertical
-    anchors.centerIn: parent
+    anchors.verticalCenter: parent.verticalCenter
+    x: {
+      var target = root.horizontalCenterGapX;
+      var minX = root.horizontalCenterMinX;
+      var maxX = root.horizontalCenterMaxX;
+      if (minX > maxX)
+        return Math.max(outerPadding, Math.min((width - centerSection.width) / 2, width - outerPadding - centerSection.width));
+      return Math.max(minX, Math.min(target, maxX));
+    }
     spacing: runtimeSpacing
     Repeater {
       model: root.sectionItems("center")
@@ -1027,6 +1043,28 @@ Item {
             font.weight: Font.Bold
           }
         }
+      }
+    }
+  }
+
+  Component {
+    id: aiChatPillComponent
+    SharedWidgets.BarPill {
+      property var widgetInstance: null
+      isActive: root.isSurfaceActive("aiChat")
+      anchorWindow: root.anchorWindow
+      tooltipText: "AI Chat"
+      onClicked: root.requestSurface("aiChat", this)
+      contextActions: [
+        { label: "Open AI Chat", icon: "󰚩", action: () => root.requestSurface("aiChat", this) }
+      ]
+      onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
+
+      Text {
+        color: Colors.text
+        font.pixelSize: Colors.fontSizeLarge
+        font.family: Colors.fontMono
+        text: "󰚩"
       }
     }
   }

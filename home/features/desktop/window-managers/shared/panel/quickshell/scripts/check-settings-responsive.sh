@@ -2,6 +2,7 @@
 set -euo pipefail
 
 runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
+runtime_pid_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid"
 
 tab_ids=(
   "wallpaper"
@@ -51,6 +52,7 @@ EOF
 }
 
 instance_id=""
+instance_pid=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -77,6 +79,20 @@ require_cmd() {
   fi
 }
 
+shell_id_for_runtime_dir() {
+  local runtime_dir="$1"
+  local log_path="${runtime_dir}/log.log"
+  local shell_id=""
+
+  if [[ ! -f "${log_path}" ]]; then
+    return 1
+  fi
+
+  shell_id="$(sed -n 's/.*Shell ID: "\([[:xdigit:]]\+\)".*/\1/p' "${log_path}" | head -n1)"
+  [[ -n "${shell_id}" ]] || return 1
+  printf '%s\n' "${shell_id}"
+}
+
 run_ipc() {
   local output=""
   local status=0
@@ -100,6 +116,25 @@ run_ipc() {
   return "${status}"
 }
 
+discover_running_pids() {
+  ps -eo pid=,comm=,args= \
+    | awk '$2 ~ /quickshell/ || $3 ~ /quickshell/ { print $1 }' \
+    | awk 'NF && !seen[$0]++'
+}
+
+discover_reachable_pid() {
+  local candidate_pid
+  while IFS= read -r candidate_pid; do
+    [[ -n "${candidate_pid}" ]] || continue
+    if run_ipc quickshell ipc --pid "${candidate_pid}" show >/dev/null; then
+      printf '%s\n' "${candidate_pid}"
+      return 0
+    fi
+  done < <(discover_running_pids)
+
+  return 1
+}
+
 discover_instances_from_pid() {
   local pid
   local resolved
@@ -107,17 +142,20 @@ discover_instances_from_pid() {
   local fallback=()
   local log_path
   local first_line
+  local shell_id
 
   while IFS= read -r pid; do
     [[ -n "${pid}" ]] || continue
     resolved="$(readlink -f "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid/${pid}" 2>/dev/null || true)"
     if [[ -n "${resolved}" && -S "${resolved}/ipc.sock" ]]; then
+      shell_id="$(shell_id_for_runtime_dir "${resolved}" || true)"
+      [[ -n "${shell_id}" ]] || continue
       log_path="${resolved}/log.log"
       first_line="$(sed -n '1p' "${log_path}" 2>/dev/null || true)"
       if [[ "${first_line}" == *'Launching config:'*'shell.qml"'* ]]; then
-        preferred+=("$(basename "${resolved}")")
+        preferred+=("${shell_id}")
       else
-        fallback+=("$(basename "${resolved}")")
+        fallback+=("${shell_id}")
       fi
     fi
   done < <(ps -eo pid=,comm=,args= | awk '$2 ~ /quickshell/ || $3 ~ /quickshell/ { print $1 }')
@@ -141,7 +179,9 @@ discover_instances() {
 
   if [[ -d "${runtime_root}" ]]; then
     while IFS= read -r dir; do
-      dirs+=("$(basename "${dir}")")
+      local shell_id=""
+      shell_id="$(shell_id_for_runtime_dir "${dir}" || true)"
+      [[ -n "${shell_id}" ]] && dirs+=("${shell_id}")
     done < <(find "${runtime_root}" -mindepth 1 -maxdepth 1 -type d -exec test -S '{}/ipc.sock' ';' -print 2>/dev/null | sort)
   fi
 
@@ -166,7 +206,7 @@ resolve_instance_dir() {
   local direct_dir="${runtime_root}/${requested_id}"
   local resolved_dir=""
 
-  if [[ -S "${direct_dir}/ipc.sock" ]]; then
+  if [[ -S "${direct_dir}/ipc.sock" ]] && shell_id_for_runtime_dir "${direct_dir}" >/dev/null 2>&1; then
     printf '%s\n' "${direct_dir}"
     return 0
   fi
@@ -191,7 +231,11 @@ resolve_instance_dir() {
 call_ipc() {
   local target="$1"
   shift
-  run_ipc quickshell ipc --id "${instance_id}" call "${target}" "$@"
+  if [[ -n "${instance_pid}" ]]; then
+    run_ipc quickshell ipc --pid "${instance_pid}" call "${target}" "$@"
+  else
+    run_ipc quickshell ipc --id "${instance_id}" call "${target}" "$@"
+  fi
 }
 
 main() {
@@ -202,8 +246,8 @@ main() {
   require_cmd grep
 
   if [[ -z "${instance_id}" ]]; then
-    instance_id="$(discover_reachable_instance || true)"
-    if [[ -z "${instance_id}" ]]; then
+    instance_pid="$(discover_reachable_pid || true)"
+    if [[ -z "${instance_pid}" ]]; then
       printf 'No live QuickShell instances found under %s\n' "${runtime_root}" >&2
       exit 1
     fi
@@ -216,24 +260,40 @@ main() {
   delta_file="$(mktemp)"
   trap "rm -f '${delta_file}'" EXIT
 
-  instance_dir="$(resolve_instance_dir "${instance_id}" || true)"
+  if [[ -n "${instance_pid}" ]]; then
+    instance_dir="$(readlink -f "${runtime_pid_root}/${instance_pid}" 2>/dev/null || true)"
+  else
+    instance_dir="$(resolve_instance_dir "${instance_id}" || true)"
+  fi
   if [[ -z "${instance_dir}" || ! -S "${instance_dir}/ipc.sock" ]]; then
-    printf 'Unable to resolve a live runtime directory for instance %s under %s\n' "${instance_id}" "${runtime_root}" >&2
+    printf 'Unable to resolve a live runtime directory for instance %s under %s\n' "${instance_pid:-$instance_id}" "${runtime_root}" >&2
     exit 1
   fi
-  instance_id="$(basename "${instance_dir}")"
+  if [[ -z "${instance_id}" ]]; then
+    instance_id="$(shell_id_for_runtime_dir "${instance_dir}" || basename "${instance_dir}")"
+  fi
   log_file="${instance_dir}/log.log"
 
   if [[ -f "${log_file}" ]]; then
     start_bytes="$(wc -c < "${log_file}")"
   fi
 
-  if run_ipc quickshell ipc --id "${instance_id}" show >/dev/null; then
-    pass "IPC reachable for instance ${instance_id}"
+  if [[ -n "${instance_pid}" ]]; then
+    if run_ipc quickshell ipc --pid "${instance_pid}" show >/dev/null; then
+      pass "IPC reachable for pid ${instance_pid}"
+    else
+      fail "IPC unreachable for pid ${instance_pid}"
+      printf '[INFO] Summary: %d pass, %d warn, %d fail\n' "${pass_count}" "${warn_count}" "${fail_count}"
+      exit 1
+    fi
   else
-    fail "IPC unreachable for instance ${instance_id}"
-    printf '[INFO] Summary: %d pass, %d warn, %d fail\n' "${pass_count}" "${warn_count}" "${fail_count}"
-    exit 1
+    if run_ipc quickshell ipc --id "${instance_id}" show >/dev/null; then
+      pass "IPC reachable for instance ${instance_id}"
+    else
+      fail "IPC unreachable for instance ${instance_id}"
+      printf '[INFO] Summary: %d pass, %d warn, %d fail\n' "${pass_count}" "${warn_count}" "${fail_count}"
+      exit 1
+    fi
   fi
 
   if call_ipc Shell reloadConfig; then

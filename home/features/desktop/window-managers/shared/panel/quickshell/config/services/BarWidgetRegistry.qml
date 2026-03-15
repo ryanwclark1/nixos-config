@@ -1,4 +1,5 @@
 import QtQuick
+import "."
 
 pragma Singleton
 
@@ -28,6 +29,7 @@ QtObject {
     { widgetType: "recording", label: "Recording", icon: "󰻃", section: "right", description: "Active screen recording indicator." },
     { widgetType: "battery", label: "Battery", icon: "󰁹", section: "right", description: "Battery status and actions popup." },
     { widgetType: "printer", label: "Printers", icon: "󰐪", section: "right", description: "Printer status popup." },
+    { widgetType: "aiChat", label: "AI Chat", icon: "󰚩", section: "right", description: "AI chat assistant toggle." },
     { widgetType: "notepad", label: "Notepad", icon: "󰠮", section: "right", description: "Slideout notepad trigger." },
     { widgetType: "controlCenter", label: "Control Center", icon: "󰒓", section: "right", description: "Command center trigger." },
     { widgetType: "tray", label: "System Tray", icon: "󰀻", section: "right", description: "Status notifier tray." },

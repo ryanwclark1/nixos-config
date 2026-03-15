@@ -367,8 +367,8 @@ Scope {
                             anchors {
                                 top: barConfig.position === "top" || barConfig.position === "left" || barConfig.position === "right"
                                 bottom: barConfig.position === "bottom" || barConfig.position === "left" || barConfig.position === "right"
-                                left: barConfig.position === "left" || ((barConfig.position === "top" || barConfig.position === "bottom") && barConfig.floating)
-                                right: barConfig.position === "right" || ((barConfig.position === "top" || barConfig.position === "bottom") && barConfig.floating)
+                                left: barConfig.position === "left" || barConfig.position === "top" || barConfig.position === "bottom"
+                                right: barConfig.position === "right" || barConfig.position === "top" || barConfig.position === "bottom"
                             }
                             margins {
                                 top: (barConfig.position === "top" || (vertical && barConfig.floating)) ? marginValue : 0
@@ -549,6 +549,18 @@ Scope {
         function onConfigLoadFinished(ok, error) {
             if (!ok)
                 ToastService.showError("Niri config error", error || "Failed to load config");
+        }
+        function onWindowUrgentChanged() {
+            var wins = NiriService.windows;
+            for (var i = 0; i < wins.length; i++) {
+                if (wins[i].is_urgent) {
+                    ToastService.showNotice(
+                        wins[i].app_id || "Window",
+                        (wins[i].title || "A window") + " needs attention"
+                    );
+                    break;
+                }
+            }
         }
     }
 

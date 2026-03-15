@@ -953,6 +953,224 @@ PanelWindow {
                 }
             }
         }
+
+        // ── Provider/model dropdown ────────────────────
+        Rectangle {
+            id: providerDropdown
+            visible: false
+            width: 220
+            height: providerDropdownCol.implicitHeight + Colors.spacingS * 2
+            anchors.right: parent.right
+            anchors.rightMargin: Colors.paddingLarge
+            y: 60
+            color: Colors.bgWidget
+            border.color: Colors.border
+            border.width: 1
+            radius: Colors.radiusMedium
+            z: 20
+
+            Column {
+                id: providerDropdownCol
+                anchors.fill: parent
+                anchors.margins: Colors.spacingS
+                spacing: Colors.spacingXS
+
+                // Provider section header
+                Text {
+                    text: "Provider"
+                    color: Colors.textDisabled
+                    font.pixelSize: Colors.fontSizeXS
+                    font.weight: Font.DemiBold
+                    leftPadding: Colors.spacingXS
+                }
+
+                Repeater {
+                    model: Providers.allProviders()
+
+                    delegate: Rectangle {
+                        required property var modelData
+                        required property int index
+                        property bool isCurrent: modelData === Config.aiProvider
+                        width: providerDropdownCol.width - Colors.spacingS * 2
+                        height: 26
+                        radius: Colors.radiusXXS
+                        color: isCurrent ? Colors.withAlpha(Colors.primary, 0.15)
+                            : providerItemMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : "transparent"
+
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.leftMargin: Colors.spacingS
+                            anchors.rightMargin: Colors.spacingS
+                            spacing: Colors.spacingXS
+
+                            Text {
+                                text: Providers.providerIcon(modelData)
+                                font.family: Colors.fontMono
+                                font.pixelSize: Colors.fontSizeSmall
+                                color: isCurrent ? Colors.primary : Colors.text
+                            }
+                            Text {
+                                text: Providers.providerLabel(modelData)
+                                font.pixelSize: Colors.fontSizeSmall
+                                color: isCurrent ? Colors.primary : Colors.text
+                                Layout.fillWidth: true
+                            }
+                            Text {
+                                visible: Providers.needsApiKey(modelData) && !AiService.apiKeyAvailable(modelData)
+                                text: "󰌆"
+                                font.family: Colors.fontMono
+                                font.pixelSize: Colors.fontSizeXS
+                                color: Colors.warning
+                            }
+                        }
+
+                        MouseArea {
+                            id: providerItemMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                Config.aiProvider = modelData;
+                                Config.aiModel = "";
+                                providerDropdown.visible = false;
+                            }
+                        }
+                    }
+                }
+
+                // Separator
+                Rectangle {
+                    width: providerDropdownCol.width - Colors.spacingS * 2
+                    height: 1
+                    color: Colors.border
+                }
+
+                // Model section header
+                Text {
+                    text: "Model"
+                    color: Colors.textDisabled
+                    font.pixelSize: Colors.fontSizeXS
+                    font.weight: Font.DemiBold
+                    leftPadding: Colors.spacingXS
+                }
+
+                Repeater {
+                    model: AiService.availableModels
+
+                    delegate: Rectangle {
+                        required property var modelData
+                        required property int index
+                        property bool isCurrent: modelData === AiService.activeModel
+                        width: providerDropdownCol.width - Colors.spacingS * 2
+                        height: 26
+                        radius: Colors.radiusXXS
+                        color: isCurrent ? Colors.withAlpha(Colors.primary, 0.15)
+                            : modelItemMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : "transparent"
+
+                        Text {
+                            anchors.fill: parent
+                            anchors.leftMargin: Colors.spacingS
+                            text: modelData
+                            font.pixelSize: Colors.fontSizeSmall
+                            font.family: Colors.fontMono
+                            color: isCurrent ? Colors.primary : Colors.text
+                            elide: Text.ElideRight
+                            verticalAlignment: Text.AlignVCenter
+                        }
+
+                        MouseArea {
+                            id: modelItemMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                Config.aiModel = modelData;
+                                providerDropdown.visible = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // ── Slash command hints popup ─────────────────
+        Rectangle {
+            id: slashHints
+            visible: inputField.text.indexOf("/") === 0 && inputField.text.indexOf(" ") === -1 && inputField.activeFocus && !AiService.isStreaming
+            width: parent.width - Colors.paddingLarge * 2
+            height: slashHintsCol.implicitHeight + Colors.spacingS * 2
+            x: Colors.paddingLarge
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 120 + Colors.paddingLarge
+            color: Colors.bgWidget
+            border.color: Colors.border
+            border.width: 1
+            radius: Colors.radiusMedium
+            z: 10
+
+            Column {
+                id: slashHintsCol
+                anchors.fill: parent
+                anchors.margins: Colors.spacingS
+                spacing: 2
+
+                Repeater {
+                    model: {
+                        var typed = inputField.text.toLowerCase();
+                        var cmds = AiService.slashCommands;
+                        var filtered = [];
+                        for (var i = 0; i < cmds.length; i++) {
+                            if (typed.length <= 1 || cmds[i].cmd.indexOf(typed) === 0)
+                                filtered.push(cmds[i]);
+                        }
+                        return filtered;
+                    }
+
+                    delegate: Rectangle {
+                        required property var modelData
+                        required property int index
+                        width: slashHintsCol.width - Colors.spacingS * 2
+                        height: 28
+                        radius: Colors.radiusXXS
+                        color: slashItemMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.1) : "transparent"
+
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.leftMargin: Colors.spacingS
+                            anchors.rightMargin: Colors.spacingS
+                            spacing: Colors.spacingS
+
+                            Text {
+                                text: modelData.cmd
+                                color: Colors.primary
+                                font.pixelSize: Colors.fontSizeSmall
+                                font.family: Colors.fontMono
+                                font.weight: Font.DemiBold
+                            }
+                            Text {
+                                text: modelData.desc
+                                color: Colors.textDisabled
+                                font.pixelSize: Colors.fontSizeSmall
+                                elide: Text.ElideRight
+                                Layout.fillWidth: true
+                            }
+                        }
+
+                        MouseArea {
+                            id: slashItemMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                inputField.text = modelData.cmd + " ";
+                                inputField.cursorPosition = inputField.text.length;
+                                inputField.forceActiveFocus();
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // ── Block components for assistant messages ──
@@ -1120,224 +1338,6 @@ PanelWindow {
                 readOnly: true
                 selectByMouse: true
                 opacity: 0.8
-            }
-        }
-    }
-
-    // ── Provider/model dropdown ────────────────────
-    Rectangle {
-        id: providerDropdown
-        visible: false
-        width: 220
-        height: providerDropdownCol.implicitHeight + Colors.spacingS * 2
-        x: slidePanel.x + slidePanel.width - width - Colors.paddingLarge
-        y: 60
-        color: Colors.bgWidget
-        border.color: Colors.border
-        border.width: 1
-        radius: Colors.radiusMedium
-        z: 20
-
-        Column {
-            id: providerDropdownCol
-            anchors.fill: parent
-            anchors.margins: Colors.spacingS
-            spacing: Colors.spacingXS
-
-            // Provider section header
-            Text {
-                text: "Provider"
-                color: Colors.textDisabled
-                font.pixelSize: Colors.fontSizeXS
-                font.weight: Font.DemiBold
-                leftPadding: Colors.spacingXS
-            }
-
-            Repeater {
-                model: Providers.allProviders()
-
-                delegate: Rectangle {
-                    required property var modelData
-                    required property int index
-                    property bool isCurrent: modelData === Config.aiProvider
-                    width: providerDropdownCol.width - Colors.spacingS * 2
-                    height: 26
-                    radius: Colors.radiusXXS
-                    color: isCurrent ? Colors.withAlpha(Colors.primary, 0.15)
-                        : providerItemMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : "transparent"
-
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: Colors.spacingS
-                        anchors.rightMargin: Colors.spacingS
-                        spacing: Colors.spacingXS
-
-                        Text {
-                            text: Providers.providerIcon(modelData)
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeSmall
-                            color: isCurrent ? Colors.primary : Colors.text
-                        }
-                        Text {
-                            text: Providers.providerLabel(modelData)
-                            font.pixelSize: Colors.fontSizeSmall
-                            color: isCurrent ? Colors.primary : Colors.text
-                            Layout.fillWidth: true
-                        }
-                        Text {
-                            visible: Providers.needsApiKey(modelData) && !AiService.apiKeyAvailable(modelData)
-                            text: "󰌆"
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeXS
-                            color: Colors.warning || Colors.textDisabled
-                        }
-                    }
-
-                    MouseArea {
-                        id: providerItemMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            Config.aiProvider = modelData;
-                            Config.aiModel = "";
-                            providerDropdown.visible = false;
-                        }
-                    }
-                }
-            }
-
-            // Separator
-            Rectangle {
-                width: providerDropdownCol.width - Colors.spacingS * 2
-                height: 1
-                color: Colors.border
-            }
-
-            // Model section header
-            Text {
-                text: "Model"
-                color: Colors.textDisabled
-                font.pixelSize: Colors.fontSizeXS
-                font.weight: Font.DemiBold
-                leftPadding: Colors.spacingXS
-            }
-
-            Repeater {
-                model: AiService.availableModels
-
-                delegate: Rectangle {
-                    required property var modelData
-                    required property int index
-                    property bool isCurrent: modelData === AiService.activeModel
-                    width: providerDropdownCol.width - Colors.spacingS * 2
-                    height: 26
-                    radius: Colors.radiusXXS
-                    color: isCurrent ? Colors.withAlpha(Colors.primary, 0.15)
-                        : modelItemMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : "transparent"
-
-                    Text {
-                        anchors.fill: parent
-                        anchors.leftMargin: Colors.spacingS
-                        text: modelData
-                        font.pixelSize: Colors.fontSizeSmall
-                        font.family: Colors.fontMono
-                        color: isCurrent ? Colors.primary : Colors.text
-                        elide: Text.ElideRight
-                        verticalAlignment: Text.AlignVCenter
-                    }
-
-                    MouseArea {
-                        id: modelItemMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            Config.aiModel = modelData;
-                            providerDropdown.visible = false;
-                        }
-                    }
-                }
-            }
-        }
-
-    }
-
-    // ── Slash command hints popup ─────────────────
-    Rectangle {
-        id: slashHints
-        visible: inputField.text.indexOf("/") === 0 && inputField.text.indexOf(" ") === -1 && inputField.activeFocus && !AiService.isStreaming
-        width: slidePanel.width - Colors.paddingLarge * 2
-        height: slashHintsCol.implicitHeight + Colors.spacingS * 2
-        x: Colors.paddingLarge
-        anchors.bottom: slidePanel.bottom
-        anchors.bottomMargin: 120 + Colors.paddingLarge
-        color: Colors.bgWidget
-        border.color: Colors.border
-        border.width: 1
-        radius: Colors.radiusMedium
-        z: 10
-
-        Column {
-            id: slashHintsCol
-            anchors.fill: parent
-            anchors.margins: Colors.spacingS
-            spacing: 2
-
-            Repeater {
-                model: {
-                    var typed = inputField.text.toLowerCase();
-                    var cmds = AiService.slashCommands;
-                    var filtered = [];
-                    for (var i = 0; i < cmds.length; i++) {
-                        if (typed.length <= 1 || cmds[i].cmd.indexOf(typed) === 0)
-                            filtered.push(cmds[i]);
-                    }
-                    return filtered;
-                }
-
-                delegate: Rectangle {
-                    required property var modelData
-                    required property int index
-                    width: slashHintsCol.width - Colors.spacingS * 2
-                    height: 28
-                    radius: Colors.radiusXXS
-                    color: slashItemMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.1) : "transparent"
-
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: Colors.spacingS
-                        anchors.rightMargin: Colors.spacingS
-                        spacing: Colors.spacingS
-
-                        Text {
-                            text: modelData.cmd
-                            color: Colors.primary
-                            font.pixelSize: Colors.fontSizeSmall
-                            font.family: Colors.fontMono
-                            font.weight: Font.DemiBold
-                        }
-                        Text {
-                            text: modelData.desc
-                            color: Colors.textDisabled
-                            font.pixelSize: Colors.fontSizeSmall
-                            elide: Text.ElideRight
-                            Layout.fillWidth: true
-                        }
-                    }
-
-                    MouseArea {
-                        id: slashItemMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            inputField.text = modelData.cmd + " ";
-                            inputField.cursorPosition = inputField.text.length;
-                            inputField.forceActiveFocus();
-                        }
-                    }
-                }
             }
         }
     }

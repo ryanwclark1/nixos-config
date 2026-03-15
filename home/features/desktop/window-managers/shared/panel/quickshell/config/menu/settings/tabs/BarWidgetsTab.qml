@@ -36,6 +36,11 @@ Item {
     readonly property bool editingPluginHasSettings: editingPluginId !== "" && PluginService.pluginSupportsSettings(editingPluginId)
     readonly property bool editingPluginCanWriteSettings: editingPluginId !== "" && PluginService.pluginCanWriteSettings(editingPluginId)
 
+    Component.onCompleted: {
+        refreshSectionWidgets();
+        Qt.callLater(refreshSectionWidgets);
+    }
+
     onWidgetSettingsOpenChanged: {
         if (!widgetSettingsOpen) {
             pluginSettingsError = "";

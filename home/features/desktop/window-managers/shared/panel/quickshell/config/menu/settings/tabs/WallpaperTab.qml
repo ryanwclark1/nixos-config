@@ -349,7 +349,7 @@ Item {
         stdinEnabled: true
         onStarted: {
             settingsExportProc.write(_settingsExportText);
-            settingsExportProc.closeStdin();
+            settingsExportProc.stdinEnabled = false;
         }
         onExited: (exitCode, exitStatus) => {
             if (exitCode === 0)
