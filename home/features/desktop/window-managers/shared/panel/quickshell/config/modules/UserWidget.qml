@@ -13,11 +13,7 @@ Rectangle {
   border.color: Colors.border
   clip: true
 
-  gradient: Gradient {
-    orientation: Gradient.Vertical
-    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-}
+  gradient: SharedWidgets.SurfaceGradient {}
 
   // Inner highlight
   SharedWidgets.InnerHighlight { }
@@ -51,7 +47,7 @@ Rectangle {
     // User Avatar placeholder
     Rectangle {
       width: 50; height: 50
-      radius: 25
+      radius: Colors.radiusPill
       color: Colors.primary
       Text {
         anchors.centerIn: parent

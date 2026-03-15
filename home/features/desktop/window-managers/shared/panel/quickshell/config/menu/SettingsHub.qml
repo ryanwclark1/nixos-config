@@ -199,11 +199,7 @@ PanelWindow {
     radius: Colors.radiusLarge
     clip: true
 
-    gradient: Gradient {
-    orientation: Gradient.Vertical
-    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-}
+    gradient: SharedWidgets.SurfaceGradient {}
 
     // Inner highlight
     SharedWidgets.InnerHighlight { highlightOpacity: 0.15 }

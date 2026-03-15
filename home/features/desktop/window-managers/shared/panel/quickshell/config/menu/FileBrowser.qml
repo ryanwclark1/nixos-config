@@ -1066,7 +1066,7 @@ PanelWindow {
                       Rectangle {
                         id: dragRect
                         visible: Drag.active
-                        width: 48; height: 48; radius: 8
+                        width: 48; height: 48; radius: Colors.radiusXS
                         color: Colors.primary
                         opacity: 0.8
                         z: 999

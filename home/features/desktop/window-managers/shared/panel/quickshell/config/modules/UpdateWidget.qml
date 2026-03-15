@@ -124,7 +124,7 @@ SharedWidgets.CardBase {
     spacing: Colors.paddingMedium
 
     Rectangle {
-      width: 50; height: 50; radius: 25; color: Colors.secondary
+      width: 50; height: 50; radius: Colors.radiusPill; color: Colors.secondary
       Text { anchors.centerIn: parent; text: "󰚰"; color: Colors.text; font.pixelSize: Colors.fontSizeHuge; font.family: Colors.fontMono }
     }
 

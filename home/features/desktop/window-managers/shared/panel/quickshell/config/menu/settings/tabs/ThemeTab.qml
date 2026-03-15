@@ -68,8 +68,8 @@ Item {
 
                             RowLayout {
                                 anchors.fill: parent
-                                anchors.leftMargin: 10
-                                anchors.rightMargin: 10
+                                anchors.leftMargin: Colors.paddingSmall
+                                anchors.rightMargin: Colors.paddingSmall
                                 Rectangle {
                                     width: 12
                                     height: 12
@@ -99,7 +99,7 @@ Item {
 
                             ColumnLayout {
                                 anchors.fill: parent
-                                anchors.margins: 10
+                                anchors.margins: Colors.paddingSmall
                                 spacing: Colors.spacingXS
                                 Rectangle {
                                     width: 60

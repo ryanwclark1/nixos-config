@@ -221,11 +221,7 @@ PanelWindow {
               border.width: actionItem.isFocused ? 2 : 1
               Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
 
-              gradient: Gradient {
-    orientation: Gradient.Vertical
-    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-}
+              gradient: SharedWidgets.SurfaceGradient {}
 
               SharedWidgets.InnerHighlight { hoveredOpacity: 0.3; hovered: actionItem.isFocused }
             }
@@ -279,7 +275,7 @@ PanelWindow {
 
       Rectangle {
         Layout.alignment: Qt.AlignHCenter
-        width: 300; height: 40; radius: 20
+        width: 300; height: 40; radius: Colors.radiusLarge
         color: Colors.withAlpha(Colors.surface, 0.3)
         visible: root.timerActive
         border.color: Colors.border

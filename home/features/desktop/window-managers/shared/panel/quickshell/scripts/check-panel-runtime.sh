@@ -156,6 +156,7 @@ start_repo_shell() {
   deadline=$((SECONDS + 20))
   while (( SECONDS < deadline )); do
     if run_ipc quickshell ipc --pid "${repo_shell_pid}" show >/dev/null; then
+      sleep 1
       printf '[INFO] Repo shell instance ready: pid %s\n' "${repo_shell_pid}"
       return 0
     fi

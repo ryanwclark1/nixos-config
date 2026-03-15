@@ -4,6 +4,7 @@ set -euo pipefail
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
 launcher_qml="${script_dir}/../config/launcher/Launcher.qml"
+launcher_search_field_qml="${script_dir}/../config/launcher/LauncherSearchField.qml"
 system_tab_qml="${script_dir}/../config/menu/settings/tabs/SystemTab.qml"
 expected_config="$(realpath "${script_dir}/../config/shell.qml" 2>/dev/null || printf '%s' "${script_dir}/../config/shell.qml")"
 
@@ -174,7 +175,7 @@ static_checks() {
   require_literal "$launcher_qml" 'readonly property bool sidebarCompact: usableWidth < 720' "sidebar compact threshold"
   require_literal "$launcher_qml" 'readonly property bool tightMode: usableWidth < 560 || usableHeight < 500' "tight mode threshold"
   require_literal "$launcher_qml" 'width: Math.min(960, Math.max(launcherRoot.sidebarCompact ? 360 : 420, launcherRoot.usableWidth - (launcherRoot.tightMode ? 24 : 40)))' "responsive launcher width bounds"
-  require_literal "$launcher_qml" 'height: launcherRoot.compactMode ? 50 : 55' "compact search bar height"
+  require_literal "$launcher_search_field_qml" 'height: 48' "compact search bar height"
   require_literal "$launcher_qml" 'visible: launcherRoot.transientNoticeText !== "" && !launcherRoot.tightMode' "transient notice tight-mode guard"
   require_literal "$launcher_qml" 'visible: Config.launcherShowRuntimeMetrics && !launcherRoot.tightMode' "runtime metrics tight-mode guard"
   require_pattern "$launcher_qml" 'function drunCategoryState\(\)\s*(?::\s*string)?\s*\{\s*return JSON\.stringify\(launcherRoot\.drunCategoryStateObject\(\)\);\s*\}' "drun category IPC payload mapping"

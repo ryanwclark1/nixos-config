@@ -262,11 +262,7 @@ Scope {
                       border.color: dropHighlight ? Colors.accent : (isFocused ? Colors.primary : Colors.border)
                       border.width: (dropHighlight || isFocused) ? 2 : 1
 
-                      gradient: Gradient {
-    orientation: Gradient.Vertical
-    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-}
+                      gradient: SharedWidgets.SurfaceGradient {}
 
                       SharedWidgets.InnerHighlight { hoveredOpacity: 0.25; hovered: isFocused }
 

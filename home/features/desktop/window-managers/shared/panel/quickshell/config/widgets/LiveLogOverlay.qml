@@ -20,11 +20,7 @@ Rectangle {
     border.width: 1
     clip: true
 
-    gradient: Gradient {
-    orientation: Gradient.Vertical
-    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-}
+    gradient: SurfaceGradient {}
 
     // Inner highlight
     InnerHighlight { highlightOpacity: 0.15 }

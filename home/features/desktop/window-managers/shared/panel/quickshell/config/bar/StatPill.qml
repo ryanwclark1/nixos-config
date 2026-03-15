@@ -1,5 +1,8 @@
 import QtQuick
+import Quickshell
+import Quickshell.Wayland
 import "../services"
+import "./widgets" as Widgets
 import "../widgets" as SharedWidgets
 
 // StatPill — parameterised bar pill for CPU / RAM / GPU stats.
@@ -28,19 +31,102 @@ Item {
   implicitHeight: pill.height
 
   SharedWidgets.Ref { service: SystemStatus }
+  SharedWidgets.Ref { service: ProcessService }
 
   SharedWidgets.BarPill {
     id: pill
     anchors.centerIn: parent
     anchorWindow: root.anchorWindow
-    isActive: root.isActive
+    isActive: root.isActive || reaperPopup.isOpen
     tooltipText: root.tooltipText
     horizontalPadding: (root.compact || root.iconOnly) ? 5 : 8
+    
     onClicked: root.clicked()
+    
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.RightButton
+        onClicked: {
+            if (root.statKey === "cpuStatus" || root.statKey === "ramStatus") {
+                ProcessService.sortBy = (root.statKey === "cpuStatus" ? "cpu" : "mem");
+                ProcessService.refresh();
+                reaperPopup.toggle();
+            }
+        }
+    }
 
     Loader {
       active: true
       sourceComponent: root.iconOnly ? iconContent : (root.compact ? compactContent : wideContent)
+    }
+  }
+
+  PopupWindow {
+    id: reaperPopup
+    property Item anchorItem: pill
+    property var anchorWindow: root.anchorWindow
+    property bool isOpen: visible
+    property real gap: 8
+    property real inset: 8
+    readonly property string anchorEdge: {
+      if (anchorWindow && anchorWindow.barConfig && anchorWindow.barConfig.position)
+        return String(anchorWindow.barConfig.position);
+      return "top";
+    }
+
+    anchor.window: anchorWindow
+    visible: false
+    color: "transparent"
+    implicitWidth: popupBody.implicitWidth
+    implicitHeight: popupBody.implicitHeight
+
+    function _windowX(item) {
+      var x = 0;
+      for (var it = item; it; it = it.parent) x += it.x;
+      return x;
+    }
+
+    function _windowY(item) {
+      var y = 0;
+      for (var it = item; it; it = it.parent) y += it.y;
+      return y;
+    }
+
+    anchor.rect.x: {
+      if (!anchorItem) return 0;
+      var x = 0;
+      if (anchorEdge === "left")
+        x = _windowX(anchorItem) + anchorItem.width + gap;
+      else if (anchorEdge === "right")
+        x = _windowX(anchorItem) - implicitWidth - gap;
+      else
+        x = _windowX(anchorItem) + (anchorItem.width - implicitWidth) / 2;
+      if (anchorWindow && anchorWindow.screen) {
+        var maxX = Math.max(inset, anchorWindow.screen.width - implicitWidth - inset);
+        x = Math.min(Math.max(inset, x), maxX);
+      }
+      return x;
+    }
+
+    anchor.rect.y: {
+      if (!anchorItem) return 0;
+      if (anchorEdge === "bottom")
+        return _windowY(anchorItem) - implicitHeight - gap;
+      if (anchorEdge === "left" || anchorEdge === "right")
+        return _windowY(anchorItem) + (anchorItem.height - implicitHeight) / 2;
+      return _windowY(anchorItem) + anchorItem.height + gap;
+    }
+
+    function toggle() {
+      visible = !visible;
+    }
+
+    function close() {
+      visible = false;
+    }
+
+    Widgets.ProcessReaperPopup {
+      id: popupBody
     }
   }
 

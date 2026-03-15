@@ -19,11 +19,7 @@ Rectangle {
   Behavior on scale { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutQuint } }
   Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
 
-  gradient: Gradient {
-    orientation: Gradient.Vertical
-    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-}
+  gradient: SharedWidgets.SurfaceGradient {}
 
   // Inner highlight
   SharedWidgets.InnerHighlight { }

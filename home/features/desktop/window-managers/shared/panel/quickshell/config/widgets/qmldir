@@ -54,6 +54,7 @@ SshWidgetData 1.0 SshWidgetData.qml
 SshWidgetSettings 1.0 SshWidgetSettings.qml
 StateLayer 1.0 StateLayer.qml
 StatusChip 1.0 StatusChip.qml
+SurfaceGradient 1.0 SurfaceGradient.qml
 Toast 1.0 Toast.qml
 ToastOverlay 1.0 ToastOverlay.qml
 ToggleSwitch 1.0 ToggleSwitch.qml

@@ -41,6 +41,14 @@ QtObject {
   readonly property bool hasToplevelManager: typeof ToplevelManager !== "undefined"
   readonly property var toplevels: hasToplevelManager ? (ToplevelManager.toplevels ? (ToplevelManager.toplevels.values || []) : []) : []
   readonly property var activeToplevel: hasToplevelManager ? ToplevelManager.activeToplevel : null
+  readonly property string activeWindowTitle: {
+    if (isNiri) {
+      var niriWindow = niriActiveWindow;
+      return niriWindow ? (niriWindow.title || "") : "";
+    }
+    var toplevel = activeToplevel;
+    return toplevel ? (toplevel.title || "") : "";
+  }
 
   // ── Niri reactive state (delegated to NiriService) ──
   // These provide zero-latency access to Niri state without polling.

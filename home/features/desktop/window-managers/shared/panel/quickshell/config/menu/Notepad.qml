@@ -310,11 +310,7 @@ PanelWindow {
     border.width: 1
     radius: Colors.radiusLarge
 
-    gradient: Gradient {
-    orientation: Gradient.Vertical
-    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-}
+    gradient: SharedWidgets.SurfaceGradient {}
 
     // Inner highlight
     SharedWidgets.InnerHighlight { highlightOpacity: 0.15 }
@@ -396,14 +392,14 @@ PanelWindow {
         // Search bar
         Rectangle {
           visible: root.isSearching
-          width: 140; height: 28; radius: 14
+          width: 140; height: 28; radius: Colors.radiusMedium
           color: Colors.withAlpha(Colors.surface, 0.6)
           border.color: searchInput.activeFocus ? Colors.primary : Colors.border
           border.width: 1
           
           TextInput {
             id: searchInput
-            anchors.fill: parent; anchors.leftMargin: 10; anchors.rightMargin: 10
+            anchors.fill: parent; anchors.leftMargin: Colors.paddingSmall; anchors.rightMargin: Colors.paddingSmall
             verticalAlignment: Text.AlignVCenter
             color: Colors.text; font.pixelSize: Colors.fontSizeSmall
             text: root.searchQuery

@@ -651,17 +651,17 @@ PanelWindow {
             launcherRoot.refreshMediaPlayers();
     }
 
+    property var _nixGens: NixOS.generations
+    on_NixGensChanged: {
+        if (launcherRoot.mode === "nixos" && launcherRoot.launcherOpacity > 0)
+            launcherRoot.loadNixos();
+    }
+
     onSelectedIndexChanged: {
         launcherRoot.rememberCurrentWebProviderSelection();
     }
 
-    function modeInfo(key) {
-        return launcherRoot.modeMeta[key] || {
-            label: key.toUpperCase(),
-            hint: "",
-            prefix: ""
-        };
-    }
+    function modeInfo(key) { return ModeData.modeInfo(key); }
 
     function sanitizeModeList(source, fallback, allowedList) {
         var out = [];
@@ -2334,7 +2334,8 @@ PanelWindow {
     }
 
     function loadNixos() {
-        allItems = [
+        NixOS.refresh();
+        var items = [
             {
                 category: "System",
                 name: "Rebuild Switch (flake)",
@@ -2352,26 +2353,29 @@ PanelWindow {
                 name: "Collect Garbage",
                 icon: "󰃢",
                 action: () => Quickshell.execDetached(["kitty", "-e", "sudo", "nix-env", "--delete-generations", "old"])
-            },
-            {
-                category: "Information",
-                name: "System Generations",
-                icon: "󰋚",
-                action: () => Quickshell.execDetached(["kitty", "-e", "sudo", "nix-env", "-p", "/nix/var/nix/profiles/system", "--list-generations"])
             }
         ];
-        runCommand(["nixos-version"], function (raw) {
-            var ver = raw.trim();
-            if (ver && mode === "nixos") {
-                allItems.unshift({
-                    category: "Information",
-                    name: "Current Version: " + ver,
-                    icon: "",
-                    action: null
+
+        var gens = NixOS.generations;
+        if (gens && gens.length > 0) {
+            for (var i = 0; i < gens.length; i++) {
+                var g = gens[i];
+                items.push({
+                    category: "Generations",
+                    name: "Generation " + g.id + (g.current ? " (current)" : ""),
+                    title: g.date + " • " + g.version,
+                    icon: g.current ? "󰄬" : "󰋚",
+                    action: (function(id) {
+                        return function() {
+                            NixOS.rollbackTo(id);
+                            close();
+                        }
+                    })(g.id)
                 });
-                filterItems();
             }
-        });
+        }
+
+        allItems = items;
         filterItems();
     }
 

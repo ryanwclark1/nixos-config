@@ -112,11 +112,7 @@ PanelWindow {
         border.width: 1
         radius: Colors.radiusLarge
 
-        gradient: Gradient {
-    orientation: Gradient.Vertical
-    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-}
+        gradient: SharedWidgets.SurfaceGradient {}
 
         // Inner highlight
         SharedWidgets.InnerHighlight { highlightOpacity: 0.15 }
@@ -575,7 +571,7 @@ PanelWindow {
 
                     RowLayout {
                         spacing: Colors.spacingS
-                        Text { text: "󰆍"; color: Colors.success; font.pixelSize: 20; font.family: Colors.fontMono }
+                        Text { text: "󰆍"; color: Colors.success; font.pixelSize: Colors.fontSizeXL; font.family: Colors.fontMono }
                         Text { 
                             text: "Install Shell Script"
                             color: Colors.text

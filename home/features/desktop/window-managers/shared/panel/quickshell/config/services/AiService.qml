@@ -551,7 +551,7 @@ QtObject {
         if (!systemPrompt) {
             systemPrompt = "You are a helpful Linux desktop assistant for Quickshell. " +
                 "You can suggest system actions by using the following format: [COMMAND: Label | command args]. " +
-                "For example: [COMMAND: Toggle Float | hyprctl dispatch togglefloating]. " +
+                "For example: [COMMAND: Lock Screen | os-lock-screen]. " +
                 "You can also propose shell scripts to be installed to ~/.local/bin using: [SCRIPT: filename | script_content]. " +
                 "For example: [SCRIPT: prune-docker | #!/bin/bash\ndocker container prune -f]. " +
                 "Only suggest commands or scripts when explicitly requested or highly relevant. " +
@@ -710,37 +710,13 @@ QtObject {
 
     // ── Context Helpers ─────────────────────────
     function getActiveWindowTitle() {
-        if (CompositorAdapter.isHyprland) {
-            // Hyprland doesn't have a singleton active window in our service yet, use a quick poll
-            return ""; // Placeholder, will implement via IPC if needed or skip
-        }
-        if (CompositorAdapter.isNiri) {
-            return NiriService.activeWindow ? NiriService.activeWindow.title : "";
-        }
-        return "";
+        return CompositorAdapter.activeWindowTitle || "";
     }
 
-    property Process _hyprActiveProc: Process {
-        id: hyprActiveProc
-        command: ["hyprctl", "activewindow", "-j"]
-        running: false
-        stdout: StdioCollector {
-            onStreamFinished: {
-                try {
-                    var data = JSON.parse(this.text);
-                    root.contextWindowTitle = data.title || "";
-                } catch(e) {}
-            }
-        }
-    }
-
-    property string contextWindowTitle: ""
+    readonly property string contextWindowTitle: CompositorAdapter.activeWindowTitle || ""
     function refreshActiveWindowTitle() {
-        if (CompositorAdapter.isHyprland) {
-            hyprActiveProc.running = true;
-        } else if (CompositorAdapter.isNiri) {
-            contextWindowTitle = NiriService.activeWindow ? NiriService.activeWindow.title : "";
-        }
+        // Kept for API compatibility with existing callers.
+        return;
     }
 
     // ── OCR Helpers ─────────────────────────────

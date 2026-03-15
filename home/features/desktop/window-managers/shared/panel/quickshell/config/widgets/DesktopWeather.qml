@@ -17,11 +17,7 @@ Item {
     border.color: Colors.withAlpha(Colors.border, 0.4)
     border.width: 1
 
-    gradient: Gradient {
-    orientation: Gradient.Vertical
-    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-}
+    gradient: SurfaceGradient {}
 
     // Inner highlight
     InnerHighlight { }

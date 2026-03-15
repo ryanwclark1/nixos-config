@@ -41,11 +41,7 @@ Item {
       border.width: 1
       Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
 
-      gradient: Gradient {
-    orientation: Gradient.Vertical
-    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-}
+      gradient: SurfaceGradient {}
     }
 
     // Inner subtle highlight border

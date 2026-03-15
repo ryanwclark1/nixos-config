@@ -99,11 +99,7 @@ Scope {
                   border.color: workspaceData.active ? Colors.primary : Colors.border
                   border.width: workspaceData.active ? 2 : 1
 
-                  gradient: Gradient {
-    orientation: Gradient.Vertical
-    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-}
+                  gradient: SharedWidgets.SurfaceGradient {}
 
                   SharedWidgets.InnerHighlight { hoveredOpacity: 0.25; hovered: workspaceData.active }
 

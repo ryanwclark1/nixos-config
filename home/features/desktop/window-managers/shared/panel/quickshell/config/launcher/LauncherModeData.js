@@ -31,9 +31,57 @@ var modeIcons = {
     "drun": "󰀻", "window": "󱗼", "files": "󰈔", "ai": "󰚩",
     "clip": "󰅍", "emoji": "󰞅", "calc": "󰪚", "web": "󰖟",
     "plugins": "󰏗", "run": "󰆍", "system": "󰒓", "keybinds": "󰌌",
-    "media": "󰝚", "nixos": "", "wallpapers": "󰸉", "bookmarks": "󰃭",
+    "media": "󰝚", "nixos": "", "wallpapers": "󰸉", "bookmarks": "󰃭",
     "settings": "󰒓", "devops": "󰒍"
 };
+
+function modeInfo(key) {
+    return modeMeta[key] || { label: key.toUpperCase(), hint: "", prefix: "" };
+}
+
+function sanitizeModeList(source, fallback, allowedList) {
+    var out = [];
+    var seen = {};
+    var allowed = {};
+    var i;
+    for (i = 0; i < allowedList.length; ++i)
+        allowed[allowedList[i]] = true;
+    var list = Array.isArray(source) && source.length > 0 ? source : fallback;
+    for (i = 0; i < list.length; ++i) {
+        var modeKey = String(list[i] || "");
+        if (!allowed[modeKey] || seen[modeKey])
+            continue;
+        out.push(modeKey);
+        seen[modeKey] = true;
+    }
+    if (out.length === 0)
+        return fallback.slice();
+    return out;
+}
+
+function modeDependencies(modeKey) {
+    if (modeKey === "drun") return ["qs-apps"];
+    if (modeKey === "run") return ["qs-run"];
+    if (modeKey === "emoji") return ["qs-emoji"];
+    if (modeKey === "clip") return ["qs-clip", "cliphist", "wl-copy"];
+    if (modeKey === "keybinds") return ["qs-keybinds"];
+    if (modeKey === "bookmarks") return ["qs-bookmarks"];
+    if (modeKey === "wallpapers") return ["qs-wallpapers"];
+    if (modeKey === "ai") return ["qs-ai", "wl-copy"];
+    if (modeKey === "files") return [];
+    if (modeKey === "plugins") return [];
+    return [];
+}
+
+function missingDependencyMessage(modeKey, cmd) {
+    if (modeKey === "files")
+        return "Required command missing: " + cmd;
+    return "Install '" + cmd + "' to use " + modeInfo(modeKey).label + " mode.";
+}
+
+function shellQuote(text) {
+    return "'" + String(text || "").replace(/'/g, "'\\''") + "'";
+}
 
 var webProviderCatalog = {
     "google": {

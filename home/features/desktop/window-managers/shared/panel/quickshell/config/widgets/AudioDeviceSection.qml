@@ -36,11 +36,7 @@ ColumnLayout {
     border.width: 1
     implicitHeight: controlCol.implicitHeight + 2 * Colors.spacingM
 
-    gradient: Gradient {
-    orientation: Gradient.Vertical
-    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-}
+    gradient: SurfaceGradient {}
 
     // Inner highlight
     InnerHighlight { }

@@ -112,11 +112,7 @@ BasePopupMenu {
           border.width: 1
           implicitHeight: root.compactMode ? 126 : 96
 
-          gradient: Gradient {
-    orientation: Gradient.Vertical
-    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-}
+          gradient: SharedWidgets.SurfaceGradient {}
 
           // Inner highlight
           SharedWidgets.InnerHighlight { }

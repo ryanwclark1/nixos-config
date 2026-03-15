@@ -72,6 +72,7 @@ Scope {
   }
 
   readonly property color osdColor: {
+    if (osdType === "critical") return Colors.error;
     if (osdType === "capslock") return capslockState ? Colors.primary : Colors.textDisabled;
     if (osdType === "numlock") return numlockState ? Colors.primary : Colors.textDisabled;
     if (osdType === "scrolllock") return scrolllockState ? Colors.primary : Colors.textDisabled;
@@ -88,6 +89,7 @@ Scope {
   }
 
   readonly property string osdIcon: {
+    if (osdType === "critical") return "󰀪";
     if (osdType === "capslock") return capslockState ? "󰬶" : "󰬵";
     if (osdType === "numlock") return numlockState ? "󰎠" : "󰎡";
     if (osdType === "scrolllock") return scrolllockState ? "󱅮" : "󱅯";
@@ -99,6 +101,7 @@ Scope {
   }
 
   readonly property string osdLabel: {
+    if (osdType === "critical") return "CRITICAL STATE";
     if (osdType === "capslock") return capslockState ? "CAPS ON" : "CAPS OFF";
     if (osdType === "numlock") return numlockState ? "NUM ON" : "NUM OFF";
     if (osdType === "scrolllock") return scrolllockState ? "SCROLL ON" : "SCROLL OFF";
@@ -190,6 +193,13 @@ Scope {
   onSinkMutedChanged: onPipewireChanged("displaySinkMuted", sinkMuted, "volume")
   onSourceVolumeChanged: onPipewireChanged("displaySourceVolume", sourceVolume, "mic")
   onSourceMutedChanged: onPipewireChanged("displaySourceMuted", sourceMuted, "mic")
+
+  Connections {
+    target: SystemStatus
+    function onIsCriticalChanged() {
+      if (SystemStatus.isCritical) showOsd("critical");
+    }
+  }
 
   Component.onCompleted: {
     root.displaySinkVolume = root.sinkVolume;
@@ -284,11 +294,7 @@ Scope {
           border.color: root.osdColor
           border.width: 2
 
-          gradient: Gradient {
-    orientation: Gradient.Vertical
-    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-}
+          gradient: SurfaceGradient {}
 
           // Inner highlight
           InnerHighlight { highlightOpacity: 0.15 }

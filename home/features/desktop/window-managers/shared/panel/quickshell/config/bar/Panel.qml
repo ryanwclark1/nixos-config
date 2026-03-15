@@ -12,11 +12,7 @@ import "../widgets" as SharedWidgets
 Item {
   id: root
 
-  Gradient {
-    id: barGradient
-    GradientStop { position: 0.0; color: Colors.surfaceGradientStart }
-    GradientStop { position: 1.0; color: Colors.surfaceGradientEnd }
-  }
+  SharedWidgets.SurfaceGradient { id: barGradient }
 
   SharedWidgets.Ref { service: RecordingService }
   SharedWidgets.Ref { service: PrivacyService }
