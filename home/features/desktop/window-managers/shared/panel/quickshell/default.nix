@@ -127,6 +127,12 @@ let
     ${builtins.readFile ./scripts/health-check.sh}
   '';
 
+  pluginDoctorScript = pkgs.writeShellScriptBin "qs-plugin-doctor" ''
+    export QS_REPO_ROOT=${lib.escapeShellArg repoRoot}
+    PATH="${pkgs.quickshell}/bin:${pkgs.jq}/bin:${pkgs.ripgrep}/bin:${pkgs.findutils}/bin:${pkgs.coreutils}/bin:${pkgs.bash}/bin:$PATH"
+    ${builtins.readFile ./scripts/plugin-doctor.sh}
+  '';
+
   surfaceResponsiveScript = pkgs.writeShellScriptBin "qs-surface-responsive-check" ''
     PATH="${pkgs.quickshell}/bin:${pkgs.findutils}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:${pkgs.procps}/bin:${pkgs.bash}/bin:$PATH"
     ${builtins.readFile ./scripts/check-surface-responsive.sh}
@@ -246,6 +252,7 @@ let
       compositorVerifyScript
       healthSafeFixScript
       healthCheckScript
+      pluginDoctorScript
       surfaceResponsiveScript
       surfacePreviewScript
       multibarSmokeScript

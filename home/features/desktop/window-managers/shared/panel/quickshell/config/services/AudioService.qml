@@ -361,7 +361,7 @@ QtObject {
     }
 
     // ── Backward compat (no-ops since PipeWire is reactive) ──
-    function refreshDevices() { }
+    function refreshDevices() { /* no-op: PipeWire is reactive */ }
 
     onSubscriberCountChanged: {
         if (subscriberCount > 0)

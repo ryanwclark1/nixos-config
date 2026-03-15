@@ -17,12 +17,12 @@ QtObject {
   property bool isHealthChecking: false
   property date lastHealthCheckTime: new Date(0)
 
-  readonly property string healthCheckScript: "/home/administrator/nixos-config/home/features/desktop/window-managers/shared/panel/quickshell/scripts/health-check.sh"
-  readonly property string pluginDoctorScript: "/home/administrator/nixos-config/home/features/desktop/window-managers/shared/panel/quickshell/scripts/plugin-doctor.sh"
+  readonly property string healthCheckScript: "qs-health-check"
+  readonly property string pluginDoctorScript: "qs-plugin-doctor"
   readonly property string incidentRoot: Quickshell.env("HOME") + "/.local/state/quickshell/incidents"
 
   property Process _healthProc: Process {
-    command: [root.healthCheckScript]
+    command: ["qs-health-check"]
     running: false
     stdout: StdioCollector {
       onStreamFinished: {
@@ -40,7 +40,7 @@ QtObject {
   }
 
   property Process _pluginProc: Process {
-    command: [root.pluginDoctorScript, "--json"]
+    command: ["qs-plugin-doctor", "--json"]
     running: false
     stdout: StdioCollector {
       onStreamFinished: {
@@ -57,7 +57,7 @@ QtObject {
   }
 
   function applySafeFixes() {
-    var fixProc = Qt.createQmlObject('import Quickshell.Io; Process { command: ["' + root.healthCheckScript + '", "--apply-safe-fixes"] }', root);
+    var fixProc = Qt.createQmlObject('import Quickshell.Io; Process { command: ["qs-health-check", "--apply-safe-fixes"] }', root);
     fixProc.onExited.connect(function() {
       root.refreshHealth();
       fixProc.destroy();

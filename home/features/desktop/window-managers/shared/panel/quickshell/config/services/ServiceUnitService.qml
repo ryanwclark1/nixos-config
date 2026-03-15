@@ -252,6 +252,14 @@ QtObject {
         return _runClipboardAction(scope, unitName, String(unitName || ""), "Unit name copied to clipboard.");
     }
 
+    function getLogStreamCommand(scope, id) {
+        if (scope === "docker") {
+            return ["docker", "logs", "-f", "--tail", "100", id];
+        }
+        var prefix = scope === "system" ? ["journalctl", "-u"] : ["journalctl", "--user", "-u"];
+        return prefix.concat([id, "-f", "-n", "100"]);
+    }
+
     function openUnitLogsInTerminal(scope, unitName) {
         if (!unitName)
             return false;

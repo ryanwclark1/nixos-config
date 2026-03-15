@@ -11,7 +11,7 @@ SharedWidgets.ScrollableContent {
 
     property string title: ""
     property string subtitle: ""
-    property var iconName: ""
+    property string iconName: ""
     property string tabId: ""
     property bool compactMode: false
     property bool tightSpacing: false

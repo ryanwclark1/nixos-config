@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Services.Notifications
 import Quickshell.Services.Mpris
 import Quickshell.Wayland
+import Quickshell.Widgets
 import "../modules"
 import "../notifications"
 import "../services"
@@ -388,9 +389,9 @@ PanelWindow {
             }
 
             // Large Image Preview
-            Rectangle {
-              width: parent.width; height: 150; visible: modelData.image !== ""; radius: Colors.radiusXS; clip: true; color: "transparent"; border.color: Colors.border; border.width: 1
-              Image { anchors.fill: parent; source: modelData.image || ""; sourceSize: Qt.size(600, 300); asynchronous: true; fillMode: Image.PreserveAspectCrop }
+            ClippingWrapperRectangle {
+              width: parent.width; height: 150; visible: modelData.image !== ""; radius: Colors.radiusXS; color: "transparent"; border.color: Colors.border; border.width: 1
+              Image { source: modelData.image || ""; sourceSize: Qt.size(600, 300); asynchronous: true; fillMode: Image.PreserveAspectCrop }
             }
 
             // Inline Reply Area

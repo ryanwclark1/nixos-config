@@ -9,11 +9,13 @@ QtObject {
 
     // ── Public state ─────────────────────────────
     property string lastScreenshotPath: ""
+    property string lastRegionPath: ""
     property bool capturing: false
 
     // ── Signals ──────────────────────────────────
     signal captureStarted()
     signal captureCompleted(string path)
+    signal regionCaptured(string path)
     signal captureFailed(string error)
 
     // ── Actions ──────────────────────────────────
@@ -41,8 +43,13 @@ QtObject {
                 var parts = result.split("|");
 
                 if (parts[0] === "OK" && parts[1]) {
-                    root.lastScreenshotPath = parts[1];
-                    root.captureCompleted(parts[1]);
+                    var path = parts[1];
+                    root.lastScreenshotPath = path;
+                    if (mode === "region") {
+                        root.lastRegionPath = path;
+                        root.regionCaptured(path);
+                    }
+                    root.captureCompleted(path);
                     // Notify
                     Quickshell.execDetached([
                         "notify-send", "-i", "camera-photo",

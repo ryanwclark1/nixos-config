@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.Mpris
+import Quickshell.Widgets
 import "../services"
 import "../widgets" as SharedWidgets
 
@@ -97,32 +98,33 @@ BasePopupMenu {
     spacing: Colors.spacingL
     visible: !!root.player
 
-    // Album art
-    Rectangle {
+    // Album art (ClippingWrapperRectangle for proper radius clipping)
+    ClippingWrapperRectangle {
       Layout.alignment: Qt.AlignHCenter
       Layout.preferredWidth: root.compactMode ? 96 : 120
       Layout.preferredHeight: root.compactMode ? 96 : 120
       radius: Colors.radiusMedium
       color: Colors.surface
-      clip: true
 
-      Image {
-        id: albumArt
-        anchors.fill: parent
-        source: root.effectiveArtUrl || ""
-        sourceSize: Qt.size(240, 240)
-        asynchronous: true
-        fillMode: Image.PreserveAspectCrop
-        visible: status === Image.Ready
-      }
+      Item {
+        Image {
+          id: albumArt
+          anchors.fill: parent
+          source: root.effectiveArtUrl || ""
+          sourceSize: Qt.size(240, 240)
+          asynchronous: true
+          fillMode: Image.PreserveAspectCrop
+          visible: status === Image.Ready
+        }
 
-      Text {
-        anchors.centerIn: parent
-        text: "󰝚"
-        color: Colors.textDisabled
-        font.family: Colors.fontMono
-        font.pixelSize: Colors.fontSizeHuge * 2
-        visible: albumArt.status !== Image.Ready
+        Text {
+          anchors.centerIn: parent
+          text: "󰝚"
+          color: Colors.textDisabled
+          font.family: Colors.fontMono
+          font.pixelSize: Colors.fontSizeHuge * 2
+          visible: albumArt.status !== Image.Ready
+        }
       }
 
     }

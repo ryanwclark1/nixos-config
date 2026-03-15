@@ -38,7 +38,13 @@ PanelWindow {
 
   property bool isOpen: false
   property bool interactionBlocked: false
-  property string currentTabId: SettingsRegistry.defaultTabId
+  property string currentTabId: _persist.currentTabId
+
+  PersistentProperties {
+    id: _persist
+    reloadableId: "settingsHubState"
+    property string currentTabId: SettingsRegistry.defaultTabId
+  }
   property string pendingTabId: ""
   readonly property int currentTabIndex: SettingsRegistry.indexForTabId(currentTabId)
   signal browseWallpaper(string monitorName)
@@ -57,7 +63,7 @@ PanelWindow {
 
   function open() {
     if (!SettingsRegistry.findTab(currentTabId))
-      currentTabId = SettingsRegistry.defaultTabId;
+      _persist.currentTabId = SettingsRegistry.defaultTabId;
     isOpen = true;
     if (CompositorAdapter.supportsHyprctlSettings) refreshHyprlandSettings();
   }
@@ -73,7 +79,7 @@ PanelWindow {
   function captureOpenTab(tabId, scrollY) {
     var tab = SettingsRegistry.findTab(tabId);
     if (tab)
-      currentTabId = tab.id;
+      _persist.currentTabId = tab.id;
     pendingTabId = "";
     setCaptureScrollY(scrollY);
     open();
@@ -96,7 +102,7 @@ PanelWindow {
     onTriggered: {
       if (settingsRoot.pendingTabId) {
         var tab = SettingsRegistry.findTab(settingsRoot.pendingTabId);
-        if (tab) settingsRoot.currentTabId = tab.id;
+        if (tab) settingsRoot._persist.currentTabId = tab.id;
         settingsRoot.pendingTabId = "";
       }
       settingsRoot.open();
@@ -231,7 +237,7 @@ PanelWindow {
         currentTabId: settingsRoot.currentTabId
         searchQuery: settingsRoot.searchQuery
         compactMode: settingsRoot.compactMode
-        onTabSelected: (tabId) => settingsRoot.currentTabId = tabId
+        onTabSelected: (tabId) => settingsRoot._persist.currentTabId = tabId
         onSearchQueryEdited: (query) => settingsRoot.searchQuery = query
         onSaveAndClose: {
           Config.save();
@@ -248,7 +254,7 @@ PanelWindow {
         searchQuery: settingsRoot.searchQuery
         compactMode: settingsRoot.compactMode
         tightSpacing: settingsRoot.tightSpacing
-        onTabSelected: (tabId) => settingsRoot.currentTabId = tabId
+        onTabSelected: (tabId) => settingsRoot._persist.currentTabId = tabId
         onSearchQueryEdited: (query) => settingsRoot.searchQuery = query
       }
     }

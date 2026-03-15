@@ -43,7 +43,6 @@ PanelWindow {
 
     property var manager: null
     property bool showContent: false
-    property int pendingPowerIndex: -1
     readonly property int maxLayerTextureSize: 4096
     readonly property int staggerDelay: 35
     signal closeRequested
@@ -81,11 +80,6 @@ PanelWindow {
         }
     }
 
-    Timer {
-        id: powerConfirmTimer
-        interval: 3000
-        onTriggered: root.pendingPowerIndex = -1
-    }
     visible: showContent || ccSlideAnim.running || ccFadeAnim.running
 
     SharedWidgets.Ref {
@@ -226,7 +220,6 @@ PanelWindow {
                             Repeater {
                                 model: ControlCenterRegistry.quickLinkItems
                                 delegate: QuickLinkCard {
-                                    required property var modelData
                                     icon: modelData.icon
                                     title: modelData.title
                                     subtitle: modelData.subtitle
@@ -246,33 +239,11 @@ PanelWindow {
                         }
 
                         // Quick Toggles Grid
-                        GridLayout {
-                            columns: 2
-                            Layout.fillWidth: true
-                            rowSpacing: Colors.paddingSmall
-                            columnSpacing: Colors.paddingSmall
-                            opacity: root.entranceOpacity(2)
-                            scale: root.entranceScale(2)
-                            transform: Translate { y: root.entranceY(2) }
-                            visible: opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(2) } NumberAnimation { duration: root.entranceDuration(2); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(2) } NumberAnimation { duration: root.entranceDuration(2); easing.type: Easing.OutBack } } }
-
-                            Repeater {
-                                model: ControlCenterRegistry.visibleQuickToggleItems
-                                delegate: QuickToggle {
-                                    required property var modelData
-                                    icon: modelData.icon
-                                    label: modelData.label
-                                    active: !!root.manager && ControlCenterRegistry.quickToggleActive(modelData.id, root.manager)
-                                    onClicked: {
-                                        if (!root.manager)
-                                            return;
-                                        ControlCenterRegistry.toggleQuickToggle(modelData.id, root.manager);
-                                    }
-                                }
-                            }
+                        QuickToggleGrid {
+                            manager: root.manager
+                            showContent: root.showContent
+                            baseIndex: 2
+                            staggerDelay: root.staggerDelay
                         }
 
                         ColumnLayout {
@@ -332,72 +303,10 @@ PanelWindow {
                         }
 
                         // DevOps & Services
-                        ColumnLayout {
-                            Layout.fillWidth: true
-                            spacing: Colors.spacingM
-                            opacity: root.entranceOpacity(15)
-                            scale: root.entranceScale(15)
-                            transform: Translate { y: root.entranceY(15) }
-                            visible: opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(15) } NumberAnimation { duration: root.entranceDuration(15); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(15) } NumberAnimation { duration: root.entranceDuration(15); easing.type: Easing.OutBack } } }
-                            Behavior on transform { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(15) } NumberAnimation { duration: root.entranceDuration(15); easing.type: Easing.OutCubic } } }
-
-                            Text {
-                                text: "DEVOPS & SERVICES"
-                                color: Colors.textDisabled
-                                font.pixelSize: Colors.fontSizeXS
-                                font.weight: Font.Bold
-                                font.letterSpacing: 1.0
-                            }
-
-                            RowLayout {
-                                Layout.fillWidth: true
-                                spacing: Colors.spacingM
-
-                                // Docker Card
-                                Rectangle {
-                                    Layout.fillWidth: true
-                                    height: 60
-                                    radius: Colors.radiusMedium
-                                    color: Colors.withAlpha(Colors.surface, 0.3)
-                                    border.color: Colors.border
-                                    border.width: 1
-                                    
-                                    RowLayout {
-                                        anchors.fill: parent; anchors.margins: Colors.paddingSmall
-                                        spacing: Colors.spacingS
-                                        Text { text: "󰡨"; color: ServiceUnitService.dockerContainers.length > 0 ? Colors.primary : Colors.textDisabled; font.pixelSize: 24; font.family: Colors.fontMono }
-                                        ColumnLayout {
-                                            spacing: 0
-                                            Text { text: "DOCKER"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Black }
-                                            Text { text: ServiceUnitService.dockerContainers.length + " Active"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Bold }
-                                        }
-                                    }
-                                }
-
-                                // SSH Card
-                                Rectangle {
-                                    Layout.fillWidth: true
-                                    height: 60
-                                    radius: Colors.radiusMedium
-                                    color: Colors.withAlpha(Colors.surface, 0.3)
-                                    border.color: Colors.border
-                                    border.width: 1
-                                    
-                                    RowLayout {
-                                        anchors.fill: parent; anchors.margins: Colors.paddingSmall
-                                        spacing: Colors.spacingS
-                                        Text { text: "󰣀"; color: ServiceUnitService.sshActiveCount > 0 ? Colors.accent : Colors.textDisabled; font.pixelSize: 24; font.family: Colors.fontMono }
-                                        ColumnLayout {
-                                            spacing: 0
-                                            Text { text: "SSH"; color: Colors.textDisabled; font.pixelSize: 8; font.weight: Font.Black }
-                                            Text { text: ServiceUnitService.sshActiveCount + " Active"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Bold }
-                                        }
-                                    }
-                                }
-                            }
+                        DevOpsSection {
+                            showContent: root.showContent
+                            baseIndex: 15
+                            staggerDelay: root.staggerDelay
                         }
 
                         // Sliders
@@ -708,167 +617,10 @@ PanelWindow {
                 }
             }
 
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: Colors.paddingSmall
-                opacity: root.entranceOpacity(14)
-                scale: root.entranceScale(14)
-                transform: Translate { y: root.entranceY(14) }
-                Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(14) } NumberAnimation { duration: root.entranceDuration(14); easing.type: Easing.OutCubic } } }
-                Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(14) } NumberAnimation { duration: root.entranceDuration(14); easing.type: Easing.OutBack } } }
-                Repeater {
-                    model: SystemActionRegistry.actionsByIds([
-                        "shutdown",
-                        "reboot",
-                        "lock"
-                    ])
-                    delegate: Rectangle {
-                        required property var modelData
-                        required property int index
-                        readonly property bool awaitingConfirm: !!root && root.pendingPowerIndex === index
-                        Layout.fillWidth: true
-                        height: 40
-                        color: awaitingConfirm ? Colors.error : Colors.surface
-                        radius: Colors.radiusXS
-                        border.color: Colors.border
-                        border.width: 1
-                        Behavior on color {
-                            ColorAnimation {
-                                duration: Colors.durationFast
-                            }
-                        }
-
-                        // Inner highlight border
-                        Rectangle {
-                            anchors.fill: parent
-                            anchors.margins: 1
-                            radius: parent.radius - 1
-                            color: "transparent"
-                            border.color: Colors.borderLight
-                            border.width: 1
-                            opacity: 0.15
-                        }
-
-                        Text {
-                            anchors.centerIn: parent
-                            text: awaitingConfirm ? "Confirm?" : modelData.icon
-                            color: awaitingConfirm ? Colors.background : Colors.text
-                            font.family: awaitingConfirm ? undefined : Colors.fontMono
-                            font.pixelSize: awaitingConfirm ? Colors.fontSizeSmall : Colors.fontSizeXL
-                            font.weight: awaitingConfirm ? Font.Bold : Font.Normal
-                        }
-
-                        SharedWidgets.StateLayer {
-                            id: powerStateLayer
-                            hovered: powerHover.containsMouse
-                            pressed: powerHover.pressed
-                        }
-
-                        MouseArea {
-                            id: powerHover
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: mouse => {
-                                powerStateLayer.burst(mouse.x, mouse.y);
-                                if (!modelData.danger) {
-                                    // Lock doesn't need confirmation
-                                    Quickshell.execDetached(modelData.cmd);
-                                    return;
-                                }
-                                if (awaitingConfirm) {
-                                    Quickshell.execDetached(modelData.cmd);
-                                    root.pendingPowerIndex = -1;
-                                    powerConfirmTimer.stop();
-                                } else {
-                                    root.pendingPowerIndex = index;
-                                    powerConfirmTimer.restart();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    component QuickLinkCard: Rectangle {
-        property string icon
-        property string title
-        property string subtitle
-        property var clickCommand: []
-
-        Layout.fillWidth: true
-        implicitHeight: 68
-        radius: Colors.radiusMedium
-        color: Colors.bgWidget
-        border.color: Colors.border
-        border.width: 1
-
-        RowLayout {
-            anchors.fill: parent
-            anchors.margins: Colors.spacingM
-            spacing: Colors.spacingM
-
-            Rectangle {
-                Layout.preferredWidth: 36
-                Layout.preferredHeight: 36
-                radius: height / 2
-                color: Colors.withAlpha(Colors.primary, 0.12)
-
-                Text {
-                    anchors.centerIn: parent
-                    text: icon
-                    color: Colors.primary
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeXL
-                }
-            }
-
-            ColumnLayout {
-                Layout.fillWidth: true
-                spacing: 1
-
-                Text {
-                    text: title
-                    color: Colors.text
-                    font.pixelSize: Colors.fontSizeMedium
-                    font.weight: Font.DemiBold
-                    Layout.fillWidth: true
-                    elide: Text.ElideRight
-                }
-
-                Text {
-                    text: subtitle
-                    color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeXS
-                    Layout.fillWidth: true
-                    elide: Text.ElideRight
-                }
-            }
-
-            Text {
-                text: "󰄮"
-                color: Colors.textSecondary
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeMedium
-            }
-        }
-
-        SharedWidgets.StateLayer {
-            id: stateLayer
-            hovered: quickLinkHover.containsMouse
-            pressed: quickLinkHover.pressed
-        }
-
-        MouseArea {
-            id: quickLinkHover
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: mouse => {
-                stateLayer.burst(mouse.x, mouse.y);
-                Quickshell.execDetached(clickCommand);
+            PowerActionsRow {
+                showContent: root.showContent
+                baseIndex: 14
+                staggerDelay: root.staggerDelay
             }
         }
     }

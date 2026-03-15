@@ -474,7 +474,7 @@ QtObject {
         return null;
     }
 
-    function sendMessage(text, contextWindow) {
+    function sendMessage(text, contextWindow, visualContext) {
         if (!text || text.trim().length === 0) return;
         if (isStreaming) return;
 
@@ -523,6 +523,12 @@ QtObject {
         if (contextWindow) {
             var winInfo = "Active Window: " + contextWindow;
             contextInfo = contextInfo ? contextInfo + "\n" + winInfo : winInfo;
+        }
+
+        if (visualContext) {
+            var visInfo = "Visual Context (latest cropped region): " + visualContext + 
+                "\n(Note: The assistant can reference this image if the multimodal backend supports it, otherwise it sees this path as a hint.)";
+            contextInfo = contextInfo ? contextInfo + "\n" + visInfo : visInfo;
         }
 
         if (contextInfo) {

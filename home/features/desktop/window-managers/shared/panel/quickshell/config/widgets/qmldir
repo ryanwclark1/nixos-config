@@ -26,6 +26,7 @@ Dock 1.0 Dock.qml
 DockContent 1.0 DockContent.qml
 DockMenu 1.0 DockMenu.qml
 LoadingSpinner 1.0 LoadingSpinner.qml
+LiveLogOverlay 1.0 LiveLogOverlay.qml
 LockContext 1.0 LockContext.qml
 LockPanel 1.0 LockPanel.qml
 MediaBar 1.0 MediaBar.qml

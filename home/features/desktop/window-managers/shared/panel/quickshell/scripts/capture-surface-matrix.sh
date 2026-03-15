@@ -18,7 +18,7 @@ surfaces=(
 
 usage() {
   cat <<'EOF'
-Usage: capture-surface-matrix.sh [--output-dir DIR] [--delay SECONDS] [--crop monitor|usable] [--workspace current|auto|NAME]
+Usage: capture-surface-matrix.sh [--output-dir DIR] [--delay SECONDS] [--crop surface|monitor|usable] [--workspace current|auto|NAME]
 
 Capture the high-risk popup/panel surfaces on the currently focused monitor.
 This produces review artifacts for manual inspection, not PASS/WARN/FAIL results.

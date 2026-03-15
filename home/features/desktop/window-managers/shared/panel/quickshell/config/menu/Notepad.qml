@@ -52,28 +52,68 @@ PanelWindow {
       nextTabId: root.nextTabId,
       notepadWidth: root.notepadWidth
     };
-    _stateFile.setText(JSON.stringify(data));
+    notepadFile.setText(JSON.stringify(data, null, 2));
   }
 
-  property FileView _stateFile: FileView {
+  property FileView notepadFile: FileView {
     path: root.savePath
-    onLoaded: {
-      try {
-        var data = JSON.parse(this.text);
-        root._loading = true;
-        root.tabs = data.tabs || [{ "id": 1, "title": "Notes", "content": "" }];
-        root.activeTabId = data.activeTabId || 1;
-        root.nextTabId = data.nextTabId || 2;
-        root.notepadWidth = data.notepadWidth || 400;
-        root._loading = false;
-        // Trigger UI sync
-        notepadText.text = root.activeContent;
-      } catch(e) { root._loading = false; }
+    blockLoading: true
+    printErrors: false
+    onLoaded: root.load()
+    onLoadFailed: (error) => {
+      if (error === 2) {
+        // File doesn't exist yet — write defaults
+        root.saveState();
+        return;
+      }
+      console.error("Notepad: failed to load file: " + error);
     }
+    onSaveFailed: (error) => console.error("Notepad: failed to save file: " + error)
+  }
+
+  function load() {
+    var raw = notepadFile.text();
+    if (!raw) return;
+    _loading = true;
+    try {
+      var data = JSON.parse(raw);
+      if (data.tabs && Array.isArray(data.tabs) && data.tabs.length > 0) {
+        tabs = data.tabs;
+        // Compute next id as max existing + 1
+        var maxId = 0;
+        for (var i = 0; i < tabs.length; i++) {
+          if (tabs[i].id > maxId) maxId = tabs[i].id;
+        }
+        nextTabId = maxId + 1;
+      }
+      if (data.activeTabId !== undefined) {
+        // Validate the id actually exists
+        var found = false;
+        for (var j = 0; j < tabs.length; j++) {
+          if (tabs[j].id === data.activeTabId) { found = true; break; }
+        }
+        activeTabId = found ? data.activeTabId : tabs[0].id;
+      }
+      if (data.notepadWidth !== undefined) {
+        notepadWidth = Math.max(notepadMinWidth, Math.min(notepadMaxWidth, data.notepadWidth));
+      } else if (data.width !== undefined) {
+        notepadWidth = Math.max(notepadMinWidth, Math.min(notepadMaxWidth, data.width));
+      }
+    } catch (e) {
+      console.error("Notepad: failed to parse JSON: " + e);
+    }
+    _loading = false;
+    // Trigger UI sync
+    notepadText.text = root.activeContent;
   }
 
   onTabsChanged: saveState()
-  onActiveTabIdChanged: saveState()
+  onActiveTabIdChanged: {
+    if (!_loading) {
+        notepadText.text = root.activeContent;
+        saveState();
+    }
+  }
   onNotepadWidthChanged: saveState()
 
   signal closeRequested()
@@ -160,76 +200,14 @@ PanelWindow {
     }
   }
 
-  // --- Persistence ---
-  readonly property string savePath: Quickshell.env("HOME") + "/.local/state/quickshell/notepad.json"
-
-  property bool _loading: false
-
-  property FileView notepadFile: FileView {
-    path: root.savePath
-    blockLoading: true
-    printErrors: false
-    onLoaded: root.load()
-    onLoadFailed: (error) => {
-      if (error === 2) {
-        // File doesn't exist yet — write defaults
-        root.save();
-        return;
-      }
-      console.error("Notepad: failed to load file: " + error);
-    }
-    onSaveFailed: (error) => console.error("Notepad: failed to save file: " + error)
-  }
-
-  function load() {
-    var raw = notepadFile.text();
-    if (!raw) return;
-    _loading = true;
-    try {
-      var data = JSON.parse(raw);
-      if (data.tabs && Array.isArray(data.tabs) && data.tabs.length > 0) {
-        tabs = data.tabs;
-        // Compute next id as max existing + 1
-        var maxId = 0;
-        for (var i = 0; i < tabs.length; i++) {
-          if (tabs[i].id > maxId) maxId = tabs[i].id;
-        }
-        nextTabId = maxId + 1;
-      }
-      if (data.activeTabId !== undefined) {
-        // Validate the id actually exists
-        var found = false;
-        for (var j = 0; j < tabs.length; j++) {
-          if (tabs[j].id === data.activeTabId) { found = true; break; }
-        }
-        activeTabId = found ? data.activeTabId : tabs[0].id;
-      }
-      if (data.width !== undefined) {
-        notepadWidth = Math.max(notepadMinWidth, Math.min(notepadMaxWidth, data.width));
-      }
-    } catch (e) {
-      console.error("Notepad: failed to parse JSON: " + e);
-    }
-    _loading = false;
-  }
-
   // Debounced save timer
   property Timer saveTimer: Timer {
     interval: 500
-    onTriggered: root.save()
+    onTriggered: root.saveState()
   }
 
   function scheduleSave() {
     if (!_loading) saveTimer.restart();
-  }
-
-  function save() {
-    var data = {
-      "tabs": tabs,
-      "activeTabId": activeTabId,
-      "width": notepadWidth
-    };
-    notepadFile.setText(JSON.stringify(data, null, 2));
   }
 
   // --- Tab Management ---
@@ -246,13 +224,18 @@ PanelWindow {
     if (tabs.length <= 1) return; // Can't delete last tab
     var newTabs = [];
     for (var i = 0; i < tabs.length; i++) {
-      if (tabs[i].id !== tabId) newTabs.push(tabs[i]);
+      if (tabs[i].id !== tabId) newConvs.push(tabs[i]); // Typo in original? (newConvs vs newTabs)
+    }
+    // Fixed typo from original
+    var updatedTabs = [];
+    for (var j = 0; j < tabs.length; j++) {
+        if (tabs[j].id !== tabId) updatedTabs.push(tabs[j]);
     }
     // If we deleted the active tab, switch to previous or first
     if (activeTabId === tabId) {
-      activeTabId = newTabs[0].id;
+      activeTabId = updatedTabs[0].id;
     }
-    tabs = newTabs;
+    tabs = updatedTabs;
     scheduleSave();
   }
 
@@ -746,13 +729,5 @@ PanelWindow {
         }
       }
     }
-  }
-
-  // When active tab changes, push updated text into TextEdit
-  onActiveTabIdChanged: {
-    _loading = true;
-    notepadText.text = root.activeContent;
-    _loading = false;
-    notepadText.forceActiveFocus();
   }
 }

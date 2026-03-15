@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.Mpris
+import Quickshell.Widgets
 import "../services"
 
 Rectangle {
@@ -62,30 +63,31 @@ Rectangle {
         spacing: Colors.paddingMedium
 
         // Album Art
-        Rectangle {
+        ClippingWrapperRectangle {
           Layout.preferredWidth: 70
           Layout.preferredHeight: 70
           radius: Colors.radiusXS
           color: Colors.surface
-          clip: true
 
-          Image {
-            id: albumArt
-            anchors.fill: parent
-            source: modelData.trackArtUrl || ""
-            sourceSize: Qt.size(140, 140)
-            asynchronous: true
-            fillMode: Image.PreserveAspectCrop
-            visible: status === Image.Ready
-          }
+          Item {
+            Image {
+              id: albumArt
+              anchors.fill: parent
+              source: modelData.trackArtUrl || ""
+              sourceSize: Qt.size(140, 140)
+              asynchronous: true
+              fillMode: Image.PreserveAspectCrop
+              visible: status === Image.Ready
+            }
 
-          Text {
-            anchors.centerIn: parent
-            text: "󰝚"
-            color: Colors.textDisabled
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeIcon
-            visible: albumArt.status !== Image.Ready
+            Text {
+              anchors.centerIn: parent
+              text: "󰝚"
+              color: Colors.textDisabled
+              font.family: Colors.fontMono
+              font.pixelSize: Colors.fontSizeIcon
+              visible: albumArt.status !== Image.Ready
+            }
           }
         }
 

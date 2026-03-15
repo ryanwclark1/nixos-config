@@ -38,6 +38,7 @@ PanelWindow {
     readonly property int panelMinWidth: 320
     readonly property int panelMaxWidth: 600
     property bool includeWindowContext: false
+    property bool includeVisualContext: false
 
     signal closeRequested()
 
@@ -964,34 +965,46 @@ PanelWindow {
                             }
                         }
 
-                        // Screenshot context
+                        // Visual context toggle
                         Rectangle {
                             width: 24; height: 24; radius: Colors.radiusXXS
-                            color: "transparent"
-                            border.color: Colors.border
+                            color: root.includeVisualContext ? Colors.withAlpha(Colors.primary, 0.18) : "transparent"
+                            border.color: root.includeVisualContext ? Colors.primary : Colors.border
                             border.width: 1
 
                             Text {
                                 anchors.centerIn: parent
                                 text: "󰄀"
-                                color: Colors.textDisabled
+                                color: root.includeVisualContext ? Colors.primary : Colors.textDisabled
                                 font.family: Colors.fontMono
                                 font.pixelSize: Colors.fontSizeSmall
                             }
                             MouseArea {
-                                id: screenCtxHover
+                                id: visualCtxHover
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
-                                    ScreenshotService.captureRegion();
+                                    if (ScreenshotService.lastRegionPath === "") {
+                                        ScreenshotService.captureRegion();
+                                    } else {
+                                        root.includeVisualContext = !root.includeVisualContext;
+                                    }
                                 }
+                                onDoubleClicked: ScreenshotService.captureRegion()
                             }
                             
                             SharedWidgets.BarTooltip {
-                                text: "Capture Region to Clipboard"
-                                hovered: screenCtxHover.containsMouse
+                                text: "Attach Latest Screen Crop (Double-click to capture new)"
+                                hovered: visualCtxHover.containsMouse
                                 anchorItem: parent
+                            }
+
+                            Connections {
+                                target: ScreenshotService
+                                function onRegionCaptured(path) {
+                                    root.includeVisualContext = true;
+                                }
                             }
                         }
 
@@ -1510,8 +1523,10 @@ PanelWindow {
         if (AiService.isStreaming) return;
         inputField.text = "";
         var winCtx = root.includeWindowContext ? AiService.contextWindowTitle : "";
-        AiService.sendMessage(text, winCtx);
+        var visualCtx = root.includeVisualContext ? ScreenshotService.lastRegionPath : "";
+        AiService.sendMessage(text, winCtx, visualCtx);
         root.includeWindowContext = false;
+        root.includeVisualContext = false;
     }
 
     function _shellEscape(str) {

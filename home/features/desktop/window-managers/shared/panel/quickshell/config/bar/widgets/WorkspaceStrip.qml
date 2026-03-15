@@ -147,4 +147,53 @@ Flow {
       }
     }
   }
+
+  // ── Create Workspace Button ─────────────────
+  Rectangle {
+    id: addWsBtn
+    width: root.pillMinWidth; height: root.pillHeight
+    radius: Colors.radiusXXS
+    color: addWsHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.12) : Colors.withAlpha(Colors.surface, 0.25)
+    border.color: addWsHover.containsMouse ? Colors.primary : Colors.border
+    border.width: 1
+    visible: Config.workspaceShowEmpty || root.state.workspaces.length < 10
+    
+    Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+    scale: addWsHover.containsMouse ? 1.1 : 1.0
+    Behavior on scale { SpringAnimation { spring: 4; damping: 0.3 } }
+
+    Text {
+      anchors.centerIn: parent
+      text: "+"
+      color: addWsHover.containsMouse ? Colors.primary : Colors.textDisabled
+      font.pixelSize: root.pillFontSize
+      font.weight: Font.Light
+    }
+
+    DropArea {
+      anchors.fill: parent
+      keys: ["window", "overview-window"]
+      onEntered: addWsBtn.color = Colors.withAlpha(Colors.accent, 0.2)
+      onExited: addWsBtn.color = Colors.withAlpha(Colors.surface, 0.25)
+      onDropped: (drop) => {
+        if (drop.source && (drop.source.windowAddress || drop.source.windowId)) {
+          var addr = drop.source.windowAddress || drop.source.windowId;
+          // Create new workspace and move window there
+          var nextId = root.state.workspaces.length + 1;
+          CompositorAdapter.moveWindowToWorkspace(addr, nextId);
+        }
+      }
+    }
+
+    MouseArea {
+      id: addWsHover
+      anchors.fill: parent
+      hoverEnabled: true
+      cursorShape: Qt.PointingHandCursor
+      onClicked: {
+        var nextId = root.state.workspaces.length + 1;
+        CompositorAdapter.focusWorkspace(nextId);
+      }
+    }
+  }
 }

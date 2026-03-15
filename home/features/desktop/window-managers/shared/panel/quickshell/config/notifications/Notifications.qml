@@ -253,20 +253,18 @@ PanelWindow {
             }
           }
 
-          // Large Image Preview
-          Rectangle {
+          // Large Image Preview (ClippingWrapperRectangle for proper radius clipping)
+          ClippingWrapperRectangle {
             width: parent.width - 24
             height: 180
             anchors.horizontalCenter: parent.horizontalCenter
             visible: notifDelegate.previewImageSource !== ""
             radius: Colors.radiusXS
-            clip: true
             color: "transparent"
             border.color: Colors.border
             border.width: 1
 
             Image {
-              anchors.fill: parent
               source: notifDelegate.previewImageSource
               sourceSize: Qt.size(600, 300)
               asynchronous: true

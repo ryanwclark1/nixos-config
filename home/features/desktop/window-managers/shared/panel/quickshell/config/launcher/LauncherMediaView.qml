@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell.Services.Mpris
+import Quickshell.Widgets
 import "../widgets" as SharedWidgets
 import "../services"
 
@@ -27,13 +28,12 @@ ColumnLayout {
         anchors.fill: parent
         anchors.margins: root.compactMode ? Colors.spacingM : Colors.paddingMedium
         spacing: root.compactMode ? Colors.paddingSmall : Colors.paddingMedium
-        Rectangle {
+        ClippingWrapperRectangle {
           width: root.compactMode ? 72 : 90
           height: root.compactMode ? 72 : 90
           radius: Colors.radiusXS
           color: Colors.surface
-          clip: true
-          Image { anchors.fill: parent; source: modelData.trackArtUrl || ""; sourceSize: Qt.size(128, 128); asynchronous: true; fillMode: Image.PreserveAspectCrop }
+          Image { source: modelData.trackArtUrl || ""; sourceSize: Qt.size(128, 128); asynchronous: true; fillMode: Image.PreserveAspectCrop }
         }
         ColumnLayout {
           Layout.fillWidth: true
