@@ -18,7 +18,7 @@ QtObject {
     { widgetType: "dateTime", label: "Clock", icon: "󰥔", section: "center", description: "Current time and date popup.", hasSettings: true, defaultSettings: { displayMode: "auto", showDate: true } },
     { widgetType: "mediaBar", label: "Media Controls", icon: "󰎆", section: "center", description: "Current media playback widget.", hasSettings: true, defaultSettings: { displayMode: "auto", maxTextWidth: 150 } },
     { widgetType: "updates", label: "Updates", icon: "󰚰", section: "center", description: "Pending system updates.", hasSettings: true, defaultSettings: { displayMode: "auto" } },
-    { widgetType: "cava", label: "Visualizer", icon: "󰎈", section: "center", description: "Compact audio spectrum with popup." },
+    { widgetType: "cava", label: "Visualizer", icon: "󰎈", section: "center", description: "Compact audio spectrum with popup.", hasSettings: true, defaultSettings: { barCount: 8 } },
     { widgetType: "idleInhibitor", label: "Idle Inhibitor", icon: "󰒲", section: "center", description: "Toggle idle inhibit state." },
     { widgetType: "weather", label: "Weather", icon: "󰖙", section: "right", description: "Current weather and forecast popup.", hasSettings: true, defaultSettings: { displayMode: "auto" } },
     {
@@ -45,8 +45,8 @@ QtObject {
     { widgetType: "bluetooth", label: "Bluetooth", icon: "󰂯", section: "right", description: "Bluetooth status and controls popup.", hasSettings: true, defaultSettings: { displayMode: "auto" } },
     { widgetType: "audio", label: "Audio", icon: "󰕾", section: "right", description: "Volume and device controls popup.", hasSettings: true, defaultSettings: { displayMode: "auto" } },
     { widgetType: "music", label: "Music", icon: "󰝚", section: "right", description: "Compact active player shortcut.", hasSettings: true, defaultSettings: { displayMode: "auto", maxTextWidth: 100 } },
-    { widgetType: "privacy", label: "Privacy", icon: "󰒃", section: "right", description: "Camera, mic, and share indicators." },
-    { widgetType: "recording", label: "Recording", icon: "󰻃", section: "right", description: "Active screen recording indicator." },
+    { widgetType: "privacy", label: "Privacy", icon: "󰒃", section: "right", description: "Camera, mic, and share indicators.", hasSettings: true, defaultSettings: { displayMode: "auto", showPulseDot: true } },
+    { widgetType: "recording", label: "Recording", icon: "󰻃", section: "right", description: "Active screen recording indicator.", hasSettings: true, defaultSettings: { displayMode: "auto", showPulseDot: true } },
     { widgetType: "battery", label: "Battery", icon: "󰁹", section: "right", description: "Battery status and actions popup.", hasSettings: true, defaultSettings: { displayMode: "auto" } },
     { widgetType: "printer", label: "Printers", icon: "󰐪", section: "right", description: "Printer status popup.", hasSettings: true, defaultSettings: { displayMode: "auto", badgeStyle: "count" } },
     { widgetType: "aiChat", label: "AI Chat", icon: "󰚩", section: "right", description: "AI chat assistant toggle." },
@@ -57,7 +57,7 @@ QtObject {
     { widgetType: "screenshot", label: "Screenshot", icon: "󰩭", section: "right", description: "Screenshot capture popup." },
     { widgetType: "notifications", label: "Notifications", icon: "󰂚", section: "right", description: "Notification center trigger.", hasSettings: true, defaultSettings: { displayMode: "auto", badgeStyle: "dot" } },
     { widgetType: "spacer", label: "Spacer", icon: "󰉺", section: "center", description: "Adjustable empty spacing.", hasSettings: true, defaultSettings: { size: 24 } },
-    { widgetType: "separator", label: "Separator", icon: "󰇘", section: "center", description: "Thin divider between widgets." }
+    { widgetType: "separator", label: "Separator", icon: "󰇘", section: "center", description: "Thin divider between widgets.", hasSettings: true, defaultSettings: { thickness: 1, length: 20, opacity: 0.8 } }
   ]
 
   readonly property var pluginWidgets: {

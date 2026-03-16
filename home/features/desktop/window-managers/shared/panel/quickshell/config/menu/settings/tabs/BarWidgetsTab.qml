@@ -212,6 +212,22 @@ Item {
         return widgetType === "printer";
     }
 
+    function isPrivacyWidget(widgetType) {
+        return widgetType === "privacy";
+    }
+
+    function isRecordingWidget(widgetType) {
+        return widgetType === "recording";
+    }
+
+    function isCavaWidget(widgetType) {
+        return widgetType === "cava";
+    }
+
+    function isSeparatorWidget(widgetType) {
+        return widgetType === "separator";
+    }
+
     function statDisplayModeLabel(widgetInstance) {
         var settings = widgetInstance && widgetInstance.settings ? widgetInstance.settings : {};
         var mode = String(settings.displayMode || "auto");
@@ -315,6 +331,25 @@ Item {
         if (badgeStyle === "off")
             return "Off";
         return "Count";
+    }
+
+    function pulseDotLabel(widgetInstance) {
+        var settings = widgetInstance && widgetInstance.settings ? widgetInstance.settings : {};
+        return settings.showPulseDot !== false ? "Pulse On" : "Pulse Off";
+    }
+
+    function cavaBarCount(widgetInstance) {
+        var settings = widgetInstance && widgetInstance.settings ? widgetInstance.settings : {};
+        var parsed = parseInt(settings.barCount !== undefined ? settings.barCount : 8, 10);
+        return isNaN(parsed) ? 8 : parsed;
+    }
+
+    function separatorSummary(widgetInstance) {
+        var settings = widgetInstance && widgetInstance.settings ? widgetInstance.settings : {};
+        var thickness = parseInt(settings.thickness !== undefined ? settings.thickness : 1, 10);
+        var length = parseInt(settings.length !== undefined ? settings.length : 20, 10);
+        var opacity = Number(settings.opacity !== undefined ? settings.opacity : 0.8);
+        return String(isNaN(thickness) ? 1 : thickness) + "px • " + String(isNaN(length) ? 20 : length) + "px • " + (isNaN(opacity) ? "80%" : Math.round(opacity * 100) + "%");
     }
 
     function loadPluginSettingsPane() {
@@ -720,6 +755,48 @@ Item {
                                         SharedWidgets.FilterChip {
                                             visible: root.isPrinterWidget(widgetRow.widgetInstance.widgetType)
                                             label: "Badge: " + root.printerBadgeLabel(widgetRow.widgetInstance)
+                                            selected: false
+                                            enabled: false
+                                        }
+
+                                        SharedWidgets.FilterChip {
+                                            visible: root.isPrivacyWidget(widgetRow.widgetInstance.widgetType)
+                                            label: "Display: " + root.summaryDisplayModeLabel(widgetRow.widgetInstance)
+                                            selected: false
+                                            enabled: false
+                                        }
+
+                                        SharedWidgets.FilterChip {
+                                            visible: root.isPrivacyWidget(widgetRow.widgetInstance.widgetType)
+                                            label: root.pulseDotLabel(widgetRow.widgetInstance)
+                                            selected: false
+                                            enabled: false
+                                        }
+
+                                        SharedWidgets.FilterChip {
+                                            visible: root.isRecordingWidget(widgetRow.widgetInstance.widgetType)
+                                            label: "Display: " + root.summaryDisplayModeLabel(widgetRow.widgetInstance)
+                                            selected: false
+                                            enabled: false
+                                        }
+
+                                        SharedWidgets.FilterChip {
+                                            visible: root.isRecordingWidget(widgetRow.widgetInstance.widgetType)
+                                            label: root.pulseDotLabel(widgetRow.widgetInstance)
+                                            selected: false
+                                            enabled: false
+                                        }
+
+                                        SharedWidgets.FilterChip {
+                                            visible: root.isCavaWidget(widgetRow.widgetInstance.widgetType)
+                                            label: "Bars: " + root.cavaBarCount(widgetRow.widgetInstance)
+                                            selected: false
+                                            enabled: false
+                                        }
+
+                                        SharedWidgets.FilterChip {
+                                            visible: root.isSeparatorWidget(widgetRow.widgetInstance.widgetType)
+                                            label: root.separatorSummary(widgetRow.widgetInstance)
                                             selected: false
                                             enabled: false
                                         }
@@ -1457,6 +1534,94 @@ Item {
                             { value: "off", label: "Off" }
                         ]
                         onModeSelected: value => root.updateEditingWidgetSetting("badgeStyle", value)
+                    }
+
+                    SettingsModeRow {
+                        visible: !!root.editingWidget && root.isPrivacyWidget(root.editingWidget.widgetType)
+                        label: "Display Mode"
+                        description: "Choose whether the privacy widget adapts to bar orientation automatically, always shows text, or stays icon-only."
+                        currentValue: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.displayMode ? root.editingWidget.settings.displayMode : "auto"
+                        options: [
+                            { value: "auto", label: "Auto" },
+                            { value: "full", label: "Full" },
+                            { value: "icon", label: "Icon" }
+                        ]
+                        onModeSelected: value => root.updateEditingWidgetSetting("displayMode", value)
+                    }
+
+                    SettingsToggleRow {
+                        visible: !!root.editingWidget && root.isPrivacyWidget(root.editingWidget.widgetType)
+                        label: "Pulse Dot"
+                        icon: "󰄯"
+                        checked: root.editingWidget && root.editingWidget.settings ? root.editingWidget.settings.showPulseDot !== false : true
+                        enabledText: "Show the animated activity dot beside the privacy icon."
+                        disabledText: "Hide the animated pulse dot and keep only the icon/text."
+                        onToggled: root.updateEditingWidgetSetting("showPulseDot", !(root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.showPulseDot !== false))
+                    }
+
+                    SettingsModeRow {
+                        visible: !!root.editingWidget && root.isRecordingWidget(root.editingWidget.widgetType)
+                        label: "Display Mode"
+                        description: "Choose whether the recording widget adapts to bar orientation automatically, always shows REC text, or stays icon-only."
+                        currentValue: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.displayMode ? root.editingWidget.settings.displayMode : "auto"
+                        options: [
+                            { value: "auto", label: "Auto" },
+                            { value: "full", label: "Full" },
+                            { value: "icon", label: "Icon" }
+                        ]
+                        onModeSelected: value => root.updateEditingWidgetSetting("displayMode", value)
+                    }
+
+                    SettingsToggleRow {
+                        visible: !!root.editingWidget && root.isRecordingWidget(root.editingWidget.widgetType)
+                        label: "Pulse Dot"
+                        icon: "󰄯"
+                        checked: root.editingWidget && root.editingWidget.settings ? root.editingWidget.settings.showPulseDot !== false : true
+                        enabledText: "Show the animated recording dot beside the label."
+                        disabledText: "Hide the recording pulse dot."
+                        onToggled: root.updateEditingWidgetSetting("showPulseDot", !(root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.showPulseDot !== false))
+                    }
+
+                    SettingsSliderRow {
+                        visible: !!root.editingWidget && root.isCavaWidget(root.editingWidget.widgetType)
+                        label: "Bar Count"
+                        icon: "󰎈"
+                        min: 4
+                        max: 20
+                        value: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.barCount !== undefined ? root.editingWidget.settings.barCount : 8
+                        onMoved: value => root.updateEditingWidgetSetting("barCount", value)
+                    }
+
+                    SettingsSliderRow {
+                        visible: !!root.editingWidget && root.isSeparatorWidget(root.editingWidget.widgetType)
+                        label: "Thickness"
+                        icon: "󰇘"
+                        min: 1
+                        max: 8
+                        value: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.thickness !== undefined ? root.editingWidget.settings.thickness : 1
+                        onMoved: value => root.updateEditingWidgetSetting("thickness", value)
+                    }
+
+                    SettingsSliderRow {
+                        visible: !!root.editingWidget && root.isSeparatorWidget(root.editingWidget.widgetType)
+                        label: "Length"
+                        icon: "󰝗"
+                        min: 8
+                        max: 64
+                        value: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.length !== undefined ? root.editingWidget.settings.length : 20
+                        onMoved: value => root.updateEditingWidgetSetting("length", value)
+                    }
+
+                    SettingsSliderRow {
+                        visible: !!root.editingWidget && root.isSeparatorWidget(root.editingWidget.widgetType)
+                        label: "Opacity"
+                        icon: "󰖔"
+                        min: 0.1
+                        max: 1.0
+                        step: 0.05
+                        unit: "%"
+                        value: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.opacity !== undefined ? root.editingWidget.settings.opacity : 0.8
+                        onMoved: value => root.updateEditingWidgetSetting("opacity", value)
                     }
 
                     SharedWidgets.SshWidgetSettings {

@@ -718,7 +718,10 @@ Item {
       property var widgetInstance: null
       readonly property string cavaBarText: {
         var full = root.fullCavaData || "";
-        return full.length >= 8 ? full.substring(0, 8) : (full.length > 0 ? full : "▁▂▃▄▅▆▇█");
+        var barCount = root.widgetIntegerSetting(widgetInstance, "barCount", 8, 4, 20);
+        var fallback = "▁▂▃▄▅▆▇█";
+        var source = full.length > 0 ? full : fallback;
+        return source.length >= barCount ? source.substring(0, barCount) : source;
       }
       visible: !root.vertical
       implicitWidth: cavaPill.width
@@ -1000,10 +1003,14 @@ Item {
   Component {
     id: privacyComponent
     SharedWidgets.BarPill {
+      id: privacyPill
       property var widgetInstance: null
       visible: PrivacyService.anyActive
       isActive: root.isSurfaceActive("privacyMenu")
       anchorWindow: root.anchorWindow
+      readonly property string displayMode: root.widgetStringSetting(widgetInstance, "displayMode", "auto", ["auto", "full", "icon"])
+      readonly property bool iconOnly: displayMode === "icon" ? true : (displayMode === "full" ? false : root.vertical)
+      readonly property bool showPulseDot: root.widgetSettings(widgetInstance).showPulseDot !== false
       activeColor: Colors.withAlpha(Colors.warning, 0.22)
       normalColor: Colors.withAlpha(Colors.warning, 0.15)
       hoverColor: Colors.withAlpha(Colors.warning, 0.28)
@@ -1020,6 +1027,7 @@ Item {
         spacing: Colors.spacingXS
 
         Rectangle {
+          visible: privacyPill.showPulseDot
           width: 7; height: 7; radius: 3.5
           color: Colors.warning
           anchors.verticalCenter: parent.verticalCenter
@@ -1038,6 +1046,15 @@ Item {
           font.pixelSize: Colors.fontSizeLarge
           anchors.verticalCenter: parent.verticalCenter
         }
+
+        Text {
+          visible: !privacyPill.iconOnly
+          text: PrivacyService.activeLabel || "Privacy"
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeSmall
+          font.weight: Font.DemiBold
+          anchors.verticalCenter: parent.verticalCenter
+        }
       }
     }
   }
@@ -1045,10 +1062,14 @@ Item {
   Component {
     id: recordingComponent
     SharedWidgets.BarPill {
+      id: recordingPill
       property var widgetInstance: null
       visible: SystemStatus.isRecording
       isActive: root.isSurfaceActive("recordingMenu")
       anchorWindow: root.anchorWindow
+      readonly property string displayMode: root.widgetStringSetting(widgetInstance, "displayMode", "auto", ["auto", "full", "icon"])
+      readonly property bool iconOnly: displayMode === "icon" ? true : (displayMode === "full" ? false : root.vertical)
+      readonly property bool showPulseDot: root.widgetSettings(widgetInstance).showPulseDot !== false
       activeColor: Colors.withAlpha(Colors.error, 0.22)
       normalColor: Colors.withAlpha(Colors.error, 0.15)
       hoverColor: Colors.withAlpha(Colors.error, 0.25)
@@ -1063,6 +1084,7 @@ Item {
         spacing: Colors.spacingS
 
         Rectangle {
+          visible: recordingPill.showPulseDot
           width: 8; height: 8; radius: 4
           color: Colors.error
           anchors.verticalCenter: parent.verticalCenter
@@ -1075,7 +1097,7 @@ Item {
         }
 
         Text {
-          visible: !root.vertical
+          visible: !recordingPill.iconOnly
           text: "REC"
           color: Colors.error
           font.pixelSize: Colors.fontSizeXS
@@ -1392,13 +1414,21 @@ Item {
     id: separatorComponent
     Rectangle {
       property var widgetInstance: null
-      implicitWidth: root.vertical ? Math.max(24, root.thickness - 8) : 1
-      implicitHeight: root.vertical ? 1 : 20
+      readonly property int separatorThickness: root.widgetIntegerSetting(widgetInstance, "thickness", 1, 1, 8)
+      readonly property int separatorLength: root.widgetIntegerSetting(widgetInstance, "length", 20, 8, 64)
+      implicitWidth: root.vertical ? Math.max(24, root.thickness - 8) : separatorThickness
+      implicitHeight: root.vertical ? separatorThickness : separatorLength
       width: implicitWidth
       height: implicitHeight
       radius: 1
       color: Colors.border
-      opacity: 0.8
+      opacity: {
+        var settings = root.widgetSettings(widgetInstance);
+        var parsed = Number(settings.opacity !== undefined ? settings.opacity : 0.8);
+        if (isNaN(parsed))
+          return 0.8;
+        return Math.max(0.1, Math.min(1.0, parsed));
+      }
     }
   }
 
