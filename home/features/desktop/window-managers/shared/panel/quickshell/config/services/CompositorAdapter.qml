@@ -2,6 +2,8 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
+import Quickshell.Hyprland
+import Quickshell.Io
 import "."
 
 QtObject {
@@ -37,17 +39,38 @@ QtObject {
   readonly property bool supportsHyprctlSettings: isHyprland
   readonly property bool supportsKeyboardLayouts: isNiri
 
-  // ── ToplevelManager abstraction ────────────
-  readonly property bool hasToplevelManager: typeof ToplevelManager !== "undefined"
-  readonly property var toplevels: hasToplevelManager ? (ToplevelManager.toplevels ? (ToplevelManager.toplevels.values || []) : []) : []
-  readonly property var activeToplevel: hasToplevelManager ? ToplevelManager.activeToplevel : null
+  // ── Toplevel abstraction ───────────────────
+  readonly property bool hasHyprlandToplevels: isHyprland && typeof Hyprland !== "undefined"
+  readonly property bool hasToplevelManager: hasHyprlandToplevels || typeof ToplevelManager !== "undefined"
+  property var hyprlandCtlWindow: ({})
+  readonly property var toplevels: {
+    if (hasHyprlandToplevels)
+      return Hyprland.toplevels || [];
+    if (typeof ToplevelManager !== "undefined")
+      return ToplevelManager.toplevels ? (ToplevelManager.toplevels.values || []) : [];
+    return [];
+  }
+  readonly property var activeToplevel: {
+    if (hasHyprlandToplevels)
+      return Hyprland.activeToplevel || null;
+    if (typeof ToplevelManager !== "undefined")
+      return ToplevelManager.activeToplevel;
+    return null;
+  }
+  readonly property var activeWindow: {
+    if (isNiri)
+      return niriActiveWindow;
+    if (activeToplevel)
+      return activeToplevel;
+    if (isHyprland)
+      return hyprlandCtlWindow;
+    return null;
+  }
   readonly property string activeWindowTitle: {
-    if (isNiri) {
-      var niriWindow = niriActiveWindow;
-      return niriWindow ? (niriWindow.title || "") : "";
-    }
-    var toplevel = activeToplevel;
-    return toplevel ? (toplevel.title || "") : "";
+    return windowTitle(activeWindow);
+  }
+  readonly property string activeWindowAppId: {
+    return windowAppId(activeWindow);
   }
 
   // ── Niri reactive state (delegated to NiriService) ──
@@ -61,6 +84,77 @@ QtObject {
   readonly property var niriDisplayScales: isNiri ? NiriService.displayScales : ({})
   readonly property var niriKeyboardLayoutNames: isNiri ? NiriService.keyboardLayoutNames : []
   readonly property int niriKeyboardLayoutIndex: isNiri ? NiriService.currentKeyboardLayoutIndex : 0
+
+  Component.onCompleted: {
+    if (hasHyprlandToplevels && typeof Hyprland.refreshToplevels === "function")
+      Hyprland.refreshToplevels();
+  }
+
+  property Process hyprctlActiveWindowProc: Process {
+    id: hyprctlActiveWindowProc
+    command: ["hyprctl", "-j", "activewindow"]
+    running: false
+    stdout: StdioCollector {
+      onStreamFinished: {
+        try {
+          var parsed = JSON.parse(this.text || "{}");
+          root.hyprlandCtlWindow = parsed && typeof parsed === "object" ? parsed : ({});
+        } catch (e) {
+          root.hyprlandCtlWindow = ({});
+        }
+      }
+    }
+    onExited: (exitCode, exitStatus) => {
+      if (exitCode !== 0)
+        root.hyprlandCtlWindow = ({});
+    }
+  }
+
+  property Timer hyprctlActiveWindowTimer: Timer {
+    interval: 1500
+    repeat: true
+    running: root.isHyprland
+    triggeredOnStart: true
+    onTriggered: {
+      if (hyprctlActiveWindowProc.running)
+        return;
+      hyprctlActiveWindowProc.running = true;
+    }
+  }
+
+  function windowTitle(windowRef) {
+    return windowRef ? String(windowRef.title || "") : "";
+  }
+
+  function windowIdentifier(windowRef) {
+    if (!windowRef)
+      return "";
+    return String(windowRef.address || windowRef.id || "");
+  }
+
+  function windowAppId(windowRef) {
+    if (!windowRef)
+      return "";
+    return String(windowRef.app_id || windowRef.appId || windowRef.class || "");
+  }
+
+  function sameWindow(left, right) {
+    if (!left || !right)
+      return false;
+    if (left === right)
+      return true;
+
+    var leftId = windowIdentifier(left);
+    var rightId = windowIdentifier(right);
+    if (leftId && rightId)
+      return leftId === rightId;
+
+    var leftTitle = windowTitle(left);
+    var rightTitle = windowTitle(right);
+    var leftApp = windowAppId(left);
+    var rightApp = windowAppId(right);
+    return leftTitle !== "" && leftApp !== "" && leftTitle === rightTitle && leftApp === rightApp;
+  }
 
   function matchesCompositorTag(tag) {
     var needs = String(tag || "any").toLowerCase();

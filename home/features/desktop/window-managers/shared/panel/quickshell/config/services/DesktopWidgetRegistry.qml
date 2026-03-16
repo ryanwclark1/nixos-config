@@ -53,6 +53,22 @@ QtObject {
         return result;
     }
 
+    function search(query) {
+        var q = String(query || "").trim().toLowerCase();
+        var items = widgetCatalog.slice();
+        if (!q)
+            return items;
+
+        var results = [];
+        for (var i = 0; i < items.length; i++) {
+            var item = items[i];
+            var haystack = (String(item.name || "") + " " + String(item.id || "") + " " + String(item.pluginId || "")).toLowerCase();
+            if (haystack.indexOf(q) !== -1)
+                results.push(item);
+        }
+        return results;
+    }
+
     function pluginForWidgetType(widgetType) {
         if (!widgetType || widgetType.indexOf("plugin:") !== 0)
             return null;

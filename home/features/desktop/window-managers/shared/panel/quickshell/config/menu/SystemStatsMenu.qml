@@ -14,6 +14,17 @@ BasePopupMenu {
     subtitle: compactMode ? "Actions first" : "Processes, services, and live telemetry"
     toggleMethod: "toggleSystemStatsMenu"
 
+    headerExtras: SharedWidgets.IconButton {
+        icon: "󰄨"
+        size: 30
+        iconSize: Colors.fontSizeLarge
+        iconColor: Colors.primary
+        onClicked: {
+            root.closeRequested();
+            Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "systemMonitor"]);
+        }
+    }
+
     Loader {
         active: root.visible
         sourceComponent: SharedWidgets.Ref {

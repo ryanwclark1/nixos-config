@@ -44,15 +44,15 @@ Flow {
       for (var m = 0; m < mru.length; m++) {
         var nw = windowMap[mru[m]];
         if (nw) {
-          var appId = (nw.app_id || "").toLowerCase();
+          var appId = CompositorAdapter.windowAppId(nw).toLowerCase();
           if (appId && mruRank[appId] === undefined)
             mruRank[appId] = m;
         }
       }
 
       out.sort(function(a, b) {
-        var aClass = (a.class || a.appId || "").toLowerCase();
-        var bClass = (b.class || b.appId || "").toLowerCase();
+        var aClass = CompositorAdapter.windowAppId(a).toLowerCase();
+        var bClass = CompositorAdapter.windowAppId(b).toLowerCase();
         var aRank = mruRank[aClass] !== undefined ? mruRank[aClass] : 9999;
         var bRank = mruRank[bClass] !== undefined ? mruRank[bClass] : 9999;
         return aRank - bRank;
@@ -163,7 +163,7 @@ Flow {
       var tlByClass = {};
       for (var t = 0; t < root.runningToplevels.length; t++) {
         var tl = root.runningToplevels[t];
-        var tlCls = tl.class || tl.appId || "";
+        var tlCls = CompositorAdapter.windowAppId(tl);
         if (tlCls && !tlByClass[tlCls]) tlByClass[tlCls] = tl;
       }
 
@@ -193,7 +193,7 @@ Flow {
       var unpinned = [];
       for (var r = 0; r < root.runningToplevels.length; r++) {
         var rt = root.runningToplevels[r];
-        var rtCls = rt.class || rt.appId || "";
+        var rtCls = CompositorAdapter.windowAppId(rt);
         if (!pinnedClasses[rtCls]) {
           unpinned.push({
             _key: "running_" + rtCls,

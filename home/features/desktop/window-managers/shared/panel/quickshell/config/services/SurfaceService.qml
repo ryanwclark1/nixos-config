@@ -67,6 +67,11 @@ QtObject {
                 focusPolicy: "preserve-app-focus",
                 legacyFlags: ["systemStatsMenuVisible"]
             },
+            systemMonitor: {
+                kind: "panel",
+                focusPolicy: "focus-on-open",
+                legacyFlags: ["systemMonitorVisible"]
+            },
             bluetoothMenu: {
                 kind: "popup",
                 focusPolicy: "preserve-app-focus",

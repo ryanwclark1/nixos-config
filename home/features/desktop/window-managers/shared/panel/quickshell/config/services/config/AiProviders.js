@@ -35,7 +35,7 @@ function defaultModel(provider) {
     var models = defaultModels(provider);
     if (models.length > 0) return models[0];
     switch (provider) {
-        case "ollama": return "devstral-small-2";
+        case "ollama": return "";
         case "custom": return "";
         default:       return "";
     }

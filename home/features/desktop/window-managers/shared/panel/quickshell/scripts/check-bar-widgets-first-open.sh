@@ -59,8 +59,27 @@ require_cmd() {
 discover_instance() {
   local runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
   local candidate attempt
+  local resolved
+  local log_path
+  local first_line
+  local preferred=()
+  local fallback=()
 
   [[ -d "${runtime_root}" ]] || return 1
+
+  while IFS= read -r candidate; do
+    [[ -n "${candidate}" ]] || continue
+    resolved="$(readlink -f "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid/${candidate}" 2>/dev/null || true)"
+    if [[ -n "${resolved}" && -S "${resolved}/ipc.sock" ]]; then
+      log_path="${resolved}/log.log"
+      first_line="$(sed -n '1p' "${log_path}" 2>/dev/null || true)"
+      if [[ "${first_line}" == *'Launching config:'*'shell.qml"'* ]]; then
+        preferred+=("$(basename "${resolved}")")
+      else
+        fallback+=("$(basename "${resolved}")")
+      fi
+    fi
+  done < <(ps -eo pid=,comm=,args= | awk '$2 ~ /quickshell/ || $3 ~ /quickshell/ { print $1 }')
 
   for attempt in $(seq 1 20); do
     while IFS= read -r candidate; do
@@ -69,7 +88,14 @@ discover_instance() {
         printf '%s\n' "${candidate}"
         return 0
       fi
-    done < <(find "${runtime_root}" -mindepth 1 -maxdepth 1 -type d -exec test -S '{}/ipc.sock' ';' -print 2>/dev/null | sed 's#.*/##')
+    done < <(
+      if (( ${#preferred[@]} > 0 )); then
+        printf '%s\n' "${preferred[@]}"
+      else
+        printf '%s\n' "${fallback[@]}"
+        find "${runtime_root}" -mindepth 1 -maxdepth 1 -type d -exec test -S '{}/ipc.sock' ';' -print 2>/dev/null | sed 's#.*/##'
+      fi | awk 'NF && !seen[$0]++'
+    )
     sleep 0.5
   done
 
@@ -172,6 +198,7 @@ require_cmd quickshell
 require_cmd systemctl
 require_cmd tesseract
 require_cmd compare
+require_cmd ps
 
 mkdir -p "${output_dir}"
 first_open_png="${output_dir}/bar-widgets-first-open.png"

@@ -223,9 +223,7 @@ PanelWindow {
     scheduleSave();
   }
 
-  Connections {
-    target: WorkspaceIdentityService
-    function onWorkspaceDataChanged() {
+  function syncProjectTab() {
         if (!Config.notepadProjectSync) return;
         var project = WorkspaceIdentityService.getActiveProject();
         if (!project) return;
@@ -235,21 +233,19 @@ PanelWindow {
                 return;
             }
         }
+  }
+
+  Connections {
+    target: WorkspaceIdentityService
+    function onWorkspaceDataChanged() {
+        root.syncProjectTab();
     }
   }
 
   Connections {
-    target: CompositorAdapter
-    function onActiveWorkspaceChanged() {
-        if (!Config.notepadProjectSync) return;
-        var project = WorkspaceIdentityService.getActiveProject();
-        if (!project) return;
-        for (var i = 0; i < tabs.length; i++) {
-            if (tabs[i].title.toLowerCase() === project.toLowerCase()) {
-                activeTabId = tabs[i].id;
-                return;
-            }
-        }
+    target: NiriService
+    function onFocusedWorkspaceIdChanged() {
+        root.syncProjectTab();
     }
   }
 

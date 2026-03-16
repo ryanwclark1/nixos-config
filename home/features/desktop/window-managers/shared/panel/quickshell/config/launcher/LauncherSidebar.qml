@@ -54,7 +54,7 @@ Rectangle {
             model: root.launcher.primaryModes
             delegate: Rectangle {
                 Layout.fillWidth: true
-                implicitHeight: root.launcher.sidebarCompact ? 40 : 52
+                implicitHeight: root.launcher.sidebarCompact ? 40 : 44
                 radius: Colors.radiusMedium
                 color: root.launcher.mode === modelData ? Colors.withAlpha(Colors.primary, 0.12) : "transparent"
                 Behavior on color {
@@ -74,26 +74,18 @@ Rectangle {
                         color: root.launcher.mode === modelData ? Colors.primary : Colors.textSecondary
                         font.family: Colors.fontMono
                         font.pixelSize: root.launcher.sidebarCompact ? Colors.fontSizeXL : Colors.fontSizeLarge
-                        Layout.alignment: Qt.AlignVCenter | (root.launcher.sidebarCompact ? Qt.AlignHCenter : 0)
+                        Layout.alignment: Qt.AlignVCenter | (root.launcher.sidebarCompact ? Qt.AlignHCenter : Qt.AlignLeft)
                     }
-                    ColumnLayout {
+                    Text {
                         visible: !root.launcher.sidebarCompact
                         Layout.fillWidth: true
-                        spacing: 0
-                        Text {
-                            text: root.launcher.modeInfo(modelData).label
-                            color: root.launcher.mode === modelData ? Colors.text : Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeSmall
-                            font.weight: root.launcher.mode === modelData ? Font.Bold : Font.Normal
-                        }
-                        Text {
-                            text: root.launcher.modeInfo(modelData).hint
-                            color: Colors.textDisabled
-                            font.pixelSize: Colors.fontSizeXS
-                            elide: Text.ElideRight
-                            Layout.fillWidth: true
-                            visible: root.launcher.mode === modelData
-                        }
+                        Layout.alignment: Qt.AlignVCenter
+                        text: root.launcher.modeInfo(modelData).label
+                        color: root.launcher.mode === modelData ? Colors.text : Colors.textSecondary
+                        font.pixelSize: Colors.fontSizeSmall
+                        font.weight: root.launcher.mode === modelData ? Font.Bold : Font.Medium
+                        elide: Text.ElideRight
+                        verticalAlignment: Text.AlignVCenter
                     }
                 }
 

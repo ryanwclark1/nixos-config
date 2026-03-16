@@ -4,6 +4,7 @@ set -euo pipefail
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 
 instance_id=""
+viewport_preset=""
 output_dir="/tmp/launcher-matrix"
 delay_seconds="1.2"
 crop_mode="usable"
@@ -111,7 +112,7 @@ EOF
 
 usage() {
   cat <<'EOF'
-Usage: capture-launcher-matrix.sh [--id INSTANCE_ID] [--output-dir DIR] [--delay SECONDS] [--crop monitor|usable] [--workspace current|auto|NAME] [--query TERM] [--empty-query TERM]
+Usage: capture-launcher-matrix.sh [--id INSTANCE_ID] [--preset portrait|laptop|wide] [--output-dir DIR] [--delay SECONDS] [--crop monitor|usable] [--workspace current|auto|NAME] [--query TERM] [--empty-query TERM]
 
 Capture a focused launcher artifact set for manual review.
 This produces review artifacts for key launcher states, not PASS/WARN/FAIL results.
@@ -122,6 +123,10 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --id)
       instance_id="${2:-}"
+      shift 2
+      ;;
+    --preset)
+      viewport_preset="${2:-}"
       shift 2
       ;;
     --output-dir)
@@ -160,12 +165,32 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+viewport_args=()
+if [[ -n "${viewport_preset}" ]]; then
+  case "${viewport_preset}" in
+    portrait)
+      viewport_args+=(--width 430 --height 932)
+      ;;
+    laptop)
+      viewport_args+=(--width 1280 --height 800)
+      ;;
+    wide)
+      viewport_args+=(--width 1600 --height 900)
+      ;;
+    *)
+      printf 'Unknown preset: %s\n' "${viewport_preset}" >&2
+      exit 2
+      ;;
+  esac
+fi
+
 mkdir -p "${output_dir}"
 
 launcher_args=()
 if [[ -n "${instance_id}" ]]; then
   launcher_args+=(--id "${instance_id}")
 fi
+launcher_args+=("${viewport_args[@]}")
 
 bash "${script_dir}/capture-launcher-viewport.sh" \
   "${launcher_args[@]}" \
@@ -216,4 +241,8 @@ bash "${script_dir}/capture-launcher-viewport.sh" \
 
 write_gallery "${output_dir}/index.html"
 
-printf '[INFO] Saved launcher review artifacts to %s\n' "${output_dir}"
+if [[ -n "${viewport_preset}" ]]; then
+  printf '[INFO] Saved launcher review artifacts for the %s preset to %s\n' "${viewport_preset}" "${output_dir}"
+else
+  printf '[INFO] Saved launcher review artifacts to %s\n' "${output_dir}"
+fi

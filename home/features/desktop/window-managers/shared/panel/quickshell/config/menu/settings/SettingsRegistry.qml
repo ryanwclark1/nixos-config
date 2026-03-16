@@ -93,12 +93,68 @@ QtObject {
         {
             id: "launcher",
             legacyIndex: 24,
-            label: "Launcher",
+            label: "General",
+            icon: "󰍉",
+            categoryId: "launcher",
+            order: 10,
+            component: "LauncherTab.qml",
+            searchTerms: ["launcher", "general", "default mode", "recents", "home"],
+            owner: {
+                surface: "launcher",
+                service: "Config",
+                configDomain: "launcher"
+            }
+        },
+        {
+            id: "launcher-search",
+            label: "Search",
             icon: "󰍉",
             categoryId: "launcher",
             order: 20,
-            component: "LauncherTab.qml",
-            searchTerms: ["launcher", "search", "web provider", "recents", "modes"],
+            component: "LauncherSearchTab.qml",
+            searchTerms: ["launcher", "search", "results", "debounce", "ranking", "score", "recents"],
+            owner: {
+                surface: "launcher",
+                service: "Config",
+                configDomain: "launcher"
+            }
+        },
+        {
+            id: "launcher-web",
+            label: "Web",
+            icon: "󰖟",
+            categoryId: "launcher",
+            order: 30,
+            component: "LauncherWebTab.qml",
+            searchTerms: ["launcher", "web", "provider", "alias", "duckduckgo", "google", "youtube", "github"],
+            owner: {
+                surface: "launcher",
+                service: "Config",
+                configDomain: "launcher"
+            }
+        },
+        {
+            id: "launcher-modes",
+            label: "Modes",
+            icon: "󰌌",
+            categoryId: "launcher",
+            order: 40,
+            component: "LauncherModesTab.qml",
+            searchTerms: ["launcher", "modes", "apps", "files", "clipboard", "emoji", "preset", "order"],
+            owner: {
+                surface: "launcher",
+                service: "Config",
+                configDomain: "launcher"
+            }
+        },
+        {
+            id: "launcher-runtime",
+            label: "Runtime",
+            icon: "󰔟",
+            categoryId: "launcher",
+            order: 50,
+            component: "LauncherRuntimeTab.qml",
+            searchTerms: ["launcher", "runtime", "diagnostics", "preload", "metrics", "reset", "recovery"],
             owner: {
                 surface: "launcher",
                 service: "Config",

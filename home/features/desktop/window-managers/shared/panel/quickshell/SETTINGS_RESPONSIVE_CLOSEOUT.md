@@ -114,6 +114,103 @@ For future changes to responsive settings surfaces:
 4. Use live shell validation for `Theme`
 5. Patch only concrete regressions
 
+## 2026-03-16 Launcher Settings Split
+
+### Scope
+
+- Split the single launcher settings page into dedicated sidebar pages under the existing `Launcher` category:
+  - `General`
+  - `Search`
+  - `Web`
+  - `Modes`
+  - `Runtime`
+- Extended settings smoke, preview, and capture tooling so those page ids are exercised directly.
+
+### Implemented Changes
+
+- Added launcher tab entries in `SettingsRegistry.qml` for:
+  - `launcher`
+  - `launcher-search`
+  - `launcher-web`
+  - `launcher-modes`
+  - `launcher-runtime`
+- Reused `ShellCoreSectionTab.qml` for the launcher subpages by introducing dedicated launcher section modes instead of duplicating config logic.
+- Updated:
+  - `scripts/check-settings-responsive.sh`
+  - `scripts/preview-settings-responsive.sh`
+  - `scripts/capture-settings-matrix.sh`
+  - `SETTINGS_RESPONSIVE_RUNBOOK.md`
+  so the launcher split is part of normal settings QA coverage.
+
+### Verification
+
+Verification completed on `2026-03-16 18:15:24 CDT`.
+
+`scripts/check-settings-guardrails.sh`:
+
+```text
+[PASS] IPC reachable for pid 1119931
+[PASS] Shell.reloadConfig
+[PASS] SettingsHub.open
+[PASS] SettingsHub.openTab launcher
+[PASS] SettingsHub.openTab launcher-search
+[PASS] SettingsHub.openTab launcher-web
+[PASS] SettingsHub.openTab launcher-modes
+[PASS] SettingsHub.openTab launcher-runtime
+[PASS] SettingsHub.openTab wallpaper
+[PASS] SettingsHub.openTab bar-widgets
+[PASS] SettingsHub.openTab bars
+[PASS] SettingsHub.openTab system
+[PASS] SettingsHub.openTab plugins
+[PASS] SettingsHub.openTab theme
+[PASS] SettingsHub.openTab hotkeys
+[PASS] SettingsHub.openTab time-weather
+[PASS] Only known non-blocking runtime warnings were observed
+[INFO] Summary: 17 pass, 0 warn, 0 fail
+Settings guardrails passed.
+```
+
+`scripts/check-launcher-guardrails.sh`:
+
+```text
+Launcher keymap check passed.
+Launcher tab matrix check passed.
+Launcher web alias check passed.
+Launcher category filters check passed.
+Launcher performance check passed.
+Launcher guardrail checks passed.
+```
+
+Repo-shell-backed artifact generation:
+
+```text
+./scripts/capture-panel-matrix.sh --repo-shell --skip-surfaces --settings-preset portrait --output-dir /tmp/panel-qa-launcher-split
+[INFO] Repo shell instance ready: gubxqej0ct
+[INFO] Saved panel QA review artifacts to /tmp/panel-qa-launcher-split
+[INFO] Saved review gallery to /tmp/panel-qa-launcher-split/index.html
+```
+
+Launcher portrait artifacts produced:
+
+- `/tmp/panel-qa-launcher-split/settings-portrait/portrait-launcher.png`
+- `/tmp/panel-qa-launcher-split/settings-portrait/portrait-launcher-search.png`
+- `/tmp/panel-qa-launcher-split/settings-portrait/portrait-launcher-web.png`
+- `/tmp/panel-qa-launcher-split/settings-portrait/portrait-launcher-modes.png`
+- `/tmp/panel-qa-launcher-split/settings-portrait/portrait-launcher-runtime.png`
+
+Launcher portrait lower-fold artifacts produced:
+
+- `/tmp/panel-qa-launcher-split/settings-portrait-deep/portrait-launcher.png`
+- `/tmp/panel-qa-launcher-split/settings-portrait-deep/portrait-launcher-search.png`
+- `/tmp/panel-qa-launcher-split/settings-portrait-deep/portrait-launcher-web.png`
+- `/tmp/panel-qa-launcher-split/settings-portrait-deep/portrait-launcher-modes.png`
+- `/tmp/panel-qa-launcher-split/settings-portrait-deep/portrait-launcher-runtime.png`
+
+### Notes
+
+- A direct live-shell `capture-settings-matrix.sh` run initially failed after `wallpaper` because the ambient QuickShell instance disappeared mid-run.
+- The repo-shell wrapper path completed successfully and is the preferred artifact path when the managed service is unstable or being reloaded during QA.
+
 ## Out Of Scope
 
 - Additional broad settings refactors without a reproduced defect

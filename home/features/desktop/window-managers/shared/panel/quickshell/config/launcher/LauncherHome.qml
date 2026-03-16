@@ -46,116 +46,7 @@ ColumnLayout {
         return "";
     }
 
-    // Section 1: Featured actions
-    Rectangle {
-        Layout.fillWidth: true
-        visible: root.launcher.showLauncherHome
-        clip: true
-        color: Colors.bgWidget
-        radius: Colors.radiusMedium
-        border.color: Colors.border
-        border.width: 1
-        implicitHeight: root.launcher.compactMode ? 116 : 130
-
-        // Inner highlight lives on the card itself, not inside the layout flow.
-        SharedWidgets.InnerHighlight {}
-
-        ColumnLayout {
-            anchors.fill: parent
-            anchors.margins: Colors.spacingM
-            spacing: Colors.spacingM
-
-            SharedWidgets.SectionLabel {
-                label: "FEATURED"
-            }
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: Colors.paddingSmall
-                Repeater {
-                    model: root.launcher.featuredActions
-                    delegate: Rectangle {
-                        Layout.fillWidth: true
-                        implicitHeight: 74
-                        radius: Colors.radiusMedium
-                        readonly property bool hovered: featureHover.containsMouse
-                        color: hovered ? Colors.withAlpha(Colors.primary, 0.12) : Colors.surface
-                        border.color: hovered ? Colors.primary : Colors.border
-                        border.width: 1
-                        scale: hovered ? 1.02 : 1.0
-                        layer.enabled: hovered
-                        Behavior on color {
-                            ColorAnimation {
-                                duration: Colors.durationFast
-                            }
-                        }
-                        Behavior on border.color {
-                            ColorAnimation {
-                                duration: Colors.durationFast
-                            }
-                        }
-                        Behavior on scale {
-                            NumberAnimation {
-                                duration: Colors.durationFast
-                                easing.type: Easing.OutCubic
-                            }
-                        }
-
-                        // Depth border
-                        SharedWidgets.InnerHighlight {
-                            highlightOpacity: 0.15
-                            hoveredOpacity: 0.3
-                            hovered: parent.hovered
-                        }
-
-                        ColumnLayout {
-                            anchors.fill: parent
-                            anchors.margins: Colors.spacingM
-                            spacing: Colors.spacingXS
-                            Text {
-                                text: modelData.icon
-                                color: Colors.primary
-                                font.family: Colors.fontMono
-                                font.pixelSize: Colors.fontSizeXL
-                            }
-                            Text {
-                                text: modelData.label
-                                color: Colors.text
-                                font.pixelSize: Colors.fontSizeSmall
-                                font.weight: Font.DemiBold
-                                elide: Text.ElideRight
-                                Layout.fillWidth: true
-                            }
-                            Text {
-                                text: modelData.description
-                                color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeXS
-                                elide: Text.ElideRight
-                                Layout.fillWidth: true
-                            }
-                        }
-
-                        SharedWidgets.StateLayer {
-                            id: featureStateLayer
-                            hovered: featureHover.containsMouse
-                            pressed: featureHover.pressed
-                        }
-                        MouseArea {
-                            id: featureHover
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: mouse => {
-                                featureStateLayer.burst(mouse.x, mouse.y);
-                                root.launcher.activateFeatured(modelData);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    // Section 2: Category filters
+    // Section 1: Category filters
     Rectangle {
         Layout.fillWidth: true
         visible: root.launcher.showLauncherHome && root.launcher.drunCategoryFiltersEnabled && root.launcher.mode === "drun" && root.launcher.drunCategoryOptions.length > 1
@@ -164,23 +55,27 @@ ColumnLayout {
         radius: Colors.radiusMedium
         border.color: Colors.border
         border.width: 1
-        implicitHeight: categoryFilterFlow.implicitHeight + 30
+        implicitHeight: categoryFiltersSection.implicitHeight + (Colors.spacingM * 2)
 
-        ColumnLayout {
+        SharedWidgets.InnerHighlight {}
+
+        SharedWidgets.CollapsibleSection {
+            id: categoryFiltersSection
             anchors.fill: parent
             anchors.margins: Colors.spacingM
-            spacing: Colors.spacingS
-            SharedWidgets.SectionLabel {
-                label: "CATEGORIES • " + root.launcher.drunCategoryFilterLabel
-            }
+            title: "CATEGORIES • " + root.launcher.drunCategoryFilterLabel
+            expanded: root.launcher.drunCategorySectionExpanded
+            onExpandedChanged: root.launcher.drunCategorySectionExpanded = expanded
+
             Text {
                 text: root.launcher.drunCategoryFilterSummary
                 color: Colors.textSecondary
                 font.pixelSize: Colors.fontSizeXS
             }
+
             Flow {
                 id: categoryFilterFlow
-                Layout.fillWidth: true
+                width: parent.width
                 spacing: Colors.spacingS
 
                 Repeater {
@@ -199,7 +94,7 @@ ColumnLayout {
         }
     }
 
-    // Section 3: Recent items
+    // Section 2: Recent items
     Rectangle {
         Layout.fillWidth: true
         visible: root.launcher.showLauncherHome && root.launcher.recentItems.length > 0
@@ -322,7 +217,7 @@ ColumnLayout {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: mouse => {
                             recentStateLayer.burst(mouse.x, mouse.y);
-                            root.launcher.activateFeatured(modelData);
+                            root.launcher.activateHomeItem(modelData);
                         }
                     }
                 }
@@ -468,12 +363,7 @@ ColumnLayout {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: mouse => {
                             suggestionStateLayer.burst(mouse.x, mouse.y);
-                            root.launcher.selectedIndex = 0;
-                            if (modelData.exec) {
-                                root.launcher.trackLaunch(modelData);
-                                root.launcher.launchExecString(modelData.exec, modelData.terminal === "true" || modelData.terminal === "True");
-                                root.launcher.close();
-                            }
+                            root.launcher.activateHomeItem(modelData);
                         }
                     }
                 }

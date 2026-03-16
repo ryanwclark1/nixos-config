@@ -16,8 +16,12 @@ PanelWindow {
     property var screenRef: screen || Quickshell.cursorScreen || Config.primaryScreen()
     screen: screenRef
     readonly property var edgeMargins: Config.reservedEdgesForScreen(screenRef, "")
-    readonly property int usableWidth: Math.max(0, width - edgeMargins.left - edgeMargins.right)
-    readonly property int usableHeight: Math.max(0, height - edgeMargins.top - edgeMargins.bottom)
+    property real diagnosticViewportWidth: 0
+    property real diagnosticViewportHeight: 0
+    readonly property real viewportWidth: diagnosticViewportWidth > 0 ? diagnosticViewportWidth : Math.max(width, screenRef ? screenRef.width : 0)
+    readonly property real viewportHeight: diagnosticViewportHeight > 0 ? diagnosticViewportHeight : Math.max(height, screenRef ? screenRef.height : 0)
+    readonly property real usableWidth: Math.max(0, viewportWidth - edgeMargins.left - edgeMargins.right)
+    readonly property real usableHeight: Math.max(0, viewportHeight - edgeMargins.top - edgeMargins.bottom)
     readonly property bool compactMode: usableWidth < 900 || usableHeight < 640
     readonly property bool sidebarCompact: usableWidth < 720
     readonly property bool tightMode: usableWidth < 560 || usableHeight < 500
@@ -58,8 +62,8 @@ PanelWindow {
 
     property var recentItems: []
     property var suggestionItems: []
-    property var featuredActions: []
     property string drunCategoryFilter: ""
+    property bool drunCategorySectionExpanded: false
     property var drunCategoryOptions: [
         {
             key: "",
@@ -90,7 +94,7 @@ PanelWindow {
     property var _commandWaiters: ({})
     property var mediaPlayers: []
     property var preloadFailureState: ({})
-    readonly property var availableToplevels: CompositorAdapter.toplevels
+    readonly property var availableToplevels: CompositorAdapter.toplevels || []
     property var launcherMetrics: ({
             opens: 0,
             cacheHits: 0,
@@ -337,10 +341,10 @@ PanelWindow {
     }
     readonly property string tabControlHintText: {
         if (launcherTabBehavior === "mode")
-            return "Tab: next mode • Shift+Tab: prev mode";
+            return "Tab: next mode • Shift+Tab: next mode";
         if (launcherTabBehavior === "results")
-            return "Tab: next result • Shift+Tab: prev mode";
-        return hasResults ? "Tab: next result • Shift+Tab: prev mode" : "Tab: next mode • Shift+Tab: prev mode";
+            return "Tab: next result • Shift+Tab: next mode";
+        return hasResults ? "Tab: next result • Shift+Tab: next mode" : "Tab: next mode • Shift+Tab: next mode";
     }
     readonly property string launcherControlHintText: {
         var resultHint = hasResults ? "↑/↓/Ctrl+P/N/PgUp/PgDn/Home/End: results • " : "";
@@ -381,7 +385,7 @@ PanelWindow {
             return "Esc: Cancel";
         if (searchText !== "" || (drunCategoryFiltersEnabled && mode === "drun" && drunCategoryFilter !== ""))
             return "Esc: Reset";
-        return "Shift+Tab: Prev Mode";
+        return "Shift+Tab: Next Mode";
     }
     readonly property string webPrimaryProviderLabel: {
         var provider = primaryWebProvider();
@@ -636,7 +640,7 @@ PanelWindow {
 
     // Reactive watchers: ObjectModel doesn't expose countChanged as a signal,
     // so we use property bindings that re-evaluate when the model count changes.
-    property int _toplevelCount: availableToplevels.length
+    property int _toplevelCount: availableToplevels ? availableToplevels.length || 0 : 0
     on_ToplevelCountChanged: {
         if (launcherRoot.mode === "window" && launcherRoot.launcherOpacity > 0)
             launcherRoot.loadWindows();
@@ -1311,7 +1315,6 @@ PanelWindow {
     }
 
     function buildLauncherHome() {
-        featuredActions = launcherShortcuts[mode] || [];
         suggestionItems = [];
         if (mode === "drun") {
             var apps = getCached("drun") || [];
@@ -1456,6 +1459,7 @@ PanelWindow {
         if (!supportsMode(requestedMode))
             requestedMode = effectiveDefaultMode();
         mode = requestedMode;
+        drunCategorySectionExpanded = false;
         buildLauncherHome();
         var shouldKeepSearch = keepSearch === true && Config.launcherKeepSearchOnModeSwitch;
         if (!shouldKeepSearch) {
@@ -1982,6 +1986,30 @@ PanelWindow {
             });
     }
 
+    function launcherStateObject() {
+        return ({
+                visible: launcherOpacity > 0,
+                mode: String(mode || ""),
+                searchText: String(searchText || ""),
+                showLauncherHome: showLauncherHome === true,
+                drunCategoryFilter: String(drunCategoryFilter || ""),
+                drunCategorySectionExpanded: drunCategorySectionExpanded === true,
+                hasResults: filteredItems.length > 0,
+                selectedIndex: selectedIndex,
+                resultCount: filteredItems.length,
+                windowWidth: width,
+                windowHeight: height,
+                screenWidth: screenRef ? screenRef.width : 0,
+                screenHeight: screenRef ? screenRef.height : 0,
+                viewportWidth: viewportWidth,
+                viewportHeight: viewportHeight,
+                usableWidth: usableWidth,
+                usableHeight: usableHeight,
+                hudWidth: hudBox.width,
+                hudHeight: hudBox.height
+            });
+    }
+
     function diagnosticSetSearchText(text) {
         searchText = String(text || "");
         if (searchInputComp.searchInput)
@@ -1997,6 +2025,12 @@ PanelWindow {
             changed: changed === true,
             state: escapeActionStateObject()
         });
+    }
+
+    function diagnosticSetViewport(widthValue, heightValue) {
+        diagnosticViewportWidth = Math.max(0, Number(widthValue || 0));
+        diagnosticViewportHeight = Math.max(0, Number(heightValue || 0));
+        return JSON.stringify(launcherStateObject());
     }
 
     function forceRedetectFileSearchBackend(announce, callback) {
@@ -2016,6 +2050,7 @@ PanelWindow {
     function diagnosticReset() {
         clearLauncherMetrics();
         clearCaches();
+        diagnosticSetViewport(0, 0);
         forceRedetectFileSearchBackend(true, function (_) {});
         showTransientNotice("Launcher diagnostics reset", 2200);
     }
@@ -2273,8 +2308,14 @@ PanelWindow {
         items = items.concat([
             {
                 category: "Utilities",
-                name: "System Monitor (btop)",
+                name: "System Monitor",
                 icon: "󰄨",
+                action: () => Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "systemMonitor"])
+            },
+            {
+                category: "Utilities",
+                name: "System Monitor (terminal btop)",
+                icon: "󱓞",
                 action: () => Quickshell.execDetached(["kitty", "-e", "btop"])
             },
             {
@@ -2341,7 +2382,7 @@ PanelWindow {
                 var win = availableToplevels[i];
                 if (!win)
                     continue;
-                var cls = win.class || win.appId || "";
+                var cls = CompositorAdapter.windowAppId(win);
                 items.push({
                     name: win.title || cls || "Window",
                     title: cls || "",
@@ -2834,13 +2875,19 @@ PanelWindow {
         close();
     }
 
-    function activateFeatured(item) {
+    function activateHomeItem(item) {
         if (item.openMode) {
             open(item.openMode);
             return;
         }
         if (item.ipcTarget && item.ipcAction) {
             Quickshell.execDetached(["quickshell", "ipc", "call", item.ipcTarget, item.ipcAction]);
+            close();
+            return;
+        }
+        if (mode === "drun" && item && item.exec) {
+            trackLaunch(item);
+            launchExecString(item.exec, item.terminal === "true" || item.terminal === "True");
             close();
             return;
         }
@@ -3026,11 +3073,17 @@ PanelWindow {
         function escapeActionState(): string {
             return JSON.stringify(launcherRoot.escapeActionStateObject());
         }
+        function launcherState(): string {
+            return JSON.stringify(launcherRoot.launcherStateObject());
+        }
         function diagnosticSetSearchText(text: string): string {
             return launcherRoot.diagnosticSetSearchText(text);
         }
         function diagnosticSetDrunCategoryFilter(categoryKey: string): string {
             return launcherRoot.diagnosticSetDrunCategoryFilter(categoryKey);
+        }
+        function diagnosticSetViewport(widthValue: real, heightValue: real): string {
+            return launcherRoot.diagnosticSetViewport(widthValue, heightValue);
         }
         function invokeEscapeAction(): string {
             var action = launcherRoot.escapeActionStateObject().action;
@@ -3067,8 +3120,8 @@ PanelWindow {
 
     Rectangle {
         id: hudBox
-        width: Math.min(960, Math.max(launcherRoot.sidebarCompact ? 360 : 420, launcherRoot.usableWidth - (launcherRoot.tightMode ? 24 : 40)))
-        height: Math.min(760, Math.max(320, launcherRoot.usableHeight - (launcherRoot.tightMode ? 24 : 40)))
+        width: Math.min(1120, Math.max(launcherRoot.sidebarCompact ? 380 : 460, launcherRoot.usableWidth - (launcherRoot.tightMode ? 24 : 40)))
+        height: Math.min(860, Math.max(360, launcherRoot.usableHeight - (launcherRoot.tightMode ? 24 : 40)))
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.topMargin: launcherRoot.edgeMargins.top + Math.max(20, (launcherRoot.usableHeight - height) / 2)
@@ -3206,7 +3259,7 @@ PanelWindow {
                             if (launcherRoot.cycleDrunCategoryFilter(direction))
                                 event.accepted = true;
                         } else if (event.key === Qt.Key_Backtab || (event.key === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier))) {
-                            launcherRoot.cycleMode(-1);
+                            launcherRoot.cycleMode(1);
                             event.accepted = true;
                         } else if (event.key === Qt.Key_Tab) {
                             if (launcherRoot.launcherTabBehavior === "mode")

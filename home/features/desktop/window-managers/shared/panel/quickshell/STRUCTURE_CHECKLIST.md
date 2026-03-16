@@ -20,8 +20,8 @@ Use this checklist before merging panel architecture changes.
 - [x] `scripts/check-launcher-benchmarks.sh` passes (threshold + parity gate for launcher benchmarks).
 - [x] `scripts/check-launcher-smoke.sh` passes (guardrails + benchmarks in one command).
 - [x] `.github/workflows/flake-checker.yml` runs launcher smoke checks in CI mode (`check-launcher-smoke.sh --ci`) for launcher-sensitive changes.
-- [ ] `scripts/check-settings-guardrails.sh` passes after changes to `SettingsHub`, shared settings components, or dense settings tabs.
-- [ ] `scripts/check-settings-responsive.sh` passes after changes to `SettingsHub`, shared settings components, or dense settings tabs.
+- [x] `scripts/check-settings-guardrails.sh` passes after changes to `SettingsHub`, shared settings components, or dense settings tabs.
+- [x] `scripts/check-settings-responsive.sh` passes after changes to `SettingsHub`, shared settings components, or dense settings tabs.
 - [ ] `scripts/capture-settings-matrix.sh --preset portrait --scroll-y 900` is reviewed after responsive settings changes that affect long/scroll-heavy tabs.
 - [ ] `scripts/capture-settings-matrix.sh --preset laptop --scroll-y 700` is reviewed after responsive settings changes that affect long/scroll-heavy tabs.
 - [ ] `SETTINGS_RESPONSIVE_CLOSEOUT.md` is reviewed when a future settings change needs prior responsive context or known harness caveats.

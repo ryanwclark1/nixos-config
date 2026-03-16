@@ -32,7 +32,7 @@ Rectangle {
     if (!CompositorAdapter.isNiri || !NiriService.available) return false;
     var aw = CompositorAdapter.niriActiveWindow;
     if (!aw) return false;
-    return (aw.app_id || "").toLowerCase() === appClass.toLowerCase();
+    return CompositorAdapter.windowAppId(aw).toLowerCase() === appClass.toLowerCase();
   }
   readonly property bool actualFocused: niriFocused || isFocused
   readonly property string tooltipText: {

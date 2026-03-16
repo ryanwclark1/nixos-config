@@ -9,12 +9,15 @@ Item {
     anchors.fill: parent
 
     property string screenName: parent ? (parent.screen ? parent.screen.name : "") : ""
+    property string widgetSearchQuery: ""
+    property bool widgetPickerOpen: false
     readonly property var screenRef: parent && parent.screen ? parent.screen : null
     readonly property var edgeMargins: Config.reservedEdgesForScreen(screenRef, "")
     readonly property real safeDragMinX: edgeMargins.left + 8 - x
     readonly property real safeDragMinY: edgeMargins.top + 8 - y
     readonly property real safeSpawnX: Math.max(100, edgeMargins.left + 24 - x)
     readonly property real safeSpawnY: Math.max(100, edgeMargins.top + 24 - y)
+    readonly property var availableDesktopWidgets: DesktopWidgetRegistry.search(widgetSearchQuery)
 
     visible: Config.desktopWidgetsEnabled || DesktopWidgetRegistry.editMode
 
@@ -125,7 +128,7 @@ Item {
             anchors.centerIn: parent
             spacing: Colors.spacingL
 
-            // Add Widget button with dropdown
+            // Add Widget button
             Item {
                 Layout.preferredWidth: addRow.implicitWidth
                 Layout.preferredHeight: 32
@@ -152,88 +155,9 @@ Item {
                 MouseArea {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: addWidgetMenu.visible = !addWidgetMenu.visible
-                }
-
-                // Add widget dropdown
-                Rectangle {
-                    id: addWidgetMenu
-                    visible: false
-                    property real menuInset: 8
-                    width: 160
-                    height: addMenuCol.implicitHeight + 16
-                    x: {
-                        var base = (parent.width - width) / 2;
-                        if (!root)
-                            return base;
-                        var parentPos = parent.mapToItem(root, 0, 0);
-                        var minX = -parentPos.x + menuInset;
-                        var maxX = root.width - parentPos.x - width - menuInset;
-                        return Math.min(Math.max(base, minX), Math.max(minX, maxX));
-                    }
-                    y: {
-                        if (!root)
-                            return -height - 12;
-                        var parentPos = parent.mapToItem(root, 0, 0);
-                        var above = -height - 12;
-                        var below = parent.height + 12;
-                        var minY = -parentPos.y + menuInset;
-                        var maxY = root.height - parentPos.y - height - menuInset;
-                        var target = parentPos.y + above >= menuInset ? above : below;
-                        return Math.min(Math.max(target, minY), Math.max(minY, maxY));
-                    }
-                    radius: Colors.radiusSmall
-                    color: Colors.bgGlass
-                    border.color: Colors.border
-                    border.width: 1
-
-                    Column {
-                        id: addMenuCol
-                        anchors.fill: parent
-                        anchors.margins: Colors.spacingS
-                        spacing: Colors.spacingXXS
-
-                        Repeater {
-                            model: DesktopWidgetRegistry.widgetCatalog
-
-                            delegate: Rectangle {
-                                required property var modelData
-                                width: parent.width
-                                height: 30
-                                radius: Colors.radiusXXS
-                                color: addItemMa.containsMouse ? Colors.highlight : "transparent"
-
-                                RowLayout {
-                                    anchors.fill: parent
-                                    anchors.margins: 6
-                                    spacing: Colors.spacingS
-
-                                    Text {
-                                        text: modelData.icon
-                                        color: Colors.primary
-                                        font.family: Colors.fontMono
-                                        font.pixelSize: Colors.fontSizeMedium
-                                    }
-                                    Text {
-                                        text: modelData.name
-                                        color: Colors.text
-                                        font.pixelSize: Colors.fontSizeSmall
-                                        Layout.fillWidth: true
-                                    }
-                                }
-
-                                MouseArea {
-                                    id: addItemMa
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                        DesktopWidgetRegistry.addWidgetAt(root.screenName, modelData.id, root.safeSpawnX, root.safeSpawnY);
-                                        addWidgetMenu.visible = false;
-                                    }
-                                }
-                            }
-                        }
+                    onClicked: {
+                        root.widgetSearchQuery = "";
+                        root.widgetPickerOpen = true;
                     }
                 }
             }
@@ -315,6 +239,159 @@ Item {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: DesktopWidgetRegistry.editMode = false
+                }
+            }
+        }
+    }
+
+    Rectangle {
+        anchors.fill: parent
+        visible: root.widgetPickerOpen
+        color: Qt.rgba(0, 0, 0, 0.45)
+        z: 20
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: root.widgetPickerOpen = false
+        }
+
+        Rectangle {
+            width: Math.min(640, parent.width - 80)
+            height: Math.min(560, parent.height - 80)
+            anchors.centerIn: parent
+            radius: Colors.radiusLarge
+            color: Colors.popupSurface
+            border.color: Colors.border
+            border.width: 1
+
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.margins: Colors.paddingLarge
+                spacing: Colors.spacingM
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: Colors.spacingS
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: "Add Desktop Widget"
+                        color: Colors.text
+                        font.pixelSize: Colors.fontSizeXL
+                        font.weight: Font.DemiBold
+                    }
+
+                    Rectangle {
+                        implicitWidth: closePickerLabel.implicitWidth + Colors.spacingM * 2
+                        implicitHeight: 32
+                        radius: Colors.radiusMedium
+                        color: Colors.withAlpha(Colors.surface, 0.4)
+                        border.color: Colors.border
+                        border.width: 1
+
+                        Text {
+                            id: closePickerLabel
+                            anchors.centerIn: parent
+                            text: "Close"
+                            color: Colors.text
+                            font.pixelSize: Colors.fontSizeSmall
+                            font.weight: Font.Medium
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: root.widgetPickerOpen = false
+                        }
+                    }
+                }
+
+                SearchBar {
+                    Layout.fillWidth: true
+                    placeholder: "Search desktop widgets"
+                    text: root.widgetSearchQuery
+                    onTextChanged: root.widgetSearchQuery = text
+                }
+
+                Flickable {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    clip: true
+                    contentHeight: widgetPickerColumn.implicitHeight
+
+                    Column {
+                        id: widgetPickerColumn
+                        width: parent.width
+                        spacing: Colors.spacingS
+
+                        Repeater {
+                            model: root.availableDesktopWidgets
+
+                            delegate: Rectangle {
+                                required property var modelData
+                                width: parent.width
+                                height: desktopWidgetInfo.implicitHeight + Colors.spacingM * 2
+                                radius: Colors.radiusSmall
+                                color: desktopWidgetAddArea.containsMouse ? Colors.highlight : Colors.withAlpha(Colors.surface, 0.4)
+                                border.color: desktopWidgetAddArea.containsMouse ? Colors.primary : Colors.border
+                                border.width: 1
+
+                                RowLayout {
+                                    id: desktopWidgetInfo
+                                    anchors.fill: parent
+                                    anchors.margins: Colors.spacingM
+                                    spacing: Colors.spacingM
+
+                                    Text {
+                                        text: modelData.icon || "󰖲"
+                                        color: Colors.primary
+                                        font.family: Colors.fontMono
+                                        font.pixelSize: Colors.fontSizeLarge
+                                    }
+
+                                    ColumnLayout {
+                                        Layout.fillWidth: true
+                                        spacing: Colors.spacingXXS
+
+                                        Text {
+                                            text: modelData.name
+                                            color: Colors.text
+                                            font.pixelSize: Colors.fontSizeMedium
+                                            font.weight: Font.Medium
+                                            Layout.fillWidth: true
+                                            wrapMode: Text.WordWrap
+                                        }
+
+                                        Text {
+                                            text: String(modelData.source || "") === "plugin" ? "Plugin widget" : "Built-in widget"
+                                            color: Colors.textSecondary
+                                            font.pixelSize: Colors.fontSizeXS
+                                        }
+                                    }
+                                }
+
+                                MouseArea {
+                                    id: desktopWidgetAddArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        DesktopWidgetRegistry.addWidgetAt(root.screenName, modelData.id, root.safeSpawnX, root.safeSpawnY);
+                                        root.widgetPickerOpen = false;
+                                    }
+                                }
+                            }
+                        }
+
+                        Text {
+                            width: parent.width
+                            visible: root.availableDesktopWidgets.length === 0
+                            text: "No desktop widgets match \"" + root.widgetSearchQuery + "\"."
+                            color: Colors.textSecondary
+                            font.pixelSize: Colors.fontSizeSmall
+                            wrapMode: Text.WordWrap
+                        }
+                    }
                 }
             }
         }

@@ -4,6 +4,11 @@ set -euo pipefail
 runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
 
 tab_ids=(
+  "launcher"
+  "launcher-search"
+  "launcher-web"
+  "launcher-modes"
+  "launcher-runtime"
   "wallpaper"
   "bar-widgets"
   "bars"

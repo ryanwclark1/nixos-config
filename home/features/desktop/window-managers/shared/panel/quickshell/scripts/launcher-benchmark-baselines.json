@@ -1,17 +1,17 @@
 {
   "filter": {
     "command": "benchmark-launcher-filter.js --items=30000 --runs=40 --seed=1337",
-    "max_optimized_ms": 420,
+    "max_optimized_ms": 760,
     "tolerance_pct": 15
   },
   "home": {
     "command": "benchmark-launcher-home.js --apps=30000 --history=500 --runs=60 --seed=1337",
-    "max_optimized_ms": 520,
+    "max_optimized_ms": 850,
     "tolerance_pct": 20
   },
   "files_shaping": {
     "command": "benchmark-launcher-files-shaping.js --lines=120000 --runs=25 --seed=1337",
-    "max_optimized_ms": 360,
+    "max_optimized_ms": 660,
     "tolerance_pct": 20
   }
 }

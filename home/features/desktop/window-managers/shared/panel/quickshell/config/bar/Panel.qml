@@ -77,8 +77,45 @@ Item {
     return items;
   }
 
+  function isLauncherWidget(widgetInstance) {
+    return !!widgetInstance && String(widgetInstance.widgetType || "") === "logo";
+  }
+
+  function leadingLauncherItems(section) {
+    var items = sectionItems(section);
+    if (items.length > 0 && isLauncherWidget(items[0]))
+      return [items[0]];
+    return [];
+  }
+
+  function trailingSectionItems(section) {
+    var items = sectionItems(section);
+    if (items.length > 0 && isLauncherWidget(items[0]))
+      return items.slice(1);
+    return items;
+  }
+
   function widgetSettings(widgetInstance) {
     return widgetInstance && widgetInstance.settings ? widgetInstance.settings : {};
+  }
+
+  function itemOccupiesSpace(item) {
+    if (!item || item.visible === false)
+      return false;
+
+    var implicitWidth = Number(item.implicitWidth);
+    var implicitHeight = Number(item.implicitHeight);
+    var width = Number(item.width);
+    var height = Number(item.height);
+
+    implicitWidth = isNaN(implicitWidth) ? 0 : implicitWidth;
+    implicitHeight = isNaN(implicitHeight) ? 0 : implicitHeight;
+    width = isNaN(width) ? 0 : width;
+    height = isNaN(height) ? 0 : height;
+
+    return vertical
+      ? Math.max(implicitHeight, height) > 0
+      : Math.max(implicitWidth, width) > 0;
   }
 
   function requestSurface(surfaceId, item) {
@@ -216,6 +253,17 @@ Item {
     return value;
   }
 
+  function triggerWidgetIconOnly(widgetInstance) {
+    var mode = widgetStringSetting(widgetInstance, "displayMode", "icon", ["icon", "full"]);
+    return mode !== "full";
+  }
+
+  function triggerWidgetLabel(widgetInstance, fallback) {
+    var settings = widgetSettings(widgetInstance);
+    var label = String(settings.labelText !== undefined ? settings.labelText : fallback);
+    return label.trim().length > 0 ? label : fallback;
+  }
+
   function componentForWidget(widgetType) {
     if (widgetType === "logo") return logoComponent;
     if (widgetType === "workspaces") return workspacesComponent;
@@ -232,6 +280,7 @@ Item {
     if (widgetType === "cava") return cavaComponent;
     if (widgetType === "idleInhibitor") return idleInhibitorComponent;
     if (widgetType === "weather") return weatherComponent;
+    if (widgetType === "ssh") return sshComponent;
     if (widgetType === "network") return networkComponent;
     if (widgetType === "bluetooth") return bluetoothComponent;
     if (widgetType === "audio") return audioComponent;
@@ -354,10 +403,21 @@ Item {
     anchors.left: parent.left
     anchors.leftMargin: outerPadding
     anchors.verticalCenter: parent.verticalCenter
-    spacing: runtimeSpacing
+    spacing: runtimeSpacing + sectionSpacing
+
     Repeater {
-      model: root.sectionItems("left")
+      model: root.leadingLauncherItems("left")
       delegate: widgetLoaderDelegate
+    }
+
+    Row {
+      visible: root.trailingSectionItems("left").length > 0
+      spacing: runtimeSpacing
+
+      Repeater {
+        model: root.trailingSectionItems("left")
+        delegate: widgetLoaderDelegate
+      }
     }
   }
 
@@ -393,10 +453,21 @@ Item {
     anchors.top: parent.top
     anchors.topMargin: outerPadding
     anchors.horizontalCenter: parent.horizontalCenter
-    spacing: runtimeSpacing
+    spacing: runtimeSpacing + sectionSpacing
+
     Repeater {
-      model: root.sectionItems("left")
+      model: root.leadingLauncherItems("left")
       delegate: widgetLoaderDelegate
+    }
+
+    Column {
+      visible: root.trailingSectionItems("left").length > 0
+      spacing: runtimeSpacing
+
+      Repeater {
+        model: root.trailingSectionItems("left")
+        delegate: widgetLoaderDelegate
+      }
     }
   }
 
@@ -429,10 +500,12 @@ Item {
     Item {
       required property var modelData
       property var widgetInstance: modelData
-      implicitWidth: widgetLoader.implicitWidth
-      implicitHeight: root.vertical ? widgetLoader.implicitHeight : root.thickness
-      width: root.vertical ? Math.max(root.thickness, widgetLoader.implicitWidth) : widgetLoader.implicitWidth
-      height: root.vertical ? widgetLoader.implicitHeight : root.thickness
+      readonly property bool occupiesSpace: root.itemOccupiesSpace(widgetLoader.item)
+      visible: occupiesSpace
+      implicitWidth: occupiesSpace ? widgetLoader.implicitWidth : 0
+      implicitHeight: occupiesSpace ? (root.vertical ? widgetLoader.implicitHeight : root.thickness) : 0
+      width: occupiesSpace ? (root.vertical ? Math.max(root.thickness, widgetLoader.implicitWidth) : widgetLoader.implicitWidth) : 0
+      height: occupiesSpace ? (root.vertical ? widgetLoader.implicitHeight : root.thickness) : 0
 
       Loader {
         id: widgetLoader
@@ -453,6 +526,8 @@ Item {
       property var widgetInstance: null
       tooltipText: "Application launcher"
       anchorWindow: root.anchorWindow
+      iconOnly: root.triggerWidgetIconOnly(widgetInstance)
+      labelText: root.triggerWidgetLabel(widgetInstance, "Apps")
     }
   }
 
@@ -674,13 +749,14 @@ Item {
       property string updatesIcon: "󰚰"
       property string updatesCount: "0"
       readonly property bool iconOnly: root.isSummaryWidgetIconOnly(widgetInstance)
-      implicitWidth: updatesPill.width
-      implicitHeight: updatesPill.height
+      visible: updatesCount !== "0" && updatesCount !== ""
+      implicitWidth: visible ? updatesPill.width : 0
+      implicitHeight: visible ? updatesPill.height : 0
 
       SharedWidgets.CommandPoll {
         id: updatePoll
         interval: 600000
-        running: updatesRoot.visible
+        running: true
         command: ["sh", "-c",
           "nix=$(cat \"${XDG_CACHE_HOME:-$HOME/.cache}/quickshell/updates/nixos\" 2>/dev/null || echo 0); "
           + "flat=$(cat \"${XDG_CACHE_HOME:-$HOME/.cache}/quickshell/updates/flatpak\" 2>/dev/null || echo 0); "
@@ -697,7 +773,7 @@ Item {
 
       SharedWidgets.BarPill {
         id: updatesPill
-        visible: updatesRoot.updatesCount !== "0" && updatesRoot.updatesCount !== ""
+        visible: updatesRoot.visible
         anchors.centerIn: parent
         anchorWindow: root.anchorWindow
         tooltipText: "System updates"
@@ -833,6 +909,15 @@ Item {
           anchors.verticalCenter: parent.verticalCenter
         }
       }
+    }
+  }
+
+  Component {
+    id: sshComponent
+    SharedWidgets.SshWidget {
+      property var widgetInstance: null
+      anchorWindow: root.anchorWindow
+      onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
     }
   }
 
@@ -1195,6 +1280,7 @@ Item {
   Component {
     id: aiChatPillComponent
     SharedWidgets.BarPill {
+      id: aiChatPill
       property var widgetInstance: null
       isActive: root.isSurfaceActive("aiChat")
       anchorWindow: root.anchorWindow
@@ -1205,11 +1291,24 @@ Item {
       ]
       onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
-      Text {
-        color: Colors.text
-        font.pixelSize: Colors.fontSizeLarge
-        font.family: Colors.fontMono
-        text: "󰚩"
+      Row {
+        spacing: Colors.spacingXS
+
+        Text {
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeLarge
+          font.family: Colors.fontMono
+          text: "󰚩"
+        }
+
+        Text {
+          visible: !root.triggerWidgetIconOnly(aiChatPill.widgetInstance)
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeSmall
+          font.weight: Font.DemiBold
+          text: root.triggerWidgetLabel(aiChatPill.widgetInstance, "AI")
+          anchors.verticalCenter: parent.verticalCenter
+        }
       }
     }
   }
@@ -1217,6 +1316,7 @@ Item {
   Component {
     id: notepadComponent
     SharedWidgets.BarPill {
+      id: notepadPill
       property var widgetInstance: null
       isActive: root.isSurfaceActive("notepad")
       anchorWindow: root.anchorWindow
@@ -1227,11 +1327,24 @@ Item {
       ]
       onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
-      Text {
-        color: Colors.text
-        font.pixelSize: Colors.fontSizeLarge
-        font.family: Colors.fontMono
-        text: "󰠮"
+      Row {
+        spacing: Colors.spacingXS
+
+        Text {
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeLarge
+          font.family: Colors.fontMono
+          text: "󰠮"
+        }
+
+        Text {
+          visible: !root.triggerWidgetIconOnly(notepadPill.widgetInstance)
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeSmall
+          font.weight: Font.DemiBold
+          text: root.triggerWidgetLabel(notepadPill.widgetInstance, "Notes")
+          anchors.verticalCenter: parent.verticalCenter
+        }
       }
     }
   }
@@ -1239,6 +1352,7 @@ Item {
   Component {
     id: controlCenterComponent
     SharedWidgets.BarPill {
+      id: controlCenterPill
       property var widgetInstance: null
       isActive: root.isSurfaceActive("controlCenter")
       anchorWindow: root.anchorWindow
@@ -1249,11 +1363,24 @@ Item {
       ]
       onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
-      Text {
-        color: Colors.text
-        font.pixelSize: Colors.fontSizeXL
-        font.family: Colors.fontMono
-        text: "󰒓"
+      Row {
+        spacing: Colors.spacingXS
+
+        Text {
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeXL
+          font.family: Colors.fontMono
+          text: "󰒓"
+        }
+
+        Text {
+          visible: !root.triggerWidgetIconOnly(controlCenterPill.widgetInstance)
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeSmall
+          font.weight: Font.DemiBold
+          text: root.triggerWidgetLabel(controlCenterPill.widgetInstance, "Controls")
+          anchors.verticalCenter: parent.verticalCenter
+        }
       }
     }
   }
@@ -1273,6 +1400,7 @@ Item {
   Component {
     id: clipboardComponent
     SharedWidgets.BarPill {
+      id: clipboardPill
       property var widgetInstance: null
       isActive: root.isSurfaceActive("clipboardMenu")
       anchorWindow: root.anchorWindow
@@ -1285,11 +1413,24 @@ Item {
       ]
       onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
-      Text {
-        text: "󰅍"
-        color: Colors.text
-        font.family: Colors.fontMono
-        font.pixelSize: Colors.fontSizeXL
+      Row {
+        spacing: Colors.spacingXS
+
+        Text {
+          text: "󰅍"
+          color: Colors.text
+          font.family: Colors.fontMono
+          font.pixelSize: Colors.fontSizeXL
+        }
+
+        Text {
+          visible: !root.triggerWidgetIconOnly(clipboardPill.widgetInstance)
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeSmall
+          font.weight: Font.DemiBold
+          text: root.triggerWidgetLabel(clipboardPill.widgetInstance, "Clipboard")
+          anchors.verticalCenter: parent.verticalCenter
+        }
       }
     }
   }
@@ -1297,6 +1438,7 @@ Item {
   Component {
     id: screenshotComponent
     SharedWidgets.BarPill {
+      id: screenshotPill
       property var widgetInstance: null
       isActive: root.isSurfaceActive("screenshotMenu")
       anchorWindow: root.anchorWindow
@@ -1307,11 +1449,24 @@ Item {
       ]
       onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
-      Text {
-        text: "󰩭"
-        color: Colors.text
-        font.family: Colors.fontMono
-        font.pixelSize: Colors.fontSizeXL
+      Row {
+        spacing: Colors.spacingXS
+
+        Text {
+          text: "󰩭"
+          color: Colors.text
+          font.family: Colors.fontMono
+          font.pixelSize: Colors.fontSizeXL
+        }
+
+        Text {
+          visible: !root.triggerWidgetIconOnly(screenshotPill.widgetInstance)
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeSmall
+          font.weight: Font.DemiBold
+          text: root.triggerWidgetLabel(screenshotPill.widgetInstance, "Shot")
+          anchors.verticalCenter: parent.verticalCenter
+        }
       }
     }
   }
@@ -1335,7 +1490,7 @@ Item {
 
       readonly property bool hasDnd: !!(root.manager && root.manager.dndEnabled)
       readonly property bool hasUnread: !!(root.manager && root.manager.notifications && root.manager.notifications.count > 0)
-      readonly property int unreadCount: (root.manager && root.manager.notifications) ? root.manager.notifications.count : 0
+      readonly property int unreadCount: (root.manager && root.manager.notifications) ? Math.max(0, Number(root.manager.notifications.count) || 0) : 0
       readonly property string displayMode: root.widgetStringSetting(widgetInstance, "displayMode", "auto", ["auto", "full", "icon"])
       readonly property string badgeStyle: root.widgetStringSetting(widgetInstance, "badgeStyle", "dot", ["dot", "count", "off"])
       readonly property bool iconOnly: displayMode === "icon" ? true : (displayMode === "full" ? false : root.vertical)

@@ -194,15 +194,14 @@ run_ipc() {
   for attempt in 1 2 3 4 5; do
     output="$(timeout 5s "$@" 2>&1)"
     status=$?
-    if [[ "${output}" == *"Not ready to accept queries yet."* ]]; then
+    if [[ "${output}" == *"Not ready to accept queries yet."* ]] \
+      || [[ "${output}" == *"No instance found for pid "* ]] \
+      || [[ "${output}" == *"No running instances start with "* ]]; then
       sleep 0.2
       continue
     fi
     if [[ ${status} -eq 0 ]]; then
       return 0
-    fi
-    if [[ "${output}" == *"No instance found for pid "* ]]; then
-      return "${status}"
     fi
     [[ -n "${output}" ]] && printf '%s\n' "${output}" >&2
     return "${status}"

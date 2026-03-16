@@ -11,7 +11,8 @@ Usage: check-settings-qa.sh [--skip-switch]
 Run the settings-focused QA stack:
   1. first-open Bar Widgets live validation
   2. settings guardrails
-  3. bar widget reorder regression
+  3. widget picker search regression
+  4. bar widget reorder regression
 
 By default this includes the Home Manager deploy path through
 check-bar-widgets-first-open.sh. Use --skip-switch if the current repo state is
@@ -44,6 +45,7 @@ else
 fi
 
 bash "${script_dir}/check-settings-guardrails.sh"
+bash "${script_dir}/check-widget-picker-search.sh"
 bash "${script_dir}/check-bar-widget-reorder.sh"
 
 printf '[PASS] Settings QA completed.\n'

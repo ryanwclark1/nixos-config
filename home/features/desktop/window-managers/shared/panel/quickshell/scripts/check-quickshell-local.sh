@@ -151,8 +151,10 @@ fi
 if run_capture "$tmp_all_out" "$tmp_all_err" "$local_runner" quickshell-all --quiet; then
   if assert_patterns "$tmp_all_out" \
     'Quickshell startup smoke summary: 1 pass, 0 fail' \
-    'Summary: 12 pass, 0 warn, 0 fail' \
+    'hidden bar widgets collapse to zero layout footprint' \
+    'Summary: 17 pass, 0 warn, 0 fail' \
     'Summary: 41 pass, 0 warn, 0 fail' \
+    'Summary: 0 pass, 0 warn, 6 skip, 0 fail' \
     'Panel runtime verification completed' \
     && ( assert_patterns "$tmp_all_out" '\[SKIP\].*no PanelWindow backend available in this environment' \
       || assert_patterns "$tmp_all_out" 'shell matrix:' ); then

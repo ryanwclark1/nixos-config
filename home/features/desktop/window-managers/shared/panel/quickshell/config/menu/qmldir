@@ -21,4 +21,5 @@ RecordingMenu 1.0 RecordingMenu.qml
 ScreenshotMenu 1.0 ScreenshotMenu.qml
 SettingsHub 1.0 SettingsHub.qml
 SystemStatsMenu 1.0 SystemStatsMenu.qml
+SystemMonitorPanel 1.0 SystemMonitorPanel.qml
 WeatherMenu 1.0 WeatherMenu.qml

@@ -245,6 +245,60 @@
             inherit inputs outputs;
           };
         };
+        hyprlandTestVm = lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            stylix.nixosModules.stylix
+            ./hosts/woody
+            (
+              { lib, ... }:
+              {
+                services.timesyncd.enable = lib.mkForce true;
+                networking.hostName = lib.mkForce "hyprlandTestVm";
+                programs.ssh.knownHosts = lib.mkForce { };
+                services.displayManager.sddm.enable = lib.mkForce false;
+                services.displayManager.autoLogin.enable = lib.mkForce false;
+                services.displayManager.autoLogin.user = lib.mkForce null;
+                services.displayManager.defaultSession = lib.mkForce "hyprland-uwsm";
+                services.xserver.displayManager.lightdm.enable = lib.mkForce false;
+                services.getty.autologinUser = lib.mkForce "administrator";
+                services.syncthing.enable = lib.mkForce false;
+                services.blueman.enable = lib.mkForce false;
+                services.geoclue2.enable = lib.mkForce false;
+                services.openssh.enable = lib.mkForce true;
+                services.openssh.settings.PasswordAuthentication = lib.mkForce true;
+                services.openssh.hostKeys = lib.mkForce [
+                  {
+                    path = "/etc/ssh/ssh_host_ed25519_key";
+                    type = "ed25519";
+                  }
+                ];
+                sops.age.sshKeyPaths = lib.mkForce [
+                  "/etc/ssh/ssh_host_ed25519_key"
+                ];
+                systemd.tmpfiles.rules = [
+                  "d /home/administrator/.ssh 0700 administrator users - -"
+                  "Z /home/administrator/.ssh 0700 administrator users - -"
+                ];
+                users.users.administrator = {
+                  hashedPasswordFile = lib.mkForce null;
+                  initialPassword = lib.mkForce "hyprland";
+                };
+                systemd.user.services.niri-flake-polkit.wantedBy = lib.mkForce [ ];
+
+                virtualisation.vmVariant = {
+                  virtualisation.graphics = true;
+                  virtualisation.cores = 4;
+                  virtualisation.memorySize = 8192;
+                  virtualisation.diskSize = 16384;
+                };
+              }
+            )
+          ];
+          specialArgs = {
+            inherit inputs outputs;
+          };
+        };
       };
       darwinConfigurations = {
         mini = nix-darwin.lib.darwinSystem {

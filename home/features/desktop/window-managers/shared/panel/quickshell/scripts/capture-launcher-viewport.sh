@@ -4,6 +4,7 @@ set -euo pipefail
 runtime_base="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell"
 runtime_root="${runtime_base}/by-id"
 instance_id=""
+instance_pid=""
 hyprland_instance=""
 hyprland_wayland_socket=""
 mode="drun"
@@ -15,8 +16,12 @@ delay_seconds="1.2"
 ipc_timeout_seconds="2"
 crop_mode="usable"
 workspace_target="auto"
+viewport_width=""
+viewport_height=""
 workspace_settle_attempts="20"
 workspace_settle_interval="0.1"
+state_settle_attempts="30"
+state_settle_interval="0.1"
 temp_full=""
 temp_crop=""
 restore_workspace=""
@@ -24,7 +29,7 @@ capture_workspace=""
 
 usage() {
   cat <<'EOF'
-Usage: capture-launcher-viewport.sh [--id INSTANCE_ID] [--mode drun|files|system|web] [--state home|query|empty|category] [--query TEXT] [--category KEY] [--delay SECONDS] [--crop monitor|usable] [--workspace current|auto|NAME] [--output PATH]
+Usage: capture-launcher-viewport.sh [--id INSTANCE_ID] [--pid INSTANCE_PID] [--mode drun|files|system|web] [--state home|query|empty|category] [--query TEXT] [--category KEY] [--delay SECONDS] [--crop monitor|usable] [--workspace current|auto|NAME] [--width PX] [--height PX] [--output PATH]
 
 Open the launcher through IPC, optionally drive a state preset, capture the focused monitor,
 and save a review screenshot.
@@ -41,6 +46,10 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --id)
       instance_id="${2:-}"
+      shift 2
+      ;;
+    --pid)
+      instance_pid="${2:-}"
       shift 2
       ;;
     --mode)
@@ -75,6 +84,14 @@ while [[ $# -gt 0 ]]; do
       workspace_target="${2:-}"
       shift 2
       ;;
+    --width)
+      viewport_width="${2:-}"
+      shift 2
+      ;;
+    --height)
+      viewport_height="${2:-}"
+      shift 2
+      ;;
     --output)
       output_path="${2:-}"
       shift 2
@@ -104,7 +121,10 @@ run_ipc() {
   local attempt
 
   for attempt in 1 2 3 4 5; do
-    output="$(timeout "${ipc_timeout_seconds}s" "$@" 2>&1)" && return 0
+    output="$(timeout "${ipc_timeout_seconds}s" "$@" 2>&1)" && {
+      [[ -n "${output}" ]] && printf '%s\n' "${output}"
+      return 0
+    }
     status=$?
     if [[ "${output}" == *"Not ready to accept queries yet."* ]]; then
       sleep 0.2
@@ -188,6 +208,7 @@ switch_to_capture_workspace() {
   local target="${requested}"
   if [[ "${requested}" == "current" ]]; then
     capture_workspace="$(hypr activeworkspace -j | jq -r '.name // (.id | tostring)')"
+    restore_workspace=""
     return 0
   fi
 
@@ -211,6 +232,9 @@ switch_to_capture_workspace() {
 
 reassert_capture_workspace() {
   [[ -n "${capture_workspace}" ]] || return 0
+  if [[ "${workspace_target}" == "current" ]]; then
+    return 0
+  fi
   hypr dispatch workspace "${capture_workspace}" >/dev/null
   wait_for_workspace "${capture_workspace}"
 }
@@ -245,11 +269,83 @@ discover_reachable_instance() {
 call_ipc() {
   local target="$1"
   shift
-  run_ipc quickshell ipc --id "${instance_id}" call "${target}" "$@"
+  if [[ -n "${instance_pid}" ]]; then
+    run_ipc quickshell ipc --pid "${instance_pid}" call "${target}" "$@"
+  else
+    run_ipc quickshell ipc --id "${instance_id}" call "${target}" "$@"
+  fi
+}
+
+wait_for_launcher_state() {
+  local expected_mode="$1"
+  local expected_query="$2"
+  local expected_category="$3"
+  local expect_home="$4"
+  local payload=""
+  local current_mode=""
+  local current_query=""
+  local current_category=""
+  local current_home=""
+  local attempt
+
+  for attempt in $(seq 1 "${state_settle_attempts}"); do
+    payload="$(call_ipc Launcher launcherState 2>/dev/null || true)"
+    if [[ -n "${payload}" ]]; then
+      current_mode="$(printf '%s' "${payload}" | node -e '
+const fs = require("node:fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+if (!raw) process.exit(1);
+let payload = JSON.parse(raw);
+if (typeof payload === "string") payload = JSON.parse(payload);
+process.stdout.write(String(payload.mode || ""));
+' 2>/dev/null || true)"
+      current_query="$(printf '%s' "${payload}" | node -e '
+const fs = require("node:fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+if (!raw) process.exit(1);
+let payload = JSON.parse(raw);
+if (typeof payload === "string") payload = JSON.parse(payload);
+process.stdout.write(String(payload.searchText || ""));
+' 2>/dev/null || true)"
+      current_category="$(printf '%s' "${payload}" | node -e '
+const fs = require("node:fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+if (!raw) process.exit(1);
+let payload = JSON.parse(raw);
+if (typeof payload === "string") payload = JSON.parse(payload);
+process.stdout.write(String(payload.drunCategoryFilter || ""));
+' 2>/dev/null || true)"
+      current_home="$(printf '%s' "${payload}" | node -e '
+const fs = require("node:fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+if (!raw) process.exit(1);
+let payload = JSON.parse(raw);
+if (typeof payload === "string") payload = JSON.parse(payload);
+process.stdout.write(String(payload.showLauncherHome === true));
+' 2>/dev/null || true)"
+    else
+      current_mode=""
+      current_query=""
+      current_category=""
+      current_home=""
+    fi
+    if [[ "${current_mode}" == "${expected_mode}" && "${current_query}" == "${expected_query}" && "${current_category}" == "${expected_category}" && "${current_home}" == "${expect_home}" ]]; then
+      return 0
+    fi
+    sleep "${state_settle_interval}"
+  done
+
+  printf 'Launcher did not settle to expected state (mode=%s query=%s category=%s home=%s). Got mode=%s query=%s category=%s home=%s\n' \
+    "${expected_mode}" "${expected_query}" "${expected_category}" "${expect_home}" \
+    "${current_mode}" "${current_query}" "${current_category}" "${current_home}" >&2
+  exit 1
 }
 
 apply_launcher_state() {
   local mode_action=""
+  local expected_query=""
+  local expected_category=""
+  local expect_home="false"
 
   case "${mode}" in
     drun) mode_action="openDrun" ;;
@@ -282,6 +378,7 @@ apply_launcher_state() {
 
   case "${state}" in
     home)
+      expect_home="true"
       ;;
     query)
       if [[ -z "${query}" ]]; then
@@ -293,6 +390,7 @@ apply_launcher_state() {
         esac
       fi
       call_ipc Launcher diagnosticSetSearchText "${query}" >/dev/null
+      expected_query="${query}"
       ;;
     empty)
       if [[ -z "${query}" ]]; then
@@ -304,6 +402,7 @@ apply_launcher_state() {
         esac
       fi
       call_ipc Launcher diagnosticSetSearchText "${query}" >/dev/null
+      expected_query="${query}"
       ;;
     category)
       if [[ "${mode}" != "drun" ]]; then
@@ -327,11 +426,16 @@ if (match) process.stdout.write(String(match.key || ""));
         exit 1
       fi
       call_ipc Launcher diagnosticSetDrunCategoryFilter "${category_key}" >/dev/null
+      expected_category="${category_key}"
+      expect_home="true"
       ;;
   esac
+
+  wait_for_launcher_state "${mode}" "${expected_query}" "${expected_category}" "${expect_home}"
 }
 
 cleanup_launcher() {
+  call_ipc Launcher diagnosticSetViewport 0 0 >/dev/null 2>&1 || true
   call_ipc Launcher diagnosticSetSearchText "" >/dev/null 2>&1 || true
   call_ipc Launcher diagnosticSetDrunCategoryFilter "" >/dev/null 2>&1 || true
   call_ipc Launcher invokeEscapeAction >/dev/null 2>&1 || call_ipc Launcher toggle >/dev/null 2>&1 || true
@@ -362,7 +466,22 @@ main() {
       ;;
   esac
 
-  if [[ -z "${instance_id}" ]]; then
+  if [[ -n "${viewport_width}" && ! "${viewport_width}" =~ ^[0-9]+$ ]]; then
+    printf 'Width must be a positive integer.\n' >&2
+    exit 2
+  fi
+  if [[ -n "${viewport_height}" && ! "${viewport_height}" =~ ^[0-9]+$ ]]; then
+    printf 'Height must be a positive integer.\n' >&2
+    exit 2
+  fi
+  if [[ -n "${viewport_width}" || -n "${viewport_height}" ]]; then
+    if [[ -z "${viewport_width}" || -z "${viewport_height}" ]]; then
+      printf 'Both --width and --height are required together.\n' >&2
+      exit 2
+    fi
+  fi
+
+  if [[ -z "${instance_id}" && -z "${instance_pid}" ]]; then
     instance_id="$(discover_reachable_instance || true)"
     if [[ -z "${instance_id}" ]]; then
       printf 'No live QuickShell launcher instances found under %s\n' "${runtime_root}" >&2
@@ -381,6 +500,9 @@ main() {
   switch_to_capture_workspace "${workspace_target}"
 
   cleanup_launcher
+  if [[ -n "${viewport_width}" ]]; then
+    call_ipc Launcher diagnosticSetViewport "${viewport_width}" "${viewport_height}" >/dev/null
+  fi
   apply_launcher_state
   reassert_capture_workspace
   sleep "${delay_seconds}"

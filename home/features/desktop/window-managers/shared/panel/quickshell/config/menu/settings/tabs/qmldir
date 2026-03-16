@@ -10,6 +10,10 @@ HooksTab 1.0 HooksTab.qml
 HotkeysTab 1.0 HotkeysTab.qml
 HyprlandTab 1.0 HyprlandTab.qml
 LauncherTab 1.0 LauncherTab.qml
+LauncherSearchTab 1.0 LauncherSearchTab.qml
+LauncherWebTab 1.0 LauncherWebTab.qml
+LauncherModesTab 1.0 LauncherModesTab.qml
+LauncherRuntimeTab 1.0 LauncherRuntimeTab.qml
 LockScreenTab 1.0 LockScreenTab.qml
 NightLightTab 1.0 NightLightTab.qml
 NotificationsTab 1.0 NotificationsTab.qml

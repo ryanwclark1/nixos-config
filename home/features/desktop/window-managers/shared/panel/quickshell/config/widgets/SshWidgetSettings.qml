@@ -104,35 +104,20 @@ ColumnLayout {
 
     Component.onCompleted: resetForm()
 
-    SettingsToggleRow {
-        label: "SSH config import"
-        icon: "󰣀"
-        checked: sshData.enableSshConfigImport
-        enabledText: "Import aliases from ~/.ssh/config and include files."
-        disabledText: "Only manual hosts are shown."
-        onToggled: sshData.setImportEnabled(!sshData.enableSshConfigImport)
+    Text {
+        text: "SSH Hosts & Import"
+        color: Colors.text
+        font.pixelSize: Colors.fontSizeMedium
+        font.weight: Font.DemiBold
+        Layout.fillWidth: true
     }
 
-    SettingsModeRow {
-        label: "Bar Label"
-        description: "Choose whether the widget shows the total host count or the most recent host label."
-        currentValue: sshData.displayMode
-        options: [
-            { value: "count", label: "Count" },
-            { value: "recent", label: "Recent" }
-        ]
-        onModeSelected: value => sshData.setDisplayMode(value)
-    }
-
-    SettingsModeRow {
-        label: "Primary Click"
-        description: "Choose the action used when the widget has exactly one host."
-        currentValue: sshData.defaultAction
-        options: [
-            { value: "connect", label: "Connect" },
-            { value: "copy", label: "Copy Command" }
-        ]
-        onModeSelected: value => sshData.setDefaultAction(value)
+    Text {
+        text: "Basic SSH pill behavior is configured above with the shared widget settings. This section manages host lists, import diagnostics, and reset actions."
+        color: Colors.textSecondary
+        font.pixelSize: Colors.fontSizeXS
+        Layout.fillWidth: true
+        wrapMode: Text.WordWrap
     }
 
     Flow {

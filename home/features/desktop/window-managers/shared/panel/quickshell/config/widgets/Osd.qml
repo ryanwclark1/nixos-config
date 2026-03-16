@@ -54,6 +54,7 @@ Scope {
   }
 
   readonly property real currentValue: {
+    if (osdType === "critical") return 1.0;
     if (osdType === "brightness") return SystemStatus.brightness;
     if (osdType === "kbdbrightness") return displayKbdBrightness;
     if (osdType === "mic") return displaySourceVolume;
@@ -64,6 +65,7 @@ Scope {
   }
 
   readonly property bool isLockKey: osdType === "capslock" || osdType === "numlock" || osdType === "scrolllock"
+  readonly property bool isCriticalAlert: osdType === "critical"
 
   // Color lerp helper for smooth gradients between two colors
   function lerpColor(a, b, t) {
@@ -112,12 +114,13 @@ Scope {
   }
 
   // --- Position helpers ---
-  readonly property string location: Config.osdPosition
+  readonly property string location: isCriticalAlert ? "center" : Config.osdPosition
   readonly property bool posTop: location === "top" || location.indexOf("top") === 0
   readonly property bool posBottom: location === "bottom" || location.indexOf("bottom") === 0
   readonly property bool posLeft: location.indexOf("left") !== -1
   readonly property bool posRight: location.indexOf("right") !== -1
-  readonly property bool posCenter: location === "center"
+  readonly property bool posVCenter: location === "center"
+  readonly property bool posHCenter: location === "center" || location.indexOf("center") !== -1 || (!posLeft && !posRight && (posTop || posBottom))
 
   function showOsd(type) {
     if (!startupComplete) return;
@@ -238,6 +241,8 @@ Scope {
         required property ShellScreen modelData
         screen: modelData
         readonly property var edgeMargins: Config.reservedEdgesForScreen(modelData, "")
+        readonly property int usableWidth: Math.max(0, screen.width - edgeMargins.left - edgeMargins.right)
+        readonly property int usableHeight: Math.max(0, screen.height - edgeMargins.top - edgeMargins.bottom)
 
         // Delayed unmap: stay mapped while exit animations run.
         // Keep this compositor-agnostic; OSD is safe to render on all screens.
@@ -245,29 +250,28 @@ Scope {
         visible: _wantVisible || osdFadeAnim.running || osdScaleAnim.running
 
         // --- 9-position anchoring ---
-        anchors.top: root.posTop || root.posCenter
+        anchors.top: root.posTop || root.posVCenter
         anchors.bottom: root.posBottom
-        anchors.left: root.posLeft || root.posCenter
+        anchors.left: root.posLeft || root.posHCenter
         anchors.right: root.posRight
 
         // Bar-aware margins: offset OSD when bar is at same edge
         margins.top: {
-          if (root.posCenter)
-            return screen ? Math.max(edgeMargins.top, edgeMargins.top + ((screen.height - edgeMargins.top - edgeMargins.bottom - implicitHeight) / 2)) : 0;
+          if (root.posVCenter) return edgeMargins.top + Math.max(0, (usableHeight - implicitHeight) / 2);
           if (!root.posTop) return 0;
           return edgeMargins.top;
         }
-        margins.bottom: root.posBottom ? edgeMargins.bottom : 0
+        margins.bottom: {
+          return root.posBottom ? edgeMargins.bottom : 0;
+        }
         margins.left: {
-          if (root.posCenter)
-            return screen ? Math.max(edgeMargins.left, edgeMargins.left + ((screen.width - edgeMargins.left - edgeMargins.right - implicitWidth) / 2)) : 0;
+          if (root.posHCenter) return edgeMargins.left + Math.max(0, (usableWidth - implicitWidth) / 2);
           if (root.posLeft) return edgeMargins.left;
-          // Horizontal center for top/bottom
-          if (!root.posLeft && !root.posRight && (root.posTop || root.posBottom))
-            return screen ? Math.max(edgeMargins.left, edgeMargins.left + ((screen.width - edgeMargins.left - edgeMargins.right - implicitWidth) / 2)) : 0;
           return 0;
         }
-        margins.right: root.posRight ? edgeMargins.right : 0
+        margins.right: {
+          return root.posRight ? edgeMargins.right : 0;
+        }
 
         exclusiveZone: 0
         color: "transparent"
@@ -275,11 +279,13 @@ Scope {
         WlrLayershell.namespace: "quickshell-osd"
 
         // Size depends on style
-        implicitWidth: Config.osdStyle === "pill" ? pillWidth : Config.osdSize
-        implicitHeight: Config.osdStyle === "pill" ? pillHeight : Config.osdSize
+        implicitWidth: root.isCriticalAlert ? criticalWidth : (Config.osdStyle === "pill" ? pillWidth : Config.osdSize)
+        implicitHeight: root.isCriticalAlert ? criticalHeight : (Config.osdStyle === "pill" ? pillHeight : Config.osdSize)
 
         readonly property int pillWidth: 280
         readonly property int pillHeight: 56
+        readonly property int criticalWidth: 320
+        readonly property int criticalHeight: 148
 
         mask: Region {
           item: content
@@ -288,7 +294,7 @@ Scope {
         Rectangle {
           id: content
           anchors.fill: parent
-          radius: Config.osdStyle === "pill" ? height / 2 : 28
+          radius: root.isCriticalAlert ? Colors.radiusLarge : (Config.osdStyle === "pill" ? height / 2 : 28)
           color: Colors.withAlpha(Colors.surface, 0.85)
           border.color: root.osdColor
           border.width: 2
@@ -338,9 +344,64 @@ Scope {
             Behavior on color { ColorAnimation { duration: Colors.durationFast } }
           }
 
+          Loader {
+            active: root.isCriticalAlert
+            anchors.fill: parent
+            sourceComponent: ColumnLayout {
+              anchors.fill: parent
+              anchors.margins: Colors.spacingL
+              spacing: Colors.spacingM
+
+              Item {
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredWidth: 76
+                Layout.preferredHeight: 76
+
+                Rectangle {
+                  anchors.centerIn: parent
+                  width: 76
+                  height: 76
+                  radius: width / 2
+                  color: Colors.withAlpha(root.osdColor, 0.14)
+                  border.color: root.osdColor
+                  border.width: 2
+                }
+
+                Text {
+                  anchors.centerIn: parent
+                  text: root.osdIcon
+                  color: root.osdColor
+                  font.pixelSize: 30
+                  font.family: Colors.fontMono
+                }
+              }
+
+              Text {
+                Layout.fillWidth: true
+                horizontalAlignment: Text.AlignHCenter
+                wrapMode: Text.NoWrap
+                text: root.osdLabel
+                color: Colors.text
+                font.pixelSize: Colors.fontSizeXL
+                font.weight: Font.Black
+                font.family: Colors.fontMono
+              }
+
+              Text {
+                Layout.fillWidth: true
+                horizontalAlignment: Text.AlignHCenter
+                text: "Check system load and temperature"
+                color: Colors.textSecondary
+                font.pixelSize: Colors.fontSizeSmall
+                font.weight: Font.Medium
+                elide: Text.ElideRight
+              }
+            }
+          }
+
           // Circular style (original)
           Loader {
-            active: Config.osdStyle === "circular"
+            active: !root.isCriticalAlert && Config.osdStyle === "circular"
             anchors.fill: parent
             sourceComponent: ColumnLayout {
               anchors.fill: parent
@@ -379,7 +440,7 @@ Scope {
 
           // Pill style (horizontal progress bar)
           Loader {
-            active: Config.osdStyle === "pill"
+            active: !root.isCriticalAlert && Config.osdStyle === "pill"
             anchors.fill: parent
             sourceComponent: RowLayout {
               anchors.fill: parent

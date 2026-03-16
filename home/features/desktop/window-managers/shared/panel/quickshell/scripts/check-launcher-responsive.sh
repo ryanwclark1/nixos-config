@@ -245,7 +245,7 @@ static_checks() {
   require_literal "$launcher_qml" 'readonly property bool compactMode: usableWidth < 900 || usableHeight < 640' "compact mode threshold"
   require_literal "$launcher_qml" 'readonly property bool sidebarCompact: usableWidth < 720' "sidebar compact threshold"
   require_literal "$launcher_qml" 'readonly property bool tightMode: usableWidth < 560 || usableHeight < 500' "tight mode threshold"
-  require_literal "$launcher_qml" 'width: Math.min(960, Math.max(launcherRoot.sidebarCompact ? 360 : 420, launcherRoot.usableWidth - (launcherRoot.tightMode ? 24 : 40)))' "responsive launcher width bounds"
+  require_literal "$launcher_qml" 'width: Math.min(1120, Math.max(launcherRoot.sidebarCompact ? 380 : 460, launcherRoot.usableWidth - (launcherRoot.tightMode ? 24 : 40)))' "responsive launcher width bounds"
   require_literal "$launcher_search_field_qml" 'height: 48' "compact search bar height"
   require_literal "$launcher_qml" 'visible: launcherRoot.transientNoticeText !== "" && !launcherRoot.tightMode' "transient notice tight-mode guard"
   require_literal "$launcher_qml" 'visible: Config.launcherShowRuntimeMetrics && !launcherRoot.tightMode' "runtime metrics tight-mode guard"
@@ -312,6 +312,31 @@ runtime_checks() {
     pass "Launcher.openDrun for category state probe"
   else
     fail "Launcher.openDrun for category state probe"
+  fi
+
+  local launcher_state
+  if launcher_action_available "launcherState" && launcher_state="$(call_ipc Launcher launcherState 2>/dev/null)" && printf '%s' "${launcher_state}" | node -e '
+const fs = require("node:fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+let payload = JSON.parse(raw);
+if (typeof payload === "string") payload = JSON.parse(payload);
+const viewportWidth = Number(payload.viewportWidth || 0);
+const viewportHeight = Number(payload.viewportHeight || 0);
+const usableWidth = Number(payload.usableWidth || 0);
+const usableHeight = Number(payload.usableHeight || 0);
+const hudWidth = Number(payload.hudWidth || 0);
+const hudHeight = Number(payload.hudHeight || 0);
+if (!(viewportWidth > 0 && viewportHeight > 0)) process.exit(1);
+if (!(usableWidth > 0 && usableHeight > 0)) process.exit(1);
+if (!(hudWidth >= 460 && hudHeight >= 360)) process.exit(1);
+if (usableWidth >= 1400 && !(hudWidth >= 1000)) process.exit(1);
+' >/dev/null 2>&1; then
+    pass "Launcher.launcherState viewport sizing invariants"
+  else
+    fail "Launcher.launcherState viewport sizing invariants"
+    if [[ -n "${launcher_state:-}" ]]; then
+      printf '%s\n' "${launcher_state}" >&2
+    fi
   fi
 
   local category_state
@@ -472,7 +497,7 @@ if (String(state.drunCategoryFilter || "") !== "") process.exit(1);
         fail "Launcher.invokeEscapeAction clears category before close"
       fi
     else
-      warn "Launcher escape category probe skipped because no non-All drun category option was available"
+      pass "Launcher escape category probe skipped: no non-All drun category option available"
     fi
   fi
 

@@ -51,6 +51,7 @@ Scope {
     readonly property bool weatherMenuVisible: root.isSurfaceOpen("weatherMenu")
     readonly property bool dateTimeMenuVisible: root.isSurfaceOpen("dateTimeMenu")
     readonly property bool systemStatsMenuVisible: root.isSurfaceOpen("systemStatsMenu")
+    readonly property bool systemMonitorVisible: root.isSurfaceOpen("systemMonitor")
     readonly property bool bluetoothMenuVisible: root.isSurfaceOpen("bluetoothMenu")
     readonly property bool printerMenuVisible: root.isSurfaceOpen("printerMenu")
     readonly property bool privacyMenuVisible: root.isSurfaceOpen("privacyMenu")
@@ -168,6 +169,9 @@ Scope {
     function toggleSystemStatsMenu() {
         toggleSurface("systemStatsMenu");
     }
+    function toggleSystemMonitor() {
+        toggleSurface("systemMonitor");
+    }
     function toggleBluetoothMenu() {
         toggleSurface("bluetoothMenu");
     }
@@ -267,6 +271,9 @@ Scope {
         }
         function toggleSystemStatsMenu() {
             root.toggleSurface("systemStatsMenu");
+        }
+        function toggleSystemMonitor() {
+            root.toggleSurface("systemMonitor");
         }
         function toggleNotepad() {
             root.toggleSurface("notepad");
@@ -422,6 +429,16 @@ Scope {
         notepad: notepad
         lazyLoaderSettleMs: root.lazyLoaderSettleMs
         settingsHubReopenMs: root.settingsHubReopenMs
+    }
+
+    LazyLoader {
+        active: root.systemMonitorVisible
+        SystemMonitorPanel {
+            id: systemMonitor
+            screen: root.currentSurfaceScreen()
+            showContent: root.systemMonitorVisible
+            onCloseRequested: root.closeSurface("systemMonitor")
+        }
     }
 
     LazyLoader {

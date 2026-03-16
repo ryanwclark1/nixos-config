@@ -319,6 +319,15 @@ EOF
 
     home.file.".config/quickshell/themes.json".source = "${themeManifest}/themes.json";
 
+    home.file.".local/bin/qs-screenshot" = {
+      force = true;
+      executable = true;
+      text = ''
+        #!/usr/bin/env bash
+        exec bash ${./scripts/screenshot.sh} "$@"
+      '';
+    };
+
     home.file.".local/share/applications/org.quickshell.desktop".text = ''
       [Desktop Entry]
       Name=Quickshell
@@ -343,6 +352,23 @@ EOF
       };
 
       Service = {
+        ExecStartPre = "${pkgs.writeShellScript "quickshell-wait-notifications-name" ''
+          set -eu
+
+          if ! command -v busctl >/dev/null 2>&1; then
+            exit 0
+          fi
+
+          for _ in $(seq 1 50); do
+            owner_pid="$(busctl --user --list 2>/dev/null | awk '/org\.freedesktop\.Notifications/ { print $2; exit }')"
+            if [ -z "$owner_pid" ] || [ "$owner_pid" = "-" ]; then
+              exit 0
+            fi
+            sleep 0.1
+          done
+
+          exit 0
+        ''}";
         ExecStart = "${pkgs.quickshell}/bin/quickshell";
         Environment = [
           "PATH=%h/.local/bin:%h/.nix-profile/bin:/etc/profiles/per-user/%u/bin:/run/current-system/sw/bin:${pkgs.quickshell}/bin:${pkgs.pipewire}/bin:${pkgs.networkmanager}/bin:${pkgs.tailscale}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.bash}/bin:${pkgs.procps}/bin:${pkgs.wl-clipboard}/bin:${pkgs.power-profiles-daemon}/bin:${pkgs.ddcutil}/bin:${pkgs.grim}/bin:${pkgs.slurp}/bin:${pkgs.dbus}/bin"

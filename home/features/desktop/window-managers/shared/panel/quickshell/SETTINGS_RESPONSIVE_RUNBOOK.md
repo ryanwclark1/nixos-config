@@ -12,6 +12,10 @@ Reference:
   - `scripts/check-panel-config-contracts.sh`
 - Automated gate: static + runtime guardrails:
   - `scripts/check-settings-guardrails.sh`
+- Automated gate: settings-focused QA stack:
+  - `scripts/check-settings-qa.sh --skip-switch`
+- Automated gate: widget picker search regression:
+  - `scripts/check-widget-picker-search.sh`
 - Automated gate: runtime smoke check against the live QuickShell instance:
   - `scripts/check-settings-responsive.sh`
 - Automated gate: runtime smoke check against the repo shell:
@@ -45,6 +49,8 @@ Reference:
 Command roles:
 
 - `check-settings-responsive.sh` is the live-session runtime gate.
+- `check-settings-qa.sh --skip-switch` is the settings-specific integrated regression stack.
+- `check-widget-picker-search.sh` is the headless add-widget catalog/search regression check.
 - `preview-settings-responsive.sh` is a manual walkthrough.
 - `capture-settings-viewport.sh` and `capture-settings-matrix.sh` produce review artifacts.
 
@@ -56,6 +62,11 @@ The smoke script:
 2. Calls `Shell.reloadConfig()`.
 3. Opens `SettingsHub`.
 4. Cycles the highest-risk tabs:
+   - `launcher`
+   - `launcher-search`
+   - `launcher-web`
+   - `launcher-modes`
+   - `launcher-runtime`
    - `wallpaper`
    - `bar-widgets`
    - `bars`
@@ -106,6 +117,7 @@ If the installed shell is stale or unhealthy, prefer the repo-shell artifact pat
 - `scripts/capture-panel-matrix.sh --repo-shell --skip-surfaces --settings-preset portrait`
 
 For Bar Widgets stat-setting changes, run `scripts/check-panel-config-contracts.sh` first so default/migration regressions are caught before live-session layout review.
+For add-widget picker changes, run `scripts/check-widget-picker-search.sh` or the broader `scripts/check-settings-qa.sh --skip-switch` stack before manual review.
 Recommended order: run the runtime gate first, then the manual preview walkthrough, then generate capture artifacts if you need repeatable screenshots for review or bug triage.
 If you are validating repo-only changes before a Home Manager rebuild, use the repo-shell variants of those steps instead.
 
@@ -175,6 +187,8 @@ Look for:
 - in `Bar Widgets`, verify CPU / Memory / GPU rows show both `Mode` and `Value` summary chips.
 - in `Bar Widgets`, open CPU / Memory / GPU settings and verify `Display Mode` and `Value Style` controls wrap cleanly in portrait/narrow layouts.
 - in `Bar Widgets`, verify compact and auto modes remain readable when long values are selected and that compact mode shortens long values instead of widening the layout.
+- in `Bar Widgets`, open `Add Widget` from left, center, and right and verify the picker shows the full widget catalog with search working across names/descriptions.
+- in desktop widget edit mode, verify `Add Widget` opens the searchable catalog and that built-in and plugin desktop widgets appear in the same list.
 
 ## Harness Notes
 
@@ -189,6 +203,9 @@ Look for:
   - `scripts/check-panel-config-contracts.sh`
   - use that for default/migration coverage,
   - use live preview/capture for final layout validation.
+- Add-widget picker behavior is now protected by a dedicated headless harness:
+  - `scripts/check-widget-picker-search.sh`
+  - this verifies full-catalog visibility and search narrowing for both bar and desktop widget pickers.
 - For `Theme`, use the live shell preview path for final validation:
   - `scripts/preview-settings-responsive.sh`
   - or open `SettingsHub` directly in the running shell and inspect the tab there.

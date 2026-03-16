@@ -35,6 +35,19 @@ run_guard_check() {
   fi
 }
 
+run_contract_check() {
+  local contract_script="${script_dir}/check-compositor-contracts.sh"
+  if [[ -x "${contract_script}" ]]; then
+    if "${contract_script}" >/dev/null; then
+      pass "Compositor contract check"
+    else
+      fail "Compositor contract check"
+    fi
+  else
+    warn "Contract script not executable: ${contract_script}"
+  fi
+}
+
 detect_compositor() {
   local desktop session
   desktop="${XDG_CURRENT_DESKTOP:-}"
@@ -129,6 +142,7 @@ check_niri() {
 
 main() {
   run_guard_check
+  run_contract_check
 
   local compositor
   compositor="$(detect_compositor)"

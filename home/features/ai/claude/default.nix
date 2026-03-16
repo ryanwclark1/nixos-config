@@ -112,6 +112,10 @@ in
   # They are automatically loaded via Cursor rules (.cursor/rules/claude-*.mdc) and should
   # be referenced when relevant. See .cursor/rules/claude-config.mdc for usage guidelines.
 
+  home.file."${claudeHome}/mcp-servers.json" = {
+    source = ./mcp-servers.json;
+  };
+
   # Core behavioral and project documentation
   home.file."${claudeHome}/BUSINESS_SYMBOLS.md" = {
     source = ./config/BUSINESS_SYMBOLS.md;

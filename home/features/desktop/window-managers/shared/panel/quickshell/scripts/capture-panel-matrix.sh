@@ -18,6 +18,7 @@ surface_delay="1.6"
 settings_deep_scroll_y=""
 run_settings=1
 run_surfaces=1
+run_launcher=1
 
 write_gallery() {
   local gallery_path="$1"
@@ -123,7 +124,7 @@ EOF
 
       printf '    </div>\n'
       printf '  </div>\n'
-    done < <(find "${output_dir}" -mindepth 1 -maxdepth 1 -type d \( -name 'settings-*' -o -name 'surfaces-*' \) -printf '%f\n' | sort)
+    done < <(find "${output_dir}" -mindepth 1 -maxdepth 1 -type d \( -name 'launcher-*' -o -name 'settings-*' -o -name 'surfaces-*' \) -printf '%f\n' | sort)
 
     printf '</body>\n</html>\n'
   } > "${gallery_path}"
@@ -131,9 +132,10 @@ EOF
 
 usage() {
   cat <<'EOF'
-Usage: capture-panel-matrix.sh [--id INSTANCE_ID] [--repo-shell] [--output-dir DIR] [--settings-preset portrait|laptop|wide] [--surface-crop surface|monitor|usable] [--workspace current|auto|NAME] [--settings-delay SECONDS] [--surface-delay SECONDS] [--settings-deep-scroll-y PX] [--skip-settings] [--skip-surfaces]
+Usage: capture-panel-matrix.sh [--id INSTANCE_ID] [--repo-shell] [--output-dir DIR] [--settings-preset portrait|laptop|wide] [--surface-crop surface|monitor|usable] [--workspace current|auto|NAME] [--settings-delay SECONDS] [--surface-delay SECONDS] [--settings-deep-scroll-y PX] [--skip-settings] [--skip-surfaces] [--skip-launcher]
 
 Capture the shared panel QA artifact set:
+  - launcher screenshots for portrait, laptop, and wide presets
   - high-risk settings tab screenshots
   - high-risk popup/panel surface screenshots
 
@@ -187,6 +189,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --skip-surfaces)
       run_surfaces=0
+      shift
+      ;;
+    --skip-launcher)
+      run_launcher=0
       shift
       ;;
     -h|--help)
@@ -360,7 +366,7 @@ start_repo_shell() {
 }
 
 main() {
-  if (( run_settings == 0 && run_surfaces == 0 )); then
+  if (( run_settings == 0 && run_surfaces == 0 && run_launcher == 0 )); then
     printf 'Nothing to capture. Remove at least one --skip-* flag.\n' >&2
     exit 2
   fi
@@ -379,6 +385,19 @@ main() {
   fi
 
   mkdir -p "${output_dir}"
+
+  if (( run_launcher == 1 )); then
+    local launcher_preset=""
+    for launcher_preset in portrait laptop wide; do
+      printf '[INFO] Capturing launcher matrix (%s)...\n' "${launcher_preset}"
+      bash "${script_dir}/capture-launcher-matrix.sh" \
+        --id "${instance_id}" \
+        --preset "${launcher_preset}" \
+        --delay "${surface_delay}" \
+        --workspace "${workspace_target}" \
+        --output-dir "${output_dir}/launcher-${launcher_preset}"
+    done
+  fi
 
   if (( run_settings == 1 )); then
     local deep_scroll_y="${settings_deep_scroll_y}"

@@ -46,7 +46,7 @@ case "$PROVIDER" in
 
         curl -s --no-buffer -X POST "$URL" \
             -H "Content-Type: application/json" \
-            -d "$BODY" 2>/dev/null | while IFS= read -r line; do
+            -d "$BODY" 2>/dev/null | while IFS= read -r line || [[ -n "$line" ]]; do
             line="${line%$'\r'}"
             [[ -z "$line" ]] && continue
 
@@ -100,7 +100,7 @@ case "$PROVIDER" in
             -H "Content-Type: application/json" \
             -H "x-api-key: $API_KEY" \
             -H "anthropic-version: 2023-06-01" \
-            -d "$BODY" 2>/dev/null | while IFS= read -r line; do
+            -d "$BODY" 2>/dev/null | while IFS= read -r line || [[ -n "$line" ]]; do
             line="${line%$'\r'}"
             # SSE format: lines starting with "data: "
             if [[ "$line" == data:* ]]; then
@@ -154,7 +154,7 @@ case "$PROVIDER" in
         curl -s --no-buffer -X POST "$URL" \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $API_KEY" \
-            -d "$BODY" 2>/dev/null | while IFS= read -r line; do
+            -d "$BODY" 2>/dev/null | while IFS= read -r line || [[ -n "$line" ]]; do
             line="${line%$'\r'}"
             if [[ "$line" == data:* ]]; then
                 data="${line#data: }"
@@ -202,7 +202,7 @@ case "$PROVIDER" in
 
         curl -s --no-buffer -X POST "$URL" \
             -H "Content-Type: application/json" \
-            -d "$BODY" 2>/dev/null | while IFS= read -r line; do
+            -d "$BODY" 2>/dev/null | while IFS= read -r line || [[ -n "$line" ]]; do
             line="${line%$'\r'}"
             if [[ "$line" == data:* ]]; then
                 data="${line#data: }"

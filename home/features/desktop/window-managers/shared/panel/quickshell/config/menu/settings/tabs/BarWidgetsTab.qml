@@ -45,6 +45,7 @@ Item {
         };
     }
     readonly property var editingWidget: (selectedBar && settingsSection && settingsInstanceId) ? Config.widgetInstance(selectedBar.id, settingsSection, settingsInstanceId) : null
+    readonly property var editingWidgetSchema: editingWidget ? BarWidgetRegistry.settingsSchema(editingWidget.widgetType) : []
     readonly property string editingPluginId: {
         var typeName = editingWidget ? String(editingWidget.widgetType || "") : "";
         return typeName.indexOf("plugin:") === 0 ? typeName.slice(7) : "";
@@ -75,6 +76,20 @@ Item {
         addSection = section;
         widgetSearchQuery = "";
         widgetPickerOpen = true;
+    }
+
+    function availableWidgetsForPicker() {
+        var items = BarWidgetRegistry.search(widgetSearchQuery, "");
+        if (!addSection)
+            return items;
+
+        return items.slice().sort(function (a, b) {
+            var aScore = String(a.section || "") === addSection ? 0 : 1;
+            var bScore = String(b.section || "") === addSection ? 0 : 1;
+            if (aScore !== bScore)
+                return aScore - bScore;
+            return String(a.label || "").localeCompare(String(b.label || ""));
+        });
     }
 
     function openWidgetSettings(section, instanceId) {
@@ -133,16 +148,6 @@ Item {
             return;
         Config.updateBarWidget(selectedBar.id, section, widgetInstance.instanceId, {
             enabled: widgetInstance.enabled === false
-        });
-    }
-
-    function updateSpacerSize(value) {
-        if (!selectedBar || !editingWidget)
-            return;
-        var settings = editingWidget.settings ? JSON.parse(JSON.stringify(editingWidget.settings)) : {};
-        settings.size = value;
-        Config.updateBarWidget(selectedBar.id, settingsSection, editingWidget.instanceId, {
-            settings: settings
         });
     }
 
@@ -226,6 +231,10 @@ Item {
 
     function isSeparatorWidget(widgetType) {
         return widgetType === "separator";
+    }
+
+    function isSimpleTriggerWidget(widgetType) {
+        return widgetType === "logo" || widgetType === "aiChat" || widgetType === "notepad" || widgetType === "controlCenter" || widgetType === "clipboard" || widgetType === "screenshot";
     }
 
     function statDisplayModeLabel(widgetInstance) {
@@ -352,6 +361,33 @@ Item {
         return String(isNaN(thickness) ? 1 : thickness) + "px • " + String(isNaN(length) ? 20 : length) + "px • " + (isNaN(opacity) ? "80%" : Math.round(opacity * 100) + "%");
     }
 
+    function simpleTriggerDisplayLabel(widgetInstance) {
+        var settings = widgetInstance && widgetInstance.settings ? widgetInstance.settings : {};
+        return String(settings.displayMode || "icon") === "full" ? "Full" : "Icon";
+    }
+
+    function simpleTriggerLabelText(widgetInstance, fallback) {
+        var settings = widgetInstance && widgetInstance.settings ? widgetInstance.settings : {};
+        var label = String(settings.labelText !== undefined ? settings.labelText : fallback);
+        return label.trim().length > 0 ? label : fallback;
+    }
+
+    function triggerFallbackLabel(widgetType) {
+        if (widgetType === "logo")
+            return "Apps";
+        if (widgetType === "aiChat")
+            return "AI";
+        if (widgetType === "notepad")
+            return "Notes";
+        if (widgetType === "controlCenter")
+            return "Controls";
+        if (widgetType === "clipboard")
+            return "Clipboard";
+        if (widgetType === "screenshot")
+            return "Shot";
+        return "Open";
+    }
+
     function loadPluginSettingsPane() {
         if (!pluginSettingsLoader)
             return;
@@ -375,6 +411,95 @@ Item {
         });
     }
 
+    function schemaFieldCurrentValue(field) {
+        if (!editingWidget || !field)
+            return "";
+        var settings = editingWidget.settings ? editingWidget.settings : {};
+        if (settings[field.key] !== undefined)
+            return settings[field.key];
+        var defaults = BarWidgetRegistry.defaultSettings(editingWidget.widgetType);
+        if (defaults[field.key] !== undefined)
+            return defaults[field.key];
+        if (field.type === "toggle")
+            return false;
+        if (field.type === "slider")
+            return field.min !== undefined ? field.min : 0;
+        return "";
+    }
+
+    Component {
+        id: schemaModeField
+
+        SettingsModeRow {
+            property var field: null
+            visible: !!field
+            label: field ? (field.label || "") : ""
+            icon: field && field.icon ? field.icon : ""
+            description: field && field.description ? field.description : ""
+            currentValue: root.schemaFieldCurrentValue(field)
+            options: field && field.options ? field.options : []
+            onModeSelected: value => {
+                if (field)
+                    root.updateEditingWidgetSetting(field.key, value);
+            }
+        }
+    }
+
+    Component {
+        id: schemaSliderField
+
+        SettingsSliderRow {
+            property var field: null
+            visible: !!field
+            label: field ? (field.label || "") : ""
+            icon: field && field.icon ? field.icon : ""
+            min: field && field.min !== undefined ? field.min : 0
+            max: field && field.max !== undefined ? field.max : 100
+            step: field && field.step !== undefined ? field.step : 1
+            unit: field && field.unit ? field.unit : ""
+            value: root.schemaFieldCurrentValue(field)
+            onMoved: value => {
+                if (field)
+                    root.updateEditingWidgetSetting(field.key, value);
+            }
+        }
+    }
+
+    Component {
+        id: schemaToggleField
+
+        SettingsToggleRow {
+            property var field: null
+            visible: !!field
+            label: field ? (field.label || "") : ""
+            icon: field && field.icon ? field.icon : ""
+            checked: !!root.schemaFieldCurrentValue(field)
+            enabledText: field && field.enabledText ? field.enabledText : "Enabled"
+            disabledText: field && field.disabledText ? field.disabledText : "Disabled"
+            onToggled: {
+                if (field)
+                    root.updateEditingWidgetSetting(field.key, !root.schemaFieldCurrentValue(field));
+            }
+        }
+    }
+
+    Component {
+        id: schemaTextField
+
+        SettingsTextInputRow {
+            property var field: null
+            visible: !!field
+            label: field ? (field.label || "") : ""
+            leadingIcon: field && field.icon ? field.icon : ""
+            placeholderText: field && field.placeholder ? field.placeholder : ""
+            text: String(root.schemaFieldCurrentValue(field) || "")
+            onTextEdited: value => {
+                if (field)
+                    root.updateEditingWidgetSetting(field.key, value);
+            }
+        }
+    }
+
     SettingsTabPage {
         anchors.fill: parent
         tabId: root.tabId
@@ -387,20 +512,18 @@ Item {
             iconName: "󰕮"
             description: root.selectedBar ? "Choose which bar to manage before editing sections below." : "Create a bar first."
 
-            Flow {
-                Layout.fillWidth: true
-                width: parent.width
-                spacing: Colors.spacingS
-
-                Repeater {
-                    model: Config.barConfigs
-                    delegate: SharedWidgets.FilterChip {
-                        required property var modelData
-                        label: modelData.name || "Bar"
-                        selected: Config.selectedBarId === modelData.id
-                        onClicked: Config.setSelectedBar(modelData.id)
-                    }
-                }
+            SettingsSelectRow {
+                label: "Bar"
+                icon: "󰕮"
+                description: "Switch the bar you are editing without taking horizontal space away from the widget sections."
+                currentValue: String(Config.selectedBarId || "")
+                options: Config.barConfigs.map(function (barConfig) {
+                    return {
+                        value: String(barConfig.id || ""),
+                        label: String(barConfig.name || "Bar")
+                    };
+                })
+                onOptionSelected: value => Config.setSelectedBar(value)
             }
         }
 
@@ -619,186 +742,15 @@ Item {
                                             onClicked: root.toggleWidgetEnabled(widgetRow.sectionKey, widgetRow.widgetInstance)
                                         }
 
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isSystemStatWidget(widgetRow.widgetInstance.widgetType)
-                                            label: "Mode: " + root.statDisplayModeLabel(widgetRow.widgetInstance)
-                                            selected: false
-                                            enabled: false
-                                        }
+                                        Repeater {
+                                            model: BarWidgetRegistry.summaryChips(widgetRow.widgetInstance)
 
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isSystemStatWidget(widgetRow.widgetInstance.widgetType)
-                                            label: "Value: " + root.statValueStyleLabel(widgetRow.widgetInstance)
-                                            selected: false
-                                            enabled: false
-                                        }
-
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isSummaryDisplayWidget(widgetRow.widgetInstance.widgetType)
-                                            label: "Display: " + root.summaryDisplayModeLabel(widgetRow.widgetInstance)
-                                            selected: false
-                                            enabled: false
-                                        }
-
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isWindowTitleWidget(widgetRow.widgetInstance.widgetType)
-                                            label: root.windowTitleDetailsLabel(widgetRow.widgetInstance)
-                                            selected: false
-                                            enabled: false
-                                        }
-
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isMediaBarWidget(widgetRow.widgetInstance.widgetType)
-                                            label: "Display: " + root.summaryDisplayModeLabel(widgetRow.widgetInstance)
-                                            selected: false
-                                            enabled: false
-                                        }
-
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isMediaBarWidget(widgetRow.widgetInstance.widgetType)
-                                            label: "Text: " + root.mediaBarTextWidth(widgetRow.widgetInstance) + "px"
-                                            selected: false
-                                            enabled: false
-                                        }
-
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isKeyboardLayoutWidget(widgetRow.widgetInstance.widgetType)
-                                            label: "Label: " + root.keyboardLayoutModeLabel(widgetRow.widgetInstance)
-                                            selected: false
-                                            enabled: false
-                                        }
-
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isDateTimeWidget(widgetRow.widgetInstance.widgetType)
-                                            label: "Display: " + root.summaryDisplayModeLabel(widgetRow.widgetInstance)
-                                            selected: false
-                                            enabled: false
-                                        }
-
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isDateTimeWidget(widgetRow.widgetInstance.widgetType)
-                                            label: (widgetRow.widgetInstance.settings && widgetRow.widgetInstance.settings.showDate !== false) ? "Date On" : "Date Off"
-                                            selected: false
-                                            enabled: false
-                                        }
-
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isNotificationsWidget(widgetRow.widgetInstance.widgetType)
-                                            label: "Display: " + root.summaryDisplayModeLabel(widgetRow.widgetInstance)
-                                            selected: false
-                                            enabled: false
-                                        }
-
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isNotificationsWidget(widgetRow.widgetInstance.widgetType)
-                                            label: "Badge: " + root.notificationBadgeLabel(widgetRow.widgetInstance)
-                                            selected: false
-                                            enabled: false
-                                        }
-
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isTrayWidget(widgetRow.widgetInstance.widgetType)
-                                            label: root.traySummary(widgetRow.widgetInstance)
-                                            selected: false
-                                            enabled: false
-                                        }
-
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isTaskbarWidget(widgetRow.widgetInstance.widgetType)
-                                            label: root.taskbarSummary(widgetRow.widgetInstance)
-                                            selected: false
-                                            enabled: false
-                                        }
-
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isWorkspacesWidget(widgetRow.widgetInstance.widgetType)
-                                            label: root.workspaceSummary(widgetRow.widgetInstance)
-                                            selected: false
-                                            enabled: false
-                                        }
-
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isUpdatesWidget(widgetRow.widgetInstance.widgetType)
-                                            label: "Display: " + root.summaryDisplayModeLabel(widgetRow.widgetInstance)
-                                            selected: false
-                                            enabled: false
-                                        }
-
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isBluetoothWidget(widgetRow.widgetInstance.widgetType)
-                                            label: "Display: " + root.summaryDisplayModeLabel(widgetRow.widgetInstance)
-                                            selected: false
-                                            enabled: false
-                                        }
-
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isMusicWidget(widgetRow.widgetInstance.widgetType)
-                                            label: "Display: " + root.summaryDisplayModeLabel(widgetRow.widgetInstance)
-                                            selected: false
-                                            enabled: false
-                                        }
-
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isMusicWidget(widgetRow.widgetInstance.widgetType)
-                                            label: "Text: " + root.musicTextWidth(widgetRow.widgetInstance) + "px"
-                                            selected: false
-                                            enabled: false
-                                        }
-
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isPrinterWidget(widgetRow.widgetInstance.widgetType)
-                                            label: "Display: " + root.summaryDisplayModeLabel(widgetRow.widgetInstance)
-                                            selected: false
-                                            enabled: false
-                                        }
-
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isPrinterWidget(widgetRow.widgetInstance.widgetType)
-                                            label: "Badge: " + root.printerBadgeLabel(widgetRow.widgetInstance)
-                                            selected: false
-                                            enabled: false
-                                        }
-
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isPrivacyWidget(widgetRow.widgetInstance.widgetType)
-                                            label: "Display: " + root.summaryDisplayModeLabel(widgetRow.widgetInstance)
-                                            selected: false
-                                            enabled: false
-                                        }
-
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isPrivacyWidget(widgetRow.widgetInstance.widgetType)
-                                            label: root.pulseDotLabel(widgetRow.widgetInstance)
-                                            selected: false
-                                            enabled: false
-                                        }
-
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isRecordingWidget(widgetRow.widgetInstance.widgetType)
-                                            label: "Display: " + root.summaryDisplayModeLabel(widgetRow.widgetInstance)
-                                            selected: false
-                                            enabled: false
-                                        }
-
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isRecordingWidget(widgetRow.widgetInstance.widgetType)
-                                            label: root.pulseDotLabel(widgetRow.widgetInstance)
-                                            selected: false
-                                            enabled: false
-                                        }
-
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isCavaWidget(widgetRow.widgetInstance.widgetType)
-                                            label: "Bars: " + root.cavaBarCount(widgetRow.widgetInstance)
-                                            selected: false
-                                            enabled: false
-                                        }
-
-                                        SharedWidgets.FilterChip {
-                                            visible: root.isSeparatorWidget(widgetRow.widgetInstance.widgetType)
-                                            label: root.separatorSummary(widgetRow.widgetInstance)
-                                            selected: false
-                                            enabled: false
+                                            delegate: SharedWidgets.FilterChip {
+                                                required property var modelData
+                                                label: String(modelData || "")
+                                                selected: false
+                                                enabled: false
+                                            }
                                         }
 
                                         SettingsActionButton {
@@ -1003,7 +955,7 @@ Item {
                         spacing: Colors.spacingS
 
                         Repeater {
-                            model: BarWidgetRegistry.search(root.widgetSearchQuery, root.addSection)
+                            model: root.availableWidgetsForPicker()
                             delegate: SettingsListRow {
                                 required property var modelData
                                 minimumHeight: root.compactMode ? 88 : 64
@@ -1019,13 +971,36 @@ Item {
                                     Layout.fillWidth: true
                                     spacing: Colors.spacingXXS
 
-                                    Text {
-                                        text: modelData.label
-                                        color: Colors.text
-                                        font.pixelSize: Colors.fontSizeMedium
-                                        font.weight: Font.Medium
+                                    RowLayout {
                                         Layout.fillWidth: true
-                                        wrapMode: Text.WordWrap
+                                        spacing: Colors.spacingS
+
+                                        Text {
+                                            text: modelData.label
+                                            color: Colors.text
+                                            font.pixelSize: Colors.fontSizeMedium
+                                            font.weight: Font.Medium
+                                            Layout.fillWidth: true
+                                            wrapMode: Text.WordWrap
+                                        }
+
+                                        Rectangle {
+                                            radius: Colors.radiusSmall
+                                            color: String(modelData.section || "") === root.addSection ? Colors.withAlpha(Colors.primary, 0.16) : Colors.withAlpha(Colors.surface, 0.55)
+                                            border.color: String(modelData.section || "") === root.addSection ? Colors.primary : Colors.border
+                                            border.width: 1
+                                            implicitWidth: sectionBadgeLabel.implicitWidth + Colors.spacingM
+                                            implicitHeight: sectionBadgeLabel.implicitHeight + Colors.spacingXS
+
+                                            Text {
+                                                id: sectionBadgeLabel
+                                                anchors.centerIn: parent
+                                                text: "Best in " + root.sectionLabel(String(modelData.section || "right"))
+                                                color: String(modelData.section || "") === root.addSection ? Colors.primary : Colors.textSecondary
+                                                font.pixelSize: Colors.fontSizeXS
+                                                font.weight: Font.Medium
+                                            }
+                                        }
                                     }
 
                                     Text {
@@ -1051,6 +1026,15 @@ Item {
                                     }
                                 }
                             }
+                        }
+
+                        Text {
+                            width: parent.width
+                            visible: root.availableWidgetsForPicker().length === 0
+                            text: "No widgets match \"" + root.widgetSearchQuery + "\"."
+                            color: Colors.textSecondary
+                            font.pixelSize: Colors.fontSizeSmall
+                            wrapMode: Text.WordWrap
                         }
                     }
                 }
@@ -1134,494 +1118,32 @@ Item {
                         body: root.pluginSettingsError
                     }
 
-                    SettingsSliderRow {
-                        visible: !!root.editingWidget && root.editingWidget.widgetType === "spacer"
-                        label: "Spacer Size"
-                        min: 8
-                        max: 80
-                        value: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.size !== undefined ? root.editingWidget.settings.size : 24
-                        onMoved: value => root.updateSpacerSize(value)
-                    }
+                    Repeater {
+                        model: root.editingWidgetSchema
 
-                    SettingsModeRow {
-                        visible: !!root.editingWidget && root.isSystemStatWidget(root.editingWidget.widgetType)
-                        label: "Display Mode"
-                        description: "Choose whether this stat adapts to bar orientation or always stays full, compact, or icon-only. Compact mode may shorten long values automatically to keep vertical bars narrow."
-                        currentValue: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.displayMode ? root.editingWidget.settings.displayMode : "auto"
-                        options: [
-                            {
-                                value: "auto",
-                                label: "Auto"
-                            },
-                            {
-                                value: "full",
-                                label: "Full"
-                            },
-                            {
-                                value: "compact",
-                                label: "Compact"
-                            },
-                            {
-                                value: "icon",
-                                label: "Icon"
+                        delegate: Loader {
+                            required property var modelData
+                            readonly property var field: modelData
+                            Layout.fillWidth: true
+                            active: !!root.editingWidget
+
+                            sourceComponent: {
+                                if (field.type === "mode")
+                                    return schemaModeField;
+                                if (field.type === "slider")
+                                    return schemaSliderField;
+                                if (field.type === "toggle")
+                                    return schemaToggleField;
+                                if (field.type === "text")
+                                    return schemaTextField;
+                                return null;
                             }
-                        ]
-                        onModeSelected: value => root.updateEditingWidgetSetting("displayMode", value)
-                    }
 
-                    SettingsModeRow {
-                        visible: !!root.editingWidget && root.isSystemStatWidget(root.editingWidget.widgetType)
-                        label: "Value Style"
-                        description: root.editingWidget && root.editingWidget.widgetType === "ramStatus" ? "Choose whether memory shows percent used or the current used-memory value. Compact mode can still fall back to percent when the usage text is too long." : "Choose whether this stat shows percent only, usage text, or usage with temperature. Compact mode can shorten long values automatically."
-                        currentValue: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.valueStyle ? root.editingWidget.settings.valueStyle : (root.editingWidget && root.editingWidget.widgetType === "ramStatus" ? "usage" : "percent")
-                        options: root.editingWidget && root.editingWidget.widgetType === "ramStatus" ? [
-                            {
-                                value: "usage",
-                                label: "Usage"
-                            },
-                            {
-                                value: "percent",
-                                label: "Percent"
+                            onLoaded: {
+                                if (item && item.field !== undefined)
+                                    item.field = field;
                             }
-                        ] : [
-                            {
-                                value: "percent",
-                                label: "Percent"
-                            },
-                            {
-                                value: "usage",
-                                label: "Usage"
-                            },
-                            {
-                                value: "usageTemp",
-                                label: "Usage + Temp"
-                            }
-                        ]
-                        onModeSelected: value => root.updateEditingWidgetSetting("valueStyle", value)
-                    }
-
-                    SettingsModeRow {
-                        visible: !!root.editingWidget && root.isSummaryDisplayWidget(root.editingWidget.widgetType)
-                        label: "Display Mode"
-                        description: "Choose whether this widget adapts to bar orientation automatically, always shows its text/details, or stays icon-only."
-                        currentValue: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.displayMode ? root.editingWidget.settings.displayMode : "auto"
-                        options: [
-                            {
-                                value: "auto",
-                                label: "Auto"
-                            },
-                            {
-                                value: "full",
-                                label: "Full"
-                            },
-                            {
-                                value: "icon",
-                                label: "Icon"
-                            }
-                        ]
-                        onModeSelected: value => root.updateEditingWidgetSetting("displayMode", value)
-                    }
-
-                    SettingsSliderRow {
-                        visible: !!root.editingWidget && root.isWindowTitleWidget(root.editingWidget.widgetType)
-                        label: "Title Width"
-                        icon: "󰨈"
-                        min: 120
-                        max: 520
-                        value: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.maxTitleWidth !== undefined ? root.editingWidget.settings.maxTitleWidth : 300
-                        onMoved: value => root.updateEditingWidgetSetting("maxTitleWidth", value)
-                    }
-
-                    SettingsToggleRow {
-                        visible: !!root.editingWidget && root.isWindowTitleWidget(root.editingWidget.widgetType)
-                        label: "App Icon"
-                        icon: "󰀻"
-                        checked: root.editingWidget && root.editingWidget.settings ? root.editingWidget.settings.showAppIcon !== false : true
-                        enabledText: "Show the active app icon before the title."
-                        disabledText: "Hide the app icon and show only textual context."
-                        onToggled: root.updateEditingWidgetSetting("showAppIcon", !(root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.showAppIcon !== false))
-                    }
-
-                    SettingsToggleRow {
-                        visible: !!root.editingWidget && root.isWindowTitleWidget(root.editingWidget.widgetType)
-                        label: "Git Status"
-                        icon: "󰊢"
-                        checked: root.editingWidget && root.editingWidget.settings ? root.editingWidget.settings.showGitStatus !== false : true
-                        enabledText: "Show inline repository status next to the active window title."
-                        disabledText: "Hide inline repository status from the title widget."
-                        onToggled: root.updateEditingWidgetSetting("showGitStatus", !(root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.showGitStatus !== false))
-                    }
-
-                    SettingsToggleRow {
-                        visible: !!root.editingWidget && root.isWindowTitleWidget(root.editingWidget.widgetType)
-                        label: "Media Context"
-                        icon: "󰎆"
-                        checked: root.editingWidget && root.editingWidget.settings ? root.editingWidget.settings.showMediaContext !== false : true
-                        enabledText: "Show the mini media context badge when media is active."
-                        disabledText: "Hide inline media context from the title widget."
-                        onToggled: root.updateEditingWidgetSetting("showMediaContext", !(root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.showMediaContext !== false))
-                    }
-
-                    SettingsModeRow {
-                        visible: !!root.editingWidget && root.isMediaBarWidget(root.editingWidget.widgetType)
-                        label: "Display Mode"
-                        description: "Choose whether the media widget adapts to bar orientation automatically, always shows track text, or stays icon-only."
-                        currentValue: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.displayMode ? root.editingWidget.settings.displayMode : "auto"
-                        options: [
-                            {
-                                value: "auto",
-                                label: "Auto"
-                            },
-                            {
-                                value: "full",
-                                label: "Full"
-                            },
-                            {
-                                value: "icon",
-                                label: "Icon"
-                            }
-                        ]
-                        onModeSelected: value => root.updateEditingWidgetSetting("displayMode", value)
-                    }
-
-                    SettingsSliderRow {
-                        visible: !!root.editingWidget && root.isMediaBarWidget(root.editingWidget.widgetType)
-                        label: "Track Text Width"
-                        icon: "󰛇"
-                        min: 80
-                        max: 240
-                        value: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.maxTextWidth !== undefined ? root.editingWidget.settings.maxTextWidth : 150
-                        onMoved: value => root.updateEditingWidgetSetting("maxTextWidth", value)
-                    }
-
-                    SettingsModeRow {
-                        visible: !!root.editingWidget && root.isKeyboardLayoutWidget(root.editingWidget.widgetType)
-                        label: "Label Mode"
-                        description: "Choose between the compact three-letter abbreviation or the full layout name."
-                        currentValue: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.labelMode ? root.editingWidget.settings.labelMode : "short"
-                        options: [
-                            {
-                                value: "short",
-                                label: "Short"
-                            },
-                            {
-                                value: "full",
-                                label: "Full"
-                            }
-                        ]
-                        onModeSelected: value => root.updateEditingWidgetSetting("labelMode", value)
-                    }
-
-                    SettingsModeRow {
-                        visible: !!root.editingWidget && root.isDateTimeWidget(root.editingWidget.widgetType)
-                        label: "Display Mode"
-                        description: "Choose whether the clock adapts to bar orientation automatically, always shows the full time row, or stays icon-only."
-                        currentValue: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.displayMode ? root.editingWidget.settings.displayMode : "auto"
-                        options: [
-                            { value: "auto", label: "Auto" },
-                            { value: "full", label: "Full" },
-                            { value: "icon", label: "Icon" }
-                        ]
-                        onModeSelected: value => root.updateEditingWidgetSetting("displayMode", value)
-                    }
-
-                    SettingsToggleRow {
-                        visible: !!root.editingWidget && root.isDateTimeWidget(root.editingWidget.widgetType)
-                        label: "Show Date"
-                        icon: "󰃭"
-                        checked: root.editingWidget && root.editingWidget.settings ? root.editingWidget.settings.showDate !== false : true
-                        enabledText: "Show the date segment alongside the time when space allows."
-                        disabledText: "Show only the time in the bar widget."
-                        onToggled: root.updateEditingWidgetSetting("showDate", !(root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.showDate !== false))
-                    }
-
-                    SettingsModeRow {
-                        visible: !!root.editingWidget && root.isNotificationsWidget(root.editingWidget.widgetType)
-                        label: "Display Mode"
-                        description: "Choose whether the notifications widget adapts to bar orientation automatically, always shows extra status text, or stays icon-only."
-                        currentValue: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.displayMode ? root.editingWidget.settings.displayMode : "auto"
-                        options: [
-                            { value: "auto", label: "Auto" },
-                            { value: "full", label: "Full" },
-                            { value: "icon", label: "Icon" }
-                        ]
-                        onModeSelected: value => root.updateEditingWidgetSetting("displayMode", value)
-                    }
-
-                    SettingsModeRow {
-                        visible: !!root.editingWidget && root.isNotificationsWidget(root.editingWidget.widgetType)
-                        label: "Badge Style"
-                        description: "Choose whether unread notifications show as a dot, a count, or no badge at all."
-                        currentValue: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.badgeStyle ? root.editingWidget.settings.badgeStyle : "dot"
-                        options: [
-                            { value: "dot", label: "Dot" },
-                            { value: "count", label: "Count" },
-                            { value: "off", label: "Off" }
-                        ]
-                        onModeSelected: value => root.updateEditingWidgetSetting("badgeStyle", value)
-                    }
-
-                    SettingsSliderRow {
-                        visible: !!root.editingWidget && root.isTrayWidget(root.editingWidget.widgetType)
-                        label: "Item Size"
-                        icon: "󰍹"
-                        min: 18
-                        max: 40
-                        value: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.itemSize !== undefined ? root.editingWidget.settings.itemSize : 24
-                        onMoved: value => root.updateEditingWidgetSetting("itemSize", value)
-                    }
-
-                    SettingsSliderRow {
-                        visible: !!root.editingWidget && root.isTrayWidget(root.editingWidget.widgetType)
-                        label: "Icon Size"
-                        icon: "󰀻"
-                        min: 12
-                        max: 32
-                        value: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.iconSize !== undefined ? root.editingWidget.settings.iconSize : 18
-                        onMoved: value => root.updateEditingWidgetSetting("iconSize", value)
-                    }
-
-                    SettingsSliderRow {
-                        visible: !!root.editingWidget && root.isTrayWidget(root.editingWidget.widgetType)
-                        label: "Spacing"
-                        icon: "󰝗"
-                        min: 2
-                        max: 16
-                        value: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.spacing !== undefined ? root.editingWidget.settings.spacing : 6
-                        onMoved: value => root.updateEditingWidgetSetting("spacing", value)
-                    }
-
-                    SettingsSliderRow {
-                        visible: !!root.editingWidget && root.isTaskbarWidget(root.editingWidget.widgetType)
-                        label: "Button Size"
-                        icon: "󰝗"
-                        min: 24
-                        max: 56
-                        value: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.buttonSize !== undefined ? root.editingWidget.settings.buttonSize : 32
-                        onMoved: value => root.updateEditingWidgetSetting("buttonSize", value)
-                    }
-
-                    SettingsSliderRow {
-                        visible: !!root.editingWidget && root.isTaskbarWidget(root.editingWidget.widgetType)
-                        label: "Icon Size"
-                        icon: "󰀻"
-                        min: 14
-                        max: 36
-                        value: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.iconSize !== undefined ? root.editingWidget.settings.iconSize : 20
-                        onMoved: value => root.updateEditingWidgetSetting("iconSize", value)
-                    }
-
-                    SettingsSliderRow {
-                        visible: !!root.editingWidget && root.isTaskbarWidget(root.editingWidget.widgetType)
-                        label: "Max Unpinned Apps"
-                        icon: "󰇚"
-                        min: 0
-                        max: 20
-                        value: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.maxUnpinned !== undefined ? root.editingWidget.settings.maxUnpinned : 0
-                        onMoved: value => root.updateEditingWidgetSetting("maxUnpinned", value)
-                    }
-
-                    SettingsToggleRow {
-                        visible: !!root.editingWidget && root.isTaskbarWidget(root.editingWidget.widgetType)
-                        label: "Running Indicator"
-                        icon: "󰄯"
-                        checked: root.editingWidget && root.editingWidget.settings ? root.editingWidget.settings.showRunningIndicator !== false : true
-                        enabledText: "Show the running-state dot on active task buttons."
-                        disabledText: "Hide the running-state indicator dot."
-                        onToggled: root.updateEditingWidgetSetting("showRunningIndicator", !(root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.showRunningIndicator !== false))
-                    }
-
-                    SettingsToggleRow {
-                        visible: !!root.editingWidget && root.isTaskbarWidget(root.editingWidget.widgetType)
-                        label: "Separator"
-                        icon: "󰇘"
-                        checked: root.editingWidget && root.editingWidget.settings ? root.editingWidget.settings.showSeparator !== false : true
-                        enabledText: "Separate pinned apps from unpinned running apps."
-                        disabledText: "Remove the divider between pinned and unpinned apps."
-                        onToggled: root.updateEditingWidgetSetting("showSeparator", !(root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.showSeparator !== false))
-                    }
-
-                    SettingsToggleRow {
-                        visible: !!root.editingWidget && root.isWorkspacesWidget(root.editingWidget.widgetType)
-                        label: "Add Button"
-                        icon: "󰐕"
-                        checked: root.editingWidget && root.editingWidget.settings ? root.editingWidget.settings.showAddButton !== false : true
-                        enabledText: "Show the quick add-workspace button at the end of the strip."
-                        disabledText: "Hide the add-workspace button from this widget instance."
-                        onToggled: root.updateEditingWidgetSetting("showAddButton", !(root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.showAddButton !== false))
-                    }
-
-                    SettingsToggleRow {
-                        visible: !!root.editingWidget && root.isWorkspacesWidget(root.editingWidget.widgetType)
-                        label: "Mini-map"
-                        icon: "󰍹"
-                        checked: root.editingWidget && root.editingWidget.settings ? root.editingWidget.settings.showMiniMap !== false : true
-                        enabledText: "Show live mini-map window previews inside workspace pills."
-                        disabledText: "Hide mini-map previews and keep the pills text-only."
-                        onToggled: root.updateEditingWidgetSetting("showMiniMap", !(root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.showMiniMap !== false))
-                    }
-
-                    SettingsModeRow {
-                        visible: !!root.editingWidget && root.isUpdatesWidget(root.editingWidget.widgetType)
-                        label: "Display Mode"
-                        description: "Choose whether the updates widget adapts to bar orientation automatically, always shows its count, or stays icon-only."
-                        currentValue: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.displayMode ? root.editingWidget.settings.displayMode : "auto"
-                        options: [
-                            { value: "auto", label: "Auto" },
-                            { value: "full", label: "Full" },
-                            { value: "icon", label: "Icon" }
-                        ]
-                        onModeSelected: value => root.updateEditingWidgetSetting("displayMode", value)
-                    }
-
-                    SettingsModeRow {
-                        visible: !!root.editingWidget && root.isBluetoothWidget(root.editingWidget.widgetType)
-                        label: "Display Mode"
-                        description: "Choose whether the Bluetooth widget adapts to bar orientation automatically, always shows status text, or stays icon-only."
-                        currentValue: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.displayMode ? root.editingWidget.settings.displayMode : "auto"
-                        options: [
-                            { value: "auto", label: "Auto" },
-                            { value: "full", label: "Full" },
-                            { value: "icon", label: "Icon" }
-                        ]
-                        onModeSelected: value => root.updateEditingWidgetSetting("displayMode", value)
-                    }
-
-                    SettingsModeRow {
-                        visible: !!root.editingWidget && root.isMusicWidget(root.editingWidget.widgetType)
-                        label: "Display Mode"
-                        description: "Choose whether the music widget adapts to bar orientation automatically, always shows track text, or stays icon-only."
-                        currentValue: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.displayMode ? root.editingWidget.settings.displayMode : "auto"
-                        options: [
-                            { value: "auto", label: "Auto" },
-                            { value: "full", label: "Full" },
-                            { value: "icon", label: "Icon" }
-                        ]
-                        onModeSelected: value => root.updateEditingWidgetSetting("displayMode", value)
-                    }
-
-                    SettingsSliderRow {
-                        visible: !!root.editingWidget && root.isMusicWidget(root.editingWidget.widgetType)
-                        label: "Track Text Width"
-                        icon: "󰛇"
-                        min: 60
-                        max: 220
-                        value: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.maxTextWidth !== undefined ? root.editingWidget.settings.maxTextWidth : 100
-                        onMoved: value => root.updateEditingWidgetSetting("maxTextWidth", value)
-                    }
-
-                    SettingsModeRow {
-                        visible: !!root.editingWidget && root.isPrinterWidget(root.editingWidget.widgetType)
-                        label: "Display Mode"
-                        description: "Choose whether the printer widget adapts to bar orientation automatically, always shows job badges, or stays icon-only."
-                        currentValue: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.displayMode ? root.editingWidget.settings.displayMode : "auto"
-                        options: [
-                            { value: "auto", label: "Auto" },
-                            { value: "full", label: "Full" },
-                            { value: "icon", label: "Icon" }
-                        ]
-                        onModeSelected: value => root.updateEditingWidgetSetting("displayMode", value)
-                    }
-
-                    SettingsModeRow {
-                        visible: !!root.editingWidget && root.isPrinterWidget(root.editingWidget.widgetType)
-                        label: "Badge Style"
-                        description: "Choose whether active print jobs show as a count badge, a dot, or no badge."
-                        currentValue: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.badgeStyle ? root.editingWidget.settings.badgeStyle : "count"
-                        options: [
-                            { value: "count", label: "Count" },
-                            { value: "dot", label: "Dot" },
-                            { value: "off", label: "Off" }
-                        ]
-                        onModeSelected: value => root.updateEditingWidgetSetting("badgeStyle", value)
-                    }
-
-                    SettingsModeRow {
-                        visible: !!root.editingWidget && root.isPrivacyWidget(root.editingWidget.widgetType)
-                        label: "Display Mode"
-                        description: "Choose whether the privacy widget adapts to bar orientation automatically, always shows text, or stays icon-only."
-                        currentValue: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.displayMode ? root.editingWidget.settings.displayMode : "auto"
-                        options: [
-                            { value: "auto", label: "Auto" },
-                            { value: "full", label: "Full" },
-                            { value: "icon", label: "Icon" }
-                        ]
-                        onModeSelected: value => root.updateEditingWidgetSetting("displayMode", value)
-                    }
-
-                    SettingsToggleRow {
-                        visible: !!root.editingWidget && root.isPrivacyWidget(root.editingWidget.widgetType)
-                        label: "Pulse Dot"
-                        icon: "󰄯"
-                        checked: root.editingWidget && root.editingWidget.settings ? root.editingWidget.settings.showPulseDot !== false : true
-                        enabledText: "Show the animated activity dot beside the privacy icon."
-                        disabledText: "Hide the animated pulse dot and keep only the icon/text."
-                        onToggled: root.updateEditingWidgetSetting("showPulseDot", !(root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.showPulseDot !== false))
-                    }
-
-                    SettingsModeRow {
-                        visible: !!root.editingWidget && root.isRecordingWidget(root.editingWidget.widgetType)
-                        label: "Display Mode"
-                        description: "Choose whether the recording widget adapts to bar orientation automatically, always shows REC text, or stays icon-only."
-                        currentValue: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.displayMode ? root.editingWidget.settings.displayMode : "auto"
-                        options: [
-                            { value: "auto", label: "Auto" },
-                            { value: "full", label: "Full" },
-                            { value: "icon", label: "Icon" }
-                        ]
-                        onModeSelected: value => root.updateEditingWidgetSetting("displayMode", value)
-                    }
-
-                    SettingsToggleRow {
-                        visible: !!root.editingWidget && root.isRecordingWidget(root.editingWidget.widgetType)
-                        label: "Pulse Dot"
-                        icon: "󰄯"
-                        checked: root.editingWidget && root.editingWidget.settings ? root.editingWidget.settings.showPulseDot !== false : true
-                        enabledText: "Show the animated recording dot beside the label."
-                        disabledText: "Hide the recording pulse dot."
-                        onToggled: root.updateEditingWidgetSetting("showPulseDot", !(root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.showPulseDot !== false))
-                    }
-
-                    SettingsSliderRow {
-                        visible: !!root.editingWidget && root.isCavaWidget(root.editingWidget.widgetType)
-                        label: "Bar Count"
-                        icon: "󰎈"
-                        min: 4
-                        max: 20
-                        value: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.barCount !== undefined ? root.editingWidget.settings.barCount : 8
-                        onMoved: value => root.updateEditingWidgetSetting("barCount", value)
-                    }
-
-                    SettingsSliderRow {
-                        visible: !!root.editingWidget && root.isSeparatorWidget(root.editingWidget.widgetType)
-                        label: "Thickness"
-                        icon: "󰇘"
-                        min: 1
-                        max: 8
-                        value: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.thickness !== undefined ? root.editingWidget.settings.thickness : 1
-                        onMoved: value => root.updateEditingWidgetSetting("thickness", value)
-                    }
-
-                    SettingsSliderRow {
-                        visible: !!root.editingWidget && root.isSeparatorWidget(root.editingWidget.widgetType)
-                        label: "Length"
-                        icon: "󰝗"
-                        min: 8
-                        max: 64
-                        value: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.length !== undefined ? root.editingWidget.settings.length : 20
-                        onMoved: value => root.updateEditingWidgetSetting("length", value)
-                    }
-
-                    SettingsSliderRow {
-                        visible: !!root.editingWidget && root.isSeparatorWidget(root.editingWidget.widgetType)
-                        label: "Opacity"
-                        icon: "󰖔"
-                        min: 0.1
-                        max: 1.0
-                        step: 0.05
-                        unit: "%"
-                        value: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.opacity !== undefined ? root.editingWidget.settings.opacity : 0.8
-                        onMoved: value => root.updateEditingWidgetSetting("opacity", value)
+                        }
                     }
 
                     SharedWidgets.SshWidgetSettings {

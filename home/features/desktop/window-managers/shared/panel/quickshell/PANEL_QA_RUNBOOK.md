@@ -25,6 +25,8 @@ Focused commands:
 
 - automated gate: settings runtime smoke:
   - `qs-panel-runtime-verify --skip-surfaces --skip-multibar`
+- automated gate: settings-specific QA stack:
+  - `scripts/check-settings-qa.sh --skip-switch`
 - automated gate: surface runtime smoke:
   - `qs-panel-runtime-verify --skip-settings --skip-multibar`
 - automated gate: synthetic multibar smoke:
@@ -90,6 +92,15 @@ The live settings and surface phases use `PASS`, `WARN`, and `FAIL` outcomes onl
 4. Verifies sparse CPU / Memory / GPU widget settings inherit missing defaults during normalization.
 
 This is the fastest no-session gate for stat-widget and config-migration changes.
+
+`scripts/check-settings-qa.sh --skip-switch`
+
+1. Runs the live first-open `Bar Widgets` capture and re-entry control check.
+2. Runs the settings guardrails flow.
+3. Runs the widget picker search regression harness.
+4. Runs the bar-widget reorder regression harness.
+
+Use this when a change is concentrated in settings behavior, bar-widget management, or widget picker flows and you want tighter coverage than the broad runtime gate.
 
 `qs-panel-preview`
 

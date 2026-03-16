@@ -13,6 +13,8 @@ QtObject {
     property bool capturing: false
     property string _captureMode: ""
     property string _captureMonitor: ""
+    property string _captureStdout: ""
+    property string _captureStderr: ""
 
     // ── Signals ──────────────────────────────────
     signal captureStarted()
@@ -30,6 +32,8 @@ QtObject {
         root.capturing = true;
         root._captureMode = mode;
         root._captureMonitor = monitor || "";
+        root._captureStdout = "";
+        root._captureStderr = "";
         root.captureStarted();
 
         _captureProc.command = root._captureMonitor !== ""
@@ -38,15 +42,21 @@ QtObject {
         _captureProc.running = true;
     }
 
+    function _resetCaptureState() {
+        root.capturing = false;
+        root._captureMode = "";
+        root._captureMonitor = "";
+        root._captureStdout = "";
+        root._captureStderr = "";
+    }
+
     property Process _captureProc: Process {
         running: false
-        stdout: StdioCollector {
-            onStreamFinished: {
-                root.capturing = false;
-                var result = (this.text || "").trim();
+        onExited: (exitCode, exitStatus) => {
+                var result = (root._captureStdout || "").trim();
                 var parts = result.split("|");
 
-                if (parts[0] === "OK" && parts[1]) {
+                if (exitCode === 0 && parts[0] === "OK" && parts[1]) {
                     var path = parts[1];
                     root.lastScreenshotPath = path;
                     if (root._captureMode === "region") {
@@ -63,12 +73,23 @@ QtObject {
                 } else if (parts[0] === "ERROR" && parts[1] === "cancelled") {
                     // User cancelled slurp — silent
                 } else {
-                    var msg = parts.length > 1 ? parts[1] : "Unknown error";
+                    var msg = parts.length > 1 && parts[1] ? parts[1] : root._captureStderr;
+                    if (!msg || msg.trim() === "")
+                        msg = exitCode === 0 ? "Unknown error" : "qs-screenshot exited with code " + exitCode;
                     root.captureFailed(msg);
+                    ToastService.showError("Screenshot failed", msg);
                 }
 
-                root._captureMode = "";
-                root._captureMonitor = "";
+                root._resetCaptureState();
+        }
+        stdout: StdioCollector {
+            onStreamFinished: {
+                root._captureStdout = this.text || "";
+            }
+        }
+        stderr: StdioCollector {
+            onStreamFinished: {
+                root._captureStderr = (this.text || "").trim();
             }
         }
     }

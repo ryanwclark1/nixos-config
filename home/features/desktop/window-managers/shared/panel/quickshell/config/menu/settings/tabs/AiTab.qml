@@ -22,9 +22,10 @@ Item {
             iconName: "󰚩"
             description: "Choose AI backend and model for the chat assistant."
 
-            SettingsModeRow {
+            SettingsSelectRow {
                 label: "Provider"
                 icon: "󱁍"
+                description: "A dropdown scales better here because providers may expand over time."
                 currentValue: Config.aiProvider
                 options: [
                     { value: "ollama", label: "Ollama" },
@@ -33,7 +34,7 @@ Item {
                     { value: "gemini", label: "Gemini" },
                     { value: "custom", label: "Custom" }
                 ]
-                onModeSelected: value => Config.aiProvider = value
+                onOptionSelected: value => Config.aiProvider = value
             }
 
             SettingsTextInputRow {
@@ -73,22 +74,20 @@ Item {
                     }
                 }
 
-                Flow {
+                SettingsSelectRow {
                     visible: AiService.availableModels.length > 0
-                    Layout.fillWidth: true
-                    width: parent.width
-                    spacing: Colors.spacingS
-
-                    Repeater {
-                        model: AiService.availableModels
-
-                        delegate: SharedWidgets.FilterChip {
-                            required property string modelData
-                            label: modelData
-                            selected: Config.aiModel === modelData || (Config.aiModel === "" && AiService.activeModel === modelData)
-                            onClicked: Config.aiModel = modelData
-                        }
-                    }
+                    label: "Detected Models"
+                    icon: "󰘦"
+                    description: "Choose from models reported by Ollama instead of scanning a large chip list."
+                    currentValue: Config.aiModel !== "" ? Config.aiModel : AiService.activeModel
+                    maxMenuHeight: 220
+                    options: AiService.availableModels.map(function (modelName) {
+                        return {
+                            value: String(modelName),
+                            label: String(modelName)
+                        };
+                    })
+                    onOptionSelected: value => Config.aiModel = value
                 }
 
                 SettingsInfoCallout {

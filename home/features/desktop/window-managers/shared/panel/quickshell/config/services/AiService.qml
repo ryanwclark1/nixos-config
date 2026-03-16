@@ -9,7 +9,13 @@ QtObject {
 
     // ── Provider state ──────────────────────────
     readonly property string activeProvider: Config.aiProvider
-    readonly property string activeModel: Config.aiModel || Providers.defaultModel(Config.aiProvider)
+    readonly property string activeModel: {
+        if (Config.aiModel)
+            return Config.aiModel;
+        if (Config.aiProvider === "ollama" && availableModels.length > 0)
+            return availableModels[0];
+        return Providers.defaultModel(Config.aiProvider);
+    }
     property var availableModels: Providers.defaultModels(Config.aiProvider)
 
     // ── Conversation state ──────────────────────
@@ -544,6 +550,13 @@ QtObject {
             _addSystemMessage("**API key required** for " + Providers.providerLabel(provider) +
                 ".\n\nSet the `" + envName + "` environment variable, or configure it in settings." +
                 "\n\nAlternatively, use `/provider ollama` for local models.");
+            return;
+        }
+
+        if (provider === "ollama" && !Config.aiModel && availableModels.length === 0) {
+            refreshModels();
+            _appendMessage("user", text.trim());
+            _addSystemMessage("**No Ollama model available yet**.\n\nStart Ollama if needed, then refresh models or wait a moment for `/api/tags` to load.");
             return;
         }
 

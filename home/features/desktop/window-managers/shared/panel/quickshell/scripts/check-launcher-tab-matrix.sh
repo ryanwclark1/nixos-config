@@ -21,14 +21,14 @@ require_literal "$launcher_qml" 'return ["contextual", "results", "mode"].indexO
 require_literal "$launcher_qml" 'readonly property string tabControlHintText: {' "tabControlHintText property"
 require_literal "$launcher_qml" 'if (launcherTabBehavior === "mode")' "tab matrix mode hint branch"
 require_literal "$launcher_qml" 'if (launcherTabBehavior === "results")' "tab matrix results hint branch"
-require_literal "$launcher_qml" 'return hasResults ? "Tab: next result • Shift+Tab: prev mode" : "Tab: next mode • Shift+Tab: prev mode";' "tab matrix contextual hint branch"
+require_literal "$launcher_qml" 'return hasResults ? "Tab: next result • Shift+Tab: next mode" : "Tab: next mode • Shift+Tab: next mode";' "tab matrix contextual hint branch"
 
 # Runtime key handling matrix.
 require_literal "$launcher_qml" 'else if (launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && launcherRoot.showLauncherHome && (event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_Tab) {' "Ctrl+Tab drun category branch"
 require_literal "$launcher_qml" 'var direction = (event.modifiers & Qt.ShiftModifier) ? -1 : 1;' "Ctrl+Tab category direction"
 require_literal "$launcher_qml" 'if (launcherRoot.cycleDrunCategoryFilter(direction))' "Ctrl+Tab category cycling"
 require_literal "$launcher_qml" 'event.key === Qt.Key_Backtab || (event.key === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier))' "Shift+Tab handling"
-require_literal "$launcher_qml" 'launcherRoot.cycleMode(-1);' "Shift+Tab cycles previous mode"
+require_literal "$launcher_qml" 'launcherRoot.cycleMode(1);' "Shift+Tab cycles next mode"
 require_literal "$launcher_qml" 'else if (event.key === Qt.Key_Tab) {' "Tab handling block"
 require_literal "$launcher_qml" 'if (launcherRoot.launcherTabBehavior === "mode")' "Tab mode branch"
 require_literal "$launcher_qml" 'else if (launcherRoot.launcherTabBehavior === "results")' "Tab results branch"
@@ -65,7 +65,7 @@ require_literal "$launcher_qml" 'readonly property string legendTertiaryAction: 
 require_literal "$launcher_qml" 'if (showingConfirm)' "legend tertiary confirm branch"
 require_literal "$launcher_qml" 'if (searchText !== "" || (drunCategoryFiltersEnabled && mode === "drun" && drunCategoryFilter !== ""))' "legend tertiary reset branch"
 require_literal "$launcher_qml" 'return "Esc: Reset";' "legend tertiary reset mapping"
-require_literal "$launcher_qml" 'return "Shift+Tab: Prev Mode";' "legend tertiary default mapping"
+require_literal "$launcher_qml" 'return "Shift+Tab: Next Mode";' "legend tertiary default mapping"
 
 # Wrapping semantics for mode/result cycling.
 require_literal "$launcher_qml" 'var nextIndex = (currentIndex + step + modeOrder.length) % modeOrder.length;' "mode cycle wrap-around"

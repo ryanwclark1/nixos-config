@@ -463,25 +463,18 @@ Item {
                 text: "MONITOR"
             }
 
-            Flow {
-                Layout.fillWidth: true
-                spacing: Colors.spacingS
-
-                SharedWidgets.FilterChip {
-                    label: "All"
-                    selected: root.wallpaperSelectedMonitor === "__all__"
-                    onClicked: root.wallpaperSelectedMonitor = "__all__"
-                }
-
-                Repeater {
-                    model: root.wallpaperMonitorNames
-                    delegate: SharedWidgets.FilterChip {
-                        required property string modelData
-                        label: modelData
-                        selected: root.wallpaperSelectedMonitor === modelData
-                        onClicked: root.wallpaperSelectedMonitor = modelData
-                    }
-                }
+            SettingsSelectRow {
+                label: "Monitor"
+                icon: "󰍹"
+                description: "Use a single target selector when you have multiple displays configured."
+                currentValue: root.wallpaperSelectedMonitor
+                options: [{ value: "__all__", label: "All Monitors" }].concat(root.wallpaperMonitorNames.map(function (monitorName) {
+                    return {
+                        value: String(monitorName),
+                        label: String(monitorName)
+                    };
+                }))
+                onOptionSelected: value => root.wallpaperSelectedMonitor = value
             }
         }
 

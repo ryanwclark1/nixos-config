@@ -19,9 +19,42 @@ Item {
     property int dragWebProviderTargetIndex: -1
     readonly property bool isSystemSection: sectionMode === "system"
     readonly property bool isLauncherSection: sectionMode === "launcher"
+    readonly property bool isLauncherGeneralSection: sectionMode === "launcher-general" || isLauncherSection
+    readonly property bool isLauncherSearchSection: sectionMode === "launcher-search"
+    readonly property bool isLauncherWebSection: sectionMode === "launcher-web"
+    readonly property bool isLauncherModesSection: sectionMode === "launcher-modes"
+    readonly property bool isLauncherRuntimeSection: sectionMode === "launcher-runtime"
     readonly property bool isControlCenterSection: sectionMode === "control-center"
-    readonly property string pageTitle: isLauncherSection ? "Launcher" : (isControlCenterSection ? "Control Center" : "Shell")
-    readonly property string pageIcon: isLauncherSection ? "󰍉" : (isControlCenterSection ? "󰖲" : "󰒓")
+    readonly property string pageTitle: {
+        if (isLauncherSearchSection)
+            return "Launcher Search";
+        if (isLauncherWebSection)
+            return "Launcher Web";
+        if (isLauncherModesSection)
+            return "Launcher Modes";
+        if (isLauncherRuntimeSection)
+            return "Launcher Runtime";
+        if (isLauncherGeneralSection)
+            return "Launcher";
+        if (isControlCenterSection)
+            return "Control Center";
+        return "Shell";
+    }
+    readonly property string pageIcon: {
+        if (isLauncherSearchSection)
+            return "󰍉";
+        if (isLauncherWebSection)
+            return "󰖟";
+        if (isLauncherModesSection)
+            return "󰌌";
+        if (isLauncherRuntimeSection)
+            return "󰔟";
+        if (isLauncherGeneralSection)
+            return "󰍉";
+        if (isControlCenterSection)
+            return "󰖲";
+        return "󰒓";
+    }
     readonly property var launcherModes: [
         {
             key: "drun",
@@ -617,10 +650,10 @@ Item {
         }
 
         SettingsCard {
-            visible: root.isLauncherSection
-            title: "Launcher Overview"
+            visible: root.isLauncherGeneralSection
+            title: "Launcher Behavior"
             iconName: "󰍉"
-            description: "Core behavior, home layout, and the default mode shown when the launcher opens."
+            description: "Choose the default launcher behavior and opening mode."
 
             SettingsInfoCallout {
                 iconName: "󰍉"
@@ -644,16 +677,6 @@ Item {
                     label: "Show Mode Hints"
                     icon: "󰌌"
                     configKey: "launcherShowModeHints"
-                }
-                SettingsToggleRow {
-                    label: "Show Home Sections"
-                    icon: "󰆍"
-                    configKey: "launcherShowHomeSections"
-                }
-                SettingsToggleRow {
-                    label: "App Category Filters"
-                    icon: "󰍉"
-                    configKey: "launcherDrunCategoryFiltersEnabled"
                 }
                 SettingsToggleRow {
                     label: "Keep Query on Mode Switch"
@@ -684,38 +707,25 @@ Item {
         }
 
         SettingsCard {
-            visible: root.isLauncherSection
-            title: "Search & Home"
-            iconName: "󰍉"
-            description: "Result volume, recents, suggestions, and how aggressively the launcher searches."
+            visible: root.isLauncherGeneralSection
+            title: "Home Layout"
+            iconName: "󰆍"
+            description: "Control what the launcher home view shows before a search is entered."
 
-            SettingsSliderRow {
-                label: "Max Results"
-                icon: "󰍉"
-                min: 20
-                max: 200
-                step: 5
-                value: Config.launcherMaxResults
-                onMoved: v => Config.launcherMaxResults = v
-            }
+            SettingsFieldGrid {
+                maximumColumns: root.compactMode ? 1 : 2
+                minimumColumnWidth: 280
 
-            SettingsSliderRow {
-                label: "File Query Min Length"
-                icon: "󰈔"
-                min: 1
-                max: 6
-                value: Config.launcherFileMinQueryLength
-                onMoved: v => Config.launcherFileMinQueryLength = v
-            }
-
-            SettingsSliderRow {
-                label: "File Search Max Results"
-                icon: "󰈔"
-                min: 20
-                max: 300
-                step: 10
-                value: Config.launcherFileMaxResults
-                onMoved: v => Config.launcherFileMaxResults = v
+                SettingsToggleRow {
+                    label: "Show Home Sections"
+                    icon: "󰆍"
+                    configKey: "launcherShowHomeSections"
+                }
+                SettingsToggleRow {
+                    label: "App Category Filters"
+                    icon: "󰍉"
+                    configKey: "launcherDrunCategoryFiltersEnabled"
+                }
             }
 
             SettingsSliderRow {
@@ -750,6 +760,42 @@ Item {
                 unit: ""
                 onMoved: v => Config.launcherSuggestionsLimit = v
             }
+        }
+
+        SettingsCard {
+            visible: root.isLauncherSearchSection
+            title: "Search Limits"
+            iconName: "󰍉"
+            description: "Tune search breadth, file query thresholds, and response timing."
+
+            SettingsSliderRow {
+                label: "Max Results"
+                icon: "󰍉"
+                min: 20
+                max: 200
+                step: 5
+                value: Config.launcherMaxResults
+                onMoved: v => Config.launcherMaxResults = v
+            }
+
+            SettingsSliderRow {
+                label: "File Query Min Length"
+                icon: "󰈔"
+                min: 1
+                max: 6
+                value: Config.launcherFileMinQueryLength
+                onMoved: v => Config.launcherFileMinQueryLength = v
+            }
+
+            SettingsSliderRow {
+                label: "File Search Max Results"
+                icon: "󰈔"
+                min: 20
+                max: 300
+                step: 10
+                value: Config.launcherFileMaxResults
+                onMoved: v => Config.launcherFileMaxResults = v
+            }
 
             SettingsSliderRow {
                 label: "Cache TTL"
@@ -783,6 +829,13 @@ Item {
                 unit: "ms"
                 onMoved: v => Config.launcherFileSearchDebounceMs = v
             }
+        }
+
+        SettingsCard {
+            visible: root.isLauncherSearchSection
+            title: "Result Scoring"
+            iconName: "󰀻"
+            description: "Adjust how launcher results are ranked across labels, commands, and metadata."
 
             SettingsSectionLabel {
                 text: "RESULT SCORING WEIGHTS"
@@ -845,10 +898,10 @@ Item {
         }
 
         SettingsCard {
-            visible: root.isLauncherSection
-            title: "Web Search"
+            visible: root.isLauncherWebSection
+            title: "Web Search Behavior"
             iconName: "󰖟"
-            description: "Provider availability, ordering, aliases, and web-mode key behavior."
+            description: "Web-mode defaults and keyboard behavior."
 
             SettingsFieldGrid {
                 maximumColumns: root.compactMode ? 1 : 2
@@ -870,6 +923,13 @@ Item {
                     configKey: "launcherRememberWebProvider"
                 }
             }
+        }
+
+        SettingsCard {
+            visible: root.isLauncherWebSection
+            title: "Web Providers"
+            iconName: "󰛢"
+            description: "Enable providers and control the order shown in web mode."
 
             SettingsSectionLabel {
                 text: "WEB PROVIDERS"
@@ -1063,6 +1123,13 @@ Item {
                     font.pixelSize: Colors.fontSizeXS
                 }
             }
+        }
+
+        SettingsCard {
+            visible: root.isLauncherWebSection
+            title: "Web Aliases"
+            iconName: "󰖟"
+            description: "Customize short prefixes for each provider."
 
             SettingsSectionLabel {
                 text: "WEB ALIASES"
@@ -1111,10 +1178,10 @@ Item {
         }
 
         SettingsCard {
-            visible: root.isLauncherSection
-            title: "Modes & Layout"
+            visible: root.isLauncherModesSection
+            title: "Launcher Modes"
             iconName: "󰌌"
-            description: "Choose which launcher modes are available and control the order they appear in."
+            description: "Enable or disable launcher modes and apply preset sets."
 
             SettingsSectionLabel {
                 text: "ENABLED MODES"
@@ -1164,6 +1231,13 @@ Item {
                     onClicked: root.applyModePreset("full")
                 }
             }
+        }
+
+        SettingsCard {
+            visible: root.isLauncherModesSection
+            title: "Mode Order"
+            iconName: "󰑖"
+            description: "Control the order the enabled modes appear in."
 
             SettingsSectionLabel {
                 text: "MODE ORDER"
@@ -1332,10 +1406,10 @@ Item {
         }
 
         SettingsCard {
-            visible: root.isLauncherSection
-            title: "Runtime & Diagnostics"
+            visible: root.isLauncherRuntimeSection
+            title: "Runtime Behavior"
             iconName: "󰔟"
-            description: "Preload policy, debug surfacing, and launcher recovery actions."
+            description: "Preload policy and runtime metric visibility."
 
             SettingsFieldGrid {
                 maximumColumns: root.compactMode ? 1 : 2
@@ -1379,6 +1453,13 @@ Item {
                 unit: "s"
                 onMoved: v => Config.launcherPreloadFailureBackoffSec = v
             }
+        }
+
+        SettingsCard {
+            visible: root.isLauncherRuntimeSection
+            title: "Diagnostics & Recovery"
+            iconName: "󰑐"
+            description: "Runtime reset actions and launcher maintenance controls."
 
             Flow {
                 Layout.fillWidth: true

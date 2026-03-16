@@ -81,12 +81,11 @@ run_ipc() {
   for attempt in 1 2 3 4 5; do
     output="$(timeout 5s "$@" 2>&1)" && return 0
     status=$?
-    if [[ "${output}" == *"Not ready to accept queries yet."* ]]; then
+    if [[ "${output}" == *"Not ready to accept queries yet."* ]] \
+      || [[ "${output}" == *"No instance found for pid "* ]] \
+      || [[ "${output}" == *"No running instances start with "* ]]; then
       sleep 0.2
       continue
-    fi
-    if [[ "${output}" == *"No instance found for pid "* ]]; then
-      return "${status}"
     fi
     [[ -n "${output}" ]] && printf '%s\n' "${output}" >&2
     return "${status}"
@@ -185,6 +184,7 @@ main() {
   fi
 
   run_step "Running panel config contract checks" "${script_dir}/check-panel-config-contracts.sh"
+  run_step "Running hidden bar widget collapse checks" "${script_dir}/check-bar-widget-collapse.sh"
 
   if (( run_settings == 1 )); then
     run_step "Running settings responsive smoke" "${script_dir}/check-settings-responsive.sh" "${args[@]}"

@@ -5,13 +5,15 @@ import "../../widgets" as SharedWidgets
 
 Item {
   id: root
-  width: 30
+  width: iconOnly ? 30 : Math.max(30, logoRow.implicitWidth + 12)
   height: 30
   implicitWidth: width
   implicitHeight: height
 
   property var anchorWindow: null
   property string tooltipText: "Applications • System Health: " + SystemStatus.overallStatus
+  property bool iconOnly: true
+  property string labelText: "Apps"
 
   property color statusColor: {
     switch (SystemStatus.overallStatus) {
@@ -56,35 +58,50 @@ Item {
     }
   }
 
-  Image {
-    id: logoImage
+  Row {
+    id: logoRow
     anchors.centerIn: parent
-    sourceSize: Qt.size(20, 20)
-    source: Quickshell.iconPath("nix-snowflake") || ""
-    visible: status === Image.Ready
-    // Apply status color to the image if it's a template
-    layer.enabled: SystemStatus.overallStatus !== "healthy"
-    layer.effect: ShaderEffect {
-        fragmentShader: "
-            varying highp vec2 qt_TexCoord0;
-            uniform highp float qt_Opacity;
-            uniform lowp sampler2D source;
-            uniform lowp vec4 color;
-            void main() {
-                lowp vec4 tex = texture2D(source, qt_TexCoord0);
-                gl_FragColor = vec4(color.rgb, tex.a) * qt_Opacity;
-            }"
-        property color color: root.statusColor
-    }
-  }
+    spacing: Colors.spacingXS
 
-  Text {
-    anchors.centerIn: parent
-    text: "󱄅"
-    color: root.statusColor
-    font.family: Colors.fontMono
-    font.pixelSize: Colors.fontSizeXL
-    visible: !logoImage.visible
+    Image {
+      id: logoImage
+      anchors.verticalCenter: parent.verticalCenter
+      sourceSize: Qt.size(20, 20)
+      source: Quickshell.iconPath("nix-snowflake") || ""
+      visible: status === Image.Ready
+      // Apply status color to the image if it's a template
+      layer.enabled: SystemStatus.overallStatus !== "healthy"
+      layer.effect: ShaderEffect {
+          fragmentShader: "
+              varying highp vec2 qt_TexCoord0;
+              uniform highp float qt_Opacity;
+              uniform lowp sampler2D source;
+              uniform lowp vec4 color;
+              void main() {
+                  lowp vec4 tex = texture2D(source, qt_TexCoord0);
+                  gl_FragColor = vec4(color.rgb, tex.a) * qt_Opacity;
+              }"
+          property color color: root.statusColor
+      }
+    }
+
+    Text {
+      anchors.verticalCenter: parent.verticalCenter
+      text: "󱄅"
+      color: root.statusColor
+      font.family: Colors.fontMono
+      font.pixelSize: Colors.fontSizeXL
+      visible: !logoImage.visible
+    }
+
+    Text {
+      visible: !root.iconOnly
+      anchors.verticalCenter: parent.verticalCenter
+      text: root.labelText
+      color: Colors.text
+      font.pixelSize: Colors.fontSizeSmall
+      font.weight: Font.DemiBold
+    }
   }
 
   scale: mouseArea.containsMouse ? 1.06 : 1.0

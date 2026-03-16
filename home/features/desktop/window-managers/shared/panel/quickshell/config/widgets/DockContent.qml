@@ -120,7 +120,7 @@ Item {
         var active = CompositorAdapter.activeToplevel;
         if (!active) return false;
         for (var i = 0; i < toplevels.length; i++) {
-          if (toplevels[i] === active) return true;
+          if (CompositorAdapter.sameWindow(toplevels[i], active)) return true;
         }
         return false;
       }
@@ -243,7 +243,7 @@ Item {
                   var active = CompositorAdapter.activeToplevel;
                   var closed = false;
                   for (var i = 0; i < appDelegate.toplevels.length; i++) {
-                    if (appDelegate.toplevels[i] === active) {
+                    if (CompositorAdapter.sameWindow(appDelegate.toplevels[i], active)) {
                       appDelegate.toplevels[i].close(); closed = true; break;
                     }
                   }
@@ -260,7 +260,7 @@ Item {
                 var activeTop = CompositorAdapter.activeToplevel;
                 var idx = -1;
                 for (var j = 0; j < appDelegate.toplevels.length; j++) {
-                  if (appDelegate.toplevels[j] === activeTop) { idx = j; break; }
+                  if (CompositorAdapter.sameWindow(appDelegate.toplevels[j], activeTop)) { idx = j; break; }
                 }
                 var next = (idx + 1) % appDelegate.toplevels.length;
                 appDelegate.toplevels[next].activate();
@@ -277,7 +277,7 @@ Item {
             var active = CompositorAdapter.activeToplevel;
             var idx = -1;
             for (var i = 0; i < appDelegate.toplevels.length; i++) {
-              if (appDelegate.toplevels[i] === active) { idx = i; break; }
+              if (CompositorAdapter.sameWindow(appDelegate.toplevels[i], active)) { idx = i; break; }
             }
             var count = appDelegate.toplevels.length;
             var delta = root.vertical ? wheel.angleDelta.x : wheel.angleDelta.y;
@@ -314,7 +314,7 @@ Item {
               color: {
                 if (!appDelegate.isFocused) return Colors.textSecondary;
                 var active = CompositorAdapter.activeToplevel;
-                if (active && index < appDelegate.toplevels.length && appDelegate.toplevels[index] === active)
+                if (active && index < appDelegate.toplevels.length && CompositorAdapter.sameWindow(appDelegate.toplevels[index], active))
                   return Colors.primary;
                 return Colors.textSecondary;
               }
@@ -336,7 +336,7 @@ Item {
               color: {
                 if (!appDelegate.isFocused) return Colors.textSecondary;
                 var active = CompositorAdapter.activeToplevel;
-                if (active && index < appDelegate.toplevels.length && appDelegate.toplevels[index] === active)
+                if (active && index < appDelegate.toplevels.length && CompositorAdapter.sameWindow(appDelegate.toplevels[index], active))
                   return Colors.primary;
                 return Colors.textSecondary;
               }

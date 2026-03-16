@@ -23,6 +23,8 @@ require_pattern() {
 }
 
 main() {
+  local runtime_args=("$@")
+
   require_cmd qmlformat
   require_cmd rg
 
@@ -41,6 +43,10 @@ main() {
   require_pattern "${config_root}/menu/settings/tabs/ShellCoreSectionTab.qml" 'label:\s*"↓"' "shell-core tab down-arrow fallback"
 
   "${script_dir}/check-settings-responsive.sh" "$@"
+  if (( ${#runtime_args[@]} == 0 )); then
+    runtime_args=(--repo-shell)
+  fi
+  "${script_dir}/check-runtime-warning-regressions.sh" "${runtime_args[@]}"
 
   printf '%s\n' "Settings guardrails passed."
 }

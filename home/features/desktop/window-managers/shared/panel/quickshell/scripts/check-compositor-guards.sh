@@ -6,6 +6,7 @@ config_dir="${script_dir}/../config"
 
 # Files intentionally compositor-scoped today.
 allow_hyprctl=(
+  "${config_dir}/bar/widgets/Workspaces.qml"
   "${config_dir}/launcher/Overview.qml"
   "${config_dir}/services/CompositorAdapter.qml"
   "${config_dir}/services/NightLightService.qml"
@@ -14,6 +15,7 @@ allow_hyprctl=(
 
 allow_hyprland_import=(
   "${config_dir}/launcher/Overview.qml"
+  "${config_dir}/services/CompositorAdapter.qml"
 )
 
 allow_direct_compositor_checks=(
@@ -28,6 +30,7 @@ allow_direct_compositor_checks=(
   "${config_dir}/services/NiriBinds.qml"
   "${config_dir}/services/NiriService.qml"
   "${config_dir}/services/PowerService.qml"
+  "${config_dir}/services/WorkspaceIdentityService.qml"
   "${config_dir}/shell.qml"
 )
 

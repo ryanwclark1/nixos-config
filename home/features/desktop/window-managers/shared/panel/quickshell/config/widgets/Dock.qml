@@ -95,9 +95,10 @@ Scope {
 
         for (var j = 0; j < toplevels.length; j++) {
           var tl = toplevels[j];
-          if (!tl || !tl.appId) continue;
-          var normTl = root.normalizeAppId(tl.appId);
-          var resolved = root.normalizeAppId(root.resolveDesktopEntryIdCached(tl.appId, entryCache));
+          var tlAppId = CompositorAdapter.windowAppId(tl);
+          if (!tl || !tlAppId) continue;
+          var normTl = root.normalizeAppId(tlAppId);
+          var resolved = root.normalizeAppId(root.resolveDesktopEntryIdCached(tlAppId, entryCache));
           if (normTl === normPinned || resolved === normPinned)
             matchingToplevels.push(tl);
         }
@@ -114,15 +115,16 @@ Scope {
       var grouped = {};
       for (var k = 0; k < toplevels.length; k++) {
         var tl2 = toplevels[k];
-        if (!tl2 || !tl2.appId) continue;
-        var norm2 = root.normalizeAppId(tl2.appId);
-        var resolved2 = root.normalizeAppId(root.resolveDesktopEntryIdCached(tl2.appId, entryCache));
+        var tl2AppId = CompositorAdapter.windowAppId(tl2);
+        if (!tl2 || !tl2AppId) continue;
+        var norm2 = root.normalizeAppId(tl2AppId);
+        var resolved2 = root.normalizeAppId(root.resolveDesktopEntryIdCached(tl2AppId, entryCache));
         if (processedIds[norm2] || processedIds[resolved2]) continue;
 
         var groupKey = groupApps ? norm2 : (norm2 + "_" + k);
         if (!grouped[groupKey]) {
           grouped[groupKey] = {
-            appId: tl2.appId,
+            appId: tl2AppId,
             pinned: false,
             toplevels: [],
             name: tl2.title

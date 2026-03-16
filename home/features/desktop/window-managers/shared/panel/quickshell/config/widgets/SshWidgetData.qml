@@ -14,6 +14,11 @@ QtObject {
     readonly property bool enableSshConfigImport: rawSettings.enableSshConfigImport !== false
     readonly property string displayMode: String(rawSettings.displayMode || "count") === "recent" ? "recent" : "count"
     readonly property string defaultAction: String(rawSettings.defaultAction || "connect") === "copy" ? "copy" : "connect"
+    readonly property bool showWhenEmpty: rawSettings.showWhenEmpty === true
+    readonly property string emptyLabel: {
+        var text = String(rawSettings.emptyLabel || "SSH").trim();
+        return text !== "" ? text : "SSH";
+    }
     readonly property var stateInfo: _normalizedState(rawSettings.state)
 
     property var importedHosts: []
@@ -244,15 +249,17 @@ QtObject {
     }
 
     function _recomputeMerged() {
+        var manualList = Array.isArray(manualHosts) ? manualHosts : [];
+        var importedList = Array.isArray(importedHosts) ? importedHosts : [];
         var manualById = ({});
         var merged = [];
-        for (var i = 0; i < manualHosts.length; ++i) {
-            var manual = manualHosts[i];
+        for (var i = 0; i < manualList.length; ++i) {
+            var manual = manualList[i];
             manualById[manual.id] = true;
             merged.push(manual);
         }
-        for (var j = 0; j < importedHosts.length; ++j) {
-            var imported = importedHosts[j];
+        for (var j = 0; j < importedList.length; ++j) {
+            var imported = importedList[j];
             if (manualById[imported.id])
                 continue;
             merged.push(imported);
@@ -498,6 +505,8 @@ QtObject {
     function summaryLabel() {
         if (displayMode === "recent" && recentHostLabel() !== "")
             return recentHostLabel();
+        if (mergedHosts.length === 0)
+            return emptyLabel;
         return String(mergedHosts.length) + " host" + (mergedHosts.length === 1 ? "" : "s");
     }
 

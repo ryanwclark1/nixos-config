@@ -6,10 +6,17 @@ Item {
 
     property var widgetInstance: null
     property var anchorWindow: null
+    property var currentContextActions: []
     signal contextMenuRequested(var actions, var triggerRect)
+    readonly property bool hasVisibleState: sshData.mergedHosts.length > 0 || sshData.importBusy || sshData.importErrors.length > 0 || sshData.showWhenEmpty
 
-    implicitWidth: sshPill.width
-    implicitHeight: sshPill.height
+    visible: hasVisibleState
+    implicitWidth: visible ? sshPill.width : 0
+    implicitHeight: visible ? sshPill.height : 0
+
+    function refreshContextActions() {
+        currentContextActions = sshData.contextActions(6);
+    }
 
     function openActionsMenu() {
         var globalPos = sshPill.mapToItem(null, 0, 0);
@@ -26,13 +33,22 @@ Item {
         widgetInstance: root.widgetInstance
     }
 
+    Connections {
+        target: sshData
+        function onMergedHostsChanged() { root.refreshContextActions(); }
+        function onImportBusyChanged() { root.refreshContextActions(); }
+        function onEnableSshConfigImportChanged() { root.refreshContextActions(); }
+    }
+
+    Component.onCompleted: refreshContextActions()
+
     BarPill {
         id: sshPill
         anchorWindow: root.anchorWindow
-        enabled: sshData.mergedHosts.length > 0 || sshData.importBusy || sshData.importErrors.length > 0 || sshData.enableSshConfigImport
+        enabled: root.hasVisibleState
         tooltipText: sshData.summaryTooltip()
         shimmerEnabled: true
-        contextActions: sshData.contextActions(6)
+        contextActions: root.currentContextActions
         onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
         onClicked: {
             if (sshData.mergedHosts.length === 1) {

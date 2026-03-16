@@ -7,20 +7,60 @@ QtObject {
   id: root
 
   readonly property var builtins: [
-    { widgetType: "logo", label: "App Launcher", icon: "󰀻", section: "left", description: "Application launcher trigger." },
-    { widgetType: "workspaces", label: "Workspace Switcher", icon: "󰍺", section: "left", description: "Current workspaces and switching.", hasSettings: true, defaultSettings: { showAddButton: true, showMiniMap: true } },
-    { widgetType: "windowTitle", label: "Active App Context", icon: "󰖯", section: "left", description: "Active window title and app-specific tools.", hasSettings: true, defaultSettings: { maxTitleWidth: 300, showAppIcon: true, showGitStatus: true, showMediaContext: true } },
-    { widgetType: "keyboardLayout", label: "Keyboard Layout", icon: "󰌌", section: "right", description: "Current keyboard layout indicator.", hasSettings: true, defaultSettings: { labelMode: "short" } },
-    { widgetType: "taskbar", label: "Running Apps", icon: "󰣆", section: "left", description: "Focused and running applications.", hasSettings: true, defaultSettings: { buttonSize: 32, iconSize: 20, showRunningIndicator: true, showSeparator: true, maxUnpinned: 0 } },
-    { widgetType: "cpuStatus", label: "CPU", icon: "", section: "left", description: "CPU usage with system stats popup.", hasSettings: true, defaultSettings: { displayMode: "auto", valueStyle: "percent" } },
-    { widgetType: "ramStatus", label: "Memory", icon: "", section: "left", description: "Memory usage with system stats popup.", hasSettings: true, defaultSettings: { displayMode: "auto", valueStyle: "usage" } },
-    { widgetType: "gpuStatus", label: "GPU", icon: "󰢮", section: "left", description: "GPU usage with system stats popup.", hasSettings: true, defaultSettings: { displayMode: "auto", valueStyle: "percent" } },
-    { widgetType: "dateTime", label: "Clock", icon: "󰥔", section: "center", description: "Current time and date popup.", hasSettings: true, defaultSettings: { displayMode: "auto", showDate: true } },
-    { widgetType: "mediaBar", label: "Media Controls", icon: "󰎆", section: "center", description: "Current media playback widget.", hasSettings: true, defaultSettings: { displayMode: "auto", maxTextWidth: 150 } },
-    { widgetType: "updates", label: "Updates", icon: "󰚰", section: "center", description: "Pending system updates.", hasSettings: true, defaultSettings: { displayMode: "auto" } },
-    { widgetType: "cava", label: "Visualizer", icon: "󰎈", section: "center", description: "Compact audio spectrum with popup.", hasSettings: true, defaultSettings: { barCount: 8 } },
+    { widgetType: "logo", label: "App Launcher", icon: "󰀻", section: "left", description: "Application launcher trigger.", hasSettings: true, defaultSettings: { displayMode: "icon", labelText: "Apps" }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this trigger stays icon-only or also shows a text label in the bar.", options: [ { value: "icon", label: "Icon" }, { value: "full", label: "Full" } ] },
+      { type: "text", key: "labelText", label: "Label Text", icon: "󰉿", placeholder: "Apps" }
+    ] },
+    { widgetType: "workspaces", label: "Workspace Switcher", icon: "󰍺", section: "left", description: "Current workspaces and switching.", hasSettings: true, defaultSettings: { showAddButton: true, showMiniMap: true }, settingsSchema: [
+      { type: "toggle", key: "showAddButton", label: "Add Button", icon: "󰐕", enabledText: "Show the quick add-workspace button at the end of the strip.", disabledText: "Hide the add-workspace button from this widget instance." },
+      { type: "toggle", key: "showMiniMap", label: "Mini-map", icon: "󰍹", enabledText: "Show live mini-map window previews inside workspace pills.", disabledText: "Hide mini-map previews and keep the pills text-only." }
+    ] },
+    { widgetType: "windowTitle", label: "Active App Context", icon: "󰖯", section: "left", description: "Active window title and app-specific tools.", hasSettings: true, defaultSettings: { maxTitleWidth: 300, showAppIcon: true, showGitStatus: true, showMediaContext: true }, settingsSchema: [
+      { type: "slider", key: "maxTitleWidth", label: "Title Width", icon: "󰨈", min: 120, max: 520, step: 1 },
+      { type: "toggle", key: "showAppIcon", label: "App Icon", icon: "󰀻", enabledText: "Show the active app icon before the title.", disabledText: "Hide the app icon and show only textual context." },
+      { type: "toggle", key: "showGitStatus", label: "Git Status", icon: "󰊢", enabledText: "Show inline repository status next to the active window title.", disabledText: "Hide inline repository status from the title widget." },
+      { type: "toggle", key: "showMediaContext", label: "Media Context", icon: "󰎆", enabledText: "Show the mini media context badge when media is active.", disabledText: "Hide inline media context from the title widget." }
+    ] },
+    { widgetType: "keyboardLayout", label: "Keyboard Layout", icon: "󰌌", section: "right", description: "Current keyboard layout indicator.", hasSettings: true, defaultSettings: { labelMode: "short" }, settingsSchema: [
+      { type: "mode", key: "labelMode", label: "Label Mode", description: "Choose between the compact three-letter abbreviation or the full layout name.", options: [ { value: "short", label: "Short" }, { value: "full", label: "Full" } ] }
+    ] },
+    { widgetType: "taskbar", label: "Running Apps", icon: "󰣆", section: "left", description: "Focused and running applications.", hasSettings: true, defaultSettings: { buttonSize: 32, iconSize: 20, showRunningIndicator: true, showSeparator: true, maxUnpinned: 0 }, settingsSchema: [
+      { type: "slider", key: "buttonSize", label: "Button Size", icon: "󰝗", min: 24, max: 56, step: 1 },
+      { type: "slider", key: "iconSize", label: "Icon Size", icon: "󰀻", min: 14, max: 36, step: 1 },
+      { type: "slider", key: "maxUnpinned", label: "Max Unpinned Apps", icon: "󰇚", min: 0, max: 20, step: 1 },
+      { type: "toggle", key: "showRunningIndicator", label: "Running Indicator", icon: "󰄯", enabledText: "Show the running-state dot on active task buttons.", disabledText: "Hide the running-state indicator dot." },
+      { type: "toggle", key: "showSeparator", label: "Separator", icon: "󰇘", enabledText: "Separate pinned apps from unpinned running apps.", disabledText: "Remove the divider between pinned and unpinned apps." }
+    ] },
+    { widgetType: "cpuStatus", label: "CPU", icon: "", section: "left", description: "CPU usage with system stats popup.", hasSettings: true, defaultSettings: { displayMode: "auto", valueStyle: "percent" }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this stat adapts to bar orientation or always stays full, compact, or icon-only. Compact mode may shorten long values automatically to keep vertical bars narrow.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "compact", label: "Compact" }, { value: "icon", label: "Icon" } ] },
+      { type: "mode", key: "valueStyle", label: "Value Style", description: "Choose whether this stat shows percent only, usage text, or usage with temperature. Compact mode can shorten long values automatically.", options: [ { value: "percent", label: "Percent" }, { value: "usage", label: "Usage" }, { value: "usageTemp", label: "Usage + Temp" } ] }
+    ] },
+    { widgetType: "ramStatus", label: "Memory", icon: "", section: "left", description: "Memory usage with system stats popup.", hasSettings: true, defaultSettings: { displayMode: "auto", valueStyle: "usage" }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this stat adapts to bar orientation or always stays full, compact, or icon-only. Compact mode may shorten long values automatically to keep vertical bars narrow.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "compact", label: "Compact" }, { value: "icon", label: "Icon" } ] },
+      { type: "mode", key: "valueStyle", label: "Value Style", description: "Choose whether memory shows percent used or the current used-memory value. Compact mode can still fall back to percent when the usage text is too long.", options: [ { value: "usage", label: "Usage" }, { value: "percent", label: "Percent" } ] }
+    ] },
+    { widgetType: "gpuStatus", label: "GPU", icon: "󰢮", section: "left", description: "GPU usage with system stats popup.", hasSettings: true, defaultSettings: { displayMode: "auto", valueStyle: "percent" }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this stat adapts to bar orientation or always stays full, compact, or icon-only. Compact mode may shorten long values automatically to keep vertical bars narrow.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "compact", label: "Compact" }, { value: "icon", label: "Icon" } ] },
+      { type: "mode", key: "valueStyle", label: "Value Style", description: "Choose whether this stat shows percent only, usage text, or usage with temperature. Compact mode can shorten long values automatically.", options: [ { value: "percent", label: "Percent" }, { value: "usage", label: "Usage" }, { value: "usageTemp", label: "Usage + Temp" } ] }
+    ] },
+    { widgetType: "dateTime", label: "Clock", icon: "󰥔", section: "center", description: "Current time and date popup.", hasSettings: true, defaultSettings: { displayMode: "auto", showDate: true }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether the clock adapts to bar orientation automatically, always shows the full time row, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] },
+      { type: "toggle", key: "showDate", label: "Show Date", icon: "󰃭", enabledText: "Show the date segment alongside the time when space allows.", disabledText: "Show only the time in the bar widget." }
+    ] },
+    { widgetType: "mediaBar", label: "Media Controls", icon: "󰎆", section: "center", description: "Current media playback widget.", hasSettings: true, defaultSettings: { displayMode: "auto", maxTextWidth: 150 }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether the media widget adapts to bar orientation automatically, always shows track text, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] },
+      { type: "slider", key: "maxTextWidth", label: "Track Text Width", icon: "󰛇", min: 80, max: 240, step: 1 }
+    ] },
+    { widgetType: "updates", label: "Updates", icon: "󰚰", section: "center", description: "Pending system updates.", hasSettings: true, defaultSettings: { displayMode: "auto" }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether the updates widget adapts to bar orientation automatically, always shows its count, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] }
+    ] },
+    { widgetType: "cava", label: "Visualizer", icon: "󰎈", section: "center", description: "Compact audio spectrum with popup.", hasSettings: true, defaultSettings: { barCount: 8 }, settingsSchema: [
+      { type: "slider", key: "barCount", label: "Bar Count", icon: "󰎈", min: 4, max: 20, step: 1 }
+    ] },
     { widgetType: "idleInhibitor", label: "Idle Inhibitor", icon: "󰒲", section: "center", description: "Toggle idle inhibit state." },
-    { widgetType: "weather", label: "Weather", icon: "󰖙", section: "right", description: "Current weather and forecast popup.", hasSettings: true, defaultSettings: { displayMode: "auto" } },
+    { widgetType: "weather", label: "Weather", icon: "󰖙", section: "right", description: "Current weather and forecast popup.", hasSettings: true, defaultSettings: { displayMode: "auto" }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this widget adapts to bar orientation automatically, always shows its text/details, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] }
+    ] },
     {
       widgetType: "ssh",
       label: "SSH",
@@ -33,31 +73,88 @@ QtObject {
         enableSshConfigImport: true,
         displayMode: "count",
         defaultAction: "connect",
+        showWhenEmpty: false,
+        emptyLabel: "SSH",
         state: {
           lastConnectedId: "",
           lastConnectedLabel: "",
           lastConnectedAt: "",
           recentIds: []
         }
-      }
+      },
+      settingsSchema: [
+        { type: "toggle", key: "enableSshConfigImport", label: "SSH Config Import", icon: "󰣀", enabledText: "Import aliases from ~/.ssh/config and include files.", disabledText: "Only manual hosts are shown." },
+        { type: "mode", key: "displayMode", label: "Bar Label", description: "Choose whether the widget shows the total host count or the most recent host label.", options: [ { value: "count", label: "Count" }, { value: "recent", label: "Recent" } ] },
+        { type: "mode", key: "defaultAction", label: "Primary Click", description: "Choose the action used when the widget has exactly one host.", options: [ { value: "connect", label: "Connect" }, { value: "copy", label: "Copy Command" } ] },
+        { type: "toggle", key: "showWhenEmpty", label: "Show When Empty", icon: "󰖰", enabledText: "Keep the SSH pill visible even when no hosts or import results are available yet.", disabledText: "Hide the SSH pill until hosts, import activity, or import errors exist." },
+        { type: "text", key: "emptyLabel", label: "Empty Label", icon: "󰉿", placeholder: "SSH" }
+      ]
     },
-    { widgetType: "network", label: "Network", icon: "󰖩", section: "right", description: "Network state and controls popup.", hasSettings: true, defaultSettings: { displayMode: "auto" } },
-    { widgetType: "bluetooth", label: "Bluetooth", icon: "󰂯", section: "right", description: "Bluetooth status and controls popup.", hasSettings: true, defaultSettings: { displayMode: "auto" } },
-    { widgetType: "audio", label: "Audio", icon: "󰕾", section: "right", description: "Volume and device controls popup.", hasSettings: true, defaultSettings: { displayMode: "auto" } },
-    { widgetType: "music", label: "Music", icon: "󰝚", section: "right", description: "Compact active player shortcut.", hasSettings: true, defaultSettings: { displayMode: "auto", maxTextWidth: 100 } },
-    { widgetType: "privacy", label: "Privacy", icon: "󰒃", section: "right", description: "Camera, mic, and share indicators.", hasSettings: true, defaultSettings: { displayMode: "auto", showPulseDot: true } },
-    { widgetType: "recording", label: "Recording", icon: "󰻃", section: "right", description: "Active screen recording indicator.", hasSettings: true, defaultSettings: { displayMode: "auto", showPulseDot: true } },
-    { widgetType: "battery", label: "Battery", icon: "󰁹", section: "right", description: "Battery status and actions popup.", hasSettings: true, defaultSettings: { displayMode: "auto" } },
-    { widgetType: "printer", label: "Printers", icon: "󰐪", section: "right", description: "Printer status popup.", hasSettings: true, defaultSettings: { displayMode: "auto", badgeStyle: "count" } },
-    { widgetType: "aiChat", label: "AI Chat", icon: "󰚩", section: "right", description: "AI chat assistant toggle." },
-    { widgetType: "notepad", label: "Notepad", icon: "󰠮", section: "right", description: "Slideout notepad trigger." },
-    { widgetType: "controlCenter", label: "Control Center", icon: "󰒓", section: "right", description: "Command center trigger." },
-    { widgetType: "tray", label: "System Tray", icon: "󰀻", section: "right", description: "Status notifier tray.", hasSettings: true, defaultSettings: { itemSize: 24, iconSize: 18, spacing: 6 } },
-    { widgetType: "clipboard", label: "Clipboard", icon: "󰅍", section: "right", description: "Clipboard history popup." },
-    { widgetType: "screenshot", label: "Screenshot", icon: "󰩭", section: "right", description: "Screenshot capture popup." },
-    { widgetType: "notifications", label: "Notifications", icon: "󰂚", section: "right", description: "Notification center trigger.", hasSettings: true, defaultSettings: { displayMode: "auto", badgeStyle: "dot" } },
-    { widgetType: "spacer", label: "Spacer", icon: "󰉺", section: "center", description: "Adjustable empty spacing.", hasSettings: true, defaultSettings: { size: 24 } },
-    { widgetType: "separator", label: "Separator", icon: "󰇘", section: "center", description: "Thin divider between widgets.", hasSettings: true, defaultSettings: { thickness: 1, length: 20, opacity: 0.8 } }
+    { widgetType: "network", label: "Network", icon: "󰖩", section: "right", description: "Network state and controls popup.", hasSettings: true, defaultSettings: { displayMode: "auto" }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this widget adapts to bar orientation automatically, always shows its text/details, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] }
+    ] },
+    { widgetType: "bluetooth", label: "Bluetooth", icon: "󰂯", section: "right", description: "Bluetooth status and controls popup.", hasSettings: true, defaultSettings: { displayMode: "auto" }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether the Bluetooth widget adapts to bar orientation automatically, always shows status text, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] }
+    ] },
+    { widgetType: "audio", label: "Audio", icon: "󰕾", section: "right", description: "Volume and device controls popup.", hasSettings: true, defaultSettings: { displayMode: "auto" }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this widget adapts to bar orientation automatically, always shows its text/details, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] }
+    ] },
+    { widgetType: "music", label: "Music", icon: "󰝚", section: "right", description: "Compact active player shortcut.", hasSettings: true, defaultSettings: { displayMode: "auto", maxTextWidth: 100 }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether the music widget adapts to bar orientation automatically, always shows track text, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] },
+      { type: "slider", key: "maxTextWidth", label: "Track Text Width", icon: "󰛇", min: 60, max: 220, step: 1 }
+    ] },
+    { widgetType: "privacy", label: "Privacy", icon: "󰒃", section: "right", description: "Camera, mic, and share indicators.", hasSettings: true, defaultSettings: { displayMode: "auto", showPulseDot: true }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether the privacy widget adapts to bar orientation automatically, always shows text, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] },
+      { type: "toggle", key: "showPulseDot", label: "Pulse Dot", icon: "󰄯", enabledText: "Show the animated activity dot beside the privacy icon.", disabledText: "Hide the animated pulse dot and keep only the icon/text." }
+    ] },
+    { widgetType: "recording", label: "Recording", icon: "󰻃", section: "right", description: "Active screen recording indicator.", hasSettings: true, defaultSettings: { displayMode: "auto", showPulseDot: true }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether the recording widget adapts to bar orientation automatically, always shows REC text, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] },
+      { type: "toggle", key: "showPulseDot", label: "Pulse Dot", icon: "󰄯", enabledText: "Show the animated recording dot beside the label.", disabledText: "Hide the recording pulse dot." }
+    ] },
+    { widgetType: "battery", label: "Battery", icon: "󰁹", section: "right", description: "Battery status and actions popup.", hasSettings: true, defaultSettings: { displayMode: "auto" }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this widget adapts to bar orientation automatically, always shows its text/details, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] }
+    ] },
+    { widgetType: "printer", label: "Printers", icon: "󰐪", section: "right", description: "Printer status popup.", hasSettings: true, defaultSettings: { displayMode: "auto", badgeStyle: "count" }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether the printer widget adapts to bar orientation automatically, always shows job badges, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] },
+      { type: "mode", key: "badgeStyle", label: "Badge Style", description: "Choose whether active print jobs show as a count badge, a dot, or no badge.", options: [ { value: "count", label: "Count" }, { value: "dot", label: "Dot" }, { value: "off", label: "Off" } ] }
+    ] },
+    { widgetType: "aiChat", label: "AI Chat", icon: "󰚩", section: "right", description: "AI chat assistant toggle.", hasSettings: true, defaultSettings: { displayMode: "icon", labelText: "AI" }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this trigger stays icon-only or also shows a text label in the bar.", options: [ { value: "icon", label: "Icon" }, { value: "full", label: "Full" } ] },
+      { type: "text", key: "labelText", label: "Label Text", icon: "󰉿", placeholder: "AI" }
+    ] },
+    { widgetType: "notepad", label: "Notepad", icon: "󰠮", section: "right", description: "Slideout notepad trigger.", hasSettings: true, defaultSettings: { displayMode: "icon", labelText: "Notes" }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this trigger stays icon-only or also shows a text label in the bar.", options: [ { value: "icon", label: "Icon" }, { value: "full", label: "Full" } ] },
+      { type: "text", key: "labelText", label: "Label Text", icon: "󰉿", placeholder: "Notes" }
+    ] },
+    { widgetType: "controlCenter", label: "Control Center", icon: "󰒓", section: "right", description: "Command center trigger.", hasSettings: true, defaultSettings: { displayMode: "icon", labelText: "Controls" }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this trigger stays icon-only or also shows a text label in the bar.", options: [ { value: "icon", label: "Icon" }, { value: "full", label: "Full" } ] },
+      { type: "text", key: "labelText", label: "Label Text", icon: "󰉿", placeholder: "Controls" }
+    ] },
+    { widgetType: "tray", label: "System Tray", icon: "󰀻", section: "right", description: "Status notifier tray.", hasSettings: true, defaultSettings: { itemSize: 24, iconSize: 18, spacing: 6 }, settingsSchema: [
+      { type: "slider", key: "itemSize", label: "Item Size", icon: "󰍹", min: 18, max: 40, step: 1 },
+      { type: "slider", key: "iconSize", label: "Icon Size", icon: "󰀻", min: 12, max: 32, step: 1 },
+      { type: "slider", key: "spacing", label: "Spacing", icon: "󰝗", min: 2, max: 16, step: 1 }
+    ] },
+    { widgetType: "clipboard", label: "Clipboard", icon: "󰅍", section: "right", description: "Clipboard history popup.", hasSettings: true, defaultSettings: { displayMode: "icon", labelText: "Clipboard" }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this trigger stays icon-only or also shows a text label in the bar.", options: [ { value: "icon", label: "Icon" }, { value: "full", label: "Full" } ] },
+      { type: "text", key: "labelText", label: "Label Text", icon: "󰉿", placeholder: "Clipboard" }
+    ] },
+    { widgetType: "screenshot", label: "Screenshot", icon: "󰩭", section: "right", description: "Screenshot capture popup.", hasSettings: true, defaultSettings: { displayMode: "icon", labelText: "Shot" }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this trigger stays icon-only or also shows a text label in the bar.", options: [ { value: "icon", label: "Icon" }, { value: "full", label: "Full" } ] },
+      { type: "text", key: "labelText", label: "Label Text", icon: "󰉿", placeholder: "Shot" }
+    ] },
+    { widgetType: "notifications", label: "Notifications", icon: "󰂚", section: "right", description: "Notification center trigger.", hasSettings: true, defaultSettings: { displayMode: "auto", badgeStyle: "dot" }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether the notifications widget adapts to bar orientation automatically, always shows extra status text, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] },
+      { type: "mode", key: "badgeStyle", label: "Badge Style", description: "Choose whether unread notifications show as a dot, a count, or no badge at all.", options: [ { value: "dot", label: "Dot" }, { value: "count", label: "Count" }, { value: "off", label: "Off" } ] }
+    ] },
+    { widgetType: "spacer", label: "Spacer", icon: "󰉺", section: "center", description: "Adjustable empty spacing.", hasSettings: true, defaultSettings: { size: 24 }, settingsSchema: [
+      { type: "slider", key: "size", label: "Spacer Size", icon: "󰉺", min: 4, max: 160, step: 1 }
+    ] },
+    { widgetType: "separator", label: "Separator", icon: "󰇘", section: "center", description: "Thin divider between widgets.", hasSettings: true, defaultSettings: { thickness: 1, length: 20, opacity: 0.8 }, settingsSchema: [
+      { type: "slider", key: "thickness", label: "Thickness", icon: "󰇘", min: 1, max: 8, step: 1 },
+      { type: "slider", key: "length", label: "Length", icon: "󰝗", min: 8, max: 64, step: 1 },
+      { type: "slider", key: "opacity", label: "Opacity", icon: "󰖔", min: 0.1, max: 1.0, step: 0.05, unit: "%" }
+    ] }
   ]
 
   readonly property var pluginWidgets: {
@@ -143,6 +240,208 @@ QtObject {
   function defaultSettings(widgetType) {
     var meta = metadataFor(widgetType);
     return meta && meta.defaultSettings ? JSON.parse(JSON.stringify(meta.defaultSettings)) : {};
+  }
+
+  function settingsSchema(widgetType) {
+    var meta = metadataFor(widgetType);
+    return meta && meta.settingsSchema ? JSON.parse(JSON.stringify(meta.settingsSchema)) : [];
+  }
+
+  function _effectiveSettings(widgetInstance) {
+    var widgetType = widgetInstance ? String(widgetInstance.widgetType || "") : "";
+    var defaults = defaultSettings(widgetType);
+    var settings = widgetInstance && widgetInstance.settings ? widgetInstance.settings : {};
+    var next = JSON.parse(JSON.stringify(defaults));
+    for (var key in settings) {
+      next[key] = settings[key];
+    }
+    return next;
+  }
+
+  function _modeLabel(modeValue) {
+    var mode = String(modeValue || "auto");
+    if (mode === "full")
+      return "Full";
+    if (mode === "compact")
+      return "Compact";
+    if (mode === "icon")
+      return "Icon";
+    return "Auto";
+  }
+
+  function _simpleTriggerFallbackLabel(widgetType) {
+    if (widgetType === "logo")
+      return "Apps";
+    if (widgetType === "aiChat")
+      return "AI";
+    if (widgetType === "notepad")
+      return "Notes";
+    if (widgetType === "controlCenter")
+      return "Controls";
+    if (widgetType === "clipboard")
+      return "Clipboard";
+    if (widgetType === "screenshot")
+      return "Shot";
+    return "Open";
+  }
+
+  function summaryChips(widgetInstance) {
+    if (!widgetInstance)
+      return [];
+
+    var widgetType = String(widgetInstance.widgetType || "");
+    var settings = _effectiveSettings(widgetInstance);
+    var chips = [];
+    var parsed;
+
+    if (widgetType === "cpuStatus" || widgetType === "ramStatus" || widgetType === "gpuStatus") {
+      var valueStyle = String(settings.valueStyle || (widgetType === "ramStatus" ? "usage" : "percent"));
+      var valueLabel = "Percent";
+      if (valueStyle === "usageTemp")
+        valueLabel = "Usage + Temp";
+      else if (valueStyle === "usage")
+        valueLabel = "Usage";
+      chips.push("Mode: " + _modeLabel(settings.displayMode));
+      chips.push("Value: " + valueLabel);
+      return chips;
+    }
+
+    if (widgetType === "weather" || widgetType === "network" || widgetType === "audio" || widgetType === "battery" || widgetType === "updates" || widgetType === "bluetooth") {
+      chips.push("Display: " + _modeLabel(settings.displayMode));
+      return chips;
+    }
+
+    if (widgetType === "windowTitle") {
+      var titleParts = [];
+      if (settings.showAppIcon !== false)
+        titleParts.push("Icon");
+      if (settings.showGitStatus !== false)
+        titleParts.push("Git");
+      if (settings.showMediaContext !== false)
+        titleParts.push("Media");
+      chips.push(titleParts.length > 0 ? titleParts.join(" + ") : "Title Only");
+      return chips;
+    }
+
+    if (widgetType === "mediaBar") {
+      parsed = parseInt(settings.maxTextWidth !== undefined ? settings.maxTextWidth : 150, 10);
+      chips.push("Display: " + _modeLabel(settings.displayMode));
+      chips.push("Text: " + String(isNaN(parsed) ? 150 : parsed) + "px");
+      return chips;
+    }
+
+    if (widgetType === "keyboardLayout") {
+      chips.push("Label: " + (String(settings.labelMode || "short") === "full" ? "Full" : "Short"));
+      return chips;
+    }
+
+    if (widgetType === "dateTime") {
+      chips.push("Display: " + _modeLabel(settings.displayMode));
+      chips.push(settings.showDate !== false ? "Date On" : "Date Off");
+      return chips;
+    }
+
+    if (widgetType === "notifications") {
+      var notificationBadge = String(settings.badgeStyle || "dot");
+      var notificationBadgeLabel = notificationBadge === "count" ? "Count" : (notificationBadge === "off" ? "Off" : "Dot");
+      chips.push("Display: " + _modeLabel(settings.displayMode));
+      chips.push("Badge: " + notificationBadgeLabel);
+      return chips;
+    }
+
+    if (widgetType === "tray") {
+      var itemSize = parseInt(settings.itemSize !== undefined ? settings.itemSize : 24, 10);
+      var iconSize = parseInt(settings.iconSize !== undefined ? settings.iconSize : 18, 10);
+      chips.push(String(isNaN(itemSize) ? 24 : itemSize) + "px items");
+      chips.push(String(isNaN(iconSize) ? 18 : iconSize) + "px icons");
+      return chips;
+    }
+
+    if (widgetType === "taskbar") {
+      var buttonSize = parseInt(settings.buttonSize !== undefined ? settings.buttonSize : 32, 10);
+      var taskIconSize = parseInt(settings.iconSize !== undefined ? settings.iconSize : 20, 10);
+      var maxUnpinned = parseInt(settings.maxUnpinned !== undefined ? settings.maxUnpinned : 0, 10);
+      chips.push(String(isNaN(buttonSize) ? 32 : buttonSize) + "px buttons");
+      chips.push(String(isNaN(taskIconSize) ? 20 : taskIconSize) + "px icons");
+      if (!isNaN(maxUnpinned) && maxUnpinned > 0)
+        chips.push("+" + maxUnpinned + " unpinned");
+      return chips;
+    }
+
+    if (widgetType === "workspaces") {
+      chips.push(settings.showAddButton !== false ? "Add On" : "Add Off");
+      chips.push(settings.showMiniMap !== false ? "Mini-map On" : "Mini-map Off");
+      return chips;
+    }
+
+    if (widgetType === "music") {
+      parsed = parseInt(settings.maxTextWidth !== undefined ? settings.maxTextWidth : 100, 10);
+      chips.push("Display: " + _modeLabel(settings.displayMode));
+      chips.push("Text: " + String(isNaN(parsed) ? 100 : parsed) + "px");
+      return chips;
+    }
+
+    if (widgetType === "printer") {
+      var printerBadge = String(settings.badgeStyle || "count");
+      var printerBadgeLabel = printerBadge === "dot" ? "Dot" : (printerBadge === "off" ? "Off" : "Count");
+      chips.push("Display: " + _modeLabel(settings.displayMode));
+      chips.push("Badge: " + printerBadgeLabel);
+      return chips;
+    }
+
+    if (widgetType === "privacy" || widgetType === "recording") {
+      chips.push("Display: " + _modeLabel(settings.displayMode));
+      chips.push(settings.showPulseDot !== false ? "Pulse On" : "Pulse Off");
+      return chips;
+    }
+
+    if (widgetType === "cava") {
+      parsed = parseInt(settings.barCount !== undefined ? settings.barCount : 8, 10);
+      chips.push("Bars: " + String(isNaN(parsed) ? 8 : parsed));
+      return chips;
+    }
+
+    if (widgetType === "separator") {
+      var thickness = parseInt(settings.thickness !== undefined ? settings.thickness : 1, 10);
+      var length = parseInt(settings.length !== undefined ? settings.length : 20, 10);
+      var opacity = Number(settings.opacity !== undefined ? settings.opacity : 0.8);
+      chips.push(String(isNaN(thickness) ? 1 : thickness) + "px");
+      chips.push(String(isNaN(length) ? 20 : length) + "px");
+      chips.push(isNaN(opacity) ? "80%" : Math.round(opacity * 100) + "%");
+      return chips;
+    }
+
+    if (widgetType === "logo" || widgetType === "aiChat" || widgetType === "notepad" || widgetType === "controlCenter" || widgetType === "clipboard" || widgetType === "screenshot") {
+      var fallback = _simpleTriggerFallbackLabel(widgetType);
+      var triggerLabel = String(settings.labelText !== undefined ? settings.labelText : fallback).trim();
+      chips.push("Display: " + (String(settings.displayMode || "icon") === "full" ? "Full" : "Icon"));
+      chips.push("Label: " + (triggerLabel.length > 0 ? triggerLabel : fallback));
+      return chips;
+    }
+
+    if (widgetType === "spacer") {
+      parsed = parseInt(settings.size !== undefined ? settings.size : 24, 10);
+      chips.push("Size: " + String(isNaN(parsed) ? 24 : parsed) + "px");
+      return chips;
+    }
+
+    if (widgetType === "ssh") {
+      var manualHosts = Array.isArray(settings.manualHosts) ? settings.manualHosts : [];
+      var state = settings.state || {};
+      var displayMode = String(settings.displayMode || "count") === "recent" ? "Recent" : "Count";
+      var defaultAction = String(settings.defaultAction || "connect") === "copy" ? "Copy" : "Connect";
+      var lastConnected = String(state.lastConnectedLabel || "").trim();
+      chips.push("Label: " + displayMode);
+      chips.push("Click: " + defaultAction);
+      chips.push("Manual: " + manualHosts.length);
+      chips.push(settings.enableSshConfigImport !== false ? "Import On" : "Import Off");
+      chips.push(settings.showWhenEmpty === true ? "Pinned Empty" : "Hide Empty");
+      if (lastConnected.length > 0)
+        chips.push("Last: " + lastConnected);
+      return chips;
+    }
+
+    return chips;
   }
 
   function pluginByWidgetType(widgetType) {

@@ -13,7 +13,7 @@ AGE_PUBLIC_KEY_FILE = $(AGE_DIR)/keys.txt
 RSA_BITS = 4096
 
 # Define the makefile targets and rules
-.PHONY: keygen rsa_key ed25519_key age_key get_age_public_key update-packages update-package-status niri-vm-build niri-vm niri-vm-reset niri-vm-fresh niri-vm-ssh niri-vm-fresh-ssh niri-vm-smoke
+.PHONY: keygen rsa_key ed25519_key age_key get_age_public_key update-packages update-package-status niri-vm-build niri-vm niri-vm-reset niri-vm-fresh niri-vm-ssh niri-vm-fresh-ssh niri-vm-smoke hyprland-vm-build hyprland-vm hyprland-vm-reset hyprland-vm-ssh hyprland-vm-panel-qa
 
 keygen: rsa_key ed25519_key age_key get_age_public_key
 
@@ -268,3 +268,18 @@ niri-vm-fresh-ssh:
 
 niri-vm-smoke:
 	bash ./scripts/vm/check-niri-test-vm.sh
+
+hyprland-vm-build:
+	bash ./scripts/vm/launch-hyprland-test-vm.sh --build-only
+
+hyprland-vm:
+	bash ./scripts/vm/launch-hyprland-test-vm.sh
+
+hyprland-vm-reset:
+	bash ./scripts/vm/launch-hyprland-test-vm.sh --reset-disk
+
+hyprland-vm-ssh:
+	bash ./scripts/vm/launch-hyprland-test-vm.sh --ssh-port 2242
+
+hyprland-vm-panel-qa:
+	bash ./scripts/vm/run-hyprland-panel-qa.sh

@@ -20,6 +20,8 @@ workspace_settle_interval="0.1"
 temp_full=""
 temp_crop=""
 restore_workspace=""
+modal_capture_padding_x="32"
+modal_capture_padding_y="20"
 
 usage() {
   cat <<'EOF'
@@ -120,6 +122,15 @@ hypr() {
       hyprctl -i "${hyprland_instance}" "$@"
   else
     hyprctl "$@"
+  fi
+}
+
+grim_capture() {
+  if [[ -n "${hyprland_instance}" ]]; then
+    env HYPRLAND_INSTANCE_SIGNATURE="${hyprland_instance}" WAYLAND_DISPLAY="${hyprland_wayland_socket}" \
+      grim -t png "$@"
+  else
+    grim -t png "$@"
   fi
 }
 
@@ -269,6 +280,14 @@ call_ipc() {
   run_ipc quickshell ipc --id "${instance_id}" call "${target}" "$@"
 }
 
+cleanup() {
+  call_ipc SettingsHub close >/dev/null 2>&1 || true
+  if [[ -n "${restore_workspace}" ]]; then
+    hypr dispatch workspace "${restore_workspace}" >/dev/null 2>&1 || true
+  fi
+  rm -f "${temp_full}" "${temp_crop}"
+}
+
 main() {
   require_cmd quickshell
   require_cmd hyprctl
@@ -297,6 +316,10 @@ main() {
     printf 'scroll-y must be a non-negative integer.\n' >&2
     exit 2
   fi
+  if ! [[ "${modal_capture_padding_x}" =~ ^[0-9]+$ ]] || ! [[ "${modal_capture_padding_y}" =~ ^[0-9]+$ ]]; then
+    printf 'Modal capture padding must be non-negative integers.\n' >&2
+    exit 2
+  fi
   case "${frame_mode}" in
     modal|viewport) ;;
     *)
@@ -320,7 +343,7 @@ main() {
   temp_full="$(mktemp /tmp/settings-viewport-full-XXXXXX.png)"
   temp_crop="$(mktemp /tmp/settings-viewport-crop-XXXXXX.png)"
 
-  trap 'call_ipc SettingsHub close >/dev/null 2>&1 || true; [[ -n "${restore_workspace}" ]] && hypr dispatch workspace "${restore_workspace}" >/dev/null 2>&1 || true; rm -f "${temp_full}" "${temp_crop}"' EXIT
+  trap cleanup EXIT
 
   switch_to_capture_workspace "${workspace_target}"
 
@@ -350,6 +373,7 @@ main() {
   usable_w=$((monitor_w - reserved_left - reserved_right))
   usable_h=$((monitor_h - reserved_top - reserved_bottom))
   if [[ "${frame_mode}" == "modal" ]]; then
+    local padded_w padded_h
     gutter_x=$(( usable_w * 4 / 100 ))
     gutter_y=$(( usable_h * 4 / 100 ))
     (( gutter_x < 24 )) && gutter_x=24
@@ -365,8 +389,13 @@ main() {
     (( modal_h < 360 )) && modal_h=360
     (( modal_h > 920 )) && modal_h=920
 
-    crop_w="${modal_w}"
-    crop_h="${modal_h}"
+    padded_w=$(( modal_w + modal_capture_padding_x * 2 ))
+    padded_h=$(( modal_h + modal_capture_padding_y * 2 ))
+    (( padded_w > usable_w )) && padded_w=usable_w
+    (( padded_h > usable_h )) && padded_h=usable_h
+
+    crop_w="${padded_w}"
+    crop_h="${padded_h}"
     crop_x=$((monitor_x + reserved_left + (usable_w - crop_w) / 2))
     crop_y=$((monitor_y + reserved_top + (usable_h - crop_h) / 2))
   else
@@ -376,7 +405,7 @@ main() {
     crop_y=$((monitor_y + reserved_top + (usable_h - crop_h) / 2))
   fi
 
-  grim -t png "${temp_full}"
+  grim_capture "${temp_full}"
   magick "${temp_full}" -crop "${crop_w}x${crop_h}+${crop_x}+${crop_y}" +repage "${temp_crop}"
   cp "${temp_crop}" "${output_path}"
 
