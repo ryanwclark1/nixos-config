@@ -44,6 +44,24 @@ Item {
                 ]
                 onModeSelected: value => Config.blurEnabled = value === "enabled"
             }
+
+            SettingsSliderRow {
+                label: "Settings Backdrop Opacity"
+                min: 0.1
+                max: 1.0
+                value: Config.settingsBackdropOpacity
+                step: 0.05
+                onMoved: v => Config.settingsBackdropOpacity = v
+            }
+
+            SettingsSliderRow {
+                label: "Settings Surface Opacity"
+                min: 0.1
+                max: 1.0
+                value: Config.settingsSurfaceOpacity
+                step: 0.05
+                onMoved: v => Config.settingsSurfaceOpacity = v
+            }
         }
 
         SettingsCard {

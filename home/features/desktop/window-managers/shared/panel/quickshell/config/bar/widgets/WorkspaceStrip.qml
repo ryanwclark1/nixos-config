@@ -70,8 +70,6 @@ Flow {
       }
       color: dropHighlight ? Colors.accent : (isActive ? root.activeColor : root.inactiveColor)
 
-      Behavior on width { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutBack } }
-
       Behavior on color {
         enabled: !wsPill.isUrgent
         ColorAnimation { duration: Colors.durationFast }

@@ -45,6 +45,7 @@ PanelWindow {
     property bool showContent: false
     readonly property int maxLayerTextureSize: 4096
     readonly property int staggerDelay: 35
+    readonly property int settingsOpenDelayMs: 130
     signal closeRequested
 
     function entranceOpacity(index) {
@@ -179,7 +180,7 @@ PanelWindow {
                     iconSize: Colors.fontSizeXL
                     onClicked: {
                         root.closeRequested();
-                        Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "toggle"]);
+                        openSettingsTimer.restart();
                     }
                 }
                 SharedWidgets.IconButton {
@@ -188,6 +189,13 @@ PanelWindow {
                     iconSize: Colors.fontSizeXL
                     onClicked: root.closeRequested()
                 }
+            }
+
+            Timer {
+                id: openSettingsTimer
+                interval: root.settingsOpenDelayMs
+                repeat: false
+                onTriggered: Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "open"])
             }
 
             Item {

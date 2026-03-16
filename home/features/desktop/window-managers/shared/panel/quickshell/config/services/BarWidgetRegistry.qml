@@ -20,7 +20,7 @@ QtObject {
     { widgetType: "updates", label: "Updates", icon: "󰚰", section: "center", description: "Pending system updates." },
     { widgetType: "cava", label: "Visualizer", icon: "󰎈", section: "center", description: "Compact audio spectrum with popup." },
     { widgetType: "idleInhibitor", label: "Idle Inhibitor", icon: "󰒲", section: "center", description: "Toggle idle inhibit state." },
-    { widgetType: "weather", label: "Weather", icon: "󰖙", section: "right", description: "Current weather and forecast popup." },
+    { widgetType: "weather", label: "Weather", icon: "󰖙", section: "right", description: "Current weather and forecast popup.", hasSettings: true, defaultSettings: { displayMode: "auto" } },
     {
       widgetType: "ssh",
       label: "SSH",
@@ -41,13 +41,13 @@ QtObject {
         }
       }
     },
-    { widgetType: "network", label: "Network", icon: "󰖩", section: "right", description: "Network state and controls popup." },
+    { widgetType: "network", label: "Network", icon: "󰖩", section: "right", description: "Network state and controls popup.", hasSettings: true, defaultSettings: { displayMode: "auto" } },
     { widgetType: "bluetooth", label: "Bluetooth", icon: "󰂯", section: "right", description: "Bluetooth status and controls popup." },
-    { widgetType: "audio", label: "Audio", icon: "󰕾", section: "right", description: "Volume and device controls popup." },
+    { widgetType: "audio", label: "Audio", icon: "󰕾", section: "right", description: "Volume and device controls popup.", hasSettings: true, defaultSettings: { displayMode: "auto" } },
     { widgetType: "music", label: "Music", icon: "󰝚", section: "right", description: "Compact active player shortcut." },
     { widgetType: "privacy", label: "Privacy", icon: "󰒃", section: "right", description: "Camera, mic, and share indicators." },
     { widgetType: "recording", label: "Recording", icon: "󰻃", section: "right", description: "Active screen recording indicator." },
-    { widgetType: "battery", label: "Battery", icon: "󰁹", section: "right", description: "Battery status and actions popup." },
+    { widgetType: "battery", label: "Battery", icon: "󰁹", section: "right", description: "Battery status and actions popup.", hasSettings: true, defaultSettings: { displayMode: "auto" } },
     { widgetType: "printer", label: "Printers", icon: "󰐪", section: "right", description: "Printer status popup." },
     { widgetType: "aiChat", label: "AI Chat", icon: "󰚩", section: "right", description: "AI chat assistant toggle." },
     { widgetType: "notepad", label: "Notepad", icon: "󰠮", section: "right", description: "Slideout notepad trigger." },

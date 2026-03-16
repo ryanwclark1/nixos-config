@@ -19,6 +19,8 @@ QtObject {
     // --- GLASS ---
     property bool blurEnabled: true
     property real glassOpacity: 0.65
+    property real settingsBackdropOpacity: 0.82
+    property real settingsSurfaceOpacity: 0.96
 
     // --- NOTIFICATIONS ---
     property int notifWidth: 350
@@ -90,7 +92,10 @@ QtObject {
     property real launcherScoreCategoryWeight: 0.7
 
     // --- CONTROL CENTER ---
-    property int controlCenterWidth: 400
+    readonly property int controlCenterWidthMin: 440
+    readonly property int controlCenterWidthDefault: 440
+    readonly property int controlCenterWidthMax: 560
+    property int controlCenterWidth: controlCenterWidthDefault
     property bool controlCenterShowQuickLinks: true
     property bool controlCenterShowMediaWidget: true
     property var controlCenterToggleOrder: ["bluetooth", "dnd", "nightLight", "caffeine", "recording"]

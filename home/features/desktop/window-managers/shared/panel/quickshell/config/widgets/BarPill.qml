@@ -21,9 +21,42 @@ MouseArea {
   property real horizontalPadding: 8
 
   default property alias content: contentContainer.data
+  signal secondaryClicked()
+
+  function isOverlayChild(child) {
+    if (!child)
+      return true;
+    try {
+      return child.anchors && child.anchors.fill === contentContainer;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function measuredContentWidth() {
+    var maxWidth = 0;
+    for (var i = 0; i < contentContainer.children.length; ++i) {
+      var child = contentContainer.children[i];
+      if (isOverlayChild(child))
+        continue;
+      maxWidth = Math.max(maxWidth, child.implicitWidth || 0, child.width || 0);
+    }
+    return maxWidth;
+  }
+
+  function measuredContentHeight() {
+    var maxHeight = 0;
+    for (var i = 0; i < contentContainer.children.length; ++i) {
+      var child = contentContainer.children[i];
+      if (isOverlayChild(child))
+        continue;
+      maxHeight = Math.max(maxHeight, child.implicitHeight || 0, child.height || 0);
+    }
+    return maxHeight;
+  }
 
   height: 28
-  width: contentContainer.childrenRect.width + horizontalPadding * 2
+  width: measuredContentWidth() + horizontalPadding * 2
   implicitWidth: width
   implicitHeight: height
   acceptedButtons: Qt.LeftButton | Qt.RightButton
@@ -117,6 +150,7 @@ MouseArea {
 
   onClicked: (mouse) => {
     if (mouse.button === Qt.RightButton) {
+      secondaryClicked();
       if (contextActions.length > 0) {
         var globalPos = mapToItem(null, 0, 0);
         contextMenuRequested(contextActions, {
@@ -131,10 +165,9 @@ MouseArea {
 
   Item {
     id: contentContainer
-    x: (parent.width - width) / 2
-    y: (parent.height - height) / 2 - 1
-    width: childrenRect.width
-    height: children.length > 0 ? children[0].height : 0
+    anchors.centerIn: parent
+    width: root.measuredContentWidth()
+    height: root.measuredContentHeight()
   }
 
   BarTooltip {

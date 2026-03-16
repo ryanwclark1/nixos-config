@@ -26,6 +26,12 @@ Rectangle {
   Connections {
     target: NiriService
     enabled: CompositorAdapter.isNiri && NiriService.available
+    function onFocusedWorkspaceIdChanged() {
+      root._applyFocusedWorkspaceFromNiriService()
+    }
+    function onFocusedWorkspaceIndexChanged() {
+      root._applyFocusedWorkspaceFromNiriService()
+    }
     function onWorkspacesUpdated() {
       root._updateStateFromNiriService()
     }
@@ -38,8 +44,40 @@ Rectangle {
   }
 
   Component.onCompleted: {
-    if (CompositorAdapter.isNiri && NiriService.available)
+    if (CompositorAdapter.isNiri && NiriService.available) {
+      _applyFocusedWorkspaceFromNiriService()
       _updateStateFromNiriService()
+    }
+  }
+
+  function _focusedWorkspaceIdFromNiriService() {
+    var focusedId = parseInt(String(NiriService.focusedWorkspaceId || ""), 10);
+    if (!isNaN(focusedId) && focusedId > 0)
+      return focusedId;
+
+    var all = NiriService.allWorkspaces || [];
+    for (var i = 0; i < all.length; i++) {
+      var ws = all[i];
+      if (!ws || !ws.is_focused)
+        continue;
+      var resolvedId = ws.idx !== undefined ? ws.idx : ws.id;
+      var parsedId = parseInt(String(resolvedId), 10);
+      if (!isNaN(parsedId) && parsedId > 0)
+        return parsedId;
+    }
+
+    return -1;
+  }
+
+  function _applyFocusedWorkspaceFromNiriService() {
+    var activeId = _focusedWorkspaceIdFromNiriService();
+    if (activeId < 0 || root.state.activeWorkspace === activeId)
+      return;
+
+    root.state = {
+      workspaces: root.state.workspaces,
+      activeWorkspace: activeId
+    };
   }
 
   function _updateStateFromNiriService() {
@@ -116,6 +154,20 @@ Rectangle {
     }
   }
 
+  function updateActiveWorkspaceFromHypr(rawText) {
+    try {
+      var activeRaw = JSON.parse(rawText || "{}");
+      var activeId = activeRaw && activeRaw.id ? activeRaw.id : -1;
+      if (activeId < 0 || root.state.activeWorkspace === activeId)
+        return;
+
+      root.state = {
+        workspaces: root.state.workspaces,
+        activeWorkspace: activeId
+      };
+    } catch (e) {}
+  }
+
   function updateStateFromNiri(rawText) {
     try {
       var parsed = JSON.parse(rawText || "[]");
@@ -164,7 +216,7 @@ Rectangle {
 
   // Only poll when NiriService is NOT available (Hyprland, or fallback)
   Timer {
-    id: pollTimer
+    id: workspacePollTimer
     interval: 1200
     running: root.workspaceApiAvailable && !CompositorAdapter.isNiri
     repeat: true
@@ -172,6 +224,18 @@ Rectangle {
     onTriggered: {
       workspaceProc.command = root.workspaceQueryCommand();
       workspaceProc.running = true;
+    }
+  }
+
+  Timer {
+    id: activeWorkspacePollTimer
+    interval: 120
+    running: CompositorAdapter.isHyprland
+    repeat: true
+    triggeredOnStart: true
+    onTriggered: {
+      activeWorkspaceProc.command = ["hyprctl", "activeworkspace", "-j"];
+      activeWorkspaceProc.running = true;
     }
   }
 
@@ -198,6 +262,19 @@ Rectangle {
           return;
         }
         root.state = ({ workspaces: [], activeWorkspace: -1 });
+      }
+    }
+  }
+
+  Process {
+    id: activeWorkspaceProc
+    running: false
+    command: ["hyprctl", "activeworkspace", "-j"]
+    stdout: StdioCollector {
+      onStreamFinished: {
+        var raw = String(this.text || "").trim();
+        if (raw !== "")
+          root.updateActiveWorkspaceFromHypr(raw);
       }
     }
   }

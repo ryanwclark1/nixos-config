@@ -78,12 +78,18 @@ PanelWindow {
   }
 
   function captureOpenTab(tabId, scrollY) {
-    var tab = SettingsRegistry.findTab(tabId);
-    if (tab)
-      _persist.currentTabId = tab.id;
+    setCurrentTab(tabId);
     pendingTabId = "";
     setCaptureScrollY(scrollY);
     open();
+  }
+
+  function setCurrentTab(tabId) {
+    var tab = SettingsRegistry.findTab(tabId);
+    if (!tab)
+      return false;
+    _persist.currentTabId = tab.id;
+    return true;
   }
 
   function toggle() {
@@ -102,8 +108,7 @@ PanelWindow {
     repeat: false
     onTriggered: {
       if (settingsRoot.pendingTabId) {
-        var tab = SettingsRegistry.findTab(settingsRoot.pendingTabId);
-        if (tab && settingsRoot._persist) settingsRoot._persist.currentTabId = tab.id;
+        settingsRoot.setCurrentTab(settingsRoot.pendingTabId);
         settingsRoot.pendingTabId = "";
       }
       settingsRoot.open();
@@ -179,7 +184,7 @@ PanelWindow {
 
     Rectangle {
       anchors.fill: parent
-      color: Colors.withAlpha(Colors.background, 0.82)
+      color: Colors.withAlpha(Colors.background, Config.settingsBackdropOpacity)
     }
   }
 
@@ -193,7 +198,7 @@ PanelWindow {
     anchors.left: parent.left
     anchors.topMargin: settingsRoot.edgeMargins.top + Math.max(settingsRoot.gutterY, (settingsRoot.usableHeight - height) / 2)
     anchors.leftMargin: settingsRoot.edgeMargins.left + Math.max(settingsRoot.gutterX, (settingsRoot.usableWidth - width) / 2)
-    color: Colors.withAlpha(Colors.surface, 0.96)
+    color: Colors.withAlpha(Colors.surface, Config.settingsSurfaceOpacity)
     border.color: Colors.border
     border.width: 1
     radius: Colors.radiusLarge
@@ -226,7 +231,7 @@ PanelWindow {
         currentTabId: settingsRoot.currentTabId
         searchQuery: settingsRoot.searchQuery
         compactMode: settingsRoot.compactMode
-        onTabSelected: (tabId) => settingsRoot._persist.currentTabId = tabId
+        onTabSelected: (tabId) => settingsRoot.setCurrentTab(tabId)
         onSearchQueryEdited: (query) => settingsRoot.searchQuery = query
         onSaveAndClose: {
           Config.save();
@@ -243,7 +248,7 @@ PanelWindow {
         searchQuery: settingsRoot.searchQuery
         compactMode: settingsRoot.compactMode
         tightSpacing: settingsRoot.tightSpacing
-        onTabSelected: (tabId) => settingsRoot._persist.currentTabId = tabId
+        onTabSelected: (tabId) => settingsRoot.setCurrentTab(tabId)
         onSearchQueryEdited: (query) => settingsRoot.searchQuery = query
       }
     }

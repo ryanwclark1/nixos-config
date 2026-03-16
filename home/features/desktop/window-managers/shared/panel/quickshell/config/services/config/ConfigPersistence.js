@@ -74,6 +74,10 @@ function applyData(config, data) {
             config.blurEnabled = data.glass.blur;
         if (data.glass.opacity !== undefined)
             config.glassOpacity = data.glass.opacity;
+        if (data.glass.settingsBackdropOpacity !== undefined)
+            config.settingsBackdropOpacity = data.glass.settingsBackdropOpacity;
+        if (data.glass.settingsSurfaceOpacity !== undefined)
+            config.settingsSurfaceOpacity = data.glass.settingsSurfaceOpacity;
     }
 
     if (data.notifications) {
@@ -133,8 +137,11 @@ function applyData(config, data) {
         config.normalizeLauncherConfig(data);
 
     if (data.controlCenter) {
-        if (data.controlCenter.width !== undefined)
-            config.controlCenterWidth = data.controlCenter.width;
+        if (data.controlCenter.width !== undefined) {
+            var controlCenterWidth = parseInt(data.controlCenter.width, 10);
+            if (!isNaN(controlCenterWidth))
+                config.controlCenterWidth = Math.max(config.controlCenterWidthMin, Math.min(config.controlCenterWidthMax, controlCenterWidth));
+        }
         if (data.controlCenter.showQuickLinks !== undefined)
             config.controlCenterShowQuickLinks = data.controlCenter.showQuickLinks;
         if (data.controlCenter.showMediaWidget !== undefined)
@@ -420,7 +427,9 @@ function buildData(config) {
         },
         "glass": {
             "blur": config.blurEnabled,
-            "opacity": config.glassOpacity
+            "opacity": config.glassOpacity,
+            "settingsBackdropOpacity": config.settingsBackdropOpacity,
+            "settingsSurfaceOpacity": config.settingsSurfaceOpacity
         },
         "notifications": {
             "width": config.notifWidth,

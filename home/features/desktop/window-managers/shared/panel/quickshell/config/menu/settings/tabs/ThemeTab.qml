@@ -14,7 +14,9 @@ Item {
     property var _themeResults: []
     property string _themeVariantFilter: ""
     property var _previewTheme: null
+    readonly property var _effectivePreviewTheme: root._previewTheme || ThemeService.activeTheme
     readonly property int _themeColumns: (compactMode || themeFlow.width < 700) ? 1 : 2
+    readonly property int _browserViewportHeight: compactMode ? Math.min(560, Math.max(360, themeListColumn.implicitHeight + Colors.spacingL * 2)) : 520
 
     function _refreshThemeResults() {
         _themeResults = ThemeService.searchThemes(themeSearchField ? themeSearchField.text : "", _themeVariantFilter);
@@ -26,206 +28,26 @@ Item {
         onTriggered: root._refreshThemeResults()
     }
 
-    Component.onCompleted: _refreshThemeResults()
+    Component.onCompleted: {
+        _refreshThemeResults();
+        root._previewTheme = ThemeService.activeTheme;
+    }
+
+    Connections {
+        target: ThemeService
+        function onActiveThemeChanged() {
+            root._previewTheme = ThemeService.activeTheme;
+        }
+    }
 
     SettingsTabPage {
         anchors.fill: parent
         tabId: root.tabId
         title: "Color Theme"
 
-        // ── Live Preview Section ──────────────────────
-        SettingsCard {
-            title: "Live Preview"
-            iconName: "󰄄"
-            description: "Real-time preview of the selected or hovered theme."
-            visible: !root.compactMode && root._previewTheme !== null
-
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: Colors.spacingXL
-
-                // Mock Shell Element
-                Rectangle {
-                    Layout.preferredWidth: 240
-                    Layout.preferredHeight: 120
-                    radius: Colors.radiusMedium
-                    color: root._previewTheme ? root._previewTheme.palette.base00 : Colors.background
-                    border.color: root._previewTheme ? root._previewTheme.palette.base03 : Colors.border
-                    border.width: 1
-                    clip: true
-
-                    ColumnLayout {
-                        anchors.fill: parent
-                        anchors.margins: Colors.spacingM
-                        spacing: Colors.spacingS
-
-                        // Mock Bar
-                        Rectangle {
-                            Layout.fillWidth: true
-                            height: 24
-                            radius: 12
-                            color: root._previewTheme ? Colors.withAlpha(root._previewTheme.palette.base01, 0.8) : Colors.surface
-
-                            RowLayout {
-                                anchors.fill: parent
-                                anchors.leftMargin: Colors.paddingSmall
-                                anchors.rightMargin: Colors.paddingSmall
-                                Rectangle {
-                                    width: 12
-                                    height: 12
-                                    radius: 6
-                                    color: root._previewTheme ? root._previewTheme.palette.base0D : Colors.primary
-                                }
-                                Item {
-                                    Layout.fillWidth: true
-                                }
-                                Text {
-                                    text: "12:00"
-                                    color: root._previewTheme ? root._previewTheme.palette.base05 : Colors.text
-                                    font.pixelSize: 10
-                                    font.bold: true
-                                }
-                            }
-                        }
-
-                        // Mock Window
-                        Rectangle {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            radius: 8
-                            color: root._previewTheme ? root._previewTheme.palette.base01 : Colors.surface
-                            border.color: root._previewTheme ? root._previewTheme.palette.base0D : Colors.primary
-                            border.width: 1
-
-                            ColumnLayout {
-                                anchors.fill: parent
-                                anchors.margins: Colors.paddingSmall
-                                spacing: Colors.spacingXS
-                                Rectangle {
-                                    width: 60
-                                    height: 4
-                                    radius: 2
-                                    color: root._previewTheme ? root._previewTheme.palette.base05 : Colors.text
-                                    opacity: 0.6
-                                }
-                                Rectangle {
-                                    width: 100
-                                    height: 4
-                                    radius: 2
-                                    color: root._previewTheme ? root._previewTheme.palette.base05 : Colors.text
-                                    opacity: 0.3
-                                }
-                                Item {
-                                    Layout.fillHeight: true
-                                }
-                                Rectangle {
-                                    Layout.alignment: Qt.AlignRight
-                                    width: 30
-                                    height: 12
-                                    radius: Colors.radiusXS
-                                    color: root._previewTheme ? root._previewTheme.palette.base0B : Colors.success
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Palette Grid
-                GridLayout {
-                    columns: 4
-                    columnSpacing: Colors.spacingS
-                    rowSpacing: Colors.spacingS
-
-                    Repeater {
-                        model: root._previewTheme ? [
-                            {
-                                c: root._previewTheme.palette.base00,
-                                l: "BG"
-                            },
-                            {
-                                c: root._previewTheme.palette.base01,
-                                l: "SRF"
-                            },
-                            {
-                                c: root._previewTheme.palette.base05,
-                                l: "TXT"
-                            },
-                            {
-                                c: root._previewTheme.palette.base0D,
-                                l: "PRI"
-                            },
-                            {
-                                c: root._previewTheme.palette.base08,
-                                l: "ERR"
-                            },
-                            {
-                                c: root._previewTheme.palette.base0A,
-                                l: "WRN"
-                            },
-                            {
-                                c: root._previewTheme.palette.base0B,
-                                l: "SUC"
-                            },
-                            {
-                                c: root._previewTheme.palette.base0E,
-                                l: "ACC"
-                            }
-                        ] : []
-
-                        Column {
-                            spacing: Colors.spacingXXS
-                            Rectangle {
-                                width: 36
-                                height: 36
-                                radius: 18
-                                color: modelData.c
-                                border.color: Colors.withAlpha(Colors.text, 0.1)
-                                border.width: 1
-                            }
-                            Text {
-                                width: 36
-                                text: modelData.l
-                                color: Colors.textDisabled
-                                font.pixelSize: Colors.fontSizeXXS
-                                font.weight: Font.Bold
-                                horizontalAlignment: Text.AlignHCenter
-                            }
-                        }
-                    }
-                }
-
-                Item {
-                    Layout.fillWidth: true
-                }
-
-                ColumnLayout {
-                    visible: root._previewTheme !== null
-                    Text {
-                        text: root._previewTheme ? root._previewTheme.name : ""
-                        color: Colors.text
-                        font.pixelSize: Colors.fontSizeLarge
-                        font.weight: Font.Bold
-                    }
-                    Text {
-                        text: root._previewTheme ? root._previewTheme.author : ""
-                        color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeSmall
-                    }
-                    Item {
-                        Layout.preferredHeight: Colors.spacingS
-                    }
-                    SettingsActionButton {
-                        label: "Apply Theme"
-                        iconName: "󰄬"
-                        onClicked: ThemeService.applyTheme(root._previewTheme.id)
-                    }
-                }
-            }
-        }
-
         SettingsCard {
             title: "Theme Browser"
-            description: "Search and apply a color theme. Typography and shell styling live in Appearance."
+            description: "The preview stays pinned while the theme catalog scrolls, so you can compare themes without losing context."
 
             ColumnLayout {
                 Layout.fillWidth: true
@@ -264,137 +86,380 @@ Item {
                         }
                     }
                 }
-            }
 
-            Flow {
-                Layout.fillWidth: true
-                width: parent.width
-                spacing: Colors.spacingM
-                visible: Config.themeName !== ""
+                Flow {
+                    Layout.fillWidth: true
+                    width: parent.width
+                    spacing: Colors.spacingM
+                    visible: Config.themeName !== ""
+
+                    Text {
+                        width: root.compactMode ? parent.width : undefined
+                        text: "Active: " + (ThemeService.activeTheme ? ThemeService.activeTheme.name : Config.themeName)
+                        color: Colors.primary
+                        font.pixelSize: Colors.fontSizeSmall
+                        font.weight: Font.DemiBold
+                        wrapMode: Text.WordWrap
+                    }
+
+                    SettingsActionButton {
+                        label: "Clear Theme"
+                        iconName: "󰅖"
+                        compact: true
+                        onClicked: ThemeService.clearTheme()
+                    }
+                }
 
                 Text {
-                    width: root.compactMode ? parent.width : undefined
-                    text: "Active: " + (ThemeService.activeTheme ? ThemeService.activeTheme.name : Config.themeName)
-                    color: Colors.primary
-                    font.pixelSize: Colors.fontSizeSmall
-                    font.weight: Font.DemiBold
-                    wrapMode: Text.WordWrap
+                    text: root._themeResults.length + " themes"
+                    color: Colors.textDisabled
+                    font.pixelSize: Colors.fontSizeXS
                 }
 
-                SettingsActionButton {
-                    label: "Clear Theme"
-                    iconName: "󰅖"
-                    compact: true
-                    onClicked: ThemeService.clearTheme()
-                }
-            }
+                RowLayout {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: root._browserViewportHeight
+                    spacing: Colors.spacingL
 
-            Text {
-                text: root._themeResults.length + " themes"
-                color: Colors.textDisabled
-                font.pixelSize: Colors.fontSizeXS
-            }
+                    Rectangle {
+                        Layout.preferredWidth: root.compactMode ? 0 : 360
+                        Layout.fillHeight: true
+                        visible: !root.compactMode && root._effectivePreviewTheme !== null
+                        radius: Colors.radiusMedium
+                        color: Colors.modalFieldSurface
+                        border.color: Colors.border
+                        border.width: 1
 
-            Flow {
-                id: themeFlow
-                Layout.fillWidth: true
-                spacing: Colors.spacingXS
-
-                Repeater {
-                    model: root._themeResults
-
-                    Item {
-                        id: themeCardWrapper
-                        width: Math.max(Math.min(180, themeFlow.width), Math.floor((themeFlow.width - Colors.spacingXS * (root._themeColumns - 1)) / root._themeColumns))
-                        height: themeCardLayout.implicitHeight + Colors.spacingS * 2
-
-                        property var _theme: modelData
-                        property bool _themeIsActive: _theme.id === Config.themeName
-
-                        Rectangle {
+                        ColumnLayout {
                             anchors.fill: parent
-                            radius: Colors.radiusSmall
-                            color: Colors.modalFieldSurface
-                            border.color: themeCardWrapper._themeIsActive ? Colors.primary : Colors.border
-                            border.width: themeCardWrapper._themeIsActive ? 2 : 1
-                            Behavior on border.color {
-                                ColorAnimation {
-                                    duration: Colors.durationFast
-                                }
+                            anchors.margins: Colors.spacingL
+                            spacing: Colors.spacingM
+
+                            Text {
+                                text: "Locked Preview"
+                                color: Colors.text
+                                font.pixelSize: Colors.fontSizeLarge
+                                font.weight: Font.DemiBold
                             }
 
                             Rectangle {
-                                anchors.fill: parent
-                                radius: parent.radius
-                                color: Colors.text
-                                opacity: themeMouseArea.pressed ? 0.12 : themeMouseArea.containsMouse ? 0.06 : 0
-                                Behavior on opacity {
-                                    NumberAnimation {
-                                        duration: Colors.durationSnap
-                                    }
-                                }
-                            }
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 176
+                                radius: Colors.radiusMedium
+                                color: root._effectivePreviewTheme ? root._effectivePreviewTheme.palette.base00 : Colors.background
+                                border.color: root._effectivePreviewTheme ? root._effectivePreviewTheme.palette.base03 : Colors.border
+                                border.width: 1
+                                clip: true
 
-                            ColumnLayout {
-                                id: themeCardLayout
-                                anchors {
-                                    fill: parent
-                                    leftMargin: Colors.spacingM
-                                    rightMargin: Colors.spacingM
-                                    topMargin: Colors.spacingS
-                                    bottomMargin: Colors.spacingS
-                                }
-                                spacing: Colors.spacingXS
-
-                                RowLayout {
-                                    Layout.fillWidth: true
+                                ColumnLayout {
+                                    anchors.fill: parent
+                                    anchors.margins: Colors.spacingM
                                     spacing: Colors.spacingS
 
-                                    Text {
-                                        text: "󰄬"
-                                        color: Colors.primary
-                                        font.family: Colors.fontMono
-                                        font.pixelSize: Colors.fontSizeLarge
-                                        visible: themeCardWrapper._themeIsActive
-                                    }
-
-                                    Text {
-                                        text: themeCardWrapper._theme.name
-                                        color: themeCardWrapper._themeIsActive ? Colors.primary : Colors.text
-                                        font.pixelSize: Colors.fontSizeMedium
-                                        font.weight: themeCardWrapper._themeIsActive ? Font.DemiBold : Font.Normal
-                                        elide: Text.ElideRight
+                                    Rectangle {
                                         Layout.fillWidth: true
+                                        height: 24
+                                        radius: 12
+                                        color: root._effectivePreviewTheme ? Colors.withAlpha(root._effectivePreviewTheme.palette.base01, 0.8) : Colors.surface
+
+                                        RowLayout {
+                                            anchors.fill: parent
+                                            anchors.leftMargin: Colors.paddingSmall
+                                            anchors.rightMargin: Colors.paddingSmall
+
+                                            Rectangle {
+                                                width: 12
+                                                height: 12
+                                                radius: 6
+                                                color: root._effectivePreviewTheme ? root._effectivePreviewTheme.palette.base0D : Colors.primary
+                                            }
+
+                                            Item {
+                                                Layout.fillWidth: true
+                                            }
+
+                                            Text {
+                                                text: "12:00"
+                                                color: root._effectivePreviewTheme ? root._effectivePreviewTheme.palette.base05 : Colors.text
+                                                font.pixelSize: 10
+                                                font.bold: true
+                                            }
+                                        }
                                     }
-                                }
 
-                                Flow {
-                                    Layout.fillWidth: true
-                                    width: parent.width
-                                    spacing: Colors.spacingXS
+                                    Rectangle {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        radius: 8
+                                        color: root._effectivePreviewTheme ? root._effectivePreviewTheme.palette.base01 : Colors.surface
+                                        border.color: root._effectivePreviewTheme ? root._effectivePreviewTheme.palette.base0D : Colors.primary
+                                        border.width: 1
 
-                                    Repeater {
-                                        model: [themeCardWrapper._theme.palette.base00, themeCardWrapper._theme.palette.base08, themeCardWrapper._theme.palette.base0B, themeCardWrapper._theme.palette.base0D, themeCardWrapper._theme.palette.base0E, themeCardWrapper._theme.palette.base05]
+                                        ColumnLayout {
+                                            anchors.fill: parent
+                                            anchors.margins: Colors.paddingSmall
+                                            spacing: Colors.spacingXS
 
-                                        delegate: Rectangle {
-                                            width: 14
-                                            height: 14
-                                            radius: width / 2
-                                            color: modelData
-                                            border.color: Colors.withAlpha(Colors.text, 0.15)
-                                            border.width: 1
+                                            Rectangle {
+                                                width: 60
+                                                height: 4
+                                                radius: 2
+                                                color: root._effectivePreviewTheme ? root._effectivePreviewTheme.palette.base05 : Colors.text
+                                                opacity: 0.6
+                                            }
+
+                                            Rectangle {
+                                                width: 100
+                                                height: 4
+                                                radius: 2
+                                                color: root._effectivePreviewTheme ? root._effectivePreviewTheme.palette.base05 : Colors.text
+                                                opacity: 0.3
+                                            }
+
+                                            Item {
+                                                Layout.fillHeight: true
+                                            }
+
+                                            Rectangle {
+                                                Layout.alignment: Qt.AlignRight
+                                                width: 30
+                                                height: 12
+                                                radius: Colors.radiusXS
+                                                color: root._effectivePreviewTheme ? root._effectivePreviewTheme.palette.base0B : Colors.success
+                                            }
                                         }
                                     }
                                 }
                             }
 
-                            MouseArea {
-                                id: themeMouseArea
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onEntered: root._previewTheme = themeCardWrapper._theme
-                                onClicked: ThemeService.applyTheme(themeCardWrapper._theme.id)
+                            GridLayout {
+                                columns: 4
+                                columnSpacing: Colors.spacingS
+                                rowSpacing: Colors.spacingS
+
+                                Repeater {
+                                    model: root._effectivePreviewTheme ? [
+                                        {
+                                            c: root._effectivePreviewTheme.palette.base00,
+                                            l: "BG"
+                                        },
+                                        {
+                                            c: root._effectivePreviewTheme.palette.base01,
+                                            l: "SRF"
+                                        },
+                                        {
+                                            c: root._effectivePreviewTheme.palette.base05,
+                                            l: "TXT"
+                                        },
+                                        {
+                                            c: root._effectivePreviewTheme.palette.base0D,
+                                            l: "PRI"
+                                        },
+                                        {
+                                            c: root._effectivePreviewTheme.palette.base08,
+                                            l: "ERR"
+                                        },
+                                        {
+                                            c: root._effectivePreviewTheme.palette.base0A,
+                                            l: "WRN"
+                                        },
+                                        {
+                                            c: root._effectivePreviewTheme.palette.base0B,
+                                            l: "SUC"
+                                        },
+                                        {
+                                            c: root._effectivePreviewTheme.palette.base0E,
+                                            l: "ACC"
+                                        }
+                                    ] : []
+
+                                    delegate: Column {
+                                        spacing: Colors.spacingXXS
+
+                                        Rectangle {
+                                            width: 36
+                                            height: 36
+                                            radius: 18
+                                            color: modelData.c
+                                            border.color: Colors.withAlpha(Colors.text, 0.1)
+                                            border.width: 1
+                                        }
+
+                                        Text {
+                                            width: 36
+                                            text: modelData.l
+                                            color: Colors.textDisabled
+                                            font.pixelSize: Colors.fontSizeXXS
+                                            font.weight: Font.Bold
+                                            horizontalAlignment: Text.AlignHCenter
+                                        }
+                                    }
+                                }
+                            }
+
+                            Text {
+                                text: root._effectivePreviewTheme ? root._effectivePreviewTheme.name : ""
+                                color: Colors.text
+                                font.pixelSize: Colors.fontSizeLarge
+                                font.weight: Font.Bold
+                            }
+
+                            Text {
+                                text: root._effectivePreviewTheme ? root._effectivePreviewTheme.author : ""
+                                color: Colors.textSecondary
+                                font.pixelSize: Colors.fontSizeSmall
+                            }
+
+                            Text {
+                                text: root._effectivePreviewTheme && root._effectivePreviewTheme.id === Config.themeName ? "Currently applied theme" : "Hover any theme card and the preview will stay pinned here."
+                                color: root._effectivePreviewTheme && root._effectivePreviewTheme.id === Config.themeName ? Colors.primary : Colors.textSecondary
+                                font.pixelSize: Colors.fontSizeXS
+                                wrapMode: Text.WordWrap
+                                Layout.fillWidth: true
+                            }
+
+                            SettingsActionButton {
+                                label: "Apply Theme"
+                                iconName: "󰄬"
+                                enabled: root._effectivePreviewTheme !== null
+                                onClicked: ThemeService.applyTheme(root._effectivePreviewTheme.id)
+                            }
+
+                            Item {
+                                Layout.fillHeight: true
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        radius: Colors.radiusMedium
+                        color: Colors.modalFieldSurface
+                        border.color: Colors.border
+                        border.width: 1
+
+                        Flickable {
+                            id: themeListFlick
+                            anchors.fill: parent
+                            anchors.margins: Colors.spacingM
+                            clip: true
+                            boundsBehavior: Flickable.DragOverBounds
+                            contentHeight: themeListColumn.implicitHeight
+
+                            Column {
+                                id: themeListColumn
+                                width: themeListFlick.width
+                                spacing: Colors.spacingS
+
+                                Flow {
+                                    id: themeFlow
+                                    width: parent.width
+                                    spacing: Colors.spacingXS
+
+                                    Repeater {
+                                        model: root._themeResults
+
+                                        Item {
+                                            id: themeCardWrapper
+                                            width: Math.max(Math.min(180, themeFlow.width), Math.floor((themeFlow.width - Colors.spacingXS * (root._themeColumns - 1)) / root._themeColumns))
+                                            height: themeCardLayout.implicitHeight + Colors.spacingS * 2
+
+                                            property var _theme: modelData
+                                            property bool _themeIsActive: _theme.id === Config.themeName
+
+                                            Rectangle {
+                                                anchors.fill: parent
+                                                radius: Colors.radiusSmall
+                                                color: Colors.modalFieldSurface
+                                                border.color: themeCardWrapper._themeIsActive ? Colors.primary : Colors.border
+                                                border.width: themeCardWrapper._themeIsActive ? 2 : 1
+
+                                                Behavior on border.color {
+                                                    ColorAnimation {
+                                                        duration: Colors.durationFast
+                                                    }
+                                                }
+
+                                                Rectangle {
+                                                    anchors.fill: parent
+                                                    radius: parent.radius
+                                                    color: Colors.text
+                                                    opacity: themeMouseArea.pressed ? 0.12 : themeMouseArea.containsMouse ? 0.06 : 0
+
+                                                    Behavior on opacity {
+                                                        NumberAnimation {
+                                                            duration: Colors.durationSnap
+                                                        }
+                                                    }
+                                                }
+
+                                                ColumnLayout {
+                                                    id: themeCardLayout
+                                                    anchors {
+                                                        fill: parent
+                                                        leftMargin: Colors.spacingM
+                                                        rightMargin: Colors.spacingM
+                                                        topMargin: Colors.spacingS
+                                                        bottomMargin: Colors.spacingS
+                                                    }
+                                                    spacing: Colors.spacingXS
+
+                                                    RowLayout {
+                                                        Layout.fillWidth: true
+                                                        spacing: Colors.spacingS
+
+                                                        Text {
+                                                            text: "󰄬"
+                                                            color: Colors.primary
+                                                            font.family: Colors.fontMono
+                                                            font.pixelSize: Colors.fontSizeLarge
+                                                            visible: themeCardWrapper._themeIsActive
+                                                        }
+
+                                                        Text {
+                                                            text: themeCardWrapper._theme.name
+                                                            color: themeCardWrapper._themeIsActive ? Colors.primary : Colors.text
+                                                            font.pixelSize: Colors.fontSizeMedium
+                                                            font.weight: themeCardWrapper._themeIsActive ? Font.DemiBold : Font.Normal
+                                                            elide: Text.ElideRight
+                                                            Layout.fillWidth: true
+                                                        }
+                                                    }
+
+                                                    Flow {
+                                                        Layout.fillWidth: true
+                                                        width: parent.width
+                                                        spacing: Colors.spacingXS
+
+                                                        Repeater {
+                                                            model: [themeCardWrapper._theme.palette.base00, themeCardWrapper._theme.palette.base08, themeCardWrapper._theme.palette.base0B, themeCardWrapper._theme.palette.base0D, themeCardWrapper._theme.palette.base0E, themeCardWrapper._theme.palette.base05]
+
+                                                            delegate: Rectangle {
+                                                                width: 14
+                                                                height: 14
+                                                                radius: width / 2
+                                                                color: modelData
+                                                                border.color: Colors.withAlpha(Colors.text, 0.15)
+                                                                border.width: 1
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                                MouseArea {
+                                                    id: themeMouseArea
+                                                    anchors.fill: parent
+                                                    hoverEnabled: true
+                                                    cursorShape: Qt.PointingHandCursor
+                                                    onEntered: root._previewTheme = themeCardWrapper._theme
+                                                    onExited: root._previewTheme = ThemeService.activeTheme
+                                                    onClicked: ThemeService.applyTheme(themeCardWrapper._theme.id)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

@@ -192,6 +192,14 @@ QtObject {
       return;
     }
     if (isNiri) {
+      if (ws === "e-1") {
+        NiriService.focusWorkspaceRelative(-1);
+        return;
+      }
+      if (ws === "e+1") {
+        NiriService.focusWorkspaceRelative(1);
+        return;
+      }
       // Use NiriService IPC for instant response instead of spawning a subprocess.
       NiriService.focusWorkspace(parseInt(ws, 10));
       return;

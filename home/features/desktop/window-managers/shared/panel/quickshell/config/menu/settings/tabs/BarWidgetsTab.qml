@@ -160,6 +160,10 @@ Item {
         return widgetType === "cpuStatus" || widgetType === "ramStatus" || widgetType === "gpuStatus";
     }
 
+    function isSummaryDisplayWidget(widgetType) {
+        return widgetType === "weather" || widgetType === "network" || widgetType === "audio" || widgetType === "battery";
+    }
+
     function statDisplayModeLabel(widgetInstance) {
         var settings = widgetInstance && widgetInstance.settings ? widgetInstance.settings : {};
         var mode = String(settings.displayMode || "auto");
@@ -181,6 +185,16 @@ Item {
         if (style === "usage")
             return "Usage";
         return "Percent";
+    }
+
+    function summaryDisplayModeLabel(widgetInstance) {
+        var settings = widgetInstance && widgetInstance.settings ? widgetInstance.settings : {};
+        var mode = String(settings.displayMode || "auto");
+        if (mode === "full")
+            return "Full";
+        if (mode === "icon")
+            return "Icon";
+        return "Auto";
     }
 
     function loadPluginSettingsPane() {
@@ -460,6 +474,13 @@ Item {
                                         SharedWidgets.FilterChip {
                                             visible: root.isSystemStatWidget(widgetRow.widgetInstance.widgetType)
                                             label: "Value: " + root.statValueStyleLabel(widgetRow.widgetInstance)
+                                            selected: false
+                                            enabled: false
+                                        }
+
+                                        SharedWidgets.FilterChip {
+                                            visible: root.isSummaryDisplayWidget(widgetRow.widgetInstance.widgetType)
+                                            label: "Display: " + root.summaryDisplayModeLabel(widgetRow.widgetInstance)
                                             selected: false
                                             enabled: false
                                         }
@@ -861,6 +882,28 @@ Item {
                             }
                         ]
                         onModeSelected: value => root.updateEditingWidgetSetting("valueStyle", value)
+                    }
+
+                    SettingsModeRow {
+                        visible: !!root.editingWidget && root.isSummaryDisplayWidget(root.editingWidget.widgetType)
+                        label: "Display Mode"
+                        description: "Choose whether this widget adapts to bar orientation automatically, always shows its text/details, or stays icon-only."
+                        currentValue: root.editingWidget && root.editingWidget.settings && root.editingWidget.settings.displayMode ? root.editingWidget.settings.displayMode : "auto"
+                        options: [
+                            {
+                                value: "auto",
+                                label: "Auto"
+                            },
+                            {
+                                value: "full",
+                                label: "Full"
+                            },
+                            {
+                                value: "icon",
+                                label: "Icon"
+                            }
+                        ]
+                        onModeSelected: value => root.updateEditingWidgetSetting("displayMode", value)
                     }
 
                     SharedWidgets.SshWidgetSettings {

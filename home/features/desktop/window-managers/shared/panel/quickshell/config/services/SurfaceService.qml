@@ -275,6 +275,16 @@ QtObject {
         popupSwitchTimer.restart();
     }
 
+    function beginPopupClose(surfaceId, surfaceContext) {
+        root.closingSurfaceId = surfaceId;
+        root.closingSurfaceContext = surfaceContext;
+        root.closingMenuScreen = root.menuScreen;
+        root.activeSurfaceId = "";
+        root.activeSurfaceContext = null;
+        root.menuScreen = null;
+        popupSwitchTimer.restart();
+    }
+
     function openSurface(surfaceId, context) {
         var resolved = normalizeSurfaceId(surfaceId);
         if (!resolved)
@@ -307,20 +317,28 @@ QtObject {
         if (root.activeSurfaceId !== resolved)
             return false;
         popupSwitchTimer.stop();
-        root.clearClosingSurface();
-        root.activeSurfaceId = "";
-        root.activeSurfaceContext = null;
-        root.menuScreen = null;
+        if (root.surfaceKind(resolved) === "popup")
+            root.beginPopupClose(resolved, root.activeSurfaceContext);
+        else {
+            root.clearClosingSurface();
+            root.activeSurfaceId = "";
+            root.activeSurfaceContext = null;
+            root.menuScreen = null;
+        }
         return true;
     }
 
     function closeAllSurfaces() {
         popupSwitchTimer.stop();
         root.clearPendingSurface();
-        root.clearClosingSurface();
-        root.activeSurfaceId = "";
-        root.activeSurfaceContext = null;
-        root.menuScreen = null;
+        if (root.activeSurfaceId && root.surfaceKind(root.activeSurfaceId) === "popup")
+            root.beginPopupClose(root.activeSurfaceId, root.activeSurfaceContext);
+        else {
+            root.clearClosingSurface();
+            root.activeSurfaceId = "";
+            root.activeSurfaceContext = null;
+            root.menuScreen = null;
+        }
     }
 
     function toggleSurface(surfaceId, context) {

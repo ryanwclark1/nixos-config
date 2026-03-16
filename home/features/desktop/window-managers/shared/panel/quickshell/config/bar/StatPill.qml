@@ -39,19 +39,14 @@ Item {
     isActive: root.isActive || reaperPopup.isOpen
     tooltipText: root.tooltipText
     horizontalPadding: (root.compact || root.iconOnly) ? 5 : 8
-    
+
     onClicked: root.clicked()
-    
-    MouseArea {
-        anchors.fill: parent
-        acceptedButtons: Qt.RightButton
-        onClicked: {
-            if (root.statKey === "cpuStatus" || root.statKey === "ramStatus") {
-                ProcessService.sortBy = (root.statKey === "cpuStatus" ? "cpu" : "mem");
-                ProcessService.refresh();
-                reaperPopup.toggle();
-            }
-        }
+    onSecondaryClicked: {
+      if (root.statKey === "cpuStatus" || root.statKey === "ramStatus") {
+        ProcessService.sortBy = (root.statKey === "cpuStatus" ? "cpu" : "mem");
+        ProcessService.refresh();
+        reaperPopup.toggle();
+      }
     }
 
     Loader {

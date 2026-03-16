@@ -74,6 +74,8 @@ Item {
 
       Row {
         spacing: Colors.spacingXS
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: 1
 
         Text {
           color: Colors.text

@@ -1,5 +1,5 @@
 import QtQuick
 
 ShellCoreSectionTab {
-    sectionMode: "system"
+    sectionMode: "launcher"
 }

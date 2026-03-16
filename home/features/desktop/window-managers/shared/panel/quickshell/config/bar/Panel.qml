@@ -34,7 +34,7 @@ Item {
   readonly property int outerPadding: Colors.spacingM
   readonly property int sectionSpacing: Colors.spacingS
   readonly property int runtimeSpacing: Colors.spacingM
-  readonly property real centerTargetOffset: (leftSection.width - rightSection.width) / 2
+  readonly property real centerTargetOffset: 0
   readonly property real centerMinOffset: outerPadding + leftSection.width + (leftSection.width > 0 ? runtimeSpacing : 0) - width / 2 + centerSection.width / 2
   readonly property real centerMaxOffset: width / 2 - outerPadding - rightSection.width - (rightSection.width > 0 ? runtimeSpacing : 0) - centerSection.width / 2
   readonly property real centerClampedOffset: centerMinOffset > centerMaxOffset
@@ -166,6 +166,12 @@ Item {
     return ["auto", "full", "compact", "icon"].indexOf(mode) !== -1 ? mode : "auto";
   }
 
+  function widgetSummaryDisplayMode(widgetInstance) {
+    var settings = widgetSettings(widgetInstance);
+    var mode = String(settings.displayMode || "auto");
+    return ["auto", "full", "icon"].indexOf(mode) !== -1 ? mode : "auto";
+  }
+
   function isCompactStatWidget(widgetInstance) {
     var mode = widgetDisplayMode(widgetInstance);
     if (mode === "compact") return true;
@@ -175,6 +181,19 @@ Item {
 
   function isIconOnlyStatWidget(widgetInstance) {
     return widgetDisplayMode(widgetInstance) === "icon";
+  }
+
+  function isSummaryWidgetIconOnly(widgetInstance) {
+    var mode = widgetSummaryDisplayMode(widgetInstance);
+    if (mode === "icon")
+      return true;
+    if (mode === "full")
+      return false;
+    return root.vertical;
+  }
+
+  function isSummaryWidgetFull(widgetInstance) {
+    return !isSummaryWidgetIconOnly(widgetInstance);
   }
 
   function componentForWidget(widgetType) {
@@ -387,14 +406,23 @@ Item {
 
   Component {
     id: widgetLoaderDelegate
-    Loader {
+    Item {
       required property var modelData
       property var widgetInstance: modelData
-      active: !!widgetInstance && widgetInstance.enabled !== false
-      sourceComponent: root.componentForWidget(widgetInstance ? widgetInstance.widgetType : "")
-      onLoaded: {
-        if (item && item.widgetInstance !== undefined)
-          item.widgetInstance = widgetInstance;
+      implicitWidth: widgetLoader.implicitWidth
+      implicitHeight: root.vertical ? widgetLoader.implicitHeight : root.thickness
+      width: root.vertical ? Math.max(root.thickness, widgetLoader.implicitWidth) : widgetLoader.implicitWidth
+      height: root.vertical ? widgetLoader.implicitHeight : root.thickness
+
+      Loader {
+        id: widgetLoader
+        anchors.centerIn: parent
+        active: !!parent.widgetInstance && parent.widgetInstance.enabled !== false
+        sourceComponent: root.componentForWidget(parent.widgetInstance ? parent.widgetInstance.widgetType : "")
+        onLoaded: {
+          if (item && item.widgetInstance !== undefined)
+            item.widgetInstance = parent.widgetInstance;
+        }
       }
     }
   }
@@ -563,6 +591,8 @@ Item {
         Row {
           visible: !root.vertical
           spacing: Colors.spacingXS
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.verticalCenterOffset: 1
 
           Text {
             color: Colors.text
@@ -760,7 +790,7 @@ Item {
         }
 
         Text {
-          visible: !root.vertical
+          visible: root.isSummaryWidgetFull(widgetInstance)
           text: WeatherService.temp
           color: Colors.text
           font.pixelSize: Colors.fontSizeSmall
@@ -788,7 +818,7 @@ Item {
         spacing: Colors.spacingS
         SharedWidgets.NetworkWidget {
           id: networkWidget
-          iconOnly: root.vertical
+          iconOnly: root.isSummaryWidgetIconOnly(widgetInstance)
         }
       }
     }
@@ -849,7 +879,7 @@ Item {
         spacing: Colors.spacingS
         SharedWidgets.AudioWidget {
           id: audioWidget
-          iconOnly: root.vertical
+          iconOnly: root.isSummaryWidgetIconOnly(widgetInstance)
         }
       }
     }
@@ -1021,7 +1051,7 @@ Item {
         spacing: Colors.spacingXS
         SharedWidgets.BatteryWidget {
           id: batteryWidget
-          iconOnly: root.vertical
+          iconOnly: root.isSummaryWidgetIconOnly(widgetInstance)
         }
       }
     }

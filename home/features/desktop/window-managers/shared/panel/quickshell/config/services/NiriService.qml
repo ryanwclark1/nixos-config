@@ -142,7 +142,31 @@ QtObject {
 
     // ── Workspace navigation ────────────────────────
     function focusWorkspace(index) {
+        const targetIndex = parseInt(index, 10)
+        if (!isNaN(targetIndex))
+            _optimisticallyFocusWorkspace(targetIndex)
         return send({ "Action": { "FocusWorkspace": { "reference": { "Index": index } } } })
+    }
+    function focusWorkspaceRelative(step) {
+        const source = currentOutputWorkspaces.length > 0 ? currentOutputWorkspaces : allWorkspaces
+        if (!source || source.length === 0)
+            return false
+
+        let focusedPos = source.findIndex(ws => !!ws.is_focused)
+        if (focusedPos < 0 && focusedWorkspaceId !== "")
+            focusedPos = source.findIndex(ws => String(ws.id) === String(focusedWorkspaceId))
+        if (focusedPos < 0)
+            focusedPos = 0
+
+        const targetPos = Math.max(0, Math.min(source.length - 1, focusedPos + step))
+        const target = source[targetPos]
+        if (!target)
+            return false
+
+        const targetIndex = target.idx !== undefined ? target.idx : parseInt(target.id, 10)
+        if (isNaN(targetIndex))
+            return false
+        return focusWorkspace(targetIndex)
     }
     function focusWorkspaceUp() {
         return send({ "Action": { "FocusWorkspaceUp": {} } })
@@ -671,6 +695,50 @@ QtObject {
             return
         }
         currentOutputWorkspaces = allWorkspaces.filter(w => w.output === currentOutput)
+    }
+
+    function _optimisticallyFocusWorkspace(targetIndex) {
+        const target = allWorkspaces.find(ws => ws && ws.idx === targetIndex)
+        if (!target)
+            return
+
+        const targetOutput = String(target.output || currentOutput || "")
+        const updated = {}
+        let changed = false
+
+        for (const id in root.workspaces) {
+            const workspace = root.workspaces[id]
+            if (!workspace) {
+                updated[id] = workspace
+                continue
+            }
+
+            const shouldFocus = workspace.idx === targetIndex
+            let shouldBeActive = !!workspace.is_active
+            const workspaceOutput = String(workspace.output || "")
+
+            if (targetOutput !== "" && workspaceOutput === targetOutput)
+                shouldBeActive = shouldFocus
+            else if (targetOutput === "" && (workspace.is_focused || shouldFocus))
+                shouldBeActive = shouldFocus
+
+            if (workspace.is_focused === shouldFocus && workspace.is_active === shouldBeActive) {
+                updated[id] = workspace
+                continue
+            }
+
+            const copy = _shallowCopy(workspace)
+            copy.is_focused = shouldFocus
+            copy.is_active = shouldBeActive
+            updated[id] = copy
+            changed = true
+        }
+
+        if (!changed)
+            return
+
+        root.workspaces = updated
+        _rebuildWorkspaceArrays(updated)
     }
 
     function _shallowCopy(obj) {

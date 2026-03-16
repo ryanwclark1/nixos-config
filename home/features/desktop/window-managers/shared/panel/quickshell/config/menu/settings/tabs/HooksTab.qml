@@ -30,14 +30,26 @@ Item {
             }
 
             SettingsListRow {
-                label: "Open Hooks Directory"
-
-                Text {
+                ColumnLayout {
                     Layout.fillWidth: true
-                    text: "Open ~/.config/quickshell/hooks in the default file manager."
-                    color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeSmall
-                    wrapMode: Text.WordWrap
+                    spacing: Colors.spacingXXS
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: "Open Hooks Directory"
+                        color: Colors.text
+                        font.pixelSize: Colors.fontSizeSmall
+                        font.weight: Font.DemiBold
+                        wrapMode: Text.WordWrap
+                    }
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: "Open ~/.config/quickshell/hooks in the default file manager."
+                        color: Colors.textSecondary
+                        font.pixelSize: Colors.fontSizeSmall
+                        wrapMode: Text.WordWrap
+                    }
                 }
 
                 SettingsActionButton {
@@ -71,7 +83,9 @@ Item {
                             spacing: Colors.spacingS
 
                             Rectangle {
-                                width: 8; height: 8; radius: Colors.radiusXS
+                                width: 8
+                                height: 8
+                                radius: Colors.radiusXS
                                 color: _hookHasScript(modelData.name) ? Colors.success : Colors.textDisabled
                             }
 
@@ -144,19 +158,29 @@ Item {
         }
         var result = [];
         for (var j = 0; j < order.length; j++) {
-            result.push({ category: order[j], hooks: groups[order[j]] });
+            result.push({
+                category: order[j],
+                hooks: groups[order[j]]
+            });
         }
         return result;
     }
 
     function _categoryIcon(cat) {
-        if (cat === "Appearance") return "󰏘";
-        if (cat === "Power") return "󰌪";
-        if (cat === "Audio") return "󰕾";
-        if (cat === "Display") return "󰍹";
-        if (cat === "Notifications") return "󰂚";
-        if (cat === "Media") return "󰝚";
-        if (cat === "Compositor") return "󱗼";
+        if (cat === "Appearance")
+            return "󰏘";
+        if (cat === "Power")
+            return "󰌪";
+        if (cat === "Audio")
+            return "󰕾";
+        if (cat === "Display")
+            return "󰍹";
+        if (cat === "Notifications")
+            return "󰂚";
+        if (cat === "Media")
+            return "󰝚";
+        if (cat === "Compositor")
+            return "󱗼";
         return "󱁨";
     }
 
