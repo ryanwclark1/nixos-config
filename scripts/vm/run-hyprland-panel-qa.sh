@@ -329,7 +329,7 @@ if (( reset_disk == 1 )); then
   launcher_args+=(--reset-disk)
 fi
 coproc VM_LAUNCHER {
-  exec env QEMU_OPTS="${qa_qemu_opts}" timeout "${boot_timeout}" bash "${launcher}" "${launcher_args[@]}" >"${launcher_log}" 2>&1
+  exec env QEMU_OPTS="${qa_qemu_opts}" bash "${launcher}" "${launcher_args[@]}" >"${launcher_log}" 2>&1
 }
 launcher_pid="${VM_LAUNCHER_PID}"
 

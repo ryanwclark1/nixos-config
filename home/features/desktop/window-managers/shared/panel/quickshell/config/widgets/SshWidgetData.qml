@@ -15,6 +15,7 @@ QtObject {
     readonly property string displayMode: String(rawSettings.displayMode || "count") === "recent" ? "recent" : "count"
     readonly property string defaultAction: String(rawSettings.defaultAction || "connect") === "copy" ? "copy" : "connect"
     readonly property bool showWhenEmpty: rawSettings.showWhenEmpty === true
+    readonly property string emptyClickAction: String(rawSettings.emptyClickAction || "menu") === "refresh" ? "refresh" : "menu"
     readonly property string emptyLabel: {
         var text = String(rawSettings.emptyLabel || "SSH").trim();
         return text !== "" ? text : "SSH";
@@ -520,12 +521,38 @@ QtObject {
             lines.push("Last connected: " + stateInfo.lastConnectedLabel + (stateInfo.lastConnectedAt ? (" at " + stateInfo.lastConnectedAt) : ""));
         if (importErrors.length > 0)
             lines.push("Import errors: " + String(importErrors.length));
+        if (mergedHosts.length === 0 && showWhenEmpty)
+            lines.push("Empty click: " + (emptyClickAction === "refresh" ? "refresh import" : "open menu"));
         return lines.join("\n");
+    }
+
+    function handleEmptyClick() {
+        if (emptyClickAction === "refresh" && enableSshConfigImport && !importBusy) {
+            refreshImport();
+            return "refresh";
+        }
+        return "menu";
     }
 
     function contextActions(limit) {
         var count = Math.max(1, Number(limit || 6));
         var actions = [];
+        if (mergedHosts.length === 0) {
+            actions.push({
+                label: "No SSH hosts configured",
+                icon: "󰅚",
+                enabled: false
+            });
+            if (!enableSshConfigImport) {
+                actions.push({
+                    label: "Enable SSH config import",
+                    icon: "󰑐",
+                    action: function() {
+                        root.setImportEnabled(true);
+                    }
+                });
+            }
+        }
         for (var i = 0; i < mergedHosts.length && i < count; ++i) {
             var host = mergedHosts[i];
             actions.push({

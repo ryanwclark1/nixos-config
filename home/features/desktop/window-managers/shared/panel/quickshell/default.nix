@@ -313,6 +313,7 @@ EOF
     '';
 
     home.file.".config/quickshell" = {
+      force = true;
       source = ./config;
       recursive = true;
     };

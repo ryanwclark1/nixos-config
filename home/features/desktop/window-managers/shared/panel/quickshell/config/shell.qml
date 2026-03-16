@@ -49,6 +49,7 @@ Scope {
     readonly property bool musicMenuVisible: root.isSurfaceOpen("musicMenu")
     readonly property bool batteryMenuVisible: root.isSurfaceOpen("batteryMenu")
     readonly property bool weatherMenuVisible: root.isSurfaceOpen("weatherMenu")
+    readonly property bool sshMenuVisible: root.isSurfaceOpen("sshMenu")
     readonly property bool dateTimeMenuVisible: root.isSurfaceOpen("dateTimeMenu")
     readonly property bool systemStatsMenuVisible: root.isSurfaceOpen("systemStatsMenu")
     readonly property bool systemMonitorVisible: root.isSurfaceOpen("systemMonitor")
@@ -163,6 +164,9 @@ Scope {
     function toggleWeatherMenu() {
         toggleSurface("weatherMenu");
     }
+    function toggleSshMenu() {
+        toggleSurface("sshMenu");
+    }
     function toggleDateTimeMenu() {
         toggleSurface("dateTimeMenu");
     }
@@ -265,6 +269,9 @@ Scope {
         }
         function toggleWeatherMenu() {
             root.toggleSurface("weatherMenu");
+        }
+        function toggleSshMenu() {
+            root.toggleSurface("sshMenu");
         }
         function toggleDateTimeMenu() {
             root.toggleSurface("dateTimeMenu");

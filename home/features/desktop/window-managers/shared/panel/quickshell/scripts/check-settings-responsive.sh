@@ -138,6 +138,8 @@ populate_repo_shell_env() {
 
 start_repo_shell() {
   local deadline
+  local runtime_dir=""
+  local runtime_id=""
 
   if ! command -v systemctl >/dev/null 2>&1; then
     printf 'systemctl is required for --repo-shell mode.\n' >&2
@@ -156,10 +158,17 @@ start_repo_shell() {
 
   deadline=$((SECONDS + 20))
   while (( SECONDS < deadline )); do
-    if run_ipc quickshell ipc --pid "${repo_shell_pid}" show >/dev/null; then
+    runtime_dir="$(readlink -f "${runtime_pid_root}/${repo_shell_pid}" 2>/dev/null || true)"
+    runtime_id=""
+    if [[ -n "${runtime_dir}" && -S "${runtime_dir}/ipc.sock" ]]; then
+      runtime_id="$(basename "${runtime_dir}")"
+    fi
+    if [[ -n "${runtime_id}" ]] && run_ipc quickshell ipc --id "${runtime_id}" show >/dev/null; then
       sleep 1
-      instance_pid="${repo_shell_pid}"
-      printf '[INFO] Repo shell instance ready: pid %s\n' "${repo_shell_pid}"
+      instance_pid=""
+      instance_id="${runtime_id}"
+      instance_dir="${runtime_dir}"
+      printf '[INFO] Repo shell instance ready: pid %s id %s\n' "${repo_shell_pid}" "${runtime_id}"
       return 0
     fi
     sleep 0.5
@@ -167,20 +176,6 @@ start_repo_shell() {
 
   printf 'Repo shell did not become IPC-ready in time. See /tmp/quickshell-repo-settings.log\n' >&2
   exit 1
-}
-
-shell_id_for_runtime_dir() {
-  local runtime_dir="$1"
-  local log_path="${runtime_dir}/log.log"
-  local shell_id=""
-
-  if [[ ! -f "${log_path}" ]]; then
-    return 1
-  fi
-
-  shell_id="$(sed -n 's/.*Shell ID: "\([[:xdigit:]]\+\)".*/\1/p' "${log_path}" | head -n1)"
-  [[ -n "${shell_id}" ]] || return 1
-  printf '%s\n' "${shell_id}"
 }
 
 run_ipc() {
@@ -209,6 +204,15 @@ run_ipc() {
 }
 
 discover_running_pids() {
+  local service_pid=""
+
+  if command -v systemctl >/dev/null 2>&1; then
+    service_pid="$(systemctl --user show quickshell.service --property MainPID --value 2>/dev/null || true)"
+    if [[ "${service_pid}" =~ ^[0-9]+$ ]] && [[ "${service_pid}" != "0" ]]; then
+      printf '%s\n' "${service_pid}"
+    fi
+  fi
+
   ps -eo pid=,comm=,args= \
     | awk '$2 ~ /quickshell/ || $3 ~ /quickshell/ { print $1 }' \
     | awk 'NF && !seen[$0]++'
@@ -234,20 +238,17 @@ discover_instances_from_pid() {
   local fallback=()
   local log_path
   local first_line
-  local shell_id
 
   while IFS= read -r pid; do
     [[ -n "${pid}" ]] || continue
     resolved="$(readlink -f "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid/${pid}" 2>/dev/null || true)"
     if [[ -n "${resolved}" && -S "${resolved}/ipc.sock" ]]; then
-      shell_id="$(shell_id_for_runtime_dir "${resolved}" || true)"
-      [[ -n "${shell_id}" ]] || continue
       log_path="${resolved}/log.log"
       first_line="$(sed -n '1p' "${log_path}" 2>/dev/null || true)"
       if [[ "${first_line}" == *'Launching config:'*'shell.qml"'* ]]; then
-        preferred+=("${shell_id}")
+        preferred+=("$(basename "${resolved}")")
       else
-        fallback+=("${shell_id}")
+        fallback+=("$(basename "${resolved}")")
       fi
     fi
   done < <(ps -eo pid=,comm=,args= | awk '$2 ~ /quickshell/ || $3 ~ /quickshell/ { print $1 }')
@@ -271,9 +272,7 @@ discover_instances() {
 
   if [[ -d "${runtime_root}" ]]; then
     while IFS= read -r dir; do
-      local shell_id=""
-      shell_id="$(shell_id_for_runtime_dir "${dir}" || true)"
-      [[ -n "${shell_id}" ]] && dirs+=("${shell_id}")
+      dirs+=("$(basename "${dir}")")
     done < <(find "${runtime_root}" -mindepth 1 -maxdepth 1 -type d -exec test -S '{}/ipc.sock' ';' -print 2>/dev/null | sort)
   fi
 
@@ -298,18 +297,13 @@ resolve_instance_dir() {
   local direct_dir="${runtime_root}/${requested_id}"
   local resolved_dir=""
 
-  if [[ -S "${direct_dir}/ipc.sock" ]] && shell_id_for_runtime_dir "${direct_dir}" >/dev/null 2>&1; then
+  if [[ -S "${direct_dir}/ipc.sock" ]]; then
     printf '%s\n' "${direct_dir}"
     return 0
   fi
 
   resolved_dir="$(
-    rg -l --fixed-strings "Shell ID: \"${requested_id}\"" "${runtime_root}"/*/log.log 2>/dev/null \
-      | xargs -r stat -c '%Y %n' 2>/dev/null \
-      | sort -nr \
-      | head -n1 \
-      | cut -d' ' -f2- \
-      | xargs -r dirname
+    find "${runtime_root}" -mindepth 1 -maxdepth 1 -type d -name "${requested_id}" 2>/dev/null | head -n1
   )"
 
   if [[ -n "${resolved_dir}" && -S "${resolved_dir}/ipc.sock" ]]; then
@@ -355,7 +349,7 @@ refresh_instance_binding() {
     if [[ -n "${refreshed_pid}" ]]; then
       refreshed_dir="$(readlink -f "${runtime_pid_root}/${refreshed_pid}" 2>/dev/null || true)"
       if [[ -n "${refreshed_dir}" && -S "${refreshed_dir}/ipc.sock" ]]; then
-        refreshed_id="$(shell_id_for_runtime_dir "${refreshed_dir}" || basename "${refreshed_dir}")"
+        refreshed_id="$(basename "${refreshed_dir}")"
         instance_pid="${refreshed_pid}"
         instance_id="${refreshed_id}"
         instance_dir="${refreshed_dir}"
@@ -428,7 +422,7 @@ main() {
     exit 1
   fi
   if [[ -z "${instance_id}" ]]; then
-    instance_id="$(shell_id_for_runtime_dir "${instance_dir}" || basename "${instance_dir}")"
+    instance_id="$(basename "${instance_dir}")"
   fi
   log_file="${instance_dir}/log.log"
 

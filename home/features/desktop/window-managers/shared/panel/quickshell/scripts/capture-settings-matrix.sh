@@ -98,6 +98,12 @@ if [[ -n "${instance_id}" ]]; then
   viewport_args+=(--id "${instance_id}")
 fi
 
+source "${script_dir}/gallery-lib.sh"
+
+write_gallery() {
+  write_gallery_v2 "${output_dir}" "Settings Matrix" "capture-settings-matrix.sh"
+}
+
 for tab in "${tabs[@]}"; do
   bash "${script_dir}/capture-settings-viewport.sh" \
     "${viewport_args[@]}" \
@@ -110,4 +116,7 @@ for tab in "${tabs[@]}"; do
     --output "${output_dir}/${viewport_preset}-${tab}.png"
 done
 
+write_gallery
+
 printf '[INFO] Saved settings review artifacts for the %s matrix to %s\n' "${viewport_preset}" "${output_dir}"
+printf '[INFO] Saved review gallery to %s/index.html\n' "${output_dir}"

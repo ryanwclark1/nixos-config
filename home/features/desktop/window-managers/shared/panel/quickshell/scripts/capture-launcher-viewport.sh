@@ -147,6 +147,15 @@ hypr() {
   fi
 }
 
+grim_capture() {
+  if [[ -n "${hyprland_instance}" ]]; then
+    env HYPRLAND_INSTANCE_SIGNATURE="${hyprland_instance}" WAYLAND_DISPLAY="${hyprland_wayland_socket}" \
+      grim -t png "$@"
+  else
+    grim -t png "$@"
+  fi
+}
+
 resolve_hyprland_instance() {
   local candidate
   local wl_socket
@@ -535,7 +544,7 @@ main() {
     crop_h="${monitor_h}"
   fi
 
-  grim -t png "${temp_full}"
+  grim_capture "${temp_full}"
   magick "${temp_full}" -crop "${crop_w}x${crop_h}+${crop_x}+${crop_y}" +repage "${temp_crop}"
   cp "${temp_crop}" "${output_path}"
 

@@ -74,6 +74,7 @@ QtObject {
         displayMode: "count",
         defaultAction: "connect",
         showWhenEmpty: false,
+        emptyClickAction: "menu",
         emptyLabel: "SSH",
         state: {
           lastConnectedId: "",
@@ -87,6 +88,7 @@ QtObject {
         { type: "mode", key: "displayMode", label: "Bar Label", description: "Choose whether the widget shows the total host count or the most recent host label.", options: [ { value: "count", label: "Count" }, { value: "recent", label: "Recent" } ] },
         { type: "mode", key: "defaultAction", label: "Primary Click", description: "Choose the action used when the widget has exactly one host.", options: [ { value: "connect", label: "Connect" }, { value: "copy", label: "Copy Command" } ] },
         { type: "toggle", key: "showWhenEmpty", label: "Show When Empty", icon: "󰖰", enabledText: "Keep the SSH pill visible even when no hosts or import results are available yet.", disabledText: "Hide the SSH pill until hosts, import activity, or import errors exist." },
+        { type: "mode", key: "emptyClickAction", label: "Empty Click", description: "Choose what clicking the SSH pill does when it is visible but still has no hosts.", options: [ { value: "menu", label: "Open Menu" }, { value: "refresh", label: "Refresh Import" } ] },
         { type: "text", key: "emptyLabel", label: "Empty Label", icon: "󰉿", placeholder: "SSH" }
       ]
     },
@@ -430,12 +432,14 @@ QtObject {
       var state = settings.state || {};
       var displayMode = String(settings.displayMode || "count") === "recent" ? "Recent" : "Count";
       var defaultAction = String(settings.defaultAction || "connect") === "copy" ? "Copy" : "Connect";
+      var emptyClickAction = String(settings.emptyClickAction || "menu") === "refresh" ? "Refresh" : "Menu";
       var lastConnected = String(state.lastConnectedLabel || "").trim();
       chips.push("Label: " + displayMode);
       chips.push("Click: " + defaultAction);
       chips.push("Manual: " + manualHosts.length);
       chips.push(settings.enableSshConfigImport !== false ? "Import On" : "Import Off");
       chips.push(settings.showWhenEmpty === true ? "Pinned Empty" : "Hide Empty");
+      chips.push("Empty: " + emptyClickAction);
       if (lastConnected.length > 0)
         chips.push("Last: " + lastConnected);
       return chips;

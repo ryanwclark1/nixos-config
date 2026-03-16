@@ -20,7 +20,7 @@ SharedWidgets.CardBase {
     readonly property bool keyboardFocused: tableFocus.activeFocus
 
     Layout.fillWidth: true
-    Layout.preferredHeight: processColumn.implicitHeight + root.pad * 2
+    Layout.preferredHeight: tableFocus.implicitHeight + root.pad * 2
 
     function focusTable() {
         tableFocus.forceActiveFocus();
@@ -108,6 +108,21 @@ SharedWidgets.CardBase {
         selectedPid = safePid > 0 ? safePid : 0;
     }
 
+    function moveSelection(delta) {
+        if (visibleProcesses.length === 0)
+            return;
+
+        var nextIndex = 0;
+        for (var i = 0; i < visibleProcesses.length; ++i) {
+            if ((visibleProcesses[i].pid || 0) === selectedPid) {
+                nextIndex = i;
+                break;
+            }
+        }
+        nextIndex = Math.max(0, Math.min(visibleProcesses.length - 1, nextIndex + delta));
+        selectedPid = visibleProcesses[nextIndex].pid || 0;
+    }
+
     function syncSelection() {
         if (visibleProcesses.length === 0) {
             selectedPid = 0;
@@ -123,20 +138,6 @@ SharedWidgets.CardBase {
         return label + (sortDescending ? " ▼" : " ▲");
     }
 
-    function moveSelection(delta) {
-        if (visibleProcesses.length === 0)
-            return;
-        var nextIndex = 0;
-        for (var i = 0; i < visibleProcesses.length; ++i) {
-            if ((visibleProcesses[i].pid || 0) === selectedPid) {
-                nextIndex = i;
-                break;
-            }
-        }
-        nextIndex = Math.max(0, Math.min(visibleProcesses.length - 1, nextIndex + delta));
-        selectedPid = visibleProcesses[nextIndex].pid || 0;
-    }
-
     onVisibleProcessesChanged: syncSelection()
     Component.onCompleted: syncSelection()
 
@@ -144,6 +145,7 @@ SharedWidgets.CardBase {
         id: tableFocus
         Layout.fillWidth: true
         activeFocusOnTab: true
+        implicitHeight: processColumn.implicitHeight
 
         Keys.onUpPressed: event => {
             root.moveSelection(-1);
@@ -195,7 +197,8 @@ SharedWidgets.CardBase {
 
         ColumnLayout {
             id: processColumn
-            anchors.fill: parent
+            anchors.left: parent.left
+            anchors.right: parent.right
             spacing: Colors.spacingS
 
             RowLayout {
@@ -269,170 +272,171 @@ SharedWidgets.CardBase {
                 radius: Colors.radiusSmall
                 color: Colors.withAlpha(Colors.surface, 0.55)
                 border.color: keyboardFocused ? Colors.primary : Colors.border
-            border.width: 1
-            implicitHeight: tableColumn.implicitHeight + Colors.spacingS * 2
+                border.width: 1
+                implicitHeight: tableColumn.implicitHeight + Colors.spacingS * 2
 
-            ColumnLayout {
-                id: tableColumn
-                anchors.fill: parent
-                anchors.margins: Colors.spacingS
-                spacing: Colors.spacingS
+                ColumnLayout {
+                    id: tableColumn
+                    anchors.fill: parent
+                    anchors.margins: Colors.spacingS
+                    spacing: Colors.spacingS
 
-                Rectangle {
-                    Layout.fillWidth: true
-                    radius: Colors.radiusSmall
-                    color: Colors.withAlpha(Colors.highlight, 0.35)
-                    implicitHeight: headerRow.implicitHeight + Colors.spacingXS * 2
+                    Rectangle {
+                        Layout.fillWidth: true
+                        radius: Colors.radiusSmall
+                        color: Colors.withAlpha(Colors.highlight, 0.35)
+                        implicitHeight: headerRow.implicitHeight + Colors.spacingXS * 2
 
-                    RowLayout {
-                        id: headerRow
-                        anchors.fill: parent
-                        anchors.margins: Colors.spacingXS
-                        spacing: Colors.spacingS
+                        RowLayout {
+                            id: headerRow
+                            anchors.fill: parent
+                            anchors.margins: Colors.spacingXS
+                            spacing: Colors.spacingS
 
-                        Repeater {
-                            model: [
-                                { key: "pid", label: "PID", width: 72 },
-                                { key: "user", label: "USER", width: 104 },
-                                { key: "name", label: "PROCESS", fill: true },
-                                { key: "cpu", label: "CPU%", width: 74 },
-                                { key: "mem", label: "MEM%", width: 74 },
-                                { key: "elapsed", label: "TIME", width: 92 },
-                                { key: "state", label: "STATE", width: 70 }
-                            ]
+                            Repeater {
+                                model: [
+                                    { key: "pid", label: "PID", width: 72 },
+                                    { key: "user", label: "USER", width: 104 },
+                                    { key: "name", label: "PROCESS", fill: true },
+                                    { key: "cpu", label: "CPU%", width: 74 },
+                                    { key: "mem", label: "MEM%", width: 74 },
+                                    { key: "elapsed", label: "TIME", width: 92 },
+                                    { key: "state", label: "STATE", width: 70 }
+                                ]
 
-                            delegate: Rectangle {
-                                required property var modelData
-                                Layout.preferredWidth: modelData.width || 120
-                                Layout.fillWidth: !!modelData.fill
-                                Layout.alignment: Qt.AlignVCenter
-                                color: "transparent"
-                                implicitHeight: headerText.implicitHeight + 8
+                                delegate: Rectangle {
+                                    required property var modelData
+                                    Layout.preferredWidth: modelData.width || 120
+                                    Layout.fillWidth: !!modelData.fill
+                                    Layout.alignment: Qt.AlignVCenter
+                                    color: "transparent"
+                                    implicitHeight: headerText.implicitHeight + 8
 
-                                Text {
-                                    id: headerText
-                                    anchors.left: parent.left
-                                    anchors.right: parent.right
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text: root.headerLabel(modelData.label, modelData.key)
-                                    color: root.sortField === modelData.key ? Colors.primary : Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeXS
-                                    font.weight: Font.Bold
-                                    elide: Text.ElideRight
-                                    horizontalAlignment: modelData.key === "name" ? Text.AlignLeft : Text.AlignRight
-                                }
+                                    Text {
+                                        id: headerText
+                                        anchors.left: parent.left
+                                        anchors.right: parent.right
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: root.headerLabel(modelData.label, modelData.key)
+                                        color: root.sortField === modelData.key ? Colors.primary : Colors.textSecondary
+                                        font.pixelSize: Colors.fontSizeXS
+                                        font.weight: Font.Bold
+                                        elide: Text.ElideRight
+                                        horizontalAlignment: modelData.key === "name" ? Text.AlignLeft : Text.AlignRight
+                                    }
 
-                                MouseArea {
-                                    anchors.fill: parent
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: root.setSort(modelData.key)
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: root.setSort(modelData.key)
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                SharedWidgets.EmptyState {
-                    Layout.fillWidth: true
-                    visible: !ProcessService.busy && root.visibleProcesses.length === 0
-                    icon: "󰍉"
-                    message: root.trimmedSearch === "" ? "No processes matched the current filter." : "No processes matched the current search."
-                }
+                    SharedWidgets.EmptyState {
+                        Layout.fillWidth: true
+                        visible: !ProcessService.busy && root.visibleProcesses.length === 0
+                        icon: "󰍉"
+                        message: root.trimmedSearch === "" ? "No processes matched the current filter." : "No processes matched the current search."
+                    }
 
-                ColumnLayout {
-                    Layout.fillWidth: true
-                    spacing: 2
-                    visible: root.visibleProcesses.length > 0
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 2
+                        visible: root.visibleProcesses.length > 0
 
-                    Repeater {
-                        model: root.visibleProcesses
+                        Repeater {
+                            model: root.visibleProcesses
 
-                        delegate: Rectangle {
-                            required property var modelData
-                            readonly property bool selected: (modelData.pid || 0) === root.selectedPid
-                            Layout.fillWidth: true
-                            radius: Colors.radiusSmall
-                            color: selected ? Colors.highlight : "transparent"
-                            border.color: selected ? Colors.primary : "transparent"
-                            border.width: 1
-                            implicitHeight: rowLayout.implicitHeight + Colors.spacingXS * 2
+                            delegate: Rectangle {
+                                required property var modelData
+                                readonly property bool selected: (modelData.pid || 0) === root.selectedPid
+                                Layout.fillWidth: true
+                                radius: Colors.radiusSmall
+                                color: selected ? Colors.highlight : "transparent"
+                                border.color: selected ? Colors.primary : "transparent"
+                                border.width: 1
+                                implicitHeight: rowLayout.implicitHeight + Colors.spacingXS * 2
 
-                            RowLayout {
-                                id: rowLayout
-                                anchors.fill: parent
-                                anchors.margins: Colors.spacingXS
-                                spacing: Colors.spacingS
+                                RowLayout {
+                                    id: rowLayout
+                                    anchors.fill: parent
+                                    anchors.margins: Colors.spacingXS
+                                    spacing: Colors.spacingS
 
-                                Text {
-                                    Layout.preferredWidth: 72
-                                    text: String(modelData.pid || 0)
-                                    color: Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeXS
-                                    font.family: Colors.fontMono
-                                    horizontalAlignment: Text.AlignRight
+                                    Text {
+                                        Layout.preferredWidth: 72
+                                        text: String(modelData.pid || 0)
+                                        color: Colors.textSecondary
+                                        font.pixelSize: Colors.fontSizeXS
+                                        font.family: Colors.fontMono
+                                        horizontalAlignment: Text.AlignRight
+                                    }
+
+                                    Text {
+                                        Layout.preferredWidth: 104
+                                        text: String(modelData.user || "")
+                                        color: Colors.textSecondary
+                                        font.pixelSize: Colors.fontSizeXS
+                                        elide: Text.ElideRight
+                                    }
+
+                                    Text {
+                                        Layout.fillWidth: true
+                                        text: String(modelData.name || "process")
+                                        color: Colors.text
+                                        font.pixelSize: Colors.fontSizeXS
+                                        font.weight: selected ? Font.DemiBold : Font.Medium
+                                        elide: Text.ElideRight
+                                    }
+
+                                    Text {
+                                        Layout.preferredWidth: 74
+                                        text: Number(modelData.cpu || 0).toFixed(1)
+                                        color: Number(modelData.cpu || 0) >= 20 ? Colors.primary : Colors.textSecondary
+                                        font.pixelSize: Colors.fontSizeXS
+                                        font.family: Colors.fontMono
+                                        horizontalAlignment: Text.AlignRight
+                                    }
+
+                                    Text {
+                                        Layout.preferredWidth: 74
+                                        text: Number(modelData.mem || 0).toFixed(1)
+                                        color: Number(modelData.mem || 0) >= 10 ? Colors.accent : Colors.textSecondary
+                                        font.pixelSize: Colors.fontSizeXS
+                                        font.family: Colors.fontMono
+                                        horizontalAlignment: Text.AlignRight
+                                    }
+
+                                    Text {
+                                        Layout.preferredWidth: 92
+                                        text: String(modelData.elapsed || "--:--")
+                                        color: Colors.textSecondary
+                                        font.pixelSize: Colors.fontSizeXS
+                                        font.family: Colors.fontMono
+                                        horizontalAlignment: Text.AlignRight
+                                    }
+
+                                    Text {
+                                        Layout.preferredWidth: 70
+                                        text: String(modelData.state || "")
+                                        color: String(modelData.state || "").indexOf("T") !== -1 ? Colors.warning : Colors.secondary
+                                        font.pixelSize: Colors.fontSizeXS
+                                        font.family: Colors.fontMono
+                                        horizontalAlignment: Text.AlignRight
+                                    }
                                 }
 
-                                Text {
-                                    Layout.preferredWidth: 104
-                                    text: String(modelData.user || "")
-                                    color: Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeXS
-                                    elide: Text.ElideRight
-                                }
-
-                                Text {
-                                    Layout.fillWidth: true
-                                    text: String(modelData.name || "process")
-                                    color: selected ? Colors.text : Colors.text
-                                    font.pixelSize: Colors.fontSizeXS
-                                    font.weight: selected ? Font.DemiBold : Font.Medium
-                                    elide: Text.ElideRight
-                                }
-
-                                Text {
-                                    Layout.preferredWidth: 74
-                                    text: Number(modelData.cpu || 0).toFixed(1)
-                                    color: Number(modelData.cpu || 0) >= 20 ? Colors.primary : Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeXS
-                                    font.family: Colors.fontMono
-                                    horizontalAlignment: Text.AlignRight
-                                }
-
-                                Text {
-                                    Layout.preferredWidth: 74
-                                    text: Number(modelData.mem || 0).toFixed(1)
-                                    color: Number(modelData.mem || 0) >= 10 ? Colors.accent : Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeXS
-                                    font.family: Colors.fontMono
-                                    horizontalAlignment: Text.AlignRight
-                                }
-
-                                Text {
-                                    Layout.preferredWidth: 92
-                                    text: String(modelData.elapsed || "--:--")
-                                    color: Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeXS
-                                    font.family: Colors.fontMono
-                                    horizontalAlignment: Text.AlignRight
-                                }
-
-                                Text {
-                                    Layout.preferredWidth: 70
-                                    text: String(modelData.state || "")
-                                    color: String(modelData.state || "").indexOf("T") !== -1 ? Colors.warning : Colors.secondary
-                                    font.pixelSize: Colors.fontSizeXS
-                                    font.family: Colors.fontMono
-                                    horizontalAlignment: Text.AlignRight
-                                }
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                acceptedButtons: Qt.LeftButton
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-                                    root.selectProcess(modelData.pid);
-                                    root.focusTable();
+                                MouseArea {
+                                    anchors.fill: parent
+                                    acceptedButtons: Qt.LeftButton
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        root.selectProcess(modelData.pid);
+                                        root.focusTable();
+                                    }
                                 }
                             }
                         }
@@ -455,134 +459,135 @@ SharedWidgets.CardBase {
                     anchors.margins: Colors.spacingM
                     spacing: Colors.spacingS
 
-                RowLayout {
-                    Layout.fillWidth: true
-
-                    ColumnLayout {
+                    RowLayout {
                         Layout.fillWidth: true
-                        spacing: Colors.spacingXXS
 
-                        Text {
-                            text: root.selectedProcess ? String(root.selectedProcess.name || "process") : ""
-                            color: Colors.text
-                            font.pixelSize: Colors.fontSizeSmall
-                            font.weight: Font.DemiBold
-                            elide: Text.ElideRight
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: Colors.spacingXXS
+
+                            Text {
+                                text: root.selectedProcess ? String(root.selectedProcess.name || "process") : ""
+                                color: Colors.text
+                                font.pixelSize: Colors.fontSizeSmall
+                                font.weight: Font.DemiBold
+                                elide: Text.ElideRight
+                            }
+
+                            Text {
+                                text: root.selectedProcess ? ("PID " + String(root.selectedProcess.pid || 0) + "  •  " + String(root.selectedProcess.user || "user")) : ""
+                                color: Colors.textDisabled
+                                font.pixelSize: Colors.fontSizeXS
+                                font.family: Colors.fontMono
+                            }
                         }
 
                         Text {
-                            text: root.selectedProcess ? ("PID " + String(root.selectedProcess.pid || 0) + "  •  " + String(root.selectedProcess.user || "user")) : ""
-                            color: Colors.textDisabled
+                            text: root.pendingAction !== "" ? ("PENDING  " + root.pendingAction.toUpperCase()) : "READY"
+                            color: root.pendingAction !== "" ? Colors.warning : Colors.textDisabled
+                            font.pixelSize: Colors.fontSizeXS
+                            font.weight: Font.Bold
+                        }
+                    }
+
+                    Flow {
+                        Layout.fillWidth: true
+                        width: parent.width
+                        spacing: Colors.spacingS
+
+                        SharedWidgets.Chip {
+                            icon: ""
+                            iconColor: Colors.primary
+                            text: "CPU " + Number(root.selectedProcess ? root.selectedProcess.cpu : 0).toFixed(1) + "%"
+                            textColor: Colors.primary
+                        }
+
+                        SharedWidgets.Chip {
+                            icon: "󰍛"
+                            iconColor: Colors.accent
+                            text: "RAM " + Number(root.selectedProcess ? root.selectedProcess.mem : 0).toFixed(1) + "%"
+                            textColor: Colors.accent
+                        }
+
+                        SharedWidgets.Chip {
+                            icon: "󰥔"
+                            iconColor: Colors.secondary
+                            text: root.selectedProcess ? String(root.selectedProcess.elapsed || "--:--") : ""
+                            textColor: Colors.secondary
+                        }
+
+                        SharedWidgets.Chip {
+                            icon: "󰈈"
+                            iconColor: root.selectedProcess && String(root.selectedProcess.state || "").indexOf("T") !== -1 ? Colors.warning : Colors.textSecondary
+                            text: root.selectedProcess ? ("STATE " + String(root.selectedProcess.state || "?")) : ""
+                            textColor: root.selectedProcess && String(root.selectedProcess.state || "").indexOf("T") !== -1 ? Colors.warning : Colors.textSecondary
+                        }
+                    }
+
+                    Flow {
+                        Layout.fillWidth: true
+                        width: parent.width
+                        spacing: Colors.spacingS
+
+                        SharedWidgets.FilterChip {
+                            label: "TERM"
+                            icon: "󰐊"
+                            enabled: !ProcessService.isPidPending(root.selectedPid)
+                            selected: false
+                            onClicked: ProcessService.terminateProcess(root.selectedPid)
+                        }
+
+                        SharedWidgets.FilterChip {
+                            label: "KILL"
+                            icon: "󰅖"
+                            enabled: !ProcessService.isPidPending(root.selectedPid)
+                            selected: false
+                            onClicked: ProcessService.killProcess(root.selectedPid)
+                        }
+
+                        SharedWidgets.FilterChip {
+                            label: root.selectedProcess && String(root.selectedProcess.state || "").indexOf("T") !== -1 ? "Resume" : "Suspend"
+                            icon: root.selectedProcess && String(root.selectedProcess.state || "").indexOf("T") !== -1 ? "󰐎" : "󰏤"
+                            enabled: !ProcessService.isPidPending(root.selectedPid)
+                            selected: false
+                            onClicked: ProcessService.togglePause(root.selectedPid)
+                        }
+
+                        SharedWidgets.FilterChip {
+                            label: "Inspect"
+                            icon: "󰆍"
+                            enabled: !ProcessService.isPidPending(root.selectedPid)
+                            selected: false
+                            onClicked: ProcessService.openProcessInTerminal(root.selectedPid)
+                        }
+
+                        SharedWidgets.FilterChip {
+                            label: "Copy Cmd"
+                            icon: "󰅍"
+                            enabled: !ProcessService.isPidPending(root.selectedPid)
+                            selected: false
+                            onClicked: ProcessService.copyCommand(root.selectedPid)
+                        }
+                    }
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        color: Colors.cardSurface
+                        radius: Colors.radiusSmall
+                        border.color: Colors.withAlpha(Colors.border, 0.65)
+                        border.width: 1
+                        implicitHeight: commandText.implicitHeight + Colors.spacingS * 2
+
+                        Text {
+                            id: commandText
+                            anchors.fill: parent
+                            anchors.margins: Colors.spacingS
+                            text: root.selectedProcess ? String(root.selectedProcess.command || root.selectedProcess.name || "") : ""
+                            color: Colors.textSecondary
                             font.pixelSize: Colors.fontSizeXS
                             font.family: Colors.fontMono
+                            wrapMode: Text.WrapAnywhere
                         }
-                    }
-
-                    Text {
-                        text: root.pendingAction !== "" ? ("PENDING  " + root.pendingAction.toUpperCase()) : "READY"
-                        color: root.pendingAction !== "" ? Colors.warning : Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeXS
-                        font.weight: Font.Bold
-                    }
-                }
-
-                Flow {
-                    Layout.fillWidth: true
-                    width: parent.width
-                    spacing: Colors.spacingS
-
-                    SharedWidgets.Chip {
-                        icon: ""
-                        iconColor: Colors.primary
-                        text: "CPU " + Number(root.selectedProcess ? root.selectedProcess.cpu : 0).toFixed(1) + "%"
-                        textColor: Colors.primary
-                    }
-
-                    SharedWidgets.Chip {
-                        icon: "󰍛"
-                        iconColor: Colors.accent
-                        text: "RAM " + Number(root.selectedProcess ? root.selectedProcess.mem : 0).toFixed(1) + "%"
-                        textColor: Colors.accent
-                    }
-
-                    SharedWidgets.Chip {
-                        icon: "󰥔"
-                        iconColor: Colors.secondary
-                        text: root.selectedProcess ? String(root.selectedProcess.elapsed || "--:--") : ""
-                        textColor: Colors.secondary
-                    }
-
-                    SharedWidgets.Chip {
-                        icon: "󰈈"
-                        iconColor: root.selectedProcess && String(root.selectedProcess.state || "").indexOf("T") !== -1 ? Colors.warning : Colors.textSecondary
-                        text: root.selectedProcess ? ("STATE " + String(root.selectedProcess.state || "?")) : ""
-                        textColor: root.selectedProcess && String(root.selectedProcess.state || "").indexOf("T") !== -1 ? Colors.warning : Colors.textSecondary
-                    }
-                }
-
-                Flow {
-                    Layout.fillWidth: true
-                    width: parent.width
-                    spacing: Colors.spacingS
-
-                    SharedWidgets.FilterChip {
-                        label: "TERM"
-                        icon: "󰐊"
-                        enabled: !ProcessService.isPidPending(root.selectedPid)
-                        selected: false
-                        onClicked: ProcessService.terminateProcess(root.selectedPid)
-                    }
-
-                    SharedWidgets.FilterChip {
-                        label: "KILL"
-                        icon: "󰅖"
-                        enabled: !ProcessService.isPidPending(root.selectedPid)
-                        selected: false
-                        onClicked: ProcessService.killProcess(root.selectedPid)
-                    }
-
-                    SharedWidgets.FilterChip {
-                        label: root.selectedProcess && String(root.selectedProcess.state || "").indexOf("T") !== -1 ? "Resume" : "Suspend"
-                        icon: root.selectedProcess && String(root.selectedProcess.state || "").indexOf("T") !== -1 ? "󰐎" : "󰏤"
-                        enabled: !ProcessService.isPidPending(root.selectedPid)
-                        selected: false
-                        onClicked: ProcessService.togglePause(root.selectedPid)
-                    }
-
-                    SharedWidgets.FilterChip {
-                        label: "Inspect"
-                        icon: "󰆍"
-                        enabled: !ProcessService.isPidPending(root.selectedPid)
-                        selected: false
-                        onClicked: ProcessService.openProcessInTerminal(root.selectedPid)
-                    }
-
-                    SharedWidgets.FilterChip {
-                        label: "Copy Cmd"
-                        icon: "󰅍"
-                        enabled: !ProcessService.isPidPending(root.selectedPid)
-                        selected: false
-                        onClicked: ProcessService.copyCommand(root.selectedPid)
-                    }
-                }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    color: Colors.cardSurface
-                    radius: Colors.radiusSmall
-                    border.color: Colors.withAlpha(Colors.border, 0.65)
-                    border.width: 1
-                    implicitHeight: commandText.implicitHeight + Colors.spacingS * 2
-
-                    Text {
-                        id: commandText
-                        anchors.fill: parent
-                        anchors.margins: Colors.spacingS
-                        text: root.selectedProcess ? String(root.selectedProcess.command || root.selectedProcess.name || "") : ""
-                        color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeXS
-                        font.family: Colors.fontMono
-                        wrapMode: Text.WrapAnywhere
                     }
                 }
             }

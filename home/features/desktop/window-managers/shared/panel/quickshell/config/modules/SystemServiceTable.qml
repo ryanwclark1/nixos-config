@@ -19,7 +19,7 @@ SharedWidgets.CardBase {
     readonly property bool keyboardFocused: tableFocus.activeFocus
 
     Layout.fillWidth: true
-    Layout.preferredHeight: serviceColumn.implicitHeight + root.pad * 2
+    Layout.preferredHeight: tableFocus.implicitHeight + root.pad * 2
 
     function focusTable() {
         tableFocus.forceActiveFocus();
@@ -138,6 +138,7 @@ SharedWidgets.CardBase {
         id: tableFocus
         Layout.fillWidth: true
         activeFocusOnTab: true
+        implicitHeight: serviceColumn.implicitHeight
 
         Keys.onUpPressed: event => {
             root.moveSelection(-1);
@@ -182,7 +183,8 @@ SharedWidgets.CardBase {
 
         ColumnLayout {
             id: serviceColumn
-            anchors.fill: parent
+            anchors.left: parent.left
+            anchors.right: parent.right
             spacing: Colors.spacingS
 
             RowLayout {
@@ -232,39 +234,39 @@ SharedWidgets.CardBase {
                     onClicked: root.scopeMode = "both"
                 }
 
-            SharedWidgets.FilterChip {
-                label: "User"
-                selected: root.scopeMode === "user"
-                onClicked: root.scopeMode = "user"
-            }
+                SharedWidgets.FilterChip {
+                    label: "User"
+                    selected: root.scopeMode === "user"
+                    onClicked: root.scopeMode = "user"
+                }
 
-            SharedWidgets.FilterChip {
-                label: "System"
-                selected: root.scopeMode === "system"
-                onClicked: root.scopeMode = "system"
-            }
+                SharedWidgets.FilterChip {
+                    label: "System"
+                    selected: root.scopeMode === "system"
+                    onClicked: root.scopeMode = "system"
+                }
 
-            Item {
-                Layout.fillWidth: true
-            }
+                Item {
+                    Layout.fillWidth: true
+                }
 
-            SharedWidgets.FilterChip {
-                label: "Failed"
-                selected: root.filterMode === "failed"
-                onClicked: root.filterMode = "failed"
-            }
+                SharedWidgets.FilterChip {
+                    label: "Failed"
+                    selected: root.filterMode === "failed"
+                    onClicked: root.filterMode = "failed"
+                }
 
-            SharedWidgets.FilterChip {
-                label: "Busy"
-                selected: root.filterMode === "busy"
-                onClicked: root.filterMode = "busy"
-            }
+                SharedWidgets.FilterChip {
+                    label: "Busy"
+                    selected: root.filterMode === "busy"
+                    onClicked: root.filterMode = "busy"
+                }
 
-            SharedWidgets.FilterChip {
-                label: "Running"
-                selected: root.filterMode === "running"
-                onClicked: root.filterMode = "running"
-            }
+                SharedWidgets.FilterChip {
+                    label: "Running"
+                    selected: root.filterMode === "running"
+                    onClicked: root.filterMode = "running"
+                }
 
                 SharedWidgets.FilterChip {
                     label: "All"
@@ -278,138 +280,139 @@ SharedWidgets.CardBase {
                 radius: Colors.radiusSmall
                 color: Colors.withAlpha(Colors.surface, 0.55)
                 border.color: keyboardFocused ? Colors.primary : Colors.border
-            border.width: 1
-            implicitHeight: tableColumn.implicitHeight + Colors.spacingS * 2
-
-            ColumnLayout {
-                id: tableColumn
-                anchors.fill: parent
-                anchors.margins: Colors.spacingS
-                spacing: Colors.spacingS
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    radius: Colors.radiusSmall
-                    color: Colors.withAlpha(Colors.highlight, 0.35)
-                    implicitHeight: headerRow.implicitHeight + Colors.spacingXS * 2
-
-                    RowLayout {
-                        id: headerRow
-                        anchors.fill: parent
-                        anchors.margins: Colors.spacingXS
-                        spacing: Colors.spacingS
-
-                        Text {
-                            Layout.preferredWidth: 70
-                            text: "SCOPE"
-                            color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeXS
-                            font.weight: Font.Bold
-                        }
-
-                        Text {
-                            Layout.preferredWidth: 92
-                            text: "STATE"
-                            color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeXS
-                            font.weight: Font.Bold
-                            horizontalAlignment: Text.AlignRight
-                        }
-
-                        Text {
-                            Layout.fillWidth: true
-                            text: "UNIT"
-                            color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeXS
-                            font.weight: Font.Bold
-                        }
-
-                        Text {
-                            Layout.preferredWidth: 120
-                            text: "SUBSTATE"
-                            color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeXS
-                            font.weight: Font.Bold
-                            horizontalAlignment: Text.AlignRight
-                        }
-                    }
-                }
-
-                SharedWidgets.EmptyState {
-                    Layout.fillWidth: true
-                    visible: root.visibleUnits.length === 0
-                    icon: "󰜺"
-                    message: root.trimmedSearch === "" ? "No matching services for the current filter." : "No services matched the current search."
-                }
+                border.width: 1
+                implicitHeight: tableColumn.implicitHeight + Colors.spacingS * 2
 
                 ColumnLayout {
-                    Layout.fillWidth: true
-                    spacing: 2
-                    visible: root.visibleUnits.length > 0
+                    id: tableColumn
+                    anchors.fill: parent
+                    anchors.margins: Colors.spacingS
+                    spacing: Colors.spacingS
 
-                    Repeater {
-                        model: root.visibleUnits
+                    Rectangle {
+                        Layout.fillWidth: true
+                        radius: Colors.radiusSmall
+                        color: Colors.withAlpha(Colors.highlight, 0.35)
+                        implicitHeight: headerRow.implicitHeight + Colors.spacingXS * 2
 
-                        delegate: Rectangle {
-                            required property var modelData
-                            required property int index
-                            readonly property bool selected: index === root.selectedIndex
-                            Layout.fillWidth: true
-                            radius: Colors.radiusSmall
-                            color: selected ? Colors.highlight : "transparent"
-                            border.color: selected ? Colors.primary : "transparent"
-                            border.width: 1
-                            implicitHeight: rowLayout.implicitHeight + Colors.spacingXS * 2
+                        RowLayout {
+                            id: headerRow
+                            anchors.fill: parent
+                            anchors.margins: Colors.spacingXS
+                            spacing: Colors.spacingS
 
-                            RowLayout {
-                                id: rowLayout
-                                anchors.fill: parent
-                                anchors.margins: Colors.spacingXS
-                                spacing: Colors.spacingS
-
-                                Text {
-                                    Layout.preferredWidth: 70
-                                    text: String(modelData.scope || "").toUpperCase()
-                                    color: Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeXS
-                                    font.weight: Font.Bold
-                                }
-
-                                Text {
-                                    Layout.preferredWidth: 92
-                                    text: String(modelData.active || "").toUpperCase()
-                                    color: root.stateColor(modelData)
-                                    font.pixelSize: Colors.fontSizeXS
-                                    font.weight: Font.Bold
-                                    horizontalAlignment: Text.AlignRight
-                                }
-
-                                Text {
-                                    Layout.fillWidth: true
-                                    text: String(modelData.name || "service")
-                                    color: Colors.text
-                                    font.pixelSize: Colors.fontSizeXS
-                                    font.weight: selected ? Font.DemiBold : Font.Medium
-                                    elide: Text.ElideRight
-                                }
-
-                                Text {
-                                    Layout.preferredWidth: 120
-                                    text: String(modelData.sub || "")
-                                    color: Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeXS
-                                    font.family: Colors.fontMono
-                                    horizontalAlignment: Text.AlignRight
-                                    elide: Text.ElideLeft
-                                }
+                            Text {
+                                Layout.preferredWidth: 70
+                                text: "SCOPE"
+                                color: Colors.textSecondary
+                                font.pixelSize: Colors.fontSizeXS
+                                font.weight: Font.Bold
                             }
 
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-                                    root.selectIndex(index);
-                                    root.focusTable();
+                            Text {
+                                Layout.preferredWidth: 92
+                                text: "STATE"
+                                color: Colors.textSecondary
+                                font.pixelSize: Colors.fontSizeXS
+                                font.weight: Font.Bold
+                                horizontalAlignment: Text.AlignRight
+                            }
+
+                            Text {
+                                Layout.fillWidth: true
+                                text: "UNIT"
+                                color: Colors.textSecondary
+                                font.pixelSize: Colors.fontSizeXS
+                                font.weight: Font.Bold
+                            }
+
+                            Text {
+                                Layout.preferredWidth: 120
+                                text: "SUBSTATE"
+                                color: Colors.textSecondary
+                                font.pixelSize: Colors.fontSizeXS
+                                font.weight: Font.Bold
+                                horizontalAlignment: Text.AlignRight
+                            }
+                        }
+                    }
+
+                    SharedWidgets.EmptyState {
+                        Layout.fillWidth: true
+                        visible: root.visibleUnits.length === 0
+                        icon: "󰜺"
+                        message: root.trimmedSearch === "" ? "No matching services for the current filter." : "No services matched the current search."
+                    }
+
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 2
+                        visible: root.visibleUnits.length > 0
+
+                        Repeater {
+                            model: root.visibleUnits
+
+                            delegate: Rectangle {
+                                required property var modelData
+                                required property int index
+                                readonly property bool selected: index === root.selectedIndex
+                                Layout.fillWidth: true
+                                radius: Colors.radiusSmall
+                                color: selected ? Colors.highlight : "transparent"
+                                border.color: selected ? Colors.primary : "transparent"
+                                border.width: 1
+                                implicitHeight: rowLayout.implicitHeight + Colors.spacingXS * 2
+
+                                RowLayout {
+                                    id: rowLayout
+                                    anchors.fill: parent
+                                    anchors.margins: Colors.spacingXS
+                                    spacing: Colors.spacingS
+
+                                    Text {
+                                        Layout.preferredWidth: 70
+                                        text: String(modelData.scope || "").toUpperCase()
+                                        color: Colors.textSecondary
+                                        font.pixelSize: Colors.fontSizeXS
+                                        font.weight: Font.Bold
+                                    }
+
+                                    Text {
+                                        Layout.preferredWidth: 92
+                                        text: String(modelData.active || "").toUpperCase()
+                                        color: root.stateColor(modelData)
+                                        font.pixelSize: Colors.fontSizeXS
+                                        font.weight: Font.Bold
+                                        horizontalAlignment: Text.AlignRight
+                                    }
+
+                                    Text {
+                                        Layout.fillWidth: true
+                                        text: String(modelData.name || "service")
+                                        color: Colors.text
+                                        font.pixelSize: Colors.fontSizeXS
+                                        font.weight: selected ? Font.DemiBold : Font.Medium
+                                        elide: Text.ElideRight
+                                    }
+
+                                    Text {
+                                        Layout.preferredWidth: 120
+                                        text: String(modelData.sub || "")
+                                        color: Colors.textSecondary
+                                        font.pixelSize: Colors.fontSizeXS
+                                        font.family: Colors.fontMono
+                                        horizontalAlignment: Text.AlignRight
+                                        elide: Text.ElideLeft
+                                    }
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        root.selectIndex(index);
+                                        root.focusTable();
+                                    }
                                 }
                             }
                         }
@@ -432,107 +435,108 @@ SharedWidgets.CardBase {
                     anchors.margins: Colors.spacingM
                     spacing: Colors.spacingS
 
-                RowLayout {
-                    Layout.fillWidth: true
-
-                    ColumnLayout {
+                    RowLayout {
                         Layout.fillWidth: true
-                        spacing: Colors.spacingXXS
 
-                        Text {
-                            text: root.selectedUnit ? String(root.selectedUnit.name || "service") : ""
-                            color: Colors.text
-                            font.pixelSize: Colors.fontSizeSmall
-                            font.weight: Font.DemiBold
-                            elide: Text.ElideRight
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: Colors.spacingXXS
+
+                            Text {
+                                text: root.selectedUnit ? String(root.selectedUnit.name || "service") : ""
+                                color: Colors.text
+                                font.pixelSize: Colors.fontSizeSmall
+                                font.weight: Font.DemiBold
+                                elide: Text.ElideRight
+                            }
+
+                            Text {
+                                text: root.selectedUnit ? (String(root.selectedUnit.scope || "").toUpperCase() + "  •  " + String(root.selectedUnit.description || root.selectedUnit.sub || "")) : ""
+                                color: Colors.textDisabled
+                                font.pixelSize: Colors.fontSizeXS
+                                elide: Text.ElideRight
+                            }
                         }
 
                         Text {
-                            text: root.selectedUnit ? (String(root.selectedUnit.scope || "").toUpperCase() + "  •  " + String(root.selectedUnit.description || root.selectedUnit.sub || "")) : ""
-                            color: Colors.textDisabled
+                            text: root.selectedPendingAction !== "" ? ("PENDING  " + root.selectedPendingAction.toUpperCase()) : "READY"
+                            color: root.selectedPendingAction !== "" ? Colors.warning : Colors.textDisabled
                             font.pixelSize: Colors.fontSizeXS
-                            elide: Text.ElideRight
+                            font.weight: Font.Bold
                         }
                     }
 
-                    Text {
-                        text: root.selectedPendingAction !== "" ? ("PENDING  " + root.selectedPendingAction.toUpperCase()) : "READY"
-                        color: root.selectedPendingAction !== "" ? Colors.warning : Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeXS
-                        font.weight: Font.Bold
-                    }
-                }
+                    Flow {
+                        Layout.fillWidth: true
+                        width: parent.width
+                        spacing: Colors.spacingS
 
-                Flow {
-                    Layout.fillWidth: true
-                    width: parent.width
-                    spacing: Colors.spacingS
+                        SharedWidgets.Chip {
+                            icon: "󰒓"
+                            iconColor: root.selectedUnit ? root.stateColor(root.selectedUnit) : Colors.textSecondary
+                            text: root.selectedUnit ? String(root.selectedUnit.active || "").toUpperCase() : ""
+                            textColor: root.selectedUnit ? root.stateColor(root.selectedUnit) : Colors.textSecondary
+                        }
 
-                    SharedWidgets.Chip {
-                        icon: "󰒓"
-                        iconColor: root.selectedUnit ? root.stateColor(root.selectedUnit) : Colors.textSecondary
-                        text: root.selectedUnit ? String(root.selectedUnit.active || "").toUpperCase() : ""
-                        textColor: root.selectedUnit ? root.stateColor(root.selectedUnit) : Colors.textSecondary
-                    }
-
-                    SharedWidgets.Chip {
-                        icon: "󱄅"
-                        iconColor: Colors.secondary
-                        text: root.selectedUnit ? String(root.selectedUnit.sub || "") : ""
-                        textColor: Colors.secondary
-                    }
-                }
-
-                Flow {
-                    Layout.fillWidth: true
-                    width: parent.width
-                    spacing: Colors.spacingS
-
-                    SharedWidgets.FilterChip {
-                        label: root.selectedUnit && root.running(root.selectedUnit) ? "Stop" : "Start"
-                        icon: root.selectedUnit && root.running(root.selectedUnit) ? "󰓛" : "󰐊"
-                        enabled: !!root.selectedUnit && !ServiceUnitService.isUnitPending(root.selectedUnit.scope, root.selectedUnit.name)
-                        selected: false
-                        onClicked: {
-                            if (!root.selectedUnit)
-                                return;
-                            if (root.running(root.selectedUnit))
-                                ServiceUnitService.stopUnit(root.selectedUnit.scope, root.selectedUnit.name);
-                            else
-                                ServiceUnitService.startUnit(root.selectedUnit.scope, root.selectedUnit.name);
+                        SharedWidgets.Chip {
+                            icon: "󱄅"
+                            iconColor: Colors.secondary
+                            text: root.selectedUnit ? String(root.selectedUnit.sub || "") : ""
+                            textColor: Colors.secondary
                         }
                     }
 
-                    SharedWidgets.FilterChip {
-                        label: "Restart"
-                        icon: "󰑐"
-                        enabled: !!root.selectedUnit && !ServiceUnitService.isUnitPending(root.selectedUnit.scope, root.selectedUnit.name)
-                        selected: false
-                        onClicked: {
-                            if (root.selectedUnit)
-                                ServiceUnitService.restartUnit(root.selectedUnit.scope, root.selectedUnit.name);
-                        }
-                    }
+                    Flow {
+                        Layout.fillWidth: true
+                        width: parent.width
+                        spacing: Colors.spacingS
 
-                    SharedWidgets.FilterChip {
-                        label: "Logs"
-                        icon: "󰌱"
-                        enabled: !!root.selectedUnit
-                        selected: false
-                        onClicked: {
-                            if (root.selectedUnit)
-                                ServiceUnitService.openUnitLogsInTerminal(root.selectedUnit.scope, root.selectedUnit.name);
+                        SharedWidgets.FilterChip {
+                            label: root.selectedUnit && root.running(root.selectedUnit) ? "Stop" : "Start"
+                            icon: root.selectedUnit && root.running(root.selectedUnit) ? "󰓛" : "󰐊"
+                            enabled: !!root.selectedUnit && !ServiceUnitService.isUnitPending(root.selectedUnit.scope, root.selectedUnit.name)
+                            selected: false
+                            onClicked: {
+                                if (!root.selectedUnit)
+                                    return;
+                                if (root.running(root.selectedUnit))
+                                    ServiceUnitService.stopUnit(root.selectedUnit.scope, root.selectedUnit.name);
+                                else
+                                    ServiceUnitService.startUnit(root.selectedUnit.scope, root.selectedUnit.name);
+                            }
                         }
-                    }
 
-                    SharedWidgets.FilterChip {
-                        label: "Status"
-                        icon: "󰋼"
-                        enabled: !!root.selectedUnit
-                        selected: false
-                        onClicked: {
-                            if (root.selectedUnit)
-                                ServiceUnitService.openUnitStatusInTerminal(root.selectedUnit.scope, root.selectedUnit.name);
+                        SharedWidgets.FilterChip {
+                            label: "Restart"
+                            icon: "󰑐"
+                            enabled: !!root.selectedUnit && !ServiceUnitService.isUnitPending(root.selectedUnit.scope, root.selectedUnit.name)
+                            selected: false
+                            onClicked: {
+                                if (root.selectedUnit)
+                                    ServiceUnitService.restartUnit(root.selectedUnit.scope, root.selectedUnit.name);
+                            }
+                        }
+
+                        SharedWidgets.FilterChip {
+                            label: "Logs"
+                            icon: "󰌱"
+                            enabled: !!root.selectedUnit
+                            selected: false
+                            onClicked: {
+                                if (root.selectedUnit)
+                                    ServiceUnitService.openUnitLogsInTerminal(root.selectedUnit.scope, root.selectedUnit.name);
+                            }
+                        }
+
+                        SharedWidgets.FilterChip {
+                            label: "Status"
+                            icon: "󰋼"
+                            enabled: !!root.selectedUnit
+                            selected: false
+                            onClicked: {
+                                if (root.selectedUnit)
+                                    ServiceUnitService.openUnitStatusInTerminal(root.selectedUnit.scope, root.selectedUnit.name);
+                            }
                         }
                     }
                 }

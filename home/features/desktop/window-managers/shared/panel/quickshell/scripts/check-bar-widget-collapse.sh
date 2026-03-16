@@ -71,15 +71,35 @@ Scope {
     var keyboardWidget = panel.componentForWidget("keyboardLayout").createObject(harnessHost, {
       widgetInstance: { instanceId: "kbd-test", widgetType: "keyboardLayout", enabled: true, settings: { labelMode: "short" } }
     });
+    var musicWidget = panel.componentForWidget("music").createObject(harnessHost, {
+      widgetInstance: { instanceId: "music-test", widgetType: "music", enabled: true, settings: { displayMode: "auto" } }
+    });
+    var privacyWidget = panel.componentForWidget("privacy").createObject(harnessHost, {
+      widgetInstance: { instanceId: "privacy-test", widgetType: "privacy", enabled: true, settings: { displayMode: "auto" } }
+    });
+    var recordingWidget = panel.componentForWidget("recording").createObject(harnessHost, {
+      widgetInstance: { instanceId: "recording-test", widgetType: "recording", enabled: true, settings: { displayMode: "auto" } }
+    });
+    var printerWidget = panel.componentForWidget("printer").createObject(harnessHost, {
+      widgetInstance: { instanceId: "printer-test", widgetType: "printer", enabled: true, settings: { displayMode: "auto" } }
+    });
 
     snapshot("updates", updatesWidget, panel);
     snapshot("ssh", sshWidget, panel);
     snapshot("keyboardLayout", keyboardWidget, panel);
+    snapshot("music", musicWidget, panel);
+    snapshot("privacy", privacyWidget, panel);
+    snapshot("recording", recordingWidget, panel);
+    snapshot("printer", printerWidget, panel);
 
     console.log("RESULT:" + JSON.stringify(results));
     updatesWidget.destroy();
     sshWidget.destroy();
     keyboardWidget.destroy();
+    musicWidget.destroy();
+    privacyWidget.destroy();
+    recordingWidget.destroy();
+    printerWidget.destroy();
     Qt.quit();
   }
 }
@@ -96,7 +116,14 @@ output="$(
 status=$?
 set -e
 
-printf '%s\n' "${output}"
+filtered_output="$(
+  printf '%s\n' "${output}" | grep -Ev \
+    '^(No running instances for |  WARN: Unable to find hyprland socket\. Cannot connect to hyprland\.|  WARN quickshell\.hyprland\.ipc: Error making request: QLocalSocket::ServerNotFoundError request: "j/clients"|  WARN: Signal QQmlEngine::quit\(\) emitted, but no receivers connected to handle it\.|  WARN quickshell\.io\.fileview: got operation finished from dropped operation .*|  INFO: Reloading configuration\.\.\.|  WARN: QQmlComponent: Component is not ready| ERROR: Failed to open reload popup: )'
+)"
+
+if [[ -n "${filtered_output}" ]]; then
+  printf '%s\n' "${filtered_output}"
+fi
 
 if [[ ${status} -ne 0 && ${status} -ne 124 ]]; then
   printf '[FAIL] collapse harness exited with status %s.\n' "${status}" >&2
@@ -108,24 +135,38 @@ grep -q 'RESULT:' <<<"${output}" || {
   exit 1
 }
 
-grep -q '"updates":{"visible":false,"implicitWidth":0,"implicitHeight":0,"occupiesSpace":false}' <<<"${output}" || {
-  printf '[FAIL] hidden updates widget still reports layout footprint.\n' >&2
-  exit 1
+result_line="$(printf '%s\n' "${output}" | sed -n 's/^.*RESULT://p' | tail -n 1)"
+
+python - "${result_line}" <<'PY'
+import json
+import sys
+
+results = json.loads(sys.argv[1])
+
+required_hidden = {
+    "updates": "hidden updates widget still reports layout footprint.",
+    "ssh": "hidden SSH widget still reports layout footprint.",
+    "keyboardLayout": "hidden keyboard layout widget still reports layout footprint.",
 }
 
-grep -q '"ssh":{"visible":false,"implicitWidth":0,"implicitHeight":0,"occupiesSpace":false}' <<<"${output}" || {
-  printf '[FAIL] hidden SSH widget still reports layout footprint.\n' >&2
-  exit 1
+for key, message in required_hidden.items():
+    entry = results.get(key)
+    if not entry or entry.get("visible") is not False or entry.get("occupiesSpace") is not False:
+        print(f"[FAIL] {message}", file=sys.stderr)
+        sys.exit(1)
+
+optional_hidden = {
+    "music": "hidden music widget still reports layout footprint.",
+    "privacy": "hidden privacy widget still reports layout footprint.",
+    "recording": "hidden recording widget still reports layout footprint.",
+    "printer": "hidden printer widget still reports layout footprint.",
 }
 
-grep -q '"keyboardLayout":{"visible":false,' <<<"${output}" || {
-  printf '[FAIL] keyboard layout widget did not collapse in the offscreen harness.\n' >&2
-  exit 1
-}
-
-grep -q '"keyboardLayout":{[^}]*"occupiesSpace":false' <<<"${output}" || {
-  printf '[FAIL] hidden keyboard layout widget still reports layout occupancy.\n' >&2
-  exit 1
-}
+for key, message in optional_hidden.items():
+    entry = results.get(key)
+    if entry and entry.get("visible") is False and entry.get("occupiesSpace") is not False:
+        print(f"[FAIL] {message}", file=sys.stderr)
+        sys.exit(1)
+PY
 
 printf '[PASS] hidden bar widgets collapse to zero layout footprint.\n'

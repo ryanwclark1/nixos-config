@@ -65,6 +65,12 @@ if [[ -n "${instance_id}" ]]; then
   surface_args+=(--id "${instance_id}")
 fi
 
+source "${script_dir}/gallery-lib.sh"
+
+write_gallery() {
+  write_gallery_v2 "${output_dir}" "Surface Matrix" "capture-surface-matrix.sh"
+}
+
 for surface in "${surfaces[@]}"; do
   bash "${script_dir}/capture-surface-viewport.sh" \
     "${surface_args[@]}" \
@@ -75,4 +81,7 @@ for surface in "${surfaces[@]}"; do
     --output "${output_dir}/${surface}-${crop_mode}.png"
 done
 
+write_gallery
+
 printf '[INFO] Saved surface review artifacts for the %s matrix to %s\n' "${crop_mode}" "${output_dir}"
+printf '[INFO] Saved review gallery to %s/index.html\n' "${output_dir}"

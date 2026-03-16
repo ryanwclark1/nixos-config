@@ -6,8 +6,10 @@ Item {
 
     property var widgetInstance: null
     property var anchorWindow: null
+    property bool isActive: false
     property var currentContextActions: []
     signal contextMenuRequested(var actions, var triggerRect)
+    signal surfaceRequested(var triggerItem, var surfaceContext)
     readonly property bool hasVisibleState: sshData.mergedHosts.length > 0 || sshData.importBusy || sshData.importErrors.length > 0 || sshData.showWhenEmpty
 
     visible: hasVisibleState
@@ -45,6 +47,7 @@ Item {
     BarPill {
         id: sshPill
         anchorWindow: root.anchorWindow
+        isActive: root.isActive
         enabled: root.hasVisibleState
         tooltipText: sshData.summaryTooltip()
         shimmerEnabled: true
@@ -55,7 +58,13 @@ Item {
                 sshData.executeDefault(sshData.mergedHosts[0]);
                 return;
             }
-            root.openActionsMenu();
+            if (sshData.mergedHosts.length === 0 && sshData.showWhenEmpty) {
+                if (sshData.handleEmptyClick() === "refresh")
+                    return;
+            }
+            root.surfaceRequested(sshPill, {
+                widgetInstance: root.widgetInstance ? JSON.parse(JSON.stringify(root.widgetInstance)) : null
+            });
         }
 
         Row {

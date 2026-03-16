@@ -77,6 +77,30 @@ Rectangle {
         return it.category || "";
     }
 
+    function itemSecondaryLabel(it) {
+        if (!it)
+            return "";
+
+        var primary = String(it.name || it.title || "");
+        var description = String(it.description || "");
+        var fullPath = String(it.fullPath || "");
+        var exec = String(it.exec || "");
+        var windowClass = String(it.class || "");
+        var title = String(it.title || "");
+
+        if (description !== "" && description !== primary)
+            return description;
+        if (fullPath !== "" && fullPath !== primary)
+            return fullPath;
+        if (windowClass !== "" && windowClass !== primary)
+            return windowClass;
+        if (title !== "" && title !== primary)
+            return title;
+        if (exec !== "" && exec !== primary)
+            return exec;
+        return "";
+    }
+
     // Indicator bar
     Rectangle {
         anchors.left: parent.left
@@ -163,20 +187,25 @@ Rectangle {
                 font.pixelSize: root.compactMode ? Colors.fontSizeSmall : Colors.fontSizeMedium
                 font.weight: highlighted ? Font.Bold : Font.Normal
                 elide: Text.ElideRight
+                wrapMode: Text.NoWrap
+                maximumLineCount: 1
                 Layout.fillWidth: true
             }
             Text {
-                text: modelData ? modelData.exec || modelData.class || modelData.title || "" : ""
+                text: root.itemSecondaryLabel(modelData)
                 color: highlighted ? Colors.withAlpha(Colors.primary, 0.82) : Colors.textSecondary
                 font.pixelSize: Colors.fontSizeXS
                 elide: Text.ElideRight
+                wrapMode: Text.NoWrap
+                maximumLineCount: 1
                 Layout.fillWidth: true
-                visible: text !== "" && text !== (modelData ? modelData.name || "" : "")
+                visible: text !== ""
             }
         }
 
         RowLayout {
             spacing: Colors.spacingXS
+            Layout.maximumWidth: root.compactMode ? 160 : 220
 
             // Provider Badge
             Rectangle {
@@ -196,7 +225,7 @@ Rectangle {
                     font.pixelSize: Colors.fontSizeXS
                     font.weight: Font.DemiBold
                     elide: Text.ElideRight
-                    width: Math.min(implicitWidth, 150)
+                    width: Math.min(implicitWidth, root.compactMode ? 84 : 120)
                 }
             }
 
@@ -217,6 +246,8 @@ Rectangle {
                     color: highlighted ? Colors.primary : Colors.textSecondary
                     font.pixelSize: Colors.fontSizeXS
                     font.weight: Font.DemiBold
+                    elide: Text.ElideRight
+                    width: Math.min(implicitWidth, root.compactMode ? 72 : 96)
                 }
             }
 

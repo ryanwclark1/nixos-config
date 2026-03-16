@@ -183,6 +183,17 @@ Item {
                                 onCloseRequested: root.shellRoot.closeSurface("weatherMenu")
                             }
 
+                            SshMenu {
+                                anchor.window: barWindow
+                                preferredEdge: barWindow.popupPreferredEdge("sshMenu")
+                                implicitHeight: Math.min(620, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
+                                anchor.rect.x: barWindow.popupAnchorXFor("sshMenu", width)
+                                anchor.rect.y: barWindow.popupAnchorYFor("sshMenu", implicitHeight)
+                                wantVisible: barWindow.popupVisible("sshMenu")
+                                surfaceContext: barWindow.surfaceContext("sshMenu")
+                                onCloseRequested: root.shellRoot.closeSurface("sshMenu")
+                            }
+
                             DateTimeMenu {
                                 anchor.window: barWindow
                                 preferredEdge: barWindow.popupPreferredEdge("dateTimeMenu")

@@ -118,10 +118,10 @@ Item {
       : Math.max(implicitWidth, width) > 0;
   }
 
-  function requestSurface(surfaceId, item) {
+  function requestSurface(surfaceId, item, extraContext) {
     if (!item) return;
     var topLeft = item.mapToItem(root, 0, 0);
-    root.surfaceRequested(surfaceId, {
+    var context = {
       surfaceId: surfaceId,
       barId: barConfig ? barConfig.id : "",
       position: position,
@@ -133,7 +133,12 @@ Item {
         width: item.width,
         height: item.height
       }
-    });
+    };
+    if (extraContext) {
+      for (var key in extraContext)
+        context[key] = extraContext[key];
+    }
+    root.surfaceRequested(surfaceId, context);
   }
 
   function isSurfaceActive(surfaceId) {
@@ -915,9 +920,18 @@ Item {
   Component {
     id: sshComponent
     SharedWidgets.SshWidget {
+      id: sshWidgetRoot
       property var widgetInstance: null
+      isActive: root.isSurfaceActive("sshMenu")
       anchorWindow: root.anchorWindow
       onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
+
+      Connections {
+        target: sshWidgetRoot
+        function onSurfaceRequested(triggerItem, extraContext) {
+          root.requestSurface("sshMenu", triggerItem, extraContext);
+        }
+      }
     }
   }
 
