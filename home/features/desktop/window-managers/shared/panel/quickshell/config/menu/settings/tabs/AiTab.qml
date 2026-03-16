@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../widgets" as SharedWidgets
 import ".."
 
 Item {
@@ -36,11 +37,73 @@ Item {
             }
 
             SettingsTextInputRow {
+                visible: Config.aiProvider !== "ollama"
                 label: "Model"
                 leadingIcon: "󰘦"
                 placeholderText: Config.aiProvider === "ollama" ? "e.g. llama3.2" : "Leave empty for default"
                 text: Config.aiModel
                 onTextEdited: value => Config.aiModel = value
+            }
+
+            ColumnLayout {
+                visible: Config.aiProvider === "ollama"
+                Layout.fillWidth: true
+                spacing: Colors.spacingS
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: Colors.spacingS
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: AiService.availableModels.length > 0
+                            ? "Available models: " + AiService.availableModels.length
+                            : "Available models"
+                        color: Colors.textSecondary
+                        font.pixelSize: Colors.fontSizeSmall
+                        font.weight: Font.Medium
+                        wrapMode: Text.WordWrap
+                    }
+
+                    SettingsActionButton {
+                        label: "Refresh"
+                        iconName: "󰑐"
+                        compact: true
+                        onClicked: AiService.refreshModels()
+                    }
+                }
+
+                Flow {
+                    visible: AiService.availableModels.length > 0
+                    Layout.fillWidth: true
+                    width: parent.width
+                    spacing: Colors.spacingS
+
+                    Repeater {
+                        model: AiService.availableModels
+
+                        delegate: SharedWidgets.FilterChip {
+                            required property string modelData
+                            label: modelData
+                            selected: Config.aiModel === modelData || (Config.aiModel === "" && AiService.activeModel === modelData)
+                            onClicked: Config.aiModel = modelData
+                        }
+                    }
+                }
+
+                SettingsInfoCallout {
+                    visible: AiService.availableModels.length === 0
+                    body: "No Ollama models were returned yet. Start Ollama, then refresh to load models from " +
+                        (Config.aiCustomEndpoint || "http://localhost:11434") + "/api/tags."
+                }
+
+                SettingsTextInputRow {
+                    label: "Model Override"
+                    leadingIcon: "󰘦"
+                    placeholderText: "e.g. llama3.2"
+                    text: Config.aiModel
+                    onTextEdited: value => Config.aiModel = value
+                }
             }
 
             SettingsTextInputRow {

@@ -808,7 +808,10 @@ QtObject {
         return _ipcHandler;
     }
 
-    Component.onCompleted: _ensureIpcHandler()
+    Component.onCompleted: {
+        refreshModels();
+        _ensureIpcHandler();
+    }
 
     Component.onDestruction: {
         if (!_ipcHandler)

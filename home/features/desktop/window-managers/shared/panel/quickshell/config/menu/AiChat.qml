@@ -45,10 +45,11 @@ PanelWindow {
     property string _pendingMsgText: ""
     property int _fileReadIndex: 0
 
-    signal closeRequested()
+    signal closeRequested
 
     onIncludeWindowContextChanged: {
-        if (includeWindowContext) AiService.refreshActiveWindowTitle();
+        if (includeWindowContext)
+            AiService.refreshActiveWindowTitle();
     }
 
     // Panel visibility: stay mapped during slide-out animation
@@ -58,7 +59,8 @@ PanelWindow {
         if (showContent) {
             inputField.forceActiveFocus();
         } else {
-            if (inputField.activeFocus) inputField.focus = false;
+            if (inputField.activeFocus)
+                inputField.focus = false;
             providerDropdown.visible = false;
         }
     }
@@ -69,13 +71,13 @@ PanelWindow {
 
     // Markdown rendering helpers
     readonly property var _mdColors: ({
-        text: Colors.text,
-        textSecondary: Colors.textSecondary,
-        primary: Colors.primary,
-        bgWidget: Colors.bgWidget,
-        fontMono: Colors.fontMono,
-        codeBg: Colors.withAlpha(Colors.text, 0.06)
-    })
+            text: Colors.text,
+            textSecondary: Colors.textSecondary,
+            primary: Colors.primary,
+            bgWidget: Colors.bgWidget,
+            fontMono: Colors.fontMono,
+            codeBg: Colors.withAlpha(Colors.text, 0.06)
+        })
 
     function _renderMarkdown(text) {
         return Markdown.toHtml(text, _mdColors);
@@ -115,7 +117,9 @@ PanelWindow {
         gradient: SharedWidgets.SurfaceGradient {}
 
         // Inner highlight
-        SharedWidgets.InnerHighlight { highlightOpacity: 0.15 }
+        SharedWidgets.InnerHighlight {
+            highlightOpacity: 0.15
+        }
 
         x: root.showContent ? 0 : root.panelWidth + 10
         opacity: root.showContent ? 1.0 : 0.0
@@ -129,7 +133,10 @@ PanelWindow {
             }
         }
         Behavior on opacity {
-            NumberAnimation { id: fadeAnim; duration: 260 }
+            NumberAnimation {
+                id: fadeAnim
+                duration: 260
+            }
         }
         layer.enabled: slideAnim.running || fadeAnim.running
 
@@ -138,13 +145,20 @@ PanelWindow {
         DropArea {
             anchors.fill: parent
             keys: ["file"]
-            onDropped: (drop) => {
+            onDropped: drop => {
                 if (drop.hasUrls) {
                     for (var i = 0; i < drop.urls.length; i++) {
                         var url = drop.urls[i].toString();
                         var path = url.replace("file://", "");
                         var name = path.split("/").pop();
-                        root.attachedFiles = root.attachedFiles.concat([{ type: "file", name: name, path: path, content: "" }]);
+                        root.attachedFiles = root.attachedFiles.concat([
+                            {
+                                type: "file",
+                                name: name,
+                                path: path,
+                                content: ""
+                            }
+                        ]);
                     }
                 }
             }
@@ -163,8 +177,16 @@ PanelWindow {
             anchors.leftMargin: -3
             anchors.verticalCenter: parent.verticalCenter
             opacity: dragArea.containsMouse || dragArea.pressed ? 1.0 : 0.4
-            Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
-            Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: Colors.durationFast
+                }
+            }
+            Behavior on color {
+                ColorAnimation {
+                    duration: Colors.durationFast
+                }
+            }
 
             MouseArea {
                 id: dragArea
@@ -172,12 +194,13 @@ PanelWindow {
                 anchors.margins: -6
                 hoverEnabled: true
                 cursorShape: Qt.SizeHorCursor
-                onPressed: (mouse) => {
+                onPressed: mouse => {
                     root._dragStartX = mapToGlobal(mouse.x, mouse.y).x;
                     root._dragStartWidth = root.panelWidth;
                 }
-                onPositionChanged: (mouse) => {
-                    if (!pressed) return;
+                onPositionChanged: mouse => {
+                    if (!pressed)
+                        return;
                     var globalX = mapToGlobal(mouse.x, mouse.y).x;
                     var delta = root._dragStartX - globalX;
                     var newW = Math.max(root.panelMinWidth, Math.min(root.panelMaxWidth, root._dragStartWidth + delta));
@@ -203,7 +226,9 @@ PanelWindow {
                     font.letterSpacing: Colors.letterSpacingTight
                 }
 
-                Item { Layout.fillWidth: true }
+                Item {
+                    Layout.fillWidth: true
+                }
 
                 // Provider/model picker
                 Rectangle {
@@ -239,7 +264,9 @@ PanelWindow {
 
                 // New conversation
                 Rectangle {
-                    width: 28; height: 28; radius: Colors.radiusXS
+                    width: 28
+                    height: 28
+                    radius: Colors.radiusXS
                     color: "transparent"
                     Text {
                         anchors.centerIn: parent
@@ -258,7 +285,7 @@ PanelWindow {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: (mouse) => {
+                        onClicked: mouse => {
                             newChatStateLayer.burst(mouse.x, mouse.y);
                             AiService.newConversation();
                         }
@@ -267,7 +294,9 @@ PanelWindow {
 
                 // Close button
                 Rectangle {
-                    width: 28; height: 28; radius: Colors.radiusMedium
+                    width: 28
+                    height: 28
+                    radius: Colors.radiusMedium
                     color: "transparent"
                     Text {
                         anchors.centerIn: parent
@@ -286,7 +315,7 @@ PanelWindow {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: (mouse) => {
+                        onClicked: mouse => {
                             closeStateLayer.burst(mouse.x, mouse.y);
                             root.closeRequested();
                         }
@@ -331,17 +360,24 @@ PanelWindow {
                                     width: isEditing ? tabEditInput.width + 16 : Math.min(tabLabelText.contentWidth + 36, 140)
                                     height: 28
 
-                                    Behavior on width { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
+                                    Behavior on width {
+                                        NumberAnimation {
+                                            duration: Colors.durationFast
+                                            easing.type: Easing.OutCubic
+                                        }
+                                    }
 
                                     Rectangle {
                                         anchors.fill: parent
                                         radius: Colors.radiusXXS
-                                        color: isActive
-                                            ? Colors.withAlpha(Colors.primary, 0.18)
-                                            : Colors.bgWidget
+                                        color: isActive ? Colors.withAlpha(Colors.primary, 0.18) : Colors.bgWidget
                                         border.color: isActive ? Colors.primary : Colors.border
                                         border.width: isActive ? 1.5 : 1
-                                        Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+                                        Behavior on color {
+                                            ColorAnimation {
+                                                duration: Colors.durationFast
+                                            }
+                                        }
 
                                         SharedWidgets.StateLayer {
                                             id: tabStateLayer
@@ -377,7 +413,10 @@ PanelWindow {
                                         font.weight: Font.DemiBold
                                         visible: tabDelegate.isEditing
                                         selectByMouse: true
-                                        onVisibleChanged: if (visible) { selectAll(); forceActiveFocus(); }
+                                        onVisibleChanged: if (visible) {
+                                            selectAll();
+                                            forceActiveFocus();
+                                        }
                                         Keys.onReturnPressed: {
                                             AiService.renameConversation(modelData.id, text);
                                             tabDelegate.isEditing = false;
@@ -391,14 +430,20 @@ PanelWindow {
 
                                     Rectangle {
                                         id: deleteTabBtn
-                                        width: 14; height: 14; radius: width / 2
+                                        width: 14
+                                        height: 14
+                                        radius: width / 2
                                         anchors.right: parent.right
                                         anchors.rightMargin: 5
                                         anchors.verticalCenter: parent.verticalCenter
                                         color: "transparent"
                                         opacity: (tabMouse.containsMouse || tabDelegate.isActive) && AiService.conversations.length > 1 ? 1 : 0
                                         visible: AiService.conversations.length > 1
-                                        Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
+                                        Behavior on opacity {
+                                            NumberAnimation {
+                                                duration: Colors.durationFast
+                                            }
+                                        }
 
                                         SharedWidgets.StateLayer {
                                             id: deleteTabStateLayer
@@ -419,7 +464,7 @@ PanelWindow {
                                             anchors.fill: parent
                                             hoverEnabled: true
                                             cursorShape: Qt.PointingHandCursor
-                                            onClicked: (mouse) => {
+                                            onClicked: mouse => {
                                                 deleteTabStateLayer.burst(mouse.x, mouse.y);
                                                 mouse.accepted = true;
                                                 AiService.deleteConversation(modelData.id);
@@ -433,13 +478,14 @@ PanelWindow {
                                         hoverEnabled: true
                                         cursorShape: Qt.PointingHandCursor
                                         acceptedButtons: Qt.LeftButton | Qt.RightButton
-                                        onClicked: (mouse) => {
+                                        onClicked: mouse => {
                                             tabStateLayer.burst(mouse.x, mouse.y);
                                             if (mouse.button === Qt.RightButton) {
                                                 tabDelegate.isEditing = true;
                                                 return;
                                             }
-                                            if (!tabDelegate.isEditing) AiService.setActiveConversation(modelData.id);
+                                            if (!tabDelegate.isEditing)
+                                                AiService.setActiveConversation(modelData.id);
                                         }
                                         onDoubleClicked: tabDelegate.isEditing = true
                                     }
@@ -451,9 +497,12 @@ PanelWindow {
 
                 // "+" add conversation button
                 Rectangle {
-                    width: 28; height: 28; radius: Colors.radiusXS
+                    width: 28
+                    height: 28
+                    radius: Colors.radiusXS
                     color: Colors.bgWidget
-                    border.color: Colors.border; border.width: 1
+                    border.color: Colors.border
+                    border.width: 1
 
                     Text {
                         anchors.centerIn: parent
@@ -472,7 +521,7 @@ PanelWindow {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: (mouse) => {
+                        onClicked: mouse => {
                             addConvStateLayer.burst(mouse.x, mouse.y);
                             AiService.newConversation();
                         }
@@ -493,18 +542,34 @@ PanelWindow {
 
                 opacity: visible ? 1.0 : 0.0
                 scale: visible ? 1.0 : 0.95
-                Behavior on opacity { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
-                Behavior on scale { NumberAnimation { duration: 350; easing.type: Easing.OutBack } }
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 250
+                        easing.type: Easing.OutCubic
+                    }
+                }
+                Behavior on scale {
+                    NumberAnimation {
+                        duration: 350
+                        easing.type: Easing.OutBack
+                    }
+                }
 
                 ColumnLayout {
                     id: cmdCol
-                    anchors.fill: parent; anchors.margins: Colors.spacingM
+                    anchors.fill: parent
+                    anchors.margins: Colors.spacingM
                     spacing: Colors.spacingS
 
                     RowLayout {
                         spacing: Colors.spacingS
-                        Text { text: "󰒓"; color: Colors.accent; font.pixelSize: Colors.fontSizeXL; font.family: Colors.fontMono }
-                        Text { 
+                        Text {
+                            text: "󰒓"
+                            color: Colors.accent
+                            font.pixelSize: Colors.fontSizeXL
+                            font.family: Colors.fontMono
+                        }
+                        Text {
                             text: "Suggested System Action"
                             color: Colors.text
                             font.pixelSize: Colors.fontSizeSmall
@@ -530,14 +595,14 @@ PanelWindow {
                     RowLayout {
                         Layout.alignment: Qt.AlignRight
                         spacing: Colors.spacingM
-                        
+
                         SettingsActionButton {
                             label: "Cancel"
                             iconName: "󰅖"
                             compact: true
                             onClicked: AiService.cancelPendingCommand()
                         }
-                        
+
                         SettingsActionButton {
                             label: "Execute"
                             iconName: "󰐊"
@@ -561,18 +626,34 @@ PanelWindow {
 
                 opacity: visible ? 1.0 : 0.0
                 scale: visible ? 1.0 : 0.95
-                Behavior on opacity { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
-                Behavior on scale { NumberAnimation { duration: 350; easing.type: Easing.OutBack } }
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 250
+                        easing.type: Easing.OutCubic
+                    }
+                }
+                Behavior on scale {
+                    NumberAnimation {
+                        duration: 350
+                        easing.type: Easing.OutBack
+                    }
+                }
 
                 ColumnLayout {
                     id: scriptCol
-                    anchors.fill: parent; anchors.margins: Colors.spacingM
+                    anchors.fill: parent
+                    anchors.margins: Colors.spacingM
                     spacing: Colors.spacingS
 
                     RowLayout {
                         spacing: Colors.spacingS
-                        Text { text: "󰆍"; color: Colors.success; font.pixelSize: Colors.fontSizeXL; font.family: Colors.fontMono }
-                        Text { 
+                        Text {
+                            text: "󰆍"
+                            color: Colors.success
+                            font.pixelSize: Colors.fontSizeXL
+                            font.family: Colors.fontMono
+                        }
+                        Text {
                             text: "Install Shell Script"
                             color: Colors.text
                             font.pixelSize: Colors.fontSizeSmall
@@ -605,7 +686,8 @@ PanelWindow {
                         clip: true
 
                         Flickable {
-                            anchors.fill: parent; anchors.margins: 8
+                            anchors.fill: parent
+                            anchors.margins: 8
                             contentHeight: scriptPreview.implicitHeight
                             contentWidth: width
                             flickableDirection: Flickable.VerticalFlick
@@ -624,14 +706,14 @@ PanelWindow {
                     RowLayout {
                         Layout.alignment: Qt.AlignRight
                         spacing: Colors.spacingM
-                        
+
                         SettingsActionButton {
                             label: "Discard"
                             iconName: "󰅖"
                             compact: true
                             onClicked: AiService.cancelPendingScript()
                         }
-                        
+
                         SettingsActionButton {
                             label: "Install to ~/.local/bin"
                             iconName: "󰄬"
@@ -663,9 +745,7 @@ PanelWindow {
                     clip: true
 
                     ScrollBar.vertical: ScrollBar {
-                        policy: messageFlickable.contentHeight > messageFlickable.height
-                            ? ScrollBar.AlwaysOn
-                            : ScrollBar.AlwaysOff
+                        policy: messageFlickable.contentHeight > messageFlickable.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
                     }
 
                     Column {
@@ -789,21 +869,31 @@ PanelWindow {
 
                                         // Copy button on hover
                                         Rectangle {
-                                            width: 22; height: 22; radius: Colors.radiusXXS
+                                            width: 22
+                                            height: 22
+                                            radius: Colors.radiusXXS
                                             anchors.top: parent.top
                                             anchors.right: parent.right
-                                            anchors.topMargin: 4; anchors.rightMargin: 4
+                                            anchors.topMargin: 4
+                                            anchors.rightMargin: 4
                                             color: userCopyHover.containsMouse ? Colors.bgWidget : "transparent"
                                             opacity: userHoverArea.containsMouse ? 1 : 0
-                                            Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
+                                            Behavior on opacity {
+                                                NumberAnimation {
+                                                    duration: Colors.durationFast
+                                                }
+                                            }
                                             Text {
                                                 anchors.centerIn: parent
-                                                text: "󰆏"; color: Colors.textSecondary
-                                                font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeSmall
+                                                text: "󰆏"
+                                                color: Colors.textSecondary
+                                                font.family: Colors.fontMono
+                                                font.pixelSize: Colors.fontSizeSmall
                                             }
                                             MouseArea {
                                                 id: userCopyHover
-                                                anchors.fill: parent; hoverEnabled: true
+                                                anchors.fill: parent
+                                                hoverEnabled: true
                                                 cursorShape: Qt.PointingHandCursor
                                                 onClicked: {
                                                     Quickshell.execDetached(["sh", "-c", "printf '%s' " + root._shellEscape(modelData.content) + " | wl-copy"]);
@@ -813,8 +903,10 @@ PanelWindow {
                                         }
                                         MouseArea {
                                             id: userHoverArea
-                                            anchors.fill: parent; hoverEnabled: true
-                                            acceptedButtons: Qt.NoButton; propagateComposedEvents: true
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            acceptedButtons: Qt.NoButton
+                                            propagateComposedEvents: true
                                         }
                                     }
 
@@ -833,8 +925,10 @@ PanelWindow {
                                                 required property int index
                                                 width: parent.width
                                                 sourceComponent: {
-                                                    if (modelData.type === "code") return codeBlockComponent;
-                                                    if (modelData.type === "thinking") return thinkingBlockComponent;
+                                                    if (modelData.type === "code")
+                                                        return codeBlockComponent;
+                                                    if (modelData.type === "thinking")
+                                                        return thinkingBlockComponent;
                                                     return textBlockComponent;
                                                 }
                                             }
@@ -864,9 +958,7 @@ PanelWindow {
                                     anchors.fill: parent
                                     anchors.margins: Colors.spacingM
                                     anchors.rightMargin: Colors.spacingM + 16
-                                    text: AiService.streamingContent.length > 0
-                                        ? root._renderMarkdown(AiService.streamingContent)
-                                        : '<span style="color: ' + Colors.textDisabled + ';">Thinking...</span>'
+                                    text: AiService.streamingContent.length > 0 ? root._renderMarkdown(AiService.streamingContent) : '<span style="color: ' + Colors.textDisabled + ';">Thinking...</span>'
                                     textFormat: TextEdit.RichText
                                     color: Colors.text
                                     font.pixelSize: Colors.fontSizeMedium
@@ -877,7 +969,8 @@ PanelWindow {
 
                                 // Blinking cursor
                                 Rectangle {
-                                    width: 2; height: 16
+                                    width: 2
+                                    height: 16
                                     radius: 1
                                     color: Colors.primary
                                     anchors.bottom: parent.bottom
@@ -885,7 +978,11 @@ PanelWindow {
                                     anchors.bottomMargin: Colors.spacingM
                                     anchors.rightMargin: Colors.spacingS
                                     opacity: cursorBlink.running ? (cursorBlink.cursorVisible ? 1 : 0) : 0
-                                    Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
+                                    Behavior on opacity {
+                                        NumberAnimation {
+                                            duration: Colors.durationFast
+                                        }
+                                    }
 
                                     Timer {
                                         id: cursorBlink
@@ -932,7 +1029,9 @@ PanelWindow {
 
                                 // Retry button
                                 Rectangle {
-                                    width: 28; height: 28; radius: Colors.radiusXS
+                                    width: 28
+                                    height: 28
+                                    radius: Colors.radiusXS
                                     color: "transparent"
                                     Text {
                                         anchors.centerIn: parent
@@ -951,7 +1050,7 @@ PanelWindow {
                                         anchors.fill: parent
                                         hoverEnabled: true
                                         cursorShape: Qt.PointingHandCursor
-                                        onClicked: (mouse) => {
+                                        onClicked: mouse => {
                                             retryStateLayer.burst(mouse.x, mouse.y);
                                             AiService.retryLastMessage();
                                         }
@@ -992,7 +1091,11 @@ PanelWindow {
                 border.color: inputField.activeFocus ? Colors.primary : Colors.border
                 border.width: inputField.activeFocus ? 1.5 : 1
                 radius: Colors.radiusMedium
-                Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+                Behavior on border.color {
+                    ColorAnimation {
+                        duration: Colors.durationFast
+                    }
+                }
 
                 ColumnLayout {
                     id: inputLayout
@@ -1024,9 +1127,10 @@ PanelWindow {
                             visible: inputField.text.length === 0 && !inputField.activeFocus
                         }
 
-                        onActiveFocusChanged: if (activeFocus) providerDropdown.visible = false
+                        onActiveFocusChanged: if (activeFocus)
+                            providerDropdown.visible = false
 
-                        Keys.onPressed: (event) => {
+                        Keys.onPressed: event => {
                             if (event.key === Qt.Key_Return && !(event.modifiers & Qt.ShiftModifier)) {
                                 event.accepted = true;
                                 root._sendCurrentMessage();
@@ -1086,7 +1190,10 @@ PanelWindow {
 
                         // Window context toggle
                         Rectangle {
-                            width: 24; height: 24; radius: Colors.radiusXXS
+                            id: windowContextToggle
+                            width: 24
+                            height: 24
+                            radius: Colors.radiusXXS
                             color: root.includeWindowContext ? Colors.withAlpha(Colors.primary, 0.18) : "transparent"
                             border.color: root.includeWindowContext ? Colors.primary : Colors.border
                             border.width: 1
@@ -1105,17 +1212,20 @@ PanelWindow {
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: root.includeWindowContext = !root.includeWindowContext
                             }
-                            
+
                             SharedWidgets.BarTooltip {
                                 text: "Attach Active Window Title"
                                 hovered: winCtxHover.containsMouse
-                                anchorItem: parent
+                                anchorItem: windowContextToggle
                             }
                         }
 
                         // Visual context toggle
                         Rectangle {
-                            width: 24; height: 24; radius: Colors.radiusXXS
+                            id: visualContextToggle
+                            width: 24
+                            height: 24
+                            radius: Colors.radiusXXS
                             color: root.includeVisualContext ? Colors.withAlpha(Colors.primary, 0.18) : "transparent"
                             border.color: root.includeVisualContext ? Colors.primary : Colors.border
                             border.width: 1
@@ -1141,11 +1251,11 @@ PanelWindow {
                                 }
                                 onDoubleClicked: ScreenshotService.captureRegion()
                             }
-                            
+
                             SharedWidgets.BarTooltip {
                                 text: "Attach Latest Screen Crop (Double-click to capture new)"
                                 hovered: visualCtxHover.containsMouse
-                                anchorItem: parent
+                                anchorItem: visualContextToggle
                             }
 
                             Connections {
@@ -1159,7 +1269,10 @@ PanelWindow {
 
                         // System context toggle
                         Rectangle {
-                            width: 24; height: 24; radius: Colors.radiusXXS
+                            id: systemContextToggle
+                            width: 24
+                            height: 24
+                            radius: Colors.radiusXXS
                             color: Config.aiSystemContext ? Colors.withAlpha(Colors.primary, 0.18) : "transparent"
                             border.color: Config.aiSystemContext ? Colors.primary : Colors.border
                             border.width: 1
@@ -1178,11 +1291,11 @@ PanelWindow {
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: Config.aiSystemContext = !Config.aiSystemContext
                             }
-                            
+
                             SharedWidgets.BarTooltip {
                                 text: "Attach System Stats (CPU/RAM)"
                                 hovered: sysCtxHover.containsMouse
-                                anchorItem: parent
+                                anchorItem: systemContextToggle
                             }
                         }
 
@@ -1200,14 +1313,16 @@ PanelWindow {
                             Layout.alignment: Qt.AlignVCenter
                         }
 
-                        Item { Layout.fillWidth: true }
+                        Item {
+                            Layout.fillWidth: true
+                        }
 
                         // Send / Cancel button
                         Rectangle {
-                            width: 32; height: 28; radius: Colors.radiusXS
-                            color: AiService.isStreaming
-                                ? Colors.withAlpha(Colors.error, 0.18)
-                                : (inputField.text.trim().length > 0 ? Colors.withAlpha(Colors.primary, 0.18) : "transparent")
+                            width: 32
+                            height: 28
+                            radius: Colors.radiusXS
+                            color: AiService.isStreaming ? Colors.withAlpha(Colors.error, 0.18) : (inputField.text.trim().length > 0 ? Colors.withAlpha(Colors.primary, 0.18) : "transparent")
                             border.color: AiService.isStreaming ? Colors.error : Colors.primary
                             border.width: AiService.isStreaming || inputField.text.trim().length > 0 ? 1 : 0
 
@@ -1228,7 +1343,7 @@ PanelWindow {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: (mouse) => {
+                                onClicked: mouse => {
                                     sendStateLayer.burst(mouse.x, mouse.y);
                                     if (AiService.isStreaming) {
                                         AiService.cancelStream();
@@ -1315,8 +1430,7 @@ PanelWindow {
                         width: providerDropdownCol.width - Colors.spacingS * 2
                         height: 26
                         radius: Colors.radiusXXS
-                        color: isCurrent ? Colors.withAlpha(Colors.primary, 0.15)
-                            : providerItemMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : "transparent"
+                        color: isCurrent ? Colors.withAlpha(Colors.primary, 0.15) : providerItemMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : "transparent"
 
                         RowLayout {
                             anchors.fill: parent
@@ -1385,8 +1499,7 @@ PanelWindow {
                         width: providerDropdownCol.width - Colors.spacingS * 2
                         height: 26
                         radius: Colors.radiusXXS
-                        color: isCurrent ? Colors.withAlpha(Colors.primary, 0.15)
-                            : modelItemMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : "transparent"
+                        color: isCurrent ? Colors.withAlpha(Colors.primary, 0.15) : modelItemMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : "transparent"
 
                         Text {
                             anchors.fill: parent
@@ -1557,16 +1670,21 @@ PanelWindow {
                 }
 
                 Rectangle {
-                    width: 20; height: 20; radius: Colors.radiusMicro
+                    width: 20
+                    height: 20
+                    radius: Colors.radiusMicro
                     color: codeCopyHover.containsMouse ? Colors.bgWidget : "transparent"
                     Text {
                         anchors.centerIn: parent
-                        text: "󰆏"; color: Colors.textSecondary
-                        font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXS
+                        text: "󰆏"
+                        color: Colors.textSecondary
+                        font.family: Colors.fontMono
+                        font.pixelSize: Colors.fontSizeXS
                     }
                     MouseArea {
                         id: codeCopyHover
-                        anchors.fill: parent; hoverEnabled: true
+                        anchors.fill: parent
+                        hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
                             if (blockData) {
@@ -1614,7 +1732,12 @@ PanelWindow {
             border.width: 1
             clip: true
 
-            Behavior on height { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
+            Behavior on height {
+                NumberAnimation {
+                    duration: Colors.durationFast
+                    easing.type: Easing.OutCubic
+                }
+            }
 
             RowLayout {
                 id: thinkingHeader
@@ -1669,7 +1792,7 @@ PanelWindow {
     Process {
         id: fileReadProc
         command: ["cat", root.attachedFiles[root._fileReadIndex] ? root.attachedFiles[root._fileReadIndex].path : ""]
-        onExited: (exitCode) => {
+        onExited: exitCode => {
             if (exitCode === 0) {
                 var files = root.attachedFiles.slice();
                 files[root._fileReadIndex].content = stdout.readAll();
@@ -1702,8 +1825,10 @@ PanelWindow {
 
     function _sendCurrentMessage() {
         var text = inputField.text.trim();
-        if (text.length === 0 && root.attachedFiles.length === 0) return;
-        if (AiService.isStreaming) return;
+        if (text.length === 0 && root.attachedFiles.length === 0)
+            return;
+        if (AiService.isStreaming)
+            return;
         inputField.text = "";
 
         if (root.attachedFiles.length > 0) {

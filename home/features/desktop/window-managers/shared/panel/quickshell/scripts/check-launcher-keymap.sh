@@ -6,7 +6,7 @@ config_dir="${script_dir}/../config"
 launcher_qml="${config_dir}/launcher/Launcher.qml"
 config_qml="${config_dir}/services/Config.qml"
 config_persistence_js="${config_dir}/services/config/ConfigPersistence.js"
-system_tab_qml="${config_dir}/menu/settings/tabs/SystemTab.qml"
+launcher_settings_qml="${config_dir}/menu/settings/tabs/ShellCoreSectionTab.qml"
 
 violations=()
 
@@ -87,10 +87,10 @@ require_literal "$config_qml" 'property string launcherTabBehavior: "contextual"
 require_literal "$config_persistence_js" '"tabBehavior": config.launcherTabBehavior,' "launcher.tabBehavior persistence"
 
 # Settings must expose tab behavior and reset default.
-require_literal "$system_tab_qml" 'Config.launcherTabBehavior = "contextual";' "launcher default reset for tab behavior"
-require_literal "$system_tab_qml" 'label: "Tab Behavior"' "Tab Behavior settings row label"
-require_literal "$system_tab_qml" 'currentValue: Config.launcherTabBehavior' "Tab Behavior settings current value binding"
-require_literal "$system_tab_qml" 'onModeSelected: modeValue => Config.launcherTabBehavior = modeValue' "Tab Behavior settings update binding"
+require_literal "$launcher_settings_qml" 'Config.launcherTabBehavior = "contextual";' "launcher default reset for tab behavior"
+require_literal "$launcher_settings_qml" 'label: "Tab Behavior"' "Tab Behavior settings row label"
+require_literal "$launcher_settings_qml" 'currentValue: Config.launcherTabBehavior' "Tab Behavior settings current value binding"
+require_literal "$launcher_settings_qml" 'onModeSelected: modeValue => Config.launcherTabBehavior = modeValue' "Tab Behavior settings update binding"
 
 if (( ${#violations[@]} > 0 )); then
   printf '%s\n' "Launcher keymap check failed:" >&2

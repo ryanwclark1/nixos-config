@@ -658,7 +658,9 @@ PanelWindow {
         launcherRoot.rememberCurrentWebProviderSelection();
     }
 
-    function modeInfo(key) { return ModeData.modeInfo(key); }
+    function modeInfo(key) {
+        return ModeData.modeInfo(key);
+    }
 
     function sanitizeModeList(source, fallback, allowedList) {
         var out = [];
@@ -832,7 +834,9 @@ PanelWindow {
         }
     }
 
-    function stripModePrefix(text) { return ModeData.stripModePrefix(text); }
+    function stripModePrefix(text) {
+        return ModeData.stripModePrefix(text);
+    }
 
     function configuredWebProviders() {
         return ModeData.configuredWebProviders(Config.launcherWebProviderOrder);
@@ -906,7 +910,9 @@ PanelWindow {
             Config.launcherWebLastProviderKey = key;
     }
 
-    function shellQuote(text) { return ModeData.shellQuote(text); }
+    function shellQuote(text) {
+        return ModeData.shellQuote(text);
+    }
 
     function telemetryStart() {
         return Date.now();
@@ -2121,12 +2127,12 @@ PanelWindow {
                 category: "Settings",
                 name: tab.label,
                 icon: tab.icon || "󰒓",
-                action: (function(tId) { 
-                    return function() {
-                        Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "openTab", tId]);
-                        close();
-                    }
-                })(tab.id),
+                action: (function (tId) {
+                        return function () {
+                            Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "openTab", tId]);
+                            close();
+                        };
+                    })(tab.id),
                 _keywords: (tab.searchTerms || []).join(" ")
             });
         }
@@ -2136,7 +2142,7 @@ PanelWindow {
 
     function loadDevOps() {
         var items = [];
-        
+
         // Docker Containers
         var containers = ServiceUnitService.dockerContainers;
         for (var i = 0; i < containers.length; i++) {
@@ -2146,12 +2152,12 @@ PanelWindow {
                 name: c.name,
                 description: c.status + " (" + c.image + ")",
                 icon: "󰡨",
-                action: (function(id, state) {
-                    return function() {
-                        ServiceUnitService.runDockerAction(id, state === "running" ? "stop" : "start");
-                        close();
-                    }
-                })(c.id, c.state)
+                action: (function (id, state) {
+                        return function () {
+                            ServiceUnitService.runDockerAction(id, state === "running" ? "stop" : "start");
+                            close();
+                        };
+                    })(c.id, c.state)
             });
         }
 
@@ -2162,7 +2168,9 @@ PanelWindow {
                 category: "SSH",
                 name: ssh[j],
                 icon: "󰣀",
-                action: function() { close(); } // Just info for now
+                action: function () {
+                    close();
+                } // Just info for now
             });
         }
 
@@ -2175,12 +2183,12 @@ PanelWindow {
                     category: "Service",
                     name: u.name.replace(".service", ""),
                     icon: u.active === "active" ? "󰄬" : "󰅚",
-                    action: (function(name) {
-                        return function() {
-                            ServiceUnitService.restartUnit("user", name);
-                            close();
-                        }
-                    })(u.name)
+                    action: (function (name) {
+                            return function () {
+                                ServiceUnitService.restartUnit("user", name);
+                                close();
+                            };
+                        })(u.name)
                 });
             }
         }
@@ -2312,12 +2320,12 @@ PanelWindow {
                     name: "Generation " + g.id + (g.current ? " (current)" : ""),
                     title: g.date + " • " + g.version,
                     icon: g.current ? "󰄬" : "󰋚",
-                    action: (function(id) {
-                        return function() {
-                            NixOS.rollbackTo(id);
-                            close();
-                        }
-                    })(g.id)
+                    action: (function (id) {
+                            return function () {
+                                NixOS.rollbackTo(id);
+                                close();
+                            };
+                        })(g.id)
                 });
             }
         }
@@ -3145,9 +3153,9 @@ PanelWindow {
 
                     Connections {
                         target: searchInputComp.searchInput
-                        function onVisibleChanged() { 
-                            if (!searchInputComp.searchInput.visible && searchInputComp.searchInput.activeFocus) 
-                                searchInputComp.searchInput.focus = false 
+                        function onVisibleChanged() {
+                            if (!searchInputComp.searchInput.visible && searchInputComp.searchInput.activeFocus)
+                                searchInputComp.searchInput.focus = false;
                         }
                     }
 
@@ -3409,7 +3417,8 @@ PanelWindow {
                                 ignoreMouseHover: launcherRoot.ignoreMouseHover
                                 modeIcons: launcherRoot.modeIcons
                                 onClicked: launcherRoot.executeSelection()
-                                onEntered: if (!launcherRoot.ignoreMouseHover) launcherRoot.selectedIndex = index
+                                onEntered: if (!launcherRoot.ignoreMouseHover)
+                                    launcherRoot.selectedIndex = index
                             }
                         }
 

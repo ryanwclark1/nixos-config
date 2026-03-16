@@ -11,6 +11,8 @@ Rectangle {
 
   property bool vertical: false
   property var anchorWindow: null
+  property bool showAddButton: true
+  property bool showMiniMap: true
   property var state: ({ workspaces: [], activeWorkspace: -1 })
 
   readonly property bool workspaceApiAvailable: CompositorAdapter.supportsWorkspaceListing
@@ -284,5 +286,7 @@ Rectangle {
     anchors.centerIn: parent
     vertical: root.vertical
     state: root.state
+    showAddButton: root.showAddButton
+    showMiniMap: root.showMiniMap
   }
 }

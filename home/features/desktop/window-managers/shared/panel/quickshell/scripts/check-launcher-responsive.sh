@@ -6,7 +6,7 @@ runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
 config_root="$(CDPATH= cd -- "${script_dir}/../config" >/dev/null && pwd)"
 launcher_qml="${script_dir}/../config/launcher/Launcher.qml"
 launcher_search_field_qml="${script_dir}/../config/launcher/LauncherSearchField.qml"
-system_tab_qml="${script_dir}/../config/menu/settings/tabs/SystemTab.qml"
+launcher_settings_qml="${script_dir}/../config/menu/settings/tabs/ShellCoreSectionTab.qml"
 expected_config="$(realpath "${script_dir}/../config/shell.qml" 2>/dev/null || printf '%s' "${script_dir}/../config/shell.qml")"
 
 instance_id=""
@@ -25,7 +25,7 @@ usage() {
 Usage: check-launcher-responsive.sh [--id INSTANCE_ID] [--repo-shell] [--ci]
 
 Validates launcher responsive guardrails by:
-  - checking static compact/tight layout invariants in Launcher.qml/SystemTab.qml,
+  - checking static compact/tight layout invariants in Launcher.qml/ShellCoreSectionTab.qml,
   - exercising launcher open flows in a live QuickShell instance,
   - scanning fresh log output for warnings/errors.
 In --ci mode, only static checks are executed.
@@ -256,9 +256,9 @@ static_checks() {
   require_pattern "$launcher_qml" 'function invokeEscapeAction\(\)\s*(?::\s*string)?\s*\{' "escape action invoker IPC mapping"
   require_literal "$launcher_qml" 'function escapeActionStateObject() {' "escape action payload helper"
   require_literal "$launcher_qml" 'visible: launcherRoot.showLauncherHome && launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && launcherRoot.drunCategoryOptions.length > 1' "drun category chip visibility guard"
-  require_literal "$system_tab_qml" 'minimumHeight: root.compactMode ? 76 : 44' "settings compact row height"
-  require_literal "$system_tab_qml" 'elide: root.compactMode ? Text.ElideNone : Text.ElideRight' "settings compact label wrapping"
-  require_literal "$system_tab_qml" 'wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap' "settings compact wrap mode"
+  require_literal "$launcher_settings_qml" 'minimumHeight: root.compactMode ? 76 : 44' "settings compact row height"
+  require_literal "$launcher_settings_qml" 'elide: root.compactMode ? Text.ElideNone : Text.ElideRight' "settings compact label wrapping"
+  require_literal "$launcher_settings_qml" 'wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap' "settings compact wrap mode"
 
   if (( ${#violations[@]} > 0 )); then
     local violation

@@ -11,6 +11,8 @@ QtObject {
     property string lastScreenshotPath: ""
     property string lastRegionPath: ""
     property bool capturing: false
+    property string _captureMode: ""
+    property string _captureMonitor: ""
 
     // ── Signals ──────────────────────────────────
     signal captureStarted()
@@ -26,11 +28,13 @@ QtObject {
     function _capture(mode, monitor) {
         if (root.capturing) return;
         root.capturing = true;
+        root._captureMode = mode;
+        root._captureMonitor = monitor || "";
         root.captureStarted();
 
-        _captureProc.command = monitor
-            ? ["qs-screenshot", mode, monitor]
-            : ["qs-screenshot", mode];
+        _captureProc.command = root._captureMonitor !== ""
+            ? ["qs-screenshot", root._captureMode, root._captureMonitor]
+            : ["qs-screenshot", root._captureMode];
         _captureProc.running = true;
     }
 
@@ -45,7 +49,7 @@ QtObject {
                 if (parts[0] === "OK" && parts[1]) {
                     var path = parts[1];
                     root.lastScreenshotPath = path;
-                    if (mode === "region") {
+                    if (root._captureMode === "region") {
                         root.lastRegionPath = path;
                         root.regionCaptured(path);
                     }
@@ -62,6 +66,9 @@ QtObject {
                     var msg = parts.length > 1 ? parts[1] : "Unknown error";
                     root.captureFailed(msg);
                 }
+
+                root._captureMode = "";
+                root._captureMonitor = "";
             }
         }
     }

@@ -5,7 +5,7 @@ import "../../widgets" as SharedWidgets
 
 Rectangle {
   id: taskItem
-  width: 32; height: 32; radius: Colors.radiusXS
+  width: buttonSize; height: buttonSize; radius: Colors.radiusXS
   color: actualFocused ? Colors.highlight : "transparent"
   border.color: actualFocused ? Colors.primary : "transparent"; border.width: 1
   clip: true
@@ -21,6 +21,9 @@ Rectangle {
   property var anchorWindow: null
   property var iconMap: ({})
   property var toplevelRef: null
+  property int buttonSize: 32
+  property int iconSize: 20
+  property bool showRunningIndicator: true
   
   signal pinToggled(var app)
 
@@ -46,14 +49,14 @@ Rectangle {
   Rectangle {
     width: 4; height: 4; radius: Colors.radiusMicro; color: taskItem.actualFocused ? Colors.primary : Colors.textDisabled
     anchors.bottom: parent.bottom; anchors.bottomMargin: 2; anchors.horizontalCenter: parent.horizontalCenter
-    visible: isRunning
+    visible: showRunningIndicator && isRunning
   }
 
   SharedWidgets.AppIcon {
     anchors.centerIn: parent
     iconName: taskItem.appClass || taskItem.appExec || ""
     appName: taskItem.appName || taskItem.appClass || ""
-    iconSize: 20
+    iconSize: taskItem.iconSize
     iconMap: taskItem.iconMap
     fallbackIcon: "󰀻"
   }

@@ -7,18 +7,21 @@ import "../services"
 
 Flow {
   id: root
-  spacing: Colors.spacingS
+  spacing: Math.max(2, itemSpacing)
   property bool vertical: false
   flow: vertical ? Flow.TopToBottom : Flow.LeftToRight
   property var anchorWindow: null
+  property int itemSize: 24
+  property int iconSize: 18
+  property int itemSpacing: Colors.spacingS
 
   Repeater {
     model: SystemTray.items
 
     delegate: Rectangle {
       id: trayItem
-      width: 24
-      height: 24
+      width: root.itemSize
+      height: root.itemSize
       radius: Colors.radiusXXS
       color: "transparent"
       scale: mouseArea.containsMouse ? 1.08 : 1.0
@@ -27,8 +30,8 @@ Flow {
 
       Image {
         anchors.centerIn: parent
-        width: 18
-        height: 18
+        width: Math.min(root.iconSize, root.itemSize)
+        height: Math.min(root.iconSize, root.itemSize)
         source: modelData.icon || ""
         asynchronous: true
 

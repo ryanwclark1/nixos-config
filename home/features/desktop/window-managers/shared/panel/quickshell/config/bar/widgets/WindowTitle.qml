@@ -8,7 +8,14 @@ RowLayout {
     spacing: Colors.spacingM
     
     property var widgetInstance: null
-    property int maxTitleWidth: 300
+    readonly property var widgetSettings: widgetInstance && widgetInstance.settings ? widgetInstance.settings : ({})
+    property int maxTitleWidth: {
+        var parsed = parseInt(widgetSettings.maxTitleWidth !== undefined ? widgetSettings.maxTitleWidth : 300, 10);
+        return Math.max(120, isNaN(parsed) ? 300 : parsed);
+    }
+    readonly property bool showAppIcon: widgetSettings.showAppIcon !== false
+    readonly property bool showGitStatus: widgetSettings.showGitStatus !== false
+    readonly property bool showMediaContext: widgetSettings.showMediaContext !== false
 
     readonly property var activeWindow: {
         if (CompositorAdapter.isNiri && CompositorAdapter.niriActiveWindow)
@@ -25,6 +32,7 @@ RowLayout {
 
     // ── App Icon ───────────────────────────────
     Rectangle {
+        visible: root.showAppIcon
         width: 22; height: 22; radius: Colors.radiusXXS
         color: Colors.withAlpha(Colors.surface, 0.4)
         border.color: Colors.border; border.width: 1
@@ -50,6 +58,7 @@ RowLayout {
 
     // ── Git Status ─────────────────────────────
     GitStatus {
+        visible: root.showGitStatus
         windowTitle: root.activeTitle
         appId: root.activeAppId
     }
@@ -57,7 +66,7 @@ RowLayout {
     // ── Inline Media Context ───────────────────
     Rectangle {
         id: mediaContext
-        visible: !!MediaService.currentPlayer && MediaService.trackTitle !== ""
+        visible: root.showMediaContext && !!MediaService.currentPlayer && MediaService.trackTitle !== ""
         
         implicitWidth: visible ? mediaRow.implicitWidth + Colors.spacingM : 0
         implicitHeight: 22

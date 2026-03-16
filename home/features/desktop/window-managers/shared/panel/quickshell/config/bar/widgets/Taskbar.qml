@@ -9,6 +9,11 @@ Flow {
   property bool vertical: false
   flow: vertical ? Flow.TopToBottom : Flow.LeftToRight
   property var anchorWindow: null
+  property int buttonSize: 32
+  property int iconSize: 20
+  property bool showRunningIndicator: true
+  property bool showSeparator: true
+  property int maxUnpinned: 0
 
   property var pinnedApps: []
   property var iconMap: ({})
@@ -204,10 +209,14 @@ Flow {
       }
 
       // Separator sentinel (only if unpinned apps exist)
-      if (unpinned.length > 0) {
+      var limitedUnpinned = unpinned;
+      if (root.maxUnpinned > 0)
+        limitedUnpinned = unpinned.slice(0, root.maxUnpinned);
+
+      if (root.showSeparator && limitedUnpinned.length > 0) {
         result.push({ _key: "__separator__", isSeparator: true });
-        result = result.concat(unpinned);
       }
+      result = result.concat(limitedUnpinned);
 
       return result;
     }
@@ -242,6 +251,9 @@ Flow {
       toplevelRef: itemData.toplevelRef || null
       iconMap: root.iconMap
       anchorWindow: root.anchorWindow
+      buttonSize: root.buttonSize
+      iconSize: root.iconSize
+      showRunningIndicator: root.showRunningIndicator
       onPinToggled: (app) => root.togglePin(app)
     }
   }

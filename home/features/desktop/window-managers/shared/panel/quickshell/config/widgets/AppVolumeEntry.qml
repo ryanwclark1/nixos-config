@@ -6,6 +6,13 @@ RowLayout {
     id: root
 
     required property var appNode   // {nodeRef, id, name, iconName, volume, muted}
+    readonly property string appIconName: root.appNode && root.appNode.iconName ? String(root.appNode.iconName) : ""
+    readonly property string appName: root.appNode && root.appNode.name ? String(root.appNode.name) : "Unknown"
+    readonly property real appVolume: {
+        var value = root.appNode ? Number(root.appNode.volume) : 0;
+        return isNaN(value) ? 0 : Colors.clamp01(value);
+    }
+    readonly property bool appMuted: !!(root.appNode && root.appNode.muted)
 
     Layout.fillWidth: true
     spacing: Colors.spacingS
@@ -14,14 +21,15 @@ RowLayout {
     // App icon (Nerd Font fallback if no icon resolved)
     Text {
         text: {
-            if (root.appNode.iconName) {
-                var resolved = Config.resolveIconSource(root.appNode.iconName);
-                if (resolved) return "";  // will use Image instead
+            if (root.appIconName) {
+                var resolved = Config.resolveIconSource(root.appIconName);
+                if (resolved)
+                    return "";  // will use Image instead
             }
             return "󰎈";  // default music/app icon
         }
         visible: !appIconImage.visible
-        color: root.appNode.muted ? Colors.error : Colors.primary
+        color: root.appMuted ? Colors.error : Colors.primary
         font.family: Colors.fontMono
         font.pixelSize: Colors.fontSizeLarge
         Layout.preferredWidth: 24
@@ -32,8 +40,9 @@ RowLayout {
         id: appIconImage
         visible: status === Image.Ready
         source: {
-            if (!root.appNode.iconName) return "";
-            return Config.resolveIconSource(root.appNode.iconName);
+            if (!root.appIconName)
+                return "";
+            return Config.resolveIconSource(root.appIconName);
         }
         Layout.preferredWidth: 20
         Layout.preferredHeight: 20
@@ -44,7 +53,7 @@ RowLayout {
 
     // App name
     Text {
-        text: root.appNode.name
+        text: root.appName
         color: Colors.text
         font.pixelSize: Colors.fontSizeSmall
         elide: Text.ElideRight
@@ -55,19 +64,19 @@ RowLayout {
     // Volume slider
     SliderTrack {
         Layout.fillWidth: true
-        value: root.appNode.volume
-        muted: root.appNode.muted
+        value: root.appVolume
+        muted: root.appMuted
         icon: "󰎈"
         onSliderMoved: v => AudioService.setAppVolume(root.appNode.nodeRef, v)
     }
 
     // Mute button
     MuteButton {
-        muted: root.appNode.muted
+        muted: root.appMuted
         icon: "󰕾"
         mutedIcon: "󰝟"
         size: 28
-        action: function() {
+        action: function () {
             AudioService.toggleAppMute(root.appNode.nodeRef);
         }
     }

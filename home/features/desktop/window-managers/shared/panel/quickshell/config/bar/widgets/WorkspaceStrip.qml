@@ -7,6 +7,8 @@ Flow {
 
   property var state: null
   property bool vertical: false
+  property bool showAddButton: true
+  property bool showMiniMap: true
   property color activeColor: Config.workspaceActiveColor !== "" ? Config.workspaceActiveColor : Colors.highlight
   property color inactiveColor: Colors.surface
   property color textColor: Colors.text
@@ -117,7 +119,7 @@ Flow {
         anchors.fill: parent
         anchors.margins: 2
         opacity: wsPill.isActive ? 0.4 : 0.6
-        visible: !!(modelData && modelData.windowData && modelData.windowData.length > 0)
+        visible: root.showMiniMap && !!(modelData && modelData.windowData && modelData.windowData.length > 0)
         z: 1
 
         Repeater {
@@ -169,7 +171,7 @@ Flow {
     color: addWsHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.12) : Colors.withAlpha(Colors.surface, 0.25)
     border.color: addWsHover.containsMouse ? Colors.primary : Colors.border
     border.width: 1
-    visible: Config.workspaceShowEmpty || root.state.workspaces.length < 10
+    visible: root.showAddButton && (Config.workspaceShowEmpty || root.state.workspaces.length < 10)
     
     Behavior on color { ColorAnimation { duration: Colors.durationFast } }
     scale: addWsHover.containsMouse ? 1.1 : 1.0

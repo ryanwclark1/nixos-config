@@ -196,6 +196,26 @@ Item {
     return !isSummaryWidgetIconOnly(widgetInstance);
   }
 
+  function widgetIntegerSetting(widgetInstance, key, fallback, minValue, maxValue) {
+    var settings = widgetSettings(widgetInstance);
+    var parsed = parseInt(settings[key] !== undefined ? settings[key] : fallback, 10);
+    if (isNaN(parsed))
+      parsed = fallback;
+    if (minValue !== undefined)
+      parsed = Math.max(minValue, parsed);
+    if (maxValue !== undefined)
+      parsed = Math.min(maxValue, parsed);
+    return parsed;
+  }
+
+  function widgetStringSetting(widgetInstance, key, fallback, allowedValues) {
+    var settings = widgetSettings(widgetInstance);
+    var value = String(settings[key] !== undefined ? settings[key] : fallback);
+    if (allowedValues && allowedValues.indexOf(value) === -1)
+      return fallback;
+    return value;
+  }
+
   function componentForWidget(widgetType) {
     if (widgetType === "logo") return logoComponent;
     if (widgetType === "workspaces") return workspacesComponent;
@@ -469,6 +489,8 @@ Item {
       property var widgetInstance: null
       vertical: root.vertical
       anchorWindow: root.anchorWindow
+      showAddButton: root.widgetSettings(widgetInstance).showAddButton !== false
+      showMiniMap: root.widgetSettings(widgetInstance).showMiniMap !== false
     }
   }
 
@@ -478,6 +500,11 @@ Item {
       property var widgetInstance: null
       vertical: root.vertical
       anchorWindow: root.anchorWindow
+      buttonSize: root.widgetIntegerSetting(widgetInstance, "buttonSize", 32, 24, 56)
+      iconSize: root.widgetIntegerSetting(widgetInstance, "iconSize", 20, 14, 36)
+      showRunningIndicator: root.widgetSettings(widgetInstance).showRunningIndicator !== false
+      showSeparator: root.widgetSettings(widgetInstance).showSeparator !== false
+      maxUnpinned: root.widgetIntegerSetting(widgetInstance, "maxUnpinned", 0, 0, 20)
     }
   }
 
@@ -561,6 +588,8 @@ Item {
       property var widgetInstance: null
       implicitWidth: dateTimePill.width
       implicitHeight: dateTimePill.height
+      readonly property bool iconOnly: root.isSummaryWidgetIconOnly(widgetInstance)
+      readonly property bool showDate: root.widgetSettings(widgetInstance).showDate !== false
 
       SystemClock {
         id: centerClock
@@ -581,7 +610,7 @@ Item {
         onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
         Text {
-          visible: root.vertical
+          visible: dateTimeRoot.iconOnly
           text: "󰥔"
           color: Colors.text
           font.pixelSize: Colors.fontSizeLarge
@@ -589,7 +618,7 @@ Item {
         }
 
         Row {
-          visible: !root.vertical
+          visible: !dateTimeRoot.iconOnly
           spacing: Colors.spacingXS
           anchors.verticalCenter: parent.verticalCenter
           anchors.verticalCenterOffset: 1
@@ -608,7 +637,7 @@ Item {
           }
 
           Text {
-            visible: Config.timeShowBarDate
+            visible: dateTimeRoot.showDate && Config.timeShowBarDate
             color: Colors.textSecondary
             font.pixelSize: Colors.fontSizeSmall
             font.weight: Font.Medium
@@ -631,6 +660,8 @@ Item {
     SharedWidgets.MediaBar {
       property var widgetInstance: null
       vertical: root.vertical
+      iconOnly: root.isSummaryWidgetIconOnly(widgetInstance)
+      maxTextWidth: root.widgetIntegerSetting(widgetInstance, "maxTextWidth", 150, 80, 240)
       anchorWindow: root.anchorWindow
     }
   }
@@ -642,6 +673,7 @@ Item {
       property var widgetInstance: null
       property string updatesIcon: "󰚰"
       property string updatesCount: "0"
+      readonly property bool iconOnly: root.isSummaryWidgetIconOnly(widgetInstance)
       implicitWidth: updatesPill.width
       implicitHeight: updatesPill.height
 
@@ -673,7 +705,7 @@ Item {
         Row {
           spacing: Colors.spacingXS
           Text { text: updatesRoot.updatesIcon; color: Colors.accent; font.pixelSize: Colors.fontSizeXL; font.family: Colors.fontMono; anchors.verticalCenter: parent.verticalCenter }
-          Text { visible: !root.vertical; text: updatesRoot.updatesCount; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.DemiBold; anchors.verticalCenter: parent.verticalCenter }
+          Text { visible: !updatesRoot.iconOnly; text: updatesRoot.updatesCount; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.DemiBold; anchors.verticalCenter: parent.verticalCenter }
         }
       }
     }
@@ -827,16 +859,25 @@ Item {
   Component {
     id: bluetoothComponent
     SharedWidgets.BarPill {
+      id: bluetoothPill
       property var widgetInstance: null
       isActive: root.isSurfaceActive("bluetoothMenu")
       anchorWindow: root.anchorWindow
-      tooltipText: {
-        if (!Bluetooth.defaultAdapter || !Bluetooth.defaultAdapter.enabled) return "Bluetooth off";
+      readonly property string displayMode: root.widgetStringSetting(widgetInstance, "displayMode", "auto", ["auto", "full", "icon"])
+      readonly property bool iconOnly: displayMode === "icon" ? true : (displayMode === "full" ? false : root.vertical)
+      readonly property int connectedCount: {
+        if (!Bluetooth.defaultAdapter || !Bluetooth.defaultAdapter.enabled)
+          return 0;
         var count = 0;
         for (var i = 0; i < Bluetooth.devices.values.length; i++) {
-          if (Bluetooth.devices.values[i].connected) count++;
+          if (Bluetooth.devices.values[i].connected)
+            count++;
         }
-        return count > 0 ? count + " device" + (count > 1 ? "s" : "") + " connected" : "Bluetooth";
+        return count;
+      }
+      tooltipText: {
+        if (!Bluetooth.defaultAdapter || !Bluetooth.defaultAdapter.enabled) return "Bluetooth off";
+        return connectedCount > 0 ? connectedCount + " device" + (connectedCount > 1 ? "s" : "") + " connected" : "Bluetooth";
       }
       onClicked: root.requestSurface("bluetoothMenu", this)
       contextActions: [
@@ -854,6 +895,19 @@ Item {
           color: (Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled) ? Colors.primary : Colors.textDisabled
           font.family: Colors.fontMono
           font.pixelSize: Colors.fontSizeLarge
+          anchors.verticalCenter: parent.verticalCenter
+        }
+
+        Text {
+          visible: !bluetoothPill.iconOnly
+          text: {
+            if (!Bluetooth.defaultAdapter || !Bluetooth.defaultAdapter.enabled)
+              return "Off";
+            return bluetoothPill.connectedCount > 0 ? String(bluetoothPill.connectedCount) : "On";
+          }
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeSmall
+          font.weight: Font.DemiBold
           anchors.verticalCenter: parent.verticalCenter
         }
       }
@@ -888,10 +942,13 @@ Item {
   Component {
     id: musicComponent
     SharedWidgets.BarPill {
+      id: musicPill
       property var widgetInstance: null
       visible: SystemStatus.hasActivePlayer
       isActive: root.isSurfaceActive("musicMenu")
       anchorWindow: root.anchorWindow
+      readonly property bool iconOnly: root.isSummaryWidgetIconOnly(widgetInstance)
+      readonly property int maxTextWidth: root.widgetIntegerSetting(widgetInstance, "maxTextWidth", 100, 60, 220)
       tooltipText: {
         var players = SystemStatus.activeMprisPlayers;
         if (!players || players.length === 0) return "Music controls";
@@ -921,8 +978,8 @@ Item {
         }
 
         Item {
-          visible: !root.vertical
-          width: visible ? Math.min(musicTitleText.contentWidth, 100) : 0
+          visible: !musicPill.iconOnly
+          width: visible ? Math.min(musicTitleText.contentWidth, musicPill.maxTextWidth) : 0
           height: 20
           clip: true
           anchors.verticalCenter: parent.verticalCenter
@@ -1060,10 +1117,14 @@ Item {
   Component {
     id: printerComponent
     SharedWidgets.BarPill {
+      id: printerPill
       property var widgetInstance: null
       visible: PrinterService.hasPrinters
       isActive: root.isSurfaceActive("printerMenu")
       anchorWindow: root.anchorWindow
+      readonly property string displayMode: root.widgetStringSetting(widgetInstance, "displayMode", "auto", ["auto", "full", "icon"])
+      readonly property string badgeStyle: root.widgetStringSetting(widgetInstance, "badgeStyle", "count", ["count", "dot", "off"])
+      readonly property bool iconOnly: displayMode === "icon" ? true : (displayMode === "full" ? false : root.vertical)
       tooltipText: PrinterService.activeJobs > 0
         ? PrinterService.activeJobs + " print job" + (PrinterService.activeJobs !== 1 ? "s" : "") + " active"
         : (PrinterService.defaultPrinter ? PrinterService.defaultPrinter : "Printers")
@@ -1088,10 +1149,10 @@ Item {
         }
 
         Rectangle {
-          visible: PrinterService.activeJobs > 0 && !root.vertical
-          width: printerJobsBadge.contentWidth + 8
+          visible: PrinterService.activeJobs > 0 && !printerPill.iconOnly && printerPill.badgeStyle !== "off"
+          width: printerPill.badgeStyle === "count" ? printerJobsBadge.contentWidth + 8 : 8
           height: 16
-          radius: Colors.radiusXS
+          radius: printerPill.badgeStyle === "count" ? Colors.radiusXS : 4
           color: Colors.withAlpha(Colors.warning, 0.20)
           anchors.verticalCenter: parent.verticalCenter
 
@@ -1102,6 +1163,7 @@ Item {
             color: Colors.warning
             font.pixelSize: Colors.fontSizeXS
             font.weight: Font.Bold
+            visible: printerPill.badgeStyle === "count"
           }
         }
       }
@@ -1180,6 +1242,9 @@ Item {
       property var widgetInstance: null
       vertical: root.vertical
       anchorWindow: root.anchorWindow
+      itemSize: root.widgetIntegerSetting(widgetInstance, "itemSize", 24, 18, 40)
+      iconSize: root.widgetIntegerSetting(widgetInstance, "iconSize", 18, 12, 32)
+      itemSpacing: root.widgetIntegerSetting(widgetInstance, "spacing", Colors.spacingS, 2, 16)
     }
   }
 
@@ -1248,17 +1313,43 @@ Item {
 
       readonly property bool hasDnd: !!(root.manager && root.manager.dndEnabled)
       readonly property bool hasUnread: !!(root.manager && root.manager.notifications && root.manager.notifications.count > 0)
+      readonly property int unreadCount: (root.manager && root.manager.notifications) ? root.manager.notifications.count : 0
+      readonly property string displayMode: root.widgetStringSetting(widgetInstance, "displayMode", "auto", ["auto", "full", "icon"])
+      readonly property string badgeStyle: root.widgetStringSetting(widgetInstance, "badgeStyle", "dot", ["dot", "count", "off"])
+      readonly property bool iconOnly: displayMode === "icon" ? true : (displayMode === "full" ? false : root.vertical)
 
-      Text {
-        color: Colors.text
-        font.pixelSize: Colors.fontSizeXL
-        font.family: Colors.fontMono
-        text: notifPill.hasDnd ? "󰂛" : "󰂚"
+      Row {
+        spacing: Colors.spacingXS
+
+        Text {
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeXL
+          font.family: Colors.fontMono
+          text: notifPill.hasDnd ? "󰂛" : "󰂚"
+        }
+
+        Text {
+          visible: !notifPill.iconOnly && notifPill.hasDnd
+          color: Colors.textSecondary
+          font.pixelSize: Colors.fontSizeSmall
+          font.weight: Font.DemiBold
+          text: "DND"
+          anchors.verticalCenter: parent.verticalCenter
+        }
+
+        Text {
+          visible: !notifPill.iconOnly && !notifPill.hasDnd && notifPill.hasUnread && notifPill.badgeStyle === "count"
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeSmall
+          font.weight: Font.DemiBold
+          text: String(notifPill.unreadCount)
+          anchors.verticalCenter: parent.verticalCenter
+        }
       }
 
       Rectangle {
         parent: notifPill
-        width: 8
+        width: notifPill.badgeStyle === "count" ? Math.max(14, unreadBadgeText.implicitWidth + 8) : 8
         height: 8
         radius: 4
         color: Colors.error
@@ -1266,8 +1357,18 @@ Item {
         anchors.right: parent.right
         anchors.topMargin: 2
         anchors.rightMargin: 2
-        visible: notifPill.hasUnread && !notifPill.hasDnd
+        visible: notifPill.hasUnread && !notifPill.hasDnd && notifPill.badgeStyle !== "off" && notifPill.iconOnly
         z: 10
+
+        Text {
+          id: unreadBadgeText
+          anchors.centerIn: parent
+          visible: notifPill.badgeStyle === "count"
+          text: String(notifPill.unreadCount)
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeXS
+          font.weight: Font.Bold
+        }
       }
     }
   }

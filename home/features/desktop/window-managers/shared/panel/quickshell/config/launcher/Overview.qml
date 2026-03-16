@@ -9,275 +9,301 @@ import "../services" // Import Colors
 import "../widgets" as SharedWidgets
 
 Scope {
-  id: root
+    id: root
 
-  property bool isVisible: false
+    property bool isVisible: false
 
-  IpcHandler {
-    target: "Overview"
-    function toggle() {
-      root.isVisible = !root.isVisible;
+    IpcHandler {
+        target: "Overview"
+        function toggle() {
+            root.isVisible = !root.isVisible;
+        }
+        function show() {
+            root.isVisible = true;
+        }
+        function hide() {
+            root.isVisible = false;
+        }
     }
-    function show() {
-      root.isVisible = true;
-    }
-    function hide() {
-      root.isVisible = false;
-    }
-  }
 
-  Variants {
-    model: Quickshell.screens
+    Variants {
+        model: Quickshell.screens
 
-    delegate: Component {
-      LazyLoader {
-        active: root.isVisible
-        required property ShellScreen modelData
+        delegate: Component {
+            LazyLoader {
+                active: root.isVisible
+                required property ShellScreen modelData
 
-        PanelWindow {
-          id: overviewWindow
-          screen: modelData
-          visible: root.isVisible
+                PanelWindow {
+                    id: overviewWindow
+                    screen: modelData
+                    visible: root.isVisible
 
-          anchors {
-            top: true
-            left: true
-            right: true
-            bottom: true
-          }
-          color: "transparent"
-          WlrLayershell.layer: WlrLayer.Overlay
-          WlrLayershell.namespace: "quickshell"
-          WlrLayershell.keyboardFocus: root.isVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-
-          exclusiveZone: -1
-
-          Rectangle {
-            id: mainRect
-            anchors.fill: parent
-            color: Colors.bgGlass
-
-            opacity: 0.0
-            Component.onCompleted: opacity = 1.0
-            Behavior on opacity { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.InOutQuad } }
-
-            MouseArea {
-              anchors.fill: parent
-              onClicked: root.isVisible = false
-            }
-
-            ColumnLayout {
-              anchors.fill: parent
-              anchors.margins: 40
-              spacing: Colors.spacingLG
-
-              Text {
-                text: "Workspace Overview"
-                color: Colors.text
-                font.pixelSize: Colors.fontSizeIcon
-                font.weight: Font.Bold
-                Layout.alignment: Qt.AlignHCenter
-              }
-
-              ListView {
-                id: workspaceList
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                model: Hyprland.workspaces
-                orientation: ListView.Horizontal
-                spacing: Colors.spacingLG
-                clip: true
-
-                delegate: Rectangle {
-                  id: workspaceRect
-                  property var workspaceData: modelData
-
-                  width: 360
-                  height: workspaceList.height
-                  color: Colors.withAlpha(Colors.surface, 0.4)
-                  radius: Colors.radiusLarge
-                  border.color: workspaceData.active ? Colors.primary : Colors.border
-                  border.width: workspaceData.active ? 2 : 1
-
-                  gradient: SharedWidgets.SurfaceGradient {}
-
-                  SharedWidgets.InnerHighlight { hoveredOpacity: 0.25; hovered: workspaceData.active }
-
-                  DropArea {
-                    anchors.fill: parent
-                    onDropped: (drop) => {
-                      if (drop.source && drop.source.windowAddress) {
-                        Quickshell.execDetached(["hyprctl", "dispatch", "movetoworkspace", workspaceData.id + ",address:" + drop.source.windowAddress]);
-                      }
+                    anchors {
+                        top: true
+                        left: true
+                        right: true
+                        bottom: true
                     }
-                  }
+                    color: "transparent"
+                    WlrLayershell.layer: WlrLayer.Overlay
+                    WlrLayershell.namespace: "quickshell"
+                    WlrLayershell.keyboardFocus: root.isVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
-                  ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: Colors.paddingMedium
-                    spacing: Colors.paddingSmall
+                    exclusiveZone: -1
 
-                    TextInput {
-                      id: wsTitle
-                      text: "Workspace " + workspaceData.name
-                      color: workspaceData.active ? Colors.primary : Colors.text
-                      font.pixelSize: Colors.fontSizeXL
-                      font.weight: Font.Bold
-                      Layout.alignment: Qt.AlignHCenter
-                      selectByMouse: true
-                      onVisibleChanged: if (!visible && activeFocus) focus = false
+                    Rectangle {
+                        id: mainRect
+                        anchors.fill: parent
+                        color: Colors.bgGlass
 
-                      onEditingFinished: {
-                        var newName = text.replace("Workspace ", "").trim();
-                        if (newName !== workspaceData.name && newName !== "") {
-                          Quickshell.execDetached(["hyprctl", "dispatch", "renameworkspace", workspaceData.id + " " + newName]);
+                        opacity: 0.0
+                        Component.onCompleted: opacity = 1.0
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: Colors.durationNormal
+                                easing.type: Easing.InOutQuad
+                            }
                         }
-                        focus = false;
-                      }
-                    }
 
-                    Flickable {
-                      Layout.fillWidth: true
-                      Layout.fillHeight: true
-                      clip: true
-                      boundsBehavior: Flickable.StopAtBounds
-                      flickableDirection: Flickable.VerticalFlick
-                      contentWidth: flow.implicitWidth
-                      contentHeight: flow.implicitHeight
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: root.isVisible = false
+                        }
 
-                      Flow {
-                        id: flow
-                        width: parent.width
-                        spacing: Colors.paddingSmall
+                        ColumnLayout {
+                            anchors.fill: parent
+                            anchors.margins: 40
+                            spacing: Colors.spacingLG
 
-                        Repeater {
-                          model: Hyprland.toplevels
+                            Text {
+                                text: "Workspace Overview"
+                                color: Colors.text
+                                font.pixelSize: Colors.fontSizeIcon
+                                font.weight: Font.Bold
+                                Layout.alignment: Qt.AlignHCenter
+                            }
 
-                          delegate: Rectangle {
-                            id: windowCard
-                            visible: modelData.workspace && modelData.workspace.id === workspaceRect.workspaceData.id
-                            width: visible ? 155 : 0
-                            height: visible ? 120 : 0
-                            color: hoverArea.containsMouse ? Colors.withAlpha(Colors.primary, 0.12) : Colors.highlightLight
-                            radius: Colors.radiusSmall
-                            border.color: hoverArea.containsMouse ? Colors.primary : Colors.border
-                            border.width: 1
-                            Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
-                            clip: true
-
-                            SharedWidgets.InnerHighlight { hoveredOpacity: 0.3; hovered: hoverArea.containsMouse }
-
-                            property string windowAddress: modelData.address
-
-                            Drag.active: dragArea.drag.active
-                            Drag.source: windowCard
-                            Drag.hotSpot.x: width / 2
-                            Drag.hotSpot.y: height / 2
-
-                            ColumnLayout {
-                              anchors.fill: parent
-                              anchors.margins: 5
-                              spacing: 5
-
-                              Rectangle {
+                            ListView {
+                                id: workspaceList
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                color: Colors.surface
-                                radius: Colors.radiusXS
+                                model: Hyprland.workspaces
+                                orientation: ListView.Horizontal
+                                spacing: Colors.spacingLG
                                 clip: true
 
-                                ScreencopyView {
-                                  anchors.fill: parent
-                                  captureSource: modelData.wayland
-                                  live: true
-                                }
+                                delegate: Rectangle {
+                                    id: workspaceRect
+                                    property var workspaceData: modelData
 
-                                // Close Button
-                                Rectangle {
-                                  width: 24; height: 24; radius: Colors.radiusCard
-                                  color: Colors.error
-                                  opacity: hoverArea.containsMouse ? 0.9 : 0.0
-                                  visible: opacity > 0
-                                  anchors.top: parent.top; anchors.right: parent.right
-                                  anchors.margins: Colors.spacingXS
-                                  Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
+                                    width: 360
+                                    height: workspaceList.height
+                                    color: Colors.withAlpha(Colors.surface, 0.4)
+                                    radius: Colors.radiusLarge
+                                    border.color: workspaceData.active ? Colors.primary : Colors.border
+                                    border.width: workspaceData.active ? 2 : 1
 
-                                  Text {
-                                    anchors.centerIn: parent
-                                    text: "󰅖"
-                                    color: Colors.text
-                                    font.family: Colors.fontMono
-                                    font.pixelSize: Colors.fontSizeMedium
-                                  }
+                                    gradient: SharedWidgets.SurfaceGradient {}
 
-                                  MouseArea {
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                      Quickshell.execDetached(["hyprctl", "dispatch", "closewindow", "address:" + modelData.address]);
+                                    SharedWidgets.InnerHighlight {
+                                        hoveredOpacity: 0.25
+                                        hovered: workspaceData.active
                                     }
-                                  }
+
+                                    DropArea {
+                                        anchors.fill: parent
+                                        onDropped: drop => {
+                                            if (drop.source && drop.source.windowAddress) {
+                                                Quickshell.execDetached(["hyprctl", "dispatch", "movetoworkspace", workspaceData.id + ",address:" + drop.source.windowAddress]);
+                                            }
+                                        }
+                                    }
+
+                                    ColumnLayout {
+                                        anchors.fill: parent
+                                        anchors.margins: Colors.paddingMedium
+                                        spacing: Colors.paddingSmall
+
+                                        TextInput {
+                                            id: wsTitle
+                                            text: "Workspace " + workspaceData.name
+                                            color: workspaceData.active ? Colors.primary : Colors.text
+                                            font.pixelSize: Colors.fontSizeXL
+                                            font.weight: Font.Bold
+                                            Layout.alignment: Qt.AlignHCenter
+                                            selectByMouse: true
+                                            onVisibleChanged: if (!visible && activeFocus)
+                                                focus = false
+
+                                            onEditingFinished: {
+                                                var newName = text.replace("Workspace ", "").trim();
+                                                if (newName !== workspaceData.name && newName !== "") {
+                                                    Quickshell.execDetached(["hyprctl", "dispatch", "renameworkspace", workspaceData.id + " " + newName]);
+                                                }
+                                                focus = false;
+                                            }
+                                        }
+
+                                        Flickable {
+                                            Layout.fillWidth: true
+                                            Layout.fillHeight: true
+                                            clip: true
+                                            boundsBehavior: Flickable.StopAtBounds
+                                            flickableDirection: Flickable.VerticalFlick
+                                            contentWidth: flow.implicitWidth
+                                            contentHeight: flow.implicitHeight
+
+                                            Flow {
+                                                id: flow
+                                                width: parent.width
+                                                spacing: Colors.paddingSmall
+
+                                                Repeater {
+                                                    model: Hyprland.toplevels
+
+                                                    delegate: Rectangle {
+                                                        id: windowCard
+                                                        visible: modelData.workspace && modelData.workspace.id === workspaceRect.workspaceData.id
+                                                        width: visible ? 155 : 0
+                                                        height: visible ? 120 : 0
+                                                        color: hoverArea.containsMouse ? Colors.withAlpha(Colors.primary, 0.12) : Colors.highlightLight
+                                                        radius: Colors.radiusSmall
+                                                        border.color: hoverArea.containsMouse ? Colors.primary : Colors.border
+                                                        border.width: 1
+                                                        Behavior on border.color {
+                                                            ColorAnimation {
+                                                                duration: Colors.durationFast
+                                                            }
+                                                        }
+                                                        clip: true
+
+                                                        SharedWidgets.InnerHighlight {
+                                                            hoveredOpacity: 0.3
+                                                            hovered: hoverArea.containsMouse
+                                                        }
+
+                                                        property string windowAddress: modelData.address
+
+                                                        Drag.active: dragArea.drag.active
+                                                        Drag.source: windowCard
+                                                        Drag.hotSpot.x: width / 2
+                                                        Drag.hotSpot.y: height / 2
+
+                                                        ColumnLayout {
+                                                            anchors.fill: parent
+                                                            anchors.margins: 5
+                                                            spacing: 5
+
+                                                            Rectangle {
+                                                                Layout.fillWidth: true
+                                                                Layout.fillHeight: true
+                                                                color: Colors.surface
+                                                                radius: Colors.radiusXS
+                                                                clip: true
+
+                                                                ScreencopyView {
+                                                                    anchors.fill: parent
+                                                                    captureSource: modelData.wayland
+                                                                    live: true
+                                                                }
+
+                                                                // Close Button
+                                                                Rectangle {
+                                                                    width: 24
+                                                                    height: 24
+                                                                    radius: Colors.radiusCard
+                                                                    color: Colors.error
+                                                                    opacity: hoverArea.containsMouse ? 0.9 : 0.0
+                                                                    visible: opacity > 0
+                                                                    anchors.top: parent.top
+                                                                    anchors.right: parent.right
+                                                                    anchors.margins: Colors.spacingXS
+                                                                    Behavior on opacity {
+                                                                        NumberAnimation {
+                                                                            duration: Colors.durationFast
+                                                                        }
+                                                                    }
+
+                                                                    Text {
+                                                                        anchors.centerIn: parent
+                                                                        text: "󰅖"
+                                                                        color: Colors.text
+                                                                        font.family: Colors.fontMono
+                                                                        font.pixelSize: Colors.fontSizeMedium
+                                                                    }
+
+                                                                    MouseArea {
+                                                                        anchors.fill: parent
+                                                                        hoverEnabled: true
+                                                                        cursorShape: Qt.PointingHandCursor
+                                                                        onClicked: {
+                                                                            Quickshell.execDetached(["hyprctl", "dispatch", "closewindow", "address:" + modelData.address]);
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+
+                                                            Text {
+                                                                text: modelData.title
+                                                                color: Colors.text
+                                                                font.pixelSize: Colors.fontSizeXS
+                                                                elide: Text.ElideRight
+                                                                Layout.fillWidth: true
+                                                                horizontalAlignment: Text.AlignHCenter
+                                                            }
+                                                        }
+
+                                                        MouseArea {
+                                                            id: hoverArea
+                                                            anchors.fill: parent
+                                                            hoverEnabled: true
+                                                            cursorShape: Qt.PointingHandCursor
+                                                            onClicked: {
+                                                                root.isVisible = false;
+                                                                Quickshell.execDetached(["hyprctl", "dispatch", "focuswindow", "address:" + modelData.address]);
+                                                            }
+                                                        }
+
+                                                        MouseArea {
+                                                            id: dragArea
+                                                            anchors.fill: parent
+                                                            drag.target: windowCard
+                                                            drag.axis: Drag.XAndYAxis
+                                                            onReleased: windowCard.Drag.drop()
+
+                                                            // Pass clicks through to hoverArea
+                                                            onClicked: hoverArea.clicked(mouse)
+                                                        }
+
+                                                        // Reset position after drag
+                                                        onXChanged: if (!dragArea.drag.active)
+                                                            x = 0
+                                                        onYChanged: if (!dragArea.drag.active)
+                                                            y = 0
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
-                              }
-
-                              Text {
-                                text: modelData.title
-                                color: Colors.text
-                                font.pixelSize: Colors.fontSizeXS
-                                elide: Text.ElideRight
-                                Layout.fillWidth: true
-                                horizontalAlignment: Text.AlignHCenter
-                              }
                             }
 
-                            MouseArea {
-                              id: hoverArea
-                              anchors.fill: parent
-                              hoverEnabled: true
-                              cursorShape: Qt.PointingHandCursor
-                              onClicked: {
-                                root.isVisible = false;
-                                Quickshell.execDetached(["hyprctl", "dispatch", "focuswindow", "address:" + modelData.address]);
-                              }
+                            Text {
+                                text: "Drag windows to move them between workspaces. Press Escape to close."
+                                color: Colors.textSecondary
+                                font.pixelSize: Colors.fontSizeMedium
+                                Layout.alignment: Qt.AlignHCenter
                             }
-
-                            MouseArea {
-                              id: dragArea
-                              anchors.fill: parent
-                              drag.target: windowCard
-                              drag.axis: Drag.XAndYAxis
-                              onReleased: windowCard.Drag.drop()
-
-                              // Pass clicks through to hoverArea
-                              onClicked: hoverArea.clicked(mouse)
-                            }
-
-                            // Reset position after drag
-                            onXChanged: if (!dragArea.drag.active) x = 0
-                            onYChanged: if (!dragArea.drag.active) y = 0
-                          }
                         }
-                      }
                     }
-                  }
+
+                    Keys.onEscapePressed: root.isVisible = false
+                    Component.onCompleted: forceActiveFocus()
+                    onVisibleChanged: if (visible)
+                        forceActiveFocus()
                 }
-              }
-
-              Text {
-                text: "Drag windows to move them between workspaces. Press Escape to close."
-                color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeMedium
-                Layout.alignment: Qt.AlignHCenter
-              }
             }
-          }
-
-          Keys.onEscapePressed: root.isVisible = false
-          Component.onCompleted: forceActiveFocus()
-          onVisibleChanged: if(visible) forceActiveFocus()
         }
-      }
     }
-  }
 }

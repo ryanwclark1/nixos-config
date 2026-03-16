@@ -13,6 +13,8 @@ Rectangle {
 
   property var anchorWindow: null
   property bool vertical: false
+  property bool iconOnly: false
+  property int maxTextWidth: 150
   visible: MediaService.currentPlayer !== null
 
   // Rewind detection: flash prev icon when position jumps backward > 3s
@@ -73,8 +75,8 @@ Rectangle {
 
     Item {
       id: marqueeContainer
-      visible: !root.vertical
-      width: visible ? Math.min(marqueeText.contentWidth, 150) : 0
+      visible: !root.vertical && !root.iconOnly
+      width: visible ? Math.min(marqueeText.contentWidth, root.maxTextWidth) : 0
       height: 20
       clip: true
       anchors.verticalCenter: parent.verticalCenter
@@ -88,7 +90,7 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
 
         SequentialAnimation on x {
-          running: marqueeText.contentWidth > 150
+          running: marqueeText.contentWidth > root.maxTextWidth
           loops: Animation.Infinite
           NumberAnimation { from: 0; to: -(marqueeText.contentWidth - marqueeContainer.width + 10); duration: 5000; easing.type: Easing.Linear }
           PauseAnimation { duration: 1000 }

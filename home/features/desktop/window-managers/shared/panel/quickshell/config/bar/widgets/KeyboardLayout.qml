@@ -6,6 +6,11 @@ SharedWidgets.BarPill {
   id: root
 
   property var widgetInstance: null
+  readonly property var widgetSettings: widgetInstance && widgetInstance.settings ? widgetInstance.settings : ({})
+  readonly property string labelMode: {
+    var mode = String(widgetSettings.labelMode || "short");
+    return ["short", "full"].indexOf(mode) !== -1 ? mode : "short";
+  }
 
   visible: CompositorAdapter.supportsKeyboardLayouts
            && CompositorAdapter.niriKeyboardLayoutNames.length > 1
@@ -21,7 +26,7 @@ SharedWidgets.BarPill {
 
   Text {
     anchors.centerIn: parent
-    text: root.layoutName.substring(0, 3).toUpperCase()
+    text: root.labelMode === "full" ? root.layoutName : root.layoutName.substring(0, 3).toUpperCase()
     color: Colors.text
     font.pixelSize: Colors.fontSizeSmall
     font.family: Colors.fontMono

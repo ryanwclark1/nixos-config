@@ -15,44 +15,65 @@ Rectangle {
     property bool ignoreMouseHover: false
     property var modeIcons: ({})
 
-    signal clicked()
-    signal entered()
+    signal clicked
+    signal entered
 
     width: parent ? parent.width : 0
     height: tightMode ? 48 : (compactMode ? 52 : 58)
-    
+
     readonly property bool highlighted: index === selectedIndex
     readonly property bool hovered: resultHover.containsMouse && !ignoreMouseHover
-    
+
     color: highlighted ? Colors.withAlpha(Colors.primary, 0.12) : (hovered ? Colors.withAlpha(Colors.primary, 0.05) : "transparent")
     radius: Colors.radiusSmall
     border.color: highlighted ? Colors.withAlpha(Colors.primary, 0.58) : (hovered ? Colors.withAlpha(Colors.primary, 0.18) : "transparent")
     border.width: highlighted || hovered ? 1 : 0
     scale: highlighted ? 1.012 : (hovered ? 1.004 : 1.0)
-    
-    Behavior on color { ColorAnimation { duration: Colors.durationFast } }
-    Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
-    Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
+
+    Behavior on color {
+        ColorAnimation {
+            duration: Colors.durationFast
+        }
+    }
+    Behavior on border.color {
+        ColorAnimation {
+            duration: Colors.durationFast
+        }
+    }
+    Behavior on scale {
+        NumberAnimation {
+            duration: Colors.durationFast
+            easing.type: Easing.OutCubic
+        }
+    }
 
     function highlightMatch(text, query) {
-        if (!query) return text;
+        if (!query)
+            return text;
         var escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         var regex = new RegExp("(" + escaped + ")", "gi");
         return text.replace(regex, "<b>$1</b>");
     }
 
     function itemActionLabel(it) {
-        if (!it) return "";
-        if (it.ipcTarget && it.ipcAction) return "System";
-        if (it.isCalc) return "Calculator";
-        if (it.fullPath) return "File";
-        if (it.url) return "Bookmark";
+        if (!it)
+            return "";
+        if (it.ipcTarget && it.ipcAction)
+            return "System";
+        if (it.isCalc)
+            return "Calculator";
+        if (it.fullPath)
+            return "File";
+        if (it.url)
+            return "Bookmark";
         return "";
     }
 
     function itemProviderLabel(it) {
-        if (!it) return "";
-        if (it.providerName) return it.providerName;
+        if (!it)
+            return "";
+        if (it.providerName)
+            return it.providerName;
         return it.category || "";
     }
 
@@ -66,8 +87,17 @@ Rectangle {
         radius: width / 2
         color: Colors.primary
         opacity: highlighted ? 0.95 : (hovered ? 0.4 : 0.0)
-        Behavior on height { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
-        Behavior on opacity { NumberAnimation { duration: Colors.durationSnap } }
+        Behavior on height {
+            NumberAnimation {
+                duration: Colors.durationFast
+                easing.type: Easing.OutCubic
+            }
+        }
+        Behavior on opacity {
+            NumberAnimation {
+                duration: Colors.durationSnap
+            }
+        }
     }
 
     RowLayout {
@@ -85,10 +115,23 @@ Rectangle {
             border.color: highlighted ? Colors.withAlpha(Colors.primary, 0.3) : "transparent"
             border.width: highlighted ? 1 : 0
             scale: highlighted ? 1.04 : 1.0
-            
-            Behavior on color { ColorAnimation { duration: Colors.durationFast } }
-            Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
-            Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
+
+            Behavior on color {
+                ColorAnimation {
+                    duration: Colors.durationFast
+                }
+            }
+            Behavior on border.color {
+                ColorAnimation {
+                    duration: Colors.durationFast
+                }
+            }
+            Behavior on scale {
+                NumberAnimation {
+                    duration: Colors.durationFast
+                    easing.type: Easing.OutCubic
+                }
+            }
 
             Image {
                 id: iconImage
@@ -134,7 +177,7 @@ Rectangle {
 
         RowLayout {
             spacing: Colors.spacingXS
-            
+
             // Provider Badge
             Rectangle {
                 property string provider: root.itemProviderLabel(modelData)
