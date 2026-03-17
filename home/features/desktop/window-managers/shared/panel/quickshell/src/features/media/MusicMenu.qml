@@ -18,28 +18,33 @@ BasePopupMenu {
   SharedWidgets.Ref { service: MediaService }
 
   // Immersive Background Glow
-  Rectangle {
-    anchors.fill: parent
+  Item {
+    Layout.fillWidth: true
+    Layout.fillHeight: true
     z: -1
-    radius: Colors.radiusLarge
-    color: "transparent"
-    clip: true
 
     Rectangle {
-      anchors.centerIn: parent
-      width: parent.width * 1.5
-      height: width
-      radius: width / 2
-      color: root.dominantColor
-      opacity: 0.12
-      scale: MediaService.isPlaying ? 1.0 : 0.8
-      Behavior on scale { NumberAnimation { duration: 2000; easing.type: Easing.InOutSine } }
+      anchors.fill: parent
+      radius: Colors.radiusLarge
+      color: "transparent"
+      clip: true
 
-      SequentialAnimation on opacity {
-        running: MediaService.isPlaying
-        loops: Animation.Infinite
-        NumberAnimation { from: 0.08; to: 0.18; duration: 3000; easing.type: Easing.InOutSine }
-        NumberAnimation { from: 0.18; to: 0.08; duration: 3000; easing.type: Easing.InOutSine }
+      Rectangle {
+        anchors.centerIn: parent
+        width: parent.width * 1.5
+        height: width
+        radius: width / 2
+        color: root.dominantColor
+        opacity: 0.12
+        scale: MediaService.isPlaying ? 1.0 : 0.8
+        Behavior on scale { NumberAnimation { duration: 2000; easing.type: Easing.InOutSine } }
+
+        SequentialAnimation on opacity {
+          running: MediaService.isPlaying
+          loops: Animation.Infinite
+          NumberAnimation { from: 0.08; to: 0.18; duration: 3000; easing.type: Easing.InOutSine }
+          NumberAnimation { from: 0.18; to: 0.08; duration: 3000; easing.type: Easing.InOutSine }
+        }
       }
     }
   }
