@@ -1,5 +1,5 @@
 import QtQuick
-import "../../../system/sections"
+import "../../system/sections"
 import "../../../services"
 import "../../../widgets"
 

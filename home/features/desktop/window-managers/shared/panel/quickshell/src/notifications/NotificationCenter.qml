@@ -5,7 +5,7 @@ import Quickshell.Services.Notifications
 import Quickshell.Services.Mpris
 import Quickshell.Wayland
 import Quickshell.Widgets
-import "../system/sections"
+import "../features/system/sections"
 import "../services"
 import "../widgets" as SharedWidgets
 

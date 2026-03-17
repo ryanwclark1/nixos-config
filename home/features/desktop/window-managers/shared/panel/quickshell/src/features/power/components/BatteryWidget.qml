@@ -1,6 +1,6 @@
 import QtQuick
 import Quickshell.Services.UPower
-import "../../../system/sections"
+import "../../system/sections"
 import "../../../services"
 
 Row {

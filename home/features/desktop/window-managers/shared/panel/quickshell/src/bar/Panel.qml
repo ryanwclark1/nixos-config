@@ -4,7 +4,7 @@ import Quickshell.Bluetooth
 import "."
 import "widgets"
 import "./widgets" as Widgets
-import "../system/sections"
+import "../features/system/sections"
 import "../services"
 import "../widgets" as SharedWidgets
 import "PanelWidgetHelpers.js" as PanelHelpers
