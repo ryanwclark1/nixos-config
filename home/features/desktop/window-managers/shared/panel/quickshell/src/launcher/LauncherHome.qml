@@ -14,8 +14,8 @@ ColumnLayout {
     readonly property bool showCategoryFilters: root.showCategoryFiltersSection && root.launcher.showLauncherHome && root.launcher.drunCategoryFiltersEnabled && root.launcher.mode === "drun" && root.launcher.drunCategoryOptions.length > 1
     readonly property bool categorySummaryExpanded: root.launcher.drunCategorySectionExpanded || root.launcher.drunCategoryFilter !== ""
     readonly property bool showCategoryChips: root.showCategoryFilters && root.categorySummaryExpanded
-    readonly property bool showRecentItems: root.launcher.showLauncherHome && root.launcher.recentItems.length > 0
-    readonly property bool showSuggestions: root.launcher.showLauncherHome && root.launcher.mode === "drun" && root.launcher.suggestionItems.length > 0
+    readonly property bool showRecentItems: root.showHomeSections && root.launcher.recentItems.length > 0
+    readonly property bool showSuggestions: root.showHomeSections && root.launcher.mode === "drun" && root.launcher.suggestionItems.length > 0
     readonly property bool useSplitColumns: width >= 720 && root.showRecentItems && root.showSuggestions
 
     function primaryText(item) {

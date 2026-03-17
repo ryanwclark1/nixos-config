@@ -59,11 +59,13 @@ quickshell_guard_commands() {
   if [[ "${quickshell_use_vm}" == "1" ]]; then
     cat <<EOF
 ${script_dir}/check-quickshell-startup.sh
+${script_dir}/check-clipboard-contracts.sh
 ${vm_script_dir}/run-panel-vm-qa.sh --vm ${quickshell_vm_default}
 EOF
   else
     cat <<EOF
 ${script_dir}/check-quickshell-startup.sh
+${script_dir}/check-clipboard-contracts.sh
 ${script_dir}/check-panel-runtime.sh --repo-shell
 EOF
   fi
@@ -74,6 +76,9 @@ quickshell_guard_label() {
   case "$guard_cmd" in
     *"check-quickshell-startup.sh")
       printf '%s' 'quickshell startup smoke'
+      ;;
+    *"check-clipboard-contracts.sh")
+      printf '%s' 'quickshell clipboard contract checks'
       ;;
     *"run-panel-vm-qa.sh"*)
       printf '%s' "quickshell VM-backed runtime/settings gate (${quickshell_vm_default})"
@@ -755,6 +760,7 @@ Quickshell Manual Flow
    - home-manager switch --flake /home/administrator/nixos-config#administrator@woody
 2. Run the focused Quickshell runtime checks:
    - scripts/check-quickshell-startup.sh
+   - scripts/check-clipboard-contracts.sh
    - ${vm_script_dir}/run-panel-vm-qa.sh --vm ${quickshell_vm_default}
 3. Capture review artifacts for high-risk UI changes:
    - ${vm_script_dir}/run-${quickshell_vm_default}-panel-qa.sh --mode panel --output-dir /tmp/panel-qa-${quickshell_vm_default}
@@ -787,7 +793,7 @@ EOF
       shell_health="$(health_label 0 "quickshell shell config")"
       health_failures=$((health_failures + 1))
     fi
-    if [[ -x "${script_dir}/check-quickshell-startup.sh" && -x "${script_dir}/check-settings-responsive.sh" && -x "${script_dir}/check-ssh-settings-smoke.sh" && -x "${script_dir}/check-surface-responsive.sh" && -x "${script_dir}/check-runtime-warning-regressions.sh" && -x "${script_dir}/check-panel-runtime.sh" && -x "${script_dir}/check-panel-capture-artifacts.sh" ]]; then
+    if [[ -x "${script_dir}/check-quickshell-startup.sh" && -x "${script_dir}/check-clipboard-contracts.sh" && -x "${script_dir}/check-settings-responsive.sh" && -x "${script_dir}/check-ssh-settings-smoke.sh" && -x "${script_dir}/check-surface-responsive.sh" && -x "${script_dir}/check-runtime-warning-regressions.sh" && -x "${script_dir}/check-panel-runtime.sh" && -x "${script_dir}/check-panel-capture-artifacts.sh" ]]; then
       guard_health="$(health_label 1 "quickshell runtime guard scripts")"
     else
       guard_health="$(health_label 0 "quickshell runtime guard scripts")"
@@ -850,6 +856,7 @@ EOF
     cat <<EOF
 shell_config=${shell_config}
 guard_startup=${script_dir}/check-quickshell-startup.sh
+guard_clipboard_contracts=${script_dir}/check-clipboard-contracts.sh
 guard_settings=${script_dir}/check-settings-responsive.sh
 guard_surfaces=${script_dir}/check-surface-responsive.sh
 guard_warning_regressions=${script_dir}/check-runtime-warning-regressions.sh

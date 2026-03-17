@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import "."
 import ".."
 import "../../../services"
 import "../../../features/settings/components"

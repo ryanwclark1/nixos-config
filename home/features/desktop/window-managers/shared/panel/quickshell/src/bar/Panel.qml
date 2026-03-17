@@ -1125,7 +1125,7 @@ Item {
                     label: "Clear History",
                     icon: "󰎟",
                     danger: true,
-                    action: () => Quickshell.execDetached(["sh", "-c", "cliphist wipe"])
+                    action: () => Quickshell.execDetached(["cliphist", "wipe"])
                 },
                 {
                     separator: true

@@ -10,7 +10,6 @@
 # Includes automatic saving, clipboard copying, and post-capture actions.
 # Enhanced with Hyprland-specific features (hyprpicker for freeze, window rectangles).
 #
-# Called by: os-cmd-screenshot.sh (wrapper for compatibility)
 # See SCREENRECORDING.md for detailed documentation and usage examples
 # -----------------------------------------------------
 

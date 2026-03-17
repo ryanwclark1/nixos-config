@@ -37,6 +37,9 @@ QtObject {
     readonly property color primaryFaint: withAlpha(primary, 0.08)   // Light hover state
     readonly property color primarySubtle: withAlpha(primary, 0.12)  // Hover/selected card bg
     readonly property color primaryMid: withAlpha(primary, 0.18)     // Active chip/button bg
+    readonly property color primaryAccent: withAlpha(primary, 0.14)  // Selected item bg
+    readonly property color primaryStrong: withAlpha(primary, 0.16)  // Active/default item bg
+    readonly property color primaryMarked: withAlpha(primary, 0.22)  // Drag target / strong selection
     readonly property color primaryRing: withAlpha(primary, 0.3)     // Focus ring / emphasis border
 
     // --- GLASSMORPHISM ---

@@ -8,5 +8,5 @@ os-state clear re*-required || true
 nohup bash -c "sleep 2 && systemctl reboot --no-wall" >/dev/null 2>&1 &
 
 # Now close all windows
-os-hyprland-window-close-all || true
+close-all-windows || true
 sleep 1 # Allow apps like Chrome to shutdown correctly

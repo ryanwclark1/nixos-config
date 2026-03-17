@@ -247,12 +247,6 @@
     (writeShellScriptBin "os-cmd-missing" (builtins.readFile ./scripts/system/os-cmd-missing.sh))
     (writeShellScriptBin "os-cmd-reboot" (builtins.readFile ./scripts/system/os-cmd-reboot.sh))
     (writeShellScriptBin "os-cmd-shutdown" (builtins.readFile ./scripts/system/os-cmd-shutdown.sh))
-    (writeShellScriptBin "os-cmd-screenshot" (
-      ''
-        PATH="${pkgs.coreutils}/bin:${pkgs.libnotify}/bin:$PATH"
-      ''
-      + builtins.readFile ./scripts/system/os-cmd-screenshot.sh
-    ))
     (writeShellScriptBin "os-cmd-screenrecord" (
       ''
         PATH="${pkgs.procps}/bin:${pkgs.coreutils}/bin:${pkgs.hyprland}/bin:${pkgs.jq}/bin:${pkgs.libnotify}/bin:${pkgs.gawk}/bin:$PATH"

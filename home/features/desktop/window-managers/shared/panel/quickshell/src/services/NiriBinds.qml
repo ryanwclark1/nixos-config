@@ -34,7 +34,7 @@ QtObject {
             onStreamFinished: {
                 const output = (stdoutCollector.text || "").trim()
                 if (bindParser.exitCode !== 0 || output.length === 0) {
-                    console.warn("[NiriBinds] Parser failed, using defaults")
+                    console.debug("[NiriBinds] Parser unavailable, using defaults")
                     root.errorMessage = "Parser script failed"
                     return
                 }

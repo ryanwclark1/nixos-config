@@ -107,8 +107,8 @@ show_capture_menu() {
 
 show_screenshot_menu() {
   case $(menu "Screenshot" "  Snap with Editing\n  Straight to Clipboard") in
-  *Editing*) os-cmd-screenshot smart ;;
-  *Clipboard*) os-cmd-screenshot smart clipboard ;;
+  *Editing*) screenshot.sh smart --freeze --satty ;;
+  *Clipboard*) screenshot.sh smart --freeze --clipboard-only ;;
   *) show_capture_menu ;;
   esac
 }

@@ -13,6 +13,10 @@ import "LauncherSearch.js" as Search
 PanelWindow {
     id: launcherRoot
 
+    Component.onCompleted: {
+        initialAppsPreloadTimer.restart();
+    }
+
     property var screenRef: screen || Quickshell.cursorScreen || Config.primaryScreen()
     screen: screenRef
     readonly property var edgeMargins: Config.reservedEdgesForScreen(screenRef, "")
@@ -165,10 +169,11 @@ PanelWindow {
     property real globalLastMouseY: 0
 
     readonly property bool showLauncherHome: Config.launcherShowHomeSections && searchText === "" && (mode === "drun" || mode === "system" || mode === "files")
+    readonly property bool showLauncherHomeCards: Config.launcherShowHomeSections && searchText === "" && mode === "drun"
     readonly property bool drunCategoryFiltersEnabled: Config.launcherDrunCategoryFiltersEnabled
     readonly property bool isModeLoading: modeLoadState === "loading"
     readonly property string selectedHomeItemKey: {
-        if (!showLauncherHome || selectedIndex < 0 || selectedIndex >= filteredItems.length)
+        if (!showLauncherHomeCards || selectedIndex < 0 || selectedIndex >= filteredItems.length)
             return "";
         return homeItemKey(filteredItems[selectedIndex]);
     }
@@ -624,6 +629,13 @@ PanelWindow {
         id: preloadDelayTimer
         interval: 100
         onTriggered: launcherRoot.startPreload()
+    }
+
+    Timer {
+        id: initialAppsPreloadTimer
+        interval: 150
+        repeat: false
+        onTriggered: launcherRoot.prewarmAppsCache()
     }
 
     Timer {
@@ -1242,6 +1254,12 @@ PanelWindow {
         return key.charAt(0).toUpperCase() + key.slice(1);
     }
 
+    function drunBrowseSectionLabel() {
+        if (String(drunCategoryFilter || "") !== "")
+            return formatDrunCategoryLabel(drunCategoryFilter);
+        return "All Apps";
+    }
+
     function resultSectionLabel(item) {
         if (!item)
             return "";
@@ -1810,6 +1828,25 @@ PanelWindow {
 
     function loadApps() {
         loadCached("drun", ["bash", launcherAppsHelperPath], JSON.parse);
+    }
+
+    function prewarmAppsCache() {
+        if (!supportsMode("drun"))
+            return;
+        if (getCached("drun"))
+            return;
+        if (_preloadProcs["drun"])
+            return;
+        if (shouldBackoffPreload("drun"))
+            return;
+
+        ensureModeDependencies("drun", function (ok, _missingCmd) {
+            if (!ok)
+                return;
+            if (getCached("drun") || _preloadProcs["drun"])
+                return;
+            _spawnPreload("drun");
+        });
     }
     function loadRun() {
         loadCached("run", ["qs-run"], JSON.parse);
@@ -2743,7 +2780,7 @@ PanelWindow {
         var cleanLower = clean.toLowerCase();
 
         if (clean === "" && mode !== "files" && mode !== "ai") {
-            if (showLauncherHome && mode === "drun") {
+            if (showLauncherHomeCards && mode === "drun") {
                 var homeItems = [];
                 var homeSeen = ({});
 
@@ -2785,6 +2822,8 @@ PanelWindow {
                     var item = allItems[j];
                     if (mode === "drun" && drunCategoryFilter !== "" && !itemMatchesDrunCategory(item, drunCategoryFilter))
                         continue;
+                    if (mode === "drun")
+                        item.sectionLabel = drunBrowseSectionLabel();
                     baseItems.push(item);
                 }
                 filteredItems = decorateResultSections(baseItems);
@@ -2881,7 +2920,14 @@ PanelWindow {
     }
 
     function copyToClipboard(text) {
-        Quickshell.execDetached(["bash", "-lc", "printf %s " + ModeData.shellQuote(text) + " | wl-copy"]);
+        Quickshell.execDetached(["sh", "-c", "printf %s " + ModeData.shellQuote(text) + " | if command -v wl-copy >/dev/null 2>&1; then wl-copy; elif command -v xclip >/dev/null 2>&1; then xclip -selection clipboard; fi"]);
+    }
+
+    function restoreClipboardHistoryItem(id) {
+        var safeId = parseInt(id, 10);
+        if (isNaN(safeId))
+            return;
+        Quickshell.execDetached(["sh", "-c", "cliphist decode " + safeId + " | if command -v wl-copy >/dev/null 2>&1; then wl-copy; elif command -v xclip >/dev/null 2>&1; then xclip -selection clipboard; fi"]);
     }
 
     function launchInTerminal(cmd) {
@@ -3238,7 +3284,7 @@ PanelWindow {
             close();
         } else if (mode === "clip") {
             if (item.id) {
-                Quickshell.execDetached(["bash", "-lc", "cliphist decode " + ModeData.shellQuote(item.id) + " | wl-copy"]);
+                restoreClipboardHistoryItem(item.id);
                 close();
             }
         } else if (mode === "web" || mode === "bookmarks") {
@@ -3293,6 +3339,25 @@ PanelWindow {
             var executed = PluginService.executeLauncherItem(item, searchText);
             if (executed)
                 close();
+        }
+    }
+
+    function handleSearchAccepted(modifiers) {
+        var activeModifiers = modifiers || Qt.NoModifier;
+        if ((activeModifiers & Qt.ControlModifier) && mode === "web" && filteredItems.length > 0) {
+            openSelectedWebHomepage();
+        } else if (mode === "web" && filteredItems.length > 0 && !(activeModifiers & Qt.ShiftModifier) && Config.launcherWebEnterUsesPrimary) {
+            executePrimaryWebSearch();
+        } else if ((activeModifiers & Qt.ShiftModifier) && filteredItems.length === 0 && emptySecondaryCta !== "") {
+            executeEmptySecondary();
+        } else if (mode === "ai" && filteredItems.length === 0) {
+            loadAi();
+        } else if (mode === "files" && stripModePrefix(searchText).trim().length >= Config.launcherFileMinQueryLength && filteredItems.length === 0) {
+            loadFiles();
+        } else if (filteredItems.length === 0) {
+            executeEmptyPrimary();
+        } else {
+            executeSelection();
         }
     }
 
@@ -3582,6 +3647,7 @@ PanelWindow {
                     text: launcherRoot.searchText
                     accentColor: Colors.primary
                     placeholder: launcherRoot.modeInfo(launcherRoot.mode).hint || "Search..."
+                    onAccepted: modifiers => launcherRoot.handleSearchAccepted(modifiers)
 
                     onTextChanged: {
                         if (text.startsWith("=") && launcherRoot.mode !== "calc")
@@ -3676,20 +3742,7 @@ PanelWindow {
                                 launcherRoot.cycleMode(1);
                             event.accepted = true;
                         } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                            if ((event.modifiers & Qt.ControlModifier) && launcherRoot.mode === "web" && launcherRoot.filteredItems.length > 0)
-                                launcherRoot.openSelectedWebHomepage();
-                            else if (launcherRoot.mode === "web" && launcherRoot.filteredItems.length > 0 && !(event.modifiers & Qt.ShiftModifier) && Config.launcherWebEnterUsesPrimary)
-                                launcherRoot.executePrimaryWebSearch();
-                            else if ((event.modifiers & Qt.ShiftModifier) && launcherRoot.filteredItems.length === 0 && launcherRoot.emptySecondaryCta !== "")
-                                launcherRoot.executeEmptySecondary();
-                            else if (launcherRoot.mode === "ai" && launcherRoot.filteredItems.length === 0)
-                                launcherRoot.loadAi();
-                            else if (launcherRoot.mode === "files" && launcherRoot.stripModePrefix(launcherRoot.searchText).trim().length >= Config.launcherFileMinQueryLength && launcherRoot.filteredItems.length === 0)
-                                launcherRoot.loadFiles();
-                            else if (launcherRoot.filteredItems.length === 0)
-                                launcherRoot.executeEmptyPrimary();
-                            else
-                                launcherRoot.executeSelection();
+                            launcherRoot.handleSearchAccepted(event.modifiers);
                         } else if ((event.modifiers & Qt.ControlModifier) && !(event.modifiers & Qt.AltModifier) && event.key === Qt.Key_P) {
                             if (launcherRoot.moveSelectionRelative(-1))
                                 event.accepted = true;
@@ -3840,6 +3893,7 @@ PanelWindow {
                     Layout.fillWidth: true
                     launcher: launcherRoot
                     visible: launcherRoot.showLauncherHome && launcherRoot.mode !== "orchestrator" && !launcherRoot.isModeLoading
+                    showHomeSections: launcherRoot.showLauncherHomeCards
                 }
 
                 OrchestratorView {

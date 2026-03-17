@@ -65,8 +65,8 @@ QtObject {
                 danger: false,
                 requiresConfirmation: false,
                 ipcTarget: "Shell",
-                ipcAction: "toggleAudioMenu",
-                clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleAudioMenu"]
+                ipcAction: "toggleSurface",
+                clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleSurface", "audioMenu"]
             },
             networkControls: {
                 id: "networkControls",
@@ -79,8 +79,8 @@ QtObject {
                 danger: false,
                 requiresConfirmation: false,
                 ipcTarget: "Shell",
-                ipcAction: "toggleNetworkMenu",
-                clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleNetworkMenu"]
+                ipcAction: "toggleSurface",
+                clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleSurface", "networkMenu"]
             },
             vpnControls: {
                 id: "vpnControls",
@@ -93,8 +93,8 @@ QtObject {
                 danger: false,
                 requiresConfirmation: false,
                 ipcTarget: "Shell",
-                ipcAction: "toggleVpnMenu",
-                clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleVpnMenu"]
+                ipcAction: "toggleSurface",
+                clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleSurface", "vpnMenu"]
             },
             commandCenter: {
                 id: "commandCenter",
@@ -107,8 +107,8 @@ QtObject {
                 danger: false,
                 requiresConfirmation: false,
                 ipcTarget: "Shell",
-                ipcAction: "toggleControls",
-                clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleControls"]
+                ipcAction: "toggleSurface",
+                clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleSurface", "controlCenter"]
             }
         })
 

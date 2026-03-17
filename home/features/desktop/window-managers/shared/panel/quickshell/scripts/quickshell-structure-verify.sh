@@ -14,10 +14,11 @@ Usage: quickshell-structure-verify.sh [--quiet]
 Run the automated post-migration verification stack:
   1. structural import-boundary checks
   2. qmldir target validation
-  3. repo-shell startup smoke
-  4. repo-shell launcher smoke
-  5. repo-shell panel runtime aggregate
-  6. live surface responsive smoke when a compositor session is available
+  3. clipboard contract checks
+  4. repo-shell startup smoke
+  5. repo-shell launcher smoke
+  6. repo-shell panel runtime aggregate
+  7. live surface responsive smoke when a compositor session is available
 EOF
 }
 
@@ -105,6 +106,7 @@ has_live_session() {
 
 run_step "Checking import boundaries" bash "${repo_root}/tools/checks/check-import-boundaries.sh"
 run_step "Validating qmldir targets" run_qmldir_validation
+run_step "Running clipboard contract checks" bash "${script_dir}/check-clipboard-contracts.sh"
 run_step_timeout "Running startup smoke" "${startup_timeout_seconds}" bash "${script_dir}/check-quickshell-startup.sh"
 run_step "Running launcher smoke" bash "${script_dir}/check-launcher-smoke.sh" --repo-shell
 run_step "Running panel runtime aggregate" bash "${script_dir}/check-panel-runtime.sh" --repo-shell

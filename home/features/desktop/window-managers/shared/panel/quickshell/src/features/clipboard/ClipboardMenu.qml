@@ -17,9 +17,44 @@ BasePopupMenu {
 
   property var clipboardItems: []
   property string searchQuery: ""
+  property int selectedIndex: 0
 
   function refresh() {
     clipPoll.triggerPoll();
+  }
+
+  function clampSelection() {
+    if (filteredItemsResult.length <= 0) {
+      selectedIndex = 0;
+      return;
+    }
+    selectedIndex = Math.max(0, Math.min(selectedIndex, filteredItemsResult.length - 1));
+  }
+
+  function moveSelection(step) {
+    if (filteredItemsResult.length <= 0)
+      return false;
+    selectedIndex = Math.max(0, Math.min(filteredItemsResult.length - 1, selectedIndex + step));
+    return true;
+  }
+
+  function activateClipboardItem(item) {
+    if (!item)
+      return;
+    var safeId = parseInt(item.id, 10);
+    if (!isNaN(safeId))
+      Quickshell.execDetached(["sh", "-c", "cliphist decode " + safeId + " | if command -v wl-copy >/dev/null 2>&1; then wl-copy; elif command -v xclip >/dev/null 2>&1; then xclip -selection clipboard; fi"]);
+    Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleClipboardMenu"]);
+  }
+
+  function deleteClipboardItem(item) {
+    if (!item)
+      return;
+    var safeId = parseInt(item.id, 10);
+    if (isNaN(safeId))
+      return;
+    Quickshell.execDetached(["sh", "-c", "cliphist list | awk -F '\\t' '$1 == " + safeId + " { print; exit }' | cliphist delete"]);
+    root.refresh();
   }
 
   // Fuzzy search: ranks by exact substring match first, then by
@@ -69,6 +104,9 @@ BasePopupMenu {
     return qi === query.length ? score : 0;
   }
 
+  onClipboardItemsChanged: clampSelection()
+  onSearchQueryChanged: selectedIndex = 0
+
   CommandPoll {
     id: clipPoll
     interval: 5000
@@ -87,7 +125,7 @@ BasePopupMenu {
     SharedWidgets.IconButton {
       icon: "󰃢"
       onClicked: {
-        Quickshell.execDetached(["sh", "-c", "cliphist wipe"]);
+        Quickshell.execDetached(["cliphist", "wipe"]);
         root.clipboardItems = [];
       }
     }
@@ -123,6 +161,22 @@ BasePopupMenu {
         clip: true
         Keys.onEscapePressed: root.closeRequested()
         onTextChanged: root.searchQuery = text
+        Keys.onDownPressed: event => {
+          if (root.moveSelection(1))
+            event.accepted = true;
+        }
+        Keys.onUpPressed: event => {
+          if (root.moveSelection(-1))
+            event.accepted = true;
+        }
+        Keys.onPressed: event => {
+          if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+            if (root.filteredItemsResult.length > 0) {
+              root.activateClipboardItem(root.filteredItemsResult[root.selectedIndex]);
+              event.accepted = true;
+            }
+          }
+        }
 
         Text {
           anchors.fill: parent
@@ -152,11 +206,12 @@ BasePopupMenu {
         model: ScriptModel { values: root.filteredItemsResult }
         delegate: Rectangle {
           id: clipCard
+          required property int index
           Layout.fillWidth: true
           implicitHeight: clipContent.implicitHeight + 20
           radius: Colors.radiusSmall
-          color: clipMouse.containsMouse ? Colors.primarySubtle : Colors.cardSurface
-          border.color: clipMouse.containsMouse ? Colors.primary : Colors.border
+          color: (clipMouse.containsMouse || root.selectedIndex === index) ? Colors.primarySubtle : Colors.cardSurface
+          border.color: (clipMouse.containsMouse || root.selectedIndex === index) ? Colors.primary : Colors.border
           border.width: 1
           Behavior on color { ColorAnimation { duration: Colors.durationFast } }
 
@@ -208,8 +263,7 @@ BasePopupMenu {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: (mouse) => {
                   deleteStateLayer.burst(mouse.x, mouse.y);
-                  Quickshell.execDetached(["sh", "-c", "cliphist list | grep -F -- \"$1\" | head -1 | cliphist delete", "--", modelData.content || ""]);
-                  root.refresh();
+                  root.deleteClipboardItem(modelData);
                 }
               }
             }
@@ -221,11 +275,11 @@ BasePopupMenu {
             anchors.rightMargin: 36
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
+            onEntered: root.selectedIndex = index
             onClicked: (mouse) => {
               clipStateLayer.burst(mouse.x, mouse.y);
-              var safeId = parseInt(modelData.id, 10);
-              if (!isNaN(safeId)) Quickshell.execDetached(["sh", "-c", "cliphist decode " + safeId + " | wl-copy"]);
-              Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleClipboardMenu"]);
+              root.selectedIndex = index;
+              root.activateClipboardItem(modelData);
             }
           }
         }

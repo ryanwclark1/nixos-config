@@ -10,7 +10,7 @@ Rectangle {
     property string placeholder: "Search..."
     property color accentColor: Colors.primary
 
-    signal accepted
+    signal accepted(var modifiers)
     signal escapePressed
 
     height: 48
@@ -105,7 +105,12 @@ Rectangle {
                 visible: !input.text && !input.activeFocus
             }
 
-            Keys.onReturnPressed: root.accepted()
+            Keys.onPressed: event => {
+                if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                    root.accepted(event.modifiers);
+                    event.accepted = true;
+                }
+            }
         }
 
         // Clear button

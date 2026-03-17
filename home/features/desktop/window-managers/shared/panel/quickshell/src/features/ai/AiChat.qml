@@ -259,6 +259,7 @@ PanelWindow {
 
                 // Copy All
                 Rectangle {
+                    id: copyAllButton
                     width: 28
                     height: 28
                     radius: Colors.radiusXS
@@ -295,12 +296,13 @@ PanelWindow {
                     SharedWidgets.BarTooltip {
                         text: "Copy full conversation"
                         hovered: copyAllHover.containsMouse
-                        anchorItem: parent
+                        anchorItem: copyAllButton
                     }
                 }
 
                 // Clear conversation
                 Rectangle {
+                    id: clearChatButton
                     width: 28
                     height: 28
                     radius: Colors.radiusXS
@@ -331,12 +333,13 @@ PanelWindow {
                     SharedWidgets.BarTooltip {
                         text: "Clear current chat"
                         hovered: clearChatHover.containsMouse
-                        anchorItem: parent
+                        anchorItem: clearChatButton
                     }
                 }
 
                 // New conversation
                 Rectangle {
+                    id: newChatButton
                     width: 28
                     height: 28
                     radius: Colors.radiusXS
@@ -369,7 +372,7 @@ PanelWindow {
                     SharedWidgets.BarTooltip {
                         text: "New Conversation (Ctrl+N)"
                         hovered: newChatHover.containsMouse
-                        anchorItem: parent
+                        anchorItem: newChatButton
                     }
                 }
 

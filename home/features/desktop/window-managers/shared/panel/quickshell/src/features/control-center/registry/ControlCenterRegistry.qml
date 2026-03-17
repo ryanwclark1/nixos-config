@@ -17,7 +17,7 @@ QtObject {
             icon: "󰩭",
             title: "Screenshot",
             subtitle: "Capture region, screen, or fullscreen",
-            clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleScreenshotMenu"]
+            clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleSurface", "screenshotMenu"]
         }
     ])
 

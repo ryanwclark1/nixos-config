@@ -17,8 +17,11 @@ QtObject {
   property bool isHealthChecking: false
   property date lastHealthCheckTime: new Date(0)
 
-  readonly property string healthCheckScript: "./scripts/health-check.sh"
-  readonly property string pluginDoctorScript: "./scripts/plugin-doctor.sh"
+  readonly property string repoRoot: (Quickshell.env("HOME") || "/home/administrator") + "/nixos-config"
+  readonly property string quickshellRepoRoot: repoRoot + "/home/features/desktop/window-managers/shared/panel/quickshell"
+  readonly property string scriptRoot: quickshellRepoRoot + "/scripts"
+  readonly property string healthCheckScript: scriptRoot + "/health-check.sh"
+  readonly property string pluginDoctorScript: scriptRoot + "/plugin-doctor.sh"
   readonly property string incidentRoot: Quickshell.env("HOME") + "/.local/state/quickshell/incidents"
 
   // ── Named constants ──────────────────────────
@@ -64,7 +67,8 @@ QtObject {
   }
 
   function applySafeFixes() {
-    var fixProc = Qt.createQmlObject('import Quickshell.Io; Process { command: ["./scripts/health-check.sh", "--apply-safe-fixes"] }', root);
+    var fixProc = Qt.createQmlObject('import Quickshell.Io; Process {}', root);
+    fixProc.command = [root.healthCheckScript, "--apply-safe-fixes"];
     fixProc.onExited.connect(function() {
       root.refreshHealth();
       fixProc.destroy();

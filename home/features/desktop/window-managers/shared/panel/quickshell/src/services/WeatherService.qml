@@ -25,6 +25,8 @@ QtObject {
   property string sunrise: "--"
   property string sunset: "--"
   property var hourlyForecast: []
+  property bool _hasSuccessfulFetch: false
+  property string _lastFailureKey: ""
 
   readonly property string _unitMode: Config.weatherUnits === "imperial" ? "imperial" : "metric"
   readonly property string _tempSuffix: _unitMode === "imperial" ? "°F" : "°C"
@@ -96,6 +98,39 @@ QtObject {
     return _tempValue(item, baseKey) + _tempSuffix;
   }
 
+  function _setUnavailableState() {
+    root.temp = "--";
+    root.feelsLike = "--";
+    root.humidity = "--";
+    root.windSpeed = "--";
+    root.windDir = "";
+    root.visibility = "--";
+    root.condition = "Weather unavailable";
+    root.location = "Local";
+    root.forecast = [];
+    root.hourlyForecast = [];
+    root.uvIndex = "--";
+    root.pressure = "--";
+    root.precipitation = "--";
+    root.sunrise = "--";
+    root.sunset = "--";
+  }
+
+  function _reportFailure(key, details) {
+    var failureKey = String(key || "unknown");
+    if (root._lastFailureKey !== failureKey) {
+      root._lastFailureKey = failureKey;
+      if (details)
+        console.warn("WeatherService:", failureKey, details);
+      else
+        console.warn("WeatherService:", failureKey);
+    }
+
+    // Preserve the last known-good snapshot for transient upstream/API failures.
+    if (!root._hasSuccessfulFetch)
+      root._setUnavailableState();
+  }
+
   function refresh() {
     var url = _buildUrl();
     if (!url) {
@@ -144,7 +179,6 @@ QtObject {
 
           var cur = (data.current_condition && data.current_condition.length > 0) ? data.current_condition[0] : null;
           if (!cur) {
-            console.warn("WeatherService: response missing current_condition:", raw.substring(0, 200));
             throw new Error("missing current condition");
           }
 
@@ -223,17 +257,10 @@ QtObject {
             }
           }
           root.hourlyForecast = hourly;
+          root._hasSuccessfulFetch = true;
+          root._lastFailureKey = "";
         } catch (e) {
-          console.warn("WeatherService: parse error:", e);
-          root.condition = "Error loading weather";
-          root.location = "Local";
-          root.forecast = [];
-          root.hourlyForecast = [];
-          root.uvIndex = "--";
-          root.pressure = "--";
-          root.precipitation = "--";
-          root.sunrise = "--";
-          root.sunset = "--";
+          root._reportFailure(String(e || "parse error"));
         }
       }
     }
