@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import "."
 import "../services"
 
 // Animated expand/collapse section with header.

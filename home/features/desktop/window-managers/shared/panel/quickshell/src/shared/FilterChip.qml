@@ -1,4 +1,5 @@
 import QtQuick
+import "."
 import "../services"
 
 // Interactive chip with selection state, hover, and ripple feedback.

@@ -1,10 +1,16 @@
 ActionCard 1.0 ActionCard.qml
+CardBase 1.0 CardBase.qml
+Chip 1.0 Chip.qml
 ClickRipple 1.0 ClickRipple.qml
+CollapsibleSection 1.0 CollapsibleSection.qml
 ContextMenu 1.0 ContextMenu.qml
 EmptyState 1.0 EmptyState.qml
+FilterChip 1.0 FilterChip.qml
 IconButton 1.0 IconButton.qml
 InnerHighlight 1.0 InnerHighlight.qml
+LoadingSpinner 1.0 LoadingSpinner.qml
 MenuCloseButton 1.0 MenuCloseButton.qml
+MiniProgressBar 1.0 MiniProgressBar.qml
 Ref 1.0 Ref.qml
 SearchBar 1.0 SearchBar.qml
 SectionLabel 1.0 SectionLabel.qml
