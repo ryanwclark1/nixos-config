@@ -1,7 +1,8 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import "../services"
+import "../../../services"
+import "../../../widgets"
 
 Item {
   id: root

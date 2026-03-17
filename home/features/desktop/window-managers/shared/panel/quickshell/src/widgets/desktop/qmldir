@@ -1,2 +1,2 @@
-DesktopEditBar 1.0 DesktopEditBar.qml
-DesktopWidgetPicker 1.0 DesktopWidgetPicker.qml
+DesktopEditBar 1.0 ../../features/desktop/components/DesktopEditBar.qml
+DesktopWidgetPicker 1.0 ../../features/desktop/components/DesktopWidgetPicker.qml

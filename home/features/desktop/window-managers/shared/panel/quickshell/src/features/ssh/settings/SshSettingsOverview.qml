@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
-import "../../services"
-import "../../menu/settings"
+import "../../../services"
+import "../../../menu/settings"
 
 Rectangle {
     id: root

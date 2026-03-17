@@ -1,4 +1,4 @@
-SshSettingsOverview 1.0 SshSettingsOverview.qml
-SshImportDiagnostics 1.0 SshImportDiagnostics.qml
-SshHostList 1.0 SshHostList.qml
-SshHostEditor 1.0 SshHostEditor.qml
+SshSettingsOverview 1.0 ../../features/ssh/settings/SshSettingsOverview.qml
+SshImportDiagnostics 1.0 ../../features/ssh/settings/SshImportDiagnostics.qml
+SshHostList 1.0 ../../features/ssh/settings/SshHostList.qml
+SshHostEditor 1.0 ../../features/ssh/settings/SshHostEditor.qml

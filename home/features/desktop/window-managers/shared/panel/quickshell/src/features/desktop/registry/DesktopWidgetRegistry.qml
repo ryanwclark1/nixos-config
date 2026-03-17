@@ -15,7 +15,7 @@ QtObject {
             name: "Clock",
             icon: "󰥔",
             source: "builtin",
-            componentSource: Qt.resolvedUrl("../widgets/DesktopClock.qml"),
+            componentSource: Qt.resolvedUrl("../components/DesktopClock.qml"),
             settingsSource: ""
         },
         {
@@ -23,7 +23,7 @@ QtObject {
             name: "System Stats",
             icon: "",
             source: "builtin",
-            componentSource: Qt.resolvedUrl("../widgets/DesktopSystemStat.qml"),
+            componentSource: Qt.resolvedUrl("../components/DesktopSystemStat.qml"),
             settingsSource: ""
         },
         {
@@ -31,7 +31,7 @@ QtObject {
             name: "Weather",
             icon: "󰖐",
             source: "builtin",
-            componentSource: Qt.resolvedUrl("../widgets/DesktopWeather.qml"),
+            componentSource: Qt.resolvedUrl("../components/DesktopWeather.qml"),
             settingsSource: ""
         }
     ]

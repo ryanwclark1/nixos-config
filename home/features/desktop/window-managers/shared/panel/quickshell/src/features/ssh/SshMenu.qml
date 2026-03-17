@@ -4,6 +4,7 @@ import Quickshell
 import "../../menu"
 import "../../services"
 import "../../widgets" as SharedWidgets
+import "."
 import "../settings/components"
 
 BasePopupMenu {
@@ -147,7 +148,7 @@ BasePopupMenu {
     root.closeRequested();
   }
 
-  SharedWidgets.SshWidgetData {
+  SshWidgetData {
     id: sshData
     widgetInstance: root.menuWidgetInstance
   }

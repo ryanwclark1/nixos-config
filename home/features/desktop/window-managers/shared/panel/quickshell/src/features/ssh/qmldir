@@ -1,1 +1,4 @@
 SshMenu 1.0 SshMenu.qml
+SshWidget 1.0 components/SshWidget.qml
+SshWidgetData 1.0 components/SshWidgetData.qml
+SshWidgetSettings 1.0 settings/SshWidgetSettings.qml

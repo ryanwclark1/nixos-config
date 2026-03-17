@@ -1,8 +1,8 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import "../services"
-import "../services/ShellUtils.js" as ShellUtils
+import "../../../services"
+import "../../../services/ShellUtils.js" as ShellUtils
 import "SshConfigParser.js" as SshConfigParser
 
 QtObject {

@@ -1,9 +1,8 @@
 import QtQuick
 import QtQuick.Layouts
-import "../services"
-import "../menu/settings"
-import "." as SharedWidgets
-import "ssh-settings"
+import ".."
+import "../../../services"
+import "../../../menu/settings"
 
 ColumnLayout {
     id: root

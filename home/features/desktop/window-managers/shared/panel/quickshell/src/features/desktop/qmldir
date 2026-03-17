@@ -1,1 +1,8 @@
 DesktopWidgetRegistry 1.0 registry/DesktopWidgetRegistry.qml
+DesktopClock 1.0 components/DesktopClock.qml
+DesktopEditBar 1.0 components/DesktopEditBar.qml
+DesktopSystemStat 1.0 components/DesktopSystemStat.qml
+DesktopWeather 1.0 components/DesktopWeather.qml
+DesktopWidgetPicker 1.0 components/DesktopWidgetPicker.qml
+DraggableDesktopWidget 1.0 components/DraggableDesktopWidget.qml
+DesktopWidgets 1.0 surfaces/DesktopWidgets.qml

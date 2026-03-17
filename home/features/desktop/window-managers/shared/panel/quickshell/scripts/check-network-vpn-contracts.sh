@@ -39,7 +39,7 @@ require_pattern() {
   fi
 }
 
-bar_registry="${repo_root}/src/services/BarWidgetRegistry.qml"
+bar_registry="${repo_root}/src/features/bar/registry/BarWidgetRegistry.qml"
 panel_qml="${repo_root}/src/bar/Panel.qml"
 surface_service_qml="${repo_root}/src/services/SurfaceService.qml"
 shell_qml="${repo_root}/src/shell.qml"
