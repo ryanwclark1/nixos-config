@@ -1,7 +1,7 @@
 pragma Singleton
 
 import QtQuick
-import "../../../services"
+import "../../../services" as Services
 
 QtObject {
   id: root
@@ -168,7 +168,7 @@ QtObject {
 
   readonly property var pluginWidgets: {
     var items = [];
-    var plugins = PluginService.barPlugins || [];
+    var plugins = Services.PluginService.barPlugins || [];
     for (var i = 0; i < plugins.length; ++i) {
       var plugin = plugins[i];
       items.push({
@@ -196,7 +196,7 @@ QtObject {
 
     if (String(widgetType || "").indexOf("plugin:") === 0) {
       var pluginId = String(widgetType).slice(7);
-      var plugins = PluginService.barPlugins || [];
+      var plugins = Services.PluginService.barPlugins || [];
       for (var j = 0; j < plugins.length; ++j) {
         if (plugins[j].id === pluginId) {
           return {
@@ -454,7 +454,7 @@ QtObject {
   function pluginByWidgetType(widgetType) {
     if (String(widgetType || "").indexOf("plugin:") !== 0) return null;
     var pluginId = String(widgetType).slice(7);
-    var plugins = PluginService.barPlugins || [];
+    var plugins = Services.PluginService.barPlugins || [];
     for (var i = 0; i < plugins.length; ++i) {
       if (plugins[i].id === pluginId) return plugins[i];
     }

@@ -6,7 +6,8 @@ config_dir="${QS_CONFIG_DIR:-${script_dir}/../src}"
 launcher_qml="${config_dir}/launcher/Launcher.qml"
 config_qml="${config_dir}/services/Config.qml"
 config_persistence_js="${config_dir}/services/config/ConfigPersistence.js"
-launcher_settings_qml="${config_dir}/features/settings/components/tabs/ShellCoreSectionTab.qml"
+launcher_settings_qml="${config_dir}/features/settings/components/tabs/ShellLauncherSection.qml"
+launcher_helpers_js="${config_dir}/features/settings/components/tabs/ShellCoreHelpers.js"
 
 violations=()
 
@@ -88,7 +89,7 @@ require_literal "$config_qml" 'property string launcherTabBehavior: "contextual"
 require_literal "$config_persistence_js" '"tabBehavior": config.launcherTabBehavior,' "launcher.tabBehavior persistence"
 
 # Settings must expose tab behavior and reset default.
-require_literal "$launcher_settings_qml" 'Config.launcherTabBehavior = "contextual";' "launcher default reset for tab behavior"
+require_literal "$launcher_helpers_js" 'Config.launcherTabBehavior = "contextual";' "launcher default reset for tab behavior"
 require_literal "$launcher_settings_qml" 'label: "Tab Behavior"' "Tab Behavior settings row label"
 require_literal "$launcher_settings_qml" 'currentValue: Config.launcherTabBehavior' "Tab Behavior settings current value binding"
 require_literal "$launcher_settings_qml" 'onModeSelected: modeValue => Config.launcherTabBehavior = modeValue' "Tab Behavior settings update binding"

@@ -17,7 +17,6 @@ QtObject {
     property string _captureStderr: ""
 
     // ── Signals ──────────────────────────────────
-    signal captureStarted()
     signal captureCompleted(string path)
     signal regionCaptured(string path)
     signal captureFailed(string error)
@@ -34,7 +33,6 @@ QtObject {
         root._captureMonitor = monitor || "";
         root._captureStdout = "";
         root._captureStderr = "";
-        root.captureStarted();
 
         _captureProc.command = root._captureMonitor !== ""
             ? ["qs-screenshot", root._captureMode, root._captureMonitor]

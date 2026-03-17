@@ -7,7 +7,8 @@ launcher_qml="${config_dir}/launcher/Launcher.qml"
 launcher_home_qml="${config_dir}/launcher/LauncherHome.qml"
 config_qml="${config_dir}/services/Config.qml"
 config_persistence_js="${config_dir}/services/config/ConfigPersistence.js"
-system_tab_qml="${config_dir}/features/settings/components/tabs/ShellCoreSectionTab.qml"
+launcher_settings_qml="${config_dir}/features/settings/components/tabs/ShellLauncherSection.qml"
+launcher_helpers_js="${config_dir}/features/settings/components/tabs/ShellCoreHelpers.js"
 apps_script="${script_dir}/apps.sh"
 
 violations=()
@@ -35,9 +36,9 @@ require_literal "$config_qml" 'property bool launcherDrunCategoryFiltersEnabled:
 require_literal "$config_persistence_js" '"drunCategoryFiltersEnabled": config.launcherDrunCategoryFiltersEnabled,' "drun category filters config persistence"
 
 # Settings exposure
-require_literal "$system_tab_qml" 'label: "App Category Filters"' "settings category filter toggle label"
-require_literal "$system_tab_qml" 'configKey: "launcherDrunCategoryFiltersEnabled"' "settings category filter toggle binding"
-require_literal "$system_tab_qml" 'Config.launcherDrunCategoryFiltersEnabled = false;' "settings category filter reset default"
+require_literal "$launcher_settings_qml" 'label: "App Category Filters"' "settings category filter toggle label"
+require_literal "$launcher_settings_qml" 'configKey: "launcherDrunCategoryFiltersEnabled"' "settings category filter toggle binding"
+require_literal "$launcher_helpers_js" 'Config.launcherDrunCategoryFiltersEnabled = false;' "settings category filter reset default"
 
 # Desktop app metadata extraction
 require_literal "$apps_script" '/^Categories=/ && categories == "" {' "apps script categories extraction"

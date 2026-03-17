@@ -5,7 +5,8 @@ script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pw
 launcher_qml="${script_dir}/../src/launcher/Launcher.qml"
 config_qml="${script_dir}/../src/services/Config.qml"
 config_persistence_js="${script_dir}/../src/services/config/ConfigPersistence.js"
-system_tab_qml="${script_dir}/../src/features/settings/components/tabs/ShellCoreSectionTab.qml"
+launcher_settings_qml="${script_dir}/../src/features/settings/components/tabs/ShellLauncherSection.qml"
+launcher_helpers_js="${script_dir}/../src/features/settings/components/tabs/ShellCoreHelpers.js"
 
 violations=()
 
@@ -138,16 +139,16 @@ require_literal "$launcher_qml" '+ " • fd " + (launcherRoot.launcherMetrics.fi
 require_literal "$launcher_qml" '+ " • find " + (launcherRoot.launcherMetrics.filesFindAvgMs || 0) + "/" + (launcherRoot.launcherMetrics.filesFindLastMs || 0) + "ms"' "runtime metrics find latency display"
 require_literal "$launcher_qml" '+ " • resolve " + (launcherRoot.launcherMetrics.filesResolveAvgMs || 0) + "/" + (launcherRoot.launcherMetrics.filesResolveLastMs || 0) + "ms"' "runtime metrics resolve latency display"
 require_literal "$launcher_qml" '+ (launcherRoot.mode === "files" ? (" • cache " + launcherRoot.filesCacheStatsLabel) : "")' "runtime metrics files cache stats display"
-require_literal "$system_tab_qml" 'label: "Re-detect Files Backend"' "settings button label for files backend redetect"
-require_literal "$system_tab_qml" 'onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Launcher", "redetectFilesBackend"])' "settings redetect files backend action binding"
-require_literal "$system_tab_qml" 'label: "Launcher Diagnostic Reset"' "settings button label for launcher diagnostic reset"
-require_literal "$system_tab_qml" 'onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Launcher", "diagnosticReset"])' "settings launcher diagnostic reset action binding"
-require_literal "$system_tab_qml" 'label: "Category/Keywords Weight"' "settings category keywords weight slider label"
-require_literal "$system_tab_qml" 'value: Config.launcherScoreCategoryWeight' "settings category keywords weight slider binding"
-require_literal "$system_tab_qml" 'onMoved: v => Config.launcherScoreCategoryWeight = v' "settings category keywords weight slider action"
-require_literal "$system_tab_qml" 'label: "App Category Filters"' "settings app category filters toggle label"
-require_literal "$system_tab_qml" 'configKey: "launcherDrunCategoryFiltersEnabled"' "settings app category filters toggle binding"
-require_literal "$system_tab_qml" 'Config.launcherDrunCategoryFiltersEnabled = false;' "settings app category filters reset default"
+require_literal "$launcher_settings_qml" 'label: "Re-detect Files Backend"' "settings button label for files backend redetect"
+require_literal "$launcher_settings_qml" 'onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Launcher", "redetectFilesBackend"])' "settings redetect files backend action binding"
+require_literal "$launcher_settings_qml" 'label: "Launcher Diagnostic Reset"' "settings button label for launcher diagnostic reset"
+require_literal "$launcher_settings_qml" 'onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Launcher", "diagnosticReset"])' "settings launcher diagnostic reset action binding"
+require_literal "$launcher_settings_qml" 'label: "Category/Keywords Weight"' "settings category keywords weight slider label"
+require_literal "$launcher_settings_qml" 'value: Config.launcherScoreCategoryWeight' "settings category keywords weight slider binding"
+require_literal "$launcher_settings_qml" 'onMoved: v => Config.launcherScoreCategoryWeight = v' "settings category keywords weight slider action"
+require_literal "$launcher_settings_qml" 'label: "App Category Filters"' "settings app category filters toggle label"
+require_literal "$launcher_settings_qml" 'configKey: "launcherDrunCategoryFiltersEnabled"' "settings app category filters toggle binding"
+require_literal "$launcher_helpers_js" 'Config.launcherDrunCategoryFiltersEnabled = false;' "settings app category filters reset default"
 forbid_literal "$launcher_qml" 'function fuzzyMatch(str, pattern) {' "legacy fuzzy matcher signature"
 
 if (( ${#violations[@]} > 0 )); then

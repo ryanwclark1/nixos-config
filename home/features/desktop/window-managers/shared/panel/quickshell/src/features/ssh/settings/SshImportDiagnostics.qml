@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
-import "../../../menu/settings"
+import "../../../features/settings/components"
 import "../../../widgets" as SharedWidgets
 
 SharedWidgets.CollapsibleSection {

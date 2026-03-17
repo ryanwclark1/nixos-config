@@ -51,9 +51,6 @@ PanelWindow {
       + ("0" + b.toString(16)).slice(-2).toUpperCase();
   }
 
-  // Fired when the user confirms a color (clicks "Pick" or a swatch)
-  signal colorPicked(color pickedColor)
-
   function open() {
     isOpen = true;
     svCanvas.requestPaint();
@@ -768,7 +765,6 @@ PanelWindow {
           onClicked: (mouse) => {
             pickStateLayer.burst(mouse.x, mouse.y);
             root.addRecent(root.currentColor);
-            root.colorPicked(root.currentColor);
             root.close();
           }
         }

@@ -8,7 +8,7 @@ import "../../services"
 import "services/AiProviders.js" as Providers
 import "services/AiMarkdown.js" as Markdown
 import "../../widgets" as SharedWidgets
-import "../../menu/settings"
+import "../../features/settings/components"
 import "components"
 
 PanelWindow {

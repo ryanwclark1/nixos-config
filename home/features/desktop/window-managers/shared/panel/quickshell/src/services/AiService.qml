@@ -2,7 +2,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import "config/AiProviders.js" as Providers
+import "../features/ai/services/AiProviders.js" as Providers
 
 QtObject {
     id: root

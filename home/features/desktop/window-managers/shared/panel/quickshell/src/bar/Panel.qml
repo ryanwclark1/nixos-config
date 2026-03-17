@@ -771,7 +771,7 @@ Item {
             anchorWindow: root.anchorWindow
             vertical: root.vertical
             isActive: root.isSurfaceActive("weatherMenu")
-            onClicked: triggerItem => root.requestSurface("weatherMenu", triggerItem)
+            onTriggerRequested: triggerItem => root.requestSurface("weatherMenu", triggerItem)
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
         }
     }
@@ -801,7 +801,7 @@ Item {
             anchorWindow: root.anchorWindow
             vertical: root.vertical
             isActive: root.isSurfaceActive("vpnMenu")
-            onClicked: triggerItem => root.requestSurface("vpnMenu", triggerItem)
+            onTriggerRequested: triggerItem => root.requestSurface("vpnMenu", triggerItem)
             onNetworkClicked: triggerItem => root.requestSurface("networkMenu", triggerItem)
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
         }
@@ -841,7 +841,7 @@ Item {
             anchorWindow: root.anchorWindow
             vertical: root.vertical
             isActive: root.isSurfaceActive("bluetoothMenu")
-            onClicked: triggerItem => root.requestSurface("bluetoothMenu", triggerItem)
+            onTriggerRequested: triggerItem => root.requestSurface("bluetoothMenu", triggerItem)
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
         }
     }
@@ -888,7 +888,7 @@ Item {
             anchorWindow: root.anchorWindow
             vertical: root.vertical
             isActive: root.isSurfaceActive("musicMenu")
-            onClicked: triggerItem => root.requestSurface("musicMenu", triggerItem)
+            onTriggerRequested: triggerItem => root.requestSurface("musicMenu", triggerItem)
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
         }
     }
@@ -900,7 +900,7 @@ Item {
             anchorWindow: root.anchorWindow
             vertical: root.vertical
             isActive: root.isSurfaceActive("privacyMenu")
-            onClicked: triggerItem => root.requestSurface("privacyMenu", triggerItem)
+            onTriggerRequested: triggerItem => root.requestSurface("privacyMenu", triggerItem)
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
         }
     }
@@ -912,7 +912,7 @@ Item {
             anchorWindow: root.anchorWindow
             vertical: root.vertical
             isActive: root.isSurfaceActive("recordingMenu")
-            onClicked: triggerItem => root.requestSurface("recordingMenu", triggerItem)
+            onTriggerRequested: triggerItem => root.requestSurface("recordingMenu", triggerItem)
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
         }
     }
@@ -970,7 +970,7 @@ Item {
             anchorWindow: root.anchorWindow
             vertical: root.vertical
             isActive: root.isSurfaceActive("printerMenu")
-            onClicked: triggerItem => root.requestSurface("printerMenu", triggerItem)
+            onTriggerRequested: triggerItem => root.requestSurface("printerMenu", triggerItem)
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
         }
     }
@@ -1204,7 +1204,7 @@ Item {
             vertical: root.vertical
             manager: root.manager
             isActive: root.isSurfaceActive("notifCenter")
-            onClicked: triggerItem => root.requestSurface("notifCenter", triggerItem)
+            onTriggerRequested: triggerItem => root.requestSurface("notifCenter", triggerItem)
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
         }
     }

@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-repo_root="$(cd "${script_dir}/../.." && pwd)"
+script_path="$(realpath "${BASH_SOURCE[0]}")"
+script_dir="$(dirname "${script_path}")"
+repo_root="$(realpath "${script_dir}/../..")"
 src_dir="${repo_root}/src"
 
 python - <<'PY' "${src_dir}"
@@ -14,7 +15,6 @@ src_dir = Path(sys.argv[1])
 fail = 0
 
 allowed_feature_imports = {
-    '../bar',
     '../features/ai',
     '../features/bar',
     '../features/color-picker',
@@ -29,19 +29,17 @@ allowed_feature_imports = {
     '../features/settings',
     '../features/system/surfaces',
     '../features/workspace',
-    '../launcher',
-    '../menu',
     '../system/sections',
+    '../../system/sections',
     '../../../system/sections',
-    '../notifications',
-    '../services',
     '../shell',
-    '../widgets',
     '../services/AiProviders.js',
     '../../services/ColorUtils.js',
     '../../services/ShellUtils.js',
     '../system/sections',
     '../settings/components',
+    '../../features/settings/components',
+    '../../../features/settings/components',
     '../../services',
     '../../shared',
     '../../../services',
@@ -49,6 +47,7 @@ allowed_feature_imports = {
     '../../widgets',
     '../../../widgets',
     '../../../../services',
+    '../../../../services/ColorUtils.js',
     '../../../../widgets',
     '../../../../services/ShellUtils.js',
     '../../menu/settings',
@@ -67,6 +66,15 @@ allowed_feature_imports = {
     'services/AiProviders.js',
     'services/AiMarkdown.js',
     '../../menu/settings',
+}
+
+forbidden_legacy_feature_imports = {
+    '../bar',
+    '../launcher',
+    '../menu',
+    '../notifications',
+    '../services',
+    '../widgets',
 }
 
 import_re = re.compile(r'^\s*import\s+"([^"]+)"', re.MULTILINE)
@@ -104,13 +112,18 @@ for root in migrated_roots:
         continue
     paths = root.rglob('*.qml')
     for path in paths:
+        rel_parts = path.relative_to(src_dir).parts
+        is_feature_file = len(rel_parts) > 0 and rel_parts[0] == 'features'
         text = path.read_text()
         for match in import_re.finditer(text):
             target = match.group(1)
             if target.startswith('root:'):
                 print(f'check-import-boundaries: forbidden root import in {path}: {target}', file=sys.stderr)
                 fail = 1
-            if '/features/' in path.as_posix() and target.startswith('../') and target not in allowed_feature_imports:
+            if is_feature_file and target in forbidden_legacy_feature_imports:
+                print(f'check-import-boundaries: forbidden legacy feature import in {path}: {target}', file=sys.stderr)
+                fail = 1
+            if is_feature_file and target.startswith('../') and target not in allowed_feature_imports:
                 print(f'check-import-boundaries: suspicious migrated-feature import in {path}: {target}', file=sys.stderr)
                 fail = 1
 

@@ -31,7 +31,6 @@ PanelWindow {
 
     property bool showContent: false
     property int panelWidth: 980
-    property real panelX: 0
     readonly property int panelMinWidth: 760
     readonly property int panelMaxWidth: 1320
     property real _dragStartX: 0

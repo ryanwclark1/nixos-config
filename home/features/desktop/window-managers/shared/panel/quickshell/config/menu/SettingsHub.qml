@@ -48,7 +48,6 @@ PanelWindow {
     property string currentTabId: SettingsRegistry.defaultTabId
   }
   property string pendingTabId: ""
-  readonly property int currentTabIndex: SettingsRegistry.indexForTabId(currentTabId)
   signal browseWallpaper(string monitorName)
   signal pickWallpaperFolder()
 

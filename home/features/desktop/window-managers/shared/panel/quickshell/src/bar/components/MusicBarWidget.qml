@@ -6,18 +6,13 @@ import "../PanelWidgetHelpers.js" as PanelHelpers
 SharedWidgets.BarPill {
     id: root
     property var widgetInstance: null
-    required property var anchorWindow
     property bool vertical: false
-    property bool isActive: false
-    signal clicked(var triggerItem)
-    signal contextMenuRequested(var actions, rect triggerRect)
+    signal triggerRequested(var triggerItem)
 
     readonly property bool iconOnly: PanelHelpers.isSummaryWidgetIconOnly(widgetInstance, vertical)
     readonly property int maxTextWidth: PanelHelpers.widgetIntegerSetting(widgetInstance, "maxTextWidth", 100, 60, 220)
 
     visible: SystemStatus.hasActivePlayer
-    isActive: root.isActive
-    anchorWindow: root.anchorWindow
     tooltipText: {
         var players = SystemStatus.activeMprisPlayers;
         if (!players || players.length === 0)
@@ -25,7 +20,7 @@ SharedWidgets.BarPill {
         var p = players[0];
         return (p.trackTitle || "Music") + (p.trackArtist ? " - " + p.trackArtist : "");
     }
-    onClicked: root.clicked(this)
+    onClicked: root.triggerRequested(this)
     contextActions: [
         {
             label: "Play / Pause",
@@ -51,10 +46,9 @@ SharedWidgets.BarPill {
         {
             label: "Open Music Menu",
             icon: "󰝚",
-            action: () => root.clicked(root)
+            action: () => root.triggerRequested(root)
         }
     ]
-    onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
     Behavior on width {
         NumberAnimation {

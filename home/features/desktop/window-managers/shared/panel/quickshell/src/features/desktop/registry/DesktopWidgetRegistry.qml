@@ -1,7 +1,7 @@
 pragma Singleton
 import QtQuick
 import Quickshell
-import "../../../services"
+import "../../../services" as Services
 
 QtObject {
     id: root
@@ -39,7 +39,7 @@ QtObject {
     // Unified desktop widget catalog (built-ins + enabled desktop plugins)
     readonly property var widgetCatalog: {
         var result = builtInWidgetCatalog.slice();
-        var plugins = PluginService.desktopPlugins || [];
+        var plugins = Services.PluginService.desktopPlugins || [];
         for (var i = 0; i < plugins.length; i++) {
             var p = plugins[i];
             result.push({
@@ -73,7 +73,7 @@ QtObject {
         if (!widgetType || widgetType.indexOf("plugin:") !== 0)
             return null;
         var pluginId = widgetType.slice("plugin:".length);
-        var plugins = PluginService.desktopPlugins || [];
+        var plugins = Services.PluginService.desktopPlugins || [];
         for (var i = 0; i < plugins.length; i++) {
             if (plugins[i].id === pluginId)
                 return plugins[i];
@@ -104,7 +104,7 @@ QtObject {
     }
 
     function getWidgetsForScreen(screenName) {
-        var monitors = Config.desktopWidgetsMonitorWidgets || [];
+        var monitors = Services.Config.desktopWidgetsMonitorWidgets || [];
         for (var i = 0; i < monitors.length; i++) {
             if (monitors[i].name === screenName)
                 return monitors[i].widgets || [];
@@ -113,7 +113,7 @@ QtObject {
     }
 
     function updateWidgetData(screenName, widgetId, data) {
-        var monitors = JSON.parse(JSON.stringify(Config.desktopWidgetsMonitorWidgets || []));
+        var monitors = JSON.parse(JSON.stringify(Services.Config.desktopWidgetsMonitorWidgets || []));
         var found = false;
         for (var i = 0; i < monitors.length; i++) {
             if (monitors[i].name === screenName) {
@@ -130,7 +130,7 @@ QtObject {
             }
         }
         if (found)
-            Config.desktopWidgetsMonitorWidgets = monitors;
+            Services.Config.desktopWidgetsMonitorWidgets = monitors;
     }
 
     function addWidget(screenName, widgetType) {
@@ -138,7 +138,7 @@ QtObject {
     }
 
     function addWidgetAt(screenName, widgetType, x, y) {
-        var monitors = JSON.parse(JSON.stringify(Config.desktopWidgetsMonitorWidgets || []));
+        var monitors = JSON.parse(JSON.stringify(Services.Config.desktopWidgetsMonitorWidgets || []));
         var monitorIdx = -1;
         for (var i = 0; i < monitors.length; i++) {
             if (monitors[i].name === screenName) {
@@ -163,12 +163,12 @@ QtObject {
             scale: 1.0
         });
 
-        Config.desktopWidgetsMonitorWidgets = monitors;
+        Services.Config.desktopWidgetsMonitorWidgets = monitors;
         return id;
     }
 
     function removeWidget(screenName, widgetId) {
-        var monitors = JSON.parse(JSON.stringify(Config.desktopWidgetsMonitorWidgets || []));
+        var monitors = JSON.parse(JSON.stringify(Services.Config.desktopWidgetsMonitorWidgets || []));
         for (var i = 0; i < monitors.length; i++) {
             if (monitors[i].name === screenName) {
                 monitors[i].widgets = (monitors[i].widgets || []).filter(function (w) {
@@ -177,6 +177,6 @@ QtObject {
                 break;
             }
         }
-        Config.desktopWidgetsMonitorWidgets = monitors;
+        Services.Config.desktopWidgetsMonitorWidgets = monitors;
     }
 }

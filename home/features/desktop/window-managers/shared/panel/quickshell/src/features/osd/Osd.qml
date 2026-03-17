@@ -6,6 +6,7 @@ import Quickshell.Services.Pipewire
 import Quickshell.Wayland
 import "../system/sections"
 import "."
+import "../../shared"
 import "../../services"
 
 Scope {

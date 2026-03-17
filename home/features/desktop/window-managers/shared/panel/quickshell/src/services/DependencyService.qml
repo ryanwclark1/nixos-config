@@ -18,10 +18,6 @@ QtObject {
   property var _features: ({})
   property bool initialized: false
 
-  // ── Signals ────────────────────────────────────
-  signal availabilityChanged()
-  signal featureChanged(string name)
-
   // ── Public API ─────────────────────────────────
 
   /**
@@ -76,7 +72,6 @@ QtObject {
       available: available
     };
     _features = next;
-    featureChanged(name);
     return available;
   }
 
@@ -136,17 +131,14 @@ QtObject {
         }
         root._availability = next;
         root.initialized = true;
-        root.availabilityChanged();
 
         // Update all features after availability changes
         var nextFeatures = Object.assign({}, root._features);
         for (var featureName in nextFeatures) {
           var feature = nextFeatures[featureName];
           var available = root.allAvailable(feature.required);
-          if (available !== feature.available) {
+          if (available !== feature.available)
             feature.available = available;
-            root.featureChanged(featureName);
-          }
         }
         root._features = nextFeatures;
       }

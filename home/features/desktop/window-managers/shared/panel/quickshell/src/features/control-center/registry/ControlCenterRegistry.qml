@@ -2,12 +2,12 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Bluetooth
-import "../../../services"
+import "../../../services" as Services
 
 QtObject {
     id: root
 
-    readonly property var quickLinkItems: SystemActionRegistry.actionsByIds([
+    readonly property var quickLinkItems: Services.SystemActionRegistry.actionsByIds([
         "audioControls",
         "networkControls",
         "vpnControls"
@@ -60,8 +60,8 @@ QtObject {
     }
 
     function orderedQuickToggleItems() {
-        var hidden = Array.isArray(Config.controlCenterHiddenToggles) ? Config.controlCenterHiddenToggles : [];
-        var order = Array.isArray(Config.controlCenterToggleOrder) ? Config.controlCenterToggleOrder : [];
+        var hidden = Array.isArray(Services.Config.controlCenterHiddenToggles) ? Services.Config.controlCenterHiddenToggles : [];
+        var order = Array.isArray(Services.Config.controlCenterToggleOrder) ? Services.Config.controlCenterToggleOrder : [];
         var seen = ({});
         var items = [];
         var i;
@@ -92,11 +92,11 @@ QtObject {
         case "dnd":
             return !!(manager && manager.dndEnabled);
         case "nightLight":
-            return NightLightService.active;
+            return Services.NightLightService.active;
         case "caffeine":
-            return CaffeineService.inhibiting;
+            return Services.CaffeineService.inhibiting;
         case "recording":
-            return RecordingService.isRecording;
+            return Services.RecordingService.isRecording;
         default:
             return false;
         }
@@ -113,16 +113,16 @@ QtObject {
                 manager.dndEnabled = !manager.dndEnabled;
             return;
         case "nightLight":
-            NightLightService.toggle();
+            Services.NightLightService.toggle();
             return;
         case "caffeine":
-            CaffeineService.toggle();
+            Services.CaffeineService.toggle();
             return;
         case "recording":
-            if (RecordingService.isRecording)
-                RecordingService.stopRecording();
+            if (Services.RecordingService.isRecording)
+                Services.RecordingService.stopRecording();
             else
-                RecordingService.startRecording("fullscreen");
+                Services.RecordingService.startRecording("fullscreen");
             return;
         }
     }

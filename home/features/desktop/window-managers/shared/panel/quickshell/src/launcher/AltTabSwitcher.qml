@@ -89,95 +89,97 @@ Scope {
         model: Quickshell.screens
 
         delegate: Component {
-            Timer {
-                id: _hideTimer
-                interval: Colors.durationFast
-                running: false
-            }
-
-            LazyLoader {
-                active: root.isVisible || _hideTimer.running
+            Scope {
                 required property ShellScreen modelData
 
-                Connections {
-                    target: root
-                    function onIsVisibleChanged() {
-                        if (!root.isVisible)
-                            _hideTimer.restart();
-                    }
+                Timer {
+                    id: _hideTimer
+                    interval: Colors.durationFast
+                    running: false
                 }
 
-                PanelWindow {
-                    id: switcherWindow
-                    screen: modelData
-                    visible: root.isVisible
+                LazyLoader {
+                    active: root.isVisible || _hideTimer.running
 
-                    anchors {
-                        top: true
-                        left: true
-                        right: true
-                        bottom: true
-                    }
-                    color: "transparent"
-                    WlrLayershell.layer: WlrLayer.Overlay
-                    WlrLayershell.namespace: "quickshell-alttab"
-                    WlrLayershell.keyboardFocus: root.isVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-                    exclusiveZone: -1
-
-                    onVisibleChanged: if (visible)
-                        focusItem.forceActiveFocus()
-
-                    Item {
-                        id: focusItem
-                        anchors.fill: parent
-                        focus: true
-
-                        Keys.onPressed: event => {
-                            if (event.key === Qt.Key_Escape) {
-                                root.hide();
-                                event.accepted = true;
-                            } else if (event.key === Qt.Key_Tab || event.key === Qt.Key_Right || event.key === Qt.Key_Down) {
-                                root.cycleNext();
-                                event.accepted = true;
-                            } else if (event.key === Qt.Key_Backtab || event.key === Qt.Key_Left || event.key === Qt.Key_Up) {
-                                root.cyclePrev();
-                                event.accepted = true;
-                            } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                                root.confirm();
-                                event.accepted = true;
-                            }
+                    Connections {
+                        target: root
+                        function onIsVisibleChanged() {
+                            if (!root.isVisible)
+                                _hideTimer.restart();
                         }
+                    }
 
-                        // Dim background
-                        Rectangle {
+                    PanelWindow {
+                        id: switcherWindow
+                        screen: modelData
+                        visible: root.isVisible
+
+                        anchors {
+                            top: true
+                            left: true
+                            right: true
+                            bottom: true
+                        }
+                        color: "transparent"
+                        WlrLayershell.layer: WlrLayer.Overlay
+                        WlrLayershell.namespace: "quickshell-alttab"
+                        WlrLayershell.keyboardFocus: root.isVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+                        exclusiveZone: -1
+
+                        onVisibleChanged: if (visible)
+                            focusItem.forceActiveFocus()
+
+                        Item {
+                            id: focusItem
                             anchors.fill: parent
-                            color: Colors.withAlpha(Colors.bg, 0.6)
-                            opacity: root.isVisible ? 1.0 : 0.0
-                            Behavior on opacity {
-                                NumberAnimation {
-                                    duration: Colors.durationFast
+                            focus: true
+
+                            Keys.onPressed: event => {
+                                if (event.key === Qt.Key_Escape) {
+                                    root.hide();
+                                    event.accepted = true;
+                                } else if (event.key === Qt.Key_Tab || event.key === Qt.Key_Right || event.key === Qt.Key_Down) {
+                                    root.cycleNext();
+                                    event.accepted = true;
+                                } else if (event.key === Qt.Key_Backtab || event.key === Qt.Key_Left || event.key === Qt.Key_Up) {
+                                    root.cyclePrev();
+                                    event.accepted = true;
+                                } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                                    root.confirm();
+                                    event.accepted = true;
                                 }
                             }
 
-                            MouseArea {
+                            // Dim background
+                            Rectangle {
                                 anchors.fill: parent
-                                onClicked: root.hide()
+                                color: Colors.withAlpha(Colors.bg, 0.6)
+                                opacity: root.isVisible ? 1.0 : 0.0
+                                Behavior on opacity {
+                                    NumberAnimation {
+                                        duration: Colors.durationFast
+                                    }
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: root.hide()
+                                }
                             }
-                        }
 
-                        // Centered card row
-                        Item {
-                            anchors.centerIn: parent
-                            width: cardRow.width
-                            height: cardRow.height + titleLabel.height + Colors.spacingM
+                            // Centered card row
+                            Item {
+                                anchors.centerIn: parent
+                                width: cardRow.width
+                                height: cardRow.height + titleLabel.height + Colors.spacingM
 
-                            Row {
-                                id: cardRow
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                spacing: Colors.spacingM
+                                Row {
+                                    id: cardRow
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    spacing: Colors.spacingM
 
-                                Repeater {
-                                    model: root.windowList
+                                    Repeater {
+                                        model: root.windowList
 
                                     delegate: Rectangle {
                                         id: card
@@ -313,21 +315,22 @@ Scope {
                                             }
                                         ]
                                     }
+                                    }
                                 }
-                            }
 
-                            // Selected window title
-                            Text {
-                                id: titleLabel
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                anchors.top: cardRow.bottom
-                                anchors.topMargin: Colors.spacingM
-                                width: Math.min(parent.width, 500)
-                                text: root.selectedIndex >= 0 && root.selectedIndex < root.windowList.length ? (root.windowList[root.selectedIndex].title || "Untitled") : ""
-                                color: Colors.text
-                                font.pixelSize: Colors.fontSizeMedium
-                                horizontalAlignment: Text.AlignHCenter
-                                elide: Text.ElideRight
+                                // Selected window title
+                                Text {
+                                    id: titleLabel
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    anchors.top: cardRow.bottom
+                                    anchors.topMargin: Colors.spacingM
+                                    width: Math.min(parent.width, 500)
+                                    text: root.selectedIndex >= 0 && root.selectedIndex < root.windowList.length ? (root.windowList[root.selectedIndex].title || "Untitled") : ""
+                                    color: Colors.text
+                                    font.pixelSize: Colors.fontSizeMedium
+                                    horizontalAlignment: Text.AlignHCenter
+                                    elide: Text.ElideRight
+                                }
                             }
                         }
                     }

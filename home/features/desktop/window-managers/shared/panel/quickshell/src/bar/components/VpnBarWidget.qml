@@ -6,26 +6,21 @@ import "../PanelWidgetHelpers.js" as PanelHelpers
 SharedWidgets.BarPill {
     id: root
     property var widgetInstance: null
-    required property var anchorWindow
     property bool vertical: false
-    property bool isActive: false
-    signal clicked(var triggerItem)
+    signal triggerRequested(var triggerItem)
     signal networkClicked(var triggerItem)
-    signal contextMenuRequested(var actions, rect triggerRect)
 
     readonly property string labelMode: PanelHelpers.widgetStringSetting(widgetInstance, "labelMode", "status", ["status", "ip"])
     readonly property bool showOtherVpnCount: PanelHelpers.widgetBooleanSetting(widgetInstance, "showOtherVpnCount", true)
     readonly property string tooltipTextValue: vpnWidgetLoader.status === Loader.Ready && vpnWidgetLoader.item && vpnWidgetLoader.item.tooltipText ? vpnWidgetLoader.item.tooltipText : "VPN"
 
-    isActive: root.isActive
-    anchorWindow: root.anchorWindow
     tooltipText: tooltipTextValue
-    onClicked: root.clicked(this)
+    onClicked: root.triggerRequested(this)
     contextActions: [
         {
             label: "Open VPN Hub",
             icon: "󰖂",
-            action: () => root.clicked(root)
+            action: () => root.triggerRequested(root)
         },
         {
             label: "Open Network Menu",
@@ -33,8 +28,6 @@ SharedWidgets.BarPill {
             action: () => root.networkClicked(root)
         }
     ]
-    onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
-
     Row {
         spacing: Colors.spacingS
         Loader {

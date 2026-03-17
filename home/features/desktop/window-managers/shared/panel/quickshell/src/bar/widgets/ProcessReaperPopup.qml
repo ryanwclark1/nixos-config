@@ -3,7 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import "../../services"
 import "../../widgets" as SharedWidgets
-import "../../menu/settings"
+import "../../features/settings/components"
 
 Rectangle {
     id: root

@@ -200,7 +200,7 @@ PanelWindow {
     readonly property var defaultModeOrder: ModeData.defaultModeOrder
     readonly property var defaultPrimaryModes: ModeData.defaultPrimaryModes
     property var modeOrder: computeModeOrder()
-    property var primaryModes: sanitizeModeList(Config.launcherEnabledModes, defaultPrimaryModes, allKnownModes).filter(function (modeKey) {
+    property var primaryModes: ModeData.sanitizeModeList(Config.launcherEnabledModes, defaultPrimaryModes, allKnownModes).filter(function (modeKey) {
         return launcherRoot.isModeAllowedByCompositor(modeKey);
     })
     readonly property var modeIcons: ModeData.modeIcons
@@ -734,30 +734,9 @@ PanelWindow {
         return ModeData.modeInfo(key);
     }
 
-    function sanitizeModeList(source, fallback, allowedList) {
-        var out = [];
-        var seen = ({});
-        var allowed = ({});
-        var i;
-        for (i = 0; i < allowedList.length; ++i)
-            allowed[allowedList[i]] = true;
-
-        var list = Array.isArray(source) && source.length > 0 ? source : fallback;
-        for (i = 0; i < list.length; ++i) {
-            var modeKey = String(list[i] || "");
-            if (!allowed[modeKey] || seen[modeKey])
-                continue;
-            out.push(modeKey);
-            seen[modeKey] = true;
-        }
-        if (out.length === 0)
-            return fallback.slice();
-        return out;
-    }
-
     function computeModeOrder() {
-        var order = sanitizeModeList(Config.launcherModeOrder, defaultModeOrder, allKnownModes);
-        var enabled = sanitizeModeList(Config.launcherEnabledModes, defaultModeOrder, allKnownModes);
+        var order = ModeData.sanitizeModeList(Config.launcherModeOrder, defaultModeOrder, allKnownModes);
+        var enabled = ModeData.sanitizeModeList(Config.launcherEnabledModes, defaultModeOrder, allKnownModes);
         var enabledSet = ({});
         var i;
         for (i = 0; i < enabled.length; ++i)

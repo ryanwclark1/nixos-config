@@ -9,15 +9,11 @@ import "../../widgets" as SharedWidgets
 PanelWindow {
     id: root
 
-    property string surfaceEdge: "right"
     property int panelWidth: Config.controlCenterWidth
-    property int panelHeight: 640
-    property real panelX: 0
     readonly property var edgeMargins: Config.reservedEdgesForScreen(screen, "")
     property int reservedTop: edgeMargins.top
     property int reservedRight: edgeMargins.right
     property int reservedBottom: edgeMargins.bottom
-    property int reservedLeft: edgeMargins.left
 
     anchors {
         top: true

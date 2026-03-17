@@ -42,11 +42,6 @@ QtObject {
     property int currentKeyboardLayoutIndex: 0
     property var keyboardLayoutNames: []
 
-    // ── Config load status ──────────────────────────
-    property bool configLoaded: false
-    property bool configLoadFailed: false
-    property string configError: ""
-
     // ── Signals ─────────────────────────────────────
     signal windowUrgentChanged()
     signal configLoadFinished(bool ok, string error)
@@ -655,11 +650,9 @@ QtObject {
 
     function _onConfigLoaded(data) {
         const failed = data && data.failed
-        configLoaded = !failed
-        configLoadFailed = !!failed
-        configError = (failed && data.error) ? data.error : ""
+        const error = (failed && data.error) ? data.error : ""
         if (!failed) _fetchOutputs()
-        configLoadFinished(!failed, configError)
+        configLoadFinished(!failed, error)
     }
 
     // ── Keyboard events ─────────────────────────────

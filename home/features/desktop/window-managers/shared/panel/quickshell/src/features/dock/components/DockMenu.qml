@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import "../../../services"
+import "../../../shared"
 
 PopupWindow {
   id: root

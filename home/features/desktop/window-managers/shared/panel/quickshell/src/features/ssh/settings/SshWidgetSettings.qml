@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import ".."
 import "../../../services"
-import "../../../menu/settings"
+import "../../../features/settings/components"
 
 ColumnLayout {
     id: root

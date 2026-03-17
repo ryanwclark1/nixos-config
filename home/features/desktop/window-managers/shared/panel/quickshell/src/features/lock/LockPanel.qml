@@ -5,6 +5,7 @@ import Quickshell.Services.UPower
 import "../../services"
 import "../system/sections"
 import "."
+import "../../shared"
 
 Item {
   id: root

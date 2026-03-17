@@ -213,14 +213,10 @@ Scope {
             screen: layoutState.screen
             manager: notifManager
             showContent: root.notifCenterVisible
-            surfaceEdge: layoutState.edge
             panelWidth: layoutState.width
-            panelHeight: layoutState.height
-            panelX: layoutState.x
             reservedTop: layoutState.top
             reservedRight: layoutState.right
             reservedBottom: layoutState.bottom
-            reservedLeft: layoutState.left
             onCloseRequested: root.closeSurface("notifCenter")
         }
     }
@@ -231,14 +227,10 @@ Scope {
         screen: layoutState.screen
         manager: notifManager
         showContent: root.controlCenterVisible
-        surfaceEdge: layoutState.edge
         panelWidth: layoutState.width
-        panelHeight: layoutState.height
-        panelX: layoutState.x
         reservedTop: layoutState.top
         reservedRight: layoutState.right
         reservedBottom: layoutState.bottom
-        reservedLeft: layoutState.left
         onCloseRequested: root.closeSurface("controlCenter")
     }
 

@@ -633,11 +633,7 @@ PanelWindow {
                     required property string modelData
                     required property int index
 
-                    property bool isCurrent: {
-                      if (displayRoot.selectedIndex < 0 || displayRoot.monitors.length === 0) return false;
-                      var monRate = displayRoot.monitors[displayRoot.selectedIndex].refreshRate.toFixed(2);
-                      return modelData === monRate;
-                    }
+                    property bool isCurrent: modelData === rateList.currentRate
 
                     width: rateLabel.implicitWidth + 20
                     height: 34

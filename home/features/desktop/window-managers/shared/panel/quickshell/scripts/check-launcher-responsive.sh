@@ -6,7 +6,7 @@ runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
 config_root="$(CDPATH= cd -- "${script_dir}/../src" >/dev/null && pwd)"
 launcher_qml="${script_dir}/../src/launcher/Launcher.qml"
 launcher_search_field_qml="${script_dir}/../src/launcher/LauncherSearchField.qml"
-launcher_settings_qml="${script_dir}/../src/features/settings/components/tabs/ShellCoreSectionTab.qml"
+launcher_settings_qml="${script_dir}/../src/features/settings/components/tabs/ShellLauncherSection.qml"
 expected_config="$(realpath "${script_dir}/../src/shell.qml" 2>/dev/null || printf '%s' "${script_dir}/../src/shell.qml")"
 apps_helper="${script_dir}/apps.sh"
 
@@ -18,6 +18,7 @@ repo_shell_mode=0
 repo_shell_pid=""
 repo_shell_service_was_active=0
 repo_shell_env=()
+ipc_timeout_cmd=()
 violations=()
 pass_count=0
 warn_count=0
@@ -247,7 +248,11 @@ call_ipc() {
   local target="$1"
   local action="$2"
   shift 2
-  quickshell ipc --id "${instance_id}" call "${target}" "${action}" "$@"
+  if (( ${#ipc_timeout_cmd[@]} > 0 )); then
+    "${ipc_timeout_cmd[@]}" quickshell ipc --id "${instance_id}" call "${target}" "${action}" "$@"
+  else
+    quickshell ipc --id "${instance_id}" call "${target}" "${action}" "$@"
+  fi
 }
 
 launcher_action_available() {
@@ -628,6 +633,9 @@ main() {
   require_cmd node
   if (( ci_mode == 0 )); then
     require_cmd quickshell
+    if command -v timeout >/dev/null 2>&1; then
+      ipc_timeout_cmd=(timeout --kill-after=2s 15s)
+    fi
   fi
 
   if (( repo_shell_mode == 1 )); then
