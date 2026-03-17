@@ -70,7 +70,7 @@ Rectangle {
             Layout.preferredWidth: snapRow.implicitWidth + 16
             Layout.preferredHeight: 28
             radius: Colors.radiusMedium
-            color: gridSnap ? Colors.withAlpha(Colors.primary, 0.2) : "transparent"
+            color: gridSnap ? Colors.primaryTint : "transparent"
             border.color: gridSnap ? Colors.primary : Colors.border
             border.width: 1
 
@@ -110,7 +110,7 @@ Rectangle {
             Layout.preferredWidth: exitRow.implicitWidth + 16
             Layout.preferredHeight: 28
             radius: Colors.radiusMedium
-            color: Colors.withAlpha(Colors.error, 0.15)
+            color: Colors.errorLight
             border.color: Colors.error
             border.width: 1
 

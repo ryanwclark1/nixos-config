@@ -682,7 +682,7 @@ PanelWindow {
                           var crumbs = root._buildBreadcrumbs();
                           var isLast = (index === crumbs.length - 1);
                           if (isLast) return Colors.primaryMid;
-                          if (crumbHover.containsMouse) return Colors.withAlpha(Colors.text, 0.08);
+                          if (crumbHover.containsMouse) return Colors.textWash;
                           return "transparent";
                         }
                         Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
@@ -998,7 +998,7 @@ PanelWindow {
                       color: {
                         var isSel = (root.selectedFile === modelData.path);
                         if (isSel) return Colors.withAlpha(Colors.primary, 0.28);
-                        if (gridItemHover.containsMouse) return Colors.withAlpha(Colors.text, 0.08);
+                        if (gridItemHover.containsMouse) return Colors.textWash;
                         return "transparent";
                       }
                       Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
@@ -1162,7 +1162,7 @@ PanelWindow {
                       anchors.left: parent.left
                       anchors.right: parent.right
                       height: 1
-                      color: Colors.withAlpha(Colors.border, 0.4)
+                      color: Colors.borderMedium
                     }
 
                     RowLayout {
@@ -1388,7 +1388,7 @@ PanelWindow {
                   width: filterText.implicitWidth + 28
                   radius: Colors.radiusSmall
                   color: filterHover.containsMouse
-                    ? Colors.withAlpha(Colors.text, 0.1) : Colors.cardSurface
+                    ? Colors.textThin : Colors.cardSurface
                   border.color: Colors.border
                   border.width: 1
                   Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
@@ -1434,7 +1434,7 @@ PanelWindow {
                   width: Math.max(Layout.minimumWidth, cancelText.implicitWidth + 24)
                   radius: Colors.radiusSmall
                   color: cancelHover.containsMouse
-                    ? Colors.withAlpha(Colors.text, 0.1) : Colors.cardSurface
+                    ? Colors.textThin : Colors.cardSurface
                   border.color: Colors.border
                   border.width: 1
                   Behavior on color { ColorAnimation { duration: Colors.durationSnap } }

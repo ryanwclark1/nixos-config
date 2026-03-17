@@ -35,6 +35,8 @@ QtObject {
 
     // --- TEXT COLOR ALIASES ---
     readonly property color textFaint: withAlpha(text, 0.06)         // Subtle code/card bg
+    readonly property color textWash: withAlpha(text, 0.08)          // Hover bg / subtle fill
+    readonly property color textThin: withAlpha(text, 0.1)           // Subtle border / light separator
 
     // --- PRIMARY COLOR ALIASES ---
     readonly property color primaryFaint: withAlpha(primary, 0.08)   // Light hover state
@@ -43,6 +45,7 @@ QtObject {
     readonly property color primaryAccent: withAlpha(primary, 0.14)  // Selected item bg
     readonly property color primaryStrong: withAlpha(primary, 0.16)  // Active/default item bg
     readonly property color primaryMid: withAlpha(primary, 0.18)     // Active chip/button bg
+    readonly property color primaryTint: withAlpha(primary, 0.2)     // Soft active bg / badge
     readonly property color primaryMarked: withAlpha(primary, 0.22)  // Drag target / strong selection
     readonly property color primaryRing: withAlpha(primary, 0.3)     // Focus ring / emphasis border
 
@@ -58,6 +61,12 @@ QtObject {
     readonly property color borderLight: withAlpha(text, 0.12)
     readonly property color borderDark: withAlpha("#000000", 0.25)
     readonly property color glassBorder: withAlpha(text, 0.1)
+    readonly property color borderMedium: withAlpha(border, 0.4)     // Subtle separator / divider
+    readonly property color borderFocus: withAlpha(border, 0.6)      // Focused input / strong border
+
+    // --- STATUS COLOR ALIASES ---
+    readonly property color errorLight: withAlpha(error, 0.15)       // Error indicator bg
+    readonly property color warningLight: withAlpha(warning, 0.16)   // Warning indicator bg
 
     // --- SHADOWS ---
     readonly property color shadowColor: withAlpha("#000000", 0.35)

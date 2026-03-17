@@ -356,7 +356,7 @@ PanelWindow {
     id: slidePanel
     width: root.notepadWidth
     height: parent.height
-    color: Colors.withAlpha(Colors.surface, 0.96)
+    color: Colors.popupSurface
     border.color: Colors.border
     border.width: 1
     radius: Colors.radiusLarge

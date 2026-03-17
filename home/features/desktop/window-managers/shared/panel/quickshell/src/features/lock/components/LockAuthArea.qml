@@ -154,7 +154,7 @@ ColumnLayout {
         width: countdownRow.implicitWidth + 24
         height: 36
         radius: Colors.radiusPill
-        color: Colors.withAlpha(Colors.error, 0.15)
+        color: Colors.errorLight
         border.color: Colors.error
         border.width: 1
 

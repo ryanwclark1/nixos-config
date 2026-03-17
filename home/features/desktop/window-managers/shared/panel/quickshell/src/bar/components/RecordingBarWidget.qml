@@ -14,7 +14,7 @@ SharedWidgets.BarPill {
 
     visible: SystemStatus.isRecording
     activeColor: Colors.withAlpha(Colors.error, 0.22)
-    normalColor: Colors.withAlpha(Colors.error, 0.15)
+    normalColor: Colors.errorLight
     hoverColor: Colors.withAlpha(Colors.error, 0.25)
     tooltipText: "Screen recording in progress"
     onClicked: root.triggerRequested(this)

@@ -1178,7 +1178,7 @@ SharedWidgets.CardBase {
                                 Layout.fillWidth: true
                                 color: Colors.cardSurface
                                 radius: Colors.radiusSmall
-                                border.color: Colors.withAlpha(Colors.border, 0.6)
+                                border.color: Colors.borderFocus
                                 border.width: 1
                                 implicitHeight: cwdBlock.implicitHeight + Colors.spacingS * 2
 
@@ -1210,7 +1210,7 @@ SharedWidgets.CardBase {
                                 Layout.fillWidth: true
                                 color: Colors.cardSurface
                                 radius: Colors.radiusSmall
-                                border.color: Colors.withAlpha(Colors.border, 0.6)
+                                border.color: Colors.borderFocus
                                 border.width: 1
                                 implicitHeight: exeBlock.implicitHeight + Colors.spacingS * 2
 
@@ -1243,7 +1243,7 @@ SharedWidgets.CardBase {
                                 visible: !!root.detailData.openFilePreview && root.detailData.openFilePreview.length > 0
                                 color: Colors.cardSurface
                                 radius: Colors.radiusSmall
-                                border.color: Colors.withAlpha(Colors.border, 0.6)
+                                border.color: Colors.borderFocus
                                 border.width: 1
                                 implicitHeight: openFilesBlock.implicitHeight + Colors.spacingS * 2
 

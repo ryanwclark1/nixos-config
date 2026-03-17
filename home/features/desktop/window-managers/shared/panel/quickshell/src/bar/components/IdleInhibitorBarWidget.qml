@@ -28,7 +28,7 @@ Item {
         id: inhibitorPill
         anchors.centerIn: parent
         anchorWindow: root.anchorWindow
-        normalColor: root.inhibitorActive ? Colors.withAlpha(Colors.primary, 0.2) : Colors.bgWidget
+        normalColor: root.inhibitorActive ? Colors.primaryTint : Colors.bgWidget
         hoverColor: root.inhibitorActive ? Colors.withAlpha(Colors.primary, 0.35) : Colors.highlightLight
         tooltipText: root.inhibitorActive ? "Idle inhibitor enabled" : "Idle inhibitor"
         contextActions: [

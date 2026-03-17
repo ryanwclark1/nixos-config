@@ -164,7 +164,7 @@ BasePopupMenu {
       implicitWidth: errorChipLabel.implicitWidth + 18
       implicitHeight: 24
       radius: Colors.radiusCard
-      color: Colors.withAlpha(Colors.warning, 0.16)
+      color: Colors.warningLight
 
       Text {
         id: errorChipLabel

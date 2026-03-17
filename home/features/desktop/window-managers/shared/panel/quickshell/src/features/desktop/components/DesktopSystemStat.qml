@@ -16,7 +16,7 @@ Item {
     anchors.margins: -Colors.spacingM
     radius: Colors.radiusLarge
     color: Colors.cardSurface
-    border.color: Colors.withAlpha(Colors.border, 0.4)
+    border.color: Colors.borderMedium
     border.width: 1
 
     gradient: SurfaceGradient {}

@@ -352,7 +352,7 @@ Item {
             Rectangle {
                 Layout.fillWidth: true
                 height: 1
-                color: Colors.withAlpha(Colors.border, 0.6)
+                color: Colors.borderFocus
                 visible: Config.notifRules && Config.notifRules.length > 0
             }
 

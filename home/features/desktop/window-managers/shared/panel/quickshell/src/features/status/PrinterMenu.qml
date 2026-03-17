@@ -28,7 +28,7 @@ BasePopupMenu {
       implicitWidth: jobsChipLabel.implicitWidth + 18
       implicitHeight: 24
       radius: Colors.radiusCard
-      color: Colors.withAlpha(Colors.warning, 0.16)
+      color: Colors.warningLight
 
       Text {
         id: jobsChipLabel
@@ -255,7 +255,7 @@ BasePopupMenu {
                   implicitHeight: 22
                   radius: height / 2
                   color: printerCard.isDisabled ? Colors.withAlpha(Colors.textDisabled, 0.12)
-                       : printerCard.isPrinting ? Colors.withAlpha(Colors.warning, 0.16)
+                       : printerCard.isPrinting ? Colors.warningLight
                        : Colors.withAlpha(Colors.success, 0.14)
 
                   visible: !root.compactMode

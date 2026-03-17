@@ -281,7 +281,7 @@ Item {
                                             height: 36
                                             radius: Colors.radiusPill
                                             color: modelData.c
-                                            border.color: Colors.withAlpha(Colors.text, 0.1)
+                                            border.color: Colors.textThin
                                             border.width: 1
                                         }
 

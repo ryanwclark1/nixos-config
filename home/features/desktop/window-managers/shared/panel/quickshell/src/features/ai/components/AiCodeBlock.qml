@@ -12,7 +12,7 @@ Rectangle {
     height: codeHeader.height + codeEdit.implicitHeight + Colors.spacingS * 2
     radius: Colors.radiusXS
     color: Colors.textFaint
-    border.color: Colors.withAlpha(Colors.text, 0.1)
+    border.color: Colors.textThin
     border.width: 1
 
     function _shellEscape(str) {

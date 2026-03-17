@@ -41,7 +41,7 @@ Rectangle {
                 height: 64
                 radius: Colors.radiusPill
                 color: Colors.primaryGhost
-                border.color: Colors.withAlpha(Colors.primary, 0.2)
+                border.color: Colors.primaryTint
                 border.width: 1
                 Layout.bottomMargin: Colors.spacingS
 
@@ -144,7 +144,7 @@ Rectangle {
             Rectangle {
                 Layout.fillWidth: true
                 height: 1
-                color: Colors.withAlpha(Colors.border, 0.4)
+                color: Colors.borderMedium
             }
 
             RowLayout {

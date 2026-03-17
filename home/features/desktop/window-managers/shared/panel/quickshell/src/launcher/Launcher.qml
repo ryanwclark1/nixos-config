@@ -2531,13 +2531,13 @@ PanelWindow {
                 category: "Capture",
                 name: "Screenshot (Area)",
                 icon: "󰹑",
-                action: () => Quickshell.execDetached(["screenshot.sh", "area", "--satty"])
+                action: () => Quickshell.execDetached(["qs-screenshot", "area", "--satty"])
             },
             {
                 category: "Capture",
                 name: "Screenshot (Display)",
                 icon: "󰍹",
-                action: () => Quickshell.execDetached(["screenshot.sh", "screen", "--satty"])
+                action: () => Quickshell.execDetached(["qs-screenshot", "screen", "--satty"])
             },
             {
                 category: "Capture",
@@ -3516,7 +3516,7 @@ PanelWindow {
             anchors.fill: parent
             anchors.margins: 1
             radius: Math.max(0, hudBox.radius - 1)
-            color: Colors.withAlpha(Colors.surface, 0.96)
+            color: Colors.popupSurface
             border.color: Colors.withAlpha(Colors.border, 0.1)
             border.width: 1
         }

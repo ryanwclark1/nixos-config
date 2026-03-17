@@ -809,7 +809,7 @@ SharedWidgets.CardBase {
                                 Layout.fillWidth: true
                                 color: Colors.cardSurface
                                 radius: Colors.radiusSmall
-                                border.color: Colors.withAlpha(Colors.border, 0.6)
+                                border.color: Colors.borderFocus
                                 border.width: 1
                                 implicitHeight: fragmentBlock.implicitHeight + Colors.spacingS * 2
 
@@ -841,7 +841,7 @@ SharedWidgets.CardBase {
                                 Layout.fillWidth: true
                                 color: Colors.cardSurface
                                 radius: Colors.radiusSmall
-                                border.color: Colors.withAlpha(Colors.border, 0.6)
+                                border.color: Colors.borderFocus
                                 border.width: 1
                                 implicitHeight: logsBlock.implicitHeight + Colors.spacingS * 2
 

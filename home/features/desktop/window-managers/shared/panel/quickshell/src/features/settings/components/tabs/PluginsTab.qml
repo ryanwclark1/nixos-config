@@ -194,7 +194,7 @@ Item {
     function severityBgColor(severity) {
         var base = severityColor(severity);
         if (String(severity || "") === "muted")
-            return Colors.withAlpha(Colors.text, 0.08);
+            return Colors.textWash;
         return Colors.withAlpha(base, 0.16);
     }
 
@@ -390,7 +390,7 @@ Item {
                     implicitWidth: degradedCount.implicitWidth + 12
                     height: 20
                     radius: Colors.radiusSmall
-                    color: Colors.withAlpha(Colors.warning, 0.16)
+                    color: Colors.warningLight
                     Text {
                         id: degradedCount
                         anchors.centerIn: parent
@@ -520,7 +520,7 @@ Item {
                                 implicitWidth: verLabel.implicitWidth + 10
                                 height: 18
                                 radius: height / 2
-                                color: Colors.withAlpha(Colors.text, 0.08)
+                                color: Colors.textWash
                                 Text {
                                     id: verLabel
                                     anchors.centerIn: parent

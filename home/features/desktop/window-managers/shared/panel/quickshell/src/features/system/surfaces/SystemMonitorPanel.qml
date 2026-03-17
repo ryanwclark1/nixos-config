@@ -136,7 +136,7 @@ PanelWindow {
         id: slidePanel
         width: root.panelWidth
         height: parent.height
-        color: Colors.withAlpha(Colors.surface, 0.96)
+        color: Colors.popupSurface
         border.color: Colors.border
         border.width: 1
         radius: Colors.radiusLarge

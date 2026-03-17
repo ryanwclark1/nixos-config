@@ -72,7 +72,7 @@ BasePopupMenu {
             id: mainStatusCard
             Layout.fillWidth: true
             radius: Colors.radiusLarge
-            color: Colors.withAlpha(Colors.surface, 0.96)
+            color: Colors.popupSurface
             border.color: Colors.withAlpha(root.statusColor(NetworkService.vpnPrimaryStatus), 0.45)
             border.width: 1
             implicitHeight: mainStatusLayout.implicitHeight + (Colors.spacingM * 2)

@@ -16,7 +16,7 @@ Rectangle {
     height: 48
     radius: Colors.radiusLarge
     color: Qt.rgba(0.2, 0.19, 0.2, 0.95)
-    border.color: input.activeFocus ? accentColor : Colors.withAlpha(Colors.border, 0.6)
+    border.color: input.activeFocus ? accentColor : Colors.borderFocus
     border.width: 1
 
     Rectangle {

@@ -37,7 +37,7 @@ Rectangle {
     width: 180
     height: menuPadding * 2 + contentColumn.implicitHeight
     radius: Colors.radiusMedium
-    color: Colors.withAlpha(Colors.surface, 0.96)
+    color: Colors.popupSurface
     border.color: Colors.border
     border.width: 1
     visible: root.showMenu

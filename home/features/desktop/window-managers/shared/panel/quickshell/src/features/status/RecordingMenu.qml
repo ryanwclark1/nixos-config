@@ -19,7 +19,7 @@ BasePopupMenu {
     Layout.fillWidth: true
     implicitHeight: 50
     radius: Colors.radiusMedium
-    color: RecordingService.isRecording ? Colors.withAlpha(Colors.error, 0.15) : Colors.cardSurface
+    color: RecordingService.isRecording ? Colors.errorLight : Colors.cardSurface
     Behavior on color { ColorAnimation { duration: Colors.durationFast } }
     border.color: RecordingService.isRecording ? Colors.error : Colors.border
     Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
