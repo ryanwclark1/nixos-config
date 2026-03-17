@@ -1,0 +1,3 @@
+NotificationCenter 1.0 ../../notifications/NotificationCenter.qml
+NotificationManager 1.0 ../../notifications/NotificationManager.qml
+Notifications 1.0 ../../notifications/Notifications.qml

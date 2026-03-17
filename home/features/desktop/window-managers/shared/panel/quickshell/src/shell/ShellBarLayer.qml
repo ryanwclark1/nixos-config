@@ -1,7 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
-import "../bar"
+import "../features/bar"
 import "../features/audio"
 import "../features/clipboard"
 import "../features/media"

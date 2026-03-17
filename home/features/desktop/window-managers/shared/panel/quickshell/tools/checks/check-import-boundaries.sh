@@ -16,6 +16,7 @@ fail = 0
 allowed_feature_imports = {
     '../bar',
     '../features/ai',
+    '../features/bar',
     '../features/color-picker',
     '../features/control-center',
     '../features/display',

@@ -2,8 +2,8 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import "../bar"
 import "../features/ai"
+import "../features/bar"
 import "../features/color-picker"
 import "../features/control-center"
 import "../features/display"
@@ -11,11 +11,11 @@ import "../features/lock"
 import "../launcher"
 import "../features/media"
 import "../features/osd"
+import "../features/notifications"
 import "../features/power"
 import "../features/system/surfaces"
 import "../features/settings"
 import "../features/workspace"
-import "../notifications"
 import "../services"
 import "../shell"
 

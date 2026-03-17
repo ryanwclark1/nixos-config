@@ -2,4 +2,6 @@ BarContextPopup 1.0 components/BarContextPopup.qml
 BarPill 1.0 components/BarPill.qml
 BarTooltip 1.0 components/BarTooltip.qml
 BarWidgetRegistry 1.0 registry/BarWidgetRegistry.qml
+Panel 1.0 ../../bar/Panel.qml
+StatPill 1.0 ../../bar/StatPill.qml
 TrayWidget 1.0 components/TrayWidget.qml
