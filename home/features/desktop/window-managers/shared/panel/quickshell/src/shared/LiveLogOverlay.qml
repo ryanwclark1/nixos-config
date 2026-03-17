@@ -2,8 +2,8 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
+import "."
 import "../services"
-import "." as SharedWidgets
 
 Rectangle {
     id: root
@@ -39,7 +39,7 @@ Rectangle {
                 font.weight: Font.Bold
             }
             Item { Layout.fillWidth: true }
-            SharedWidgets.IconButton {
+            IconButton {
                 icon: "󰅖"
                 size: 28; iconSize: 16
                 onClicked: root.closeRequested()

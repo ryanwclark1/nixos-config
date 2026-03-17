@@ -1,4 +1,5 @@
 import QtQuick
+import "."
 import "../services"
 
 // Material-style toggle switch.

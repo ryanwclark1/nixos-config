@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import "."
 import "../services"
 
 // ScrollableContent — reusable scrollable wrapper for popup menus.
