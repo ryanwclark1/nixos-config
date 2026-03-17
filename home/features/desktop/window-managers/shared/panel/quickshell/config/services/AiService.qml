@@ -569,14 +569,18 @@ QtObject {
         // System prompt
         var systemPrompt = Config.aiSystemPrompt;
         if (!systemPrompt) {
-            systemPrompt = "You are a helpful Linux desktop assistant for Quickshell. " +
-                "You can suggest system actions by using the following format: [COMMAND: Label | command args]. " +
-                "For example: [COMMAND: Lock Screen | os-lock-screen]. " +
-                "You can also propose shell scripts to be installed to ~/.local/bin using: [SCRIPT: filename | script_content]. " +
-                "For example: [SCRIPT: prune-docker | #!/bin/bash\ndocker container prune -f]. " +
-                "To rename a workspace, use: [RENAME_WORKSPACE: workspace_id | new_name]. " +
-                "Only suggest commands or scripts when explicitly requested or highly relevant. " +
-                "The user must confirm the action before it is executed.";
+            systemPrompt = "You are a senior Linux desktop assistant for Quickshell on NixOS. " +
+                "Your goal is to help the user manage their system, troubleshoot issues, and automate tasks. " +
+                "\n\nCapabilities:\n" +
+                "1. Suggest system actions: [COMMAND: Label | command args]. Example: [COMMAND: Update System | make update].\n" +
+                "2. Propose scripts to ~/.local/bin: [SCRIPT: filename | content]. Ensure scripts have a proper shebang.\n" +
+                "3. Rename workspaces: [RENAME_WORKSPACE: id | name].\n" +
+                "\n\nGuidelines:\n" +
+                "- Be concise and technical. Prefer shell commands over long explanations.\n" +
+                "- When suggesting fixes, consider that this is a NixOS system (declarative config in ~/nixos-config).\n" +
+                "- Use markdown for formatting. Use code blocks for all code or command output.\n" +
+                "- If the user provides visual context or window titles, use them to provide more relevant help.\n" +
+                "- You can see system stats like CPU/RAM usage when provided in context.";
         }
         var contextInfo = "";
         if (Config.aiSystemContext) {
@@ -645,19 +649,20 @@ QtObject {
         var conv = activeConversation;
         if (!conv || conv.messages.length === 0) return;
 
-        // Find the last user message
+        // Find the last user message and remove subsequent messages
         var lastUserMsg = "";
         var newMsgs = conv.messages.slice();
 
-        // Remove trailing assistant message (if it was an error/incomplete)
-        if (newMsgs.length > 0 && newMsgs[newMsgs.length - 1].role === "assistant") {
-            newMsgs.pop();
-        }
-
-        // Get the user message to retry
-        if (newMsgs.length > 0 && newMsgs[newMsgs.length - 1].role === "user") {
-            lastUserMsg = newMsgs[newMsgs.length - 1].content;
-            newMsgs.pop(); // Remove it; sendMessage will re-add it
+        // Pop until we find a user message
+        while (newMsgs.length > 0) {
+            var last = newMsgs[newMsgs.length - 1];
+            if (last.role === "user") {
+                lastUserMsg = last.content;
+                newMsgs.pop();
+                break;
+            } else {
+                newMsgs.pop();
+            }
         }
 
         if (!lastUserMsg) return;

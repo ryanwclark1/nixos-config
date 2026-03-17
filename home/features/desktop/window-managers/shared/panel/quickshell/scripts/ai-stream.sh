@@ -44,7 +44,7 @@ case "$PROVIDER" in
             --argjson temperature "$TEMPERATURE" \
             '{model: $model, messages: $messages, stream: true, options: {num_predict: $max_tokens, temperature: $temperature}}')
 
-        curl -s --no-buffer -X POST "$URL" \
+        curl -s --connect-timeout 5 --no-buffer -X POST "$URL" \
             -H "Content-Type: application/json" \
             -d "$BODY" 2>/dev/null | while IFS= read -r line || [[ -n "$line" ]]; do
             line="${line%$'\r'}"
@@ -96,7 +96,7 @@ case "$PROVIDER" in
                 {model: $model, messages: $messages, max_tokens: $max_tokens, temperature: $temperature, stream: true}
             end')
 
-        curl -s --no-buffer -X POST "$URL" \
+        curl -s --connect-timeout 5 --no-buffer -X POST "$URL" \
             -H "Content-Type: application/json" \
             -H "x-api-key: $API_KEY" \
             -H "anthropic-version: 2023-06-01" \
@@ -151,7 +151,7 @@ case "$PROVIDER" in
             --argjson temperature "$TEMPERATURE" \
             '{model: $model, messages: $messages, max_completion_tokens: $max_tokens, temperature: $temperature, stream: true, stream_options: {include_usage: true}}')
 
-        curl -s --no-buffer -X POST "$URL" \
+        curl -s --connect-timeout 5 --no-buffer -X POST "$URL" \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $API_KEY" \
             -d "$BODY" 2>/dev/null | while IFS= read -r line || [[ -n "$line" ]]; do
@@ -200,7 +200,7 @@ case "$PROVIDER" in
                 {contents: $contents, generationConfig: {maxOutputTokens: $max_tokens, temperature: $temperature}}
             end')
 
-        curl -s --no-buffer -X POST "$URL" \
+        curl -s --connect-timeout 5 --no-buffer -X POST "$URL" \
             -H "Content-Type: application/json" \
             -d "$BODY" 2>/dev/null | while IFS= read -r line || [[ -n "$line" ]]; do
             line="${line%$'\r'}"

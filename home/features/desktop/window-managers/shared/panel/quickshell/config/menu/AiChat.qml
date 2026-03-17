@@ -1004,54 +1004,54 @@ PanelWindow {
                             width: messageColumn.width - Colors.spacingM * 2
                             visible: AiService.isStreaming
                             spacing: Colors.spacingXS
+                            readonly property var streamingBlocks: root._renderBlocks(AiService.streamingContent)
 
+                            // Empty state while waiting for first tokens
                             Rectangle {
-                                id: streamingBubble
-                                width: Math.min(parent.width * 0.85, streamingText.implicitWidth + Colors.spacingL * 2 + 20)
-                                height: streamingText.implicitHeight + Colors.spacingM * 2
+                                visible: AiService.isStreaming && AiService.streamingContent.length === 0
+                                width: 140
+                                height: 38
                                 radius: Colors.radiusMedium
                                 color: Colors.bgGlass
                                 border.color: Colors.border
                                 border.width: 1
 
-                                TextEdit {
-                                    id: streamingText
+                                RowLayout {
                                     anchors.fill: parent
                                     anchors.margins: Colors.spacingM
-                                    anchors.rightMargin: Colors.spacingM + 16
-                                    text: AiService.streamingContent.length > 0 ? root._renderMarkdown(AiService.streamingContent) : '<span style="color: ' + Colors.textDisabled + ';">Thinking...</span>'
-                                    textFormat: TextEdit.RichText
-                                    color: Colors.text
-                                    font.pixelSize: Colors.fontSizeMedium
-                                    wrapMode: TextEdit.WrapAtWordBoundaryOrAnywhere
-                                    readOnly: true
-                                    selectByMouse: true
-                                }
-
-                                // Blinking cursor
-                                Rectangle {
-                                    width: 2
-                                    height: 16
-                                    radius: 1
-                                    color: Colors.primary
-                                    anchors.bottom: parent.bottom
-                                    anchors.right: parent.right
-                                    anchors.bottomMargin: Colors.spacingM
-                                    anchors.rightMargin: Colors.spacingS
-                                    opacity: cursorBlink.running ? (cursorBlink.cursorVisible ? 1 : 0) : 0
-                                    Behavior on opacity {
-                                        NumberAnimation {
-                                            duration: Colors.durationFast
+                                    spacing: Colors.spacingS
+                                    Text {
+                                        text: "󰚩"
+                                        color: Colors.primary
+                                        font.family: Colors.fontMono
+                                        font.pixelSize: Colors.fontSizeLarge
+                                        OpacityAnimator on opacity {
+                                            from: 0.3; to: 1.0; duration: 800; running: AiService.isStreaming && AiService.streamingContent.length === 0; loops: Animation.Infinite
                                         }
                                     }
+                                    Text {
+                                        text: "Thinking..."
+                                        color: Colors.textDisabled
+                                        font.pixelSize: Colors.fontSizeSmall
+                                        font.italic: true
+                                    }
+                                }
+                            }
 
-                                    Timer {
-                                        id: cursorBlink
-                                        interval: 530
-                                        repeat: true
-                                        running: AiService.isStreaming
-                                        property bool cursorVisible: true
-                                        onTriggered: cursorVisible = !cursorVisible
+                            Repeater {
+                                model: parent.streamingBlocks
+
+                                delegate: Loader {
+                                    id: streamBlockLoader
+                                    required property var modelData
+                                    required property int index
+                                    width: parent.width
+                                    sourceComponent: {
+                                        if (modelData.type === "code")
+                                            return codeBlockComponent;
+                                        if (modelData.type === "thinking")
+                                            return thinkingBlockComponent;
+                                        return streamTextBlockComponent;
                                     }
                                 }
                             }
@@ -1780,11 +1780,66 @@ PanelWindow {
     }
 
     Component {
+        id: streamTextBlockComponent
+        Rectangle {
+            id: streamTextBlock
+            property var blockData: parent ? parent.modelData : null
+            width: parent ? parent.width : 0
+            height: streamTextBlockEdit.implicitHeight + Colors.spacingM * 2
+            radius: Colors.radiusMedium
+            color: Colors.bgGlass
+            border.color: Colors.border
+            border.width: 1
+
+            TextEdit {
+                id: streamTextBlockEdit
+                anchors.fill: parent
+                anchors.margins: Colors.spacingM
+                anchors.rightMargin: Colors.spacingM + 12
+                text: blockData ? blockData.html : ""
+                textFormat: TextEdit.RichText
+                color: Colors.text
+                font.pixelSize: Colors.fontSizeMedium
+                wrapMode: TextEdit.WrapAtWordBoundaryOrAnywhere
+                readOnly: true
+                selectByMouse: true
+            }
+
+            // Blinking cursor
+            Rectangle {
+                width: 2
+                height: 16
+                radius: 1
+                color: Colors.primary
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                anchors.bottomMargin: Colors.spacingM
+                anchors.rightMargin: Colors.spacingS
+                opacity: (index === (parent ? parent.parent.model.length - 1 : 0)) && cursorBlink.running ? (cursorBlink.cursorVisible ? 1 : 0) : 0
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Colors.durationFast
+                    }
+                }
+
+                Timer {
+                    id: cursorBlink
+                    interval: 530
+                    repeat: true
+                    running: AiService.isStreaming
+                    property bool cursorVisible: true
+                    onTriggered: cursorVisible = !cursorVisible
+                }
+            }
+        }
+    }
+
+    Component {
         id: thinkingBlockComponent
         Rectangle {
             id: thinkingBlock
             property var blockData: parent ? parent.modelData : null
-            property bool expanded: false
+            property bool expanded: AiService.isStreaming // Expanded by default while streaming
             width: parent ? parent.width : 0
             height: thinkingHeader.height + (expanded ? thinkingContent.implicitHeight + Colors.spacingS : 0)
             radius: Colors.radiusXS

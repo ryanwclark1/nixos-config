@@ -19,11 +19,11 @@ function defaultModels(provider) {
         case "ollama":
             return []; // dynamic — populated by refreshModels()
         case "anthropic":
-            return ["claude-sonnet-4-5-20250929", "claude-haiku-4-5-20251001", "claude-opus-4-0-20250514"];
+            return ["claude-3-7-sonnet-20250219", "claude-3-5-haiku-20241022", "claude-3-opus-20240229"];
         case "openai":
-            return ["gpt-4o", "gpt-4o-mini", "o3-mini"];
+            return ["gpt-4o", "gpt-4o-mini", "o1", "o3-mini"];
         case "gemini":
-            return ["gemini-2.5-flash", "gemini-2.5-pro"];
+            return ["gemini-2.0-flash", "gemini-2.0-pro-exp-02-05", "gemini-1.5-pro"];
         case "custom":
             return []; // user enters manually
         default:

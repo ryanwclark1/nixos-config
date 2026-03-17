@@ -3994,8 +3994,7 @@ PanelWindow {
                                 launcher: launcherRoot
                                 showCategoryFiltersSection: false
                                 visible: launcherRoot.showLauncherHome && launcherRoot.mode !== "orchestrator" && !launcherRoot.isModeLoading
-                                height: visible ? implicitHeight : 0
-                                Layout.bottomMargin: visible ? Colors.spacingM : 0
+                                height: visible ? (implicitHeight + Colors.spacingM) : 0
                             }
                             
                             section.property: "sectionLabel"
