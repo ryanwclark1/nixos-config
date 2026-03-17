@@ -12,9 +12,11 @@ SharedWidgets.CardBase {
 
   SharedWidgets.Ref { service: SystemStatus }
 
+  readonly property int _vramPollMs: 5000
+
   CommandPoll {
     id: vramPoll
-    interval: 5000
+    interval: root._vramPollMs
     running: root.visible
     command: ["sh", "-c",
       "gpu_card=$(for c in /sys/class/drm/card[0-9]*/device/mem_info_vram_total; do "

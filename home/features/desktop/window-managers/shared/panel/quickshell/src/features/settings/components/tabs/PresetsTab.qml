@@ -15,9 +15,11 @@ Item {
     property string _presetDesc: ""
     property string _pendingDeleteName: ""
 
+    readonly property int _confirmTimeoutMs: 3000
+
     Timer {
         id: deleteConfirmTimer
-        interval: 3000
+        interval: root._confirmTimeoutMs
         onTriggered: root._pendingDeleteName = ""
     }
 

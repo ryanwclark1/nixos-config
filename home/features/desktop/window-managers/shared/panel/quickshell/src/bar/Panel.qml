@@ -170,17 +170,14 @@ Item {
         return !!(root.activeSurfaceContext && root.activeSurfaceContext[extraKey] === extraValue);
     }
 
-    function compactPercentText(value) { return PanelHelpers.compactPercentText(value); }
     function statDisplayText(widgetType, wi) { return PanelHelpers.statDisplayText(widgetType, wi, SystemStatus); }
     function compactStatDisplayText(widgetType, wi) { return PanelHelpers.compactStatDisplayText(widgetType, wi, SystemStatus); }
     function statTooltipText(widgetType, wi) { return PanelHelpers.statTooltipText(widgetType, wi, SystemStatus); }
     function isCompactStatWidget(wi) { return PanelHelpers.isCompactStatWidget(wi, root.vertical); }
     function isIconOnlyStatWidget(wi) { return PanelHelpers.isIconOnlyStatWidget(wi); }
     function isSummaryWidgetIconOnly(wi) { return PanelHelpers.isSummaryWidgetIconOnly(wi, root.vertical); }
-    function isSummaryWidgetFull(wi) { return PanelHelpers.isSummaryWidgetFull(wi, root.vertical); }
     function widgetIntegerSetting(wi, key, fallback, minValue, maxValue) { return PanelHelpers.widgetIntegerSetting(wi, key, fallback, minValue, maxValue); }
     function widgetBooleanSetting(wi, key, fallback) { return PanelHelpers.widgetBooleanSetting(wi, key, fallback); }
-    function widgetStringSetting(wi, key, fallback, allowedValues) { return PanelHelpers.widgetStringSetting(wi, key, fallback, allowedValues); }
     function triggerWidgetIconOnly(wi) { return PanelHelpers.triggerWidgetIconOnly(wi); }
     function triggerWidgetLabel(wi, fallback) { return PanelHelpers.triggerWidgetLabel(wi, fallback); }
 

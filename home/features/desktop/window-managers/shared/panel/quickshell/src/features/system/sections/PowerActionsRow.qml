@@ -21,9 +21,11 @@ RowLayout {
   Behavior on scale { SequentialAnimation { PauseAnimation { duration: showContent ? (root.baseIndex * root.staggerDelay) : 0 } NumberAnimation { duration: Colors.durationNormal + (root.baseIndex * 20); easing.type: Easing.OutBack } } }
   Behavior on transform { SequentialAnimation { PauseAnimation { duration: showContent ? (root.baseIndex * root.staggerDelay) : 0 } NumberAnimation { duration: Colors.durationNormal + (root.baseIndex * 20); easing.type: Easing.OutCubic } } }
 
+  readonly property int _confirmTimeoutMs: 3000
+
   Timer {
     id: powerConfirmTimer
-    interval: 3000
+    interval: root._confirmTimeoutMs
     onTriggered: root.pendingPowerIndex = -1
   }
 

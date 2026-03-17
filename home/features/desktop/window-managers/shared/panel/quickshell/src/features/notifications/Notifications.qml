@@ -4,7 +4,6 @@ import Quickshell
 import Quickshell.Services.Notifications
 import Quickshell.Widgets
 import "../../services"
-import "../../widgets" as SharedWidgets
 
 PanelWindow {
   id: root

@@ -364,9 +364,6 @@ QtObject {
         root.postWriteRefreshTimer.restart();
     }
 
-    // ── Backward compat (no-ops since PipeWire is reactive) ──
-    function refreshDevices() { /* no-op: PipeWire is reactive */ }
-
     onSubscriberCountChanged: {
         if (subscriberCount > 0)
             refreshVolumes();

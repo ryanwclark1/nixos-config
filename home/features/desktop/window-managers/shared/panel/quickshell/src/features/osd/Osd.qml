@@ -10,6 +10,7 @@ import "../../services"
 
 Scope {
   id: root
+  readonly property int _startupSuppressMs: 2000
 
   PwObjectTracker {
     objects: [ Pipewire.defaultAudioSink, Pipewire.defaultAudioSource ]
@@ -214,7 +215,7 @@ Scope {
   // Startup suppression: 2s gate to prevent spurious OSD on shell init
   Timer {
     id: startupTimer
-    interval: 2000
+    interval: root._startupSuppressMs
     running: true
     onTriggered: {
       root.suppressPipewireOsd = false;

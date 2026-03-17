@@ -154,13 +154,6 @@ PanelWindow {
         deferredOpenTimer.restart();
       });
     }
-    function openIndex(index: int) {
-      Qt.callLater(() => {
-        settingsRoot.pendingTabId = SettingsRegistry.tabIdForIndex(index) || "";
-        settingsRoot.setCaptureScrollY(0);
-        deferredOpenTimer.restart();
-      });
-    }
     function close() {
       Qt.callLater(() => settingsRoot.close());
     }

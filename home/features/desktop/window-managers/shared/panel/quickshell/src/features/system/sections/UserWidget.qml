@@ -29,9 +29,11 @@ Rectangle {
     }
   }
 
+  readonly property int _uptimePollMs: 60000  // 1 min
+
   CommandPoll {
     id: uptimePoll
-    interval: 60000
+    interval: root._uptimePollMs
     running: root.visible
     command: ["sh", "-c", "uptime -p | sed 's/up //;s/ hours/h/;s/ minutes/m/;s/ hour/h/;s/ minute/m/'"]
     parse: function(out) { return String(out || "").trim() || "just started" }

@@ -13,9 +13,12 @@ Item {
     implicitWidth: inhibitorPill.width
     implicitHeight: inhibitorPill.height
 
+    readonly property int _inhibitorPollMs: 5000
+    readonly property int _inhibitorRecheckMs: 500
+
     CommandPoll {
         id: inhibitorPoll
-        interval: 5000
+        interval: root._inhibitorPollMs
         running: root.visible
         command: ["sh", "-c", "[ -f /tmp/wayland_idle_inhibitor.pid ] && echo true || echo false"]
         parse: function (out) {
@@ -36,14 +39,14 @@ Item {
                 label: root.inhibitorActive ? "Disable Inhibitor" : "Enable Inhibitor",
                 icon: "󰒲",
                 action: () => {
-                    Quickshell.execDetached(["qs-inhibitor"]);
+                    Quickshell.execDetached(DependencyService.resolveCommand("qs-inhibitor"));
                     inhibitorCheckTimer.restart();
                 }
             }
         ]
         onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
         onClicked: {
-            Quickshell.execDetached(["qs-inhibitor"]);
+            Quickshell.execDetached(DependencyService.resolveCommand("qs-inhibitor"));
             inhibitorCheckTimer.restart();
         }
 
@@ -56,7 +59,7 @@ Item {
 
         Timer {
             id: inhibitorCheckTimer
-            interval: 500
+            interval: root._inhibitorRecheckMs
             running: false
             repeat: false
             onTriggered: inhibitorPoll.triggerPoll()

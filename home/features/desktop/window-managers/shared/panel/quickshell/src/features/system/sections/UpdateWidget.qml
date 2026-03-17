@@ -35,9 +35,11 @@ SharedWidgets.CardBase {
     return seconds.toFixed(1) + "s";
   }
 
+  readonly property int _updateCachePollMs: 3600000  // 1 hour
+
   CommandPoll {
     id: cachePoll
-    interval: 3600000
+    interval: root._updateCachePollMs
     running: true
     command: ["sh", "-c",
       "nix=$(cat '" + root.cacheDir + "/nixos' 2>/dev/null || echo __missing__); "
@@ -72,7 +74,7 @@ SharedWidgets.CardBase {
 
   Process {
     id: refreshProc
-    command: ["qs-updator"]
+    command: DependencyService.resolveCommand("qs-updator")
     onStarted: {
       root.isChecking = true;
       root.lastRunFailed = false;

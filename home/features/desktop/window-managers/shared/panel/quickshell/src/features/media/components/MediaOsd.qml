@@ -8,6 +8,7 @@ import "../../../widgets"
 Scope {
   id: root
   Ref { service: MediaService }
+  readonly property int _startupSuppressMs: 2000
   property bool shouldShowOsd: false
   property bool initialized: false
 
@@ -20,7 +21,7 @@ Scope {
   // Startup suppression — don't show OSD for 2 seconds after shell starts
   Timer {
     id: startupGuard
-    interval: 2000
+    interval: root._startupSuppressMs
     running: true
     onTriggered: root.initialized = true
   }

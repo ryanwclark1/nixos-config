@@ -9,9 +9,11 @@ SharedWidgets.CardBase {
 
   property var drives: []
 
+  readonly property int _diskPollMs: 30000  // 30 sec
+
   CommandPoll {
     id: diskPoll
-    interval: 30000
+    interval: root._diskPollMs
     running: root.visible
     command: ["sh", "-c", "df -h / /home 2>/dev/null | tail -n +2 | awk '{print $6 \":\" $5 \":\" $3 \":\" $2}' | sort -u"]
     parse: function(out) {
