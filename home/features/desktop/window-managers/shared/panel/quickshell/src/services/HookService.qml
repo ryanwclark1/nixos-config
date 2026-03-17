@@ -96,7 +96,7 @@ QtObject {
         onExited: (exitCode, exitStatus) => {
             // Fire-and-forget; log errors in debug
             if (exitCode !== 0)
-                console.log("HookService: hook exited with code " + exitCode);
+                console.warn("HookService: hook exited with code " + exitCode);
         }
     }
 

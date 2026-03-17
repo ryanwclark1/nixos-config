@@ -119,8 +119,6 @@ Item {
             return;
 
         if (state === "ok" || state === "inactive" || state === "pending") {
-            if (previous !== "" && previous !== "ok" && previous !== "inactive" && previous !== "pending")
-                console.log("[Panel] widget state recovered:", widgetId, "state=" + state);
             _widgetDiagnosticStates[widgetId] = state;
             return;
         }
