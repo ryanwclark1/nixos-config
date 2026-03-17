@@ -16,7 +16,7 @@ Rectangle {
     signal searchChanged(string query)
 
     visible: pickerOpen
-    color: Qt.rgba(0, 0, 0, 0.45)
+    color: Colors.overlayScrim
 
     MouseArea {
         anchors.fill: parent

@@ -735,7 +735,7 @@ Item {
     Rectangle {
         anchors.fill: parent
         visible: root.widgetPickerOpen
-        color: Qt.rgba(0, 0, 0, 0.45)
+        color: Colors.overlayScrim
         z: 20
 
         MouseArea {
@@ -893,7 +893,7 @@ Item {
     Rectangle {
         anchors.fill: parent
         visible: root.widgetSettingsOpen
-        color: Qt.rgba(0, 0, 0, 0.45)
+        color: Colors.overlayScrim
         z: 21
 
         MouseArea {
