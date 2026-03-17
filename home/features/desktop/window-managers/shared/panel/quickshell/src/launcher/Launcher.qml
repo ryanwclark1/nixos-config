@@ -853,7 +853,7 @@ PanelWindow {
 
         var proc = commandCheckProcComponent.createObject(launcherRoot);
         proc._commandName = cmd;
-        proc.command = ["bash", "-c", "command -v " + shellQuote(cmd) + " >/dev/null 2>&1 && echo 1 || echo 0"];
+        proc.command = ["bash", "-c", "command -v " + ModeData.shellQuote(cmd) + " >/dev/null 2>&1 && echo 1 || echo 0"];
         var nextProcMap = Object.assign({}, _commandCheckProcs);
         nextProcMap[cmd] = proc;
         _commandCheckProcs = nextProcMap;
@@ -980,10 +980,6 @@ PanelWindow {
         _sessionWebProviderKey = key;
         if (Config.launcherRememberWebProvider && Config.launcherWebLastProviderKey !== key)
             Config.launcherWebLastProviderKey = key;
-    }
-
-    function shellQuote(text) {
-        return ModeData.shellQuote(text);
     }
 
     function telemetryStart() {
@@ -1132,7 +1128,7 @@ PanelWindow {
         fileIndexReady = false;
         if (mode === "files" && fileIndexItems.length === 0)
             beginModeLoad("files", "Building file index");
-        var script = "cd " + shellQuote(homeDir) + " && fd --hidden --exclude .git --exclude .cache --exclude node_modules --exclude .local/share/Trash --exclude .local/share/Steam --exclude .cargo --exclude .npm --exclude .mozilla . 2>/dev/null";
+        var script = "cd " + ModeData.shellQuote(homeDir) + " && fd --hidden --exclude .git --exclude .cache --exclude node_modules --exclude .local/share/Trash --exclude .local/share/Steam --exclude .cargo --exclude .npm --exclude .mozilla . 2>/dev/null";
         fileIndexProc._startedAt = Date.now();
         fileIndexProc.command = ["bash", "-lc", script];
         fileIndexProc.running = true;
@@ -2330,7 +2326,7 @@ PanelWindow {
                 return;
             }
 
-            var script = "find " + shellQuote(homeDir) + " -mindepth 1 -maxdepth 6 -iname '*" + searchQuery.replace(/'/g, "'\\''") + "*' 2>/dev/null | head -n " + maxResults;
+            var script = "find " + ModeData.shellQuote(homeDir) + " -mindepth 1 -maxdepth 6 -iname '*" + searchQuery.replace(/'/g, "'\\''") + "*' 2>/dev/null | head -n " + maxResults;
             runCommand(["bash", "-lc", script], function (raw) {
                 if (!isRequestCurrent("files", token))
                     return;
@@ -2906,7 +2902,7 @@ PanelWindow {
     }
 
     function copyToClipboard(text) {
-        Quickshell.execDetached(["bash", "-lc", "printf %s " + shellQuote(text) + " | wl-copy"]);
+        Quickshell.execDetached(["bash", "-lc", "printf %s " + ModeData.shellQuote(text) + " | wl-copy"]);
     }
 
     function launchInTerminal(cmd) {
@@ -3256,14 +3252,14 @@ PanelWindow {
             close();
         } else if (mode === "dmenu") {
             var fifoPath = "/tmp/qs-dmenu-result";
-            Quickshell.execDetached(["bash", "-c", "echo " + shellQuote(item.name) + " > " + shellQuote(fifoPath)]);
+            Quickshell.execDetached(["bash", "-c", "echo " + ModeData.shellQuote(item.name) + " > " + ModeData.shellQuote(fifoPath)]);
             close();
         } else if (mode === "emoji" || mode === "calc") {
             copyToClipboard(item.name);
             close();
         } else if (mode === "clip") {
             if (item.id) {
-                Quickshell.execDetached(["bash", "-lc", "cliphist decode " + shellQuote(item.id) + " | wl-copy"]);
+                Quickshell.execDetached(["bash", "-lc", "cliphist decode " + ModeData.shellQuote(item.id) + " | wl-copy"]);
                 close();
             }
         } else if (mode === "web" || mode === "bookmarks") {

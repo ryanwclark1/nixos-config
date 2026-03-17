@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import "../../../services"
+import "../../../services/ShellUtils.js" as ShellUtils
 import "../../../widgets" as SharedWidgets
 import ".."
 
@@ -34,11 +35,6 @@ Item {
             return;
         }
         Qt.callLater(loadPluginPane);
-    }
-
-    function shellQuote(value) {
-        var text = String(value || "");
-        return "'" + text.replace(/'/g, "'\"'\"'") + "'";
     }
 
     function diagnosticsTimestamp() {
@@ -180,7 +176,7 @@ Item {
         _pluginDiagnosticsSavePath = root.pluginDiagnosticsOutputPath();
         if (pluginDiagnosticsSaveProc.running)
             return;
-        pluginDiagnosticsSaveProc.command = ["sh", "-c", "mkdir -p " + shellQuote(root.diagnosticsOutputDir()) + " && cat > " + shellQuote(_pluginDiagnosticsSavePath)];
+        pluginDiagnosticsSaveProc.command = ["sh", "-c", "mkdir -p " + ShellUtils.shellQuote(root.diagnosticsOutputDir()) + " && cat > " + ShellUtils.shellQuote(_pluginDiagnosticsSavePath)];
         pluginDiagnosticsSaveProc.running = true;
     }
 

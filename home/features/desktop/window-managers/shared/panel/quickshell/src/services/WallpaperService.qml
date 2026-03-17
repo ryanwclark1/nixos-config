@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import "."
+import "ShellUtils.js" as ShellUtils
 
 // WallpaperService — per-monitor wallpaper management with swww/hyprpaper support.
 // Scans multiple well-known wallpaper directories and exposes the list of available
@@ -269,7 +270,7 @@ QtObject {
 
         if (Config.wallpaperRunPywal && !Config.themeName) {
           Quickshell.execDetached(["sh", "-c",
-            "wal -i " + root._shellQuote(root._applyImagePath) + " -n -q 2>/dev/null || true"
+            "wal -i " + ShellUtils.shellQuote(root._applyImagePath) + " -n -q 2>/dev/null || true"
           ]);
         }
         var backendLine = "";
@@ -280,7 +281,6 @@ QtObject {
             break;
           }
         }
-        console.debug("WallpaperService: applied wallpaper via", backendLine || "unknown", "monitor", key, "path", root._applyImagePath);
       } else {
         var err = (root._applyStderr || "").trim();
         if (!err.length) err = "All wallpaper backends failed";
@@ -335,7 +335,6 @@ QtObject {
         solidMap[key] = root._colorHex;
       root._persistSolidMap(solidMap);
       root.solidColorHex = root._colorHex;
-      console.debug("WallpaperService: applied solid color", root._colorHex, "monitor", root._colorMonitorName || "__all__");
       if (root._colorNotify)
         ToastService.showSuccess("Solid color applied", "#" + root._colorHex.slice(0, 6));
       if (root._queuedSolidApplies.length > 0) {
@@ -399,16 +398,11 @@ QtObject {
     return fallback;
   }
 
-  // Minimal single-quote escaping for POSIX shell: replace ' with '\''
-  function _shellQuote(s) {
-    return "'" + s.replace(/'/g, "'\\''") + "'";
-  }
-
   function _buildSetterScript(imagePath, monitorName) {
-    var quoted = _shellQuote(imagePath);
-    var outputFlag = monitorName ? ("--outputs " + _shellQuote(monitorName) + " ") : "";
+    var quoted = ShellUtils.shellQuote(imagePath);
+    var outputFlag = monitorName ? ("--outputs " + ShellUtils.shellQuote(monitorName) + " ") : "";
     var hyprTarget = monitorName ? (monitorName + ",") : ",";
-    var compositorWallpaperArg = _shellQuote(hyprTarget + imagePath);
+    var compositorWallpaperArg = ShellUtils.shellQuote(hyprTarget + imagePath);
 
     return "set -u; ok=0; "
          + "if command -v swww >/dev/null 2>&1; then "
@@ -430,13 +424,13 @@ QtObject {
   }
 
   function _buildSolidColorScript(colorHex, monitorName) {
-    var outputFlag = monitorName ? ("--outputs " + _shellQuote(monitorName) + " ") : "";
+    var outputFlag = monitorName ? ("--outputs " + ShellUtils.shellQuote(monitorName) + " ") : "";
     return "set -u; "
          + "command -v swww >/dev/null 2>&1 || { echo 'swww not installed' >&2; exit 1; }; "
          + "if ! swww query >/dev/null 2>&1; then "
          + "  swww-daemon >/dev/null 2>&1 & "
          + "  tries=0; while ! swww query >/dev/null 2>&1 && [ \"$tries\" -lt 10 ]; do sleep 0.2; tries=$((tries + 1)); done; "
          + "fi; "
-         + "swww clear " + outputFlag + _shellQuote(colorHex);
+         + "swww clear " + outputFlag + ShellUtils.shellQuote(colorHex);
   }
 }

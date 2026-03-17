@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import "../services"
+import "../services/ShellUtils.js" as ShellUtils
 import "SshConfigParser.js" as SshConfigParser
 
 QtObject {
@@ -47,11 +48,6 @@ QtObject {
         if (text.indexOf("~/") === 0)
             return String(Quickshell.env("HOME") || "") + text.slice(1);
         return text;
-    }
-
-    function _shellQuote(text) {
-        var value = String(text || "");
-        return "'" + value.replace(/'/g, "'\"'\"'") + "'";
     }
 
     function _clone(value) {
@@ -437,7 +433,7 @@ QtObject {
             parts.push(String(host.remoteCommand));
         var escaped = [];
         for (var i = 0; i < parts.length; ++i)
-            escaped.push(_shellQuote(parts[i]));
+            escaped.push(ShellUtils.shellQuote(parts[i]));
         return "exec " + escaped.join(" ");
     }
 
@@ -448,7 +444,7 @@ QtObject {
         Quickshell.execDetached([
             "bash",
             "-lc",
-            "printf '%s' " + _shellQuote(value) + " | wl-copy"
+            "printf '%s' " + ShellUtils.shellQuote(value) + " | wl-copy"
         ]);
         return true;
     }
@@ -514,7 +510,7 @@ QtObject {
         if (!host)
             return false;
         var terminalCommand = host.source === "imported"
-            ? "exec ssh " + _shellQuote(String(host.alias || ""))
+            ? "exec ssh " + ShellUtils.shellQuote(String(host.alias || ""))
             : _buildManualCommand(host);
         Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc '" + terminalCommand.replace(/'/g, "'\\''") + "'; fi; done"]);
         _rememberHost(host);
