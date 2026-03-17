@@ -32,7 +32,7 @@ Flow {
         anchors.centerIn: parent
         width: Math.min(root.iconSize, root.itemSize)
         height: Math.min(root.iconSize, root.itemSize)
-        source: modelData.icon || ""
+        source: Config.resolveIconSource(modelData.icon || "")
         asynchronous: true
 
         // Fallback icon if none found

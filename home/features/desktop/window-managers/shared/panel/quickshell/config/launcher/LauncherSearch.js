@@ -39,7 +39,7 @@ function ensureItemRankCache(item) {
     item._nameLower = item.name ? String(item.name).toLowerCase() : "";
     item._titleLower = item.title ? String(item.title).toLowerCase() : "";
     item._execLower = item.exec ? String(item.exec).toLowerCase() : (item.class ? String(item.class).toLowerCase() : "");
-    item._bodyLower = item.body ? String(item.body).toLowerCase() : "";
+    item._bodyLower = [item.body, item.description, item.fullPath].filter(Boolean).join(" ").toLowerCase();
     var category = item.category ? String(item.category).toLowerCase() : "";
     var keywords = item.keywords ? String(item.keywords).toLowerCase() : "";
     var tokens = [];

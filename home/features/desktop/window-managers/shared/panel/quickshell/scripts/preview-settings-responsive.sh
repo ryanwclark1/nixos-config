@@ -9,6 +9,7 @@ tab_ids=(
   "launcher-web"
   "launcher-modes"
   "launcher-runtime"
+  "ai"
   "wallpaper"
   "bar-widgets"
   "bars"

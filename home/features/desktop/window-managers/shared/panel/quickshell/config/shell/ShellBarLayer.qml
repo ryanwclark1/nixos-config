@@ -237,7 +237,7 @@ Item {
                                 anchor.rect.x: barWindow.popupAnchorXFor("cavaPopup", width)
                                 anchor.rect.y: barWindow.popupAnchorYFor("cavaPopup", height)
                                 wantVisible: barWindow.popupVisible("cavaPopup")
-                                cavaData: panel.fullCavaData
+                                cavaData: panel.fullCavaData || ""
                                 onCloseRequested: root.shellRoot.closeSurface("cavaPopup")
                             }
                         }

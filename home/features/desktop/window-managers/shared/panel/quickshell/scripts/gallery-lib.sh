@@ -15,6 +15,8 @@ render_gallery_css() {
       --muted: #9aa6b2;
       --accent: #7aa2ff;
       --success: #4ade80;
+      --warning: #facc15;
+      --error: #f87171;
     }
 
     body {
@@ -101,16 +103,22 @@ render_gallery_css() {
       box-shadow: 0 12px 24px rgba(0,0,0,0.3);
     }
 
-    .card a { display: block; text-decoration: none; color: inherit; }
-
+    .card .img-container { position: relative; background: #000; aspect-ratio: 16/10; overflow: hidden; cursor: zoom-in; }
     .card img {
       display: block;
       width: 100%;
-      aspect-ratio: 16/10;
+      height: 100%;
       object-fit: contain;
-      background: #000;
-      cursor: zoom-in;
     }
+    .card .baseline-img {
+      position: absolute;
+      top: 0; left: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .card.comparing-diff .baseline-img { opacity: 1; mix-blend-mode: difference; }
+    .card.viewing-baseline .baseline-img { opacity: 1; pointer-events: auto; }
+    .card.viewing-baseline .current-img { opacity: 0; }
 
     .card .meta { padding: 12px; }
 
@@ -136,6 +144,7 @@ render_gallery_css() {
 
     .btn:hover { background: var(--border); color: var(--text); }
     .btn.active { color: var(--success); border-color: var(--success); }
+    .btn.accent { background: var(--accent); color: #000; border-color: var(--accent); }
 
     .card.reviewed { opacity: 0.6; }
     .card.reviewed::after {
@@ -152,6 +161,126 @@ render_gallery_css() {
       z-index: 10;
     }
 
+    /* Lightbox */
+    #lightbox {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.95);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(10px);
+    }
+    #lightbox img { max-width: 90%; max-height: 90%; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
+    .lightbox-close { position: absolute; top: 20px; right: 30px; font-size: 40px; cursor: pointer; color: var(--muted); }
+    .lightbox-nav { position: absolute; top: 50%; width: 100%; display: flex; justify-content: space-between; padding: 0 40px; box-sizing: border-box; pointer-events: none; }
+    .lightbox-nav button { pointer-events: auto; background: rgba(255,255,255,0.1); border: none; color: white; padding: 20px; cursor: pointer; border-radius: 50%; font-size: 24px; }
+
+    /* Checklist Sidebar */
+    #checklistSidebar {
+      position: fixed;
+      right: -400px;
+      top: 0;
+      width: 380px;
+      height: 100vh;
+      background: var(--panel);
+      border-left: 1px solid var(--border);
+      z-index: 1000;
+      transition: right 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+    }
+    #checklistSidebar.open { right: 0; }
+    .checklist-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .checklist-content {
+      padding: 20px;
+      overflow-y: auto;
+      flex-grow: 1;
+    }
+    .checklist-item {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      align-items: flex-start;
+      cursor: pointer;
+    }
+    .checklist-item input { margin-top: 4px; }
+    .checklist-item span { font-size: 0.9rem; }
+    .checklist-category {
+      font-weight: 700;
+      color: var(--accent);
+      margin: 20px 0 10px;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+    }
+
+    /* Health Status */
+    .health-badge {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .health-healthy { background: rgba(74, 222, 128, 0.1); color: var(--success); border: 1px solid var(--success); }
+    .health-warning { background: rgba(250, 204, 21, 0.1); color: var(--warning); border: 1px solid var(--warning); }
+    .health-error { background: rgba(248, 113, 113, 0.1); color: var(--error); border: 1px solid var(--error); }
+
+    .health-section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 32px;
+    }
+    .incident-list { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+    .incident-item {
+      background: var(--bg);
+      border-left: 4px solid var(--error);
+      padding: 10px 16px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .incident-item.warning { border-left-color: var(--warning); }
+    .incident-signature { font-family: monospace; font-weight: 600; }
+
+    /* Progress UI */
+    .progress-container {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .progress-bar {
+      width: 120px;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--success);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
     [hidden] { display: none !important; }
   </style>
 EOF
@@ -160,6 +289,9 @@ EOF
 render_gallery_js() {
   cat <<'EOF'
   <script>
+    let currentLightboxIdx = -1;
+    let lightboxImages = [];
+
     function filterCards() {
       const query = document.getElementById('filterInput').value.toLowerCase();
       const cards = document.querySelectorAll('.card');
@@ -168,16 +300,17 @@ render_gallery_js() {
         const name = card.getAttribute('data-name').toLowerCase();
         card.hidden = !name.includes(query);
       });
+      updateLightboxImages();
     }
 
-    function copyPath(path, btn) {
-      navigator.clipboard.writeText(path);
+    function copyText(text, btn) {
+      navigator.clipboard.writeText(text);
       const originalText = btn.innerText;
       btn.innerText = 'Copied!';
-      btn.style.borderColor = 'var(--accent)';
+      btn.classList.add('active');
       setTimeout(() => {
         btn.innerText = originalText;
-        btn.style.borderColor = '';
+        btn.classList.remove('active');
       }, 1500);
     }
 
@@ -186,7 +319,152 @@ render_gallery_js() {
       card.classList.toggle('reviewed');
       btn.classList.toggle('active');
       btn.innerText = card.classList.contains('reviewed') ? 'Unmark' : 'Mark Reviewed';
+      
+      const states = JSON.parse(localStorage.getItem('quickshell-qa-reviewed') || '{}');
+      const pageId = document.title + location.pathname;
+      if (!states[pageId]) states[pageId] = {};
+      states[pageId][card.getAttribute('data-name')] = card.classList.contains('reviewed');
+      localStorage.setItem('quickshell-qa-reviewed', JSON.stringify(states));
+      
+      updateProgress();
     }
+
+    function cycleCompare(btn) {
+      const card = btn.closest('.card');
+      const states = ['none', 'baseline', 'diff'];
+      let currentIdx = states.indexOf(card.getAttribute('data-compare-state') || 'none');
+      let nextIdx = (currentIdx + 1) % states.length;
+      let nextState = states[nextIdx];
+      
+      card.setAttribute('data-compare-state', nextState);
+      card.classList.remove('viewing-baseline', 'comparing-diff');
+      
+      if (nextState === 'baseline') {
+        card.classList.add('viewing-baseline');
+        btn.innerText = 'Viewing Baseline';
+        btn.classList.add('accent');
+      } else if (nextState === 'diff') {
+        card.classList.add('comparing-diff');
+        btn.innerText = 'Viewing Diff';
+        btn.classList.add('accent');
+      } else {
+        btn.innerText = 'Compare Baseline';
+        btn.classList.remove('accent');
+      }
+    }
+
+    function toggleChecklist() {
+      document.getElementById('checklistSidebar').classList.toggle('open');
+    }
+
+    function saveChecklist() {
+      const states = {};
+      document.querySelectorAll('.checklist-content input').forEach((cb, i) => {
+        states[i] = cb.checked;
+      });
+      localStorage.setItem('quickshell-qa-checklist', JSON.stringify(states));
+    }
+
+    function loadChecklist() {
+      const states = JSON.parse(localStorage.getItem('quickshell-qa-checklist') || '{}');
+      document.querySelectorAll('.checklist-content input').forEach((cb, i) => {
+        if (states[i]) cb.checked = true;
+      });
+    }
+
+    function updateProgress() {
+      const cards = document.querySelectorAll('.card');
+      if (cards.length === 0) return;
+      const reviewed = document.querySelectorAll('.card.reviewed').length;
+      const percent = Math.round((reviewed / cards.length) * 100);
+      
+      const fill = document.querySelector('.progress-fill');
+      const text = document.querySelector('.progress-text');
+      if (fill) fill.style.width = percent + '%';
+      if (text) text.innerText = `${reviewed} / ${cards.length} reviewed (${percent}%)`;
+    }
+
+    function loadReviewed() {
+      const states = JSON.parse(localStorage.getItem('quickshell-qa-reviewed') || '{}');
+      const pageId = document.title + location.pathname;
+      const pageStates = states[pageId] || {};
+      
+      document.querySelectorAll('.card').forEach(card => {
+        const name = card.getAttribute('data-name');
+        if (pageStates[name]) {
+          card.classList.add('reviewed');
+          const btn = card.querySelector('button[onclick="toggleReviewed(this)"]');
+          if (btn) {
+            btn.classList.add('active');
+            btn.innerText = 'Unmark';
+          }
+        }
+      });
+      updateProgress();
+    }
+
+    function updateLightboxImages() {
+      lightboxImages = Array.from(document.querySelectorAll('.card:not([hidden]) .current-img')).map(img => img.src);
+    }
+
+    function openLightbox(src) {
+      updateLightboxImages();
+      currentLightboxIdx = lightboxImages.indexOf(src);
+      const lb = document.getElementById('lightbox');
+      lb.querySelector('img').src = src;
+      lb.style.display = 'flex';
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').style.display = 'none';
+    }
+
+    function navigateLightbox(dir) {
+      currentLightboxIdx = (currentLightboxIdx + dir + lightboxImages.length) % lightboxImages.length;
+      document.getElementById('lightbox').querySelector('img').src = lightboxImages[currentLightboxIdx];
+    }
+
+    function exportReport() {
+      const cards = document.querySelectorAll('.card');
+      const reviewed = document.querySelectorAll('.card.reviewed').length;
+      const checklist = document.querySelectorAll('.checklist-content input');
+      const checked = Array.from(checklist).filter(c => c.checked).length;
+      
+      let md = `# QA Pass Report: ${document.title}\n\n`;
+      md += `**Visual Matrix:** ${reviewed}/${cards.length} items reviewed\n`;
+      md += `**Checklist:** ${checked}/${checklist.length} tasks completed\n\n`;
+      
+      if (checked < checklist.length) {
+        md += `### Pending Tasks\n`;
+        checklist.forEach(c => {
+          if (!c.checked) md += `- [ ] ${c.nextElementSibling.innerText}\n`;
+        });
+      }
+
+      navigator.clipboard.writeText(md);
+      alert('PR Report copied to clipboard!');
+    }
+
+    window.addEventListener('keydown', (e) => {
+      const lb = document.getElementById('lightbox');
+      if (lb.style.display === 'flex') {
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft') navigateLightbox(-1);
+        if (e.key === 'ArrowRight') navigateLightbox(1);
+      } else {
+        if (e.key === 'f' && e.target.tagName !== 'INPUT') {
+          e.preventDefault();
+          document.getElementById('filterInput')?.focus();
+        }
+        if (e.key === 'c' && e.target.tagName !== 'INPUT') toggleChecklist();
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadChecklist();
+      loadReviewed();
+      updateLightboxImages();
+    });
   </script>
 EOF
 }
@@ -197,10 +475,10 @@ write_gallery_v2() {
   local script_name="$3"
   local gallery_path="${output_dir}/index.html"
   local sections=()
-  local section_count=0
+  local baseline_dir="${output_dir}/baselines"
 
   # Discover sections
-  mapfile -t sections < <(find "${output_dir}" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort)
+  mapfile -t sections < <(find "${output_dir}" -mindepth 1 -maxdepth 1 -type d -not -name "baselines" -printf '%f\n' | sort)
 
   {
     cat <<EOF
@@ -216,12 +494,27 @@ EOF
 </head>
 <body>
 
+<div id="lightbox" onclick="if(event.target === this) closeLightbox()">
+  <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+  <div class="lightbox-nav">
+    <button onclick="navigateLightbox(-1)">&lsaquo;</button>
+    <button onclick="navigateLightbox(1)">&rsaquo;</button>
+  </div>
+  <img src="" alt="Lightbox">
+</div>
+
 <header>
   <div class="title-area">
     <h1>${title}</h1>
     <p>Generated by <code>${script_name}</code></p>
   </div>
   
+  <div class="progress-container">
+    <span class="progress-text">0 / 0 reviewed (0%)</span>
+    <div class="progress-bar"><div class="progress-fill"></div></div>
+    <button class="btn" onclick="exportReport()">Export PR Report</button>
+  </div>
+
   <div class="controls">
     <input type="text" id="filterInput" placeholder="Filter by filename..." oninput="filterCards()">
 EOF
@@ -243,59 +536,160 @@ EOF
 EOF
 
     if (( ${#sections[@]} == 0 )); then
-      # Flat mode (images in root)
       printf '  <div class="grid">\n'
       while IFS= read -r image_path; do
         rel_image_path="${image_path#${output_dir}/}"
         image_name="$(basename "${image_path}")"
-        render_card "${rel_image_path}" "${image_name}"
+        local baseline_path=""
+        [[ -f "${baseline_dir}/${image_name}" ]] && baseline_path="baselines/${image_name}"
+        render_card "${rel_image_path}" "${image_name}" "${baseline_path}"
       done < <(find "${output_dir}" -maxdepth 1 -type f -name '*.png' | sort)
       printf '  </div>\n'
     else
-      # Nested mode (directories as sections)
       for s in "${sections[@]}"; do
-        local image_count
-        image_count=$(find "${output_dir}/${s}" -maxdepth 1 -type f -name '*.png' | wc -l)
-        
+        local image_count=$(find "${output_dir}/${s}" -maxdepth 1 -type f -name '*.png' | wc -l)
         printf '  <div class="section" id="sec-%s">\n' "${s}"
-        printf '    <div class="section-header">\n'
-        printf '      <h2>%s</h2>\n' "${s}"
-        printf '      <span class="count">(%s items)</span>\n' "${image_count}"
-        printf '    </div>\n'
+        printf '    <div class="section-header"><h2>%s</h2><span class="count">(%s items)</span></div>\n' "${s}" "${image_count}"
         printf '    <div class="grid">\n'
-        
         while IFS= read -r image_path; do
           rel_image_path="${image_path#${output_dir}/}"
           image_name="$(basename "${image_path}")"
-          render_card "${rel_image_path}" "${image_name}"
+          local baseline_path=""
+          [[ -f "${baseline_dir}/${rel_image_path}" ]] && baseline_path="baselines/${rel_image_path}"
+          render_card "${rel_image_path}" "${image_name}" "${baseline_path}"
         done < <(find "${output_dir}/${s}" -maxdepth 1 -type f -name '*.png' | sort)
-        
-        printf '    </div>\n'
-        printf '  </div>\n'
+        printf '    </div></div>\n'
       done
     fi
-
-    cat <<EOF
-</main>
-EOF
+    printf '</main>\n'
     render_gallery_js
-    printf '</body>\n</html>\n'
+    printf '</body></html>\n'
+  } > "${gallery_path}"
+}
+
+write_master_index() {
+  local output_dir="$1"
+  local title="$2"
+  local checklist_md="$3"
+  local health_json="${4:-{}}"
+  local gallery_path="${output_dir}/index.html"
+  shift 4
+  local links=("$@")
+
+  local health_status=$(echo "${health_json}" | jq -r '.status // "unknown"')
+  local health_class="health-error"
+  local health_icon="❌"
+  case "${health_status}" in
+    healthy) health_class="health-healthy"; health_icon="✓" ;;
+    safe_fix_pending|manual_review_required) health_class="health-warning"; health_icon="⚠️" ;;
+  esac
+
+  {
+    cat <<EOF
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${title}</title>
+EOF
+    render_gallery_css
+    cat <<EOF
+  <style>
+    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 20px; }
+    .db-card { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 32px; text-align: center; text-decoration: none; color: inherit; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .db-card:hover { border-color: var(--accent); transform: translateY(-4px); background: var(--panel-hover); }
+    .db-card h3 { margin: 0; font-size: 1.4rem; color: var(--accent); }
+    .db-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .db-icon { font-size: 32px; background: rgba(122, 162, 255, 0.1); width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; border-radius: 12px; color: var(--accent); }
+  </style>
+</head>
+<body>
+<div id="checklistSidebar">
+  <div class="checklist-header">
+    <h2 style="margin:0; font-size:1.1rem;">Manual Checklist</h2>
+    <button class="btn" onclick="toggleChecklist()">Close</button>
+  </div>
+  <div class="checklist-content">
+EOF
+    echo "${checklist_md}" | while IFS= read -r line; do
+      if [[ "${line}" =~ ^##\ (.*) ]]; then
+        printf '    <div class="checklist-category">%s</div>\n' "${BASH_REMATCH[1]}"
+      elif [[ "${line}" =~ ^-\ (.*) ]]; then
+        printf '    <label class="checklist-item"><input type="checkbox" onchange="saveChecklist()"><span>%s</span></label>\n' "${BASH_REMATCH[1]}"
+      fi
+    done
+    cat <<EOF
+  </div>
+</div>
+<header>
+  <div class="title-area">
+    <h1>${title}</h1>
+    <p>Manual QA Dashboard &bull; <span class="health-badge ${health_class}">${health_icon} System ${health_status}</span></p>
+  </div>
+  <div class="progress-container">
+    <button class="btn" onclick="exportReport()">Export PR Report</button>
+    <button class="toggle-checklist-btn" onclick="toggleChecklist()">📋 View Checklist</button>
+  </div>
+</header>
+<main>
+EOF
+    if [[ "${health_status}" != "healthy" && "${health_status}" != "unknown" ]]; then
+      printf '  <div class="health-section"><h3 style="margin:0 0 12px; font-size:1rem; color:var(--error);">Active Health Incidents</h3><div class="incident-list">\n'
+      echo "${health_json}" | jq -r '.active_signatures[]' | while IFS= read -r sig; do
+        printf '      <div class="incident-item"><div><span class="incident-signature">%s</span></div></div>\n' "${sig}"
+      done
+      printf '    </div></div>\n'
+    fi
+    printf '  <div class="dashboard-grid">\n'
+    for link in "${links[@]}"; do
+      local label="${link%%|*}" path="${link#*|}" icon="📊"
+      case "${label,,}" in *launcher*) icon="🚀" ;; *settings*) icon="⚙️" ;; *surface*) icon="🖼️" ;; *panel*) icon="📟" ;; esac
+      printf '    <a href="%s" class="db-card"><div class="db-icon">%s</div><h3>%s</h3><p>View visual regression artifacts</p></a>\n' "${path}" "${icon}" "${label}"
+    done
+    printf '  </div></main>\n'
+    render_gallery_js
+    printf '</body></html>\n'
   } > "${gallery_path}"
 }
 
 render_card() {
-  local rel_path="$1"
-  local name="$2"
+  local rel_path="$1" name="$2" baseline_path="$3" repro_cmd="${4:-}"
   cat <<EOF
       <div class="card" data-name="${name}">
-        <a href="${rel_path}" target="_blank">
-          <img src="${rel_path}" alt="${name}" loading="lazy">
-        </a>
+        <div class="img-container" onclick="openLightbox(this.querySelector('.current-img').src)">
+          <img src="${rel_path}" class="current-img" alt="${name}" loading="lazy">
+EOF
+  if [[ -n "${baseline_path}" ]]; then
+    cat <<EOF
+          <img src="${baseline_path}" class="baseline-img" alt="Baseline">
+EOF
+  fi
+  cat <<EOF
+        </div>
         <div class="meta">
           <div class="name">${name}</div>
           <div class="actions">
-            <button class="btn" onclick="copyPath('${rel_path}', this)">Copy Path</button>
-            <button class="btn" onclick="toggleReviewed(this)">Mark Reviewed</button>
+            <div style="display: flex; gap: 4px;">
+              <button class="btn" onclick="copyText('${rel_path}', this)">Copy Path</button>
+EOF
+  if [[ -n "${repro_cmd}" ]]; then
+    cat <<EOF
+              <button class="btn" onclick="copyText('${repro_cmd}', this)">Repro</button>
+EOF
+  fi
+  cat <<EOF
+            </div>
+            <div style="display: flex; gap: 4px;">
+EOF
+  if [[ -n "${baseline_path}" ]]; then
+    cat <<EOF
+              <button class="btn" onclick="cycleCompare(this)">Compare Baseline</button>
+EOF
+  fi
+  cat <<EOF
+              <button class="btn" onclick="toggleReviewed(this)">Mark Reviewed</button>
+            </div>
           </div>
         </div>
       </div>

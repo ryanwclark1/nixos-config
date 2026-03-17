@@ -184,32 +184,38 @@ Launcher guardrail checks passed.
 Repo-shell-backed artifact generation:
 
 ```text
-./scripts/capture-panel-matrix.sh --repo-shell --skip-surfaces --settings-preset portrait --output-dir /tmp/panel-qa-launcher-split
-[INFO] Repo shell instance ready: gubxqej0ct
-[INFO] Saved panel QA review artifacts to /tmp/panel-qa-launcher-split
-[INFO] Saved review gallery to /tmp/panel-qa-launcher-split/index.html
+./scripts/capture-panel-matrix.sh --repo-shell --skip-surfaces --settings-preset portrait --output-dir /tmp/panel-qa-launcher-split-padding-test
+[INFO] Repo shell instance ready: tomj10jm0ct
+[INFO] Saved panel QA review artifacts to /tmp/panel-qa-launcher-split-padding-test
+[INFO] Saved review gallery to /tmp/panel-qa-launcher-split-padding-test/index.html
 ```
 
 Launcher portrait artifacts produced:
 
-- `/tmp/panel-qa-launcher-split/settings-portrait/portrait-launcher.png`
-- `/tmp/panel-qa-launcher-split/settings-portrait/portrait-launcher-search.png`
-- `/tmp/panel-qa-launcher-split/settings-portrait/portrait-launcher-web.png`
-- `/tmp/panel-qa-launcher-split/settings-portrait/portrait-launcher-modes.png`
-- `/tmp/panel-qa-launcher-split/settings-portrait/portrait-launcher-runtime.png`
+- `/tmp/panel-qa-launcher-split-padding-test/settings-portrait/portrait-launcher.png`
+- `/tmp/panel-qa-launcher-split-padding-test/settings-portrait/portrait-launcher-search.png`
+- `/tmp/panel-qa-launcher-split-padding-test/settings-portrait/portrait-launcher-web.png`
+- `/tmp/panel-qa-launcher-split-padding-test/settings-portrait/portrait-launcher-modes.png`
+- `/tmp/panel-qa-launcher-split-padding-test/settings-portrait/portrait-launcher-runtime.png`
 
 Launcher portrait lower-fold artifacts produced:
 
-- `/tmp/panel-qa-launcher-split/settings-portrait-deep/portrait-launcher.png`
-- `/tmp/panel-qa-launcher-split/settings-portrait-deep/portrait-launcher-search.png`
-- `/tmp/panel-qa-launcher-split/settings-portrait-deep/portrait-launcher-web.png`
-- `/tmp/panel-qa-launcher-split/settings-portrait-deep/portrait-launcher-modes.png`
-- `/tmp/panel-qa-launcher-split/settings-portrait-deep/portrait-launcher-runtime.png`
+- `/tmp/panel-qa-launcher-split-padding-test/settings-portrait-deep/portrait-launcher.png`
+- `/tmp/panel-qa-launcher-split-padding-test/settings-portrait-deep/portrait-launcher-search.png`
+- `/tmp/panel-qa-launcher-split-padding-test/settings-portrait-deep/portrait-launcher-web.png`
+- `/tmp/panel-qa-launcher-split-padding-test/settings-portrait-deep/portrait-launcher-modes.png`
+- `/tmp/panel-qa-launcher-split-padding-test/settings-portrait-deep/portrait-launcher-runtime.png`
 
 ### Notes
 
 - A direct live-shell `capture-settings-matrix.sh` run initially failed after `wallpaper` because the ambient QuickShell instance disappeared mid-run.
 - The repo-shell wrapper path completed successfully and is the preferred artifact path when the managed service is unstable or being reloaded during QA.
+- Settings modal captures now include extra padding so the full left sidebar remains visible instead of being clipped at the left edge.
+- The final padded gallery at `/tmp/panel-qa-launcher-split-padding-test/index.html` was visually reviewed and accepted.
+- Older temporary capture directories from earlier failed/tight-crop runs are superseded by the padded gallery and can be removed when command policy allows:
+  - `/tmp/panel-qa-launcher-split`
+  - `/tmp/panel-qa-launcher-split-rerun`
+  - `/tmp/panel-qa-launcher-split-rerun-fixed`
 
 ## Out Of Scope
 

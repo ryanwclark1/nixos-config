@@ -14,6 +14,7 @@ Rectangle {
     property bool tightMode: false
     property bool ignoreMouseHover: false
     property var modeIcons: ({})
+    property var iconMap: ({})
 
     signal clicked
     signal entered
@@ -74,7 +75,9 @@ Rectangle {
             return "";
         if (it.providerName)
             return it.providerName;
-        return it.category || "";
+        if (root.mode === "web")
+            return it.category || "";
+        return "";
     }
 
     function itemSecondaryLabel(it) {
@@ -99,6 +102,27 @@ Rectangle {
         if (exec !== "" && exec !== primary)
             return exec;
         return "";
+    }
+
+    function itemIconName(it) {
+        if (!it)
+            return "";
+        var explicitIcon = String(it.icon || "");
+        if (explicitIcon !== "")
+            return explicitIcon;
+        if (root.mode === "window")
+            return String(it.class || "");
+        return "";
+    }
+
+    function itemFallbackIcon(it) {
+        if (root.mode === "window")
+            return "󰖯";
+        if (root.mode === "files")
+            return "󰈔";
+        if (root.mode === "web")
+            return "󰖟";
+        return root.modeIcons[root.mode] || "󰀻";
     }
 
     // Indicator bar
@@ -157,29 +181,20 @@ Rectangle {
                 }
             }
 
-            Image {
-                id: iconImage
-                anchors.fill: parent
-                anchors.margins: Colors.spacingXS
-                source: Config.resolveIconSource(modelData ? modelData.icon || "" : "")
-                sourceSize: Qt.size(64, 64)
-                asynchronous: true
-                fillMode: Image.PreserveAspectCrop
-                visible: source !== "" && status === Image.Ready
-            }
-            Text {
+            SharedWidgets.AppIcon {
                 anchors.centerIn: parent
-                text: (modelData ? modelData.icon : "") || root.modeIcons[root.mode] || "󰀻"
-                color: Colors.primary
-                font.family: Colors.fontMono
-                font.pixelSize: root.compactMode ? Colors.fontSizeLarge : Colors.fontSizeXL
-                visible: !iconImage.visible
+                iconName: root.itemIconName(modelData)
+                appName: modelData ? String(modelData.name || modelData.title || "") : ""
+                iconMap: root.mode === "window" ? root.iconMap : null
+                iconSize: root.compactMode ? 18 : 20
+                fallbackIcon: root.itemFallbackIcon(modelData)
             }
         }
 
         ColumnLayout {
             spacing: 1
             Layout.fillWidth: true
+            Layout.minimumWidth: 0
             Text {
                 text: root.highlightMatch(modelData ? modelData.name || modelData.title || "" : "", root.searchText)
                 color: highlighted ? Colors.primary : Colors.text
@@ -190,6 +205,7 @@ Rectangle {
                 wrapMode: Text.NoWrap
                 maximumLineCount: 1
                 Layout.fillWidth: true
+                Layout.minimumWidth: 0
             }
             Text {
                 text: root.itemSecondaryLabel(modelData)
@@ -199,6 +215,7 @@ Rectangle {
                 wrapMode: Text.NoWrap
                 maximumLineCount: 1
                 Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 visible: text !== ""
             }
         }
@@ -206,6 +223,7 @@ Rectangle {
         RowLayout {
             spacing: Colors.spacingXS
             Layout.maximumWidth: root.compactMode ? 160 : 220
+            Layout.alignment: Qt.AlignVCenter
 
             // Provider Badge
             Rectangle {
@@ -256,6 +274,7 @@ Rectangle {
                 width: root.compactMode ? 24 : 28
                 height: root.compactMode ? 24 : 28
                 radius: Colors.radiusMedium
+                visible: highlighted || hovered
                 color: highlighted ? Colors.withAlpha(Colors.primary, 0.18) : "transparent"
                 Text {
                     anchors.centerIn: parent

@@ -63,8 +63,11 @@ PanelWindow {
         if (root.showContent && searchInput)
           searchInput.forceActiveFocus();
       });
-    } else if (searchInput && searchInput.activeFocus) {
-      searchInput.focus = false;
+    } else {
+      if (searchInput && searchInput.activeFocus)
+        searchInput.focus = false;
+      if (sidebarContent.activeFocus)
+        sidebarContent.focus = false;
     }
   }
 
@@ -76,6 +79,7 @@ PanelWindow {
     border.color: Colors.border
     border.width: 1
     radius: Colors.radiusLarge
+    focus: true
 
     x: {
       if (root.surfaceEdge === "right") return root.showContent ? 0 : root.panelWidth + 10;

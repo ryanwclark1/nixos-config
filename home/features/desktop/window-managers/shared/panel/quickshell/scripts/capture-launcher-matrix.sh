@@ -7,7 +7,7 @@ instance_id=""
 viewport_preset=""
 output_dir="/tmp/launcher-matrix"
 delay_seconds="1.2"
-crop_mode="usable"
+crop_mode="hud"
 workspace_target="auto"
 query_term="firefox"
 empty_query="__launcher_empty_probe__"
@@ -21,7 +21,7 @@ write_gallery() {
 
 usage() {
   cat <<'EOF'
-Usage: capture-launcher-matrix.sh [--id INSTANCE_ID] [--preset portrait|laptop|wide] [--output-dir DIR] [--delay SECONDS] [--crop monitor|usable] [--workspace current|auto|NAME] [--query TERM] [--empty-query TERM]
+Usage: capture-launcher-matrix.sh [--id INSTANCE_ID] [--preset portrait|laptop|wide] [--output-dir DIR] [--delay SECONDS] [--crop hud|monitor|usable] [--workspace current|auto|NAME] [--query TERM] [--empty-query TERM]
 
 Capture a focused launcher artifact set for manual review.
 This produces review artifacts for key launcher states, not PASS/WARN/FAIL results.
@@ -127,7 +127,8 @@ bash "${script_dir}/capture-launcher-viewport.sh" \
   --delay "${delay_seconds}" \
   --crop "${crop_mode}" \
   --workspace "${workspace_target}" \
-  --output "${output_dir}/drun-category.png"
+  --output "${output_dir}/drun-category.png" \
+  || printf '[INFO] Skipped drun-category capture because no non-All category was available.\n'
 
 bash "${script_dir}/capture-launcher-viewport.sh" \
   "${launcher_args[@]}" \

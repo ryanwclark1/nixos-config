@@ -259,6 +259,12 @@ start_repo_shell() {
   done
 
   printf 'Repo shell did not become IPC-ready in time. See /tmp/quickshell-repo-qa.log\n' >&2
+  echo "--- repo shell env ---" >&2
+  printf '%s\n' "${repo_shell_env[@]}" >&2 || true
+  echo "--- systemd user env ---" >&2
+  systemctl --user show-environment 2>/dev/null | grep -E 'HYPRLAND|WAYLAND|NIRI|XDG_CURRENT_DESKTOP|DESKTOP_SESSION' >&2 || true
+  echo "--- quickshell repo qa log ---" >&2
+  sed -n '1,200p' /tmp/quickshell-repo-qa.log >&2 || true
   exit 1
 }
 
@@ -332,7 +338,7 @@ main() {
       --output-dir "${output_dir}/surfaces-${surface_crop}"
   fi
 
-  write_gallery "${output_dir}/index.html"
+  write_gallery "${output_dir}"
 
   printf '[INFO] Saved panel QA review artifacts to %s\n' "${output_dir}"
   printf '[INFO] Saved review gallery to %s/index.html\n' "${output_dir}"

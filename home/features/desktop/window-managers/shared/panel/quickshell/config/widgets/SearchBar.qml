@@ -32,6 +32,7 @@ Rectangle {
             color: Colors.text
             font.pixelSize: Colors.fontSizeSmall
             verticalAlignment: Text.AlignVCenter
+            onVisibleChanged: if (!visible && activeFocus) focus = false
         }
 
         Text {

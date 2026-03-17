@@ -300,8 +300,12 @@ Scope {
 
                     Keys.onEscapePressed: root.isVisible = false
                     Component.onCompleted: forceActiveFocus()
-                    onVisibleChanged: if (visible)
-                        forceActiveFocus()
+                    onVisibleChanged: {
+                        if (visible)
+                            forceActiveFocus()
+                        else if (activeFocus)
+                            focus = false
+                    }
                 }
             }
         }

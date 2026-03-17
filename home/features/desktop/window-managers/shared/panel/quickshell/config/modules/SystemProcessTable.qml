@@ -11,11 +11,16 @@ SharedWidgets.CardBase {
     property int maxRows: 24
     property string sortField: ProcessService.sortBy === "mem" ? "mem" : "cpu"
     property bool sortDescending: true
+    property string displayMode: "flat"
     property int selectedPid: 0
+    property Flickable viewportFlickable: null
+    property Item selectedRowItem: null
+    property var collapsedPids: ({})
 
     readonly property string trimmedSearch: String(searchQuery || "").trim().toLowerCase()
     readonly property var visibleProcesses: computeVisibleProcesses()
     readonly property var selectedProcess: findProcessByPid(selectedPid)
+    readonly property var detailData: ProcessService.detailPid === selectedPid ? ProcessService.processDetail : ({})
     readonly property string pendingAction: ProcessService.pendingActionForPid(selectedPid)
     readonly property bool keyboardFocused: tableFocus.activeFocus
 
@@ -24,6 +29,26 @@ SharedWidgets.CardBase {
 
     function focusTable() {
         tableFocus.forceActiveFocus();
+    }
+
+    function ensureSelectedVisible() {
+        if (!viewportFlickable || !selectedRowItem)
+            return;
+
+        var mapped = selectedRowItem.mapToItem(viewportFlickable.contentItem, 0, 0);
+        var top = mapped.y;
+        var bottom = top + selectedRowItem.height;
+        var viewportTop = viewportFlickable.contentY;
+        var viewportBottom = viewportTop + viewportFlickable.height;
+        var nextContentY = viewportTop;
+
+        if (top < viewportTop)
+            nextContentY = top;
+        else if (bottom > viewportBottom)
+            nextContentY = bottom - viewportFlickable.height;
+
+        var maxContentY = Math.max(0, viewportFlickable.contentHeight - viewportFlickable.height);
+        viewportFlickable.contentY = Math.max(0, Math.min(maxContentY, nextContentY));
     }
 
     function matchesQuery(process) {
@@ -70,6 +95,30 @@ SharedWidgets.CardBase {
         return sortDescending ? -1 : 1;
     }
 
+    function isCollapsed(pid) {
+        return !!collapsedPids[String(parseInt(pid, 10) || 0)];
+    }
+
+    function setCollapsed(pid, collapsed) {
+        var safePid = parseInt(pid, 10) || 0;
+        if (safePid <= 0)
+            return;
+        var next = Object.assign({}, collapsedPids || {});
+        if (collapsed)
+            next[String(safePid)] = true;
+        else
+            delete next[String(safePid)];
+        collapsedPids = next;
+    }
+
+    function toggleCollapsed(pid) {
+        setCollapsed(pid, !isCollapsed(pid));
+    }
+
+    function clearCollapsed() {
+        collapsedPids = ({});
+    }
+
     function computeVisibleProcesses() {
         var source = (ProcessService.processes || []).slice();
         var filtered = [];
@@ -79,8 +128,109 @@ SharedWidgets.CardBase {
                 continue;
             filtered.push(process);
         }
-        filtered.sort(compareProcesses);
-        return filtered.slice(0, maxRows);
+
+        if (displayMode !== "tree") {
+            filtered.sort(compareProcesses);
+            return filtered.slice(0, maxRows);
+        }
+
+        var byParent = {};
+        var byPid = {};
+        for (var j = 0; j < filtered.length; ++j) {
+            var entry = filtered[j];
+            var pidKey = String(entry.pid || 0);
+            var parentKey = String(entry.parentPid || 0);
+            byPid[pidKey] = entry;
+            if (!byParent[parentKey])
+                byParent[parentKey] = [];
+            byParent[parentKey].push(entry);
+        }
+
+        for (var parentId in byParent)
+            byParent[parentId].sort(compareProcesses);
+
+        var descendantCounts = {};
+
+        function countDescendants(pid) {
+            var pidKey = String(pid || 0);
+            if (descendantCounts[pidKey] !== undefined)
+                return descendantCounts[pidKey];
+
+            var total = 0;
+            var children = byParent[pidKey] || [];
+            for (var childIndex = 0; childIndex < children.length; ++childIndex) {
+                var childPid = children[childIndex].pid || 0;
+                total += 1 + countDescendants(childPid);
+            }
+            descendantCounts[pidKey] = total;
+            return total;
+        }
+
+        var ordered = [];
+        var visited = {};
+
+        function walk(parentPid, depth) {
+            var children = byParent[String(parentPid)] || [];
+            for (var childIndex = 0; childIndex < children.length; ++childIndex) {
+                var child = children[childIndex];
+                var childPid = String(child.pid || 0);
+                if (visited[childPid])
+                    continue;
+                visited[childPid] = true;
+                var copy = Object.assign({}, child);
+                copy._depth = depth;
+                copy._hasChildren = (byParent[childPid] || []).length > 0;
+                copy._collapsed = root.isCollapsed(child.pid);
+                copy._descendantCount = countDescendants(child.pid);
+                ordered.push(copy);
+                if (copy._collapsed)
+                    continue;
+                walk(child.pid || 0, depth + 1);
+            }
+        }
+
+        var roots = [];
+        for (var k = 0; k < filtered.length; ++k) {
+            var candidate = filtered[k];
+            if (!byPid[String(candidate.parentPid || 0)])
+                roots.push(candidate);
+        }
+        roots.sort(compareProcesses);
+        for (var rootIndex = 0; rootIndex < roots.length; ++rootIndex) {
+            var rootProcess = roots[rootIndex];
+            var rootPid = String(rootProcess.pid || 0);
+            if (visited[rootPid])
+                continue;
+            visited[rootPid] = true;
+            var rootCopy = Object.assign({}, rootProcess);
+            rootCopy._depth = 0;
+            rootCopy._hasChildren = (byParent[rootPid] || []).length > 0;
+            rootCopy._collapsed = root.isCollapsed(rootProcess.pid);
+            rootCopy._descendantCount = countDescendants(rootProcess.pid);
+            ordered.push(rootCopy);
+            if (rootCopy._collapsed)
+                continue;
+            walk(rootProcess.pid || 0, 1);
+        }
+
+        for (var m = 0; m < filtered.length; ++m) {
+            var dangling = filtered[m];
+            var danglingPid = String(dangling.pid || 0);
+            if (visited[danglingPid])
+                continue;
+            visited[danglingPid] = true;
+            var danglingCopy = Object.assign({}, dangling);
+            danglingCopy._depth = 0;
+            danglingCopy._hasChildren = (byParent[danglingPid] || []).length > 0;
+            danglingCopy._collapsed = root.isCollapsed(dangling.pid);
+            danglingCopy._descendantCount = countDescendants(dangling.pid);
+            ordered.push(danglingCopy);
+            if (danglingCopy._collapsed)
+                continue;
+            walk(dangling.pid || 0, 1);
+        }
+
+        return ordered.slice(0, maxRows);
     }
 
     function findProcessByPid(pid) {
@@ -123,6 +273,32 @@ SharedWidgets.CardBase {
         selectedPid = visibleProcesses[nextIndex].pid || 0;
     }
 
+    function moveTreeHorizontally(delta) {
+        if (displayMode !== "tree" || !selectedProcess)
+            return false;
+
+        var hasChildren = !!selectedProcess._hasChildren;
+        if (delta > 0) {
+            if (hasChildren && selectedProcess._collapsed) {
+                setCollapsed(selectedPid, false);
+                return true;
+            }
+            return false;
+        }
+
+        if (hasChildren && !selectedProcess._collapsed) {
+            setCollapsed(selectedPid, true);
+            return true;
+        }
+
+        var parentPid = parseInt(selectedProcess.parentPid, 10) || 0;
+        if (parentPid > 0 && findProcessByPid(parentPid)) {
+            selectedPid = parentPid;
+            return true;
+        }
+        return false;
+    }
+
     function syncSelection() {
         if (visibleProcesses.length === 0) {
             selectedPid = 0;
@@ -138,8 +314,53 @@ SharedWidgets.CardBase {
         return label + (sortDescending ? " ▼" : " ▲");
     }
 
+    function formatKiB(kib) {
+        var value = Number(kib || 0);
+        if (value <= 0)
+            return "0 KiB";
+        if (value >= 1024 * 1024)
+            return (value / (1024 * 1024)).toFixed(1) + " GiB";
+        if (value >= 1024)
+            return (value / 1024).toFixed(1) + " MiB";
+        return Math.round(value) + " KiB";
+    }
+
+    function formatBytes(bytes) {
+        var value = Number(bytes);
+        if (!isFinite(value) || value < 0)
+            return "Unavailable";
+        if (value >= 1024 * 1024 * 1024)
+            return (value / (1024 * 1024 * 1024)).toFixed(1) + " GiB";
+        if (value >= 1024 * 1024)
+            return (value / (1024 * 1024)).toFixed(1) + " MiB";
+        if (value >= 1024)
+            return (value / 1024).toFixed(1) + " KiB";
+        return Math.round(value) + " B";
+    }
+
+    function fallbackText(value) {
+        return String(value || "").trim() === "" ? "Unavailable" : String(value);
+    }
+
+    function detailStatusColor(status) {
+        if (status === "ready")
+            return Colors.success;
+        if (status === "loading")
+            return Colors.warning;
+        if (status === "terminated" || status === "error")
+            return Colors.error;
+        return Colors.textDisabled;
+    }
+
     onVisibleProcessesChanged: syncSelection()
-    Component.onCompleted: syncSelection()
+    onSelectedPidChanged: {
+        Qt.callLater(ensureSelectedVisible);
+        ProcessService.setDetailPid(selectedPid);
+    }
+    Component.onCompleted: {
+        syncSelection();
+        ProcessService.setDetailPid(selectedPid);
+    }
 
     FocusScope {
         id: tableFocus
@@ -155,6 +376,12 @@ SharedWidgets.CardBase {
             root.moveSelection(1);
             event.accepted = true;
         }
+        Keys.onLeftPressed: event => {
+            event.accepted = root.moveTreeHorizontally(-1);
+        }
+        Keys.onRightPressed: event => {
+            event.accepted = root.moveTreeHorizontally(1);
+        }
         Keys.onPressed: event => {
             if (!root.selectedProcess)
                 return;
@@ -169,8 +396,26 @@ SharedWidgets.CardBase {
                 event.accepted = true;
                 return;
             }
+            if (event.key === Qt.Key_H) {
+                event.accepted = root.moveTreeHorizontally(-1);
+                return;
+            }
+            if (event.key === Qt.Key_L) {
+                event.accepted = root.moveTreeHorizontally(1);
+                return;
+            }
             if (event.key === Qt.Key_R) {
                 ProcessService.refresh();
+                event.accepted = true;
+                return;
+            }
+            if (event.key === Qt.Key_Plus || event.key === Qt.Key_Equal || event.key === Qt.Key_BracketRight) {
+                ProcessService.reniceProcess(root.selectedPid, Number(root.selectedProcess.nice || 0) + 1);
+                event.accepted = true;
+                return;
+            }
+            if (event.key === Qt.Key_Minus || event.key === Qt.Key_Underscore || event.key === Qt.Key_BracketLeft) {
+                ProcessService.reniceProcess(root.selectedPid, Number(root.selectedProcess.nice || 0) - 1);
                 event.accepted = true;
                 return;
             }
@@ -186,6 +431,21 @@ SharedWidgets.CardBase {
             }
             if (event.key === Qt.Key_Space) {
                 ProcessService.togglePause(root.selectedPid);
+                event.accepted = true;
+                return;
+            }
+            if (event.key === Qt.Key_C) {
+                ProcessService.copyCommand(root.selectedPid);
+                event.accepted = true;
+                return;
+            }
+            if (event.key === Qt.Key_Y) {
+                ProcessService.copyPid(root.selectedPid);
+                event.accepted = true;
+                return;
+            }
+            if (event.key === Qt.Key_D) {
+                ProcessService.openProcessDetailsInTerminal(root.selectedPid);
                 event.accepted = true;
                 return;
             }
@@ -264,6 +524,38 @@ SharedWidgets.CardBase {
                     label: "High Load"
                     selected: root.stateFilter === "high"
                     onClicked: root.stateFilter = "high"
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                }
+
+                SharedWidgets.FilterChip {
+                    label: "Flat"
+                    selected: root.displayMode === "flat"
+                    onClicked: root.displayMode = "flat"
+                }
+
+                SharedWidgets.FilterChip {
+                    label: "Tree"
+                    selected: root.displayMode === "tree"
+                    onClicked: root.displayMode = "tree"
+                }
+
+                SharedWidgets.FilterChip {
+                    visible: root.displayMode === "tree"
+                    label: "Expand All"
+                    enabled: Object.keys(root.collapsedPids || {}).length > 0
+                    selected: false
+                    onClicked: root.clearCollapsed()
+                }
+
+                SharedWidgets.FilterChip {
+                    visible: root.displayMode === "tree"
+                    label: "Collapse Sel"
+                    enabled: !!root.selectedProcess && !!root.selectedProcess._hasChildren && !root.selectedProcess._collapsed
+                    selected: false
+                    onClicked: root.setCollapsed(root.selectedPid, true)
                 }
             }
 
@@ -383,13 +675,48 @@ SharedWidgets.CardBase {
                                         elide: Text.ElideRight
                                     }
 
-                                    Text {
+                                    RowLayout {
                                         Layout.fillWidth: true
-                                        text: String(modelData.name || "process")
-                                        color: Colors.text
-                                        font.pixelSize: Colors.fontSizeXS
-                                        font.weight: selected ? Font.DemiBold : Font.Medium
-                                        elide: Text.ElideRight
+                                        spacing: Colors.spacingXS
+
+                                        Item {
+                                            Layout.preferredWidth: Math.min(84, Number(modelData._depth || 0) * 12)
+                                            Layout.fillHeight: true
+                                        }
+
+                                        SharedWidgets.IconButton {
+                                            visible: root.displayMode === "tree"
+                                            enabled: !!modelData._hasChildren
+                                            icon: modelData._hasChildren ? (modelData._collapsed ? "󰅀" : "󰅂") : "󰧼"
+                                            size: 18
+                                            iconSize: Colors.fontSizeXS
+                                            iconColor: selected ? Colors.primary : Colors.textDisabled
+                                            onClicked: {
+                                                root.selectProcess(modelData.pid);
+                                                if (modelData._hasChildren)
+                                                    root.toggleCollapsed(modelData.pid);
+                                                root.focusTable();
+                                            }
+                                        }
+
+                                        Text {
+                                            Layout.fillWidth: true
+                                            text: String(modelData.name || "process")
+                                            color: Colors.text
+                                            font.pixelSize: Colors.fontSizeXS
+                                            font.weight: selected ? Font.DemiBold : Font.Medium
+                                            elide: Text.ElideRight
+                                        }
+
+                                        Text {
+                                            visible: root.displayMode === "tree" && !!modelData._hasChildren
+                                            text: modelData._collapsed
+                                                ? ("+" + String(modelData._descendantCount || 0))
+                                                : String(modelData._descendantCount || 0)
+                                            color: selected ? Colors.primary : Colors.textDisabled
+                                            font.pixelSize: Colors.fontSizeXS
+                                            font.family: Colors.fontMono
+                                        }
                                     }
 
                                     Text {
@@ -438,6 +765,17 @@ SharedWidgets.CardBase {
                                         root.focusTable();
                                     }
                                 }
+
+                                onSelectedChanged: {
+                                    if (selected)
+                                        root.selectedRowItem = this;
+                                    else if (root.selectedRowItem === this)
+                                        root.selectedRowItem = null;
+                                }
+                                Component.onCompleted: {
+                                    if (selected)
+                                        root.selectedRowItem = this;
+                                }
                             }
                         }
                     }
@@ -475,7 +813,13 @@ SharedWidgets.CardBase {
                             }
 
                             Text {
-                                text: root.selectedProcess ? ("PID " + String(root.selectedProcess.pid || 0) + "  •  " + String(root.selectedProcess.user || "user")) : ""
+                                text: root.selectedProcess
+                                    ? ("PID " + String(root.selectedProcess.pid || 0)
+                                       + "  •  "
+                                       + String(root.selectedProcess.user || "user")
+                                       + "  •  "
+                                       + String(root.selectedProcess.tty || "?"))
+                                    : ""
                                 color: Colors.textDisabled
                                 font.pixelSize: Colors.fontSizeXS
                                 font.family: Colors.fontMono
@@ -510,10 +854,45 @@ SharedWidgets.CardBase {
                         }
 
                         SharedWidgets.Chip {
+                            icon: "󰾆"
+                            iconColor: Colors.accent
+                            text: root.selectedProcess ? ("RSS " + root.formatKiB(root.selectedProcess.rssKb || 0)) : "RSS 0 KiB"
+                            textColor: Colors.accent
+                        }
+
+                        SharedWidgets.Chip {
                             icon: "󰥔"
                             iconColor: Colors.secondary
                             text: root.selectedProcess ? String(root.selectedProcess.elapsed || "--:--") : ""
                             textColor: Colors.secondary
+                        }
+
+                        SharedWidgets.Chip {
+                            icon: "󰘚"
+                            iconColor: Colors.textSecondary
+                            text: "PPID " + String(root.selectedProcess ? root.selectedProcess.parentPid || 0 : 0)
+                            textColor: Colors.textSecondary
+                        }
+
+                        SharedWidgets.Chip {
+                            icon: "󰓅"
+                            iconColor: Colors.secondary
+                            text: "THR " + String(root.selectedProcess ? root.selectedProcess.threadCount || 0 : 0)
+                            textColor: Colors.secondary
+                        }
+
+                        SharedWidgets.Chip {
+                            icon: Number(root.selectedProcess ? root.selectedProcess.nice : 0) < 0 ? "󰓅" : "󰾆"
+                            iconColor: Number(root.selectedProcess ? root.selectedProcess.nice : 0) < 0 ? Colors.primary : Colors.textSecondary
+                            text: "NICE " + String(root.selectedProcess ? root.selectedProcess.nice || 0 : 0)
+                            textColor: Number(root.selectedProcess ? root.selectedProcess.nice : 0) < 0 ? Colors.primary : Colors.textSecondary
+                        }
+
+                        SharedWidgets.Chip {
+                            icon: "󰈔"
+                            iconColor: Colors.textSecondary
+                            text: root.selectedProcess ? ("TTY " + String(root.selectedProcess.tty || "?")) : "TTY ?"
+                            textColor: Colors.textSecondary
                         }
 
                         SharedWidgets.Chip {
@@ -562,11 +941,189 @@ SharedWidgets.CardBase {
                         }
 
                         SharedWidgets.FilterChip {
+                            label: "Details"
+                            icon: "󰋼"
+                            enabled: !ProcessService.isPidPending(root.selectedPid)
+                            selected: false
+                            onClicked: ProcessService.openProcessDetailsInTerminal(root.selectedPid)
+                        }
+
+                        SharedWidgets.FilterChip {
+                            label: "Nice -1"
+                            icon: "󰓅"
+                            enabled: !ProcessService.isPidPending(root.selectedPid)
+                            selected: false
+                            onClicked: ProcessService.reniceProcess(root.selectedPid, Number(root.selectedProcess ? root.selectedProcess.nice : 0) - 1)
+                        }
+
+                        SharedWidgets.FilterChip {
+                            label: "Nice +1"
+                            icon: "󰾆"
+                            enabled: !ProcessService.isPidPending(root.selectedPid)
+                            selected: false
+                            onClicked: ProcessService.reniceProcess(root.selectedPid, Number(root.selectedProcess ? root.selectedProcess.nice : 0) + 1)
+                        }
+
+                        SharedWidgets.FilterChip {
+                            label: "Copy PID"
+                            icon: "󰅍"
+                            enabled: !ProcessService.isPidPending(root.selectedPid)
+                            selected: false
+                            onClicked: ProcessService.copyPid(root.selectedPid)
+                        }
+
+                        SharedWidgets.FilterChip {
                             label: "Copy Cmd"
                             icon: "󰅍"
                             enabled: !ProcessService.isPidPending(root.selectedPid)
                             selected: false
                             onClicked: ProcessService.copyCommand(root.selectedPid)
+                        }
+                    }
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        radius: Colors.radiusSmall
+                        color: Colors.cardSurface
+                        border.color: Colors.withAlpha(root.detailStatusColor(ProcessService.detailStatus), 0.4)
+                        border.width: 1
+                        implicitHeight: liveDetailColumn.implicitHeight + Colors.spacingM * 2
+
+                        ColumnLayout {
+                            id: liveDetailColumn
+                            anchors.fill: parent
+                            anchors.margins: Colors.spacingM
+                            spacing: Colors.spacingS
+
+                            RowLayout {
+                                Layout.fillWidth: true
+
+                                Text {
+                                    text: "LIVE DETAIL"
+                                    color: Colors.textDisabled
+                                    font.pixelSize: Colors.fontSizeXS
+                                    font.weight: Font.Bold
+                                    font.letterSpacing: Colors.letterSpacingWide
+                                }
+
+                                Item {
+                                    Layout.fillWidth: true
+                                }
+
+                                SharedWidgets.Chip {
+                                    icon: ProcessService.detailBusy ? "󰑐" : "󰄬"
+                                    iconColor: root.detailStatusColor(ProcessService.detailStatus)
+                                    text: ProcessService.detailStatus.toUpperCase()
+                                    textColor: root.detailStatusColor(ProcessService.detailStatus)
+                                }
+                            }
+
+                            Text {
+                                Layout.fillWidth: true
+                                visible: ProcessService.detailMessage !== ""
+                                text: ProcessService.detailMessage
+                                color: Colors.textSecondary
+                                font.pixelSize: Colors.fontSizeXS
+                                wrapMode: Text.WordWrap
+                            }
+
+                            Flow {
+                                Layout.fillWidth: true
+                                width: parent.width
+                                spacing: Colors.spacingS
+
+                                SharedWidgets.Chip {
+                                    icon: "󰞷"
+                                    iconColor: Colors.secondary
+                                    text: "FD " + (root.detailData.fdCount === undefined || root.detailData.fdCount === null ? "Unavailable" : String(root.detailData.fdCount))
+                                    textColor: Colors.secondary
+                                }
+
+                                SharedWidgets.Chip {
+                                    icon: "󰈀"
+                                    iconColor: Colors.primary
+                                    text: "READ " + root.formatBytes(root.detailData.readBytes)
+                                    textColor: Colors.primary
+                                }
+
+                                SharedWidgets.Chip {
+                                    icon: "󰆼"
+                                    iconColor: Colors.accent
+                                    text: "WRITE " + root.formatBytes(root.detailData.writeBytes)
+                                    textColor: Colors.accent
+                                }
+
+                                SharedWidgets.Chip {
+                                    icon: "󰛐"
+                                    iconColor: Colors.warning
+                                    text: "CANCEL " + root.formatBytes(root.detailData.cancelledWriteBytes)
+                                    textColor: Colors.warning
+                                }
+                            }
+
+                            Rectangle {
+                                Layout.fillWidth: true
+                                color: Colors.withAlpha(Colors.surface, 0.5)
+                                radius: Colors.radiusSmall
+                                border.color: Colors.withAlpha(Colors.border, 0.6)
+                                border.width: 1
+                                implicitHeight: cwdBlock.implicitHeight + Colors.spacingS * 2
+
+                                ColumnLayout {
+                                    id: cwdBlock
+                                    anchors.fill: parent
+                                    anchors.margins: Colors.spacingS
+                                    spacing: Colors.spacingXXS
+
+                                    Text {
+                                        text: "CWD"
+                                        color: Colors.textDisabled
+                                        font.pixelSize: Colors.fontSizeXS
+                                        font.weight: Font.Bold
+                                    }
+
+                                    Text {
+                                        Layout.fillWidth: true
+                                        text: root.fallbackText(root.detailData.cwd)
+                                        color: Colors.textSecondary
+                                        font.pixelSize: Colors.fontSizeXS
+                                        font.family: Colors.fontMono
+                                        wrapMode: Text.WrapAnywhere
+                                    }
+                                }
+                            }
+
+                            Rectangle {
+                                Layout.fillWidth: true
+                                color: Colors.withAlpha(Colors.surface, 0.5)
+                                radius: Colors.radiusSmall
+                                border.color: Colors.withAlpha(Colors.border, 0.6)
+                                border.width: 1
+                                implicitHeight: exeBlock.implicitHeight + Colors.spacingS * 2
+
+                                ColumnLayout {
+                                    id: exeBlock
+                                    anchors.fill: parent
+                                    anchors.margins: Colors.spacingS
+                                    spacing: Colors.spacingXXS
+
+                                    Text {
+                                        text: "EXECUTABLE"
+                                        color: Colors.textDisabled
+                                        font.pixelSize: Colors.fontSizeXS
+                                        font.weight: Font.Bold
+                                    }
+
+                                    Text {
+                                        Layout.fillWidth: true
+                                        text: root.fallbackText(root.detailData.exe)
+                                        color: Colors.textSecondary
+                                        font.pixelSize: Colors.fontSizeXS
+                                        font.family: Colors.fontMono
+                                        wrapMode: Text.WrapAnywhere
+                                    }
+                                }
+                            }
                         }
                     }
 
@@ -582,7 +1139,7 @@ SharedWidgets.CardBase {
                             id: commandText
                             anchors.fill: parent
                             anchors.margins: Colors.spacingS
-                            text: root.selectedProcess ? String(root.selectedProcess.command || root.selectedProcess.name || "") : ""
+                            text: root.selectedProcess ? String(root.detailData.command || root.selectedProcess.command || root.selectedProcess.name || "") : ""
                             color: Colors.textSecondary
                             font.pixelSize: Colors.fontSizeXS
                             font.family: Colors.fontMono

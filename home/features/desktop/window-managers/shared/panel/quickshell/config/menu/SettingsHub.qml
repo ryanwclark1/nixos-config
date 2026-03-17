@@ -40,6 +40,7 @@ PanelWindow {
   property bool isOpen: false
   property bool interactionBlocked: false
   property string currentTabId: _persist.currentTabId
+  property var pendingBarWidgetTarget: null
 
   PersistentProperties {
     id: _persist
@@ -133,6 +134,15 @@ PanelWindow {
     function openTabScrolled(tabId: string, scrollY: int) {
       settingsRoot.captureOpenTab(tabId, scrollY);
     }
+    function openBarWidgetInstance(instanceId: string) {
+      Qt.callLater(() => {
+        var target = Config.findBarWidgetInstance(instanceId);
+        settingsRoot.pendingBarWidgetTarget = target ? JSON.parse(JSON.stringify(target)) : null;
+        settingsRoot.pendingTabId = "bar-widgets";
+        settingsRoot.setCaptureScrollY(0);
+        deferredOpenTimer.restart();
+      });
+    }
     function openIndex(index: int) {
       Qt.callLater(() => {
         settingsRoot.pendingTabId = SettingsRegistry.tabIdForIndex(index) || "";
@@ -210,7 +220,12 @@ PanelWindow {
     SharedWidgets.InnerHighlight { highlightOpacity: 0.15 }
 
     focus: settingsRoot.isOpen
-    onVisibleChanged: if (visible) forceActiveFocus()
+    onVisibleChanged: {
+      if (visible)
+        forceActiveFocus()
+      else if (activeFocus)
+        focus = false
+    }
     Keys.onEscapePressed: settingsRoot.isOpen = false
 
     opacity: settingsRoot.isOpen ? 1.0 : 0.0

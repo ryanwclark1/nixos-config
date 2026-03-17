@@ -555,7 +555,7 @@ Item {
         Config.launcherDefaultMode = "drun";
         Config.launcherShowModeHints = true;
         Config.launcherShowHomeSections = true;
-        Config.launcherDrunCategoryFiltersEnabled = true;
+        Config.launcherDrunCategoryFiltersEnabled = false;
         Config.launcherEnablePreload = true;
         Config.launcherKeepSearchOnModeSwitch = true;
         Config.launcherEnableDebugTimings = false;

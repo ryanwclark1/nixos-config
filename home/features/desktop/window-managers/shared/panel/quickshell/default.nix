@@ -370,7 +370,7 @@ EOF
 
           exit 0
         ''}";
-        ExecStart = "${pkgs.quickshell}/bin/quickshell";
+        ExecStart = "${pkgs.quickshell}/bin/quickshell -p %h/.config/quickshell/shell.qml";
         Environment = [
           "PATH=%h/.local/bin:%h/.nix-profile/bin:/etc/profiles/per-user/%u/bin:/run/current-system/sw/bin:${pkgs.quickshell}/bin:${pkgs.pipewire}/bin:${pkgs.networkmanager}/bin:${pkgs.tailscale}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.bash}/bin:${pkgs.procps}/bin:${pkgs.wl-clipboard}/bin:${pkgs.power-profiles-daemon}/bin:${pkgs.ddcutil}/bin:${pkgs.grim}/bin:${pkgs.slurp}/bin:${pkgs.dbus}/bin"
           "QT_QPA_PLATFORMTHEME=adwaita"

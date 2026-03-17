@@ -269,6 +269,9 @@ niri-vm-fresh-ssh:
 niri-vm-smoke:
 	bash ./scripts/vm/check-niri-test-vm.sh
 
+niri-vm-panel-qa:
+	bash ./scripts/vm/run-niri-panel-qa.sh
+
 hyprland-vm-build:
 	bash ./scripts/vm/launch-hyprland-test-vm.sh --build-only
 

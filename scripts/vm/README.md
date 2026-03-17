@@ -29,7 +29,7 @@ The `niriTestVm` profile is configured for test access:
 The wrapper uses a persistent qcow2 disk by default:
 
 - default path: `${XDG_STATE_HOME:-$HOME/.local/state}/nixos-config/niri-test-vm/niriTestVm.qcow2`
-- default VM disk size: `16G` (from `niriTestVm` profile)
+- default VM disk size: `32G` (from `niriTestVm` profile)
 - override: `NIRI_VM_DISK_IMAGE=/path/to/disk.qcow2`
 - one-time override: `--disk /path/to/disk.qcow2`
 - reset disk: `make niri-vm-reset` or `--reset-disk`
@@ -52,6 +52,13 @@ For an automated boot-and-verify smoke check:
 make niri-vm-smoke
 ```
 
+For host-side panel QA artifacts copied back from the VM:
+
+```bash
+make niri-vm-panel-qa
+bash scripts/vm/run-niri-panel-qa.sh --mode settings --output-dir /tmp/panel-qa-niri-settings
+```
+
 ## SSH debugging
 
 Run with SSH forwarding:
@@ -69,6 +76,10 @@ ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 administ
 ```
 
 Password: `niri`
+
+After any QA wrapper or smoke run, your local SSH public key is copied into the
+guest automatically when `~/.ssh/id_ed25519.pub` or `~/.ssh/id_rsa.pub` exists,
+so follow-up `ssh` to the running VM should not prompt for a password.
 
 ## Useful launch variants
 

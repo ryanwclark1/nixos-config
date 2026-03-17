@@ -3,11 +3,12 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 port="${NIRI_VM_SMOKE_SSH_PORT:-2232}"
-boot_timeout="${NIRI_VM_SMOKE_BOOT_TIMEOUT:-300}"
 poll_attempts="${NIRI_VM_SMOKE_POLL_ATTEMPTS:-120}"
 poll_delay="${NIRI_VM_SMOKE_POLL_DELAY:-2}"
 launcher="${repo_root}/scripts/vm/launch-niri-test-vm.sh"
 log_file="${NIRI_VM_SMOKE_LOG:-/tmp/niri-test-vm-smoke.log}"
+vm_password="${NIRI_VM_PASSWORD:-niri}"
+host_pubkey_file=""
 
 cleanup() {
   if [[ -n "${launcher_pid:-}" ]] && kill -0 "${launcher_pid}" 2>/dev/null; then
@@ -17,19 +18,60 @@ cleanup() {
 }
 trap cleanup EXIT
 
+resolve_host_pubkey() {
+  local candidate=""
+  for candidate in \
+    "${HOME}/.ssh/id_ed25519.pub" \
+    "${HOME}/.ssh/id_rsa.pub"
+  do
+    if [[ -r "${candidate}" ]]; then
+      host_pubkey_file="${candidate}"
+      return 0
+    fi
+  done
+  return 1
+}
+
 ssh_base=(
+  nix
+  shell
+  nixpkgs#sshpass
+  -c
+  env
+  SSH_ASKPASS=
+  SSH_ASKPASS_REQUIRE=never
+  DISPLAY=
+  SSHPASS="${vm_password}"
+  sshpass
+  -e
   ssh
   -o StrictHostKeyChecking=no
   -o UserKnownHostsFile=/dev/null
   -o ConnectTimeout=5
+  -o PreferredAuthentications=password
+  -o PubkeyAuthentication=no
+  -o KbdInteractiveAuthentication=no
+  -o NumberOfPasswordPrompts=1
+  -o ControlMaster=no
+  -o ControlPath=none
   -p "${port}"
   administrator@127.0.0.1
 )
 
+install_host_pubkey() {
+  local pubkey=""
+
+  resolve_host_pubkey || return 0
+  pubkey="$(<"${host_pubkey_file}")"
+  [[ -n "${pubkey}" ]] || return 0
+
+  "${ssh_base[@]}" "umask 077 && mkdir -p ~/.ssh && touch ~/.ssh/authorized_keys && grep -qxF $(printf '%q' "${pubkey}") ~/.ssh/authorized_keys || printf '%s\n' $(printf '%q' "${pubkey}") >> ~/.ssh/authorized_keys"
+}
+
 echo "[INFO] Launching smoke VM on SSH port ${port}"
 : > "${log_file}"
 coproc VM_LAUNCHER {
-  exec timeout "${boot_timeout}" bash "${launcher}" --reset-disk --ssh-port "${port}" >"${log_file}" 2>&1
+  exec bash "${launcher}" --reset-disk --ssh-port "${port}" >"${log_file}" 2>&1
 }
 launcher_pid="${VM_LAUNCHER_PID}"
 
@@ -50,6 +92,8 @@ if ! "${ssh_base[@]}" "echo READY" >/dev/null 2>&1; then
   tail -n 120 "${log_file}" >&2 || true
   exit 1
 fi
+
+install_host_pubkey
 
 echo "[INFO] SSH is ready; validating session"
 

@@ -8,6 +8,7 @@ launcher_qml="${script_dir}/../config/launcher/Launcher.qml"
 launcher_search_field_qml="${script_dir}/../config/launcher/LauncherSearchField.qml"
 launcher_settings_qml="${script_dir}/../config/menu/settings/tabs/ShellCoreSectionTab.qml"
 expected_config="$(realpath "${script_dir}/../config/shell.qml" 2>/dev/null || printf '%s' "${script_dir}/../config/shell.qml")"
+apps_helper="${script_dir}/apps.sh"
 
 instance_id=""
 ci_mode=0
@@ -111,6 +112,7 @@ cleanup_repo_shell() {
 populate_repo_shell_env() {
   local line key value
   repo_shell_env=()
+  repo_shell_env+=("PATH=${script_dir}:${PATH}")
   for key in HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY NIRI_SOCKET XDG_CURRENT_DESKTOP DESKTOP_SESSION; do
     value="${!key:-}"
     [[ -n "${value}" ]] && repo_shell_env+=("${key}=${value}")
@@ -246,9 +248,13 @@ static_checks() {
   require_literal "$launcher_qml" 'readonly property bool sidebarCompact: usableWidth < 720' "sidebar compact threshold"
   require_literal "$launcher_qml" 'readonly property bool tightMode: usableWidth < 560 || usableHeight < 500' "tight mode threshold"
   require_literal "$launcher_qml" 'width: Math.min(1120, Math.max(launcherRoot.sidebarCompact ? 380 : 460, launcherRoot.usableWidth - (launcherRoot.tightMode ? 24 : 40)))' "responsive launcher width bounds"
+  require_literal "$launcher_qml" 'height: Math.min(980, Math.max(520, launcherRoot.usableHeight - (launcherRoot.tightMode ? 24 : 28)))' "responsive launcher height bounds"
   require_literal "$launcher_search_field_qml" 'height: 48' "compact search bar height"
   require_literal "$launcher_qml" 'visible: launcherRoot.transientNoticeText !== "" && !launcherRoot.tightMode' "transient notice tight-mode guard"
   require_literal "$launcher_qml" 'visible: Config.launcherShowRuntimeMetrics && !launcherRoot.tightMode' "runtime metrics tight-mode guard"
+  require_literal "$launcher_qml" 'loadState: String(modeLoadState || "idle"),' "launcher state load-state payload"
+  require_literal "$launcher_qml" 'allItemCount: allItems.length,' "launcher state all-item payload"
+  require_literal "$launcher_qml" 'filteredItemCount: filteredItems.length,' "launcher state filtered-item payload"
   require_pattern "$launcher_qml" 'function drunCategoryState\(\)\s*(?::\s*string)?\s*\{\s*return JSON\.stringify\(launcherRoot\.drunCategoryStateObject\(\)\);\s*\}' "drun category IPC payload mapping"
   require_pattern "$launcher_qml" 'function escapeActionState\(\)\s*(?::\s*string)?\s*\{\s*return JSON\.stringify\(launcherRoot\.escapeActionStateObject\(\)\);\s*\}' "escape action IPC payload mapping"
   require_pattern "$launcher_qml" 'function diagnosticSetSearchText\(text(?::\s*string)?\)\s*(?::\s*string)?\s*\{\s*return launcherRoot\.diagnosticSetSearchText\(text\);\s*\}' "escape action query setter IPC mapping"
@@ -316,6 +322,24 @@ runtime_checks() {
     fail "Launcher.openDrun for category state probe"
   fi
 
+  local data_state
+  if launcher_state="$(call_ipc Launcher launcherState 2>/dev/null)" && printf '%s' "${launcher_state}" | node -e '
+const fs = require("node:fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+let payload = JSON.parse(raw);
+if (typeof payload === "string") payload = JSON.parse(payload);
+if (String(payload.mode || "") !== "drun") process.exit(1);
+if (String(payload.loadState || "") !== "ready") process.exit(1);
+if (!(Number(payload.allItemCount || 0) > 0)) process.exit(1);
+' >/dev/null 2>&1; then
+    pass "Launcher.openDrun populates application results"
+  else
+    fail "Launcher.openDrun populates application results"
+    if [[ -n "${launcher_state:-}" ]]; then
+      printf '%s\n' "${launcher_state}" >&2
+    fi
+  fi
+
   local launcher_state
   if launcher_action_available "launcherState" && launcher_state="$(call_ipc Launcher launcherState 2>/dev/null)" && printf '%s' "${launcher_state}" | node -e '
 const fs = require("node:fs");
@@ -330,7 +354,7 @@ const hudWidth = Number(payload.hudWidth || 0);
 const hudHeight = Number(payload.hudHeight || 0);
 if (!(viewportWidth > 0 && viewportHeight > 0)) process.exit(1);
 if (!(usableWidth > 0 && usableHeight > 0)) process.exit(1);
-if (!(hudWidth >= 460 && hudHeight >= 360)) process.exit(1);
+if (!(hudWidth >= 460 && hudHeight >= 520)) process.exit(1);
 if (usableWidth >= 1400 && !(hudWidth >= 1000)) process.exit(1);
 ' >/dev/null 2>&1; then
     pass "Launcher.launcherState viewport sizing invariants"
@@ -339,6 +363,58 @@ if (usableWidth >= 1400 && !(hudWidth >= 1000)) process.exit(1);
     if [[ -n "${launcher_state:-}" ]]; then
       printf '%s\n' "${launcher_state}" >&2
     fi
+  fi
+
+  if call_ipc Launcher openFiles >/dev/null 2>&1 && call_ipc Launcher diagnosticSetSearchText "/nixos" >/dev/null 2>&1; then
+    local files_ready=0 files_attempt
+    for files_attempt in $(seq 1 60); do
+      data_state="$(call_ipc Launcher launcherState 2>/dev/null || true)"
+      if [[ -n "${data_state}" ]] && printf '%s' "${data_state}" | node -e '
+const fs = require("node:fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+let payload = JSON.parse(raw);
+if (typeof payload === "string") payload = JSON.parse(payload);
+if (String(payload.mode || "") !== "files") process.exit(1);
+if (String(payload.searchText || "") !== "/nixos") process.exit(1);
+if (String(payload.loadState || "") !== "ready") process.exit(1);
+if (!(Number(payload.filteredItemCount || 0) > 0)) process.exit(1);
+' >/dev/null 2>&1; then
+        files_ready=1
+        break
+      fi
+      sleep 0.5
+    done
+    if (( files_ready == 1 )); then
+      pass "Launcher.files query reaches ready state with results"
+    else
+      fail "Launcher.files query reaches ready state with results"
+      if [[ -n "${data_state:-}" ]]; then
+        printf '%s\n' "${data_state}" >&2
+      fi
+    fi
+  else
+    fail "Launcher.files query probe setup"
+  fi
+
+  if call_ipc Launcher openDrun >/dev/null 2>&1; then
+    pass "Launcher.openDrun for category diagnostics"
+  else
+    fail "Launcher.openDrun for category diagnostics"
+  fi
+
+  if [[ -f "${apps_helper}" ]]; then
+    local app_probe duration_ms app_count
+    app_probe="$(node -e 'const {spawnSync} = require("node:child_process"); const helper = process.argv[1]; const started = Date.now(); const result = spawnSync("bash", [helper], {encoding:"utf8"}); if (result.status !== 0) process.exit(result.status || 1); const took = Date.now() - started; let payload = []; try { payload = JSON.parse(result.stdout || "[]"); } catch (error) { process.exit(2); } process.stdout.write(String(took) + "\n" + String(Array.isArray(payload) ? payload.length : 0));' "${apps_helper}" 2>/dev/null || true)"
+    duration_ms="$(printf '%s\n' "${app_probe}" | head -n 1)"
+    app_count="$(printf '%s\n' "${app_probe}" | tail -n 1)"
+    if [[ "${duration_ms}" =~ ^[0-9]+$ ]] && [[ "${app_count}" =~ ^[0-9]+$ ]] && (( duration_ms <= 2000 )) && (( app_count > 0 )); then
+      pass "apps helper populates quickly (${duration_ms}ms, ${app_count} apps)"
+    else
+      fail "apps helper populates quickly"
+      printf 'apps helper probe: duration_ms=%s count=%s path=%s\n' "${duration_ms:-<none>}" "${app_count:-<none>}" "${apps_helper}" >&2
+    fi
+  else
+    warn "apps helper missing; skipping launcher app helper timing probe"
   fi
 
   local category_state

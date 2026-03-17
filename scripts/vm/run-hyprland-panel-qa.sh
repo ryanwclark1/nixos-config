@@ -16,6 +16,7 @@ keep_vm_running=0
 vm_output_dir=""
 launcher_log="${HYPRLAND_VM_QA_LOG:-/tmp/hyprland-test-vm-qa.log}"
 extra_capture_args=()
+host_pubkey_file=""
 
 usage() {
   cat <<'EOF'
@@ -83,6 +84,20 @@ if [[ -z "${vm_output_dir}" ]]; then
 fi
 
 mkdir -p "${output_dir}"
+
+resolve_host_pubkey() {
+  local candidate=""
+  for candidate in \
+    "${HOME}/.ssh/id_ed25519.pub" \
+    "${HOME}/.ssh/id_rsa.pub"
+  do
+    if [[ -r "${candidate}" ]]; then
+      host_pubkey_file="${candidate}"
+      return 0
+    fi
+  done
+  return 1
+}
 
 ssh_base=(
   nix
@@ -160,6 +175,16 @@ wait_for_ssh() {
   return 1
 }
 
+install_host_pubkey() {
+  local pubkey=""
+
+  resolve_host_pubkey || return 0
+  pubkey="$(<"${host_pubkey_file}")"
+  [[ -n "${pubkey}" ]] || return 0
+
+  "${ssh_base[@]}" "umask 077 && mkdir -p ~/.ssh && touch ~/.ssh/authorized_keys && grep -qxF $(printf '%q' "${pubkey}") ~/.ssh/authorized_keys || printf '%s\n' $(printf '%q' "${pubkey}") >> ~/.ssh/authorized_keys"
+}
+
 wait_for_hyprland() {
   local i
   if ! "${ssh_base[@]}" '
@@ -198,14 +223,13 @@ wait_for_hyprland() {
 
 sync_repo() {
   local remote_repo="$1"
+  local panel_rel="home/features/desktop/window-managers/shared/panel"
+  local remote_panel_parent
+
+  remote_panel_parent="${remote_repo}/home/features/desktop/window-managers/shared"
   echo "[INFO] Syncing repo checkout into VM: ${remote_repo}"
-  "${ssh_base[@]}" "rm -rf '${remote_repo}' && mkdir -p '${remote_repo}'"
-  tar \
-    --exclude='./result' \
-    --exclude='./.git' \
-    --exclude='./tmp' \
-    -C "${repo_root}" \
-    -cf - . | "${ssh_base[@]}" "tar -xf - -C '${remote_repo}'"
+  "${ssh_base[@]}" "rm -rf '${remote_repo}' && mkdir -p '${remote_panel_parent}'"
+  tar -C "${repo_root}" -cf - "${panel_rel}" | "${ssh_base[@]}" "tar -xf - -C '${remote_repo}'"
 }
 
 run_remote_capture() {
@@ -229,6 +253,36 @@ set -euo pipefail
 
 repo_shell_pid=""
 service_was_active=0
+repo_shell_env=()
+
+populate_repo_shell_env() {
+  local line=""
+  local key=""
+  local value=""
+
+  repo_shell_env=()
+  for key in HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY NIRI_SOCKET XDG_CURRENT_DESKTOP DESKTOP_SESSION; do
+    value="${!key:-}"
+    if [[ -n "${value}" ]]; then
+      repo_shell_env+=("${key}=${value}")
+    fi
+  done
+
+  if (( ${#repo_shell_env[@]} > 0 )); then
+    return 0
+  fi
+
+  while IFS= read -r line; do
+    [[ "${line}" == *=* ]] || continue
+    key="${line%%=*}"
+    value="${line#*=}"
+    case "${key}" in
+      HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|XDG_CURRENT_DESKTOP|DESKTOP_SESSION)
+        [[ -n "${value}" ]] && repo_shell_env+=("${key}=${value}")
+        ;;
+    esac
+  done < <(systemctl --user show-environment 2>/dev/null || true)
+}
 
 cleanup() {
   if [[ -n "${repo_shell_pid}" ]]; then
@@ -248,19 +302,23 @@ if systemctl --user is-active --quiet quickshell.service; then
 fi
 
 mkdir -p "${VM_OUTPUT_DIR}"
-env HYPRLAND_INSTANCE_SIGNATURE="${HYPRLAND_INSTANCE_SIGNATURE:-}" \
-  WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-}" \
-  XDG_CURRENT_DESKTOP="${XDG_CURRENT_DESKTOP:-}" \
-  DESKTOP_SESSION="${DESKTOP_SESSION:-}" \
-  quickshell -p "${REMOTE_PANEL_ROOT}/config/shell.qml" >/tmp/quickshell-repo-launcher-qa.log 2>&1 &
+populate_repo_shell_env
+env "${repo_shell_env[@]}" quickshell -p "${REMOTE_PANEL_ROOT}/config/shell.qml" >/tmp/quickshell-repo-launcher-qa.log 2>&1 &
 repo_shell_pid="$!"
 
+ready=0
 for _ in $(seq 1 40); do
   if quickshell ipc --pid "${repo_shell_pid}" show >/dev/null 2>&1; then
+    ready=1
     break
   fi
   sleep 0.5
 done
+
+if (( ready == 0 )); then
+  sed -n '1,160p' /tmp/quickshell-repo-launcher-qa.log >&2 || true
+  exit 1
+fi
 
 for capture in \
   "drun home '' ${VM_OUTPUT_DIR}/drun-home.png" \
@@ -334,6 +392,7 @@ coproc VM_LAUNCHER {
 launcher_pid="${VM_LAUNCHER_PID}"
 
 wait_for_ssh
+install_host_pubkey
 wait_for_hyprland
 
 run_id="$(date +%Y%m%d-%H%M%S)-$$"

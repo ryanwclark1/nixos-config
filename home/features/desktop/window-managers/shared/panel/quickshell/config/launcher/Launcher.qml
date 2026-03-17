@@ -18,10 +18,16 @@ PanelWindow {
     readonly property var edgeMargins: Config.reservedEdgesForScreen(screenRef, "")
     property real diagnosticViewportWidth: 0
     property real diagnosticViewportHeight: 0
-    readonly property real viewportWidth: diagnosticViewportWidth > 0 ? diagnosticViewportWidth : Math.max(width, screenRef ? screenRef.width : 0)
-    readonly property real viewportHeight: diagnosticViewportHeight > 0 ? diagnosticViewportHeight : Math.max(height, screenRef ? screenRef.height : 0)
+    readonly property real actualViewportWidth: Math.max(width, screenRef ? screenRef.width : 0)
+    readonly property real actualViewportHeight: Math.max(height, screenRef ? screenRef.height : 0)
+    readonly property real viewportWidth: diagnosticViewportWidth > 0 ? diagnosticViewportWidth : actualViewportWidth
+    readonly property real viewportHeight: diagnosticViewportHeight > 0 ? diagnosticViewportHeight : actualViewportHeight
     readonly property real usableWidth: Math.max(0, viewportWidth - edgeMargins.left - edgeMargins.right)
     readonly property real usableHeight: Math.max(0, viewportHeight - edgeMargins.top - edgeMargins.bottom)
+    readonly property real actualUsableWidth: Math.max(0, actualViewportWidth - edgeMargins.left - edgeMargins.right)
+    readonly property real actualUsableHeight: Math.max(0, actualViewportHeight - edgeMargins.top - edgeMargins.bottom)
+    readonly property real diagnosticViewportOffsetX: diagnosticViewportWidth > 0 ? Math.max(0, (actualUsableWidth - usableWidth) / 2) : 0
+    readonly property real diagnosticViewportOffsetY: diagnosticViewportHeight > 0 ? Math.max(0, (actualUsableHeight - usableHeight) / 2) : 0
     readonly property bool compactMode: usableWidth < 900 || usableHeight < 640
     readonly property bool sidebarCompact: usableWidth < 720
     readonly property bool tightMode: usableWidth < 560 || usableHeight < 500
@@ -76,12 +82,22 @@ PanelWindow {
     property var appFrequency: ({})
     property var launchHistory: []
     property var onCommandOutput: null
+    property var onCommandError: null
+    property string commandStdoutBuffer: ""
+    property string commandStderrBuffer: ""
+    property string modeLoadState: "idle"
+    property string modeLoadMessage: ""
+    property string modeLoadTarget: ""
     property var modeCache: ({})
     property var modeCacheTime: ({})
     property var fileQueryCache: ({})
     property var fileQueryCacheTime: ({})
     property string fileSearchBackend: ""
     property int fileSearchBackendResolvedAt: 0
+    property var fileIndexItems: []
+    property bool fileIndexReady: false
+    property bool fileIndexBuilding: false
+    property int fileIndexBuiltAt: 0
     property string transientNoticeText: ""
     readonly property int fileSearchBackendRefreshMs: 180000
     readonly property int fileSearchBackendMissRefreshMs: 20000
@@ -94,6 +110,7 @@ PanelWindow {
     property var _commandWaiters: ({})
     property var mediaPlayers: []
     property var preloadFailureState: ({})
+    property var launcherIconMap: ({})
     readonly property var availableToplevels: CompositorAdapter.toplevels || []
     property var launcherMetrics: ({
             opens: 0,
@@ -114,9 +131,27 @@ PanelWindow {
             filesResolveAvgMs: 0,
             perMode: ({})
         })
+    readonly property string repoAppsHelperPath: (Quickshell.env("HOME") || "/home/administrator") + "/nixos-config/home/features/desktop/window-managers/shared/panel/quickshell/scripts/qs-apps"
 
     function refreshMediaPlayers() {
         mediaPlayers = MediaService.getAvailablePlayers();
+    }
+
+    function setModeLoadState(nextState, targetMode, message) {
+        modeLoadState = String(nextState || "idle");
+        modeLoadTarget = String(targetMode || mode || "");
+        modeLoadMessage = String(message || "");
+    }
+
+    function beginModeLoad(targetMode, message) {
+        setModeLoadState("loading", targetMode, message);
+    }
+
+    function completeModeLoad(targetMode, success, message) {
+        var target = String(targetMode || "");
+        if (target !== "" && target !== mode)
+            return;
+        setModeLoadState(success ? "ready" : "error", targetMode, message);
     }
 
     // ── Hover anti-flicker ─────────────────────────
@@ -128,6 +163,7 @@ PanelWindow {
 
     readonly property bool showLauncherHome: Config.launcherShowHomeSections && searchText === "" && (mode === "drun" || mode === "system" || mode === "files")
     readonly property bool drunCategoryFiltersEnabled: Config.launcherDrunCategoryFiltersEnabled
+    readonly property bool isModeLoading: modeLoadState === "loading"
     readonly property string drunCategoryFilterLabel: {
         for (var i = 0; i < drunCategoryOptions.length; ++i) {
             var option = drunCategoryOptions[i];
@@ -168,7 +204,7 @@ PanelWindow {
                     description: "Installed desktop apps"
                 },
                 {
-                    icon: "󱗼",
+                    icon: "󰖯",
                     label: "Windows",
                     description: "Focus open clients",
                     openMode: "window"
@@ -197,7 +233,7 @@ PanelWindow {
             ],
             "window": [
                 {
-                    icon: "󱗼",
+                    icon: "󰖯",
                     label: "Window Switcher",
                     description: "Jump between open clients"
                 }
@@ -542,11 +578,63 @@ PanelWindow {
         running: false
         stdout: StdioCollector {
             onStreamFinished: {
-                if (launcherRoot.onCommandOutput) {
-                    var cb = launcherRoot.onCommandOutput;
-                    launcherRoot.onCommandOutput = null;
-                    cb(this.text || "");
+                launcherRoot.commandStdoutBuffer = this.text || "";
+            }
+        }
+        stderr: StdioCollector {
+            onStreamFinished: {
+                launcherRoot.commandStderrBuffer = this.text || "";
+            }
+        }
+        onExited: (exitCode, exitStatus) => {
+            var outputCb = launcherRoot.onCommandOutput;
+            var errorCb = launcherRoot.onCommandError;
+            var stdoutText = launcherRoot.commandStdoutBuffer || "";
+            var stderrText = launcherRoot.commandStderrBuffer || "";
+            launcherRoot.onCommandOutput = null;
+            launcherRoot.onCommandError = null;
+            launcherRoot.commandStdoutBuffer = "";
+            launcherRoot.commandStderrBuffer = "";
+            if (exitCode === 0) {
+                if (outputCb)
+                    outputCb(stdoutText);
+                return;
+            }
+            if (errorCb) {
+                errorCb(stderrText !== "" ? stderrText : stdoutText, exitCode, exitStatus);
+            } else {
+                console.warn("Launcher command failed:", exitCode, stderrText !== "" ? stderrText : stdoutText);
+            }
+        }
+    }
+
+    property Process iconResolverProc: Process {
+        running: true
+        command: ["qs-icon-resolver"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    launcherRoot.launcherIconMap = JSON.parse(this.text || "{}");
+                } catch (e) {
+                    console.warn("Launcher: icon map parse error:", e);
                 }
+            }
+        }
+    }
+
+    property Process fileIndexProc: Process {
+        property int _startedAt: 0
+        running: false
+        stdout: StdioCollector {
+            onStreamFinished: {
+                launcherRoot._handleFileIndexBuilt(this.text || "", fileIndexProc._startedAt || Date.now());
+            }
+        }
+        onExited: exitCode => {
+            if (exitCode !== 0 && launcherRoot.fileIndexBuilding) {
+                launcherRoot.fileIndexBuilding = false;
+                launcherRoot.fileIndexReady = false;
+                launcherRoot.completeModeLoad("files", false, "Files index build failed");
             }
         }
     }
@@ -616,10 +704,12 @@ PanelWindow {
                     launcherRoot.allItems = cached;
                     launcherRoot.filterItems();
                     launcherRoot.buildLauncherHome();
+                    launcherRoot.completeModeLoad(waitingFor, true, "");
                 }
             } else if (!launcherRoot._preloadProcs[waitingFor]) {
                 // Preload finished but no cache entry (failed) — stop waiting
                 running = false;
+                launcherRoot.completeModeLoad(waitingFor, false, "Preload failed");
             }
         }
     }
@@ -737,7 +827,7 @@ PanelWindow {
 
     function modeDependencies(modeKey) {
         if (modeKey === "drun")
-            return ["qs-apps"];
+            return [];
         if (modeKey === "run")
             return ["qs-run"];
         if (modeKey === "emoji")
@@ -785,7 +875,7 @@ PanelWindow {
 
         var proc = commandCheckProcComponent.createObject(launcherRoot);
         proc._commandName = cmd;
-        proc.command = ["bash", "-lc", "command -v " + shellQuote(cmd) + " >/dev/null 2>&1 && echo 1 || echo 0"];
+        proc.command = ["bash", "-c", "command -v " + shellQuote(cmd) + " >/dev/null 2>&1 && echo 1 || echo 0"];
         var nextProcMap = Object.assign({}, _commandCheckProcs);
         nextProcMap[cmd] = proc;
         _commandCheckProcs = nextProcMap;
@@ -969,10 +1059,16 @@ PanelWindow {
     }
 
     function clearCaches() {
+        if (fileIndexProc.running)
+            fileIndexProc.running = false;
         modeCache = ({});
         modeCacheTime = ({});
         fileQueryCache = ({});
         fileQueryCacheTime = ({});
+        fileIndexItems = [];
+        fileIndexReady = false;
+        fileIndexBuilding = false;
+        fileIndexBuiltAt = 0;
     }
 
     function invalidateCommandAvailability(cmd) {
@@ -1042,6 +1138,38 @@ PanelWindow {
                 filesResolveAvgMs: 0,
                 perMode: ({})
             });
+    }
+
+    function fileIndexStale() {
+        if (!fileIndexReady)
+            return true;
+        var ttlMs = Math.max(1, Config.launcherCacheTtlSec) * 1000;
+        return (Date.now() - fileIndexBuiltAt) > ttlMs;
+    }
+
+    function buildFileIndex(homeDir) {
+        if (fileIndexBuilding)
+            return;
+        fileIndexBuilding = true;
+        fileIndexReady = false;
+        beginModeLoad("files", "Building file index");
+        var script = "cd " + shellQuote(homeDir) + " && fd --hidden --exclude .git --exclude .cache --exclude node_modules --exclude .local/share/Trash --exclude .local/share/Steam --exclude .cargo --exclude .npm --exclude .mozilla . 2>/dev/null";
+        fileIndexProc._startedAt = Date.now();
+        fileIndexProc.command = ["bash", "-lc", script];
+        fileIndexProc.running = true;
+    }
+
+    function _handleFileIndexBuilt(raw, startedAt) {
+        var tookMs = Math.max(0, Date.now() - startedAt);
+        fileIndexBuilding = false;
+        fileIndexItems = buildFileItemsFromRaw(raw, Quickshell.env("HOME") || "/");
+        fileIndexReady = true;
+        fileIndexBuiltAt = Date.now();
+        recordFilesBackendLoad("fd", tookMs);
+        if (mode === "files" && stripModePrefix(searchText).trim().length >= Config.launcherFileMinQueryLength)
+            loadFiles();
+        else
+            completeModeLoad("files", true, "");
     }
 
     function recordFilesBackendLoad(backend, durationMs) {
@@ -1158,6 +1286,48 @@ PanelWindow {
         if (key === "")
             return "All";
         return key.charAt(0).toUpperCase() + key.slice(1);
+    }
+
+    function resultSectionLabel(item) {
+        if (!item)
+            return "";
+
+        if (mode === "drun") {
+            if (!drunCategoryFiltersEnabled)
+                return "Applications";
+            ensureItemRankCache(item);
+            var drunKey = String(item._primaryCategoryKey || "");
+            return drunKey === "" ? "Applications" : formatDrunCategoryLabel(drunKey);
+        }
+
+        if (mode === "files")
+            return "Files";
+        if (mode === "run")
+            return "Commands";
+        if (mode === "clip")
+            return "Clipboard";
+        if (mode === "emoji")
+            return "Emoji";
+        if (mode === "bookmarks")
+            return "Bookmarks";
+        if (mode === "web")
+            return String(item.providerName || item.category || "Web");
+
+        var category = String(item.category || "");
+        if (category !== "")
+            return category;
+        return String(modeInfo(mode).label || "Results");
+    }
+
+    function decorateResultSections(items) {
+        var source = Array.isArray(items) ? items : [];
+        for (var i = 0; i < source.length; ++i) {
+            var entry = source[i];
+            if (!entry)
+                continue;
+            entry.sectionLabel = resultSectionLabel(entry);
+        }
+        return source;
     }
 
     function itemMatchesDrunCategory(item, categoryKey) {
@@ -1410,7 +1580,7 @@ PanelWindow {
                 {
                     name: "Focus open windows",
                     title: "Jump into current clients",
-                    icon: "󱗼",
+                    icon: "󰖯",
                     openMode: "window"
                 }
             ];
@@ -1459,6 +1629,7 @@ PanelWindow {
         if (!supportsMode(requestedMode))
             requestedMode = effectiveDefaultMode();
         mode = requestedMode;
+        setModeLoadState("idle", mode, "");
         drunCategorySectionExpanded = false;
         buildLauncherHome();
         var shouldKeepSearch = keepSearch === true && Config.launcherKeepSearchOnModeSwitch;
@@ -1478,6 +1649,7 @@ PanelWindow {
         ensureModeDependencies(mode, function (ok, missingCmd) {
             if (!ok) {
                 setModeHint("Dependency missing", missingDependencyMessage(mode, missingCmd), "󰋼");
+                completeModeLoad(mode, false, "Dependency missing");
                 return;
             }
 
@@ -1486,6 +1658,7 @@ PanelWindow {
             else if (mode === "window") {
                 allItems = [];
                 filterItems();
+                beginModeLoad("window", "Loading windows");
                 windowLoadTimer.restart();
             } else if (mode === "run")
                 loadRun();
@@ -1496,6 +1669,7 @@ PanelWindow {
             else if (mode === "calc") {
                 allItems = [];
                 filterItems();
+                completeModeLoad("calc", true, "");
             } else if (mode === "web")
                 loadWeb();
             else if (mode === "plugins")
@@ -1505,6 +1679,7 @@ PanelWindow {
             else if (mode === "media") {
                 allItems = [];
                 filterItems();
+                completeModeLoad("media", true, "");
                 refreshMediaPlayers();
             } else if (mode === "nixos")
                 loadNixos();
@@ -1524,8 +1699,10 @@ PanelWindow {
                 loadAi();
             else if (mode === "keybinds")
                 loadKeybinds();
-            else if (mode === "dmenu")
+            else if (mode === "dmenu") {
                 filterItems();
+                completeModeLoad("dmenu", true, "");
+            }
         });
 
         // Start background preload of other cacheable modes
@@ -1556,6 +1733,7 @@ PanelWindow {
         _preloadProcs = {};
         if (showingConfirm)
             confirmTitle = "";
+        setModeLoadState("idle", mode, "");
     }
 
     function cycleMode(step) {
@@ -1617,10 +1795,13 @@ PanelWindow {
         close();
     }
 
-    function runCommand(command, callback) {
+    function runCommand(command, callback, errorCallback) {
         if (commandProc.running)
             commandProc.running = false;
         onCommandOutput = callback;
+        onCommandError = errorCallback || null;
+        commandStdoutBuffer = "";
+        commandStderrBuffer = "";
         commandProc.command = command;
         commandProc.running = true;
     }
@@ -1631,29 +1812,23 @@ PanelWindow {
         if (cached) {
             allItems = cached;
             filterItems();
+            buildLauncherHome();
+            completeModeLoad(modeKey, true, "");
             recordLoadMetric(modeKey, 0, true, true);
             return;
         }
         // If a preload is already running for this mode, wait for it
         if (_preloadProcs[modeKey]) {
-            allItems = [
-                {
-                    name: "Loading...",
-                    isHint: true,
-                    icon: "󰔟"
-                }
-            ];
+            allItems = [];
+            filteredItems = [];
+            beginModeLoad(modeKey, "Loading " + modeInfo(modeKey).label);
             filterItems();
             _waitForPreload(modeKey);
             return;
         }
-        allItems = [
-            {
-                name: "Loading...",
-                isHint: true,
-                icon: "󰔟"
-            }
-        ];
+        allItems = [];
+        filteredItems = [];
+        beginModeLoad(modeKey, "Loading " + modeInfo(modeKey).label);
         filterItems();
         var token = beginRequest(modeKey);
         runCommand(command, function (raw) {
@@ -1669,17 +1844,29 @@ PanelWindow {
                     allItems = items;
                     filterItems();
                     buildLauncherHome();
+                    completeModeLoad(modeKey, true, "");
                 }
             } catch (e) {
                 recordLoadMetric(modeKey, Date.now() - startedAt, false, false);
-                if (mode === modeKey)
+                if (mode === modeKey) {
                     setModeHint("Failed to load " + modeInfo(modeKey).label, "Check helper command output and logs.", "󰅚");
+                    completeModeLoad(modeKey, false, "Failed to load " + modeInfo(modeKey).label);
+                }
+            }
+        }, function (errorText, exitCode, _exitStatus) {
+            if (!isRequestCurrent(modeKey, token))
+                return;
+            recordLoadMetric(modeKey, Date.now() - startedAt, false, false);
+            console.warn("Launcher load command failed for", modeKey, "exit", exitCode, errorText || "");
+            if (mode === modeKey) {
+                setModeHint("Failed to load " + modeInfo(modeKey).label, "Check helper command output and logs.", "󰅚");
+                completeModeLoad(modeKey, false, "Failed to load " + modeInfo(modeKey).label);
             }
         });
     }
 
     function loadApps() {
-        loadCached("drun", ["qs-apps"], JSON.parse);
+        loadCached("drun", ["bash", repoAppsHelperPath], JSON.parse);
     }
     function loadRun() {
         loadCached("run", ["qs-run"], JSON.parse);
@@ -1732,7 +1919,7 @@ PanelWindow {
     // ── Background preloading ───────────────────
     readonly property var preloadModes: ({
             "drun": {
-                command: ["qs-apps"],
+                command: ["bash", repoAppsHelperPath],
                 parse: JSON.parse
             },
             "run": {
@@ -1887,6 +2074,9 @@ PanelWindow {
                 backend: filesBackendLabel,
                 backendRaw: String(fileSearchBackend || ""),
                 resolvedAt: fileSearchBackendResolvedAt,
+                indexReady: fileIndexReady,
+                indexBuilding: fileIndexBuilding,
+                indexSize: fileIndexItems.length,
                 metrics: ({
                         filesResolveRuns: resolveRuns,
                         filesResolveAvgMs: resolveAvgMs,
@@ -1915,7 +2105,10 @@ PanelWindow {
                 filesFindLastMs: filesFindLastMs,
                 fileCacheHits: fileCacheHits,
                 fileCacheMisses: fileCacheMisses,
-                fileCacheHitRateLabel: filesCacheStatsLabel
+                fileCacheHitRateLabel: filesCacheStatsLabel,
+                fileIndexReady: fileIndexReady,
+                fileIndexBuilding: fileIndexBuilding,
+                fileIndexSize: fileIndexItems.length
             });
     }
 
@@ -1995,18 +2188,36 @@ PanelWindow {
                 drunCategoryFilter: String(drunCategoryFilter || ""),
                 drunCategorySectionExpanded: drunCategorySectionExpanded === true,
                 hasResults: filteredItems.length > 0,
+                loadState: String(modeLoadState || "idle"),
+                loadMessage: String(modeLoadMessage || ""),
+                allItemCount: allItems.length,
+                filteredItemCount: filteredItems.length,
+                recentCount: recentItems.length,
+                suggestionCount: suggestionItems.length,
+                fileIndexReady: fileIndexReady === true,
+                fileIndexBuilding: fileIndexBuilding === true,
+                fileIndexSize: fileIndexItems.length,
                 selectedIndex: selectedIndex,
                 resultCount: filteredItems.length,
                 windowWidth: width,
                 windowHeight: height,
                 screenWidth: screenRef ? screenRef.width : 0,
                 screenHeight: screenRef ? screenRef.height : 0,
+                actualViewportWidth: actualViewportWidth,
+                actualViewportHeight: actualViewportHeight,
                 viewportWidth: viewportWidth,
                 viewportHeight: viewportHeight,
                 usableWidth: usableWidth,
                 usableHeight: usableHeight,
+                actualUsableWidth: actualUsableWidth,
+                actualUsableHeight: actualUsableHeight,
+                diagnosticViewportOffsetX: diagnosticViewportOffsetX,
+                diagnosticViewportOffsetY: diagnosticViewportOffsetY,
+                hudX: hudBox.x,
+                hudY: hudBox.y + yOffset,
                 hudWidth: hudBox.width,
-                hudHeight: hudBox.height
+                hudHeight: hudBox.height,
+                hudScale: scaleValue
             });
     }
 
@@ -2035,8 +2246,14 @@ PanelWindow {
 
     function forceRedetectFileSearchBackend(announce, callback) {
         var shouldAnnounce = announce === true;
+        if (fileIndexProc.running)
+            fileIndexProc.running = false;
         fileSearchBackend = "";
         fileSearchBackendResolvedAt = 0;
+        fileIndexItems = [];
+        fileIndexReady = false;
+        fileIndexBuilding = false;
+        fileIndexBuiltAt = 0;
         invalidateCommandAvailability("fd");
         invalidateCommandAvailability("find");
         resolveFileSearchBackend(function (backend) {
@@ -2060,47 +2277,78 @@ PanelWindow {
         if (searchQuery.length < Config.launcherFileMinQueryLength) {
             allItems = [];
             filterItems();
+            completeModeLoad("files", true, "");
             return;
         }
         var cacheKey = String(searchQuery).toLowerCase();
-        var cachedItems = getFileQueryCached(cacheKey);
-        if (cachedItems) {
-            allItems = cachedItems;
-            filterItems();
-            recordLoadMetric("files", 0, true, true);
-            return;
-        }
         var token = beginRequest("files");
         var startedAt = Date.now();
         var homeDir = Quickshell.env("HOME") || "/";
         var maxResults = Math.max(20, Config.launcherFileMaxResults);
+        beginModeLoad("files", "Searching files");
         resolveFileSearchBackend(function (backend) {
             if (!isRequestCurrent("files", token))
                 return;
             if (backend === "none") {
                 setModeHint("Dependency missing", "Install 'fd' or 'find' to use Files mode.", "󰋼");
+                completeModeLoad("files", false, "Missing files backend");
                 recordLoadMetric("files", Date.now() - startedAt, false, false);
                 return;
             }
 
-            var command = [];
             if (backend === "fd") {
-                command = ["fd", "--base-directory", homeDir, "--max-results", String(maxResults), searchQuery];
-            } else {
-                var script = "find " + shellQuote(homeDir) + " -mindepth 1 -maxdepth 6 -iname '*" + searchQuery.replace(/'/g, "'\\''") + "*' 2>/dev/null | head -n " + maxResults;
-                command = ["bash", "-lc", script];
+                if (fileIndexStale()) {
+                    if (!fileIndexBuilding)
+                        buildFileIndex(homeDir);
+                    runCommand(["fd", "--base-directory", homeDir, "--max-results", String(maxResults), searchQuery], function (raw) {
+                        if (!isRequestCurrent("files", token))
+                            return;
+                        var tookMs = Date.now() - startedAt;
+                        recordFilesBackendLoad("fd", tookMs);
+                        var items = buildFileItemsFromRaw(raw, homeDir);
+                        allItems = items;
+                        setFileQueryCached(cacheKey, items);
+                        filterItems();
+                        completeModeLoad("files", true, fileIndexBuilding ? "Indexing in background" : "");
+                        recordLoadMetric("files", tookMs, false, true);
+                    });
+                    return;
+                }
+
+                var cachedItems = getFileQueryCached(cacheKey);
+                allItems = fileIndexItems;
+                if (cachedItems) {
+                    filteredItems = decorateResultSections(cachedItems.slice(0, Config.launcherMaxResults));
+                    selectedIndex = Math.min(selectedIndex, Math.max(0, filteredItems.length - 1));
+                    completeModeLoad("files", true, "");
+                    recordLoadMetric("files", 0, true, true);
+                    return;
+                }
+
+                filterItems();
+                setFileQueryCached(cacheKey, filteredItems.slice());
+                completeModeLoad("files", true, "");
+                recordLoadMetric("files", Date.now() - startedAt, false, true);
+                return;
             }
 
-            runCommand(command, function (raw) {
+            var script = "find " + shellQuote(homeDir) + " -mindepth 1 -maxdepth 6 -iname '*" + searchQuery.replace(/'/g, "'\\''") + "*' 2>/dev/null | head -n " + maxResults;
+            runCommand(["bash", "-lc", script], function (raw) {
                 if (!isRequestCurrent("files", token))
                     return;
                 var tookMs = Date.now() - startedAt;
-                recordFilesBackendLoad(backend, tookMs);
+                recordFilesBackendLoad("find", tookMs);
                 var items = buildFileItemsFromRaw(raw, homeDir);
                 allItems = items;
                 setFileQueryCached(cacheKey, items);
                 filterItems();
+                completeModeLoad("files", true, "");
                 recordLoadMetric("files", tookMs, false, true);
+            }, function (_errorText, _exitCode, _exitStatus) {
+                if (!isRequestCurrent("files", token))
+                    return;
+                completeModeLoad("files", false, "File search failed");
+                recordLoadMetric("files", Date.now() - startedAt, false, false);
             });
         });
     }
@@ -2110,15 +2358,11 @@ PanelWindow {
         if (query.length < 3) {
             allItems = [];
             filterItems();
+            completeModeLoad("ai", true, "");
             return;
         }
-        allItems = [
-            {
-                name: "Thinking...",
-                isHint: true,
-                icon: "󰚩"
-            }
-        ];
+        allItems = [];
+        beginModeLoad("ai", "Thinking");
         filterItems();
         var token = beginRequest("ai");
         var startedAt = Date.now();
@@ -2138,19 +2382,29 @@ PanelWindow {
             else
                 allItems = [];
             filterItems();
+            completeModeLoad("ai", true, "");
             recordLoadMetric("ai", Date.now() - startedAt, false, true);
+        }, function (_errorText, _exitCode, _exitStatus) {
+            if (!isRequestCurrent("ai", token))
+                return;
+            allItems = [];
+            filterItems();
+            completeModeLoad("ai", false, "AI helper failed");
+            recordLoadMetric("ai", Date.now() - startedAt, false, false);
         });
     }
 
     function loadWeb() {
         allItems = configuredWebProviders();
         filterItems();
+        completeModeLoad("web", true, "");
         applyRememberedWebProviderSelection();
     }
 
     function loadPlugins() {
         allItems = PluginService.queryLauncherItems(searchText, true);
         filterItems();
+        completeModeLoad("plugins", true, "");
     }
 
     function loadSettings() {
@@ -2173,6 +2427,7 @@ PanelWindow {
         }
         allItems = items;
         filterItems();
+        completeModeLoad("settings", true, "");
     }
 
     function loadDevOps() {
@@ -2230,11 +2485,13 @@ PanelWindow {
 
         allItems = items;
         filterItems();
+        completeModeLoad("devops", true, "");
     }
 
     function loadOrchestrator() {
         allItems = [];
         filterItems();
+        completeModeLoad("orchestrator", true, "");
     }
 
     function loadSystem() {
@@ -2327,6 +2584,7 @@ PanelWindow {
         ]);
         allItems = items;
         filterItems();
+        completeModeLoad("system", true, "");
     }
 
     function loadNixos() {
@@ -2373,6 +2631,7 @@ PanelWindow {
 
         allItems = items;
         filterItems();
+        completeModeLoad("nixos", true, "");
     }
 
     function loadWindows() {
@@ -2386,7 +2645,7 @@ PanelWindow {
                 items.push({
                     name: win.title || cls || "Window",
                     title: cls || "",
-                    icon: "󱗼",
+                    icon: cls || "",
                     class: cls,
                     toplevel: win
                 });
@@ -2396,6 +2655,7 @@ PanelWindow {
         }
         allItems = items;
         filterItems();
+        completeModeLoad("window", true, "");
     }
 
     function highlightMatch(fullText, query) {
@@ -2458,7 +2718,7 @@ PanelWindow {
         }
 
         if (mode === "plugins") {
-            filteredItems = allItems.slice(0, Config.launcherMaxResults);
+            filteredItems = decorateResultSections(allItems.slice(0, Config.launcherMaxResults));
             selectedIndex = Math.min(selectedIndex, Math.max(0, filteredItems.length - 1));
             recordFilterMetric(Date.now() - startedAt);
             return;
@@ -2485,7 +2745,7 @@ PanelWindow {
         var cleanLower = clean.toLowerCase();
 
         if (clean === "" && mode !== "files" && mode !== "ai") {
-            filteredItems = allItems;
+            filteredItems = decorateResultSections(allItems);
         } else {
             var scoredItems = [];
             for (var i = 0; i < allItems.length; i++) {
@@ -2531,7 +2791,7 @@ PanelWindow {
                     return 0;
                 });
             }
-            filteredItems = scoredItems.slice(0, Config.launcherMaxResults);
+            filteredItems = decorateResultSections(scoredItems.slice(0, Config.launcherMaxResults));
         }
         selectedIndex = Math.min(selectedIndex, Math.max(0, filteredItems.length - 1));
         if (mode === "web" && webContext && webContext.providerKey !== "")
@@ -2918,7 +3178,7 @@ PanelWindow {
             rememberRecent({
                 name: item.name || item.title || "Window",
                 title: item.title || item.class || "",
-                icon: "󱗼",
+                icon: item.icon || "󰖯",
                 openMode: "window"
             });
             if (item.toplevel && item.toplevel.activate)
@@ -3121,20 +3381,108 @@ PanelWindow {
     Rectangle {
         id: hudBox
         width: Math.min(1120, Math.max(launcherRoot.sidebarCompact ? 380 : 460, launcherRoot.usableWidth - (launcherRoot.tightMode ? 24 : 40)))
-        height: Math.min(860, Math.max(360, launcherRoot.usableHeight - (launcherRoot.tightMode ? 24 : 40)))
+        height: Math.min(980, Math.max(520, launcherRoot.usableHeight - (launcherRoot.tightMode ? 24 : 28)))
         anchors.top: parent.top
         anchors.left: parent.left
-        anchors.topMargin: launcherRoot.edgeMargins.top + Math.max(20, (launcherRoot.usableHeight - height) / 2)
-        anchors.leftMargin: launcherRoot.edgeMargins.left + Math.max(20, (launcherRoot.usableWidth - width) / 2)
-        color: Colors.bgGlass
+        anchors.topMargin: launcherRoot.edgeMargins.top + launcherRoot.diagnosticViewportOffsetY + Math.max(20, (launcherRoot.usableHeight - height) / 2)
+        anchors.leftMargin: launcherRoot.edgeMargins.left + launcherRoot.diagnosticViewportOffsetX + Math.max(20, (launcherRoot.usableWidth - width) / 2)
+        color: Qt.rgba(0.1, 0.105, 0.12, 0.96)
         radius: Colors.radiusLarge
-        border.color: Colors.border
+        border.color: Colors.withAlpha(Colors.primary, 0.26)
         border.width: 1
         scale: launcherRoot.scaleValue
         transform: Translate {
             y: launcherRoot.yOffset
         }
         clip: true
+
+        Rectangle {
+            anchors.fill: parent
+            anchors.margins: 1
+            radius: Math.max(0, hudBox.radius - 1)
+            color: Qt.rgba(0.16, 0.15, 0.17, 0.9)
+            border.color: Colors.withAlpha(Colors.border, 0.8)
+            border.width: 1
+        }
+
+        Rectangle {
+            id: windowChrome
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: launcherRoot.tightMode ? 34 : 42
+            radius: hudBox.radius
+            color: Qt.rgba(0.13, 0.14, 0.16, 0.98)
+            border.color: Colors.withAlpha(Colors.primary, 0.18)
+            border.width: 1
+
+            Rectangle {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                height: 1
+                color: Colors.withAlpha(Colors.primary, 0.18)
+            }
+
+            RowLayout {
+                anchors.fill: parent
+                anchors.leftMargin: launcherRoot.tightMode ? Colors.spacingS : Colors.spacingM
+                anchors.rightMargin: launcherRoot.tightMode ? Colors.spacingS : Colors.spacingM
+                spacing: launcherRoot.tightMode ? Colors.spacingXS : Colors.spacingS
+
+                Row {
+                    spacing: 6
+                    Repeater {
+                        model: [Qt.rgba(0.98, 0.36, 0.31, 0.9), Qt.rgba(0.96, 0.74, 0.28, 0.9), Qt.rgba(0.18, 0.8, 0.44, 0.9)]
+                        delegate: Rectangle {
+                            required property color modelData
+                            width: 10
+                            height: 10
+                            radius: 5
+                            color: modelData
+                            opacity: 0.9
+                        }
+                    }
+                }
+
+                Text {
+                    text: "Launcher"
+                    color: Colors.text
+                    font.pixelSize: launcherRoot.tightMode ? Colors.fontSizeSmall : Colors.fontSizeMedium
+                    font.weight: Font.DemiBold
+                }
+
+                Rectangle {
+                    radius: Colors.radiusPill
+                    color: Colors.withAlpha(Colors.primary, 0.16)
+                    border.color: Colors.withAlpha(Colors.primary, 0.35)
+                    border.width: 1
+                    implicitHeight: launcherRoot.tightMode ? 22 : 24
+                    implicitWidth: chromeModeLabel.implicitWidth + 16
+
+                    Text {
+                        id: chromeModeLabel
+                        anchors.centerIn: parent
+                        text: launcherRoot.modeInfo(launcherRoot.mode).label
+                        color: Colors.primary
+                        font.pixelSize: Colors.fontSizeXS
+                        font.weight: Font.DemiBold
+                    }
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                }
+
+                Text {
+                    visible: !launcherRoot.tightMode
+                    text: "QuickShell"
+                    color: Colors.textDisabled
+                    font.pixelSize: Colors.fontSizeXS
+                    font.letterSpacing: 0.4
+                }
+            }
+        }
 
         // Anti-flicker: track mouse movement after open to enable hover-select
         HoverHandler {
@@ -3157,8 +3505,12 @@ PanelWindow {
         }
 
         RowLayout {
-            anchors.fill: parent
+            anchors.top: windowChrome.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
             anchors.margins: launcherRoot.tightMode ? Colors.spacingM : Colors.paddingMedium
+            anchors.topMargin: launcherRoot.tightMode ? Colors.spacingS : Colors.spacingM
             spacing: launcherRoot.compactMode ? Colors.paddingSmall : 18
 
             LauncherSidebar {
@@ -3170,11 +3522,12 @@ PanelWindow {
             ColumnLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                spacing: launcherRoot.compactMode ? Colors.paddingSmall : Colors.paddingMedium
+                spacing: launcherRoot.compactMode ? Colors.spacingS : Colors.spacingM
 
                 LauncherSearchField {
                     id: searchInputComp
                     Layout.fillWidth: true
+                    Layout.bottomMargin: launcherRoot.tightMode ? 0 : Colors.spacingXXS
                     text: launcherRoot.searchText
                     accentColor: Colors.primary
                     placeholder: launcherRoot.modeInfo(launcherRoot.mode).hint || "Search..."
@@ -3316,10 +3669,12 @@ PanelWindow {
 
                 LauncherActionLegend {
                     visible: Config.launcherShowModeHints && !launcherRoot.tightMode
+                    Layout.bottomMargin: visible ? Colors.spacingXXS : 0
                     hintText: launcherRoot.modeInfo(launcherRoot.mode).hint
                     primaryAction: launcherRoot.legendPrimaryAction
                     secondaryAction: launcherRoot.legendSecondaryAction
                     tertiaryAction: launcherRoot.legendTertiaryAction
+                    compact: launcherRoot.compactMode || launcherRoot.webHintCompact
                 }
 
                 LauncherWebProviderBar {
@@ -3429,7 +3784,7 @@ PanelWindow {
                 LauncherHome {
                     Layout.fillWidth: true
                     launcher: launcherRoot
-                    visible: launcherRoot.showLauncherHome && launcherRoot.mode !== "orchestrator"
+                    visible: launcherRoot.showLauncherHome && launcherRoot.mode !== "orchestrator" && !launcherRoot.isModeLoading
                 }
 
                 OrchestratorView {
@@ -3442,7 +3797,7 @@ PanelWindow {
                     currentIndex: mode === "media" ? 1 : 0
 
                     StackLayout {
-                        currentIndex: launcherRoot.filteredItems.length > 0 ? 0 : 1
+                        currentIndex: launcherRoot.filteredItems.length > 0 ? 0 : (launcherRoot.isModeLoading ? 1 : 2)
 
                         ListView {
                             id: resultsList
@@ -3451,17 +3806,46 @@ PanelWindow {
                             spacing: launcherRoot.compactMode ? Colors.spacingXS : Colors.spacingS
                             currentIndex: launcherRoot.selectedIndex
                             enabled: !launcherRoot.showingConfirm
-                            section.property: "category"
-                            section.delegate: Text {
-                                text: section
-                                color: Colors.primary
-                                font.pixelSize: Colors.fontSizeXS
-                                font.bold: true
-                                height: launcherRoot.compactMode ? 21 : 25
-                                verticalAlignment: Text.AlignBottom
+                            topMargin: launcherRoot.compactMode ? Colors.spacingXXS : Colors.spacingXS
+                            section.property: "sectionLabel"
+                            section.delegate: Item {
+                                width: resultsList.width
+                                height: launcherRoot.compactMode ? 26 : 30
+
+                                RowLayout {
+                                    anchors.fill: parent
+                                    anchors.topMargin: launcherRoot.compactMode ? Colors.spacingXXS : Colors.spacingXS
+                                    spacing: launcherRoot.compactMode ? Colors.spacingXS : Colors.spacingS
+
+                                    Rectangle {
+                                        radius: Colors.radiusPill
+                                        color: Colors.withAlpha(Colors.primary, 0.12)
+                                        border.color: Colors.withAlpha(Colors.primary, 0.22)
+                                        border.width: 1
+                                        implicitHeight: launcherRoot.compactMode ? 18 : 20
+                                        implicitWidth: sectionHeaderLabel.implicitWidth + (launcherRoot.compactMode ? 12 : 14)
+
+                                        SharedWidgets.SectionLabel {
+                                            id: sectionHeaderLabel
+                                            anchors.centerIn: parent
+                                            label: section
+                                            color: Colors.primary
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        Layout.fillWidth: true
+                                        Layout.alignment: Qt.AlignVCenter
+                                        implicitHeight: 1
+                                        radius: 1
+                                        color: Colors.withAlpha(Colors.border, 0.9)
+                                    }
+                                }
                             }
 
                             delegate: LauncherResultDelegate {
+                                modelData: modelData
+                                index: index
                                 selectedIndex: launcherRoot.selectedIndex
                                 searchText: launcherRoot.searchText
                                 mode: launcherRoot.mode
@@ -3469,9 +3853,40 @@ PanelWindow {
                                 tightMode: launcherRoot.tightMode
                                 ignoreMouseHover: launcherRoot.ignoreMouseHover
                                 modeIcons: launcherRoot.modeIcons
+                                iconMap: launcherRoot.launcherIconMap
                                 onClicked: launcherRoot.executeSelection()
                                 onEntered: if (!launcherRoot.ignoreMouseHover)
                                     launcherRoot.selectedIndex = index
+                            }
+                        }
+
+                        Rectangle {
+                            color: Colors.bgWidget
+                            radius: Colors.radiusMedium
+                            border.color: Colors.border
+                            border.width: 1
+
+                            ColumnLayout {
+                                anchors.centerIn: parent
+                                spacing: Colors.spacingS
+
+                                SharedWidgets.LoadingSpinner {
+                                    Layout.alignment: Qt.AlignHCenter
+                                    size: launcherRoot.compactMode ? 18 : 24
+                                }
+                                Text {
+                                    Layout.alignment: Qt.AlignHCenter
+                                    text: launcherRoot.modeLoadMessage !== "" ? launcherRoot.modeLoadMessage : ("Loading " + launcherRoot.modeInfo(launcherRoot.mode).label)
+                                    color: Colors.text
+                                    font.pixelSize: Colors.fontSizeSmall
+                                    font.weight: Font.DemiBold
+                                }
+                                Text {
+                                    Layout.alignment: Qt.AlignHCenter
+                                    text: "Please wait"
+                                    color: Colors.textSecondary
+                                    font.pixelSize: Colors.fontSizeXS
+                                }
                             }
                         }
 

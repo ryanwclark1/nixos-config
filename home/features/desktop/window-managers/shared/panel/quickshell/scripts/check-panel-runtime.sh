@@ -3,6 +3,7 @@ set -euo pipefail
 
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 config_root="$(CDPATH= cd -- "${script_dir}/../config" >/dev/null && pwd)"
+runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
 instance_id=""
 repo_shell_mode=0
 repo_shell_pid=""
@@ -93,6 +94,70 @@ run_ipc() {
 
   [[ -n "${output}" ]] && printf '%s\n' "${output}" >&2
   return "${status}"
+}
+
+discover_instances() {
+  local service_pid=""
+  local resolved=""
+  local dir
+
+  if command -v systemctl >/dev/null 2>&1; then
+    service_pid="$(systemctl --user show quickshell.service --property MainPID --value 2>/dev/null || true)"
+    if [[ "${service_pid}" =~ ^[0-9]+$ ]] && [[ "${service_pid}" != "0" ]]; then
+      resolved="$(readlink -f "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid/${service_pid}" 2>/dev/null || true)"
+      if [[ -n "${resolved}" && -S "${resolved}/ipc.sock" ]]; then
+        basename "${resolved}"
+        return 0
+      fi
+    fi
+  fi
+
+  if [[ ! -d "${runtime_root}" ]]; then
+    return 0
+  fi
+
+  while IFS= read -r dir; do
+    basename "${dir}"
+  done < <(find "${runtime_root}" -mindepth 1 -maxdepth 1 -type d -exec test -S '{}/ipc.sock' ';' -printf '%T@ %p\n' 2>/dev/null | sort -nr | head -n 20 | awk '{print $2}')
+}
+
+discover_reachable_instance() {
+  local candidate
+
+  while IFS= read -r candidate; do
+    [[ -n "${candidate}" ]] || continue
+    if run_ipc quickshell ipc --id "${candidate}" show >/dev/null; then
+      printf '%s\n' "${candidate}"
+      return 0
+    fi
+  done < <(discover_instances)
+
+  return 1
+}
+
+refresh_instance_args() {
+  local refreshed_id=""
+
+  if (( repo_shell_mode == 1 )) || [[ -z "${instance_id}" ]]; then
+    return 0
+  fi
+
+  if run_ipc quickshell ipc --id "${instance_id}" show >/dev/null; then
+    return 0
+  fi
+
+  refreshed_id="$(discover_reachable_instance || true)"
+  if [[ -z "${refreshed_id}" ]]; then
+    printf 'Unable to rediscover a live QuickShell instance after reload.\n' >&2
+    return 1
+  fi
+
+  if [[ "${refreshed_id}" != "${instance_id}" ]]; then
+    printf '[INFO] Refreshing stale instance id %s -> %s\n' "${instance_id}" "${refreshed_id}"
+    instance_id="${refreshed_id}"
+  fi
+
+  return 0
 }
 
 cleanup_repo_shell() {
@@ -188,6 +253,11 @@ main() {
 
   if (( run_settings == 1 )); then
     run_step "Running settings responsive smoke" "${script_dir}/check-settings-responsive.sh" "${args[@]}"
+    refresh_instance_args
+    args=()
+    if [[ -n "${instance_id}" ]]; then
+      args+=(--id "${instance_id}")
+    fi
   fi
 
   if (( run_surfaces == 1 )); then

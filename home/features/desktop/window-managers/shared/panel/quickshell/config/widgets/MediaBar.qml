@@ -15,11 +15,33 @@ Rectangle {
   property bool vertical: false
   property bool iconOnly: false
   property int maxTextWidth: 150
+  property bool showVisualizer: true
+  property int visualizerBars: 8
   visible: MediaService.currentPlayer !== null
+  readonly property bool visualizerVisible: showVisualizer && MediaService.currentPlayer !== null && MediaService.isPlaying
+  readonly property var visualizerValues: {
+    var source = (SpectrumService && SpectrumService.values) ? SpectrumService.values : [];
+    var count = Math.max(4, visualizerBars);
+    var aggregated = [];
+    for (var i = 0; i < count; ++i) {
+      var start = Math.floor((i * source.length) / count);
+      var end = Math.floor(((i + 1) * source.length) / count);
+      var peak = 0;
+      for (var j = start; j < end; ++j)
+        peak = Math.max(peak, Number(source[j]) || 0);
+      aggregated.push(peak);
+    }
+    return aggregated;
+  }
 
   // Rewind detection: flash prev icon when position jumps backward > 3s
   property real _lastPosition: 0
   property real _rewindFlashOpacity: 0
+
+  Ref {
+    service: SpectrumService
+    active: root.visualizerVisible
+  }
 
   Connections {
     target: MediaService
@@ -71,6 +93,36 @@ Rectangle {
       color: MediaService.artAccentColor
       Behavior on color { ColorAnimation { duration: Colors.durationEmphasis } }
       icon: MediaService.isPlaying ? "󰏤" : "󰐊"
+    }
+
+    Item {
+      visible: root.visualizerVisible
+      width: visible ? visualizerRow.width : 0
+      height: 16
+      anchors.verticalCenter: parent.verticalCenter
+
+      Row {
+        id: visualizerRow
+        anchors.verticalCenter: parent.verticalCenter
+        spacing: 2
+
+        Repeater {
+          model: root.visualizerValues
+
+          delegate: Rectangle {
+            required property var modelData
+            width: 3
+            height: 4 + Math.round(Math.max(0, Math.min(1, Number(modelData) || 0)) * 12)
+            radius: 1.5
+            anchors.verticalCenter: parent.verticalCenter
+            color: Colors.withAlpha(MediaService.artAccentColor, 0.9)
+
+            Behavior on height {
+              NumberAnimation { duration: 90; easing.type: Easing.OutCubic }
+            }
+          }
+        }
+      }
     }
 
     Item {

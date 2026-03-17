@@ -56,8 +56,11 @@ PopupWindow {
         else if (surface.forceActiveFocus)
           surface.forceActiveFocus();
       });
-    } else if (!showContent && root.initialFocusTarget && root.initialFocusTarget.activeFocus) {
-      root.initialFocusTarget.focus = false;
+    } else if (!showContent) {
+      if (root.initialFocusTarget && root.initialFocusTarget.activeFocus)
+        root.initialFocusTarget.focus = false;
+      if (surface.activeFocus)
+        surface.focus = false;
     }
   }
 

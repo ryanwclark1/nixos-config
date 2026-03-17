@@ -47,9 +47,11 @@ QtObject {
       { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether the clock adapts to bar orientation automatically, always shows the full time row, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] },
       { type: "toggle", key: "showDate", label: "Show Date", icon: "󰃭", enabledText: "Show the date segment alongside the time when space allows.", disabledText: "Show only the time in the bar widget." }
     ] },
-    { widgetType: "mediaBar", label: "Media Controls", icon: "󰎆", section: "center", description: "Current media playback widget.", hasSettings: true, defaultSettings: { displayMode: "auto", maxTextWidth: 150 }, settingsSchema: [
+    { widgetType: "mediaBar", label: "Media Controls", icon: "󰎆", section: "center", description: "Current media playback widget with optional inline visualizer.", hasSettings: true, defaultSettings: { displayMode: "auto", maxTextWidth: 150, showVisualizer: true, visualizerBars: 8 }, settingsSchema: [
       { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether the media widget adapts to bar orientation automatically, always shows track text, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] },
-      { type: "slider", key: "maxTextWidth", label: "Track Text Width", icon: "󰛇", min: 80, max: 240, step: 1 }
+      { type: "slider", key: "maxTextWidth", label: "Track Text Width", icon: "󰛇", min: 80, max: 240, step: 1 },
+      { type: "toggle", key: "showVisualizer", label: "Visualizer", icon: "󰎈", enabledText: "Show the inline visualizer inside media controls while media is actively playing.", disabledText: "Hide the inline visualizer and keep only the media controls." },
+      { type: "slider", key: "visualizerBars", label: "Visualizer Bars", icon: "󰎈", min: 4, max: 20, step: 1 }
     ] },
     { widgetType: "updates", label: "Updates", icon: "󰚰", section: "center", description: "Pending system updates.", hasSettings: true, defaultSettings: { displayMode: "auto" }, settingsSchema: [
       { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether the updates widget adapts to bar orientation automatically, always shows its count, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] }
@@ -329,6 +331,11 @@ QtObject {
       parsed = parseInt(settings.maxTextWidth !== undefined ? settings.maxTextWidth : 150, 10);
       chips.push("Display: " + _modeLabel(settings.displayMode));
       chips.push("Text: " + String(isNaN(parsed) ? 150 : parsed) + "px");
+      chips.push(settings.showVisualizer !== false ? "Visualizer On" : "Visualizer Off");
+      if (settings.showVisualizer !== false) {
+        var mediaBars = parseInt(settings.visualizerBars !== undefined ? settings.visualizerBars : 8, 10);
+        chips.push("Bars: " + String(isNaN(mediaBars) ? 8 : mediaBars));
+      }
       return chips;
     }
 

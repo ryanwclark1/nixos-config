@@ -16,7 +16,6 @@ Item {
   SharedWidgets.Ref { service: RecordingService }
   SharedWidgets.Ref { service: PrivacyService }
   SharedWidgets.Ref { service: PrinterService }
-  SharedWidgets.Ref { service: SpectrumService }
   SharedWidgets.Ref { service: SystemStatus }
   SharedWidgets.Ref { service: MediaService }
   SharedWidgets.Ref { service: WeatherService }
@@ -55,17 +54,6 @@ Item {
   property bool _hovered: false
   // Expose to shell.qml for exclusiveZone control
   readonly property bool isAutoHidden: _autoHidden
-  readonly property string fullCavaData: {
-    var vals = (SpectrumService && SpectrumService.values) ? SpectrumService.values : [];
-    var blocks = ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"];
-    var s = "";
-    for (var i = 0; i < vals.length; ++i) {
-      var idx = Math.min(7, Math.floor(vals[i] * 8));
-      s += blocks[Math.max(0, idx)];
-    }
-    return s;
-  }
-
   signal surfaceRequested(string surfaceId, var context)
   signal contextMenuRequested(var actions, var triggerRect)
 
@@ -248,6 +236,13 @@ Item {
     if (maxValue !== undefined)
       parsed = Math.min(maxValue, parsed);
     return parsed;
+  }
+
+  function widgetBooleanSetting(widgetInstance, key, fallback) {
+    var settings = widgetSettings(widgetInstance);
+    if (settings[key] === undefined)
+      return fallback;
+    return settings[key] !== false;
   }
 
   function widgetStringSetting(widgetInstance, key, fallback, allowedValues) {
@@ -506,7 +501,6 @@ Item {
       required property var modelData
       property var widgetInstance: modelData
       readonly property bool occupiesSpace: root.itemOccupiesSpace(widgetLoader.item)
-      visible: occupiesSpace
       implicitWidth: occupiesSpace ? widgetLoader.implicitWidth : 0
       implicitHeight: occupiesSpace ? (root.vertical ? widgetLoader.implicitHeight : root.thickness) : 0
       width: occupiesSpace ? (root.vertical ? Math.max(root.thickness, widgetLoader.implicitWidth) : widgetLoader.implicitWidth) : 0
@@ -742,6 +736,8 @@ Item {
       vertical: root.vertical
       iconOnly: root.isSummaryWidgetIconOnly(widgetInstance)
       maxTextWidth: root.widgetIntegerSetting(widgetInstance, "maxTextWidth", 150, 80, 240)
+      showVisualizer: root.widgetBooleanSetting(widgetInstance, "showVisualizer", true)
+      visualizerBars: root.widgetIntegerSetting(widgetInstance, "visualizerBars", 8, 4, 20)
       anchorWindow: root.anchorWindow
     }
   }
@@ -797,16 +793,31 @@ Item {
     Item {
       id: cavaRoot
       property var widgetInstance: null
+      readonly property string fullCavaData: {
+        var vals = (SpectrumService && SpectrumService.values) ? SpectrumService.values : [];
+        var blocks = ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"];
+        var s = "";
+        for (var i = 0; i < vals.length; ++i) {
+          var idx = Math.min(7, Math.floor(vals[i] * 8));
+          s += blocks[Math.max(0, idx)];
+        }
+        return s;
+      }
       readonly property string cavaBarText: {
-        var full = root.fullCavaData || "";
+        var full = cavaRoot.fullCavaData || "";
         var barCount = root.widgetIntegerSetting(widgetInstance, "barCount", 8, 4, 20);
         var fallback = "▁▂▃▄▅▆▇█";
         var source = full.length > 0 ? full : fallback;
         return source.length >= barCount ? source.substring(0, barCount) : source;
       }
-      visible: !root.vertical
+      visible: !root.vertical && MediaService.currentPlayer !== null && MediaService.isPlaying
       implicitWidth: cavaPill.width
       implicitHeight: cavaPill.height
+
+      SharedWidgets.Ref {
+        service: SpectrumService
+        active: cavaRoot.visible
+      }
 
       SharedWidgets.BarPill {
         id: cavaPill

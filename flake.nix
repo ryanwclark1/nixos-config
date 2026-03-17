@@ -202,11 +202,12 @@
                 services.timesyncd.enable = lib.mkForce true;
                 networking.hostName = lib.mkForce "niriTestVm";
                 programs.ssh.knownHosts = lib.mkForce { };
-                # Make the test VM reliably accessible without depending on host sops state.
-                services.displayManager.autoLogin.enable = lib.mkForce true;
-                services.displayManager.autoLogin.user = lib.mkForce "administrator";
+                # Use a tty autologin path instead of relying on SDDM in the VM.
+                services.displayManager.sddm.enable = lib.mkForce false;
+                services.displayManager.autoLogin.enable = lib.mkForce false;
+                services.displayManager.autoLogin.user = lib.mkForce null;
                 services.displayManager.defaultSession = lib.mkForce "niri";
-                services.getty.autologinUser = lib.mkForce null;
+                services.getty.autologinUser = lib.mkForce "administrator";
                 services.syncthing.enable = lib.mkForce false;
                 services.blueman.enable = lib.mkForce false;
                 services.geoclue2.enable = lib.mkForce false;
@@ -236,7 +237,7 @@
                   virtualisation.graphics = true;
                   virtualisation.cores = 4;
                   virtualisation.memorySize = 8192;
-                  virtualisation.diskSize = 16384;
+                  virtualisation.diskSize = 32768;
                 };
               }
             )
@@ -290,7 +291,7 @@
                   virtualisation.graphics = true;
                   virtualisation.cores = 4;
                   virtualisation.memorySize = 8192;
-                  virtualisation.diskSize = 16384;
+                  virtualisation.diskSize = 32768;
                 };
               }
             )

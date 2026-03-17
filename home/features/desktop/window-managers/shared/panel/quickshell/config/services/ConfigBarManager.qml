@@ -26,7 +26,6 @@ QtObject {
         createWidgetInstance("dateTime"),
         createWidgetInstance("mediaBar"),
         createWidgetInstance("updates"),
-        createWidgetInstance("cava"),
         createWidgetInstance("idleInhibitor")
       ],
       right: [
@@ -168,6 +167,82 @@ QtObject {
     return normalized;
   }
 
+  function _findWidgetIndex(widgets, widgetType) {
+    for (var i = 0; i < widgets.length; ++i) {
+      if (String(widgets[i].widgetType || "") === widgetType)
+        return i;
+    }
+    return -1;
+  }
+
+  function migrateCavaWidget(sectionWidgets) {
+    var normalized = sectionWidgets || { left: [], center: [], right: [] };
+    var sections = ["left", "center", "right"];
+    var foundCava = false;
+    var preferredSection = "center";
+    var preferredIndex = -1;
+    var visualizerBars = 8;
+
+    for (var i = 0; i < sections.length; ++i) {
+      var section = sections[i];
+      var widgets = normalized[section] || [];
+      for (var j = 0; j < widgets.length; ++j) {
+        if (String(widgets[j].widgetType || "") !== "cava")
+          continue;
+
+        foundCava = true;
+        preferredSection = section;
+        preferredIndex = j;
+        var cavaSettings = widgets[j].settings || {};
+        var parsedBars = parseInt(cavaSettings.barCount !== undefined ? cavaSettings.barCount : 8, 10);
+        if (!isNaN(parsedBars))
+          visualizerBars = Math.max(4, Math.min(20, parsedBars));
+      }
+    }
+
+    if (!foundCava)
+      return normalized;
+
+    var mediaSection = "";
+    var mediaIndex = -1;
+    for (var mediaSectionIdx = 0; mediaSectionIdx < sections.length; ++mediaSectionIdx) {
+      var candidateSection = sections[mediaSectionIdx];
+      var candidateIndex = _findWidgetIndex(normalized[candidateSection] || [], "mediaBar");
+      if (candidateIndex !== -1) {
+        mediaSection = candidateSection;
+        mediaIndex = candidateIndex;
+        break;
+      }
+    }
+
+    if (mediaIndex !== -1) {
+      var mediaWidget = JSON.parse(JSON.stringify(normalized[mediaSection][mediaIndex]));
+      if (!mediaWidget.settings)
+        mediaWidget.settings = {};
+      mediaWidget.settings.showVisualizer = true;
+      mediaWidget.settings.visualizerBars = visualizerBars;
+      normalized[mediaSection][mediaIndex] = normalizeWidgetInstance(mediaWidget);
+    } else {
+      var createdMediaWidget = createWidgetInstance("mediaBar", {
+        showVisualizer: true,
+        visualizerBars: visualizerBars
+      });
+      var targetWidgets = (normalized[preferredSection] || []).slice();
+      var insertIndex = preferredIndex < 0 ? targetWidgets.length : Math.min(preferredIndex, targetWidgets.length);
+      targetWidgets.splice(insertIndex, 0, normalizeWidgetInstance(createdMediaWidget));
+      normalized[preferredSection] = targetWidgets;
+    }
+
+    for (var removeSectionIdx = 0; removeSectionIdx < sections.length; ++removeSectionIdx) {
+      var removeSection = sections[removeSectionIdx];
+      normalized[removeSection] = (normalized[removeSection] || []).filter(function(widget) {
+        return String(widget.widgetType || "") !== "cava";
+      });
+    }
+
+    return normalized;
+  }
+
   function cloneWidgetSettings(item) {
     return item && item.settings ? JSON.parse(JSON.stringify(item.settings)) : {};
   }
@@ -260,7 +335,7 @@ QtObject {
       shadowOpacity: Math.max(0.0, Math.min(1.0, Number(bar && bar.shadowOpacity !== undefined ? bar.shadowOpacity : 0.3) || 0.3)),
       fontScale: Math.max(0.5, Math.min(2.0, Number(bar && bar.fontScale !== undefined ? bar.fontScale : 1.0) || 1.0)),
       iconScale: Math.max(0.5, Math.min(2.0, Number(bar && bar.iconScale !== undefined ? bar.iconScale : 1.0) || 1.0)),
-      sectionWidgets: normalizeSectionWidgets(bar && bar.sectionWidgets ? bar.sectionWidgets : defaultBarSectionWidgets())
+      sectionWidgets: migrateCavaWidget(normalizeSectionWidgets(bar && bar.sectionWidgets ? bar.sectionWidgets : defaultBarSectionWidgets()))
     };
 
     return normalized;
@@ -555,6 +630,34 @@ QtObject {
     }
 
     return false;
+  }
+
+  function findBarWidgetInstance(instanceId) {
+    var targetId = String(instanceId || "");
+    if (targetId === "")
+      return null;
+
+    var bars = config.barConfigs || [];
+    var sections = ["left", "center", "right"];
+    for (var i = 0; i < bars.length; ++i) {
+      var barConfig = bars[i];
+      for (var j = 0; j < sections.length; ++j) {
+        var section = sections[j];
+        var widgets = barSectionWidgets(barConfig, section);
+        for (var k = 0; k < widgets.length; ++k) {
+          if (String(widgets[k].instanceId || "") === targetId) {
+            return {
+              barId: String(barConfig.id || ""),
+              section: section,
+              instanceId: targetId,
+              widgetType: String(widgets[k].widgetType || "")
+            };
+          }
+        }
+      }
+    }
+
+    return null;
   }
 
   function moveBarWidget(barId, section, fromIndex, toIndex, targetSection) {

@@ -14,10 +14,19 @@ Rectangle {
     signal escapePressed
 
     height: 48
-    radius: Colors.radiusMedium
-    color: Colors.withAlpha(Colors.surface, 0.4)
-    border.color: input.activeFocus ? accentColor : Colors.border
+    radius: Colors.radiusLarge
+    color: Qt.rgba(0.2, 0.19, 0.2, 0.95)
+    border.color: input.activeFocus ? accentColor : Colors.withAlpha(Colors.border, 0.6)
     border.width: 1
+
+    Rectangle {
+        anchors.fill: parent
+        anchors.margins: 1
+        radius: Math.max(0, root.radius - 1)
+        color: Qt.rgba(0.22, 0.21, 0.22, 0.94)
+        border.color: Colors.withAlpha(input.activeFocus ? accentColor : Colors.surface, input.activeFocus ? 0.2 : 0.32)
+        border.width: 1
+    }
 
     Behavior on border.color {
         ColorAnimation {
@@ -54,6 +63,8 @@ Rectangle {
             verticalAlignment: Text.AlignVCenter
             selectByMouse: true
             selectionColor: Colors.highlight
+            onVisibleChanged: if (!visible && activeFocus)
+                focus = false
 
             Text {
                 text: root.placeholder

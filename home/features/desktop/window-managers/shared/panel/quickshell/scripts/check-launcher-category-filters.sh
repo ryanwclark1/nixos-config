@@ -30,19 +30,20 @@ require_pattern() {
 }
 
 # Config/state wiring
-require_literal "$config_qml" 'property bool launcherDrunCategoryFiltersEnabled: true' "drun category filters config property"
+require_literal "$config_qml" 'property bool launcherDrunCategoryFiltersEnabled: false' "drun category filters config property"
 require_literal "$config_persistence_js" '"drunCategoryFiltersEnabled": config.launcherDrunCategoryFiltersEnabled,' "drun category filters config persistence"
 
 # Settings exposure
 require_literal "$system_tab_qml" 'label: "App Category Filters"' "settings category filter toggle label"
 require_literal "$system_tab_qml" 'configKey: "launcherDrunCategoryFiltersEnabled"' "settings category filter toggle binding"
-require_literal "$system_tab_qml" 'Config.launcherDrunCategoryFiltersEnabled = true;' "settings category filter reset default"
+require_literal "$system_tab_qml" 'Config.launcherDrunCategoryFiltersEnabled = false;' "settings category filter reset default"
 
 # Desktop app metadata extraction
-require_literal "$apps_script" 'categories=$(grep -m1 "^Categories="' "apps script categories extraction"
-require_literal "$apps_script" 'keywords=$(grep -m1 "^Keywords="' "apps script keywords extraction"
-require_literal "$apps_script" 'categories_esc=$(echo "${categories:-}" | jq -R .)' "apps script category JSON escaping"
-require_literal "$apps_script" 'keywords_esc=$(echo "${keywords:-}" | jq -R .)' "apps script keywords JSON escaping"
+require_literal "$apps_script" '/^Categories=/ && categories == "" {' "apps script categories extraction"
+require_literal "$apps_script" '/^Keywords=/ && keywords == "" {' "apps script keywords extraction"
+require_literal "$apps_script" 'gsub(/;/, " ", cleaned_categories)' "apps script category shaping"
+require_literal "$apps_script" 'gsub(/;/, " ", cleaned_keywords)' "apps script keyword shaping"
+require_literal "$apps_script" '/^Hidden=/ && hidden == "" {' "apps script hidden flag extraction"
 
 # Launcher behavior and UI guards
 require_literal "$launcher_qml" 'readonly property bool drunCategoryFiltersEnabled: Config.launcherDrunCategoryFiltersEnabled' "launcher category filters enabled binding"

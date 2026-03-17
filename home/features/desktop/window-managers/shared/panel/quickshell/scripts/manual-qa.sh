@@ -7,7 +7,7 @@ checklist_path="${repo_root}/MANUAL_QA_CHECKLIST.md"
 
 usage() {
   cat <<EOF
-Usage: manual-qa.sh [--checklist] [--journal] [--settings] [--surfaces] [--launcher] [--all]
+Usage: manual-qa.sh [--checklist] [--journal] [--settings] [--surfaces] [--launcher] [--artifacts] [--all]
 
 Helpers for the remaining manual Quickshell QA pass.
 
@@ -17,7 +17,8 @@ Options:
   --settings   Open SettingsHub.
   --surfaces   Open the main runtime surfaces used for sanity checks.
   --launcher   Open the launcher in its primary manual QA modes.
-  --all        Print the checklist path, journal command, and run settings/surfaces/launcher helpers.
+  --artifacts  Generate all visual QA matrices and a dashboard index.
+  --all        Print the checklist path, journal command, run settings/surfaces/launcher helpers, and generate artifacts.
   -h, --help   Show this help text.
 EOF
 }
@@ -49,6 +50,10 @@ open_launcher() {
   quickshell ipc call Launcher openWeb
 }
 
+capture_artifacts() {
+  bash "${script_dir}/capture-manual-qa-dashboard.sh"
+}
+
 if (( $# == 0 )); then
   usage
   exit 0
@@ -71,6 +76,9 @@ while [[ $# -gt 0 ]]; do
     --launcher)
       open_launcher
       ;;
+    --artifacts)
+      capture_artifacts
+      ;;
     --all)
       printf '[INFO] Checklist: %s\n' "${checklist_path}"
       printf '[INFO] Journal: '
@@ -78,6 +86,7 @@ while [[ $# -gt 0 ]]; do
       open_settings
       open_surfaces
       open_launcher
+      capture_artifacts
       ;;
     -h|--help)
       usage

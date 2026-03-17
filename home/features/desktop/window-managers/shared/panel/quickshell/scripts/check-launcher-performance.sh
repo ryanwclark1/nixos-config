@@ -43,7 +43,7 @@ require_literal "$launcher_qml" 'property int fileSearchBackendResolvedAt: 0' "f
 require_literal "$launcher_qml" 'readonly property int fileSearchBackendRefreshMs: 180000' "files backend refresh interval field"
 require_literal "$launcher_qml" 'readonly property int fileSearchBackendMissRefreshMs: 20000' "files backend miss refresh interval field"
 require_literal "$config_qml" 'property real launcherScoreCategoryWeight: 0.7' "category weight config property"
-require_literal "$config_qml" 'property bool launcherDrunCategoryFiltersEnabled: true' "drun category filter enable config property"
+require_literal "$config_qml" 'property bool launcherDrunCategoryFiltersEnabled: false' "drun category filter enable config property"
 require_literal "$config_persistence_js" '"drunCategoryFiltersEnabled": config.launcherDrunCategoryFiltersEnabled,' "drun category filter enable config persistence"
 require_literal "$config_persistence_js" '"scoreCategoryWeight": config.launcherScoreCategoryWeight' "category weight config persistence"
 require_literal "$launcher_qml" 'readonly property string filesCacheStatsLabel: {' "files cache stats label property"
@@ -81,7 +81,8 @@ require_literal "$launcher_qml" 'function redetectFilesBackend() {' "files backe
 require_literal "$launcher_qml" 'function diagnosticReset() {' "launcher diagnostic reset IPC action"
 require_literal "$launcher_qml" 'function filesBackendStatus(): string {' "files backend status IPC action"
 require_literal "$launcher_qml" 'recordFilterMetric(Date.now() - startedAt);' "filter metric recording call"
-require_literal "$launcher_qml" 'recordFilesBackendLoad(backend, tookMs);' "files backend metric recording call"
+require_literal "$launcher_qml" 'recordFilesBackendLoad("fd", tookMs);' "files fd backend metric recording call"
+require_literal "$launcher_qml" 'recordFilesBackendLoad("find", tookMs);' "files find backend metric recording call"
 require_literal "$launcher_qml" 'recordFilesBackendResolveMetric(Date.now() - startedAt);' "files backend resolve metric recording call"
 require_literal "$launcher_qml" 'invalidateCommandAvailability("fd");' "files backend fd cache invalidation call"
 require_literal "$launcher_qml" 'invalidateCommandAvailability("find");' "files backend find cache invalidation call"
@@ -146,7 +147,7 @@ require_literal "$system_tab_qml" 'value: Config.launcherScoreCategoryWeight' "s
 require_literal "$system_tab_qml" 'onMoved: v => Config.launcherScoreCategoryWeight = v' "settings category keywords weight slider action"
 require_literal "$system_tab_qml" 'label: "App Category Filters"' "settings app category filters toggle label"
 require_literal "$system_tab_qml" 'configKey: "launcherDrunCategoryFiltersEnabled"' "settings app category filters toggle binding"
-require_literal "$system_tab_qml" 'Config.launcherDrunCategoryFiltersEnabled = true;' "settings app category filters reset default"
+require_literal "$system_tab_qml" 'Config.launcherDrunCategoryFiltersEnabled = false;' "settings app category filters reset default"
 forbid_literal "$launcher_qml" 'function fuzzyMatch(str, pattern) {' "legacy fuzzy matcher signature"
 
 if (( ${#violations[@]} > 0 )); then

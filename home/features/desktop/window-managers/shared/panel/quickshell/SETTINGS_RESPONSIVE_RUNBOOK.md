@@ -54,6 +54,12 @@ Command roles:
 - `preview-settings-responsive.sh` is a manual walkthrough.
 - `capture-settings-viewport.sh` and `capture-settings-matrix.sh` produce review artifacts.
 
+Capture note:
+
+- Settings viewport captures use padded modal framing so the full left sidebar remains visible in portrait review artifacts.
+- If the ambient shell is unstable during capture, prefer:
+  - `scripts/capture-panel-matrix.sh --repo-shell --skip-surfaces --settings-preset portrait`
+
 ## What The Smoke Script Covers
 
 The smoke script:

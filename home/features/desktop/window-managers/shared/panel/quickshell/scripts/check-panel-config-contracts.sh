@@ -213,6 +213,55 @@ main() {
     fail "Sparse stat widget settings inherit missing defaults"
   fi
 
+  local media_migration_output media_migration_json
+  media_migration_output="$(run_harness "cava to mediaBar migration" '
+    var normalized = Config.normalizeBarConfigs([
+      {
+        id: "bar-media",
+        name: "Media",
+        enabled: true,
+        position: "top",
+        sectionWidgets: {
+          center: [
+            { instanceId: "clock-1", widgetType: "dateTime", enabled: true, settings: {} },
+            { instanceId: "media-1", widgetType: "mediaBar", enabled: true, settings: { displayMode: "full", maxTextWidth: 222 } },
+            { instanceId: "cava-1", widgetType: "cava", enabled: true, settings: { barCount: 12 } }
+          ]
+        }
+      },
+      {
+        id: "bar-cava-only",
+        name: "Cava Only",
+        enabled: true,
+        position: "bottom",
+        sectionWidgets: {
+          center: [
+            { instanceId: "cava-2", widgetType: "cava", enabled: true, settings: { barCount: 6 } }
+          ]
+        }
+      }
+    ], {});
+    console.log("CONTRACT:" + JSON.stringify(normalized));
+    Qt.quit();
+  ')" || true
+
+  media_migration_json="$(printf '%s\n' "${media_migration_output}" | sed -n 's/^.*CONTRACT://p' | tail -n 1)"
+  if [[ -n "${media_migration_json}" ]] \
+    && [[ "$(printf '%s' "${media_migration_json}" | jq -r '.[0].sectionWidgets.center | map(select(.widgetType == "cava")) | length')" == "0" ]] \
+    && [[ "$(printf '%s' "${media_migration_json}" | jq -r '.[0].sectionWidgets.center | map(select(.widgetType == "mediaBar")) | length')" == "1" ]] \
+    && [[ "$(printf '%s' "${media_migration_json}" | jq -r '.[0].sectionWidgets.center[] | select(.widgetType == "mediaBar").settings.displayMode')" == "full" ]] \
+    && [[ "$(printf '%s' "${media_migration_json}" | jq -r '.[0].sectionWidgets.center[] | select(.widgetType == "mediaBar").settings.maxTextWidth')" == "222" ]] \
+    && [[ "$(printf '%s' "${media_migration_json}" | jq -r '.[0].sectionWidgets.center[] | select(.widgetType == "mediaBar").settings.showVisualizer')" == "true" ]] \
+    && [[ "$(printf '%s' "${media_migration_json}" | jq -r '.[0].sectionWidgets.center[] | select(.widgetType == "mediaBar").settings.visualizerBars')" == "12" ]] \
+    && [[ "$(printf '%s' "${media_migration_json}" | jq -r '.[1].sectionWidgets.center | map(select(.widgetType == "cava")) | length')" == "0" ]] \
+    && [[ "$(printf '%s' "${media_migration_json}" | jq -r '.[1].sectionWidgets.center | map(select(.widgetType == "mediaBar")) | length')" == "1" ]] \
+    && [[ "$(printf '%s' "${media_migration_json}" | jq -r '.[1].sectionWidgets.center[0].settings.showVisualizer')" == "true" ]] \
+    && [[ "$(printf '%s' "${media_migration_json}" | jq -r '.[1].sectionWidgets.center[0].settings.visualizerBars')" == "6" ]]; then
+    pass "Legacy cava widgets migrate into mediaBar settings"
+  else
+    fail "Legacy cava widgets migrate into mediaBar settings"
+  fi
+
   printf '[INFO] Summary: %d pass, %d fail\n' "${pass_count}" "${fail_count}"
   if (( fail_count == 0 )); then
     return 0

@@ -83,6 +83,9 @@ Scope {
     var printerWidget = panel.componentForWidget("printer").createObject(harnessHost, {
       widgetInstance: { instanceId: "printer-test", widgetType: "printer", enabled: true, settings: { displayMode: "auto" } }
     });
+    var batteryWidget = panel.componentForWidget("battery").createObject(harnessHost, {
+      widgetInstance: { instanceId: "battery-test", widgetType: "battery", enabled: true, settings: { displayMode: "auto" } }
+    });
 
     snapshot("updates", updatesWidget, panel);
     snapshot("ssh", sshWidget, panel);
@@ -91,6 +94,7 @@ Scope {
     snapshot("privacy", privacyWidget, panel);
     snapshot("recording", recordingWidget, panel);
     snapshot("printer", printerWidget, panel);
+    snapshot("battery", batteryWidget, panel);
 
     console.log("RESULT:" + JSON.stringify(results));
     updatesWidget.destroy();
@@ -100,6 +104,7 @@ Scope {
     privacyWidget.destroy();
     recordingWidget.destroy();
     printerWidget.destroy();
+    batteryWidget.destroy();
     Qt.quit();
   }
 }
@@ -156,6 +161,7 @@ for key, message in required_hidden.items():
         sys.exit(1)
 
 optional_hidden = {
+    "battery": "hidden battery widget still reports layout footprint.",
     "music": "hidden music widget still reports layout footprint.",
     "privacy": "hidden privacy widget still reports layout footprint.",
     "recording": "hidden recording widget still reports layout footprint.",

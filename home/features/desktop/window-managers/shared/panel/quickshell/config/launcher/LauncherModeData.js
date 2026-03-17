@@ -29,7 +29,7 @@ var modeMeta = {
 };
 
 var modeIcons = {
-    "drun": "󰀻", "window": "󱗼", "files": "󰈔", "ai": "󰚩",
+    "drun": "󰀻", "window": "󰖯", "files": "󰈔", "ai": "󰚩",
     "clip": "󰅍", "emoji": "󰞅", "calc": "󰪚", "web": "󰖟",
     "plugins": "󰏗", "run": "󰆍", "system": "󰒓", "keybinds": "󰌌",
     "media": "󰝚", "nixos": "", "wallpapers": "󰸉", "bookmarks": "󰃭",

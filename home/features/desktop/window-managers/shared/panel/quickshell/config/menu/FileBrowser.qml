@@ -305,7 +305,12 @@ PanelWindow {
     clip: true
 
     focus: root.isOpen
-    onVisibleChanged: if (visible) forceActiveFocus()
+    onVisibleChanged: {
+      if (visible)
+        forceActiveFocus();
+      else if (activeFocus)
+        focus = false;
+    }
     Keys.onEscapePressed: root.close()
 
     opacity: root.isOpen ? 1.0 : 0.0

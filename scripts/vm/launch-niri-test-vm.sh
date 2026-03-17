@@ -2,7 +2,7 @@
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-flake_ref="${FLAKE_REF:-${repo_root}}"
+flake_ref="${FLAKE_REF:-path:${repo_root}}"
 config_name="${NIRI_VM_CONFIG:-niriTestVm}"
 state_dir="${NIRI_VM_STATE_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}/nixos-config/niri-test-vm}"
 disk_image="${NIRI_VM_DISK_IMAGE:-${state_dir}/${config_name}.qcow2}"

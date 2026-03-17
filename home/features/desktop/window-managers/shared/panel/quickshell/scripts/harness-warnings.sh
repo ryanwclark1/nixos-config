@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+known_quickshell_harness_warning_pattern() {
+  cat <<'EOF'
+^(No running instances for |  WARN: <Unknown File>: QML ProxyFloatingWindow: Setting `(width|height)` is deprecated\. Set `(implicitWidth|implicitHeight)` instead\.|  WARN: Unable to find hyprland socket\. Cannot connect to hyprland\.|  WARN quickshell\.hyprland\.ipc: Error making request: QLocalSocket::ServerNotFoundError request: "j/clients"|  WARN: This plugin does not support setting window masks|  INFO: Launching config: |  INFO: Shell ID: |  INFO: Saving logs to |  INFO: Configuration Loaded$)
+EOF
+}
+
+filter_known_quickshell_harness_warnings() {
+  local output="${1-}"
+  printf '%s\n' "${output}" | grep -Ev "$(known_quickshell_harness_warning_pattern)"
+}
+
+fail_on_quickshell_harness_warnings() {
+  local harness_name="${1:?missing harness name}"
+  local output="${2-}"
+  local filtered_output="${3-}"
+
+  if grep -q 'TypeError:' <<<"${output}"; then
+    printf '[FAIL] %s emitted QML TypeError warnings.\n' "${harness_name}" >&2
+    exit 1
+  fi
+
+  if [[ -n "${filtered_output}" ]] && printf '%s\n' "${filtered_output}" | grep -Eqi 'warn|error|exception|binding loop|ReferenceError|TypeError|failed'; then
+    printf '[FAIL] %s emitted unexpected warnings/errors.\n' "${harness_name}" >&2
+    printf '%s\n' "${filtered_output}" >&2
+    exit 1
+  fi
+}

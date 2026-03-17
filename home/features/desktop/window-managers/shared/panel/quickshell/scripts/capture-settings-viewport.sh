@@ -348,8 +348,13 @@ main() {
   switch_to_capture_workspace "${workspace_target}"
 
   call_ipc SettingsHub close >/dev/null 2>&1 || true
-  if ! call_ipc SettingsHub openTabScrolled "${tab_id}" "${scroll_y}" >/dev/null; then
-    printf 'SettingsHub.openTabScrolled %s %s timed out for instance %s.\n' "${tab_id}" "${scroll_y}" "${instance_id}" >&2
+  if ! call_ipc SettingsHub open >/dev/null; then
+    printf 'SettingsHub.open timed out for instance %s.\n' "${instance_id}" >&2
+    exit 1
+  fi
+  sleep 0.2
+  if ! call_ipc SettingsHub openTab "${tab_id}" >/dev/null; then
+    printf 'SettingsHub.openTab %s timed out for instance %s.\n' "${tab_id}" "${instance_id}" >&2
     exit 1
   fi
   sleep "${delay_seconds}"

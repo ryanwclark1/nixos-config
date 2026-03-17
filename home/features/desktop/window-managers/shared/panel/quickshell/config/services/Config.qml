@@ -20,7 +20,7 @@ QtObject {
     property bool blurEnabled: true
     property real glassOpacity: 0.65
     property real settingsBackdropOpacity: 0.82
-    property real settingsSurfaceOpacity: 0.96
+    property real settingsSurfaceOpacity: 0.985
 
     // --- NOTIFICATIONS ---
     property int notifWidth: 350
@@ -54,7 +54,7 @@ QtObject {
     property string launcherDefaultMode: "drun"
     property bool launcherShowModeHints: true
     property bool launcherShowHomeSections: true
-    property bool launcherDrunCategoryFiltersEnabled: true
+    property bool launcherDrunCategoryFiltersEnabled: false
     property bool launcherEnablePreload: true
     property bool launcherKeepSearchOnModeSwitch: true
     property bool launcherEnableDebugTimings: false
@@ -271,7 +271,16 @@ QtObject {
         if (name.startsWith("/") || name.startsWith("file://"))
             return [name];
 
-        var lower = name.toLowerCase();
+        var customPathIndex = name.indexOf("?path=");
+        var baseName = customPathIndex === -1 ? name : name.substring(0, customPathIndex);
+        var customPath = customPathIndex === -1 ? "" : name.substring(customPathIndex + 6);
+        var lookupName = baseName;
+        if (lookupName.startsWith("image://icon/"))
+            lookupName = lookupName.substring("image://icon/".length);
+        else if (lookupName.startsWith("image://"))
+            return [lookupName];
+
+        var lower = lookupName.toLowerCase();
         var names = [];
 
         function appendUnique(value) {
@@ -281,7 +290,14 @@ QtObject {
                 names.push(value);
         }
 
-        appendUnique(name);
+        if (customPath.startsWith("/")) {
+            appendUnique(customPath + "/" + lookupName);
+            appendUnique(customPath + "/" + lookupName + ".svg");
+            appendUnique(customPath + "/" + lookupName + ".png");
+            appendUnique(customPath + "/" + lookupName + ".xpm");
+        }
+
+        appendUnique(lookupName);
         appendUnique(lower);
 
         var aliases = iconAliases[lower] || [];
@@ -455,6 +471,9 @@ QtObject {
     }
     function updateBarWidgetByInstance(instanceId, patch) {
         return _barMgr.updateBarWidgetByInstance(instanceId, patch);
+    }
+    function findBarWidgetInstance(instanceId) {
+        return _barMgr.findBarWidgetInstance(instanceId);
     }
     function moveBarWidget(barId, section, fromIndex, toIndex, targetSection) {
         return _barMgr.moveBarWidget(barId, section, fromIndex, toIndex, targetSection);

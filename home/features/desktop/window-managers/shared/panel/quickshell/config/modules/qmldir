@@ -15,6 +15,7 @@ ScratchpadWidget 1.0 ScratchpadWidget.qml
 ServiceUnitWidget 1.0 ServiceUnitWidget.qml
 SystemCpuCores 1.0 SystemCpuCores.qml
 SystemGraphs 1.0 SystemGraphs.qml
+SystemIoHistory 1.0 SystemIoHistory.qml
 SystemMonitor 1.0 SystemMonitor.qml
 SystemProcessTable 1.0 SystemProcessTable.qml
 SystemServiceTable 1.0 SystemServiceTable.qml

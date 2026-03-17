@@ -22,6 +22,9 @@ Item {
     property int dragSourceIndex: -1
     property string dragTargetSection: ""
     property int dragTargetIndex: -1
+    property bool applyingPendingBarWidgetTarget: false
+    property var editingWidget: null
+    property var editingWidgetSchema: []
     readonly property int overlayInset: root.tightSpacing ? 20 : 40
     readonly property bool dragReorderEnabled: true
 
@@ -44,8 +47,6 @@ Item {
             right: (sections.right || []).slice()
         };
     }
-    readonly property var editingWidget: (selectedBar && settingsSection && settingsInstanceId) ? Config.widgetInstance(selectedBar.id, settingsSection, settingsInstanceId) : null
-    readonly property var editingWidgetSchema: editingWidget ? BarWidgetRegistry.settingsSchema(editingWidget.widgetType) : []
     readonly property string editingPluginId: {
         var typeName = editingWidget ? String(editingWidget.widgetType || "") : "";
         return typeName.indexOf("plugin:") === 0 ? typeName.slice(7) : "";
@@ -59,11 +60,22 @@ Item {
             if (pluginSettingsLoader)
                 pluginSettingsLoader.source = "";
         }
+        Qt.callLater(refreshEditingWidgetState);
     }
     onEditingPluginIdChanged: {
         if (widgetSettingsOpen)
             Qt.callLater(loadPluginSettingsPane);
     }
+    onSettingsSectionChanged: Qt.callLater(refreshEditingWidgetState)
+    onSettingsInstanceIdChanged: Qt.callLater(refreshEditingWidgetState)
+
+    Connections {
+        target: Config
+        function onBarConfigsChanged() {
+            Qt.callLater(root.refreshEditingWidgetState);
+        }
+    }
+
     function sectionWidgets(section) {
         return currentSectionWidgets[section] || [];
     }
@@ -76,6 +88,52 @@ Item {
         addSection = section;
         widgetSearchQuery = "";
         widgetPickerOpen = true;
+    }
+
+    function refreshEditingWidgetState() {
+        if (!widgetSettingsOpen || !selectedBar || settingsSection === "" || settingsInstanceId === "") {
+            editingWidget = null;
+            editingWidgetSchema = [];
+            return;
+        }
+        var widget = Config.widgetInstance(selectedBar.id, settingsSection, settingsInstanceId);
+        editingWidget = widget;
+        editingWidgetSchema = widget ? BarWidgetRegistry.settingsSchema(widget.widgetType) : [];
+    }
+
+    function queuePendingBarWidgetTarget() {
+        if (pendingBarWidgetTargetTimer.running)
+            pendingBarWidgetTargetTimer.restart();
+        else
+            pendingBarWidgetTargetTimer.start();
+    }
+
+    function applyPendingBarWidgetTarget() {
+        if (applyingPendingBarWidgetTarget || !settingsRoot || !settingsRoot.pendingBarWidgetTarget)
+            return false;
+        applyingPendingBarWidgetTarget = true;
+        var target = settingsRoot.pendingBarWidgetTarget;
+        var targetBarId = String(target.barId || "");
+        var targetSection = String(target.section || "");
+        var targetInstanceId = String(target.instanceId || "");
+        if (targetBarId === "" || targetSection === "" || targetInstanceId === "") {
+            applyingPendingBarWidgetTarget = false;
+            return false;
+        }
+        if (!selectedBar || String(selectedBar.id || "") !== targetBarId) {
+            Config.setSelectedBar(targetBarId);
+            applyingPendingBarWidgetTarget = false;
+            queuePendingBarWidgetTarget();
+            return false;
+        }
+        settingsSection = targetSection;
+        settingsInstanceId = targetInstanceId;
+        pluginSettingsError = "";
+        widgetSettingsOpen = true;
+        settingsRoot.pendingBarWidgetTarget = null;
+        applyingPendingBarWidgetTarget = false;
+        Qt.callLater(loadPluginSettingsPane);
+        return true;
     }
 
     function availableWidgetsForPicker() {
@@ -97,7 +155,23 @@ Item {
         settingsInstanceId = instanceId;
         pluginSettingsError = "";
         widgetSettingsOpen = true;
+        Qt.callLater(refreshEditingWidgetState);
         Qt.callLater(loadPluginSettingsPane);
+    }
+
+    Component.onCompleted: queuePendingBarWidgetTarget()
+    onSettingsRootChanged: queuePendingBarWidgetTarget()
+    onSelectedBarChanged: {
+        Qt.callLater(refreshEditingWidgetState);
+        if (settingsRoot && settingsRoot.pendingBarWidgetTarget)
+            queuePendingBarWidgetTarget();
+    }
+
+    Timer {
+        id: pendingBarWidgetTargetTimer
+        interval: 0
+        repeat: false
+        onTriggered: root.applyPendingBarWidgetTarget()
     }
 
     function addWidget(widgetType) {

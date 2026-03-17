@@ -35,6 +35,7 @@ PanelWindow {
     readonly property int panelMaxWidth: 1320
     property real _dragStartX: 0
     property real _dragStartWidth: 0
+    property int keyboardSectionIndex: 0
 
     signal closeRequested()
 
@@ -44,8 +45,7 @@ PanelWindow {
         if (showContent) {
             slidePanel.forceActiveFocus();
             Qt.callLater(function() {
-                if (processTable && processTable.focusTable)
-                    processTable.focusTable();
+                root.focusKeyboardSection(0);
             });
         }
         else if (slidePanel.activeFocus)
@@ -58,6 +58,47 @@ PanelWindow {
         ProcessService.refresh();
         ServiceUnitService.refresh();
         NetworkService.refreshData();
+    }
+
+    function focusKeyboardSection(index) {
+        keyboardSectionIndex = index;
+        if (keyboardSectionIndex === 0) {
+            if (processTable && processTable.focusTable)
+                processTable.focusTable();
+            scrollDetailSectionIntoView(processTable);
+            return;
+        }
+        if (serviceTable && serviceTable.focusTable) {
+            serviceTable.focusTable();
+            scrollDetailSectionIntoView(serviceTable);
+        }
+    }
+
+    function cycleKeyboardSection(delta) {
+        var nextIndex = keyboardSectionIndex + delta;
+        if (nextIndex < 0)
+            nextIndex = 1;
+        if (nextIndex > 1)
+            nextIndex = 0;
+        focusKeyboardSection(nextIndex);
+    }
+
+    function scrollDetailSectionIntoView(item) {
+        if (!item || !detailFlick)
+            return;
+        var top = item.y;
+        var bottom = item.y + item.height;
+        var viewportTop = detailFlick.contentY;
+        var viewportBottom = viewportTop + detailFlick.height;
+        var nextContentY = viewportTop;
+
+        if (top < viewportTop)
+            nextContentY = top;
+        else if (bottom > viewportBottom)
+            nextContentY = bottom - detailFlick.height;
+
+        var maxContentY = Math.max(0, detailFlick.contentHeight - detailFlick.height);
+        detailFlick.contentY = Math.max(0, Math.min(maxContentY, nextContentY));
     }
 
     Loader {
@@ -121,6 +162,14 @@ PanelWindow {
         layer.enabled: slideAnim.running || fadeAnim.running
 
         Keys.onEscapePressed: root.closeRequested()
+        Keys.onTabPressed: event => {
+            root.cycleKeyboardSection(1);
+            event.accepted = true;
+        }
+        Keys.onBacktabPressed: event => {
+            root.cycleKeyboardSection(-1);
+            event.accepted = true;
+        }
 
         Rectangle {
             id: dragHandle
@@ -200,6 +249,20 @@ PanelWindow {
                     textColor: SystemStatus.isCritical ? Colors.error : Colors.success
                 }
 
+                SharedWidgets.FilterChip {
+                    label: "Processes"
+                    icon: "󰆍"
+                    selected: root.keyboardSectionIndex === 0
+                    onClicked: root.focusKeyboardSection(0)
+                }
+
+                SharedWidgets.FilterChip {
+                    label: "Services"
+                    icon: "󰒓"
+                    selected: root.keyboardSectionIndex === 1
+                    onClicked: root.focusKeyboardSection(1)
+                }
+
                 SharedWidgets.IconButton {
                     icon: "󰑐"
                     size: 34
@@ -248,8 +311,7 @@ PanelWindow {
                             SystemCpuCores {}
                             SystemGraphs {}
                             GPUWidget {}
-                            DiskWidget {}
-                            NetworkGraphs {}
+                            SystemIoHistory {}
                         }
                     }
 
@@ -282,10 +344,13 @@ PanelWindow {
                             SystemProcessTable {
                                 id: processTable
                                 maxRows: 26
+                                viewportFlickable: detailFlick
                             }
 
                             SystemServiceTable {
+                                id: serviceTable
                                 maxRows: 18
+                                viewportFlickable: detailFlick
                             }
                         }
                     }
@@ -302,9 +367,12 @@ PanelWindow {
 
             Text {
                 Layout.fillWidth: true
-                text: "Esc closes the panel. Drag the left edge to resize."
+                text: root.keyboardSectionIndex === 0
+                    ? "Tab switches sections. Process keys: arrows/j/k move, selection updates live detail, left/right or h/l collapse tree, r refresh, x term, Delete kill, Space suspend, +/- renice, d details, c/y copy, Enter inspect."
+                    : "Tab switches sections. Service keys: arrows/j/k move, r restart, s start/stop, Enter or l opens logs."
                 color: Colors.textDisabled
                 font.pixelSize: Colors.fontSizeXS
+                wrapMode: Text.WordWrap
             }
         }
     }

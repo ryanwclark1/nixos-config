@@ -14,12 +14,12 @@ category_key=""
 output_path=""
 delay_seconds="1.2"
 ipc_timeout_seconds="2"
-crop_mode="usable"
+crop_mode="hud"
 workspace_target="auto"
 viewport_width=""
 viewport_height=""
-workspace_settle_attempts="20"
-workspace_settle_interval="0.1"
+workspace_settle_attempts="80"
+workspace_settle_interval="0.2"
 state_settle_attempts="30"
 state_settle_interval="0.1"
 temp_full=""
@@ -29,7 +29,7 @@ capture_workspace=""
 
 usage() {
   cat <<'EOF'
-Usage: capture-launcher-viewport.sh [--id INSTANCE_ID] [--pid INSTANCE_PID] [--mode drun|files|system|web] [--state home|query|empty|category] [--query TEXT] [--category KEY] [--delay SECONDS] [--crop monitor|usable] [--workspace current|auto|NAME] [--width PX] [--height PX] [--output PATH]
+Usage: capture-launcher-viewport.sh [--id INSTANCE_ID] [--pid INSTANCE_PID] [--mode drun|files|system|web] [--state home|query|empty|category] [--query TEXT] [--category KEY] [--delay SECONDS] [--crop hud|monitor|usable] [--workspace current|auto|NAME] [--width PX] [--height PX] [--output PATH]
 
 Open the launcher through IPC, optionally drive a state preset, capture the focused monitor,
 and save a review screenshot.
@@ -183,7 +183,8 @@ resolve_hyprland_instance() {
 pick_capture_workspace() {
   local used
   local candidate
-  for candidate in $(seq 9101 9199); do
+  for candidate in $(seq 1 99); do
+    candidate="qs-launcher-capture-${candidate}"
     used="$(hypr workspaces -j | jq --arg candidate "${candidate}" 'map(select((.name // "") == $candidate or ((.id | tostring) == $candidate))) | length')"
     if [[ "${used}" == "0" ]]; then
       printf '%s\n' "${candidate}"
@@ -212,6 +213,15 @@ wait_for_workspace() {
   exit 1
 }
 
+dispatch_workspace() {
+  local target="$1"
+  if [[ "${target}" =~ ^[0-9]+$ ]]; then
+    hypr dispatch workspace "${target}" >/dev/null
+  else
+    hypr dispatch workspace "name:${target}" >/dev/null
+  fi
+}
+
 switch_to_capture_workspace() {
   local requested="$1"
   local target="${requested}"
@@ -235,7 +245,7 @@ switch_to_capture_workspace() {
   fi
 
   capture_workspace="${target}"
-  hypr dispatch workspace "${target}" >/dev/null
+  dispatch_workspace "${target}"
   wait_for_workspace "${target}"
 }
 
@@ -244,7 +254,7 @@ reassert_capture_workspace() {
   if [[ "${workspace_target}" == "current" ]]; then
     return 0
   fi
-  hypr dispatch workspace "${capture_workspace}" >/dev/null
+  dispatch_workspace "${capture_workspace}"
   wait_for_workspace "${capture_workspace}"
 }
 
@@ -295,59 +305,71 @@ wait_for_launcher_state() {
   local current_query=""
   local current_category=""
   local current_home=""
+  local current_load_state=""
+  local current_result_count=""
+  local expected_has_results="either"
+  local snapshot=""
   local attempt
+
+  if [[ "${expected_query}" != "" ]]; then
+    expected_has_results="true"
+  elif [[ "${state}" == "empty" ]]; then
+    expected_has_results="false"
+  elif [[ "${state}" == "category" ]]; then
+    expected_has_results="true"
+  fi
 
   for attempt in $(seq 1 "${state_settle_attempts}"); do
     payload="$(call_ipc Launcher launcherState 2>/dev/null || true)"
     if [[ -n "${payload}" ]]; then
-      current_mode="$(printf '%s' "${payload}" | node -e '
+      snapshot="$(printf '%s' "${payload}" | node -e '
 const fs = require("node:fs");
 const raw = fs.readFileSync(0, "utf8").trim();
 if (!raw) process.exit(1);
 let payload = JSON.parse(raw);
 if (typeof payload === "string") payload = JSON.parse(payload);
-process.stdout.write(String(payload.mode || ""));
+const parts = [
+  String(payload.mode || ""),
+  String(payload.searchText || ""),
+  String(payload.drunCategoryFilter || ""),
+  String(payload.showLauncherHome === true),
+  String(payload.loadState || "idle"),
+  String(Math.max(0, Math.round(Number(payload.resultCount || payload.filteredItemCount || 0))))
+];
+process.stdout.write(parts.join("\t"));
 ' 2>/dev/null || true)"
-      current_query="$(printf '%s' "${payload}" | node -e '
-const fs = require("node:fs");
-const raw = fs.readFileSync(0, "utf8").trim();
-if (!raw) process.exit(1);
-let payload = JSON.parse(raw);
-if (typeof payload === "string") payload = JSON.parse(payload);
-process.stdout.write(String(payload.searchText || ""));
-' 2>/dev/null || true)"
-      current_category="$(printf '%s' "${payload}" | node -e '
-const fs = require("node:fs");
-const raw = fs.readFileSync(0, "utf8").trim();
-if (!raw) process.exit(1);
-let payload = JSON.parse(raw);
-if (typeof payload === "string") payload = JSON.parse(payload);
-process.stdout.write(String(payload.drunCategoryFilter || ""));
-' 2>/dev/null || true)"
-      current_home="$(printf '%s' "${payload}" | node -e '
-const fs = require("node:fs");
-const raw = fs.readFileSync(0, "utf8").trim();
-if (!raw) process.exit(1);
-let payload = JSON.parse(raw);
-if (typeof payload === "string") payload = JSON.parse(payload);
-process.stdout.write(String(payload.showLauncherHome === true));
-' 2>/dev/null || true)"
+      IFS=$'\t' read -r current_mode current_query current_category current_home current_load_state current_result_count <<< "${snapshot}" || true
     else
       current_mode=""
       current_query=""
       current_category=""
       current_home=""
+      current_load_state=""
+      current_result_count=""
     fi
     if [[ "${current_mode}" == "${expected_mode}" && "${current_query}" == "${expected_query}" && "${current_category}" == "${expected_category}" && "${current_home}" == "${expect_home}" ]]; then
+      if [[ "${current_load_state}" == "loading" ]]; then
+        sleep "${state_settle_interval}"
+        continue
+      fi
+      if [[ "${expected_has_results}" == "true" && "${current_result_count}" == "0" ]]; then
+        sleep "${state_settle_interval}"
+        continue
+      fi
+      if [[ "${expected_has_results}" == "false" && "${current_result_count}" != "0" ]]; then
+        sleep "${state_settle_interval}"
+        continue
+      fi
       return 0
     fi
     sleep "${state_settle_interval}"
   done
 
-  printf 'Launcher did not settle to expected state (mode=%s query=%s category=%s home=%s). Got mode=%s query=%s category=%s home=%s\n' \
+  printf 'Launcher did not settle to expected state (mode=%s query=%s category=%s home=%s hasResults=%s). Got mode=%s query=%s category=%s home=%s loadState=%s resultCount=%s\n' \
     "${expected_mode}" "${expected_query}" "${expected_category}" "${expect_home}" \
-    "${current_mode}" "${current_query}" "${current_category}" "${current_home}" >&2
-  exit 1
+    "${expected_has_results}" \
+    "${current_mode}" "${current_query}" "${current_category}" "${current_home}" "${current_load_state}" "${current_result_count}" >&2
+  return 1
 }
 
 apply_launcher_state() {
@@ -355,6 +377,8 @@ apply_launcher_state() {
   local expected_query=""
   local expected_category=""
   local expect_home="false"
+  local state_applied=0
+  local attempt
 
   case "${mode}" in
     drun) mode_action="openDrun" ;;
@@ -375,16 +399,6 @@ apply_launcher_state() {
       ;;
   esac
 
-  call_ipc Launcher "${mode_action}" >/dev/null
-  sleep 0.15
-
-  if call_ipc Launcher diagnosticSetSearchText "" >/dev/null 2>&1; then
-    :
-  fi
-  if call_ipc Launcher diagnosticSetDrunCategoryFilter "" >/dev/null 2>&1; then
-    :
-  fi
-
   case "${state}" in
     home)
       expect_home="true"
@@ -393,12 +407,11 @@ apply_launcher_state() {
       if [[ -z "${query}" ]]; then
         case "${mode}" in
           drun) query="firefox" ;;
-          files) query="/nix" ;;
+          files) query="/nixos" ;;
           system) query="reboot" ;;
           web) query="wayland" ;;
         esac
       fi
-      call_ipc Launcher diagnosticSetSearchText "${query}" >/dev/null
       expected_query="${query}"
       ;;
     empty)
@@ -410,7 +423,6 @@ apply_launcher_state() {
           web) query="zxqv-empty-probe" ;;
         esac
       fi
-      call_ipc Launcher diagnosticSetSearchText "${query}" >/dev/null
       expected_query="${query}"
       ;;
     category)
@@ -434,13 +446,36 @@ if (match) process.stdout.write(String(match.key || ""));
         printf 'Could not resolve a non-All drun category for capture.\n' >&2
         exit 1
       fi
-      call_ipc Launcher diagnosticSetDrunCategoryFilter "${category_key}" >/dev/null
       expected_category="${category_key}"
       expect_home="true"
       ;;
   esac
 
-  wait_for_launcher_state "${mode}" "${expected_query}" "${expected_category}" "${expect_home}"
+  for attempt in 1 2 3; do
+    call_ipc Launcher "${mode_action}" >/dev/null
+    sleep 0.15
+    call_ipc Launcher diagnosticSetSearchText "" >/dev/null 2>&1 || true
+    call_ipc Launcher diagnosticSetDrunCategoryFilter "" >/dev/null 2>&1 || true
+
+    case "${state}" in
+      query|empty)
+        call_ipc Launcher diagnosticSetSearchText "${expected_query}" >/dev/null
+        ;;
+      category)
+        call_ipc Launcher diagnosticSetDrunCategoryFilter "${expected_category}" >/dev/null
+        ;;
+    esac
+
+    if wait_for_launcher_state "${mode}" "${expected_query}" "${expected_category}" "${expect_home}" 2>/dev/null; then
+      state_applied=1
+      break
+    fi
+    sleep 0.15
+  done
+
+  if (( state_applied == 0 )); then
+    wait_for_launcher_state "${mode}" "${expected_query}" "${expected_category}" "${expect_home}"
+  fi
 }
 
 cleanup_launcher() {
@@ -468,7 +503,7 @@ main() {
   fi
 
   case "${crop_mode}" in
-    monitor|usable) ;;
+    hud|monitor|usable) ;;
     *)
       printf 'Unknown crop mode: %s\n' "${crop_mode}" >&2
       exit 2
@@ -504,7 +539,7 @@ main() {
 
   temp_full="$(mktemp /tmp/launcher-capture-full-XXXXXX.png)"
   temp_crop="$(mktemp /tmp/launcher-capture-crop-XXXXXX.png)"
-  trap 'rm -f "${temp_full}" "${temp_crop}"; cleanup_launcher; [[ -n "${restore_workspace}" ]] && hypr dispatch workspace "${restore_workspace}" >/dev/null 2>&1 || true' EXIT
+  trap 'rm -f "${temp_full}" "${temp_crop}"; cleanup_launcher; [[ -n "${restore_workspace}" ]] && dispatch_workspace "${restore_workspace}" >/dev/null 2>&1 || true' EXIT
 
   switch_to_capture_workspace "${workspace_target}"
 
@@ -516,7 +551,7 @@ main() {
   reassert_capture_workspace
   sleep "${delay_seconds}"
 
-  local monitor_json monitor_x monitor_y monitor_w monitor_h reserved_top reserved_left reserved_bottom reserved_right crop_x crop_y crop_w crop_h
+  local monitor_json monitor_x monitor_y monitor_w monitor_h reserved_top reserved_left reserved_bottom reserved_right crop_x crop_y crop_w crop_h launcher_state hud_x hud_y hud_w hud_h launcher_usable_w launcher_usable_h launcher_diag_x launcher_diag_y
   monitor_json="$(hypr monitors -j | jq 'map(select(.focused == true))[0]')"
   if [[ -z "${monitor_json}" || "${monitor_json}" == "null" ]]; then
     printf 'Could not resolve focused monitor from hyprctl.\n' >&2
@@ -532,7 +567,52 @@ main() {
   reserved_bottom="$(printf '%s' "${monitor_json}" | jq -r '.reserved[2]')"
   reserved_right="$(printf '%s' "${monitor_json}" | jq -r '.reserved[3]')"
 
-  if [[ "${crop_mode}" == "usable" ]]; then
+  if [[ "${crop_mode}" == "hud" ]]; then
+    launcher_state="$(call_ipc Launcher launcherState 2>/dev/null || true)"
+    if [[ -z "${launcher_state}" ]]; then
+      printf 'Could not read launcher state for hud crop.\n' >&2
+      exit 1
+    fi
+
+    read -r hud_x hud_y hud_w hud_h launcher_usable_w launcher_usable_h launcher_diag_x launcher_diag_y < <(printf '%s' "${launcher_state}" | node -e '
+const fs = require("node:fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+if (!raw) process.exit(1);
+let payload = JSON.parse(raw);
+if (typeof payload === "string") payload = JSON.parse(payload);
+const values = [
+  Math.round(Number(payload.hudX || -1)),
+  Math.round(Number(payload.hudY || -1)),
+  Math.round(Number(payload.hudWidth || 0)),
+  Math.round(Number(payload.hudHeight || 0)),
+  Math.round(Number(payload.usableWidth || 0)),
+  Math.round(Number(payload.usableHeight || 0)),
+  Math.round(Number(payload.diagnosticViewportOffsetX || 0)),
+  Math.round(Number(payload.diagnosticViewportOffsetY || 0)),
+];
+if (values[2] <= 0 || values[3] <= 0) process.exit(1);
+process.stdout.write(values.join(" "));
+') || true
+
+    if (( hud_x < 0 )); then
+      hud_x=$((reserved_left + launcher_diag_x + (launcher_usable_w - hud_w) / 2))
+      if (( hud_x < reserved_left + launcher_diag_x + 20 )); then
+        hud_x=$((reserved_left + launcher_diag_x + 20))
+      fi
+    fi
+
+    if (( hud_y < 0 )); then
+      hud_y=$((reserved_top + launcher_diag_y + (launcher_usable_h - hud_h) / 2))
+      if (( hud_y < reserved_top + launcher_diag_y + 20 )); then
+        hud_y=$((reserved_top + launcher_diag_y + 20))
+      fi
+    fi
+
+    crop_x=$((monitor_x + hud_x))
+    crop_y=$((monitor_y + hud_y))
+    crop_w="${hud_w}"
+    crop_h="${hud_h}"
+  elif [[ "${crop_mode}" == "usable" ]]; then
     crop_x=$((monitor_x + reserved_left))
     crop_y=$((monitor_y + reserved_top))
     crop_w=$((monitor_w - reserved_left - reserved_right))

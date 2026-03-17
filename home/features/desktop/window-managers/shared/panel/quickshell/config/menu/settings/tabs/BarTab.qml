@@ -154,6 +154,20 @@ Item {
             description: root.selectedBar ? "Edit edge placement, displays, and bar styling." : "Select a bar to edit."
             visible: !!root.selectedBar
 
+            SettingsSelectRow {
+                label: "Editing"
+                icon: "󰖲"
+                description: "Switch the active bar here while comparing layout settings."
+                currentValue: String(Config.selectedBarId || "")
+                options: Config.barConfigs.map(function (barConfig) {
+                    return {
+                        value: String(barConfig.id || ""),
+                        label: String(barConfig.name || "Bar")
+                    };
+                })
+                onOptionSelected: value => Config.setSelectedBar(value)
+            }
+
             SettingsInfoCallout {
                 visible: !!root.selectedBar && root.selectedBarDockMessage !== ""
                 iconName: "󰀪"

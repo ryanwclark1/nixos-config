@@ -75,6 +75,7 @@ cleanup_repo_shell() {
 populate_repo_shell_env() {
   local line key value
   repo_shell_env=()
+  repo_shell_env+=("PATH=${script_dir}:${PATH}")
   for key in HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY NIRI_SOCKET XDG_CURRENT_DESKTOP DESKTOP_SESSION; do
     value="${!key:-}"
     [[ -n "${value}" ]] && repo_shell_env+=("${key}=${value}")

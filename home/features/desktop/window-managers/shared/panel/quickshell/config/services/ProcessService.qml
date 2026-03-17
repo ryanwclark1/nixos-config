@@ -13,6 +13,12 @@ QtObject {
     property string sortBy: "cpu"
     property var processes: []
     property bool busy: processPoll.busy
+    property int detailPollIntervalMs: 2000
+    property int detailPid: 0
+    property string detailStatus: "idle"
+    property string detailMessage: ""
+    property var processDetail: ({})
+    readonly property bool detailBusy: detailPoll.busy
     property double lastRefreshAt: 0
     property var pendingActions: ({})
 
@@ -25,9 +31,38 @@ QtObject {
     property string _actionStdin: ""
     property var _actionCommand: []
 
+    function _detailCommand(pid) {
+        var safePid = parseInt(pid, 10) || 0;
+        return ["sh", "-c", "pid=\"$1\"; proc=\"/proc/$pid\"; " +
+                              "if [ -z \"$pid\" ] || [ \"$pid\" -le 0 ] 2>/dev/null; then printf '__STATUS__\\tidle\\tNo process selected\\n'; printf 'pid\\t0\\n'; exit 0; fi; " +
+                              "if [ ! -d \"$proc\" ]; then printf '__STATUS__\\tterminated\\tProcess exited\\n'; printf 'pid\\t%s\\n' \"$pid\"; exit 0; fi; " +
+                              "status='ready'; message=''; " +
+                              "cwd=$(readlink \"$proc/cwd\" 2>/dev/null || true); " +
+                              "if [ -z \"$cwd\" ]; then message='cwd unavailable'; fi; " +
+                              "exe=$(readlink \"$proc/exe\" 2>/dev/null || true); " +
+                              "if [ -z \"$exe\" ]; then if [ -n \"$message\" ]; then message=\"$message; exe unavailable\"; else message='exe unavailable'; fi; fi; " +
+                              "fdCount=$(find \"$proc/fd\" -mindepth 1 -maxdepth 1 2>/dev/null | wc -l | tr -d ' '); " +
+                              "readBytes=''; writeBytes=''; cancelledWriteBytes=''; " +
+                              "if [ -r \"$proc/io\" ]; then " +
+                              "  readBytes=$(awk '/^read_bytes:/ {print $2}' \"$proc/io\" 2>/dev/null); " +
+                              "  writeBytes=$(awk '/^write_bytes:/ {print $2}' \"$proc/io\" 2>/dev/null); " +
+                              "  cancelledWriteBytes=$(awk '/^cancelled_write_bytes:/ {print $2}' \"$proc/io\" 2>/dev/null); " +
+                              "else " +
+                              "  if [ -n \"$message\" ]; then message=\"$message; io unavailable\"; else message='io unavailable'; fi; " +
+                              "fi; " +
+                              "printf '__STATUS__\\t%s\\t%s\\n' \"$status\" \"$message\"; " +
+                              "printf 'pid\\t%s\\n' \"$pid\"; " +
+                              "printf 'cwd\\t%s\\n' \"$cwd\"; " +
+                              "printf 'exe\\t%s\\n' \"$exe\"; " +
+                              "printf 'fdCount\\t%s\\n' \"$fdCount\"; " +
+                              "printf 'readBytes\\t%s\\n' \"$readBytes\"; " +
+                              "printf 'writeBytes\\t%s\\n' \"$writeBytes\"; " +
+                              "printf 'cancelledWriteBytes\\t%s\\n' \"$cancelledWriteBytes\";", "sh", String(safePid)];
+    }
+
     function snapshotCommand() {
         var sortField = sortBy === "mem" ? "-pmem" : "-pcpu";
-        return ["sh", "-c", "ps -eo pid=,ppid=,ni=,user=,stat=,etime=,pcpu=,pmem=,comm=,args= --sort=" + sortField + " | awk 'BEGIN{OFS=\"\\t\"} {pid=$1; ppid=$2; nice=$3; user=$4; state=$5; etime=$6; cpu=$7; mem=$8; comm=$9; $1=$2=$3=$4=$5=$6=$7=$8=$9=\"\"; sub(/^[ \\t]+/, \"\", $0); print pid,ppid,nice,user,state,etime,cpu,mem,comm,$0}' | head -n " + String(snapshotLimit)];
+        return ["sh", "-c", "ps -eo pid=,ppid=,ni=,nlwp=,rss=,tty=,user=,stat=,etime=,pcpu=,pmem=,comm=,args= --sort=" + sortField + " | awk 'BEGIN{OFS=\"\\t\"} {pid=$1; ppid=$2; nice=$3; nlwp=$4; rss=$5; tty=$6; user=$7; state=$8; etime=$9; cpu=$10; mem=$11; comm=$12; $1=$2=$3=$4=$5=$6=$7=$8=$9=$10=$11=$12=\"\"; sub(/^[ \\t]+/, \"\", $0); print pid,ppid,nice,nlwp,rss,tty,user,state,etime,cpu,mem,comm,$0}' | head -n " + String(snapshotLimit)];
     }
 
     function parseSnapshot(out) {
@@ -39,20 +74,23 @@ QtObject {
                 continue;
 
             var parts = line.split("\t");
-            if (parts.length < 10)
+            if (parts.length < 13)
                 continue;
 
             result.push({
                 pid: parseInt(parts[0], 10) || 0,
                 parentPid: parseInt(parts[1], 10) || 0,
                 nice: parseInt(parts[2], 10) || 0,
-                user: String(parts[3] || ""),
-                state: String(parts[4] || ""),
-                elapsed: String(parts[5] || ""),
-                cpu: Number(parts[6]) || 0,
-                mem: Number(parts[7]) || 0,
-                name: String(parts[8] || ""),
-                command: String(parts.slice(9).join("\t") || "")
+                threadCount: parseInt(parts[3], 10) || 0,
+                rssKb: parseInt(parts[4], 10) || 0,
+                tty: String(parts[5] || ""),
+                user: String(parts[6] || ""),
+                state: String(parts[7] || ""),
+                elapsed: String(parts[8] || ""),
+                cpu: Number(parts[9]) || 0,
+                mem: Number(parts[10]) || 0,
+                name: String(parts[11] || ""),
+                command: String(parts.slice(12).join("\t") || "")
             });
         }
         return result;
@@ -60,6 +98,104 @@ QtObject {
 
     function refresh() {
         processPoll.triggerPoll();
+        refreshDetail();
+    }
+
+    function _clearDetail() {
+        detailStatus = "idle";
+        detailMessage = "";
+        processDetail = ({});
+    }
+
+    function _mergeDetailSnapshot(snapshot, pid) {
+        var safePid = parseInt(pid, 10) || 0;
+        var base = processByPid(safePid) || {};
+        return {
+            pid: safePid,
+            cwd: snapshot.cwd || "",
+            exe: snapshot.exe || "",
+            fdCount: snapshot.fdCount,
+            threadCount: base.threadCount !== undefined ? base.threadCount : null,
+            rssKb: base.rssKb !== undefined ? base.rssKb : null,
+            tty: String(base.tty || ""),
+            state: String(base.state || ""),
+            readBytes: snapshot.readBytes,
+            writeBytes: snapshot.writeBytes,
+            cancelledWriteBytes: snapshot.cancelledWriteBytes,
+            command: String(base.command || base.name || "")
+        };
+    }
+
+    function setDetailPid(pid) {
+        var safePid = parseInt(pid, 10) || 0;
+        if (safePid <= 0) {
+            detailPid = 0;
+            _clearDetail();
+            return;
+        }
+        detailPid = safePid;
+        detailStatus = "loading";
+        detailMessage = "Loading process detail...";
+        processDetail = { pid: safePid };
+        detailPoll.triggerPoll();
+    }
+
+    function refreshDetail() {
+        if ((parseInt(detailPid, 10) || 0) <= 0)
+            return;
+        detailPoll.triggerPoll();
+    }
+
+    function parseDetailSnapshot(out) {
+        var text = String(out || "").trim();
+        if (text === "")
+            return {
+                pid: detailPid,
+                status: "error",
+                message: "No process detail returned."
+            };
+
+        var lines = text.split("\n");
+        var first = String(lines[0] || "");
+        var status = "ready";
+        var message = "";
+        if (first.indexOf("__STATUS__\t") === 0) {
+            var meta = first.split("\t");
+            status = String(meta[1] || "ready");
+            message = String(meta.slice(2).join("\t") || "");
+            lines.shift();
+        }
+
+        var result = {
+            pid: detailPid,
+            status: status,
+            message: message
+        };
+
+        function parseOptionalInt(value) {
+            if (value === undefined || value === null || String(value) === "")
+                return null;
+            return parseInt(value, 10);
+        }
+
+        for (var i = 0; i < lines.length; ++i) {
+            var line = String(lines[i] || "");
+            if (line === "")
+                continue;
+            var splitIndex = line.indexOf("\t");
+            if (splitIndex < 0)
+                continue;
+            var key = line.slice(0, splitIndex);
+            var value = line.slice(splitIndex + 1);
+            if (key === "pid")
+                result.pid = parseInt(value, 10) || 0;
+            else if (key === "fdCount" || key === "readBytes" || key === "writeBytes" || key === "cancelledWriteBytes")
+                result[key] = parseOptionalInt(value);
+            else
+                result[key] = value;
+        }
+
+        return result;
     }
 
     function processByPid(pid) {
@@ -203,6 +339,33 @@ QtObject {
         onUpdated: {
             root.processes = processPoll.value || [];
             root.lastRefreshAt = Date.now();
+            if (root.detailPid > 0 && !root.processByPid(root.detailPid) && root.detailStatus !== "loading") {
+                root.detailStatus = "terminated";
+                root.detailMessage = "Process exited.";
+                root.processDetail = {
+                    pid: root.detailPid
+                };
+            }
+        }
+    }
+
+    property SharedWidgets.CommandPoll detailPoll: SharedWidgets.CommandPoll {
+        id: detailPoll
+        interval: Math.max(1000, root.detailPollIntervalMs)
+        running: root.subscriberCount > 0 && root.detailPid > 0
+        command: root._detailCommand(root.detailPid)
+        parse: function(out) {
+            return root.parseDetailSnapshot(out);
+        }
+        onUpdated: {
+            var snapshot = detailPoll.value || {};
+            var snapshotPid = parseInt(snapshot.pid, 10) || 0;
+            if (snapshotPid <= 0 || snapshotPid !== root.detailPid)
+                return;
+
+            root.detailStatus = String(snapshot.status || "ready");
+            root.detailMessage = String(snapshot.message || "");
+            root.processDetail = root._mergeDetailSnapshot(snapshot, snapshotPid);
         }
     }
 

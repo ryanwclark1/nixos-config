@@ -11,6 +11,8 @@ SharedWidgets.CardBase {
     property string scopeMode: "both"
     property int maxRows: 16
     property int selectedIndex: -1
+    property Flickable viewportFlickable: null
+    property Item selectedRowItem: null
 
     readonly property string trimmedSearch: String(searchQuery || "").trim().toLowerCase()
     readonly property var visibleUnits: computeVisibleUnits()
@@ -23,6 +25,26 @@ SharedWidgets.CardBase {
 
     function focusTable() {
         tableFocus.forceActiveFocus();
+    }
+
+    function ensureSelectedVisible() {
+        if (!viewportFlickable || !selectedRowItem)
+            return;
+
+        var mapped = selectedRowItem.mapToItem(viewportFlickable.contentItem, 0, 0);
+        var top = mapped.y;
+        var bottom = top + selectedRowItem.height;
+        var viewportTop = viewportFlickable.contentY;
+        var viewportBottom = viewportTop + viewportFlickable.height;
+        var nextContentY = viewportTop;
+
+        if (top < viewportTop)
+            nextContentY = top;
+        else if (bottom > viewportBottom)
+            nextContentY = bottom - viewportFlickable.height;
+
+        var maxContentY = Math.max(0, viewportFlickable.contentHeight - viewportFlickable.height);
+        viewportFlickable.contentY = Math.max(0, Math.min(maxContentY, nextContentY));
     }
 
     function matchesQuery(unit) {
@@ -132,6 +154,7 @@ SharedWidgets.CardBase {
     }
 
     onVisibleUnitsChanged: syncSelection()
+    onSelectedIndexChanged: Qt.callLater(ensureSelectedVisible)
     Component.onCompleted: syncSelection()
 
     FocusScope {
@@ -413,6 +436,17 @@ SharedWidgets.CardBase {
                                         root.selectIndex(index);
                                         root.focusTable();
                                     }
+                                }
+
+                                onSelectedChanged: {
+                                    if (selected)
+                                        root.selectedRowItem = this;
+                                    else if (root.selectedRowItem === this)
+                                        root.selectedRowItem = null;
+                                }
+                                Component.onCompleted: {
+                                    if (selected)
+                                        root.selectedRowItem = this;
                                 }
                             }
                         }

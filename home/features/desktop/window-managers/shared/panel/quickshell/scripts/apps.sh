@@ -1,4 +1,5 @@
-# apps.sh - List all installed applications from .desktop files with icon resolution
+# apps.sh - List installed applications from .desktop files.
+# Keep icon identifiers raw so QML can resolve them lazily at render time.
 
 dirs=(
   "/usr/share/applications"
@@ -8,67 +9,136 @@ dirs=(
   "/run/current-system/sw/share/applications"
 )
 
-# Icon search paths
-icon_dirs=(
-  "$HOME/.nix-profile/share/icons"
-  "$HOME/.local/share/icons"
-  "/run/current-system/sw/share/icons"
-  "/usr/share/icons"
-  "/usr/share/pixmaps"
-)
-
-# Cache for resolved icons to speed up
-declare -A icon_cache
-
-resolve_icon() {
-  local icon_name="$1"
-  if [[ -z "$icon_name" ]]; then echo ""; return; fi
-  if [[ "$icon_name" == /* ]]; then echo "$icon_name"; return; fi
-  if [[ -n "${icon_cache[$icon_name]}" ]]; then echo "${icon_cache[$icon_name]}"; return; fi
-
-  # Try to find the icon file
-  for dir in "${icon_dirs[@]}"; do
-    if [ -d "$dir" ]; then
-      # Look for svg, then png
-      match=$(find "$dir" \( -name "${icon_name}.svg" -o -name "${icon_name}.png" \) -print | head -n 1)
-      if [[ -n "$match" ]]; then
-        icon_cache["$icon_name"]="$match"
-        echo "$match"
-        return
-      fi
-    fi
-  done
-  
-  icon_cache["$icon_name"]=""
-  echo ""
-}
-
-# Use jq to build the final JSON array
 output=$(for dir in "${dirs[@]}"; do
   if [ -d "$dir" ]; then
-    find "$dir" -name "*.desktop"
+    find "$dir" -maxdepth 1 -name "*.desktop" -print0
   fi
-done | while read -r file; do
-  name=$(grep -m1 "^Name=" "$file" | cut -d'=' -f2)
-  exec=$(grep -m1 "^Exec=" "$file" | cut -d'=' -f2 | sed 's/ %[fFuU]//g' | sed 's/"//g')
-  icon_name=$(grep -m1 "^Icon=" "$file" | cut -d'=' -f2)
-  categories=$(grep -m1 "^Categories=" "$file" | cut -d'=' -f2 | tr ';' ' ')
-  keywords=$(grep -m1 "^Keywords=" "$file" | cut -d'=' -f2 | tr ';' ' ')
-  no_display=$(grep -m1 "^NoDisplay=" "$file" | cut -d'=' -f2)
-  terminal=$(grep -m1 "^Terminal=" "$file" | cut -d'=' -f2)
-  
-  if [[ -n "$name" && -n "$exec" && "$no_display" != "true" ]]; then
-    icon_path=$(resolve_icon "$icon_name")
-    
-    # Escape for JSON
-    name_esc=$(echo "$name" | jq -R .)
-    exec_esc=$(echo "$exec" | jq -R .)
-    icon_esc=$(echo "$icon_path" | jq -R .)
-    categories_esc=$(echo "${categories:-}" | jq -R .)
-    keywords_esc=$(echo "${keywords:-}" | jq -R .)
-    term_esc=$(echo "${terminal:-false}" | jq -R .)
-    echo "{\"name\":$name_esc,\"exec\":$exec_esc,\"icon\":$icon_esc,\"category\":$categories_esc,\"keywords\":$keywords_esc,\"terminal\":$term_esc}"
-  fi
-done | jq -s 'unique_by(.exec)')
+done | xargs -0 awk '
+function json_escape(value,    out) {
+  out = value
+  gsub(/\\/, "\\\\", out)
+  gsub(/"/, "\\\"", out)
+  gsub(/\t/, "\\t", out)
+  return out
+}
+
+function bool_string(value) {
+  return tolower(value) == "true" ? "true" : "false"
+}
+
+function flush_entry(    cleaned_exec, cleaned_categories, cleaned_keywords) {
+  if (!in_desktop_entry)
+    return
+  if (name == "" || exec == "" || tolower(no_display) == "true" || tolower(hidden) == "true")
+    return
+
+  cleaned_exec = exec
+  gsub(/ %[fFuUdDnNickvm]/, "", cleaned_exec)
+  gsub(/"/, "", cleaned_exec)
+
+  cleaned_categories = categories
+  gsub(/;/, " ", cleaned_categories)
+
+  cleaned_keywords = keywords
+  gsub(/;/, " ", cleaned_keywords)
+
+  if (count > 0)
+    printf(",\n")
+  printf("{\"name\":\"%s\",\"exec\":\"%s\",\"icon\":\"%s\",\"category\":\"%s\",\"keywords\":\"%s\",\"terminal\":%s}",
+         json_escape(name),
+         json_escape(cleaned_exec),
+         json_escape(icon_name),
+         json_escape(cleaned_categories),
+         json_escape(cleaned_keywords),
+         bool_string(terminal))
+  count += 1
+}
+
+function reset_entry() {
+  in_desktop_entry = 0
+  in_other_group = 0
+  name = ""
+  exec = ""
+  icon_name = ""
+  categories = ""
+  keywords = ""
+  no_display = ""
+  hidden = ""
+  terminal = ""
+}
+
+BEGIN {
+  printf("[")
+  count = 0
+  reset_entry()
+}
+
+FNR == 1 {
+  if (NR > 1)
+    flush_entry()
+  reset_entry()
+}
+
+/^\[Desktop Entry\]$/ {
+  in_desktop_entry = 1
+  in_other_group = 0
+  next
+}
+
+/^\[/ {
+  if (in_desktop_entry)
+    in_other_group = 1
+  next
+}
+
+!in_desktop_entry || in_other_group {
+  next
+}
+
+/^Name=/ && name == "" {
+  name = substr($0, 6)
+  next
+}
+
+/^Exec=/ && exec == "" {
+  exec = substr($0, 6)
+  next
+}
+
+/^Icon=/ && icon_name == "" {
+  icon_name = substr($0, 6)
+  next
+}
+
+/^Categories=/ && categories == "" {
+  categories = substr($0, 12)
+  next
+}
+
+/^Keywords=/ && keywords == "" {
+  keywords = substr($0, 10)
+  next
+}
+
+/^NoDisplay=/ && no_display == "" {
+  no_display = substr($0, 11)
+  next
+}
+
+/^Hidden=/ && hidden == "" {
+  hidden = substr($0, 8)
+  next
+}
+
+/^Terminal=/ && terminal == "" {
+  terminal = substr($0, 10)
+  next
+}
+
+END {
+  flush_entry()
+  print "]"
+}
+' | jq 'unique_by(.exec)')
 
 echo "$output"

@@ -3,6 +3,7 @@ set -euo pipefail
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd -P)"
 config_dir="${script_dir}/../config"
+source "${script_dir}/harness-warnings.sh"
 
 tmp_home="$(mktemp -d)"
 tmp_runtime="$(mktemp -d)"
@@ -146,17 +147,18 @@ output="$(
 status=$?
 set -e
 
-printf '%s\n' "${output}"
+filtered_output="$(filter_known_quickshell_harness_warnings "${output}")"
+
+if [[ -n "${filtered_output}" ]]; then
+  printf '%s\n' "${filtered_output}"
+fi
 
 if [[ ${status} -ne 0 && ${status} -ne 124 ]]; then
   printf '[FAIL] quickshell harness exited with status %s.\n' "${status}" >&2
   exit 1
 fi
 
-if grep -q 'TypeError:' <<<"${output}"; then
-  printf '[FAIL] Widget picker harness emitted QML TypeError warnings.\n' >&2
-  exit 1
-fi
+fail_on_quickshell_harness_warnings "Widget picker harness" "${output}" "${filtered_output}"
 
 grep -q 'BAR_HAS_BATTERY true' <<<"${output}" || {
   printf '[FAIL] Bar widget picker did not expose right-section widgets when adding to left.\n' >&2

@@ -198,8 +198,11 @@ PanelWindow {
   onShowContentChanged: {
     if (showContent) {
       notepadText.forceActiveFocus();
-    } else if (notepadText.activeFocus) {
-      notepadText.focus = false;
+    } else {
+      if (notepadText.activeFocus)
+        notepadText.focus = false;
+      if (searchInput.activeFocus)
+        searchInput.focus = false;
     }
   }
 
@@ -430,7 +433,10 @@ PanelWindow {
             color: Colors.text; font.pixelSize: Colors.fontSizeSmall
             text: root.searchQuery
             onTextChanged: root.searchQuery = text
-            onVisibleChanged: if (visible) forceActiveFocus()
+            onVisibleChanged: {
+              if (visible) forceActiveFocus();
+              else if (activeFocus) focus = false;
+            }
           }
         }
 
@@ -572,7 +578,14 @@ PanelWindow {
                     font.weight: Font.DemiBold
                     visible: tabDelegate.isEditing
                     selectByMouse: true
-                    onVisibleChanged: if (visible) { selectAll(); forceActiveFocus(); }
+                    onVisibleChanged: {
+                      if (visible) {
+                        selectAll();
+                        forceActiveFocus();
+                      } else if (activeFocus) {
+                        focus = false;
+                      }
+                    }
                     Keys.onReturnPressed: {
                       root.renameTab(modelData.id, text);
                       tabDelegate.isEditing = false;

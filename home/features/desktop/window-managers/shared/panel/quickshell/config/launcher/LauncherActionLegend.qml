@@ -9,28 +9,31 @@ RowLayout {
     required property string primaryAction
     required property string secondaryAction
     required property string tertiaryAction
+    property bool compact: false
 
     Layout.fillWidth: true
-    spacing: Colors.paddingSmall
+    spacing: root.compact ? Colors.spacingXS : Colors.paddingSmall
 
     Text {
         Layout.fillWidth: true
         text: root.hintText
         color: Colors.textSecondary
-        font.pixelSize: Colors.fontSizeSmall
+        font.pixelSize: root.compact ? Colors.fontSizeXS : Colors.fontSizeSmall
         elide: Text.ElideRight
+        maximumLineCount: 1
+        wrapMode: Text.NoWrap
     }
 
     Row {
-        spacing: Colors.spacingXS
+        spacing: root.compact ? Colors.spacingXXS : Colors.spacingXS
 
         Rectangle {
             radius: Colors.radiusPill
             color: Colors.withAlpha(Colors.primary, 0.12)
             border.color: Colors.withAlpha(Colors.primary, 0.3)
             border.width: 1
-            implicitHeight: 24
-            implicitWidth: primaryText.implicitWidth + 14
+            implicitHeight: root.compact ? 22 : 24
+            implicitWidth: primaryText.implicitWidth + (root.compact ? 12 : 14)
 
             Text {
                 id: primaryText
@@ -47,8 +50,8 @@ RowLayout {
             color: Colors.withAlpha(Colors.textSecondary, 0.08)
             border.color: Colors.withAlpha(Colors.primary, 0.14)
             border.width: 1
-            implicitHeight: 24
-            implicitWidth: secondaryText.implicitWidth + 14
+            implicitHeight: root.compact ? 22 : 24
+            implicitWidth: secondaryText.implicitWidth + (root.compact ? 12 : 14)
 
             Text {
                 id: secondaryText
@@ -65,8 +68,8 @@ RowLayout {
             color: Colors.surface
             border.color: Colors.withAlpha(Colors.primary, 0.12)
             border.width: 1
-            implicitHeight: 24
-            implicitWidth: tertiaryText.implicitWidth + 14
+            implicitHeight: root.compact ? 22 : 24
+            implicitWidth: tertiaryText.implicitWidth + (root.compact ? 12 : 14)
 
             Text {
                 id: tertiaryText

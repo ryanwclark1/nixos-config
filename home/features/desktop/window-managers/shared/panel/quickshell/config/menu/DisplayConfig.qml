@@ -481,7 +481,12 @@ PanelWindow {
     clip: true
 
     focus: displayRoot.isOpen
-    onVisibleChanged: if (visible) forceActiveFocus()
+    onVisibleChanged: {
+      if (visible)
+        forceActiveFocus()
+      else if (activeFocus)
+        focus = false
+    }
     Keys.onEscapePressed: {
       if (displayRoot.countdownActive) { displayRoot._revertConfig(); displayRoot._cancelCountdown(); }
       else displayRoot.close();
