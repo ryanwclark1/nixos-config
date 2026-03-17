@@ -2,8 +2,10 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Bluetooth
-import "../services"
-import "../widgets" as SharedWidgets
+import "../../menu"
+import "../../services"
+import "../../widgets" as SharedWidgets
+import "../../services/ShellUtils.js" as ShellUtils
 
 BasePopupMenu {
   id: root
@@ -68,15 +70,11 @@ BasePopupMenu {
     return "󰂯";
   }
 
-  function shellQuote(text) {
-    return "'" + String(text || "").replace(/'/g, "'\\''") + "'";
-  }
-
   function pairDevice(address) {
     if (!address) return;
 
     root.stopScan();
-    var quotedAddress = shellQuote(address);
+    var quotedAddress = ShellUtils.shellQuote(address);
     Quickshell.execDetached(["sh", "-c",
       "bluetoothctl pair " + quotedAddress
       + " && bluetoothctl trust " + quotedAddress

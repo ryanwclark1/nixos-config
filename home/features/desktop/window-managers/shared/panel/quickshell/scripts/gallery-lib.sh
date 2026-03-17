@@ -960,7 +960,7 @@ EOF
   local source_file="src/shell.qml"
   if [[ "${name}" == portrait-* || "${name}" == laptop-* || "${name}" == wide-* ]]; then source_file="src/features/settings/SettingsHub.qml";
   elif [[ "${name}" == drun-* || "${name}" == files-* || "${name}" == web-* ]]; then source_file="src/launcher/Launcher.qml";
-  elif [[ "${name}" == networkMenu-* || "${name}" == audioMenu-* ]]; then source_file="src/menu/NetworkMenu.qml"; fi
+  elif [[ "${name}" == networkMenu-* || "${name}" == audioMenu-* ]]; then source_file="src/features/network/NetworkMenu.qml"; fi
 
   cat <<EOF
         </div>
