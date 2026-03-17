@@ -88,15 +88,15 @@ Rectangle {
         var description = String(it.description || "");
         var fullPath = String(it.fullPath || "");
         var exec = String(it.exec || "");
-        var windowClass = String(it.class || "");
+        var windowAppId = String(it.appId || it.class || "");
         var title = String(it.title || "");
 
         if (description !== "" && description !== primary)
             return description;
         if (fullPath !== "" && fullPath !== primary)
             return fullPath;
-        if (windowClass !== "" && windowClass !== primary)
-            return windowClass;
+        if (windowAppId !== "" && windowAppId !== primary)
+            return windowAppId;
         if (title !== "" && title !== primary)
             return title;
         if (exec !== "" && exec !== primary)
@@ -111,7 +111,7 @@ Rectangle {
         if (explicitIcon !== "")
             return explicitIcon;
         if (root.mode === "window")
-            return String(it.class || "");
+            return String(it.appId || it.class || "");
         return "";
     }
 

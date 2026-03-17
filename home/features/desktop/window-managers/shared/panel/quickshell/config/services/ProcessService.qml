@@ -57,7 +57,19 @@ QtObject {
                               "printf 'fdCount\\t%s\\n' \"$fdCount\"; " +
                               "printf 'readBytes\\t%s\\n' \"$readBytes\"; " +
                               "printf 'writeBytes\\t%s\\n' \"$writeBytes\"; " +
-                              "printf 'cancelledWriteBytes\\t%s\\n' \"$cancelledWriteBytes\";", "sh", String(safePid)];
+                              "printf 'cancelledWriteBytes\\t%s\\n' \"$cancelledWriteBytes\"; " +
+                              "if [ -r \"$proc/status\" ]; then " +
+                              "  printf 'threads\\t%s\\n' \"$(awk '/^Threads:/ {print $2}' \"$proc/status\" 2>/dev/null)\"; " +
+                              "  printf 'vmRssKb\\t%s\\n' \"$(awk '/^VmRSS:/ {print $2}' \"$proc/status\" 2>/dev/null)\"; " +
+                              "  printf 'voluntaryCtxtSwitches\\t%s\\n' \"$(awk '/^voluntary_ctxt_switches:/ {print $2}' \"$proc/status\" 2>/dev/null)\"; " +
+                              "  printf 'nonvoluntaryCtxtSwitches\\t%s\\n' \"$(awk '/^nonvoluntary_ctxt_switches:/ {print $2}' \"$proc/status\" 2>/dev/null)\"; " +
+                              "fi; " +
+                              "if [ -d \"$proc/fd\" ]; then " +
+                              "  for fdPath in $(find \"$proc/fd\" -mindepth 1 -maxdepth 1 2>/dev/null | sort -V | head -n 8); do " +
+                              "    fdName=$(basename \"$fdPath\"); target=$(readlink \"$fdPath\" 2>/dev/null || true); " +
+                              "    printf 'openFile\\t%s\\t%s\\n' \"$fdName\" \"$target\"; " +
+                              "  done; " +
+                              "fi;", "sh", String(safePid)];
     }
 
     function snapshotCommand() {
@@ -115,14 +127,21 @@ QtObject {
             cwd: snapshot.cwd || "",
             exe: snapshot.exe || "",
             fdCount: snapshot.fdCount,
-            threadCount: base.threadCount !== undefined ? base.threadCount : null,
-            rssKb: base.rssKb !== undefined ? base.rssKb : null,
+            threadCount: snapshot.threads !== undefined && snapshot.threads !== null ? snapshot.threads : (base.threadCount !== undefined ? base.threadCount : null),
+            rssKb: snapshot.vmRssKb !== undefined && snapshot.vmRssKb !== null ? snapshot.vmRssKb : (base.rssKb !== undefined ? base.rssKb : null),
             tty: String(base.tty || ""),
             state: String(base.state || ""),
             readBytes: snapshot.readBytes,
             writeBytes: snapshot.writeBytes,
             cancelledWriteBytes: snapshot.cancelledWriteBytes,
-            command: String(base.command || base.name || "")
+            command: String(base.command || base.name || ""),
+            statusFields: {
+                threads: snapshot.threads !== undefined ? snapshot.threads : null,
+                vmRssKb: snapshot.vmRssKb !== undefined ? snapshot.vmRssKb : null,
+                voluntaryCtxtSwitches: snapshot.voluntaryCtxtSwitches !== undefined ? snapshot.voluntaryCtxtSwitches : null,
+                nonvoluntaryCtxtSwitches: snapshot.nonvoluntaryCtxtSwitches !== undefined ? snapshot.nonvoluntaryCtxtSwitches : null
+            },
+            openFilePreview: snapshot.openFilePreview || []
         };
     }
 
@@ -144,6 +163,20 @@ QtObject {
         if ((parseInt(detailPid, 10) || 0) <= 0)
             return;
         detailPoll.triggerPoll();
+    }
+
+    function copyCwd(pid) {
+        var safePid = parseInt(pid, 10) || 0;
+        if (safePid <= 0 || detailPid !== safePid)
+            return false;
+        return _runClipboardAction(safePid, String(processDetail.cwd || ""), "Working directory copied to clipboard.");
+    }
+
+    function copyExe(pid) {
+        var safePid = parseInt(pid, 10) || 0;
+        if (safePid <= 0 || detailPid !== safePid)
+            return false;
+        return _runClipboardAction(safePid, String(processDetail.exe || ""), "Executable path copied to clipboard.");
     }
 
     function parseDetailSnapshot(out) {
@@ -169,7 +202,8 @@ QtObject {
         var result = {
             pid: detailPid,
             status: status,
-            message: message
+            message: message,
+            openFilePreview: []
         };
 
         function parseOptionalInt(value) {
@@ -182,14 +216,21 @@ QtObject {
             var line = String(lines[i] || "");
             if (line === "")
                 continue;
-            var splitIndex = line.indexOf("\t");
-            if (splitIndex < 0)
+            var parts = line.split("\t");
+            if (parts.length < 2)
                 continue;
-            var key = line.slice(0, splitIndex);
-            var value = line.slice(splitIndex + 1);
+            var key = parts[0];
+            if (key === "openFile") {
+                result.openFilePreview.push({
+                    fd: parseInt(parts[1], 10) || 0,
+                    target: String(parts.slice(2).join("\t") || "")
+                });
+                continue;
+            }
+            var value = parts.slice(1).join("\t");
             if (key === "pid")
                 result.pid = parseInt(value, 10) || 0;
-            else if (key === "fdCount" || key === "readBytes" || key === "writeBytes" || key === "cancelledWriteBytes")
+            else if (key === "fdCount" || key === "readBytes" || key === "writeBytes" || key === "cancelledWriteBytes" || key === "threads" || key === "vmRssKb" || key === "voluntaryCtxtSwitches" || key === "nonvoluntaryCtxtSwitches")
                 result[key] = parseOptionalInt(value);
             else
                 result[key] = value;

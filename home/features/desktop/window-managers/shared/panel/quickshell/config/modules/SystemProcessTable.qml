@@ -31,6 +31,11 @@ SharedWidgets.CardBase {
         tableFocus.forceActiveFocus();
     }
 
+    function clearTableFocus() {
+        if (tableFocus.activeFocus)
+            tableFocus.focus = false;
+    }
+
     function ensureSelectedVisible() {
         if (!viewportFlickable || !selectedRowItem)
             return;
@@ -979,6 +984,22 @@ SharedWidgets.CardBase {
                             selected: false
                             onClicked: ProcessService.copyCommand(root.selectedPid)
                         }
+
+                        SharedWidgets.FilterChip {
+                            label: "Copy CWD"
+                            icon: "󰉋"
+                            enabled: !ProcessService.isPidPending(root.selectedPid) && root.detailData.cwd !== undefined
+                            selected: false
+                            onClicked: ProcessService.copyCwd(root.selectedPid)
+                        }
+
+                        SharedWidgets.FilterChip {
+                            label: "Copy EXE"
+                            icon: "󰆍"
+                            enabled: !ProcessService.isPidPending(root.selectedPid) && root.detailData.exe !== undefined
+                            selected: false
+                            onClicked: ProcessService.copyExe(root.selectedPid)
+                        }
                     }
 
                     Rectangle {
@@ -1061,6 +1082,40 @@ SharedWidgets.CardBase {
                                 }
                             }
 
+                            Flow {
+                                Layout.fillWidth: true
+                                width: parent.width
+                                spacing: Colors.spacingS
+
+                                SharedWidgets.Chip {
+                                    icon: "󰓅"
+                                    iconColor: Colors.secondary
+                                    text: "THR " + (root.detailData.statusFields && root.detailData.statusFields.threads !== null && root.detailData.statusFields.threads !== undefined ? String(root.detailData.statusFields.threads) : "Unavailable")
+                                    textColor: Colors.secondary
+                                }
+
+                                SharedWidgets.Chip {
+                                    icon: "󰾆"
+                                    iconColor: Colors.accent
+                                    text: "VMRSS " + (root.detailData.statusFields && root.detailData.statusFields.vmRssKb !== null && root.detailData.statusFields.vmRssKb !== undefined ? root.formatKiB(root.detailData.statusFields.vmRssKb) : "Unavailable")
+                                    textColor: Colors.accent
+                                }
+
+                                SharedWidgets.Chip {
+                                    icon: "󰚰"
+                                    iconColor: Colors.primary
+                                    text: "VCTX " + (root.detailData.statusFields && root.detailData.statusFields.voluntaryCtxtSwitches !== null && root.detailData.statusFields.voluntaryCtxtSwitches !== undefined ? String(root.detailData.statusFields.voluntaryCtxtSwitches) : "Unavailable")
+                                    textColor: Colors.primary
+                                }
+
+                                SharedWidgets.Chip {
+                                    icon: "󰚌"
+                                    iconColor: Colors.warning
+                                    text: "NVCTX " + (root.detailData.statusFields && root.detailData.statusFields.nonvoluntaryCtxtSwitches !== null && root.detailData.statusFields.nonvoluntaryCtxtSwitches !== undefined ? String(root.detailData.statusFields.nonvoluntaryCtxtSwitches) : "Unavailable")
+                                    textColor: Colors.warning
+                                }
+                            }
+
                             Rectangle {
                                 Layout.fillWidth: true
                                 color: Colors.withAlpha(Colors.surface, 0.5)
@@ -1121,6 +1176,44 @@ SharedWidgets.CardBase {
                                         font.pixelSize: Colors.fontSizeXS
                                         font.family: Colors.fontMono
                                         wrapMode: Text.WrapAnywhere
+                                    }
+                                }
+                            }
+
+                            Rectangle {
+                                Layout.fillWidth: true
+                                visible: !!root.detailData.openFilePreview && root.detailData.openFilePreview.length > 0
+                                color: Colors.withAlpha(Colors.surface, 0.5)
+                                radius: Colors.radiusSmall
+                                border.color: Colors.withAlpha(Colors.border, 0.6)
+                                border.width: 1
+                                implicitHeight: openFilesBlock.implicitHeight + Colors.spacingS * 2
+
+                                ColumnLayout {
+                                    id: openFilesBlock
+                                    anchors.fill: parent
+                                    anchors.margins: Colors.spacingS
+                                    spacing: Colors.spacingXXS
+
+                                    Text {
+                                        text: "OPEN FILES"
+                                        color: Colors.textDisabled
+                                        font.pixelSize: Colors.fontSizeXS
+                                        font.weight: Font.Bold
+                                    }
+
+                                    Repeater {
+                                        model: root.detailData.openFilePreview || []
+
+                                        delegate: Text {
+                                            required property var modelData
+                                            Layout.fillWidth: true
+                                            text: String(modelData.fd || 0) + "  " + root.fallbackText(modelData.target)
+                                            color: Colors.textSecondary
+                                            font.pixelSize: Colors.fontSizeXS
+                                            font.family: Colors.fontMono
+                                            wrapMode: Text.WrapAnywhere
+                                        }
                                     }
                                 }
                             }

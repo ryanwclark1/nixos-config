@@ -35,6 +35,7 @@ singleton SpectrumService 1.0 SpectrumService.qml
 SurfaceService 1.0 SurfaceService.qml
 singleton SuspendManager 1.0 SuspendManager.qml
 singleton SystemActionRegistry 1.0 SystemActionRegistry.qml
+singleton SystemIoTelemetryService 1.0 SystemIoTelemetryService.qml
 singleton SystemStatus 1.0 SystemStatus.qml
 singleton ThemeService 1.0 ThemeService.qml
 singleton ToastService 1.0 ToastService.qml

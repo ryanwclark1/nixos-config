@@ -142,8 +142,10 @@ Rectangle {
         }
 
         Rectangle {
+            id: controlsBox
             Layout.fillWidth: true
-            implicitHeight: 74
+            Layout.topMargin: Colors.spacingS
+            implicitHeight: controlsLayout.implicitHeight + (Colors.spacingM * 2)
             radius: Colors.radiusMedium
             color: Colors.withAlpha(Colors.surface, 0.2)
             border.color: Colors.withAlpha(Colors.primary, 0.14)
@@ -151,6 +153,7 @@ Rectangle {
             visible: Config.launcherShowModeHints && !root.launcher.sidebarCompact
 
             ColumnLayout {
+                id: controlsLayout
                 anchors.fill: parent
                 anchors.margins: Colors.spacingM
                 spacing: Colors.spacingXXS
@@ -158,11 +161,14 @@ Rectangle {
                     label: "CONTROLS"
                 }
                 Text {
+                    Layout.fillWidth: true
                     text: root.launcher.tabControlHintText
                     color: Colors.text
                     font.pixelSize: Colors.fontSizeSmall
+                    wrapMode: Text.WordWrap
                 }
                 Text {
+                    Layout.fillWidth: true
                     text: root.launcher.launcherControlHintText
                     color: Colors.textSecondary
                     font.pixelSize: Colors.fontSizeXS

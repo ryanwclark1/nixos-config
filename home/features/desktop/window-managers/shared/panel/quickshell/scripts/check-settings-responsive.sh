@@ -6,6 +6,8 @@ runtime_pid_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid"
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 config_root="$(CDPATH= cd -- "${script_dir}/../config" >/dev/null && pwd)"
 
+source "${script_dir}/runtime-warning-filter.sh"
+
 tab_ids=(
   "launcher"
   "launcher-search"
@@ -499,8 +501,8 @@ main() {
 
   if [[ -s "${delta_file}" ]]; then
     local filtered
-    filtered="$(grep -Evi 'qt\.qpa\.wayland\.textinput|qt\.svg: .*Could not resolve property' "${delta_file}" || true)"
-    if [[ -n "${filtered}" ]] && printf '%s' "${filtered}" | grep -Eqi 'warn|error|exception|binding loop|ReferenceError|TypeError|failed'; then
+    filtered="$(runtime_filter_log_delta settings "${delta_file}")"
+    if runtime_log_contains_actionable_text "${filtered}"; then
       fail "New runtime warnings/errors detected"
       printf '%s\n' "${filtered}" >&2
     else

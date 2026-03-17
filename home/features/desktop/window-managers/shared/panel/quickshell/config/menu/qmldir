@@ -12,6 +12,7 @@ DisplayConfig 1.0 DisplayConfig.qml
 FileBrowser 1.0 FileBrowser.qml
 MusicMenu 1.0 MusicMenu.qml
 NetworkMenu 1.0 NetworkMenu.qml
+VpnMenu 1.0 VpnMenu.qml
 Notepad 1.0 Notepad.qml
 NotificationCenter 1.0 NotificationCenter.qml
 Powermenu 1.0 Powermenu.qml

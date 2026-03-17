@@ -42,6 +42,7 @@ Scope {
     readonly property bool notifCenterVisible: root.isSurfaceOpen("notifCenter")
     readonly property bool controlCenterVisible: root.isSurfaceOpen("controlCenter")
     readonly property bool networkMenuVisible: root.isSurfaceOpen("networkMenu")
+    readonly property bool vpnMenuVisible: root.isSurfaceOpen("vpnMenu")
     readonly property bool audioMenuVisible: root.isSurfaceOpen("audioMenu")
     readonly property bool powerMenuVisible: root.isSurfaceOpen("powerMenu")
     readonly property bool clipboardMenuVisible: root.isSurfaceOpen("clipboardMenu")
@@ -146,6 +147,9 @@ Scope {
     function toggleNetworkMenu() {
         toggleSurface("networkMenu");
     }
+    function toggleVpnMenu() {
+        toggleSurface("vpnMenu");
+    }
     function toggleAudioMenu() {
         toggleSurface("audioMenu");
     }
@@ -242,6 +246,9 @@ Scope {
         }
         function toggleNetworkMenu() {
             root.toggleSurface("networkMenu");
+        }
+        function toggleVpnMenu() {
+            root.toggleSurface("vpnMenu");
         }
         function toggleAudioMenu() {
             root.toggleSurface("audioMenu");

@@ -329,6 +329,15 @@ EOF
       '';
     };
 
+    home.file.".local/bin/qs-apps" = {
+      force = true;
+      executable = true;
+      text = ''
+        #!/usr/bin/env bash
+        exec bash ${./scripts/apps.sh} "$@"
+      '';
+    };
+
     home.file.".local/share/applications/org.quickshell.desktop".text = ''
       [Desktop Entry]
       Name=Quickshell

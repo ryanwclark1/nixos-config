@@ -44,6 +44,8 @@ PanelWindow {
   function close() {
     if (countdownActive) _revertConfig();
     _cancelCountdown();
+    if (mainCard.activeFocus)
+      mainCard.focus = false;
     isOpen = false;
   }
 

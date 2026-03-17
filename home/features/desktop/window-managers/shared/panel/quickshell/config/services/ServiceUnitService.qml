@@ -21,6 +21,13 @@ QtObject {
     property bool userBusy: userPoll.busy
     property bool systemBusy: systemPoll.busy
     property bool dockerBusy: dockerPoll.busy
+    property int detailPollIntervalMs: 3000
+    property string detailScope: ""
+    property string detailUnitName: ""
+    property string detailStatus: "idle"
+    property string detailMessage: ""
+    property var unitDetail: ({})
+    readonly property bool detailBusy: detailPoll.busy
     property var pendingActions: ({})
 
     function _dockerCommand() {
@@ -162,6 +169,132 @@ QtObject {
         systemPoll.triggerPoll();
         dockerPoll.triggerPoll();
         sshPoll.triggerPoll();
+        refreshDetail();
+    }
+
+    function _clearDetail() {
+        detailScope = "";
+        detailUnitName = "";
+        detailStatus = "idle";
+        detailMessage = "";
+        unitDetail = ({});
+    }
+
+    function _detailCommand(scope, unitName) {
+        var safeScope = scope === "system" ? "system" : "user";
+        var safeUnit = String(unitName || "");
+        var prefix = safeScope === "system" ? "systemctl" : "systemctl --user";
+        var journalPrefix = safeScope === "system" ? "journalctl -u " : "journalctl --user -u ";
+        return ["sh", "-c", "scope=\"$1\"; unit=\"$2\"; prefix=\"$3\"; journalPrefix=\"$4\"; " +
+                              "if [ -z \"$unit\" ]; then printf '__STATUS__\\tidle\\tNo service selected\\n'; exit 0; fi; " +
+                              "if ! command -v systemctl >/dev/null 2>&1; then printf '__STATUS__\\tmissing\\tsystemctl is not installed\\n'; exit 0; fi; " +
+                              "if ! showOutput=$($prefix show \"$unit\" -p Description -p ActiveState -p SubState -p MainPID -p ExecMainStatus -p FragmentPath -p ActiveEnterTimestamp -p TasksCurrent -p MemoryCurrent 2>/dev/null); then " +
+                              "  printf '__STATUS__\\terror\\tUnable to query unit detail\\n'; exit 0; " +
+                              "fi; " +
+                              "logOutput=$($journalPrefix\"$unit\" -n 20 --no-pager -o short-iso 2>/dev/null || true); " +
+                              "printf '__STATUS__\\tready\\t\\n'; " +
+                              "printf 'scope\\t%s\\n' \"$scope\"; " +
+                              "printf 'name\\t%s\\n' \"$unit\"; " +
+                              "printf '%s\\n' \"$showOutput\" | awk -F= 'BEGIN{OFS=\"\\t\"} {key=$1; sub(/^[^=]*=/, \"\", $0); print key, $0}'; " +
+                              "printf '%s\\n' \"$logOutput\" | while IFS= read -r line; do [ -n \"$line\" ] && printf 'log\\t%s\\n' \"$line\"; done;", "sh", safeScope, safeUnit, prefix, journalPrefix];
+    }
+
+    function _mergeDetailSnapshot(snapshot) {
+        return {
+            name: String(snapshot.name || detailUnitName || ""),
+            scope: String(snapshot.scope || detailScope || ""),
+            description: String(snapshot.Description || ""),
+            activeState: String(snapshot.ActiveState || ""),
+            subState: String(snapshot.SubState || ""),
+            mainPid: snapshot.MainPID !== undefined ? snapshot.MainPID : null,
+            execMainStatus: snapshot.ExecMainStatus !== undefined ? snapshot.ExecMainStatus : null,
+            fragmentPath: String(snapshot.FragmentPath || ""),
+            activeEnterTimestamp: String(snapshot.ActiveEnterTimestamp || ""),
+            tasksCurrent: snapshot.TasksCurrent !== undefined ? snapshot.TasksCurrent : null,
+            memoryCurrent: snapshot.MemoryCurrent !== undefined ? snapshot.MemoryCurrent : null,
+            recentLogs: snapshot.recentLogs || []
+        };
+    }
+
+    function setDetailUnit(scope, unitName) {
+        var safeUnit = String(unitName || "");
+        if (safeUnit === "") {
+            _clearDetail();
+            return;
+        }
+        detailScope = scope === "system" ? "system" : "user";
+        detailUnitName = safeUnit;
+        detailStatus = "loading";
+        detailMessage = "Loading unit detail...";
+        unitDetail = {
+            name: detailUnitName,
+            scope: detailScope
+        };
+        detailPoll.triggerPoll();
+    }
+
+    function refreshDetail() {
+        if (detailUnitName === "")
+            return;
+        detailPoll.triggerPoll();
+    }
+
+    function parseDetailSnapshot(out) {
+        var text = String(out || "").trim();
+        if (text === "")
+            return {
+                scope: detailScope,
+                name: detailUnitName,
+                status: "error",
+                message: "No unit detail returned.",
+                recentLogs: []
+            };
+
+        var lines = text.split("\n");
+        var first = String(lines[0] || "");
+        var status = "ready";
+        var message = "";
+        if (first.indexOf("__STATUS__\t") === 0) {
+            var meta = first.split("\t");
+            status = String(meta[1] || "ready");
+            message = String(meta.slice(2).join("\t") || "");
+            lines.shift();
+        }
+
+        var result = {
+            scope: detailScope,
+            name: detailUnitName,
+            status: status,
+            message: message,
+            recentLogs: []
+        };
+
+        function parseOptionalInt(value) {
+            if (value === undefined || value === null || String(value) === "")
+                return null;
+            return parseInt(value, 10);
+        }
+
+        for (var i = 0; i < lines.length; ++i) {
+            var line = String(lines[i] || "");
+            if (line === "")
+                continue;
+            var parts = line.split("\t");
+            if (parts.length < 2)
+                continue;
+            var key = parts[0];
+            var value = parts.slice(1).join("\t");
+            if (key === "log") {
+                result.recentLogs.push(value);
+                continue;
+            }
+            if (key === "MainPID" || key === "ExecMainStatus" || key === "TasksCurrent" || key === "MemoryCurrent")
+                result[key] = parseOptionalInt(value);
+            else
+                result[key] = value;
+        }
+
+        return result;
     }
 
     function pendingActionForUnit(scope, unitName) {
@@ -252,6 +385,12 @@ QtObject {
         return _runClipboardAction(scope, unitName, String(unitName || ""), "Unit name copied to clipboard.");
     }
 
+    function copyUnitFragmentPath(scope, unitName) {
+        if (String(scope || "") !== detailScope || String(unitName || "") !== detailUnitName)
+            return false;
+        return _runClipboardAction(scope, unitName, String(unitDetail.fragmentPath || ""), "Unit fragment path copied to clipboard.");
+    }
+
     function getLogStreamCommand(scope, id) {
         if (scope === "docker") {
             return ["docker", "logs", "-f", "--tail", "100", id];
@@ -307,6 +446,24 @@ QtObject {
             root.systemStatus = String(snapshot.status || "error");
             root.systemMessage = String(snapshot.message || "");
             root.systemUnits = snapshot.units || [];
+        }
+    }
+
+    property SharedWidgets.CommandPoll detailPoll: SharedWidgets.CommandPoll {
+        id: detailPoll
+        interval: Math.max(1500, root.detailPollIntervalMs)
+        running: root.subscriberCount > 0 && root.detailUnitName !== ""
+        command: root._detailCommand(root.detailScope, root.detailUnitName)
+        parse: function(out) {
+            return root.parseDetailSnapshot(out);
+        }
+        onUpdated: {
+            var snapshot = detailPoll.value || {};
+            if (String(snapshot.scope || "") !== root.detailScope || String(snapshot.name || "") !== root.detailUnitName)
+                return;
+            root.detailStatus = String(snapshot.status || "ready");
+            root.detailMessage = String(snapshot.message || "");
+            root.unitDetail = root._mergeDetailSnapshot(snapshot);
         }
     }
 

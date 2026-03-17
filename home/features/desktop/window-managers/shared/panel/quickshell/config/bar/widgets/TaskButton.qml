@@ -12,7 +12,7 @@ Rectangle {
   scale: mouseArea.containsMouse ? 1.06 : 1.0
   layer.enabled: mouseArea.containsMouse
 
-  property string appClass: ""
+  property string appId: ""
   property string appAddress: ""
   property string appExec: ""
   property string appName: ""
@@ -32,12 +32,12 @@ Rectangle {
     if (!CompositorAdapter.isNiri || !NiriService.available) return false;
     var aw = CompositorAdapter.niriActiveWindow;
     if (!aw) return false;
-    return CompositorAdapter.windowAppId(aw).toLowerCase() === appClass.toLowerCase();
+    return CompositorAdapter.windowAppId(aw).toLowerCase() === appId.toLowerCase();
   }
   readonly property bool actualFocused: niriFocused || isFocused
   readonly property string tooltipText: {
     if ((appName || "").trim().length > 0) return appName;
-    if ((appClass || "").trim().length > 0) return appClass;
+    if ((appId || "").trim().length > 0) return appId;
     if ((appExec || "").trim().length > 0) return appExec;
     return isPinned ? "Pinned app" : "Running app";
   }
@@ -54,8 +54,8 @@ Rectangle {
 
   SharedWidgets.AppIcon {
     anchors.centerIn: parent
-    iconName: taskItem.appClass || taskItem.appExec || ""
-    appName: taskItem.appName || taskItem.appClass || ""
+    iconName: taskItem.appId || taskItem.appExec || ""
+    appName: taskItem.appName || taskItem.appId || ""
     iconSize: taskItem.iconSize
     iconMap: taskItem.iconMap
     fallbackIcon: "󰀻"
@@ -80,7 +80,7 @@ Rectangle {
         if (isRunning) {
           // On Niri, prefer NiriService.focusWindow for instant IPC focus
           if (CompositorAdapter.isNiri && NiriService.available) {
-            var niriWin = NiriService.findWindowByAppId(appClass);
+            var niriWin = NiriService.findWindowByAppId(appId);
             if (niriWin) { CompositorAdapter.focusWindow(niriWin.id); return; }
           }
           if (toplevelRef && toplevelRef.activate) toplevelRef.activate();
@@ -88,7 +88,7 @@ Rectangle {
           Quickshell.execDetached(["sh", "-c", appExec]);
         }
       } else if (mouse.button === Qt.RightButton) {
-        taskItem.pinToggled({ class: appClass, title: appName, exec: appExec });
+        taskItem.pinToggled({ appId: appId, title: appName, exec: appExec });
       }
     }
   }
@@ -97,7 +97,7 @@ Rectangle {
   Drag.source: {
     if (isPinned) return null;
     var winId = toplevelRef ? (toplevelRef.id || toplevelRef.address || "") : "";
-    return ({ type: "window", windowId: winId, windowAddress: winId, appId: appClass });
+    return ({ type: "window", windowId: winId, windowAddress: winId, appId: appId });
   }
   Drag.hotSpot.x: width / 2
   Drag.hotSpot.y: height / 2

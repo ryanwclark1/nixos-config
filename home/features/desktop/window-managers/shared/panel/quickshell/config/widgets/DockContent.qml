@@ -116,8 +116,8 @@ Item {
       readonly property string appName: modelData.name || appId
       readonly property string iconSource: root.dockRoot ? root.dockRoot.getAppIcon(appId) : ""
       readonly property bool isFocused: {
-        if (!isRunning || !CompositorAdapter.hasToplevelManager) return false;
-        var active = CompositorAdapter.activeToplevel;
+        if (!isRunning) return false;
+        var active = CompositorAdapter.activeWindow;
         if (!active) return false;
         for (var i = 0; i < toplevels.length; i++) {
           if (CompositorAdapter.sameWindow(toplevels[i], active)) return true;
@@ -240,7 +240,7 @@ Item {
             if (mouse.button === Qt.MiddleButton) {
               if (appDelegate.isRunning) {
                 if (appDelegate.isGrouped) {
-                  var active = CompositorAdapter.activeToplevel;
+                  var active = CompositorAdapter.activeWindow;
                   var closed = false;
                   for (var i = 0; i < appDelegate.toplevels.length; i++) {
                     if (CompositorAdapter.sameWindow(appDelegate.toplevels[i], active)) {
@@ -257,7 +257,7 @@ Item {
 
             if (appDelegate.isRunning) {
               if (appDelegate.isGrouped) {
-                var activeTop = CompositorAdapter.activeToplevel;
+                var activeTop = CompositorAdapter.activeWindow;
                 var idx = -1;
                 for (var j = 0; j < appDelegate.toplevels.length; j++) {
                   if (CompositorAdapter.sameWindow(appDelegate.toplevels[j], activeTop)) { idx = j; break; }
@@ -274,7 +274,7 @@ Item {
 
           onWheel: function(wheel) {
             if (!appDelegate.isGrouped) return;
-            var active = CompositorAdapter.activeToplevel;
+            var active = CompositorAdapter.activeWindow;
             var idx = -1;
             for (var i = 0; i < appDelegate.toplevels.length; i++) {
               if (CompositorAdapter.sameWindow(appDelegate.toplevels[i], active)) { idx = i; break; }
@@ -313,7 +313,7 @@ Item {
               width: 4; height: 4; radius: Colors.radiusMicro
               color: {
                 if (!appDelegate.isFocused) return Colors.textSecondary;
-                var active = CompositorAdapter.activeToplevel;
+                var active = CompositorAdapter.activeWindow;
                 if (active && index < appDelegate.toplevels.length && CompositorAdapter.sameWindow(appDelegate.toplevels[index], active))
                   return Colors.primary;
                 return Colors.textSecondary;
@@ -335,7 +335,7 @@ Item {
               width: 4; height: 4; radius: Colors.radiusMicro
               color: {
                 if (!appDelegate.isFocused) return Colors.textSecondary;
-                var active = CompositorAdapter.activeToplevel;
+                var active = CompositorAdapter.activeWindow;
                 if (active && index < appDelegate.toplevels.length && CompositorAdapter.sameWindow(appDelegate.toplevels[index], active))
                   return Colors.primary;
                 return Colors.textSecondary;

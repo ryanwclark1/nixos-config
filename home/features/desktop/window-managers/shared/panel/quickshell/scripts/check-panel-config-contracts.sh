@@ -98,6 +98,7 @@ QML
 main() {
   require_cmd quickshell
   require_cmd jq
+  require_cmd bash
   require_cmd sed
   require_cmd mktemp
   require_cmd timeout
@@ -260,6 +261,12 @@ main() {
     pass "Legacy cava widgets migrate into mediaBar settings"
   else
     fail "Legacy cava widgets migrate into mediaBar settings"
+  fi
+
+  if bash "${script_dir}/check-network-vpn-contracts.sh"; then
+    pass "VPN hub structural contracts stay wired across registry, shell, and popup layers"
+  else
+    fail "VPN hub structural contracts stay wired across registry, shell, and popup layers"
   fi
 
   printf '[INFO] Summary: %d pass, %d fail\n' "${pass_count}" "${fail_count}"

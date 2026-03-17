@@ -5,8 +5,11 @@ import "../../services"
 
 Rectangle {
   id: root
-  height: vertical ? (workspaceApiAvailable && state.workspaces.length > 0 ? (strip.implicitHeight + 12) : 0) : 24
-  radius: vertical ? 12 : height / 2
+  readonly property bool hasWorkspaceContent: workspaceApiAvailable && !!state && (state.workspaces || []).length > 0
+  readonly property real contentWidth: vertical ? 28 : (strip.implicitWidth + 12)
+  readonly property real contentHeight: vertical ? (strip.implicitHeight + 12) : 24
+  height: hasWorkspaceContent ? contentHeight : 0
+  radius: vertical ? 12 : (height > 0 ? height / 2 : 0)
   color: Colors.bgWidget
 
   property bool vertical: false
@@ -16,11 +19,10 @@ Rectangle {
   property var state: ({ workspaces: [], activeWorkspace: -1 })
 
   readonly property bool workspaceApiAvailable: CompositorAdapter.supportsWorkspaceListing
-  width: vertical ? (workspaceApiAvailable && state.workspaces.length > 0 ? 28 : 0)
-       : (workspaceApiAvailable && state.workspaces.length > 0 ? (strip.implicitWidth + 12) : 0)
+  width: hasWorkspaceContent ? contentWidth : 0
   implicitWidth: width
   implicitHeight: height
-  visible: vertical ? (height > 0) : (width > 0)
+  visible: hasWorkspaceContent
 
   // ── Niri reactive path ──────────────────────────
   // When NiriService is available, derive state directly from its event-driven

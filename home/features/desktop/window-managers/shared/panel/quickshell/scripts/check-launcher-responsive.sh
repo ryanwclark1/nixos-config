@@ -10,6 +10,8 @@ launcher_settings_qml="${script_dir}/../config/menu/settings/tabs/ShellCoreSecti
 expected_config="$(realpath "${script_dir}/../config/shell.qml" 2>/dev/null || printf '%s' "${script_dir}/../config/shell.qml")"
 apps_helper="${script_dir}/apps.sh"
 
+source "${script_dir}/runtime-warning-filter.sh"
+
 instance_id=""
 ci_mode=0
 repo_shell_mode=0
@@ -590,8 +592,8 @@ if (String(state.drunCategoryFilter || "") !== "") process.exit(1);
   fi
 
   if [[ -s "${delta_file}" ]]; then
-    filtered="$(grep -Evi 'qt\.qpa\.wayland\.textinput|qt\.svg: .*Could not resolve property' "${delta_file}" || true)"
-    if [[ -n "${filtered}" ]] && printf '%s' "${filtered}" | grep -Eqi 'warn|error|exception|binding loop|ReferenceError|TypeError|failed'; then
+    filtered="$(runtime_filter_log_delta launcher "${delta_file}")"
+    if runtime_log_contains_actionable_text "${filtered}"; then
       fail "New runtime warnings/errors detected after launcher responsive exercise"
       printf '%s\n' "${filtered}" >&2
     else

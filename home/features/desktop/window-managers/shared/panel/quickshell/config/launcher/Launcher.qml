@@ -131,7 +131,7 @@ PanelWindow {
             filesResolveAvgMs: 0,
             perMode: ({})
         })
-    readonly property string repoAppsHelperPath: (Quickshell.env("HOME") || "/home/administrator") + "/nixos-config/home/features/desktop/window-managers/shared/panel/quickshell/scripts/qs-apps"
+    readonly property string launcherAppsHelperPath: (Quickshell.env("HOME") || "/home/administrator") + "/.local/bin/qs-apps"
 
     function refreshMediaPlayers() {
         mediaPlayers = MediaService.getAvailablePlayers();
@@ -827,7 +827,7 @@ PanelWindow {
 
     function modeDependencies(modeKey) {
         if (modeKey === "drun")
-            return [];
+            return [launcherAppsHelperPath];
         if (modeKey === "run")
             return ["qs-run"];
         if (modeKey === "emoji")
@@ -1449,7 +1449,7 @@ PanelWindow {
     }
 
     function rememberRecent(item) {
-        var key = item.exec || item.address || item.fullPath || item.name || item.title || "";
+        var key = item.exec || item.address || item.appId || item.fullPath || item.name || item.title || "";
         if (!key)
             return;
         var next = [
@@ -1458,7 +1458,9 @@ PanelWindow {
                 name: item.name || item.label || item.title || key,
                 title: item.title || item.description || item.exec || "",
                 icon: item.icon || modeIcons[mode] || "󰀻",
+                appId: item.appId || "",
                 exec: item.exec || "",
+                address: item.address || "",
                 openMode: item.openMode || "",
                 timestamp: Date.now()
             }
@@ -1866,7 +1868,7 @@ PanelWindow {
     }
 
     function loadApps() {
-        loadCached("drun", ["bash", repoAppsHelperPath], JSON.parse);
+        loadCached("drun", ["bash", launcherAppsHelperPath], JSON.parse);
     }
     function loadRun() {
         loadCached("run", ["qs-run"], JSON.parse);
@@ -1919,7 +1921,7 @@ PanelWindow {
     // ── Background preloading ───────────────────
     readonly property var preloadModes: ({
             "drun": {
-                command: ["bash", repoAppsHelperPath],
+                command: ["bash", launcherAppsHelperPath],
                 parse: JSON.parse
             },
             "run": {
@@ -2641,12 +2643,15 @@ PanelWindow {
                 var win = availableToplevels[i];
                 if (!win)
                     continue;
-                var cls = CompositorAdapter.windowAppId(win);
+                var appId = CompositorAdapter.windowAppId(win);
+                var title = CompositorAdapter.windowTitle(win);
+                var address = CompositorAdapter.windowIdentifier(win);
                 items.push({
-                    name: win.title || cls || "Window",
-                    title: cls || "",
-                    icon: cls || "",
-                    class: cls,
+                    name: title || appId || "Window",
+                    title: title || "",
+                    appId: appId,
+                    icon: appId || "",
+                    address: address,
                     toplevel: win
                 });
             }
@@ -3177,8 +3182,10 @@ PanelWindow {
         } else if (mode === "window") {
             rememberRecent({
                 name: item.name || item.title || "Window",
-                title: item.title || item.class || "",
-                icon: item.icon || "󰖯",
+                title: item.title || item.appId || "",
+                icon: item.icon || item.appId || "󰖯",
+                appId: item.appId || "",
+                address: item.address || "",
                 openMode: "window"
             });
             if (item.toplevel && item.toplevel.activate)
@@ -3509,7 +3516,7 @@ PanelWindow {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            anchors.margins: launcherRoot.tightMode ? Colors.spacingM : Colors.paddingMedium
+            anchors.margins: launcherRoot.tightMode ? Colors.spacingM : Colors.spacingXL
             anchors.topMargin: launcherRoot.tightMode ? Colors.spacingS : Colors.spacingM
             spacing: launcherRoot.compactMode ? Colors.paddingSmall : 18
 
@@ -3717,15 +3724,17 @@ PanelWindow {
                 }
 
                 Rectangle {
+                    id: metricsBox
                     Layout.fillWidth: true
                     visible: Config.launcherShowRuntimeMetrics && !launcherRoot.tightMode
                     color: Colors.bgWidget
                     radius: Colors.radiusMedium
                     border.color: Colors.border
                     border.width: 1
-                    implicitHeight: 74
+                    implicitHeight: metricsLayout.implicitHeight + (Colors.spacingM * 2)
 
                     RowLayout {
+                        id: metricsLayout
                         anchors.fill: parent
                         anchors.margins: Colors.spacingM
                         spacing: Colors.spacingM
@@ -3740,17 +3749,19 @@ PanelWindow {
                                 font.weight: Font.DemiBold
                             }
                             Text {
+                                Layout.fillWidth: true
                                 text: "opens " + launcherRoot.launcherMetrics.opens + " • cache " + launcherRoot.launcherMetrics.cacheHits + "/" + launcherRoot.launcherMetrics.cacheMisses + " • failures " + launcherRoot.launcherMetrics.commandFailures + " • filter avg " + (launcherRoot.launcherMetrics.avgFilterMs || 0) + "ms" + " / last " + (launcherRoot.launcherMetrics.lastFilterMs || 0) + "ms" + (launcherRoot.mode === "files" ? (" • backend " + launcherRoot.filesBackendLabel + " • fd/find " + (launcherRoot.launcherMetrics.filesFdLoads || 0) + "/" + (launcherRoot.launcherMetrics.filesFindLoads || 0) + " • fd " + (launcherRoot.launcherMetrics.filesFdAvgMs || 0) + "/" + (launcherRoot.launcherMetrics.filesFdLastMs || 0) + "ms" + " • find " + (launcherRoot.launcherMetrics.filesFindAvgMs || 0) + "/" + (launcherRoot.launcherMetrics.filesFindLastMs || 0) + "ms" + " • resolve " + (launcherRoot.launcherMetrics.filesResolveAvgMs || 0) + "/" + (launcherRoot.launcherMetrics.filesResolveLastMs || 0) + "ms") : "")
                                 color: Colors.textSecondary
                                 font.pixelSize: Colors.fontSizeXS
-                                elide: Text.ElideRight
+                                wrapMode: Text.WordWrap
                             }
                             Text {
                                 readonly property var modeStats: launcherRoot.modeMetric(launcherRoot.mode)
+                                Layout.fillWidth: true
                                 text: launcherRoot.modeInfo(launcherRoot.mode).label + ": avg " + modeStats.avgLoadMs + "ms" + " • last " + modeStats.lastLoadMs + "ms" + " • failures " + modeStats.failures + (launcherRoot.mode === "files" ? (" • cache " + launcherRoot.filesCacheStatsLabel) : "")
                                 color: Colors.textSecondary
                                 font.pixelSize: Colors.fontSizeXS
-                                elide: Text.ElideRight
+                                wrapMode: Text.WordWrap
                             }
                         }
 

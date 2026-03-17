@@ -47,9 +47,14 @@ PanelWindow {
             Qt.callLater(function() {
                 root.focusKeyboardSection(0);
             });
+        } else {
+            if (processTable && processTable.clearTableFocus)
+                processTable.clearTableFocus();
+            if (serviceTable && serviceTable.clearTableFocus)
+                serviceTable.clearTableFocus();
+            if (slidePanel.activeFocus)
+                slidePanel.focus = false;
         }
-        else if (slidePanel.activeFocus)
-            slidePanel.focus = false;
     }
 
     function refreshAll() {
@@ -369,7 +374,7 @@ PanelWindow {
                 Layout.fillWidth: true
                 text: root.keyboardSectionIndex === 0
                     ? "Tab switches sections. Process keys: arrows/j/k move, selection updates live detail, left/right or h/l collapse tree, r refresh, x term, Delete kill, Space suspend, +/- renice, d details, c/y copy, Enter inspect."
-                    : "Tab switches sections. Service keys: arrows/j/k move, r restart, s start/stop, Enter or l opens logs."
+                    : "Tab switches sections. Service keys: arrows/j/k move, selection updates live unit detail, r restart, s start/stop, Enter or l opens logs."
                 color: Colors.textDisabled
                 font.pixelSize: Colors.fontSizeXS
                 wrapMode: Text.WordWrap

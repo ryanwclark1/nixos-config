@@ -65,6 +65,10 @@ PanelWindow {
   }
 
   function close() {
+    if (saveField.activeFocus)
+      saveField.focus = false;
+    if (mainBox.activeFocus)
+      mainBox.focus = false;
     isOpen = false;
     _fileEntries = [];
   }
@@ -306,10 +310,21 @@ PanelWindow {
 
     focus: root.isOpen
     onVisibleChanged: {
-      if (visible)
-        forceActiveFocus();
-      else if (activeFocus)
+      if (visible) {
+        if (root.mode === "save") {
+          Qt.callLater(function() {
+            if (root.isOpen && root.mode === "save")
+              saveField.forceActiveFocus();
+          });
+        } else {
+          forceActiveFocus();
+        }
+      } else {
+        if (saveField.activeFocus)
+          saveField.focus = false;
+        if (activeFocus)
         focus = false;
+      }
     }
     Keys.onEscapePressed: root.close()
 
@@ -1292,11 +1307,16 @@ PanelWindow {
                   TextInput {
                     id: saveField
                     Layout.fillWidth: true
+                    enabled: root.mode === "save" && root.isOpen
                     text: root.saveFileName
                     color: Colors.text
                     font.pixelSize: Colors.fontSizeMedium
                     selectionColor: Colors.withAlpha(Colors.primary, 0.4)
                     clip: true
+                    onVisibleChanged: {
+                      if (!visible && activeFocus)
+                        focus = false;
+                    }
 
                     onTextChanged: root.saveFileName = text
 

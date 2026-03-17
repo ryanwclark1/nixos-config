@@ -742,7 +742,10 @@ Quickshell Manual Flow
 2. Run the focused Quickshell runtime checks:
    - scripts/check-quickshell-startup.sh
    - scripts/check-panel-runtime.sh --repo-shell
-3. Run the assembled Quickshell workflow:
+3. Capture review artifacts for high-risk UI changes:
+   - scripts/capture-panel-matrix.sh --repo-shell
+   - artifact validation runs automatically; use scripts/check-panel-capture-artifacts.sh --dir DIR to re-check a saved bundle
+4. Run the assembled Quickshell workflow:
    - scripts/plugin-local.sh quickshell-all
 EOF
     ;;
@@ -768,7 +771,7 @@ EOF
       shell_health="$(health_label 0 "quickshell shell config")"
       health_failures=$((health_failures + 1))
     fi
-    if [[ -x "${script_dir}/check-quickshell-startup.sh" && -x "${script_dir}/check-settings-responsive.sh" && -x "${script_dir}/check-surface-responsive.sh" && -x "${script_dir}/check-panel-runtime.sh" ]]; then
+    if [[ -x "${script_dir}/check-quickshell-startup.sh" && -x "${script_dir}/check-settings-responsive.sh" && -x "${script_dir}/check-surface-responsive.sh" && -x "${script_dir}/check-runtime-warning-regressions.sh" && -x "${script_dir}/check-panel-runtime.sh" && -x "${script_dir}/check-panel-capture-artifacts.sh" ]]; then
       guard_health="$(health_label 1 "quickshell runtime guard scripts")"
     else
       guard_health="$(health_label 0 "quickshell runtime guard scripts")"
@@ -802,10 +805,12 @@ Local commands:
   status:  scripts/plugin-local.sh quickshell-status --check
   guards:  scripts/plugin-local.sh quickshell-guards
   all:     scripts/plugin-local.sh quickshell-all
+  capture: scripts/capture-panel-matrix.sh --repo-shell
 
 Runtime files:
   startup:  ${script_dir}/check-quickshell-startup.sh
   panel:    ${script_dir}/check-panel-runtime.sh --repo-shell
+  capture:  ${script_dir}/check-panel-capture-artifacts.sh
 EOF
     else
       printf '[INFO] Quickshell status: %s | %s | %s\n' \
@@ -828,7 +833,9 @@ shell_config=${shell_config}
 guard_startup=${script_dir}/check-quickshell-startup.sh
 guard_settings=${script_dir}/check-settings-responsive.sh
 guard_surfaces=${script_dir}/check-surface-responsive.sh
+guard_warning_regressions=${script_dir}/check-runtime-warning-regressions.sh
 guard_panel_runtime=${script_dir}/check-panel-runtime.sh
+capture_validator=${script_dir}/check-panel-capture-artifacts.sh
 service_name=quickshell.service
 EOF
     ;;

@@ -12,6 +12,7 @@ QtObject {
   readonly property string desktopEnv: (Quickshell.env("XDG_CURRENT_DESKTOP") || "").toLowerCase()
   readonly property string sessionDesktop: (Quickshell.env("DESKTOP_SESSION") || "").toLowerCase()
   readonly property bool hasHyprSig: (Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE") || "") !== ""
+  readonly property bool hasWaylandDisplay: (Quickshell.env("WAYLAND_DISPLAY") || "") !== ""
   readonly property bool hasNiriSocket: (Quickshell.env("NIRI_SOCKET") || "") !== ""
 
   readonly property bool desktopSaysHyprland: desktopEnv.indexOf("hyprland") !== -1 || sessionDesktop.indexOf("hyprland") !== -1
@@ -43,6 +44,8 @@ QtObject {
   readonly property bool hasHyprlandToplevels: isHyprland && typeof Hyprland !== "undefined"
   readonly property bool hasToplevelManager: hasHyprlandToplevels || typeof ToplevelManager !== "undefined"
   property var hyprlandCtlWindow: ({})
+  property string _lastHyprctlFailureState: ""
+  property string _lastActiveWindowSourceLog: ""
   readonly property var toplevels: {
     if (hasHyprlandToplevels)
       return Hyprland.toplevels || [];
@@ -62,15 +65,35 @@ QtObject {
       return niriActiveWindow;
     if (activeToplevel)
       return activeToplevel;
-    if (isHyprland)
+    if (isHyprland && windowHasData(hyprlandCtlWindow))
       return hyprlandCtlWindow;
     return null;
   }
+  readonly property string activeWindowSource: {
+    if (isNiri && windowHasData(niriActiveWindow))
+      return "niri";
+    if (hasHyprlandToplevels && activeToplevel)
+      return "hyprland-qml";
+    if (!hasHyprlandToplevels && activeToplevel)
+      return "toplevel-manager";
+    if (isHyprland && windowHasData(hyprlandCtlWindow))
+      return "hyprctl-fallback";
+    return "none";
+  }
+  readonly property bool activeWindowReady: activeWindowSource !== "none"
   readonly property string activeWindowTitle: {
     return windowTitle(activeWindow);
   }
   readonly property string activeWindowAppId: {
     return windowAppId(activeWindow);
+  }
+  readonly property string activeWindowDebugSummary: {
+    return "compositor=" + compositor
+      + " source=" + activeWindowSource
+      + " ready=" + activeWindowReady
+      + " title=" + windowTitle(activeWindow)
+      + " appId=" + windowAppId(activeWindow)
+      + " id=" + windowIdentifier(activeWindow);
   }
 
   // ── Niri reactive state (delegated to NiriService) ──
@@ -88,7 +111,10 @@ QtObject {
   Component.onCompleted: {
     if (hasHyprlandToplevels && typeof Hyprland.refreshToplevels === "function")
       Hyprland.refreshToplevels();
+    logActiveWindowSourceTransition();
   }
+
+  onActiveWindowSourceChanged: logActiveWindowSourceTransition()
 
   property Process hyprctlActiveWindowProc: Process {
     id: hyprctlActiveWindowProc
@@ -96,24 +122,34 @@ QtObject {
     running: false
     stdout: StdioCollector {
       onStreamFinished: {
+        var raw = (this.text || "").trim();
+        if (raw === "") {
+          root.hyprlandCtlWindow = ({});
+          root.reportHyprctlFailureState("command-failed", "empty output");
+          return;
+        }
         try {
-          var parsed = JSON.parse(this.text || "{}");
+          var parsed = JSON.parse(raw);
           root.hyprlandCtlWindow = parsed && typeof parsed === "object" ? parsed : ({});
+          root.reportHyprctlFailureState("ok");
         } catch (e) {
           root.hyprlandCtlWindow = ({});
+          root.reportHyprctlFailureState("command-failed", String(e));
         }
       }
     }
     onExited: (exitCode, exitStatus) => {
-      if (exitCode !== 0)
+      if (exitCode !== 0) {
         root.hyprlandCtlWindow = ({});
+        root.reportHyprctlFailureState("command-failed", "exitCode=" + exitCode + " status=" + exitStatus);
+      }
     }
   }
 
   property Timer hyprctlActiveWindowTimer: Timer {
     interval: 1500
     repeat: true
-    running: root.isHyprland
+    running: root.isHyprland && root.hasHyprSig && root.hasWaylandDisplay
     triggeredOnStart: true
     onTriggered: {
       if (hyprctlActiveWindowProc.running)
@@ -124,6 +160,14 @@ QtObject {
 
   function windowTitle(windowRef) {
     return windowRef ? String(windowRef.title || "") : "";
+  }
+
+  function windowHasData(windowRef) {
+    if (!windowRef)
+      return false;
+    return windowIdentifier(windowRef) !== ""
+      || windowTitle(windowRef) !== ""
+      || windowAppId(windowRef) !== "";
   }
 
   function windowIdentifier(windowRef) {
@@ -154,6 +198,26 @@ QtObject {
     var leftApp = windowAppId(left);
     var rightApp = windowAppId(right);
     return leftTitle !== "" && leftApp !== "" && leftTitle === rightTitle && leftApp === rightApp;
+  }
+
+  function logActiveWindowSourceTransition() {
+    if (_lastActiveWindowSourceLog === activeWindowSource)
+      return;
+    _lastActiveWindowSourceLog = activeWindowSource;
+  }
+
+  function reportHyprctlFailureState(state, details) {
+    var nextState = String(state || "unknown");
+    if (_lastHyprctlFailureState === nextState)
+      return;
+
+    if (nextState === "ok") {
+      _lastHyprctlFailureState = nextState;
+      return;
+    }
+
+    _lastHyprctlFailureState = nextState;
+    console.warn("[CompositorAdapter] hyprctl activewindow failure:", nextState, details || "");
   }
 
   function matchesCompositorTag(tag) {

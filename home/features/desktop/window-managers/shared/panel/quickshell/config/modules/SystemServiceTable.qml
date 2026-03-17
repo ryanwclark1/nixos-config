@@ -17,6 +17,11 @@ SharedWidgets.CardBase {
     readonly property string trimmedSearch: String(searchQuery || "").trim().toLowerCase()
     readonly property var visibleUnits: computeVisibleUnits()
     readonly property var selectedUnit: (selectedIndex >= 0 && selectedIndex < visibleUnits.length) ? visibleUnits[selectedIndex] : null
+    readonly property var detailData: root.selectedUnit
+        && ServiceUnitService.detailScope === root.selectedUnit.scope
+        && ServiceUnitService.detailUnitName === root.selectedUnit.name
+        ? ServiceUnitService.unitDetail
+        : ({})
     readonly property string selectedPendingAction: selectedUnit ? ServiceUnitService.pendingActionForUnit(selectedUnit.scope, selectedUnit.name) : ""
     readonly property bool keyboardFocused: tableFocus.activeFocus
 
@@ -25,6 +30,11 @@ SharedWidgets.CardBase {
 
     function focusTable() {
         tableFocus.forceActiveFocus();
+    }
+
+    function clearTableFocus() {
+        if (tableFocus.activeFocus)
+            tableFocus.focus = false;
     }
 
     function ensureSelectedVisible() {
@@ -83,6 +93,33 @@ SharedWidgets.CardBase {
         if (active === "activating" || active === "reloading")
             return Colors.warning;
         return Colors.textSecondary;
+    }
+
+    function detailStatusColor(status) {
+        if (status === "ready")
+            return Colors.success;
+        if (status === "loading")
+            return Colors.warning;
+        if (status === "error" || status === "missing")
+            return Colors.error;
+        return Colors.textDisabled;
+    }
+
+    function formatBytes(bytes) {
+        var value = Number(bytes);
+        if (!isFinite(value) || value < 0)
+            return "Unavailable";
+        if (value >= 1024 * 1024 * 1024)
+            return (value / (1024 * 1024 * 1024)).toFixed(1) + " GiB";
+        if (value >= 1024 * 1024)
+            return (value / (1024 * 1024)).toFixed(1) + " MiB";
+        if (value >= 1024)
+            return (value / 1024).toFixed(1) + " KiB";
+        return Math.round(value) + " B";
+    }
+
+    function fallbackText(value) {
+        return String(value || "").trim() === "" ? "Unavailable" : String(value);
     }
 
     function sourceUnitsForScope(scope) {
@@ -154,8 +191,18 @@ SharedWidgets.CardBase {
     }
 
     onVisibleUnitsChanged: syncSelection()
-    onSelectedIndexChanged: Qt.callLater(ensureSelectedVisible)
-    Component.onCompleted: syncSelection()
+    onSelectedIndexChanged: {
+        Qt.callLater(ensureSelectedVisible);
+        if (root.selectedUnit)
+            ServiceUnitService.setDetailUnit(root.selectedUnit.scope, root.selectedUnit.name);
+        else
+            ServiceUnitService.setDetailUnit("", "");
+    }
+    Component.onCompleted: {
+        syncSelection();
+        if (root.selectedUnit)
+            ServiceUnitService.setDetailUnit(root.selectedUnit.scope, root.selectedUnit.name);
+    }
 
     FocusScope {
         id: tableFocus
@@ -570,6 +617,188 @@ SharedWidgets.CardBase {
                             onClicked: {
                                 if (root.selectedUnit)
                                     ServiceUnitService.openUnitStatusInTerminal(root.selectedUnit.scope, root.selectedUnit.name);
+                            }
+                        }
+
+                        SharedWidgets.FilterChip {
+                            label: "Copy Unit"
+                            icon: "󰅍"
+                            enabled: !!root.selectedUnit
+                            selected: false
+                            onClicked: {
+                                if (root.selectedUnit)
+                                    ServiceUnitService.copyUnitName(root.selectedUnit.scope, root.selectedUnit.name);
+                            }
+                        }
+
+                        SharedWidgets.FilterChip {
+                            label: "Copy Path"
+                            icon: "󰅍"
+                            enabled: !!root.selectedUnit && !!root.detailData.fragmentPath
+                            selected: false
+                            onClicked: {
+                                if (root.selectedUnit)
+                                    ServiceUnitService.copyUnitFragmentPath(root.selectedUnit.scope, root.selectedUnit.name);
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        radius: Colors.radiusSmall
+                        color: Colors.cardSurface
+                        border.color: Colors.withAlpha(root.detailStatusColor(ServiceUnitService.detailStatus), 0.4)
+                        border.width: 1
+                        implicitHeight: liveDetailColumn.implicitHeight + Colors.spacingM * 2
+
+                        ColumnLayout {
+                            id: liveDetailColumn
+                            anchors.fill: parent
+                            anchors.margins: Colors.spacingM
+                            spacing: Colors.spacingS
+
+                            RowLayout {
+                                Layout.fillWidth: true
+
+                                Text {
+                                    text: "LIVE UNIT DETAIL"
+                                    color: Colors.textDisabled
+                                    font.pixelSize: Colors.fontSizeXS
+                                    font.weight: Font.Bold
+                                    font.letterSpacing: Colors.letterSpacingWide
+                                }
+
+                                Item {
+                                    Layout.fillWidth: true
+                                }
+
+                                SharedWidgets.Chip {
+                                    icon: ServiceUnitService.detailBusy ? "󰑐" : "󰄬"
+                                    iconColor: root.detailStatusColor(ServiceUnitService.detailStatus)
+                                    text: ServiceUnitService.detailStatus.toUpperCase()
+                                    textColor: root.detailStatusColor(ServiceUnitService.detailStatus)
+                                }
+                            }
+
+                            Text {
+                                Layout.fillWidth: true
+                                visible: ServiceUnitService.detailMessage !== ""
+                                text: ServiceUnitService.detailMessage
+                                color: Colors.textSecondary
+                                font.pixelSize: Colors.fontSizeXS
+                                wrapMode: Text.WordWrap
+                            }
+
+                            Flow {
+                                Layout.fillWidth: true
+                                width: parent.width
+                                spacing: Colors.spacingS
+
+                                SharedWidgets.Chip {
+                                    icon: "󰈐"
+                                    iconColor: Colors.primary
+                                    text: "PID " + (root.detailData.mainPid !== undefined && root.detailData.mainPid !== null ? String(root.detailData.mainPid) : "Unavailable")
+                                    textColor: Colors.primary
+                                }
+
+                                SharedWidgets.Chip {
+                                    icon: "󰜎"
+                                    iconColor: Colors.secondary
+                                    text: "EXIT " + (root.detailData.execMainStatus !== undefined && root.detailData.execMainStatus !== null ? String(root.detailData.execMainStatus) : "Unavailable")
+                                    textColor: Colors.secondary
+                                }
+
+                                SharedWidgets.Chip {
+                                    icon: "󰍛"
+                                    iconColor: Colors.accent
+                                    text: "MEM " + root.formatBytes(root.detailData.memoryCurrent)
+                                    textColor: Colors.accent
+                                }
+
+                                SharedWidgets.Chip {
+                                    icon: "󰓅"
+                                    iconColor: Colors.warning
+                                    text: "TASKS " + (root.detailData.tasksCurrent !== undefined && root.detailData.tasksCurrent !== null ? String(root.detailData.tasksCurrent) : "Unavailable")
+                                    textColor: Colors.warning
+                                }
+                            }
+
+                            Rectangle {
+                                Layout.fillWidth: true
+                                color: Colors.withAlpha(Colors.surface, 0.5)
+                                radius: Colors.radiusSmall
+                                border.color: Colors.withAlpha(Colors.border, 0.6)
+                                border.width: 1
+                                implicitHeight: fragmentBlock.implicitHeight + Colors.spacingS * 2
+
+                                ColumnLayout {
+                                    id: fragmentBlock
+                                    anchors.fill: parent
+                                    anchors.margins: Colors.spacingS
+                                    spacing: Colors.spacingXXS
+
+                                    Text {
+                                        text: "FRAGMENT PATH"
+                                        color: Colors.textDisabled
+                                        font.pixelSize: Colors.fontSizeXS
+                                        font.weight: Font.Bold
+                                    }
+
+                                    Text {
+                                        Layout.fillWidth: true
+                                        text: root.fallbackText(root.detailData.fragmentPath)
+                                        color: Colors.textSecondary
+                                        font.pixelSize: Colors.fontSizeXS
+                                        font.family: Colors.fontMono
+                                        wrapMode: Text.WrapAnywhere
+                                    }
+                                }
+                            }
+
+                            Rectangle {
+                                Layout.fillWidth: true
+                                color: Colors.withAlpha(Colors.surface, 0.5)
+                                radius: Colors.radiusSmall
+                                border.color: Colors.withAlpha(Colors.border, 0.6)
+                                border.width: 1
+                                implicitHeight: logsBlock.implicitHeight + Colors.spacingS * 2
+
+                                ColumnLayout {
+                                    id: logsBlock
+                                    anchors.fill: parent
+                                    anchors.margins: Colors.spacingS
+                                    spacing: Colors.spacingXXS
+
+                                    Text {
+                                        text: "RECENT LOGS"
+                                        color: Colors.textDisabled
+                                        font.pixelSize: Colors.fontSizeXS
+                                        font.weight: Font.Bold
+                                    }
+
+                                    Text {
+                                        Layout.fillWidth: true
+                                        visible: !root.detailData.recentLogs || root.detailData.recentLogs.length === 0
+                                        text: "Unavailable"
+                                        color: Colors.textSecondary
+                                        font.pixelSize: Colors.fontSizeXS
+                                        font.family: Colors.fontMono
+                                    }
+
+                                    Repeater {
+                                        model: root.detailData.recentLogs || []
+
+                                        delegate: Text {
+                                            required property var modelData
+                                            Layout.fillWidth: true
+                                            text: String(modelData || "")
+                                            color: Colors.textSecondary
+                                            font.pixelSize: Colors.fontSizeXS
+                                            font.family: Colors.fontMono
+                                            wrapMode: Text.WrapAnywhere
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

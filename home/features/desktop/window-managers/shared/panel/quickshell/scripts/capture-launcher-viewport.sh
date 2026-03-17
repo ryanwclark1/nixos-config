@@ -20,7 +20,7 @@ viewport_width=""
 viewport_height=""
 workspace_settle_attempts="80"
 workspace_settle_interval="0.2"
-state_settle_attempts="30"
+state_settle_attempts="18"
 state_settle_interval="0.1"
 temp_full=""
 temp_crop=""
@@ -122,6 +122,10 @@ run_ipc() {
 
   for attempt in 1 2 3 4 5; do
     output="$(timeout "${ipc_timeout_seconds}s" "$@" 2>&1)" && {
+      if [[ "${output}" == *"Not ready to accept queries yet."* ]]; then
+        sleep 0.2
+        continue
+      fi
       [[ -n "${output}" ]] && printf '%s\n' "${output}"
       return 0
     }
@@ -336,9 +340,9 @@ const parts = [
   String(payload.loadState || "idle"),
   String(Math.max(0, Math.round(Number(payload.resultCount || payload.filteredItemCount || 0))))
 ];
-process.stdout.write(parts.join("\t"));
+process.stdout.write(parts.join("\u001f"));
 ' 2>/dev/null || true)"
-      IFS=$'\t' read -r current_mode current_query current_category current_home current_load_state current_result_count <<< "${snapshot}" || true
+      IFS=$'\x1f' read -r current_mode current_query current_category current_home current_load_state current_result_count <<< "${snapshot}" || true
     else
       current_mode=""
       current_query=""
@@ -451,7 +455,7 @@ if (match) process.stdout.write(String(match.key || ""));
       ;;
   esac
 
-  for attempt in 1 2 3; do
+  for attempt in 1 2; do
     call_ipc Launcher "${mode_action}" >/dev/null
     sleep 0.15
     call_ipc Launcher diagnosticSetSearchText "" >/dev/null 2>&1 || true
@@ -574,7 +578,8 @@ main() {
       exit 1
     fi
 
-    read -r hud_x hud_y hud_w hud_h launcher_usable_w launcher_usable_h launcher_diag_x launcher_diag_y < <(printf '%s' "${launcher_state}" | node -e '
+    local hud_snapshot=""
+    hud_snapshot="$(printf '%s' "${launcher_state}" | node -e '
 const fs = require("node:fs");
 const raw = fs.readFileSync(0, "utf8").trim();
 if (!raw) process.exit(1);
@@ -591,8 +596,9 @@ const values = [
   Math.round(Number(payload.diagnosticViewportOffsetY || 0)),
 ];
 if (values[2] <= 0 || values[3] <= 0) process.exit(1);
-process.stdout.write(values.join(" "));
-') || true
+process.stdout.write(values.join("\t"));
+' 2>/dev/null || true)"
+    IFS=$'\t' read -r hud_x hud_y hud_w hud_h launcher_usable_w launcher_usable_h launcher_diag_x launcher_diag_y <<< "${hud_snapshot}" || true
 
     if (( hud_x < 0 )); then
       hud_x=$((reserved_left + launcher_diag_x + (launcher_usable_w - hud_w) / 2))

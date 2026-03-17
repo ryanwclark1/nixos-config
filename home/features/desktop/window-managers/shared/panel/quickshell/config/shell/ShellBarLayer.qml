@@ -128,6 +128,15 @@ Item {
                                 onCloseRequested: root.shellRoot.closeSurface("networkMenu")
                             }
 
+                            VpnMenu {
+                                anchor.window: barWindow
+                                preferredEdge: barWindow.popupPreferredEdge("vpnMenu")
+                                anchor.rect.x: barWindow.popupAnchorXFor("vpnMenu", width)
+                                anchor.rect.y: barWindow.popupAnchorYFor("vpnMenu", height)
+                                wantVisible: barWindow.popupVisible("vpnMenu")
+                                onCloseRequested: root.shellRoot.closeSurface("vpnMenu")
+                            }
+
                             ClipboardMenu {
                                 anchor.window: barWindow
                                 preferredEdge: barWindow.popupPreferredEdge("clipboardMenu")

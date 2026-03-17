@@ -328,6 +328,8 @@ QtObject {
         var resolved = resolveIconPath(name);
         if (!resolved)
             return "";
+        if (resolved.startsWith("file://") && resolved.indexOf("/image://") !== -1)
+            return "";
         if (resolved.startsWith("/") || resolved.startsWith("file://"))
             return resolved.startsWith("file://") ? resolved : "file://" + resolved;
         return resolved;

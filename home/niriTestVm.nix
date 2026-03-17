@@ -25,7 +25,7 @@
     # Niri VM test profile
   '';
   home.file.".zprofile".text = ''
-    if [[ -z "''${SSH_TTY:-}" && -z "''${WAYLAND_DISPLAY:-}" && -z "''${DISPLAY:-}" ]]; then
+    if [[ -z "''${SSH_TTY:-}" && -z "''${SSH_CONNECTION:-}" && -z "''${WAYLAND_DISPLAY:-}" && -z "''${DISPLAY:-}" && "''${XDG_VTNR:-}" == "1" ]]; then
       exec niri-session
     fi
   '';

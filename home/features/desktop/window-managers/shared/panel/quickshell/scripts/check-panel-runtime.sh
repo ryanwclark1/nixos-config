@@ -262,6 +262,12 @@ main() {
 
   if (( run_surfaces == 1 )); then
     run_step "Running live surface responsive smoke" "${script_dir}/check-surface-responsive.sh" "${args[@]}"
+    refresh_instance_args
+    args=()
+    if [[ -n "${instance_id}" ]]; then
+      args+=(--id "${instance_id}")
+    fi
+    run_step "Running targeted runtime warning regressions" "${script_dir}/check-runtime-warning-regressions.sh" "${args[@]}"
   fi
 
   if (( run_multibar == 1 )); then

@@ -70,11 +70,24 @@ QtObject {
                 title: "Open the network popup",
                 label: "Network Controls",
                 icon: "󰖩",
-                subtitle: "Wi-Fi, VPN, and Tailscale",
+                subtitle: "Wi-Fi and connectivity",
                 danger: false,
                 ipcTarget: "Shell",
                 ipcAction: "toggleNetworkMenu",
                 clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleNetworkMenu"]
+            },
+            vpnControls: {
+                id: "vpnControls",
+                category: "Controls",
+                name: "Open VPN Hub",
+                title: "Open the VPN popup",
+                label: "VPN Hub",
+                icon: "󰖂",
+                subtitle: "Tailscale and active VPN sessions",
+                danger: false,
+                ipcTarget: "Shell",
+                ipcAction: "toggleVpnMenu",
+                clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleVpnMenu"]
             },
             commandCenter: {
                 id: "commandCenter",
@@ -92,7 +105,7 @@ QtObject {
         })
 
     readonly property var sessionActionIds: ["shutdown", "reboot", "lock", "logout"]
-    readonly property var shellEntryActionIds: ["audioControls", "networkControls", "commandCenter"]
+    readonly property var shellEntryActionIds: ["audioControls", "networkControls", "vpnControls", "commandCenter"]
 
     readonly property var sessionActions: actionsByIds(sessionActionIds)
     readonly property var shellEntryActions: actionsByIds(shellEntryActionIds)

@@ -7,7 +7,7 @@ import "../widgets" as SharedWidgets
 
 SharedWidgets.CardBase {
   id: root
-  Layout.preferredHeight: 132
+  Layout.preferredHeight: updatesLayout.implicitHeight + root.pad * 2
 
   property string nixUpdates: "0"
   property string flatpakUpdates: "0"
@@ -118,19 +118,21 @@ SharedWidgets.CardBase {
     refreshProc.running = true;
   }
 
-  RowLayout {
+  ColumnLayout {
+    id: updatesLayout
     Layout.fillWidth: true
-    Layout.fillHeight: true
     spacing: Colors.paddingMedium
 
-    Rectangle {
-      width: 50; height: 50; radius: Colors.radiusPill; color: Colors.secondary
-      Text { anchors.centerIn: parent; text: "󰚰"; color: Colors.text; font.pixelSize: Colors.fontSizeHuge; font.family: Colors.fontMono }
-    }
-
-    ColumnLayout {
+    RowLayout {
       Layout.fillWidth: true
-      spacing: Colors.spacingXS
+      spacing: Colors.paddingMedium
+
+      Rectangle {
+        width: 42; height: 42; radius: Colors.radiusPill; color: Colors.secondary
+        Layout.alignment: Qt.AlignTop
+        Text { anchors.centerIn: parent; text: "󰚰"; color: Colors.text; font.pixelSize: Colors.fontSizeXL; font.family: Colors.fontMono }
+      }
+
       Text {
         text: "System Updates"
         color: Colors.text
@@ -138,102 +140,108 @@ SharedWidgets.CardBase {
         font.weight: Font.Bold
         elide: Text.ElideRight
         Layout.fillWidth: true
+        Layout.alignment: Qt.AlignVCenter
       }
 
-      RowLayout {
-        spacing: Colors.spacingM; Layout.fillWidth: true
-        RowLayout {
-          spacing: Colors.spacingXS
-          Text { text: "󱄅"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeSmall }
-          Text {
-            text: root.nixUpdates
-            color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeSmall
-            font.family: Colors.fontMono
-          }
-        }
-        RowLayout {
-          spacing: Colors.spacingXS
-          Text { text: "󰏘"; color: Colors.accent; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeSmall }
-          Text {
-            text: root.flatpakUpdates
-            color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeSmall
-            font.family: Colors.fontMono
-          }
-        }
-        Item { Layout.fillWidth: true }
-      }
+      Rectangle {
+        width: 80; height: 32; radius: Colors.radiusXXS
+        color: root.isChecking ? Colors.withAlpha(Colors.surface, 0.4) : Colors.withAlpha(Colors.primary, 0.18)
+        border.color: root.isChecking ? Colors.border : Colors.primary
+        border.width: 1
+        Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+        scale: refreshHover.pressed ? 0.96 : 1.0
+        Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutBack } }
 
-      Text {
-        text: root.statusText
-        color: root.lastRunFailed ? Colors.error : (root.isChecking ? Colors.info : Colors.textSecondary)
-        font.pixelSize: Colors.fontSizeXS
-        Layout.fillWidth: true
-        elide: Text.ElideRight
-      }
-      Text {
-        text: root.statusDetail
-        color: Colors.textDisabled
-        font.pixelSize: Colors.fontSizeXS
-        Layout.fillWidth: true
-        elide: Text.ElideRight
-      }
-      Text {
-        text: "Last checked: " + root.lastCheckedText
-        color: Colors.textDisabled
-        font.pixelSize: Colors.fontSizeXS
-        Layout.fillWidth: true
-        elide: Text.ElideRight
-      }
-      Text {
-        text: "Only nix-based updates are currently supported."
-        color: Colors.textDisabled
-        font.pixelSize: Colors.fontSizeXS
-        Layout.fillWidth: true
-        elide: Text.ElideRight
+        Rectangle {
+          anchors.fill: parent
+          anchors.margins: 1
+          radius: parent.radius - 1
+          color: "transparent"
+          border.color: root.isChecking ? Colors.borderLight : Colors.withAlpha("#ffffff", 0.2)
+          border.width: 1
+          opacity: refreshHover.containsMouse ? 0.25 : 0.1
+        }
+        SharedWidgets.StateLayer {
+          id: refreshStateLayer
+          anchors.fill: parent
+          radius: parent.radius
+          stateColor: Colors.primary
+          visible: !root.isChecking
+          hovered: refreshHover.containsMouse
+          pressed: refreshHover.pressed
+        }
+        MouseArea {
+          id: refreshHover
+          anchors.fill: parent
+          hoverEnabled: true
+          enabled: !root.isChecking
+          cursorShape: Qt.PointingHandCursor
+          onClicked: (mouse) => {
+            refreshStateLayer.burst(mouse.x, mouse.y);
+            root.checkUpdates();
+          }
+        }
+        Text {
+          anchors.centerIn: parent
+          text: root.isChecking ? "..." : "Refresh"
+          color: root.isChecking ? Colors.textDisabled : Colors.primary
+          font.pixelSize: Colors.fontSizeSmall
+          font.weight: Font.DemiBold
+        }
       }
     }
 
-    Rectangle {
-      width: 80; height: 32; radius: Colors.radiusXXS
-      color: root.isChecking ? Colors.withAlpha(Colors.surface, 0.4) : Colors.withAlpha(Colors.primary, 0.18)
-      border.color: root.isChecking ? Colors.border : Colors.primary
-      border.width: 1
-      Behavior on color { ColorAnimation { duration: Colors.durationFast } }
-      scale: refreshHover.pressed ? 0.96 : 1.0
-      Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutBack } }
+    Flow {
+      Layout.fillWidth: true
+      width: parent.width
+      spacing: Colors.spacingS
 
-      // Inner highlight
-      Rectangle {
-        anchors.fill: parent
-        anchors.margins: 1
-        radius: parent.radius - 1
-        color: "transparent"
-        border.color: root.isChecking ? Colors.borderLight : Colors.withAlpha("#ffffff", 0.2)
-        border.width: 1
-        opacity: refreshHover.containsMouse ? 0.25 : 0.1
+      SharedWidgets.Chip {
+        icon: "󱄅"
+        iconColor: Colors.primary
+        text: "NixOS " + root.nixUpdates
+        textColor: Colors.primary
       }
-      SharedWidgets.StateLayer {
-        id: refreshStateLayer
-        anchors.fill: parent
-        radius: parent.radius
-        stateColor: Colors.primary
-        visible: !root.isChecking
-        hovered: refreshHover.containsMouse
-        pressed: refreshHover.pressed
+
+      SharedWidgets.Chip {
+        icon: "󰏘"
+        iconColor: Colors.accent
+        text: "Flatpak " + root.flatpakUpdates
+        textColor: Colors.accent
       }
-      MouseArea {
-        id: refreshHover
-        anchors.fill: parent
-        hoverEnabled: true
-        enabled: !root.isChecking
-        cursorShape: Qt.PointingHandCursor
-        onClicked: (mouse) => {
-          refreshStateLayer.burst(mouse.x, mouse.y);
-          root.checkUpdates();
-        }
-      }
+    }
+
+    Text {
+      text: root.statusText
+      color: root.lastRunFailed ? Colors.error : (root.isChecking ? Colors.info : Colors.textSecondary)
+      font.pixelSize: Colors.fontSizeXS
+      Layout.fillWidth: true
+      wrapMode: Text.Wrap
+      maximumLineCount: 2
+    }
+    Text {
+      text: root.statusDetail
+      color: Colors.textDisabled
+      font.pixelSize: Colors.fontSizeXS
+      Layout.fillWidth: true
+      wrapMode: Text.Wrap
+      maximumLineCount: 3
+    }
+    Text {
+      text: "Last checked: " + root.lastCheckedText
+      color: Colors.textDisabled
+      font.pixelSize: Colors.fontSizeXS
+      Layout.fillWidth: true
+      wrapMode: Text.Wrap
+      maximumLineCount: 2
+    }
+    Text {
+      text: "Only nix-based updates are currently supported."
+      color: Colors.textDisabled
+      font.pixelSize: Colors.fontSizeXS
+      Layout.fillWidth: true
+      wrapMode: Text.Wrap
+      maximumLineCount: 2
     }
   }
 }

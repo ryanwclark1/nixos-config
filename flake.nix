@@ -202,6 +202,14 @@
                 services.timesyncd.enable = lib.mkForce true;
                 networking.hostName = lib.mkForce "niriTestVm";
                 programs.ssh.knownHosts = lib.mkForce { };
+                programs.uwsm = {
+                  enable = lib.mkForce true;
+                  waylandCompositors.niri = {
+                    binPath = "/run/current-system/sw/bin/niri-session";
+                    prettyName = "Niri";
+                    comment = "Niri managed by UWSM";
+                  };
+                };
                 # Use a tty autologin path instead of relying on SDDM in the VM.
                 services.displayManager.sddm.enable = lib.mkForce false;
                 services.displayManager.autoLogin.enable = lib.mkForce false;

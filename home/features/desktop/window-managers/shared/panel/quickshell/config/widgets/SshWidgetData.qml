@@ -441,12 +441,56 @@ QtObject {
         return "exec " + escaped.join(" ");
     }
 
+    function _copyText(text) {
+        var value = String(text || "");
+        if (value === "")
+            return false;
+        Quickshell.execDetached([
+            "bash",
+            "-lc",
+            "printf '%s' " + _shellQuote(value) + " | wl-copy"
+        ]);
+        return true;
+    }
+
     function buildDisplayCommand(host) {
         if (!host)
             return "";
         if (host.source === "imported")
             return "ssh " + String(host.alias || host.label || "");
         return _buildManualCommand(host).replace(/^exec\s+/, "");
+    }
+
+    function hostAliasText(host) {
+        if (!host || host.source !== "imported")
+            return "";
+        return String(host.alias || host.label || "").trim();
+    }
+
+    function hostNameText(host) {
+        if (!host)
+            return "";
+        return String(host.host || "").trim();
+    }
+
+    function hostUserHostText(host) {
+        if (!host)
+            return "";
+        var hostName = hostNameText(host);
+        if (hostName === "")
+            return "";
+        var userName = String(host.user || "").trim();
+        return userName !== "" ? (userName + "@" + hostName) : hostName;
+    }
+
+    function hostSourceLabel(host) {
+        if (!host || host.source !== "imported")
+            return "";
+        var path = String(host.sourcePath || "").trim();
+        if (path === "")
+            return "";
+        var line = Math.max(0, Number(host.sourceLine || 0));
+        return line > 0 ? (path + ":" + String(line)) : path;
     }
 
     function _rememberHost(host) {
@@ -483,13 +527,25 @@ QtObject {
         var commandText = buildDisplayCommand(host);
         if (commandText === "")
             return false;
-        Quickshell.execDetached([
-            "bash",
-            "-lc",
-            "printf '%s' " + _shellQuote(commandText) + " | wl-copy"
-        ]);
+        _copyText(commandText);
         _rememberHost(host);
         return true;
+    }
+
+    function copyHostAlias(host) {
+        return _copyText(hostAliasText(host));
+    }
+
+    function copyHostName(host) {
+        return _copyText(hostNameText(host));
+    }
+
+    function copyHostUserHost(host) {
+        return _copyText(hostUserHostText(host));
+    }
+
+    function copyHostSourcePath(host) {
+        return _copyText(hostSourceLabel(host));
     }
 
     function executeDefault(host) {

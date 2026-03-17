@@ -134,9 +134,9 @@ if [[ "${build_only}" -eq 1 ]]; then
 fi
 
 qemu_opts="${QEMU_OPTS:-}"
-# Niri needs a DRM-capable virtio GPU in QEMU; the default VGA device leaves it
-# with no real outputs and only placeholder screens.
-default_qemu_opts="-vga none -device virtio-vga-gl -display gtk,gl=on"
+# Use a headless virtio GPU by default so VM QA does not open a host-side QEMU
+# window while still exposing a DRM-capable display to the guest compositor.
+default_qemu_opts="-vga none -device virtio-vga -display none"
 if [[ -z "${qemu_opts}" ]]; then
   qemu_opts="${default_qemu_opts}"
   echo "[INFO] Using default QEMU graphics options for compositor testing: ${qemu_opts}"

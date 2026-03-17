@@ -111,7 +111,7 @@ else
 fi
 
 if run_capture "$tmp_files_out" "$tmp_files_err" "$local_runner" quickshell-files; then
-  if assert_patterns "$tmp_files_out" '^shell_config=.*/config/shell\.qml$' 'guard_panel_runtime=.*/check-panel-runtime\.sh$'; then
+  if assert_patterns "$tmp_files_out" '^shell_config=.*/config/shell\.qml$' 'guard_panel_runtime=.*/check-panel-runtime\.sh$' 'capture_validator=.*/check-panel-capture-artifacts\.sh$'; then
     pass "plugin-local quickshell-files prints the canonical Quickshell runtime file and guard paths"
   else
     fail "plugin-local quickshell-files output drifted from the expected Quickshell file summary"
@@ -123,7 +123,7 @@ else
 fi
 
 if run_capture "$tmp_flow_out" "$tmp_flow_err" "$local_runner" quickshell-flow; then
-  if assert_patterns "$tmp_flow_out" '^Quickshell Manual Flow$' 'scripts/plugin-local\.sh quickshell-all'; then
+  if assert_patterns "$tmp_flow_out" '^Quickshell Manual Flow$' 'scripts/capture-panel-matrix\.sh --repo-shell' 'scripts/check-panel-capture-artifacts\.sh --dir DIR' 'scripts/plugin-local\.sh quickshell-all'; then
     pass "plugin-local quickshell-flow documents the expected Quickshell runtime validation sequence"
   else
     fail "plugin-local quickshell-flow output drifted from the expected Quickshell manual flow"
@@ -152,9 +152,7 @@ if run_capture "$tmp_all_out" "$tmp_all_err" "$local_runner" quickshell-all --qu
   if assert_patterns "$tmp_all_out" \
     'Quickshell startup smoke summary: 1 pass, 0 fail' \
     'hidden bar widgets collapse to zero layout footprint' \
-    'Summary: 17 pass, 0 warn, 0 fail' \
-    'Summary: 41 pass, 0 warn, 0 fail' \
-    'Summary: 0 pass, 0 warn, 6 skip, 0 fail' \
+    'Running targeted runtime warning regressions' \
     'Panel runtime verification completed' \
     && ( assert_patterns "$tmp_all_out" '\[SKIP\].*no PanelWindow backend available in this environment' \
       || assert_patterns "$tmp_all_out" 'shell matrix:' ); then

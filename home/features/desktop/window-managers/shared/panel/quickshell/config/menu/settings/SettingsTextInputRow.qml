@@ -71,6 +71,10 @@ ColumnLayout {
                     selectByMouse: true
                     selectedTextColor: Colors.text
                     selectionColor: Colors.withAlpha(Colors.primary, 0.45)
+                    onVisibleChanged: {
+                        if (!visible && activeFocus)
+                            focus = false;
+                    }
                     onTextChanged: root.textEdited(text)
                     onAccepted: root.submitted(text)
 

@@ -15,6 +15,18 @@ SharedWidgets.CardBase {
 
     SharedWidgets.Ref { service: SystemStatus }
     SharedWidgets.Ref { service: NetworkService }
+    SharedWidgets.Ref { service: SystemIoTelemetryService }
+
+    function formatRate(bytes) {
+        var value = Number(bytes || 0);
+        if (value < 1024)
+            return Math.round(value) + " B/s";
+        if (value < 1048576)
+            return (value / 1024).toFixed(1) + " KB/s";
+        if (value < 1073741824)
+            return (value / 1048576).toFixed(1) + " MB/s";
+        return (value / 1073741824).toFixed(2) + " GB/s";
+    }
 
     SharedWidgets.CommandPoll {
         id: hostPoll
@@ -111,6 +123,22 @@ SharedWidgets.CardBase {
                 iconColor: Colors.warning
                 text: NetworkService.activePrimaryName
                 textColor: Colors.warning
+            }
+
+            SharedWidgets.Chip {
+                visible: SystemIoTelemetryService.selectedInterface !== ""
+                icon: SystemIoTelemetryService.networkHotspot ? "󰀦" : "󰈀"
+                iconColor: SystemIoTelemetryService.networkHotspot ? Colors.warning : Colors.primary
+                text: "NET PEAK " + root.formatRate(Math.max(SystemIoTelemetryService.peakNetworkDown, SystemIoTelemetryService.peakNetworkUp))
+                textColor: SystemIoTelemetryService.networkHotspot ? Colors.warning : Colors.primary
+            }
+
+            SharedWidgets.Chip {
+                visible: SystemIoTelemetryService.selectedDiskDevice !== ""
+                icon: SystemIoTelemetryService.diskHotspot ? "󰀦" : "󰋊"
+                iconColor: SystemIoTelemetryService.diskHotspot ? Colors.warning : Colors.secondary
+                text: "DISK PEAK " + root.formatRate(Math.max(SystemIoTelemetryService.peakDiskRead, SystemIoTelemetryService.peakDiskWrite))
+                textColor: SystemIoTelemetryService.diskHotspot ? Colors.warning : Colors.secondary
             }
         }
 
@@ -209,6 +237,30 @@ SharedWidgets.CardBase {
                 Layout.fillWidth: true
                 label: "TX Total"
                 value: NetworkService.detailValue(NetworkService.totalSent, "Unavailable")
+            }
+
+            SharedWidgets.InfoRow {
+                Layout.fillWidth: true
+                label: "Tracked Iface"
+                value: SystemIoTelemetryService.selectedInterface !== "" ? SystemIoTelemetryService.selectedInterface : "Unavailable"
+            }
+
+            SharedWidgets.InfoRow {
+                Layout.fillWidth: true
+                label: "Tracked Disk"
+                value: SystemIoTelemetryService.selectedDiskDevice !== "" ? SystemIoTelemetryService.selectedDiskDevice : "Unavailable"
+            }
+
+            SharedWidgets.InfoRow {
+                Layout.fillWidth: true
+                label: "Net Peak"
+                value: root.formatRate(Math.max(SystemIoTelemetryService.peakNetworkDown, SystemIoTelemetryService.peakNetworkUp))
+            }
+
+            SharedWidgets.InfoRow {
+                Layout.fillWidth: true
+                label: "Disk Peak"
+                value: root.formatRate(Math.max(SystemIoTelemetryService.peakDiskRead, SystemIoTelemetryService.peakDiskWrite))
             }
         }
     }

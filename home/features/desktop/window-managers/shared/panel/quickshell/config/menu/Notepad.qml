@@ -123,6 +123,20 @@ PanelWindow {
   signal openFileRequested()
   signal saveAsRequested(string content)
 
+  function clearInteractiveFocus() {
+    if (notepadText.activeFocus)
+      notepadText.focus = false;
+    if (searchInput.activeFocus)
+      searchInput.focus = false;
+    for (var i = 0; i < tabRepeater.count; i++) {
+      var tabItem = tabRepeater.itemAt(i);
+      if (tabItem && tabItem.isEditing)
+        tabItem.isEditing = false;
+    }
+    if (slidePanel.activeFocus)
+      slidePanel.focus = false;
+  }
+
   // Called by shell.qml when a file is selected from FileBrowser
   function loadFile(filePath) {
     _pendingFilePath = filePath;
@@ -197,12 +211,10 @@ PanelWindow {
   // Focus text area when opened
   onShowContentChanged: {
     if (showContent) {
-      notepadText.forceActiveFocus();
+      focusRestoreTimer.restart();
     } else {
-      if (notepadText.activeFocus)
-        notepadText.focus = false;
-      if (searchInput.activeFocus)
-        searchInput.focus = false;
+      focusRestoreTimer.stop();
+      clearInteractiveFocus();
     }
   }
 
@@ -210,6 +222,16 @@ PanelWindow {
   property Timer saveTimer: Timer {
     interval: 500
     onTriggered: root.saveState()
+  }
+
+  Timer {
+    id: focusRestoreTimer
+    interval: 180
+    repeat: false
+    onTriggered: {
+      if (root.showContent)
+        notepadText.forceActiveFocus();
+    }
   }
 
   function scheduleSave() {

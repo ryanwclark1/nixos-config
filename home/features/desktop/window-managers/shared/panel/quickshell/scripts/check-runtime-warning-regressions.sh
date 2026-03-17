@@ -19,6 +19,8 @@ pass_count=0
 warn_count=0
 fail_count=0
 
+source "${script_dir}/runtime-warning-filter.sh"
+
 usage() {
   cat <<'EOF'
 Usage: check-runtime-warning-regressions.sh [--id INSTANCE_ID] [--repo-shell]
@@ -303,8 +305,8 @@ main() {
   fi
 
   if [[ -s "${delta_file}" ]]; then
-    filtered="$(grep -Evi 'qt\.qpa\.wayland\.textinput|qt\.svg: .*Could not resolve property|Could not register notification server|Registration will be attempted again' "${delta_file}" || true)"
-    if [[ -n "${filtered}" ]] && printf '%s' "${filtered}" | grep -Eqi 'warn|error|exception|binding loop|ReferenceError|TypeError|failed'; then
+    filtered="$(runtime_filter_log_delta targeted-surfaces "${delta_file}")"
+    if runtime_log_contains_actionable_text "${filtered}"; then
       fail "New runtime warnings/errors detected in targeted surfaces"
       printf '%s\n' "${filtered}" >&2
     else

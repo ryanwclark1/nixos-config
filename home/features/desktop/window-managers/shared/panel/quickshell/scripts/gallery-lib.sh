@@ -145,6 +145,7 @@ render_gallery_css() {
     .btn:hover { background: var(--border); color: var(--text); }
     .btn.active { color: var(--success); border-color: var(--success); }
     .btn.accent { background: var(--accent); color: #000; border-color: var(--accent); }
+    .btn.warn { border-color: var(--warning); color: var(--warning); }
 
     .card.reviewed { opacity: 0.6; }
     .card.reviewed::after {
@@ -160,6 +161,23 @@ render_gallery_css() {
       font-weight: 700;
       z-index: 10;
     }
+
+    .badge {
+      position: absolute;
+      top: 10px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      z-index: 10;
+      display: none;
+    }
+    .diff-badge { left: 10px; background: var(--warning); color: #000; }
+    .failure-badge { left: 10px; background: var(--error); color: white; }
+    
+    .card.has-diff .diff-badge { display: block; }
+    .card.capture-failure .failure-badge { display: block; }
+    .card.capture-failure .diff-badge { display: none; }
 
     /* Lightbox */
     #lightbox {
@@ -182,7 +200,7 @@ render_gallery_css() {
       position: fixed;
       right: -400px;
       top: 0;
-      width: 380px;
+      width: 420px;
       height: 100vh;
       background: var(--panel);
       border-left: 1px solid var(--border);
@@ -221,6 +239,17 @@ render_gallery_css() {
       text-transform: uppercase;
       font-size: 0.8rem;
     }
+    .checklist-item .run-btn {
+      margin-left: auto;
+      padding: 2px 6px;
+      font-size: 10px;
+      background: rgba(122, 162, 255, 0.1);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .checklist-item .run-btn:hover { background: var(--accent); color: #000; }
 
     /* Health Status */
     .health-badge {
@@ -281,6 +310,15 @@ render_gallery_css() {
       transition: width 0.3s ease;
     }
 
+    .meta-tag {
+      font-family: monospace;
+      font-size: 10px;
+      background: var(--border);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--muted);
+    }
+
     [hidden] { display: none !important; }
   </style>
 EOF
@@ -294,13 +332,104 @@ render_gallery_js() {
 
     function filterCards() {
       const query = document.getElementById('filterInput').value.toLowerCase();
+      const showOnlyDiff = document.getElementById('diffFilter')?.classList.contains('active');
       const cards = document.querySelectorAll('.card');
       
       cards.forEach(card => {
         const name = card.getAttribute('data-name').toLowerCase();
-        card.hidden = !name.includes(query);
+        let visible = name.includes(query);
+        if (showOnlyDiff && !card.classList.contains('has-diff')) visible = false;
+        card.hidden = !visible;
       });
       updateLightboxImages();
+    }
+
+    function toggleDiffFilter(btn) {
+      btn.classList.toggle('active');
+      btn.innerText = btn.classList.contains('active') ? 'Showing Only Diffs' : 'Filter by Diff';
+      filterCards();
+    }
+
+    async function validateAndDetect() {
+      const cards = document.querySelectorAll('.card');
+      for (const card of cards) {
+        const currentImg = card.querySelector('.current-img');
+        const baselineImg = card.querySelector('.baseline-img');
+        
+        // Check for blank screen / capture failure
+        const isFailure = await checkCaptureFailure(currentImg.src);
+        if (isFailure) {
+          card.classList.add('capture-failure');
+          continue;
+        }
+
+        if (!baselineImg) continue;
+
+        const hasDiff = await compareImages(currentImg.src, baselineImg.src);
+        if (hasDiff) {
+          card.classList.add('has-diff');
+        }
+      }
+    }
+
+    function checkCaptureFailure(src) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+          const data = ctx.getImageData(0, 0, img.width, img.height).data;
+          
+          let blackPixels = 0;
+          let totalPixels = data.length / 4;
+          for (let i = 0; i < data.length; i += 4) {
+            if (data[i] < 10 && data[i+1] < 10 && data[i+2] < 10) blackPixels++;
+          }
+          // If > 98% pixels are black, it's likely a capture failure
+          resolve((blackPixels / totalPixels) > 0.98);
+        };
+        img.src = src;
+      });
+    }
+
+    function compareImages(src1, src2) {
+      return new Promise((resolve) => {
+        const img1 = new Image();
+        const img2 = new Image();
+        let loaded = 0;
+        const onload = () => {
+          if (++loaded === 2) {
+            if (img1.width !== img2.width || img1.height !== img2.height) return resolve(true);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = img1.width;
+            canvas.height = img1.height;
+            ctx.drawImage(img1, 0, 0);
+            const data1 = ctx.getImageData(0, 0, img1.width, img1.height).data;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img2, 0, 0);
+            const data2 = ctx.getImageData(0, 0, img2.width, img2.height).data;
+            for (let i = 0; i < data1.length; i += 4) {
+              if (Math.abs(data1[i] - data2[i]) > 5 || 
+                  Math.abs(data1[i+1] - data2[i+1]) > 5 || 
+                  Math.abs(data1[i+2] - data2[i+2]) > 5) {
+                return resolve(true);
+              }
+            }
+            resolve(false);
+          }
+        };
+        img1.crossOrigin = "anonymous";
+        img2.crossOrigin = "anonymous";
+        img1.onload = onload;
+        img2.onload = onload;
+        img1.src = src1;
+        img2.src = src2;
+      });
     }
 
     function copyText(text, btn) {
@@ -427,11 +556,15 @@ render_gallery_js() {
     function exportReport() {
       const cards = document.querySelectorAll('.card');
       const reviewed = document.querySelectorAll('.card.reviewed').length;
+      const failures = document.querySelectorAll('.card.capture-failure').length;
+      const diffs = document.querySelectorAll('.card.has-diff').length;
       const checklist = document.querySelectorAll('.checklist-content input');
       const checked = Array.from(checklist).filter(c => c.checked).length;
       
       let md = `# QA Pass Report: ${document.title}\n\n`;
-      md += `**Visual Matrix:** ${reviewed}/${cards.length} items reviewed\n`;
+      md += `**Visual Matrix:** ${reviewed}/${cards.length} reviewed\n`;
+      if (diffs > 0) md += `**Regressions:** ${diffs} detected ⚠️\n`;
+      if (failures > 0) md += `**Capture Failures:** ${failures} detected ❌\n`;
       md += `**Checklist:** ${checked}/${checklist.length} tasks completed\n\n`;
       
       if (checked < checklist.length) {
@@ -443,6 +576,13 @@ render_gallery_js() {
 
       navigator.clipboard.writeText(md);
       alert('PR Report copied to clipboard!');
+    }
+
+    function runChecklistCommand(cmd, btn) {
+      navigator.clipboard.writeText(cmd);
+      const originalText = btn.innerText;
+      btn.innerText = 'Copied to run!';
+      setTimeout(() => btn.innerText = originalText, 1500);
     }
 
     window.addEventListener('keydown', (e) => {
@@ -464,6 +604,7 @@ render_gallery_js() {
       loadChecklist();
       loadReviewed();
       updateLightboxImages();
+      validateAndDetect();
     });
   </script>
 EOF
@@ -516,6 +657,7 @@ EOF
   </div>
 
   <div class="controls">
+    <button id="diffFilter" class="btn" onclick="toggleDiffFilter(this)">Filter by Diff</button>
     <input type="text" id="filterInput" placeholder="Filter by filename..." oninput="filterCards()">
 EOF
     if (( ${#sections[@]} > 0 )); then
@@ -542,7 +684,7 @@ EOF
         image_name="$(basename "${image_path}")"
         local baseline_path=""
         [[ -f "${baseline_dir}/${image_name}" ]] && baseline_path="baselines/${image_name}"
-        render_card "${rel_image_path}" "${image_name}" "${baseline_path}"
+        render_card "${rel_image_path}" "${image_name}" "${baseline_path}" ""
       done < <(find "${output_dir}" -maxdepth 1 -type f -name '*.png' | sort)
       printf '  </div>\n'
     else
@@ -556,7 +698,7 @@ EOF
           image_name="$(basename "${image_path}")"
           local baseline_path=""
           [[ -f "${baseline_dir}/${rel_image_path}" ]] && baseline_path="baselines/${rel_image_path}"
-          render_card "${rel_image_path}" "${image_name}" "${baseline_path}"
+          render_card "${rel_image_path}" "${image_name}" "${baseline_path}" ""
         done < <(find "${output_dir}/${s}" -maxdepth 1 -type f -name '*.png' | sort)
         printf '    </div></div>\n'
       done
@@ -583,6 +725,9 @@ write_master_index() {
     healthy) health_class="health-healthy"; health_icon="✓" ;;
     safe_fix_pending|manual_review_required) health_class="health-warning"; health_icon="⚠️" ;;
   esac
+
+  local git_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
+  local git_hash=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 
   {
     cat <<EOF
@@ -613,10 +758,18 @@ EOF
   <div class="checklist-content">
 EOF
     echo "${checklist_md}" | while IFS= read -r line; do
+      if [[ "${line}" =~ ^##\ Recommended\ Interactive\ Commands ]]; then
+        in_commands=1
+        continue
+      fi
       if [[ "${line}" =~ ^##\ (.*) ]]; then
         printf '    <div class="checklist-category">%s</div>\n' "${BASH_REMATCH[1]}"
+        in_commands=0
       elif [[ "${line}" =~ ^-\ (.*) ]]; then
         printf '    <label class="checklist-item"><input type="checkbox" onchange="saveChecklist()"><span>%s</span></label>\n' "${BASH_REMATCH[1]}"
+      elif [[ "${in_commands}" == 1 && "${line}" =~ ^\`(quickshell\ ipc\ call\ .*)\` ]]; then
+        local cmd="${BASH_REMATCH[1]}"
+        printf '    <div class="checklist-item"><span style="font-family:monospace; font-size:11px; color:var(--muted);">%s</span> <button class="run-btn" onclick="runChecklistCommand('\''%s'\'', this)">Copy & Run</button></div>\n' "${cmd}" "${cmd}"
       fi
     done
     cat <<EOF
@@ -625,7 +778,11 @@ EOF
 <header>
   <div class="title-area">
     <h1>${title}</h1>
-    <p>Manual QA Dashboard &bull; <span class="health-badge ${health_class}">${health_icon} System ${health_status}</span></p>
+    <p style="display:flex; gap:8px; align-items:center;">
+      <span class="meta-tag"> ${git_branch} (${git_hash})</span>
+      &bull; 
+      <span class="health-badge ${health_class}">${health_icon} System ${health_status}</span>
+    </p>
   </div>
   <div class="progress-container">
     <button class="btn" onclick="exportReport()">Export PR Report</button>
@@ -657,6 +814,8 @@ render_card() {
   local rel_path="$1" name="$2" baseline_path="$3" repro_cmd="${4:-}"
   cat <<EOF
       <div class="card" data-name="${name}">
+        <div class="badge diff-badge">⚠️ DIFF DETECTED</div>
+        <div class="badge failure-badge">❌ CAPTURE FAILURE</div>
         <div class="img-container" onclick="openLightbox(this.querySelector('.current-img').src)">
           <img src="${rel_path}" class="current-img" alt="${name}" loading="lazy">
 EOF
@@ -675,7 +834,7 @@ EOF
 EOF
   if [[ -n "${repro_cmd}" ]]; then
     cat <<EOF
-              <button class="btn" onclick="copyText('${repro_cmd}', this)">Repro</button>
+              <button class="btn" onclick="copyText('\`${repro_cmd}\`', this)">Repro</button>
 EOF
   fi
   cat <<EOF

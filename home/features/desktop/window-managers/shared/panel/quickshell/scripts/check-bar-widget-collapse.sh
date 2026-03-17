@@ -71,6 +71,30 @@ Scope {
     var keyboardWidget = panel.componentForWidget("keyboardLayout").createObject(harnessHost, {
       widgetInstance: { instanceId: "kbd-test", widgetType: "keyboardLayout", enabled: true, settings: { labelMode: "short" } }
     });
+    var titleWidget = panel.componentForWidget("windowTitle").createObject(harnessHost, {
+      widgetInstance: {
+        instanceId: "title-test",
+        widgetType: "windowTitle",
+        enabled: true,
+        settings: { showAppIcon: true, showGitStatus: true, showMediaContext: true }
+      }
+    });
+    var workspacesWidget = panel.componentForWidget("workspaces").createObject(harnessHost, {
+      widgetInstance: {
+        instanceId: "workspaces-test",
+        widgetType: "workspaces",
+        enabled: true,
+        settings: { showAddButton: true, showMiniMap: true }
+      }
+    });
+    var mediaBarWidget = panel.componentForWidget("mediaBar").createObject(harnessHost, {
+      widgetInstance: {
+        instanceId: "media-bar-test",
+        widgetType: "mediaBar",
+        enabled: true,
+        settings: { displayMode: "auto", maxTextWidth: 150, showVisualizer: true, visualizerBars: 8 }
+      }
+    });
     var musicWidget = panel.componentForWidget("music").createObject(harnessHost, {
       widgetInstance: { instanceId: "music-test", widgetType: "music", enabled: true, settings: { displayMode: "auto" } }
     });
@@ -90,6 +114,9 @@ Scope {
     snapshot("updates", updatesWidget, panel);
     snapshot("ssh", sshWidget, panel);
     snapshot("keyboardLayout", keyboardWidget, panel);
+    snapshot("windowTitle", titleWidget, panel);
+    snapshot("workspaces", workspacesWidget, panel);
+    snapshot("mediaBar", mediaBarWidget, panel);
     snapshot("music", musicWidget, panel);
     snapshot("privacy", privacyWidget, panel);
     snapshot("recording", recordingWidget, panel);
@@ -100,6 +127,9 @@ Scope {
     updatesWidget.destroy();
     sshWidget.destroy();
     keyboardWidget.destroy();
+    titleWidget.destroy();
+    workspacesWidget.destroy();
+    mediaBarWidget.destroy();
     musicWidget.destroy();
     privacyWidget.destroy();
     recordingWidget.destroy();
@@ -152,6 +182,9 @@ required_hidden = {
     "updates": "hidden updates widget still reports layout footprint.",
     "ssh": "hidden SSH widget still reports layout footprint.",
     "keyboardLayout": "hidden keyboard layout widget still reports layout footprint.",
+    "windowTitle": "hidden window title widget still reports layout footprint.",
+    "workspaces": "hidden workspaces widget still reports layout footprint.",
+    "mediaBar": "hidden media bar widget still reports layout footprint.",
 }
 
 for key, message in required_hidden.items():

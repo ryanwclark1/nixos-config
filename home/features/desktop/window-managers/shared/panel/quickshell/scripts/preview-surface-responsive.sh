@@ -8,6 +8,7 @@ surface_ids=(
   "notifCenter"
   "controlCenter"
   "networkMenu"
+  "vpnMenu"
   "audioMenu"
   "bluetoothMenu"
   "printerMenu"

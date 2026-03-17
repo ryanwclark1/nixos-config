@@ -38,6 +38,7 @@ MiniProgressBar 1.0 MiniProgressBar.qml
 MuteButton 1.0 MuteButton.qml
 NativeLock 1.0 NativeLock.qml
 NetworkWidget 1.0 NetworkWidget.qml
+VpnWidget 1.0 VpnWidget.qml
 Osd 1.0 Osd.qml
 OverscrollGlow 1.0 OverscrollGlow.qml
 PrivacySourceRow 1.0 PrivacySourceRow.qml
@@ -51,7 +52,6 @@ SectionLabel 1.0 SectionLabel.qml
 SliderTrack 1.0 SliderTrack.qml
 SshWidget 1.0 SshWidget.qml
 SshWidgetData 1.0 SshWidgetData.qml
-SshWidgetSettings 1.0 SshWidgetSettings.qml
 StateLayer 1.0 StateLayer.qml
 StatusChip 1.0 StatusChip.qml
 SurfaceGradient 1.0 SurfaceGradient.qml

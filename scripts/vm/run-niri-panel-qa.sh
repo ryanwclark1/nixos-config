@@ -185,11 +185,22 @@ install_host_pubkey() {
 
 wait_for_niri() {
   local i
+  if ! "${ssh_base[@]}" '
+    if pgrep -fa "niri --session" >/dev/null 2>&1; then
+      exit 0
+    fi
+    systemctl --user stop quickshell.service quickshell-health.service graphical-session.target >/dev/null 2>&1 || true
+    nohup sh -lc "exec uwsm start niri.desktop >/tmp/uwsm-niri.log 2>&1" >/dev/null 2>&1 &
+  ' >/dev/null 2>&1; then
+    echo "[ERROR] Failed to request Niri startup inside the VM" >&2
+    return 1
+  fi
+
   for ((i = 1; i <= 60; i++)); do
     if "${ssh_base[@]}" '
       pgrep -fa "niri --session" >/dev/null 2>&1 &&
       systemctl --user show-environment 2>/dev/null | grep -q "^NIRI_SOCKET=" &&
-      pgrep -fa "/quickshell" >/dev/null 2>&1
+      systemctl --user show-environment 2>/dev/null | grep -q "^WAYLAND_DISPLAY="
     ' >/dev/null 2>&1; then
       return 0
     fi
@@ -199,9 +210,11 @@ wait_for_niri() {
   echo "[ERROR] Expected Niri session to be running in the VM" >&2
   "${ssh_base[@]}" '
     echo "--- processes ---"
-    pgrep -a "niri|quickshell|kitty|sddm" || true
+    pgrep -a "niri|quickshell|kitty|uwsm|sddm" || true
+    echo "--- uwsm log ---"
+    sed -n "1,160p" /tmp/uwsm-niri.log 2>/dev/null || true
     echo "--- env ---"
-    systemctl --user show-environment 2>/dev/null | grep -E "NIRI|WAYLAND|XDG_CURRENT_DESKTOP|DESKTOP_SESSION" || true
+    systemctl --user show-environment 2>/dev/null | grep -E "NIRI|WAYLAND|XDG_CURRENT_DESKTOP|DESKTOP_SESSION|XDG_SESSION_TYPE" || true
     echo "--- session ---"
     loginctl show-session "$XDG_SESSION_ID" -p Name -p Desktop -p Type 2>/dev/null || true
     echo "--- user journal ---"

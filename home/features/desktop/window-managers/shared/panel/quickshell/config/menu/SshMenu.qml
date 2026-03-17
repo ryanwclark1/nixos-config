@@ -91,9 +91,12 @@ BasePopupMenu {
     var haystack = _hostSearchText(host);
     if (!haystack)
       return 0;
+    var queryLength = query.length;
     var exactIndex = haystack.indexOf(query);
     if (exactIndex !== -1)
       return 1000 + (1.0 / (1 + exactIndex));
+    if (queryLength <= 2)
+      return 0;
 
     var qi = 0;
     var score = 0;
@@ -108,7 +111,11 @@ BasePopupMenu {
       lastMatch = i;
       qi += 1;
     }
-    return qi === query.length ? score : 0;
+    if (qi !== query.length)
+      return 0;
+    if (queryLength === 3 && score < 24)
+      return 0;
+    return score;
   }
 
   function _hostSectionMeta(host) {
@@ -454,6 +461,16 @@ BasePopupMenu {
                       elide: Text.ElideMiddle
                       Layout.fillWidth: true
                     }
+
+                    Text {
+                      text: sshData.hostSourceLabel(modelData)
+                      visible: text !== ""
+                      color: Colors.textDisabled
+                      font.pixelSize: Colors.fontSizeXS
+                      font.family: Colors.fontMono
+                      elide: Text.ElideMiddle
+                      Layout.fillWidth: true
+                    }
                   }
                 }
 
@@ -513,11 +530,43 @@ BasePopupMenu {
                   SettingsActionButton {
                     compact: true
                     iconName: "󰅍"
-                    label: "Copy"
+                    label: "Copy Cmd"
                     onClicked: {
                       sshData.copyHostCommand(modelData);
                       root.closeRequested();
                     }
+                  }
+
+                  SettingsActionButton {
+                    compact: true
+                    iconName: "󰌹"
+                    label: "Copy Alias"
+                    visible: sshData.hostAliasText(modelData) !== ""
+                    onClicked: sshData.copyHostAlias(modelData)
+                  }
+
+                  SettingsActionButton {
+                    compact: true
+                    iconName: "󰇖"
+                    label: "Copy Host"
+                    visible: sshData.hostNameText(modelData) !== ""
+                    onClicked: sshData.copyHostName(modelData)
+                  }
+
+                  SettingsActionButton {
+                    compact: true
+                    iconName: "󰞇"
+                    label: "Copy User@Host"
+                    visible: sshData.hostUserHostText(modelData) !== "" && sshData.hostUserHostText(modelData) !== sshData.hostNameText(modelData)
+                    onClicked: sshData.copyHostUserHost(modelData)
+                  }
+
+                  SettingsActionButton {
+                    compact: true
+                    iconName: "󰈔"
+                    label: "Copy Source"
+                    visible: sshData.hostSourceLabel(modelData) !== ""
+                    onClicked: sshData.copyHostSourcePath(modelData)
                   }
                 }
               }

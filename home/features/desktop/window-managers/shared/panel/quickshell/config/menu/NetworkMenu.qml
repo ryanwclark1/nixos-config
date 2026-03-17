@@ -17,6 +17,11 @@ BasePopupMenu {
   property string selectedSSID: ""
   property bool showAdvanced: false
 
+  function openVpnHub() {
+    root.closeRequested();
+    Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleVpnMenu"]);
+  }
+
   // Subscriber-based polling: NetworkService polls only while we're visible.
   SharedWidgets.Ref { service: NetworkService; active: root.visible }
 
@@ -344,14 +349,13 @@ BasePopupMenu {
         ColumnLayout {
           Layout.fillWidth: true
           spacing: Colors.spacingS
-          visible: NetworkService.vpns.length > 0 || NetworkService.tailscaleStatus !== "Offline"
+          visible: NetworkService.tailscaleInstalled || NetworkService.vpnOtherCount > 0
 
-          SharedWidgets.SectionLabel { label: "VPN & Overlays" }
+          SharedWidgets.SectionLabel { label: "VPN Hub" }
 
           Rectangle {
             Layout.fillWidth: true
-            visible: NetworkService.tailscaleStatus !== "Offline"
-            implicitHeight: 54
+            implicitHeight: 72
             radius: Colors.radiusMedium
             color: Colors.cardSurface
             border.color: Colors.border
@@ -360,16 +364,29 @@ BasePopupMenu {
             RowLayout {
               anchors.fill: parent
               anchors.margins: Colors.spacingM
-              spacing: Colors.paddingSmall
+              spacing: Colors.spacingS
 
-              Text { text: "󰖂"; color: NetworkService.tailscaleStatus === "Connected" ? Colors.primary : Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL }
+              Text {
+                text: "󰖂"
+                color: NetworkService.vpnPrimaryStatus === "connected" ? Colors.success
+                  : (NetworkService.vpnPrimaryStatus === "stopped" ? Colors.warning : Colors.textSecondary)
+                font.family: Colors.fontMono
+                font.pixelSize: Colors.fontSizeXL
+              }
 
               ColumnLayout {
                 Layout.fillWidth: true
                 spacing: 0
-                Text { text: "Tailscale"; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.DemiBold }
+
                 Text {
-                  text: NetworkService.tailscaleIp !== "" ? (NetworkService.tailscaleStatus + " \u2022 " + NetworkService.tailscaleIp) : NetworkService.tailscaleStatus
+                  text: "Tailscale"
+                  color: Colors.text
+                  font.pixelSize: Colors.fontSizeMedium
+                  font.weight: Font.DemiBold
+                }
+
+                Text {
+                  text: NetworkService.vpnPrimaryDetail + (NetworkService.vpnOtherCount > 0 ? " \u2022 " + (NetworkService.vpnOtherCount === 1 ? "1 other VPN" : NetworkService.vpnOtherCount + " other VPNs") : "")
                   color: Colors.textSecondary
                   font.pixelSize: Colors.fontSizeXS
                   Layout.fillWidth: true
@@ -378,18 +395,17 @@ BasePopupMenu {
               }
 
               Rectangle {
-                width: 72
+                width: 86
                 height: 28
                 radius: Colors.radiusMedium
-                color: NetworkService.tailscaleStatus === "Connected"
-                  ? Colors.withAlpha(Colors.error, 0.14)
-                  : Colors.withAlpha(Colors.primary, 0.16)
-                border.color: NetworkService.tailscaleStatus === "Connected" ? Colors.error : Colors.primary
+                color: Colors.withAlpha(Colors.primary, 0.14)
+                border.color: Colors.primary
                 border.width: 1
+
                 Text {
                   anchors.centerIn: parent
-                  text: NetworkService.tailscaleStatus === "Connected" ? "Down" : "Up"
-                  color: NetworkService.tailscaleStatus === "Connected" ? Colors.error : Colors.primary
+                  text: "Open Hub"
+                  color: Colors.primary
                   font.pixelSize: Colors.fontSizeSmall
                   font.weight: Font.Medium
                 }
@@ -399,41 +415,7 @@ BasePopupMenu {
             MouseArea {
               anchors.fill: parent
               cursorShape: Qt.PointingHandCursor
-              onClicked: {
-                if (NetworkService.tailscaleStatus === "Connected") NetworkService.tailscaleDown();
-                else NetworkService.tailscaleUp();
-              }
-            }
-          }
-
-          Repeater {
-            model: NetworkService.vpns
-            delegate: Rectangle {
-              Layout.fillWidth: true
-              implicitHeight: 54
-              radius: Colors.radiusMedium
-              color: Colors.cardSurface
-              border.color: Colors.border
-              border.width: 1
-
-              RowLayout {
-                anchors.fill: parent
-                anchors.margins: Colors.spacingM
-                spacing: Colors.paddingSmall
-                Text { text: "󰖂"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
-                ColumnLayout {
-                  Layout.fillWidth: true
-                  spacing: 0
-                  Text { text: modelData.name; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; Layout.fillWidth: true; elide: Text.ElideRight }
-                  Text { text: modelData.type + (modelData.state ? " \u2022 " + modelData.state : ""); color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
-                }
-              }
-
-              MouseArea {
-                anchors.fill: parent
-                cursorShape: Qt.PointingHandCursor
-                onClicked: NetworkService.disconnectVpn(modelData.name)
-              }
+              onClicked: root.openVpnHub()
             }
           }
         }

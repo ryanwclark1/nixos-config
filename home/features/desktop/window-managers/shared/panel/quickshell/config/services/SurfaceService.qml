@@ -22,6 +22,11 @@ QtObject {
                 focusPolicy: "preserve-app-focus",
                 legacyFlags: ["networkMenuVisible"]
             },
+            vpnMenu: {
+                kind: "popup",
+                focusPolicy: "preserve-app-focus",
+                legacyFlags: ["vpnMenuVisible"]
+            },
             audioMenu: {
                 kind: "popup",
                 focusPolicy: "preserve-app-focus",

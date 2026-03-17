@@ -38,6 +38,7 @@ SharedWidgets.CardBase {
   }
 
   ColumnLayout {
+    id: gpuLayout
     Layout.fillWidth: true
     Layout.fillHeight: true
     spacing: Colors.spacingS
@@ -51,38 +52,62 @@ SharedWidgets.CardBase {
       font.capitalization: Font.AllUppercase
     }
 
-    RowLayout {
+    GridLayout {
       Layout.fillWidth: true
-      spacing: Colors.spacingXL
+      columns: width >= 220 ? 2 : 1
+      columnSpacing: Colors.spacingXL
+      rowSpacing: Colors.spacingS
 
-      // GPU Load
       ColumnLayout {
-        Layout.fillWidth: true; spacing: Colors.spacingXS
+        Layout.fillWidth: true
+        spacing: Colors.spacingXS
         RowLayout {
+          Layout.fillWidth: true
           Text { 
             text: "󰢮  CORE LOAD"
             color: Colors.textSecondary
             font.pixelSize: Colors.fontSizeXXS
             font.weight: Font.Bold
             Layout.fillWidth: true
+            elide: Text.ElideRight
           }
-          Text { text: SystemStatus.gpuUsage; color: Colors.accent; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Bold; font.family: Colors.fontMono }
+          Text {
+            text: SystemStatus.gpuUsage
+            color: Colors.accent
+            font.pixelSize: Colors.fontSizeSmall
+            font.weight: Font.Bold
+            font.family: Colors.fontMono
+            Layout.maximumWidth: Math.max(56, gpuLayout.width * 0.42)
+            horizontalAlignment: Text.AlignRight
+            elide: Text.ElideLeft
+          }
         }
         SharedWidgets.MiniProgressBar { value: SystemStatus.gpuPercent; barColor: Colors.accent }
       }
 
-      // VRAM
       ColumnLayout {
-        Layout.fillWidth: true; spacing: Colors.spacingXS
+        Layout.fillWidth: true
+        spacing: Colors.spacingXS
         RowLayout {
+          Layout.fillWidth: true
           Text { 
             text: "󰍛  MEMORY"
             color: Colors.textSecondary
             font.pixelSize: Colors.fontSizeXXS
             font.weight: Font.Bold
             Layout.fillWidth: true
+            elide: Text.ElideRight
           }
-          Text { text: root.vramUsage; color: Colors.primary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Bold; font.family: Colors.fontMono }
+          Text {
+            text: root.vramUsage
+            color: Colors.primary
+            font.pixelSize: Colors.fontSizeSmall
+            font.weight: Font.Bold
+            font.family: Colors.fontMono
+            Layout.maximumWidth: Math.max(72, gpuLayout.width * 0.46)
+            horizontalAlignment: Text.AlignRight
+            elide: Text.ElideLeft
+          }
         }
         SharedWidgets.MiniProgressBar { value: root.vramPercent; barColor: Colors.primary }
       }

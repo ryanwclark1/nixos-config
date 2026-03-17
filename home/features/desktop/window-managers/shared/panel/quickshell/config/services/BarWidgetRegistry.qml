@@ -94,6 +94,11 @@ QtObject {
         { type: "text", key: "emptyLabel", label: "Empty Label", icon: "󰉿", placeholder: "SSH" }
       ]
     },
+    { widgetType: "vpn", label: "VPN Hub", icon: "󰖂", section: "right", description: "Tailscale-first VPN status and controls popup.", hasSettings: true, defaultSettings: { displayMode: "auto", labelMode: "status", showOtherVpnCount: true }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this widget adapts to bar orientation automatically, always shows its label, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] },
+      { type: "mode", key: "labelMode", label: "Detail Label", description: "Choose whether the secondary chip shows Tailscale status text or the current IPv4 address when connected.", options: [ { value: "status", label: "Status" }, { value: "ip", label: "IP" } ] },
+      { type: "toggle", key: "showOtherVpnCount", label: "Other VPN Count", icon: "󰖂", enabledText: "Show a secondary badge when non-Tailscale VPN sessions are active.", disabledText: "Hide the secondary VPN count badge and keep the widget Tailscale-only." }
+    ] },
     { widgetType: "network", label: "Network", icon: "󰖩", section: "right", description: "Network state and controls popup.", hasSettings: true, defaultSettings: { displayMode: "auto" }, settingsSchema: [
       { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this widget adapts to bar orientation automatically, always shows its text/details, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] }
     ] },

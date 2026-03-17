@@ -135,6 +135,10 @@ Rectangle {
           font.pixelSize: Colors.fontSizeSmall
           clip: true
           wrapMode: TextInput.Wrap
+          onVisibleChanged: {
+            if (!visible && activeFocus)
+              focus = false;
+          }
           onTextChanged: {
             if (text !== root.searchQuery)
               root.searchQueryEdited(text);

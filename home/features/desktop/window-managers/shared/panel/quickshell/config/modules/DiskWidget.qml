@@ -27,6 +27,7 @@ SharedWidgets.CardBase {
   }
 
   ColumnLayout {
+    id: diskLayout
     Layout.fillWidth: true
     Layout.fillHeight: true
     spacing: Colors.spacingS
@@ -40,9 +41,11 @@ SharedWidgets.CardBase {
       font.capitalization: Font.AllUppercase
     }
 
-    RowLayout {
+    GridLayout {
       Layout.fillWidth: true
-      spacing: Colors.spacingXL
+      columns: width >= 220 ? 2 : 1
+      columnSpacing: Colors.spacingXL
+      rowSpacing: Colors.spacingS
       
       Repeater {
         model: root.drives
@@ -50,6 +53,7 @@ SharedWidgets.CardBase {
           Layout.fillWidth: true
           spacing: Colors.spacingXS
           RowLayout {
+            Layout.fillWidth: true
             Text { 
               text: "󰋊 " + (modelData.mount === "/" ? "ROOT" : modelData.mount.replace("/home/", "").toUpperCase())
               color: Colors.textSecondary
@@ -58,7 +62,16 @@ SharedWidgets.CardBase {
               Layout.fillWidth: true
               elide: Text.ElideRight
             }
-            Text { text: modelData.percent; color: Colors.secondary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Bold; font.family: Colors.fontMono }
+            Text {
+              text: modelData.percent
+              color: Colors.secondary
+              font.pixelSize: Colors.fontSizeSmall
+              font.weight: Font.Bold
+              font.family: Colors.fontMono
+              Layout.maximumWidth: Math.max(44, diskLayout.width * 0.24)
+              horizontalAlignment: Text.AlignRight
+              elide: Text.ElideLeft
+            }
           }
           SharedWidgets.MiniProgressBar {
             value: Math.min(100, parseInt(modelData.percent, 10) || 0) / 100.0

@@ -498,6 +498,7 @@ PanelWindow {
               font.capitalization: Font.AllUppercase
               maximumLength: 7
               text: root.hexValue
+              onVisibleChanged: if (!visible && activeFocus) focus = false
 
               // When user edits hex, apply to color state
               onEditingFinished: {

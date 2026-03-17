@@ -15,6 +15,57 @@ Item {
     property var keybindsList: []
     property string keybindsFilter: ""
 
+    function normalizeModifierLabel(mod) {
+        var value = String(mod || "").trim();
+        if (!value)
+            return "";
+        var lower = value.toLowerCase();
+        if (lower === "mod" || lower === "super" || lower === "meta" || lower === "$mainmod")
+            return "Super";
+        if (lower === "ctrl" || lower === "control")
+            return "Ctrl";
+        if (lower === "alt" || lower === "mod1")
+            return "Alt";
+        if (lower === "shift")
+            return "Shift";
+        return value;
+    }
+
+    function formatModifierList(mods) {
+        var normalized = [];
+        for (var i = 0; i < mods.length; i++) {
+            var label = normalizeModifierLabel(mods[i]);
+            if (label && normalized.indexOf(label) === -1)
+                normalized.push(label);
+        }
+        return normalized.join(" + ");
+    }
+
+    function formatHyprModifiers(bind) {
+        if (bind.modString) {
+            var rawMods = [];
+            if (Array.isArray(bind.modString))
+                rawMods = bind.modString;
+            else
+                rawMods = String(bind.modString).split(/[+\s]+/);
+            var modString = formatModifierList(rawMods);
+            if (modString)
+                return modString;
+        }
+
+        var modmask = Number(bind.modmask || 0);
+        var decoded = [];
+        if (modmask & 64)
+            decoded.push("Super");
+        if (modmask & 4)
+            decoded.push("Ctrl");
+        if (modmask & 8)
+            decoded.push("Alt");
+        if (modmask & 1)
+            decoded.push("Shift");
+        return decoded.join(" + ");
+    }
+
     Process {
         id: hyprBindsProc
         command: CompositorAdapter.hotkeysCommand()
@@ -26,9 +77,8 @@ Item {
                     var result = [];
                     for (var i = 0; i < raw.length; i++) {
                         var b = raw[i];
-                        var mods = (b.modmask !== undefined && b.modmask !== 0) ? b.modString || "" : "";
                         result.push({
-                            mods: mods,
+                            mods: root.formatHyprModifiers(b),
                             key: b["key"] || "",
                             dispatcher: b.dispatcher || "",
                             arg: b.arg || ""
@@ -50,14 +100,14 @@ Item {
             var cat = categories[i];
             var catName = cat.name || "";
             var groups = cat.children || [];
-            for (var g = 0; g < groups.length; g++) {
-                var binds = groups[g].keybinds || [];
-                for (var k = 0; k < binds.length; k++) {
-                    var b = binds[k];
-                    var modStr = (b.mods || []).join(" + ");
-                    result.push({
-                        mods: modStr,
-                        key: b["key"] || "",
+                for (var g = 0; g < groups.length; g++) {
+                    var binds = groups[g].keybinds || [];
+                    for (var k = 0; k < binds.length; k++) {
+                        var b = binds[k];
+                        var modStr = root.formatModifierList(b.mods || []);
+                        result.push({
+                            mods: modStr,
+                            key: b["key"] || "",
                         dispatcher: catName,
                         arg: b.comment || ""
                     });

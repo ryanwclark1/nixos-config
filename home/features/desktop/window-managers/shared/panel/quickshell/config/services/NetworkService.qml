@@ -54,6 +54,31 @@ QtObject {
     // ── Tailscale ────────────────────────────────────
     property string tailscaleStatus: "Offline"
     property string tailscaleIp: ""
+    readonly property string vpnPrimaryStatus: {
+        var state = String(tailscaleStatus || "Offline");
+        if (state === "Connected")
+            return "connected";
+        if (state === "Stopped")
+            return "stopped";
+        if (state === "Disconnected")
+            return "disconnected";
+        return "unavailable";
+    }
+    readonly property string vpnPrimaryLabel: "Tailscale"
+    readonly property string vpnPrimaryDetail: {
+        if (vpnPrimaryStatus === "connected")
+            return tailscaleIp !== "" ? tailscaleIp : "Connected";
+        if (vpnPrimaryStatus === "stopped")
+            return "Stopped";
+        if (vpnPrimaryStatus === "disconnected")
+            return "Ready to connect";
+        return "CLI unavailable";
+    }
+    readonly property var vpnOtherSessions: Array.isArray(vpns) ? vpns.slice() : []
+    readonly property int vpnOtherCount: vpnOtherSessions.length
+    readonly property bool vpnHasAnyOverlay: vpnPrimaryStatus === "connected" || vpnOtherCount > 0
+    readonly property bool tailscaleInstalled: vpnPrimaryStatus !== "unavailable"
+    readonly property bool tailscaleConnected: vpnPrimaryStatus === "connected"
 
     // ── Refresh state ────────────────────────────────
     property bool isRefreshing: false
@@ -149,6 +174,17 @@ QtObject {
         if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
         if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + " MB";
         return (bytes / 1073741824).toFixed(2) + " GB";
+    }
+
+    function vpnStatusLabel(statusValue) {
+        var status = String(statusValue || "");
+        if (status === "connected")
+            return "Connected";
+        if (status === "stopped")
+            return "Stopped";
+        if (status === "disconnected")
+            return "Disconnected";
+        return "Unavailable";
     }
 
     // ═══════════════════════════════════════════════════
@@ -306,7 +342,7 @@ QtObject {
         command: [
             "sh",
             "-c",
-            "command -v nmcli >/dev/null 2>&1 && nmcli -t -f NAME,TYPE,STATE connection show --active 2>/dev/null | grep -E 'vpn|wireguard|tun' || true"
+            "command -v nmcli >/dev/null 2>&1 && nmcli -t -f NAME,TYPE,DEVICE,STATE connection show --active 2>/dev/null | grep -E ':(vpn|wireguard|tun):' || true"
         ]
         running: false
         stdout: StdioCollector {
@@ -316,7 +352,12 @@ QtObject {
                 for (var i = 0; i < lines.length; ++i) {
                     if (!lines[i]) continue;
                     var parts = lines[i].split(":");
-                    activeVpns.push({ name: parts[0] || "", type: parts[1] || "", state: parts[2] || "" });
+                    activeVpns.push({
+                        name: parts[0] || "",
+                        type: parts[1] || "",
+                        device: parts[2] || "",
+                        state: parts[3] || ""
+                    });
                 }
                 root.vpns = activeVpns;
             }
@@ -441,13 +482,13 @@ QtObject {
             + "elif [ -n \"$status\" ]; then state='Connected'; "
             + "else state='Disconnected'; fi; "
             + "printf 'STATUS=%s\\nIP4=%s\\n' \"$state\" \"$ip4\"; "
-            + "else printf 'STATUS=Offline\\nIP4=\\n'; fi"
+            + "else printf 'STATUS=Unavailable\\nIP4=\\n'; fi"
         ]
         running: false
         stdout: StdioCollector {
             onStreamFinished: {
                 var data = root.parseKeyValue(this.text || "");
-                root.tailscaleStatus = data.STATUS || "Offline";
+                root.tailscaleStatus = data.STATUS || "Unavailable";
                 root.tailscaleIp = data.IP4 || "";
             }
         }

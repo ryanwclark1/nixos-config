@@ -8,7 +8,8 @@ QtObject {
 
     readonly property var quickLinkItems: SystemActionRegistry.actionsByIds([
         "audioControls",
-        "networkControls"
+        "networkControls",
+        "vpnControls"
     ]).concat([
         {
             id: "screenshotControls",

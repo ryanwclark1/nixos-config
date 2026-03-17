@@ -127,13 +127,23 @@ Flow {
     pinnedFile.setText(JSON.stringify(pinnedApps));
   }
 
+  function pinnedAppId(app) {
+    return String((app && (app.appId || app.class)) || "");
+  }
+
   function togglePin(app) {
+    var targetAppId = pinnedAppId(app);
     var found = -1;
     for (var i = 0; i < pinnedApps.length; i++) {
-      if (pinnedApps[i].class === app.class) { found = i; break; }
+      if (pinnedAppId(pinnedApps[i]) === targetAppId) { found = i; break; }
     }
     if (found !== -1) pinnedApps.splice(found, 1);
-    else pinnedApps.push({ name: app.title || app.class, class: app.class, exec: app.exec || app.class });
+    else pinnedApps.push({
+      name: app.title || targetAppId,
+      appId: targetAppId,
+      class: targetAppId,
+      exec: app.exec || targetAppId
+    });
     pinnedApps = pinnedApps; // Trigger update
     savePinned();
   }
@@ -159,29 +169,29 @@ Flow {
       var result = [];
       var pinnedClasses = {};
 
-      // Pre-build class→toplevel map for O(1) pinned lookups
-      var tlByClass = {};
+      // Pre-build appId→toplevel map for O(1) pinned lookups
+      var tlByAppId = {};
       for (var t = 0; t < root.runningToplevels.length; t++) {
         var tl = root.runningToplevels[t];
-        var tlCls = CompositorAdapter.windowAppId(tl);
-        if (tlCls && !tlByClass[tlCls]) tlByClass[tlCls] = tl;
+        var tlAppId = CompositorAdapter.windowAppId(tl);
+        if (tlAppId && !tlByAppId[tlAppId]) tlByAppId[tlAppId] = tl;
       }
 
       // Phase 1: Pinned apps (always first)
       for (var i = 0; i < root.pinnedApps.length; i++) {
         var p = root.pinnedApps[i];
-        var cls = p.class || "";
-        pinnedClasses[cls] = true;
+        var appId = root.pinnedAppId(p);
+        pinnedClasses[appId] = true;
 
         // O(1) lookup from pre-built map
-        var matchedTl = tlByClass[cls] || null;
+        var matchedTl = tlByAppId[appId] || null;
         var matchedFocused = matchedTl ? !!matchedTl.activated : false;
 
         result.push({
-          _key: "pinned_" + cls,
+          _key: "pinned_" + appId,
           name: p.name || "",
-          class: cls,
-          exec: p.exec || "",
+          appId: appId,
+          exec: p.exec || appId,
           isPinned: true,
           isSeparator: false,
           toplevelRef: matchedTl,
@@ -193,13 +203,13 @@ Flow {
       var unpinned = [];
       for (var r = 0; r < root.runningToplevels.length; r++) {
         var rt = root.runningToplevels[r];
-        var rtCls = CompositorAdapter.windowAppId(rt);
-        if (!pinnedClasses[rtCls]) {
+        var rtAppId = CompositorAdapter.windowAppId(rt);
+        if (!pinnedClasses[rtAppId]) {
           unpinned.push({
-            _key: "running_" + rtCls,
+            _key: "running_" + rtAppId,
             name: rt.title || "",
-            class: rtCls,
-            exec: rtCls,
+            appId: rtAppId,
+            exec: rtAppId,
             isPinned: false,
             isSeparator: false,
             toplevelRef: rt,
@@ -243,7 +253,7 @@ Flow {
     id: taskButtonComponent
     TaskButton {
       readonly property var itemData: parent ? parent.modelData : ({})
-      appClass: itemData.class || ""
+      appId: itemData.appId || ""
       appExec: itemData.exec || ""
       appName: itemData.name || ""
       isPinned: !!itemData.isPinned
