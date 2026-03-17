@@ -1,5 +1,7 @@
 import QtQuick
-import "../services"
+import "."
+import "../../../services"
+import "../../../widgets"
 
 MouseArea {
   id: root

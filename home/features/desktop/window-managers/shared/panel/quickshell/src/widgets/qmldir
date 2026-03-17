@@ -3,9 +3,9 @@ AppIcon 1.0 AppIcon.qml
 AppVolumeEntry 1.0 ../features/audio/components/AppVolumeEntry.qml
 AudioDeviceSection 1.0 ../features/audio/components/AudioDeviceSection.qml
 AudioWidget 1.0 ../features/audio/components/AudioWidget.qml
-BarContextPopup 1.0 BarContextPopup.qml
-BarPill 1.0 BarPill.qml
-BarTooltip 1.0 BarTooltip.qml
+BarContextPopup 1.0 ../features/bar/components/BarContextPopup.qml
+BarPill 1.0 ../features/bar/components/BarPill.qml
+BarTooltip 1.0 ../features/bar/components/BarTooltip.qml
 BatteryWidget 1.0 ../features/power/components/BatteryWidget.qml
 CardBase 1.0 CardBase.qml
 Chip 1.0 Chip.qml
@@ -60,6 +60,6 @@ SurfaceGradient 1.0 SurfaceGradient.qml
 Toast 1.0 Toast.qml
 ToastOverlay 1.0 ToastOverlay.qml
 ToggleSwitch 1.0 ToggleSwitch.qml
-TrayWidget 1.0 TrayWidget.qml
+TrayWidget 1.0 ../features/bar/components/TrayWidget.qml
 WavyProgress 1.0 WavyProgress.qml
 WorkspaceOsd 1.0 ../features/osd/components/WorkspaceOsd.qml

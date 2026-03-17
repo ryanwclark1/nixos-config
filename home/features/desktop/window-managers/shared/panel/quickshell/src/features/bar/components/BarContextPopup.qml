@@ -1,7 +1,8 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import "../services"
+import "../../../services"
+import "../../../widgets"
 
 // Lightweight popup surface for bar pill right-click context menus.
 // One instance is shared across all bars/screens; call show() with actions.
