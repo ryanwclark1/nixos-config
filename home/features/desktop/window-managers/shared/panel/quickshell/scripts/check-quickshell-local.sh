@@ -136,9 +136,8 @@ fi
 
 if run_capture "$tmp_guards_out" "$tmp_guards_err" "$local_runner" quickshell-guards; then
   if assert_patterns "$tmp_guards_out" \
-    'check-quickshell-startup\.sh' \
-    'check-clipboard-contracts\.sh' \
-    'scripts/vm/run-panel-vm-qa\.sh --vm hyprland'; then
+    'quickshell-structure-verify\.sh$' \
+    'quickshell-structure-verify\.sh --vm hyprland$'; then
     pass "plugin-local quickshell-guards prints the assembled Quickshell guard sequence"
   else
     fail "plugin-local quickshell-guards output drifted from the expected Quickshell guard sequence"
@@ -151,14 +150,12 @@ fi
 
 if run_capture "$tmp_all_out" "$tmp_all_err" "$local_runner" quickshell-all --quiet; then
   if assert_patterns "$tmp_all_out" \
+    'Stage timing summary:' \
     'Quickshell startup smoke summary: 1 pass, 0 fail' \
     'Clipboard contract summary: 17 pass, 0 fail' \
-    'SSH widget settings smoke .*custom editor' \
-    'hidden bar widgets collapse to zero layout footprint' \
-    'Running targeted runtime warning regressions' \
-    'Panel runtime verification completed' \
-    && ( assert_patterns "$tmp_all_out" '\[SKIP\].*no PanelWindow backend available in this environment' \
-      || assert_patterns "$tmp_all_out" 'shell matrix:' ); then
+    'Running transient repo-shell journal warning gate' \
+    'Launcher smoke checks passed.' \
+    'Aggregate artifacts saved to'; then
     pass "plugin-local quickshell-all --quiet runs the assembled Quickshell runtime guard sequence"
   else
     fail "plugin-local quickshell-all --quiet output drifted from the expected Quickshell aggregate guard sequence"
@@ -173,7 +170,8 @@ if run_capture "$tmp_live_out" "$tmp_live_err" "$local_runner" live-gates --quie
   if assert_patterns "$tmp_live_out" \
     'Plugin runtime guard summary:' \
     'Quickshell startup smoke summary: 1 pass, 0 fail' \
-    'Panel runtime verification completed'; then
+    'Stage timing summary:' \
+    'Aggregate artifacts saved to'; then
     pass "plugin-local live-gates --quiet runs the shared and live Quickshell gate sequence"
   else
     fail "plugin-local live-gates --quiet output drifted from the expected combined gate sequence"

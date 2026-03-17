@@ -60,7 +60,6 @@ QtObject {
     readonly property color surfaceGradientEnd: solid(surface)
     readonly property color borderLight: withAlpha(text, 0.12)
     readonly property color borderDark: withAlpha("#000000", 0.25)
-    readonly property color glassBorder: withAlpha(text, 0.1)
     readonly property color borderMedium: withAlpha(text, 0.4)       // Subtle separator / divider
     readonly property color borderFocus: withAlpha(text, 0.6)        // Focused input / strong border
 
@@ -68,15 +67,8 @@ QtObject {
     readonly property color errorLight: withAlpha(error, 0.15)       // Error indicator bg
     readonly property color warningLight: withAlpha(warning, 0.16)   // Warning indicator bg
 
-    // --- SHADOWS ---
-    readonly property color shadowColor: withAlpha("#000000", 0.35)
-    readonly property int shadowSizeLow: 4
-    readonly property int shadowSizeMedium: 8
-    readonly property int shadowSizeHigh: 16
-
     // --- OVERLAYS ---
     readonly property color overlayScrim: Qt.rgba(0, 0, 0, 0.45)
-    readonly property color overlayHeavy: Qt.rgba(0, 0, 0, 0.55)
 
     // --- POPUP SURFACES (shared across all menus) ---
     property real _popupOpacity: 0.96
@@ -84,9 +76,6 @@ QtObject {
     readonly property color popupSurface: withAlpha(surface, _popupOpacity)
     readonly property color cardSurface: withAlpha(surface, _cardOpacity)
     readonly property color chipSurface: withAlpha(surface, 0.92)
-    readonly property color modalSurface: solid(surface)
-    readonly property color modalSidebarSurface: _isLight ? Qt.darker(modalSurface, 1.04) : Qt.darker(modalSurface, 1.12)
-    readonly property color modalCardSurface: cardSurface
     readonly property color modalFieldSurface: chipSurface
 
     property Connections _configConn: Connections {
@@ -105,7 +94,6 @@ QtObject {
 
 
     // --- DIMENSIONS ---
-    readonly property int spacingXXXS: 1
     readonly property int spacingXXS: 2
     readonly property int spacingXS: 4
     readonly property int spacingSM: 6

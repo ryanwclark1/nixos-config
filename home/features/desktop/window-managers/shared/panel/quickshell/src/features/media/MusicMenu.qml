@@ -13,9 +13,36 @@ BasePopupMenu {
   implicitHeight: compactMode ? 430 : 400
   title: "Music"
   toggleMethod: "toggleMusicMenu"
-  surfaceTint: Colors.withAlpha(root.dominantColor, 0.05)
+  surfaceTint: Colors.withAlpha(root.dominantColor, 0.12)
 
   SharedWidgets.Ref { service: MediaService }
+
+  // Immersive Background Glow
+  Rectangle {
+    anchors.fill: parent
+    z: -1
+    radius: Colors.radiusLarge
+    color: "transparent"
+    clip: true
+
+    Rectangle {
+      anchors.centerIn: parent
+      width: parent.width * 1.5
+      height: width
+      radius: width / 2
+      color: root.dominantColor
+      opacity: 0.12
+      scale: MediaService.isPlaying ? 1.0 : 0.8
+      Behavior on scale { NumberAnimation { duration: 2000; easing.type: Easing.InOutSine } }
+
+      SequentialAnimation on opacity {
+        running: MediaService.isPlaying
+        loops: Animation.Infinite
+        NumberAnimation { from: 0.08; to: 0.18; duration: 3000; easing.type: Easing.InOutSine }
+        NumberAnimation { from: 0.18; to: 0.08; duration: 3000; easing.type: Easing.InOutSine }
+      }
+    }
+  }
 
   readonly property var activePlayers: {
     MediaService.currentPlayer; // force re-eval on player change
@@ -102,34 +129,51 @@ BasePopupMenu {
     visible: !!root.player
 
     // Album art (ClippingWrapperRectangle for proper radius clipping)
-    ClippingWrapperRectangle {
+    Item {
       Layout.alignment: Qt.AlignHCenter
       Layout.preferredWidth: root.compactMode ? 96 : 120
       Layout.preferredHeight: root.compactMode ? 96 : 120
-      radius: Colors.radiusMedium
-      color: Colors.surface
 
-      Item {
-        Image {
-          id: albumArt
-          anchors.fill: parent
-          source: root.effectiveArtUrl || ""
-          sourceSize: Qt.size(240, 240)
-          asynchronous: true
-          fillMode: Image.PreserveAspectCrop
-          visible: status === Image.Ready
-        }
-
-        Text {
-          anchors.centerIn: parent
-          text: "󰝚"
-          color: Colors.textDisabled
-          font.family: Colors.fontMono
-          font.pixelSize: Colors.fontSizeHuge * 2
-          visible: albumArt.status !== Image.Ready
-        }
+      // Glow Shadow
+      Rectangle {
+        anchors.fill: parent
+        anchors.margins: -4
+        radius: Colors.radiusMedium + 4
+        color: root.dominantColor
+        opacity: MediaService.isPlaying ? 0.25 : 0.1
+        visible: albumArt.status === Image.Ready
+        Behavior on opacity { NumberAnimation { duration: 1000 } }
       }
 
+      ClippingWrapperRectangle {
+        anchors.fill: parent
+        radius: Colors.radiusMedium
+        color: Colors.surface
+        border.color: Colors.withAlpha(root.dominantColor, 0.3)
+        border.width: 1
+
+        Item {
+          anchors.fill: parent
+          Image {
+            id: albumArt
+            anchors.fill: parent
+            source: root.effectiveArtUrl || ""
+            sourceSize: Qt.size(240, 240)
+            asynchronous: true
+            fillMode: Image.PreserveAspectCrop
+            visible: status === Image.Ready
+          }
+
+          Text {
+            anchors.centerIn: parent
+            text: "󰝚"
+            color: Colors.textDisabled
+            font.family: Colors.fontMono
+            font.pixelSize: Colors.fontSizeHuge * 2
+            visible: albumArt.status !== Image.Ready
+          }
+        }
+      }
     }
 
     // Track info

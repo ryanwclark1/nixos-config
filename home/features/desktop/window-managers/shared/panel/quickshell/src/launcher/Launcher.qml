@@ -138,8 +138,6 @@ PanelWindow {
             filesResolveAvgMs: 0,
             perMode: ({})
         })
-    readonly property string launcherAppsHelperPath: (Quickshell.env("HOME") || "/home/administrator") + "/.local/bin/qs-apps"
-
     function refreshMediaPlayers() {
         mediaPlayers = MediaService.getAvailablePlayers();
     }
@@ -796,13 +794,13 @@ PanelWindow {
 
     function modeDependencies(modeKey) {
         if (modeKey === "drun")
-            return [launcherAppsHelperPath];
+            return [];
         if (modeKey === "run")
             return ["qs-run"];
         if (modeKey === "emoji")
             return ["qs-emoji"];
         if (modeKey === "clip")
-            return ["qs-clip", "cliphist", "wl-copy"];
+            return ["cliphist", "wl-copy", "wl-paste"];
         if (modeKey === "keybinds")
             return ["qs-keybinds"];
         if (modeKey === "bookmarks")
@@ -827,6 +825,10 @@ PanelWindow {
     function checkCommandAvailable(cmd, callback) {
         if (!cmd) {
             callback(false);
+            return;
+        }
+        if (DependencyService.knows(cmd)) {
+            callback(DependencyService.isAvailable(cmd));
             return;
         }
         if (commandAvailability[cmd] !== undefined) {
@@ -1827,7 +1829,39 @@ PanelWindow {
     }
 
     function loadApps() {
-        loadCached("drun", ["bash", launcherAppsHelperPath], JSON.parse);
+        var startedAt = Date.now();
+        var cached = getCached("drun");
+        if (cached) {
+            allItems = cached;
+            filterItems();
+            buildLauncherHome();
+            completeModeLoad("drun", true, "");
+            recordLoadMetric("drun", 0, true, true);
+            return;
+        }
+        allItems = [];
+        filteredItems = [];
+        beginModeLoad("drun", "Loading " + modeInfo("drun").label);
+        filterItems();
+        var token = beginRequest("drun");
+        AppCatalogService.ensureLoaded(function(items, errorText) {
+            if (!isRequestCurrent("drun", token))
+                return;
+            if (errorText) {
+                console.warn("Launcher app catalog load failed:", errorText);
+                _handleLoadFailure("drun", startedAt);
+                return;
+            }
+            var appItems = Array.isArray(items) ? items : [];
+            setCached("drun", appItems);
+            recordLoadMetric("drun", Date.now() - startedAt, false, true);
+            if (mode === "drun") {
+                allItems = appItems;
+                filterItems();
+                buildLauncherHome();
+                completeModeLoad("drun", true, "");
+            }
+        });
     }
 
     function prewarmAppsCache() {
@@ -1835,30 +1869,31 @@ PanelWindow {
             return;
         if (getCached("drun"))
             return;
-        if (_preloadProcs["drun"])
-            return;
         if (shouldBackoffPreload("drun"))
             return;
 
         ensureModeDependencies("drun", function (ok, _missingCmd) {
             if (!ok)
                 return;
-            if (getCached("drun") || _preloadProcs["drun"])
+            if (getCached("drun"))
                 return;
-            _spawnPreload("drun");
+            AppCatalogService.ensureLoaded(function(items, errorText) {
+                if (!errorText)
+                    setCached("drun", Array.isArray(items) ? items : []);
+            });
         });
     }
     function loadRun() {
-        loadCached("run", ["qs-run"], JSON.parse);
+        loadCached("run", DependencyService.resolveCommand("qs-run"), JSON.parse);
     }
     function loadWallpapers() {
-        loadCached("wallpapers", ["qs-wallpapers"], JSON.parse);
+        loadCached("wallpapers", DependencyService.resolveCommand("qs-wallpapers"), JSON.parse);
     }
     function loadKeybinds() {
-        loadCached("keybinds", ["qs-keybinds"], JSON.parse);
+        loadCached("keybinds", DependencyService.resolveCommand("qs-keybinds"), JSON.parse);
     }
     function loadBookmarks() {
-        loadCached("bookmarks", ["qs-bookmarks"], JSON.parse);
+        loadCached("bookmarks", DependencyService.resolveCommand("qs-bookmarks"), JSON.parse);
     }
 
     function parseEmoji(raw) {
@@ -1876,10 +1911,8 @@ PanelWindow {
         return items;
     }
 
-    function parseClip(raw) {
-        return JSON.parse(raw).filter(function (it) {
-            return it.content && it.content.indexOf("[[ binary data") === -1;
-        }).map(function (it) {
+    function clipModeItems(items) {
+        return (Array.isArray(items) ? items : []).map(function (it) {
             return {
                 id: it.id,
                 name: it.content,
@@ -1890,36 +1923,60 @@ PanelWindow {
     }
 
     function loadEmojis() {
-        loadCached("emoji", ["qs-emoji"], parseEmoji);
+        loadCached("emoji", DependencyService.resolveCommand("qs-emoji"), parseEmoji);
     }
     function loadClip() {
-        loadCached("clip", ["qs-clip"], parseClip);
+        var startedAt = Date.now();
+        var cached = getCached("clip");
+        if (cached) {
+            allItems = cached;
+            filterItems();
+            buildLauncherHome();
+            completeModeLoad("clip", true, "");
+            recordLoadMetric("clip", 0, true, true);
+            return;
+        }
+        allItems = [];
+        filteredItems = [];
+        beginModeLoad("clip", "Loading " + modeInfo("clip").label);
+        filterItems();
+        var token = beginRequest("clip");
+        ClipboardHistoryService.refresh(function(items, errorText) {
+            if (!isRequestCurrent("clip", token))
+                return;
+            if (errorText) {
+                console.warn("Launcher clipboard load failed:", errorText);
+                _handleLoadFailure("clip", startedAt);
+                return;
+            }
+            var clipItems = clipModeItems(items);
+            setCached("clip", clipItems);
+            recordLoadMetric("clip", Date.now() - startedAt, false, true);
+            if (mode === "clip") {
+                allItems = clipItems;
+                filterItems();
+                buildLauncherHome();
+                completeModeLoad("clip", true, "");
+            }
+        });
     }
 
     // ── Background preloading ───────────────────
     readonly property var preloadModes: ({
-            "drun": {
-                command: ["bash", launcherAppsHelperPath],
-                parse: JSON.parse
-            },
             "run": {
-                command: ["qs-run"],
+                command: DependencyService.resolveCommand("qs-run"),
                 parse: JSON.parse
             },
             "emoji": {
-                command: ["qs-emoji"],
+                command: DependencyService.resolveCommand("qs-emoji"),
                 parse: parseEmoji
             },
-            "clip": {
-                command: ["qs-clip"],
-                parse: parseClip
-            },
             "keybinds": {
-                command: ["qs-keybinds"],
+                command: DependencyService.resolveCommand("qs-keybinds"),
                 parse: JSON.parse
             },
             "bookmarks": {
-                command: ["qs-bookmarks"],
+                command: DependencyService.resolveCommand("qs-bookmarks"),
                 parse: JSON.parse
             }
         })
@@ -1927,6 +1984,8 @@ PanelWindow {
     function startPreload() {
         if (!Config.launcherEnablePreload)
             return;
+        prewarmAppsCache();
+        prewarmClipCache();
         var keys = Object.keys(preloadModes);
         for (var i = 0; i < keys.length; i++) {
             var key = keys[i];
@@ -1937,12 +1996,34 @@ PanelWindow {
     }
 
     function _spawnPreload(key) {
+        if (!preloadModes[key])
+            return;
+        var command = preloadModes[key].command;
+        if (!command || command.length === 0)
+            return;
         var proc = preloadProcComponent.createObject(launcherRoot);
         proc._modeKey = key;
         proc._startedAt = Date.now();
-        proc.command = preloadModes[key].command;
+        proc.command = command;
         _preloadProcs[key] = proc;
         proc.running = true;
+    }
+
+    function prewarmClipCache() {
+        if (!supportsMode("clip"))
+            return;
+        if (getCached("clip"))
+            return;
+        if (shouldBackoffPreload("clip"))
+            return;
+        ensureModeDependencies("clip", function(ok, _missingCmd) {
+            if (!ok)
+                return;
+            ClipboardHistoryService.ensureLoaded(function(items, errorText) {
+                if (!errorText)
+                    setCached("clip", clipModeItems(items));
+            });
+        });
     }
 
     function _handlePreloadDone(proc, raw) {
@@ -2376,7 +2457,7 @@ PanelWindow {
         filterItems();
         var token = beginRequest("ai");
         var startedAt = Date.now();
-        runCommand(["qs-ai", query], function (raw) {
+        runCommand(DependencyService.resolveCommand("qs-ai", [query]), function (raw) {
             if (!isRequestCurrent("ai", token))
                 return;
             raw = raw.trim();
@@ -2531,13 +2612,13 @@ PanelWindow {
                 category: "Capture",
                 name: "Screenshot (Area)",
                 icon: "󰹑",
-                action: () => Quickshell.execDetached(["qs-screenshot", "area", "--satty"])
+                action: () => Quickshell.execDetached(DependencyService.resolveCommand("qs-screenshot", ["area", "--satty"]))
             },
             {
                 category: "Capture",
                 name: "Screenshot (Display)",
                 icon: "󰍹",
-                action: () => Quickshell.execDetached(["qs-screenshot", "screen", "--satty"])
+                action: () => Quickshell.execDetached(DependencyService.resolveCommand("qs-screenshot", ["screen", "--satty"]))
             },
             {
                 category: "Capture",
@@ -2920,14 +3001,11 @@ PanelWindow {
     }
 
     function copyToClipboard(text) {
-        Quickshell.execDetached(["sh", "-c", "printf %s " + ModeData.shellQuote(text) + " | if command -v wl-copy >/dev/null 2>&1; then wl-copy; elif command -v xclip >/dev/null 2>&1; then xclip -selection clipboard; fi"]);
+        Quickshell.execDetached(["sh", "-c", "printf %s " + ModeData.shellQuote(text) + " | wl-copy"]);
     }
 
     function restoreClipboardHistoryItem(id) {
-        var safeId = parseInt(id, 10);
-        if (isNaN(safeId))
-            return;
-        Quickshell.execDetached(["sh", "-c", "cliphist decode " + safeId + " | if command -v wl-copy >/dev/null 2>&1; then wl-copy; elif command -v xclip >/dev/null 2>&1; then xclip -selection clipboard; fi"]);
+        ClipboardHistoryService.restore(id);
     }
 
     function launchInTerminal(cmd) {

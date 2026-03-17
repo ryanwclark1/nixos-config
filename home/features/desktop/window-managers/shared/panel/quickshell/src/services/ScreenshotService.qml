@@ -34,9 +34,11 @@ QtObject {
         root._captureStdout = "";
         root._captureStderr = "";
 
-        _captureProc.command = root._captureMonitor !== ""
-            ? ["qs-screenshot", root._captureMode, root._captureMonitor]
-            : ["qs-screenshot", root._captureMode];
+        _captureProc.command = DependencyService.resolveCommand("qs-screenshot",
+            root._captureMonitor !== ""
+                ? [root._captureMode, root._captureMonitor]
+                : [root._captureMode]
+        );
         _captureProc.running = true;
     }
 

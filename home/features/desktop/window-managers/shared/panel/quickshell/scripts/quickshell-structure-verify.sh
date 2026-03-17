@@ -5,25 +5,31 @@ script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 repo_root="$(CDPATH= cd -- "${script_dir}/.." && pwd -P)"
 src_root="${repo_root}/src"
 quiet=0
+use_vm=0
+vm_selector="${QS_VERIFY_VM_SELECTOR:-hyprland}"
 startup_timeout_seconds="${QS_VERIFY_STARTUP_TIMEOUT_SECONDS:-60}"
-launcher_timeout_seconds="${QS_VERIFY_LAUNCHER_SMOKE_TIMEOUT_SECONDS:-240}"
-panel_timeout_seconds="${QS_VERIFY_PANEL_RUNTIME_TIMEOUT_SECONDS:-360}"
+launcher_timeout_seconds="${QS_VERIFY_LAUNCHER_SMOKE_TIMEOUT_SECONDS:-180}"
 journal_timeout_seconds="${QS_VERIFY_JOURNAL_GATE_TIMEOUT_SECONDS:-180}"
-surface_timeout_seconds="${QS_VERIFY_SURFACE_RESPONSIVE_TIMEOUT_SECONDS:-180}"
+vm_timeout_seconds="${QS_VERIFY_VM_TIMEOUT_SECONDS:-5400}"
+stage_names=()
+stage_durations=()
+stage_exits=()
 
 usage() {
   cat <<'EOF'
-Usage: quickshell-structure-verify.sh [--quiet]
+Usage: quickshell-structure-verify.sh [--quiet] [--vm [niri|hyprland|both]]
 
-Run the automated post-migration verification stack:
+Default fast host path:
   1. structural import-boundary checks
   2. qmldir target validation
   3. clipboard contract checks
   4. startup smoke
-  5. quickshell.service journal warning gate when a live session is available
-  6. launcher runtime smoke
-  7. panel runtime aggregate
-  8. live surface responsive smoke when a compositor session is available
+  5. transient repo-shell journal warning gate when a live session is available
+  6. launcher smoke
+
+Optional exhaustive path:
+  --vm [selector]  Run the fast host preflight first, then delegate exhaustive
+                   runtime/settings coverage to scripts/vm/run-panel-vm-qa.sh.
 EOF
 }
 
@@ -31,6 +37,13 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --quiet)
       quiet=1
+      ;;
+    --vm)
+      use_vm=1
+      if [[ $# -gt 1 && ! "${2}" =~ ^- ]]; then
+        vm_selector="${2}"
+        shift
+      fi
       ;;
     -h|--help)
       usage
@@ -55,23 +68,58 @@ step_skip() {
   printf '[SKIP] %s\n' "$1"
 }
 
+record_stage() {
+  stage_names+=("$1")
+  stage_durations+=("$2")
+  stage_exits+=("$3")
+}
+
 run_step() {
   local label="$1"
   shift
+  local start_ts end_ts duration exit_code
   step_info "$label"
+  start_ts=$SECONDS
+  set +e
   "$@"
+  exit_code=$?
+  set -e
+  end_ts=$SECONDS
+  duration=$((end_ts - start_ts))
+  record_stage "$label" "$duration" "$exit_code"
+  return "$exit_code"
 }
 
 run_step_timeout() {
   local label="$1"
   local timeout_seconds="$2"
   shift 2
+  local start_ts end_ts duration exit_code
   step_info "$label"
+  start_ts=$SECONDS
+  set +e
   if command -v timeout >/dev/null 2>&1; then
     timeout --foreground --signal=TERM --kill-after=10s "${timeout_seconds}s" "$@"
   else
     "$@"
   fi
+  exit_code=$?
+  set -e
+  end_ts=$SECONDS
+  duration=$((end_ts - start_ts))
+  record_stage "$label" "$duration" "$exit_code"
+  return "$exit_code"
+}
+
+print_stage_summary() {
+  local i
+  printf '[INFO] Stage timing summary:\n'
+  for i in "${!stage_names[@]}"; do
+    printf '[INFO]   %s: %ss (exit %s)\n' \
+      "${stage_names[$i]}" \
+      "${stage_durations[$i]}" \
+      "${stage_exits[$i]}"
+  done
 }
 
 run_qmldir_validation() {
@@ -109,21 +157,26 @@ has_live_session() {
   [[ -n "${WAYLAND_DISPLAY:-}" || -n "${DISPLAY:-}" ]]
 }
 
+trap print_stage_summary EXIT
+
 run_step "Checking import boundaries" bash "${repo_root}/tools/checks/check-import-boundaries.sh"
 run_step "Validating qmldir targets" run_qmldir_validation
 run_step "Running clipboard contract checks" bash "${script_dir}/check-clipboard-contracts.sh"
 run_step_timeout "Running startup smoke" "${startup_timeout_seconds}" bash "${script_dir}/check-quickshell-startup.sh"
 
 if has_live_session; then
-  run_step_timeout "Running quickshell.service journal warning gate" "${journal_timeout_seconds}" bash "${script_dir}/check-runtime-journal-gate.sh"
-  run_step_timeout "Running launcher smoke" "${launcher_timeout_seconds}" bash "${script_dir}/check-launcher-smoke.sh" --repo-shell
-  run_step_timeout "Running panel runtime aggregate" "${panel_timeout_seconds}" bash "${script_dir}/check-panel-runtime.sh" --repo-shell
-  run_step_timeout "Running live surface responsive smoke" "${surface_timeout_seconds}" bash "${script_dir}/check-surface-responsive.sh" --repo-shell
-else
-  step_skip "quickshell.service journal warning gate: no live compositor session detected"
+  run_step_timeout "Running transient repo-shell journal warning gate" "${journal_timeout_seconds}" bash "${script_dir}/check-runtime-journal-gate.sh"
   run_step_timeout "Running launcher smoke" "${launcher_timeout_seconds}" bash "${script_dir}/check-launcher-smoke.sh" --ci
-  run_step_timeout "Running panel runtime aggregate" "${panel_timeout_seconds}" bash "${script_dir}/check-panel-runtime.sh" --skip-settings --skip-surfaces
-  step_skip "live surface responsive smoke: no live compositor session detected"
+else
+  step_skip "transient repo-shell journal warning gate: no live compositor session detected"
+  run_step_timeout "Running launcher smoke" "${launcher_timeout_seconds}" bash "${script_dir}/check-launcher-smoke.sh" --ci
+fi
+
+if (( use_vm == 1 )); then
+  run_step_timeout \
+    "Running VM-backed runtime/settings gate (${vm_selector})" \
+    "${vm_timeout_seconds}" \
+    bash "${repo_root}/scripts/vm/run-panel-vm-qa.sh" --vm "${vm_selector}"
 fi
 
 if (( quiet == 0 )); then

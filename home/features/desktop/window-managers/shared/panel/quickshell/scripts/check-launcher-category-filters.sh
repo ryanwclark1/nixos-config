@@ -9,7 +9,7 @@ config_qml="${config_dir}/services/Config.qml"
 config_persistence_js="${config_dir}/services/config/ConfigPersistence.js"
 launcher_settings_qml="${config_dir}/features/settings/components/tabs/ShellLauncherSection.qml"
 launcher_helpers_js="${config_dir}/features/settings/components/tabs/ShellCoreHelpers.js"
-apps_script="${script_dir}/apps.sh"
+app_catalog_qml="${config_dir}/services/AppCatalogService.qml"
 
 violations=()
 
@@ -41,12 +41,12 @@ require_literal "$launcher_settings_qml" 'configKey: "launcherDrunCategoryFilter
 require_literal "$launcher_helpers_js" 'Config.launcherDrunCategoryFiltersEnabled = false;' "settings category filter reset default"
 
 # Desktop app metadata extraction
-require_literal "$apps_script" '/^Categories=/ && categories == "" {' "apps script categories extraction"
-require_literal "$apps_script" '/^Keywords=/ && keywords == "" {' "apps script keywords extraction"
-require_literal "$apps_script" 'gsub(/;/, " ", cleaned_categories)' "apps script category shaping"
-require_literal "$apps_script" 'gsub(/;/, " ", cleaned_keywords)' "apps script keyword shaping"
-require_literal "$apps_script" '/^Hidden=/ && hidden == "" {' "apps script hidden flag extraction"
-require_literal "$apps_script" '\"desktopId\":\"%s\"' "apps script desktop id output"
+require_literal "$app_catalog_qml" 'line.startsWith("Categories=")' "app catalog categories extraction"
+require_literal "$app_catalog_qml" 'line.startsWith("Keywords=")' "app catalog keywords extraction"
+require_literal "$app_catalog_qml" '_spaceSeparated(fields.categories)' "app catalog category shaping"
+require_literal "$app_catalog_qml" '_spaceSeparated(fields.keywords)' "app catalog keyword shaping"
+require_literal "$app_catalog_qml" 'line.startsWith("Hidden=")' "app catalog hidden flag extraction"
+require_literal "$app_catalog_qml" 'desktopId: _desktopIdForPath(path)' "app catalog desktop id output"
 
 # Launcher behavior and UI guards
 require_literal "$launcher_qml" 'readonly property bool drunCategoryFiltersEnabled: Config.launcherDrunCategoryFiltersEnabled' "launcher category filters enabled binding"

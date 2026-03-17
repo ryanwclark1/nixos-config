@@ -8,7 +8,6 @@ launcher_qml="${script_dir}/../src/launcher/Launcher.qml"
 launcher_search_field_qml="${script_dir}/../src/launcher/LauncherSearchField.qml"
 launcher_settings_qml="${script_dir}/../src/features/settings/components/tabs/ShellLauncherSection.qml"
 expected_config="$(realpath "${script_dir}/../src/shell.qml" 2>/dev/null || printf '%s' "${script_dir}/../src/shell.qml")"
-apps_helper="${script_dir}/apps.sh"
 
 source "${script_dir}/runtime-warning-filter.sh"
 
@@ -428,21 +427,6 @@ if (!(Number(payload.filteredItemCount || 0) > 0)) process.exit(1);
     pass "Launcher.openDrun for category diagnostics"
   else
     fail "Launcher.openDrun for category diagnostics"
-  fi
-
-  if [[ -f "${apps_helper}" ]]; then
-    local app_probe duration_ms app_count
-    app_probe="$(node -e 'const {spawnSync} = require("node:child_process"); const helper = process.argv[1]; const started = Date.now(); const result = spawnSync("bash", [helper], {encoding:"utf8"}); if (result.status !== 0) process.exit(result.status || 1); const took = Date.now() - started; let payload = []; try { payload = JSON.parse(result.stdout || "[]"); } catch (error) { process.exit(2); } process.stdout.write(String(took) + "\n" + String(Array.isArray(payload) ? payload.length : 0));' "${apps_helper}" 2>/dev/null || true)"
-    duration_ms="$(printf '%s\n' "${app_probe}" | head -n 1)"
-    app_count="$(printf '%s\n' "${app_probe}" | tail -n 1)"
-    if [[ "${duration_ms}" =~ ^[0-9]+$ ]] && [[ "${app_count}" =~ ^[0-9]+$ ]] && (( duration_ms <= 2000 )) && (( app_count > 0 )); then
-      pass "apps helper populates quickly (${duration_ms}ms, ${app_count} apps)"
-    else
-      fail "apps helper populates quickly"
-      printf 'apps helper probe: duration_ms=%s count=%s path=%s\n' "${duration_ms:-<none>}" "${app_count:-<none>}" "${apps_helper}" >&2
-    fi
-  else
-    warn "apps helper missing; skipping launcher app helper timing probe"
   fi
 
   local category_state

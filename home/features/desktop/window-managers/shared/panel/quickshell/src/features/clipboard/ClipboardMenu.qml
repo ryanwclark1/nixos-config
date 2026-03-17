@@ -15,12 +15,12 @@ BasePopupMenu {
   focusOnOpen: true
   initialFocusTarget: searchInput
 
-  property var clipboardItems: []
+  property var clipboardItems: ClipboardHistoryService.items
   property string searchQuery: ""
   property int selectedIndex: 0
 
   function refresh() {
-    clipPoll.triggerPoll();
+    ClipboardHistoryService.refresh(null);
   }
 
   function clampSelection() {
@@ -43,20 +43,14 @@ BasePopupMenu {
   function activateClipboardItem(item) {
     if (!item)
       return;
-    var safeId = parseInt(item.id, 10);
-    if (!isNaN(safeId))
-      Quickshell.execDetached(["sh", "-c", "cliphist decode " + safeId + " | if command -v wl-copy >/dev/null 2>&1; then wl-copy; elif command -v xclip >/dev/null 2>&1; then xclip -selection clipboard; fi"]);
+    ClipboardHistoryService.restore(item.id);
     Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleClipboardMenu"]);
   }
 
   function deleteClipboardItem(item) {
     if (!item)
       return;
-    var safeId = parseInt(item.id, 10);
-    if (isNaN(safeId))
-      return;
-    Quickshell.execDetached(["sh", "-c", "cliphist list | awk -F '\\t' '$1 == " + safeId + " { print; exit }' | cliphist delete"]);
-    root.refresh();
+    ClipboardHistoryService.deleteEntry(item.id);
   }
 
   // Fuzzy search: ranks by exact substring match first, then by
@@ -110,15 +104,6 @@ BasePopupMenu {
   onClipboardItemsChanged: clampSelection()
   onSearchQueryChanged: selectedIndex = 0
 
-  CommandPoll {
-    id: clipPoll
-    interval: 5000
-    running: root.visible
-    command: ["qs-clip"]
-    parse: function(out) { try { return JSON.parse(out || "[]") } catch(e) { return [] } }
-    onUpdated: root.clipboardItems = clipPoll.value || []
-  }
-
   onVisibleChanged: {
     if (visible) refresh();
     else if (searchInput.activeFocus) searchInput.focus = false;
@@ -128,8 +113,7 @@ BasePopupMenu {
     SharedWidgets.IconButton {
       icon: "󰃢"
       onClicked: {
-        Quickshell.execDetached(["cliphist", "wipe"]);
-        root.clipboardItems = [];
+        ClipboardHistoryService.wipe();
       }
     }
   ]

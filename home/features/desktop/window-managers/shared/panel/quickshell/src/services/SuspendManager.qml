@@ -29,7 +29,7 @@ QtObject {
 
     // ── dbus-monitor Process ─────────────────────
     property Process _monitor: Process {
-        command: ["qs-sleep-monitor"]
+        command: DependencyService.resolveCommand("qs-sleep-monitor")
         running: true
 
         stdout: SplitParser {

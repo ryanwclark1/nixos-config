@@ -15,6 +15,7 @@ reference_recovery_fixture="${reference_source_dir}/expected-recovery-scenarios.
 reference_diag_active_fixture="${reference_source_dir}/expected-diagnostics-active.json"
 reference_diag_degraded_fixture="${reference_source_dir}/expected-diagnostics-degraded.json"
 shell_config="${script_dir}/../src/shell.qml"
+structure_verify_script="${script_dir}/quickshell-structure-verify.sh"
 quickshell_vm_default="${PLUGIN_LOCAL_QUICKSHELL_VM_DEFAULT:-hyprland}"
 quickshell_use_vm="${PLUGIN_LOCAL_QUICKSHELL_USE_VM:-1}"
 docker_plugin_dir_name="docker-manager"
@@ -58,14 +59,12 @@ docker_guard_label() {
 quickshell_guard_commands() {
   if [[ "${quickshell_use_vm}" == "1" ]]; then
     cat <<EOF
-${script_dir}/check-quickshell-startup.sh
-${script_dir}/check-clipboard-contracts.sh
-${vm_script_dir}/run-panel-vm-qa.sh --vm ${quickshell_vm_default}
+${structure_verify_script}
+${structure_verify_script} --vm ${quickshell_vm_default}
 EOF
   else
     cat <<EOF
-${script_dir}/check-quickshell-startup.sh
-${script_dir}/check-clipboard-contracts.sh
+${structure_verify_script}
 ${script_dir}/check-panel-runtime.sh --repo-shell
 EOF
   fi
@@ -74,11 +73,11 @@ EOF
 quickshell_guard_label() {
   local guard_cmd="$1"
   case "$guard_cmd" in
-    *"check-quickshell-startup.sh")
-      printf '%s' 'quickshell startup smoke'
+    *"quickshell-structure-verify.sh --vm "*)
+      printf '%s' "quickshell VM-backed exhaustive verification (${quickshell_vm_default})"
       ;;
-    *"check-clipboard-contracts.sh")
-      printf '%s' 'quickshell clipboard contract checks'
+    *"quickshell-structure-verify.sh")
+      printf '%s' 'quickshell fast host verification'
       ;;
     *"run-panel-vm-qa.sh"*)
       printf '%s' "quickshell VM-backed runtime/settings gate (${quickshell_vm_default})"
