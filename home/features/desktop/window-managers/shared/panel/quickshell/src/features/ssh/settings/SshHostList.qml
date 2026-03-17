@@ -112,7 +112,7 @@ Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: hostColumn.implicitHeight + Colors.spacingM * 2
                 radius: Colors.radiusSmall
-                color: editingThisHost ? Colors.withAlpha(Colors.primary, 0.12) : Colors.cardSurface
+                color: editingThisHost ? Colors.primarySubtle : Colors.cardSurface
                 border.color: editingThisHost ? Colors.primary : Colors.border
                 border.width: 1
 

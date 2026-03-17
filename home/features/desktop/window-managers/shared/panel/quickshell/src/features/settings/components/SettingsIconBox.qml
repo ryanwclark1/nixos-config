@@ -12,7 +12,7 @@ Rectangle {
     height: 38
     radius: Colors.radiusSmall
     color: root.active
-        ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.14)
+        ? Colors.withAlpha(Colors.primary, 0.14)
         : Colors.withAlpha(Colors.text, 0.06)
     border.color: root.active
         ? Colors.withAlpha(Colors.primary, 0.6)

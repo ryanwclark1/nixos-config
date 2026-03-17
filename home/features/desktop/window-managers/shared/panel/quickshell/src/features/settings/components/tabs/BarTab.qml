@@ -91,7 +91,7 @@ Item {
                                     implicitWidth: metaText.implicitWidth + 16
                                     implicitHeight: 24
                                     radius: Colors.radiusPill
-                                    color: Colors.withAlpha(Colors.primary, 0.08)
+                                    color: Colors.primaryFaint
                                     border.color: Colors.border
                                     border.width: 1
 

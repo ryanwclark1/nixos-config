@@ -42,7 +42,7 @@ Rectangle {
             top: parent.top
         }
         implicitHeight: headerColumn.implicitHeight + Colors.spacingM * 2
-        color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.06)
+        color: Colors.withAlpha(Colors.primary, 0.06)
 
         ColumnLayout {
             id: headerColumn

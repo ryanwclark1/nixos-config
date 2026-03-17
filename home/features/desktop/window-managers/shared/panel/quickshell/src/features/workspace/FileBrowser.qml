@@ -681,7 +681,7 @@ PanelWindow {
                           // highlight last segment
                           var crumbs = root._buildBreadcrumbs();
                           var isLast = (index === crumbs.length - 1);
-                          if (isLast) return Colors.withAlpha(Colors.primary, 0.18);
+                          if (isLast) return Colors.primaryMid;
                           if (crumbHover.containsMouse) return Colors.withAlpha(Colors.text, 0.08);
                           return "transparent";
                         }

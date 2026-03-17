@@ -140,7 +140,7 @@ Rectangle {
                     implicitWidth: countText.implicitWidth + Colors.spacingM
                     implicitHeight: 22
                     radius: Colors.radiusPill
-                    color: Colors.withAlpha(Colors.primary, 0.08)
+                    color: Colors.primaryFaint
                     visible: root.options.length > 0
 
                     Text {

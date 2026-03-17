@@ -9,6 +9,8 @@ SharedWidgets.BarPill {
     property bool vertical: false
     signal triggerRequested(var triggerItem)
 
+    SharedWidgets.Ref { service: WeatherService }
+
     tooltipText: WeatherService.condition || "Weather"
     onClicked: root.triggerRequested(this)
     contextActions: [

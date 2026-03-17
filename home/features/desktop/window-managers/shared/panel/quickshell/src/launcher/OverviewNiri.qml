@@ -347,6 +347,7 @@ Scope {
 
                                                 // Window list
                                                 Flickable {
+                                                    id: windowFlick
                                                     Layout.fillWidth: true
                                                     Layout.fillHeight: true
                                                     contentHeight: windowCol.height
@@ -354,7 +355,7 @@ Scope {
                                                     flickableDirection: Flickable.VerticalFlick
 
                                                     SharedWidgets.OverscrollGlow {
-                                                        flickable: parent
+                                                        flickable: windowFlick
                                                         glowColor: Colors.primary
                                                     }
 

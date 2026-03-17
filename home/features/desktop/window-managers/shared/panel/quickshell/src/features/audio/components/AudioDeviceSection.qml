@@ -114,7 +114,7 @@ ColumnLayout {
       radius: Colors.radiusMedium
       property bool isDefault: modelData.id === root.defaultDeviceId
       property bool isHovered: deviceHover.containsMouse
-      color: isDefault ? Colors.withAlpha(Colors.primary, 0.16) : (isHovered ? Colors.withAlpha(Colors.primary, 0.12) : Colors.cardSurface)
+      color: isDefault ? Colors.withAlpha(Colors.primary, 0.16) : (isHovered ? Colors.primarySubtle : Colors.cardSurface)
       border.color: isDefault ? Colors.primary : Colors.border
       border.width: 1
       Behavior on color { ColorAnimation { duration: Colors.durationFast } }

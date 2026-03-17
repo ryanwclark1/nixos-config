@@ -31,7 +31,7 @@ Rectangle {
                 width: 30
                 height: 30
                 radius: Colors.radiusMedium
-                color: Colors.withAlpha(Colors.primary, 0.12)
+                color: Colors.primarySubtle
                 border.color: Colors.withAlpha(Colors.primary, 0.24)
                 border.width: 1
 

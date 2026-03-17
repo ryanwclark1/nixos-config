@@ -13,8 +13,8 @@ Rectangle {
     Layout.fillWidth: true
     implicitHeight: contentColumn.implicitHeight + Colors.spacingM * 2
     radius: Colors.radiusMedium
-    color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.07)
-    border.color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.22)
+    color: Colors.withAlpha(Colors.primary, 0.07)
+    border.color: Colors.withAlpha(Colors.primary, 0.22)
     border.width: 1
 
     ColumnLayout {

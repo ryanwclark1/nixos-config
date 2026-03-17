@@ -33,6 +33,12 @@ QtObject {
     readonly property color highlight: withAlpha(primary, 0.25)
     readonly property color highlightLight: withAlpha(primary, 0.15)
 
+    // --- PRIMARY COLOR ALIASES ---
+    readonly property color primaryFaint: withAlpha(primary, 0.08)   // Light hover state
+    readonly property color primarySubtle: withAlpha(primary, 0.12)  // Hover/selected card bg
+    readonly property color primaryMid: withAlpha(primary, 0.18)     // Active chip/button bg
+    readonly property color primaryRing: withAlpha(primary, 0.3)     // Focus ring / emphasis border
+
     // --- GLASSMORPHISM ---
     readonly property real bgOpacity: Config.glassOpacity
     readonly property color bgGlass: withAlpha(background, bgOpacity)

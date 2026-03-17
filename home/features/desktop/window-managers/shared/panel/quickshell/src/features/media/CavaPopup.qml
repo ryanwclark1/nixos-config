@@ -87,7 +87,7 @@ PopupWindow {
         Text {
           anchors.centerIn: parent
           text: root.cavaData
-          color: Colors.withAlpha(Colors.primary, 0.3)
+          color: Colors.primaryRing
           font.pixelSize: root.compactMode ? 30 : 36
           font.letterSpacing: 2
           horizontalAlignment: Text.AlignHCenter

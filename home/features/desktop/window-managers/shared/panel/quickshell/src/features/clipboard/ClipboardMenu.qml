@@ -155,7 +155,7 @@ BasePopupMenu {
           Layout.fillWidth: true
           implicitHeight: clipContent.implicitHeight + 20
           radius: Colors.radiusSmall
-          color: clipMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.12) : Colors.cardSurface
+          color: clipMouse.containsMouse ? Colors.primarySubtle : Colors.cardSurface
           border.color: clipMouse.containsMouse ? Colors.primary : Colors.border
           border.width: 1
           Behavior on color { ColorAnimation { duration: Colors.durationFast } }

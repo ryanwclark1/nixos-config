@@ -238,7 +238,7 @@ BasePopupMenu {
           implicitHeight: visible ? (root.compactMode ? 56 : 46) : 0
           visible: modelData.connected
           radius: Colors.radiusMedium
-          color: modelData.connected ? Colors.withAlpha(Colors.primary, 0.12) : (connHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : Colors.cardSurface)
+          color: modelData.connected ? Colors.primarySubtle : (connHover.containsMouse ? Colors.primaryFaint : Colors.cardSurface)
           border.color: modelData.connected ? Colors.primary : Colors.border
           border.width: 1
 
@@ -310,7 +310,7 @@ BasePopupMenu {
           implicitHeight: visible ? (root.compactMode ? 56 : 46) : 0
           visible: modelData.paired && !modelData.connected
           radius: Colors.radiusMedium
-          color: pairedHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : Colors.cardSurface
+          color: pairedHover.containsMouse ? Colors.primaryFaint : Colors.cardSurface
           border.color: Colors.border
           border.width: 1
 
@@ -401,7 +401,7 @@ BasePopupMenu {
           implicitHeight: visible ? (root.compactMode ? 56 : 46) : 0
           visible: !modelData.paired && !modelData.connected
           radius: Colors.radiusMedium
-          color: availHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : Colors.cardSurface
+          color: availHover.containsMouse ? Colors.primaryFaint : Colors.cardSurface
           border.color: Colors.border
           border.width: 1
 

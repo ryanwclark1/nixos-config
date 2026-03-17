@@ -252,7 +252,7 @@ BasePopupMenu {
         Layout.fillWidth: true
         implicitHeight: root.compactMode ? 78 : 60
         radius: Colors.radiusMedium
-        color: forecastHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : Colors.cardSurface
+        color: forecastHover.containsMouse ? Colors.primaryFaint : Colors.cardSurface
         border.color: forecastHover.containsMouse ? Colors.primary : Colors.border
         border.width: 1
 

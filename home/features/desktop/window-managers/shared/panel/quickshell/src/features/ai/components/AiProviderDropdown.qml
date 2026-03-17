@@ -41,7 +41,7 @@ Rectangle {
                 width: dropdownCol.width - Colors.spacingS * 2
                 height: 26
                 radius: Colors.radiusXXS
-                color: isCurrent ? Colors.withAlpha(Colors.primary, 0.15) : providerItemMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : "transparent"
+                color: isCurrent ? Colors.withAlpha(Colors.primary, 0.15) : providerItemMouse.containsMouse ? Colors.primaryFaint : "transparent"
 
                 RowLayout {
                     anchors.fill: parent
@@ -110,7 +110,7 @@ Rectangle {
                 width: dropdownCol.width - Colors.spacingS * 2
                 height: 26
                 radius: Colors.radiusXXS
-                color: isCurrent ? Colors.withAlpha(Colors.primary, 0.15) : modelItemMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : "transparent"
+                color: isCurrent ? Colors.withAlpha(Colors.primary, 0.15) : modelItemMouse.containsMouse ? Colors.primaryFaint : "transparent"
 
                 Text {
                     anchors.fill: parent

@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Layouts
 import "../services"
 import "../features/system/sections" as Modules
-import "../widgets" as SharedWidgets
 
 ColumnLayout {
     id: root

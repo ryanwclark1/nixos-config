@@ -112,6 +112,12 @@ cleanup_repo_shell() {
   fi
 }
 
+handle_termination() {
+  trap - EXIT TERM INT
+  cleanup_repo_shell
+  exit 124
+}
+
 populate_repo_shell_env() {
   local line key value
   repo_shell_env=()
@@ -639,7 +645,8 @@ main() {
   fi
 
   if (( repo_shell_mode == 1 )); then
-    trap cleanup_repo_shell EXIT TERM INT
+    trap cleanup_repo_shell EXIT
+    trap handle_termination TERM INT
     start_repo_shell
   fi
 

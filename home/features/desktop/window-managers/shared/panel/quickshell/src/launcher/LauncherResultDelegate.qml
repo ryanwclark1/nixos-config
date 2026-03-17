@@ -27,9 +27,9 @@ Rectangle {
     readonly property bool highlighted: index === selectedIndex
     readonly property bool hovered: resultHover.containsMouse && !ignoreMouseHover
 
-    color: highlighted ? Colors.withAlpha(Colors.primary, 0.12) : (hovered ? Colors.withAlpha(Colors.primary, 0.05) : "transparent")
+    color: highlighted ? Colors.primarySubtle : (hovered ? Colors.withAlpha(Colors.primary, 0.05) : "transparent")
     radius: Colors.radiusSmall
-    border.color: highlighted ? Colors.withAlpha(Colors.primary, 0.58) : (hovered ? Colors.withAlpha(Colors.primary, 0.18) : "transparent")
+    border.color: highlighted ? Colors.withAlpha(Colors.primary, 0.58) : (hovered ? Colors.primaryMid : "transparent")
     border.width: highlighted || hovered ? 1 : 0
     scale: highlighted ? 1.012 : (hovered ? 1.004 : 1.0)
 
@@ -167,8 +167,8 @@ Rectangle {
             width: root.compactMode ? 30 : 34
             height: root.compactMode ? 30 : 34
             radius: Colors.radiusXS
-            color: highlighted ? Colors.withAlpha(Colors.primary, 0.14) : (hovered ? Colors.withAlpha(Colors.primary, 0.08) : Colors.surface)
-            border.color: highlighted ? Colors.withAlpha(Colors.primary, 0.3) : "transparent"
+            color: highlighted ? Colors.withAlpha(Colors.primary, 0.14) : (hovered ? Colors.primaryFaint : Colors.surface)
+            border.color: highlighted ? Colors.primaryRing : "transparent"
             border.width: highlighted ? 1 : 0
             scale: highlighted ? 1.04 : 1.0
 
@@ -263,7 +263,7 @@ Rectangle {
                 property string action: root.itemActionLabel(modelData)
                 visible: action !== ""
                 radius: Colors.radiusPill
-                color: highlighted ? Colors.withAlpha(Colors.primary, 0.18) : Colors.surface
+                color: highlighted ? Colors.primaryMid : Colors.surface
                 border.color: Colors.border
                 border.width: 1
                 implicitHeight: 22
@@ -286,7 +286,7 @@ Rectangle {
                 height: root.compactMode ? 24 : 28
                 radius: Colors.radiusMedium
                 visible: highlighted || hovered
-                color: highlighted ? Colors.withAlpha(Colors.primary, 0.18) : "transparent"
+                color: highlighted ? Colors.primaryMid : "transparent"
                 Text {
                     anchors.centerIn: parent
                     text: "󰄮"

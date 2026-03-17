@@ -234,7 +234,7 @@ PanelWindow {
                     height: 24
                     radius: Colors.radiusXXS
                     color: providerPickerMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.1) : "transparent"
-                    border.color: providerPickerMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.3) : "transparent"
+                    border.color: providerPickerMouse.containsMouse ? Colors.primaryRing : "transparent"
                     border.width: 1
 
                     Text {
@@ -341,7 +341,7 @@ PanelWindow {
                     height: 28
                     radius: Colors.radiusXS
                     color: newChatHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.1) : "transparent"
-                    border.color: newChatHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.3) : "transparent"
+                    border.color: newChatHover.containsMouse ? Colors.primaryRing : "transparent"
                     border.width: 1
 
                     Text {
@@ -681,7 +681,7 @@ PanelWindow {
                                 height: 24
                                 color: Colors.withAlpha(Colors.primary, 0.15)
                                 radius: Colors.radiusSmall
-                                border.color: Colors.withAlpha(Colors.primary, 0.3)
+                                border.color: Colors.primaryRing
                                 border.width: 1
 
                                 RowLayout {
@@ -724,7 +724,7 @@ PanelWindow {
                             width: 24
                             height: 24
                             radius: Colors.radiusXXS
-                            color: root.includeWindowContext ? Colors.withAlpha(Colors.primary, 0.18) : "transparent"
+                            color: root.includeWindowContext ? Colors.primaryMid : "transparent"
                             border.color: root.includeWindowContext ? Colors.primary : Colors.border
                             border.width: 1
 
@@ -756,7 +756,7 @@ PanelWindow {
                             width: 24
                             height: 24
                             radius: Colors.radiusXXS
-                            color: root.includeVisualContext ? Colors.withAlpha(Colors.primary, 0.18) : "transparent"
+                            color: root.includeVisualContext ? Colors.primaryMid : "transparent"
                             border.color: root.includeVisualContext ? Colors.primary : Colors.border
                             border.width: 1
 
@@ -806,7 +806,7 @@ PanelWindow {
                             width: 24
                             height: 24
                             radius: Colors.radiusXXS
-                            color: root.includeSelectionContext ? Colors.withAlpha(Colors.primary, 0.18) : "transparent"
+                            color: root.includeSelectionContext ? Colors.primaryMid : "transparent"
                             border.color: root.includeSelectionContext ? Colors.primary : Colors.border
                             border.width: 1
 
@@ -881,7 +881,7 @@ PanelWindow {
                             width: 24
                             height: 24
                             radius: Colors.radiusXXS
-                            color: Config.aiSystemContext ? Colors.withAlpha(Colors.primary, 0.18) : "transparent"
+                            color: Config.aiSystemContext ? Colors.primaryMid : "transparent"
                             border.color: Config.aiSystemContext ? Colors.primary : Colors.border
                             border.width: 1
 
@@ -930,7 +930,7 @@ PanelWindow {
                             width: 32
                             height: 28
                             radius: Colors.radiusXS
-                            color: AiService.isStreaming ? Colors.withAlpha(Colors.error, 0.18) : (inputField.text.trim().length > 0 ? Colors.withAlpha(Colors.primary, 0.18) : "transparent")
+                            color: AiService.isStreaming ? Colors.withAlpha(Colors.error, 0.18) : (inputField.text.trim().length > 0 ? Colors.primaryMid : "transparent")
                             border.color: AiService.isStreaming ? Colors.error : Colors.primary
                             border.width: AiService.isStreaming || inputField.text.trim().length > 0 ? 1 : 0
 

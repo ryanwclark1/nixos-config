@@ -29,7 +29,7 @@ BasePopupMenu {
                 Layout.fillWidth: true
                 implicitHeight: 48
                 radius: Colors.radiusMedium
-                color: mouseArea.containsMouse ? Colors.withAlpha(Colors.primary, 0.12) : Colors.cardSurface
+                color: mouseArea.containsMouse ? Colors.primarySubtle : Colors.cardSurface
                 border.color: mouseArea.containsMouse ? Colors.primary : Colors.border
                 border.width: 1
 

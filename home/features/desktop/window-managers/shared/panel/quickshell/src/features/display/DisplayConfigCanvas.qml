@@ -88,7 +88,7 @@ Item {
         Rectangle {
           anchors.fill: parent
           color: monDelegate.isSelected
-                 ? Colors.withAlpha(Colors.primary, 0.18)
+                 ? Colors.primaryMid
                  : Colors.cardSurface
           border.color: monDelegate.isSelected
                         ? Colors.primary

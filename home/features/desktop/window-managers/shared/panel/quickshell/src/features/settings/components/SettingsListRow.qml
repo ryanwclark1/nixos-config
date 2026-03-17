@@ -16,7 +16,7 @@ Rectangle {
     Layout.fillWidth: true
     implicitHeight: Math.max(minimumHeight, contentRow.implicitHeight + contentInset * 2)
     radius: Colors.radiusXS
-    color: root.active ? Colors.withAlpha(Colors.primary, 0.12) : Colors.cardSurface
+    color: root.active ? Colors.primarySubtle : Colors.cardSurface
     border.color: root.active ? Colors.primary : Colors.border
     border.width: 1
 

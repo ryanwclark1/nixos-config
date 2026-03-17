@@ -17,12 +17,15 @@ QtObject {
     readonly property int suspendTimeout: _onBattery ? Config.powerBatSuspendTimeout : Config.powerAcSuspendTimeout
     readonly property string suspendAction: _onBattery ? Config.powerBatSuspendAction : Config.powerAcSuspendAction
 
+    // ── Named constants ──────────────────────────
+    readonly property int _pollIntervalMs: 10000
+
     // ── Internal ─────────────────────────────────
     property bool _onBattery: false
 
     // Poll power supply status
     property Timer _pollTimer: Timer {
-        interval: 10000
+        interval: root._pollIntervalMs
         running: true
         repeat: true
         triggeredOnStart: true

@@ -33,6 +33,10 @@ QtObject {
     readonly property var outputAppNodes: _buildAppNodes(true)
     readonly property var inputAppNodes: _buildAppNodes(false)
 
+    // ── Named constants ──────────────────────────
+    readonly property int _volumePollMs: 1000
+    readonly property int _postWriteDebounceMs: 120
+
     // ── Subscriber-based (kept for Ref.qml compat, now a no-op) ──
     property int subscriberCount: 0
 
@@ -80,14 +84,14 @@ QtObject {
     }
 
     property Timer volumeTimer: Timer {
-        interval: 1000
+        interval: root._volumePollMs
         running: root.subscriberCount > 0
         repeat: true
         onTriggered: root.refreshVolumes()
     }
 
     property Timer postWriteRefreshTimer: Timer {
-        interval: 120
+        interval: root._postWriteDebounceMs
         repeat: false
         onTriggered: root.refreshVolumes()
     }

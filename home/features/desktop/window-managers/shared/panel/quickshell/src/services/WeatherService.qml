@@ -31,6 +31,10 @@ QtObject {
   readonly property string _windSuffix: _unitMode === "imperial" ? " mph" : " km/h"
   readonly property string _visibilitySuffix: _unitMode === "imperial" ? " mi" : " km"
 
+  // ── Named constants ──────────────────────────
+  readonly property int _refreshIntervalMs: 1800000  // 30 min
+  readonly property int _configDebounceMs: 500
+
   // Deferred activation flag — ensures Timer starts via a false→true transition
   // after the event loop is ready.
   property bool _ready: false
@@ -134,10 +138,15 @@ QtObject {
         try {
           var raw = String(this.text || "").trim();
           if (!raw) throw new Error("empty weather response");
-          var data = JSON.parse(raw);
+          if (raw.indexOf("{") !== 0) throw new Error("response is not JSON");
+          var json = JSON.parse(raw);
+          var data = json.data || json; // Handle wrapped or unwrapped data
 
           var cur = (data.current_condition && data.current_condition.length > 0) ? data.current_condition[0] : null;
-          if (!cur) throw new Error("missing current condition");
+          if (!cur) {
+            console.warn("WeatherService: response missing current_condition:", raw.substring(0, 200));
+            throw new Error("missing current condition");
+          }
 
           var loc = "Local";
           if (data.nearest_area && data.nearest_area[0]) {
@@ -231,7 +240,7 @@ QtObject {
   }
 
   property Timer weatherTimer: Timer {
-    interval: 1800000
+    interval: root._refreshIntervalMs
     running: root._ready && root.subscriberCount > 0
     repeat: true
     triggeredOnStart: true
@@ -241,7 +250,7 @@ QtObject {
   // Debounce config changes — avoids multiple curl requests when several
   // weather settings change in rapid succession (e.g. SettingsHub batch updates).
   property Timer _configDebounce: Timer {
-    interval: 500
+    interval: root._configDebounceMs
     onTriggered: root.refresh()
   }
 

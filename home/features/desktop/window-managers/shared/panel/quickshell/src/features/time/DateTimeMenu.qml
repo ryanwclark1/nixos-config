@@ -74,7 +74,7 @@ BasePopupMenu {
             Layout.fillWidth: true
             implicitHeight: 84
             radius: Colors.radiusMedium
-            color: Colors.withAlpha(Colors.primary, 0.18)
+            color: Colors.primaryMid
             border.color: Colors.withAlpha(Colors.primary, 0.42)
             border.width: 1
 

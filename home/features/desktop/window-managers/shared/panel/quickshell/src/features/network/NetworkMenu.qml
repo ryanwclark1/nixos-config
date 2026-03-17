@@ -39,7 +39,7 @@ BasePopupMenu {
       implicitWidth: wifiStatusLabel.implicitWidth + 20
       height: 28
       radius: Colors.radiusMedium
-      color: NetworkService.wifiRadioEnabled ? Colors.withAlpha(Colors.primary, 0.18) : Colors.chipSurface
+      color: NetworkService.wifiRadioEnabled ? Colors.primaryMid : Colors.chipSurface
       border.color: NetworkService.wifiRadioEnabled ? Colors.primary : Colors.border
       border.width: 1
       Text {
@@ -557,7 +557,7 @@ BasePopupMenu {
                 implicitHeight: 46
                 radius: Colors.radiusMedium
                 color: networkMouse.containsMouse
-                  ? Colors.withAlpha(Colors.primary, 0.12)
+                  ? Colors.primarySubtle
                   : (modelData.active ? Colors.withAlpha(Colors.primary, 0.16) : Colors.cardSurface)
                 border.color: modelData.active ? Colors.primary : Colors.border
                 border.width: 1

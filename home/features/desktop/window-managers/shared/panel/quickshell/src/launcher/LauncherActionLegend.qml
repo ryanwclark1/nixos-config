@@ -29,8 +29,8 @@ RowLayout {
 
         Rectangle {
             radius: Colors.radiusPill
-            color: Colors.withAlpha(Colors.primary, 0.12)
-            border.color: Colors.withAlpha(Colors.primary, 0.3)
+            color: Colors.primarySubtle
+            border.color: Colors.primaryRing
             border.width: 1
             implicitHeight: root.compact ? 22 : 24
             implicitWidth: primaryText.implicitWidth + (root.compact ? 12 : 14)
@@ -66,7 +66,7 @@ RowLayout {
         Rectangle {
             radius: Colors.radiusPill
             color: Colors.surface
-            border.color: Colors.withAlpha(Colors.primary, 0.12)
+            border.color: Colors.primarySubtle
             border.width: 1
             implicitHeight: root.compact ? 22 : 24
             implicitWidth: tertiaryText.implicitWidth + (root.compact ? 12 : 14)

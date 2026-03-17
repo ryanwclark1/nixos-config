@@ -34,7 +34,7 @@ Rectangle {
     Rectangle {
         anchors.fill: parent
         radius: parent.radius
-        color: root._active ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.08) : "transparent"
+        color: root._active ? Colors.primaryFaint : "transparent"
         Behavior on color {
             ColorAnimation {
                 duration: Colors.durationFast

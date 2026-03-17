@@ -67,7 +67,7 @@ Rectangle {
                 Text {
                     width: parent.width
                     text: "󰚩"
-                    color: Colors.withAlpha(Colors.primary, 0.3)
+                    color: Colors.primaryRing
                     font.family: Colors.fontMono
                     font.pixelSize: 48
                     horizontalAlignment: Text.AlignHCenter
@@ -148,7 +148,7 @@ Rectangle {
                             height: visible ? userMsgContent.implicitHeight + Colors.spacingM * 2 : 0
                             radius: Colors.radiusMedium
                             color: Colors.withAlpha(Colors.primary, 0.15)
-                            border.color: Colors.withAlpha(Colors.primary, 0.3)
+                            border.color: Colors.primaryRing
                             border.width: 1
                             anchors.right: parent.right
 

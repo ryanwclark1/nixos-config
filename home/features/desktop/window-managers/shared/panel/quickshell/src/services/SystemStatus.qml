@@ -21,6 +21,13 @@ QtObject {
   readonly property string pluginDoctorScript: "./scripts/plugin-doctor.sh"
   readonly property string incidentRoot: Quickshell.env("HOME") + "/.local/state/quickshell/incidents"
 
+  // ── Named constants ──────────────────────────
+  readonly property int _healthCheckIntervalMs: 300000  // 5 min
+  readonly property int _cpuUsageHighThreshold: 85
+  readonly property int _ramUsageHighThreshold: 90
+  readonly property int _cpuTempHighThreshold: 85
+  readonly property int _gpuTempHighThreshold: 80
+
   property Process _healthProc: Process {
     command: [root.healthCheckScript]
     running: false
@@ -92,7 +99,7 @@ QtObject {
   }
 
   property Timer _healthTimer: Timer {
-    interval: 300000 // 5 minutes
+    interval: root._healthCheckIntervalMs
     running: root.subscriberCount > 0
     repeat: true
     onTriggered: root.refreshHealth()
@@ -104,8 +111,8 @@ QtObject {
   readonly property real cpuUsageNum: parseFloat(cpuUsage) || 0
   readonly property real ramUsageNum: parseFloat(ramUsage) || 0
 
-  readonly property bool hasHighLoad: cpuUsageNum > 85 || ramUsageNum > 90
-  readonly property bool hasHighTemp: cpuTempNum > 85 || gpuTempNum > 80
+  readonly property bool hasHighLoad: cpuUsageNum > _cpuUsageHighThreshold || ramUsageNum > _ramUsageHighThreshold
+  readonly property bool hasHighTemp: cpuTempNum > _cpuTempHighThreshold || gpuTempNum > _gpuTempHighThreshold
   readonly property bool isCritical: hasHighLoad || hasHighTemp || overallStatus === "failure"
 
   property string cpuTemp: "--"

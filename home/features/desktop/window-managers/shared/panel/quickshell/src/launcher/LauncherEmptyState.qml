@@ -20,7 +20,7 @@ Rectangle {
 
     color: Colors.withAlpha(Colors.surface, 0.4)
     radius: Colors.radiusLarge
-    border.color: Colors.withAlpha(Colors.primary, 0.12)
+    border.color: Colors.primarySubtle
     border.width: 1
     Layout.fillWidth: true
     Layout.fillHeight: true

@@ -404,7 +404,7 @@ Item {
                         Layout.fillWidth: true
                         visible: root.sectionWidgets(sectionKey).length === 0
                         radius: Colors.radiusSmall
-                        color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.06)
+                        color: Colors.withAlpha(Colors.primary, 0.06)
                         border.color: root.dragReorderEnabled && root.dragTargetSection === sectionKey && root.dragTargetIndex === 0 ? Colors.primary : Colors.border
                         border.width: root.dragReorderEnabled && root.dragTargetSection === sectionKey && root.dragTargetIndex === 0 ? 2 : 1
                         implicitHeight: emptyDropColumn.implicitHeight + Colors.spacingM * 2

@@ -213,7 +213,7 @@ Item {
                     Layout.preferredWidth: 36
                     Layout.preferredHeight: 36
                     radius: Colors.radiusSmall
-                    color: Colors.withAlpha(Colors.primary, 0.12)
+                    color: Colors.primarySubtle
 
                     Text {
                       anchors.centerIn: parent

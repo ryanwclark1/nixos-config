@@ -168,7 +168,7 @@ Flow {
     id: addWsBtn
     width: root.pillMinWidth; height: root.pillHeight
     radius: Colors.radiusXXS
-    color: addWsHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.12) : Colors.cardSurface
+    color: addWsHover.containsMouse ? Colors.primarySubtle : Colors.cardSurface
     border.color: addWsHover.containsMouse ? Colors.primary : Colors.border
     border.width: 1
     visible: root.showAddButton && (Config.workspaceShowEmpty || root.state.workspaces.length < 10)

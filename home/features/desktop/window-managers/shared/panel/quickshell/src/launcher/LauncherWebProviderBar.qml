@@ -41,7 +41,7 @@ Rectangle {
                     required property var modelData
 
                     readonly property bool selected: String(modelData.key || "") === root.selectedKey
-                    color: selected ? Colors.withAlpha(Colors.primary, 0.18) : Colors.surface
+                    color: selected ? Colors.primaryMid : Colors.surface
                     radius: Colors.radiusPill
                     border.color: selected ? Colors.withAlpha(Colors.primary, 0.6) : Colors.border
                     border.width: 1

@@ -474,7 +474,7 @@ Item {
                         width: root.compactMode ? 32 : 38
                         height: root.compactMode ? 32 : 38
                         radius: Colors.radiusSmall
-                        color: modelData.enabled ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.12) : Colors.withAlpha(Colors.text, 0.06)
+                        color: modelData.enabled ? Colors.primarySubtle : Colors.withAlpha(Colors.text, 0.06)
                         Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
 
                         Text {

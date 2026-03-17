@@ -27,7 +27,7 @@ Rectangle {
             Layout.preferredWidth: 36
             Layout.preferredHeight: 36
             radius: height / 2
-            color: Colors.withAlpha(Colors.primary, 0.12)
+            color: Colors.primarySubtle
 
             Text {
                 anchors.centerIn: parent

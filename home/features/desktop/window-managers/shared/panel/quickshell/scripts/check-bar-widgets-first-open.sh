@@ -75,6 +75,12 @@ cleanup_repo_shell() {
   fi
 }
 
+handle_termination() {
+  trap - EXIT TERM INT
+  cleanup_repo_shell
+  exit 124
+}
+
 populate_repo_shell_env() {
   local line=""
   local key=""
@@ -310,6 +316,7 @@ reenter_txt="${output_dir}/bar-widgets-reenter.txt"
 
 if (( repo_shell_mode == 1 )); then
   trap cleanup_repo_shell EXIT
+  trap handle_termination TERM INT
   load_quickshell_env
   start_repo_shell
 elif (( skip_switch == 0 )); then

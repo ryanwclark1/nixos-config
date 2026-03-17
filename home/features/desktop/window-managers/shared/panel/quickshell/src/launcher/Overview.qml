@@ -167,7 +167,7 @@ Scope {
                                                         visible: modelData.workspace && modelData.workspace.id === workspaceRect.workspaceData.id
                                                         width: visible ? 155 : 0
                                                         height: visible ? 120 : 0
-                                                        color: hoverArea.containsMouse ? Colors.withAlpha(Colors.primary, 0.12) : Colors.highlightLight
+                                                        color: hoverArea.containsMouse ? Colors.primarySubtle : Colors.highlightLight
                                                         radius: Colors.radiusSmall
                                                         border.color: hoverArea.containsMouse ? Colors.primary : Colors.border
                                                         border.width: 1

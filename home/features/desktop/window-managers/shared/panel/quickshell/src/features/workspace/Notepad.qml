@@ -557,7 +557,7 @@ PanelWindow {
                     anchors.fill: parent
                     radius: Colors.radiusXXS
                     color: isActive
-                      ? Colors.withAlpha(Colors.primary, 0.18)
+                      ? Colors.primaryMid
                       : (hasSearchMatch ? Colors.withAlpha(Colors.accent, 0.12) : Colors.bgWidget)
                     border.color: isActive ? Colors.primary : (hasSearchMatch ? Colors.accent : Colors.border)
                     border.width: (isActive || hasSearchMatch) ? 1.5 : 1

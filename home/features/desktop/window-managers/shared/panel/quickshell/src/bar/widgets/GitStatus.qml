@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../services"
-import "../../widgets" as SharedWidgets
 
 Rectangle {
   id: root
@@ -22,7 +21,7 @@ Rectangle {
   implicitHeight: 22
   radius: height / 2
   color: Colors.withAlpha(Colors.primary, 0.15)
-  border.color: Colors.withAlpha(Colors.primary, 0.3)
+  border.color: Colors.primaryRing
   border.width: 1
 
   CommandPoll {

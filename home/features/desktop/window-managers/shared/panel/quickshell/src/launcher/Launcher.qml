@@ -101,7 +101,7 @@ PanelWindow {
     property var fileIndexItems: []
     property bool fileIndexReady: false
     property bool fileIndexBuilding: false
-    property int fileIndexBuiltAt: 0
+    property var fileIndexBuiltAt: 0
     property string transientNoticeText: ""
     readonly property int fileSearchBackendRefreshMs: 180000
     readonly property int fileSearchBackendMissRefreshMs: 20000
@@ -601,7 +601,7 @@ PanelWindow {
     }
 
     property Process fileIndexProc: Process {
-        property int _startedAt: 0
+        property var _startedAt: 0
         running: false
         stdout: StdioCollector {
             onStreamFinished: {
@@ -645,7 +645,7 @@ PanelWindow {
         Process {
             id: _preloadProc
             property string _modeKey: ""
-            property int _startedAt: 0
+            property var _startedAt: 0
             running: false
             stdout: StdioCollector {
                 onStreamFinished: {
@@ -3464,7 +3464,7 @@ PanelWindow {
             height: launcherRoot.tightMode ? 34 : 42
             radius: hudBox.radius
             color: Colors.withAlpha(Colors.surface, 0.98)
-            border.color: Colors.withAlpha(Colors.primary, 0.18)
+            border.color: Colors.primaryMid
             border.width: 1
 
             Rectangle {
@@ -3472,7 +3472,7 @@ PanelWindow {
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 height: 1
-                color: Colors.withAlpha(Colors.primary, 0.18)
+                color: Colors.primaryMid
             }
 
             RowLayout {
@@ -3747,7 +3747,7 @@ PanelWindow {
                 Rectangle {
                     Layout.fillWidth: true
                     visible: launcherRoot.transientNoticeText !== "" && !launcherRoot.tightMode
-                    color: Colors.withAlpha(Colors.primary, 0.12)
+                    color: Colors.primarySubtle
                     radius: Colors.radiusMedium
                     border.color: Colors.withAlpha(Colors.primary, 0.5)
                     border.width: 1
@@ -3874,7 +3874,7 @@ PanelWindow {
 
                                     Rectangle {
                                         radius: Colors.radiusPill
-                                        color: Colors.withAlpha(Colors.primary, 0.12)
+                                        color: Colors.primarySubtle
                                         border.color: Colors.withAlpha(Colors.primary, 0.22)
                                         border.width: 1
                                         implicitHeight: launcherRoot.compactMode ? 18 : 20

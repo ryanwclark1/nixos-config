@@ -163,7 +163,7 @@ BasePopupMenu {
             readonly property bool isPrinting: modelData.status === "printing"
             readonly property bool isHovered: cardHover.containsMouse
 
-            color: isDefault ? Colors.withAlpha(Colors.primary, 0.08) : Colors.cardSurface
+            color: isDefault ? Colors.primaryFaint : Colors.cardSurface
 
             border.color: isDefault ? Colors.withAlpha(Colors.primary, 0.4) : Colors.border
             border.width: 1
@@ -226,7 +226,7 @@ BasePopupMenu {
                       implicitWidth: defaultBadgeLabel.implicitWidth + 12
                       implicitHeight: 18
                       radius: height / 2
-                      color: Colors.withAlpha(Colors.primary, 0.18)
+                      color: Colors.primaryMid
 
                       Text {
                         id: defaultBadgeLabel

@@ -20,7 +20,7 @@ Rectangle {
     implicitWidth: handleSize
     implicitHeight: handleSize
     radius: Colors.radiusSmall
-    color: root.pressed ? Colors.withAlpha(Colors.primary, 0.18) : (root.containsMouse ? Colors.withAlpha(Colors.text, 0.10) : "transparent")
+    color: root.pressed ? Colors.primaryMid : (root.containsMouse ? Colors.withAlpha(Colors.text, 0.10) : "transparent")
     border.color: root.containsMouse ? Colors.border : "transparent"
     border.width: root.containsMouse ? 1 : 0
     opacity: root.enabled ? 1.0 : 0.45

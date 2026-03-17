@@ -29,6 +29,9 @@ QtObject {
     return parts.join(" · ");
   }
 
+  // ── Named constants ──────────────────────────
+  readonly property int _privacyPollMs: 3000
+
   // ── Subscriber-based polling ─────────────────
   // Use Ref { service: PrivacyService } for automatic lifecycle management.
   property int subscriberCount: 0
@@ -39,7 +42,7 @@ QtObject {
   //   cam:   processes holding a /dev/video* device open (via lsof)
   //   share: compositor-specific screen sharing probe from CompositorAdapter
   property var privacyPoll: CommandPoll {
-    interval: 3000
+    interval: root._privacyPollMs
     running: root.subscriberCount > 0
     command: [
       "sh", "-c",

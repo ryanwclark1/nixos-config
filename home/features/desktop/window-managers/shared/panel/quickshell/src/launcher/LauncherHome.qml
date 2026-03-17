@@ -158,7 +158,7 @@ ColumnLayout {
             clip: true
             color: Colors.withAlpha(Colors.surface, 0.4)
             radius: Colors.radiusLarge
-            border.color: Colors.withAlpha(Colors.primary, 0.12)
+            border.color: Colors.primarySubtle
             border.width: 1
             implicitHeight: recentLayout.implicitHeight + (Colors.spacingM * 2)
 
@@ -195,8 +195,8 @@ ColumnLayout {
                             readonly property bool hovered: recentHover.containsMouse
                             readonly property bool selected: root.isSelected(modelData)
                             
-                            color: selected ? Colors.withAlpha(Colors.primary, 0.15) : (hovered ? Colors.withAlpha(Colors.primary, 0.08) : Colors.withAlpha(Colors.surface, 0.3))
-                            border.color: selected ? Colors.primary : (hovered ? Colors.withAlpha(Colors.primary, 0.3) : "transparent")
+                            color: selected ? Colors.withAlpha(Colors.primary, 0.15) : (hovered ? Colors.primaryFaint : Colors.withAlpha(Colors.surface, 0.3))
+                            border.color: selected ? Colors.primary : (hovered ? Colors.primaryRing : "transparent")
                             border.width: 1
 
                             ColumnLayout {
@@ -277,7 +277,7 @@ ColumnLayout {
                         radius: Colors.radiusSmall
                         readonly property bool hovered: suggestionHover.containsMouse
                         readonly property bool selected: root.isSelected(modelData)
-                        color: selected ? Colors.withAlpha(Colors.primary, 0.14) : (hovered ? Colors.withAlpha(Colors.primary, 0.08) : "transparent")
+                        color: selected ? Colors.withAlpha(Colors.primary, 0.14) : (hovered ? Colors.primaryFaint : "transparent")
                         border.color: selected ? Colors.withAlpha(Colors.primary, 0.52) : (hovered ? Colors.withAlpha(Colors.primary, 0.28) : "transparent")
                         border.width: selected || hovered ? 1 : 0
                         scale: selected ? 1.01 : (hovered ? 1.008 : 1.0)
@@ -305,7 +305,7 @@ ColumnLayout {
                                 implicitWidth: 28
                                 implicitHeight: 28
                                 radius: Colors.radiusXS
-                                color: selected ? Colors.withAlpha(Colors.primary, 0.14) : (hovered ? Colors.withAlpha(Colors.primary, 0.12) : Colors.surface)
+                                color: selected ? Colors.withAlpha(Colors.primary, 0.14) : (hovered ? Colors.primarySubtle : Colors.surface)
                                 border.color: selected ? Colors.withAlpha(Colors.primary, 0.32) : "transparent"
                                 border.width: selected ? 1 : 0
                                 Layout.alignment: Qt.AlignVCenter
