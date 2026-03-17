@@ -1,0 +1,15 @@
+AltTabSwitcher 1.0 ../../launcher/AltTabSwitcher.qml
+Launcher 1.0 ../../launcher/Launcher.qml
+LauncherActionLegend 1.0 ../../launcher/LauncherActionLegend.qml
+LauncherConfirmDialog 1.0 ../../launcher/LauncherConfirmDialog.qml
+LauncherEmptyState 1.0 ../../launcher/LauncherEmptyState.qml
+LauncherHome 1.0 ../../launcher/LauncherHome.qml
+LauncherMediaView 1.0 ../../launcher/LauncherMediaView.qml
+LauncherResultDelegate 1.0 ../../launcher/LauncherResultDelegate.qml
+LauncherSearchField 1.0 ../../launcher/LauncherSearchField.qml
+LauncherSidebar 1.0 ../../launcher/LauncherSidebar.qml
+LauncherWebHints 1.0 ../../launcher/LauncherWebHints.qml
+LauncherWebProviderBar 1.0 ../../launcher/LauncherWebProviderBar.qml
+OrchestratorView 1.0 ../../launcher/OrchestratorView.qml
+Overview 1.0 ../../launcher/Overview.qml
+OverviewNiri 1.0 ../../launcher/OverviewNiri.qml

@@ -8,7 +8,7 @@ import "../features/color-picker"
 import "../features/control-center"
 import "../features/display"
 import "../features/lock"
-import "../launcher"
+import "../features/launcher"
 import "../features/media"
 import "../features/osd"
 import "../features/notifications"
@@ -199,13 +199,28 @@ Scope {
     Loader {
         id: overview
         active: CompositorAdapter.supportsOverview
-        source: CompositorAdapter.isNiri ? "launcher/OverviewNiri.qml" : "launcher/Overview.qml"
+        sourceComponent: CompositorAdapter.isNiri ? overviewNiriComponent : overviewComponent
     }
 
     Loader {
         id: altTabSwitcher
         active: CompositorAdapter.isNiri && NiriService.available
-        source: "launcher/AltTabSwitcher.qml"
+        sourceComponent: altTabSwitcherComponent
+    }
+
+    Component {
+        id: overviewComponent
+        Overview {}
+    }
+
+    Component {
+        id: overviewNiriComponent
+        OverviewNiri {}
+    }
+
+    Component {
+        id: altTabSwitcherComponent
+        AltTabSwitcher {}
     }
 
     Notifications {
