@@ -3576,9 +3576,9 @@ PanelWindow {
         anchors.topMargin: launcherRoot.edgeMargins.top + launcherRoot.diagnosticViewportOffsetY + Math.max(20, (launcherRoot.usableHeight - height) / 2)
         anchors.leftMargin: launcherRoot.edgeMargins.left + launcherRoot.diagnosticViewportOffsetX + Math.max(20, (launcherRoot.usableWidth - width) / 2)
         
-        color: Colors.bgGlass
+        color: Colors.cardSurface
         radius: Colors.radiusLarge
-        border.color: Colors.withAlpha(Colors.primary, 0.26)
+        border.color: Colors.border
         border.width: 1
         scale: launcherRoot.scaleValue
         transform: Translate {
@@ -3591,23 +3591,14 @@ PanelWindow {
         SharedWidgets.SurfaceGradient {}
 
         Rectangle {
-            anchors.fill: parent
-            anchors.margins: 1
-            radius: Math.max(0, hudBox.radius - 1)
-            color: Colors.cardSurface
-            border.color: Colors.withAlpha(Colors.border, 0.1)
-            border.width: 1
-        }
-
-        Rectangle {
             id: windowChrome
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
-            height: launcherRoot.tightMode ? 34 : 42
+            height: launcherRoot.tightMode ? 34 : 44
             radius: hudBox.radius
             color: Colors.withAlpha(Colors.surface, 0.98)
-            border.color: Colors.primaryMid
+            border.color: Colors.border
             border.width: 1
 
             Rectangle {
@@ -3615,7 +3606,7 @@ PanelWindow {
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 height: 1
-                color: Colors.primaryMid
+                color: Colors.border
             }
 
             RowLayout {
@@ -3625,30 +3616,35 @@ PanelWindow {
                 spacing: launcherRoot.tightMode ? Colors.spacingXS : Colors.spacingS
 
                 Row {
-                    spacing: 6
+                    spacing: 8
                     Repeater {
                         model: [Qt.rgba(0.98, 0.36, 0.31, 0.9), Qt.rgba(0.96, 0.74, 0.28, 0.9), Qt.rgba(0.18, 0.8, 0.44, 0.9)]
                         delegate: Rectangle {
                             required property color modelData
-                            width: 10
-                            height: 10
+                            width: 12
+                            height: 12
                             radius: width / 2
                             color: modelData
                             opacity: 0.9
+                            SharedWidgets.InnerHighlight { highlightOpacity: 0.2 }
                         }
                     }
                 }
+
+                Item { Layout.preferredWidth: Colors.spacingS }
 
                 Text {
                     text: "Launcher"
                     color: Colors.text
                     font.pixelSize: launcherRoot.tightMode ? Colors.fontSizeSmall : Colors.fontSizeMedium
-                    font.weight: Font.DemiBold
+                    font.weight: Font.Black
+                    font.capitalization: Font.AllUppercase
+                    font.letterSpacing: Colors.letterSpacingWide
                 }
 
                 Rectangle {
                     radius: Colors.radiusPill
-                    color: Colors.primaryStrong
+                    color: Colors.primaryMarked
                     border.color: Colors.withAlpha(Colors.primary, 0.35)
                     border.width: 1
                     implicitHeight: launcherRoot.tightMode ? 22 : 24
@@ -3659,8 +3655,9 @@ PanelWindow {
                         anchors.centerIn: parent
                         text: launcherRoot.modeInfo(launcherRoot.mode).label
                         color: Colors.primary
-                        font.pixelSize: Colors.fontSizeXS
-                        font.weight: Font.DemiBold
+                        font.pixelSize: Colors.fontSizeXXS
+                        font.weight: Font.Black
+                        font.capitalization: Font.AllUppercase
                     }
                 }
 
@@ -3670,10 +3667,10 @@ PanelWindow {
 
                 Text {
                     visible: !launcherRoot.tightMode
-                    text: "QuickShell"
+                    text: "V3.0"
                     color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXS
-                    font.letterSpacing: 0.4
+                    font.pixelSize: Colors.fontSizeXXS
+                    font.weight: Font.Black
                 }
             }
         }

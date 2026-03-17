@@ -457,4 +457,24 @@ QtObject {
             }
         }
     }
+
+    onActiveSurfaceIdChanged: {
+        if (!Config._loading && Config.activeSurfaceId !== activeSurfaceId) {
+            Config.activeSurfaceId = activeSurfaceId;
+        }
+    }
+
+    Component.onCompleted: {
+        // Delay recovery slightly to ensure all shell components are ready
+        recoveryTimer.restart();
+    }
+
+    property Timer recoveryTimer: Timer {
+        interval: 350
+        onTriggered: {
+            if (Config.activeSurfaceId && root.surfaceKind(Config.activeSurfaceId) !== "popup") {
+                root.openSurface(Config.activeSurfaceId);
+            }
+        }
+    }
 }

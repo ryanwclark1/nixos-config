@@ -600,6 +600,9 @@ function buildData(config) {
             "maxConversations": config.aiMaxConversations,
             "maxMessages": config.aiMaxMessages
         },
+        "state": {
+            "activeSurfaceId": config.activeSurfaceId
+        },
         "plugins": {
             "disabled": _sanitizeDisabledPlugins(config.disabledPlugins),
             "launcherTriggers": _sanitizePluginMap(config.pluginLauncherTriggers),

@@ -195,14 +195,16 @@ BasePopupMenu {
           id: clipCard
           required property int index
           Layout.fillWidth: true
-          implicitHeight: clipContent.implicitHeight + 20
-          radius: Colors.radiusSmall
-          color: (clipMouse.containsMouse || root.selectedIndex === index) ? Colors.primarySubtle : Colors.cardSurface
-          border.color: (clipMouse.containsMouse || root.selectedIndex === index) ? Colors.primary : Colors.border
+          implicitHeight: 54
+          radius: Colors.radiusMedium
+          color: (clipMouse.containsMouse || root.selectedIndex === index) ? Colors.highlight : Colors.cardSurface
+          border.color: (clipMouse.containsMouse || root.selectedIndex === index) ? Colors.withAlpha(Colors.primary, 0.4) : Colors.border
           border.width: 1
-          Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+          Behavior on color { ColorAnimation { duration: 150 } }
 
-          SharedWidgets.InnerHighlight { hoveredOpacity: 0.25; hovered: clipMouse.containsMouse }
+          readonly property bool isImage: modelData.content && modelData.content.includes("[[ binary data")
+
+          SharedWidgets.InnerHighlight { highlightOpacity: 0.08 }
 
           SharedWidgets.StateLayer {
             id: clipStateLayer
@@ -214,44 +216,40 @@ BasePopupMenu {
             id: clipContent
             anchors.fill: parent
             anchors.margins: Colors.paddingSmall
-            spacing: Colors.spacingS
-
-            Text {
-              text: modelData.content || ""
-              color: Colors.text
-              font.pixelSize: Colors.fontSizeSmall
-              Layout.fillWidth: true
-              maximumLineCount: 2
-              elide: Text.ElideRight
-              wrapMode: Text.WrapAnywhere
-            }
+            spacing: Colors.spacingM
 
             Rectangle {
-              width: 24; height: 24; radius: Colors.radiusCard
-              color: "transparent"
+              width: 32; height: 32; radius: Colors.radiusSmall
+              color: (clipMouse.containsMouse || root.selectedIndex === index) ? Colors.surface : Colors.chipSurface
               Text {
                 anchors.centerIn: parent
-                text: "󰅖"
-                color: deleteHover.containsMouse ? Colors.error : Colors.textDisabled
-                Behavior on color { ColorAnimation { duration: Colors.durationFast } }
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeSmall
+                text: clipCard.isImage ? "󰋩" : "󰅍"
+                color: (clipMouse.containsMouse || root.selectedIndex === index) ? Colors.primary : Colors.textSecondary
+                font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge
               }
-              SharedWidgets.StateLayer {
-                id: deleteStateLayer
-                hovered: deleteHover.containsMouse
-                pressed: deleteHover.pressed
-                stateColor: Colors.error
+            }
+
+            ColumnLayout {
+              Layout.fillWidth: true; spacing: 0
+              Text {
+                text: clipCard.isImage ? "IMAGE DATA" : modelData.content
+                color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium
+                elide: Text.ElideRight; Layout.fillWidth: true
+                font.capitalization: clipCard.isImage ? Font.AllUppercase : Font.MixedCase
+                font.letterSpacing: clipCard.isImage ? 0.5 : 0
               }
-              MouseArea {
-                id: deleteHover
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: (mouse) => {
-                  deleteStateLayer.burst(mouse.x, mouse.y);
-                  root.deleteClipboardItem(modelData);
-                }
+              Text {
+                text: modelData.id || ""
+                color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXXS
+                visible: text !== ""
+              }
+            }
+
+            SharedWidgets.IconButton {
+              icon: "󰎟"; size: 28; iconSize: Colors.fontSizeLarge; iconColor: Colors.textDisabled
+              stateColor: Colors.error
+              onClicked: {
+                root.deleteClipboardItem(modelData);
               }
             }
           }
@@ -259,7 +257,7 @@ BasePopupMenu {
           MouseArea {
             id: clipMouse
             anchors.fill: parent
-            anchors.rightMargin: 36
+            anchors.rightMargin: 40
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
             onEntered: root.selectedIndex = index

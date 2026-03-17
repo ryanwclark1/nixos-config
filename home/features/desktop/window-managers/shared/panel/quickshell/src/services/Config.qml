@@ -241,6 +241,9 @@ QtObject {
 
     // --- STATE RECOVERY ---
     property string activeSurfaceId: ""
+    onActiveSurfaceIdChanged: {
+        if (!_loading) scheduleSave();
+    }
 
     // --- PLUGINS ---
     property var disabledPlugins: []

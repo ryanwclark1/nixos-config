@@ -9,13 +9,13 @@ Rectangle {
     required property var launcher
 
     radius: Colors.radiusLarge
-    color: Colors.popupSurface
-    border.color: Colors.primaryStrong
+    color: Colors.withAlpha(Colors.black, 0.15)
+    border.color: Colors.border
     border.width: 1
 
     // Depth highlight
     SharedWidgets.InnerHighlight {
-        highlightOpacity: 0.2
+        highlightOpacity: 0.1
     }
 
     ColumnLayout {
@@ -28,10 +28,10 @@ Rectangle {
             Layout.fillWidth: true
             spacing: Colors.spacingS
             Rectangle {
-                width: 30
-                height: 30
+                width: 32
+                height: 32
                 radius: Colors.radiusMedium
-                color: Colors.primarySubtle
+                color: Colors.primaryMarked
                 border.color: Colors.withAlpha(Colors.primary, 0.24)
                 border.width: 1
 
@@ -46,16 +46,18 @@ Rectangle {
             ColumnLayout {
                 spacing: 0
                 Text {
-                    text: "Launcher"
+                    text: "NAVIGATE"
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeXL
-                    font.weight: Font.DemiBold
+                    font.pixelSize: Colors.fontSizeXXS
+                    font.weight: Font.Black
+                    font.capitalization: Font.AllUppercase
+                    font.letterSpacing: Colors.letterSpacingWide
                 }
                 Text {
-                    text: "Application Hub"
+                    text: "Quick Hub"
                     color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXS
-                    font.weight: Font.Medium
+                    font.pixelSize: Colors.fontSizeXXS
+                    font.weight: Font.Bold
                 }
             }
         }
@@ -63,10 +65,6 @@ Rectangle {
         Item {
             Layout.preferredHeight: Colors.spacingS
             visible: !root.launcher.sidebarCompact
-        }
-        SharedWidgets.SectionLabel {
-            visible: !root.launcher.sidebarCompact
-            label: "MODES"
         }
 
         Flickable {
@@ -79,62 +77,72 @@ Rectangle {
             ColumnLayout {
                 id: modeColumn
                 width: parent.width
-                spacing: root.launcher.sidebarCompact ? Colors.spacingXS : Colors.paddingSmall
+                spacing: root.launcher.sidebarCompact ? Colors.spacingS : Colors.spacingS
 
                 Repeater {
                     model: root.launcher.primaryModes
                     delegate: Rectangle {
                         Layout.fillWidth: true
-                        implicitHeight: root.launcher.sidebarCompact ? 40 : 44
+                        implicitHeight: root.launcher.sidebarCompact ? 44 : 46
                         radius: Colors.radiusMedium
-                        color: root.launcher.mode === modelData ? Colors.primaryAccent : Colors.withAlpha(Colors.surface, 0.12)
-                        Behavior on color {
-                            ColorAnimation {
-                                duration: Colors.durationFast
-                            }
-                        }
-                        border.color: root.launcher.mode === modelData ? Colors.primary : Colors.withAlpha(Colors.border, 0.28)
+                        readonly property bool isCurrent: root.launcher.mode === modelData
+                        readonly property bool isHovered: modeHover.containsMouse
+                        
+                        color: isCurrent ? Colors.highlight : (isHovered ? Colors.withAlpha(Colors.white, 0.04) : "transparent")
+                        Behavior on color { ColorAnimation { duration: 150 } }
+                        
+                        border.color: isCurrent ? Colors.withAlpha(Colors.primary, 0.4) : (isHovered ? Colors.withAlpha(Colors.border, 0.5) : "transparent")
                         border.width: 1
 
                         RowLayout {
                             anchors.fill: parent
                             anchors.margins: root.launcher.sidebarCompact ? Colors.spacingXS : Colors.paddingSmall
-                            spacing: root.launcher.sidebarCompact ? Colors.spacingXS : Colors.paddingSmall
-                            Text {
-                                text: root.launcher.modeIcons[modelData] || "•"
-                                color: root.launcher.mode === modelData ? Colors.primary : Colors.textSecondary
-                                font.family: Colors.fontMono
-                                font.pixelSize: root.launcher.sidebarCompact ? Colors.fontSizeXL : Colors.fontSizeLarge
-                                Layout.alignment: Qt.AlignVCenter | (root.launcher.sidebarCompact ? Qt.AlignHCenter : Qt.AlignLeft)
+                            spacing: root.launcher.sidebarCompact ? Colors.spacingXS : Colors.paddingMedium
+                            
+                            Rectangle {
+                                Layout.preferredWidth: 30; Layout.preferredHeight: 30
+                                radius: Colors.radiusSmall
+                                color: isCurrent ? Colors.surface : "transparent"
+                                visible: !root.launcher.sidebarCompact
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: root.launcher.modeIcons[modelData] || "•"
+                                    color: isCurrent ? Colors.primary : Colors.textSecondary
+                                    font.family: Colors.fontMono
+                                    font.pixelSize: Colors.fontSizeLarge
+                                }
                             }
+
+                            Text {
+                                visible: root.launcher.sidebarCompact
+                                Layout.alignment: Qt.AlignHCenter
+                                text: root.launcher.modeIcons[modelData] || "•"
+                                color: isCurrent ? Colors.primary : Colors.textSecondary
+                                font.family: Colors.fontMono
+                                font.pixelSize: Colors.fontSizeXL
+                            }
+
                             Text {
                                 visible: !root.launcher.sidebarCompact
                                 Layout.fillWidth: true
                                 Layout.alignment: Qt.AlignVCenter
                                 text: root.launcher.modeInfo(modelData).label
-                                color: root.launcher.mode === modelData ? Colors.text : Colors.textSecondary
+                                color: isCurrent ? Colors.primary : Colors.textSecondary
                                 font.pixelSize: Colors.fontSizeSmall
-                                font.weight: root.launcher.mode === modelData ? Font.Bold : Font.Medium
+                                font.weight: isCurrent ? Font.Black : Font.Medium
+                                font.capitalization: isCurrent ? Font.AllUppercase : Font.MixedCase
+                                font.letterSpacing: isCurrent ? 0.5 : 0
                                 elide: Text.ElideRight
                                 verticalAlignment: Text.AlignVCenter
                             }
                         }
 
-                        SharedWidgets.StateLayer {
-                            id: modeStateLayer
-                            hovered: modeHover.containsMouse
-                            pressed: modeHover.pressed
-                            visible: root.launcher.mode !== modelData
-                        }
                         MouseArea {
                             id: modeHover
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: mouse => {
-                                modeStateLayer.burst(mouse.x, mouse.y);
-                                root.launcher.open(modelData, true);
-                            }
+                            onClicked: root.launcher.open(modelData, true)
                         }
                     }
                 }
@@ -145,33 +153,38 @@ Rectangle {
             id: controlsBox
             Layout.fillWidth: true
             Layout.topMargin: Colors.spacingS
-            implicitHeight: controlsLayout.implicitHeight + (Colors.spacingM * 2)
+            implicitHeight: controlsLayout.implicitHeight + (Colors.paddingMedium * 2)
             radius: Colors.radiusMedium
-            color: Colors.withAlpha(Colors.surface, 0.2)
-            border.color: Colors.primaryAccent
+            color: Colors.withAlpha(Colors.black, 0.1)
+            border.color: Colors.border
             border.width: 1
             visible: Config.launcherShowModeHints && !root.launcher.sidebarCompact
 
             ColumnLayout {
                 id: controlsLayout
                 anchors.fill: parent
-                anchors.margins: Colors.spacingM
-                spacing: Colors.spacingXXS
-                SharedWidgets.SectionLabel {
-                    label: "CONTROLS"
+                anchors.margins: Colors.paddingMedium
+                spacing: 2
+                Text {
+                    text: "SHORTCUTS"
+                    color: Colors.textDisabled
+                    font.pixelSize: Colors.fontSizeXXS
+                    font.weight: Font.Black
+                    font.letterSpacing: Colors.letterSpacingWide
                 }
                 Text {
                     Layout.fillWidth: true
                     text: root.launcher.tabControlHintText
-                    color: Colors.text
-                    font.pixelSize: Colors.fontSizeSmall
+                    color: Colors.textSecondary
+                    font.pixelSize: Colors.fontSizeXXS
+                    font.weight: Font.Bold
                     wrapMode: Text.WordWrap
                 }
                 Text {
                     Layout.fillWidth: true
                     text: root.launcher.launcherControlHintText
-                    color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeXS
+                    color: Colors.textDisabled
+                    font.pixelSize: 10
                     wrapMode: Text.WordWrap
                 }
             }
